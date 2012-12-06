@@ -1,0 +1,780 @@
+
+
+<!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Transitional//EN"
+  "http://www.w3.org/TR/xhtml1/DTD/xhtml1-transitional.dtd">
+
+
+<html xmlns="http://www.w3.org/1999/xhtml">
+  <head>
+    <meta http-equiv="Content-Type" content="text/html; charset=utf-8" />
+    
+    <title>xmodule.capa_module &mdash; MITx 1.0 documentation</title>
+    
+    <link rel="stylesheet" href="../../_static/sphinxdoc.css" type="text/css" />
+    <link rel="stylesheet" href="../../_static/pygments.css" type="text/css" />
+    
+    <script type="text/javascript">
+      var DOCUMENTATION_OPTIONS = {
+        URL_ROOT:    '../../',
+        VERSION:     '1.0',
+        COLLAPSE_INDEX: false,
+        FILE_SUFFIX: '.html',
+        HAS_SOURCE:  true
+      };
+    </script>
+    <script type="text/javascript" src="../../_static/jquery.js"></script>
+    <script type="text/javascript" src="../../_static/underscore.js"></script>
+    <script type="text/javascript" src="../../_static/doctools.js"></script>
+    <script type="text/javascript" src="http://cdn.mathjax.org/mathjax/latest/MathJax.js?config=TeX-AMS-MML_HTMLorMML"></script>
+    <link rel="top" title="MITx 1.0 documentation" href="../../index.html" />
+    <link rel="up" title="Module code" href="../index.html" /> 
+  </head>
+  <body>
+<img src="../../_static/homepage-bg.jpg" alt="Edx logo"  width="100%;"/>
+
+    <div class="related">
+      <h3>Navigation</h3>
+      <ul>
+        <li class="right" style="margin-right: 10px">
+          <a href="../../genindex.html" title="General Index"
+             accesskey="I">index</a></li>
+        <li class="right" >
+          <a href="../../py-modindex.html" title="Python Module Index"
+             >modules</a> |</li>
+        <li><a href="../../index.html">MITx 1.0 documentation</a> &raquo;</li>
+          <li><a href="../index.html" accesskey="U">Module code</a> &raquo;</li> 
+      </ul>
+    </div>
+      <div class="sphinxsidebar">
+        <div class="sphinxsidebarwrapper">
+<div id="searchbox" style="display: none">
+  <h3>Quick search</h3>
+    <form class="search" action="../../search.html" method="get">
+      <input type="text" name="q" />
+      <input type="submit" value="Go" />
+      <input type="hidden" name="check_keywords" value="yes" />
+      <input type="hidden" name="area" value="default" />
+    </form>
+    <p class="searchtip" style="font-size: 90%">
+    Enter search terms or a module, class or function name.
+    </p>
+</div>
+<script type="text/javascript">$('#searchbox').show(0);</script>
+        </div>
+      </div>
+
+    <div class="document">
+      <div class="documentwrapper">
+        <div class="bodywrapper">
+          <div class="body">
+            
+  <h1>Source code for xmodule.capa_module</h1><div class="highlight"><pre>
+<span class="kn">import</span> <span class="nn">cgi</span>
+<span class="kn">import</span> <span class="nn">datetime</span>
+<span class="kn">import</span> <span class="nn">dateutil</span>
+<span class="kn">import</span> <span class="nn">dateutil.parser</span>
+<span class="kn">import</span> <span class="nn">json</span>
+<span class="kn">import</span> <span class="nn">logging</span>
+<span class="kn">import</span> <span class="nn">traceback</span>
+<span class="kn">import</span> <span class="nn">re</span>
+<span class="kn">import</span> <span class="nn">sys</span>
+
+<span class="kn">from</span> <span class="nn">datetime</span> <span class="kn">import</span> <span class="n">timedelta</span>
+<span class="kn">from</span> <span class="nn">lxml</span> <span class="kn">import</span> <span class="n">etree</span>
+<span class="kn">from</span> <span class="nn">lxml.html</span> <span class="kn">import</span> <span class="n">rewrite_links</span>
+<span class="kn">from</span> <span class="nn">pkg_resources</span> <span class="kn">import</span> <span class="n">resource_string</span>
+
+<span class="kn">from</span> <span class="nn">capa.capa_problem</span> <span class="kn">import</span> <span class="n">LoncapaProblem</span>
+<span class="kn">from</span> <span class="nn">capa.responsetypes</span> <span class="kn">import</span> <span class="n">StudentInputError</span>
+<span class="kn">from</span> <span class="nn">capa.util</span> <span class="kn">import</span> <span class="n">convert_files_to_filenames</span>
+<span class="kn">from</span> <span class="nn">progress</span> <span class="kn">import</span> <span class="n">Progress</span>
+<span class="kn">from</span> <span class="nn">xmodule.x_module</span> <span class="kn">import</span> <span class="n">XModule</span>
+<span class="kn">from</span> <span class="nn">xmodule.raw_module</span> <span class="kn">import</span> <span class="n">RawDescriptor</span>
+<span class="kn">from</span> <span class="nn">xmodule.exceptions</span> <span class="kn">import</span> <span class="n">NotFoundError</span>
+
+<span class="n">log</span> <span class="o">=</span> <span class="n">logging</span><span class="o">.</span><span class="n">getLogger</span><span class="p">(</span><span class="s">&quot;mitx.courseware&quot;</span><span class="p">)</span>
+
+<span class="c">#-----------------------------------------------------------------------------</span>
+<span class="n">TIMEDELTA_REGEX</span> <span class="o">=</span> <span class="n">re</span><span class="o">.</span><span class="n">compile</span><span class="p">(</span><span class="s">r&#39;^((?P&lt;days&gt;\d+?) day(?:s?))?(\s)?((?P&lt;hours&gt;\d+?) hour(?:s?))?(\s)?((?P&lt;minutes&gt;\d+?) minute(?:s)?)?(\s)?((?P&lt;seconds&gt;\d+?) second(?:s)?)?$&#39;</span><span class="p">)</span>
+
+
+<div class="viewcode-block" id="only_one"><a class="viewcode-back" href="../../xmodule.html#xmodule.capa_module.only_one">[docs]</a><span class="k">def</span> <span class="nf">only_one</span><span class="p">(</span><span class="n">lst</span><span class="p">,</span> <span class="n">default</span><span class="o">=</span><span class="s">&quot;&quot;</span><span class="p">,</span> <span class="n">process</span><span class="o">=</span><span class="k">lambda</span> <span class="n">x</span><span class="p">:</span> <span class="n">x</span><span class="p">):</span>
+    <span class="sd">&quot;&quot;&quot;</span>
+<span class="sd">    If lst is empty, returns default</span>
+<span class="sd">    If lst has a single element, applies process to that element and returns it</span>
+<span class="sd">    Otherwise, raises an exeception</span>
+<span class="sd">    &quot;&quot;&quot;</span>
+    <span class="k">if</span> <span class="nb">len</span><span class="p">(</span><span class="n">lst</span><span class="p">)</span> <span class="o">==</span> <span class="mi">0</span><span class="p">:</span>
+        <span class="k">return</span> <span class="n">default</span>
+    <span class="k">elif</span> <span class="nb">len</span><span class="p">(</span><span class="n">lst</span><span class="p">)</span> <span class="o">==</span> <span class="mi">1</span><span class="p">:</span>
+        <span class="k">return</span> <span class="n">process</span><span class="p">(</span><span class="n">lst</span><span class="p">[</span><span class="mi">0</span><span class="p">])</span>
+    <span class="k">else</span><span class="p">:</span>
+        <span class="k">raise</span> <span class="ne">Exception</span><span class="p">(</span><span class="s">&#39;Malformed XML&#39;</span><span class="p">)</span>
+
+</div>
+<div class="viewcode-block" id="parse_timedelta"><a class="viewcode-back" href="../../xmodule.html#xmodule.capa_module.parse_timedelta">[docs]</a><span class="k">def</span> <span class="nf">parse_timedelta</span><span class="p">(</span><span class="n">time_str</span><span class="p">):</span>
+    <span class="sd">&quot;&quot;&quot;</span>
+<span class="sd">    time_str: A string with the following components:</span>
+<span class="sd">        &lt;D&gt; day[s] (optional)</span>
+<span class="sd">        &lt;H&gt; hour[s] (optional)</span>
+<span class="sd">        &lt;M&gt; minute[s] (optional)</span>
+<span class="sd">        &lt;S&gt; second[s] (optional)</span>
+
+<span class="sd">    Returns a datetime.timedelta parsed from the string</span>
+<span class="sd">    &quot;&quot;&quot;</span>
+    <span class="n">parts</span> <span class="o">=</span> <span class="n">TIMEDELTA_REGEX</span><span class="o">.</span><span class="n">match</span><span class="p">(</span><span class="n">time_str</span><span class="p">)</span>
+    <span class="k">if</span> <span class="ow">not</span> <span class="n">parts</span><span class="p">:</span>
+        <span class="k">return</span>
+    <span class="n">parts</span> <span class="o">=</span> <span class="n">parts</span><span class="o">.</span><span class="n">groupdict</span><span class="p">()</span>
+    <span class="n">time_params</span> <span class="o">=</span> <span class="p">{}</span>
+    <span class="k">for</span> <span class="p">(</span><span class="n">name</span><span class="p">,</span> <span class="n">param</span><span class="p">)</span> <span class="ow">in</span> <span class="n">parts</span><span class="o">.</span><span class="n">iteritems</span><span class="p">():</span>
+        <span class="k">if</span> <span class="n">param</span><span class="p">:</span>
+            <span class="n">time_params</span><span class="p">[</span><span class="n">name</span><span class="p">]</span> <span class="o">=</span> <span class="nb">int</span><span class="p">(</span><span class="n">param</span><span class="p">)</span>
+    <span class="k">return</span> <span class="n">timedelta</span><span class="p">(</span><span class="o">**</span><span class="n">time_params</span><span class="p">)</span>
+
+</div>
+<span class="k">class</span> <span class="nc">ComplexEncoder</span><span class="p">(</span><span class="n">json</span><span class="o">.</span><span class="n">JSONEncoder</span><span class="p">):</span>
+    <span class="k">def</span> <span class="nf">default</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">obj</span><span class="p">):</span>
+        <span class="k">if</span> <span class="nb">isinstance</span><span class="p">(</span><span class="n">obj</span><span class="p">,</span> <span class="nb">complex</span><span class="p">):</span>
+            <span class="k">return</span> <span class="s">&quot;{real:.7g}{imag:+.7g}*j&quot;</span><span class="o">.</span><span class="n">format</span><span class="p">(</span><span class="n">real</span><span class="o">=</span><span class="n">obj</span><span class="o">.</span><span class="n">real</span><span class="p">,</span> <span class="n">imag</span><span class="o">=</span><span class="n">obj</span><span class="o">.</span><span class="n">imag</span><span class="p">)</span>
+        <span class="k">return</span> <span class="n">json</span><span class="o">.</span><span class="n">JSONEncoder</span><span class="o">.</span><span class="n">default</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">obj</span><span class="p">)</span>
+
+
+<div class="viewcode-block" id="CapaModule"><a class="viewcode-back" href="../../xmodule.html#xmodule.capa_module.CapaModule">[docs]</a><span class="k">class</span> <span class="nc">CapaModule</span><span class="p">(</span><span class="n">XModule</span><span class="p">):</span>
+    <span class="sd">&#39;&#39;&#39;</span>
+<span class="sd">    An XModule implementing LonCapa format problems, implemented by way of</span>
+<span class="sd">    capa.capa_problem.LoncapaProblem</span>
+<span class="sd">    &#39;&#39;&#39;</span>
+    <span class="n">icon_class</span> <span class="o">=</span> <span class="s">&#39;problem&#39;</span>
+
+    <span class="n">js</span> <span class="o">=</span> <span class="p">{</span><span class="s">&#39;coffee&#39;</span><span class="p">:</span> <span class="p">[</span><span class="n">resource_string</span><span class="p">(</span><span class="n">__name__</span><span class="p">,</span> <span class="s">&#39;js/src/capa/display.coffee&#39;</span><span class="p">),</span>
+                     <span class="n">resource_string</span><span class="p">(</span><span class="n">__name__</span><span class="p">,</span> <span class="s">&#39;js/src/collapsible.coffee&#39;</span><span class="p">),</span>
+                     <span class="n">resource_string</span><span class="p">(</span><span class="n">__name__</span><span class="p">,</span> <span class="s">&#39;js/src/javascript_loader.coffee&#39;</span><span class="p">),</span>
+                    <span class="p">],</span>
+          <span class="s">&#39;js&#39;</span><span class="p">:</span> <span class="p">[</span><span class="n">resource_string</span><span class="p">(</span><span class="n">__name__</span><span class="p">,</span> <span class="s">&#39;js/src/capa/imageinput.js&#39;</span><span class="p">),</span>
+                 <span class="n">resource_string</span><span class="p">(</span><span class="n">__name__</span><span class="p">,</span> <span class="s">&#39;js/src/capa/schematic.js&#39;</span><span class="p">)]}</span>
+
+    <span class="n">js_module_name</span> <span class="o">=</span> <span class="s">&quot;Problem&quot;</span>
+    <span class="n">css</span> <span class="o">=</span> <span class="p">{</span><span class="s">&#39;scss&#39;</span><span class="p">:</span> <span class="p">[</span><span class="n">resource_string</span><span class="p">(</span><span class="n">__name__</span><span class="p">,</span> <span class="s">&#39;css/capa/display.scss&#39;</span><span class="p">)]}</span>
+
+    <span class="k">def</span> <span class="nf">__init__</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">system</span><span class="p">,</span> <span class="n">location</span><span class="p">,</span> <span class="n">definition</span><span class="p">,</span> <span class="n">descriptor</span><span class="p">,</span> <span class="n">instance_state</span><span class="o">=</span><span class="bp">None</span><span class="p">,</span>
+                 <span class="n">shared_state</span><span class="o">=</span><span class="bp">None</span><span class="p">,</span> <span class="o">**</span><span class="n">kwargs</span><span class="p">):</span>
+        <span class="n">XModule</span><span class="o">.</span><span class="n">__init__</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">system</span><span class="p">,</span> <span class="n">location</span><span class="p">,</span> <span class="n">definition</span><span class="p">,</span> <span class="n">descriptor</span><span class="p">,</span> <span class="n">instance_state</span><span class="p">,</span>
+                         <span class="n">shared_state</span><span class="p">,</span> <span class="o">**</span><span class="n">kwargs</span><span class="p">)</span>
+
+        <span class="bp">self</span><span class="o">.</span><span class="n">attempts</span> <span class="o">=</span> <span class="mi">0</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">max_attempts</span> <span class="o">=</span> <span class="bp">None</span>
+
+        <span class="n">dom2</span> <span class="o">=</span> <span class="n">etree</span><span class="o">.</span><span class="n">fromstring</span><span class="p">(</span><span class="n">definition</span><span class="p">[</span><span class="s">&#39;data&#39;</span><span class="p">])</span>
+
+        <span class="n">display_due_date_string</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">metadata</span><span class="o">.</span><span class="n">get</span><span class="p">(</span><span class="s">&#39;due&#39;</span><span class="p">,</span> <span class="bp">None</span><span class="p">)</span>
+        <span class="k">if</span> <span class="n">display_due_date_string</span> <span class="ow">is</span> <span class="ow">not</span> <span class="bp">None</span><span class="p">:</span>
+            <span class="bp">self</span><span class="o">.</span><span class="n">display_due_date</span> <span class="o">=</span> <span class="n">dateutil</span><span class="o">.</span><span class="n">parser</span><span class="o">.</span><span class="n">parse</span><span class="p">(</span><span class="n">display_due_date_string</span><span class="p">)</span>
+            <span class="c">#log.debug(&quot;Parsed &quot; + display_due_date_string +</span>
+            <span class="c">#          &quot; to &quot; + str(self.display_due_date))</span>
+        <span class="k">else</span><span class="p">:</span>
+            <span class="bp">self</span><span class="o">.</span><span class="n">display_due_date</span> <span class="o">=</span> <span class="bp">None</span>
+
+        <span class="n">grace_period_string</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">metadata</span><span class="o">.</span><span class="n">get</span><span class="p">(</span><span class="s">&#39;graceperiod&#39;</span><span class="p">,</span> <span class="bp">None</span><span class="p">)</span>
+        <span class="k">if</span> <span class="n">grace_period_string</span> <span class="ow">is</span> <span class="ow">not</span> <span class="bp">None</span> <span class="ow">and</span> <span class="bp">self</span><span class="o">.</span><span class="n">display_due_date</span><span class="p">:</span>
+            <span class="bp">self</span><span class="o">.</span><span class="n">grace_period</span> <span class="o">=</span> <span class="n">parse_timedelta</span><span class="p">(</span><span class="n">grace_period_string</span><span class="p">)</span>
+            <span class="bp">self</span><span class="o">.</span><span class="n">close_date</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">display_due_date</span> <span class="o">+</span> <span class="bp">self</span><span class="o">.</span><span class="n">grace_period</span>
+            <span class="c">#log.debug(&quot;Then parsed &quot; + grace_period_string +</span>
+            <span class="c">#          &quot; to closing date&quot; + str(self.close_date))</span>
+        <span class="k">else</span><span class="p">:</span>
+            <span class="bp">self</span><span class="o">.</span><span class="n">grace_period</span> <span class="o">=</span> <span class="bp">None</span>
+            <span class="bp">self</span><span class="o">.</span><span class="n">close_date</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">display_due_date</span>
+
+        <span class="bp">self</span><span class="o">.</span><span class="n">max_attempts</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">metadata</span><span class="o">.</span><span class="n">get</span><span class="p">(</span><span class="s">&#39;attempts&#39;</span><span class="p">,</span> <span class="bp">None</span><span class="p">)</span>
+        <span class="k">if</span> <span class="bp">self</span><span class="o">.</span><span class="n">max_attempts</span> <span class="ow">is</span> <span class="ow">not</span> <span class="bp">None</span><span class="p">:</span>
+            <span class="bp">self</span><span class="o">.</span><span class="n">max_attempts</span> <span class="o">=</span> <span class="nb">int</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">max_attempts</span><span class="p">)</span>
+
+        <span class="bp">self</span><span class="o">.</span><span class="n">show_answer</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">metadata</span><span class="o">.</span><span class="n">get</span><span class="p">(</span><span class="s">&#39;showanswer&#39;</span><span class="p">,</span> <span class="s">&#39;closed&#39;</span><span class="p">)</span>
+
+        <span class="bp">self</span><span class="o">.</span><span class="n">force_save_button</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">metadata</span><span class="o">.</span><span class="n">get</span><span class="p">(</span><span class="s">&#39;force_save_button&#39;</span><span class="p">,</span> <span class="s">&#39;false&#39;</span><span class="p">)</span>
+
+        <span class="k">if</span> <span class="bp">self</span><span class="o">.</span><span class="n">show_answer</span> <span class="o">==</span> <span class="s">&quot;&quot;</span><span class="p">:</span>
+            <span class="bp">self</span><span class="o">.</span><span class="n">show_answer</span> <span class="o">=</span> <span class="s">&quot;closed&quot;</span>
+
+        <span class="k">if</span> <span class="n">instance_state</span> <span class="ow">is</span> <span class="ow">not</span> <span class="bp">None</span><span class="p">:</span>
+            <span class="n">instance_state</span> <span class="o">=</span> <span class="n">json</span><span class="o">.</span><span class="n">loads</span><span class="p">(</span><span class="n">instance_state</span><span class="p">)</span>
+        <span class="k">if</span> <span class="n">instance_state</span> <span class="ow">is</span> <span class="ow">not</span> <span class="bp">None</span> <span class="ow">and</span> <span class="s">&#39;attempts&#39;</span> <span class="ow">in</span> <span class="n">instance_state</span><span class="p">:</span>
+            <span class="bp">self</span><span class="o">.</span><span class="n">attempts</span> <span class="o">=</span> <span class="n">instance_state</span><span class="p">[</span><span class="s">&#39;attempts&#39;</span><span class="p">]</span>
+
+        <span class="bp">self</span><span class="o">.</span><span class="n">name</span> <span class="o">=</span> <span class="n">only_one</span><span class="p">(</span><span class="n">dom2</span><span class="o">.</span><span class="n">xpath</span><span class="p">(</span><span class="s">&#39;/problem/@name&#39;</span><span class="p">))</span>
+
+        <span class="k">if</span> <span class="bp">self</span><span class="o">.</span><span class="n">rerandomize</span> <span class="o">==</span> <span class="s">&#39;never&#39;</span><span class="p">:</span>
+            <span class="bp">self</span><span class="o">.</span><span class="n">seed</span> <span class="o">=</span> <span class="mi">1</span>
+        <span class="k">elif</span> <span class="bp">self</span><span class="o">.</span><span class="n">rerandomize</span> <span class="o">==</span> <span class="s">&quot;per_student&quot;</span> <span class="ow">and</span> <span class="nb">hasattr</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">system</span><span class="p">,</span> <span class="s">&#39;id&#39;</span><span class="p">):</span>
+            <span class="c"># TODO: This line is badly broken:</span>
+            <span class="c"># (1) We&#39;re passing student ID to xmodule.</span>
+            <span class="c"># (2) There aren&#39;t bins of students.  -- we only want 10 or 20 randomizations, and want to assign students</span>
+            <span class="c"># to these bins, and may not want cohorts.  So e.g. hash(your-id, problem_id) % num_bins.</span>
+            <span class="c">#     - analytics really needs small number of bins.</span>
+            <span class="bp">self</span><span class="o">.</span><span class="n">seed</span> <span class="o">=</span> <span class="n">system</span><span class="o">.</span><span class="n">id</span>
+        <span class="k">else</span><span class="p">:</span>
+            <span class="bp">self</span><span class="o">.</span><span class="n">seed</span> <span class="o">=</span> <span class="bp">None</span>
+
+        <span class="k">try</span><span class="p">:</span>
+            <span class="c"># TODO (vshnayder): move as much as possible of this work and error</span>
+            <span class="c"># checking to descriptor load time</span>
+            <span class="bp">self</span><span class="o">.</span><span class="n">lcp</span> <span class="o">=</span> <span class="n">LoncapaProblem</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">definition</span><span class="p">[</span><span class="s">&#39;data&#39;</span><span class="p">],</span> <span class="bp">self</span><span class="o">.</span><span class="n">location</span><span class="o">.</span><span class="n">html_id</span><span class="p">(),</span>
+                                      <span class="n">instance_state</span><span class="p">,</span> <span class="n">seed</span><span class="o">=</span><span class="bp">self</span><span class="o">.</span><span class="n">seed</span><span class="p">,</span> <span class="n">system</span><span class="o">=</span><span class="bp">self</span><span class="o">.</span><span class="n">system</span><span class="p">)</span>
+        <span class="k">except</span> <span class="ne">Exception</span> <span class="k">as</span> <span class="n">err</span><span class="p">:</span>
+            <span class="n">msg</span> <span class="o">=</span> <span class="s">&#39;cannot create LoncapaProblem {loc}: {err}&#39;</span><span class="o">.</span><span class="n">format</span><span class="p">(</span>
+                <span class="n">loc</span><span class="o">=</span><span class="bp">self</span><span class="o">.</span><span class="n">location</span><span class="o">.</span><span class="n">url</span><span class="p">(),</span> <span class="n">err</span><span class="o">=</span><span class="n">err</span><span class="p">)</span>
+            <span class="c"># TODO (vshnayder): do modules need error handlers too?</span>
+            <span class="c"># We shouldn&#39;t be switching on DEBUG.</span>
+            <span class="k">if</span> <span class="bp">self</span><span class="o">.</span><span class="n">system</span><span class="o">.</span><span class="n">DEBUG</span><span class="p">:</span>
+                <span class="n">log</span><span class="o">.</span><span class="n">warning</span><span class="p">(</span><span class="n">msg</span><span class="p">)</span>
+                <span class="c"># TODO (vshnayder): This logic should be general, not here--and may</span>
+                <span class="c"># want to preserve the data instead of replacing it.</span>
+                <span class="c"># e.g. in the CMS</span>
+                <span class="n">msg</span> <span class="o">=</span> <span class="s">&#39;&lt;p&gt;</span><span class="si">%s</span><span class="s">&lt;/p&gt;&#39;</span> <span class="o">%</span> <span class="n">msg</span><span class="o">.</span><span class="n">replace</span><span class="p">(</span><span class="s">&#39;&lt;&#39;</span><span class="p">,</span> <span class="s">&#39;&amp;lt;&#39;</span><span class="p">)</span>
+                <span class="n">msg</span> <span class="o">+=</span> <span class="s">&#39;&lt;p&gt;&lt;pre&gt;</span><span class="si">%s</span><span class="s">&lt;/pre&gt;&lt;/p&gt;&#39;</span> <span class="o">%</span> <span class="n">traceback</span><span class="o">.</span><span class="n">format_exc</span><span class="p">()</span><span class="o">.</span><span class="n">replace</span><span class="p">(</span><span class="s">&#39;&lt;&#39;</span><span class="p">,</span> <span class="s">&#39;&amp;lt;&#39;</span><span class="p">)</span>
+                <span class="c"># create a dummy problem with error message instead of failing</span>
+                <span class="n">problem_text</span> <span class="o">=</span> <span class="p">(</span><span class="s">&#39;&lt;problem&gt;&lt;text&gt;&lt;span class=&quot;inline-error&quot;&gt;&#39;</span>
+                                <span class="s">&#39;Problem </span><span class="si">%s</span><span class="s"> has an error:&lt;/span&gt;</span><span class="si">%s</span><span class="s">&lt;/text&gt;&lt;/problem&gt;&#39;</span> <span class="o">%</span>
+                                <span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">location</span><span class="o">.</span><span class="n">url</span><span class="p">(),</span> <span class="n">msg</span><span class="p">))</span>
+                <span class="bp">self</span><span class="o">.</span><span class="n">lcp</span> <span class="o">=</span> <span class="n">LoncapaProblem</span><span class="p">(</span>
+                    <span class="n">problem_text</span><span class="p">,</span> <span class="bp">self</span><span class="o">.</span><span class="n">location</span><span class="o">.</span><span class="n">html_id</span><span class="p">(),</span>
+                    <span class="n">instance_state</span><span class="p">,</span> <span class="n">seed</span><span class="o">=</span><span class="bp">self</span><span class="o">.</span><span class="n">seed</span><span class="p">,</span> <span class="n">system</span><span class="o">=</span><span class="bp">self</span><span class="o">.</span><span class="n">system</span><span class="p">)</span>
+            <span class="k">else</span><span class="p">:</span>
+                <span class="c"># add extra info and raise</span>
+                <span class="k">raise</span> <span class="ne">Exception</span><span class="p">(</span><span class="n">msg</span><span class="p">),</span> <span class="bp">None</span><span class="p">,</span> <span class="n">sys</span><span class="o">.</span><span class="n">exc_info</span><span class="p">()[</span><span class="mi">2</span><span class="p">]</span>
+
+    <span class="nd">@property</span>
+<div class="viewcode-block" id="CapaModule.rerandomize"><a class="viewcode-back" href="../../xmodule.html#xmodule.capa_module.CapaModule.rerandomize">[docs]</a>    <span class="k">def</span> <span class="nf">rerandomize</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
+        <span class="sd">&quot;&quot;&quot;</span>
+<span class="sd">        Property accessor that returns self.metadata[&#39;rerandomize&#39;] in a</span>
+<span class="sd">        canonical form</span>
+<span class="sd">        &quot;&quot;&quot;</span>
+        <span class="n">rerandomize</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">metadata</span><span class="o">.</span><span class="n">get</span><span class="p">(</span><span class="s">&#39;rerandomize&#39;</span><span class="p">,</span> <span class="s">&#39;always&#39;</span><span class="p">)</span>
+        <span class="k">if</span> <span class="n">rerandomize</span> <span class="ow">in</span> <span class="p">(</span><span class="s">&quot;&quot;</span><span class="p">,</span> <span class="s">&quot;always&quot;</span><span class="p">,</span> <span class="s">&quot;true&quot;</span><span class="p">):</span>
+            <span class="k">return</span> <span class="s">&quot;always&quot;</span>
+        <span class="k">elif</span> <span class="n">rerandomize</span> <span class="ow">in</span> <span class="p">(</span><span class="s">&quot;false&quot;</span><span class="p">,</span> <span class="s">&quot;per_student&quot;</span><span class="p">):</span>
+            <span class="k">return</span> <span class="s">&quot;per_student&quot;</span>
+        <span class="k">elif</span> <span class="n">rerandomize</span> <span class="o">==</span> <span class="s">&quot;never&quot;</span><span class="p">:</span>
+            <span class="k">return</span> <span class="s">&quot;never&quot;</span>
+        <span class="k">elif</span> <span class="n">rerandomize</span> <span class="o">==</span> <span class="s">&quot;onreset&quot;</span><span class="p">:</span>
+            <span class="k">return</span> <span class="s">&quot;onreset&quot;</span>
+        <span class="k">else</span><span class="p">:</span>
+            <span class="k">raise</span> <span class="ne">Exception</span><span class="p">(</span><span class="s">&quot;Invalid rerandomize attribute &quot;</span> <span class="o">+</span> <span class="n">rerandomize</span><span class="p">)</span>
+</div>
+    <span class="k">def</span> <span class="nf">get_instance_state</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
+        <span class="n">state</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">lcp</span><span class="o">.</span><span class="n">get_state</span><span class="p">()</span>
+        <span class="n">state</span><span class="p">[</span><span class="s">&#39;attempts&#39;</span><span class="p">]</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">attempts</span>
+        <span class="k">return</span> <span class="n">json</span><span class="o">.</span><span class="n">dumps</span><span class="p">(</span><span class="n">state</span><span class="p">)</span>
+
+    <span class="k">def</span> <span class="nf">get_score</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
+        <span class="k">return</span> <span class="bp">self</span><span class="o">.</span><span class="n">lcp</span><span class="o">.</span><span class="n">get_score</span><span class="p">()</span>
+
+    <span class="k">def</span> <span class="nf">max_score</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
+        <span class="k">return</span> <span class="bp">self</span><span class="o">.</span><span class="n">lcp</span><span class="o">.</span><span class="n">get_max_score</span><span class="p">()</span>
+
+<div class="viewcode-block" id="CapaModule.get_progress"><a class="viewcode-back" href="../../xmodule.html#xmodule.capa_module.CapaModule.get_progress">[docs]</a>    <span class="k">def</span> <span class="nf">get_progress</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
+        <span class="sd">&#39;&#39;&#39; For now, just return score / max_score</span>
+<span class="sd">        &#39;&#39;&#39;</span>
+        <span class="n">d</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">get_score</span><span class="p">()</span>
+        <span class="n">score</span> <span class="o">=</span> <span class="n">d</span><span class="p">[</span><span class="s">&#39;score&#39;</span><span class="p">]</span>
+        <span class="n">total</span> <span class="o">=</span> <span class="n">d</span><span class="p">[</span><span class="s">&#39;total&#39;</span><span class="p">]</span>
+        <span class="k">if</span> <span class="n">total</span> <span class="o">&gt;</span> <span class="mi">0</span><span class="p">:</span>
+            <span class="k">try</span><span class="p">:</span>
+                <span class="k">return</span> <span class="n">Progress</span><span class="p">(</span><span class="n">score</span><span class="p">,</span> <span class="n">total</span><span class="p">)</span>
+            <span class="k">except</span> <span class="ne">Exception</span> <span class="k">as</span> <span class="n">err</span><span class="p">:</span>
+                <span class="n">log</span><span class="o">.</span><span class="n">exception</span><span class="p">(</span><span class="s">&quot;Got bad progress&quot;</span><span class="p">)</span>
+                <span class="k">return</span> <span class="bp">None</span>
+        <span class="k">return</span> <span class="bp">None</span>
+</div>
+    <span class="k">def</span> <span class="nf">get_html</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
+        <span class="k">return</span> <span class="bp">self</span><span class="o">.</span><span class="n">system</span><span class="o">.</span><span class="n">render_template</span><span class="p">(</span><span class="s">&#39;problem_ajax.html&#39;</span><span class="p">,</span> <span class="p">{</span>
+            <span class="s">&#39;element_id&#39;</span><span class="p">:</span> <span class="bp">self</span><span class="o">.</span><span class="n">location</span><span class="o">.</span><span class="n">html_id</span><span class="p">(),</span>
+            <span class="s">&#39;id&#39;</span><span class="p">:</span> <span class="bp">self</span><span class="o">.</span><span class="n">id</span><span class="p">,</span>
+            <span class="s">&#39;ajax_url&#39;</span><span class="p">:</span> <span class="bp">self</span><span class="o">.</span><span class="n">system</span><span class="o">.</span><span class="n">ajax_url</span><span class="p">,</span>
+        <span class="p">})</span>
+
+<div class="viewcode-block" id="CapaModule.get_problem_html"><a class="viewcode-back" href="../../xmodule.html#xmodule.capa_module.CapaModule.get_problem_html">[docs]</a>    <span class="k">def</span> <span class="nf">get_problem_html</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">encapsulate</span><span class="o">=</span><span class="bp">True</span><span class="p">):</span>
+        <span class="sd">&#39;&#39;&#39;Return html for the problem.  Adds check, reset, save buttons</span>
+<span class="sd">        as necessary based on the problem config and state.&#39;&#39;&#39;</span>
+
+        <span class="k">try</span><span class="p">:</span>
+            <span class="n">html</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">lcp</span><span class="o">.</span><span class="n">get_html</span><span class="p">()</span>
+        <span class="k">except</span> <span class="ne">Exception</span><span class="p">,</span> <span class="n">err</span><span class="p">:</span>
+            <span class="n">log</span><span class="o">.</span><span class="n">exception</span><span class="p">(</span><span class="n">err</span><span class="p">)</span>
+
+            <span class="c"># TODO (vshnayder): another switch on DEBUG.</span>
+            <span class="k">if</span> <span class="bp">self</span><span class="o">.</span><span class="n">system</span><span class="o">.</span><span class="n">DEBUG</span><span class="p">:</span>
+                <span class="n">msg</span> <span class="o">=</span> <span class="p">(</span>
+                    <span class="s">&#39;[courseware.capa.capa_module] &lt;font size=&quot;+1&quot; color=&quot;red&quot;&gt;&#39;</span>
+                    <span class="s">&#39;Failed to generate HTML for problem </span><span class="si">%s</span><span class="s">&lt;/font&gt;&#39;</span> <span class="o">%</span>
+                    <span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">location</span><span class="o">.</span><span class="n">url</span><span class="p">()))</span>
+                <span class="n">msg</span> <span class="o">+=</span> <span class="s">&#39;&lt;p&gt;Error:&lt;/p&gt;&lt;p&gt;&lt;pre&gt;</span><span class="si">%s</span><span class="s">&lt;/pre&gt;&lt;/p&gt;&#39;</span> <span class="o">%</span> <span class="nb">str</span><span class="p">(</span><span class="n">err</span><span class="p">)</span><span class="o">.</span><span class="n">replace</span><span class="p">(</span><span class="s">&#39;&lt;&#39;</span><span class="p">,</span> <span class="s">&#39;&amp;lt;&#39;</span><span class="p">)</span>
+                <span class="n">msg</span> <span class="o">+=</span> <span class="s">&#39;&lt;p&gt;&lt;pre&gt;</span><span class="si">%s</span><span class="s">&lt;/pre&gt;&lt;/p&gt;&#39;</span> <span class="o">%</span> <span class="n">traceback</span><span class="o">.</span><span class="n">format_exc</span><span class="p">()</span><span class="o">.</span><span class="n">replace</span><span class="p">(</span><span class="s">&#39;&lt;&#39;</span><span class="p">,</span> <span class="s">&#39;&amp;lt;&#39;</span><span class="p">)</span>
+                <span class="n">html</span> <span class="o">=</span> <span class="n">msg</span>
+            <span class="k">else</span><span class="p">:</span>
+                <span class="c"># We&#39;re in non-debug mode, and possibly even in production. We want</span>
+                <span class="c">#   to avoid bricking of problem as much as possible</span>
+
+                <span class="c"># Presumably, student submission has corrupted LoncapaProblem HTML.</span>
+                <span class="c">#   First, pull down all student answers</span>
+                <span class="n">student_answers</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">lcp</span><span class="o">.</span><span class="n">student_answers</span>
+                <span class="n">answer_ids</span> <span class="o">=</span> <span class="n">student_answers</span><span class="o">.</span><span class="n">keys</span><span class="p">()</span>
+
+                <span class="c"># Some inputtypes, such as dynamath, have additional &quot;hidden&quot; state that</span>
+                <span class="c">#   is not exposed to the student. Keep those hidden</span>
+                <span class="c"># TODO: Use regex, e.g. &#39;dynamath&#39; is suffix at end of answer_id</span>
+                <span class="n">hidden_state_keywords</span> <span class="o">=</span> <span class="p">[</span><span class="s">&#39;dynamath&#39;</span><span class="p">]</span>
+                <span class="k">for</span> <span class="n">answer_id</span> <span class="ow">in</span> <span class="n">answer_ids</span><span class="p">:</span>
+                    <span class="k">for</span> <span class="n">hidden_state_keyword</span> <span class="ow">in</span> <span class="n">hidden_state_keywords</span><span class="p">:</span>
+                        <span class="k">if</span> <span class="n">answer_id</span><span class="o">.</span><span class="n">find</span><span class="p">(</span><span class="n">hidden_state_keyword</span><span class="p">)</span> <span class="o">&gt;=</span> <span class="mi">0</span><span class="p">:</span>
+                            <span class="n">student_answers</span><span class="o">.</span><span class="n">pop</span><span class="p">(</span><span class="n">answer_id</span><span class="p">)</span>
+
+                <span class="c">#   Next, generate a fresh LoncapaProblem</span>
+                <span class="bp">self</span><span class="o">.</span><span class="n">lcp</span> <span class="o">=</span> <span class="n">LoncapaProblem</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">definition</span><span class="p">[</span><span class="s">&#39;data&#39;</span><span class="p">],</span> <span class="bp">self</span><span class="o">.</span><span class="n">location</span><span class="o">.</span><span class="n">html_id</span><span class="p">(),</span>
+                               <span class="n">state</span><span class="o">=</span><span class="bp">None</span><span class="p">,</span> <span class="c"># Tabula rasa</span>
+                               <span class="n">seed</span><span class="o">=</span><span class="bp">self</span><span class="o">.</span><span class="n">seed</span><span class="p">,</span> <span class="n">system</span><span class="o">=</span><span class="bp">self</span><span class="o">.</span><span class="n">system</span><span class="p">)</span>
+
+                <span class="c"># Prepend a scary warning to the student</span>
+                <span class="n">warning</span>  <span class="o">=</span> <span class="s">&#39;&lt;div class=&quot;capa_reset&quot;&gt;&#39;</span>\
+                           <span class="s">&#39;&lt;h2&gt;Warning: The problem has been reset to its initial state!&lt;/h2&gt;&#39;</span>\
+                           <span class="s">&#39;The problem</span><span class="se">\&#39;</span><span class="s">s state was corrupted by an invalid submission. &#39;</span> \
+                           <span class="s">&#39;The submission consisted of:&#39;</span>\
+                           <span class="s">&#39;&lt;ul&gt;&#39;</span>
+                <span class="k">for</span> <span class="n">student_answer</span> <span class="ow">in</span> <span class="n">student_answers</span><span class="o">.</span><span class="n">values</span><span class="p">():</span>
+                    <span class="k">if</span> <span class="n">student_answer</span> <span class="o">!=</span> <span class="s">&#39;&#39;</span><span class="p">:</span>
+                        <span class="n">warning</span> <span class="o">+=</span> <span class="s">&#39;&lt;li&gt;&#39;</span> <span class="o">+</span> <span class="n">cgi</span><span class="o">.</span><span class="n">escape</span><span class="p">(</span><span class="n">student_answer</span><span class="p">)</span> <span class="o">+</span> <span class="s">&#39;&lt;/li&gt;&#39;</span>
+                <span class="n">warning</span> <span class="o">+=</span> <span class="s">&#39;&lt;/ul&gt;&#39;</span>\
+                           <span class="s">&#39;If this error persists, please contact the course staff.&#39;</span>\
+                           <span class="s">&#39;&lt;/div&gt;&#39;</span>
+
+                <span class="n">html</span> <span class="o">=</span> <span class="n">warning</span>
+                <span class="k">try</span><span class="p">:</span>
+                    <span class="n">html</span> <span class="o">+=</span> <span class="bp">self</span><span class="o">.</span><span class="n">lcp</span><span class="o">.</span><span class="n">get_html</span><span class="p">()</span>
+                <span class="k">except</span> <span class="ne">Exception</span><span class="p">,</span> <span class="n">err</span><span class="p">:</span> <span class="c"># Couldn&#39;t do it. Give up</span>
+                    <span class="n">log</span><span class="o">.</span><span class="n">exception</span><span class="p">(</span><span class="n">err</span><span class="p">)</span>
+                    <span class="k">raise</span>
+
+        <span class="n">content</span> <span class="o">=</span> <span class="p">{</span><span class="s">&#39;name&#39;</span><span class="p">:</span> <span class="bp">self</span><span class="o">.</span><span class="n">display_name</span><span class="p">,</span>
+                   <span class="s">&#39;html&#39;</span><span class="p">:</span> <span class="n">html</span><span class="p">,</span>
+                   <span class="s">&#39;weight&#39;</span><span class="p">:</span> <span class="bp">self</span><span class="o">.</span><span class="n">descriptor</span><span class="o">.</span><span class="n">weight</span><span class="p">,</span>
+                   <span class="p">}</span>
+
+        <span class="c"># We using strings as truthy values, because the terminology of the</span>
+        <span class="c"># check button is context-specific.</span>
+
+        <span class="c"># Put a &quot;Check&quot; button if unlimited attempts or still some left</span>
+        <span class="k">if</span> <span class="bp">self</span><span class="o">.</span><span class="n">max_attempts</span> <span class="ow">is</span> <span class="bp">None</span> <span class="ow">or</span> <span class="bp">self</span><span class="o">.</span><span class="n">attempts</span> <span class="o">&lt;</span> <span class="bp">self</span><span class="o">.</span><span class="n">max_attempts</span><span class="o">-</span><span class="mi">1</span><span class="p">:</span> 
+            <span class="n">check_button</span> <span class="o">=</span> <span class="s">&quot;Check&quot;</span>
+        <span class="k">else</span><span class="p">:</span>
+            <span class="c"># Will be final check so let user know that</span>
+            <span class="n">check_button</span> <span class="o">=</span> <span class="s">&quot;Final Check&quot;</span> 
+
+        <span class="n">reset_button</span> <span class="o">=</span> <span class="bp">True</span>
+        <span class="n">save_button</span> <span class="o">=</span> <span class="bp">True</span>
+
+        <span class="c"># If we&#39;re after deadline, or user has exhausted attempts,</span>
+        <span class="c"># question is read-only.</span>
+        <span class="k">if</span> <span class="bp">self</span><span class="o">.</span><span class="n">closed</span><span class="p">():</span>
+            <span class="n">check_button</span> <span class="o">=</span> <span class="bp">False</span>
+            <span class="n">reset_button</span> <span class="o">=</span> <span class="bp">False</span>
+            <span class="n">save_button</span> <span class="o">=</span> <span class="bp">False</span>
+
+        <span class="c"># User submitted a problem, and hasn&#39;t reset. We don&#39;t want</span>
+        <span class="c"># more submissions.</span>
+        <span class="k">if</span> <span class="bp">self</span><span class="o">.</span><span class="n">lcp</span><span class="o">.</span><span class="n">done</span> <span class="ow">and</span> <span class="bp">self</span><span class="o">.</span><span class="n">rerandomize</span> <span class="o">==</span> <span class="s">&quot;always&quot;</span><span class="p">:</span>
+            <span class="n">check_button</span> <span class="o">=</span> <span class="bp">False</span>
+            <span class="n">save_button</span> <span class="o">=</span> <span class="bp">False</span>
+
+        <span class="c"># Only show the reset button if pressing it will show different values</span>
+        <span class="k">if</span> <span class="bp">self</span><span class="o">.</span><span class="n">rerandomize</span> <span class="ow">not</span> <span class="ow">in</span> <span class="p">[</span><span class="s">&quot;always&quot;</span><span class="p">,</span> <span class="s">&quot;onreset&quot;</span><span class="p">]:</span>
+            <span class="n">reset_button</span> <span class="o">=</span> <span class="bp">False</span>
+
+        <span class="c"># User hasn&#39;t submitted an answer yet -- we don&#39;t want resets</span>
+        <span class="k">if</span> <span class="ow">not</span> <span class="bp">self</span><span class="o">.</span><span class="n">lcp</span><span class="o">.</span><span class="n">done</span><span class="p">:</span>
+            <span class="n">reset_button</span> <span class="o">=</span> <span class="bp">False</span>
+
+        <span class="c"># We may not need a &quot;save&quot; button if infinite number of attempts and</span>
+        <span class="c"># non-randomized. The problem author can force it. It&#39;s a bit weird for</span>
+        <span class="c"># randomization to control this; should perhaps be cleaned up.</span>
+        <span class="k">if</span> <span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">force_save_button</span> <span class="o">==</span> <span class="s">&quot;false&quot;</span><span class="p">)</span> <span class="ow">and</span> <span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">max_attempts</span> <span class="ow">is</span> <span class="bp">None</span> <span class="ow">and</span> <span class="bp">self</span><span class="o">.</span><span class="n">rerandomize</span> <span class="o">!=</span> <span class="s">&quot;always&quot;</span><span class="p">):</span>
+            <span class="n">save_button</span> <span class="o">=</span> <span class="bp">False</span>
+
+        <span class="n">context</span> <span class="o">=</span> <span class="p">{</span><span class="s">&#39;problem&#39;</span><span class="p">:</span> <span class="n">content</span><span class="p">,</span>
+                   <span class="s">&#39;id&#39;</span><span class="p">:</span> <span class="bp">self</span><span class="o">.</span><span class="n">id</span><span class="p">,</span>
+                   <span class="s">&#39;check_button&#39;</span><span class="p">:</span> <span class="n">check_button</span><span class="p">,</span>
+                   <span class="s">&#39;reset_button&#39;</span><span class="p">:</span> <span class="n">reset_button</span><span class="p">,</span>
+                   <span class="s">&#39;save_button&#39;</span><span class="p">:</span> <span class="n">save_button</span><span class="p">,</span>
+                   <span class="s">&#39;answer_available&#39;</span><span class="p">:</span> <span class="bp">self</span><span class="o">.</span><span class="n">answer_available</span><span class="p">(),</span>
+                   <span class="s">&#39;ajax_url&#39;</span><span class="p">:</span> <span class="bp">self</span><span class="o">.</span><span class="n">system</span><span class="o">.</span><span class="n">ajax_url</span><span class="p">,</span>
+                   <span class="s">&#39;attempts_used&#39;</span><span class="p">:</span> <span class="bp">self</span><span class="o">.</span><span class="n">attempts</span><span class="p">,</span>
+                   <span class="s">&#39;attempts_allowed&#39;</span><span class="p">:</span> <span class="bp">self</span><span class="o">.</span><span class="n">max_attempts</span><span class="p">,</span>
+                   <span class="s">&#39;progress&#39;</span><span class="p">:</span> <span class="bp">self</span><span class="o">.</span><span class="n">get_progress</span><span class="p">(),</span>
+                   <span class="p">}</span>
+
+        <span class="n">html</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">system</span><span class="o">.</span><span class="n">render_template</span><span class="p">(</span><span class="s">&#39;problem.html&#39;</span><span class="p">,</span> <span class="n">context</span><span class="p">)</span>
+        <span class="k">if</span> <span class="n">encapsulate</span><span class="p">:</span>
+            <span class="n">html</span> <span class="o">=</span> <span class="s">&#39;&lt;div id=&quot;problem_{id}&quot; class=&quot;problem&quot; data-url=&quot;{ajax_url}&quot;&gt;&#39;</span><span class="o">.</span><span class="n">format</span><span class="p">(</span>
+                <span class="nb">id</span><span class="o">=</span><span class="bp">self</span><span class="o">.</span><span class="n">location</span><span class="o">.</span><span class="n">html_id</span><span class="p">(),</span> <span class="n">ajax_url</span><span class="o">=</span><span class="bp">self</span><span class="o">.</span><span class="n">system</span><span class="o">.</span><span class="n">ajax_url</span><span class="p">)</span> <span class="o">+</span> <span class="n">html</span> <span class="o">+</span> <span class="s">&quot;&lt;/div&gt;&quot;</span>
+
+        <span class="c"># cdodge: OK, we have to do two rounds of url reference subsitutions</span>
+        <span class="c"># one which uses the &#39;asset library&#39; that is served by the contentstore and the</span>
+        <span class="c"># more global /static/ filesystem based static content.</span>
+        <span class="c"># NOTE: rewrite_content_links is defined in XModule</span>
+        <span class="c"># This is a bit unfortunate and I&#39;m sure we&#39;ll try to considate this into</span>
+        <span class="c"># a one step process.</span>
+        <span class="n">html</span> <span class="o">=</span> <span class="n">rewrite_links</span><span class="p">(</span><span class="n">html</span><span class="p">,</span> <span class="bp">self</span><span class="o">.</span><span class="n">rewrite_content_links</span><span class="p">)</span>
+
+        <span class="c"># now do the substitutions which are filesystem based, e.g. &#39;/static/&#39; prefixes</span>
+        <span class="k">return</span> <span class="bp">self</span><span class="o">.</span><span class="n">system</span><span class="o">.</span><span class="n">replace_urls</span><span class="p">(</span><span class="n">html</span><span class="p">,</span> <span class="bp">self</span><span class="o">.</span><span class="n">metadata</span><span class="p">[</span><span class="s">&#39;data_dir&#39;</span><span class="p">])</span>
+</div>
+<div class="viewcode-block" id="CapaModule.handle_ajax"><a class="viewcode-back" href="../../xmodule.html#xmodule.capa_module.CapaModule.handle_ajax">[docs]</a>    <span class="k">def</span> <span class="nf">handle_ajax</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">dispatch</span><span class="p">,</span> <span class="n">get</span><span class="p">):</span>
+        <span class="sd">&#39;&#39;&#39;</span>
+<span class="sd">        This is called by courseware.module_render, to handle an AJAX call.</span>
+<span class="sd">        &quot;get&quot; is request.POST.</span>
+
+<span class="sd">        Returns a json dictionary:</span>
+<span class="sd">        { &#39;progress_changed&#39; : True/False,</span>
+<span class="sd">          &#39;progress&#39; : &#39;none&#39;/&#39;in_progress&#39;/&#39;done&#39;,</span>
+<span class="sd">          &lt;other request-specific values here &gt; }</span>
+<span class="sd">        &#39;&#39;&#39;</span>
+        <span class="n">handlers</span> <span class="o">=</span> <span class="p">{</span>
+            <span class="s">&#39;problem_get&#39;</span><span class="p">:</span> <span class="bp">self</span><span class="o">.</span><span class="n">get_problem</span><span class="p">,</span>
+            <span class="s">&#39;problem_check&#39;</span><span class="p">:</span> <span class="bp">self</span><span class="o">.</span><span class="n">check_problem</span><span class="p">,</span>
+            <span class="s">&#39;problem_reset&#39;</span><span class="p">:</span> <span class="bp">self</span><span class="o">.</span><span class="n">reset_problem</span><span class="p">,</span>
+            <span class="s">&#39;problem_save&#39;</span><span class="p">:</span> <span class="bp">self</span><span class="o">.</span><span class="n">save_problem</span><span class="p">,</span>
+            <span class="s">&#39;problem_show&#39;</span><span class="p">:</span> <span class="bp">self</span><span class="o">.</span><span class="n">get_answer</span><span class="p">,</span>
+            <span class="s">&#39;score_update&#39;</span><span class="p">:</span> <span class="bp">self</span><span class="o">.</span><span class="n">update_score</span><span class="p">,</span>
+            <span class="p">}</span>
+
+        <span class="k">if</span> <span class="n">dispatch</span> <span class="ow">not</span> <span class="ow">in</span> <span class="n">handlers</span><span class="p">:</span>
+            <span class="k">return</span> <span class="s">&#39;Error&#39;</span>
+
+        <span class="n">before</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">get_progress</span><span class="p">()</span>
+        <span class="n">d</span> <span class="o">=</span> <span class="n">handlers</span><span class="p">[</span><span class="n">dispatch</span><span class="p">](</span><span class="n">get</span><span class="p">)</span>
+        <span class="n">after</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">get_progress</span><span class="p">()</span>
+        <span class="n">d</span><span class="o">.</span><span class="n">update</span><span class="p">({</span>
+            <span class="s">&#39;progress_changed&#39;</span><span class="p">:</span> <span class="n">after</span> <span class="o">!=</span> <span class="n">before</span><span class="p">,</span>
+            <span class="s">&#39;progress_status&#39;</span><span class="p">:</span> <span class="n">Progress</span><span class="o">.</span><span class="n">to_js_status_str</span><span class="p">(</span><span class="n">after</span><span class="p">),</span>
+            <span class="p">})</span>
+        <span class="k">return</span> <span class="n">json</span><span class="o">.</span><span class="n">dumps</span><span class="p">(</span><span class="n">d</span><span class="p">,</span> <span class="n">cls</span><span class="o">=</span><span class="n">ComplexEncoder</span><span class="p">)</span>
+</div>
+<div class="viewcode-block" id="CapaModule.closed"><a class="viewcode-back" href="../../xmodule.html#xmodule.capa_module.CapaModule.closed">[docs]</a>    <span class="k">def</span> <span class="nf">closed</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
+        <span class="sd">&#39;&#39;&#39; Is the student still allowed to submit answers? &#39;&#39;&#39;</span>
+        <span class="k">if</span> <span class="bp">self</span><span class="o">.</span><span class="n">attempts</span> <span class="o">==</span> <span class="bp">self</span><span class="o">.</span><span class="n">max_attempts</span><span class="p">:</span>
+            <span class="k">return</span> <span class="bp">True</span>
+        <span class="k">if</span> <span class="bp">self</span><span class="o">.</span><span class="n">close_date</span> <span class="ow">is</span> <span class="ow">not</span> <span class="bp">None</span> <span class="ow">and</span> <span class="n">datetime</span><span class="o">.</span><span class="n">datetime</span><span class="o">.</span><span class="n">utcnow</span><span class="p">()</span> <span class="o">&gt;</span> <span class="bp">self</span><span class="o">.</span><span class="n">close_date</span><span class="p">:</span>
+            <span class="k">return</span> <span class="bp">True</span>
+
+        <span class="k">return</span> <span class="bp">False</span>
+</div>
+<div class="viewcode-block" id="CapaModule.answer_available"><a class="viewcode-back" href="../../xmodule.html#xmodule.capa_module.CapaModule.answer_available">[docs]</a>    <span class="k">def</span> <span class="nf">answer_available</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
+        <span class="sd">&#39;&#39;&#39; Is the user allowed to see an answer?</span>
+<span class="sd">        &#39;&#39;&#39;</span>
+        <span class="k">if</span> <span class="bp">self</span><span class="o">.</span><span class="n">show_answer</span> <span class="o">==</span> <span class="s">&#39;&#39;</span><span class="p">:</span>
+            <span class="k">return</span> <span class="bp">False</span>
+
+        <span class="k">if</span> <span class="bp">self</span><span class="o">.</span><span class="n">show_answer</span> <span class="o">==</span> <span class="s">&quot;never&quot;</span><span class="p">:</span>
+            <span class="k">return</span> <span class="bp">False</span>
+
+        <span class="c"># Admins can see the answer, unless the problem explicitly prevents it</span>
+        <span class="k">if</span> <span class="bp">self</span><span class="o">.</span><span class="n">system</span><span class="o">.</span><span class="n">user_is_staff</span><span class="p">:</span>
+            <span class="k">return</span> <span class="bp">True</span>
+
+        <span class="k">if</span> <span class="bp">self</span><span class="o">.</span><span class="n">show_answer</span> <span class="o">==</span> <span class="s">&#39;attempted&#39;</span><span class="p">:</span>
+            <span class="k">return</span> <span class="bp">self</span><span class="o">.</span><span class="n">attempts</span> <span class="o">&gt;</span> <span class="mi">0</span>
+
+        <span class="k">if</span> <span class="bp">self</span><span class="o">.</span><span class="n">show_answer</span> <span class="o">==</span> <span class="s">&#39;answered&#39;</span><span class="p">:</span>
+            <span class="k">return</span> <span class="bp">self</span><span class="o">.</span><span class="n">lcp</span><span class="o">.</span><span class="n">done</span>
+
+        <span class="k">if</span> <span class="bp">self</span><span class="o">.</span><span class="n">show_answer</span> <span class="o">==</span> <span class="s">&#39;closed&#39;</span><span class="p">:</span>
+            <span class="k">return</span> <span class="bp">self</span><span class="o">.</span><span class="n">closed</span><span class="p">()</span>
+
+        <span class="k">if</span> <span class="bp">self</span><span class="o">.</span><span class="n">show_answer</span> <span class="o">==</span> <span class="s">&#39;always&#39;</span><span class="p">:</span>
+            <span class="k">return</span> <span class="bp">True</span>
+
+        <span class="k">return</span> <span class="bp">False</span>
+</div>
+<div class="viewcode-block" id="CapaModule.update_score"><a class="viewcode-back" href="../../xmodule.html#xmodule.capa_module.CapaModule.update_score">[docs]</a>    <span class="k">def</span> <span class="nf">update_score</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">get</span><span class="p">):</span>
+        <span class="sd">&quot;&quot;&quot;</span>
+<span class="sd">        Delivers grading response (e.g. from asynchronous code checking) to</span>
+<span class="sd">            the capa problem, so its score can be updated</span>
+
+<span class="sd">        &#39;get&#39; must have a field &#39;response&#39; which is a string that contains the</span>
+<span class="sd">            grader&#39;s response</span>
+
+<span class="sd">        No ajax return is needed. Return empty dict.</span>
+<span class="sd">        &quot;&quot;&quot;</span>
+        <span class="n">queuekey</span> <span class="o">=</span> <span class="n">get</span><span class="p">[</span><span class="s">&#39;queuekey&#39;</span><span class="p">]</span>
+        <span class="n">score_msg</span> <span class="o">=</span> <span class="n">get</span><span class="p">[</span><span class="s">&#39;xqueue_body&#39;</span><span class="p">]</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">lcp</span><span class="o">.</span><span class="n">update_score</span><span class="p">(</span><span class="n">score_msg</span><span class="p">,</span> <span class="n">queuekey</span><span class="p">)</span>
+
+        <span class="k">return</span> <span class="nb">dict</span><span class="p">()</span>  <span class="c"># No AJAX return is needed</span>
+</div>
+<div class="viewcode-block" id="CapaModule.get_answer"><a class="viewcode-back" href="../../xmodule.html#xmodule.capa_module.CapaModule.get_answer">[docs]</a>    <span class="k">def</span> <span class="nf">get_answer</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">get</span><span class="p">):</span>
+        <span class="sd">&#39;&#39;&#39;</span>
+<span class="sd">        For the &quot;show answer&quot; button.</span>
+
+<span class="sd">        Returns the answers: {&#39;answers&#39; : answers}</span>
+<span class="sd">        &#39;&#39;&#39;</span>
+        <span class="n">event_info</span> <span class="o">=</span> <span class="nb">dict</span><span class="p">()</span>
+        <span class="n">event_info</span><span class="p">[</span><span class="s">&#39;problem_id&#39;</span><span class="p">]</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">location</span><span class="o">.</span><span class="n">url</span><span class="p">()</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">system</span><span class="o">.</span><span class="n">track_function</span><span class="p">(</span><span class="s">&#39;show_answer&#39;</span><span class="p">,</span> <span class="n">event_info</span><span class="p">)</span>
+        <span class="k">if</span> <span class="ow">not</span> <span class="bp">self</span><span class="o">.</span><span class="n">answer_available</span><span class="p">():</span>
+            <span class="k">raise</span> <span class="n">NotFoundError</span><span class="p">(</span><span class="s">&#39;Answer is not available&#39;</span><span class="p">)</span>
+        <span class="k">else</span><span class="p">:</span>
+            <span class="n">answers</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">lcp</span><span class="o">.</span><span class="n">get_question_answers</span><span class="p">()</span>
+
+	    <span class="c"># answers (eg &lt;solution&gt;) may have embedded images</span>
+        <span class="c">#   but be careful, some problems are using non-string answer dicts</span>
+        <span class="n">new_answers</span> <span class="o">=</span> <span class="nb">dict</span><span class="p">()</span>
+        <span class="k">for</span> <span class="n">answer_id</span> <span class="ow">in</span> <span class="n">answers</span><span class="p">:</span>
+            <span class="k">try</span><span class="p">:</span>
+                <span class="n">new_answer</span> <span class="o">=</span> <span class="p">{</span><span class="n">answer_id</span><span class="p">:</span> <span class="bp">self</span><span class="o">.</span><span class="n">system</span><span class="o">.</span><span class="n">replace_urls</span><span class="p">(</span><span class="n">answers</span><span class="p">[</span><span class="n">answer_id</span><span class="p">],</span> <span class="bp">self</span><span class="o">.</span><span class="n">metadata</span><span class="p">[</span><span class="s">&#39;data_dir&#39;</span><span class="p">])}</span>
+            <span class="k">except</span> <span class="ne">TypeError</span><span class="p">:</span>
+                <span class="n">log</span><span class="o">.</span><span class="n">debug</span><span class="p">(</span><span class="s">&#39;Unable to perform URL substitution on answers[</span><span class="si">%s</span><span class="s">]: </span><span class="si">%s</span><span class="s">&#39;</span> <span class="o">%</span> <span class="p">(</span><span class="n">answer_id</span><span class="p">,</span> <span class="n">answers</span><span class="p">[</span><span class="n">answer_id</span><span class="p">]))</span>
+                <span class="n">new_answer</span> <span class="o">=</span> <span class="p">{</span><span class="n">answer_id</span><span class="p">:</span> <span class="n">answers</span><span class="p">[</span><span class="n">answer_id</span><span class="p">]}</span>
+            <span class="n">new_answers</span><span class="o">.</span><span class="n">update</span><span class="p">(</span><span class="n">new_answer</span><span class="p">)</span>
+
+        <span class="k">return</span> <span class="p">{</span><span class="s">&#39;answers&#39;</span><span class="p">:</span> <span class="n">new_answers</span><span class="p">}</span>
+
+    <span class="c"># Figure out if we should move these to capa_problem?</span></div>
+<div class="viewcode-block" id="CapaModule.get_problem"><a class="viewcode-back" href="../../xmodule.html#xmodule.capa_module.CapaModule.get_problem">[docs]</a>    <span class="k">def</span> <span class="nf">get_problem</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">get</span><span class="p">):</span>
+        <span class="sd">&#39;&#39;&#39; Return results of get_problem_html, as a simple dict for json-ing.</span>
+<span class="sd">        { &#39;html&#39;: &lt;the-html&gt; }</span>
+
+<span class="sd">            Used if we want to reconfirm we have the right thing e.g. after</span>
+<span class="sd">            several AJAX calls.</span>
+<span class="sd">        &#39;&#39;&#39;</span>
+        <span class="k">return</span> <span class="p">{</span><span class="s">&#39;html&#39;</span><span class="p">:</span> <span class="bp">self</span><span class="o">.</span><span class="n">get_problem_html</span><span class="p">(</span><span class="n">encapsulate</span><span class="o">=</span><span class="bp">False</span><span class="p">)}</span>
+</div>
+    <span class="nd">@staticmethod</span>
+<div class="viewcode-block" id="CapaModule.make_dict_of_responses"><a class="viewcode-back" href="../../xmodule.html#xmodule.capa_module.CapaModule.make_dict_of_responses">[docs]</a>    <span class="k">def</span> <span class="nf">make_dict_of_responses</span><span class="p">(</span><span class="n">get</span><span class="p">):</span>
+        <span class="sd">&#39;&#39;&#39;Make dictionary of student responses (aka &quot;answers&quot;)</span>
+<span class="sd">        get is POST dictionary.</span>
+<span class="sd">        &#39;&#39;&#39;</span>
+        <span class="n">answers</span> <span class="o">=</span> <span class="nb">dict</span><span class="p">()</span>
+        <span class="k">for</span> <span class="n">key</span> <span class="ow">in</span> <span class="n">get</span><span class="p">:</span>
+            <span class="c"># e.g. input_resistor_1 ==&gt; resistor_1</span>
+            <span class="n">_</span><span class="p">,</span> <span class="n">_</span><span class="p">,</span> <span class="n">name</span> <span class="o">=</span> <span class="n">key</span><span class="o">.</span><span class="n">partition</span><span class="p">(</span><span class="s">&#39;_&#39;</span><span class="p">)</span>
+
+            <span class="c"># This allows for answers which require more than one value for</span>
+            <span class="c"># the same form input (e.g. checkbox inputs). The convention is that</span>
+            <span class="c"># if the name ends with &#39;[]&#39; (which looks like an array), then the</span>
+            <span class="c"># answer will be an array.</span>
+            <span class="k">if</span> <span class="ow">not</span> <span class="n">name</span><span class="o">.</span><span class="n">endswith</span><span class="p">(</span><span class="s">&#39;[]&#39;</span><span class="p">):</span>
+                <span class="n">answers</span><span class="p">[</span><span class="n">name</span><span class="p">]</span> <span class="o">=</span> <span class="n">get</span><span class="p">[</span><span class="n">key</span><span class="p">]</span>
+            <span class="k">else</span><span class="p">:</span>
+                <span class="n">name</span> <span class="o">=</span> <span class="n">name</span><span class="p">[:</span><span class="o">-</span><span class="mi">2</span><span class="p">]</span>
+                <span class="n">answers</span><span class="p">[</span><span class="n">name</span><span class="p">]</span> <span class="o">=</span> <span class="n">get</span><span class="o">.</span><span class="n">getlist</span><span class="p">(</span><span class="n">key</span><span class="p">)</span>
+
+        <span class="k">return</span> <span class="n">answers</span>
+</div>
+<div class="viewcode-block" id="CapaModule.check_problem"><a class="viewcode-back" href="../../xmodule.html#xmodule.capa_module.CapaModule.check_problem">[docs]</a>    <span class="k">def</span> <span class="nf">check_problem</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">get</span><span class="p">):</span>
+        <span class="sd">&#39;&#39;&#39; Checks whether answers to a problem are correct, and</span>
+<span class="sd">            returns a map of correct/incorrect answers:</span>
+
+<span class="sd">            {&#39;success&#39; : bool,</span>
+<span class="sd">             &#39;contents&#39; : html}</span>
+<span class="sd">            &#39;&#39;&#39;</span>
+        <span class="n">event_info</span> <span class="o">=</span> <span class="nb">dict</span><span class="p">()</span>
+        <span class="n">event_info</span><span class="p">[</span><span class="s">&#39;state&#39;</span><span class="p">]</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">lcp</span><span class="o">.</span><span class="n">get_state</span><span class="p">()</span>
+        <span class="n">event_info</span><span class="p">[</span><span class="s">&#39;problem_id&#39;</span><span class="p">]</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">location</span><span class="o">.</span><span class="n">url</span><span class="p">()</span>
+
+        <span class="n">answers</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">make_dict_of_responses</span><span class="p">(</span><span class="n">get</span><span class="p">)</span>
+        <span class="n">event_info</span><span class="p">[</span><span class="s">&#39;answers&#39;</span><span class="p">]</span> <span class="o">=</span> <span class="n">convert_files_to_filenames</span><span class="p">(</span><span class="n">answers</span><span class="p">)</span>
+
+        <span class="c"># Too late. Cannot submit</span>
+        <span class="k">if</span> <span class="bp">self</span><span class="o">.</span><span class="n">closed</span><span class="p">():</span>
+            <span class="n">event_info</span><span class="p">[</span><span class="s">&#39;failure&#39;</span><span class="p">]</span> <span class="o">=</span> <span class="s">&#39;closed&#39;</span>
+            <span class="bp">self</span><span class="o">.</span><span class="n">system</span><span class="o">.</span><span class="n">track_function</span><span class="p">(</span><span class="s">&#39;save_problem_check_fail&#39;</span><span class="p">,</span> <span class="n">event_info</span><span class="p">)</span>
+            <span class="k">raise</span> <span class="n">NotFoundError</span><span class="p">(</span><span class="s">&#39;Problem is closed&#39;</span><span class="p">)</span>
+
+        <span class="c"># Problem submitted. Student should reset before checking again</span>
+        <span class="k">if</span> <span class="bp">self</span><span class="o">.</span><span class="n">lcp</span><span class="o">.</span><span class="n">done</span> <span class="ow">and</span> <span class="bp">self</span><span class="o">.</span><span class="n">rerandomize</span> <span class="o">==</span> <span class="s">&quot;always&quot;</span><span class="p">:</span>
+            <span class="n">event_info</span><span class="p">[</span><span class="s">&#39;failure&#39;</span><span class="p">]</span> <span class="o">=</span> <span class="s">&#39;unreset&#39;</span>
+            <span class="bp">self</span><span class="o">.</span><span class="n">system</span><span class="o">.</span><span class="n">track_function</span><span class="p">(</span><span class="s">&#39;save_problem_check_fail&#39;</span><span class="p">,</span> <span class="n">event_info</span><span class="p">)</span>
+            <span class="k">raise</span> <span class="n">NotFoundError</span><span class="p">(</span><span class="s">&#39;Problem must be reset before it can be checked again&#39;</span><span class="p">)</span>
+
+        <span class="c"># Problem queued. Students must wait a specified waittime before they are allowed to submit</span>
+        <span class="k">if</span> <span class="bp">self</span><span class="o">.</span><span class="n">lcp</span><span class="o">.</span><span class="n">is_queued</span><span class="p">():</span>
+            <span class="n">current_time</span> <span class="o">=</span> <span class="n">datetime</span><span class="o">.</span><span class="n">datetime</span><span class="o">.</span><span class="n">now</span><span class="p">()</span>
+            <span class="n">prev_submit_time</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">lcp</span><span class="o">.</span><span class="n">get_recentmost_queuetime</span><span class="p">()</span> 
+            <span class="n">waittime_between_requests</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">system</span><span class="o">.</span><span class="n">xqueue</span><span class="p">[</span><span class="s">&#39;waittime&#39;</span><span class="p">]</span>
+            <span class="k">if</span> <span class="p">(</span><span class="n">current_time</span><span class="o">-</span><span class="n">prev_submit_time</span><span class="p">)</span><span class="o">.</span><span class="n">total_seconds</span><span class="p">()</span> <span class="o">&lt;</span> <span class="n">waittime_between_requests</span><span class="p">:</span>
+                <span class="n">msg</span> <span class="o">=</span> <span class="s">&#39;You must wait at least </span><span class="si">%d</span><span class="s"> seconds between submissions&#39;</span> <span class="o">%</span> <span class="n">waittime_between_requests</span>
+                <span class="k">return</span> <span class="p">{</span><span class="s">&#39;success&#39;</span><span class="p">:</span> <span class="n">msg</span><span class="p">,</span> <span class="s">&#39;html&#39;</span><span class="p">:</span> <span class="s">&#39;&#39;</span><span class="p">}</span> <span class="c"># Prompts a modal dialog in ajax callback </span>
+
+        <span class="k">try</span><span class="p">:</span>
+            <span class="n">old_state</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">lcp</span><span class="o">.</span><span class="n">get_state</span><span class="p">()</span>
+            <span class="n">lcp_id</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">lcp</span><span class="o">.</span><span class="n">problem_id</span>
+            <span class="n">correct_map</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">lcp</span><span class="o">.</span><span class="n">grade_answers</span><span class="p">(</span><span class="n">answers</span><span class="p">)</span>
+        <span class="k">except</span> <span class="n">StudentInputError</span> <span class="k">as</span> <span class="n">inst</span><span class="p">:</span>
+            <span class="n">log</span><span class="o">.</span><span class="n">exception</span><span class="p">(</span><span class="s">&quot;StudentInputError in capa_module:problem_check&quot;</span><span class="p">)</span>
+            <span class="k">return</span> <span class="p">{</span><span class="s">&#39;success&#39;</span><span class="p">:</span> <span class="n">inst</span><span class="o">.</span><span class="n">message</span><span class="p">}</span>
+        <span class="k">except</span> <span class="ne">Exception</span><span class="p">,</span> <span class="n">err</span><span class="p">:</span>
+            <span class="k">if</span> <span class="bp">self</span><span class="o">.</span><span class="n">system</span><span class="o">.</span><span class="n">DEBUG</span><span class="p">:</span>
+                <span class="n">msg</span> <span class="o">=</span> <span class="s">&quot;Error checking problem: &quot;</span> <span class="o">+</span> <span class="nb">str</span><span class="p">(</span><span class="n">err</span><span class="p">)</span>
+                <span class="n">msg</span> <span class="o">+=</span> <span class="s">&#39;</span><span class="se">\n</span><span class="s">Traceback:</span><span class="se">\n</span><span class="s">&#39;</span> <span class="o">+</span> <span class="n">traceback</span><span class="o">.</span><span class="n">format_exc</span><span class="p">()</span>
+                <span class="k">return</span> <span class="p">{</span><span class="s">&#39;success&#39;</span><span class="p">:</span> <span class="n">msg</span><span class="p">}</span>
+            <span class="n">log</span><span class="o">.</span><span class="n">exception</span><span class="p">(</span><span class="s">&quot;Error in capa_module problem checking&quot;</span><span class="p">)</span>
+            <span class="k">raise</span> <span class="ne">Exception</span><span class="p">(</span><span class="s">&quot;error in capa_module&quot;</span><span class="p">)</span>
+
+        <span class="bp">self</span><span class="o">.</span><span class="n">attempts</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">attempts</span> <span class="o">+</span> <span class="mi">1</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">lcp</span><span class="o">.</span><span class="n">done</span> <span class="o">=</span> <span class="bp">True</span>
+
+        <span class="c"># success = correct if ALL questions in this problem are correct</span>
+        <span class="n">success</span> <span class="o">=</span> <span class="s">&#39;correct&#39;</span>
+        <span class="k">for</span> <span class="n">answer_id</span> <span class="ow">in</span> <span class="n">correct_map</span><span class="p">:</span>
+            <span class="k">if</span> <span class="ow">not</span> <span class="n">correct_map</span><span class="o">.</span><span class="n">is_correct</span><span class="p">(</span><span class="n">answer_id</span><span class="p">):</span>
+                <span class="n">success</span> <span class="o">=</span> <span class="s">&#39;incorrect&#39;</span>
+
+        <span class="c"># NOTE: We are logging both full grading and queued-grading submissions. In the latter,</span>
+        <span class="c">#       &#39;success&#39; will always be incorrect</span>
+        <span class="n">event_info</span><span class="p">[</span><span class="s">&#39;correct_map&#39;</span><span class="p">]</span> <span class="o">=</span> <span class="n">correct_map</span><span class="o">.</span><span class="n">get_dict</span><span class="p">()</span>
+        <span class="n">event_info</span><span class="p">[</span><span class="s">&#39;success&#39;</span><span class="p">]</span> <span class="o">=</span> <span class="n">success</span>
+	<span class="n">event_info</span><span class="p">[</span><span class="s">&#39;attempts&#39;</span><span class="p">]</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">attempts</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">system</span><span class="o">.</span><span class="n">track_function</span><span class="p">(</span><span class="s">&#39;save_problem_check&#39;</span><span class="p">,</span> <span class="n">event_info</span><span class="p">)</span>
+
+	<span class="k">if</span> <span class="nb">hasattr</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">system</span><span class="p">,</span><span class="s">&#39;psychometrics_handler&#39;</span><span class="p">):</span>	<span class="c"># update PsychometricsData using callback</span>
+		<span class="bp">self</span><span class="o">.</span><span class="n">system</span><span class="o">.</span><span class="n">psychometrics_handler</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">get_instance_state</span><span class="p">())</span>
+
+        <span class="c"># render problem into HTML</span>
+        <span class="n">html</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">get_problem_html</span><span class="p">(</span><span class="n">encapsulate</span><span class="o">=</span><span class="bp">False</span><span class="p">)</span>
+
+        <span class="k">return</span> <span class="p">{</span><span class="s">&#39;success&#39;</span><span class="p">:</span> <span class="n">success</span><span class="p">,</span>
+                <span class="s">&#39;contents&#39;</span><span class="p">:</span> <span class="n">html</span><span class="p">,</span>
+                <span class="p">}</span>
+</div>
+<div class="viewcode-block" id="CapaModule.save_problem"><a class="viewcode-back" href="../../xmodule.html#xmodule.capa_module.CapaModule.save_problem">[docs]</a>    <span class="k">def</span> <span class="nf">save_problem</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">get</span><span class="p">):</span>
+        <span class="sd">&#39;&#39;&#39;</span>
+<span class="sd">        Save the passed in answers.</span>
+<span class="sd">        Returns a dict { &#39;success&#39; : bool, [&#39;error&#39; : error-msg]},</span>
+<span class="sd">        with the error key only present if success is False.</span>
+<span class="sd">        &#39;&#39;&#39;</span>
+        <span class="n">event_info</span> <span class="o">=</span> <span class="nb">dict</span><span class="p">()</span>
+        <span class="n">event_info</span><span class="p">[</span><span class="s">&#39;state&#39;</span><span class="p">]</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">lcp</span><span class="o">.</span><span class="n">get_state</span><span class="p">()</span>
+        <span class="n">event_info</span><span class="p">[</span><span class="s">&#39;problem_id&#39;</span><span class="p">]</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">location</span><span class="o">.</span><span class="n">url</span><span class="p">()</span>
+
+        <span class="n">answers</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">make_dict_of_responses</span><span class="p">(</span><span class="n">get</span><span class="p">)</span>
+        <span class="n">event_info</span><span class="p">[</span><span class="s">&#39;answers&#39;</span><span class="p">]</span> <span class="o">=</span> <span class="n">answers</span>
+
+        <span class="c"># Too late. Cannot submit</span>
+        <span class="k">if</span> <span class="bp">self</span><span class="o">.</span><span class="n">closed</span><span class="p">():</span>
+            <span class="n">event_info</span><span class="p">[</span><span class="s">&#39;failure&#39;</span><span class="p">]</span> <span class="o">=</span> <span class="s">&#39;closed&#39;</span>
+            <span class="bp">self</span><span class="o">.</span><span class="n">system</span><span class="o">.</span><span class="n">track_function</span><span class="p">(</span><span class="s">&#39;save_problem_fail&#39;</span><span class="p">,</span> <span class="n">event_info</span><span class="p">)</span>
+            <span class="k">return</span> <span class="p">{</span><span class="s">&#39;success&#39;</span><span class="p">:</span> <span class="bp">False</span><span class="p">,</span>
+                    <span class="s">&#39;error&#39;</span><span class="p">:</span> <span class="s">&quot;Problem is closed&quot;</span><span class="p">}</span>
+
+        <span class="c"># Problem submitted. Student should reset before saving</span>
+        <span class="c"># again.</span>
+        <span class="k">if</span> <span class="bp">self</span><span class="o">.</span><span class="n">lcp</span><span class="o">.</span><span class="n">done</span> <span class="ow">and</span> <span class="bp">self</span><span class="o">.</span><span class="n">rerandomize</span> <span class="o">==</span> <span class="s">&quot;always&quot;</span><span class="p">:</span>
+            <span class="n">event_info</span><span class="p">[</span><span class="s">&#39;failure&#39;</span><span class="p">]</span> <span class="o">=</span> <span class="s">&#39;done&#39;</span>
+            <span class="bp">self</span><span class="o">.</span><span class="n">system</span><span class="o">.</span><span class="n">track_function</span><span class="p">(</span><span class="s">&#39;save_problem_fail&#39;</span><span class="p">,</span> <span class="n">event_info</span><span class="p">)</span>
+            <span class="k">return</span> <span class="p">{</span><span class="s">&#39;success&#39;</span><span class="p">:</span> <span class="bp">False</span><span class="p">,</span>
+                    <span class="s">&#39;error&#39;</span><span class="p">:</span> <span class="s">&quot;Problem needs to be reset prior to save.&quot;</span><span class="p">}</span>
+
+        <span class="bp">self</span><span class="o">.</span><span class="n">lcp</span><span class="o">.</span><span class="n">student_answers</span> <span class="o">=</span> <span class="n">answers</span>
+
+        <span class="c"># TODO: should this be save_problem_fail?  Looks like success to me...</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">system</span><span class="o">.</span><span class="n">track_function</span><span class="p">(</span><span class="s">&#39;save_problem_fail&#39;</span><span class="p">,</span> <span class="n">event_info</span><span class="p">)</span>
+        <span class="k">return</span> <span class="p">{</span><span class="s">&#39;success&#39;</span><span class="p">:</span> <span class="bp">True</span><span class="p">}</span>
+</div>
+<div class="viewcode-block" id="CapaModule.reset_problem"><a class="viewcode-back" href="../../xmodule.html#xmodule.capa_module.CapaModule.reset_problem">[docs]</a>    <span class="k">def</span> <span class="nf">reset_problem</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">get</span><span class="p">):</span>
+        <span class="sd">&#39;&#39;&#39; Changes problem state to unfinished -- removes student answers,</span>
+<span class="sd">            and causes problem to rerender itself.</span>
+
+<span class="sd">            Returns problem html as { &#39;html&#39; : html-string }.</span>
+<span class="sd">        &#39;&#39;&#39;</span>
+        <span class="n">event_info</span> <span class="o">=</span> <span class="nb">dict</span><span class="p">()</span>
+        <span class="n">event_info</span><span class="p">[</span><span class="s">&#39;old_state&#39;</span><span class="p">]</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">lcp</span><span class="o">.</span><span class="n">get_state</span><span class="p">()</span>
+        <span class="n">event_info</span><span class="p">[</span><span class="s">&#39;problem_id&#39;</span><span class="p">]</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">location</span><span class="o">.</span><span class="n">url</span><span class="p">()</span>
+
+        <span class="k">if</span> <span class="bp">self</span><span class="o">.</span><span class="n">closed</span><span class="p">():</span>
+            <span class="n">event_info</span><span class="p">[</span><span class="s">&#39;failure&#39;</span><span class="p">]</span> <span class="o">=</span> <span class="s">&#39;closed&#39;</span>
+            <span class="bp">self</span><span class="o">.</span><span class="n">system</span><span class="o">.</span><span class="n">track_function</span><span class="p">(</span><span class="s">&#39;reset_problem_fail&#39;</span><span class="p">,</span> <span class="n">event_info</span><span class="p">)</span>
+            <span class="k">return</span> <span class="p">{</span><span class="s">&#39;success&#39;</span><span class="p">:</span> <span class="bp">False</span><span class="p">,</span>
+                    <span class="s">&#39;error&#39;</span><span class="p">:</span> <span class="s">&quot;Problem is closed&quot;</span><span class="p">}</span>
+
+        <span class="k">if</span> <span class="ow">not</span> <span class="bp">self</span><span class="o">.</span><span class="n">lcp</span><span class="o">.</span><span class="n">done</span><span class="p">:</span>
+            <span class="n">event_info</span><span class="p">[</span><span class="s">&#39;failure&#39;</span><span class="p">]</span> <span class="o">=</span> <span class="s">&#39;not_done&#39;</span>
+            <span class="bp">self</span><span class="o">.</span><span class="n">system</span><span class="o">.</span><span class="n">track_function</span><span class="p">(</span><span class="s">&#39;reset_problem_fail&#39;</span><span class="p">,</span> <span class="n">event_info</span><span class="p">)</span>
+            <span class="k">return</span> <span class="p">{</span><span class="s">&#39;success&#39;</span><span class="p">:</span> <span class="bp">False</span><span class="p">,</span>
+                    <span class="s">&#39;error&#39;</span><span class="p">:</span> <span class="s">&quot;Refresh the page and make an attempt before resetting.&quot;</span><span class="p">}</span>
+
+        <span class="bp">self</span><span class="o">.</span><span class="n">lcp</span><span class="o">.</span><span class="n">do_reset</span><span class="p">()</span>
+        <span class="k">if</span> <span class="bp">self</span><span class="o">.</span><span class="n">rerandomize</span> <span class="ow">in</span> <span class="p">[</span><span class="s">&quot;always&quot;</span><span class="p">,</span> <span class="s">&quot;onreset&quot;</span><span class="p">]:</span>
+            <span class="c"># reset random number generator seed (note the self.lcp.get_state()</span>
+            <span class="c"># in next line)</span>
+            <span class="bp">self</span><span class="o">.</span><span class="n">lcp</span><span class="o">.</span><span class="n">seed</span> <span class="o">=</span> <span class="bp">None</span>
+
+        <span class="bp">self</span><span class="o">.</span><span class="n">lcp</span> <span class="o">=</span> <span class="n">LoncapaProblem</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">definition</span><span class="p">[</span><span class="s">&#39;data&#39;</span><span class="p">],</span>
+                                  <span class="bp">self</span><span class="o">.</span><span class="n">location</span><span class="o">.</span><span class="n">html_id</span><span class="p">(),</span> <span class="bp">self</span><span class="o">.</span><span class="n">lcp</span><span class="o">.</span><span class="n">get_state</span><span class="p">(),</span>
+                                  <span class="n">system</span><span class="o">=</span><span class="bp">self</span><span class="o">.</span><span class="n">system</span><span class="p">)</span>
+
+        <span class="n">event_info</span><span class="p">[</span><span class="s">&#39;new_state&#39;</span><span class="p">]</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">lcp</span><span class="o">.</span><span class="n">get_state</span><span class="p">()</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">system</span><span class="o">.</span><span class="n">track_function</span><span class="p">(</span><span class="s">&#39;reset_problem&#39;</span><span class="p">,</span> <span class="n">event_info</span><span class="p">)</span>
+
+        <span class="k">return</span> <span class="p">{</span><span class="s">&#39;html&#39;</span><span class="p">:</span> <span class="bp">self</span><span class="o">.</span><span class="n">get_problem_html</span><span class="p">(</span><span class="n">encapsulate</span><span class="o">=</span><span class="bp">False</span><span class="p">)}</span>
+
+</div></div>
+<div class="viewcode-block" id="CapaDescriptor"><a class="viewcode-back" href="../../xmodule.html#xmodule.capa_module.CapaDescriptor">[docs]</a><span class="k">class</span> <span class="nc">CapaDescriptor</span><span class="p">(</span><span class="n">RawDescriptor</span><span class="p">):</span>
+    <span class="sd">&quot;&quot;&quot;</span>
+<span class="sd">    Module implementing problems in the LON-CAPA format,</span>
+<span class="sd">    as implemented by capa.capa_problem</span>
+<span class="sd">    &quot;&quot;&quot;</span>
+
+    <span class="n">module_class</span> <span class="o">=</span> <span class="n">CapaModule</span>
+
+    <span class="n">stores_state</span> <span class="o">=</span> <span class="bp">True</span>
+    <span class="n">has_score</span> <span class="o">=</span> <span class="bp">True</span>
+    <span class="n">template_dir_name</span> <span class="o">=</span> <span class="s">&#39;problem&#39;</span>
+
+    <span class="c"># Capa modules have some additional metadata:</span>
+    <span class="c"># TODO (vshnayder): do problems have any other metadata?  Do they</span>
+    <span class="c"># actually use type and points?</span>
+    <span class="n">metadata_attributes</span> <span class="o">=</span> <span class="n">RawDescriptor</span><span class="o">.</span><span class="n">metadata_attributes</span> <span class="o">+</span> <span class="p">(</span><span class="s">&#39;type&#39;</span><span class="p">,</span> <span class="s">&#39;points&#39;</span><span class="p">)</span>
+
+    <span class="c"># VS[compat]</span>
+    <span class="c"># TODO (cpennington): Delete this method once all fall 2012 course are being</span>
+    <span class="c"># edited in the cms</span>
+    <span class="nd">@classmethod</span>
+    <span class="k">def</span> <span class="nf">backcompat_paths</span><span class="p">(</span><span class="n">cls</span><span class="p">,</span> <span class="n">path</span><span class="p">):</span>
+        <span class="k">return</span> <span class="p">[</span>
+            <span class="s">&#39;problems/&#39;</span> <span class="o">+</span> <span class="n">path</span><span class="p">[</span><span class="mi">8</span><span class="p">:],</span>
+            <span class="n">path</span><span class="p">[</span><span class="mi">8</span><span class="p">:],</span>
+        <span class="p">]</span>
+        
+    <span class="k">def</span> <span class="nf">__init__</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="o">*</span><span class="n">args</span><span class="p">,</span> <span class="o">**</span><span class="n">kwargs</span><span class="p">):</span>
+        <span class="nb">super</span><span class="p">(</span><span class="n">CapaDescriptor</span><span class="p">,</span> <span class="bp">self</span><span class="p">)</span><span class="o">.</span><span class="n">__init__</span><span class="p">(</span><span class="o">*</span><span class="n">args</span><span class="p">,</span> <span class="o">**</span><span class="n">kwargs</span><span class="p">)</span>
+        
+        <span class="n">weight_string</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">metadata</span><span class="o">.</span><span class="n">get</span><span class="p">(</span><span class="s">&#39;weight&#39;</span><span class="p">,</span> <span class="bp">None</span><span class="p">)</span>
+        <span class="k">if</span> <span class="n">weight_string</span><span class="p">:</span>
+            <span class="bp">self</span><span class="o">.</span><span class="n">weight</span> <span class="o">=</span> <span class="nb">float</span><span class="p">(</span><span class="n">weight_string</span><span class="p">)</span>
+        <span class="k">else</span><span class="p">:</span>
+            <span class="bp">self</span><span class="o">.</span><span class="n">weight</span> <span class="o">=</span> <span class="bp">None</span></div>
+</pre></div>
+
+          </div>
+        </div>
+      </div>
+      <div class="clearer"></div>
+    </div>
+    <div class="related">
+      <h3>Navigation</h3>
+      <ul>
+        <li class="right" style="margin-right: 10px">
+          <a href="../../genindex.html" title="General Index"
+             >index</a></li>
+        <li class="right" >
+          <a href="../../py-modindex.html" title="Python Module Index"
+             >modules</a> |</li>
+        <li><a href="../../index.html">MITx 1.0 documentation</a> &raquo;</li>
+          <li><a href="../index.html" >Module code</a> &raquo;</li> 
+      </ul>
+    </div>
+    <div class="footer">
+        &copy; Copyright 2012, MITx team.
+      Created using <a href="http://sphinx.pocoo.org/">Sphinx</a> 1.1.3.
+    </div>
+  </body>
+</html>

@@ -1,0 +1,386 @@
+
+
+<!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Transitional//EN"
+  "http://www.w3.org/TR/xhtml1/DTD/xhtml1-transitional.dtd">
+
+
+<html xmlns="http://www.w3.org/1999/xhtml">
+  <head>
+    <meta http-equiv="Content-Type" content="text/html; charset=utf-8" />
+    
+    <title>capa.chem.miller &mdash; MITx 1.0 documentation</title>
+    
+    <link rel="stylesheet" href="../../../_static/sphinxdoc.css" type="text/css" />
+    <link rel="stylesheet" href="../../../_static/pygments.css" type="text/css" />
+    
+    <script type="text/javascript">
+      var DOCUMENTATION_OPTIONS = {
+        URL_ROOT:    '../../../',
+        VERSION:     '1.0',
+        COLLAPSE_INDEX: false,
+        FILE_SUFFIX: '.html',
+        HAS_SOURCE:  true
+      };
+    </script>
+    <script type="text/javascript" src="../../../_static/jquery.js"></script>
+    <script type="text/javascript" src="../../../_static/underscore.js"></script>
+    <script type="text/javascript" src="../../../_static/doctools.js"></script>
+    <script type="text/javascript" src="http://cdn.mathjax.org/mathjax/latest/MathJax.js?config=TeX-AMS-MML_HTMLorMML"></script>
+    <link rel="top" title="MITx 1.0 documentation" href="../../../index.html" />
+    <link rel="up" title="Module code" href="../../index.html" /> 
+  </head>
+  <body>
+<img src="../../../_static/homepage-bg.jpg" alt="Edx logo"  width="100%;"/>
+
+    <div class="related">
+      <h3>Navigation</h3>
+      <ul>
+        <li class="right" style="margin-right: 10px">
+          <a href="../../../genindex.html" title="General Index"
+             accesskey="I">index</a></li>
+        <li class="right" >
+          <a href="../../../py-modindex.html" title="Python Module Index"
+             >modules</a> |</li>
+        <li><a href="../../../index.html">MITx 1.0 documentation</a> &raquo;</li>
+          <li><a href="../../index.html" accesskey="U">Module code</a> &raquo;</li> 
+      </ul>
+    </div>
+      <div class="sphinxsidebar">
+        <div class="sphinxsidebarwrapper">
+<div id="searchbox" style="display: none">
+  <h3>Quick search</h3>
+    <form class="search" action="../../../search.html" method="get">
+      <input type="text" name="q" />
+      <input type="submit" value="Go" />
+      <input type="hidden" name="check_keywords" value="yes" />
+      <input type="hidden" name="area" value="default" />
+    </form>
+    <p class="searchtip" style="font-size: 90%">
+    Enter search terms or a module, class or function name.
+    </p>
+</div>
+<script type="text/javascript">$('#searchbox').show(0);</script>
+        </div>
+      </div>
+
+    <div class="document">
+      <div class="documentwrapper">
+        <div class="bodywrapper">
+          <div class="body">
+            
+  <h1>Source code for capa.chem.miller</h1><div class="highlight"><pre>
+<span class="sd">&quot;&quot;&quot; Calculation of miller indices &quot;&quot;&quot;</span>
+
+<span class="kn">import</span> <span class="nn">numpy</span> <span class="kn">as</span> <span class="nn">np</span>
+<span class="kn">import</span> <span class="nn">math</span>
+<span class="kn">import</span> <span class="nn">fractions</span> <span class="kn">as</span> <span class="nn">fr</span>
+<span class="kn">import</span> <span class="nn">decimal</span>
+<span class="kn">import</span> <span class="nn">unittest</span>
+<span class="kn">import</span> <span class="nn">json</span>
+
+
+<div class="viewcode-block" id="lcm"><a class="viewcode-back" href="../../../chem.html#capa.chem.miller.lcm">[docs]</a><span class="k">def</span> <span class="nf">lcm</span><span class="p">(</span><span class="n">a</span><span class="p">,</span> <span class="n">b</span><span class="p">):</span>
+    <span class="sd">&quot;&quot;&quot;</span>
+<span class="sd">    Return least common multiple of a,b</span>
+
+<span class="sd">   :param etype: exception type</span>
+<span class="sd">   :param value: exception value</span>
+<span class="sd">   :param tb: traceback object</span>
+<span class="sd">   :param limit: maximum number of stack frames to show</span>
+<span class="sd">   :type limit: integer or None</span>
+<span class="sd">   :rtype: list of strings</span>
+
+<span class="sd">    &quot;&quot;&quot;</span>
+    <span class="k">return</span> <span class="n">a</span> <span class="o">*</span> <span class="n">b</span> <span class="o">/</span> <span class="n">fr</span><span class="o">.</span><span class="n">gcd</span><span class="p">(</span><span class="n">a</span><span class="p">,</span> <span class="n">b</span><span class="p">)</span>
+
+</div>
+<div class="viewcode-block" id="section_to_fraction"><a class="viewcode-back" href="../../../chem.html#capa.chem.miller.section_to_fraction">[docs]</a><span class="k">def</span> <span class="nf">section_to_fraction</span><span class="p">(</span><span class="n">distance</span><span class="p">):</span>
+    <span class="sd">&quot;&quot;&quot; Convert float distance, that plane cuts on axis</span>
+<span class="sd">    to fraction. Returns inverted fraction.</span>
+<span class="sd">    &quot;&quot;&quot;</span>
+    <span class="k">if</span> <span class="n">np</span><span class="o">.</span><span class="n">isnan</span><span class="p">(</span><span class="n">distance</span><span class="p">):</span>  <span class="c"># plane || to axis (or contains axis)</span>
+        <span class="c"># return inverted fration to a == nan == 1/0  =&gt; 0 / 1</span>
+        <span class="k">return</span> <span class="n">fr</span><span class="o">.</span><span class="n">Fraction</span><span class="p">(</span><span class="mi">0</span><span class="p">,</span> <span class="mi">1</span><span class="p">)</span>
+    <span class="k">elif</span> <span class="n">math</span><span class="o">.</span><span class="n">fabs</span><span class="p">(</span><span class="n">distance</span><span class="p">)</span> <span class="o">&lt;=</span> <span class="mf">0.05</span><span class="p">:</span>  <span class="c"># plane goes through origin, 0.05 - approximation interval.</span>
+        <span class="c"># as now UI sends to server only values multiple to 0.05, this does not matter.</span>
+        <span class="c"># But this important for tests.</span>
+        <span class="k">return</span> <span class="n">fr</span><span class="o">.</span><span class="n">Fraction</span><span class="p">(</span><span class="mi">1</span> <span class="k">if</span> <span class="n">distance</span> <span class="o">&gt;=</span> <span class="mi">0</span> <span class="k">else</span> <span class="o">-</span><span class="mi">1</span><span class="p">,</span> <span class="mi">1</span><span class="p">)</span>  <span class="c"># ERROR, need shift of coordinates</span>
+    <span class="k">else</span><span class="p">:</span>
+        <span class="c"># limit_denominator to closest nicest fraction</span>
+        <span class="c"># import ipdb; ipdb.set_trace()</span>
+        <span class="n">fract</span> <span class="o">=</span> <span class="n">fr</span><span class="o">.</span><span class="n">Fraction</span><span class="p">(</span><span class="n">distance</span><span class="p">)</span><span class="o">.</span><span class="n">limit_denominator</span><span class="p">(</span><span class="mi">10</span><span class="p">)</span>  <span class="c"># 5 / 2 : numerator / denominator</span>
+        <span class="k">print</span> <span class="s">&#39;Distance&#39;</span><span class="p">,</span> <span class="n">distance</span><span class="p">,</span> <span class="s">&#39;Inverted fraction&#39;</span><span class="p">,</span> <span class="n">fract</span>
+        <span class="c"># return inverted fraction</span>
+        <span class="k">return</span> <span class="n">fr</span><span class="o">.</span><span class="n">Fraction</span><span class="p">(</span><span class="n">fract</span><span class="o">.</span><span class="n">denominator</span><span class="p">,</span> <span class="n">fract</span><span class="o">.</span><span class="n">numerator</span><span class="p">)</span>
+
+</div>
+<div class="viewcode-block" id="sub_miller"><a class="viewcode-back" href="../../../chem.html#capa.chem.miller.sub_miller">[docs]</a><span class="k">def</span> <span class="nf">sub_miller</span><span class="p">(</span><span class="n">sections</span><span class="p">):</span>
+    <span class="sd">&#39;&#39;&#39; Calculate miller indices.</span>
+<span class="sd">        Plane does not intersect origin</span>
+<span class="sd">    &#39;&#39;&#39;</span>
+    <span class="n">fracts</span> <span class="o">=</span> <span class="p">[</span><span class="n">section_to_fraction</span><span class="p">(</span><span class="n">section</span><span class="p">)</span> <span class="k">for</span> <span class="n">section</span> <span class="ow">in</span> <span class="n">sections</span><span class="p">]</span>
+
+    <span class="k">print</span> <span class="n">sections</span><span class="p">,</span> <span class="n">fracts</span>
+
+    <span class="n">common_denominator</span> <span class="o">=</span> <span class="nb">reduce</span><span class="p">(</span><span class="n">lcm</span><span class="p">,</span> <span class="p">[</span><span class="n">fract</span><span class="o">.</span><span class="n">denominator</span> <span class="k">for</span> <span class="n">fract</span> <span class="ow">in</span> <span class="n">fracts</span><span class="p">])</span>
+    <span class="k">print</span> <span class="s">&#39;common_denominator:&#39;</span><span class="p">,</span> <span class="n">common_denominator</span>
+
+    <span class="c"># 2) lead to a common denominator</span>
+    <span class="c"># 3) throw away denominator</span>
+    <span class="n">miller</span> <span class="o">=</span> <span class="p">[</span><span class="n">fract</span><span class="o">.</span><span class="n">numerator</span> <span class="o">*</span> <span class="n">math</span><span class="o">.</span><span class="n">fabs</span><span class="p">(</span><span class="n">common_denominator</span><span class="p">)</span> <span class="o">/</span> <span class="n">fract</span><span class="o">.</span><span class="n">denominator</span> <span class="k">for</span> <span class="n">fract</span> <span class="ow">in</span> <span class="n">fracts</span><span class="p">]</span>
+
+    <span class="c"># import ipdb; ipdb.set_trace()</span>
+    <span class="c"># nice output:</span>
+    <span class="c"># output = &#39;(&#39; + &#39;&#39;.join(map(str, map(decimal.Decimal, miller))) + &#39;)&#39;</span>
+    <span class="c"># import ipdb; ipdb.set_trace()</span>
+    <span class="n">output</span> <span class="o">=</span> <span class="s">&#39;(&#39;</span> <span class="o">+</span> <span class="s">&#39;,&#39;</span><span class="o">.</span><span class="n">join</span><span class="p">(</span><span class="nb">map</span><span class="p">(</span><span class="nb">str</span><span class="p">,</span> <span class="nb">map</span><span class="p">(</span><span class="n">decimal</span><span class="o">.</span><span class="n">Decimal</span><span class="p">,</span> <span class="n">miller</span><span class="p">)))</span> <span class="o">+</span> <span class="s">&#39;)&#39;</span>
+    <span class="c"># print &#39;Miller indices:&#39;, output</span>
+    <span class="k">return</span> <span class="n">output</span>
+
+</div>
+<div class="viewcode-block" id="miller"><a class="viewcode-back" href="../../../chem.html#capa.chem.miller.miller">[docs]</a><span class="k">def</span> <span class="nf">miller</span><span class="p">(</span><span class="n">points</span><span class="p">):</span>
+    <span class="sd">&quot;&quot;&quot;Calculate miller indices of plane</span>
+<span class="sd">    &quot;&quot;&quot;</span>
+
+    <span class="c"># print &quot;\nCalculating miller indices:&quot;</span>
+    <span class="c"># print &#39;Points:\n&#39;, points</span>
+    <span class="c"># calculate normal to plane</span>
+    <span class="n">N</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">cross</span><span class="p">(</span><span class="n">points</span><span class="p">[</span><span class="mi">1</span><span class="p">]</span> <span class="o">-</span> <span class="n">points</span><span class="p">[</span><span class="mi">0</span><span class="p">],</span> <span class="n">points</span><span class="p">[</span><span class="mi">2</span><span class="p">]</span> <span class="o">-</span> <span class="n">points</span><span class="p">[</span><span class="mi">0</span><span class="p">])</span>
+    <span class="c"># print &quot;Normal:&quot;, N</span>
+
+    <span class="c"># origin</span>
+    <span class="n">O</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">array</span><span class="p">([</span><span class="mi">0</span><span class="p">,</span> <span class="mi">0</span><span class="p">,</span> <span class="mi">0</span><span class="p">])</span>
+
+    <span class="c"># point of plane</span>
+    <span class="n">P</span> <span class="o">=</span> <span class="n">points</span><span class="p">[</span><span class="mi">0</span><span class="p">]</span>
+
+    <span class="c"># equation of a line for axes: O + (B-O) * t</span>
+    <span class="c"># t - parameters, B = [Bx, By, Bz]:</span>
+    <span class="n">B</span> <span class="o">=</span> <span class="nb">map</span><span class="p">(</span><span class="n">np</span><span class="o">.</span><span class="n">array</span><span class="p">,</span> <span class="p">[[</span><span class="mf">1.0</span><span class="p">,</span> <span class="mi">0</span><span class="p">,</span> <span class="mi">0</span><span class="p">],</span> <span class="p">[</span><span class="mi">0</span><span class="p">,</span> <span class="mf">1.0</span><span class="p">,</span> <span class="mi">0</span><span class="p">],</span> <span class="p">[</span><span class="mi">0</span><span class="p">,</span> <span class="mi">0</span><span class="p">,</span> <span class="mf">1.0</span><span class="p">]])</span>
+
+    <span class="c"># coordinates of intersections with axis:</span>
+    <span class="n">sections</span> <span class="o">=</span> <span class="p">[</span><span class="n">np</span><span class="o">.</span><span class="n">dot</span><span class="p">(</span><span class="n">P</span> <span class="o">-</span> <span class="n">O</span><span class="p">,</span> <span class="n">N</span><span class="p">)</span> <span class="o">/</span> <span class="n">np</span><span class="o">.</span><span class="n">dot</span><span class="p">(</span><span class="n">B_axis</span><span class="p">,</span> <span class="n">N</span><span class="p">)</span> <span class="k">if</span> <span class="n">np</span><span class="o">.</span><span class="n">dot</span><span class="p">(</span><span class="n">B_axis</span><span class="p">,</span> <span class="n">N</span><span class="p">)</span> <span class="o">!=</span> <span class="mi">0</span> <span class="k">else</span> <span class="n">np</span><span class="o">.</span><span class="n">nan</span> <span class="k">for</span> <span class="n">B_axis</span> <span class="ow">in</span> <span class="n">B</span><span class="p">]</span>
+    <span class="c"># import ipdb; ipdb.set_trace()</span>
+
+    <span class="k">if</span> <span class="nb">any</span><span class="p">(</span><span class="n">x</span> <span class="o">==</span> <span class="mi">0</span> <span class="k">for</span> <span class="n">x</span> <span class="ow">in</span> <span class="n">sections</span><span class="p">):</span>  <span class="c"># Plane goes through origin.</span>
+        <span class="c"># Need to shift plane out of origin.</span>
+        <span class="c"># For this change origin position</span>
+
+        <span class="c"># 1) find cube vertex, not crossed by plane</span>
+        <span class="n">vertices</span> <span class="o">=</span> <span class="p">[</span>
+            <span class="c"># top</span>
+            <span class="n">np</span><span class="o">.</span><span class="n">array</span><span class="p">([</span><span class="mf">1.0</span><span class="p">,</span> <span class="mf">1.0</span><span class="p">,</span> <span class="mf">1.0</span><span class="p">]),</span>
+            <span class="n">np</span><span class="o">.</span><span class="n">array</span><span class="p">([</span><span class="mf">0.0</span><span class="p">,</span> <span class="mf">0.0</span><span class="p">,</span> <span class="mf">1.0</span><span class="p">]),</span>
+            <span class="n">np</span><span class="o">.</span><span class="n">array</span><span class="p">([</span><span class="mf">1.0</span><span class="p">,</span> <span class="mf">0.0</span><span class="p">,</span> <span class="mf">1.0</span><span class="p">]),</span>
+            <span class="n">np</span><span class="o">.</span><span class="n">array</span><span class="p">([</span><span class="mf">0.0</span><span class="p">,</span> <span class="mf">1.0</span><span class="p">,</span> <span class="mf">1.0</span><span class="p">]),</span>
+            <span class="c"># bottom, except 0,0,0</span>
+            <span class="n">np</span><span class="o">.</span><span class="n">array</span><span class="p">([</span><span class="mf">1.0</span><span class="p">,</span> <span class="mf">0.0</span><span class="p">,</span> <span class="mf">0.0</span><span class="p">]),</span>
+            <span class="n">np</span><span class="o">.</span><span class="n">array</span><span class="p">([</span><span class="mf">0.0</span><span class="p">,</span> <span class="mf">1.0</span><span class="p">,</span> <span class="mf">0.0</span><span class="p">]),</span>
+            <span class="n">np</span><span class="o">.</span><span class="n">array</span><span class="p">([</span><span class="mf">1.0</span><span class="p">,</span> <span class="mf">1.0</span><span class="p">,</span> <span class="mf">1.0</span><span class="p">]),</span>
+                    <span class="p">]</span>
+
+        <span class="k">for</span> <span class="n">vertex</span> <span class="ow">in</span> <span class="n">vertices</span><span class="p">:</span>
+            <span class="k">if</span> <span class="n">np</span><span class="o">.</span><span class="n">dot</span><span class="p">(</span><span class="n">vertex</span> <span class="o">-</span> <span class="n">O</span><span class="p">,</span> <span class="n">N</span><span class="p">)</span> <span class="o">!=</span> <span class="mi">0</span><span class="p">:</span>  <span class="c"># vertex in plane</span>
+                <span class="n">new_origin</span> <span class="o">=</span> <span class="n">vertex</span>
+                <span class="k">break</span>
+
+        <span class="c"># get axis with center in new origin</span>
+        <span class="n">X</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">array</span><span class="p">([</span><span class="mi">1</span> <span class="o">-</span> <span class="n">new_origin</span><span class="p">[</span><span class="mi">0</span><span class="p">],</span> <span class="n">new_origin</span><span class="p">[</span><span class="mi">1</span><span class="p">],</span> <span class="n">new_origin</span><span class="p">[</span><span class="mi">2</span><span class="p">]])</span>
+        <span class="n">Y</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">array</span><span class="p">([</span><span class="n">new_origin</span><span class="p">[</span><span class="mi">0</span><span class="p">],</span> <span class="mi">1</span> <span class="o">-</span> <span class="n">new_origin</span><span class="p">[</span><span class="mi">1</span><span class="p">],</span> <span class="n">new_origin</span><span class="p">[</span><span class="mi">2</span><span class="p">]])</span>
+        <span class="n">Z</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">array</span><span class="p">([</span><span class="n">new_origin</span><span class="p">[</span><span class="mi">0</span><span class="p">],</span> <span class="n">new_origin</span><span class="p">[</span><span class="mi">1</span><span class="p">],</span> <span class="mi">1</span> <span class="o">-</span> <span class="n">new_origin</span><span class="p">[</span><span class="mi">2</span><span class="p">]])</span>
+
+        <span class="c"># 2) calculate miller indexes by new origin</span>
+        <span class="n">new_axis</span> <span class="o">=</span> <span class="p">[</span><span class="n">X</span> <span class="o">-</span> <span class="n">new_origin</span><span class="p">,</span> <span class="n">Y</span> <span class="o">-</span> <span class="n">new_origin</span><span class="p">,</span> <span class="n">Z</span> <span class="o">-</span> <span class="n">new_origin</span><span class="p">]</span>
+        <span class="c"># coordinates of intersections with axis:</span>
+        <span class="n">sections</span> <span class="o">=</span> <span class="p">[</span><span class="n">np</span><span class="o">.</span><span class="n">dot</span><span class="p">(</span><span class="n">P</span> <span class="o">-</span> <span class="n">new_origin</span><span class="p">,</span> <span class="n">N</span><span class="p">)</span> <span class="o">/</span> <span class="n">np</span><span class="o">.</span><span class="n">dot</span><span class="p">(</span><span class="n">B_axis</span><span class="p">,</span> <span class="n">N</span><span class="p">)</span> <span class="k">if</span> <span class="n">np</span><span class="o">.</span><span class="n">dot</span><span class="p">(</span><span class="n">B_axis</span><span class="p">,</span> <span class="n">N</span><span class="p">)</span> <span class="o">!=</span> <span class="mi">0</span> <span class="k">else</span> <span class="n">np</span><span class="o">.</span><span class="n">nan</span> <span class="k">for</span> <span class="n">B_axis</span> <span class="ow">in</span> <span class="n">new_axis</span><span class="p">]</span>
+        <span class="c"># 3) fix signs of indexes</span>
+        <span class="c">#  0 -&gt; 1, 1 -&gt; -1</span>
+        <span class="n">sections</span> <span class="o">=</span> <span class="p">(</span><span class="mi">1</span> <span class="o">-</span> <span class="mi">2</span> <span class="o">*</span> <span class="n">new_origin</span><span class="p">)</span> <span class="o">*</span> <span class="n">sections</span>
+    <span class="k">return</span> <span class="n">sub_miller</span><span class="p">(</span><span class="n">sections</span><span class="p">)</span>
+
+</div>
+<div class="viewcode-block" id="grade"><a class="viewcode-back" href="../../../chem.html#capa.chem.miller.grade">[docs]</a><span class="k">def</span> <span class="nf">grade</span><span class="p">(</span><span class="n">user_input</span><span class="p">,</span> <span class="n">correct_answer</span><span class="p">):</span>
+    <span class="sd">&#39;&#39;&#39;</span>
+<span class="sd">    Format:</span>
+<span class="sd">    user_input: {&quot;lattice&quot;:&quot;sc&quot;,&quot;points&quot;:[[&quot;0.77&quot;,&quot;0.00&quot;,&quot;1.00&quot;],[&quot;0.78&quot;,&quot;1.00&quot;,&quot;0.00&quot;],[&quot;0.00&quot;,&quot;1.00&quot;,&quot;0.72&quot;]]}</span>
+<span class="sd">    &quot;lattice&quot; is one of: &quot;&quot;, &quot;sc&quot;, &quot;bcc&quot;, &quot;fcc&quot;</span>
+<span class="sd">    correct_answer: {&#39;miller&#39;: &#39;(00-1)&#39;, &#39;lattice&#39;: &#39;bcc&#39;}</span>
+<span class="sd">    &#39;&#39;&#39;</span>
+    <span class="k">def</span> <span class="nf">negative</span><span class="p">(</span><span class="n">s</span><span class="p">):</span>
+        <span class="c"># import ipdb; ipdb.set_trace()</span>
+        <span class="n">output</span> <span class="o">=</span> <span class="s">&#39;&#39;</span>
+        <span class="n">i</span> <span class="o">=</span> <span class="mi">1</span>
+        <span class="k">while</span> <span class="n">i</span> <span class="ow">in</span> <span class="nb">range</span><span class="p">(</span><span class="mi">1</span><span class="p">,</span> <span class="nb">len</span><span class="p">(</span><span class="n">s</span><span class="p">)</span> <span class="o">-</span> <span class="mi">1</span><span class="p">):</span>
+            <span class="k">if</span> <span class="n">s</span><span class="p">[</span><span class="n">i</span><span class="p">]</span> <span class="ow">in</span> <span class="p">(</span><span class="s">&#39;,&#39;</span><span class="p">,</span> <span class="s">&#39; &#39;</span><span class="p">):</span>
+                <span class="n">output</span> <span class="o">+=</span> <span class="n">s</span><span class="p">[</span><span class="n">i</span><span class="p">]</span>
+            <span class="k">elif</span> <span class="n">s</span><span class="p">[</span><span class="n">i</span><span class="p">]</span> <span class="ow">not</span> <span class="ow">in</span> <span class="p">(</span><span class="s">&#39;-&#39;</span><span class="p">,</span> <span class="s">&#39;0&#39;</span><span class="p">):</span>
+                <span class="n">output</span> <span class="o">+=</span> <span class="s">&#39;-&#39;</span> <span class="o">+</span> <span class="n">s</span><span class="p">[</span><span class="n">i</span><span class="p">]</span>
+            <span class="k">elif</span> <span class="n">s</span><span class="p">[</span><span class="n">i</span><span class="p">]</span> <span class="o">==</span> <span class="s">&#39;0&#39;</span><span class="p">:</span>
+                <span class="n">output</span> <span class="o">+=</span> <span class="n">s</span><span class="p">[</span><span class="n">i</span><span class="p">]</span>
+            <span class="k">else</span><span class="p">:</span>
+                <span class="n">i</span> <span class="o">+=</span> <span class="mi">1</span>
+                <span class="n">output</span> <span class="o">+=</span> <span class="n">s</span><span class="p">[</span><span class="n">i</span><span class="p">]</span>
+            <span class="n">i</span> <span class="o">+=</span> <span class="mi">1</span>
+            <span class="c"># import ipdb; ipdb.set_trace()</span>
+        <span class="k">return</span> <span class="s">&#39;(&#39;</span> <span class="o">+</span> <span class="n">output</span> <span class="o">+</span> <span class="s">&#39;)&#39;</span>
+
+    <span class="n">user_answer</span> <span class="o">=</span> <span class="n">json</span><span class="o">.</span><span class="n">loads</span><span class="p">(</span><span class="n">user_input</span><span class="p">)</span>
+
+    <span class="k">if</span> <span class="n">user_answer</span><span class="p">[</span><span class="s">&#39;lattice&#39;</span><span class="p">]</span> <span class="o">!=</span> <span class="n">correct_answer</span><span class="p">[</span><span class="s">&#39;lattice&#39;</span><span class="p">]:</span>
+        <span class="k">return</span> <span class="bp">False</span>
+
+    <span class="n">points</span> <span class="o">=</span> <span class="p">[</span><span class="nb">map</span><span class="p">(</span><span class="nb">float</span><span class="p">,</span> <span class="n">p</span><span class="p">)</span> <span class="k">for</span> <span class="n">p</span> <span class="ow">in</span> <span class="n">user_answer</span><span class="p">[</span><span class="s">&#39;points&#39;</span><span class="p">]]</span>
+    <span class="n">points</span> <span class="o">=</span> <span class="p">[</span><span class="n">np</span><span class="o">.</span><span class="n">array</span><span class="p">(</span><span class="n">point</span><span class="p">)</span> <span class="k">for</span> <span class="n">point</span> <span class="ow">in</span> <span class="n">points</span><span class="p">]</span>
+    <span class="c"># import ipdb; ipdb.set_trace()</span>
+    <span class="k">print</span> <span class="n">miller</span><span class="p">(</span><span class="n">points</span><span class="p">),</span> <span class="p">(</span><span class="n">correct_answer</span><span class="p">[</span><span class="s">&#39;miller&#39;</span><span class="p">]</span><span class="o">.</span><span class="n">replace</span><span class="p">(</span><span class="s">&#39; &#39;</span><span class="p">,</span> <span class="s">&#39;&#39;</span><span class="p">),</span> <span class="n">negative</span><span class="p">(</span><span class="n">correct_answer</span><span class="p">[</span><span class="s">&#39;miller&#39;</span><span class="p">])</span><span class="o">.</span><span class="n">replace</span><span class="p">(</span><span class="s">&#39; &#39;</span><span class="p">,</span> <span class="s">&#39;&#39;</span><span class="p">))</span>
+
+    <span class="k">if</span> <span class="n">miller</span><span class="p">(</span><span class="n">points</span><span class="p">)</span> <span class="ow">in</span> <span class="p">(</span><span class="n">correct_answer</span><span class="p">[</span><span class="s">&#39;miller&#39;</span><span class="p">]</span><span class="o">.</span><span class="n">replace</span><span class="p">(</span><span class="s">&#39; &#39;</span><span class="p">,</span> <span class="s">&#39;&#39;</span><span class="p">),</span> <span class="n">negative</span><span class="p">(</span><span class="n">correct_answer</span><span class="p">[</span><span class="s">&#39;miller&#39;</span><span class="p">])</span><span class="o">.</span><span class="n">replace</span><span class="p">(</span><span class="s">&#39; &#39;</span><span class="p">,</span> <span class="s">&#39;&#39;</span><span class="p">)):</span>
+        <span class="k">return</span> <span class="bp">True</span>
+
+    <span class="k">return</span> <span class="bp">False</span>
+
+</div>
+<div class="viewcode-block" id="Test_Crystallography_Miller"><a class="viewcode-back" href="../../../chem.html#capa.chem.miller.Test_Crystallography_Miller">[docs]</a><span class="k">class</span> <span class="nc">Test_Crystallography_Miller</span><span class="p">(</span><span class="n">unittest</span><span class="o">.</span><span class="n">TestCase</span><span class="p">):</span>
+    <span class="sd">&#39;&#39;&#39; test crystallography grade function &#39;&#39;&#39;</span>
+
+    <span class="k">def</span> <span class="nf">test_1</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
+        <span class="n">user_input</span> <span class="o">=</span> <span class="s">&#39;{&quot;lattice&quot;: &quot;bcc&quot;, &quot;points&quot;: [[&quot;0.50&quot;, &quot;0.00&quot;, &quot;0.00&quot;], [&quot;0.00&quot;, &quot;0.50&quot;, &quot;0.00&quot;], [&quot;0.00&quot;, &quot;0.00&quot;, &quot;0.50&quot;]]}&#39;</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">assertTrue</span><span class="p">(</span><span class="n">grade</span><span class="p">(</span><span class="n">user_input</span><span class="p">,</span> <span class="p">{</span><span class="s">&#39;miller&#39;</span><span class="p">:</span> <span class="s">&#39;(2,2,2)&#39;</span><span class="p">,</span> <span class="s">&#39;lattice&#39;</span><span class="p">:</span> <span class="s">&#39;bcc&#39;</span><span class="p">}))</span>
+
+    <span class="k">def</span> <span class="nf">test_2</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
+        <span class="n">user_input</span> <span class="o">=</span> <span class="s">&#39;{&quot;lattice&quot;: &quot;bcc&quot;, &quot;points&quot;: [[&quot;1.00&quot;, &quot;0.00&quot;, &quot;0.00&quot;], [&quot;0.00&quot;, &quot;1.00&quot;, &quot;0.00&quot;], [&quot;0.00&quot;, &quot;0.00&quot;, &quot;1.00&quot;]]}&#39;</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">assertTrue</span><span class="p">(</span><span class="n">grade</span><span class="p">(</span><span class="n">user_input</span><span class="p">,</span> <span class="p">{</span><span class="s">&#39;miller&#39;</span><span class="p">:</span> <span class="s">&#39;(1,1,1)&#39;</span><span class="p">,</span> <span class="s">&#39;lattice&#39;</span><span class="p">:</span> <span class="s">&#39;bcc&#39;</span><span class="p">}))</span>
+
+    <span class="k">def</span> <span class="nf">test_3</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
+        <span class="n">user_input</span> <span class="o">=</span> <span class="s">&#39;{&quot;lattice&quot;: &quot;bcc&quot;, &quot;points&quot;: [[&quot;1.00&quot;, &quot;0.50&quot;, &quot;1.00&quot;], [&quot;1.00&quot;, &quot;1.00&quot;, &quot;0.50&quot;], [&quot;0.50&quot;, &quot;1.00&quot;, &quot;1.00&quot;]]}&#39;</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">assertTrue</span><span class="p">(</span><span class="n">grade</span><span class="p">(</span><span class="n">user_input</span><span class="p">,</span> <span class="p">{</span><span class="s">&#39;miller&#39;</span><span class="p">:</span> <span class="s">&#39;(2,2,2)&#39;</span><span class="p">,</span> <span class="s">&#39;lattice&#39;</span><span class="p">:</span> <span class="s">&#39;bcc&#39;</span><span class="p">}))</span>
+
+    <span class="k">def</span> <span class="nf">test_4</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
+        <span class="n">user_input</span> <span class="o">=</span> <span class="s">&#39;{&quot;lattice&quot;: &quot;bcc&quot;, &quot;points&quot;: [[&quot;0.33&quot;, &quot;1.00&quot;, &quot;0.00&quot;], [&quot;0.00&quot;, &quot;0.664&quot;, &quot;0.00&quot;], [&quot;0.00&quot;, &quot;1.00&quot;, &quot;0.33&quot;]]}&#39;</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">assertTrue</span><span class="p">(</span><span class="n">grade</span><span class="p">(</span><span class="n">user_input</span><span class="p">,</span> <span class="p">{</span><span class="s">&#39;miller&#39;</span><span class="p">:</span> <span class="s">&#39;(-3, 3, -3)&#39;</span><span class="p">,</span> <span class="s">&#39;lattice&#39;</span><span class="p">:</span> <span class="s">&#39;bcc&#39;</span><span class="p">}))</span>
+
+<div class="viewcode-block" id="Test_Crystallography_Miller.test_5"><a class="viewcode-back" href="../../../chem.html#capa.chem.miller.Test_Crystallography_Miller.test_5">[docs]</a>    <span class="k">def</span> <span class="nf">test_5</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
+        <span class="n">user_input</span> <span class="o">=</span> <span class="s">&#39;{&quot;lattice&quot;: &quot;bcc&quot;, &quot;points&quot;: [[&quot;0.33&quot;, &quot;1.00&quot;, &quot;0.00&quot;], [&quot;0.00&quot;, &quot;0.33&quot;, &quot;0.00&quot;], [&quot;0.00&quot;, &quot;1.00&quot;, &quot;0.33&quot;]]}&#39;</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">assertTrue</span><span class="p">(</span><span class="n">grade</span><span class="p">(</span><span class="n">user_input</span><span class="p">,</span> <span class="p">{</span><span class="s">&#39;miller&#39;</span><span class="p">:</span> <span class="s">&#39;(-6,3,-6)&#39;</span><span class="p">,</span> <span class="s">&#39;lattice&#39;</span><span class="p">:</span> <span class="s">&#39;bcc&#39;</span><span class="p">}))</span>
+</div>
+    <span class="k">def</span> <span class="nf">test_6</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
+        <span class="n">user_input</span> <span class="o">=</span> <span class="s">&#39;{&quot;lattice&quot;: &quot;bcc&quot;, &quot;points&quot;: [[&quot;0.00&quot;, &quot;0.25&quot;, &quot;0.00&quot;], [&quot;0.25&quot;, &quot;0.00&quot;, &quot;0.00&quot;], [&quot;0.00&quot;, &quot;0.00&quot;, &quot;0.25&quot;]]}&#39;</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">assertTrue</span><span class="p">(</span><span class="n">grade</span><span class="p">(</span><span class="n">user_input</span><span class="p">,</span> <span class="p">{</span><span class="s">&#39;miller&#39;</span><span class="p">:</span> <span class="s">&#39;(4,4,4)&#39;</span><span class="p">,</span> <span class="s">&#39;lattice&#39;</span><span class="p">:</span> <span class="s">&#39;bcc&#39;</span><span class="p">}))</span>
+
+    <span class="k">def</span> <span class="nf">test_7</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>  <span class="c"># goes throug origin</span>
+        <span class="n">user_input</span> <span class="o">=</span> <span class="s">&#39;{&quot;lattice&quot;: &quot;bcc&quot;, &quot;points&quot;: [[&quot;0.00&quot;, &quot;1.00&quot;, &quot;0.00&quot;], [&quot;1.00&quot;, &quot;0.00&quot;, &quot;0.00&quot;], [&quot;0.50&quot;, &quot;1.00&quot;, &quot;0.00&quot;]]}&#39;</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">assertTrue</span><span class="p">(</span><span class="n">grade</span><span class="p">(</span><span class="n">user_input</span><span class="p">,</span> <span class="p">{</span><span class="s">&#39;miller&#39;</span><span class="p">:</span> <span class="s">&#39;(0,0,-1)&#39;</span><span class="p">,</span> <span class="s">&#39;lattice&#39;</span><span class="p">:</span> <span class="s">&#39;bcc&#39;</span><span class="p">}))</span>
+
+    <span class="k">def</span> <span class="nf">test_8</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
+        <span class="n">user_input</span> <span class="o">=</span> <span class="s">&#39;{&quot;lattice&quot;: &quot;bcc&quot;, &quot;points&quot;: [[&quot;0.00&quot;, &quot;1.00&quot;, &quot;0.50&quot;], [&quot;1.00&quot;, &quot;0.00&quot;, &quot;0.50&quot;], [&quot;0.50&quot;, &quot;1.00&quot;, &quot;0.50&quot;]]}&#39;</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">assertTrue</span><span class="p">(</span><span class="n">grade</span><span class="p">(</span><span class="n">user_input</span><span class="p">,</span> <span class="p">{</span><span class="s">&#39;miller&#39;</span><span class="p">:</span> <span class="s">&#39;(0,0,2)&#39;</span><span class="p">,</span> <span class="s">&#39;lattice&#39;</span><span class="p">:</span> <span class="s">&#39;bcc&#39;</span><span class="p">}))</span>
+
+    <span class="k">def</span> <span class="nf">test_9</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
+        <span class="n">user_input</span> <span class="o">=</span> <span class="s">&#39;{&quot;lattice&quot;: &quot;bcc&quot;, &quot;points&quot;: [[&quot;1.00&quot;, &quot;0.00&quot;, &quot;1.00&quot;], [&quot;0.00&quot;, &quot;1.00&quot;, &quot;1.00&quot;], [&quot;1.00&quot;, &quot;0.00&quot;, &quot;0.00&quot;]]}&#39;</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">assertTrue</span><span class="p">(</span><span class="n">grade</span><span class="p">(</span><span class="n">user_input</span><span class="p">,</span> <span class="p">{</span><span class="s">&#39;miller&#39;</span><span class="p">:</span> <span class="s">&#39;(1,1,0)&#39;</span><span class="p">,</span> <span class="s">&#39;lattice&#39;</span><span class="p">:</span> <span class="s">&#39;bcc&#39;</span><span class="p">}))</span>
+
+    <span class="k">def</span> <span class="nf">test_10</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
+        <span class="n">user_input</span> <span class="o">=</span> <span class="s">&#39;{&quot;lattice&quot;: &quot;bcc&quot;, &quot;points&quot;: [[&quot;1.00&quot;, &quot;0.00&quot;, &quot;1.00&quot;], [&quot;0.00&quot;, &quot;0.00&quot;, &quot;0.00&quot;], [&quot;0.00&quot;, &quot;1.00&quot;, &quot;1.00&quot;]]}&#39;</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">assertTrue</span><span class="p">(</span><span class="n">grade</span><span class="p">(</span><span class="n">user_input</span><span class="p">,</span> <span class="p">{</span><span class="s">&#39;miller&#39;</span><span class="p">:</span> <span class="s">&#39;(1,1,-1)&#39;</span><span class="p">,</span> <span class="s">&#39;lattice&#39;</span><span class="p">:</span> <span class="s">&#39;bcc&#39;</span><span class="p">}))</span>
+
+    <span class="k">def</span> <span class="nf">test_11</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
+        <span class="n">user_input</span> <span class="o">=</span> <span class="s">&#39;{&quot;lattice&quot;: &quot;bcc&quot;, &quot;points&quot;: [[&quot;1.00&quot;, &quot;0.00&quot;, &quot;0.50&quot;], [&quot;1.00&quot;, &quot;1.00&quot;, &quot;0.00&quot;], [&quot;0.00&quot;, &quot;1.00&quot;, &quot;0.00&quot;]]}&#39;</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">assertTrue</span><span class="p">(</span><span class="n">grade</span><span class="p">(</span><span class="n">user_input</span><span class="p">,</span> <span class="p">{</span><span class="s">&#39;miller&#39;</span><span class="p">:</span> <span class="s">&#39;(0,1,2)&#39;</span><span class="p">,</span> <span class="s">&#39;lattice&#39;</span><span class="p">:</span> <span class="s">&#39;bcc&#39;</span><span class="p">}))</span>
+
+    <span class="k">def</span> <span class="nf">test_12</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
+        <span class="n">user_input</span> <span class="o">=</span> <span class="s">&#39;{&quot;lattice&quot;: &quot;bcc&quot;, &quot;points&quot;: [[&quot;1.00&quot;, &quot;0.00&quot;, &quot;0.50&quot;], [&quot;0.00&quot;, &quot;0.00&quot;, &quot;0.50&quot;], [&quot;1.00&quot;, &quot;1.00&quot;, &quot;1.00&quot;]]}&#39;</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">assertTrue</span><span class="p">(</span><span class="n">grade</span><span class="p">(</span><span class="n">user_input</span><span class="p">,</span> <span class="p">{</span><span class="s">&#39;miller&#39;</span><span class="p">:</span> <span class="s">&#39;(0,1,-2)&#39;</span><span class="p">,</span> <span class="s">&#39;lattice&#39;</span><span class="p">:</span> <span class="s">&#39;bcc&#39;</span><span class="p">}))</span>
+
+    <span class="k">def</span> <span class="nf">test_13</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
+        <span class="n">user_input</span> <span class="o">=</span> <span class="s">&#39;{&quot;lattice&quot;: &quot;bcc&quot;, &quot;points&quot;: [[&quot;0.50&quot;, &quot;0.00&quot;, &quot;0.00&quot;], [&quot;0.50&quot;, &quot;1.00&quot;, &quot;0.00&quot;], [&quot;0.00&quot;, &quot;0.00&quot;, &quot;1.00&quot;]]}&#39;</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">assertTrue</span><span class="p">(</span><span class="n">grade</span><span class="p">(</span><span class="n">user_input</span><span class="p">,</span> <span class="p">{</span><span class="s">&#39;miller&#39;</span><span class="p">:</span> <span class="s">&#39;(2,0,1)&#39;</span><span class="p">,</span> <span class="s">&#39;lattice&#39;</span><span class="p">:</span> <span class="s">&#39;bcc&#39;</span><span class="p">}))</span>
+
+    <span class="k">def</span> <span class="nf">test_14</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
+        <span class="n">user_input</span> <span class="o">=</span> <span class="s">&#39;{&quot;lattice&quot;: &quot;bcc&quot;, &quot;points&quot;: [[&quot;0.00&quot;, &quot;0.00&quot;, &quot;0.00&quot;], [&quot;0.00&quot;, &quot;0.00&quot;, &quot;1.00&quot;], [&quot;0.50&quot;, &quot;1.00&quot;, &quot;0.00&quot;]]}&#39;</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">assertTrue</span><span class="p">(</span><span class="n">grade</span><span class="p">(</span><span class="n">user_input</span><span class="p">,</span> <span class="p">{</span><span class="s">&#39;miller&#39;</span><span class="p">:</span> <span class="s">&#39;(2,-1,0)&#39;</span><span class="p">,</span> <span class="s">&#39;lattice&#39;</span><span class="p">:</span> <span class="s">&#39;bcc&#39;</span><span class="p">}))</span>
+
+    <span class="k">def</span> <span class="nf">test_15</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
+        <span class="n">user_input</span> <span class="o">=</span> <span class="s">&#39;{&quot;lattice&quot;: &quot;bcc&quot;, &quot;points&quot;: [[&quot;0.00&quot;, &quot;0.00&quot;, &quot;0.00&quot;], [&quot;1.00&quot;, &quot;1.00&quot;, &quot;0.00&quot;], [&quot;0.00&quot;, &quot;1.00&quot;, &quot;1.00&quot;]]}&#39;</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">assertTrue</span><span class="p">(</span><span class="n">grade</span><span class="p">(</span><span class="n">user_input</span><span class="p">,</span> <span class="p">{</span><span class="s">&#39;miller&#39;</span><span class="p">:</span> <span class="s">&#39;(1,-1,1)&#39;</span><span class="p">,</span> <span class="s">&#39;lattice&#39;</span><span class="p">:</span> <span class="s">&#39;bcc&#39;</span><span class="p">}))</span>
+
+    <span class="k">def</span> <span class="nf">test_16</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
+        <span class="n">user_input</span> <span class="o">=</span> <span class="s">&#39;{&quot;lattice&quot;: &quot;bcc&quot;, &quot;points&quot;: [[&quot;1.00&quot;, &quot;0.00&quot;, &quot;0.00&quot;], [&quot;0.00&quot;, &quot;1.00&quot;, &quot;0.00&quot;], [&quot;1.00&quot;, &quot;1.00&quot;, &quot;1.00&quot;]]}&#39;</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">assertTrue</span><span class="p">(</span><span class="n">grade</span><span class="p">(</span><span class="n">user_input</span><span class="p">,</span> <span class="p">{</span><span class="s">&#39;miller&#39;</span><span class="p">:</span> <span class="s">&#39;(1,1,-1)&#39;</span><span class="p">,</span> <span class="s">&#39;lattice&#39;</span><span class="p">:</span> <span class="s">&#39;bcc&#39;</span><span class="p">}))</span>
+
+    <span class="k">def</span> <span class="nf">test_17</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
+        <span class="n">user_input</span> <span class="o">=</span> <span class="s">&#39;{&quot;lattice&quot;: &quot;bcc&quot;, &quot;points&quot;: [[&quot;0.00&quot;, &quot;0.00&quot;, &quot;0.00&quot;], [&quot;1.00&quot;, &quot;0.00&quot;, &quot;1.00&quot;], [&quot;1.00&quot;, &quot;1.00&quot;, &quot;0.00&quot;]]}&#39;</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">assertTrue</span><span class="p">(</span><span class="n">grade</span><span class="p">(</span><span class="n">user_input</span><span class="p">,</span> <span class="p">{</span><span class="s">&#39;miller&#39;</span><span class="p">:</span> <span class="s">&#39;(-1,1,1)&#39;</span><span class="p">,</span> <span class="s">&#39;lattice&#39;</span><span class="p">:</span> <span class="s">&#39;bcc&#39;</span><span class="p">}))</span>
+
+    <span class="k">def</span> <span class="nf">test_18</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
+        <span class="n">user_input</span> <span class="o">=</span> <span class="s">&#39;{&quot;lattice&quot;: &quot;bcc&quot;, &quot;points&quot;: [[&quot;0.00&quot;, &quot;0.00&quot;, &quot;0.00&quot;], [&quot;1.00&quot;, &quot;1.00&quot;, &quot;0.00&quot;], [&quot;0.00&quot;, &quot;1.00&quot;, &quot;1.00&quot;]]}&#39;</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">assertTrue</span><span class="p">(</span><span class="n">grade</span><span class="p">(</span><span class="n">user_input</span><span class="p">,</span> <span class="p">{</span><span class="s">&#39;miller&#39;</span><span class="p">:</span> <span class="s">&#39;(1,-1,1)&#39;</span><span class="p">,</span> <span class="s">&#39;lattice&#39;</span><span class="p">:</span> <span class="s">&#39;bcc&#39;</span><span class="p">}))</span>
+
+    <span class="k">def</span> <span class="nf">test_19</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
+        <span class="n">user_input</span> <span class="o">=</span> <span class="s">&#39;{&quot;lattice&quot;: &quot;bcc&quot;, &quot;points&quot;: [[&quot;0.00&quot;, &quot;0.00&quot;, &quot;0.00&quot;], [&quot;1.00&quot;, &quot;1.00&quot;, &quot;0.00&quot;], [&quot;0.00&quot;, &quot;0.00&quot;, &quot;1.00&quot;]]}&#39;</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">assertTrue</span><span class="p">(</span><span class="n">grade</span><span class="p">(</span><span class="n">user_input</span><span class="p">,</span> <span class="p">{</span><span class="s">&#39;miller&#39;</span><span class="p">:</span> <span class="s">&#39;(-1,1,0)&#39;</span><span class="p">,</span> <span class="s">&#39;lattice&#39;</span><span class="p">:</span> <span class="s">&#39;bcc&#39;</span><span class="p">}))</span>
+
+    <span class="k">def</span> <span class="nf">test_20</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
+        <span class="n">user_input</span> <span class="o">=</span> <span class="s">&#39;{&quot;lattice&quot;: &quot;bcc&quot;, &quot;points&quot;: [[&quot;1.00&quot;, &quot;0.00&quot;, &quot;0.00&quot;], [&quot;1.00&quot;, &quot;1.00&quot;, &quot;0.00&quot;], [&quot;0.00&quot;, &quot;0.00&quot;, &quot;1.00&quot;]]}&#39;</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">assertTrue</span><span class="p">(</span><span class="n">grade</span><span class="p">(</span><span class="n">user_input</span><span class="p">,</span> <span class="p">{</span><span class="s">&#39;miller&#39;</span><span class="p">:</span> <span class="s">&#39;(1,0,1)&#39;</span><span class="p">,</span> <span class="s">&#39;lattice&#39;</span><span class="p">:</span> <span class="s">&#39;bcc&#39;</span><span class="p">}))</span>
+
+    <span class="k">def</span> <span class="nf">test_21</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
+        <span class="n">user_input</span> <span class="o">=</span> <span class="s">&#39;{&quot;lattice&quot;: &quot;bcc&quot;, &quot;points&quot;: [[&quot;0.00&quot;, &quot;0.00&quot;, &quot;0.00&quot;], [&quot;0.00&quot;, &quot;1.00&quot;, &quot;0.00&quot;], [&quot;1.00&quot;, &quot;0.00&quot;, &quot;1.00&quot;]]}&#39;</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">assertTrue</span><span class="p">(</span><span class="n">grade</span><span class="p">(</span><span class="n">user_input</span><span class="p">,</span> <span class="p">{</span><span class="s">&#39;miller&#39;</span><span class="p">:</span> <span class="s">&#39;(-1,0,1)&#39;</span><span class="p">,</span> <span class="s">&#39;lattice&#39;</span><span class="p">:</span> <span class="s">&#39;bcc&#39;</span><span class="p">}))</span>
+
+    <span class="k">def</span> <span class="nf">test_22</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
+        <span class="n">user_input</span> <span class="o">=</span> <span class="s">&#39;{&quot;lattice&quot;: &quot;bcc&quot;, &quot;points&quot;: [[&quot;0.00&quot;, &quot;1.00&quot;, &quot;0.00&quot;], [&quot;1.00&quot;, &quot;1.00&quot;, &quot;0.00&quot;], [&quot;0.00&quot;, &quot;0.00&quot;, &quot;1.00&quot;]]}&#39;</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">assertTrue</span><span class="p">(</span><span class="n">grade</span><span class="p">(</span><span class="n">user_input</span><span class="p">,</span> <span class="p">{</span><span class="s">&#39;miller&#39;</span><span class="p">:</span> <span class="s">&#39;(0,1,1)&#39;</span><span class="p">,</span> <span class="s">&#39;lattice&#39;</span><span class="p">:</span> <span class="s">&#39;bcc&#39;</span><span class="p">}))</span>
+
+    <span class="k">def</span> <span class="nf">test_23</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
+        <span class="n">user_input</span> <span class="o">=</span> <span class="s">&#39;{&quot;lattice&quot;: &quot;bcc&quot;, &quot;points&quot;: [[&quot;0.00&quot;, &quot;0.00&quot;, &quot;0.00&quot;], [&quot;1.00&quot;, &quot;0.00&quot;, &quot;0.00&quot;], [&quot;1.00&quot;, &quot;1.00&quot;, &quot;1.00&quot;]]}&#39;</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">assertTrue</span><span class="p">(</span><span class="n">grade</span><span class="p">(</span><span class="n">user_input</span><span class="p">,</span> <span class="p">{</span><span class="s">&#39;miller&#39;</span><span class="p">:</span> <span class="s">&#39;(0,-1,1)&#39;</span><span class="p">,</span> <span class="s">&#39;lattice&#39;</span><span class="p">:</span> <span class="s">&#39;bcc&#39;</span><span class="p">}))</span>
+
+    <span class="k">def</span> <span class="nf">test_24</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
+        <span class="n">user_input</span> <span class="o">=</span> <span class="s">&#39;{&quot;lattice&quot;: &quot;bcc&quot;, &quot;points&quot;: [[&quot;0.66&quot;, &quot;0.00&quot;, &quot;0.00&quot;], [&quot;0.00&quot;, &quot;0.66&quot;, &quot;0.00&quot;], [&quot;0.00&quot;, &quot;0.00&quot;, &quot;0.66&quot;]]}&#39;</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">assertTrue</span><span class="p">(</span><span class="n">grade</span><span class="p">(</span><span class="n">user_input</span><span class="p">,</span> <span class="p">{</span><span class="s">&#39;miller&#39;</span><span class="p">:</span> <span class="s">&#39;(3,3,3)&#39;</span><span class="p">,</span> <span class="s">&#39;lattice&#39;</span><span class="p">:</span> <span class="s">&#39;bcc&#39;</span><span class="p">}))</span>
+
+    <span class="k">def</span> <span class="nf">test_25</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
+        <span class="n">user_input</span> <span class="o">=</span> <span class="s">u&#39;{&quot;lattice&quot;:&quot;&quot;,&quot;points&quot;:[[&quot;0.00&quot;,&quot;0.00&quot;,&quot;0.01&quot;],[&quot;1.00&quot;,&quot;1.00&quot;,&quot;0.01&quot;],[&quot;0.00&quot;,&quot;1.00&quot;,&quot;1.00&quot;]]}&#39;</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">assertTrue</span><span class="p">(</span><span class="n">grade</span><span class="p">(</span><span class="n">user_input</span><span class="p">,</span> <span class="p">{</span><span class="s">&#39;miller&#39;</span><span class="p">:</span> <span class="s">&#39;(1,-1,1)&#39;</span><span class="p">,</span> <span class="s">&#39;lattice&#39;</span><span class="p">:</span> <span class="s">&#39;&#39;</span><span class="p">}))</span>
+
+    <span class="k">def</span> <span class="nf">test_wrong_lattice</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
+        <span class="n">user_input</span> <span class="o">=</span> <span class="s">&#39;{&quot;lattice&quot;: &quot;bcc&quot;, &quot;points&quot;: [[&quot;0.00&quot;, &quot;0.00&quot;, &quot;0.00&quot;], [&quot;1.00&quot;, &quot;0.00&quot;, &quot;0.00&quot;], [&quot;1.00&quot;, &quot;1.00&quot;, &quot;1.00&quot;]]}&#39;</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">assertFalse</span><span class="p">(</span><span class="n">grade</span><span class="p">(</span><span class="n">user_input</span><span class="p">,</span> <span class="p">{</span><span class="s">&#39;miller&#39;</span><span class="p">:</span> <span class="s">&#39;(3,3,3)&#39;</span><span class="p">,</span> <span class="s">&#39;lattice&#39;</span><span class="p">:</span> <span class="s">&#39;fcc&#39;</span><span class="p">}))</span>
+
+</div>
+<span class="k">def</span> <span class="nf">suite</span><span class="p">():</span>
+
+    <span class="n">testcases</span> <span class="o">=</span> <span class="p">[</span><span class="n">Test_Crystallography_Miller</span><span class="p">]</span>
+    <span class="n">suites</span> <span class="o">=</span> <span class="p">[]</span>
+    <span class="k">for</span> <span class="n">testcase</span> <span class="ow">in</span> <span class="n">testcases</span><span class="p">:</span>
+        <span class="n">suites</span><span class="o">.</span><span class="n">append</span><span class="p">(</span><span class="n">unittest</span><span class="o">.</span><span class="n">TestLoader</span><span class="p">()</span><span class="o">.</span><span class="n">loadTestsFromTestCase</span><span class="p">(</span><span class="n">testcase</span><span class="p">))</span>
+    <span class="k">return</span> <span class="n">unittest</span><span class="o">.</span><span class="n">TestSuite</span><span class="p">(</span><span class="n">suites</span><span class="p">)</span>
+
+<span class="k">if</span> <span class="n">__name__</span> <span class="o">==</span> <span class="s">&quot;__main__&quot;</span><span class="p">:</span>
+    <span class="n">unittest</span><span class="o">.</span><span class="n">TextTestRunner</span><span class="p">(</span><span class="n">verbosity</span><span class="o">=</span><span class="mi">2</span><span class="p">)</span><span class="o">.</span><span class="n">run</span><span class="p">(</span><span class="n">suite</span><span class="p">())</span>
+</pre></div>
+
+          </div>
+        </div>
+      </div>
+      <div class="clearer"></div>
+    </div>
+    <div class="related">
+      <h3>Navigation</h3>
+      <ul>
+        <li class="right" style="margin-right: 10px">
+          <a href="../../../genindex.html" title="General Index"
+             >index</a></li>
+        <li class="right" >
+          <a href="../../../py-modindex.html" title="Python Module Index"
+             >modules</a> |</li>
+        <li><a href="../../../index.html">MITx 1.0 documentation</a> &raquo;</li>
+          <li><a href="../../index.html" >Module code</a> &raquo;</li> 
+      </ul>
+    </div>
+    <div class="footer">
+        &copy; Copyright 2012, MITx team.
+      Created using <a href="http://sphinx.pocoo.org/">Sphinx</a> 1.1.3.
+    </div>
+  </body>
+</html>

@@ -1,0 +1,958 @@
+
+
+<!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Transitional//EN"
+  "http://www.w3.org/TR/xhtml1/DTD/xhtml1-transitional.dtd">
+
+
+<html xmlns="http://www.w3.org/1999/xhtml">
+  <head>
+    <meta http-equiv="Content-Type" content="text/html; charset=utf-8" />
+    
+    <title>xmodule.x_module &mdash; MITx 1.0 documentation</title>
+    
+    <link rel="stylesheet" href="../../_static/sphinxdoc.css" type="text/css" />
+    <link rel="stylesheet" href="../../_static/pygments.css" type="text/css" />
+    
+    <script type="text/javascript">
+      var DOCUMENTATION_OPTIONS = {
+        URL_ROOT:    '../../',
+        VERSION:     '1.0',
+        COLLAPSE_INDEX: false,
+        FILE_SUFFIX: '.html',
+        HAS_SOURCE:  true
+      };
+    </script>
+    <script type="text/javascript" src="../../_static/jquery.js"></script>
+    <script type="text/javascript" src="../../_static/underscore.js"></script>
+    <script type="text/javascript" src="../../_static/doctools.js"></script>
+    <script type="text/javascript" src="http://cdn.mathjax.org/mathjax/latest/MathJax.js?config=TeX-AMS-MML_HTMLorMML"></script>
+    <link rel="top" title="MITx 1.0 documentation" href="../../index.html" />
+    <link rel="up" title="Module code" href="../index.html" /> 
+  </head>
+  <body>
+<img src="../../_static/homepage-bg.jpg" alt="Edx logo"  width="100%;"/>
+
+    <div class="related">
+      <h3>Navigation</h3>
+      <ul>
+        <li class="right" style="margin-right: 10px">
+          <a href="../../genindex.html" title="General Index"
+             accesskey="I">index</a></li>
+        <li class="right" >
+          <a href="../../py-modindex.html" title="Python Module Index"
+             >modules</a> |</li>
+        <li><a href="../../index.html">MITx 1.0 documentation</a> &raquo;</li>
+          <li><a href="../index.html" accesskey="U">Module code</a> &raquo;</li> 
+      </ul>
+    </div>
+      <div class="sphinxsidebar">
+        <div class="sphinxsidebarwrapper">
+<div id="searchbox" style="display: none">
+  <h3>Quick search</h3>
+    <form class="search" action="../../search.html" method="get">
+      <input type="text" name="q" />
+      <input type="submit" value="Go" />
+      <input type="hidden" name="check_keywords" value="yes" />
+      <input type="hidden" name="area" value="default" />
+    </form>
+    <p class="searchtip" style="font-size: 90%">
+    Enter search terms or a module, class or function name.
+    </p>
+</div>
+<script type="text/javascript">$('#searchbox').show(0);</script>
+        </div>
+      </div>
+
+    <div class="document">
+      <div class="documentwrapper">
+        <div class="bodywrapper">
+          <div class="body">
+            
+  <h1>Source code for xmodule.x_module</h1><div class="highlight"><pre>
+<span class="kn">import</span> <span class="nn">logging</span>
+<span class="kn">import</span> <span class="nn">pkg_resources</span>
+<span class="kn">import</span> <span class="nn">yaml</span>
+<span class="kn">import</span> <span class="nn">os</span>
+
+<span class="kn">from</span> <span class="nn">functools</span> <span class="kn">import</span> <span class="n">partial</span>
+<span class="kn">from</span> <span class="nn">lxml</span> <span class="kn">import</span> <span class="n">etree</span>
+<span class="kn">from</span> <span class="nn">pprint</span> <span class="kn">import</span> <span class="n">pprint</span>
+<span class="kn">from</span> <span class="nn">collections</span> <span class="kn">import</span> <span class="n">namedtuple</span>
+<span class="kn">from</span> <span class="nn">pkg_resources</span> <span class="kn">import</span> <span class="n">resource_listdir</span><span class="p">,</span> <span class="n">resource_string</span><span class="p">,</span> <span class="n">resource_isdir</span>
+
+<span class="kn">from</span> <span class="nn">xmodule.modulestore</span> <span class="kn">import</span> <span class="n">Location</span>
+<span class="kn">from</span> <span class="nn">xmodule.timeparse</span> <span class="kn">import</span> <span class="n">parse_time</span>
+
+<span class="kn">from</span> <span class="nn">xmodule.contentstore.content</span> <span class="kn">import</span> <span class="n">StaticContent</span><span class="p">,</span> <span class="n">XASSET_SRCREF_PREFIX</span>
+
+<span class="n">log</span> <span class="o">=</span> <span class="n">logging</span><span class="o">.</span><span class="n">getLogger</span><span class="p">(</span><span class="s">&#39;mitx.&#39;</span> <span class="o">+</span> <span class="n">__name__</span><span class="p">)</span>
+
+
+<span class="k">def</span> <span class="nf">dummy_track</span><span class="p">(</span><span class="n">event_type</span><span class="p">,</span> <span class="n">event</span><span class="p">):</span>
+    <span class="k">pass</span>
+
+
+<span class="k">class</span> <span class="nc">ModuleMissingError</span><span class="p">(</span><span class="ne">Exception</span><span class="p">):</span>
+    <span class="k">pass</span>
+
+
+<div class="viewcode-block" id="Plugin"><a class="viewcode-back" href="../../xmodule.html#xmodule.x_module.Plugin">[docs]</a><span class="k">class</span> <span class="nc">Plugin</span><span class="p">(</span><span class="nb">object</span><span class="p">):</span>
+    <span class="sd">&quot;&quot;&quot;</span>
+<span class="sd">    Base class for a system that uses entry_points to load plugins.</span>
+
+<span class="sd">    Implementing classes are expected to have the following attributes:</span>
+
+<span class="sd">        entry_point: The name of the entry point to load plugins from</span>
+<span class="sd">    &quot;&quot;&quot;</span>
+
+    <span class="n">_plugin_cache</span> <span class="o">=</span> <span class="bp">None</span>
+
+    <span class="nd">@classmethod</span>
+<div class="viewcode-block" id="Plugin.load_class"><a class="viewcode-back" href="../../xmodule.html#xmodule.x_module.Plugin.load_class">[docs]</a>    <span class="k">def</span> <span class="nf">load_class</span><span class="p">(</span><span class="n">cls</span><span class="p">,</span> <span class="n">identifier</span><span class="p">,</span> <span class="n">default</span><span class="o">=</span><span class="bp">None</span><span class="p">):</span>
+        <span class="sd">&quot;&quot;&quot;</span>
+<span class="sd">        Loads a single class instance specified by identifier. If identifier</span>
+<span class="sd">        specifies more than a single class, then logs a warning and returns the</span>
+<span class="sd">        first class identified.</span>
+
+<span class="sd">        If default is not None, will return default if no entry_point matching</span>
+<span class="sd">        identifier is found. Otherwise, will raise a ModuleMissingError</span>
+<span class="sd">        &quot;&quot;&quot;</span>
+        <span class="k">if</span> <span class="n">cls</span><span class="o">.</span><span class="n">_plugin_cache</span> <span class="ow">is</span> <span class="bp">None</span><span class="p">:</span>
+            <span class="n">cls</span><span class="o">.</span><span class="n">_plugin_cache</span> <span class="o">=</span> <span class="p">{}</span>
+
+        <span class="k">if</span> <span class="n">identifier</span> <span class="ow">not</span> <span class="ow">in</span> <span class="n">cls</span><span class="o">.</span><span class="n">_plugin_cache</span><span class="p">:</span>
+            <span class="n">identifier</span> <span class="o">=</span> <span class="n">identifier</span><span class="o">.</span><span class="n">lower</span><span class="p">()</span>
+            <span class="n">classes</span> <span class="o">=</span> <span class="nb">list</span><span class="p">(</span><span class="n">pkg_resources</span><span class="o">.</span><span class="n">iter_entry_points</span><span class="p">(</span>
+                    <span class="n">cls</span><span class="o">.</span><span class="n">entry_point</span><span class="p">,</span> <span class="n">name</span><span class="o">=</span><span class="n">identifier</span><span class="p">))</span>
+
+            <span class="k">if</span> <span class="nb">len</span><span class="p">(</span><span class="n">classes</span><span class="p">)</span> <span class="o">&gt;</span> <span class="mi">1</span><span class="p">:</span>
+                <span class="n">log</span><span class="o">.</span><span class="n">warning</span><span class="p">(</span><span class="s">&quot;Found multiple classes for {entry_point} with &quot;</span>
+                            <span class="s">&quot;identifier {id}: {classes}. &quot;</span>
+                            <span class="s">&quot;Returning the first one.&quot;</span><span class="o">.</span><span class="n">format</span><span class="p">(</span>
+                    <span class="n">entry_point</span><span class="o">=</span><span class="n">cls</span><span class="o">.</span><span class="n">entry_point</span><span class="p">,</span>
+                    <span class="nb">id</span><span class="o">=</span><span class="n">identifier</span><span class="p">,</span>
+                    <span class="n">classes</span><span class="o">=</span><span class="s">&quot;, &quot;</span><span class="o">.</span><span class="n">join</span><span class="p">(</span>
+                            <span class="n">class_</span><span class="o">.</span><span class="n">module_name</span> <span class="k">for</span> <span class="n">class_</span> <span class="ow">in</span> <span class="n">classes</span><span class="p">)))</span>
+
+            <span class="k">if</span> <span class="nb">len</span><span class="p">(</span><span class="n">classes</span><span class="p">)</span> <span class="o">==</span> <span class="mi">0</span><span class="p">:</span>
+                <span class="k">if</span> <span class="n">default</span> <span class="ow">is</span> <span class="ow">not</span> <span class="bp">None</span><span class="p">:</span>
+                    <span class="k">return</span> <span class="n">default</span>
+                <span class="k">raise</span> <span class="n">ModuleMissingError</span><span class="p">(</span><span class="n">identifier</span><span class="p">)</span>
+
+            <span class="n">cls</span><span class="o">.</span><span class="n">_plugin_cache</span><span class="p">[</span><span class="n">identifier</span><span class="p">]</span> <span class="o">=</span> <span class="n">classes</span><span class="p">[</span><span class="mi">0</span><span class="p">]</span><span class="o">.</span><span class="n">load</span><span class="p">()</span>
+        <span class="k">return</span> <span class="n">cls</span><span class="o">.</span><span class="n">_plugin_cache</span><span class="p">[</span><span class="n">identifier</span><span class="p">]</span>
+</div>
+    <span class="nd">@classmethod</span>
+<div class="viewcode-block" id="Plugin.load_classes"><a class="viewcode-back" href="../../xmodule.html#xmodule.x_module.Plugin.load_classes">[docs]</a>    <span class="k">def</span> <span class="nf">load_classes</span><span class="p">(</span><span class="n">cls</span><span class="p">):</span>
+        <span class="sd">&quot;&quot;&quot;</span>
+<span class="sd">        Returns a list of containing the identifiers and their corresponding classes for all</span>
+<span class="sd">        of the available instances of this plugin</span>
+<span class="sd">        &quot;&quot;&quot;</span>
+        <span class="k">return</span> <span class="p">[(</span><span class="n">class_</span><span class="o">.</span><span class="n">name</span><span class="p">,</span> <span class="n">class_</span><span class="o">.</span><span class="n">load</span><span class="p">())</span>
+                <span class="k">for</span> <span class="n">class_</span>
+                <span class="ow">in</span> <span class="n">pkg_resources</span><span class="o">.</span><span class="n">iter_entry_points</span><span class="p">(</span><span class="n">cls</span><span class="o">.</span><span class="n">entry_point</span><span class="p">)]</span>
+
+</div></div>
+<div class="viewcode-block" id="HTMLSnippet"><a class="viewcode-back" href="../../xmodule.html#xmodule.x_module.HTMLSnippet">[docs]</a><span class="k">class</span> <span class="nc">HTMLSnippet</span><span class="p">(</span><span class="nb">object</span><span class="p">):</span>
+    <span class="sd">&quot;&quot;&quot;</span>
+<span class="sd">    A base class defining an interface for an object that is able to present an</span>
+<span class="sd">    html snippet, along with associated javascript and css</span>
+<span class="sd">    &quot;&quot;&quot;</span>
+
+    <span class="n">js</span> <span class="o">=</span> <span class="p">{}</span>
+    <span class="n">js_module_name</span> <span class="o">=</span> <span class="bp">None</span>
+
+    <span class="n">css</span> <span class="o">=</span> <span class="p">{}</span>
+
+    <span class="nd">@classmethod</span>
+<div class="viewcode-block" id="HTMLSnippet.get_javascript"><a class="viewcode-back" href="../../xmodule.html#xmodule.x_module.HTMLSnippet.get_javascript">[docs]</a>    <span class="k">def</span> <span class="nf">get_javascript</span><span class="p">(</span><span class="n">cls</span><span class="p">):</span>
+        <span class="sd">&quot;&quot;&quot;</span>
+<span class="sd">        Return a dictionary containing some of the following keys:</span>
+
+<span class="sd">            coffee: A list of coffeescript fragments that should be compiled and</span>
+<span class="sd">                    placed on the page</span>
+
+<span class="sd">            js: A list of javascript fragments that should be included on the</span>
+<span class="sd">            page</span>
+
+<span class="sd">        All of these will be loaded onto the page in the CMS</span>
+<span class="sd">        &quot;&quot;&quot;</span>
+        <span class="k">return</span> <span class="n">cls</span><span class="o">.</span><span class="n">js</span>
+</div>
+    <span class="nd">@classmethod</span>
+<div class="viewcode-block" id="HTMLSnippet.get_css"><a class="viewcode-back" href="../../xmodule.html#xmodule.x_module.HTMLSnippet.get_css">[docs]</a>    <span class="k">def</span> <span class="nf">get_css</span><span class="p">(</span><span class="n">cls</span><span class="p">):</span>
+        <span class="sd">&quot;&quot;&quot;</span>
+<span class="sd">        Return a dictionary containing some of the following keys:</span>
+
+<span class="sd">            css: A list of css fragments that should be applied to the html</span>
+<span class="sd">                 contents of the snippet</span>
+
+<span class="sd">            sass: A list of sass fragments that should be applied to the html</span>
+<span class="sd">                  contents of the snippet</span>
+
+<span class="sd">            scss: A list of scss fragments that should be applied to the html</span>
+<span class="sd">                  contents of the snippet</span>
+<span class="sd">        &quot;&quot;&quot;</span>
+        <span class="k">return</span> <span class="n">cls</span><span class="o">.</span><span class="n">css</span>
+</div>
+<div class="viewcode-block" id="HTMLSnippet.get_html"><a class="viewcode-back" href="../../xmodule.html#xmodule.x_module.HTMLSnippet.get_html">[docs]</a>    <span class="k">def</span> <span class="nf">get_html</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
+        <span class="sd">&quot;&quot;&quot;</span>
+<span class="sd">        Return the html used to display this snippet</span>
+<span class="sd">        &quot;&quot;&quot;</span>
+        <span class="k">raise</span> <span class="ne">NotImplementedError</span><span class="p">(</span>
+            <span class="s">&quot;get_html() must be provided by specific modules - not present in {0}&quot;</span>
+                                  <span class="o">.</span><span class="n">format</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">__class__</span><span class="p">))</span>
+
+</div></div>
+<div class="viewcode-block" id="XModule"><a class="viewcode-back" href="../../xmodule.html#xmodule.x_module.XModule">[docs]</a><span class="k">class</span> <span class="nc">XModule</span><span class="p">(</span><span class="n">HTMLSnippet</span><span class="p">):</span>
+    <span class="sd">&#39;&#39;&#39; Implements a generic learning module.</span>
+
+<span class="sd">        Subclasses must at a minimum provide a definition for get_html in order</span>
+<span class="sd">        to be displayed to users.</span>
+
+<span class="sd">        See the HTML module for a simple example.</span>
+<span class="sd">    &#39;&#39;&#39;</span>
+
+    <span class="c"># The default implementation of get_icon_class returns the icon_class</span>
+    <span class="c"># attribute of the class</span>
+    <span class="c">#</span>
+    <span class="c"># This attribute can be overridden by subclasses, and</span>
+    <span class="c"># the function can also be overridden if the icon class depends on the data</span>
+    <span class="c"># in the module</span>
+    <span class="n">icon_class</span> <span class="o">=</span> <span class="s">&#39;other&#39;</span>
+
+    <span class="k">def</span> <span class="nf">__init__</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">system</span><span class="p">,</span> <span class="n">location</span><span class="p">,</span> <span class="n">definition</span><span class="p">,</span> <span class="n">descriptor</span><span class="p">,</span>
+                 <span class="n">instance_state</span><span class="o">=</span><span class="bp">None</span><span class="p">,</span> <span class="n">shared_state</span><span class="o">=</span><span class="bp">None</span><span class="p">,</span> <span class="o">**</span><span class="n">kwargs</span><span class="p">):</span>
+        <span class="sd">&#39;&#39;&#39;</span>
+<span class="sd">        Construct a new xmodule</span>
+
+<span class="sd">        system: A ModuleSystem allowing access to external resources</span>
+
+<span class="sd">        location: Something Location-like that identifies this xmodule</span>
+
+<span class="sd">        definition: A dictionary containing &#39;data&#39; and &#39;children&#39;. Both are</span>
+<span class="sd">        optional</span>
+
+<span class="sd">            &#39;data&#39;: is JSON-like (string, dictionary, list, bool, or None,</span>
+<span class="sd">                optionally nested).</span>
+
+<span class="sd">                This defines all of the data necessary for a problem to display</span>
+<span class="sd">                that is intrinsic to the problem.  It should not include any</span>
+<span class="sd">                data that would vary between two courses using the same problem</span>
+<span class="sd">                (due dates, grading policy, randomization, etc.)</span>
+
+<span class="sd">            &#39;children&#39;: is a list of Location-like values for child modules that</span>
+<span class="sd">                this module depends on</span>
+
+<span class="sd">        descriptor: the XModuleDescriptor that this module is an instance of.</span>
+<span class="sd">            TODO (vshnayder): remove the definition parameter and location--they</span>
+<span class="sd">            can come from the descriptor.</span>
+
+<span class="sd">        instance_state: A string of serialized json that contains the state of</span>
+<span class="sd">                this module for current student accessing the system, or None if</span>
+<span class="sd">                no state has been saved</span>
+
+<span class="sd">        shared_state: A string of serialized json that contains the state that</span>
+<span class="sd">            is shared between this module and any modules of the same type with</span>
+<span class="sd">            the same shared_state_key. This state is only shared per-student,</span>
+<span class="sd">            not across different students</span>
+
+<span class="sd">        kwargs: Optional arguments. Subclasses should always accept kwargs and</span>
+<span class="sd">            pass them to the parent class constructor.</span>
+
+<span class="sd">            Current known uses of kwargs:</span>
+
+<span class="sd">                metadata: SCAFFOLDING - This dictionary will be split into</span>
+<span class="sd">                    several different types of metadata in the future (course</span>
+<span class="sd">                    policy, modification history, etc).  A dictionary containing</span>
+<span class="sd">                    data that specifies information that is particular to a</span>
+<span class="sd">                    problem in the context of a course</span>
+<span class="sd">        &#39;&#39;&#39;</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">system</span> <span class="o">=</span> <span class="n">system</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">location</span> <span class="o">=</span> <span class="n">Location</span><span class="p">(</span><span class="n">location</span><span class="p">)</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">definition</span> <span class="o">=</span> <span class="n">definition</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">descriptor</span> <span class="o">=</span> <span class="n">descriptor</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">instance_state</span> <span class="o">=</span> <span class="n">instance_state</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">shared_state</span> <span class="o">=</span> <span class="n">shared_state</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">id</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">location</span><span class="o">.</span><span class="n">url</span><span class="p">()</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">url_name</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">location</span><span class="o">.</span><span class="n">name</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">category</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">location</span><span class="o">.</span><span class="n">category</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">metadata</span> <span class="o">=</span> <span class="n">kwargs</span><span class="o">.</span><span class="n">get</span><span class="p">(</span><span class="s">&#39;metadata&#39;</span><span class="p">,</span> <span class="p">{})</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">_loaded_children</span> <span class="o">=</span> <span class="bp">None</span>
+
+    <span class="nd">@property</span>
+<div class="viewcode-block" id="XModule.display_name"><a class="viewcode-back" href="../../xmodule.html#xmodule.x_module.XModule.display_name">[docs]</a>    <span class="k">def</span> <span class="nf">display_name</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
+        <span class="sd">&#39;&#39;&#39;</span>
+<span class="sd">        Return a display name for the module: use display_name if defined in</span>
+<span class="sd">        metadata, otherwise convert the url name.</span>
+<span class="sd">        &#39;&#39;&#39;</span>
+        <span class="k">return</span> <span class="bp">self</span><span class="o">.</span><span class="n">metadata</span><span class="o">.</span><span class="n">get</span><span class="p">(</span><span class="s">&#39;display_name&#39;</span><span class="p">,</span>
+                                 <span class="bp">self</span><span class="o">.</span><span class="n">url_name</span><span class="o">.</span><span class="n">replace</span><span class="p">(</span><span class="s">&#39;_&#39;</span><span class="p">,</span> <span class="s">&#39; &#39;</span><span class="p">))</span>
+</div>
+    <span class="k">def</span> <span class="nf">__unicode__</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
+        <span class="k">return</span> <span class="s">&#39;&lt;x_module(id={0})&gt;&#39;</span><span class="o">.</span><span class="n">format</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">id</span><span class="p">)</span>
+
+<div class="viewcode-block" id="XModule.get_children"><a class="viewcode-back" href="../../xmodule.html#xmodule.x_module.XModule.get_children">[docs]</a>    <span class="k">def</span> <span class="nf">get_children</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
+        <span class="sd">&#39;&#39;&#39;</span>
+<span class="sd">        Return module instances for all the children of this module.</span>
+<span class="sd">        &#39;&#39;&#39;</span>
+        <span class="k">if</span> <span class="bp">self</span><span class="o">.</span><span class="n">_loaded_children</span> <span class="ow">is</span> <span class="bp">None</span><span class="p">:</span>
+            <span class="n">child_locations</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">get_children_locations</span><span class="p">()</span>
+            <span class="n">children</span> <span class="o">=</span> <span class="p">[</span><span class="bp">self</span><span class="o">.</span><span class="n">system</span><span class="o">.</span><span class="n">get_module</span><span class="p">(</span><span class="n">loc</span><span class="p">)</span> <span class="k">for</span> <span class="n">loc</span> <span class="ow">in</span> <span class="n">child_locations</span><span class="p">]</span>
+            <span class="c"># get_module returns None if the current user doesn&#39;t have access</span>
+            <span class="c"># to the location.</span>
+            <span class="bp">self</span><span class="o">.</span><span class="n">_loaded_children</span> <span class="o">=</span> <span class="p">[</span><span class="n">c</span> <span class="k">for</span> <span class="n">c</span> <span class="ow">in</span> <span class="n">children</span> <span class="k">if</span> <span class="n">c</span> <span class="ow">is</span> <span class="ow">not</span> <span class="bp">None</span><span class="p">]</span>
+
+        <span class="k">return</span> <span class="bp">self</span><span class="o">.</span><span class="n">_loaded_children</span>
+    </div>
+<div class="viewcode-block" id="XModule.get_children_locations"><a class="viewcode-back" href="../../xmodule.html#xmodule.x_module.XModule.get_children_locations">[docs]</a>    <span class="k">def</span> <span class="nf">get_children_locations</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
+        <span class="sd">&#39;&#39;&#39;</span>
+<span class="sd">        Returns the locations of each of child modules.</span>
+<span class="sd">        </span>
+<span class="sd">        Overriding this changes the behavior of get_children and</span>
+<span class="sd">        anything that uses get_children, such as get_display_items.</span>
+<span class="sd">        </span>
+<span class="sd">        This method will not instantiate the modules of the children</span>
+<span class="sd">        unless absolutely necessary, so it is cheaper to call than get_children</span>
+<span class="sd">        </span>
+<span class="sd">        These children will be the same children returned by the</span>
+<span class="sd">        descriptor unless descriptor.has_dynamic_children() is true.</span>
+<span class="sd">        &#39;&#39;&#39;</span>
+        <span class="k">return</span> <span class="bp">self</span><span class="o">.</span><span class="n">definition</span><span class="o">.</span><span class="n">get</span><span class="p">(</span><span class="s">&#39;children&#39;</span><span class="p">,</span> <span class="p">[])</span>
+</div>
+<div class="viewcode-block" id="XModule.get_display_items"><a class="viewcode-back" href="../../xmodule.html#xmodule.x_module.XModule.get_display_items">[docs]</a>    <span class="k">def</span> <span class="nf">get_display_items</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
+        <span class="sd">&#39;&#39;&#39;</span>
+<span class="sd">        Returns a list of descendent module instances that will display</span>
+<span class="sd">        immediately inside this module.</span>
+<span class="sd">        &#39;&#39;&#39;</span>
+        <span class="n">items</span> <span class="o">=</span> <span class="p">[]</span>
+        <span class="k">for</span> <span class="n">child</span> <span class="ow">in</span> <span class="bp">self</span><span class="o">.</span><span class="n">get_children</span><span class="p">():</span>
+            <span class="n">items</span><span class="o">.</span><span class="n">extend</span><span class="p">(</span><span class="n">child</span><span class="o">.</span><span class="n">displayable_items</span><span class="p">())</span>
+
+        <span class="k">return</span> <span class="n">items</span>
+</div>
+<div class="viewcode-block" id="XModule.displayable_items"><a class="viewcode-back" href="../../xmodule.html#xmodule.x_module.XModule.displayable_items">[docs]</a>    <span class="k">def</span> <span class="nf">displayable_items</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
+        <span class="sd">&#39;&#39;&#39;</span>
+<span class="sd">        Returns list of displayable modules contained by this module. If this</span>
+<span class="sd">        module is visible, should return [self].</span>
+<span class="sd">        &#39;&#39;&#39;</span>
+        <span class="k">return</span> <span class="p">[</span><span class="bp">self</span><span class="p">]</span>
+</div>
+<div class="viewcode-block" id="XModule.get_icon_class"><a class="viewcode-back" href="../../xmodule.html#xmodule.x_module.XModule.get_icon_class">[docs]</a>    <span class="k">def</span> <span class="nf">get_icon_class</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
+        <span class="sd">&#39;&#39;&#39;</span>
+<span class="sd">        Return a css class identifying this module in the context of an icon</span>
+<span class="sd">        &#39;&#39;&#39;</span>
+        <span class="k">return</span> <span class="bp">self</span><span class="o">.</span><span class="n">icon_class</span>
+
+    <span class="c">### Functions used in the LMS</span>
+</div>
+<div class="viewcode-block" id="XModule.get_instance_state"><a class="viewcode-back" href="../../xmodule.html#xmodule.x_module.XModule.get_instance_state">[docs]</a>    <span class="k">def</span> <span class="nf">get_instance_state</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
+        <span class="sd">&#39;&#39;&#39; State of the object, as stored in the database</span>
+<span class="sd">        &#39;&#39;&#39;</span>
+        <span class="k">return</span> <span class="s">&#39;{}&#39;</span>
+</div>
+<div class="viewcode-block" id="XModule.get_shared_state"><a class="viewcode-back" href="../../xmodule.html#xmodule.x_module.XModule.get_shared_state">[docs]</a>    <span class="k">def</span> <span class="nf">get_shared_state</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
+        <span class="sd">&#39;&#39;&#39;</span>
+<span class="sd">        Get state that should be shared with other instances</span>
+<span class="sd">        using the same &#39;shared_state_key&#39; attribute.</span>
+<span class="sd">        &#39;&#39;&#39;</span>
+        <span class="k">return</span> <span class="s">&#39;{}&#39;</span>
+</div>
+<div class="viewcode-block" id="XModule.get_score"><a class="viewcode-back" href="../../xmodule.html#xmodule.x_module.XModule.get_score">[docs]</a>    <span class="k">def</span> <span class="nf">get_score</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
+        <span class="sd">&#39;&#39;&#39; Score the student received on the problem.</span>
+<span class="sd">        &#39;&#39;&#39;</span>
+        <span class="k">return</span> <span class="bp">None</span>
+</div>
+<div class="viewcode-block" id="XModule.max_score"><a class="viewcode-back" href="../../xmodule.html#xmodule.x_module.XModule.max_score">[docs]</a>    <span class="k">def</span> <span class="nf">max_score</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
+        <span class="sd">&#39;&#39;&#39; Maximum score. Two notes:</span>
+
+<span class="sd">            * This is generic; in abstract, a problem could be 3/5 points on one</span>
+<span class="sd">              randomization, and 5/7 on another</span>
+
+<span class="sd">            * In practice, this is a Very Bad Idea, and (a) will break some code</span>
+<span class="sd">              in place (although that code should get fixed), and (b) break some</span>
+<span class="sd">              analytics we plan to put in place.</span>
+<span class="sd">        &#39;&#39;&#39;</span>
+        <span class="k">return</span> <span class="bp">None</span>
+</div>
+<div class="viewcode-block" id="XModule.get_progress"><a class="viewcode-back" href="../../xmodule.html#xmodule.x_module.XModule.get_progress">[docs]</a>    <span class="k">def</span> <span class="nf">get_progress</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
+        <span class="sd">&#39;&#39;&#39; Return a progress.Progress object that represents how far the</span>
+<span class="sd">        student has gone in this module.  Must be implemented to get correct</span>
+<span class="sd">        progress tracking behavior in nesting modules like sequence and</span>
+<span class="sd">        vertical.</span>
+
+<span class="sd">        If this module has no notion of progress, return None.</span>
+<span class="sd">        &#39;&#39;&#39;</span>
+        <span class="k">return</span> <span class="bp">None</span>
+</div>
+<div class="viewcode-block" id="XModule.handle_ajax"><a class="viewcode-back" href="../../xmodule.html#xmodule.x_module.XModule.handle_ajax">[docs]</a>    <span class="k">def</span> <span class="nf">handle_ajax</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">dispatch</span><span class="p">,</span> <span class="n">get</span><span class="p">):</span>
+        <span class="sd">&#39;&#39;&#39; dispatch is last part of the URL.</span>
+<span class="sd">            get is a dictionary-like object &#39;&#39;&#39;</span>
+        <span class="k">return</span> <span class="s">&quot;&quot;</span>
+
+    <span class="c"># cdodge: added to support dynamic substitutions of </span>
+    <span class="c"># links for courseware assets (e.g. images). &lt;link&gt; is passed through from lxml.html parser</span></div>
+    <span class="k">def</span> <span class="nf">rewrite_content_links</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">link</span><span class="p">):</span>
+        <span class="c"># see if we start with our format, e.g. &#39;xasset:&lt;filename&gt;&#39;</span>
+        <span class="k">if</span> <span class="n">link</span><span class="o">.</span><span class="n">startswith</span><span class="p">(</span><span class="n">XASSET_SRCREF_PREFIX</span><span class="p">):</span>
+            <span class="c"># yes, then parse out the name</span>
+            <span class="n">name</span> <span class="o">=</span> <span class="n">link</span><span class="p">[</span><span class="nb">len</span><span class="p">(</span><span class="n">XASSET_SRCREF_PREFIX</span><span class="p">):]</span>
+            <span class="n">loc</span> <span class="o">=</span> <span class="n">Location</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">location</span><span class="p">)</span>
+            <span class="c"># resolve the reference to our internal &#39;filepath&#39; which</span>
+            <span class="n">link</span> <span class="o">=</span> <span class="n">StaticContent</span><span class="o">.</span><span class="n">compute_location_filename</span><span class="p">(</span><span class="n">loc</span><span class="o">.</span><span class="n">org</span><span class="p">,</span> <span class="n">loc</span><span class="o">.</span><span class="n">course</span><span class="p">,</span> <span class="n">name</span><span class="p">)</span>
+
+        <span class="k">return</span> <span class="n">link</span>
+
+
+</div>
+<div class="viewcode-block" id="policy_key"><a class="viewcode-back" href="../../xmodule.html#xmodule.x_module.policy_key">[docs]</a><span class="k">def</span> <span class="nf">policy_key</span><span class="p">(</span><span class="n">location</span><span class="p">):</span>
+    <span class="sd">&quot;&quot;&quot;</span>
+<span class="sd">    Get the key for a location in a policy file.  (Since the policy file is</span>
+<span class="sd">    specific to a course, it doesn&#39;t need the full location url).</span>
+<span class="sd">    &quot;&quot;&quot;</span>
+    <span class="k">return</span> <span class="s">&#39;{cat}/{name}&#39;</span><span class="o">.</span><span class="n">format</span><span class="p">(</span><span class="n">cat</span><span class="o">=</span><span class="n">location</span><span class="o">.</span><span class="n">category</span><span class="p">,</span> <span class="n">name</span><span class="o">=</span><span class="n">location</span><span class="o">.</span><span class="n">name</span><span class="p">)</span>
+
+</div>
+<span class="n">Template</span> <span class="o">=</span> <span class="n">namedtuple</span><span class="p">(</span><span class="s">&quot;Template&quot;</span><span class="p">,</span> <span class="s">&quot;metadata data children&quot;</span><span class="p">)</span>
+
+
+<span class="k">class</span> <span class="nc">ResourceTemplates</span><span class="p">(</span><span class="nb">object</span><span class="p">):</span>
+    <span class="nd">@classmethod</span>
+    <span class="k">def</span> <span class="nf">templates</span><span class="p">(</span><span class="n">cls</span><span class="p">):</span>
+        <span class="sd">&quot;&quot;&quot;</span>
+<span class="sd">        Returns a list of Template objects that describe possible templates that can be used</span>
+<span class="sd">        to create a module of this type.</span>
+<span class="sd">        If no templates are provided, there will be no way to create a module of</span>
+<span class="sd">        this type</span>
+
+<span class="sd">        Expects a class attribute template_dir_name that defines the directory</span>
+<span class="sd">        inside the &#39;templates&#39; resource directory to pull templates from</span>
+<span class="sd">        &quot;&quot;&quot;</span>
+        <span class="n">templates</span> <span class="o">=</span> <span class="p">[]</span>
+        <span class="n">dirname</span> <span class="o">=</span> <span class="n">os</span><span class="o">.</span><span class="n">path</span><span class="o">.</span><span class="n">join</span><span class="p">(</span><span class="s">&#39;templates&#39;</span><span class="p">,</span> <span class="n">cls</span><span class="o">.</span><span class="n">template_dir_name</span><span class="p">)</span>
+        <span class="k">if</span> <span class="ow">not</span> <span class="n">resource_isdir</span><span class="p">(</span><span class="n">__name__</span><span class="p">,</span> <span class="n">dirname</span><span class="p">):</span>
+            <span class="n">log</span><span class="o">.</span><span class="n">warning</span><span class="p">(</span><span class="s">&quot;No resource directory {dir} found when loading {cls_name} templates&quot;</span><span class="o">.</span><span class="n">format</span><span class="p">(</span>
+                <span class="nb">dir</span><span class="o">=</span><span class="n">dirname</span><span class="p">,</span>
+                <span class="n">cls_name</span><span class="o">=</span><span class="n">cls</span><span class="o">.</span><span class="n">__name__</span><span class="p">,</span>
+            <span class="p">))</span>
+            <span class="k">return</span> <span class="p">[]</span>
+
+        <span class="k">for</span> <span class="n">template_file</span> <span class="ow">in</span> <span class="n">resource_listdir</span><span class="p">(</span><span class="n">__name__</span><span class="p">,</span> <span class="n">dirname</span><span class="p">):</span>
+            <span class="n">template_content</span> <span class="o">=</span> <span class="n">resource_string</span><span class="p">(</span><span class="n">__name__</span><span class="p">,</span> <span class="n">os</span><span class="o">.</span><span class="n">path</span><span class="o">.</span><span class="n">join</span><span class="p">(</span><span class="n">dirname</span><span class="p">,</span> <span class="n">template_file</span><span class="p">))</span>
+            <span class="n">template</span> <span class="o">=</span> <span class="n">yaml</span><span class="o">.</span><span class="n">load</span><span class="p">(</span><span class="n">template_content</span><span class="p">)</span>
+            <span class="n">templates</span><span class="o">.</span><span class="n">append</span><span class="p">(</span><span class="n">Template</span><span class="p">(</span><span class="o">**</span><span class="n">template</span><span class="p">))</span>
+
+        <span class="k">return</span> <span class="n">templates</span>
+
+
+<div class="viewcode-block" id="XModuleDescriptor"><a class="viewcode-back" href="../../xmodule.html#xmodule.x_module.XModuleDescriptor">[docs]</a><span class="k">class</span> <span class="nc">XModuleDescriptor</span><span class="p">(</span><span class="n">Plugin</span><span class="p">,</span> <span class="n">HTMLSnippet</span><span class="p">,</span> <span class="n">ResourceTemplates</span><span class="p">):</span>
+    <span class="sd">&quot;&quot;&quot;</span>
+<span class="sd">    An XModuleDescriptor is a specification for an element of a course. This</span>
+<span class="sd">    could be a problem, an organizational element (a group of content), or a</span>
+<span class="sd">    segment of video, for example.</span>
+
+<span class="sd">    XModuleDescriptors are independent and agnostic to the current student state</span>
+<span class="sd">    on a problem. They handle the editing interface used by instructors to</span>
+<span class="sd">    create a problem, and can generate XModules (which do know about student</span>
+<span class="sd">    state).</span>
+<span class="sd">    &quot;&quot;&quot;</span>
+    <span class="n">entry_point</span> <span class="o">=</span> <span class="s">&quot;xmodule.v1&quot;</span>
+    <span class="n">module_class</span> <span class="o">=</span> <span class="n">XModule</span>
+
+    <span class="c"># Attributes for inpsection of the descriptor</span>
+    <span class="n">stores_state</span> <span class="o">=</span> <span class="bp">False</span>  <span class="c"># Indicates whether the xmodule state should be</span>
+    <span class="c"># stored in a database (independent of shared state)</span>
+    <span class="n">has_score</span> <span class="o">=</span> <span class="bp">False</span>  <span class="c"># This indicates whether the xmodule is a problem-type.</span>
+    <span class="c"># It should respond to max_score() and grade(). It can be graded or ungraded</span>
+    <span class="c"># (like a practice problem).</span>
+
+    <span class="c"># A list of metadata that this module can inherit from its parent module</span>
+    <span class="n">inheritable_metadata</span> <span class="o">=</span> <span class="p">(</span>
+        <span class="s">&#39;graded&#39;</span><span class="p">,</span> <span class="s">&#39;start&#39;</span><span class="p">,</span> <span class="s">&#39;due&#39;</span><span class="p">,</span> <span class="s">&#39;graceperiod&#39;</span><span class="p">,</span> <span class="s">&#39;showanswer&#39;</span><span class="p">,</span> <span class="s">&#39;rerandomize&#39;</span><span class="p">,</span>
+        <span class="c"># TODO (ichuang): used for Fall 2012 xqa server access</span>
+        <span class="s">&#39;xqa_key&#39;</span><span class="p">,</span>
+        <span class="c"># TODO: This is used by the XMLModuleStore to provide for locations for</span>
+        <span class="c"># static files, and will need to be removed when that code is removed</span>
+        <span class="s">&#39;data_dir&#39;</span>
+    <span class="p">)</span>
+
+    <span class="c"># cdodge: this is a list of metadata names which are &#39;system&#39; metadata</span>
+    <span class="c"># and should not be edited by an end-user</span>
+    <span class="n">system_metadata_fields</span> <span class="o">=</span> <span class="p">[</span> <span class="s">&#39;data_dir&#39;</span> <span class="p">]</span>
+    
+    <span class="c"># A list of descriptor attributes that must be equal for the descriptors to</span>
+    <span class="c"># be equal</span>
+    <span class="n">equality_attributes</span> <span class="o">=</span> <span class="p">(</span><span class="s">&#39;definition&#39;</span><span class="p">,</span> <span class="s">&#39;metadata&#39;</span><span class="p">,</span> <span class="s">&#39;location&#39;</span><span class="p">,</span>
+                           <span class="s">&#39;shared_state_key&#39;</span><span class="p">,</span> <span class="s">&#39;_inherited_metadata&#39;</span><span class="p">)</span>
+
+    <span class="c"># Name of resource directory to load templates from</span>
+    <span class="n">template_dir_name</span> <span class="o">=</span> <span class="s">&quot;default&quot;</span>
+
+    <span class="c"># ============================= STRUCTURAL MANIPULATION ===================</span>
+    <span class="k">def</span> <span class="nf">__init__</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span>
+                 <span class="n">system</span><span class="p">,</span>
+                 <span class="n">definition</span><span class="o">=</span><span class="bp">None</span><span class="p">,</span>
+                 <span class="o">**</span><span class="n">kwargs</span><span class="p">):</span>
+        <span class="sd">&quot;&quot;&quot;</span>
+<span class="sd">        Construct a new XModuleDescriptor. The only required arguments are the</span>
+<span class="sd">        system, used for interaction with external resources, and the</span>
+<span class="sd">        definition, which specifies all the data needed to edit and display the</span>
+<span class="sd">        problem (but none of the associated metadata that handles recordkeeping</span>
+<span class="sd">        around the problem).</span>
+
+<span class="sd">        This allows for maximal flexibility to add to the interface while</span>
+<span class="sd">        preserving backwards compatibility.</span>
+
+<span class="sd">        system: A DescriptorSystem for interacting with external resources</span>
+
+<span class="sd">        definition: A dict containing `data` and `children` representing the</span>
+<span class="sd">        problem definition</span>
+
+<span class="sd">        Current arguments passed in kwargs:</span>
+
+<span class="sd">            location: A xmodule.modulestore.Location object indicating the name</span>
+<span class="sd">                and ownership of this problem</span>
+
+<span class="sd">            shared_state_key: The key to use for sharing StudentModules with</span>
+<span class="sd">                other modules of this type</span>
+
+<span class="sd">            metadata: A dictionary containing the following optional keys:</span>
+<span class="sd">                goals: A list of strings of learning goals associated with this</span>
+<span class="sd">                    module</span>
+<span class="sd">                display_name: The name to use for displaying this module to the</span>
+<span class="sd">                    user</span>
+<span class="sd">                url_name: The name to use for this module in urls and other places</span>
+<span class="sd">                    where a unique name is needed.</span>
+<span class="sd">                format: The format of this module (&#39;Homework&#39;, &#39;Lab&#39;, etc)</span>
+<span class="sd">                graded (bool): Whether this module is should be graded or not</span>
+<span class="sd">                start (string): The date for which this module will be available</span>
+<span class="sd">                due (string): The due date for this module</span>
+<span class="sd">                graceperiod (string): The amount of grace period to allow when</span>
+<span class="sd">                    enforcing the due date</span>
+<span class="sd">                showanswer (string): When to show answers for this module</span>
+<span class="sd">                rerandomize (string): When to generate a newly randomized</span>
+<span class="sd">                    instance of the module data</span>
+<span class="sd">        &quot;&quot;&quot;</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">system</span> <span class="o">=</span> <span class="n">system</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">metadata</span> <span class="o">=</span> <span class="n">kwargs</span><span class="o">.</span><span class="n">get</span><span class="p">(</span><span class="s">&#39;metadata&#39;</span><span class="p">,</span> <span class="p">{})</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">definition</span> <span class="o">=</span> <span class="n">definition</span> <span class="k">if</span> <span class="n">definition</span> <span class="ow">is</span> <span class="ow">not</span> <span class="bp">None</span> <span class="k">else</span> <span class="p">{}</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">location</span> <span class="o">=</span> <span class="n">Location</span><span class="p">(</span><span class="n">kwargs</span><span class="o">.</span><span class="n">get</span><span class="p">(</span><span class="s">&#39;location&#39;</span><span class="p">))</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">url_name</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">location</span><span class="o">.</span><span class="n">name</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">category</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">location</span><span class="o">.</span><span class="n">category</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">shared_state_key</span> <span class="o">=</span> <span class="n">kwargs</span><span class="o">.</span><span class="n">get</span><span class="p">(</span><span class="s">&#39;shared_state_key&#39;</span><span class="p">)</span>
+
+        <span class="bp">self</span><span class="o">.</span><span class="n">_child_instances</span> <span class="o">=</span> <span class="bp">None</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">_inherited_metadata</span> <span class="o">=</span> <span class="nb">set</span><span class="p">()</span>
+
+    <span class="nd">@property</span>
+<div class="viewcode-block" id="XModuleDescriptor.display_name"><a class="viewcode-back" href="../../xmodule.html#xmodule.x_module.XModuleDescriptor.display_name">[docs]</a>    <span class="k">def</span> <span class="nf">display_name</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
+        <span class="sd">&#39;&#39;&#39;</span>
+<span class="sd">        Return a display name for the module: use display_name if defined in</span>
+<span class="sd">        metadata, otherwise convert the url name.</span>
+<span class="sd">        &#39;&#39;&#39;</span>
+        <span class="k">return</span> <span class="bp">self</span><span class="o">.</span><span class="n">metadata</span><span class="o">.</span><span class="n">get</span><span class="p">(</span><span class="s">&#39;display_name&#39;</span><span class="p">,</span>
+                                 <span class="bp">self</span><span class="o">.</span><span class="n">url_name</span><span class="o">.</span><span class="n">replace</span><span class="p">(</span><span class="s">&#39;_&#39;</span><span class="p">,</span> <span class="s">&#39; &#39;</span><span class="p">))</span>
+</div>
+    <span class="nd">@property</span>
+<div class="viewcode-block" id="XModuleDescriptor.start"><a class="viewcode-back" href="../../xmodule.html#xmodule.x_module.XModuleDescriptor.start">[docs]</a>    <span class="k">def</span> <span class="nf">start</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
+        <span class="sd">&quot;&quot;&quot;</span>
+<span class="sd">        If self.metadata contains start, return it.  Else return None.</span>
+<span class="sd">        &quot;&quot;&quot;</span>
+        <span class="k">if</span> <span class="s">&#39;start&#39;</span> <span class="ow">not</span> <span class="ow">in</span> <span class="bp">self</span><span class="o">.</span><span class="n">metadata</span><span class="p">:</span>
+            <span class="k">return</span> <span class="bp">None</span>
+        <span class="k">return</span> <span class="bp">self</span><span class="o">.</span><span class="n">_try_parse_time</span><span class="p">(</span><span class="s">&#39;start&#39;</span><span class="p">)</span>
+</div>
+    <span class="nd">@property</span>
+<div class="viewcode-block" id="XModuleDescriptor.own_metadata"><a class="viewcode-back" href="../../xmodule.html#xmodule.x_module.XModuleDescriptor.own_metadata">[docs]</a>    <span class="k">def</span> <span class="nf">own_metadata</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
+        <span class="sd">&quot;&quot;&quot;</span>
+<span class="sd">        Return the metadata that is not inherited, but was defined on this module.</span>
+<span class="sd">        &quot;&quot;&quot;</span>
+        <span class="k">return</span> <span class="nb">dict</span><span class="p">((</span><span class="n">k</span><span class="p">,</span> <span class="n">v</span><span class="p">)</span> <span class="k">for</span> <span class="n">k</span><span class="p">,</span> <span class="n">v</span> <span class="ow">in</span> <span class="bp">self</span><span class="o">.</span><span class="n">metadata</span><span class="o">.</span><span class="n">items</span><span class="p">()</span>
+                    <span class="k">if</span> <span class="n">k</span> <span class="ow">not</span> <span class="ow">in</span> <span class="bp">self</span><span class="o">.</span><span class="n">_inherited_metadata</span><span class="p">)</span>
+</div>
+    <span class="nd">@staticmethod</span>
+<div class="viewcode-block" id="XModuleDescriptor.compute_inherited_metadata"><a class="viewcode-back" href="../../xmodule.html#xmodule.x_module.XModuleDescriptor.compute_inherited_metadata">[docs]</a>    <span class="k">def</span> <span class="nf">compute_inherited_metadata</span><span class="p">(</span><span class="n">node</span><span class="p">):</span>
+        <span class="sd">&quot;&quot;&quot;Given a descriptor, traverse all of its descendants and do metadata</span>
+<span class="sd">        inheritance.  Should be called on a CourseDescriptor after importing a</span>
+<span class="sd">        course.</span>
+
+<span class="sd">        NOTE: This means that there is no such thing as lazy loading at the</span>
+<span class="sd">        moment--this accesses all the children.&quot;&quot;&quot;</span>
+        <span class="k">for</span> <span class="n">c</span> <span class="ow">in</span> <span class="n">node</span><span class="o">.</span><span class="n">get_children</span><span class="p">():</span>
+            <span class="n">c</span><span class="o">.</span><span class="n">inherit_metadata</span><span class="p">(</span><span class="n">node</span><span class="o">.</span><span class="n">metadata</span><span class="p">)</span>
+            <span class="n">XModuleDescriptor</span><span class="o">.</span><span class="n">compute_inherited_metadata</span><span class="p">(</span><span class="n">c</span><span class="p">)</span>
+</div>
+<div class="viewcode-block" id="XModuleDescriptor.inherit_metadata"><a class="viewcode-back" href="../../xmodule.html#xmodule.x_module.XModuleDescriptor.inherit_metadata">[docs]</a>    <span class="k">def</span> <span class="nf">inherit_metadata</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">metadata</span><span class="p">):</span>
+        <span class="sd">&quot;&quot;&quot;</span>
+<span class="sd">        Updates this module with metadata inherited from a containing module.</span>
+<span class="sd">        Only metadata specified in self.inheritable_metadata will</span>
+<span class="sd">        be inherited</span>
+<span class="sd">        &quot;&quot;&quot;</span>
+        <span class="c"># Set all inheritable metadata from kwargs that are</span>
+        <span class="c"># in self.inheritable_metadata and aren&#39;t already set in metadata</span>
+        <span class="k">for</span> <span class="n">attr</span> <span class="ow">in</span> <span class="bp">self</span><span class="o">.</span><span class="n">inheritable_metadata</span><span class="p">:</span>
+            <span class="k">if</span> <span class="n">attr</span> <span class="ow">not</span> <span class="ow">in</span> <span class="bp">self</span><span class="o">.</span><span class="n">metadata</span> <span class="ow">and</span> <span class="n">attr</span> <span class="ow">in</span> <span class="n">metadata</span><span class="p">:</span>
+                <span class="bp">self</span><span class="o">.</span><span class="n">_inherited_metadata</span><span class="o">.</span><span class="n">add</span><span class="p">(</span><span class="n">attr</span><span class="p">)</span>
+                <span class="bp">self</span><span class="o">.</span><span class="n">metadata</span><span class="p">[</span><span class="n">attr</span><span class="p">]</span> <span class="o">=</span> <span class="n">metadata</span><span class="p">[</span><span class="n">attr</span><span class="p">]</span>
+</div>
+<div class="viewcode-block" id="XModuleDescriptor.get_children"><a class="viewcode-back" href="../../xmodule.html#xmodule.x_module.XModuleDescriptor.get_children">[docs]</a>    <span class="k">def</span> <span class="nf">get_children</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
+        <span class="sd">&quot;&quot;&quot;Returns a list of XModuleDescriptor instances for the children of</span>
+<span class="sd">        this module&quot;&quot;&quot;</span>
+        <span class="k">if</span> <span class="bp">self</span><span class="o">.</span><span class="n">_child_instances</span> <span class="ow">is</span> <span class="bp">None</span><span class="p">:</span>
+            <span class="bp">self</span><span class="o">.</span><span class="n">_child_instances</span> <span class="o">=</span> <span class="p">[]</span>
+            <span class="k">for</span> <span class="n">child_loc</span> <span class="ow">in</span> <span class="bp">self</span><span class="o">.</span><span class="n">definition</span><span class="o">.</span><span class="n">get</span><span class="p">(</span><span class="s">&#39;children&#39;</span><span class="p">,</span> <span class="p">[]):</span>
+                <span class="n">child</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">system</span><span class="o">.</span><span class="n">load_item</span><span class="p">(</span><span class="n">child_loc</span><span class="p">)</span>
+                <span class="c"># TODO (vshnayder): this should go away once we have</span>
+                <span class="c"># proper inheritance support in mongo.  The xml</span>
+                <span class="c"># datastore does all inheritance on course load.</span>
+                <span class="n">child</span><span class="o">.</span><span class="n">inherit_metadata</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">metadata</span><span class="p">)</span>
+                <span class="bp">self</span><span class="o">.</span><span class="n">_child_instances</span><span class="o">.</span><span class="n">append</span><span class="p">(</span><span class="n">child</span><span class="p">)</span>
+
+        <span class="k">return</span> <span class="bp">self</span><span class="o">.</span><span class="n">_child_instances</span>
+</div>
+<div class="viewcode-block" id="XModuleDescriptor.get_child_by_url_name"><a class="viewcode-back" href="../../xmodule.html#xmodule.x_module.XModuleDescriptor.get_child_by_url_name">[docs]</a>    <span class="k">def</span> <span class="nf">get_child_by_url_name</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">url_name</span><span class="p">):</span>
+        <span class="sd">&quot;&quot;&quot;</span>
+<span class="sd">        Return a child XModuleDescriptor with the specified url_name, if it exists, and None otherwise.</span>
+<span class="sd">        &quot;&quot;&quot;</span>
+        <span class="k">for</span> <span class="n">c</span> <span class="ow">in</span> <span class="bp">self</span><span class="o">.</span><span class="n">get_children</span><span class="p">():</span>
+            <span class="k">if</span> <span class="n">c</span><span class="o">.</span><span class="n">url_name</span> <span class="o">==</span> <span class="n">url_name</span><span class="p">:</span>
+                <span class="k">return</span> <span class="n">c</span>
+        <span class="k">return</span> <span class="bp">None</span>
+</div>
+<div class="viewcode-block" id="XModuleDescriptor.xmodule_constructor"><a class="viewcode-back" href="../../xmodule.html#xmodule.x_module.XModuleDescriptor.xmodule_constructor">[docs]</a>    <span class="k">def</span> <span class="nf">xmodule_constructor</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">system</span><span class="p">):</span>
+        <span class="sd">&quot;&quot;&quot;</span>
+<span class="sd">        Returns a constructor for an XModule. This constructor takes two</span>
+<span class="sd">        arguments: instance_state and shared_state, and returns a fully</span>
+<span class="sd">        instantiated XModule</span>
+<span class="sd">        &quot;&quot;&quot;</span>
+        <span class="k">return</span> <span class="n">partial</span><span class="p">(</span>
+            <span class="bp">self</span><span class="o">.</span><span class="n">module_class</span><span class="p">,</span>
+            <span class="n">system</span><span class="p">,</span>
+            <span class="bp">self</span><span class="o">.</span><span class="n">location</span><span class="p">,</span>
+            <span class="bp">self</span><span class="o">.</span><span class="n">definition</span><span class="p">,</span>
+            <span class="bp">self</span><span class="p">,</span>
+            <span class="n">metadata</span><span class="o">=</span><span class="bp">self</span><span class="o">.</span><span class="n">metadata</span>
+        <span class="p">)</span>
+    
+    </div>
+<div class="viewcode-block" id="XModuleDescriptor.has_dynamic_children"><a class="viewcode-back" href="../../xmodule.html#xmodule.x_module.XModuleDescriptor.has_dynamic_children">[docs]</a>    <span class="k">def</span> <span class="nf">has_dynamic_children</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
+        <span class="sd">&quot;&quot;&quot;</span>
+<span class="sd">        Returns True if this descriptor has dynamic children for a given</span>
+<span class="sd">        student when the module is created.</span>
+<span class="sd">        </span>
+<span class="sd">        Returns False if the children of this descriptor are the same</span>
+<span class="sd">        children that the module will return for any student. </span>
+<span class="sd">        &quot;&quot;&quot;</span>
+        <span class="k">return</span> <span class="bp">False</span>
+        
+
+    <span class="c"># ================================= JSON PARSING ===========================</span></div>
+    <span class="nd">@staticmethod</span>
+<div class="viewcode-block" id="XModuleDescriptor.load_from_json"><a class="viewcode-back" href="../../xmodule.html#xmodule.x_module.XModuleDescriptor.load_from_json">[docs]</a>    <span class="k">def</span> <span class="nf">load_from_json</span><span class="p">(</span><span class="n">json_data</span><span class="p">,</span> <span class="n">system</span><span class="p">,</span> <span class="n">default_class</span><span class="o">=</span><span class="bp">None</span><span class="p">):</span>
+        <span class="sd">&quot;&quot;&quot;</span>
+<span class="sd">        This method instantiates the correct subclass of XModuleDescriptor based</span>
+<span class="sd">        on the contents of json_data.</span>
+
+<span class="sd">        json_data must contain a &#39;location&#39; element, and must be suitable to be</span>
+<span class="sd">        passed into the subclasses `from_json` method.</span>
+<span class="sd">        &quot;&quot;&quot;</span>
+        <span class="n">class_</span> <span class="o">=</span> <span class="n">XModuleDescriptor</span><span class="o">.</span><span class="n">load_class</span><span class="p">(</span>
+            <span class="n">json_data</span><span class="p">[</span><span class="s">&#39;location&#39;</span><span class="p">][</span><span class="s">&#39;category&#39;</span><span class="p">],</span>
+            <span class="n">default_class</span>
+        <span class="p">)</span>
+        <span class="k">return</span> <span class="n">class_</span><span class="o">.</span><span class="n">from_json</span><span class="p">(</span><span class="n">json_data</span><span class="p">,</span> <span class="n">system</span><span class="p">)</span>
+</div>
+    <span class="nd">@classmethod</span>
+<div class="viewcode-block" id="XModuleDescriptor.from_json"><a class="viewcode-back" href="../../xmodule.html#xmodule.x_module.XModuleDescriptor.from_json">[docs]</a>    <span class="k">def</span> <span class="nf">from_json</span><span class="p">(</span><span class="n">cls</span><span class="p">,</span> <span class="n">json_data</span><span class="p">,</span> <span class="n">system</span><span class="p">):</span>
+        <span class="sd">&quot;&quot;&quot;</span>
+<span class="sd">        Creates an instance of this descriptor from the supplied json_data.</span>
+<span class="sd">        This may be overridden by subclasses</span>
+
+<span class="sd">        json_data: A json object specifying the definition and any optional</span>
+<span class="sd">            keyword arguments for the XModuleDescriptor</span>
+
+<span class="sd">        system: A DescriptorSystem for interacting with external resources</span>
+<span class="sd">        &quot;&quot;&quot;</span>
+        <span class="k">return</span> <span class="n">cls</span><span class="p">(</span><span class="n">system</span><span class="o">=</span><span class="n">system</span><span class="p">,</span> <span class="o">**</span><span class="n">json_data</span><span class="p">)</span>
+
+    <span class="c"># ================================= XML PARSING ============================</span></div>
+    <span class="nd">@staticmethod</span>
+<div class="viewcode-block" id="XModuleDescriptor.load_from_xml"><a class="viewcode-back" href="../../xmodule.html#xmodule.x_module.XModuleDescriptor.load_from_xml">[docs]</a>    <span class="k">def</span> <span class="nf">load_from_xml</span><span class="p">(</span><span class="n">xml_data</span><span class="p">,</span>
+            <span class="n">system</span><span class="p">,</span>
+            <span class="n">org</span><span class="o">=</span><span class="bp">None</span><span class="p">,</span>
+            <span class="n">course</span><span class="o">=</span><span class="bp">None</span><span class="p">,</span>
+            <span class="n">default_class</span><span class="o">=</span><span class="bp">None</span><span class="p">):</span>
+        <span class="sd">&quot;&quot;&quot;</span>
+<span class="sd">        This method instantiates the correct subclass of XModuleDescriptor based</span>
+<span class="sd">        on the contents of xml_data.</span>
+
+<span class="sd">        xml_data must be a string containing valid xml</span>
+
+<span class="sd">        system is an XMLParsingSystem</span>
+
+<span class="sd">        org and course are optional strings that will be used in the generated</span>
+<span class="sd">            module&#39;s url identifiers</span>
+<span class="sd">        &quot;&quot;&quot;</span>
+        <span class="n">class_</span> <span class="o">=</span> <span class="n">XModuleDescriptor</span><span class="o">.</span><span class="n">load_class</span><span class="p">(</span>
+            <span class="n">etree</span><span class="o">.</span><span class="n">fromstring</span><span class="p">(</span><span class="n">xml_data</span><span class="p">)</span><span class="o">.</span><span class="n">tag</span><span class="p">,</span>
+            <span class="n">default_class</span>
+            <span class="p">)</span>
+        <span class="c"># leave next line, commented out - useful for low-level debugging</span>
+        <span class="c"># log.debug(&#39;[XModuleDescriptor.load_from_xml] tag=%s, class_=%s&#39; % (</span>
+        <span class="c">#        etree.fromstring(xml_data).tag,class_))</span>
+
+        <span class="k">return</span> <span class="n">class_</span><span class="o">.</span><span class="n">from_xml</span><span class="p">(</span><span class="n">xml_data</span><span class="p">,</span> <span class="n">system</span><span class="p">,</span> <span class="n">org</span><span class="p">,</span> <span class="n">course</span><span class="p">)</span>
+</div>
+    <span class="nd">@classmethod</span>
+<div class="viewcode-block" id="XModuleDescriptor.from_xml"><a class="viewcode-back" href="../../xmodule.html#xmodule.x_module.XModuleDescriptor.from_xml">[docs]</a>    <span class="k">def</span> <span class="nf">from_xml</span><span class="p">(</span><span class="n">cls</span><span class="p">,</span> <span class="n">xml_data</span><span class="p">,</span> <span class="n">system</span><span class="p">,</span> <span class="n">org</span><span class="o">=</span><span class="bp">None</span><span class="p">,</span> <span class="n">course</span><span class="o">=</span><span class="bp">None</span><span class="p">):</span>
+        <span class="sd">&quot;&quot;&quot;</span>
+<span class="sd">        Creates an instance of this descriptor from the supplied xml_data.</span>
+<span class="sd">        This may be overridden by subclasses</span>
+
+<span class="sd">        xml_data: A string of xml that will be translated into data and children</span>
+<span class="sd">            for this module</span>
+
+<span class="sd">        system is an XMLParsingSystem</span>
+
+<span class="sd">        org and course are optional strings that will be used in the generated</span>
+<span class="sd">            module&#39;s url identifiers</span>
+<span class="sd">        &quot;&quot;&quot;</span>
+        <span class="k">raise</span> <span class="ne">NotImplementedError</span><span class="p">(</span>
+            <span class="s">&#39;Modules must implement from_xml to be parsable from xml&#39;</span><span class="p">)</span>
+</div>
+<div class="viewcode-block" id="XModuleDescriptor.export_to_xml"><a class="viewcode-back" href="../../xmodule.html#xmodule.x_module.XModuleDescriptor.export_to_xml">[docs]</a>    <span class="k">def</span> <span class="nf">export_to_xml</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">resource_fs</span><span class="p">):</span>
+        <span class="sd">&quot;&quot;&quot;</span>
+<span class="sd">        Returns an xml string representing this module, and all modules</span>
+<span class="sd">        underneath it.  May also write required resources out to resource_fs</span>
+
+<span class="sd">        Assumes that modules have single parentage (that no module appears twice</span>
+<span class="sd">        in the same course), and that it is thus safe to nest modules as xml</span>
+<span class="sd">        children as appropriate.</span>
+
+<span class="sd">        The returned XML should be able to be parsed back into an identical</span>
+<span class="sd">        XModuleDescriptor using the from_xml method with the same system, org,</span>
+<span class="sd">        and course</span>
+<span class="sd">        &quot;&quot;&quot;</span>
+        <span class="k">raise</span> <span class="ne">NotImplementedError</span><span class="p">(</span>
+            <span class="s">&#39;Modules must implement export_to_xml to enable xml export&#39;</span><span class="p">)</span>
+
+    <span class="c"># =============================== Testing ==================================</span></div>
+<div class="viewcode-block" id="XModuleDescriptor.get_sample_state"><a class="viewcode-back" href="../../xmodule.html#xmodule.x_module.XModuleDescriptor.get_sample_state">[docs]</a>    <span class="k">def</span> <span class="nf">get_sample_state</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
+        <span class="sd">&quot;&quot;&quot;</span>
+<span class="sd">        Return a list of tuples of instance_state, shared_state. Each tuple</span>
+<span class="sd">        defines a sample case for this module</span>
+<span class="sd">        &quot;&quot;&quot;</span>
+        <span class="k">return</span> <span class="p">[(</span><span class="s">&#39;{}&#39;</span><span class="p">,</span> <span class="s">&#39;{}&#39;</span><span class="p">)]</span>
+
+    <span class="c"># =============================== BUILTIN METHODS ==========================</span></div>
+    <span class="k">def</span> <span class="nf">__eq__</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">other</span><span class="p">):</span>
+        <span class="n">eq</span> <span class="o">=</span> <span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">__class__</span> <span class="o">==</span> <span class="n">other</span><span class="o">.</span><span class="n">__class__</span> <span class="ow">and</span>
+                <span class="nb">all</span><span class="p">(</span><span class="nb">getattr</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">attr</span><span class="p">,</span> <span class="bp">None</span><span class="p">)</span> <span class="o">==</span> <span class="nb">getattr</span><span class="p">(</span><span class="n">other</span><span class="p">,</span> <span class="n">attr</span><span class="p">,</span> <span class="bp">None</span><span class="p">)</span>
+                    <span class="k">for</span> <span class="n">attr</span> <span class="ow">in</span> <span class="bp">self</span><span class="o">.</span><span class="n">equality_attributes</span><span class="p">))</span>
+
+        <span class="k">if</span> <span class="ow">not</span> <span class="n">eq</span><span class="p">:</span>
+            <span class="k">for</span> <span class="n">attr</span> <span class="ow">in</span> <span class="bp">self</span><span class="o">.</span><span class="n">equality_attributes</span><span class="p">:</span>
+                <span class="n">pprint</span><span class="p">((</span><span class="nb">getattr</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">attr</span><span class="p">,</span> <span class="bp">None</span><span class="p">),</span>
+                       <span class="nb">getattr</span><span class="p">(</span><span class="n">other</span><span class="p">,</span> <span class="n">attr</span><span class="p">,</span> <span class="bp">None</span><span class="p">),</span>
+                       <span class="nb">getattr</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">attr</span><span class="p">,</span> <span class="bp">None</span><span class="p">)</span> <span class="o">==</span> <span class="nb">getattr</span><span class="p">(</span><span class="n">other</span><span class="p">,</span> <span class="n">attr</span><span class="p">,</span> <span class="bp">None</span><span class="p">)))</span>
+
+        <span class="k">return</span> <span class="n">eq</span>
+
+    <span class="k">def</span> <span class="nf">__repr__</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
+        <span class="k">return</span> <span class="p">(</span><span class="s">&quot;{class_}({system!r}, {definition!r}, location={location!r},&quot;</span>
+                <span class="s">&quot; metadata={metadata!r})&quot;</span><span class="o">.</span><span class="n">format</span><span class="p">(</span>
+            <span class="n">class_</span><span class="o">=</span><span class="bp">self</span><span class="o">.</span><span class="n">__class__</span><span class="o">.</span><span class="n">__name__</span><span class="p">,</span>
+            <span class="n">system</span><span class="o">=</span><span class="bp">self</span><span class="o">.</span><span class="n">system</span><span class="p">,</span>
+            <span class="n">definition</span><span class="o">=</span><span class="bp">self</span><span class="o">.</span><span class="n">definition</span><span class="p">,</span>
+            <span class="n">location</span><span class="o">=</span><span class="bp">self</span><span class="o">.</span><span class="n">location</span><span class="p">,</span>
+            <span class="n">metadata</span><span class="o">=</span><span class="bp">self</span><span class="o">.</span><span class="n">metadata</span>
+        <span class="p">))</span>
+
+    <span class="c"># ================================ Internal helpers =======================</span>
+
+    <span class="k">def</span> <span class="nf">_try_parse_time</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">key</span><span class="p">):</span>
+        <span class="sd">&quot;&quot;&quot;</span>
+<span class="sd">        Parse an optional metadata key containing a time: if present, complain</span>
+<span class="sd">        if it doesn&#39;t parse.</span>
+<span class="sd">        Return None if not present or invalid.</span>
+<span class="sd">        &quot;&quot;&quot;</span>
+        <span class="k">if</span> <span class="n">key</span> <span class="ow">in</span> <span class="bp">self</span><span class="o">.</span><span class="n">metadata</span><span class="p">:</span>
+            <span class="k">try</span><span class="p">:</span>
+                <span class="k">return</span> <span class="n">parse_time</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">metadata</span><span class="p">[</span><span class="n">key</span><span class="p">])</span>
+            <span class="k">except</span> <span class="ne">ValueError</span> <span class="k">as</span> <span class="n">e</span><span class="p">:</span>
+                <span class="n">msg</span> <span class="o">=</span> <span class="s">&quot;Descriptor {0} loaded with a bad metadata key &#39;{1}&#39;: &#39;{2}&#39;&quot;</span><span class="o">.</span><span class="n">format</span><span class="p">(</span>
+                    <span class="bp">self</span><span class="o">.</span><span class="n">location</span><span class="o">.</span><span class="n">url</span><span class="p">(),</span> <span class="bp">self</span><span class="o">.</span><span class="n">metadata</span><span class="p">[</span><span class="n">key</span><span class="p">],</span> <span class="n">e</span><span class="p">)</span>
+                <span class="n">log</span><span class="o">.</span><span class="n">warning</span><span class="p">(</span><span class="n">msg</span><span class="p">)</span>
+        <span class="k">return</span> <span class="bp">None</span>
+
+</div>
+<span class="k">class</span> <span class="nc">DescriptorSystem</span><span class="p">(</span><span class="nb">object</span><span class="p">):</span>
+    <span class="k">def</span> <span class="nf">__init__</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">load_item</span><span class="p">,</span> <span class="n">resources_fs</span><span class="p">,</span> <span class="n">error_tracker</span><span class="p">,</span> <span class="o">**</span><span class="n">kwargs</span><span class="p">):</span>
+        <span class="sd">&quot;&quot;&quot;</span>
+<span class="sd">        load_item: Takes a Location and returns an XModuleDescriptor</span>
+
+<span class="sd">        resources_fs: A Filesystem object that contains all of the</span>
+<span class="sd">            resources needed for the course</span>
+
+<span class="sd">        error_tracker: A hook for tracking errors in loading the descriptor.</span>
+<span class="sd">            Used for example to get a list of all non-fatal problems on course</span>
+<span class="sd">            load, and display them to the user.</span>
+
+<span class="sd">            A function of (error_msg). errortracker.py provides a</span>
+<span class="sd">            handy make_error_tracker() function.</span>
+
+<span class="sd">            Patterns for using the error handler:</span>
+<span class="sd">               try:</span>
+<span class="sd">                  x = access_some_resource()</span>
+<span class="sd">                  check_some_format(x)</span>
+<span class="sd">               except SomeProblem as err:</span>
+<span class="sd">                  msg = &#39;Grommet {0} is broken: {1}&#39;.format(x, str(err))</span>
+<span class="sd">                  log.warning(msg)  # don&#39;t rely on tracker to log</span>
+<span class="sd">                        # NOTE: we generally don&#39;t want content errors logged as errors</span>
+<span class="sd">                  self.system.error_tracker(msg)</span>
+<span class="sd">                  # work around</span>
+<span class="sd">                  return &#39;Oops, couldn&#39;t load grommet&#39;</span>
+
+<span class="sd">               OR, if not in an exception context:</span>
+
+<span class="sd">               if not check_something(thingy):</span>
+<span class="sd">                  msg = &quot;thingy {0} is broken&quot;.format(thingy)</span>
+<span class="sd">                  log.critical(msg)</span>
+<span class="sd">                  self.system.error_tracker(msg)</span>
+
+<span class="sd">               NOTE: To avoid duplication, do not call the tracker on errors</span>
+<span class="sd">               that you&#39;re about to re-raise---let the caller track them.</span>
+<span class="sd">        &quot;&quot;&quot;</span>
+
+        <span class="bp">self</span><span class="o">.</span><span class="n">load_item</span> <span class="o">=</span> <span class="n">load_item</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">resources_fs</span> <span class="o">=</span> <span class="n">resources_fs</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">error_tracker</span> <span class="o">=</span> <span class="n">error_tracker</span>
+
+
+<span class="k">class</span> <span class="nc">XMLParsingSystem</span><span class="p">(</span><span class="n">DescriptorSystem</span><span class="p">):</span>
+    <span class="k">def</span> <span class="nf">__init__</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">load_item</span><span class="p">,</span> <span class="n">resources_fs</span><span class="p">,</span> <span class="n">error_tracker</span><span class="p">,</span> <span class="n">process_xml</span><span class="p">,</span> <span class="n">policy</span><span class="p">,</span> <span class="o">**</span><span class="n">kwargs</span><span class="p">):</span>
+        <span class="sd">&quot;&quot;&quot;</span>
+<span class="sd">        load_item, resources_fs, error_tracker: see DescriptorSystem</span>
+
+<span class="sd">        policy: a policy dictionary for overriding xml metadata</span>
+
+<span class="sd">        process_xml: Takes an xml string, and returns a XModuleDescriptor</span>
+<span class="sd">            created from that xml</span>
+<span class="sd">        &quot;&quot;&quot;</span>
+        <span class="n">DescriptorSystem</span><span class="o">.</span><span class="n">__init__</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">load_item</span><span class="p">,</span> <span class="n">resources_fs</span><span class="p">,</span> <span class="n">error_tracker</span><span class="p">,</span>
+                                  <span class="o">**</span><span class="n">kwargs</span><span class="p">)</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">process_xml</span> <span class="o">=</span> <span class="n">process_xml</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">policy</span> <span class="o">=</span> <span class="n">policy</span>
+
+
+<div class="viewcode-block" id="ModuleSystem"><a class="viewcode-back" href="../../xmodule.html#xmodule.x_module.ModuleSystem">[docs]</a><span class="k">class</span> <span class="nc">ModuleSystem</span><span class="p">(</span><span class="nb">object</span><span class="p">):</span>
+    <span class="sd">&#39;&#39;&#39;</span>
+<span class="sd">    This is an abstraction such that x_modules can function independent</span>
+<span class="sd">    of the courseware (e.g. import into other types of courseware, LMS,</span>
+<span class="sd">    or if we want to have a sandbox server for user-contributed content)</span>
+
+<span class="sd">    ModuleSystem objects are passed to x_modules to provide access to system</span>
+<span class="sd">    functionality.</span>
+
+<span class="sd">    Note that these functions can be closures over e.g. a django request</span>
+<span class="sd">    and user, or other environment-specific info.</span>
+<span class="sd">    &#39;&#39;&#39;</span>
+    <span class="k">def</span> <span class="nf">__init__</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span>
+                 <span class="n">ajax_url</span><span class="p">,</span>
+                 <span class="n">track_function</span><span class="p">,</span>
+                 <span class="n">get_module</span><span class="p">,</span>
+                 <span class="n">render_template</span><span class="p">,</span>
+                 <span class="n">replace_urls</span><span class="p">,</span>
+                 <span class="n">user</span><span class="o">=</span><span class="bp">None</span><span class="p">,</span>
+                 <span class="n">filestore</span><span class="o">=</span><span class="bp">None</span><span class="p">,</span>
+                 <span class="n">debug</span><span class="o">=</span><span class="bp">False</span><span class="p">,</span>
+                 <span class="n">xqueue</span><span class="o">=</span><span class="bp">None</span><span class="p">,</span>
+                 <span class="n">node_path</span><span class="o">=</span><span class="s">&quot;&quot;</span><span class="p">,</span>
+                 <span class="n">anonymous_student_id</span><span class="o">=</span><span class="s">&#39;&#39;</span><span class="p">):</span>
+        <span class="sd">&#39;&#39;&#39;</span>
+<span class="sd">        Create a closure around the system environment.</span>
+
+<span class="sd">        ajax_url - the url where ajax calls to the encapsulating module go.</span>
+
+<span class="sd">        track_function - function of (event_type, event), intended for logging</span>
+<span class="sd">                         or otherwise tracking the event.</span>
+<span class="sd">                         TODO: Not used, and has inconsistent args in different</span>
+<span class="sd">                         files.  Update or remove.</span>
+
+<span class="sd">        get_module - function that takes (location) and returns a corresponding</span>
+<span class="sd">                         module instance object.  If the current user does not have</span>
+<span class="sd">                         access to that location, returns None.</span>
+
+<span class="sd">        render_template - a function that takes (template_file, context), and</span>
+<span class="sd">                         returns rendered html.</span>
+
+<span class="sd">        user - The user to base the random number generator seed off of for this</span>
+<span class="sd">                         request</span>
+
+<span class="sd">        filestore - A filestore ojbect.  Defaults to an instance of OSFS based</span>
+<span class="sd">                         at settings.DATA_DIR.</span>
+
+<span class="sd">        xqueue - Dict containing XqueueInterface object, as well as parameters</span>
+<span class="sd">                    for the specific StudentModule:</span>
+<span class="sd">                    xqueue = {&#39;interface&#39;: XQueueInterface object,</span>
+<span class="sd">                              &#39;callback_url&#39;: Callback into the LMS,</span>
+<span class="sd">                              &#39;queue_name&#39;: Target queuename in Xqueue}</span>
+
+<span class="sd">        replace_urls - TEMPORARY - A function like static_replace.replace_urls</span>
+<span class="sd">                         that capa_module can use to fix up the static urls in</span>
+<span class="sd">                         ajax results.</span>
+
+<span class="sd">        anonymous_student_id - Used for tracking modules with student id</span>
+<span class="sd">        &#39;&#39;&#39;</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">ajax_url</span> <span class="o">=</span> <span class="n">ajax_url</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">xqueue</span> <span class="o">=</span> <span class="n">xqueue</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">track_function</span> <span class="o">=</span> <span class="n">track_function</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">filestore</span> <span class="o">=</span> <span class="n">filestore</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">get_module</span> <span class="o">=</span> <span class="n">get_module</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">render_template</span> <span class="o">=</span> <span class="n">render_template</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">DEBUG</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">debug</span> <span class="o">=</span> <span class="n">debug</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">seed</span> <span class="o">=</span> <span class="n">user</span><span class="o">.</span><span class="n">id</span> <span class="k">if</span> <span class="n">user</span> <span class="ow">is</span> <span class="ow">not</span> <span class="bp">None</span> <span class="k">else</span> <span class="mi">0</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">replace_urls</span> <span class="o">=</span> <span class="n">replace_urls</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">node_path</span> <span class="o">=</span> <span class="n">node_path</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">anonymous_student_id</span> <span class="o">=</span> <span class="n">anonymous_student_id</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">user_is_staff</span> <span class="o">=</span> <span class="n">user</span> <span class="ow">is</span> <span class="ow">not</span> <span class="bp">None</span> <span class="ow">and</span> <span class="n">user</span><span class="o">.</span><span class="n">is_staff</span>
+
+<div class="viewcode-block" id="ModuleSystem.get"><a class="viewcode-back" href="../../xmodule.html#xmodule.x_module.ModuleSystem.get">[docs]</a>    <span class="k">def</span> <span class="nf">get</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">attr</span><span class="p">):</span>
+        <span class="sd">&#39;&#39;&#39;	provide uniform access to attributes (like etree).&#39;&#39;&#39;</span>
+        <span class="k">return</span> <span class="bp">self</span><span class="o">.</span><span class="n">__dict__</span><span class="o">.</span><span class="n">get</span><span class="p">(</span><span class="n">attr</span><span class="p">)</span>
+</div>
+<div class="viewcode-block" id="ModuleSystem.set"><a class="viewcode-back" href="../../xmodule.html#xmodule.x_module.ModuleSystem.set">[docs]</a>    <span class="k">def</span> <span class="nf">set</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">attr</span><span class="p">,</span> <span class="n">val</span><span class="p">):</span>
+        <span class="sd">&#39;&#39;&#39;provide uniform access to attributes (like etree)&#39;&#39;&#39;</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">__dict__</span><span class="p">[</span><span class="n">attr</span><span class="p">]</span> <span class="o">=</span> <span class="n">val</span>
+</div>
+    <span class="k">def</span> <span class="nf">__repr__</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
+        <span class="k">return</span> <span class="nb">repr</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">__dict__</span><span class="p">)</span>
+
+    <span class="k">def</span> <span class="nf">__str__</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
+        <span class="k">return</span> <span class="nb">str</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">__dict__</span><span class="p">)</span></div>
+</pre></div>
+
+          </div>
+        </div>
+      </div>
+      <div class="clearer"></div>
+    </div>
+    <div class="related">
+      <h3>Navigation</h3>
+      <ul>
+        <li class="right" style="margin-right: 10px">
+          <a href="../../genindex.html" title="General Index"
+             >index</a></li>
+        <li class="right" >
+          <a href="../../py-modindex.html" title="Python Module Index"
+             >modules</a> |</li>
+        <li><a href="../../index.html">MITx 1.0 documentation</a> &raquo;</li>
+          <li><a href="../index.html" >Module code</a> &raquo;</li> 
+      </ul>
+    </div>
+    <div class="footer">
+        &copy; Copyright 2012, MITx team.
+      Created using <a href="http://sphinx.pocoo.org/">Sphinx</a> 1.1.3.
+    </div>
+  </body>
+</html>

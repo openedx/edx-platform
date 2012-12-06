@@ -1,0 +1,648 @@
+
+
+<!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Transitional//EN"
+  "http://www.w3.org/TR/xhtml1/DTD/xhtml1-transitional.dtd">
+
+
+<html xmlns="http://www.w3.org/1999/xhtml">
+  <head>
+    <meta http-equiv="Content-Type" content="text/html; charset=utf-8" />
+    
+    <title>simplewiki.views &mdash; MITx 1.0 documentation</title>
+    
+    <link rel="stylesheet" href="../../_static/sphinxdoc.css" type="text/css" />
+    <link rel="stylesheet" href="../../_static/pygments.css" type="text/css" />
+    
+    <script type="text/javascript">
+      var DOCUMENTATION_OPTIONS = {
+        URL_ROOT:    '../../',
+        VERSION:     '1.0',
+        COLLAPSE_INDEX: false,
+        FILE_SUFFIX: '.html',
+        HAS_SOURCE:  true
+      };
+    </script>
+    <script type="text/javascript" src="../../_static/jquery.js"></script>
+    <script type="text/javascript" src="../../_static/underscore.js"></script>
+    <script type="text/javascript" src="../../_static/doctools.js"></script>
+    <script type="text/javascript" src="http://cdn.mathjax.org/mathjax/latest/MathJax.js?config=TeX-AMS-MML_HTMLorMML"></script>
+    <link rel="top" title="MITx 1.0 documentation" href="../../index.html" />
+    <link rel="up" title="Module code" href="../index.html" /> 
+  </head>
+  <body>
+<img src="../../_static/homepage-bg.jpg" alt="Edx logo"  width="100%;"/>
+
+    <div class="related">
+      <h3>Navigation</h3>
+      <ul>
+        <li class="right" style="margin-right: 10px">
+          <a href="../../genindex.html" title="General Index"
+             accesskey="I">index</a></li>
+        <li class="right" >
+          <a href="../../py-modindex.html" title="Python Module Index"
+             >modules</a> |</li>
+        <li><a href="../../index.html">MITx 1.0 documentation</a> &raquo;</li>
+          <li><a href="../index.html" accesskey="U">Module code</a> &raquo;</li> 
+      </ul>
+    </div>
+      <div class="sphinxsidebar">
+        <div class="sphinxsidebarwrapper">
+<div id="searchbox" style="display: none">
+  <h3>Quick search</h3>
+    <form class="search" action="../../search.html" method="get">
+      <input type="text" name="q" />
+      <input type="submit" value="Go" />
+      <input type="hidden" name="check_keywords" value="yes" />
+      <input type="hidden" name="area" value="default" />
+    </form>
+    <p class="searchtip" style="font-size: 90%">
+    Enter search terms or a module, class or function name.
+    </p>
+</div>
+<script type="text/javascript">$('#searchbox').show(0);</script>
+        </div>
+      </div>
+
+    <div class="document">
+      <div class="documentwrapper">
+        <div class="bodywrapper">
+          <div class="body">
+            
+  <h1>Source code for simplewiki.views</h1><div class="highlight"><pre>
+<span class="c"># -*- coding: utf-8 -*-</span>
+<span class="kn">from</span> <span class="nn">django.conf</span> <span class="kn">import</span> <span class="n">settings</span> <span class="k">as</span> <span class="n">settings</span>
+<span class="kn">from</span> <span class="nn">django.contrib.auth.decorators</span> <span class="kn">import</span> <span class="n">login_required</span>
+<span class="kn">from</span> <span class="nn">django.core.context_processors</span> <span class="kn">import</span> <span class="n">csrf</span>
+<span class="kn">from</span> <span class="nn">django.core.urlresolvers</span> <span class="kn">import</span> <span class="n">reverse</span>
+<span class="kn">from</span> <span class="nn">django.db.models</span> <span class="kn">import</span> <span class="n">Q</span>
+<span class="kn">from</span> <span class="nn">django.http</span> <span class="kn">import</span> <span class="n">HttpResponse</span><span class="p">,</span> <span class="n">HttpResponseRedirect</span><span class="p">,</span> <span class="n">Http404</span>
+<span class="kn">from</span> <span class="nn">django.utils</span> <span class="kn">import</span> <span class="n">simplejson</span>
+<span class="kn">from</span> <span class="nn">django.utils.translation</span> <span class="kn">import</span> <span class="n">ugettext_lazy</span> <span class="k">as</span> <span class="n">_</span>
+<span class="kn">from</span> <span class="nn">mitxmako.shortcuts</span> <span class="kn">import</span> <span class="n">render_to_response</span>
+
+<span class="kn">from</span> <span class="nn">courseware.courses</span> <span class="kn">import</span> <span class="n">get_opt_course_with_access</span>
+<span class="kn">from</span> <span class="nn">courseware.access</span> <span class="kn">import</span> <span class="n">has_access</span>
+<span class="kn">from</span> <span class="nn">xmodule.course_module</span> <span class="kn">import</span> <span class="n">CourseDescriptor</span>
+<span class="kn">from</span> <span class="nn">xmodule.modulestore.django</span> <span class="kn">import</span> <span class="n">modulestore</span>
+
+<span class="kn">from</span> <span class="nn">models</span> <span class="kn">import</span> <span class="n">Revision</span><span class="p">,</span> <span class="n">Article</span><span class="p">,</span> <span class="n">Namespace</span><span class="p">,</span> <span class="n">CreateArticleForm</span><span class="p">,</span> <span class="n">RevisionFormWithTitle</span><span class="p">,</span> <span class="n">RevisionForm</span>
+<span class="kn">import</span> <span class="nn">wiki_settings</span>
+
+
+<span class="k">def</span> <span class="nf">wiki_reverse</span><span class="p">(</span><span class="n">wiki_page</span><span class="p">,</span> <span class="n">article</span><span class="o">=</span><span class="bp">None</span><span class="p">,</span> <span class="n">course</span><span class="o">=</span><span class="bp">None</span><span class="p">,</span> <span class="n">namespace</span><span class="o">=</span><span class="bp">None</span><span class="p">,</span> <span class="n">args</span><span class="o">=</span><span class="p">[],</span> <span class="n">kwargs</span><span class="o">=</span><span class="p">{}):</span>
+    <span class="n">kwargs</span> <span class="o">=</span> <span class="nb">dict</span><span class="p">(</span><span class="n">kwargs</span><span class="p">)</span>  <span class="c"># TODO: Figure out why if I don&#39;t do this kwargs sometimes contains {&#39;article_path&#39;}</span>
+    <span class="k">if</span> <span class="ow">not</span> <span class="s">&#39;course_id&#39;</span> <span class="ow">in</span> <span class="n">kwargs</span> <span class="ow">and</span> <span class="n">course</span><span class="p">:</span>
+        <span class="n">kwargs</span><span class="p">[</span><span class="s">&#39;course_id&#39;</span><span class="p">]</span> <span class="o">=</span> <span class="n">course</span><span class="o">.</span><span class="n">id</span>
+    <span class="k">if</span> <span class="ow">not</span> <span class="s">&#39;article_path&#39;</span> <span class="ow">in</span> <span class="n">kwargs</span> <span class="ow">and</span> <span class="n">article</span><span class="p">:</span>
+        <span class="n">kwargs</span><span class="p">[</span><span class="s">&#39;article_path&#39;</span><span class="p">]</span> <span class="o">=</span> <span class="n">article</span><span class="o">.</span><span class="n">get_path</span><span class="p">()</span>
+    <span class="k">if</span> <span class="ow">not</span> <span class="s">&#39;namespace&#39;</span> <span class="ow">in</span> <span class="n">kwargs</span> <span class="ow">and</span> <span class="n">namespace</span><span class="p">:</span>
+        <span class="n">kwargs</span><span class="p">[</span><span class="s">&#39;namespace&#39;</span><span class="p">]</span> <span class="o">=</span> <span class="n">namespace</span>
+    <span class="k">return</span> <span class="n">reverse</span><span class="p">(</span><span class="n">wiki_page</span><span class="p">,</span> <span class="n">kwargs</span><span class="o">=</span><span class="n">kwargs</span><span class="p">,</span> <span class="n">args</span><span class="o">=</span><span class="n">args</span><span class="p">)</span>
+
+
+<span class="k">def</span> <span class="nf">update_template_dictionary</span><span class="p">(</span><span class="n">dictionary</span><span class="p">,</span> <span class="n">request</span><span class="o">=</span><span class="bp">None</span><span class="p">,</span> <span class="n">course</span><span class="o">=</span><span class="bp">None</span><span class="p">,</span> <span class="n">article</span><span class="o">=</span><span class="bp">None</span><span class="p">,</span> <span class="n">revision</span><span class="o">=</span><span class="bp">None</span><span class="p">):</span>
+    <span class="k">if</span> <span class="n">article</span><span class="p">:</span>
+        <span class="n">dictionary</span><span class="p">[</span><span class="s">&#39;wiki_article&#39;</span><span class="p">]</span> <span class="o">=</span> <span class="n">article</span>
+        <span class="n">dictionary</span><span class="p">[</span><span class="s">&#39;wiki_title&#39;</span><span class="p">]</span> <span class="o">=</span> <span class="n">article</span><span class="o">.</span><span class="n">title</span>  <span class="c"># TODO: What is the title when viewing the article in a course?</span>
+        <span class="k">if</span> <span class="ow">not</span> <span class="n">course</span> <span class="ow">and</span> <span class="s">&#39;namespace&#39;</span> <span class="ow">not</span> <span class="ow">in</span> <span class="n">dictionary</span><span class="p">:</span>
+            <span class="n">dictionary</span><span class="p">[</span><span class="s">&#39;namespace&#39;</span><span class="p">]</span> <span class="o">=</span> <span class="n">article</span><span class="o">.</span><span class="n">namespace</span><span class="o">.</span><span class="n">name</span>
+
+    <span class="k">if</span> <span class="n">course</span><span class="p">:</span>
+        <span class="n">dictionary</span><span class="p">[</span><span class="s">&#39;course&#39;</span><span class="p">]</span> <span class="o">=</span> <span class="n">course</span>
+        <span class="k">if</span> <span class="s">&#39;namespace&#39;</span> <span class="ow">not</span> <span class="ow">in</span> <span class="n">dictionary</span><span class="p">:</span>
+            <span class="n">dictionary</span><span class="p">[</span><span class="s">&#39;namespace&#39;</span><span class="p">]</span> <span class="o">=</span> <span class="s">&quot;edX&quot;</span>
+    <span class="k">else</span><span class="p">:</span>
+        <span class="n">dictionary</span><span class="p">[</span><span class="s">&#39;course&#39;</span><span class="p">]</span> <span class="o">=</span> <span class="bp">None</span>
+
+    <span class="k">if</span> <span class="n">revision</span><span class="p">:</span>
+        <span class="n">dictionary</span><span class="p">[</span><span class="s">&#39;wiki_article_revision&#39;</span><span class="p">]</span> <span class="o">=</span> <span class="n">revision</span>
+        <span class="n">dictionary</span><span class="p">[</span><span class="s">&#39;wiki_current_revision_deleted&#39;</span><span class="p">]</span> <span class="o">=</span> <span class="ow">not</span> <span class="p">(</span><span class="n">revision</span><span class="o">.</span><span class="n">deleted</span> <span class="o">==</span> <span class="mi">0</span><span class="p">)</span>
+
+    <span class="k">if</span> <span class="n">request</span><span class="p">:</span>
+        <span class="n">dictionary</span><span class="o">.</span><span class="n">update</span><span class="p">(</span><span class="n">csrf</span><span class="p">(</span><span class="n">request</span><span class="p">))</span>
+
+    <span class="k">if</span> <span class="n">request</span> <span class="ow">and</span> <span class="n">course</span><span class="p">:</span>
+        <span class="n">dictionary</span><span class="p">[</span><span class="s">&#39;staff_access&#39;</span><span class="p">]</span> <span class="o">=</span> <span class="n">has_access</span><span class="p">(</span><span class="n">request</span><span class="o">.</span><span class="n">user</span><span class="p">,</span> <span class="n">course</span><span class="p">,</span> <span class="s">&#39;staff&#39;</span><span class="p">)</span>
+    <span class="k">else</span><span class="p">:</span>
+        <span class="n">dictionary</span><span class="p">[</span><span class="s">&#39;staff_access&#39;</span><span class="p">]</span> <span class="o">=</span> <span class="bp">False</span>
+
+<span class="k">def</span> <span class="nf">view</span><span class="p">(</span><span class="n">request</span><span class="p">,</span> <span class="n">article_path</span><span class="p">,</span> <span class="n">course_id</span><span class="o">=</span><span class="bp">None</span><span class="p">):</span>
+    <span class="n">course</span> <span class="o">=</span> <span class="n">get_opt_course_with_access</span><span class="p">(</span><span class="n">request</span><span class="o">.</span><span class="n">user</span><span class="p">,</span> <span class="n">course_id</span><span class="p">,</span> <span class="s">&#39;load&#39;</span><span class="p">)</span>
+
+    <span class="p">(</span><span class="n">article</span><span class="p">,</span> <span class="n">err</span><span class="p">)</span> <span class="o">=</span> <span class="n">get_article</span><span class="p">(</span><span class="n">request</span><span class="p">,</span> <span class="n">article_path</span><span class="p">,</span> <span class="n">course</span><span class="p">)</span>
+    <span class="k">if</span> <span class="n">err</span><span class="p">:</span>
+        <span class="k">return</span> <span class="n">err</span>
+
+    <span class="n">perm_err</span> <span class="o">=</span> <span class="n">check_permissions</span><span class="p">(</span><span class="n">request</span><span class="p">,</span> <span class="n">article</span><span class="p">,</span> <span class="n">course</span><span class="p">,</span> <span class="n">check_read</span><span class="o">=</span><span class="bp">True</span><span class="p">,</span> <span class="n">check_deleted</span><span class="o">=</span><span class="bp">True</span><span class="p">)</span>
+    <span class="k">if</span> <span class="n">perm_err</span><span class="p">:</span>
+        <span class="k">return</span> <span class="n">perm_err</span>
+
+    <span class="n">d</span> <span class="o">=</span> <span class="p">{}</span>
+    <span class="n">update_template_dictionary</span><span class="p">(</span><span class="n">d</span><span class="p">,</span> <span class="n">request</span><span class="p">,</span> <span class="n">course</span><span class="p">,</span> <span class="n">article</span><span class="p">,</span> <span class="n">article</span><span class="o">.</span><span class="n">current_revision</span><span class="p">)</span>
+    <span class="k">return</span> <span class="n">render_to_response</span><span class="p">(</span><span class="s">&#39;simplewiki/simplewiki_view.html&#39;</span><span class="p">,</span> <span class="n">d</span><span class="p">)</span>
+
+
+<span class="k">def</span> <span class="nf">view_revision</span><span class="p">(</span><span class="n">request</span><span class="p">,</span> <span class="n">revision_number</span><span class="p">,</span> <span class="n">article_path</span><span class="p">,</span> <span class="n">course_id</span><span class="o">=</span><span class="bp">None</span><span class="p">):</span>
+    <span class="n">course</span> <span class="o">=</span> <span class="n">get_opt_course_with_access</span><span class="p">(</span><span class="n">request</span><span class="o">.</span><span class="n">user</span><span class="p">,</span> <span class="n">course_id</span><span class="p">,</span> <span class="s">&#39;load&#39;</span><span class="p">)</span>
+
+    <span class="p">(</span><span class="n">article</span><span class="p">,</span> <span class="n">err</span><span class="p">)</span> <span class="o">=</span> <span class="n">get_article</span><span class="p">(</span><span class="n">request</span><span class="p">,</span> <span class="n">article_path</span><span class="p">,</span> <span class="n">course</span><span class="p">)</span>
+    <span class="k">if</span> <span class="n">err</span><span class="p">:</span>
+        <span class="k">return</span> <span class="n">err</span>
+
+    <span class="k">try</span><span class="p">:</span>
+        <span class="n">revision</span> <span class="o">=</span> <span class="n">Revision</span><span class="o">.</span><span class="n">objects</span><span class="o">.</span><span class="n">get</span><span class="p">(</span><span class="n">counter</span><span class="o">=</span><span class="nb">int</span><span class="p">(</span><span class="n">revision_number</span><span class="p">),</span> <span class="n">article</span><span class="o">=</span><span class="n">article</span><span class="p">)</span>
+    <span class="k">except</span><span class="p">:</span>
+        <span class="n">d</span> <span class="o">=</span> <span class="p">{</span><span class="s">&#39;wiki_err_norevision&#39;</span><span class="p">:</span> <span class="n">revision_number</span><span class="p">}</span>
+        <span class="n">update_template_dictionary</span><span class="p">(</span><span class="n">d</span><span class="p">,</span> <span class="n">request</span><span class="p">,</span> <span class="n">course</span><span class="p">,</span> <span class="n">article</span><span class="p">)</span>
+        <span class="k">return</span> <span class="n">render_to_response</span><span class="p">(</span><span class="s">&#39;simplewiki/simplewiki_error.html&#39;</span><span class="p">,</span> <span class="n">d</span><span class="p">)</span>
+
+    <span class="n">perm_err</span> <span class="o">=</span> <span class="n">check_permissions</span><span class="p">(</span><span class="n">request</span><span class="p">,</span> <span class="n">article</span><span class="p">,</span> <span class="n">course</span><span class="p">,</span> <span class="n">check_read</span><span class="o">=</span><span class="bp">True</span><span class="p">,</span> <span class="n">check_deleted</span><span class="o">=</span><span class="bp">True</span><span class="p">,</span> <span class="n">revision</span><span class="o">=</span><span class="n">revision</span><span class="p">)</span>
+    <span class="k">if</span> <span class="n">perm_err</span><span class="p">:</span>
+        <span class="k">return</span> <span class="n">perm_err</span>
+
+    <span class="n">d</span> <span class="o">=</span> <span class="p">{}</span>
+    <span class="n">update_template_dictionary</span><span class="p">(</span><span class="n">d</span><span class="p">,</span> <span class="n">request</span><span class="p">,</span> <span class="n">course</span><span class="p">,</span> <span class="n">article</span><span class="p">,</span> <span class="n">revision</span><span class="p">)</span>
+
+    <span class="k">return</span> <span class="n">render_to_response</span><span class="p">(</span><span class="s">&#39;simplewiki/simplewiki_view.html&#39;</span><span class="p">,</span> <span class="n">d</span><span class="p">)</span>
+
+
+<span class="k">def</span> <span class="nf">root_redirect</span><span class="p">(</span><span class="n">request</span><span class="p">,</span> <span class="n">course_id</span><span class="o">=</span><span class="bp">None</span><span class="p">):</span>
+    <span class="n">course</span> <span class="o">=</span> <span class="n">get_opt_course_with_access</span><span class="p">(</span><span class="n">request</span><span class="o">.</span><span class="n">user</span><span class="p">,</span> <span class="n">course_id</span><span class="p">,</span> <span class="s">&#39;load&#39;</span><span class="p">)</span>
+
+    <span class="c">#TODO: Add a default namespace to settings.</span>
+    <span class="n">namespace</span> <span class="o">=</span> <span class="s">&quot;edX&quot;</span>
+
+    <span class="k">try</span><span class="p">:</span>
+        <span class="n">root</span> <span class="o">=</span> <span class="n">Article</span><span class="o">.</span><span class="n">get_root</span><span class="p">(</span><span class="n">namespace</span><span class="p">)</span>
+        <span class="k">return</span> <span class="n">HttpResponseRedirect</span><span class="p">(</span><span class="n">reverse</span><span class="p">(</span><span class="s">&#39;wiki_view&#39;</span><span class="p">,</span> <span class="n">kwargs</span><span class="o">=</span><span class="p">{</span><span class="s">&#39;course_id&#39;</span><span class="p">:</span> <span class="n">course_id</span><span class="p">,</span> <span class="s">&#39;article_path&#39;</span><span class="p">:</span> <span class="n">root</span><span class="o">.</span><span class="n">get_path</span><span class="p">()}))</span>
+    <span class="k">except</span><span class="p">:</span>
+        <span class="c"># If the root is not found, we probably are loading this class for the first time</span>
+        <span class="c"># We should make sure the namespace exists so the root article can be created.</span>
+        <span class="n">Namespace</span><span class="o">.</span><span class="n">ensure_namespace</span><span class="p">(</span><span class="n">namespace</span><span class="p">)</span>
+
+        <span class="n">err</span> <span class="o">=</span> <span class="n">not_found</span><span class="p">(</span><span class="n">request</span><span class="p">,</span> <span class="n">namespace</span> <span class="o">+</span> <span class="s">&#39;/&#39;</span><span class="p">,</span> <span class="n">course</span><span class="p">)</span>
+        <span class="k">return</span> <span class="n">err</span>
+
+
+<span class="k">def</span> <span class="nf">create</span><span class="p">(</span><span class="n">request</span><span class="p">,</span> <span class="n">article_path</span><span class="p">,</span> <span class="n">course_id</span><span class="o">=</span><span class="bp">None</span><span class="p">):</span>
+    <span class="n">course</span> <span class="o">=</span> <span class="n">get_opt_course_with_access</span><span class="p">(</span><span class="n">request</span><span class="o">.</span><span class="n">user</span><span class="p">,</span> <span class="n">course_id</span><span class="p">,</span> <span class="s">&#39;load&#39;</span><span class="p">)</span>
+
+    <span class="n">article_path_components</span> <span class="o">=</span> <span class="n">article_path</span><span class="o">.</span><span class="n">split</span><span class="p">(</span><span class="s">&#39;/&#39;</span><span class="p">)</span>
+
+    <span class="c"># Ensure the namespace exists</span>
+    <span class="k">if</span> <span class="ow">not</span> <span class="nb">len</span><span class="p">(</span><span class="n">article_path_components</span><span class="p">)</span> <span class="o">&gt;=</span> <span class="mi">1</span> <span class="ow">or</span> <span class="nb">len</span><span class="p">(</span><span class="n">article_path_components</span><span class="p">[</span><span class="mi">0</span><span class="p">])</span> <span class="o">==</span> <span class="mi">0</span><span class="p">:</span>
+        <span class="n">d</span> <span class="o">=</span> <span class="p">{</span><span class="s">&#39;wiki_err_no_namespace&#39;</span><span class="p">:</span> <span class="bp">True</span><span class="p">}</span>
+        <span class="n">update_template_dictionary</span><span class="p">(</span><span class="n">d</span><span class="p">,</span> <span class="n">request</span><span class="p">,</span> <span class="n">course</span><span class="p">)</span>
+        <span class="k">return</span> <span class="n">render_to_response</span><span class="p">(</span><span class="s">&#39;simplewiki/simplewiki_error.html&#39;</span><span class="p">,</span> <span class="n">d</span><span class="p">)</span>
+
+    <span class="n">namespace</span> <span class="o">=</span> <span class="bp">None</span>
+    <span class="k">try</span><span class="p">:</span>
+        <span class="n">namespace</span> <span class="o">=</span> <span class="n">Namespace</span><span class="o">.</span><span class="n">objects</span><span class="o">.</span><span class="n">get</span><span class="p">(</span><span class="n">name__exact</span><span class="o">=</span><span class="n">article_path_components</span><span class="p">[</span><span class="mi">0</span><span class="p">])</span>
+    <span class="k">except</span> <span class="n">Namespace</span><span class="o">.</span><span class="n">DoesNotExist</span><span class="p">,</span> <span class="ne">ValueError</span><span class="p">:</span>
+        <span class="n">d</span> <span class="o">=</span> <span class="p">{</span><span class="s">&#39;wiki_err_bad_namespace&#39;</span><span class="p">:</span> <span class="bp">True</span><span class="p">}</span>
+        <span class="n">update_template_dictionary</span><span class="p">(</span><span class="n">d</span><span class="p">,</span> <span class="n">request</span><span class="p">,</span> <span class="n">course</span><span class="p">)</span>
+        <span class="k">return</span> <span class="n">render_to_response</span><span class="p">(</span><span class="s">&#39;simplewiki/simplewiki_error.html&#39;</span><span class="p">,</span> <span class="n">d</span><span class="p">)</span>
+
+    <span class="c"># See if the article already exists</span>
+    <span class="n">article_slug</span> <span class="o">=</span> <span class="n">article_path_components</span><span class="p">[</span><span class="mi">1</span><span class="p">]</span> <span class="k">if</span> <span class="nb">len</span><span class="p">(</span><span class="n">article_path_components</span><span class="p">)</span> <span class="o">&gt;=</span> <span class="mi">2</span> <span class="k">else</span> <span class="s">&#39;&#39;</span>
+    <span class="c">#TODO: Make sure the slug only contains legal characters (which is already done a bit by the url regex)</span>
+
+    <span class="k">try</span><span class="p">:</span>
+        <span class="n">existing_article</span> <span class="o">=</span> <span class="n">Article</span><span class="o">.</span><span class="n">objects</span><span class="o">.</span><span class="n">get</span><span class="p">(</span><span class="n">namespace</span><span class="o">=</span><span class="n">namespace</span><span class="p">,</span> <span class="n">slug__exact</span><span class="o">=</span><span class="n">article_slug</span><span class="p">)</span>
+        <span class="c">#It already exists, so we just redirect to view the article</span>
+        <span class="k">return</span> <span class="n">HttpResponseRedirect</span><span class="p">(</span><span class="n">wiki_reverse</span><span class="p">(</span><span class="s">&quot;wiki_view&quot;</span><span class="p">,</span> <span class="n">existing_article</span><span class="p">,</span> <span class="n">course</span><span class="p">))</span>
+    <span class="k">except</span> <span class="n">Article</span><span class="o">.</span><span class="n">DoesNotExist</span><span class="p">:</span>
+        <span class="c">#This is good. The article doesn&#39;t exist</span>
+        <span class="k">pass</span>
+
+    <span class="c">#TODO: Once we have permissions for namespaces, we should check for create permissions</span>
+    <span class="c">#check_permissions(request, #namespace#, check_locked=False, check_write=True, check_deleted=True)</span>
+
+    <span class="k">if</span> <span class="n">request</span><span class="o">.</span><span class="n">method</span> <span class="o">==</span> <span class="s">&#39;POST&#39;</span><span class="p">:</span>
+        <span class="n">f</span> <span class="o">=</span> <span class="n">CreateArticleForm</span><span class="p">(</span><span class="n">request</span><span class="o">.</span><span class="n">POST</span><span class="p">)</span>
+        <span class="k">if</span> <span class="n">f</span><span class="o">.</span><span class="n">is_valid</span><span class="p">():</span>
+            <span class="n">article</span> <span class="o">=</span> <span class="n">Article</span><span class="p">()</span>
+            <span class="n">article</span><span class="o">.</span><span class="n">slug</span> <span class="o">=</span> <span class="n">article_slug</span>
+            <span class="k">if</span> <span class="ow">not</span> <span class="n">request</span><span class="o">.</span><span class="n">user</span><span class="o">.</span><span class="n">is_anonymous</span><span class="p">():</span>
+                <span class="n">article</span><span class="o">.</span><span class="n">created_by</span> <span class="o">=</span> <span class="n">request</span><span class="o">.</span><span class="n">user</span>
+            <span class="n">article</span><span class="o">.</span><span class="n">title</span> <span class="o">=</span> <span class="n">f</span><span class="o">.</span><span class="n">cleaned_data</span><span class="o">.</span><span class="n">get</span><span class="p">(</span><span class="s">&#39;title&#39;</span><span class="p">)</span>
+            <span class="n">article</span><span class="o">.</span><span class="n">namespace</span> <span class="o">=</span> <span class="n">namespace</span>
+            <span class="n">a</span> <span class="o">=</span> <span class="n">article</span><span class="o">.</span><span class="n">save</span><span class="p">()</span>
+            <span class="n">new_revision</span> <span class="o">=</span> <span class="n">f</span><span class="o">.</span><span class="n">save</span><span class="p">(</span><span class="n">commit</span><span class="o">=</span><span class="bp">False</span><span class="p">)</span>
+            <span class="k">if</span> <span class="ow">not</span> <span class="n">request</span><span class="o">.</span><span class="n">user</span><span class="o">.</span><span class="n">is_anonymous</span><span class="p">():</span>
+                <span class="n">new_revision</span><span class="o">.</span><span class="n">revision_user</span> <span class="o">=</span> <span class="n">request</span><span class="o">.</span><span class="n">user</span>
+            <span class="n">new_revision</span><span class="o">.</span><span class="n">article</span> <span class="o">=</span> <span class="n">article</span>
+            <span class="n">new_revision</span><span class="o">.</span><span class="n">save</span><span class="p">()</span>
+
+            <span class="k">return</span> <span class="n">HttpResponseRedirect</span><span class="p">(</span><span class="n">wiki_reverse</span><span class="p">(</span><span class="s">&quot;wiki_view&quot;</span><span class="p">,</span> <span class="n">article</span><span class="p">,</span> <span class="n">course</span><span class="p">))</span>
+    <span class="k">else</span><span class="p">:</span>
+        <span class="n">f</span> <span class="o">=</span> <span class="n">CreateArticleForm</span><span class="p">(</span><span class="n">initial</span><span class="o">=</span><span class="p">{</span><span class="s">&#39;title&#39;</span><span class="p">:</span> <span class="n">request</span><span class="o">.</span><span class="n">GET</span><span class="o">.</span><span class="n">get</span><span class="p">(</span><span class="s">&#39;wiki_article_name&#39;</span><span class="p">,</span> <span class="n">article_slug</span><span class="p">),</span>
+                                       <span class="s">&#39;contents&#39;</span><span class="p">:</span> <span class="n">_</span><span class="p">(</span><span class="s">&#39;Headline</span><span class="se">\n</span><span class="s">===</span><span class="se">\n\n</span><span class="s">&#39;</span><span class="p">)})</span>
+
+    <span class="n">d</span> <span class="o">=</span> <span class="p">{</span><span class="s">&#39;wiki_form&#39;</span><span class="p">:</span> <span class="n">f</span><span class="p">,</span> <span class="s">&#39;create_article&#39;</span><span class="p">:</span> <span class="bp">True</span><span class="p">,</span> <span class="s">&#39;namespace&#39;</span><span class="p">:</span> <span class="n">namespace</span><span class="o">.</span><span class="n">name</span><span class="p">}</span>
+    <span class="n">update_template_dictionary</span><span class="p">(</span><span class="n">d</span><span class="p">,</span> <span class="n">request</span><span class="p">,</span> <span class="n">course</span><span class="p">)</span>
+
+    <span class="k">return</span> <span class="n">render_to_response</span><span class="p">(</span><span class="s">&#39;simplewiki/simplewiki_edit.html&#39;</span><span class="p">,</span> <span class="n">d</span><span class="p">)</span>
+
+
+<span class="k">def</span> <span class="nf">edit</span><span class="p">(</span><span class="n">request</span><span class="p">,</span> <span class="n">article_path</span><span class="p">,</span> <span class="n">course_id</span><span class="o">=</span><span class="bp">None</span><span class="p">):</span>
+    <span class="n">course</span> <span class="o">=</span> <span class="n">get_opt_course_with_access</span><span class="p">(</span><span class="n">request</span><span class="o">.</span><span class="n">user</span><span class="p">,</span> <span class="n">course_id</span><span class="p">,</span> <span class="s">&#39;load&#39;</span><span class="p">)</span>
+
+    <span class="p">(</span><span class="n">article</span><span class="p">,</span> <span class="n">err</span><span class="p">)</span> <span class="o">=</span> <span class="n">get_article</span><span class="p">(</span><span class="n">request</span><span class="p">,</span> <span class="n">article_path</span><span class="p">,</span> <span class="n">course</span><span class="p">)</span>
+    <span class="k">if</span> <span class="n">err</span><span class="p">:</span>
+        <span class="k">return</span> <span class="n">err</span>
+
+    <span class="c"># Check write permissions</span>
+    <span class="n">perm_err</span> <span class="o">=</span> <span class="n">check_permissions</span><span class="p">(</span><span class="n">request</span><span class="p">,</span> <span class="n">article</span><span class="p">,</span> <span class="n">course</span><span class="p">,</span> <span class="n">check_write</span><span class="o">=</span><span class="bp">True</span><span class="p">,</span> <span class="n">check_locked</span><span class="o">=</span><span class="bp">True</span><span class="p">,</span> <span class="n">check_deleted</span><span class="o">=</span><span class="bp">False</span><span class="p">)</span>
+    <span class="k">if</span> <span class="n">perm_err</span><span class="p">:</span>
+        <span class="k">return</span> <span class="n">perm_err</span>
+
+    <span class="k">if</span> <span class="n">wiki_settings</span><span class="o">.</span><span class="n">WIKI_ALLOW_TITLE_EDIT</span><span class="p">:</span>
+        <span class="n">EditForm</span> <span class="o">=</span> <span class="n">RevisionFormWithTitle</span>
+    <span class="k">else</span><span class="p">:</span>
+        <span class="n">EditForm</span> <span class="o">=</span> <span class="n">RevisionForm</span>
+
+    <span class="k">if</span> <span class="n">request</span><span class="o">.</span><span class="n">method</span> <span class="o">==</span> <span class="s">&#39;POST&#39;</span><span class="p">:</span>
+        <span class="n">f</span> <span class="o">=</span> <span class="n">EditForm</span><span class="p">(</span><span class="n">request</span><span class="o">.</span><span class="n">POST</span><span class="p">)</span>
+        <span class="k">if</span> <span class="n">f</span><span class="o">.</span><span class="n">is_valid</span><span class="p">():</span>
+            <span class="n">new_revision</span> <span class="o">=</span> <span class="n">f</span><span class="o">.</span><span class="n">save</span><span class="p">(</span><span class="n">commit</span><span class="o">=</span><span class="bp">False</span><span class="p">)</span>
+            <span class="n">new_revision</span><span class="o">.</span><span class="n">article</span> <span class="o">=</span> <span class="n">article</span>
+
+            <span class="k">if</span> <span class="n">request</span><span class="o">.</span><span class="n">POST</span><span class="o">.</span><span class="n">__contains__</span><span class="p">(</span><span class="s">&#39;delete&#39;</span><span class="p">):</span>
+                <span class="k">if</span> <span class="p">(</span><span class="n">article</span><span class="o">.</span><span class="n">current_revision</span><span class="o">.</span><span class="n">deleted</span> <span class="o">==</span> <span class="mi">1</span><span class="p">):</span>  <span class="c"># This article has already been deleted. Redirect</span>
+                    <span class="k">return</span> <span class="n">HttpResponseRedirect</span><span class="p">(</span><span class="n">wiki_reverse</span><span class="p">(</span><span class="s">&#39;wiki_view&#39;</span><span class="p">,</span> <span class="n">article</span><span class="p">,</span> <span class="n">course</span><span class="p">))</span>
+                <span class="n">new_revision</span><span class="o">.</span><span class="n">contents</span> <span class="o">=</span> <span class="s">&quot;&quot;</span>
+                <span class="n">new_revision</span><span class="o">.</span><span class="n">deleted</span> <span class="o">=</span> <span class="mi">1</span>
+            <span class="k">elif</span> <span class="ow">not</span> <span class="n">new_revision</span><span class="o">.</span><span class="n">get_diff</span><span class="p">():</span>
+                <span class="k">return</span> <span class="n">HttpResponseRedirect</span><span class="p">(</span><span class="n">wiki_reverse</span><span class="p">(</span><span class="s">&#39;wiki_view&#39;</span><span class="p">,</span> <span class="n">article</span><span class="p">,</span> <span class="n">course</span><span class="p">))</span>
+
+            <span class="k">if</span> <span class="ow">not</span> <span class="n">request</span><span class="o">.</span><span class="n">user</span><span class="o">.</span><span class="n">is_anonymous</span><span class="p">():</span>
+                <span class="n">new_revision</span><span class="o">.</span><span class="n">revision_user</span> <span class="o">=</span> <span class="n">request</span><span class="o">.</span><span class="n">user</span>
+            <span class="n">new_revision</span><span class="o">.</span><span class="n">save</span><span class="p">()</span>
+            <span class="k">if</span> <span class="n">wiki_settings</span><span class="o">.</span><span class="n">WIKI_ALLOW_TITLE_EDIT</span><span class="p">:</span>
+                <span class="n">new_revision</span><span class="o">.</span><span class="n">article</span><span class="o">.</span><span class="n">title</span> <span class="o">=</span> <span class="n">f</span><span class="o">.</span><span class="n">cleaned_data</span><span class="p">[</span><span class="s">&#39;title&#39;</span><span class="p">]</span>
+                <span class="n">new_revision</span><span class="o">.</span><span class="n">article</span><span class="o">.</span><span class="n">save</span><span class="p">()</span>
+            <span class="k">return</span> <span class="n">HttpResponseRedirect</span><span class="p">(</span><span class="n">wiki_reverse</span><span class="p">(</span><span class="s">&#39;wiki_view&#39;</span><span class="p">,</span> <span class="n">article</span><span class="p">,</span> <span class="n">course</span><span class="p">))</span>
+    <span class="k">else</span><span class="p">:</span>
+        <span class="n">startContents</span> <span class="o">=</span> <span class="n">article</span><span class="o">.</span><span class="n">current_revision</span><span class="o">.</span><span class="n">contents</span> <span class="k">if</span> <span class="p">(</span><span class="n">article</span><span class="o">.</span><span class="n">current_revision</span><span class="o">.</span><span class="n">deleted</span> <span class="o">==</span> <span class="mi">0</span><span class="p">)</span> <span class="k">else</span> <span class="s">&#39;Headline</span><span class="se">\n</span><span class="s">===</span><span class="se">\n\n</span><span class="s">&#39;</span>
+
+        <span class="n">f</span> <span class="o">=</span> <span class="n">EditForm</span><span class="p">({</span><span class="s">&#39;contents&#39;</span><span class="p">:</span> <span class="n">startContents</span><span class="p">,</span> <span class="s">&#39;title&#39;</span><span class="p">:</span> <span class="n">article</span><span class="o">.</span><span class="n">title</span><span class="p">})</span>
+
+    <span class="n">d</span> <span class="o">=</span> <span class="p">{</span><span class="s">&#39;wiki_form&#39;</span><span class="p">:</span> <span class="n">f</span><span class="p">}</span>
+    <span class="n">update_template_dictionary</span><span class="p">(</span><span class="n">d</span><span class="p">,</span> <span class="n">request</span><span class="p">,</span> <span class="n">course</span><span class="p">,</span> <span class="n">article</span><span class="p">)</span>
+    <span class="k">return</span> <span class="n">render_to_response</span><span class="p">(</span><span class="s">&#39;simplewiki/simplewiki_edit.html&#39;</span><span class="p">,</span> <span class="n">d</span><span class="p">)</span>
+
+
+<span class="k">def</span> <span class="nf">history</span><span class="p">(</span><span class="n">request</span><span class="p">,</span> <span class="n">article_path</span><span class="p">,</span> <span class="n">page</span><span class="o">=</span><span class="mi">1</span><span class="p">,</span> <span class="n">course_id</span><span class="o">=</span><span class="bp">None</span><span class="p">):</span>
+    <span class="n">course</span> <span class="o">=</span> <span class="n">get_opt_course_with_access</span><span class="p">(</span><span class="n">request</span><span class="o">.</span><span class="n">user</span><span class="p">,</span> <span class="n">course_id</span><span class="p">,</span> <span class="s">&#39;load&#39;</span><span class="p">)</span>
+
+    <span class="p">(</span><span class="n">article</span><span class="p">,</span> <span class="n">err</span><span class="p">)</span> <span class="o">=</span> <span class="n">get_article</span><span class="p">(</span><span class="n">request</span><span class="p">,</span> <span class="n">article_path</span><span class="p">,</span> <span class="n">course</span><span class="p">)</span>
+    <span class="k">if</span> <span class="n">err</span><span class="p">:</span>
+        <span class="k">return</span> <span class="n">err</span>
+
+    <span class="n">perm_err</span> <span class="o">=</span> <span class="n">check_permissions</span><span class="p">(</span><span class="n">request</span><span class="p">,</span> <span class="n">article</span><span class="p">,</span> <span class="n">course</span><span class="p">,</span> <span class="n">check_read</span><span class="o">=</span><span class="bp">True</span><span class="p">,</span> <span class="n">check_deleted</span><span class="o">=</span><span class="bp">False</span><span class="p">)</span>
+    <span class="k">if</span> <span class="n">perm_err</span><span class="p">:</span>
+        <span class="k">return</span> <span class="n">perm_err</span>
+
+    <span class="n">page_size</span> <span class="o">=</span> <span class="mi">10</span>
+
+    <span class="k">if</span> <span class="n">page</span> <span class="o">==</span> <span class="bp">None</span><span class="p">:</span>
+        <span class="n">page</span> <span class="o">=</span> <span class="mi">1</span>
+    <span class="k">try</span><span class="p">:</span>
+        <span class="n">p</span> <span class="o">=</span> <span class="nb">int</span><span class="p">(</span><span class="n">page</span><span class="p">)</span>
+    <span class="k">except</span> <span class="ne">ValueError</span><span class="p">:</span>
+        <span class="n">p</span> <span class="o">=</span> <span class="mi">1</span>
+
+    <span class="n">history</span> <span class="o">=</span> <span class="n">Revision</span><span class="o">.</span><span class="n">objects</span><span class="o">.</span><span class="n">filter</span><span class="p">(</span><span class="n">article__exact</span><span class="o">=</span><span class="n">article</span><span class="p">)</span><span class="o">.</span><span class="n">order_by</span><span class="p">(</span><span class="s">&#39;-counter&#39;</span><span class="p">)</span><span class="o">.</span><span class="n">select_related</span><span class="p">(</span><span class="s">&#39;previous_revision__counter&#39;</span><span class="p">,</span> <span class="s">&#39;revision_user&#39;</span><span class="p">,</span> <span class="s">&#39;wiki_article&#39;</span><span class="p">)</span>
+
+    <span class="k">if</span> <span class="n">request</span><span class="o">.</span><span class="n">method</span> <span class="o">==</span> <span class="s">&#39;POST&#39;</span><span class="p">:</span>
+        <span class="k">if</span> <span class="n">request</span><span class="o">.</span><span class="n">POST</span><span class="o">.</span><span class="n">__contains__</span><span class="p">(</span><span class="s">&#39;revision&#39;</span><span class="p">):</span>  <span class="c"># They selected a version, but they can be either deleting or changing the version</span>
+            <span class="n">perm_err</span> <span class="o">=</span> <span class="n">check_permissions</span><span class="p">(</span><span class="n">request</span><span class="p">,</span> <span class="n">article</span><span class="p">,</span> <span class="n">course</span><span class="p">,</span> <span class="n">check_write</span><span class="o">=</span><span class="bp">True</span><span class="p">,</span> <span class="n">check_locked</span><span class="o">=</span><span class="bp">True</span><span class="p">)</span>
+            <span class="k">if</span> <span class="n">perm_err</span><span class="p">:</span>
+                <span class="k">return</span> <span class="n">perm_err</span>
+
+            <span class="n">redirectURL</span> <span class="o">=</span> <span class="n">wiki_reverse</span><span class="p">(</span><span class="s">&#39;wiki_view&#39;</span><span class="p">,</span> <span class="n">article</span><span class="p">,</span> <span class="n">course</span><span class="p">)</span>
+            <span class="k">try</span><span class="p">:</span>
+                <span class="n">r</span> <span class="o">=</span> <span class="nb">int</span><span class="p">(</span><span class="n">request</span><span class="o">.</span><span class="n">POST</span><span class="p">[</span><span class="s">&#39;revision&#39;</span><span class="p">])</span>
+                <span class="n">revision</span> <span class="o">=</span> <span class="n">Revision</span><span class="o">.</span><span class="n">objects</span><span class="o">.</span><span class="n">get</span><span class="p">(</span><span class="nb">id</span><span class="o">=</span><span class="n">r</span><span class="p">)</span>
+                <span class="k">if</span> <span class="n">request</span><span class="o">.</span><span class="n">POST</span><span class="o">.</span><span class="n">__contains__</span><span class="p">(</span><span class="s">&#39;change&#39;</span><span class="p">):</span>
+                    <span class="n">article</span><span class="o">.</span><span class="n">current_revision</span> <span class="o">=</span> <span class="n">revision</span>
+                    <span class="n">article</span><span class="o">.</span><span class="n">save</span><span class="p">()</span>
+                <span class="k">elif</span> <span class="n">request</span><span class="o">.</span><span class="n">POST</span><span class="o">.</span><span class="n">__contains__</span><span class="p">(</span><span class="s">&#39;view&#39;</span><span class="p">):</span>
+                    <span class="n">redirectURL</span> <span class="o">=</span> <span class="n">wiki_reverse</span><span class="p">(</span><span class="s">&#39;wiki_view_revision&#39;</span><span class="p">,</span> <span class="n">course</span><span class="o">=</span><span class="n">course</span><span class="p">,</span>
+                                    <span class="n">kwargs</span><span class="o">=</span><span class="p">{</span><span class="s">&#39;revision_number&#39;</span><span class="p">:</span> <span class="n">revision</span><span class="o">.</span><span class="n">counter</span><span class="p">,</span> <span class="s">&#39;article_path&#39;</span><span class="p">:</span> <span class="n">article</span><span class="o">.</span><span class="n">get_path</span><span class="p">()})</span>
+                <span class="c">#The rese of these are admin functions</span>
+                <span class="k">elif</span> <span class="n">request</span><span class="o">.</span><span class="n">POST</span><span class="o">.</span><span class="n">__contains__</span><span class="p">(</span><span class="s">&#39;delete&#39;</span><span class="p">)</span> <span class="ow">and</span> <span class="n">request</span><span class="o">.</span><span class="n">user</span><span class="o">.</span><span class="n">is_superuser</span><span class="p">:</span>
+                    <span class="k">if</span> <span class="p">(</span><span class="n">revision</span><span class="o">.</span><span class="n">deleted</span> <span class="o">==</span> <span class="mi">0</span><span class="p">):</span>
+                         <span class="n">revision</span><span class="o">.</span><span class="n">adminSetDeleted</span><span class="p">(</span><span class="mi">2</span><span class="p">)</span>
+                <span class="k">elif</span> <span class="n">request</span><span class="o">.</span><span class="n">POST</span><span class="o">.</span><span class="n">__contains__</span><span class="p">(</span><span class="s">&#39;restore&#39;</span><span class="p">)</span> <span class="ow">and</span> <span class="n">request</span><span class="o">.</span><span class="n">user</span><span class="o">.</span><span class="n">is_superuser</span><span class="p">:</span>
+                    <span class="k">if</span> <span class="p">(</span><span class="n">revision</span><span class="o">.</span><span class="n">deleted</span> <span class="o">==</span> <span class="mi">2</span><span class="p">):</span>
+                        <span class="n">revision</span><span class="o">.</span><span class="n">adminSetDeleted</span><span class="p">(</span><span class="mi">0</span><span class="p">)</span>
+                <span class="k">elif</span> <span class="n">request</span><span class="o">.</span><span class="n">POST</span><span class="o">.</span><span class="n">__contains__</span><span class="p">(</span><span class="s">&#39;delete_all&#39;</span><span class="p">)</span> <span class="ow">and</span> <span class="n">request</span><span class="o">.</span><span class="n">user</span><span class="o">.</span><span class="n">is_superuser</span><span class="p">:</span>
+                    <span class="n">Revision</span><span class="o">.</span><span class="n">objects</span><span class="o">.</span><span class="n">filter</span><span class="p">(</span><span class="n">article__exact</span><span class="o">=</span><span class="n">article</span><span class="p">,</span> <span class="n">deleted</span><span class="o">=</span><span class="mi">0</span><span class="p">)</span><span class="o">.</span><span class="n">update</span><span class="p">(</span><span class="n">deleted</span><span class="o">=</span><span class="mi">2</span><span class="p">)</span>
+                <span class="k">elif</span> <span class="n">request</span><span class="o">.</span><span class="n">POST</span><span class="o">.</span><span class="n">__contains__</span><span class="p">(</span><span class="s">&#39;lock_article&#39;</span><span class="p">):</span>
+                    <span class="n">article</span><span class="o">.</span><span class="n">locked</span> <span class="o">=</span> <span class="ow">not</span> <span class="n">article</span><span class="o">.</span><span class="n">locked</span>
+                    <span class="n">article</span><span class="o">.</span><span class="n">save</span><span class="p">()</span>
+            <span class="k">except</span> <span class="ne">Exception</span> <span class="k">as</span> <span class="n">e</span><span class="p">:</span>
+                <span class="k">print</span> <span class="nb">str</span><span class="p">(</span><span class="n">e</span><span class="p">)</span>
+                <span class="k">pass</span>
+            <span class="k">finally</span><span class="p">:</span>
+                <span class="k">return</span> <span class="n">HttpResponseRedirect</span><span class="p">(</span><span class="n">redirectURL</span><span class="p">)</span>
+                <span class="c">#</span>
+                <span class="c">#</span>
+                <span class="c"># &lt;input type=&quot;submit&quot; name=&quot;delete&quot; value=&quot;Delete revision&quot;/&gt;</span>
+                <span class="c"># &lt;input type=&quot;submit&quot; name=&quot;restore&quot; value=&quot;Restore revision&quot;/&gt;</span>
+                <span class="c"># &lt;input type=&quot;submit&quot; name=&quot;delete_all&quot; value=&quot;Delete all revisions&quot;&gt;</span>
+                <span class="c"># %else:</span>
+                <span class="c"># &lt;input type=&quot;submit&quot; name=&quot;delete_article&quot; value=&quot;Delete all revisions&quot;&gt;</span>
+                <span class="c">#</span>
+
+    <span class="n">page_count</span> <span class="o">=</span> <span class="p">(</span><span class="n">history</span><span class="o">.</span><span class="n">count</span><span class="p">()</span> <span class="o">+</span> <span class="p">(</span><span class="n">page_size</span> <span class="o">-</span> <span class="mi">1</span><span class="p">))</span> <span class="o">/</span> <span class="n">page_size</span>
+    <span class="k">if</span> <span class="n">p</span> <span class="o">&gt;</span> <span class="n">page_count</span><span class="p">:</span>
+        <span class="n">p</span> <span class="o">=</span> <span class="mi">1</span>
+    <span class="n">beginItem</span> <span class="o">=</span> <span class="p">(</span><span class="n">p</span> <span class="o">-</span> <span class="mi">1</span><span class="p">)</span> <span class="o">*</span> <span class="n">page_size</span>
+
+    <span class="n">next_page</span> <span class="o">=</span> <span class="n">p</span> <span class="o">+</span> <span class="mi">1</span> <span class="k">if</span> <span class="n">page_count</span> <span class="o">&gt;</span> <span class="n">p</span> <span class="k">else</span> <span class="bp">None</span>
+    <span class="n">prev_page</span> <span class="o">=</span> <span class="n">p</span> <span class="o">-</span> <span class="mi">1</span> <span class="k">if</span> <span class="n">p</span> <span class="o">&gt;</span> <span class="mi">1</span> <span class="k">else</span> <span class="bp">None</span>
+
+    <span class="n">d</span> <span class="o">=</span> <span class="p">{</span><span class="s">&#39;wiki_page&#39;</span><span class="p">:</span> <span class="n">p</span><span class="p">,</span>
+            <span class="s">&#39;wiki_next_page&#39;</span><span class="p">:</span> <span class="n">next_page</span><span class="p">,</span>
+            <span class="s">&#39;wiki_prev_page&#39;</span><span class="p">:</span> <span class="n">prev_page</span><span class="p">,</span>
+            <span class="s">&#39;wiki_history&#39;</span><span class="p">:</span> <span class="n">history</span><span class="p">[</span><span class="n">beginItem</span><span class="p">:</span><span class="n">beginItem</span> <span class="o">+</span> <span class="n">page_size</span><span class="p">],</span>
+            <span class="s">&#39;show_delete_revision&#39;</span><span class="p">:</span> <span class="n">request</span><span class="o">.</span><span class="n">user</span><span class="o">.</span><span class="n">is_superuser</span><span class="p">}</span>
+    <span class="n">update_template_dictionary</span><span class="p">(</span><span class="n">d</span><span class="p">,</span> <span class="n">request</span><span class="p">,</span> <span class="n">course</span><span class="p">,</span> <span class="n">article</span><span class="p">)</span>
+
+    <span class="k">return</span> <span class="n">render_to_response</span><span class="p">(</span><span class="s">&#39;simplewiki/simplewiki_history.html&#39;</span><span class="p">,</span> <span class="n">d</span><span class="p">)</span>
+
+
+<span class="k">def</span> <span class="nf">revision_feed</span><span class="p">(</span><span class="n">request</span><span class="p">,</span> <span class="n">page</span><span class="o">=</span><span class="mi">1</span><span class="p">,</span> <span class="n">namespace</span><span class="o">=</span><span class="bp">None</span><span class="p">,</span> <span class="n">course_id</span><span class="o">=</span><span class="bp">None</span><span class="p">):</span>
+    <span class="n">course</span> <span class="o">=</span> <span class="n">get_opt_course_with_access</span><span class="p">(</span><span class="n">request</span><span class="o">.</span><span class="n">user</span><span class="p">,</span> <span class="n">course_id</span><span class="p">,</span> <span class="s">&#39;load&#39;</span><span class="p">)</span>
+
+    <span class="n">page_size</span> <span class="o">=</span> <span class="mi">10</span>
+
+    <span class="k">if</span> <span class="n">page</span> <span class="o">==</span> <span class="bp">None</span><span class="p">:</span>
+        <span class="n">page</span> <span class="o">=</span> <span class="mi">1</span>
+    <span class="k">try</span><span class="p">:</span>
+        <span class="n">p</span> <span class="o">=</span> <span class="nb">int</span><span class="p">(</span><span class="n">page</span><span class="p">)</span>
+    <span class="k">except</span> <span class="ne">ValueError</span><span class="p">:</span>
+        <span class="n">p</span> <span class="o">=</span> <span class="mi">1</span>
+
+    <span class="n">history</span> <span class="o">=</span> <span class="n">Revision</span><span class="o">.</span><span class="n">objects</span><span class="o">.</span><span class="n">order_by</span><span class="p">(</span><span class="s">&#39;-revision_date&#39;</span><span class="p">)</span><span class="o">.</span><span class="n">select_related</span><span class="p">(</span><span class="s">&#39;revision_user&#39;</span><span class="p">,</span> <span class="s">&#39;article&#39;</span><span class="p">,</span> <span class="s">&#39;previous_revision&#39;</span><span class="p">)</span>
+
+    <span class="n">page_count</span> <span class="o">=</span> <span class="p">(</span><span class="n">history</span><span class="o">.</span><span class="n">count</span><span class="p">()</span> <span class="o">+</span> <span class="p">(</span><span class="n">page_size</span> <span class="o">-</span> <span class="mi">1</span><span class="p">))</span> <span class="o">/</span> <span class="n">page_size</span>
+    <span class="k">if</span> <span class="n">p</span> <span class="o">&gt;</span> <span class="n">page_count</span><span class="p">:</span>
+        <span class="n">p</span> <span class="o">=</span> <span class="mi">1</span>
+    <span class="n">beginItem</span> <span class="o">=</span> <span class="p">(</span><span class="n">p</span> <span class="o">-</span> <span class="mi">1</span><span class="p">)</span> <span class="o">*</span> <span class="n">page_size</span>
+
+    <span class="n">next_page</span> <span class="o">=</span> <span class="n">p</span> <span class="o">+</span> <span class="mi">1</span> <span class="k">if</span> <span class="n">page_count</span> <span class="o">&gt;</span> <span class="n">p</span> <span class="k">else</span> <span class="bp">None</span>
+    <span class="n">prev_page</span> <span class="o">=</span> <span class="n">p</span> <span class="o">-</span> <span class="mi">1</span> <span class="k">if</span> <span class="n">p</span> <span class="o">&gt;</span> <span class="mi">1</span> <span class="k">else</span> <span class="bp">None</span>
+
+    <span class="n">d</span> <span class="o">=</span> <span class="p">{</span><span class="s">&#39;wiki_page&#39;</span><span class="p">:</span> <span class="n">p</span><span class="p">,</span>
+            <span class="s">&#39;wiki_next_page&#39;</span><span class="p">:</span> <span class="n">next_page</span><span class="p">,</span>
+            <span class="s">&#39;wiki_prev_page&#39;</span><span class="p">:</span> <span class="n">prev_page</span><span class="p">,</span>
+            <span class="s">&#39;wiki_history&#39;</span><span class="p">:</span> <span class="n">history</span><span class="p">[</span><span class="n">beginItem</span><span class="p">:</span><span class="n">beginItem</span> <span class="o">+</span> <span class="n">page_size</span><span class="p">],</span>
+            <span class="s">&#39;show_delete_revision&#39;</span><span class="p">:</span> <span class="n">request</span><span class="o">.</span><span class="n">user</span><span class="o">.</span><span class="n">is_superuser</span><span class="p">,</span>
+            <span class="s">&#39;namespace&#39;</span><span class="p">:</span> <span class="n">namespace</span><span class="p">}</span>
+    <span class="n">update_template_dictionary</span><span class="p">(</span><span class="n">d</span><span class="p">,</span> <span class="n">request</span><span class="p">,</span> <span class="n">course</span><span class="p">)</span>
+
+    <span class="k">return</span> <span class="n">render_to_response</span><span class="p">(</span><span class="s">&#39;simplewiki/simplewiki_revision_feed.html&#39;</span><span class="p">,</span> <span class="n">d</span><span class="p">)</span>
+
+
+<span class="k">def</span> <span class="nf">search_articles</span><span class="p">(</span><span class="n">request</span><span class="p">,</span> <span class="n">namespace</span><span class="o">=</span><span class="bp">None</span><span class="p">,</span> <span class="n">course_id</span><span class="o">=</span><span class="bp">None</span><span class="p">):</span>
+    <span class="n">course</span> <span class="o">=</span> <span class="n">get_opt_course_with_access</span><span class="p">(</span><span class="n">request</span><span class="o">.</span><span class="n">user</span><span class="p">,</span> <span class="n">course_id</span><span class="p">,</span> <span class="s">&#39;load&#39;</span><span class="p">)</span>
+
+    <span class="c"># blampe: We should check for the presence of other popular django search</span>
+    <span class="c"># apps and use those if possible. Only fall back on this as a last resort.</span>
+    <span class="c"># Adding some context to results (eg where matches were) would also be nice.</span>
+
+    <span class="c"># todo: maybe do some perm checking here</span>
+
+    <span class="k">if</span> <span class="n">request</span><span class="o">.</span><span class="n">method</span> <span class="o">==</span> <span class="s">&#39;GET&#39;</span><span class="p">:</span>
+        <span class="n">querystring</span> <span class="o">=</span> <span class="n">request</span><span class="o">.</span><span class="n">GET</span><span class="o">.</span><span class="n">get</span><span class="p">(</span><span class="s">&#39;value&#39;</span><span class="p">,</span> <span class="s">&#39;&#39;</span><span class="p">)</span><span class="o">.</span><span class="n">strip</span><span class="p">()</span>
+    <span class="k">else</span><span class="p">:</span>
+        <span class="n">querystring</span> <span class="o">=</span> <span class="s">&quot;&quot;</span>
+
+    <span class="n">results</span> <span class="o">=</span> <span class="n">Article</span><span class="o">.</span><span class="n">objects</span><span class="o">.</span><span class="n">all</span><span class="p">()</span>
+    <span class="k">if</span> <span class="n">namespace</span><span class="p">:</span>
+        <span class="n">results</span> <span class="o">=</span> <span class="n">results</span><span class="o">.</span><span class="n">filter</span><span class="p">(</span><span class="n">namespace__name__exact</span><span class="o">=</span><span class="n">namespace</span><span class="p">)</span>
+
+    <span class="k">if</span> <span class="n">request</span><span class="o">.</span><span class="n">user</span><span class="o">.</span><span class="n">is_superuser</span><span class="p">:</span>
+        <span class="n">results</span> <span class="o">=</span> <span class="n">results</span><span class="o">.</span><span class="n">order_by</span><span class="p">(</span><span class="s">&#39;current_revision__deleted&#39;</span><span class="p">)</span>
+    <span class="k">else</span><span class="p">:</span>
+        <span class="n">results</span> <span class="o">=</span> <span class="n">results</span><span class="o">.</span><span class="n">filter</span><span class="p">(</span><span class="n">current_revision__deleted</span><span class="o">=</span><span class="mi">0</span><span class="p">)</span>
+
+    <span class="k">if</span> <span class="n">querystring</span><span class="p">:</span>
+        <span class="k">for</span> <span class="n">queryword</span> <span class="ow">in</span> <span class="n">querystring</span><span class="o">.</span><span class="n">split</span><span class="p">():</span>
+            <span class="c"># Basic negation is as fancy as we get right now</span>
+            <span class="k">if</span> <span class="n">queryword</span><span class="p">[</span><span class="mi">0</span><span class="p">]</span> <span class="o">==</span> <span class="s">&#39;-&#39;</span> <span class="ow">and</span> <span class="nb">len</span><span class="p">(</span><span class="n">queryword</span><span class="p">)</span> <span class="o">&gt;</span> <span class="mi">1</span><span class="p">:</span>
+                <span class="n">results</span><span class="o">.</span><span class="n">_search</span> <span class="o">=</span> <span class="k">lambda</span> <span class="n">x</span><span class="p">:</span> <span class="n">results</span><span class="o">.</span><span class="n">exclude</span><span class="p">(</span><span class="n">x</span><span class="p">)</span>
+                <span class="n">queryword</span> <span class="o">=</span> <span class="n">queryword</span><span class="p">[</span><span class="mi">1</span><span class="p">:]</span>
+            <span class="k">else</span><span class="p">:</span>
+                <span class="n">results</span><span class="o">.</span><span class="n">_search</span> <span class="o">=</span> <span class="k">lambda</span> <span class="n">x</span><span class="p">:</span> <span class="n">results</span><span class="o">.</span><span class="n">filter</span><span class="p">(</span><span class="n">x</span><span class="p">)</span>
+
+            <span class="n">results</span> <span class="o">=</span> <span class="n">results</span><span class="o">.</span><span class="n">_search</span><span class="p">(</span><span class="n">Q</span><span class="p">(</span><span class="n">current_revision__contents__icontains</span><span class="o">=</span><span class="n">queryword</span><span class="p">)</span> <span class="o">|</span> \
+                                      <span class="n">Q</span><span class="p">(</span><span class="n">title__icontains</span><span class="o">=</span><span class="n">queryword</span><span class="p">))</span>
+
+    <span class="n">results</span> <span class="o">=</span> <span class="n">results</span><span class="o">.</span><span class="n">select_related</span><span class="p">(</span><span class="s">&#39;current_revision__deleted&#39;</span><span class="p">,</span> <span class="s">&#39;namespace&#39;</span><span class="p">)</span>
+
+    <span class="n">results</span> <span class="o">=</span> <span class="nb">sorted</span><span class="p">(</span><span class="n">results</span><span class="p">,</span> <span class="n">key</span><span class="o">=</span><span class="k">lambda</span> <span class="n">article</span><span class="p">:</span> <span class="p">(</span><span class="n">article</span><span class="o">.</span><span class="n">current_revision</span><span class="o">.</span><span class="n">deleted</span><span class="p">,</span> <span class="n">article</span><span class="o">.</span><span class="n">get_path</span><span class="p">()</span><span class="o">.</span><span class="n">lower</span><span class="p">()))</span>
+
+    <span class="k">if</span> <span class="nb">len</span><span class="p">(</span><span class="n">results</span><span class="p">)</span> <span class="o">==</span> <span class="mi">1</span> <span class="ow">and</span> <span class="n">querystring</span><span class="p">:</span>
+        <span class="k">return</span> <span class="n">HttpResponseRedirect</span><span class="p">(</span><span class="n">wiki_reverse</span><span class="p">(</span><span class="s">&#39;wiki_view&#39;</span><span class="p">,</span> <span class="n">article</span><span class="o">=</span><span class="n">results</span><span class="p">[</span><span class="mi">0</span><span class="p">],</span> <span class="n">course</span><span class="o">=</span><span class="n">course</span><span class="p">))</span>
+    <span class="k">else</span><span class="p">:</span>
+        <span class="n">d</span> <span class="o">=</span> <span class="p">{</span><span class="s">&#39;wiki_search_results&#39;</span><span class="p">:</span> <span class="n">results</span><span class="p">,</span>
+                <span class="s">&#39;wiki_search_query&#39;</span><span class="p">:</span> <span class="n">querystring</span><span class="p">,</span>
+                <span class="s">&#39;namespace&#39;</span><span class="p">:</span> <span class="n">namespace</span><span class="p">}</span>
+        <span class="n">update_template_dictionary</span><span class="p">(</span><span class="n">d</span><span class="p">,</span> <span class="n">request</span><span class="p">,</span> <span class="n">course</span><span class="p">)</span>
+        <span class="k">return</span> <span class="n">render_to_response</span><span class="p">(</span><span class="s">&#39;simplewiki/simplewiki_searchresults.html&#39;</span><span class="p">,</span> <span class="n">d</span><span class="p">)</span>
+
+
+<span class="k">def</span> <span class="nf">search_add_related</span><span class="p">(</span><span class="n">request</span><span class="p">,</span> <span class="n">course_id</span><span class="p">,</span> <span class="n">slug</span><span class="p">,</span> <span class="n">namespace</span><span class="p">):</span>
+    <span class="n">course</span> <span class="o">=</span> <span class="n">get_opt_course_with_access</span><span class="p">(</span><span class="n">request</span><span class="o">.</span><span class="n">user</span><span class="p">,</span> <span class="n">course_id</span><span class="p">,</span> <span class="s">&#39;load&#39;</span><span class="p">)</span>
+
+    <span class="p">(</span><span class="n">article</span><span class="p">,</span> <span class="n">err</span><span class="p">)</span> <span class="o">=</span> <span class="n">get_article</span><span class="p">(</span><span class="n">request</span><span class="p">,</span> <span class="n">slug</span><span class="p">,</span> <span class="n">namespace</span> <span class="k">if</span> <span class="n">namespace</span> <span class="k">else</span> <span class="n">course_id</span><span class="p">)</span>
+    <span class="k">if</span> <span class="n">err</span><span class="p">:</span>
+        <span class="k">return</span> <span class="n">err</span>
+
+    <span class="n">perm_err</span> <span class="o">=</span> <span class="n">check_permissions</span><span class="p">(</span><span class="n">request</span><span class="p">,</span> <span class="n">article</span><span class="p">,</span> <span class="n">course</span><span class="p">,</span> <span class="n">check_read</span><span class="o">=</span><span class="bp">True</span><span class="p">)</span>
+    <span class="k">if</span> <span class="n">perm_err</span><span class="p">:</span>
+        <span class="k">return</span> <span class="n">perm_err</span>
+
+    <span class="n">search_string</span> <span class="o">=</span> <span class="n">request</span><span class="o">.</span><span class="n">GET</span><span class="o">.</span><span class="n">get</span><span class="p">(</span><span class="s">&#39;query&#39;</span><span class="p">,</span> <span class="bp">None</span><span class="p">)</span>
+    <span class="n">self_pk</span> <span class="o">=</span> <span class="n">request</span><span class="o">.</span><span class="n">GET</span><span class="o">.</span><span class="n">get</span><span class="p">(</span><span class="s">&#39;self&#39;</span><span class="p">,</span> <span class="bp">None</span><span class="p">)</span>
+    <span class="k">if</span> <span class="n">search_string</span><span class="p">:</span>
+        <span class="n">results</span> <span class="o">=</span> <span class="p">[]</span>
+        <span class="n">related</span> <span class="o">=</span> <span class="n">Article</span><span class="o">.</span><span class="n">objects</span><span class="o">.</span><span class="n">filter</span><span class="p">(</span><span class="n">title__istartswith</span><span class="o">=</span><span class="n">search_string</span><span class="p">)</span>
+        <span class="n">others</span> <span class="o">=</span> <span class="n">article</span><span class="o">.</span><span class="n">related</span><span class="o">.</span><span class="n">all</span><span class="p">()</span>
+        <span class="k">if</span> <span class="n">self_pk</span><span class="p">:</span>
+            <span class="n">related</span> <span class="o">=</span> <span class="n">related</span><span class="o">.</span><span class="n">exclude</span><span class="p">(</span><span class="n">pk</span><span class="o">=</span><span class="n">self_pk</span><span class="p">)</span>
+        <span class="k">if</span> <span class="n">others</span><span class="p">:</span>
+            <span class="n">related</span> <span class="o">=</span> <span class="n">related</span><span class="o">.</span><span class="n">exclude</span><span class="p">(</span><span class="n">related__in</span><span class="o">=</span><span class="n">others</span><span class="p">)</span>
+        <span class="n">related</span> <span class="o">=</span> <span class="n">related</span><span class="o">.</span><span class="n">order_by</span><span class="p">(</span><span class="s">&#39;title&#39;</span><span class="p">)[:</span><span class="mi">10</span><span class="p">]</span>
+        <span class="k">for</span> <span class="n">item</span> <span class="ow">in</span> <span class="n">related</span><span class="p">:</span>
+            <span class="n">results</span><span class="o">.</span><span class="n">append</span><span class="p">({</span><span class="s">&#39;id&#39;</span><span class="p">:</span> <span class="nb">str</span><span class="p">(</span><span class="n">item</span><span class="o">.</span><span class="n">id</span><span class="p">),</span>
+                            <span class="s">&#39;value&#39;</span><span class="p">:</span> <span class="n">item</span><span class="o">.</span><span class="n">title</span><span class="p">,</span>
+                            <span class="s">&#39;info&#39;</span><span class="p">:</span> <span class="n">item</span><span class="o">.</span><span class="n">get_url</span><span class="p">()})</span>
+    <span class="k">else</span><span class="p">:</span>
+        <span class="n">results</span> <span class="o">=</span> <span class="p">[]</span>
+
+    <span class="n">json</span> <span class="o">=</span> <span class="n">simplejson</span><span class="o">.</span><span class="n">dumps</span><span class="p">({</span><span class="s">&#39;results&#39;</span><span class="p">:</span> <span class="n">results</span><span class="p">})</span>
+    <span class="k">return</span> <span class="n">HttpResponse</span><span class="p">(</span><span class="n">json</span><span class="p">,</span> <span class="n">mimetype</span><span class="o">=</span><span class="s">&#39;application/json&#39;</span><span class="p">)</span>
+
+
+<span class="k">def</span> <span class="nf">add_related</span><span class="p">(</span><span class="n">request</span><span class="p">,</span> <span class="n">course_id</span><span class="p">,</span> <span class="n">slug</span><span class="p">,</span> <span class="n">namespace</span><span class="p">):</span>
+    <span class="n">course</span> <span class="o">=</span> <span class="n">get_opt_course_with_access</span><span class="p">(</span><span class="n">request</span><span class="o">.</span><span class="n">user</span><span class="p">,</span> <span class="n">course_id</span><span class="p">,</span> <span class="s">&#39;load&#39;</span><span class="p">)</span>
+
+    <span class="p">(</span><span class="n">article</span><span class="p">,</span> <span class="n">err</span><span class="p">)</span> <span class="o">=</span> <span class="n">get_article</span><span class="p">(</span><span class="n">request</span><span class="p">,</span> <span class="n">slug</span><span class="p">,</span> <span class="n">namespace</span> <span class="k">if</span> <span class="n">namespace</span> <span class="k">else</span> <span class="n">course_id</span><span class="p">)</span>
+    <span class="k">if</span> <span class="n">err</span><span class="p">:</span>
+        <span class="k">return</span> <span class="n">err</span>
+
+    <span class="n">perm_err</span> <span class="o">=</span> <span class="n">check_permissions</span><span class="p">(</span><span class="n">request</span><span class="p">,</span> <span class="n">article</span><span class="p">,</span> <span class="n">course</span><span class="p">,</span> <span class="n">check_write</span><span class="o">=</span><span class="bp">True</span><span class="p">,</span> <span class="n">check_locked</span><span class="o">=</span><span class="bp">True</span><span class="p">)</span>
+    <span class="k">if</span> <span class="n">perm_err</span><span class="p">:</span>
+        <span class="k">return</span> <span class="n">perm_err</span>
+
+    <span class="k">try</span><span class="p">:</span>
+        <span class="n">related_id</span> <span class="o">=</span> <span class="n">request</span><span class="o">.</span><span class="n">POST</span><span class="p">[</span><span class="s">&#39;id&#39;</span><span class="p">]</span>
+        <span class="n">rel</span> <span class="o">=</span> <span class="n">Article</span><span class="o">.</span><span class="n">objects</span><span class="o">.</span><span class="n">get</span><span class="p">(</span><span class="nb">id</span><span class="o">=</span><span class="n">related_id</span><span class="p">)</span>
+        <span class="n">has_already</span> <span class="o">=</span> <span class="n">article</span><span class="o">.</span><span class="n">related</span><span class="o">.</span><span class="n">filter</span><span class="p">(</span><span class="nb">id</span><span class="o">=</span><span class="n">related_id</span><span class="p">)</span><span class="o">.</span><span class="n">count</span><span class="p">()</span>
+        <span class="k">if</span> <span class="n">has_already</span> <span class="o">==</span> <span class="mi">0</span> <span class="ow">and</span> <span class="ow">not</span> <span class="n">rel</span> <span class="o">==</span> <span class="n">article</span><span class="p">:</span>
+            <span class="n">article</span><span class="o">.</span><span class="n">related</span><span class="o">.</span><span class="n">add</span><span class="p">(</span><span class="n">rel</span><span class="p">)</span>
+            <span class="n">article</span><span class="o">.</span><span class="n">save</span><span class="p">()</span>
+    <span class="k">except</span><span class="p">:</span>
+        <span class="k">pass</span>
+    <span class="k">finally</span><span class="p">:</span>
+        <span class="k">return</span> <span class="n">HttpResponseRedirect</span><span class="p">(</span><span class="n">reverse</span><span class="p">(</span><span class="s">&#39;wiki_view&#39;</span><span class="p">,</span> <span class="n">args</span><span class="o">=</span><span class="p">(</span><span class="n">article</span><span class="o">.</span><span class="n">get_url</span><span class="p">(),)))</span>
+
+
+<span class="k">def</span> <span class="nf">remove_related</span><span class="p">(</span><span class="n">request</span><span class="p">,</span> <span class="n">course_id</span><span class="p">,</span> <span class="n">namespace</span><span class="p">,</span> <span class="n">slug</span><span class="p">,</span> <span class="n">related_id</span><span class="p">):</span>
+    <span class="n">course</span> <span class="o">=</span> <span class="n">get_opt_course_with_access</span><span class="p">(</span><span class="n">request</span><span class="o">.</span><span class="n">user</span><span class="p">,</span> <span class="n">course_id</span><span class="p">,</span> <span class="s">&#39;load&#39;</span><span class="p">)</span>
+
+    <span class="p">(</span><span class="n">article</span><span class="p">,</span> <span class="n">err</span><span class="p">)</span> <span class="o">=</span> <span class="n">get_article</span><span class="p">(</span><span class="n">request</span><span class="p">,</span> <span class="n">slug</span><span class="p">,</span> <span class="n">namespace</span> <span class="k">if</span> <span class="n">namespace</span> <span class="k">else</span> <span class="n">course_id</span><span class="p">)</span>
+
+    <span class="k">if</span> <span class="n">err</span><span class="p">:</span>
+        <span class="k">return</span> <span class="n">err</span>
+
+    <span class="n">perm_err</span> <span class="o">=</span> <span class="n">check_permissions</span><span class="p">(</span><span class="n">request</span><span class="p">,</span> <span class="n">article</span><span class="p">,</span> <span class="n">course</span><span class="p">,</span> <span class="n">check_write</span><span class="o">=</span><span class="bp">True</span><span class="p">,</span> <span class="n">check_locked</span><span class="o">=</span><span class="bp">True</span><span class="p">)</span>
+    <span class="k">if</span> <span class="n">perm_err</span><span class="p">:</span>
+        <span class="k">return</span> <span class="n">perm_err</span>
+
+    <span class="k">try</span><span class="p">:</span>
+        <span class="n">rel_id</span> <span class="o">=</span> <span class="nb">int</span><span class="p">(</span><span class="n">related_id</span><span class="p">)</span>
+        <span class="n">rel</span> <span class="o">=</span> <span class="n">Article</span><span class="o">.</span><span class="n">objects</span><span class="o">.</span><span class="n">get</span><span class="p">(</span><span class="nb">id</span><span class="o">=</span><span class="n">rel_id</span><span class="p">)</span>
+        <span class="n">article</span><span class="o">.</span><span class="n">related</span><span class="o">.</span><span class="n">remove</span><span class="p">(</span><span class="n">rel</span><span class="p">)</span>
+        <span class="n">article</span><span class="o">.</span><span class="n">save</span><span class="p">()</span>
+    <span class="k">except</span><span class="p">:</span>
+        <span class="k">pass</span>
+    <span class="k">finally</span><span class="p">:</span>
+        <span class="k">return</span> <span class="n">HttpResponseRedirect</span><span class="p">(</span><span class="n">reverse</span><span class="p">(</span><span class="s">&#39;wiki_view&#39;</span><span class="p">,</span> <span class="n">args</span><span class="o">=</span><span class="p">(</span><span class="n">article</span><span class="o">.</span><span class="n">get_url</span><span class="p">(),)))</span>
+
+
+<span class="k">def</span> <span class="nf">random_article</span><span class="p">(</span><span class="n">request</span><span class="p">,</span> <span class="n">course_id</span><span class="o">=</span><span class="bp">None</span><span class="p">):</span>
+    <span class="n">course</span> <span class="o">=</span> <span class="n">get_opt_course_with_access</span><span class="p">(</span><span class="n">request</span><span class="o">.</span><span class="n">user</span><span class="p">,</span> <span class="n">course_id</span><span class="p">,</span> <span class="s">&#39;load&#39;</span><span class="p">)</span>
+
+    <span class="kn">from</span> <span class="nn">random</span> <span class="kn">import</span> <span class="n">randint</span>
+    <span class="n">num_arts</span> <span class="o">=</span> <span class="n">Article</span><span class="o">.</span><span class="n">objects</span><span class="o">.</span><span class="n">count</span><span class="p">()</span>
+    <span class="n">article</span> <span class="o">=</span> <span class="n">Article</span><span class="o">.</span><span class="n">objects</span><span class="o">.</span><span class="n">all</span><span class="p">()[</span><span class="n">randint</span><span class="p">(</span><span class="mi">0</span><span class="p">,</span> <span class="n">num_arts</span> <span class="o">-</span> <span class="mi">1</span><span class="p">)]</span>
+    <span class="k">return</span> <span class="n">HttpResponseRedirect</span><span class="p">(</span><span class="n">wiki_reverse</span><span class="p">(</span><span class="s">&#39;wiki_view&#39;</span><span class="p">,</span> <span class="n">article</span><span class="p">,</span> <span class="n">course</span><span class="p">))</span>
+
+
+<div class="viewcode-block" id="not_found"><a class="viewcode-back" href="../../lms.html#simplewiki.views.not_found">[docs]</a><span class="k">def</span> <span class="nf">not_found</span><span class="p">(</span><span class="n">request</span><span class="p">,</span> <span class="n">article_path</span><span class="p">,</span> <span class="n">course</span><span class="p">):</span>
+    <span class="sd">&quot;&quot;&quot;Generate a NOT FOUND message for some URL&quot;&quot;&quot;</span>
+    <span class="n">d</span> <span class="o">=</span> <span class="p">{</span><span class="s">&#39;wiki_err_notfound&#39;</span><span class="p">:</span> <span class="bp">True</span><span class="p">,</span>
+         <span class="s">&#39;article_path&#39;</span><span class="p">:</span> <span class="n">article_path</span><span class="p">,</span>
+         <span class="s">&#39;namespace&#39;</span><span class="p">:</span> <span class="s">&quot;edX&quot;</span><span class="p">}</span>
+    <span class="n">update_template_dictionary</span><span class="p">(</span><span class="n">d</span><span class="p">,</span> <span class="n">request</span><span class="p">,</span> <span class="n">course</span><span class="p">)</span>
+    <span class="k">return</span> <span class="n">render_to_response</span><span class="p">(</span><span class="s">&#39;simplewiki/simplewiki_error.html&#39;</span><span class="p">,</span> <span class="n">d</span><span class="p">)</span>
+
+</div>
+<span class="k">def</span> <span class="nf">get_article</span><span class="p">(</span><span class="n">request</span><span class="p">,</span> <span class="n">article_path</span><span class="p">,</span> <span class="n">course</span><span class="p">):</span>
+    <span class="n">err</span> <span class="o">=</span> <span class="bp">None</span>
+    <span class="n">article</span> <span class="o">=</span> <span class="bp">None</span>
+
+    <span class="k">try</span><span class="p">:</span>
+        <span class="n">article</span> <span class="o">=</span> <span class="n">Article</span><span class="o">.</span><span class="n">get_article</span><span class="p">(</span><span class="n">article_path</span><span class="p">)</span>
+    <span class="k">except</span> <span class="n">Article</span><span class="o">.</span><span class="n">DoesNotExist</span><span class="p">,</span> <span class="ne">ValueError</span><span class="p">:</span>
+        <span class="n">err</span> <span class="o">=</span> <span class="n">not_found</span><span class="p">(</span><span class="n">request</span><span class="p">,</span> <span class="n">article_path</span><span class="p">,</span> <span class="n">course</span><span class="p">)</span>
+
+    <span class="k">return</span> <span class="p">(</span><span class="n">article</span><span class="p">,</span> <span class="n">err</span><span class="p">)</span>
+
+
+<span class="k">def</span> <span class="nf">check_permissions</span><span class="p">(</span><span class="n">request</span><span class="p">,</span> <span class="n">article</span><span class="p">,</span> <span class="n">course</span><span class="p">,</span> <span class="n">check_read</span><span class="o">=</span><span class="bp">False</span><span class="p">,</span> <span class="n">check_write</span><span class="o">=</span><span class="bp">False</span><span class="p">,</span> <span class="n">check_locked</span><span class="o">=</span><span class="bp">False</span><span class="p">,</span> <span class="n">check_deleted</span><span class="o">=</span><span class="bp">False</span><span class="p">,</span> <span class="n">revision</span><span class="o">=</span><span class="bp">None</span><span class="p">):</span>
+    <span class="n">read_err</span> <span class="o">=</span> <span class="n">check_read</span> <span class="ow">and</span> <span class="ow">not</span> <span class="n">article</span><span class="o">.</span><span class="n">can_read</span><span class="p">(</span><span class="n">request</span><span class="o">.</span><span class="n">user</span><span class="p">)</span>
+
+    <span class="n">write_err</span> <span class="o">=</span> <span class="n">check_write</span> <span class="ow">and</span> <span class="ow">not</span> <span class="n">article</span><span class="o">.</span><span class="n">can_write</span><span class="p">(</span><span class="n">request</span><span class="o">.</span><span class="n">user</span><span class="p">)</span>
+
+    <span class="n">locked_err</span> <span class="o">=</span> <span class="n">check_locked</span> <span class="ow">and</span> <span class="n">article</span><span class="o">.</span><span class="n">locked</span>
+
+    <span class="k">if</span> <span class="n">revision</span> <span class="ow">is</span> <span class="bp">None</span><span class="p">:</span>
+        <span class="n">revision</span> <span class="o">=</span> <span class="n">article</span><span class="o">.</span><span class="n">current_revision</span>
+    <span class="n">deleted_err</span> <span class="o">=</span> <span class="n">check_deleted</span> <span class="ow">and</span> <span class="ow">not</span> <span class="p">(</span><span class="n">revision</span><span class="o">.</span><span class="n">deleted</span> <span class="o">==</span> <span class="mi">0</span><span class="p">)</span>
+    <span class="k">if</span> <span class="p">(</span><span class="n">request</span><span class="o">.</span><span class="n">user</span><span class="o">.</span><span class="n">is_superuser</span><span class="p">):</span>
+        <span class="n">deleted_err</span> <span class="o">=</span> <span class="bp">False</span>
+        <span class="n">locked_err</span> <span class="o">=</span> <span class="bp">False</span>
+
+    <span class="k">if</span> <span class="n">read_err</span> <span class="ow">or</span> <span class="n">write_err</span> <span class="ow">or</span> <span class="n">locked_err</span> <span class="ow">or</span> <span class="n">deleted_err</span><span class="p">:</span>
+        <span class="n">d</span> <span class="o">=</span> <span class="p">{</span><span class="s">&#39;wiki_article&#39;</span><span class="p">:</span> <span class="n">article</span><span class="p">,</span>
+                <span class="s">&#39;wiki_err_noread&#39;</span><span class="p">:</span> <span class="n">read_err</span><span class="p">,</span>
+                <span class="s">&#39;wiki_err_nowrite&#39;</span><span class="p">:</span> <span class="n">write_err</span><span class="p">,</span>
+                <span class="s">&#39;wiki_err_locked&#39;</span><span class="p">:</span> <span class="n">locked_err</span><span class="p">,</span>
+                <span class="s">&#39;wiki_err_deleted&#39;</span><span class="p">:</span> <span class="n">deleted_err</span><span class="p">,</span> <span class="p">}</span>
+        <span class="n">update_template_dictionary</span><span class="p">(</span><span class="n">d</span><span class="p">,</span> <span class="n">request</span><span class="p">,</span> <span class="n">course</span><span class="p">)</span>
+        <span class="c"># TODO: Make this a little less jarring by just displaying an error</span>
+        <span class="c">#       on the current page? (no such redirect happens for an anon upload yet)</span>
+        <span class="c"># benjaoming: I think this is the nicest way of displaying an error, but</span>
+        <span class="c"># these errors shouldn&#39;t occur, but rather be prevented on the other pages.</span>
+        <span class="k">return</span> <span class="n">render_to_response</span><span class="p">(</span><span class="s">&#39;simplewiki/simplewiki_error.html&#39;</span><span class="p">,</span> <span class="n">d</span><span class="p">)</span>
+    <span class="k">else</span><span class="p">:</span>
+        <span class="k">return</span> <span class="bp">None</span>
+
+<span class="c">####################</span>
+<span class="c"># LOGIN PROTECTION #</span>
+<span class="c">####################</span>
+
+
+<span class="k">if</span> <span class="n">wiki_settings</span><span class="o">.</span><span class="n">WIKI_REQUIRE_LOGIN_VIEW</span><span class="p">:</span>
+    <span class="n">view</span> <span class="o">=</span> <span class="n">login_required</span><span class="p">(</span><span class="n">view</span><span class="p">)</span>
+    <span class="n">history</span> <span class="o">=</span> <span class="n">login_required</span><span class="p">(</span><span class="n">history</span><span class="p">)</span>
+    <span class="n">search_articles</span> <span class="o">=</span> <span class="n">login_required</span><span class="p">(</span><span class="n">search_articles</span><span class="p">)</span>
+    <span class="n">root_redirect</span> <span class="o">=</span> <span class="n">login_required</span><span class="p">(</span><span class="n">root_redirect</span><span class="p">)</span>
+    <span class="n">revision_feed</span> <span class="o">=</span> <span class="n">login_required</span><span class="p">(</span><span class="n">revision_feed</span><span class="p">)</span>
+    <span class="n">random_article</span> <span class="o">=</span> <span class="n">login_required</span><span class="p">(</span><span class="n">random_article</span><span class="p">)</span>
+    <span class="n">search_add_related</span> <span class="o">=</span> <span class="n">login_required</span><span class="p">(</span><span class="n">search_add_related</span><span class="p">)</span>
+    <span class="n">not_found</span> <span class="o">=</span> <span class="n">login_required</span><span class="p">(</span><span class="n">not_found</span><span class="p">)</span>
+    <span class="n">view_revision</span> <span class="o">=</span> <span class="n">login_required</span><span class="p">(</span><span class="n">view_revision</span><span class="p">)</span>
+
+<span class="k">if</span> <span class="n">wiki_settings</span><span class="o">.</span><span class="n">WIKI_REQUIRE_LOGIN_EDIT</span><span class="p">:</span>
+    <span class="n">create</span> <span class="o">=</span> <span class="n">login_required</span><span class="p">(</span><span class="n">create</span><span class="p">)</span>
+    <span class="n">edit</span> <span class="o">=</span> <span class="n">login_required</span><span class="p">(</span><span class="n">edit</span><span class="p">)</span>
+    <span class="n">add_related</span> <span class="o">=</span> <span class="n">login_required</span><span class="p">(</span><span class="n">add_related</span><span class="p">)</span>
+    <span class="n">remove_related</span> <span class="o">=</span> <span class="n">login_required</span><span class="p">(</span><span class="n">remove_related</span><span class="p">)</span>
+
+<span class="k">if</span> <span class="n">wiki_settings</span><span class="o">.</span><span class="n">WIKI_CONTEXT_PREPROCESSORS</span><span class="p">:</span>
+    <span class="n">settings</span><span class="o">.</span><span class="n">TEMPLATE_CONTEXT_PROCESSORS</span> <span class="o">+=</span> <span class="n">wiki_settings</span><span class="o">.</span><span class="n">WIKI_CONTEXT_PREPROCESSORS</span>
+</pre></div>
+
+          </div>
+        </div>
+      </div>
+      <div class="clearer"></div>
+    </div>
+    <div class="related">
+      <h3>Navigation</h3>
+      <ul>
+        <li class="right" style="margin-right: 10px">
+          <a href="../../genindex.html" title="General Index"
+             >index</a></li>
+        <li class="right" >
+          <a href="../../py-modindex.html" title="Python Module Index"
+             >modules</a> |</li>
+        <li><a href="../../index.html">MITx 1.0 documentation</a> &raquo;</li>
+          <li><a href="../index.html" >Module code</a> &raquo;</li> 
+      </ul>
+    </div>
+    <div class="footer">
+        &copy; Copyright 2012, MITx team.
+      Created using <a href="http://sphinx.pocoo.org/">Sphinx</a> 1.1.3.
+    </div>
+  </body>
+</html>

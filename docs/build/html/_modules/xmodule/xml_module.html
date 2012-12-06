@@ -1,0 +1,485 @@
+
+
+<!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Transitional//EN"
+  "http://www.w3.org/TR/xhtml1/DTD/xhtml1-transitional.dtd">
+
+
+<html xmlns="http://www.w3.org/1999/xhtml">
+  <head>
+    <meta http-equiv="Content-Type" content="text/html; charset=utf-8" />
+    
+    <title>xmodule.xml_module &mdash; MITx 1.0 documentation</title>
+    
+    <link rel="stylesheet" href="../../_static/sphinxdoc.css" type="text/css" />
+    <link rel="stylesheet" href="../../_static/pygments.css" type="text/css" />
+    
+    <script type="text/javascript">
+      var DOCUMENTATION_OPTIONS = {
+        URL_ROOT:    '../../',
+        VERSION:     '1.0',
+        COLLAPSE_INDEX: false,
+        FILE_SUFFIX: '.html',
+        HAS_SOURCE:  true
+      };
+    </script>
+    <script type="text/javascript" src="../../_static/jquery.js"></script>
+    <script type="text/javascript" src="../../_static/underscore.js"></script>
+    <script type="text/javascript" src="../../_static/doctools.js"></script>
+    <script type="text/javascript" src="http://cdn.mathjax.org/mathjax/latest/MathJax.js?config=TeX-AMS-MML_HTMLorMML"></script>
+    <link rel="top" title="MITx 1.0 documentation" href="../../index.html" />
+    <link rel="up" title="Module code" href="../index.html" /> 
+  </head>
+  <body>
+<img src="../../_static/homepage-bg.jpg" alt="Edx logo"  width="100%;"/>
+
+    <div class="related">
+      <h3>Navigation</h3>
+      <ul>
+        <li class="right" style="margin-right: 10px">
+          <a href="../../genindex.html" title="General Index"
+             accesskey="I">index</a></li>
+        <li class="right" >
+          <a href="../../py-modindex.html" title="Python Module Index"
+             >modules</a> |</li>
+        <li><a href="../../index.html">MITx 1.0 documentation</a> &raquo;</li>
+          <li><a href="../index.html" accesskey="U">Module code</a> &raquo;</li> 
+      </ul>
+    </div>
+      <div class="sphinxsidebar">
+        <div class="sphinxsidebarwrapper">
+<div id="searchbox" style="display: none">
+  <h3>Quick search</h3>
+    <form class="search" action="../../search.html" method="get">
+      <input type="text" name="q" />
+      <input type="submit" value="Go" />
+      <input type="hidden" name="check_keywords" value="yes" />
+      <input type="hidden" name="area" value="default" />
+    </form>
+    <p class="searchtip" style="font-size: 90%">
+    Enter search terms or a module, class or function name.
+    </p>
+</div>
+<script type="text/javascript">$('#searchbox').show(0);</script>
+        </div>
+      </div>
+
+    <div class="document">
+      <div class="documentwrapper">
+        <div class="bodywrapper">
+          <div class="body">
+            
+  <h1>Source code for xmodule.xml_module</h1><div class="highlight"><pre>
+<span class="kn">from</span> <span class="nn">xmodule.x_module</span> <span class="kn">import</span> <span class="p">(</span><span class="n">XModuleDescriptor</span><span class="p">,</span> <span class="n">policy_key</span><span class="p">)</span>
+<span class="kn">from</span> <span class="nn">xmodule.modulestore</span> <span class="kn">import</span> <span class="n">Location</span>
+<span class="kn">from</span> <span class="nn">lxml</span> <span class="kn">import</span> <span class="n">etree</span>
+<span class="kn">import</span> <span class="nn">json</span>
+<span class="kn">import</span> <span class="nn">copy</span>
+<span class="kn">import</span> <span class="nn">logging</span>
+<span class="kn">import</span> <span class="nn">traceback</span>
+<span class="kn">from</span> <span class="nn">collections</span> <span class="kn">import</span> <span class="n">namedtuple</span>
+<span class="kn">from</span> <span class="nn">fs.errors</span> <span class="kn">import</span> <span class="n">ResourceNotFoundError</span>
+<span class="kn">import</span> <span class="nn">os</span>
+<span class="kn">import</span> <span class="nn">sys</span>
+
+<span class="n">log</span> <span class="o">=</span> <span class="n">logging</span><span class="o">.</span><span class="n">getLogger</span><span class="p">(</span><span class="n">__name__</span><span class="p">)</span>
+
+<span class="n">edx_xml_parser</span> <span class="o">=</span> <span class="n">etree</span><span class="o">.</span><span class="n">XMLParser</span><span class="p">(</span><span class="n">dtd_validation</span><span class="o">=</span><span class="bp">False</span><span class="p">,</span> <span class="n">load_dtd</span><span class="o">=</span><span class="bp">False</span><span class="p">,</span>
+                                 <span class="n">remove_comments</span><span class="o">=</span><span class="bp">True</span><span class="p">,</span> <span class="n">remove_blank_text</span><span class="o">=</span><span class="bp">True</span><span class="p">)</span>
+
+<div class="viewcode-block" id="name_to_pathname"><a class="viewcode-back" href="../../xmodule.html#xmodule.xml_module.name_to_pathname">[docs]</a><span class="k">def</span> <span class="nf">name_to_pathname</span><span class="p">(</span><span class="n">name</span><span class="p">):</span>
+    <span class="sd">&quot;&quot;&quot;</span>
+<span class="sd">    Convert a location name for use in a path: replace &#39;:&#39; with &#39;/&#39;.</span>
+<span class="sd">    This allows users of the xml format to organize content into directories</span>
+<span class="sd">    &quot;&quot;&quot;</span>
+    <span class="k">return</span> <span class="n">name</span><span class="o">.</span><span class="n">replace</span><span class="p">(</span><span class="s">&#39;:&#39;</span><span class="p">,</span> <span class="s">&#39;/&#39;</span><span class="p">)</span>
+</div>
+<div class="viewcode-block" id="is_pointer_tag"><a class="viewcode-back" href="../../xmodule.html#xmodule.xml_module.is_pointer_tag">[docs]</a><span class="k">def</span> <span class="nf">is_pointer_tag</span><span class="p">(</span><span class="n">xml_obj</span><span class="p">):</span>
+    <span class="sd">&quot;&quot;&quot;</span>
+<span class="sd">    Check if xml_obj is a pointer tag: &lt;blah url_name=&quot;something&quot; /&gt;.</span>
+<span class="sd">    No children, one attribute named url_name.</span>
+
+<span class="sd">    Special case for course roots: the pointer is</span>
+<span class="sd">      &lt;course url_name=&quot;something&quot; org=&quot;myorg&quot; course=&quot;course&quot;&gt;</span>
+
+<span class="sd">    xml_obj: an etree Element</span>
+
+<span class="sd">    Returns a bool.</span>
+<span class="sd">    &quot;&quot;&quot;</span>
+    <span class="k">if</span> <span class="n">xml_obj</span><span class="o">.</span><span class="n">tag</span> <span class="o">!=</span> <span class="s">&quot;course&quot;</span><span class="p">:</span>
+        <span class="n">expected_attr</span> <span class="o">=</span> <span class="nb">set</span><span class="p">([</span><span class="s">&#39;url_name&#39;</span><span class="p">])</span>
+    <span class="k">else</span><span class="p">:</span>
+        <span class="n">expected_attr</span> <span class="o">=</span> <span class="nb">set</span><span class="p">([</span><span class="s">&#39;url_name&#39;</span><span class="p">,</span> <span class="s">&#39;course&#39;</span><span class="p">,</span> <span class="s">&#39;org&#39;</span><span class="p">])</span>
+
+    <span class="n">actual_attr</span> <span class="o">=</span> <span class="nb">set</span><span class="p">(</span><span class="n">xml_obj</span><span class="o">.</span><span class="n">attrib</span><span class="o">.</span><span class="n">keys</span><span class="p">())</span>
+    <span class="k">return</span> <span class="nb">len</span><span class="p">(</span><span class="n">xml_obj</span><span class="p">)</span> <span class="o">==</span> <span class="mi">0</span> <span class="ow">and</span> <span class="n">actual_attr</span> <span class="o">==</span> <span class="n">expected_attr</span>
+</div>
+<span class="k">def</span> <span class="nf">get_metadata_from_xml</span><span class="p">(</span><span class="n">xml_object</span><span class="p">,</span> <span class="n">remove</span><span class="o">=</span><span class="bp">True</span><span class="p">):</span>
+    <span class="n">meta</span> <span class="o">=</span> <span class="n">xml_object</span><span class="o">.</span><span class="n">find</span><span class="p">(</span><span class="s">&#39;meta&#39;</span><span class="p">)</span>
+    <span class="k">if</span> <span class="n">meta</span> <span class="ow">is</span> <span class="bp">None</span><span class="p">:</span>
+        <span class="k">return</span> <span class="s">&#39;&#39;</span>
+    <span class="n">dmdata</span> <span class="o">=</span> <span class="n">meta</span><span class="o">.</span><span class="n">text</span>
+    <span class="c">#log.debug(&#39;meta for %s loaded: %s&#39; % (xml_object,dmdata))</span>
+    <span class="k">if</span> <span class="n">remove</span><span class="p">:</span>
+        <span class="n">xml_object</span><span class="o">.</span><span class="n">remove</span><span class="p">(</span><span class="n">meta</span><span class="p">)</span>
+    <span class="k">return</span> <span class="n">dmdata</span>
+
+<span class="n">_AttrMapBase</span> <span class="o">=</span> <span class="n">namedtuple</span><span class="p">(</span><span class="s">&#39;_AttrMap&#39;</span><span class="p">,</span> <span class="s">&#39;from_xml to_xml&#39;</span><span class="p">)</span>
+
+<div class="viewcode-block" id="AttrMap"><a class="viewcode-back" href="../../xmodule.html#xmodule.xml_module.AttrMap">[docs]</a><span class="k">class</span> <span class="nc">AttrMap</span><span class="p">(</span><span class="n">_AttrMapBase</span><span class="p">):</span>
+    <span class="sd">&quot;&quot;&quot;</span>
+<span class="sd">    A class that specifies two functions:</span>
+
+<span class="sd">        from_xml: convert value from the xml representation into</span>
+<span class="sd">            an internal python representation</span>
+
+<span class="sd">        to_xml: convert the internal python representation into</span>
+<span class="sd">            the value to store in the xml.</span>
+<span class="sd">    &quot;&quot;&quot;</span>
+    <span class="k">def</span> <span class="nf">__new__</span><span class="p">(</span><span class="n">_cls</span><span class="p">,</span> <span class="n">from_xml</span><span class="o">=</span><span class="k">lambda</span> <span class="n">x</span><span class="p">:</span> <span class="n">x</span><span class="p">,</span>
+                <span class="n">to_xml</span><span class="o">=</span><span class="k">lambda</span> <span class="n">x</span><span class="p">:</span> <span class="n">x</span><span class="p">):</span>
+        <span class="k">return</span> <span class="n">_AttrMapBase</span><span class="o">.</span><span class="n">__new__</span><span class="p">(</span><span class="n">_cls</span><span class="p">,</span> <span class="n">from_xml</span><span class="p">,</span> <span class="n">to_xml</span><span class="p">)</span>
+
+</div>
+<div class="viewcode-block" id="XmlDescriptor"><a class="viewcode-back" href="../../xmodule.html#xmodule.xml_module.XmlDescriptor">[docs]</a><span class="k">class</span> <span class="nc">XmlDescriptor</span><span class="p">(</span><span class="n">XModuleDescriptor</span><span class="p">):</span>
+    <span class="sd">&quot;&quot;&quot;</span>
+<span class="sd">    Mixin class for standardized parsing of from xml</span>
+<span class="sd">    &quot;&quot;&quot;</span>
+
+    <span class="c"># Extension to append to filename paths</span>
+    <span class="n">filename_extension</span> <span class="o">=</span> <span class="s">&#39;xml&#39;</span>
+
+    <span class="c"># The attributes will be removed from the definition xml passed</span>
+    <span class="c"># to definition_from_xml, and from the xml returned by definition_to_xml</span>
+
+    <span class="c"># Note -- url_name isn&#39;t in this list because it&#39;s handled specially on</span>
+    <span class="c"># import and export.</span>
+
+    <span class="c"># TODO (vshnayder): Do we need a list of metadata we actually</span>
+    <span class="c"># understand?  And if we do, is this the place?</span>
+    <span class="c"># Related: What&#39;s the right behavior for clean_metadata?</span>
+    <span class="n">metadata_attributes</span> <span class="o">=</span> <span class="p">(</span><span class="s">&#39;format&#39;</span><span class="p">,</span> <span class="s">&#39;graceperiod&#39;</span><span class="p">,</span> <span class="s">&#39;showanswer&#39;</span><span class="p">,</span> <span class="s">&#39;rerandomize&#39;</span><span class="p">,</span>
+        <span class="s">&#39;start&#39;</span><span class="p">,</span> <span class="s">&#39;due&#39;</span><span class="p">,</span> <span class="s">&#39;graded&#39;</span><span class="p">,</span> <span class="s">&#39;display_name&#39;</span><span class="p">,</span> <span class="s">&#39;url_name&#39;</span><span class="p">,</span> <span class="s">&#39;hide_from_toc&#39;</span><span class="p">,</span>
+        <span class="s">&#39;ispublic&#39;</span><span class="p">,</span> 	<span class="c"># if True, then course is listed for all users; see</span>
+        <span class="s">&#39;xqa_key&#39;</span><span class="p">,</span>	<span class="c"># for xqaa server access</span>
+        <span class="c"># VS[compat] Remove once unused.</span>
+        <span class="s">&#39;name&#39;</span><span class="p">,</span> <span class="s">&#39;slug&#39;</span><span class="p">)</span>
+
+    <span class="n">metadata_to_strip</span> <span class="o">=</span> <span class="p">(</span><span class="s">&#39;data_dir&#39;</span><span class="p">,</span>
+           <span class="c"># VS[compat] -- remove the below attrs once everything is in the CMS</span>
+           <span class="s">&#39;course&#39;</span><span class="p">,</span> <span class="s">&#39;org&#39;</span><span class="p">,</span> <span class="s">&#39;url_name&#39;</span><span class="p">,</span> <span class="s">&#39;filename&#39;</span><span class="p">)</span>
+
+    <span class="c"># A dictionary mapping xml attribute names AttrMaps that describe how</span>
+    <span class="c"># to import and export them</span>
+    <span class="c"># Allow json to specify either the string &quot;true&quot;, or the bool True.  The string is preferred.</span>
+    <span class="n">to_bool</span> <span class="o">=</span> <span class="k">lambda</span> <span class="n">val</span><span class="p">:</span> <span class="n">val</span> <span class="o">==</span> <span class="s">&#39;true&#39;</span> <span class="ow">or</span> <span class="n">val</span> <span class="o">==</span> <span class="bp">True</span>
+    <span class="n">from_bool</span> <span class="o">=</span> <span class="k">lambda</span> <span class="n">val</span><span class="p">:</span> <span class="nb">str</span><span class="p">(</span><span class="n">val</span><span class="p">)</span><span class="o">.</span><span class="n">lower</span><span class="p">()</span>
+    <span class="n">bool_map</span> <span class="o">=</span> <span class="n">AttrMap</span><span class="p">(</span><span class="n">to_bool</span><span class="p">,</span> <span class="n">from_bool</span><span class="p">)</span>
+    <span class="n">xml_attribute_map</span> <span class="o">=</span> <span class="p">{</span>
+        <span class="c"># type conversion: want True/False in python, &quot;true&quot;/&quot;false&quot; in xml</span>
+        <span class="s">&#39;graded&#39;</span><span class="p">:</span> <span class="n">bool_map</span><span class="p">,</span>
+        <span class="s">&#39;hide_progress_tab&#39;</span><span class="p">:</span> <span class="n">bool_map</span><span class="p">,</span>
+    <span class="p">}</span>
+
+
+    <span class="c"># VS[compat].  Backwards compatibility code that can go away after</span>
+    <span class="c"># importing 2012 courses.</span>
+    <span class="c"># A set of metadata key conversions that we want to make</span>
+    <span class="n">metadata_translations</span> <span class="o">=</span> <span class="p">{</span>
+        <span class="s">&#39;slug&#39;</span> <span class="p">:</span> <span class="s">&#39;url_name&#39;</span><span class="p">,</span>
+        <span class="s">&#39;name&#39;</span> <span class="p">:</span> <span class="s">&#39;display_name&#39;</span><span class="p">,</span>
+        <span class="p">}</span>
+
+    <span class="nd">@classmethod</span>
+    <span class="k">def</span> <span class="nf">_translate</span><span class="p">(</span><span class="n">cls</span><span class="p">,</span> <span class="n">key</span><span class="p">):</span>
+        <span class="s">&#39;VS[compat]&#39;</span>
+        <span class="k">return</span> <span class="n">cls</span><span class="o">.</span><span class="n">metadata_translations</span><span class="o">.</span><span class="n">get</span><span class="p">(</span><span class="n">key</span><span class="p">,</span> <span class="n">key</span><span class="p">)</span>
+
+
+    <span class="nd">@classmethod</span>
+<div class="viewcode-block" id="XmlDescriptor.definition_from_xml"><a class="viewcode-back" href="../../xmodule.html#xmodule.xml_module.XmlDescriptor.definition_from_xml">[docs]</a>    <span class="k">def</span> <span class="nf">definition_from_xml</span><span class="p">(</span><span class="n">cls</span><span class="p">,</span> <span class="n">xml_object</span><span class="p">,</span> <span class="n">system</span><span class="p">):</span>
+        <span class="sd">&quot;&quot;&quot;</span>
+<span class="sd">        Return the definition to be passed to the newly created descriptor</span>
+<span class="sd">        during from_xml</span>
+
+<span class="sd">        xml_object: An etree Element</span>
+<span class="sd">        &quot;&quot;&quot;</span>
+        <span class="k">raise</span> <span class="ne">NotImplementedError</span><span class="p">(</span>
+            <span class="s">&quot;</span><span class="si">%s</span><span class="s"> does not implement definition_from_xml&quot;</span> <span class="o">%</span> <span class="n">cls</span><span class="o">.</span><span class="n">__name__</span><span class="p">)</span>
+</div>
+    <span class="nd">@classmethod</span>
+<div class="viewcode-block" id="XmlDescriptor.clean_metadata_from_xml"><a class="viewcode-back" href="../../xmodule.html#xmodule.xml_module.XmlDescriptor.clean_metadata_from_xml">[docs]</a>    <span class="k">def</span> <span class="nf">clean_metadata_from_xml</span><span class="p">(</span><span class="n">cls</span><span class="p">,</span> <span class="n">xml_object</span><span class="p">):</span>
+        <span class="sd">&quot;&quot;&quot;</span>
+<span class="sd">        Remove any attribute named in cls.metadata_attributes from the supplied</span>
+<span class="sd">        xml_object</span>
+<span class="sd">        &quot;&quot;&quot;</span>
+        <span class="k">for</span> <span class="n">attr</span> <span class="ow">in</span> <span class="n">cls</span><span class="o">.</span><span class="n">metadata_attributes</span><span class="p">:</span>
+            <span class="k">if</span> <span class="n">xml_object</span><span class="o">.</span><span class="n">get</span><span class="p">(</span><span class="n">attr</span><span class="p">)</span> <span class="ow">is</span> <span class="ow">not</span> <span class="bp">None</span><span class="p">:</span>
+                <span class="k">del</span> <span class="n">xml_object</span><span class="o">.</span><span class="n">attrib</span><span class="p">[</span><span class="n">attr</span><span class="p">]</span>
+</div>
+    <span class="nd">@classmethod</span>
+<div class="viewcode-block" id="XmlDescriptor.file_to_xml"><a class="viewcode-back" href="../../xmodule.html#xmodule.xml_module.XmlDescriptor.file_to_xml">[docs]</a>    <span class="k">def</span> <span class="nf">file_to_xml</span><span class="p">(</span><span class="n">cls</span><span class="p">,</span> <span class="n">file_object</span><span class="p">):</span>
+        <span class="sd">&quot;&quot;&quot;</span>
+<span class="sd">        Used when this module wants to parse a file object to xml</span>
+<span class="sd">        that will be converted to the definition.</span>
+
+<span class="sd">        Returns an lxml Element</span>
+<span class="sd">        &quot;&quot;&quot;</span>
+        <span class="k">return</span> <span class="n">etree</span><span class="o">.</span><span class="n">parse</span><span class="p">(</span><span class="n">file_object</span><span class="p">,</span> <span class="n">parser</span><span class="o">=</span><span class="n">edx_xml_parser</span><span class="p">)</span><span class="o">.</span><span class="n">getroot</span><span class="p">()</span>
+</div>
+    <span class="nd">@classmethod</span>
+<div class="viewcode-block" id="XmlDescriptor.load_file"><a class="viewcode-back" href="../../xmodule.html#xmodule.xml_module.XmlDescriptor.load_file">[docs]</a>    <span class="k">def</span> <span class="nf">load_file</span><span class="p">(</span><span class="n">cls</span><span class="p">,</span> <span class="n">filepath</span><span class="p">,</span> <span class="n">fs</span><span class="p">,</span> <span class="n">location</span><span class="p">):</span>
+        <span class="sd">&#39;&#39;&#39;</span>
+<span class="sd">        Open the specified file in fs, and call cls.file_to_xml on it,</span>
+<span class="sd">        returning the lxml object.</span>
+
+<span class="sd">        Add details and reraise on error.</span>
+<span class="sd">        &#39;&#39;&#39;</span>
+        <span class="k">try</span><span class="p">:</span>
+            <span class="k">with</span> <span class="n">fs</span><span class="o">.</span><span class="n">open</span><span class="p">(</span><span class="n">filepath</span><span class="p">)</span> <span class="k">as</span> <span class="nb">file</span><span class="p">:</span>
+                <span class="k">return</span> <span class="n">cls</span><span class="o">.</span><span class="n">file_to_xml</span><span class="p">(</span><span class="nb">file</span><span class="p">)</span>
+        <span class="k">except</span> <span class="ne">Exception</span> <span class="k">as</span> <span class="n">err</span><span class="p">:</span>
+            <span class="c"># Add info about where we are, but keep the traceback</span>
+            <span class="n">msg</span> <span class="o">=</span> <span class="s">&#39;Unable to load file contents at path </span><span class="si">%s</span><span class="s"> for item </span><span class="si">%s</span><span class="s">: </span><span class="si">%s</span><span class="s"> &#39;</span> <span class="o">%</span> <span class="p">(</span>
+                <span class="n">filepath</span><span class="p">,</span> <span class="n">location</span><span class="o">.</span><span class="n">url</span><span class="p">(),</span> <span class="nb">str</span><span class="p">(</span><span class="n">err</span><span class="p">))</span>
+            <span class="k">raise</span> <span class="ne">Exception</span><span class="p">,</span> <span class="n">msg</span><span class="p">,</span> <span class="n">sys</span><span class="o">.</span><span class="n">exc_info</span><span class="p">()[</span><span class="mi">2</span><span class="p">]</span>
+
+</div>
+    <span class="nd">@classmethod</span>
+<div class="viewcode-block" id="XmlDescriptor.load_definition"><a class="viewcode-back" href="../../xmodule.html#xmodule.xml_module.XmlDescriptor.load_definition">[docs]</a>    <span class="k">def</span> <span class="nf">load_definition</span><span class="p">(</span><span class="n">cls</span><span class="p">,</span> <span class="n">xml_object</span><span class="p">,</span> <span class="n">system</span><span class="p">,</span> <span class="n">location</span><span class="p">):</span>
+        <span class="sd">&#39;&#39;&#39;Load a descriptor definition from the specified xml_object.</span>
+<span class="sd">        Subclasses should not need to override this except in special</span>
+<span class="sd">        cases (e.g. html module)&#39;&#39;&#39;</span>
+
+        <span class="c"># VS[compat] -- the filename attr should go away once everything is</span>
+        <span class="c"># converted.  (note: make sure html files still work once this goes away)</span>
+        <span class="n">filename</span> <span class="o">=</span> <span class="n">xml_object</span><span class="o">.</span><span class="n">get</span><span class="p">(</span><span class="s">&#39;filename&#39;</span><span class="p">)</span>
+        <span class="k">if</span> <span class="n">filename</span> <span class="ow">is</span> <span class="bp">None</span><span class="p">:</span>
+            <span class="n">definition_xml</span> <span class="o">=</span> <span class="n">copy</span><span class="o">.</span><span class="n">deepcopy</span><span class="p">(</span><span class="n">xml_object</span><span class="p">)</span>
+            <span class="n">filepath</span> <span class="o">=</span> <span class="s">&#39;&#39;</span>
+        <span class="k">else</span><span class="p">:</span>
+            <span class="n">filepath</span> <span class="o">=</span> <span class="n">cls</span><span class="o">.</span><span class="n">_format_filepath</span><span class="p">(</span><span class="n">xml_object</span><span class="o">.</span><span class="n">tag</span><span class="p">,</span> <span class="n">filename</span><span class="p">)</span>
+
+            <span class="c"># VS[compat]</span>
+            <span class="c"># TODO (cpennington): If the file doesn&#39;t exist at the right path,</span>
+            <span class="c"># give the class a chance to fix it up. The file will be written out</span>
+            <span class="c"># again in the correct format.  This should go away once the CMS is</span>
+            <span class="c"># online and has imported all current (fall 2012) courses from xml</span>
+            <span class="k">if</span> <span class="ow">not</span> <span class="n">system</span><span class="o">.</span><span class="n">resources_fs</span><span class="o">.</span><span class="n">exists</span><span class="p">(</span><span class="n">filepath</span><span class="p">)</span> <span class="ow">and</span> <span class="nb">hasattr</span><span class="p">(</span>
+                    <span class="n">cls</span><span class="p">,</span> <span class="s">&#39;backcompat_paths&#39;</span><span class="p">):</span>
+                <span class="n">candidates</span> <span class="o">=</span> <span class="n">cls</span><span class="o">.</span><span class="n">backcompat_paths</span><span class="p">(</span><span class="n">filepath</span><span class="p">)</span>
+                <span class="k">for</span> <span class="n">candidate</span> <span class="ow">in</span> <span class="n">candidates</span><span class="p">:</span>
+                    <span class="k">if</span> <span class="n">system</span><span class="o">.</span><span class="n">resources_fs</span><span class="o">.</span><span class="n">exists</span><span class="p">(</span><span class="n">candidate</span><span class="p">):</span>
+                        <span class="n">filepath</span> <span class="o">=</span> <span class="n">candidate</span>
+                        <span class="k">break</span>
+
+            <span class="n">definition_xml</span> <span class="o">=</span> <span class="n">cls</span><span class="o">.</span><span class="n">load_file</span><span class="p">(</span><span class="n">filepath</span><span class="p">,</span> <span class="n">system</span><span class="o">.</span><span class="n">resources_fs</span><span class="p">,</span> <span class="n">location</span><span class="p">)</span>
+
+        <span class="n">definition_metadata</span> <span class="o">=</span> <span class="n">get_metadata_from_xml</span><span class="p">(</span><span class="n">definition_xml</span><span class="p">)</span>
+        <span class="n">cls</span><span class="o">.</span><span class="n">clean_metadata_from_xml</span><span class="p">(</span><span class="n">definition_xml</span><span class="p">)</span>
+        <span class="n">definition</span> <span class="o">=</span> <span class="n">cls</span><span class="o">.</span><span class="n">definition_from_xml</span><span class="p">(</span><span class="n">definition_xml</span><span class="p">,</span> <span class="n">system</span><span class="p">)</span>
+        <span class="k">if</span> <span class="n">definition_metadata</span><span class="p">:</span>
+            <span class="n">definition</span><span class="p">[</span><span class="s">&#39;definition_metadata&#39;</span><span class="p">]</span> <span class="o">=</span> <span class="n">definition_metadata</span>
+
+        <span class="c"># TODO (ichuang): remove this after migration</span>
+        <span class="c"># for Fall 2012 LMS migration: keep filename (and unmangled filename)</span>
+        <span class="n">definition</span><span class="p">[</span><span class="s">&#39;filename&#39;</span><span class="p">]</span> <span class="o">=</span> <span class="p">[</span> <span class="n">filepath</span><span class="p">,</span> <span class="n">filename</span> <span class="p">]</span>
+
+        <span class="k">return</span> <span class="n">definition</span>
+</div>
+    <span class="nd">@classmethod</span>
+<div class="viewcode-block" id="XmlDescriptor.load_metadata"><a class="viewcode-back" href="../../xmodule.html#xmodule.xml_module.XmlDescriptor.load_metadata">[docs]</a>    <span class="k">def</span> <span class="nf">load_metadata</span><span class="p">(</span><span class="n">cls</span><span class="p">,</span> <span class="n">xml_object</span><span class="p">):</span>
+        <span class="sd">&quot;&quot;&quot;</span>
+<span class="sd">        Read the metadata attributes from this xml_object.</span>
+
+<span class="sd">        Returns a dictionary {key: value}.</span>
+<span class="sd">        &quot;&quot;&quot;</span>
+        <span class="n">metadata</span> <span class="o">=</span> <span class="p">{}</span>
+        <span class="k">for</span> <span class="n">attr</span> <span class="ow">in</span> <span class="n">xml_object</span><span class="o">.</span><span class="n">attrib</span><span class="p">:</span>
+            <span class="n">val</span> <span class="o">=</span> <span class="n">xml_object</span><span class="o">.</span><span class="n">get</span><span class="p">(</span><span class="n">attr</span><span class="p">)</span>
+            <span class="k">if</span> <span class="n">val</span> <span class="ow">is</span> <span class="ow">not</span> <span class="bp">None</span><span class="p">:</span>
+                <span class="c"># VS[compat].  Remove after all key translations done</span>
+                <span class="n">attr</span> <span class="o">=</span> <span class="n">cls</span><span class="o">.</span><span class="n">_translate</span><span class="p">(</span><span class="n">attr</span><span class="p">)</span>
+
+                <span class="k">if</span> <span class="n">attr</span> <span class="ow">in</span> <span class="n">cls</span><span class="o">.</span><span class="n">metadata_to_strip</span><span class="p">:</span>
+                    <span class="c"># don&#39;t load these</span>
+                    <span class="k">continue</span>
+
+                <span class="n">attr_map</span> <span class="o">=</span> <span class="n">cls</span><span class="o">.</span><span class="n">xml_attribute_map</span><span class="o">.</span><span class="n">get</span><span class="p">(</span><span class="n">attr</span><span class="p">,</span> <span class="n">AttrMap</span><span class="p">())</span>
+                <span class="n">metadata</span><span class="p">[</span><span class="n">attr</span><span class="p">]</span> <span class="o">=</span> <span class="n">attr_map</span><span class="o">.</span><span class="n">from_xml</span><span class="p">(</span><span class="n">val</span><span class="p">)</span>
+        <span class="k">return</span> <span class="n">metadata</span>
+
+</div>
+    <span class="nd">@classmethod</span>
+<div class="viewcode-block" id="XmlDescriptor.apply_policy"><a class="viewcode-back" href="../../xmodule.html#xmodule.xml_module.XmlDescriptor.apply_policy">[docs]</a>    <span class="k">def</span> <span class="nf">apply_policy</span><span class="p">(</span><span class="n">cls</span><span class="p">,</span> <span class="n">metadata</span><span class="p">,</span> <span class="n">policy</span><span class="p">):</span>
+        <span class="sd">&quot;&quot;&quot;</span>
+<span class="sd">        Add the keys in policy to metadata, after processing them</span>
+<span class="sd">        through the attrmap.  Updates the metadata dict in place.</span>
+<span class="sd">        &quot;&quot;&quot;</span>
+        <span class="k">for</span> <span class="n">attr</span> <span class="ow">in</span> <span class="n">policy</span><span class="p">:</span>
+            <span class="n">attr_map</span> <span class="o">=</span> <span class="n">cls</span><span class="o">.</span><span class="n">xml_attribute_map</span><span class="o">.</span><span class="n">get</span><span class="p">(</span><span class="n">attr</span><span class="p">,</span> <span class="n">AttrMap</span><span class="p">())</span>
+            <span class="n">metadata</span><span class="p">[</span><span class="n">attr</span><span class="p">]</span> <span class="o">=</span> <span class="n">attr_map</span><span class="o">.</span><span class="n">from_xml</span><span class="p">(</span><span class="n">policy</span><span class="p">[</span><span class="n">attr</span><span class="p">])</span>
+</div>
+    <span class="nd">@classmethod</span>
+<div class="viewcode-block" id="XmlDescriptor.from_xml"><a class="viewcode-back" href="../../xmodule.html#xmodule.xml_module.XmlDescriptor.from_xml">[docs]</a>    <span class="k">def</span> <span class="nf">from_xml</span><span class="p">(</span><span class="n">cls</span><span class="p">,</span> <span class="n">xml_data</span><span class="p">,</span> <span class="n">system</span><span class="p">,</span> <span class="n">org</span><span class="o">=</span><span class="bp">None</span><span class="p">,</span> <span class="n">course</span><span class="o">=</span><span class="bp">None</span><span class="p">):</span>
+        <span class="sd">&quot;&quot;&quot;</span>
+<span class="sd">        Creates an instance of this descriptor from the supplied xml_data.</span>
+<span class="sd">        This may be overridden by subclasses</span>
+
+<span class="sd">        xml_data: A string of xml that will be translated into data and children for</span>
+<span class="sd">            this module</span>
+<span class="sd">        system: A DescriptorSystem for interacting with external resources</span>
+<span class="sd">        org and course are optional strings that will be used in the generated modules</span>
+<span class="sd">            url identifiers</span>
+<span class="sd">        &quot;&quot;&quot;</span>
+        <span class="n">xml_object</span> <span class="o">=</span> <span class="n">etree</span><span class="o">.</span><span class="n">fromstring</span><span class="p">(</span><span class="n">xml_data</span><span class="p">)</span>
+        <span class="c"># VS[compat] -- just have the url_name lookup, once translation is done</span>
+        <span class="n">url_name</span> <span class="o">=</span> <span class="n">xml_object</span><span class="o">.</span><span class="n">get</span><span class="p">(</span><span class="s">&#39;url_name&#39;</span><span class="p">,</span> <span class="n">xml_object</span><span class="o">.</span><span class="n">get</span><span class="p">(</span><span class="s">&#39;slug&#39;</span><span class="p">))</span>
+        <span class="n">location</span> <span class="o">=</span> <span class="n">Location</span><span class="p">(</span><span class="s">&#39;i4x&#39;</span><span class="p">,</span> <span class="n">org</span><span class="p">,</span> <span class="n">course</span><span class="p">,</span> <span class="n">xml_object</span><span class="o">.</span><span class="n">tag</span><span class="p">,</span> <span class="n">url_name</span><span class="p">)</span>
+
+        <span class="c"># VS[compat] -- detect new-style each-in-a-file mode</span>
+        <span class="k">if</span> <span class="n">is_pointer_tag</span><span class="p">(</span><span class="n">xml_object</span><span class="p">):</span>
+            <span class="c"># new style:</span>
+            <span class="c"># read the actual definition file--named using url_name.replace(&#39;:&#39;,&#39;/&#39;)</span>
+            <span class="n">filepath</span> <span class="o">=</span> <span class="n">cls</span><span class="o">.</span><span class="n">_format_filepath</span><span class="p">(</span><span class="n">xml_object</span><span class="o">.</span><span class="n">tag</span><span class="p">,</span> <span class="n">name_to_pathname</span><span class="p">(</span><span class="n">url_name</span><span class="p">))</span>
+            <span class="n">definition_xml</span> <span class="o">=</span> <span class="n">cls</span><span class="o">.</span><span class="n">load_file</span><span class="p">(</span><span class="n">filepath</span><span class="p">,</span> <span class="n">system</span><span class="o">.</span><span class="n">resources_fs</span><span class="p">,</span> <span class="n">location</span><span class="p">)</span>
+        <span class="k">else</span><span class="p">:</span>
+            <span class="n">definition_xml</span> <span class="o">=</span> <span class="n">xml_object</span>	<span class="c"># this is just a pointer, not the real definition content</span>
+
+        <span class="n">definition</span> <span class="o">=</span> <span class="n">cls</span><span class="o">.</span><span class="n">load_definition</span><span class="p">(</span><span class="n">definition_xml</span><span class="p">,</span> <span class="n">system</span><span class="p">,</span> <span class="n">location</span><span class="p">)</span>	<span class="c"># note this removes metadata</span>
+        <span class="c"># VS[compat] -- make Ike&#39;s github preview links work in both old and</span>
+        <span class="c"># new file layouts</span>
+        <span class="k">if</span> <span class="n">is_pointer_tag</span><span class="p">(</span><span class="n">xml_object</span><span class="p">):</span>
+            <span class="c"># new style -- contents actually at filepath</span>
+            <span class="n">definition</span><span class="p">[</span><span class="s">&#39;filename&#39;</span><span class="p">]</span> <span class="o">=</span> <span class="p">[</span><span class="n">filepath</span><span class="p">,</span> <span class="n">filepath</span><span class="p">]</span>
+
+        <span class="n">metadata</span> <span class="o">=</span> <span class="n">cls</span><span class="o">.</span><span class="n">load_metadata</span><span class="p">(</span><span class="n">definition_xml</span><span class="p">)</span>
+
+        <span class="c"># move definition metadata into dict</span>
+        <span class="n">dmdata</span> <span class="o">=</span> <span class="n">definition</span><span class="o">.</span><span class="n">get</span><span class="p">(</span><span class="s">&#39;definition_metadata&#39;</span><span class="p">,</span><span class="s">&#39;&#39;</span><span class="p">)</span>
+        <span class="k">if</span> <span class="n">dmdata</span><span class="p">:</span>
+            <span class="n">metadata</span><span class="p">[</span><span class="s">&#39;definition_metadata_raw&#39;</span><span class="p">]</span> <span class="o">=</span> <span class="n">dmdata</span>
+            <span class="k">try</span><span class="p">:</span>
+                <span class="n">metadata</span><span class="o">.</span><span class="n">update</span><span class="p">(</span><span class="n">json</span><span class="o">.</span><span class="n">loads</span><span class="p">(</span><span class="n">dmdata</span><span class="p">))</span>
+            <span class="k">except</span> <span class="ne">Exception</span> <span class="k">as</span> <span class="n">err</span><span class="p">:</span>
+                <span class="n">log</span><span class="o">.</span><span class="n">debug</span><span class="p">(</span><span class="s">&#39;Error </span><span class="si">%s</span><span class="s"> in loading metadata </span><span class="si">%s</span><span class="s">&#39;</span> <span class="o">%</span> <span class="p">(</span><span class="n">err</span><span class="p">,</span><span class="n">dmdata</span><span class="p">))</span>
+                <span class="n">metadata</span><span class="p">[</span><span class="s">&#39;definition_metadata_err&#39;</span><span class="p">]</span> <span class="o">=</span> <span class="nb">str</span><span class="p">(</span><span class="n">err</span><span class="p">)</span>
+
+        <span class="c"># Set/override any metadata specified by policy</span>
+        <span class="n">k</span> <span class="o">=</span> <span class="n">policy_key</span><span class="p">(</span><span class="n">location</span><span class="p">)</span>
+        <span class="k">if</span> <span class="n">k</span> <span class="ow">in</span> <span class="n">system</span><span class="o">.</span><span class="n">policy</span><span class="p">:</span>
+            <span class="n">cls</span><span class="o">.</span><span class="n">apply_policy</span><span class="p">(</span><span class="n">metadata</span><span class="p">,</span> <span class="n">system</span><span class="o">.</span><span class="n">policy</span><span class="p">[</span><span class="n">k</span><span class="p">])</span>
+
+        <span class="k">return</span> <span class="n">cls</span><span class="p">(</span>
+            <span class="n">system</span><span class="p">,</span>
+            <span class="n">definition</span><span class="p">,</span>
+            <span class="n">location</span><span class="o">=</span><span class="n">location</span><span class="p">,</span>
+            <span class="n">metadata</span><span class="o">=</span><span class="n">metadata</span><span class="p">,</span>
+        <span class="p">)</span>
+</div>
+    <span class="nd">@classmethod</span>
+    <span class="k">def</span> <span class="nf">_format_filepath</span><span class="p">(</span><span class="n">cls</span><span class="p">,</span> <span class="n">category</span><span class="p">,</span> <span class="n">name</span><span class="p">):</span>
+        <span class="k">return</span> <span class="s">u&#39;{category}/{name}.{ext}&#39;</span><span class="o">.</span><span class="n">format</span><span class="p">(</span><span class="n">category</span><span class="o">=</span><span class="n">category</span><span class="p">,</span>
+                                                 <span class="n">name</span><span class="o">=</span><span class="n">name</span><span class="p">,</span>
+                                                 <span class="n">ext</span><span class="o">=</span><span class="n">cls</span><span class="o">.</span><span class="n">filename_extension</span><span class="p">)</span>
+
+<div class="viewcode-block" id="XmlDescriptor.export_to_file"><a class="viewcode-back" href="../../xmodule.html#xmodule.xml_module.XmlDescriptor.export_to_file">[docs]</a>    <span class="k">def</span> <span class="nf">export_to_file</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
+        <span class="sd">&quot;&quot;&quot;If this returns True, write the definition of this descriptor to a separate</span>
+<span class="sd">        file.</span>
+
+<span class="sd">        NOTE: Do not override this without a good reason.  It is here</span>
+<span class="sd">        specifically for customtag...</span>
+<span class="sd">        &quot;&quot;&quot;</span>
+        <span class="k">return</span> <span class="bp">True</span>
+
+</div>
+<div class="viewcode-block" id="XmlDescriptor.export_to_xml"><a class="viewcode-back" href="../../xmodule.html#xmodule.xml_module.XmlDescriptor.export_to_xml">[docs]</a>    <span class="k">def</span> <span class="nf">export_to_xml</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">resource_fs</span><span class="p">):</span>
+        <span class="sd">&quot;&quot;&quot;</span>
+<span class="sd">        Returns an xml string representing this module, and all modules</span>
+<span class="sd">        underneath it.  May also write required resources out to resource_fs</span>
+
+<span class="sd">        Assumes that modules have single parentage (that no module appears twice</span>
+<span class="sd">        in the same course), and that it is thus safe to nest modules as xml</span>
+<span class="sd">        children as appropriate.</span>
+
+<span class="sd">        The returned XML should be able to be parsed back into an identical</span>
+<span class="sd">        XModuleDescriptor using the from_xml method with the same system, org,</span>
+<span class="sd">        and course</span>
+
+<span class="sd">        resource_fs is a pyfilesystem object (from the fs package)</span>
+<span class="sd">        &quot;&quot;&quot;</span>
+
+        <span class="c"># Get the definition</span>
+        <span class="n">xml_object</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">definition_to_xml</span><span class="p">(</span><span class="n">resource_fs</span><span class="p">)</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">__class__</span><span class="o">.</span><span class="n">clean_metadata_from_xml</span><span class="p">(</span><span class="n">xml_object</span><span class="p">)</span>
+
+        <span class="c"># Set the tag so we get the file path right</span>
+        <span class="n">xml_object</span><span class="o">.</span><span class="n">tag</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">category</span>
+
+        <span class="k">def</span> <span class="nf">val_for_xml</span><span class="p">(</span><span class="n">attr</span><span class="p">):</span>
+            <span class="sd">&quot;&quot;&quot;Get the value for this attribute that we want to store.</span>
+<span class="sd">            (Possible format conversion through an AttrMap).</span>
+<span class="sd">             &quot;&quot;&quot;</span>
+            <span class="n">attr_map</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">xml_attribute_map</span><span class="o">.</span><span class="n">get</span><span class="p">(</span><span class="n">attr</span><span class="p">,</span> <span class="n">AttrMap</span><span class="p">())</span>
+            <span class="k">return</span> <span class="n">attr_map</span><span class="o">.</span><span class="n">to_xml</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">own_metadata</span><span class="p">[</span><span class="n">attr</span><span class="p">])</span>
+
+        <span class="c"># Add the non-inherited metadata</span>
+        <span class="k">for</span> <span class="n">attr</span> <span class="ow">in</span> <span class="nb">sorted</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">own_metadata</span><span class="p">):</span>
+            <span class="c"># don&#39;t want e.g. data_dir</span>
+            <span class="k">if</span> <span class="n">attr</span> <span class="ow">not</span> <span class="ow">in</span> <span class="bp">self</span><span class="o">.</span><span class="n">metadata_to_strip</span><span class="p">:</span>
+                <span class="n">xml_object</span><span class="o">.</span><span class="n">set</span><span class="p">(</span><span class="n">attr</span><span class="p">,</span> <span class="n">val_for_xml</span><span class="p">(</span><span class="n">attr</span><span class="p">))</span>
+
+        <span class="k">if</span> <span class="bp">self</span><span class="o">.</span><span class="n">export_to_file</span><span class="p">():</span>
+            <span class="c"># Write the definition to a file</span>
+            <span class="n">url_path</span> <span class="o">=</span> <span class="n">name_to_pathname</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">url_name</span><span class="p">)</span>
+            <span class="n">filepath</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">__class__</span><span class="o">.</span><span class="n">_format_filepath</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">category</span><span class="p">,</span> <span class="n">url_path</span><span class="p">)</span>
+            <span class="n">resource_fs</span><span class="o">.</span><span class="n">makedir</span><span class="p">(</span><span class="n">os</span><span class="o">.</span><span class="n">path</span><span class="o">.</span><span class="n">dirname</span><span class="p">(</span><span class="n">filepath</span><span class="p">),</span> <span class="n">allow_recreate</span><span class="o">=</span><span class="bp">True</span><span class="p">)</span>
+            <span class="k">with</span> <span class="n">resource_fs</span><span class="o">.</span><span class="n">open</span><span class="p">(</span><span class="n">filepath</span><span class="p">,</span> <span class="s">&#39;w&#39;</span><span class="p">)</span> <span class="k">as</span> <span class="nb">file</span><span class="p">:</span>
+                <span class="nb">file</span><span class="o">.</span><span class="n">write</span><span class="p">(</span><span class="n">etree</span><span class="o">.</span><span class="n">tostring</span><span class="p">(</span><span class="n">xml_object</span><span class="p">,</span> <span class="n">pretty_print</span><span class="o">=</span><span class="bp">True</span><span class="p">))</span>
+
+            <span class="c"># And return just a pointer with the category and filename.</span>
+            <span class="n">record_object</span> <span class="o">=</span> <span class="n">etree</span><span class="o">.</span><span class="n">Element</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">category</span><span class="p">)</span>
+        <span class="k">else</span><span class="p">:</span>
+            <span class="n">record_object</span> <span class="o">=</span> <span class="n">xml_object</span>
+
+        <span class="n">record_object</span><span class="o">.</span><span class="n">set</span><span class="p">(</span><span class="s">&#39;url_name&#39;</span><span class="p">,</span> <span class="bp">self</span><span class="o">.</span><span class="n">url_name</span><span class="p">)</span>
+
+        <span class="c"># Special case for course pointers:</span>
+        <span class="k">if</span> <span class="bp">self</span><span class="o">.</span><span class="n">category</span> <span class="o">==</span> <span class="s">&#39;course&#39;</span><span class="p">:</span>
+            <span class="c"># add org and course attributes on the pointer tag</span>
+            <span class="n">record_object</span><span class="o">.</span><span class="n">set</span><span class="p">(</span><span class="s">&#39;org&#39;</span><span class="p">,</span> <span class="bp">self</span><span class="o">.</span><span class="n">location</span><span class="o">.</span><span class="n">org</span><span class="p">)</span>
+            <span class="n">record_object</span><span class="o">.</span><span class="n">set</span><span class="p">(</span><span class="s">&#39;course&#39;</span><span class="p">,</span> <span class="bp">self</span><span class="o">.</span><span class="n">location</span><span class="o">.</span><span class="n">course</span><span class="p">)</span>
+
+        <span class="k">return</span> <span class="n">etree</span><span class="o">.</span><span class="n">tostring</span><span class="p">(</span><span class="n">record_object</span><span class="p">,</span> <span class="n">pretty_print</span><span class="o">=</span><span class="bp">True</span><span class="p">)</span>
+</div>
+<div class="viewcode-block" id="XmlDescriptor.definition_to_xml"><a class="viewcode-back" href="../../xmodule.html#xmodule.xml_module.XmlDescriptor.definition_to_xml">[docs]</a>    <span class="k">def</span> <span class="nf">definition_to_xml</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">resource_fs</span><span class="p">):</span>
+        <span class="sd">&quot;&quot;&quot;</span>
+<span class="sd">        Return a new etree Element object created from this modules definition.</span>
+<span class="sd">        &quot;&quot;&quot;</span>
+        <span class="k">raise</span> <span class="ne">NotImplementedError</span><span class="p">(</span>
+            <span class="s">&quot;</span><span class="si">%s</span><span class="s"> does not implement definition_to_xml&quot;</span> <span class="o">%</span> <span class="bp">self</span><span class="o">.</span><span class="n">__class__</span><span class="o">.</span><span class="n">__name__</span><span class="p">)</span></div></div>
+</pre></div>
+
+          </div>
+        </div>
+      </div>
+      <div class="clearer"></div>
+    </div>
+    <div class="related">
+      <h3>Navigation</h3>
+      <ul>
+        <li class="right" style="margin-right: 10px">
+          <a href="../../genindex.html" title="General Index"
+             >index</a></li>
+        <li class="right" >
+          <a href="../../py-modindex.html" title="Python Module Index"
+             >modules</a> |</li>
+        <li><a href="../../index.html">MITx 1.0 documentation</a> &raquo;</li>
+          <li><a href="../index.html" >Module code</a> &raquo;</li> 
+      </ul>
+    </div>
+    <div class="footer">
+        &copy; Copyright 2012, MITx team.
+      Created using <a href="http://sphinx.pocoo.org/">Sphinx</a> 1.1.3.
+    </div>
+  </body>
+</html>

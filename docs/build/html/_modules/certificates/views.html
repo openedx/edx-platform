@@ -1,0 +1,243 @@
+
+
+<!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Transitional//EN"
+  "http://www.w3.org/TR/xhtml1/DTD/xhtml1-transitional.dtd">
+
+
+<html xmlns="http://www.w3.org/1999/xhtml">
+  <head>
+    <meta http-equiv="Content-Type" content="text/html; charset=utf-8" />
+    
+    <title>certificates.views &mdash; MITx 1.0 documentation</title>
+    
+    <link rel="stylesheet" href="../../_static/sphinxdoc.css" type="text/css" />
+    <link rel="stylesheet" href="../../_static/pygments.css" type="text/css" />
+    
+    <script type="text/javascript">
+      var DOCUMENTATION_OPTIONS = {
+        URL_ROOT:    '../../',
+        VERSION:     '1.0',
+        COLLAPSE_INDEX: false,
+        FILE_SUFFIX: '.html',
+        HAS_SOURCE:  true
+      };
+    </script>
+    <script type="text/javascript" src="../../_static/jquery.js"></script>
+    <script type="text/javascript" src="../../_static/underscore.js"></script>
+    <script type="text/javascript" src="../../_static/doctools.js"></script>
+    <script type="text/javascript" src="http://cdn.mathjax.org/mathjax/latest/MathJax.js?config=TeX-AMS-MML_HTMLorMML"></script>
+    <link rel="top" title="MITx 1.0 documentation" href="../../index.html" />
+    <link rel="up" title="Module code" href="../index.html" /> 
+  </head>
+  <body>
+<img src="../../_static/homepage-bg.jpg" alt="Edx logo"  width="100%;"/>
+
+    <div class="related">
+      <h3>Navigation</h3>
+      <ul>
+        <li class="right" style="margin-right: 10px">
+          <a href="../../genindex.html" title="General Index"
+             accesskey="I">index</a></li>
+        <li class="right" >
+          <a href="../../py-modindex.html" title="Python Module Index"
+             >modules</a> |</li>
+        <li><a href="../../index.html">MITx 1.0 documentation</a> &raquo;</li>
+          <li><a href="../index.html" accesskey="U">Module code</a> &raquo;</li> 
+      </ul>
+    </div>
+      <div class="sphinxsidebar">
+        <div class="sphinxsidebarwrapper">
+<div id="searchbox" style="display: none">
+  <h3>Quick search</h3>
+    <form class="search" action="../../search.html" method="get">
+      <input type="text" name="q" />
+      <input type="submit" value="Go" />
+      <input type="hidden" name="check_keywords" value="yes" />
+      <input type="hidden" name="area" value="default" />
+    </form>
+    <p class="searchtip" style="font-size: 90%">
+    Enter search terms or a module, class or function name.
+    </p>
+</div>
+<script type="text/javascript">$('#searchbox').show(0);</script>
+        </div>
+      </div>
+
+    <div class="document">
+      <div class="documentwrapper">
+        <div class="bodywrapper">
+          <div class="body">
+            
+  <h1>Source code for certificates.views</h1><div class="highlight"><pre>
+<span class="kn">import</span> <span class="nn">json</span>
+<span class="kn">import</span> <span class="nn">logging</span>
+<span class="kn">import</span> <span class="nn">uuid</span>
+
+<span class="kn">from</span> <span class="nn">django.conf</span> <span class="kn">import</span> <span class="n">settings</span>
+<span class="kn">from</span> <span class="nn">django.contrib.auth.decorators</span> <span class="kn">import</span> <span class="n">login_required</span>
+<span class="kn">from</span> <span class="nn">django.core.mail</span> <span class="kn">import</span> <span class="n">send_mail</span>
+<span class="kn">from</span> <span class="nn">django.http</span> <span class="kn">import</span> <span class="n">Http404</span><span class="p">,</span> <span class="n">HttpResponse</span>
+<span class="kn">from</span> <span class="nn">django.shortcuts</span> <span class="kn">import</span> <span class="n">redirect</span>
+
+<span class="kn">import</span> <span class="nn">courseware.grades</span> <span class="kn">as</span> <span class="nn">grades</span>
+<span class="kn">from</span> <span class="nn">certificates.models</span> <span class="kn">import</span> <span class="n">GeneratedCertificate</span><span class="p">,</span> <span class="n">certificate_state_for_student</span><span class="p">,</span> <span class="n">revoke_certificate</span>
+<span class="kn">from</span> <span class="nn">mitxmako.shortcuts</span> <span class="kn">import</span> <span class="n">render_to_response</span><span class="p">,</span> <span class="n">render_to_string</span>
+<span class="kn">from</span> <span class="nn">student.models</span> <span class="kn">import</span> <span class="n">UserProfile</span>
+<span class="c">#TODO: Finish migrating these changes from stable</span>
+<span class="c"># from student.survey_questions import exit_survey_list_for_student</span>
+<span class="c"># from student.views import student_took_survey, record_exit_survey</span>
+
+<span class="n">log</span> <span class="o">=</span> <span class="n">logging</span><span class="o">.</span><span class="n">getLogger</span><span class="p">(</span><span class="s">&quot;mitx.certificates&quot;</span><span class="p">)</span>
+
+
+<span class="nd">@login_required</span>
+<div class="viewcode-block" id="certificate_request"><a class="viewcode-back" href="../../lms.html#certificates.views.certificate_request">[docs]</a><span class="k">def</span> <span class="nf">certificate_request</span><span class="p">(</span><span class="n">request</span><span class="p">):</span>
+    <span class="sd">&#39;&#39;&#39; Attempt to send a certificate. &#39;&#39;&#39;</span>
+    <span class="k">if</span> <span class="ow">not</span> <span class="n">settings</span><span class="o">.</span><span class="n">END_COURSE_ENABLED</span><span class="p">:</span>
+        <span class="k">raise</span> <span class="n">Http404</span>
+
+    <span class="k">if</span> <span class="n">request</span><span class="o">.</span><span class="n">method</span> <span class="o">==</span> <span class="s">&quot;POST&quot;</span><span class="p">:</span>
+        <span class="n">honor_code_verify</span> <span class="o">=</span> <span class="n">request</span><span class="o">.</span><span class="n">POST</span><span class="o">.</span><span class="n">get</span><span class="p">(</span><span class="s">&#39;cert_request_honor_code_verify&#39;</span><span class="p">,</span> <span class="s">&#39;false&#39;</span><span class="p">)</span>
+        <span class="n">name_verify</span> <span class="o">=</span> <span class="n">request</span><span class="o">.</span><span class="n">POST</span><span class="o">.</span><span class="n">get</span><span class="p">(</span><span class="s">&#39;cert_request_name_verify&#39;</span><span class="p">,</span> <span class="s">&#39;false&#39;</span><span class="p">)</span>
+        <span class="n">id_verify</span> <span class="o">=</span> <span class="n">request</span><span class="o">.</span><span class="n">POST</span><span class="o">.</span><span class="n">get</span><span class="p">(</span><span class="s">&#39;cert_request_id_verify&#39;</span><span class="p">,</span> <span class="s">&#39;false&#39;</span><span class="p">)</span>
+        <span class="n">error</span> <span class="o">=</span> <span class="s">&#39;&#39;</span>
+
+        <span class="k">def</span> <span class="nf">return_error</span><span class="p">(</span><span class="n">error</span><span class="p">):</span>
+            <span class="k">return</span> <span class="n">HttpResponse</span><span class="p">(</span><span class="n">json</span><span class="o">.</span><span class="n">dumps</span><span class="p">({</span><span class="s">&#39;success&#39;</span><span class="p">:</span> <span class="bp">False</span><span class="p">,</span>
+                                            <span class="s">&#39;error&#39;</span><span class="p">:</span> <span class="n">error</span><span class="p">}))</span>
+
+        <span class="k">if</span> <span class="n">honor_code_verify</span> <span class="o">!=</span> <span class="s">&#39;true&#39;</span><span class="p">:</span>
+            <span class="n">error</span> <span class="o">+=</span> <span class="s">&#39;Please verify that you have followed the honor code to receive a certificate. &#39;</span>
+
+        <span class="k">if</span> <span class="n">name_verify</span> <span class="o">!=</span> <span class="s">&#39;true&#39;</span><span class="p">:</span>
+            <span class="n">error</span> <span class="o">+=</span> <span class="s">&#39;Please verify that your name is correct to receive a certificate. &#39;</span>
+
+        <span class="k">if</span> <span class="n">id_verify</span> <span class="o">!=</span> <span class="s">&#39;true&#39;</span><span class="p">:</span>
+            <span class="n">error</span> <span class="o">+=</span> <span class="s">&#39;Please certify that you understand the unique ID on the certificate. &#39;</span>
+
+        <span class="k">if</span> <span class="nb">len</span><span class="p">(</span><span class="n">error</span><span class="p">)</span> <span class="o">&gt;</span> <span class="mi">0</span><span class="p">:</span>
+            <span class="k">return</span> <span class="n">return_error</span><span class="p">(</span><span class="n">error</span><span class="p">)</span>
+
+        <span class="n">survey_response</span> <span class="o">=</span> <span class="n">record_exit_survey</span><span class="p">(</span><span class="n">request</span><span class="p">,</span> <span class="n">internal_request</span><span class="o">=</span><span class="bp">True</span><span class="p">)</span>
+        <span class="k">if</span> <span class="ow">not</span> <span class="n">survey_response</span><span class="p">[</span><span class="s">&#39;success&#39;</span><span class="p">]:</span>
+            <span class="k">return</span> <span class="n">return_error</span><span class="p">(</span><span class="n">survey_response</span><span class="p">[</span><span class="s">&#39;error&#39;</span><span class="p">])</span>
+
+        <span class="n">grade</span> <span class="o">=</span> <span class="bp">None</span>
+        <span class="n">student_gradesheet</span> <span class="o">=</span> <span class="n">grades</span><span class="o">.</span><span class="n">grade</span><span class="p">(</span><span class="n">request</span><span class="o">.</span><span class="n">user</span><span class="p">,</span> <span class="n">request</span><span class="p">,</span> <span class="n">course</span><span class="p">)</span>
+        <span class="n">grade</span> <span class="o">=</span> <span class="n">student_gradesheet</span><span class="p">[</span><span class="s">&#39;grade&#39;</span><span class="p">]</span>
+
+        <span class="k">if</span> <span class="ow">not</span> <span class="n">grade</span><span class="p">:</span>
+            <span class="k">return</span> <span class="n">return_error</span><span class="p">(</span><span class="s">&#39;You have not earned a grade in this course. &#39;</span><span class="p">)</span>
+
+        <span class="n">generate_certificate</span><span class="p">(</span><span class="n">request</span><span class="o">.</span><span class="n">user</span><span class="p">,</span> <span class="n">grade</span><span class="p">)</span>
+
+        <span class="k">return</span> <span class="n">HttpResponse</span><span class="p">(</span><span class="n">json</span><span class="o">.</span><span class="n">dumps</span><span class="p">({</span><span class="s">&#39;success&#39;</span><span class="p">:</span> <span class="bp">True</span><span class="p">}))</span>
+
+    <span class="k">else</span><span class="p">:</span>
+        <span class="c">#This is not a POST, we should render the page with the form</span>
+
+        <span class="n">student_gradesheet</span> <span class="o">=</span> <span class="n">grades</span><span class="o">.</span><span class="n">grade</span><span class="p">(</span><span class="n">request</span><span class="o">.</span><span class="n">user</span><span class="p">,</span> <span class="n">request</span><span class="p">,</span> <span class="n">course</span><span class="p">)</span>
+        <span class="n">certificate_state</span> <span class="o">=</span> <span class="n">certificate_state_for_student</span><span class="p">(</span><span class="n">request</span><span class="o">.</span><span class="n">user</span><span class="p">,</span> <span class="n">grade_sheet</span><span class="p">[</span><span class="s">&#39;grade&#39;</span><span class="p">])</span>
+
+        <span class="k">if</span> <span class="n">certificate_state</span><span class="p">[</span><span class="s">&#39;state&#39;</span><span class="p">]</span> <span class="o">!=</span> <span class="s">&quot;requestable&quot;</span><span class="p">:</span>
+            <span class="k">return</span> <span class="n">redirect</span><span class="p">(</span><span class="s">&quot;/profile&quot;</span><span class="p">)</span>
+
+        <span class="n">user_info</span> <span class="o">=</span> <span class="n">UserProfile</span><span class="o">.</span><span class="n">objects</span><span class="o">.</span><span class="n">get</span><span class="p">(</span><span class="n">user</span><span class="o">=</span><span class="n">request</span><span class="o">.</span><span class="n">user</span><span class="p">)</span>
+
+        <span class="n">took_survey</span> <span class="o">=</span> <span class="n">student_took_survey</span><span class="p">(</span><span class="n">user_info</span><span class="p">)</span>
+        <span class="k">if</span> <span class="n">settings</span><span class="o">.</span><span class="n">DEBUG_SURVEY</span><span class="p">:</span>
+            <span class="n">took_survey</span> <span class="o">=</span> <span class="bp">False</span>
+        <span class="n">survey_list</span> <span class="o">=</span> <span class="p">[]</span>
+        <span class="k">if</span> <span class="ow">not</span> <span class="n">took_survey</span><span class="p">:</span>
+            <span class="n">survey_list</span> <span class="o">=</span> <span class="n">exit_survey_list_for_student</span><span class="p">(</span><span class="n">request</span><span class="o">.</span><span class="n">user</span><span class="p">)</span>
+
+        <span class="n">context</span> <span class="o">=</span> <span class="p">{</span><span class="s">&#39;certificate_state&#39;</span><span class="p">:</span> <span class="n">certificate_state</span><span class="p">,</span>
+                 <span class="s">&#39;took_survey&#39;</span><span class="p">:</span> <span class="n">took_survey</span><span class="p">,</span>
+                 <span class="s">&#39;survey_list&#39;</span><span class="p">:</span> <span class="n">survey_list</span><span class="p">,</span>
+                 <span class="s">&#39;name&#39;</span><span class="p">:</span> <span class="n">user_info</span><span class="o">.</span><span class="n">name</span><span class="p">}</span>
+
+        <span class="k">return</span> <span class="n">render_to_response</span><span class="p">(</span><span class="s">&#39;cert_request.html&#39;</span><span class="p">,</span> <span class="n">context</span><span class="p">)</span>
+
+
+<span class="c"># This method should only be called if the user has a grade and has requested a certificate</span></div>
+<span class="k">def</span> <span class="nf">generate_certificate</span><span class="p">(</span><span class="n">user</span><span class="p">,</span> <span class="n">grade</span><span class="p">):</span>
+    <span class="c"># Make sure to see the comments in models.GeneratedCertificate to read about the valid</span>
+    <span class="c"># states for a GeneratedCertificate object</span>
+    <span class="k">if</span> <span class="n">grade</span> <span class="ow">and</span> <span class="n">user</span><span class="o">.</span><span class="n">is_active</span><span class="p">:</span>
+        <span class="n">generated_certificate</span> <span class="o">=</span> <span class="bp">None</span>
+
+        <span class="k">try</span><span class="p">:</span>
+            <span class="n">generated_certificate</span> <span class="o">=</span> <span class="n">GeneratedCertificate</span><span class="o">.</span><span class="n">objects</span><span class="o">.</span><span class="n">get</span><span class="p">(</span><span class="n">user</span><span class="o">=</span><span class="n">user</span><span class="p">)</span>
+        <span class="k">except</span> <span class="n">GeneratedCertificate</span><span class="o">.</span><span class="n">DoesNotExist</span><span class="p">:</span>
+            <span class="n">generated_certificate</span> <span class="o">=</span> <span class="n">GeneratedCertificate</span><span class="p">(</span><span class="n">user</span><span class="o">=</span><span class="n">user</span><span class="p">)</span>
+
+        <span class="n">generated_certificate</span><span class="o">.</span><span class="n">enabled</span> <span class="o">=</span> <span class="bp">True</span>
+        <span class="k">if</span> <span class="n">generated_certificate</span><span class="o">.</span><span class="n">graded_download_url</span> <span class="ow">and</span> <span class="p">(</span><span class="n">generated_certificate</span><span class="o">.</span><span class="n">grade</span> <span class="o">!=</span> <span class="n">grade</span><span class="p">):</span>
+            <span class="n">log</span><span class="o">.</span><span class="n">critical</span><span class="p">(</span><span class="s">u&quot;A graded certificate has been pre-generated with the grade &quot;</span>
+                         <span class="s">&quot;of {gen_grade} but requested by user id {userid} with grade &quot;</span>
+                         <span class="s">&quot;{req_grade}! The download URLs were {graded_dl_url} and &quot;</span>
+                         <span class="s">&quot;{ungraded_dl_url}&quot;</span><span class="o">.</span><span class="n">format</span><span class="p">(</span>
+                             <span class="n">gen_grade</span><span class="o">=</span><span class="n">generated_certificate</span><span class="o">.</span><span class="n">grade</span><span class="p">,</span>
+                             <span class="n">req_grade</span><span class="o">=</span><span class="n">grade</span><span class="p">,</span>
+                             <span class="n">graded_dl_url</span><span class="o">=</span><span class="n">generated_certificate</span><span class="o">.</span><span class="n">graded_download_url</span><span class="p">,</span>
+                             <span class="n">ungraded_dl_url</span><span class="o">=</span><span class="n">generated_certificate</span><span class="o">.</span><span class="n">download_url</span><span class="p">,</span>
+                             <span class="n">userid</span><span class="o">=</span><span class="n">user</span><span class="o">.</span><span class="n">id</span><span class="p">))</span>
+            <span class="n">revoke_certificate</span><span class="p">(</span><span class="n">generated_certificate</span><span class="p">,</span> <span class="s">&quot;The grade on this certificate may be inaccurate.&quot;</span><span class="p">)</span>
+
+        <span class="n">user_name</span> <span class="o">=</span> <span class="n">UserProfile</span><span class="o">.</span><span class="n">objects</span><span class="o">.</span><span class="n">get</span><span class="p">(</span><span class="n">user</span><span class="o">=</span><span class="n">user</span><span class="p">)</span><span class="o">.</span><span class="n">name</span>
+        <span class="k">if</span> <span class="n">generated_certificate</span><span class="o">.</span><span class="n">download_url</span> <span class="ow">and</span> <span class="p">(</span><span class="n">generated_certificate</span><span class="o">.</span><span class="n">name</span> <span class="o">!=</span> <span class="n">user_name</span><span class="p">):</span>
+            <span class="n">log</span><span class="o">.</span><span class="n">critical</span><span class="p">(</span><span class="s">u&quot;A Certificate has been pre-generated with the name of &quot;</span>
+                         <span class="s">&quot;{gen_name} but current name is {user_name} (user id is &quot;</span>
+                         <span class="s">&quot;{userid})! The download URLs were {graded_dl_url} and &quot;</span>
+                         <span class="s">&quot;{ungraded_dl_url}&quot;</span><span class="o">.</span><span class="n">format</span><span class="p">(</span>
+                             <span class="n">gen_name</span><span class="o">=</span><span class="n">generated_certificate</span><span class="o">.</span><span class="n">name</span><span class="o">.</span><span class="n">encode</span><span class="p">(</span><span class="s">&#39;utf-8&#39;</span><span class="p">),</span>
+                             <span class="n">user_name</span><span class="o">=</span><span class="n">user_name</span><span class="o">.</span><span class="n">encode</span><span class="p">(</span><span class="s">&#39;utf-8&#39;</span><span class="p">),</span>
+                             <span class="n">graded_dl_url</span><span class="o">=</span><span class="n">generated_certificate</span><span class="o">.</span><span class="n">graded_download_url</span><span class="p">,</span>
+                             <span class="n">ungraded_dl_url</span><span class="o">=</span><span class="n">generated_certificate</span><span class="o">.</span><span class="n">download_url</span><span class="p">,</span>
+                             <span class="n">userid</span><span class="o">=</span><span class="n">user</span><span class="o">.</span><span class="n">id</span><span class="p">))</span>
+            <span class="n">revoke_certificate</span><span class="p">(</span><span class="n">generated_certificate</span><span class="p">,</span> <span class="s">&quot;The name on this certificate may be inaccurate.&quot;</span><span class="p">)</span>
+
+        <span class="n">generated_certificate</span><span class="o">.</span><span class="n">grade</span> <span class="o">=</span> <span class="n">grade</span>
+        <span class="n">generated_certificate</span><span class="o">.</span><span class="n">name</span> <span class="o">=</span> <span class="n">user_name</span>
+        <span class="n">generated_certificate</span><span class="o">.</span><span class="n">save</span><span class="p">()</span>
+
+        <span class="n">certificate_id</span> <span class="o">=</span> <span class="n">generated_certificate</span><span class="o">.</span><span class="n">certificate_id</span>
+
+        <span class="n">log</span><span class="o">.</span><span class="n">debug</span><span class="p">(</span><span class="s">&quot;Generating certificate for &quot;</span> <span class="o">+</span> <span class="nb">str</span><span class="p">(</span><span class="n">user</span><span class="o">.</span><span class="n">username</span><span class="p">)</span> <span class="o">+</span> <span class="s">&quot; with ID: &quot;</span> <span class="o">+</span> <span class="nb">str</span><span class="p">(</span><span class="n">certificate_id</span><span class="p">))</span>
+
+        <span class="c"># TODO: If the certificate was pre-generated, send the email that it is ready to download</span>
+        <span class="k">if</span> <span class="n">certificate_state_for_student</span><span class="p">(</span><span class="n">user</span><span class="p">,</span> <span class="n">grade</span><span class="p">)[</span><span class="s">&#39;state&#39;</span><span class="p">]</span> <span class="o">==</span> <span class="s">&quot;downloadable&quot;</span><span class="p">:</span>
+            <span class="n">subject</span> <span class="o">=</span> <span class="n">render_to_string</span><span class="p">(</span><span class="s">&#39;emails/certificate_ready_subject.txt&#39;</span><span class="p">,</span> <span class="p">{})</span>
+            <span class="n">subject</span> <span class="o">=</span> <span class="s">&#39;&#39;</span><span class="o">.</span><span class="n">join</span><span class="p">(</span><span class="n">subject</span><span class="o">.</span><span class="n">splitlines</span><span class="p">())</span>
+            <span class="n">message</span> <span class="o">=</span> <span class="n">render_to_string</span><span class="p">(</span><span class="s">&#39;emails/certificate_ready.txt&#39;</span><span class="p">,</span> <span class="p">{})</span>
+
+            <span class="n">res</span> <span class="o">=</span> <span class="n">send_mail</span><span class="p">(</span><span class="n">subject</span><span class="p">,</span> <span class="n">message</span><span class="p">,</span> <span class="n">settings</span><span class="o">.</span><span class="n">DEFAULT_FROM_EMAIL</span><span class="p">,</span> <span class="p">[</span><span class="n">user</span><span class="o">.</span><span class="n">email</span><span class="p">,</span> <span class="p">])</span>
+
+    <span class="k">else</span><span class="p">:</span>
+        <span class="n">log</span><span class="o">.</span><span class="n">warning</span><span class="p">(</span><span class="s">&quot;Asked to generate a certificate for student &quot;</span> <span class="o">+</span> <span class="nb">str</span><span class="p">(</span><span class="n">user</span><span class="o">.</span><span class="n">username</span><span class="p">)</span> <span class="o">+</span> <span class="s">&quot; but with a grade of &quot;</span> <span class="o">+</span> <span class="nb">str</span><span class="p">(</span><span class="n">grade</span><span class="p">)</span> <span class="o">+</span> <span class="s">&quot; and active status &quot;</span> <span class="o">+</span> <span class="nb">str</span><span class="p">(</span><span class="n">user</span><span class="o">.</span><span class="n">is_active</span><span class="p">))</span>
+</pre></div>
+
+          </div>
+        </div>
+      </div>
+      <div class="clearer"></div>
+    </div>
+    <div class="related">
+      <h3>Navigation</h3>
+      <ul>
+        <li class="right" style="margin-right: 10px">
+          <a href="../../genindex.html" title="General Index"
+             >index</a></li>
+        <li class="right" >
+          <a href="../../py-modindex.html" title="Python Module Index"
+             >modules</a> |</li>
+        <li><a href="../../index.html">MITx 1.0 documentation</a> &raquo;</li>
+          <li><a href="../index.html" >Module code</a> &raquo;</li> 
+      </ul>
+    </div>
+    <div class="footer">
+        &copy; Copyright 2012, MITx team.
+      Created using <a href="http://sphinx.pocoo.org/">Sphinx</a> 1.1.3.
+    </div>
+  </body>
+</html>

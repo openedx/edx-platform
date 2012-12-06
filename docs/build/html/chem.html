@@ -1,0 +1,504 @@
+
+
+<!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Transitional//EN"
+  "http://www.w3.org/TR/xhtml1/DTD/xhtml1-transitional.dtd">
+
+
+<html xmlns="http://www.w3.org/1999/xhtml">
+  <head>
+    <meta http-equiv="Content-Type" content="text/html; charset=utf-8" />
+    
+    <title>Chem module &mdash; MITx 1.0 documentation</title>
+    
+    <link rel="stylesheet" href="_static/sphinxdoc.css" type="text/css" />
+    <link rel="stylesheet" href="_static/pygments.css" type="text/css" />
+    
+    <script type="text/javascript">
+      var DOCUMENTATION_OPTIONS = {
+        URL_ROOT:    '',
+        VERSION:     '1.0',
+        COLLAPSE_INDEX: false,
+        FILE_SUFFIX: '.html',
+        HAS_SOURCE:  true
+      };
+    </script>
+    <script type="text/javascript" src="_static/jquery.js"></script>
+    <script type="text/javascript" src="_static/underscore.js"></script>
+    <script type="text/javascript" src="_static/doctools.js"></script>
+    <script type="text/javascript" src="http://cdn.mathjax.org/mathjax/latest/MathJax.js?config=TeX-AMS-MML_HTMLorMML"></script>
+    <link rel="top" title="MITx 1.0 documentation" href="index.html" />
+    <link rel="up" title="Capa module" href="capa.html" />
+    <link rel="next" title="Django applications" href="djangoapps.html" />
+    <link rel="prev" title="Capa module" href="capa.html" /> 
+  </head>
+  <body>
+<img src="_static/homepage-bg.jpg" alt="Edx logo"  width="100%;"/>
+
+    <div class="related">
+      <h3>Navigation</h3>
+      <ul>
+        <li class="right" style="margin-right: 10px">
+          <a href="genindex.html" title="General Index"
+             accesskey="I">index</a></li>
+        <li class="right" >
+          <a href="py-modindex.html" title="Python Module Index"
+             >modules</a> |</li>
+        <li class="right" >
+          <a href="djangoapps.html" title="Django applications"
+             accesskey="N">next</a> |</li>
+        <li class="right" >
+          <a href="capa.html" title="Capa module"
+             accesskey="P">previous</a> |</li>
+        <li><a href="index.html">MITx 1.0 documentation</a> &raquo;</li>
+          <li><a href="common-lib.html" >Common / lib</a> &raquo;</li>
+          <li><a href="capa.html" accesskey="U">Capa module</a> &raquo;</li> 
+      </ul>
+    </div>
+      <div class="sphinxsidebar">
+        <div class="sphinxsidebarwrapper">
+  <h3><a href="index.html">Table Of Contents</a></h3>
+  <ul>
+<li><a class="reference internal" href="#">Chem module</a><ul>
+<li><a class="reference internal" href="#module-capa.chem.miller">Miller</a><ul>
+<li><a class="reference internal" href="#ui-part-and-inputtypes">UI part and inputtypes</a></li>
+</ul>
+</li>
+<li><a class="reference internal" href="#module-capa.chem.chemcalc">Chemcalc</a></li>
+<li><a class="reference internal" href="#module-capa.chem.chemtools">Chemtools</a></li>
+<li><a class="reference internal" href="#module-capa.chem.tests">Tests</a></li>
+</ul>
+</li>
+</ul>
+
+  <h4>Previous topic</h4>
+  <p class="topless"><a href="capa.html"
+                        title="previous chapter">Capa module</a></p>
+  <h4>Next topic</h4>
+  <p class="topless"><a href="djangoapps.html"
+                        title="next chapter">Django applications</a></p>
+  <h3>This Page</h3>
+  <ul class="this-page-menu">
+    <li><a href="_sources/chem.txt"
+           rel="nofollow">Show Source</a></li>
+  </ul>
+<div id="searchbox" style="display: none">
+  <h3>Quick search</h3>
+    <form class="search" action="search.html" method="get">
+      <input type="text" name="q" />
+      <input type="submit" value="Go" />
+      <input type="hidden" name="check_keywords" value="yes" />
+      <input type="hidden" name="area" value="default" />
+    </form>
+    <p class="searchtip" style="font-size: 90%">
+    Enter search terms or a module, class or function name.
+    </p>
+</div>
+<script type="text/javascript">$('#searchbox').show(0);</script>
+        </div>
+      </div>
+
+    <div class="document">
+      <div class="documentwrapper">
+        <div class="bodywrapper">
+          <div class="body">
+            
+  <div class="section" id="module-chem">
+<span id="chem-module"></span><h1>Chem module<a class="headerlink" href="#module-chem" title="Permalink to this headline">¶</a></h1>
+<div class="section" id="module-capa.chem.miller">
+<span id="miller"></span><h2>Miller<a class="headerlink" href="#module-capa.chem.miller" title="Permalink to this headline">¶</a></h2>
+<p>Calculation of Miller indices</p>
+<dl class="function">
+<dt id="capa.chem.miller.grade">
+<tt class="descclassname">capa.chem.miller.</tt><tt class="descname">grade</tt><big>(</big><em>user_input</em>, <em>correct_answer</em><big>)</big><a class="reference internal" href="_modules/capa/chem/miller.html#grade"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#capa.chem.miller.grade" title="Permalink to this definition">¶</a></dt>
+<dd><p>Grade crystallography problem.</p>
+<p>Returns true if lattices are the same and Miller indices are same or minus
+same. E.g. (2,2,2) = (2, 2, 2) or (-2, -2, -2). Because sign depends only
+on student&#8217;s selection of origin.</p>
+<dl class="docutils">
+<dt>Args:</dt>
+<dd><p class="first">user_input, correct_answer: json. Format:</p>
+<p>user_input: {&#8220;lattice&#8221;:&#8221;sc&#8221;,&#8221;points&#8221;:[[&#8220;0.77&#8221;,&#8221;0.00&#8221;,&#8221;1.00&#8221;],
+[&#8220;0.78&#8221;,&#8221;1.00&#8221;,&#8221;0.00&#8221;],[&#8220;0.00&#8221;,&#8221;1.00&#8221;,&#8221;0.72&#8221;]]}</p>
+<p>correct_answer: {&#8216;miller&#8217;: &#8216;(00-1)&#8217;, &#8216;lattice&#8217;: &#8216;bcc&#8217;}</p>
+<p class="last">&#8220;lattice&#8221; is one of: &#8220;&#8221;, &#8220;sc&#8221;, &#8220;bcc&#8221;, &#8220;fcc&#8221;</p>
+</dd>
+<dt>Returns:</dt>
+<dd>True or false.</dd>
+</dl>
+</dd></dl>
+
+<dl class="function">
+<dt id="capa.chem.miller.lcm">
+<tt class="descclassname">capa.chem.miller.</tt><tt class="descname">lcm</tt><big>(</big><em>a</em>, <em>b</em><big>)</big><a class="reference internal" href="_modules/capa/chem/miller.html#lcm"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#capa.chem.miller.lcm" title="Permalink to this definition">¶</a></dt>
+<dd><p>Returns least common multiple of a, b</p>
+<dl class="docutils">
+<dt>Args:</dt>
+<dd>a, b: floats</dd>
+<dt>Returns:</dt>
+<dd>float</dd>
+</dl>
+</dd></dl>
+
+<dl class="function">
+<dt id="capa.chem.miller.miller">
+<tt class="descclassname">capa.chem.miller.</tt><tt class="descname">miller</tt><big>(</big><em>points</em><big>)</big><a class="reference internal" href="_modules/capa/chem/miller.html#miller"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#capa.chem.miller.miller" title="Permalink to this definition">¶</a></dt>
+<dd><p>Calculates Miller indices from points.</p>
+<p>Algorithm:</p>
+<ol class="arabic simple">
+<li>Calculate normal vector to a plane that goes trough all points.</li>
+<li>Set origin.</li>
+<li>Create Cartesian coordinate system (Ccs).</li>
+<li>Find the lengths of segments of which the plane cuts the axes. Equation
+of a line for axes: Origin + (Coordinate_vector - Origin) * parameter.</li>
+<li>If plane goes trough Origin:<ol class="loweralpha">
+<li>Find new random origin: find unit cube vertex, not crossed by a plane.</li>
+<li>Repeat 2-4.</li>
+<li>Fix signs of segments after Origin shift. This means to consider
+original directions of axes. I.g.: Origin was 0,0,0 and became
+new_origin. If new_origin has same Y coordinate as Origin, then segment
+does not change its sign. But if new_origin has another Y coordinate than
+origin (was 0, became 1), than segment has to change its sign (it now
+lies on negative side of Y axis). New Origin 0 value of X or Y or Z
+coordinate means that segment does not change sign, 1 value -&gt; does
+change. So new sign  is (1 - 2 * new_origin): 0 -&gt; 1, 1 -&gt; -1</li>
+</ol>
+</li>
+<li>Run function that calculates miller indices from segments.</li>
+</ol>
+<dl class="docutils">
+<dt>Args:</dt>
+<dd>List of points. Each point is list of float coordinates. Order of
+coordinates in point&#8217;s list: x, y, z. Points are different!</dd>
+<dt>Returns:</dt>
+<dd>String that represents Miller indices, e.g: (-6,3,-6) or (2,2,2)</dd>
+</dl>
+</dd></dl>
+
+<dl class="function">
+<dt id="capa.chem.miller.segment_to_fraction">
+<tt class="descclassname">capa.chem.miller.</tt><tt class="descname">segment_to_fraction</tt><big>(</big><em>distance</em><big>)</big><a class="headerlink" href="#capa.chem.miller.segment_to_fraction" title="Permalink to this definition">¶</a></dt>
+<dd><p>Converts lengths of which the plane cuts the axes to fraction.</p>
+<p>Tries convert distance to closest nicest fraction with denominator less or
+equal than 10. It is
+purely for simplicity and clearance of learning purposes. Jenny: &#8216;In typical
+courses students usually do not encounter indices any higher than 6&#8217;.</p>
+<p>If distance is not a number (numpy nan), it means that plane is parallel to
+axis or contains it. Inverted fraction to nan (nan is 1/0) = 0 / 1 is
+returned</p>
+<p>Generally (special cases):</p>
+<p>a) if distance is smaller than some constant, i.g. 0.01011,
+than fraction&#8217;s denominator usually much greater than 10.</p>
+<p>b) Also, if student will set point on 0.66 -&gt; 1/3, so it is 333 plane,
+But if he will slightly move the mouse and click on 0.65 -&gt; it will be
+(16,15,16) plane. That&#8217;s why we are doing adjustments for points coordinates,
+to the closest tick, tick + tick / 2 value. And now UI sends to server only
+values multiple to 0.05  (half of tick). Same rounding is implemented for
+unittests.</p>
+<p>But if one will want to calculate miller indices with exact coordinates and
+with nice fractions (which produce small Miller indices), he may want shift
+to new origin if segments are like S = (0.015, &gt; 0.05, &gt;0.05) - close to zero
+in one coordinate. He may update S to (0, &gt;0.05, &gt;0.05) and shift origin.
+In this way he can recieve nice small fractions. Also there is can be
+degenerated case when S = (0.015, 0.012, &gt;0.05) - if update S to (0, 0, &gt;0.05) -
+it is a line. This case  should be considered separately. Small nice Miller
+numbers and possibility to create very small segments can not be implemented
+at same time).</p>
+<dl class="docutils">
+<dt>Args:</dt>
+<dd>distance: float distance that plane cuts on axis, it must not be 0.
+Distance is multiple of 0.05.</dd>
+<dt>Returns:</dt>
+<dd>Inverted fraction.
+0 / 1 if distance is nan</dd>
+</dl>
+</dd></dl>
+
+<dl class="function">
+<dt id="capa.chem.miller.sub_miller">
+<tt class="descclassname">capa.chem.miller.</tt><tt class="descname">sub_miller</tt><big>(</big><em>segments</em><big>)</big><a class="reference internal" href="_modules/capa/chem/miller.html#sub_miller"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#capa.chem.miller.sub_miller" title="Permalink to this definition">¶</a></dt>
+<dd><p>Calculates Miller indices from segments.</p>
+<p>Algorithm:</p>
+<ol class="arabic simple">
+<li>Obtain inverted fraction from segments</li>
+<li>Find common denominator of inverted fractions</li>
+<li>Lead fractions to common denominator and throws denominator away.</li>
+<li>Return obtained values.</li>
+</ol>
+<dl class="docutils">
+<dt>Args:</dt>
+<dd>List of 3 floats, meaning distances that plane cuts on x, y, z axes.
+Any float not equals zero, it means that plane does not intersect origin,
+i. e. shift of origin has already been done.</dd>
+<dt>Returns:</dt>
+<dd>String that represents Miller indices, e.g: (-6,3,-6) or (2,2,2)</dd>
+</dl>
+</dd></dl>
+
+<div class="section" id="ui-part-and-inputtypes">
+<h3>UI part and inputtypes<a class="headerlink" href="#ui-part-and-inputtypes" title="Permalink to this headline">¶</a></h3>
+<p>Miller module is used in the system in crystallography problems.
+Crystallography is a class in <a class="reference internal" href="capa.html#module-capa" title="capa"><tt class="xref py py-mod docutils literal"><span class="pre">capa</span></tt></a> inputtypes module.
+It uses <em>crystallography.html</em> for rendering and <strong>crystallography.js</strong>
+for UI part.</p>
+<p>Documentation from <strong>crystallography.js</strong>:</p>
+<div class="highlight-python"><pre>For a crystallographic problem of the type
+
+ Given a plane definition via miller indexes, specify it by plotting points on the edges
+ of a 3D cube. Additionally, select the correct Bravais cubic lattice type depending on the
+ physical crystal mentioned in the problem.
+
+we create a graph which contains a cube, and a 3D Cartesian coordinate system. The interface
+will allow to plot 3 points anywhere along the edges of the cube, and select which type of
+Bravais lattice should be displayed along with the basic cube outline.
+
+When 3 points are successfully plotted, an intersection of the resulting plane (defined by
+the 3 plotted points), and the cube, will be automatically displayed for clarity.
+
+After lotting the three points, it is possible to continue plotting additional points. By
+doing so, the point that was plotted first (from the three that already exist), will be
+removed, and the new point will be added. The intersection of the resulting new plane and
+the cube will be redrawn.
+
+The UI has been designed in such a way, that the user is able to determine which point will
+be removed next (if adding a new point). This is achieved via filling the to-be-removed point
+with a different color.</pre>
+</div>
+</div>
+</div>
+<div class="section" id="module-capa.chem.chemcalc">
+<span id="chemcalc"></span><h2>Chemcalc<a class="headerlink" href="#module-capa.chem.chemcalc" title="Permalink to this headline">¶</a></h2>
+<dl class="function">
+<dt id="capa.chem.chemcalc.chemical_equations_equal">
+<tt class="descclassname">capa.chem.chemcalc.</tt><tt class="descname">chemical_equations_equal</tt><big>(</big><em>eq1</em>, <em>eq2</em>, <em>exact=False</em><big>)</big><a class="reference internal" href="_modules/capa/chem/chemcalc.html#chemical_equations_equal"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#capa.chem.chemcalc.chemical_equations_equal" title="Permalink to this definition">¶</a></dt>
+<dd><p>Check whether two chemical equations are the same.  (equations have arrows)</p>
+<p>If exact is False, then they are considered equal if they differ by a
+constant factor.</p>
+<p>arrows matter: -&gt; and &lt;-&gt; are different.</p>
+<p>e.g.
+chemical_equations_equal(&#8216;H2 + O2 -&gt; H2O2&#8217;, &#8216;O2 + H2 -&gt; H2O2&#8217;) -&gt; True
+chemical_equations_equal(&#8216;H2 + O2 -&gt; H2O2&#8217;, &#8216;O2 + 2H2 -&gt; H2O2&#8217;) -&gt; False</p>
+<p>chemical_equations_equal(&#8216;H2 + O2 -&gt; H2O2&#8217;, &#8216;O2 + H2 &lt;-&gt; H2O2&#8217;) -&gt; False</p>
+<p>chemical_equations_equal(&#8216;H2 + O2 -&gt; H2O2&#8217;, &#8216;2 H2 + 2 O2 -&gt; 2 H2O2&#8217;) -&gt; True
+chemical_equations_equal(&#8216;H2 + O2 -&gt; H2O2&#8217;, &#8216;2 H2 + 2 O2 -&gt; 2 H2O2&#8217;, exact=True) -&gt; False</p>
+<p>If there&#8217;s a syntax error, we return False.</p>
+</dd></dl>
+
+<dl class="function">
+<dt id="capa.chem.chemcalc.compare_chemical_expression">
+<tt class="descclassname">capa.chem.chemcalc.</tt><tt class="descname">compare_chemical_expression</tt><big>(</big><em>s1</em>, <em>s2</em>, <em>ignore_state=False</em><big>)</big><a class="reference internal" href="_modules/capa/chem/chemcalc.html#compare_chemical_expression"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#capa.chem.chemcalc.compare_chemical_expression" title="Permalink to this definition">¶</a></dt>
+<dd><p>It does comparison between two expressions.
+It uses divide_chemical_expression and check if division is 1</p>
+</dd></dl>
+
+<dl class="function">
+<dt id="capa.chem.chemcalc.divide_chemical_expression">
+<tt class="descclassname">capa.chem.chemcalc.</tt><tt class="descname">divide_chemical_expression</tt><big>(</big><em>s1</em>, <em>s2</em>, <em>ignore_state=False</em><big>)</big><a class="reference internal" href="_modules/capa/chem/chemcalc.html#divide_chemical_expression"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#capa.chem.chemcalc.divide_chemical_expression" title="Permalink to this definition">¶</a></dt>
+<dd><p>Compare two chemical expressions for equivalence up to a multiplicative factor:</p>
+<ul class="simple">
+<li>If they are not the same chemicals, returns False.</li>
+<li>If they are the same, &#8220;divide&#8221; s1 by s2 to returns a factor x such that s1 / s2 == x as a Fraction object.</li>
+<li>if ignore_state is True, ignores phases when doing the comparison.</li>
+</ul>
+<p>Examples:
+divide_chemical_expression(&#8220;H2O&#8221;, &#8220;3H2O&#8221;) -&gt; Fraction(1,3)
+divide_chemical_expression(&#8220;3H2O&#8221;, &#8220;H2O&#8221;) -&gt; 3  # actually Fraction(3, 1), but compares == to 3.
+divide_chemical_expression(&#8220;2H2O(s) + 2CO2&#8221;, &#8220;H2O(s)+CO2&#8221;) -&gt; 2
+divide_chemical_expression(&#8220;H2O(s) + CO2&#8221;, &#8220;3H2O(s)+2CO2&#8221;) -&gt; False</p>
+<dl class="docutils">
+<dt>Implementation sketch:</dt>
+<dd><ul class="first last">
+<li><p class="first">extract factors and phases to standalone lists,</p>
+</li>
+<li><p class="first">compare expressions without factors and phases,</p>
+</li>
+<li><dl class="first docutils">
+<dt>divide lists of factors for each other and check</dt>
+<dd><p class="first last">for equality of every element in list,</p>
+</dd>
+</dl>
+</li>
+<li><p class="first">return result of factor division</p>
+</li>
+</ul>
+</dd>
+</dl>
+</dd></dl>
+
+<dl class="function">
+<dt id="capa.chem.chemcalc.render_to_html">
+<tt class="descclassname">capa.chem.chemcalc.</tt><tt class="descname">render_to_html</tt><big>(</big><em>eq</em><big>)</big><a class="reference internal" href="_modules/capa/chem/chemcalc.html#render_to_html"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#capa.chem.chemcalc.render_to_html" title="Permalink to this definition">¶</a></dt>
+<dd><p>Render a chemical equation string to html.</p>
+<p>Renders each molecule separately, and returns invalid input wrapped in a &lt;span&gt;.</p>
+</dd></dl>
+
+<dl class="function">
+<dt id="capa.chem.chemcalc.split_on_arrow">
+<tt class="descclassname">capa.chem.chemcalc.</tt><tt class="descname">split_on_arrow</tt><big>(</big><em>eq</em><big>)</big><a class="reference internal" href="_modules/capa/chem/chemcalc.html#split_on_arrow"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#capa.chem.chemcalc.split_on_arrow" title="Permalink to this definition">¶</a></dt>
+<dd><p>Split a string on an arrow.  Returns left, arrow, right.  If there is no arrow, returns the
+entire eq in left, and &#8216;&#8217; in arrow and right.</p>
+<p>Return left, arrow, right.</p>
+</dd></dl>
+
+</div>
+<div class="section" id="module-capa.chem.chemtools">
+<span id="chemtools"></span><h2>Chemtools<a class="headerlink" href="#module-capa.chem.chemtools" title="Permalink to this headline">¶</a></h2>
+<p>This module originally includes functions for grading Vsepr problems.</p>
+<p>Also, may be this module is the place for other chemistry-related grade functions. TODO: discuss it.</p>
+<dl class="class">
+<dt id="capa.chem.chemtools.Test_Grade">
+<em class="property">class </em><tt class="descclassname">capa.chem.chemtools.</tt><tt class="descname">Test_Grade</tt><big>(</big><em>methodName='runTest'</em><big>)</big><a class="reference internal" href="_modules/capa/chem/chemtools.html#Test_Grade"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#capa.chem.chemtools.Test_Grade" title="Permalink to this definition">¶</a></dt>
+<dd><p>Bases: <tt class="xref py py-class docutils literal"><span class="pre">unittest.case.TestCase</span></tt></p>
+<p>test grade function</p>
+</dd></dl>
+
+<dl class="function">
+<dt id="capa.chem.chemtools.vsepr_build_correct_answer">
+<tt class="descclassname">capa.chem.chemtools.</tt><tt class="descname">vsepr_build_correct_answer</tt><big>(</big><em>geometry</em>, <em>atoms</em><big>)</big><a class="reference internal" href="_modules/capa/chem/chemtools.html#vsepr_build_correct_answer"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#capa.chem.chemtools.vsepr_build_correct_answer" title="Permalink to this definition">¶</a></dt>
+<dd><p>geometry is string.
+atoms is dict of atoms with proper positions.
+Example:</p>
+<p>correct_answer = vsepr_build_correct_answer(geometry=&#8221;AX4E0&#8221;, atoms={&#8220;c0&#8221;: &#8220;N&#8221;, &#8220;p0&#8221;: &#8220;H&#8221;, &#8220;p1&#8221;: &#8220;(ep)&#8221;, &#8220;p2&#8221;: &#8220;H&#8221;, &#8220;p3&#8221;: &#8220;H&#8221;})</p>
+<dl class="docutils">
+<dt>returns a dictionary composed from input values:</dt>
+<dd>{&#8216;geometry&#8217;: geometry, &#8216;atoms&#8217;: atoms}</dd>
+</dl>
+</dd></dl>
+
+<dl class="function">
+<dt id="capa.chem.chemtools.vsepr_grade">
+<tt class="descclassname">capa.chem.chemtools.</tt><tt class="descname">vsepr_grade</tt><big>(</big><em>user_input</em>, <em>correct_answer</em>, <em>convert_to_peripheral=False</em><big>)</big><a class="reference internal" href="_modules/capa/chem/chemtools.html#vsepr_grade"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#capa.chem.chemtools.vsepr_grade" title="Permalink to this definition">¶</a></dt>
+<dd><p>This function does comparison between user_input and correct_answer.</p>
+<p>Comparison is successful if all steps are successful:</p>
+<ol class="arabic simple">
+<li>geometries are equal</li>
+</ol>
+<p>2) central atoms (index in dictionary &#8216;c0&#8217;) are equal
+3):</p>
+<blockquote>
+<div><p>In next steps there is comparing of corresponding subsets of atom positions: equatorial (e0..eN), axial (a0..aN) or peripheral (p0..pN)</p>
+<p>If convert_to_peripheral is True, then axial and equatorial positions are converted to peripheral.
+This means that user_input from:
+&#8220;atoms&#8221;:{&#8220;c0&#8221;: &#8220;Br&#8221;,&#8221;a0&#8221;: &#8220;test&#8221;,&#8221;a1&#8221;: &#8220;(ep)&#8221;,&#8221;e10&#8221;: &#8220;H&#8221;,&#8221;e11&#8221;: &#8220;(ep)&#8221;,&#8221;e20&#8221;: &#8220;H&#8221;,&#8221;e21&#8221;: &#8220;(ep)&#8221;}}&#8217; after parsing to json
+is converted to:
+{&#8220;c0&#8221;: &#8220;Br&#8221;, &#8220;p0&#8221;: &#8220;(ep)&#8221;, &#8220;p1&#8221;: &#8220;test&#8221;, &#8220;p2&#8221;: &#8220;H&#8221;, &#8220;p3&#8221;: &#8220;H&#8221;, &#8220;p4&#8221;: &#8220;(ep)&#8221;, &#8220;p6&#8221;: &#8220;(ep)&#8221;}
+i.e. aX and eX -&gt; pX</p>
+<p>So if converted, p subsets are compared,
+if not a and e subsets are compared
+If all subsets are equal, grade succeeds.</p>
+<p>There is also one special case for AX6 geometry.
+In this case user_input[&#8220;atoms&#8221;] contains special 3 symbol keys: e10, e12, e20, and e21.
+Correct answer for this geometry can be of 3 types:
+1) c0 and peripheral
+2) c0 and axial and equatorial
+3) c0 and axial and equatorial-subset-1 (e1X) and equatorial-subset-2 (e2X)</p>
+<p>If correct answer is type 1 or 2, then user_input is converted from type 3 to type 2 (or to type 1 if convert_to_peripheral is True)</p>
+<p>If correct_answer is type 3, then we done special case comparison. We have 3 sets of atoms positions both in user_input and correct_answer: axial, eq-1 and eq-2.
+Answer will be correct if these sets are equals for one of permutations. For example, if :</p>
+<blockquote>
+<div>user_axial = correct_eq-1
+user_eq-1 = correct-axial
+user_eq-2 = correct-eq-2</div></blockquote>
+</div></blockquote>
+</dd></dl>
+
+<dl class="function">
+<dt id="capa.chem.chemtools.vsepr_parse_user_answer">
+<tt class="descclassname">capa.chem.chemtools.</tt><tt class="descname">vsepr_parse_user_answer</tt><big>(</big><em>user_input</em><big>)</big><a class="reference internal" href="_modules/capa/chem/chemtools.html#vsepr_parse_user_answer"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#capa.chem.chemtools.vsepr_parse_user_answer" title="Permalink to this definition">¶</a></dt>
+<dd><p>user_input is json generated by vsepr.js from dictionary.
+There are must be only two keys in original user_input dictionary: &#8220;geometry&#8221; and &#8220;atoms&#8221;.
+Format: u&#8217;{&#8220;geometry&#8221;: &#8220;AX3E0&#8221;,&#8221;atoms&#8221;:{&#8220;c0&#8221;: &#8220;B&#8221;,&#8221;p0&#8221;: &#8220;F&#8221;,&#8221;p1&#8221;: &#8220;B&#8221;,&#8221;p2&#8221;: &#8220;F&#8221;}}&#8217;
+Order of elements inside &#8220;atoms&#8221; subdict does not matters.
+Return dict from parsed json.</p>
+<p>&#8220;Atoms&#8221; subdict stores positions of atoms in molecule.
+General types of positions:</p>
+<blockquote>
+<div>c0 - central atom
+p0..pN - peripheral atoms
+a0..aN - axial atoms
+e0..eN - equatorial atoms</div></blockquote>
+<p>Each position is dictionary key, i.e. user_input[&#8220;atoms&#8221;][&#8220;c0&#8221;] is central atom, user_input[&#8220;atoms&#8221;][&#8220;a0&#8221;] is one of axial atoms.</p>
+<dl class="docutils">
+<dt>Special position only for AX6 (Octahedral) geometry:</dt>
+<dd>e10, e12  - atom pairs opposite the central atom,
+e20, e22  - atom pairs opposite the central atom,
+e1 and e2 pairs lying crosswise in equatorial plane.</dd>
+<dt>In user_input[&#8220;atoms&#8221;] may be only 3 set of keys:</dt>
+<dd>(c0,p0..pN),
+(c0, a0..aN, e0..eN),
+(c0, a0, a1, e10,e11,e20,e21) - if geometry is AX6.</dd>
+</dl>
+</dd></dl>
+
+</div>
+<div class="section" id="module-capa.chem.tests">
+<span id="tests"></span><h2>Tests<a class="headerlink" href="#module-capa.chem.tests" title="Permalink to this headline">¶</a></h2>
+<dl class="class">
+<dt id="capa.chem.tests.Test_Crystallography_Miller">
+<em class="property">class </em><tt class="descclassname">capa.chem.tests.</tt><tt class="descname">Test_Crystallography_Miller</tt><big>(</big><em>methodName='runTest'</em><big>)</big><a class="headerlink" href="#capa.chem.tests.Test_Crystallography_Miller" title="Permalink to this definition">¶</a></dt>
+<dd><p>Bases: <tt class="xref py py-class docutils literal"><span class="pre">unittest.case.TestCase</span></tt></p>
+<p>Tests  for crystallography grade function.</p>
+<dl class="method">
+<dt id="capa.chem.tests.Test_Crystallography_Miller.test_27">
+<tt class="descname">test_27</tt><big>(</big><big>)</big><a class="headerlink" href="#capa.chem.tests.Test_Crystallography_Miller.test_27" title="Permalink to this definition">¶</a></dt>
+<dd><p>rounding to 0.35</p>
+</dd></dl>
+
+<dl class="method">
+<dt id="capa.chem.tests.Test_Crystallography_Miller.test_28">
+<tt class="descname">test_28</tt><big>(</big><big>)</big><a class="headerlink" href="#capa.chem.tests.Test_Crystallography_Miller.test_28" title="Permalink to this definition">¶</a></dt>
+<dd><p>rounding to 0.30</p>
+</dd></dl>
+
+<dl class="method">
+<dt id="capa.chem.tests.Test_Crystallography_Miller.test_5">
+<tt class="descname">test_5</tt><big>(</big><big>)</big><a class="headerlink" href="#capa.chem.tests.Test_Crystallography_Miller.test_5" title="Permalink to this definition">¶</a></dt>
+<dd><p>return true only in case points coordinates are exact.
+But if they transform to closest 0.05 value it is not true</p>
+</dd></dl>
+
+</dd></dl>
+
+<dl class="class">
+<dt id="capa.chem.tests.Test_Divide_Expressions">
+<em class="property">class </em><tt class="descclassname">capa.chem.tests.</tt><tt class="descname">Test_Divide_Expressions</tt><big>(</big><em>methodName='runTest'</em><big>)</big><a class="reference internal" href="_modules/capa/chem/tests.html#Test_Divide_Expressions"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#capa.chem.tests.Test_Divide_Expressions" title="Permalink to this definition">¶</a></dt>
+<dd><p>Bases: <tt class="xref py py-class docutils literal"><span class="pre">unittest.case.TestCase</span></tt></p>
+<p>as <a href="#id1"><span class="problematic" id="id2">compare_</span></a> use <a href="#id3"><span class="problematic" id="id4">divide_</span></a>,
+tests here must consider different
+division (not equality) cases</p>
+</dd></dl>
+
+</div>
+</div>
+
+
+          </div>
+        </div>
+      </div>
+      <div class="clearer"></div>
+    </div>
+    <div class="related">
+      <h3>Navigation</h3>
+      <ul>
+        <li class="right" style="margin-right: 10px">
+          <a href="genindex.html" title="General Index"
+             >index</a></li>
+        <li class="right" >
+          <a href="py-modindex.html" title="Python Module Index"
+             >modules</a> |</li>
+        <li class="right" >
+          <a href="djangoapps.html" title="Django applications"
+             >next</a> |</li>
+        <li class="right" >
+          <a href="capa.html" title="Capa module"
+             >previous</a> |</li>
+        <li><a href="index.html">MITx 1.0 documentation</a> &raquo;</li>
+          <li><a href="common-lib.html" >Common / lib</a> &raquo;</li>
+          <li><a href="capa.html" >Capa module</a> &raquo;</li> 
+      </ul>
+    </div>
+    <div class="footer">
+        &copy; Copyright 2012, MITx team.
+      Created using <a href="http://sphinx.pocoo.org/">Sphinx</a> 1.1.3.
+    </div>
+  </body>
+</html>

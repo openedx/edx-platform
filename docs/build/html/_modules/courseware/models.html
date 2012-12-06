@@ -1,0 +1,278 @@
+
+
+<!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Transitional//EN"
+  "http://www.w3.org/TR/xhtml1/DTD/xhtml1-transitional.dtd">
+
+
+<html xmlns="http://www.w3.org/1999/xhtml">
+  <head>
+    <meta http-equiv="Content-Type" content="text/html; charset=utf-8" />
+    
+    <title>courseware.models &mdash; MITx 1.0 documentation</title>
+    
+    <link rel="stylesheet" href="../../_static/sphinxdoc.css" type="text/css" />
+    <link rel="stylesheet" href="../../_static/pygments.css" type="text/css" />
+    
+    <script type="text/javascript">
+      var DOCUMENTATION_OPTIONS = {
+        URL_ROOT:    '../../',
+        VERSION:     '1.0',
+        COLLAPSE_INDEX: false,
+        FILE_SUFFIX: '.html',
+        HAS_SOURCE:  true
+      };
+    </script>
+    <script type="text/javascript" src="../../_static/jquery.js"></script>
+    <script type="text/javascript" src="../../_static/underscore.js"></script>
+    <script type="text/javascript" src="../../_static/doctools.js"></script>
+    <script type="text/javascript" src="http://cdn.mathjax.org/mathjax/latest/MathJax.js?config=TeX-AMS-MML_HTMLorMML"></script>
+    <link rel="top" title="MITx 1.0 documentation" href="../../index.html" />
+    <link rel="up" title="Module code" href="../index.html" /> 
+  </head>
+  <body>
+<img src="../../_static/homepage-bg.jpg" alt="Edx logo"  width="100%;"/>
+
+    <div class="related">
+      <h3>Navigation</h3>
+      <ul>
+        <li class="right" style="margin-right: 10px">
+          <a href="../../genindex.html" title="General Index"
+             accesskey="I">index</a></li>
+        <li class="right" >
+          <a href="../../py-modindex.html" title="Python Module Index"
+             >modules</a> |</li>
+        <li><a href="../../index.html">MITx 1.0 documentation</a> &raquo;</li>
+          <li><a href="../index.html" accesskey="U">Module code</a> &raquo;</li> 
+      </ul>
+    </div>
+      <div class="sphinxsidebar">
+        <div class="sphinxsidebarwrapper">
+<div id="searchbox" style="display: none">
+  <h3>Quick search</h3>
+    <form class="search" action="../../search.html" method="get">
+      <input type="text" name="q" />
+      <input type="submit" value="Go" />
+      <input type="hidden" name="check_keywords" value="yes" />
+      <input type="hidden" name="area" value="default" />
+    </form>
+    <p class="searchtip" style="font-size: 90%">
+    Enter search terms or a module, class or function name.
+    </p>
+</div>
+<script type="text/javascript">$('#searchbox').show(0);</script>
+        </div>
+      </div>
+
+    <div class="document">
+      <div class="documentwrapper">
+        <div class="bodywrapper">
+          <div class="body">
+            
+  <h1>Source code for courseware.models</h1><div class="highlight"><pre>
+<span class="sd">&quot;&quot;&quot;</span>
+<span class="sd">WE&#39;RE USING MIGRATIONS!</span>
+
+<span class="sd">If you make changes to this model, be sure to create an appropriate migration</span>
+<span class="sd">file and check it in at the same time as your model changes. To do that,</span>
+
+<span class="sd">1. Go to the mitx dir</span>
+<span class="sd">2. ./manage.py schemamigration courseware --auto description_of_your_change</span>
+<span class="sd">3. Add the migration file created in mitx/courseware/migrations/</span>
+
+
+<span class="sd">ASSUMPTIONS: modules have unique IDs, even across different module_types</span>
+
+<span class="sd">&quot;&quot;&quot;</span>
+<span class="kn">from</span> <span class="nn">django.db</span> <span class="kn">import</span> <span class="n">models</span>
+<span class="c">#from django.core.cache import cache</span>
+<span class="kn">from</span> <span class="nn">django.contrib.auth.models</span> <span class="kn">import</span> <span class="n">User</span>
+
+<span class="c">#from cache_toolbox import cache_model, cache_relation</span>
+
+<span class="c">#CACHE_TIMEOUT = 60 * 60 * 4 # Set the cache timeout to be four hours</span>
+
+
+<div class="viewcode-block" id="StudentModule"><a class="viewcode-back" href="../../lms.html#courseware.models.StudentModule">[docs]</a><span class="k">class</span> <span class="nc">StudentModule</span><span class="p">(</span><span class="n">models</span><span class="o">.</span><span class="n">Model</span><span class="p">):</span>
+    <span class="sd">&quot;&quot;&quot;</span>
+<span class="sd">    Keeps student state for a particular module in a particular course.</span>
+<span class="sd">    &quot;&quot;&quot;</span>
+    <span class="c"># For a homework problem, contains a JSON</span>
+    <span class="c"># object consisting of state</span>
+    <span class="n">MODULE_TYPES</span> <span class="o">=</span> <span class="p">((</span><span class="s">&#39;problem&#39;</span><span class="p">,</span> <span class="s">&#39;problem&#39;</span><span class="p">),</span>
+                    <span class="p">(</span><span class="s">&#39;video&#39;</span><span class="p">,</span> <span class="s">&#39;video&#39;</span><span class="p">),</span>
+                    <span class="p">(</span><span class="s">&#39;html&#39;</span><span class="p">,</span> <span class="s">&#39;html&#39;</span><span class="p">),</span>
+                    <span class="p">)</span>
+    <span class="c">## These three are the key for the object</span>
+    <span class="n">module_type</span> <span class="o">=</span> <span class="n">models</span><span class="o">.</span><span class="n">CharField</span><span class="p">(</span><span class="n">max_length</span><span class="o">=</span><span class="mi">32</span><span class="p">,</span> <span class="n">choices</span><span class="o">=</span><span class="n">MODULE_TYPES</span><span class="p">,</span> <span class="n">default</span><span class="o">=</span><span class="s">&#39;problem&#39;</span><span class="p">,</span> <span class="n">db_index</span><span class="o">=</span><span class="bp">True</span><span class="p">)</span>
+
+    <span class="c"># Key used to share state. By default, this is the module_id,</span>
+    <span class="c"># but for abtests and the like, this can be set to a shared value</span>
+    <span class="c"># for many instances of the module.</span>
+    <span class="c"># Filename for homeworks, etc.</span>
+    <span class="n">module_state_key</span> <span class="o">=</span> <span class="n">models</span><span class="o">.</span><span class="n">CharField</span><span class="p">(</span><span class="n">max_length</span><span class="o">=</span><span class="mi">255</span><span class="p">,</span> <span class="n">db_index</span><span class="o">=</span><span class="bp">True</span><span class="p">,</span> <span class="n">db_column</span><span class="o">=</span><span class="s">&#39;module_id&#39;</span><span class="p">)</span>
+    <span class="n">student</span> <span class="o">=</span> <span class="n">models</span><span class="o">.</span><span class="n">ForeignKey</span><span class="p">(</span><span class="n">User</span><span class="p">,</span> <span class="n">db_index</span><span class="o">=</span><span class="bp">True</span><span class="p">)</span>
+    <span class="n">course_id</span> <span class="o">=</span> <span class="n">models</span><span class="o">.</span><span class="n">CharField</span><span class="p">(</span><span class="n">max_length</span><span class="o">=</span><span class="mi">255</span><span class="p">,</span> <span class="n">db_index</span><span class="o">=</span><span class="bp">True</span><span class="p">)</span>
+
+    <span class="k">class</span> <span class="nc">Meta</span><span class="p">:</span>
+        <span class="n">unique_together</span> <span class="o">=</span> <span class="p">((</span><span class="s">&#39;student&#39;</span><span class="p">,</span> <span class="s">&#39;module_state_key&#39;</span><span class="p">,</span> <span class="s">&#39;course_id&#39;</span><span class="p">),)</span>
+
+    <span class="c">## Internal state of the object</span>
+    <span class="n">state</span> <span class="o">=</span> <span class="n">models</span><span class="o">.</span><span class="n">TextField</span><span class="p">(</span><span class="n">null</span><span class="o">=</span><span class="bp">True</span><span class="p">,</span> <span class="n">blank</span><span class="o">=</span><span class="bp">True</span><span class="p">)</span>
+
+    <span class="c">## Grade, and are we done?</span>
+    <span class="n">grade</span> <span class="o">=</span> <span class="n">models</span><span class="o">.</span><span class="n">FloatField</span><span class="p">(</span><span class="n">null</span><span class="o">=</span><span class="bp">True</span><span class="p">,</span> <span class="n">blank</span><span class="o">=</span><span class="bp">True</span><span class="p">,</span> <span class="n">db_index</span><span class="o">=</span><span class="bp">True</span><span class="p">)</span>
+    <span class="n">max_grade</span> <span class="o">=</span> <span class="n">models</span><span class="o">.</span><span class="n">FloatField</span><span class="p">(</span><span class="n">null</span><span class="o">=</span><span class="bp">True</span><span class="p">,</span> <span class="n">blank</span><span class="o">=</span><span class="bp">True</span><span class="p">)</span>
+    <span class="n">DONE_TYPES</span> <span class="o">=</span> <span class="p">((</span><span class="s">&#39;na&#39;</span><span class="p">,</span> <span class="s">&#39;NOT_APPLICABLE&#39;</span><span class="p">),</span>
+                    <span class="p">(</span><span class="s">&#39;f&#39;</span><span class="p">,</span> <span class="s">&#39;FINISHED&#39;</span><span class="p">),</span>
+                    <span class="p">(</span><span class="s">&#39;i&#39;</span><span class="p">,</span> <span class="s">&#39;INCOMPLETE&#39;</span><span class="p">),</span>
+                    <span class="p">)</span>
+    <span class="n">done</span> <span class="o">=</span> <span class="n">models</span><span class="o">.</span><span class="n">CharField</span><span class="p">(</span><span class="n">max_length</span><span class="o">=</span><span class="mi">8</span><span class="p">,</span> <span class="n">choices</span><span class="o">=</span><span class="n">DONE_TYPES</span><span class="p">,</span> <span class="n">default</span><span class="o">=</span><span class="s">&#39;na&#39;</span><span class="p">,</span> <span class="n">db_index</span><span class="o">=</span><span class="bp">True</span><span class="p">)</span>
+
+    <span class="n">created</span> <span class="o">=</span> <span class="n">models</span><span class="o">.</span><span class="n">DateTimeField</span><span class="p">(</span><span class="n">auto_now_add</span><span class="o">=</span><span class="bp">True</span><span class="p">,</span> <span class="n">db_index</span><span class="o">=</span><span class="bp">True</span><span class="p">)</span>
+    <span class="n">modified</span> <span class="o">=</span> <span class="n">models</span><span class="o">.</span><span class="n">DateTimeField</span><span class="p">(</span><span class="n">auto_now</span><span class="o">=</span><span class="bp">True</span><span class="p">,</span> <span class="n">db_index</span><span class="o">=</span><span class="bp">True</span><span class="p">)</span>
+
+    <span class="k">def</span> <span class="nf">__unicode__</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
+        <span class="k">return</span> <span class="s">&#39;/&#39;</span><span class="o">.</span><span class="n">join</span><span class="p">([</span><span class="bp">self</span><span class="o">.</span><span class="n">course_id</span><span class="p">,</span> <span class="bp">self</span><span class="o">.</span><span class="n">module_type</span><span class="p">,</span>
+                         <span class="bp">self</span><span class="o">.</span><span class="n">student</span><span class="o">.</span><span class="n">username</span><span class="p">,</span> <span class="bp">self</span><span class="o">.</span><span class="n">module_state_key</span><span class="p">,</span> <span class="nb">str</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">state</span><span class="p">)[:</span><span class="mi">20</span><span class="p">]])</span>
+
+
+<span class="c"># TODO (cpennington): Remove these once the LMS switches to using XModuleDescriptors</span>
+
+</div>
+<div class="viewcode-block" id="StudentModuleCache"><a class="viewcode-back" href="../../lms.html#courseware.models.StudentModuleCache">[docs]</a><span class="k">class</span> <span class="nc">StudentModuleCache</span><span class="p">(</span><span class="nb">object</span><span class="p">):</span>
+    <span class="sd">&quot;&quot;&quot;</span>
+<span class="sd">    A cache of StudentModules for a specific student</span>
+<span class="sd">    &quot;&quot;&quot;</span>
+    <span class="k">def</span> <span class="nf">__init__</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">course_id</span><span class="p">,</span> <span class="n">user</span><span class="p">,</span> <span class="n">descriptors</span><span class="p">,</span> <span class="n">select_for_update</span><span class="o">=</span><span class="bp">False</span><span class="p">):</span>
+        <span class="sd">&#39;&#39;&#39;</span>
+<span class="sd">        Find any StudentModule objects that are needed by any descriptor</span>
+<span class="sd">        in descriptors. Avoids making multiple queries to the database.</span>
+<span class="sd">        Note: Only modules that have store_state = True or have shared</span>
+<span class="sd">        state will have a StudentModule.</span>
+
+<span class="sd">        Arguments</span>
+<span class="sd">        user: The user for which to fetch maching StudentModules</span>
+<span class="sd">        descriptors: An array of XModuleDescriptors.</span>
+<span class="sd">        select_for_update: Flag indicating whether the rows should be locked until end of transaction</span>
+<span class="sd">        &#39;&#39;&#39;</span>
+        <span class="k">if</span> <span class="n">user</span><span class="o">.</span><span class="n">is_authenticated</span><span class="p">():</span>
+            <span class="n">module_ids</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">_get_module_state_keys</span><span class="p">(</span><span class="n">descriptors</span><span class="p">)</span>
+
+            <span class="c"># This works around a limitation in sqlite3 on the number of parameters</span>
+            <span class="c"># that can be put into a single query</span>
+            <span class="bp">self</span><span class="o">.</span><span class="n">cache</span> <span class="o">=</span> <span class="p">[]</span>
+            <span class="n">chunk_size</span> <span class="o">=</span> <span class="mi">500</span>
+            <span class="k">for</span> <span class="n">id_chunk</span> <span class="ow">in</span> <span class="p">[</span><span class="n">module_ids</span><span class="p">[</span><span class="n">i</span><span class="p">:</span><span class="n">i</span> <span class="o">+</span> <span class="n">chunk_size</span><span class="p">]</span> <span class="k">for</span> <span class="n">i</span> <span class="ow">in</span> <span class="nb">xrange</span><span class="p">(</span><span class="mi">0</span><span class="p">,</span> <span class="nb">len</span><span class="p">(</span><span class="n">module_ids</span><span class="p">),</span> <span class="n">chunk_size</span><span class="p">)]:</span>
+                <span class="k">if</span> <span class="n">select_for_update</span><span class="p">:</span>
+                    <span class="bp">self</span><span class="o">.</span><span class="n">cache</span><span class="o">.</span><span class="n">extend</span><span class="p">(</span><span class="n">StudentModule</span><span class="o">.</span><span class="n">objects</span><span class="o">.</span><span class="n">select_for_update</span><span class="p">()</span><span class="o">.</span><span class="n">filter</span><span class="p">(</span>
+                        <span class="n">course_id</span><span class="o">=</span><span class="n">course_id</span><span class="p">,</span>
+                        <span class="n">student</span><span class="o">=</span><span class="n">user</span><span class="p">,</span>
+                        <span class="n">module_state_key__in</span><span class="o">=</span><span class="n">id_chunk</span><span class="p">)</span>
+                    <span class="p">)</span>
+                <span class="k">else</span><span class="p">:</span>
+                    <span class="bp">self</span><span class="o">.</span><span class="n">cache</span><span class="o">.</span><span class="n">extend</span><span class="p">(</span><span class="n">StudentModule</span><span class="o">.</span><span class="n">objects</span><span class="o">.</span><span class="n">filter</span><span class="p">(</span>
+                        <span class="n">course_id</span><span class="o">=</span><span class="n">course_id</span><span class="p">,</span>
+                        <span class="n">student</span><span class="o">=</span><span class="n">user</span><span class="p">,</span>
+                        <span class="n">module_state_key__in</span><span class="o">=</span><span class="n">id_chunk</span><span class="p">)</span>
+                    <span class="p">)</span>
+
+        <span class="k">else</span><span class="p">:</span>
+            <span class="bp">self</span><span class="o">.</span><span class="n">cache</span> <span class="o">=</span> <span class="p">[]</span>
+
+
+    <span class="nd">@classmethod</span>
+<div class="viewcode-block" id="StudentModuleCache.cache_for_descriptor_descendents"><a class="viewcode-back" href="../../lms.html#courseware.models.StudentModuleCache.cache_for_descriptor_descendents">[docs]</a>    <span class="k">def</span> <span class="nf">cache_for_descriptor_descendents</span><span class="p">(</span><span class="n">cls</span><span class="p">,</span> <span class="n">course_id</span><span class="p">,</span> <span class="n">user</span><span class="p">,</span> <span class="n">descriptor</span><span class="p">,</span> <span class="n">depth</span><span class="o">=</span><span class="bp">None</span><span class="p">,</span>
+                                         <span class="n">descriptor_filter</span><span class="o">=</span><span class="k">lambda</span> <span class="n">descriptor</span><span class="p">:</span> <span class="bp">True</span><span class="p">,</span>
+                                         <span class="n">select_for_update</span><span class="o">=</span><span class="bp">False</span><span class="p">):</span>
+        <span class="sd">&quot;&quot;&quot;</span>
+<span class="sd">        course_id: the course in the context of which we want StudentModules.</span>
+<span class="sd">        user: the django user for whom to load modules.</span>
+<span class="sd">        descriptor: An XModuleDescriptor</span>
+<span class="sd">        depth is the number of levels of descendent modules to load StudentModules for, in addition to</span>
+<span class="sd">            the supplied descriptor. If depth is None, load all descendent StudentModules</span>
+<span class="sd">        descriptor_filter is a function that accepts a descriptor and return wether the StudentModule</span>
+<span class="sd">            should be cached</span>
+<span class="sd">        select_for_update: Flag indicating whether the rows should be locked until end of transaction</span>
+<span class="sd">        &quot;&quot;&quot;</span>
+
+        <span class="k">def</span> <span class="nf">get_child_descriptors</span><span class="p">(</span><span class="n">descriptor</span><span class="p">,</span> <span class="n">depth</span><span class="p">,</span> <span class="n">descriptor_filter</span><span class="p">):</span>
+            <span class="k">if</span> <span class="n">descriptor_filter</span><span class="p">(</span><span class="n">descriptor</span><span class="p">):</span>
+                <span class="n">descriptors</span> <span class="o">=</span> <span class="p">[</span><span class="n">descriptor</span><span class="p">]</span>
+            <span class="k">else</span><span class="p">:</span>
+                <span class="n">descriptors</span> <span class="o">=</span> <span class="p">[]</span>
+
+            <span class="k">if</span> <span class="n">depth</span> <span class="ow">is</span> <span class="bp">None</span> <span class="ow">or</span> <span class="n">depth</span> <span class="o">&gt;</span> <span class="mi">0</span><span class="p">:</span>
+                <span class="n">new_depth</span> <span class="o">=</span> <span class="n">depth</span> <span class="o">-</span> <span class="mi">1</span> <span class="k">if</span> <span class="n">depth</span> <span class="ow">is</span> <span class="ow">not</span> <span class="bp">None</span> <span class="k">else</span> <span class="n">depth</span>
+
+                <span class="k">for</span> <span class="n">child</span> <span class="ow">in</span> <span class="n">descriptor</span><span class="o">.</span><span class="n">get_children</span><span class="p">():</span>
+                    <span class="n">descriptors</span><span class="o">.</span><span class="n">extend</span><span class="p">(</span><span class="n">get_child_descriptors</span><span class="p">(</span><span class="n">child</span><span class="p">,</span> <span class="n">new_depth</span><span class="p">,</span> <span class="n">descriptor_filter</span><span class="p">))</span>
+
+            <span class="k">return</span> <span class="n">descriptors</span>
+
+
+        <span class="n">descriptors</span> <span class="o">=</span> <span class="n">get_child_descriptors</span><span class="p">(</span><span class="n">descriptor</span><span class="p">,</span> <span class="n">depth</span><span class="p">,</span> <span class="n">descriptor_filter</span><span class="p">)</span>
+
+        <span class="k">return</span> <span class="n">StudentModuleCache</span><span class="p">(</span><span class="n">course_id</span><span class="p">,</span> <span class="n">user</span><span class="p">,</span> <span class="n">descriptors</span><span class="p">,</span> <span class="n">select_for_update</span><span class="p">)</span>
+</div>
+    <span class="k">def</span> <span class="nf">_get_module_state_keys</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">descriptors</span><span class="p">):</span>
+        <span class="sd">&#39;&#39;&#39;</span>
+<span class="sd">        Get a list of the state_keys needed for StudentModules</span>
+<span class="sd">        required for this module descriptor</span>
+
+<span class="sd">        descriptor_filter is a function that accepts a descriptor and return wether the StudentModule</span>
+<span class="sd">            should be cached</span>
+<span class="sd">        &#39;&#39;&#39;</span>
+        <span class="n">keys</span> <span class="o">=</span> <span class="p">[]</span>
+        <span class="k">for</span> <span class="n">descriptor</span> <span class="ow">in</span> <span class="n">descriptors</span><span class="p">:</span>
+            <span class="k">if</span> <span class="n">descriptor</span><span class="o">.</span><span class="n">stores_state</span><span class="p">:</span>
+                <span class="n">keys</span><span class="o">.</span><span class="n">append</span><span class="p">(</span><span class="n">descriptor</span><span class="o">.</span><span class="n">location</span><span class="o">.</span><span class="n">url</span><span class="p">())</span>
+
+            <span class="n">shared_state_key</span> <span class="o">=</span> <span class="nb">getattr</span><span class="p">(</span><span class="n">descriptor</span><span class="p">,</span> <span class="s">&#39;shared_state_key&#39;</span><span class="p">,</span> <span class="bp">None</span><span class="p">)</span>
+            <span class="k">if</span> <span class="n">shared_state_key</span> <span class="ow">is</span> <span class="ow">not</span> <span class="bp">None</span><span class="p">:</span>
+                <span class="n">keys</span><span class="o">.</span><span class="n">append</span><span class="p">(</span><span class="n">shared_state_key</span><span class="p">)</span>
+
+        <span class="k">return</span> <span class="n">keys</span>
+
+<div class="viewcode-block" id="StudentModuleCache.lookup"><a class="viewcode-back" href="../../lms.html#courseware.models.StudentModuleCache.lookup">[docs]</a>    <span class="k">def</span> <span class="nf">lookup</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">course_id</span><span class="p">,</span> <span class="n">module_type</span><span class="p">,</span> <span class="n">module_state_key</span><span class="p">):</span>
+        <span class="sd">&#39;&#39;&#39;</span>
+<span class="sd">        Look for a student module with the given course_id, type, and id in the cache.</span>
+
+<span class="sd">        cache -- list of student modules</span>
+
+<span class="sd">        returns first found object, or None</span>
+<span class="sd">        &#39;&#39;&#39;</span>
+        <span class="k">for</span> <span class="n">o</span> <span class="ow">in</span> <span class="bp">self</span><span class="o">.</span><span class="n">cache</span><span class="p">:</span>
+            <span class="k">if</span> <span class="p">(</span><span class="n">o</span><span class="o">.</span><span class="n">course_id</span> <span class="o">==</span> <span class="n">course_id</span> <span class="ow">and</span>
+                <span class="n">o</span><span class="o">.</span><span class="n">module_type</span> <span class="o">==</span> <span class="n">module_type</span> <span class="ow">and</span>
+                <span class="n">o</span><span class="o">.</span><span class="n">module_state_key</span> <span class="o">==</span> <span class="n">module_state_key</span><span class="p">):</span>
+                <span class="k">return</span> <span class="n">o</span>
+        <span class="k">return</span> <span class="bp">None</span>
+</div>
+    <span class="k">def</span> <span class="nf">append</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">student_module</span><span class="p">):</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">cache</span><span class="o">.</span><span class="n">append</span><span class="p">(</span><span class="n">student_module</span><span class="p">)</span></div>
+</pre></div>
+
+          </div>
+        </div>
+      </div>
+      <div class="clearer"></div>
+    </div>
+    <div class="related">
+      <h3>Navigation</h3>
+      <ul>
+        <li class="right" style="margin-right: 10px">
+          <a href="../../genindex.html" title="General Index"
+             >index</a></li>
+        <li class="right" >
+          <a href="../../py-modindex.html" title="Python Module Index"
+             >modules</a> |</li>
+        <li><a href="../../index.html">MITx 1.0 documentation</a> &raquo;</li>
+          <li><a href="../index.html" >Module code</a> &raquo;</li> 
+      </ul>
+    </div>
+    <div class="footer">
+        &copy; Copyright 2012, MITx team.
+      Created using <a href="http://sphinx.pocoo.org/">Sphinx</a> 1.1.3.
+    </div>
+  </body>
+</html>

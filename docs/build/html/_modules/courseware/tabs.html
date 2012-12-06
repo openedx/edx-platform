@@ -1,0 +1,374 @@
+
+
+<!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Transitional//EN"
+  "http://www.w3.org/TR/xhtml1/DTD/xhtml1-transitional.dtd">
+
+
+<html xmlns="http://www.w3.org/1999/xhtml">
+  <head>
+    <meta http-equiv="Content-Type" content="text/html; charset=utf-8" />
+    
+    <title>courseware.tabs &mdash; MITx 1.0 documentation</title>
+    
+    <link rel="stylesheet" href="../../_static/sphinxdoc.css" type="text/css" />
+    <link rel="stylesheet" href="../../_static/pygments.css" type="text/css" />
+    
+    <script type="text/javascript">
+      var DOCUMENTATION_OPTIONS = {
+        URL_ROOT:    '../../',
+        VERSION:     '1.0',
+        COLLAPSE_INDEX: false,
+        FILE_SUFFIX: '.html',
+        HAS_SOURCE:  true
+      };
+    </script>
+    <script type="text/javascript" src="../../_static/jquery.js"></script>
+    <script type="text/javascript" src="../../_static/underscore.js"></script>
+    <script type="text/javascript" src="../../_static/doctools.js"></script>
+    <script type="text/javascript" src="http://cdn.mathjax.org/mathjax/latest/MathJax.js?config=TeX-AMS-MML_HTMLorMML"></script>
+    <link rel="top" title="MITx 1.0 documentation" href="../../index.html" />
+    <link rel="up" title="Module code" href="../index.html" /> 
+  </head>
+  <body>
+<img src="../../_static/homepage-bg.jpg" alt="Edx logo"  width="100%;"/>
+
+    <div class="related">
+      <h3>Navigation</h3>
+      <ul>
+        <li class="right" style="margin-right: 10px">
+          <a href="../../genindex.html" title="General Index"
+             accesskey="I">index</a></li>
+        <li class="right" >
+          <a href="../../py-modindex.html" title="Python Module Index"
+             >modules</a> |</li>
+        <li><a href="../../index.html">MITx 1.0 documentation</a> &raquo;</li>
+          <li><a href="../index.html" accesskey="U">Module code</a> &raquo;</li> 
+      </ul>
+    </div>
+      <div class="sphinxsidebar">
+        <div class="sphinxsidebarwrapper">
+<div id="searchbox" style="display: none">
+  <h3>Quick search</h3>
+    <form class="search" action="../../search.html" method="get">
+      <input type="text" name="q" />
+      <input type="submit" value="Go" />
+      <input type="hidden" name="check_keywords" value="yes" />
+      <input type="hidden" name="area" value="default" />
+    </form>
+    <p class="searchtip" style="font-size: 90%">
+    Enter search terms or a module, class or function name.
+    </p>
+</div>
+<script type="text/javascript">$('#searchbox').show(0);</script>
+        </div>
+      </div>
+
+    <div class="document">
+      <div class="documentwrapper">
+        <div class="bodywrapper">
+          <div class="body">
+            
+  <h1>Source code for courseware.tabs</h1><div class="highlight"><pre>
+<span class="sd">&quot;&quot;&quot;</span>
+<span class="sd">Tabs configuration.  By the time the tab is being rendered, it&#39;s just a name,</span>
+<span class="sd">link, and css class (CourseTab tuple).  Tabs are specified in course policy.</span>
+<span class="sd">Each tab has a type, and possibly some type-specific parameters.</span>
+
+<span class="sd">To add a new tab type, add a TabImpl to the VALID_TAB_TYPES dict below--it will</span>
+<span class="sd">contain a validation function that checks whether config for the tab type is</span>
+<span class="sd">valid, and a generator function that takes the config, user, and course, and</span>
+<span class="sd">actually generates the CourseTab.</span>
+<span class="sd">&quot;&quot;&quot;</span>
+
+<span class="kn">from</span> <span class="nn">collections</span> <span class="kn">import</span> <span class="n">namedtuple</span>
+<span class="kn">import</span> <span class="nn">logging</span>
+
+<span class="kn">from</span> <span class="nn">django.conf</span> <span class="kn">import</span> <span class="n">settings</span>
+<span class="kn">from</span> <span class="nn">django.core.urlresolvers</span> <span class="kn">import</span> <span class="n">reverse</span>
+
+<span class="kn">from</span> <span class="nn">fs.errors</span> <span class="kn">import</span> <span class="n">ResourceNotFoundError</span>
+
+<span class="kn">from</span> <span class="nn">courseware.access</span> <span class="kn">import</span> <span class="n">has_access</span>
+<span class="kn">from</span> <span class="nn">static_replace</span> <span class="kn">import</span> <span class="n">replace_urls</span>
+
+<span class="n">log</span> <span class="o">=</span> <span class="n">logging</span><span class="o">.</span><span class="n">getLogger</span><span class="p">(</span><span class="n">__name__</span><span class="p">)</span>
+
+<div class="viewcode-block" id="InvalidTabsException"><a class="viewcode-back" href="../../lms.html#courseware.tabs.InvalidTabsException">[docs]</a><span class="k">class</span> <span class="nc">InvalidTabsException</span><span class="p">(</span><span class="ne">Exception</span><span class="p">):</span>
+    <span class="sd">&quot;&quot;&quot;</span>
+<span class="sd">    A complaint about invalid tabs.</span>
+<span class="sd">    &quot;&quot;&quot;</span>
+    <span class="k">pass</span>
+</div>
+<span class="n">CourseTab</span> <span class="o">=</span> <span class="n">namedtuple</span><span class="p">(</span><span class="s">&#39;CourseTab&#39;</span><span class="p">,</span> <span class="s">&#39;name link is_active&#39;</span><span class="p">)</span>
+
+<span class="c"># encapsulate implementation for a tab:</span>
+<span class="c">#  - a validation function: takes the config dict and raises</span>
+<span class="c">#    InvalidTabsException if required fields are missing or otherwise</span>
+<span class="c">#    wrong.  (e.g. &quot;is there a &#39;name&#39; field?).  Validators can assume</span>
+<span class="c">#    that the type field is valid.</span>
+<span class="c">#</span>
+<span class="c">#  - a function that takes a config, a user, and a course, and active_page and</span>
+<span class="c">#    return a list of CourseTabs.  (e.g. &quot;return a CourseTab with specified</span>
+<span class="c">#    name, link to courseware, and is_active=True/False&quot;).  The function can</span>
+<span class="c">#    assume that it is only called with configs of the appropriate type that</span>
+<span class="c">#    have passed the corresponding validator.</span>
+<span class="n">TabImpl</span> <span class="o">=</span> <span class="n">namedtuple</span><span class="p">(</span><span class="s">&#39;TabImpl&#39;</span><span class="p">,</span> <span class="s">&#39;validator generator&#39;</span><span class="p">)</span>
+
+
+<span class="c">#####  Generators for various tabs.</span>
+
+<span class="k">def</span> <span class="nf">_courseware</span><span class="p">(</span><span class="n">tab</span><span class="p">,</span> <span class="n">user</span><span class="p">,</span> <span class="n">course</span><span class="p">,</span> <span class="n">active_page</span><span class="p">):</span>
+    <span class="n">link</span> <span class="o">=</span> <span class="n">reverse</span><span class="p">(</span><span class="s">&#39;courseware&#39;</span><span class="p">,</span> <span class="n">args</span><span class="o">=</span><span class="p">[</span><span class="n">course</span><span class="o">.</span><span class="n">id</span><span class="p">])</span>
+    <span class="k">return</span> <span class="p">[</span><span class="n">CourseTab</span><span class="p">(</span><span class="s">&#39;Courseware&#39;</span><span class="p">,</span> <span class="n">link</span><span class="p">,</span> <span class="n">active_page</span> <span class="o">==</span> <span class="s">&quot;courseware&quot;</span><span class="p">)]</span>
+
+<span class="k">def</span> <span class="nf">_course_info</span><span class="p">(</span><span class="n">tab</span><span class="p">,</span> <span class="n">user</span><span class="p">,</span> <span class="n">course</span><span class="p">,</span> <span class="n">active_page</span><span class="p">):</span>
+    <span class="n">link</span> <span class="o">=</span> <span class="n">reverse</span><span class="p">(</span><span class="s">&#39;info&#39;</span><span class="p">,</span> <span class="n">args</span><span class="o">=</span><span class="p">[</span><span class="n">course</span><span class="o">.</span><span class="n">id</span><span class="p">])</span>
+    <span class="k">return</span> <span class="p">[</span><span class="n">CourseTab</span><span class="p">(</span><span class="n">tab</span><span class="p">[</span><span class="s">&#39;name&#39;</span><span class="p">],</span> <span class="n">link</span><span class="p">,</span> <span class="n">active_page</span> <span class="o">==</span> <span class="s">&quot;info&quot;</span><span class="p">)]</span>
+
+<span class="k">def</span> <span class="nf">_progress</span><span class="p">(</span><span class="n">tab</span><span class="p">,</span> <span class="n">user</span><span class="p">,</span> <span class="n">course</span><span class="p">,</span> <span class="n">active_page</span><span class="p">):</span>
+    <span class="k">if</span> <span class="n">user</span><span class="o">.</span><span class="n">is_authenticated</span><span class="p">():</span>
+        <span class="n">link</span> <span class="o">=</span> <span class="n">reverse</span><span class="p">(</span><span class="s">&#39;progress&#39;</span><span class="p">,</span> <span class="n">args</span><span class="o">=</span><span class="p">[</span><span class="n">course</span><span class="o">.</span><span class="n">id</span><span class="p">])</span>
+        <span class="k">return</span> <span class="p">[</span><span class="n">CourseTab</span><span class="p">(</span><span class="n">tab</span><span class="p">[</span><span class="s">&#39;name&#39;</span><span class="p">],</span> <span class="n">link</span><span class="p">,</span> <span class="n">active_page</span> <span class="o">==</span> <span class="s">&quot;progress&quot;</span><span class="p">)]</span>
+    <span class="k">return</span> <span class="p">[]</span>
+
+<span class="k">def</span> <span class="nf">_wiki</span><span class="p">(</span><span class="n">tab</span><span class="p">,</span> <span class="n">user</span><span class="p">,</span> <span class="n">course</span><span class="p">,</span> <span class="n">active_page</span><span class="p">):</span>
+    <span class="k">if</span> <span class="n">settings</span><span class="o">.</span><span class="n">WIKI_ENABLED</span><span class="p">:</span>
+        <span class="n">link</span> <span class="o">=</span> <span class="n">reverse</span><span class="p">(</span><span class="s">&#39;course_wiki&#39;</span><span class="p">,</span> <span class="n">args</span><span class="o">=</span><span class="p">[</span><span class="n">course</span><span class="o">.</span><span class="n">id</span><span class="p">])</span>
+        <span class="k">return</span> <span class="p">[</span><span class="n">CourseTab</span><span class="p">(</span><span class="n">tab</span><span class="p">[</span><span class="s">&#39;name&#39;</span><span class="p">],</span> <span class="n">link</span><span class="p">,</span> <span class="n">active_page</span> <span class="o">==</span> <span class="s">&#39;wiki&#39;</span><span class="p">)]</span>
+    <span class="k">return</span> <span class="p">[]</span>
+
+<span class="k">def</span> <span class="nf">_discussion</span><span class="p">(</span><span class="n">tab</span><span class="p">,</span> <span class="n">user</span><span class="p">,</span> <span class="n">course</span><span class="p">,</span> <span class="n">active_page</span><span class="p">):</span>
+    <span class="sd">&quot;&quot;&quot;</span>
+<span class="sd">    This tab format only supports the new Berkeley discussion forums.</span>
+<span class="sd">    &quot;&quot;&quot;</span>
+    <span class="k">if</span> <span class="n">settings</span><span class="o">.</span><span class="n">MITX_FEATURES</span><span class="o">.</span><span class="n">get</span><span class="p">(</span><span class="s">&#39;ENABLE_DISCUSSION_SERVICE&#39;</span><span class="p">):</span>
+        <span class="n">link</span> <span class="o">=</span> <span class="n">reverse</span><span class="p">(</span><span class="s">&#39;django_comment_client.forum.views.forum_form_discussion&#39;</span><span class="p">,</span>
+                              <span class="n">args</span><span class="o">=</span><span class="p">[</span><span class="n">course</span><span class="o">.</span><span class="n">id</span><span class="p">])</span>
+        <span class="k">return</span> <span class="p">[</span><span class="n">CourseTab</span><span class="p">(</span><span class="n">tab</span><span class="p">[</span><span class="s">&#39;name&#39;</span><span class="p">],</span> <span class="n">link</span><span class="p">,</span> <span class="n">active_page</span><span class="o">==</span><span class="s">&#39;discussion&#39;</span><span class="p">)]</span>
+    <span class="k">return</span> <span class="p">[]</span>
+
+<span class="k">def</span> <span class="nf">_external_link</span><span class="p">(</span><span class="n">tab</span><span class="p">,</span> <span class="n">user</span><span class="p">,</span> <span class="n">course</span><span class="p">,</span> <span class="n">active_page</span><span class="p">):</span>
+    <span class="c"># external links are never active</span>
+    <span class="k">return</span> <span class="p">[</span><span class="n">CourseTab</span><span class="p">(</span><span class="n">tab</span><span class="p">[</span><span class="s">&#39;name&#39;</span><span class="p">],</span> <span class="n">tab</span><span class="p">[</span><span class="s">&#39;link&#39;</span><span class="p">],</span> <span class="bp">False</span><span class="p">)]</span>
+
+<span class="k">def</span> <span class="nf">_static_tab</span><span class="p">(</span><span class="n">tab</span><span class="p">,</span> <span class="n">user</span><span class="p">,</span> <span class="n">course</span><span class="p">,</span> <span class="n">active_page</span><span class="p">):</span>
+    <span class="n">link</span> <span class="o">=</span> <span class="n">reverse</span><span class="p">(</span><span class="s">&#39;static_tab&#39;</span><span class="p">,</span> <span class="n">args</span><span class="o">=</span><span class="p">[</span><span class="n">course</span><span class="o">.</span><span class="n">id</span><span class="p">,</span> <span class="n">tab</span><span class="p">[</span><span class="s">&#39;url_slug&#39;</span><span class="p">]])</span>
+    <span class="n">active_str</span> <span class="o">=</span> <span class="s">&#39;static_tab_{0}&#39;</span><span class="o">.</span><span class="n">format</span><span class="p">(</span><span class="n">tab</span><span class="p">[</span><span class="s">&#39;url_slug&#39;</span><span class="p">])</span>
+    <span class="k">return</span> <span class="p">[</span><span class="n">CourseTab</span><span class="p">(</span><span class="n">tab</span><span class="p">[</span><span class="s">&#39;name&#39;</span><span class="p">],</span> <span class="n">link</span><span class="p">,</span> <span class="n">active_page</span><span class="o">==</span><span class="n">active_str</span><span class="p">)]</span>
+
+
+<span class="k">def</span> <span class="nf">_textbooks</span><span class="p">(</span><span class="n">tab</span><span class="p">,</span> <span class="n">user</span><span class="p">,</span> <span class="n">course</span><span class="p">,</span> <span class="n">active_page</span><span class="p">):</span>
+    <span class="sd">&quot;&quot;&quot;</span>
+<span class="sd">    Generates one tab per textbook.  Only displays if user is authenticated.</span>
+<span class="sd">    &quot;&quot;&quot;</span>
+    <span class="k">if</span> <span class="n">user</span><span class="o">.</span><span class="n">is_authenticated</span><span class="p">()</span> <span class="ow">and</span> <span class="n">settings</span><span class="o">.</span><span class="n">MITX_FEATURES</span><span class="o">.</span><span class="n">get</span><span class="p">(</span><span class="s">&#39;ENABLE_TEXTBOOK&#39;</span><span class="p">):</span>
+        <span class="c"># since there can be more than one textbook, active_page is e.g. &quot;book/0&quot;.</span>
+        <span class="k">return</span> <span class="p">[</span><span class="n">CourseTab</span><span class="p">(</span><span class="n">textbook</span><span class="o">.</span><span class="n">title</span><span class="p">,</span> <span class="n">reverse</span><span class="p">(</span><span class="s">&#39;book&#39;</span><span class="p">,</span> <span class="n">args</span><span class="o">=</span><span class="p">[</span><span class="n">course</span><span class="o">.</span><span class="n">id</span><span class="p">,</span> <span class="n">index</span><span class="p">]),</span>
+                          <span class="n">active_page</span><span class="o">==</span><span class="s">&quot;textbook/{0}&quot;</span><span class="o">.</span><span class="n">format</span><span class="p">(</span><span class="n">index</span><span class="p">))</span>
+                <span class="k">for</span> <span class="n">index</span><span class="p">,</span> <span class="n">textbook</span> <span class="ow">in</span> <span class="nb">enumerate</span><span class="p">(</span><span class="n">course</span><span class="o">.</span><span class="n">textbooks</span><span class="p">)]</span>
+    <span class="k">return</span> <span class="p">[]</span>
+
+<span class="c">#### Validators</span>
+
+
+<div class="viewcode-block" id="key_checker"><a class="viewcode-back" href="../../lms.html#courseware.tabs.key_checker">[docs]</a><span class="k">def</span> <span class="nf">key_checker</span><span class="p">(</span><span class="n">expected_keys</span><span class="p">):</span>
+    <span class="sd">&quot;&quot;&quot;</span>
+<span class="sd">    Returns a function that checks that specified keys are present in a dict</span>
+<span class="sd">    &quot;&quot;&quot;</span>
+    <span class="k">def</span> <span class="nf">check</span><span class="p">(</span><span class="n">d</span><span class="p">):</span>
+        <span class="k">for</span> <span class="n">k</span> <span class="ow">in</span> <span class="n">expected_keys</span><span class="p">:</span>
+            <span class="k">if</span> <span class="n">k</span> <span class="ow">not</span> <span class="ow">in</span> <span class="n">d</span><span class="p">:</span>
+                <span class="k">raise</span> <span class="n">InvalidTabsException</span><span class="p">(</span><span class="s">&quot;Key {0} not present in {1}&quot;</span>
+                                           <span class="o">.</span><span class="n">format</span><span class="p">(</span><span class="n">k</span><span class="p">,</span> <span class="n">d</span><span class="p">))</span>
+    <span class="k">return</span> <span class="n">check</span>
+
+</div>
+<span class="n">need_name</span> <span class="o">=</span> <span class="n">key_checker</span><span class="p">([</span><span class="s">&#39;name&#39;</span><span class="p">])</span>
+
+<div class="viewcode-block" id="null_validator"><a class="viewcode-back" href="../../lms.html#courseware.tabs.null_validator">[docs]</a><span class="k">def</span> <span class="nf">null_validator</span><span class="p">(</span><span class="n">d</span><span class="p">):</span>
+    <span class="sd">&quot;&quot;&quot;</span>
+<span class="sd">    Don&#39;t check anything--use for tabs that don&#39;t need any params. (e.g. textbook)</span>
+<span class="sd">    &quot;&quot;&quot;</span>
+    <span class="k">pass</span>
+
+<span class="c">##### The main tab config dict.</span>
+
+<span class="c"># type -&gt; TabImpl</span></div>
+<span class="n">VALID_TAB_TYPES</span> <span class="o">=</span> <span class="p">{</span>
+    <span class="s">&#39;courseware&#39;</span><span class="p">:</span> <span class="n">TabImpl</span><span class="p">(</span><span class="n">null_validator</span><span class="p">,</span> <span class="n">_courseware</span><span class="p">),</span>
+    <span class="s">&#39;course_info&#39;</span><span class="p">:</span> <span class="n">TabImpl</span><span class="p">(</span><span class="n">need_name</span><span class="p">,</span> <span class="n">_course_info</span><span class="p">),</span>
+    <span class="s">&#39;wiki&#39;</span><span class="p">:</span> <span class="n">TabImpl</span><span class="p">(</span><span class="n">need_name</span><span class="p">,</span> <span class="n">_wiki</span><span class="p">),</span>
+    <span class="s">&#39;discussion&#39;</span><span class="p">:</span> <span class="n">TabImpl</span><span class="p">(</span><span class="n">need_name</span><span class="p">,</span> <span class="n">_discussion</span><span class="p">),</span>
+    <span class="s">&#39;external_link&#39;</span><span class="p">:</span> <span class="n">TabImpl</span><span class="p">(</span><span class="n">key_checker</span><span class="p">([</span><span class="s">&#39;name&#39;</span><span class="p">,</span> <span class="s">&#39;link&#39;</span><span class="p">]),</span> <span class="n">_external_link</span><span class="p">),</span>
+    <span class="s">&#39;textbooks&#39;</span><span class="p">:</span> <span class="n">TabImpl</span><span class="p">(</span><span class="n">null_validator</span><span class="p">,</span> <span class="n">_textbooks</span><span class="p">),</span>
+    <span class="s">&#39;progress&#39;</span><span class="p">:</span> <span class="n">TabImpl</span><span class="p">(</span><span class="n">need_name</span><span class="p">,</span> <span class="n">_progress</span><span class="p">),</span>
+    <span class="s">&#39;static_tab&#39;</span><span class="p">:</span> <span class="n">TabImpl</span><span class="p">(</span><span class="n">key_checker</span><span class="p">([</span><span class="s">&#39;name&#39;</span><span class="p">,</span> <span class="s">&#39;url_slug&#39;</span><span class="p">]),</span> <span class="n">_static_tab</span><span class="p">),</span>
+    <span class="p">}</span>
+
+
+<span class="c">### External interface below this.</span>
+
+<div class="viewcode-block" id="validate_tabs"><a class="viewcode-back" href="../../lms.html#courseware.tabs.validate_tabs">[docs]</a><span class="k">def</span> <span class="nf">validate_tabs</span><span class="p">(</span><span class="n">course</span><span class="p">):</span>
+    <span class="sd">&quot;&quot;&quot;</span>
+<span class="sd">    Check that the tabs set for the specified course is valid.  If it</span>
+<span class="sd">    isn&#39;t, raise InvalidTabsException with the complaint.</span>
+
+<span class="sd">    Specific rules checked:</span>
+<span class="sd">    - if no tabs specified, that&#39;s fine</span>
+<span class="sd">    - if tabs specified, first two must have type &#39;courseware&#39; and &#39;course_info&#39;, in that order.</span>
+<span class="sd">    - All the tabs must have a type in VALID_TAB_TYPES.</span>
+
+<span class="sd">    &quot;&quot;&quot;</span>
+    <span class="n">tabs</span> <span class="o">=</span> <span class="n">course</span><span class="o">.</span><span class="n">tabs</span>
+    <span class="k">if</span> <span class="n">tabs</span> <span class="ow">is</span> <span class="bp">None</span><span class="p">:</span>
+        <span class="k">return</span>
+
+    <span class="k">if</span> <span class="nb">len</span><span class="p">(</span><span class="n">tabs</span><span class="p">)</span> <span class="o">&lt;</span> <span class="mi">2</span><span class="p">:</span>
+        <span class="k">raise</span> <span class="n">InvalidTabsException</span><span class="p">(</span><span class="s">&quot;Expected at least two tabs.  tabs: &#39;{0}&#39;&quot;</span><span class="o">.</span><span class="n">format</span><span class="p">(</span><span class="n">tabs</span><span class="p">))</span>
+    <span class="k">if</span> <span class="n">tabs</span><span class="p">[</span><span class="mi">0</span><span class="p">][</span><span class="s">&#39;type&#39;</span><span class="p">]</span> <span class="o">!=</span> <span class="s">&#39;courseware&#39;</span><span class="p">:</span>
+        <span class="k">raise</span> <span class="n">InvalidTabsException</span><span class="p">(</span>
+            <span class="s">&quot;Expected first tab to have type &#39;courseware&#39;.  tabs: &#39;{0}&#39;&quot;</span><span class="o">.</span><span class="n">format</span><span class="p">(</span><span class="n">tabs</span><span class="p">))</span>
+    <span class="k">if</span> <span class="n">tabs</span><span class="p">[</span><span class="mi">1</span><span class="p">][</span><span class="s">&#39;type&#39;</span><span class="p">]</span> <span class="o">!=</span> <span class="s">&#39;course_info&#39;</span><span class="p">:</span>
+        <span class="k">raise</span> <span class="n">InvalidTabsException</span><span class="p">(</span>
+            <span class="s">&quot;Expected second tab to have type &#39;course_info&#39;.  tabs: &#39;{0}&#39;&quot;</span><span class="o">.</span><span class="n">format</span><span class="p">(</span><span class="n">tabs</span><span class="p">))</span>
+    <span class="k">for</span> <span class="n">t</span> <span class="ow">in</span> <span class="n">tabs</span><span class="p">:</span>
+        <span class="k">if</span> <span class="n">t</span><span class="p">[</span><span class="s">&#39;type&#39;</span><span class="p">]</span> <span class="ow">not</span> <span class="ow">in</span> <span class="n">VALID_TAB_TYPES</span><span class="p">:</span>
+            <span class="k">raise</span> <span class="n">InvalidTabsException</span><span class="p">(</span><span class="s">&quot;Unknown tab type {0}. Known types: {1}&quot;</span>
+                                       <span class="o">.</span><span class="n">format</span><span class="p">(</span><span class="n">t</span><span class="p">[</span><span class="s">&#39;type&#39;</span><span class="p">],</span> <span class="n">VALID_TAB_TYPES</span><span class="p">))</span>
+        <span class="c"># the type-specific validator checks the rest of the tab config</span>
+        <span class="n">VALID_TAB_TYPES</span><span class="p">[</span><span class="n">t</span><span class="p">[</span><span class="s">&#39;type&#39;</span><span class="p">]]</span><span class="o">.</span><span class="n">validator</span><span class="p">(</span><span class="n">t</span><span class="p">)</span>
+
+    <span class="c"># Possible other checks: make sure tabs that should only appear once (e.g. courseware)</span>
+    <span class="c"># are actually unique (otherwise, will break active tag code)</span>
+
+</div>
+<div class="viewcode-block" id="get_course_tabs"><a class="viewcode-back" href="../../lms.html#courseware.tabs.get_course_tabs">[docs]</a><span class="k">def</span> <span class="nf">get_course_tabs</span><span class="p">(</span><span class="n">user</span><span class="p">,</span> <span class="n">course</span><span class="p">,</span> <span class="n">active_page</span><span class="p">):</span>
+    <span class="sd">&quot;&quot;&quot;</span>
+<span class="sd">    Return the tabs to show a particular user, as a list of CourseTab items.</span>
+<span class="sd">    &quot;&quot;&quot;</span>
+    <span class="k">if</span> <span class="ow">not</span> <span class="nb">hasattr</span><span class="p">(</span><span class="n">course</span><span class="p">,</span><span class="s">&#39;tabs&#39;</span><span class="p">)</span> <span class="ow">or</span> <span class="ow">not</span> <span class="n">course</span><span class="o">.</span><span class="n">tabs</span><span class="p">:</span>
+        <span class="k">return</span> <span class="n">get_default_tabs</span><span class="p">(</span><span class="n">user</span><span class="p">,</span> <span class="n">course</span><span class="p">,</span> <span class="n">active_page</span><span class="p">)</span>
+
+    <span class="c"># TODO (vshnayder): There needs to be a place to call this right after course</span>
+    <span class="c"># load, but not from inside xmodule, since that doesn&#39;t (and probably</span>
+    <span class="c"># shouldn&#39;t) know about the details of what tabs are supported, etc.</span>
+    <span class="n">validate_tabs</span><span class="p">(</span><span class="n">course</span><span class="p">)</span>
+
+    <span class="n">tabs</span> <span class="o">=</span> <span class="p">[]</span>
+    <span class="k">for</span> <span class="n">tab</span> <span class="ow">in</span> <span class="n">course</span><span class="o">.</span><span class="n">tabs</span><span class="p">:</span>
+        <span class="c"># expect handlers to return lists--handles things that are turned off</span>
+        <span class="c"># via feature flags, and things like &#39;textbook&#39; which might generate</span>
+        <span class="c"># multiple tabs.</span>
+        <span class="n">gen</span> <span class="o">=</span> <span class="n">VALID_TAB_TYPES</span><span class="p">[</span><span class="n">tab</span><span class="p">[</span><span class="s">&#39;type&#39;</span><span class="p">]]</span><span class="o">.</span><span class="n">generator</span>
+        <span class="n">tabs</span><span class="o">.</span><span class="n">extend</span><span class="p">(</span><span class="n">gen</span><span class="p">(</span><span class="n">tab</span><span class="p">,</span> <span class="n">user</span><span class="p">,</span> <span class="n">course</span><span class="p">,</span> <span class="n">active_page</span><span class="p">))</span>
+
+    <span class="c"># Instructor tab is special--automatically added if user is staff for the course</span>
+    <span class="k">if</span> <span class="n">has_access</span><span class="p">(</span><span class="n">user</span><span class="p">,</span> <span class="n">course</span><span class="p">,</span> <span class="s">&#39;staff&#39;</span><span class="p">):</span>
+        <span class="n">tabs</span><span class="o">.</span><span class="n">append</span><span class="p">(</span><span class="n">CourseTab</span><span class="p">(</span><span class="s">&#39;Instructor&#39;</span><span class="p">,</span>
+                              <span class="n">reverse</span><span class="p">(</span><span class="s">&#39;instructor_dashboard&#39;</span><span class="p">,</span> <span class="n">args</span><span class="o">=</span><span class="p">[</span><span class="n">course</span><span class="o">.</span><span class="n">id</span><span class="p">]),</span>
+                              <span class="n">active_page</span> <span class="o">==</span> <span class="s">&#39;instructor&#39;</span><span class="p">))</span>
+    <span class="k">return</span> <span class="n">tabs</span>
+
+</div>
+<span class="k">def</span> <span class="nf">get_default_tabs</span><span class="p">(</span><span class="n">user</span><span class="p">,</span> <span class="n">course</span><span class="p">,</span> <span class="n">active_page</span><span class="p">):</span>
+
+    <span class="c"># When calling the various _tab methods, can omit the &#39;type&#39;:&#39;blah&#39; from the</span>
+    <span class="c"># first arg, since that&#39;s only used for dispatch</span>
+    <span class="n">tabs</span> <span class="o">=</span> <span class="p">[]</span>
+    <span class="n">tabs</span><span class="o">.</span><span class="n">extend</span><span class="p">(</span><span class="n">_courseware</span><span class="p">({</span><span class="s">&#39;&#39;</span><span class="p">},</span> <span class="n">user</span><span class="p">,</span> <span class="n">course</span><span class="p">,</span> <span class="n">active_page</span><span class="p">))</span>
+    <span class="n">tabs</span><span class="o">.</span><span class="n">extend</span><span class="p">(</span><span class="n">_course_info</span><span class="p">({</span><span class="s">&#39;name&#39;</span><span class="p">:</span> <span class="s">&#39;Course Info&#39;</span><span class="p">},</span> <span class="n">user</span><span class="p">,</span> <span class="n">course</span><span class="p">,</span> <span class="n">active_page</span><span class="p">))</span>
+
+    <span class="k">if</span> <span class="nb">hasattr</span><span class="p">(</span><span class="n">course</span><span class="p">,</span> <span class="s">&#39;syllabus_present&#39;</span><span class="p">)</span> <span class="ow">and</span> <span class="n">course</span><span class="o">.</span><span class="n">syllabus_present</span><span class="p">:</span>
+        <span class="n">link</span> <span class="o">=</span> <span class="n">reverse</span><span class="p">(</span><span class="s">&#39;syllabus&#39;</span><span class="p">,</span> <span class="n">args</span><span class="o">=</span><span class="p">[</span><span class="n">course</span><span class="o">.</span><span class="n">id</span><span class="p">])</span>
+        <span class="n">tabs</span><span class="o">.</span><span class="n">append</span><span class="p">(</span><span class="n">CourseTab</span><span class="p">(</span><span class="s">&#39;Syllabus&#39;</span><span class="p">,</span> <span class="n">link</span><span class="p">,</span> <span class="n">active_page</span><span class="o">==</span><span class="s">&#39;syllabus&#39;</span><span class="p">))</span>
+
+    <span class="n">tabs</span><span class="o">.</span><span class="n">extend</span><span class="p">(</span><span class="n">_textbooks</span><span class="p">({},</span> <span class="n">user</span><span class="p">,</span> <span class="n">course</span><span class="p">,</span> <span class="n">active_page</span><span class="p">))</span>
+
+    <span class="c">## If they have a discussion link specified, use that even if we feature</span>
+    <span class="c">## flag discussions off. Disabling that is mostly a server safety feature</span>
+    <span class="c">## at this point, and we don&#39;t need to worry about external sites.</span>
+    <span class="k">if</span> <span class="n">course</span><span class="o">.</span><span class="n">discussion_link</span><span class="p">:</span>
+        <span class="n">tabs</span><span class="o">.</span><span class="n">append</span><span class="p">(</span><span class="n">CourseTab</span><span class="p">(</span><span class="s">&#39;Discussion&#39;</span><span class="p">,</span> <span class="n">course</span><span class="o">.</span><span class="n">discussion_link</span><span class="p">,</span> <span class="n">active_page</span> <span class="o">==</span> <span class="s">&#39;discussion&#39;</span><span class="p">))</span>
+    <span class="k">elif</span> <span class="n">settings</span><span class="o">.</span><span class="n">MITX_FEATURES</span><span class="o">.</span><span class="n">get</span><span class="p">(</span><span class="s">&#39;ENABLE_DISCUSSION_SERVICE&#39;</span><span class="p">):</span>
+        <span class="n">link</span> <span class="o">=</span> <span class="n">reverse</span><span class="p">(</span><span class="s">&#39;django_comment_client.forum.views.forum_form_discussion&#39;</span><span class="p">,</span>
+                              <span class="n">args</span><span class="o">=</span><span class="p">[</span><span class="n">course</span><span class="o">.</span><span class="n">id</span><span class="p">])</span>
+        <span class="n">tabs</span><span class="o">.</span><span class="n">append</span><span class="p">(</span><span class="n">CourseTab</span><span class="p">(</span><span class="s">&#39;Discussion&#39;</span><span class="p">,</span> <span class="n">link</span><span class="p">,</span> <span class="n">active_page</span> <span class="o">==</span> <span class="s">&#39;discussion&#39;</span><span class="p">))</span>
+    <span class="k">elif</span> <span class="n">settings</span><span class="o">.</span><span class="n">MITX_FEATURES</span><span class="o">.</span><span class="n">get</span><span class="p">(</span><span class="s">&#39;ENABLE_DISCUSSION&#39;</span><span class="p">):</span>
+        <span class="c">## This is Askbot, which we should be retiring soon...</span>
+        <span class="n">tabs</span><span class="o">.</span><span class="n">append</span><span class="p">(</span><span class="n">CourseTab</span><span class="p">(</span><span class="s">&#39;Discussion&#39;</span><span class="p">,</span> <span class="n">reverse</span><span class="p">(</span><span class="s">&#39;questions&#39;</span><span class="p">),</span> <span class="n">active_page</span> <span class="o">==</span> <span class="s">&#39;discussion&#39;</span><span class="p">))</span>
+
+    <span class="n">tabs</span><span class="o">.</span><span class="n">extend</span><span class="p">(</span><span class="n">_wiki</span><span class="p">({</span><span class="s">&#39;name&#39;</span><span class="p">:</span> <span class="s">&#39;Wiki&#39;</span><span class="p">,</span> <span class="s">&#39;type&#39;</span><span class="p">:</span> <span class="s">&#39;wiki&#39;</span><span class="p">},</span> <span class="n">user</span><span class="p">,</span> <span class="n">course</span><span class="p">,</span> <span class="n">active_page</span><span class="p">))</span>
+
+    <span class="k">if</span> <span class="n">user</span><span class="o">.</span><span class="n">is_authenticated</span><span class="p">()</span> <span class="ow">and</span> <span class="ow">not</span> <span class="n">course</span><span class="o">.</span><span class="n">hide_progress_tab</span><span class="p">:</span>
+        <span class="n">tabs</span><span class="o">.</span><span class="n">extend</span><span class="p">(</span><span class="n">_progress</span><span class="p">({</span><span class="s">&#39;name&#39;</span><span class="p">:</span> <span class="s">&#39;Progress&#39;</span><span class="p">},</span> <span class="n">user</span><span class="p">,</span> <span class="n">course</span><span class="p">,</span> <span class="n">active_page</span><span class="p">))</span>
+
+    <span class="k">if</span> <span class="n">has_access</span><span class="p">(</span><span class="n">user</span><span class="p">,</span> <span class="n">course</span><span class="p">,</span> <span class="s">&#39;staff&#39;</span><span class="p">):</span>
+        <span class="n">link</span> <span class="o">=</span> <span class="n">reverse</span><span class="p">(</span><span class="s">&#39;instructor_dashboard&#39;</span><span class="p">,</span> <span class="n">args</span><span class="o">=</span><span class="p">[</span><span class="n">course</span><span class="o">.</span><span class="n">id</span><span class="p">])</span>
+        <span class="n">tabs</span><span class="o">.</span><span class="n">append</span><span class="p">(</span><span class="n">CourseTab</span><span class="p">(</span><span class="s">&#39;Instructor&#39;</span><span class="p">,</span> <span class="n">link</span><span class="p">,</span> <span class="n">active_page</span><span class="o">==</span><span class="s">&#39;instructor&#39;</span><span class="p">))</span>
+
+    <span class="k">return</span> <span class="n">tabs</span>
+
+<div class="viewcode-block" id="get_static_tab_by_slug"><a class="viewcode-back" href="../../lms.html#courseware.tabs.get_static_tab_by_slug">[docs]</a><span class="k">def</span> <span class="nf">get_static_tab_by_slug</span><span class="p">(</span><span class="n">course</span><span class="p">,</span> <span class="n">tab_slug</span><span class="p">):</span>
+    <span class="sd">&quot;&quot;&quot;</span>
+<span class="sd">    Look for a tab with type &#39;static_tab&#39; and the specified &#39;tab_slug&#39;.  Returns</span>
+<span class="sd">    the tab (a config dict), or None if not found.</span>
+<span class="sd">    &quot;&quot;&quot;</span>
+    <span class="k">if</span> <span class="n">course</span><span class="o">.</span><span class="n">tabs</span> <span class="ow">is</span> <span class="bp">None</span><span class="p">:</span>
+        <span class="k">return</span> <span class="bp">None</span>
+    <span class="k">for</span> <span class="n">tab</span> <span class="ow">in</span> <span class="n">course</span><span class="o">.</span><span class="n">tabs</span><span class="p">:</span>
+        <span class="c"># The validation code checks that these exist.</span>
+        <span class="k">if</span> <span class="n">tab</span><span class="p">[</span><span class="s">&#39;type&#39;</span><span class="p">]</span> <span class="o">==</span> <span class="s">&#39;static_tab&#39;</span> <span class="ow">and</span> <span class="n">tab</span><span class="p">[</span><span class="s">&#39;url_slug&#39;</span><span class="p">]</span> <span class="o">==</span> <span class="n">tab_slug</span><span class="p">:</span>
+            <span class="k">return</span> <span class="n">tab</span>
+
+    <span class="k">return</span> <span class="bp">None</span>
+
+</div>
+<div class="viewcode-block" id="get_static_tab_contents"><a class="viewcode-back" href="../../lms.html#courseware.tabs.get_static_tab_contents">[docs]</a><span class="k">def</span> <span class="nf">get_static_tab_contents</span><span class="p">(</span><span class="n">course</span><span class="p">,</span> <span class="n">tab</span><span class="p">):</span>
+    <span class="sd">&quot;&quot;&quot;</span>
+<span class="sd">    Given a course and a static tab config dict, load the tab contents,</span>
+<span class="sd">    returning None if not found.</span>
+
+<span class="sd">    Looks in tabs/{course_url_name}/{tab_slug}.html first, then tabs/{tab_slug}.html.</span>
+<span class="sd">    &quot;&quot;&quot;</span>
+    <span class="n">slug</span> <span class="o">=</span> <span class="n">tab</span><span class="p">[</span><span class="s">&#39;url_slug&#39;</span><span class="p">]</span>
+    <span class="n">paths</span> <span class="o">=</span> <span class="p">[</span><span class="s">&#39;tabs/{0}/{1}.html&#39;</span><span class="o">.</span><span class="n">format</span><span class="p">(</span><span class="n">course</span><span class="o">.</span><span class="n">url_name</span><span class="p">,</span> <span class="n">slug</span><span class="p">),</span>
+             <span class="s">&#39;tabs/{0}.html&#39;</span><span class="o">.</span><span class="n">format</span><span class="p">(</span><span class="n">slug</span><span class="p">)]</span>
+    <span class="n">fs</span> <span class="o">=</span> <span class="n">course</span><span class="o">.</span><span class="n">system</span><span class="o">.</span><span class="n">resources_fs</span>
+    <span class="k">for</span> <span class="n">p</span> <span class="ow">in</span> <span class="n">paths</span><span class="p">:</span>
+        <span class="k">if</span> <span class="n">fs</span><span class="o">.</span><span class="n">exists</span><span class="p">(</span><span class="n">p</span><span class="p">):</span>
+            <span class="k">try</span><span class="p">:</span>
+                <span class="k">with</span> <span class="n">fs</span><span class="o">.</span><span class="n">open</span><span class="p">(</span><span class="n">p</span><span class="p">)</span> <span class="k">as</span> <span class="n">tabfile</span><span class="p">:</span>
+                    <span class="c"># TODO: redundant with module_render.py.  Want to be helper methods in static_replace or something.</span>
+                    <span class="n">text</span> <span class="o">=</span> <span class="n">tabfile</span><span class="o">.</span><span class="n">read</span><span class="p">()</span><span class="o">.</span><span class="n">decode</span><span class="p">(</span><span class="s">&#39;utf-8&#39;</span><span class="p">)</span>
+                    <span class="n">contents</span> <span class="o">=</span> <span class="n">replace_urls</span><span class="p">(</span><span class="n">text</span><span class="p">,</span> <span class="n">course</span><span class="o">.</span><span class="n">metadata</span><span class="p">[</span><span class="s">&#39;data_dir&#39;</span><span class="p">])</span>
+                    <span class="k">return</span> <span class="n">replace_urls</span><span class="p">(</span><span class="n">contents</span><span class="p">,</span> <span class="n">staticfiles_prefix</span><span class="o">=</span><span class="s">&#39;/courses/&#39;</span><span class="o">+</span><span class="n">course</span><span class="o">.</span><span class="n">id</span><span class="p">,</span> <span class="n">replace_prefix</span><span class="o">=</span><span class="s">&#39;/course/&#39;</span><span class="p">)</span>
+            <span class="k">except</span> <span class="p">(</span><span class="n">ResourceNotFoundError</span><span class="p">)</span> <span class="k">as</span> <span class="n">err</span><span class="p">:</span>
+                <span class="n">log</span><span class="o">.</span><span class="n">exception</span><span class="p">(</span><span class="s">&quot;Couldn&#39;t load tab contents from &#39;{0}&#39;: {1}&quot;</span><span class="o">.</span><span class="n">format</span><span class="p">(</span><span class="n">p</span><span class="p">,</span> <span class="n">err</span><span class="p">))</span>
+                <span class="k">return</span> <span class="bp">None</span>
+    <span class="k">return</span> <span class="bp">None</span></div>
+</pre></div>
+
+          </div>
+        </div>
+      </div>
+      <div class="clearer"></div>
+    </div>
+    <div class="related">
+      <h3>Navigation</h3>
+      <ul>
+        <li class="right" style="margin-right: 10px">
+          <a href="../../genindex.html" title="General Index"
+             >index</a></li>
+        <li class="right" >
+          <a href="../../py-modindex.html" title="Python Module Index"
+             >modules</a> |</li>
+        <li><a href="../../index.html">MITx 1.0 documentation</a> &raquo;</li>
+          <li><a href="../index.html" >Module code</a> &raquo;</li> 
+      </ul>
+    </div>
+    <div class="footer">
+        &copy; Copyright 2012, MITx team.
+      Created using <a href="http://sphinx.pocoo.org/">Sphinx</a> 1.1.3.
+    </div>
+  </body>
+</html>

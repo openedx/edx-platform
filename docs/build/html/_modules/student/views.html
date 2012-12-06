@@ -1,0 +1,873 @@
+
+
+<!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Transitional//EN"
+  "http://www.w3.org/TR/xhtml1/DTD/xhtml1-transitional.dtd">
+
+
+<html xmlns="http://www.w3.org/1999/xhtml">
+  <head>
+    <meta http-equiv="Content-Type" content="text/html; charset=utf-8" />
+    
+    <title>student.views &mdash; MITx 1.0 documentation</title>
+    
+    <link rel="stylesheet" href="../../_static/sphinxdoc.css" type="text/css" />
+    <link rel="stylesheet" href="../../_static/pygments.css" type="text/css" />
+    
+    <script type="text/javascript">
+      var DOCUMENTATION_OPTIONS = {
+        URL_ROOT:    '../../',
+        VERSION:     '1.0',
+        COLLAPSE_INDEX: false,
+        FILE_SUFFIX: '.html',
+        HAS_SOURCE:  true
+      };
+    </script>
+    <script type="text/javascript" src="../../_static/jquery.js"></script>
+    <script type="text/javascript" src="../../_static/underscore.js"></script>
+    <script type="text/javascript" src="../../_static/doctools.js"></script>
+    <script type="text/javascript" src="http://cdn.mathjax.org/mathjax/latest/MathJax.js?config=TeX-AMS-MML_HTMLorMML"></script>
+    <link rel="top" title="MITx 1.0 documentation" href="../../index.html" />
+    <link rel="up" title="Module code" href="../index.html" /> 
+  </head>
+  <body>
+<img src="../../_static/homepage-bg.jpg" alt="Edx logo"  width="100%;"/>
+
+    <div class="related">
+      <h3>Navigation</h3>
+      <ul>
+        <li class="right" style="margin-right: 10px">
+          <a href="../../genindex.html" title="General Index"
+             accesskey="I">index</a></li>
+        <li class="right" >
+          <a href="../../py-modindex.html" title="Python Module Index"
+             >modules</a> |</li>
+        <li><a href="../../index.html">MITx 1.0 documentation</a> &raquo;</li>
+          <li><a href="../index.html" accesskey="U">Module code</a> &raquo;</li> 
+      </ul>
+    </div>
+      <div class="sphinxsidebar">
+        <div class="sphinxsidebarwrapper">
+<div id="searchbox" style="display: none">
+  <h3>Quick search</h3>
+    <form class="search" action="../../search.html" method="get">
+      <input type="text" name="q" />
+      <input type="submit" value="Go" />
+      <input type="hidden" name="check_keywords" value="yes" />
+      <input type="hidden" name="area" value="default" />
+    </form>
+    <p class="searchtip" style="font-size: 90%">
+    Enter search terms or a module, class or function name.
+    </p>
+</div>
+<script type="text/javascript">$('#searchbox').show(0);</script>
+        </div>
+      </div>
+
+    <div class="document">
+      <div class="documentwrapper">
+        <div class="bodywrapper">
+          <div class="body">
+            
+  <h1>Source code for student.views</h1><div class="highlight"><pre>
+<span class="kn">import</span> <span class="nn">datetime</span>
+<span class="kn">import</span> <span class="nn">feedparser</span>
+<span class="kn">import</span> <span class="nn">itertools</span>
+<span class="kn">import</span> <span class="nn">json</span>
+<span class="kn">import</span> <span class="nn">logging</span>
+<span class="kn">import</span> <span class="nn">random</span>
+<span class="kn">import</span> <span class="nn">string</span>
+<span class="kn">import</span> <span class="nn">sys</span>
+<span class="kn">import</span> <span class="nn">time</span>
+<span class="kn">import</span> <span class="nn">urllib</span>
+<span class="kn">import</span> <span class="nn">uuid</span>
+
+<span class="kn">from</span> <span class="nn">django.conf</span> <span class="kn">import</span> <span class="n">settings</span>
+<span class="kn">from</span> <span class="nn">django.contrib.auth</span> <span class="kn">import</span> <span class="n">logout</span><span class="p">,</span> <span class="n">authenticate</span><span class="p">,</span> <span class="n">login</span>
+<span class="kn">from</span> <span class="nn">django.contrib.auth.forms</span> <span class="kn">import</span> <span class="n">PasswordResetForm</span>
+<span class="kn">from</span> <span class="nn">django.contrib.auth.models</span> <span class="kn">import</span> <span class="n">User</span>
+<span class="kn">from</span> <span class="nn">django.contrib.auth.decorators</span> <span class="kn">import</span> <span class="n">login_required</span>
+<span class="kn">from</span> <span class="nn">django.core.context_processors</span> <span class="kn">import</span> <span class="n">csrf</span>
+<span class="kn">from</span> <span class="nn">django.core.mail</span> <span class="kn">import</span> <span class="n">send_mail</span>
+<span class="kn">from</span> <span class="nn">django.core.validators</span> <span class="kn">import</span> <span class="n">validate_email</span><span class="p">,</span> <span class="n">validate_slug</span><span class="p">,</span> <span class="n">ValidationError</span>
+<span class="kn">from</span> <span class="nn">django.db</span> <span class="kn">import</span> <span class="n">IntegrityError</span>
+<span class="kn">from</span> <span class="nn">django.http</span> <span class="kn">import</span> <span class="n">HttpResponse</span><span class="p">,</span> <span class="n">Http404</span>
+<span class="kn">from</span> <span class="nn">django.shortcuts</span> <span class="kn">import</span> <span class="n">redirect</span>
+<span class="kn">from</span> <span class="nn">mitxmako.shortcuts</span> <span class="kn">import</span> <span class="n">render_to_response</span><span class="p">,</span> <span class="n">render_to_string</span>
+<span class="kn">from</span> <span class="nn">bs4</span> <span class="kn">import</span> <span class="n">BeautifulSoup</span>
+<span class="kn">from</span> <span class="nn">django.core.cache</span> <span class="kn">import</span> <span class="n">cache</span>
+
+<span class="kn">from</span> <span class="nn">django_future.csrf</span> <span class="kn">import</span> <span class="n">ensure_csrf_cookie</span>
+<span class="kn">from</span> <span class="nn">student.models</span> <span class="kn">import</span> <span class="p">(</span><span class="n">Registration</span><span class="p">,</span> <span class="n">UserProfile</span><span class="p">,</span>
+                            <span class="n">PendingNameChange</span><span class="p">,</span> <span class="n">PendingEmailChange</span><span class="p">,</span>
+                            <span class="n">CourseEnrollment</span><span class="p">)</span>
+<span class="kn">from</span> <span class="nn">xmodule.course_module</span> <span class="kn">import</span> <span class="n">CourseDescriptor</span>
+<span class="kn">from</span> <span class="nn">xmodule.modulestore.exceptions</span> <span class="kn">import</span> <span class="n">ItemNotFoundError</span>
+<span class="kn">from</span> <span class="nn">xmodule.modulestore.django</span> <span class="kn">import</span> <span class="n">modulestore</span>
+<span class="kn">from</span> <span class="nn">xmodule.modulestore.exceptions</span> <span class="kn">import</span> <span class="n">ItemNotFoundError</span>
+
+<span class="kn">from</span> <span class="nn">datetime</span> <span class="kn">import</span> <span class="n">date</span>
+<span class="kn">from</span> <span class="nn">collections</span> <span class="kn">import</span> <span class="n">namedtuple</span>
+<span class="kn">from</span> <span class="nn">courseware.courses</span> <span class="kn">import</span> <span class="n">get_courses_by_university</span>
+<span class="kn">from</span> <span class="nn">courseware.access</span> <span class="kn">import</span> <span class="n">has_access</span>
+
+<span class="kn">from</span> <span class="nn">statsd</span> <span class="kn">import</span> <span class="n">statsd</span>
+
+<span class="n">log</span> <span class="o">=</span> <span class="n">logging</span><span class="o">.</span><span class="n">getLogger</span><span class="p">(</span><span class="s">&quot;mitx.student&quot;</span><span class="p">)</span>
+<span class="n">Article</span> <span class="o">=</span> <span class="n">namedtuple</span><span class="p">(</span><span class="s">&#39;Article&#39;</span><span class="p">,</span> <span class="s">&#39;title url author image deck publication publish_date&#39;</span><span class="p">)</span>
+
+<div class="viewcode-block" id="csrf_token"><a class="viewcode-back" href="../../djangoapps-common.html#student.views.csrf_token">[docs]</a><span class="k">def</span> <span class="nf">csrf_token</span><span class="p">(</span><span class="n">context</span><span class="p">):</span>
+    <span class="sd">&#39;&#39;&#39; A csrf token that can be included in a form.</span>
+<span class="sd">    &#39;&#39;&#39;</span>
+    <span class="n">csrf_token</span> <span class="o">=</span> <span class="n">context</span><span class="o">.</span><span class="n">get</span><span class="p">(</span><span class="s">&#39;csrf_token&#39;</span><span class="p">,</span> <span class="s">&#39;&#39;</span><span class="p">)</span>
+    <span class="k">if</span> <span class="n">csrf_token</span> <span class="o">==</span> <span class="s">&#39;NOTPROVIDED&#39;</span><span class="p">:</span>
+        <span class="k">return</span> <span class="s">&#39;&#39;</span>
+    <span class="k">return</span> <span class="p">(</span><span class="s">u&#39;&lt;div style=&quot;display:none&quot;&gt;&lt;input type=&quot;hidden&quot;&#39;</span>
+            <span class="s">&#39; name=&quot;csrfmiddlewaretoken&quot; value=&quot;</span><span class="si">%s</span><span class="s">&quot; /&gt;&lt;/div&gt;&#39;</span> <span class="o">%</span> <span class="p">(</span><span class="n">csrf_token</span><span class="p">))</span>
+
+
+<span class="c"># NOTE: This view is not linked to directly--it is called from</span>
+<span class="c"># branding/views.py:index(), which is cached for anonymous users.</span>
+<span class="c"># This means that it should always return the same thing for anon</span>
+<span class="c"># users. (in particular, no switching based on query params allowed)</span></div>
+<div class="viewcode-block" id="index"><a class="viewcode-back" href="../../djangoapps-common.html#student.views.index">[docs]</a><span class="k">def</span> <span class="nf">index</span><span class="p">(</span><span class="n">request</span><span class="p">,</span> <span class="n">extra_context</span><span class="o">=</span><span class="p">{},</span> <span class="n">user</span><span class="o">=</span><span class="bp">None</span><span class="p">):</span>
+    <span class="sd">&#39;&#39;&#39;</span>
+<span class="sd">    Render the edX main page.</span>
+
+<span class="sd">    extra_context is used to allow immediate display of certain modal windows, eg signup,</span>
+<span class="sd">    as used by external_auth.</span>
+<span class="sd">    &#39;&#39;&#39;</span>
+    <span class="n">feed_data</span> <span class="o">=</span> <span class="n">cache</span><span class="o">.</span><span class="n">get</span><span class="p">(</span><span class="s">&quot;students_index_rss_feed_data&quot;</span><span class="p">)</span>
+    <span class="k">if</span> <span class="n">feed_data</span> <span class="o">==</span> <span class="bp">None</span><span class="p">:</span>
+        <span class="k">if</span> <span class="nb">hasattr</span><span class="p">(</span><span class="n">settings</span><span class="p">,</span> <span class="s">&#39;RSS_URL&#39;</span><span class="p">):</span>
+            <span class="n">feed_data</span> <span class="o">=</span> <span class="n">urllib</span><span class="o">.</span><span class="n">urlopen</span><span class="p">(</span><span class="n">settings</span><span class="o">.</span><span class="n">RSS_URL</span><span class="p">)</span><span class="o">.</span><span class="n">read</span><span class="p">()</span>
+        <span class="k">else</span><span class="p">:</span>
+            <span class="n">feed_data</span> <span class="o">=</span> <span class="n">render_to_string</span><span class="p">(</span><span class="s">&quot;feed.rss&quot;</span><span class="p">,</span> <span class="bp">None</span><span class="p">)</span>
+        <span class="n">cache</span><span class="o">.</span><span class="n">set</span><span class="p">(</span><span class="s">&quot;students_index_rss_feed_data&quot;</span><span class="p">,</span> <span class="n">feed_data</span><span class="p">,</span> <span class="n">settings</span><span class="o">.</span><span class="n">RSS_TIMEOUT</span><span class="p">)</span>
+
+    <span class="n">feed</span> <span class="o">=</span> <span class="n">feedparser</span><span class="o">.</span><span class="n">parse</span><span class="p">(</span><span class="n">feed_data</span><span class="p">)</span>
+    <span class="n">entries</span> <span class="o">=</span> <span class="n">feed</span><span class="p">[</span><span class="s">&#39;entries&#39;</span><span class="p">][</span><span class="mi">0</span><span class="p">:</span><span class="mi">3</span><span class="p">]</span>
+    <span class="k">for</span> <span class="n">entry</span> <span class="ow">in</span> <span class="n">entries</span><span class="p">:</span>
+        <span class="n">soup</span> <span class="o">=</span> <span class="n">BeautifulSoup</span><span class="p">(</span><span class="n">entry</span><span class="o">.</span><span class="n">description</span><span class="p">)</span>
+        <span class="n">entry</span><span class="o">.</span><span class="n">image</span> <span class="o">=</span> <span class="n">soup</span><span class="o">.</span><span class="n">img</span><span class="p">[</span><span class="s">&#39;src&#39;</span><span class="p">]</span> <span class="k">if</span> <span class="n">soup</span><span class="o">.</span><span class="n">img</span> <span class="k">else</span> <span class="bp">None</span>
+        <span class="n">entry</span><span class="o">.</span><span class="n">summary</span> <span class="o">=</span> <span class="n">soup</span><span class="o">.</span><span class="n">getText</span><span class="p">()</span>
+
+    <span class="c"># The course selection work is done in courseware.courses.</span>
+    <span class="n">domain</span> <span class="o">=</span> <span class="n">settings</span><span class="o">.</span><span class="n">MITX_FEATURES</span><span class="o">.</span><span class="n">get</span><span class="p">(</span><span class="s">&#39;FORCE_UNIVERSITY_DOMAIN&#39;</span><span class="p">)</span>	<span class="c"># normally False</span>
+    <span class="k">if</span> <span class="n">domain</span><span class="o">==</span><span class="bp">False</span><span class="p">:</span>				<span class="c"># do explicit check, because domain=None is valid</span>
+        <span class="n">domain</span> <span class="o">=</span> <span class="n">request</span><span class="o">.</span><span class="n">META</span><span class="o">.</span><span class="n">get</span><span class="p">(</span><span class="s">&#39;HTTP_HOST&#39;</span><span class="p">)</span>
+    <span class="n">universities</span> <span class="o">=</span> <span class="n">get_courses_by_university</span><span class="p">(</span><span class="bp">None</span><span class="p">,</span>
+                                             <span class="n">domain</span><span class="o">=</span><span class="n">domain</span><span class="p">)</span>
+    <span class="n">context</span> <span class="o">=</span> <span class="p">{</span><span class="s">&#39;universities&#39;</span><span class="p">:</span> <span class="n">universities</span><span class="p">,</span> <span class="s">&#39;entries&#39;</span><span class="p">:</span> <span class="n">entries</span><span class="p">}</span>
+    <span class="n">context</span><span class="o">.</span><span class="n">update</span><span class="p">(</span><span class="n">extra_context</span><span class="p">)</span>
+    <span class="k">return</span> <span class="n">render_to_response</span><span class="p">(</span><span class="s">&#39;index.html&#39;</span><span class="p">,</span> <span class="n">context</span><span class="p">)</span>
+</div>
+<div class="viewcode-block" id="course_from_id"><a class="viewcode-back" href="../../djangoapps-common.html#student.views.course_from_id">[docs]</a><span class="k">def</span> <span class="nf">course_from_id</span><span class="p">(</span><span class="n">course_id</span><span class="p">):</span>
+    <span class="sd">&quot;&quot;&quot;Return the CourseDescriptor corresponding to this course_id&quot;&quot;&quot;</span>
+    <span class="n">course_loc</span> <span class="o">=</span> <span class="n">CourseDescriptor</span><span class="o">.</span><span class="n">id_to_location</span><span class="p">(</span><span class="n">course_id</span><span class="p">)</span>
+    <span class="k">return</span> <span class="n">modulestore</span><span class="p">()</span><span class="o">.</span><span class="n">get_instance</span><span class="p">(</span><span class="n">course_id</span><span class="p">,</span> <span class="n">course_loc</span><span class="p">)</span>
+
+</div>
+<span class="k">def</span> <span class="nf">press</span><span class="p">(</span><span class="n">request</span><span class="p">):</span>
+    <span class="n">json_articles</span> <span class="o">=</span> <span class="n">cache</span><span class="o">.</span><span class="n">get</span><span class="p">(</span><span class="s">&quot;student_press_json_articles&quot;</span><span class="p">)</span>
+    <span class="k">if</span> <span class="n">json_articles</span> <span class="o">==</span> <span class="bp">None</span><span class="p">:</span>
+        <span class="k">if</span> <span class="nb">hasattr</span><span class="p">(</span><span class="n">settings</span><span class="p">,</span> <span class="s">&#39;RSS_URL&#39;</span><span class="p">):</span>
+            <span class="n">content</span> <span class="o">=</span> <span class="n">urllib</span><span class="o">.</span><span class="n">urlopen</span><span class="p">(</span><span class="n">settings</span><span class="o">.</span><span class="n">PRESS_URL</span><span class="p">)</span><span class="o">.</span><span class="n">read</span><span class="p">()</span>
+            <span class="n">json_articles</span> <span class="o">=</span> <span class="n">json</span><span class="o">.</span><span class="n">loads</span><span class="p">(</span><span class="n">content</span><span class="p">)</span>
+        <span class="k">else</span><span class="p">:</span>
+            <span class="n">content</span> <span class="o">=</span> <span class="nb">open</span><span class="p">(</span><span class="n">settings</span><span class="o">.</span><span class="n">PROJECT_ROOT</span> <span class="o">/</span> <span class="s">&quot;templates&quot;</span> <span class="o">/</span> <span class="s">&quot;press.json&quot;</span><span class="p">)</span><span class="o">.</span><span class="n">read</span><span class="p">()</span>
+            <span class="n">json_articles</span> <span class="o">=</span> <span class="n">json</span><span class="o">.</span><span class="n">loads</span><span class="p">(</span><span class="n">content</span><span class="p">)</span>
+        <span class="n">cache</span><span class="o">.</span><span class="n">set</span><span class="p">(</span><span class="s">&quot;student_press_json_articles&quot;</span><span class="p">,</span> <span class="n">json_articles</span><span class="p">)</span>
+    <span class="n">articles</span> <span class="o">=</span> <span class="p">[</span><span class="n">Article</span><span class="p">(</span><span class="o">**</span><span class="n">article</span><span class="p">)</span> <span class="k">for</span> <span class="n">article</span> <span class="ow">in</span> <span class="n">json_articles</span><span class="p">]</span>
+    <span class="k">return</span> <span class="n">render_to_response</span><span class="p">(</span><span class="s">&#39;static_templates/press.html&#39;</span><span class="p">,</span> <span class="p">{</span><span class="s">&#39;articles&#39;</span><span class="p">:</span> <span class="n">articles</span><span class="p">})</span>
+
+
+<span class="nd">@login_required</span>
+<span class="nd">@ensure_csrf_cookie</span>
+<span class="k">def</span> <span class="nf">dashboard</span><span class="p">(</span><span class="n">request</span><span class="p">):</span>
+    <span class="n">user</span> <span class="o">=</span> <span class="n">request</span><span class="o">.</span><span class="n">user</span>
+    <span class="n">enrollments</span> <span class="o">=</span> <span class="n">CourseEnrollment</span><span class="o">.</span><span class="n">objects</span><span class="o">.</span><span class="n">filter</span><span class="p">(</span><span class="n">user</span><span class="o">=</span><span class="n">user</span><span class="p">)</span>
+
+    <span class="c"># Build our courses list for the user, but ignore any courses that no longer</span>
+    <span class="c"># exist (because the course IDs have changed). Still, we don&#39;t delete those</span>
+    <span class="c"># enrollments, because it could have been a data push snafu.</span>
+    <span class="n">courses</span> <span class="o">=</span> <span class="p">[]</span>
+    <span class="k">for</span> <span class="n">enrollment</span> <span class="ow">in</span> <span class="n">enrollments</span><span class="p">:</span>
+        <span class="k">try</span><span class="p">:</span>
+            <span class="n">courses</span><span class="o">.</span><span class="n">append</span><span class="p">(</span><span class="n">course_from_id</span><span class="p">(</span><span class="n">enrollment</span><span class="o">.</span><span class="n">course_id</span><span class="p">))</span>
+        <span class="k">except</span> <span class="n">ItemNotFoundError</span><span class="p">:</span>
+            <span class="n">log</span><span class="o">.</span><span class="n">error</span><span class="p">(</span><span class="s">&quot;User {0} enrolled in non-existent course {1}&quot;</span>
+                      <span class="o">.</span><span class="n">format</span><span class="p">(</span><span class="n">user</span><span class="o">.</span><span class="n">username</span><span class="p">,</span> <span class="n">enrollment</span><span class="o">.</span><span class="n">course_id</span><span class="p">))</span>
+
+    <span class="n">message</span> <span class="o">=</span> <span class="s">&quot;&quot;</span>
+    <span class="k">if</span> <span class="ow">not</span> <span class="n">user</span><span class="o">.</span><span class="n">is_active</span><span class="p">:</span>
+        <span class="n">message</span> <span class="o">=</span> <span class="n">render_to_string</span><span class="p">(</span><span class="s">&#39;registration/activate_account_notice.html&#39;</span><span class="p">,</span> <span class="p">{</span><span class="s">&#39;email&#39;</span><span class="p">:</span> <span class="n">user</span><span class="o">.</span><span class="n">email</span><span class="p">})</span>
+
+
+    <span class="c"># Global staff can see what courses errored on their dashboard</span>
+    <span class="n">staff_access</span> <span class="o">=</span> <span class="bp">False</span>
+    <span class="n">errored_courses</span> <span class="o">=</span> <span class="p">{}</span>
+    <span class="k">if</span> <span class="n">has_access</span><span class="p">(</span><span class="n">user</span><span class="p">,</span> <span class="s">&#39;global&#39;</span><span class="p">,</span> <span class="s">&#39;staff&#39;</span><span class="p">):</span>
+        <span class="c"># Show any courses that errored on load</span>
+        <span class="n">staff_access</span> <span class="o">=</span> <span class="bp">True</span>
+        <span class="n">errored_courses</span> <span class="o">=</span> <span class="n">modulestore</span><span class="p">()</span><span class="o">.</span><span class="n">get_errored_courses</span><span class="p">()</span>
+
+    <span class="n">show_courseware_links_for</span> <span class="o">=</span> <span class="nb">frozenset</span><span class="p">(</span><span class="n">course</span><span class="o">.</span><span class="n">id</span> <span class="k">for</span> <span class="n">course</span> <span class="ow">in</span> <span class="n">courses</span>
+                                          <span class="k">if</span> <span class="n">has_access</span><span class="p">(</span><span class="n">request</span><span class="o">.</span><span class="n">user</span><span class="p">,</span> <span class="n">course</span><span class="p">,</span> <span class="s">&#39;load&#39;</span><span class="p">))</span>
+
+    <span class="n">context</span> <span class="o">=</span> <span class="p">{</span><span class="s">&#39;courses&#39;</span><span class="p">:</span> <span class="n">courses</span><span class="p">,</span>
+               <span class="s">&#39;message&#39;</span><span class="p">:</span> <span class="n">message</span><span class="p">,</span>
+               <span class="s">&#39;staff_access&#39;</span><span class="p">:</span> <span class="n">staff_access</span><span class="p">,</span>
+               <span class="s">&#39;errored_courses&#39;</span><span class="p">:</span> <span class="n">errored_courses</span><span class="p">,</span>
+               <span class="s">&#39;show_courseware_links_for&#39;</span> <span class="p">:</span> <span class="n">show_courseware_links_for</span><span class="p">}</span>
+
+    <span class="k">return</span> <span class="n">render_to_response</span><span class="p">(</span><span class="s">&#39;dashboard.html&#39;</span><span class="p">,</span> <span class="n">context</span><span class="p">)</span>
+
+
+<div class="viewcode-block" id="try_change_enrollment"><a class="viewcode-back" href="../../djangoapps-common.html#student.views.try_change_enrollment">[docs]</a><span class="k">def</span> <span class="nf">try_change_enrollment</span><span class="p">(</span><span class="n">request</span><span class="p">):</span>
+    <span class="sd">&quot;&quot;&quot;</span>
+<span class="sd">    This method calls change_enrollment if the necessary POST</span>
+<span class="sd">    parameters are present, but does not return anything. It</span>
+<span class="sd">    simply logs the result or exception. This is usually</span>
+<span class="sd">    called after a registration or login, as secondary action.</span>
+<span class="sd">    It should not interrupt a successful registration or login.</span>
+<span class="sd">    &quot;&quot;&quot;</span>
+    <span class="k">if</span> <span class="s">&#39;enrollment_action&#39;</span> <span class="ow">in</span> <span class="n">request</span><span class="o">.</span><span class="n">POST</span><span class="p">:</span>
+        <span class="k">try</span><span class="p">:</span>
+            <span class="n">enrollment_output</span> <span class="o">=</span> <span class="n">change_enrollment</span><span class="p">(</span><span class="n">request</span><span class="p">)</span>
+            <span class="c"># There isn&#39;t really a way to display the results to the user, so we just log it</span>
+            <span class="c"># We expect the enrollment to be a success, and will show up on the dashboard anyway</span>
+            <span class="n">log</span><span class="o">.</span><span class="n">info</span><span class="p">(</span><span class="s">&quot;Attempted to automatically enroll after login. Results: {0}&quot;</span><span class="o">.</span><span class="n">format</span><span class="p">(</span><span class="n">enrollment_output</span><span class="p">))</span>
+        <span class="k">except</span> <span class="ne">Exception</span><span class="p">,</span> <span class="n">e</span><span class="p">:</span>
+            <span class="n">log</span><span class="o">.</span><span class="n">exception</span><span class="p">(</span><span class="s">&quot;Exception automatically enrolling after login: {0}&quot;</span><span class="o">.</span><span class="n">format</span><span class="p">(</span><span class="nb">str</span><span class="p">(</span><span class="n">e</span><span class="p">)))</span>
+
+</div>
+<span class="nd">@login_required</span>
+<div class="viewcode-block" id="change_enrollment_view"><a class="viewcode-back" href="../../djangoapps-common.html#student.views.change_enrollment_view">[docs]</a><span class="k">def</span> <span class="nf">change_enrollment_view</span><span class="p">(</span><span class="n">request</span><span class="p">):</span>
+    <span class="sd">&quot;&quot;&quot;Delegate to change_enrollment to actually do the work.&quot;&quot;&quot;</span>
+    <span class="k">return</span> <span class="n">HttpResponse</span><span class="p">(</span><span class="n">json</span><span class="o">.</span><span class="n">dumps</span><span class="p">(</span><span class="n">change_enrollment</span><span class="p">(</span><span class="n">request</span><span class="p">)))</span>
+
+
+</div>
+<span class="k">def</span> <span class="nf">change_enrollment</span><span class="p">(</span><span class="n">request</span><span class="p">):</span>
+    <span class="k">if</span> <span class="n">request</span><span class="o">.</span><span class="n">method</span> <span class="o">!=</span> <span class="s">&quot;POST&quot;</span><span class="p">:</span>
+        <span class="k">raise</span> <span class="n">Http404</span>
+
+    <span class="n">user</span> <span class="o">=</span> <span class="n">request</span><span class="o">.</span><span class="n">user</span>
+    <span class="k">if</span> <span class="ow">not</span> <span class="n">user</span><span class="o">.</span><span class="n">is_authenticated</span><span class="p">():</span>
+        <span class="k">raise</span> <span class="n">Http404</span>
+
+    <span class="n">action</span> <span class="o">=</span> <span class="n">request</span><span class="o">.</span><span class="n">POST</span><span class="o">.</span><span class="n">get</span><span class="p">(</span><span class="s">&quot;enrollment_action&quot;</span><span class="p">,</span> <span class="s">&quot;&quot;</span><span class="p">)</span>
+
+    <span class="n">course_id</span> <span class="o">=</span> <span class="n">request</span><span class="o">.</span><span class="n">POST</span><span class="o">.</span><span class="n">get</span><span class="p">(</span><span class="s">&quot;course_id&quot;</span><span class="p">,</span> <span class="bp">None</span><span class="p">)</span>
+    <span class="k">if</span> <span class="n">course_id</span> <span class="o">==</span> <span class="bp">None</span><span class="p">:</span>
+        <span class="k">return</span> <span class="n">HttpResponse</span><span class="p">(</span><span class="n">json</span><span class="o">.</span><span class="n">dumps</span><span class="p">({</span><span class="s">&#39;success&#39;</span><span class="p">:</span> <span class="bp">False</span><span class="p">,</span>
+                                        <span class="s">&#39;error&#39;</span><span class="p">:</span> <span class="s">&#39;There was an error receiving the course id.&#39;</span><span class="p">}))</span>
+
+    <span class="k">if</span> <span class="n">action</span> <span class="o">==</span> <span class="s">&quot;enroll&quot;</span><span class="p">:</span>
+        <span class="c"># Make sure the course exists</span>
+        <span class="c"># We don&#39;t do this check on unenroll, or a bad course id can&#39;t be unenrolled from</span>
+        <span class="k">try</span><span class="p">:</span>
+            <span class="n">course</span> <span class="o">=</span> <span class="n">course_from_id</span><span class="p">(</span><span class="n">course_id</span><span class="p">)</span>
+        <span class="k">except</span> <span class="n">ItemNotFoundError</span><span class="p">:</span>
+            <span class="n">log</span><span class="o">.</span><span class="n">warning</span><span class="p">(</span><span class="s">&quot;User {0} tried to enroll in non-existant course {1}&quot;</span>
+                      <span class="o">.</span><span class="n">format</span><span class="p">(</span><span class="n">user</span><span class="o">.</span><span class="n">username</span><span class="p">,</span> <span class="n">enrollment</span><span class="o">.</span><span class="n">course_id</span><span class="p">))</span>
+            <span class="k">return</span> <span class="p">{</span><span class="s">&#39;success&#39;</span><span class="p">:</span> <span class="bp">False</span><span class="p">,</span> <span class="s">&#39;error&#39;</span><span class="p">:</span> <span class="s">&#39;The course requested does not exist.&#39;</span><span class="p">}</span>
+
+        <span class="k">if</span> <span class="ow">not</span> <span class="n">has_access</span><span class="p">(</span><span class="n">user</span><span class="p">,</span> <span class="n">course</span><span class="p">,</span> <span class="s">&#39;enroll&#39;</span><span class="p">):</span>
+            <span class="k">return</span> <span class="p">{</span><span class="s">&#39;success&#39;</span><span class="p">:</span> <span class="bp">False</span><span class="p">,</span>
+                    <span class="s">&#39;error&#39;</span><span class="p">:</span> <span class="s">&#39;enrollment in {} not allowed at this time&#39;</span>
+                    <span class="o">.</span><span class="n">format</span><span class="p">(</span><span class="n">course</span><span class="o">.</span><span class="n">display_name</span><span class="p">)}</span>
+                    
+        <span class="n">org</span><span class="p">,</span> <span class="n">course_num</span><span class="p">,</span> <span class="n">run</span><span class="o">=</span><span class="n">course_id</span><span class="o">.</span><span class="n">split</span><span class="p">(</span><span class="s">&quot;/&quot;</span><span class="p">)</span>        
+        <span class="n">statsd</span><span class="o">.</span><span class="n">increment</span><span class="p">(</span><span class="s">&quot;common.student.enrollment&quot;</span><span class="p">,</span>
+                        <span class="n">tags</span><span class="o">=</span><span class="p">[</span><span class="s">&quot;org:{0}&quot;</span><span class="o">.</span><span class="n">format</span><span class="p">(</span><span class="n">org</span><span class="p">),</span>
+                              <span class="s">&quot;course:{0}&quot;</span><span class="o">.</span><span class="n">format</span><span class="p">(</span><span class="n">course_num</span><span class="p">),</span>
+                              <span class="s">&quot;run:{0}&quot;</span><span class="o">.</span><span class="n">format</span><span class="p">(</span><span class="n">run</span><span class="p">)])</span>
+        
+        <span class="n">enrollment</span><span class="p">,</span> <span class="n">created</span> <span class="o">=</span> <span class="n">CourseEnrollment</span><span class="o">.</span><span class="n">objects</span><span class="o">.</span><span class="n">get_or_create</span><span class="p">(</span><span class="n">user</span><span class="o">=</span><span class="n">user</span><span class="p">,</span> <span class="n">course_id</span><span class="o">=</span><span class="n">course</span><span class="o">.</span><span class="n">id</span><span class="p">)</span>
+        <span class="k">return</span> <span class="p">{</span><span class="s">&#39;success&#39;</span><span class="p">:</span> <span class="bp">True</span><span class="p">}</span>
+
+    <span class="k">elif</span> <span class="n">action</span> <span class="o">==</span> <span class="s">&quot;unenroll&quot;</span><span class="p">:</span>
+        <span class="k">try</span><span class="p">:</span>
+            <span class="n">enrollment</span> <span class="o">=</span> <span class="n">CourseEnrollment</span><span class="o">.</span><span class="n">objects</span><span class="o">.</span><span class="n">get</span><span class="p">(</span><span class="n">user</span><span class="o">=</span><span class="n">user</span><span class="p">,</span> <span class="n">course_id</span><span class="o">=</span><span class="n">course_id</span><span class="p">)</span>
+            <span class="n">enrollment</span><span class="o">.</span><span class="n">delete</span><span class="p">()</span>
+            
+            <span class="n">org</span><span class="p">,</span> <span class="n">course_num</span><span class="p">,</span> <span class="n">run</span><span class="o">=</span><span class="n">course_id</span><span class="o">.</span><span class="n">split</span><span class="p">(</span><span class="s">&quot;/&quot;</span><span class="p">)</span>        
+            <span class="n">statsd</span><span class="o">.</span><span class="n">increment</span><span class="p">(</span><span class="s">&quot;common.student.unenrollment&quot;</span><span class="p">,</span>
+                            <span class="n">tags</span><span class="o">=</span><span class="p">[</span><span class="s">&quot;org:{0}&quot;</span><span class="o">.</span><span class="n">format</span><span class="p">(</span><span class="n">org</span><span class="p">),</span>
+                                  <span class="s">&quot;course:{0}&quot;</span><span class="o">.</span><span class="n">format</span><span class="p">(</span><span class="n">course_num</span><span class="p">),</span>
+                                  <span class="s">&quot;run:{0}&quot;</span><span class="o">.</span><span class="n">format</span><span class="p">(</span><span class="n">run</span><span class="p">)])</span>
+                              
+            <span class="k">return</span> <span class="p">{</span><span class="s">&#39;success&#39;</span><span class="p">:</span> <span class="bp">True</span><span class="p">}</span>
+        <span class="k">except</span> <span class="n">CourseEnrollment</span><span class="o">.</span><span class="n">DoesNotExist</span><span class="p">:</span>
+            <span class="k">return</span> <span class="p">{</span><span class="s">&#39;success&#39;</span><span class="p">:</span> <span class="bp">False</span><span class="p">,</span> <span class="s">&#39;error&#39;</span><span class="p">:</span> <span class="s">&#39;You are not enrolled for this course.&#39;</span><span class="p">}</span>
+    <span class="k">else</span><span class="p">:</span>
+        <span class="k">return</span> <span class="p">{</span><span class="s">&#39;success&#39;</span><span class="p">:</span> <span class="bp">False</span><span class="p">,</span> <span class="s">&#39;error&#39;</span><span class="p">:</span> <span class="s">&#39;Invalid enrollment_action.&#39;</span><span class="p">}</span>
+
+    <span class="k">return</span> <span class="p">{</span><span class="s">&#39;success&#39;</span><span class="p">:</span> <span class="bp">False</span><span class="p">,</span> <span class="s">&#39;error&#39;</span><span class="p">:</span> <span class="s">&#39;We weren</span><span class="se">\&#39;</span><span class="s">t able to unenroll you. Please try again.&#39;</span><span class="p">}</span>
+
+
+<span class="c"># Need different levels of logging</span>
+<span class="nd">@ensure_csrf_cookie</span>
+<div class="viewcode-block" id="login_user"><a class="viewcode-back" href="../../djangoapps-common.html#student.views.login_user">[docs]</a><span class="k">def</span> <span class="nf">login_user</span><span class="p">(</span><span class="n">request</span><span class="p">,</span> <span class="n">error</span><span class="o">=</span><span class="s">&quot;&quot;</span><span class="p">):</span>
+    <span class="sd">&#39;&#39;&#39; AJAX request to log in the user. &#39;&#39;&#39;</span>
+    <span class="k">if</span> <span class="s">&#39;email&#39;</span> <span class="ow">not</span> <span class="ow">in</span> <span class="n">request</span><span class="o">.</span><span class="n">POST</span> <span class="ow">or</span> <span class="s">&#39;password&#39;</span> <span class="ow">not</span> <span class="ow">in</span> <span class="n">request</span><span class="o">.</span><span class="n">POST</span><span class="p">:</span>
+        <span class="k">return</span> <span class="n">HttpResponse</span><span class="p">(</span><span class="n">json</span><span class="o">.</span><span class="n">dumps</span><span class="p">({</span><span class="s">&#39;success&#39;</span><span class="p">:</span> <span class="bp">False</span><span class="p">,</span>
+                                        <span class="s">&#39;value&#39;</span><span class="p">:</span> <span class="s">&#39;There was an error receiving your login information. Please email us.&#39;</span><span class="p">}))</span>  <span class="c"># TODO: User error message</span>
+
+    <span class="n">email</span> <span class="o">=</span> <span class="n">request</span><span class="o">.</span><span class="n">POST</span><span class="p">[</span><span class="s">&#39;email&#39;</span><span class="p">]</span>
+    <span class="n">password</span> <span class="o">=</span> <span class="n">request</span><span class="o">.</span><span class="n">POST</span><span class="p">[</span><span class="s">&#39;password&#39;</span><span class="p">]</span>
+    <span class="k">try</span><span class="p">:</span>
+        <span class="n">user</span> <span class="o">=</span> <span class="n">User</span><span class="o">.</span><span class="n">objects</span><span class="o">.</span><span class="n">get</span><span class="p">(</span><span class="n">email</span><span class="o">=</span><span class="n">email</span><span class="p">)</span>
+    <span class="k">except</span> <span class="n">User</span><span class="o">.</span><span class="n">DoesNotExist</span><span class="p">:</span>
+        <span class="n">log</span><span class="o">.</span><span class="n">warning</span><span class="p">(</span><span class="s">&quot;Login failed - Unknown user email: {0}&quot;</span><span class="o">.</span><span class="n">format</span><span class="p">(</span><span class="n">email</span><span class="p">))</span>
+        <span class="k">return</span> <span class="n">HttpResponse</span><span class="p">(</span><span class="n">json</span><span class="o">.</span><span class="n">dumps</span><span class="p">({</span><span class="s">&#39;success&#39;</span><span class="p">:</span> <span class="bp">False</span><span class="p">,</span>
+                                        <span class="s">&#39;value&#39;</span><span class="p">:</span> <span class="s">&#39;Email or password is incorrect.&#39;</span><span class="p">}))</span>  <span class="c"># TODO: User error message</span>
+
+    <span class="n">username</span> <span class="o">=</span> <span class="n">user</span><span class="o">.</span><span class="n">username</span>
+    <span class="n">user</span> <span class="o">=</span> <span class="n">authenticate</span><span class="p">(</span><span class="n">username</span><span class="o">=</span><span class="n">username</span><span class="p">,</span> <span class="n">password</span><span class="o">=</span><span class="n">password</span><span class="p">)</span>
+    <span class="k">if</span> <span class="n">user</span> <span class="ow">is</span> <span class="bp">None</span><span class="p">:</span>
+        <span class="n">log</span><span class="o">.</span><span class="n">warning</span><span class="p">(</span><span class="s">&quot;Login failed - password for {0} is invalid&quot;</span><span class="o">.</span><span class="n">format</span><span class="p">(</span><span class="n">email</span><span class="p">))</span>
+        <span class="k">return</span> <span class="n">HttpResponse</span><span class="p">(</span><span class="n">json</span><span class="o">.</span><span class="n">dumps</span><span class="p">({</span><span class="s">&#39;success&#39;</span><span class="p">:</span> <span class="bp">False</span><span class="p">,</span>
+                                        <span class="s">&#39;value&#39;</span><span class="p">:</span> <span class="s">&#39;Email or password is incorrect.&#39;</span><span class="p">}))</span>
+
+    <span class="k">if</span> <span class="n">user</span> <span class="ow">is</span> <span class="ow">not</span> <span class="bp">None</span> <span class="ow">and</span> <span class="n">user</span><span class="o">.</span><span class="n">is_active</span><span class="p">:</span>
+        <span class="k">try</span><span class="p">:</span>
+            <span class="n">login</span><span class="p">(</span><span class="n">request</span><span class="p">,</span> <span class="n">user</span><span class="p">)</span>
+            <span class="k">if</span> <span class="n">request</span><span class="o">.</span><span class="n">POST</span><span class="o">.</span><span class="n">get</span><span class="p">(</span><span class="s">&#39;remember&#39;</span><span class="p">)</span> <span class="o">==</span> <span class="s">&#39;true&#39;</span><span class="p">:</span>
+                <span class="n">request</span><span class="o">.</span><span class="n">session</span><span class="o">.</span><span class="n">set_expiry</span><span class="p">(</span><span class="bp">None</span><span class="p">)</span>  <span class="c"># or change to 604800 for 7 days</span>
+                <span class="n">log</span><span class="o">.</span><span class="n">debug</span><span class="p">(</span><span class="s">&quot;Setting user session to never expire&quot;</span><span class="p">)</span>
+            <span class="k">else</span><span class="p">:</span>
+                <span class="n">request</span><span class="o">.</span><span class="n">session</span><span class="o">.</span><span class="n">set_expiry</span><span class="p">(</span><span class="mi">0</span><span class="p">)</span>
+        <span class="k">except</span> <span class="ne">Exception</span> <span class="k">as</span> <span class="n">e</span><span class="p">:</span>
+            <span class="n">log</span><span class="o">.</span><span class="n">critical</span><span class="p">(</span><span class="s">&quot;Login failed - Could not create session. Is memcached running?&quot;</span><span class="p">)</span>
+            <span class="n">log</span><span class="o">.</span><span class="n">exception</span><span class="p">(</span><span class="n">e</span><span class="p">)</span>
+
+        <span class="n">log</span><span class="o">.</span><span class="n">info</span><span class="p">(</span><span class="s">&quot;Login success - {0} ({1})&quot;</span><span class="o">.</span><span class="n">format</span><span class="p">(</span><span class="n">username</span><span class="p">,</span> <span class="n">email</span><span class="p">))</span>
+
+        <span class="n">try_change_enrollment</span><span class="p">(</span><span class="n">request</span><span class="p">)</span>
+        
+        <span class="n">statsd</span><span class="o">.</span><span class="n">increment</span><span class="p">(</span><span class="s">&quot;common.student.successful_login&quot;</span><span class="p">)</span>
+        
+        <span class="k">return</span> <span class="n">HttpResponse</span><span class="p">(</span><span class="n">json</span><span class="o">.</span><span class="n">dumps</span><span class="p">({</span><span class="s">&#39;success&#39;</span><span class="p">:</span> <span class="bp">True</span><span class="p">}))</span>
+    
+    <span class="n">log</span><span class="o">.</span><span class="n">warning</span><span class="p">(</span><span class="s">&quot;Login failed - Account not active for user {0}, resending activation&quot;</span><span class="o">.</span><span class="n">format</span><span class="p">(</span><span class="n">username</span><span class="p">))</span>
+    
+    <span class="n">reactivation_email_for_user</span><span class="p">(</span><span class="n">user</span><span class="p">)</span>
+    <span class="n">not_activated_msg</span> <span class="o">=</span> <span class="s">&quot;This account has not been activated. We have &quot;</span> <span class="o">+</span> \
+                        <span class="s">&quot;sent another activation message. Please check your &quot;</span> <span class="o">+</span> \
+                        <span class="s">&quot;e-mail for the activation instructions.&quot;</span>
+    <span class="k">return</span> <span class="n">HttpResponse</span><span class="p">(</span><span class="n">json</span><span class="o">.</span><span class="n">dumps</span><span class="p">({</span><span class="s">&#39;success&#39;</span><span class="p">:</span> <span class="bp">False</span><span class="p">,</span>
+                                    <span class="s">&#39;value&#39;</span><span class="p">:</span> <span class="n">not_activated_msg</span><span class="p">}))</span>
+
+</div>
+<span class="nd">@ensure_csrf_cookie</span>
+<div class="viewcode-block" id="logout_user"><a class="viewcode-back" href="../../djangoapps-common.html#student.views.logout_user">[docs]</a><span class="k">def</span> <span class="nf">logout_user</span><span class="p">(</span><span class="n">request</span><span class="p">):</span>
+    <span class="sd">&#39;&#39;&#39; HTTP request to log out the user. Redirects to marketing page&#39;&#39;&#39;</span>
+    <span class="n">logout</span><span class="p">(</span><span class="n">request</span><span class="p">)</span>
+    <span class="k">return</span> <span class="n">redirect</span><span class="p">(</span><span class="s">&#39;/&#39;</span><span class="p">)</span>
+
+</div>
+<span class="nd">@login_required</span>
+<span class="nd">@ensure_csrf_cookie</span>
+<div class="viewcode-block" id="change_setting"><a class="viewcode-back" href="../../djangoapps-common.html#student.views.change_setting">[docs]</a><span class="k">def</span> <span class="nf">change_setting</span><span class="p">(</span><span class="n">request</span><span class="p">):</span>
+    <span class="sd">&#39;&#39;&#39; JSON call to change a profile setting: Right now, location</span>
+<span class="sd">    &#39;&#39;&#39;</span>
+    <span class="c"># TODO (vshnayder): location is no longer used</span>
+    <span class="n">up</span> <span class="o">=</span> <span class="n">UserProfile</span><span class="o">.</span><span class="n">objects</span><span class="o">.</span><span class="n">get</span><span class="p">(</span><span class="n">user</span><span class="o">=</span><span class="n">request</span><span class="o">.</span><span class="n">user</span><span class="p">)</span>  <span class="c"># request.user.profile_cache</span>
+    <span class="k">if</span> <span class="s">&#39;location&#39;</span> <span class="ow">in</span> <span class="n">request</span><span class="o">.</span><span class="n">POST</span><span class="p">:</span>
+        <span class="n">up</span><span class="o">.</span><span class="n">location</span> <span class="o">=</span> <span class="n">request</span><span class="o">.</span><span class="n">POST</span><span class="p">[</span><span class="s">&#39;location&#39;</span><span class="p">]</span>
+    <span class="n">up</span><span class="o">.</span><span class="n">save</span><span class="p">()</span>
+
+    <span class="k">return</span> <span class="n">HttpResponse</span><span class="p">(</span><span class="n">json</span><span class="o">.</span><span class="n">dumps</span><span class="p">({</span><span class="s">&#39;success&#39;</span><span class="p">:</span> <span class="bp">True</span><span class="p">,</span>
+                                    <span class="s">&#39;location&#39;</span><span class="p">:</span> <span class="n">up</span><span class="o">.</span><span class="n">location</span><span class="p">,</span> <span class="p">}))</span>
+</div>
+<span class="k">def</span> <span class="nf">_do_create_account</span><span class="p">(</span><span class="n">post_vars</span><span class="p">):</span>
+    <span class="sd">&quot;&quot;&quot;</span>
+<span class="sd">    Given cleaned post variables, create the User and UserProfile objects, as well as the</span>
+<span class="sd">    registration for this user.</span>
+
+<span class="sd">    Returns a tuple (User, UserProfile, Registration).</span>
+
+<span class="sd">    Note: this function is also used for creating test users.</span>
+<span class="sd">    &quot;&quot;&quot;</span>
+    <span class="n">user</span> <span class="o">=</span> <span class="n">User</span><span class="p">(</span><span class="n">username</span><span class="o">=</span><span class="n">post_vars</span><span class="p">[</span><span class="s">&#39;username&#39;</span><span class="p">],</span>
+             <span class="n">email</span><span class="o">=</span><span class="n">post_vars</span><span class="p">[</span><span class="s">&#39;email&#39;</span><span class="p">],</span>
+             <span class="n">is_active</span><span class="o">=</span><span class="bp">False</span><span class="p">)</span>
+    <span class="n">user</span><span class="o">.</span><span class="n">set_password</span><span class="p">(</span><span class="n">post_vars</span><span class="p">[</span><span class="s">&#39;password&#39;</span><span class="p">])</span>
+    <span class="n">registration</span> <span class="o">=</span> <span class="n">Registration</span><span class="p">()</span>
+    <span class="c"># TODO: Rearrange so that if part of the process fails, the whole process fails.</span>
+    <span class="c"># Right now, we can have e.g. no registration e-mail sent out and a zombie account</span>
+    <span class="k">try</span><span class="p">:</span>
+        <span class="n">user</span><span class="o">.</span><span class="n">save</span><span class="p">()</span>
+    <span class="k">except</span> <span class="n">IntegrityError</span><span class="p">:</span>
+        <span class="n">js</span> <span class="o">=</span> <span class="p">{</span><span class="s">&#39;success&#39;</span><span class="p">:</span> <span class="bp">False</span><span class="p">}</span>
+        <span class="c"># Figure out the cause of the integrity error</span>
+        <span class="k">if</span> <span class="nb">len</span><span class="p">(</span><span class="n">User</span><span class="o">.</span><span class="n">objects</span><span class="o">.</span><span class="n">filter</span><span class="p">(</span><span class="n">username</span><span class="o">=</span><span class="n">post_vars</span><span class="p">[</span><span class="s">&#39;username&#39;</span><span class="p">]))</span> <span class="o">&gt;</span> <span class="mi">0</span><span class="p">:</span>
+            <span class="n">js</span><span class="p">[</span><span class="s">&#39;value&#39;</span><span class="p">]</span> <span class="o">=</span> <span class="s">&quot;An account with this username already exists.&quot;</span>
+            <span class="n">js</span><span class="p">[</span><span class="s">&#39;field&#39;</span><span class="p">]</span> <span class="o">=</span> <span class="s">&#39;username&#39;</span>
+            <span class="k">return</span> <span class="n">HttpResponse</span><span class="p">(</span><span class="n">json</span><span class="o">.</span><span class="n">dumps</span><span class="p">(</span><span class="n">js</span><span class="p">))</span>
+
+        <span class="k">if</span> <span class="nb">len</span><span class="p">(</span><span class="n">User</span><span class="o">.</span><span class="n">objects</span><span class="o">.</span><span class="n">filter</span><span class="p">(</span><span class="n">email</span><span class="o">=</span><span class="n">post_vars</span><span class="p">[</span><span class="s">&#39;email&#39;</span><span class="p">]))</span> <span class="o">&gt;</span> <span class="mi">0</span><span class="p">:</span>
+            <span class="n">js</span><span class="p">[</span><span class="s">&#39;value&#39;</span><span class="p">]</span> <span class="o">=</span> <span class="s">&quot;An account with this e-mail already exists.&quot;</span>
+            <span class="n">js</span><span class="p">[</span><span class="s">&#39;field&#39;</span><span class="p">]</span> <span class="o">=</span> <span class="s">&#39;email&#39;</span>
+            <span class="k">return</span> <span class="n">HttpResponse</span><span class="p">(</span><span class="n">json</span><span class="o">.</span><span class="n">dumps</span><span class="p">(</span><span class="n">js</span><span class="p">))</span>
+
+        <span class="k">raise</span>
+
+    <span class="n">registration</span><span class="o">.</span><span class="n">register</span><span class="p">(</span><span class="n">user</span><span class="p">)</span>
+
+    <span class="n">profile</span> <span class="o">=</span> <span class="n">UserProfile</span><span class="p">(</span><span class="n">user</span><span class="o">=</span><span class="n">user</span><span class="p">)</span>
+    <span class="n">profile</span><span class="o">.</span><span class="n">name</span> <span class="o">=</span> <span class="n">post_vars</span><span class="p">[</span><span class="s">&#39;name&#39;</span><span class="p">]</span>
+    <span class="n">profile</span><span class="o">.</span><span class="n">level_of_education</span> <span class="o">=</span> <span class="n">post_vars</span><span class="o">.</span><span class="n">get</span><span class="p">(</span><span class="s">&#39;level_of_education&#39;</span><span class="p">)</span>
+    <span class="n">profile</span><span class="o">.</span><span class="n">gender</span> <span class="o">=</span> <span class="n">post_vars</span><span class="o">.</span><span class="n">get</span><span class="p">(</span><span class="s">&#39;gender&#39;</span><span class="p">)</span>
+    <span class="n">profile</span><span class="o">.</span><span class="n">mailing_address</span> <span class="o">=</span> <span class="n">post_vars</span><span class="o">.</span><span class="n">get</span><span class="p">(</span><span class="s">&#39;mailing_address&#39;</span><span class="p">)</span>
+    <span class="n">profile</span><span class="o">.</span><span class="n">goals</span> <span class="o">=</span> <span class="n">post_vars</span><span class="o">.</span><span class="n">get</span><span class="p">(</span><span class="s">&#39;goals&#39;</span><span class="p">)</span>
+
+    <span class="k">try</span><span class="p">:</span>
+        <span class="n">profile</span><span class="o">.</span><span class="n">year_of_birth</span> <span class="o">=</span> <span class="nb">int</span><span class="p">(</span><span class="n">post_vars</span><span class="p">[</span><span class="s">&#39;year_of_birth&#39;</span><span class="p">])</span>
+    <span class="k">except</span> <span class="p">(</span><span class="ne">ValueError</span><span class="p">,</span> <span class="ne">KeyError</span><span class="p">):</span>
+        <span class="n">profile</span><span class="o">.</span><span class="n">year_of_birth</span> <span class="o">=</span> <span class="bp">None</span>  <span class="c"># If they give us garbage, just ignore it instead</span>
+                                <span class="c"># of asking them to put an integer.</span>
+    <span class="k">try</span><span class="p">:</span>
+        <span class="n">profile</span><span class="o">.</span><span class="n">save</span><span class="p">()</span>
+    <span class="k">except</span> <span class="ne">Exception</span><span class="p">:</span>
+        <span class="n">log</span><span class="o">.</span><span class="n">exception</span><span class="p">(</span><span class="s">&quot;UserProfile creation failed for user {0}.&quot;</span><span class="o">.</span><span class="n">format</span><span class="p">(</span><span class="n">user</span><span class="o">.</span><span class="n">id</span><span class="p">))</span>
+    <span class="k">return</span> <span class="p">(</span><span class="n">user</span><span class="p">,</span> <span class="n">profile</span><span class="p">,</span> <span class="n">registration</span><span class="p">)</span>
+
+
+<span class="nd">@ensure_csrf_cookie</span>
+<div class="viewcode-block" id="create_account"><a class="viewcode-back" href="../../djangoapps-common.html#student.views.create_account">[docs]</a><span class="k">def</span> <span class="nf">create_account</span><span class="p">(</span><span class="n">request</span><span class="p">,</span> <span class="n">post_override</span><span class="o">=</span><span class="bp">None</span><span class="p">):</span>
+    <span class="sd">&#39;&#39;&#39;</span>
+<span class="sd">    JSON call to create new edX account.</span>
+<span class="sd">    Used by form in signup_modal.html, which is included into navigation.html</span>
+<span class="sd">    &#39;&#39;&#39;</span>
+    <span class="n">js</span> <span class="o">=</span> <span class="p">{</span><span class="s">&#39;success&#39;</span><span class="p">:</span> <span class="bp">False</span><span class="p">}</span>
+
+    <span class="n">post_vars</span> <span class="o">=</span> <span class="n">post_override</span> <span class="k">if</span> <span class="n">post_override</span> <span class="k">else</span> <span class="n">request</span><span class="o">.</span><span class="n">POST</span>
+
+    <span class="c"># if doing signup for an external authorization, then get email, password, name from the eamap</span>
+    <span class="c"># don&#39;t use the ones from the form, since the user could have hacked those</span>
+    <span class="n">DoExternalAuth</span> <span class="o">=</span> <span class="s">&#39;ExternalAuthMap&#39;</span> <span class="ow">in</span> <span class="n">request</span><span class="o">.</span><span class="n">session</span>
+    <span class="k">if</span> <span class="n">DoExternalAuth</span><span class="p">:</span>
+        <span class="n">eamap</span> <span class="o">=</span> <span class="n">request</span><span class="o">.</span><span class="n">session</span><span class="p">[</span><span class="s">&#39;ExternalAuthMap&#39;</span><span class="p">]</span>
+        <span class="n">email</span> <span class="o">=</span> <span class="n">eamap</span><span class="o">.</span><span class="n">external_email</span>
+        <span class="n">name</span> <span class="o">=</span> <span class="n">eamap</span><span class="o">.</span><span class="n">external_name</span>
+        <span class="n">password</span> <span class="o">=</span> <span class="n">eamap</span><span class="o">.</span><span class="n">internal_password</span>
+        <span class="n">post_vars</span> <span class="o">=</span> <span class="nb">dict</span><span class="p">(</span><span class="n">post_vars</span><span class="o">.</span><span class="n">items</span><span class="p">())</span>
+        <span class="n">post_vars</span><span class="o">.</span><span class="n">update</span><span class="p">(</span><span class="nb">dict</span><span class="p">(</span><span class="n">email</span><span class="o">=</span><span class="n">email</span><span class="p">,</span> <span class="n">name</span><span class="o">=</span><span class="n">name</span><span class="p">,</span> <span class="n">password</span><span class="o">=</span><span class="n">password</span><span class="p">))</span>
+        <span class="n">log</span><span class="o">.</span><span class="n">debug</span><span class="p">(</span><span class="s">&#39;extauth test: post_vars = </span><span class="si">%s</span><span class="s">&#39;</span> <span class="o">%</span> <span class="n">post_vars</span><span class="p">)</span>
+
+    <span class="c"># Confirm we have a properly formed request</span>
+    <span class="k">for</span> <span class="n">a</span> <span class="ow">in</span> <span class="p">[</span><span class="s">&#39;username&#39;</span><span class="p">,</span> <span class="s">&#39;email&#39;</span><span class="p">,</span> <span class="s">&#39;password&#39;</span><span class="p">,</span> <span class="s">&#39;name&#39;</span><span class="p">]:</span>
+        <span class="k">if</span> <span class="n">a</span> <span class="ow">not</span> <span class="ow">in</span> <span class="n">post_vars</span><span class="p">:</span>
+            <span class="n">js</span><span class="p">[</span><span class="s">&#39;value&#39;</span><span class="p">]</span> <span class="o">=</span> <span class="s">&quot;Error (401 {field}). E-mail us.&quot;</span><span class="o">.</span><span class="n">format</span><span class="p">(</span><span class="n">field</span><span class="o">=</span><span class="n">a</span><span class="p">)</span>
+            <span class="n">js</span><span class="p">[</span><span class="s">&#39;field&#39;</span><span class="p">]</span> <span class="o">=</span> <span class="n">a</span>
+            <span class="k">return</span> <span class="n">HttpResponse</span><span class="p">(</span><span class="n">json</span><span class="o">.</span><span class="n">dumps</span><span class="p">(</span><span class="n">js</span><span class="p">))</span>
+
+    <span class="k">if</span> <span class="n">post_vars</span><span class="o">.</span><span class="n">get</span><span class="p">(</span><span class="s">&#39;honor_code&#39;</span><span class="p">,</span> <span class="s">&#39;false&#39;</span><span class="p">)</span> <span class="o">!=</span> <span class="s">u&#39;true&#39;</span><span class="p">:</span>
+        <span class="n">js</span><span class="p">[</span><span class="s">&#39;value&#39;</span><span class="p">]</span> <span class="o">=</span> <span class="s">&quot;To enroll, you must follow the honor code.&quot;</span><span class="o">.</span><span class="n">format</span><span class="p">(</span><span class="n">field</span><span class="o">=</span><span class="n">a</span><span class="p">)</span>
+        <span class="n">js</span><span class="p">[</span><span class="s">&#39;field&#39;</span><span class="p">]</span> <span class="o">=</span> <span class="s">&#39;honor_code&#39;</span>
+        <span class="k">return</span> <span class="n">HttpResponse</span><span class="p">(</span><span class="n">json</span><span class="o">.</span><span class="n">dumps</span><span class="p">(</span><span class="n">js</span><span class="p">))</span>
+
+    <span class="k">if</span> <span class="n">post_vars</span><span class="o">.</span><span class="n">get</span><span class="p">(</span><span class="s">&#39;terms_of_service&#39;</span><span class="p">,</span> <span class="s">&#39;false&#39;</span><span class="p">)</span> <span class="o">!=</span> <span class="s">u&#39;true&#39;</span><span class="p">:</span>
+        <span class="n">js</span><span class="p">[</span><span class="s">&#39;value&#39;</span><span class="p">]</span> <span class="o">=</span> <span class="s">&quot;You must accept the terms of service.&quot;</span><span class="o">.</span><span class="n">format</span><span class="p">(</span><span class="n">field</span><span class="o">=</span><span class="n">a</span><span class="p">)</span>
+        <span class="n">js</span><span class="p">[</span><span class="s">&#39;field&#39;</span><span class="p">]</span> <span class="o">=</span> <span class="s">&#39;terms_of_service&#39;</span>
+        <span class="k">return</span> <span class="n">HttpResponse</span><span class="p">(</span><span class="n">json</span><span class="o">.</span><span class="n">dumps</span><span class="p">(</span><span class="n">js</span><span class="p">))</span>
+
+    <span class="c"># Confirm appropriate fields are there.</span>
+    <span class="c"># TODO: Check e-mail format is correct.</span>
+    <span class="c"># TODO: Confirm e-mail is not from a generic domain (mailinator, etc.)? Not sure if</span>
+    <span class="c"># this is a good idea</span>
+    <span class="c"># TODO: Check password is sane</span>
+    <span class="k">for</span> <span class="n">a</span> <span class="ow">in</span> <span class="p">[</span><span class="s">&#39;username&#39;</span><span class="p">,</span> <span class="s">&#39;email&#39;</span><span class="p">,</span> <span class="s">&#39;name&#39;</span><span class="p">,</span> <span class="s">&#39;password&#39;</span><span class="p">,</span> <span class="s">&#39;terms_of_service&#39;</span><span class="p">,</span> <span class="s">&#39;honor_code&#39;</span><span class="p">]:</span>
+        <span class="k">if</span> <span class="nb">len</span><span class="p">(</span><span class="n">post_vars</span><span class="p">[</span><span class="n">a</span><span class="p">])</span> <span class="o">&lt;</span> <span class="mi">2</span><span class="p">:</span>
+            <span class="n">error_str</span> <span class="o">=</span> <span class="p">{</span><span class="s">&#39;username&#39;</span><span class="p">:</span> <span class="s">&#39;Username must be minimum of two characters long.&#39;</span><span class="p">,</span>
+                         <span class="s">&#39;email&#39;</span><span class="p">:</span> <span class="s">&#39;A properly formatted e-mail is required.&#39;</span><span class="p">,</span>
+                         <span class="s">&#39;name&#39;</span><span class="p">:</span> <span class="s">&#39;Your legal name must be a minimum of two characters long.&#39;</span><span class="p">,</span>
+                         <span class="s">&#39;password&#39;</span><span class="p">:</span> <span class="s">&#39;A valid password is required.&#39;</span><span class="p">,</span>
+                         <span class="s">&#39;terms_of_service&#39;</span><span class="p">:</span> <span class="s">&#39;Accepting Terms of Service is required.&#39;</span><span class="p">,</span>
+                         <span class="s">&#39;honor_code&#39;</span><span class="p">:</span> <span class="s">&#39;Agreeing to the Honor Code is required.&#39;</span><span class="p">}</span>
+            <span class="n">js</span><span class="p">[</span><span class="s">&#39;value&#39;</span><span class="p">]</span> <span class="o">=</span> <span class="n">error_str</span><span class="p">[</span><span class="n">a</span><span class="p">]</span>
+            <span class="n">js</span><span class="p">[</span><span class="s">&#39;field&#39;</span><span class="p">]</span> <span class="o">=</span> <span class="n">a</span>
+            <span class="k">return</span> <span class="n">HttpResponse</span><span class="p">(</span><span class="n">json</span><span class="o">.</span><span class="n">dumps</span><span class="p">(</span><span class="n">js</span><span class="p">))</span>
+
+    <span class="k">try</span><span class="p">:</span>
+        <span class="n">validate_email</span><span class="p">(</span><span class="n">post_vars</span><span class="p">[</span><span class="s">&#39;email&#39;</span><span class="p">])</span>
+    <span class="k">except</span> <span class="n">ValidationError</span><span class="p">:</span>
+        <span class="n">js</span><span class="p">[</span><span class="s">&#39;value&#39;</span><span class="p">]</span> <span class="o">=</span> <span class="s">&quot;Valid e-mail is required.&quot;</span><span class="o">.</span><span class="n">format</span><span class="p">(</span><span class="n">field</span><span class="o">=</span><span class="n">a</span><span class="p">)</span>
+        <span class="n">js</span><span class="p">[</span><span class="s">&#39;field&#39;</span><span class="p">]</span> <span class="o">=</span> <span class="s">&#39;email&#39;</span>
+        <span class="k">return</span> <span class="n">HttpResponse</span><span class="p">(</span><span class="n">json</span><span class="o">.</span><span class="n">dumps</span><span class="p">(</span><span class="n">js</span><span class="p">))</span>
+
+    <span class="k">try</span><span class="p">:</span>
+        <span class="n">validate_slug</span><span class="p">(</span><span class="n">post_vars</span><span class="p">[</span><span class="s">&#39;username&#39;</span><span class="p">])</span>
+    <span class="k">except</span> <span class="n">ValidationError</span><span class="p">:</span>
+        <span class="n">js</span><span class="p">[</span><span class="s">&#39;value&#39;</span><span class="p">]</span> <span class="o">=</span> <span class="s">&quot;Username should only consist of A-Z and 0-9.&quot;</span><span class="o">.</span><span class="n">format</span><span class="p">(</span><span class="n">field</span><span class="o">=</span><span class="n">a</span><span class="p">)</span>
+        <span class="n">js</span><span class="p">[</span><span class="s">&#39;field&#39;</span><span class="p">]</span> <span class="o">=</span> <span class="s">&#39;username&#39;</span>
+        <span class="k">return</span> <span class="n">HttpResponse</span><span class="p">(</span><span class="n">json</span><span class="o">.</span><span class="n">dumps</span><span class="p">(</span><span class="n">js</span><span class="p">))</span>
+
+    <span class="c"># Ok, looks like everything is legit.  Create the account.</span>
+    <span class="n">ret</span> <span class="o">=</span> <span class="n">_do_create_account</span><span class="p">(</span><span class="n">post_vars</span><span class="p">)</span>
+    <span class="k">if</span> <span class="nb">isinstance</span><span class="p">(</span><span class="n">ret</span><span class="p">,</span><span class="n">HttpResponse</span><span class="p">):</span>		<span class="c"># if there was an error then return that</span>
+        <span class="k">return</span> <span class="n">ret</span>
+    <span class="p">(</span><span class="n">user</span><span class="p">,</span> <span class="n">profile</span><span class="p">,</span> <span class="n">registration</span><span class="p">)</span> <span class="o">=</span> <span class="n">ret</span>
+
+    <span class="n">d</span> <span class="o">=</span> <span class="p">{</span><span class="s">&#39;name&#39;</span><span class="p">:</span> <span class="n">post_vars</span><span class="p">[</span><span class="s">&#39;name&#39;</span><span class="p">],</span>
+         <span class="s">&#39;key&#39;</span><span class="p">:</span> <span class="n">registration</span><span class="o">.</span><span class="n">activation_key</span><span class="p">,</span>
+         <span class="p">}</span>
+
+    <span class="c"># composes activation email</span>
+    <span class="n">subject</span> <span class="o">=</span> <span class="n">render_to_string</span><span class="p">(</span><span class="s">&#39;emails/activation_email_subject.txt&#39;</span><span class="p">,</span> <span class="n">d</span><span class="p">)</span>
+    <span class="c"># Email subject *must not* contain newlines</span>
+    <span class="n">subject</span> <span class="o">=</span> <span class="s">&#39;&#39;</span><span class="o">.</span><span class="n">join</span><span class="p">(</span><span class="n">subject</span><span class="o">.</span><span class="n">splitlines</span><span class="p">())</span>
+    <span class="n">message</span> <span class="o">=</span> <span class="n">render_to_string</span><span class="p">(</span><span class="s">&#39;emails/activation_email.txt&#39;</span><span class="p">,</span> <span class="n">d</span><span class="p">)</span>
+
+    <span class="k">try</span><span class="p">:</span>
+        <span class="k">if</span> <span class="n">settings</span><span class="o">.</span><span class="n">MITX_FEATURES</span><span class="o">.</span><span class="n">get</span><span class="p">(</span><span class="s">&#39;REROUTE_ACTIVATION_EMAIL&#39;</span><span class="p">):</span>
+            <span class="n">dest_addr</span> <span class="o">=</span> <span class="n">settings</span><span class="o">.</span><span class="n">MITX_FEATURES</span><span class="p">[</span><span class="s">&#39;REROUTE_ACTIVATION_EMAIL&#39;</span><span class="p">]</span>
+            <span class="n">message</span> <span class="o">=</span> <span class="p">(</span><span class="s">&quot;Activation for </span><span class="si">%s</span><span class="s"> (</span><span class="si">%s</span><span class="s">): </span><span class="si">%s</span><span class="se">\n</span><span class="s">&quot;</span> <span class="o">%</span> <span class="p">(</span><span class="n">user</span><span class="p">,</span> <span class="n">user</span><span class="o">.</span><span class="n">email</span><span class="p">,</span> <span class="n">profile</span><span class="o">.</span><span class="n">name</span><span class="p">)</span> <span class="o">+</span>
+                       <span class="s">&#39;-&#39;</span> <span class="o">*</span> <span class="mi">80</span> <span class="o">+</span> <span class="s">&#39;</span><span class="se">\n\n</span><span class="s">&#39;</span> <span class="o">+</span> <span class="n">message</span><span class="p">)</span>
+            <span class="n">send_mail</span><span class="p">(</span><span class="n">subject</span><span class="p">,</span> <span class="n">message</span><span class="p">,</span> <span class="n">settings</span><span class="o">.</span><span class="n">DEFAULT_FROM_EMAIL</span><span class="p">,</span> <span class="p">[</span><span class="n">dest_addr</span><span class="p">],</span> <span class="n">fail_silently</span><span class="o">=</span><span class="bp">False</span><span class="p">)</span>
+        <span class="k">elif</span> <span class="ow">not</span> <span class="n">settings</span><span class="o">.</span><span class="n">GENERATE_RANDOM_USER_CREDENTIALS</span><span class="p">:</span>
+            <span class="n">res</span> <span class="o">=</span> <span class="n">user</span><span class="o">.</span><span class="n">email_user</span><span class="p">(</span><span class="n">subject</span><span class="p">,</span> <span class="n">message</span><span class="p">,</span> <span class="n">settings</span><span class="o">.</span><span class="n">DEFAULT_FROM_EMAIL</span><span class="p">)</span>
+    <span class="k">except</span><span class="p">:</span>
+        <span class="n">log</span><span class="o">.</span><span class="n">exception</span><span class="p">(</span><span class="n">sys</span><span class="o">.</span><span class="n">exc_info</span><span class="p">())</span>
+        <span class="n">js</span><span class="p">[</span><span class="s">&#39;value&#39;</span><span class="p">]</span> <span class="o">=</span> <span class="s">&#39;Could not send activation e-mail.&#39;</span>
+        <span class="k">return</span> <span class="n">HttpResponse</span><span class="p">(</span><span class="n">json</span><span class="o">.</span><span class="n">dumps</span><span class="p">(</span><span class="n">js</span><span class="p">))</span>
+
+    <span class="c"># Immediately after a user creates an account, we log them in. They are only</span>
+    <span class="c"># logged in until they close the browser. They can&#39;t log in again until they click</span>
+    <span class="c"># the activation link from the email.</span>
+    <span class="n">login_user</span> <span class="o">=</span> <span class="n">authenticate</span><span class="p">(</span><span class="n">username</span><span class="o">=</span><span class="n">post_vars</span><span class="p">[</span><span class="s">&#39;username&#39;</span><span class="p">],</span> <span class="n">password</span><span class="o">=</span><span class="n">post_vars</span><span class="p">[</span><span class="s">&#39;password&#39;</span><span class="p">])</span>
+    <span class="n">login</span><span class="p">(</span><span class="n">request</span><span class="p">,</span> <span class="n">login_user</span><span class="p">)</span>
+    <span class="n">request</span><span class="o">.</span><span class="n">session</span><span class="o">.</span><span class="n">set_expiry</span><span class="p">(</span><span class="mi">0</span><span class="p">)</span>
+
+    <span class="n">try_change_enrollment</span><span class="p">(</span><span class="n">request</span><span class="p">)</span>
+
+    <span class="k">if</span> <span class="n">DoExternalAuth</span><span class="p">:</span>
+        <span class="n">eamap</span><span class="o">.</span><span class="n">user</span> <span class="o">=</span> <span class="n">login_user</span>
+        <span class="n">eamap</span><span class="o">.</span><span class="n">dtsignup</span> <span class="o">=</span> <span class="n">datetime</span><span class="o">.</span><span class="n">datetime</span><span class="o">.</span><span class="n">now</span><span class="p">()</span>
+        <span class="n">eamap</span><span class="o">.</span><span class="n">save</span><span class="p">()</span>
+        <span class="n">log</span><span class="o">.</span><span class="n">debug</span><span class="p">(</span><span class="s">&#39;Updated ExternalAuthMap for </span><span class="si">%s</span><span class="s"> to be </span><span class="si">%s</span><span class="s">&#39;</span> <span class="o">%</span> <span class="p">(</span><span class="n">post_vars</span><span class="p">[</span><span class="s">&#39;username&#39;</span><span class="p">],</span><span class="n">eamap</span><span class="p">))</span>
+
+        <span class="k">if</span> <span class="n">settings</span><span class="o">.</span><span class="n">MITX_FEATURES</span><span class="o">.</span><span class="n">get</span><span class="p">(</span><span class="s">&#39;BYPASS_ACTIVATION_EMAIL_FOR_EXTAUTH&#39;</span><span class="p">):</span>
+            <span class="n">log</span><span class="o">.</span><span class="n">debug</span><span class="p">(</span><span class="s">&#39;bypassing activation email&#39;</span><span class="p">)</span>
+            <span class="n">login_user</span><span class="o">.</span><span class="n">is_active</span> <span class="o">=</span> <span class="bp">True</span>
+            <span class="n">login_user</span><span class="o">.</span><span class="n">save</span><span class="p">()</span>
+            
+    <span class="n">statsd</span><span class="o">.</span><span class="n">increment</span><span class="p">(</span><span class="s">&quot;common.student.account_created&quot;</span><span class="p">)</span>
+    
+    <span class="n">js</span> <span class="o">=</span> <span class="p">{</span><span class="s">&#39;success&#39;</span><span class="p">:</span> <span class="bp">True</span><span class="p">}</span>
+    <span class="k">return</span> <span class="n">HttpResponse</span><span class="p">(</span><span class="n">json</span><span class="o">.</span><span class="n">dumps</span><span class="p">(</span><span class="n">js</span><span class="p">),</span> <span class="n">mimetype</span><span class="o">=</span><span class="s">&quot;application/json&quot;</span><span class="p">)</span>
+
+</div>
+<div class="viewcode-block" id="get_random_post_override"><a class="viewcode-back" href="../../djangoapps-common.html#student.views.get_random_post_override">[docs]</a><span class="k">def</span> <span class="nf">get_random_post_override</span><span class="p">():</span>
+    <span class="sd">&quot;&quot;&quot;</span>
+<span class="sd">    Return a dictionary suitable for passing to post_vars of _do_create_account or post_override</span>
+<span class="sd">    of create_account, with random user info.</span>
+<span class="sd">    &quot;&quot;&quot;</span>
+    <span class="k">def</span> <span class="nf">id_generator</span><span class="p">(</span><span class="n">size</span><span class="o">=</span><span class="mi">6</span><span class="p">,</span> <span class="n">chars</span><span class="o">=</span><span class="n">string</span><span class="o">.</span><span class="n">ascii_uppercase</span> <span class="o">+</span> <span class="n">string</span><span class="o">.</span><span class="n">ascii_lowercase</span> <span class="o">+</span> <span class="n">string</span><span class="o">.</span><span class="n">digits</span><span class="p">):</span>
+        <span class="k">return</span> <span class="s">&#39;&#39;</span><span class="o">.</span><span class="n">join</span><span class="p">(</span><span class="n">random</span><span class="o">.</span><span class="n">choice</span><span class="p">(</span><span class="n">chars</span><span class="p">)</span> <span class="k">for</span> <span class="n">x</span> <span class="ow">in</span> <span class="nb">range</span><span class="p">(</span><span class="n">size</span><span class="p">))</span>
+
+    <span class="k">return</span> <span class="p">{</span><span class="s">&#39;username&#39;</span><span class="p">:</span> <span class="s">&quot;random_&quot;</span> <span class="o">+</span> <span class="n">id_generator</span><span class="p">(),</span>
+            <span class="s">&#39;email&#39;</span><span class="p">:</span> <span class="n">id_generator</span><span class="p">(</span><span class="n">size</span><span class="o">=</span><span class="mi">10</span><span class="p">,</span> <span class="n">chars</span><span class="o">=</span><span class="n">string</span><span class="o">.</span><span class="n">ascii_lowercase</span><span class="p">)</span> <span class="o">+</span> <span class="s">&quot;_dummy_test@mitx.mit.edu&quot;</span><span class="p">,</span>
+            <span class="s">&#39;password&#39;</span><span class="p">:</span> <span class="n">id_generator</span><span class="p">(),</span>
+            <span class="s">&#39;name&#39;</span><span class="p">:</span> <span class="p">(</span><span class="n">id_generator</span><span class="p">(</span><span class="n">size</span><span class="o">=</span><span class="mi">5</span><span class="p">,</span> <span class="n">chars</span><span class="o">=</span><span class="n">string</span><span class="o">.</span><span class="n">ascii_lowercase</span><span class="p">)</span> <span class="o">+</span> <span class="s">&quot; &quot;</span> <span class="o">+</span>
+                     <span class="n">id_generator</span><span class="p">(</span><span class="n">size</span><span class="o">=</span><span class="mi">7</span><span class="p">,</span> <span class="n">chars</span><span class="o">=</span><span class="n">string</span><span class="o">.</span><span class="n">ascii_lowercase</span><span class="p">)),</span>
+                     <span class="s">&#39;honor_code&#39;</span><span class="p">:</span> <span class="s">u&#39;true&#39;</span><span class="p">,</span>
+                     <span class="s">&#39;terms_of_service&#39;</span><span class="p">:</span> <span class="s">u&#39;true&#39;</span><span class="p">,</span> <span class="p">}</span>
+
+</div>
+<span class="k">def</span> <span class="nf">create_random_account</span><span class="p">(</span><span class="n">create_account_function</span><span class="p">):</span>
+    <span class="k">def</span> <span class="nf">inner_create_random_account</span><span class="p">(</span><span class="n">request</span><span class="p">):</span>
+        <span class="k">return</span> <span class="n">create_account_function</span><span class="p">(</span><span class="n">request</span><span class="p">,</span> <span class="n">post_override</span><span class="o">=</span><span class="n">get_random_post_override</span><span class="p">())</span>
+
+    <span class="k">return</span> <span class="n">inner_create_random_account</span>
+
+<span class="c"># TODO (vshnayder): do we need GENERATE_RANDOM_USER_CREDENTIALS for anything?</span>
+<span class="k">if</span> <span class="n">settings</span><span class="o">.</span><span class="n">GENERATE_RANDOM_USER_CREDENTIALS</span><span class="p">:</span>
+    <span class="n">create_account</span> <span class="o">=</span> <span class="n">create_random_account</span><span class="p">(</span><span class="n">create_account</span><span class="p">)</span>
+
+
+<span class="nd">@ensure_csrf_cookie</span>
+<div class="viewcode-block" id="activate_account"><a class="viewcode-back" href="../../djangoapps-common.html#student.views.activate_account">[docs]</a><span class="k">def</span> <span class="nf">activate_account</span><span class="p">(</span><span class="n">request</span><span class="p">,</span> <span class="n">key</span><span class="p">):</span>
+    <span class="sd">&#39;&#39;&#39; When link in activation e-mail is clicked</span>
+<span class="sd">    &#39;&#39;&#39;</span>
+    <span class="n">r</span> <span class="o">=</span> <span class="n">Registration</span><span class="o">.</span><span class="n">objects</span><span class="o">.</span><span class="n">filter</span><span class="p">(</span><span class="n">activation_key</span><span class="o">=</span><span class="n">key</span><span class="p">)</span>
+    <span class="k">if</span> <span class="nb">len</span><span class="p">(</span><span class="n">r</span><span class="p">)</span> <span class="o">==</span> <span class="mi">1</span><span class="p">:</span>
+        <span class="n">user_logged_in</span> <span class="o">=</span> <span class="n">request</span><span class="o">.</span><span class="n">user</span><span class="o">.</span><span class="n">is_authenticated</span><span class="p">()</span>
+        <span class="n">already_active</span> <span class="o">=</span> <span class="bp">True</span>
+        <span class="k">if</span> <span class="ow">not</span> <span class="n">r</span><span class="p">[</span><span class="mi">0</span><span class="p">]</span><span class="o">.</span><span class="n">user</span><span class="o">.</span><span class="n">is_active</span><span class="p">:</span>
+            <span class="n">r</span><span class="p">[</span><span class="mi">0</span><span class="p">]</span><span class="o">.</span><span class="n">activate</span><span class="p">()</span>
+            <span class="n">already_active</span> <span class="o">=</span> <span class="bp">False</span>
+        <span class="n">resp</span> <span class="o">=</span> <span class="n">render_to_response</span><span class="p">(</span><span class="s">&quot;registration/activation_complete.html&quot;</span><span class="p">,</span> <span class="p">{</span><span class="s">&#39;user_logged_in&#39;</span><span class="p">:</span> <span class="n">user_logged_in</span><span class="p">,</span> <span class="s">&#39;already_active&#39;</span><span class="p">:</span> <span class="n">already_active</span><span class="p">})</span>
+        <span class="k">return</span> <span class="n">resp</span>
+    <span class="k">if</span> <span class="nb">len</span><span class="p">(</span><span class="n">r</span><span class="p">)</span> <span class="o">==</span> <span class="mi">0</span><span class="p">:</span>
+        <span class="k">return</span> <span class="n">render_to_response</span><span class="p">(</span><span class="s">&quot;registration/activation_invalid.html&quot;</span><span class="p">,</span> <span class="p">{</span><span class="s">&#39;csrf&#39;</span><span class="p">:</span> <span class="n">csrf</span><span class="p">(</span><span class="n">request</span><span class="p">)[</span><span class="s">&#39;csrf_token&#39;</span><span class="p">]})</span>
+    <span class="k">return</span> <span class="n">HttpResponse</span><span class="p">(</span><span class="s">&quot;Unknown error. Please e-mail us to let us know how it happened.&quot;</span><span class="p">)</span>
+
+</div>
+<span class="nd">@ensure_csrf_cookie</span>
+<div class="viewcode-block" id="password_reset"><a class="viewcode-back" href="../../djangoapps-common.html#student.views.password_reset">[docs]</a><span class="k">def</span> <span class="nf">password_reset</span><span class="p">(</span><span class="n">request</span><span class="p">):</span>
+    <span class="sd">&#39;&#39;&#39; Attempts to send a password reset e-mail. &#39;&#39;&#39;</span>
+    <span class="k">if</span> <span class="n">request</span><span class="o">.</span><span class="n">method</span> <span class="o">!=</span> <span class="s">&quot;POST&quot;</span><span class="p">:</span>
+        <span class="k">raise</span> <span class="n">Http404</span>
+    
+    <span class="c"># By default, Django doesn&#39;t allow Users with is_active = False to reset their passwords,</span>
+    <span class="c"># but this bites people who signed up a long time ago, never activated, and forgot their </span>
+    <span class="c"># password. So for their sake, we&#39;ll auto-activate a user for whome password_reset is called.</span>
+    <span class="k">try</span><span class="p">:</span>
+        <span class="n">user</span> <span class="o">=</span> <span class="n">User</span><span class="o">.</span><span class="n">objects</span><span class="o">.</span><span class="n">get</span><span class="p">(</span><span class="n">email</span><span class="o">=</span><span class="n">request</span><span class="o">.</span><span class="n">POST</span><span class="p">[</span><span class="s">&#39;email&#39;</span><span class="p">])</span>
+        <span class="n">user</span><span class="o">.</span><span class="n">is_active</span> <span class="o">=</span> <span class="bp">True</span>
+        <span class="n">user</span><span class="o">.</span><span class="n">save</span><span class="p">()</span>
+    <span class="k">except</span><span class="p">:</span>
+        <span class="n">log</span><span class="o">.</span><span class="n">exception</span><span class="p">(</span><span class="s">&quot;Tried to auto-activate user to enable password reset, but failed.&quot;</span><span class="p">)</span>
+    
+    <span class="n">form</span> <span class="o">=</span> <span class="n">PasswordResetForm</span><span class="p">(</span><span class="n">request</span><span class="o">.</span><span class="n">POST</span><span class="p">)</span>
+    <span class="k">if</span> <span class="n">form</span><span class="o">.</span><span class="n">is_valid</span><span class="p">():</span>
+        <span class="n">form</span><span class="o">.</span><span class="n">save</span><span class="p">(</span><span class="n">use_https</span> <span class="o">=</span> <span class="n">request</span><span class="o">.</span><span class="n">is_secure</span><span class="p">(),</span>
+                  <span class="n">from_email</span> <span class="o">=</span> <span class="n">settings</span><span class="o">.</span><span class="n">DEFAULT_FROM_EMAIL</span><span class="p">,</span>
+                  <span class="n">request</span> <span class="o">=</span> <span class="n">request</span><span class="p">,</span>
+                  <span class="n">domain_override</span> <span class="o">=</span> <span class="n">request</span><span class="o">.</span><span class="n">get_host</span><span class="p">())</span>
+        <span class="k">return</span> <span class="n">HttpResponse</span><span class="p">(</span><span class="n">json</span><span class="o">.</span><span class="n">dumps</span><span class="p">({</span><span class="s">&#39;success&#39;</span><span class="p">:</span><span class="bp">True</span><span class="p">,</span>
+                                        <span class="s">&#39;value&#39;</span><span class="p">:</span> <span class="n">render_to_string</span><span class="p">(</span><span class="s">&#39;registration/password_reset_done.html&#39;</span><span class="p">,</span> <span class="p">{})}))</span>
+    <span class="k">else</span><span class="p">:</span>
+        <span class="k">return</span> <span class="n">HttpResponse</span><span class="p">(</span><span class="n">json</span><span class="o">.</span><span class="n">dumps</span><span class="p">({</span><span class="s">&#39;success&#39;</span><span class="p">:</span> <span class="bp">False</span><span class="p">,</span>
+                                        <span class="s">&#39;error&#39;</span><span class="p">:</span> <span class="s">&#39;Invalid e-mail&#39;</span><span class="p">}))</span>
+</div>
+<span class="nd">@ensure_csrf_cookie</span>
+<div class="viewcode-block" id="reactivation_email"><a class="viewcode-back" href="../../djangoapps-common.html#student.views.reactivation_email">[docs]</a><span class="k">def</span> <span class="nf">reactivation_email</span><span class="p">(</span><span class="n">request</span><span class="p">):</span>
+    <span class="sd">&#39;&#39;&#39; Send an e-mail to reactivate a deactivated account, or to</span>
+<span class="sd">    resend an activation e-mail. Untested. &#39;&#39;&#39;</span>
+    <span class="n">email</span> <span class="o">=</span> <span class="n">request</span><span class="o">.</span><span class="n">POST</span><span class="p">[</span><span class="s">&#39;email&#39;</span><span class="p">]</span>
+    <span class="k">try</span><span class="p">:</span>
+        <span class="n">user</span> <span class="o">=</span> <span class="n">User</span><span class="o">.</span><span class="n">objects</span><span class="o">.</span><span class="n">get</span><span class="p">(</span><span class="n">email</span><span class="o">=</span><span class="s">&#39;email&#39;</span><span class="p">)</span>
+    <span class="k">except</span> <span class="n">User</span><span class="o">.</span><span class="n">DoesNotExist</span><span class="p">:</span>
+        <span class="k">return</span> <span class="n">HttpResponse</span><span class="p">(</span><span class="n">json</span><span class="o">.</span><span class="n">dumps</span><span class="p">({</span><span class="s">&#39;success&#39;</span><span class="p">:</span> <span class="bp">False</span><span class="p">,</span>
+                                        <span class="s">&#39;error&#39;</span><span class="p">:</span> <span class="s">&#39;No inactive user with this e-mail exists&#39;</span><span class="p">}))</span>
+    <span class="k">return</span> <span class="n">reactivation_email_for_user</span><span class="p">(</span><span class="n">user</span><span class="p">)</span>
+</div>
+<span class="k">def</span> <span class="nf">reactivation_email_for_user</span><span class="p">(</span><span class="n">user</span><span class="p">):</span>
+    <span class="n">reg</span> <span class="o">=</span> <span class="n">Registration</span><span class="o">.</span><span class="n">objects</span><span class="o">.</span><span class="n">get</span><span class="p">(</span><span class="n">user</span><span class="o">=</span><span class="n">user</span><span class="p">)</span>
+
+    <span class="n">d</span> <span class="o">=</span> <span class="p">{</span><span class="s">&#39;name&#39;</span><span class="p">:</span> <span class="n">user</span><span class="o">.</span><span class="n">profile</span><span class="o">.</span><span class="n">name</span><span class="p">,</span>
+         <span class="s">&#39;key&#39;</span><span class="p">:</span> <span class="n">reg</span><span class="o">.</span><span class="n">activation_key</span><span class="p">}</span>
+
+    <span class="n">subject</span> <span class="o">=</span> <span class="n">render_to_string</span><span class="p">(</span><span class="s">&#39;emails/activation_email_subject.txt&#39;</span><span class="p">,</span> <span class="n">d</span><span class="p">)</span>
+    <span class="n">subject</span> <span class="o">=</span> <span class="s">&#39;&#39;</span><span class="o">.</span><span class="n">join</span><span class="p">(</span><span class="n">subject</span><span class="o">.</span><span class="n">splitlines</span><span class="p">())</span>
+    <span class="n">message</span> <span class="o">=</span> <span class="n">render_to_string</span><span class="p">(</span><span class="s">&#39;emails/activation_email.txt&#39;</span><span class="p">,</span> <span class="n">d</span><span class="p">)</span>
+
+    <span class="n">res</span> <span class="o">=</span> <span class="n">user</span><span class="o">.</span><span class="n">email_user</span><span class="p">(</span><span class="n">subject</span><span class="p">,</span> <span class="n">message</span><span class="p">,</span> <span class="n">settings</span><span class="o">.</span><span class="n">DEFAULT_FROM_EMAIL</span><span class="p">)</span>
+
+    <span class="k">return</span> <span class="n">HttpResponse</span><span class="p">(</span><span class="n">json</span><span class="o">.</span><span class="n">dumps</span><span class="p">({</span><span class="s">&#39;success&#39;</span><span class="p">:</span> <span class="bp">True</span><span class="p">}))</span>
+    
+
+<span class="nd">@ensure_csrf_cookie</span>
+<div class="viewcode-block" id="change_email_request"><a class="viewcode-back" href="../../djangoapps-common.html#student.views.change_email_request">[docs]</a><span class="k">def</span> <span class="nf">change_email_request</span><span class="p">(</span><span class="n">request</span><span class="p">):</span>
+    <span class="sd">&#39;&#39;&#39; AJAX call from the profile page. User wants a new e-mail.</span>
+<span class="sd">    &#39;&#39;&#39;</span>
+    <span class="c">## Make sure it checks for existing e-mail conflicts</span>
+    <span class="k">if</span> <span class="ow">not</span> <span class="n">request</span><span class="o">.</span><span class="n">user</span><span class="o">.</span><span class="n">is_authenticated</span><span class="p">:</span>
+        <span class="k">raise</span> <span class="n">Http404</span>
+
+    <span class="n">user</span> <span class="o">=</span> <span class="n">request</span><span class="o">.</span><span class="n">user</span>
+
+    <span class="k">if</span> <span class="ow">not</span> <span class="n">user</span><span class="o">.</span><span class="n">check_password</span><span class="p">(</span><span class="n">request</span><span class="o">.</span><span class="n">POST</span><span class="p">[</span><span class="s">&#39;password&#39;</span><span class="p">]):</span>
+        <span class="k">return</span> <span class="n">HttpResponse</span><span class="p">(</span><span class="n">json</span><span class="o">.</span><span class="n">dumps</span><span class="p">({</span><span class="s">&#39;success&#39;</span><span class="p">:</span> <span class="bp">False</span><span class="p">,</span>
+                                        <span class="s">&#39;error&#39;</span><span class="p">:</span> <span class="s">&#39;Invalid password&#39;</span><span class="p">}))</span>
+
+    <span class="n">new_email</span> <span class="o">=</span> <span class="n">request</span><span class="o">.</span><span class="n">POST</span><span class="p">[</span><span class="s">&#39;new_email&#39;</span><span class="p">]</span>
+    <span class="k">try</span><span class="p">:</span>
+        <span class="n">validate_email</span><span class="p">(</span><span class="n">new_email</span><span class="p">)</span>
+    <span class="k">except</span> <span class="n">ValidationError</span><span class="p">:</span>
+        <span class="k">return</span> <span class="n">HttpResponse</span><span class="p">(</span><span class="n">json</span><span class="o">.</span><span class="n">dumps</span><span class="p">({</span><span class="s">&#39;success&#39;</span><span class="p">:</span> <span class="bp">False</span><span class="p">,</span>
+                                        <span class="s">&#39;error&#39;</span><span class="p">:</span> <span class="s">&#39;Valid e-mail address required.&#39;</span><span class="p">}))</span>
+
+    <span class="k">if</span> <span class="nb">len</span><span class="p">(</span><span class="n">User</span><span class="o">.</span><span class="n">objects</span><span class="o">.</span><span class="n">filter</span><span class="p">(</span><span class="n">email</span><span class="o">=</span><span class="n">new_email</span><span class="p">))</span> <span class="o">!=</span> <span class="mi">0</span><span class="p">:</span>
+        <span class="c">## CRITICAL TODO: Handle case sensitivity for e-mails</span>
+        <span class="k">return</span> <span class="n">HttpResponse</span><span class="p">(</span><span class="n">json</span><span class="o">.</span><span class="n">dumps</span><span class="p">({</span><span class="s">&#39;success&#39;</span><span class="p">:</span> <span class="bp">False</span><span class="p">,</span>
+                                        <span class="s">&#39;error&#39;</span><span class="p">:</span> <span class="s">&#39;An account with this e-mail already exists.&#39;</span><span class="p">}))</span>
+
+    <span class="n">pec_list</span> <span class="o">=</span> <span class="n">PendingEmailChange</span><span class="o">.</span><span class="n">objects</span><span class="o">.</span><span class="n">filter</span><span class="p">(</span><span class="n">user</span><span class="o">=</span><span class="n">request</span><span class="o">.</span><span class="n">user</span><span class="p">)</span>
+    <span class="k">if</span> <span class="nb">len</span><span class="p">(</span><span class="n">pec_list</span><span class="p">)</span> <span class="o">==</span> <span class="mi">0</span><span class="p">:</span>
+        <span class="n">pec</span> <span class="o">=</span> <span class="n">PendingEmailChange</span><span class="p">()</span>
+        <span class="n">pec</span><span class="o">.</span><span class="n">user</span> <span class="o">=</span> <span class="n">user</span>
+    <span class="k">else</span><span class="p">:</span>
+        <span class="n">pec</span> <span class="o">=</span> <span class="n">pec_list</span><span class="p">[</span><span class="mi">0</span><span class="p">]</span>
+
+    <span class="n">pec</span><span class="o">.</span><span class="n">new_email</span> <span class="o">=</span> <span class="n">request</span><span class="o">.</span><span class="n">POST</span><span class="p">[</span><span class="s">&#39;new_email&#39;</span><span class="p">]</span>
+    <span class="n">pec</span><span class="o">.</span><span class="n">activation_key</span> <span class="o">=</span> <span class="n">uuid</span><span class="o">.</span><span class="n">uuid4</span><span class="p">()</span><span class="o">.</span><span class="n">hex</span>
+    <span class="n">pec</span><span class="o">.</span><span class="n">save</span><span class="p">()</span>
+
+    <span class="k">if</span> <span class="n">pec</span><span class="o">.</span><span class="n">new_email</span> <span class="o">==</span> <span class="n">user</span><span class="o">.</span><span class="n">email</span><span class="p">:</span>
+        <span class="n">pec</span><span class="o">.</span><span class="n">delete</span><span class="p">()</span>
+        <span class="k">return</span> <span class="n">HttpResponse</span><span class="p">(</span><span class="n">json</span><span class="o">.</span><span class="n">dumps</span><span class="p">({</span><span class="s">&#39;success&#39;</span><span class="p">:</span> <span class="bp">False</span><span class="p">,</span>
+                                        <span class="s">&#39;error&#39;</span><span class="p">:</span> <span class="s">&#39;Old email is the same as the new email.&#39;</span><span class="p">}))</span>
+
+    <span class="n">d</span> <span class="o">=</span> <span class="p">{</span><span class="s">&#39;key&#39;</span><span class="p">:</span> <span class="n">pec</span><span class="o">.</span><span class="n">activation_key</span><span class="p">,</span>
+         <span class="s">&#39;old_email&#39;</span><span class="p">:</span> <span class="n">user</span><span class="o">.</span><span class="n">email</span><span class="p">,</span>
+         <span class="s">&#39;new_email&#39;</span><span class="p">:</span> <span class="n">pec</span><span class="o">.</span><span class="n">new_email</span><span class="p">}</span>
+
+    <span class="n">subject</span> <span class="o">=</span> <span class="n">render_to_string</span><span class="p">(</span><span class="s">&#39;emails/email_change_subject.txt&#39;</span><span class="p">,</span> <span class="n">d</span><span class="p">)</span>
+    <span class="n">subject</span> <span class="o">=</span> <span class="s">&#39;&#39;</span><span class="o">.</span><span class="n">join</span><span class="p">(</span><span class="n">subject</span><span class="o">.</span><span class="n">splitlines</span><span class="p">())</span>
+    <span class="n">message</span> <span class="o">=</span> <span class="n">render_to_string</span><span class="p">(</span><span class="s">&#39;emails/email_change.txt&#39;</span><span class="p">,</span> <span class="n">d</span><span class="p">)</span>
+
+    <span class="n">res</span> <span class="o">=</span> <span class="n">send_mail</span><span class="p">(</span><span class="n">subject</span><span class="p">,</span> <span class="n">message</span><span class="p">,</span> <span class="n">settings</span><span class="o">.</span><span class="n">DEFAULT_FROM_EMAIL</span><span class="p">,</span> <span class="p">[</span><span class="n">pec</span><span class="o">.</span><span class="n">new_email</span><span class="p">])</span>
+
+    <span class="k">return</span> <span class="n">HttpResponse</span><span class="p">(</span><span class="n">json</span><span class="o">.</span><span class="n">dumps</span><span class="p">({</span><span class="s">&#39;success&#39;</span><span class="p">:</span> <span class="bp">True</span><span class="p">}))</span>
+
+</div>
+<span class="nd">@ensure_csrf_cookie</span>
+<div class="viewcode-block" id="confirm_email_change"><a class="viewcode-back" href="../../djangoapps-common.html#student.views.confirm_email_change">[docs]</a><span class="k">def</span> <span class="nf">confirm_email_change</span><span class="p">(</span><span class="n">request</span><span class="p">,</span> <span class="n">key</span><span class="p">):</span>
+    <span class="sd">&#39;&#39;&#39; User requested a new e-mail. This is called when the activation</span>
+<span class="sd">    link is clicked. We confirm with the old e-mail, and update</span>
+<span class="sd">    &#39;&#39;&#39;</span>
+    <span class="k">try</span><span class="p">:</span>
+        <span class="n">pec</span> <span class="o">=</span> <span class="n">PendingEmailChange</span><span class="o">.</span><span class="n">objects</span><span class="o">.</span><span class="n">get</span><span class="p">(</span><span class="n">activation_key</span><span class="o">=</span><span class="n">key</span><span class="p">)</span>
+    <span class="k">except</span> <span class="n">PendingEmailChange</span><span class="o">.</span><span class="n">DoesNotExist</span><span class="p">:</span>
+        <span class="k">return</span> <span class="n">render_to_response</span><span class="p">(</span><span class="s">&quot;invalid_email_key.html&quot;</span><span class="p">,</span> <span class="p">{})</span>
+
+    <span class="n">user</span> <span class="o">=</span> <span class="n">pec</span><span class="o">.</span><span class="n">user</span>
+    <span class="n">d</span> <span class="o">=</span> <span class="p">{</span><span class="s">&#39;old_email&#39;</span><span class="p">:</span> <span class="n">user</span><span class="o">.</span><span class="n">email</span><span class="p">,</span>
+         <span class="s">&#39;new_email&#39;</span><span class="p">:</span> <span class="n">pec</span><span class="o">.</span><span class="n">new_email</span><span class="p">}</span>
+
+    <span class="k">if</span> <span class="nb">len</span><span class="p">(</span><span class="n">User</span><span class="o">.</span><span class="n">objects</span><span class="o">.</span><span class="n">filter</span><span class="p">(</span><span class="n">email</span><span class="o">=</span><span class="n">pec</span><span class="o">.</span><span class="n">new_email</span><span class="p">))</span> <span class="o">!=</span> <span class="mi">0</span><span class="p">:</span>
+        <span class="k">return</span> <span class="n">render_to_response</span><span class="p">(</span><span class="s">&quot;email_exists.html&quot;</span><span class="p">,</span> <span class="n">d</span><span class="p">)</span>
+
+    <span class="n">subject</span> <span class="o">=</span> <span class="n">render_to_string</span><span class="p">(</span><span class="s">&#39;emails/email_change_subject.txt&#39;</span><span class="p">,</span> <span class="n">d</span><span class="p">)</span>
+    <span class="n">subject</span> <span class="o">=</span> <span class="s">&#39;&#39;</span><span class="o">.</span><span class="n">join</span><span class="p">(</span><span class="n">subject</span><span class="o">.</span><span class="n">splitlines</span><span class="p">())</span>
+    <span class="n">message</span> <span class="o">=</span> <span class="n">render_to_string</span><span class="p">(</span><span class="s">&#39;emails/confirm_email_change.txt&#39;</span><span class="p">,</span> <span class="n">d</span><span class="p">)</span>
+    <span class="n">up</span> <span class="o">=</span> <span class="n">UserProfile</span><span class="o">.</span><span class="n">objects</span><span class="o">.</span><span class="n">get</span><span class="p">(</span><span class="n">user</span><span class="o">=</span><span class="n">user</span><span class="p">)</span>
+    <span class="n">meta</span> <span class="o">=</span> <span class="n">up</span><span class="o">.</span><span class="n">get_meta</span><span class="p">()</span>
+    <span class="k">if</span> <span class="s">&#39;old_emails&#39;</span> <span class="ow">not</span> <span class="ow">in</span> <span class="n">meta</span><span class="p">:</span>
+        <span class="n">meta</span><span class="p">[</span><span class="s">&#39;old_emails&#39;</span><span class="p">]</span> <span class="o">=</span> <span class="p">[]</span>
+    <span class="n">meta</span><span class="p">[</span><span class="s">&#39;old_emails&#39;</span><span class="p">]</span><span class="o">.</span><span class="n">append</span><span class="p">([</span><span class="n">user</span><span class="o">.</span><span class="n">email</span><span class="p">,</span> <span class="n">datetime</span><span class="o">.</span><span class="n">datetime</span><span class="o">.</span><span class="n">now</span><span class="p">()</span><span class="o">.</span><span class="n">isoformat</span><span class="p">()])</span>
+    <span class="n">up</span><span class="o">.</span><span class="n">set_meta</span><span class="p">(</span><span class="n">meta</span><span class="p">)</span>
+    <span class="n">up</span><span class="o">.</span><span class="n">save</span><span class="p">()</span>
+    <span class="c"># Send it to the old email...</span>
+    <span class="n">user</span><span class="o">.</span><span class="n">email_user</span><span class="p">(</span><span class="n">subject</span><span class="p">,</span> <span class="n">message</span><span class="p">,</span> <span class="n">settings</span><span class="o">.</span><span class="n">DEFAULT_FROM_EMAIL</span><span class="p">)</span>
+    <span class="n">user</span><span class="o">.</span><span class="n">email</span> <span class="o">=</span> <span class="n">pec</span><span class="o">.</span><span class="n">new_email</span>
+    <span class="n">user</span><span class="o">.</span><span class="n">save</span><span class="p">()</span>
+    <span class="n">pec</span><span class="o">.</span><span class="n">delete</span><span class="p">()</span>
+    <span class="c"># And send it to the new email...</span>
+    <span class="n">user</span><span class="o">.</span><span class="n">email_user</span><span class="p">(</span><span class="n">subject</span><span class="p">,</span> <span class="n">message</span><span class="p">,</span> <span class="n">settings</span><span class="o">.</span><span class="n">DEFAULT_FROM_EMAIL</span><span class="p">)</span>
+
+    <span class="k">return</span> <span class="n">render_to_response</span><span class="p">(</span><span class="s">&quot;email_change_successful.html&quot;</span><span class="p">,</span> <span class="n">d</span><span class="p">)</span>
+
+</div>
+<span class="nd">@ensure_csrf_cookie</span>
+<div class="viewcode-block" id="change_name_request"><a class="viewcode-back" href="../../djangoapps-common.html#student.views.change_name_request">[docs]</a><span class="k">def</span> <span class="nf">change_name_request</span><span class="p">(</span><span class="n">request</span><span class="p">):</span>
+    <span class="sd">&#39;&#39;&#39; Log a request for a new name. &#39;&#39;&#39;</span>
+    <span class="k">if</span> <span class="ow">not</span> <span class="n">request</span><span class="o">.</span><span class="n">user</span><span class="o">.</span><span class="n">is_authenticated</span><span class="p">:</span>
+        <span class="k">raise</span> <span class="n">Http404</span>
+
+    <span class="k">try</span><span class="p">:</span>
+        <span class="n">pnc</span> <span class="o">=</span> <span class="n">PendingNameChange</span><span class="o">.</span><span class="n">objects</span><span class="o">.</span><span class="n">get</span><span class="p">(</span><span class="n">user</span><span class="o">=</span><span class="n">request</span><span class="o">.</span><span class="n">user</span><span class="p">)</span>
+    <span class="k">except</span> <span class="n">PendingNameChange</span><span class="o">.</span><span class="n">DoesNotExist</span><span class="p">:</span>
+        <span class="n">pnc</span> <span class="o">=</span> <span class="n">PendingNameChange</span><span class="p">()</span>
+    <span class="n">pnc</span><span class="o">.</span><span class="n">user</span> <span class="o">=</span> <span class="n">request</span><span class="o">.</span><span class="n">user</span>
+    <span class="n">pnc</span><span class="o">.</span><span class="n">new_name</span> <span class="o">=</span> <span class="n">request</span><span class="o">.</span><span class="n">POST</span><span class="p">[</span><span class="s">&#39;new_name&#39;</span><span class="p">]</span>
+    <span class="n">pnc</span><span class="o">.</span><span class="n">rationale</span> <span class="o">=</span> <span class="n">request</span><span class="o">.</span><span class="n">POST</span><span class="p">[</span><span class="s">&#39;rationale&#39;</span><span class="p">]</span>
+    <span class="k">if</span> <span class="nb">len</span><span class="p">(</span><span class="n">pnc</span><span class="o">.</span><span class="n">new_name</span><span class="p">)</span> <span class="o">&lt;</span> <span class="mi">2</span><span class="p">:</span>
+        <span class="k">return</span> <span class="n">HttpResponse</span><span class="p">(</span><span class="n">json</span><span class="o">.</span><span class="n">dumps</span><span class="p">({</span><span class="s">&#39;success&#39;</span><span class="p">:</span> <span class="bp">False</span><span class="p">,</span> <span class="s">&#39;error&#39;</span><span class="p">:</span> <span class="s">&#39;Name required&#39;</span><span class="p">}))</span>
+    <span class="n">pnc</span><span class="o">.</span><span class="n">save</span><span class="p">()</span>
+
+    <span class="c"># The following automatically accepts name change requests. Remove this to</span>
+    <span class="c"># go back to the old system where it gets queued up for admin approval.</span>
+    <span class="n">accept_name_change_by_id</span><span class="p">(</span><span class="n">pnc</span><span class="o">.</span><span class="n">id</span><span class="p">)</span>
+
+    <span class="k">return</span> <span class="n">HttpResponse</span><span class="p">(</span><span class="n">json</span><span class="o">.</span><span class="n">dumps</span><span class="p">({</span><span class="s">&#39;success&#39;</span><span class="p">:</span> <span class="bp">True</span><span class="p">}))</span>
+
+</div>
+<span class="nd">@ensure_csrf_cookie</span>
+<div class="viewcode-block" id="pending_name_changes"><a class="viewcode-back" href="../../djangoapps-common.html#student.views.pending_name_changes">[docs]</a><span class="k">def</span> <span class="nf">pending_name_changes</span><span class="p">(</span><span class="n">request</span><span class="p">):</span>
+    <span class="sd">&#39;&#39;&#39; Web page which allows staff to approve or reject name changes. &#39;&#39;&#39;</span>
+    <span class="k">if</span> <span class="ow">not</span> <span class="n">request</span><span class="o">.</span><span class="n">user</span><span class="o">.</span><span class="n">is_staff</span><span class="p">:</span>
+        <span class="k">raise</span> <span class="n">Http404</span>
+
+    <span class="n">changes</span> <span class="o">=</span> <span class="nb">list</span><span class="p">(</span><span class="n">PendingNameChange</span><span class="o">.</span><span class="n">objects</span><span class="o">.</span><span class="n">all</span><span class="p">())</span>
+    <span class="n">js</span> <span class="o">=</span> <span class="p">{</span><span class="s">&#39;students&#39;</span><span class="p">:</span> <span class="p">[{</span><span class="s">&#39;new_name&#39;</span><span class="p">:</span> <span class="n">c</span><span class="o">.</span><span class="n">new_name</span><span class="p">,</span>
+                        <span class="s">&#39;rationale&#39;</span><span class="p">:</span><span class="n">c</span><span class="o">.</span><span class="n">rationale</span><span class="p">,</span>
+                        <span class="s">&#39;old_name&#39;</span><span class="p">:</span><span class="n">UserProfile</span><span class="o">.</span><span class="n">objects</span><span class="o">.</span><span class="n">get</span><span class="p">(</span><span class="n">user</span><span class="o">=</span><span class="n">c</span><span class="o">.</span><span class="n">user</span><span class="p">)</span><span class="o">.</span><span class="n">name</span><span class="p">,</span>
+                        <span class="s">&#39;email&#39;</span><span class="p">:</span><span class="n">c</span><span class="o">.</span><span class="n">user</span><span class="o">.</span><span class="n">email</span><span class="p">,</span>
+                        <span class="s">&#39;uid&#39;</span><span class="p">:</span><span class="n">c</span><span class="o">.</span><span class="n">user</span><span class="o">.</span><span class="n">id</span><span class="p">,</span>
+                        <span class="s">&#39;cid&#39;</span><span class="p">:</span><span class="n">c</span><span class="o">.</span><span class="n">id</span><span class="p">}</span> <span class="k">for</span> <span class="n">c</span> <span class="ow">in</span> <span class="n">changes</span><span class="p">]}</span>
+    <span class="k">return</span> <span class="n">render_to_response</span><span class="p">(</span><span class="s">&#39;name_changes.html&#39;</span><span class="p">,</span> <span class="n">js</span><span class="p">)</span>
+
+</div>
+<span class="nd">@ensure_csrf_cookie</span>
+<div class="viewcode-block" id="reject_name_change"><a class="viewcode-back" href="../../djangoapps-common.html#student.views.reject_name_change">[docs]</a><span class="k">def</span> <span class="nf">reject_name_change</span><span class="p">(</span><span class="n">request</span><span class="p">):</span>
+    <span class="sd">&#39;&#39;&#39; JSON: Name change process. Course staff clicks &#39;reject&#39; on a given name change &#39;&#39;&#39;</span>
+    <span class="k">if</span> <span class="ow">not</span> <span class="n">request</span><span class="o">.</span><span class="n">user</span><span class="o">.</span><span class="n">is_staff</span><span class="p">:</span>
+        <span class="k">raise</span> <span class="n">Http404</span>
+
+    <span class="k">try</span><span class="p">:</span>
+        <span class="n">pnc</span> <span class="o">=</span> <span class="n">PendingNameChange</span><span class="o">.</span><span class="n">objects</span><span class="o">.</span><span class="n">get</span><span class="p">(</span><span class="nb">id</span><span class="o">=</span><span class="nb">int</span><span class="p">(</span><span class="n">request</span><span class="o">.</span><span class="n">POST</span><span class="p">[</span><span class="s">&#39;id&#39;</span><span class="p">]))</span>
+    <span class="k">except</span> <span class="n">PendingNameChange</span><span class="o">.</span><span class="n">DoesNotExist</span><span class="p">:</span>
+        <span class="k">return</span> <span class="n">HttpResponse</span><span class="p">(</span><span class="n">json</span><span class="o">.</span><span class="n">dumps</span><span class="p">({</span><span class="s">&#39;success&#39;</span><span class="p">:</span> <span class="bp">False</span><span class="p">,</span> <span class="s">&#39;error&#39;</span><span class="p">:</span> <span class="s">&#39;Invalid ID&#39;</span><span class="p">}))</span>
+
+    <span class="n">pnc</span><span class="o">.</span><span class="n">delete</span><span class="p">()</span>
+    <span class="k">return</span> <span class="n">HttpResponse</span><span class="p">(</span><span class="n">json</span><span class="o">.</span><span class="n">dumps</span><span class="p">({</span><span class="s">&#39;success&#39;</span><span class="p">:</span> <span class="bp">True</span><span class="p">}))</span>
+
+</div>
+<span class="k">def</span> <span class="nf">accept_name_change_by_id</span><span class="p">(</span><span class="nb">id</span><span class="p">):</span>
+    <span class="k">try</span><span class="p">:</span>
+        <span class="n">pnc</span> <span class="o">=</span> <span class="n">PendingNameChange</span><span class="o">.</span><span class="n">objects</span><span class="o">.</span><span class="n">get</span><span class="p">(</span><span class="nb">id</span><span class="o">=</span><span class="nb">id</span><span class="p">)</span>
+    <span class="k">except</span> <span class="n">PendingNameChange</span><span class="o">.</span><span class="n">DoesNotExist</span><span class="p">:</span>
+        <span class="k">return</span> <span class="n">HttpResponse</span><span class="p">(</span><span class="n">json</span><span class="o">.</span><span class="n">dumps</span><span class="p">({</span><span class="s">&#39;success&#39;</span><span class="p">:</span> <span class="bp">False</span><span class="p">,</span> <span class="s">&#39;error&#39;</span><span class="p">:</span> <span class="s">&#39;Invalid ID&#39;</span><span class="p">}))</span>
+
+    <span class="n">u</span> <span class="o">=</span> <span class="n">pnc</span><span class="o">.</span><span class="n">user</span>
+    <span class="n">up</span> <span class="o">=</span> <span class="n">UserProfile</span><span class="o">.</span><span class="n">objects</span><span class="o">.</span><span class="n">get</span><span class="p">(</span><span class="n">user</span><span class="o">=</span><span class="n">u</span><span class="p">)</span>
+
+    <span class="c"># Save old name</span>
+    <span class="n">meta</span> <span class="o">=</span> <span class="n">up</span><span class="o">.</span><span class="n">get_meta</span><span class="p">()</span>
+    <span class="k">if</span> <span class="s">&#39;old_names&#39;</span> <span class="ow">not</span> <span class="ow">in</span> <span class="n">meta</span><span class="p">:</span>
+        <span class="n">meta</span><span class="p">[</span><span class="s">&#39;old_names&#39;</span><span class="p">]</span> <span class="o">=</span> <span class="p">[]</span>
+    <span class="n">meta</span><span class="p">[</span><span class="s">&#39;old_names&#39;</span><span class="p">]</span><span class="o">.</span><span class="n">append</span><span class="p">([</span><span class="n">up</span><span class="o">.</span><span class="n">name</span><span class="p">,</span> <span class="n">pnc</span><span class="o">.</span><span class="n">rationale</span><span class="p">,</span> <span class="n">datetime</span><span class="o">.</span><span class="n">datetime</span><span class="o">.</span><span class="n">now</span><span class="p">()</span><span class="o">.</span><span class="n">isoformat</span><span class="p">()])</span>
+    <span class="n">up</span><span class="o">.</span><span class="n">set_meta</span><span class="p">(</span><span class="n">meta</span><span class="p">)</span>
+
+    <span class="n">up</span><span class="o">.</span><span class="n">name</span> <span class="o">=</span> <span class="n">pnc</span><span class="o">.</span><span class="n">new_name</span>
+    <span class="n">up</span><span class="o">.</span><span class="n">save</span><span class="p">()</span>
+    <span class="n">pnc</span><span class="o">.</span><span class="n">delete</span><span class="p">()</span>
+
+    <span class="k">return</span> <span class="n">HttpResponse</span><span class="p">(</span><span class="n">json</span><span class="o">.</span><span class="n">dumps</span><span class="p">({</span><span class="s">&#39;success&#39;</span><span class="p">:</span> <span class="bp">True</span><span class="p">}))</span>
+
+
+<span class="nd">@ensure_csrf_cookie</span>
+<div class="viewcode-block" id="accept_name_change"><a class="viewcode-back" href="../../djangoapps-common.html#student.views.accept_name_change">[docs]</a><span class="k">def</span> <span class="nf">accept_name_change</span><span class="p">(</span><span class="n">request</span><span class="p">):</span>
+    <span class="sd">&#39;&#39;&#39; JSON: Name change process. Course staff clicks &#39;accept&#39; on a given name change </span>
+<span class="sd">    </span>
+<span class="sd">    We used this during the prototype but now we simply record name changes instead</span>
+<span class="sd">    of manually approving them. Still keeping this around in case we want to go</span>
+<span class="sd">    back to this approval method.</span>
+<span class="sd">    &#39;&#39;&#39;</span>
+    <span class="k">if</span> <span class="ow">not</span> <span class="n">request</span><span class="o">.</span><span class="n">user</span><span class="o">.</span><span class="n">is_staff</span><span class="p">:</span>
+        <span class="k">raise</span> <span class="n">Http404</span>
+
+    <span class="k">return</span> <span class="n">accept_name_change_by_id</span><span class="p">(</span><span class="nb">int</span><span class="p">(</span><span class="n">request</span><span class="o">.</span><span class="n">POST</span><span class="p">[</span><span class="s">&#39;id&#39;</span><span class="p">]))</span></div>
+</pre></div>
+
+          </div>
+        </div>
+      </div>
+      <div class="clearer"></div>
+    </div>
+    <div class="related">
+      <h3>Navigation</h3>
+      <ul>
+        <li class="right" style="margin-right: 10px">
+          <a href="../../genindex.html" title="General Index"
+             >index</a></li>
+        <li class="right" >
+          <a href="../../py-modindex.html" title="Python Module Index"
+             >modules</a> |</li>
+        <li><a href="../../index.html">MITx 1.0 documentation</a> &raquo;</li>
+          <li><a href="../index.html" >Module code</a> &raquo;</li> 
+      </ul>
+    </div>
+    <div class="footer">
+        &copy; Copyright 2012, MITx team.
+      Created using <a href="http://sphinx.pocoo.org/">Sphinx</a> 1.1.3.
+    </div>
+  </body>
+</html>

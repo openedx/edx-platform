@@ -1,0 +1,1408 @@
+
+
+<!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Transitional//EN"
+  "http://www.w3.org/TR/xhtml1/DTD/xhtml1-transitional.dtd">
+
+
+<html xmlns="http://www.w3.org/1999/xhtml">
+  <head>
+    <meta http-equiv="Content-Type" content="text/html; charset=utf-8" />
+    
+    <title>LMS module &mdash; MITx 1.0 documentation</title>
+    
+    <link rel="stylesheet" href="_static/sphinxdoc.css" type="text/css" />
+    <link rel="stylesheet" href="_static/pygments.css" type="text/css" />
+    
+    <script type="text/javascript">
+      var DOCUMENTATION_OPTIONS = {
+        URL_ROOT:    '',
+        VERSION:     '1.0',
+        COLLAPSE_INDEX: false,
+        FILE_SUFFIX: '.html',
+        HAS_SOURCE:  true
+      };
+    </script>
+    <script type="text/javascript" src="_static/jquery.js"></script>
+    <script type="text/javascript" src="_static/underscore.js"></script>
+    <script type="text/javascript" src="_static/doctools.js"></script>
+    <script type="text/javascript" src="http://cdn.mathjax.org/mathjax/latest/MathJax.js?config=TeX-AMS-MML_HTMLorMML"></script>
+    <link rel="top" title="MITx 1.0 documentation" href="index.html" />
+    <link rel="up" title="Django applications" href="djangoapps.html" />
+    <link rel="next" title="CMS module" href="cms.html" />
+    <link rel="prev" title="Django applications" href="djangoapps.html" /> 
+  </head>
+  <body>
+<img src="_static/homepage-bg.jpg" alt="Edx logo"  width="100%;"/>
+
+    <div class="related">
+      <h3>Navigation</h3>
+      <ul>
+        <li class="right" style="margin-right: 10px">
+          <a href="genindex.html" title="General Index"
+             accesskey="I">index</a></li>
+        <li class="right" >
+          <a href="py-modindex.html" title="Python Module Index"
+             >modules</a> |</li>
+        <li class="right" >
+          <a href="cms.html" title="CMS module"
+             accesskey="N">next</a> |</li>
+        <li class="right" >
+          <a href="djangoapps.html" title="Django applications"
+             accesskey="P">previous</a> |</li>
+        <li><a href="index.html">MITx 1.0 documentation</a> &raquo;</li>
+          <li><a href="djangoapps.html" accesskey="U">Django applications</a> &raquo;</li> 
+      </ul>
+    </div>
+      <div class="sphinxsidebar">
+        <div class="sphinxsidebarwrapper">
+  <h3><a href="index.html">Table Of Contents</a></h3>
+  <ul>
+<li><a class="reference internal" href="#">LMS module</a><ul>
+<li><a class="reference internal" href="#module-branding">Branding</a><ul>
+<li><a class="reference internal" href="#module-branding.views">Views</a></li>
+</ul>
+</li>
+<li><a class="reference internal" href="#module-certificates">Certificates</a><ul>
+<li><a class="reference internal" href="#module-certificates.models">Models</a></li>
+<li><a class="reference internal" href="#id1">Views</a></li>
+<li><a class="reference internal" href="#module-certificates.tests">Tests</a></li>
+</ul>
+</li>
+<li><a class="reference internal" href="#module-circuit">Circuit</a><ul>
+<li><a class="reference internal" href="#id2">Models</a></li>
+<li><a class="reference internal" href="#id3">Views</a></li>
+<li><a class="reference internal" href="#id4">Tests</a></li>
+</ul>
+</li>
+<li><a class="reference internal" href="#module-course_wiki">Course_wiki</a><ul>
+<li><a class="reference internal" href="#course-nav">Course Nav</a></li>
+<li><a class="reference internal" href="#id5">Views</a></li>
+<li><a class="reference internal" href="#module-course_wiki.editors">Editors</a></li>
+</ul>
+</li>
+<li><a class="reference internal" href="#module-courseware">Courseware</a><ul>
+<li><a class="reference internal" href="#module-courseware.access">Access</a></li>
+<li><a class="reference internal" href="#module-courseware.admin">Admin</a></li>
+<li><a class="reference internal" href="#module-courseware.courses">Courses</a></li>
+<li><a class="reference internal" href="#module-courseware.grades">Grades</a></li>
+<li><a class="reference internal" href="#id6">Models</a></li>
+<li><a class="reference internal" href="#module-courseware.progress">Progress</a></li>
+<li><a class="reference internal" href="#module-courseware.tabs">Tabs</a></li>
+</ul>
+</li>
+<li><a class="reference internal" href="#module-dashboard">Dashboard</a><ul>
+<li><a class="reference internal" href="#id7">Models</a></li>
+<li><a class="reference internal" href="#id8">Views</a></li>
+<li><a class="reference internal" href="#id9">Tests</a></li>
+</ul>
+</li>
+<li><a class="reference internal" href="#module-django_comment_client">Django comment client</a><ul>
+<li><a class="reference internal" href="#id10">Models</a></li>
+<li><a class="reference internal" href="#id11">Tests</a></li>
+</ul>
+</li>
+<li><a class="reference internal" href="#module-heartbeat">Heartbeat</a></li>
+<li><a class="reference internal" href="#module-instructor">Instructor</a><ul>
+<li><a class="reference internal" href="#id12">Views</a></li>
+<li><a class="reference internal" href="#id13">Tests</a></li>
+</ul>
+</li>
+<li><a class="reference internal" href="#module-licenses">Lisenses</a><ul>
+<li><a class="reference internal" href="#id14">Models</a></li>
+<li><a class="reference internal" href="#id15">Views</a></li>
+<li><a class="reference internal" href="#id16">Tests</a></li>
+</ul>
+</li>
+<li><a class="reference internal" href="#module-lms_migration">LMS migration</a><ul>
+<li><a class="reference internal" href="#module-lms_migration.migrate">Migration</a></li>
+</ul>
+</li>
+<li><a class="reference internal" href="#module-multicourse">Multicourse</a></li>
+<li><a class="reference internal" href="#module-psychometrics">Psychometrics</a><ul>
+<li><a class="reference internal" href="#id17">Models</a></li>
+<li><a class="reference internal" href="#id18">Admin</a></li>
+<li><a class="reference internal" href="#module-psychometrics.psychoanalyze">Psychoanalyze</a></li>
+</ul>
+</li>
+<li><a class="reference internal" href="#module-simplewiki">Simple wiki</a><ul>
+<li><a class="reference internal" href="#id19">Models</a></li>
+<li><a class="reference internal" href="#id20">Views</a></li>
+<li><a class="reference internal" href="#id21">Tests</a></li>
+</ul>
+</li>
+<li><a class="reference internal" href="#module-static_template_view">Static template view</a><ul>
+<li><a class="reference internal" href="#id22">Models</a></li>
+<li><a class="reference internal" href="#id23">Views</a></li>
+<li><a class="reference internal" href="#id24">Tests</a></li>
+</ul>
+</li>
+<li><a class="reference internal" href="#module-staticbook">Static book</a><ul>
+<li><a class="reference internal" href="#id25">Models</a></li>
+<li><a class="reference internal" href="#id26">Views</a></li>
+<li><a class="reference internal" href="#id27">Tests</a></li>
+</ul>
+</li>
+</ul>
+</li>
+</ul>
+
+  <h4>Previous topic</h4>
+  <p class="topless"><a href="djangoapps.html"
+                        title="previous chapter">Django applications</a></p>
+  <h4>Next topic</h4>
+  <p class="topless"><a href="cms.html"
+                        title="next chapter">CMS module</a></p>
+  <h3>This Page</h3>
+  <ul class="this-page-menu">
+    <li><a href="_sources/lms.txt"
+           rel="nofollow">Show Source</a></li>
+  </ul>
+<div id="searchbox" style="display: none">
+  <h3>Quick search</h3>
+    <form class="search" action="search.html" method="get">
+      <input type="text" name="q" />
+      <input type="submit" value="Go" />
+      <input type="hidden" name="check_keywords" value="yes" />
+      <input type="hidden" name="area" value="default" />
+    </form>
+    <p class="searchtip" style="font-size: 90%">
+    Enter search terms or a module, class or function name.
+    </p>
+</div>
+<script type="text/javascript">$('#searchbox').show(0);</script>
+        </div>
+      </div>
+
+    <div class="document">
+      <div class="documentwrapper">
+        <div class="bodywrapper">
+          <div class="body">
+            
+  <div class="section" id="module-lms">
+<span id="lms-module"></span><h1>LMS module<a class="headerlink" href="#module-lms" title="Permalink to this headline">¶</a></h1>
+<div class="section" id="module-branding">
+<span id="branding"></span><h2>Branding<a class="headerlink" href="#module-branding" title="Permalink to this headline">¶</a></h2>
+<dl class="function">
+<dt id="branding.get_logo_url">
+<tt class="descclassname">branding.</tt><tt class="descname">get_logo_url</tt><big>(</big><em>domain=None</em><big>)</big><a class="reference internal" href="_modules/branding.html#get_logo_url"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#branding.get_logo_url" title="Permalink to this definition">¶</a></dt>
+<dd><p>Return the url for the branded logo image to be used</p>
+</dd></dl>
+
+<dl class="function">
+<dt id="branding.get_university">
+<tt class="descclassname">branding.</tt><tt class="descname">get_university</tt><big>(</big><em>domain=None</em><big>)</big><a class="reference internal" href="_modules/branding.html#get_university"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#branding.get_university" title="Permalink to this definition">¶</a></dt>
+<dd><p>Return the university name specified for the domain, or None
+if no university was specified</p>
+</dd></dl>
+
+<dl class="function">
+<dt id="branding.get_visible_courses">
+<tt class="descclassname">branding.</tt><tt class="descname">get_visible_courses</tt><big>(</big><em>domain=None</em><big>)</big><a class="reference internal" href="_modules/branding.html#get_visible_courses"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#branding.get_visible_courses" title="Permalink to this definition">¶</a></dt>
+<dd><p>Return the set of CourseDescriptors that should be visible in this branded instance</p>
+</dd></dl>
+
+<div class="section" id="module-branding.views">
+<span id="views"></span><h3>Views<a class="headerlink" href="#module-branding.views" title="Permalink to this headline">¶</a></h3>
+<dl class="function">
+<dt id="branding.views.courses">
+<tt class="descclassname">branding.views.</tt><tt class="descname">courses</tt><big>(</big><em>request</em>, <em>*args</em>, <em>**kwargs</em><big>)</big><a class="reference internal" href="_modules/branding/views.html#courses"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#branding.views.courses" title="Permalink to this definition">¶</a></dt>
+<dd><p>Render the &#8220;find courses&#8221; page. If subdomain branding is on, this is the
+university profile page, otherwise it&#8217;s the edX courseware.views.courses page</p>
+</dd></dl>
+
+<dl class="function">
+<dt id="branding.views.index">
+<tt class="descclassname">branding.views.</tt><tt class="descname">index</tt><big>(</big><em>request</em>, <em>*args</em>, <em>**kwargs</em><big>)</big><a class="reference internal" href="_modules/branding/views.html#index"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#branding.views.index" title="Permalink to this definition">¶</a></dt>
+<dd><p>Redirects to main page &#8211; info page if user authenticated, or marketing if not</p>
+</dd></dl>
+
+</div>
+</div>
+<div class="section" id="module-certificates">
+<span id="certificates"></span><h2>Certificates<a class="headerlink" href="#module-certificates" title="Permalink to this headline">¶</a></h2>
+<div class="section" id="module-certificates.models">
+<span id="models"></span><h3>Models<a class="headerlink" href="#module-certificates.models" title="Permalink to this headline">¶</a></h3>
+<dl class="class">
+<dt id="certificates.models.GeneratedCertificate">
+<em class="property">class </em><tt class="descclassname">certificates.models.</tt><tt class="descname">GeneratedCertificate</tt><big>(</big><em>*args</em>, <em>**kwargs</em><big>)</big><a class="reference internal" href="_modules/certificates/models.html#GeneratedCertificate"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#certificates.models.GeneratedCertificate" title="Permalink to this definition">¶</a></dt>
+<dd><p>Bases: <tt class="xref py py-class docutils literal"><span class="pre">django.db.models.base.Model</span></tt></p>
+<p>GeneratedCertificate(id, user_id, course_id, verify_uuid, download_uuid, download_url, grade, key, distinction, status, name, created_date, modified_date, error_reason)</p>
+<table class="docutils field-list" frame="void" rules="none">
+<col class="field-name" />
+<col class="field-body" />
+<tbody valign="top">
+<tr class="field-odd field"><th class="field-name">Parameters:</th><td class="field-body"><ul class="first last simple">
+<li><strong>id</strong> (<em>AutoField</em>) &#8211; Id</li>
+<li><strong>user_id</strong> (<em>ForeignKey</em>) &#8211; User</li>
+<li><strong>course_id</strong> (<em>CharField</em>) &#8211; Course id</li>
+<li><strong>verify_uuid</strong> (<em>CharField</em>) &#8211; Verify uuid</li>
+<li><strong>download_uuid</strong> (<em>CharField</em>) &#8211; Download uuid</li>
+<li><strong>download_url</strong> (<em>CharField</em>) &#8211; Download url</li>
+<li><strong>grade</strong> (<em>CharField</em>) &#8211; Grade</li>
+<li><strong>key</strong> (<em>CharField</em>) &#8211; Key</li>
+<li><strong>distinction</strong> (<em>BooleanField</em>) &#8211; Distinction</li>
+<li><strong>status</strong> (<em>CharField</em>) &#8211; Status</li>
+<li><strong>name</strong> (<em>CharField</em>) &#8211; Name</li>
+<li><strong>created_date</strong> (<em>DateTimeField</em>) &#8211; Created date</li>
+<li><strong>modified_date</strong> (<em>DateTimeField</em>) &#8211; Modified date</li>
+<li><strong>error_reason</strong> (<em>CharField</em>) &#8211; Error reason</li>
+</ul>
+</td>
+</tr>
+</tbody>
+</table>
+</dd></dl>
+
+<dl class="function">
+<dt id="certificates.models.certificate_status_for_student">
+<tt class="descclassname">certificates.models.</tt><tt class="descname">certificate_status_for_student</tt><big>(</big><em>student</em>, <em>course_id</em><big>)</big><a class="headerlink" href="#certificates.models.certificate_status_for_student" title="Permalink to this definition">¶</a></dt>
+<dd><p>This returns a dictionary with a key for status, and other information.
+The status is one of the following:</p>
+<dl class="docutils">
+<dt>unavailable  - No entry for this student&#8211;if they are actually in</dt>
+<dd>the course, they probably have not been graded for
+certificate generation yet.</dd>
+<dt>generating   - A request has been made to generate a certificate,</dt>
+<dd>but it has not been generated yet.</dd>
+<dt>regenerating - A request has been made to regenerate a certificate,</dt>
+<dd>but it has not been generated yet.</dd>
+</dl>
+<p>deleting     - A request has been made to delete a certificate.</p>
+<p>deleted      - The certificate has been deleted.
+downloadable - The certificate is available for download.
+notpassing   - The student was graded but is not passing</p>
+<p>If the status is &#8220;downloadable&#8221;, the dictionary also contains
+&#8220;download_url&#8221;.</p>
+<p>If the student has been graded, the dictionary also contains their
+grade for the course with the key &#8220;grade&#8221;.</p>
+</dd></dl>
+
+</div>
+<div class="section" id="id1">
+<h3>Views<a class="headerlink" href="#id1" title="Permalink to this headline">¶</a></h3>
+<span class="target" id="module-certificates.views"></span><dl class="function">
+<dt id="certificates.views.update_certificate">
+<tt class="descclassname">certificates.views.</tt><tt class="descname">update_certificate</tt><big>(</big><em>*args</em>, <em>**kwargs</em><big>)</big><a class="headerlink" href="#certificates.views.update_certificate" title="Permalink to this definition">¶</a></dt>
+<dd><p>Will update GeneratedCertificate for a new certificate or
+modify an existing certificate entry.</p>
+<p>See models.py for a state diagram of certificate states</p>
+<p>This view should only ever be accessed by the xqueue server</p>
+</dd></dl>
+
+</div>
+<div class="section" id="module-certificates.tests">
+<span id="tests"></span><h3>Tests<a class="headerlink" href="#module-certificates.tests" title="Permalink to this headline">¶</a></h3>
+<p>This file demonstrates writing tests using the unittest module. These will pass
+when you run &#8220;manage.py test&#8221;.</p>
+<p>Replace this with more appropriate tests for your application.</p>
+</div>
+</div>
+<div class="section" id="module-circuit">
+<span id="circuit"></span><h2>Circuit<a class="headerlink" href="#module-circuit" title="Permalink to this headline">¶</a></h2>
+<div class="section" id="id2">
+<h3>Models<a class="headerlink" href="#id2" title="Permalink to this headline">¶</a></h3>
+<span class="target" id="module-circuit.models"></span><dl class="class">
+<dt id="circuit.models.ServerCircuit">
+<em class="property">class </em><tt class="descclassname">circuit.models.</tt><tt class="descname">ServerCircuit</tt><big>(</big><em>*args</em>, <em>**kwargs</em><big>)</big><a class="reference internal" href="_modules/circuit/models.html#ServerCircuit"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#circuit.models.ServerCircuit" title="Permalink to this definition">¶</a></dt>
+<dd><p>Bases: <tt class="xref py py-class docutils literal"><span class="pre">django.db.models.base.Model</span></tt></p>
+<p>ServerCircuit(id, name, schematic)</p>
+<table class="docutils field-list" frame="void" rules="none">
+<col class="field-name" />
+<col class="field-body" />
+<tbody valign="top">
+<tr class="field-odd field"><th class="field-name">Parameters:</th><td class="field-body"><ul class="first last simple">
+<li><strong>id</strong> (<em>AutoField</em>) &#8211; Id</li>
+<li><strong>name</strong> (<em>CharField</em>) &#8211; Name</li>
+<li><strong>schematic</strong> (<em>TextField</em>) &#8211; Schematic</li>
+</ul>
+</td>
+</tr>
+</tbody>
+</table>
+</dd></dl>
+
+</div>
+<div class="section" id="id3">
+<h3>Views<a class="headerlink" href="#id3" title="Permalink to this headline">¶</a></h3>
+<span class="target" id="module-circuit.views"></span><dl class="function">
+<dt id="circuit.views.circuit_line">
+<tt class="descclassname">circuit.views.</tt><tt class="descname">circuit_line</tt><big>(</big><em>circuit</em><big>)</big><a class="reference internal" href="_modules/circuit/views.html#circuit_line"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#circuit.views.circuit_line" title="Permalink to this definition">¶</a></dt>
+<dd><p>Returns string for an appropriate input element for a circuit.
+TODO: Rename.</p>
+</dd></dl>
+
+</div>
+<div class="section" id="id4">
+<h3>Tests<a class="headerlink" href="#id4" title="Permalink to this headline">¶</a></h3>
+<span class="target" id="module-circuit.tests"></span><p>This file demonstrates writing tests using the unittest module. These will pass
+when you run &#8220;manage.py test&#8221;.</p>
+<p>Replace this with more appropriate tests for your application.</p>
+</div>
+</div>
+<div class="section" id="module-course_wiki">
+<span id="course-wiki"></span><h2>Course_wiki<a class="headerlink" href="#module-course_wiki" title="Permalink to this headline">¶</a></h2>
+<div class="section" id="course-nav">
+<h3>Course Nav<a class="headerlink" href="#course-nav" title="Permalink to this headline">¶</a></h3>
+</div>
+<div class="section" id="id5">
+<h3>Views<a class="headerlink" href="#id5" title="Permalink to this headline">¶</a></h3>
+<span class="target" id="module-course_wiki.views"></span><dl class="function">
+<dt id="course_wiki.views.course_wiki_redirect">
+<tt class="descclassname">course_wiki.views.</tt><tt class="descname">course_wiki_redirect</tt><big>(</big><em>request</em>, <em>course_id</em><big>)</big><a class="reference internal" href="_modules/course_wiki/views.html#course_wiki_redirect"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#course_wiki.views.course_wiki_redirect" title="Permalink to this definition">¶</a></dt>
+<dd><p>This redirects to whatever page on the wiki that the course designates
+as it&#8217;s home page. A course&#8217;s wiki must be an article on the root (for
+example, &#8220;/6.002x&#8221;) to keep things simple.</p>
+</dd></dl>
+
+<dl class="function">
+<dt id="course_wiki.views.get_or_create_root">
+<tt class="descclassname">course_wiki.views.</tt><tt class="descname">get_or_create_root</tt><big>(</big><big>)</big><a class="reference internal" href="_modules/course_wiki/views.html#get_or_create_root"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#course_wiki.views.get_or_create_root" title="Permalink to this definition">¶</a></dt>
+<dd><p>Returns the root article, or creates it if it doesn&#8217;t exist.</p>
+</dd></dl>
+
+<dl class="function">
+<dt id="course_wiki.views.root_create">
+<tt class="descclassname">course_wiki.views.</tt><tt class="descname">root_create</tt><big>(</big><em>request</em><big>)</big><a class="reference internal" href="_modules/course_wiki/views.html#root_create"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#course_wiki.views.root_create" title="Permalink to this definition">¶</a></dt>
+<dd><p>In the edX wiki, we don&#8217;t show the root_create view. Instead, we
+just create the root automatically if it doesn&#8217;t exist.</p>
+</dd></dl>
+
+</div>
+<div class="section" id="module-course_wiki.editors">
+<span id="editors"></span><h3>Editors<a class="headerlink" href="#module-course_wiki.editors" title="Permalink to this headline">¶</a></h3>
+</div>
+</div>
+<div class="section" id="module-courseware">
+<span id="courseware"></span><h2>Courseware<a class="headerlink" href="#module-courseware" title="Permalink to this headline">¶</a></h2>
+<div class="section" id="module-courseware.access">
+<span id="access"></span><h3>Access<a class="headerlink" href="#module-courseware.access" title="Permalink to this headline">¶</a></h3>
+<p>This file contains (or should), all access control logic for the courseware.
+Ideally, it will be the only place that needs to know about any special settings
+like DISABLE_START_DATES</p>
+<dl class="function">
+<dt id="courseware.access.get_access_group_name">
+<tt class="descclassname">courseware.access.</tt><tt class="descname">get_access_group_name</tt><big>(</big><em>obj</em>, <em>action</em><big>)</big><a class="reference internal" href="_modules/courseware/access.html#get_access_group_name"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#courseware.access.get_access_group_name" title="Permalink to this definition">¶</a></dt>
+<dd><p>Returns group name for user group which has &#8220;action&#8221; access to the given object.</p>
+<p>Used in managing access lists.</p>
+</dd></dl>
+
+<dl class="function">
+<dt id="courseware.access.has_access">
+<tt class="descclassname">courseware.access.</tt><tt class="descname">has_access</tt><big>(</big><em>user</em>, <em>obj</em>, <em>action</em><big>)</big><a class="reference internal" href="_modules/courseware/access.html#has_access"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#courseware.access.has_access" title="Permalink to this definition">¶</a></dt>
+<dd><p>Check whether a user has the access to do action on obj.  Handles any magic
+switching based on various settings.</p>
+<p>Things this module understands:
+- start dates for modules
+- DISABLE_START_DATES
+- different access for instructor, staff, course staff, and students.</p>
+<p>user: a Django user object. May be anonymous.</p>
+<p>obj: The object to check access for.  For now, a module or descriptor.</p>
+<p>action: A string specifying the action that the client is trying to perform.</p>
+<p>actions depend on the obj type, but include e.g. &#8216;enroll&#8217; for courses.  See the
+type-specific functions below for the known actions for that type.</p>
+<p>Returns a bool.  It is up to the caller to actually deny access in a way
+that makes sense in context.</p>
+</dd></dl>
+
+</div>
+<div class="section" id="module-courseware.admin">
+<span id="admin"></span><h3>Admin<a class="headerlink" href="#module-courseware.admin" title="Permalink to this headline">¶</a></h3>
+<p>django admin pages for courseware model</p>
+</div>
+<div class="section" id="module-courseware.courses">
+<span id="courses"></span><h3>Courses<a class="headerlink" href="#module-courseware.courses" title="Permalink to this headline">¶</a></h3>
+<dl class="function">
+<dt id="courseware.courses.course_image_url">
+<tt class="descclassname">courseware.courses.</tt><tt class="descname">course_image_url</tt><big>(</big><em>course</em><big>)</big><a class="reference internal" href="_modules/courseware/courses.html#course_image_url"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#courseware.courses.course_image_url" title="Permalink to this definition">¶</a></dt>
+<dd><p>Try to look up the image url for the course.  If it&#8217;s not found,
+log an error and return the dead link</p>
+</dd></dl>
+
+<dl class="function">
+<dt id="courseware.courses.find_file">
+<tt class="descclassname">courseware.courses.</tt><tt class="descname">find_file</tt><big>(</big><em>fs</em>, <em>dirs</em>, <em>filename</em><big>)</big><a class="reference internal" href="_modules/courseware/courses.html#find_file"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#courseware.courses.find_file" title="Permalink to this definition">¶</a></dt>
+<dd><p>Looks for a filename in a list of dirs on a filesystem, in the specified order.</p>
+<p>fs: an OSFS filesystem
+dirs: a list of path objects
+filename: a string</p>
+<p>Returns d / filename if found in dir d, else raises ResourceNotFoundError.</p>
+</dd></dl>
+
+<dl class="function">
+<dt id="courseware.courses.get_course_about_section">
+<tt class="descclassname">courseware.courses.</tt><tt class="descname">get_course_about_section</tt><big>(</big><em>course</em>, <em>section_key</em><big>)</big><a class="reference internal" href="_modules/courseware/courses.html#get_course_about_section"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#courseware.courses.get_course_about_section" title="Permalink to this definition">¶</a></dt>
+<dd><p>This returns the snippet of html to be rendered on the course about page,
+given the key for the section.</p>
+<p>Valid keys:
+- overview
+- title
+- university
+- number
+- short_description
+- description
+- key_dates (includes start, end, exams, etc)
+- video
+- course_staff_short
+- course_staff_extended
+- requirements
+- syllabus
+- textbook
+- faq
+- more_info
+- ocw_links</p>
+</dd></dl>
+
+<dl class="function">
+<dt id="courseware.courses.get_course_by_id">
+<tt class="descclassname">courseware.courses.</tt><tt class="descname">get_course_by_id</tt><big>(</big><em>course_id</em><big>)</big><a class="reference internal" href="_modules/courseware/courses.html#get_course_by_id"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#courseware.courses.get_course_by_id" title="Permalink to this definition">¶</a></dt>
+<dd><p>Given a course id, return the corresponding course descriptor.</p>
+<p>If course_id is not valid, raises a 404.</p>
+</dd></dl>
+
+<dl class="function">
+<dt id="courseware.courses.get_course_info_section">
+<tt class="descclassname">courseware.courses.</tt><tt class="descname">get_course_info_section</tt><big>(</big><em>course</em>, <em>section_key</em><big>)</big><a class="reference internal" href="_modules/courseware/courses.html#get_course_info_section"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#courseware.courses.get_course_info_section" title="Permalink to this definition">¶</a></dt>
+<dd><p>This returns the snippet of html to be rendered on the course info page,
+given the key for the section.</p>
+<p>Valid keys:
+- handouts
+- guest_handouts
+- updates
+- guest_updates</p>
+</dd></dl>
+
+<dl class="function">
+<dt id="courseware.courses.get_course_syllabus_section">
+<tt class="descclassname">courseware.courses.</tt><tt class="descname">get_course_syllabus_section</tt><big>(</big><em>course</em>, <em>section_key</em><big>)</big><a class="reference internal" href="_modules/courseware/courses.html#get_course_syllabus_section"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#courseware.courses.get_course_syllabus_section" title="Permalink to this definition">¶</a></dt>
+<dd><p>This returns the snippet of html to be rendered on the syllabus page,
+given the key for the section.</p>
+<p>Valid keys:
+- syllabus
+- guest_syllabus</p>
+</dd></dl>
+
+<dl class="function">
+<dt id="courseware.courses.get_course_with_access">
+<tt class="descclassname">courseware.courses.</tt><tt class="descname">get_course_with_access</tt><big>(</big><em>user</em>, <em>course_id</em>, <em>action</em><big>)</big><a class="reference internal" href="_modules/courseware/courses.html#get_course_with_access"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#courseware.courses.get_course_with_access" title="Permalink to this definition">¶</a></dt>
+<dd><p>Given a course_id, look up the corresponding course descriptor,
+check that the user has the access to perform the specified action
+on the course, and return the descriptor.</p>
+<p>Raises a 404 if the course_id is invalid, or the user doesn&#8217;t have access.</p>
+</dd></dl>
+
+<dl class="function">
+<dt id="courseware.courses.get_courses_by_university">
+<tt class="descclassname">courseware.courses.</tt><tt class="descname">get_courses_by_university</tt><big>(</big><em>user</em>, <em>domain=None</em><big>)</big><a class="reference internal" href="_modules/courseware/courses.html#get_courses_by_university"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#courseware.courses.get_courses_by_university" title="Permalink to this definition">¶</a></dt>
+<dd><p>Returns dict of lists of courses available, keyed by course.org (ie university).
+Courses are sorted by course.number.</p>
+</dd></dl>
+
+<dl class="function">
+<dt id="courseware.courses.get_opt_course_with_access">
+<tt class="descclassname">courseware.courses.</tt><tt class="descname">get_opt_course_with_access</tt><big>(</big><em>user</em>, <em>course_id</em>, <em>action</em><big>)</big><a class="reference internal" href="_modules/courseware/courses.html#get_opt_course_with_access"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#courseware.courses.get_opt_course_with_access" title="Permalink to this definition">¶</a></dt>
+<dd><p>Same as get_course_with_access, except that if course_id is None,
+return None without performing any access checks.</p>
+</dd></dl>
+
+</div>
+<div class="section" id="module-courseware.grades">
+<span id="grades"></span><h3>Grades<a class="headerlink" href="#module-courseware.grades" title="Permalink to this headline">¶</a></h3>
+<dl class="function">
+<dt id="courseware.grades.answer_distributions">
+<tt class="descclassname">courseware.grades.</tt><tt class="descname">answer_distributions</tt><big>(</big><em>request</em>, <em>course</em><big>)</big><a class="reference internal" href="_modules/courseware/grades.html#answer_distributions"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#courseware.grades.answer_distributions" title="Permalink to this definition">¶</a></dt>
+<dd><p>Given a course_descriptor, compute frequencies of answers for each problem:</p>
+<p>Format is:</p>
+<p>dict: (problem url_name, problem display_name, problem_id) -&gt; (dict : answer -&gt;  count)</p>
+<p>TODO (vshnayder): this is currently doing a full linear pass through all
+students and all problems.  This will be just a little slow.</p>
+</dd></dl>
+
+<dl class="function">
+<dt id="courseware.grades.get_score">
+<tt class="descclassname">courseware.grades.</tt><tt class="descname">get_score</tt><big>(</big><em>course_id</em>, <em>user</em>, <em>problem_descriptor</em>, <em>module_creator</em>, <em>student_module_cache</em><big>)</big><a class="reference internal" href="_modules/courseware/grades.html#get_score"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#courseware.grades.get_score" title="Permalink to this definition">¶</a></dt>
+<dd><p>Return the score for a user on a problem, as a tuple (correct, total).
+e.g. (5,7) if you got 5 out of 7 points.</p>
+<p>If this problem doesn&#8217;t have a score, or we couldn&#8217;t load it, returns (None,
+None).</p>
+<p>user: a Student object
+problem_descriptor: an XModuleDescriptor
+module_creator: a function that takes a descriptor, and returns the corresponding XModule for this user.</p>
+<blockquote>
+<div>Can return None if user doesn&#8217;t have access, or if something else went wrong.</div></blockquote>
+<p>cache: A StudentModuleCache</p>
+</dd></dl>
+
+<dl class="function">
+<dt id="courseware.grades.grade">
+<tt class="descclassname">courseware.grades.</tt><tt class="descname">grade</tt><big>(</big><em>student</em>, <em>request</em>, <em>course</em>, <em>student_module_cache=None</em>, <em>keep_raw_scores=False</em><big>)</big><a class="reference internal" href="_modules/courseware/grades.html#grade"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#courseware.grades.grade" title="Permalink to this definition">¶</a></dt>
+<dd><p>This grades a student as quickly as possible. It retuns the
+output from the course grader, augmented with the final letter
+grade. The keys in the output are:</p>
+<p>course: a CourseDescriptor</p>
+<ul>
+<li><p class="first">grade : A final letter grade.</p>
+</li>
+<li><p class="first">percent : The final percent for the class (rounded up).</p>
+</li>
+<li><dl class="first docutils">
+<dt>section_breakdown <span class="classifier-delimiter">:</span> <span class="classifier">A breakdown of each section that makes</span></dt>
+<dd><p class="first last">up the grade. (For display)</p>
+</dd>
+</dl>
+</li>
+<li><dl class="first docutils">
+<dt>grade_breakdown <span class="classifier-delimiter">:</span> <span class="classifier">A breakdown of the major components that</span></dt>
+<dd><p class="first last">make up the final grade. (For display)</p>
+</dd>
+</dl>
+</li>
+<li><p class="first">keep_raw_scores : if True, then value for key &#8216;raw_scores&#8217; contains scores for every graded module</p>
+</li>
+</ul>
+<p>More information on the format is in the docstring for CourseGrader.</p>
+</dd></dl>
+
+<dl class="function">
+<dt id="courseware.grades.grade_for_percentage">
+<tt class="descclassname">courseware.grades.</tt><tt class="descname">grade_for_percentage</tt><big>(</big><em>grade_cutoffs</em>, <em>percentage</em><big>)</big><a class="reference internal" href="_modules/courseware/grades.html#grade_for_percentage"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#courseware.grades.grade_for_percentage" title="Permalink to this definition">¶</a></dt>
+<dd><p>Returns a letter grade as defined in grading_policy (e.g. &#8216;A&#8217; &#8216;B&#8217; &#8216;C&#8217; for 6.002x) or None.</p>
+<p>Arguments
+- grade_cutoffs is a dictionary mapping a grade to the lowest</p>
+<blockquote>
+<div>possible percentage to earn that grade.</div></blockquote>
+<ul class="simple">
+<li>percentage is the final percent across all problems in a course</li>
+</ul>
+</dd></dl>
+
+<dl class="function">
+<dt id="courseware.grades.progress_summary">
+<tt class="descclassname">courseware.grades.</tt><tt class="descname">progress_summary</tt><big>(</big><em>student</em>, <em>request</em>, <em>course</em>, <em>student_module_cache</em><big>)</big><a class="reference internal" href="_modules/courseware/grades.html#progress_summary"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#courseware.grades.progress_summary" title="Permalink to this definition">¶</a></dt>
+<dd><p>This pulls a summary of all problems in the course.</p>
+<p>Returns
+- courseware_summary is a summary of all sections with problems in the course.
+It is organized as an array of chapters, each containing an array of sections,
+each containing an array of scores. This contains information for graded and
+ungraded problems, and is good for displaying a course summary with due dates,
+etc.</p>
+<dl class="docutils">
+<dt>Arguments:</dt>
+<dd><p class="first">student: A User object for the student to grade
+course: A Descriptor containing the course to grade
+student_module_cache: A StudentModuleCache initialized with all</p>
+<blockquote class="last">
+<div>instance_modules for the student</div></blockquote>
+</dd>
+</dl>
+<p>If the student does not have access to load the course module, this function
+will return None.</p>
+</dd></dl>
+
+<dl class="function">
+<dt id="courseware.grades.yield_dynamic_descriptor_descendents">
+<tt class="descclassname">courseware.grades.</tt><tt class="descname">yield_dynamic_descriptor_descendents</tt><big>(</big><em>descriptor</em>, <em>module_creator</em><big>)</big><a class="reference internal" href="_modules/courseware/grades.html#yield_dynamic_descriptor_descendents"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#courseware.grades.yield_dynamic_descriptor_descendents" title="Permalink to this definition">¶</a></dt>
+<dd><p>This returns all of the descendants of a descriptor. If the descriptor
+has dynamic children, the module will be created using module_creator
+and the children (as descriptors) of that module will be returned.</p>
+</dd></dl>
+
+<dl class="function">
+<dt id="courseware.grades.yield_problems">
+<tt class="descclassname">courseware.grades.</tt><tt class="descname">yield_problems</tt><big>(</big><em>request</em>, <em>course</em>, <em>student</em><big>)</big><a class="reference internal" href="_modules/courseware/grades.html#yield_problems"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#courseware.grades.yield_problems" title="Permalink to this definition">¶</a></dt>
+<dd><p>Return an iterator over capa_modules that this student has
+potentially answered.  (all that student has answered will definitely be in
+the list, but there may be others as well).</p>
+</dd></dl>
+
+</div>
+<div class="section" id="id6">
+<h3>Models<a class="headerlink" href="#id6" title="Permalink to this headline">¶</a></h3>
+<span class="target" id="module-courseware.models"></span><p>WE&#8217;RE USING MIGRATIONS!</p>
+<p>If you make changes to this model, be sure to create an appropriate migration
+file and check it in at the same time as your model changes. To do that,</p>
+<ol class="arabic simple">
+<li>Go to the mitx dir</li>
+<li>./manage.py schemamigration courseware &#8211;auto description_of_your_change</li>
+<li>Add the migration file created in mitx/courseware/migrations/</li>
+</ol>
+<p>ASSUMPTIONS: modules have unique IDs, even across different module_types</p>
+<dl class="class">
+<dt id="courseware.models.StudentModule">
+<em class="property">class </em><tt class="descclassname">courseware.models.</tt><tt class="descname">StudentModule</tt><big>(</big><em>*args</em>, <em>**kwargs</em><big>)</big><a class="reference internal" href="_modules/courseware/models.html#StudentModule"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#courseware.models.StudentModule" title="Permalink to this definition">¶</a></dt>
+<dd><p>Bases: <tt class="xref py py-class docutils literal"><span class="pre">django.db.models.base.Model</span></tt></p>
+<p>Keeps student state for a particular module in a particular course.</p>
+<table class="docutils field-list" frame="void" rules="none">
+<col class="field-name" />
+<col class="field-body" />
+<tbody valign="top">
+<tr class="field-odd field"><th class="field-name">Parameters:</th><td class="field-body"><ul class="first last simple">
+<li><strong>id</strong> (<em>AutoField</em>) &#8211; Id</li>
+<li><strong>module_type</strong> (<em>CharField</em>) &#8211; Module type</li>
+<li><strong>module_state_key</strong> (<em>CharField</em>) &#8211; Module state key</li>
+<li><strong>student_id</strong> (<em>ForeignKey</em>) &#8211; Student</li>
+<li><strong>course_id</strong> (<em>CharField</em>) &#8211; Course id</li>
+<li><strong>state</strong> (<em>TextField</em>) &#8211; State</li>
+<li><strong>grade</strong> (<em>FloatField</em>) &#8211; Grade</li>
+<li><strong>max_grade</strong> (<em>FloatField</em>) &#8211; Max grade</li>
+<li><strong>done</strong> (<em>CharField</em>) &#8211; Done</li>
+<li><strong>created</strong> (<em>DateTimeField</em>) &#8211; Created</li>
+<li><strong>modified</strong> (<em>DateTimeField</em>) &#8211; Modified</li>
+</ul>
+</td>
+</tr>
+</tbody>
+</table>
+</dd></dl>
+
+<dl class="class">
+<dt id="courseware.models.StudentModuleCache">
+<em class="property">class </em><tt class="descclassname">courseware.models.</tt><tt class="descname">StudentModuleCache</tt><big>(</big><em>course_id</em>, <em>user</em>, <em>descriptors</em>, <em>select_for_update=False</em><big>)</big><a class="reference internal" href="_modules/courseware/models.html#StudentModuleCache"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#courseware.models.StudentModuleCache" title="Permalink to this definition">¶</a></dt>
+<dd><p>Bases: <tt class="xref py py-class docutils literal"><span class="pre">object</span></tt></p>
+<p>A cache of StudentModules for a specific student</p>
+<dl class="classmethod">
+<dt id="courseware.models.StudentModuleCache.cache_for_descriptor_descendents">
+<em class="property">classmethod </em><tt class="descname">cache_for_descriptor_descendents</tt><big>(</big><em>course_id</em>, <em>user</em>, <em>descriptor</em>, <em>depth=None</em>, <em>descriptor_filter=&lt;function &lt;lambda&gt; at 0x10920fe60&gt;</em>, <em>select_for_update=False</em><big>)</big><a class="reference internal" href="_modules/courseware/models.html#StudentModuleCache.cache_for_descriptor_descendents"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#courseware.models.StudentModuleCache.cache_for_descriptor_descendents" title="Permalink to this definition">¶</a></dt>
+<dd><p>course_id: the course in the context of which we want StudentModules.
+user: the django user for whom to load modules.
+descriptor: An XModuleDescriptor
+depth is the number of levels of descendent modules to load StudentModules for, in addition to</p>
+<blockquote>
+<div>the supplied descriptor. If depth is None, load all descendent StudentModules</div></blockquote>
+<dl class="docutils">
+<dt>descriptor_filter is a function that accepts a descriptor and return wether the StudentModule</dt>
+<dd>should be cached</dd>
+</dl>
+<p>select_for_update: Flag indicating whether the rows should be locked until end of transaction</p>
+</dd></dl>
+
+<dl class="method">
+<dt id="courseware.models.StudentModuleCache.lookup">
+<tt class="descname">lookup</tt><big>(</big><em>course_id</em>, <em>module_type</em>, <em>module_state_key</em><big>)</big><a class="reference internal" href="_modules/courseware/models.html#StudentModuleCache.lookup"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#courseware.models.StudentModuleCache.lookup" title="Permalink to this definition">¶</a></dt>
+<dd><p>Look for a student module with the given course_id, type, and id in the cache.</p>
+<p>cache &#8211; list of student modules</p>
+<p>returns first found object, or None</p>
+</dd></dl>
+
+</dd></dl>
+
+</div>
+<div class="section" id="module-courseware.progress">
+<span id="progress"></span><h3>Progress<a class="headerlink" href="#module-courseware.progress" title="Permalink to this headline">¶</a></h3>
+</div>
+<div class="section" id="module-courseware.tabs">
+<span id="tabs"></span><h3>Tabs<a class="headerlink" href="#module-courseware.tabs" title="Permalink to this headline">¶</a></h3>
+<p>Tabs configuration.  By the time the tab is being rendered, it&#8217;s just a name,
+link, and css class (CourseTab tuple).  Tabs are specified in course policy.
+Each tab has a type, and possibly some type-specific parameters.</p>
+<p>To add a new tab type, add a TabImpl to the VALID_TAB_TYPES dict below&#8211;it will
+contain a validation function that checks whether config for the tab type is
+valid, and a generator function that takes the config, user, and course, and
+actually generates the CourseTab.</p>
+<dl class="class">
+<dt id="courseware.tabs.CourseTab">
+<em class="property">class </em><tt class="descclassname">courseware.tabs.</tt><tt class="descname">CourseTab</tt><a class="headerlink" href="#courseware.tabs.CourseTab" title="Permalink to this definition">¶</a></dt>
+<dd><p>Bases: <tt class="xref py py-class docutils literal"><span class="pre">tuple</span></tt></p>
+<p>CourseTab(name, link, is_active)</p>
+<dl class="attribute">
+<dt id="courseware.tabs.CourseTab.is_active">
+<tt class="descname">is_active</tt><a class="headerlink" href="#courseware.tabs.CourseTab.is_active" title="Permalink to this definition">¶</a></dt>
+<dd><p>Alias for field number 2</p>
+</dd></dl>
+
+<dl class="attribute">
+<dt id="courseware.tabs.CourseTab.link">
+<tt class="descname">link</tt><a class="headerlink" href="#courseware.tabs.CourseTab.link" title="Permalink to this definition">¶</a></dt>
+<dd><p>Alias for field number 1</p>
+</dd></dl>
+
+<dl class="attribute">
+<dt id="courseware.tabs.CourseTab.name">
+<tt class="descname">name</tt><a class="headerlink" href="#courseware.tabs.CourseTab.name" title="Permalink to this definition">¶</a></dt>
+<dd><p>Alias for field number 0</p>
+</dd></dl>
+
+</dd></dl>
+
+<dl class="exception">
+<dt id="courseware.tabs.InvalidTabsException">
+<em class="property">exception </em><tt class="descclassname">courseware.tabs.</tt><tt class="descname">InvalidTabsException</tt><a class="reference internal" href="_modules/courseware/tabs.html#InvalidTabsException"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#courseware.tabs.InvalidTabsException" title="Permalink to this definition">¶</a></dt>
+<dd><p>Bases: <tt class="xref py py-class docutils literal"><span class="pre">exceptions.Exception</span></tt></p>
+<p>A complaint about invalid tabs.</p>
+</dd></dl>
+
+<dl class="class">
+<dt id="courseware.tabs.TabImpl">
+<em class="property">class </em><tt class="descclassname">courseware.tabs.</tt><tt class="descname">TabImpl</tt><a class="headerlink" href="#courseware.tabs.TabImpl" title="Permalink to this definition">¶</a></dt>
+<dd><p>Bases: <tt class="xref py py-class docutils literal"><span class="pre">tuple</span></tt></p>
+<p>TabImpl(validator, generator)</p>
+<dl class="attribute">
+<dt id="courseware.tabs.TabImpl.generator">
+<tt class="descname">generator</tt><a class="headerlink" href="#courseware.tabs.TabImpl.generator" title="Permalink to this definition">¶</a></dt>
+<dd><p>Alias for field number 1</p>
+</dd></dl>
+
+<dl class="attribute">
+<dt id="courseware.tabs.TabImpl.validator">
+<tt class="descname">validator</tt><a class="headerlink" href="#courseware.tabs.TabImpl.validator" title="Permalink to this definition">¶</a></dt>
+<dd><p>Alias for field number 0</p>
+</dd></dl>
+
+</dd></dl>
+
+<dl class="function">
+<dt id="courseware.tabs.get_course_tabs">
+<tt class="descclassname">courseware.tabs.</tt><tt class="descname">get_course_tabs</tt><big>(</big><em>user</em>, <em>course</em>, <em>active_page</em><big>)</big><a class="reference internal" href="_modules/courseware/tabs.html#get_course_tabs"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#courseware.tabs.get_course_tabs" title="Permalink to this definition">¶</a></dt>
+<dd><p>Return the tabs to show a particular user, as a list of CourseTab items.</p>
+</dd></dl>
+
+<dl class="function">
+<dt id="courseware.tabs.get_static_tab_by_slug">
+<tt class="descclassname">courseware.tabs.</tt><tt class="descname">get_static_tab_by_slug</tt><big>(</big><em>course</em>, <em>tab_slug</em><big>)</big><a class="reference internal" href="_modules/courseware/tabs.html#get_static_tab_by_slug"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#courseware.tabs.get_static_tab_by_slug" title="Permalink to this definition">¶</a></dt>
+<dd><p>Look for a tab with type &#8216;static_tab&#8217; and the specified &#8216;tab_slug&#8217;.  Returns
+the tab (a config dict), or None if not found.</p>
+</dd></dl>
+
+<dl class="function">
+<dt id="courseware.tabs.get_static_tab_contents">
+<tt class="descclassname">courseware.tabs.</tt><tt class="descname">get_static_tab_contents</tt><big>(</big><em>course</em>, <em>tab</em><big>)</big><a class="reference internal" href="_modules/courseware/tabs.html#get_static_tab_contents"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#courseware.tabs.get_static_tab_contents" title="Permalink to this definition">¶</a></dt>
+<dd><p>Given a course and a static tab config dict, load the tab contents,
+returning None if not found.</p>
+<p>Looks in tabs/{course_url_name}/{tab_slug}.html first, then tabs/{tab_slug}.html.</p>
+</dd></dl>
+
+<dl class="function">
+<dt id="courseware.tabs.key_checker">
+<tt class="descclassname">courseware.tabs.</tt><tt class="descname">key_checker</tt><big>(</big><em>expected_keys</em><big>)</big><a class="reference internal" href="_modules/courseware/tabs.html#key_checker"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#courseware.tabs.key_checker" title="Permalink to this definition">¶</a></dt>
+<dd><p>Returns a function that checks that specified keys are present in a dict</p>
+</dd></dl>
+
+<dl class="function">
+<dt id="courseware.tabs.null_validator">
+<tt class="descclassname">courseware.tabs.</tt><tt class="descname">null_validator</tt><big>(</big><em>d</em><big>)</big><a class="reference internal" href="_modules/courseware/tabs.html#null_validator"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#courseware.tabs.null_validator" title="Permalink to this definition">¶</a></dt>
+<dd><p>Don&#8217;t check anything&#8211;use for tabs that don&#8217;t need any params. (e.g. textbook)</p>
+</dd></dl>
+
+<dl class="function">
+<dt id="courseware.tabs.validate_tabs">
+<tt class="descclassname">courseware.tabs.</tt><tt class="descname">validate_tabs</tt><big>(</big><em>course</em><big>)</big><a class="reference internal" href="_modules/courseware/tabs.html#validate_tabs"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#courseware.tabs.validate_tabs" title="Permalink to this definition">¶</a></dt>
+<dd><p>Check that the tabs set for the specified course is valid.  If it
+isn&#8217;t, raise InvalidTabsException with the complaint.</p>
+<p>Specific rules checked:
+- if no tabs specified, that&#8217;s fine
+- if tabs specified, first two must have type &#8216;courseware&#8217; and &#8216;course_info&#8217;, in that order.
+- All the tabs must have a type in VALID_TAB_TYPES.</p>
+</dd></dl>
+
+</div>
+</div>
+<div class="section" id="module-dashboard">
+<span id="dashboard"></span><h2>Dashboard<a class="headerlink" href="#module-dashboard" title="Permalink to this headline">¶</a></h2>
+<div class="section" id="id7">
+<h3>Models<a class="headerlink" href="#id7" title="Permalink to this headline">¶</a></h3>
+<span class="target" id="module-dashboard.models"></span></div>
+<div class="section" id="id8">
+<h3>Views<a class="headerlink" href="#id8" title="Permalink to this headline">¶</a></h3>
+<span class="target" id="module-dashboard.views"></span><dl class="function">
+<dt id="dashboard.views.dashboard">
+<tt class="descclassname">dashboard.views.</tt><tt class="descname">dashboard</tt><big>(</big><em>request</em><big>)</big><a class="reference internal" href="_modules/dashboard/views.html#dashboard"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#dashboard.views.dashboard" title="Permalink to this definition">¶</a></dt>
+<dd><p>Quick hack to show staff enrollment numbers.  This should be
+replaced with a real dashboard later. This version is a short-term
+bandaid for the next couple weeks.</p>
+</dd></dl>
+
+<dl class="function">
+<dt id="dashboard.views.dictfetchall">
+<tt class="descclassname">dashboard.views.</tt><tt class="descname">dictfetchall</tt><big>(</big><em>cursor</em><big>)</big><a class="reference internal" href="_modules/dashboard/views.html#dictfetchall"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#dashboard.views.dictfetchall" title="Permalink to this definition">¶</a></dt>
+<dd><p>Returns all rows from a cursor as a dict.
+Borrowed from Django documentation</p>
+</dd></dl>
+
+</div>
+<div class="section" id="id9">
+<h3>Tests<a class="headerlink" href="#id9" title="Permalink to this headline">¶</a></h3>
+<span class="target" id="module-dashboard.tests"></span><p>This file demonstrates writing tests using the unittest module. These will pass
+when you run &#8220;manage.py test&#8221;.</p>
+<p>Replace this with more appropriate tests for your application.</p>
+</div>
+</div>
+<div class="section" id="module-django_comment_client">
+<span id="django-comment-client"></span><h2>Django comment client<a class="headerlink" href="#module-django_comment_client" title="Permalink to this headline">¶</a></h2>
+<div class="section" id="id10">
+<h3>Models<a class="headerlink" href="#id10" title="Permalink to this headline">¶</a></h3>
+<span class="target" id="module-django_comment_client.models"></span><dl class="class">
+<dt id="django_comment_client.models.Permission">
+<em class="property">class </em><tt class="descclassname">django_comment_client.models.</tt><tt class="descname">Permission</tt><big>(</big><em>*args</em>, <em>**kwargs</em><big>)</big><a class="reference internal" href="_modules/django_comment_client/models.html#Permission"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#django_comment_client.models.Permission" title="Permalink to this definition">¶</a></dt>
+<dd><p>Bases: <tt class="xref py py-class docutils literal"><span class="pre">django.db.models.base.Model</span></tt></p>
+<p>Permission(name)</p>
+<table class="docutils field-list" frame="void" rules="none">
+<col class="field-name" />
+<col class="field-body" />
+<tbody valign="top">
+<tr class="field-odd field"><th class="field-name">Parameters:</th><td class="field-body"><strong>name</strong> (<em>CharField</em>) &#8211; Name</td>
+</tr>
+</tbody>
+</table>
+</dd></dl>
+
+<dl class="class">
+<dt id="django_comment_client.models.Role">
+<em class="property">class </em><tt class="descclassname">django_comment_client.models.</tt><tt class="descname">Role</tt><big>(</big><em>*args</em>, <em>**kwargs</em><big>)</big><a class="reference internal" href="_modules/django_comment_client/models.html#Role"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#django_comment_client.models.Role" title="Permalink to this definition">¶</a></dt>
+<dd><p>Bases: <tt class="xref py py-class docutils literal"><span class="pre">django.db.models.base.Model</span></tt></p>
+<p>Role(id, name, course_id)</p>
+<table class="docutils field-list" frame="void" rules="none">
+<col class="field-name" />
+<col class="field-body" />
+<tbody valign="top">
+<tr class="field-odd field"><th class="field-name">Parameters:</th><td class="field-body"><ul class="first last simple">
+<li><strong>id</strong> (<em>AutoField</em>) &#8211; Id</li>
+<li><strong>name</strong> (<em>CharField</em>) &#8211; Name</li>
+<li><strong>course_id</strong> (<em>CharField</em>) &#8211; Course id</li>
+</ul>
+</td>
+</tr>
+</tbody>
+</table>
+</dd></dl>
+
+</div>
+<div class="section" id="id11">
+<h3>Tests<a class="headerlink" href="#id11" title="Permalink to this headline">¶</a></h3>
+<span class="target" id="module-django_comment_client.tests"></span></div>
+</div>
+<div class="section" id="module-heartbeat">
+<span id="heartbeat"></span><h2>Heartbeat<a class="headerlink" href="#module-heartbeat" title="Permalink to this headline">¶</a></h2>
+</div>
+<div class="section" id="module-instructor">
+<span id="instructor"></span><h2>Instructor<a class="headerlink" href="#module-instructor" title="Permalink to this headline">¶</a></h2>
+<div class="section" id="id12">
+<h3>Views<a class="headerlink" href="#id12" title="Permalink to this headline">¶</a></h3>
+<span class="target" id="module-instructor.views"></span><dl class="function">
+<dt id="instructor.views.compute_course_stats">
+<tt class="descclassname">instructor.views.</tt><tt class="descname">compute_course_stats</tt><big>(</big><em>course</em><big>)</big><a class="reference internal" href="_modules/instructor/views.html#compute_course_stats"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#instructor.views.compute_course_stats" title="Permalink to this definition">¶</a></dt>
+<dd><p>Compute course statistics, including number of problems, videos, html.</p>
+<p>course is a CourseDescriptor from the xmodule system.</p>
+</dd></dl>
+
+<dl class="function">
+<dt id="instructor.views.enroll_students">
+<tt class="descclassname">instructor.views.</tt><tt class="descname">enroll_students</tt><big>(</big><em>request</em>, <em>*args</em>, <em>**kwargs</em><big>)</big><a class="reference internal" href="_modules/instructor/views.html#enroll_students"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#instructor.views.enroll_students" title="Permalink to this definition">¶</a></dt>
+<dd><p>Allows a staff member to enroll students in a course.</p>
+<p>This is a short-term hack for Berkeley courses launching fall
+2012. In the long term, we would like functionality like this, but
+we would like both the instructor and the student to agree. Right
+now, this allows any instructor to add students to their course,
+which we do not want.</p>
+<p>It is poorly written and poorly tested, but it&#8217;s designed to be
+stripped out.</p>
+</dd></dl>
+
+<dl class="function">
+<dt id="instructor.views.get_answers_distribution">
+<tt class="descclassname">instructor.views.</tt><tt class="descname">get_answers_distribution</tt><big>(</big><em>request</em>, <em>course_id</em><big>)</big><a class="reference internal" href="_modules/instructor/views.html#get_answers_distribution"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#instructor.views.get_answers_distribution" title="Permalink to this definition">¶</a></dt>
+<dd><p>Get the distribution of answers for all graded problems in the course.</p>
+<p>Return a dict with two keys:
+&#8216;header&#8217;: a header row
+&#8216;data&#8217;: a list of rows</p>
+</dd></dl>
+
+<dl class="function">
+<dt id="instructor.views.get_student_grade_summary_data">
+<tt class="descclassname">instructor.views.</tt><tt class="descname">get_student_grade_summary_data</tt><big>(</big><em>request</em>, <em>course</em>, <em>course_id</em>, <em>get_grades=True</em>, <em>get_raw_scores=False</em><big>)</big><a class="reference internal" href="_modules/instructor/views.html#get_student_grade_summary_data"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#instructor.views.get_student_grade_summary_data" title="Permalink to this definition">¶</a></dt>
+<dd><p>Return data arrays with student identity and grades for specified course.</p>
+<p>course = CourseDescriptor
+course_id = course ID</p>
+<p>Note: both are passed in, only because instructor_dashboard already has them already.</p>
+<p>returns datatable = dict(header=header, data=data)
+where</p>
+<p>header = list of strings labeling the data fields
+data = list (one per student) of lists of data corresponding to the fields</p>
+<p>If get_raw_scores=True, then instead of grade summaries, the raw grades for all graded modules are returned.</p>
+</dd></dl>
+
+<dl class="function">
+<dt id="instructor.views.grade_summary">
+<tt class="descclassname">instructor.views.</tt><tt class="descname">grade_summary</tt><big>(</big><em>request</em>, <em>*args</em>, <em>**kw</em><big>)</big><a class="reference internal" href="_modules/instructor/views.html#grade_summary"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#instructor.views.grade_summary" title="Permalink to this definition">¶</a></dt>
+<dd><p>Display the grade summary for a course.</p>
+</dd></dl>
+
+<dl class="function">
+<dt id="instructor.views.gradebook">
+<tt class="descclassname">instructor.views.</tt><tt class="descname">gradebook</tt><big>(</big><em>request</em>, <em>*args</em>, <em>**kw</em><big>)</big><a class="reference internal" href="_modules/instructor/views.html#gradebook"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#instructor.views.gradebook" title="Permalink to this definition">¶</a></dt>
+<dd><p>Show the gradebook for this course:
+- only displayed to course staff
+- shows students who are enrolled.</p>
+</dd></dl>
+
+<dl class="function">
+<dt id="instructor.views.instructor_dashboard">
+<tt class="descclassname">instructor.views.</tt><tt class="descname">instructor_dashboard</tt><big>(</big><em>request</em>, <em>*args</em>, <em>**kwargs</em><big>)</big><a class="reference internal" href="_modules/instructor/views.html#instructor_dashboard"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#instructor.views.instructor_dashboard" title="Permalink to this definition">¶</a></dt>
+<dd><p>Display the instructor dashboard for a course.</p>
+</dd></dl>
+
+</div>
+<div class="section" id="id13">
+<h3>Tests<a class="headerlink" href="#id13" title="Permalink to this headline">¶</a></h3>
+</div>
+</div>
+<div class="section" id="module-licenses">
+<span id="lisenses"></span><h2>Lisenses<a class="headerlink" href="#module-licenses" title="Permalink to this headline">¶</a></h2>
+<div class="section" id="id14">
+<h3>Models<a class="headerlink" href="#id14" title="Permalink to this headline">¶</a></h3>
+<span class="target" id="module-licenses.models"></span><dl class="class">
+<dt id="licenses.models.CourseSoftware">
+<em class="property">class </em><tt class="descclassname">licenses.models.</tt><tt class="descname">CourseSoftware</tt><big>(</big><em>*args</em>, <em>**kwargs</em><big>)</big><a class="reference internal" href="_modules/licenses/models.html#CourseSoftware"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#licenses.models.CourseSoftware" title="Permalink to this definition">¶</a></dt>
+<dd><p>Bases: <tt class="xref py py-class docutils literal"><span class="pre">django.db.models.base.Model</span></tt></p>
+<p>CourseSoftware(id, name, full_name, url, course_id)</p>
+<table class="docutils field-list" frame="void" rules="none">
+<col class="field-name" />
+<col class="field-body" />
+<tbody valign="top">
+<tr class="field-odd field"><th class="field-name">Parameters:</th><td class="field-body"><ul class="first last simple">
+<li><strong>id</strong> (<em>AutoField</em>) &#8211; Id</li>
+<li><strong>name</strong> (<em>CharField</em>) &#8211; Name</li>
+<li><strong>full_name</strong> (<em>CharField</em>) &#8211; Full name</li>
+<li><strong>url</strong> (<em>CharField</em>) &#8211; Url</li>
+<li><strong>course_id</strong> (<em>CharField</em>) &#8211; Course id</li>
+</ul>
+</td>
+</tr>
+</tbody>
+</table>
+</dd></dl>
+
+<dl class="class">
+<dt id="licenses.models.UserLicense">
+<em class="property">class </em><tt class="descclassname">licenses.models.</tt><tt class="descname">UserLicense</tt><big>(</big><em>*args</em>, <em>**kwargs</em><big>)</big><a class="reference internal" href="_modules/licenses/models.html#UserLicense"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#licenses.models.UserLicense" title="Permalink to this definition">¶</a></dt>
+<dd><p>Bases: <tt class="xref py py-class docutils literal"><span class="pre">django.db.models.base.Model</span></tt></p>
+<p>UserLicense(id, software_id, user_id, serial)</p>
+<table class="docutils field-list" frame="void" rules="none">
+<col class="field-name" />
+<col class="field-body" />
+<tbody valign="top">
+<tr class="field-odd field"><th class="field-name">Parameters:</th><td class="field-body"><ul class="first last simple">
+<li><strong>id</strong> (<em>AutoField</em>) &#8211; Id</li>
+<li><strong>software_id</strong> (<em>ForeignKey</em>) &#8211; Software</li>
+<li><strong>user_id</strong> (<em>ForeignKey</em>) &#8211; User</li>
+<li><strong>serial</strong> (<em>CharField</em>) &#8211; Serial</li>
+</ul>
+</td>
+</tr>
+</tbody>
+</table>
+</dd></dl>
+
+</div>
+<div class="section" id="id15">
+<h3>Views<a class="headerlink" href="#id15" title="Permalink to this headline">¶</a></h3>
+<span class="target" id="module-licenses.views"></span><dl class="class">
+<dt id="licenses.views.License">
+<em class="property">class </em><tt class="descclassname">licenses.views.</tt><tt class="descname">License</tt><a class="headerlink" href="#licenses.views.License" title="Permalink to this definition">¶</a></dt>
+<dd><p>Bases: <tt class="xref py py-class docutils literal"><span class="pre">tuple</span></tt></p>
+<p>License(software, serial)</p>
+<dl class="attribute">
+<dt id="licenses.views.License.serial">
+<tt class="descname">serial</tt><a class="headerlink" href="#licenses.views.License.serial" title="Permalink to this definition">¶</a></dt>
+<dd><p>Alias for field number 1</p>
+</dd></dl>
+
+<dl class="attribute">
+<dt id="licenses.views.License.software">
+<tt class="descname">software</tt><a class="headerlink" href="#licenses.views.License.software" title="Permalink to this definition">¶</a></dt>
+<dd><p>Alias for field number 0</p>
+</dd></dl>
+
+</dd></dl>
+
+</div>
+<div class="section" id="id16">
+<h3>Tests<a class="headerlink" href="#id16" title="Permalink to this headline">¶</a></h3>
+<span class="target" id="module-licenses.tests"></span></div>
+</div>
+<div class="section" id="module-lms_migration">
+<span id="lms-migration"></span><h2>LMS migration<a class="headerlink" href="#module-lms_migration" title="Permalink to this headline">¶</a></h2>
+<div class="section" id="module-lms_migration.migrate">
+<span id="migration"></span><h3>Migration<a class="headerlink" href="#module-lms_migration.migrate" title="Permalink to this headline">¶</a></h3>
+<dl class="function">
+<dt id="lms_migration.migrate.escape">
+<tt class="descclassname">lms_migration.migrate.</tt><tt class="descname">escape</tt><big>(</big><em>s</em><big>)</big><a class="reference internal" href="_modules/lms_migration/migrate.html#escape"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#lms_migration.migrate.escape" title="Permalink to this definition">¶</a></dt>
+<dd><p>escape HTML special characters in string</p>
+</dd></dl>
+
+<dl class="function">
+<dt id="lms_migration.migrate.getip">
+<tt class="descclassname">lms_migration.migrate.</tt><tt class="descname">getip</tt><big>(</big><em>request</em><big>)</big><a class="reference internal" href="_modules/lms_migration/migrate.html#getip"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#lms_migration.migrate.getip" title="Permalink to this definition">¶</a></dt>
+<dd><p>Extract IP address of requester from header, even if behind proxy</p>
+</dd></dl>
+
+<dl class="function">
+<dt id="lms_migration.migrate.gitreload">
+<tt class="descclassname">lms_migration.migrate.</tt><tt class="descname">gitreload</tt><big>(</big><em>*args</em>, <em>**kwargs</em><big>)</big><a class="reference internal" href="_modules/lms_migration/migrate.html#gitreload"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#lms_migration.migrate.gitreload" title="Permalink to this definition">¶</a></dt>
+<dd><p>This can be used as a github WebHook Service Hook, for reloading of the content repo used by the LMS.</p>
+<p>If reload_dir is not None, then instruct the xml loader to reload that course directory.</p>
+</dd></dl>
+
+<dl class="function">
+<dt id="lms_migration.migrate.manage_modulestores">
+<tt class="descclassname">lms_migration.migrate.</tt><tt class="descname">manage_modulestores</tt><big>(</big><em>request</em>, <em>reload_dir=None</em>, <em>commit_id=None</em><big>)</big><a class="reference internal" href="_modules/lms_migration/migrate.html#manage_modulestores"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#lms_migration.migrate.manage_modulestores" title="Permalink to this definition">¶</a></dt>
+<dd><p>Manage the static in-memory modulestores.</p>
+<p>If reload_dir is not None, then instruct the xml loader to reload that course directory.</p>
+</dd></dl>
+
+</div>
+</div>
+<div class="section" id="module-multicourse">
+<span id="multicourse"></span><h2>Multicourse<a class="headerlink" href="#module-multicourse" title="Permalink to this headline">¶</a></h2>
+</div>
+<div class="section" id="module-psychometrics">
+<span id="psychometrics"></span><h2>Psychometrics<a class="headerlink" href="#module-psychometrics" title="Permalink to this headline">¶</a></h2>
+<div class="section" id="id17">
+<h3>Models<a class="headerlink" href="#id17" title="Permalink to this headline">¶</a></h3>
+<span class="target" id="module-psychometrics.models"></span><dl class="class">
+<dt id="psychometrics.models.PsychometricData">
+<em class="property">class </em><tt class="descclassname">psychometrics.models.</tt><tt class="descname">PsychometricData</tt><big>(</big><em>*args</em>, <em>**kwargs</em><big>)</big><a class="reference internal" href="_modules/psychometrics/models.html#PsychometricData"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#psychometrics.models.PsychometricData" title="Permalink to this definition">¶</a></dt>
+<dd><p>Bases: <tt class="xref py py-class docutils literal"><span class="pre">django.db.models.base.Model</span></tt></p>
+<p>This data is a table linking student, module, and module performance,
+including number of attempts, grade, max grade, and time of checks.</p>
+<p>Links to instances of StudentModule, but only those for capa problems.</p>
+<p>Note that StudentModule.module_state_key is nominally a Location instance (url string).
+That means it is of the form {tag}://{org}/{course}/{category}/{name}[&#64;{revision}]
+and for capa problems, category = &#8220;problem&#8221;.</p>
+<p>checktimes is extracted from tracking logs, or added by capa module via psychometrics callback.</p>
+<table class="docutils field-list" frame="void" rules="none">
+<col class="field-name" />
+<col class="field-body" />
+<tbody valign="top">
+<tr class="field-odd field"><th class="field-name">Parameters:</th><td class="field-body"><ul class="first last simple">
+<li><strong>id</strong> (<em>AutoField</em>) &#8211; Id</li>
+<li><strong>studentmodule_id</strong> (<em>ForeignKey</em>) &#8211; Studentmodule</li>
+<li><strong>done</strong> (<em>BooleanField</em>) &#8211; Done</li>
+<li><strong>attempts</strong> (<em>IntegerField</em>) &#8211; Attempts</li>
+<li><strong>checktimes</strong> (<em>TextField</em>) &#8211; Checktimes</li>
+</ul>
+</td>
+</tr>
+</tbody>
+</table>
+</dd></dl>
+
+</div>
+<div class="section" id="id18">
+<h3>Admin<a class="headerlink" href="#id18" title="Permalink to this headline">¶</a></h3>
+<span class="target" id="module-psychometrics.admin"></span><p>django admin pages for courseware model</p>
+</div>
+<div class="section" id="module-psychometrics.psychoanalyze">
+<span id="psychoanalyze"></span><h3>Psychoanalyze<a class="headerlink" href="#module-psychometrics.psychoanalyze" title="Permalink to this headline">¶</a></h3>
+<dl class="class">
+<dt id="psychometrics.psychoanalyze.StatVar">
+<em class="property">class </em><tt class="descclassname">psychometrics.psychoanalyze.</tt><tt class="descname">StatVar</tt><big>(</big><em>unit=1</em><big>)</big><a class="reference internal" href="_modules/psychometrics/psychoanalyze.html#StatVar"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#psychometrics.psychoanalyze.StatVar" title="Permalink to this definition">¶</a></dt>
+<dd><p>Bases: <tt class="xref py py-class docutils literal"><span class="pre">object</span></tt></p>
+<p>Simple statistics on floating point numbers: avg, sdv, var, min, max</p>
+</dd></dl>
+
+<dl class="function">
+<dt id="psychometrics.psychoanalyze.func_2pl">
+<tt class="descclassname">psychometrics.psychoanalyze.</tt><tt class="descname">func_2pl</tt><big>(</big><em>x</em>, <em>a</em>, <em>b</em><big>)</big><a class="reference internal" href="_modules/psychometrics/psychoanalyze.html#func_2pl"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#psychometrics.psychoanalyze.func_2pl" title="Permalink to this definition">¶</a></dt>
+<dd><p>2-parameter logistic function</p>
+</dd></dl>
+
+<dl class="function">
+<dt id="psychometrics.psychoanalyze.make_histogram">
+<tt class="descclassname">psychometrics.psychoanalyze.</tt><tt class="descname">make_histogram</tt><big>(</big><em>ydata</em>, <em>bins=None</em><big>)</big><a class="reference internal" href="_modules/psychometrics/psychoanalyze.html#make_histogram"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#psychometrics.psychoanalyze.make_histogram" title="Permalink to this definition">¶</a></dt>
+<dd><p>Generate histogram of ydata using bins provided, or by default bins
+from 0 to 100 by 10.  bins should be ordered in increasing order.</p>
+<p>returns dict with keys being bins, and values being counts.
+special: hist[&#8216;bins&#8217;] = bins</p>
+</dd></dl>
+
+<dl class="function">
+<dt id="psychometrics.psychoanalyze.make_psychometrics_data_update_handler">
+<tt class="descclassname">psychometrics.psychoanalyze.</tt><tt class="descname">make_psychometrics_data_update_handler</tt><big>(</big><em>studentmodule</em><big>)</big><a class="reference internal" href="_modules/psychometrics/psychoanalyze.html#make_psychometrics_data_update_handler"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#psychometrics.psychoanalyze.make_psychometrics_data_update_handler" title="Permalink to this definition">¶</a></dt>
+<dd><p>Construct and return a procedure which may be called to update
+the PsychometricsData instance for the given StudentModule instance.</p>
+</dd></dl>
+
+<dl class="function">
+<dt id="psychometrics.psychoanalyze.problems_with_psychometric_data">
+<tt class="descclassname">psychometrics.psychoanalyze.</tt><tt class="descname">problems_with_psychometric_data</tt><big>(</big><em>course_id</em><big>)</big><a class="reference internal" href="_modules/psychometrics/psychoanalyze.html#problems_with_psychometric_data"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#psychometrics.psychoanalyze.problems_with_psychometric_data" title="Permalink to this definition">¶</a></dt>
+<dd><p>Return dict of {problems (location urls): count} for which psychometric data is available.
+Does this for a given course_id.</p>
+</dd></dl>
+
+</div>
+</div>
+<div class="section" id="module-simplewiki">
+<span id="simple-wiki"></span><h2>Simple wiki<a class="headerlink" href="#module-simplewiki" title="Permalink to this headline">¶</a></h2>
+<div class="section" id="id19">
+<h3>Models<a class="headerlink" href="#id19" title="Permalink to this headline">¶</a></h3>
+<span class="target" id="module-simplewiki.models"></span><dl class="class">
+<dt id="simplewiki.models.Article">
+<em class="property">class </em><tt class="descclassname">simplewiki.models.</tt><tt class="descname">Article</tt><big>(</big><em>*args</em>, <em>**kwargs</em><big>)</big><a class="reference internal" href="_modules/simplewiki/models.html#Article"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#simplewiki.models.Article" title="Permalink to this definition">¶</a></dt>
+<dd><p>Bases: <tt class="xref py py-class docutils literal"><span class="pre">django.db.models.base.Model</span></tt></p>
+<p>Wiki article referring to Revision model for actual content.
+&#8216;slug&#8217; and &#8216;title&#8217; field should be maintained centrally, since users
+aren&#8217;t allowed to change them, anyways.</p>
+<table class="docutils field-list" frame="void" rules="none">
+<col class="field-name" />
+<col class="field-body" />
+<tbody valign="top">
+<tr class="field-odd field"><th class="field-name">Parameters:</th><td class="field-body"><ul class="first last simple">
+<li><strong>id</strong> (<em>AutoField</em>) &#8211; Id</li>
+<li><strong>title</strong> (<em>CharField</em>) &#8211; Article title</li>
+<li><strong>slug</strong> (<em>SlugField</em>) &#8211; Letters, numbers, underscore and hyphen.</li>
+<li><strong>namespace_id</strong> (<em>ForeignKey</em>) &#8211; Namespace</li>
+<li><strong>created_by_id</strong> (<em>ForeignKey</em>) &#8211; Created by</li>
+<li><strong>created_on</strong> (<em>DateTimeField</em>) &#8211; Created on</li>
+<li><strong>modified_on</strong> (<em>DateTimeField</em>) &#8211; Modified on</li>
+<li><strong>locked</strong> (<em>BooleanField</em>) &#8211; Locked for editing</li>
+<li><strong>permissions_id</strong> (<em>ForeignKey</em>) &#8211; Permission group</li>
+<li><strong>current_revision_id</strong> (<em>OneToOneField</em>) &#8211; Current revision</li>
+</ul>
+</td>
+</tr>
+</tbody>
+</table>
+<dl class="method">
+<dt id="simplewiki.models.Article.can_read">
+<tt class="descname">can_read</tt><big>(</big><em>user</em><big>)</big><a class="reference internal" href="_modules/simplewiki/models.html#Article.can_read"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#simplewiki.models.Article.can_read" title="Permalink to this definition">¶</a></dt>
+<dd><p>Check read permissions and return True/False.</p>
+</dd></dl>
+
+<dl class="method">
+<dt id="simplewiki.models.Article.can_write">
+<tt class="descname">can_write</tt><big>(</big><em>user</em><big>)</big><a class="reference internal" href="_modules/simplewiki/models.html#Article.can_write"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#simplewiki.models.Article.can_write" title="Permalink to this definition">¶</a></dt>
+<dd><p>Check write permissions and return True/False.</p>
+</dd></dl>
+
+<dl class="method">
+<dt id="simplewiki.models.Article.can_write_l">
+<tt class="descname">can_write_l</tt><big>(</big><em>user</em><big>)</big><a class="reference internal" href="_modules/simplewiki/models.html#Article.can_write_l"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#simplewiki.models.Article.can_write_l" title="Permalink to this definition">¶</a></dt>
+<dd><p>Check write permissions and locked status</p>
+</dd></dl>
+
+<dl class="classmethod">
+<dt id="simplewiki.models.Article.get_article">
+<em class="property">classmethod </em><tt class="descname">get_article</tt><big>(</big><em>article_path</em><big>)</big><a class="reference internal" href="_modules/simplewiki/models.html#Article.get_article"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#simplewiki.models.Article.get_article" title="Permalink to this definition">¶</a></dt>
+<dd><p>Given an article_path like namespace/slug, this returns the article. It may raise
+a Article.DoesNotExist if no matching article is found or ValueError if the
+article_path is not constructed properly.</p>
+</dd></dl>
+
+<dl class="classmethod">
+<dt id="simplewiki.models.Article.get_root">
+<em class="property">classmethod </em><tt class="descname">get_root</tt><big>(</big><em>namespace</em><big>)</big><a class="reference internal" href="_modules/simplewiki/models.html#Article.get_root"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#simplewiki.models.Article.get_root" title="Permalink to this definition">¶</a></dt>
+<dd><p>Return the root article, which should ALWAYS exist..
+except the very first time the wiki is loaded, in which
+case the user is prompted to create this article.</p>
+</dd></dl>
+
+</dd></dl>
+
+<dl class="class">
+<dt id="simplewiki.models.ArticleAttachment">
+<em class="property">class </em><tt class="descclassname">simplewiki.models.</tt><tt class="descname">ArticleAttachment</tt><big>(</big><em>*args</em>, <em>**kwargs</em><big>)</big><a class="reference internal" href="_modules/simplewiki/models.html#ArticleAttachment"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#simplewiki.models.ArticleAttachment" title="Permalink to this definition">¶</a></dt>
+<dd><p>Bases: <tt class="xref py py-class docutils literal"><span class="pre">django.db.models.base.Model</span></tt></p>
+<p>ArticleAttachment(id, article_id, file, uploaded_by_id, uploaded_on)</p>
+<table class="docutils field-list" frame="void" rules="none">
+<col class="field-name" />
+<col class="field-body" />
+<tbody valign="top">
+<tr class="field-odd field"><th class="field-name">Parameters:</th><td class="field-body"><ul class="first last simple">
+<li><strong>id</strong> (<em>AutoField</em>) &#8211; Id</li>
+<li><strong>article_id</strong> (<em>ForeignKey</em>) &#8211; Article</li>
+<li><strong>file</strong> (<em>FileField</em>) &#8211; Attachment</li>
+<li><strong>uploaded_by_id</strong> (<em>ForeignKey</em>) &#8211; Uploaded by</li>
+<li><strong>uploaded_on</strong> (<em>DateTimeField</em>) &#8211; Upload date</li>
+</ul>
+</td>
+</tr>
+</tbody>
+</table>
+<dl class="method">
+<dt id="simplewiki.models.ArticleAttachment.get_thumb_impl">
+<tt class="descname">get_thumb_impl</tt><big>(</big><em>width</em>, <em>height</em><big>)</big><a class="reference internal" href="_modules/simplewiki/models.html#ArticleAttachment.get_thumb_impl"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#simplewiki.models.ArticleAttachment.get_thumb_impl" title="Permalink to this definition">¶</a></dt>
+<dd><p>Requires Python Imaging Library (PIL)</p>
+</dd></dl>
+
+<dl class="method">
+<dt id="simplewiki.models.ArticleAttachment.mk_thumb">
+<tt class="descname">mk_thumb</tt><big>(</big><em>width</em>, <em>height</em>, <em>force=False</em><big>)</big><a class="reference internal" href="_modules/simplewiki/models.html#ArticleAttachment.mk_thumb"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#simplewiki.models.ArticleAttachment.mk_thumb" title="Permalink to this definition">¶</a></dt>
+<dd><p>Requires Python Imaging Library (PIL)</p>
+</dd></dl>
+
+</dd></dl>
+
+<dl class="class">
+<dt id="simplewiki.models.Namespace">
+<em class="property">class </em><tt class="descclassname">simplewiki.models.</tt><tt class="descname">Namespace</tt><big>(</big><em>*args</em>, <em>**kwargs</em><big>)</big><a class="reference internal" href="_modules/simplewiki/models.html#Namespace"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#simplewiki.models.Namespace" title="Permalink to this definition">¶</a></dt>
+<dd><p>Bases: <tt class="xref py py-class docutils literal"><span class="pre">django.db.models.base.Model</span></tt></p>
+<p>Namespace(id, name)</p>
+<table class="docutils field-list" frame="void" rules="none">
+<col class="field-name" />
+<col class="field-body" />
+<tbody valign="top">
+<tr class="field-odd field"><th class="field-name">Parameters:</th><td class="field-body"><ul class="first last simple">
+<li><strong>id</strong> (<em>AutoField</em>) &#8211; Id</li>
+<li><strong>name</strong> (<em>CharField</em>) &#8211; Namespace</li>
+</ul>
+</td>
+</tr>
+</tbody>
+</table>
+</dd></dl>
+
+<dl class="class">
+<dt id="simplewiki.models.Permission">
+<em class="property">class </em><tt class="descclassname">simplewiki.models.</tt><tt class="descname">Permission</tt><big>(</big><em>*args</em>, <em>**kwargs</em><big>)</big><a class="reference internal" href="_modules/simplewiki/models.html#Permission"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#simplewiki.models.Permission" title="Permalink to this definition">¶</a></dt>
+<dd><p>Bases: <tt class="xref py py-class docutils literal"><span class="pre">django.db.models.base.Model</span></tt></p>
+<p>Permission(id, permission_name)</p>
+<table class="docutils field-list" frame="void" rules="none">
+<col class="field-name" />
+<col class="field-body" />
+<tbody valign="top">
+<tr class="field-odd field"><th class="field-name">Parameters:</th><td class="field-body"><ul class="first last simple">
+<li><strong>id</strong> (<em>AutoField</em>) &#8211; Id</li>
+<li><strong>permission_name</strong> (<em>CharField</em>) &#8211; Permission name</li>
+</ul>
+</td>
+</tr>
+</tbody>
+</table>
+</dd></dl>
+
+<dl class="class">
+<dt id="simplewiki.models.Revision">
+<em class="property">class </em><tt class="descclassname">simplewiki.models.</tt><tt class="descname">Revision</tt><big>(</big><em>*args</em>, <em>**kwargs</em><big>)</big><a class="reference internal" href="_modules/simplewiki/models.html#Revision"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#simplewiki.models.Revision" title="Permalink to this definition">¶</a></dt>
+<dd><p>Bases: <tt class="xref py py-class docutils literal"><span class="pre">django.db.models.base.Model</span></tt></p>
+<p>Revision(id, article_id, revision_text, revision_user_id, revision_date, contents, contents_parsed, counter, previous_revision_id, deleted)</p>
+<table class="docutils field-list" frame="void" rules="none">
+<col class="field-name" />
+<col class="field-body" />
+<tbody valign="top">
+<tr class="field-odd field"><th class="field-name">Parameters:</th><td class="field-body"><ul class="first last simple">
+<li><strong>id</strong> (<em>AutoField</em>) &#8211; Id</li>
+<li><strong>article_id</strong> (<em>ForeignKey</em>) &#8211; Article</li>
+<li><strong>revision_text</strong> (<em>CharField</em>) &#8211; Description of change</li>
+<li><strong>revision_user_id</strong> (<em>ForeignKey</em>) &#8211; Modified by</li>
+<li><strong>revision_date</strong> (<em>DateTimeField</em>) &#8211; Revision date</li>
+<li><strong>contents</strong> (<em>TextField</em>) &#8211; Contents (use markdown format)</li>
+<li><strong>contents_parsed</strong> (<em>TextField</em>) &#8211; Contents parsed</li>
+<li><strong>counter</strong> (<em>IntegerField</em>) &#8211; Revision#</li>
+<li><strong>previous_revision_id</strong> (<em>ForeignKey</em>) &#8211; Previous revision</li>
+<li><strong>deleted</strong> (<em>IntegerField</em>) &#8211; Deleted group</li>
+</ul>
+</td>
+</tr>
+</tbody>
+</table>
+<dl class="method">
+<dt id="simplewiki.models.Revision.delete">
+<tt class="descname">delete</tt><big>(</big><em>**kwargs</em><big>)</big><a class="reference internal" href="_modules/simplewiki/models.html#Revision.delete"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#simplewiki.models.Revision.delete" title="Permalink to this definition">¶</a></dt>
+<dd><p>If a current revision is deleted, then regress to the previous
+revision or insert a stub, if no other revisions are available</p>
+</dd></dl>
+
+</dd></dl>
+
+<dl class="function">
+<dt id="simplewiki.models.get_attachment_filepath">
+<tt class="descclassname">simplewiki.models.</tt><tt class="descname">get_attachment_filepath</tt><big>(</big><em>instance</em>, <em>filename</em><big>)</big><a class="reference internal" href="_modules/simplewiki/models.html#get_attachment_filepath"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#simplewiki.models.get_attachment_filepath" title="Permalink to this definition">¶</a></dt>
+<dd><p>Store file, appending new extension for added security</p>
+</dd></dl>
+
+<dl class="function">
+<dt id="simplewiki.models.set_revision">
+<tt class="descclassname">simplewiki.models.</tt><tt class="descname">set_revision</tt><big>(</big><em>sender</em>, <em>*args</em>, <em>**kwargs</em><big>)</big><a class="reference internal" href="_modules/simplewiki/models.html#set_revision"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#simplewiki.models.set_revision" title="Permalink to this definition">¶</a></dt>
+<dd><p>Signal handler to ensure that a new revision is always chosen as the
+current revision - automatically. It simplifies stuff greatly. Also
+stores previous revision for diff-purposes</p>
+</dd></dl>
+
+</div>
+<div class="section" id="id20">
+<h3>Views<a class="headerlink" href="#id20" title="Permalink to this headline">¶</a></h3>
+<span class="target" id="module-simplewiki.views"></span><dl class="function">
+<dt id="simplewiki.views.not_found">
+<tt class="descclassname">simplewiki.views.</tt><tt class="descname">not_found</tt><big>(</big><em>request</em>, <em>article_path</em>, <em>course</em><big>)</big><a class="reference internal" href="_modules/simplewiki/views.html#not_found"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#simplewiki.views.not_found" title="Permalink to this definition">¶</a></dt>
+<dd><p>Generate a NOT FOUND message for some URL</p>
+</dd></dl>
+
+</div>
+<div class="section" id="id21">
+<h3>Tests<a class="headerlink" href="#id21" title="Permalink to this headline">¶</a></h3>
+<span class="target" id="module-simplewiki.tests"></span><p>This file demonstrates two different styles of tests (one doctest and one
+unittest). These will both pass when you run &#8220;manage.py test&#8221;.</p>
+<p>Replace these with more appropriate tests for your application.</p>
+</div>
+</div>
+<div class="section" id="module-static_template_view">
+<span id="static-template-view"></span><h2>Static template view<a class="headerlink" href="#module-static_template_view" title="Permalink to this headline">¶</a></h2>
+<div class="section" id="id22">
+<h3>Models<a class="headerlink" href="#id22" title="Permalink to this headline">¶</a></h3>
+<span class="target" id="module-static_template_view.models"></span></div>
+<div class="section" id="id23">
+<h3>Views<a class="headerlink" href="#id23" title="Permalink to this headline">¶</a></h3>
+<span class="target" id="module-static_template_view.views"></span><dl class="function">
+<dt id="static_template_view.views.render">
+<tt class="descclassname">static_template_view.views.</tt><tt class="descname">render</tt><big>(</big><em>request</em>, <em>*args</em>, <em>**kwargs</em><big>)</big><a class="reference internal" href="_modules/static_template_view/views.html#render"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#static_template_view.views.render" title="Permalink to this definition">¶</a></dt>
+<dd><p>This view function renders the template sent without checking that it
+exists. Do not expose template as a regex part of the url. The user should
+not be able to ender any arbitray template name. The correct usage would be:</p>
+<p>url(r&#8217;^jobs$&#8217;, &#8216;static_template_view.views.render&#8217;, {&#8216;template&#8217;: &#8216;jobs.html&#8217;}, name=&#8221;jobs&#8221;)</p>
+</dd></dl>
+
+</div>
+<div class="section" id="id24">
+<h3>Tests<a class="headerlink" href="#id24" title="Permalink to this headline">¶</a></h3>
+<span class="target" id="module-static_template_view.tests"></span><p>This file demonstrates writing tests using the unittest module. These will pass
+when you run &#8220;manage.py test&#8221;.</p>
+<p>Replace this with more appropriate tests for your application.</p>
+</div>
+</div>
+<div class="section" id="module-staticbook">
+<span id="static-book"></span><h2>Static book<a class="headerlink" href="#module-staticbook" title="Permalink to this headline">¶</a></h2>
+<div class="section" id="id25">
+<h3>Models<a class="headerlink" href="#id25" title="Permalink to this headline">¶</a></h3>
+<span class="target" id="module-staticbook.models"></span></div>
+<div class="section" id="id26">
+<h3>Views<a class="headerlink" href="#id26" title="Permalink to this headline">¶</a></h3>
+<span class="target" id="module-staticbook.views"></span></div>
+<div class="section" id="id27">
+<h3>Tests<a class="headerlink" href="#id27" title="Permalink to this headline">¶</a></h3>
+<span class="target" id="module-staticbook.tests"></span><p>This file demonstrates writing tests using the unittest module. These will pass
+when you run &#8220;manage.py test&#8221;.</p>
+<p>Replace this with more appropriate tests for your application.</p>
+</div>
+</div>
+</div>
+
+
+          </div>
+        </div>
+      </div>
+      <div class="clearer"></div>
+    </div>
+    <div class="related">
+      <h3>Navigation</h3>
+      <ul>
+        <li class="right" style="margin-right: 10px">
+          <a href="genindex.html" title="General Index"
+             >index</a></li>
+        <li class="right" >
+          <a href="py-modindex.html" title="Python Module Index"
+             >modules</a> |</li>
+        <li class="right" >
+          <a href="cms.html" title="CMS module"
+             >next</a> |</li>
+        <li class="right" >
+          <a href="djangoapps.html" title="Django applications"
+             >previous</a> |</li>
+        <li><a href="index.html">MITx 1.0 documentation</a> &raquo;</li>
+          <li><a href="djangoapps.html" >Django applications</a> &raquo;</li> 
+      </ul>
+    </div>
+    <div class="footer">
+        &copy; Copyright 2012, MITx team.
+      Created using <a href="http://sphinx.pocoo.org/">Sphinx</a> 1.1.3.
+    </div>
+  </body>
+</html>

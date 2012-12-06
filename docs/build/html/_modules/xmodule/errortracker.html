@@ -1,0 +1,146 @@
+
+
+<!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Transitional//EN"
+  "http://www.w3.org/TR/xhtml1/DTD/xhtml1-transitional.dtd">
+
+
+<html xmlns="http://www.w3.org/1999/xhtml">
+  <head>
+    <meta http-equiv="Content-Type" content="text/html; charset=utf-8" />
+    
+    <title>xmodule.errortracker &mdash; MITx 1.0 documentation</title>
+    
+    <link rel="stylesheet" href="../../_static/sphinxdoc.css" type="text/css" />
+    <link rel="stylesheet" href="../../_static/pygments.css" type="text/css" />
+    
+    <script type="text/javascript">
+      var DOCUMENTATION_OPTIONS = {
+        URL_ROOT:    '../../',
+        VERSION:     '1.0',
+        COLLAPSE_INDEX: false,
+        FILE_SUFFIX: '.html',
+        HAS_SOURCE:  true
+      };
+    </script>
+    <script type="text/javascript" src="../../_static/jquery.js"></script>
+    <script type="text/javascript" src="../../_static/underscore.js"></script>
+    <script type="text/javascript" src="../../_static/doctools.js"></script>
+    <script type="text/javascript" src="http://cdn.mathjax.org/mathjax/latest/MathJax.js?config=TeX-AMS-MML_HTMLorMML"></script>
+    <link rel="top" title="MITx 1.0 documentation" href="../../index.html" />
+    <link rel="up" title="Module code" href="../index.html" /> 
+  </head>
+  <body>
+<img src="../../_static/homepage-bg.jpg" alt="Edx logo"  width="100%;"/>
+
+    <div class="related">
+      <h3>Navigation</h3>
+      <ul>
+        <li class="right" style="margin-right: 10px">
+          <a href="../../genindex.html" title="General Index"
+             accesskey="I">index</a></li>
+        <li class="right" >
+          <a href="../../py-modindex.html" title="Python Module Index"
+             >modules</a> |</li>
+        <li><a href="../../index.html">MITx 1.0 documentation</a> &raquo;</li>
+          <li><a href="../index.html" accesskey="U">Module code</a> &raquo;</li> 
+      </ul>
+    </div>
+      <div class="sphinxsidebar">
+        <div class="sphinxsidebarwrapper">
+<div id="searchbox" style="display: none">
+  <h3>Quick search</h3>
+    <form class="search" action="../../search.html" method="get">
+      <input type="text" name="q" />
+      <input type="submit" value="Go" />
+      <input type="hidden" name="check_keywords" value="yes" />
+      <input type="hidden" name="area" value="default" />
+    </form>
+    <p class="searchtip" style="font-size: 90%">
+    Enter search terms or a module, class or function name.
+    </p>
+</div>
+<script type="text/javascript">$('#searchbox').show(0);</script>
+        </div>
+      </div>
+
+    <div class="document">
+      <div class="documentwrapper">
+        <div class="bodywrapper">
+          <div class="body">
+            
+  <h1>Source code for xmodule.errortracker</h1><div class="highlight"><pre>
+<span class="kn">import</span> <span class="nn">logging</span>
+<span class="kn">import</span> <span class="nn">sys</span>
+<span class="kn">import</span> <span class="nn">traceback</span>
+
+<span class="kn">from</span> <span class="nn">collections</span> <span class="kn">import</span> <span class="n">namedtuple</span>
+
+<span class="n">log</span> <span class="o">=</span> <span class="n">logging</span><span class="o">.</span><span class="n">getLogger</span><span class="p">(</span><span class="n">__name__</span><span class="p">)</span>
+
+<span class="n">ErrorLog</span> <span class="o">=</span> <span class="n">namedtuple</span><span class="p">(</span><span class="s">&#39;ErrorLog&#39;</span><span class="p">,</span> <span class="s">&#39;tracker errors&#39;</span><span class="p">)</span>
+
+<div class="viewcode-block" id="exc_info_to_str"><a class="viewcode-back" href="../../xmodule.html#xmodule.errortracker.exc_info_to_str">[docs]</a><span class="k">def</span> <span class="nf">exc_info_to_str</span><span class="p">(</span><span class="n">exc_info</span><span class="p">):</span>
+    <span class="sd">&quot;&quot;&quot;Given some exception info, convert it into a string using</span>
+<span class="sd">    the traceback.format_exception() function.</span>
+<span class="sd">    &quot;&quot;&quot;</span>
+    <span class="k">return</span> <span class="s">&#39;&#39;</span><span class="o">.</span><span class="n">join</span><span class="p">(</span><span class="n">traceback</span><span class="o">.</span><span class="n">format_exception</span><span class="p">(</span><span class="o">*</span><span class="n">exc_info</span><span class="p">))</span>
+</div>
+<div class="viewcode-block" id="in_exception_handler"><a class="viewcode-back" href="../../xmodule.html#xmodule.errortracker.in_exception_handler">[docs]</a><span class="k">def</span> <span class="nf">in_exception_handler</span><span class="p">():</span>
+    <span class="sd">&#39;&#39;&#39;Is there an active exception?&#39;&#39;&#39;</span>
+    <span class="k">return</span> <span class="n">sys</span><span class="o">.</span><span class="n">exc_info</span><span class="p">()</span> <span class="o">!=</span> <span class="p">(</span><span class="bp">None</span><span class="p">,</span> <span class="bp">None</span><span class="p">,</span> <span class="bp">None</span><span class="p">)</span>
+
+</div>
+<div class="viewcode-block" id="make_error_tracker"><a class="viewcode-back" href="../../xmodule.html#xmodule.errortracker.make_error_tracker">[docs]</a><span class="k">def</span> <span class="nf">make_error_tracker</span><span class="p">():</span>
+    <span class="sd">&#39;&#39;&#39;Return an ErrorLog (named tuple), with fields (tracker, errors), where</span>
+<span class="sd">    the logger appends a tuple (message, exception_str) to the errors on every</span>
+<span class="sd">    call.  exception_str is in the format returned by traceback.format_exception.</span>
+
+<span class="sd">    error_list is a simple list.  If the caller modifies it, info</span>
+<span class="sd">    will be lost.</span>
+<span class="sd">    &#39;&#39;&#39;</span>
+    <span class="n">errors</span> <span class="o">=</span> <span class="p">[]</span>
+
+    <span class="k">def</span> <span class="nf">error_tracker</span><span class="p">(</span><span class="n">msg</span><span class="p">):</span>
+        <span class="sd">&#39;&#39;&#39;Log errors&#39;&#39;&#39;</span>
+        <span class="n">exc_str</span> <span class="o">=</span> <span class="s">&#39;&#39;</span>
+        <span class="k">if</span> <span class="n">in_exception_handler</span><span class="p">():</span>
+            <span class="n">exc_str</span> <span class="o">=</span> <span class="n">exc_info_to_str</span><span class="p">(</span><span class="n">sys</span><span class="o">.</span><span class="n">exc_info</span><span class="p">())</span>
+
+            <span class="c"># don&#39;t display irrelevant gunicorn sync error</span>
+            <span class="k">if</span> <span class="p">((</span><span class="s">&#39;python2.7/site-packages/gunicorn/workers/sync.py&#39;</span> <span class="ow">in</span> <span class="n">exc_str</span><span class="p">)</span> <span class="ow">and</span>
+                <span class="p">(</span><span class="s">&#39;[Errno 11] Resource temporarily unavailable&#39;</span> <span class="ow">in</span> <span class="n">exc_str</span><span class="p">)):</span>
+                <span class="n">exc_str</span> <span class="o">=</span> <span class="s">&#39;&#39;</span>
+
+        <span class="n">errors</span><span class="o">.</span><span class="n">append</span><span class="p">((</span><span class="n">msg</span><span class="p">,</span> <span class="n">exc_str</span><span class="p">))</span>
+
+    <span class="k">return</span> <span class="n">ErrorLog</span><span class="p">(</span><span class="n">error_tracker</span><span class="p">,</span> <span class="n">errors</span><span class="p">)</span>
+</div>
+<div class="viewcode-block" id="null_error_tracker"><a class="viewcode-back" href="../../xmodule.html#xmodule.errortracker.null_error_tracker">[docs]</a><span class="k">def</span> <span class="nf">null_error_tracker</span><span class="p">(</span><span class="n">msg</span><span class="p">):</span>
+    <span class="sd">&#39;&#39;&#39;A dummy error tracker that just ignores the messages&#39;&#39;&#39;</span>
+    <span class="k">pass</span></div>
+</pre></div>
+
+          </div>
+        </div>
+      </div>
+      <div class="clearer"></div>
+    </div>
+    <div class="related">
+      <h3>Navigation</h3>
+      <ul>
+        <li class="right" style="margin-right: 10px">
+          <a href="../../genindex.html" title="General Index"
+             >index</a></li>
+        <li class="right" >
+          <a href="../../py-modindex.html" title="Python Module Index"
+             >modules</a> |</li>
+        <li><a href="../../index.html">MITx 1.0 documentation</a> &raquo;</li>
+          <li><a href="../index.html" >Module code</a> &raquo;</li> 
+      </ul>
+    </div>
+    <div class="footer">
+        &copy; Copyright 2012, MITx team.
+      Created using <a href="http://sphinx.pocoo.org/">Sphinx</a> 1.1.3.
+    </div>
+  </body>
+</html>

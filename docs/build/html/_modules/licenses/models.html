@@ -1,0 +1,178 @@
+
+
+<!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Transitional//EN"
+  "http://www.w3.org/TR/xhtml1/DTD/xhtml1-transitional.dtd">
+
+
+<html xmlns="http://www.w3.org/1999/xhtml">
+  <head>
+    <meta http-equiv="Content-Type" content="text/html; charset=utf-8" />
+    
+    <title>licenses.models &mdash; MITx 1.0 documentation</title>
+    
+    <link rel="stylesheet" href="../../_static/sphinxdoc.css" type="text/css" />
+    <link rel="stylesheet" href="../../_static/pygments.css" type="text/css" />
+    
+    <script type="text/javascript">
+      var DOCUMENTATION_OPTIONS = {
+        URL_ROOT:    '../../',
+        VERSION:     '1.0',
+        COLLAPSE_INDEX: false,
+        FILE_SUFFIX: '.html',
+        HAS_SOURCE:  true
+      };
+    </script>
+    <script type="text/javascript" src="../../_static/jquery.js"></script>
+    <script type="text/javascript" src="../../_static/underscore.js"></script>
+    <script type="text/javascript" src="../../_static/doctools.js"></script>
+    <script type="text/javascript" src="http://cdn.mathjax.org/mathjax/latest/MathJax.js?config=TeX-AMS-MML_HTMLorMML"></script>
+    <link rel="top" title="MITx 1.0 documentation" href="../../index.html" />
+    <link rel="up" title="Module code" href="../index.html" /> 
+  </head>
+  <body>
+<img src="../../_static/homepage-bg.jpg" alt="Edx logo"  width="100%;"/>
+
+    <div class="related">
+      <h3>Navigation</h3>
+      <ul>
+        <li class="right" style="margin-right: 10px">
+          <a href="../../genindex.html" title="General Index"
+             accesskey="I">index</a></li>
+        <li class="right" >
+          <a href="../../py-modindex.html" title="Python Module Index"
+             >modules</a> |</li>
+        <li><a href="../../index.html">MITx 1.0 documentation</a> &raquo;</li>
+          <li><a href="../index.html" accesskey="U">Module code</a> &raquo;</li> 
+      </ul>
+    </div>
+      <div class="sphinxsidebar">
+        <div class="sphinxsidebarwrapper">
+<div id="searchbox" style="display: none">
+  <h3>Quick search</h3>
+    <form class="search" action="../../search.html" method="get">
+      <input type="text" name="q" />
+      <input type="submit" value="Go" />
+      <input type="hidden" name="check_keywords" value="yes" />
+      <input type="hidden" name="area" value="default" />
+    </form>
+    <p class="searchtip" style="font-size: 90%">
+    Enter search terms or a module, class or function name.
+    </p>
+</div>
+<script type="text/javascript">$('#searchbox').show(0);</script>
+        </div>
+      </div>
+
+    <div class="document">
+      <div class="documentwrapper">
+        <div class="bodywrapper">
+          <div class="body">
+            
+  <h1>Source code for licenses.models</h1><div class="highlight"><pre>
+<span class="kn">import</span> <span class="nn">logging</span>
+
+<span class="kn">from</span> <span class="nn">django.db</span> <span class="kn">import</span> <span class="n">models</span><span class="p">,</span> <span class="n">transaction</span>
+
+<span class="kn">from</span> <span class="nn">student.models</span> <span class="kn">import</span> <span class="n">User</span>
+
+<span class="n">log</span> <span class="o">=</span> <span class="n">logging</span><span class="o">.</span><span class="n">getLogger</span><span class="p">(</span><span class="s">&quot;mitx.licenses&quot;</span><span class="p">)</span>
+
+
+<div class="viewcode-block" id="CourseSoftware"><a class="viewcode-back" href="../../lms.html#licenses.models.CourseSoftware">[docs]</a><span class="k">class</span> <span class="nc">CourseSoftware</span><span class="p">(</span><span class="n">models</span><span class="o">.</span><span class="n">Model</span><span class="p">):</span>
+    <span class="n">name</span> <span class="o">=</span> <span class="n">models</span><span class="o">.</span><span class="n">CharField</span><span class="p">(</span><span class="n">max_length</span><span class="o">=</span><span class="mi">255</span><span class="p">)</span>
+    <span class="n">full_name</span> <span class="o">=</span> <span class="n">models</span><span class="o">.</span><span class="n">CharField</span><span class="p">(</span><span class="n">max_length</span><span class="o">=</span><span class="mi">255</span><span class="p">)</span>
+    <span class="n">url</span> <span class="o">=</span> <span class="n">models</span><span class="o">.</span><span class="n">CharField</span><span class="p">(</span><span class="n">max_length</span><span class="o">=</span><span class="mi">255</span><span class="p">)</span>
+    <span class="n">course_id</span> <span class="o">=</span> <span class="n">models</span><span class="o">.</span><span class="n">CharField</span><span class="p">(</span><span class="n">max_length</span><span class="o">=</span><span class="mi">255</span><span class="p">)</span>
+
+    <span class="k">def</span> <span class="nf">__unicode__</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
+        <span class="k">return</span> <span class="s">u&#39;{0} for {1}&#39;</span><span class="o">.</span><span class="n">format</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">name</span><span class="p">,</span> <span class="bp">self</span><span class="o">.</span><span class="n">course_id</span><span class="p">)</span>
+
+</div>
+<div class="viewcode-block" id="UserLicense"><a class="viewcode-back" href="../../lms.html#licenses.models.UserLicense">[docs]</a><span class="k">class</span> <span class="nc">UserLicense</span><span class="p">(</span><span class="n">models</span><span class="o">.</span><span class="n">Model</span><span class="p">):</span>
+    <span class="n">software</span> <span class="o">=</span> <span class="n">models</span><span class="o">.</span><span class="n">ForeignKey</span><span class="p">(</span><span class="n">CourseSoftware</span><span class="p">,</span> <span class="n">db_index</span><span class="o">=</span><span class="bp">True</span><span class="p">)</span>
+    <span class="n">user</span> <span class="o">=</span> <span class="n">models</span><span class="o">.</span><span class="n">ForeignKey</span><span class="p">(</span><span class="n">User</span><span class="p">,</span> <span class="n">null</span><span class="o">=</span><span class="bp">True</span><span class="p">)</span>
+    <span class="n">serial</span> <span class="o">=</span> <span class="n">models</span><span class="o">.</span><span class="n">CharField</span><span class="p">(</span><span class="n">max_length</span><span class="o">=</span><span class="mi">255</span><span class="p">)</span>
+
+</div>
+<span class="k">def</span> <span class="nf">get_courses_licenses</span><span class="p">(</span><span class="n">user</span><span class="p">,</span> <span class="n">courses</span><span class="p">):</span>
+    <span class="n">course_ids</span> <span class="o">=</span> <span class="nb">set</span><span class="p">(</span><span class="n">course</span><span class="o">.</span><span class="n">id</span> <span class="k">for</span> <span class="n">course</span> <span class="ow">in</span> <span class="n">courses</span><span class="p">)</span>
+    <span class="n">all_software</span> <span class="o">=</span> <span class="n">CourseSoftware</span><span class="o">.</span><span class="n">objects</span><span class="o">.</span><span class="n">filter</span><span class="p">(</span><span class="n">course_id__in</span><span class="o">=</span><span class="n">course_ids</span><span class="p">)</span>
+
+    <span class="n">assigned_licenses</span> <span class="o">=</span> <span class="n">UserLicense</span><span class="o">.</span><span class="n">objects</span><span class="o">.</span><span class="n">filter</span><span class="p">(</span><span class="n">software__in</span><span class="o">=</span><span class="n">all_software</span><span class="p">,</span>
+                                                   <span class="n">user</span><span class="o">=</span><span class="n">user</span><span class="p">)</span>
+
+    <span class="n">licenses</span> <span class="o">=</span> <span class="nb">dict</span><span class="o">.</span><span class="n">fromkeys</span><span class="p">(</span><span class="n">all_software</span><span class="p">,</span> <span class="bp">None</span><span class="p">)</span>
+    <span class="k">for</span> <span class="n">license</span> <span class="ow">in</span> <span class="n">assigned_licenses</span><span class="p">:</span>
+        <span class="n">licenses</span><span class="p">[</span><span class="n">license</span><span class="o">.</span><span class="n">software</span><span class="p">]</span> <span class="o">=</span> <span class="n">license</span>
+
+    <span class="n">log</span><span class="o">.</span><span class="n">info</span><span class="p">(</span><span class="n">assigned_licenses</span><span class="p">)</span>
+    <span class="n">log</span><span class="o">.</span><span class="n">info</span><span class="p">(</span><span class="n">licenses</span><span class="p">)</span>
+
+    <span class="k">return</span> <span class="n">licenses</span>
+
+
+<span class="k">def</span> <span class="nf">get_license</span><span class="p">(</span><span class="n">user</span><span class="p">,</span> <span class="n">software</span><span class="p">):</span>
+    <span class="k">try</span><span class="p">:</span>
+        <span class="c"># TODO: temporary fix for when somehow a user got more that one license.</span>
+        <span class="c"># The proper fix should use Meta.unique_together in the UserLicense model.</span>
+        <span class="n">licenses</span> <span class="o">=</span> <span class="n">UserLicense</span><span class="o">.</span><span class="n">objects</span><span class="o">.</span><span class="n">filter</span><span class="p">(</span><span class="n">user</span><span class="o">=</span><span class="n">user</span><span class="p">,</span> <span class="n">software</span><span class="o">=</span><span class="n">software</span><span class="p">)</span>
+        <span class="n">license</span> <span class="o">=</span> <span class="n">licenses</span><span class="p">[</span><span class="mi">0</span><span class="p">]</span> <span class="k">if</span> <span class="n">licenses</span> <span class="k">else</span> <span class="bp">None</span>
+    <span class="k">except</span> <span class="n">UserLicense</span><span class="o">.</span><span class="n">DoesNotExist</span><span class="p">:</span>
+        <span class="n">license</span> <span class="o">=</span> <span class="bp">None</span>
+
+    <span class="k">return</span> <span class="n">license</span>
+
+
+<span class="k">def</span> <span class="nf">get_or_create_license</span><span class="p">(</span><span class="n">user</span><span class="p">,</span> <span class="n">software</span><span class="p">):</span>
+    <span class="n">license</span> <span class="o">=</span> <span class="n">get_license</span><span class="p">(</span><span class="n">user</span><span class="p">,</span> <span class="n">software</span><span class="p">)</span>
+    <span class="k">if</span> <span class="n">license</span> <span class="ow">is</span> <span class="bp">None</span><span class="p">:</span>
+        <span class="n">license</span> <span class="o">=</span> <span class="n">_create_license</span><span class="p">(</span><span class="n">user</span><span class="p">,</span> <span class="n">software</span><span class="p">)</span>
+
+    <span class="k">return</span> <span class="n">license</span>
+
+
+<span class="k">def</span> <span class="nf">_create_license</span><span class="p">(</span><span class="n">user</span><span class="p">,</span> <span class="n">software</span><span class="p">):</span>
+    <span class="n">license</span> <span class="o">=</span> <span class="bp">None</span>
+
+    <span class="k">try</span><span class="p">:</span>
+        <span class="c"># find one license that has not been assigned, locking the</span>
+        <span class="c"># table/rows with select_for_update to prevent race conditions</span>
+        <span class="k">with</span> <span class="n">transaction</span><span class="o">.</span><span class="n">commit_on_success</span><span class="p">():</span>
+            <span class="n">selected</span> <span class="o">=</span> <span class="n">UserLicense</span><span class="o">.</span><span class="n">objects</span><span class="o">.</span><span class="n">select_for_update</span><span class="p">()</span>
+            <span class="n">license</span> <span class="o">=</span> <span class="n">selected</span><span class="o">.</span><span class="n">filter</span><span class="p">(</span><span class="n">user__isnull</span><span class="o">=</span><span class="bp">True</span><span class="p">,</span> <span class="n">software</span><span class="o">=</span><span class="n">software</span><span class="p">)[</span><span class="mi">0</span><span class="p">]</span>
+            <span class="n">license</span><span class="o">.</span><span class="n">user</span> <span class="o">=</span> <span class="n">user</span>
+            <span class="n">license</span><span class="o">.</span><span class="n">save</span><span class="p">()</span>
+    <span class="k">except</span> <span class="ne">IndexError</span><span class="p">:</span>
+        <span class="c"># there are no free licenses</span>
+        <span class="n">log</span><span class="o">.</span><span class="n">error</span><span class="p">(</span><span class="s">&#39;No serial numbers available for {0}&#39;</span><span class="p">,</span> <span class="n">software</span><span class="p">)</span>
+        <span class="n">license</span> <span class="o">=</span> <span class="bp">None</span>
+        <span class="c"># TODO [rocha]look if someone has unenrolled from the class</span>
+        <span class="c"># and already has a serial number</span>
+
+    <span class="k">return</span> <span class="n">license</span>
+</pre></div>
+
+          </div>
+        </div>
+      </div>
+      <div class="clearer"></div>
+    </div>
+    <div class="related">
+      <h3>Navigation</h3>
+      <ul>
+        <li class="right" style="margin-right: 10px">
+          <a href="../../genindex.html" title="General Index"
+             >index</a></li>
+        <li class="right" >
+          <a href="../../py-modindex.html" title="Python Module Index"
+             >modules</a> |</li>
+        <li><a href="../../index.html">MITx 1.0 documentation</a> &raquo;</li>
+          <li><a href="../index.html" >Module code</a> &raquo;</li> 
+      </ul>
+    </div>
+    <div class="footer">
+        &copy; Copyright 2012, MITx team.
+      Created using <a href="http://sphinx.pocoo.org/">Sphinx</a> 1.1.3.
+    </div>
+  </body>
+</html>

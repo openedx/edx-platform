@@ -1,0 +1,507 @@
+
+
+<!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Transitional//EN"
+  "http://www.w3.org/TR/xhtml1/DTD/xhtml1-transitional.dtd">
+
+
+<html xmlns="http://www.w3.org/1999/xhtml">
+  <head>
+    <meta http-equiv="Content-Type" content="text/html; charset=utf-8" />
+    
+    <title>courseware.access &mdash; MITx 1.0 documentation</title>
+    
+    <link rel="stylesheet" href="../../_static/sphinxdoc.css" type="text/css" />
+    <link rel="stylesheet" href="../../_static/pygments.css" type="text/css" />
+    
+    <script type="text/javascript">
+      var DOCUMENTATION_OPTIONS = {
+        URL_ROOT:    '../../',
+        VERSION:     '1.0',
+        COLLAPSE_INDEX: false,
+        FILE_SUFFIX: '.html',
+        HAS_SOURCE:  true
+      };
+    </script>
+    <script type="text/javascript" src="../../_static/jquery.js"></script>
+    <script type="text/javascript" src="../../_static/underscore.js"></script>
+    <script type="text/javascript" src="../../_static/doctools.js"></script>
+    <script type="text/javascript" src="http://cdn.mathjax.org/mathjax/latest/MathJax.js?config=TeX-AMS-MML_HTMLorMML"></script>
+    <link rel="top" title="MITx 1.0 documentation" href="../../index.html" />
+    <link rel="up" title="Module code" href="../index.html" /> 
+  </head>
+  <body>
+<img src="../../_static/homepage-bg.jpg" alt="Edx logo"  width="100%;"/>
+
+    <div class="related">
+      <h3>Navigation</h3>
+      <ul>
+        <li class="right" style="margin-right: 10px">
+          <a href="../../genindex.html" title="General Index"
+             accesskey="I">index</a></li>
+        <li class="right" >
+          <a href="../../py-modindex.html" title="Python Module Index"
+             >modules</a> |</li>
+        <li><a href="../../index.html">MITx 1.0 documentation</a> &raquo;</li>
+          <li><a href="../index.html" accesskey="U">Module code</a> &raquo;</li> 
+      </ul>
+    </div>
+      <div class="sphinxsidebar">
+        <div class="sphinxsidebarwrapper">
+<div id="searchbox" style="display: none">
+  <h3>Quick search</h3>
+    <form class="search" action="../../search.html" method="get">
+      <input type="text" name="q" />
+      <input type="submit" value="Go" />
+      <input type="hidden" name="check_keywords" value="yes" />
+      <input type="hidden" name="area" value="default" />
+    </form>
+    <p class="searchtip" style="font-size: 90%">
+    Enter search terms or a module, class or function name.
+    </p>
+</div>
+<script type="text/javascript">$('#searchbox').show(0);</script>
+        </div>
+      </div>
+
+    <div class="document">
+      <div class="documentwrapper">
+        <div class="bodywrapper">
+          <div class="body">
+            
+  <h1>Source code for courseware.access</h1><div class="highlight"><pre>
+<span class="sd">&quot;&quot;&quot;This file contains (or should), all access control logic for the courseware.</span>
+<span class="sd">Ideally, it will be the only place that needs to know about any special settings</span>
+<span class="sd">like DISABLE_START_DATES&quot;&quot;&quot;</span>
+
+<span class="kn">import</span> <span class="nn">logging</span>
+<span class="kn">import</span> <span class="nn">time</span>
+
+<span class="kn">from</span> <span class="nn">django.conf</span> <span class="kn">import</span> <span class="n">settings</span>
+
+<span class="kn">from</span> <span class="nn">xmodule.course_module</span> <span class="kn">import</span> <span class="n">CourseDescriptor</span>
+<span class="kn">from</span> <span class="nn">xmodule.error_module</span> <span class="kn">import</span> <span class="n">ErrorDescriptor</span>
+<span class="kn">from</span> <span class="nn">xmodule.modulestore</span> <span class="kn">import</span> <span class="n">Location</span>
+<span class="kn">from</span> <span class="nn">xmodule.timeparse</span> <span class="kn">import</span> <span class="n">parse_time</span>
+<span class="kn">from</span> <span class="nn">xmodule.x_module</span> <span class="kn">import</span> <span class="n">XModule</span><span class="p">,</span> <span class="n">XModuleDescriptor</span>
+
+<span class="n">DEBUG_ACCESS</span> <span class="o">=</span> <span class="bp">False</span>
+
+<span class="n">log</span> <span class="o">=</span> <span class="n">logging</span><span class="o">.</span><span class="n">getLogger</span><span class="p">(</span><span class="n">__name__</span><span class="p">)</span>
+
+<span class="k">def</span> <span class="nf">debug</span><span class="p">(</span><span class="o">*</span><span class="n">args</span><span class="p">,</span> <span class="o">**</span><span class="n">kwargs</span><span class="p">):</span>
+    <span class="c"># to avoid overly verbose output, this is off by default</span>
+    <span class="k">if</span> <span class="n">DEBUG_ACCESS</span><span class="p">:</span>
+        <span class="n">log</span><span class="o">.</span><span class="n">debug</span><span class="p">(</span><span class="o">*</span><span class="n">args</span><span class="p">,</span> <span class="o">**</span><span class="n">kwargs</span><span class="p">)</span>
+
+<div class="viewcode-block" id="has_access"><a class="viewcode-back" href="../../lms.html#courseware.access.has_access">[docs]</a><span class="k">def</span> <span class="nf">has_access</span><span class="p">(</span><span class="n">user</span><span class="p">,</span> <span class="n">obj</span><span class="p">,</span> <span class="n">action</span><span class="p">):</span>
+    <span class="sd">&quot;&quot;&quot;</span>
+<span class="sd">    Check whether a user has the access to do action on obj.  Handles any magic</span>
+<span class="sd">    switching based on various settings.</span>
+
+<span class="sd">    Things this module understands:</span>
+<span class="sd">    - start dates for modules</span>
+<span class="sd">    - DISABLE_START_DATES</span>
+<span class="sd">    - different access for instructor, staff, course staff, and students.</span>
+
+<span class="sd">    user: a Django user object. May be anonymous.</span>
+
+<span class="sd">    obj: The object to check access for.  For now, a module or descriptor.</span>
+
+<span class="sd">    action: A string specifying the action that the client is trying to perform.</span>
+
+<span class="sd">    actions depend on the obj type, but include e.g. &#39;enroll&#39; for courses.  See the</span>
+<span class="sd">    type-specific functions below for the known actions for that type.</span>
+
+<span class="sd">    Returns a bool.  It is up to the caller to actually deny access in a way</span>
+<span class="sd">    that makes sense in context.</span>
+<span class="sd">    &quot;&quot;&quot;</span>
+    <span class="c"># delegate the work to type-specific functions.</span>
+    <span class="c"># (start with more specific types, then get more general)</span>
+    <span class="k">if</span> <span class="nb">isinstance</span><span class="p">(</span><span class="n">obj</span><span class="p">,</span> <span class="n">CourseDescriptor</span><span class="p">):</span>
+        <span class="k">return</span> <span class="n">_has_access_course_desc</span><span class="p">(</span><span class="n">user</span><span class="p">,</span> <span class="n">obj</span><span class="p">,</span> <span class="n">action</span><span class="p">)</span>
+
+    <span class="k">if</span> <span class="nb">isinstance</span><span class="p">(</span><span class="n">obj</span><span class="p">,</span> <span class="n">ErrorDescriptor</span><span class="p">):</span>
+        <span class="k">return</span> <span class="n">_has_access_error_desc</span><span class="p">(</span><span class="n">user</span><span class="p">,</span> <span class="n">obj</span><span class="p">,</span> <span class="n">action</span><span class="p">)</span>
+
+    <span class="c"># NOTE: any descriptor access checkers need to go above this</span>
+    <span class="k">if</span> <span class="nb">isinstance</span><span class="p">(</span><span class="n">obj</span><span class="p">,</span> <span class="n">XModuleDescriptor</span><span class="p">):</span>
+        <span class="k">return</span> <span class="n">_has_access_descriptor</span><span class="p">(</span><span class="n">user</span><span class="p">,</span> <span class="n">obj</span><span class="p">,</span> <span class="n">action</span><span class="p">)</span>
+
+    <span class="k">if</span> <span class="nb">isinstance</span><span class="p">(</span><span class="n">obj</span><span class="p">,</span> <span class="n">XModule</span><span class="p">):</span>
+        <span class="k">return</span> <span class="n">_has_access_xmodule</span><span class="p">(</span><span class="n">user</span><span class="p">,</span> <span class="n">obj</span><span class="p">,</span> <span class="n">action</span><span class="p">)</span>
+
+    <span class="k">if</span> <span class="nb">isinstance</span><span class="p">(</span><span class="n">obj</span><span class="p">,</span> <span class="n">Location</span><span class="p">):</span>
+        <span class="k">return</span> <span class="n">_has_access_location</span><span class="p">(</span><span class="n">user</span><span class="p">,</span> <span class="n">obj</span><span class="p">,</span> <span class="n">action</span><span class="p">)</span>
+
+    <span class="k">if</span> <span class="nb">isinstance</span><span class="p">(</span><span class="n">obj</span><span class="p">,</span> <span class="nb">basestring</span><span class="p">):</span>
+        <span class="k">return</span> <span class="n">_has_access_string</span><span class="p">(</span><span class="n">user</span><span class="p">,</span> <span class="n">obj</span><span class="p">,</span> <span class="n">action</span><span class="p">)</span>
+
+    <span class="c"># Passing an unknown object here is a coding error, so rather than</span>
+    <span class="c"># returning a default, complain.</span>
+    <span class="k">raise</span> <span class="ne">TypeError</span><span class="p">(</span><span class="s">&quot;Unknown object type in has_access(): &#39;{0}&#39;&quot;</span>
+                    <span class="o">.</span><span class="n">format</span><span class="p">(</span><span class="nb">type</span><span class="p">(</span><span class="n">obj</span><span class="p">)))</span>
+</div>
+<div class="viewcode-block" id="get_access_group_name"><a class="viewcode-back" href="../../lms.html#courseware.access.get_access_group_name">[docs]</a><span class="k">def</span> <span class="nf">get_access_group_name</span><span class="p">(</span><span class="n">obj</span><span class="p">,</span><span class="n">action</span><span class="p">):</span>
+    <span class="sd">&#39;&#39;&#39;</span>
+<span class="sd">    Returns group name for user group which has &quot;action&quot; access to the given object.</span>
+
+<span class="sd">    Used in managing access lists.</span>
+<span class="sd">    &#39;&#39;&#39;</span>
+
+    <span class="k">if</span> <span class="nb">isinstance</span><span class="p">(</span><span class="n">obj</span><span class="p">,</span> <span class="n">CourseDescriptor</span><span class="p">):</span>
+        <span class="k">return</span> <span class="n">_get_access_group_name_course_desc</span><span class="p">(</span><span class="n">obj</span><span class="p">,</span> <span class="n">action</span><span class="p">)</span>
+
+    <span class="c"># Passing an unknown object here is a coding error, so rather than</span>
+    <span class="c"># returning a default, complain.</span>
+    <span class="k">raise</span> <span class="ne">TypeError</span><span class="p">(</span><span class="s">&quot;Unknown object type in get_access_group_name(): &#39;{0}&#39;&quot;</span>
+                    <span class="o">.</span><span class="n">format</span><span class="p">(</span><span class="nb">type</span><span class="p">(</span><span class="n">obj</span><span class="p">)))</span>
+
+<span class="c"># ================ Implementation helpers ================================</span>
+</div>
+<span class="k">def</span> <span class="nf">_has_access_course_desc</span><span class="p">(</span><span class="n">user</span><span class="p">,</span> <span class="n">course</span><span class="p">,</span> <span class="n">action</span><span class="p">):</span>
+    <span class="sd">&quot;&quot;&quot;</span>
+<span class="sd">    Check if user has access to a course descriptor.</span>
+
+<span class="sd">    Valid actions:</span>
+
+<span class="sd">    &#39;load&#39; -- load the courseware, see inside the course</span>
+<span class="sd">    &#39;enroll&#39; -- enroll.  Checks for enrollment window,</span>
+<span class="sd">                  ACCESS_REQUIRE_STAFF_FOR_COURSE,</span>
+<span class="sd">    &#39;see_exists&#39; -- can see that the course exists.</span>
+<span class="sd">    &#39;staff&#39; -- staff access to course.</span>
+<span class="sd">    &quot;&quot;&quot;</span>
+    <span class="k">def</span> <span class="nf">can_load</span><span class="p">():</span>
+        <span class="sd">&quot;&quot;&quot;</span>
+<span class="sd">        Can this user load this course?</span>
+
+<span class="sd">        NOTE: this is not checking whether user is actually enrolled in the course.</span>
+<span class="sd">        &quot;&quot;&quot;</span>
+        <span class="c"># delegate to generic descriptor check to check start dates</span>
+        <span class="k">return</span> <span class="n">_has_access_descriptor</span><span class="p">(</span><span class="n">user</span><span class="p">,</span> <span class="n">course</span><span class="p">,</span> <span class="s">&#39;load&#39;</span><span class="p">)</span>
+
+    <span class="k">def</span> <span class="nf">can_enroll</span><span class="p">():</span>
+        <span class="sd">&quot;&quot;&quot;</span>
+<span class="sd">        If the course has an enrollment period, check whether we are in it.</span>
+<span class="sd">        (staff can always enroll)</span>
+<span class="sd">        &quot;&quot;&quot;</span>
+
+        <span class="n">now</span> <span class="o">=</span> <span class="n">time</span><span class="o">.</span><span class="n">gmtime</span><span class="p">()</span>
+        <span class="n">start</span> <span class="o">=</span> <span class="n">course</span><span class="o">.</span><span class="n">enrollment_start</span>
+        <span class="n">end</span> <span class="o">=</span> <span class="n">course</span><span class="o">.</span><span class="n">enrollment_end</span>
+
+        <span class="k">if</span> <span class="p">(</span><span class="n">start</span> <span class="ow">is</span> <span class="bp">None</span> <span class="ow">or</span> <span class="n">now</span> <span class="o">&gt;</span> <span class="n">start</span><span class="p">)</span> <span class="ow">and</span> <span class="p">(</span><span class="n">end</span> <span class="ow">is</span> <span class="bp">None</span> <span class="ow">or</span> <span class="n">now</span> <span class="o">&lt;</span> <span class="n">end</span><span class="p">):</span>
+            <span class="c"># in enrollment period, so any user is allowed to enroll.</span>
+            <span class="n">debug</span><span class="p">(</span><span class="s">&quot;Allow: in enrollment period&quot;</span><span class="p">)</span>
+            <span class="k">return</span> <span class="bp">True</span>
+
+        <span class="c"># otherwise, need staff access</span>
+        <span class="k">return</span> <span class="n">_has_staff_access_to_descriptor</span><span class="p">(</span><span class="n">user</span><span class="p">,</span> <span class="n">course</span><span class="p">)</span>
+
+    <span class="k">def</span> <span class="nf">see_exists</span><span class="p">():</span>
+        <span class="sd">&quot;&quot;&quot;</span>
+<span class="sd">        Can see if can enroll, but also if can load it: if user enrolled in a course and now</span>
+<span class="sd">        it&#39;s past the enrollment period, they should still see it.</span>
+
+<span class="sd">        TODO (vshnayder): This means that courses with limited enrollment periods will not appear</span>
+<span class="sd">        to non-staff visitors after the enrollment period is over.  If this is not what we want, will</span>
+<span class="sd">        need to change this logic.</span>
+<span class="sd">        &quot;&quot;&quot;</span>
+        <span class="c"># VS[compat] -- this setting should go away once all courses have</span>
+        <span class="c"># properly configured enrollment_start times (if course should be</span>
+        <span class="c"># staff-only, set enrollment_start far in the future.)</span>
+        <span class="k">if</span> <span class="n">settings</span><span class="o">.</span><span class="n">MITX_FEATURES</span><span class="o">.</span><span class="n">get</span><span class="p">(</span><span class="s">&#39;ACCESS_REQUIRE_STAFF_FOR_COURSE&#39;</span><span class="p">):</span>
+            <span class="c"># if this feature is on, only allow courses that have ispublic set to be</span>
+            <span class="c"># seen by non-staff</span>
+            <span class="k">if</span> <span class="n">course</span><span class="o">.</span><span class="n">metadata</span><span class="o">.</span><span class="n">get</span><span class="p">(</span><span class="s">&#39;ispublic&#39;</span><span class="p">):</span>
+                <span class="n">debug</span><span class="p">(</span><span class="s">&quot;Allow: ACCESS_REQUIRE_STAFF_FOR_COURSE and ispublic&quot;</span><span class="p">)</span>
+                <span class="k">return</span> <span class="bp">True</span>
+            <span class="k">return</span> <span class="n">_has_staff_access_to_descriptor</span><span class="p">(</span><span class="n">user</span><span class="p">,</span> <span class="n">course</span><span class="p">)</span>
+
+        <span class="k">return</span> <span class="n">can_enroll</span><span class="p">()</span> <span class="ow">or</span> <span class="n">can_load</span><span class="p">()</span>
+
+    <span class="n">checkers</span> <span class="o">=</span> <span class="p">{</span>
+        <span class="s">&#39;load&#39;</span><span class="p">:</span> <span class="n">can_load</span><span class="p">,</span>
+        <span class="s">&#39;enroll&#39;</span><span class="p">:</span> <span class="n">can_enroll</span><span class="p">,</span>
+        <span class="s">&#39;see_exists&#39;</span><span class="p">:</span> <span class="n">see_exists</span><span class="p">,</span>
+        <span class="s">&#39;staff&#39;</span><span class="p">:</span> <span class="k">lambda</span><span class="p">:</span> <span class="n">_has_staff_access_to_descriptor</span><span class="p">(</span><span class="n">user</span><span class="p">,</span> <span class="n">course</span><span class="p">),</span>
+        <span class="s">&#39;instructor&#39;</span><span class="p">:</span> <span class="k">lambda</span><span class="p">:</span> <span class="n">_has_instructor_access_to_descriptor</span><span class="p">(</span><span class="n">user</span><span class="p">,</span> <span class="n">course</span><span class="p">),</span>
+        <span class="p">}</span>
+
+    <span class="k">return</span> <span class="n">_dispatch</span><span class="p">(</span><span class="n">checkers</span><span class="p">,</span> <span class="n">action</span><span class="p">,</span> <span class="n">user</span><span class="p">,</span> <span class="n">course</span><span class="p">)</span>
+
+<span class="k">def</span> <span class="nf">_get_access_group_name_course_desc</span><span class="p">(</span><span class="n">course</span><span class="p">,</span> <span class="n">action</span><span class="p">):</span>
+    <span class="sd">&#39;&#39;&#39;</span>
+<span class="sd">    Return name of group which gives staff access to course.  Only understands action = &#39;staff&#39;</span>
+<span class="sd">    &#39;&#39;&#39;</span>
+    <span class="k">if</span> <span class="ow">not</span> <span class="n">action</span><span class="o">==</span><span class="s">&#39;staff&#39;</span><span class="p">:</span>
+        <span class="k">return</span> <span class="p">[]</span>
+    <span class="k">return</span> <span class="n">_course_staff_group_name</span><span class="p">(</span><span class="n">course</span><span class="o">.</span><span class="n">location</span><span class="p">)</span>
+
+<span class="k">def</span> <span class="nf">_has_access_error_desc</span><span class="p">(</span><span class="n">user</span><span class="p">,</span> <span class="n">descriptor</span><span class="p">,</span> <span class="n">action</span><span class="p">):</span>
+    <span class="sd">&quot;&quot;&quot;</span>
+<span class="sd">    Only staff should see error descriptors.</span>
+
+<span class="sd">    Valid actions:</span>
+<span class="sd">    &#39;load&#39; -- load this descriptor, showing it to the user.</span>
+<span class="sd">    &#39;staff&#39; -- staff access to descriptor.</span>
+<span class="sd">    &quot;&quot;&quot;</span>
+    <span class="k">def</span> <span class="nf">check_for_staff</span><span class="p">():</span>
+        <span class="k">return</span> <span class="n">_has_staff_access_to_descriptor</span><span class="p">(</span><span class="n">user</span><span class="p">,</span> <span class="n">descriptor</span><span class="p">)</span>
+
+    <span class="n">checkers</span> <span class="o">=</span> <span class="p">{</span>
+        <span class="s">&#39;load&#39;</span><span class="p">:</span> <span class="n">check_for_staff</span><span class="p">,</span>
+        <span class="s">&#39;staff&#39;</span><span class="p">:</span> <span class="n">check_for_staff</span>
+        <span class="p">}</span>
+
+    <span class="k">return</span> <span class="n">_dispatch</span><span class="p">(</span><span class="n">checkers</span><span class="p">,</span> <span class="n">action</span><span class="p">,</span> <span class="n">user</span><span class="p">,</span> <span class="n">descriptor</span><span class="p">)</span>
+
+
+<span class="k">def</span> <span class="nf">_has_access_descriptor</span><span class="p">(</span><span class="n">user</span><span class="p">,</span> <span class="n">descriptor</span><span class="p">,</span> <span class="n">action</span><span class="p">):</span>
+    <span class="sd">&quot;&quot;&quot;</span>
+<span class="sd">    Check if user has access to this descriptor.</span>
+
+<span class="sd">    Valid actions:</span>
+<span class="sd">    &#39;load&#39; -- load this descriptor, showing it to the user.</span>
+<span class="sd">    &#39;staff&#39; -- staff access to descriptor.</span>
+
+<span class="sd">    NOTE: This is the fallback logic for descriptors that don&#39;t have custom policy</span>
+<span class="sd">    (e.g. courses).  If you call this method directly instead of going through</span>
+<span class="sd">    has_access(), it will not do the right thing.</span>
+<span class="sd">    &quot;&quot;&quot;</span>
+    <span class="k">def</span> <span class="nf">can_load</span><span class="p">():</span>
+        <span class="sd">&quot;&quot;&quot;</span>
+<span class="sd">        NOTE: This does not check that the student is enrolled in the course</span>
+<span class="sd">        that contains this module.  We may or may not want to allow non-enrolled</span>
+<span class="sd">        students to see modules.  If not, views should check the course, so we</span>
+<span class="sd">        don&#39;t have to hit the enrollments table on every module load.</span>
+<span class="sd">        &quot;&quot;&quot;</span>
+        <span class="c"># If start dates are off, can always load</span>
+        <span class="k">if</span> <span class="n">settings</span><span class="o">.</span><span class="n">MITX_FEATURES</span><span class="p">[</span><span class="s">&#39;DISABLE_START_DATES&#39;</span><span class="p">]:</span>
+            <span class="n">debug</span><span class="p">(</span><span class="s">&quot;Allow: DISABLE_START_DATES&quot;</span><span class="p">)</span>
+            <span class="k">return</span> <span class="bp">True</span>
+
+        <span class="c"># Check start date</span>
+        <span class="k">if</span> <span class="n">descriptor</span><span class="o">.</span><span class="n">start</span> <span class="ow">is</span> <span class="ow">not</span> <span class="bp">None</span><span class="p">:</span>
+            <span class="n">now</span> <span class="o">=</span> <span class="n">time</span><span class="o">.</span><span class="n">gmtime</span><span class="p">()</span>
+            <span class="k">if</span> <span class="n">now</span> <span class="o">&gt;</span> <span class="n">descriptor</span><span class="o">.</span><span class="n">start</span><span class="p">:</span>
+                <span class="c"># after start date, everyone can see it</span>
+                <span class="n">debug</span><span class="p">(</span><span class="s">&quot;Allow: now &gt; start date&quot;</span><span class="p">)</span>
+                <span class="k">return</span> <span class="bp">True</span>
+            <span class="c"># otherwise, need staff access</span>
+            <span class="k">return</span> <span class="n">_has_staff_access_to_descriptor</span><span class="p">(</span><span class="n">user</span><span class="p">,</span> <span class="n">descriptor</span><span class="p">)</span>
+
+        <span class="c"># No start date, so can always load.</span>
+        <span class="n">debug</span><span class="p">(</span><span class="s">&quot;Allow: no start date&quot;</span><span class="p">)</span>
+        <span class="k">return</span> <span class="bp">True</span>
+
+    <span class="n">checkers</span> <span class="o">=</span> <span class="p">{</span>
+        <span class="s">&#39;load&#39;</span><span class="p">:</span> <span class="n">can_load</span><span class="p">,</span>
+        <span class="s">&#39;staff&#39;</span><span class="p">:</span> <span class="k">lambda</span><span class="p">:</span> <span class="n">_has_staff_access_to_descriptor</span><span class="p">(</span><span class="n">user</span><span class="p">,</span> <span class="n">descriptor</span><span class="p">)</span>
+        <span class="p">}</span>
+
+    <span class="k">return</span> <span class="n">_dispatch</span><span class="p">(</span><span class="n">checkers</span><span class="p">,</span> <span class="n">action</span><span class="p">,</span> <span class="n">user</span><span class="p">,</span> <span class="n">descriptor</span><span class="p">)</span>
+
+
+<span class="k">def</span> <span class="nf">_has_access_xmodule</span><span class="p">(</span><span class="n">user</span><span class="p">,</span> <span class="n">xmodule</span><span class="p">,</span> <span class="n">action</span><span class="p">):</span>
+    <span class="sd">&quot;&quot;&quot;</span>
+<span class="sd">    Check if user has access to this xmodule.</span>
+
+<span class="sd">    Valid actions:</span>
+<span class="sd">      - same as the valid actions for xmodule.descriptor</span>
+<span class="sd">    &quot;&quot;&quot;</span>
+    <span class="c"># Delegate to the descriptor</span>
+    <span class="k">return</span> <span class="n">has_access</span><span class="p">(</span><span class="n">user</span><span class="p">,</span> <span class="n">xmodule</span><span class="o">.</span><span class="n">descriptor</span><span class="p">,</span> <span class="n">action</span><span class="p">)</span>
+
+
+<span class="k">def</span> <span class="nf">_has_access_location</span><span class="p">(</span><span class="n">user</span><span class="p">,</span> <span class="n">location</span><span class="p">,</span> <span class="n">action</span><span class="p">):</span>
+    <span class="sd">&quot;&quot;&quot;</span>
+<span class="sd">    Check if user has access to this location.</span>
+
+<span class="sd">    Valid actions:</span>
+<span class="sd">    &#39;staff&#39; : True if the user has staff access to this location</span>
+
+<span class="sd">    NOTE: if you add other actions, make sure that</span>
+
+<span class="sd">     has_access(user, location, action) == has_access(user, get_item(location), action)</span>
+
+<span class="sd">    And in general, prefer checking access on loaded items, rather than locations.</span>
+<span class="sd">    &quot;&quot;&quot;</span>
+    <span class="n">checkers</span> <span class="o">=</span> <span class="p">{</span>
+        <span class="s">&#39;staff&#39;</span><span class="p">:</span> <span class="k">lambda</span><span class="p">:</span> <span class="n">_has_staff_access_to_location</span><span class="p">(</span><span class="n">user</span><span class="p">,</span> <span class="n">location</span><span class="p">)</span>
+        <span class="p">}</span>
+
+    <span class="k">return</span> <span class="n">_dispatch</span><span class="p">(</span><span class="n">checkers</span><span class="p">,</span> <span class="n">action</span><span class="p">,</span> <span class="n">user</span><span class="p">,</span> <span class="n">location</span><span class="p">)</span>
+
+
+<span class="k">def</span> <span class="nf">_has_access_string</span><span class="p">(</span><span class="n">user</span><span class="p">,</span> <span class="n">perm</span><span class="p">,</span> <span class="n">action</span><span class="p">):</span>
+    <span class="sd">&quot;&quot;&quot;</span>
+<span class="sd">    Check if user has certain special access, specified as string.  Valid strings:</span>
+
+<span class="sd">    &#39;global&#39;</span>
+
+<span class="sd">    Valid actions:</span>
+
+<span class="sd">    &#39;staff&#39; -- global staff access.</span>
+<span class="sd">    &quot;&quot;&quot;</span>
+
+    <span class="k">def</span> <span class="nf">check_staff</span><span class="p">():</span>
+        <span class="k">if</span> <span class="n">perm</span> <span class="o">!=</span> <span class="s">&#39;global&#39;</span><span class="p">:</span>
+            <span class="n">debug</span><span class="p">(</span><span class="s">&quot;Deny: invalid permission &#39;</span><span class="si">%s</span><span class="s">&#39;&quot;</span><span class="p">,</span> <span class="n">perm</span><span class="p">)</span>
+            <span class="k">return</span> <span class="bp">False</span>
+        <span class="k">return</span> <span class="n">_has_global_staff_access</span><span class="p">(</span><span class="n">user</span><span class="p">)</span>
+
+    <span class="n">checkers</span> <span class="o">=</span> <span class="p">{</span>
+        <span class="s">&#39;staff&#39;</span><span class="p">:</span> <span class="n">check_staff</span>
+        <span class="p">}</span>
+
+    <span class="k">return</span> <span class="n">_dispatch</span><span class="p">(</span><span class="n">checkers</span><span class="p">,</span> <span class="n">action</span><span class="p">,</span> <span class="n">user</span><span class="p">,</span> <span class="n">perm</span><span class="p">)</span>
+
+
+<span class="c">#####  Internal helper methods below</span>
+
+<span class="k">def</span> <span class="nf">_dispatch</span><span class="p">(</span><span class="n">table</span><span class="p">,</span> <span class="n">action</span><span class="p">,</span> <span class="n">user</span><span class="p">,</span> <span class="n">obj</span><span class="p">):</span>
+    <span class="sd">&quot;&quot;&quot;</span>
+<span class="sd">    Helper: call table[action], raising a nice pretty error if there is no such key.</span>
+
+<span class="sd">    user and object passed in only for error messages and debugging</span>
+<span class="sd">    &quot;&quot;&quot;</span>
+    <span class="k">if</span> <span class="n">action</span> <span class="ow">in</span> <span class="n">table</span><span class="p">:</span>
+        <span class="n">result</span> <span class="o">=</span> <span class="n">table</span><span class="p">[</span><span class="n">action</span><span class="p">]()</span>
+        <span class="n">debug</span><span class="p">(</span><span class="s">&quot;</span><span class="si">%s</span><span class="s"> user </span><span class="si">%s</span><span class="s">, object </span><span class="si">%s</span><span class="s">, action </span><span class="si">%s</span><span class="s">&quot;</span><span class="p">,</span>
+              <span class="s">&#39;ALLOWED&#39;</span> <span class="k">if</span> <span class="n">result</span> <span class="k">else</span> <span class="s">&#39;DENIED&#39;</span><span class="p">,</span>
+              <span class="n">user</span><span class="p">,</span>
+              <span class="n">obj</span><span class="o">.</span><span class="n">location</span><span class="o">.</span><span class="n">url</span><span class="p">()</span> <span class="k">if</span> <span class="nb">isinstance</span><span class="p">(</span><span class="n">obj</span><span class="p">,</span> <span class="n">XModuleDescriptor</span><span class="p">)</span> <span class="k">else</span> <span class="nb">str</span><span class="p">(</span><span class="n">obj</span><span class="p">)[:</span><span class="mi">60</span><span class="p">],</span>
+              <span class="n">action</span><span class="p">)</span>
+        <span class="k">return</span> <span class="n">result</span>
+
+    <span class="k">raise</span> <span class="ne">ValueError</span><span class="p">(</span><span class="s">&quot;Unknown action for object type &#39;{0}&#39;: &#39;{1}&#39;&quot;</span><span class="o">.</span><span class="n">format</span><span class="p">(</span>
+        <span class="nb">type</span><span class="p">(</span><span class="n">obj</span><span class="p">),</span> <span class="n">action</span><span class="p">))</span>
+
+<span class="k">def</span> <span class="nf">_course_staff_group_name</span><span class="p">(</span><span class="n">location</span><span class="p">):</span>
+    <span class="sd">&quot;&quot;&quot;</span>
+<span class="sd">    Get the name of the staff group for a location.  Right now, that&#39;s staff_COURSE.</span>
+
+<span class="sd">    location: something that can passed to Location.</span>
+<span class="sd">    &quot;&quot;&quot;</span>
+    <span class="k">return</span> <span class="s">&#39;staff_</span><span class="si">%s</span><span class="s">&#39;</span> <span class="o">%</span> <span class="n">Location</span><span class="p">(</span><span class="n">location</span><span class="p">)</span><span class="o">.</span><span class="n">course</span>
+
+
+<span class="k">def</span> <span class="nf">_course_instructor_group_name</span><span class="p">(</span><span class="n">location</span><span class="p">):</span>
+    <span class="sd">&quot;&quot;&quot;</span>
+<span class="sd">    Get the name of the instructor group for a location.  Right now, that&#39;s instructor_COURSE.</span>
+<span class="sd">    A course instructor has all staff privileges, but also can manage list of course staff (add, remove, list).</span>
+
+<span class="sd">    location: something that can passed to Location.</span>
+<span class="sd">    &quot;&quot;&quot;</span>
+    <span class="k">return</span> <span class="s">&#39;instructor_</span><span class="si">%s</span><span class="s">&#39;</span> <span class="o">%</span> <span class="n">Location</span><span class="p">(</span><span class="n">location</span><span class="p">)</span><span class="o">.</span><span class="n">course</span>
+
+
+<span class="k">def</span> <span class="nf">_has_global_staff_access</span><span class="p">(</span><span class="n">user</span><span class="p">):</span>
+    <span class="k">if</span> <span class="n">user</span><span class="o">.</span><span class="n">is_staff</span><span class="p">:</span>
+        <span class="n">debug</span><span class="p">(</span><span class="s">&quot;Allow: user.is_staff&quot;</span><span class="p">)</span>
+        <span class="k">return</span> <span class="bp">True</span>
+    <span class="k">else</span><span class="p">:</span>
+        <span class="n">debug</span><span class="p">(</span><span class="s">&quot;Deny: not user.is_staff&quot;</span><span class="p">)</span>
+        <span class="k">return</span> <span class="bp">False</span>
+
+
+<span class="k">def</span> <span class="nf">_has_instructor_access_to_location</span><span class="p">(</span><span class="n">user</span><span class="p">,</span> <span class="n">location</span><span class="p">):</span>
+    <span class="k">return</span> <span class="n">_has_access_to_location</span><span class="p">(</span><span class="n">user</span><span class="p">,</span> <span class="n">location</span><span class="p">,</span> <span class="s">&#39;instructor&#39;</span><span class="p">)</span>
+
+
+<span class="k">def</span> <span class="nf">_has_staff_access_to_location</span><span class="p">(</span><span class="n">user</span><span class="p">,</span> <span class="n">location</span><span class="p">):</span>
+    <span class="k">return</span> <span class="n">_has_access_to_location</span><span class="p">(</span><span class="n">user</span><span class="p">,</span> <span class="n">location</span><span class="p">,</span> <span class="s">&#39;staff&#39;</span><span class="p">)</span>
+
+
+<span class="k">def</span> <span class="nf">_has_access_to_location</span><span class="p">(</span><span class="n">user</span><span class="p">,</span> <span class="n">location</span><span class="p">,</span> <span class="n">access_level</span><span class="p">):</span>
+    <span class="sd">&#39;&#39;&#39;</span>
+<span class="sd">    Returns True if the given user has access_level (= staff or</span>
+<span class="sd">    instructor) access to a location.  For now this is equivalent to</span>
+<span class="sd">    having staff / instructor access to the course location.course.</span>
+
+<span class="sd">    This means that user is in the staff_* group or instructor_* group, or is an overall admin.</span>
+
+<span class="sd">    TODO (vshnayder): this needs to be changed to allow per-course_id permissions, not per-course</span>
+<span class="sd">    (e.g. staff in 2012 is different from 2013, but maybe some people always have access)</span>
+
+<span class="sd">    course is a string: the course field of the location being accessed.</span>
+<span class="sd">    location = location</span>
+<span class="sd">    access_level = string, either &quot;staff&quot; or &quot;instructor&quot;</span>
+<span class="sd">    &#39;&#39;&#39;</span>
+    <span class="k">if</span> <span class="n">user</span> <span class="ow">is</span> <span class="bp">None</span> <span class="ow">or</span> <span class="p">(</span><span class="ow">not</span> <span class="n">user</span><span class="o">.</span><span class="n">is_authenticated</span><span class="p">()):</span>
+        <span class="n">debug</span><span class="p">(</span><span class="s">&quot;Deny: no user or anon user&quot;</span><span class="p">)</span>
+        <span class="k">return</span> <span class="bp">False</span>
+    <span class="k">if</span> <span class="n">user</span><span class="o">.</span><span class="n">is_staff</span><span class="p">:</span>
+        <span class="n">debug</span><span class="p">(</span><span class="s">&quot;Allow: user.is_staff&quot;</span><span class="p">)</span>
+        <span class="k">return</span> <span class="bp">True</span>
+
+    <span class="c"># If not global staff, is the user in the Auth group for this class?</span>
+    <span class="n">user_groups</span> <span class="o">=</span> <span class="p">[</span><span class="n">g</span><span class="o">.</span><span class="n">name</span> <span class="k">for</span> <span class="n">g</span> <span class="ow">in</span> <span class="n">user</span><span class="o">.</span><span class="n">groups</span><span class="o">.</span><span class="n">all</span><span class="p">()]</span>
+
+    <span class="k">if</span> <span class="n">access_level</span> <span class="o">==</span> <span class="s">&#39;staff&#39;</span><span class="p">:</span>
+        <span class="n">staff_group</span> <span class="o">=</span> <span class="n">_course_staff_group_name</span><span class="p">(</span><span class="n">location</span><span class="p">)</span>
+        <span class="k">if</span> <span class="n">staff_group</span> <span class="ow">in</span> <span class="n">user_groups</span><span class="p">:</span>
+            <span class="n">debug</span><span class="p">(</span><span class="s">&quot;Allow: user in group </span><span class="si">%s</span><span class="s">&quot;</span><span class="p">,</span> <span class="n">staff_group</span><span class="p">)</span>
+            <span class="k">return</span> <span class="bp">True</span>
+        <span class="n">debug</span><span class="p">(</span><span class="s">&quot;Deny: user not in group </span><span class="si">%s</span><span class="s">&quot;</span><span class="p">,</span> <span class="n">staff_group</span><span class="p">)</span>
+
+    <span class="k">if</span> <span class="n">access_level</span> <span class="o">==</span> <span class="s">&#39;instructor&#39;</span> <span class="ow">or</span> <span class="n">access_level</span> <span class="o">==</span> <span class="s">&#39;staff&#39;</span><span class="p">:</span> 	<span class="c"># instructors get staff privileges</span>
+        <span class="n">instructor_group</span> <span class="o">=</span> <span class="n">_course_instructor_group_name</span><span class="p">(</span><span class="n">location</span><span class="p">)</span>
+        <span class="k">if</span> <span class="n">instructor_group</span> <span class="ow">in</span> <span class="n">user_groups</span><span class="p">:</span>
+            <span class="n">debug</span><span class="p">(</span><span class="s">&quot;Allow: user in group </span><span class="si">%s</span><span class="s">&quot;</span><span class="p">,</span> <span class="n">instructor_group</span><span class="p">)</span>
+            <span class="k">return</span> <span class="bp">True</span>
+        <span class="n">debug</span><span class="p">(</span><span class="s">&quot;Deny: user not in group </span><span class="si">%s</span><span class="s">&quot;</span><span class="p">,</span> <span class="n">instructor_group</span><span class="p">)</span>
+
+    <span class="k">else</span><span class="p">:</span>
+        <span class="n">log</span><span class="o">.</span><span class="n">debug</span><span class="p">(</span><span class="s">&quot;Error in access._has_access_to_location access_level=</span><span class="si">%s</span><span class="s"> unknown&quot;</span> <span class="o">%</span> <span class="n">access_level</span><span class="p">)</span>
+
+    <span class="k">return</span> <span class="bp">False</span>
+
+
+<span class="k">def</span> <span class="nf">_has_staff_access_to_course_id</span><span class="p">(</span><span class="n">user</span><span class="p">,</span> <span class="n">course_id</span><span class="p">):</span>
+    <span class="sd">&quot;&quot;&quot;Helper method that takes a course_id instead of a course name&quot;&quot;&quot;</span>
+    <span class="n">loc</span> <span class="o">=</span> <span class="n">CourseDescriptor</span><span class="o">.</span><span class="n">id_to_location</span><span class="p">(</span><span class="n">course_id</span><span class="p">)</span>
+    <span class="k">return</span> <span class="n">_has_staff_access_to_location</span><span class="p">(</span><span class="n">user</span><span class="p">,</span> <span class="n">loc</span><span class="p">)</span>
+
+
+<span class="k">def</span> <span class="nf">_has_instructor_access_to_descriptor</span><span class="p">(</span><span class="n">user</span><span class="p">,</span> <span class="n">descriptor</span><span class="p">):</span>
+    <span class="sd">&quot;&quot;&quot;Helper method that checks whether the user has staff access to</span>
+<span class="sd">    the course of the location.</span>
+
+<span class="sd">    descriptor: something that has a location attribute</span>
+<span class="sd">    &quot;&quot;&quot;</span>
+    <span class="k">return</span> <span class="n">_has_instructor_access_to_location</span><span class="p">(</span><span class="n">user</span><span class="p">,</span> <span class="n">descriptor</span><span class="o">.</span><span class="n">location</span><span class="p">)</span>
+
+<span class="k">def</span> <span class="nf">_has_staff_access_to_descriptor</span><span class="p">(</span><span class="n">user</span><span class="p">,</span> <span class="n">descriptor</span><span class="p">):</span>
+    <span class="sd">&quot;&quot;&quot;Helper method that checks whether the user has staff access to</span>
+<span class="sd">    the course of the location.</span>
+
+<span class="sd">    descriptor: something that has a location attribute</span>
+<span class="sd">    &quot;&quot;&quot;</span>
+    <span class="k">return</span> <span class="n">_has_staff_access_to_location</span><span class="p">(</span><span class="n">user</span><span class="p">,</span> <span class="n">descriptor</span><span class="o">.</span><span class="n">location</span><span class="p">)</span>
+</pre></div>
+
+          </div>
+        </div>
+      </div>
+      <div class="clearer"></div>
+    </div>
+    <div class="related">
+      <h3>Navigation</h3>
+      <ul>
+        <li class="right" style="margin-right: 10px">
+          <a href="../../genindex.html" title="General Index"
+             >index</a></li>
+        <li class="right" >
+          <a href="../../py-modindex.html" title="Python Module Index"
+             >modules</a> |</li>
+        <li><a href="../../index.html">MITx 1.0 documentation</a> &raquo;</li>
+          <li><a href="../index.html" >Module code</a> &raquo;</li> 
+      </ul>
+    </div>
+    <div class="footer">
+        &copy; Copyright 2012, MITx team.
+      Created using <a href="http://sphinx.pocoo.org/">Sphinx</a> 1.1.3.
+    </div>
+  </body>
+</html>

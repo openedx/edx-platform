@@ -1,0 +1,513 @@
+
+
+<!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Transitional//EN"
+  "http://www.w3.org/TR/xhtml1/DTD/xhtml1-transitional.dtd">
+
+
+<html xmlns="http://www.w3.org/1999/xhtml">
+  <head>
+    <meta http-equiv="Content-Type" content="text/html; charset=utf-8" />
+    
+    <title>instructor.views &mdash; MITx 1.0 documentation</title>
+    
+    <link rel="stylesheet" href="../../_static/sphinxdoc.css" type="text/css" />
+    <link rel="stylesheet" href="../../_static/pygments.css" type="text/css" />
+    
+    <script type="text/javascript">
+      var DOCUMENTATION_OPTIONS = {
+        URL_ROOT:    '../../',
+        VERSION:     '1.0',
+        COLLAPSE_INDEX: false,
+        FILE_SUFFIX: '.html',
+        HAS_SOURCE:  true
+      };
+    </script>
+    <script type="text/javascript" src="../../_static/jquery.js"></script>
+    <script type="text/javascript" src="../../_static/underscore.js"></script>
+    <script type="text/javascript" src="../../_static/doctools.js"></script>
+    <script type="text/javascript" src="http://cdn.mathjax.org/mathjax/latest/MathJax.js?config=TeX-AMS-MML_HTMLorMML"></script>
+    <link rel="top" title="MITx 1.0 documentation" href="../../index.html" />
+    <link rel="up" title="Module code" href="../index.html" /> 
+  </head>
+  <body>
+<img src="../../_static/homepage-bg.jpg" alt="Edx logo"  width="100%;"/>
+
+    <div class="related">
+      <h3>Navigation</h3>
+      <ul>
+        <li class="right" style="margin-right: 10px">
+          <a href="../../genindex.html" title="General Index"
+             accesskey="I">index</a></li>
+        <li class="right" >
+          <a href="../../py-modindex.html" title="Python Module Index"
+             >modules</a> |</li>
+        <li><a href="../../index.html">MITx 1.0 documentation</a> &raquo;</li>
+          <li><a href="../index.html" accesskey="U">Module code</a> &raquo;</li> 
+      </ul>
+    </div>
+      <div class="sphinxsidebar">
+        <div class="sphinxsidebarwrapper">
+<div id="searchbox" style="display: none">
+  <h3>Quick search</h3>
+    <form class="search" action="../../search.html" method="get">
+      <input type="text" name="q" />
+      <input type="submit" value="Go" />
+      <input type="hidden" name="check_keywords" value="yes" />
+      <input type="hidden" name="area" value="default" />
+    </form>
+    <p class="searchtip" style="font-size: 90%">
+    Enter search terms or a module, class or function name.
+    </p>
+</div>
+<script type="text/javascript">$('#searchbox').show(0);</script>
+        </div>
+      </div>
+
+    <div class="document">
+      <div class="documentwrapper">
+        <div class="bodywrapper">
+          <div class="body">
+            
+  <h1>Source code for instructor.views</h1><div class="highlight"><pre>
+<span class="c"># ======== Instructor views =============================================================================</span>
+
+<span class="kn">import</span> <span class="nn">csv</span>
+<span class="kn">import</span> <span class="nn">itertools</span>
+<span class="kn">import</span> <span class="nn">json</span>
+<span class="kn">import</span> <span class="nn">logging</span>
+<span class="kn">import</span> <span class="nn">os</span>
+<span class="kn">import</span> <span class="nn">urllib</span>
+
+<span class="kn">import</span> <span class="nn">track.views</span>
+
+<span class="kn">from</span> <span class="nn">functools</span> <span class="kn">import</span> <span class="n">partial</span>
+<span class="kn">from</span> <span class="nn">collections</span> <span class="kn">import</span> <span class="n">defaultdict</span>
+
+<span class="kn">from</span> <span class="nn">django.conf</span> <span class="kn">import</span> <span class="n">settings</span>
+<span class="kn">from</span> <span class="nn">django.core.context_processors</span> <span class="kn">import</span> <span class="n">csrf</span>
+<span class="kn">from</span> <span class="nn">django.core.urlresolvers</span> <span class="kn">import</span> <span class="n">reverse</span>
+<span class="kn">from</span> <span class="nn">django.contrib.auth.models</span> <span class="kn">import</span> <span class="n">User</span><span class="p">,</span> <span class="n">Group</span>
+<span class="kn">from</span> <span class="nn">django.contrib.auth.decorators</span> <span class="kn">import</span> <span class="n">login_required</span>
+<span class="kn">from</span> <span class="nn">django.http</span> <span class="kn">import</span> <span class="n">Http404</span><span class="p">,</span> <span class="n">HttpResponse</span>
+<span class="kn">from</span> <span class="nn">django.shortcuts</span> <span class="kn">import</span> <span class="n">redirect</span>
+<span class="kn">from</span> <span class="nn">mitxmako.shortcuts</span> <span class="kn">import</span> <span class="n">render_to_response</span><span class="p">,</span> <span class="n">render_to_string</span>
+<span class="c">#from django.views.decorators.csrf import ensure_csrf_cookie</span>
+<span class="kn">from</span> <span class="nn">django_future.csrf</span> <span class="kn">import</span> <span class="n">ensure_csrf_cookie</span>
+<span class="kn">from</span> <span class="nn">django.views.decorators.cache</span> <span class="kn">import</span> <span class="n">cache_control</span>
+
+<span class="kn">from</span> <span class="nn">courseware</span> <span class="kn">import</span> <span class="n">grades</span>
+<span class="kn">from</span> <span class="nn">courseware.access</span> <span class="kn">import</span> <span class="n">has_access</span><span class="p">,</span> <span class="n">get_access_group_name</span>
+<span class="kn">from</span> <span class="nn">courseware.courses</span> <span class="kn">import</span> <span class="p">(</span><span class="n">get_course_with_access</span><span class="p">,</span> <span class="n">get_courses_by_university</span><span class="p">)</span>
+<span class="kn">from</span> <span class="nn">psychometrics</span> <span class="kn">import</span> <span class="n">psychoanalyze</span>
+<span class="kn">from</span> <span class="nn">student.models</span> <span class="kn">import</span> <span class="n">UserProfile</span>
+
+<span class="kn">from</span> <span class="nn">student.models</span> <span class="kn">import</span> <span class="n">UserTestGroup</span><span class="p">,</span> <span class="n">CourseEnrollment</span>
+<span class="kn">from</span> <span class="nn">util.cache</span> <span class="kn">import</span> <span class="n">cache</span><span class="p">,</span> <span class="n">cache_if_anonymous</span>
+<span class="kn">from</span> <span class="nn">xmodule.course_module</span> <span class="kn">import</span> <span class="n">CourseDescriptor</span>
+<span class="kn">from</span> <span class="nn">xmodule.modulestore</span> <span class="kn">import</span> <span class="n">Location</span>
+<span class="kn">from</span> <span class="nn">xmodule.modulestore.django</span> <span class="kn">import</span> <span class="n">modulestore</span>
+<span class="kn">from</span> <span class="nn">xmodule.modulestore.exceptions</span> <span class="kn">import</span> <span class="n">InvalidLocationError</span><span class="p">,</span> <span class="n">ItemNotFoundError</span><span class="p">,</span> <span class="n">NoPathToItem</span>
+<span class="kn">from</span> <span class="nn">xmodule.modulestore.search</span> <span class="kn">import</span> <span class="n">path_to_location</span>
+
+<span class="n">log</span> <span class="o">=</span> <span class="n">logging</span><span class="o">.</span><span class="n">getLogger</span><span class="p">(</span><span class="s">&quot;mitx.courseware&quot;</span><span class="p">)</span>
+
+<span class="n">template_imports</span> <span class="o">=</span> <span class="p">{</span><span class="s">&#39;urllib&#39;</span><span class="p">:</span> <span class="n">urllib</span><span class="p">}</span>
+
+
+<span class="nd">@ensure_csrf_cookie</span>
+<span class="nd">@cache_control</span><span class="p">(</span><span class="n">no_cache</span><span class="o">=</span><span class="bp">True</span><span class="p">,</span> <span class="n">no_store</span><span class="o">=</span><span class="bp">True</span><span class="p">,</span> <span class="n">must_revalidate</span><span class="o">=</span><span class="bp">True</span><span class="p">)</span>
+<div class="viewcode-block" id="instructor_dashboard"><a class="viewcode-back" href="../../lms.html#instructor.views.instructor_dashboard">[docs]</a><span class="k">def</span> <span class="nf">instructor_dashboard</span><span class="p">(</span><span class="n">request</span><span class="p">,</span> <span class="n">course_id</span><span class="p">):</span>
+    <span class="sd">&quot;&quot;&quot;Display the instructor dashboard for a course.&quot;&quot;&quot;</span>
+    <span class="n">course</span> <span class="o">=</span> <span class="n">get_course_with_access</span><span class="p">(</span><span class="n">request</span><span class="o">.</span><span class="n">user</span><span class="p">,</span> <span class="n">course_id</span><span class="p">,</span> <span class="s">&#39;staff&#39;</span><span class="p">)</span>
+
+    <span class="n">instructor_access</span> <span class="o">=</span> <span class="n">has_access</span><span class="p">(</span><span class="n">request</span><span class="o">.</span><span class="n">user</span><span class="p">,</span> <span class="n">course</span><span class="p">,</span> <span class="s">&#39;instructor&#39;</span><span class="p">)</span>   <span class="c"># an instructor can manage staff lists</span>
+
+    <span class="n">msg</span> <span class="o">=</span> <span class="s">&#39;&#39;</span>
+    <span class="c">#msg += (&#39;POST=%s&#39; % dict(request.POST)).replace(&#39;&lt;&#39;,&#39;&amp;lt;&#39;)</span>
+
+    <span class="n">problems</span> <span class="o">=</span> <span class="p">[]</span>
+    <span class="n">plots</span> <span class="o">=</span> <span class="p">[]</span>
+
+    <span class="c"># the instructor dashboard page is modal: grades, psychometrics, admin</span>
+    <span class="c"># keep that state in request.session (defaults to grades mode)</span>
+    <span class="n">idash_mode</span> <span class="o">=</span> <span class="n">request</span><span class="o">.</span><span class="n">POST</span><span class="o">.</span><span class="n">get</span><span class="p">(</span><span class="s">&#39;idash_mode&#39;</span><span class="p">,</span><span class="s">&#39;&#39;</span><span class="p">)</span>
+    <span class="k">if</span> <span class="n">idash_mode</span><span class="p">:</span>
+        <span class="n">request</span><span class="o">.</span><span class="n">session</span><span class="p">[</span><span class="s">&#39;idash_mode&#39;</span><span class="p">]</span> <span class="o">=</span> <span class="n">idash_mode</span>
+    <span class="k">else</span><span class="p">:</span>
+        <span class="n">idash_mode</span> <span class="o">=</span> <span class="n">request</span><span class="o">.</span><span class="n">session</span><span class="o">.</span><span class="n">get</span><span class="p">(</span><span class="s">&#39;idash_mode&#39;</span><span class="p">,</span><span class="s">&#39;Grades&#39;</span><span class="p">)</span>
+
+    <span class="k">def</span> <span class="nf">escape</span><span class="p">(</span><span class="n">s</span><span class="p">):</span>
+        <span class="sd">&quot;&quot;&quot;escape HTML special characters in string&quot;&quot;&quot;</span>
+        <span class="k">return</span> <span class="nb">str</span><span class="p">(</span><span class="n">s</span><span class="p">)</span><span class="o">.</span><span class="n">replace</span><span class="p">(</span><span class="s">&#39;&lt;&#39;</span><span class="p">,</span> <span class="s">&#39;&amp;lt;&#39;</span><span class="p">)</span><span class="o">.</span><span class="n">replace</span><span class="p">(</span><span class="s">&#39;&gt;&#39;</span><span class="p">,</span> <span class="s">&#39;&amp;gt;&#39;</span><span class="p">)</span>
+
+    <span class="c"># assemble some course statistics for output to instructor</span>
+    <span class="n">datatable</span> <span class="o">=</span> <span class="p">{</span><span class="s">&#39;header&#39;</span><span class="p">:</span> <span class="p">[</span><span class="s">&#39;Statistic&#39;</span><span class="p">,</span> <span class="s">&#39;Value&#39;</span><span class="p">],</span>
+                 <span class="s">&#39;title&#39;</span><span class="p">:</span> <span class="s">&#39;Course Statistics At A Glance&#39;</span><span class="p">,</span>
+                 <span class="p">}</span>
+    <span class="n">data</span> <span class="o">=</span> <span class="p">[[</span><span class="s">&#39;# Enrolled&#39;</span><span class="p">,</span> <span class="n">CourseEnrollment</span><span class="o">.</span><span class="n">objects</span><span class="o">.</span><span class="n">filter</span><span class="p">(</span><span class="n">course_id</span><span class="o">=</span><span class="n">course_id</span><span class="p">)</span><span class="o">.</span><span class="n">count</span><span class="p">()]]</span>
+    <span class="n">data</span> <span class="o">+=</span> <span class="n">compute_course_stats</span><span class="p">(</span><span class="n">course</span><span class="p">)</span><span class="o">.</span><span class="n">items</span><span class="p">()</span>
+    <span class="k">if</span> <span class="n">request</span><span class="o">.</span><span class="n">user</span><span class="o">.</span><span class="n">is_staff</span><span class="p">:</span>
+        <span class="n">data</span><span class="o">.</span><span class="n">append</span><span class="p">([</span><span class="s">&#39;metadata&#39;</span><span class="p">,</span> <span class="n">escape</span><span class="p">(</span><span class="nb">str</span><span class="p">(</span><span class="n">course</span><span class="o">.</span><span class="n">metadata</span><span class="p">))])</span>
+    <span class="n">datatable</span><span class="p">[</span><span class="s">&#39;data&#39;</span><span class="p">]</span> <span class="o">=</span> <span class="n">data</span>
+
+    <span class="k">def</span> <span class="nf">return_csv</span><span class="p">(</span><span class="n">fn</span><span class="p">,</span> <span class="n">datatable</span><span class="p">):</span>
+        <span class="n">response</span> <span class="o">=</span> <span class="n">HttpResponse</span><span class="p">(</span><span class="n">mimetype</span><span class="o">=</span><span class="s">&#39;text/csv&#39;</span><span class="p">)</span>
+        <span class="n">response</span><span class="p">[</span><span class="s">&#39;Content-Disposition&#39;</span><span class="p">]</span> <span class="o">=</span> <span class="s">&#39;attachment; filename=</span><span class="si">%s</span><span class="s">&#39;</span> <span class="o">%</span> <span class="n">fn</span>
+        <span class="n">writer</span> <span class="o">=</span> <span class="n">csv</span><span class="o">.</span><span class="n">writer</span><span class="p">(</span><span class="n">response</span><span class="p">,</span> <span class="n">dialect</span><span class="o">=</span><span class="s">&#39;excel&#39;</span><span class="p">,</span> <span class="n">quotechar</span><span class="o">=</span><span class="s">&#39;&quot;&#39;</span><span class="p">,</span> <span class="n">quoting</span><span class="o">=</span><span class="n">csv</span><span class="o">.</span><span class="n">QUOTE_ALL</span><span class="p">)</span>
+        <span class="n">writer</span><span class="o">.</span><span class="n">writerow</span><span class="p">(</span><span class="n">datatable</span><span class="p">[</span><span class="s">&#39;header&#39;</span><span class="p">])</span>
+        <span class="k">for</span> <span class="n">datarow</span> <span class="ow">in</span> <span class="n">datatable</span><span class="p">[</span><span class="s">&#39;data&#39;</span><span class="p">]:</span>
+            <span class="n">encoded_row</span> <span class="o">=</span> <span class="p">[</span><span class="nb">unicode</span><span class="p">(</span><span class="n">s</span><span class="p">)</span><span class="o">.</span><span class="n">encode</span><span class="p">(</span><span class="s">&#39;utf-8&#39;</span><span class="p">)</span> <span class="k">for</span> <span class="n">s</span> <span class="ow">in</span> <span class="n">datarow</span><span class="p">]</span>
+            <span class="n">writer</span><span class="o">.</span><span class="n">writerow</span><span class="p">(</span><span class="n">encoded_row</span><span class="p">)</span>
+        <span class="k">return</span> <span class="n">response</span>
+
+    <span class="k">def</span> <span class="nf">get_staff_group</span><span class="p">(</span><span class="n">course</span><span class="p">):</span>
+        <span class="n">staffgrp</span> <span class="o">=</span> <span class="n">get_access_group_name</span><span class="p">(</span><span class="n">course</span><span class="p">,</span> <span class="s">&#39;staff&#39;</span><span class="p">)</span>
+        <span class="k">try</span><span class="p">:</span>
+            <span class="n">group</span> <span class="o">=</span> <span class="n">Group</span><span class="o">.</span><span class="n">objects</span><span class="o">.</span><span class="n">get</span><span class="p">(</span><span class="n">name</span><span class="o">=</span><span class="n">staffgrp</span><span class="p">)</span>
+        <span class="k">except</span> <span class="n">Group</span><span class="o">.</span><span class="n">DoesNotExist</span><span class="p">:</span>
+            <span class="n">group</span> <span class="o">=</span> <span class="n">Group</span><span class="p">(</span><span class="n">name</span><span class="o">=</span><span class="n">staffgrp</span><span class="p">)</span>		<span class="c"># create the group</span>
+            <span class="n">group</span><span class="o">.</span><span class="n">save</span><span class="p">()</span>
+        <span class="k">return</span> <span class="n">group</span>
+
+    <span class="c"># process actions from form POST</span>
+    <span class="n">action</span> <span class="o">=</span> <span class="n">request</span><span class="o">.</span><span class="n">POST</span><span class="o">.</span><span class="n">get</span><span class="p">(</span><span class="s">&#39;action&#39;</span><span class="p">,</span> <span class="s">&#39;&#39;</span><span class="p">)</span>
+
+    <span class="k">if</span> <span class="n">settings</span><span class="o">.</span><span class="n">MITX_FEATURES</span><span class="p">[</span><span class="s">&#39;ENABLE_MANUAL_GIT_RELOAD&#39;</span><span class="p">]:</span>
+        <span class="k">if</span> <span class="s">&#39;GIT pull&#39;</span> <span class="ow">in</span> <span class="n">action</span><span class="p">:</span>
+            <span class="n">data_dir</span> <span class="o">=</span> <span class="n">course</span><span class="o">.</span><span class="n">metadata</span><span class="p">[</span><span class="s">&#39;data_dir&#39;</span><span class="p">]</span>
+            <span class="n">log</span><span class="o">.</span><span class="n">debug</span><span class="p">(</span><span class="s">&#39;git pull </span><span class="si">%s</span><span class="s">&#39;</span> <span class="o">%</span> <span class="p">(</span><span class="n">data_dir</span><span class="p">))</span>
+            <span class="n">gdir</span> <span class="o">=</span> <span class="n">settings</span><span class="o">.</span><span class="n">DATA_DIR</span> <span class="o">/</span> <span class="n">data_dir</span>
+            <span class="k">if</span> <span class="ow">not</span> <span class="n">os</span><span class="o">.</span><span class="n">path</span><span class="o">.</span><span class="n">exists</span><span class="p">(</span><span class="n">gdir</span><span class="p">):</span>
+                <span class="n">msg</span> <span class="o">+=</span> <span class="s">&quot;====&gt; ERROR in gitreload - no such directory </span><span class="si">%s</span><span class="s">&quot;</span> <span class="o">%</span> <span class="n">gdir</span>
+            <span class="k">else</span><span class="p">:</span>
+                <span class="n">cmd</span> <span class="o">=</span> <span class="s">&quot;cd </span><span class="si">%s</span><span class="s">; git reset --hard HEAD; git clean -f -d; git pull origin; chmod g+w course.xml&quot;</span> <span class="o">%</span> <span class="n">gdir</span>
+                <span class="n">msg</span> <span class="o">+=</span> <span class="s">&quot;git pull on </span><span class="si">%s</span><span class="s">:&lt;p&gt;&quot;</span> <span class="o">%</span> <span class="n">data_dir</span>
+                <span class="n">msg</span> <span class="o">+=</span> <span class="s">&quot;&lt;pre&gt;</span><span class="si">%s</span><span class="s">&lt;/pre&gt;&lt;/p&gt;&quot;</span> <span class="o">%</span> <span class="n">escape</span><span class="p">(</span><span class="n">os</span><span class="o">.</span><span class="n">popen</span><span class="p">(</span><span class="n">cmd</span><span class="p">)</span><span class="o">.</span><span class="n">read</span><span class="p">())</span>
+                <span class="n">track</span><span class="o">.</span><span class="n">views</span><span class="o">.</span><span class="n">server_track</span><span class="p">(</span><span class="n">request</span><span class="p">,</span> <span class="s">&#39;git pull </span><span class="si">%s</span><span class="s">&#39;</span> <span class="o">%</span> <span class="n">data_dir</span><span class="p">,</span> <span class="p">{},</span> <span class="n">page</span><span class="o">=</span><span class="s">&#39;idashboard&#39;</span><span class="p">)</span>
+
+        <span class="k">if</span> <span class="s">&#39;Reload course&#39;</span> <span class="ow">in</span> <span class="n">action</span><span class="p">:</span>
+            <span class="n">log</span><span class="o">.</span><span class="n">debug</span><span class="p">(</span><span class="s">&#39;reloading </span><span class="si">%s</span><span class="s"> (</span><span class="si">%s</span><span class="s">)&#39;</span> <span class="o">%</span> <span class="p">(</span><span class="n">course_id</span><span class="p">,</span> <span class="n">course</span><span class="p">))</span>
+            <span class="k">try</span><span class="p">:</span>
+                <span class="n">data_dir</span> <span class="o">=</span> <span class="n">course</span><span class="o">.</span><span class="n">metadata</span><span class="p">[</span><span class="s">&#39;data_dir&#39;</span><span class="p">]</span>
+                <span class="n">modulestore</span><span class="p">()</span><span class="o">.</span><span class="n">try_load_course</span><span class="p">(</span><span class="n">data_dir</span><span class="p">)</span>
+                <span class="n">msg</span> <span class="o">+=</span> <span class="s">&quot;&lt;br/&gt;&lt;p&gt;Course reloaded from </span><span class="si">%s</span><span class="s">&lt;/p&gt;&quot;</span> <span class="o">%</span> <span class="n">data_dir</span>
+                <span class="n">track</span><span class="o">.</span><span class="n">views</span><span class="o">.</span><span class="n">server_track</span><span class="p">(</span><span class="n">request</span><span class="p">,</span> <span class="s">&#39;reload </span><span class="si">%s</span><span class="s">&#39;</span> <span class="o">%</span> <span class="n">data_dir</span><span class="p">,</span> <span class="p">{},</span> <span class="n">page</span><span class="o">=</span><span class="s">&#39;idashboard&#39;</span><span class="p">)</span>
+                <span class="n">course_errors</span> <span class="o">=</span> <span class="n">modulestore</span><span class="p">()</span><span class="o">.</span><span class="n">get_item_errors</span><span class="p">(</span><span class="n">course</span><span class="o">.</span><span class="n">location</span><span class="p">)</span>
+                <span class="n">msg</span> <span class="o">+=</span> <span class="s">&#39;&lt;ul&gt;&#39;</span>
+                <span class="k">for</span> <span class="n">cmsg</span><span class="p">,</span> <span class="n">cerr</span> <span class="ow">in</span> <span class="n">course_errors</span><span class="p">:</span>
+                    <span class="n">msg</span> <span class="o">+=</span> <span class="s">&quot;&lt;li&gt;</span><span class="si">%s</span><span class="s">: &lt;pre&gt;</span><span class="si">%s</span><span class="s">&lt;/pre&gt;&quot;</span> <span class="o">%</span> <span class="p">(</span><span class="n">cmsg</span><span class="p">,</span><span class="n">escape</span><span class="p">(</span><span class="n">cerr</span><span class="p">))</span>
+                <span class="n">msg</span> <span class="o">+=</span> <span class="s">&#39;&lt;/ul&gt;&#39;</span>
+            <span class="k">except</span> <span class="ne">Exception</span> <span class="k">as</span> <span class="n">err</span><span class="p">:</span>
+                <span class="n">msg</span> <span class="o">+=</span> <span class="s">&#39;&lt;br/&gt;&lt;p&gt;Error: </span><span class="si">%s</span><span class="s">&lt;/p&gt;&#39;</span> <span class="o">%</span> <span class="n">escape</span><span class="p">(</span><span class="n">err</span><span class="p">)</span>
+
+    <span class="k">if</span> <span class="n">action</span> <span class="o">==</span> <span class="s">&#39;Dump list of enrolled students&#39;</span><span class="p">:</span>
+        <span class="n">log</span><span class="o">.</span><span class="n">debug</span><span class="p">(</span><span class="n">action</span><span class="p">)</span>
+        <span class="n">datatable</span> <span class="o">=</span> <span class="n">get_student_grade_summary_data</span><span class="p">(</span><span class="n">request</span><span class="p">,</span> <span class="n">course</span><span class="p">,</span> <span class="n">course_id</span><span class="p">,</span> <span class="n">get_grades</span><span class="o">=</span><span class="bp">False</span><span class="p">)</span>
+        <span class="n">datatable</span><span class="p">[</span><span class="s">&#39;title&#39;</span><span class="p">]</span> <span class="o">=</span> <span class="s">&#39;List of students enrolled in </span><span class="si">%s</span><span class="s">&#39;</span> <span class="o">%</span> <span class="n">course_id</span>
+        <span class="n">track</span><span class="o">.</span><span class="n">views</span><span class="o">.</span><span class="n">server_track</span><span class="p">(</span><span class="n">request</span><span class="p">,</span> <span class="s">&#39;list-students&#39;</span><span class="p">,</span> <span class="p">{},</span> <span class="n">page</span><span class="o">=</span><span class="s">&#39;idashboard&#39;</span><span class="p">)</span>
+
+    <span class="k">elif</span> <span class="s">&#39;Dump Grades&#39;</span> <span class="ow">in</span> <span class="n">action</span><span class="p">:</span>
+        <span class="n">log</span><span class="o">.</span><span class="n">debug</span><span class="p">(</span><span class="n">action</span><span class="p">)</span>
+        <span class="n">datatable</span> <span class="o">=</span> <span class="n">get_student_grade_summary_data</span><span class="p">(</span><span class="n">request</span><span class="p">,</span> <span class="n">course</span><span class="p">,</span> <span class="n">course_id</span><span class="p">,</span> <span class="n">get_grades</span><span class="o">=</span><span class="bp">True</span><span class="p">)</span>
+        <span class="n">datatable</span><span class="p">[</span><span class="s">&#39;title&#39;</span><span class="p">]</span> <span class="o">=</span> <span class="s">&#39;Summary Grades of students enrolled in </span><span class="si">%s</span><span class="s">&#39;</span> <span class="o">%</span> <span class="n">course_id</span>
+        <span class="n">track</span><span class="o">.</span><span class="n">views</span><span class="o">.</span><span class="n">server_track</span><span class="p">(</span><span class="n">request</span><span class="p">,</span> <span class="s">&#39;dump-grades&#39;</span><span class="p">,</span> <span class="p">{},</span> <span class="n">page</span><span class="o">=</span><span class="s">&#39;idashboard&#39;</span><span class="p">)</span>
+
+    <span class="k">elif</span> <span class="s">&#39;Dump all RAW grades&#39;</span> <span class="ow">in</span> <span class="n">action</span><span class="p">:</span>
+        <span class="n">log</span><span class="o">.</span><span class="n">debug</span><span class="p">(</span><span class="n">action</span><span class="p">)</span>
+        <span class="n">datatable</span> <span class="o">=</span> <span class="n">get_student_grade_summary_data</span><span class="p">(</span><span class="n">request</span><span class="p">,</span> <span class="n">course</span><span class="p">,</span> <span class="n">course_id</span><span class="p">,</span> <span class="n">get_grades</span><span class="o">=</span><span class="bp">True</span><span class="p">,</span>
+                                                   <span class="n">get_raw_scores</span><span class="o">=</span><span class="bp">True</span><span class="p">)</span>
+        <span class="n">datatable</span><span class="p">[</span><span class="s">&#39;title&#39;</span><span class="p">]</span> <span class="o">=</span> <span class="s">&#39;Raw Grades of students enrolled in </span><span class="si">%s</span><span class="s">&#39;</span> <span class="o">%</span> <span class="n">course_id</span>
+        <span class="n">track</span><span class="o">.</span><span class="n">views</span><span class="o">.</span><span class="n">server_track</span><span class="p">(</span><span class="n">request</span><span class="p">,</span> <span class="s">&#39;dump-grades-raw&#39;</span><span class="p">,</span> <span class="p">{},</span> <span class="n">page</span><span class="o">=</span><span class="s">&#39;idashboard&#39;</span><span class="p">)</span>
+
+    <span class="k">elif</span> <span class="s">&#39;Download CSV of all student grades&#39;</span> <span class="ow">in</span> <span class="n">action</span><span class="p">:</span>
+        <span class="n">track</span><span class="o">.</span><span class="n">views</span><span class="o">.</span><span class="n">server_track</span><span class="p">(</span><span class="n">request</span><span class="p">,</span> <span class="s">&#39;dump-grades-csv&#39;</span><span class="p">,</span> <span class="p">{},</span> <span class="n">page</span><span class="o">=</span><span class="s">&#39;idashboard&#39;</span><span class="p">)</span>
+        <span class="k">return</span> <span class="n">return_csv</span><span class="p">(</span><span class="s">&#39;grades_</span><span class="si">%s</span><span class="s">.csv&#39;</span> <span class="o">%</span> <span class="n">course_id</span><span class="p">,</span>
+                          <span class="n">get_student_grade_summary_data</span><span class="p">(</span><span class="n">request</span><span class="p">,</span> <span class="n">course</span><span class="p">,</span> <span class="n">course_id</span><span class="p">))</span>
+
+    <span class="k">elif</span> <span class="s">&#39;Download CSV of all RAW grades&#39;</span> <span class="ow">in</span> <span class="n">action</span><span class="p">:</span>
+        <span class="n">track</span><span class="o">.</span><span class="n">views</span><span class="o">.</span><span class="n">server_track</span><span class="p">(</span><span class="n">request</span><span class="p">,</span> <span class="s">&#39;dump-grades-csv-raw&#39;</span><span class="p">,</span> <span class="p">{},</span> <span class="n">page</span><span class="o">=</span><span class="s">&#39;idashboard&#39;</span><span class="p">)</span>
+        <span class="k">return</span> <span class="n">return_csv</span><span class="p">(</span><span class="s">&#39;grades_</span><span class="si">%s</span><span class="s">_raw.csv&#39;</span> <span class="o">%</span> <span class="n">course_id</span><span class="p">,</span>
+                          <span class="n">get_student_grade_summary_data</span><span class="p">(</span><span class="n">request</span><span class="p">,</span> <span class="n">course</span><span class="p">,</span> <span class="n">course_id</span><span class="p">,</span> <span class="n">get_raw_scores</span><span class="o">=</span><span class="bp">True</span><span class="p">))</span>
+
+    <span class="k">elif</span> <span class="s">&#39;Download CSV of answer distributions&#39;</span> <span class="ow">in</span> <span class="n">action</span><span class="p">:</span>
+        <span class="n">track</span><span class="o">.</span><span class="n">views</span><span class="o">.</span><span class="n">server_track</span><span class="p">(</span><span class="n">request</span><span class="p">,</span> <span class="s">&#39;dump-answer-dist-csv&#39;</span><span class="p">,</span> <span class="p">{},</span> <span class="n">page</span><span class="o">=</span><span class="s">&#39;idashboard&#39;</span><span class="p">)</span>
+        <span class="k">return</span> <span class="n">return_csv</span><span class="p">(</span><span class="s">&#39;answer_dist_</span><span class="si">%s</span><span class="s">.csv&#39;</span> <span class="o">%</span> <span class="n">course_id</span><span class="p">,</span> <span class="n">get_answers_distribution</span><span class="p">(</span><span class="n">request</span><span class="p">,</span> <span class="n">course_id</span><span class="p">))</span>
+
+    <span class="c">#----------------------------------------</span>
+    <span class="c"># Admin</span>
+
+    <span class="k">elif</span> <span class="s">&#39;List course staff&#39;</span> <span class="ow">in</span> <span class="n">action</span><span class="p">:</span>
+        <span class="n">group</span> <span class="o">=</span> <span class="n">get_staff_group</span><span class="p">(</span><span class="n">course</span><span class="p">)</span>
+        <span class="n">msg</span> <span class="o">+=</span> <span class="s">&#39;Staff group = </span><span class="si">%s</span><span class="s">&#39;</span> <span class="o">%</span> <span class="n">group</span><span class="o">.</span><span class="n">name</span>
+        <span class="n">log</span><span class="o">.</span><span class="n">debug</span><span class="p">(</span><span class="s">&#39;staffgrp=</span><span class="si">%s</span><span class="s">&#39;</span> <span class="o">%</span> <span class="n">group</span><span class="o">.</span><span class="n">name</span><span class="p">)</span>
+        <span class="n">uset</span> <span class="o">=</span> <span class="n">group</span><span class="o">.</span><span class="n">user_set</span><span class="o">.</span><span class="n">all</span><span class="p">()</span>
+        <span class="n">datatable</span> <span class="o">=</span> <span class="p">{</span><span class="s">&#39;header&#39;</span><span class="p">:</span> <span class="p">[</span><span class="s">&#39;Username&#39;</span><span class="p">,</span> <span class="s">&#39;Full name&#39;</span><span class="p">]}</span>
+        <span class="n">datatable</span><span class="p">[</span><span class="s">&#39;data&#39;</span><span class="p">]</span> <span class="o">=</span> <span class="p">[[</span><span class="n">x</span><span class="o">.</span><span class="n">username</span><span class="p">,</span> <span class="n">x</span><span class="o">.</span><span class="n">profile</span><span class="o">.</span><span class="n">name</span><span class="p">]</span> <span class="k">for</span> <span class="n">x</span> <span class="ow">in</span> <span class="n">uset</span><span class="p">]</span>
+        <span class="n">datatable</span><span class="p">[</span><span class="s">&#39;title&#39;</span><span class="p">]</span> <span class="o">=</span> <span class="s">&#39;List of Staff in course </span><span class="si">%s</span><span class="s">&#39;</span> <span class="o">%</span> <span class="n">course_id</span>
+        <span class="n">track</span><span class="o">.</span><span class="n">views</span><span class="o">.</span><span class="n">server_track</span><span class="p">(</span><span class="n">request</span><span class="p">,</span> <span class="s">&#39;list-staff&#39;</span><span class="p">,</span> <span class="p">{},</span> <span class="n">page</span><span class="o">=</span><span class="s">&#39;idashboard&#39;</span><span class="p">)</span>
+
+    <span class="k">elif</span> <span class="n">action</span> <span class="o">==</span> <span class="s">&#39;Add course staff&#39;</span><span class="p">:</span>
+        <span class="n">uname</span> <span class="o">=</span> <span class="n">request</span><span class="o">.</span><span class="n">POST</span><span class="p">[</span><span class="s">&#39;staffuser&#39;</span><span class="p">]</span>
+        <span class="k">try</span><span class="p">:</span>
+            <span class="n">user</span> <span class="o">=</span> <span class="n">User</span><span class="o">.</span><span class="n">objects</span><span class="o">.</span><span class="n">get</span><span class="p">(</span><span class="n">username</span><span class="o">=</span><span class="n">uname</span><span class="p">)</span>
+        <span class="k">except</span> <span class="n">User</span><span class="o">.</span><span class="n">DoesNotExist</span><span class="p">:</span>
+            <span class="n">msg</span> <span class="o">+=</span> <span class="s">&#39;&lt;font color=&quot;red&quot;&gt;Error: unknown username &quot;</span><span class="si">%s</span><span class="s">&quot;&lt;/font&gt;&#39;</span> <span class="o">%</span> <span class="n">uname</span>
+            <span class="n">user</span> <span class="o">=</span> <span class="bp">None</span>
+        <span class="k">if</span> <span class="n">user</span> <span class="ow">is</span> <span class="ow">not</span> <span class="bp">None</span><span class="p">:</span>
+            <span class="n">group</span> <span class="o">=</span> <span class="n">get_staff_group</span><span class="p">(</span><span class="n">course</span><span class="p">)</span>
+            <span class="n">msg</span> <span class="o">+=</span> <span class="s">&#39;&lt;font color=&quot;green&quot;&gt;Added </span><span class="si">%s</span><span class="s"> to staff group = </span><span class="si">%s</span><span class="s">&lt;/font&gt;&#39;</span> <span class="o">%</span> <span class="p">(</span><span class="n">user</span><span class="p">,</span> <span class="n">group</span><span class="o">.</span><span class="n">name</span><span class="p">)</span>
+            <span class="n">log</span><span class="o">.</span><span class="n">debug</span><span class="p">(</span><span class="s">&#39;staffgrp=</span><span class="si">%s</span><span class="s">&#39;</span> <span class="o">%</span> <span class="n">group</span><span class="o">.</span><span class="n">name</span><span class="p">)</span>
+            <span class="n">user</span><span class="o">.</span><span class="n">groups</span><span class="o">.</span><span class="n">add</span><span class="p">(</span><span class="n">group</span><span class="p">)</span>
+            <span class="n">track</span><span class="o">.</span><span class="n">views</span><span class="o">.</span><span class="n">server_track</span><span class="p">(</span><span class="n">request</span><span class="p">,</span> <span class="s">&#39;add-staff </span><span class="si">%s</span><span class="s">&#39;</span> <span class="o">%</span> <span class="n">user</span><span class="p">,</span> <span class="p">{},</span> <span class="n">page</span><span class="o">=</span><span class="s">&#39;idashboard&#39;</span><span class="p">)</span>
+
+    <span class="k">elif</span> <span class="n">action</span> <span class="o">==</span> <span class="s">&#39;Remove course staff&#39;</span><span class="p">:</span>
+        <span class="n">uname</span> <span class="o">=</span> <span class="n">request</span><span class="o">.</span><span class="n">POST</span><span class="p">[</span><span class="s">&#39;staffuser&#39;</span><span class="p">]</span>
+        <span class="k">try</span><span class="p">:</span>
+            <span class="n">user</span> <span class="o">=</span> <span class="n">User</span><span class="o">.</span><span class="n">objects</span><span class="o">.</span><span class="n">get</span><span class="p">(</span><span class="n">username</span><span class="o">=</span><span class="n">uname</span><span class="p">)</span>
+        <span class="k">except</span> <span class="n">User</span><span class="o">.</span><span class="n">DoesNotExist</span><span class="p">:</span>
+            <span class="n">msg</span> <span class="o">+=</span> <span class="s">&#39;&lt;font color=&quot;red&quot;&gt;Error: unknown username &quot;</span><span class="si">%s</span><span class="s">&quot;&lt;/font&gt;&#39;</span> <span class="o">%</span> <span class="n">uname</span>
+            <span class="n">user</span> <span class="o">=</span> <span class="bp">None</span>
+        <span class="k">if</span> <span class="n">user</span> <span class="ow">is</span> <span class="ow">not</span> <span class="bp">None</span><span class="p">:</span>
+            <span class="n">group</span> <span class="o">=</span> <span class="n">get_staff_group</span><span class="p">(</span><span class="n">course</span><span class="p">)</span>
+            <span class="n">msg</span> <span class="o">+=</span> <span class="s">&#39;&lt;font color=&quot;green&quot;&gt;Removed </span><span class="si">%s</span><span class="s"> from staff group = </span><span class="si">%s</span><span class="s">&lt;/font&gt;&#39;</span> <span class="o">%</span> <span class="p">(</span><span class="n">user</span><span class="p">,</span> <span class="n">group</span><span class="o">.</span><span class="n">name</span><span class="p">)</span>
+            <span class="n">log</span><span class="o">.</span><span class="n">debug</span><span class="p">(</span><span class="s">&#39;staffgrp=</span><span class="si">%s</span><span class="s">&#39;</span> <span class="o">%</span> <span class="n">group</span><span class="o">.</span><span class="n">name</span><span class="p">)</span>
+            <span class="n">user</span><span class="o">.</span><span class="n">groups</span><span class="o">.</span><span class="n">remove</span><span class="p">(</span><span class="n">group</span><span class="p">)</span>
+            <span class="n">track</span><span class="o">.</span><span class="n">views</span><span class="o">.</span><span class="n">server_track</span><span class="p">(</span><span class="n">request</span><span class="p">,</span> <span class="s">&#39;remove-staff </span><span class="si">%s</span><span class="s">&#39;</span> <span class="o">%</span> <span class="n">user</span><span class="p">,</span> <span class="p">{},</span> <span class="n">page</span><span class="o">=</span><span class="s">&#39;idashboard&#39;</span><span class="p">)</span>
+
+    <span class="c">#----------------------------------------</span>
+    <span class="c"># psychometrics</span>
+
+    <span class="k">elif</span> <span class="n">action</span> <span class="o">==</span> <span class="s">&#39;Generate Histogram and IRT Plot&#39;</span><span class="p">:</span>
+        <span class="n">problem</span> <span class="o">=</span> <span class="n">request</span><span class="o">.</span><span class="n">POST</span><span class="p">[</span><span class="s">&#39;Problem&#39;</span><span class="p">]</span>
+        <span class="n">nmsg</span><span class="p">,</span> <span class="n">plots</span> <span class="o">=</span> <span class="n">psychoanalyze</span><span class="o">.</span><span class="n">generate_plots_for_problem</span><span class="p">(</span><span class="n">problem</span><span class="p">)</span>
+        <span class="n">msg</span> <span class="o">+=</span> <span class="n">nmsg</span>
+        <span class="n">track</span><span class="o">.</span><span class="n">views</span><span class="o">.</span><span class="n">server_track</span><span class="p">(</span><span class="n">request</span><span class="p">,</span> <span class="s">&#39;psychometrics </span><span class="si">%s</span><span class="s">&#39;</span> <span class="o">%</span> <span class="n">problem</span><span class="p">,</span> <span class="p">{},</span> <span class="n">page</span><span class="o">=</span><span class="s">&#39;idashboard&#39;</span><span class="p">)</span>
+
+    <span class="k">if</span> <span class="n">idash_mode</span><span class="o">==</span><span class="s">&#39;Psychometrics&#39;</span><span class="p">:</span>
+        <span class="n">problems</span> <span class="o">=</span> <span class="n">psychoanalyze</span><span class="o">.</span><span class="n">problems_with_psychometric_data</span><span class="p">(</span><span class="n">course_id</span><span class="p">)</span>
+
+    <span class="c">#----------------------------------------</span>
+    <span class="c"># context for rendering</span>
+    <span class="n">context</span> <span class="o">=</span> <span class="p">{</span><span class="s">&#39;course&#39;</span><span class="p">:</span> <span class="n">course</span><span class="p">,</span>
+               <span class="s">&#39;staff_access&#39;</span><span class="p">:</span> <span class="bp">True</span><span class="p">,</span>
+               <span class="s">&#39;admin_access&#39;</span><span class="p">:</span> <span class="n">request</span><span class="o">.</span><span class="n">user</span><span class="o">.</span><span class="n">is_staff</span><span class="p">,</span>
+               <span class="s">&#39;instructor_access&#39;</span><span class="p">:</span> <span class="n">instructor_access</span><span class="p">,</span>
+               <span class="s">&#39;datatable&#39;</span><span class="p">:</span> <span class="n">datatable</span><span class="p">,</span>
+               <span class="s">&#39;msg&#39;</span><span class="p">:</span> <span class="n">msg</span><span class="p">,</span>
+               <span class="s">&#39;modeflag&#39;</span><span class="p">:</span> <span class="p">{</span><span class="n">idash_mode</span><span class="p">:</span> <span class="s">&#39;selectedmode&#39;</span><span class="p">},</span>
+               <span class="s">&#39;problems&#39;</span><span class="p">:</span> <span class="n">problems</span><span class="p">,</span>		<span class="c"># psychometrics</span>
+               <span class="s">&#39;plots&#39;</span><span class="p">:</span> <span class="n">plots</span><span class="p">,</span>			<span class="c"># psychometrics</span>
+               <span class="s">&#39;course_errors&#39;</span><span class="p">:</span> <span class="n">modulestore</span><span class="p">()</span><span class="o">.</span><span class="n">get_item_errors</span><span class="p">(</span><span class="n">course</span><span class="o">.</span><span class="n">location</span><span class="p">),</span>
+               <span class="s">&#39;djangopid&#39;</span> <span class="p">:</span> <span class="n">os</span><span class="o">.</span><span class="n">getpid</span><span class="p">(),</span>
+               <span class="p">}</span>
+
+    <span class="k">return</span> <span class="n">render_to_response</span><span class="p">(</span><span class="s">&#39;courseware/instructor_dashboard.html&#39;</span><span class="p">,</span> <span class="n">context</span><span class="p">)</span>
+
+</div>
+<div class="viewcode-block" id="get_student_grade_summary_data"><a class="viewcode-back" href="../../lms.html#instructor.views.get_student_grade_summary_data">[docs]</a><span class="k">def</span> <span class="nf">get_student_grade_summary_data</span><span class="p">(</span><span class="n">request</span><span class="p">,</span> <span class="n">course</span><span class="p">,</span> <span class="n">course_id</span><span class="p">,</span> <span class="n">get_grades</span><span class="o">=</span><span class="bp">True</span><span class="p">,</span> <span class="n">get_raw_scores</span><span class="o">=</span><span class="bp">False</span><span class="p">):</span>
+    <span class="sd">&#39;&#39;&#39;</span>
+<span class="sd">    Return data arrays with student identity and grades for specified course.</span>
+
+<span class="sd">    course = CourseDescriptor</span>
+<span class="sd">    course_id = course ID</span>
+
+<span class="sd">    Note: both are passed in, only because instructor_dashboard already has them already.</span>
+
+<span class="sd">    returns datatable = dict(header=header, data=data)</span>
+<span class="sd">    where</span>
+
+<span class="sd">    header = list of strings labeling the data fields</span>
+<span class="sd">    data = list (one per student) of lists of data corresponding to the fields</span>
+
+<span class="sd">    If get_raw_scores=True, then instead of grade summaries, the raw grades for all graded modules are returned.</span>
+
+<span class="sd">    &#39;&#39;&#39;</span>
+    <span class="n">enrolled_students</span> <span class="o">=</span> <span class="n">User</span><span class="o">.</span><span class="n">objects</span><span class="o">.</span><span class="n">filter</span><span class="p">(</span><span class="n">courseenrollment__course_id</span><span class="o">=</span><span class="n">course_id</span><span class="p">)</span><span class="o">.</span><span class="n">prefetch_related</span><span class="p">(</span><span class="s">&quot;groups&quot;</span><span class="p">)</span><span class="o">.</span><span class="n">order_by</span><span class="p">(</span><span class="s">&#39;username&#39;</span><span class="p">)</span>
+
+    <span class="n">header</span> <span class="o">=</span> <span class="p">[</span><span class="s">&#39;ID&#39;</span><span class="p">,</span> <span class="s">&#39;Username&#39;</span><span class="p">,</span> <span class="s">&#39;Full Name&#39;</span><span class="p">,</span> <span class="s">&#39;edX email&#39;</span><span class="p">,</span> <span class="s">&#39;External email&#39;</span><span class="p">]</span>
+    <span class="k">if</span> <span class="n">get_grades</span><span class="p">:</span>
+        <span class="c"># just to construct the header</span>
+        <span class="n">gradeset</span> <span class="o">=</span> <span class="n">grades</span><span class="o">.</span><span class="n">grade</span><span class="p">(</span><span class="n">enrolled_students</span><span class="p">[</span><span class="mi">0</span><span class="p">],</span> <span class="n">request</span><span class="p">,</span> <span class="n">course</span><span class="p">,</span> <span class="n">keep_raw_scores</span><span class="o">=</span><span class="n">get_raw_scores</span><span class="p">)</span>
+        <span class="c"># log.debug(&#39;student %s gradeset %s&#39; % (enrolled_students[0], gradeset))</span>
+        <span class="k">if</span> <span class="n">get_raw_scores</span><span class="p">:</span>
+            <span class="n">header</span> <span class="o">+=</span> <span class="p">[</span><span class="n">score</span><span class="o">.</span><span class="n">section</span> <span class="k">for</span> <span class="n">score</span> <span class="ow">in</span> <span class="n">gradeset</span><span class="p">[</span><span class="s">&#39;raw_scores&#39;</span><span class="p">]]</span>
+        <span class="k">else</span><span class="p">:</span>
+            <span class="n">header</span> <span class="o">+=</span> <span class="p">[</span><span class="n">x</span><span class="p">[</span><span class="s">&#39;label&#39;</span><span class="p">]</span> <span class="k">for</span> <span class="n">x</span> <span class="ow">in</span> <span class="n">gradeset</span><span class="p">[</span><span class="s">&#39;section_breakdown&#39;</span><span class="p">]]</span>
+
+    <span class="n">datatable</span> <span class="o">=</span> <span class="p">{</span><span class="s">&#39;header&#39;</span><span class="p">:</span> <span class="n">header</span><span class="p">}</span>
+    <span class="n">data</span> <span class="o">=</span> <span class="p">[]</span>
+
+    <span class="k">for</span> <span class="n">student</span> <span class="ow">in</span> <span class="n">enrolled_students</span><span class="p">:</span>
+        <span class="n">datarow</span> <span class="o">=</span> <span class="p">[</span> <span class="n">student</span><span class="o">.</span><span class="n">id</span><span class="p">,</span> <span class="n">student</span><span class="o">.</span><span class="n">username</span><span class="p">,</span> <span class="n">student</span><span class="o">.</span><span class="n">profile</span><span class="o">.</span><span class="n">name</span><span class="p">,</span> <span class="n">student</span><span class="o">.</span><span class="n">email</span> <span class="p">]</span>
+        <span class="k">try</span><span class="p">:</span>
+            <span class="n">datarow</span><span class="o">.</span><span class="n">append</span><span class="p">(</span><span class="n">student</span><span class="o">.</span><span class="n">externalauthmap</span><span class="o">.</span><span class="n">external_email</span><span class="p">)</span>
+        <span class="k">except</span><span class="p">:</span>	<span class="c"># ExternalAuthMap.DoesNotExist</span>
+            <span class="n">datarow</span><span class="o">.</span><span class="n">append</span><span class="p">(</span><span class="s">&#39;&#39;</span><span class="p">)</span>
+
+        <span class="k">if</span> <span class="n">get_grades</span><span class="p">:</span>
+            <span class="n">gradeset</span> <span class="o">=</span> <span class="n">grades</span><span class="o">.</span><span class="n">grade</span><span class="p">(</span><span class="n">student</span><span class="p">,</span> <span class="n">request</span><span class="p">,</span> <span class="n">course</span><span class="p">,</span> <span class="n">keep_raw_scores</span><span class="o">=</span><span class="n">get_raw_scores</span><span class="p">)</span>
+            <span class="c"># log.debug(&#39;student=%s, gradeset=%s&#39; % (student,gradeset))</span>
+            <span class="k">if</span> <span class="n">get_raw_scores</span><span class="p">:</span>
+                <span class="n">datarow</span> <span class="o">+=</span> <span class="p">[</span><span class="n">score</span><span class="o">.</span><span class="n">earned</span> <span class="k">for</span> <span class="n">score</span> <span class="ow">in</span> <span class="n">gradeset</span><span class="p">[</span><span class="s">&#39;raw_scores&#39;</span><span class="p">]]</span>
+            <span class="k">else</span><span class="p">:</span>
+                <span class="n">datarow</span> <span class="o">+=</span> <span class="p">[</span><span class="n">x</span><span class="p">[</span><span class="s">&#39;percent&#39;</span><span class="p">]</span> <span class="k">for</span> <span class="n">x</span> <span class="ow">in</span> <span class="n">gradeset</span><span class="p">[</span><span class="s">&#39;section_breakdown&#39;</span><span class="p">]]</span>
+
+        <span class="n">data</span><span class="o">.</span><span class="n">append</span><span class="p">(</span><span class="n">datarow</span><span class="p">)</span>
+    <span class="n">datatable</span><span class="p">[</span><span class="s">&#39;data&#39;</span><span class="p">]</span> <span class="o">=</span> <span class="n">data</span>
+    <span class="k">return</span> <span class="n">datatable</span>
+
+</div>
+<span class="nd">@cache_control</span><span class="p">(</span><span class="n">no_cache</span><span class="o">=</span><span class="bp">True</span><span class="p">,</span> <span class="n">no_store</span><span class="o">=</span><span class="bp">True</span><span class="p">,</span> <span class="n">must_revalidate</span><span class="o">=</span><span class="bp">True</span><span class="p">)</span>
+<div class="viewcode-block" id="gradebook"><a class="viewcode-back" href="../../lms.html#instructor.views.gradebook">[docs]</a><span class="k">def</span> <span class="nf">gradebook</span><span class="p">(</span><span class="n">request</span><span class="p">,</span> <span class="n">course_id</span><span class="p">):</span>
+    <span class="sd">&quot;&quot;&quot;</span>
+<span class="sd">    Show the gradebook for this course:</span>
+<span class="sd">    - only displayed to course staff</span>
+<span class="sd">    - shows students who are enrolled.</span>
+<span class="sd">    &quot;&quot;&quot;</span>
+    <span class="n">course</span> <span class="o">=</span> <span class="n">get_course_with_access</span><span class="p">(</span><span class="n">request</span><span class="o">.</span><span class="n">user</span><span class="p">,</span> <span class="n">course_id</span><span class="p">,</span> <span class="s">&#39;staff&#39;</span><span class="p">)</span>
+
+    <span class="n">enrolled_students</span> <span class="o">=</span> <span class="n">User</span><span class="o">.</span><span class="n">objects</span><span class="o">.</span><span class="n">filter</span><span class="p">(</span><span class="n">courseenrollment__course_id</span><span class="o">=</span><span class="n">course_id</span><span class="p">)</span><span class="o">.</span><span class="n">order_by</span><span class="p">(</span><span class="s">&#39;username&#39;</span><span class="p">)</span><span class="o">.</span><span class="n">select_related</span><span class="p">(</span><span class="s">&quot;profile&quot;</span><span class="p">)</span>
+
+    <span class="c"># TODO (vshnayder): implement pagination.</span>
+    <span class="n">enrolled_students</span> <span class="o">=</span> <span class="n">enrolled_students</span><span class="p">[:</span><span class="mi">1000</span><span class="p">]</span>   <span class="c"># HACK!</span>
+
+    <span class="n">student_info</span> <span class="o">=</span> <span class="p">[{</span><span class="s">&#39;username&#39;</span><span class="p">:</span> <span class="n">student</span><span class="o">.</span><span class="n">username</span><span class="p">,</span>
+                     <span class="s">&#39;id&#39;</span><span class="p">:</span> <span class="n">student</span><span class="o">.</span><span class="n">id</span><span class="p">,</span>
+                     <span class="s">&#39;email&#39;</span><span class="p">:</span> <span class="n">student</span><span class="o">.</span><span class="n">email</span><span class="p">,</span>
+                     <span class="s">&#39;grade_summary&#39;</span><span class="p">:</span> <span class="n">grades</span><span class="o">.</span><span class="n">grade</span><span class="p">(</span><span class="n">student</span><span class="p">,</span> <span class="n">request</span><span class="p">,</span> <span class="n">course</span><span class="p">),</span>
+                     <span class="s">&#39;realname&#39;</span><span class="p">:</span> <span class="n">student</span><span class="o">.</span><span class="n">profile</span><span class="o">.</span><span class="n">name</span><span class="p">,</span>
+                     <span class="p">}</span>
+                     <span class="k">for</span> <span class="n">student</span> <span class="ow">in</span> <span class="n">enrolled_students</span><span class="p">]</span>
+
+    <span class="k">return</span> <span class="n">render_to_response</span><span class="p">(</span><span class="s">&#39;courseware/gradebook.html&#39;</span><span class="p">,</span> <span class="p">{</span><span class="s">&#39;students&#39;</span><span class="p">:</span> <span class="n">student_info</span><span class="p">,</span>
+                                                 <span class="s">&#39;course&#39;</span><span class="p">:</span> <span class="n">course</span><span class="p">,</span>
+                                                 <span class="s">&#39;course_id&#39;</span><span class="p">:</span> <span class="n">course_id</span><span class="p">,</span>
+                                                 <span class="c"># Checked above</span>
+                                                 <span class="s">&#39;staff_access&#39;</span><span class="p">:</span> <span class="bp">True</span><span class="p">,</span> <span class="p">})</span>
+
+</div>
+<span class="nd">@cache_control</span><span class="p">(</span><span class="n">no_cache</span><span class="o">=</span><span class="bp">True</span><span class="p">,</span> <span class="n">no_store</span><span class="o">=</span><span class="bp">True</span><span class="p">,</span> <span class="n">must_revalidate</span><span class="o">=</span><span class="bp">True</span><span class="p">)</span>
+<div class="viewcode-block" id="grade_summary"><a class="viewcode-back" href="../../lms.html#instructor.views.grade_summary">[docs]</a><span class="k">def</span> <span class="nf">grade_summary</span><span class="p">(</span><span class="n">request</span><span class="p">,</span> <span class="n">course_id</span><span class="p">):</span>
+    <span class="sd">&quot;&quot;&quot;Display the grade summary for a course.&quot;&quot;&quot;</span>
+    <span class="n">course</span> <span class="o">=</span> <span class="n">get_course_with_access</span><span class="p">(</span><span class="n">request</span><span class="o">.</span><span class="n">user</span><span class="p">,</span> <span class="n">course_id</span><span class="p">,</span> <span class="s">&#39;staff&#39;</span><span class="p">)</span>
+
+    <span class="c"># For now, just a static page</span>
+    <span class="n">context</span> <span class="o">=</span> <span class="p">{</span><span class="s">&#39;course&#39;</span><span class="p">:</span> <span class="n">course</span><span class="p">,</span>
+               <span class="s">&#39;staff_access&#39;</span><span class="p">:</span> <span class="bp">True</span><span class="p">,</span> <span class="p">}</span>
+    <span class="k">return</span> <span class="n">render_to_response</span><span class="p">(</span><span class="s">&#39;courseware/grade_summary.html&#39;</span><span class="p">,</span> <span class="n">context</span><span class="p">)</span>
+
+</div>
+<span class="nd">@ensure_csrf_cookie</span>
+<span class="nd">@cache_control</span><span class="p">(</span><span class="n">no_cache</span><span class="o">=</span><span class="bp">True</span><span class="p">,</span> <span class="n">no_store</span><span class="o">=</span><span class="bp">True</span><span class="p">,</span> <span class="n">must_revalidate</span><span class="o">=</span><span class="bp">True</span><span class="p">)</span>
+<div class="viewcode-block" id="enroll_students"><a class="viewcode-back" href="../../lms.html#instructor.views.enroll_students">[docs]</a><span class="k">def</span> <span class="nf">enroll_students</span><span class="p">(</span><span class="n">request</span><span class="p">,</span> <span class="n">course_id</span><span class="p">):</span>
+    <span class="sd">&quot;&quot;&quot;Allows a staff member to enroll students in a course.</span>
+
+<span class="sd">    This is a short-term hack for Berkeley courses launching fall</span>
+<span class="sd">    2012. In the long term, we would like functionality like this, but</span>
+<span class="sd">    we would like both the instructor and the student to agree. Right</span>
+<span class="sd">    now, this allows any instructor to add students to their course,</span>
+<span class="sd">    which we do not want.</span>
+
+<span class="sd">    It is poorly written and poorly tested, but it&#39;s designed to be</span>
+<span class="sd">    stripped out.</span>
+<span class="sd">    &quot;&quot;&quot;</span>
+
+    <span class="n">course</span> <span class="o">=</span> <span class="n">get_course_with_access</span><span class="p">(</span><span class="n">request</span><span class="o">.</span><span class="n">user</span><span class="p">,</span> <span class="n">course_id</span><span class="p">,</span> <span class="s">&#39;staff&#39;</span><span class="p">)</span>
+    <span class="n">existing_students</span> <span class="o">=</span> <span class="p">[</span><span class="n">ce</span><span class="o">.</span><span class="n">user</span><span class="o">.</span><span class="n">email</span> <span class="k">for</span> <span class="n">ce</span> <span class="ow">in</span> <span class="n">CourseEnrollment</span><span class="o">.</span><span class="n">objects</span><span class="o">.</span><span class="n">filter</span><span class="p">(</span><span class="n">course_id</span><span class="o">=</span><span class="n">course_id</span><span class="p">)]</span>
+
+    <span class="k">if</span> <span class="s">&#39;new_students&#39;</span> <span class="ow">in</span> <span class="n">request</span><span class="o">.</span><span class="n">POST</span><span class="p">:</span>
+        <span class="n">new_students</span> <span class="o">=</span> <span class="n">request</span><span class="o">.</span><span class="n">POST</span><span class="p">[</span><span class="s">&#39;new_students&#39;</span><span class="p">]</span><span class="o">.</span><span class="n">split</span><span class="p">(</span><span class="s">&#39;</span><span class="se">\n</span><span class="s">&#39;</span><span class="p">)</span>
+    <span class="k">else</span><span class="p">:</span>
+        <span class="n">new_students</span> <span class="o">=</span> <span class="p">[]</span>
+    <span class="n">new_students</span> <span class="o">=</span> <span class="p">[</span><span class="n">s</span><span class="o">.</span><span class="n">strip</span><span class="p">()</span> <span class="k">for</span> <span class="n">s</span> <span class="ow">in</span> <span class="n">new_students</span><span class="p">]</span>
+
+    <span class="n">added_students</span> <span class="o">=</span> <span class="p">[]</span>
+    <span class="n">rejected_students</span> <span class="o">=</span> <span class="p">[]</span>
+
+    <span class="k">for</span> <span class="n">student</span> <span class="ow">in</span> <span class="n">new_students</span><span class="p">:</span>
+        <span class="k">try</span><span class="p">:</span>
+            <span class="n">nce</span> <span class="o">=</span> <span class="n">CourseEnrollment</span><span class="p">(</span><span class="n">user</span><span class="o">=</span><span class="n">User</span><span class="o">.</span><span class="n">objects</span><span class="o">.</span><span class="n">get</span><span class="p">(</span><span class="n">email</span><span class="o">=</span><span class="n">student</span><span class="p">),</span> <span class="n">course_id</span><span class="o">=</span><span class="n">course_id</span><span class="p">)</span>
+            <span class="n">nce</span><span class="o">.</span><span class="n">save</span><span class="p">()</span>
+            <span class="n">added_students</span><span class="o">.</span><span class="n">append</span><span class="p">(</span><span class="n">student</span><span class="p">)</span>
+        <span class="k">except</span><span class="p">:</span>
+            <span class="n">rejected_students</span><span class="o">.</span><span class="n">append</span><span class="p">(</span><span class="n">student</span><span class="p">)</span>
+
+    <span class="k">return</span> <span class="n">render_to_response</span><span class="p">(</span><span class="s">&quot;enroll_students.html&quot;</span><span class="p">,</span> <span class="p">{</span><span class="s">&#39;course&#39;</span><span class="p">:</span> <span class="n">course_id</span><span class="p">,</span>
+                                                       <span class="s">&#39;existing_students&#39;</span><span class="p">:</span> <span class="n">existing_students</span><span class="p">,</span>
+                                                       <span class="s">&#39;added_students&#39;</span><span class="p">:</span> <span class="n">added_students</span><span class="p">,</span>
+                                                       <span class="s">&#39;rejected_students&#39;</span><span class="p">:</span> <span class="n">rejected_students</span><span class="p">,</span>
+                                                       <span class="s">&#39;debug&#39;</span><span class="p">:</span> <span class="n">new_students</span><span class="p">})</span>
+
+</div>
+<div class="viewcode-block" id="get_answers_distribution"><a class="viewcode-back" href="../../lms.html#instructor.views.get_answers_distribution">[docs]</a><span class="k">def</span> <span class="nf">get_answers_distribution</span><span class="p">(</span><span class="n">request</span><span class="p">,</span> <span class="n">course_id</span><span class="p">):</span>
+    <span class="sd">&quot;&quot;&quot;</span>
+<span class="sd">    Get the distribution of answers for all graded problems in the course.</span>
+
+<span class="sd">    Return a dict with two keys:</span>
+<span class="sd">    &#39;header&#39;: a header row</span>
+<span class="sd">    &#39;data&#39;: a list of rows</span>
+<span class="sd">    &quot;&quot;&quot;</span>
+    <span class="n">course</span> <span class="o">=</span> <span class="n">get_course_with_access</span><span class="p">(</span><span class="n">request</span><span class="o">.</span><span class="n">user</span><span class="p">,</span> <span class="n">course_id</span><span class="p">,</span> <span class="s">&#39;staff&#39;</span><span class="p">)</span>
+
+    <span class="n">dist</span> <span class="o">=</span> <span class="n">grades</span><span class="o">.</span><span class="n">answer_distributions</span><span class="p">(</span><span class="n">request</span><span class="p">,</span> <span class="n">course</span><span class="p">)</span>
+
+    <span class="n">d</span> <span class="o">=</span> <span class="p">{}</span>
+    <span class="n">d</span><span class="p">[</span><span class="s">&#39;header&#39;</span><span class="p">]</span> <span class="o">=</span> <span class="p">[</span><span class="s">&#39;url_name&#39;</span><span class="p">,</span> <span class="s">&#39;display name&#39;</span><span class="p">,</span> <span class="s">&#39;answer id&#39;</span><span class="p">,</span> <span class="s">&#39;answer&#39;</span><span class="p">,</span> <span class="s">&#39;count&#39;</span><span class="p">]</span>
+
+    <span class="n">d</span><span class="p">[</span><span class="s">&#39;data&#39;</span><span class="p">]</span> <span class="o">=</span> <span class="p">[[</span><span class="n">url_name</span><span class="p">,</span> <span class="n">display_name</span><span class="p">,</span> <span class="n">answer_id</span><span class="p">,</span> <span class="n">a</span><span class="p">,</span> <span class="n">answers</span><span class="p">[</span><span class="n">a</span><span class="p">]]</span>
+                 <span class="k">for</span> <span class="p">(</span><span class="n">url_name</span><span class="p">,</span> <span class="n">display_name</span><span class="p">,</span> <span class="n">answer_id</span><span class="p">),</span> <span class="n">answers</span> <span class="ow">in</span> <span class="n">dist</span><span class="o">.</span><span class="n">items</span><span class="p">()</span>
+                 <span class="k">for</span> <span class="n">a</span> <span class="ow">in</span> <span class="n">answers</span><span class="p">]</span>
+    <span class="k">return</span> <span class="n">d</span>
+
+
+<span class="c">#-----------------------------------------------------------------------------</span>
+
+</div>
+<div class="viewcode-block" id="compute_course_stats"><a class="viewcode-back" href="../../lms.html#instructor.views.compute_course_stats">[docs]</a><span class="k">def</span> <span class="nf">compute_course_stats</span><span class="p">(</span><span class="n">course</span><span class="p">):</span>
+    <span class="sd">&#39;&#39;&#39;</span>
+<span class="sd">    Compute course statistics, including number of problems, videos, html.</span>
+
+<span class="sd">    course is a CourseDescriptor from the xmodule system.</span>
+<span class="sd">    &#39;&#39;&#39;</span>
+
+    <span class="c"># walk the course by using get_children() until we come to the leaves; count the</span>
+    <span class="c"># number of different leaf types</span>
+
+    <span class="n">counts</span> <span class="o">=</span> <span class="n">defaultdict</span><span class="p">(</span><span class="nb">int</span><span class="p">)</span>
+
+    <span class="k">def</span> <span class="nf">walk</span><span class="p">(</span><span class="n">module</span><span class="p">):</span>
+        <span class="n">children</span> <span class="o">=</span> <span class="n">module</span><span class="o">.</span><span class="n">get_children</span><span class="p">()</span>
+        <span class="n">category</span> <span class="o">=</span> <span class="n">module</span><span class="o">.</span><span class="n">__class__</span><span class="o">.</span><span class="n">__name__</span> 	<span class="c"># HtmlDescriptor, CapaDescriptor, ...</span>
+        <span class="n">counts</span><span class="p">[</span><span class="n">category</span><span class="p">]</span> <span class="o">+=</span> <span class="mi">1</span>
+        <span class="k">for</span> <span class="n">c</span> <span class="ow">in</span> <span class="n">children</span><span class="p">:</span>
+            <span class="n">walk</span><span class="p">(</span><span class="n">c</span><span class="p">)</span>
+
+    <span class="n">walk</span><span class="p">(</span><span class="n">course</span><span class="p">)</span>
+    <span class="n">stats</span> <span class="o">=</span> <span class="nb">dict</span><span class="p">(</span><span class="n">counts</span><span class="p">)</span>	<span class="c"># number of each kind of module</span>
+    <span class="k">return</span> <span class="n">stats</span></div>
+</pre></div>
+
+          </div>
+        </div>
+      </div>
+      <div class="clearer"></div>
+    </div>
+    <div class="related">
+      <h3>Navigation</h3>
+      <ul>
+        <li class="right" style="margin-right: 10px">
+          <a href="../../genindex.html" title="General Index"
+             >index</a></li>
+        <li class="right" >
+          <a href="../../py-modindex.html" title="Python Module Index"
+             >modules</a> |</li>
+        <li><a href="../../index.html">MITx 1.0 documentation</a> &raquo;</li>
+          <li><a href="../index.html" >Module code</a> &raquo;</li> 
+      </ul>
+    </div>
+    <div class="footer">
+        &copy; Copyright 2012, MITx team.
+      Created using <a href="http://sphinx.pocoo.org/">Sphinx</a> 1.1.3.
+    </div>
+  </body>
+</html>

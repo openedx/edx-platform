@@ -1,0 +1,241 @@
+
+
+<!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Transitional//EN"
+  "http://www.w3.org/TR/xhtml1/DTD/xhtml1-transitional.dtd">
+
+
+<html xmlns="http://www.w3.org/1999/xhtml">
+  <head>
+    <meta http-equiv="Content-Type" content="text/html; charset=utf-8" />
+    
+    <title>certificates.models &mdash; MITx 1.0 documentation</title>
+    
+    <link rel="stylesheet" href="../../_static/sphinxdoc.css" type="text/css" />
+    <link rel="stylesheet" href="../../_static/pygments.css" type="text/css" />
+    
+    <script type="text/javascript">
+      var DOCUMENTATION_OPTIONS = {
+        URL_ROOT:    '../../',
+        VERSION:     '1.0',
+        COLLAPSE_INDEX: false,
+        FILE_SUFFIX: '.html',
+        HAS_SOURCE:  true
+      };
+    </script>
+    <script type="text/javascript" src="../../_static/jquery.js"></script>
+    <script type="text/javascript" src="../../_static/underscore.js"></script>
+    <script type="text/javascript" src="../../_static/doctools.js"></script>
+    <script type="text/javascript" src="http://cdn.mathjax.org/mathjax/latest/MathJax.js?config=TeX-AMS-MML_HTMLorMML"></script>
+    <link rel="top" title="MITx 1.0 documentation" href="../../index.html" />
+    <link rel="up" title="Module code" href="../index.html" /> 
+  </head>
+  <body>
+<img src="../../_static/homepage-bg.jpg" alt="Edx logo"  width="100%;"/>
+
+    <div class="related">
+      <h3>Navigation</h3>
+      <ul>
+        <li class="right" style="margin-right: 10px">
+          <a href="../../genindex.html" title="General Index"
+             accesskey="I">index</a></li>
+        <li class="right" >
+          <a href="../../py-modindex.html" title="Python Module Index"
+             >modules</a> |</li>
+        <li><a href="../../index.html">MITx 1.0 documentation</a> &raquo;</li>
+          <li><a href="../index.html" accesskey="U">Module code</a> &raquo;</li> 
+      </ul>
+    </div>
+      <div class="sphinxsidebar">
+        <div class="sphinxsidebarwrapper">
+<div id="searchbox" style="display: none">
+  <h3>Quick search</h3>
+    <form class="search" action="../../search.html" method="get">
+      <input type="text" name="q" />
+      <input type="submit" value="Go" />
+      <input type="hidden" name="check_keywords" value="yes" />
+      <input type="hidden" name="area" value="default" />
+    </form>
+    <p class="searchtip" style="font-size: 90%">
+    Enter search terms or a module, class or function name.
+    </p>
+</div>
+<script type="text/javascript">$('#searchbox').show(0);</script>
+        </div>
+      </div>
+
+    <div class="document">
+      <div class="documentwrapper">
+        <div class="bodywrapper">
+          <div class="body">
+            
+  <h1>Source code for certificates.models</h1><div class="highlight"><pre>
+<span class="kn">from</span> <span class="nn">django.conf</span> <span class="kn">import</span> <span class="n">settings</span> <span class="k">as</span> <span class="n">settings</span>
+
+<span class="kn">from</span> <span class="nn">django.contrib.auth.models</span> <span class="kn">import</span> <span class="n">User</span>
+<span class="kn">from</span> <span class="nn">django.db</span> <span class="kn">import</span> <span class="n">models</span>
+
+
+<span class="sd">&#39;&#39;&#39;</span>
+<span class="sd">Certificates are created for a student and an offering of a course.</span>
+
+<span class="sd">When a certificate is generated, a unique ID is generated so that</span>
+<span class="sd">the certificate can be verified later. The ID is a UUID4, so that</span>
+<span class="sd">it can&#39;t be easily guessed and so that it is unique. Even though</span>
+<span class="sd">we save these generated certificates (for later verification), we</span>
+<span class="sd">also record the UUID so that if we regenerate the certificate it</span>
+<span class="sd">will have the same UUID.</span>
+
+<span class="sd">If certificates are being generated on the fly, a GeneratedCertificate</span>
+<span class="sd">should be created with the user, certificate_id, and enabled set</span>
+<span class="sd">when a student requests a certificate. When the certificate has been</span>
+<span class="sd">generated, the download_url should be set.</span>
+
+<span class="sd">Certificates can also be pre-generated. In this case, the user,</span>
+<span class="sd">certificate_id, and download_url are all set before the user does</span>
+<span class="sd">anything. When the user requests the certificate, only enabled</span>
+<span class="sd">needs to be set to true.</span>
+
+<span class="sd">&#39;&#39;&#39;</span>
+
+
+<div class="viewcode-block" id="GeneratedCertificate"><a class="viewcode-back" href="../../lms.html#certificates.models.GeneratedCertificate">[docs]</a><span class="k">class</span> <span class="nc">GeneratedCertificate</span><span class="p">(</span><span class="n">models</span><span class="o">.</span><span class="n">Model</span><span class="p">):</span>
+    <span class="n">user</span> <span class="o">=</span> <span class="n">models</span><span class="o">.</span><span class="n">ForeignKey</span><span class="p">(</span><span class="n">User</span><span class="p">,</span> <span class="n">db_index</span><span class="o">=</span><span class="bp">True</span><span class="p">)</span>
+    <span class="c"># This is the name at the time of request</span>
+    <span class="n">name</span> <span class="o">=</span> <span class="n">models</span><span class="o">.</span><span class="n">CharField</span><span class="p">(</span><span class="n">blank</span><span class="o">=</span><span class="bp">True</span><span class="p">,</span> <span class="n">max_length</span><span class="o">=</span><span class="mi">255</span><span class="p">)</span>
+
+    <span class="n">certificate_id</span> <span class="o">=</span> <span class="n">models</span><span class="o">.</span><span class="n">CharField</span><span class="p">(</span><span class="n">max_length</span><span class="o">=</span><span class="mi">32</span><span class="p">,</span> <span class="n">null</span><span class="o">=</span><span class="bp">True</span><span class="p">,</span> <span class="n">default</span><span class="o">=</span><span class="bp">None</span><span class="p">)</span>
+    <span class="n">graded_certificate_id</span> <span class="o">=</span> <span class="n">models</span><span class="o">.</span><span class="n">CharField</span><span class="p">(</span><span class="n">max_length</span><span class="o">=</span><span class="mi">32</span><span class="p">,</span> <span class="n">null</span><span class="o">=</span><span class="bp">True</span><span class="p">,</span> <span class="n">default</span><span class="o">=</span><span class="bp">None</span><span class="p">)</span>
+
+    <span class="n">download_url</span> <span class="o">=</span> <span class="n">models</span><span class="o">.</span><span class="n">CharField</span><span class="p">(</span><span class="n">max_length</span><span class="o">=</span><span class="mi">128</span><span class="p">,</span> <span class="n">null</span><span class="o">=</span><span class="bp">True</span><span class="p">)</span>
+    <span class="n">graded_download_url</span> <span class="o">=</span> <span class="n">models</span><span class="o">.</span><span class="n">CharField</span><span class="p">(</span><span class="n">max_length</span><span class="o">=</span><span class="mi">128</span><span class="p">,</span> <span class="n">null</span><span class="o">=</span><span class="bp">True</span><span class="p">)</span>
+
+    <span class="n">grade</span> <span class="o">=</span> <span class="n">models</span><span class="o">.</span><span class="n">CharField</span><span class="p">(</span><span class="n">max_length</span><span class="o">=</span><span class="mi">5</span><span class="p">,</span> <span class="n">null</span><span class="o">=</span><span class="bp">True</span><span class="p">)</span>
+
+    <span class="c"># enabled should only be true if the student has earned a grade in the course</span>
+    <span class="c"># The student must have a grade and request a certificate for enabled to be True</span>
+    <span class="n">enabled</span> <span class="o">=</span> <span class="n">models</span><span class="o">.</span><span class="n">BooleanField</span><span class="p">(</span><span class="n">default</span><span class="o">=</span><span class="bp">False</span><span class="p">)</span>
+
+</div>
+<div class="viewcode-block" id="RevokedCertificate"><a class="viewcode-back" href="../../lms.html#certificates.models.RevokedCertificate">[docs]</a><span class="k">class</span> <span class="nc">RevokedCertificate</span><span class="p">(</span><span class="n">models</span><span class="o">.</span><span class="n">Model</span><span class="p">):</span>
+    <span class="sd">&quot;&quot;&quot;</span>
+<span class="sd">    This model is for when a GeneratedCertificate must be regenerated. This model</span>
+<span class="sd">    contains all the same fields, to store a record of what the GeneratedCertificate</span>
+<span class="sd">    was before it was revoked (at which time all of it&#39;s information can change when</span>
+<span class="sd">    it is regenerated).</span>
+
+<span class="sd">    GeneratedCertificate may be deleted once they are revoked, and then created again.</span>
+<span class="sd">    For this reason, the only link between a GeneratedCertificate and RevokedCertificate</span>
+<span class="sd">    is that they share the same user.</span>
+<span class="sd">    &quot;&quot;&quot;</span>
+    <span class="c">####-------------------New Fields--------------------####</span>
+    <span class="n">explanation</span> <span class="o">=</span> <span class="n">models</span><span class="o">.</span><span class="n">TextField</span><span class="p">(</span><span class="n">blank</span><span class="o">=</span><span class="bp">True</span><span class="p">)</span>
+
+    <span class="c">####---------Fields from GeneratedCertificate---------####</span>
+    <span class="n">user</span> <span class="o">=</span> <span class="n">models</span><span class="o">.</span><span class="n">ForeignKey</span><span class="p">(</span><span class="n">User</span><span class="p">,</span> <span class="n">db_index</span><span class="o">=</span><span class="bp">True</span><span class="p">)</span>
+    <span class="c"># This is the name at the time of request</span>
+    <span class="n">name</span> <span class="o">=</span> <span class="n">models</span><span class="o">.</span><span class="n">CharField</span><span class="p">(</span><span class="n">blank</span><span class="o">=</span><span class="bp">True</span><span class="p">,</span> <span class="n">max_length</span><span class="o">=</span><span class="mi">255</span><span class="p">)</span>
+
+    <span class="n">certificate_id</span> <span class="o">=</span> <span class="n">models</span><span class="o">.</span><span class="n">CharField</span><span class="p">(</span><span class="n">max_length</span><span class="o">=</span><span class="mi">32</span><span class="p">,</span> <span class="n">null</span><span class="o">=</span><span class="bp">True</span><span class="p">,</span> <span class="n">default</span><span class="o">=</span><span class="bp">None</span><span class="p">)</span>
+    <span class="n">graded_certificate_id</span> <span class="o">=</span> <span class="n">models</span><span class="o">.</span><span class="n">CharField</span><span class="p">(</span><span class="n">max_length</span><span class="o">=</span><span class="mi">32</span><span class="p">,</span> <span class="n">null</span><span class="o">=</span><span class="bp">True</span><span class="p">,</span> <span class="n">default</span><span class="o">=</span><span class="bp">None</span><span class="p">)</span>
+
+    <span class="n">download_url</span> <span class="o">=</span> <span class="n">models</span><span class="o">.</span><span class="n">CharField</span><span class="p">(</span><span class="n">max_length</span><span class="o">=</span><span class="mi">128</span><span class="p">,</span> <span class="n">null</span><span class="o">=</span><span class="bp">True</span><span class="p">)</span>
+    <span class="n">graded_download_url</span> <span class="o">=</span> <span class="n">models</span><span class="o">.</span><span class="n">CharField</span><span class="p">(</span><span class="n">max_length</span><span class="o">=</span><span class="mi">128</span><span class="p">,</span> <span class="n">null</span><span class="o">=</span><span class="bp">True</span><span class="p">)</span>
+
+    <span class="n">grade</span> <span class="o">=</span> <span class="n">models</span><span class="o">.</span><span class="n">CharField</span><span class="p">(</span><span class="n">max_length</span><span class="o">=</span><span class="mi">5</span><span class="p">,</span> <span class="n">null</span><span class="o">=</span><span class="bp">True</span><span class="p">)</span>
+
+    <span class="n">enabled</span> <span class="o">=</span> <span class="n">models</span><span class="o">.</span><span class="n">BooleanField</span><span class="p">(</span><span class="n">default</span><span class="o">=</span><span class="bp">False</span><span class="p">)</span>
+
+</div>
+<div class="viewcode-block" id="revoke_certificate"><a class="viewcode-back" href="../../lms.html#certificates.models.revoke_certificate">[docs]</a><span class="k">def</span> <span class="nf">revoke_certificate</span><span class="p">(</span><span class="n">certificate</span><span class="p">,</span> <span class="n">explanation</span><span class="p">):</span>
+    <span class="sd">&quot;&quot;&quot;</span>
+<span class="sd">    This method takes a GeneratedCertificate. It records its information from the certificate</span>
+<span class="sd">    into a RevokedCertificate, and then marks the certificate as needing regenerating.</span>
+<span class="sd">    When the new certificiate is regenerated it will have new IDs and download URLS.</span>
+
+<span class="sd">    Once this method has been called, it is safe to delete the certificate, or modify the</span>
+<span class="sd">    certificate&#39;s name or grade until it has been generated again.</span>
+<span class="sd">    &quot;&quot;&quot;</span>
+    <span class="n">revoked</span> <span class="o">=</span> <span class="n">RevokedCertificate</span><span class="p">(</span><span class="n">user</span><span class="o">=</span><span class="n">certificate</span><span class="o">.</span><span class="n">user</span><span class="p">,</span>
+                                    <span class="n">name</span><span class="o">=</span><span class="n">certificate</span><span class="o">.</span><span class="n">name</span><span class="p">,</span>
+                                    <span class="n">certificate_id</span><span class="o">=</span><span class="n">certificate</span><span class="o">.</span><span class="n">certificate_id</span><span class="p">,</span>
+                                    <span class="n">graded_certificate_id</span><span class="o">=</span><span class="n">certificate</span><span class="o">.</span><span class="n">graded_certificate_id</span><span class="p">,</span>
+                                    <span class="n">download_url</span><span class="o">=</span><span class="n">certificate</span><span class="o">.</span><span class="n">download_url</span><span class="p">,</span>
+                                    <span class="n">graded_download_url</span><span class="o">=</span><span class="n">certificate</span><span class="o">.</span><span class="n">graded_download_url</span><span class="p">,</span>
+                                    <span class="n">grade</span><span class="o">=</span><span class="n">certificate</span><span class="o">.</span><span class="n">grade</span><span class="p">,</span>
+                                    <span class="n">enabled</span><span class="o">=</span><span class="n">certificate</span><span class="o">.</span><span class="n">enabled</span><span class="p">)</span>
+
+    <span class="n">revoked</span><span class="o">.</span><span class="n">explanation</span> <span class="o">=</span> <span class="n">explanation</span>
+
+    <span class="n">certificate</span><span class="o">.</span><span class="n">certificate_id</span> <span class="o">=</span> <span class="bp">None</span>
+    <span class="n">certificate</span><span class="o">.</span><span class="n">graded_certificate_id</span> <span class="o">=</span> <span class="bp">None</span>
+    <span class="n">certificate</span><span class="o">.</span><span class="n">download_url</span> <span class="o">=</span> <span class="bp">None</span>
+    <span class="n">certificate</span><span class="o">.</span><span class="n">graded_download_url</span> <span class="o">=</span> <span class="bp">None</span>
+
+    <span class="n">certificate</span><span class="o">.</span><span class="n">save</span><span class="p">()</span>
+    <span class="n">revoked</span><span class="o">.</span><span class="n">save</span><span class="p">()</span>
+
+</div>
+<div class="viewcode-block" id="certificate_state_for_student"><a class="viewcode-back" href="../../lms.html#certificates.models.certificate_state_for_student">[docs]</a><span class="k">def</span> <span class="nf">certificate_state_for_student</span><span class="p">(</span><span class="n">student</span><span class="p">,</span> <span class="n">grade</span><span class="p">):</span>
+    <span class="sd">&#39;&#39;&#39;</span>
+<span class="sd">    This returns a dictionary with a key for state, and other information. The state is one of the</span>
+<span class="sd">    following:</span>
+
+<span class="sd">    unavailable - A student is not eligible for a certificate.</span>
+<span class="sd">    requestable - A student is eligible to request a certificate</span>
+<span class="sd">    generating - A student has requested a certificate, but it is not generated yet.</span>
+<span class="sd">    downloadable - The certificate has been requested and is available for download.</span>
+
+<span class="sd">    If the state is &quot;downloadable&quot;, the dictionary also contains &quot;download_url&quot; and &quot;graded_download_url&quot;.</span>
+
+<span class="sd">    &#39;&#39;&#39;</span>
+
+    <span class="k">if</span> <span class="n">grade</span><span class="p">:</span>
+        <span class="c">#TODO: Remove the following after debugging</span>
+        <span class="k">if</span> <span class="n">settings</span><span class="o">.</span><span class="n">DEBUG_SURVEY</span><span class="p">:</span>
+            <span class="k">return</span> <span class="p">{</span><span class="s">&#39;state&#39;</span><span class="p">:</span> <span class="s">&#39;requestable&#39;</span><span class="p">}</span>
+
+        <span class="k">try</span><span class="p">:</span>
+            <span class="n">generated_certificate</span> <span class="o">=</span> <span class="n">GeneratedCertificate</span><span class="o">.</span><span class="n">objects</span><span class="o">.</span><span class="n">get</span><span class="p">(</span><span class="n">user</span><span class="o">=</span><span class="n">student</span><span class="p">)</span>
+            <span class="k">if</span> <span class="n">generated_certificate</span><span class="o">.</span><span class="n">enabled</span><span class="p">:</span>
+                <span class="k">if</span> <span class="n">generated_certificate</span><span class="o">.</span><span class="n">download_url</span><span class="p">:</span>
+                    <span class="k">return</span> <span class="p">{</span><span class="s">&#39;state&#39;</span><span class="p">:</span> <span class="s">&#39;downloadable&#39;</span><span class="p">,</span>
+                             <span class="s">&#39;download_url&#39;</span><span class="p">:</span> <span class="n">generated_certificate</span><span class="o">.</span><span class="n">download_url</span><span class="p">,</span>
+                             <span class="s">&#39;graded_download_url&#39;</span><span class="p">:</span> <span class="n">generated_certificate</span><span class="o">.</span><span class="n">graded_download_url</span><span class="p">}</span>
+                <span class="k">else</span><span class="p">:</span>
+                    <span class="k">return</span> <span class="p">{</span><span class="s">&#39;state&#39;</span><span class="p">:</span> <span class="s">&#39;generating&#39;</span><span class="p">}</span>
+            <span class="k">else</span><span class="p">:</span>
+                <span class="c"># If enabled=False, it may have been pre-generated but not yet requested</span>
+                <span class="c"># Our output will be the same as if the GeneratedCertificate did not exist</span>
+                <span class="k">pass</span>
+        <span class="k">except</span> <span class="n">GeneratedCertificate</span><span class="o">.</span><span class="n">DoesNotExist</span><span class="p">:</span>
+            <span class="k">pass</span>
+        <span class="k">return</span> <span class="p">{</span><span class="s">&#39;state&#39;</span><span class="p">:</span> <span class="s">&#39;requestable&#39;</span><span class="p">}</span>
+    <span class="k">else</span><span class="p">:</span>
+        <span class="c"># No grade, no certificate. No exceptions</span>
+        <span class="k">return</span> <span class="p">{</span><span class="s">&#39;state&#39;</span><span class="p">:</span> <span class="s">&#39;unavailable&#39;</span><span class="p">}</span></div>
+</pre></div>
+
+          </div>
+        </div>
+      </div>
+      <div class="clearer"></div>
+    </div>
+    <div class="related">
+      <h3>Navigation</h3>
+      <ul>
+        <li class="right" style="margin-right: 10px">
+          <a href="../../genindex.html" title="General Index"
+             >index</a></li>
+        <li class="right" >
+          <a href="../../py-modindex.html" title="Python Module Index"
+             >modules</a> |</li>
+        <li><a href="../../index.html">MITx 1.0 documentation</a> &raquo;</li>
+          <li><a href="../index.html" >Module code</a> &raquo;</li> 
+      </ul>
+    </div>
+    <div class="footer">
+        &copy; Copyright 2012, MITx team.
+      Created using <a href="http://sphinx.pocoo.org/">Sphinx</a> 1.1.3.
+    </div>
+  </body>
+</html>

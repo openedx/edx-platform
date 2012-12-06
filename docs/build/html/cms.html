@@ -1,0 +1,244 @@
+
+
+<!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Transitional//EN"
+  "http://www.w3.org/TR/xhtml1/DTD/xhtml1-transitional.dtd">
+
+
+<html xmlns="http://www.w3.org/1999/xhtml">
+  <head>
+    <meta http-equiv="Content-Type" content="text/html; charset=utf-8" />
+    
+    <title>CMS module &mdash; MITx 1.0 documentation</title>
+    
+    <link rel="stylesheet" href="_static/sphinxdoc.css" type="text/css" />
+    <link rel="stylesheet" href="_static/pygments.css" type="text/css" />
+    
+    <script type="text/javascript">
+      var DOCUMENTATION_OPTIONS = {
+        URL_ROOT:    '',
+        VERSION:     '1.0',
+        COLLAPSE_INDEX: false,
+        FILE_SUFFIX: '.html',
+        HAS_SOURCE:  true
+      };
+    </script>
+    <script type="text/javascript" src="_static/jquery.js"></script>
+    <script type="text/javascript" src="_static/underscore.js"></script>
+    <script type="text/javascript" src="_static/doctools.js"></script>
+    <script type="text/javascript" src="http://cdn.mathjax.org/mathjax/latest/MathJax.js?config=TeX-AMS-MML_HTMLorMML"></script>
+    <link rel="top" title="MITx 1.0 documentation" href="index.html" />
+    <link rel="up" title="Django applications" href="djangoapps.html" />
+    <link rel="next" title="Common" href="djangoapps-common.html" />
+    <link rel="prev" title="LMS module" href="lms.html" /> 
+  </head>
+  <body>
+<img src="_static/homepage-bg.jpg" alt="Edx logo"  width="100%;"/>
+
+    <div class="related">
+      <h3>Navigation</h3>
+      <ul>
+        <li class="right" style="margin-right: 10px">
+          <a href="genindex.html" title="General Index"
+             accesskey="I">index</a></li>
+        <li class="right" >
+          <a href="py-modindex.html" title="Python Module Index"
+             >modules</a> |</li>
+        <li class="right" >
+          <a href="djangoapps-common.html" title="Common"
+             accesskey="N">next</a> |</li>
+        <li class="right" >
+          <a href="lms.html" title="LMS module"
+             accesskey="P">previous</a> |</li>
+        <li><a href="index.html">MITx 1.0 documentation</a> &raquo;</li>
+          <li><a href="djangoapps.html" accesskey="U">Django applications</a> &raquo;</li> 
+      </ul>
+    </div>
+      <div class="sphinxsidebar">
+        <div class="sphinxsidebarwrapper">
+  <h3><a href="index.html">Table Of Contents</a></h3>
+  <ul>
+<li><a class="reference internal" href="#">CMS module</a><ul>
+<li><a class="reference internal" href="#module-auth">Auth</a><ul>
+<li><a class="reference internal" href="#module-auth.authz">Authz</a></li>
+</ul>
+</li>
+<li><a class="reference internal" href="#content-store">Content store</a></li>
+<li><a class="reference internal" href="#module-github_sync">Github sync</a><ul>
+<li><a class="reference internal" href="#module-github_sync.exceptions">Exceptions</a></li>
+<li><a class="reference internal" href="#module-github_sync.views">Views</a></li>
+<li><a class="reference internal" href="#module-github_sync.management">Management</a></li>
+<li><a class="reference internal" href="#tests">Tests</a></li>
+</ul>
+</li>
+</ul>
+</li>
+</ul>
+
+  <h4>Previous topic</h4>
+  <p class="topless"><a href="lms.html"
+                        title="previous chapter">LMS module</a></p>
+  <h4>Next topic</h4>
+  <p class="topless"><a href="djangoapps-common.html"
+                        title="next chapter">Common</a></p>
+  <h3>This Page</h3>
+  <ul class="this-page-menu">
+    <li><a href="_sources/cms.txt"
+           rel="nofollow">Show Source</a></li>
+  </ul>
+<div id="searchbox" style="display: none">
+  <h3>Quick search</h3>
+    <form class="search" action="search.html" method="get">
+      <input type="text" name="q" />
+      <input type="submit" value="Go" />
+      <input type="hidden" name="check_keywords" value="yes" />
+      <input type="hidden" name="area" value="default" />
+    </form>
+    <p class="searchtip" style="font-size: 90%">
+    Enter search terms or a module, class or function name.
+    </p>
+</div>
+<script type="text/javascript">$('#searchbox').show(0);</script>
+        </div>
+      </div>
+
+    <div class="document">
+      <div class="documentwrapper">
+        <div class="bodywrapper">
+          <div class="body">
+            
+  <div class="section" id="module-cms">
+<span id="cms-module"></span><h1>CMS module<a class="headerlink" href="#module-cms" title="Permalink to this headline">¶</a></h1>
+<div class="section" id="module-auth">
+<span id="auth"></span><h2>Auth<a class="headerlink" href="#module-auth" title="Permalink to this headline">¶</a></h2>
+<div class="section" id="module-auth.authz">
+<span id="authz"></span><h3>Authz<a class="headerlink" href="#module-auth.authz" title="Permalink to this headline">¶</a></h3>
+</div>
+</div>
+<div class="section" id="content-store">
+<h2>Content store<a class="headerlink" href="#content-store" title="Permalink to this headline">¶</a></h2>
+</div>
+<div class="section" id="module-github_sync">
+<span id="github-sync"></span><h2>Github sync<a class="headerlink" href="#module-github_sync" title="Permalink to this headline">¶</a></h2>
+<dl class="class">
+<dt id="github_sync.RepoSettings">
+<em class="property">class </em><tt class="descclassname">github_sync.</tt><tt class="descname">RepoSettings</tt><a class="headerlink" href="#github_sync.RepoSettings" title="Permalink to this definition">¶</a></dt>
+<dd><p>Bases: <tt class="xref py py-class docutils literal"><span class="pre">tuple</span></tt></p>
+<p>RepoSettings(path, branch, origin)</p>
+<dl class="attribute">
+<dt id="github_sync.RepoSettings.branch">
+<tt class="descname">branch</tt><a class="headerlink" href="#github_sync.RepoSettings.branch" title="Permalink to this definition">¶</a></dt>
+<dd><p>Alias for field number 1</p>
+</dd></dl>
+
+<dl class="attribute">
+<dt id="github_sync.RepoSettings.origin">
+<tt class="descname">origin</tt><a class="headerlink" href="#github_sync.RepoSettings.origin" title="Permalink to this definition">¶</a></dt>
+<dd><p>Alias for field number 2</p>
+</dd></dl>
+
+<dl class="attribute">
+<dt id="github_sync.RepoSettings.path">
+<tt class="descname">path</tt><a class="headerlink" href="#github_sync.RepoSettings.path" title="Permalink to this definition">¶</a></dt>
+<dd><p>Alias for field number 0</p>
+</dd></dl>
+
+</dd></dl>
+
+<dl class="function">
+<dt id="github_sync.export_to_github">
+<tt class="descclassname">github_sync.</tt><tt class="descname">export_to_github</tt><big>(</big><em>course</em>, <em>commit_message</em>, <em>author_str=None</em><big>)</big><a class="reference internal" href="_modules/github_sync.html#export_to_github"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#github_sync.export_to_github" title="Permalink to this definition">¶</a></dt>
+<dd><p>Commit any changes to the specified course with given commit message,
+and push to github (if MITX_FEATURES[&#8216;GITHUB_PUSH&#8217;] is True).
+If author_str is specified, uses it in the commit.</p>
+</dd></dl>
+
+<dl class="function">
+<dt id="github_sync.import_from_github">
+<tt class="descclassname">github_sync.</tt><tt class="descname">import_from_github</tt><big>(</big><em>repo_settings</em><big>)</big><a class="reference internal" href="_modules/github_sync.html#import_from_github"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#github_sync.import_from_github" title="Permalink to this definition">¶</a></dt>
+<dd><p>Imports data into the modulestore based on the XML stored on github</p>
+</dd></dl>
+
+<dl class="function">
+<dt id="github_sync.load_repo_settings">
+<tt class="descclassname">github_sync.</tt><tt class="descname">load_repo_settings</tt><big>(</big><em>course_dir</em><big>)</big><a class="reference internal" href="_modules/github_sync.html#load_repo_settings"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#github_sync.load_repo_settings" title="Permalink to this definition">¶</a></dt>
+<dd><p>Returns the repo_settings for the course stored in course_dir</p>
+</dd></dl>
+
+<dl class="function">
+<dt id="github_sync.setup_repo">
+<tt class="descclassname">github_sync.</tt><tt class="descname">setup_repo</tt><big>(</big><em>repo_settings</em><big>)</big><a class="reference internal" href="_modules/github_sync.html#setup_repo"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#github_sync.setup_repo" title="Permalink to this definition">¶</a></dt>
+<dd><p>Reset the local github repo specified by repo_settings</p>
+<p>repo_settings (RepoSettings): The settings for the repo to reset</p>
+</dd></dl>
+
+<dl class="function">
+<dt id="github_sync.sync_all_with_github">
+<tt class="descclassname">github_sync.</tt><tt class="descname">sync_all_with_github</tt><big>(</big><big>)</big><a class="reference internal" href="_modules/github_sync.html#sync_all_with_github"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#github_sync.sync_all_with_github" title="Permalink to this definition">¶</a></dt>
+<dd><p>Sync all defined repositories from github</p>
+</dd></dl>
+
+<dl class="function">
+<dt id="github_sync.sync_with_github">
+<tt class="descclassname">github_sync.</tt><tt class="descname">sync_with_github</tt><big>(</big><em>repo_settings</em><big>)</big><a class="reference internal" href="_modules/github_sync.html#sync_with_github"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#github_sync.sync_with_github" title="Permalink to this definition">¶</a></dt>
+<dd><p>Sync specified repository from github</p>
+<p>repo_settings: A RepoSettings defining which repo to sync</p>
+</dd></dl>
+
+<div class="section" id="module-github_sync.exceptions">
+<span id="exceptions"></span><h3>Exceptions<a class="headerlink" href="#module-github_sync.exceptions" title="Permalink to this headline">¶</a></h3>
+</div>
+<div class="section" id="module-github_sync.views">
+<span id="views"></span><h3>Views<a class="headerlink" href="#module-github_sync.views" title="Permalink to this headline">¶</a></h3>
+<dl class="function">
+<dt id="github_sync.views.github_post_receive">
+<tt class="descclassname">github_sync.views.</tt><tt class="descname">github_post_receive</tt><big>(</big><em>*args</em>, <em>**kwargs</em><big>)</big><a class="reference internal" href="_modules/github_sync/views.html#github_post_receive"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#github_sync.views.github_post_receive" title="Permalink to this definition">¶</a></dt>
+<dd><p>This view recieves post-receive requests from github whenever one of
+the watched repositiories changes.</p>
+<p>It is responsible for updating the relevant local git repo,
+importing the new version of the course (if anything changed),
+and then pushing back to github any changes that happened as part of the
+import.</p>
+<p>The github request format is described here: <a class="reference external" href="https://help.github.com/articles/post-receive-hooks">https://help.github.com/articles/post-receive-hooks</a></p>
+</dd></dl>
+
+</div>
+<div class="section" id="module-github_sync.management">
+<span id="management"></span><h3>Management<a class="headerlink" href="#module-github_sync.management" title="Permalink to this headline">¶</a></h3>
+</div>
+<div class="section" id="tests">
+<h3>Tests<a class="headerlink" href="#tests" title="Permalink to this headline">¶</a></h3>
+</div>
+</div>
+</div>
+
+
+          </div>
+        </div>
+      </div>
+      <div class="clearer"></div>
+    </div>
+    <div class="related">
+      <h3>Navigation</h3>
+      <ul>
+        <li class="right" style="margin-right: 10px">
+          <a href="genindex.html" title="General Index"
+             >index</a></li>
+        <li class="right" >
+          <a href="py-modindex.html" title="Python Module Index"
+             >modules</a> |</li>
+        <li class="right" >
+          <a href="djangoapps-common.html" title="Common"
+             >next</a> |</li>
+        <li class="right" >
+          <a href="lms.html" title="LMS module"
+             >previous</a> |</li>
+        <li><a href="index.html">MITx 1.0 documentation</a> &raquo;</li>
+          <li><a href="djangoapps.html" >Django applications</a> &raquo;</li> 
+      </ul>
+    </div>
+    <div class="footer">
+        &copy; Copyright 2012, MITx team.
+      Created using <a href="http://sphinx.pocoo.org/">Sphinx</a> 1.1.3.
+    </div>
+  </body>
+</html>

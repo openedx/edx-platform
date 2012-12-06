@@ -1,0 +1,198 @@
+
+
+<!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Transitional//EN"
+  "http://www.w3.org/TR/xhtml1/DTD/xhtml1-transitional.dtd">
+
+
+<html xmlns="http://www.w3.org/1999/xhtml">
+  <head>
+    <meta http-equiv="Content-Type" content="text/html; charset=utf-8" />
+    
+    <title>xmodule.backcompat_module &mdash; MITx 1.0 documentation</title>
+    
+    <link rel="stylesheet" href="../../_static/sphinxdoc.css" type="text/css" />
+    <link rel="stylesheet" href="../../_static/pygments.css" type="text/css" />
+    
+    <script type="text/javascript">
+      var DOCUMENTATION_OPTIONS = {
+        URL_ROOT:    '../../',
+        VERSION:     '1.0',
+        COLLAPSE_INDEX: false,
+        FILE_SUFFIX: '.html',
+        HAS_SOURCE:  true
+      };
+    </script>
+    <script type="text/javascript" src="../../_static/jquery.js"></script>
+    <script type="text/javascript" src="../../_static/underscore.js"></script>
+    <script type="text/javascript" src="../../_static/doctools.js"></script>
+    <script type="text/javascript" src="http://cdn.mathjax.org/mathjax/latest/MathJax.js?config=TeX-AMS-MML_HTMLorMML"></script>
+    <link rel="top" title="MITx 1.0 documentation" href="../../index.html" />
+    <link rel="up" title="Module code" href="../index.html" /> 
+  </head>
+  <body>
+<img src="../../_static/homepage-bg.jpg" alt="Edx logo"  width="100%;"/>
+
+    <div class="related">
+      <h3>Navigation</h3>
+      <ul>
+        <li class="right" style="margin-right: 10px">
+          <a href="../../genindex.html" title="General Index"
+             accesskey="I">index</a></li>
+        <li class="right" >
+          <a href="../../py-modindex.html" title="Python Module Index"
+             >modules</a> |</li>
+        <li><a href="../../index.html">MITx 1.0 documentation</a> &raquo;</li>
+          <li><a href="../index.html" accesskey="U">Module code</a> &raquo;</li> 
+      </ul>
+    </div>
+      <div class="sphinxsidebar">
+        <div class="sphinxsidebarwrapper">
+<div id="searchbox" style="display: none">
+  <h3>Quick search</h3>
+    <form class="search" action="../../search.html" method="get">
+      <input type="text" name="q" />
+      <input type="submit" value="Go" />
+      <input type="hidden" name="check_keywords" value="yes" />
+      <input type="hidden" name="area" value="default" />
+    </form>
+    <p class="searchtip" style="font-size: 90%">
+    Enter search terms or a module, class or function name.
+    </p>
+</div>
+<script type="text/javascript">$('#searchbox').show(0);</script>
+        </div>
+      </div>
+
+    <div class="document">
+      <div class="documentwrapper">
+        <div class="bodywrapper">
+          <div class="body">
+            
+  <h1>Source code for xmodule.backcompat_module</h1><div class="highlight"><pre>
+<span class="sd">&quot;&quot;&quot;</span>
+<span class="sd">These modules exist to translate old format XML into newer, semantic forms</span>
+<span class="sd">&quot;&quot;&quot;</span>
+<span class="kn">from</span> <span class="nn">x_module</span> <span class="kn">import</span> <span class="n">XModuleDescriptor</span>
+<span class="kn">from</span> <span class="nn">lxml</span> <span class="kn">import</span> <span class="n">etree</span>
+<span class="kn">from</span> <span class="nn">functools</span> <span class="kn">import</span> <span class="n">wraps</span>
+<span class="kn">import</span> <span class="nn">logging</span>
+<span class="kn">import</span> <span class="nn">traceback</span>
+
+<span class="n">log</span> <span class="o">=</span> <span class="n">logging</span><span class="o">.</span><span class="n">getLogger</span><span class="p">(</span><span class="n">__name__</span><span class="p">)</span>
+
+
+<div class="viewcode-block" id="process_includes"><a class="viewcode-back" href="../../xmodule.html#xmodule.backcompat_module.process_includes">[docs]</a><span class="k">def</span> <span class="nf">process_includes</span><span class="p">(</span><span class="n">fn</span><span class="p">):</span>
+    <span class="sd">&quot;&quot;&quot;</span>
+<span class="sd">    Wraps a XModuleDescriptor.from_xml method, and modifies xml_data to replace</span>
+<span class="sd">    any immediate child &lt;include&gt; items with the contents of the file that they</span>
+<span class="sd">    are supposed to include</span>
+<span class="sd">    &quot;&quot;&quot;</span>
+    <span class="nd">@wraps</span><span class="p">(</span><span class="n">fn</span><span class="p">)</span>
+    <span class="k">def</span> <span class="nf">from_xml</span><span class="p">(</span><span class="n">cls</span><span class="p">,</span> <span class="n">xml_data</span><span class="p">,</span> <span class="n">system</span><span class="p">,</span> <span class="n">org</span><span class="o">=</span><span class="bp">None</span><span class="p">,</span> <span class="n">course</span><span class="o">=</span><span class="bp">None</span><span class="p">):</span>
+        <span class="n">xml_object</span> <span class="o">=</span> <span class="n">etree</span><span class="o">.</span><span class="n">fromstring</span><span class="p">(</span><span class="n">xml_data</span><span class="p">)</span>
+        <span class="n">next_include</span> <span class="o">=</span> <span class="n">xml_object</span><span class="o">.</span><span class="n">find</span><span class="p">(</span><span class="s">&#39;include&#39;</span><span class="p">)</span>
+        <span class="k">while</span> <span class="n">next_include</span> <span class="ow">is</span> <span class="ow">not</span> <span class="bp">None</span><span class="p">:</span>
+            <span class="n">system</span><span class="o">.</span><span class="n">error_tracker</span><span class="p">(</span><span class="s">&quot;WARNING: the &lt;include&gt; tag is deprecated, and will go away.&quot;</span><span class="p">)</span>
+            <span class="nb">file</span> <span class="o">=</span> <span class="n">next_include</span><span class="o">.</span><span class="n">get</span><span class="p">(</span><span class="s">&#39;file&#39;</span><span class="p">)</span>
+            <span class="n">parent</span> <span class="o">=</span> <span class="n">next_include</span><span class="o">.</span><span class="n">getparent</span><span class="p">()</span>
+
+            <span class="k">if</span> <span class="nb">file</span> <span class="ow">is</span> <span class="bp">None</span><span class="p">:</span>
+                <span class="k">continue</span>
+
+            <span class="k">try</span><span class="p">:</span>
+                <span class="n">ifp</span> <span class="o">=</span> <span class="n">system</span><span class="o">.</span><span class="n">resources_fs</span><span class="o">.</span><span class="n">open</span><span class="p">(</span><span class="nb">file</span><span class="p">)</span>
+                <span class="c"># read in and convert to XML</span>
+                <span class="n">incxml</span> <span class="o">=</span> <span class="n">etree</span><span class="o">.</span><span class="n">XML</span><span class="p">(</span><span class="n">ifp</span><span class="o">.</span><span class="n">read</span><span class="p">())</span>
+
+                <span class="c"># insert  new XML into tree in place of include</span>
+                <span class="n">parent</span><span class="o">.</span><span class="n">insert</span><span class="p">(</span><span class="n">parent</span><span class="o">.</span><span class="n">index</span><span class="p">(</span><span class="n">next_include</span><span class="p">),</span> <span class="n">incxml</span><span class="p">)</span>
+            <span class="k">except</span> <span class="ne">Exception</span><span class="p">:</span>
+                <span class="c"># Log error</span>
+                <span class="n">msg</span> <span class="o">=</span> <span class="s">&quot;Error in problem xml include: </span><span class="si">%s</span><span class="s">&quot;</span> <span class="o">%</span> <span class="p">(</span>
+                    <span class="n">etree</span><span class="o">.</span><span class="n">tostring</span><span class="p">(</span><span class="n">next_include</span><span class="p">,</span> <span class="n">pretty_print</span><span class="o">=</span><span class="bp">True</span><span class="p">))</span>
+                <span class="c"># tell the tracker</span>
+                <span class="n">system</span><span class="o">.</span><span class="n">error_tracker</span><span class="p">(</span><span class="n">msg</span><span class="p">)</span>
+
+                <span class="c"># work around</span>
+                <span class="n">parent</span> <span class="o">=</span> <span class="n">next_include</span><span class="o">.</span><span class="n">getparent</span><span class="p">()</span>
+                <span class="n">errorxml</span> <span class="o">=</span> <span class="n">etree</span><span class="o">.</span><span class="n">Element</span><span class="p">(</span><span class="s">&#39;error&#39;</span><span class="p">)</span>
+                <span class="n">messagexml</span> <span class="o">=</span> <span class="n">etree</span><span class="o">.</span><span class="n">SubElement</span><span class="p">(</span><span class="n">errorxml</span><span class="p">,</span> <span class="s">&#39;message&#39;</span><span class="p">)</span>
+                <span class="n">messagexml</span><span class="o">.</span><span class="n">text</span> <span class="o">=</span> <span class="n">msg</span>
+                <span class="n">stackxml</span> <span class="o">=</span> <span class="n">etree</span><span class="o">.</span><span class="n">SubElement</span><span class="p">(</span><span class="n">errorxml</span><span class="p">,</span> <span class="s">&#39;stacktrace&#39;</span><span class="p">)</span>
+                <span class="n">stackxml</span><span class="o">.</span><span class="n">text</span> <span class="o">=</span> <span class="n">traceback</span><span class="o">.</span><span class="n">format_exc</span><span class="p">()</span>
+                <span class="c"># insert error XML in place of include</span>
+                <span class="n">parent</span><span class="o">.</span><span class="n">insert</span><span class="p">(</span><span class="n">parent</span><span class="o">.</span><span class="n">index</span><span class="p">(</span><span class="n">next_include</span><span class="p">),</span> <span class="n">errorxml</span><span class="p">)</span>
+
+            <span class="n">parent</span><span class="o">.</span><span class="n">remove</span><span class="p">(</span><span class="n">next_include</span><span class="p">)</span>
+
+            <span class="n">next_include</span> <span class="o">=</span> <span class="n">xml_object</span><span class="o">.</span><span class="n">find</span><span class="p">(</span><span class="s">&#39;include&#39;</span><span class="p">)</span>
+        <span class="k">return</span> <span class="n">fn</span><span class="p">(</span><span class="n">cls</span><span class="p">,</span> <span class="n">etree</span><span class="o">.</span><span class="n">tostring</span><span class="p">(</span><span class="n">xml_object</span><span class="p">),</span> <span class="n">system</span><span class="p">,</span> <span class="n">org</span><span class="p">,</span> <span class="n">course</span><span class="p">)</span>
+    <span class="k">return</span> <span class="n">from_xml</span>
+
+</div>
+<span class="k">class</span> <span class="nc">SemanticSectionDescriptor</span><span class="p">(</span><span class="n">XModuleDescriptor</span><span class="p">):</span>
+    <span class="nd">@classmethod</span>
+    <span class="nd">@process_includes</span>
+    <span class="k">def</span> <span class="nf">from_xml</span><span class="p">(</span><span class="n">cls</span><span class="p">,</span> <span class="n">xml_data</span><span class="p">,</span> <span class="n">system</span><span class="p">,</span> <span class="n">org</span><span class="o">=</span><span class="bp">None</span><span class="p">,</span> <span class="n">course</span><span class="o">=</span><span class="bp">None</span><span class="p">):</span>
+        <span class="sd">&quot;&quot;&quot;</span>
+<span class="sd">        Removes sections with single child elements in favor of just embedding</span>
+<span class="sd">        the child element</span>
+<span class="sd">        &quot;&quot;&quot;</span>
+        <span class="n">xml_object</span> <span class="o">=</span> <span class="n">etree</span><span class="o">.</span><span class="n">fromstring</span><span class="p">(</span><span class="n">xml_data</span><span class="p">)</span>
+        <span class="n">system</span><span class="o">.</span><span class="n">error_tracker</span><span class="p">(</span><span class="s">&quot;WARNING: the &lt;{0}&gt; tag is deprecated.  Please do not use in new content.&quot;</span>
+                             <span class="o">.</span><span class="n">format</span><span class="p">(</span><span class="n">xml_object</span><span class="o">.</span><span class="n">tag</span><span class="p">))</span>
+
+        <span class="k">if</span> <span class="nb">len</span><span class="p">(</span><span class="n">xml_object</span><span class="p">)</span> <span class="o">==</span> <span class="mi">1</span><span class="p">:</span>
+            <span class="k">for</span> <span class="p">(</span><span class="n">key</span><span class="p">,</span> <span class="n">val</span><span class="p">)</span> <span class="ow">in</span> <span class="n">xml_object</span><span class="o">.</span><span class="n">items</span><span class="p">():</span>
+                <span class="n">xml_object</span><span class="p">[</span><span class="mi">0</span><span class="p">]</span><span class="o">.</span><span class="n">set</span><span class="p">(</span><span class="n">key</span><span class="p">,</span> <span class="n">val</span><span class="p">)</span>
+
+            <span class="k">return</span> <span class="n">system</span><span class="o">.</span><span class="n">process_xml</span><span class="p">(</span><span class="n">etree</span><span class="o">.</span><span class="n">tostring</span><span class="p">(</span><span class="n">xml_object</span><span class="p">[</span><span class="mi">0</span><span class="p">]))</span>
+        <span class="k">else</span><span class="p">:</span>
+            <span class="n">xml_object</span><span class="o">.</span><span class="n">tag</span> <span class="o">=</span> <span class="s">&#39;sequential&#39;</span>
+            <span class="k">return</span> <span class="n">system</span><span class="o">.</span><span class="n">process_xml</span><span class="p">(</span><span class="n">etree</span><span class="o">.</span><span class="n">tostring</span><span class="p">(</span><span class="n">xml_object</span><span class="p">))</span>
+
+
+<span class="k">class</span> <span class="nc">TranslateCustomTagDescriptor</span><span class="p">(</span><span class="n">XModuleDescriptor</span><span class="p">):</span>
+    <span class="nd">@classmethod</span>
+    <span class="k">def</span> <span class="nf">from_xml</span><span class="p">(</span><span class="n">cls</span><span class="p">,</span> <span class="n">xml_data</span><span class="p">,</span> <span class="n">system</span><span class="p">,</span> <span class="n">org</span><span class="o">=</span><span class="bp">None</span><span class="p">,</span> <span class="n">course</span><span class="o">=</span><span class="bp">None</span><span class="p">):</span>
+        <span class="sd">&quot;&quot;&quot;</span>
+<span class="sd">        Transforms the xml_data from &lt;$custom_tag attr=&quot;&quot; attr=&quot;&quot;/&gt; to</span>
+<span class="sd">        &lt;customtag attr=&quot;&quot; attr=&quot;&quot; impl=&quot;$custom_tag&quot;/&gt;</span>
+<span class="sd">        &quot;&quot;&quot;</span>
+
+        <span class="n">xml_object</span> <span class="o">=</span> <span class="n">etree</span><span class="o">.</span><span class="n">fromstring</span><span class="p">(</span><span class="n">xml_data</span><span class="p">)</span>
+        <span class="n">system</span><span class="o">.</span><span class="n">error_tracker</span><span class="p">(</span><span class="s">&#39;WARNING: the &lt;{tag}&gt; tag is deprecated.  &#39;</span>
+                             <span class="s">&#39;Instead, use &lt;customtag impl=&quot;{tag}&quot; attr1=&quot;...&quot; attr2=&quot;...&quot;/&gt;. &#39;</span>
+                             <span class="o">.</span><span class="n">format</span><span class="p">(</span><span class="n">tag</span><span class="o">=</span><span class="n">xml_object</span><span class="o">.</span><span class="n">tag</span><span class="p">))</span>
+
+        <span class="n">tag</span> <span class="o">=</span> <span class="n">xml_object</span><span class="o">.</span><span class="n">tag</span>
+        <span class="n">xml_object</span><span class="o">.</span><span class="n">tag</span> <span class="o">=</span> <span class="s">&#39;customtag&#39;</span>
+        <span class="n">xml_object</span><span class="o">.</span><span class="n">attrib</span><span class="p">[</span><span class="s">&#39;impl&#39;</span><span class="p">]</span> <span class="o">=</span> <span class="n">tag</span>
+
+        <span class="k">return</span> <span class="n">system</span><span class="o">.</span><span class="n">process_xml</span><span class="p">(</span><span class="n">etree</span><span class="o">.</span><span class="n">tostring</span><span class="p">(</span><span class="n">xml_object</span><span class="p">))</span>
+</pre></div>
+
+          </div>
+        </div>
+      </div>
+      <div class="clearer"></div>
+    </div>
+    <div class="related">
+      <h3>Navigation</h3>
+      <ul>
+        <li class="right" style="margin-right: 10px">
+          <a href="../../genindex.html" title="General Index"
+             >index</a></li>
+        <li class="right" >
+          <a href="../../py-modindex.html" title="Python Module Index"
+             >modules</a> |</li>
+        <li><a href="../../index.html">MITx 1.0 documentation</a> &raquo;</li>
+          <li><a href="../index.html" >Module code</a> &raquo;</li> 
+      </ul>
+    </div>
+    <div class="footer">
+        &copy; Copyright 2012, MITx team.
+      Created using <a href="http://sphinx.pocoo.org/">Sphinx</a> 1.1.3.
+    </div>
+  </body>
+</html>

@@ -1,0 +1,490 @@
+
+
+<!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Transitional//EN"
+  "http://www.w3.org/TR/xhtml1/DTD/xhtml1-transitional.dtd">
+
+
+<html xmlns="http://www.w3.org/1999/xhtml">
+  <head>
+    <meta http-equiv="Content-Type" content="text/html; charset=utf-8" />
+    
+    <title>xmodule.graders &mdash; MITx 1.0 documentation</title>
+    
+    <link rel="stylesheet" href="../../_static/sphinxdoc.css" type="text/css" />
+    <link rel="stylesheet" href="../../_static/pygments.css" type="text/css" />
+    
+    <script type="text/javascript">
+      var DOCUMENTATION_OPTIONS = {
+        URL_ROOT:    '../../',
+        VERSION:     '1.0',
+        COLLAPSE_INDEX: false,
+        FILE_SUFFIX: '.html',
+        HAS_SOURCE:  true
+      };
+    </script>
+    <script type="text/javascript" src="../../_static/jquery.js"></script>
+    <script type="text/javascript" src="../../_static/underscore.js"></script>
+    <script type="text/javascript" src="../../_static/doctools.js"></script>
+    <script type="text/javascript" src="http://cdn.mathjax.org/mathjax/latest/MathJax.js?config=TeX-AMS-MML_HTMLorMML"></script>
+    <link rel="top" title="MITx 1.0 documentation" href="../../index.html" />
+    <link rel="up" title="Module code" href="../index.html" /> 
+  </head>
+  <body>
+<img src="../../_static/homepage-bg.jpg" alt="Edx logo"  width="100%;"/>
+
+    <div class="related">
+      <h3>Navigation</h3>
+      <ul>
+        <li class="right" style="margin-right: 10px">
+          <a href="../../genindex.html" title="General Index"
+             accesskey="I">index</a></li>
+        <li class="right" >
+          <a href="../../py-modindex.html" title="Python Module Index"
+             >modules</a> |</li>
+        <li><a href="../../index.html">MITx 1.0 documentation</a> &raquo;</li>
+          <li><a href="../index.html" accesskey="U">Module code</a> &raquo;</li> 
+      </ul>
+    </div>
+      <div class="sphinxsidebar">
+        <div class="sphinxsidebarwrapper">
+<div id="searchbox" style="display: none">
+  <h3>Quick search</h3>
+    <form class="search" action="../../search.html" method="get">
+      <input type="text" name="q" />
+      <input type="submit" value="Go" />
+      <input type="hidden" name="check_keywords" value="yes" />
+      <input type="hidden" name="area" value="default" />
+    </form>
+    <p class="searchtip" style="font-size: 90%">
+    Enter search terms or a module, class or function name.
+    </p>
+</div>
+<script type="text/javascript">$('#searchbox').show(0);</script>
+        </div>
+      </div>
+
+    <div class="document">
+      <div class="documentwrapper">
+        <div class="bodywrapper">
+          <div class="body">
+            
+  <h1>Source code for xmodule.graders</h1><div class="highlight"><pre>
+<span class="kn">import</span> <span class="nn">abc</span>
+<span class="kn">import</span> <span class="nn">inspect</span>
+<span class="kn">import</span> <span class="nn">json</span>
+<span class="kn">import</span> <span class="nn">logging</span>
+<span class="kn">import</span> <span class="nn">random</span>
+<span class="kn">import</span> <span class="nn">sys</span>
+
+<span class="kn">from</span> <span class="nn">collections</span> <span class="kn">import</span> <span class="n">namedtuple</span>
+
+<span class="n">log</span> <span class="o">=</span> <span class="n">logging</span><span class="o">.</span><span class="n">getLogger</span><span class="p">(</span><span class="s">&quot;mitx.courseware&quot;</span><span class="p">)</span>
+
+<span class="c"># This is a tuple for holding scores, either from problems or sections.</span>
+<span class="c"># Section either indicates the name of the problem or the name of the section</span>
+<span class="n">Score</span> <span class="o">=</span> <span class="n">namedtuple</span><span class="p">(</span><span class="s">&quot;Score&quot;</span><span class="p">,</span> <span class="s">&quot;earned possible graded section&quot;</span><span class="p">)</span>
+
+<div class="viewcode-block" id="load_grading_policy"><a class="viewcode-back" href="../../xmodule.html#xmodule.graders.load_grading_policy">[docs]</a><span class="k">def</span> <span class="nf">load_grading_policy</span><span class="p">(</span><span class="n">course_policy_string</span><span class="p">):</span>
+    <span class="sd">&quot;&quot;&quot;</span>
+<span class="sd">    This loads a grading policy from a string (usually read from a file),</span>
+<span class="sd">    which can be a JSON object or an empty string.</span>
+
+<span class="sd">    The JSON object can have the keys GRADER and GRADE_CUTOFFS. If either is</span>
+<span class="sd">    missing, it reverts to the default.</span>
+<span class="sd">    &quot;&quot;&quot;</span>
+
+    <span class="n">default_policy_string</span> <span class="o">=</span> <span class="s">&quot;&quot;&quot;</span>
+<span class="s">    {</span>
+<span class="s">        &quot;GRADER&quot; : [</span>
+<span class="s">            {</span>
+<span class="s">                &quot;type&quot; : &quot;Homework&quot;,</span>
+<span class="s">                &quot;min_count&quot; : 12,</span>
+<span class="s">                &quot;drop_count&quot; : 2,</span>
+<span class="s">                &quot;short_label&quot; : &quot;HW&quot;,</span>
+<span class="s">                &quot;weight&quot; : 0.15</span>
+<span class="s">            },</span>
+<span class="s">            {</span>
+<span class="s">                &quot;type&quot; : &quot;Lab&quot;,</span>
+<span class="s">                &quot;min_count&quot; : 12,</span>
+<span class="s">                &quot;drop_count&quot; : 2,</span>
+<span class="s">                &quot;category&quot; : &quot;Labs&quot;,</span>
+<span class="s">                &quot;weight&quot; : 0.15</span>
+<span class="s">            },</span>
+<span class="s">            {</span>
+<span class="s">                &quot;type&quot; : &quot;Midterm&quot;,</span>
+<span class="s">                &quot;name&quot; : &quot;Midterm Exam&quot;,</span>
+<span class="s">                &quot;short_label&quot; : &quot;Midterm&quot;,</span>
+<span class="s">                &quot;weight&quot; : 0.3</span>
+<span class="s">            },</span>
+<span class="s">            {</span>
+<span class="s">                &quot;type&quot; : &quot;Final&quot;,</span>
+<span class="s">                &quot;name&quot; : &quot;Final Exam&quot;,</span>
+<span class="s">                &quot;short_label&quot; : &quot;Final&quot;,</span>
+<span class="s">                &quot;weight&quot; : 0.4</span>
+<span class="s">            }</span>
+<span class="s">        ],</span>
+<span class="s">        &quot;GRADE_CUTOFFS&quot; : {</span>
+<span class="s">            &quot;A&quot; : 0.87,</span>
+<span class="s">            &quot;B&quot; : 0.7,</span>
+<span class="s">            &quot;C&quot; : 0.6</span>
+<span class="s">        }</span>
+<span class="s">    }</span>
+<span class="s">    &quot;&quot;&quot;</span>
+
+    <span class="c"># Load the global settings as a dictionary</span>
+    <span class="n">grading_policy</span> <span class="o">=</span> <span class="n">json</span><span class="o">.</span><span class="n">loads</span><span class="p">(</span><span class="n">default_policy_string</span><span class="p">)</span>
+
+    <span class="c"># Load the course policies as a dictionary</span>
+    <span class="n">course_policy</span> <span class="o">=</span> <span class="p">{}</span>
+    <span class="k">if</span> <span class="n">course_policy_string</span><span class="p">:</span>
+        <span class="n">course_policy</span> <span class="o">=</span> <span class="n">json</span><span class="o">.</span><span class="n">loads</span><span class="p">(</span><span class="n">course_policy_string</span><span class="p">)</span>
+
+    <span class="c"># Override any global settings with the course settings</span>
+    <span class="n">grading_policy</span><span class="o">.</span><span class="n">update</span><span class="p">(</span><span class="n">course_policy</span><span class="p">)</span>
+
+    <span class="c"># Here is where we should parse any configurations, so that we can fail early</span>
+    <span class="n">grading_policy</span><span class="p">[</span><span class="s">&#39;GRADER&#39;</span><span class="p">]</span> <span class="o">=</span> <span class="n">grader_from_conf</span><span class="p">(</span><span class="n">grading_policy</span><span class="p">[</span><span class="s">&#39;GRADER&#39;</span><span class="p">])</span>
+
+    <span class="k">return</span> <span class="n">grading_policy</span>
+
+</div>
+<div class="viewcode-block" id="aggregate_scores"><a class="viewcode-back" href="../../xmodule.html#xmodule.graders.aggregate_scores">[docs]</a><span class="k">def</span> <span class="nf">aggregate_scores</span><span class="p">(</span><span class="n">scores</span><span class="p">,</span> <span class="n">section_name</span><span class="o">=</span><span class="s">&quot;summary&quot;</span><span class="p">):</span>
+    <span class="sd">&quot;&quot;&quot;</span>
+<span class="sd">    scores: A list of Score objects</span>
+<span class="sd">    returns: A tuple (all_total, graded_total).</span>
+<span class="sd">        all_total: A Score representing the total score summed over all input scores</span>
+<span class="sd">        graded_total: A Score representing the score summed over all graded input scores</span>
+<span class="sd">    &quot;&quot;&quot;</span>
+    <span class="n">total_correct_graded</span> <span class="o">=</span> <span class="nb">sum</span><span class="p">(</span><span class="n">score</span><span class="o">.</span><span class="n">earned</span> <span class="k">for</span> <span class="n">score</span> <span class="ow">in</span> <span class="n">scores</span> <span class="k">if</span> <span class="n">score</span><span class="o">.</span><span class="n">graded</span><span class="p">)</span>
+    <span class="n">total_possible_graded</span> <span class="o">=</span> <span class="nb">sum</span><span class="p">(</span><span class="n">score</span><span class="o">.</span><span class="n">possible</span> <span class="k">for</span> <span class="n">score</span> <span class="ow">in</span> <span class="n">scores</span> <span class="k">if</span> <span class="n">score</span><span class="o">.</span><span class="n">graded</span><span class="p">)</span>
+
+    <span class="n">total_correct</span> <span class="o">=</span> <span class="nb">sum</span><span class="p">(</span><span class="n">score</span><span class="o">.</span><span class="n">earned</span> <span class="k">for</span> <span class="n">score</span> <span class="ow">in</span> <span class="n">scores</span><span class="p">)</span>
+    <span class="n">total_possible</span> <span class="o">=</span> <span class="nb">sum</span><span class="p">(</span><span class="n">score</span><span class="o">.</span><span class="n">possible</span> <span class="k">for</span> <span class="n">score</span> <span class="ow">in</span> <span class="n">scores</span><span class="p">)</span>
+
+    <span class="c">#regardless of whether or not it is graded</span>
+    <span class="n">all_total</span> <span class="o">=</span> <span class="n">Score</span><span class="p">(</span><span class="n">total_correct</span><span class="p">,</span>
+                      <span class="n">total_possible</span><span class="p">,</span>
+                      <span class="bp">False</span><span class="p">,</span>
+                      <span class="n">section_name</span><span class="p">)</span>
+    <span class="c">#selecting only graded things</span>
+    <span class="n">graded_total</span> <span class="o">=</span> <span class="n">Score</span><span class="p">(</span><span class="n">total_correct_graded</span><span class="p">,</span>
+                         <span class="n">total_possible_graded</span><span class="p">,</span>
+                         <span class="bp">True</span><span class="p">,</span>
+                         <span class="n">section_name</span><span class="p">)</span>
+
+    <span class="k">return</span> <span class="n">all_total</span><span class="p">,</span> <span class="n">graded_total</span>
+
+</div>
+<div class="viewcode-block" id="invalid_args"><a class="viewcode-back" href="../../xmodule.html#xmodule.graders.invalid_args">[docs]</a><span class="k">def</span> <span class="nf">invalid_args</span><span class="p">(</span><span class="n">func</span><span class="p">,</span> <span class="n">argdict</span><span class="p">):</span>
+    <span class="sd">&quot;&quot;&quot;</span>
+<span class="sd">    Given a function and a dictionary of arguments, returns a set of arguments</span>
+<span class="sd">    from argdict that aren&#39;t accepted by func</span>
+<span class="sd">    &quot;&quot;&quot;</span>
+    <span class="n">args</span><span class="p">,</span> <span class="n">varargs</span><span class="p">,</span> <span class="n">keywords</span><span class="p">,</span> <span class="n">defaults</span> <span class="o">=</span> <span class="n">inspect</span><span class="o">.</span><span class="n">getargspec</span><span class="p">(</span><span class="n">func</span><span class="p">)</span>
+    <span class="k">if</span> <span class="n">keywords</span><span class="p">:</span> <span class="k">return</span> <span class="nb">set</span><span class="p">()</span>  <span class="c"># All accepted</span>
+    <span class="k">return</span> <span class="nb">set</span><span class="p">(</span><span class="n">argdict</span><span class="p">)</span> <span class="o">-</span> <span class="nb">set</span><span class="p">(</span><span class="n">args</span><span class="p">)</span>
+</div>
+<div class="viewcode-block" id="grader_from_conf"><a class="viewcode-back" href="../../xmodule.html#xmodule.graders.grader_from_conf">[docs]</a><span class="k">def</span> <span class="nf">grader_from_conf</span><span class="p">(</span><span class="n">conf</span><span class="p">):</span>
+    <span class="sd">&quot;&quot;&quot;</span>
+<span class="sd">    This creates a CourseGrader from a configuration (such as in course_settings.py).</span>
+<span class="sd">    The conf can simply be an instance of CourseGrader, in which case no work is done.</span>
+<span class="sd">    More commonly, the conf is a list of dictionaries. A WeightedSubsectionsGrader</span>
+<span class="sd">    with AssignmentFormatGrader&#39;s or SingleSectionGrader&#39;s as subsections will be</span>
+<span class="sd">    generated. Every dictionary should contain the parameters for making either a</span>
+<span class="sd">    AssignmentFormatGrader or SingleSectionGrader, in addition to a &#39;weight&#39; key.</span>
+<span class="sd">    &quot;&quot;&quot;</span>
+    <span class="k">if</span> <span class="nb">isinstance</span><span class="p">(</span><span class="n">conf</span><span class="p">,</span> <span class="n">CourseGrader</span><span class="p">):</span>
+        <span class="k">return</span> <span class="n">conf</span>
+
+    <span class="n">subgraders</span> <span class="o">=</span> <span class="p">[]</span>
+    <span class="k">for</span> <span class="n">subgraderconf</span> <span class="ow">in</span> <span class="n">conf</span><span class="p">:</span>
+        <span class="n">subgraderconf</span> <span class="o">=</span> <span class="n">subgraderconf</span><span class="o">.</span><span class="n">copy</span><span class="p">()</span>
+        <span class="n">weight</span> <span class="o">=</span> <span class="n">subgraderconf</span><span class="o">.</span><span class="n">pop</span><span class="p">(</span><span class="s">&quot;weight&quot;</span><span class="p">,</span> <span class="mi">0</span><span class="p">)</span>
+        <span class="k">try</span><span class="p">:</span>
+            <span class="k">if</span> <span class="s">&#39;min_count&#39;</span> <span class="ow">in</span> <span class="n">subgraderconf</span><span class="p">:</span>
+                <span class="c">#This is an AssignmentFormatGrader</span>
+                <span class="n">subgrader_class</span> <span class="o">=</span> <span class="n">AssignmentFormatGrader</span>
+            <span class="k">elif</span> <span class="s">&#39;name&#39;</span> <span class="ow">in</span> <span class="n">subgraderconf</span><span class="p">:</span>
+                <span class="c">#This is an SingleSectionGrader</span>
+                <span class="n">subgrader_class</span> <span class="o">=</span> <span class="n">SingleSectionGrader</span>
+            <span class="k">else</span><span class="p">:</span>
+                <span class="k">raise</span> <span class="ne">ValueError</span><span class="p">(</span><span class="s">&quot;Configuration has no appropriate grader class.&quot;</span><span class="p">)</span>
+            
+            <span class="n">bad_args</span> <span class="o">=</span> <span class="n">invalid_args</span><span class="p">(</span><span class="n">subgrader_class</span><span class="o">.</span><span class="n">__init__</span><span class="p">,</span> <span class="n">subgraderconf</span><span class="p">)</span>
+            <span class="k">if</span> <span class="nb">len</span><span class="p">(</span><span class="n">bad_args</span><span class="p">)</span> <span class="o">&gt;</span> <span class="mi">0</span><span class="p">:</span>
+                <span class="n">log</span><span class="o">.</span><span class="n">warning</span><span class="p">(</span><span class="s">&quot;Invalid arguments for a subgrader: </span><span class="si">%s</span><span class="s">&quot;</span><span class="p">,</span> <span class="n">bad_args</span><span class="p">)</span>
+                <span class="k">for</span> <span class="n">key</span> <span class="ow">in</span> <span class="n">bad_args</span><span class="p">:</span>
+                    <span class="k">del</span> <span class="n">subgraderconf</span><span class="p">[</span><span class="n">key</span><span class="p">]</span>
+            
+            <span class="n">subgrader</span> <span class="o">=</span> <span class="n">subgrader_class</span><span class="p">(</span><span class="o">**</span><span class="n">subgraderconf</span><span class="p">)</span>
+            <span class="n">subgraders</span><span class="o">.</span><span class="n">append</span><span class="p">((</span><span class="n">subgrader</span><span class="p">,</span> <span class="n">subgrader</span><span class="o">.</span><span class="n">category</span><span class="p">,</span> <span class="n">weight</span><span class="p">))</span>
+
+        <span class="k">except</span> <span class="p">(</span><span class="ne">TypeError</span><span class="p">,</span> <span class="ne">ValueError</span><span class="p">)</span> <span class="k">as</span> <span class="n">error</span><span class="p">:</span>
+            <span class="c"># Add info and re-raise</span>
+            <span class="n">msg</span> <span class="o">=</span> <span class="p">(</span><span class="s">&quot;Unable to parse grader configuration:</span><span class="se">\n</span><span class="s">    &quot;</span> <span class="o">+</span>
+                   <span class="nb">str</span><span class="p">(</span><span class="n">subgraderconf</span><span class="p">)</span> <span class="o">+</span>
+                   <span class="s">&quot;</span><span class="se">\n</span><span class="s">    Error was:</span><span class="se">\n</span><span class="s">    &quot;</span> <span class="o">+</span> <span class="nb">str</span><span class="p">(</span><span class="n">error</span><span class="p">))</span>
+            <span class="k">raise</span> <span class="ne">ValueError</span><span class="p">(</span><span class="n">msg</span><span class="p">),</span> <span class="bp">None</span><span class="p">,</span> <span class="n">sys</span><span class="o">.</span><span class="n">exc_info</span><span class="p">()[</span><span class="mi">2</span><span class="p">]</span>
+
+    <span class="k">return</span> <span class="n">WeightedSubsectionsGrader</span><span class="p">(</span><span class="n">subgraders</span><span class="p">)</span>
+
+</div>
+<div class="viewcode-block" id="CourseGrader"><a class="viewcode-back" href="../../xmodule.html#xmodule.graders.CourseGrader">[docs]</a><span class="k">class</span> <span class="nc">CourseGrader</span><span class="p">(</span><span class="nb">object</span><span class="p">):</span>
+    <span class="sd">&quot;&quot;&quot;</span>
+<span class="sd">    A course grader takes the totaled scores for each graded section (that a student has</span>
+<span class="sd">    started) in the course. From these scores, the grader calculates an overall percentage</span>
+<span class="sd">    grade. The grader should also generate information about how that score was calculated,</span>
+<span class="sd">    to be displayed in graphs or charts.</span>
+
+<span class="sd">    A grader has one required method, grade(), which is passed a grade_sheet. The grade_sheet</span>
+<span class="sd">    contains scores for all graded section that the student has started. If a student has</span>
+<span class="sd">    a score of 0 for that section, it may be missing from the grade_sheet. The grade_sheet</span>
+<span class="sd">    is keyed by section format. Each value is a list of Score namedtuples for each section</span>
+<span class="sd">    that has the matching section format.</span>
+
+<span class="sd">    The grader outputs a dictionary with the following keys:</span>
+<span class="sd">    - percent: Contaisn a float value, which is the final percentage score for the student.</span>
+<span class="sd">    - section_breakdown: This is a list of dictionaries which provide details on sections</span>
+<span class="sd">    that were graded. These are used for display in a graph or chart. The format for a</span>
+<span class="sd">    section_breakdown dictionary is explained below.</span>
+<span class="sd">    - grade_breakdown: This is a list of dictionaries which provide details on the contributions</span>
+<span class="sd">    of the final percentage grade. This is a higher level breakdown, for when the grade is constructed</span>
+<span class="sd">    of a few very large sections (such as Homeworks, Labs, a Midterm, and a Final). The format for</span>
+<span class="sd">    a grade_breakdown is explained below. This section is optional.</span>
+
+<span class="sd">    A dictionary in the section_breakdown list has the following keys:</span>
+<span class="sd">    percent: A float percentage for the section.</span>
+<span class="sd">    label: A short string identifying the section. Preferably fixed-length. E.g. &quot;HW  3&quot;.</span>
+<span class="sd">    detail: A string explanation of the score. E.g. &quot;Homework 1 - Ohms Law - 83% (5/6)&quot;</span>
+<span class="sd">    category: A string identifying the category. Items with the same category are grouped together</span>
+<span class="sd">    in the display (for example, by color).</span>
+<span class="sd">    prominent: A boolean value indicating that this section should be displayed as more prominent</span>
+<span class="sd">    than other items.</span>
+
+<span class="sd">    A dictionary in the grade_breakdown list has the following keys:</span>
+<span class="sd">    percent: A float percentage in the breakdown. All percents should add up to the final percentage.</span>
+<span class="sd">    detail: A string explanation of this breakdown. E.g. &quot;Homework - 10% of a possible 15%&quot;</span>
+<span class="sd">    category: A string identifying the category. Items with the same category are grouped together</span>
+<span class="sd">    in the display (for example, by color).</span>
+
+
+<span class="sd">    &quot;&quot;&quot;</span>
+
+    <span class="n">__metaclass__</span> <span class="o">=</span> <span class="n">abc</span><span class="o">.</span><span class="n">ABCMeta</span>
+
+    <span class="nd">@abc.abstractmethod</span>
+    <span class="k">def</span> <span class="nf">grade</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">grade_sheet</span><span class="p">,</span> <span class="n">generate_random_scores</span><span class="o">=</span><span class="bp">False</span><span class="p">):</span>
+        <span class="k">raise</span> <span class="ne">NotImplementedError</span>
+
+</div>
+<div class="viewcode-block" id="WeightedSubsectionsGrader"><a class="viewcode-back" href="../../xmodule.html#xmodule.graders.WeightedSubsectionsGrader">[docs]</a><span class="k">class</span> <span class="nc">WeightedSubsectionsGrader</span><span class="p">(</span><span class="n">CourseGrader</span><span class="p">):</span>
+    <span class="sd">&quot;&quot;&quot;</span>
+<span class="sd">    This grader takes a list of tuples containing (grader, category_name, weight) and computes</span>
+<span class="sd">    a final grade by totalling the contribution of each sub grader and multiplying it by the</span>
+<span class="sd">    given weight. For example, the sections may be</span>
+<span class="sd">    [ (homeworkGrader, &quot;Homework&quot;, 0.15), (labGrader, &quot;Labs&quot;, 0.15), (midtermGrader, &quot;Midterm&quot;, 0.30), (finalGrader, &quot;Final&quot;, 0.40) ]</span>
+<span class="sd">    All items in section_breakdown for each subgrader will be combined. A grade_breakdown will be</span>
+<span class="sd">    composed using the score from each grader.</span>
+
+<span class="sd">    Note that the sum of the weights is not take into consideration. If the weights add up to</span>
+<span class="sd">    a value &gt; 1, the student may end up with a percent &gt; 100%. This allows for sections that</span>
+<span class="sd">    are extra credit.</span>
+<span class="sd">    &quot;&quot;&quot;</span>
+    <span class="k">def</span> <span class="nf">__init__</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">sections</span><span class="p">):</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">sections</span> <span class="o">=</span> <span class="n">sections</span>
+
+    <span class="k">def</span> <span class="nf">grade</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">grade_sheet</span><span class="p">,</span> <span class="n">generate_random_scores</span><span class="o">=</span><span class="bp">False</span><span class="p">):</span>
+        <span class="n">total_percent</span> <span class="o">=</span> <span class="mf">0.0</span>
+        <span class="n">section_breakdown</span> <span class="o">=</span> <span class="p">[]</span>
+        <span class="n">grade_breakdown</span> <span class="o">=</span> <span class="p">[]</span>
+
+        <span class="k">for</span> <span class="n">subgrader</span><span class="p">,</span> <span class="n">category</span><span class="p">,</span> <span class="n">weight</span> <span class="ow">in</span> <span class="bp">self</span><span class="o">.</span><span class="n">sections</span><span class="p">:</span>
+            <span class="n">subgrade_result</span> <span class="o">=</span> <span class="n">subgrader</span><span class="o">.</span><span class="n">grade</span><span class="p">(</span><span class="n">grade_sheet</span><span class="p">,</span> <span class="n">generate_random_scores</span><span class="p">)</span>
+
+            <span class="n">weightedPercent</span> <span class="o">=</span> <span class="n">subgrade_result</span><span class="p">[</span><span class="s">&#39;percent&#39;</span><span class="p">]</span> <span class="o">*</span> <span class="n">weight</span>
+            <span class="n">section_detail</span> <span class="o">=</span> <span class="s">&quot;{0} = {1:.1%} of a possible {2:.0%}&quot;</span><span class="o">.</span><span class="n">format</span><span class="p">(</span><span class="n">category</span><span class="p">,</span> <span class="n">weightedPercent</span><span class="p">,</span> <span class="n">weight</span><span class="p">)</span>
+
+            <span class="n">total_percent</span> <span class="o">+=</span> <span class="n">weightedPercent</span>
+            <span class="n">section_breakdown</span> <span class="o">+=</span> <span class="n">subgrade_result</span><span class="p">[</span><span class="s">&#39;section_breakdown&#39;</span><span class="p">]</span>
+            <span class="n">grade_breakdown</span><span class="o">.</span><span class="n">append</span><span class="p">({</span><span class="s">&#39;percent&#39;</span><span class="p">:</span> <span class="n">weightedPercent</span><span class="p">,</span> <span class="s">&#39;detail&#39;</span><span class="p">:</span> <span class="n">section_detail</span><span class="p">,</span> <span class="s">&#39;category&#39;</span><span class="p">:</span> <span class="n">category</span><span class="p">})</span>
+
+        <span class="k">return</span> <span class="p">{</span><span class="s">&#39;percent&#39;</span><span class="p">:</span> <span class="n">total_percent</span><span class="p">,</span>
+                <span class="s">&#39;section_breakdown&#39;</span><span class="p">:</span> <span class="n">section_breakdown</span><span class="p">,</span>
+                <span class="s">&#39;grade_breakdown&#39;</span><span class="p">:</span> <span class="n">grade_breakdown</span><span class="p">}</span>
+
+</div>
+<div class="viewcode-block" id="SingleSectionGrader"><a class="viewcode-back" href="../../xmodule.html#xmodule.graders.SingleSectionGrader">[docs]</a><span class="k">class</span> <span class="nc">SingleSectionGrader</span><span class="p">(</span><span class="n">CourseGrader</span><span class="p">):</span>
+    <span class="sd">&quot;&quot;&quot;</span>
+<span class="sd">    This grades a single section with the format &#39;type&#39; and the name &#39;name&#39;.</span>
+
+<span class="sd">    If the name is not appropriate for the short short_label or category, they each may</span>
+<span class="sd">    be specified individually.</span>
+<span class="sd">    &quot;&quot;&quot;</span>
+    <span class="k">def</span> <span class="nf">__init__</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="nb">type</span><span class="p">,</span> <span class="n">name</span><span class="p">,</span> <span class="n">short_label</span><span class="o">=</span><span class="bp">None</span><span class="p">,</span> <span class="n">category</span><span class="o">=</span><span class="bp">None</span><span class="p">):</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">type</span> <span class="o">=</span> <span class="nb">type</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">name</span> <span class="o">=</span> <span class="n">name</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">short_label</span> <span class="o">=</span> <span class="n">short_label</span> <span class="ow">or</span> <span class="n">name</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">category</span> <span class="o">=</span> <span class="n">category</span> <span class="ow">or</span> <span class="n">name</span>
+
+    <span class="k">def</span> <span class="nf">grade</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">grade_sheet</span><span class="p">,</span> <span class="n">generate_random_scores</span><span class="o">=</span><span class="bp">False</span><span class="p">):</span>
+        <span class="n">foundScore</span> <span class="o">=</span> <span class="bp">None</span>
+        <span class="k">if</span> <span class="bp">self</span><span class="o">.</span><span class="n">type</span> <span class="ow">in</span> <span class="n">grade_sheet</span><span class="p">:</span>
+            <span class="k">for</span> <span class="n">score</span> <span class="ow">in</span> <span class="n">grade_sheet</span><span class="p">[</span><span class="bp">self</span><span class="o">.</span><span class="n">type</span><span class="p">]:</span>
+                <span class="k">if</span> <span class="n">score</span><span class="o">.</span><span class="n">section</span> <span class="o">==</span> <span class="bp">self</span><span class="o">.</span><span class="n">name</span><span class="p">:</span>
+                    <span class="n">foundScore</span> <span class="o">=</span> <span class="n">score</span>
+                    <span class="k">break</span>
+
+        <span class="k">if</span> <span class="n">foundScore</span> <span class="ow">or</span> <span class="n">generate_random_scores</span><span class="p">:</span>
+            <span class="k">if</span> <span class="n">generate_random_scores</span><span class="p">:</span>	<span class="c"># for debugging!</span>
+                <span class="n">earned</span> <span class="o">=</span> <span class="n">random</span><span class="o">.</span><span class="n">randint</span><span class="p">(</span><span class="mi">2</span><span class="p">,</span><span class="mi">15</span><span class="p">)</span>
+                <span class="n">possible</span> <span class="o">=</span> <span class="n">random</span><span class="o">.</span><span class="n">randint</span><span class="p">(</span><span class="n">earned</span><span class="p">,</span> <span class="mi">15</span><span class="p">)</span>
+            <span class="k">else</span><span class="p">:</span> <span class="c"># We found the score</span>
+                <span class="n">earned</span> <span class="o">=</span> <span class="n">foundScore</span><span class="o">.</span><span class="n">earned</span>
+                <span class="n">possible</span> <span class="o">=</span> <span class="n">foundScore</span><span class="o">.</span><span class="n">possible</span>
+                
+            <span class="n">percent</span> <span class="o">=</span> <span class="n">earned</span> <span class="o">/</span> <span class="nb">float</span><span class="p">(</span><span class="n">possible</span><span class="p">)</span>
+            <span class="n">detail</span> <span class="o">=</span> <span class="s">&quot;{name} - {percent:.0%} ({earned:.3n}/{possible:.3n})&quot;</span><span class="o">.</span><span class="n">format</span><span class="p">(</span><span class="n">name</span><span class="o">=</span><span class="bp">self</span><span class="o">.</span><span class="n">name</span><span class="p">,</span>
+                                                                        <span class="n">percent</span><span class="o">=</span><span class="n">percent</span><span class="p">,</span>
+                                                                        <span class="n">earned</span><span class="o">=</span><span class="nb">float</span><span class="p">(</span><span class="n">earned</span><span class="p">),</span>
+                                                                        <span class="n">possible</span><span class="o">=</span><span class="nb">float</span><span class="p">(</span><span class="n">possible</span><span class="p">))</span>
+
+        <span class="k">else</span><span class="p">:</span>
+            <span class="n">percent</span> <span class="o">=</span> <span class="mf">0.0</span>
+            <span class="n">detail</span> <span class="o">=</span> <span class="s">&quot;{name} - 0% (?/?)&quot;</span><span class="o">.</span><span class="n">format</span><span class="p">(</span><span class="n">name</span><span class="o">=</span><span class="bp">self</span><span class="o">.</span><span class="n">name</span><span class="p">)</span>
+
+        <span class="n">breakdown</span> <span class="o">=</span> <span class="p">[{</span><span class="s">&#39;percent&#39;</span><span class="p">:</span> <span class="n">percent</span><span class="p">,</span> <span class="s">&#39;label&#39;</span><span class="p">:</span> <span class="bp">self</span><span class="o">.</span><span class="n">short_label</span><span class="p">,</span> <span class="s">&#39;detail&#39;</span><span class="p">:</span> <span class="n">detail</span><span class="p">,</span> <span class="s">&#39;category&#39;</span><span class="p">:</span> <span class="bp">self</span><span class="o">.</span><span class="n">category</span><span class="p">,</span> <span class="s">&#39;prominent&#39;</span><span class="p">:</span> <span class="bp">True</span><span class="p">}]</span>
+
+        <span class="k">return</span> <span class="p">{</span><span class="s">&#39;percent&#39;</span><span class="p">:</span> <span class="n">percent</span><span class="p">,</span>
+                <span class="s">&#39;section_breakdown&#39;</span><span class="p">:</span> <span class="n">breakdown</span><span class="p">,</span>
+                <span class="c">#No grade_breakdown here</span>
+                <span class="p">}</span>
+
+</div>
+<div class="viewcode-block" id="AssignmentFormatGrader"><a class="viewcode-back" href="../../xmodule.html#xmodule.graders.AssignmentFormatGrader">[docs]</a><span class="k">class</span> <span class="nc">AssignmentFormatGrader</span><span class="p">(</span><span class="n">CourseGrader</span><span class="p">):</span>
+    <span class="sd">&quot;&quot;&quot;</span>
+<span class="sd">    Grades all sections matching the format &#39;type&#39; with an equal weight. A specified</span>
+<span class="sd">    number of lowest scores can be dropped from the calculation. The minimum number of</span>
+<span class="sd">    sections in this format must be specified (even if those sections haven&#39;t been</span>
+<span class="sd">    written yet).</span>
+
+<span class="sd">    min_count defines how many assignments are expected throughout the course. Placeholder</span>
+<span class="sd">    scores (of 0) will be inserted if the number of matching sections in the course is &lt; min_count.</span>
+<span class="sd">    If there number of matching sections in the course is &gt; min_count, min_count will be ignored.</span>
+<span class="sd">    </span>
+<span class="sd">    show_only_average is to suppress the display of each assignment in this grader and instead</span>
+<span class="sd">    only show the total score of this grader in the breakdown.</span>
+
+<span class="sd">    category should be presentable to the user, but may not appear. When the grade breakdown is</span>
+<span class="sd">    displayed, scores from the same category will be similar (for example, by color).</span>
+
+<span class="sd">    section_type is a string that is the type of a singular section. For example, for Labs it</span>
+<span class="sd">    would be &quot;Lab&quot;. This defaults to be the same as category.</span>
+
+<span class="sd">    short_label is similar to section_type, but shorter. For example, for Homework it would be</span>
+<span class="sd">    &quot;HW&quot;.</span>
+<span class="sd">    </span>
+<span class="sd">    starting_index is the first number that will appear. For example, starting_index=3 and</span>
+<span class="sd">    min_count = 2 would produce the labels &quot;Assignment 3&quot;, &quot;Assignment 4&quot;</span>
+
+<span class="sd">    &quot;&quot;&quot;</span>
+    <span class="k">def</span> <span class="nf">__init__</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="nb">type</span><span class="p">,</span> <span class="n">min_count</span><span class="p">,</span> <span class="n">drop_count</span><span class="p">,</span> <span class="n">category</span><span class="o">=</span><span class="bp">None</span><span class="p">,</span> <span class="n">section_type</span><span class="o">=</span><span class="bp">None</span><span class="p">,</span> <span class="n">short_label</span><span class="o">=</span><span class="bp">None</span><span class="p">,</span> <span class="n">show_only_average</span><span class="o">=</span><span class="bp">False</span><span class="p">,</span> <span class="n">starting_index</span><span class="o">=</span><span class="mi">1</span><span class="p">):</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">type</span> <span class="o">=</span> <span class="nb">type</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">min_count</span> <span class="o">=</span> <span class="n">min_count</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">drop_count</span> <span class="o">=</span> <span class="n">drop_count</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">category</span> <span class="o">=</span> <span class="n">category</span> <span class="ow">or</span> <span class="bp">self</span><span class="o">.</span><span class="n">type</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">section_type</span> <span class="o">=</span> <span class="n">section_type</span> <span class="ow">or</span> <span class="bp">self</span><span class="o">.</span><span class="n">type</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">short_label</span> <span class="o">=</span> <span class="n">short_label</span> <span class="ow">or</span> <span class="bp">self</span><span class="o">.</span><span class="n">type</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">show_only_average</span> <span class="o">=</span> <span class="n">show_only_average</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">starting_index</span> <span class="o">=</span> <span class="n">starting_index</span>
+
+    <span class="k">def</span> <span class="nf">grade</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">grade_sheet</span><span class="p">,</span> <span class="n">generate_random_scores</span><span class="o">=</span><span class="bp">False</span><span class="p">):</span>
+        <span class="k">def</span> <span class="nf">totalWithDrops</span><span class="p">(</span><span class="n">breakdown</span><span class="p">,</span> <span class="n">drop_count</span><span class="p">):</span>
+            <span class="c">#create an array of tuples with (index, mark), sorted by mark[&#39;percent&#39;] descending</span>
+            <span class="n">sorted_breakdown</span> <span class="o">=</span> <span class="nb">sorted</span><span class="p">(</span><span class="nb">enumerate</span><span class="p">(</span><span class="n">breakdown</span><span class="p">),</span> <span class="n">key</span><span class="o">=</span><span class="k">lambda</span> <span class="n">x</span><span class="p">:</span> <span class="o">-</span><span class="n">x</span><span class="p">[</span><span class="mi">1</span><span class="p">][</span><span class="s">&#39;percent&#39;</span><span class="p">])</span>
+            <span class="c"># A list of the indices of the dropped scores</span>
+            <span class="n">dropped_indices</span> <span class="o">=</span> <span class="p">[]</span>
+            <span class="k">if</span> <span class="n">drop_count</span> <span class="o">&gt;</span> <span class="mi">0</span><span class="p">:</span>
+                <span class="n">dropped_indices</span> <span class="o">=</span> <span class="p">[</span><span class="n">x</span><span class="p">[</span><span class="mi">0</span><span class="p">]</span> <span class="k">for</span> <span class="n">x</span> <span class="ow">in</span> <span class="n">sorted_breakdown</span><span class="p">[</span><span class="o">-</span><span class="n">drop_count</span><span class="p">:]]</span>
+            <span class="n">aggregate_score</span> <span class="o">=</span> <span class="mi">0</span>
+            <span class="k">for</span> <span class="n">index</span><span class="p">,</span> <span class="n">mark</span> <span class="ow">in</span> <span class="nb">enumerate</span><span class="p">(</span><span class="n">breakdown</span><span class="p">):</span>
+                <span class="k">if</span> <span class="n">index</span> <span class="ow">not</span> <span class="ow">in</span> <span class="n">dropped_indices</span><span class="p">:</span>
+                    <span class="n">aggregate_score</span> <span class="o">+=</span> <span class="n">mark</span><span class="p">[</span><span class="s">&#39;percent&#39;</span><span class="p">]</span>
+
+            <span class="k">if</span> <span class="p">(</span><span class="nb">len</span><span class="p">(</span><span class="n">breakdown</span><span class="p">)</span> <span class="o">-</span> <span class="n">drop_count</span> <span class="o">&gt;</span> <span class="mi">0</span><span class="p">):</span>
+                <span class="n">aggregate_score</span> <span class="o">/=</span> <span class="nb">len</span><span class="p">(</span><span class="n">breakdown</span><span class="p">)</span> <span class="o">-</span> <span class="n">drop_count</span>
+
+            <span class="k">return</span> <span class="n">aggregate_score</span><span class="p">,</span> <span class="n">dropped_indices</span>
+
+        <span class="c">#Figure the homework scores</span>
+        <span class="n">scores</span> <span class="o">=</span> <span class="n">grade_sheet</span><span class="o">.</span><span class="n">get</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">type</span><span class="p">,</span> <span class="p">[])</span>
+        <span class="n">breakdown</span> <span class="o">=</span> <span class="p">[]</span>
+        <span class="k">for</span> <span class="n">i</span> <span class="ow">in</span> <span class="nb">range</span><span class="p">(</span><span class="nb">max</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">min_count</span><span class="p">,</span> <span class="nb">len</span><span class="p">(</span><span class="n">scores</span><span class="p">))):</span>
+            <span class="k">if</span> <span class="n">i</span> <span class="o">&lt;</span> <span class="nb">len</span><span class="p">(</span><span class="n">scores</span><span class="p">)</span> <span class="ow">or</span> <span class="n">generate_random_scores</span><span class="p">:</span>
+                <span class="k">if</span> <span class="n">generate_random_scores</span><span class="p">:</span>	<span class="c"># for debugging!</span>
+                    <span class="n">earned</span> <span class="o">=</span> <span class="n">random</span><span class="o">.</span><span class="n">randint</span><span class="p">(</span><span class="mi">2</span><span class="p">,</span><span class="mi">15</span><span class="p">)</span>
+                    <span class="n">possible</span> <span class="o">=</span> <span class="n">random</span><span class="o">.</span><span class="n">randint</span><span class="p">(</span><span class="n">earned</span><span class="p">,</span> <span class="mi">15</span><span class="p">)</span>                    
+                    <span class="n">section_name</span> <span class="o">=</span> <span class="s">&quot;Generated&quot;</span>
+                    
+                <span class="k">else</span><span class="p">:</span>
+                    <span class="n">earned</span> <span class="o">=</span> <span class="n">scores</span><span class="p">[</span><span class="n">i</span><span class="p">]</span><span class="o">.</span><span class="n">earned</span>
+                    <span class="n">possible</span> <span class="o">=</span> <span class="n">scores</span><span class="p">[</span><span class="n">i</span><span class="p">]</span><span class="o">.</span><span class="n">possible</span>
+                    <span class="n">section_name</span> <span class="o">=</span> <span class="n">scores</span><span class="p">[</span><span class="n">i</span><span class="p">]</span><span class="o">.</span><span class="n">section</span>
+                
+                <span class="n">percentage</span> <span class="o">=</span> <span class="n">earned</span> <span class="o">/</span> <span class="nb">float</span><span class="p">(</span><span class="n">possible</span><span class="p">)</span>
+                <span class="n">summary</span> <span class="o">=</span> <span class="s">&quot;{section_type} {index} - {name} - {percent:.0%} ({earned:.3n}/{possible:.3n})&quot;</span><span class="o">.</span><span class="n">format</span><span class="p">(</span><span class="n">index</span><span class="o">=</span><span class="n">i</span> <span class="o">+</span> <span class="bp">self</span><span class="o">.</span><span class="n">starting_index</span><span class="p">,</span>
+                                                                <span class="n">section_type</span><span class="o">=</span><span class="bp">self</span><span class="o">.</span><span class="n">section_type</span><span class="p">,</span>
+                                                                <span class="n">name</span><span class="o">=</span><span class="n">section_name</span><span class="p">,</span>
+                                                                <span class="n">percent</span><span class="o">=</span><span class="n">percentage</span><span class="p">,</span>
+                                                                <span class="n">earned</span><span class="o">=</span><span class="nb">float</span><span class="p">(</span><span class="n">earned</span><span class="p">),</span>
+                                                                <span class="n">possible</span><span class="o">=</span><span class="nb">float</span><span class="p">(</span><span class="n">possible</span><span class="p">))</span>
+            <span class="k">else</span><span class="p">:</span>
+                <span class="n">percentage</span> <span class="o">=</span> <span class="mi">0</span>
+                <span class="n">summary</span> <span class="o">=</span> <span class="s">&quot;{section_type} {index} Unreleased - 0% (?/?)&quot;</span><span class="o">.</span><span class="n">format</span><span class="p">(</span><span class="n">index</span><span class="o">=</span><span class="n">i</span> <span class="o">+</span> <span class="bp">self</span><span class="o">.</span><span class="n">starting_index</span><span class="p">,</span> <span class="n">section_type</span><span class="o">=</span><span class="bp">self</span><span class="o">.</span><span class="n">section_type</span><span class="p">)</span>
+
+            <span class="n">short_label</span> <span class="o">=</span> <span class="s">&quot;{short_label} {index:02d}&quot;</span><span class="o">.</span><span class="n">format</span><span class="p">(</span><span class="n">index</span><span class="o">=</span><span class="n">i</span> <span class="o">+</span> <span class="bp">self</span><span class="o">.</span><span class="n">starting_index</span><span class="p">,</span> <span class="n">short_label</span><span class="o">=</span><span class="bp">self</span><span class="o">.</span><span class="n">short_label</span><span class="p">)</span>
+            
+            <span class="n">breakdown</span><span class="o">.</span><span class="n">append</span><span class="p">({</span><span class="s">&#39;percent&#39;</span><span class="p">:</span> <span class="n">percentage</span><span class="p">,</span> <span class="s">&#39;label&#39;</span><span class="p">:</span> <span class="n">short_label</span><span class="p">,</span> <span class="s">&#39;detail&#39;</span><span class="p">:</span> <span class="n">summary</span><span class="p">,</span> <span class="s">&#39;category&#39;</span><span class="p">:</span> <span class="bp">self</span><span class="o">.</span><span class="n">category</span><span class="p">})</span>
+
+        <span class="n">total_percent</span><span class="p">,</span> <span class="n">dropped_indices</span> <span class="o">=</span> <span class="n">totalWithDrops</span><span class="p">(</span><span class="n">breakdown</span><span class="p">,</span> <span class="bp">self</span><span class="o">.</span><span class="n">drop_count</span><span class="p">)</span>
+
+        <span class="k">for</span> <span class="n">dropped_index</span> <span class="ow">in</span> <span class="n">dropped_indices</span><span class="p">:</span>
+            <span class="n">breakdown</span><span class="p">[</span><span class="n">dropped_index</span><span class="p">][</span><span class="s">&#39;mark&#39;</span><span class="p">]</span> <span class="o">=</span> <span class="p">{</span><span class="s">&#39;detail&#39;</span><span class="p">:</span> <span class="s">&quot;The lowest {drop_count} {section_type} scores are dropped.&quot;</span><span class="o">.</span><span class="n">format</span><span class="p">(</span><span class="n">drop_count</span><span class="o">=</span><span class="bp">self</span><span class="o">.</span><span class="n">drop_count</span><span class="p">,</span> <span class="n">section_type</span><span class="o">=</span><span class="bp">self</span><span class="o">.</span><span class="n">section_type</span><span class="p">)}</span>
+
+        <span class="n">total_detail</span> <span class="o">=</span> <span class="s">&quot;{section_type} Average = {percent:.0%}&quot;</span><span class="o">.</span><span class="n">format</span><span class="p">(</span><span class="n">percent</span><span class="o">=</span><span class="n">total_percent</span><span class="p">,</span> <span class="n">section_type</span><span class="o">=</span><span class="bp">self</span><span class="o">.</span><span class="n">section_type</span><span class="p">)</span>
+        <span class="n">total_label</span> <span class="o">=</span> <span class="s">&quot;{short_label} Avg&quot;</span><span class="o">.</span><span class="n">format</span><span class="p">(</span><span class="n">short_label</span><span class="o">=</span><span class="bp">self</span><span class="o">.</span><span class="n">short_label</span><span class="p">)</span>
+        
+        <span class="k">if</span> <span class="bp">self</span><span class="o">.</span><span class="n">show_only_average</span><span class="p">:</span>
+            <span class="n">breakdown</span> <span class="o">=</span> <span class="p">[]</span>
+        
+        <span class="n">breakdown</span><span class="o">.</span><span class="n">append</span><span class="p">({</span><span class="s">&#39;percent&#39;</span><span class="p">:</span> <span class="n">total_percent</span><span class="p">,</span> <span class="s">&#39;label&#39;</span><span class="p">:</span> <span class="n">total_label</span><span class="p">,</span> <span class="s">&#39;detail&#39;</span><span class="p">:</span> <span class="n">total_detail</span><span class="p">,</span> <span class="s">&#39;category&#39;</span><span class="p">:</span> <span class="bp">self</span><span class="o">.</span><span class="n">category</span><span class="p">,</span> <span class="s">&#39;prominent&#39;</span><span class="p">:</span> <span class="bp">True</span><span class="p">})</span>
+        
+        <span class="k">return</span> <span class="p">{</span><span class="s">&#39;percent&#39;</span><span class="p">:</span> <span class="n">total_percent</span><span class="p">,</span>
+                <span class="s">&#39;section_breakdown&#39;</span><span class="p">:</span> <span class="n">breakdown</span><span class="p">,</span>
+                <span class="c">#No grade_breakdown here</span>
+                <span class="p">}</span></div>
+</pre></div>
+
+          </div>
+        </div>
+      </div>
+      <div class="clearer"></div>
+    </div>
+    <div class="related">
+      <h3>Navigation</h3>
+      <ul>
+        <li class="right" style="margin-right: 10px">
+          <a href="../../genindex.html" title="General Index"
+             >index</a></li>
+        <li class="right" >
+          <a href="../../py-modindex.html" title="Python Module Index"
+             >modules</a> |</li>
+        <li><a href="../../index.html">MITx 1.0 documentation</a> &raquo;</li>
+          <li><a href="../index.html" >Module code</a> &raquo;</li> 
+      </ul>
+    </div>
+    <div class="footer">
+        &copy; Copyright 2012, MITx team.
+      Created using <a href="http://sphinx.pocoo.org/">Sphinx</a> 1.1.3.
+    </div>
+  </body>
+</html>

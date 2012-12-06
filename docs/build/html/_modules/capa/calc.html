@@ -1,0 +1,346 @@
+
+
+<!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Transitional//EN"
+  "http://www.w3.org/TR/xhtml1/DTD/xhtml1-transitional.dtd">
+
+
+<html xmlns="http://www.w3.org/1999/xhtml">
+  <head>
+    <meta http-equiv="Content-Type" content="text/html; charset=utf-8" />
+    
+    <title>capa.calc &mdash; MITx 1.0 documentation</title>
+    
+    <link rel="stylesheet" href="../../_static/sphinxdoc.css" type="text/css" />
+    <link rel="stylesheet" href="../../_static/pygments.css" type="text/css" />
+    
+    <script type="text/javascript">
+      var DOCUMENTATION_OPTIONS = {
+        URL_ROOT:    '../../',
+        VERSION:     '1.0',
+        COLLAPSE_INDEX: false,
+        FILE_SUFFIX: '.html',
+        HAS_SOURCE:  true
+      };
+    </script>
+    <script type="text/javascript" src="../../_static/jquery.js"></script>
+    <script type="text/javascript" src="../../_static/underscore.js"></script>
+    <script type="text/javascript" src="../../_static/doctools.js"></script>
+    <script type="text/javascript" src="http://cdn.mathjax.org/mathjax/latest/MathJax.js?config=TeX-AMS-MML_HTMLorMML"></script>
+    <link rel="top" title="MITx 1.0 documentation" href="../../index.html" />
+    <link rel="up" title="Module code" href="../index.html" /> 
+  </head>
+  <body>
+<img src="../../_static/homepage-bg.jpg" alt="Edx logo"  width="100%;"/>
+
+    <div class="related">
+      <h3>Navigation</h3>
+      <ul>
+        <li class="right" style="margin-right: 10px">
+          <a href="../../genindex.html" title="General Index"
+             accesskey="I">index</a></li>
+        <li class="right" >
+          <a href="../../py-modindex.html" title="Python Module Index"
+             >modules</a> |</li>
+        <li><a href="../../index.html">MITx 1.0 documentation</a> &raquo;</li>
+          <li><a href="../index.html" accesskey="U">Module code</a> &raquo;</li> 
+      </ul>
+    </div>
+      <div class="sphinxsidebar">
+        <div class="sphinxsidebarwrapper">
+<div id="searchbox" style="display: none">
+  <h3>Quick search</h3>
+    <form class="search" action="../../search.html" method="get">
+      <input type="text" name="q" />
+      <input type="submit" value="Go" />
+      <input type="hidden" name="check_keywords" value="yes" />
+      <input type="hidden" name="area" value="default" />
+    </form>
+    <p class="searchtip" style="font-size: 90%">
+    Enter search terms or a module, class or function name.
+    </p>
+</div>
+<script type="text/javascript">$('#searchbox').show(0);</script>
+        </div>
+      </div>
+
+    <div class="document">
+      <div class="documentwrapper">
+        <div class="bodywrapper">
+          <div class="body">
+            
+  <h1>Source code for capa.calc</h1><div class="highlight"><pre>
+<span class="kn">import</span> <span class="nn">copy</span>
+<span class="kn">import</span> <span class="nn">logging</span>
+<span class="kn">import</span> <span class="nn">math</span>
+<span class="kn">import</span> <span class="nn">operator</span>
+<span class="kn">import</span> <span class="nn">re</span>
+
+<span class="kn">import</span> <span class="nn">numpy</span>
+<span class="kn">import</span> <span class="nn">numbers</span>
+<span class="kn">import</span> <span class="nn">scipy.constants</span>
+
+<span class="kn">from</span> <span class="nn">pyparsing</span> <span class="kn">import</span> <span class="n">Word</span><span class="p">,</span> <span class="n">alphas</span><span class="p">,</span> <span class="n">nums</span><span class="p">,</span> <span class="n">oneOf</span><span class="p">,</span> <span class="n">Literal</span>
+<span class="kn">from</span> <span class="nn">pyparsing</span> <span class="kn">import</span> <span class="n">ZeroOrMore</span><span class="p">,</span> <span class="n">OneOrMore</span><span class="p">,</span> <span class="n">StringStart</span>
+<span class="kn">from</span> <span class="nn">pyparsing</span> <span class="kn">import</span> <span class="n">StringEnd</span><span class="p">,</span> <span class="n">Optional</span><span class="p">,</span> <span class="n">Forward</span>
+<span class="kn">from</span> <span class="nn">pyparsing</span> <span class="kn">import</span> <span class="n">CaselessLiteral</span><span class="p">,</span> <span class="n">Group</span><span class="p">,</span> <span class="n">StringEnd</span>
+<span class="kn">from</span> <span class="nn">pyparsing</span> <span class="kn">import</span> <span class="n">NoMatch</span><span class="p">,</span> <span class="n">stringEnd</span><span class="p">,</span> <span class="n">alphanums</span>
+
+<span class="n">default_functions</span> <span class="o">=</span> <span class="p">{</span><span class="s">&#39;sin&#39;</span><span class="p">:</span> <span class="n">numpy</span><span class="o">.</span><span class="n">sin</span><span class="p">,</span>
+                     <span class="s">&#39;cos&#39;</span><span class="p">:</span> <span class="n">numpy</span><span class="o">.</span><span class="n">cos</span><span class="p">,</span>
+                     <span class="s">&#39;tan&#39;</span><span class="p">:</span> <span class="n">numpy</span><span class="o">.</span><span class="n">tan</span><span class="p">,</span>
+                     <span class="s">&#39;sqrt&#39;</span><span class="p">:</span> <span class="n">numpy</span><span class="o">.</span><span class="n">sqrt</span><span class="p">,</span>
+                     <span class="s">&#39;log10&#39;</span><span class="p">:</span> <span class="n">numpy</span><span class="o">.</span><span class="n">log10</span><span class="p">,</span>
+                     <span class="s">&#39;log2&#39;</span><span class="p">:</span> <span class="n">numpy</span><span class="o">.</span><span class="n">log2</span><span class="p">,</span>
+                     <span class="s">&#39;ln&#39;</span><span class="p">:</span> <span class="n">numpy</span><span class="o">.</span><span class="n">log</span><span class="p">,</span>
+                     <span class="s">&#39;arccos&#39;</span><span class="p">:</span> <span class="n">numpy</span><span class="o">.</span><span class="n">arccos</span><span class="p">,</span>
+                     <span class="s">&#39;arcsin&#39;</span><span class="p">:</span> <span class="n">numpy</span><span class="o">.</span><span class="n">arcsin</span><span class="p">,</span>
+                     <span class="s">&#39;arctan&#39;</span><span class="p">:</span> <span class="n">numpy</span><span class="o">.</span><span class="n">arctan</span><span class="p">,</span>
+                     <span class="s">&#39;abs&#39;</span><span class="p">:</span> <span class="n">numpy</span><span class="o">.</span><span class="n">abs</span>
+                     <span class="p">}</span>
+<span class="n">default_variables</span> <span class="o">=</span> <span class="p">{</span><span class="s">&#39;j&#39;</span><span class="p">:</span> <span class="n">numpy</span><span class="o">.</span><span class="n">complex</span><span class="p">(</span><span class="mi">0</span><span class="p">,</span> <span class="mi">1</span><span class="p">),</span>
+                     <span class="s">&#39;e&#39;</span><span class="p">:</span> <span class="n">numpy</span><span class="o">.</span><span class="n">e</span><span class="p">,</span>
+                     <span class="s">&#39;pi&#39;</span><span class="p">:</span> <span class="n">numpy</span><span class="o">.</span><span class="n">pi</span><span class="p">,</span>
+                     <span class="s">&#39;k&#39;</span><span class="p">:</span> <span class="n">scipy</span><span class="o">.</span><span class="n">constants</span><span class="o">.</span><span class="n">k</span><span class="p">,</span>
+                     <span class="s">&#39;c&#39;</span><span class="p">:</span> <span class="n">scipy</span><span class="o">.</span><span class="n">constants</span><span class="o">.</span><span class="n">c</span><span class="p">,</span>
+                     <span class="s">&#39;T&#39;</span><span class="p">:</span> <span class="mf">298.15</span><span class="p">,</span>
+                     <span class="s">&#39;q&#39;</span><span class="p">:</span> <span class="n">scipy</span><span class="o">.</span><span class="n">constants</span><span class="o">.</span><span class="n">e</span>
+                     <span class="p">}</span>
+
+<span class="n">log</span> <span class="o">=</span> <span class="n">logging</span><span class="o">.</span><span class="n">getLogger</span><span class="p">(</span><span class="s">&quot;mitx.courseware.capa&quot;</span><span class="p">)</span>
+
+
+<span class="k">class</span> <span class="nc">UndefinedVariable</span><span class="p">(</span><span class="ne">Exception</span><span class="p">):</span>
+    <span class="k">def</span> <span class="nf">raiseself</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
+        <span class="sd">&#39;&#39;&#39; Helper so we can use inside of a lambda &#39;&#39;&#39;</span>
+        <span class="k">raise</span> <span class="bp">self</span>
+
+
+<span class="n">general_whitespace</span> <span class="o">=</span> <span class="n">re</span><span class="o">.</span><span class="n">compile</span><span class="p">(</span><span class="s">&#39;[^\w]+&#39;</span><span class="p">)</span>
+
+
+<div class="viewcode-block" id="check_variables"><a class="viewcode-back" href="../../capa.html#capa.calc.check_variables">[docs]</a><span class="k">def</span> <span class="nf">check_variables</span><span class="p">(</span><span class="n">string</span><span class="p">,</span> <span class="n">variables</span><span class="p">):</span>
+    <span class="sd">&#39;&#39;&#39;Confirm the only variables in string are defined.</span>
+
+<span class="sd">    Pyparsing uses a left-to-right parser, which makes the more</span>
+<span class="sd">    elegant approach pretty hopeless.</span>
+
+<span class="sd">    achar = reduce(lambda a,b:a|b ,map(Literal,alphas)) # Any alphabetic character</span>
+<span class="sd">    undefined_variable = achar + Word(alphanums)</span>
+<span class="sd">    undefined_variable.setParseAction(lambda x:UndefinedVariable(&quot;&quot;.join(x)).raiseself())</span>
+<span class="sd">    varnames = varnames | undefined_variable</span>
+<span class="sd">    &#39;&#39;&#39;</span>
+    <span class="n">possible_variables</span> <span class="o">=</span> <span class="n">re</span><span class="o">.</span><span class="n">split</span><span class="p">(</span><span class="n">general_whitespace</span><span class="p">,</span> <span class="n">string</span><span class="p">)</span>  <span class="c"># List of all alnums in string</span>
+    <span class="n">bad_variables</span> <span class="o">=</span> <span class="nb">list</span><span class="p">()</span>
+    <span class="k">for</span> <span class="n">v</span> <span class="ow">in</span> <span class="n">possible_variables</span><span class="p">:</span>
+        <span class="k">if</span> <span class="nb">len</span><span class="p">(</span><span class="n">v</span><span class="p">)</span> <span class="o">==</span> <span class="mi">0</span><span class="p">:</span>
+            <span class="k">continue</span>
+        <span class="k">if</span> <span class="n">v</span><span class="p">[</span><span class="mi">0</span><span class="p">]</span> <span class="o">&lt;=</span> <span class="s">&#39;9&#39;</span> <span class="ow">and</span> <span class="s">&#39;0&#39;</span> <span class="o">&lt;=</span> <span class="s">&#39;v&#39;</span><span class="p">:</span>  <span class="c"># Skip things that begin with numbers</span>
+            <span class="k">continue</span>
+        <span class="k">if</span> <span class="n">v</span> <span class="ow">not</span> <span class="ow">in</span> <span class="n">variables</span><span class="p">:</span>
+            <span class="n">bad_variables</span><span class="o">.</span><span class="n">append</span><span class="p">(</span><span class="n">v</span><span class="p">)</span>
+    <span class="k">if</span> <span class="nb">len</span><span class="p">(</span><span class="n">bad_variables</span><span class="p">)</span> <span class="o">&gt;</span> <span class="mi">0</span><span class="p">:</span>
+        <span class="k">raise</span> <span class="n">UndefinedVariable</span><span class="p">(</span><span class="s">&#39; &#39;</span><span class="o">.</span><span class="n">join</span><span class="p">(</span><span class="n">bad_variables</span><span class="p">))</span>
+
+</div>
+<div class="viewcode-block" id="evaluator"><a class="viewcode-back" href="../../capa.html#capa.calc.evaluator">[docs]</a><span class="k">def</span> <span class="nf">evaluator</span><span class="p">(</span><span class="n">variables</span><span class="p">,</span> <span class="n">functions</span><span class="p">,</span> <span class="n">string</span><span class="p">,</span> <span class="n">cs</span><span class="o">=</span><span class="bp">False</span><span class="p">):</span>
+    <span class="sd">&#39;&#39;&#39;</span>
+<span class="sd">    Evaluate an expression. Variables are passed as a dictionary</span>
+<span class="sd">    from string to value. Unary functions are passed as a dictionary</span>
+<span class="sd">    from string to function. Variables must be floats.</span>
+<span class="sd">    cs: Case sensitive</span>
+
+<span class="sd">    TODO: Fix it so we can pass integers and complex numbers in variables dict</span>
+<span class="sd">    &#39;&#39;&#39;</span>
+    <span class="c"># log.debug(&quot;variables: {0}&quot;.format(variables))</span>
+    <span class="c"># log.debug(&quot;functions: {0}&quot;.format(functions))</span>
+    <span class="c"># log.debug(&quot;string: {0}&quot;.format(string))</span>
+
+    <span class="k">def</span> <span class="nf">lower_dict</span><span class="p">(</span><span class="n">d</span><span class="p">):</span>
+        <span class="k">return</span> <span class="nb">dict</span><span class="p">([(</span><span class="n">k</span><span class="o">.</span><span class="n">lower</span><span class="p">(),</span> <span class="n">d</span><span class="p">[</span><span class="n">k</span><span class="p">])</span> <span class="k">for</span> <span class="n">k</span> <span class="ow">in</span> <span class="n">d</span><span class="p">])</span>
+
+    <span class="n">all_variables</span> <span class="o">=</span> <span class="n">copy</span><span class="o">.</span><span class="n">copy</span><span class="p">(</span><span class="n">default_variables</span><span class="p">)</span>
+    <span class="n">all_functions</span> <span class="o">=</span> <span class="n">copy</span><span class="o">.</span><span class="n">copy</span><span class="p">(</span><span class="n">default_functions</span><span class="p">)</span>
+
+    <span class="k">if</span> <span class="ow">not</span> <span class="n">cs</span><span class="p">:</span>
+        <span class="n">all_variables</span> <span class="o">=</span> <span class="n">lower_dict</span><span class="p">(</span><span class="n">all_variables</span><span class="p">)</span>
+        <span class="n">all_functions</span> <span class="o">=</span> <span class="n">lower_dict</span><span class="p">(</span><span class="n">all_functions</span><span class="p">)</span>
+
+    <span class="n">all_variables</span><span class="o">.</span><span class="n">update</span><span class="p">(</span><span class="n">variables</span><span class="p">)</span>
+    <span class="n">all_functions</span><span class="o">.</span><span class="n">update</span><span class="p">(</span><span class="n">functions</span><span class="p">)</span>
+
+    <span class="k">if</span> <span class="ow">not</span> <span class="n">cs</span><span class="p">:</span>
+        <span class="n">string_cs</span> <span class="o">=</span> <span class="n">string</span><span class="o">.</span><span class="n">lower</span><span class="p">()</span>
+        <span class="n">all_functions</span> <span class="o">=</span> <span class="n">lower_dict</span><span class="p">(</span><span class="n">all_functions</span><span class="p">)</span>
+        <span class="n">all_variables</span> <span class="o">=</span> <span class="n">lower_dict</span><span class="p">(</span><span class="n">all_variables</span><span class="p">)</span>
+        <span class="n">CasedLiteral</span> <span class="o">=</span> <span class="n">CaselessLiteral</span>
+    <span class="k">else</span><span class="p">:</span>
+        <span class="n">string_cs</span> <span class="o">=</span> <span class="n">string</span>
+        <span class="n">CasedLiteral</span> <span class="o">=</span> <span class="n">Literal</span>
+
+    <span class="n">check_variables</span><span class="p">(</span><span class="n">string_cs</span><span class="p">,</span> <span class="nb">set</span><span class="p">(</span><span class="n">all_variables</span><span class="o">.</span><span class="n">keys</span><span class="p">()</span> <span class="o">+</span> <span class="n">all_functions</span><span class="o">.</span><span class="n">keys</span><span class="p">()))</span>
+
+    <span class="k">if</span> <span class="n">string</span><span class="o">.</span><span class="n">strip</span><span class="p">()</span> <span class="o">==</span> <span class="s">&quot;&quot;</span><span class="p">:</span>
+        <span class="k">return</span> <span class="nb">float</span><span class="p">(</span><span class="s">&#39;nan&#39;</span><span class="p">)</span>
+
+    <span class="n">ops</span> <span class="o">=</span> <span class="p">{</span><span class="s">&quot;^&quot;</span><span class="p">:</span> <span class="n">operator</span><span class="o">.</span><span class="n">pow</span><span class="p">,</span>
+            <span class="s">&quot;*&quot;</span><span class="p">:</span> <span class="n">operator</span><span class="o">.</span><span class="n">mul</span><span class="p">,</span>
+            <span class="s">&quot;/&quot;</span><span class="p">:</span> <span class="n">operator</span><span class="o">.</span><span class="n">truediv</span><span class="p">,</span>
+            <span class="s">&quot;+&quot;</span><span class="p">:</span> <span class="n">operator</span><span class="o">.</span><span class="n">add</span><span class="p">,</span>
+            <span class="s">&quot;-&quot;</span><span class="p">:</span> <span class="n">operator</span><span class="o">.</span><span class="n">sub</span><span class="p">,</span>
+            <span class="p">}</span>
+    <span class="c"># We eliminated extreme ones, since they&#39;re rarely used, and potentially</span>
+    <span class="c"># confusing. They may also conflict with variables if we ever allow e.g.</span>
+    <span class="c"># 5R instead of 5*R</span>
+    <span class="n">suffixes</span> <span class="o">=</span> <span class="p">{</span><span class="s">&#39;%&#39;</span><span class="p">:</span> <span class="mf">0.01</span><span class="p">,</span> <span class="s">&#39;k&#39;</span><span class="p">:</span> <span class="mf">1e3</span><span class="p">,</span> <span class="s">&#39;M&#39;</span><span class="p">:</span> <span class="mf">1e6</span><span class="p">,</span> <span class="s">&#39;G&#39;</span><span class="p">:</span> <span class="mf">1e9</span><span class="p">,</span>
+              <span class="s">&#39;T&#39;</span><span class="p">:</span> <span class="mf">1e12</span><span class="p">,</span><span class="c">#  &#39;P&#39;:1e15,&#39;E&#39;:1e18,&#39;Z&#39;:1e21,&#39;Y&#39;:1e24,</span>
+              <span class="s">&#39;c&#39;</span><span class="p">:</span> <span class="mf">1e-2</span><span class="p">,</span> <span class="s">&#39;m&#39;</span><span class="p">:</span> <span class="mf">1e-3</span><span class="p">,</span> <span class="s">&#39;u&#39;</span><span class="p">:</span> <span class="mf">1e-6</span><span class="p">,</span>
+              <span class="s">&#39;n&#39;</span><span class="p">:</span> <span class="mf">1e-9</span><span class="p">,</span> <span class="s">&#39;p&#39;</span><span class="p">:</span> <span class="mf">1e-12</span><span class="p">}</span><span class="c">#  ,&#39;f&#39;:1e-15,&#39;a&#39;:1e-18,&#39;z&#39;:1e-21,&#39;y&#39;:1e-24}</span>
+
+    <span class="k">def</span> <span class="nf">super_float</span><span class="p">(</span><span class="n">text</span><span class="p">):</span>
+        <span class="sd">&#39;&#39;&#39; Like float, but with si extensions. 1k goes to 1000&#39;&#39;&#39;</span>
+        <span class="k">if</span> <span class="n">text</span><span class="p">[</span><span class="o">-</span><span class="mi">1</span><span class="p">]</span> <span class="ow">in</span> <span class="n">suffixes</span><span class="p">:</span>
+            <span class="k">return</span> <span class="nb">float</span><span class="p">(</span><span class="n">text</span><span class="p">[:</span><span class="o">-</span><span class="mi">1</span><span class="p">])</span> <span class="o">*</span> <span class="n">suffixes</span><span class="p">[</span><span class="n">text</span><span class="p">[</span><span class="o">-</span><span class="mi">1</span><span class="p">]]</span>
+        <span class="k">else</span><span class="p">:</span>
+            <span class="k">return</span> <span class="nb">float</span><span class="p">(</span><span class="n">text</span><span class="p">)</span>
+
+    <span class="k">def</span> <span class="nf">number_parse_action</span><span class="p">(</span><span class="n">x</span><span class="p">):</span>  <span class="c"># [ &#39;7&#39; ] -&gt;  [ 7 ]</span>
+        <span class="k">return</span> <span class="p">[</span><span class="n">super_float</span><span class="p">(</span><span class="s">&quot;&quot;</span><span class="o">.</span><span class="n">join</span><span class="p">(</span><span class="n">x</span><span class="p">))]</span>
+
+    <span class="k">def</span> <span class="nf">exp_parse_action</span><span class="p">(</span><span class="n">x</span><span class="p">):</span>  <span class="c"># [ 2 ^ 3 ^ 2 ] -&gt; 512</span>
+        <span class="n">x</span> <span class="o">=</span> <span class="p">[</span><span class="n">e</span> <span class="k">for</span> <span class="n">e</span> <span class="ow">in</span> <span class="n">x</span> <span class="k">if</span> <span class="nb">isinstance</span><span class="p">(</span><span class="n">e</span><span class="p">,</span> <span class="n">numbers</span><span class="o">.</span><span class="n">Number</span><span class="p">)]</span>  <span class="c"># Ignore ^</span>
+        <span class="n">x</span><span class="o">.</span><span class="n">reverse</span><span class="p">()</span>
+        <span class="n">x</span> <span class="o">=</span> <span class="nb">reduce</span><span class="p">(</span><span class="k">lambda</span> <span class="n">a</span><span class="p">,</span> <span class="n">b</span><span class="p">:</span> <span class="n">b</span> <span class="o">**</span> <span class="n">a</span><span class="p">,</span> <span class="n">x</span><span class="p">)</span>
+        <span class="k">return</span> <span class="n">x</span>
+
+    <span class="k">def</span> <span class="nf">parallel</span><span class="p">(</span><span class="n">x</span><span class="p">):</span>  <span class="c"># Parallel resistors [ 1 2 ] =&gt; 2/3</span>
+        <span class="k">if</span> <span class="nb">len</span><span class="p">(</span><span class="n">x</span><span class="p">)</span> <span class="o">==</span> <span class="mi">1</span><span class="p">:</span>
+            <span class="k">return</span> <span class="n">x</span><span class="p">[</span><span class="mi">0</span><span class="p">]</span>
+        <span class="k">if</span> <span class="mi">0</span> <span class="ow">in</span> <span class="n">x</span><span class="p">:</span>
+            <span class="k">return</span> <span class="nb">float</span><span class="p">(</span><span class="s">&#39;nan&#39;</span><span class="p">)</span>
+        <span class="n">x</span> <span class="o">=</span> <span class="p">[</span><span class="mf">1.</span> <span class="o">/</span> <span class="n">e</span> <span class="k">for</span> <span class="n">e</span> <span class="ow">in</span> <span class="n">x</span> <span class="k">if</span> <span class="nb">isinstance</span><span class="p">(</span><span class="n">e</span><span class="p">,</span> <span class="n">numbers</span><span class="o">.</span><span class="n">Number</span><span class="p">)]</span>  <span class="c"># Ignore ||</span>
+        <span class="k">return</span> <span class="mf">1.</span> <span class="o">/</span> <span class="nb">sum</span><span class="p">(</span><span class="n">x</span><span class="p">)</span>
+
+    <span class="k">def</span> <span class="nf">sum_parse_action</span><span class="p">(</span><span class="n">x</span><span class="p">):</span>  <span class="c"># [ 1 + 2 - 3 ] -&gt; 0</span>
+        <span class="n">total</span> <span class="o">=</span> <span class="mf">0.0</span>
+        <span class="n">op</span> <span class="o">=</span> <span class="n">ops</span><span class="p">[</span><span class="s">&#39;+&#39;</span><span class="p">]</span>
+        <span class="k">for</span> <span class="n">e</span> <span class="ow">in</span> <span class="n">x</span><span class="p">:</span>
+            <span class="k">if</span> <span class="n">e</span> <span class="ow">in</span> <span class="nb">set</span><span class="p">(</span><span class="s">&#39;+-&#39;</span><span class="p">):</span>
+                <span class="n">op</span> <span class="o">=</span> <span class="n">ops</span><span class="p">[</span><span class="n">e</span><span class="p">]</span>
+            <span class="k">else</span><span class="p">:</span>
+                <span class="n">total</span> <span class="o">=</span> <span class="n">op</span><span class="p">(</span><span class="n">total</span><span class="p">,</span> <span class="n">e</span><span class="p">)</span>
+        <span class="k">return</span> <span class="n">total</span>
+
+    <span class="k">def</span> <span class="nf">prod_parse_action</span><span class="p">(</span><span class="n">x</span><span class="p">):</span>  <span class="c"># [ 1 * 2 / 3 ] =&gt; 0.66</span>
+        <span class="n">prod</span> <span class="o">=</span> <span class="mf">1.0</span>
+        <span class="n">op</span> <span class="o">=</span> <span class="n">ops</span><span class="p">[</span><span class="s">&#39;*&#39;</span><span class="p">]</span>
+        <span class="k">for</span> <span class="n">e</span> <span class="ow">in</span> <span class="n">x</span><span class="p">:</span>
+            <span class="k">if</span> <span class="n">e</span> <span class="ow">in</span> <span class="nb">set</span><span class="p">(</span><span class="s">&#39;*/&#39;</span><span class="p">):</span>
+                <span class="n">op</span> <span class="o">=</span> <span class="n">ops</span><span class="p">[</span><span class="n">e</span><span class="p">]</span>
+            <span class="k">else</span><span class="p">:</span>
+                <span class="n">prod</span> <span class="o">=</span> <span class="n">op</span><span class="p">(</span><span class="n">prod</span><span class="p">,</span> <span class="n">e</span><span class="p">)</span>
+        <span class="k">return</span> <span class="n">prod</span>
+
+    <span class="k">def</span> <span class="nf">func_parse_action</span><span class="p">(</span><span class="n">x</span><span class="p">):</span>
+        <span class="k">return</span> <span class="p">[</span><span class="n">all_functions</span><span class="p">[</span><span class="n">x</span><span class="p">[</span><span class="mi">0</span><span class="p">]](</span><span class="n">x</span><span class="p">[</span><span class="mi">1</span><span class="p">])]</span>
+
+    <span class="c"># SI suffixes and percent</span>
+    <span class="n">number_suffix</span> <span class="o">=</span> <span class="nb">reduce</span><span class="p">(</span><span class="k">lambda</span> <span class="n">a</span><span class="p">,</span> <span class="n">b</span><span class="p">:</span> <span class="n">a</span> <span class="o">|</span> <span class="n">b</span><span class="p">,</span> <span class="nb">map</span><span class="p">(</span><span class="n">Literal</span><span class="p">,</span> <span class="n">suffixes</span><span class="o">.</span><span class="n">keys</span><span class="p">()),</span> <span class="n">NoMatch</span><span class="p">())</span>
+    <span class="p">(</span><span class="n">dot</span><span class="p">,</span> <span class="n">minus</span><span class="p">,</span> <span class="n">plus</span><span class="p">,</span> <span class="n">times</span><span class="p">,</span> <span class="n">div</span><span class="p">,</span> <span class="n">lpar</span><span class="p">,</span> <span class="n">rpar</span><span class="p">,</span> <span class="n">exp</span><span class="p">)</span> <span class="o">=</span> <span class="nb">map</span><span class="p">(</span><span class="n">Literal</span><span class="p">,</span> <span class="s">&quot;.-+*/()^&quot;</span><span class="p">)</span>
+
+    <span class="n">number_part</span> <span class="o">=</span> <span class="n">Word</span><span class="p">(</span><span class="n">nums</span><span class="p">)</span>
+
+    <span class="c"># 0.33 or 7 or .34</span>
+    <span class="n">inner_number</span> <span class="o">=</span> <span class="p">(</span><span class="n">number_part</span> <span class="o">+</span> <span class="n">Optional</span><span class="p">(</span><span class="s">&quot;.&quot;</span> <span class="o">+</span> <span class="n">number_part</span><span class="p">))</span> <span class="o">|</span> <span class="p">(</span><span class="s">&quot;.&quot;</span> <span class="o">+</span> <span class="n">number_part</span><span class="p">)</span>
+
+    <span class="c"># 0.33k or -17</span>
+    <span class="n">number</span> <span class="o">=</span> <span class="p">(</span><span class="n">Optional</span><span class="p">(</span><span class="n">minus</span> <span class="o">|</span> <span class="n">plus</span><span class="p">)</span> <span class="o">+</span> <span class="n">inner_number</span>
+              <span class="o">+</span> <span class="n">Optional</span><span class="p">(</span><span class="n">CaselessLiteral</span><span class="p">(</span><span class="s">&quot;E&quot;</span><span class="p">)</span> <span class="o">+</span> <span class="n">Optional</span><span class="p">(</span><span class="s">&quot;-&quot;</span><span class="p">)</span> <span class="o">+</span> <span class="n">number_part</span><span class="p">)</span>
+              <span class="o">+</span> <span class="n">Optional</span><span class="p">(</span><span class="n">number_suffix</span><span class="p">))</span>
+    <span class="n">number</span> <span class="o">=</span> <span class="n">number</span><span class="o">.</span><span class="n">setParseAction</span><span class="p">(</span><span class="n">number_parse_action</span><span class="p">)</span>  <span class="c"># Convert to number</span>
+
+    <span class="c"># Predefine recursive variables</span>
+    <span class="n">expr</span> <span class="o">=</span> <span class="n">Forward</span><span class="p">()</span>
+    <span class="n">factor</span> <span class="o">=</span> <span class="n">Forward</span><span class="p">()</span>
+
+    <span class="k">def</span> <span class="nf">sreduce</span><span class="p">(</span><span class="n">f</span><span class="p">,</span> <span class="n">l</span><span class="p">):</span>
+        <span class="sd">&#39;&#39;&#39; Same as reduce, but handle len 1 and len 0 lists sensibly &#39;&#39;&#39;</span>
+        <span class="k">if</span> <span class="nb">len</span><span class="p">(</span><span class="n">l</span><span class="p">)</span> <span class="o">==</span> <span class="mi">0</span><span class="p">:</span>
+            <span class="k">return</span> <span class="n">NoMatch</span><span class="p">()</span>
+        <span class="k">if</span> <span class="nb">len</span><span class="p">(</span><span class="n">l</span><span class="p">)</span> <span class="o">==</span> <span class="mi">1</span><span class="p">:</span>
+            <span class="k">return</span> <span class="n">l</span><span class="p">[</span><span class="mi">0</span><span class="p">]</span>
+        <span class="k">return</span> <span class="nb">reduce</span><span class="p">(</span><span class="n">f</span><span class="p">,</span> <span class="n">l</span><span class="p">)</span>
+
+    <span class="c"># Handle variables passed in. E.g. if we have {&#39;R&#39;:0.5}, we make the substitution.</span>
+    <span class="c"># Special case for no variables because of how we understand PyParsing is put together</span>
+    <span class="k">if</span> <span class="nb">len</span><span class="p">(</span><span class="n">all_variables</span><span class="p">)</span> <span class="o">&gt;</span> <span class="mi">0</span><span class="p">:</span>
+        <span class="c"># We sort the list so that var names (like &quot;e2&quot;) match before</span>
+        <span class="c"># mathematical constants (like &quot;e&quot;). This is kind of a hack.</span>
+        <span class="n">all_variables_keys</span> <span class="o">=</span> <span class="nb">sorted</span><span class="p">(</span><span class="n">all_variables</span><span class="o">.</span><span class="n">keys</span><span class="p">(),</span> <span class="n">key</span><span class="o">=</span><span class="nb">len</span><span class="p">,</span> <span class="n">reverse</span><span class="o">=</span><span class="bp">True</span><span class="p">)</span>
+        <span class="n">varnames</span> <span class="o">=</span> <span class="n">sreduce</span><span class="p">(</span><span class="k">lambda</span> <span class="n">x</span><span class="p">,</span> <span class="n">y</span><span class="p">:</span> <span class="n">x</span> <span class="o">|</span> <span class="n">y</span><span class="p">,</span> <span class="nb">map</span><span class="p">(</span><span class="k">lambda</span> <span class="n">x</span><span class="p">:</span> <span class="n">CasedLiteral</span><span class="p">(</span><span class="n">x</span><span class="p">),</span> <span class="n">all_variables_keys</span><span class="p">))</span>
+        <span class="n">varnames</span><span class="o">.</span><span class="n">setParseAction</span><span class="p">(</span><span class="k">lambda</span> <span class="n">x</span><span class="p">:</span> <span class="nb">map</span><span class="p">(</span><span class="k">lambda</span> <span class="n">y</span><span class="p">:</span> <span class="n">all_variables</span><span class="p">[</span><span class="n">y</span><span class="p">],</span> <span class="n">x</span><span class="p">))</span>
+    <span class="k">else</span><span class="p">:</span>
+        <span class="n">varnames</span> <span class="o">=</span> <span class="n">NoMatch</span><span class="p">()</span>
+
+    <span class="c"># Same thing for functions.</span>
+    <span class="k">if</span> <span class="nb">len</span><span class="p">(</span><span class="n">all_functions</span><span class="p">)</span> <span class="o">&gt;</span> <span class="mi">0</span><span class="p">:</span>
+        <span class="n">funcnames</span> <span class="o">=</span> <span class="n">sreduce</span><span class="p">(</span><span class="k">lambda</span> <span class="n">x</span><span class="p">,</span> <span class="n">y</span><span class="p">:</span> <span class="n">x</span> <span class="o">|</span> <span class="n">y</span><span class="p">,</span>
+                            <span class="nb">map</span><span class="p">(</span><span class="k">lambda</span> <span class="n">x</span><span class="p">:</span> <span class="n">CasedLiteral</span><span class="p">(</span><span class="n">x</span><span class="p">),</span> <span class="n">all_functions</span><span class="o">.</span><span class="n">keys</span><span class="p">()))</span>
+        <span class="n">function</span> <span class="o">=</span> <span class="n">funcnames</span> <span class="o">+</span> <span class="n">lpar</span><span class="o">.</span><span class="n">suppress</span><span class="p">()</span> <span class="o">+</span> <span class="n">expr</span> <span class="o">+</span> <span class="n">rpar</span><span class="o">.</span><span class="n">suppress</span><span class="p">()</span>
+        <span class="n">function</span><span class="o">.</span><span class="n">setParseAction</span><span class="p">(</span><span class="n">func_parse_action</span><span class="p">)</span>
+    <span class="k">else</span><span class="p">:</span>
+        <span class="n">function</span> <span class="o">=</span> <span class="n">NoMatch</span><span class="p">()</span>
+
+    <span class="n">atom</span> <span class="o">=</span> <span class="n">number</span> <span class="o">|</span> <span class="n">function</span> <span class="o">|</span> <span class="n">varnames</span> <span class="o">|</span> <span class="n">lpar</span> <span class="o">+</span> <span class="n">expr</span> <span class="o">+</span> <span class="n">rpar</span>
+    <span class="n">factor</span> <span class="o">&lt;&lt;</span> <span class="p">(</span><span class="n">atom</span> <span class="o">+</span> <span class="n">ZeroOrMore</span><span class="p">(</span><span class="n">exp</span> <span class="o">+</span> <span class="n">atom</span><span class="p">))</span><span class="o">.</span><span class="n">setParseAction</span><span class="p">(</span><span class="n">exp_parse_action</span><span class="p">)</span>  <span class="c"># 7^6</span>
+    <span class="n">paritem</span> <span class="o">=</span> <span class="n">factor</span> <span class="o">+</span> <span class="n">ZeroOrMore</span><span class="p">(</span><span class="n">Literal</span><span class="p">(</span><span class="s">&#39;||&#39;</span><span class="p">)</span> <span class="o">+</span> <span class="n">factor</span><span class="p">)</span>  <span class="c"># 5k || 4k</span>
+    <span class="n">paritem</span> <span class="o">=</span> <span class="n">paritem</span><span class="o">.</span><span class="n">setParseAction</span><span class="p">(</span><span class="n">parallel</span><span class="p">)</span>
+    <span class="n">term</span> <span class="o">=</span> <span class="n">paritem</span> <span class="o">+</span> <span class="n">ZeroOrMore</span><span class="p">((</span><span class="n">times</span> <span class="o">|</span> <span class="n">div</span><span class="p">)</span> <span class="o">+</span> <span class="n">paritem</span><span class="p">)</span>  <span class="c"># 7 * 5 / 4 - 3</span>
+    <span class="n">term</span> <span class="o">=</span> <span class="n">term</span><span class="o">.</span><span class="n">setParseAction</span><span class="p">(</span><span class="n">prod_parse_action</span><span class="p">)</span>
+    <span class="n">expr</span> <span class="o">&lt;&lt;</span> <span class="n">Optional</span><span class="p">((</span><span class="n">plus</span> <span class="o">|</span> <span class="n">minus</span><span class="p">))</span> <span class="o">+</span> <span class="n">term</span> <span class="o">+</span> <span class="n">ZeroOrMore</span><span class="p">((</span><span class="n">plus</span> <span class="o">|</span> <span class="n">minus</span><span class="p">)</span> <span class="o">+</span> <span class="n">term</span><span class="p">)</span>  <span class="c"># -5 + 4 - 3</span>
+    <span class="n">expr</span> <span class="o">=</span> <span class="n">expr</span><span class="o">.</span><span class="n">setParseAction</span><span class="p">(</span><span class="n">sum_parse_action</span><span class="p">)</span>
+    <span class="k">return</span> <span class="p">(</span><span class="n">expr</span> <span class="o">+</span> <span class="n">stringEnd</span><span class="p">)</span><span class="o">.</span><span class="n">parseString</span><span class="p">(</span><span class="n">string</span><span class="p">)[</span><span class="mi">0</span><span class="p">]</span>
+</div>
+<span class="k">if</span> <span class="n">__name__</span> <span class="o">==</span> <span class="s">&#39;__main__&#39;</span><span class="p">:</span>
+    <span class="n">variables</span> <span class="o">=</span> <span class="p">{</span><span class="s">&#39;R1&#39;</span><span class="p">:</span> <span class="mf">2.0</span><span class="p">,</span> <span class="s">&#39;R3&#39;</span><span class="p">:</span> <span class="mf">4.0</span><span class="p">}</span>
+    <span class="n">functions</span> <span class="o">=</span> <span class="p">{</span><span class="s">&#39;sin&#39;</span><span class="p">:</span> <span class="n">numpy</span><span class="o">.</span><span class="n">sin</span><span class="p">,</span> <span class="s">&#39;cos&#39;</span><span class="p">:</span> <span class="n">numpy</span><span class="o">.</span><span class="n">cos</span><span class="p">}</span>
+    <span class="k">print</span> <span class="s">&quot;X&quot;</span><span class="p">,</span> <span class="n">evaluator</span><span class="p">(</span><span class="n">variables</span><span class="p">,</span> <span class="n">functions</span><span class="p">,</span> <span class="s">&quot;10000||sin(7+5)-6k&quot;</span><span class="p">)</span>
+    <span class="k">print</span> <span class="s">&quot;X&quot;</span><span class="p">,</span> <span class="n">evaluator</span><span class="p">(</span><span class="n">variables</span><span class="p">,</span> <span class="n">functions</span><span class="p">,</span> <span class="s">&quot;13&quot;</span><span class="p">)</span>
+    <span class="k">print</span> <span class="n">evaluator</span><span class="p">({</span><span class="s">&#39;R1&#39;</span><span class="p">:</span> <span class="mf">2.0</span><span class="p">,</span> <span class="s">&#39;R3&#39;</span><span class="p">:</span> <span class="mf">4.0</span><span class="p">},</span> <span class="p">{},</span> <span class="s">&quot;13&quot;</span><span class="p">)</span>
+
+    <span class="k">print</span> <span class="n">evaluator</span><span class="p">({</span><span class="s">&#39;e1&#39;</span><span class="p">:</span> <span class="mi">1</span><span class="p">,</span> <span class="s">&#39;e2&#39;</span><span class="p">:</span> <span class="mf">1.0</span><span class="p">,</span> <span class="s">&#39;R3&#39;</span><span class="p">:</span> <span class="mi">7</span><span class="p">,</span> <span class="s">&#39;V0&#39;</span><span class="p">:</span> <span class="mi">5</span><span class="p">,</span> <span class="s">&#39;R5&#39;</span><span class="p">:</span> <span class="mi">15</span><span class="p">,</span> <span class="s">&#39;I1&#39;</span><span class="p">:</span> <span class="mi">1</span><span class="p">,</span> <span class="s">&#39;R4&#39;</span><span class="p">:</span> <span class="mi">6</span><span class="p">},</span> <span class="p">{},</span> <span class="s">&quot;e2&quot;</span><span class="p">)</span>
+
+    <span class="k">print</span> <span class="n">evaluator</span><span class="p">({</span><span class="s">&#39;a&#39;</span><span class="p">:</span> <span class="mf">2.2997471478310274</span><span class="p">,</span> <span class="s">&#39;k&#39;</span><span class="p">:</span> <span class="mi">9</span><span class="p">,</span> <span class="s">&#39;m&#39;</span><span class="p">:</span> <span class="mi">8</span><span class="p">,</span> <span class="s">&#39;x&#39;</span><span class="p">:</span> <span class="mf">0.66009498411213041</span><span class="p">},</span> <span class="p">{},</span> <span class="s">&quot;5&quot;</span><span class="p">)</span>
+    <span class="k">print</span> <span class="n">evaluator</span><span class="p">({},</span> <span class="p">{},</span> <span class="s">&quot;-1&quot;</span><span class="p">)</span>
+    <span class="k">print</span> <span class="n">evaluator</span><span class="p">({},</span> <span class="p">{},</span> <span class="s">&quot;-(7+5)&quot;</span><span class="p">)</span>
+    <span class="k">print</span> <span class="n">evaluator</span><span class="p">({},</span> <span class="p">{},</span> <span class="s">&quot;-0.33&quot;</span><span class="p">)</span>
+    <span class="k">print</span> <span class="n">evaluator</span><span class="p">({},</span> <span class="p">{},</span> <span class="s">&quot;-.33&quot;</span><span class="p">)</span>
+    <span class="k">print</span> <span class="n">evaluator</span><span class="p">({},</span> <span class="p">{},</span> <span class="s">&quot;5+1*j&quot;</span><span class="p">)</span>
+    <span class="k">print</span> <span class="n">evaluator</span><span class="p">({},</span> <span class="p">{},</span> <span class="s">&quot;j||1&quot;</span><span class="p">)</span>
+    <span class="k">print</span> <span class="n">evaluator</span><span class="p">({},</span> <span class="p">{},</span> <span class="s">&quot;e^(j*pi)&quot;</span><span class="p">)</span>
+    <span class="k">print</span> <span class="n">evaluator</span><span class="p">({},</span> <span class="p">{},</span> <span class="s">&quot;5+7 QWSEKO&quot;</span><span class="p">)</span>
+</pre></div>
+
+          </div>
+        </div>
+      </div>
+      <div class="clearer"></div>
+    </div>
+    <div class="related">
+      <h3>Navigation</h3>
+      <ul>
+        <li class="right" style="margin-right: 10px">
+          <a href="../../genindex.html" title="General Index"
+             >index</a></li>
+        <li class="right" >
+          <a href="../../py-modindex.html" title="Python Module Index"
+             >modules</a> |</li>
+        <li><a href="../../index.html">MITx 1.0 documentation</a> &raquo;</li>
+          <li><a href="../index.html" >Module code</a> &raquo;</li> 
+      </ul>
+    </div>
+    <div class="footer">
+        &copy; Copyright 2012, MITx team.
+      Created using <a href="http://sphinx.pocoo.org/">Sphinx</a> 1.1.3.
+    </div>
+  </body>
+</html>

@@ -1,0 +1,759 @@
+
+
+<!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Transitional//EN"
+  "http://www.w3.org/TR/xhtml1/DTD/xhtml1-transitional.dtd">
+
+
+<html xmlns="http://www.w3.org/1999/xhtml">
+  <head>
+    <meta http-equiv="Content-Type" content="text/html; charset=utf-8" />
+    
+    <title>capa.inputtypes &mdash; MITx 1.0 documentation</title>
+    
+    <link rel="stylesheet" href="../../_static/sphinxdoc.css" type="text/css" />
+    <link rel="stylesheet" href="../../_static/pygments.css" type="text/css" />
+    
+    <script type="text/javascript">
+      var DOCUMENTATION_OPTIONS = {
+        URL_ROOT:    '../../',
+        VERSION:     '1.0',
+        COLLAPSE_INDEX: false,
+        FILE_SUFFIX: '.html',
+        HAS_SOURCE:  true
+      };
+    </script>
+    <script type="text/javascript" src="../../_static/jquery.js"></script>
+    <script type="text/javascript" src="../../_static/underscore.js"></script>
+    <script type="text/javascript" src="../../_static/doctools.js"></script>
+    <script type="text/javascript" src="http://cdn.mathjax.org/mathjax/latest/MathJax.js?config=TeX-AMS-MML_HTMLorMML"></script>
+    <link rel="top" title="MITx 1.0 documentation" href="../../index.html" />
+    <link rel="up" title="Module code" href="../index.html" /> 
+  </head>
+  <body>
+<img src="../../_static/homepage-bg.jpg" alt="Edx logo"  width="100%;"/>
+
+    <div class="related">
+      <h3>Navigation</h3>
+      <ul>
+        <li class="right" style="margin-right: 10px">
+          <a href="../../genindex.html" title="General Index"
+             accesskey="I">index</a></li>
+        <li class="right" >
+          <a href="../../py-modindex.html" title="Python Module Index"
+             >modules</a> |</li>
+        <li><a href="../../index.html">MITx 1.0 documentation</a> &raquo;</li>
+          <li><a href="../index.html" accesskey="U">Module code</a> &raquo;</li> 
+      </ul>
+    </div>
+      <div class="sphinxsidebar">
+        <div class="sphinxsidebarwrapper">
+<div id="searchbox" style="display: none">
+  <h3>Quick search</h3>
+    <form class="search" action="../../search.html" method="get">
+      <input type="text" name="q" />
+      <input type="submit" value="Go" />
+      <input type="hidden" name="check_keywords" value="yes" />
+      <input type="hidden" name="area" value="default" />
+    </form>
+    <p class="searchtip" style="font-size: 90%">
+    Enter search terms or a module, class or function name.
+    </p>
+</div>
+<script type="text/javascript">$('#searchbox').show(0);</script>
+        </div>
+      </div>
+
+    <div class="document">
+      <div class="documentwrapper">
+        <div class="bodywrapper">
+          <div class="body">
+            
+  <h1>Source code for capa.inputtypes</h1><div class="highlight"><pre>
+<span class="c">#</span>
+<span class="c"># File:   courseware/capa/inputtypes.py</span>
+<span class="c">#</span>
+
+<span class="sd">&quot;&quot;&quot;</span>
+<span class="sd">Module containing the problem elements which render into input objects</span>
+
+<span class="sd">- textline</span>
+<span class="sd">- textbox (aka codeinput)</span>
+<span class="sd">- schematic</span>
+<span class="sd">- choicegroup (aka radiogroup, checkboxgroup)</span>
+<span class="sd">- javascriptinput</span>
+<span class="sd">- imageinput  (for clickable image)</span>
+<span class="sd">- optioninput (for option list)</span>
+<span class="sd">- filesubmission (upload a file)</span>
+
+<span class="sd">These are matched by *.html files templates/*.html which are mako templates with the</span>
+<span class="sd">actual html.</span>
+
+<span class="sd">Each input type takes the xml tree as &#39;element&#39;, the previous answer as &#39;value&#39;, and the</span>
+<span class="sd">graded status as&#39;status&#39;</span>
+<span class="sd">&quot;&quot;&quot;</span>
+
+<span class="c"># TODO: there is a lot of repetitive &quot;grab these elements from xml attributes, with these defaults,</span>
+<span class="c"># put them in the context&quot; code.  Refactor so class just specifies required and optional attrs (with</span>
+<span class="c"># defaults for latter), and InputTypeBase does the right thing.</span>
+
+<span class="c"># TODO: Quoting and unquoting is handled in a pretty ad-hoc way.  Also something that could be done</span>
+<span class="c"># properly once in InputTypeBase.</span>
+
+<span class="c"># Possible todo: make inline the default for textlines and other &quot;one-line&quot; inputs.  It probably</span>
+<span class="c"># makes sense, but a bunch of problems have markup that assumes block.  Bigger TODO: figure out a</span>
+<span class="c"># general css and layout strategy for capa, document it, then implement it.</span>
+
+
+
+<span class="kn">import</span> <span class="nn">json</span>
+<span class="kn">import</span> <span class="nn">logging</span>
+<span class="kn">from</span> <span class="nn">lxml</span> <span class="kn">import</span> <span class="n">etree</span>
+<span class="kn">import</span> <span class="nn">re</span>
+<span class="kn">import</span> <span class="nn">shlex</span>  <span class="c"># for splitting quoted strings</span>
+<span class="kn">import</span> <span class="nn">sys</span>
+<span class="kn">import</span> <span class="nn">xml.sax.saxutils</span> <span class="kn">as</span> <span class="nn">saxutils</span>
+
+<span class="kn">from</span> <span class="nn">registry</span> <span class="kn">import</span> <span class="n">TagRegistry</span>
+
+<span class="n">log</span> <span class="o">=</span> <span class="n">logging</span><span class="o">.</span><span class="n">getLogger</span><span class="p">(</span><span class="s">&#39;mitx.&#39;</span> <span class="o">+</span> <span class="n">__name__</span><span class="p">)</span>
+
+<span class="c">#########################################################################</span>
+
+<span class="n">registry</span> <span class="o">=</span> <span class="n">TagRegistry</span><span class="p">()</span>
+
+<div class="viewcode-block" id="InputTypeBase"><a class="viewcode-back" href="../../capa.html#capa.inputtypes.InputTypeBase">[docs]</a><span class="k">class</span> <span class="nc">InputTypeBase</span><span class="p">(</span><span class="nb">object</span><span class="p">):</span>
+    <span class="sd">&quot;&quot;&quot;</span>
+<span class="sd">    Abstract base class for input types.</span>
+<span class="sd">    &quot;&quot;&quot;</span>
+
+    <span class="n">template</span> <span class="o">=</span> <span class="bp">None</span>
+
+    <span class="k">def</span> <span class="nf">__init__</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">system</span><span class="p">,</span> <span class="n">xml</span><span class="p">,</span> <span class="n">state</span><span class="p">):</span>
+        <span class="sd">&quot;&quot;&quot;</span>
+<span class="sd">        Instantiate an InputType class.  Arguments:</span>
+
+<span class="sd">        - system    : ModuleSystem instance which provides OS, rendering, and user context.</span>
+<span class="sd">                      Specifically, must have a render_template function.</span>
+<span class="sd">        - xml       : Element tree of this Input element</span>
+<span class="sd">        - state     : a dictionary with optional keys:</span>
+<span class="sd">                      * &#39;value&#39;  -- the current value of this input</span>
+<span class="sd">                                    (what the student entered last time)</span>
+<span class="sd">                      * &#39;id&#39; -- the id of this input, typically</span>
+<span class="sd">                                &quot;{problem-location}_{response-num}_{input-num}&quot;</span>
+<span class="sd">                      * &#39;status&#39; (answered, unanswered, unsubmitted)</span>
+<span class="sd">                      * &#39;feedback&#39; (dictionary containing keys for hints, errors, or other</span>
+<span class="sd">                         feedback from previous attempt.  Specifically &#39;message&#39;, &#39;hint&#39;,</span>
+<span class="sd">                         &#39;hintmode&#39;.  If &#39;hintmode&#39; is &#39;always&#39;, the hint is always displayed.)</span>
+<span class="sd">        &quot;&quot;&quot;</span>
+
+        <span class="bp">self</span><span class="o">.</span><span class="n">xml</span> <span class="o">=</span> <span class="n">xml</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">tag</span> <span class="o">=</span> <span class="n">xml</span><span class="o">.</span><span class="n">tag</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">system</span> <span class="o">=</span> <span class="n">system</span>
+
+        <span class="c">## NOTE: ID should only come from one place.  If it comes from multiple,</span>
+        <span class="c">## we use state first, XML second (in case the xml changed, but we have</span>
+        <span class="c">## existing state with an old id). Since we don&#39;t make this guarantee,</span>
+        <span class="c">## we can swap this around in the future if there&#39;s a more logical</span>
+        <span class="c">## order.</span>
+
+        <span class="bp">self</span><span class="o">.</span><span class="n">id</span> <span class="o">=</span> <span class="n">state</span><span class="o">.</span><span class="n">get</span><span class="p">(</span><span class="s">&#39;id&#39;</span><span class="p">,</span> <span class="n">xml</span><span class="o">.</span><span class="n">get</span><span class="p">(</span><span class="s">&#39;id&#39;</span><span class="p">))</span>
+        <span class="k">if</span> <span class="bp">self</span><span class="o">.</span><span class="n">id</span> <span class="ow">is</span> <span class="bp">None</span><span class="p">:</span>
+            <span class="k">raise</span> <span class="ne">ValueError</span><span class="p">(</span><span class="s">&quot;input id state is None. xml is {0}&quot;</span><span class="o">.</span><span class="n">format</span><span class="p">(</span><span class="n">etree</span><span class="o">.</span><span class="n">tostring</span><span class="p">(</span><span class="n">xml</span><span class="p">)))</span>
+
+        <span class="bp">self</span><span class="o">.</span><span class="n">value</span> <span class="o">=</span> <span class="n">state</span><span class="o">.</span><span class="n">get</span><span class="p">(</span><span class="s">&#39;value&#39;</span><span class="p">,</span> <span class="s">&#39;&#39;</span><span class="p">)</span>
+
+        <span class="n">feedback</span> <span class="o">=</span> <span class="n">state</span><span class="o">.</span><span class="n">get</span><span class="p">(</span><span class="s">&#39;feedback&#39;</span><span class="p">,</span> <span class="p">{})</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">msg</span> <span class="o">=</span> <span class="n">feedback</span><span class="o">.</span><span class="n">get</span><span class="p">(</span><span class="s">&#39;message&#39;</span><span class="p">,</span> <span class="s">&#39;&#39;</span><span class="p">)</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">hint</span> <span class="o">=</span> <span class="n">feedback</span><span class="o">.</span><span class="n">get</span><span class="p">(</span><span class="s">&#39;hint&#39;</span><span class="p">,</span> <span class="s">&#39;&#39;</span><span class="p">)</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">hintmode</span> <span class="o">=</span> <span class="n">feedback</span><span class="o">.</span><span class="n">get</span><span class="p">(</span><span class="s">&#39;hintmode&#39;</span><span class="p">,</span> <span class="bp">None</span><span class="p">)</span>
+
+        <span class="c"># put hint above msg if it should be displayed</span>
+        <span class="k">if</span> <span class="bp">self</span><span class="o">.</span><span class="n">hintmode</span> <span class="o">==</span> <span class="s">&#39;always&#39;</span><span class="p">:</span>
+            <span class="bp">self</span><span class="o">.</span><span class="n">msg</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">hint</span> <span class="o">+</span> <span class="p">(</span><span class="s">&#39;&lt;br/&gt;&#39;</span> <span class="k">if</span> <span class="bp">self</span><span class="o">.</span><span class="n">msg</span> <span class="k">else</span> <span class="s">&#39;&#39;</span><span class="p">)</span> <span class="o">+</span> <span class="bp">self</span><span class="o">.</span><span class="n">msg</span>
+
+        <span class="bp">self</span><span class="o">.</span><span class="n">status</span> <span class="o">=</span> <span class="n">state</span><span class="o">.</span><span class="n">get</span><span class="p">(</span><span class="s">&#39;status&#39;</span><span class="p">,</span> <span class="s">&#39;unanswered&#39;</span><span class="p">)</span>
+
+        <span class="c"># Call subclass &quot;constructor&quot; -- means they don&#39;t have to worry about calling</span>
+        <span class="c"># super().__init__, and are isolated from changes to the input constructor interface.</span>
+        <span class="k">try</span><span class="p">:</span>
+            <span class="bp">self</span><span class="o">.</span><span class="n">setup</span><span class="p">()</span>
+        <span class="k">except</span> <span class="ne">Exception</span> <span class="k">as</span> <span class="n">err</span><span class="p">:</span>
+            <span class="c"># Something went wrong: add xml to message, but keep the traceback</span>
+            <span class="n">msg</span> <span class="o">=</span> <span class="s">&quot;Error in xml &#39;{x}&#39;: {err} &quot;</span><span class="o">.</span><span class="n">format</span><span class="p">(</span><span class="n">x</span><span class="o">=</span><span class="n">etree</span><span class="o">.</span><span class="n">tostring</span><span class="p">(</span><span class="n">xml</span><span class="p">),</span> <span class="n">err</span><span class="o">=</span><span class="nb">str</span><span class="p">(</span><span class="n">err</span><span class="p">))</span>
+            <span class="k">raise</span> <span class="ne">Exception</span><span class="p">,</span> <span class="n">msg</span><span class="p">,</span> <span class="n">sys</span><span class="o">.</span><span class="n">exc_info</span><span class="p">()[</span><span class="mi">2</span><span class="p">]</span>
+
+
+<div class="viewcode-block" id="InputTypeBase.setup"><a class="viewcode-back" href="../../capa.html#capa.inputtypes.InputTypeBase.setup">[docs]</a>    <span class="k">def</span> <span class="nf">setup</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
+        <span class="sd">&quot;&quot;&quot;</span>
+<span class="sd">        InputTypes should override this to do any needed initialization.  It is called after the</span>
+<span class="sd">        constructor, so all base attributes will be set.</span>
+
+<span class="sd">        If this method raises an exception, it will be wrapped with a message that includes the</span>
+<span class="sd">        problem xml.</span>
+<span class="sd">        &quot;&quot;&quot;</span>
+        <span class="k">pass</span>
+</div>
+    <span class="k">def</span> <span class="nf">_get_render_context</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
+        <span class="sd">&quot;&quot;&quot;</span>
+<span class="sd">        Abstract method.  Subclasses should implement to return the dictionary</span>
+<span class="sd">        of keys needed to render their template.</span>
+
+<span class="sd">        (Separate from get_html to faciliate testing of logic separately from the rendering)</span>
+<span class="sd">        &quot;&quot;&quot;</span>
+        <span class="k">raise</span> <span class="ne">NotImplementedError</span>
+
+<div class="viewcode-block" id="InputTypeBase.get_html"><a class="viewcode-back" href="../../capa.html#capa.inputtypes.InputTypeBase.get_html">[docs]</a>    <span class="k">def</span> <span class="nf">get_html</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
+        <span class="sd">&quot;&quot;&quot;</span>
+<span class="sd">        Return the html for this input, as an etree element.</span>
+<span class="sd">        &quot;&quot;&quot;</span>
+        <span class="k">if</span> <span class="bp">self</span><span class="o">.</span><span class="n">template</span> <span class="ow">is</span> <span class="bp">None</span><span class="p">:</span>
+            <span class="k">raise</span> <span class="ne">NotImplementedError</span><span class="p">(</span><span class="s">&quot;no rendering template specified for class {0}&quot;</span>
+                                      <span class="o">.</span><span class="n">format</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">__class__</span><span class="p">))</span>
+
+        <span class="n">html</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">system</span><span class="o">.</span><span class="n">render_template</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">template</span><span class="p">,</span> <span class="bp">self</span><span class="o">.</span><span class="n">_get_render_context</span><span class="p">())</span>
+        <span class="k">return</span> <span class="n">etree</span><span class="o">.</span><span class="n">XML</span><span class="p">(</span><span class="n">html</span><span class="p">)</span>
+
+
+<span class="c">#-----------------------------------------------------------------------------</span>
+
+</div></div>
+<div class="viewcode-block" id="OptionInput"><a class="viewcode-back" href="../../capa.html#capa.inputtypes.OptionInput">[docs]</a><span class="k">class</span> <span class="nc">OptionInput</span><span class="p">(</span><span class="n">InputTypeBase</span><span class="p">):</span>
+    <span class="sd">&quot;&quot;&quot;</span>
+<span class="sd">    Input type for selecting and Select option input type.</span>
+
+<span class="sd">    Example:</span>
+
+<span class="sd">    &lt;optioninput options=&quot;(&#39;Up&#39;,&#39;Down&#39;)&quot; correct=&quot;Up&quot;/&gt;&lt;text&gt;The location of the sky&lt;/text&gt;</span>
+<span class="sd">    &quot;&quot;&quot;</span>
+
+    <span class="n">template</span> <span class="o">=</span> <span class="s">&quot;optioninput.html&quot;</span>
+    <span class="n">tags</span> <span class="o">=</span> <span class="p">[</span><span class="s">&#39;optioninput&#39;</span><span class="p">]</span>
+
+    <span class="k">def</span> <span class="nf">setup</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
+        <span class="c"># Extract the options...</span>
+        <span class="n">options</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">xml</span><span class="o">.</span><span class="n">get</span><span class="p">(</span><span class="s">&#39;options&#39;</span><span class="p">)</span>
+        <span class="k">if</span> <span class="ow">not</span> <span class="n">options</span><span class="p">:</span>
+            <span class="k">raise</span> <span class="ne">ValueError</span><span class="p">(</span><span class="s">&quot;optioninput: Missing &#39;options&#39; specification.&quot;</span><span class="p">)</span>
+
+        <span class="c"># parse the set of possible options</span>
+        <span class="n">oset</span> <span class="o">=</span> <span class="n">shlex</span><span class="o">.</span><span class="n">shlex</span><span class="p">(</span><span class="n">options</span><span class="p">[</span><span class="mi">1</span><span class="p">:</span><span class="o">-</span><span class="mi">1</span><span class="p">])</span>
+        <span class="n">oset</span><span class="o">.</span><span class="n">quotes</span> <span class="o">=</span> <span class="s">&quot;&#39;&quot;</span>
+        <span class="n">oset</span><span class="o">.</span><span class="n">whitespace</span> <span class="o">=</span> <span class="s">&quot;,&quot;</span>
+        <span class="n">oset</span> <span class="o">=</span> <span class="p">[</span><span class="n">x</span><span class="p">[</span><span class="mi">1</span><span class="p">:</span><span class="o">-</span><span class="mi">1</span><span class="p">]</span> <span class="k">for</span> <span class="n">x</span>  <span class="ow">in</span> <span class="nb">list</span><span class="p">(</span><span class="n">oset</span><span class="p">)]</span>
+
+        <span class="c"># make ordered list with (key, value) same</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">osetdict</span> <span class="o">=</span> <span class="p">[(</span><span class="n">oset</span><span class="p">[</span><span class="n">x</span><span class="p">],</span> <span class="n">oset</span><span class="p">[</span><span class="n">x</span><span class="p">])</span> <span class="k">for</span> <span class="n">x</span> <span class="ow">in</span> <span class="nb">range</span><span class="p">(</span><span class="nb">len</span><span class="p">(</span><span class="n">oset</span><span class="p">))]</span>
+        <span class="c"># TODO: allow ordering to be randomized</span>
+
+    <span class="k">def</span> <span class="nf">_get_render_context</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
+
+        <span class="n">context</span> <span class="o">=</span> <span class="p">{</span>
+            <span class="s">&#39;id&#39;</span><span class="p">:</span> <span class="bp">self</span><span class="o">.</span><span class="n">id</span><span class="p">,</span>
+            <span class="s">&#39;value&#39;</span><span class="p">:</span> <span class="bp">self</span><span class="o">.</span><span class="n">value</span><span class="p">,</span>
+            <span class="s">&#39;status&#39;</span><span class="p">:</span> <span class="bp">self</span><span class="o">.</span><span class="n">status</span><span class="p">,</span>
+            <span class="s">&#39;msg&#39;</span><span class="p">:</span> <span class="bp">self</span><span class="o">.</span><span class="n">msg</span><span class="p">,</span>
+            <span class="s">&#39;options&#39;</span><span class="p">:</span> <span class="bp">self</span><span class="o">.</span><span class="n">osetdict</span><span class="p">,</span>
+            <span class="s">&#39;inline&#39;</span><span class="p">:</span> <span class="bp">self</span><span class="o">.</span><span class="n">xml</span><span class="o">.</span><span class="n">get</span><span class="p">(</span><span class="s">&#39;inline&#39;</span><span class="p">,</span><span class="s">&#39;&#39;</span><span class="p">),</span>
+            <span class="p">}</span>
+        <span class="k">return</span> <span class="n">context</span>
+</div>
+<span class="n">registry</span><span class="o">.</span><span class="n">register</span><span class="p">(</span><span class="n">OptionInput</span><span class="p">)</span>
+
+<span class="c">#-----------------------------------------------------------------------------</span>
+
+
+<span class="c"># TODO: consolidate choicegroup, radiogroup, checkboxgroup after discussion of</span>
+<span class="c"># desired semantics.</span>
+
+<div class="viewcode-block" id="ChoiceGroup"><a class="viewcode-back" href="../../capa.html#capa.inputtypes.ChoiceGroup">[docs]</a><span class="k">class</span> <span class="nc">ChoiceGroup</span><span class="p">(</span><span class="n">InputTypeBase</span><span class="p">):</span>
+    <span class="sd">&quot;&quot;&quot;</span>
+<span class="sd">    Radio button or checkbox inputs: multiple choice or true/false</span>
+
+<span class="sd">    TODO: allow order of choices to be randomized, following lon-capa spec.  Use</span>
+<span class="sd">    &quot;location&quot; attribute, ie random, top, bottom.</span>
+
+<span class="sd">    Example:</span>
+
+<span class="sd">    &lt;choicegroup&gt;</span>
+<span class="sd">      &lt;choice correct=&quot;false&quot; name=&quot;foil1&quot;&gt;</span>
+<span class="sd">        &lt;text&gt;This is foil One.&lt;/text&gt;</span>
+<span class="sd">      &lt;/choice&gt;</span>
+<span class="sd">      &lt;choice correct=&quot;false&quot; name=&quot;foil2&quot;&gt;</span>
+<span class="sd">        &lt;text&gt;This is foil Two.&lt;/text&gt;</span>
+<span class="sd">      &lt;/choice&gt;</span>
+<span class="sd">      &lt;choice correct=&quot;true&quot; name=&quot;foil3&quot;&gt;</span>
+<span class="sd">        &lt;text&gt;This is foil Three.&lt;/text&gt;</span>
+<span class="sd">      &lt;/choice&gt;</span>
+<span class="sd">    &lt;/choicegroup&gt;</span>
+<span class="sd">    &quot;&quot;&quot;</span>
+    <span class="n">template</span> <span class="o">=</span> <span class="s">&quot;choicegroup.html&quot;</span>
+    <span class="n">tags</span> <span class="o">=</span> <span class="p">[</span><span class="s">&#39;choicegroup&#39;</span><span class="p">,</span> <span class="s">&#39;radiogroup&#39;</span><span class="p">,</span> <span class="s">&#39;checkboxgroup&#39;</span><span class="p">]</span>
+
+    <span class="k">def</span> <span class="nf">setup</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
+        <span class="c"># suffix is &#39;&#39; or [] to change the way the input is handled in --as a scalar or vector</span>
+        <span class="c"># value.  (VS: would be nice to make this less hackish).</span>
+        <span class="k">if</span> <span class="bp">self</span><span class="o">.</span><span class="n">tag</span> <span class="o">==</span> <span class="s">&#39;choicegroup&#39;</span><span class="p">:</span>
+            <span class="bp">self</span><span class="o">.</span><span class="n">suffix</span> <span class="o">=</span> <span class="s">&#39;&#39;</span>
+            <span class="bp">self</span><span class="o">.</span><span class="n">element_type</span> <span class="o">=</span> <span class="s">&quot;radio&quot;</span>
+        <span class="k">elif</span> <span class="bp">self</span><span class="o">.</span><span class="n">tag</span> <span class="o">==</span> <span class="s">&#39;radiogroup&#39;</span><span class="p">:</span>
+            <span class="bp">self</span><span class="o">.</span><span class="n">element_type</span> <span class="o">=</span> <span class="s">&quot;radio&quot;</span>
+            <span class="bp">self</span><span class="o">.</span><span class="n">suffix</span> <span class="o">=</span> <span class="s">&#39;[]&#39;</span>
+        <span class="k">elif</span> <span class="bp">self</span><span class="o">.</span><span class="n">tag</span> <span class="o">==</span> <span class="s">&#39;checkboxgroup&#39;</span><span class="p">:</span>
+            <span class="bp">self</span><span class="o">.</span><span class="n">element_type</span> <span class="o">=</span> <span class="s">&quot;checkbox&quot;</span>
+            <span class="bp">self</span><span class="o">.</span><span class="n">suffix</span> <span class="o">=</span> <span class="s">&#39;[]&#39;</span>
+        <span class="k">else</span><span class="p">:</span>
+            <span class="k">raise</span> <span class="ne">Exception</span><span class="p">(</span><span class="s">&quot;ChoiceGroup: unexpected tag {0}&quot;</span><span class="o">.</span><span class="n">format</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">tag</span><span class="p">))</span>
+
+        <span class="bp">self</span><span class="o">.</span><span class="n">choices</span> <span class="o">=</span> <span class="n">extract_choices</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">xml</span><span class="p">)</span>
+
+    <span class="k">def</span> <span class="nf">_get_render_context</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
+        <span class="n">context</span> <span class="o">=</span> <span class="p">{</span><span class="s">&#39;id&#39;</span><span class="p">:</span> <span class="bp">self</span><span class="o">.</span><span class="n">id</span><span class="p">,</span>
+                   <span class="s">&#39;value&#39;</span><span class="p">:</span> <span class="bp">self</span><span class="o">.</span><span class="n">value</span><span class="p">,</span>
+                   <span class="s">&#39;status&#39;</span><span class="p">:</span> <span class="bp">self</span><span class="o">.</span><span class="n">status</span><span class="p">,</span>
+                   <span class="s">&#39;input_type&#39;</span><span class="p">:</span> <span class="bp">self</span><span class="o">.</span><span class="n">element_type</span><span class="p">,</span>
+                   <span class="s">&#39;choices&#39;</span><span class="p">:</span> <span class="bp">self</span><span class="o">.</span><span class="n">choices</span><span class="p">,</span>
+                   <span class="s">&#39;name_array_suffix&#39;</span><span class="p">:</span> <span class="bp">self</span><span class="o">.</span><span class="n">suffix</span><span class="p">}</span>
+        <span class="k">return</span> <span class="n">context</span>
+</div>
+<div class="viewcode-block" id="extract_choices"><a class="viewcode-back" href="../../capa.html#capa.inputtypes.extract_choices">[docs]</a><span class="k">def</span> <span class="nf">extract_choices</span><span class="p">(</span><span class="n">element</span><span class="p">):</span>
+    <span class="sd">&#39;&#39;&#39;</span>
+<span class="sd">    Extracts choices for a few input types, such as ChoiceGroup, RadioGroup and</span>
+<span class="sd">    CheckboxGroup.</span>
+
+<span class="sd">    returns list of (choice_name, choice_text) tuples</span>
+
+<span class="sd">    TODO: allow order of choices to be randomized, following lon-capa spec.  Use</span>
+<span class="sd">    &quot;location&quot; attribute, ie random, top, bottom.</span>
+<span class="sd">    &#39;&#39;&#39;</span>
+
+    <span class="n">choices</span> <span class="o">=</span> <span class="p">[]</span>
+
+    <span class="k">for</span> <span class="n">choice</span> <span class="ow">in</span> <span class="n">element</span><span class="p">:</span>
+        <span class="k">if</span> <span class="n">choice</span><span class="o">.</span><span class="n">tag</span> <span class="o">!=</span> <span class="s">&#39;choice&#39;</span><span class="p">:</span>
+            <span class="k">raise</span> <span class="ne">Exception</span><span class="p">(</span>
+                <span class="s">&quot;[capa.inputtypes.extract_choices] Expected a &lt;choice&gt; tag; got </span><span class="si">%s</span><span class="s"> instead&quot;</span>
+                <span class="o">%</span> <span class="n">choice</span><span class="o">.</span><span class="n">tag</span><span class="p">)</span>
+        <span class="n">choice_text</span> <span class="o">=</span> <span class="s">&#39;&#39;</span><span class="o">.</span><span class="n">join</span><span class="p">([</span><span class="n">etree</span><span class="o">.</span><span class="n">tostring</span><span class="p">(</span><span class="n">x</span><span class="p">)</span> <span class="k">for</span> <span class="n">x</span> <span class="ow">in</span> <span class="n">choice</span><span class="p">])</span>
+        <span class="k">if</span> <span class="n">choice</span><span class="o">.</span><span class="n">text</span> <span class="ow">is</span> <span class="ow">not</span> <span class="bp">None</span><span class="p">:</span>
+            <span class="c"># TODO: fix order?</span>
+            <span class="n">choice_text</span> <span class="o">+=</span> <span class="n">choice</span><span class="o">.</span><span class="n">text</span>
+
+        <span class="n">choices</span><span class="o">.</span><span class="n">append</span><span class="p">((</span><span class="n">choice</span><span class="o">.</span><span class="n">get</span><span class="p">(</span><span class="s">&quot;name&quot;</span><span class="p">),</span> <span class="n">choice_text</span><span class="p">))</span>
+
+    <span class="k">return</span> <span class="n">choices</span>
+
+</div>
+<span class="n">registry</span><span class="o">.</span><span class="n">register</span><span class="p">(</span><span class="n">ChoiceGroup</span><span class="p">)</span>
+
+
+<span class="c">#-----------------------------------------------------------------------------</span>
+
+
+<div class="viewcode-block" id="JavascriptInput"><a class="viewcode-back" href="../../capa.html#capa.inputtypes.JavascriptInput">[docs]</a><span class="k">class</span> <span class="nc">JavascriptInput</span><span class="p">(</span><span class="n">InputTypeBase</span><span class="p">):</span>
+    <span class="sd">&quot;&quot;&quot;</span>
+<span class="sd">    Hidden field for javascript to communicate via; also loads the required</span>
+<span class="sd">    scripts for rendering the problem and passes data to the problem.</span>
+
+<span class="sd">    TODO (arjun?): document this in detail.  Initial notes:</span>
+<span class="sd">    - display_class is a subclass of XProblemClassDisplay (see</span>
+<span class="sd">        xmodule/xmodule/js/src/capa/display.coffee),</span>
+<span class="sd">    - display_file is the js script to be in /static/js/ where display_class is defined.</span>
+<span class="sd">    &quot;&quot;&quot;</span>
+
+    <span class="n">template</span> <span class="o">=</span> <span class="s">&quot;javascriptinput.html&quot;</span>
+    <span class="n">tags</span> <span class="o">=</span> <span class="p">[</span><span class="s">&#39;javascriptinput&#39;</span><span class="p">]</span>
+
+    <span class="k">def</span> <span class="nf">setup</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
+        <span class="c"># Need to provide a value that JSON can parse if there is no</span>
+        <span class="c"># student-supplied value yet.</span>
+        <span class="k">if</span> <span class="bp">self</span><span class="o">.</span><span class="n">value</span> <span class="o">==</span> <span class="s">&quot;&quot;</span><span class="p">:</span>
+            <span class="bp">self</span><span class="o">.</span><span class="n">value</span> <span class="o">=</span> <span class="s">&#39;null&#39;</span>
+
+        <span class="bp">self</span><span class="o">.</span><span class="n">params</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">xml</span><span class="o">.</span><span class="n">get</span><span class="p">(</span><span class="s">&#39;params&#39;</span><span class="p">)</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">problem_state</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">xml</span><span class="o">.</span><span class="n">get</span><span class="p">(</span><span class="s">&#39;problem_state&#39;</span><span class="p">)</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">display_class</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">xml</span><span class="o">.</span><span class="n">get</span><span class="p">(</span><span class="s">&#39;display_class&#39;</span><span class="p">)</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">display_file</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">xml</span><span class="o">.</span><span class="n">get</span><span class="p">(</span><span class="s">&#39;display_file&#39;</span><span class="p">)</span>
+
+
+    <span class="k">def</span> <span class="nf">_get_render_context</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
+        <span class="n">escapedict</span> <span class="o">=</span> <span class="p">{</span><span class="s">&#39;&quot;&#39;</span><span class="p">:</span> <span class="s">&#39;&amp;quot;&#39;</span><span class="p">}</span>
+        <span class="n">value</span> <span class="o">=</span> <span class="n">saxutils</span><span class="o">.</span><span class="n">escape</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">value</span><span class="p">,</span> <span class="n">escapedict</span><span class="p">)</span>
+        <span class="n">msg</span>   <span class="o">=</span> <span class="n">saxutils</span><span class="o">.</span><span class="n">escape</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">msg</span><span class="p">,</span> <span class="n">escapedict</span><span class="p">)</span>
+
+        <span class="n">context</span> <span class="o">=</span> <span class="p">{</span><span class="s">&#39;id&#39;</span><span class="p">:</span> <span class="bp">self</span><span class="o">.</span><span class="n">id</span><span class="p">,</span>
+               <span class="s">&#39;params&#39;</span><span class="p">:</span> <span class="bp">self</span><span class="o">.</span><span class="n">params</span><span class="p">,</span>
+               <span class="s">&#39;display_file&#39;</span><span class="p">:</span> <span class="bp">self</span><span class="o">.</span><span class="n">display_file</span><span class="p">,</span>
+               <span class="s">&#39;display_class&#39;</span><span class="p">:</span> <span class="bp">self</span><span class="o">.</span><span class="n">display_class</span><span class="p">,</span>
+               <span class="s">&#39;problem_state&#39;</span><span class="p">:</span> <span class="bp">self</span><span class="o">.</span><span class="n">problem_state</span><span class="p">,</span>
+               <span class="s">&#39;value&#39;</span><span class="p">:</span> <span class="n">value</span><span class="p">,</span>
+               <span class="s">&#39;evaluation&#39;</span><span class="p">:</span> <span class="n">msg</span><span class="p">,</span>
+               <span class="p">}</span>
+        <span class="k">return</span> <span class="n">context</span>
+</div>
+<span class="n">registry</span><span class="o">.</span><span class="n">register</span><span class="p">(</span><span class="n">JavascriptInput</span><span class="p">)</span>
+
+
+<span class="c">#-----------------------------------------------------------------------------</span>
+
+<div class="viewcode-block" id="TextLine"><a class="viewcode-back" href="../../capa.html#capa.inputtypes.TextLine">[docs]</a><span class="k">class</span> <span class="nc">TextLine</span><span class="p">(</span><span class="n">InputTypeBase</span><span class="p">):</span>
+    <span class="sd">&quot;&quot;&quot;</span>
+
+<span class="sd">    &quot;&quot;&quot;</span>
+
+    <span class="n">template</span> <span class="o">=</span> <span class="s">&quot;textline.html&quot;</span>
+    <span class="n">tags</span> <span class="o">=</span> <span class="p">[</span><span class="s">&#39;textline&#39;</span><span class="p">]</span>
+
+    <span class="k">def</span> <span class="nf">setup</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">size</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">xml</span><span class="o">.</span><span class="n">get</span><span class="p">(</span><span class="s">&#39;size&#39;</span><span class="p">)</span>
+
+        <span class="c"># if specified, then textline is hidden and input id is stored</span>
+        <span class="c"># in div with name=self.hidden.</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">hidden</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">xml</span><span class="o">.</span><span class="n">get</span><span class="p">(</span><span class="s">&#39;hidden&#39;</span><span class="p">,</span> <span class="bp">False</span><span class="p">)</span>
+
+        <span class="bp">self</span><span class="o">.</span><span class="n">inline</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">xml</span><span class="o">.</span><span class="n">get</span><span class="p">(</span><span class="s">&#39;inline&#39;</span><span class="p">,</span> <span class="bp">False</span><span class="p">)</span>
+
+        <span class="c"># TODO: &#39;dojs&#39; flag is temporary, for backwards compatibility with 8.02x</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">do_math</span> <span class="o">=</span> <span class="nb">bool</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">xml</span><span class="o">.</span><span class="n">get</span><span class="p">(</span><span class="s">&#39;math&#39;</span><span class="p">)</span> <span class="ow">or</span> <span class="bp">self</span><span class="o">.</span><span class="n">xml</span><span class="o">.</span><span class="n">get</span><span class="p">(</span><span class="s">&#39;dojs&#39;</span><span class="p">))</span>
+        <span class="c"># TODO: do math checking using ajax instead of using js, so</span>
+        <span class="c"># that we only have one math parser.</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">preprocessor</span> <span class="o">=</span> <span class="bp">None</span>
+        <span class="k">if</span> <span class="bp">self</span><span class="o">.</span><span class="n">do_math</span><span class="p">:</span>
+            <span class="c"># Preprocessor to insert between raw input and Mathjax</span>
+            <span class="bp">self</span><span class="o">.</span><span class="n">preprocessor</span> <span class="o">=</span> <span class="p">{</span><span class="s">&#39;class_name&#39;</span><span class="p">:</span> <span class="bp">self</span><span class="o">.</span><span class="n">xml</span><span class="o">.</span><span class="n">get</span><span class="p">(</span><span class="s">&#39;preprocessorClassName&#39;</span><span class="p">,</span><span class="s">&#39;&#39;</span><span class="p">),</span>
+                            <span class="s">&#39;script_src&#39;</span><span class="p">:</span> <span class="bp">self</span><span class="o">.</span><span class="n">xml</span><span class="o">.</span><span class="n">get</span><span class="p">(</span><span class="s">&#39;preprocessorSrc&#39;</span><span class="p">,</span><span class="s">&#39;&#39;</span><span class="p">)}</span>
+            <span class="k">if</span> <span class="s">&#39;&#39;</span> <span class="ow">in</span> <span class="bp">self</span><span class="o">.</span><span class="n">preprocessor</span><span class="o">.</span><span class="n">values</span><span class="p">():</span>
+                <span class="bp">self</span><span class="o">.</span><span class="n">preprocessor</span> <span class="o">=</span> <span class="bp">None</span>
+
+
+
+    <span class="k">def</span> <span class="nf">_get_render_context</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
+        <span class="c"># Escape answers with quotes, so they don&#39;t crash the system!</span>
+        <span class="n">escapedict</span> <span class="o">=</span> <span class="p">{</span><span class="s">&#39;&quot;&#39;</span><span class="p">:</span> <span class="s">&#39;&amp;quot;&#39;</span><span class="p">}</span>
+        <span class="n">value</span> <span class="o">=</span> <span class="n">saxutils</span><span class="o">.</span><span class="n">escape</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">value</span><span class="p">,</span> <span class="n">escapedict</span><span class="p">)</span>
+
+        <span class="n">context</span> <span class="o">=</span> <span class="p">{</span><span class="s">&#39;id&#39;</span><span class="p">:</span> <span class="bp">self</span><span class="o">.</span><span class="n">id</span><span class="p">,</span>
+                   <span class="s">&#39;value&#39;</span><span class="p">:</span> <span class="n">value</span><span class="p">,</span>
+                   <span class="s">&#39;status&#39;</span><span class="p">:</span> <span class="bp">self</span><span class="o">.</span><span class="n">status</span><span class="p">,</span>
+                   <span class="s">&#39;size&#39;</span><span class="p">:</span> <span class="bp">self</span><span class="o">.</span><span class="n">size</span><span class="p">,</span>
+                   <span class="s">&#39;msg&#39;</span><span class="p">:</span> <span class="bp">self</span><span class="o">.</span><span class="n">msg</span><span class="p">,</span>
+                   <span class="s">&#39;hidden&#39;</span><span class="p">:</span> <span class="bp">self</span><span class="o">.</span><span class="n">hidden</span><span class="p">,</span>
+                   <span class="s">&#39;inline&#39;</span><span class="p">:</span> <span class="bp">self</span><span class="o">.</span><span class="n">inline</span><span class="p">,</span>
+                   <span class="s">&#39;do_math&#39;</span><span class="p">:</span> <span class="bp">self</span><span class="o">.</span><span class="n">do_math</span><span class="p">,</span>
+                   <span class="s">&#39;preprocessor&#39;</span><span class="p">:</span> <span class="bp">self</span><span class="o">.</span><span class="n">preprocessor</span><span class="p">,</span>
+               <span class="p">}</span>
+        <span class="k">return</span> <span class="n">context</span>
+</div>
+<span class="n">registry</span><span class="o">.</span><span class="n">register</span><span class="p">(</span><span class="n">TextLine</span><span class="p">)</span>
+
+<span class="c">#-----------------------------------------------------------------------------</span>
+
+<div class="viewcode-block" id="FileSubmission"><a class="viewcode-back" href="../../capa.html#capa.inputtypes.FileSubmission">[docs]</a><span class="k">class</span> <span class="nc">FileSubmission</span><span class="p">(</span><span class="n">InputTypeBase</span><span class="p">):</span>
+    <span class="sd">&quot;&quot;&quot;</span>
+<span class="sd">    Upload some files (e.g. for programming assignments)</span>
+<span class="sd">    &quot;&quot;&quot;</span>
+
+    <span class="n">template</span> <span class="o">=</span> <span class="s">&quot;filesubmission.html&quot;</span>
+    <span class="n">tags</span> <span class="o">=</span> <span class="p">[</span><span class="s">&#39;filesubmission&#39;</span><span class="p">]</span>
+
+    <span class="c"># pulled out for testing</span>
+    <span class="n">submitted_msg</span> <span class="o">=</span> <span class="p">(</span><span class="s">&quot;Your file(s) have been submitted; as soon as your submission is&quot;</span>
+                     <span class="s">&quot; graded, this message will be replaced with the grader&#39;s feedback.&quot;</span><span class="p">)</span>
+
+<div class="viewcode-block" id="FileSubmission.setup"><a class="viewcode-back" href="../../capa.html#capa.inputtypes.FileSubmission.setup">[docs]</a>    <span class="k">def</span> <span class="nf">setup</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
+        <span class="n">escapedict</span> <span class="o">=</span> <span class="p">{</span><span class="s">&#39;&quot;&#39;</span><span class="p">:</span> <span class="s">&#39;&amp;quot;&#39;</span><span class="p">}</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">allowed_files</span>  <span class="o">=</span> <span class="n">json</span><span class="o">.</span><span class="n">dumps</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">xml</span><span class="o">.</span><span class="n">get</span><span class="p">(</span><span class="s">&#39;allowed_files&#39;</span><span class="p">,</span> <span class="s">&#39;&#39;</span><span class="p">)</span><span class="o">.</span><span class="n">split</span><span class="p">())</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">allowed_files</span>  <span class="o">=</span> <span class="n">saxutils</span><span class="o">.</span><span class="n">escape</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">allowed_files</span><span class="p">,</span> <span class="n">escapedict</span><span class="p">)</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">required_files</span> <span class="o">=</span> <span class="n">json</span><span class="o">.</span><span class="n">dumps</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">xml</span><span class="o">.</span><span class="n">get</span><span class="p">(</span><span class="s">&#39;required_files&#39;</span><span class="p">,</span> <span class="s">&#39;&#39;</span><span class="p">)</span><span class="o">.</span><span class="n">split</span><span class="p">())</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">required_files</span> <span class="o">=</span> <span class="n">saxutils</span><span class="o">.</span><span class="n">escape</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">required_files</span><span class="p">,</span> <span class="n">escapedict</span><span class="p">)</span>
+
+        <span class="c"># Check if problem has been queued</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">queue_len</span> <span class="o">=</span> <span class="mi">0</span>
+        <span class="c"># Flag indicating that the problem has been queued, &#39;msg&#39; is length of queue</span>
+        <span class="k">if</span> <span class="bp">self</span><span class="o">.</span><span class="n">status</span> <span class="o">==</span> <span class="s">&#39;incomplete&#39;</span><span class="p">:</span>
+            <span class="bp">self</span><span class="o">.</span><span class="n">status</span> <span class="o">=</span> <span class="s">&#39;queued&#39;</span>
+            <span class="bp">self</span><span class="o">.</span><span class="n">queue_len</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">msg</span>
+            <span class="bp">self</span><span class="o">.</span><span class="n">msg</span> <span class="o">=</span> <span class="n">FileSubmission</span><span class="o">.</span><span class="n">submitted_msg</span>
+</div>
+    <span class="k">def</span> <span class="nf">_get_render_context</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
+
+        <span class="n">context</span> <span class="o">=</span> <span class="p">{</span><span class="s">&#39;id&#39;</span><span class="p">:</span> <span class="bp">self</span><span class="o">.</span><span class="n">id</span><span class="p">,</span>
+                   <span class="s">&#39;status&#39;</span><span class="p">:</span> <span class="bp">self</span><span class="o">.</span><span class="n">status</span><span class="p">,</span>
+                   <span class="s">&#39;msg&#39;</span><span class="p">:</span> <span class="bp">self</span><span class="o">.</span><span class="n">msg</span><span class="p">,</span>
+                   <span class="s">&#39;value&#39;</span><span class="p">:</span> <span class="bp">self</span><span class="o">.</span><span class="n">value</span><span class="p">,</span>
+                   <span class="s">&#39;queue_len&#39;</span><span class="p">:</span> <span class="bp">self</span><span class="o">.</span><span class="n">queue_len</span><span class="p">,</span>
+                   <span class="s">&#39;allowed_files&#39;</span><span class="p">:</span> <span class="bp">self</span><span class="o">.</span><span class="n">allowed_files</span><span class="p">,</span>
+                   <span class="s">&#39;required_files&#39;</span><span class="p">:</span> <span class="bp">self</span><span class="o">.</span><span class="n">required_files</span><span class="p">,}</span>
+        <span class="k">return</span> <span class="n">context</span>
+</div>
+<span class="n">registry</span><span class="o">.</span><span class="n">register</span><span class="p">(</span><span class="n">FileSubmission</span><span class="p">)</span>
+
+
+<span class="c">#-----------------------------------------------------------------------------</span>
+
+<div class="viewcode-block" id="CodeInput"><a class="viewcode-back" href="../../capa.html#capa.inputtypes.CodeInput">[docs]</a><span class="k">class</span> <span class="nc">CodeInput</span><span class="p">(</span><span class="n">InputTypeBase</span><span class="p">):</span>
+    <span class="sd">&quot;&quot;&quot;</span>
+<span class="sd">    A text area input for code--uses codemirror, does syntax highlighting, special tab handling,</span>
+<span class="sd">    etc.</span>
+<span class="sd">    &quot;&quot;&quot;</span>
+
+    <span class="n">template</span> <span class="o">=</span> <span class="s">&quot;codeinput.html&quot;</span>
+    <span class="n">tags</span> <span class="o">=</span> <span class="p">[</span><span class="s">&#39;codeinput&#39;</span><span class="p">,</span>
+            <span class="s">&#39;textbox&#39;</span><span class="p">,</span>        <span class="c"># Another (older) name--at some point we may want to make it use a</span>
+                              <span class="c"># non-codemirror editor.</span>
+            <span class="p">]</span>
+
+
+<div class="viewcode-block" id="CodeInput.setup"><a class="viewcode-back" href="../../capa.html#capa.inputtypes.CodeInput.setup">[docs]</a>    <span class="k">def</span> <span class="nf">setup</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">rows</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">xml</span><span class="o">.</span><span class="n">get</span><span class="p">(</span><span class="s">&#39;rows&#39;</span><span class="p">)</span> <span class="ow">or</span> <span class="s">&#39;30&#39;</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">cols</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">xml</span><span class="o">.</span><span class="n">get</span><span class="p">(</span><span class="s">&#39;cols&#39;</span><span class="p">)</span> <span class="ow">or</span> <span class="s">&#39;80&#39;</span>
+        <span class="c"># if specified, then textline is hidden and id is stored in div of name given by hidden</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">hidden</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">xml</span><span class="o">.</span><span class="n">get</span><span class="p">(</span><span class="s">&#39;hidden&#39;</span><span class="p">,</span> <span class="s">&#39;&#39;</span><span class="p">)</span>
+
+        <span class="c"># if no student input yet, then use the default input given by the problem</span>
+        <span class="k">if</span> <span class="ow">not</span> <span class="bp">self</span><span class="o">.</span><span class="n">value</span><span class="p">:</span>
+            <span class="bp">self</span><span class="o">.</span><span class="n">value</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">xml</span><span class="o">.</span><span class="n">text</span>
+
+        <span class="c"># Check if problem has been queued</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">queue_len</span> <span class="o">=</span> <span class="mi">0</span>
+        <span class="c"># Flag indicating that the problem has been queued, &#39;msg&#39; is length of queue</span>
+        <span class="k">if</span> <span class="bp">self</span><span class="o">.</span><span class="n">status</span> <span class="o">==</span> <span class="s">&#39;incomplete&#39;</span><span class="p">:</span>
+            <span class="bp">self</span><span class="o">.</span><span class="n">status</span> <span class="o">=</span> <span class="s">&#39;queued&#39;</span>
+            <span class="bp">self</span><span class="o">.</span><span class="n">queue_len</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">msg</span>
+            <span class="bp">self</span><span class="o">.</span><span class="n">msg</span> <span class="o">=</span> <span class="s">&#39;Submitted to grader.&#39;</span>
+
+        <span class="c"># For CodeMirror</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">mode</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">xml</span><span class="o">.</span><span class="n">get</span><span class="p">(</span><span class="s">&#39;mode&#39;</span><span class="p">,</span> <span class="s">&#39;python&#39;</span><span class="p">)</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">linenumbers</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">xml</span><span class="o">.</span><span class="n">get</span><span class="p">(</span><span class="s">&#39;linenumbers&#39;</span><span class="p">,</span> <span class="s">&#39;true&#39;</span><span class="p">)</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">tabsize</span> <span class="o">=</span> <span class="nb">int</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">xml</span><span class="o">.</span><span class="n">get</span><span class="p">(</span><span class="s">&#39;tabsize&#39;</span><span class="p">,</span> <span class="s">&#39;4&#39;</span><span class="p">))</span>
+</div>
+    <span class="k">def</span> <span class="nf">_get_render_context</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
+
+        <span class="n">context</span> <span class="o">=</span> <span class="p">{</span><span class="s">&#39;id&#39;</span><span class="p">:</span> <span class="bp">self</span><span class="o">.</span><span class="n">id</span><span class="p">,</span>
+                   <span class="s">&#39;value&#39;</span><span class="p">:</span> <span class="bp">self</span><span class="o">.</span><span class="n">value</span><span class="p">,</span>
+                   <span class="s">&#39;status&#39;</span><span class="p">:</span> <span class="bp">self</span><span class="o">.</span><span class="n">status</span><span class="p">,</span>
+                   <span class="s">&#39;msg&#39;</span><span class="p">:</span> <span class="bp">self</span><span class="o">.</span><span class="n">msg</span><span class="p">,</span>
+                   <span class="s">&#39;mode&#39;</span><span class="p">:</span> <span class="bp">self</span><span class="o">.</span><span class="n">mode</span><span class="p">,</span>
+                   <span class="s">&#39;linenumbers&#39;</span><span class="p">:</span> <span class="bp">self</span><span class="o">.</span><span class="n">linenumbers</span><span class="p">,</span>
+                   <span class="s">&#39;rows&#39;</span><span class="p">:</span> <span class="bp">self</span><span class="o">.</span><span class="n">rows</span><span class="p">,</span>
+                   <span class="s">&#39;cols&#39;</span><span class="p">:</span> <span class="bp">self</span><span class="o">.</span><span class="n">cols</span><span class="p">,</span>
+                   <span class="s">&#39;hidden&#39;</span><span class="p">:</span> <span class="bp">self</span><span class="o">.</span><span class="n">hidden</span><span class="p">,</span>
+                   <span class="s">&#39;tabsize&#39;</span><span class="p">:</span> <span class="bp">self</span><span class="o">.</span><span class="n">tabsize</span><span class="p">,</span>
+                   <span class="s">&#39;queue_len&#39;</span><span class="p">:</span> <span class="bp">self</span><span class="o">.</span><span class="n">queue_len</span><span class="p">,</span>
+               <span class="p">}</span>
+        <span class="k">return</span> <span class="n">context</span>
+</div>
+<span class="n">registry</span><span class="o">.</span><span class="n">register</span><span class="p">(</span><span class="n">CodeInput</span><span class="p">)</span>
+
+
+<span class="c">#-----------------------------------------------------------------------------</span>
+<div class="viewcode-block" id="Schematic"><a class="viewcode-back" href="../../capa.html#capa.inputtypes.Schematic">[docs]</a><span class="k">class</span> <span class="nc">Schematic</span><span class="p">(</span><span class="n">InputTypeBase</span><span class="p">):</span>
+    <span class="sd">&quot;&quot;&quot;</span>
+<span class="sd">    &quot;&quot;&quot;</span>
+
+    <span class="n">template</span> <span class="o">=</span> <span class="s">&quot;schematicinput.html&quot;</span>
+    <span class="n">tags</span> <span class="o">=</span> <span class="p">[</span><span class="s">&#39;schematic&#39;</span><span class="p">]</span>
+
+    <span class="k">def</span> <span class="nf">setup</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">height</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">xml</span><span class="o">.</span><span class="n">get</span><span class="p">(</span><span class="s">&#39;height&#39;</span><span class="p">)</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">width</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">xml</span><span class="o">.</span><span class="n">get</span><span class="p">(</span><span class="s">&#39;width&#39;</span><span class="p">)</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">parts</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">xml</span><span class="o">.</span><span class="n">get</span><span class="p">(</span><span class="s">&#39;parts&#39;</span><span class="p">)</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">analyses</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">xml</span><span class="o">.</span><span class="n">get</span><span class="p">(</span><span class="s">&#39;analyses&#39;</span><span class="p">)</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">initial_value</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">xml</span><span class="o">.</span><span class="n">get</span><span class="p">(</span><span class="s">&#39;initial_value&#39;</span><span class="p">)</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">submit_analyses</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">xml</span><span class="o">.</span><span class="n">get</span><span class="p">(</span><span class="s">&#39;submit_analyses&#39;</span><span class="p">)</span>
+
+
+    <span class="k">def</span> <span class="nf">_get_render_context</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
+
+        <span class="n">context</span> <span class="o">=</span> <span class="p">{</span><span class="s">&#39;id&#39;</span><span class="p">:</span> <span class="bp">self</span><span class="o">.</span><span class="n">id</span><span class="p">,</span>
+                   <span class="s">&#39;value&#39;</span><span class="p">:</span> <span class="bp">self</span><span class="o">.</span><span class="n">value</span><span class="p">,</span>
+                   <span class="s">&#39;initial_value&#39;</span><span class="p">:</span> <span class="bp">self</span><span class="o">.</span><span class="n">initial_value</span><span class="p">,</span>
+                   <span class="s">&#39;status&#39;</span><span class="p">:</span> <span class="bp">self</span><span class="o">.</span><span class="n">status</span><span class="p">,</span>
+                   <span class="s">&#39;width&#39;</span><span class="p">:</span> <span class="bp">self</span><span class="o">.</span><span class="n">width</span><span class="p">,</span>
+                   <span class="s">&#39;height&#39;</span><span class="p">:</span> <span class="bp">self</span><span class="o">.</span><span class="n">height</span><span class="p">,</span>
+                   <span class="s">&#39;parts&#39;</span><span class="p">:</span> <span class="bp">self</span><span class="o">.</span><span class="n">parts</span><span class="p">,</span>
+                   <span class="s">&#39;analyses&#39;</span><span class="p">:</span> <span class="bp">self</span><span class="o">.</span><span class="n">analyses</span><span class="p">,</span>
+                   <span class="s">&#39;submit_analyses&#39;</span><span class="p">:</span> <span class="bp">self</span><span class="o">.</span><span class="n">submit_analyses</span><span class="p">,}</span>
+        <span class="k">return</span> <span class="n">context</span>
+</div>
+<span class="n">registry</span><span class="o">.</span><span class="n">register</span><span class="p">(</span><span class="n">Schematic</span><span class="p">)</span>
+
+<span class="c">#-----------------------------------------------------------------------------</span>
+
+<div class="viewcode-block" id="ImageInput"><a class="viewcode-back" href="../../capa.html#capa.inputtypes.ImageInput">[docs]</a><span class="k">class</span> <span class="nc">ImageInput</span><span class="p">(</span><span class="n">InputTypeBase</span><span class="p">):</span>
+    <span class="sd">&quot;&quot;&quot;</span>
+<span class="sd">    Clickable image as an input field.  Element should specify the image source, height,</span>
+<span class="sd">    and width, e.g.</span>
+
+<span class="sd">    &lt;imageinput src=&quot;/static/Figures/Skier-conservation-of-energy.jpg&quot; width=&quot;388&quot; height=&quot;560&quot; /&gt;</span>
+
+<span class="sd">    TODO: showanswer for imageimput does not work yet - need javascript to put rectangle</span>
+<span class="sd">    over acceptable area of image.</span>
+<span class="sd">    &quot;&quot;&quot;</span>
+
+    <span class="n">template</span> <span class="o">=</span> <span class="s">&quot;imageinput.html&quot;</span>
+    <span class="n">tags</span> <span class="o">=</span> <span class="p">[</span><span class="s">&#39;imageinput&#39;</span><span class="p">]</span>
+
+<div class="viewcode-block" id="ImageInput.setup"><a class="viewcode-back" href="../../capa.html#capa.inputtypes.ImageInput.setup">[docs]</a>    <span class="k">def</span> <span class="nf">setup</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">src</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">xml</span><span class="o">.</span><span class="n">get</span><span class="p">(</span><span class="s">&#39;src&#39;</span><span class="p">)</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">height</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">xml</span><span class="o">.</span><span class="n">get</span><span class="p">(</span><span class="s">&#39;height&#39;</span><span class="p">)</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">width</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">xml</span><span class="o">.</span><span class="n">get</span><span class="p">(</span><span class="s">&#39;width&#39;</span><span class="p">)</span>
+
+        <span class="c"># if value is of the form [x,y] then parse it and send along coordinates of previous answer</span>
+        <span class="n">m</span> <span class="o">=</span> <span class="n">re</span><span class="o">.</span><span class="n">match</span><span class="p">(</span><span class="s">&#39;\[([0-9]+),([0-9]+)]&#39;</span><span class="p">,</span> <span class="bp">self</span><span class="o">.</span><span class="n">value</span><span class="o">.</span><span class="n">strip</span><span class="p">()</span><span class="o">.</span><span class="n">replace</span><span class="p">(</span><span class="s">&#39; &#39;</span><span class="p">,</span> <span class="s">&#39;&#39;</span><span class="p">))</span>
+        <span class="k">if</span> <span class="n">m</span><span class="p">:</span>
+            <span class="c"># Note: we subtract 15 to compensate for the size of the dot on the screen.</span>
+            <span class="c"># (is a 30x30 image--lms/static/green-pointer.png).</span>
+            <span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">gx</span><span class="p">,</span> <span class="bp">self</span><span class="o">.</span><span class="n">gy</span><span class="p">)</span> <span class="o">=</span> <span class="p">[</span><span class="nb">int</span><span class="p">(</span><span class="n">x</span><span class="p">)</span> <span class="o">-</span> <span class="mi">15</span> <span class="k">for</span> <span class="n">x</span> <span class="ow">in</span> <span class="n">m</span><span class="o">.</span><span class="n">groups</span><span class="p">()]</span>
+        <span class="k">else</span><span class="p">:</span>
+            <span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">gx</span><span class="p">,</span> <span class="bp">self</span><span class="o">.</span><span class="n">gy</span><span class="p">)</span> <span class="o">=</span> <span class="p">(</span><span class="mi">0</span><span class="p">,</span> <span class="mi">0</span><span class="p">)</span>
+
+</div>
+    <span class="k">def</span> <span class="nf">_get_render_context</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
+
+        <span class="n">context</span> <span class="o">=</span> <span class="p">{</span><span class="s">&#39;id&#39;</span><span class="p">:</span> <span class="bp">self</span><span class="o">.</span><span class="n">id</span><span class="p">,</span>
+                   <span class="s">&#39;value&#39;</span><span class="p">:</span> <span class="bp">self</span><span class="o">.</span><span class="n">value</span><span class="p">,</span>
+                   <span class="s">&#39;height&#39;</span><span class="p">:</span> <span class="bp">self</span><span class="o">.</span><span class="n">height</span><span class="p">,</span>
+                   <span class="s">&#39;width&#39;</span><span class="p">:</span> <span class="bp">self</span><span class="o">.</span><span class="n">width</span><span class="p">,</span>
+                   <span class="s">&#39;src&#39;</span><span class="p">:</span> <span class="bp">self</span><span class="o">.</span><span class="n">src</span><span class="p">,</span>
+                   <span class="s">&#39;gx&#39;</span><span class="p">:</span> <span class="bp">self</span><span class="o">.</span><span class="n">gx</span><span class="p">,</span>
+                   <span class="s">&#39;gy&#39;</span><span class="p">:</span> <span class="bp">self</span><span class="o">.</span><span class="n">gy</span><span class="p">,</span>
+                   <span class="s">&#39;status&#39;</span><span class="p">:</span> <span class="bp">self</span><span class="o">.</span><span class="n">status</span><span class="p">,</span>
+                   <span class="s">&#39;msg&#39;</span><span class="p">:</span> <span class="bp">self</span><span class="o">.</span><span class="n">msg</span><span class="p">,</span>
+               <span class="p">}</span>
+        <span class="k">return</span> <span class="n">context</span>
+</div>
+<span class="n">registry</span><span class="o">.</span><span class="n">register</span><span class="p">(</span><span class="n">ImageInput</span><span class="p">)</span>
+
+<span class="c">#-----------------------------------------------------------------------------</span>
+
+<div class="viewcode-block" id="Crystallography"><a class="viewcode-back" href="../../capa.html#capa.inputtypes.Crystallography">[docs]</a><span class="k">class</span> <span class="nc">Crystallography</span><span class="p">(</span><span class="n">InputTypeBase</span><span class="p">):</span>
+    <span class="sd">&quot;&quot;&quot;</span>
+<span class="sd">    An input for crystallography -- user selects 3 points on the axes, and we get a plane.</span>
+
+<span class="sd">    TODO: what&#39;s the actual value format?</span>
+<span class="sd">    &quot;&quot;&quot;</span>
+
+    <span class="n">template</span> <span class="o">=</span> <span class="s">&quot;crystallography.html&quot;</span>
+    <span class="n">tags</span> <span class="o">=</span> <span class="p">[</span><span class="s">&#39;crystallography&#39;</span><span class="p">]</span>
+
+
+    <span class="k">def</span> <span class="nf">setup</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">height</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">xml</span><span class="o">.</span><span class="n">get</span><span class="p">(</span><span class="s">&#39;height&#39;</span><span class="p">)</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">width</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">xml</span><span class="o">.</span><span class="n">get</span><span class="p">(</span><span class="s">&#39;width&#39;</span><span class="p">)</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">size</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">xml</span><span class="o">.</span><span class="n">get</span><span class="p">(</span><span class="s">&#39;size&#39;</span><span class="p">)</span>
+
+        <span class="c"># if specified, then textline is hidden and id is stored in div of name given by hidden</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">hidden</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">xml</span><span class="o">.</span><span class="n">get</span><span class="p">(</span><span class="s">&#39;hidden&#39;</span><span class="p">,</span> <span class="s">&#39;&#39;</span><span class="p">)</span>
+
+        <span class="c"># Escape answers with quotes, so they don&#39;t crash the system!</span>
+        <span class="n">escapedict</span> <span class="o">=</span> <span class="p">{</span><span class="s">&#39;&quot;&#39;</span><span class="p">:</span> <span class="s">&#39;&amp;quot;&#39;</span><span class="p">}</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">value</span> <span class="o">=</span> <span class="n">saxutils</span><span class="o">.</span><span class="n">escape</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">value</span><span class="p">,</span> <span class="n">escapedict</span><span class="p">)</span>
+
+    <span class="k">def</span> <span class="nf">_get_render_context</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
+        <span class="n">context</span> <span class="o">=</span> <span class="p">{</span><span class="s">&#39;id&#39;</span><span class="p">:</span> <span class="bp">self</span><span class="o">.</span><span class="n">id</span><span class="p">,</span>
+                   <span class="s">&#39;value&#39;</span><span class="p">:</span> <span class="bp">self</span><span class="o">.</span><span class="n">value</span><span class="p">,</span>
+                   <span class="s">&#39;status&#39;</span><span class="p">:</span> <span class="bp">self</span><span class="o">.</span><span class="n">status</span><span class="p">,</span>
+                   <span class="s">&#39;size&#39;</span><span class="p">:</span> <span class="bp">self</span><span class="o">.</span><span class="n">size</span><span class="p">,</span>
+                   <span class="s">&#39;msg&#39;</span><span class="p">:</span> <span class="bp">self</span><span class="o">.</span><span class="n">msg</span><span class="p">,</span>
+                   <span class="s">&#39;hidden&#39;</span><span class="p">:</span> <span class="bp">self</span><span class="o">.</span><span class="n">hidden</span><span class="p">,</span>
+                   <span class="s">&#39;width&#39;</span><span class="p">:</span> <span class="bp">self</span><span class="o">.</span><span class="n">width</span><span class="p">,</span>
+                   <span class="s">&#39;height&#39;</span><span class="p">:</span> <span class="bp">self</span><span class="o">.</span><span class="n">height</span><span class="p">,</span>
+               <span class="p">}</span>
+        <span class="k">return</span> <span class="n">context</span>
+</div>
+<span class="n">registry</span><span class="o">.</span><span class="n">register</span><span class="p">(</span><span class="n">Crystallography</span><span class="p">)</span>
+
+<span class="c"># -------------------------------------------------------------------------</span>
+
+<div class="viewcode-block" id="VseprInput"><a class="viewcode-back" href="../../capa.html#capa.inputtypes.VseprInput">[docs]</a><span class="k">class</span> <span class="nc">VseprInput</span><span class="p">(</span><span class="n">InputTypeBase</span><span class="p">):</span>
+    <span class="sd">&quot;&quot;&quot;</span>
+<span class="sd">    Input for molecular geometry--show possible structures, let student</span>
+<span class="sd">    pick structure and label positions with atoms or electron pairs.</span>
+<span class="sd">    &quot;&quot;&quot;</span>
+
+    <span class="n">template</span> <span class="o">=</span> <span class="s">&#39;vsepr_input.html&#39;</span>
+    <span class="n">tags</span> <span class="o">=</span> <span class="p">[</span><span class="s">&#39;vsepr_input&#39;</span><span class="p">]</span>
+
+    <span class="k">def</span> <span class="nf">setup</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">height</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">xml</span><span class="o">.</span><span class="n">get</span><span class="p">(</span><span class="s">&#39;height&#39;</span><span class="p">)</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">width</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">xml</span><span class="o">.</span><span class="n">get</span><span class="p">(</span><span class="s">&#39;width&#39;</span><span class="p">)</span>
+
+        <span class="c"># Escape answers with quotes, so they don&#39;t crash the system!</span>
+        <span class="n">escapedict</span> <span class="o">=</span> <span class="p">{</span><span class="s">&#39;&quot;&#39;</span><span class="p">:</span> <span class="s">&#39;&amp;quot;&#39;</span><span class="p">}</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">value</span> <span class="o">=</span> <span class="n">saxutils</span><span class="o">.</span><span class="n">escape</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">value</span><span class="p">,</span> <span class="n">escapedict</span><span class="p">)</span>
+
+        <span class="bp">self</span><span class="o">.</span><span class="n">molecules</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">xml</span><span class="o">.</span><span class="n">get</span><span class="p">(</span><span class="s">&#39;molecules&#39;</span><span class="p">)</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">geometries</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">xml</span><span class="o">.</span><span class="n">get</span><span class="p">(</span><span class="s">&#39;geometries&#39;</span><span class="p">)</span>
+
+    <span class="k">def</span> <span class="nf">_get_render_context</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
+
+        <span class="n">context</span> <span class="o">=</span> <span class="p">{</span><span class="s">&#39;id&#39;</span><span class="p">:</span> <span class="bp">self</span><span class="o">.</span><span class="n">id</span><span class="p">,</span>
+                   <span class="s">&#39;value&#39;</span><span class="p">:</span> <span class="bp">self</span><span class="o">.</span><span class="n">value</span><span class="p">,</span>
+                   <span class="s">&#39;status&#39;</span><span class="p">:</span> <span class="bp">self</span><span class="o">.</span><span class="n">status</span><span class="p">,</span>
+                   <span class="s">&#39;msg&#39;</span><span class="p">:</span> <span class="bp">self</span><span class="o">.</span><span class="n">msg</span><span class="p">,</span>
+                   <span class="s">&#39;width&#39;</span><span class="p">:</span> <span class="bp">self</span><span class="o">.</span><span class="n">width</span><span class="p">,</span>
+                   <span class="s">&#39;height&#39;</span><span class="p">:</span> <span class="bp">self</span><span class="o">.</span><span class="n">height</span><span class="p">,</span>
+                   <span class="s">&#39;molecules&#39;</span><span class="p">:</span> <span class="bp">self</span><span class="o">.</span><span class="n">molecules</span><span class="p">,</span>
+                   <span class="s">&#39;geometries&#39;</span><span class="p">:</span> <span class="bp">self</span><span class="o">.</span><span class="n">geometries</span><span class="p">,</span>
+               <span class="p">}</span>
+        <span class="k">return</span> <span class="n">context</span>
+</div>
+<span class="n">registry</span><span class="o">.</span><span class="n">register</span><span class="p">(</span><span class="n">VseprInput</span><span class="p">)</span>
+
+<span class="c">#--------------------------------------------------------------------------------</span>
+
+
+<div class="viewcode-block" id="ChemicalEquationInput"><a class="viewcode-back" href="../../capa.html#capa.inputtypes.ChemicalEquationInput">[docs]</a><span class="k">class</span> <span class="nc">ChemicalEquationInput</span><span class="p">(</span><span class="n">InputTypeBase</span><span class="p">):</span>
+    <span class="sd">&quot;&quot;&quot;</span>
+<span class="sd">    An input type for entering chemical equations.  Supports live preview.</span>
+
+<span class="sd">    Example:</span>
+
+<span class="sd">    &lt;chemicalequationinput size=&quot;50&quot;/&gt;</span>
+
+<span class="sd">    options: size -- width of the textbox.</span>
+<span class="sd">    &quot;&quot;&quot;</span>
+
+    <span class="n">template</span> <span class="o">=</span> <span class="s">&quot;chemicalequationinput.html&quot;</span>
+    <span class="n">tags</span> <span class="o">=</span> <span class="p">[</span><span class="s">&#39;chemicalequationinput&#39;</span><span class="p">]</span>
+
+    <span class="k">def</span> <span class="nf">setup</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">size</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">xml</span><span class="o">.</span><span class="n">get</span><span class="p">(</span><span class="s">&#39;size&#39;</span><span class="p">,</span> <span class="s">&#39;20&#39;</span><span class="p">)</span>
+
+    <span class="k">def</span> <span class="nf">_get_render_context</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
+        <span class="n">context</span> <span class="o">=</span> <span class="p">{</span>
+            <span class="s">&#39;id&#39;</span><span class="p">:</span> <span class="bp">self</span><span class="o">.</span><span class="n">id</span><span class="p">,</span>
+            <span class="s">&#39;value&#39;</span><span class="p">:</span> <span class="bp">self</span><span class="o">.</span><span class="n">value</span><span class="p">,</span>
+            <span class="s">&#39;status&#39;</span><span class="p">:</span> <span class="bp">self</span><span class="o">.</span><span class="n">status</span><span class="p">,</span>
+            <span class="s">&#39;size&#39;</span><span class="p">:</span> <span class="bp">self</span><span class="o">.</span><span class="n">size</span><span class="p">,</span>
+            <span class="s">&#39;previewer&#39;</span><span class="p">:</span> <span class="s">&#39;/static/js/capa/chemical_equation_preview.js&#39;</span><span class="p">,</span>
+            <span class="p">}</span>
+        <span class="k">return</span> <span class="n">context</span>
+</div>
+<span class="n">registry</span><span class="o">.</span><span class="n">register</span><span class="p">(</span><span class="n">ChemicalEquationInput</span><span class="p">)</span>
+</pre></div>
+
+          </div>
+        </div>
+      </div>
+      <div class="clearer"></div>
+    </div>
+    <div class="related">
+      <h3>Navigation</h3>
+      <ul>
+        <li class="right" style="margin-right: 10px">
+          <a href="../../genindex.html" title="General Index"
+             >index</a></li>
+        <li class="right" >
+          <a href="../../py-modindex.html" title="Python Module Index"
+             >modules</a> |</li>
+        <li><a href="../../index.html">MITx 1.0 documentation</a> &raquo;</li>
+          <li><a href="../index.html" >Module code</a> &raquo;</li> 
+      </ul>
+    </div>
+    <div class="footer">
+        &copy; Copyright 2012, MITx team.
+      Created using <a href="http://sphinx.pocoo.org/">Sphinx</a> 1.1.3.
+    </div>
+  </body>
+</html>

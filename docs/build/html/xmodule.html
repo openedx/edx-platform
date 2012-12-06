@@ -1,0 +1,1486 @@
+
+
+<!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Transitional//EN"
+  "http://www.w3.org/TR/xhtml1/DTD/xhtml1-transitional.dtd">
+
+
+<html xmlns="http://www.w3.org/1999/xhtml">
+  <head>
+    <meta http-equiv="Content-Type" content="text/html; charset=utf-8" />
+    
+    <title>Xmodule &mdash; MITx 1.0 documentation</title>
+    
+    <link rel="stylesheet" href="_static/sphinxdoc.css" type="text/css" />
+    <link rel="stylesheet" href="_static/pygments.css" type="text/css" />
+    
+    <script type="text/javascript">
+      var DOCUMENTATION_OPTIONS = {
+        URL_ROOT:    '',
+        VERSION:     '1.0',
+        COLLAPSE_INDEX: false,
+        FILE_SUFFIX: '.html',
+        HAS_SOURCE:  true
+      };
+    </script>
+    <script type="text/javascript" src="_static/jquery.js"></script>
+    <script type="text/javascript" src="_static/underscore.js"></script>
+    <script type="text/javascript" src="_static/doctools.js"></script>
+    <script type="text/javascript" src="http://cdn.mathjax.org/mathjax/latest/MathJax.js?config=TeX-AMS-MML_HTMLorMML"></script>
+    <link rel="top" title="MITx 1.0 documentation" href="index.html" />
+    <link rel="up" title="Common / lib" href="common-lib.html" />
+    <link rel="next" title="Capa module" href="capa.html" />
+    <link rel="prev" title="Common / lib" href="common-lib.html" /> 
+  </head>
+  <body>
+<img src="_static/homepage-bg.jpg" alt="Edx logo"  width="100%;"/>
+
+    <div class="related">
+      <h3>Navigation</h3>
+      <ul>
+        <li class="right" style="margin-right: 10px">
+          <a href="genindex.html" title="General Index"
+             accesskey="I">index</a></li>
+        <li class="right" >
+          <a href="py-modindex.html" title="Python Module Index"
+             >modules</a> |</li>
+        <li class="right" >
+          <a href="capa.html" title="Capa module"
+             accesskey="N">next</a> |</li>
+        <li class="right" >
+          <a href="common-lib.html" title="Common / lib"
+             accesskey="P">previous</a> |</li>
+        <li><a href="index.html">MITx 1.0 documentation</a> &raquo;</li>
+          <li><a href="common-lib.html" accesskey="U">Common / lib</a> &raquo;</li> 
+      </ul>
+    </div>
+      <div class="sphinxsidebar">
+        <div class="sphinxsidebarwrapper">
+  <h3><a href="index.html">Table Of Contents</a></h3>
+  <ul>
+<li><a class="reference internal" href="#">Xmodule</a><ul>
+<li><a class="reference internal" href="#module-xmodule.abtest_module">Abtest</a></li>
+<li><a class="reference internal" href="#module-xmodule.backcompat_module">Back compatibility</a></li>
+<li><a class="reference internal" href="#module-xmodule.capa_module">Capa</a></li>
+<li><a class="reference internal" href="#module-xmodule.course_module">Course</a></li>
+<li><a class="reference internal" href="#module-xmodule.discussion_module">Discussion</a></li>
+<li><a class="reference internal" href="#module-xmodule.editing_module">Editing</a></li>
+<li><a class="reference internal" href="#module-xmodule.error_module">Error</a></li>
+<li><a class="reference internal" href="#module-xmodule.errortracker">Error tracker</a></li>
+<li><a class="reference internal" href="#module-xmodule.exceptions">Exceptions</a></li>
+<li><a class="reference internal" href="#module-xmodule.graders">Graders</a></li>
+<li><a class="reference internal" href="#module-xmodule.hidden_module">Hidden</a></li>
+<li><a class="reference internal" href="#module-xmodule.html_checker">Html checker</a></li>
+<li><a class="reference internal" href="#module-xmodule.html_module">Html</a></li>
+<li><a class="reference internal" href="#module-xmodule.mako_module">Mako</a></li>
+<li><a class="reference internal" href="#module-xmodule.progress">Progress</a></li>
+<li><a class="reference internal" href="#module-xmodule.schematic_module">Schematic</a></li>
+<li><a class="reference internal" href="#module-xmodule.seq_module">Sequence</a></li>
+<li><a class="reference internal" href="#module-xmodule.stringify">Stringify</a></li>
+<li><a class="reference internal" href="#module-xmodule.template_module">Template</a></li>
+<li><a class="reference internal" href="#module-xmodule.templates">Templates</a></li>
+<li><a class="reference internal" href="#module-xmodule.timeparse">Time parse</a></li>
+<li><a class="reference internal" href="#module-xmodule.vertical_module">Vertical</a></li>
+<li><a class="reference internal" href="#module-xmodule.video_module">Video</a></li>
+<li><a class="reference internal" href="#module-xmodule.x_module">X</a></li>
+<li><a class="reference internal" href="#module-xmodule.xml_module">Xml</a></li>
+</ul>
+</li>
+</ul>
+
+  <h4>Previous topic</h4>
+  <p class="topless"><a href="common-lib.html"
+                        title="previous chapter">Common / lib</a></p>
+  <h4>Next topic</h4>
+  <p class="topless"><a href="capa.html"
+                        title="next chapter">Capa module</a></p>
+  <h3>This Page</h3>
+  <ul class="this-page-menu">
+    <li><a href="_sources/xmodule.txt"
+           rel="nofollow">Show Source</a></li>
+  </ul>
+<div id="searchbox" style="display: none">
+  <h3>Quick search</h3>
+    <form class="search" action="search.html" method="get">
+      <input type="text" name="q" />
+      <input type="submit" value="Go" />
+      <input type="hidden" name="check_keywords" value="yes" />
+      <input type="hidden" name="area" value="default" />
+    </form>
+    <p class="searchtip" style="font-size: 90%">
+    Enter search terms or a module, class or function name.
+    </p>
+</div>
+<script type="text/javascript">$('#searchbox').show(0);</script>
+        </div>
+      </div>
+
+    <div class="document">
+      <div class="documentwrapper">
+        <div class="bodywrapper">
+          <div class="body">
+            
+  <div class="section" id="module-xmodule">
+<span id="xmodule"></span><h1>Xmodule<a class="headerlink" href="#module-xmodule" title="Permalink to this headline">¶</a></h1>
+<div class="section" id="module-xmodule.abtest_module">
+<span id="abtest"></span><h2>Abtest<a class="headerlink" href="#module-xmodule.abtest_module" title="Permalink to this headline">¶</a></h2>
+<dl class="class">
+<dt id="xmodule.abtest_module.ABTestModule">
+<em class="property">class </em><tt class="descclassname">xmodule.abtest_module.</tt><tt class="descname">ABTestModule</tt><big>(</big><em>system</em>, <em>location</em>, <em>definition</em>, <em>descriptor</em>, <em>instance_state=None</em>, <em>shared_state=None</em>, <em>**kwargs</em><big>)</big><a class="reference internal" href="_modules/xmodule/abtest_module.html#ABTestModule"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#xmodule.abtest_module.ABTestModule" title="Permalink to this definition">¶</a></dt>
+<dd><p>Bases: <a class="reference internal" href="#xmodule.x_module.XModule" title="xmodule.x_module.XModule"><tt class="xref py py-class docutils literal"><span class="pre">xmodule.x_module.XModule</span></tt></a></p>
+<p>Implements an A/B test with an aribtrary number of competing groups</p>
+</dd></dl>
+
+<dl class="function">
+<dt id="xmodule.abtest_module.group_from_value">
+<tt class="descclassname">xmodule.abtest_module.</tt><tt class="descname">group_from_value</tt><big>(</big><em>groups</em>, <em>v</em><big>)</big><a class="reference internal" href="_modules/xmodule/abtest_module.html#group_from_value"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#xmodule.abtest_module.group_from_value" title="Permalink to this definition">¶</a></dt>
+<dd><p>Given group: ((&#8216;a&#8217;, 0.3), (&#8216;b&#8217;, 0.4), (&#8216;c&#8217;, 0.3)) and random value v
+in [0,1], return the associated group (in the above case, return
+&#8216;a&#8217; if v &lt; 0.3, &#8216;b&#8217; if 0.3 &lt;= v &lt; 0.7, and &#8216;c&#8217; if v &gt; 0.7</p>
+</dd></dl>
+
+</div>
+<div class="section" id="module-xmodule.backcompat_module">
+<span id="back-compatibility"></span><h2>Back compatibility<a class="headerlink" href="#module-xmodule.backcompat_module" title="Permalink to this headline">¶</a></h2>
+<p>These modules exist to translate old format XML into newer, semantic forms</p>
+<dl class="function">
+<dt id="xmodule.backcompat_module.process_includes">
+<tt class="descclassname">xmodule.backcompat_module.</tt><tt class="descname">process_includes</tt><big>(</big><em>fn</em><big>)</big><a class="reference internal" href="_modules/xmodule/backcompat_module.html#process_includes"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#xmodule.backcompat_module.process_includes" title="Permalink to this definition">¶</a></dt>
+<dd><p>Wraps a XModuleDescriptor.from_xml method, and modifies xml_data to replace
+any immediate child &lt;include&gt; items with the contents of the file that they
+are supposed to include</p>
+</dd></dl>
+
+</div>
+<div class="section" id="module-xmodule.capa_module">
+<span id="capa"></span><h2>Capa<a class="headerlink" href="#module-xmodule.capa_module" title="Permalink to this headline">¶</a></h2>
+<dl class="class">
+<dt id="xmodule.capa_module.CapaDescriptor">
+<em class="property">class </em><tt class="descclassname">xmodule.capa_module.</tt><tt class="descname">CapaDescriptor</tt><big>(</big><em>*args</em>, <em>**kwargs</em><big>)</big><a class="reference internal" href="_modules/xmodule/capa_module.html#CapaDescriptor"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#xmodule.capa_module.CapaDescriptor" title="Permalink to this definition">¶</a></dt>
+<dd><p>Bases: <tt class="xref py py-class docutils literal"><span class="pre">xmodule.raw_module.RawDescriptor</span></tt></p>
+<p>Module implementing problems in the LON-CAPA format,
+as implemented by capa.capa_problem</p>
+<dl class="attribute">
+<dt id="xmodule.capa_module.CapaDescriptor.module_class">
+<tt class="descname">module_class</tt><a class="headerlink" href="#xmodule.capa_module.CapaDescriptor.module_class" title="Permalink to this definition">¶</a></dt>
+<dd><p>alias of <a class="reference internal" href="#xmodule.capa_module.CapaModule" title="xmodule.capa_module.CapaModule"><tt class="xref py py-class docutils literal"><span class="pre">CapaModule</span></tt></a></p>
+</dd></dl>
+
+</dd></dl>
+
+<dl class="class">
+<dt id="xmodule.capa_module.CapaModule">
+<em class="property">class </em><tt class="descclassname">xmodule.capa_module.</tt><tt class="descname">CapaModule</tt><big>(</big><em>system</em>, <em>location</em>, <em>definition</em>, <em>descriptor</em>, <em>instance_state=None</em>, <em>shared_state=None</em>, <em>**kwargs</em><big>)</big><a class="reference internal" href="_modules/xmodule/capa_module.html#CapaModule"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#xmodule.capa_module.CapaModule" title="Permalink to this definition">¶</a></dt>
+<dd><p>Bases: <a class="reference internal" href="#xmodule.x_module.XModule" title="xmodule.x_module.XModule"><tt class="xref py py-class docutils literal"><span class="pre">xmodule.x_module.XModule</span></tt></a></p>
+<p>An XModule implementing LonCapa format problems, implemented by way of
+capa.capa_problem.LoncapaProblem</p>
+<dl class="method">
+<dt id="xmodule.capa_module.CapaModule.answer_available">
+<tt class="descname">answer_available</tt><big>(</big><big>)</big><a class="reference internal" href="_modules/xmodule/capa_module.html#CapaModule.answer_available"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#xmodule.capa_module.CapaModule.answer_available" title="Permalink to this definition">¶</a></dt>
+<dd><p>Is the user allowed to see an answer?</p>
+</dd></dl>
+
+<dl class="method">
+<dt id="xmodule.capa_module.CapaModule.check_problem">
+<tt class="descname">check_problem</tt><big>(</big><em>get</em><big>)</big><a class="reference internal" href="_modules/xmodule/capa_module.html#CapaModule.check_problem"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#xmodule.capa_module.CapaModule.check_problem" title="Permalink to this definition">¶</a></dt>
+<dd><p>Checks whether answers to a problem are correct, and
+returns a map of correct/incorrect answers:</p>
+<dl class="docutils">
+<dt>{&#8216;success&#8217; <span class="classifier-delimiter">:</span> <span class="classifier">bool,</span></dt>
+<dd>&#8216;contents&#8217; : html}</dd>
+</dl>
+</dd></dl>
+
+<dl class="method">
+<dt id="xmodule.capa_module.CapaModule.closed">
+<tt class="descname">closed</tt><big>(</big><big>)</big><a class="reference internal" href="_modules/xmodule/capa_module.html#CapaModule.closed"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#xmodule.capa_module.CapaModule.closed" title="Permalink to this definition">¶</a></dt>
+<dd><p>Is the student still allowed to submit answers?</p>
+</dd></dl>
+
+<dl class="method">
+<dt id="xmodule.capa_module.CapaModule.get_answer">
+<tt class="descname">get_answer</tt><big>(</big><em>get</em><big>)</big><a class="reference internal" href="_modules/xmodule/capa_module.html#CapaModule.get_answer"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#xmodule.capa_module.CapaModule.get_answer" title="Permalink to this definition">¶</a></dt>
+<dd><p>For the &#8220;show answer&#8221; button.</p>
+<p>Returns the answers: {&#8216;answers&#8217; : answers}</p>
+</dd></dl>
+
+<dl class="method">
+<dt id="xmodule.capa_module.CapaModule.get_problem">
+<tt class="descname">get_problem</tt><big>(</big><em>get</em><big>)</big><a class="reference internal" href="_modules/xmodule/capa_module.html#CapaModule.get_problem"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#xmodule.capa_module.CapaModule.get_problem" title="Permalink to this definition">¶</a></dt>
+<dd><p>Return results of get_problem_html, as a simple dict for json-ing.
+{ &#8216;html&#8217;: &lt;the-html&gt; }</p>
+<p>Used if we want to reconfirm we have the right thing e.g. after
+several AJAX calls.</p>
+</dd></dl>
+
+<dl class="method">
+<dt id="xmodule.capa_module.CapaModule.get_problem_html">
+<tt class="descname">get_problem_html</tt><big>(</big><em>encapsulate=True</em><big>)</big><a class="reference internal" href="_modules/xmodule/capa_module.html#CapaModule.get_problem_html"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#xmodule.capa_module.CapaModule.get_problem_html" title="Permalink to this definition">¶</a></dt>
+<dd><p>Return html for the problem.  Adds check, reset, save buttons
+as necessary based on the problem config and state.</p>
+</dd></dl>
+
+<dl class="method">
+<dt id="xmodule.capa_module.CapaModule.get_progress">
+<tt class="descname">get_progress</tt><big>(</big><big>)</big><a class="reference internal" href="_modules/xmodule/capa_module.html#CapaModule.get_progress"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#xmodule.capa_module.CapaModule.get_progress" title="Permalink to this definition">¶</a></dt>
+<dd><p>For now, just return score / max_score</p>
+</dd></dl>
+
+<dl class="method">
+<dt id="xmodule.capa_module.CapaModule.handle_ajax">
+<tt class="descname">handle_ajax</tt><big>(</big><em>dispatch</em>, <em>get</em><big>)</big><a class="reference internal" href="_modules/xmodule/capa_module.html#CapaModule.handle_ajax"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#xmodule.capa_module.CapaModule.handle_ajax" title="Permalink to this definition">¶</a></dt>
+<dd><p>This is called by courseware.module_render, to handle an AJAX call.
+&#8220;get&#8221; is request.POST.</p>
+<p>Returns a json dictionary:
+{ &#8216;progress_changed&#8217; : True/False,</p>
+<blockquote>
+<div>&#8216;progress&#8217; : &#8216;none&#8217;/&#8217;in_progress&#8217;/&#8217;done&#8217;,
+&lt;other request-specific values here &gt; }</div></blockquote>
+</dd></dl>
+
+<dl class="staticmethod">
+<dt id="xmodule.capa_module.CapaModule.make_dict_of_responses">
+<em class="property">static </em><tt class="descname">make_dict_of_responses</tt><big>(</big><em>get</em><big>)</big><a class="reference internal" href="_modules/xmodule/capa_module.html#CapaModule.make_dict_of_responses"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#xmodule.capa_module.CapaModule.make_dict_of_responses" title="Permalink to this definition">¶</a></dt>
+<dd><p>Make dictionary of student responses (aka &#8220;answers&#8221;)
+get is POST dictionary.</p>
+</dd></dl>
+
+<dl class="attribute">
+<dt id="xmodule.capa_module.CapaModule.rerandomize">
+<tt class="descname">rerandomize</tt><a class="reference internal" href="_modules/xmodule/capa_module.html#CapaModule.rerandomize"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#xmodule.capa_module.CapaModule.rerandomize" title="Permalink to this definition">¶</a></dt>
+<dd><p>Property accessor that returns self.metadata[&#8216;rerandomize&#8217;] in a
+canonical form</p>
+</dd></dl>
+
+<dl class="method">
+<dt id="xmodule.capa_module.CapaModule.reset_problem">
+<tt class="descname">reset_problem</tt><big>(</big><em>get</em><big>)</big><a class="reference internal" href="_modules/xmodule/capa_module.html#CapaModule.reset_problem"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#xmodule.capa_module.CapaModule.reset_problem" title="Permalink to this definition">¶</a></dt>
+<dd><p>Changes problem state to unfinished &#8211; removes student answers,
+and causes problem to rerender itself.</p>
+<p>Returns problem html as { &#8216;html&#8217; : html-string }.</p>
+</dd></dl>
+
+<dl class="method">
+<dt id="xmodule.capa_module.CapaModule.save_problem">
+<tt class="descname">save_problem</tt><big>(</big><em>get</em><big>)</big><a class="reference internal" href="_modules/xmodule/capa_module.html#CapaModule.save_problem"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#xmodule.capa_module.CapaModule.save_problem" title="Permalink to this definition">¶</a></dt>
+<dd><p>Save the passed in answers.
+Returns a dict { &#8216;success&#8217; : bool, [&#8216;error&#8217; : error-msg]},
+with the error key only present if success is False.</p>
+</dd></dl>
+
+<dl class="method">
+<dt id="xmodule.capa_module.CapaModule.update_score">
+<tt class="descname">update_score</tt><big>(</big><em>get</em><big>)</big><a class="reference internal" href="_modules/xmodule/capa_module.html#CapaModule.update_score"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#xmodule.capa_module.CapaModule.update_score" title="Permalink to this definition">¶</a></dt>
+<dd><dl class="docutils">
+<dt>Delivers grading response (e.g. from asynchronous code checking) to</dt>
+<dd>the capa problem, so its score can be updated</dd>
+<dt>&#8216;get&#8217; must have a field &#8216;response&#8217; which is a string that contains the</dt>
+<dd>grader&#8217;s response</dd>
+</dl>
+<p>No ajax return is needed. Return empty dict.</p>
+</dd></dl>
+
+</dd></dl>
+
+<dl class="function">
+<dt id="xmodule.capa_module.only_one">
+<tt class="descclassname">xmodule.capa_module.</tt><tt class="descname">only_one</tt><big>(</big><em>lst</em>, <em>default=''</em>, <em>process=&lt;function &lt;lambda&gt; at 0x106c1a2a8&gt;</em><big>)</big><a class="reference internal" href="_modules/xmodule/capa_module.html#only_one"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#xmodule.capa_module.only_one" title="Permalink to this definition">¶</a></dt>
+<dd><p>If lst is empty, returns default</p>
+<p>If lst has a single element, applies process to that element and returns it.</p>
+<p>Otherwise, raises an exception.</p>
+</dd></dl>
+
+<dl class="function">
+<dt id="xmodule.capa_module.parse_timedelta">
+<tt class="descclassname">xmodule.capa_module.</tt><tt class="descname">parse_timedelta</tt><big>(</big><em>time_str</em><big>)</big><a class="reference internal" href="_modules/xmodule/capa_module.html#parse_timedelta"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#xmodule.capa_module.parse_timedelta" title="Permalink to this definition">¶</a></dt>
+<dd><dl class="docutils">
+<dt>time_str: A string with the following components:</dt>
+<dd>&lt;D&gt; day[s] (optional)
+&lt;H&gt; hour[s] (optional)
+&lt;M&gt; minute[s] (optional)
+&lt;S&gt; second[s] (optional)</dd>
+</dl>
+<p>Returns a datetime.timedelta parsed from the string</p>
+</dd></dl>
+
+</div>
+<div class="section" id="module-xmodule.course_module">
+<span id="course"></span><h2>Course<a class="headerlink" href="#module-xmodule.course_module" title="Permalink to this headline">¶</a></h2>
+</div>
+<div class="section" id="module-xmodule.discussion_module">
+<span id="discussion"></span><h2>Discussion<a class="headerlink" href="#module-xmodule.discussion_module" title="Permalink to this headline">¶</a></h2>
+</div>
+<div class="section" id="module-xmodule.editing_module">
+<span id="editing"></span><h2>Editing<a class="headerlink" href="#module-xmodule.editing_module" title="Permalink to this headline">¶</a></h2>
+<dl class="class">
+<dt id="xmodule.editing_module.EditingDescriptor">
+<em class="property">class </em><tt class="descclassname">xmodule.editing_module.</tt><tt class="descname">EditingDescriptor</tt><big>(</big><em>system</em>, <em>definition=None</em>, <em>**kwargs</em><big>)</big><a class="reference internal" href="_modules/xmodule/editing_module.html#EditingDescriptor"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#xmodule.editing_module.EditingDescriptor" title="Permalink to this definition">¶</a></dt>
+<dd><p>Bases: <a class="reference internal" href="#xmodule.mako_module.MakoModuleDescriptor" title="xmodule.mako_module.MakoModuleDescriptor"><tt class="xref py py-class docutils literal"><span class="pre">xmodule.mako_module.MakoModuleDescriptor</span></tt></a></p>
+<p>Module that provides a raw editing view of its data and children.  It does not
+perform any validation on its definition&#8212;just passes it along to the browser.</p>
+<p>This class is intended to be used as a mixin.</p>
+</dd></dl>
+
+<dl class="class">
+<dt id="xmodule.editing_module.JSONEditingDescriptor">
+<em class="property">class </em><tt class="descclassname">xmodule.editing_module.</tt><tt class="descname">JSONEditingDescriptor</tt><big>(</big><em>system</em>, <em>definition=None</em>, <em>**kwargs</em><big>)</big><a class="reference internal" href="_modules/xmodule/editing_module.html#JSONEditingDescriptor"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#xmodule.editing_module.JSONEditingDescriptor" title="Permalink to this definition">¶</a></dt>
+<dd><p>Bases: <a class="reference internal" href="#xmodule.editing_module.EditingDescriptor" title="xmodule.editing_module.EditingDescriptor"><tt class="xref py py-class docutils literal"><span class="pre">xmodule.editing_module.EditingDescriptor</span></tt></a></p>
+<p>Module that provides a raw editing view of its data as XML. It does not perform
+any validation of its definition</p>
+</dd></dl>
+
+<dl class="class">
+<dt id="xmodule.editing_module.XMLEditingDescriptor">
+<em class="property">class </em><tt class="descclassname">xmodule.editing_module.</tt><tt class="descname">XMLEditingDescriptor</tt><big>(</big><em>system</em>, <em>definition=None</em>, <em>**kwargs</em><big>)</big><a class="reference internal" href="_modules/xmodule/editing_module.html#XMLEditingDescriptor"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#xmodule.editing_module.XMLEditingDescriptor" title="Permalink to this definition">¶</a></dt>
+<dd><p>Bases: <a class="reference internal" href="#xmodule.editing_module.EditingDescriptor" title="xmodule.editing_module.EditingDescriptor"><tt class="xref py py-class docutils literal"><span class="pre">xmodule.editing_module.EditingDescriptor</span></tt></a></p>
+<p>Module that provides a raw editing view of its data as XML. It does not perform
+any validation of its definition</p>
+</dd></dl>
+
+</div>
+<div class="section" id="module-xmodule.error_module">
+<span id="error"></span><h2>Error<a class="headerlink" href="#module-xmodule.error_module" title="Permalink to this headline">¶</a></h2>
+<dl class="class">
+<dt id="xmodule.error_module.ErrorDescriptor">
+<em class="property">class </em><tt class="descclassname">xmodule.error_module.</tt><tt class="descname">ErrorDescriptor</tt><big>(</big><em>system</em>, <em>definition=None</em>, <em>**kwargs</em><big>)</big><a class="reference internal" href="_modules/xmodule/error_module.html#ErrorDescriptor"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#xmodule.error_module.ErrorDescriptor" title="Permalink to this definition">¶</a></dt>
+<dd><p>Bases: <a class="reference internal" href="#xmodule.editing_module.JSONEditingDescriptor" title="xmodule.editing_module.JSONEditingDescriptor"><tt class="xref py py-class docutils literal"><span class="pre">xmodule.editing_module.JSONEditingDescriptor</span></tt></a></p>
+<p>Module that provides a raw editing view of broken xml.</p>
+<dl class="method">
+<dt id="xmodule.error_module.ErrorDescriptor.export_to_xml">
+<tt class="descname">export_to_xml</tt><big>(</big><em>resource_fs</em><big>)</big><a class="reference internal" href="_modules/xmodule/error_module.html#ErrorDescriptor.export_to_xml"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#xmodule.error_module.ErrorDescriptor.export_to_xml" title="Permalink to this definition">¶</a></dt>
+<dd><p>If the definition data is invalid xml, export it wrapped in an &#8220;error&#8221;
+tag.  If it is valid, export without the wrapper.</p>
+<p>NOTE: There may still be problems with the valid xml&#8211;it could be
+missing required attributes, could have the wrong tags, refer to missing
+files, etc.  That would just get re-wrapped on import.</p>
+</dd></dl>
+
+<dl class="classmethod">
+<dt id="xmodule.error_module.ErrorDescriptor.from_xml">
+<em class="property">classmethod </em><tt class="descname">from_xml</tt><big>(</big><em>xml_data</em>, <em>system</em>, <em>org=None</em>, <em>course=None</em>, <em>error_msg='Error not available'</em><big>)</big><a class="reference internal" href="_modules/xmodule/error_module.html#ErrorDescriptor.from_xml"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#xmodule.error_module.ErrorDescriptor.from_xml" title="Permalink to this definition">¶</a></dt>
+<dd><p>Create an instance of this descriptor from the supplied data.</p>
+<p>Does not require that xml_data be parseable&#8211;just stores it and exports
+as-is if not.</p>
+<p>Takes an extra, optional, parameter&#8211;the error that caused an
+issue.  (should be a string, or convert usefully into one).</p>
+</dd></dl>
+
+</dd></dl>
+
+<dl class="class">
+<dt id="xmodule.error_module.NonStaffErrorDescriptor">
+<em class="property">class </em><tt class="descclassname">xmodule.error_module.</tt><tt class="descname">NonStaffErrorDescriptor</tt><big>(</big><em>system</em>, <em>definition=None</em>, <em>**kwargs</em><big>)</big><a class="reference internal" href="_modules/xmodule/error_module.html#NonStaffErrorDescriptor"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#xmodule.error_module.NonStaffErrorDescriptor" title="Permalink to this definition">¶</a></dt>
+<dd><p>Bases: <a class="reference internal" href="#xmodule.error_module.ErrorDescriptor" title="xmodule.error_module.ErrorDescriptor"><tt class="xref py py-class docutils literal"><span class="pre">xmodule.error_module.ErrorDescriptor</span></tt></a></p>
+<p>Module that provides non-staff error messages.</p>
+</dd></dl>
+
+</div>
+<div class="section" id="module-xmodule.errortracker">
+<span id="error-tracker"></span><h2>Error tracker<a class="headerlink" href="#module-xmodule.errortracker" title="Permalink to this headline">¶</a></h2>
+<dl class="class">
+<dt id="xmodule.errortracker.ErrorLog">
+<em class="property">class </em><tt class="descclassname">xmodule.errortracker.</tt><tt class="descname">ErrorLog</tt><a class="headerlink" href="#xmodule.errortracker.ErrorLog" title="Permalink to this definition">¶</a></dt>
+<dd><p>Bases: <tt class="xref py py-class docutils literal"><span class="pre">tuple</span></tt></p>
+<p>ErrorLog(tracker, errors)</p>
+<dl class="attribute">
+<dt id="xmodule.errortracker.ErrorLog.errors">
+<tt class="descname">errors</tt><a class="headerlink" href="#xmodule.errortracker.ErrorLog.errors" title="Permalink to this definition">¶</a></dt>
+<dd><p>Alias for field number 1</p>
+</dd></dl>
+
+<dl class="attribute">
+<dt id="xmodule.errortracker.ErrorLog.tracker">
+<tt class="descname">tracker</tt><a class="headerlink" href="#xmodule.errortracker.ErrorLog.tracker" title="Permalink to this definition">¶</a></dt>
+<dd><p>Alias for field number 0</p>
+</dd></dl>
+
+</dd></dl>
+
+<dl class="function">
+<dt id="xmodule.errortracker.exc_info_to_str">
+<tt class="descclassname">xmodule.errortracker.</tt><tt class="descname">exc_info_to_str</tt><big>(</big><em>exc_info</em><big>)</big><a class="reference internal" href="_modules/xmodule/errortracker.html#exc_info_to_str"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#xmodule.errortracker.exc_info_to_str" title="Permalink to this definition">¶</a></dt>
+<dd><p>Given some exception info, convert it into a string using
+the traceback.format_exception() function.</p>
+</dd></dl>
+
+<dl class="function">
+<dt id="xmodule.errortracker.in_exception_handler">
+<tt class="descclassname">xmodule.errortracker.</tt><tt class="descname">in_exception_handler</tt><big>(</big><big>)</big><a class="reference internal" href="_modules/xmodule/errortracker.html#in_exception_handler"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#xmodule.errortracker.in_exception_handler" title="Permalink to this definition">¶</a></dt>
+<dd><p>Is there an active exception?</p>
+</dd></dl>
+
+<dl class="function">
+<dt id="xmodule.errortracker.make_error_tracker">
+<tt class="descclassname">xmodule.errortracker.</tt><tt class="descname">make_error_tracker</tt><big>(</big><big>)</big><a class="reference internal" href="_modules/xmodule/errortracker.html#make_error_tracker"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#xmodule.errortracker.make_error_tracker" title="Permalink to this definition">¶</a></dt>
+<dd><p>Return an ErrorLog (named tuple), with fields (tracker, errors), where
+the logger appends a tuple (message, exception_str) to the errors on every
+call.  exception_str is in the format returned by traceback.format_exception.</p>
+<p>error_list is a simple list.  If the caller modifies it, info
+will be lost.</p>
+</dd></dl>
+
+<dl class="function">
+<dt id="xmodule.errortracker.null_error_tracker">
+<tt class="descclassname">xmodule.errortracker.</tt><tt class="descname">null_error_tracker</tt><big>(</big><em>msg</em><big>)</big><a class="reference internal" href="_modules/xmodule/errortracker.html#null_error_tracker"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#xmodule.errortracker.null_error_tracker" title="Permalink to this definition">¶</a></dt>
+<dd><p>A dummy error tracker that just ignores the messages</p>
+</dd></dl>
+
+</div>
+<div class="section" id="module-xmodule.exceptions">
+<span id="exceptions"></span><h2>Exceptions<a class="headerlink" href="#module-xmodule.exceptions" title="Permalink to this headline">¶</a></h2>
+</div>
+<div class="section" id="module-xmodule.graders">
+<span id="graders"></span><h2>Graders<a class="headerlink" href="#module-xmodule.graders" title="Permalink to this headline">¶</a></h2>
+<dl class="class">
+<dt id="xmodule.graders.AssignmentFormatGrader">
+<em class="property">class </em><tt class="descclassname">xmodule.graders.</tt><tt class="descname">AssignmentFormatGrader</tt><big>(</big><em>type</em>, <em>min_count</em>, <em>drop_count</em>, <em>category=None</em>, <em>section_type=None</em>, <em>short_label=None</em>, <em>show_only_average=False</em>, <em>starting_index=1</em><big>)</big><a class="reference internal" href="_modules/xmodule/graders.html#AssignmentFormatGrader"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#xmodule.graders.AssignmentFormatGrader" title="Permalink to this definition">¶</a></dt>
+<dd><p>Bases: <a class="reference internal" href="#xmodule.graders.CourseGrader" title="xmodule.graders.CourseGrader"><tt class="xref py py-class docutils literal"><span class="pre">xmodule.graders.CourseGrader</span></tt></a></p>
+<p>Grades all sections matching the format &#8216;type&#8217; with an equal weight. A specified
+number of lowest scores can be dropped from the calculation. The minimum number of
+sections in this format must be specified (even if those sections haven&#8217;t been
+written yet).</p>
+<p>min_count defines how many assignments are expected throughout the course. Placeholder
+scores (of 0) will be inserted if the number of matching sections in the course is &lt; min_count.
+If there number of matching sections in the course is &gt; min_count, min_count will be ignored.</p>
+<p>show_only_average is to suppress the display of each assignment in this grader and instead
+only show the total score of this grader in the breakdown.</p>
+<p>category should be presentable to the user, but may not appear. When the grade breakdown is
+displayed, scores from the same category will be similar (for example, by color).</p>
+<p>section_type is a string that is the type of a singular section. For example, for Labs it
+would be &#8220;Lab&#8221;. This defaults to be the same as category.</p>
+<p>short_label is similar to section_type, but shorter. For example, for Homework it would be
+&#8220;HW&#8221;.</p>
+<p>starting_index is the first number that will appear. For example, starting_index=3 and
+min_count = 2 would produce the labels &#8220;Assignment 3&#8221;, &#8220;Assignment 4&#8221;</p>
+</dd></dl>
+
+<dl class="class">
+<dt id="xmodule.graders.CourseGrader">
+<em class="property">class </em><tt class="descclassname">xmodule.graders.</tt><tt class="descname">CourseGrader</tt><a class="reference internal" href="_modules/xmodule/graders.html#CourseGrader"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#xmodule.graders.CourseGrader" title="Permalink to this definition">¶</a></dt>
+<dd><p>Bases: <tt class="xref py py-class docutils literal"><span class="pre">object</span></tt></p>
+<p>A course grader takes the totaled scores for each graded section (that a student has
+started) in the course. From these scores, the grader calculates an overall percentage
+grade. The grader should also generate information about how that score was calculated,
+to be displayed in graphs or charts.</p>
+<p>A grader has one required method, grade(), which is passed a grade_sheet. The grade_sheet
+contains scores for all graded section that the student has started. If a student has
+a score of 0 for that section, it may be missing from the grade_sheet. The grade_sheet
+is keyed by section format. Each value is a list of Score namedtuples for each section
+that has the matching section format.</p>
+<p>The grader outputs a dictionary with the following keys:
+- percent: Contaisn a float value, which is the final percentage score for the student.
+- section_breakdown: This is a list of dictionaries which provide details on sections
+that were graded. These are used for display in a graph or chart. The format for a
+section_breakdown dictionary is explained below.
+- grade_breakdown: This is a list of dictionaries which provide details on the contributions
+of the final percentage grade. This is a higher level breakdown, for when the grade is constructed
+of a few very large sections (such as Homeworks, Labs, a Midterm, and a Final). The format for
+a grade_breakdown is explained below. This section is optional.</p>
+<p>A dictionary in the section_breakdown list has the following keys:
+percent: A float percentage for the section.
+label: A short string identifying the section. Preferably fixed-length. E.g. &#8220;HW  3&#8221;.
+detail: A string explanation of the score. E.g. &#8220;Homework 1 - Ohms Law - 83% (5/6)&#8221;
+category: A string identifying the category. Items with the same category are grouped together
+in the display (for example, by color).
+prominent: A boolean value indicating that this section should be displayed as more prominent
+than other items.</p>
+<p>A dictionary in the grade_breakdown list has the following keys:
+percent: A float percentage in the breakdown. All percents should add up to the final percentage.
+detail: A string explanation of this breakdown. E.g. &#8220;Homework - 10% of a possible 15%&#8221;
+category: A string identifying the category. Items with the same category are grouped together
+in the display (for example, by color).</p>
+</dd></dl>
+
+<dl class="class">
+<dt id="xmodule.graders.Score">
+<em class="property">class </em><tt class="descclassname">xmodule.graders.</tt><tt class="descname">Score</tt><a class="headerlink" href="#xmodule.graders.Score" title="Permalink to this definition">¶</a></dt>
+<dd><p>Bases: <tt class="xref py py-class docutils literal"><span class="pre">tuple</span></tt></p>
+<p>Score(earned, possible, graded, section)</p>
+<dl class="attribute">
+<dt id="xmodule.graders.Score.earned">
+<tt class="descname">earned</tt><a class="headerlink" href="#xmodule.graders.Score.earned" title="Permalink to this definition">¶</a></dt>
+<dd><p>Alias for field number 0</p>
+</dd></dl>
+
+<dl class="attribute">
+<dt id="xmodule.graders.Score.graded">
+<tt class="descname">graded</tt><a class="headerlink" href="#xmodule.graders.Score.graded" title="Permalink to this definition">¶</a></dt>
+<dd><p>Alias for field number 2</p>
+</dd></dl>
+
+<dl class="attribute">
+<dt id="xmodule.graders.Score.possible">
+<tt class="descname">possible</tt><a class="headerlink" href="#xmodule.graders.Score.possible" title="Permalink to this definition">¶</a></dt>
+<dd><p>Alias for field number 1</p>
+</dd></dl>
+
+<dl class="attribute">
+<dt id="xmodule.graders.Score.section">
+<tt class="descname">section</tt><a class="headerlink" href="#xmodule.graders.Score.section" title="Permalink to this definition">¶</a></dt>
+<dd><p>Alias for field number 3</p>
+</dd></dl>
+
+</dd></dl>
+
+<dl class="class">
+<dt id="xmodule.graders.SingleSectionGrader">
+<em class="property">class </em><tt class="descclassname">xmodule.graders.</tt><tt class="descname">SingleSectionGrader</tt><big>(</big><em>type</em>, <em>name</em>, <em>short_label=None</em>, <em>category=None</em><big>)</big><a class="reference internal" href="_modules/xmodule/graders.html#SingleSectionGrader"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#xmodule.graders.SingleSectionGrader" title="Permalink to this definition">¶</a></dt>
+<dd><p>Bases: <a class="reference internal" href="#xmodule.graders.CourseGrader" title="xmodule.graders.CourseGrader"><tt class="xref py py-class docutils literal"><span class="pre">xmodule.graders.CourseGrader</span></tt></a></p>
+<p>This grades a single section with the format &#8216;type&#8217; and the name &#8216;name&#8217;.</p>
+<p>If the name is not appropriate for the short short_label or category, they each may
+be specified individually.</p>
+</dd></dl>
+
+<dl class="class">
+<dt id="xmodule.graders.WeightedSubsectionsGrader">
+<em class="property">class </em><tt class="descclassname">xmodule.graders.</tt><tt class="descname">WeightedSubsectionsGrader</tt><big>(</big><em>sections</em><big>)</big><a class="reference internal" href="_modules/xmodule/graders.html#WeightedSubsectionsGrader"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#xmodule.graders.WeightedSubsectionsGrader" title="Permalink to this definition">¶</a></dt>
+<dd><p>Bases: <a class="reference internal" href="#xmodule.graders.CourseGrader" title="xmodule.graders.CourseGrader"><tt class="xref py py-class docutils literal"><span class="pre">xmodule.graders.CourseGrader</span></tt></a></p>
+<p>This grader takes a list of tuples containing (grader, category_name, weight) and computes
+a final grade by totalling the contribution of each sub grader and multiplying it by the
+given weight. For example, the sections may be
+[ (homeworkGrader, &#8220;Homework&#8221;, 0.15), (labGrader, &#8220;Labs&#8221;, 0.15), (midtermGrader, &#8220;Midterm&#8221;, 0.30), (finalGrader, &#8220;Final&#8221;, 0.40) ]
+All items in section_breakdown for each subgrader will be combined. A grade_breakdown will be
+composed using the score from each grader.</p>
+<p>Note that the sum of the weights is not take into consideration. If the weights add up to
+a value &gt; 1, the student may end up with a percent &gt; 100%. This allows for sections that
+are extra credit.</p>
+</dd></dl>
+
+<dl class="function">
+<dt id="xmodule.graders.aggregate_scores">
+<tt class="descclassname">xmodule.graders.</tt><tt class="descname">aggregate_scores</tt><big>(</big><em>scores</em>, <em>section_name='summary'</em><big>)</big><a class="reference internal" href="_modules/xmodule/graders.html#aggregate_scores"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#xmodule.graders.aggregate_scores" title="Permalink to this definition">¶</a></dt>
+<dd><p>scores: A list of Score objects
+returns: A tuple (all_total, graded_total).</p>
+<blockquote>
+<div>all_total: A Score representing the total score summed over all input scores
+graded_total: A Score representing the score summed over all graded input scores</div></blockquote>
+</dd></dl>
+
+<dl class="function">
+<dt id="xmodule.graders.grader_from_conf">
+<tt class="descclassname">xmodule.graders.</tt><tt class="descname">grader_from_conf</tt><big>(</big><em>conf</em><big>)</big><a class="reference internal" href="_modules/xmodule/graders.html#grader_from_conf"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#xmodule.graders.grader_from_conf" title="Permalink to this definition">¶</a></dt>
+<dd><p>This creates a CourseGrader from a configuration (such as in course_settings.py).
+The conf can simply be an instance of CourseGrader, in which case no work is done.
+More commonly, the conf is a list of dictionaries. A WeightedSubsectionsGrader
+with AssignmentFormatGrader&#8217;s or SingleSectionGrader&#8217;s as subsections will be
+generated. Every dictionary should contain the parameters for making either a
+AssignmentFormatGrader or SingleSectionGrader, in addition to a &#8216;weight&#8217; key.</p>
+</dd></dl>
+
+<dl class="function">
+<dt id="xmodule.graders.invalid_args">
+<tt class="descclassname">xmodule.graders.</tt><tt class="descname">invalid_args</tt><big>(</big><em>func</em>, <em>argdict</em><big>)</big><a class="reference internal" href="_modules/xmodule/graders.html#invalid_args"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#xmodule.graders.invalid_args" title="Permalink to this definition">¶</a></dt>
+<dd><p>Given a function and a dictionary of arguments, returns a set of arguments
+from argdict that aren&#8217;t accepted by func</p>
+</dd></dl>
+
+<dl class="function">
+<dt id="xmodule.graders.load_grading_policy">
+<tt class="descclassname">xmodule.graders.</tt><tt class="descname">load_grading_policy</tt><big>(</big><em>course_policy_string</em><big>)</big><a class="reference internal" href="_modules/xmodule/graders.html#load_grading_policy"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#xmodule.graders.load_grading_policy" title="Permalink to this definition">¶</a></dt>
+<dd><p>This loads a grading policy from a string (usually read from a file),
+which can be a JSON object or an empty string.</p>
+<p>The JSON object can have the keys GRADER and GRADE_CUTOFFS. If either is
+missing, it reverts to the default.</p>
+</dd></dl>
+
+</div>
+<div class="section" id="module-xmodule.hidden_module">
+<span id="hidden"></span><h2>Hidden<a class="headerlink" href="#module-xmodule.hidden_module" title="Permalink to this headline">¶</a></h2>
+</div>
+<div class="section" id="module-xmodule.html_checker">
+<span id="html-checker"></span><h2>Html checker<a class="headerlink" href="#module-xmodule.html_checker" title="Permalink to this headline">¶</a></h2>
+<dl class="function">
+<dt id="xmodule.html_checker.check_html">
+<tt class="descclassname">xmodule.html_checker.</tt><tt class="descname">check_html</tt><big>(</big><em>html</em><big>)</big><a class="reference internal" href="_modules/xmodule/html_checker.html#check_html"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#xmodule.html_checker.check_html" title="Permalink to this definition">¶</a></dt>
+<dd><p>Check whether the passed in html string can be parsed by lxml.
+Return bool success.</p>
+</dd></dl>
+
+</div>
+<div class="section" id="module-xmodule.html_module">
+<span id="html"></span><h2>Html<a class="headerlink" href="#module-xmodule.html_module" title="Permalink to this headline">¶</a></h2>
+<dl class="class">
+<dt id="xmodule.html_module.HtmlDescriptor">
+<em class="property">class </em><tt class="descclassname">xmodule.html_module.</tt><tt class="descname">HtmlDescriptor</tt><big>(</big><em>system</em>, <em>definition=None</em>, <em>**kwargs</em><big>)</big><a class="reference internal" href="_modules/xmodule/html_module.html#HtmlDescriptor"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#xmodule.html_module.HtmlDescriptor" title="Permalink to this definition">¶</a></dt>
+<dd><p>Bases: <a class="reference internal" href="#xmodule.xml_module.XmlDescriptor" title="xmodule.xml_module.XmlDescriptor"><tt class="xref py py-class docutils literal"><span class="pre">xmodule.xml_module.XmlDescriptor</span></tt></a>, <a class="reference internal" href="#xmodule.editing_module.EditingDescriptor" title="xmodule.editing_module.EditingDescriptor"><tt class="xref py py-class docutils literal"><span class="pre">xmodule.editing_module.EditingDescriptor</span></tt></a></p>
+<p>Module for putting raw html in a course</p>
+<dl class="method">
+<dt id="xmodule.html_module.HtmlDescriptor.definition_to_xml">
+<tt class="descname">definition_to_xml</tt><big>(</big><em>resource_fs</em><big>)</big><a class="reference internal" href="_modules/xmodule/html_module.html#HtmlDescriptor.definition_to_xml"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#xmodule.html_module.HtmlDescriptor.definition_to_xml" title="Permalink to this definition">¶</a></dt>
+<dd><p>If the contents are valid xml, write them to filename.xml.  Otherwise,
+write just &lt;html filename=&#8221;&#8221; [meta-attrs=&#8221;...&#8221;]&gt; to filename.xml, and the html
+string to filename.html.</p>
+</dd></dl>
+
+<dl class="classmethod">
+<dt id="xmodule.html_module.HtmlDescriptor.load_definition">
+<em class="property">classmethod </em><tt class="descname">load_definition</tt><big>(</big><em>xml_object</em>, <em>system</em>, <em>location</em><big>)</big><a class="reference internal" href="_modules/xmodule/html_module.html#HtmlDescriptor.load_definition"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#xmodule.html_module.HtmlDescriptor.load_definition" title="Permalink to this definition">¶</a></dt>
+<dd><p>Load a descriptor from the specified xml_object:</p>
+<p>If there is a filename attribute, load it as a string, and
+log a warning if it is not parseable by etree.HTMLParser.</p>
+<p>If there is not a filename attribute, the definition is the body
+of the xml_object, without the root tag (do not want &lt;html&gt; in the
+middle of a page)</p>
+</dd></dl>
+
+</dd></dl>
+
+</div>
+<div class="section" id="module-xmodule.mako_module">
+<span id="mako"></span><h2>Mako<a class="headerlink" href="#module-xmodule.mako_module" title="Permalink to this headline">¶</a></h2>
+<dl class="class">
+<dt id="xmodule.mako_module.MakoModuleDescriptor">
+<em class="property">class </em><tt class="descclassname">xmodule.mako_module.</tt><tt class="descname">MakoModuleDescriptor</tt><big>(</big><em>system</em>, <em>definition=None</em>, <em>**kwargs</em><big>)</big><a class="reference internal" href="_modules/xmodule/mako_module.html#MakoModuleDescriptor"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#xmodule.mako_module.MakoModuleDescriptor" title="Permalink to this definition">¶</a></dt>
+<dd><p>Bases: <a class="reference internal" href="#xmodule.x_module.XModuleDescriptor" title="xmodule.x_module.XModuleDescriptor"><tt class="xref py py-class docutils literal"><span class="pre">xmodule.x_module.XModuleDescriptor</span></tt></a></p>
+<p>Module descriptor intended as a mixin that uses a mako template
+to specify the module html.</p>
+<p>Expects the descriptor to have the <cite>mako_template</cite> attribute set
+with the name of the template to render, and it will pass
+the descriptor as the <cite>module</cite> parameter to that template</p>
+<dl class="method">
+<dt id="xmodule.mako_module.MakoModuleDescriptor.get_context">
+<tt class="descname">get_context</tt><big>(</big><big>)</big><a class="reference internal" href="_modules/xmodule/mako_module.html#MakoModuleDescriptor.get_context"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#xmodule.mako_module.MakoModuleDescriptor.get_context" title="Permalink to this definition">¶</a></dt>
+<dd><p>Return the context to render the mako template with</p>
+</dd></dl>
+
+</dd></dl>
+
+</div>
+<div class="section" id="module-xmodule.progress">
+<span id="progress"></span><h2>Progress<a class="headerlink" href="#module-xmodule.progress" title="Permalink to this headline">¶</a></h2>
+<p>Progress class for modules.  Represents where a student is in a module.</p>
+<dl class="docutils">
+<dt>Useful things to know:</dt>
+<dd><ul class="first last simple">
+<li>Use Progress.to_js_status_str() to convert a progress into a simple
+status string to pass to js.</li>
+<li>Use Progress.to_js_detail_str() to convert a progress into a more detailed
+string to pass to js.</li>
+</ul>
+</dd>
+</dl>
+<p>In particular, these functions have a canonical handing of None.</p>
+<p>For most subclassing needs, you should only need to reimplement
+frac() and __str__().</p>
+<dl class="class">
+<dt id="xmodule.progress.Progress">
+<em class="property">class </em><tt class="descclassname">xmodule.progress.</tt><tt class="descname">Progress</tt><big>(</big><em>a</em>, <em>b</em><big>)</big><a class="reference internal" href="_modules/xmodule/progress.html#Progress"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#xmodule.progress.Progress" title="Permalink to this definition">¶</a></dt>
+<dd><p>Bases: <tt class="xref py py-class docutils literal"><span class="pre">object</span></tt></p>
+<p>Represents a progress of a/b (a out of b done)</p>
+<p>a and b must be numeric, but not necessarily integer, with
+0 &lt;= a &lt;= b and b &gt; 0.</p>
+<p>Progress can only represent Progress for modules where that makes sense.  Other
+modules (e.g. html) should return None from get_progress().</p>
+<p>TODO: add tag for module type?  Would allow for smarter merging.</p>
+<dl class="staticmethod">
+<dt id="xmodule.progress.Progress.add_counts">
+<em class="property">static </em><tt class="descname">add_counts</tt><big>(</big><em>a</em>, <em>b</em><big>)</big><a class="reference internal" href="_modules/xmodule/progress.html#Progress.add_counts"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#xmodule.progress.Progress.add_counts" title="Permalink to this definition">¶</a></dt>
+<dd><p>Add two progress indicators, assuming that each represents items done:
+(a / b) + (c / d) = (a + c) / (b + d).
+If either is None, returns the other.</p>
+</dd></dl>
+
+<dl class="method">
+<dt id="xmodule.progress.Progress.done">
+<tt class="descname">done</tt><big>(</big><big>)</big><a class="reference internal" href="_modules/xmodule/progress.html#Progress.done"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#xmodule.progress.Progress.done" title="Permalink to this definition">¶</a></dt>
+<dd><p>Return True if this represents done.</p>
+<p>subclassing note: implemented in terms of frac(), assumes sanity
+checking is done at construction time.</p>
+</dd></dl>
+
+<dl class="method">
+<dt id="xmodule.progress.Progress.frac">
+<tt class="descname">frac</tt><big>(</big><big>)</big><a class="reference internal" href="_modules/xmodule/progress.html#Progress.frac"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#xmodule.progress.Progress.frac" title="Permalink to this definition">¶</a></dt>
+<dd><p>Return tuple (a,b) representing progress of a/b</p>
+</dd></dl>
+
+<dl class="method">
+<dt id="xmodule.progress.Progress.inprogress">
+<tt class="descname">inprogress</tt><big>(</big><big>)</big><a class="reference internal" href="_modules/xmodule/progress.html#Progress.inprogress"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#xmodule.progress.Progress.inprogress" title="Permalink to this definition">¶</a></dt>
+<dd><p>Returns True if fractional progress is strictly between 0 and 1.</p>
+<p>subclassing note: implemented in terms of frac(), assumes sanity
+checking is done at construction time.</p>
+</dd></dl>
+
+<dl class="method">
+<dt id="xmodule.progress.Progress.percent">
+<tt class="descname">percent</tt><big>(</big><big>)</big><a class="reference internal" href="_modules/xmodule/progress.html#Progress.percent"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#xmodule.progress.Progress.percent" title="Permalink to this definition">¶</a></dt>
+<dd><p>Returns a percentage progress as a float between 0 and 100.</p>
+<p>subclassing note: implemented in terms of frac(), assumes sanity
+checking is done at construction time.</p>
+</dd></dl>
+
+<dl class="method">
+<dt id="xmodule.progress.Progress.started">
+<tt class="descname">started</tt><big>(</big><big>)</big><a class="reference internal" href="_modules/xmodule/progress.html#Progress.started"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#xmodule.progress.Progress.started" title="Permalink to this definition">¶</a></dt>
+<dd><p>Returns True if fractional progress is greater than 0.</p>
+<p>subclassing note: implemented in terms of frac(), assumes sanity
+checking is done at construction time.</p>
+</dd></dl>
+
+<dl class="method">
+<dt id="xmodule.progress.Progress.ternary_str">
+<tt class="descname">ternary_str</tt><big>(</big><big>)</big><a class="reference internal" href="_modules/xmodule/progress.html#Progress.ternary_str"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#xmodule.progress.Progress.ternary_str" title="Permalink to this definition">¶</a></dt>
+<dd><p>Return a string version of this progress: either
+&#8220;none&#8221;, &#8220;in_progress&#8221;, or &#8220;done&#8221;.</p>
+<p>subclassing note: implemented in terms of frac()</p>
+</dd></dl>
+
+<dl class="staticmethod">
+<dt id="xmodule.progress.Progress.to_js_detail_str">
+<em class="property">static </em><tt class="descname">to_js_detail_str</tt><big>(</big><em>progress</em><big>)</big><a class="reference internal" href="_modules/xmodule/progress.html#Progress.to_js_detail_str"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#xmodule.progress.Progress.to_js_detail_str" title="Permalink to this definition">¶</a></dt>
+<dd><p>Return the &#8220;detail string&#8221; version of the passed Progress
+object that should be passed to js.  Use this function when
+passing Progress objects to js to limit dependencies.</p>
+</dd></dl>
+
+<dl class="staticmethod">
+<dt id="xmodule.progress.Progress.to_js_status_str">
+<em class="property">static </em><tt class="descname">to_js_status_str</tt><big>(</big><em>progress</em><big>)</big><a class="reference internal" href="_modules/xmodule/progress.html#Progress.to_js_status_str"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#xmodule.progress.Progress.to_js_status_str" title="Permalink to this definition">¶</a></dt>
+<dd><p>Return the &#8220;status string&#8221; version of the passed Progress
+object that should be passed to js.  Use this function when
+sending Progress objects to js to limit dependencies.</p>
+</dd></dl>
+
+</dd></dl>
+
+</div>
+<div class="section" id="module-xmodule.schematic_module">
+<span id="schematic"></span><h2>Schematic<a class="headerlink" href="#module-xmodule.schematic_module" title="Permalink to this headline">¶</a></h2>
+</div>
+<div class="section" id="module-xmodule.seq_module">
+<span id="sequence"></span><h2>Sequence<a class="headerlink" href="#module-xmodule.seq_module" title="Permalink to this headline">¶</a></h2>
+<dl class="class">
+<dt id="xmodule.seq_module.SequenceModule">
+<em class="property">class </em><tt class="descclassname">xmodule.seq_module.</tt><tt class="descname">SequenceModule</tt><big>(</big><em>system</em>, <em>location</em>, <em>definition</em>, <em>descriptor</em>, <em>instance_state=None</em>, <em>shared_state=None</em>, <em>**kwargs</em><big>)</big><a class="reference internal" href="_modules/xmodule/seq_module.html#SequenceModule"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#xmodule.seq_module.SequenceModule" title="Permalink to this definition">¶</a></dt>
+<dd><p>Bases: <a class="reference internal" href="#xmodule.x_module.XModule" title="xmodule.x_module.XModule"><tt class="xref py py-class docutils literal"><span class="pre">xmodule.x_module.XModule</span></tt></a></p>
+<p>Layout module which lays out content in a temporal sequence</p>
+<dl class="method">
+<dt id="xmodule.seq_module.SequenceModule.get_progress">
+<tt class="descname">get_progress</tt><big>(</big><big>)</big><a class="reference internal" href="_modules/xmodule/seq_module.html#SequenceModule.get_progress"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#xmodule.seq_module.SequenceModule.get_progress" title="Permalink to this definition">¶</a></dt>
+<dd><p>Return the total progress, adding total done and total available.
+(assumes that each submodule uses the same &#8220;units&#8221; for progress.)</p>
+</dd></dl>
+
+<dl class="method">
+<dt id="xmodule.seq_module.SequenceModule.handle_ajax">
+<tt class="descname">handle_ajax</tt><big>(</big><em>dispatch</em>, <em>get</em><big>)</big><a class="reference internal" href="_modules/xmodule/seq_module.html#SequenceModule.handle_ajax"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#xmodule.seq_module.SequenceModule.handle_ajax" title="Permalink to this definition">¶</a></dt>
+<dd><p>get = request.POST instance</p>
+</dd></dl>
+
+</dd></dl>
+
+</div>
+<div class="section" id="module-xmodule.stringify">
+<span id="stringify"></span><h2>Stringify<a class="headerlink" href="#module-xmodule.stringify" title="Permalink to this headline">¶</a></h2>
+<dl class="function">
+<dt id="xmodule.stringify.stringify_children">
+<tt class="descclassname">xmodule.stringify.</tt><tt class="descname">stringify_children</tt><big>(</big><em>node</em><big>)</big><a class="reference internal" href="_modules/xmodule/stringify.html#stringify_children"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#xmodule.stringify.stringify_children" title="Permalink to this definition">¶</a></dt>
+<dd><p>Return all contents of an xml tree, without the outside tags.
+e.g. if node is parse of</p>
+<blockquote>
+<div>&#8220;&lt;html a=&#8221;b&#8221; foo=&#8221;bar&#8221;&gt;Hi &lt;div&gt;there &lt;span&gt;Bruce&lt;/span&gt;&lt;b&gt;!&lt;/b&gt;&lt;/div&gt;&lt;html&gt;&#8221;</div></blockquote>
+<dl class="docutils">
+<dt>should return</dt>
+<dd>&#8220;Hi &lt;div&gt;there &lt;span&gt;Bruce&lt;/span&gt;&lt;b&gt;!&lt;/b&gt;&lt;/div&gt;&#8221;</dd>
+</dl>
+<p>fixed from
+<a class="reference external" href="http://stackoverflow.com/questions/4624062/get-all-text-inside-a-tag-in-lxml">http://stackoverflow.com/questions/4624062/get-all-text-inside-a-tag-in-lxml</a></p>
+</dd></dl>
+
+</div>
+<div class="section" id="module-xmodule.template_module">
+<span id="template"></span><h2>Template<a class="headerlink" href="#module-xmodule.template_module" title="Permalink to this headline">¶</a></h2>
+<dl class="class">
+<dt id="xmodule.template_module.CustomTagDescriptor">
+<em class="property">class </em><tt class="descclassname">xmodule.template_module.</tt><tt class="descname">CustomTagDescriptor</tt><big>(</big><em>system</em>, <em>definition</em>, <em>**kwargs</em><big>)</big><a class="reference internal" href="_modules/xmodule/template_module.html#CustomTagDescriptor"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#xmodule.template_module.CustomTagDescriptor" title="Permalink to this definition">¶</a></dt>
+<dd><p>Bases: <tt class="xref py py-class docutils literal"><span class="pre">xmodule.raw_module.RawDescriptor</span></tt></p>
+<p>Descriptor for custom tags.  Loads the template when created.</p>
+<dl class="method">
+<dt id="xmodule.template_module.CustomTagDescriptor.export_to_file">
+<tt class="descname">export_to_file</tt><big>(</big><big>)</big><a class="reference internal" href="_modules/xmodule/template_module.html#CustomTagDescriptor.export_to_file"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#xmodule.template_module.CustomTagDescriptor.export_to_file" title="Permalink to this definition">¶</a></dt>
+<dd><p>Custom tags are special: since they&#8217;re already pointers, we don&#8217;t want
+to export them in a file with yet another layer of indirection.</p>
+</dd></dl>
+
+<dl class="attribute">
+<dt id="xmodule.template_module.CustomTagDescriptor.module_class">
+<tt class="descname">module_class</tt><a class="headerlink" href="#xmodule.template_module.CustomTagDescriptor.module_class" title="Permalink to this definition">¶</a></dt>
+<dd><p>alias of <a class="reference internal" href="#xmodule.template_module.CustomTagModule" title="xmodule.template_module.CustomTagModule"><tt class="xref py py-class docutils literal"><span class="pre">CustomTagModule</span></tt></a></p>
+</dd></dl>
+
+<dl class="staticmethod">
+<dt id="xmodule.template_module.CustomTagDescriptor.render_template">
+<em class="property">static </em><tt class="descname">render_template</tt><big>(</big><em>system</em>, <em>xml_data</em><big>)</big><a class="reference internal" href="_modules/xmodule/template_module.html#CustomTagDescriptor.render_template"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#xmodule.template_module.CustomTagDescriptor.render_template" title="Permalink to this definition">¶</a></dt>
+<dd><p>Render the template, given the definition xml_data</p>
+</dd></dl>
+
+</dd></dl>
+
+<dl class="class">
+<dt id="xmodule.template_module.CustomTagModule">
+<em class="property">class </em><tt class="descclassname">xmodule.template_module.</tt><tt class="descname">CustomTagModule</tt><big>(</big><em>system</em>, <em>location</em>, <em>definition</em>, <em>descriptor</em>, <em>instance_state=None</em>, <em>shared_state=None</em>, <em>**kwargs</em><big>)</big><a class="reference internal" href="_modules/xmodule/template_module.html#CustomTagModule"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#xmodule.template_module.CustomTagModule" title="Permalink to this definition">¶</a></dt>
+<dd><p>Bases: <a class="reference internal" href="#xmodule.x_module.XModule" title="xmodule.x_module.XModule"><tt class="xref py py-class docutils literal"><span class="pre">xmodule.x_module.XModule</span></tt></a></p>
+<p>This module supports tags of the form
+&lt;customtag option=&#8221;val&#8221; option2=&#8221;val2&#8221; impl=&#8221;tagname&#8221;/&gt;</p>
+<p>In this case, $tagname should refer to a file in data/custom_tags, which contains
+a mako template that uses ${option} and ${option2} for the content.</p>
+<p>For instance:</p>
+<dl class="docutils">
+<dt>data/mycourse/custom_tags/book::</dt>
+<dd>More information given in &lt;a href=&#8221;/book/${page}&#8221;&gt;the text&lt;/a&gt;</dd>
+<dt>course.xml::</dt>
+<dd>...
+&lt;customtag page=&#8221;234&#8221; impl=&#8221;book&#8221;/&gt;
+...</dd>
+<dt>Renders to::</dt>
+<dd>More information given in &lt;a href=&#8221;/book/234&#8221;&gt;the text&lt;/a&gt;</dd>
+</dl>
+</dd></dl>
+
+</div>
+<div class="section" id="module-xmodule.templates">
+<span id="templates"></span><h2>Templates<a class="headerlink" href="#module-xmodule.templates" title="Permalink to this headline">¶</a></h2>
+<p>This module handles loading xmodule templates from disk into the modulestore.
+These templates are used by the CMS to provide baseline content that
+can be cloned when adding new modules to a course.</p>
+<dl class="docutils">
+<dt><a href="#id1"><span class="problematic" id="id2">`</span></a>Template`s are defined in x_module. They contain 3 attributes:</dt>
+<dd>metadata: A dictionary with the template metadata
+data: A JSON value that defines the template content
+children: A list of Location urls that define the template children</dd>
+</dl>
+<p>Templates are defined on XModuleDescriptor types, in the template attribute.</p>
+<dl class="class">
+<dt id="xmodule.templates.TemplateTestSystem">
+<em class="property">class </em><tt class="descclassname">xmodule.templates.</tt><tt class="descname">TemplateTestSystem</tt><a class="reference internal" href="_modules/xmodule/templates.html#TemplateTestSystem"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#xmodule.templates.TemplateTestSystem" title="Permalink to this definition">¶</a></dt>
+<dd><p>Bases: <tt class="xref py py-class docutils literal"><span class="pre">xmodule.mako_module.MakoDescriptorSystem</span></tt></p>
+<p>This system exists to help verify that XModuleDescriptors can be instantiated
+from their defined templates before we load the templates into the modulestore.</p>
+</dd></dl>
+
+<dl class="function">
+<dt id="xmodule.templates.all_templates">
+<tt class="descclassname">xmodule.templates.</tt><tt class="descname">all_templates</tt><big>(</big><big>)</big><a class="reference internal" href="_modules/xmodule/templates.html#all_templates"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#xmodule.templates.all_templates" title="Permalink to this definition">¶</a></dt>
+<dd><p>Returns all templates for enabled modules, grouped by descriptor type</p>
+</dd></dl>
+
+<dl class="function">
+<dt id="xmodule.templates.update_templates">
+<tt class="descclassname">xmodule.templates.</tt><tt class="descname">update_templates</tt><big>(</big><big>)</big><a class="reference internal" href="_modules/xmodule/templates.html#update_templates"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#xmodule.templates.update_templates" title="Permalink to this definition">¶</a></dt>
+<dd><p>Updates the set of templates in the modulestore with all templates currently
+available from the installed plugins</p>
+</dd></dl>
+
+</div>
+<div class="section" id="module-xmodule.timeparse">
+<span id="time-parse"></span><h2>Time parse<a class="headerlink" href="#module-xmodule.timeparse" title="Permalink to this headline">¶</a></h2>
+<p>Helper functions for handling time in the format we like.</p>
+<dl class="function">
+<dt id="xmodule.timeparse.parse_time">
+<tt class="descclassname">xmodule.timeparse.</tt><tt class="descname">parse_time</tt><big>(</big><em>time_str</em><big>)</big><a class="reference internal" href="_modules/xmodule/timeparse.html#parse_time"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#xmodule.timeparse.parse_time" title="Permalink to this definition">¶</a></dt>
+<dd><p>Takes a time string in TIME_FORMAT, returns
+it as a time_struct.  Raises ValueError if the string is not in the right format.</p>
+</dd></dl>
+
+<dl class="function">
+<dt id="xmodule.timeparse.stringify_time">
+<tt class="descclassname">xmodule.timeparse.</tt><tt class="descname">stringify_time</tt><big>(</big><em>time_struct</em><big>)</big><a class="reference internal" href="_modules/xmodule/timeparse.html#stringify_time"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#xmodule.timeparse.stringify_time" title="Permalink to this definition">¶</a></dt>
+<dd><p>Convert a time struct to a string</p>
+</dd></dl>
+
+</div>
+<div class="section" id="module-xmodule.vertical_module">
+<span id="vertical"></span><h2>Vertical<a class="headerlink" href="#module-xmodule.vertical_module" title="Permalink to this headline">¶</a></h2>
+<dl class="class">
+<dt id="xmodule.vertical_module.VerticalModule">
+<em class="property">class </em><tt class="descclassname">xmodule.vertical_module.</tt><tt class="descname">VerticalModule</tt><big>(</big><em>system</em>, <em>location</em>, <em>definition</em>, <em>descriptor</em>, <em>instance_state=None</em>, <em>shared_state=None</em>, <em>**kwargs</em><big>)</big><a class="reference internal" href="_modules/xmodule/vertical_module.html#VerticalModule"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#xmodule.vertical_module.VerticalModule" title="Permalink to this definition">¶</a></dt>
+<dd><p>Bases: <a class="reference internal" href="#xmodule.x_module.XModule" title="xmodule.x_module.XModule"><tt class="xref py py-class docutils literal"><span class="pre">xmodule.x_module.XModule</span></tt></a></p>
+<p>Layout module for laying out submodules vertically.</p>
+</dd></dl>
+
+</div>
+<div class="section" id="module-xmodule.video_module">
+<span id="video"></span><h2>Video<a class="headerlink" href="#module-xmodule.video_module" title="Permalink to this headline">¶</a></h2>
+</div>
+<div class="section" id="module-xmodule.x_module">
+<span id="x"></span><h2>X<a class="headerlink" href="#module-xmodule.x_module" title="Permalink to this headline">¶</a></h2>
+<dl class="class">
+<dt id="xmodule.x_module.HTMLSnippet">
+<em class="property">class </em><tt class="descclassname">xmodule.x_module.</tt><tt class="descname">HTMLSnippet</tt><a class="reference internal" href="_modules/xmodule/x_module.html#HTMLSnippet"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#xmodule.x_module.HTMLSnippet" title="Permalink to this definition">¶</a></dt>
+<dd><p>Bases: <tt class="xref py py-class docutils literal"><span class="pre">object</span></tt></p>
+<p>A base class defining an interface for an object that is able to present an
+html snippet, along with associated javascript and css</p>
+<dl class="classmethod">
+<dt id="xmodule.x_module.HTMLSnippet.get_css">
+<em class="property">classmethod </em><tt class="descname">get_css</tt><big>(</big><big>)</big><a class="reference internal" href="_modules/xmodule/x_module.html#HTMLSnippet.get_css"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#xmodule.x_module.HTMLSnippet.get_css" title="Permalink to this definition">¶</a></dt>
+<dd><p>Return a dictionary containing some of the following keys:</p>
+<dl class="docutils">
+<dt>css: A list of css fragments that should be applied to the html</dt>
+<dd>contents of the snippet</dd>
+<dt>sass: A list of sass fragments that should be applied to the html</dt>
+<dd>contents of the snippet</dd>
+<dt>scss: A list of scss fragments that should be applied to the html</dt>
+<dd>contents of the snippet</dd>
+</dl>
+</dd></dl>
+
+<dl class="method">
+<dt id="xmodule.x_module.HTMLSnippet.get_html">
+<tt class="descname">get_html</tt><big>(</big><big>)</big><a class="reference internal" href="_modules/xmodule/x_module.html#HTMLSnippet.get_html"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#xmodule.x_module.HTMLSnippet.get_html" title="Permalink to this definition">¶</a></dt>
+<dd><p>Return the html used to display this snippet</p>
+</dd></dl>
+
+<dl class="classmethod">
+<dt id="xmodule.x_module.HTMLSnippet.get_javascript">
+<em class="property">classmethod </em><tt class="descname">get_javascript</tt><big>(</big><big>)</big><a class="reference internal" href="_modules/xmodule/x_module.html#HTMLSnippet.get_javascript"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#xmodule.x_module.HTMLSnippet.get_javascript" title="Permalink to this definition">¶</a></dt>
+<dd><p>Return a dictionary containing some of the following keys:</p>
+<blockquote>
+<div><dl class="docutils">
+<dt>coffee: A list of coffeescript fragments that should be compiled and</dt>
+<dd>placed on the page</dd>
+</dl>
+<p>js: A list of javascript fragments that should be included on the
+page</p>
+</div></blockquote>
+<p>All of these will be loaded onto the page in the CMS</p>
+</dd></dl>
+
+</dd></dl>
+
+<dl class="class">
+<dt id="xmodule.x_module.ModuleSystem">
+<em class="property">class </em><tt class="descclassname">xmodule.x_module.</tt><tt class="descname">ModuleSystem</tt><big>(</big><em>ajax_url</em>, <em>track_function</em>, <em>get_module</em>, <em>render_template</em>, <em>replace_urls</em>, <em>user=None</em>, <em>filestore=None</em>, <em>debug=False</em>, <em>xqueue=None</em>, <em>node_path=''</em>, <em>anonymous_student_id=''</em><big>)</big><a class="reference internal" href="_modules/xmodule/x_module.html#ModuleSystem"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#xmodule.x_module.ModuleSystem" title="Permalink to this definition">¶</a></dt>
+<dd><p>Bases: <tt class="xref py py-class docutils literal"><span class="pre">object</span></tt></p>
+<p>This is an abstraction such that x_modules can function independent
+of the courseware (e.g. import into other types of courseware, LMS,
+or if we want to have a sandbox server for user-contributed content)</p>
+<p>ModuleSystem objects are passed to x_modules to provide access to system
+functionality.</p>
+<p>Note that these functions can be closures over e.g. a django request
+and user, or other environment-specific info.</p>
+<dl class="method">
+<dt id="xmodule.x_module.ModuleSystem.get">
+<tt class="descname">get</tt><big>(</big><em>attr</em><big>)</big><a class="reference internal" href="_modules/xmodule/x_module.html#ModuleSystem.get"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#xmodule.x_module.ModuleSystem.get" title="Permalink to this definition">¶</a></dt>
+<dd><p>provide uniform access to attributes (like etree).</p>
+</dd></dl>
+
+<dl class="method">
+<dt id="xmodule.x_module.ModuleSystem.set">
+<tt class="descname">set</tt><big>(</big><em>attr</em>, <em>val</em><big>)</big><a class="reference internal" href="_modules/xmodule/x_module.html#ModuleSystem.set"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#xmodule.x_module.ModuleSystem.set" title="Permalink to this definition">¶</a></dt>
+<dd><p>provide uniform access to attributes (like etree)</p>
+</dd></dl>
+
+</dd></dl>
+
+<dl class="class">
+<dt id="xmodule.x_module.Plugin">
+<em class="property">class </em><tt class="descclassname">xmodule.x_module.</tt><tt class="descname">Plugin</tt><a class="reference internal" href="_modules/xmodule/x_module.html#Plugin"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#xmodule.x_module.Plugin" title="Permalink to this definition">¶</a></dt>
+<dd><p>Bases: <tt class="xref py py-class docutils literal"><span class="pre">object</span></tt></p>
+<p>Base class for a system that uses entry_points to load plugins.</p>
+<p>Implementing classes are expected to have the following attributes:</p>
+<blockquote>
+<div>entry_point: The name of the entry point to load plugins from</div></blockquote>
+<dl class="classmethod">
+<dt id="xmodule.x_module.Plugin.load_class">
+<em class="property">classmethod </em><tt class="descname">load_class</tt><big>(</big><em>identifier</em>, <em>default=None</em><big>)</big><a class="reference internal" href="_modules/xmodule/x_module.html#Plugin.load_class"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#xmodule.x_module.Plugin.load_class" title="Permalink to this definition">¶</a></dt>
+<dd><p>Loads a single class instance specified by identifier. If identifier
+specifies more than a single class, then logs a warning and returns the
+first class identified.</p>
+<p>If default is not None, will return default if no entry_point matching
+identifier is found. Otherwise, will raise a ModuleMissingError</p>
+</dd></dl>
+
+<dl class="classmethod">
+<dt id="xmodule.x_module.Plugin.load_classes">
+<em class="property">classmethod </em><tt class="descname">load_classes</tt><big>(</big><big>)</big><a class="reference internal" href="_modules/xmodule/x_module.html#Plugin.load_classes"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#xmodule.x_module.Plugin.load_classes" title="Permalink to this definition">¶</a></dt>
+<dd><p>Returns a list of containing the identifiers and their corresponding classes for all
+of the available instances of this plugin</p>
+</dd></dl>
+
+</dd></dl>
+
+<dl class="class">
+<dt id="xmodule.x_module.Template">
+<em class="property">class </em><tt class="descclassname">xmodule.x_module.</tt><tt class="descname">Template</tt><a class="headerlink" href="#xmodule.x_module.Template" title="Permalink to this definition">¶</a></dt>
+<dd><p>Bases: <tt class="xref py py-class docutils literal"><span class="pre">tuple</span></tt></p>
+<p>Template(metadata, data, children)</p>
+<dl class="attribute">
+<dt id="xmodule.x_module.Template.children">
+<tt class="descname">children</tt><a class="headerlink" href="#xmodule.x_module.Template.children" title="Permalink to this definition">¶</a></dt>
+<dd><p>Alias for field number 2</p>
+</dd></dl>
+
+<dl class="attribute">
+<dt id="xmodule.x_module.Template.data">
+<tt class="descname">data</tt><a class="headerlink" href="#xmodule.x_module.Template.data" title="Permalink to this definition">¶</a></dt>
+<dd><p>Alias for field number 1</p>
+</dd></dl>
+
+<dl class="attribute">
+<dt id="xmodule.x_module.Template.metadata">
+<tt class="descname">metadata</tt><a class="headerlink" href="#xmodule.x_module.Template.metadata" title="Permalink to this definition">¶</a></dt>
+<dd><p>Alias for field number 0</p>
+</dd></dl>
+
+</dd></dl>
+
+<dl class="class">
+<dt id="xmodule.x_module.XModule">
+<em class="property">class </em><tt class="descclassname">xmodule.x_module.</tt><tt class="descname">XModule</tt><big>(</big><em>system</em>, <em>location</em>, <em>definition</em>, <em>descriptor</em>, <em>instance_state=None</em>, <em>shared_state=None</em>, <em>**kwargs</em><big>)</big><a class="reference internal" href="_modules/xmodule/x_module.html#XModule"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#xmodule.x_module.XModule" title="Permalink to this definition">¶</a></dt>
+<dd><p>Bases: <a class="reference internal" href="#xmodule.x_module.HTMLSnippet" title="xmodule.x_module.HTMLSnippet"><tt class="xref py py-class docutils literal"><span class="pre">xmodule.x_module.HTMLSnippet</span></tt></a></p>
+<p>Implements a generic learning module.</p>
+<p>Subclasses must at a minimum provide a definition for get_html in order
+to be displayed to users.</p>
+<p>See the HTML module for a simple example.</p>
+<dl class="attribute">
+<dt id="xmodule.x_module.XModule.display_name">
+<tt class="descname">display_name</tt><a class="reference internal" href="_modules/xmodule/x_module.html#XModule.display_name"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#xmodule.x_module.XModule.display_name" title="Permalink to this definition">¶</a></dt>
+<dd><p>Return a display name for the module: use display_name if defined in
+metadata, otherwise convert the url name.</p>
+</dd></dl>
+
+<dl class="method">
+<dt id="xmodule.x_module.XModule.displayable_items">
+<tt class="descname">displayable_items</tt><big>(</big><big>)</big><a class="reference internal" href="_modules/xmodule/x_module.html#XModule.displayable_items"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#xmodule.x_module.XModule.displayable_items" title="Permalink to this definition">¶</a></dt>
+<dd><p>Returns list of displayable modules contained by this module. If this
+module is visible, should return [self].</p>
+</dd></dl>
+
+<dl class="method">
+<dt id="xmodule.x_module.XModule.get_children">
+<tt class="descname">get_children</tt><big>(</big><big>)</big><a class="reference internal" href="_modules/xmodule/x_module.html#XModule.get_children"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#xmodule.x_module.XModule.get_children" title="Permalink to this definition">¶</a></dt>
+<dd><p>Return module instances for all the children of this module.</p>
+</dd></dl>
+
+<dl class="method">
+<dt id="xmodule.x_module.XModule.get_children_locations">
+<tt class="descname">get_children_locations</tt><big>(</big><big>)</big><a class="reference internal" href="_modules/xmodule/x_module.html#XModule.get_children_locations"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#xmodule.x_module.XModule.get_children_locations" title="Permalink to this definition">¶</a></dt>
+<dd><p>Returns the locations of each of child modules.</p>
+<p>Overriding this changes the behavior of get_children and
+anything that uses get_children, such as get_display_items.</p>
+<p>This method will not instantiate the modules of the children
+unless absolutely necessary, so it is cheaper to call than get_children</p>
+<p>These children will be the same children returned by the
+descriptor unless descriptor.has_dynamic_children() is true.</p>
+</dd></dl>
+
+<dl class="method">
+<dt id="xmodule.x_module.XModule.get_display_items">
+<tt class="descname">get_display_items</tt><big>(</big><big>)</big><a class="reference internal" href="_modules/xmodule/x_module.html#XModule.get_display_items"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#xmodule.x_module.XModule.get_display_items" title="Permalink to this definition">¶</a></dt>
+<dd><p>Returns a list of descendent module instances that will display
+immediately inside this module.</p>
+</dd></dl>
+
+<dl class="method">
+<dt id="xmodule.x_module.XModule.get_icon_class">
+<tt class="descname">get_icon_class</tt><big>(</big><big>)</big><a class="reference internal" href="_modules/xmodule/x_module.html#XModule.get_icon_class"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#xmodule.x_module.XModule.get_icon_class" title="Permalink to this definition">¶</a></dt>
+<dd><p>Return a css class identifying this module in the context of an icon</p>
+</dd></dl>
+
+<dl class="method">
+<dt id="xmodule.x_module.XModule.get_instance_state">
+<tt class="descname">get_instance_state</tt><big>(</big><big>)</big><a class="reference internal" href="_modules/xmodule/x_module.html#XModule.get_instance_state"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#xmodule.x_module.XModule.get_instance_state" title="Permalink to this definition">¶</a></dt>
+<dd><p>State of the object, as stored in the database</p>
+</dd></dl>
+
+<dl class="method">
+<dt id="xmodule.x_module.XModule.get_progress">
+<tt class="descname">get_progress</tt><big>(</big><big>)</big><a class="reference internal" href="_modules/xmodule/x_module.html#XModule.get_progress"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#xmodule.x_module.XModule.get_progress" title="Permalink to this definition">¶</a></dt>
+<dd><p>Return a progress.Progress object that represents how far the
+student has gone in this module.  Must be implemented to get correct
+progress tracking behavior in nesting modules like sequence and
+vertical.</p>
+<p>If this module has no notion of progress, return None.</p>
+</dd></dl>
+
+<dl class="method">
+<dt id="xmodule.x_module.XModule.get_score">
+<tt class="descname">get_score</tt><big>(</big><big>)</big><a class="reference internal" href="_modules/xmodule/x_module.html#XModule.get_score"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#xmodule.x_module.XModule.get_score" title="Permalink to this definition">¶</a></dt>
+<dd><p>Score the student received on the problem, or None if there is no
+score.</p>
+<dl class="docutils">
+<dt>Returns:</dt>
+<dd><dl class="first docutils">
+<dt>dictionary</dt>
+<dd><dl class="first last docutils">
+<dt>{&#8216;score&#8217;: integer, from 0 to get_max_score(),</dt>
+<dd>&#8216;total&#8217;: get_max_score()}</dd>
+</dl>
+</dd>
+</dl>
+<p class="last">NOTE (vshnayder): not sure if this was the intended return value, but
+that&#8217;s what it&#8217;s doing now.  I suspect that we really want it to just
+return a number.  Would need to change (at least) capa and
+modx_dispatch to match if we did that.</p>
+</dd>
+</dl>
+</dd></dl>
+
+<dl class="method">
+<dt id="xmodule.x_module.XModule.get_shared_state">
+<tt class="descname">get_shared_state</tt><big>(</big><big>)</big><a class="reference internal" href="_modules/xmodule/x_module.html#XModule.get_shared_state"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#xmodule.x_module.XModule.get_shared_state" title="Permalink to this definition">¶</a></dt>
+<dd><p>Get state that should be shared with other instances
+using the same &#8216;shared_state_key&#8217; attribute.</p>
+</dd></dl>
+
+<dl class="method">
+<dt id="xmodule.x_module.XModule.handle_ajax">
+<tt class="descname">handle_ajax</tt><big>(</big><em>dispatch</em>, <em>get</em><big>)</big><a class="reference internal" href="_modules/xmodule/x_module.html#XModule.handle_ajax"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#xmodule.x_module.XModule.handle_ajax" title="Permalink to this definition">¶</a></dt>
+<dd><p>dispatch is last part of the URL.
+get is a dictionary-like object</p>
+</dd></dl>
+
+<dl class="method">
+<dt id="xmodule.x_module.XModule.max_score">
+<tt class="descname">max_score</tt><big>(</big><big>)</big><a class="reference internal" href="_modules/xmodule/x_module.html#XModule.max_score"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#xmodule.x_module.XModule.max_score" title="Permalink to this definition">¶</a></dt>
+<dd><p>Maximum score. Two notes:</p>
+<ul class="simple">
+<li>This is generic; in abstract, a problem could be 3/5 points on one
+randomization, and 5/7 on another</li>
+<li>In practice, this is a Very Bad Idea, and (a) will break some code
+in place (although that code should get fixed), and (b) break some
+analytics we plan to put in place.</li>
+</ul>
+</dd></dl>
+
+</dd></dl>
+
+<dl class="class">
+<dt id="xmodule.x_module.XModuleDescriptor">
+<em class="property">class </em><tt class="descclassname">xmodule.x_module.</tt><tt class="descname">XModuleDescriptor</tt><big>(</big><em>system</em>, <em>definition=None</em>, <em>**kwargs</em><big>)</big><a class="reference internal" href="_modules/xmodule/x_module.html#XModuleDescriptor"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#xmodule.x_module.XModuleDescriptor" title="Permalink to this definition">¶</a></dt>
+<dd><p>Bases: <a class="reference internal" href="#xmodule.x_module.Plugin" title="xmodule.x_module.Plugin"><tt class="xref py py-class docutils literal"><span class="pre">xmodule.x_module.Plugin</span></tt></a>, <a class="reference internal" href="#xmodule.x_module.HTMLSnippet" title="xmodule.x_module.HTMLSnippet"><tt class="xref py py-class docutils literal"><span class="pre">xmodule.x_module.HTMLSnippet</span></tt></a>, <tt class="xref py py-class docutils literal"><span class="pre">xmodule.x_module.ResourceTemplates</span></tt></p>
+<p>An XModuleDescriptor is a specification for an element of a course. This
+could be a problem, an organizational element (a group of content), or a
+segment of video, for example.</p>
+<p>XModuleDescriptors are independent and agnostic to the current student state
+on a problem. They handle the editing interface used by instructors to
+create a problem, and can generate XModules (which do know about student
+state).</p>
+<dl class="staticmethod">
+<dt id="xmodule.x_module.XModuleDescriptor.compute_inherited_metadata">
+<em class="property">static </em><tt class="descname">compute_inherited_metadata</tt><big>(</big><em>node</em><big>)</big><a class="reference internal" href="_modules/xmodule/x_module.html#XModuleDescriptor.compute_inherited_metadata"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#xmodule.x_module.XModuleDescriptor.compute_inherited_metadata" title="Permalink to this definition">¶</a></dt>
+<dd><p>Given a descriptor, traverse all of its descendants and do metadata
+inheritance.  Should be called on a CourseDescriptor after importing a
+course.</p>
+<p>NOTE: This means that there is no such thing as lazy loading at the
+moment&#8211;this accesses all the children.</p>
+</dd></dl>
+
+<dl class="attribute">
+<dt id="xmodule.x_module.XModuleDescriptor.display_name">
+<tt class="descname">display_name</tt><a class="reference internal" href="_modules/xmodule/x_module.html#XModuleDescriptor.display_name"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#xmodule.x_module.XModuleDescriptor.display_name" title="Permalink to this definition">¶</a></dt>
+<dd><p>Return a display name for the module: use display_name if defined in
+metadata, otherwise convert the url name.</p>
+</dd></dl>
+
+<dl class="method">
+<dt id="xmodule.x_module.XModuleDescriptor.export_to_xml">
+<tt class="descname">export_to_xml</tt><big>(</big><em>resource_fs</em><big>)</big><a class="reference internal" href="_modules/xmodule/x_module.html#XModuleDescriptor.export_to_xml"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#xmodule.x_module.XModuleDescriptor.export_to_xml" title="Permalink to this definition">¶</a></dt>
+<dd><p>Returns an xml string representing this module, and all modules
+underneath it.  May also write required resources out to resource_fs</p>
+<p>Assumes that modules have single parentage (that no module appears twice
+in the same course), and that it is thus safe to nest modules as xml
+children as appropriate.</p>
+<p>The returned XML should be able to be parsed back into an identical
+XModuleDescriptor using the from_xml method with the same system, org,
+and course</p>
+</dd></dl>
+
+<dl class="classmethod">
+<dt id="xmodule.x_module.XModuleDescriptor.from_json">
+<em class="property">classmethod </em><tt class="descname">from_json</tt><big>(</big><em>json_data</em>, <em>system</em><big>)</big><a class="reference internal" href="_modules/xmodule/x_module.html#XModuleDescriptor.from_json"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#xmodule.x_module.XModuleDescriptor.from_json" title="Permalink to this definition">¶</a></dt>
+<dd><p>Creates an instance of this descriptor from the supplied json_data.
+This may be overridden by subclasses</p>
+<dl class="docutils">
+<dt>json_data: A json object specifying the definition and any optional</dt>
+<dd>keyword arguments for the XModuleDescriptor</dd>
+</dl>
+<p>system: A DescriptorSystem for interacting with external resources</p>
+</dd></dl>
+
+<dl class="classmethod">
+<dt id="xmodule.x_module.XModuleDescriptor.from_xml">
+<em class="property">classmethod </em><tt class="descname">from_xml</tt><big>(</big><em>xml_data</em>, <em>system</em>, <em>org=None</em>, <em>course=None</em><big>)</big><a class="reference internal" href="_modules/xmodule/x_module.html#XModuleDescriptor.from_xml"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#xmodule.x_module.XModuleDescriptor.from_xml" title="Permalink to this definition">¶</a></dt>
+<dd><p>Creates an instance of this descriptor from the supplied xml_data.
+This may be overridden by subclasses</p>
+<dl class="docutils">
+<dt>xml_data: A string of xml that will be translated into data and children</dt>
+<dd>for this module</dd>
+</dl>
+<p>system is an XMLParsingSystem</p>
+<dl class="docutils">
+<dt>org and course are optional strings that will be used in the generated</dt>
+<dd>module&#8217;s url identifiers</dd>
+</dl>
+</dd></dl>
+
+<dl class="method">
+<dt id="xmodule.x_module.XModuleDescriptor.get_child_by_url_name">
+<tt class="descname">get_child_by_url_name</tt><big>(</big><em>url_name</em><big>)</big><a class="reference internal" href="_modules/xmodule/x_module.html#XModuleDescriptor.get_child_by_url_name"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#xmodule.x_module.XModuleDescriptor.get_child_by_url_name" title="Permalink to this definition">¶</a></dt>
+<dd><p>Return a child XModuleDescriptor with the specified url_name, if it exists, and None otherwise.</p>
+</dd></dl>
+
+<dl class="method">
+<dt id="xmodule.x_module.XModuleDescriptor.get_children">
+<tt class="descname">get_children</tt><big>(</big><big>)</big><a class="reference internal" href="_modules/xmodule/x_module.html#XModuleDescriptor.get_children"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#xmodule.x_module.XModuleDescriptor.get_children" title="Permalink to this definition">¶</a></dt>
+<dd><p>Returns a list of XModuleDescriptor instances for the children of
+this module</p>
+</dd></dl>
+
+<dl class="method">
+<dt id="xmodule.x_module.XModuleDescriptor.get_sample_state">
+<tt class="descname">get_sample_state</tt><big>(</big><big>)</big><a class="reference internal" href="_modules/xmodule/x_module.html#XModuleDescriptor.get_sample_state"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#xmodule.x_module.XModuleDescriptor.get_sample_state" title="Permalink to this definition">¶</a></dt>
+<dd><p>Return a list of tuples of instance_state, shared_state. Each tuple
+defines a sample case for this module</p>
+</dd></dl>
+
+<dl class="method">
+<dt id="xmodule.x_module.XModuleDescriptor.has_dynamic_children">
+<tt class="descname">has_dynamic_children</tt><big>(</big><big>)</big><a class="reference internal" href="_modules/xmodule/x_module.html#XModuleDescriptor.has_dynamic_children"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#xmodule.x_module.XModuleDescriptor.has_dynamic_children" title="Permalink to this definition">¶</a></dt>
+<dd><p>Returns True if this descriptor has dynamic children for a given
+student when the module is created.</p>
+<p>Returns False if the children of this descriptor are the same
+children that the module will return for any student.</p>
+</dd></dl>
+
+<dl class="method">
+<dt id="xmodule.x_module.XModuleDescriptor.inherit_metadata">
+<tt class="descname">inherit_metadata</tt><big>(</big><em>metadata</em><big>)</big><a class="reference internal" href="_modules/xmodule/x_module.html#XModuleDescriptor.inherit_metadata"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#xmodule.x_module.XModuleDescriptor.inherit_metadata" title="Permalink to this definition">¶</a></dt>
+<dd><p>Updates this module with metadata inherited from a containing module.
+Only metadata specified in self.inheritable_metadata will
+be inherited</p>
+</dd></dl>
+
+<dl class="staticmethod">
+<dt id="xmodule.x_module.XModuleDescriptor.load_from_json">
+<em class="property">static </em><tt class="descname">load_from_json</tt><big>(</big><em>json_data</em>, <em>system</em>, <em>default_class=None</em><big>)</big><a class="reference internal" href="_modules/xmodule/x_module.html#XModuleDescriptor.load_from_json"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#xmodule.x_module.XModuleDescriptor.load_from_json" title="Permalink to this definition">¶</a></dt>
+<dd><p>This method instantiates the correct subclass of XModuleDescriptor based
+on the contents of json_data.</p>
+<p>json_data must contain a &#8216;location&#8217; element, and must be suitable to be
+passed into the subclasses <cite>from_json</cite> method.</p>
+</dd></dl>
+
+<dl class="staticmethod">
+<dt id="xmodule.x_module.XModuleDescriptor.load_from_xml">
+<em class="property">static </em><tt class="descname">load_from_xml</tt><big>(</big><em>xml_data</em>, <em>system</em>, <em>org=None</em>, <em>course=None</em>, <em>default_class=None</em><big>)</big><a class="reference internal" href="_modules/xmodule/x_module.html#XModuleDescriptor.load_from_xml"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#xmodule.x_module.XModuleDescriptor.load_from_xml" title="Permalink to this definition">¶</a></dt>
+<dd><p>This method instantiates the correct subclass of XModuleDescriptor based
+on the contents of xml_data.</p>
+<p>xml_data must be a string containing valid xml</p>
+<p>system is an XMLParsingSystem</p>
+<dl class="docutils">
+<dt>org and course are optional strings that will be used in the generated</dt>
+<dd>module&#8217;s url identifiers</dd>
+</dl>
+</dd></dl>
+
+<dl class="attribute">
+<dt id="xmodule.x_module.XModuleDescriptor.module_class">
+<tt class="descname">module_class</tt><a class="headerlink" href="#xmodule.x_module.XModuleDescriptor.module_class" title="Permalink to this definition">¶</a></dt>
+<dd><p>alias of <a class="reference internal" href="#xmodule.x_module.XModule" title="xmodule.x_module.XModule"><tt class="xref py py-class docutils literal"><span class="pre">XModule</span></tt></a></p>
+</dd></dl>
+
+<dl class="attribute">
+<dt id="xmodule.x_module.XModuleDescriptor.own_metadata">
+<tt class="descname">own_metadata</tt><a class="reference internal" href="_modules/xmodule/x_module.html#XModuleDescriptor.own_metadata"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#xmodule.x_module.XModuleDescriptor.own_metadata" title="Permalink to this definition">¶</a></dt>
+<dd><p>Return the metadata that is not inherited, but was defined on this module.</p>
+</dd></dl>
+
+<dl class="attribute">
+<dt id="xmodule.x_module.XModuleDescriptor.start">
+<tt class="descname">start</tt><a class="reference internal" href="_modules/xmodule/x_module.html#XModuleDescriptor.start"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#xmodule.x_module.XModuleDescriptor.start" title="Permalink to this definition">¶</a></dt>
+<dd><p>If self.metadata contains start, return it.  Else return None.</p>
+</dd></dl>
+
+<dl class="method">
+<dt id="xmodule.x_module.XModuleDescriptor.xmodule_constructor">
+<tt class="descname">xmodule_constructor</tt><big>(</big><em>system</em><big>)</big><a class="reference internal" href="_modules/xmodule/x_module.html#XModuleDescriptor.xmodule_constructor"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#xmodule.x_module.XModuleDescriptor.xmodule_constructor" title="Permalink to this definition">¶</a></dt>
+<dd><p>Returns a constructor for an XModule. This constructor takes two
+arguments: instance_state and shared_state, and returns a fully
+instantiated XModule</p>
+</dd></dl>
+
+</dd></dl>
+
+<dl class="function">
+<dt id="xmodule.x_module.policy_key">
+<tt class="descclassname">xmodule.x_module.</tt><tt class="descname">policy_key</tt><big>(</big><em>location</em><big>)</big><a class="reference internal" href="_modules/xmodule/x_module.html#policy_key"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#xmodule.x_module.policy_key" title="Permalink to this definition">¶</a></dt>
+<dd><p>Get the key for a location in a policy file.  (Since the policy file is
+specific to a course, it doesn&#8217;t need the full location url).</p>
+</dd></dl>
+
+</div>
+<div class="section" id="module-xmodule.xml_module">
+<span id="xml"></span><h2>Xml<a class="headerlink" href="#module-xmodule.xml_module" title="Permalink to this headline">¶</a></h2>
+<dl class="class">
+<dt id="xmodule.xml_module.AttrMap">
+<em class="property">class </em><tt class="descclassname">xmodule.xml_module.</tt><tt class="descname">AttrMap</tt><a class="reference internal" href="_modules/xmodule/xml_module.html#AttrMap"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#xmodule.xml_module.AttrMap" title="Permalink to this definition">¶</a></dt>
+<dd><p>Bases: <tt class="xref py py-class docutils literal"><span class="pre">xmodule.xml_module._AttrMap</span></tt></p>
+<p>A class that specifies two functions:</p>
+<blockquote>
+<div><dl class="docutils">
+<dt>from_xml: convert value from the xml representation into</dt>
+<dd>an internal python representation</dd>
+<dt>to_xml: convert the internal python representation into</dt>
+<dd>the value to store in the xml.</dd>
+</dl>
+</div></blockquote>
+</dd></dl>
+
+<dl class="class">
+<dt id="xmodule.xml_module.XmlDescriptor">
+<em class="property">class </em><tt class="descclassname">xmodule.xml_module.</tt><tt class="descname">XmlDescriptor</tt><big>(</big><em>system</em>, <em>definition=None</em>, <em>**kwargs</em><big>)</big><a class="reference internal" href="_modules/xmodule/xml_module.html#XmlDescriptor"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#xmodule.xml_module.XmlDescriptor" title="Permalink to this definition">¶</a></dt>
+<dd><p>Bases: <a class="reference internal" href="#xmodule.x_module.XModuleDescriptor" title="xmodule.x_module.XModuleDescriptor"><tt class="xref py py-class docutils literal"><span class="pre">xmodule.x_module.XModuleDescriptor</span></tt></a></p>
+<p>Mixin class for standardized parsing of from xml</p>
+<dl class="classmethod">
+<dt id="xmodule.xml_module.XmlDescriptor.apply_policy">
+<em class="property">classmethod </em><tt class="descname">apply_policy</tt><big>(</big><em>metadata</em>, <em>policy</em><big>)</big><a class="reference internal" href="_modules/xmodule/xml_module.html#XmlDescriptor.apply_policy"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#xmodule.xml_module.XmlDescriptor.apply_policy" title="Permalink to this definition">¶</a></dt>
+<dd><p>Add the keys in policy to metadata, after processing them
+through the attrmap.  Updates the metadata dict in place.</p>
+</dd></dl>
+
+<dl class="classmethod">
+<dt id="xmodule.xml_module.XmlDescriptor.clean_metadata_from_xml">
+<em class="property">classmethod </em><tt class="descname">clean_metadata_from_xml</tt><big>(</big><em>xml_object</em><big>)</big><a class="reference internal" href="_modules/xmodule/xml_module.html#XmlDescriptor.clean_metadata_from_xml"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#xmodule.xml_module.XmlDescriptor.clean_metadata_from_xml" title="Permalink to this definition">¶</a></dt>
+<dd><p>Remove any attribute named in cls.metadata_attributes from the supplied
+xml_object</p>
+</dd></dl>
+
+<dl class="classmethod">
+<dt id="xmodule.xml_module.XmlDescriptor.definition_from_xml">
+<em class="property">classmethod </em><tt class="descname">definition_from_xml</tt><big>(</big><em>xml_object</em>, <em>system</em><big>)</big><a class="reference internal" href="_modules/xmodule/xml_module.html#XmlDescriptor.definition_from_xml"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#xmodule.xml_module.XmlDescriptor.definition_from_xml" title="Permalink to this definition">¶</a></dt>
+<dd><p>Return the definition to be passed to the newly created descriptor
+during from_xml</p>
+<p>xml_object: An etree Element</p>
+</dd></dl>
+
+<dl class="method">
+<dt id="xmodule.xml_module.XmlDescriptor.definition_to_xml">
+<tt class="descname">definition_to_xml</tt><big>(</big><em>resource_fs</em><big>)</big><a class="reference internal" href="_modules/xmodule/xml_module.html#XmlDescriptor.definition_to_xml"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#xmodule.xml_module.XmlDescriptor.definition_to_xml" title="Permalink to this definition">¶</a></dt>
+<dd><p>Return a new etree Element object created from this modules definition.</p>
+</dd></dl>
+
+<dl class="method">
+<dt id="xmodule.xml_module.XmlDescriptor.export_to_file">
+<tt class="descname">export_to_file</tt><big>(</big><big>)</big><a class="reference internal" href="_modules/xmodule/xml_module.html#XmlDescriptor.export_to_file"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#xmodule.xml_module.XmlDescriptor.export_to_file" title="Permalink to this definition">¶</a></dt>
+<dd><p>If this returns True, write the definition of this descriptor to a separate
+file.</p>
+<p>NOTE: Do not override this without a good reason.  It is here
+specifically for customtag...</p>
+</dd></dl>
+
+<dl class="method">
+<dt id="xmodule.xml_module.XmlDescriptor.export_to_xml">
+<tt class="descname">export_to_xml</tt><big>(</big><em>resource_fs</em><big>)</big><a class="reference internal" href="_modules/xmodule/xml_module.html#XmlDescriptor.export_to_xml"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#xmodule.xml_module.XmlDescriptor.export_to_xml" title="Permalink to this definition">¶</a></dt>
+<dd><p>Returns an xml string representing this module, and all modules
+underneath it.  May also write required resources out to resource_fs</p>
+<p>Assumes that modules have single parentage (that no module appears twice
+in the same course), and that it is thus safe to nest modules as xml
+children as appropriate.</p>
+<p>The returned XML should be able to be parsed back into an identical
+XModuleDescriptor using the from_xml method with the same system, org,
+and course</p>
+<p>resource_fs is a pyfilesystem object (from the fs package)</p>
+</dd></dl>
+
+<dl class="classmethod">
+<dt id="xmodule.xml_module.XmlDescriptor.file_to_xml">
+<em class="property">classmethod </em><tt class="descname">file_to_xml</tt><big>(</big><em>file_object</em><big>)</big><a class="reference internal" href="_modules/xmodule/xml_module.html#XmlDescriptor.file_to_xml"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#xmodule.xml_module.XmlDescriptor.file_to_xml" title="Permalink to this definition">¶</a></dt>
+<dd><p>Used when this module wants to parse a file object to xml
+that will be converted to the definition.</p>
+<p>Returns an lxml Element</p>
+</dd></dl>
+
+<dl class="classmethod">
+<dt id="xmodule.xml_module.XmlDescriptor.from_xml">
+<em class="property">classmethod </em><tt class="descname">from_xml</tt><big>(</big><em>xml_data</em>, <em>system</em>, <em>org=None</em>, <em>course=None</em><big>)</big><a class="reference internal" href="_modules/xmodule/xml_module.html#XmlDescriptor.from_xml"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#xmodule.xml_module.XmlDescriptor.from_xml" title="Permalink to this definition">¶</a></dt>
+<dd><p>Creates an instance of this descriptor from the supplied xml_data.
+This may be overridden by subclasses</p>
+<dl class="docutils">
+<dt>xml_data: A string of xml that will be translated into data and children for</dt>
+<dd>this module</dd>
+</dl>
+<p>system: A DescriptorSystem for interacting with external resources
+org and course are optional strings that will be used in the generated modules</p>
+<blockquote>
+<div>url identifiers</div></blockquote>
+</dd></dl>
+
+<dl class="classmethod">
+<dt id="xmodule.xml_module.XmlDescriptor.load_definition">
+<em class="property">classmethod </em><tt class="descname">load_definition</tt><big>(</big><em>xml_object</em>, <em>system</em>, <em>location</em><big>)</big><a class="reference internal" href="_modules/xmodule/xml_module.html#XmlDescriptor.load_definition"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#xmodule.xml_module.XmlDescriptor.load_definition" title="Permalink to this definition">¶</a></dt>
+<dd><p>Load a descriptor definition from the specified xml_object.
+Subclasses should not need to override this except in special
+cases (e.g. html module)</p>
+</dd></dl>
+
+<dl class="classmethod">
+<dt id="xmodule.xml_module.XmlDescriptor.load_file">
+<em class="property">classmethod </em><tt class="descname">load_file</tt><big>(</big><em>filepath</em>, <em>fs</em>, <em>location</em><big>)</big><a class="reference internal" href="_modules/xmodule/xml_module.html#XmlDescriptor.load_file"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#xmodule.xml_module.XmlDescriptor.load_file" title="Permalink to this definition">¶</a></dt>
+<dd><p>Open the specified file in fs, and call cls.file_to_xml on it,
+returning the lxml object.</p>
+<p>Add details and reraise on error.</p>
+</dd></dl>
+
+<dl class="classmethod">
+<dt id="xmodule.xml_module.XmlDescriptor.load_metadata">
+<em class="property">classmethod </em><tt class="descname">load_metadata</tt><big>(</big><em>xml_object</em><big>)</big><a class="reference internal" href="_modules/xmodule/xml_module.html#XmlDescriptor.load_metadata"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#xmodule.xml_module.XmlDescriptor.load_metadata" title="Permalink to this definition">¶</a></dt>
+<dd><p>Read the metadata attributes from this xml_object.</p>
+<p>Returns a dictionary {key: value}.</p>
+</dd></dl>
+
+</dd></dl>
+
+<dl class="function">
+<dt id="xmodule.xml_module.is_pointer_tag">
+<tt class="descclassname">xmodule.xml_module.</tt><tt class="descname">is_pointer_tag</tt><big>(</big><em>xml_obj</em><big>)</big><a class="reference internal" href="_modules/xmodule/xml_module.html#is_pointer_tag"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#xmodule.xml_module.is_pointer_tag" title="Permalink to this definition">¶</a></dt>
+<dd><p>Check if xml_obj is a pointer tag: &lt;blah url_name=&#8221;something&#8221; /&gt;.
+No children, one attribute named url_name, no text.</p>
+<dl class="docutils">
+<dt>Special case for course roots: the pointer is</dt>
+<dd>&lt;course url_name=&#8221;something&#8221; org=&#8221;myorg&#8221; course=&#8221;course&#8221;&gt;</dd>
+</dl>
+<p>xml_obj: an etree Element</p>
+<p>Returns a bool.</p>
+</dd></dl>
+
+<dl class="function">
+<dt id="xmodule.xml_module.name_to_pathname">
+<tt class="descclassname">xmodule.xml_module.</tt><tt class="descname">name_to_pathname</tt><big>(</big><em>name</em><big>)</big><a class="reference internal" href="_modules/xmodule/xml_module.html#name_to_pathname"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#xmodule.xml_module.name_to_pathname" title="Permalink to this definition">¶</a></dt>
+<dd><p>Convert a location name for use in a path: replace &#8216;:&#8217; with &#8216;/&#8217;.
+This allows users of the xml format to organize content into directories</p>
+</dd></dl>
+
+</div>
+</div>
+
+
+          </div>
+        </div>
+      </div>
+      <div class="clearer"></div>
+    </div>
+    <div class="related">
+      <h3>Navigation</h3>
+      <ul>
+        <li class="right" style="margin-right: 10px">
+          <a href="genindex.html" title="General Index"
+             >index</a></li>
+        <li class="right" >
+          <a href="py-modindex.html" title="Python Module Index"
+             >modules</a> |</li>
+        <li class="right" >
+          <a href="capa.html" title="Capa module"
+             >next</a> |</li>
+        <li class="right" >
+          <a href="common-lib.html" title="Common / lib"
+             >previous</a> |</li>
+        <li><a href="index.html">MITx 1.0 documentation</a> &raquo;</li>
+          <li><a href="common-lib.html" >Common / lib</a> &raquo;</li> 
+      </ul>
+    </div>
+    <div class="footer">
+        &copy; Copyright 2012, MITx team.
+      Created using <a href="http://sphinx.pocoo.org/">Sphinx</a> 1.1.3.
+    </div>
+  </body>
+</html>

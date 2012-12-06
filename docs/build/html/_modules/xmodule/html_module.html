@@ -1,0 +1,271 @@
+
+
+<!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Transitional//EN"
+  "http://www.w3.org/TR/xhtml1/DTD/xhtml1-transitional.dtd">
+
+
+<html xmlns="http://www.w3.org/1999/xhtml">
+  <head>
+    <meta http-equiv="Content-Type" content="text/html; charset=utf-8" />
+    
+    <title>xmodule.html_module &mdash; MITx 1.0 documentation</title>
+    
+    <link rel="stylesheet" href="../../_static/sphinxdoc.css" type="text/css" />
+    <link rel="stylesheet" href="../../_static/pygments.css" type="text/css" />
+    
+    <script type="text/javascript">
+      var DOCUMENTATION_OPTIONS = {
+        URL_ROOT:    '../../',
+        VERSION:     '1.0',
+        COLLAPSE_INDEX: false,
+        FILE_SUFFIX: '.html',
+        HAS_SOURCE:  true
+      };
+    </script>
+    <script type="text/javascript" src="../../_static/jquery.js"></script>
+    <script type="text/javascript" src="../../_static/underscore.js"></script>
+    <script type="text/javascript" src="../../_static/doctools.js"></script>
+    <script type="text/javascript" src="http://cdn.mathjax.org/mathjax/latest/MathJax.js?config=TeX-AMS-MML_HTMLorMML"></script>
+    <link rel="top" title="MITx 1.0 documentation" href="../../index.html" />
+    <link rel="up" title="Module code" href="../index.html" /> 
+  </head>
+  <body>
+<img src="../../_static/homepage-bg.jpg" alt="Edx logo"  width="100%;"/>
+
+    <div class="related">
+      <h3>Navigation</h3>
+      <ul>
+        <li class="right" style="margin-right: 10px">
+          <a href="../../genindex.html" title="General Index"
+             accesskey="I">index</a></li>
+        <li class="right" >
+          <a href="../../py-modindex.html" title="Python Module Index"
+             >modules</a> |</li>
+        <li><a href="../../index.html">MITx 1.0 documentation</a> &raquo;</li>
+          <li><a href="../index.html" accesskey="U">Module code</a> &raquo;</li> 
+      </ul>
+    </div>
+      <div class="sphinxsidebar">
+        <div class="sphinxsidebarwrapper">
+<div id="searchbox" style="display: none">
+  <h3>Quick search</h3>
+    <form class="search" action="../../search.html" method="get">
+      <input type="text" name="q" />
+      <input type="submit" value="Go" />
+      <input type="hidden" name="check_keywords" value="yes" />
+      <input type="hidden" name="area" value="default" />
+    </form>
+    <p class="searchtip" style="font-size: 90%">
+    Enter search terms or a module, class or function name.
+    </p>
+</div>
+<script type="text/javascript">$('#searchbox').show(0);</script>
+        </div>
+      </div>
+
+    <div class="document">
+      <div class="documentwrapper">
+        <div class="bodywrapper">
+          <div class="body">
+            
+  <h1>Source code for xmodule.html_module</h1><div class="highlight"><pre>
+<span class="kn">import</span> <span class="nn">copy</span>
+<span class="kn">from</span> <span class="nn">fs.errors</span> <span class="kn">import</span> <span class="n">ResourceNotFoundError</span>
+<span class="kn">import</span> <span class="nn">logging</span>
+<span class="kn">import</span> <span class="nn">os</span>
+<span class="kn">import</span> <span class="nn">sys</span>
+<span class="kn">from</span> <span class="nn">lxml</span> <span class="kn">import</span> <span class="n">etree</span>
+<span class="kn">from</span> <span class="nn">lxml.html</span> <span class="kn">import</span> <span class="n">rewrite_links</span>
+<span class="kn">from</span> <span class="nn">path</span> <span class="kn">import</span> <span class="n">path</span>
+
+<span class="kn">from</span> <span class="nn">.x_module</span> <span class="kn">import</span> <span class="n">XModule</span>
+<span class="kn">from</span> <span class="nn">pkg_resources</span> <span class="kn">import</span> <span class="n">resource_string</span>
+<span class="kn">from</span> <span class="nn">.xml_module</span> <span class="kn">import</span> <span class="n">XmlDescriptor</span><span class="p">,</span> <span class="n">name_to_pathname</span>
+<span class="kn">from</span> <span class="nn">.editing_module</span> <span class="kn">import</span> <span class="n">EditingDescriptor</span>
+<span class="kn">from</span> <span class="nn">.stringify</span> <span class="kn">import</span> <span class="n">stringify_children</span>
+<span class="kn">from</span> <span class="nn">.html_checker</span> <span class="kn">import</span> <span class="n">check_html</span>
+<span class="kn">from</span> <span class="nn">xmodule.modulestore</span> <span class="kn">import</span> <span class="n">Location</span>
+
+<span class="kn">from</span> <span class="nn">xmodule.contentstore.content</span> <span class="kn">import</span> <span class="n">XASSET_SRCREF_PREFIX</span><span class="p">,</span> <span class="n">StaticContent</span>
+
+<span class="n">log</span> <span class="o">=</span> <span class="n">logging</span><span class="o">.</span><span class="n">getLogger</span><span class="p">(</span><span class="s">&quot;mitx.courseware&quot;</span><span class="p">)</span>
+
+
+<span class="k">class</span> <span class="nc">HtmlModule</span><span class="p">(</span><span class="n">XModule</span><span class="p">):</span>
+    <span class="n">js</span> <span class="o">=</span> <span class="p">{</span><span class="s">&#39;coffee&#39;</span><span class="p">:</span> <span class="p">[</span><span class="n">resource_string</span><span class="p">(</span><span class="n">__name__</span><span class="p">,</span> <span class="s">&#39;js/src/javascript_loader.coffee&#39;</span><span class="p">),</span>
+                     <span class="n">resource_string</span><span class="p">(</span><span class="n">__name__</span><span class="p">,</span> <span class="s">&#39;js/src/collapsible.coffee&#39;</span><span class="p">),</span>
+                     <span class="n">resource_string</span><span class="p">(</span><span class="n">__name__</span><span class="p">,</span> <span class="s">&#39;js/src/html/display.coffee&#39;</span><span class="p">)</span>
+                    <span class="p">]</span>
+         <span class="p">}</span>
+    <span class="n">js_module_name</span> <span class="o">=</span> <span class="s">&quot;HTMLModule&quot;</span>
+    
+    <span class="k">def</span> <span class="nf">get_html</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
+        <span class="c"># cdodge: perform link substitutions for any references to course static content (e.g. images)</span>
+        <span class="k">return</span> <span class="n">rewrite_links</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">html</span><span class="p">,</span> <span class="bp">self</span><span class="o">.</span><span class="n">rewrite_content_links</span><span class="p">)</span>
+
+    <span class="k">def</span> <span class="nf">__init__</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">system</span><span class="p">,</span> <span class="n">location</span><span class="p">,</span> <span class="n">definition</span><span class="p">,</span> <span class="n">descriptor</span><span class="p">,</span>
+                 <span class="n">instance_state</span><span class="o">=</span><span class="bp">None</span><span class="p">,</span> <span class="n">shared_state</span><span class="o">=</span><span class="bp">None</span><span class="p">,</span> <span class="o">**</span><span class="n">kwargs</span><span class="p">):</span>
+        <span class="n">XModule</span><span class="o">.</span><span class="n">__init__</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">system</span><span class="p">,</span> <span class="n">location</span><span class="p">,</span> <span class="n">definition</span><span class="p">,</span> <span class="n">descriptor</span><span class="p">,</span>
+                         <span class="n">instance_state</span><span class="p">,</span> <span class="n">shared_state</span><span class="p">,</span> <span class="o">**</span><span class="n">kwargs</span><span class="p">)</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">html</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">definition</span><span class="p">[</span><span class="s">&#39;data&#39;</span><span class="p">]</span>
+
+
+
+<div class="viewcode-block" id="HtmlDescriptor"><a class="viewcode-back" href="../../xmodule.html#xmodule.html_module.HtmlDescriptor">[docs]</a><span class="k">class</span> <span class="nc">HtmlDescriptor</span><span class="p">(</span><span class="n">XmlDescriptor</span><span class="p">,</span> <span class="n">EditingDescriptor</span><span class="p">):</span>
+    <span class="sd">&quot;&quot;&quot;</span>
+<span class="sd">    Module for putting raw html in a course</span>
+<span class="sd">    &quot;&quot;&quot;</span>
+    <span class="n">mako_template</span> <span class="o">=</span> <span class="s">&quot;widgets/html-edit.html&quot;</span>
+    <span class="n">module_class</span> <span class="o">=</span> <span class="n">HtmlModule</span>
+    <span class="n">filename_extension</span> <span class="o">=</span> <span class="s">&quot;xml&quot;</span>
+    <span class="n">template_dir_name</span> <span class="o">=</span> <span class="s">&quot;html&quot;</span>
+
+    <span class="n">js</span> <span class="o">=</span> <span class="p">{</span><span class="s">&#39;coffee&#39;</span><span class="p">:</span> <span class="p">[</span><span class="n">resource_string</span><span class="p">(</span><span class="n">__name__</span><span class="p">,</span> <span class="s">&#39;js/src/html/edit.coffee&#39;</span><span class="p">)]}</span>
+    <span class="n">js_module_name</span> <span class="o">=</span> <span class="s">&quot;HTMLEditingDescriptor&quot;</span>
+
+    <span class="c"># VS[compat] TODO (cpennington): Delete this method once all fall 2012 course</span>
+    <span class="c"># are being edited in the cms</span>
+    <span class="nd">@classmethod</span>
+    <span class="k">def</span> <span class="nf">backcompat_paths</span><span class="p">(</span><span class="n">cls</span><span class="p">,</span> <span class="n">path</span><span class="p">):</span>
+        <span class="k">if</span> <span class="n">path</span><span class="o">.</span><span class="n">endswith</span><span class="p">(</span><span class="s">&#39;.html.xml&#39;</span><span class="p">):</span>
+            <span class="n">path</span> <span class="o">=</span> <span class="n">path</span><span class="p">[:</span><span class="o">-</span><span class="mi">9</span><span class="p">]</span> <span class="o">+</span> <span class="s">&#39;.html&#39;</span>  <span class="c"># backcompat--look for html instead of xml</span>
+        <span class="k">if</span> <span class="n">path</span><span class="o">.</span><span class="n">endswith</span><span class="p">(</span><span class="s">&#39;.html.html&#39;</span><span class="p">):</span>
+            <span class="n">path</span> <span class="o">=</span> <span class="n">path</span><span class="p">[:</span><span class="o">-</span><span class="mi">5</span><span class="p">]</span>            <span class="c"># some people like to include .html in filenames..</span>
+        <span class="n">candidates</span> <span class="o">=</span> <span class="p">[]</span>
+        <span class="k">while</span> <span class="n">os</span><span class="o">.</span><span class="n">sep</span> <span class="ow">in</span> <span class="n">path</span><span class="p">:</span>
+            <span class="n">candidates</span><span class="o">.</span><span class="n">append</span><span class="p">(</span><span class="n">path</span><span class="p">)</span>
+            <span class="n">_</span><span class="p">,</span> <span class="n">_</span><span class="p">,</span> <span class="n">path</span> <span class="o">=</span> <span class="n">path</span><span class="o">.</span><span class="n">partition</span><span class="p">(</span><span class="n">os</span><span class="o">.</span><span class="n">sep</span><span class="p">)</span>
+
+        <span class="c"># also look for .html versions instead of .xml</span>
+        <span class="n">nc</span> <span class="o">=</span> <span class="p">[]</span>
+        <span class="k">for</span> <span class="n">candidate</span> <span class="ow">in</span> <span class="n">candidates</span><span class="p">:</span>
+            <span class="k">if</span> <span class="n">candidate</span><span class="o">.</span><span class="n">endswith</span><span class="p">(</span><span class="s">&#39;.xml&#39;</span><span class="p">):</span>
+                <span class="n">nc</span><span class="o">.</span><span class="n">append</span><span class="p">(</span><span class="n">candidate</span><span class="p">[:</span><span class="o">-</span><span class="mi">4</span><span class="p">]</span> <span class="o">+</span> <span class="s">&#39;.html&#39;</span><span class="p">)</span>
+        <span class="k">return</span> <span class="n">candidates</span> <span class="o">+</span> <span class="n">nc</span>
+
+    <span class="c"># NOTE: html descriptors are special.  We do not want to parse and</span>
+    <span class="c"># export them ourselves, because that can break things (e.g. lxml</span>
+    <span class="c"># adds body tags when it exports, but they should just be html</span>
+    <span class="c"># snippets that will be included in the middle of pages.</span>
+
+    <span class="nd">@classmethod</span>
+<div class="viewcode-block" id="HtmlDescriptor.load_definition"><a class="viewcode-back" href="../../xmodule.html#xmodule.html_module.HtmlDescriptor.load_definition">[docs]</a>    <span class="k">def</span> <span class="nf">load_definition</span><span class="p">(</span><span class="n">cls</span><span class="p">,</span> <span class="n">xml_object</span><span class="p">,</span> <span class="n">system</span><span class="p">,</span> <span class="n">location</span><span class="p">):</span>
+        <span class="sd">&#39;&#39;&#39;Load a descriptor from the specified xml_object:</span>
+
+<span class="sd">        If there is a filename attribute, load it as a string, and</span>
+<span class="sd">        log a warning if it is not parseable by etree.HTMLParser.</span>
+
+<span class="sd">        If there is not a filename attribute, the definition is the body</span>
+<span class="sd">        of the xml_object, without the root tag (do not want &lt;html&gt; in the</span>
+<span class="sd">        middle of a page)</span>
+<span class="sd">        &#39;&#39;&#39;</span>
+        <span class="n">filename</span> <span class="o">=</span> <span class="n">xml_object</span><span class="o">.</span><span class="n">get</span><span class="p">(</span><span class="s">&#39;filename&#39;</span><span class="p">)</span>
+        <span class="k">if</span> <span class="n">filename</span> <span class="ow">is</span> <span class="bp">None</span><span class="p">:</span>
+            <span class="n">definition_xml</span> <span class="o">=</span> <span class="n">copy</span><span class="o">.</span><span class="n">deepcopy</span><span class="p">(</span><span class="n">xml_object</span><span class="p">)</span>
+            <span class="n">cls</span><span class="o">.</span><span class="n">clean_metadata_from_xml</span><span class="p">(</span><span class="n">definition_xml</span><span class="p">)</span>
+            <span class="k">return</span> <span class="p">{</span><span class="s">&#39;data&#39;</span><span class="p">:</span> <span class="n">stringify_children</span><span class="p">(</span><span class="n">definition_xml</span><span class="p">)}</span>
+        <span class="k">else</span><span class="p">:</span>
+            <span class="c"># html is special.  cls.filename_extension is &#39;xml&#39;, but</span>
+            <span class="c"># if &#39;filename&#39; is in the definition, that means to load</span>
+            <span class="c"># from .html</span>
+            <span class="c"># &#39;filename&#39; in html pointers is a relative path</span>
+            <span class="c"># (not same as &#39;html/blah.html&#39; when the pointer is in a directory itself)</span>
+            <span class="n">pointer_path</span> <span class="o">=</span> <span class="s">&quot;{category}/{url_path}&quot;</span><span class="o">.</span><span class="n">format</span><span class="p">(</span><span class="n">category</span><span class="o">=</span><span class="s">&#39;html&#39;</span><span class="p">,</span>
+                                                  <span class="n">url_path</span><span class="o">=</span><span class="n">name_to_pathname</span><span class="p">(</span><span class="n">location</span><span class="o">.</span><span class="n">name</span><span class="p">))</span>
+            <span class="n">base</span> <span class="o">=</span> <span class="n">path</span><span class="p">(</span><span class="n">pointer_path</span><span class="p">)</span><span class="o">.</span><span class="n">dirname</span><span class="p">()</span>
+            <span class="c">#log.debug(&quot;base = {0}, base.dirname={1}, filename={2}&quot;.format(base, base.dirname(), filename))</span>
+            <span class="n">filepath</span> <span class="o">=</span> <span class="s">&quot;{base}/{name}.html&quot;</span><span class="o">.</span><span class="n">format</span><span class="p">(</span><span class="n">base</span><span class="o">=</span><span class="n">base</span><span class="p">,</span> <span class="n">name</span><span class="o">=</span><span class="n">filename</span><span class="p">)</span>
+            <span class="c">#log.debug(&quot;looking for html file for {0} at {1}&quot;.format(location, filepath))</span>
+
+
+
+            <span class="c"># VS[compat]</span>
+            <span class="c"># TODO (cpennington): If the file doesn&#39;t exist at the right path,</span>
+            <span class="c"># give the class a chance to fix it up. The file will be written out</span>
+            <span class="c"># again in the correct format.  This should go away once the CMS is</span>
+            <span class="c"># online and has imported all current (fall 2012) courses from xml</span>
+            <span class="k">if</span> <span class="ow">not</span> <span class="n">system</span><span class="o">.</span><span class="n">resources_fs</span><span class="o">.</span><span class="n">exists</span><span class="p">(</span><span class="n">filepath</span><span class="p">):</span>
+                <span class="n">candidates</span> <span class="o">=</span> <span class="n">cls</span><span class="o">.</span><span class="n">backcompat_paths</span><span class="p">(</span><span class="n">filepath</span><span class="p">)</span>
+                <span class="c">#log.debug(&quot;candidates = {0}&quot;.format(candidates))</span>
+                <span class="k">for</span> <span class="n">candidate</span> <span class="ow">in</span> <span class="n">candidates</span><span class="p">:</span>
+                    <span class="k">if</span> <span class="n">system</span><span class="o">.</span><span class="n">resources_fs</span><span class="o">.</span><span class="n">exists</span><span class="p">(</span><span class="n">candidate</span><span class="p">):</span>
+                        <span class="n">filepath</span> <span class="o">=</span> <span class="n">candidate</span>
+                        <span class="k">break</span>
+
+            <span class="k">try</span><span class="p">:</span>
+                <span class="k">with</span> <span class="n">system</span><span class="o">.</span><span class="n">resources_fs</span><span class="o">.</span><span class="n">open</span><span class="p">(</span><span class="n">filepath</span><span class="p">)</span> <span class="k">as</span> <span class="nb">file</span><span class="p">:</span>
+                    <span class="n">html</span> <span class="o">=</span> <span class="nb">file</span><span class="o">.</span><span class="n">read</span><span class="p">()</span>
+                    <span class="c"># Log a warning if we can&#39;t parse the file, but don&#39;t error</span>
+                    <span class="k">if</span> <span class="ow">not</span> <span class="n">check_html</span><span class="p">(</span><span class="n">html</span><span class="p">):</span>
+                        <span class="n">msg</span> <span class="o">=</span> <span class="s">&quot;Couldn&#39;t parse html in {0}.&quot;</span><span class="o">.</span><span class="n">format</span><span class="p">(</span><span class="n">filepath</span><span class="p">)</span>
+                        <span class="n">log</span><span class="o">.</span><span class="n">warning</span><span class="p">(</span><span class="n">msg</span><span class="p">)</span>
+                        <span class="n">system</span><span class="o">.</span><span class="n">error_tracker</span><span class="p">(</span><span class="s">&quot;Warning: &quot;</span> <span class="o">+</span> <span class="n">msg</span><span class="p">)</span>
+
+                    <span class="n">definition</span> <span class="o">=</span> <span class="p">{</span><span class="s">&#39;data&#39;</span><span class="p">:</span> <span class="n">html</span><span class="p">}</span>
+
+                    <span class="c"># TODO (ichuang): remove this after migration</span>
+                    <span class="c"># for Fall 2012 LMS migration: keep filename (and unmangled filename)</span>
+                    <span class="n">definition</span><span class="p">[</span><span class="s">&#39;filename&#39;</span><span class="p">]</span> <span class="o">=</span> <span class="p">[</span> <span class="n">filepath</span><span class="p">,</span> <span class="n">filename</span> <span class="p">]</span>
+
+                    <span class="k">return</span> <span class="n">definition</span>
+
+            <span class="k">except</span> <span class="p">(</span><span class="n">ResourceNotFoundError</span><span class="p">)</span> <span class="k">as</span> <span class="n">err</span><span class="p">:</span>
+                <span class="n">msg</span> <span class="o">=</span> <span class="s">&#39;Unable to load file contents at path {0}: {1} &#39;</span><span class="o">.</span><span class="n">format</span><span class="p">(</span>
+                    <span class="n">filepath</span><span class="p">,</span> <span class="n">err</span><span class="p">)</span>
+                <span class="c"># add more info and re-raise</span>
+                <span class="k">raise</span> <span class="ne">Exception</span><span class="p">(</span><span class="n">msg</span><span class="p">),</span> <span class="bp">None</span><span class="p">,</span> <span class="n">sys</span><span class="o">.</span><span class="n">exc_info</span><span class="p">()[</span><span class="mi">2</span><span class="p">]</span>
+
+    <span class="c"># TODO (vshnayder): make export put things in the right places.</span>
+</div>
+<div class="viewcode-block" id="HtmlDescriptor.definition_to_xml"><a class="viewcode-back" href="../../xmodule.html#xmodule.html_module.HtmlDescriptor.definition_to_xml">[docs]</a>    <span class="k">def</span> <span class="nf">definition_to_xml</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">resource_fs</span><span class="p">):</span>
+        <span class="sd">&#39;&#39;&#39;If the contents are valid xml, write them to filename.xml.  Otherwise,</span>
+<span class="sd">        write just &lt;html filename=&quot;&quot; [meta-attrs=&quot;...&quot;]&gt; to filename.xml, and the html</span>
+<span class="sd">        string to filename.html.</span>
+<span class="sd">        &#39;&#39;&#39;</span>
+        <span class="k">try</span><span class="p">:</span>
+            <span class="k">return</span> <span class="n">etree</span><span class="o">.</span><span class="n">fromstring</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">definition</span><span class="p">[</span><span class="s">&#39;data&#39;</span><span class="p">])</span>
+        <span class="k">except</span> <span class="n">etree</span><span class="o">.</span><span class="n">XMLSyntaxError</span><span class="p">:</span>
+            <span class="k">pass</span>
+
+        <span class="c"># Not proper format.  Write html to file, return an empty tag</span>
+        <span class="n">pathname</span> <span class="o">=</span> <span class="n">name_to_pathname</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">url_name</span><span class="p">)</span>
+        <span class="n">pathdir</span> <span class="o">=</span> <span class="n">path</span><span class="p">(</span><span class="n">pathname</span><span class="p">)</span><span class="o">.</span><span class="n">dirname</span><span class="p">()</span>
+        <span class="n">filepath</span> <span class="o">=</span> <span class="s">u&#39;{category}/{pathname}.html&#39;</span><span class="o">.</span><span class="n">format</span><span class="p">(</span><span class="n">category</span><span class="o">=</span><span class="bp">self</span><span class="o">.</span><span class="n">category</span><span class="p">,</span>
+                                                    <span class="n">pathname</span><span class="o">=</span><span class="n">pathname</span><span class="p">)</span>
+
+        <span class="n">resource_fs</span><span class="o">.</span><span class="n">makedir</span><span class="p">(</span><span class="n">os</span><span class="o">.</span><span class="n">path</span><span class="o">.</span><span class="n">dirname</span><span class="p">(</span><span class="n">filepath</span><span class="p">),</span> <span class="n">allow_recreate</span><span class="o">=</span><span class="bp">True</span><span class="p">)</span>
+        <span class="k">with</span> <span class="n">resource_fs</span><span class="o">.</span><span class="n">open</span><span class="p">(</span><span class="n">filepath</span><span class="p">,</span> <span class="s">&#39;w&#39;</span><span class="p">)</span> <span class="k">as</span> <span class="nb">file</span><span class="p">:</span>
+            <span class="nb">file</span><span class="o">.</span><span class="n">write</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">definition</span><span class="p">[</span><span class="s">&#39;data&#39;</span><span class="p">])</span>
+
+        <span class="c"># write out the relative name</span>
+        <span class="n">relname</span> <span class="o">=</span> <span class="n">path</span><span class="p">(</span><span class="n">pathname</span><span class="p">)</span><span class="o">.</span><span class="n">basename</span><span class="p">()</span>
+
+        <span class="n">elt</span> <span class="o">=</span> <span class="n">etree</span><span class="o">.</span><span class="n">Element</span><span class="p">(</span><span class="s">&#39;html&#39;</span><span class="p">)</span>
+        <span class="n">elt</span><span class="o">.</span><span class="n">set</span><span class="p">(</span><span class="s">&quot;filename&quot;</span><span class="p">,</span> <span class="n">relname</span><span class="p">)</span>
+        <span class="k">return</span> <span class="n">elt</span></div></div>
+</pre></div>
+
+          </div>
+        </div>
+      </div>
+      <div class="clearer"></div>
+    </div>
+    <div class="related">
+      <h3>Navigation</h3>
+      <ul>
+        <li class="right" style="margin-right: 10px">
+          <a href="../../genindex.html" title="General Index"
+             >index</a></li>
+        <li class="right" >
+          <a href="../../py-modindex.html" title="Python Module Index"
+             >modules</a> |</li>
+        <li><a href="../../index.html">MITx 1.0 documentation</a> &raquo;</li>
+          <li><a href="../index.html" >Module code</a> &raquo;</li> 
+      </ul>
+    </div>
+    <div class="footer">
+        &copy; Copyright 2012, MITx team.
+      Created using <a href="http://sphinx.pocoo.org/">Sphinx</a> 1.1.3.
+    </div>
+  </body>
+</html>

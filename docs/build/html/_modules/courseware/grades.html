@@ -1,0 +1,474 @@
+
+
+<!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Transitional//EN"
+  "http://www.w3.org/TR/xhtml1/DTD/xhtml1-transitional.dtd">
+
+
+<html xmlns="http://www.w3.org/1999/xhtml">
+  <head>
+    <meta http-equiv="Content-Type" content="text/html; charset=utf-8" />
+    
+    <title>courseware.grades &mdash; MITx 1.0 documentation</title>
+    
+    <link rel="stylesheet" href="../../_static/sphinxdoc.css" type="text/css" />
+    <link rel="stylesheet" href="../../_static/pygments.css" type="text/css" />
+    
+    <script type="text/javascript">
+      var DOCUMENTATION_OPTIONS = {
+        URL_ROOT:    '../../',
+        VERSION:     '1.0',
+        COLLAPSE_INDEX: false,
+        FILE_SUFFIX: '.html',
+        HAS_SOURCE:  true
+      };
+    </script>
+    <script type="text/javascript" src="../../_static/jquery.js"></script>
+    <script type="text/javascript" src="../../_static/underscore.js"></script>
+    <script type="text/javascript" src="../../_static/doctools.js"></script>
+    <script type="text/javascript" src="http://cdn.mathjax.org/mathjax/latest/MathJax.js?config=TeX-AMS-MML_HTMLorMML"></script>
+    <link rel="top" title="MITx 1.0 documentation" href="../../index.html" />
+    <link rel="up" title="Module code" href="../index.html" /> 
+  </head>
+  <body>
+<img src="../../_static/homepage-bg.jpg" alt="Edx logo"  width="100%;"/>
+
+    <div class="related">
+      <h3>Navigation</h3>
+      <ul>
+        <li class="right" style="margin-right: 10px">
+          <a href="../../genindex.html" title="General Index"
+             accesskey="I">index</a></li>
+        <li class="right" >
+          <a href="../../py-modindex.html" title="Python Module Index"
+             >modules</a> |</li>
+        <li><a href="../../index.html">MITx 1.0 documentation</a> &raquo;</li>
+          <li><a href="../index.html" accesskey="U">Module code</a> &raquo;</li> 
+      </ul>
+    </div>
+      <div class="sphinxsidebar">
+        <div class="sphinxsidebarwrapper">
+<div id="searchbox" style="display: none">
+  <h3>Quick search</h3>
+    <form class="search" action="../../search.html" method="get">
+      <input type="text" name="q" />
+      <input type="submit" value="Go" />
+      <input type="hidden" name="check_keywords" value="yes" />
+      <input type="hidden" name="area" value="default" />
+    </form>
+    <p class="searchtip" style="font-size: 90%">
+    Enter search terms or a module, class or function name.
+    </p>
+</div>
+<script type="text/javascript">$('#searchbox').show(0);</script>
+        </div>
+      </div>
+
+    <div class="document">
+      <div class="documentwrapper">
+        <div class="bodywrapper">
+          <div class="body">
+            
+  <h1>Source code for courseware.grades</h1><div class="highlight"><pre>
+<span class="c"># Compute grades using real division, with no integer truncation</span>
+<span class="kn">from</span> <span class="nn">__future__</span> <span class="kn">import</span> <span class="n">division</span>
+
+<span class="kn">import</span> <span class="nn">random</span>
+<span class="kn">import</span> <span class="nn">logging</span>
+
+<span class="kn">from</span> <span class="nn">collections</span> <span class="kn">import</span> <span class="n">defaultdict</span>
+<span class="kn">from</span> <span class="nn">django.conf</span> <span class="kn">import</span> <span class="n">settings</span>
+<span class="kn">from</span> <span class="nn">django.contrib.auth.models</span> <span class="kn">import</span> <span class="n">User</span>
+
+<span class="kn">from</span> <span class="nn">models</span> <span class="kn">import</span> <span class="n">StudentModuleCache</span>
+<span class="kn">from</span> <span class="nn">module_render</span> <span class="kn">import</span> <span class="n">get_module</span><span class="p">,</span> <span class="n">get_instance_module</span>
+<span class="kn">from</span> <span class="nn">xmodule</span> <span class="kn">import</span> <span class="n">graders</span>
+<span class="kn">from</span> <span class="nn">xmodule.capa_module</span> <span class="kn">import</span> <span class="n">CapaModule</span>
+<span class="kn">from</span> <span class="nn">xmodule.course_module</span> <span class="kn">import</span> <span class="n">CourseDescriptor</span>
+<span class="kn">from</span> <span class="nn">xmodule.graders</span> <span class="kn">import</span> <span class="n">Score</span>
+<span class="kn">from</span> <span class="nn">models</span> <span class="kn">import</span> <span class="n">StudentModule</span>
+
+<span class="n">log</span> <span class="o">=</span> <span class="n">logging</span><span class="o">.</span><span class="n">getLogger</span><span class="p">(</span><span class="s">&quot;mitx.courseware&quot;</span><span class="p">)</span>
+
+<span class="k">def</span> <span class="nf">yield_module_descendents</span><span class="p">(</span><span class="n">module</span><span class="p">):</span>
+    <span class="n">stack</span> <span class="o">=</span> <span class="n">module</span><span class="o">.</span><span class="n">get_display_items</span><span class="p">()</span>
+    <span class="n">stack</span><span class="o">.</span><span class="n">reverse</span><span class="p">()</span>
+
+    <span class="k">while</span> <span class="nb">len</span><span class="p">(</span><span class="n">stack</span><span class="p">)</span> <span class="o">&gt;</span> <span class="mi">0</span><span class="p">:</span>
+        <span class="n">next_module</span> <span class="o">=</span> <span class="n">stack</span><span class="o">.</span><span class="n">pop</span><span class="p">()</span>
+        <span class="n">stack</span><span class="o">.</span><span class="n">extend</span><span class="p">(</span> <span class="n">next_module</span><span class="o">.</span><span class="n">get_display_items</span><span class="p">()</span> <span class="p">)</span>
+        <span class="k">yield</span> <span class="n">next_module</span>
+
+<div class="viewcode-block" id="yield_dynamic_descriptor_descendents"><a class="viewcode-back" href="../../lms.html#courseware.grades.yield_dynamic_descriptor_descendents">[docs]</a><span class="k">def</span> <span class="nf">yield_dynamic_descriptor_descendents</span><span class="p">(</span><span class="n">descriptor</span><span class="p">,</span> <span class="n">module_creator</span><span class="p">):</span>
+    <span class="sd">&quot;&quot;&quot;</span>
+<span class="sd">    This returns all of the descendants of a descriptor. If the descriptor</span>
+<span class="sd">    has dynamic children, the module will be created using module_creator</span>
+<span class="sd">    and the children (as descriptors) of that module will be returned.</span>
+<span class="sd">    &quot;&quot;&quot;</span>
+    <span class="k">def</span> <span class="nf">get_dynamic_descriptor_children</span><span class="p">(</span><span class="n">descriptor</span><span class="p">):</span>
+        <span class="k">if</span> <span class="n">descriptor</span><span class="o">.</span><span class="n">has_dynamic_children</span><span class="p">():</span>
+            <span class="n">module</span> <span class="o">=</span> <span class="n">module_creator</span><span class="p">(</span><span class="n">descriptor</span><span class="p">)</span>
+            <span class="n">child_locations</span> <span class="o">=</span> <span class="n">module</span><span class="o">.</span><span class="n">get_children_locations</span><span class="p">()</span>
+            <span class="k">return</span> <span class="p">[</span><span class="n">descriptor</span><span class="o">.</span><span class="n">system</span><span class="o">.</span><span class="n">load_item</span><span class="p">(</span><span class="n">child_location</span><span class="p">)</span> <span class="k">for</span> <span class="n">child_location</span> <span class="ow">in</span> <span class="n">child_locations</span> <span class="p">]</span>
+        <span class="k">else</span><span class="p">:</span>
+            <span class="k">return</span> <span class="n">descriptor</span><span class="o">.</span><span class="n">get_children</span><span class="p">()</span>
+    
+    
+    <span class="n">stack</span> <span class="o">=</span> <span class="p">[</span><span class="n">descriptor</span><span class="p">]</span>
+
+    <span class="k">while</span> <span class="nb">len</span><span class="p">(</span><span class="n">stack</span><span class="p">)</span> <span class="o">&gt;</span> <span class="mi">0</span><span class="p">:</span>
+        <span class="n">next_descriptor</span> <span class="o">=</span> <span class="n">stack</span><span class="o">.</span><span class="n">pop</span><span class="p">()</span>
+        <span class="n">stack</span><span class="o">.</span><span class="n">extend</span><span class="p">(</span> <span class="n">get_dynamic_descriptor_children</span><span class="p">(</span><span class="n">next_descriptor</span><span class="p">)</span> <span class="p">)</span>
+        <span class="k">yield</span> <span class="n">next_descriptor</span>
+    
+</div>
+<div class="viewcode-block" id="yield_problems"><a class="viewcode-back" href="../../lms.html#courseware.grades.yield_problems">[docs]</a><span class="k">def</span> <span class="nf">yield_problems</span><span class="p">(</span><span class="n">request</span><span class="p">,</span> <span class="n">course</span><span class="p">,</span> <span class="n">student</span><span class="p">):</span>
+    <span class="sd">&quot;&quot;&quot;</span>
+<span class="sd">    Return an iterator over capa_modules that this student has</span>
+<span class="sd">    potentially answered.  (all that student has answered will definitely be in</span>
+<span class="sd">    the list, but there may be others as well).</span>
+<span class="sd">    &quot;&quot;&quot;</span>
+    <span class="n">grading_context</span> <span class="o">=</span> <span class="n">course</span><span class="o">.</span><span class="n">grading_context</span>
+    <span class="n">student_module_cache</span> <span class="o">=</span> <span class="n">StudentModuleCache</span><span class="p">(</span><span class="n">course</span><span class="o">.</span><span class="n">id</span><span class="p">,</span> <span class="n">student</span><span class="p">,</span> <span class="n">grading_context</span><span class="p">[</span><span class="s">&#39;all_descriptors&#39;</span><span class="p">])</span>
+
+    <span class="k">for</span> <span class="n">section_format</span><span class="p">,</span> <span class="n">sections</span> <span class="ow">in</span> <span class="n">grading_context</span><span class="p">[</span><span class="s">&#39;graded_sections&#39;</span><span class="p">]</span><span class="o">.</span><span class="n">iteritems</span><span class="p">():</span>
+        <span class="k">for</span> <span class="n">section</span> <span class="ow">in</span> <span class="n">sections</span><span class="p">:</span>
+
+            <span class="n">section_descriptor</span> <span class="o">=</span> <span class="n">section</span><span class="p">[</span><span class="s">&#39;section_descriptor&#39;</span><span class="p">]</span>
+
+            <span class="c"># If the student hasn&#39;t seen a single problem in the section, skip it.</span>
+            <span class="n">skip</span> <span class="o">=</span> <span class="bp">True</span>
+            <span class="k">for</span> <span class="n">moduledescriptor</span> <span class="ow">in</span> <span class="n">section</span><span class="p">[</span><span class="s">&#39;xmoduledescriptors&#39;</span><span class="p">]:</span>
+                <span class="k">if</span> <span class="n">student_module_cache</span><span class="o">.</span><span class="n">lookup</span><span class="p">(</span>
+                        <span class="n">course</span><span class="o">.</span><span class="n">id</span><span class="p">,</span> <span class="n">moduledescriptor</span><span class="o">.</span><span class="n">category</span><span class="p">,</span> <span class="n">moduledescriptor</span><span class="o">.</span><span class="n">location</span><span class="o">.</span><span class="n">url</span><span class="p">()):</span>
+                    <span class="n">skip</span> <span class="o">=</span> <span class="bp">False</span>
+                    <span class="k">break</span>
+
+            <span class="k">if</span> <span class="n">skip</span><span class="p">:</span>
+                <span class="k">continue</span>
+
+            <span class="n">section_module</span> <span class="o">=</span> <span class="n">get_module</span><span class="p">(</span><span class="n">student</span><span class="p">,</span> <span class="n">request</span><span class="p">,</span>
+                                        <span class="n">section_descriptor</span><span class="o">.</span><span class="n">location</span><span class="p">,</span> <span class="n">student_module_cache</span><span class="p">,</span>
+                                        <span class="n">course</span><span class="o">.</span><span class="n">id</span><span class="p">)</span>
+            <span class="k">if</span> <span class="n">section_module</span> <span class="ow">is</span> <span class="bp">None</span><span class="p">:</span>
+                <span class="c"># student doesn&#39;t have access to this module, or something else</span>
+                <span class="c"># went wrong.</span>
+                <span class="c"># log.debug(&quot;couldn&#39;t get module for student {0} for section location {1}&quot;</span>
+                <span class="c">#           .format(student.username, section_descriptor.location))</span>
+                <span class="k">continue</span>
+
+            <span class="k">for</span> <span class="n">problem</span> <span class="ow">in</span> <span class="n">yield_module_descendents</span><span class="p">(</span><span class="n">section_module</span><span class="p">):</span>
+                <span class="k">if</span> <span class="nb">isinstance</span><span class="p">(</span><span class="n">problem</span><span class="p">,</span> <span class="n">CapaModule</span><span class="p">):</span>
+                    <span class="k">yield</span> <span class="n">problem</span>
+</div>
+<div class="viewcode-block" id="answer_distributions"><a class="viewcode-back" href="../../lms.html#courseware.grades.answer_distributions">[docs]</a><span class="k">def</span> <span class="nf">answer_distributions</span><span class="p">(</span><span class="n">request</span><span class="p">,</span> <span class="n">course</span><span class="p">):</span>
+    <span class="sd">&quot;&quot;&quot;</span>
+<span class="sd">    Given a course_descriptor, compute frequencies of answers for each problem:</span>
+
+<span class="sd">    Format is:</span>
+
+<span class="sd">    dict: (problem url_name, problem display_name, problem_id) -&gt; (dict : answer -&gt;  count)</span>
+
+<span class="sd">    TODO (vshnayder): this is currently doing a full linear pass through all</span>
+<span class="sd">    students and all problems.  This will be just a little slow.</span>
+<span class="sd">    &quot;&quot;&quot;</span>
+
+    <span class="n">counts</span> <span class="o">=</span> <span class="n">defaultdict</span><span class="p">(</span><span class="k">lambda</span><span class="p">:</span> <span class="n">defaultdict</span><span class="p">(</span><span class="nb">int</span><span class="p">))</span>
+
+    <span class="n">enrolled_students</span> <span class="o">=</span> <span class="n">User</span><span class="o">.</span><span class="n">objects</span><span class="o">.</span><span class="n">filter</span><span class="p">(</span><span class="n">courseenrollment__course_id</span><span class="o">=</span><span class="n">course</span><span class="o">.</span><span class="n">id</span><span class="p">)</span>
+
+    <span class="k">for</span> <span class="n">student</span> <span class="ow">in</span> <span class="n">enrolled_students</span><span class="p">:</span>
+        <span class="k">for</span> <span class="n">capa_module</span> <span class="ow">in</span> <span class="n">yield_problems</span><span class="p">(</span><span class="n">request</span><span class="p">,</span> <span class="n">course</span><span class="p">,</span> <span class="n">student</span><span class="p">):</span>
+            <span class="k">for</span> <span class="n">problem_id</span> <span class="ow">in</span> <span class="n">capa_module</span><span class="o">.</span><span class="n">lcp</span><span class="o">.</span><span class="n">student_answers</span><span class="p">:</span>
+                <span class="c"># Answer can be a list or some other unhashable element.  Convert to string.</span>
+                <span class="n">answer</span> <span class="o">=</span> <span class="nb">str</span><span class="p">(</span><span class="n">capa_module</span><span class="o">.</span><span class="n">lcp</span><span class="o">.</span><span class="n">student_answers</span><span class="p">[</span><span class="n">problem_id</span><span class="p">])</span>
+                <span class="n">key</span> <span class="o">=</span> <span class="p">(</span><span class="n">capa_module</span><span class="o">.</span><span class="n">url_name</span><span class="p">,</span> <span class="n">capa_module</span><span class="o">.</span><span class="n">display_name</span><span class="p">,</span> <span class="n">problem_id</span><span class="p">)</span>
+                <span class="n">counts</span><span class="p">[</span><span class="n">key</span><span class="p">][</span><span class="n">answer</span><span class="p">]</span> <span class="o">+=</span> <span class="mi">1</span>
+
+    <span class="k">return</span> <span class="n">counts</span>
+
+</div>
+<div class="viewcode-block" id="grade"><a class="viewcode-back" href="../../lms.html#courseware.grades.grade">[docs]</a><span class="k">def</span> <span class="nf">grade</span><span class="p">(</span><span class="n">student</span><span class="p">,</span> <span class="n">request</span><span class="p">,</span> <span class="n">course</span><span class="p">,</span> <span class="n">student_module_cache</span><span class="o">=</span><span class="bp">None</span><span class="p">,</span> <span class="n">keep_raw_scores</span><span class="o">=</span><span class="bp">False</span><span class="p">):</span>
+    <span class="sd">&quot;&quot;&quot;</span>
+<span class="sd">    This grades a student as quickly as possible. It retuns the</span>
+<span class="sd">    output from the course grader, augmented with the final letter</span>
+<span class="sd">    grade. The keys in the output are:</span>
+
+<span class="sd">    course: a CourseDescriptor</span>
+
+<span class="sd">    - grade : A final letter grade.</span>
+<span class="sd">    - percent : The final percent for the class (rounded up).</span>
+<span class="sd">    - section_breakdown : A breakdown of each section that makes</span>
+<span class="sd">        up the grade. (For display)</span>
+<span class="sd">    - grade_breakdown : A breakdown of the major components that</span>
+<span class="sd">        make up the final grade. (For display)</span>
+<span class="sd">    - keep_raw_scores : if True, then value for key &#39;raw_scores&#39; contains scores for every graded module</span>
+
+<span class="sd">    More information on the format is in the docstring for CourseGrader.</span>
+<span class="sd">    &quot;&quot;&quot;</span>
+
+    <span class="n">grading_context</span> <span class="o">=</span> <span class="n">course</span><span class="o">.</span><span class="n">grading_context</span>
+    <span class="n">raw_scores</span> <span class="o">=</span> <span class="p">[]</span>
+
+    <span class="k">if</span> <span class="n">student_module_cache</span> <span class="o">==</span> <span class="bp">None</span><span class="p">:</span>
+        <span class="n">student_module_cache</span> <span class="o">=</span> <span class="n">StudentModuleCache</span><span class="p">(</span><span class="n">course</span><span class="o">.</span><span class="n">id</span><span class="p">,</span> <span class="n">student</span><span class="p">,</span> <span class="n">grading_context</span><span class="p">[</span><span class="s">&#39;all_descriptors&#39;</span><span class="p">])</span>
+
+    <span class="n">totaled_scores</span> <span class="o">=</span> <span class="p">{}</span>
+    <span class="c"># This next complicated loop is just to collect the totaled_scores, which is</span>
+    <span class="c"># passed to the grader</span>
+    <span class="k">for</span> <span class="n">section_format</span><span class="p">,</span> <span class="n">sections</span> <span class="ow">in</span> <span class="n">grading_context</span><span class="p">[</span><span class="s">&#39;graded_sections&#39;</span><span class="p">]</span><span class="o">.</span><span class="n">iteritems</span><span class="p">():</span>
+        <span class="n">format_scores</span> <span class="o">=</span> <span class="p">[]</span>
+        <span class="k">for</span> <span class="n">section</span> <span class="ow">in</span> <span class="n">sections</span><span class="p">:</span>
+            <span class="n">section_descriptor</span> <span class="o">=</span> <span class="n">section</span><span class="p">[</span><span class="s">&#39;section_descriptor&#39;</span><span class="p">]</span>
+            <span class="n">section_name</span> <span class="o">=</span> <span class="n">section_descriptor</span><span class="o">.</span><span class="n">metadata</span><span class="o">.</span><span class="n">get</span><span class="p">(</span><span class="s">&#39;display_name&#39;</span><span class="p">)</span>
+
+            <span class="n">should_grade_section</span> <span class="o">=</span> <span class="bp">False</span>
+            <span class="c"># If we haven&#39;t seen a single problem in the section, we don&#39;t have to grade it at all! We can assume 0%  </span>
+            <span class="k">for</span> <span class="n">moduledescriptor</span> <span class="ow">in</span> <span class="n">section</span><span class="p">[</span><span class="s">&#39;xmoduledescriptors&#39;</span><span class="p">]:</span>
+                <span class="k">if</span> <span class="n">student_module_cache</span><span class="o">.</span><span class="n">lookup</span><span class="p">(</span>
+                        <span class="n">course</span><span class="o">.</span><span class="n">id</span><span class="p">,</span> <span class="n">moduledescriptor</span><span class="o">.</span><span class="n">category</span><span class="p">,</span> <span class="n">moduledescriptor</span><span class="o">.</span><span class="n">location</span><span class="o">.</span><span class="n">url</span><span class="p">()):</span>
+                    <span class="n">should_grade_section</span> <span class="o">=</span> <span class="bp">True</span>
+                    <span class="k">break</span>
+
+            <span class="k">if</span> <span class="n">should_grade_section</span><span class="p">:</span>
+                <span class="n">scores</span> <span class="o">=</span> <span class="p">[]</span>
+                
+                <span class="k">def</span> <span class="nf">create_module</span><span class="p">(</span><span class="n">descriptor</span><span class="p">):</span>
+                    <span class="c"># TODO: We need the request to pass into here. If we could forgo that, our arguments</span>
+                    <span class="c"># would be simpler</span>
+                    <span class="k">return</span> <span class="n">get_module</span><span class="p">(</span><span class="n">student</span><span class="p">,</span> <span class="n">request</span><span class="p">,</span> <span class="n">descriptor</span><span class="o">.</span><span class="n">location</span><span class="p">,</span> 
+                                        <span class="n">student_module_cache</span><span class="p">,</span> <span class="n">course</span><span class="o">.</span><span class="n">id</span><span class="p">)</span>
+                                
+                <span class="k">for</span> <span class="n">module_descriptor</span> <span class="ow">in</span> <span class="n">yield_dynamic_descriptor_descendents</span><span class="p">(</span><span class="n">section_descriptor</span><span class="p">,</span> <span class="n">create_module</span><span class="p">):</span>
+                                                     
+                    <span class="p">(</span><span class="n">correct</span><span class="p">,</span> <span class="n">total</span><span class="p">)</span> <span class="o">=</span> <span class="n">get_score</span><span class="p">(</span><span class="n">course</span><span class="o">.</span><span class="n">id</span><span class="p">,</span> <span class="n">student</span><span class="p">,</span> <span class="n">module_descriptor</span><span class="p">,</span> <span class="n">create_module</span><span class="p">,</span> <span class="n">student_module_cache</span><span class="p">)</span>
+                    <span class="k">if</span> <span class="n">correct</span> <span class="ow">is</span> <span class="bp">None</span> <span class="ow">and</span> <span class="n">total</span> <span class="ow">is</span> <span class="bp">None</span><span class="p">:</span>
+                        <span class="k">continue</span>
+
+                    <span class="k">if</span> <span class="n">settings</span><span class="o">.</span><span class="n">GENERATE_PROFILE_SCORES</span><span class="p">:</span>	<span class="c"># for debugging!</span>
+                        <span class="k">if</span> <span class="n">total</span> <span class="o">&gt;</span> <span class="mi">1</span><span class="p">:</span>
+                            <span class="n">correct</span> <span class="o">=</span> <span class="n">random</span><span class="o">.</span><span class="n">randrange</span><span class="p">(</span><span class="nb">max</span><span class="p">(</span><span class="n">total</span> <span class="o">-</span> <span class="mi">2</span><span class="p">,</span> <span class="mi">1</span><span class="p">),</span> <span class="n">total</span> <span class="o">+</span> <span class="mi">1</span><span class="p">)</span>
+                        <span class="k">else</span><span class="p">:</span>
+                            <span class="n">correct</span> <span class="o">=</span> <span class="n">total</span>
+
+                    <span class="n">graded</span> <span class="o">=</span> <span class="n">module_descriptor</span><span class="o">.</span><span class="n">metadata</span><span class="o">.</span><span class="n">get</span><span class="p">(</span><span class="s">&quot;graded&quot;</span><span class="p">,</span> <span class="bp">False</span><span class="p">)</span>
+                    <span class="k">if</span> <span class="ow">not</span> <span class="n">total</span> <span class="o">&gt;</span> <span class="mi">0</span><span class="p">:</span>
+                        <span class="c">#We simply cannot grade a problem that is 12/0, because we might need it as a percentage</span>
+                        <span class="n">graded</span> <span class="o">=</span> <span class="bp">False</span>
+
+                    <span class="n">scores</span><span class="o">.</span><span class="n">append</span><span class="p">(</span><span class="n">Score</span><span class="p">(</span><span class="n">correct</span><span class="p">,</span> <span class="n">total</span><span class="p">,</span> <span class="n">graded</span><span class="p">,</span> <span class="n">module_descriptor</span><span class="o">.</span><span class="n">metadata</span><span class="o">.</span><span class="n">get</span><span class="p">(</span><span class="s">&#39;display_name&#39;</span><span class="p">)))</span>
+
+                <span class="n">section_total</span><span class="p">,</span> <span class="n">graded_total</span> <span class="o">=</span> <span class="n">graders</span><span class="o">.</span><span class="n">aggregate_scores</span><span class="p">(</span><span class="n">scores</span><span class="p">,</span> <span class="n">section_name</span><span class="p">)</span>
+                <span class="k">if</span> <span class="n">keep_raw_scores</span><span class="p">:</span>
+                    <span class="n">raw_scores</span> <span class="o">+=</span> <span class="n">scores</span>
+            <span class="k">else</span><span class="p">:</span>
+                <span class="n">section_total</span> <span class="o">=</span> <span class="n">Score</span><span class="p">(</span><span class="mf">0.0</span><span class="p">,</span> <span class="mf">1.0</span><span class="p">,</span> <span class="bp">False</span><span class="p">,</span> <span class="n">section_name</span><span class="p">)</span>
+                <span class="n">graded_total</span> <span class="o">=</span> <span class="n">Score</span><span class="p">(</span><span class="mf">0.0</span><span class="p">,</span> <span class="mf">1.0</span><span class="p">,</span> <span class="bp">True</span><span class="p">,</span> <span class="n">section_name</span><span class="p">)</span>
+
+            <span class="c">#Add the graded total to totaled_scores</span>
+            <span class="k">if</span> <span class="n">graded_total</span><span class="o">.</span><span class="n">possible</span> <span class="o">&gt;</span> <span class="mi">0</span><span class="p">:</span>
+                <span class="n">format_scores</span><span class="o">.</span><span class="n">append</span><span class="p">(</span><span class="n">graded_total</span><span class="p">)</span>
+            <span class="k">else</span><span class="p">:</span>
+                <span class="n">log</span><span class="o">.</span><span class="n">exception</span><span class="p">(</span><span class="s">&quot;Unable to grade a section with a total possible score of zero. &quot;</span> <span class="o">+</span> <span class="nb">str</span><span class="p">(</span><span class="n">section_descriptor</span><span class="o">.</span><span class="n">location</span><span class="p">))</span>
+
+        <span class="n">totaled_scores</span><span class="p">[</span><span class="n">section_format</span><span class="p">]</span> <span class="o">=</span> <span class="n">format_scores</span>
+
+    <span class="n">grade_summary</span> <span class="o">=</span> <span class="n">course</span><span class="o">.</span><span class="n">grader</span><span class="o">.</span><span class="n">grade</span><span class="p">(</span><span class="n">totaled_scores</span><span class="p">,</span> <span class="n">generate_random_scores</span><span class="o">=</span><span class="n">settings</span><span class="o">.</span><span class="n">GENERATE_PROFILE_SCORES</span><span class="p">)</span>
+
+    <span class="c"># We round the grade here, to make sure that the grade is an whole percentage and</span>
+    <span class="c"># doesn&#39;t get displayed differently than it gets grades</span>
+    <span class="n">grade_summary</span><span class="p">[</span><span class="s">&#39;percent&#39;</span><span class="p">]</span> <span class="o">=</span> <span class="nb">round</span><span class="p">(</span><span class="n">grade_summary</span><span class="p">[</span><span class="s">&#39;percent&#39;</span><span class="p">]</span> <span class="o">*</span> <span class="mi">100</span> <span class="o">+</span> <span class="mf">0.05</span><span class="p">)</span> <span class="o">/</span> <span class="mi">100</span>
+
+    <span class="n">letter_grade</span> <span class="o">=</span> <span class="n">grade_for_percentage</span><span class="p">(</span><span class="n">course</span><span class="o">.</span><span class="n">grade_cutoffs</span><span class="p">,</span> <span class="n">grade_summary</span><span class="p">[</span><span class="s">&#39;percent&#39;</span><span class="p">])</span>
+    <span class="n">grade_summary</span><span class="p">[</span><span class="s">&#39;grade&#39;</span><span class="p">]</span> <span class="o">=</span> <span class="n">letter_grade</span>
+    <span class="n">grade_summary</span><span class="p">[</span><span class="s">&#39;totaled_scores&#39;</span><span class="p">]</span> <span class="o">=</span> <span class="n">totaled_scores</span>	<span class="c"># make this available, eg for instructor download &amp; debugging</span>
+    <span class="k">if</span> <span class="n">keep_raw_scores</span><span class="p">:</span>
+        <span class="n">grade_summary</span><span class="p">[</span><span class="s">&#39;raw_scores&#39;</span><span class="p">]</span> <span class="o">=</span> <span class="n">raw_scores</span>        <span class="c"># way to get all RAW scores out to instructor</span>
+                                                        <span class="c"># so grader can be double-checked</span>
+    <span class="k">return</span> <span class="n">grade_summary</span>
+</div>
+<div class="viewcode-block" id="grade_for_percentage"><a class="viewcode-back" href="../../lms.html#courseware.grades.grade_for_percentage">[docs]</a><span class="k">def</span> <span class="nf">grade_for_percentage</span><span class="p">(</span><span class="n">grade_cutoffs</span><span class="p">,</span> <span class="n">percentage</span><span class="p">):</span>
+    <span class="sd">&quot;&quot;&quot;</span>
+<span class="sd">    Returns a letter grade as defined in grading_policy (e.g. &#39;A&#39; &#39;B&#39; &#39;C&#39; for 6.002x) or None.</span>
+
+<span class="sd">    Arguments</span>
+<span class="sd">    - grade_cutoffs is a dictionary mapping a grade to the lowest</span>
+<span class="sd">        possible percentage to earn that grade.</span>
+<span class="sd">    - percentage is the final percent across all problems in a course</span>
+<span class="sd">    &quot;&quot;&quot;</span>
+
+    <span class="n">letter_grade</span> <span class="o">=</span> <span class="bp">None</span>
+    
+    <span class="c"># Possible grades, sorted in descending order of score</span>
+    <span class="n">descending_grades</span> <span class="o">=</span> <span class="nb">sorted</span><span class="p">(</span><span class="n">grade_cutoffs</span><span class="p">,</span> <span class="n">key</span><span class="o">=</span><span class="k">lambda</span> <span class="n">x</span><span class="p">:</span> <span class="n">grade_cutoffs</span><span class="p">[</span><span class="n">x</span><span class="p">],</span> <span class="n">reverse</span><span class="o">=</span><span class="bp">True</span><span class="p">)</span>
+    <span class="k">for</span> <span class="n">possible_grade</span> <span class="ow">in</span> <span class="n">descending_grades</span><span class="p">:</span>
+        <span class="k">if</span> <span class="n">percentage</span> <span class="o">&gt;=</span> <span class="n">grade_cutoffs</span><span class="p">[</span><span class="n">possible_grade</span><span class="p">]:</span>
+            <span class="n">letter_grade</span> <span class="o">=</span> <span class="n">possible_grade</span>
+            <span class="k">break</span>
+
+    <span class="k">return</span> <span class="n">letter_grade</span>
+
+
+<span class="c"># TODO: This method is not very good. It was written in the old course style and</span>
+<span class="c"># then converted over and performance is not good. Once the progress page is redesigned</span>
+<span class="c"># to not have the progress summary this method should be deleted (so it won&#39;t be copied).</span></div>
+<div class="viewcode-block" id="progress_summary"><a class="viewcode-back" href="../../lms.html#courseware.grades.progress_summary">[docs]</a><span class="k">def</span> <span class="nf">progress_summary</span><span class="p">(</span><span class="n">student</span><span class="p">,</span> <span class="n">request</span><span class="p">,</span> <span class="n">course</span><span class="p">,</span> <span class="n">student_module_cache</span><span class="p">):</span>
+    <span class="sd">&quot;&quot;&quot;</span>
+<span class="sd">    This pulls a summary of all problems in the course.</span>
+
+<span class="sd">    Returns</span>
+<span class="sd">    - courseware_summary is a summary of all sections with problems in the course.</span>
+<span class="sd">    It is organized as an array of chapters, each containing an array of sections,</span>
+<span class="sd">    each containing an array of scores. This contains information for graded and</span>
+<span class="sd">    ungraded problems, and is good for displaying a course summary with due dates,</span>
+<span class="sd">    etc.</span>
+
+<span class="sd">    Arguments:</span>
+<span class="sd">        student: A User object for the student to grade</span>
+<span class="sd">        course: A Descriptor containing the course to grade</span>
+<span class="sd">        student_module_cache: A StudentModuleCache initialized with all</span>
+<span class="sd">             instance_modules for the student</span>
+<span class="sd">    </span>
+<span class="sd">    If the student does not have access to load the course module, this function</span>
+<span class="sd">    will return None.</span>
+<span class="sd">    </span>
+<span class="sd">    &quot;&quot;&quot;</span>
+    
+    
+    <span class="c"># TODO: We need the request to pass into here. If we could forgo that, our arguments</span>
+    <span class="c"># would be simpler</span>
+    <span class="n">course_module</span> <span class="o">=</span> <span class="n">get_module</span><span class="p">(</span><span class="n">student</span><span class="p">,</span> <span class="n">request</span><span class="p">,</span>
+                                <span class="n">course</span><span class="o">.</span><span class="n">location</span><span class="p">,</span> <span class="n">student_module_cache</span><span class="p">,</span>
+                                <span class="n">course</span><span class="o">.</span><span class="n">id</span><span class="p">)</span>
+    <span class="k">if</span> <span class="ow">not</span> <span class="n">course_module</span><span class="p">:</span>
+        <span class="c"># This student must not have access to the course.</span>
+        <span class="k">return</span> <span class="bp">None</span>
+    
+    <span class="n">chapters</span> <span class="o">=</span> <span class="p">[]</span>
+    <span class="c"># Don&#39;t include chapters that aren&#39;t displayable (e.g. due to error)</span>
+    <span class="k">for</span> <span class="n">chapter_module</span> <span class="ow">in</span> <span class="n">course_module</span><span class="o">.</span><span class="n">get_display_items</span><span class="p">():</span>
+        <span class="c"># Skip if the chapter is hidden</span>
+        <span class="n">hidden</span> <span class="o">=</span> <span class="n">chapter_module</span><span class="o">.</span><span class="n">metadata</span><span class="o">.</span><span class="n">get</span><span class="p">(</span><span class="s">&#39;hide_from_toc&#39;</span><span class="p">,</span><span class="s">&#39;false&#39;</span><span class="p">)</span>
+        <span class="k">if</span> <span class="n">hidden</span><span class="o">.</span><span class="n">lower</span><span class="p">()</span> <span class="o">==</span> <span class="s">&#39;true&#39;</span><span class="p">:</span>
+            <span class="k">continue</span>
+        
+        <span class="n">sections</span> <span class="o">=</span> <span class="p">[]</span>
+        <span class="k">for</span> <span class="n">section_module</span> <span class="ow">in</span> <span class="n">chapter_module</span><span class="o">.</span><span class="n">get_display_items</span><span class="p">():</span>
+            <span class="c"># Skip if the section is hidden</span>
+            <span class="n">hidden</span> <span class="o">=</span> <span class="n">section_module</span><span class="o">.</span><span class="n">metadata</span><span class="o">.</span><span class="n">get</span><span class="p">(</span><span class="s">&#39;hide_from_toc&#39;</span><span class="p">,</span><span class="s">&#39;false&#39;</span><span class="p">)</span>
+            <span class="k">if</span> <span class="n">hidden</span><span class="o">.</span><span class="n">lower</span><span class="p">()</span> <span class="o">==</span> <span class="s">&#39;true&#39;</span><span class="p">:</span>
+                <span class="k">continue</span>
+            
+            <span class="c"># Same for sections</span>
+            <span class="n">graded</span> <span class="o">=</span> <span class="n">section_module</span><span class="o">.</span><span class="n">metadata</span><span class="o">.</span><span class="n">get</span><span class="p">(</span><span class="s">&#39;graded&#39;</span><span class="p">,</span> <span class="bp">False</span><span class="p">)</span>
+            <span class="n">scores</span> <span class="o">=</span> <span class="p">[]</span>
+            
+            <span class="n">module_creator</span> <span class="o">=</span> <span class="k">lambda</span> <span class="n">descriptor</span> <span class="p">:</span> <span class="n">section_module</span><span class="o">.</span><span class="n">system</span><span class="o">.</span><span class="n">get_module</span><span class="p">(</span><span class="n">descriptor</span><span class="o">.</span><span class="n">location</span><span class="p">)</span>
+            
+            <span class="k">for</span> <span class="n">module_descriptor</span> <span class="ow">in</span> <span class="n">yield_dynamic_descriptor_descendents</span><span class="p">(</span><span class="n">section_module</span><span class="o">.</span><span class="n">descriptor</span><span class="p">,</span> <span class="n">module_creator</span><span class="p">):</span>
+                
+                <span class="n">course_id</span> <span class="o">=</span> <span class="n">course</span><span class="o">.</span><span class="n">id</span>
+                <span class="p">(</span><span class="n">correct</span><span class="p">,</span> <span class="n">total</span><span class="p">)</span> <span class="o">=</span> <span class="n">get_score</span><span class="p">(</span><span class="n">course_id</span><span class="p">,</span> <span class="n">student</span><span class="p">,</span> <span class="n">module_descriptor</span><span class="p">,</span> <span class="n">module_creator</span><span class="p">,</span> <span class="n">student_module_cache</span><span class="p">)</span>
+                <span class="k">if</span> <span class="n">correct</span> <span class="ow">is</span> <span class="bp">None</span> <span class="ow">and</span> <span class="n">total</span> <span class="ow">is</span> <span class="bp">None</span><span class="p">:</span>
+                    <span class="k">continue</span>
+
+                <span class="n">scores</span><span class="o">.</span><span class="n">append</span><span class="p">(</span><span class="n">Score</span><span class="p">(</span><span class="n">correct</span><span class="p">,</span> <span class="n">total</span><span class="p">,</span> <span class="n">graded</span><span class="p">,</span>
+                    <span class="n">module_descriptor</span><span class="o">.</span><span class="n">metadata</span><span class="o">.</span><span class="n">get</span><span class="p">(</span><span class="s">&#39;display_name&#39;</span><span class="p">)))</span>
+
+            <span class="n">scores</span><span class="o">.</span><span class="n">reverse</span><span class="p">()</span>
+            <span class="n">section_total</span><span class="p">,</span> <span class="n">graded_total</span> <span class="o">=</span> <span class="n">graders</span><span class="o">.</span><span class="n">aggregate_scores</span><span class="p">(</span>
+                <span class="n">scores</span><span class="p">,</span> <span class="n">section_module</span><span class="o">.</span><span class="n">metadata</span><span class="o">.</span><span class="n">get</span><span class="p">(</span><span class="s">&#39;display_name&#39;</span><span class="p">))</span>
+
+            <span class="n">format</span> <span class="o">=</span> <span class="n">section_module</span><span class="o">.</span><span class="n">metadata</span><span class="o">.</span><span class="n">get</span><span class="p">(</span><span class="s">&#39;format&#39;</span><span class="p">,</span> <span class="s">&quot;&quot;</span><span class="p">)</span>
+            <span class="n">sections</span><span class="o">.</span><span class="n">append</span><span class="p">({</span>
+                <span class="s">&#39;display_name&#39;</span><span class="p">:</span> <span class="n">section_module</span><span class="o">.</span><span class="n">display_name</span><span class="p">,</span>
+                <span class="s">&#39;url_name&#39;</span><span class="p">:</span> <span class="n">section_module</span><span class="o">.</span><span class="n">url_name</span><span class="p">,</span>
+                <span class="s">&#39;scores&#39;</span><span class="p">:</span> <span class="n">scores</span><span class="p">,</span>
+                <span class="s">&#39;section_total&#39;</span><span class="p">:</span> <span class="n">section_total</span><span class="p">,</span>
+                <span class="s">&#39;format&#39;</span><span class="p">:</span> <span class="n">format</span><span class="p">,</span>
+                <span class="s">&#39;due&#39;</span><span class="p">:</span> <span class="n">section_module</span><span class="o">.</span><span class="n">metadata</span><span class="o">.</span><span class="n">get</span><span class="p">(</span><span class="s">&quot;due&quot;</span><span class="p">,</span> <span class="s">&quot;&quot;</span><span class="p">),</span>
+                <span class="s">&#39;graded&#39;</span><span class="p">:</span> <span class="n">graded</span><span class="p">,</span>
+            <span class="p">})</span>
+
+        <span class="n">chapters</span><span class="o">.</span><span class="n">append</span><span class="p">({</span><span class="s">&#39;course&#39;</span><span class="p">:</span> <span class="n">course</span><span class="o">.</span><span class="n">display_name</span><span class="p">,</span>
+                         <span class="s">&#39;display_name&#39;</span><span class="p">:</span> <span class="n">chapter_module</span><span class="o">.</span><span class="n">display_name</span><span class="p">,</span>
+                         <span class="s">&#39;url_name&#39;</span><span class="p">:</span> <span class="n">chapter_module</span><span class="o">.</span><span class="n">url_name</span><span class="p">,</span>
+                         <span class="s">&#39;sections&#39;</span><span class="p">:</span> <span class="n">sections</span><span class="p">})</span>
+
+    <span class="k">return</span> <span class="n">chapters</span>
+
+</div>
+<div class="viewcode-block" id="get_score"><a class="viewcode-back" href="../../lms.html#courseware.grades.get_score">[docs]</a><span class="k">def</span> <span class="nf">get_score</span><span class="p">(</span><span class="n">course_id</span><span class="p">,</span> <span class="n">user</span><span class="p">,</span> <span class="n">problem_descriptor</span><span class="p">,</span> <span class="n">module_creator</span><span class="p">,</span> <span class="n">student_module_cache</span><span class="p">):</span>
+    <span class="sd">&quot;&quot;&quot;</span>
+<span class="sd">    Return the score for a user on a problem, as a tuple (correct, total).</span>
+<span class="sd">    e.g. (5,7) if you got 5 out of 7 points.</span>
+
+<span class="sd">    If this problem doesn&#39;t have a score, or we couldn&#39;t load it, returns (None,</span>
+<span class="sd">    None).</span>
+
+<span class="sd">    user: a Student object</span>
+<span class="sd">    problem_descriptor: an XModuleDescriptor</span>
+<span class="sd">    module_creator: a function that takes a descriptor, and returns the corresponding XModule for this user.</span>
+<span class="sd">           Can return None if user doesn&#39;t have access, or if something else went wrong.</span>
+<span class="sd">    cache: A StudentModuleCache</span>
+<span class="sd">    &quot;&quot;&quot;</span>
+    <span class="k">if</span> <span class="ow">not</span> <span class="p">(</span><span class="n">problem_descriptor</span><span class="o">.</span><span class="n">stores_state</span> <span class="ow">and</span> <span class="n">problem_descriptor</span><span class="o">.</span><span class="n">has_score</span><span class="p">):</span>
+        <span class="c"># These are not problems, and do not have a score</span>
+        <span class="k">return</span> <span class="p">(</span><span class="bp">None</span><span class="p">,</span> <span class="bp">None</span><span class="p">)</span>
+
+    <span class="n">correct</span> <span class="o">=</span> <span class="mf">0.0</span>
+
+    <span class="n">instance_module</span> <span class="o">=</span> <span class="n">student_module_cache</span><span class="o">.</span><span class="n">lookup</span><span class="p">(</span>
+        <span class="n">course_id</span><span class="p">,</span> <span class="n">problem_descriptor</span><span class="o">.</span><span class="n">category</span><span class="p">,</span> <span class="n">problem_descriptor</span><span class="o">.</span><span class="n">location</span><span class="o">.</span><span class="n">url</span><span class="p">())</span>
+
+    <span class="k">if</span> <span class="ow">not</span> <span class="n">instance_module</span><span class="p">:</span>
+        <span class="c"># If the problem was not in the cache, we need to instantiate the problem.</span>
+        <span class="c"># Otherwise, the max score (cached in instance_module) won&#39;t be available</span>
+        <span class="n">problem</span> <span class="o">=</span> <span class="n">module_creator</span><span class="p">(</span><span class="n">problem_descriptor</span><span class="p">)</span>
+        <span class="k">if</span> <span class="n">problem</span> <span class="ow">is</span> <span class="bp">None</span><span class="p">:</span>
+            <span class="k">return</span> <span class="p">(</span><span class="bp">None</span><span class="p">,</span> <span class="bp">None</span><span class="p">)</span>
+        <span class="n">instance_module</span> <span class="o">=</span> <span class="n">get_instance_module</span><span class="p">(</span><span class="n">course_id</span><span class="p">,</span> <span class="n">user</span><span class="p">,</span> <span class="n">problem</span><span class="p">,</span> <span class="n">student_module_cache</span><span class="p">)</span>
+
+    <span class="c"># If this problem is ungraded/ungradable, bail</span>
+    <span class="k">if</span> <span class="ow">not</span> <span class="n">instance_module</span> <span class="ow">or</span> <span class="n">instance_module</span><span class="o">.</span><span class="n">max_grade</span> <span class="ow">is</span> <span class="bp">None</span><span class="p">:</span>
+        <span class="k">return</span> <span class="p">(</span><span class="bp">None</span><span class="p">,</span> <span class="bp">None</span><span class="p">)</span>
+
+    <span class="n">correct</span> <span class="o">=</span> <span class="n">instance_module</span><span class="o">.</span><span class="n">grade</span> <span class="k">if</span> <span class="n">instance_module</span><span class="o">.</span><span class="n">grade</span> <span class="ow">is</span> <span class="ow">not</span> <span class="bp">None</span> <span class="k">else</span> <span class="mi">0</span>
+    <span class="n">total</span> <span class="o">=</span> <span class="n">instance_module</span><span class="o">.</span><span class="n">max_grade</span>
+
+    <span class="k">if</span> <span class="n">correct</span> <span class="ow">is</span> <span class="ow">not</span> <span class="bp">None</span> <span class="ow">and</span> <span class="n">total</span> <span class="ow">is</span> <span class="ow">not</span> <span class="bp">None</span><span class="p">:</span>
+        <span class="c">#Now we re-weight the problem, if specified</span>
+        <span class="n">weight</span> <span class="o">=</span> <span class="nb">getattr</span><span class="p">(</span><span class="n">problem_descriptor</span><span class="p">,</span> <span class="s">&#39;weight&#39;</span><span class="p">,</span> <span class="bp">None</span><span class="p">)</span>
+        <span class="k">if</span> <span class="n">weight</span> <span class="ow">is</span> <span class="ow">not</span> <span class="bp">None</span><span class="p">:</span>
+            <span class="k">if</span> <span class="n">total</span> <span class="o">==</span> <span class="mi">0</span><span class="p">:</span>
+                <span class="n">log</span><span class="o">.</span><span class="n">exception</span><span class="p">(</span><span class="s">&quot;Cannot reweight a problem with zero total points. Problem: &quot;</span> <span class="o">+</span> <span class="nb">str</span><span class="p">(</span><span class="n">instance_module</span><span class="p">))</span>
+                <span class="k">return</span> <span class="p">(</span><span class="n">correct</span><span class="p">,</span> <span class="n">total</span><span class="p">)</span>
+            <span class="n">correct</span> <span class="o">=</span> <span class="n">correct</span> <span class="o">*</span> <span class="n">weight</span> <span class="o">/</span> <span class="n">total</span>
+            <span class="n">total</span> <span class="o">=</span> <span class="n">weight</span>
+
+    <span class="k">return</span> <span class="p">(</span><span class="n">correct</span><span class="p">,</span> <span class="n">total</span><span class="p">)</span></div>
+</pre></div>
+
+          </div>
+        </div>
+      </div>
+      <div class="clearer"></div>
+    </div>
+    <div class="related">
+      <h3>Navigation</h3>
+      <ul>
+        <li class="right" style="margin-right: 10px">
+          <a href="../../genindex.html" title="General Index"
+             >index</a></li>
+        <li class="right" >
+          <a href="../../py-modindex.html" title="Python Module Index"
+             >modules</a> |</li>
+        <li><a href="../../index.html">MITx 1.0 documentation</a> &raquo;</li>
+          <li><a href="../index.html" >Module code</a> &raquo;</li> 
+      </ul>
+    </div>
+    <div class="footer">
+        &copy; Copyright 2012, MITx team.
+      Created using <a href="http://sphinx.pocoo.org/">Sphinx</a> 1.1.3.
+    </div>
+  </body>
+</html>

@@ -1,0 +1,702 @@
+
+
+<!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Transitional//EN"
+  "http://www.w3.org/TR/xhtml1/DTD/xhtml1-transitional.dtd">
+
+
+<html xmlns="http://www.w3.org/1999/xhtml">
+  <head>
+    <meta http-equiv="Content-Type" content="text/html; charset=utf-8" />
+    
+    <title>Common &mdash; MITx 1.0 documentation</title>
+    
+    <link rel="stylesheet" href="_static/sphinxdoc.css" type="text/css" />
+    <link rel="stylesheet" href="_static/pygments.css" type="text/css" />
+    
+    <script type="text/javascript">
+      var DOCUMENTATION_OPTIONS = {
+        URL_ROOT:    '',
+        VERSION:     '1.0',
+        COLLAPSE_INDEX: false,
+        FILE_SUFFIX: '.html',
+        HAS_SOURCE:  true
+      };
+    </script>
+    <script type="text/javascript" src="_static/jquery.js"></script>
+    <script type="text/javascript" src="_static/underscore.js"></script>
+    <script type="text/javascript" src="_static/doctools.js"></script>
+    <script type="text/javascript" src="http://cdn.mathjax.org/mathjax/latest/MathJax.js?config=TeX-AMS-MML_HTMLorMML"></script>
+    <link rel="top" title="MITx 1.0 documentation" href="index.html" />
+    <link rel="up" title="Django applications" href="djangoapps.html" />
+    <link rel="prev" title="CMS module" href="cms.html" /> 
+  </head>
+  <body>
+<img src="_static/homepage-bg.jpg" alt="Edx logo"  width="100%;"/>
+
+    <div class="related">
+      <h3>Navigation</h3>
+      <ul>
+        <li class="right" style="margin-right: 10px">
+          <a href="genindex.html" title="General Index"
+             accesskey="I">index</a></li>
+        <li class="right" >
+          <a href="py-modindex.html" title="Python Module Index"
+             >modules</a> |</li>
+        <li class="right" >
+          <a href="cms.html" title="CMS module"
+             accesskey="P">previous</a> |</li>
+        <li><a href="index.html">MITx 1.0 documentation</a> &raquo;</li>
+          <li><a href="djangoapps.html" accesskey="U">Django applications</a> &raquo;</li> 
+      </ul>
+    </div>
+      <div class="sphinxsidebar">
+        <div class="sphinxsidebarwrapper">
+  <h3><a href="index.html">Table Of Contents</a></h3>
+  <ul>
+<li><a class="reference internal" href="#">Common</a><ul>
+<li><a class="reference internal" href="#module-student">Student</a><ul>
+<li><a class="reference internal" href="#module-student.models">Models</a></li>
+<li><a class="reference internal" href="#module-student.views">Views</a></li>
+<li><a class="reference internal" href="#module-student.admin">Admin</a></li>
+<li><a class="reference internal" href="#module-student.tests">Tests</a></li>
+<li><a class="reference internal" href="#module-student.management">Management</a></li>
+<li><a class="reference internal" href="#module-student.migrations">Migrations</a></li>
+</ul>
+</li>
+</ul>
+</li>
+</ul>
+
+  <h4>Previous topic</h4>
+  <p class="topless"><a href="cms.html"
+                        title="previous chapter">CMS module</a></p>
+  <h3>This Page</h3>
+  <ul class="this-page-menu">
+    <li><a href="_sources/djangoapps-common.txt"
+           rel="nofollow">Show Source</a></li>
+  </ul>
+<div id="searchbox" style="display: none">
+  <h3>Quick search</h3>
+    <form class="search" action="search.html" method="get">
+      <input type="text" name="q" />
+      <input type="submit" value="Go" />
+      <input type="hidden" name="check_keywords" value="yes" />
+      <input type="hidden" name="area" value="default" />
+    </form>
+    <p class="searchtip" style="font-size: 90%">
+    Enter search terms or a module, class or function name.
+    </p>
+</div>
+<script type="text/javascript">$('#searchbox').show(0);</script>
+        </div>
+      </div>
+
+    <div class="document">
+      <div class="documentwrapper">
+        <div class="bodywrapper">
+          <div class="body">
+            
+  <div class="section" id="module-common.djangoapps">
+<span id="common"></span><h1>Common<a class="headerlink" href="#module-common.djangoapps" title="Permalink to this headline">¶</a></h1>
+<div class="section" id="module-student">
+<span id="student"></span><h2>Student<a class="headerlink" href="#module-student" title="Permalink to this headline">¶</a></h2>
+<div class="section" id="module-student.models">
+<span id="models"></span><h3>Models<a class="headerlink" href="#module-student.models" title="Permalink to this headline">¶</a></h3>
+<p>Models for Student Information</p>
+<p>Replication Notes</p>
+<p>TODO: Update this to be consistent with reality  (no portal servers, no more askbot)</p>
+<p>In our live deployment, we intend to run in a scenario where there is a pool of
+Portal servers that hold the canoncial user information and that user
+information is replicated to slave Course server pools. Each Course has a set of
+servers that serves only its content and has users that are relevant only to it.</p>
+<p>We replicate the following tables into the Course DBs where the user is
+enrolled. Only the Portal servers should ever write to these models.
+* UserProfile
+* CourseEnrollment</p>
+<p>We do a partial replication of:
+* User &#8211; Askbot extends this and uses the extra fields, so we replicate only</p>
+<blockquote>
+<div>the stuff that comes with basic django_auth and ignore the rest.)</div></blockquote>
+<p>There are a couple different scenarios:</p>
+<ol class="arabic simple">
+<li>There&#8217;s an update of User or UserProfile &#8211; replicate it to all Course DBs
+that the user is enrolled in (found via CourseEnrollment).</li>
+<li>There&#8217;s a change in CourseEnrollment. We need to push copies of UserProfile,
+CourseEnrollment, and the base fields in User</li>
+</ol>
+<p>Migration Notes</p>
+<p>If you make changes to this model, be sure to create an appropriate migration
+file and check it in at the same time as your model changes. To do that,</p>
+<ol class="arabic simple">
+<li>Go to the mitx dir</li>
+<li>django-admin.py schemamigration student &#8211;auto &#8211;settings=lms.envs.dev &#8211;pythonpath=. description_of_your_change</li>
+<li>Add the migration file created in mitx/common/djangoapps/student/migrations/</li>
+</ol>
+<dl class="class">
+<dt id="student.models.CourseEnrollment">
+<em class="property">class </em><tt class="descclassname">student.models.</tt><tt class="descname">CourseEnrollment</tt><big>(</big><em>*args</em>, <em>**kwargs</em><big>)</big><a class="reference internal" href="_modules/student/models.html#CourseEnrollment"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#student.models.CourseEnrollment" title="Permalink to this definition">¶</a></dt>
+<dd><p>Bases: <tt class="xref py py-class docutils literal"><span class="pre">django.db.models.base.Model</span></tt></p>
+<p>CourseEnrollment(id, user_id, course_id, created)</p>
+<table class="docutils field-list" frame="void" rules="none">
+<col class="field-name" />
+<col class="field-body" />
+<tbody valign="top">
+<tr class="field-odd field"><th class="field-name">Parameters:</th><td class="field-body"><ul class="first last simple">
+<li><strong>id</strong> (<em>AutoField</em>) &#8211; Id</li>
+<li><strong>user_id</strong> (<em>ForeignKey</em>) &#8211; User</li>
+<li><strong>course_id</strong> (<em>CharField</em>) &#8211; Course id</li>
+<li><strong>created</strong> (<em>DateTimeField</em>) &#8211; Created</li>
+</ul>
+</td>
+</tr>
+</tbody>
+</table>
+</dd></dl>
+
+<dl class="class">
+<dt id="student.models.PendingEmailChange">
+<em class="property">class </em><tt class="descclassname">student.models.</tt><tt class="descname">PendingEmailChange</tt><big>(</big><em>*args</em>, <em>**kwargs</em><big>)</big><a class="reference internal" href="_modules/student/models.html#PendingEmailChange"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#student.models.PendingEmailChange" title="Permalink to this definition">¶</a></dt>
+<dd><p>Bases: <tt class="xref py py-class docutils literal"><span class="pre">django.db.models.base.Model</span></tt></p>
+<p>PendingEmailChange(id, user_id, new_email, activation_key)</p>
+<table class="docutils field-list" frame="void" rules="none">
+<col class="field-name" />
+<col class="field-body" />
+<tbody valign="top">
+<tr class="field-odd field"><th class="field-name">Parameters:</th><td class="field-body"><ul class="first last simple">
+<li><strong>id</strong> (<em>AutoField</em>) &#8211; Id</li>
+<li><strong>user_id</strong> (<em>OneToOneField</em>) &#8211; User</li>
+<li><strong>new_email</strong> (<em>CharField</em>) &#8211; New email</li>
+<li><strong>activation_key</strong> (<em>CharField</em>) &#8211; Activation key</li>
+</ul>
+</td>
+</tr>
+</tbody>
+</table>
+</dd></dl>
+
+<dl class="class">
+<dt id="student.models.PendingNameChange">
+<em class="property">class </em><tt class="descclassname">student.models.</tt><tt class="descname">PendingNameChange</tt><big>(</big><em>*args</em>, <em>**kwargs</em><big>)</big><a class="reference internal" href="_modules/student/models.html#PendingNameChange"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#student.models.PendingNameChange" title="Permalink to this definition">¶</a></dt>
+<dd><p>Bases: <tt class="xref py py-class docutils literal"><span class="pre">django.db.models.base.Model</span></tt></p>
+<p>PendingNameChange(id, user_id, new_name, rationale)</p>
+<table class="docutils field-list" frame="void" rules="none">
+<col class="field-name" />
+<col class="field-body" />
+<tbody valign="top">
+<tr class="field-odd field"><th class="field-name">Parameters:</th><td class="field-body"><ul class="first last simple">
+<li><strong>id</strong> (<em>AutoField</em>) &#8211; Id</li>
+<li><strong>user_id</strong> (<em>OneToOneField</em>) &#8211; User</li>
+<li><strong>new_name</strong> (<em>CharField</em>) &#8211; New name</li>
+<li><strong>rationale</strong> (<em>CharField</em>) &#8211; Rationale</li>
+</ul>
+</td>
+</tr>
+</tbody>
+</table>
+</dd></dl>
+
+<dl class="class">
+<dt id="student.models.Registration">
+<em class="property">class </em><tt class="descclassname">student.models.</tt><tt class="descname">Registration</tt><big>(</big><em>*args</em>, <em>**kwargs</em><big>)</big><a class="reference internal" href="_modules/student/models.html#Registration"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#student.models.Registration" title="Permalink to this definition">¶</a></dt>
+<dd><p>Bases: <tt class="xref py py-class docutils literal"><span class="pre">django.db.models.base.Model</span></tt></p>
+<p>Allows us to wait for e-mail before user is registered. A
+registration profile is created when the user creates an
+account, but that account is inactive. Once the user clicks
+on the activation key, it becomes active.</p>
+<table class="docutils field-list" frame="void" rules="none">
+<col class="field-name" />
+<col class="field-body" />
+<tbody valign="top">
+<tr class="field-odd field"><th class="field-name">Parameters:</th><td class="field-body"><ul class="first last simple">
+<li><strong>id</strong> (<em>AutoField</em>) &#8211; Id</li>
+<li><strong>user_id</strong> (<em>ForeignKey</em>) &#8211; User</li>
+<li><strong>activation_key</strong> (<em>CharField</em>) &#8211; Activation key</li>
+</ul>
+</td>
+</tr>
+</tbody>
+</table>
+</dd></dl>
+
+<dl class="class">
+<dt id="student.models.TestCenterUser">
+<em class="property">class </em><tt class="descclassname">student.models.</tt><tt class="descname">TestCenterUser</tt><big>(</big><em>*args</em>, <em>**kwargs</em><big>)</big><a class="headerlink" href="#student.models.TestCenterUser" title="Permalink to this definition">¶</a></dt>
+<dd><p>Bases: <tt class="xref py py-class docutils literal"><span class="pre">django.db.models.base.Model</span></tt></p>
+<p>This is our representation of the User for in-person testing, and
+specifically for Pearson at this point. A few things to note:</p>
+<ul class="simple">
+<li>Pearson only supports Latin-1, so we have to make sure that the data we
+capture here will work with that encoding.</li>
+<li>While we have a lot of this demographic data in UserProfile, it&#8217;s much
+more free-structured there. We&#8217;ll try to pre-pop the form with data from
+UserProfile, but we&#8217;ll need to have a step where people who are signing
+up re-enter their demographic data into the fields we specify.</li>
+<li>Users are only created here if they register to take an exam in person.</li>
+</ul>
+<p>The field names and lengths are modeled on the conventions and constraints
+of Pearson&#8217;s data import system, including oddities such as suffix having
+a limit of 255 while last_name only gets 50.</p>
+<table class="docutils field-list" frame="void" rules="none">
+<col class="field-name" />
+<col class="field-body" />
+<tbody valign="top">
+<tr class="field-odd field"><th class="field-name">Parameters:</th><td class="field-body"><ul class="first last simple">
+<li><strong>id</strong> (<em>AutoField</em>) &#8211; Id</li>
+<li><strong>user_id</strong> (<em>ForeignKey</em>) &#8211; User</li>
+<li><strong>created_at</strong> (<em>DateTimeField</em>) &#8211; Created at</li>
+<li><strong>updated_at</strong> (<em>DateTimeField</em>) &#8211; Updated at</li>
+<li><strong>user_updated_at</strong> (<em>DateTimeField</em>) &#8211; User updated at</li>
+<li><strong>candidate_id</strong> (<em>IntegerField</em>) &#8211; Candidate id</li>
+<li><strong>client_candidate_id</strong> (<em>CharField</em>) &#8211; Client candidate id</li>
+<li><strong>first_name</strong> (<em>CharField</em>) &#8211; First name</li>
+<li><strong>last_name</strong> (<em>CharField</em>) &#8211; Last name</li>
+<li><strong>middle_name</strong> (<em>CharField</em>) &#8211; Middle name</li>
+<li><strong>suffix</strong> (<em>CharField</em>) &#8211; Suffix</li>
+<li><strong>salutation</strong> (<em>CharField</em>) &#8211; Salutation</li>
+<li><strong>address_1</strong> (<em>CharField</em>) &#8211; Address 1</li>
+<li><strong>address_2</strong> (<em>CharField</em>) &#8211; Address 2</li>
+<li><strong>address_3</strong> (<em>CharField</em>) &#8211; Address 3</li>
+<li><strong>city</strong> (<em>CharField</em>) &#8211; City</li>
+<li><strong>state</strong> (<em>CharField</em>) &#8211; State</li>
+<li><strong>postal_code</strong> (<em>CharField</em>) &#8211; Postal code</li>
+<li><strong>country</strong> (<em>CharField</em>) &#8211; Country</li>
+<li><strong>phone</strong> (<em>CharField</em>) &#8211; Phone</li>
+<li><strong>extension</strong> (<em>CharField</em>) &#8211; Extension</li>
+<li><strong>phone_country_code</strong> (<em>CharField</em>) &#8211; Phone country code</li>
+<li><strong>fax</strong> (<em>CharField</em>) &#8211; Fax</li>
+<li><strong>fax_country_code</strong> (<em>CharField</em>) &#8211; Fax country code</li>
+<li><strong>company_name</strong> (<em>CharField</em>) &#8211; Company name</li>
+</ul>
+</td>
+</tr>
+</tbody>
+</table>
+</dd></dl>
+
+<dl class="class">
+<dt id="student.models.UserProfile">
+<em class="property">class </em><tt class="descclassname">student.models.</tt><tt class="descname">UserProfile</tt><big>(</big><em>*args</em>, <em>**kwargs</em><big>)</big><a class="reference internal" href="_modules/student/models.html#UserProfile"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#student.models.UserProfile" title="Permalink to this definition">¶</a></dt>
+<dd><p>Bases: <tt class="xref py py-class docutils literal"><span class="pre">django.db.models.base.Model</span></tt></p>
+<p>This is where we store all the user demographic fields. We have a
+separate table for this rather than extending the built-in Django auth_user.</p>
+<dl class="docutils">
+<dt>Notes:</dt>
+<dd><ul class="first last simple">
+<li>Some fields are legacy ones from the first run of 6.002, from which
+we imported many users.</li>
+<li>Fields like name and address are intentionally open ended, to account
+for international variations. An unfortunate side-effect is that we
+cannot efficiently sort on last names for instance.</li>
+</ul>
+</dd>
+<dt>Replication:</dt>
+<dd><ul class="first last simple">
+<li>Only the Portal servers should ever modify this information.</li>
+<li>All fields are replicated into relevant Course databases</li>
+</ul>
+</dd>
+</dl>
+<p>Some of the fields are legacy ones that were captured during the initial
+MITx fall prototype.</p>
+<table class="docutils field-list" frame="void" rules="none">
+<col class="field-name" />
+<col class="field-body" />
+<tbody valign="top">
+<tr class="field-odd field"><th class="field-name">Parameters:</th><td class="field-body"><ul class="first last simple">
+<li><strong>id</strong> (<em>AutoField</em>) &#8211; Id</li>
+<li><strong>user_id</strong> (<em>OneToOneField</em>) &#8211; User</li>
+<li><strong>name</strong> (<em>CharField</em>) &#8211; Name</li>
+<li><strong>meta</strong> (<em>TextField</em>) &#8211; Meta</li>
+<li><strong>courseware</strong> (<em>CharField</em>) &#8211; Courseware</li>
+<li><strong>language</strong> (<em>CharField</em>) &#8211; Language</li>
+<li><strong>location</strong> (<em>CharField</em>) &#8211; Location</li>
+<li><strong>year_of_birth</strong> (<em>IntegerField</em>) &#8211; Year of birth</li>
+<li><strong>gender</strong> (<em>CharField</em>) &#8211; Gender</li>
+<li><strong>level_of_education</strong> (<em>CharField</em>) &#8211; Level of education</li>
+<li><strong>mailing_address</strong> (<em>TextField</em>) &#8211; Mailing address</li>
+<li><strong>goals</strong> (<em>TextField</em>) &#8211; Goals</li>
+</ul>
+</td>
+</tr>
+</tbody>
+</table>
+</dd></dl>
+
+<dl class="class">
+<dt id="student.models.UserTestGroup">
+<em class="property">class </em><tt class="descclassname">student.models.</tt><tt class="descname">UserTestGroup</tt><big>(</big><em>*args</em>, <em>**kwargs</em><big>)</big><a class="reference internal" href="_modules/student/models.html#UserTestGroup"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#student.models.UserTestGroup" title="Permalink to this definition">¶</a></dt>
+<dd><p>Bases: <tt class="xref py py-class docutils literal"><span class="pre">django.db.models.base.Model</span></tt></p>
+<p>UserTestGroup(id, name, description)</p>
+<table class="docutils field-list" frame="void" rules="none">
+<col class="field-name" />
+<col class="field-body" />
+<tbody valign="top">
+<tr class="field-odd field"><th class="field-name">Parameters:</th><td class="field-body"><ul class="first last simple">
+<li><strong>id</strong> (<em>AutoField</em>) &#8211; Id</li>
+<li><strong>name</strong> (<em>CharField</em>) &#8211; Name</li>
+<li><strong>description</strong> (<em>TextField</em>) &#8211; Description</li>
+</ul>
+</td>
+</tr>
+</tbody>
+</table>
+</dd></dl>
+
+<dl class="function">
+<dt id="student.models.db_names_to_replicate_to">
+<tt class="descclassname">student.models.</tt><tt class="descname">db_names_to_replicate_to</tt><big>(</big><em>user_id</em><big>)</big><a class="reference internal" href="_modules/student/models.html#db_names_to_replicate_to"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#student.models.db_names_to_replicate_to" title="Permalink to this definition">¶</a></dt>
+<dd><p>Return a list of DB names that this user_id is enrolled in.</p>
+</dd></dl>
+
+<dl class="function">
+<dt id="student.models.is_portal">
+<tt class="descclassname">student.models.</tt><tt class="descname">is_portal</tt><big>(</big><big>)</big><a class="reference internal" href="_modules/student/models.html#is_portal"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#student.models.is_portal" title="Permalink to this definition">¶</a></dt>
+<dd><p>Are we in the portal pool? Only Portal servers are allowed to replicate
+their changes. For now, only Portal servers see multiple DBs, so we use
+that to decide.</p>
+</dd></dl>
+
+<dl class="function">
+<dt id="student.models.is_valid_course_id">
+<tt class="descclassname">student.models.</tt><tt class="descname">is_valid_course_id</tt><big>(</big><em>course_id</em><big>)</big><a class="reference internal" href="_modules/student/models.html#is_valid_course_id"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#student.models.is_valid_course_id" title="Permalink to this definition">¶</a></dt>
+<dd><p>Right now, the only database that&#8217;s not a course database is &#8216;default&#8217;.
+I had nicer checking in here originally &#8211; it would scan the courses that
+were in the system and only let you choose that. But it was annoying to run
+tests with, since we don&#8217;t have course data for some for our course test
+databases. Hence the lazy version.</p>
+</dd></dl>
+
+<dl class="function">
+<dt id="student.models.mark_handled">
+<tt class="descclassname">student.models.</tt><tt class="descname">mark_handled</tt><big>(</big><em>instance</em><big>)</big><a class="reference internal" href="_modules/student/models.html#mark_handled"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#student.models.mark_handled" title="Permalink to this definition">¶</a></dt>
+<dd><p>You have to mark your instance with this function or else we&#8217;ll go into
+an infinite loop since we&#8217;re putting listeners on Model saves/deletes and
+the act of replication requires us to call the same model method.</p>
+<p>We create a _replicated attribute to differentiate the first save of this
+model vs. the duplicate save we force on to the course database. Kind of
+a hack &#8211; suggestions welcome.</p>
+</dd></dl>
+
+<dl class="function">
+<dt id="student.models.marked_handled">
+<tt class="descclassname">student.models.</tt><tt class="descname">marked_handled</tt><big>(</big><em>instance</em><big>)</big><a class="reference internal" href="_modules/student/models.html#marked_handled"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#student.models.marked_handled" title="Permalink to this definition">¶</a></dt>
+<dd><p>Have we marked this instance as being handled to avoid infinite loops
+caused by saving models in post_save hooks for the same models?</p>
+</dd></dl>
+
+<dl class="function">
+<dt id="student.models.replicate_enrollment_save">
+<tt class="descclassname">student.models.</tt><tt class="descname">replicate_enrollment_save</tt><big>(</big><em>sender</em>, <em>**kwargs</em><big>)</big><a class="reference internal" href="_modules/student/models.html#replicate_enrollment_save"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#student.models.replicate_enrollment_save" title="Permalink to this definition">¶</a></dt>
+<dd><p>This is called when a Student enrolls in a course. It has to do the
+following:</p>
+<ol class="arabic simple">
+<li>Make sure the User is copied into the Course DB. It may already exist
+(someone deleting and re-adding a course). This has to happen first or
+the foreign key constraint breaks.</li>
+<li>Replicate the CourseEnrollment.</li>
+<li>Replicate the UserProfile.</li>
+</ol>
+</dd></dl>
+
+<dl class="function">
+<dt id="student.models.replicate_model">
+<tt class="descclassname">student.models.</tt><tt class="descname">replicate_model</tt><big>(</big><em>model_method</em>, <em>instance</em>, <em>user_id</em><big>)</big><a class="reference internal" href="_modules/student/models.html#replicate_model"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#student.models.replicate_model" title="Permalink to this definition">¶</a></dt>
+<dd><p>model_method is the model action that we want replicated. For instance,
+UserProfile.save</p>
+</dd></dl>
+
+<dl class="function">
+<dt id="student.models.replicate_user">
+<tt class="descclassname">student.models.</tt><tt class="descname">replicate_user</tt><big>(</big><em>portal_user</em>, <em>course_db_name</em><big>)</big><a class="reference internal" href="_modules/student/models.html#replicate_user"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#student.models.replicate_user" title="Permalink to this definition">¶</a></dt>
+<dd><p>Replicate a User to the correct Course DB. This is more complicated than
+it should be because Askbot extends the auth_user table and adds its own
+fields. So we need to only push changes to the standard fields and leave
+the rest alone so that Askbot changes at the Course DB level don&#8217;t get
+overridden.</p>
+</dd></dl>
+
+<dl class="function">
+<dt id="student.models.replicate_userprofile_save">
+<tt class="descclassname">student.models.</tt><tt class="descname">replicate_userprofile_save</tt><big>(</big><em>sender</em>, <em>**kwargs</em><big>)</big><a class="reference internal" href="_modules/student/models.html#replicate_userprofile_save"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#student.models.replicate_userprofile_save" title="Permalink to this definition">¶</a></dt>
+<dd><p>We just updated the UserProfile (say an update to the name), so push that
+change to all Course DBs that we&#8217;re enrolled in.</p>
+</dd></dl>
+
+<dl class="function">
+<dt id="student.models.should_replicate">
+<tt class="descclassname">student.models.</tt><tt class="descname">should_replicate</tt><big>(</big><em>instance</em><big>)</big><a class="reference internal" href="_modules/student/models.html#should_replicate"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#student.models.should_replicate" title="Permalink to this definition">¶</a></dt>
+<dd><p>Should this instance be replicated? We need to be a Portal server and
+the instance has to not have been marked_handled.</p>
+</dd></dl>
+
+<dl class="function">
+<dt id="student.models.unique_id_for_user">
+<tt class="descclassname">student.models.</tt><tt class="descname">unique_id_for_user</tt><big>(</big><em>user</em><big>)</big><a class="headerlink" href="#student.models.unique_id_for_user" title="Permalink to this definition">¶</a></dt>
+<dd><p>Return a unique id for a user, suitable for inserting into
+e.g. personalized survey links.</p>
+<p>Currently happens to be implemented as a sha1 hash of the username
+(and thus assumes that usernames don&#8217;t change).</p>
+</dd></dl>
+
+<dl class="function">
+<dt id="student.models.unmark">
+<tt class="descclassname">student.models.</tt><tt class="descname">unmark</tt><big>(</big><em>instance</em><big>)</big><a class="reference internal" href="_modules/student/models.html#unmark"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#student.models.unmark" title="Permalink to this definition">¶</a></dt>
+<dd><p>If we don&#8217;t unmark a model after we do replication, then consecutive
+save() calls won&#8217;t be properly replicated.</p>
+</dd></dl>
+
+</div>
+<div class="section" id="module-student.views">
+<span id="views"></span><h3>Views<a class="headerlink" href="#module-student.views" title="Permalink to this headline">¶</a></h3>
+<dl class="class">
+<dt id="student.views.Article">
+<em class="property">class </em><tt class="descclassname">student.views.</tt><tt class="descname">Article</tt><a class="headerlink" href="#student.views.Article" title="Permalink to this definition">¶</a></dt>
+<dd><p>Bases: <tt class="xref py py-class docutils literal"><span class="pre">tuple</span></tt></p>
+<p>Article(title, url, author, image, deck, publication, publish_date)</p>
+<dl class="attribute">
+<dt id="student.views.Article.author">
+<tt class="descname">author</tt><a class="headerlink" href="#student.views.Article.author" title="Permalink to this definition">¶</a></dt>
+<dd><p>Alias for field number 2</p>
+</dd></dl>
+
+<dl class="attribute">
+<dt id="student.views.Article.deck">
+<tt class="descname">deck</tt><a class="headerlink" href="#student.views.Article.deck" title="Permalink to this definition">¶</a></dt>
+<dd><p>Alias for field number 4</p>
+</dd></dl>
+
+<dl class="attribute">
+<dt id="student.views.Article.image">
+<tt class="descname">image</tt><a class="headerlink" href="#student.views.Article.image" title="Permalink to this definition">¶</a></dt>
+<dd><p>Alias for field number 3</p>
+</dd></dl>
+
+<dl class="attribute">
+<dt id="student.views.Article.publication">
+<tt class="descname">publication</tt><a class="headerlink" href="#student.views.Article.publication" title="Permalink to this definition">¶</a></dt>
+<dd><p>Alias for field number 5</p>
+</dd></dl>
+
+<dl class="attribute">
+<dt id="student.views.Article.publish_date">
+<tt class="descname">publish_date</tt><a class="headerlink" href="#student.views.Article.publish_date" title="Permalink to this definition">¶</a></dt>
+<dd><p>Alias for field number 6</p>
+</dd></dl>
+
+<dl class="attribute">
+<dt id="student.views.Article.title">
+<tt class="descname">title</tt><a class="headerlink" href="#student.views.Article.title" title="Permalink to this definition">¶</a></dt>
+<dd><p>Alias for field number 0</p>
+</dd></dl>
+
+<dl class="attribute">
+<dt id="student.views.Article.url">
+<tt class="descname">url</tt><a class="headerlink" href="#student.views.Article.url" title="Permalink to this definition">¶</a></dt>
+<dd><p>Alias for field number 1</p>
+</dd></dl>
+
+</dd></dl>
+
+<dl class="function">
+<dt id="student.views.accept_name_change">
+<tt class="descclassname">student.views.</tt><tt class="descname">accept_name_change</tt><big>(</big><em>request</em>, <em>*args</em>, <em>**kwargs</em><big>)</big><a class="reference internal" href="_modules/student/views.html#accept_name_change"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#student.views.accept_name_change" title="Permalink to this definition">¶</a></dt>
+<dd><p>JSON: Name change process. Course staff clicks &#8216;accept&#8217; on a given name change</p>
+<p>We used this during the prototype but now we simply record name changes instead
+of manually approving them. Still keeping this around in case we want to go
+back to this approval method.</p>
+</dd></dl>
+
+<dl class="function">
+<dt id="student.views.activate_account">
+<tt class="descclassname">student.views.</tt><tt class="descname">activate_account</tt><big>(</big><em>request</em>, <em>*args</em>, <em>**kwargs</em><big>)</big><a class="reference internal" href="_modules/student/views.html#activate_account"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#student.views.activate_account" title="Permalink to this definition">¶</a></dt>
+<dd><p>When link in activation e-mail is clicked</p>
+</dd></dl>
+
+<dl class="function">
+<dt id="student.views.cert_info">
+<tt class="descclassname">student.views.</tt><tt class="descname">cert_info</tt><big>(</big><em>user</em>, <em>course</em><big>)</big><a class="headerlink" href="#student.views.cert_info" title="Permalink to this definition">¶</a></dt>
+<dd><p>Get the certificate info needed to render the dashboard section for the given
+student and course.  Returns a dictionary with keys:</p>
+<p>&#8216;status&#8217;: one of &#8216;generating&#8217;, &#8216;ready&#8217;, &#8216;notpassing&#8217;, &#8216;processing&#8217;
+&#8216;show_download_url&#8217;: bool
+&#8216;download_url&#8217;: url, only present if show_download_url is True
+&#8216;show_disabled_download_button&#8217;: bool &#8211; true if state is &#8216;generating&#8217;
+&#8216;show_survey_button&#8217;: bool
+&#8216;survey_url&#8217;: url, only if show_survey_button is True
+&#8216;grade&#8217;: if status is not &#8216;processing&#8217;</p>
+</dd></dl>
+
+<dl class="function">
+<dt id="student.views.change_email_request">
+<tt class="descclassname">student.views.</tt><tt class="descname">change_email_request</tt><big>(</big><em>request</em>, <em>*args</em>, <em>**kwargs</em><big>)</big><a class="reference internal" href="_modules/student/views.html#change_email_request"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#student.views.change_email_request" title="Permalink to this definition">¶</a></dt>
+<dd><p>AJAX call from the profile page. User wants a new e-mail.</p>
+</dd></dl>
+
+<dl class="function">
+<dt id="student.views.change_enrollment_view">
+<tt class="descclassname">student.views.</tt><tt class="descname">change_enrollment_view</tt><big>(</big><em>request</em>, <em>*args</em>, <em>**kwargs</em><big>)</big><a class="reference internal" href="_modules/student/views.html#change_enrollment_view"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#student.views.change_enrollment_view" title="Permalink to this definition">¶</a></dt>
+<dd><p>Delegate to change_enrollment to actually do the work.</p>
+</dd></dl>
+
+<dl class="function">
+<dt id="student.views.change_name_request">
+<tt class="descclassname">student.views.</tt><tt class="descname">change_name_request</tt><big>(</big><em>request</em>, <em>*args</em>, <em>**kwargs</em><big>)</big><a class="reference internal" href="_modules/student/views.html#change_name_request"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#student.views.change_name_request" title="Permalink to this definition">¶</a></dt>
+<dd><p>Log a request for a new name.</p>
+</dd></dl>
+
+<dl class="function">
+<dt id="student.views.change_setting">
+<tt class="descclassname">student.views.</tt><tt class="descname">change_setting</tt><big>(</big><em>request</em>, <em>*args</em>, <em>**kwargs</em><big>)</big><a class="reference internal" href="_modules/student/views.html#change_setting"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#student.views.change_setting" title="Permalink to this definition">¶</a></dt>
+<dd><p>JSON call to change a profile setting: Right now, location</p>
+</dd></dl>
+
+<dl class="function">
+<dt id="student.views.confirm_email_change">
+<tt class="descclassname">student.views.</tt><tt class="descname">confirm_email_change</tt><big>(</big><em>request</em>, <em>*args</em>, <em>**kwargs</em><big>)</big><a class="reference internal" href="_modules/student/views.html#confirm_email_change"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#student.views.confirm_email_change" title="Permalink to this definition">¶</a></dt>
+<dd><p>User requested a new e-mail. This is called when the activation
+link is clicked. We confirm with the old e-mail, and update</p>
+</dd></dl>
+
+<dl class="function">
+<dt id="student.views.course_from_id">
+<tt class="descclassname">student.views.</tt><tt class="descname">course_from_id</tt><big>(</big><em>course_id</em><big>)</big><a class="reference internal" href="_modules/student/views.html#course_from_id"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#student.views.course_from_id" title="Permalink to this definition">¶</a></dt>
+<dd><p>Return the CourseDescriptor corresponding to this course_id</p>
+</dd></dl>
+
+<dl class="function">
+<dt id="student.views.create_account">
+<tt class="descclassname">student.views.</tt><tt class="descname">create_account</tt><big>(</big><em>request</em>, <em>*args</em>, <em>**kwargs</em><big>)</big><a class="reference internal" href="_modules/student/views.html#create_account"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#student.views.create_account" title="Permalink to this definition">¶</a></dt>
+<dd><p>JSON call to create new edX account.
+Used by form in signup_modal.html, which is included into navigation.html</p>
+</dd></dl>
+
+<dl class="function">
+<dt id="student.views.csrf_token">
+<tt class="descclassname">student.views.</tt><tt class="descname">csrf_token</tt><big>(</big><em>context</em><big>)</big><a class="reference internal" href="_modules/student/views.html#csrf_token"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#student.views.csrf_token" title="Permalink to this definition">¶</a></dt>
+<dd><p>A csrf token that can be included in a form.</p>
+</dd></dl>
+
+<dl class="function">
+<dt id="student.views.get_random_post_override">
+<tt class="descclassname">student.views.</tt><tt class="descname">get_random_post_override</tt><big>(</big><big>)</big><a class="reference internal" href="_modules/student/views.html#get_random_post_override"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#student.views.get_random_post_override" title="Permalink to this definition">¶</a></dt>
+<dd><p>Return a dictionary suitable for passing to post_vars of _do_create_account or post_override
+of create_account, with random user info.</p>
+</dd></dl>
+
+<dl class="function">
+<dt id="student.views.index">
+<tt class="descclassname">student.views.</tt><tt class="descname">index</tt><big>(</big><em>request</em>, <em>extra_context={}</em>, <em>user=None</em><big>)</big><a class="reference internal" href="_modules/student/views.html#index"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#student.views.index" title="Permalink to this definition">¶</a></dt>
+<dd><p>Render the edX main page.</p>
+<p>extra_context is used to allow immediate display of certain modal windows, eg signup,
+as used by external_auth.</p>
+</dd></dl>
+
+<dl class="function">
+<dt id="student.views.login_user">
+<tt class="descclassname">student.views.</tt><tt class="descname">login_user</tt><big>(</big><em>request</em>, <em>*args</em>, <em>**kwargs</em><big>)</big><a class="reference internal" href="_modules/student/views.html#login_user"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#student.views.login_user" title="Permalink to this definition">¶</a></dt>
+<dd><p>AJAX request to log in the user.</p>
+</dd></dl>
+
+<dl class="function">
+<dt id="student.views.logout_user">
+<tt class="descclassname">student.views.</tt><tt class="descname">logout_user</tt><big>(</big><em>request</em>, <em>*args</em>, <em>**kwargs</em><big>)</big><a class="reference internal" href="_modules/student/views.html#logout_user"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#student.views.logout_user" title="Permalink to this definition">¶</a></dt>
+<dd><p>HTTP request to log out the user. Redirects to marketing page</p>
+</dd></dl>
+
+<dl class="function">
+<dt id="student.views.password_reset">
+<tt class="descclassname">student.views.</tt><tt class="descname">password_reset</tt><big>(</big><em>request</em>, <em>*args</em>, <em>**kwargs</em><big>)</big><a class="reference internal" href="_modules/student/views.html#password_reset"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#student.views.password_reset" title="Permalink to this definition">¶</a></dt>
+<dd><p>Attempts to send a password reset e-mail.</p>
+</dd></dl>
+
+<dl class="function">
+<dt id="student.views.pending_name_changes">
+<tt class="descclassname">student.views.</tt><tt class="descname">pending_name_changes</tt><big>(</big><em>request</em>, <em>*args</em>, <em>**kwargs</em><big>)</big><a class="reference internal" href="_modules/student/views.html#pending_name_changes"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#student.views.pending_name_changes" title="Permalink to this definition">¶</a></dt>
+<dd><p>Web page which allows staff to approve or reject name changes.</p>
+</dd></dl>
+
+<dl class="function">
+<dt id="student.views.process_survey_link">
+<tt class="descclassname">student.views.</tt><tt class="descname">process_survey_link</tt><big>(</big><em>survey_link</em>, <em>user</em><big>)</big><a class="headerlink" href="#student.views.process_survey_link" title="Permalink to this definition">¶</a></dt>
+<dd><p>If {UNIQUE_ID} appears in the link, replace it with a unique id for the user.
+Currently, this is sha1(user.username).  Otherwise, return survey_link.</p>
+</dd></dl>
+
+<dl class="function">
+<dt id="student.views.reactivation_email">
+<tt class="descclassname">student.views.</tt><tt class="descname">reactivation_email</tt><big>(</big><em>request</em>, <em>*args</em>, <em>**kwargs</em><big>)</big><a class="reference internal" href="_modules/student/views.html#reactivation_email"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#student.views.reactivation_email" title="Permalink to this definition">¶</a></dt>
+<dd><p>Send an e-mail to reactivate a deactivated account, or to
+resend an activation e-mail. Untested.</p>
+</dd></dl>
+
+<dl class="function">
+<dt id="student.views.reject_name_change">
+<tt class="descclassname">student.views.</tt><tt class="descname">reject_name_change</tt><big>(</big><em>request</em>, <em>*args</em>, <em>**kwargs</em><big>)</big><a class="reference internal" href="_modules/student/views.html#reject_name_change"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#student.views.reject_name_change" title="Permalink to this definition">¶</a></dt>
+<dd><p>JSON: Name change process. Course staff clicks &#8216;reject&#8217; on a given name change</p>
+</dd></dl>
+
+<dl class="function">
+<dt id="student.views.try_change_enrollment">
+<tt class="descclassname">student.views.</tt><tt class="descname">try_change_enrollment</tt><big>(</big><em>request</em><big>)</big><a class="reference internal" href="_modules/student/views.html#try_change_enrollment"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#student.views.try_change_enrollment" title="Permalink to this definition">¶</a></dt>
+<dd><p>This method calls change_enrollment if the necessary POST
+parameters are present, but does not return anything. It
+simply logs the result or exception. This is usually
+called after a registration or login, as secondary action.
+It should not interrupt a successful registration or login.</p>
+</dd></dl>
+
+</div>
+<div class="section" id="module-student.admin">
+<span id="admin"></span><h3>Admin<a class="headerlink" href="#module-student.admin" title="Permalink to this headline">¶</a></h3>
+<p>django admin pages for courseware model</p>
+</div>
+<div class="section" id="module-student.tests">
+<span id="tests"></span><h3>Tests<a class="headerlink" href="#module-student.tests" title="Permalink to this headline">¶</a></h3>
+<p>This file demonstrates writing tests using the unittest module. These will pass
+when you run &#8220;manage.py test&#8221;.</p>
+<p>Replace this with more appropriate tests for your application.</p>
+<dl class="class">
+<dt id="student.tests.CourseEndingTest">
+<em class="property">class </em><tt class="descclassname">student.tests.</tt><tt class="descname">CourseEndingTest</tt><big>(</big><em>methodName='runTest'</em><big>)</big><a class="reference internal" href="_modules/student/tests.html#CourseEndingTest"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#student.tests.CourseEndingTest" title="Permalink to this definition">¶</a></dt>
+<dd><p>Bases: <tt class="xref py py-class docutils literal"><span class="pre">django.test.testcases.TestCase</span></tt></p>
+<p>Test things related to course endings: certificates, surveys, etc</p>
+</dd></dl>
+
+</div>
+<div class="section" id="module-student.management">
+<span id="management"></span><h3>Management<a class="headerlink" href="#module-student.management" title="Permalink to this headline">¶</a></h3>
+</div>
+<div class="section" id="module-student.migrations">
+<span id="migrations"></span><h3>Migrations<a class="headerlink" href="#module-student.migrations" title="Permalink to this headline">¶</a></h3>
+</div>
+</div>
+</div>
+
+
+          </div>
+        </div>
+      </div>
+      <div class="clearer"></div>
+    </div>
+    <div class="related">
+      <h3>Navigation</h3>
+      <ul>
+        <li class="right" style="margin-right: 10px">
+          <a href="genindex.html" title="General Index"
+             >index</a></li>
+        <li class="right" >
+          <a href="py-modindex.html" title="Python Module Index"
+             >modules</a> |</li>
+        <li class="right" >
+          <a href="cms.html" title="CMS module"
+             >previous</a> |</li>
+        <li><a href="index.html">MITx 1.0 documentation</a> &raquo;</li>
+          <li><a href="djangoapps.html" >Django applications</a> &raquo;</li> 
+      </ul>
+    </div>
+    <div class="footer">
+        &copy; Copyright 2012, MITx team.
+      Created using <a href="http://sphinx.pocoo.org/">Sphinx</a> 1.1.3.
+    </div>
+  </body>
+</html>

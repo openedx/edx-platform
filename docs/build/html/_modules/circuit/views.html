@@ -1,0 +1,165 @@
+
+
+<!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Transitional//EN"
+  "http://www.w3.org/TR/xhtml1/DTD/xhtml1-transitional.dtd">
+
+
+<html xmlns="http://www.w3.org/1999/xhtml">
+  <head>
+    <meta http-equiv="Content-Type" content="text/html; charset=utf-8" />
+    
+    <title>circuit.views &mdash; MITx 1.0 documentation</title>
+    
+    <link rel="stylesheet" href="../../_static/sphinxdoc.css" type="text/css" />
+    <link rel="stylesheet" href="../../_static/pygments.css" type="text/css" />
+    
+    <script type="text/javascript">
+      var DOCUMENTATION_OPTIONS = {
+        URL_ROOT:    '../../',
+        VERSION:     '1.0',
+        COLLAPSE_INDEX: false,
+        FILE_SUFFIX: '.html',
+        HAS_SOURCE:  true
+      };
+    </script>
+    <script type="text/javascript" src="../../_static/jquery.js"></script>
+    <script type="text/javascript" src="../../_static/underscore.js"></script>
+    <script type="text/javascript" src="../../_static/doctools.js"></script>
+    <script type="text/javascript" src="http://cdn.mathjax.org/mathjax/latest/MathJax.js?config=TeX-AMS-MML_HTMLorMML"></script>
+    <link rel="top" title="MITx 1.0 documentation" href="../../index.html" />
+    <link rel="up" title="Module code" href="../index.html" /> 
+  </head>
+  <body>
+<img src="../../_static/homepage-bg.jpg" alt="Edx logo"  width="100%;"/>
+
+    <div class="related">
+      <h3>Navigation</h3>
+      <ul>
+        <li class="right" style="margin-right: 10px">
+          <a href="../../genindex.html" title="General Index"
+             accesskey="I">index</a></li>
+        <li class="right" >
+          <a href="../../py-modindex.html" title="Python Module Index"
+             >modules</a> |</li>
+        <li><a href="../../index.html">MITx 1.0 documentation</a> &raquo;</li>
+          <li><a href="../index.html" accesskey="U">Module code</a> &raquo;</li> 
+      </ul>
+    </div>
+      <div class="sphinxsidebar">
+        <div class="sphinxsidebarwrapper">
+<div id="searchbox" style="display: none">
+  <h3>Quick search</h3>
+    <form class="search" action="../../search.html" method="get">
+      <input type="text" name="q" />
+      <input type="submit" value="Go" />
+      <input type="hidden" name="check_keywords" value="yes" />
+      <input type="hidden" name="area" value="default" />
+    </form>
+    <p class="searchtip" style="font-size: 90%">
+    Enter search terms or a module, class or function name.
+    </p>
+</div>
+<script type="text/javascript">$('#searchbox').show(0);</script>
+        </div>
+      </div>
+
+    <div class="document">
+      <div class="documentwrapper">
+        <div class="bodywrapper">
+          <div class="body">
+            
+  <h1>Source code for circuit.views</h1><div class="highlight"><pre>
+<span class="kn">import</span> <span class="nn">json</span>
+<span class="kn">import</span> <span class="nn">os</span>
+
+<span class="kn">import</span> <span class="nn">xml.etree.ElementTree</span>
+
+<span class="kn">from</span> <span class="nn">django.conf</span> <span class="kn">import</span> <span class="n">settings</span>
+<span class="kn">from</span> <span class="nn">django.http</span> <span class="kn">import</span> <span class="n">Http404</span>
+<span class="kn">from</span> <span class="nn">django.http</span> <span class="kn">import</span> <span class="n">HttpResponse</span>
+<span class="kn">from</span> <span class="nn">django.shortcuts</span> <span class="kn">import</span> <span class="n">redirect</span>
+<span class="kn">from</span> <span class="nn">mitxmako.shortcuts</span> <span class="kn">import</span> <span class="n">render_to_response</span><span class="p">,</span> <span class="n">render_to_string</span>
+
+<span class="kn">from</span> <span class="nn">models</span> <span class="kn">import</span> <span class="n">ServerCircuit</span>
+
+
+<div class="viewcode-block" id="circuit_line"><a class="viewcode-back" href="../../lms.html#circuit.views.circuit_line">[docs]</a><span class="k">def</span> <span class="nf">circuit_line</span><span class="p">(</span><span class="n">circuit</span><span class="p">):</span>
+    <span class="sd">&#39;&#39;&#39; Returns string for an appropriate input element for a circuit.</span>
+<span class="sd">        TODO: Rename. &#39;&#39;&#39;</span>
+    <span class="k">if</span> <span class="ow">not</span> <span class="n">circuit</span><span class="o">.</span><span class="n">isalnum</span><span class="p">():</span>
+        <span class="k">raise</span> <span class="n">Http404</span><span class="p">()</span>
+    <span class="k">try</span><span class="p">:</span>
+        <span class="n">sc</span> <span class="o">=</span> <span class="n">ServerCircuit</span><span class="o">.</span><span class="n">objects</span><span class="o">.</span><span class="n">get</span><span class="p">(</span><span class="n">name</span><span class="o">=</span><span class="n">circuit</span><span class="p">)</span>
+        <span class="n">schematic</span> <span class="o">=</span> <span class="n">sc</span><span class="o">.</span><span class="n">schematic</span>
+    <span class="k">except</span><span class="p">:</span>
+        <span class="n">schematic</span> <span class="o">=</span> <span class="s">&#39;&#39;</span>
+
+    <span class="n">circuit_line</span> <span class="o">=</span> <span class="n">xml</span><span class="o">.</span><span class="n">etree</span><span class="o">.</span><span class="n">ElementTree</span><span class="o">.</span><span class="n">Element</span><span class="p">(</span><span class="s">&#39;input&#39;</span><span class="p">)</span>
+    <span class="n">circuit_line</span><span class="o">.</span><span class="n">set</span><span class="p">(</span><span class="s">&#39;type&#39;</span><span class="p">,</span> <span class="s">&#39;hidden&#39;</span><span class="p">)</span>
+    <span class="n">circuit_line</span><span class="o">.</span><span class="n">set</span><span class="p">(</span><span class="s">&#39;class&#39;</span><span class="p">,</span> <span class="s">&#39;schematic&#39;</span><span class="p">)</span>
+    <span class="n">circuit_line</span><span class="o">.</span><span class="n">set</span><span class="p">(</span><span class="s">&#39;width&#39;</span><span class="p">,</span> <span class="s">&#39;640&#39;</span><span class="p">)</span>
+    <span class="n">circuit_line</span><span class="o">.</span><span class="n">set</span><span class="p">(</span><span class="s">&#39;height&#39;</span><span class="p">,</span> <span class="s">&#39;480&#39;</span><span class="p">)</span>
+    <span class="n">circuit_line</span><span class="o">.</span><span class="n">set</span><span class="p">(</span><span class="s">&#39;name&#39;</span><span class="p">,</span> <span class="s">&#39;schematic&#39;</span><span class="p">)</span>
+    <span class="n">circuit_line</span><span class="o">.</span><span class="n">set</span><span class="p">(</span><span class="s">&#39;id&#39;</span><span class="p">,</span> <span class="s">&#39;schematic_&#39;</span> <span class="o">+</span> <span class="n">circuit</span><span class="p">)</span>
+    <span class="n">circuit_line</span><span class="o">.</span><span class="n">set</span><span class="p">(</span><span class="s">&#39;value&#39;</span><span class="p">,</span> <span class="n">schematic</span><span class="p">)</span>  <span class="c"># We do it this way for security -- guarantees users cannot put funny stuff in schematic.</span>
+    <span class="k">return</span> <span class="n">xml</span><span class="o">.</span><span class="n">etree</span><span class="o">.</span><span class="n">ElementTree</span><span class="o">.</span><span class="n">tostring</span><span class="p">(</span><span class="n">circuit_line</span><span class="p">)</span>
+
+</div>
+<span class="k">def</span> <span class="nf">edit_circuit</span><span class="p">(</span><span class="n">request</span><span class="p">,</span> <span class="n">circuit</span><span class="p">):</span>
+    <span class="k">try</span><span class="p">:</span>
+        <span class="n">sc</span> <span class="o">=</span> <span class="n">ServerCircuit</span><span class="o">.</span><span class="n">objects</span><span class="o">.</span><span class="n">get</span><span class="p">(</span><span class="n">name</span><span class="o">=</span><span class="n">circuit</span><span class="p">)</span>
+    <span class="k">except</span><span class="p">:</span>
+        <span class="n">sc</span> <span class="o">=</span> <span class="bp">None</span>
+
+    <span class="k">if</span> <span class="ow">not</span> <span class="n">circuit</span><span class="o">.</span><span class="n">isalnum</span><span class="p">():</span>
+        <span class="k">raise</span> <span class="n">Http404</span><span class="p">()</span>
+    <span class="n">response</span> <span class="o">=</span> <span class="n">render_to_response</span><span class="p">(</span><span class="s">&#39;edit_circuit.html&#39;</span><span class="p">,</span> <span class="p">{</span><span class="s">&#39;name&#39;</span><span class="p">:</span> <span class="n">circuit</span><span class="p">,</span>
+                                                        <span class="s">&#39;circuit_line&#39;</span><span class="p">:</span> <span class="n">circuit_line</span><span class="p">(</span><span class="n">circuit</span><span class="p">)})</span>
+    <span class="n">response</span><span class="p">[</span><span class="s">&#39;Cache-Control&#39;</span><span class="p">]</span> <span class="o">=</span> <span class="s">&#39;no-cache&#39;</span>
+    <span class="k">return</span> <span class="n">response</span>
+
+
+<span class="k">def</span> <span class="nf">save_circuit</span><span class="p">(</span><span class="n">request</span><span class="p">,</span> <span class="n">circuit</span><span class="p">):</span>
+    <span class="k">if</span> <span class="ow">not</span> <span class="n">circuit</span><span class="o">.</span><span class="n">isalnum</span><span class="p">():</span>
+        <span class="k">raise</span> <span class="n">Http404</span><span class="p">()</span>
+    <span class="k">print</span> <span class="nb">dict</span><span class="p">(</span><span class="n">request</span><span class="o">.</span><span class="n">POST</span><span class="p">)</span>
+    <span class="n">schematic</span> <span class="o">=</span> <span class="n">request</span><span class="o">.</span><span class="n">POST</span><span class="p">[</span><span class="s">&#39;schematic&#39;</span><span class="p">]</span>
+    <span class="k">print</span> <span class="n">schematic</span>
+    <span class="k">try</span><span class="p">:</span>
+        <span class="n">sc</span> <span class="o">=</span> <span class="n">ServerCircuit</span><span class="o">.</span><span class="n">objects</span><span class="o">.</span><span class="n">get</span><span class="p">(</span><span class="n">name</span><span class="o">=</span><span class="n">circuit</span><span class="p">)</span>
+    <span class="k">except</span><span class="p">:</span>
+        <span class="n">sc</span> <span class="o">=</span> <span class="n">ServerCircuit</span><span class="p">()</span>
+        <span class="n">sc</span><span class="o">.</span><span class="n">name</span> <span class="o">=</span> <span class="n">circuit</span>
+    <span class="n">sc</span><span class="o">.</span><span class="n">schematic</span> <span class="o">=</span> <span class="n">schematic</span>
+    <span class="k">print</span> <span class="s">&quot;:&quot;</span><span class="p">,</span> <span class="n">sc</span><span class="o">.</span><span class="n">schematic</span>
+    <span class="n">sc</span><span class="o">.</span><span class="n">save</span><span class="p">()</span>
+    <span class="n">json_str</span> <span class="o">=</span> <span class="n">json</span><span class="o">.</span><span class="n">dumps</span><span class="p">({</span><span class="s">&#39;results&#39;</span><span class="p">:</span> <span class="s">&#39;success&#39;</span><span class="p">})</span>
+    <span class="n">response</span> <span class="o">=</span> <span class="n">HttpResponse</span><span class="p">(</span><span class="n">json_str</span><span class="p">,</span> <span class="n">mimetype</span><span class="o">=</span><span class="s">&#39;application/json&#39;</span><span class="p">)</span>
+    <span class="n">response</span><span class="p">[</span><span class="s">&#39;Cache-Control&#39;</span><span class="p">]</span> <span class="o">=</span> <span class="s">&#39;no-cache&#39;</span>
+    <span class="k">return</span> <span class="n">response</span>
+</pre></div>
+
+          </div>
+        </div>
+      </div>
+      <div class="clearer"></div>
+    </div>
+    <div class="related">
+      <h3>Navigation</h3>
+      <ul>
+        <li class="right" style="margin-right: 10px">
+          <a href="../../genindex.html" title="General Index"
+             >index</a></li>
+        <li class="right" >
+          <a href="../../py-modindex.html" title="Python Module Index"
+             >modules</a> |</li>
+        <li><a href="../../index.html">MITx 1.0 documentation</a> &raquo;</li>
+          <li><a href="../index.html" >Module code</a> &raquo;</li> 
+      </ul>
+    </div>
+    <div class="footer">
+        &copy; Copyright 2012, MITx team.
+      Created using <a href="http://sphinx.pocoo.org/">Sphinx</a> 1.1.3.
+    </div>
+  </body>
+</html>

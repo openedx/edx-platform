@@ -1,0 +1,261 @@
+
+
+<!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Transitional//EN"
+  "http://www.w3.org/TR/xhtml1/DTD/xhtml1-transitional.dtd">
+
+
+<html xmlns="http://www.w3.org/1999/xhtml">
+  <head>
+    <meta http-equiv="Content-Type" content="text/html; charset=utf-8" />
+    
+    <title>capa.checker &mdash; MITx 1.0 documentation</title>
+    
+    <link rel="stylesheet" href="../../_static/sphinxdoc.css" type="text/css" />
+    <link rel="stylesheet" href="../../_static/pygments.css" type="text/css" />
+    
+    <script type="text/javascript">
+      var DOCUMENTATION_OPTIONS = {
+        URL_ROOT:    '../../',
+        VERSION:     '1.0',
+        COLLAPSE_INDEX: false,
+        FILE_SUFFIX: '.html',
+        HAS_SOURCE:  true
+      };
+    </script>
+    <script type="text/javascript" src="../../_static/jquery.js"></script>
+    <script type="text/javascript" src="../../_static/underscore.js"></script>
+    <script type="text/javascript" src="../../_static/doctools.js"></script>
+    <script type="text/javascript" src="http://cdn.mathjax.org/mathjax/latest/MathJax.js?config=TeX-AMS-MML_HTMLorMML"></script>
+    <link rel="top" title="MITx 1.0 documentation" href="../../index.html" />
+    <link rel="up" title="Module code" href="../index.html" /> 
+  </head>
+  <body>
+<img src="../../_static/homepage-bg.jpg" alt="Edx logo"  width="100%;"/>
+
+    <div class="related">
+      <h3>Navigation</h3>
+      <ul>
+        <li class="right" style="margin-right: 10px">
+          <a href="../../genindex.html" title="General Index"
+             accesskey="I">index</a></li>
+        <li class="right" >
+          <a href="../../py-modindex.html" title="Python Module Index"
+             >modules</a> |</li>
+        <li><a href="../../index.html">MITx 1.0 documentation</a> &raquo;</li>
+          <li><a href="../index.html" accesskey="U">Module code</a> &raquo;</li> 
+      </ul>
+    </div>
+      <div class="sphinxsidebar">
+        <div class="sphinxsidebarwrapper">
+<div id="searchbox" style="display: none">
+  <h3>Quick search</h3>
+    <form class="search" action="../../search.html" method="get">
+      <input type="text" name="q" />
+      <input type="submit" value="Go" />
+      <input type="hidden" name="check_keywords" value="yes" />
+      <input type="hidden" name="area" value="default" />
+    </form>
+    <p class="searchtip" style="font-size: 90%">
+    Enter search terms or a module, class or function name.
+    </p>
+</div>
+<script type="text/javascript">$('#searchbox').show(0);</script>
+        </div>
+      </div>
+
+    <div class="document">
+      <div class="documentwrapper">
+        <div class="bodywrapper">
+          <div class="body">
+            
+  <h1>Source code for capa.checker</h1><div class="highlight"><pre>
+<span class="c">#!/usr/bin/env python</span>
+<span class="sd">&quot;&quot;&quot;</span>
+<span class="sd">Commandline tool for doing operations on Problems</span>
+<span class="sd">&quot;&quot;&quot;</span>
+<span class="kn">from</span> <span class="nn">__future__</span> <span class="kn">import</span> <span class="n">unicode_literals</span>
+
+<span class="kn">import</span> <span class="nn">argparse</span>
+<span class="kn">import</span> <span class="nn">logging</span>
+<span class="kn">import</span> <span class="nn">sys</span>
+<span class="kn">from</span> <span class="nn">path</span> <span class="kn">import</span> <span class="n">path</span>
+
+<span class="kn">from</span> <span class="nn">cStringIO</span> <span class="kn">import</span> <span class="n">StringIO</span>
+<span class="kn">from</span> <span class="nn">collections</span> <span class="kn">import</span> <span class="n">defaultdict</span>
+
+<span class="kn">from</span> <span class="nn">calc</span> <span class="kn">import</span> <span class="n">UndefinedVariable</span>
+<span class="kn">from</span> <span class="nn">capa_problem</span> <span class="kn">import</span> <span class="n">LoncapaProblem</span>
+<span class="kn">from</span> <span class="nn">mako.lookup</span> <span class="kn">import</span> <span class="n">TemplateLookup</span>
+
+<span class="n">logging</span><span class="o">.</span><span class="n">basicConfig</span><span class="p">(</span><span class="n">format</span><span class="o">=</span><span class="s">&quot;</span><span class="si">%(levelname)s</span><span class="s"> </span><span class="si">%(message)s</span><span class="s">&quot;</span><span class="p">)</span>
+<span class="n">log</span> <span class="o">=</span> <span class="n">logging</span><span class="o">.</span><span class="n">getLogger</span><span class="p">(</span><span class="s">&#39;capa.checker&#39;</span><span class="p">)</span>
+
+
+<span class="k">class</span> <span class="nc">DemoSystem</span><span class="p">(</span><span class="nb">object</span><span class="p">):</span>
+    <span class="k">def</span> <span class="nf">__init__</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">lookup</span> <span class="o">=</span> <span class="n">TemplateLookup</span><span class="p">(</span><span class="n">directories</span><span class="o">=</span><span class="p">[</span><span class="n">path</span><span class="p">(</span><span class="n">__file__</span><span class="p">)</span><span class="o">.</span><span class="n">dirname</span><span class="p">()</span> <span class="o">/</span> <span class="s">&#39;templates&#39;</span><span class="p">])</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">DEBUG</span> <span class="o">=</span> <span class="bp">True</span>
+
+    <span class="k">def</span> <span class="nf">render_template</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">template_filename</span><span class="p">,</span> <span class="n">dictionary</span><span class="p">,</span> <span class="n">context</span><span class="o">=</span><span class="bp">None</span><span class="p">):</span>
+        <span class="k">if</span> <span class="n">context</span> <span class="ow">is</span> <span class="bp">None</span><span class="p">:</span>
+            <span class="n">context</span> <span class="o">=</span> <span class="p">{}</span>
+
+        <span class="n">context_dict</span> <span class="o">=</span> <span class="p">{}</span>
+        <span class="n">context_dict</span><span class="o">.</span><span class="n">update</span><span class="p">(</span><span class="n">dictionary</span><span class="p">)</span>
+        <span class="n">context_dict</span><span class="o">.</span><span class="n">update</span><span class="p">(</span><span class="n">context</span><span class="p">)</span>
+        <span class="k">return</span> <span class="bp">self</span><span class="o">.</span><span class="n">lookup</span><span class="o">.</span><span class="n">get_template</span><span class="p">(</span><span class="n">template_filename</span><span class="p">)</span><span class="o">.</span><span class="n">render</span><span class="p">(</span><span class="o">**</span><span class="n">context_dict</span><span class="p">)</span>
+
+
+<span class="k">def</span> <span class="nf">main</span><span class="p">():</span>
+    <span class="n">parser</span> <span class="o">=</span> <span class="n">argparse</span><span class="o">.</span><span class="n">ArgumentParser</span><span class="p">(</span><span class="n">description</span><span class="o">=</span><span class="s">&#39;Check Problem Files&#39;</span><span class="p">)</span>
+    <span class="n">parser</span><span class="o">.</span><span class="n">add_argument</span><span class="p">(</span><span class="s">&quot;command&quot;</span><span class="p">,</span> <span class="n">choices</span><span class="o">=</span><span class="p">[</span><span class="s">&#39;test&#39;</span><span class="p">,</span> <span class="s">&#39;show&#39;</span><span class="p">])</span>  <span class="c"># Watch? Render? Open?</span>
+    <span class="n">parser</span><span class="o">.</span><span class="n">add_argument</span><span class="p">(</span><span class="s">&quot;files&quot;</span><span class="p">,</span> <span class="n">nargs</span><span class="o">=</span><span class="s">&quot;+&quot;</span><span class="p">,</span> <span class="nb">type</span><span class="o">=</span><span class="n">argparse</span><span class="o">.</span><span class="n">FileType</span><span class="p">(</span><span class="s">&#39;r&#39;</span><span class="p">))</span>
+    <span class="n">parser</span><span class="o">.</span><span class="n">add_argument</span><span class="p">(</span><span class="s">&quot;--seed&quot;</span><span class="p">,</span> <span class="n">required</span><span class="o">=</span><span class="bp">False</span><span class="p">,</span> <span class="nb">type</span><span class="o">=</span><span class="nb">int</span><span class="p">)</span>
+    <span class="n">parser</span><span class="o">.</span><span class="n">add_argument</span><span class="p">(</span><span class="s">&quot;--log-level&quot;</span><span class="p">,</span> <span class="n">required</span><span class="o">=</span><span class="bp">False</span><span class="p">,</span> <span class="n">default</span><span class="o">=</span><span class="s">&quot;INFO&quot;</span><span class="p">,</span>
+                        <span class="n">choices</span><span class="o">=</span><span class="p">[</span><span class="s">&#39;info&#39;</span><span class="p">,</span> <span class="s">&#39;debug&#39;</span><span class="p">,</span> <span class="s">&#39;warn&#39;</span><span class="p">,</span> <span class="s">&#39;error&#39;</span><span class="p">,</span>
+                                 <span class="s">&#39;INFO&#39;</span><span class="p">,</span> <span class="s">&#39;DEBUG&#39;</span><span class="p">,</span> <span class="s">&#39;WARN&#39;</span><span class="p">,</span> <span class="s">&#39;ERROR&#39;</span><span class="p">])</span>
+
+    <span class="n">args</span> <span class="o">=</span> <span class="n">parser</span><span class="o">.</span><span class="n">parse_args</span><span class="p">()</span>
+    <span class="n">log</span><span class="o">.</span><span class="n">setLevel</span><span class="p">(</span><span class="n">args</span><span class="o">.</span><span class="n">log_level</span><span class="o">.</span><span class="n">upper</span><span class="p">())</span>
+
+    <span class="n">system</span> <span class="o">=</span> <span class="n">DemoSystem</span><span class="p">()</span>
+
+    <span class="k">for</span> <span class="n">problem_file</span> <span class="ow">in</span> <span class="n">args</span><span class="o">.</span><span class="n">files</span><span class="p">:</span>
+        <span class="n">log</span><span class="o">.</span><span class="n">info</span><span class="p">(</span><span class="s">&quot;Opening {0}&quot;</span><span class="o">.</span><span class="n">format</span><span class="p">(</span><span class="n">problem_file</span><span class="o">.</span><span class="n">name</span><span class="p">))</span>
+
+        <span class="k">try</span><span class="p">:</span>
+            <span class="n">problem</span> <span class="o">=</span> <span class="n">LoncapaProblem</span><span class="p">(</span><span class="n">problem_file</span><span class="p">,</span> <span class="s">&quot;fakeid&quot;</span><span class="p">,</span> <span class="n">seed</span><span class="o">=</span><span class="n">args</span><span class="o">.</span><span class="n">seed</span><span class="p">,</span> <span class="n">system</span><span class="o">=</span><span class="n">system</span><span class="p">)</span>
+        <span class="k">except</span> <span class="ne">Exception</span> <span class="k">as</span> <span class="n">ex</span><span class="p">:</span>
+            <span class="n">log</span><span class="o">.</span><span class="n">error</span><span class="p">(</span><span class="s">&quot;Could not parse file {0}&quot;</span><span class="o">.</span><span class="n">format</span><span class="p">(</span><span class="n">problem_file</span><span class="o">.</span><span class="n">name</span><span class="p">))</span>
+            <span class="n">log</span><span class="o">.</span><span class="n">exception</span><span class="p">(</span><span class="n">ex</span><span class="p">)</span>
+            <span class="k">continue</span>
+
+        <span class="k">if</span> <span class="n">args</span><span class="o">.</span><span class="n">command</span> <span class="o">==</span> <span class="s">&#39;test&#39;</span><span class="p">:</span>
+            <span class="n">command_test</span><span class="p">(</span><span class="n">problem</span><span class="p">)</span>
+        <span class="k">elif</span> <span class="n">args</span><span class="o">.</span><span class="n">command</span> <span class="o">==</span> <span class="s">&#39;show&#39;</span><span class="p">:</span>
+            <span class="n">command_show</span><span class="p">(</span><span class="n">problem</span><span class="p">)</span>
+
+        <span class="n">problem_file</span><span class="o">.</span><span class="n">close</span><span class="p">()</span>
+
+    <span class="c"># In case we want to do anything else here.</span>
+
+
+<div class="viewcode-block" id="command_show"><a class="viewcode-back" href="../../capa.html#capa.checker.command_show">[docs]</a><span class="k">def</span> <span class="nf">command_show</span><span class="p">(</span><span class="n">problem</span><span class="p">):</span>
+    <span class="sd">&quot;&quot;&quot;Display the text for this problem&quot;&quot;&quot;</span>
+    <span class="k">print</span> <span class="n">problem</span><span class="o">.</span><span class="n">get_html</span><span class="p">()</span>
+
+</div>
+<span class="k">def</span> <span class="nf">command_test</span><span class="p">(</span><span class="n">problem</span><span class="p">):</span>
+    <span class="c"># We&#39;re going to trap stdout/stderr from the problems (yes, some print)</span>
+    <span class="n">old_stdout</span><span class="p">,</span> <span class="n">old_stderr</span> <span class="o">=</span> <span class="n">sys</span><span class="o">.</span><span class="n">stdout</span><span class="p">,</span> <span class="n">sys</span><span class="o">.</span><span class="n">stderr</span>
+    <span class="k">try</span><span class="p">:</span>
+        <span class="n">sys</span><span class="o">.</span><span class="n">stdout</span> <span class="o">=</span> <span class="n">StringIO</span><span class="p">()</span>
+        <span class="n">sys</span><span class="o">.</span><span class="n">stderr</span> <span class="o">=</span> <span class="n">StringIO</span><span class="p">()</span>
+
+        <span class="n">check_that_suggested_answers_work</span><span class="p">(</span><span class="n">problem</span><span class="p">)</span>
+        <span class="n">check_that_blanks_fail</span><span class="p">(</span><span class="n">problem</span><span class="p">)</span>
+
+        <span class="n">log_captured_output</span><span class="p">(</span><span class="n">sys</span><span class="o">.</span><span class="n">stdout</span><span class="p">,</span>
+                            <span class="s">&quot;captured stdout from {0}&quot;</span><span class="o">.</span><span class="n">format</span><span class="p">(</span><span class="n">problem</span><span class="p">))</span>
+        <span class="n">log_captured_output</span><span class="p">(</span><span class="n">sys</span><span class="o">.</span><span class="n">stderr</span><span class="p">,</span>
+                            <span class="s">&quot;captured stderr from {0}&quot;</span><span class="o">.</span><span class="n">format</span><span class="p">(</span><span class="n">problem</span><span class="p">))</span>
+    <span class="k">except</span> <span class="ne">Exception</span> <span class="k">as</span> <span class="n">e</span><span class="p">:</span>
+        <span class="n">log</span><span class="o">.</span><span class="n">exception</span><span class="p">(</span><span class="n">e</span><span class="p">)</span>
+    <span class="k">finally</span><span class="p">:</span>
+        <span class="n">sys</span><span class="o">.</span><span class="n">stdout</span><span class="p">,</span> <span class="n">sys</span><span class="o">.</span><span class="n">stderr</span> <span class="o">=</span> <span class="n">old_stdout</span><span class="p">,</span> <span class="n">old_stderr</span>
+
+
+<div class="viewcode-block" id="check_that_blanks_fail"><a class="viewcode-back" href="../../capa.html#capa.checker.check_that_blanks_fail">[docs]</a><span class="k">def</span> <span class="nf">check_that_blanks_fail</span><span class="p">(</span><span class="n">problem</span><span class="p">):</span>
+    <span class="sd">&quot;&quot;&quot;Leaving it blank should never work. Neither should a space.&quot;&quot;&quot;</span>
+    <span class="n">blank_answers</span> <span class="o">=</span> <span class="nb">dict</span><span class="p">((</span><span class="n">answer_id</span><span class="p">,</span> <span class="s">u&quot;&quot;</span><span class="p">)</span>
+                         <span class="k">for</span> <span class="n">answer_id</span> <span class="ow">in</span> <span class="n">problem</span><span class="o">.</span><span class="n">get_question_answers</span><span class="p">())</span>
+    <span class="n">grading_results</span> <span class="o">=</span> <span class="n">problem</span><span class="o">.</span><span class="n">grade_answers</span><span class="p">(</span><span class="n">blank_answers</span><span class="p">)</span>
+    <span class="k">try</span><span class="p">:</span>
+        <span class="k">assert</span><span class="p">(</span><span class="nb">all</span><span class="p">(</span><span class="n">result</span> <span class="o">==</span> <span class="s">&#39;incorrect&#39;</span> <span class="k">for</span> <span class="n">result</span> <span class="ow">in</span> <span class="n">grading_results</span><span class="o">.</span><span class="n">values</span><span class="p">()))</span>
+    <span class="k">except</span> <span class="ne">AssertionError</span><span class="p">:</span>
+        <span class="n">log</span><span class="o">.</span><span class="n">error</span><span class="p">(</span><span class="s">&quot;Blank accepted as correct answer in {0} for {1}&quot;</span>
+                  <span class="o">.</span><span class="n">format</span><span class="p">(</span><span class="n">problem</span><span class="p">,</span>
+                          <span class="p">[</span><span class="n">answer_id</span> <span class="k">for</span> <span class="n">answer_id</span><span class="p">,</span> <span class="n">result</span>
+                           <span class="ow">in</span> <span class="nb">sorted</span><span class="p">(</span><span class="n">grading_results</span><span class="o">.</span><span class="n">items</span><span class="p">())</span>
+                           <span class="k">if</span> <span class="n">result</span> <span class="o">!=</span> <span class="s">&#39;incorrect&#39;</span><span class="p">]))</span>
+
+</div>
+<div class="viewcode-block" id="check_that_suggested_answers_work"><a class="viewcode-back" href="../../capa.html#capa.checker.check_that_suggested_answers_work">[docs]</a><span class="k">def</span> <span class="nf">check_that_suggested_answers_work</span><span class="p">(</span><span class="n">problem</span><span class="p">):</span>
+    <span class="sd">&quot;&quot;&quot;Split this up so that we&#39;re only used for formula/numeric answers.</span>
+
+<span class="sd">    Examples of where this fails:</span>
+<span class="sd">    * Displayed answers use units but acceptable ones do not.</span>
+<span class="sd">      - L1e0.xml</span>
+<span class="sd">      - Presents itself as UndefinedVariable (when it tries to pass to calc)</span>
+<span class="sd">    * &quot;a or d&quot; is what&#39;s displayed, but only &quot;a&quot; or &quot;d&quot; is accepted, not the</span>
+<span class="sd">      string &quot;a or d&quot;.</span>
+<span class="sd">      - L1-e00.xml</span>
+<span class="sd">    &quot;&quot;&quot;</span>
+    <span class="c"># These are actual answers we get from the responsetypes</span>
+    <span class="n">real_answers</span> <span class="o">=</span> <span class="n">problem</span><span class="o">.</span><span class="n">get_question_answers</span><span class="p">()</span>
+
+    <span class="c"># all_answers is real_answers + blanks for other answer_ids for which the</span>
+    <span class="c"># responsetypes can&#39;t provide us pre-canned answers (customresponse)</span>
+    <span class="n">all_answer_ids</span> <span class="o">=</span> <span class="n">problem</span><span class="o">.</span><span class="n">get_answer_ids</span><span class="p">()</span>
+    <span class="n">all_answers</span> <span class="o">=</span> <span class="nb">dict</span><span class="p">((</span><span class="n">answer_id</span><span class="p">,</span> <span class="n">real_answers</span><span class="o">.</span><span class="n">get</span><span class="p">(</span><span class="n">answer_id</span><span class="p">,</span> <span class="s">&quot;&quot;</span><span class="p">))</span>
+                       <span class="k">for</span> <span class="n">answer_id</span> <span class="ow">in</span> <span class="n">all_answer_ids</span><span class="p">)</span>
+
+    <span class="n">log</span><span class="o">.</span><span class="n">debug</span><span class="p">(</span><span class="s">&quot;Real answers: {0}&quot;</span><span class="o">.</span><span class="n">format</span><span class="p">(</span><span class="n">real_answers</span><span class="p">))</span>
+    <span class="k">if</span> <span class="n">real_answers</span><span class="p">:</span>
+        <span class="k">try</span><span class="p">:</span>
+            <span class="n">real_results</span> <span class="o">=</span> <span class="nb">dict</span><span class="p">((</span><span class="n">answer_id</span><span class="p">,</span> <span class="n">result</span><span class="p">)</span> <span class="k">for</span> <span class="n">answer_id</span><span class="p">,</span> <span class="n">result</span>
+                                <span class="ow">in</span> <span class="n">problem</span><span class="o">.</span><span class="n">grade_answers</span><span class="p">(</span><span class="n">all_answers</span><span class="p">)</span><span class="o">.</span><span class="n">items</span><span class="p">()</span>
+                                <span class="k">if</span> <span class="n">answer_id</span> <span class="ow">in</span> <span class="n">real_answers</span><span class="p">)</span>
+            <span class="n">log</span><span class="o">.</span><span class="n">debug</span><span class="p">(</span><span class="n">real_results</span><span class="p">)</span>
+            <span class="k">assert</span><span class="p">(</span><span class="nb">all</span><span class="p">(</span><span class="n">result</span> <span class="o">==</span> <span class="s">&#39;correct&#39;</span>
+                       <span class="k">for</span> <span class="n">answer_id</span><span class="p">,</span> <span class="n">result</span> <span class="ow">in</span> <span class="n">real_results</span><span class="o">.</span><span class="n">items</span><span class="p">()))</span>
+        <span class="k">except</span> <span class="n">UndefinedVariable</span> <span class="k">as</span> <span class="n">uv_exc</span><span class="p">:</span>
+            <span class="n">log</span><span class="o">.</span><span class="n">error</span><span class="p">(</span><span class="s">&quot;The variable </span><span class="se">\&quot;</span><span class="s">{0}</span><span class="se">\&quot;</span><span class="s"> specified in the &quot;</span><span class="o">.</span><span class="n">format</span><span class="p">(</span><span class="n">uv_exc</span><span class="p">)</span> <span class="o">+</span>
+                      <span class="s">&quot;solution isn&#39;t recognized (is it a units measure?).&quot;</span><span class="p">)</span>
+        <span class="k">except</span> <span class="ne">AssertionError</span><span class="p">:</span>
+            <span class="n">log</span><span class="o">.</span><span class="n">error</span><span class="p">(</span><span class="s">&quot;The following generated answers were not accepted for {0}:&quot;</span>
+                      <span class="o">.</span><span class="n">format</span><span class="p">(</span><span class="n">problem</span><span class="p">))</span>
+            <span class="k">for</span> <span class="n">question_id</span><span class="p">,</span> <span class="n">result</span> <span class="ow">in</span> <span class="nb">sorted</span><span class="p">(</span><span class="n">real_results</span><span class="o">.</span><span class="n">items</span><span class="p">()):</span>
+                <span class="k">if</span> <span class="n">result</span> <span class="o">!=</span> <span class="s">&#39;correct&#39;</span><span class="p">:</span>
+                    <span class="n">log</span><span class="o">.</span><span class="n">error</span><span class="p">(</span><span class="s">&quot;  {0} = {1}&quot;</span><span class="o">.</span><span class="n">format</span><span class="p">(</span><span class="n">question_id</span><span class="p">,</span> <span class="n">real_answers</span><span class="p">[</span><span class="n">question_id</span><span class="p">]))</span>
+        <span class="k">except</span> <span class="ne">Exception</span> <span class="k">as</span> <span class="n">ex</span><span class="p">:</span>
+            <span class="n">log</span><span class="o">.</span><span class="n">error</span><span class="p">(</span><span class="s">&quot;Uncaught error in {0}&quot;</span><span class="o">.</span><span class="n">format</span><span class="p">(</span><span class="n">problem</span><span class="p">))</span>
+            <span class="n">log</span><span class="o">.</span><span class="n">exception</span><span class="p">(</span><span class="n">ex</span><span class="p">)</span>
+
+</div>
+<span class="k">def</span> <span class="nf">log_captured_output</span><span class="p">(</span><span class="n">output_stream</span><span class="p">,</span> <span class="n">stream_name</span><span class="p">):</span>
+    <span class="n">output_stream</span><span class="o">.</span><span class="n">seek</span><span class="p">(</span><span class="mi">0</span><span class="p">)</span>
+    <span class="n">output_text</span> <span class="o">=</span> <span class="n">output_stream</span><span class="o">.</span><span class="n">read</span><span class="p">()</span>
+    <span class="k">if</span> <span class="n">output_text</span><span class="p">:</span>
+        <span class="n">log</span><span class="o">.</span><span class="n">info</span><span class="p">(</span><span class="s">&quot;##### Begin {0} #####</span><span class="se">\n</span><span class="s">&quot;</span><span class="o">.</span><span class="n">format</span><span class="p">(</span><span class="n">stream_name</span><span class="p">)</span> <span class="o">+</span> <span class="n">output_text</span><span class="p">)</span>
+        <span class="n">log</span><span class="o">.</span><span class="n">info</span><span class="p">(</span><span class="s">&quot;##### End {0} #####&quot;</span><span class="o">.</span><span class="n">format</span><span class="p">(</span><span class="n">stream_name</span><span class="p">))</span>
+
+
+<span class="k">if</span> <span class="n">__name__</span> <span class="o">==</span> <span class="s">&#39;__main__&#39;</span><span class="p">:</span>
+    <span class="n">sys</span><span class="o">.</span><span class="n">exit</span><span class="p">(</span><span class="n">main</span><span class="p">())</span>
+</pre></div>
+
+          </div>
+        </div>
+      </div>
+      <div class="clearer"></div>
+    </div>
+    <div class="related">
+      <h3>Navigation</h3>
+      <ul>
+        <li class="right" style="margin-right: 10px">
+          <a href="../../genindex.html" title="General Index"
+             >index</a></li>
+        <li class="right" >
+          <a href="../../py-modindex.html" title="Python Module Index"
+             >modules</a> |</li>
+        <li><a href="../../index.html">MITx 1.0 documentation</a> &raquo;</li>
+          <li><a href="../index.html" >Module code</a> &raquo;</li> 
+      </ul>
+    </div>
+    <div class="footer">
+        &copy; Copyright 2012, MITx team.
+      Created using <a href="http://sphinx.pocoo.org/">Sphinx</a> 1.1.3.
+    </div>
+  </body>
+</html>

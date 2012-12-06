@@ -1,0 +1,259 @@
+
+
+<!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Transitional//EN"
+  "http://www.w3.org/TR/xhtml1/DTD/xhtml1-transitional.dtd">
+
+
+<html xmlns="http://www.w3.org/1999/xhtml">
+  <head>
+    <meta http-equiv="Content-Type" content="text/html; charset=utf-8" />
+    
+    <title>xmodule.progress &mdash; MITx 1.0 documentation</title>
+    
+    <link rel="stylesheet" href="../../_static/sphinxdoc.css" type="text/css" />
+    <link rel="stylesheet" href="../../_static/pygments.css" type="text/css" />
+    
+    <script type="text/javascript">
+      var DOCUMENTATION_OPTIONS = {
+        URL_ROOT:    '../../',
+        VERSION:     '1.0',
+        COLLAPSE_INDEX: false,
+        FILE_SUFFIX: '.html',
+        HAS_SOURCE:  true
+      };
+    </script>
+    <script type="text/javascript" src="../../_static/jquery.js"></script>
+    <script type="text/javascript" src="../../_static/underscore.js"></script>
+    <script type="text/javascript" src="../../_static/doctools.js"></script>
+    <script type="text/javascript" src="http://cdn.mathjax.org/mathjax/latest/MathJax.js?config=TeX-AMS-MML_HTMLorMML"></script>
+    <link rel="top" title="MITx 1.0 documentation" href="../../index.html" />
+    <link rel="up" title="Module code" href="../index.html" /> 
+  </head>
+  <body>
+<img src="../../_static/homepage-bg.jpg" alt="Edx logo"  width="100%;"/>
+
+    <div class="related">
+      <h3>Navigation</h3>
+      <ul>
+        <li class="right" style="margin-right: 10px">
+          <a href="../../genindex.html" title="General Index"
+             accesskey="I">index</a></li>
+        <li class="right" >
+          <a href="../../py-modindex.html" title="Python Module Index"
+             >modules</a> |</li>
+        <li><a href="../../index.html">MITx 1.0 documentation</a> &raquo;</li>
+          <li><a href="../index.html" accesskey="U">Module code</a> &raquo;</li> 
+      </ul>
+    </div>
+      <div class="sphinxsidebar">
+        <div class="sphinxsidebarwrapper">
+<div id="searchbox" style="display: none">
+  <h3>Quick search</h3>
+    <form class="search" action="../../search.html" method="get">
+      <input type="text" name="q" />
+      <input type="submit" value="Go" />
+      <input type="hidden" name="check_keywords" value="yes" />
+      <input type="hidden" name="area" value="default" />
+    </form>
+    <p class="searchtip" style="font-size: 90%">
+    Enter search terms or a module, class or function name.
+    </p>
+</div>
+<script type="text/javascript">$('#searchbox').show(0);</script>
+        </div>
+      </div>
+
+    <div class="document">
+      <div class="documentwrapper">
+        <div class="bodywrapper">
+          <div class="body">
+            
+  <h1>Source code for xmodule.progress</h1><div class="highlight"><pre>
+<span class="sd">&#39;&#39;&#39;</span>
+<span class="sd">Progress class for modules.  Represents where a student is in a module.</span>
+
+<span class="sd">Useful things to know:</span>
+<span class="sd"> - Use Progress.to_js_status_str() to convert a progress into a simple</span>
+<span class="sd">   status string to pass to js.</span>
+<span class="sd"> - Use Progress.to_js_detail_str() to convert a progress into a more detailed</span>
+<span class="sd">   string to pass to js.</span>
+
+<span class="sd">In particular, these functions have a canonical handing of None.</span>
+
+<span class="sd">For most subclassing needs, you should only need to reimplement</span>
+<span class="sd">frac() and __str__().</span>
+<span class="sd">&#39;&#39;&#39;</span>
+
+<span class="kn">from</span> <span class="nn">collections</span> <span class="kn">import</span> <span class="n">namedtuple</span>
+<span class="kn">import</span> <span class="nn">numbers</span>
+
+
+<div class="viewcode-block" id="Progress"><a class="viewcode-back" href="../../xmodule.html#xmodule.progress.Progress">[docs]</a><span class="k">class</span> <span class="nc">Progress</span><span class="p">(</span><span class="nb">object</span><span class="p">):</span>
+    <span class="sd">&#39;&#39;&#39;Represents a progress of a/b (a out of b done)</span>
+
+<span class="sd">    a and b must be numeric, but not necessarily integer, with</span>
+<span class="sd">    0 &lt;= a &lt;= b and b &gt; 0.</span>
+
+<span class="sd">    Progress can only represent Progress for modules where that makes sense.  Other</span>
+<span class="sd">    modules (e.g. html) should return None from get_progress().</span>
+
+<span class="sd">    TODO: add tag for module type?  Would allow for smarter merging.</span>
+<span class="sd">    &#39;&#39;&#39;</span>
+
+    <span class="k">def</span> <span class="nf">__init__</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">a</span><span class="p">,</span> <span class="n">b</span><span class="p">):</span>
+        <span class="sd">&#39;&#39;&#39;Construct a Progress object.  a and b must be numbers, and must have</span>
+<span class="sd">              0 &lt;= a &lt;= b and b &gt; 0</span>
+<span class="sd">        &#39;&#39;&#39;</span>
+
+        <span class="c"># Want to do all checking at construction time, so explicitly check types</span>
+        <span class="k">if</span> <span class="ow">not</span> <span class="p">(</span><span class="nb">isinstance</span><span class="p">(</span><span class="n">a</span><span class="p">,</span> <span class="n">numbers</span><span class="o">.</span><span class="n">Number</span><span class="p">)</span> <span class="ow">and</span>
+                <span class="nb">isinstance</span><span class="p">(</span><span class="n">b</span><span class="p">,</span> <span class="n">numbers</span><span class="o">.</span><span class="n">Number</span><span class="p">)):</span>
+            <span class="k">raise</span> <span class="ne">TypeError</span><span class="p">(</span><span class="s">&#39;a and b must be numbers.  Passed {0}/{1}&#39;</span><span class="o">.</span><span class="n">format</span><span class="p">(</span><span class="n">a</span><span class="p">,</span> <span class="n">b</span><span class="p">))</span>
+
+        <span class="k">if</span> <span class="n">a</span> <span class="o">&gt;</span> <span class="n">b</span><span class="p">:</span>
+            <span class="n">a</span> <span class="o">=</span> <span class="n">b</span>
+
+        <span class="k">if</span> <span class="n">a</span> <span class="o">&lt;</span> <span class="mi">0</span><span class="p">:</span>
+            <span class="n">a</span> <span class="o">=</span> <span class="mi">0</span>
+
+        <span class="k">if</span> <span class="n">b</span> <span class="o">&lt;=</span> <span class="mi">0</span><span class="p">:</span>
+            <span class="k">raise</span> <span class="ne">ValueError</span><span class="p">(</span><span class="s">&#39;fraction a/b = {0}/{1} must have b &gt; 0&#39;</span><span class="o">.</span><span class="n">format</span><span class="p">(</span><span class="n">a</span><span class="p">,</span> <span class="n">b</span><span class="p">))</span>
+
+        <span class="bp">self</span><span class="o">.</span><span class="n">_a</span> <span class="o">=</span> <span class="n">a</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">_b</span> <span class="o">=</span> <span class="n">b</span>
+
+<div class="viewcode-block" id="Progress.frac"><a class="viewcode-back" href="../../xmodule.html#xmodule.progress.Progress.frac">[docs]</a>    <span class="k">def</span> <span class="nf">frac</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
+        <span class="sd">&#39;&#39;&#39; Return tuple (a,b) representing progress of a/b&#39;&#39;&#39;</span>
+        <span class="k">return</span> <span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">_a</span><span class="p">,</span> <span class="bp">self</span><span class="o">.</span><span class="n">_b</span><span class="p">)</span>
+</div>
+<div class="viewcode-block" id="Progress.percent"><a class="viewcode-back" href="../../xmodule.html#xmodule.progress.Progress.percent">[docs]</a>    <span class="k">def</span> <span class="nf">percent</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
+        <span class="sd">&#39;&#39;&#39; Returns a percentage progress as a float between 0 and 100.</span>
+
+<span class="sd">        subclassing note: implemented in terms of frac(), assumes sanity</span>
+<span class="sd">        checking is done at construction time.</span>
+<span class="sd">        &#39;&#39;&#39;</span>
+        <span class="p">(</span><span class="n">a</span><span class="p">,</span> <span class="n">b</span><span class="p">)</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">frac</span><span class="p">()</span>
+        <span class="k">return</span> <span class="mf">100.0</span> <span class="o">*</span> <span class="n">a</span> <span class="o">/</span> <span class="n">b</span>
+</div>
+<div class="viewcode-block" id="Progress.started"><a class="viewcode-back" href="../../xmodule.html#xmodule.progress.Progress.started">[docs]</a>    <span class="k">def</span> <span class="nf">started</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
+        <span class="sd">&#39;&#39;&#39; Returns True if fractional progress is greater than 0.</span>
+
+<span class="sd">        subclassing note: implemented in terms of frac(), assumes sanity</span>
+<span class="sd">        checking is done at construction time.</span>
+<span class="sd">        &#39;&#39;&#39;</span>
+        <span class="k">return</span> <span class="bp">self</span><span class="o">.</span><span class="n">frac</span><span class="p">()[</span><span class="mi">0</span><span class="p">]</span> <span class="o">&gt;</span> <span class="mi">0</span>
+</div>
+<div class="viewcode-block" id="Progress.inprogress"><a class="viewcode-back" href="../../xmodule.html#xmodule.progress.Progress.inprogress">[docs]</a>    <span class="k">def</span> <span class="nf">inprogress</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
+        <span class="sd">&#39;&#39;&#39; Returns True if fractional progress is strictly between 0 and 1.</span>
+
+<span class="sd">        subclassing note: implemented in terms of frac(), assumes sanity</span>
+<span class="sd">        checking is done at construction time.</span>
+<span class="sd">        &#39;&#39;&#39;</span>
+        <span class="p">(</span><span class="n">a</span><span class="p">,</span> <span class="n">b</span><span class="p">)</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">frac</span><span class="p">()</span>
+        <span class="k">return</span> <span class="n">a</span> <span class="o">&gt;</span> <span class="mi">0</span> <span class="ow">and</span> <span class="n">a</span> <span class="o">&lt;</span> <span class="n">b</span>
+</div>
+<div class="viewcode-block" id="Progress.done"><a class="viewcode-back" href="../../xmodule.html#xmodule.progress.Progress.done">[docs]</a>    <span class="k">def</span> <span class="nf">done</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
+        <span class="sd">&#39;&#39;&#39; Return True if this represents done.</span>
+
+<span class="sd">        subclassing note: implemented in terms of frac(), assumes sanity</span>
+<span class="sd">        checking is done at construction time.</span>
+<span class="sd">        &#39;&#39;&#39;</span>
+        <span class="p">(</span><span class="n">a</span><span class="p">,</span> <span class="n">b</span><span class="p">)</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">frac</span><span class="p">()</span>
+        <span class="k">return</span> <span class="n">a</span> <span class="o">==</span> <span class="n">b</span>
+</div>
+<div class="viewcode-block" id="Progress.ternary_str"><a class="viewcode-back" href="../../xmodule.html#xmodule.progress.Progress.ternary_str">[docs]</a>    <span class="k">def</span> <span class="nf">ternary_str</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
+        <span class="sd">&#39;&#39;&#39; Return a string version of this progress: either</span>
+<span class="sd">           &quot;none&quot;, &quot;in_progress&quot;, or &quot;done&quot;.</span>
+
+<span class="sd">        subclassing note: implemented in terms of frac()</span>
+<span class="sd">        &#39;&#39;&#39;</span>
+        <span class="p">(</span><span class="n">a</span><span class="p">,</span> <span class="n">b</span><span class="p">)</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">frac</span><span class="p">()</span>
+        <span class="k">if</span> <span class="n">a</span> <span class="o">==</span> <span class="mi">0</span><span class="p">:</span>
+            <span class="k">return</span> <span class="s">&quot;none&quot;</span>
+        <span class="k">if</span> <span class="n">a</span> <span class="o">&lt;</span> <span class="n">b</span><span class="p">:</span>
+            <span class="k">return</span> <span class="s">&quot;in_progress&quot;</span>
+        <span class="k">return</span> <span class="s">&quot;done&quot;</span>
+</div>
+    <span class="k">def</span> <span class="nf">__eq__</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">other</span><span class="p">):</span>
+        <span class="sd">&#39;&#39;&#39; Two Progress objects are equal if they have identical values.</span>
+<span class="sd">        Implemented in terms of frac()&#39;&#39;&#39;</span>
+        <span class="k">if</span> <span class="ow">not</span> <span class="nb">isinstance</span><span class="p">(</span><span class="n">other</span><span class="p">,</span> <span class="n">Progress</span><span class="p">):</span>
+            <span class="k">return</span> <span class="bp">False</span>
+        <span class="p">(</span><span class="n">a</span><span class="p">,</span> <span class="n">b</span><span class="p">)</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">frac</span><span class="p">()</span>
+        <span class="p">(</span><span class="n">a2</span><span class="p">,</span> <span class="n">b2</span><span class="p">)</span> <span class="o">=</span> <span class="n">other</span><span class="o">.</span><span class="n">frac</span><span class="p">()</span>
+        <span class="k">return</span> <span class="n">a</span> <span class="o">==</span> <span class="n">a2</span> <span class="ow">and</span> <span class="n">b</span> <span class="o">==</span> <span class="n">b2</span>
+
+    <span class="k">def</span> <span class="nf">__ne__</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">other</span><span class="p">):</span>
+        <span class="sd">&#39;&#39;&#39; The opposite of equal&#39;&#39;&#39;</span>
+        <span class="k">return</span> <span class="ow">not</span> <span class="bp">self</span><span class="o">.</span><span class="n">__eq__</span><span class="p">(</span><span class="n">other</span><span class="p">)</span>
+
+    <span class="k">def</span> <span class="nf">__str__</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
+        <span class="sd">&#39;&#39;&#39; Return a string representation of this string.</span>
+
+<span class="sd">        subclassing note: implemented in terms of frac().</span>
+<span class="sd">        &#39;&#39;&#39;</span>
+        <span class="p">(</span><span class="n">a</span><span class="p">,</span> <span class="n">b</span><span class="p">)</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">frac</span><span class="p">()</span>
+        <span class="k">return</span> <span class="s">&quot;{0}/{1}&quot;</span><span class="o">.</span><span class="n">format</span><span class="p">(</span><span class="n">a</span><span class="p">,</span> <span class="n">b</span><span class="p">)</span>
+
+    <span class="nd">@staticmethod</span>
+<div class="viewcode-block" id="Progress.add_counts"><a class="viewcode-back" href="../../xmodule.html#xmodule.progress.Progress.add_counts">[docs]</a>    <span class="k">def</span> <span class="nf">add_counts</span><span class="p">(</span><span class="n">a</span><span class="p">,</span> <span class="n">b</span><span class="p">):</span>
+        <span class="sd">&#39;&#39;&#39;Add two progress indicators, assuming that each represents items done:</span>
+<span class="sd">        (a / b) + (c / d) = (a + c) / (b + d).</span>
+<span class="sd">        If either is None, returns the other.</span>
+<span class="sd">        &#39;&#39;&#39;</span>
+        <span class="k">if</span> <span class="n">a</span> <span class="ow">is</span> <span class="bp">None</span><span class="p">:</span>
+            <span class="k">return</span> <span class="n">b</span>
+        <span class="k">if</span> <span class="n">b</span> <span class="ow">is</span> <span class="bp">None</span><span class="p">:</span>
+            <span class="k">return</span> <span class="n">a</span>
+        <span class="c"># get numerators + denominators</span>
+        <span class="p">(</span><span class="n">n</span><span class="p">,</span> <span class="n">d</span><span class="p">)</span> <span class="o">=</span> <span class="n">a</span><span class="o">.</span><span class="n">frac</span><span class="p">()</span>
+        <span class="p">(</span><span class="n">n2</span><span class="p">,</span> <span class="n">d2</span><span class="p">)</span> <span class="o">=</span> <span class="n">b</span><span class="o">.</span><span class="n">frac</span><span class="p">()</span>
+        <span class="k">return</span> <span class="n">Progress</span><span class="p">(</span><span class="n">n</span> <span class="o">+</span> <span class="n">n2</span><span class="p">,</span> <span class="n">d</span> <span class="o">+</span> <span class="n">d2</span><span class="p">)</span>
+</div>
+    <span class="nd">@staticmethod</span>
+<div class="viewcode-block" id="Progress.to_js_status_str"><a class="viewcode-back" href="../../xmodule.html#xmodule.progress.Progress.to_js_status_str">[docs]</a>    <span class="k">def</span> <span class="nf">to_js_status_str</span><span class="p">(</span><span class="n">progress</span><span class="p">):</span>
+        <span class="sd">&#39;&#39;&#39;</span>
+<span class="sd">        Return the &quot;status string&quot; version of the passed Progress</span>
+<span class="sd">        object that should be passed to js.  Use this function when</span>
+<span class="sd">        sending Progress objects to js to limit dependencies.</span>
+<span class="sd">        &#39;&#39;&#39;</span>
+        <span class="k">if</span> <span class="n">progress</span> <span class="ow">is</span> <span class="bp">None</span><span class="p">:</span>
+            <span class="k">return</span> <span class="s">&quot;NA&quot;</span>
+        <span class="k">return</span> <span class="n">progress</span><span class="o">.</span><span class="n">ternary_str</span><span class="p">()</span>
+</div>
+    <span class="nd">@staticmethod</span>
+<div class="viewcode-block" id="Progress.to_js_detail_str"><a class="viewcode-back" href="../../xmodule.html#xmodule.progress.Progress.to_js_detail_str">[docs]</a>    <span class="k">def</span> <span class="nf">to_js_detail_str</span><span class="p">(</span><span class="n">progress</span><span class="p">):</span>
+        <span class="sd">&#39;&#39;&#39;</span>
+<span class="sd">        Return the &quot;detail string&quot; version of the passed Progress</span>
+<span class="sd">        object that should be passed to js.  Use this function when</span>
+<span class="sd">        passing Progress objects to js to limit dependencies.</span>
+<span class="sd">        &#39;&#39;&#39;</span>
+        <span class="k">if</span> <span class="n">progress</span> <span class="ow">is</span> <span class="bp">None</span><span class="p">:</span>
+            <span class="k">return</span> <span class="s">&quot;NA&quot;</span>
+        <span class="k">return</span> <span class="nb">str</span><span class="p">(</span><span class="n">progress</span><span class="p">)</span></div></div>
+</pre></div>
+
+          </div>
+        </div>
+      </div>
+      <div class="clearer"></div>
+    </div>
+    <div class="related">
+      <h3>Navigation</h3>
+      <ul>
+        <li class="right" style="margin-right: 10px">
+          <a href="../../genindex.html" title="General Index"
+             >index</a></li>
+        <li class="right" >
+          <a href="../../py-modindex.html" title="Python Module Index"
+             >modules</a> |</li>
+        <li><a href="../../index.html">MITx 1.0 documentation</a> &raquo;</li>
+          <li><a href="../index.html" >Module code</a> &raquo;</li> 
+      </ul>
+    </div>
+    <div class="footer">
+        &copy; Copyright 2012, MITx team.
+      Created using <a href="http://sphinx.pocoo.org/">Sphinx</a> 1.1.3.
+    </div>
+  </body>
+</html>

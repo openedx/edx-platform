@@ -1,0 +1,177 @@
+
+
+<!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Transitional//EN"
+  "http://www.w3.org/TR/xhtml1/DTD/xhtml1-transitional.dtd">
+
+
+<html xmlns="http://www.w3.org/1999/xhtml">
+  <head>
+    <meta http-equiv="Content-Type" content="text/html; charset=utf-8" />
+    
+    <title>xmodule.templates &mdash; MITx 1.0 documentation</title>
+    
+    <link rel="stylesheet" href="../../_static/sphinxdoc.css" type="text/css" />
+    <link rel="stylesheet" href="../../_static/pygments.css" type="text/css" />
+    
+    <script type="text/javascript">
+      var DOCUMENTATION_OPTIONS = {
+        URL_ROOT:    '../../',
+        VERSION:     '1.0',
+        COLLAPSE_INDEX: false,
+        FILE_SUFFIX: '.html',
+        HAS_SOURCE:  true
+      };
+    </script>
+    <script type="text/javascript" src="../../_static/jquery.js"></script>
+    <script type="text/javascript" src="../../_static/underscore.js"></script>
+    <script type="text/javascript" src="../../_static/doctools.js"></script>
+    <script type="text/javascript" src="http://cdn.mathjax.org/mathjax/latest/MathJax.js?config=TeX-AMS-MML_HTMLorMML"></script>
+    <link rel="top" title="MITx 1.0 documentation" href="../../index.html" />
+    <link rel="up" title="Module code" href="../index.html" /> 
+  </head>
+  <body>
+<img src="../../_static/homepage-bg.jpg" alt="Edx logo"  width="100%;"/>
+
+    <div class="related">
+      <h3>Navigation</h3>
+      <ul>
+        <li class="right" style="margin-right: 10px">
+          <a href="../../genindex.html" title="General Index"
+             accesskey="I">index</a></li>
+        <li class="right" >
+          <a href="../../py-modindex.html" title="Python Module Index"
+             >modules</a> |</li>
+        <li><a href="../../index.html">MITx 1.0 documentation</a> &raquo;</li>
+          <li><a href="../index.html" accesskey="U">Module code</a> &raquo;</li> 
+      </ul>
+    </div>
+      <div class="sphinxsidebar">
+        <div class="sphinxsidebarwrapper">
+<div id="searchbox" style="display: none">
+  <h3>Quick search</h3>
+    <form class="search" action="../../search.html" method="get">
+      <input type="text" name="q" />
+      <input type="submit" value="Go" />
+      <input type="hidden" name="check_keywords" value="yes" />
+      <input type="hidden" name="area" value="default" />
+    </form>
+    <p class="searchtip" style="font-size: 90%">
+    Enter search terms or a module, class or function name.
+    </p>
+</div>
+<script type="text/javascript">$('#searchbox').show(0);</script>
+        </div>
+      </div>
+
+    <div class="document">
+      <div class="documentwrapper">
+        <div class="bodywrapper">
+          <div class="body">
+            
+  <h1>Source code for xmodule.templates</h1><div class="highlight"><pre>
+<span class="sd">&quot;&quot;&quot;</span>
+<span class="sd">This module handles loading xmodule templates from disk into the modulestore.</span>
+<span class="sd">These templates are used by the CMS to provide baseline content that</span>
+<span class="sd">can be cloned when adding new modules to a course.</span>
+
+<span class="sd">`Template`s are defined in x_module. They contain 3 attributes:</span>
+<span class="sd">    metadata: A dictionary with the template metadata</span>
+<span class="sd">    data: A JSON value that defines the template content</span>
+<span class="sd">    children: A list of Location urls that define the template children</span>
+
+<span class="sd">Templates are defined on XModuleDescriptor types, in the template attribute.</span>
+<span class="sd">&quot;&quot;&quot;</span>
+
+
+<span class="kn">import</span> <span class="nn">logging</span>
+<span class="kn">from</span> <span class="nn">fs.memoryfs</span> <span class="kn">import</span> <span class="n">MemoryFS</span>
+
+<span class="kn">from</span> <span class="nn">collections</span> <span class="kn">import</span> <span class="n">defaultdict</span>
+<span class="kn">from</span> <span class="nn">.x_module</span> <span class="kn">import</span> <span class="n">XModuleDescriptor</span>
+<span class="kn">from</span> <span class="nn">.mako_module</span> <span class="kn">import</span> <span class="n">MakoDescriptorSystem</span>
+<span class="kn">from</span> <span class="nn">.modulestore</span> <span class="kn">import</span> <span class="n">Location</span>
+<span class="kn">from</span> <span class="nn">.modulestore.django</span> <span class="kn">import</span> <span class="n">modulestore</span>
+
+<span class="n">log</span> <span class="o">=</span> <span class="n">logging</span><span class="o">.</span><span class="n">getLogger</span><span class="p">(</span><span class="n">__name__</span><span class="p">)</span>
+
+
+<div class="viewcode-block" id="all_templates"><a class="viewcode-back" href="../../xmodule.html#xmodule.templates.all_templates">[docs]</a><span class="k">def</span> <span class="nf">all_templates</span><span class="p">():</span>
+    <span class="sd">&quot;&quot;&quot;</span>
+<span class="sd">    Returns all templates for enabled modules, grouped by descriptor type</span>
+<span class="sd">    &quot;&quot;&quot;</span>
+
+    <span class="n">templates</span> <span class="o">=</span> <span class="n">defaultdict</span><span class="p">(</span><span class="nb">list</span><span class="p">)</span>
+    <span class="k">for</span> <span class="n">category</span><span class="p">,</span> <span class="n">descriptor</span> <span class="ow">in</span> <span class="n">XModuleDescriptor</span><span class="o">.</span><span class="n">load_classes</span><span class="p">():</span>
+        <span class="n">templates</span><span class="p">[</span><span class="n">category</span><span class="p">]</span> <span class="o">=</span> <span class="n">descriptor</span><span class="o">.</span><span class="n">templates</span><span class="p">()</span>
+
+    <span class="k">return</span> <span class="n">templates</span>
+
+</div>
+<div class="viewcode-block" id="TemplateTestSystem"><a class="viewcode-back" href="../../xmodule.html#xmodule.templates.TemplateTestSystem">[docs]</a><span class="k">class</span> <span class="nc">TemplateTestSystem</span><span class="p">(</span><span class="n">MakoDescriptorSystem</span><span class="p">):</span>
+    <span class="sd">&quot;&quot;&quot;</span>
+<span class="sd">    This system exists to help verify that XModuleDescriptors can be instantiated</span>
+<span class="sd">    from their defined templates before we load the templates into the modulestore.</span>
+<span class="sd">    &quot;&quot;&quot;</span>
+    <span class="k">def</span> <span class="nf">__init__</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
+        <span class="nb">super</span><span class="p">(</span><span class="n">TemplateTestSystem</span><span class="p">,</span> <span class="bp">self</span><span class="p">)</span><span class="o">.</span><span class="n">__init__</span><span class="p">(</span>
+            <span class="k">lambda</span> <span class="o">*</span><span class="n">a</span><span class="p">,</span> <span class="o">**</span><span class="n">k</span><span class="p">:</span> <span class="bp">None</span><span class="p">,</span>
+            <span class="n">MemoryFS</span><span class="p">(),</span>
+            <span class="k">lambda</span> <span class="n">msg</span><span class="p">:</span> <span class="bp">None</span><span class="p">,</span>
+            <span class="n">render_template</span><span class="o">=</span><span class="k">lambda</span> <span class="o">*</span><span class="n">a</span><span class="p">,</span> <span class="o">**</span><span class="n">k</span><span class="p">:</span> <span class="bp">None</span><span class="p">,</span>
+        <span class="p">)</span>
+
+</div>
+<div class="viewcode-block" id="update_templates"><a class="viewcode-back" href="../../xmodule.html#xmodule.templates.update_templates">[docs]</a><span class="k">def</span> <span class="nf">update_templates</span><span class="p">():</span>
+    <span class="sd">&quot;&quot;&quot;</span>
+<span class="sd">    Updates the set of templates in the modulestore with all templates currently</span>
+<span class="sd">    available from the installed plugins</span>
+<span class="sd">    &quot;&quot;&quot;</span>
+
+    <span class="k">for</span> <span class="n">category</span><span class="p">,</span> <span class="n">templates</span> <span class="ow">in</span> <span class="n">all_templates</span><span class="p">()</span><span class="o">.</span><span class="n">items</span><span class="p">():</span>
+        <span class="k">for</span> <span class="n">template</span> <span class="ow">in</span> <span class="n">templates</span><span class="p">:</span>
+            <span class="k">if</span> <span class="s">&#39;display_name&#39;</span> <span class="ow">not</span> <span class="ow">in</span> <span class="n">template</span><span class="o">.</span><span class="n">metadata</span><span class="p">:</span>
+                <span class="n">log</span><span class="o">.</span><span class="n">warning</span><span class="p">(</span><span class="s">&#39;No display_name specified in template {0}, skipping&#39;</span><span class="o">.</span><span class="n">format</span><span class="p">(</span><span class="n">template</span><span class="p">))</span>
+                <span class="k">continue</span>
+
+            <span class="n">template_location</span> <span class="o">=</span> <span class="n">Location</span><span class="p">(</span><span class="s">&#39;i4x&#39;</span><span class="p">,</span> <span class="s">&#39;edx&#39;</span><span class="p">,</span> <span class="s">&#39;templates&#39;</span><span class="p">,</span> <span class="n">category</span><span class="p">,</span> <span class="n">Location</span><span class="o">.</span><span class="n">clean_for_url_name</span><span class="p">(</span><span class="n">template</span><span class="o">.</span><span class="n">metadata</span><span class="p">[</span><span class="s">&#39;display_name&#39;</span><span class="p">]))</span>
+
+            <span class="k">try</span><span class="p">:</span>
+                <span class="n">json_data</span> <span class="o">=</span> <span class="n">template</span><span class="o">.</span><span class="n">_asdict</span><span class="p">()</span>
+                <span class="n">json_data</span><span class="p">[</span><span class="s">&#39;location&#39;</span><span class="p">]</span> <span class="o">=</span> <span class="n">template_location</span><span class="o">.</span><span class="n">dict</span><span class="p">()</span>
+                <span class="n">XModuleDescriptor</span><span class="o">.</span><span class="n">load_from_json</span><span class="p">(</span><span class="n">json_data</span><span class="p">,</span> <span class="n">TemplateTestSystem</span><span class="p">())</span>
+            <span class="k">except</span><span class="p">:</span>
+                <span class="n">log</span><span class="o">.</span><span class="n">warning</span><span class="p">(</span><span class="s">&#39;Unable to instantiate {cat} from template {template}, skipping&#39;</span><span class="o">.</span><span class="n">format</span><span class="p">(</span>
+                    <span class="n">cat</span><span class="o">=</span><span class="n">category</span><span class="p">,</span>
+                    <span class="n">template</span><span class="o">=</span><span class="n">template</span>
+                <span class="p">),</span> <span class="n">exc_info</span><span class="o">=</span><span class="bp">True</span><span class="p">)</span>
+                <span class="k">continue</span>
+
+            <span class="n">modulestore</span><span class="p">()</span><span class="o">.</span><span class="n">update_item</span><span class="p">(</span><span class="n">template_location</span><span class="p">,</span> <span class="n">template</span><span class="o">.</span><span class="n">data</span><span class="p">)</span>
+            <span class="n">modulestore</span><span class="p">()</span><span class="o">.</span><span class="n">update_children</span><span class="p">(</span><span class="n">template_location</span><span class="p">,</span> <span class="n">template</span><span class="o">.</span><span class="n">children</span><span class="p">)</span>
+            <span class="n">modulestore</span><span class="p">()</span><span class="o">.</span><span class="n">update_metadata</span><span class="p">(</span><span class="n">template_location</span><span class="p">,</span> <span class="n">template</span><span class="o">.</span><span class="n">metadata</span><span class="p">)</span></div>
+</pre></div>
+
+          </div>
+        </div>
+      </div>
+      <div class="clearer"></div>
+    </div>
+    <div class="related">
+      <h3>Navigation</h3>
+      <ul>
+        <li class="right" style="margin-right: 10px">
+          <a href="../../genindex.html" title="General Index"
+             >index</a></li>
+        <li class="right" >
+          <a href="../../py-modindex.html" title="Python Module Index"
+             >modules</a> |</li>
+        <li><a href="../../index.html">MITx 1.0 documentation</a> &raquo;</li>
+          <li><a href="../index.html" >Module code</a> &raquo;</li> 
+      </ul>
+    </div>
+    <div class="footer">
+        &copy; Copyright 2012, MITx team.
+      Created using <a href="http://sphinx.pocoo.org/">Sphinx</a> 1.1.3.
+    </div>
+  </body>
+</html>

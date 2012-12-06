@@ -1,0 +1,142 @@
+
+
+<!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Transitional//EN"
+  "http://www.w3.org/TR/xhtml1/DTD/xhtml1-transitional.dtd">
+
+
+<html xmlns="http://www.w3.org/1999/xhtml">
+  <head>
+    <meta http-equiv="Content-Type" content="text/html; charset=utf-8" />
+    
+    <title>psychometrics.models &mdash; MITx 1.0 documentation</title>
+    
+    <link rel="stylesheet" href="../../_static/sphinxdoc.css" type="text/css" />
+    <link rel="stylesheet" href="../../_static/pygments.css" type="text/css" />
+    
+    <script type="text/javascript">
+      var DOCUMENTATION_OPTIONS = {
+        URL_ROOT:    '../../',
+        VERSION:     '1.0',
+        COLLAPSE_INDEX: false,
+        FILE_SUFFIX: '.html',
+        HAS_SOURCE:  true
+      };
+    </script>
+    <script type="text/javascript" src="../../_static/jquery.js"></script>
+    <script type="text/javascript" src="../../_static/underscore.js"></script>
+    <script type="text/javascript" src="../../_static/doctools.js"></script>
+    <script type="text/javascript" src="http://cdn.mathjax.org/mathjax/latest/MathJax.js?config=TeX-AMS-MML_HTMLorMML"></script>
+    <link rel="top" title="MITx 1.0 documentation" href="../../index.html" />
+    <link rel="up" title="Module code" href="../index.html" /> 
+  </head>
+  <body>
+<img src="../../_static/homepage-bg.jpg" alt="Edx logo"  width="100%;"/>
+
+    <div class="related">
+      <h3>Navigation</h3>
+      <ul>
+        <li class="right" style="margin-right: 10px">
+          <a href="../../genindex.html" title="General Index"
+             accesskey="I">index</a></li>
+        <li class="right" >
+          <a href="../../py-modindex.html" title="Python Module Index"
+             >modules</a> |</li>
+        <li><a href="../../index.html">MITx 1.0 documentation</a> &raquo;</li>
+          <li><a href="../index.html" accesskey="U">Module code</a> &raquo;</li> 
+      </ul>
+    </div>
+      <div class="sphinxsidebar">
+        <div class="sphinxsidebarwrapper">
+<div id="searchbox" style="display: none">
+  <h3>Quick search</h3>
+    <form class="search" action="../../search.html" method="get">
+      <input type="text" name="q" />
+      <input type="submit" value="Go" />
+      <input type="hidden" name="check_keywords" value="yes" />
+      <input type="hidden" name="area" value="default" />
+    </form>
+    <p class="searchtip" style="font-size: 90%">
+    Enter search terms or a module, class or function name.
+    </p>
+</div>
+<script type="text/javascript">$('#searchbox').show(0);</script>
+        </div>
+      </div>
+
+    <div class="document">
+      <div class="documentwrapper">
+        <div class="bodywrapper">
+          <div class="body">
+            
+  <h1>Source code for psychometrics.models</h1><div class="highlight"><pre>
+<span class="c">#</span>
+<span class="c"># db model for psychometrics data</span>
+<span class="c">#</span>
+<span class="c"># this data is collected in real time</span>
+<span class="c">#</span>
+
+<span class="kn">from</span> <span class="nn">django.db</span> <span class="kn">import</span> <span class="n">models</span>
+<span class="kn">from</span> <span class="nn">courseware.models</span> <span class="kn">import</span> <span class="n">StudentModule</span>
+
+<div class="viewcode-block" id="PsychometricData"><a class="viewcode-back" href="../../lms.html#psychometrics.models.PsychometricData">[docs]</a><span class="k">class</span> <span class="nc">PsychometricData</span><span class="p">(</span><span class="n">models</span><span class="o">.</span><span class="n">Model</span><span class="p">):</span>
+    <span class="sd">&quot;&quot;&quot;</span>
+<span class="sd">    This data is a table linking student, module, and module performance,</span>
+<span class="sd">    including number of attempts, grade, max grade, and time of checks.</span>
+
+<span class="sd">    Links to instances of StudentModule, but only those for capa problems.</span>
+
+<span class="sd">    Note that StudentModule.module_state_key is nominally a Location instance (url string).</span>
+<span class="sd">    That means it is of the form {tag}://{org}/{course}/{category}/{name}[@{revision}]</span>
+<span class="sd">    and for capa problems, category = &quot;problem&quot;.</span>
+
+<span class="sd">    checktimes is extracted from tracking logs, or added by capa module via psychometrics callback.</span>
+<span class="sd">    &quot;&quot;&quot;</span>
+
+    <span class="n">studentmodule</span> <span class="o">=</span> <span class="n">models</span><span class="o">.</span><span class="n">ForeignKey</span><span class="p">(</span><span class="n">StudentModule</span><span class="p">,</span> <span class="n">db_index</span><span class="o">=</span><span class="bp">True</span><span class="p">,</span> <span class="n">unique</span><span class="o">=</span><span class="bp">True</span><span class="p">)</span>   <span class="c"># contains student, module_state_key, course_id</span>
+
+    <span class="n">done</span> <span class="o">=</span> <span class="n">models</span><span class="o">.</span><span class="n">BooleanField</span><span class="p">(</span><span class="n">default</span><span class="o">=</span><span class="bp">False</span><span class="p">)</span>
+    <span class="n">attempts</span> <span class="o">=</span> <span class="n">models</span><span class="o">.</span><span class="n">IntegerField</span><span class="p">(</span><span class="n">default</span><span class="o">=</span><span class="mi">0</span><span class="p">)</span>			<span class="c"># extracted from studentmodule.state</span>
+    <span class="n">checktimes</span> <span class="o">=</span> <span class="n">models</span><span class="o">.</span><span class="n">TextField</span><span class="p">(</span><span class="n">null</span><span class="o">=</span><span class="bp">True</span><span class="p">,</span> <span class="n">blank</span><span class="o">=</span><span class="bp">True</span><span class="p">)</span>	<span class="c"># internally stored as list of datetime objects</span>
+
+    <span class="c"># keep in mind</span>
+    <span class="c"># grade = studentmodule.grade</span>
+    <span class="c"># max_grade = studentmodule.max_grade</span>
+    <span class="c"># student = studentmodule.student</span>
+    <span class="c"># course_id = studentmodule.course_id</span>
+    <span class="c"># location = studentmodule.module_state_key</span>
+    
+    <span class="k">def</span> <span class="nf">__unicode__</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
+        <span class="n">sm</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">studentmodule</span>
+        <span class="k">return</span> <span class="s">&quot;[PsychometricData] </span><span class="si">%s</span><span class="s"> url=</span><span class="si">%s</span><span class="s">, grade=</span><span class="si">%s</span><span class="s">, max=</span><span class="si">%s</span><span class="s">, attempts=</span><span class="si">%s</span><span class="s">, ct=</span><span class="si">%s</span><span class="s">&quot;</span> <span class="o">%</span> <span class="p">(</span><span class="n">sm</span><span class="o">.</span><span class="n">student</span><span class="p">,</span>
+                                                                                       <span class="n">sm</span><span class="o">.</span><span class="n">module_state_key</span><span class="p">,</span>
+                                                                                       <span class="n">sm</span><span class="o">.</span><span class="n">grade</span><span class="p">,</span>
+                                                                                       <span class="n">sm</span><span class="o">.</span><span class="n">max_grade</span><span class="p">,</span>
+                                                                                       <span class="bp">self</span><span class="o">.</span><span class="n">attempts</span><span class="p">,</span>
+                                                                                       <span class="bp">self</span><span class="o">.</span><span class="n">checktimes</span><span class="p">)</span>
+    </div>
+</pre></div>
+
+          </div>
+        </div>
+      </div>
+      <div class="clearer"></div>
+    </div>
+    <div class="related">
+      <h3>Navigation</h3>
+      <ul>
+        <li class="right" style="margin-right: 10px">
+          <a href="../../genindex.html" title="General Index"
+             >index</a></li>
+        <li class="right" >
+          <a href="../../py-modindex.html" title="Python Module Index"
+             >modules</a> |</li>
+        <li><a href="../../index.html">MITx 1.0 documentation</a> &raquo;</li>
+          <li><a href="../index.html" >Module code</a> &raquo;</li> 
+      </ul>
+    </div>
+    <div class="footer">
+        &copy; Copyright 2012, MITx team.
+      Created using <a href="http://sphinx.pocoo.org/">Sphinx</a> 1.1.3.
+    </div>
+  </body>
+</html>

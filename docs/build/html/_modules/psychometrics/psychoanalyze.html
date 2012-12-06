@@ -1,0 +1,435 @@
+
+
+<!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Transitional//EN"
+  "http://www.w3.org/TR/xhtml1/DTD/xhtml1-transitional.dtd">
+
+
+<html xmlns="http://www.w3.org/1999/xhtml">
+  <head>
+    <meta http-equiv="Content-Type" content="text/html; charset=utf-8" />
+    
+    <title>psychometrics.psychoanalyze &mdash; MITx 1.0 documentation</title>
+    
+    <link rel="stylesheet" href="../../_static/sphinxdoc.css" type="text/css" />
+    <link rel="stylesheet" href="../../_static/pygments.css" type="text/css" />
+    
+    <script type="text/javascript">
+      var DOCUMENTATION_OPTIONS = {
+        URL_ROOT:    '../../',
+        VERSION:     '1.0',
+        COLLAPSE_INDEX: false,
+        FILE_SUFFIX: '.html',
+        HAS_SOURCE:  true
+      };
+    </script>
+    <script type="text/javascript" src="../../_static/jquery.js"></script>
+    <script type="text/javascript" src="../../_static/underscore.js"></script>
+    <script type="text/javascript" src="../../_static/doctools.js"></script>
+    <script type="text/javascript" src="http://cdn.mathjax.org/mathjax/latest/MathJax.js?config=TeX-AMS-MML_HTMLorMML"></script>
+    <link rel="top" title="MITx 1.0 documentation" href="../../index.html" />
+    <link rel="up" title="Module code" href="../index.html" /> 
+  </head>
+  <body>
+<img src="../../_static/homepage-bg.jpg" alt="Edx logo"  width="100%;"/>
+
+    <div class="related">
+      <h3>Navigation</h3>
+      <ul>
+        <li class="right" style="margin-right: 10px">
+          <a href="../../genindex.html" title="General Index"
+             accesskey="I">index</a></li>
+        <li class="right" >
+          <a href="../../py-modindex.html" title="Python Module Index"
+             >modules</a> |</li>
+        <li><a href="../../index.html">MITx 1.0 documentation</a> &raquo;</li>
+          <li><a href="../index.html" accesskey="U">Module code</a> &raquo;</li> 
+      </ul>
+    </div>
+      <div class="sphinxsidebar">
+        <div class="sphinxsidebarwrapper">
+<div id="searchbox" style="display: none">
+  <h3>Quick search</h3>
+    <form class="search" action="../../search.html" method="get">
+      <input type="text" name="q" />
+      <input type="submit" value="Go" />
+      <input type="hidden" name="check_keywords" value="yes" />
+      <input type="hidden" name="area" value="default" />
+    </form>
+    <p class="searchtip" style="font-size: 90%">
+    Enter search terms or a module, class or function name.
+    </p>
+</div>
+<script type="text/javascript">$('#searchbox').show(0);</script>
+        </div>
+      </div>
+
+    <div class="document">
+      <div class="documentwrapper">
+        <div class="bodywrapper">
+          <div class="body">
+            
+  <h1>Source code for psychometrics.psychoanalyze</h1><div class="highlight"><pre>
+<span class="c">#</span>
+<span class="c"># File:   psychometrics/psychoanalyze.py</span>
+<span class="c">#</span>
+<span class="c"># generate pyschometrics plots from PsychometricData</span>
+
+<span class="kn">from</span> <span class="nn">__future__</span> <span class="kn">import</span> <span class="n">division</span>
+
+<span class="kn">import</span> <span class="nn">datetime</span>
+<span class="kn">import</span> <span class="nn">logging</span>
+<span class="kn">import</span> <span class="nn">json</span>
+<span class="kn">import</span> <span class="nn">math</span>
+<span class="kn">import</span> <span class="nn">numpy</span> <span class="kn">as</span> <span class="nn">np</span>
+<span class="kn">from</span> <span class="nn">scipy.optimize</span> <span class="kn">import</span> <span class="n">curve_fit</span>
+
+<span class="kn">from</span> <span class="nn">django.conf</span> <span class="kn">import</span> <span class="n">settings</span>
+<span class="kn">from</span> <span class="nn">django.db.models</span> <span class="kn">import</span> <span class="n">Sum</span><span class="p">,</span> <span class="n">Max</span>
+<span class="kn">from</span> <span class="nn">psychometrics.models</span> <span class="kn">import</span> <span class="o">*</span>
+<span class="kn">from</span> <span class="nn">xmodule.modulestore</span> <span class="kn">import</span> <span class="n">Location</span>
+
+<span class="n">log</span> <span class="o">=</span> <span class="n">logging</span><span class="o">.</span><span class="n">getLogger</span><span class="p">(</span><span class="s">&quot;mitx.psychometrics&quot;</span><span class="p">)</span>
+
+<span class="c">#db = &quot;ocwtutor&quot;        # for debugging</span>
+<span class="c">#db = &quot;default&quot;</span>
+
+<span class="n">db</span> <span class="o">=</span> <span class="nb">getattr</span><span class="p">(</span><span class="n">settings</span><span class="p">,</span> <span class="s">&#39;DATABASE_FOR_PSYCHOMETRICS&#39;</span><span class="p">,</span> <span class="s">&#39;default&#39;</span><span class="p">)</span>
+
+<span class="c">#-----------------------------------------------------------------------------</span>
+<span class="c"># fit functions</span>
+
+
+<div class="viewcode-block" id="func_2pl"><a class="viewcode-back" href="../../lms.html#psychometrics.psychoanalyze.func_2pl">[docs]</a><span class="k">def</span> <span class="nf">func_2pl</span><span class="p">(</span><span class="n">x</span><span class="p">,</span> <span class="n">a</span><span class="p">,</span> <span class="n">b</span><span class="p">):</span>
+    <span class="sd">&quot;&quot;&quot;</span>
+<span class="sd">    2-parameter logistic function</span>
+<span class="sd">    &quot;&quot;&quot;</span>
+    <span class="n">D</span> <span class="o">=</span> <span class="mf">1.7</span>
+    <span class="n">edax</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">exp</span><span class="p">(</span><span class="n">D</span> <span class="o">*</span> <span class="n">a</span> <span class="o">*</span> <span class="p">(</span><span class="n">x</span> <span class="o">-</span> <span class="n">b</span><span class="p">))</span>
+    <span class="k">return</span> <span class="n">edax</span> <span class="o">/</span> <span class="p">(</span><span class="mi">1</span> <span class="o">+</span> <span class="n">edax</span><span class="p">)</span>
+
+<span class="c">#-----------------------------------------------------------------------------</span>
+<span class="c"># statistics class</span>
+
+</div>
+<div class="viewcode-block" id="StatVar"><a class="viewcode-back" href="../../lms.html#psychometrics.psychoanalyze.StatVar">[docs]</a><span class="k">class</span> <span class="nc">StatVar</span><span class="p">(</span><span class="nb">object</span><span class="p">):</span>
+    <span class="sd">&quot;&quot;&quot;</span>
+<span class="sd">    Simple statistics on floating point numbers: avg, sdv, var, min, max</span>
+<span class="sd">    &quot;&quot;&quot;</span>
+    <span class="k">def</span> <span class="nf">__init__</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">unit</span><span class="o">=</span><span class="mi">1</span><span class="p">):</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">sum</span> <span class="o">=</span> <span class="mi">0</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">sum2</span> <span class="o">=</span> <span class="mi">0</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">cnt</span> <span class="o">=</span> <span class="mi">0</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">unit</span> <span class="o">=</span> <span class="n">unit</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">min</span> <span class="o">=</span> <span class="bp">None</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">max</span> <span class="o">=</span> <span class="bp">None</span>
+
+    <span class="k">def</span> <span class="nf">add</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">x</span><span class="p">):</span>
+        <span class="k">if</span> <span class="n">x</span> <span class="ow">is</span> <span class="bp">None</span><span class="p">:</span>
+            <span class="k">return</span>
+        <span class="k">if</span> <span class="bp">self</span><span class="o">.</span><span class="n">min</span> <span class="ow">is</span> <span class="bp">None</span><span class="p">:</span>
+            <span class="bp">self</span><span class="o">.</span><span class="n">min</span> <span class="o">=</span> <span class="n">x</span>
+        <span class="k">else</span><span class="p">:</span>
+            <span class="k">if</span> <span class="n">x</span> <span class="o">&lt;</span> <span class="bp">self</span><span class="o">.</span><span class="n">min</span><span class="p">:</span>
+                <span class="bp">self</span><span class="o">.</span><span class="n">min</span> <span class="o">=</span> <span class="n">x</span>
+        <span class="k">if</span> <span class="bp">self</span><span class="o">.</span><span class="n">max</span> <span class="ow">is</span> <span class="bp">None</span><span class="p">:</span>
+            <span class="bp">self</span><span class="o">.</span><span class="n">max</span> <span class="o">=</span> <span class="n">x</span>
+        <span class="k">else</span><span class="p">:</span>
+            <span class="k">if</span> <span class="n">x</span> <span class="o">&gt;</span> <span class="bp">self</span><span class="o">.</span><span class="n">max</span><span class="p">:</span>
+                <span class="bp">self</span><span class="o">.</span><span class="n">max</span> <span class="o">=</span> <span class="n">x</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">sum</span> <span class="o">+=</span> <span class="n">x</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">sum2</span> <span class="o">+=</span> <span class="n">x</span><span class="o">**</span><span class="mi">2</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">cnt</span> <span class="o">+=</span> <span class="mi">1</span>
+
+    <span class="k">def</span> <span class="nf">avg</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
+        <span class="k">if</span> <span class="bp">self</span><span class="o">.</span><span class="n">cnt</span> <span class="ow">is</span> <span class="bp">None</span><span class="p">:</span>
+            <span class="k">return</span> <span class="mi">0</span>
+        <span class="k">return</span> <span class="bp">self</span><span class="o">.</span><span class="n">sum</span> <span class="o">/</span> <span class="mf">1.0</span> <span class="o">/</span> <span class="bp">self</span><span class="o">.</span><span class="n">cnt</span> <span class="o">/</span> <span class="bp">self</span><span class="o">.</span><span class="n">unit</span>
+
+    <span class="k">def</span> <span class="nf">var</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
+        <span class="k">if</span> <span class="bp">self</span><span class="o">.</span><span class="n">cnt</span> <span class="ow">is</span> <span class="bp">None</span><span class="p">:</span>
+            <span class="k">return</span> <span class="mi">0</span>
+        <span class="k">return</span> <span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">sum2</span> <span class="o">/</span> <span class="mf">1.0</span> <span class="o">/</span> <span class="bp">self</span><span class="o">.</span><span class="n">cnt</span> <span class="o">/</span> <span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">unit</span><span class="o">**</span><span class="mi">2</span><span class="p">))</span> <span class="o">-</span> <span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">avg</span><span class="p">()</span><span class="o">**</span><span class="mi">2</span><span class="p">)</span>
+
+    <span class="k">def</span> <span class="nf">sdv</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
+        <span class="n">v</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">var</span><span class="p">()</span>
+        <span class="k">if</span> <span class="n">v</span><span class="o">&gt;</span><span class="mi">0</span><span class="p">:</span>
+            <span class="k">return</span> <span class="n">math</span><span class="o">.</span><span class="n">sqrt</span><span class="p">(</span><span class="n">v</span><span class="p">)</span>
+        <span class="k">else</span><span class="p">:</span>
+            <span class="k">return</span> <span class="mi">0</span>
+
+    <span class="k">def</span> <span class="nf">__str__</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
+        <span class="k">return</span> <span class="s">&#39;cnt=</span><span class="si">%d</span><span class="s">, avg=</span><span class="si">%f</span><span class="s">, sdv=</span><span class="si">%f</span><span class="s">&#39;</span> <span class="o">%</span> <span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">cnt</span><span class="p">,</span> <span class="bp">self</span><span class="o">.</span><span class="n">avg</span><span class="p">(),</span> <span class="bp">self</span><span class="o">.</span><span class="n">sdv</span><span class="p">())</span>
+
+    <span class="k">def</span> <span class="nf">__add__</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">x</span><span class="p">):</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">add</span><span class="p">(</span><span class="n">x</span><span class="p">)</span>
+        <span class="k">return</span> <span class="bp">self</span>
+
+<span class="c">#-----------------------------------------------------------------------------</span>
+<span class="c"># histogram generator</span>
+
+</div>
+<div class="viewcode-block" id="make_histogram"><a class="viewcode-back" href="../../lms.html#psychometrics.psychoanalyze.make_histogram">[docs]</a><span class="k">def</span> <span class="nf">make_histogram</span><span class="p">(</span><span class="n">ydata</span><span class="p">,</span> <span class="n">bins</span><span class="o">=</span><span class="bp">None</span><span class="p">):</span>
+    <span class="sd">&#39;&#39;&#39;</span>
+<span class="sd">    Generate histogram of ydata using bins provided, or by default bins</span>
+<span class="sd">    from 0 to 100 by 10.  bins should be ordered in increasing order.</span>
+
+<span class="sd">    returns dict with keys being bins, and values being counts.</span>
+<span class="sd">    special: hist[&#39;bins&#39;] = bins</span>
+<span class="sd">    &#39;&#39;&#39;</span>
+    <span class="k">if</span> <span class="n">bins</span> <span class="ow">is</span> <span class="bp">None</span><span class="p">:</span>
+        <span class="n">bins</span> <span class="o">=</span> <span class="nb">range</span><span class="p">(</span><span class="mi">0</span><span class="p">,</span> <span class="mi">100</span><span class="p">,</span> <span class="mi">10</span><span class="p">)</span>
+
+    <span class="n">nbins</span> <span class="o">=</span> <span class="nb">len</span><span class="p">(</span><span class="n">bins</span><span class="p">)</span>
+    <span class="n">hist</span> <span class="o">=</span> <span class="nb">dict</span><span class="p">(</span><span class="nb">zip</span><span class="p">(</span><span class="n">bins</span><span class="p">,</span> <span class="p">[</span><span class="mi">0</span><span class="p">]</span> <span class="o">*</span> <span class="n">nbins</span><span class="p">))</span>
+    <span class="k">for</span> <span class="n">y</span> <span class="ow">in</span> <span class="n">ydata</span><span class="p">:</span>
+        <span class="k">for</span> <span class="n">b</span> <span class="ow">in</span> <span class="n">bins</span><span class="p">[::</span><span class="o">-</span><span class="mi">1</span><span class="p">]:</span>    <span class="c"># in reverse order</span>
+            <span class="k">if</span> <span class="n">y</span><span class="o">&gt;</span><span class="n">b</span><span class="p">:</span>
+                <span class="n">hist</span><span class="p">[</span><span class="n">b</span><span class="p">]</span> <span class="o">+=</span> <span class="mi">1</span>
+                <span class="k">break</span>
+    <span class="c"># hist[&#39;bins&#39;] = bins</span>
+    <span class="k">return</span> <span class="n">hist</span>
+
+<span class="c">#-----------------------------------------------------------------------------</span>
+
+</div>
+<div class="viewcode-block" id="problems_with_psychometric_data"><a class="viewcode-back" href="../../lms.html#psychometrics.psychoanalyze.problems_with_psychometric_data">[docs]</a><span class="k">def</span> <span class="nf">problems_with_psychometric_data</span><span class="p">(</span><span class="n">course_id</span><span class="p">):</span>
+    <span class="sd">&#39;&#39;&#39;</span>
+<span class="sd">    Return dict of {problems (location urls): count} for which psychometric data is available.</span>
+<span class="sd">    Does this for a given course_id.</span>
+<span class="sd">    &#39;&#39;&#39;</span>
+    <span class="n">pmdset</span> <span class="o">=</span> <span class="n">PsychometricData</span><span class="o">.</span><span class="n">objects</span><span class="o">.</span><span class="n">using</span><span class="p">(</span><span class="n">db</span><span class="p">)</span><span class="o">.</span><span class="n">filter</span><span class="p">(</span><span class="n">studentmodule__course_id</span><span class="o">=</span><span class="n">course_id</span><span class="p">)</span>
+    <span class="n">plist</span> <span class="o">=</span> <span class="p">[</span><span class="n">p</span><span class="p">[</span><span class="s">&#39;studentmodule__module_state_key&#39;</span><span class="p">]</span> <span class="k">for</span> <span class="n">p</span> <span class="ow">in</span> <span class="n">pmdset</span><span class="o">.</span><span class="n">values</span><span class="p">(</span><span class="s">&#39;studentmodule__module_state_key&#39;</span><span class="p">)</span><span class="o">.</span><span class="n">distinct</span><span class="p">()]</span>
+    <span class="n">problems</span> <span class="o">=</span> <span class="nb">dict</span><span class="p">(</span> <span class="p">(</span><span class="n">p</span><span class="p">,</span> <span class="n">pmdset</span><span class="o">.</span><span class="n">filter</span><span class="p">(</span><span class="n">studentmodule__module_state_key</span><span class="o">=</span><span class="n">p</span><span class="p">)</span><span class="o">.</span><span class="n">count</span><span class="p">())</span> <span class="k">for</span> <span class="n">p</span> <span class="ow">in</span> <span class="n">plist</span> <span class="p">)</span>
+
+    <span class="k">return</span> <span class="n">problems</span>
+
+<span class="c">#-----------------------------------------------------------------------------</span>
+
+</div>
+<span class="k">def</span> <span class="nf">generate_plots_for_problem</span><span class="p">(</span><span class="n">problem</span><span class="p">):</span>
+
+    <span class="n">pmdset</span> <span class="o">=</span> <span class="n">PsychometricData</span><span class="o">.</span><span class="n">objects</span><span class="o">.</span><span class="n">using</span><span class="p">(</span><span class="n">db</span><span class="p">)</span><span class="o">.</span><span class="n">filter</span><span class="p">(</span><span class="n">studentmodule__module_state_key</span><span class="o">=</span><span class="n">problem</span><span class="p">)</span>
+    <span class="n">nstudents</span> <span class="o">=</span> <span class="n">pmdset</span><span class="o">.</span><span class="n">count</span><span class="p">()</span>
+    <span class="n">msg</span> <span class="o">=</span> <span class="s">&quot;&quot;</span>
+    <span class="n">plots</span> <span class="o">=</span> <span class="p">[]</span>
+
+    <span class="k">if</span> <span class="n">nstudents</span> <span class="o">&lt;</span> <span class="mi">2</span><span class="p">:</span>
+        <span class="n">msg</span> <span class="o">+=</span> <span class="s">&quot;</span><span class="si">%s</span><span class="s"> nstudents=</span><span class="si">%d</span><span class="s"> --&gt; skipping, too few&quot;</span> <span class="o">%</span> <span class="p">(</span><span class="n">problem</span><span class="p">,</span> <span class="n">nstudents</span><span class="p">)</span>
+        <span class="k">return</span> <span class="n">msg</span><span class="p">,</span> <span class="n">plots</span>
+
+    <span class="n">max_grade</span> <span class="o">=</span> <span class="n">pmdset</span><span class="p">[</span><span class="mi">0</span><span class="p">]</span><span class="o">.</span><span class="n">studentmodule</span><span class="o">.</span><span class="n">max_grade</span>
+
+    <span class="n">agdat</span> <span class="o">=</span> <span class="n">pmdset</span><span class="o">.</span><span class="n">aggregate</span><span class="p">(</span><span class="n">Sum</span><span class="p">(</span><span class="s">&#39;attempts&#39;</span><span class="p">),</span> <span class="n">Max</span><span class="p">(</span><span class="s">&#39;attempts&#39;</span><span class="p">))</span>
+    <span class="n">max_attempts</span> <span class="o">=</span> <span class="n">agdat</span><span class="p">[</span><span class="s">&#39;attempts__max&#39;</span><span class="p">]</span>
+    <span class="n">total_attempts</span> <span class="o">=</span> <span class="n">agdat</span><span class="p">[</span><span class="s">&#39;attempts__sum&#39;</span><span class="p">]</span>     <span class="c"># not used yet</span>
+
+    <span class="n">msg</span> <span class="o">+=</span> <span class="s">&quot;max attempts = </span><span class="si">%d</span><span class="s">&quot;</span> <span class="o">%</span> <span class="n">max_attempts</span>
+
+    <span class="n">xdat</span> <span class="o">=</span> <span class="nb">range</span><span class="p">(</span><span class="mi">1</span><span class="p">,</span> <span class="n">max_attempts</span> <span class="o">+</span> <span class="mi">1</span><span class="p">)</span>
+    <span class="n">dataset</span> <span class="o">=</span> <span class="p">{</span><span class="s">&#39;xdat&#39;</span><span class="p">:</span> <span class="n">xdat</span><span class="p">}</span>
+
+    <span class="c"># compute grade statistics</span>
+    <span class="n">grades</span> <span class="o">=</span> <span class="p">[</span><span class="n">pmd</span><span class="o">.</span><span class="n">studentmodule</span><span class="o">.</span><span class="n">grade</span> <span class="k">for</span> <span class="n">pmd</span> <span class="ow">in</span> <span class="n">pmdset</span><span class="p">]</span>
+    <span class="n">gsv</span> <span class="o">=</span> <span class="n">StatVar</span><span class="p">()</span>
+    <span class="k">for</span> <span class="n">g</span> <span class="ow">in</span> <span class="n">grades</span><span class="p">:</span>
+        <span class="n">gsv</span> <span class="o">+=</span> <span class="n">g</span>
+    <span class="n">msg</span> <span class="o">+=</span> <span class="s">&quot;&lt;br&gt;&lt;p&gt;&lt;font color=&#39;blue&#39;&gt;Grade distribution: </span><span class="si">%s</span><span class="s">&lt;/font&gt;&lt;/p&gt;&quot;</span> <span class="o">%</span> <span class="n">gsv</span>
+
+    <span class="c"># generate grade histogram</span>
+    <span class="n">ghist</span> <span class="o">=</span> <span class="p">[]</span>
+
+    <span class="n">axisopts</span> <span class="o">=</span> <span class="s">&quot;&quot;&quot;{</span>
+<span class="s">        xaxes: [{</span>
+<span class="s">            axisLabel: &#39;Grade&#39;</span>
+<span class="s">        }],</span>
+<span class="s">        yaxes: [{</span>
+<span class="s">            position: &#39;left&#39;,</span>
+<span class="s">            axisLabel: &#39;Count&#39;</span>
+<span class="s">         }]</span>
+<span class="s">         }&quot;&quot;&quot;</span>
+
+    <span class="k">if</span> <span class="n">gsv</span><span class="o">.</span><span class="n">max</span> <span class="o">&gt;</span> <span class="n">max_grade</span><span class="p">:</span>
+        <span class="n">msg</span> <span class="o">+=</span> <span class="s">&quot;&lt;br/&gt;&lt;p&gt;&lt;font color=&#39;red&#39;&gt;Something is wrong: max_grade=</span><span class="si">%s</span><span class="s">, but max(grades)=</span><span class="si">%s</span><span class="s">&lt;/font&gt;&lt;/p&gt;&quot;</span> <span class="o">%</span> <span class="p">(</span><span class="n">max_grade</span><span class="p">,</span> <span class="n">gsv</span><span class="o">.</span><span class="n">max</span><span class="p">)</span>
+        <span class="n">max_grade</span> <span class="o">=</span> <span class="n">gsv</span><span class="o">.</span><span class="n">max</span>
+
+    <span class="k">if</span> <span class="n">max_grade</span> <span class="o">&gt;</span> <span class="mi">1</span><span class="p">:</span>
+        <span class="n">ghist</span> <span class="o">=</span> <span class="n">make_histogram</span><span class="p">(</span><span class="n">grades</span><span class="p">,</span> <span class="n">np</span><span class="o">.</span><span class="n">linspace</span><span class="p">(</span><span class="mi">0</span><span class="p">,</span> <span class="n">max_grade</span><span class="p">,</span> <span class="n">max_grade</span> <span class="o">+</span> <span class="mi">1</span><span class="p">))</span>
+        <span class="n">ghist_json</span> <span class="o">=</span> <span class="n">json</span><span class="o">.</span><span class="n">dumps</span><span class="p">(</span><span class="n">ghist</span><span class="o">.</span><span class="n">items</span><span class="p">())</span>
+
+        <span class="n">plot</span> <span class="o">=</span> <span class="p">{</span><span class="s">&#39;title&#39;</span><span class="p">:</span> <span class="s">&quot;Grade histogram for </span><span class="si">%s</span><span class="s">&quot;</span> <span class="o">%</span> <span class="n">problem</span><span class="p">,</span>
+                <span class="s">&#39;id&#39;</span><span class="p">:</span> <span class="s">&#39;histogram&#39;</span><span class="p">,</span>
+                <span class="s">&#39;info&#39;</span><span class="p">:</span> <span class="s">&#39;&#39;</span><span class="p">,</span>
+                <span class="s">&#39;data&#39;</span><span class="p">:</span> <span class="s">&quot;var dhist = </span><span class="si">%s</span><span class="s">;</span><span class="se">\n</span><span class="s">&quot;</span> <span class="o">%</span> <span class="n">ghist_json</span><span class="p">,</span>
+                <span class="s">&#39;cmd&#39;</span><span class="p">:</span> <span class="s">&#39;[ {data: dhist, bars: { show: true, align: &quot;center&quot; }} ], </span><span class="si">%s</span><span class="s">&#39;</span> <span class="o">%</span> <span class="n">axisopts</span><span class="p">,</span>
+                <span class="p">}</span>
+        <span class="n">plots</span><span class="o">.</span><span class="n">append</span><span class="p">(</span><span class="n">plot</span><span class="p">)</span>
+    <span class="k">else</span><span class="p">:</span>
+        <span class="n">msg</span> <span class="o">+=</span> <span class="s">&quot;&lt;br/&gt;Not generating histogram: max_grade=</span><span class="si">%s</span><span class="s">&quot;</span> <span class="o">%</span> <span class="n">max_grade</span>
+
+    <span class="c"># histogram of time differences between checks</span>
+    <span class="c"># Warning: this is inefficient - doesn&#39;t scale to large numbers of students</span>
+    <span class="n">dtset</span> <span class="o">=</span> <span class="p">[]</span>  <span class="c"># time differences in minutes</span>
+    <span class="n">dtsv</span> <span class="o">=</span> <span class="n">StatVar</span><span class="p">()</span>
+    <span class="k">for</span> <span class="n">pmd</span> <span class="ow">in</span> <span class="n">pmdset</span><span class="p">:</span>
+        <span class="k">try</span><span class="p">:</span>
+            <span class="n">checktimes</span> <span class="o">=</span> <span class="nb">eval</span><span class="p">(</span><span class="n">pmd</span><span class="o">.</span><span class="n">checktimes</span><span class="p">)</span>                   <span class="c"># update log of attempt timestamps</span>
+        <span class="k">except</span><span class="p">:</span>
+            <span class="k">continue</span>
+        <span class="k">if</span> <span class="nb">len</span><span class="p">(</span><span class="n">checktimes</span><span class="p">)</span> <span class="o">&lt;</span> <span class="mi">2</span><span class="p">:</span>
+            <span class="k">continue</span>
+        <span class="n">ct0</span> <span class="o">=</span> <span class="n">checktimes</span><span class="p">[</span><span class="mi">0</span><span class="p">]</span>
+        <span class="k">for</span> <span class="n">ct</span> <span class="ow">in</span> <span class="n">checktimes</span><span class="p">[</span><span class="mi">1</span><span class="p">:]:</span>
+            <span class="n">dt</span> <span class="o">=</span> <span class="p">(</span><span class="n">ct</span> <span class="o">-</span> <span class="n">ct0</span><span class="p">)</span><span class="o">.</span><span class="n">total_seconds</span><span class="p">()</span> <span class="o">/</span> <span class="mf">60.0</span>
+            <span class="k">if</span> <span class="n">dt</span> <span class="o">&lt;</span> <span class="mi">20</span><span class="p">:</span>                   <span class="c"># ignore if dt too long</span>
+                <span class="n">dtset</span><span class="o">.</span><span class="n">append</span><span class="p">(</span><span class="n">dt</span><span class="p">)</span>
+                <span class="n">dtsv</span> <span class="o">+=</span> <span class="n">dt</span>
+            <span class="n">ct0</span> <span class="o">=</span> <span class="n">ct</span>
+    <span class="k">if</span> <span class="n">dtsv</span><span class="o">.</span><span class="n">cnt</span> <span class="o">&gt;</span> <span class="mi">2</span><span class="p">:</span>
+        <span class="n">msg</span> <span class="o">+=</span> <span class="s">&quot;&lt;br/&gt;&lt;p&gt;&lt;font color=&#39;brown&#39;&gt;Time differences between checks: </span><span class="si">%s</span><span class="s">&lt;/font&gt;&lt;/p&gt;&quot;</span> <span class="o">%</span> <span class="n">dtsv</span>
+        <span class="n">bins</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">linspace</span><span class="p">(</span><span class="mi">0</span><span class="p">,</span> <span class="mf">1.5</span> <span class="o">*</span> <span class="n">dtsv</span><span class="o">.</span><span class="n">sdv</span><span class="p">(),</span> <span class="mi">30</span><span class="p">)</span>
+        <span class="n">dbar</span> <span class="o">=</span> <span class="n">bins</span><span class="p">[</span><span class="mi">1</span><span class="p">]</span> <span class="o">-</span> <span class="n">bins</span><span class="p">[</span><span class="mi">0</span><span class="p">]</span>
+        <span class="n">thist</span> <span class="o">=</span> <span class="n">make_histogram</span><span class="p">(</span><span class="n">dtset</span><span class="p">,</span> <span class="n">bins</span><span class="p">)</span>
+        <span class="n">thist_json</span> <span class="o">=</span> <span class="n">json</span><span class="o">.</span><span class="n">dumps</span><span class="p">(</span><span class="nb">sorted</span><span class="p">(</span><span class="n">thist</span><span class="o">.</span><span class="n">items</span><span class="p">(),</span> <span class="n">key</span><span class="o">=</span><span class="k">lambda</span><span class="p">(</span><span class="n">x</span><span class="p">):</span> <span class="n">x</span><span class="p">[</span><span class="mi">0</span><span class="p">]))</span>
+
+        <span class="n">axisopts</span> <span class="o">=</span> <span class="s">&quot;&quot;&quot;{ xaxes: [{ axisLabel: &#39;Time (min)&#39;}], yaxes: [{position: &#39;left&#39;,axisLabel: &#39;Count&#39;}]}&quot;&quot;&quot;</span>
+
+        <span class="n">plot</span> <span class="o">=</span> <span class="p">{</span><span class="s">&#39;title&#39;</span><span class="p">:</span> <span class="s">&quot;Histogram of time differences between checks&quot;</span><span class="p">,</span>
+                <span class="s">&#39;id&#39;</span><span class="p">:</span> <span class="s">&#39;thistogram&#39;</span><span class="p">,</span>
+                <span class="s">&#39;info&#39;</span><span class="p">:</span> <span class="s">&#39;&#39;</span><span class="p">,</span>
+                <span class="s">&#39;data&#39;</span><span class="p">:</span> <span class="s">&quot;var thist = </span><span class="si">%s</span><span class="s">;</span><span class="se">\n</span><span class="s">&quot;</span> <span class="o">%</span> <span class="n">thist_json</span><span class="p">,</span>
+                <span class="s">&#39;cmd&#39;</span><span class="p">:</span> <span class="s">&#39;[ {data: thist, bars: { show: true, align: &quot;center&quot;, barWidth:</span><span class="si">%f</span><span class="s"> }} ], </span><span class="si">%s</span><span class="s">&#39;</span> <span class="o">%</span> <span class="p">(</span><span class="n">dbar</span><span class="p">,</span> <span class="n">axisopts</span><span class="p">),</span>
+                <span class="p">}</span>
+        <span class="n">plots</span><span class="o">.</span><span class="n">append</span><span class="p">(</span><span class="n">plot</span><span class="p">)</span>
+
+    <span class="c"># one IRT plot curve for each grade received (TODO: this assumes integer grades)</span>
+    <span class="k">for</span> <span class="n">grade</span> <span class="ow">in</span> <span class="nb">range</span><span class="p">(</span><span class="mi">1</span><span class="p">,</span> <span class="nb">int</span><span class="p">(</span><span class="n">max_grade</span><span class="p">)</span> <span class="o">+</span> <span class="mi">1</span><span class="p">):</span>
+        <span class="n">yset</span> <span class="o">=</span> <span class="p">{}</span>
+        <span class="n">gset</span> <span class="o">=</span> <span class="n">pmdset</span><span class="o">.</span><span class="n">filter</span><span class="p">(</span><span class="n">studentmodule__grade</span><span class="o">=</span><span class="n">grade</span><span class="p">)</span>
+        <span class="n">ngset</span> <span class="o">=</span> <span class="n">gset</span><span class="o">.</span><span class="n">count</span><span class="p">()</span>
+        <span class="k">if</span> <span class="n">ngset</span> <span class="o">==</span> <span class="mi">0</span><span class="p">:</span>
+            <span class="k">continue</span>
+        <span class="n">ydat</span> <span class="o">=</span> <span class="p">[]</span>
+        <span class="n">ylast</span> <span class="o">=</span> <span class="mi">0</span>
+        <span class="k">for</span> <span class="n">x</span> <span class="ow">in</span> <span class="n">xdat</span><span class="p">:</span>
+            <span class="n">y</span> <span class="o">=</span> <span class="n">gset</span><span class="o">.</span><span class="n">filter</span><span class="p">(</span><span class="n">attempts</span><span class="o">=</span><span class="n">x</span><span class="p">)</span><span class="o">.</span><span class="n">count</span><span class="p">()</span> <span class="o">/</span> <span class="n">ngset</span>
+            <span class="n">ydat</span><span class="o">.</span><span class="n">append</span><span class="p">(</span> <span class="n">y</span> <span class="o">+</span> <span class="n">ylast</span> <span class="p">)</span>
+            <span class="n">ylast</span> <span class="o">=</span> <span class="n">y</span> <span class="o">+</span> <span class="n">ylast</span>
+        <span class="n">yset</span><span class="p">[</span><span class="s">&#39;ydat&#39;</span><span class="p">]</span> <span class="o">=</span> <span class="n">ydat</span>
+
+        <span class="k">if</span> <span class="nb">len</span><span class="p">(</span><span class="n">ydat</span><span class="p">)</span> <span class="o">&gt;</span> <span class="mi">3</span><span class="p">:</span>         <span class="c"># try to fit to logistic function if enough data points</span>
+            <span class="n">cfp</span> <span class="o">=</span> <span class="n">curve_fit</span><span class="p">(</span><span class="n">func_2pl</span><span class="p">,</span> <span class="n">xdat</span><span class="p">,</span> <span class="n">ydat</span><span class="p">,</span> <span class="p">[</span><span class="mf">1.0</span><span class="p">,</span> <span class="n">max_attempts</span> <span class="o">/</span> <span class="mf">2.0</span><span class="p">])</span>
+            <span class="n">yset</span><span class="p">[</span><span class="s">&#39;fitparam&#39;</span><span class="p">]</span> <span class="o">=</span> <span class="n">cfp</span>
+            <span class="n">yset</span><span class="p">[</span><span class="s">&#39;fitpts&#39;</span><span class="p">]</span> <span class="o">=</span> <span class="n">func_2pl</span><span class="p">(</span><span class="n">np</span><span class="o">.</span><span class="n">array</span><span class="p">(</span><span class="n">xdat</span><span class="p">),</span> <span class="o">*</span><span class="n">cfp</span><span class="p">[</span><span class="mi">0</span><span class="p">])</span>
+            <span class="n">yset</span><span class="p">[</span><span class="s">&#39;fiterr&#39;</span><span class="p">]</span> <span class="o">=</span> <span class="p">[</span><span class="n">yd</span> <span class="o">-</span> <span class="n">yf</span> <span class="k">for</span> <span class="p">(</span><span class="n">yd</span><span class="p">,</span> <span class="n">yf</span><span class="p">)</span> <span class="ow">in</span> <span class="nb">zip</span><span class="p">(</span><span class="n">ydat</span><span class="p">,</span> <span class="n">yset</span><span class="p">[</span><span class="s">&#39;fitpts&#39;</span><span class="p">])]</span>
+            <span class="n">fitx</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">linspace</span><span class="p">(</span><span class="n">xdat</span><span class="p">[</span><span class="mi">0</span><span class="p">],</span> <span class="n">xdat</span><span class="p">[</span><span class="o">-</span><span class="mi">1</span><span class="p">],</span> <span class="mi">100</span><span class="p">)</span>
+            <span class="n">yset</span><span class="p">[</span><span class="s">&#39;fitx&#39;</span><span class="p">]</span> <span class="o">=</span> <span class="n">fitx</span>
+            <span class="n">yset</span><span class="p">[</span><span class="s">&#39;fity&#39;</span><span class="p">]</span> <span class="o">=</span> <span class="n">func_2pl</span><span class="p">(</span><span class="n">np</span><span class="o">.</span><span class="n">array</span><span class="p">(</span><span class="n">fitx</span><span class="p">),</span> <span class="o">*</span><span class="n">cfp</span><span class="p">[</span><span class="mi">0</span><span class="p">])</span>
+
+        <span class="n">dataset</span><span class="p">[</span><span class="s">&#39;grade_</span><span class="si">%d</span><span class="s">&#39;</span> <span class="o">%</span> <span class="n">grade</span><span class="p">]</span> <span class="o">=</span> <span class="n">yset</span>
+
+    <span class="n">axisopts</span> <span class="o">=</span> <span class="s">&quot;&quot;&quot;{</span>
+<span class="s">        xaxes: [{</span>
+<span class="s">            axisLabel: &#39;Number of Attempts&#39;</span>
+<span class="s">        }],</span>
+<span class="s">        yaxes: [{</span>
+<span class="s">            max:1.0,</span>
+<span class="s">            position: &#39;left&#39;,</span>
+<span class="s">            axisLabel: &#39;Probability of correctness&#39;</span>
+<span class="s">         }]</span>
+<span class="s">         }&quot;&quot;&quot;</span>
+
+    <span class="c"># generate points for flot plot</span>
+    <span class="k">for</span> <span class="n">grade</span> <span class="ow">in</span> <span class="nb">range</span><span class="p">(</span><span class="mi">1</span><span class="p">,</span> <span class="nb">int</span><span class="p">(</span><span class="n">max_grade</span><span class="p">)</span> <span class="o">+</span> <span class="mi">1</span><span class="p">):</span>
+        <span class="n">jsdata</span> <span class="o">=</span> <span class="s">&quot;&quot;</span>
+        <span class="n">jsplots</span> <span class="o">=</span> <span class="p">[]</span>
+        <span class="n">gkey</span> <span class="o">=</span> <span class="s">&#39;grade_</span><span class="si">%d</span><span class="s">&#39;</span> <span class="o">%</span> <span class="n">grade</span>
+        <span class="k">if</span> <span class="n">gkey</span> <span class="ow">in</span> <span class="n">dataset</span><span class="p">:</span>
+            <span class="n">yset</span> <span class="o">=</span> <span class="n">dataset</span><span class="p">[</span><span class="n">gkey</span><span class="p">]</span>
+            <span class="n">jsdata</span> <span class="o">+=</span> <span class="s">&quot;var d</span><span class="si">%d</span><span class="s"> = </span><span class="si">%s</span><span class="s">;</span><span class="se">\n</span><span class="s">&quot;</span> <span class="o">%</span> <span class="p">(</span><span class="n">grade</span><span class="p">,</span> <span class="n">json</span><span class="o">.</span><span class="n">dumps</span><span class="p">(</span><span class="nb">zip</span><span class="p">(</span><span class="n">xdat</span><span class="p">,</span> <span class="n">yset</span><span class="p">[</span><span class="s">&#39;ydat&#39;</span><span class="p">])))</span>
+            <span class="n">jsplots</span><span class="o">.</span><span class="n">append</span><span class="p">(</span><span class="s">&#39;{ data: d</span><span class="si">%d</span><span class="s">, lines: { show: false }, points: { show: true}, color: &quot;red&quot; }&#39;</span> <span class="o">%</span> <span class="n">grade</span><span class="p">)</span>
+            <span class="k">if</span> <span class="s">&#39;fitpts&#39;</span> <span class="ow">in</span> <span class="n">yset</span><span class="p">:</span>
+                <span class="n">jsdata</span> <span class="o">+=</span> <span class="s">&#39;var fit = </span><span class="si">%s</span><span class="s">;</span><span class="se">\n</span><span class="s">&#39;</span> <span class="o">%</span> <span class="p">(</span><span class="n">json</span><span class="o">.</span><span class="n">dumps</span><span class="p">(</span><span class="nb">zip</span><span class="p">(</span><span class="n">yset</span><span class="p">[</span><span class="s">&#39;fitx&#39;</span><span class="p">],</span> <span class="n">yset</span><span class="p">[</span><span class="s">&#39;fity&#39;</span><span class="p">])))</span>
+                <span class="n">jsplots</span><span class="o">.</span><span class="n">append</span><span class="p">(</span><span class="s">&#39;{ data: fit,  lines: { show: true }, color: &quot;blue&quot; }&#39;</span><span class="p">)</span>
+                <span class="p">(</span><span class="n">a</span><span class="p">,</span> <span class="n">b</span><span class="p">)</span> <span class="o">=</span> <span class="n">yset</span><span class="p">[</span><span class="s">&#39;fitparam&#39;</span><span class="p">][</span><span class="mi">0</span><span class="p">]</span>
+                <span class="n">irtinfo</span> <span class="o">=</span> <span class="s">&quot;(2PL: D=1.7, a=</span><span class="si">%6.3f</span><span class="s">, b=</span><span class="si">%6.3f</span><span class="s">)&quot;</span> <span class="o">%</span> <span class="p">(</span><span class="n">a</span><span class="p">,</span> <span class="n">b</span><span class="p">)</span>
+            <span class="k">else</span><span class="p">:</span>
+                <span class="n">irtinfo</span> <span class="o">=</span> <span class="s">&quot;&quot;</span>
+
+            <span class="n">plots</span><span class="o">.</span><span class="n">append</span><span class="p">({</span><span class="s">&#39;title&#39;</span><span class="p">:</span> <span class="s">&#39;IRT Plot for grade=</span><span class="si">%s</span><span class="s"> </span><span class="si">%s</span><span class="s">&#39;</span> <span class="o">%</span> <span class="p">(</span><span class="n">grade</span><span class="p">,</span> <span class="n">irtinfo</span><span class="p">),</span>
+                          <span class="s">&#39;id&#39;</span><span class="p">:</span> <span class="s">&quot;irt</span><span class="si">%s</span><span class="s">&quot;</span> <span class="o">%</span> <span class="n">grade</span><span class="p">,</span>
+                          <span class="s">&#39;info&#39;</span><span class="p">:</span> <span class="s">&#39;&#39;</span><span class="p">,</span>
+                          <span class="s">&#39;data&#39;</span><span class="p">:</span> <span class="n">jsdata</span><span class="p">,</span>
+                          <span class="s">&#39;cmd&#39;</span><span class="p">:</span> <span class="s">&#39;[</span><span class="si">%s</span><span class="s">], </span><span class="si">%s</span><span class="s">&#39;</span> <span class="o">%</span> <span class="p">(</span><span class="s">&#39;,&#39;</span><span class="o">.</span><span class="n">join</span><span class="p">(</span><span class="n">jsplots</span><span class="p">),</span> <span class="n">axisopts</span><span class="p">),</span>
+                <span class="p">})</span>
+
+    <span class="c">#log.debug(&#39;plots = %s&#39; % plots)</span>
+    <span class="k">return</span> <span class="n">msg</span><span class="p">,</span> <span class="n">plots</span>
+
+<span class="c">#-----------------------------------------------------------------------------</span>
+
+
+<div class="viewcode-block" id="make_psychometrics_data_update_handler"><a class="viewcode-back" href="../../lms.html#psychometrics.psychoanalyze.make_psychometrics_data_update_handler">[docs]</a><span class="k">def</span> <span class="nf">make_psychometrics_data_update_handler</span><span class="p">(</span><span class="n">studentmodule</span><span class="p">):</span>
+    <span class="sd">&quot;&quot;&quot;</span>
+<span class="sd">    Construct and return a procedure which may be called to update</span>
+<span class="sd">    the PsychometricsData instance for the given StudentModule instance.</span>
+<span class="sd">    &quot;&quot;&quot;</span>
+    <span class="n">sm</span> <span class="o">=</span> <span class="n">studentmodule</span>
+    <span class="k">try</span><span class="p">:</span>
+        <span class="n">pmd</span> <span class="o">=</span> <span class="n">PsychometricData</span><span class="o">.</span><span class="n">objects</span><span class="o">.</span><span class="n">using</span><span class="p">(</span><span class="n">db</span><span class="p">)</span><span class="o">.</span><span class="n">get</span><span class="p">(</span><span class="n">studentmodule</span><span class="o">=</span><span class="n">sm</span><span class="p">)</span>
+    <span class="k">except</span> <span class="n">PsychometricData</span><span class="o">.</span><span class="n">DoesNotExist</span><span class="p">:</span>
+        <span class="n">pmd</span> <span class="o">=</span> <span class="n">PsychometricData</span><span class="p">(</span><span class="n">studentmodule</span><span class="o">=</span><span class="n">sm</span><span class="p">)</span>
+
+    <span class="k">def</span> <span class="nf">psychometrics_data_update_handler</span><span class="p">(</span><span class="n">state</span><span class="p">):</span>
+        <span class="sd">&quot;&quot;&quot;</span>
+<span class="sd">        This function may be called each time a problem is successfully checked</span>
+<span class="sd">        (eg on save_problem_check events in capa_module).</span>
+
+<span class="sd">        state = instance state (a nice, uniform way to interface - for more future psychometric feature extraction)</span>
+<span class="sd">        &quot;&quot;&quot;</span>
+        <span class="k">try</span><span class="p">:</span>
+            <span class="n">state</span> <span class="o">=</span> <span class="n">json</span><span class="o">.</span><span class="n">loads</span><span class="p">(</span><span class="n">sm</span><span class="o">.</span><span class="n">state</span><span class="p">)</span>
+            <span class="n">done</span> <span class="o">=</span> <span class="n">state</span><span class="p">[</span><span class="s">&#39;done&#39;</span><span class="p">]</span>
+        <span class="k">except</span><span class="p">:</span>
+            <span class="n">log</span><span class="o">.</span><span class="n">exception</span><span class="p">(</span><span class="s">&quot;Oops, failed to eval state for </span><span class="si">%s</span><span class="s"> (state=</span><span class="si">%s</span><span class="s">)&quot;</span> <span class="o">%</span> <span class="p">(</span><span class="n">sm</span><span class="p">,</span> <span class="n">sm</span><span class="o">.</span><span class="n">state</span><span class="p">))</span>
+            <span class="k">return</span>
+
+        <span class="n">pmd</span><span class="o">.</span><span class="n">done</span> <span class="o">=</span> <span class="n">done</span>
+        <span class="n">pmd</span><span class="o">.</span><span class="n">attempts</span> <span class="o">=</span> <span class="n">state</span><span class="p">[</span><span class="s">&#39;attempts&#39;</span><span class="p">]</span>
+        <span class="k">try</span><span class="p">:</span>
+            <span class="n">checktimes</span> <span class="o">=</span> <span class="nb">eval</span><span class="p">(</span><span class="n">pmd</span><span class="o">.</span><span class="n">checktimes</span><span class="p">)</span>                   <span class="c"># update log of attempt timestamps</span>
+        <span class="k">except</span><span class="p">:</span>
+            <span class="n">checktimes</span> <span class="o">=</span> <span class="p">[]</span>
+        <span class="n">checktimes</span><span class="o">.</span><span class="n">append</span><span class="p">(</span><span class="n">datetime</span><span class="o">.</span><span class="n">datetime</span><span class="o">.</span><span class="n">now</span><span class="p">())</span>
+        <span class="n">pmd</span><span class="o">.</span><span class="n">checktimes</span> <span class="o">=</span> <span class="n">checktimes</span>
+        <span class="k">try</span><span class="p">:</span>
+            <span class="n">pmd</span><span class="o">.</span><span class="n">save</span><span class="p">()</span>
+        <span class="k">except</span><span class="p">:</span>
+            <span class="n">log</span><span class="o">.</span><span class="n">exception</span><span class="p">(</span><span class="s">&quot;Error in updating psychometrics data for </span><span class="si">%s</span><span class="s">&quot;</span> <span class="o">%</span> <span class="n">sm</span><span class="p">)</span>
+
+    <span class="k">return</span> <span class="n">psychometrics_data_update_handler</span></div>
+</pre></div>
+
+          </div>
+        </div>
+      </div>
+      <div class="clearer"></div>
+    </div>
+    <div class="related">
+      <h3>Navigation</h3>
+      <ul>
+        <li class="right" style="margin-right: 10px">
+          <a href="../../genindex.html" title="General Index"
+             >index</a></li>
+        <li class="right" >
+          <a href="../../py-modindex.html" title="Python Module Index"
+             >modules</a> |</li>
+        <li><a href="../../index.html">MITx 1.0 documentation</a> &raquo;</li>
+          <li><a href="../index.html" >Module code</a> &raquo;</li> 
+      </ul>
+    </div>
+    <div class="footer">
+        &copy; Copyright 2012, MITx team.
+      Created using <a href="http://sphinx.pocoo.org/">Sphinx</a> 1.1.3.
+    </div>
+  </body>
+</html>

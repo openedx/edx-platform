@@ -1,0 +1,225 @@
+
+
+<!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Transitional//EN"
+  "http://www.w3.org/TR/xhtml1/DTD/xhtml1-transitional.dtd">
+
+
+<html xmlns="http://www.w3.org/1999/xhtml">
+  <head>
+    <meta http-equiv="Content-Type" content="text/html; charset=utf-8" />
+    
+    <title>course_wiki.views &mdash; MITx 1.0 documentation</title>
+    
+    <link rel="stylesheet" href="../../_static/sphinxdoc.css" type="text/css" />
+    <link rel="stylesheet" href="../../_static/pygments.css" type="text/css" />
+    
+    <script type="text/javascript">
+      var DOCUMENTATION_OPTIONS = {
+        URL_ROOT:    '../../',
+        VERSION:     '1.0',
+        COLLAPSE_INDEX: false,
+        FILE_SUFFIX: '.html',
+        HAS_SOURCE:  true
+      };
+    </script>
+    <script type="text/javascript" src="../../_static/jquery.js"></script>
+    <script type="text/javascript" src="../../_static/underscore.js"></script>
+    <script type="text/javascript" src="../../_static/doctools.js"></script>
+    <script type="text/javascript" src="http://cdn.mathjax.org/mathjax/latest/MathJax.js?config=TeX-AMS-MML_HTMLorMML"></script>
+    <link rel="top" title="MITx 1.0 documentation" href="../../index.html" />
+    <link rel="up" title="Module code" href="../index.html" /> 
+  </head>
+  <body>
+<img src="../../_static/homepage-bg.jpg" alt="Edx logo"  width="100%;"/>
+
+    <div class="related">
+      <h3>Navigation</h3>
+      <ul>
+        <li class="right" style="margin-right: 10px">
+          <a href="../../genindex.html" title="General Index"
+             accesskey="I">index</a></li>
+        <li class="right" >
+          <a href="../../py-modindex.html" title="Python Module Index"
+             >modules</a> |</li>
+        <li><a href="../../index.html">MITx 1.0 documentation</a> &raquo;</li>
+          <li><a href="../index.html" accesskey="U">Module code</a> &raquo;</li> 
+      </ul>
+    </div>
+      <div class="sphinxsidebar">
+        <div class="sphinxsidebarwrapper">
+<div id="searchbox" style="display: none">
+  <h3>Quick search</h3>
+    <form class="search" action="../../search.html" method="get">
+      <input type="text" name="q" />
+      <input type="submit" value="Go" />
+      <input type="hidden" name="check_keywords" value="yes" />
+      <input type="hidden" name="area" value="default" />
+    </form>
+    <p class="searchtip" style="font-size: 90%">
+    Enter search terms or a module, class or function name.
+    </p>
+</div>
+<script type="text/javascript">$('#searchbox').show(0);</script>
+        </div>
+      </div>
+
+    <div class="document">
+      <div class="documentwrapper">
+        <div class="bodywrapper">
+          <div class="body">
+            
+  <h1>Source code for course_wiki.views</h1><div class="highlight"><pre>
+<span class="kn">import</span> <span class="nn">logging</span>
+<span class="kn">import</span> <span class="nn">re</span>
+
+<span class="kn">from</span> <span class="nn">django.conf</span> <span class="kn">import</span> <span class="n">settings</span>
+<span class="kn">from</span> <span class="nn">django.contrib.sites.models</span> <span class="kn">import</span> <span class="n">Site</span>
+<span class="kn">from</span> <span class="nn">django.core.exceptions</span> <span class="kn">import</span> <span class="n">ImproperlyConfigured</span>
+<span class="kn">from</span> <span class="nn">django.shortcuts</span> <span class="kn">import</span> <span class="n">redirect</span>
+<span class="kn">from</span> <span class="nn">wiki.core.exceptions</span> <span class="kn">import</span> <span class="n">NoRootURL</span>
+<span class="kn">from</span> <span class="nn">wiki.models</span> <span class="kn">import</span> <span class="n">URLPath</span><span class="p">,</span> <span class="n">Article</span>
+
+<span class="kn">from</span> <span class="nn">courseware.courses</span> <span class="kn">import</span> <span class="n">get_course_by_id</span>
+
+<span class="n">log</span> <span class="o">=</span> <span class="n">logging</span><span class="o">.</span><span class="n">getLogger</span><span class="p">(</span><span class="n">__name__</span><span class="p">)</span>
+
+<div class="viewcode-block" id="root_create"><a class="viewcode-back" href="../../lms.html#course_wiki.views.root_create">[docs]</a><span class="k">def</span> <span class="nf">root_create</span><span class="p">(</span><span class="n">request</span><span class="p">):</span>
+    <span class="sd">&quot;&quot;&quot;</span>
+<span class="sd">    In the edX wiki, we don&#39;t show the root_create view. Instead, we</span>
+<span class="sd">    just create the root automatically if it doesn&#39;t exist.</span>
+<span class="sd">    &quot;&quot;&quot;</span>
+    <span class="n">root</span> <span class="o">=</span> <span class="n">get_or_create_root</span><span class="p">()</span>
+    <span class="k">return</span> <span class="n">redirect</span><span class="p">(</span><span class="s">&#39;wiki:get&#39;</span><span class="p">,</span> <span class="n">path</span><span class="o">=</span><span class="n">root</span><span class="o">.</span><span class="n">path</span><span class="p">)</span>
+
+</div>
+<div class="viewcode-block" id="course_wiki_redirect"><a class="viewcode-back" href="../../lms.html#course_wiki.views.course_wiki_redirect">[docs]</a><span class="k">def</span> <span class="nf">course_wiki_redirect</span><span class="p">(</span><span class="n">request</span><span class="p">,</span> <span class="n">course_id</span><span class="p">):</span>
+    <span class="sd">&quot;&quot;&quot;</span>
+<span class="sd">    This redirects to whatever page on the wiki that the course designates</span>
+<span class="sd">    as it&#39;s home page. A course&#39;s wiki must be an article on the root (for</span>
+<span class="sd">    example, &quot;/6.002x&quot;) to keep things simple.</span>
+<span class="sd">    &quot;&quot;&quot;</span>
+    <span class="n">course</span> <span class="o">=</span> <span class="n">get_course_by_id</span><span class="p">(</span><span class="n">course_id</span><span class="p">)</span>
+    
+    <span class="n">course_slug</span> <span class="o">=</span> <span class="n">course</span><span class="o">.</span><span class="n">wiki_slug</span>
+    
+    <span class="n">valid_slug</span> <span class="o">=</span> <span class="bp">True</span>
+    <span class="k">if</span> <span class="ow">not</span> <span class="n">course_slug</span><span class="p">:</span>
+        <span class="n">log</span><span class="o">.</span><span class="n">exception</span><span class="p">(</span><span class="s">&quot;This course is improperly configured. The slug cannot be empty.&quot;</span><span class="p">)</span>
+        <span class="n">valid_slug</span> <span class="o">=</span> <span class="bp">False</span>
+    <span class="k">if</span> <span class="n">re</span><span class="o">.</span><span class="n">match</span><span class="p">(</span><span class="s">&#39;^[-\w\.]+$&#39;</span><span class="p">,</span> <span class="n">course_slug</span><span class="p">)</span> <span class="o">==</span> <span class="bp">None</span><span class="p">:</span>
+        <span class="n">log</span><span class="o">.</span><span class="n">exception</span><span class="p">(</span><span class="s">&quot;This course is improperly configured. The slug can only contain letters, numbers, periods or hyphens.&quot;</span><span class="p">)</span>
+        <span class="n">valid_slug</span> <span class="o">=</span> <span class="bp">False</span>
+
+    <span class="k">if</span> <span class="ow">not</span> <span class="n">valid_slug</span><span class="p">:</span>
+        <span class="k">return</span> <span class="n">redirect</span><span class="p">(</span><span class="s">&quot;wiki:get&quot;</span><span class="p">,</span> <span class="n">path</span><span class="o">=</span><span class="s">&quot;&quot;</span><span class="p">)</span>
+    
+    
+    <span class="c"># The wiki needs a Site object created. We make sure it exists here</span>
+    <span class="k">try</span><span class="p">:</span>
+        <span class="n">site</span> <span class="o">=</span> <span class="n">Site</span><span class="o">.</span><span class="n">objects</span><span class="o">.</span><span class="n">get_current</span><span class="p">()</span>
+    <span class="k">except</span> <span class="n">Site</span><span class="o">.</span><span class="n">DoesNotExist</span><span class="p">:</span>
+        <span class="n">new_site</span> <span class="o">=</span> <span class="n">Site</span><span class="p">()</span>
+        <span class="n">new_site</span><span class="o">.</span><span class="n">domain</span> <span class="o">=</span> <span class="n">settings</span><span class="o">.</span><span class="n">SITE_NAME</span>
+        <span class="n">new_site</span><span class="o">.</span><span class="n">name</span> <span class="o">=</span> <span class="s">&quot;edX&quot;</span>
+        <span class="n">new_site</span><span class="o">.</span><span class="n">save</span><span class="p">()</span>
+        <span class="k">if</span> <span class="nb">str</span><span class="p">(</span><span class="n">new_site</span><span class="o">.</span><span class="n">id</span><span class="p">)</span> <span class="o">!=</span> <span class="nb">str</span><span class="p">(</span><span class="n">settings</span><span class="o">.</span><span class="n">SITE_ID</span><span class="p">):</span>
+            <span class="k">raise</span> <span class="n">ImproperlyConfigured</span><span class="p">(</span><span class="s">&quot;No site object was created and the SITE_ID doesn&#39;t match the newly created one. &quot;</span> <span class="o">+</span> <span class="nb">str</span><span class="p">(</span><span class="n">new_site</span><span class="o">.</span><span class="n">id</span><span class="p">)</span> <span class="o">+</span> <span class="s">&quot;!=&quot;</span> <span class="o">+</span> <span class="nb">str</span><span class="p">(</span><span class="n">settings</span><span class="o">.</span><span class="n">SITE_ID</span><span class="p">))</span>
+    
+    <span class="k">try</span><span class="p">:</span>
+        <span class="n">urlpath</span> <span class="o">=</span> <span class="n">URLPath</span><span class="o">.</span><span class="n">get_by_path</span><span class="p">(</span><span class="n">course_slug</span><span class="p">,</span> <span class="n">select_related</span><span class="o">=</span><span class="bp">True</span><span class="p">)</span>
+        
+        <span class="n">results</span> <span class="o">=</span> <span class="nb">list</span><span class="p">(</span> <span class="n">Article</span><span class="o">.</span><span class="n">objects</span><span class="o">.</span><span class="n">filter</span><span class="p">(</span> <span class="nb">id</span> <span class="o">=</span> <span class="n">urlpath</span><span class="o">.</span><span class="n">article</span><span class="o">.</span><span class="n">id</span> <span class="p">)</span> <span class="p">)</span>
+        <span class="k">if</span> <span class="n">results</span><span class="p">:</span>
+            <span class="n">article</span> <span class="o">=</span> <span class="n">results</span><span class="p">[</span><span class="mi">0</span><span class="p">]</span>
+        <span class="k">else</span><span class="p">:</span>
+            <span class="n">article</span> <span class="o">=</span> <span class="bp">None</span>
+    
+    <span class="k">except</span> <span class="p">(</span><span class="n">NoRootURL</span><span class="p">,</span> <span class="n">URLPath</span><span class="o">.</span><span class="n">DoesNotExist</span><span class="p">):</span>
+        <span class="c"># We will create it in the next block</span>
+        <span class="n">urlpath</span> <span class="o">=</span> <span class="bp">None</span>
+        <span class="n">article</span> <span class="o">=</span> <span class="bp">None</span>
+        
+    <span class="k">if</span> <span class="ow">not</span> <span class="n">article</span><span class="p">:</span>
+        <span class="c"># create it</span>
+        <span class="n">root</span> <span class="o">=</span> <span class="n">get_or_create_root</span><span class="p">()</span>
+        
+        <span class="k">if</span> <span class="n">urlpath</span><span class="p">:</span>
+            <span class="c"># Somehow we got a urlpath without an article. Just delete it and</span>
+            <span class="c"># recerate it.</span>
+            <span class="n">urlpath</span><span class="o">.</span><span class="n">delete</span><span class="p">()</span>
+        
+        <span class="n">urlpath</span> <span class="o">=</span> <span class="n">URLPath</span><span class="o">.</span><span class="n">create_article</span><span class="p">(</span>
+            <span class="n">root</span><span class="p">,</span>
+            <span class="n">course_slug</span><span class="p">,</span>
+            <span class="n">title</span><span class="o">=</span><span class="n">course_slug</span><span class="p">,</span>
+            <span class="n">content</span><span class="o">=</span><span class="s">&quot;This is the wiki for **{0}**&#39;s _{1}_.&quot;</span><span class="o">.</span><span class="n">format</span><span class="p">(</span><span class="n">course</span><span class="o">.</span><span class="n">org</span><span class="p">,</span> <span class="n">course</span><span class="o">.</span><span class="n">title</span><span class="p">),</span>
+            <span class="n">user_message</span><span class="o">=</span><span class="s">&quot;Course page automatically created.&quot;</span><span class="p">,</span>
+            <span class="n">user</span><span class="o">=</span><span class="bp">None</span><span class="p">,</span>
+            <span class="n">ip_address</span><span class="o">=</span><span class="bp">None</span><span class="p">,</span>
+            <span class="n">article_kwargs</span><span class="o">=</span><span class="p">{</span><span class="s">&#39;owner&#39;</span><span class="p">:</span> <span class="bp">None</span><span class="p">,</span>
+                            <span class="s">&#39;group&#39;</span><span class="p">:</span> <span class="bp">None</span><span class="p">,</span>
+                            <span class="s">&#39;group_read&#39;</span><span class="p">:</span> <span class="bp">True</span><span class="p">,</span>
+                            <span class="s">&#39;group_write&#39;</span><span class="p">:</span> <span class="bp">True</span><span class="p">,</span>
+                            <span class="s">&#39;other_read&#39;</span><span class="p">:</span> <span class="bp">True</span><span class="p">,</span>
+                            <span class="s">&#39;other_write&#39;</span><span class="p">:</span> <span class="bp">True</span><span class="p">,</span>
+                            <span class="p">})</span>
+        
+    <span class="k">return</span> <span class="n">redirect</span><span class="p">(</span><span class="s">&quot;wiki:get&quot;</span><span class="p">,</span> <span class="n">path</span><span class="o">=</span><span class="n">urlpath</span><span class="o">.</span><span class="n">path</span><span class="p">)</span>
+    
+</div>
+<div class="viewcode-block" id="get_or_create_root"><a class="viewcode-back" href="../../lms.html#course_wiki.views.get_or_create_root">[docs]</a><span class="k">def</span> <span class="nf">get_or_create_root</span><span class="p">():</span>
+    <span class="sd">&quot;&quot;&quot;</span>
+<span class="sd">    Returns the root article, or creates it if it doesn&#39;t exist.</span>
+<span class="sd">    &quot;&quot;&quot;</span>
+    <span class="k">try</span><span class="p">:</span>
+        <span class="n">root</span> <span class="o">=</span> <span class="n">URLPath</span><span class="o">.</span><span class="n">root</span><span class="p">()</span>
+        <span class="k">if</span> <span class="ow">not</span> <span class="n">root</span><span class="o">.</span><span class="n">article</span><span class="p">:</span>
+            <span class="n">root</span><span class="o">.</span><span class="n">delete</span><span class="p">()</span>
+            <span class="k">raise</span> <span class="n">NoRootURL</span>
+        <span class="k">return</span> <span class="n">root</span>
+    <span class="k">except</span> <span class="n">NoRootURL</span><span class="p">:</span>
+        <span class="k">pass</span>
+    
+    <span class="n">starting_content</span> <span class="o">=</span> <span class="s">&quot;</span><span class="se">\n</span><span class="s">&quot;</span><span class="o">.</span><span class="n">join</span><span class="p">((</span>
+    <span class="s">&quot;Welcome to the edX Wiki&quot;</span><span class="p">,</span>
+    <span class="s">&quot;===&quot;</span><span class="p">,</span>
+    <span class="s">&quot;Visit a course wiki to add an article.&quot;</span><span class="p">))</span>
+    
+    <span class="n">root</span> <span class="o">=</span> <span class="n">URLPath</span><span class="o">.</span><span class="n">create_root</span><span class="p">(</span><span class="n">title</span><span class="o">=</span><span class="s">&quot;Wiki&quot;</span><span class="p">,</span>
+                        <span class="n">content</span><span class="o">=</span><span class="n">starting_content</span><span class="p">)</span>
+    <span class="n">article</span> <span class="o">=</span> <span class="n">root</span><span class="o">.</span><span class="n">article</span>
+    <span class="n">article</span><span class="o">.</span><span class="n">group</span> <span class="o">=</span> <span class="bp">None</span>
+    <span class="n">article</span><span class="o">.</span><span class="n">group_read</span> <span class="o">=</span> <span class="bp">True</span>
+    <span class="n">article</span><span class="o">.</span><span class="n">group_write</span> <span class="o">=</span> <span class="bp">False</span>
+    <span class="n">article</span><span class="o">.</span><span class="n">other_read</span> <span class="o">=</span> <span class="bp">True</span>
+    <span class="n">article</span><span class="o">.</span><span class="n">other_write</span> <span class="o">=</span> <span class="bp">False</span>
+    <span class="n">article</span><span class="o">.</span><span class="n">save</span><span class="p">()</span>
+    
+    <span class="k">return</span> <span class="n">root</span>
+    </div>
+</pre></div>
+
+          </div>
+        </div>
+      </div>
+      <div class="clearer"></div>
+    </div>
+    <div class="related">
+      <h3>Navigation</h3>
+      <ul>
+        <li class="right" style="margin-right: 10px">
+          <a href="../../genindex.html" title="General Index"
+             >index</a></li>
+        <li class="right" >
+          <a href="../../py-modindex.html" title="Python Module Index"
+             >modules</a> |</li>
+        <li><a href="../../index.html">MITx 1.0 documentation</a> &raquo;</li>
+          <li><a href="../index.html" >Module code</a> &raquo;</li> 
+      </ul>
+    </div>
+    <div class="footer">
+        &copy; Copyright 2012, MITx team.
+      Created using <a href="http://sphinx.pocoo.org/">Sphinx</a> 1.1.3.
+    </div>
+  </body>
+</html>

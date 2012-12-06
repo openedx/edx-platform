@@ -1,0 +1,139 @@
+
+
+<!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Transitional//EN"
+  "http://www.w3.org/TR/xhtml1/DTD/xhtml1-transitional.dtd">
+
+
+<html xmlns="http://www.w3.org/1999/xhtml">
+  <head>
+    <meta http-equiv="Content-Type" content="text/html; charset=utf-8" />
+    
+    <title>xmodule.vertical_module &mdash; MITx 1.0 documentation</title>
+    
+    <link rel="stylesheet" href="../../_static/sphinxdoc.css" type="text/css" />
+    <link rel="stylesheet" href="../../_static/pygments.css" type="text/css" />
+    
+    <script type="text/javascript">
+      var DOCUMENTATION_OPTIONS = {
+        URL_ROOT:    '../../',
+        VERSION:     '1.0',
+        COLLAPSE_INDEX: false,
+        FILE_SUFFIX: '.html',
+        HAS_SOURCE:  true
+      };
+    </script>
+    <script type="text/javascript" src="../../_static/jquery.js"></script>
+    <script type="text/javascript" src="../../_static/underscore.js"></script>
+    <script type="text/javascript" src="../../_static/doctools.js"></script>
+    <script type="text/javascript" src="http://cdn.mathjax.org/mathjax/latest/MathJax.js?config=TeX-AMS-MML_HTMLorMML"></script>
+    <link rel="top" title="MITx 1.0 documentation" href="../../index.html" />
+    <link rel="up" title="Module code" href="../index.html" /> 
+  </head>
+  <body>
+<img src="../../_static/homepage-bg.jpg" alt="Edx logo"  width="100%;"/>
+
+    <div class="related">
+      <h3>Navigation</h3>
+      <ul>
+        <li class="right" style="margin-right: 10px">
+          <a href="../../genindex.html" title="General Index"
+             accesskey="I">index</a></li>
+        <li class="right" >
+          <a href="../../py-modindex.html" title="Python Module Index"
+             >modules</a> |</li>
+        <li><a href="../../index.html">MITx 1.0 documentation</a> &raquo;</li>
+          <li><a href="../index.html" accesskey="U">Module code</a> &raquo;</li> 
+      </ul>
+    </div>
+      <div class="sphinxsidebar">
+        <div class="sphinxsidebarwrapper">
+<div id="searchbox" style="display: none">
+  <h3>Quick search</h3>
+    <form class="search" action="../../search.html" method="get">
+      <input type="text" name="q" />
+      <input type="submit" value="Go" />
+      <input type="hidden" name="check_keywords" value="yes" />
+      <input type="hidden" name="area" value="default" />
+    </form>
+    <p class="searchtip" style="font-size: 90%">
+    Enter search terms or a module, class or function name.
+    </p>
+</div>
+<script type="text/javascript">$('#searchbox').show(0);</script>
+        </div>
+      </div>
+
+    <div class="document">
+      <div class="documentwrapper">
+        <div class="bodywrapper">
+          <div class="body">
+            
+  <h1>Source code for xmodule.vertical_module</h1><div class="highlight"><pre>
+<span class="kn">from</span> <span class="nn">xmodule.x_module</span> <span class="kn">import</span> <span class="n">XModule</span>
+<span class="kn">from</span> <span class="nn">xmodule.seq_module</span> <span class="kn">import</span> <span class="n">SequenceDescriptor</span>
+<span class="kn">from</span> <span class="nn">xmodule.progress</span> <span class="kn">import</span> <span class="n">Progress</span>
+
+<span class="c"># HACK: This shouldn&#39;t be hard-coded to two types</span>
+<span class="c"># OBSOLETE: This obsoletes &#39;type&#39;</span>
+<span class="n">class_priority</span> <span class="o">=</span> <span class="p">[</span><span class="s">&#39;video&#39;</span><span class="p">,</span> <span class="s">&#39;problem&#39;</span><span class="p">]</span>
+
+
+<div class="viewcode-block" id="VerticalModule"><a class="viewcode-back" href="../../xmodule.html#xmodule.vertical_module.VerticalModule">[docs]</a><span class="k">class</span> <span class="nc">VerticalModule</span><span class="p">(</span><span class="n">XModule</span><span class="p">):</span>
+    <span class="sd">&#39;&#39;&#39; Layout module for laying out submodules vertically.&#39;&#39;&#39;</span>
+
+    <span class="k">def</span> <span class="nf">__init__</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">system</span><span class="p">,</span> <span class="n">location</span><span class="p">,</span> <span class="n">definition</span><span class="p">,</span> <span class="n">descriptor</span><span class="p">,</span> <span class="n">instance_state</span><span class="o">=</span><span class="bp">None</span><span class="p">,</span> <span class="n">shared_state</span><span class="o">=</span><span class="bp">None</span><span class="p">,</span> <span class="o">**</span><span class="n">kwargs</span><span class="p">):</span>
+        <span class="n">XModule</span><span class="o">.</span><span class="n">__init__</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">system</span><span class="p">,</span> <span class="n">location</span><span class="p">,</span> <span class="n">definition</span><span class="p">,</span> <span class="n">descriptor</span><span class="p">,</span> <span class="n">instance_state</span><span class="p">,</span> <span class="n">shared_state</span><span class="p">,</span> <span class="o">**</span><span class="n">kwargs</span><span class="p">)</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">contents</span> <span class="o">=</span> <span class="bp">None</span>
+
+    <span class="k">def</span> <span class="nf">get_html</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
+        <span class="k">if</span> <span class="bp">self</span><span class="o">.</span><span class="n">contents</span> <span class="ow">is</span> <span class="bp">None</span><span class="p">:</span>
+            <span class="bp">self</span><span class="o">.</span><span class="n">contents</span> <span class="o">=</span> <span class="p">[</span><span class="n">child</span><span class="o">.</span><span class="n">get_html</span><span class="p">()</span> <span class="k">for</span> <span class="n">child</span> <span class="ow">in</span> <span class="bp">self</span><span class="o">.</span><span class="n">get_display_items</span><span class="p">()]</span>
+
+        <span class="k">return</span> <span class="bp">self</span><span class="o">.</span><span class="n">system</span><span class="o">.</span><span class="n">render_template</span><span class="p">(</span><span class="s">&#39;vert_module.html&#39;</span><span class="p">,</span> <span class="p">{</span>
+            <span class="s">&#39;items&#39;</span><span class="p">:</span> <span class="bp">self</span><span class="o">.</span><span class="n">contents</span>
+        <span class="p">})</span>
+
+    <span class="k">def</span> <span class="nf">get_progress</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
+        <span class="c"># TODO: Cache progress or children array?</span>
+        <span class="n">children</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">get_children</span><span class="p">()</span>
+        <span class="n">progresses</span> <span class="o">=</span> <span class="p">[</span><span class="n">child</span><span class="o">.</span><span class="n">get_progress</span><span class="p">()</span> <span class="k">for</span> <span class="n">child</span> <span class="ow">in</span> <span class="n">children</span><span class="p">]</span>
+        <span class="n">progress</span> <span class="o">=</span> <span class="nb">reduce</span><span class="p">(</span><span class="n">Progress</span><span class="o">.</span><span class="n">add_counts</span><span class="p">,</span> <span class="n">progresses</span><span class="p">,</span> <span class="bp">None</span><span class="p">)</span>
+        <span class="k">return</span> <span class="n">progress</span>
+
+    <span class="k">def</span> <span class="nf">get_icon_class</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
+        <span class="n">child_classes</span> <span class="o">=</span> <span class="nb">set</span><span class="p">(</span><span class="n">child</span><span class="o">.</span><span class="n">get_icon_class</span><span class="p">()</span> <span class="k">for</span> <span class="n">child</span> <span class="ow">in</span> <span class="bp">self</span><span class="o">.</span><span class="n">get_children</span><span class="p">())</span>
+        <span class="n">new_class</span> <span class="o">=</span> <span class="s">&#39;other&#39;</span>
+        <span class="k">for</span> <span class="n">c</span> <span class="ow">in</span> <span class="n">class_priority</span><span class="p">:</span>
+            <span class="k">if</span> <span class="n">c</span> <span class="ow">in</span> <span class="n">child_classes</span><span class="p">:</span>
+                <span class="n">new_class</span> <span class="o">=</span> <span class="n">c</span>
+        <span class="k">return</span> <span class="n">new_class</span>
+
+</div>
+<span class="k">class</span> <span class="nc">VerticalDescriptor</span><span class="p">(</span><span class="n">SequenceDescriptor</span><span class="p">):</span>
+    <span class="n">module_class</span> <span class="o">=</span> <span class="n">VerticalModule</span>
+</pre></div>
+
+          </div>
+        </div>
+      </div>
+      <div class="clearer"></div>
+    </div>
+    <div class="related">
+      <h3>Navigation</h3>
+      <ul>
+        <li class="right" style="margin-right: 10px">
+          <a href="../../genindex.html" title="General Index"
+             >index</a></li>
+        <li class="right" >
+          <a href="../../py-modindex.html" title="Python Module Index"
+             >modules</a> |</li>
+        <li><a href="../../index.html">MITx 1.0 documentation</a> &raquo;</li>
+          <li><a href="../index.html" >Module code</a> &raquo;</li> 
+      </ul>
+    </div>
+    <div class="footer">
+        &copy; Copyright 2012, MITx team.
+      Created using <a href="http://sphinx.pocoo.org/">Sphinx</a> 1.1.3.
+    </div>
+  </body>
+</html>

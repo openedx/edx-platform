@@ -1,0 +1,144 @@
+
+
+<!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Transitional//EN"
+  "http://www.w3.org/TR/xhtml1/DTD/xhtml1-transitional.dtd">
+
+
+<html xmlns="http://www.w3.org/1999/xhtml">
+  <head>
+    <meta http-equiv="Content-Type" content="text/html; charset=utf-8" />
+    
+    <title>branding.views &mdash; MITx 1.0 documentation</title>
+    
+    <link rel="stylesheet" href="../../_static/sphinxdoc.css" type="text/css" />
+    <link rel="stylesheet" href="../../_static/pygments.css" type="text/css" />
+    
+    <script type="text/javascript">
+      var DOCUMENTATION_OPTIONS = {
+        URL_ROOT:    '../../',
+        VERSION:     '1.0',
+        COLLAPSE_INDEX: false,
+        FILE_SUFFIX: '.html',
+        HAS_SOURCE:  true
+      };
+    </script>
+    <script type="text/javascript" src="../../_static/jquery.js"></script>
+    <script type="text/javascript" src="../../_static/underscore.js"></script>
+    <script type="text/javascript" src="../../_static/doctools.js"></script>
+    <script type="text/javascript" src="http://cdn.mathjax.org/mathjax/latest/MathJax.js?config=TeX-AMS-MML_HTMLorMML"></script>
+    <link rel="top" title="MITx 1.0 documentation" href="../../index.html" />
+    <link rel="up" title="branding" href="../branding.html" /> 
+  </head>
+  <body>
+<img src="../../_static/homepage-bg.jpg" alt="Edx logo"  width="100%;"/>
+
+    <div class="related">
+      <h3>Navigation</h3>
+      <ul>
+        <li class="right" style="margin-right: 10px">
+          <a href="../../genindex.html" title="General Index"
+             accesskey="I">index</a></li>
+        <li class="right" >
+          <a href="../../py-modindex.html" title="Python Module Index"
+             >modules</a> |</li>
+        <li><a href="../../index.html">MITx 1.0 documentation</a> &raquo;</li>
+          <li><a href="../index.html" >Module code</a> &raquo;</li>
+          <li><a href="../branding.html" accesskey="U">branding</a> &raquo;</li> 
+      </ul>
+    </div>
+      <div class="sphinxsidebar">
+        <div class="sphinxsidebarwrapper">
+<div id="searchbox" style="display: none">
+  <h3>Quick search</h3>
+    <form class="search" action="../../search.html" method="get">
+      <input type="text" name="q" />
+      <input type="submit" value="Go" />
+      <input type="hidden" name="check_keywords" value="yes" />
+      <input type="hidden" name="area" value="default" />
+    </form>
+    <p class="searchtip" style="font-size: 90%">
+    Enter search terms or a module, class or function name.
+    </p>
+</div>
+<script type="text/javascript">$('#searchbox').show(0);</script>
+        </div>
+      </div>
+
+    <div class="document">
+      <div class="documentwrapper">
+        <div class="bodywrapper">
+          <div class="body">
+            
+  <h1>Source code for branding.views</h1><div class="highlight"><pre>
+<span class="kn">from</span> <span class="nn">django.conf</span> <span class="kn">import</span> <span class="n">settings</span>
+<span class="kn">from</span> <span class="nn">django.core.urlresolvers</span> <span class="kn">import</span> <span class="n">reverse</span>
+<span class="kn">from</span> <span class="nn">django.shortcuts</span> <span class="kn">import</span> <span class="n">redirect</span>
+<span class="kn">from</span> <span class="nn">django_future.csrf</span> <span class="kn">import</span> <span class="n">ensure_csrf_cookie</span>
+
+<span class="kn">import</span> <span class="nn">student.views</span>
+<span class="kn">import</span> <span class="nn">branding</span>
+<span class="kn">import</span> <span class="nn">courseware.views</span>
+<span class="kn">from</span> <span class="nn">util.cache</span> <span class="kn">import</span> <span class="n">cache_if_anonymous</span>
+
+
+<span class="nd">@ensure_csrf_cookie</span>
+<span class="nd">@cache_if_anonymous</span>
+<div class="viewcode-block" id="index"><a class="viewcode-back" href="../../lms.html#branding.views.index">[docs]</a><span class="k">def</span> <span class="nf">index</span><span class="p">(</span><span class="n">request</span><span class="p">):</span>
+    <span class="sd">&#39;&#39;&#39;</span>
+<span class="sd">    Redirects to main page -- info page if user authenticated, or marketing if not</span>
+<span class="sd">    &#39;&#39;&#39;</span>
+
+    <span class="k">if</span> <span class="n">settings</span><span class="o">.</span><span class="n">COURSEWARE_ENABLED</span> <span class="ow">and</span> <span class="n">request</span><span class="o">.</span><span class="n">user</span><span class="o">.</span><span class="n">is_authenticated</span><span class="p">():</span>
+        <span class="k">return</span> <span class="n">redirect</span><span class="p">(</span><span class="n">reverse</span><span class="p">(</span><span class="s">&#39;dashboard&#39;</span><span class="p">))</span>
+
+    <span class="k">if</span> <span class="n">settings</span><span class="o">.</span><span class="n">MITX_FEATURES</span><span class="o">.</span><span class="n">get</span><span class="p">(</span><span class="s">&#39;AUTH_USE_MIT_CERTIFICATES&#39;</span><span class="p">):</span>
+        <span class="kn">from</span> <span class="nn">external_auth.views</span> <span class="kn">import</span> <span class="n">ssl_login</span>
+        <span class="k">return</span> <span class="n">ssl_login</span><span class="p">(</span><span class="n">request</span><span class="p">)</span>
+
+    <span class="n">university</span> <span class="o">=</span> <span class="n">branding</span><span class="o">.</span><span class="n">get_university</span><span class="p">(</span><span class="n">request</span><span class="o">.</span><span class="n">META</span><span class="o">.</span><span class="n">get</span><span class="p">(</span><span class="s">&#39;HTTP_HOST&#39;</span><span class="p">))</span>
+    <span class="k">if</span> <span class="n">university</span> <span class="ow">is</span> <span class="bp">None</span><span class="p">:</span>
+        <span class="k">return</span> <span class="n">student</span><span class="o">.</span><span class="n">views</span><span class="o">.</span><span class="n">index</span><span class="p">(</span><span class="n">request</span><span class="p">,</span> <span class="n">user</span><span class="o">=</span><span class="n">request</span><span class="o">.</span><span class="n">user</span><span class="p">)</span>
+
+    <span class="k">return</span> <span class="n">courseware</span><span class="o">.</span><span class="n">views</span><span class="o">.</span><span class="n">university_profile</span><span class="p">(</span><span class="n">request</span><span class="p">,</span> <span class="n">university</span><span class="p">)</span>
+
+</div>
+<span class="nd">@ensure_csrf_cookie</span>
+<span class="nd">@cache_if_anonymous</span>
+<div class="viewcode-block" id="courses"><a class="viewcode-back" href="../../lms.html#branding.views.courses">[docs]</a><span class="k">def</span> <span class="nf">courses</span><span class="p">(</span><span class="n">request</span><span class="p">):</span>
+    <span class="sd">&quot;&quot;&quot;</span>
+<span class="sd">    Render the &quot;find courses&quot; page. If subdomain branding is on, this is the</span>
+<span class="sd">    university profile page, otherwise it&#39;s the edX courseware.views.courses page</span>
+<span class="sd">    &quot;&quot;&quot;</span>
+
+    <span class="n">university</span> <span class="o">=</span> <span class="n">branding</span><span class="o">.</span><span class="n">get_university</span><span class="p">(</span><span class="n">request</span><span class="o">.</span><span class="n">META</span><span class="o">.</span><span class="n">get</span><span class="p">(</span><span class="s">&#39;HTTP_HOST&#39;</span><span class="p">))</span>
+    <span class="k">if</span> <span class="n">university</span> <span class="ow">is</span> <span class="bp">None</span><span class="p">:</span>
+        <span class="k">return</span> <span class="n">courseware</span><span class="o">.</span><span class="n">views</span><span class="o">.</span><span class="n">courses</span><span class="p">(</span><span class="n">request</span><span class="p">)</span>
+
+    <span class="k">return</span> <span class="n">courseware</span><span class="o">.</span><span class="n">views</span><span class="o">.</span><span class="n">university_profile</span><span class="p">(</span><span class="n">request</span><span class="p">,</span> <span class="n">university</span><span class="p">)</span></div>
+</pre></div>
+
+          </div>
+        </div>
+      </div>
+      <div class="clearer"></div>
+    </div>
+    <div class="related">
+      <h3>Navigation</h3>
+      <ul>
+        <li class="right" style="margin-right: 10px">
+          <a href="../../genindex.html" title="General Index"
+             >index</a></li>
+        <li class="right" >
+          <a href="../../py-modindex.html" title="Python Module Index"
+             >modules</a> |</li>
+        <li><a href="../../index.html">MITx 1.0 documentation</a> &raquo;</li>
+          <li><a href="../index.html" >Module code</a> &raquo;</li>
+          <li><a href="../branding.html" >branding</a> &raquo;</li> 
+      </ul>
+    </div>
+    <div class="footer">
+        &copy; Copyright 2012, MITx team.
+      Created using <a href="http://sphinx.pocoo.org/">Sphinx</a> 1.1.3.
+    </div>
+  </body>
+</html>

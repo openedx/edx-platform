@@ -1,0 +1,222 @@
+
+
+<!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Transitional//EN"
+  "http://www.w3.org/TR/xhtml1/DTD/xhtml1-transitional.dtd">
+
+
+<html xmlns="http://www.w3.org/1999/xhtml">
+  <head>
+    <meta http-equiv="Content-Type" content="text/html; charset=utf-8" />
+    
+    <title>github_sync &mdash; MITx 1.0 documentation</title>
+    
+    <link rel="stylesheet" href="../_static/sphinxdoc.css" type="text/css" />
+    <link rel="stylesheet" href="../_static/pygments.css" type="text/css" />
+    
+    <script type="text/javascript">
+      var DOCUMENTATION_OPTIONS = {
+        URL_ROOT:    '../',
+        VERSION:     '1.0',
+        COLLAPSE_INDEX: false,
+        FILE_SUFFIX: '.html',
+        HAS_SOURCE:  true
+      };
+    </script>
+    <script type="text/javascript" src="../_static/jquery.js"></script>
+    <script type="text/javascript" src="../_static/underscore.js"></script>
+    <script type="text/javascript" src="../_static/doctools.js"></script>
+    <script type="text/javascript" src="http://cdn.mathjax.org/mathjax/latest/MathJax.js?config=TeX-AMS-MML_HTMLorMML"></script>
+    <link rel="top" title="MITx 1.0 documentation" href="../index.html" />
+    <link rel="up" title="Module code" href="index.html" /> 
+  </head>
+  <body>
+<img src="../_static/homepage-bg.jpg" alt="Edx logo"  width="100%;"/>
+
+    <div class="related">
+      <h3>Navigation</h3>
+      <ul>
+        <li class="right" style="margin-right: 10px">
+          <a href="../genindex.html" title="General Index"
+             accesskey="I">index</a></li>
+        <li class="right" >
+          <a href="../py-modindex.html" title="Python Module Index"
+             >modules</a> |</li>
+        <li><a href="../index.html">MITx 1.0 documentation</a> &raquo;</li>
+          <li><a href="index.html" accesskey="U">Module code</a> &raquo;</li> 
+      </ul>
+    </div>
+      <div class="sphinxsidebar">
+        <div class="sphinxsidebarwrapper">
+<div id="searchbox" style="display: none">
+  <h3>Quick search</h3>
+    <form class="search" action="../search.html" method="get">
+      <input type="text" name="q" />
+      <input type="submit" value="Go" />
+      <input type="hidden" name="check_keywords" value="yes" />
+      <input type="hidden" name="area" value="default" />
+    </form>
+    <p class="searchtip" style="font-size: 90%">
+    Enter search terms or a module, class or function name.
+    </p>
+</div>
+<script type="text/javascript">$('#searchbox').show(0);</script>
+        </div>
+      </div>
+
+    <div class="document">
+      <div class="documentwrapper">
+        <div class="bodywrapper">
+          <div class="body">
+            
+  <h1>Source code for github_sync</h1><div class="highlight"><pre>
+<span class="kn">import</span> <span class="nn">logging</span>
+<span class="kn">import</span> <span class="nn">os</span>
+
+<span class="kn">from</span> <span class="nn">django.conf</span> <span class="kn">import</span> <span class="n">settings</span>
+<span class="kn">from</span> <span class="nn">fs.osfs</span> <span class="kn">import</span> <span class="n">OSFS</span>
+<span class="kn">from</span> <span class="nn">git</span> <span class="kn">import</span> <span class="n">Repo</span><span class="p">,</span> <span class="n">PushInfo</span>
+
+<span class="kn">from</span> <span class="nn">xmodule.modulestore.xml_importer</span> <span class="kn">import</span> <span class="n">import_from_xml</span>
+<span class="kn">from</span> <span class="nn">xmodule.modulestore.django</span> <span class="kn">import</span> <span class="n">modulestore</span>
+<span class="kn">from</span> <span class="nn">collections</span> <span class="kn">import</span> <span class="n">namedtuple</span>
+
+<span class="kn">from</span> <span class="nn">.exceptions</span> <span class="kn">import</span> <span class="n">GithubSyncError</span><span class="p">,</span> <span class="n">InvalidRepo</span>
+
+<span class="n">log</span> <span class="o">=</span> <span class="n">logging</span><span class="o">.</span><span class="n">getLogger</span><span class="p">(</span><span class="n">__name__</span><span class="p">)</span>
+
+<span class="n">RepoSettings</span> <span class="o">=</span> <span class="n">namedtuple</span><span class="p">(</span><span class="s">&#39;RepoSettings&#39;</span><span class="p">,</span> <span class="s">&#39;path branch origin&#39;</span><span class="p">)</span>
+
+
+<div class="viewcode-block" id="sync_all_with_github"><a class="viewcode-back" href="../cms.html#github_sync.sync_all_with_github">[docs]</a><span class="k">def</span> <span class="nf">sync_all_with_github</span><span class="p">():</span>
+    <span class="sd">&quot;&quot;&quot;</span>
+<span class="sd">    Sync all defined repositories from github</span>
+<span class="sd">    &quot;&quot;&quot;</span>
+    <span class="k">for</span> <span class="n">repo_name</span> <span class="ow">in</span> <span class="n">settings</span><span class="o">.</span><span class="n">REPOS</span><span class="p">:</span>
+        <span class="n">sync_with_github</span><span class="p">(</span><span class="n">load_repo_settings</span><span class="p">(</span><span class="n">repo_name</span><span class="p">))</span>
+
+</div>
+<div class="viewcode-block" id="sync_with_github"><a class="viewcode-back" href="../cms.html#github_sync.sync_with_github">[docs]</a><span class="k">def</span> <span class="nf">sync_with_github</span><span class="p">(</span><span class="n">repo_settings</span><span class="p">):</span>
+    <span class="sd">&quot;&quot;&quot;</span>
+<span class="sd">    Sync specified repository from github</span>
+
+<span class="sd">    repo_settings: A RepoSettings defining which repo to sync</span>
+<span class="sd">    &quot;&quot;&quot;</span>
+    <span class="n">revision</span><span class="p">,</span> <span class="n">course</span> <span class="o">=</span> <span class="n">import_from_github</span><span class="p">(</span><span class="n">repo_settings</span><span class="p">)</span>
+    <span class="n">export_to_github</span><span class="p">(</span><span class="n">course</span><span class="p">,</span> <span class="s">&quot;Changes from cms import of revision </span><span class="si">%s</span><span class="s">&quot;</span> <span class="o">%</span> <span class="n">revision</span><span class="p">,</span> <span class="s">&quot;CMS &lt;cms@edx.org&gt;&quot;</span><span class="p">)</span>
+
+</div>
+<div class="viewcode-block" id="setup_repo"><a class="viewcode-back" href="../cms.html#github_sync.setup_repo">[docs]</a><span class="k">def</span> <span class="nf">setup_repo</span><span class="p">(</span><span class="n">repo_settings</span><span class="p">):</span>
+    <span class="sd">&quot;&quot;&quot;</span>
+<span class="sd">    Reset the local github repo specified by repo_settings</span>
+
+<span class="sd">    repo_settings (RepoSettings): The settings for the repo to reset</span>
+<span class="sd">    &quot;&quot;&quot;</span>
+    <span class="n">course_dir</span> <span class="o">=</span> <span class="n">repo_settings</span><span class="o">.</span><span class="n">path</span>
+    <span class="n">repo_path</span> <span class="o">=</span> <span class="n">settings</span><span class="o">.</span><span class="n">GITHUB_REPO_ROOT</span> <span class="o">/</span> <span class="n">course_dir</span>
+
+    <span class="k">if</span> <span class="ow">not</span> <span class="n">os</span><span class="o">.</span><span class="n">path</span><span class="o">.</span><span class="n">isdir</span><span class="p">(</span><span class="n">repo_path</span><span class="p">):</span>
+        <span class="n">Repo</span><span class="o">.</span><span class="n">clone_from</span><span class="p">(</span><span class="n">repo_settings</span><span class="o">.</span><span class="n">origin</span><span class="p">,</span> <span class="n">repo_path</span><span class="p">)</span>
+
+    <span class="n">git_repo</span> <span class="o">=</span> <span class="n">Repo</span><span class="p">(</span><span class="n">repo_path</span><span class="p">)</span>
+    <span class="n">origin</span> <span class="o">=</span> <span class="n">git_repo</span><span class="o">.</span><span class="n">remotes</span><span class="o">.</span><span class="n">origin</span>
+    <span class="n">origin</span><span class="o">.</span><span class="n">fetch</span><span class="p">()</span>
+
+    <span class="c"># Do a hard reset to the remote branch so that we have a clean import</span>
+    <span class="n">git_repo</span><span class="o">.</span><span class="n">git</span><span class="o">.</span><span class="n">checkout</span><span class="p">(</span><span class="n">repo_settings</span><span class="o">.</span><span class="n">branch</span><span class="p">)</span>
+
+    <span class="k">return</span> <span class="n">git_repo</span>
+
+</div>
+<div class="viewcode-block" id="load_repo_settings"><a class="viewcode-back" href="../cms.html#github_sync.load_repo_settings">[docs]</a><span class="k">def</span> <span class="nf">load_repo_settings</span><span class="p">(</span><span class="n">course_dir</span><span class="p">):</span>
+    <span class="sd">&quot;&quot;&quot;</span>
+<span class="sd">    Returns the repo_settings for the course stored in course_dir</span>
+<span class="sd">    &quot;&quot;&quot;</span>
+    <span class="k">if</span> <span class="n">course_dir</span> <span class="ow">not</span> <span class="ow">in</span> <span class="n">settings</span><span class="o">.</span><span class="n">REPOS</span><span class="p">:</span>
+        <span class="k">raise</span> <span class="n">InvalidRepo</span><span class="p">(</span><span class="n">course_dir</span><span class="p">)</span>
+
+    <span class="k">return</span> <span class="n">RepoSettings</span><span class="p">(</span><span class="n">course_dir</span><span class="p">,</span> <span class="o">**</span><span class="n">settings</span><span class="o">.</span><span class="n">REPOS</span><span class="p">[</span><span class="n">course_dir</span><span class="p">])</span>
+
+</div>
+<div class="viewcode-block" id="import_from_github"><a class="viewcode-back" href="../cms.html#github_sync.import_from_github">[docs]</a><span class="k">def</span> <span class="nf">import_from_github</span><span class="p">(</span><span class="n">repo_settings</span><span class="p">):</span>
+    <span class="sd">&quot;&quot;&quot;</span>
+<span class="sd">    Imports data into the modulestore based on the XML stored on github</span>
+<span class="sd">    &quot;&quot;&quot;</span>
+    <span class="n">course_dir</span> <span class="o">=</span> <span class="n">repo_settings</span><span class="o">.</span><span class="n">path</span>
+    <span class="n">git_repo</span> <span class="o">=</span> <span class="n">setup_repo</span><span class="p">(</span><span class="n">repo_settings</span><span class="p">)</span>
+    <span class="n">git_repo</span><span class="o">.</span><span class="n">head</span><span class="o">.</span><span class="n">reset</span><span class="p">(</span><span class="s">&#39;origin/</span><span class="si">%s</span><span class="s">&#39;</span> <span class="o">%</span> <span class="n">repo_settings</span><span class="o">.</span><span class="n">branch</span><span class="p">,</span> <span class="n">index</span><span class="o">=</span><span class="bp">True</span><span class="p">,</span> <span class="n">working_tree</span><span class="o">=</span><span class="bp">True</span><span class="p">)</span>
+
+    <span class="n">module_store</span> <span class="o">=</span> <span class="n">import_from_xml</span><span class="p">(</span><span class="n">modulestore</span><span class="p">(),</span>
+                                   <span class="n">settings</span><span class="o">.</span><span class="n">GITHUB_REPO_ROOT</span><span class="p">,</span> <span class="n">course_dirs</span><span class="o">=</span><span class="p">[</span><span class="n">course_dir</span><span class="p">])</span>
+    <span class="k">return</span> <span class="n">git_repo</span><span class="o">.</span><span class="n">head</span><span class="o">.</span><span class="n">commit</span><span class="o">.</span><span class="n">hexsha</span><span class="p">,</span> <span class="n">module_store</span><span class="o">.</span><span class="n">courses</span><span class="p">[</span><span class="n">course_dir</span><span class="p">]</span>
+
+</div>
+<div class="viewcode-block" id="export_to_github"><a class="viewcode-back" href="../cms.html#github_sync.export_to_github">[docs]</a><span class="k">def</span> <span class="nf">export_to_github</span><span class="p">(</span><span class="n">course</span><span class="p">,</span> <span class="n">commit_message</span><span class="p">,</span> <span class="n">author_str</span><span class="o">=</span><span class="bp">None</span><span class="p">):</span>
+    <span class="sd">&#39;&#39;&#39;</span>
+<span class="sd">    Commit any changes to the specified course with given commit message,</span>
+<span class="sd">    and push to github (if MITX_FEATURES[&#39;GITHUB_PUSH&#39;] is True).</span>
+<span class="sd">    If author_str is specified, uses it in the commit.</span>
+<span class="sd">    &#39;&#39;&#39;</span>
+    <span class="n">course_dir</span> <span class="o">=</span> <span class="n">course</span><span class="o">.</span><span class="n">metadata</span><span class="o">.</span><span class="n">get</span><span class="p">(</span><span class="s">&#39;data_dir&#39;</span><span class="p">,</span> <span class="n">course</span><span class="o">.</span><span class="n">location</span><span class="o">.</span><span class="n">course</span><span class="p">)</span>
+    <span class="k">try</span><span class="p">:</span>
+        <span class="n">repo_settings</span> <span class="o">=</span> <span class="n">load_repo_settings</span><span class="p">(</span><span class="n">course_dir</span><span class="p">)</span>
+    <span class="k">except</span> <span class="n">InvalidRepo</span><span class="p">:</span>
+        <span class="n">log</span><span class="o">.</span><span class="n">warning</span><span class="p">(</span><span class="s">&quot;Invalid repo {0}, not exporting data to xml&quot;</span><span class="o">.</span><span class="n">format</span><span class="p">(</span><span class="n">course_dir</span><span class="p">))</span>
+        <span class="k">return</span>
+
+    <span class="n">git_repo</span> <span class="o">=</span> <span class="n">setup_repo</span><span class="p">(</span><span class="n">repo_settings</span><span class="p">)</span>
+
+    <span class="n">fs</span> <span class="o">=</span> <span class="n">OSFS</span><span class="p">(</span><span class="n">git_repo</span><span class="o">.</span><span class="n">working_dir</span><span class="p">)</span>
+    <span class="n">xml</span> <span class="o">=</span> <span class="n">course</span><span class="o">.</span><span class="n">export_to_xml</span><span class="p">(</span><span class="n">fs</span><span class="p">)</span>
+
+    <span class="k">with</span> <span class="n">fs</span><span class="o">.</span><span class="n">open</span><span class="p">(</span><span class="s">&#39;course.xml&#39;</span><span class="p">,</span> <span class="s">&#39;w&#39;</span><span class="p">)</span> <span class="k">as</span> <span class="n">course_xml</span><span class="p">:</span>
+        <span class="n">course_xml</span><span class="o">.</span><span class="n">write</span><span class="p">(</span><span class="n">xml</span><span class="p">)</span>
+
+    <span class="k">if</span> <span class="n">git_repo</span><span class="o">.</span><span class="n">is_dirty</span><span class="p">():</span>
+        <span class="n">git_repo</span><span class="o">.</span><span class="n">git</span><span class="o">.</span><span class="n">add</span><span class="p">(</span><span class="n">A</span><span class="o">=</span><span class="bp">True</span><span class="p">)</span>
+        <span class="k">if</span> <span class="n">author_str</span> <span class="ow">is</span> <span class="ow">not</span> <span class="bp">None</span><span class="p">:</span>
+            <span class="n">git_repo</span><span class="o">.</span><span class="n">git</span><span class="o">.</span><span class="n">commit</span><span class="p">(</span><span class="n">m</span><span class="o">=</span><span class="n">commit_message</span><span class="p">,</span> <span class="n">author</span><span class="o">=</span><span class="n">author_str</span><span class="p">)</span>
+        <span class="k">else</span><span class="p">:</span>
+            <span class="n">git_repo</span><span class="o">.</span><span class="n">git</span><span class="o">.</span><span class="n">commit</span><span class="p">(</span><span class="n">m</span><span class="o">=</span><span class="n">commit_message</span><span class="p">)</span>
+
+        <span class="n">origin</span> <span class="o">=</span> <span class="n">git_repo</span><span class="o">.</span><span class="n">remotes</span><span class="o">.</span><span class="n">origin</span>
+        <span class="k">if</span> <span class="n">settings</span><span class="o">.</span><span class="n">MITX_FEATURES</span><span class="p">[</span><span class="s">&#39;GITHUB_PUSH&#39;</span><span class="p">]:</span>
+            <span class="n">push_infos</span> <span class="o">=</span> <span class="n">origin</span><span class="o">.</span><span class="n">push</span><span class="p">()</span>
+            <span class="k">if</span> <span class="nb">len</span><span class="p">(</span><span class="n">push_infos</span><span class="p">)</span> <span class="o">&gt;</span> <span class="mi">1</span><span class="p">:</span>
+                <span class="n">log</span><span class="o">.</span><span class="n">error</span><span class="p">(</span><span class="s">&#39;Unexpectedly pushed multiple heads: {infos}&#39;</span><span class="o">.</span><span class="n">format</span><span class="p">(</span>
+                    <span class="n">infos</span><span class="o">=</span><span class="s">&quot;</span><span class="se">\n</span><span class="s">&quot;</span><span class="o">.</span><span class="n">join</span><span class="p">(</span><span class="nb">str</span><span class="p">(</span><span class="n">info</span><span class="o">.</span><span class="n">summary</span><span class="p">)</span> <span class="k">for</span> <span class="n">info</span> <span class="ow">in</span> <span class="n">push_infos</span><span class="p">)</span>
+                <span class="p">))</span>
+
+            <span class="k">if</span> <span class="n">push_infos</span><span class="p">[</span><span class="mi">0</span><span class="p">]</span><span class="o">.</span><span class="n">flags</span> <span class="o">&amp;</span> <span class="n">PushInfo</span><span class="o">.</span><span class="n">ERROR</span><span class="p">:</span>
+                <span class="n">log</span><span class="o">.</span><span class="n">error</span><span class="p">(</span><span class="s">&#39;Failed push: flags={p.flags}, local_ref={p.local_ref}, &#39;</span>
+                          <span class="s">&#39;remote_ref_string={p.remote_ref_string}, &#39;</span>
+                          <span class="s">&#39;remote_ref={p.remote_ref}, old_commit={p.old_commit}, &#39;</span>
+                          <span class="s">&#39;summary={p.summary})&#39;</span><span class="o">.</span><span class="n">format</span><span class="p">(</span><span class="n">p</span><span class="o">=</span><span class="n">push_infos</span><span class="p">[</span><span class="mi">0</span><span class="p">]))</span>
+                <span class="k">raise</span> <span class="n">GithubSyncError</span><span class="p">(</span><span class="s">&#39;Failed to push: {info}&#39;</span><span class="o">.</span><span class="n">format</span><span class="p">(</span>
+                    <span class="n">info</span><span class="o">=</span><span class="nb">str</span><span class="p">(</span><span class="n">push_infos</span><span class="p">[</span><span class="mi">0</span><span class="p">]</span><span class="o">.</span><span class="n">summary</span><span class="p">)</span>
+                <span class="p">))</span></div>
+</pre></div>
+
+          </div>
+        </div>
+      </div>
+      <div class="clearer"></div>
+    </div>
+    <div class="related">
+      <h3>Navigation</h3>
+      <ul>
+        <li class="right" style="margin-right: 10px">
+          <a href="../genindex.html" title="General Index"
+             >index</a></li>
+        <li class="right" >
+          <a href="../py-modindex.html" title="Python Module Index"
+             >modules</a> |</li>
+        <li><a href="../index.html">MITx 1.0 documentation</a> &raquo;</li>
+          <li><a href="index.html" >Module code</a> &raquo;</li> 
+      </ul>
+    </div>
+    <div class="footer">
+        &copy; Copyright 2012, MITx team.
+      Created using <a href="http://sphinx.pocoo.org/">Sphinx</a> 1.1.3.
+    </div>
+  </body>
+</html>

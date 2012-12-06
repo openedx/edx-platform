@@ -1,0 +1,263 @@
+
+
+<!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Transitional//EN"
+  "http://www.w3.org/TR/xhtml1/DTD/xhtml1-transitional.dtd">
+
+
+<html xmlns="http://www.w3.org/1999/xhtml">
+  <head>
+    <meta http-equiv="Content-Type" content="text/html; charset=utf-8" />
+    
+    <title>xmodule.error_module &mdash; MITx 1.0 documentation</title>
+    
+    <link rel="stylesheet" href="../../_static/sphinxdoc.css" type="text/css" />
+    <link rel="stylesheet" href="../../_static/pygments.css" type="text/css" />
+    
+    <script type="text/javascript">
+      var DOCUMENTATION_OPTIONS = {
+        URL_ROOT:    '../../',
+        VERSION:     '1.0',
+        COLLAPSE_INDEX: false,
+        FILE_SUFFIX: '.html',
+        HAS_SOURCE:  true
+      };
+    </script>
+    <script type="text/javascript" src="../../_static/jquery.js"></script>
+    <script type="text/javascript" src="../../_static/underscore.js"></script>
+    <script type="text/javascript" src="../../_static/doctools.js"></script>
+    <script type="text/javascript" src="http://cdn.mathjax.org/mathjax/latest/MathJax.js?config=TeX-AMS-MML_HTMLorMML"></script>
+    <link rel="top" title="MITx 1.0 documentation" href="../../index.html" />
+    <link rel="up" title="Module code" href="../index.html" /> 
+  </head>
+  <body>
+<img src="../../_static/homepage-bg.jpg" alt="Edx logo"  width="100%;"/>
+
+    <div class="related">
+      <h3>Navigation</h3>
+      <ul>
+        <li class="right" style="margin-right: 10px">
+          <a href="../../genindex.html" title="General Index"
+             accesskey="I">index</a></li>
+        <li class="right" >
+          <a href="../../py-modindex.html" title="Python Module Index"
+             >modules</a> |</li>
+        <li><a href="../../index.html">MITx 1.0 documentation</a> &raquo;</li>
+          <li><a href="../index.html" accesskey="U">Module code</a> &raquo;</li> 
+      </ul>
+    </div>
+      <div class="sphinxsidebar">
+        <div class="sphinxsidebarwrapper">
+<div id="searchbox" style="display: none">
+  <h3>Quick search</h3>
+    <form class="search" action="../../search.html" method="get">
+      <input type="text" name="q" />
+      <input type="submit" value="Go" />
+      <input type="hidden" name="check_keywords" value="yes" />
+      <input type="hidden" name="area" value="default" />
+    </form>
+    <p class="searchtip" style="font-size: 90%">
+    Enter search terms or a module, class or function name.
+    </p>
+</div>
+<script type="text/javascript">$('#searchbox').show(0);</script>
+        </div>
+      </div>
+
+    <div class="document">
+      <div class="documentwrapper">
+        <div class="bodywrapper">
+          <div class="body">
+            
+  <h1>Source code for xmodule.error_module</h1><div class="highlight"><pre>
+<span class="kn">import</span> <span class="nn">hashlib</span>
+<span class="kn">import</span> <span class="nn">logging</span>
+<span class="kn">import</span> <span class="nn">json</span>
+<span class="kn">import</span> <span class="nn">sys</span>
+
+<span class="kn">from</span> <span class="nn">lxml</span> <span class="kn">import</span> <span class="n">etree</span>
+<span class="kn">from</span> <span class="nn">xmodule.x_module</span> <span class="kn">import</span> <span class="n">XModule</span>
+<span class="kn">from</span> <span class="nn">xmodule.editing_module</span> <span class="kn">import</span> <span class="n">JSONEditingDescriptor</span>
+<span class="kn">from</span> <span class="nn">xmodule.errortracker</span> <span class="kn">import</span> <span class="n">exc_info_to_str</span>
+<span class="kn">from</span> <span class="nn">xmodule.modulestore</span> <span class="kn">import</span> <span class="n">Location</span>
+
+
+<span class="n">log</span> <span class="o">=</span> <span class="n">logging</span><span class="o">.</span><span class="n">getLogger</span><span class="p">(</span><span class="n">__name__</span><span class="p">)</span>
+
+<span class="c"># NOTE: This is not the most beautiful design in the world, but there&#39;s no good</span>
+<span class="c"># way to tell if the module is being used in a staff context or not.  Errors that get discovered</span>
+<span class="c"># at course load time are turned into ErrorDescriptor objects, and automatically hidden from students.</span>
+<span class="c"># Unfortunately, we can also have errors when loading modules mid-request, and then we need to decide</span>
+<span class="c"># what to show, and the logic for that belongs in the LMS (e.g. in get_module), so the error handler</span>
+<span class="c"># decides whether to create a staff or not-staff module.</span>
+
+
+<span class="k">class</span> <span class="nc">ErrorModule</span><span class="p">(</span><span class="n">XModule</span><span class="p">):</span>
+    <span class="k">def</span> <span class="nf">get_html</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
+        <span class="sd">&#39;&#39;&#39;Show an error to staff.</span>
+<span class="sd">        TODO (vshnayder): proper style, divs, etc.</span>
+<span class="sd">        &#39;&#39;&#39;</span>
+        <span class="c"># staff get to see all the details</span>
+        <span class="k">return</span> <span class="bp">self</span><span class="o">.</span><span class="n">system</span><span class="o">.</span><span class="n">render_template</span><span class="p">(</span><span class="s">&#39;module-error.html&#39;</span><span class="p">,</span> <span class="p">{</span>
+            <span class="s">&#39;staff_access&#39;</span><span class="p">:</span> <span class="bp">True</span><span class="p">,</span>
+            <span class="s">&#39;data&#39;</span><span class="p">:</span> <span class="bp">self</span><span class="o">.</span><span class="n">definition</span><span class="p">[</span><span class="s">&#39;data&#39;</span><span class="p">][</span><span class="s">&#39;contents&#39;</span><span class="p">],</span>
+            <span class="s">&#39;error&#39;</span><span class="p">:</span> <span class="bp">self</span><span class="o">.</span><span class="n">definition</span><span class="p">[</span><span class="s">&#39;data&#39;</span><span class="p">][</span><span class="s">&#39;error_msg&#39;</span><span class="p">],</span>
+            <span class="p">})</span>
+
+
+<span class="k">class</span> <span class="nc">NonStaffErrorModule</span><span class="p">(</span><span class="n">XModule</span><span class="p">):</span>
+    <span class="k">def</span> <span class="nf">get_html</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
+        <span class="sd">&#39;&#39;&#39;Show an error to a student.</span>
+<span class="sd">        TODO (vshnayder): proper style, divs, etc.</span>
+<span class="sd">        &#39;&#39;&#39;</span>
+        <span class="c"># staff get to see all the details</span>
+        <span class="k">return</span> <span class="bp">self</span><span class="o">.</span><span class="n">system</span><span class="o">.</span><span class="n">render_template</span><span class="p">(</span><span class="s">&#39;module-error.html&#39;</span><span class="p">,</span> <span class="p">{</span>
+            <span class="s">&#39;staff_access&#39;</span><span class="p">:</span> <span class="bp">False</span><span class="p">,</span>
+            <span class="s">&#39;data&#39;</span><span class="p">:</span> <span class="s">&quot;&quot;</span><span class="p">,</span>
+            <span class="s">&#39;error&#39;</span><span class="p">:</span> <span class="s">&quot;&quot;</span><span class="p">,</span>
+            <span class="p">})</span>
+
+
+<div class="viewcode-block" id="ErrorDescriptor"><a class="viewcode-back" href="../../xmodule.html#xmodule.error_module.ErrorDescriptor">[docs]</a><span class="k">class</span> <span class="nc">ErrorDescriptor</span><span class="p">(</span><span class="n">JSONEditingDescriptor</span><span class="p">):</span>
+    <span class="sd">&quot;&quot;&quot;</span>
+<span class="sd">    Module that provides a raw editing view of broken xml.</span>
+<span class="sd">    &quot;&quot;&quot;</span>
+    <span class="n">module_class</span> <span class="o">=</span> <span class="n">ErrorModule</span>
+
+    <span class="nd">@classmethod</span>
+    <span class="k">def</span> <span class="nf">_construct</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">system</span><span class="p">,</span> <span class="n">contents</span><span class="p">,</span> <span class="n">error_msg</span><span class="p">,</span> <span class="n">location</span><span class="p">):</span>
+
+        <span class="k">if</span> <span class="n">location</span><span class="o">.</span><span class="n">name</span> <span class="ow">is</span> <span class="bp">None</span><span class="p">:</span>
+            <span class="n">location</span> <span class="o">=</span> <span class="n">location</span><span class="o">.</span><span class="n">_replace</span><span class="p">(</span>
+                <span class="n">category</span><span class="o">=</span><span class="s">&#39;error&#39;</span><span class="p">,</span>
+                <span class="c"># Pick a unique url_name -- the sha1 hash of the contents.</span>
+                <span class="c"># NOTE: We could try to pull out the url_name of the errored descriptor,</span>
+                <span class="c"># but url_names aren&#39;t guaranteed to be unique between descriptor types,</span>
+                <span class="c"># and ErrorDescriptor can wrap any type.  When the wrapped module is fixed,</span>
+                <span class="c"># it will be written out with the original url_name.</span>
+                <span class="n">name</span><span class="o">=</span><span class="n">hashlib</span><span class="o">.</span><span class="n">sha1</span><span class="p">(</span><span class="n">contents</span><span class="p">)</span><span class="o">.</span><span class="n">hexdigest</span><span class="p">()</span>
+            <span class="p">)</span>
+
+        <span class="n">definition</span> <span class="o">=</span> <span class="p">{</span>
+            <span class="s">&#39;data&#39;</span><span class="p">:</span> <span class="p">{</span>
+                <span class="s">&#39;error_msg&#39;</span><span class="p">:</span> <span class="nb">str</span><span class="p">(</span><span class="n">error_msg</span><span class="p">),</span>
+                <span class="s">&#39;contents&#39;</span><span class="p">:</span> <span class="n">contents</span><span class="p">,</span>
+            <span class="p">}</span>
+        <span class="p">}</span>
+
+        <span class="c"># real metadata stays in the content, but add a display name</span>
+        <span class="n">metadata</span> <span class="o">=</span> <span class="p">{</span><span class="s">&#39;display_name&#39;</span><span class="p">:</span> <span class="s">&#39;Error: &#39;</span> <span class="o">+</span> <span class="n">location</span><span class="o">.</span><span class="n">name</span><span class="p">}</span>
+        <span class="k">return</span> <span class="n">ErrorDescriptor</span><span class="p">(</span>
+            <span class="n">system</span><span class="p">,</span>
+            <span class="n">definition</span><span class="p">,</span>
+            <span class="n">location</span><span class="o">=</span><span class="n">location</span><span class="p">,</span>
+            <span class="n">metadata</span><span class="o">=</span><span class="n">metadata</span>
+        <span class="p">)</span>
+
+    <span class="k">def</span> <span class="nf">get_context</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
+        <span class="k">return</span> <span class="p">{</span>
+            <span class="s">&#39;module&#39;</span><span class="p">:</span> <span class="bp">self</span><span class="p">,</span>
+            <span class="s">&#39;data&#39;</span><span class="p">:</span> <span class="bp">self</span><span class="o">.</span><span class="n">definition</span><span class="p">[</span><span class="s">&#39;data&#39;</span><span class="p">][</span><span class="s">&#39;contents&#39;</span><span class="p">],</span>
+        <span class="p">}</span>
+
+    <span class="nd">@classmethod</span>
+    <span class="k">def</span> <span class="nf">from_json</span><span class="p">(</span><span class="n">cls</span><span class="p">,</span> <span class="n">json_data</span><span class="p">,</span> <span class="n">system</span><span class="p">,</span> <span class="n">error_msg</span><span class="o">=</span><span class="s">&#39;Error not available&#39;</span><span class="p">):</span>
+        <span class="k">return</span> <span class="n">cls</span><span class="o">.</span><span class="n">_construct</span><span class="p">(</span>
+            <span class="n">system</span><span class="p">,</span>
+            <span class="n">json</span><span class="o">.</span><span class="n">dumps</span><span class="p">(</span><span class="n">json_data</span><span class="p">,</span> <span class="n">indent</span><span class="o">=</span><span class="mi">4</span><span class="p">),</span>
+            <span class="n">error_msg</span><span class="p">,</span>
+            <span class="n">location</span><span class="o">=</span><span class="n">Location</span><span class="p">(</span><span class="n">json_data</span><span class="p">[</span><span class="s">&#39;location&#39;</span><span class="p">]),</span>
+        <span class="p">)</span>
+
+    <span class="nd">@classmethod</span>
+    <span class="k">def</span> <span class="nf">from_descriptor</span><span class="p">(</span><span class="n">cls</span><span class="p">,</span> <span class="n">descriptor</span><span class="p">,</span> <span class="n">error_msg</span><span class="o">=</span><span class="s">&#39;Error not available&#39;</span><span class="p">):</span>
+        <span class="k">return</span> <span class="n">cls</span><span class="o">.</span><span class="n">_construct</span><span class="p">(</span>
+            <span class="n">descriptor</span><span class="o">.</span><span class="n">system</span><span class="p">,</span>
+            <span class="n">json</span><span class="o">.</span><span class="n">dumps</span><span class="p">({</span>
+                <span class="s">&#39;definition&#39;</span><span class="p">:</span> <span class="n">descriptor</span><span class="o">.</span><span class="n">definition</span><span class="p">,</span>
+                <span class="s">&#39;metadata&#39;</span><span class="p">:</span> <span class="n">descriptor</span><span class="o">.</span><span class="n">metadata</span><span class="p">,</span>
+            <span class="p">},</span> <span class="n">indent</span><span class="o">=</span><span class="mi">4</span><span class="p">),</span>
+            <span class="n">error_msg</span><span class="p">,</span>
+            <span class="n">location</span><span class="o">=</span><span class="n">descriptor</span><span class="o">.</span><span class="n">location</span><span class="p">,</span>
+        <span class="p">)</span>
+
+    <span class="nd">@classmethod</span>
+<div class="viewcode-block" id="ErrorDescriptor.from_xml"><a class="viewcode-back" href="../../xmodule.html#xmodule.error_module.ErrorDescriptor.from_xml">[docs]</a>    <span class="k">def</span> <span class="nf">from_xml</span><span class="p">(</span><span class="n">cls</span><span class="p">,</span> <span class="n">xml_data</span><span class="p">,</span> <span class="n">system</span><span class="p">,</span> <span class="n">org</span><span class="o">=</span><span class="bp">None</span><span class="p">,</span> <span class="n">course</span><span class="o">=</span><span class="bp">None</span><span class="p">,</span>
+                 <span class="n">error_msg</span><span class="o">=</span><span class="s">&#39;Error not available&#39;</span><span class="p">):</span>
+        <span class="sd">&#39;&#39;&#39;Create an instance of this descriptor from the supplied data.</span>
+
+<span class="sd">        Does not require that xml_data be parseable--just stores it and exports</span>
+<span class="sd">        as-is if not.</span>
+
+<span class="sd">        Takes an extra, optional, parameter--the error that caused an</span>
+<span class="sd">        issue.  (should be a string, or convert usefully into one).</span>
+<span class="sd">        &#39;&#39;&#39;</span>
+
+        <span class="k">try</span><span class="p">:</span>
+            <span class="c"># If this is already an error tag, don&#39;t want to re-wrap it.</span>
+            <span class="n">xml_obj</span> <span class="o">=</span> <span class="n">etree</span><span class="o">.</span><span class="n">fromstring</span><span class="p">(</span><span class="n">xml_data</span><span class="p">)</span>
+            <span class="k">if</span> <span class="n">xml_obj</span><span class="o">.</span><span class="n">tag</span> <span class="o">==</span> <span class="s">&#39;error&#39;</span><span class="p">:</span>
+                <span class="n">xml_data</span> <span class="o">=</span> <span class="n">xml_obj</span><span class="o">.</span><span class="n">text</span>
+                <span class="n">error_node</span> <span class="o">=</span> <span class="n">xml_obj</span><span class="o">.</span><span class="n">find</span><span class="p">(</span><span class="s">&#39;error_msg&#39;</span><span class="p">)</span>
+                <span class="k">if</span> <span class="n">error_node</span> <span class="ow">is</span> <span class="ow">not</span> <span class="bp">None</span><span class="p">:</span>
+                    <span class="n">error_msg</span> <span class="o">=</span> <span class="n">error_node</span><span class="o">.</span><span class="n">text</span>
+                <span class="k">else</span><span class="p">:</span>
+                    <span class="n">error_msg</span> <span class="o">=</span> <span class="s">&#39;Error not available&#39;</span>
+
+        <span class="k">except</span> <span class="n">etree</span><span class="o">.</span><span class="n">XMLSyntaxError</span><span class="p">:</span>
+            <span class="c"># Save the error to display later--overrides other problems</span>
+            <span class="n">error_msg</span> <span class="o">=</span> <span class="n">exc_info_to_str</span><span class="p">(</span><span class="n">sys</span><span class="o">.</span><span class="n">exc_info</span><span class="p">())</span>
+
+        <span class="k">return</span> <span class="n">cls</span><span class="o">.</span><span class="n">_construct</span><span class="p">(</span><span class="n">system</span><span class="p">,</span> <span class="n">xml_data</span><span class="p">,</span> <span class="n">error_msg</span><span class="p">,</span> <span class="n">location</span><span class="o">=</span><span class="n">Location</span><span class="p">(</span><span class="s">&#39;i4x&#39;</span><span class="p">,</span> <span class="n">org</span><span class="p">,</span> <span class="n">course</span><span class="p">,</span> <span class="bp">None</span><span class="p">,</span> <span class="bp">None</span><span class="p">))</span>
+</div>
+<div class="viewcode-block" id="ErrorDescriptor.export_to_xml"><a class="viewcode-back" href="../../xmodule.html#xmodule.error_module.ErrorDescriptor.export_to_xml">[docs]</a>    <span class="k">def</span> <span class="nf">export_to_xml</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">resource_fs</span><span class="p">):</span>
+        <span class="sd">&#39;&#39;&#39;</span>
+<span class="sd">        If the definition data is invalid xml, export it wrapped in an &quot;error&quot;</span>
+<span class="sd">        tag.  If it is valid, export without the wrapper.</span>
+
+<span class="sd">        NOTE: There may still be problems with the valid xml--it could be</span>
+<span class="sd">        missing required attributes, could have the wrong tags, refer to missing</span>
+<span class="sd">        files, etc.  That would just get re-wrapped on import.</span>
+<span class="sd">        &#39;&#39;&#39;</span>
+        <span class="k">try</span><span class="p">:</span>
+            <span class="n">xml</span> <span class="o">=</span> <span class="n">etree</span><span class="o">.</span><span class="n">fromstring</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">definition</span><span class="p">[</span><span class="s">&#39;data&#39;</span><span class="p">][</span><span class="s">&#39;contents&#39;</span><span class="p">])</span>
+            <span class="k">return</span> <span class="n">etree</span><span class="o">.</span><span class="n">tostring</span><span class="p">(</span><span class="n">xml</span><span class="p">)</span>
+        <span class="k">except</span> <span class="n">etree</span><span class="o">.</span><span class="n">XMLSyntaxError</span><span class="p">:</span>
+            <span class="c"># still not valid.</span>
+            <span class="n">root</span> <span class="o">=</span> <span class="n">etree</span><span class="o">.</span><span class="n">Element</span><span class="p">(</span><span class="s">&#39;error&#39;</span><span class="p">)</span>
+            <span class="n">root</span><span class="o">.</span><span class="n">text</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">definition</span><span class="p">[</span><span class="s">&#39;data&#39;</span><span class="p">][</span><span class="s">&#39;contents&#39;</span><span class="p">]</span>
+            <span class="n">err_node</span> <span class="o">=</span> <span class="n">etree</span><span class="o">.</span><span class="n">SubElement</span><span class="p">(</span><span class="n">root</span><span class="p">,</span> <span class="s">&#39;error_msg&#39;</span><span class="p">)</span>
+            <span class="n">err_node</span><span class="o">.</span><span class="n">text</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">definition</span><span class="p">[</span><span class="s">&#39;data&#39;</span><span class="p">][</span><span class="s">&#39;error_msg&#39;</span><span class="p">]</span>
+            <span class="k">return</span> <span class="n">etree</span><span class="o">.</span><span class="n">tostring</span><span class="p">(</span><span class="n">root</span><span class="p">)</span>
+
+</div></div>
+<div class="viewcode-block" id="NonStaffErrorDescriptor"><a class="viewcode-back" href="../../xmodule.html#xmodule.error_module.NonStaffErrorDescriptor">[docs]</a><span class="k">class</span> <span class="nc">NonStaffErrorDescriptor</span><span class="p">(</span><span class="n">ErrorDescriptor</span><span class="p">):</span>
+    <span class="sd">&quot;&quot;&quot;</span>
+<span class="sd">    Module that provides non-staff error messages.</span>
+<span class="sd">    &quot;&quot;&quot;</span>
+    <span class="n">module_class</span> <span class="o">=</span> <span class="n">NonStaffErrorModule</span></div>
+</pre></div>
+
+          </div>
+        </div>
+      </div>
+      <div class="clearer"></div>
+    </div>
+    <div class="related">
+      <h3>Navigation</h3>
+      <ul>
+        <li class="right" style="margin-right: 10px">
+          <a href="../../genindex.html" title="General Index"
+             >index</a></li>
+        <li class="right" >
+          <a href="../../py-modindex.html" title="Python Module Index"
+             >modules</a> |</li>
+        <li><a href="../../index.html">MITx 1.0 documentation</a> &raquo;</li>
+          <li><a href="../index.html" >Module code</a> &raquo;</li> 
+      </ul>
+    </div>
+    <div class="footer">
+        &copy; Copyright 2012, MITx team.
+      Created using <a href="http://sphinx.pocoo.org/">Sphinx</a> 1.1.3.
+    </div>
+  </body>
+</html>

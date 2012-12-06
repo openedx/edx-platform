@@ -1,0 +1,324 @@
+
+
+<!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Transitional//EN"
+  "http://www.w3.org/TR/xhtml1/DTD/xhtml1-transitional.dtd">
+
+
+<html xmlns="http://www.w3.org/1999/xhtml">
+  <head>
+    <meta http-equiv="Content-Type" content="text/html; charset=utf-8" />
+    
+    <title>courseware.courses &mdash; MITx 1.0 documentation</title>
+    
+    <link rel="stylesheet" href="../../_static/sphinxdoc.css" type="text/css" />
+    <link rel="stylesheet" href="../../_static/pygments.css" type="text/css" />
+    
+    <script type="text/javascript">
+      var DOCUMENTATION_OPTIONS = {
+        URL_ROOT:    '../../',
+        VERSION:     '1.0',
+        COLLAPSE_INDEX: false,
+        FILE_SUFFIX: '.html',
+        HAS_SOURCE:  true
+      };
+    </script>
+    <script type="text/javascript" src="../../_static/jquery.js"></script>
+    <script type="text/javascript" src="../../_static/underscore.js"></script>
+    <script type="text/javascript" src="../../_static/doctools.js"></script>
+    <script type="text/javascript" src="http://cdn.mathjax.org/mathjax/latest/MathJax.js?config=TeX-AMS-MML_HTMLorMML"></script>
+    <link rel="top" title="MITx 1.0 documentation" href="../../index.html" />
+    <link rel="up" title="Module code" href="../index.html" /> 
+  </head>
+  <body>
+<img src="../../_static/homepage-bg.jpg" alt="Edx logo"  width="100%;"/>
+
+    <div class="related">
+      <h3>Navigation</h3>
+      <ul>
+        <li class="right" style="margin-right: 10px">
+          <a href="../../genindex.html" title="General Index"
+             accesskey="I">index</a></li>
+        <li class="right" >
+          <a href="../../py-modindex.html" title="Python Module Index"
+             >modules</a> |</li>
+        <li><a href="../../index.html">MITx 1.0 documentation</a> &raquo;</li>
+          <li><a href="../index.html" accesskey="U">Module code</a> &raquo;</li> 
+      </ul>
+    </div>
+      <div class="sphinxsidebar">
+        <div class="sphinxsidebarwrapper">
+<div id="searchbox" style="display: none">
+  <h3>Quick search</h3>
+    <form class="search" action="../../search.html" method="get">
+      <input type="text" name="q" />
+      <input type="submit" value="Go" />
+      <input type="hidden" name="check_keywords" value="yes" />
+      <input type="hidden" name="area" value="default" />
+    </form>
+    <p class="searchtip" style="font-size: 90%">
+    Enter search terms or a module, class or function name.
+    </p>
+</div>
+<script type="text/javascript">$('#searchbox').show(0);</script>
+        </div>
+      </div>
+
+    <div class="document">
+      <div class="documentwrapper">
+        <div class="bodywrapper">
+          <div class="body">
+            
+  <h1>Source code for courseware.courses</h1><div class="highlight"><pre>
+<span class="kn">from</span> <span class="nn">collections</span> <span class="kn">import</span> <span class="n">defaultdict</span>
+<span class="kn">from</span> <span class="nn">fs.errors</span> <span class="kn">import</span> <span class="n">ResourceNotFoundError</span>
+<span class="kn">from</span> <span class="nn">functools</span> <span class="kn">import</span> <span class="n">wraps</span>
+<span class="kn">import</span> <span class="nn">logging</span>
+
+<span class="kn">from</span> <span class="nn">path</span> <span class="kn">import</span> <span class="n">path</span>
+<span class="kn">from</span> <span class="nn">django.conf</span> <span class="kn">import</span> <span class="n">settings</span>
+<span class="kn">from</span> <span class="nn">django.core.urlresolvers</span> <span class="kn">import</span> <span class="n">reverse</span>
+<span class="kn">from</span> <span class="nn">django.http</span> <span class="kn">import</span> <span class="n">Http404</span>
+
+<span class="kn">from</span> <span class="nn">xmodule.course_module</span> <span class="kn">import</span> <span class="n">CourseDescriptor</span>
+<span class="kn">from</span> <span class="nn">xmodule.modulestore</span> <span class="kn">import</span> <span class="n">Location</span>
+<span class="kn">from</span> <span class="nn">xmodule.modulestore.django</span> <span class="kn">import</span> <span class="n">modulestore</span>
+<span class="kn">from</span> <span class="nn">xmodule.modulestore.exceptions</span> <span class="kn">import</span> <span class="n">ItemNotFoundError</span>
+<span class="kn">from</span> <span class="nn">static_replace</span> <span class="kn">import</span> <span class="n">replace_urls</span><span class="p">,</span> <span class="n">try_staticfiles_lookup</span>
+<span class="kn">from</span> <span class="nn">courseware.access</span> <span class="kn">import</span> <span class="n">has_access</span>
+<span class="kn">import</span> <span class="nn">branding</span>
+
+<span class="n">log</span> <span class="o">=</span> <span class="n">logging</span><span class="o">.</span><span class="n">getLogger</span><span class="p">(</span><span class="n">__name__</span><span class="p">)</span>
+
+
+<div class="viewcode-block" id="get_course_by_id"><a class="viewcode-back" href="../../lms.html#courseware.courses.get_course_by_id">[docs]</a><span class="k">def</span> <span class="nf">get_course_by_id</span><span class="p">(</span><span class="n">course_id</span><span class="p">):</span>
+    <span class="sd">&quot;&quot;&quot;</span>
+<span class="sd">    Given a course id, return the corresponding course descriptor.</span>
+
+<span class="sd">    If course_id is not valid, raises a 404.</span>
+<span class="sd">    &quot;&quot;&quot;</span>
+    <span class="k">try</span><span class="p">:</span>
+        <span class="n">course_loc</span> <span class="o">=</span> <span class="n">CourseDescriptor</span><span class="o">.</span><span class="n">id_to_location</span><span class="p">(</span><span class="n">course_id</span><span class="p">)</span>
+        <span class="k">return</span> <span class="n">modulestore</span><span class="p">()</span><span class="o">.</span><span class="n">get_instance</span><span class="p">(</span><span class="n">course_id</span><span class="p">,</span> <span class="n">course_loc</span><span class="p">)</span>
+    <span class="k">except</span> <span class="p">(</span><span class="ne">KeyError</span><span class="p">,</span> <span class="n">ItemNotFoundError</span><span class="p">):</span>
+        <span class="k">raise</span> <span class="n">Http404</span><span class="p">(</span><span class="s">&quot;Course not found.&quot;</span><span class="p">)</span>
+
+</div>
+<div class="viewcode-block" id="get_course_with_access"><a class="viewcode-back" href="../../lms.html#courseware.courses.get_course_with_access">[docs]</a><span class="k">def</span> <span class="nf">get_course_with_access</span><span class="p">(</span><span class="n">user</span><span class="p">,</span> <span class="n">course_id</span><span class="p">,</span> <span class="n">action</span><span class="p">):</span>
+    <span class="sd">&quot;&quot;&quot;</span>
+<span class="sd">    Given a course_id, look up the corresponding course descriptor,</span>
+<span class="sd">    check that the user has the access to perform the specified action</span>
+<span class="sd">    on the course, and return the descriptor.</span>
+
+<span class="sd">    Raises a 404 if the course_id is invalid, or the user doesn&#39;t have access.</span>
+<span class="sd">    &quot;&quot;&quot;</span>
+    <span class="n">course</span> <span class="o">=</span> <span class="n">get_course_by_id</span><span class="p">(</span><span class="n">course_id</span><span class="p">)</span>
+    <span class="k">if</span> <span class="ow">not</span> <span class="n">has_access</span><span class="p">(</span><span class="n">user</span><span class="p">,</span> <span class="n">course</span><span class="p">,</span> <span class="n">action</span><span class="p">):</span>
+        <span class="c"># Deliberately return a non-specific error message to avoid</span>
+        <span class="c"># leaking info about access control settings</span>
+        <span class="k">raise</span> <span class="n">Http404</span><span class="p">(</span><span class="s">&quot;Course not found.&quot;</span><span class="p">)</span>
+    <span class="k">return</span> <span class="n">course</span>
+
+</div>
+<div class="viewcode-block" id="get_opt_course_with_access"><a class="viewcode-back" href="../../lms.html#courseware.courses.get_opt_course_with_access">[docs]</a><span class="k">def</span> <span class="nf">get_opt_course_with_access</span><span class="p">(</span><span class="n">user</span><span class="p">,</span> <span class="n">course_id</span><span class="p">,</span> <span class="n">action</span><span class="p">):</span>
+    <span class="sd">&quot;&quot;&quot;</span>
+<span class="sd">    Same as get_course_with_access, except that if course_id is None,</span>
+<span class="sd">    return None without performing any access checks.</span>
+<span class="sd">    &quot;&quot;&quot;</span>
+    <span class="k">if</span> <span class="n">course_id</span> <span class="ow">is</span> <span class="bp">None</span><span class="p">:</span>
+        <span class="k">return</span> <span class="bp">None</span>
+    <span class="k">return</span> <span class="n">get_course_with_access</span><span class="p">(</span><span class="n">user</span><span class="p">,</span> <span class="n">course_id</span><span class="p">,</span> <span class="n">action</span><span class="p">)</span>
+
+</div>
+<div class="viewcode-block" id="course_image_url"><a class="viewcode-back" href="../../lms.html#courseware.courses.course_image_url">[docs]</a><span class="k">def</span> <span class="nf">course_image_url</span><span class="p">(</span><span class="n">course</span><span class="p">):</span>
+    <span class="sd">&quot;&quot;&quot;Try to look up the image url for the course.  If it&#39;s not found,</span>
+<span class="sd">    log an error and return the dead link&quot;&quot;&quot;</span>
+    <span class="n">path</span> <span class="o">=</span> <span class="n">course</span><span class="o">.</span><span class="n">metadata</span><span class="p">[</span><span class="s">&#39;data_dir&#39;</span><span class="p">]</span> <span class="o">+</span> <span class="s">&quot;/images/course_image.jpg&quot;</span>
+    <span class="k">return</span> <span class="n">try_staticfiles_lookup</span><span class="p">(</span><span class="n">path</span><span class="p">)</span>
+</div>
+<div class="viewcode-block" id="find_file"><a class="viewcode-back" href="../../lms.html#courseware.courses.find_file">[docs]</a><span class="k">def</span> <span class="nf">find_file</span><span class="p">(</span><span class="n">fs</span><span class="p">,</span> <span class="n">dirs</span><span class="p">,</span> <span class="n">filename</span><span class="p">):</span>
+    <span class="sd">&quot;&quot;&quot;</span>
+<span class="sd">    Looks for a filename in a list of dirs on a filesystem, in the specified order.</span>
+
+<span class="sd">    fs: an OSFS filesystem</span>
+<span class="sd">    dirs: a list of path objects</span>
+<span class="sd">    filename: a string</span>
+
+<span class="sd">    Returns d / filename if found in dir d, else raises ResourceNotFoundError.</span>
+<span class="sd">    &quot;&quot;&quot;</span>
+    <span class="k">for</span> <span class="n">d</span> <span class="ow">in</span> <span class="n">dirs</span><span class="p">:</span>
+        <span class="n">filepath</span> <span class="o">=</span> <span class="n">path</span><span class="p">(</span><span class="n">d</span><span class="p">)</span> <span class="o">/</span> <span class="n">filename</span>
+        <span class="k">if</span> <span class="n">fs</span><span class="o">.</span><span class="n">exists</span><span class="p">(</span><span class="n">filepath</span><span class="p">):</span>
+            <span class="k">return</span> <span class="n">filepath</span>
+    <span class="k">raise</span> <span class="n">ResourceNotFoundError</span><span class="p">(</span><span class="s">&quot;Could not find {0}&quot;</span><span class="o">.</span><span class="n">format</span><span class="p">(</span><span class="n">filename</span><span class="p">))</span>
+</div>
+<div class="viewcode-block" id="get_course_about_section"><a class="viewcode-back" href="../../lms.html#courseware.courses.get_course_about_section">[docs]</a><span class="k">def</span> <span class="nf">get_course_about_section</span><span class="p">(</span><span class="n">course</span><span class="p">,</span> <span class="n">section_key</span><span class="p">):</span>
+    <span class="sd">&quot;&quot;&quot;</span>
+<span class="sd">    This returns the snippet of html to be rendered on the course about page,</span>
+<span class="sd">    given the key for the section.</span>
+
+<span class="sd">    Valid keys:</span>
+<span class="sd">    - overview</span>
+<span class="sd">    - title</span>
+<span class="sd">    - university</span>
+<span class="sd">    - number</span>
+<span class="sd">    - short_description</span>
+<span class="sd">    - description</span>
+<span class="sd">    - key_dates (includes start, end, exams, etc)</span>
+<span class="sd">    - video</span>
+<span class="sd">    - course_staff_short</span>
+<span class="sd">    - course_staff_extended</span>
+<span class="sd">    - requirements</span>
+<span class="sd">    - syllabus</span>
+<span class="sd">    - textbook</span>
+<span class="sd">    - faq</span>
+<span class="sd">    - more_info</span>
+<span class="sd">    - ocw_links</span>
+<span class="sd">    &quot;&quot;&quot;</span>
+
+    <span class="c"># Many of these are stored as html files instead of some semantic</span>
+    <span class="c"># markup. This can change without effecting this interface when we find a</span>
+    <span class="c"># good format for defining so many snippets of text/html.</span>
+
+<span class="c"># TODO: Remove number, instructors from this list</span>
+    <span class="k">if</span> <span class="n">section_key</span> <span class="ow">in</span> <span class="p">[</span><span class="s">&#39;short_description&#39;</span><span class="p">,</span> <span class="s">&#39;description&#39;</span><span class="p">,</span> <span class="s">&#39;key_dates&#39;</span><span class="p">,</span> <span class="s">&#39;video&#39;</span><span class="p">,</span>
+                       <span class="s">&#39;course_staff_short&#39;</span><span class="p">,</span> <span class="s">&#39;course_staff_extended&#39;</span><span class="p">,</span>
+                       <span class="s">&#39;requirements&#39;</span><span class="p">,</span> <span class="s">&#39;syllabus&#39;</span><span class="p">,</span> <span class="s">&#39;textbook&#39;</span><span class="p">,</span> <span class="s">&#39;faq&#39;</span><span class="p">,</span> <span class="s">&#39;more_info&#39;</span><span class="p">,</span>
+                       <span class="s">&#39;number&#39;</span><span class="p">,</span> <span class="s">&#39;instructors&#39;</span><span class="p">,</span> <span class="s">&#39;overview&#39;</span><span class="p">,</span>
+                       <span class="s">&#39;effort&#39;</span><span class="p">,</span> <span class="s">&#39;end_date&#39;</span><span class="p">,</span> <span class="s">&#39;prerequisites&#39;</span><span class="p">,</span> <span class="s">&#39;ocw_links&#39;</span><span class="p">]:</span>
+
+        <span class="k">try</span><span class="p">:</span>
+            <span class="n">fs</span> <span class="o">=</span> <span class="n">course</span><span class="o">.</span><span class="n">system</span><span class="o">.</span><span class="n">resources_fs</span>
+            <span class="c"># first look for a run-specific version</span>
+            <span class="n">dirs</span> <span class="o">=</span> <span class="p">[</span><span class="n">path</span><span class="p">(</span><span class="s">&quot;about&quot;</span><span class="p">)</span> <span class="o">/</span> <span class="n">course</span><span class="o">.</span><span class="n">url_name</span><span class="p">,</span> <span class="n">path</span><span class="p">(</span><span class="s">&quot;about&quot;</span><span class="p">)]</span>
+            <span class="n">filepath</span> <span class="o">=</span> <span class="n">find_file</span><span class="p">(</span><span class="n">fs</span><span class="p">,</span> <span class="n">dirs</span><span class="p">,</span> <span class="n">section_key</span> <span class="o">+</span> <span class="s">&quot;.html&quot;</span><span class="p">)</span>
+            <span class="k">with</span> <span class="n">fs</span><span class="o">.</span><span class="n">open</span><span class="p">(</span><span class="n">filepath</span><span class="p">)</span> <span class="k">as</span> <span class="n">htmlFile</span><span class="p">:</span>
+                <span class="k">return</span> <span class="n">replace_urls</span><span class="p">(</span><span class="n">htmlFile</span><span class="o">.</span><span class="n">read</span><span class="p">()</span><span class="o">.</span><span class="n">decode</span><span class="p">(</span><span class="s">&#39;utf-8&#39;</span><span class="p">),</span>
+                                    <span class="n">course</span><span class="o">.</span><span class="n">metadata</span><span class="p">[</span><span class="s">&#39;data_dir&#39;</span><span class="p">])</span>
+        <span class="k">except</span> <span class="n">ResourceNotFoundError</span><span class="p">:</span>
+            <span class="n">log</span><span class="o">.</span><span class="n">warning</span><span class="p">(</span><span class="s">&quot;Missing about section {key} in course {url}&quot;</span><span class="o">.</span><span class="n">format</span><span class="p">(</span>
+                <span class="n">key</span><span class="o">=</span><span class="n">section_key</span><span class="p">,</span> <span class="n">url</span><span class="o">=</span><span class="n">course</span><span class="o">.</span><span class="n">location</span><span class="o">.</span><span class="n">url</span><span class="p">()))</span>
+            <span class="k">return</span> <span class="bp">None</span>
+    <span class="k">elif</span> <span class="n">section_key</span> <span class="o">==</span> <span class="s">&quot;title&quot;</span><span class="p">:</span>
+        <span class="k">return</span> <span class="n">course</span><span class="o">.</span><span class="n">metadata</span><span class="o">.</span><span class="n">get</span><span class="p">(</span><span class="s">&#39;display_name&#39;</span><span class="p">,</span> <span class="n">course</span><span class="o">.</span><span class="n">url_name</span><span class="p">)</span>
+    <span class="k">elif</span> <span class="n">section_key</span> <span class="o">==</span> <span class="s">&quot;university&quot;</span><span class="p">:</span>
+        <span class="k">return</span> <span class="n">course</span><span class="o">.</span><span class="n">location</span><span class="o">.</span><span class="n">org</span>
+    <span class="k">elif</span> <span class="n">section_key</span> <span class="o">==</span> <span class="s">&quot;number&quot;</span><span class="p">:</span>
+        <span class="k">return</span> <span class="n">course</span><span class="o">.</span><span class="n">number</span>
+
+    <span class="k">raise</span> <span class="ne">KeyError</span><span class="p">(</span><span class="s">&quot;Invalid about key &quot;</span> <span class="o">+</span> <span class="nb">str</span><span class="p">(</span><span class="n">section_key</span><span class="p">))</span>
+
+</div>
+<div class="viewcode-block" id="get_course_info_section"><a class="viewcode-back" href="../../lms.html#courseware.courses.get_course_info_section">[docs]</a><span class="k">def</span> <span class="nf">get_course_info_section</span><span class="p">(</span><span class="n">course</span><span class="p">,</span> <span class="n">section_key</span><span class="p">):</span>
+    <span class="sd">&quot;&quot;&quot;</span>
+<span class="sd">    This returns the snippet of html to be rendered on the course info page,</span>
+<span class="sd">    given the key for the section.</span>
+
+<span class="sd">    Valid keys:</span>
+<span class="sd">    - handouts</span>
+<span class="sd">    - guest_handouts</span>
+<span class="sd">    - updates</span>
+<span class="sd">    - guest_updates</span>
+<span class="sd">    &quot;&quot;&quot;</span>
+
+    <span class="c"># Many of these are stored as html files instead of some semantic</span>
+    <span class="c"># markup. This can change without effecting this interface when we find a</span>
+    <span class="c"># good format for defining so many snippets of text/html.</span>
+
+    <span class="k">if</span> <span class="n">section_key</span> <span class="ow">in</span> <span class="p">[</span><span class="s">&#39;handouts&#39;</span><span class="p">,</span> <span class="s">&#39;guest_handouts&#39;</span><span class="p">,</span> <span class="s">&#39;updates&#39;</span><span class="p">,</span> <span class="s">&#39;guest_updates&#39;</span><span class="p">]:</span>
+        <span class="k">try</span><span class="p">:</span>
+            <span class="n">fs</span> <span class="o">=</span> <span class="n">course</span><span class="o">.</span><span class="n">system</span><span class="o">.</span><span class="n">resources_fs</span>
+            <span class="c"># first look for a run-specific version</span>
+            <span class="n">dirs</span> <span class="o">=</span> <span class="p">[</span><span class="n">path</span><span class="p">(</span><span class="s">&quot;info&quot;</span><span class="p">)</span> <span class="o">/</span> <span class="n">course</span><span class="o">.</span><span class="n">url_name</span><span class="p">,</span> <span class="n">path</span><span class="p">(</span><span class="s">&quot;info&quot;</span><span class="p">)]</span>
+            <span class="n">filepath</span> <span class="o">=</span> <span class="n">find_file</span><span class="p">(</span><span class="n">fs</span><span class="p">,</span> <span class="n">dirs</span><span class="p">,</span> <span class="n">section_key</span> <span class="o">+</span> <span class="s">&quot;.html&quot;</span><span class="p">)</span>
+
+            <span class="k">with</span> <span class="n">fs</span><span class="o">.</span><span class="n">open</span><span class="p">(</span><span class="n">filepath</span><span class="p">)</span> <span class="k">as</span> <span class="n">htmlFile</span><span class="p">:</span>
+                <span class="c"># Replace &#39;/static/&#39; urls</span>
+                <span class="n">info_html</span> <span class="o">=</span> <span class="n">replace_urls</span><span class="p">(</span><span class="n">htmlFile</span><span class="o">.</span><span class="n">read</span><span class="p">()</span><span class="o">.</span><span class="n">decode</span><span class="p">(</span><span class="s">&#39;utf-8&#39;</span><span class="p">),</span> <span class="n">course</span><span class="o">.</span><span class="n">metadata</span><span class="p">[</span><span class="s">&#39;data_dir&#39;</span><span class="p">])</span>
+
+                <span class="c"># Replace &#39;/course/&#39; urls</span>
+                <span class="n">course_root</span> <span class="o">=</span> <span class="n">reverse</span><span class="p">(</span><span class="s">&#39;course_root&#39;</span><span class="p">,</span> <span class="n">args</span><span class="o">=</span><span class="p">[</span><span class="n">course</span><span class="o">.</span><span class="n">id</span><span class="p">])[:</span><span class="o">-</span><span class="mi">1</span><span class="p">]</span> <span class="c"># Remove trailing slash</span>
+                <span class="n">info_html</span> <span class="o">=</span> <span class="n">replace_urls</span><span class="p">(</span><span class="n">info_html</span><span class="p">,</span> <span class="n">course_root</span><span class="p">,</span> <span class="s">&#39;/course/&#39;</span><span class="p">)</span>
+                <span class="k">return</span> <span class="n">info_html</span>
+        <span class="k">except</span> <span class="n">ResourceNotFoundError</span><span class="p">:</span>
+            <span class="n">log</span><span class="o">.</span><span class="n">exception</span><span class="p">(</span><span class="s">&quot;Missing info section {key} in course {url}&quot;</span><span class="o">.</span><span class="n">format</span><span class="p">(</span>
+                <span class="n">key</span><span class="o">=</span><span class="n">section_key</span><span class="p">,</span> <span class="n">url</span><span class="o">=</span><span class="n">course</span><span class="o">.</span><span class="n">location</span><span class="o">.</span><span class="n">url</span><span class="p">()))</span>
+            <span class="k">return</span> <span class="s">&quot;! Info section missing !&quot;</span>
+
+    <span class="k">raise</span> <span class="ne">KeyError</span><span class="p">(</span><span class="s">&quot;Invalid about key &quot;</span> <span class="o">+</span> <span class="nb">str</span><span class="p">(</span><span class="n">section_key</span><span class="p">))</span>
+
+
+<span class="c"># TODO: Fix this such that these are pulled in as extra course-specific tabs.</span>
+<span class="c">#       arjun will address this by the end of October if no one does so prior to</span>
+<span class="c">#       then.</span></div>
+<div class="viewcode-block" id="get_course_syllabus_section"><a class="viewcode-back" href="../../lms.html#courseware.courses.get_course_syllabus_section">[docs]</a><span class="k">def</span> <span class="nf">get_course_syllabus_section</span><span class="p">(</span><span class="n">course</span><span class="p">,</span> <span class="n">section_key</span><span class="p">):</span>
+    <span class="sd">&quot;&quot;&quot;</span>
+<span class="sd">    This returns the snippet of html to be rendered on the syllabus page,</span>
+<span class="sd">    given the key for the section.</span>
+
+<span class="sd">    Valid keys:</span>
+<span class="sd">    - syllabus</span>
+<span class="sd">    - guest_syllabus</span>
+<span class="sd">    &quot;&quot;&quot;</span>
+
+    <span class="c"># Many of these are stored as html files instead of some semantic</span>
+    <span class="c"># markup. This can change without effecting this interface when we find a</span>
+    <span class="c"># good format for defining so many snippets of text/html.</span>
+
+    <span class="k">if</span> <span class="n">section_key</span> <span class="ow">in</span> <span class="p">[</span><span class="s">&#39;syllabus&#39;</span><span class="p">,</span> <span class="s">&#39;guest_syllabus&#39;</span><span class="p">]:</span>
+        <span class="k">try</span><span class="p">:</span>
+            <span class="n">fs</span> <span class="o">=</span> <span class="n">course</span><span class="o">.</span><span class="n">system</span><span class="o">.</span><span class="n">resources_fs</span>
+            <span class="c"># first look for a run-specific version</span>
+            <span class="n">dirs</span> <span class="o">=</span> <span class="p">[</span><span class="n">path</span><span class="p">(</span><span class="s">&quot;syllabus&quot;</span><span class="p">)</span> <span class="o">/</span> <span class="n">course</span><span class="o">.</span><span class="n">url_name</span><span class="p">,</span> <span class="n">path</span><span class="p">(</span><span class="s">&quot;syllabus&quot;</span><span class="p">)]</span>
+            <span class="n">filepath</span> <span class="o">=</span> <span class="n">find_file</span><span class="p">(</span><span class="n">fs</span><span class="p">,</span> <span class="n">dirs</span><span class="p">,</span> <span class="n">section_key</span> <span class="o">+</span> <span class="s">&quot;.html&quot;</span><span class="p">)</span>
+            <span class="k">with</span> <span class="n">fs</span><span class="o">.</span><span class="n">open</span><span class="p">(</span><span class="n">filepath</span><span class="p">)</span> <span class="k">as</span> <span class="n">htmlFile</span><span class="p">:</span>
+                <span class="k">return</span> <span class="n">replace_urls</span><span class="p">(</span><span class="n">htmlFile</span><span class="o">.</span><span class="n">read</span><span class="p">()</span><span class="o">.</span><span class="n">decode</span><span class="p">(</span><span class="s">&#39;utf-8&#39;</span><span class="p">),</span>
+                                    <span class="n">course</span><span class="o">.</span><span class="n">metadata</span><span class="p">[</span><span class="s">&#39;data_dir&#39;</span><span class="p">])</span>
+        <span class="k">except</span> <span class="n">ResourceNotFoundError</span><span class="p">:</span>
+            <span class="n">log</span><span class="o">.</span><span class="n">exception</span><span class="p">(</span><span class="s">&quot;Missing syllabus section {key} in course {url}&quot;</span><span class="o">.</span><span class="n">format</span><span class="p">(</span>
+                <span class="n">key</span><span class="o">=</span><span class="n">section_key</span><span class="p">,</span> <span class="n">url</span><span class="o">=</span><span class="n">course</span><span class="o">.</span><span class="n">location</span><span class="o">.</span><span class="n">url</span><span class="p">()))</span>
+            <span class="k">return</span> <span class="s">&quot;! Syllabus missing !&quot;</span>
+
+    <span class="k">raise</span> <span class="ne">KeyError</span><span class="p">(</span><span class="s">&quot;Invalid about key &quot;</span> <span class="o">+</span> <span class="nb">str</span><span class="p">(</span><span class="n">section_key</span><span class="p">))</span>
+
+</div>
+<div class="viewcode-block" id="get_courses_by_university"><a class="viewcode-back" href="../../lms.html#courseware.courses.get_courses_by_university">[docs]</a><span class="k">def</span> <span class="nf">get_courses_by_university</span><span class="p">(</span><span class="n">user</span><span class="p">,</span> <span class="n">domain</span><span class="o">=</span><span class="bp">None</span><span class="p">):</span>
+    <span class="sd">&#39;&#39;&#39;</span>
+<span class="sd">    Returns dict of lists of courses available, keyed by course.org (ie university).</span>
+<span class="sd">    Courses are sorted by course.number.</span>
+<span class="sd">    &#39;&#39;&#39;</span>
+    <span class="c"># TODO: Clean up how &#39;error&#39; is done.</span>
+    <span class="c"># filter out any courses that errored.</span>
+    <span class="n">visible_courses</span> <span class="o">=</span> <span class="n">branding</span><span class="o">.</span><span class="n">get_visible_courses</span><span class="p">(</span><span class="n">domain</span><span class="p">)</span>
+
+    <span class="n">universities</span> <span class="o">=</span> <span class="n">defaultdict</span><span class="p">(</span><span class="nb">list</span><span class="p">)</span>
+    <span class="k">for</span> <span class="n">course</span> <span class="ow">in</span> <span class="n">visible_courses</span><span class="p">:</span>
+        <span class="k">if</span> <span class="ow">not</span> <span class="n">has_access</span><span class="p">(</span><span class="n">user</span><span class="p">,</span> <span class="n">course</span><span class="p">,</span> <span class="s">&#39;see_exists&#39;</span><span class="p">):</span>
+            <span class="k">continue</span>
+        <span class="n">universities</span><span class="p">[</span><span class="n">course</span><span class="o">.</span><span class="n">org</span><span class="p">]</span><span class="o">.</span><span class="n">append</span><span class="p">(</span><span class="n">course</span><span class="p">)</span>
+    <span class="k">return</span> <span class="n">universities</span></div>
+</pre></div>
+
+          </div>
+        </div>
+      </div>
+      <div class="clearer"></div>
+    </div>
+    <div class="related">
+      <h3>Navigation</h3>
+      <ul>
+        <li class="right" style="margin-right: 10px">
+          <a href="../../genindex.html" title="General Index"
+             >index</a></li>
+        <li class="right" >
+          <a href="../../py-modindex.html" title="Python Module Index"
+             >modules</a> |</li>
+        <li><a href="../../index.html">MITx 1.0 documentation</a> &raquo;</li>
+          <li><a href="../index.html" >Module code</a> &raquo;</li> 
+      </ul>
+    </div>
+    <div class="footer">
+        &copy; Copyright 2012, MITx team.
+      Created using <a href="http://sphinx.pocoo.org/">Sphinx</a> 1.1.3.
+    </div>
+  </body>
+</html>

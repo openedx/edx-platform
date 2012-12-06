@@ -1,0 +1,320 @@
+
+
+<!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Transitional//EN"
+  "http://www.w3.org/TR/xhtml1/DTD/xhtml1-transitional.dtd">
+
+
+<html xmlns="http://www.w3.org/1999/xhtml">
+  <head>
+    <meta http-equiv="Content-Type" content="text/html; charset=utf-8" />
+    
+    <title>lms_migration.migrate &mdash; MITx 1.0 documentation</title>
+    
+    <link rel="stylesheet" href="../../_static/sphinxdoc.css" type="text/css" />
+    <link rel="stylesheet" href="../../_static/pygments.css" type="text/css" />
+    
+    <script type="text/javascript">
+      var DOCUMENTATION_OPTIONS = {
+        URL_ROOT:    '../../',
+        VERSION:     '1.0',
+        COLLAPSE_INDEX: false,
+        FILE_SUFFIX: '.html',
+        HAS_SOURCE:  true
+      };
+    </script>
+    <script type="text/javascript" src="../../_static/jquery.js"></script>
+    <script type="text/javascript" src="../../_static/underscore.js"></script>
+    <script type="text/javascript" src="../../_static/doctools.js"></script>
+    <script type="text/javascript" src="http://cdn.mathjax.org/mathjax/latest/MathJax.js?config=TeX-AMS-MML_HTMLorMML"></script>
+    <link rel="top" title="MITx 1.0 documentation" href="../../index.html" />
+    <link rel="up" title="Module code" href="../index.html" /> 
+  </head>
+  <body>
+<img src="../../_static/homepage-bg.jpg" alt="Edx logo"  width="100%;"/>
+
+    <div class="related">
+      <h3>Navigation</h3>
+      <ul>
+        <li class="right" style="margin-right: 10px">
+          <a href="../../genindex.html" title="General Index"
+             accesskey="I">index</a></li>
+        <li class="right" >
+          <a href="../../py-modindex.html" title="Python Module Index"
+             >modules</a> |</li>
+        <li><a href="../../index.html">MITx 1.0 documentation</a> &raquo;</li>
+          <li><a href="../index.html" accesskey="U">Module code</a> &raquo;</li> 
+      </ul>
+    </div>
+      <div class="sphinxsidebar">
+        <div class="sphinxsidebarwrapper">
+<div id="searchbox" style="display: none">
+  <h3>Quick search</h3>
+    <form class="search" action="../../search.html" method="get">
+      <input type="text" name="q" />
+      <input type="submit" value="Go" />
+      <input type="hidden" name="check_keywords" value="yes" />
+      <input type="hidden" name="area" value="default" />
+    </form>
+    <p class="searchtip" style="font-size: 90%">
+    Enter search terms or a module, class or function name.
+    </p>
+</div>
+<script type="text/javascript">$('#searchbox').show(0);</script>
+        </div>
+      </div>
+
+    <div class="document">
+      <div class="documentwrapper">
+        <div class="bodywrapper">
+          <div class="body">
+            
+  <h1>Source code for lms_migration.migrate</h1><div class="highlight"><pre>
+<span class="c">#</span>
+<span class="c"># migration tools for content team to go from stable-edx4edx to LMS+CMS</span>
+<span class="c">#</span>
+
+<span class="kn">import</span> <span class="nn">json</span>
+<span class="kn">import</span> <span class="nn">logging</span>
+<span class="kn">import</span> <span class="nn">os</span>
+<span class="kn">from</span> <span class="nn">pprint</span> <span class="kn">import</span> <span class="n">pprint</span>
+<span class="kn">import</span> <span class="nn">xmodule.modulestore.django</span> <span class="kn">as</span> <span class="nn">xmodule_django</span>
+<span class="kn">from</span> <span class="nn">xmodule.modulestore.django</span> <span class="kn">import</span> <span class="n">modulestore</span>
+
+<span class="kn">from</span> <span class="nn">django.http</span> <span class="kn">import</span> <span class="n">HttpResponse</span>
+<span class="kn">from</span> <span class="nn">django.conf</span> <span class="kn">import</span> <span class="n">settings</span>
+<span class="kn">import</span> <span class="nn">track.views</span>
+
+<span class="k">try</span><span class="p">:</span>
+    <span class="kn">from</span> <span class="nn">django.views.decorators.csrf</span> <span class="kn">import</span> <span class="n">csrf_exempt</span>
+<span class="k">except</span> <span class="ne">ImportError</span><span class="p">:</span>
+    <span class="kn">from</span> <span class="nn">django.contrib.csrf.middleware</span> <span class="kn">import</span> <span class="n">csrf_exempt</span>
+
+<span class="n">log</span> <span class="o">=</span> <span class="n">logging</span><span class="o">.</span><span class="n">getLogger</span><span class="p">(</span><span class="s">&quot;mitx.lms_migrate&quot;</span><span class="p">)</span>
+<span class="n">LOCAL_DEBUG</span> <span class="o">=</span> <span class="bp">True</span>
+<span class="n">ALLOWED_IPS</span> <span class="o">=</span> <span class="n">settings</span><span class="o">.</span><span class="n">LMS_MIGRATION_ALLOWED_IPS</span>
+
+<div class="viewcode-block" id="escape"><a class="viewcode-back" href="../../lms.html#lms_migration.migrate.escape">[docs]</a><span class="k">def</span> <span class="nf">escape</span><span class="p">(</span><span class="n">s</span><span class="p">):</span>
+    <span class="sd">&quot;&quot;&quot;escape HTML special characters in string&quot;&quot;&quot;</span>
+    <span class="k">return</span> <span class="nb">str</span><span class="p">(</span><span class="n">s</span><span class="p">)</span><span class="o">.</span><span class="n">replace</span><span class="p">(</span><span class="s">&#39;&lt;&#39;</span><span class="p">,</span><span class="s">&#39;&amp;lt;&#39;</span><span class="p">)</span><span class="o">.</span><span class="n">replace</span><span class="p">(</span><span class="s">&#39;&gt;&#39;</span><span class="p">,</span><span class="s">&#39;&amp;gt;&#39;</span><span class="p">)</span>
+</div>
+<div class="viewcode-block" id="getip"><a class="viewcode-back" href="../../lms.html#lms_migration.migrate.getip">[docs]</a><span class="k">def</span> <span class="nf">getip</span><span class="p">(</span><span class="n">request</span><span class="p">):</span>
+    <span class="sd">&#39;&#39;&#39;</span>
+<span class="sd">    Extract IP address of requester from header, even if behind proxy</span>
+<span class="sd">    &#39;&#39;&#39;</span>
+    <span class="n">ip</span> <span class="o">=</span> <span class="n">request</span><span class="o">.</span><span class="n">META</span><span class="o">.</span><span class="n">get</span><span class="p">(</span><span class="s">&#39;HTTP_X_REAL_IP&#39;</span><span class="p">,</span><span class="s">&#39;&#39;</span><span class="p">)</span>	<span class="c"># nginx reverse proxy</span>
+    <span class="k">if</span> <span class="ow">not</span> <span class="n">ip</span><span class="p">:</span>
+        <span class="n">ip</span> <span class="o">=</span> <span class="n">request</span><span class="o">.</span><span class="n">META</span><span class="o">.</span><span class="n">get</span><span class="p">(</span><span class="s">&#39;REMOTE_ADDR&#39;</span><span class="p">,</span><span class="s">&#39;None&#39;</span><span class="p">)</span>
+    <span class="k">return</span> <span class="n">ip</span>
+
+</div>
+<span class="k">def</span> <span class="nf">get_commit_id</span><span class="p">(</span><span class="n">course</span><span class="p">):</span>
+    <span class="k">return</span> <span class="n">course</span><span class="o">.</span><span class="n">metadata</span><span class="o">.</span><span class="n">get</span><span class="p">(</span><span class="s">&#39;GIT_COMMIT_ID&#39;</span><span class="p">,</span><span class="s">&#39;No commit id&#39;</span><span class="p">)</span>
+    <span class="c"># getattr(def_ms.courses[reload_dir], &#39;GIT_COMMIT_ID&#39;,&#39;No commit id&#39;)</span>
+
+
+<span class="k">def</span> <span class="nf">set_commit_id</span><span class="p">(</span><span class="n">course</span><span class="p">,</span><span class="n">commit_id</span><span class="p">):</span>
+    <span class="n">course</span><span class="o">.</span><span class="n">metadata</span><span class="p">[</span><span class="s">&#39;GIT_COMMIT_ID&#39;</span><span class="p">]</span> <span class="o">=</span> <span class="n">commit_id</span>
+    <span class="c"># setattr(def_ms.courses[reload_dir], &#39;GIT_COMMIT_ID&#39;, new_commit_id)</span>
+
+<div class="viewcode-block" id="manage_modulestores"><a class="viewcode-back" href="../../lms.html#lms_migration.migrate.manage_modulestores">[docs]</a><span class="k">def</span> <span class="nf">manage_modulestores</span><span class="p">(</span><span class="n">request</span><span class="p">,</span> <span class="n">reload_dir</span><span class="o">=</span><span class="bp">None</span><span class="p">,</span> <span class="n">commit_id</span><span class="o">=</span><span class="bp">None</span><span class="p">):</span>
+    <span class="sd">&#39;&#39;&#39;</span>
+<span class="sd">    Manage the static in-memory modulestores.</span>
+
+<span class="sd">    If reload_dir is not None, then instruct the xml loader to reload that course directory.</span>
+<span class="sd">    &#39;&#39;&#39;</span>
+    <span class="n">html</span> <span class="o">=</span> <span class="s">&quot;&lt;html&gt;&lt;body&gt;&quot;</span>
+
+    <span class="n">def_ms</span> <span class="o">=</span> <span class="n">modulestore</span><span class="p">()</span>
+    <span class="n">courses</span> <span class="o">=</span> <span class="n">def_ms</span><span class="o">.</span><span class="n">get_courses</span><span class="p">()</span>
+
+    <span class="c">#----------------------------------------</span>
+    <span class="c"># check on IP address of requester</span>
+
+    <span class="n">ip</span> <span class="o">=</span> <span class="n">getip</span><span class="p">(</span><span class="n">request</span><span class="p">)</span>
+
+    <span class="k">if</span> <span class="n">LOCAL_DEBUG</span><span class="p">:</span>
+        <span class="n">html</span> <span class="o">+=</span> <span class="s">&#39;&lt;h3&gt;IP address: </span><span class="si">%s</span><span class="s"> &lt;h3&gt;&#39;</span> <span class="o">%</span> <span class="n">ip</span>
+        <span class="n">html</span> <span class="o">+=</span> <span class="s">&#39;&lt;h3&gt;User: </span><span class="si">%s</span><span class="s"> &lt;/h3&gt;&#39;</span> <span class="o">%</span> <span class="n">request</span><span class="o">.</span><span class="n">user</span>
+        <span class="n">html</span> <span class="o">+=</span> <span class="s">&#39;&lt;h3&gt;My pid: </span><span class="si">%s</span><span class="s">&lt;/h3&gt;&#39;</span> <span class="o">%</span> <span class="n">os</span><span class="o">.</span><span class="n">getpid</span><span class="p">()</span>
+        <span class="n">log</span><span class="o">.</span><span class="n">debug</span><span class="p">(</span><span class="s">&#39;request from ip=</span><span class="si">%s</span><span class="s">, user=</span><span class="si">%s</span><span class="s">&#39;</span> <span class="o">%</span> <span class="p">(</span><span class="n">ip</span><span class="p">,</span><span class="n">request</span><span class="o">.</span><span class="n">user</span><span class="p">))</span>
+
+    <span class="k">if</span> <span class="ow">not</span> <span class="p">(</span><span class="n">ip</span> <span class="ow">in</span> <span class="n">ALLOWED_IPS</span> <span class="ow">or</span> <span class="s">&#39;any&#39;</span> <span class="ow">in</span> <span class="n">ALLOWED_IPS</span><span class="p">):</span>
+        <span class="k">if</span> <span class="n">request</span><span class="o">.</span><span class="n">user</span> <span class="ow">and</span> <span class="n">request</span><span class="o">.</span><span class="n">user</span><span class="o">.</span><span class="n">is_staff</span><span class="p">:</span>
+            <span class="n">log</span><span class="o">.</span><span class="n">debug</span><span class="p">(</span><span class="s">&#39;request allowed because user=</span><span class="si">%s</span><span class="s"> is staff&#39;</span> <span class="o">%</span> <span class="n">request</span><span class="o">.</span><span class="n">user</span><span class="p">)</span>
+        <span class="k">else</span><span class="p">:</span>
+            <span class="n">html</span> <span class="o">+=</span> <span class="s">&#39;Permission denied&#39;</span>
+            <span class="n">html</span> <span class="o">+=</span> <span class="s">&quot;&lt;/body&gt;&lt;/html&gt;&quot;</span>
+            <span class="n">log</span><span class="o">.</span><span class="n">debug</span><span class="p">(</span><span class="s">&#39;request denied, ALLOWED_IPS=</span><span class="si">%s</span><span class="s">&#39;</span> <span class="o">%</span> <span class="n">ALLOWED_IPS</span><span class="p">)</span>
+            <span class="k">return</span> <span class="n">HttpResponse</span><span class="p">(</span><span class="n">html</span><span class="p">,</span> <span class="n">status</span><span class="o">=</span><span class="mi">403</span><span class="p">)</span>
+
+    <span class="c">#----------------------------------------</span>
+    <span class="c"># reload course if specified; handle optional commit_id</span>
+
+    <span class="k">if</span> <span class="n">reload_dir</span> <span class="ow">is</span> <span class="ow">not</span> <span class="bp">None</span><span class="p">:</span>
+        <span class="k">if</span> <span class="n">reload_dir</span> <span class="ow">not</span> <span class="ow">in</span> <span class="n">def_ms</span><span class="o">.</span><span class="n">courses</span><span class="p">:</span>
+            <span class="n">html</span> <span class="o">+=</span> <span class="s">&#39;&lt;h2 class=&quot;inline-error&quot;&gt;Error: &quot;</span><span class="si">%s</span><span class="s">&quot; is not a valid course directory&lt;/h2&gt;&#39;</span> <span class="o">%</span> <span class="n">reload_dir</span>
+        <span class="k">else</span><span class="p">:</span>
+            <span class="c"># reloading based on commit_id is needed when running mutiple worker threads,</span>
+            <span class="c"># so that a given thread doesn&#39;t reload the same commit multiple times</span>
+            <span class="n">current_commit_id</span> <span class="o">=</span> <span class="n">get_commit_id</span><span class="p">(</span><span class="n">def_ms</span><span class="o">.</span><span class="n">courses</span><span class="p">[</span><span class="n">reload_dir</span><span class="p">])</span>
+            <span class="n">log</span><span class="o">.</span><span class="n">debug</span><span class="p">(</span><span class="s">&#39;commit_id=&quot;</span><span class="si">%s</span><span class="s">&quot;&#39;</span> <span class="o">%</span> <span class="n">commit_id</span><span class="p">)</span>
+            <span class="n">log</span><span class="o">.</span><span class="n">debug</span><span class="p">(</span><span class="s">&#39;current_commit_id=&quot;</span><span class="si">%s</span><span class="s">&quot;&#39;</span> <span class="o">%</span> <span class="n">current_commit_id</span><span class="p">)</span>
+
+            <span class="k">if</span> <span class="p">(</span><span class="n">commit_id</span> <span class="ow">is</span> <span class="ow">not</span> <span class="bp">None</span><span class="p">)</span> <span class="ow">and</span> <span class="p">(</span><span class="n">commit_id</span><span class="o">==</span><span class="n">current_commit_id</span><span class="p">):</span>
+                <span class="n">html</span> <span class="o">+=</span> <span class="s">&quot;&lt;h2&gt;Already at commit id </span><span class="si">%s</span><span class="s"> for </span><span class="si">%s</span><span class="s">&lt;/h2&gt;&quot;</span> <span class="o">%</span> <span class="p">(</span><span class="n">commit_id</span><span class="p">,</span> <span class="n">reload_dir</span><span class="p">)</span>
+                <span class="n">track</span><span class="o">.</span><span class="n">views</span><span class="o">.</span><span class="n">server_track</span><span class="p">(</span><span class="n">request</span><span class="p">,</span>
+                                         <span class="s">&#39;reload </span><span class="si">%s</span><span class="s"> skipped already at </span><span class="si">%s</span><span class="s"> (pid=</span><span class="si">%s</span><span class="s">)&#39;</span> <span class="o">%</span> <span class="p">(</span><span class="n">reload_dir</span><span class="p">,</span>
+                                                                                       <span class="n">commit_id</span><span class="p">,</span>
+                                                                                       <span class="n">os</span><span class="o">.</span><span class="n">getpid</span><span class="p">(),</span>
+                                                                                       <span class="p">),</span>
+                                         <span class="p">{},</span> <span class="n">page</span><span class="o">=</span><span class="s">&#39;migrate&#39;</span><span class="p">)</span>
+            <span class="k">else</span><span class="p">:</span>
+                <span class="n">html</span> <span class="o">+=</span> <span class="s">&#39;&lt;h2&gt;Reloaded course directory &quot;</span><span class="si">%s</span><span class="s">&quot;&lt;/h2&gt;&#39;</span> <span class="o">%</span> <span class="n">reload_dir</span>
+                <span class="n">def_ms</span><span class="o">.</span><span class="n">try_load_course</span><span class="p">(</span><span class="n">reload_dir</span><span class="p">)</span>
+                <span class="n">gdir</span> <span class="o">=</span> <span class="n">settings</span><span class="o">.</span><span class="n">DATA_DIR</span> <span class="o">/</span> <span class="n">reload_dir</span> 
+                <span class="n">new_commit_id</span> <span class="o">=</span> <span class="n">os</span><span class="o">.</span><span class="n">popen</span><span class="p">(</span><span class="s">&#39;cd </span><span class="si">%s</span><span class="s">; git log -n 1 | head -1&#39;</span> <span class="o">%</span> <span class="n">gdir</span><span class="p">)</span><span class="o">.</span><span class="n">read</span><span class="p">()</span><span class="o">.</span><span class="n">strip</span><span class="p">()</span><span class="o">.</span><span class="n">split</span><span class="p">(</span><span class="s">&#39; &#39;</span><span class="p">)[</span><span class="mi">1</span><span class="p">]</span>
+                <span class="n">set_commit_id</span><span class="p">(</span><span class="n">def_ms</span><span class="o">.</span><span class="n">courses</span><span class="p">[</span><span class="n">reload_dir</span><span class="p">],</span> <span class="n">new_commit_id</span><span class="p">)</span>
+                <span class="n">html</span> <span class="o">+=</span> <span class="s">&#39;&lt;p&gt;commit_id=</span><span class="si">%s</span><span class="s">&lt;/p&gt;&#39;</span> <span class="o">%</span> <span class="n">new_commit_id</span>
+                <span class="n">track</span><span class="o">.</span><span class="n">views</span><span class="o">.</span><span class="n">server_track</span><span class="p">(</span><span class="n">request</span><span class="p">,</span> <span class="s">&#39;reloaded </span><span class="si">%s</span><span class="s"> now at </span><span class="si">%s</span><span class="s"> (pid=</span><span class="si">%s</span><span class="s">)&#39;</span> <span class="o">%</span> <span class="p">(</span><span class="n">reload_dir</span><span class="p">,</span>
+                                                                                      <span class="n">new_commit_id</span><span class="p">,</span>
+                                                                                      <span class="n">os</span><span class="o">.</span><span class="n">getpid</span><span class="p">()),</span> <span class="p">{},</span> <span class="n">page</span><span class="o">=</span><span class="s">&#39;migrate&#39;</span><span class="p">)</span>
+
+    <span class="c">#----------------------------------------</span>
+
+    <span class="n">html</span> <span class="o">+=</span> <span class="s">&#39;&lt;h2&gt;Courses loaded in the modulestore&lt;/h2&gt;&#39;</span>
+    <span class="n">html</span> <span class="o">+=</span> <span class="s">&#39;&lt;ol&gt;&#39;</span>
+    <span class="k">for</span> <span class="n">cdir</span><span class="p">,</span> <span class="n">course</span> <span class="ow">in</span> <span class="n">def_ms</span><span class="o">.</span><span class="n">courses</span><span class="o">.</span><span class="n">items</span><span class="p">():</span>
+        <span class="n">html</span> <span class="o">+=</span> <span class="s">&#39;&lt;li&gt;&lt;a href=&quot;</span><span class="si">%s</span><span class="s">/migrate/reload/</span><span class="si">%s</span><span class="s">&quot;&gt;</span><span class="si">%s</span><span class="s">&lt;/a&gt; (</span><span class="si">%s</span><span class="s">)&lt;/li&gt;&#39;</span> <span class="o">%</span> <span class="p">(</span><span class="n">settings</span><span class="o">.</span><span class="n">MITX_ROOT_URL</span><span class="p">,</span>
+                                                            <span class="n">escape</span><span class="p">(</span><span class="n">cdir</span><span class="p">),</span>
+                                                            <span class="n">escape</span><span class="p">(</span><span class="n">cdir</span><span class="p">),</span>
+                                                            <span class="n">course</span><span class="o">.</span><span class="n">location</span><span class="o">.</span><span class="n">url</span><span class="p">())</span>
+    <span class="n">html</span> <span class="o">+=</span> <span class="s">&#39;&lt;/ol&gt;&#39;</span>
+
+    <span class="c">#----------------------------------------</span>
+
+    <span class="n">dumpfields</span> <span class="o">=</span> <span class="p">[</span><span class="s">&#39;definition&#39;</span><span class="p">,</span><span class="s">&#39;location&#39;</span><span class="p">,</span><span class="s">&#39;metadata&#39;</span><span class="p">]</span>
+
+    <span class="k">for</span> <span class="n">cdir</span><span class="p">,</span> <span class="n">course</span> <span class="ow">in</span> <span class="n">def_ms</span><span class="o">.</span><span class="n">courses</span><span class="o">.</span><span class="n">items</span><span class="p">():</span>
+        <span class="n">html</span> <span class="o">+=</span> <span class="s">&#39;&lt;hr width=&quot;100%&quot;/&gt;&#39;</span>
+        <span class="n">html</span> <span class="o">+=</span> <span class="s">&#39;&lt;h2&gt;Course: </span><span class="si">%s</span><span class="s"> (</span><span class="si">%s</span><span class="s">)&lt;/h2&gt;&#39;</span> <span class="o">%</span> <span class="p">(</span><span class="n">course</span><span class="o">.</span><span class="n">display_name</span><span class="p">,</span><span class="n">cdir</span><span class="p">)</span>
+
+        <span class="n">html</span> <span class="o">+=</span> <span class="s">&#39;&lt;p&gt;commit_id=</span><span class="si">%s</span><span class="s">&lt;/p&gt;&#39;</span> <span class="o">%</span> <span class="n">get_commit_id</span><span class="p">(</span><span class="n">course</span><span class="p">)</span>
+
+        <span class="k">for</span> <span class="n">field</span> <span class="ow">in</span> <span class="n">dumpfields</span><span class="p">:</span>
+            <span class="n">data</span> <span class="o">=</span> <span class="nb">getattr</span><span class="p">(</span><span class="n">course</span><span class="p">,</span><span class="n">field</span><span class="p">)</span>
+            <span class="n">html</span> <span class="o">+=</span> <span class="s">&#39;&lt;h3&gt;</span><span class="si">%s</span><span class="s">&lt;/h3&gt;&#39;</span> <span class="o">%</span> <span class="n">field</span>
+            <span class="k">if</span> <span class="nb">type</span><span class="p">(</span><span class="n">data</span><span class="p">)</span><span class="o">==</span><span class="nb">dict</span><span class="p">:</span>
+                <span class="n">html</span> <span class="o">+=</span> <span class="s">&#39;&lt;ul&gt;&#39;</span>
+                <span class="k">for</span> <span class="n">k</span><span class="p">,</span><span class="n">v</span> <span class="ow">in</span> <span class="n">data</span><span class="o">.</span><span class="n">items</span><span class="p">():</span>
+                    <span class="n">html</span> <span class="o">+=</span> <span class="s">&#39;&lt;li&gt;</span><span class="si">%s</span><span class="s">:</span><span class="si">%s</span><span class="s">&lt;/li&gt;&#39;</span> <span class="o">%</span> <span class="p">(</span><span class="n">escape</span><span class="p">(</span><span class="n">k</span><span class="p">),</span><span class="n">escape</span><span class="p">(</span><span class="n">v</span><span class="p">))</span>
+                <span class="n">html</span> <span class="o">+=</span> <span class="s">&#39;&lt;/ul&gt;&#39;</span>
+            <span class="k">else</span><span class="p">:</span>
+                <span class="n">html</span> <span class="o">+=</span> <span class="s">&#39;&lt;ul&gt;&lt;li&gt;</span><span class="si">%s</span><span class="s">&lt;/li&gt;&lt;/ul&gt;&#39;</span> <span class="o">%</span> <span class="n">escape</span><span class="p">(</span><span class="n">data</span><span class="p">)</span>
+
+
+    <span class="c">#----------------------------------------</span>
+
+    <span class="n">html</span> <span class="o">+=</span> <span class="s">&#39;&lt;hr width=&quot;100%&quot;/&gt;&#39;</span>
+    <span class="n">html</span> <span class="o">+=</span> <span class="s">&quot;courses: &lt;pre&gt;</span><span class="si">%s</span><span class="s">&lt;/pre&gt;&quot;</span> <span class="o">%</span> <span class="n">escape</span><span class="p">(</span><span class="n">courses</span><span class="p">)</span>
+
+    <span class="n">ms</span> <span class="o">=</span> <span class="n">xmodule_django</span><span class="o">.</span><span class="n">_MODULESTORES</span>
+    <span class="n">html</span> <span class="o">+=</span> <span class="s">&quot;modules: &lt;pre&gt;</span><span class="si">%s</span><span class="s">&lt;/pre&gt;&quot;</span> <span class="o">%</span> <span class="n">escape</span><span class="p">(</span><span class="n">ms</span><span class="p">)</span>
+    <span class="n">html</span> <span class="o">+=</span> <span class="s">&quot;default modulestore: &lt;pre&gt;</span><span class="si">%s</span><span class="s">&lt;/pre&gt;&quot;</span> <span class="o">%</span> <span class="n">escape</span><span class="p">(</span><span class="nb">unicode</span><span class="p">(</span><span class="n">def_ms</span><span class="p">))</span>
+
+    <span class="c">#----------------------------------------</span>
+
+    <span class="n">log</span><span class="o">.</span><span class="n">debug</span><span class="p">(</span><span class="s">&#39;_MODULESTORES=</span><span class="si">%s</span><span class="s">&#39;</span> <span class="o">%</span> <span class="n">ms</span><span class="p">)</span>
+    <span class="n">log</span><span class="o">.</span><span class="n">debug</span><span class="p">(</span><span class="s">&#39;courses=</span><span class="si">%s</span><span class="s">&#39;</span> <span class="o">%</span> <span class="n">courses</span><span class="p">)</span>
+    <span class="n">log</span><span class="o">.</span><span class="n">debug</span><span class="p">(</span><span class="s">&#39;def_ms=</span><span class="si">%s</span><span class="s">&#39;</span> <span class="o">%</span> <span class="nb">unicode</span><span class="p">(</span><span class="n">def_ms</span><span class="p">))</span>
+
+    <span class="n">html</span> <span class="o">+=</span> <span class="s">&quot;&lt;/body&gt;&lt;/html&gt;&quot;</span>
+    <span class="k">return</span> <span class="n">HttpResponse</span><span class="p">(</span><span class="n">html</span><span class="p">)</span>
+</div>
+<span class="nd">@csrf_exempt</span>
+<div class="viewcode-block" id="gitreload"><a class="viewcode-back" href="../../lms.html#lms_migration.migrate.gitreload">[docs]</a><span class="k">def</span> <span class="nf">gitreload</span><span class="p">(</span><span class="n">request</span><span class="p">,</span> <span class="n">reload_dir</span><span class="o">=</span><span class="bp">None</span><span class="p">):</span>
+    <span class="sd">&#39;&#39;&#39;</span>
+<span class="sd">    This can be used as a github WebHook Service Hook, for reloading of the content repo used by the LMS.</span>
+
+<span class="sd">    If reload_dir is not None, then instruct the xml loader to reload that course directory.</span>
+<span class="sd">    &#39;&#39;&#39;</span>
+    <span class="n">html</span> <span class="o">=</span> <span class="s">&quot;&lt;html&gt;&lt;body&gt;&quot;</span>
+    <span class="n">ip</span> <span class="o">=</span> <span class="n">getip</span><span class="p">(</span><span class="n">request</span><span class="p">)</span>
+
+    <span class="n">html</span> <span class="o">+=</span> <span class="s">&#39;&lt;h3&gt;IP address: </span><span class="si">%s</span><span class="s"> &#39;</span> <span class="o">%</span> <span class="n">ip</span>
+    <span class="n">html</span> <span class="o">+=</span> <span class="s">&#39;&lt;h3&gt;User: </span><span class="si">%s</span><span class="s"> &#39;</span> <span class="o">%</span> <span class="n">request</span><span class="o">.</span><span class="n">user</span>
+
+    <span class="n">ALLOWED_IPS</span> <span class="o">=</span> <span class="p">[]</span>	<span class="c"># allow none by default</span>
+    <span class="k">if</span> <span class="nb">hasattr</span><span class="p">(</span><span class="n">settings</span><span class="p">,</span><span class="s">&#39;ALLOWED_GITRELOAD_IPS&#39;</span><span class="p">):</span>	<span class="c"># allow override in settings</span>
+        <span class="n">ALLOWED_IPS</span> <span class="o">=</span> <span class="n">settings</span><span class="o">.</span><span class="n">ALLOWED_GITRELOAD_IPS</span>
+
+    <span class="k">if</span> <span class="ow">not</span> <span class="p">(</span><span class="n">ip</span> <span class="ow">in</span> <span class="n">ALLOWED_IPS</span> <span class="ow">or</span> <span class="s">&#39;any&#39;</span> <span class="ow">in</span> <span class="n">ALLOWED_IPS</span><span class="p">):</span>
+        <span class="k">if</span> <span class="n">request</span><span class="o">.</span><span class="n">user</span> <span class="ow">and</span> <span class="n">request</span><span class="o">.</span><span class="n">user</span><span class="o">.</span><span class="n">is_staff</span><span class="p">:</span>
+            <span class="n">log</span><span class="o">.</span><span class="n">debug</span><span class="p">(</span><span class="s">&#39;request allowed because user=</span><span class="si">%s</span><span class="s"> is staff&#39;</span> <span class="o">%</span> <span class="n">request</span><span class="o">.</span><span class="n">user</span><span class="p">)</span>
+        <span class="k">else</span><span class="p">:</span>
+            <span class="n">html</span> <span class="o">+=</span> <span class="s">&#39;Permission denied&#39;</span>
+            <span class="n">html</span> <span class="o">+=</span> <span class="s">&quot;&lt;/body&gt;&lt;/html&gt;&quot;</span>
+            <span class="n">log</span><span class="o">.</span><span class="n">debug</span><span class="p">(</span><span class="s">&#39;request denied from </span><span class="si">%s</span><span class="s">, ALLOWED_IPS=</span><span class="si">%s</span><span class="s">&#39;</span> <span class="o">%</span> <span class="p">(</span><span class="n">ip</span><span class="p">,</span><span class="n">ALLOWED_IPS</span><span class="p">))</span>
+            <span class="k">return</span> <span class="n">HttpResponse</span><span class="p">(</span><span class="n">html</span><span class="p">)</span>    
+        
+    <span class="c">#----------------------------------------</span>
+    <span class="c"># see if request is from github (POST with JSON)</span>
+
+    <span class="k">if</span> <span class="n">reload_dir</span> <span class="ow">is</span> <span class="bp">None</span> <span class="ow">and</span> <span class="s">&#39;payload&#39;</span> <span class="ow">in</span> <span class="n">request</span><span class="o">.</span><span class="n">POST</span><span class="p">:</span>
+        <span class="n">payload</span> <span class="o">=</span> <span class="n">request</span><span class="o">.</span><span class="n">POST</span><span class="p">[</span><span class="s">&#39;payload&#39;</span><span class="p">]</span>
+        <span class="n">log</span><span class="o">.</span><span class="n">debug</span><span class="p">(</span><span class="s">&quot;payload=</span><span class="si">%s</span><span class="s">&quot;</span> <span class="o">%</span> <span class="n">payload</span><span class="p">)</span>
+        <span class="n">gitargs</span> <span class="o">=</span> <span class="n">json</span><span class="o">.</span><span class="n">loads</span><span class="p">(</span><span class="n">payload</span><span class="p">)</span>
+        <span class="n">log</span><span class="o">.</span><span class="n">debug</span><span class="p">(</span><span class="s">&quot;gitargs=</span><span class="si">%s</span><span class="s">&quot;</span> <span class="o">%</span> <span class="n">gitargs</span><span class="p">)</span>
+        <span class="n">reload_dir</span> <span class="o">=</span> <span class="n">gitargs</span><span class="p">[</span><span class="s">&#39;repository&#39;</span><span class="p">][</span><span class="s">&#39;name&#39;</span><span class="p">]</span>
+        <span class="n">log</span><span class="o">.</span><span class="n">debug</span><span class="p">(</span><span class="s">&quot;github reload_dir=</span><span class="si">%s</span><span class="s">&quot;</span> <span class="o">%</span> <span class="n">reload_dir</span><span class="p">)</span>
+        <span class="n">gdir</span> <span class="o">=</span> <span class="n">settings</span><span class="o">.</span><span class="n">DATA_DIR</span> <span class="o">/</span> <span class="n">reload_dir</span> 
+        <span class="k">if</span> <span class="ow">not</span> <span class="n">os</span><span class="o">.</span><span class="n">path</span><span class="o">.</span><span class="n">exists</span><span class="p">(</span><span class="n">gdir</span><span class="p">):</span>
+            <span class="n">log</span><span class="o">.</span><span class="n">debug</span><span class="p">(</span><span class="s">&quot;====&gt; ERROR in gitreload - no such directory </span><span class="si">%s</span><span class="s">&quot;</span> <span class="o">%</span> <span class="n">reload_dir</span><span class="p">)</span>
+            <span class="k">return</span> <span class="n">HttpResponse</span><span class="p">(</span><span class="s">&#39;Error&#39;</span><span class="p">)</span>
+        <span class="n">cmd</span> <span class="o">=</span> <span class="s">&quot;cd </span><span class="si">%s</span><span class="s">; git reset --hard HEAD; git clean -f -d; git pull origin; chmod g+w course.xml&quot;</span> <span class="o">%</span> <span class="n">gdir</span>
+        <span class="n">log</span><span class="o">.</span><span class="n">debug</span><span class="p">(</span><span class="n">os</span><span class="o">.</span><span class="n">popen</span><span class="p">(</span><span class="n">cmd</span><span class="p">)</span><span class="o">.</span><span class="n">read</span><span class="p">())</span>
+        <span class="k">if</span> <span class="nb">hasattr</span><span class="p">(</span><span class="n">settings</span><span class="p">,</span><span class="s">&#39;GITRELOAD_HOOK&#39;</span><span class="p">):</span>	<span class="c"># hit this hook after reload, if set</span>
+            <span class="n">gh</span> <span class="o">=</span> <span class="n">settings</span><span class="o">.</span><span class="n">GITRELOAD_HOOK</span>
+            <span class="k">if</span> <span class="n">gh</span><span class="p">:</span>
+                <span class="n">ghurl</span> <span class="o">=</span> <span class="s">&#39;</span><span class="si">%s</span><span class="s">/</span><span class="si">%s</span><span class="s">&#39;</span> <span class="o">%</span> <span class="p">(</span><span class="n">gh</span><span class="p">,</span><span class="n">reload_dir</span><span class="p">)</span>
+                <span class="n">r</span> <span class="o">=</span> <span class="n">requests</span><span class="o">.</span><span class="n">get</span><span class="p">(</span><span class="n">ghurl</span><span class="p">)</span>
+                <span class="n">log</span><span class="o">.</span><span class="n">debug</span><span class="p">(</span><span class="s">&quot;GITRELOAD_HOOK to </span><span class="si">%s</span><span class="s">: </span><span class="si">%s</span><span class="s">&quot;</span> <span class="o">%</span> <span class="p">(</span><span class="n">ghurl</span><span class="p">,</span> <span class="n">r</span><span class="o">.</span><span class="n">text</span><span class="p">))</span>
+        
+    <span class="c">#----------------------------------------</span>
+    <span class="c"># reload course if specified</span>
+
+    <span class="k">if</span> <span class="n">reload_dir</span> <span class="ow">is</span> <span class="ow">not</span> <span class="bp">None</span><span class="p">:</span>
+        <span class="n">def_ms</span> <span class="o">=</span> <span class="n">modulestore</span><span class="p">()</span>
+        <span class="k">if</span> <span class="n">reload_dir</span> <span class="ow">not</span> <span class="ow">in</span> <span class="n">def_ms</span><span class="o">.</span><span class="n">courses</span><span class="p">:</span>
+            <span class="n">html</span> <span class="o">+=</span> <span class="s">&#39;&lt;h2 class=&quot;inline-error&quot;&gt;Error: &quot;</span><span class="si">%s</span><span class="s">&quot; is not a valid course directory&lt;/font&gt;&lt;/h2&gt;&#39;</span> <span class="o">%</span> <span class="n">reload_dir</span>
+        <span class="k">else</span><span class="p">:</span>
+            <span class="n">html</span> <span class="o">+=</span> <span class="s">&quot;&lt;h2&gt;Reloaded course directory &#39;</span><span class="si">%s</span><span class="s">&#39;&lt;/h2&gt;&quot;</span> <span class="o">%</span> <span class="n">reload_dir</span>
+            <span class="n">def_ms</span><span class="o">.</span><span class="n">try_load_course</span><span class="p">(</span><span class="n">reload_dir</span><span class="p">)</span>
+            <span class="n">track</span><span class="o">.</span><span class="n">views</span><span class="o">.</span><span class="n">server_track</span><span class="p">(</span><span class="n">request</span><span class="p">,</span> <span class="s">&#39;reloaded </span><span class="si">%s</span><span class="s">&#39;</span> <span class="o">%</span> <span class="n">reload_dir</span><span class="p">,</span> <span class="p">{},</span> <span class="n">page</span><span class="o">=</span><span class="s">&#39;migrate&#39;</span><span class="p">)</span>
+
+    <span class="k">return</span> <span class="n">HttpResponse</span><span class="p">(</span><span class="n">html</span><span class="p">)</span>    </div>
+</pre></div>
+
+          </div>
+        </div>
+      </div>
+      <div class="clearer"></div>
+    </div>
+    <div class="related">
+      <h3>Navigation</h3>
+      <ul>
+        <li class="right" style="margin-right: 10px">
+          <a href="../../genindex.html" title="General Index"
+             >index</a></li>
+        <li class="right" >
+          <a href="../../py-modindex.html" title="Python Module Index"
+             >modules</a> |</li>
+        <li><a href="../../index.html">MITx 1.0 documentation</a> &raquo;</li>
+          <li><a href="../index.html" >Module code</a> &raquo;</li> 
+      </ul>
+    </div>
+    <div class="footer">
+        &copy; Copyright 2012, MITx team.
+      Created using <a href="http://sphinx.pocoo.org/">Sphinx</a> 1.1.3.
+    </div>
+  </body>
+</html>

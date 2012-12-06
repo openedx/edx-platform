@@ -1,0 +1,196 @@
+
+
+<!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Transitional//EN"
+  "http://www.w3.org/TR/xhtml1/DTD/xhtml1-transitional.dtd">
+
+
+<html xmlns="http://www.w3.org/1999/xhtml">
+  <head>
+    <meta http-equiv="Content-Type" content="text/html; charset=utf-8" />
+    
+    <title>capa.customrender &mdash; MITx 1.0 documentation</title>
+    
+    <link rel="stylesheet" href="../../_static/sphinxdoc.css" type="text/css" />
+    <link rel="stylesheet" href="../../_static/pygments.css" type="text/css" />
+    
+    <script type="text/javascript">
+      var DOCUMENTATION_OPTIONS = {
+        URL_ROOT:    '../../',
+        VERSION:     '1.0',
+        COLLAPSE_INDEX: false,
+        FILE_SUFFIX: '.html',
+        HAS_SOURCE:  true
+      };
+    </script>
+    <script type="text/javascript" src="../../_static/jquery.js"></script>
+    <script type="text/javascript" src="../../_static/underscore.js"></script>
+    <script type="text/javascript" src="../../_static/doctools.js"></script>
+    <script type="text/javascript" src="http://cdn.mathjax.org/mathjax/latest/MathJax.js?config=TeX-AMS-MML_HTMLorMML"></script>
+    <link rel="top" title="MITx 1.0 documentation" href="../../index.html" />
+    <link rel="up" title="Module code" href="../index.html" /> 
+  </head>
+  <body>
+<img src="../../_static/homepage-bg.jpg" alt="Edx logo"  width="100%;"/>
+
+    <div class="related">
+      <h3>Navigation</h3>
+      <ul>
+        <li class="right" style="margin-right: 10px">
+          <a href="../../genindex.html" title="General Index"
+             accesskey="I">index</a></li>
+        <li class="right" >
+          <a href="../../py-modindex.html" title="Python Module Index"
+             >modules</a> |</li>
+        <li><a href="../../index.html">MITx 1.0 documentation</a> &raquo;</li>
+          <li><a href="../index.html" accesskey="U">Module code</a> &raquo;</li> 
+      </ul>
+    </div>
+      <div class="sphinxsidebar">
+        <div class="sphinxsidebarwrapper">
+<div id="searchbox" style="display: none">
+  <h3>Quick search</h3>
+    <form class="search" action="../../search.html" method="get">
+      <input type="text" name="q" />
+      <input type="submit" value="Go" />
+      <input type="hidden" name="check_keywords" value="yes" />
+      <input type="hidden" name="area" value="default" />
+    </form>
+    <p class="searchtip" style="font-size: 90%">
+    Enter search terms or a module, class or function name.
+    </p>
+</div>
+<script type="text/javascript">$('#searchbox').show(0);</script>
+        </div>
+      </div>
+
+    <div class="document">
+      <div class="documentwrapper">
+        <div class="bodywrapper">
+          <div class="body">
+            
+  <h1>Source code for capa.customrender</h1><div class="highlight"><pre>
+<span class="sd">&quot;&quot;&quot;</span>
+<span class="sd">This has custom renderers: classes that know how to render certain problem tags (e.g. &lt;math&gt; and</span>
+<span class="sd">&lt;solution&gt;) to html.</span>
+
+<span class="sd">These tags do not have state, so they just get passed the system (for access to render_template),</span>
+<span class="sd">and the xml element.</span>
+<span class="sd">&quot;&quot;&quot;</span>
+
+<span class="kn">from</span> <span class="nn">registry</span> <span class="kn">import</span> <span class="n">TagRegistry</span>
+
+<span class="kn">import</span> <span class="nn">logging</span>
+<span class="kn">import</span> <span class="nn">re</span>
+<span class="kn">import</span> <span class="nn">shlex</span>  <span class="c"># for splitting quoted strings</span>
+<span class="kn">import</span> <span class="nn">json</span>
+
+<span class="kn">from</span> <span class="nn">lxml</span> <span class="kn">import</span> <span class="n">etree</span>
+<span class="kn">import</span> <span class="nn">xml.sax.saxutils</span> <span class="kn">as</span> <span class="nn">saxutils</span>
+<span class="kn">from</span> <span class="nn">registry</span> <span class="kn">import</span> <span class="n">TagRegistry</span>
+
+<span class="n">log</span> <span class="o">=</span> <span class="n">logging</span><span class="o">.</span><span class="n">getLogger</span><span class="p">(</span><span class="s">&#39;mitx.&#39;</span> <span class="o">+</span> <span class="n">__name__</span><span class="p">)</span>
+
+<span class="n">registry</span> <span class="o">=</span> <span class="n">TagRegistry</span><span class="p">()</span>
+
+<span class="c">#-----------------------------------------------------------------------------</span>
+<span class="k">class</span> <span class="nc">MathRenderer</span><span class="p">(</span><span class="nb">object</span><span class="p">):</span>
+    <span class="n">tags</span> <span class="o">=</span> <span class="p">[</span><span class="s">&#39;math&#39;</span><span class="p">]</span>
+
+    <span class="k">def</span> <span class="nf">__init__</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">system</span><span class="p">,</span> <span class="n">xml</span><span class="p">):</span>
+        <span class="sd">&#39;&#39;&#39;</span>
+<span class="sd">        Render math using latex-like formatting.</span>
+
+<span class="sd">        Examples:</span>
+
+<span class="sd">        &lt;math&gt;$\displaystyle U(r)=4 U_0 $&lt;/math&gt;</span>
+<span class="sd">        &lt;math&gt;$r_0$&lt;/math&gt;</span>
+
+<span class="sd">        We convert these to [mathjax]...[/mathjax] and [mathjaxinline]...[/mathjaxinline]</span>
+
+<span class="sd">        TODO: use shorter tags (but this will require converting problem XML files!)</span>
+<span class="sd">        &#39;&#39;&#39;</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">system</span> <span class="o">=</span> <span class="n">system</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">xml</span> <span class="o">=</span> <span class="n">xml</span>
+
+        <span class="n">mathstr</span> <span class="o">=</span> <span class="n">re</span><span class="o">.</span><span class="n">sub</span><span class="p">(</span><span class="s">&#39;\$(.*)\$&#39;</span><span class="p">,</span> <span class="s">r&#39;[mathjaxinline]\1[/mathjaxinline]&#39;</span><span class="p">,</span> <span class="n">xml</span><span class="o">.</span><span class="n">text</span><span class="p">)</span>
+        <span class="n">mtag</span> <span class="o">=</span> <span class="s">&#39;mathjax&#39;</span>
+        <span class="k">if</span> <span class="ow">not</span> <span class="s">r&#39;\displaystyle&#39;</span> <span class="ow">in</span> <span class="n">mathstr</span><span class="p">:</span>
+            <span class="n">mtag</span> <span class="o">+=</span> <span class="s">&#39;inline&#39;</span>
+        <span class="k">else</span><span class="p">:</span>
+            <span class="n">mathstr</span> <span class="o">=</span> <span class="n">mathstr</span><span class="o">.</span><span class="n">replace</span><span class="p">(</span><span class="s">r&#39;\displaystyle&#39;</span><span class="p">,</span> <span class="s">&#39;&#39;</span><span class="p">)</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">mathstr</span> <span class="o">=</span> <span class="n">mathstr</span><span class="o">.</span><span class="n">replace</span><span class="p">(</span><span class="s">&#39;mathjaxinline]&#39;</span><span class="p">,</span> <span class="s">&#39;</span><span class="si">%s</span><span class="s">]&#39;</span> <span class="o">%</span> <span class="n">mtag</span><span class="p">)</span>
+
+
+    <span class="k">def</span> <span class="nf">get_html</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
+        <span class="sd">&quot;&quot;&quot;</span>
+<span class="sd">        Return the contents of this tag, rendered to html, as an etree element.</span>
+<span class="sd">        &quot;&quot;&quot;</span>
+        <span class="c"># TODO: why are there nested html tags here??  Why are there html tags at all, in fact?</span>
+        <span class="n">html</span> <span class="o">=</span> <span class="s">&#39;&lt;html&gt;&lt;html&gt;</span><span class="si">%s</span><span class="s">&lt;/html&gt;&lt;html&gt;</span><span class="si">%s</span><span class="s">&lt;/html&gt;&lt;/html&gt;&#39;</span> <span class="o">%</span> <span class="p">(</span>
+            <span class="bp">self</span><span class="o">.</span><span class="n">mathstr</span><span class="p">,</span> <span class="n">saxutils</span><span class="o">.</span><span class="n">escape</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">xml</span><span class="o">.</span><span class="n">tail</span><span class="p">))</span>
+        <span class="k">try</span><span class="p">:</span>
+            <span class="n">xhtml</span> <span class="o">=</span> <span class="n">etree</span><span class="o">.</span><span class="n">XML</span><span class="p">(</span><span class="n">html</span><span class="p">)</span>
+        <span class="k">except</span> <span class="ne">Exception</span> <span class="k">as</span> <span class="n">err</span><span class="p">:</span>
+            <span class="k">if</span> <span class="bp">self</span><span class="o">.</span><span class="n">system</span><span class="o">.</span><span class="n">DEBUG</span><span class="p">:</span>
+                <span class="n">msg</span> <span class="o">=</span> <span class="s">&#39;&lt;html&gt;&lt;div class=&quot;inline-error&quot;&gt;&lt;p&gt;Error </span><span class="si">%s</span><span class="s">&lt;/p&gt;&#39;</span> <span class="o">%</span> <span class="p">(</span>
+                    <span class="nb">str</span><span class="p">(</span><span class="n">err</span><span class="p">)</span><span class="o">.</span><span class="n">replace</span><span class="p">(</span><span class="s">&#39;&lt;&#39;</span><span class="p">,</span> <span class="s">&#39;&amp;lt;&#39;</span><span class="p">))</span>
+                <span class="n">msg</span> <span class="o">+=</span> <span class="p">(</span><span class="s">&#39;&lt;p&gt;Failed to construct math expression from &lt;pre&gt;</span><span class="si">%s</span><span class="s">&lt;/pre&gt;&lt;/p&gt;&#39;</span> <span class="o">%</span>
+                        <span class="n">html</span><span class="o">.</span><span class="n">replace</span><span class="p">(</span><span class="s">&#39;&lt;&#39;</span><span class="p">,</span> <span class="s">&#39;&amp;lt;&#39;</span><span class="p">))</span>
+                <span class="n">msg</span> <span class="o">+=</span> <span class="s">&quot;&lt;/div&gt;&lt;/html&gt;&quot;</span>
+                <span class="n">log</span><span class="o">.</span><span class="n">error</span><span class="p">(</span><span class="n">msg</span><span class="p">)</span>
+                <span class="k">return</span> <span class="n">etree</span><span class="o">.</span><span class="n">XML</span><span class="p">(</span><span class="n">msg</span><span class="p">)</span>
+            <span class="k">else</span><span class="p">:</span>
+                <span class="k">raise</span>
+        <span class="k">return</span> <span class="n">xhtml</span>
+
+
+<span class="n">registry</span><span class="o">.</span><span class="n">register</span><span class="p">(</span><span class="n">MathRenderer</span><span class="p">)</span>
+
+<span class="c">#-----------------------------------------------------------------------------</span>
+
+<div class="viewcode-block" id="SolutionRenderer"><a class="viewcode-back" href="../../capa.html#capa.customrender.SolutionRenderer">[docs]</a><span class="k">class</span> <span class="nc">SolutionRenderer</span><span class="p">(</span><span class="nb">object</span><span class="p">):</span>
+    <span class="sd">&#39;&#39;&#39;</span>
+<span class="sd">    A solution is just a &lt;span&gt;...&lt;/span&gt; which is given an ID, that is used for displaying an</span>
+<span class="sd">    extended answer (a problem &quot;solution&quot;) after &quot;show answers&quot; is pressed.</span>
+
+<span class="sd">    Note that the solution content is NOT rendered and returned in the HTML. It is obtained by an</span>
+<span class="sd">    ajax call.</span>
+<span class="sd">    &#39;&#39;&#39;</span>
+    <span class="n">tags</span> <span class="o">=</span> <span class="p">[</span><span class="s">&#39;solution&#39;</span><span class="p">]</span>
+
+    <span class="k">def</span> <span class="nf">__init__</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">system</span><span class="p">,</span> <span class="n">xml</span><span class="p">):</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">system</span> <span class="o">=</span> <span class="n">system</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">id</span> <span class="o">=</span> <span class="n">xml</span><span class="o">.</span><span class="n">get</span><span class="p">(</span><span class="s">&#39;id&#39;</span><span class="p">)</span>
+
+    <span class="k">def</span> <span class="nf">get_html</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
+        <span class="n">context</span> <span class="o">=</span> <span class="p">{</span><span class="s">&#39;id&#39;</span><span class="p">:</span> <span class="bp">self</span><span class="o">.</span><span class="n">id</span><span class="p">}</span>
+        <span class="n">html</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">system</span><span class="o">.</span><span class="n">render_template</span><span class="p">(</span><span class="s">&quot;solutionspan.html&quot;</span><span class="p">,</span> <span class="n">context</span><span class="p">)</span>
+        <span class="k">return</span> <span class="n">etree</span><span class="o">.</span><span class="n">XML</span><span class="p">(</span><span class="n">html</span><span class="p">)</span>
+</div>
+<span class="n">registry</span><span class="o">.</span><span class="n">register</span><span class="p">(</span><span class="n">SolutionRenderer</span><span class="p">)</span>
+</pre></div>
+
+          </div>
+        </div>
+      </div>
+      <div class="clearer"></div>
+    </div>
+    <div class="related">
+      <h3>Navigation</h3>
+      <ul>
+        <li class="right" style="margin-right: 10px">
+          <a href="../../genindex.html" title="General Index"
+             >index</a></li>
+        <li class="right" >
+          <a href="../../py-modindex.html" title="Python Module Index"
+             >modules</a> |</li>
+        <li><a href="../../index.html">MITx 1.0 documentation</a> &raquo;</li>
+          <li><a href="../index.html" >Module code</a> &raquo;</li> 
+      </ul>
+    </div>
+    <div class="footer">
+        &copy; Copyright 2012, MITx team.
+      Created using <a href="http://sphinx.pocoo.org/">Sphinx</a> 1.1.3.
+    </div>
+  </body>
+</html>

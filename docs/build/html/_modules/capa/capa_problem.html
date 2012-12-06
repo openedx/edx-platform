@@ -1,0 +1,687 @@
+
+
+<!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Transitional//EN"
+  "http://www.w3.org/TR/xhtml1/DTD/xhtml1-transitional.dtd">
+
+
+<html xmlns="http://www.w3.org/1999/xhtml">
+  <head>
+    <meta http-equiv="Content-Type" content="text/html; charset=utf-8" />
+    
+    <title>capa.capa_problem &mdash; MITx 1.0 documentation</title>
+    
+    <link rel="stylesheet" href="../../_static/sphinxdoc.css" type="text/css" />
+    <link rel="stylesheet" href="../../_static/pygments.css" type="text/css" />
+    
+    <script type="text/javascript">
+      var DOCUMENTATION_OPTIONS = {
+        URL_ROOT:    '../../',
+        VERSION:     '1.0',
+        COLLAPSE_INDEX: false,
+        FILE_SUFFIX: '.html',
+        HAS_SOURCE:  true
+      };
+    </script>
+    <script type="text/javascript" src="../../_static/jquery.js"></script>
+    <script type="text/javascript" src="../../_static/underscore.js"></script>
+    <script type="text/javascript" src="../../_static/doctools.js"></script>
+    <script type="text/javascript" src="http://cdn.mathjax.org/mathjax/latest/MathJax.js?config=TeX-AMS-MML_HTMLorMML"></script>
+    <link rel="top" title="MITx 1.0 documentation" href="../../index.html" />
+    <link rel="up" title="Module code" href="../index.html" /> 
+  </head>
+  <body>
+<img src="../../_static/homepage-bg.jpg" alt="Edx logo"  width="100%;"/>
+
+    <div class="related">
+      <h3>Navigation</h3>
+      <ul>
+        <li class="right" style="margin-right: 10px">
+          <a href="../../genindex.html" title="General Index"
+             accesskey="I">index</a></li>
+        <li class="right" >
+          <a href="../../py-modindex.html" title="Python Module Index"
+             >modules</a> |</li>
+        <li><a href="../../index.html">MITx 1.0 documentation</a> &raquo;</li>
+          <li><a href="../index.html" accesskey="U">Module code</a> &raquo;</li> 
+      </ul>
+    </div>
+      <div class="sphinxsidebar">
+        <div class="sphinxsidebarwrapper">
+<div id="searchbox" style="display: none">
+  <h3>Quick search</h3>
+    <form class="search" action="../../search.html" method="get">
+      <input type="text" name="q" />
+      <input type="submit" value="Go" />
+      <input type="hidden" name="check_keywords" value="yes" />
+      <input type="hidden" name="area" value="default" />
+    </form>
+    <p class="searchtip" style="font-size: 90%">
+    Enter search terms or a module, class or function name.
+    </p>
+</div>
+<script type="text/javascript">$('#searchbox').show(0);</script>
+        </div>
+      </div>
+
+    <div class="document">
+      <div class="documentwrapper">
+        <div class="bodywrapper">
+          <div class="body">
+            
+  <h1>Source code for capa.capa_problem</h1><div class="highlight"><pre>
+<span class="c">#</span>
+<span class="c"># File:   capa/capa_problem.py</span>
+<span class="c">#</span>
+<span class="c"># Nomenclature:</span>
+<span class="c">#</span>
+<span class="c"># A capa Problem is a collection of text and capa Response questions.</span>
+<span class="c"># Each Response may have one or more Input entry fields.</span>
+<span class="c"># The capa problem may include a solution.</span>
+<span class="c">#</span>
+<span class="sd">&#39;&#39;&#39;</span>
+<span class="sd">Main module which shows problems (of &quot;capa&quot; type).</span>
+
+<span class="sd">This is used by capa_module.</span>
+<span class="sd">&#39;&#39;&#39;</span>
+
+<span class="kn">from</span> <span class="nn">__future__</span> <span class="kn">import</span> <span class="n">division</span>
+
+<span class="kn">from</span> <span class="nn">datetime</span> <span class="kn">import</span> <span class="n">datetime</span>
+<span class="kn">import</span> <span class="nn">json</span>
+<span class="kn">import</span> <span class="nn">logging</span>
+<span class="kn">import</span> <span class="nn">math</span>
+<span class="kn">import</span> <span class="nn">numpy</span>
+<span class="kn">import</span> <span class="nn">os</span>
+<span class="kn">import</span> <span class="nn">random</span>
+<span class="kn">import</span> <span class="nn">re</span>
+<span class="kn">import</span> <span class="nn">scipy</span>
+<span class="kn">import</span> <span class="nn">struct</span>
+<span class="kn">import</span> <span class="nn">sys</span>
+
+<span class="kn">from</span> <span class="nn">lxml</span> <span class="kn">import</span> <span class="n">etree</span>
+<span class="kn">from</span> <span class="nn">xml.sax.saxutils</span> <span class="kn">import</span> <span class="n">unescape</span>
+
+<span class="kn">import</span> <span class="nn">chem</span>
+<span class="kn">import</span> <span class="nn">chem.chemcalc</span>
+<span class="kn">import</span> <span class="nn">chem.chemtools</span>
+
+<span class="kn">import</span> <span class="nn">calc</span>
+<span class="kn">from</span> <span class="nn">correctmap</span> <span class="kn">import</span> <span class="n">CorrectMap</span>
+<span class="kn">import</span> <span class="nn">eia</span>
+<span class="kn">import</span> <span class="nn">inputtypes</span>
+<span class="kn">import</span> <span class="nn">customrender</span>
+<span class="kn">from</span> <span class="nn">util</span> <span class="kn">import</span> <span class="n">contextualize_text</span><span class="p">,</span> <span class="n">convert_files_to_filenames</span>
+<span class="kn">import</span> <span class="nn">xqueue_interface</span>
+
+<span class="c"># to be replaced with auto-registering</span>
+<span class="kn">import</span> <span class="nn">responsetypes</span>
+
+<span class="c"># dict of tagname, Response Class -- this should come from auto-registering</span>
+<span class="n">response_tag_dict</span> <span class="o">=</span> <span class="nb">dict</span><span class="p">([(</span><span class="n">x</span><span class="o">.</span><span class="n">response_tag</span><span class="p">,</span> <span class="n">x</span><span class="p">)</span> <span class="k">for</span> <span class="n">x</span> <span class="ow">in</span> <span class="n">responsetypes</span><span class="o">.</span><span class="n">__all__</span><span class="p">])</span>
+
+<span class="c"># extra things displayed after &quot;show answers&quot; is pressed</span>
+<span class="n">solution_tags</span> <span class="o">=</span> <span class="p">[</span><span class="s">&#39;solution&#39;</span><span class="p">]</span>
+
+<span class="c"># these get captured as student responses</span>
+<span class="n">response_properties</span> <span class="o">=</span> <span class="p">[</span><span class="s">&quot;codeparam&quot;</span><span class="p">,</span> <span class="s">&quot;responseparam&quot;</span><span class="p">,</span> <span class="s">&quot;answer&quot;</span><span class="p">]</span>
+
+<span class="c"># special problem tags which should be turned into innocuous HTML</span>
+<span class="n">html_transforms</span> <span class="o">=</span> <span class="p">{</span><span class="s">&#39;problem&#39;</span><span class="p">:</span> <span class="p">{</span><span class="s">&#39;tag&#39;</span><span class="p">:</span> <span class="s">&#39;div&#39;</span><span class="p">},</span>
+                   <span class="s">&quot;text&quot;</span><span class="p">:</span> <span class="p">{</span><span class="s">&#39;tag&#39;</span><span class="p">:</span> <span class="s">&#39;span&#39;</span><span class="p">},</span>
+                   <span class="s">&quot;math&quot;</span><span class="p">:</span> <span class="p">{</span><span class="s">&#39;tag&#39;</span><span class="p">:</span> <span class="s">&#39;span&#39;</span><span class="p">},</span>
+                   <span class="p">}</span>
+
+<span class="n">global_context</span> <span class="o">=</span> <span class="p">{</span><span class="s">&#39;random&#39;</span><span class="p">:</span> <span class="n">random</span><span class="p">,</span>
+                  <span class="s">&#39;numpy&#39;</span><span class="p">:</span> <span class="n">numpy</span><span class="p">,</span>
+                  <span class="s">&#39;math&#39;</span><span class="p">:</span> <span class="n">math</span><span class="p">,</span>
+                  <span class="s">&#39;scipy&#39;</span><span class="p">:</span> <span class="n">scipy</span><span class="p">,</span>
+                  <span class="s">&#39;calc&#39;</span><span class="p">:</span> <span class="n">calc</span><span class="p">,</span>
+                  <span class="s">&#39;eia&#39;</span><span class="p">:</span> <span class="n">eia</span><span class="p">,</span>
+                  <span class="s">&#39;chemcalc&#39;</span><span class="p">:</span> <span class="n">chem</span><span class="o">.</span><span class="n">chemcalc</span><span class="p">,</span>
+                  <span class="s">&#39;chemtools&#39;</span><span class="p">:</span> <span class="n">chem</span><span class="o">.</span><span class="n">chemtools</span><span class="p">}</span>
+
+<span class="c"># These should be removed from HTML output, including all subelements</span>
+<span class="n">html_problem_semantics</span> <span class="o">=</span> <span class="p">[</span><span class="s">&quot;codeparam&quot;</span><span class="p">,</span> <span class="s">&quot;responseparam&quot;</span><span class="p">,</span> <span class="s">&quot;answer&quot;</span><span class="p">,</span> <span class="s">&quot;script&quot;</span><span class="p">,</span> <span class="s">&quot;hintgroup&quot;</span><span class="p">]</span>
+
+<span class="n">log</span> <span class="o">=</span> <span class="n">logging</span><span class="o">.</span><span class="n">getLogger</span><span class="p">(</span><span class="s">&#39;mitx.&#39;</span> <span class="o">+</span> <span class="n">__name__</span><span class="p">)</span>
+
+<span class="c">#-----------------------------------------------------------------------------</span>
+<span class="c"># main class for this module</span>
+
+
+<div class="viewcode-block" id="LoncapaProblem"><a class="viewcode-back" href="../../capa.html#capa.capa_problem.LoncapaProblem">[docs]</a><span class="k">class</span> <span class="nc">LoncapaProblem</span><span class="p">(</span><span class="nb">object</span><span class="p">):</span>
+    <span class="sd">&#39;&#39;&#39;</span>
+<span class="sd">    Main class for capa Problems.</span>
+<span class="sd">    &#39;&#39;&#39;</span>
+
+    <span class="k">def</span> <span class="nf">__init__</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">problem_text</span><span class="p">,</span> <span class="nb">id</span><span class="p">,</span> <span class="n">state</span><span class="o">=</span><span class="bp">None</span><span class="p">,</span> <span class="n">seed</span><span class="o">=</span><span class="bp">None</span><span class="p">,</span> <span class="n">system</span><span class="o">=</span><span class="bp">None</span><span class="p">):</span>
+        <span class="sd">&#39;&#39;&#39;</span>
+<span class="sd">        Initializes capa Problem.</span>
+
+<span class="sd">        Arguments:</span>
+
+<span class="sd">         - problem_text (string): xml defining the problem</span>
+<span class="sd">         - id           (string): identifier for this problem; often a filename (no spaces)</span>
+<span class="sd">         - state        (dict): student state</span>
+<span class="sd">         - seed         (int): random number generator seed (int)</span>
+<span class="sd">         - system       (ModuleSystem): ModuleSystem instance which provides OS,</span>
+<span class="sd">                                        rendering, and user context</span>
+
+<span class="sd">        &#39;&#39;&#39;</span>
+
+        <span class="c">## Initialize class variables from state</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">do_reset</span><span class="p">()</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">problem_id</span> <span class="o">=</span> <span class="nb">id</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">system</span> <span class="o">=</span> <span class="n">system</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">seed</span> <span class="o">=</span> <span class="n">seed</span>
+
+        <span class="k">if</span> <span class="n">state</span><span class="p">:</span>
+            <span class="k">if</span> <span class="s">&#39;seed&#39;</span> <span class="ow">in</span> <span class="n">state</span><span class="p">:</span>
+                <span class="bp">self</span><span class="o">.</span><span class="n">seed</span> <span class="o">=</span> <span class="n">state</span><span class="p">[</span><span class="s">&#39;seed&#39;</span><span class="p">]</span>
+            <span class="k">if</span> <span class="s">&#39;student_answers&#39;</span> <span class="ow">in</span> <span class="n">state</span><span class="p">:</span>
+                <span class="bp">self</span><span class="o">.</span><span class="n">student_answers</span> <span class="o">=</span> <span class="n">state</span><span class="p">[</span><span class="s">&#39;student_answers&#39;</span><span class="p">]</span>
+            <span class="k">if</span> <span class="s">&#39;correct_map&#39;</span> <span class="ow">in</span> <span class="n">state</span><span class="p">:</span>
+                <span class="bp">self</span><span class="o">.</span><span class="n">correct_map</span><span class="o">.</span><span class="n">set_dict</span><span class="p">(</span><span class="n">state</span><span class="p">[</span><span class="s">&#39;correct_map&#39;</span><span class="p">])</span>
+            <span class="k">if</span> <span class="s">&#39;done&#39;</span> <span class="ow">in</span> <span class="n">state</span><span class="p">:</span>
+                <span class="bp">self</span><span class="o">.</span><span class="n">done</span> <span class="o">=</span> <span class="n">state</span><span class="p">[</span><span class="s">&#39;done&#39;</span><span class="p">]</span>
+
+        <span class="c"># TODO: Does this deplete the Linux entropy pool? Is this fast enough?</span>
+        <span class="k">if</span> <span class="ow">not</span> <span class="bp">self</span><span class="o">.</span><span class="n">seed</span><span class="p">:</span>
+            <span class="bp">self</span><span class="o">.</span><span class="n">seed</span> <span class="o">=</span> <span class="n">struct</span><span class="o">.</span><span class="n">unpack</span><span class="p">(</span><span class="s">&#39;i&#39;</span><span class="p">,</span> <span class="n">os</span><span class="o">.</span><span class="n">urandom</span><span class="p">(</span><span class="mi">4</span><span class="p">))[</span><span class="mi">0</span><span class="p">]</span>
+
+        <span class="c"># Convert startouttext and endouttext to proper &lt;text&gt;&lt;/text&gt;</span>
+        <span class="n">problem_text</span> <span class="o">=</span> <span class="n">re</span><span class="o">.</span><span class="n">sub</span><span class="p">(</span><span class="s">&quot;startouttext\s*/&quot;</span><span class="p">,</span> <span class="s">&quot;text&quot;</span><span class="p">,</span> <span class="n">problem_text</span><span class="p">)</span>
+        <span class="n">problem_text</span> <span class="o">=</span> <span class="n">re</span><span class="o">.</span><span class="n">sub</span><span class="p">(</span><span class="s">&quot;endouttext\s*/&quot;</span><span class="p">,</span> <span class="s">&quot;/text&quot;</span><span class="p">,</span> <span class="n">problem_text</span><span class="p">)</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">problem_text</span> <span class="o">=</span> <span class="n">problem_text</span>
+
+        <span class="c"># parse problem XML file into an element tree</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">tree</span> <span class="o">=</span> <span class="n">etree</span><span class="o">.</span><span class="n">XML</span><span class="p">(</span><span class="n">problem_text</span><span class="p">)</span>
+
+        <span class="c"># handle any &lt;include file=&quot;foo&quot;&gt; tags</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">_process_includes</span><span class="p">()</span>
+
+        <span class="c"># construct script processor context (eg for customresponse problems)</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">context</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">_extract_context</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">tree</span><span class="p">,</span> <span class="n">seed</span><span class="o">=</span><span class="bp">self</span><span class="o">.</span><span class="n">seed</span><span class="p">)</span>
+
+        <span class="c"># Pre-parse the XML tree: modifies it to add ID&#39;s and perform some in-place</span>
+        <span class="c"># transformations.  This also creates the dict (self.responders) of Response</span>
+        <span class="c"># instances for each question in the problem. The dict has keys = xml subtree of</span>
+        <span class="c"># Response, values = Response instance</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">_preprocess_problem</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">tree</span><span class="p">)</span>
+
+        <span class="k">if</span> <span class="ow">not</span> <span class="bp">self</span><span class="o">.</span><span class="n">student_answers</span><span class="p">:</span>  <span class="c"># True when student_answers is an empty dict</span>
+            <span class="bp">self</span><span class="o">.</span><span class="n">set_initial_display</span><span class="p">()</span>
+
+<div class="viewcode-block" id="LoncapaProblem.do_reset"><a class="viewcode-back" href="../../capa.html#capa.capa_problem.LoncapaProblem.do_reset">[docs]</a>    <span class="k">def</span> <span class="nf">do_reset</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
+        <span class="sd">&#39;&#39;&#39;</span>
+<span class="sd">        Reset internal state to unfinished, with no answers</span>
+<span class="sd">        &#39;&#39;&#39;</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">student_answers</span> <span class="o">=</span> <span class="nb">dict</span><span class="p">()</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">correct_map</span> <span class="o">=</span> <span class="n">CorrectMap</span><span class="p">()</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">done</span> <span class="o">=</span> <span class="bp">False</span>
+</div>
+<div class="viewcode-block" id="LoncapaProblem.set_initial_display"><a class="viewcode-back" href="../../capa.html#capa.capa_problem.LoncapaProblem.set_initial_display">[docs]</a>    <span class="k">def</span> <span class="nf">set_initial_display</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
+        <span class="sd">&quot;&quot;&quot;</span>
+<span class="sd">        Set the student&#39;s answers to the responders&#39; initial displays, if specified.</span>
+<span class="sd">        &quot;&quot;&quot;</span>
+        <span class="n">initial_answers</span> <span class="o">=</span> <span class="nb">dict</span><span class="p">()</span>
+        <span class="k">for</span> <span class="n">responder</span> <span class="ow">in</span> <span class="bp">self</span><span class="o">.</span><span class="n">responders</span><span class="o">.</span><span class="n">values</span><span class="p">():</span>
+            <span class="k">if</span> <span class="nb">hasattr</span><span class="p">(</span><span class="n">responder</span><span class="p">,</span> <span class="s">&#39;get_initial_display&#39;</span><span class="p">):</span>
+                <span class="n">initial_answers</span><span class="o">.</span><span class="n">update</span><span class="p">(</span><span class="n">responder</span><span class="o">.</span><span class="n">get_initial_display</span><span class="p">())</span>
+
+        <span class="bp">self</span><span class="o">.</span><span class="n">student_answers</span> <span class="o">=</span> <span class="n">initial_answers</span>
+</div>
+    <span class="k">def</span> <span class="nf">__unicode__</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
+        <span class="k">return</span> <span class="s">u&quot;LoncapaProblem ({0})&quot;</span><span class="o">.</span><span class="n">format</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">problem_id</span><span class="p">)</span>
+
+<div class="viewcode-block" id="LoncapaProblem.get_state"><a class="viewcode-back" href="../../capa.html#capa.capa_problem.LoncapaProblem.get_state">[docs]</a>    <span class="k">def</span> <span class="nf">get_state</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
+        <span class="sd">&#39;&#39;&#39;</span>
+<span class="sd">        Stored per-user session data neeeded to:</span>
+<span class="sd">            1) Recreate the problem</span>
+<span class="sd">            2) Populate any student answers.</span>
+<span class="sd">        &#39;&#39;&#39;</span>
+
+        <span class="k">return</span> <span class="p">{</span><span class="s">&#39;seed&#39;</span><span class="p">:</span> <span class="bp">self</span><span class="o">.</span><span class="n">seed</span><span class="p">,</span>
+                <span class="s">&#39;student_answers&#39;</span><span class="p">:</span> <span class="bp">self</span><span class="o">.</span><span class="n">student_answers</span><span class="p">,</span>
+                <span class="s">&#39;correct_map&#39;</span><span class="p">:</span> <span class="bp">self</span><span class="o">.</span><span class="n">correct_map</span><span class="o">.</span><span class="n">get_dict</span><span class="p">(),</span>
+                <span class="s">&#39;done&#39;</span><span class="p">:</span> <span class="bp">self</span><span class="o">.</span><span class="n">done</span><span class="p">}</span>
+</div>
+<div class="viewcode-block" id="LoncapaProblem.get_max_score"><a class="viewcode-back" href="../../capa.html#capa.capa_problem.LoncapaProblem.get_max_score">[docs]</a>    <span class="k">def</span> <span class="nf">get_max_score</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
+        <span class="sd">&#39;&#39;&#39;</span>
+<span class="sd">        Return the maximum score for this problem.</span>
+<span class="sd">        &#39;&#39;&#39;</span>
+        <span class="n">maxscore</span> <span class="o">=</span> <span class="mi">0</span>
+        <span class="k">for</span> <span class="n">response</span><span class="p">,</span> <span class="n">responder</span> <span class="ow">in</span> <span class="bp">self</span><span class="o">.</span><span class="n">responders</span><span class="o">.</span><span class="n">iteritems</span><span class="p">():</span>
+            <span class="n">maxscore</span> <span class="o">+=</span> <span class="n">responder</span><span class="o">.</span><span class="n">get_max_score</span><span class="p">()</span>
+        <span class="k">return</span> <span class="n">maxscore</span>
+</div>
+<div class="viewcode-block" id="LoncapaProblem.get_score"><a class="viewcode-back" href="../../capa.html#capa.capa_problem.LoncapaProblem.get_score">[docs]</a>    <span class="k">def</span> <span class="nf">get_score</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
+        <span class="sd">&quot;&quot;&quot;</span>
+<span class="sd">        Compute score for this problem.  The score is the number of points awarded.</span>
+<span class="sd">        Returns a dictionary {&#39;score&#39;: integer, from 0 to get_max_score(),</span>
+<span class="sd">                              &#39;total&#39;: get_max_score()}.</span>
+<span class="sd">        &quot;&quot;&quot;</span>
+        <span class="n">correct</span> <span class="o">=</span> <span class="mi">0</span>
+        <span class="k">for</span> <span class="n">key</span> <span class="ow">in</span> <span class="bp">self</span><span class="o">.</span><span class="n">correct_map</span><span class="p">:</span>
+            <span class="k">try</span><span class="p">:</span>
+                <span class="n">correct</span> <span class="o">+=</span> <span class="bp">self</span><span class="o">.</span><span class="n">correct_map</span><span class="o">.</span><span class="n">get_npoints</span><span class="p">(</span><span class="n">key</span><span class="p">)</span>
+            <span class="k">except</span> <span class="ne">Exception</span><span class="p">:</span>
+                <span class="n">log</span><span class="o">.</span><span class="n">error</span><span class="p">(</span><span class="s">&#39;key=</span><span class="si">%s</span><span class="s">, correct_map = </span><span class="si">%s</span><span class="s">&#39;</span> <span class="o">%</span> <span class="p">(</span><span class="n">key</span><span class="p">,</span> <span class="bp">self</span><span class="o">.</span><span class="n">correct_map</span><span class="p">))</span>
+                <span class="k">raise</span>
+
+        <span class="k">if</span> <span class="p">(</span><span class="ow">not</span> <span class="bp">self</span><span class="o">.</span><span class="n">student_answers</span><span class="p">)</span> <span class="ow">or</span> <span class="nb">len</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">student_answers</span><span class="p">)</span> <span class="o">==</span> <span class="mi">0</span><span class="p">:</span>
+            <span class="k">return</span> <span class="p">{</span><span class="s">&#39;score&#39;</span><span class="p">:</span> <span class="mi">0</span><span class="p">,</span>
+                    <span class="s">&#39;total&#39;</span><span class="p">:</span> <span class="bp">self</span><span class="o">.</span><span class="n">get_max_score</span><span class="p">()}</span>
+        <span class="k">else</span><span class="p">:</span>
+            <span class="k">return</span> <span class="p">{</span><span class="s">&#39;score&#39;</span><span class="p">:</span> <span class="n">correct</span><span class="p">,</span>
+                    <span class="s">&#39;total&#39;</span><span class="p">:</span> <span class="bp">self</span><span class="o">.</span><span class="n">get_max_score</span><span class="p">()}</span>
+</div>
+<div class="viewcode-block" id="LoncapaProblem.update_score"><a class="viewcode-back" href="../../capa.html#capa.capa_problem.LoncapaProblem.update_score">[docs]</a>    <span class="k">def</span> <span class="nf">update_score</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">score_msg</span><span class="p">,</span> <span class="n">queuekey</span><span class="p">):</span>
+        <span class="sd">&#39;&#39;&#39;</span>
+<span class="sd">        Deliver grading response (e.g. from async code checking) to</span>
+<span class="sd">            the specific ResponseType that requested grading</span>
+
+<span class="sd">        Returns an updated CorrectMap</span>
+<span class="sd">        &#39;&#39;&#39;</span>
+        <span class="n">cmap</span> <span class="o">=</span> <span class="n">CorrectMap</span><span class="p">()</span>
+        <span class="n">cmap</span><span class="o">.</span><span class="n">update</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">correct_map</span><span class="p">)</span>
+        <span class="k">for</span> <span class="n">responder</span> <span class="ow">in</span> <span class="bp">self</span><span class="o">.</span><span class="n">responders</span><span class="o">.</span><span class="n">values</span><span class="p">():</span>
+            <span class="k">if</span> <span class="nb">hasattr</span><span class="p">(</span><span class="n">responder</span><span class="p">,</span> <span class="s">&#39;update_score&#39;</span><span class="p">):</span>
+                <span class="c"># Each LoncapaResponse will update its specific entries in cmap</span>
+                <span class="c">#   cmap is passed by reference</span>
+                <span class="n">responder</span><span class="o">.</span><span class="n">update_score</span><span class="p">(</span><span class="n">score_msg</span><span class="p">,</span> <span class="n">cmap</span><span class="p">,</span> <span class="n">queuekey</span><span class="p">)</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">correct_map</span><span class="o">.</span><span class="n">set_dict</span><span class="p">(</span><span class="n">cmap</span><span class="o">.</span><span class="n">get_dict</span><span class="p">())</span>
+        <span class="k">return</span> <span class="n">cmap</span>
+</div>
+<div class="viewcode-block" id="LoncapaProblem.is_queued"><a class="viewcode-back" href="../../capa.html#capa.capa_problem.LoncapaProblem.is_queued">[docs]</a>    <span class="k">def</span> <span class="nf">is_queued</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
+        <span class="sd">&#39;&#39;&#39;</span>
+<span class="sd">        Returns True if any part of the problem has been submitted to an external queue</span>
+<span class="sd">        (e.g. for grading.)</span>
+<span class="sd">        &#39;&#39;&#39;</span>
+        <span class="k">return</span> <span class="nb">any</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">correct_map</span><span class="o">.</span><span class="n">is_queued</span><span class="p">(</span><span class="n">answer_id</span><span class="p">)</span> <span class="k">for</span> <span class="n">answer_id</span> <span class="ow">in</span> <span class="bp">self</span><span class="o">.</span><span class="n">correct_map</span><span class="p">)</span>
+
+</div>
+<div class="viewcode-block" id="LoncapaProblem.get_recentmost_queuetime"><a class="viewcode-back" href="../../capa.html#capa.capa_problem.LoncapaProblem.get_recentmost_queuetime">[docs]</a>    <span class="k">def</span> <span class="nf">get_recentmost_queuetime</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
+        <span class="sd">&#39;&#39;&#39;</span>
+<span class="sd">        Returns a DateTime object that represents the timestamp of the most recent</span>
+<span class="sd">        queueing request, or None if not queued</span>
+<span class="sd">        &#39;&#39;&#39;</span>
+        <span class="k">if</span> <span class="ow">not</span> <span class="bp">self</span><span class="o">.</span><span class="n">is_queued</span><span class="p">():</span>
+            <span class="k">return</span> <span class="bp">None</span>
+
+        <span class="c"># Get a list of timestamps of all queueing requests, then convert it to a DateTime object</span>
+        <span class="n">queuetime_strs</span> <span class="o">=</span> <span class="p">[</span><span class="bp">self</span><span class="o">.</span><span class="n">correct_map</span><span class="o">.</span><span class="n">get_queuetime_str</span><span class="p">(</span><span class="n">answer_id</span><span class="p">)</span>
+                          <span class="k">for</span> <span class="n">answer_id</span> <span class="ow">in</span> <span class="bp">self</span><span class="o">.</span><span class="n">correct_map</span>
+                          <span class="k">if</span> <span class="bp">self</span><span class="o">.</span><span class="n">correct_map</span><span class="o">.</span><span class="n">is_queued</span><span class="p">(</span><span class="n">answer_id</span><span class="p">)]</span>
+        <span class="n">queuetimes</span> <span class="o">=</span> <span class="p">[</span><span class="n">datetime</span><span class="o">.</span><span class="n">strptime</span><span class="p">(</span><span class="n">qt_str</span><span class="p">,</span> <span class="n">xqueue_interface</span><span class="o">.</span><span class="n">dateformat</span><span class="p">)</span>
+                      <span class="k">for</span> <span class="n">qt_str</span> <span class="ow">in</span> <span class="n">queuetime_strs</span><span class="p">]</span>
+
+        <span class="k">return</span> <span class="nb">max</span><span class="p">(</span><span class="n">queuetimes</span><span class="p">)</span>
+
+</div>
+<div class="viewcode-block" id="LoncapaProblem.grade_answers"><a class="viewcode-back" href="../../capa.html#capa.capa_problem.LoncapaProblem.grade_answers">[docs]</a>    <span class="k">def</span> <span class="nf">grade_answers</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">answers</span><span class="p">):</span>
+        <span class="sd">&#39;&#39;&#39;</span>
+<span class="sd">        Grade student responses.  Called by capa_module.check_problem.</span>
+<span class="sd">        answers is a dict of all the entries from request.POST, but with the first part</span>
+<span class="sd">        of each key removed (the string before the first &quot;_&quot;).</span>
+
+<span class="sd">        Thus, for example, input_ID123 -&gt; ID123, and input_fromjs_ID123 -&gt; fromjs_ID123</span>
+
+<span class="sd">        Calls the Response for each question in this problem, to do the actual grading.</span>
+<span class="sd">        &#39;&#39;&#39;</span>
+
+        <span class="c"># if answers include File objects, convert them to filenames.</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">student_answers</span> <span class="o">=</span> <span class="n">convert_files_to_filenames</span><span class="p">(</span><span class="n">answers</span><span class="p">)</span>
+
+        <span class="c"># old CorrectMap</span>
+        <span class="n">oldcmap</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">correct_map</span>
+
+        <span class="c"># start new with empty CorrectMap</span>
+        <span class="n">newcmap</span> <span class="o">=</span> <span class="n">CorrectMap</span><span class="p">()</span>
+        <span class="c"># log.debug(&#39;Responders: %s&#39; % self.responders)</span>
+        <span class="c"># Call each responsetype instance to do actual grading</span>
+        <span class="k">for</span> <span class="n">responder</span> <span class="ow">in</span> <span class="bp">self</span><span class="o">.</span><span class="n">responders</span><span class="o">.</span><span class="n">values</span><span class="p">():</span>
+            <span class="c"># File objects are passed only if responsetype explicitly allows for file</span>
+            <span class="c"># submissions</span>
+            <span class="k">if</span> <span class="s">&#39;filesubmission&#39;</span> <span class="ow">in</span> <span class="n">responder</span><span class="o">.</span><span class="n">allowed_inputfields</span><span class="p">:</span>
+                <span class="n">results</span> <span class="o">=</span> <span class="n">responder</span><span class="o">.</span><span class="n">evaluate_answers</span><span class="p">(</span><span class="n">answers</span><span class="p">,</span> <span class="n">oldcmap</span><span class="p">)</span>
+            <span class="k">else</span><span class="p">:</span>
+                <span class="n">results</span> <span class="o">=</span> <span class="n">responder</span><span class="o">.</span><span class="n">evaluate_answers</span><span class="p">(</span><span class="n">convert_files_to_filenames</span><span class="p">(</span><span class="n">answers</span><span class="p">),</span> <span class="n">oldcmap</span><span class="p">)</span>
+            <span class="n">newcmap</span><span class="o">.</span><span class="n">update</span><span class="p">(</span><span class="n">results</span><span class="p">)</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">correct_map</span> <span class="o">=</span> <span class="n">newcmap</span>
+        <span class="c"># log.debug(&#39;%s: in grade_answers, answers=%s, cmap=%s&#39; % (self,answers,newcmap))</span>
+        <span class="k">return</span> <span class="n">newcmap</span>
+</div>
+<div class="viewcode-block" id="LoncapaProblem.get_question_answers"><a class="viewcode-back" href="../../capa.html#capa.capa_problem.LoncapaProblem.get_question_answers">[docs]</a>    <span class="k">def</span> <span class="nf">get_question_answers</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
+        <span class="sd">&quot;&quot;&quot;</span>
+<span class="sd">        Returns a dict of answer_ids to answer values. If we cannot generate</span>
+<span class="sd">        an answer (this sometimes happens in customresponses), that answer_id is</span>
+<span class="sd">        not included. Called by &quot;show answers&quot; button JSON request</span>
+<span class="sd">        (see capa_module)</span>
+<span class="sd">        &quot;&quot;&quot;</span>
+        <span class="c"># dict of (id, correct_answer)</span>
+        <span class="n">answer_map</span> <span class="o">=</span> <span class="nb">dict</span><span class="p">()</span>
+        <span class="k">for</span> <span class="n">response</span> <span class="ow">in</span> <span class="bp">self</span><span class="o">.</span><span class="n">responders</span><span class="o">.</span><span class="n">keys</span><span class="p">():</span>
+            <span class="n">results</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">responder_answers</span><span class="p">[</span><span class="n">response</span><span class="p">]</span>
+            <span class="n">answer_map</span><span class="o">.</span><span class="n">update</span><span class="p">(</span><span class="n">results</span><span class="p">)</span>
+
+        <span class="c"># include solutions from &lt;solution&gt;...&lt;/solution&gt; stanzas</span>
+        <span class="k">for</span> <span class="n">entry</span> <span class="ow">in</span> <span class="bp">self</span><span class="o">.</span><span class="n">tree</span><span class="o">.</span><span class="n">xpath</span><span class="p">(</span><span class="s">&quot;//&quot;</span> <span class="o">+</span> <span class="s">&quot;|//&quot;</span><span class="o">.</span><span class="n">join</span><span class="p">(</span><span class="n">solution_tags</span><span class="p">)):</span>
+            <span class="n">answer</span> <span class="o">=</span> <span class="n">etree</span><span class="o">.</span><span class="n">tostring</span><span class="p">(</span><span class="n">entry</span><span class="p">)</span>
+            <span class="k">if</span> <span class="n">answer</span><span class="p">:</span>
+                <span class="n">answer_map</span><span class="p">[</span><span class="n">entry</span><span class="o">.</span><span class="n">get</span><span class="p">(</span><span class="s">&#39;id&#39;</span><span class="p">)]</span> <span class="o">=</span> <span class="n">contextualize_text</span><span class="p">(</span><span class="n">answer</span><span class="p">,</span> <span class="bp">self</span><span class="o">.</span><span class="n">context</span><span class="p">)</span>
+
+        <span class="n">log</span><span class="o">.</span><span class="n">debug</span><span class="p">(</span><span class="s">&#39;answer_map = </span><span class="si">%s</span><span class="s">&#39;</span> <span class="o">%</span> <span class="n">answer_map</span><span class="p">)</span>
+        <span class="k">return</span> <span class="n">answer_map</span>
+</div>
+<div class="viewcode-block" id="LoncapaProblem.get_answer_ids"><a class="viewcode-back" href="../../capa.html#capa.capa_problem.LoncapaProblem.get_answer_ids">[docs]</a>    <span class="k">def</span> <span class="nf">get_answer_ids</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
+        <span class="sd">&quot;&quot;&quot;</span>
+<span class="sd">        Return the IDs of all the responses -- these are the keys used for</span>
+<span class="sd">        the dicts returned by grade_answers and get_question_answers. (Though</span>
+<span class="sd">        get_question_answers may only return a subset of these.</span>
+<span class="sd">        &quot;&quot;&quot;</span>
+        <span class="n">answer_ids</span> <span class="o">=</span> <span class="p">[]</span>
+        <span class="k">for</span> <span class="n">response</span> <span class="ow">in</span> <span class="bp">self</span><span class="o">.</span><span class="n">responders</span><span class="o">.</span><span class="n">keys</span><span class="p">():</span>
+            <span class="n">results</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">responder_answers</span><span class="p">[</span><span class="n">response</span><span class="p">]</span>
+            <span class="n">answer_ids</span><span class="o">.</span><span class="n">append</span><span class="p">(</span><span class="n">results</span><span class="o">.</span><span class="n">keys</span><span class="p">())</span>
+        <span class="k">return</span> <span class="n">answer_ids</span>
+</div>
+<div class="viewcode-block" id="LoncapaProblem.get_html"><a class="viewcode-back" href="../../capa.html#capa.capa_problem.LoncapaProblem.get_html">[docs]</a>    <span class="k">def</span> <span class="nf">get_html</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
+        <span class="sd">&#39;&#39;&#39;</span>
+<span class="sd">        Main method called externally to get the HTML to be rendered for this capa Problem.</span>
+<span class="sd">        &#39;&#39;&#39;</span>
+        <span class="k">return</span> <span class="n">contextualize_text</span><span class="p">(</span><span class="n">etree</span><span class="o">.</span><span class="n">tostring</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">_extract_html</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">tree</span><span class="p">)),</span> <span class="bp">self</span><span class="o">.</span><span class="n">context</span><span class="p">)</span>
+
+    <span class="c"># ======= Private Methods Below ========</span>
+</div>
+    <span class="k">def</span> <span class="nf">_process_includes</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
+        <span class="sd">&#39;&#39;&#39;</span>
+<span class="sd">        Handle any &lt;include file=&quot;foo&quot;&gt; tags by reading in the specified file and inserting it</span>
+<span class="sd">        into our XML tree.  Fail gracefully if debugging.</span>
+<span class="sd">        &#39;&#39;&#39;</span>
+        <span class="n">includes</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">tree</span><span class="o">.</span><span class="n">findall</span><span class="p">(</span><span class="s">&#39;.//include&#39;</span><span class="p">)</span>
+        <span class="k">for</span> <span class="n">inc</span> <span class="ow">in</span> <span class="n">includes</span><span class="p">:</span>
+            <span class="nb">file</span> <span class="o">=</span> <span class="n">inc</span><span class="o">.</span><span class="n">get</span><span class="p">(</span><span class="s">&#39;file&#39;</span><span class="p">)</span>
+            <span class="k">if</span> <span class="nb">file</span> <span class="ow">is</span> <span class="ow">not</span> <span class="bp">None</span><span class="p">:</span>
+                <span class="k">try</span><span class="p">:</span>
+                    <span class="c"># open using ModuleSystem OSFS filestore</span>
+                    <span class="n">ifp</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">system</span><span class="o">.</span><span class="n">filestore</span><span class="o">.</span><span class="n">open</span><span class="p">(</span><span class="nb">file</span><span class="p">)</span>
+                <span class="k">except</span> <span class="ne">Exception</span> <span class="k">as</span> <span class="n">err</span><span class="p">:</span>
+                    <span class="n">log</span><span class="o">.</span><span class="n">warning</span><span class="p">(</span><span class="s">&#39;Error </span><span class="si">%s</span><span class="s"> in problem xml include: </span><span class="si">%s</span><span class="s">&#39;</span> <span class="o">%</span> <span class="p">(</span>
+                            <span class="n">err</span><span class="p">,</span> <span class="n">etree</span><span class="o">.</span><span class="n">tostring</span><span class="p">(</span><span class="n">inc</span><span class="p">,</span> <span class="n">pretty_print</span><span class="o">=</span><span class="bp">True</span><span class="p">)))</span>
+                    <span class="n">log</span><span class="o">.</span><span class="n">warning</span><span class="p">(</span><span class="s">&#39;Cannot find file </span><span class="si">%s</span><span class="s"> in </span><span class="si">%s</span><span class="s">&#39;</span> <span class="o">%</span> <span class="p">(</span>
+                            <span class="nb">file</span><span class="p">,</span> <span class="bp">self</span><span class="o">.</span><span class="n">system</span><span class="o">.</span><span class="n">filestore</span><span class="p">))</span>
+                    <span class="c"># if debugging, don&#39;t fail - just log error</span>
+                    <span class="c"># TODO (vshnayder): need real error handling, display to users</span>
+                    <span class="k">if</span> <span class="ow">not</span> <span class="bp">self</span><span class="o">.</span><span class="n">system</span><span class="o">.</span><span class="n">get</span><span class="p">(</span><span class="s">&#39;DEBUG&#39;</span><span class="p">):</span>
+                        <span class="k">raise</span>
+                    <span class="k">else</span><span class="p">:</span>
+                        <span class="k">continue</span>
+                <span class="k">try</span><span class="p">:</span>
+                    <span class="c"># read in and convert to XML</span>
+                    <span class="n">incxml</span> <span class="o">=</span> <span class="n">etree</span><span class="o">.</span><span class="n">XML</span><span class="p">(</span><span class="n">ifp</span><span class="o">.</span><span class="n">read</span><span class="p">())</span>
+                <span class="k">except</span> <span class="ne">Exception</span> <span class="k">as</span> <span class="n">err</span><span class="p">:</span>
+                    <span class="n">log</span><span class="o">.</span><span class="n">warning</span><span class="p">(</span><span class="s">&#39;Error </span><span class="si">%s</span><span class="s"> in problem xml include: </span><span class="si">%s</span><span class="s">&#39;</span> <span class="o">%</span> <span class="p">(</span>
+                            <span class="n">err</span><span class="p">,</span> <span class="n">etree</span><span class="o">.</span><span class="n">tostring</span><span class="p">(</span><span class="n">inc</span><span class="p">,</span> <span class="n">pretty_print</span><span class="o">=</span><span class="bp">True</span><span class="p">)))</span>
+                    <span class="n">log</span><span class="o">.</span><span class="n">warning</span><span class="p">(</span><span class="s">&#39;Cannot parse XML in </span><span class="si">%s</span><span class="s">&#39;</span> <span class="o">%</span> <span class="p">(</span><span class="nb">file</span><span class="p">))</span>
+                    <span class="c"># if debugging, don&#39;t fail - just log error</span>
+                    <span class="c"># TODO (vshnayder): same as above</span>
+                    <span class="k">if</span> <span class="ow">not</span> <span class="bp">self</span><span class="o">.</span><span class="n">system</span><span class="o">.</span><span class="n">get</span><span class="p">(</span><span class="s">&#39;DEBUG&#39;</span><span class="p">):</span>
+                        <span class="k">raise</span>
+                    <span class="k">else</span><span class="p">:</span>
+                        <span class="k">continue</span>
+
+                <span class="c"># insert new XML into tree in place of inlcude</span>
+                <span class="n">parent</span> <span class="o">=</span> <span class="n">inc</span><span class="o">.</span><span class="n">getparent</span><span class="p">()</span>
+                <span class="n">parent</span><span class="o">.</span><span class="n">insert</span><span class="p">(</span><span class="n">parent</span><span class="o">.</span><span class="n">index</span><span class="p">(</span><span class="n">inc</span><span class="p">),</span> <span class="n">incxml</span><span class="p">)</span>
+                <span class="n">parent</span><span class="o">.</span><span class="n">remove</span><span class="p">(</span><span class="n">inc</span><span class="p">)</span>
+                <span class="n">log</span><span class="o">.</span><span class="n">debug</span><span class="p">(</span><span class="s">&#39;Included </span><span class="si">%s</span><span class="s"> into </span><span class="si">%s</span><span class="s">&#39;</span> <span class="o">%</span> <span class="p">(</span><span class="nb">file</span><span class="p">,</span> <span class="bp">self</span><span class="o">.</span><span class="n">problem_id</span><span class="p">))</span>
+
+    <span class="k">def</span> <span class="nf">_extract_system_path</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">script</span><span class="p">):</span>
+        <span class="sd">&quot;&quot;&quot;</span>
+<span class="sd">        Extracts and normalizes additional paths for code execution.</span>
+<span class="sd">        For now, there&#39;s a default path of data/course/code; this may be removed</span>
+<span class="sd">        at some point.</span>
+
+<span class="sd">        script : ?? (TODO)</span>
+<span class="sd">        &quot;&quot;&quot;</span>
+
+        <span class="n">DEFAULT_PATH</span> <span class="o">=</span> <span class="p">[</span><span class="s">&#39;code&#39;</span><span class="p">]</span>
+
+        <span class="c"># Separate paths by :, like the system path.</span>
+        <span class="n">raw_path</span> <span class="o">=</span> <span class="n">script</span><span class="o">.</span><span class="n">get</span><span class="p">(</span><span class="s">&#39;system_path&#39;</span><span class="p">,</span> <span class="s">&#39;&#39;</span><span class="p">)</span><span class="o">.</span><span class="n">split</span><span class="p">(</span><span class="s">&quot;:&quot;</span><span class="p">)</span> <span class="o">+</span> <span class="n">DEFAULT_PATH</span>
+
+        <span class="c"># find additional comma-separated modules search path</span>
+        <span class="n">path</span> <span class="o">=</span> <span class="p">[]</span>
+
+        <span class="k">for</span> <span class="nb">dir</span> <span class="ow">in</span> <span class="n">raw_path</span><span class="p">:</span>
+
+            <span class="k">if</span> <span class="ow">not</span> <span class="nb">dir</span><span class="p">:</span>
+                <span class="k">continue</span>
+
+            <span class="c"># path is an absolute path or a path relative to the data dir</span>
+            <span class="nb">dir</span> <span class="o">=</span> <span class="n">os</span><span class="o">.</span><span class="n">path</span><span class="o">.</span><span class="n">join</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">system</span><span class="o">.</span><span class="n">filestore</span><span class="o">.</span><span class="n">root_path</span><span class="p">,</span> <span class="nb">dir</span><span class="p">)</span>
+            <span class="n">abs_dir</span> <span class="o">=</span> <span class="n">os</span><span class="o">.</span><span class="n">path</span><span class="o">.</span><span class="n">normpath</span><span class="p">(</span><span class="nb">dir</span><span class="p">)</span>
+            <span class="n">path</span><span class="o">.</span><span class="n">append</span><span class="p">(</span><span class="n">abs_dir</span><span class="p">)</span>
+
+        <span class="k">return</span> <span class="n">path</span>
+
+    <span class="k">def</span> <span class="nf">_extract_context</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">tree</span><span class="p">,</span> <span class="n">seed</span><span class="o">=</span><span class="n">struct</span><span class="o">.</span><span class="n">unpack</span><span class="p">(</span><span class="s">&#39;i&#39;</span><span class="p">,</span> <span class="n">os</span><span class="o">.</span><span class="n">urandom</span><span class="p">(</span><span class="mi">4</span><span class="p">))[</span><span class="mi">0</span><span class="p">]):</span>  <span class="c"># private</span>
+        <span class="sd">&#39;&#39;&#39;</span>
+<span class="sd">        Extract content of &lt;script&gt;...&lt;/script&gt; from the problem.xml file, and exec it in the</span>
+<span class="sd">        context of this problem.  Provides ability to randomize problems, and also set</span>
+<span class="sd">        variables for problem answer checking.</span>
+
+<span class="sd">        Problem XML goes to Python execution context. Runs everything in script tags.</span>
+<span class="sd">        &#39;&#39;&#39;</span>
+        <span class="n">random</span><span class="o">.</span><span class="n">seed</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">seed</span><span class="p">)</span>
+        <span class="c"># save global context in here also</span>
+        <span class="n">context</span> <span class="o">=</span> <span class="p">{</span><span class="s">&#39;global_context&#39;</span><span class="p">:</span> <span class="n">global_context</span><span class="p">}</span>
+
+        <span class="c"># initialize context to have stuff in global_context</span>
+        <span class="n">context</span><span class="o">.</span><span class="n">update</span><span class="p">(</span><span class="n">global_context</span><span class="p">)</span>
+
+        <span class="c"># put globals there also</span>
+        <span class="n">context</span><span class="p">[</span><span class="s">&#39;__builtins__&#39;</span><span class="p">]</span> <span class="o">=</span> <span class="nb">globals</span><span class="p">()[</span><span class="s">&#39;__builtins__&#39;</span><span class="p">]</span>
+
+        <span class="c"># pass instance of LoncapaProblem in</span>
+        <span class="n">context</span><span class="p">[</span><span class="s">&#39;the_lcp&#39;</span><span class="p">]</span> <span class="o">=</span> <span class="bp">self</span>
+        <span class="n">context</span><span class="p">[</span><span class="s">&#39;script_code&#39;</span><span class="p">]</span> <span class="o">=</span> <span class="s">&#39;&#39;</span>
+
+        <span class="bp">self</span><span class="o">.</span><span class="n">_execute_scripts</span><span class="p">(</span><span class="n">tree</span><span class="o">.</span><span class="n">findall</span><span class="p">(</span><span class="s">&#39;.//script&#39;</span><span class="p">),</span> <span class="n">context</span><span class="p">)</span>
+
+        <span class="k">return</span> <span class="n">context</span>
+
+    <span class="k">def</span> <span class="nf">_execute_scripts</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">scripts</span><span class="p">,</span> <span class="n">context</span><span class="p">):</span>
+        <span class="sd">&#39;&#39;&#39;</span>
+<span class="sd">        Executes scripts in the given context.</span>
+<span class="sd">        &#39;&#39;&#39;</span>
+        <span class="n">original_path</span> <span class="o">=</span> <span class="n">sys</span><span class="o">.</span><span class="n">path</span>
+
+        <span class="k">for</span> <span class="n">script</span> <span class="ow">in</span> <span class="n">scripts</span><span class="p">:</span>
+            <span class="n">sys</span><span class="o">.</span><span class="n">path</span> <span class="o">=</span> <span class="n">original_path</span> <span class="o">+</span> <span class="bp">self</span><span class="o">.</span><span class="n">_extract_system_path</span><span class="p">(</span><span class="n">script</span><span class="p">)</span>
+
+            <span class="n">stype</span> <span class="o">=</span> <span class="n">script</span><span class="o">.</span><span class="n">get</span><span class="p">(</span><span class="s">&#39;type&#39;</span><span class="p">)</span>
+
+            <span class="k">if</span> <span class="n">stype</span><span class="p">:</span>
+                <span class="k">if</span> <span class="s">&#39;javascript&#39;</span> <span class="ow">in</span> <span class="n">stype</span><span class="p">:</span>
+                    <span class="k">continue</span>    <span class="c"># skip javascript</span>
+                <span class="k">if</span> <span class="s">&#39;perl&#39;</span> <span class="ow">in</span> <span class="n">stype</span><span class="p">:</span>
+                    <span class="k">continue</span>        <span class="c"># skip perl</span>
+            <span class="c"># TODO: evaluate only python</span>
+            <span class="n">code</span> <span class="o">=</span> <span class="n">script</span><span class="o">.</span><span class="n">text</span>
+            <span class="n">XMLESC</span> <span class="o">=</span> <span class="p">{</span><span class="s">&quot;&amp;apos;&quot;</span><span class="p">:</span> <span class="s">&quot;&#39;&quot;</span><span class="p">,</span> <span class="s">&quot;&amp;quot;&quot;</span><span class="p">:</span> <span class="s">&#39;&quot;&#39;</span><span class="p">}</span>
+            <span class="n">code</span> <span class="o">=</span> <span class="n">unescape</span><span class="p">(</span><span class="n">code</span><span class="p">,</span> <span class="n">XMLESC</span><span class="p">)</span>
+            <span class="c"># store code source in context</span>
+            <span class="n">context</span><span class="p">[</span><span class="s">&#39;script_code&#39;</span><span class="p">]</span> <span class="o">+=</span> <span class="n">code</span>
+            <span class="k">try</span><span class="p">:</span>
+                <span class="c"># use &quot;context&quot; for global context; thus defs in code are global within code</span>
+                <span class="k">exec</span> <span class="n">code</span> <span class="ow">in</span> <span class="n">context</span><span class="p">,</span> <span class="n">context</span>
+            <span class="k">except</span> <span class="ne">Exception</span> <span class="k">as</span> <span class="n">err</span><span class="p">:</span>
+                <span class="n">log</span><span class="o">.</span><span class="n">exception</span><span class="p">(</span><span class="s">&quot;Error while execing script code: &quot;</span> <span class="o">+</span> <span class="n">code</span><span class="p">)</span>
+                <span class="n">msg</span> <span class="o">=</span> <span class="s">&quot;Error while executing script code: </span><span class="si">%s</span><span class="s">&quot;</span> <span class="o">%</span> <span class="nb">str</span><span class="p">(</span><span class="n">err</span><span class="p">)</span><span class="o">.</span><span class="n">replace</span><span class="p">(</span><span class="s">&#39;&lt;&#39;</span><span class="p">,</span><span class="s">&#39;&amp;lt;&#39;</span><span class="p">)</span>
+                <span class="k">raise</span> <span class="n">responsetypes</span><span class="o">.</span><span class="n">LoncapaProblemError</span><span class="p">(</span><span class="n">msg</span><span class="p">)</span>
+            <span class="k">finally</span><span class="p">:</span>
+                <span class="n">sys</span><span class="o">.</span><span class="n">path</span> <span class="o">=</span> <span class="n">original_path</span>
+
+    <span class="k">def</span> <span class="nf">_extract_html</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">problemtree</span><span class="p">):</span>  <span class="c"># private</span>
+        <span class="sd">&#39;&#39;&#39;</span>
+<span class="sd">        Main (private) function which converts Problem XML tree to HTML.</span>
+<span class="sd">        Calls itself recursively.</span>
+
+<span class="sd">        Returns Element tree of XHTML representation of problemtree.</span>
+<span class="sd">        Calls render_html of Response instances to render responses into XHTML.</span>
+
+<span class="sd">        Used by get_html.</span>
+<span class="sd">        &#39;&#39;&#39;</span>
+        <span class="k">if</span> <span class="p">(</span><span class="n">problemtree</span><span class="o">.</span><span class="n">tag</span> <span class="o">==</span> <span class="s">&#39;script&#39;</span> <span class="ow">and</span> <span class="n">problemtree</span><span class="o">.</span><span class="n">get</span><span class="p">(</span><span class="s">&#39;type&#39;</span><span class="p">)</span>
+            <span class="ow">and</span> <span class="s">&#39;javascript&#39;</span> <span class="ow">in</span> <span class="n">problemtree</span><span class="o">.</span><span class="n">get</span><span class="p">(</span><span class="s">&#39;type&#39;</span><span class="p">)):</span>
+            <span class="c"># leave javascript intact.</span>
+            <span class="k">return</span> <span class="n">problemtree</span>
+
+        <span class="k">if</span> <span class="n">problemtree</span><span class="o">.</span><span class="n">tag</span> <span class="ow">in</span> <span class="n">html_problem_semantics</span><span class="p">:</span>
+            <span class="k">return</span>
+
+        <span class="n">problemid</span> <span class="o">=</span> <span class="n">problemtree</span><span class="o">.</span><span class="n">get</span><span class="p">(</span><span class="s">&#39;id&#39;</span><span class="p">)</span>    <span class="c"># my ID</span>
+
+        <span class="k">if</span> <span class="n">problemtree</span><span class="o">.</span><span class="n">tag</span> <span class="ow">in</span> <span class="n">inputtypes</span><span class="o">.</span><span class="n">registry</span><span class="o">.</span><span class="n">registered_tags</span><span class="p">():</span>
+            <span class="c"># If this is an inputtype subtree, let it render itself.</span>
+            <span class="n">status</span> <span class="o">=</span> <span class="s">&quot;unsubmitted&quot;</span>
+            <span class="n">msg</span> <span class="o">=</span> <span class="s">&#39;&#39;</span>
+            <span class="n">hint</span> <span class="o">=</span> <span class="s">&#39;&#39;</span>
+            <span class="n">hintmode</span> <span class="o">=</span> <span class="bp">None</span>
+            <span class="k">if</span> <span class="n">problemid</span> <span class="ow">in</span> <span class="bp">self</span><span class="o">.</span><span class="n">correct_map</span><span class="p">:</span>
+                <span class="n">pid</span> <span class="o">=</span> <span class="n">problemtree</span><span class="o">.</span><span class="n">get</span><span class="p">(</span><span class="s">&#39;id&#39;</span><span class="p">)</span>
+                <span class="n">status</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">correct_map</span><span class="o">.</span><span class="n">get_correctness</span><span class="p">(</span><span class="n">pid</span><span class="p">)</span>
+                <span class="n">msg</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">correct_map</span><span class="o">.</span><span class="n">get_msg</span><span class="p">(</span><span class="n">pid</span><span class="p">)</span>
+                <span class="n">hint</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">correct_map</span><span class="o">.</span><span class="n">get_hint</span><span class="p">(</span><span class="n">pid</span><span class="p">)</span>
+                <span class="n">hintmode</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">correct_map</span><span class="o">.</span><span class="n">get_hintmode</span><span class="p">(</span><span class="n">pid</span><span class="p">)</span>
+
+            <span class="n">value</span> <span class="o">=</span> <span class="s">&quot;&quot;</span>
+            <span class="k">if</span> <span class="bp">self</span><span class="o">.</span><span class="n">student_answers</span> <span class="ow">and</span> <span class="n">problemid</span> <span class="ow">in</span> <span class="bp">self</span><span class="o">.</span><span class="n">student_answers</span><span class="p">:</span>
+                <span class="n">value</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">student_answers</span><span class="p">[</span><span class="n">problemid</span><span class="p">]</span>
+
+            <span class="c"># do the rendering</span>
+
+            <span class="n">state</span> <span class="o">=</span> <span class="p">{</span><span class="s">&#39;value&#39;</span><span class="p">:</span> <span class="n">value</span><span class="p">,</span>
+                   <span class="s">&#39;status&#39;</span><span class="p">:</span> <span class="n">status</span><span class="p">,</span>
+                   <span class="s">&#39;id&#39;</span><span class="p">:</span> <span class="n">problemtree</span><span class="o">.</span><span class="n">get</span><span class="p">(</span><span class="s">&#39;id&#39;</span><span class="p">),</span>
+                   <span class="s">&#39;feedback&#39;</span><span class="p">:</span> <span class="p">{</span><span class="s">&#39;message&#39;</span><span class="p">:</span> <span class="n">msg</span><span class="p">,</span>
+                                <span class="s">&#39;hint&#39;</span><span class="p">:</span> <span class="n">hint</span><span class="p">,</span>
+                                <span class="s">&#39;hintmode&#39;</span><span class="p">:</span> <span class="n">hintmode</span><span class="p">,}}</span>
+
+            <span class="n">input_type_cls</span> <span class="o">=</span> <span class="n">inputtypes</span><span class="o">.</span><span class="n">registry</span><span class="o">.</span><span class="n">get_class_for_tag</span><span class="p">(</span><span class="n">problemtree</span><span class="o">.</span><span class="n">tag</span><span class="p">)</span>
+            <span class="n">the_input</span> <span class="o">=</span> <span class="n">input_type_cls</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">system</span><span class="p">,</span> <span class="n">problemtree</span><span class="p">,</span> <span class="n">state</span><span class="p">)</span>
+            <span class="k">return</span> <span class="n">the_input</span><span class="o">.</span><span class="n">get_html</span><span class="p">()</span>
+
+        <span class="c"># let each Response render itself</span>
+        <span class="k">if</span> <span class="n">problemtree</span> <span class="ow">in</span> <span class="bp">self</span><span class="o">.</span><span class="n">responders</span><span class="p">:</span>
+            <span class="k">return</span> <span class="bp">self</span><span class="o">.</span><span class="n">responders</span><span class="p">[</span><span class="n">problemtree</span><span class="p">]</span><span class="o">.</span><span class="n">render_html</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">_extract_html</span><span class="p">)</span>
+
+        <span class="c"># let each custom renderer render itself:</span>
+        <span class="k">if</span> <span class="n">problemtree</span><span class="o">.</span><span class="n">tag</span> <span class="ow">in</span> <span class="n">customrender</span><span class="o">.</span><span class="n">registry</span><span class="o">.</span><span class="n">registered_tags</span><span class="p">():</span>
+            <span class="n">renderer_class</span> <span class="o">=</span> <span class="n">customrender</span><span class="o">.</span><span class="n">registry</span><span class="o">.</span><span class="n">get_class_for_tag</span><span class="p">(</span><span class="n">problemtree</span><span class="o">.</span><span class="n">tag</span><span class="p">)</span>
+            <span class="n">renderer</span> <span class="o">=</span> <span class="n">renderer_class</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">system</span><span class="p">,</span> <span class="n">problemtree</span><span class="p">)</span>
+            <span class="k">return</span> <span class="n">renderer</span><span class="o">.</span><span class="n">get_html</span><span class="p">()</span>
+
+        <span class="c"># otherwise, render children recursively, and copy over attributes</span>
+        <span class="n">tree</span> <span class="o">=</span> <span class="n">etree</span><span class="o">.</span><span class="n">Element</span><span class="p">(</span><span class="n">problemtree</span><span class="o">.</span><span class="n">tag</span><span class="p">)</span>
+        <span class="k">for</span> <span class="n">item</span> <span class="ow">in</span> <span class="n">problemtree</span><span class="p">:</span>
+            <span class="n">item_xhtml</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">_extract_html</span><span class="p">(</span><span class="n">item</span><span class="p">)</span>
+            <span class="k">if</span> <span class="n">item_xhtml</span> <span class="ow">is</span> <span class="ow">not</span> <span class="bp">None</span><span class="p">:</span>
+                    <span class="n">tree</span><span class="o">.</span><span class="n">append</span><span class="p">(</span><span class="n">item_xhtml</span><span class="p">)</span>
+
+        <span class="k">if</span> <span class="n">tree</span><span class="o">.</span><span class="n">tag</span> <span class="ow">in</span> <span class="n">html_transforms</span><span class="p">:</span>
+            <span class="n">tree</span><span class="o">.</span><span class="n">tag</span> <span class="o">=</span> <span class="n">html_transforms</span><span class="p">[</span><span class="n">problemtree</span><span class="o">.</span><span class="n">tag</span><span class="p">][</span><span class="s">&#39;tag&#39;</span><span class="p">]</span>
+        <span class="k">else</span><span class="p">:</span>
+            <span class="c"># copy attributes over if not innocufying</span>
+            <span class="k">for</span> <span class="p">(</span><span class="n">key</span><span class="p">,</span> <span class="n">value</span><span class="p">)</span> <span class="ow">in</span> <span class="n">problemtree</span><span class="o">.</span><span class="n">items</span><span class="p">():</span>
+                <span class="n">tree</span><span class="o">.</span><span class="n">set</span><span class="p">(</span><span class="n">key</span><span class="p">,</span> <span class="n">value</span><span class="p">)</span>
+
+        <span class="n">tree</span><span class="o">.</span><span class="n">text</span> <span class="o">=</span> <span class="n">problemtree</span><span class="o">.</span><span class="n">text</span>
+        <span class="n">tree</span><span class="o">.</span><span class="n">tail</span> <span class="o">=</span> <span class="n">problemtree</span><span class="o">.</span><span class="n">tail</span>
+
+        <span class="k">return</span> <span class="n">tree</span>
+
+    <span class="k">def</span> <span class="nf">_preprocess_problem</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">tree</span><span class="p">):</span>  <span class="c"># private</span>
+        <span class="sd">&#39;&#39;&#39;</span>
+<span class="sd">        Assign IDs to all the responses</span>
+<span class="sd">        Assign sub-IDs to all entries (textline, schematic, etc.)</span>
+<span class="sd">        Annoted correctness and value</span>
+<span class="sd">        In-place transformation</span>
+
+<span class="sd">        Also create capa Response instances for each responsetype and save as self.responders</span>
+
+<span class="sd">        Obtain all responder answers and save as self.responder_answers dict (key = response)</span>
+<span class="sd">        &#39;&#39;&#39;</span>
+        <span class="n">response_id</span> <span class="o">=</span> <span class="mi">1</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">responders</span> <span class="o">=</span> <span class="p">{}</span>
+        <span class="k">for</span> <span class="n">response</span> <span class="ow">in</span> <span class="n">tree</span><span class="o">.</span><span class="n">xpath</span><span class="p">(</span><span class="s">&#39;//&#39;</span> <span class="o">+</span> <span class="s">&quot;|//&quot;</span><span class="o">.</span><span class="n">join</span><span class="p">(</span><span class="n">response_tag_dict</span><span class="p">)):</span>
+            <span class="n">response_id_str</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">problem_id</span> <span class="o">+</span> <span class="s">&quot;_&quot;</span> <span class="o">+</span> <span class="nb">str</span><span class="p">(</span><span class="n">response_id</span><span class="p">)</span>
+            <span class="c"># create and save ID for this response</span>
+            <span class="n">response</span><span class="o">.</span><span class="n">set</span><span class="p">(</span><span class="s">&#39;id&#39;</span><span class="p">,</span> <span class="n">response_id_str</span><span class="p">)</span>
+            <span class="n">response_id</span> <span class="o">+=</span> <span class="mi">1</span>
+
+            <span class="n">answer_id</span> <span class="o">=</span> <span class="mi">1</span>
+            <span class="n">input_tags</span> <span class="o">=</span> <span class="n">inputtypes</span><span class="o">.</span><span class="n">registry</span><span class="o">.</span><span class="n">registered_tags</span><span class="p">()</span>
+            <span class="n">inputfields</span> <span class="o">=</span> <span class="n">tree</span><span class="o">.</span><span class="n">xpath</span><span class="p">(</span><span class="s">&quot;|&quot;</span><span class="o">.</span><span class="n">join</span><span class="p">([</span><span class="s">&#39;//&#39;</span> <span class="o">+</span> <span class="n">response</span><span class="o">.</span><span class="n">tag</span> <span class="o">+</span> <span class="s">&#39;[@id=$id]//&#39;</span> <span class="o">+</span> <span class="n">x</span>
+                                               <span class="k">for</span> <span class="n">x</span> <span class="ow">in</span> <span class="p">(</span><span class="n">input_tags</span> <span class="o">+</span> <span class="n">solution_tags</span><span class="p">)]),</span>
+                                    <span class="nb">id</span><span class="o">=</span><span class="n">response_id_str</span><span class="p">)</span>
+
+            <span class="c"># assign one answer_id for each input type or solution type</span>
+            <span class="k">for</span> <span class="n">entry</span> <span class="ow">in</span> <span class="n">inputfields</span><span class="p">:</span>
+                <span class="n">entry</span><span class="o">.</span><span class="n">attrib</span><span class="p">[</span><span class="s">&#39;response_id&#39;</span><span class="p">]</span> <span class="o">=</span> <span class="nb">str</span><span class="p">(</span><span class="n">response_id</span><span class="p">)</span>
+                <span class="n">entry</span><span class="o">.</span><span class="n">attrib</span><span class="p">[</span><span class="s">&#39;answer_id&#39;</span><span class="p">]</span> <span class="o">=</span> <span class="nb">str</span><span class="p">(</span><span class="n">answer_id</span><span class="p">)</span>
+                <span class="n">entry</span><span class="o">.</span><span class="n">attrib</span><span class="p">[</span><span class="s">&#39;id&#39;</span><span class="p">]</span> <span class="o">=</span> <span class="s">&quot;</span><span class="si">%s</span><span class="s">_</span><span class="si">%i</span><span class="s">_</span><span class="si">%i</span><span class="s">&quot;</span> <span class="o">%</span> <span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">problem_id</span><span class="p">,</span> <span class="n">response_id</span><span class="p">,</span> <span class="n">answer_id</span><span class="p">)</span>
+                <span class="n">answer_id</span> <span class="o">=</span> <span class="n">answer_id</span> <span class="o">+</span> <span class="mi">1</span>
+
+            <span class="c"># instantiate capa Response</span>
+            <span class="n">responder</span> <span class="o">=</span> <span class="n">response_tag_dict</span><span class="p">[</span><span class="n">response</span><span class="o">.</span><span class="n">tag</span><span class="p">](</span><span class="n">response</span><span class="p">,</span> <span class="n">inputfields</span><span class="p">,</span>
+                                                        <span class="bp">self</span><span class="o">.</span><span class="n">context</span><span class="p">,</span> <span class="bp">self</span><span class="o">.</span><span class="n">system</span><span class="p">)</span>
+            <span class="c"># save in list in self</span>
+            <span class="bp">self</span><span class="o">.</span><span class="n">responders</span><span class="p">[</span><span class="n">response</span><span class="p">]</span> <span class="o">=</span> <span class="n">responder</span>
+
+        <span class="c"># get responder answers (do this only once, since there may be a performance cost,</span>
+        <span class="c"># eg with externalresponse)</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">responder_answers</span> <span class="o">=</span> <span class="p">{}</span>
+        <span class="k">for</span> <span class="n">response</span> <span class="ow">in</span> <span class="bp">self</span><span class="o">.</span><span class="n">responders</span><span class="o">.</span><span class="n">keys</span><span class="p">():</span>
+            <span class="k">try</span><span class="p">:</span>
+                <span class="bp">self</span><span class="o">.</span><span class="n">responder_answers</span><span class="p">[</span><span class="n">response</span><span class="p">]</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">responders</span><span class="p">[</span><span class="n">response</span><span class="p">]</span><span class="o">.</span><span class="n">get_answers</span><span class="p">()</span>
+            <span class="k">except</span><span class="p">:</span>
+                <span class="n">log</span><span class="o">.</span><span class="n">debug</span><span class="p">(</span><span class="s">&#39;responder </span><span class="si">%s</span><span class="s"> failed to properly return get_answers()&#39;</span><span class="p">,</span>
+                          <span class="bp">self</span><span class="o">.</span><span class="n">responders</span><span class="p">[</span><span class="n">response</span><span class="p">])</span>  <span class="c"># FIXME</span>
+                <span class="k">raise</span>
+
+        <span class="c"># &lt;solution&gt;...&lt;/solution&gt; may not be associated with any specific response; give</span>
+        <span class="c"># IDs for those separately</span>
+        <span class="c"># TODO: We should make the namespaces consistent and unique (e.g. %s_problem_%i).</span>
+        <span class="n">solution_id</span> <span class="o">=</span> <span class="mi">1</span>
+        <span class="k">for</span> <span class="n">solution</span> <span class="ow">in</span> <span class="n">tree</span><span class="o">.</span><span class="n">findall</span><span class="p">(</span><span class="s">&#39;.//solution&#39;</span><span class="p">):</span>
+            <span class="n">solution</span><span class="o">.</span><span class="n">attrib</span><span class="p">[</span><span class="s">&#39;id&#39;</span><span class="p">]</span> <span class="o">=</span> <span class="s">&quot;</span><span class="si">%s</span><span class="s">_solution_</span><span class="si">%i</span><span class="s">&quot;</span> <span class="o">%</span> <span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">problem_id</span><span class="p">,</span> <span class="n">solution_id</span><span class="p">)</span>
+            <span class="n">solution_id</span> <span class="o">+=</span> <span class="mi">1</span></div>
+</pre></div>
+
+          </div>
+        </div>
+      </div>
+      <div class="clearer"></div>
+    </div>
+    <div class="related">
+      <h3>Navigation</h3>
+      <ul>
+        <li class="right" style="margin-right: 10px">
+          <a href="../../genindex.html" title="General Index"
+             >index</a></li>
+        <li class="right" >
+          <a href="../../py-modindex.html" title="Python Module Index"
+             >modules</a> |</li>
+        <li><a href="../../index.html">MITx 1.0 documentation</a> &raquo;</li>
+          <li><a href="../index.html" >Module code</a> &raquo;</li> 
+      </ul>
+    </div>
+    <div class="footer">
+        &copy; Copyright 2012, MITx team.
+      Created using <a href="http://sphinx.pocoo.org/">Sphinx</a> 1.1.3.
+    </div>
+  </body>
+</html>

@@ -1,0 +1,556 @@
+
+
+<!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Transitional//EN"
+  "http://www.w3.org/TR/xhtml1/DTD/xhtml1-transitional.dtd">
+
+
+<html xmlns="http://www.w3.org/1999/xhtml">
+  <head>
+    <meta http-equiv="Content-Type" content="text/html; charset=utf-8" />
+    
+    <title>student.models &mdash; MITx 1.0 documentation</title>
+    
+    <link rel="stylesheet" href="../../_static/sphinxdoc.css" type="text/css" />
+    <link rel="stylesheet" href="../../_static/pygments.css" type="text/css" />
+    
+    <script type="text/javascript">
+      var DOCUMENTATION_OPTIONS = {
+        URL_ROOT:    '../../',
+        VERSION:     '1.0',
+        COLLAPSE_INDEX: false,
+        FILE_SUFFIX: '.html',
+        HAS_SOURCE:  true
+      };
+    </script>
+    <script type="text/javascript" src="../../_static/jquery.js"></script>
+    <script type="text/javascript" src="../../_static/underscore.js"></script>
+    <script type="text/javascript" src="../../_static/doctools.js"></script>
+    <script type="text/javascript" src="http://cdn.mathjax.org/mathjax/latest/MathJax.js?config=TeX-AMS-MML_HTMLorMML"></script>
+    <link rel="top" title="MITx 1.0 documentation" href="../../index.html" />
+    <link rel="up" title="Module code" href="../index.html" /> 
+  </head>
+  <body>
+<img src="../../_static/homepage-bg.jpg" alt="Edx logo"  width="100%;"/>
+
+    <div class="related">
+      <h3>Navigation</h3>
+      <ul>
+        <li class="right" style="margin-right: 10px">
+          <a href="../../genindex.html" title="General Index"
+             accesskey="I">index</a></li>
+        <li class="right" >
+          <a href="../../py-modindex.html" title="Python Module Index"
+             >modules</a> |</li>
+        <li><a href="../../index.html">MITx 1.0 documentation</a> &raquo;</li>
+          <li><a href="../index.html" accesskey="U">Module code</a> &raquo;</li> 
+      </ul>
+    </div>
+      <div class="sphinxsidebar">
+        <div class="sphinxsidebarwrapper">
+<div id="searchbox" style="display: none">
+  <h3>Quick search</h3>
+    <form class="search" action="../../search.html" method="get">
+      <input type="text" name="q" />
+      <input type="submit" value="Go" />
+      <input type="hidden" name="check_keywords" value="yes" />
+      <input type="hidden" name="area" value="default" />
+    </form>
+    <p class="searchtip" style="font-size: 90%">
+    Enter search terms or a module, class or function name.
+    </p>
+</div>
+<script type="text/javascript">$('#searchbox').show(0);</script>
+        </div>
+      </div>
+
+    <div class="document">
+      <div class="documentwrapper">
+        <div class="bodywrapper">
+          <div class="body">
+            
+  <h1>Source code for student.models</h1><div class="highlight"><pre>
+<span class="sd">&quot;&quot;&quot;</span>
+<span class="sd">Models for Student Information</span>
+
+<span class="sd">Replication Notes</span>
+
+<span class="sd">In our live deployment, we intend to run in a scenario where there is a pool of</span>
+<span class="sd">Portal servers that hold the canoncial user information and that user</span>
+<span class="sd">information is replicated to slave Course server pools. Each Course has a set of</span>
+<span class="sd">servers that serves only its content and has users that are relevant only to it.</span>
+
+<span class="sd">We replicate the following tables into the Course DBs where the user is </span>
+<span class="sd">enrolled. Only the Portal servers should ever write to these models.</span>
+<span class="sd">* UserProfile</span>
+<span class="sd">* CourseEnrollment</span>
+
+<span class="sd">We do a partial replication of:</span>
+<span class="sd">* User -- Askbot extends this and uses the extra fields, so we replicate only</span>
+<span class="sd">          the stuff that comes with basic django_auth and ignore the rest.)</span>
+
+<span class="sd">There are a couple different scenarios:</span>
+
+<span class="sd">1. There&#39;s an update of User or UserProfile -- replicate it to all Course DBs</span>
+<span class="sd">   that the user is enrolled in (found via CourseEnrollment).</span>
+<span class="sd">2. There&#39;s a change in CourseEnrollment. We need to push copies of UserProfile,</span>
+<span class="sd">   CourseEnrollment, and the base fields in User</span>
+
+<span class="sd">Migration Notes</span>
+
+<span class="sd">If you make changes to this model, be sure to create an appropriate migration</span>
+<span class="sd">file and check it in at the same time as your model changes. To do that,</span>
+
+<span class="sd">1. Go to the mitx dir</span>
+<span class="sd">2. django-admin.py schemamigration student --auto --settings=lms.envs.dev --pythonpath=. description_of_your_change</span>
+<span class="sd">3. Add the migration file created in mitx/common/djangoapps/student/migrations/</span>
+<span class="sd">&quot;&quot;&quot;</span>
+<span class="kn">from</span> <span class="nn">datetime</span> <span class="kn">import</span> <span class="n">datetime</span>
+<span class="kn">import</span> <span class="nn">json</span>
+<span class="kn">import</span> <span class="nn">logging</span>
+<span class="kn">import</span> <span class="nn">uuid</span>
+
+<span class="kn">from</span> <span class="nn">django.conf</span> <span class="kn">import</span> <span class="n">settings</span>
+<span class="kn">from</span> <span class="nn">django.contrib.auth.models</span> <span class="kn">import</span> <span class="n">User</span>
+<span class="kn">from</span> <span class="nn">django.db</span> <span class="kn">import</span> <span class="n">models</span>
+<span class="kn">from</span> <span class="nn">django.db.models.signals</span> <span class="kn">import</span> <span class="n">post_delete</span><span class="p">,</span> <span class="n">post_save</span>
+<span class="kn">from</span> <span class="nn">django.dispatch</span> <span class="kn">import</span> <span class="n">receiver</span>
+<span class="kn">from</span> <span class="nn">django_countries</span> <span class="kn">import</span> <span class="n">CountryField</span>
+
+<span class="kn">from</span> <span class="nn">django.db.models.signals</span> <span class="kn">import</span> <span class="n">post_save</span>
+<span class="kn">from</span> <span class="nn">django.dispatch</span> <span class="kn">import</span> <span class="n">receiver</span>
+
+<span class="kn">from</span> <span class="nn">functools</span> <span class="kn">import</span> <span class="n">partial</span>
+
+<span class="kn">import</span> <span class="nn">comment_client</span> <span class="kn">as</span> <span class="nn">cc</span>
+<span class="kn">from</span> <span class="nn">django_comment_client.models</span> <span class="kn">import</span> <span class="n">Role</span><span class="p">,</span> <span class="n">Permission</span>
+
+<span class="kn">import</span> <span class="nn">logging</span>
+
+<span class="kn">from</span> <span class="nn">xmodule.modulestore.django</span> <span class="kn">import</span> <span class="n">modulestore</span>
+
+<span class="c">#from cache_toolbox import cache_model, cache_relation</span>
+
+<span class="n">log</span> <span class="o">=</span> <span class="n">logging</span><span class="o">.</span><span class="n">getLogger</span><span class="p">(</span><span class="n">__name__</span><span class="p">)</span>
+
+
+<div class="viewcode-block" id="UserProfile"><a class="viewcode-back" href="../../djangoapps-common.html#student.models.UserProfile">[docs]</a><span class="k">class</span> <span class="nc">UserProfile</span><span class="p">(</span><span class="n">models</span><span class="o">.</span><span class="n">Model</span><span class="p">):</span>
+    <span class="sd">&quot;&quot;&quot;This is where we store all the user demographic fields. We have a </span>
+<span class="sd">    separate table for this rather than extending the built-in Django auth_user.</span>
+
+<span class="sd">    Notes:</span>
+<span class="sd">        * Some fields are legacy ones from the first run of 6.002, from which </span>
+<span class="sd">          we imported many users.</span>
+<span class="sd">        * Fields like name and address are intentionally open ended, to account</span>
+<span class="sd">          for international variations. An unfortunate side-effect is that we</span>
+<span class="sd">          cannot efficiently sort on last names for instance.</span>
+
+<span class="sd">    Replication:</span>
+<span class="sd">        * Only the Portal servers should ever modify this information.</span>
+<span class="sd">        * All fields are replicated into relevant Course databases</span>
+
+<span class="sd">    Some of the fields are legacy ones that were captured during the initial</span>
+<span class="sd">    MITx fall prototype.</span>
+<span class="sd">    &quot;&quot;&quot;</span>
+
+    <span class="k">class</span> <span class="nc">Meta</span><span class="p">:</span>
+        <span class="n">db_table</span> <span class="o">=</span> <span class="s">&quot;auth_userprofile&quot;</span>
+
+    <span class="c">## CRITICAL TODO/SECURITY</span>
+    <span class="c"># Sanitize all fields.</span>
+    <span class="c"># This is not visible to other users, but could introduce holes later</span>
+    <span class="n">user</span> <span class="o">=</span> <span class="n">models</span><span class="o">.</span><span class="n">OneToOneField</span><span class="p">(</span><span class="n">User</span><span class="p">,</span> <span class="n">unique</span><span class="o">=</span><span class="bp">True</span><span class="p">,</span> <span class="n">db_index</span><span class="o">=</span><span class="bp">True</span><span class="p">,</span> <span class="n">related_name</span><span class="o">=</span><span class="s">&#39;profile&#39;</span><span class="p">)</span>
+    <span class="n">name</span> <span class="o">=</span> <span class="n">models</span><span class="o">.</span><span class="n">CharField</span><span class="p">(</span><span class="n">blank</span><span class="o">=</span><span class="bp">True</span><span class="p">,</span> <span class="n">max_length</span><span class="o">=</span><span class="mi">255</span><span class="p">,</span> <span class="n">db_index</span><span class="o">=</span><span class="bp">True</span><span class="p">)</span>
+
+    <span class="n">meta</span> <span class="o">=</span> <span class="n">models</span><span class="o">.</span><span class="n">TextField</span><span class="p">(</span><span class="n">blank</span><span class="o">=</span><span class="bp">True</span><span class="p">)</span>  <span class="c"># JSON dictionary for future expansion</span>
+    <span class="n">courseware</span> <span class="o">=</span> <span class="n">models</span><span class="o">.</span><span class="n">CharField</span><span class="p">(</span><span class="n">blank</span><span class="o">=</span><span class="bp">True</span><span class="p">,</span> <span class="n">max_length</span><span class="o">=</span><span class="mi">255</span><span class="p">,</span> <span class="n">default</span><span class="o">=</span><span class="s">&#39;course.xml&#39;</span><span class="p">)</span>
+
+    <span class="c"># Location is no longer used, but is held here for backwards compatibility</span>
+    <span class="c"># for users imported from our first class.</span>
+    <span class="n">language</span> <span class="o">=</span> <span class="n">models</span><span class="o">.</span><span class="n">CharField</span><span class="p">(</span><span class="n">blank</span><span class="o">=</span><span class="bp">True</span><span class="p">,</span> <span class="n">max_length</span><span class="o">=</span><span class="mi">255</span><span class="p">,</span> <span class="n">db_index</span><span class="o">=</span><span class="bp">True</span><span class="p">)</span>
+    <span class="n">location</span> <span class="o">=</span> <span class="n">models</span><span class="o">.</span><span class="n">CharField</span><span class="p">(</span><span class="n">blank</span><span class="o">=</span><span class="bp">True</span><span class="p">,</span> <span class="n">max_length</span><span class="o">=</span><span class="mi">255</span><span class="p">,</span> <span class="n">db_index</span><span class="o">=</span><span class="bp">True</span><span class="p">)</span>
+
+    <span class="c"># Optional demographic data we started capturing from Fall 2012</span>
+    <span class="n">this_year</span> <span class="o">=</span> <span class="n">datetime</span><span class="o">.</span><span class="n">now</span><span class="p">()</span><span class="o">.</span><span class="n">year</span>
+    <span class="n">VALID_YEARS</span> <span class="o">=</span> <span class="nb">range</span><span class="p">(</span><span class="n">this_year</span><span class="p">,</span> <span class="n">this_year</span> <span class="o">-</span> <span class="mi">120</span><span class="p">,</span> <span class="o">-</span><span class="mi">1</span><span class="p">)</span>
+    <span class="n">year_of_birth</span> <span class="o">=</span> <span class="n">models</span><span class="o">.</span><span class="n">IntegerField</span><span class="p">(</span><span class="n">blank</span><span class="o">=</span><span class="bp">True</span><span class="p">,</span> <span class="n">null</span><span class="o">=</span><span class="bp">True</span><span class="p">,</span> <span class="n">db_index</span><span class="o">=</span><span class="bp">True</span><span class="p">)</span>
+    <span class="n">GENDER_CHOICES</span> <span class="o">=</span> <span class="p">((</span><span class="s">&#39;m&#39;</span><span class="p">,</span> <span class="s">&#39;Male&#39;</span><span class="p">),</span> <span class="p">(</span><span class="s">&#39;f&#39;</span><span class="p">,</span> <span class="s">&#39;Female&#39;</span><span class="p">),</span> <span class="p">(</span><span class="s">&#39;o&#39;</span><span class="p">,</span> <span class="s">&#39;Other&#39;</span><span class="p">))</span>
+    <span class="n">gender</span> <span class="o">=</span> <span class="n">models</span><span class="o">.</span><span class="n">CharField</span><span class="p">(</span><span class="n">blank</span><span class="o">=</span><span class="bp">True</span><span class="p">,</span> <span class="n">null</span><span class="o">=</span><span class="bp">True</span><span class="p">,</span> <span class="n">max_length</span><span class="o">=</span><span class="mi">6</span><span class="p">,</span> <span class="n">db_index</span><span class="o">=</span><span class="bp">True</span><span class="p">,</span>
+                              <span class="n">choices</span><span class="o">=</span><span class="n">GENDER_CHOICES</span><span class="p">)</span>
+    <span class="n">LEVEL_OF_EDUCATION_CHOICES</span> <span class="o">=</span> <span class="p">((</span><span class="s">&#39;p_se&#39;</span><span class="p">,</span> <span class="s">&#39;Doctorate in science or engineering&#39;</span><span class="p">),</span>
+                                  <span class="p">(</span><span class="s">&#39;p_oth&#39;</span><span class="p">,</span> <span class="s">&#39;Doctorate in another field&#39;</span><span class="p">),</span>
+                                  <span class="p">(</span><span class="s">&#39;m&#39;</span><span class="p">,</span> <span class="s">&quot;Master&#39;s or professional degree&quot;</span><span class="p">),</span>
+                                  <span class="p">(</span><span class="s">&#39;b&#39;</span><span class="p">,</span> <span class="s">&quot;Bachelor&#39;s degree&quot;</span><span class="p">),</span>
+                                  <span class="p">(</span><span class="s">&#39;hs&#39;</span><span class="p">,</span> <span class="s">&quot;Secondary/high school&quot;</span><span class="p">),</span>
+                                  <span class="p">(</span><span class="s">&#39;jhs&#39;</span><span class="p">,</span> <span class="s">&quot;Junior secondary/junior high/middle school&quot;</span><span class="p">),</span>
+                                  <span class="p">(</span><span class="s">&#39;el&#39;</span><span class="p">,</span> <span class="s">&quot;Elementary/primary school&quot;</span><span class="p">),</span>
+                                  <span class="p">(</span><span class="s">&#39;none&#39;</span><span class="p">,</span> <span class="s">&quot;None&quot;</span><span class="p">),</span>
+                                  <span class="p">(</span><span class="s">&#39;other&#39;</span><span class="p">,</span> <span class="s">&quot;Other&quot;</span><span class="p">))</span>
+    <span class="n">level_of_education</span> <span class="o">=</span> <span class="n">models</span><span class="o">.</span><span class="n">CharField</span><span class="p">(</span>
+                            <span class="n">blank</span><span class="o">=</span><span class="bp">True</span><span class="p">,</span> <span class="n">null</span><span class="o">=</span><span class="bp">True</span><span class="p">,</span> <span class="n">max_length</span><span class="o">=</span><span class="mi">6</span><span class="p">,</span> <span class="n">db_index</span><span class="o">=</span><span class="bp">True</span><span class="p">,</span>
+                            <span class="n">choices</span><span class="o">=</span><span class="n">LEVEL_OF_EDUCATION_CHOICES</span>
+                         <span class="p">)</span>
+    <span class="n">mailing_address</span> <span class="o">=</span> <span class="n">models</span><span class="o">.</span><span class="n">TextField</span><span class="p">(</span><span class="n">blank</span><span class="o">=</span><span class="bp">True</span><span class="p">,</span> <span class="n">null</span><span class="o">=</span><span class="bp">True</span><span class="p">)</span>
+    <span class="n">goals</span> <span class="o">=</span> <span class="n">models</span><span class="o">.</span><span class="n">TextField</span><span class="p">(</span><span class="n">blank</span><span class="o">=</span><span class="bp">True</span><span class="p">,</span> <span class="n">null</span><span class="o">=</span><span class="bp">True</span><span class="p">)</span>
+
+    <span class="k">def</span> <span class="nf">get_meta</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
+        <span class="n">js_str</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">meta</span>
+        <span class="k">if</span> <span class="ow">not</span> <span class="n">js_str</span><span class="p">:</span>
+            <span class="n">js_str</span> <span class="o">=</span> <span class="nb">dict</span><span class="p">()</span>
+        <span class="k">else</span><span class="p">:</span>
+            <span class="n">js_str</span> <span class="o">=</span> <span class="n">json</span><span class="o">.</span><span class="n">loads</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">meta</span><span class="p">)</span>
+
+        <span class="k">return</span> <span class="n">js_str</span>
+
+    <span class="k">def</span> <span class="nf">set_meta</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">js</span><span class="p">):</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">meta</span> <span class="o">=</span> <span class="n">json</span><span class="o">.</span><span class="n">dumps</span><span class="p">(</span><span class="n">js</span><span class="p">)</span>
+
+
+<span class="c">## TODO: Should be renamed to generic UserGroup, and possibly</span>
+<span class="c"># Given an optional field for type of group</span></div>
+<div class="viewcode-block" id="UserTestGroup"><a class="viewcode-back" href="../../djangoapps-common.html#student.models.UserTestGroup">[docs]</a><span class="k">class</span> <span class="nc">UserTestGroup</span><span class="p">(</span><span class="n">models</span><span class="o">.</span><span class="n">Model</span><span class="p">):</span>
+    <span class="n">users</span> <span class="o">=</span> <span class="n">models</span><span class="o">.</span><span class="n">ManyToManyField</span><span class="p">(</span><span class="n">User</span><span class="p">,</span> <span class="n">db_index</span><span class="o">=</span><span class="bp">True</span><span class="p">)</span>
+    <span class="n">name</span> <span class="o">=</span> <span class="n">models</span><span class="o">.</span><span class="n">CharField</span><span class="p">(</span><span class="n">blank</span><span class="o">=</span><span class="bp">False</span><span class="p">,</span> <span class="n">max_length</span><span class="o">=</span><span class="mi">32</span><span class="p">,</span> <span class="n">db_index</span><span class="o">=</span><span class="bp">True</span><span class="p">)</span>
+    <span class="n">description</span> <span class="o">=</span> <span class="n">models</span><span class="o">.</span><span class="n">TextField</span><span class="p">(</span><span class="n">blank</span><span class="o">=</span><span class="bp">True</span><span class="p">)</span>
+
+</div>
+<div class="viewcode-block" id="Registration"><a class="viewcode-back" href="../../djangoapps-common.html#student.models.Registration">[docs]</a><span class="k">class</span> <span class="nc">Registration</span><span class="p">(</span><span class="n">models</span><span class="o">.</span><span class="n">Model</span><span class="p">):</span>
+    <span class="sd">&#39;&#39;&#39; Allows us to wait for e-mail before user is registered. A</span>
+<span class="sd">        registration profile is created when the user creates an</span>
+<span class="sd">        account, but that account is inactive. Once the user clicks</span>
+<span class="sd">        on the activation key, it becomes active. &#39;&#39;&#39;</span>
+    <span class="k">class</span> <span class="nc">Meta</span><span class="p">:</span>
+        <span class="n">db_table</span> <span class="o">=</span> <span class="s">&quot;auth_registration&quot;</span>
+
+    <span class="n">user</span> <span class="o">=</span> <span class="n">models</span><span class="o">.</span><span class="n">ForeignKey</span><span class="p">(</span><span class="n">User</span><span class="p">,</span> <span class="n">unique</span><span class="o">=</span><span class="bp">True</span><span class="p">)</span>
+    <span class="n">activation_key</span> <span class="o">=</span> <span class="n">models</span><span class="o">.</span><span class="n">CharField</span><span class="p">((</span><span class="s">&#39;activation key&#39;</span><span class="p">),</span> <span class="n">max_length</span><span class="o">=</span><span class="mi">32</span><span class="p">,</span> <span class="n">unique</span><span class="o">=</span><span class="bp">True</span><span class="p">,</span> <span class="n">db_index</span><span class="o">=</span><span class="bp">True</span><span class="p">)</span>
+
+    <span class="k">def</span> <span class="nf">register</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">user</span><span class="p">):</span>
+        <span class="c"># MINOR TODO: Switch to crypto-secure key</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">activation_key</span> <span class="o">=</span> <span class="n">uuid</span><span class="o">.</span><span class="n">uuid4</span><span class="p">()</span><span class="o">.</span><span class="n">hex</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">user</span> <span class="o">=</span> <span class="n">user</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">save</span><span class="p">()</span>
+
+    <span class="k">def</span> <span class="nf">activate</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">user</span><span class="o">.</span><span class="n">is_active</span> <span class="o">=</span> <span class="bp">True</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">user</span><span class="o">.</span><span class="n">save</span><span class="p">()</span>
+        <span class="c">#self.delete()</span>
+
+</div>
+<div class="viewcode-block" id="PendingNameChange"><a class="viewcode-back" href="../../djangoapps-common.html#student.models.PendingNameChange">[docs]</a><span class="k">class</span> <span class="nc">PendingNameChange</span><span class="p">(</span><span class="n">models</span><span class="o">.</span><span class="n">Model</span><span class="p">):</span>
+    <span class="n">user</span> <span class="o">=</span> <span class="n">models</span><span class="o">.</span><span class="n">OneToOneField</span><span class="p">(</span><span class="n">User</span><span class="p">,</span> <span class="n">unique</span><span class="o">=</span><span class="bp">True</span><span class="p">,</span> <span class="n">db_index</span><span class="o">=</span><span class="bp">True</span><span class="p">)</span>
+    <span class="n">new_name</span> <span class="o">=</span> <span class="n">models</span><span class="o">.</span><span class="n">CharField</span><span class="p">(</span><span class="n">blank</span><span class="o">=</span><span class="bp">True</span><span class="p">,</span> <span class="n">max_length</span><span class="o">=</span><span class="mi">255</span><span class="p">)</span>
+    <span class="n">rationale</span> <span class="o">=</span> <span class="n">models</span><span class="o">.</span><span class="n">CharField</span><span class="p">(</span><span class="n">blank</span><span class="o">=</span><span class="bp">True</span><span class="p">,</span> <span class="n">max_length</span><span class="o">=</span><span class="mi">1024</span><span class="p">)</span>
+
+</div>
+<div class="viewcode-block" id="PendingEmailChange"><a class="viewcode-back" href="../../djangoapps-common.html#student.models.PendingEmailChange">[docs]</a><span class="k">class</span> <span class="nc">PendingEmailChange</span><span class="p">(</span><span class="n">models</span><span class="o">.</span><span class="n">Model</span><span class="p">):</span>
+    <span class="n">user</span> <span class="o">=</span> <span class="n">models</span><span class="o">.</span><span class="n">OneToOneField</span><span class="p">(</span><span class="n">User</span><span class="p">,</span> <span class="n">unique</span><span class="o">=</span><span class="bp">True</span><span class="p">,</span> <span class="n">db_index</span><span class="o">=</span><span class="bp">True</span><span class="p">)</span>
+    <span class="n">new_email</span> <span class="o">=</span> <span class="n">models</span><span class="o">.</span><span class="n">CharField</span><span class="p">(</span><span class="n">blank</span><span class="o">=</span><span class="bp">True</span><span class="p">,</span> <span class="n">max_length</span><span class="o">=</span><span class="mi">255</span><span class="p">,</span> <span class="n">db_index</span><span class="o">=</span><span class="bp">True</span><span class="p">)</span>
+    <span class="n">activation_key</span> <span class="o">=</span> <span class="n">models</span><span class="o">.</span><span class="n">CharField</span><span class="p">((</span><span class="s">&#39;activation key&#39;</span><span class="p">),</span> <span class="n">max_length</span><span class="o">=</span><span class="mi">32</span><span class="p">,</span> <span class="n">unique</span><span class="o">=</span><span class="bp">True</span><span class="p">,</span> <span class="n">db_index</span><span class="o">=</span><span class="bp">True</span><span class="p">)</span>
+
+</div>
+<div class="viewcode-block" id="CourseEnrollment"><a class="viewcode-back" href="../../djangoapps-common.html#student.models.CourseEnrollment">[docs]</a><span class="k">class</span> <span class="nc">CourseEnrollment</span><span class="p">(</span><span class="n">models</span><span class="o">.</span><span class="n">Model</span><span class="p">):</span>
+    <span class="n">user</span> <span class="o">=</span> <span class="n">models</span><span class="o">.</span><span class="n">ForeignKey</span><span class="p">(</span><span class="n">User</span><span class="p">)</span>
+    <span class="n">course_id</span> <span class="o">=</span> <span class="n">models</span><span class="o">.</span><span class="n">CharField</span><span class="p">(</span><span class="n">max_length</span><span class="o">=</span><span class="mi">255</span><span class="p">,</span> <span class="n">db_index</span><span class="o">=</span><span class="bp">True</span><span class="p">)</span>
+
+    <span class="n">created</span> <span class="o">=</span> <span class="n">models</span><span class="o">.</span><span class="n">DateTimeField</span><span class="p">(</span><span class="n">auto_now_add</span><span class="o">=</span><span class="bp">True</span><span class="p">,</span> <span class="n">null</span><span class="o">=</span><span class="bp">True</span><span class="p">,</span> <span class="n">db_index</span><span class="o">=</span><span class="bp">True</span><span class="p">)</span>
+
+    <span class="k">class</span> <span class="nc">Meta</span><span class="p">:</span>
+        <span class="n">unique_together</span> <span class="o">=</span> <span class="p">((</span><span class="s">&#39;user&#39;</span><span class="p">,</span> <span class="s">&#39;course_id&#39;</span><span class="p">),</span> <span class="p">)</span>
+
+    <span class="k">def</span> <span class="nf">__unicode__</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
+        <span class="k">return</span> <span class="s">&quot;[CourseEnrollment] </span><span class="si">%s</span><span class="s">: </span><span class="si">%s</span><span class="s"> (</span><span class="si">%s</span><span class="s">)&quot;</span> <span class="o">%</span> <span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">user</span><span class="p">,</span> <span class="bp">self</span><span class="o">.</span><span class="n">course_id</span><span class="p">,</span> <span class="bp">self</span><span class="o">.</span><span class="n">created</span><span class="p">)</span>
+
+</div>
+<span class="nd">@receiver</span><span class="p">(</span><span class="n">post_save</span><span class="p">,</span> <span class="n">sender</span><span class="o">=</span><span class="n">CourseEnrollment</span><span class="p">)</span>
+<span class="k">def</span> <span class="nf">assign_default_role</span><span class="p">(</span><span class="n">sender</span><span class="p">,</span> <span class="n">instance</span><span class="p">,</span> <span class="o">**</span><span class="n">kwargs</span><span class="p">):</span>
+    <span class="k">if</span> <span class="n">instance</span><span class="o">.</span><span class="n">user</span><span class="o">.</span><span class="n">is_staff</span><span class="p">:</span>
+        <span class="n">role</span> <span class="o">=</span> <span class="n">Role</span><span class="o">.</span><span class="n">objects</span><span class="o">.</span><span class="n">get_or_create</span><span class="p">(</span><span class="n">course_id</span><span class="o">=</span><span class="n">instance</span><span class="o">.</span><span class="n">course_id</span><span class="p">,</span> <span class="n">name</span><span class="o">=</span><span class="s">&quot;Moderator&quot;</span><span class="p">)[</span><span class="mi">0</span><span class="p">]</span>
+    <span class="k">else</span><span class="p">:</span>
+        <span class="n">role</span> <span class="o">=</span> <span class="n">Role</span><span class="o">.</span><span class="n">objects</span><span class="o">.</span><span class="n">get_or_create</span><span class="p">(</span><span class="n">course_id</span><span class="o">=</span><span class="n">instance</span><span class="o">.</span><span class="n">course_id</span><span class="p">,</span> <span class="n">name</span><span class="o">=</span><span class="s">&quot;Student&quot;</span><span class="p">)[</span><span class="mi">0</span><span class="p">]</span>
+
+    <span class="n">logging</span><span class="o">.</span><span class="n">info</span><span class="p">(</span><span class="s">&quot;assign_default_role: adding </span><span class="si">%s</span><span class="s"> as </span><span class="si">%s</span><span class="s">&quot;</span> <span class="o">%</span> <span class="p">(</span><span class="n">instance</span><span class="o">.</span><span class="n">user</span><span class="p">,</span> <span class="n">role</span><span class="p">))</span>
+    <span class="n">instance</span><span class="o">.</span><span class="n">user</span><span class="o">.</span><span class="n">roles</span><span class="o">.</span><span class="n">add</span><span class="p">(</span><span class="n">role</span><span class="p">)</span>
+
+<span class="c">#cache_relation(User.profile)</span>
+
+<span class="c">#### Helper methods for use from python manage.py shell.</span>
+
+
+<span class="k">def</span> <span class="nf">get_user</span><span class="p">(</span><span class="n">email</span><span class="p">):</span>
+    <span class="n">u</span> <span class="o">=</span> <span class="n">User</span><span class="o">.</span><span class="n">objects</span><span class="o">.</span><span class="n">get</span><span class="p">(</span><span class="n">email</span><span class="o">=</span><span class="n">email</span><span class="p">)</span>
+    <span class="n">up</span> <span class="o">=</span> <span class="n">UserProfile</span><span class="o">.</span><span class="n">objects</span><span class="o">.</span><span class="n">get</span><span class="p">(</span><span class="n">user</span><span class="o">=</span><span class="n">u</span><span class="p">)</span>
+    <span class="k">return</span> <span class="n">u</span><span class="p">,</span> <span class="n">up</span>
+
+
+<span class="k">def</span> <span class="nf">user_info</span><span class="p">(</span><span class="n">email</span><span class="p">):</span>
+    <span class="n">u</span><span class="p">,</span> <span class="n">up</span> <span class="o">=</span> <span class="n">get_user</span><span class="p">(</span><span class="n">email</span><span class="p">)</span>
+    <span class="k">print</span> <span class="s">&quot;User id&quot;</span><span class="p">,</span> <span class="n">u</span><span class="o">.</span><span class="n">id</span>
+    <span class="k">print</span> <span class="s">&quot;Username&quot;</span><span class="p">,</span> <span class="n">u</span><span class="o">.</span><span class="n">username</span>
+    <span class="k">print</span> <span class="s">&quot;E-mail&quot;</span><span class="p">,</span> <span class="n">u</span><span class="o">.</span><span class="n">email</span>
+    <span class="k">print</span> <span class="s">&quot;Name&quot;</span><span class="p">,</span> <span class="n">up</span><span class="o">.</span><span class="n">name</span>
+    <span class="k">print</span> <span class="s">&quot;Location&quot;</span><span class="p">,</span> <span class="n">up</span><span class="o">.</span><span class="n">location</span>
+    <span class="k">print</span> <span class="s">&quot;Language&quot;</span><span class="p">,</span> <span class="n">up</span><span class="o">.</span><span class="n">language</span>
+    <span class="k">return</span> <span class="n">u</span><span class="p">,</span> <span class="n">up</span>
+
+
+<span class="k">def</span> <span class="nf">change_email</span><span class="p">(</span><span class="n">old_email</span><span class="p">,</span> <span class="n">new_email</span><span class="p">):</span>
+    <span class="n">u</span> <span class="o">=</span> <span class="n">User</span><span class="o">.</span><span class="n">objects</span><span class="o">.</span><span class="n">get</span><span class="p">(</span><span class="n">email</span><span class="o">=</span><span class="n">old_email</span><span class="p">)</span>
+    <span class="n">u</span><span class="o">.</span><span class="n">email</span> <span class="o">=</span> <span class="n">new_email</span>
+    <span class="n">u</span><span class="o">.</span><span class="n">save</span><span class="p">()</span>
+
+
+<span class="k">def</span> <span class="nf">change_name</span><span class="p">(</span><span class="n">email</span><span class="p">,</span> <span class="n">new_name</span><span class="p">):</span>
+    <span class="n">u</span><span class="p">,</span> <span class="n">up</span> <span class="o">=</span> <span class="n">get_user</span><span class="p">(</span><span class="n">email</span><span class="p">)</span>
+    <span class="n">up</span><span class="o">.</span><span class="n">name</span> <span class="o">=</span> <span class="n">new_name</span>
+    <span class="n">up</span><span class="o">.</span><span class="n">save</span><span class="p">()</span>
+
+
+<span class="k">def</span> <span class="nf">user_count</span><span class="p">():</span>
+    <span class="k">print</span> <span class="s">&quot;All users&quot;</span><span class="p">,</span> <span class="n">User</span><span class="o">.</span><span class="n">objects</span><span class="o">.</span><span class="n">all</span><span class="p">()</span><span class="o">.</span><span class="n">count</span><span class="p">()</span>
+    <span class="k">print</span> <span class="s">&quot;Active users&quot;</span><span class="p">,</span> <span class="n">User</span><span class="o">.</span><span class="n">objects</span><span class="o">.</span><span class="n">filter</span><span class="p">(</span><span class="n">is_active</span><span class="o">=</span><span class="bp">True</span><span class="p">)</span><span class="o">.</span><span class="n">count</span><span class="p">()</span>
+    <span class="k">return</span> <span class="n">User</span><span class="o">.</span><span class="n">objects</span><span class="o">.</span><span class="n">all</span><span class="p">()</span><span class="o">.</span><span class="n">count</span><span class="p">()</span>
+
+
+<span class="k">def</span> <span class="nf">active_user_count</span><span class="p">():</span>
+    <span class="k">return</span> <span class="n">User</span><span class="o">.</span><span class="n">objects</span><span class="o">.</span><span class="n">filter</span><span class="p">(</span><span class="n">is_active</span><span class="o">=</span><span class="bp">True</span><span class="p">)</span><span class="o">.</span><span class="n">count</span><span class="p">()</span>
+
+
+<span class="k">def</span> <span class="nf">create_group</span><span class="p">(</span><span class="n">name</span><span class="p">,</span> <span class="n">description</span><span class="p">):</span>
+    <span class="n">utg</span> <span class="o">=</span> <span class="n">UserTestGroup</span><span class="p">()</span>
+    <span class="n">utg</span><span class="o">.</span><span class="n">name</span> <span class="o">=</span> <span class="n">name</span>
+    <span class="n">utg</span><span class="o">.</span><span class="n">description</span> <span class="o">=</span> <span class="n">description</span>
+    <span class="n">utg</span><span class="o">.</span><span class="n">save</span><span class="p">()</span>
+
+
+<span class="k">def</span> <span class="nf">add_user_to_group</span><span class="p">(</span><span class="n">user</span><span class="p">,</span> <span class="n">group</span><span class="p">):</span>
+    <span class="n">utg</span> <span class="o">=</span> <span class="n">UserTestGroup</span><span class="o">.</span><span class="n">objects</span><span class="o">.</span><span class="n">get</span><span class="p">(</span><span class="n">name</span><span class="o">=</span><span class="n">group</span><span class="p">)</span>
+    <span class="n">utg</span><span class="o">.</span><span class="n">users</span><span class="o">.</span><span class="n">add</span><span class="p">(</span><span class="n">User</span><span class="o">.</span><span class="n">objects</span><span class="o">.</span><span class="n">get</span><span class="p">(</span><span class="n">username</span><span class="o">=</span><span class="n">user</span><span class="p">))</span>
+    <span class="n">utg</span><span class="o">.</span><span class="n">save</span><span class="p">()</span>
+
+
+<span class="k">def</span> <span class="nf">remove_user_from_group</span><span class="p">(</span><span class="n">user</span><span class="p">,</span> <span class="n">group</span><span class="p">):</span>
+    <span class="n">utg</span> <span class="o">=</span> <span class="n">UserTestGroup</span><span class="o">.</span><span class="n">objects</span><span class="o">.</span><span class="n">get</span><span class="p">(</span><span class="n">name</span><span class="o">=</span><span class="n">group</span><span class="p">)</span>
+    <span class="n">utg</span><span class="o">.</span><span class="n">users</span><span class="o">.</span><span class="n">remove</span><span class="p">(</span><span class="n">User</span><span class="o">.</span><span class="n">objects</span><span class="o">.</span><span class="n">get</span><span class="p">(</span><span class="n">username</span><span class="o">=</span><span class="n">user</span><span class="p">))</span>
+    <span class="n">utg</span><span class="o">.</span><span class="n">save</span><span class="p">()</span>
+
+<span class="n">default_groups</span> <span class="o">=</span> <span class="p">{</span><span class="s">&#39;email_future_courses&#39;</span><span class="p">:</span> <span class="s">&#39;Receive e-mails about future MITx courses&#39;</span><span class="p">,</span>
+                  <span class="s">&#39;email_helpers&#39;</span><span class="p">:</span> <span class="s">&#39;Receive e-mails about how to help with MITx&#39;</span><span class="p">,</span>
+                  <span class="s">&#39;mitx_unenroll&#39;</span><span class="p">:</span> <span class="s">&#39;Fully unenrolled -- no further communications&#39;</span><span class="p">,</span>
+                  <span class="s">&#39;6002x_unenroll&#39;</span><span class="p">:</span> <span class="s">&#39;Took and dropped 6002x&#39;</span><span class="p">}</span>
+
+
+<span class="k">def</span> <span class="nf">add_user_to_default_group</span><span class="p">(</span><span class="n">user</span><span class="p">,</span> <span class="n">group</span><span class="p">):</span>
+    <span class="k">try</span><span class="p">:</span>
+        <span class="n">utg</span> <span class="o">=</span> <span class="n">UserTestGroup</span><span class="o">.</span><span class="n">objects</span><span class="o">.</span><span class="n">get</span><span class="p">(</span><span class="n">name</span><span class="o">=</span><span class="n">group</span><span class="p">)</span>
+    <span class="k">except</span> <span class="n">UserTestGroup</span><span class="o">.</span><span class="n">DoesNotExist</span><span class="p">:</span>
+        <span class="n">utg</span> <span class="o">=</span> <span class="n">UserTestGroup</span><span class="p">()</span>
+        <span class="n">utg</span><span class="o">.</span><span class="n">name</span> <span class="o">=</span> <span class="n">group</span>
+        <span class="n">utg</span><span class="o">.</span><span class="n">description</span> <span class="o">=</span> <span class="n">default_groups</span><span class="p">[</span><span class="n">group</span><span class="p">]</span>
+        <span class="n">utg</span><span class="o">.</span><span class="n">save</span><span class="p">()</span>
+    <span class="n">utg</span><span class="o">.</span><span class="n">users</span><span class="o">.</span><span class="n">add</span><span class="p">(</span><span class="n">User</span><span class="o">.</span><span class="n">objects</span><span class="o">.</span><span class="n">get</span><span class="p">(</span><span class="n">username</span><span class="o">=</span><span class="n">user</span><span class="p">))</span>
+    <span class="n">utg</span><span class="o">.</span><span class="n">save</span><span class="p">()</span>
+
+
+<span class="nd">@receiver</span><span class="p">(</span><span class="n">post_save</span><span class="p">,</span> <span class="n">sender</span><span class="o">=</span><span class="n">User</span><span class="p">)</span>
+<span class="k">def</span> <span class="nf">update_user_information</span><span class="p">(</span><span class="n">sender</span><span class="p">,</span> <span class="n">instance</span><span class="p">,</span> <span class="n">created</span><span class="p">,</span> <span class="o">**</span><span class="n">kwargs</span><span class="p">):</span>
+    <span class="k">if</span> <span class="ow">not</span> <span class="n">settings</span><span class="o">.</span><span class="n">MITX_FEATURES</span><span class="p">[</span><span class="s">&#39;ENABLE_DISCUSSION_SERVICE&#39;</span><span class="p">]:</span>
+        <span class="c"># Don&#39;t try--it won&#39;t work, and it will fill the logs with lots of errors</span>
+        <span class="k">return</span>
+    <span class="k">try</span><span class="p">:</span>
+        <span class="n">cc_user</span> <span class="o">=</span> <span class="n">cc</span><span class="o">.</span><span class="n">User</span><span class="o">.</span><span class="n">from_django_user</span><span class="p">(</span><span class="n">instance</span><span class="p">)</span>
+        <span class="n">cc_user</span><span class="o">.</span><span class="n">save</span><span class="p">()</span>
+    <span class="k">except</span> <span class="ne">Exception</span> <span class="k">as</span> <span class="n">e</span><span class="p">:</span>
+        <span class="n">log</span> <span class="o">=</span> <span class="n">logging</span><span class="o">.</span><span class="n">getLogger</span><span class="p">(</span><span class="s">&quot;mitx.discussion&quot;</span><span class="p">)</span>
+        <span class="n">log</span><span class="o">.</span><span class="n">error</span><span class="p">(</span><span class="nb">unicode</span><span class="p">(</span><span class="n">e</span><span class="p">))</span>
+        <span class="n">log</span><span class="o">.</span><span class="n">error</span><span class="p">(</span><span class="s">&quot;update user info to discussion failed for user with id: &quot;</span> <span class="o">+</span> <span class="nb">str</span><span class="p">(</span><span class="n">instance</span><span class="o">.</span><span class="n">id</span><span class="p">))</span>
+
+
+<span class="c">########################## REPLICATION SIGNALS #################################</span>
+<span class="c"># @receiver(post_save, sender=User)</span>
+<span class="k">def</span> <span class="nf">replicate_user_save</span><span class="p">(</span><span class="n">sender</span><span class="p">,</span> <span class="o">**</span><span class="n">kwargs</span><span class="p">):</span>
+    <span class="n">user_obj</span> <span class="o">=</span> <span class="n">kwargs</span><span class="p">[</span><span class="s">&#39;instance&#39;</span><span class="p">]</span>
+    <span class="k">if</span> <span class="ow">not</span> <span class="n">should_replicate</span><span class="p">(</span><span class="n">user_obj</span><span class="p">):</span>
+        <span class="k">return</span>
+    <span class="k">for</span> <span class="n">course_db_name</span> <span class="ow">in</span> <span class="n">db_names_to_replicate_to</span><span class="p">(</span><span class="n">user_obj</span><span class="o">.</span><span class="n">id</span><span class="p">):</span>
+        <span class="n">replicate_user</span><span class="p">(</span><span class="n">user_obj</span><span class="p">,</span> <span class="n">course_db_name</span><span class="p">)</span>
+
+
+<span class="c"># @receiver(post_save, sender=CourseEnrollment)</span>
+<div class="viewcode-block" id="replicate_enrollment_save"><a class="viewcode-back" href="../../djangoapps-common.html#student.models.replicate_enrollment_save">[docs]</a><span class="k">def</span> <span class="nf">replicate_enrollment_save</span><span class="p">(</span><span class="n">sender</span><span class="p">,</span> <span class="o">**</span><span class="n">kwargs</span><span class="p">):</span>
+    <span class="sd">&quot;&quot;&quot;This is called when a Student enrolls in a course. It has to do the </span>
+<span class="sd">    following:</span>
+
+<span class="sd">    1. Make sure the User is copied into the Course DB. It may already exist </span>
+<span class="sd">       (someone deleting and re-adding a course). This has to happen first or</span>
+<span class="sd">       the foreign key constraint breaks.</span>
+<span class="sd">    2. Replicate the CourseEnrollment.</span>
+<span class="sd">    3. Replicate the UserProfile.</span>
+<span class="sd">    &quot;&quot;&quot;</span>
+    <span class="k">if</span> <span class="ow">not</span> <span class="n">is_portal</span><span class="p">():</span>
+        <span class="k">return</span>
+
+    <span class="n">enrollment_obj</span> <span class="o">=</span> <span class="n">kwargs</span><span class="p">[</span><span class="s">&#39;instance&#39;</span><span class="p">]</span>
+    <span class="n">log</span><span class="o">.</span><span class="n">debug</span><span class="p">(</span><span class="s">&quot;Replicating user because of new enrollment&quot;</span><span class="p">)</span>
+    <span class="k">for</span> <span class="n">course_db_name</span> <span class="ow">in</span> <span class="n">db_names_to_replicate_to</span><span class="p">(</span><span class="n">enrollment_obj</span><span class="o">.</span><span class="n">user</span><span class="o">.</span><span class="n">id</span><span class="p">):</span>
+        <span class="n">replicate_user</span><span class="p">(</span><span class="n">enrollment_obj</span><span class="o">.</span><span class="n">user</span><span class="p">,</span> <span class="n">course_db_name</span><span class="p">)</span>
+
+    <span class="n">log</span><span class="o">.</span><span class="n">debug</span><span class="p">(</span><span class="s">&quot;Replicating enrollment because of new enrollment&quot;</span><span class="p">)</span>
+    <span class="n">replicate_model</span><span class="p">(</span><span class="n">CourseEnrollment</span><span class="o">.</span><span class="n">save</span><span class="p">,</span> <span class="n">enrollment_obj</span><span class="p">,</span> <span class="n">enrollment_obj</span><span class="o">.</span><span class="n">user_id</span><span class="p">)</span>
+
+    <span class="n">log</span><span class="o">.</span><span class="n">debug</span><span class="p">(</span><span class="s">&quot;Replicating user profile because of new enrollment&quot;</span><span class="p">)</span>
+    <span class="n">user_profile</span> <span class="o">=</span> <span class="n">UserProfile</span><span class="o">.</span><span class="n">objects</span><span class="o">.</span><span class="n">get</span><span class="p">(</span><span class="n">user_id</span><span class="o">=</span><span class="n">enrollment_obj</span><span class="o">.</span><span class="n">user_id</span><span class="p">)</span>
+    <span class="n">replicate_model</span><span class="p">(</span><span class="n">UserProfile</span><span class="o">.</span><span class="n">save</span><span class="p">,</span> <span class="n">user_profile</span><span class="p">,</span> <span class="n">enrollment_obj</span><span class="o">.</span><span class="n">user_id</span><span class="p">)</span>
+
+
+<span class="c"># @receiver(post_delete, sender=CourseEnrollment)</span></div>
+<span class="k">def</span> <span class="nf">replicate_enrollment_delete</span><span class="p">(</span><span class="n">sender</span><span class="p">,</span> <span class="o">**</span><span class="n">kwargs</span><span class="p">):</span>
+    <span class="n">enrollment_obj</span> <span class="o">=</span> <span class="n">kwargs</span><span class="p">[</span><span class="s">&#39;instance&#39;</span><span class="p">]</span>
+    <span class="k">return</span> <span class="n">replicate_model</span><span class="p">(</span><span class="n">CourseEnrollment</span><span class="o">.</span><span class="n">delete</span><span class="p">,</span> <span class="n">enrollment_obj</span><span class="p">,</span> <span class="n">enrollment_obj</span><span class="o">.</span><span class="n">user_id</span><span class="p">)</span>
+
+
+<span class="c"># @receiver(post_save, sender=UserProfile)</span>
+<div class="viewcode-block" id="replicate_userprofile_save"><a class="viewcode-back" href="../../djangoapps-common.html#student.models.replicate_userprofile_save">[docs]</a><span class="k">def</span> <span class="nf">replicate_userprofile_save</span><span class="p">(</span><span class="n">sender</span><span class="p">,</span> <span class="o">**</span><span class="n">kwargs</span><span class="p">):</span>
+    <span class="sd">&quot;&quot;&quot;We just updated the UserProfile (say an update to the name), so push that</span>
+<span class="sd">    change to all Course DBs that we&#39;re enrolled in.&quot;&quot;&quot;</span>
+    <span class="n">user_profile_obj</span> <span class="o">=</span> <span class="n">kwargs</span><span class="p">[</span><span class="s">&#39;instance&#39;</span><span class="p">]</span>
+    <span class="k">return</span> <span class="n">replicate_model</span><span class="p">(</span><span class="n">UserProfile</span><span class="o">.</span><span class="n">save</span><span class="p">,</span> <span class="n">user_profile_obj</span><span class="p">,</span> <span class="n">user_profile_obj</span><span class="o">.</span><span class="n">user_id</span><span class="p">)</span>
+
+
+<span class="c">######### Replication functions #########</span></div>
+<span class="n">USER_FIELDS_TO_COPY</span> <span class="o">=</span> <span class="p">[</span><span class="s">&quot;id&quot;</span><span class="p">,</span> <span class="s">&quot;username&quot;</span><span class="p">,</span> <span class="s">&quot;first_name&quot;</span><span class="p">,</span> <span class="s">&quot;last_name&quot;</span><span class="p">,</span> <span class="s">&quot;email&quot;</span><span class="p">,</span>
+                       <span class="s">&quot;password&quot;</span><span class="p">,</span> <span class="s">&quot;is_staff&quot;</span><span class="p">,</span> <span class="s">&quot;is_active&quot;</span><span class="p">,</span> <span class="s">&quot;is_superuser&quot;</span><span class="p">,</span>
+                       <span class="s">&quot;last_login&quot;</span><span class="p">,</span> <span class="s">&quot;date_joined&quot;</span><span class="p">]</span>
+
+
+<div class="viewcode-block" id="replicate_user"><a class="viewcode-back" href="../../djangoapps-common.html#student.models.replicate_user">[docs]</a><span class="k">def</span> <span class="nf">replicate_user</span><span class="p">(</span><span class="n">portal_user</span><span class="p">,</span> <span class="n">course_db_name</span><span class="p">):</span>
+    <span class="sd">&quot;&quot;&quot;Replicate a User to the correct Course DB. This is more complicated than</span>
+<span class="sd">    it should be because Askbot extends the auth_user table and adds its own </span>
+<span class="sd">    fields. So we need to only push changes to the standard fields and leave</span>
+<span class="sd">    the rest alone so that Askbot changes at the Course DB level don&#39;t get </span>
+<span class="sd">    overridden.</span>
+<span class="sd">    &quot;&quot;&quot;</span>
+    <span class="k">try</span><span class="p">:</span>
+        <span class="n">course_user</span> <span class="o">=</span> <span class="n">User</span><span class="o">.</span><span class="n">objects</span><span class="o">.</span><span class="n">using</span><span class="p">(</span><span class="n">course_db_name</span><span class="p">)</span><span class="o">.</span><span class="n">get</span><span class="p">(</span><span class="nb">id</span><span class="o">=</span><span class="n">portal_user</span><span class="o">.</span><span class="n">id</span><span class="p">)</span>
+        <span class="n">log</span><span class="o">.</span><span class="n">debug</span><span class="p">(</span><span class="s">&quot;User {0} found in Course DB, replicating fields to {1}&quot;</span>
+                  <span class="o">.</span><span class="n">format</span><span class="p">(</span><span class="n">course_user</span><span class="p">,</span> <span class="n">course_db_name</span><span class="p">))</span>
+    <span class="k">except</span> <span class="n">User</span><span class="o">.</span><span class="n">DoesNotExist</span><span class="p">:</span>
+        <span class="n">log</span><span class="o">.</span><span class="n">debug</span><span class="p">(</span><span class="s">&quot;User {0} not found in Course DB, creating copy in {1}&quot;</span>
+                  <span class="o">.</span><span class="n">format</span><span class="p">(</span><span class="n">portal_user</span><span class="p">,</span> <span class="n">course_db_name</span><span class="p">))</span>
+        <span class="n">course_user</span> <span class="o">=</span> <span class="n">User</span><span class="p">()</span>
+
+    <span class="k">for</span> <span class="n">field</span> <span class="ow">in</span> <span class="n">USER_FIELDS_TO_COPY</span><span class="p">:</span>
+        <span class="nb">setattr</span><span class="p">(</span><span class="n">course_user</span><span class="p">,</span> <span class="n">field</span><span class="p">,</span> <span class="nb">getattr</span><span class="p">(</span><span class="n">portal_user</span><span class="p">,</span> <span class="n">field</span><span class="p">))</span>
+
+    <span class="n">mark_handled</span><span class="p">(</span><span class="n">course_user</span><span class="p">)</span>
+    <span class="n">course_user</span><span class="o">.</span><span class="n">save</span><span class="p">(</span><span class="n">using</span><span class="o">=</span><span class="n">course_db_name</span><span class="p">)</span>
+    <span class="n">unmark</span><span class="p">(</span><span class="n">course_user</span><span class="p">)</span>
+
+</div>
+<div class="viewcode-block" id="replicate_model"><a class="viewcode-back" href="../../djangoapps-common.html#student.models.replicate_model">[docs]</a><span class="k">def</span> <span class="nf">replicate_model</span><span class="p">(</span><span class="n">model_method</span><span class="p">,</span> <span class="n">instance</span><span class="p">,</span> <span class="n">user_id</span><span class="p">):</span>
+    <span class="sd">&quot;&quot;&quot;</span>
+<span class="sd">    model_method is the model action that we want replicated. For instance,</span>
+<span class="sd">                 UserProfile.save</span>
+<span class="sd">    &quot;&quot;&quot;</span>
+    <span class="k">if</span> <span class="ow">not</span> <span class="n">should_replicate</span><span class="p">(</span><span class="n">instance</span><span class="p">):</span>
+        <span class="k">return</span>
+
+    <span class="n">course_db_names</span> <span class="o">=</span> <span class="n">db_names_to_replicate_to</span><span class="p">(</span><span class="n">user_id</span><span class="p">)</span>
+    <span class="n">log</span><span class="o">.</span><span class="n">debug</span><span class="p">(</span><span class="s">&quot;Replicating {0} for user {1} to DBs: {2}&quot;</span>
+              <span class="o">.</span><span class="n">format</span><span class="p">(</span><span class="n">model_method</span><span class="p">,</span> <span class="n">user_id</span><span class="p">,</span> <span class="n">course_db_names</span><span class="p">))</span>
+
+    <span class="n">mark_handled</span><span class="p">(</span><span class="n">instance</span><span class="p">)</span>
+    <span class="k">for</span> <span class="n">db_name</span> <span class="ow">in</span> <span class="n">course_db_names</span><span class="p">:</span>
+        <span class="n">model_method</span><span class="p">(</span><span class="n">instance</span><span class="p">,</span> <span class="n">using</span><span class="o">=</span><span class="n">db_name</span><span class="p">)</span>
+    <span class="n">unmark</span><span class="p">(</span><span class="n">instance</span><span class="p">)</span>
+
+
+<span class="c">######### Replication Helpers #########</span>
+
+</div>
+<div class="viewcode-block" id="is_valid_course_id"><a class="viewcode-back" href="../../djangoapps-common.html#student.models.is_valid_course_id">[docs]</a><span class="k">def</span> <span class="nf">is_valid_course_id</span><span class="p">(</span><span class="n">course_id</span><span class="p">):</span>
+    <span class="sd">&quot;&quot;&quot;Right now, the only database that&#39;s not a course database is &#39;default&#39;.</span>
+<span class="sd">    I had nicer checking in here originally -- it would scan the courses that</span>
+<span class="sd">    were in the system and only let you choose that. But it was annoying to run</span>
+<span class="sd">    tests with, since we don&#39;t have course data for some for our course test </span>
+<span class="sd">    databases. Hence the lazy version.</span>
+<span class="sd">    &quot;&quot;&quot;</span>
+    <span class="k">return</span> <span class="n">course_id</span> <span class="o">!=</span> <span class="s">&#39;default&#39;</span>
+
+</div>
+<div class="viewcode-block" id="is_portal"><a class="viewcode-back" href="../../djangoapps-common.html#student.models.is_portal">[docs]</a><span class="k">def</span> <span class="nf">is_portal</span><span class="p">():</span>
+    <span class="sd">&quot;&quot;&quot;Are we in the portal pool? Only Portal servers are allowed to replicate</span>
+<span class="sd">    their changes. For now, only Portal servers see multiple DBs, so we use</span>
+<span class="sd">    that to decide.&quot;&quot;&quot;</span>
+    <span class="k">return</span> <span class="nb">len</span><span class="p">(</span><span class="n">settings</span><span class="o">.</span><span class="n">DATABASES</span><span class="p">)</span> <span class="o">&gt;</span> <span class="mi">1</span>
+
+</div>
+<div class="viewcode-block" id="db_names_to_replicate_to"><a class="viewcode-back" href="../../djangoapps-common.html#student.models.db_names_to_replicate_to">[docs]</a><span class="k">def</span> <span class="nf">db_names_to_replicate_to</span><span class="p">(</span><span class="n">user_id</span><span class="p">):</span>
+    <span class="sd">&quot;&quot;&quot;Return a list of DB names that this user_id is enrolled in.&quot;&quot;&quot;</span>
+    <span class="k">return</span> <span class="p">[</span><span class="n">c</span><span class="o">.</span><span class="n">course_id</span>
+            <span class="k">for</span> <span class="n">c</span> <span class="ow">in</span> <span class="n">CourseEnrollment</span><span class="o">.</span><span class="n">objects</span><span class="o">.</span><span class="n">filter</span><span class="p">(</span><span class="n">user_id</span><span class="o">=</span><span class="n">user_id</span><span class="p">)</span>
+            <span class="k">if</span> <span class="n">is_valid_course_id</span><span class="p">(</span><span class="n">c</span><span class="o">.</span><span class="n">course_id</span><span class="p">)]</span>
+
+</div>
+<div class="viewcode-block" id="marked_handled"><a class="viewcode-back" href="../../djangoapps-common.html#student.models.marked_handled">[docs]</a><span class="k">def</span> <span class="nf">marked_handled</span><span class="p">(</span><span class="n">instance</span><span class="p">):</span>
+    <span class="sd">&quot;&quot;&quot;Have we marked this instance as being handled to avoid infinite loops</span>
+<span class="sd">    caused by saving models in post_save hooks for the same models?&quot;&quot;&quot;</span>
+    <span class="k">return</span> <span class="nb">hasattr</span><span class="p">(</span><span class="n">instance</span><span class="p">,</span> <span class="s">&#39;_do_not_copy_to_course_db&#39;</span><span class="p">)</span> <span class="ow">and</span> <span class="n">instance</span><span class="o">.</span><span class="n">_do_not_copy_to_course_db</span>
+
+</div>
+<div class="viewcode-block" id="mark_handled"><a class="viewcode-back" href="../../djangoapps-common.html#student.models.mark_handled">[docs]</a><span class="k">def</span> <span class="nf">mark_handled</span><span class="p">(</span><span class="n">instance</span><span class="p">):</span>
+    <span class="sd">&quot;&quot;&quot;You have to mark your instance with this function or else we&#39;ll go into</span>
+<span class="sd">    an infinite loop since we&#39;re putting listeners on Model saves/deletes and</span>
+<span class="sd">    the act of replication requires us to call the same model method.</span>
+
+<span class="sd">    We create a _replicated attribute to differentiate the first save of this</span>
+<span class="sd">    model vs. the duplicate save we force on to the course database. Kind of</span>
+<span class="sd">    a hack -- suggestions welcome.</span>
+<span class="sd">    &quot;&quot;&quot;</span>
+    <span class="n">instance</span><span class="o">.</span><span class="n">_do_not_copy_to_course_db</span> <span class="o">=</span> <span class="bp">True</span>
+
+</div>
+<div class="viewcode-block" id="unmark"><a class="viewcode-back" href="../../djangoapps-common.html#student.models.unmark">[docs]</a><span class="k">def</span> <span class="nf">unmark</span><span class="p">(</span><span class="n">instance</span><span class="p">):</span>
+    <span class="sd">&quot;&quot;&quot;If we don&#39;t unmark a model after we do replication, then consecutive</span>
+<span class="sd">    save() calls won&#39;t be properly replicated.&quot;&quot;&quot;</span>
+    <span class="n">instance</span><span class="o">.</span><span class="n">_do_not_copy_to_course_db</span> <span class="o">=</span> <span class="bp">False</span>
+
+</div>
+<div class="viewcode-block" id="should_replicate"><a class="viewcode-back" href="../../djangoapps-common.html#student.models.should_replicate">[docs]</a><span class="k">def</span> <span class="nf">should_replicate</span><span class="p">(</span><span class="n">instance</span><span class="p">):</span>
+    <span class="sd">&quot;&quot;&quot;Should this instance be replicated? We need to be a Portal server and</span>
+<span class="sd">    the instance has to not have been marked_handled.&quot;&quot;&quot;</span>
+    <span class="k">if</span> <span class="n">marked_handled</span><span class="p">(</span><span class="n">instance</span><span class="p">):</span>
+        <span class="c"># Basically, avoid an infinite loop. You should</span>
+        <span class="n">log</span><span class="o">.</span><span class="n">debug</span><span class="p">(</span><span class="s">&quot;{0} should not be replicated because it&#39;s been marked&quot;</span>
+                  <span class="o">.</span><span class="n">format</span><span class="p">(</span><span class="n">instance</span><span class="p">))</span>
+        <span class="k">return</span> <span class="bp">False</span>
+    <span class="k">if</span> <span class="ow">not</span> <span class="n">is_portal</span><span class="p">():</span>
+        <span class="n">log</span><span class="o">.</span><span class="n">debug</span><span class="p">(</span><span class="s">&quot;{0} should not be replicated because we&#39;re not a portal.&quot;</span>
+                  <span class="o">.</span><span class="n">format</span><span class="p">(</span><span class="n">instance</span><span class="p">))</span>
+        <span class="k">return</span> <span class="bp">False</span>
+    <span class="k">return</span> <span class="bp">True</span></div>
+</pre></div>
+
+          </div>
+        </div>
+      </div>
+      <div class="clearer"></div>
+    </div>
+    <div class="related">
+      <h3>Navigation</h3>
+      <ul>
+        <li class="right" style="margin-right: 10px">
+          <a href="../../genindex.html" title="General Index"
+             >index</a></li>
+        <li class="right" >
+          <a href="../../py-modindex.html" title="Python Module Index"
+             >modules</a> |</li>
+        <li><a href="../../index.html">MITx 1.0 documentation</a> &raquo;</li>
+          <li><a href="../index.html" >Module code</a> &raquo;</li> 
+      </ul>
+    </div>
+    <div class="footer">
+        &copy; Copyright 2012, MITx team.
+      Created using <a href="http://sphinx.pocoo.org/">Sphinx</a> 1.1.3.
+    </div>
+  </body>
+</html>

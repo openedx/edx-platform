@@ -1,0 +1,708 @@
+
+
+<!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Transitional//EN"
+  "http://www.w3.org/TR/xhtml1/DTD/xhtml1-transitional.dtd">
+
+
+<html xmlns="http://www.w3.org/1999/xhtml">
+  <head>
+    <meta http-equiv="Content-Type" content="text/html; charset=utf-8" />
+    
+    <title>Capa module &mdash; MITx 1.0 documentation</title>
+    
+    <link rel="stylesheet" href="_static/sphinxdoc.css" type="text/css" />
+    <link rel="stylesheet" href="_static/pygments.css" type="text/css" />
+    
+    <script type="text/javascript">
+      var DOCUMENTATION_OPTIONS = {
+        URL_ROOT:    '',
+        VERSION:     '1.0',
+        COLLAPSE_INDEX: false,
+        FILE_SUFFIX: '.html',
+        HAS_SOURCE:  true
+      };
+    </script>
+    <script type="text/javascript" src="_static/jquery.js"></script>
+    <script type="text/javascript" src="_static/underscore.js"></script>
+    <script type="text/javascript" src="_static/doctools.js"></script>
+    <script type="text/javascript" src="http://cdn.mathjax.org/mathjax/latest/MathJax.js?config=TeX-AMS-MML_HTMLorMML"></script>
+    <link rel="top" title="MITx 1.0 documentation" href="index.html" />
+    <link rel="up" title="Common / lib" href="common-lib.html" />
+    <link rel="next" title="Chem module" href="chem.html" />
+    <link rel="prev" title="Xmodule" href="xmodule.html" /> 
+  </head>
+  <body>
+<img src="_static/homepage-bg.jpg" alt="Edx logo"  width="100%;"/>
+
+    <div class="related">
+      <h3>Navigation</h3>
+      <ul>
+        <li class="right" style="margin-right: 10px">
+          <a href="genindex.html" title="General Index"
+             accesskey="I">index</a></li>
+        <li class="right" >
+          <a href="py-modindex.html" title="Python Module Index"
+             >modules</a> |</li>
+        <li class="right" >
+          <a href="chem.html" title="Chem module"
+             accesskey="N">next</a> |</li>
+        <li class="right" >
+          <a href="xmodule.html" title="Xmodule"
+             accesskey="P">previous</a> |</li>
+        <li><a href="index.html">MITx 1.0 documentation</a> &raquo;</li>
+          <li><a href="common-lib.html" accesskey="U">Common / lib</a> &raquo;</li> 
+      </ul>
+    </div>
+      <div class="sphinxsidebar">
+        <div class="sphinxsidebarwrapper">
+  <h3><a href="index.html">Table Of Contents</a></h3>
+  <ul>
+<li><a class="reference internal" href="#">Capa module</a><ul>
+<li><a class="reference internal" href="#module-capa.calc">Calc</a></li>
+<li><a class="reference internal" href="#module-capa.capa_problem">Capa_problem</a></li>
+<li><a class="reference internal" href="#module-capa.checker">Checker</a></li>
+<li><a class="reference internal" href="#module-capa.correctmap">Correctmap</a></li>
+<li><a class="reference internal" href="#module-capa.customrender">Customrender</a></li>
+<li><a class="reference internal" href="#module-capa.inputtypes">Inputtypes</a></li>
+<li><a class="reference internal" href="#resposetypes">Resposetypes</a></li>
+</ul>
+</li>
+</ul>
+
+  <h4>Previous topic</h4>
+  <p class="topless"><a href="xmodule.html"
+                        title="previous chapter">Xmodule</a></p>
+  <h4>Next topic</h4>
+  <p class="topless"><a href="chem.html"
+                        title="next chapter">Chem module</a></p>
+  <h3>This Page</h3>
+  <ul class="this-page-menu">
+    <li><a href="_sources/capa.txt"
+           rel="nofollow">Show Source</a></li>
+  </ul>
+<div id="searchbox" style="display: none">
+  <h3>Quick search</h3>
+    <form class="search" action="search.html" method="get">
+      <input type="text" name="q" />
+      <input type="submit" value="Go" />
+      <input type="hidden" name="check_keywords" value="yes" />
+      <input type="hidden" name="area" value="default" />
+    </form>
+    <p class="searchtip" style="font-size: 90%">
+    Enter search terms or a module, class or function name.
+    </p>
+</div>
+<script type="text/javascript">$('#searchbox').show(0);</script>
+        </div>
+      </div>
+
+    <div class="document">
+      <div class="documentwrapper">
+        <div class="bodywrapper">
+          <div class="body">
+            
+  <div class="section" id="capa-module">
+<h1>Capa module<a class="headerlink" href="#capa-module" title="Permalink to this headline">¶</a></h1>
+<p>Contents:</p>
+<span class="target" id="module-capa"></span><div class="toctree-wrapper compound">
+<ul>
+<li class="toctree-l1"><a class="reference internal" href="chem.html">Chem module</a><ul>
+<li class="toctree-l2"><a class="reference internal" href="chem.html#module-capa.chem.miller">Miller</a></li>
+<li class="toctree-l2"><a class="reference internal" href="chem.html#module-capa.chem.chemcalc">Chemcalc</a></li>
+<li class="toctree-l2"><a class="reference internal" href="chem.html#module-capa.chem.chemtools">Chemtools</a></li>
+<li class="toctree-l2"><a class="reference internal" href="chem.html#module-capa.chem.tests">Tests</a></li>
+</ul>
+</li>
+</ul>
+</div>
+<div class="section" id="module-capa.calc">
+<span id="calc"></span><h2>Calc<a class="headerlink" href="#module-capa.calc" title="Permalink to this headline">¶</a></h2>
+<dl class="function">
+<dt id="capa.calc.check_variables">
+<tt class="descclassname">capa.calc.</tt><tt class="descname">check_variables</tt><big>(</big><em>string</em>, <em>variables</em><big>)</big><a class="reference internal" href="_modules/capa/calc.html#check_variables"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#capa.calc.check_variables" title="Permalink to this definition">¶</a></dt>
+<dd><p>Confirm the only variables in string are defined.</p>
+<p>Pyparsing uses a left-to-right parser, which makes the more
+elegant approach pretty hopeless.</p>
+<p>achar = reduce(lambda a,b:a|b ,map(Literal,alphas)) # Any alphabetic character
+undefined_variable = achar + Word(alphanums)
+undefined_variable.setParseAction(lambda x:UndefinedVariable(&#8220;&#8221;.join(x)).raiseself())
+varnames = varnames | undefined_variable</p>
+</dd></dl>
+
+<dl class="function">
+<dt id="capa.calc.evaluator">
+<tt class="descclassname">capa.calc.</tt><tt class="descname">evaluator</tt><big>(</big><em>variables</em>, <em>functions</em>, <em>string</em>, <em>cs=False</em><big>)</big><a class="reference internal" href="_modules/capa/calc.html#evaluator"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#capa.calc.evaluator" title="Permalink to this definition">¶</a></dt>
+<dd><p>Evaluate an expression. Variables are passed as a dictionary
+from string to value. Unary functions are passed as a dictionary
+from string to function. Variables must be floats.
+cs: Case sensitive</p>
+<p>TODO: Fix it so we can pass integers and complex numbers in variables dict</p>
+</dd></dl>
+
+</div>
+<div class="section" id="module-capa.capa_problem">
+<span id="capa-problem"></span><h2>Capa_problem<a class="headerlink" href="#module-capa.capa_problem" title="Permalink to this headline">¶</a></h2>
+<p>Main module which shows problems (of &#8220;capa&#8221; type).</p>
+<p>This is used by capa_module.</p>
+<dl class="class">
+<dt id="capa.capa_problem.LoncapaProblem">
+<em class="property">class </em><tt class="descclassname">capa.capa_problem.</tt><tt class="descname">LoncapaProblem</tt><big>(</big><em>problem_text</em>, <em>id</em>, <em>state=None</em>, <em>seed=None</em>, <em>system=None</em><big>)</big><a class="reference internal" href="_modules/capa/capa_problem.html#LoncapaProblem"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#capa.capa_problem.LoncapaProblem" title="Permalink to this definition">¶</a></dt>
+<dd><p>Bases: <tt class="xref py py-class docutils literal"><span class="pre">object</span></tt></p>
+<p>Main class for capa Problems.</p>
+<dl class="method">
+<dt id="capa.capa_problem.LoncapaProblem.do_reset">
+<tt class="descname">do_reset</tt><big>(</big><big>)</big><a class="reference internal" href="_modules/capa/capa_problem.html#LoncapaProblem.do_reset"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#capa.capa_problem.LoncapaProblem.do_reset" title="Permalink to this definition">¶</a></dt>
+<dd><p>Reset internal state to unfinished, with no answers</p>
+</dd></dl>
+
+<dl class="method">
+<dt id="capa.capa_problem.LoncapaProblem.get_answer_ids">
+<tt class="descname">get_answer_ids</tt><big>(</big><big>)</big><a class="reference internal" href="_modules/capa/capa_problem.html#LoncapaProblem.get_answer_ids"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#capa.capa_problem.LoncapaProblem.get_answer_ids" title="Permalink to this definition">¶</a></dt>
+<dd><p>Return the IDs of all the responses &#8211; these are the keys used for
+the dicts returned by grade_answers and get_question_answers. (Though
+get_question_answers may only return a subset of these.</p>
+</dd></dl>
+
+<dl class="method">
+<dt id="capa.capa_problem.LoncapaProblem.get_html">
+<tt class="descname">get_html</tt><big>(</big><big>)</big><a class="reference internal" href="_modules/capa/capa_problem.html#LoncapaProblem.get_html"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#capa.capa_problem.LoncapaProblem.get_html" title="Permalink to this definition">¶</a></dt>
+<dd><p>Main method called externally to get the HTML to be rendered for this capa Problem.</p>
+</dd></dl>
+
+<dl class="method">
+<dt id="capa.capa_problem.LoncapaProblem.get_max_score">
+<tt class="descname">get_max_score</tt><big>(</big><big>)</big><a class="reference internal" href="_modules/capa/capa_problem.html#LoncapaProblem.get_max_score"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#capa.capa_problem.LoncapaProblem.get_max_score" title="Permalink to this definition">¶</a></dt>
+<dd><p>Return the maximum score for this problem.</p>
+</dd></dl>
+
+<dl class="method">
+<dt id="capa.capa_problem.LoncapaProblem.get_question_answers">
+<tt class="descname">get_question_answers</tt><big>(</big><big>)</big><a class="reference internal" href="_modules/capa/capa_problem.html#LoncapaProblem.get_question_answers"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#capa.capa_problem.LoncapaProblem.get_question_answers" title="Permalink to this definition">¶</a></dt>
+<dd><p>Returns a dict of answer_ids to answer values. If we cannot generate
+an answer (this sometimes happens in customresponses), that answer_id is
+not included. Called by &#8220;show answers&#8221; button JSON request
+(see capa_module)</p>
+</dd></dl>
+
+<dl class="method">
+<dt id="capa.capa_problem.LoncapaProblem.get_recentmost_queuetime">
+<tt class="descname">get_recentmost_queuetime</tt><big>(</big><big>)</big><a class="reference internal" href="_modules/capa/capa_problem.html#LoncapaProblem.get_recentmost_queuetime"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#capa.capa_problem.LoncapaProblem.get_recentmost_queuetime" title="Permalink to this definition">¶</a></dt>
+<dd><p>Returns a DateTime object that represents the timestamp of the most recent
+queueing request, or None if not queued</p>
+</dd></dl>
+
+<dl class="method">
+<dt id="capa.capa_problem.LoncapaProblem.get_score">
+<tt class="descname">get_score</tt><big>(</big><big>)</big><a class="reference internal" href="_modules/capa/capa_problem.html#LoncapaProblem.get_score"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#capa.capa_problem.LoncapaProblem.get_score" title="Permalink to this definition">¶</a></dt>
+<dd><p>Compute score for this problem.  The score is the number of points awarded.
+Returns a dictionary {&#8216;score&#8217;: integer, from 0 to get_max_score(),</p>
+<blockquote>
+<div>&#8216;total&#8217;: get_max_score()}.</div></blockquote>
+</dd></dl>
+
+<dl class="method">
+<dt id="capa.capa_problem.LoncapaProblem.get_state">
+<tt class="descname">get_state</tt><big>(</big><big>)</big><a class="reference internal" href="_modules/capa/capa_problem.html#LoncapaProblem.get_state"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#capa.capa_problem.LoncapaProblem.get_state" title="Permalink to this definition">¶</a></dt>
+<dd><p>Stored per-user session data neeeded to:
+1) Recreate the problem
+2) Populate any student answers.</p>
+</dd></dl>
+
+<dl class="method">
+<dt id="capa.capa_problem.LoncapaProblem.grade_answers">
+<tt class="descname">grade_answers</tt><big>(</big><em>answers</em><big>)</big><a class="reference internal" href="_modules/capa/capa_problem.html#LoncapaProblem.grade_answers"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#capa.capa_problem.LoncapaProblem.grade_answers" title="Permalink to this definition">¶</a></dt>
+<dd><p>Grade student responses.  Called by capa_module.check_problem.
+answers is a dict of all the entries from request.POST, but with the first part
+of each key removed (the string before the first &#8220;_&#8221;).</p>
+<p>Thus, for example, input_ID123 -&gt; ID123, and input_fromjs_ID123 -&gt; fromjs_ID123</p>
+<p>Calls the Response for each question in this problem, to do the actual grading.</p>
+</dd></dl>
+
+<dl class="method">
+<dt id="capa.capa_problem.LoncapaProblem.is_queued">
+<tt class="descname">is_queued</tt><big>(</big><big>)</big><a class="reference internal" href="_modules/capa/capa_problem.html#LoncapaProblem.is_queued"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#capa.capa_problem.LoncapaProblem.is_queued" title="Permalink to this definition">¶</a></dt>
+<dd><p>Returns True if any part of the problem has been submitted to an external queue
+(e.g. for grading.)</p>
+</dd></dl>
+
+<dl class="method">
+<dt id="capa.capa_problem.LoncapaProblem.set_initial_display">
+<tt class="descname">set_initial_display</tt><big>(</big><big>)</big><a class="reference internal" href="_modules/capa/capa_problem.html#LoncapaProblem.set_initial_display"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#capa.capa_problem.LoncapaProblem.set_initial_display" title="Permalink to this definition">¶</a></dt>
+<dd><p>Set the student&#8217;s answers to the responders&#8217; initial displays, if specified.</p>
+</dd></dl>
+
+<dl class="method">
+<dt id="capa.capa_problem.LoncapaProblem.update_score">
+<tt class="descname">update_score</tt><big>(</big><em>score_msg</em>, <em>queuekey</em><big>)</big><a class="reference internal" href="_modules/capa/capa_problem.html#LoncapaProblem.update_score"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#capa.capa_problem.LoncapaProblem.update_score" title="Permalink to this definition">¶</a></dt>
+<dd><dl class="docutils">
+<dt>Deliver grading response (e.g. from async code checking) to</dt>
+<dd>the specific ResponseType that requested grading</dd>
+</dl>
+<p>Returns an updated CorrectMap</p>
+</dd></dl>
+
+</dd></dl>
+
+</div>
+<div class="section" id="module-capa.checker">
+<span id="checker"></span><h2>Checker<a class="headerlink" href="#module-capa.checker" title="Permalink to this headline">¶</a></h2>
+<p>Commandline tool for doing operations on Problems</p>
+<dl class="function">
+<dt id="capa.checker.check_that_blanks_fail">
+<tt class="descclassname">capa.checker.</tt><tt class="descname">check_that_blanks_fail</tt><big>(</big><em>problem</em><big>)</big><a class="reference internal" href="_modules/capa/checker.html#check_that_blanks_fail"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#capa.checker.check_that_blanks_fail" title="Permalink to this definition">¶</a></dt>
+<dd><p>Leaving it blank should never work. Neither should a space.</p>
+</dd></dl>
+
+<dl class="function">
+<dt id="capa.checker.check_that_suggested_answers_work">
+<tt class="descclassname">capa.checker.</tt><tt class="descname">check_that_suggested_answers_work</tt><big>(</big><em>problem</em><big>)</big><a class="reference internal" href="_modules/capa/checker.html#check_that_suggested_answers_work"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#capa.checker.check_that_suggested_answers_work" title="Permalink to this definition">¶</a></dt>
+<dd><p>Split this up so that we&#8217;re only used for formula/numeric answers.</p>
+<p>Examples of where this fails:
+* Displayed answers use units but acceptable ones do not.</p>
+<blockquote>
+<div><ul class="simple">
+<li>L1e0.xml</li>
+<li>Presents itself as UndefinedVariable (when it tries to pass to calc)</li>
+</ul>
+</div></blockquote>
+<ul class="simple">
+<li>&#8220;a or d&#8221; is what&#8217;s displayed, but only &#8220;a&#8221; or &#8220;d&#8221; is accepted, not the
+string &#8220;a or d&#8221;.
+- L1-e00.xml</li>
+</ul>
+</dd></dl>
+
+<dl class="function">
+<dt id="capa.checker.command_show">
+<tt class="descclassname">capa.checker.</tt><tt class="descname">command_show</tt><big>(</big><em>problem</em><big>)</big><a class="reference internal" href="_modules/capa/checker.html#command_show"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#capa.checker.command_show" title="Permalink to this definition">¶</a></dt>
+<dd><p>Display the text for this problem</p>
+</dd></dl>
+
+</div>
+<div class="section" id="module-capa.correctmap">
+<span id="correctmap"></span><h2>Correctmap<a class="headerlink" href="#module-capa.correctmap" title="Permalink to this headline">¶</a></h2>
+<dl class="class">
+<dt id="capa.correctmap.CorrectMap">
+<em class="property">class </em><tt class="descclassname">capa.correctmap.</tt><tt class="descname">CorrectMap</tt><big>(</big><em>*args</em>, <em>**kwargs</em><big>)</big><a class="reference internal" href="_modules/capa/correctmap.html#CorrectMap"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#capa.correctmap.CorrectMap" title="Permalink to this definition">¶</a></dt>
+<dd><p>Bases: <tt class="xref py py-class docutils literal"><span class="pre">object</span></tt></p>
+<p>Stores map between answer_id and response evaluation result for each question
+in a capa problem.  The response evaluation result for each answer_id includes
+(correctness, npoints, msg, hint, hintmode).</p>
+<ul>
+<li><p class="first">correctness : either &#8216;correct&#8217; or &#8216;incorrect&#8217;</p>
+</li>
+<li><p class="first">npoints     : None, or integer specifying number of points awarded for this answer_id</p>
+</li>
+<li><dl class="first docutils">
+<dt>msg <span class="classifier-delimiter">:</span> <span class="classifier">string (may have HTML) giving extra message response</span></dt>
+<dd><p class="first last">(displayed below textline or textbox)</p>
+</dd>
+</dl>
+</li>
+<li><dl class="first docutils">
+<dt>hint <span class="classifier-delimiter">:</span> <span class="classifier">string (may have HTML) giving optional hint</span></dt>
+<dd><p class="first last">(displayed below textline or textbox, above msg)</p>
+</dd>
+</dl>
+</li>
+<li><p class="first">hintmode    : one of (None,&#8217;on_request&#8217;,&#8217;always&#8217;) criteria for displaying hint</p>
+</li>
+<li><dl class="first docutils">
+<dt>queuestate <span class="classifier-delimiter">:</span> <span class="classifier">Dict {key:&#8217;&#8216;, time:&#8217;&#8216;} where key is a secret string, and time is a string dump</span></dt>
+<dd><p class="first last">of a DateTime object in the format &#8216;%Y%m%d%H%M%S&#8217;. Is None when not queued</p>
+</dd>
+</dl>
+</li>
+</ul>
+<p>Behaves as a dict.</p>
+<dl class="method">
+<dt id="capa.correctmap.CorrectMap.get_dict">
+<tt class="descname">get_dict</tt><big>(</big><big>)</big><a class="reference internal" href="_modules/capa/correctmap.html#CorrectMap.get_dict"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#capa.correctmap.CorrectMap.get_dict" title="Permalink to this definition">¶</a></dt>
+<dd><p>return dict version of self</p>
+</dd></dl>
+
+<dl class="method">
+<dt id="capa.correctmap.CorrectMap.set_dict">
+<tt class="descname">set_dict</tt><big>(</big><em>correct_map</em><big>)</big><a class="reference internal" href="_modules/capa/correctmap.html#CorrectMap.set_dict"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#capa.correctmap.CorrectMap.set_dict" title="Permalink to this definition">¶</a></dt>
+<dd><p>Set internal dict of CorrectMap to provided correct_map dict</p>
+<p>correct_map is saved by LMS as a plaintext JSON dump of the correctmap dict. This
+means that when the definition of CorrectMap (e.g. its properties) are altered,
+an existing correct_map dict will not coincide with the newest CorrectMap format as
+defined by self.set.</p>
+<p>For graceful migration, feed the contents of each correct map to self.set, rather than
+making a direct copy of the given correct_map dict. This way, the common keys between
+the incoming correct_map dict and the new CorrectMap instance will be written, while
+mismatched keys will be gracefully ignored.</p>
+<dl class="docutils">
+<dt>Special migration case:</dt>
+<dd>If correct_map is a one-level dict, then convert it to the new dict of dicts format.</dd>
+</dl>
+</dd></dl>
+
+<dl class="method">
+<dt id="capa.correctmap.CorrectMap.set_hint_and_mode">
+<tt class="descname">set_hint_and_mode</tt><big>(</big><em>answer_id</em>, <em>hint</em>, <em>hintmode</em><big>)</big><a class="reference internal" href="_modules/capa/correctmap.html#CorrectMap.set_hint_and_mode"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#capa.correctmap.CorrectMap.set_hint_and_mode" title="Permalink to this definition">¶</a></dt>
+<dd><ul class="simple">
+<li>hint     : (string) HTML text for hint</li>
+<li>hintmode : (string) mode for hint display (&#8216;always&#8217; or &#8216;on_request&#8217;)</li>
+</ul>
+</dd></dl>
+
+<dl class="method">
+<dt id="capa.correctmap.CorrectMap.update">
+<tt class="descname">update</tt><big>(</big><em>other_cmap</em><big>)</big><a class="reference internal" href="_modules/capa/correctmap.html#CorrectMap.update"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#capa.correctmap.CorrectMap.update" title="Permalink to this definition">¶</a></dt>
+<dd><p>Update this CorrectMap with the contents of another CorrectMap</p>
+</dd></dl>
+
+</dd></dl>
+
+</div>
+<div class="section" id="module-capa.customrender">
+<span id="customrender"></span><h2>Customrender<a class="headerlink" href="#module-capa.customrender" title="Permalink to this headline">¶</a></h2>
+<p>This has custom renderers: classes that know how to render certain problem tags (e.g. &lt;math&gt; and
+&lt;solution&gt;) to html.</p>
+<p>These tags do not have state, so they just get passed the system (for access to render_template),
+and the xml element.</p>
+<dl class="class">
+<dt id="capa.customrender.SolutionRenderer">
+<em class="property">class </em><tt class="descclassname">capa.customrender.</tt><tt class="descname">SolutionRenderer</tt><big>(</big><em>system</em>, <em>xml</em><big>)</big><a class="reference internal" href="_modules/capa/customrender.html#SolutionRenderer"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#capa.customrender.SolutionRenderer" title="Permalink to this definition">¶</a></dt>
+<dd><p>Bases: <tt class="xref py py-class docutils literal"><span class="pre">object</span></tt></p>
+<p>A solution is just a &lt;span&gt;...&lt;/span&gt; which is given an ID, that is used for displaying an
+extended answer (a problem &#8220;solution&#8221;) after &#8220;show answers&#8221; is pressed.</p>
+<p>Note that the solution content is NOT rendered and returned in the HTML. It is obtained by an
+ajax call.</p>
+</dd></dl>
+
+</div>
+<div class="section" id="module-capa.inputtypes">
+<span id="inputtypes"></span><h2>Inputtypes<a class="headerlink" href="#module-capa.inputtypes" title="Permalink to this headline">¶</a></h2>
+<p>Module containing the problem elements which render into input objects</p>
+<ul class="simple">
+<li>textline</li>
+<li>textbox (aka codeinput)</li>
+<li>schematic</li>
+<li>choicegroup (aka radiogroup, checkboxgroup)</li>
+<li>javascriptinput</li>
+<li>imageinput  (for clickable image)</li>
+<li>optioninput (for option list)</li>
+<li>filesubmission (upload a file)</li>
+</ul>
+<p>These are matched by <em>.html files templates/</em>.html which are mako templates with the
+actual html.</p>
+<p>Each input type takes the xml tree as &#8216;element&#8217;, the previous answer as &#8216;value&#8217;, and the
+graded status as&#8217;status&#8217;</p>
+<dl class="class">
+<dt id="capa.inputtypes.Attribute">
+<em class="property">class </em><tt class="descclassname">capa.inputtypes.</tt><tt class="descname">Attribute</tt><big>(</big><em>name</em>, <em>default=&lt;object object at 0x105742f30&gt;</em>, <em>transform=None</em>, <em>validate=None</em>, <em>render=True</em><big>)</big><a class="headerlink" href="#capa.inputtypes.Attribute" title="Permalink to this definition">¶</a></dt>
+<dd><p>Bases: <tt class="xref py py-class docutils literal"><span class="pre">object</span></tt></p>
+<p>Allows specifying required and optional attributes for input types.</p>
+<dl class="method">
+<dt id="capa.inputtypes.Attribute.parse_from_xml">
+<tt class="descname">parse_from_xml</tt><big>(</big><em>element</em><big>)</big><a class="headerlink" href="#capa.inputtypes.Attribute.parse_from_xml" title="Permalink to this definition">¶</a></dt>
+<dd><p>Given an etree xml element that should have this attribute, do the obvious thing:
+- look for it.  raise ValueError if not found and required.
+- transform and validate.  pass through any exceptions from transform or validate.</p>
+</dd></dl>
+
+</dd></dl>
+
+<dl class="class">
+<dt id="capa.inputtypes.ChemicalEquationInput">
+<em class="property">class </em><tt class="descclassname">capa.inputtypes.</tt><tt class="descname">ChemicalEquationInput</tt><big>(</big><em>system</em>, <em>xml</em>, <em>state</em><big>)</big><a class="reference internal" href="_modules/capa/inputtypes.html#ChemicalEquationInput"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#capa.inputtypes.ChemicalEquationInput" title="Permalink to this definition">¶</a></dt>
+<dd><p>Bases: <a class="reference internal" href="#capa.inputtypes.InputTypeBase" title="capa.inputtypes.InputTypeBase"><tt class="xref py py-class docutils literal"><span class="pre">capa.inputtypes.InputTypeBase</span></tt></a></p>
+<p>An input type for entering chemical equations.  Supports live preview.</p>
+<p>Example:</p>
+<p>&lt;chemicalequationinput size=&#8221;50&#8221;/&gt;</p>
+<p>options: size &#8211; width of the textbox.</p>
+<dl class="classmethod">
+<dt id="capa.inputtypes.ChemicalEquationInput.get_attributes">
+<em class="property">classmethod </em><tt class="descname">get_attributes</tt><big>(</big><big>)</big><a class="headerlink" href="#capa.inputtypes.ChemicalEquationInput.get_attributes" title="Permalink to this definition">¶</a></dt>
+<dd><p>Can set size of text field.</p>
+</dd></dl>
+
+</dd></dl>
+
+<dl class="class">
+<dt id="capa.inputtypes.ChoiceGroup">
+<em class="property">class </em><tt class="descclassname">capa.inputtypes.</tt><tt class="descname">ChoiceGroup</tt><big>(</big><em>system</em>, <em>xml</em>, <em>state</em><big>)</big><a class="reference internal" href="_modules/capa/inputtypes.html#ChoiceGroup"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#capa.inputtypes.ChoiceGroup" title="Permalink to this definition">¶</a></dt>
+<dd><p>Bases: <a class="reference internal" href="#capa.inputtypes.InputTypeBase" title="capa.inputtypes.InputTypeBase"><tt class="xref py py-class docutils literal"><span class="pre">capa.inputtypes.InputTypeBase</span></tt></a></p>
+<p>Radio button or checkbox inputs: multiple choice or true/false</p>
+<p>TODO: allow order of choices to be randomized, following lon-capa spec.  Use
+&#8220;location&#8221; attribute, ie random, top, bottom.</p>
+<p>Example:</p>
+<dl class="docutils">
+<dt>&lt;choicegroup&gt;</dt>
+<dd><dl class="first docutils">
+<dt>&lt;choice correct=&#8221;false&#8221; name=&#8221;foil1&#8221;&gt;</dt>
+<dd>&lt;text&gt;This is foil One.&lt;/text&gt;</dd>
+</dl>
+<p>&lt;/choice&gt;
+&lt;choice correct=&#8221;false&#8221; name=&#8221;foil2&#8221;&gt;</p>
+<blockquote>
+<div>&lt;text&gt;This is foil Two.&lt;/text&gt;</div></blockquote>
+<p>&lt;/choice&gt;
+&lt;choice correct=&#8221;true&#8221; name=&#8221;foil3&#8221;&gt;</p>
+<blockquote>
+<div>&lt;text&gt;This is foil Three.&lt;/text&gt;</div></blockquote>
+<p class="last">&lt;/choice&gt;</p>
+</dd>
+</dl>
+<p>&lt;/choicegroup&gt;</p>
+<dl class="staticmethod">
+<dt id="capa.inputtypes.ChoiceGroup.extract_choices">
+<em class="property">static </em><tt class="descname">extract_choices</tt><big>(</big><em>element</em><big>)</big><a class="headerlink" href="#capa.inputtypes.ChoiceGroup.extract_choices" title="Permalink to this definition">¶</a></dt>
+<dd><p>Extracts choices for a few input types, such as ChoiceGroup, RadioGroup and
+CheckboxGroup.</p>
+<p>returns list of (choice_name, choice_text) tuples</p>
+<p>TODO: allow order of choices to be randomized, following lon-capa spec.  Use
+&#8220;location&#8221; attribute, ie random, top, bottom.</p>
+</dd></dl>
+
+</dd></dl>
+
+<dl class="class">
+<dt id="capa.inputtypes.CodeInput">
+<em class="property">class </em><tt class="descclassname">capa.inputtypes.</tt><tt class="descname">CodeInput</tt><big>(</big><em>system</em>, <em>xml</em>, <em>state</em><big>)</big><a class="reference internal" href="_modules/capa/inputtypes.html#CodeInput"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#capa.inputtypes.CodeInput" title="Permalink to this definition">¶</a></dt>
+<dd><p>Bases: <a class="reference internal" href="#capa.inputtypes.InputTypeBase" title="capa.inputtypes.InputTypeBase"><tt class="xref py py-class docutils literal"><span class="pre">capa.inputtypes.InputTypeBase</span></tt></a></p>
+<p>A text area input for code&#8211;uses codemirror, does syntax highlighting, special tab handling,
+etc.</p>
+<dl class="classmethod">
+<dt id="capa.inputtypes.CodeInput.get_attributes">
+<em class="property">classmethod </em><tt class="descname">get_attributes</tt><big>(</big><big>)</big><a class="headerlink" href="#capa.inputtypes.CodeInput.get_attributes" title="Permalink to this definition">¶</a></dt>
+<dd><p>Convert options to a convenient format.</p>
+</dd></dl>
+
+<dl class="method">
+<dt id="capa.inputtypes.CodeInput.setup">
+<tt class="descname">setup</tt><big>(</big><big>)</big><a class="reference internal" href="_modules/capa/inputtypes.html#CodeInput.setup"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#capa.inputtypes.CodeInput.setup" title="Permalink to this definition">¶</a></dt>
+<dd><p>Implement special logic: handle queueing state, and default input.</p>
+</dd></dl>
+
+</dd></dl>
+
+<dl class="class">
+<dt id="capa.inputtypes.Crystallography">
+<em class="property">class </em><tt class="descclassname">capa.inputtypes.</tt><tt class="descname">Crystallography</tt><big>(</big><em>system</em>, <em>xml</em>, <em>state</em><big>)</big><a class="reference internal" href="_modules/capa/inputtypes.html#Crystallography"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#capa.inputtypes.Crystallography" title="Permalink to this definition">¶</a></dt>
+<dd><p>Bases: <a class="reference internal" href="#capa.inputtypes.InputTypeBase" title="capa.inputtypes.InputTypeBase"><tt class="xref py py-class docutils literal"><span class="pre">capa.inputtypes.InputTypeBase</span></tt></a></p>
+<p>An input for crystallography &#8211; user selects 3 points on the axes, and we get a plane.</p>
+<p>TODO: what&#8217;s the actual value format?</p>
+<dl class="classmethod">
+<dt id="capa.inputtypes.Crystallography.get_attributes">
+<em class="property">classmethod </em><tt class="descname">get_attributes</tt><big>(</big><big>)</big><a class="headerlink" href="#capa.inputtypes.Crystallography.get_attributes" title="Permalink to this definition">¶</a></dt>
+<dd><p>Note: height, width are required.</p>
+</dd></dl>
+
+</dd></dl>
+
+<dl class="class">
+<dt id="capa.inputtypes.FileSubmission">
+<em class="property">class </em><tt class="descclassname">capa.inputtypes.</tt><tt class="descname">FileSubmission</tt><big>(</big><em>system</em>, <em>xml</em>, <em>state</em><big>)</big><a class="reference internal" href="_modules/capa/inputtypes.html#FileSubmission"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#capa.inputtypes.FileSubmission" title="Permalink to this definition">¶</a></dt>
+<dd><p>Bases: <a class="reference internal" href="#capa.inputtypes.InputTypeBase" title="capa.inputtypes.InputTypeBase"><tt class="xref py py-class docutils literal"><span class="pre">capa.inputtypes.InputTypeBase</span></tt></a></p>
+<p>Upload some files (e.g. for programming assignments)</p>
+<dl class="classmethod">
+<dt id="capa.inputtypes.FileSubmission.get_attributes">
+<em class="property">classmethod </em><tt class="descname">get_attributes</tt><big>(</big><big>)</big><a class="headerlink" href="#capa.inputtypes.FileSubmission.get_attributes" title="Permalink to this definition">¶</a></dt>
+<dd><p>Convert the list of allowed files to a convenient format.</p>
+</dd></dl>
+
+<dl class="staticmethod">
+<dt id="capa.inputtypes.FileSubmission.parse_files">
+<em class="property">static </em><tt class="descname">parse_files</tt><big>(</big><em>files</em><big>)</big><a class="headerlink" href="#capa.inputtypes.FileSubmission.parse_files" title="Permalink to this definition">¶</a></dt>
+<dd><p>Given a string like &#8216;a.py b.py c.out&#8217;, split on whitespace and return as a json list.</p>
+</dd></dl>
+
+<dl class="method">
+<dt id="capa.inputtypes.FileSubmission.setup">
+<tt class="descname">setup</tt><big>(</big><big>)</big><a class="reference internal" href="_modules/capa/inputtypes.html#FileSubmission.setup"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#capa.inputtypes.FileSubmission.setup" title="Permalink to this definition">¶</a></dt>
+<dd><p>Do some magic to handle queueing status (render as &#8220;queued&#8221; instead of &#8220;incomplete&#8221;),
+pull queue_len from the msg field.  (TODO: get rid of the queue_len hack).</p>
+</dd></dl>
+
+</dd></dl>
+
+<dl class="class">
+<dt id="capa.inputtypes.ImageInput">
+<em class="property">class </em><tt class="descclassname">capa.inputtypes.</tt><tt class="descname">ImageInput</tt><big>(</big><em>system</em>, <em>xml</em>, <em>state</em><big>)</big><a class="reference internal" href="_modules/capa/inputtypes.html#ImageInput"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#capa.inputtypes.ImageInput" title="Permalink to this definition">¶</a></dt>
+<dd><p>Bases: <a class="reference internal" href="#capa.inputtypes.InputTypeBase" title="capa.inputtypes.InputTypeBase"><tt class="xref py py-class docutils literal"><span class="pre">capa.inputtypes.InputTypeBase</span></tt></a></p>
+<p>Clickable image as an input field.  Element should specify the image source, height,
+and width, e.g.</p>
+<p>&lt;imageinput src=&#8221;/static/Figures/Skier-conservation-of-energy.jpg&#8221; width=&#8221;388&#8221; height=&#8221;560&#8221; /&gt;</p>
+<p>TODO: showanswer for imageimput does not work yet - need javascript to put rectangle
+over acceptable area of image.</p>
+<dl class="classmethod">
+<dt id="capa.inputtypes.ImageInput.get_attributes">
+<em class="property">classmethod </em><tt class="descname">get_attributes</tt><big>(</big><big>)</big><a class="headerlink" href="#capa.inputtypes.ImageInput.get_attributes" title="Permalink to this definition">¶</a></dt>
+<dd><p>Note: src, height, and width are all required.</p>
+</dd></dl>
+
+<dl class="method">
+<dt id="capa.inputtypes.ImageInput.setup">
+<tt class="descname">setup</tt><big>(</big><big>)</big><a class="reference internal" href="_modules/capa/inputtypes.html#ImageInput.setup"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#capa.inputtypes.ImageInput.setup" title="Permalink to this definition">¶</a></dt>
+<dd><p>if value is of the form [x,y] then parse it and send along coordinates of previous answer</p>
+</dd></dl>
+
+</dd></dl>
+
+<dl class="class">
+<dt id="capa.inputtypes.InputTypeBase">
+<em class="property">class </em><tt class="descclassname">capa.inputtypes.</tt><tt class="descname">InputTypeBase</tt><big>(</big><em>system</em>, <em>xml</em>, <em>state</em><big>)</big><a class="reference internal" href="_modules/capa/inputtypes.html#InputTypeBase"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#capa.inputtypes.InputTypeBase" title="Permalink to this definition">¶</a></dt>
+<dd><p>Bases: <tt class="xref py py-class docutils literal"><span class="pre">object</span></tt></p>
+<p>Abstract base class for input types.</p>
+<dl class="classmethod">
+<dt id="capa.inputtypes.InputTypeBase.get_attributes">
+<em class="property">classmethod </em><tt class="descname">get_attributes</tt><big>(</big><big>)</big><a class="headerlink" href="#capa.inputtypes.InputTypeBase.get_attributes" title="Permalink to this definition">¶</a></dt>
+<dd><p>Should return a list of Attribute objects (see docstring there for details). Subclasses should override.  e.g.</p>
+<p>return [Attribute(&#8216;unicorn&#8217;, True), Attribute(&#8216;num_dragons&#8217;, 12, transform=int), ...]</p>
+</dd></dl>
+
+<dl class="method">
+<dt id="capa.inputtypes.InputTypeBase.get_html">
+<tt class="descname">get_html</tt><big>(</big><big>)</big><a class="reference internal" href="_modules/capa/inputtypes.html#InputTypeBase.get_html"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#capa.inputtypes.InputTypeBase.get_html" title="Permalink to this definition">¶</a></dt>
+<dd><p>Return the html for this input, as an etree element.</p>
+</dd></dl>
+
+<dl class="method">
+<dt id="capa.inputtypes.InputTypeBase.process_requirements">
+<tt class="descname">process_requirements</tt><big>(</big><big>)</big><a class="headerlink" href="#capa.inputtypes.InputTypeBase.process_requirements" title="Permalink to this definition">¶</a></dt>
+<dd><p>Subclasses can declare lists of required and optional attributes.  This
+function parses the input xml and pulls out those attributes.  This
+isolates most simple input types from needing to deal with xml parsing at all.</p>
+<p>Processes attributes, putting the results in the self.loaded_attributes dictionary.  Also creates a set
+self.to_render, containing the names of attributes that should be included in the context by default.</p>
+</dd></dl>
+
+<dl class="method">
+<dt id="capa.inputtypes.InputTypeBase.setup">
+<tt class="descname">setup</tt><big>(</big><big>)</big><a class="reference internal" href="_modules/capa/inputtypes.html#InputTypeBase.setup"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#capa.inputtypes.InputTypeBase.setup" title="Permalink to this definition">¶</a></dt>
+<dd><p>InputTypes should override this to do any needed initialization.  It is called after the
+constructor, so all base attributes will be set.</p>
+<p>If this method raises an exception, it will be wrapped with a message that includes the
+problem xml.</p>
+</dd></dl>
+
+</dd></dl>
+
+<dl class="class">
+<dt id="capa.inputtypes.JavascriptInput">
+<em class="property">class </em><tt class="descclassname">capa.inputtypes.</tt><tt class="descname">JavascriptInput</tt><big>(</big><em>system</em>, <em>xml</em>, <em>state</em><big>)</big><a class="reference internal" href="_modules/capa/inputtypes.html#JavascriptInput"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#capa.inputtypes.JavascriptInput" title="Permalink to this definition">¶</a></dt>
+<dd><p>Bases: <a class="reference internal" href="#capa.inputtypes.InputTypeBase" title="capa.inputtypes.InputTypeBase"><tt class="xref py py-class docutils literal"><span class="pre">capa.inputtypes.InputTypeBase</span></tt></a></p>
+<p>Hidden field for javascript to communicate via; also loads the required
+scripts for rendering the problem and passes data to the problem.</p>
+<p>TODO (arjun?): document this in detail.  Initial notes:
+- display_class is a subclass of XProblemClassDisplay (see</p>
+<blockquote>
+<div>xmodule/xmodule/js/src/capa/display.coffee),</div></blockquote>
+<ul class="simple">
+<li>display_file is the js script to be in /static/js/ where display_class is defined.</li>
+</ul>
+<dl class="classmethod">
+<dt id="capa.inputtypes.JavascriptInput.get_attributes">
+<em class="property">classmethod </em><tt class="descname">get_attributes</tt><big>(</big><big>)</big><a class="headerlink" href="#capa.inputtypes.JavascriptInput.get_attributes" title="Permalink to this definition">¶</a></dt>
+<dd><p>Register the attributes.</p>
+</dd></dl>
+
+</dd></dl>
+
+<dl class="class">
+<dt id="capa.inputtypes.OptionInput">
+<em class="property">class </em><tt class="descclassname">capa.inputtypes.</tt><tt class="descname">OptionInput</tt><big>(</big><em>system</em>, <em>xml</em>, <em>state</em><big>)</big><a class="reference internal" href="_modules/capa/inputtypes.html#OptionInput"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#capa.inputtypes.OptionInput" title="Permalink to this definition">¶</a></dt>
+<dd><p>Bases: <a class="reference internal" href="#capa.inputtypes.InputTypeBase" title="capa.inputtypes.InputTypeBase"><tt class="xref py py-class docutils literal"><span class="pre">capa.inputtypes.InputTypeBase</span></tt></a></p>
+<p>Input type for selecting and Select option input type.</p>
+<p>Example:</p>
+<p>&lt;optioninput options=&#8221;(&#8216;Up&#8217;,&#8217;Down&#8217;)&#8221; correct=&#8221;Up&#8221;/&gt;&lt;text&gt;The location of the sky&lt;/text&gt;</p>
+<p># TODO: allow ordering to be randomized</p>
+<dl class="classmethod">
+<dt id="capa.inputtypes.OptionInput.get_attributes">
+<em class="property">classmethod </em><tt class="descname">get_attributes</tt><big>(</big><big>)</big><a class="headerlink" href="#capa.inputtypes.OptionInput.get_attributes" title="Permalink to this definition">¶</a></dt>
+<dd><p>Convert options to a convenient format.</p>
+</dd></dl>
+
+<dl class="staticmethod">
+<dt id="capa.inputtypes.OptionInput.parse_options">
+<em class="property">static </em><tt class="descname">parse_options</tt><big>(</big><em>options</em><big>)</big><a class="headerlink" href="#capa.inputtypes.OptionInput.parse_options" title="Permalink to this definition">¶</a></dt>
+<dd><p>Given options string, convert it into an ordered list of (option_id, option_description) tuples, where
+id==description for now.  TODO: make it possible to specify different id and descriptions.</p>
+</dd></dl>
+
+</dd></dl>
+
+<dl class="class">
+<dt id="capa.inputtypes.Schematic">
+<em class="property">class </em><tt class="descclassname">capa.inputtypes.</tt><tt class="descname">Schematic</tt><big>(</big><em>system</em>, <em>xml</em>, <em>state</em><big>)</big><a class="reference internal" href="_modules/capa/inputtypes.html#Schematic"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#capa.inputtypes.Schematic" title="Permalink to this definition">¶</a></dt>
+<dd><p>Bases: <a class="reference internal" href="#capa.inputtypes.InputTypeBase" title="capa.inputtypes.InputTypeBase"><tt class="xref py py-class docutils literal"><span class="pre">capa.inputtypes.InputTypeBase</span></tt></a></p>
+<dl class="classmethod">
+<dt id="capa.inputtypes.Schematic.get_attributes">
+<em class="property">classmethod </em><tt class="descname">get_attributes</tt><big>(</big><big>)</big><a class="headerlink" href="#capa.inputtypes.Schematic.get_attributes" title="Permalink to this definition">¶</a></dt>
+<dd><p>Convert options to a convenient format.</p>
+</dd></dl>
+
+</dd></dl>
+
+<dl class="class">
+<dt id="capa.inputtypes.TextLine">
+<em class="property">class </em><tt class="descclassname">capa.inputtypes.</tt><tt class="descname">TextLine</tt><big>(</big><em>system</em>, <em>xml</em>, <em>state</em><big>)</big><a class="reference internal" href="_modules/capa/inputtypes.html#TextLine"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#capa.inputtypes.TextLine" title="Permalink to this definition">¶</a></dt>
+<dd><p>Bases: <a class="reference internal" href="#capa.inputtypes.InputTypeBase" title="capa.inputtypes.InputTypeBase"><tt class="xref py py-class docutils literal"><span class="pre">capa.inputtypes.InputTypeBase</span></tt></a></p>
+<p>A text line input.  Can do math preview if &#8220;math&#8221;=&#8221;1&#8221; is specified.</p>
+<p>If the hidden attribute is specified, the textline is hidden and the input id is stored in a div with name equal
+to the value of the hidden attribute.  This is used e.g. for embedding simulations turned into questions.</p>
+<dl class="classmethod">
+<dt id="capa.inputtypes.TextLine.get_attributes">
+<em class="property">classmethod </em><tt class="descname">get_attributes</tt><big>(</big><big>)</big><a class="headerlink" href="#capa.inputtypes.TextLine.get_attributes" title="Permalink to this definition">¶</a></dt>
+<dd><p>Register the attributes.</p>
+</dd></dl>
+
+</dd></dl>
+
+<dl class="class">
+<dt id="capa.inputtypes.VseprInput">
+<em class="property">class </em><tt class="descclassname">capa.inputtypes.</tt><tt class="descname">VseprInput</tt><big>(</big><em>system</em>, <em>xml</em>, <em>state</em><big>)</big><a class="reference internal" href="_modules/capa/inputtypes.html#VseprInput"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#capa.inputtypes.VseprInput" title="Permalink to this definition">¶</a></dt>
+<dd><p>Bases: <a class="reference internal" href="#capa.inputtypes.InputTypeBase" title="capa.inputtypes.InputTypeBase"><tt class="xref py py-class docutils literal"><span class="pre">capa.inputtypes.InputTypeBase</span></tt></a></p>
+<p>Input for molecular geometry&#8211;show possible structures, let student
+pick structure and label positions with atoms or electron pairs.</p>
+<dl class="classmethod">
+<dt id="capa.inputtypes.VseprInput.get_attributes">
+<em class="property">classmethod </em><tt class="descname">get_attributes</tt><big>(</big><big>)</big><a class="headerlink" href="#capa.inputtypes.VseprInput.get_attributes" title="Permalink to this definition">¶</a></dt>
+<dd><p>Note: height, width are required.</p>
+</dd></dl>
+
+</dd></dl>
+
+</div>
+<div class="section" id="resposetypes">
+<h2>Resposetypes<a class="headerlink" href="#resposetypes" title="Permalink to this headline">¶</a></h2>
+<span class="target" id="module-capa.responsetypes"></span><p>Problem response evaluation.  Handles checking of student responses, of a variety of types.</p>
+<p>Used by capa_problem.py</p>
+</div>
+</div>
+
+
+          </div>
+        </div>
+      </div>
+      <div class="clearer"></div>
+    </div>
+    <div class="related">
+      <h3>Navigation</h3>
+      <ul>
+        <li class="right" style="margin-right: 10px">
+          <a href="genindex.html" title="General Index"
+             >index</a></li>
+        <li class="right" >
+          <a href="py-modindex.html" title="Python Module Index"
+             >modules</a> |</li>
+        <li class="right" >
+          <a href="chem.html" title="Chem module"
+             >next</a> |</li>
+        <li class="right" >
+          <a href="xmodule.html" title="Xmodule"
+             >previous</a> |</li>
+        <li><a href="index.html">MITx 1.0 documentation</a> &raquo;</li>
+          <li><a href="common-lib.html" >Common / lib</a> &raquo;</li> 
+      </ul>
+    </div>
+    <div class="footer">
+        &copy; Copyright 2012, MITx team.
+      Created using <a href="http://sphinx.pocoo.org/">Sphinx</a> 1.1.3.
+    </div>
+  </body>
+</html>

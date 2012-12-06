@@ -1,0 +1,530 @@
+
+
+<!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Transitional//EN"
+  "http://www.w3.org/TR/xhtml1/DTD/xhtml1-transitional.dtd">
+
+
+<html xmlns="http://www.w3.org/1999/xhtml">
+  <head>
+    <meta http-equiv="Content-Type" content="text/html; charset=utf-8" />
+    
+    <title>capa.chem.chemcalc &mdash; MITx 1.0 documentation</title>
+    
+    <link rel="stylesheet" href="../../../_static/sphinxdoc.css" type="text/css" />
+    <link rel="stylesheet" href="../../../_static/pygments.css" type="text/css" />
+    
+    <script type="text/javascript">
+      var DOCUMENTATION_OPTIONS = {
+        URL_ROOT:    '../../../',
+        VERSION:     '1.0',
+        COLLAPSE_INDEX: false,
+        FILE_SUFFIX: '.html',
+        HAS_SOURCE:  true
+      };
+    </script>
+    <script type="text/javascript" src="../../../_static/jquery.js"></script>
+    <script type="text/javascript" src="../../../_static/underscore.js"></script>
+    <script type="text/javascript" src="../../../_static/doctools.js"></script>
+    <script type="text/javascript" src="http://cdn.mathjax.org/mathjax/latest/MathJax.js?config=TeX-AMS-MML_HTMLorMML"></script>
+    <link rel="top" title="MITx 1.0 documentation" href="../../../index.html" />
+    <link rel="up" title="Module code" href="../../index.html" /> 
+  </head>
+  <body>
+<img src="../../../_static/homepage-bg.jpg" alt="Edx logo"  width="100%;"/>
+
+    <div class="related">
+      <h3>Navigation</h3>
+      <ul>
+        <li class="right" style="margin-right: 10px">
+          <a href="../../../genindex.html" title="General Index"
+             accesskey="I">index</a></li>
+        <li class="right" >
+          <a href="../../../py-modindex.html" title="Python Module Index"
+             >modules</a> |</li>
+        <li><a href="../../../index.html">MITx 1.0 documentation</a> &raquo;</li>
+          <li><a href="../../index.html" accesskey="U">Module code</a> &raquo;</li> 
+      </ul>
+    </div>
+      <div class="sphinxsidebar">
+        <div class="sphinxsidebarwrapper">
+<div id="searchbox" style="display: none">
+  <h3>Quick search</h3>
+    <form class="search" action="../../../search.html" method="get">
+      <input type="text" name="q" />
+      <input type="submit" value="Go" />
+      <input type="hidden" name="check_keywords" value="yes" />
+      <input type="hidden" name="area" value="default" />
+    </form>
+    <p class="searchtip" style="font-size: 90%">
+    Enter search terms or a module, class or function name.
+    </p>
+</div>
+<script type="text/javascript">$('#searchbox').show(0);</script>
+        </div>
+      </div>
+
+    <div class="document">
+      <div class="documentwrapper">
+        <div class="bodywrapper">
+          <div class="body">
+            
+  <h1>Source code for capa.chem.chemcalc</h1><div class="highlight"><pre>
+<span class="kn">from</span> <span class="nn">__future__</span> <span class="kn">import</span> <span class="n">division</span>
+<span class="kn">import</span> <span class="nn">copy</span>
+<span class="kn">from</span> <span class="nn">fractions</span> <span class="kn">import</span> <span class="n">Fraction</span>
+<span class="kn">import</span> <span class="nn">logging</span>
+<span class="kn">import</span> <span class="nn">math</span>
+<span class="kn">import</span> <span class="nn">operator</span>
+<span class="kn">import</span> <span class="nn">re</span>
+<span class="kn">import</span> <span class="nn">numpy</span>
+<span class="kn">import</span> <span class="nn">numbers</span>
+<span class="kn">import</span> <span class="nn">scipy.constants</span>
+
+<span class="kn">from</span> <span class="nn">pyparsing</span> <span class="kn">import</span> <span class="p">(</span><span class="n">Literal</span><span class="p">,</span> <span class="n">Keyword</span><span class="p">,</span> <span class="n">Word</span><span class="p">,</span> <span class="n">nums</span><span class="p">,</span> <span class="n">StringEnd</span><span class="p">,</span> <span class="n">Optional</span><span class="p">,</span>
+                       <span class="n">Forward</span><span class="p">,</span> <span class="n">OneOrMore</span><span class="p">,</span> <span class="n">ParseException</span><span class="p">)</span>
+<span class="kn">import</span> <span class="nn">nltk</span>
+<span class="kn">from</span> <span class="nn">nltk.tree</span> <span class="kn">import</span> <span class="n">Tree</span>
+
+<span class="n">ARROWS</span> <span class="o">=</span> <span class="p">(</span><span class="s">&#39;&lt;-&gt;&#39;</span><span class="p">,</span> <span class="s">&#39;-&gt;&#39;</span><span class="p">)</span>
+
+<span class="c">## Defines a simple pyparsing tokenizer for chemical equations</span>
+<span class="n">elements</span> <span class="o">=</span> <span class="p">[</span><span class="s">&#39;Ac&#39;</span><span class="p">,</span><span class="s">&#39;Ag&#39;</span><span class="p">,</span><span class="s">&#39;Al&#39;</span><span class="p">,</span><span class="s">&#39;Am&#39;</span><span class="p">,</span><span class="s">&#39;Ar&#39;</span><span class="p">,</span><span class="s">&#39;As&#39;</span><span class="p">,</span><span class="s">&#39;At&#39;</span><span class="p">,</span><span class="s">&#39;Au&#39;</span><span class="p">,</span><span class="s">&#39;B&#39;</span><span class="p">,</span><span class="s">&#39;Ba&#39;</span><span class="p">,</span><span class="s">&#39;Be&#39;</span><span class="p">,</span>
+            <span class="s">&#39;Bh&#39;</span><span class="p">,</span><span class="s">&#39;Bi&#39;</span><span class="p">,</span><span class="s">&#39;Bk&#39;</span><span class="p">,</span><span class="s">&#39;Br&#39;</span><span class="p">,</span><span class="s">&#39;C&#39;</span><span class="p">,</span><span class="s">&#39;Ca&#39;</span><span class="p">,</span><span class="s">&#39;Cd&#39;</span><span class="p">,</span><span class="s">&#39;Ce&#39;</span><span class="p">,</span><span class="s">&#39;Cf&#39;</span><span class="p">,</span><span class="s">&#39;Cl&#39;</span><span class="p">,</span><span class="s">&#39;Cm&#39;</span><span class="p">,</span>
+            <span class="s">&#39;Cn&#39;</span><span class="p">,</span><span class="s">&#39;Co&#39;</span><span class="p">,</span><span class="s">&#39;Cr&#39;</span><span class="p">,</span><span class="s">&#39;Cs&#39;</span><span class="p">,</span><span class="s">&#39;Cu&#39;</span><span class="p">,</span><span class="s">&#39;Db&#39;</span><span class="p">,</span><span class="s">&#39;Ds&#39;</span><span class="p">,</span><span class="s">&#39;Dy&#39;</span><span class="p">,</span><span class="s">&#39;Er&#39;</span><span class="p">,</span><span class="s">&#39;Es&#39;</span><span class="p">,</span><span class="s">&#39;Eu&#39;</span><span class="p">,</span>
+            <span class="s">&#39;F&#39;</span><span class="p">,</span><span class="s">&#39;Fe&#39;</span><span class="p">,</span><span class="s">&#39;Fl&#39;</span><span class="p">,</span><span class="s">&#39;Fm&#39;</span><span class="p">,</span><span class="s">&#39;Fr&#39;</span><span class="p">,</span><span class="s">&#39;Ga&#39;</span><span class="p">,</span><span class="s">&#39;Gd&#39;</span><span class="p">,</span><span class="s">&#39;Ge&#39;</span><span class="p">,</span><span class="s">&#39;H&#39;</span><span class="p">,</span><span class="s">&#39;He&#39;</span><span class="p">,</span><span class="s">&#39;Hf&#39;</span><span class="p">,</span>
+            <span class="s">&#39;Hg&#39;</span><span class="p">,</span><span class="s">&#39;Ho&#39;</span><span class="p">,</span><span class="s">&#39;Hs&#39;</span><span class="p">,</span><span class="s">&#39;I&#39;</span><span class="p">,</span><span class="s">&#39;In&#39;</span><span class="p">,</span><span class="s">&#39;Ir&#39;</span><span class="p">,</span><span class="s">&#39;K&#39;</span><span class="p">,</span><span class="s">&#39;Kr&#39;</span><span class="p">,</span><span class="s">&#39;La&#39;</span><span class="p">,</span><span class="s">&#39;Li&#39;</span><span class="p">,</span><span class="s">&#39;Lr&#39;</span><span class="p">,</span>
+            <span class="s">&#39;Lu&#39;</span><span class="p">,</span><span class="s">&#39;Lv&#39;</span><span class="p">,</span><span class="s">&#39;Md&#39;</span><span class="p">,</span><span class="s">&#39;Mg&#39;</span><span class="p">,</span><span class="s">&#39;Mn&#39;</span><span class="p">,</span><span class="s">&#39;Mo&#39;</span><span class="p">,</span><span class="s">&#39;Mt&#39;</span><span class="p">,</span><span class="s">&#39;N&#39;</span><span class="p">,</span><span class="s">&#39;Na&#39;</span><span class="p">,</span><span class="s">&#39;Nb&#39;</span><span class="p">,</span><span class="s">&#39;Nd&#39;</span><span class="p">,</span>
+            <span class="s">&#39;Ne&#39;</span><span class="p">,</span><span class="s">&#39;Ni&#39;</span><span class="p">,</span><span class="s">&#39;No&#39;</span><span class="p">,</span><span class="s">&#39;Np&#39;</span><span class="p">,</span><span class="s">&#39;O&#39;</span><span class="p">,</span><span class="s">&#39;Os&#39;</span><span class="p">,</span><span class="s">&#39;P&#39;</span><span class="p">,</span><span class="s">&#39;Pa&#39;</span><span class="p">,</span><span class="s">&#39;Pb&#39;</span><span class="p">,</span><span class="s">&#39;Pd&#39;</span><span class="p">,</span><span class="s">&#39;Pm&#39;</span><span class="p">,</span>
+            <span class="s">&#39;Po&#39;</span><span class="p">,</span><span class="s">&#39;Pr&#39;</span><span class="p">,</span><span class="s">&#39;Pt&#39;</span><span class="p">,</span><span class="s">&#39;Pu&#39;</span><span class="p">,</span><span class="s">&#39;Ra&#39;</span><span class="p">,</span><span class="s">&#39;Rb&#39;</span><span class="p">,</span><span class="s">&#39;Re&#39;</span><span class="p">,</span><span class="s">&#39;Rf&#39;</span><span class="p">,</span><span class="s">&#39;Rg&#39;</span><span class="p">,</span><span class="s">&#39;Rh&#39;</span><span class="p">,</span><span class="s">&#39;Rn&#39;</span><span class="p">,</span>
+            <span class="s">&#39;Ru&#39;</span><span class="p">,</span><span class="s">&#39;S&#39;</span><span class="p">,</span><span class="s">&#39;Sb&#39;</span><span class="p">,</span><span class="s">&#39;Sc&#39;</span><span class="p">,</span><span class="s">&#39;Se&#39;</span><span class="p">,</span><span class="s">&#39;Sg&#39;</span><span class="p">,</span><span class="s">&#39;Si&#39;</span><span class="p">,</span><span class="s">&#39;Sm&#39;</span><span class="p">,</span><span class="s">&#39;Sn&#39;</span><span class="p">,</span><span class="s">&#39;Sr&#39;</span><span class="p">,</span><span class="s">&#39;Ta&#39;</span><span class="p">,</span>
+            <span class="s">&#39;Tb&#39;</span><span class="p">,</span><span class="s">&#39;Tc&#39;</span><span class="p">,</span><span class="s">&#39;Te&#39;</span><span class="p">,</span><span class="s">&#39;Th&#39;</span><span class="p">,</span><span class="s">&#39;Ti&#39;</span><span class="p">,</span><span class="s">&#39;Tl&#39;</span><span class="p">,</span><span class="s">&#39;Tm&#39;</span><span class="p">,</span><span class="s">&#39;U&#39;</span><span class="p">,</span><span class="s">&#39;Uuo&#39;</span><span class="p">,</span><span class="s">&#39;Uup&#39;</span><span class="p">,</span>
+            <span class="s">&#39;Uus&#39;</span><span class="p">,</span><span class="s">&#39;Uut&#39;</span><span class="p">,</span><span class="s">&#39;V&#39;</span><span class="p">,</span><span class="s">&#39;W&#39;</span><span class="p">,</span><span class="s">&#39;Xe&#39;</span><span class="p">,</span><span class="s">&#39;Y&#39;</span><span class="p">,</span><span class="s">&#39;Yb&#39;</span><span class="p">,</span><span class="s">&#39;Zn&#39;</span><span class="p">,</span><span class="s">&#39;Zr&#39;</span><span class="p">]</span>
+<span class="n">digits</span> <span class="o">=</span> <span class="nb">map</span><span class="p">(</span><span class="nb">str</span><span class="p">,</span> <span class="nb">range</span><span class="p">(</span><span class="mi">10</span><span class="p">))</span>
+<span class="n">symbols</span> <span class="o">=</span> <span class="nb">list</span><span class="p">(</span><span class="s">&quot;[](){}^+-/&quot;</span><span class="p">)</span>
+<span class="n">phases</span> <span class="o">=</span> <span class="p">[</span><span class="s">&quot;(s)&quot;</span><span class="p">,</span> <span class="s">&quot;(l)&quot;</span><span class="p">,</span> <span class="s">&quot;(g)&quot;</span><span class="p">,</span> <span class="s">&quot;(aq)&quot;</span><span class="p">]</span>
+<span class="n">tokens</span> <span class="o">=</span> <span class="nb">reduce</span><span class="p">(</span><span class="k">lambda</span> <span class="n">a</span><span class="p">,</span> <span class="n">b</span><span class="p">:</span> <span class="n">a</span> <span class="o">^</span> <span class="n">b</span><span class="p">,</span> <span class="nb">map</span><span class="p">(</span><span class="n">Literal</span><span class="p">,</span> <span class="n">elements</span> <span class="o">+</span> <span class="n">digits</span> <span class="o">+</span> <span class="n">symbols</span> <span class="o">+</span> <span class="n">phases</span><span class="p">))</span>
+<span class="n">tokenizer</span> <span class="o">=</span> <span class="n">OneOrMore</span><span class="p">(</span><span class="n">tokens</span><span class="p">)</span> <span class="o">+</span> <span class="n">StringEnd</span><span class="p">()</span>
+
+
+<span class="k">def</span> <span class="nf">_orjoin</span><span class="p">(</span><span class="n">l</span><span class="p">):</span>
+    <span class="k">return</span> <span class="s">&quot;&#39;&quot;</span> <span class="o">+</span> <span class="s">&quot;&#39; | &#39;&quot;</span><span class="o">.</span><span class="n">join</span><span class="p">(</span><span class="n">l</span><span class="p">)</span> <span class="o">+</span> <span class="s">&quot;&#39;&quot;</span>
+
+<span class="c">## Defines an NLTK parser for tokenized expressions</span>
+<span class="n">grammar</span> <span class="o">=</span> <span class="s">&quot;&quot;&quot;</span>
+<span class="s">  S -&gt; multimolecule | multimolecule &#39;+&#39; S</span>
+<span class="s">  multimolecule -&gt; count molecule | molecule</span>
+<span class="s">  count -&gt; number | number &#39;/&#39; number</span>
+<span class="s">  molecule -&gt; unphased | unphased phase</span>
+<span class="s">  unphased -&gt; group | paren_group_round | paren_group_square</span>
+<span class="s">  element -&gt; &quot;&quot;&quot;</span> <span class="o">+</span> <span class="n">_orjoin</span><span class="p">(</span><span class="n">elements</span><span class="p">)</span> <span class="o">+</span> <span class="s">&quot;&quot;&quot;</span>
+<span class="s">  digit -&gt; &quot;&quot;&quot;</span> <span class="o">+</span> <span class="n">_orjoin</span><span class="p">(</span><span class="n">digits</span><span class="p">)</span> <span class="o">+</span> <span class="s">&quot;&quot;&quot;</span>
+<span class="s">  phase -&gt; &quot;&quot;&quot;</span> <span class="o">+</span> <span class="n">_orjoin</span><span class="p">(</span><span class="n">phases</span><span class="p">)</span> <span class="o">+</span> <span class="s">&quot;&quot;&quot;</span>
+<span class="s">  number -&gt; digit | digit number</span>
+<span class="s">  group -&gt; suffixed | suffixed group</span>
+<span class="s">  paren_group_round -&gt; &#39;(&#39; group &#39;)&#39;</span>
+<span class="s">  paren_group_square -&gt; &#39;[&#39; group &#39;]&#39;</span>
+<span class="s">  plus_minus -&gt; &#39;+&#39; | &#39;-&#39;</span>
+<span class="s">  number_suffix -&gt; number</span>
+<span class="s">  ion_suffix -&gt; &#39;^&#39; number plus_minus | &#39;^&#39; plus_minus</span>
+<span class="s">  suffix -&gt; number_suffix | number_suffix ion_suffix | ion_suffix</span>
+<span class="s">  unsuffixed -&gt; element | paren_group_round | paren_group_square</span>
+
+<span class="s">  suffixed -&gt; unsuffixed | unsuffixed suffix</span>
+<span class="s">&quot;&quot;&quot;</span>
+<span class="n">parser</span> <span class="o">=</span> <span class="n">nltk</span><span class="o">.</span><span class="n">ChartParser</span><span class="p">(</span><span class="n">nltk</span><span class="o">.</span><span class="n">parse_cfg</span><span class="p">(</span><span class="n">grammar</span><span class="p">))</span>
+
+
+<span class="k">def</span> <span class="nf">_clean_parse_tree</span><span class="p">(</span><span class="n">tree</span><span class="p">):</span>
+    <span class="sd">&#39;&#39;&#39; The parse tree contains a lot of redundant</span>
+<span class="sd">    nodes. E.g. paren_groups have groups as children, etc. This will</span>
+<span class="sd">    clean up the tree.</span>
+<span class="sd">    &#39;&#39;&#39;</span>
+    <span class="k">def</span> <span class="nf">unparse_number</span><span class="p">(</span><span class="n">n</span><span class="p">):</span>
+        <span class="sd">&#39;&#39;&#39; Go from a number parse tree to a number &#39;&#39;&#39;</span>
+        <span class="k">if</span> <span class="nb">len</span><span class="p">(</span><span class="n">n</span><span class="p">)</span> <span class="o">==</span> <span class="mi">1</span><span class="p">:</span>
+            <span class="n">rv</span> <span class="o">=</span> <span class="n">n</span><span class="p">[</span><span class="mi">0</span><span class="p">][</span><span class="mi">0</span><span class="p">]</span>
+        <span class="k">else</span><span class="p">:</span>
+            <span class="n">rv</span> <span class="o">=</span> <span class="n">n</span><span class="p">[</span><span class="mi">0</span><span class="p">][</span><span class="mi">0</span><span class="p">]</span> <span class="o">+</span> <span class="n">unparse_number</span><span class="p">(</span><span class="n">n</span><span class="p">[</span><span class="mi">1</span><span class="p">])</span>
+        <span class="k">return</span> <span class="n">rv</span>
+
+    <span class="k">def</span> <span class="nf">null_tag</span><span class="p">(</span><span class="n">n</span><span class="p">):</span>
+        <span class="sd">&#39;&#39;&#39; Remove a tag &#39;&#39;&#39;</span>
+        <span class="k">return</span> <span class="n">n</span><span class="p">[</span><span class="mi">0</span><span class="p">]</span>
+
+    <span class="k">def</span> <span class="nf">ion_suffix</span><span class="p">(</span><span class="n">n</span><span class="p">):</span>
+        <span class="sd">&#39;&#39;&#39;1. &quot;if&quot; part handles special case</span>
+<span class="sd">           2. &quot;else&quot; part is general behaviour &#39;&#39;&#39;</span>
+
+        <span class="k">if</span> <span class="n">n</span><span class="p">[</span><span class="mi">1</span><span class="p">:][</span><span class="mi">0</span><span class="p">]</span><span class="o">.</span><span class="n">node</span> <span class="o">==</span> <span class="s">&#39;number&#39;</span> <span class="ow">and</span> <span class="n">n</span><span class="p">[</span><span class="mi">1</span><span class="p">:][</span><span class="mi">0</span><span class="p">][</span><span class="mi">0</span><span class="p">][</span><span class="mi">0</span><span class="p">]</span> <span class="o">==</span> <span class="s">&#39;1&#39;</span><span class="p">:</span>
+            <span class="c"># if suffix is explicitly 1, like ^1-</span>
+            <span class="c"># strip 1, leave only sign: ^-</span>
+            <span class="k">return</span> <span class="n">nltk</span><span class="o">.</span><span class="n">tree</span><span class="o">.</span><span class="n">Tree</span><span class="p">(</span><span class="n">n</span><span class="o">.</span><span class="n">node</span><span class="p">,</span> <span class="n">n</span><span class="p">[</span><span class="mi">2</span><span class="p">:])</span>
+        <span class="k">else</span><span class="p">:</span>
+            <span class="k">return</span> <span class="n">nltk</span><span class="o">.</span><span class="n">tree</span><span class="o">.</span><span class="n">Tree</span><span class="p">(</span><span class="n">n</span><span class="o">.</span><span class="n">node</span><span class="p">,</span> <span class="n">n</span><span class="p">[</span><span class="mi">1</span><span class="p">:])</span>
+
+    <span class="n">dispatch</span> <span class="o">=</span> <span class="p">{</span><span class="s">&#39;number&#39;</span><span class="p">:</span> <span class="k">lambda</span> <span class="n">x</span><span class="p">:</span> <span class="n">nltk</span><span class="o">.</span><span class="n">tree</span><span class="o">.</span><span class="n">Tree</span><span class="p">(</span><span class="s">&quot;number&quot;</span><span class="p">,</span> <span class="p">[</span><span class="n">unparse_number</span><span class="p">(</span><span class="n">x</span><span class="p">)]),</span>
+                <span class="s">&#39;unphased&#39;</span><span class="p">:</span> <span class="n">null_tag</span><span class="p">,</span>
+                <span class="s">&#39;unsuffixed&#39;</span><span class="p">:</span> <span class="n">null_tag</span><span class="p">,</span>
+                <span class="s">&#39;number_suffix&#39;</span><span class="p">:</span> <span class="k">lambda</span> <span class="n">x</span><span class="p">:</span> <span class="n">nltk</span><span class="o">.</span><span class="n">tree</span><span class="o">.</span><span class="n">Tree</span><span class="p">(</span><span class="s">&#39;number_suffix&#39;</span><span class="p">,</span> <span class="p">[</span><span class="n">unparse_number</span><span class="p">(</span><span class="n">x</span><span class="p">[</span><span class="mi">0</span><span class="p">])]),</span>
+                <span class="s">&#39;suffixed&#39;</span><span class="p">:</span> <span class="k">lambda</span> <span class="n">x</span><span class="p">:</span> <span class="nb">len</span><span class="p">(</span><span class="n">x</span><span class="p">)</span> <span class="o">&gt;</span> <span class="mi">1</span> <span class="ow">and</span> <span class="n">x</span> <span class="ow">or</span> <span class="n">x</span><span class="p">[</span><span class="mi">0</span><span class="p">],</span>
+                <span class="s">&#39;ion_suffix&#39;</span><span class="p">:</span> <span class="n">ion_suffix</span><span class="p">,</span>
+                <span class="s">&#39;paren_group_square&#39;</span><span class="p">:</span> <span class="k">lambda</span> <span class="n">x</span><span class="p">:</span> <span class="n">nltk</span><span class="o">.</span><span class="n">tree</span><span class="o">.</span><span class="n">Tree</span><span class="p">(</span><span class="n">x</span><span class="o">.</span><span class="n">node</span><span class="p">,</span> <span class="n">x</span><span class="p">[</span><span class="mi">1</span><span class="p">]),</span>
+                <span class="s">&#39;paren_group_round&#39;</span><span class="p">:</span> <span class="k">lambda</span> <span class="n">x</span><span class="p">:</span> <span class="n">nltk</span><span class="o">.</span><span class="n">tree</span><span class="o">.</span><span class="n">Tree</span><span class="p">(</span><span class="n">x</span><span class="o">.</span><span class="n">node</span><span class="p">,</span> <span class="n">x</span><span class="p">[</span><span class="mi">1</span><span class="p">])}</span>
+
+    <span class="k">if</span> <span class="nb">type</span><span class="p">(</span><span class="n">tree</span><span class="p">)</span> <span class="o">==</span> <span class="nb">str</span><span class="p">:</span>
+        <span class="k">return</span> <span class="n">tree</span>
+
+    <span class="n">old_node</span> <span class="o">=</span> <span class="bp">None</span>
+    <span class="c">## This loop means that if a node is processed, and returns a child,</span>
+    <span class="c">## the child will be processed.</span>
+    <span class="k">while</span> <span class="n">tree</span><span class="o">.</span><span class="n">node</span> <span class="ow">in</span> <span class="n">dispatch</span> <span class="ow">and</span> <span class="n">tree</span><span class="o">.</span><span class="n">node</span> <span class="o">!=</span> <span class="n">old_node</span><span class="p">:</span>
+        <span class="n">old_node</span> <span class="o">=</span> <span class="n">tree</span><span class="o">.</span><span class="n">node</span>
+        <span class="n">tree</span> <span class="o">=</span> <span class="n">dispatch</span><span class="p">[</span><span class="n">tree</span><span class="o">.</span><span class="n">node</span><span class="p">](</span><span class="n">tree</span><span class="p">)</span>
+
+    <span class="n">children</span> <span class="o">=</span> <span class="p">[]</span>
+    <span class="k">for</span> <span class="n">child</span> <span class="ow">in</span> <span class="n">tree</span><span class="p">:</span>
+        <span class="n">child</span> <span class="o">=</span> <span class="n">_clean_parse_tree</span><span class="p">(</span><span class="n">child</span><span class="p">)</span>
+        <span class="n">children</span><span class="o">.</span><span class="n">append</span><span class="p">(</span><span class="n">child</span><span class="p">)</span>
+
+    <span class="n">tree</span> <span class="o">=</span> <span class="n">nltk</span><span class="o">.</span><span class="n">tree</span><span class="o">.</span><span class="n">Tree</span><span class="p">(</span><span class="n">tree</span><span class="o">.</span><span class="n">node</span><span class="p">,</span> <span class="n">children</span><span class="p">)</span>
+
+    <span class="k">return</span> <span class="n">tree</span>
+
+
+<span class="k">def</span> <span class="nf">_merge_children</span><span class="p">(</span><span class="n">tree</span><span class="p">,</span> <span class="n">tags</span><span class="p">):</span>
+    <span class="sd">&#39;&#39;&#39; nltk, by documentation, cannot do arbitrary length</span>
+<span class="sd">    groups. Instead of:</span>
+<span class="sd">    (group 1 2 3 4)</span>
+<span class="sd">    It has to handle this recursively:</span>
+<span class="sd">    (group 1 (group 2 (group 3 (group 4))))</span>
+<span class="sd">    We do the cleanup of converting from the latter to the former.</span>
+<span class="sd">    &#39;&#39;&#39;</span>
+    <span class="k">if</span> <span class="n">tree</span> <span class="ow">is</span> <span class="bp">None</span><span class="p">:</span>
+        <span class="c"># There was a problem--shouldn&#39;t have empty trees (NOTE: see this with input e.g. &#39;H2O(&#39;, or &#39;Xe+&#39;).</span>
+        <span class="c"># Haven&#39;t grokked the code to tell if this is indeed the right thing to do.</span>
+        <span class="k">raise</span> <span class="n">ParseException</span><span class="p">(</span><span class="s">&quot;Shouldn&#39;t have empty trees&quot;</span><span class="p">)</span>
+
+    <span class="k">if</span> <span class="nb">type</span><span class="p">(</span><span class="n">tree</span><span class="p">)</span> <span class="o">==</span> <span class="nb">str</span><span class="p">:</span>
+        <span class="k">return</span> <span class="n">tree</span>
+
+    <span class="n">merged_children</span> <span class="o">=</span> <span class="p">[]</span>
+    <span class="n">done</span> <span class="o">=</span> <span class="bp">False</span>
+    <span class="c">#print &#39;00000&#39;, tree</span>
+    <span class="c">## Merge current tag</span>
+    <span class="k">while</span> <span class="ow">not</span> <span class="n">done</span><span class="p">:</span>
+        <span class="n">done</span> <span class="o">=</span> <span class="bp">True</span>
+        <span class="k">for</span> <span class="n">child</span> <span class="ow">in</span> <span class="n">tree</span><span class="p">:</span>
+            <span class="k">if</span> <span class="nb">type</span><span class="p">(</span><span class="n">child</span><span class="p">)</span> <span class="o">==</span> <span class="n">nltk</span><span class="o">.</span><span class="n">tree</span><span class="o">.</span><span class="n">Tree</span> <span class="ow">and</span> <span class="n">child</span><span class="o">.</span><span class="n">node</span> <span class="o">==</span> <span class="n">tree</span><span class="o">.</span><span class="n">node</span> <span class="ow">and</span> <span class="n">tree</span><span class="o">.</span><span class="n">node</span> <span class="ow">in</span> <span class="n">tags</span><span class="p">:</span>
+                <span class="n">merged_children</span> <span class="o">=</span> <span class="n">merged_children</span> <span class="o">+</span> <span class="nb">list</span><span class="p">(</span><span class="n">child</span><span class="p">)</span>
+                <span class="n">done</span> <span class="o">=</span> <span class="bp">False</span>
+            <span class="k">else</span><span class="p">:</span>
+                <span class="n">merged_children</span> <span class="o">=</span> <span class="n">merged_children</span> <span class="o">+</span> <span class="p">[</span><span class="n">child</span><span class="p">]</span>
+        <span class="n">tree</span> <span class="o">=</span> <span class="n">nltk</span><span class="o">.</span><span class="n">tree</span><span class="o">.</span><span class="n">Tree</span><span class="p">(</span><span class="n">tree</span><span class="o">.</span><span class="n">node</span><span class="p">,</span> <span class="n">merged_children</span><span class="p">)</span>
+        <span class="n">merged_children</span> <span class="o">=</span> <span class="p">[]</span>
+    <span class="c">#print &#39;======&#39;,tree</span>
+
+    <span class="c"># And recurse</span>
+    <span class="n">children</span> <span class="o">=</span> <span class="p">[]</span>
+    <span class="k">for</span> <span class="n">child</span> <span class="ow">in</span> <span class="n">tree</span><span class="p">:</span>
+        <span class="n">children</span><span class="o">.</span><span class="n">append</span><span class="p">(</span><span class="n">_merge_children</span><span class="p">(</span><span class="n">child</span><span class="p">,</span> <span class="n">tags</span><span class="p">))</span>
+
+    <span class="c">#return tree</span>
+    <span class="k">return</span> <span class="n">nltk</span><span class="o">.</span><span class="n">tree</span><span class="o">.</span><span class="n">Tree</span><span class="p">(</span><span class="n">tree</span><span class="o">.</span><span class="n">node</span><span class="p">,</span> <span class="n">children</span><span class="p">)</span>
+
+
+<span class="k">def</span> <span class="nf">_render_to_html</span><span class="p">(</span><span class="n">tree</span><span class="p">):</span>
+    <span class="sd">&#39;&#39;&#39; Renders a cleaned tree to HTML &#39;&#39;&#39;</span>
+
+    <span class="k">def</span> <span class="nf">molecule_count</span><span class="p">(</span><span class="n">tree</span><span class="p">,</span> <span class="n">children</span><span class="p">):</span>
+        <span class="c"># If an integer, return that integer</span>
+        <span class="k">if</span> <span class="nb">len</span><span class="p">(</span><span class="n">tree</span><span class="p">)</span> <span class="o">==</span> <span class="mi">1</span><span class="p">:</span>
+            <span class="k">return</span> <span class="n">tree</span><span class="p">[</span><span class="mi">0</span><span class="p">][</span><span class="mi">0</span><span class="p">]</span>
+        <span class="c"># If a fraction, return the fraction</span>
+        <span class="k">if</span> <span class="nb">len</span><span class="p">(</span><span class="n">tree</span><span class="p">)</span> <span class="o">==</span> <span class="mi">3</span><span class="p">:</span>
+            <span class="k">return</span> <span class="s">&quot; &lt;sup&gt;{num}&lt;/sup&gt;&amp;frasl;&lt;sub&gt;{den}&lt;/sub&gt; &quot;</span><span class="o">.</span><span class="n">format</span><span class="p">(</span><span class="n">num</span><span class="o">=</span><span class="n">tree</span><span class="p">[</span><span class="mi">0</span><span class="p">][</span><span class="mi">0</span><span class="p">],</span> <span class="n">den</span><span class="o">=</span><span class="n">tree</span><span class="p">[</span><span class="mi">2</span><span class="p">][</span><span class="mi">0</span><span class="p">])</span>
+        <span class="k">return</span> <span class="s">&quot;Error&quot;</span>
+
+    <span class="k">def</span> <span class="nf">subscript</span><span class="p">(</span><span class="n">tree</span><span class="p">,</span> <span class="n">children</span><span class="p">):</span>
+        <span class="k">return</span> <span class="s">&quot;&lt;sub&gt;{sub}&lt;/sub&gt;&quot;</span><span class="o">.</span><span class="n">format</span><span class="p">(</span><span class="n">sub</span><span class="o">=</span><span class="n">children</span><span class="p">)</span>
+
+    <span class="k">def</span> <span class="nf">superscript</span><span class="p">(</span><span class="n">tree</span><span class="p">,</span> <span class="n">children</span><span class="p">):</span>
+        <span class="k">return</span> <span class="s">&quot;&lt;sup&gt;{sup}&lt;/sup&gt;&quot;</span><span class="o">.</span><span class="n">format</span><span class="p">(</span><span class="n">sup</span><span class="o">=</span><span class="n">children</span><span class="p">)</span>
+
+    <span class="k">def</span> <span class="nf">round_brackets</span><span class="p">(</span><span class="n">tree</span><span class="p">,</span> <span class="n">children</span><span class="p">):</span>
+        <span class="k">return</span> <span class="s">&quot;({insider})&quot;</span><span class="o">.</span><span class="n">format</span><span class="p">(</span><span class="n">insider</span><span class="o">=</span><span class="n">children</span><span class="p">)</span>
+
+    <span class="k">def</span> <span class="nf">square_brackets</span><span class="p">(</span><span class="n">tree</span><span class="p">,</span> <span class="n">children</span><span class="p">):</span>
+        <span class="k">return</span> <span class="s">&quot;[{insider}]&quot;</span><span class="o">.</span><span class="n">format</span><span class="p">(</span><span class="n">insider</span><span class="o">=</span><span class="n">children</span><span class="p">)</span>
+
+    <span class="n">dispatch</span> <span class="o">=</span> <span class="p">{</span><span class="s">&#39;count&#39;</span><span class="p">:</span> <span class="n">molecule_count</span><span class="p">,</span>
+                <span class="s">&#39;number_suffix&#39;</span><span class="p">:</span> <span class="n">subscript</span><span class="p">,</span>
+                <span class="s">&#39;ion_suffix&#39;</span><span class="p">:</span> <span class="n">superscript</span><span class="p">,</span>
+                <span class="s">&#39;paren_group_round&#39;</span><span class="p">:</span> <span class="n">round_brackets</span><span class="p">,</span>
+                <span class="s">&#39;paren_group_square&#39;</span><span class="p">:</span> <span class="n">square_brackets</span><span class="p">}</span>
+
+    <span class="k">if</span> <span class="nb">type</span><span class="p">(</span><span class="n">tree</span><span class="p">)</span> <span class="o">==</span> <span class="nb">str</span><span class="p">:</span>
+        <span class="k">return</span> <span class="n">tree</span>
+    <span class="k">else</span><span class="p">:</span>
+        <span class="n">children</span> <span class="o">=</span> <span class="s">&quot;&quot;</span><span class="o">.</span><span class="n">join</span><span class="p">(</span><span class="nb">map</span><span class="p">(</span><span class="n">_render_to_html</span><span class="p">,</span> <span class="n">tree</span><span class="p">))</span>
+        <span class="k">if</span> <span class="n">tree</span><span class="o">.</span><span class="n">node</span> <span class="ow">in</span> <span class="n">dispatch</span><span class="p">:</span>
+            <span class="k">return</span> <span class="n">dispatch</span><span class="p">[</span><span class="n">tree</span><span class="o">.</span><span class="n">node</span><span class="p">](</span><span class="n">tree</span><span class="p">,</span> <span class="n">children</span><span class="p">)</span>
+        <span class="k">else</span><span class="p">:</span>
+            <span class="k">return</span> <span class="n">children</span><span class="o">.</span><span class="n">replace</span><span class="p">(</span><span class="s">&#39; &#39;</span><span class="p">,</span> <span class="s">&#39;&#39;</span><span class="p">)</span>
+
+
+
+<div class="viewcode-block" id="render_to_html"><a class="viewcode-back" href="../../../chem.html#capa.chem.chemcalc.render_to_html">[docs]</a><span class="k">def</span> <span class="nf">render_to_html</span><span class="p">(</span><span class="n">eq</span><span class="p">):</span>
+    <span class="sd">&#39;&#39;&#39;</span>
+<span class="sd">    Render a chemical equation string to html.</span>
+
+<span class="sd">    Renders each molecule separately, and returns invalid input wrapped in a &lt;span&gt;.</span>
+<span class="sd">    &#39;&#39;&#39;</span>
+    <span class="k">def</span> <span class="nf">err</span><span class="p">(</span><span class="n">s</span><span class="p">):</span>
+        <span class="s">&quot;Render as an error span&quot;</span>
+        <span class="k">return</span> <span class="s">&#39;&lt;span class=&quot;inline-error inline&quot;&gt;{0}&lt;/span&gt;&#39;</span><span class="o">.</span><span class="n">format</span><span class="p">(</span><span class="n">s</span><span class="p">)</span>
+
+    <span class="k">def</span> <span class="nf">render_arrow</span><span class="p">(</span><span class="n">arrow</span><span class="p">):</span>
+        <span class="sd">&quot;&quot;&quot;Turn text arrows into pretty ones&quot;&quot;&quot;</span>
+        <span class="k">if</span> <span class="n">arrow</span> <span class="o">==</span> <span class="s">&#39;-&gt;&#39;</span><span class="p">:</span>
+            <span class="k">return</span> <span class="s">u&#39;</span><span class="se">\u2192</span><span class="s">&#39;</span>
+        <span class="k">if</span> <span class="n">arrow</span> <span class="o">==</span> <span class="s">&#39;&lt;-&gt;&#39;</span><span class="p">:</span>
+            <span class="k">return</span> <span class="s">u&#39;</span><span class="se">\u2194</span><span class="s">&#39;</span>
+
+        <span class="c"># this won&#39;t be reached unless we add more arrow types, but keep it to avoid explosions when</span>
+        <span class="c"># that happens.</span>
+        <span class="k">return</span> <span class="n">arrow</span>
+
+    <span class="k">def</span> <span class="nf">render_expression</span><span class="p">(</span><span class="n">ex</span><span class="p">):</span>
+        <span class="sd">&quot;&quot;&quot;</span>
+<span class="sd">        Render a chemical expression--no arrows.</span>
+<span class="sd">        &quot;&quot;&quot;</span>
+        <span class="k">try</span><span class="p">:</span>
+            <span class="k">return</span> <span class="n">_render_to_html</span><span class="p">(</span><span class="n">_get_final_tree</span><span class="p">(</span><span class="n">ex</span><span class="p">))</span>
+        <span class="k">except</span> <span class="n">ParseException</span><span class="p">:</span>
+            <span class="k">return</span> <span class="n">err</span><span class="p">(</span><span class="n">ex</span><span class="p">)</span>
+
+    <span class="k">def</span> <span class="nf">spanify</span><span class="p">(</span><span class="n">s</span><span class="p">):</span>
+        <span class="k">return</span> <span class="s">u&#39;&lt;span class=&quot;math&quot;&gt;{0}&lt;/span&gt;&#39;</span><span class="o">.</span><span class="n">format</span><span class="p">(</span><span class="n">s</span><span class="p">)</span>
+
+    <span class="n">left</span><span class="p">,</span> <span class="n">arrow</span><span class="p">,</span> <span class="n">right</span> <span class="o">=</span> <span class="n">split_on_arrow</span><span class="p">(</span><span class="n">eq</span><span class="p">)</span>
+    <span class="k">if</span> <span class="n">arrow</span> <span class="o">==</span> <span class="s">&#39;&#39;</span><span class="p">:</span>
+        <span class="c"># only one side</span>
+        <span class="k">return</span> <span class="n">spanify</span><span class="p">(</span><span class="n">render_expression</span><span class="p">(</span><span class="n">left</span><span class="p">))</span>
+
+
+    <span class="k">return</span> <span class="n">spanify</span><span class="p">(</span><span class="n">render_expression</span><span class="p">(</span><span class="n">left</span><span class="p">)</span> <span class="o">+</span> <span class="n">render_arrow</span><span class="p">(</span><span class="n">arrow</span><span class="p">)</span> <span class="o">+</span> <span class="n">render_expression</span><span class="p">(</span><span class="n">right</span><span class="p">))</span>
+
+</div>
+<span class="k">def</span> <span class="nf">_get_final_tree</span><span class="p">(</span><span class="n">s</span><span class="p">):</span>
+    <span class="sd">&#39;&#39;&#39;</span>
+<span class="sd">    Return final tree after merge and clean.</span>
+
+<span class="sd">    Raises pyparsing.ParseException if s is invalid.</span>
+<span class="sd">    &#39;&#39;&#39;</span>
+    <span class="n">tokenized</span> <span class="o">=</span> <span class="n">tokenizer</span><span class="o">.</span><span class="n">parseString</span><span class="p">(</span><span class="n">s</span><span class="p">)</span>
+    <span class="n">parsed</span> <span class="o">=</span> <span class="n">parser</span><span class="o">.</span><span class="n">parse</span><span class="p">(</span><span class="n">tokenized</span><span class="p">)</span>
+    <span class="n">merged</span> <span class="o">=</span> <span class="n">_merge_children</span><span class="p">(</span><span class="n">parsed</span><span class="p">,</span> <span class="p">{</span><span class="s">&#39;S&#39;</span><span class="p">,</span><span class="s">&#39;group&#39;</span><span class="p">})</span>
+    <span class="n">final</span> <span class="o">=</span> <span class="n">_clean_parse_tree</span><span class="p">(</span><span class="n">merged</span><span class="p">)</span>
+    <span class="k">return</span> <span class="n">final</span>
+
+
+<span class="k">def</span> <span class="nf">_check_equality</span><span class="p">(</span><span class="n">tuple1</span><span class="p">,</span> <span class="n">tuple2</span><span class="p">):</span>
+    <span class="sd">&#39;&#39;&#39; return True if tuples of multimolecules are equal &#39;&#39;&#39;</span>
+    <span class="n">list1</span> <span class="o">=</span> <span class="nb">list</span><span class="p">(</span><span class="n">tuple1</span><span class="p">)</span>
+    <span class="n">list2</span> <span class="o">=</span> <span class="nb">list</span><span class="p">(</span><span class="n">tuple2</span><span class="p">)</span>
+
+    <span class="c"># Hypo: trees where are levels count+molecule vs just molecule</span>
+    <span class="c"># cannot be sorted properly (tested on test_complex_additivity)</span>
+    <span class="c"># But without factors and phases sorting seems to work.</span>
+
+    <span class="c"># Also for lists of multimolecules without factors and phases</span>
+    <span class="c"># sorting seems to work fine.</span>
+    <span class="n">list1</span><span class="o">.</span><span class="n">sort</span><span class="p">()</span>
+    <span class="n">list2</span><span class="o">.</span><span class="n">sort</span><span class="p">()</span>
+    <span class="k">return</span> <span class="n">list1</span> <span class="o">==</span> <span class="n">list2</span>
+
+
+<div class="viewcode-block" id="compare_chemical_expression"><a class="viewcode-back" href="../../../chem.html#capa.chem.chemcalc.compare_chemical_expression">[docs]</a><span class="k">def</span> <span class="nf">compare_chemical_expression</span><span class="p">(</span><span class="n">s1</span><span class="p">,</span> <span class="n">s2</span><span class="p">,</span> <span class="n">ignore_state</span><span class="o">=</span><span class="bp">False</span><span class="p">):</span>
+    <span class="sd">&#39;&#39;&#39; It does comparison between two expressions.</span>
+<span class="sd">        It uses divide_chemical_expression and check if division is 1</span>
+<span class="sd">    &#39;&#39;&#39;</span>
+    <span class="k">return</span> <span class="n">divide_chemical_expression</span><span class="p">(</span><span class="n">s1</span><span class="p">,</span> <span class="n">s2</span><span class="p">,</span> <span class="n">ignore_state</span><span class="p">)</span> <span class="o">==</span> <span class="mi">1</span>
+
+</div>
+<div class="viewcode-block" id="divide_chemical_expression"><a class="viewcode-back" href="../../../chem.html#capa.chem.chemcalc.divide_chemical_expression">[docs]</a><span class="k">def</span> <span class="nf">divide_chemical_expression</span><span class="p">(</span><span class="n">s1</span><span class="p">,</span> <span class="n">s2</span><span class="p">,</span> <span class="n">ignore_state</span><span class="o">=</span><span class="bp">False</span><span class="p">):</span>
+    <span class="sd">&#39;&#39;&#39;Compare two chemical expressions for equivalence up to a multiplicative factor:</span>
+
+<span class="sd">    - If they are not the same chemicals, returns False.</span>
+<span class="sd">    - If they are the same, &quot;divide&quot; s1 by s2 to returns a factor x such that s1 / s2 == x as a Fraction object.</span>
+<span class="sd">    - if ignore_state is True, ignores phases when doing the comparison.</span>
+
+<span class="sd">    Examples:</span>
+<span class="sd">    divide_chemical_expression(&quot;H2O&quot;, &quot;3H2O&quot;) -&gt; Fraction(1,3)</span>
+<span class="sd">    divide_chemical_expression(&quot;3H2O&quot;, &quot;H2O&quot;) -&gt; 3  # actually Fraction(3, 1), but compares == to 3.</span>
+<span class="sd">    divide_chemical_expression(&quot;2H2O(s) + 2CO2&quot;, &quot;H2O(s)+CO2&quot;) -&gt; 2</span>
+<span class="sd">    divide_chemical_expression(&quot;H2O(s) + CO2&quot;, &quot;3H2O(s)+2CO2&quot;) -&gt; False</span>
+
+<span class="sd">    Implementation sketch:</span>
+<span class="sd">        - extract factors and phases to standalone lists,</span>
+<span class="sd">        - compare expressions without factors and phases,</span>
+<span class="sd">        - divide lists of factors for each other and check</span>
+<span class="sd">             for equality of every element in list,</span>
+<span class="sd">        - return result of factor division</span>
+
+<span class="sd">    &#39;&#39;&#39;</span>
+
+    <span class="c"># parsed final trees</span>
+    <span class="n">treedic</span> <span class="o">=</span> <span class="p">{}</span>
+    <span class="n">treedic</span><span class="p">[</span><span class="s">&#39;1&#39;</span><span class="p">]</span> <span class="o">=</span> <span class="n">_get_final_tree</span><span class="p">(</span><span class="n">s1</span><span class="p">)</span>
+    <span class="n">treedic</span><span class="p">[</span><span class="s">&#39;2&#39;</span><span class="p">]</span> <span class="o">=</span> <span class="n">_get_final_tree</span><span class="p">(</span><span class="n">s2</span><span class="p">)</span>
+
+    <span class="c"># strip phases and factors</span>
+    <span class="c"># collect factors in list</span>
+    <span class="k">for</span> <span class="n">i</span> <span class="ow">in</span> <span class="p">(</span><span class="s">&#39;1&#39;</span><span class="p">,</span> <span class="s">&#39;2&#39;</span><span class="p">):</span>
+        <span class="n">treedic</span><span class="p">[</span><span class="n">i</span> <span class="o">+</span> <span class="s">&#39; cleaned_mm_list&#39;</span><span class="p">]</span> <span class="o">=</span> <span class="p">[]</span>
+        <span class="n">treedic</span><span class="p">[</span><span class="n">i</span> <span class="o">+</span> <span class="s">&#39; factors&#39;</span><span class="p">]</span> <span class="o">=</span> <span class="p">[]</span>
+        <span class="n">treedic</span><span class="p">[</span><span class="n">i</span> <span class="o">+</span> <span class="s">&#39; phases&#39;</span><span class="p">]</span> <span class="o">=</span> <span class="p">[]</span>
+        <span class="k">for</span> <span class="n">el</span> <span class="ow">in</span> <span class="n">treedic</span><span class="p">[</span><span class="n">i</span><span class="p">]</span><span class="o">.</span><span class="n">subtrees</span><span class="p">(</span><span class="nb">filter</span><span class="o">=</span><span class="k">lambda</span> <span class="n">t</span><span class="p">:</span> <span class="n">t</span><span class="o">.</span><span class="n">node</span> <span class="o">==</span> <span class="s">&#39;multimolecule&#39;</span><span class="p">):</span>
+            <span class="n">count_subtree</span> <span class="o">=</span> <span class="p">[</span><span class="n">t</span> <span class="k">for</span> <span class="n">t</span> <span class="ow">in</span> <span class="n">el</span><span class="o">.</span><span class="n">subtrees</span><span class="p">()</span> <span class="k">if</span> <span class="n">t</span><span class="o">.</span><span class="n">node</span> <span class="o">==</span> <span class="s">&#39;count&#39;</span><span class="p">]</span>
+            <span class="n">group_subtree</span> <span class="o">=</span> <span class="p">[</span><span class="n">t</span> <span class="k">for</span> <span class="n">t</span> <span class="ow">in</span> <span class="n">el</span><span class="o">.</span><span class="n">subtrees</span><span class="p">()</span> <span class="k">if</span> <span class="n">t</span><span class="o">.</span><span class="n">node</span> <span class="o">==</span> <span class="s">&#39;group&#39;</span><span class="p">]</span>
+            <span class="n">phase_subtree</span> <span class="o">=</span> <span class="p">[</span><span class="n">t</span> <span class="k">for</span> <span class="n">t</span> <span class="ow">in</span> <span class="n">el</span><span class="o">.</span><span class="n">subtrees</span><span class="p">()</span> <span class="k">if</span> <span class="n">t</span><span class="o">.</span><span class="n">node</span> <span class="o">==</span> <span class="s">&#39;phase&#39;</span><span class="p">]</span>
+            <span class="k">if</span> <span class="n">count_subtree</span><span class="p">:</span>
+                <span class="k">if</span> <span class="nb">len</span><span class="p">(</span><span class="n">count_subtree</span><span class="p">[</span><span class="mi">0</span><span class="p">])</span> <span class="o">&gt;</span> <span class="mi">1</span><span class="p">:</span>
+                    <span class="n">treedic</span><span class="p">[</span><span class="n">i</span> <span class="o">+</span> <span class="s">&#39; factors&#39;</span><span class="p">]</span><span class="o">.</span><span class="n">append</span><span class="p">(</span>
+                        <span class="nb">int</span><span class="p">(</span><span class="n">count_subtree</span><span class="p">[</span><span class="mi">0</span><span class="p">][</span><span class="mi">0</span><span class="p">][</span><span class="mi">0</span><span class="p">])</span> <span class="o">/</span>
+                        <span class="nb">int</span><span class="p">(</span><span class="n">count_subtree</span><span class="p">[</span><span class="mi">0</span><span class="p">][</span><span class="mi">2</span><span class="p">][</span><span class="mi">0</span><span class="p">]))</span>
+                <span class="k">else</span><span class="p">:</span>
+                    <span class="n">treedic</span><span class="p">[</span><span class="n">i</span> <span class="o">+</span> <span class="s">&#39; factors&#39;</span><span class="p">]</span><span class="o">.</span><span class="n">append</span><span class="p">(</span><span class="nb">int</span><span class="p">(</span><span class="n">count_subtree</span><span class="p">[</span><span class="mi">0</span><span class="p">][</span><span class="mi">0</span><span class="p">][</span><span class="mi">0</span><span class="p">]))</span>
+            <span class="k">else</span><span class="p">:</span>
+                <span class="n">treedic</span><span class="p">[</span><span class="n">i</span> <span class="o">+</span> <span class="s">&#39; factors&#39;</span><span class="p">]</span><span class="o">.</span><span class="n">append</span><span class="p">(</span><span class="mf">1.0</span><span class="p">)</span>
+            <span class="k">if</span> <span class="n">phase_subtree</span><span class="p">:</span>
+                <span class="n">treedic</span><span class="p">[</span><span class="n">i</span> <span class="o">+</span> <span class="s">&#39; phases&#39;</span><span class="p">]</span><span class="o">.</span><span class="n">append</span><span class="p">(</span><span class="n">phase_subtree</span><span class="p">[</span><span class="mi">0</span><span class="p">][</span><span class="mi">0</span><span class="p">])</span>
+            <span class="k">else</span><span class="p">:</span>
+                <span class="n">treedic</span><span class="p">[</span><span class="n">i</span> <span class="o">+</span> <span class="s">&#39; phases&#39;</span><span class="p">]</span><span class="o">.</span><span class="n">append</span><span class="p">(</span><span class="s">&#39; &#39;</span><span class="p">)</span>
+            <span class="n">treedic</span><span class="p">[</span><span class="n">i</span> <span class="o">+</span> <span class="s">&#39; cleaned_mm_list&#39;</span><span class="p">]</span><span class="o">.</span><span class="n">append</span><span class="p">(</span>
+                <span class="n">Tree</span><span class="p">(</span><span class="s">&#39;multimolecule&#39;</span><span class="p">,</span> <span class="p">[</span><span class="n">Tree</span><span class="p">(</span><span class="s">&#39;molecule&#39;</span><span class="p">,</span> <span class="n">group_subtree</span><span class="p">)]))</span>
+
+    <span class="c"># order of factors and phases must mirror the order of multimolecules,</span>
+    <span class="c"># use &#39;decorate, sort, undecorate&#39; pattern</span>
+    <span class="n">treedic</span><span class="p">[</span><span class="s">&#39;1 cleaned_mm_list&#39;</span><span class="p">],</span> <span class="n">treedic</span><span class="p">[</span><span class="s">&#39;1 factors&#39;</span><span class="p">],</span> <span class="n">treedic</span><span class="p">[</span><span class="s">&#39;1 phases&#39;</span><span class="p">]</span> <span class="o">=</span> <span class="nb">zip</span><span class="p">(</span>
+        <span class="o">*</span><span class="nb">sorted</span><span class="p">(</span><span class="nb">zip</span><span class="p">(</span><span class="n">treedic</span><span class="p">[</span><span class="s">&#39;1 cleaned_mm_list&#39;</span><span class="p">],</span> <span class="n">treedic</span><span class="p">[</span><span class="s">&#39;1 factors&#39;</span><span class="p">],</span> <span class="n">treedic</span><span class="p">[</span><span class="s">&#39;1 phases&#39;</span><span class="p">])))</span>
+
+    <span class="n">treedic</span><span class="p">[</span><span class="s">&#39;2 cleaned_mm_list&#39;</span><span class="p">],</span> <span class="n">treedic</span><span class="p">[</span><span class="s">&#39;2 factors&#39;</span><span class="p">],</span> <span class="n">treedic</span><span class="p">[</span><span class="s">&#39;2 phases&#39;</span><span class="p">]</span> <span class="o">=</span> <span class="nb">zip</span><span class="p">(</span>
+        <span class="o">*</span><span class="nb">sorted</span><span class="p">(</span><span class="nb">zip</span><span class="p">(</span><span class="n">treedic</span><span class="p">[</span><span class="s">&#39;2 cleaned_mm_list&#39;</span><span class="p">],</span> <span class="n">treedic</span><span class="p">[</span><span class="s">&#39;2 factors&#39;</span><span class="p">],</span> <span class="n">treedic</span><span class="p">[</span><span class="s">&#39;2 phases&#39;</span><span class="p">])))</span>
+
+    <span class="c"># check if expressions are correct without factors</span>
+    <span class="k">if</span> <span class="ow">not</span> <span class="n">_check_equality</span><span class="p">(</span><span class="n">treedic</span><span class="p">[</span><span class="s">&#39;1 cleaned_mm_list&#39;</span><span class="p">],</span> <span class="n">treedic</span><span class="p">[</span><span class="s">&#39;2 cleaned_mm_list&#39;</span><span class="p">]):</span>
+        <span class="k">return</span> <span class="bp">False</span>
+
+    <span class="c"># phases are ruled by ingore_state flag</span>
+    <span class="k">if</span> <span class="ow">not</span> <span class="n">ignore_state</span><span class="p">:</span>  <span class="c"># phases matters</span>
+        <span class="k">if</span> <span class="n">treedic</span><span class="p">[</span><span class="s">&#39;1 phases&#39;</span><span class="p">]</span> <span class="o">!=</span> <span class="n">treedic</span><span class="p">[</span><span class="s">&#39;2 phases&#39;</span><span class="p">]:</span>
+            <span class="k">return</span> <span class="bp">False</span>
+
+    <span class="k">if</span> <span class="nb">any</span><span class="p">(</span><span class="nb">map</span><span class="p">(</span><span class="k">lambda</span> <span class="n">x</span><span class="p">,</span> <span class="n">y</span><span class="p">:</span> <span class="n">x</span> <span class="o">/</span> <span class="n">y</span> <span class="o">-</span> <span class="n">treedic</span><span class="p">[</span><span class="s">&#39;1 factors&#39;</span><span class="p">][</span><span class="mi">0</span><span class="p">]</span> <span class="o">/</span> <span class="n">treedic</span><span class="p">[</span><span class="s">&#39;2 factors&#39;</span><span class="p">][</span><span class="mi">0</span><span class="p">],</span>
+                                         <span class="n">treedic</span><span class="p">[</span><span class="s">&#39;1 factors&#39;</span><span class="p">],</span> <span class="n">treedic</span><span class="p">[</span><span class="s">&#39;2 factors&#39;</span><span class="p">])):</span>
+        <span class="c"># factors are not proportional</span>
+        <span class="k">return</span> <span class="bp">False</span>
+    <span class="k">else</span><span class="p">:</span>
+        <span class="c"># return ratio</span>
+        <span class="k">return</span> <span class="n">Fraction</span><span class="p">(</span><span class="n">treedic</span><span class="p">[</span><span class="s">&#39;1 factors&#39;</span><span class="p">][</span><span class="mi">0</span><span class="p">]</span> <span class="o">/</span> <span class="n">treedic</span><span class="p">[</span><span class="s">&#39;2 factors&#39;</span><span class="p">][</span><span class="mi">0</span><span class="p">])</span>
+
+</div>
+<div class="viewcode-block" id="split_on_arrow"><a class="viewcode-back" href="../../../chem.html#capa.chem.chemcalc.split_on_arrow">[docs]</a><span class="k">def</span> <span class="nf">split_on_arrow</span><span class="p">(</span><span class="n">eq</span><span class="p">):</span>
+    <span class="sd">&quot;&quot;&quot;</span>
+<span class="sd">    Split a string on an arrow.  Returns left, arrow, right.  If there is no arrow, returns the</span>
+<span class="sd">    entire eq in left, and &#39;&#39; in arrow and right.</span>
+
+<span class="sd">    Return left, arrow, right.</span>
+<span class="sd">    &quot;&quot;&quot;</span>
+    <span class="c"># order matters -- need to try &lt;-&gt; first</span>
+    <span class="k">for</span> <span class="n">arrow</span> <span class="ow">in</span> <span class="n">ARROWS</span><span class="p">:</span>
+        <span class="n">left</span><span class="p">,</span> <span class="n">a</span><span class="p">,</span> <span class="n">right</span> <span class="o">=</span> <span class="n">eq</span><span class="o">.</span><span class="n">partition</span><span class="p">(</span><span class="n">arrow</span><span class="p">)</span>
+        <span class="k">if</span> <span class="n">a</span> <span class="o">!=</span> <span class="s">&#39;&#39;</span><span class="p">:</span>
+            <span class="k">return</span> <span class="n">left</span><span class="p">,</span> <span class="n">a</span><span class="p">,</span> <span class="n">right</span>
+
+    <span class="k">return</span> <span class="n">eq</span><span class="p">,</span> <span class="s">&#39;&#39;</span><span class="p">,</span> <span class="s">&#39;&#39;</span>
+
+</div>
+<div class="viewcode-block" id="chemical_equations_equal"><a class="viewcode-back" href="../../../chem.html#capa.chem.chemcalc.chemical_equations_equal">[docs]</a><span class="k">def</span> <span class="nf">chemical_equations_equal</span><span class="p">(</span><span class="n">eq1</span><span class="p">,</span> <span class="n">eq2</span><span class="p">,</span> <span class="n">exact</span><span class="o">=</span><span class="bp">False</span><span class="p">):</span>
+    <span class="sd">&quot;&quot;&quot;</span>
+<span class="sd">    Check whether two chemical equations are the same.  (equations have arrows)</span>
+
+<span class="sd">    If exact is False, then they are considered equal if they differ by a</span>
+<span class="sd">    constant factor.</span>
+
+<span class="sd">    arrows matter: -&gt; and &lt;-&gt; are different.</span>
+
+<span class="sd">    e.g.</span>
+<span class="sd">    chemical_equations_equal(&#39;H2 + O2 -&gt; H2O2&#39;, &#39;O2 + H2 -&gt; H2O2&#39;) -&gt; True</span>
+<span class="sd">    chemical_equations_equal(&#39;H2 + O2 -&gt; H2O2&#39;, &#39;O2 + 2H2 -&gt; H2O2&#39;) -&gt; False</span>
+
+<span class="sd">    chemical_equations_equal(&#39;H2 + O2 -&gt; H2O2&#39;, &#39;O2 + H2 &lt;-&gt; H2O2&#39;) -&gt; False</span>
+
+<span class="sd">    chemical_equations_equal(&#39;H2 + O2 -&gt; H2O2&#39;, &#39;2 H2 + 2 O2 -&gt; 2 H2O2&#39;) -&gt; True</span>
+<span class="sd">    chemical_equations_equal(&#39;H2 + O2 -&gt; H2O2&#39;, &#39;2 H2 + 2 O2 -&gt; 2 H2O2&#39;, exact=True) -&gt; False</span>
+
+
+<span class="sd">    If there&#39;s a syntax error, we return False.</span>
+<span class="sd">    &quot;&quot;&quot;</span>
+
+    <span class="n">left1</span><span class="p">,</span> <span class="n">arrow1</span><span class="p">,</span> <span class="n">right1</span> <span class="o">=</span> <span class="n">split_on_arrow</span><span class="p">(</span><span class="n">eq1</span><span class="p">)</span>
+    <span class="n">left2</span><span class="p">,</span> <span class="n">arrow2</span><span class="p">,</span> <span class="n">right2</span> <span class="o">=</span> <span class="n">split_on_arrow</span><span class="p">(</span><span class="n">eq2</span><span class="p">)</span>
+
+    <span class="k">if</span> <span class="n">arrow1</span> <span class="o">==</span> <span class="s">&#39;&#39;</span> <span class="ow">or</span> <span class="n">arrow2</span> <span class="o">==</span> <span class="s">&#39;&#39;</span><span class="p">:</span>
+        <span class="k">return</span> <span class="bp">False</span>
+
+    <span class="c"># TODO: may want to be able to give student helpful feedback about why things didn&#39;t work.</span>
+    <span class="k">if</span> <span class="n">arrow1</span> <span class="o">!=</span> <span class="n">arrow2</span><span class="p">:</span>
+        <span class="c"># arrows don&#39;t match</span>
+        <span class="k">return</span> <span class="bp">False</span>
+
+    <span class="k">try</span><span class="p">:</span>
+        <span class="n">factor_left</span> <span class="o">=</span> <span class="n">divide_chemical_expression</span><span class="p">(</span><span class="n">left1</span><span class="p">,</span> <span class="n">left2</span><span class="p">)</span>
+        <span class="k">if</span> <span class="ow">not</span> <span class="n">factor_left</span><span class="p">:</span>
+            <span class="c"># left sides don&#39;t match</span>
+            <span class="k">return</span> <span class="bp">False</span>
+
+        <span class="n">factor_right</span> <span class="o">=</span> <span class="n">divide_chemical_expression</span><span class="p">(</span><span class="n">right1</span><span class="p">,</span> <span class="n">right2</span><span class="p">)</span>
+        <span class="k">if</span> <span class="ow">not</span> <span class="n">factor_right</span><span class="p">:</span>
+            <span class="c"># right sides don&#39;t match</span>
+            <span class="k">return</span> <span class="bp">False</span>
+
+        <span class="k">if</span> <span class="n">factor_left</span> <span class="o">!=</span> <span class="n">factor_right</span><span class="p">:</span>
+            <span class="c"># factors don&#39;t match (molecule counts to add up)</span>
+            <span class="k">return</span> <span class="bp">False</span>
+
+        <span class="k">if</span> <span class="n">exact</span> <span class="ow">and</span> <span class="n">factor_left</span> <span class="o">!=</span> <span class="mi">1</span><span class="p">:</span>
+            <span class="c"># want an exact match.</span>
+            <span class="k">return</span> <span class="bp">False</span>
+
+        <span class="k">return</span> <span class="bp">True</span>
+    <span class="k">except</span> <span class="n">ParseException</span><span class="p">:</span>
+        <span class="c"># Don&#39;t want external users to have to deal with parsing exceptions.  Just return False.</span>
+        <span class="k">return</span> <span class="bp">False</span></div>
+</pre></div>
+
+          </div>
+        </div>
+      </div>
+      <div class="clearer"></div>
+    </div>
+    <div class="related">
+      <h3>Navigation</h3>
+      <ul>
+        <li class="right" style="margin-right: 10px">
+          <a href="../../../genindex.html" title="General Index"
+             >index</a></li>
+        <li class="right" >
+          <a href="../../../py-modindex.html" title="Python Module Index"
+             >modules</a> |</li>
+        <li><a href="../../../index.html">MITx 1.0 documentation</a> &raquo;</li>
+          <li><a href="../../index.html" >Module code</a> &raquo;</li> 
+      </ul>
+    </div>
+    <div class="footer">
+        &copy; Copyright 2012, MITx team.
+      Created using <a href="http://sphinx.pocoo.org/">Sphinx</a> 1.1.3.
+    </div>
+  </body>
+</html>

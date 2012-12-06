@@ -1,0 +1,433 @@
+
+
+<!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Transitional//EN"
+  "http://www.w3.org/TR/xhtml1/DTD/xhtml1-transitional.dtd">
+
+
+<html xmlns="http://www.w3.org/1999/xhtml">
+  <head>
+    <meta http-equiv="Content-Type" content="text/html; charset=utf-8" />
+    
+    <title>capa.chem.tests &mdash; MITx 1.0 documentation</title>
+    
+    <link rel="stylesheet" href="../../../_static/sphinxdoc.css" type="text/css" />
+    <link rel="stylesheet" href="../../../_static/pygments.css" type="text/css" />
+    
+    <script type="text/javascript">
+      var DOCUMENTATION_OPTIONS = {
+        URL_ROOT:    '../../../',
+        VERSION:     '1.0',
+        COLLAPSE_INDEX: false,
+        FILE_SUFFIX: '.html',
+        HAS_SOURCE:  true
+      };
+    </script>
+    <script type="text/javascript" src="../../../_static/jquery.js"></script>
+    <script type="text/javascript" src="../../../_static/underscore.js"></script>
+    <script type="text/javascript" src="../../../_static/doctools.js"></script>
+    <script type="text/javascript" src="http://cdn.mathjax.org/mathjax/latest/MathJax.js?config=TeX-AMS-MML_HTMLorMML"></script>
+    <link rel="top" title="MITx 1.0 documentation" href="../../../index.html" />
+    <link rel="up" title="Module code" href="../../index.html" /> 
+  </head>
+  <body>
+<img src="../../../_static/homepage-bg.jpg" alt="Edx logo"  width="100%;"/>
+
+    <div class="related">
+      <h3>Navigation</h3>
+      <ul>
+        <li class="right" style="margin-right: 10px">
+          <a href="../../../genindex.html" title="General Index"
+             accesskey="I">index</a></li>
+        <li class="right" >
+          <a href="../../../py-modindex.html" title="Python Module Index"
+             >modules</a> |</li>
+        <li><a href="../../../index.html">MITx 1.0 documentation</a> &raquo;</li>
+          <li><a href="../../index.html" accesskey="U">Module code</a> &raquo;</li> 
+      </ul>
+    </div>
+      <div class="sphinxsidebar">
+        <div class="sphinxsidebarwrapper">
+<div id="searchbox" style="display: none">
+  <h3>Quick search</h3>
+    <form class="search" action="../../../search.html" method="get">
+      <input type="text" name="q" />
+      <input type="submit" value="Go" />
+      <input type="hidden" name="check_keywords" value="yes" />
+      <input type="hidden" name="area" value="default" />
+    </form>
+    <p class="searchtip" style="font-size: 90%">
+    Enter search terms or a module, class or function name.
+    </p>
+</div>
+<script type="text/javascript">$('#searchbox').show(0);</script>
+        </div>
+      </div>
+
+    <div class="document">
+      <div class="documentwrapper">
+        <div class="bodywrapper">
+          <div class="body">
+            
+  <h1>Source code for capa.chem.tests</h1><div class="highlight"><pre>
+<span class="kn">import</span> <span class="nn">codecs</span>
+<span class="kn">from</span> <span class="nn">fractions</span> <span class="kn">import</span> <span class="n">Fraction</span>
+<span class="kn">from</span> <span class="nn">pyparsing</span> <span class="kn">import</span> <span class="n">ParseException</span>
+<span class="kn">import</span> <span class="nn">unittest</span>
+
+<span class="kn">from</span> <span class="nn">chemcalc</span> <span class="kn">import</span> <span class="p">(</span><span class="n">compare_chemical_expression</span><span class="p">,</span> <span class="n">divide_chemical_expression</span><span class="p">,</span>
+                      <span class="n">render_to_html</span><span class="p">,</span> <span class="n">chemical_equations_equal</span><span class="p">)</span>
+
+<span class="n">local_debug</span> <span class="o">=</span> <span class="bp">None</span>
+
+<span class="k">def</span> <span class="nf">log</span><span class="p">(</span><span class="n">s</span><span class="p">,</span> <span class="n">output_type</span><span class="o">=</span><span class="bp">None</span><span class="p">):</span>
+    <span class="k">if</span> <span class="n">local_debug</span><span class="p">:</span>
+        <span class="k">print</span> <span class="n">s</span>
+        <span class="k">if</span> <span class="n">output_type</span> <span class="o">==</span> <span class="s">&#39;html&#39;</span><span class="p">:</span>
+            <span class="n">f</span><span class="o">.</span><span class="n">write</span><span class="p">(</span><span class="n">s</span> <span class="o">+</span> <span class="s">&#39;</span><span class="se">\n</span><span class="s">&lt;br&gt;</span><span class="se">\n</span><span class="s">&#39;</span><span class="p">)</span>
+
+
+<span class="k">class</span> <span class="nc">Test_Compare_Equations</span><span class="p">(</span><span class="n">unittest</span><span class="o">.</span><span class="n">TestCase</span><span class="p">):</span>
+    <span class="k">def</span> <span class="nf">test_simple_equation</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">assertTrue</span><span class="p">(</span><span class="n">chemical_equations_equal</span><span class="p">(</span><span class="s">&#39;H2 + O2 -&gt; H2O2&#39;</span><span class="p">,</span>
+                                                 <span class="s">&#39;O2 + H2 -&gt; H2O2&#39;</span><span class="p">))</span>
+        <span class="c"># left sides don&#39;t match</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">assertFalse</span><span class="p">(</span><span class="n">chemical_equations_equal</span><span class="p">(</span><span class="s">&#39;H2 + O2 -&gt; H2O2&#39;</span><span class="p">,</span>
+                                                  <span class="s">&#39;O2 + 2H2 -&gt; H2O2&#39;</span><span class="p">))</span>
+        <span class="c"># right sides don&#39;t match</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">assertFalse</span><span class="p">(</span><span class="n">chemical_equations_equal</span><span class="p">(</span><span class="s">&#39;H2 + O2 -&gt; H2O2&#39;</span><span class="p">,</span>
+                                                  <span class="s">&#39;O2 + H2 -&gt; H2O&#39;</span><span class="p">))</span>
+
+        <span class="c"># factors don&#39;t match</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">assertFalse</span><span class="p">(</span><span class="n">chemical_equations_equal</span><span class="p">(</span><span class="s">&#39;H2 + O2 -&gt; H2O2&#39;</span><span class="p">,</span>
+                                                  <span class="s">&#39;O2 + H2 -&gt; 2H2O2&#39;</span><span class="p">))</span>
+
+    <span class="k">def</span> <span class="nf">test_different_factor</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">assertTrue</span><span class="p">(</span><span class="n">chemical_equations_equal</span><span class="p">(</span><span class="s">&#39;H2 + O2 -&gt; H2O2&#39;</span><span class="p">,</span>
+                                                 <span class="s">&#39;2O2 + 2H2 -&gt; 2H2O2&#39;</span><span class="p">))</span>
+
+        <span class="bp">self</span><span class="o">.</span><span class="n">assertFalse</span><span class="p">(</span><span class="n">chemical_equations_equal</span><span class="p">(</span><span class="s">&#39;2H2 + O2 -&gt; H2O2&#39;</span><span class="p">,</span>
+                                                 <span class="s">&#39;2O2 + 2H2 -&gt; 2H2O2&#39;</span><span class="p">))</span>
+
+
+    <span class="k">def</span> <span class="nf">test_different_arrows</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">assertTrue</span><span class="p">(</span><span class="n">chemical_equations_equal</span><span class="p">(</span><span class="s">&#39;H2 + O2 -&gt; H2O2&#39;</span><span class="p">,</span>
+                                                 <span class="s">&#39;2O2 + 2H2 -&gt; 2H2O2&#39;</span><span class="p">))</span>
+
+        <span class="bp">self</span><span class="o">.</span><span class="n">assertFalse</span><span class="p">(</span><span class="n">chemical_equations_equal</span><span class="p">(</span><span class="s">&#39;H2 + O2 -&gt; H2O2&#39;</span><span class="p">,</span>
+                                                  <span class="s">&#39;O2 + H2 &lt;-&gt; 2H2O2&#39;</span><span class="p">))</span>
+
+    <span class="k">def</span> <span class="nf">test_exact_match</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">assertTrue</span><span class="p">(</span><span class="n">chemical_equations_equal</span><span class="p">(</span><span class="s">&#39;H2 + O2 -&gt; H2O2&#39;</span><span class="p">,</span>
+                                                 <span class="s">&#39;2O2 + 2H2 -&gt; 2H2O2&#39;</span><span class="p">))</span>
+
+        <span class="bp">self</span><span class="o">.</span><span class="n">assertFalse</span><span class="p">(</span><span class="n">chemical_equations_equal</span><span class="p">(</span><span class="s">&#39;H2 + O2 -&gt; H2O2&#39;</span><span class="p">,</span>
+                                                 <span class="s">&#39;2O2 + 2H2 -&gt; 2H2O2&#39;</span><span class="p">,</span> <span class="n">exact</span><span class="o">=</span><span class="bp">True</span><span class="p">))</span>
+
+        <span class="c"># order still doesn&#39;t matter</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">assertTrue</span><span class="p">(</span><span class="n">chemical_equations_equal</span><span class="p">(</span><span class="s">&#39;H2 + O2 -&gt; H2O2&#39;</span><span class="p">,</span>
+                                                 <span class="s">&#39;O2 + H2 -&gt; H2O2&#39;</span><span class="p">,</span> <span class="n">exact</span><span class="o">=</span><span class="bp">True</span><span class="p">))</span>
+
+
+    <span class="k">def</span> <span class="nf">test_syntax_errors</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">assertFalse</span><span class="p">(</span><span class="n">chemical_equations_equal</span><span class="p">(</span><span class="s">&#39;H2 + O2 a-&gt; H2O2&#39;</span><span class="p">,</span>
+                                                  <span class="s">&#39;2O2 + 2H2 -&gt; 2H2O2&#39;</span><span class="p">))</span>
+
+        <span class="bp">self</span><span class="o">.</span><span class="n">assertFalse</span><span class="p">(</span><span class="n">chemical_equations_equal</span><span class="p">(</span><span class="s">&#39;H2O( -&gt; H2O2&#39;</span><span class="p">,</span>
+                                                  <span class="s">&#39;H2O -&gt; H2O2&#39;</span><span class="p">))</span>
+
+
+        <span class="bp">self</span><span class="o">.</span><span class="n">assertFalse</span><span class="p">(</span><span class="n">chemical_equations_equal</span><span class="p">(</span><span class="s">&#39;H2 + O2 ==&gt; H2O2&#39;</span><span class="p">,</span>   <span class="c"># strange arrow</span>
+                                                  <span class="s">&#39;2O2 + 2H2 -&gt; 2H2O2&#39;</span><span class="p">))</span>
+
+
+<span class="k">class</span> <span class="nc">Test_Compare_Expressions</span><span class="p">(</span><span class="n">unittest</span><span class="o">.</span><span class="n">TestCase</span><span class="p">):</span>
+
+    <span class="k">def</span> <span class="nf">test_compare_incorrect_order_of_atoms_in_molecule</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">assertFalse</span><span class="p">(</span><span class="n">compare_chemical_expression</span><span class="p">(</span><span class="s">&quot;H2O + CO2&quot;</span><span class="p">,</span> <span class="s">&quot;O2C + OH2&quot;</span><span class="p">))</span>
+
+    <span class="k">def</span> <span class="nf">test_compare_same_order_no_phases_no_factors_no_ions</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">assertTrue</span><span class="p">(</span><span class="n">compare_chemical_expression</span><span class="p">(</span><span class="s">&quot;H2O + CO2&quot;</span><span class="p">,</span> <span class="s">&quot;CO2+H2O&quot;</span><span class="p">))</span>
+
+    <span class="k">def</span> <span class="nf">test_compare_different_order_no_phases_no_factors_no_ions</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">assertTrue</span><span class="p">(</span><span class="n">compare_chemical_expression</span><span class="p">(</span><span class="s">&quot;H2O + CO2&quot;</span><span class="p">,</span> <span class="s">&quot;CO2 + H2O&quot;</span><span class="p">))</span>
+
+    <span class="k">def</span> <span class="nf">test_compare_different_order_three_multimolecule</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">assertTrue</span><span class="p">(</span><span class="n">compare_chemical_expression</span><span class="p">(</span><span class="s">&quot;H2O + Fe(OH)3 +  CO2&quot;</span><span class="p">,</span> <span class="s">&quot;CO2 + H2O + Fe(OH)3&quot;</span><span class="p">))</span>
+
+    <span class="k">def</span> <span class="nf">test_compare_same_factors</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">assertTrue</span><span class="p">(</span><span class="n">compare_chemical_expression</span><span class="p">(</span><span class="s">&quot;3H2O +  2CO2&quot;</span><span class="p">,</span> <span class="s">&quot;2CO2 + 3H2O &quot;</span><span class="p">))</span>
+
+    <span class="k">def</span> <span class="nf">test_compare_different_factors</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">assertFalse</span><span class="p">(</span><span class="n">compare_chemical_expression</span><span class="p">(</span><span class="s">&quot;2H2O +  3CO2&quot;</span><span class="p">,</span> <span class="s">&quot;2CO2 + 3H2O &quot;</span><span class="p">))</span>
+
+    <span class="k">def</span> <span class="nf">test_compare_correct_ions</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">assertTrue</span><span class="p">(</span><span class="n">compare_chemical_expression</span><span class="p">(</span><span class="s">&quot;H^+ + OH^-&quot;</span><span class="p">,</span> <span class="s">&quot; OH^- + H^+ &quot;</span><span class="p">))</span>
+
+    <span class="k">def</span> <span class="nf">test_compare_wrong_ions</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">assertFalse</span><span class="p">(</span><span class="n">compare_chemical_expression</span><span class="p">(</span><span class="s">&quot;H^+ + OH^-&quot;</span><span class="p">,</span> <span class="s">&quot; OH^- + H^- &quot;</span><span class="p">))</span>
+
+    <span class="k">def</span> <span class="nf">test_compare_parent_groups_ions</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">assertTrue</span><span class="p">(</span><span class="n">compare_chemical_expression</span><span class="p">(</span><span class="s">&quot;Fe(OH)^2- + (OH)^-&quot;</span><span class="p">,</span> <span class="s">&quot; (OH)^- + Fe(OH)^2- &quot;</span><span class="p">))</span>
+
+    <span class="k">def</span> <span class="nf">test_compare_correct_factors_ions_and_one</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">assertTrue</span><span class="p">(</span><span class="n">compare_chemical_expression</span><span class="p">(</span><span class="s">&quot;3H^+ + 2OH^-&quot;</span><span class="p">,</span> <span class="s">&quot; 2OH^- + 3H^+ &quot;</span><span class="p">))</span>
+
+    <span class="k">def</span> <span class="nf">test_compare_wrong_factors_ions</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">assertFalse</span><span class="p">(</span><span class="n">compare_chemical_expression</span><span class="p">(</span><span class="s">&quot;2H^+ + 3OH^-&quot;</span><span class="p">,</span> <span class="s">&quot; 2OH^- + 3H^+ &quot;</span><span class="p">))</span>
+
+    <span class="k">def</span> <span class="nf">test_compare_float_factors</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">assertTrue</span><span class="p">(</span><span class="n">compare_chemical_expression</span><span class="p">(</span><span class="s">&quot;7/2H^+ + 3/5OH^-&quot;</span><span class="p">,</span> <span class="s">&quot; 3/5OH^- + 7/2H^+ &quot;</span><span class="p">))</span>
+
+    <span class="c"># Phases tests</span>
+    <span class="k">def</span> <span class="nf">test_compare_phases_ignored</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">assertTrue</span><span class="p">(</span><span class="n">compare_chemical_expression</span><span class="p">(</span>
+            <span class="s">&quot;H2O(s) + CO2&quot;</span><span class="p">,</span> <span class="s">&quot;H2O+CO2&quot;</span><span class="p">,</span> <span class="n">ignore_state</span><span class="o">=</span><span class="bp">True</span><span class="p">))</span>
+
+    <span class="k">def</span> <span class="nf">test_compare_phases_not_ignored_explicitly</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">assertFalse</span><span class="p">(</span><span class="n">compare_chemical_expression</span><span class="p">(</span>
+            <span class="s">&quot;H2O(s) + CO2&quot;</span><span class="p">,</span> <span class="s">&quot;H2O+CO2&quot;</span><span class="p">,</span> <span class="n">ignore_state</span><span class="o">=</span><span class="bp">False</span><span class="p">))</span>
+
+    <span class="k">def</span> <span class="nf">test_compare_phases_not_ignored</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>  <span class="c"># same as previous</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">assertFalse</span><span class="p">(</span><span class="n">compare_chemical_expression</span><span class="p">(</span>
+            <span class="s">&quot;H2O(s) + CO2&quot;</span><span class="p">,</span> <span class="s">&quot;H2O+CO2&quot;</span><span class="p">))</span>
+
+    <span class="k">def</span> <span class="nf">test_compare_phases_not_ignored_explicitly</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">assertTrue</span><span class="p">(</span><span class="n">compare_chemical_expression</span><span class="p">(</span>
+            <span class="s">&quot;H2O(s) + CO2&quot;</span><span class="p">,</span> <span class="s">&quot;H2O(s)+CO2&quot;</span><span class="p">,</span> <span class="n">ignore_state</span><span class="o">=</span><span class="bp">False</span><span class="p">))</span>
+
+    <span class="c"># all in one cases</span>
+    <span class="k">def</span> <span class="nf">test_complex_additivity</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">assertTrue</span><span class="p">(</span><span class="n">compare_chemical_expression</span><span class="p">(</span>
+            <span class="s">&quot;5(H1H212)^70010- + 2H20 + 7/2HCl + H2O&quot;</span><span class="p">,</span>
+            <span class="s">&quot;7/2HCl + 2H20 + H2O + 5(H1H212)^70010-&quot;</span><span class="p">))</span>
+
+    <span class="k">def</span> <span class="nf">test_complex_additivity_wrong</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">assertFalse</span><span class="p">(</span><span class="n">compare_chemical_expression</span><span class="p">(</span>
+            <span class="s">&quot;5(H1H212)^70010- + 2H20 + 7/2HCl + H2O&quot;</span><span class="p">,</span>
+            <span class="s">&quot;2H20 + 7/2HCl + H2O + 5(H1H212)^70011-&quot;</span><span class="p">))</span>
+
+    <span class="k">def</span> <span class="nf">test_complex_all_grammar</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">assertTrue</span><span class="p">(</span><span class="n">compare_chemical_expression</span><span class="p">(</span>
+            <span class="s">&quot;5[Ni(NH3)4]^2+ + 5/2SO4^2-&quot;</span><span class="p">,</span>
+            <span class="s">&quot;5/2SO4^2- + 5[Ni(NH3)4]^2+&quot;</span><span class="p">))</span>
+
+    <span class="c"># special cases</span>
+
+    <span class="k">def</span> <span class="nf">test_compare_one_superscript_explicitly_set</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">assertTrue</span><span class="p">(</span><span class="n">compare_chemical_expression</span><span class="p">(</span><span class="s">&quot;H^+ + OH^1-&quot;</span><span class="p">,</span> <span class="s">&quot; OH^- + H^+ &quot;</span><span class="p">))</span>
+
+    <span class="k">def</span> <span class="nf">test_compare_equal_factors_differently_set</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">assertTrue</span><span class="p">(</span><span class="n">compare_chemical_expression</span><span class="p">(</span><span class="s">&quot;6/2H^+ + OH^-&quot;</span><span class="p">,</span> <span class="s">&quot; OH^- + 3H^+ &quot;</span><span class="p">))</span>
+
+    <span class="k">def</span> <span class="nf">test_compare_one_subscript_explicitly_set</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">assertFalse</span><span class="p">(</span><span class="n">compare_chemical_expression</span><span class="p">(</span><span class="s">&quot;H2 + CO2&quot;</span><span class="p">,</span> <span class="s">&quot;H2 + C102&quot;</span><span class="p">))</span>
+
+
+<div class="viewcode-block" id="Test_Divide_Expressions"><a class="viewcode-back" href="../../../chem.html#capa.chem.tests.Test_Divide_Expressions">[docs]</a><span class="k">class</span> <span class="nc">Test_Divide_Expressions</span><span class="p">(</span><span class="n">unittest</span><span class="o">.</span><span class="n">TestCase</span><span class="p">):</span>
+    <span class="sd">&#39;&#39;&#39; as compare_ use divide_,</span>
+<span class="sd">    tests here must consider different</span>
+<span class="sd">    division (not equality) cases &#39;&#39;&#39;</span>
+
+    <span class="k">def</span> <span class="nf">test_divide_by_zero</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">assertFalse</span><span class="p">(</span><span class="n">divide_chemical_expression</span><span class="p">(</span>
+            <span class="s">&quot;0H2O&quot;</span><span class="p">,</span> <span class="s">&quot;H2O&quot;</span><span class="p">))</span>
+
+    <span class="k">def</span> <span class="nf">test_divide_wrong_factors</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">assertFalse</span><span class="p">(</span><span class="n">divide_chemical_expression</span><span class="p">(</span>
+            <span class="s">&quot;5(H1H212)^70010- + 10H2O&quot;</span><span class="p">,</span> <span class="s">&quot;5H2O + 10(H1H212)^70010-&quot;</span><span class="p">))</span>
+
+    <span class="k">def</span> <span class="nf">test_divide_right</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">assertEqual</span><span class="p">(</span><span class="n">divide_chemical_expression</span><span class="p">(</span>
+            <span class="s">&quot;5(H1H212)^70010- + 10H2O&quot;</span><span class="p">,</span> <span class="s">&quot;10H2O + 5(H1H212)^70010-&quot;</span><span class="p">),</span> <span class="mi">1</span><span class="p">)</span>
+
+    <span class="k">def</span> <span class="nf">test_divide_wrong_reagents</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">assertFalse</span><span class="p">(</span><span class="n">divide_chemical_expression</span><span class="p">(</span>
+            <span class="s">&quot;H2O + CO2&quot;</span><span class="p">,</span> <span class="s">&quot;CO2&quot;</span><span class="p">))</span>
+
+    <span class="k">def</span> <span class="nf">test_divide_right_simple</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">assertEqual</span><span class="p">(</span><span class="n">divide_chemical_expression</span><span class="p">(</span>
+            <span class="s">&quot;H2O + CO2&quot;</span><span class="p">,</span> <span class="s">&quot;H2O+CO2&quot;</span><span class="p">),</span> <span class="mi">1</span><span class="p">)</span>
+
+    <span class="k">def</span> <span class="nf">test_divide_right_phases</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">assertEqual</span><span class="p">(</span><span class="n">divide_chemical_expression</span><span class="p">(</span>
+            <span class="s">&quot;H2O(s) + CO2&quot;</span><span class="p">,</span> <span class="s">&quot;2H2O(s)+2CO2&quot;</span><span class="p">),</span> <span class="n">Fraction</span><span class="p">(</span><span class="mi">1</span><span class="p">,</span> <span class="mi">2</span><span class="p">))</span>
+
+    <span class="k">def</span> <span class="nf">test_divide_right_phases_other_order</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">assertEqual</span><span class="p">(</span><span class="n">divide_chemical_expression</span><span class="p">(</span>
+            <span class="s">&quot;2H2O(s) + 2CO2&quot;</span><span class="p">,</span> <span class="s">&quot;H2O(s)+CO2&quot;</span><span class="p">),</span> <span class="mi">2</span><span class="p">)</span>
+
+    <span class="k">def</span> <span class="nf">test_divide_wrong_phases</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">assertFalse</span><span class="p">(</span><span class="n">divide_chemical_expression</span><span class="p">(</span>
+            <span class="s">&quot;H2O(s) + CO2&quot;</span><span class="p">,</span> <span class="s">&quot;2H2O+2CO2(s)&quot;</span><span class="p">))</span>
+
+    <span class="k">def</span> <span class="nf">test_divide_wrong_phases_but_phases_ignored</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">assertEqual</span><span class="p">(</span><span class="n">divide_chemical_expression</span><span class="p">(</span>
+            <span class="s">&quot;H2O(s) + CO2&quot;</span><span class="p">,</span> <span class="s">&quot;2H2O+2CO2(s)&quot;</span><span class="p">,</span> <span class="n">ignore_state</span><span class="o">=</span><span class="bp">True</span><span class="p">),</span> <span class="n">Fraction</span><span class="p">(</span><span class="mi">1</span><span class="p">,</span> <span class="mi">2</span><span class="p">))</span>
+
+    <span class="k">def</span> <span class="nf">test_divide_order</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">assertEqual</span><span class="p">(</span><span class="n">divide_chemical_expression</span><span class="p">(</span>
+            <span class="s">&quot;2CO2 + H2O&quot;</span><span class="p">,</span> <span class="s">&quot;2H2O+4CO2&quot;</span><span class="p">),</span> <span class="n">Fraction</span><span class="p">(</span><span class="mi">1</span><span class="p">,</span> <span class="mi">2</span><span class="p">))</span>
+
+    <span class="k">def</span> <span class="nf">test_divide_fract_to_int</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">assertEqual</span><span class="p">(</span><span class="n">divide_chemical_expression</span><span class="p">(</span>
+            <span class="s">&quot;3/2CO2 + H2O&quot;</span><span class="p">,</span> <span class="s">&quot;2H2O+3CO2&quot;</span><span class="p">),</span> <span class="n">Fraction</span><span class="p">(</span><span class="mi">1</span><span class="p">,</span> <span class="mi">2</span><span class="p">))</span>
+
+    <span class="k">def</span> <span class="nf">test_divide_fract_to_frac</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">assertEqual</span><span class="p">(</span><span class="n">divide_chemical_expression</span><span class="p">(</span>
+            <span class="s">&quot;3/4CO2 + H2O&quot;</span><span class="p">,</span> <span class="s">&quot;2H2O+9/6CO2&quot;</span><span class="p">),</span> <span class="n">Fraction</span><span class="p">(</span><span class="mi">1</span><span class="p">,</span> <span class="mi">2</span><span class="p">))</span>
+
+    <span class="k">def</span> <span class="nf">test_divide_fract_to_frac_wrog</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">assertFalse</span><span class="p">(</span><span class="n">divide_chemical_expression</span><span class="p">(</span>
+            <span class="s">&quot;6/2CO2 + H2O&quot;</span><span class="p">,</span> <span class="s">&quot;2H2O+9/6CO2&quot;</span><span class="p">),</span> <span class="mi">2</span><span class="p">)</span>
+
+</div>
+<span class="k">class</span> <span class="nc">Test_Render_Equations</span><span class="p">(</span><span class="n">unittest</span><span class="o">.</span><span class="n">TestCase</span><span class="p">):</span>
+
+    <span class="k">def</span> <span class="nf">test_render1</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
+        <span class="n">s</span> <span class="o">=</span> <span class="s">&quot;H2O + CO2&quot;</span>
+        <span class="n">out</span> <span class="o">=</span> <span class="n">render_to_html</span><span class="p">(</span><span class="n">s</span><span class="p">)</span>
+        <span class="n">correct</span> <span class="o">=</span> <span class="s">u&#39;&lt;span class=&quot;math&quot;&gt;H&lt;sub&gt;2&lt;/sub&gt;O+CO&lt;sub&gt;2&lt;/sub&gt;&lt;/span&gt;&#39;</span>
+        <span class="n">log</span><span class="p">(</span><span class="n">out</span> <span class="o">+</span> <span class="s">&#39; ------- &#39;</span> <span class="o">+</span> <span class="n">correct</span><span class="p">,</span> <span class="s">&#39;html&#39;</span><span class="p">)</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">assertEqual</span><span class="p">(</span><span class="n">out</span><span class="p">,</span> <span class="n">correct</span><span class="p">)</span>
+
+    <span class="k">def</span> <span class="nf">test_render_uncorrect_reaction</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
+        <span class="n">s</span> <span class="o">=</span> <span class="s">&quot;O2C + OH2&quot;</span>
+        <span class="n">out</span> <span class="o">=</span> <span class="n">render_to_html</span><span class="p">(</span><span class="n">s</span><span class="p">)</span>
+        <span class="n">correct</span> <span class="o">=</span> <span class="s">u&#39;&lt;span class=&quot;math&quot;&gt;O&lt;sub&gt;2&lt;/sub&gt;C+OH&lt;sub&gt;2&lt;/sub&gt;&lt;/span&gt;&#39;</span>
+        <span class="n">log</span><span class="p">(</span><span class="n">out</span> <span class="o">+</span> <span class="s">&#39; ------- &#39;</span> <span class="o">+</span> <span class="n">correct</span><span class="p">,</span> <span class="s">&#39;html&#39;</span><span class="p">)</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">assertEqual</span><span class="p">(</span><span class="n">out</span><span class="p">,</span> <span class="n">correct</span><span class="p">)</span>
+
+    <span class="k">def</span> <span class="nf">test_render2</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
+        <span class="n">s</span> <span class="o">=</span> <span class="s">&quot;CO2 + H2O + Fe(OH)3&quot;</span>
+        <span class="n">out</span> <span class="o">=</span> <span class="n">render_to_html</span><span class="p">(</span><span class="n">s</span><span class="p">)</span>
+        <span class="n">correct</span> <span class="o">=</span> <span class="s">u&#39;&lt;span class=&quot;math&quot;&gt;CO&lt;sub&gt;2&lt;/sub&gt;+H&lt;sub&gt;2&lt;/sub&gt;O+Fe(OH)&lt;sub&gt;3&lt;/sub&gt;&lt;/span&gt;&#39;</span>
+        <span class="n">log</span><span class="p">(</span><span class="n">out</span> <span class="o">+</span> <span class="s">&#39; ------- &#39;</span> <span class="o">+</span> <span class="n">correct</span><span class="p">,</span> <span class="s">&#39;html&#39;</span><span class="p">)</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">assertEqual</span><span class="p">(</span><span class="n">out</span><span class="p">,</span> <span class="n">correct</span><span class="p">)</span>
+
+    <span class="k">def</span> <span class="nf">test_render3</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
+        <span class="n">s</span> <span class="o">=</span> <span class="s">&quot;3H2O + 2CO2&quot;</span>
+        <span class="n">out</span> <span class="o">=</span> <span class="n">render_to_html</span><span class="p">(</span><span class="n">s</span><span class="p">)</span>
+        <span class="n">correct</span> <span class="o">=</span> <span class="s">u&#39;&lt;span class=&quot;math&quot;&gt;3H&lt;sub&gt;2&lt;/sub&gt;O+2CO&lt;sub&gt;2&lt;/sub&gt;&lt;/span&gt;&#39;</span>
+        <span class="n">log</span><span class="p">(</span><span class="n">out</span> <span class="o">+</span> <span class="s">&#39; ------- &#39;</span> <span class="o">+</span> <span class="n">correct</span><span class="p">,</span> <span class="s">&#39;html&#39;</span><span class="p">)</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">assertEqual</span><span class="p">(</span><span class="n">out</span><span class="p">,</span> <span class="n">correct</span><span class="p">)</span>
+
+    <span class="k">def</span> <span class="nf">test_render4</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
+        <span class="n">s</span> <span class="o">=</span> <span class="s">&quot;H^+ + OH^-&quot;</span>
+        <span class="n">out</span> <span class="o">=</span> <span class="n">render_to_html</span><span class="p">(</span><span class="n">s</span><span class="p">)</span>
+        <span class="n">correct</span> <span class="o">=</span> <span class="s">u&#39;&lt;span class=&quot;math&quot;&gt;H&lt;sup&gt;+&lt;/sup&gt;+OH&lt;sup&gt;-&lt;/sup&gt;&lt;/span&gt;&#39;</span>
+        <span class="n">log</span><span class="p">(</span><span class="n">out</span> <span class="o">+</span> <span class="s">&#39; ------- &#39;</span> <span class="o">+</span> <span class="n">correct</span><span class="p">,</span> <span class="s">&#39;html&#39;</span><span class="p">)</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">assertEqual</span><span class="p">(</span><span class="n">out</span><span class="p">,</span> <span class="n">correct</span><span class="p">)</span>
+
+    <span class="k">def</span> <span class="nf">test_render5</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
+        <span class="n">s</span> <span class="o">=</span> <span class="s">&quot;Fe(OH)^2- + (OH)^-&quot;</span>
+        <span class="n">out</span> <span class="o">=</span> <span class="n">render_to_html</span><span class="p">(</span><span class="n">s</span><span class="p">)</span>
+        <span class="n">correct</span> <span class="o">=</span> <span class="s">u&#39;&lt;span class=&quot;math&quot;&gt;Fe(OH)&lt;sup&gt;2-&lt;/sup&gt;+(OH)&lt;sup&gt;-&lt;/sup&gt;&lt;/span&gt;&#39;</span>
+        <span class="n">log</span><span class="p">(</span><span class="n">out</span> <span class="o">+</span> <span class="s">&#39; ------- &#39;</span> <span class="o">+</span> <span class="n">correct</span><span class="p">,</span> <span class="s">&#39;html&#39;</span><span class="p">)</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">assertEqual</span><span class="p">(</span><span class="n">out</span><span class="p">,</span> <span class="n">correct</span><span class="p">)</span>
+
+    <span class="k">def</span> <span class="nf">test_render6</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
+        <span class="n">s</span> <span class="o">=</span> <span class="s">&quot;7/2H^+ + 3/5OH^-&quot;</span>
+        <span class="n">out</span> <span class="o">=</span> <span class="n">render_to_html</span><span class="p">(</span><span class="n">s</span><span class="p">)</span>
+        <span class="n">correct</span> <span class="o">=</span> <span class="s">u&#39;&lt;span class=&quot;math&quot;&gt;&lt;sup&gt;7&lt;/sup&gt;&amp;frasl;&lt;sub&gt;2&lt;/sub&gt;H&lt;sup&gt;+&lt;/sup&gt;+&lt;sup&gt;3&lt;/sup&gt;&amp;frasl;&lt;sub&gt;5&lt;/sub&gt;OH&lt;sup&gt;-&lt;/sup&gt;&lt;/span&gt;&#39;</span>
+        <span class="n">log</span><span class="p">(</span><span class="n">out</span> <span class="o">+</span> <span class="s">&#39; ------- &#39;</span> <span class="o">+</span> <span class="n">correct</span><span class="p">,</span> <span class="s">&#39;html&#39;</span><span class="p">)</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">assertEqual</span><span class="p">(</span><span class="n">out</span><span class="p">,</span> <span class="n">correct</span><span class="p">)</span>
+
+    <span class="k">def</span> <span class="nf">test_render7</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
+        <span class="n">s</span> <span class="o">=</span> <span class="s">&quot;5(H1H212)^70010- + 2H2O + 7/2HCl + H2O&quot;</span>
+        <span class="n">out</span> <span class="o">=</span> <span class="n">render_to_html</span><span class="p">(</span><span class="n">s</span><span class="p">)</span>
+        <span class="n">correct</span> <span class="o">=</span> <span class="s">u&#39;&lt;span class=&quot;math&quot;&gt;5(H&lt;sub&gt;1&lt;/sub&gt;H&lt;sub&gt;212&lt;/sub&gt;)&lt;sup&gt;70010-&lt;/sup&gt;+2H&lt;sub&gt;2&lt;/sub&gt;O+&lt;sup&gt;7&lt;/sup&gt;&amp;frasl;&lt;sub&gt;2&lt;/sub&gt;HCl+H&lt;sub&gt;2&lt;/sub&gt;O&lt;/span&gt;&#39;</span>
+        <span class="n">log</span><span class="p">(</span><span class="n">out</span> <span class="o">+</span> <span class="s">&#39; ------- &#39;</span> <span class="o">+</span> <span class="n">correct</span><span class="p">,</span> <span class="s">&#39;html&#39;</span><span class="p">)</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">assertEqual</span><span class="p">(</span><span class="n">out</span><span class="p">,</span> <span class="n">correct</span><span class="p">)</span>
+
+    <span class="k">def</span> <span class="nf">test_render8</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
+        <span class="n">s</span> <span class="o">=</span> <span class="s">&quot;H2O(s) + CO2&quot;</span>
+        <span class="n">out</span> <span class="o">=</span> <span class="n">render_to_html</span><span class="p">(</span><span class="n">s</span><span class="p">)</span>
+        <span class="n">correct</span> <span class="o">=</span> <span class="s">u&#39;&lt;span class=&quot;math&quot;&gt;H&lt;sub&gt;2&lt;/sub&gt;O(s)+CO&lt;sub&gt;2&lt;/sub&gt;&lt;/span&gt;&#39;</span>
+        <span class="n">log</span><span class="p">(</span><span class="n">out</span> <span class="o">+</span> <span class="s">&#39; ------- &#39;</span> <span class="o">+</span> <span class="n">correct</span><span class="p">,</span> <span class="s">&#39;html&#39;</span><span class="p">)</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">assertEqual</span><span class="p">(</span><span class="n">out</span><span class="p">,</span> <span class="n">correct</span><span class="p">)</span>
+
+    <span class="k">def</span> <span class="nf">test_render9</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
+        <span class="n">s</span> <span class="o">=</span> <span class="s">&quot;5[Ni(NH3)4]^2+ + 5/2SO4^2-&quot;</span>
+        <span class="c">#import ipdb; ipdb.set_trace()</span>
+        <span class="n">out</span> <span class="o">=</span> <span class="n">render_to_html</span><span class="p">(</span><span class="n">s</span><span class="p">)</span>
+        <span class="n">correct</span> <span class="o">=</span> <span class="s">u&#39;&lt;span class=&quot;math&quot;&gt;5[Ni(NH&lt;sub&gt;3&lt;/sub&gt;)&lt;sub&gt;4&lt;/sub&gt;]&lt;sup&gt;2+&lt;/sup&gt;+&lt;sup&gt;5&lt;/sup&gt;&amp;frasl;&lt;sub&gt;2&lt;/sub&gt;SO&lt;sub&gt;4&lt;/sub&gt;&lt;sup&gt;2-&lt;/sup&gt;&lt;/span&gt;&#39;</span>
+        <span class="n">log</span><span class="p">(</span><span class="n">out</span> <span class="o">+</span> <span class="s">&#39; ------- &#39;</span> <span class="o">+</span> <span class="n">correct</span><span class="p">,</span> <span class="s">&#39;html&#39;</span><span class="p">)</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">assertEqual</span><span class="p">(</span><span class="n">out</span><span class="p">,</span> <span class="n">correct</span><span class="p">)</span>
+
+    <span class="k">def</span> <span class="nf">test_render_error</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
+        <span class="n">s</span> <span class="o">=</span> <span class="s">&quot;5.2H20&quot;</span>
+        <span class="n">out</span> <span class="o">=</span> <span class="n">render_to_html</span><span class="p">(</span><span class="n">s</span><span class="p">)</span>
+        <span class="n">correct</span> <span class="o">=</span> <span class="s">u&#39;&lt;span class=&quot;math&quot;&gt;&lt;span class=&quot;inline-error inline&quot;&gt;5.2H20&lt;/span&gt;&lt;/span&gt;&#39;</span>
+        <span class="n">log</span><span class="p">(</span><span class="n">out</span> <span class="o">+</span> <span class="s">&#39; ------- &#39;</span> <span class="o">+</span> <span class="n">correct</span><span class="p">,</span> <span class="s">&#39;html&#39;</span><span class="p">)</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">assertEqual</span><span class="p">(</span><span class="n">out</span><span class="p">,</span> <span class="n">correct</span><span class="p">)</span>
+
+    <span class="k">def</span> <span class="nf">test_render_simple_brackets</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
+        <span class="n">s</span> <span class="o">=</span> <span class="s">&quot;(Ar)&quot;</span>
+        <span class="n">out</span> <span class="o">=</span> <span class="n">render_to_html</span><span class="p">(</span><span class="n">s</span><span class="p">)</span>
+        <span class="n">correct</span> <span class="o">=</span> <span class="s">u&#39;&lt;span class=&quot;math&quot;&gt;(Ar)&lt;/span&gt;&#39;</span>
+        <span class="n">log</span><span class="p">(</span><span class="n">out</span> <span class="o">+</span> <span class="s">&#39; ------- &#39;</span> <span class="o">+</span> <span class="n">correct</span><span class="p">,</span> <span class="s">&#39;html&#39;</span><span class="p">)</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">assertEqual</span><span class="p">(</span><span class="n">out</span><span class="p">,</span> <span class="n">correct</span><span class="p">)</span>
+
+    <span class="k">def</span> <span class="nf">test_render_eq1</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
+        <span class="n">s</span> <span class="o">=</span> <span class="s">&quot;H^+ + OH^- -&gt; H2O&quot;</span>
+        <span class="n">out</span> <span class="o">=</span> <span class="n">render_to_html</span><span class="p">(</span><span class="n">s</span><span class="p">)</span>
+        <span class="n">correct</span> <span class="o">=</span> <span class="s">u&#39;&lt;span class=&quot;math&quot;&gt;H&lt;sup&gt;+&lt;/sup&gt;+OH&lt;sup&gt;-&lt;/sup&gt;</span><span class="se">\u2192</span><span class="s">H&lt;sub&gt;2&lt;/sub&gt;O&lt;/span&gt;&#39;</span>
+        <span class="n">log</span><span class="p">(</span><span class="n">out</span> <span class="o">+</span> <span class="s">&#39; ------- &#39;</span> <span class="o">+</span> <span class="n">correct</span><span class="p">,</span> <span class="s">&#39;html&#39;</span><span class="p">)</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">assertEqual</span><span class="p">(</span><span class="n">out</span><span class="p">,</span> <span class="n">correct</span><span class="p">)</span>
+
+    <span class="k">def</span> <span class="nf">test_render_eq2</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
+        <span class="n">s</span> <span class="o">=</span> <span class="s">&quot;H^+ + OH^- &lt;-&gt; H2O&quot;</span>
+        <span class="n">out</span> <span class="o">=</span> <span class="n">render_to_html</span><span class="p">(</span><span class="n">s</span><span class="p">)</span>
+        <span class="n">correct</span> <span class="o">=</span> <span class="s">u&#39;&lt;span class=&quot;math&quot;&gt;H&lt;sup&gt;+&lt;/sup&gt;+OH&lt;sup&gt;-&lt;/sup&gt;</span><span class="se">\u2194</span><span class="s">H&lt;sub&gt;2&lt;/sub&gt;O&lt;/span&gt;&#39;</span>
+        <span class="n">log</span><span class="p">(</span><span class="n">out</span> <span class="o">+</span> <span class="s">&#39; ------- &#39;</span> <span class="o">+</span> <span class="n">correct</span><span class="p">,</span> <span class="s">&#39;html&#39;</span><span class="p">)</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">assertEqual</span><span class="p">(</span><span class="n">out</span><span class="p">,</span> <span class="n">correct</span><span class="p">)</span>
+
+        
+    <span class="k">def</span> <span class="nf">test_render_eq3</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
+        <span class="n">s</span> <span class="o">=</span> <span class="s">&quot;H^+ + OH^- &lt;= H2O&quot;</span>   <span class="c"># unsupported arrow</span>
+        <span class="n">out</span> <span class="o">=</span> <span class="n">render_to_html</span><span class="p">(</span><span class="n">s</span><span class="p">)</span>
+        <span class="n">correct</span> <span class="o">=</span> <span class="s">u&#39;&lt;span class=&quot;math&quot;&gt;&lt;span class=&quot;inline-error inline&quot;&gt;H^+ + OH^- &lt;= H2O&lt;/span&gt;&lt;/span&gt;&#39;</span>
+        <span class="n">log</span><span class="p">(</span><span class="n">out</span> <span class="o">+</span> <span class="s">&#39; ------- &#39;</span> <span class="o">+</span> <span class="n">correct</span><span class="p">,</span> <span class="s">&#39;html&#39;</span><span class="p">)</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">assertEqual</span><span class="p">(</span><span class="n">out</span><span class="p">,</span> <span class="n">correct</span><span class="p">)</span>
+
+
+
+<span class="k">def</span> <span class="nf">suite</span><span class="p">():</span>
+
+    <span class="n">testcases</span> <span class="o">=</span> <span class="p">[</span><span class="n">Test_Compare_Expressions</span><span class="p">,</span> <span class="n">Test_Divide_Expressions</span><span class="p">,</span> <span class="n">Test_Render_Equations</span><span class="p">]</span>
+    <span class="n">suites</span> <span class="o">=</span> <span class="p">[]</span>
+    <span class="k">for</span> <span class="n">testcase</span> <span class="ow">in</span> <span class="n">testcases</span><span class="p">:</span>
+        <span class="n">suites</span><span class="o">.</span><span class="n">append</span><span class="p">(</span><span class="n">unittest</span><span class="o">.</span><span class="n">TestLoader</span><span class="p">()</span><span class="o">.</span><span class="n">loadTestsFromTestCase</span><span class="p">(</span><span class="n">testcase</span><span class="p">))</span>
+    <span class="k">return</span> <span class="n">unittest</span><span class="o">.</span><span class="n">TestSuite</span><span class="p">(</span><span class="n">suites</span><span class="p">)</span>
+
+<span class="k">if</span> <span class="n">__name__</span> <span class="o">==</span> <span class="s">&quot;__main__&quot;</span><span class="p">:</span>
+    <span class="n">local_debug</span> <span class="o">=</span> <span class="bp">True</span>
+    <span class="k">with</span> <span class="n">codecs</span><span class="o">.</span><span class="n">open</span><span class="p">(</span><span class="s">&#39;render.html&#39;</span><span class="p">,</span> <span class="s">&#39;w&#39;</span><span class="p">,</span> <span class="n">encoding</span><span class="o">=</span><span class="s">&#39;utf-8&#39;</span><span class="p">)</span> <span class="k">as</span> <span class="n">f</span><span class="p">:</span>
+        <span class="n">unittest</span><span class="o">.</span><span class="n">TextTestRunner</span><span class="p">(</span><span class="n">verbosity</span><span class="o">=</span><span class="mi">2</span><span class="p">)</span><span class="o">.</span><span class="n">run</span><span class="p">(</span><span class="n">suite</span><span class="p">())</span>
+    <span class="c"># open render.html to look at rendered equations</span>
+</pre></div>
+
+          </div>
+        </div>
+      </div>
+      <div class="clearer"></div>
+    </div>
+    <div class="related">
+      <h3>Navigation</h3>
+      <ul>
+        <li class="right" style="margin-right: 10px">
+          <a href="../../../genindex.html" title="General Index"
+             >index</a></li>
+        <li class="right" >
+          <a href="../../../py-modindex.html" title="Python Module Index"
+             >modules</a> |</li>
+        <li><a href="../../../index.html">MITx 1.0 documentation</a> &raquo;</li>
+          <li><a href="../../index.html" >Module code</a> &raquo;</li> 
+      </ul>
+    </div>
+    <div class="footer">
+        &copy; Copyright 2012, MITx team.
+      Created using <a href="http://sphinx.pocoo.org/">Sphinx</a> 1.1.3.
+    </div>
+  </body>
+</html>

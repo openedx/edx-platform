@@ -1,0 +1,387 @@
+
+
+<!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Transitional//EN"
+  "http://www.w3.org/TR/xhtml1/DTD/xhtml1-transitional.dtd">
+
+
+<html xmlns="http://www.w3.org/1999/xhtml">
+  <head>
+    <meta http-equiv="Content-Type" content="text/html; charset=utf-8" />
+    
+    <title>student.tests &mdash; MITx 1.0 documentation</title>
+    
+    <link rel="stylesheet" href="../../_static/sphinxdoc.css" type="text/css" />
+    <link rel="stylesheet" href="../../_static/pygments.css" type="text/css" />
+    
+    <script type="text/javascript">
+      var DOCUMENTATION_OPTIONS = {
+        URL_ROOT:    '../../',
+        VERSION:     '1.0',
+        COLLAPSE_INDEX: false,
+        FILE_SUFFIX: '.html',
+        HAS_SOURCE:  true
+      };
+    </script>
+    <script type="text/javascript" src="../../_static/jquery.js"></script>
+    <script type="text/javascript" src="../../_static/underscore.js"></script>
+    <script type="text/javascript" src="../../_static/doctools.js"></script>
+    <script type="text/javascript" src="http://cdn.mathjax.org/mathjax/latest/MathJax.js?config=TeX-AMS-MML_HTMLorMML"></script>
+    <link rel="top" title="MITx 1.0 documentation" href="../../index.html" />
+    <link rel="up" title="Module code" href="../index.html" /> 
+  </head>
+  <body>
+<img src="../../_static/homepage-bg.jpg" alt="Edx logo"  width="100%;"/>
+
+    <div class="related">
+      <h3>Navigation</h3>
+      <ul>
+        <li class="right" style="margin-right: 10px">
+          <a href="../../genindex.html" title="General Index"
+             accesskey="I">index</a></li>
+        <li class="right" >
+          <a href="../../py-modindex.html" title="Python Module Index"
+             >modules</a> |</li>
+        <li><a href="../../index.html">MITx 1.0 documentation</a> &raquo;</li>
+          <li><a href="../index.html" accesskey="U">Module code</a> &raquo;</li> 
+      </ul>
+    </div>
+      <div class="sphinxsidebar">
+        <div class="sphinxsidebarwrapper">
+<div id="searchbox" style="display: none">
+  <h3>Quick search</h3>
+    <form class="search" action="../../search.html" method="get">
+      <input type="text" name="q" />
+      <input type="submit" value="Go" />
+      <input type="hidden" name="check_keywords" value="yes" />
+      <input type="hidden" name="area" value="default" />
+    </form>
+    <p class="searchtip" style="font-size: 90%">
+    Enter search terms or a module, class or function name.
+    </p>
+</div>
+<script type="text/javascript">$('#searchbox').show(0);</script>
+        </div>
+      </div>
+
+    <div class="document">
+      <div class="documentwrapper">
+        <div class="bodywrapper">
+          <div class="body">
+            
+  <h1>Source code for student.tests</h1><div class="highlight"><pre>
+<span class="sd">&quot;&quot;&quot;</span>
+<span class="sd">This file demonstrates writing tests using the unittest module. These will pass</span>
+<span class="sd">when you run &quot;manage.py test&quot;.</span>
+
+<span class="sd">Replace this with more appropriate tests for your application.</span>
+<span class="sd">&quot;&quot;&quot;</span>
+<span class="kn">import</span> <span class="nn">logging</span>
+<span class="kn">from</span> <span class="nn">datetime</span> <span class="kn">import</span> <span class="n">datetime</span>
+<span class="kn">from</span> <span class="nn">hashlib</span> <span class="kn">import</span> <span class="n">sha1</span>
+
+<span class="kn">from</span> <span class="nn">django.test</span> <span class="kn">import</span> <span class="n">TestCase</span>
+<span class="kn">from</span> <span class="nn">mock</span> <span class="kn">import</span> <span class="n">patch</span><span class="p">,</span> <span class="n">Mock</span>
+<span class="kn">from</span> <span class="nn">nose.plugins.skip</span> <span class="kn">import</span> <span class="n">SkipTest</span>
+
+<span class="kn">from</span> <span class="nn">.models</span> <span class="kn">import</span> <span class="p">(</span><span class="n">User</span><span class="p">,</span> <span class="n">UserProfile</span><span class="p">,</span> <span class="n">CourseEnrollment</span><span class="p">,</span>
+                     <span class="n">replicate_user</span><span class="p">,</span> <span class="n">USER_FIELDS_TO_COPY</span><span class="p">,</span>
+                     <span class="n">unique_id_for_user</span><span class="p">)</span>
+<span class="kn">from</span> <span class="nn">.views</span> <span class="kn">import</span> <span class="n">process_survey_link</span><span class="p">,</span> <span class="n">_cert_info</span>
+
+<span class="n">COURSE_1</span> <span class="o">=</span> <span class="s">&#39;edX/toy/2012_Fall&#39;</span>
+<span class="n">COURSE_2</span> <span class="o">=</span> <span class="s">&#39;edx/full/6.002_Spring_2012&#39;</span>
+
+<span class="n">log</span> <span class="o">=</span> <span class="n">logging</span><span class="o">.</span><span class="n">getLogger</span><span class="p">(</span><span class="n">__name__</span><span class="p">)</span>
+
+<span class="k">class</span> <span class="nc">ReplicationTest</span><span class="p">(</span><span class="n">TestCase</span><span class="p">):</span>
+
+    <span class="n">multi_db</span> <span class="o">=</span> <span class="bp">True</span>
+
+    <span class="k">def</span> <span class="nf">test_user_replication</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
+        <span class="sd">&quot;&quot;&quot;Test basic user replication.&quot;&quot;&quot;</span>
+        <span class="k">raise</span> <span class="n">SkipTest</span><span class="p">()</span>
+        <span class="n">portal_user</span> <span class="o">=</span> <span class="n">User</span><span class="o">.</span><span class="n">objects</span><span class="o">.</span><span class="n">create_user</span><span class="p">(</span><span class="s">&#39;rusty&#39;</span><span class="p">,</span> <span class="s">&#39;rusty@edx.org&#39;</span><span class="p">,</span> <span class="s">&#39;fakepass&#39;</span><span class="p">)</span>
+        <span class="n">portal_user</span><span class="o">.</span><span class="n">first_name</span><span class="o">=</span><span class="s">&#39;Rusty&#39;</span>
+        <span class="n">portal_user</span><span class="o">.</span><span class="n">last_name</span><span class="o">=</span><span class="s">&#39;Skids&#39;</span>
+        <span class="n">portal_user</span><span class="o">.</span><span class="n">is_staff</span><span class="o">=</span><span class="bp">True</span>
+        <span class="n">portal_user</span><span class="o">.</span><span class="n">is_active</span><span class="o">=</span><span class="bp">True</span>
+        <span class="n">portal_user</span><span class="o">.</span><span class="n">is_superuser</span><span class="o">=</span><span class="bp">True</span>
+        <span class="n">portal_user</span><span class="o">.</span><span class="n">last_login</span><span class="o">=</span><span class="n">datetime</span><span class="p">(</span><span class="mi">2012</span><span class="p">,</span> <span class="mi">1</span><span class="p">,</span> <span class="mi">1</span><span class="p">)</span>
+        <span class="n">portal_user</span><span class="o">.</span><span class="n">date_joined</span><span class="o">=</span><span class="n">datetime</span><span class="p">(</span><span class="mi">2011</span><span class="p">,</span> <span class="mi">1</span><span class="p">,</span> <span class="mi">1</span><span class="p">)</span>
+        <span class="c"># This is an Askbot field and will break if askbot is not included</span>
+
+        <span class="k">if</span> <span class="nb">hasattr</span><span class="p">(</span><span class="n">portal_user</span><span class="p">,</span> <span class="s">&#39;seen_response_count&#39;</span><span class="p">):</span>
+            <span class="n">portal_user</span><span class="o">.</span><span class="n">seen_response_count</span> <span class="o">=</span> <span class="mi">10</span>
+
+        <span class="n">portal_user</span><span class="o">.</span><span class="n">save</span><span class="p">(</span><span class="n">using</span><span class="o">=</span><span class="s">&#39;default&#39;</span><span class="p">)</span>
+
+        <span class="c"># We replicate this user to Course 1, then pull the same user and verify</span>
+        <span class="c"># that the fields copied over properly.</span>
+        <span class="n">replicate_user</span><span class="p">(</span><span class="n">portal_user</span><span class="p">,</span> <span class="n">COURSE_1</span><span class="p">)</span>
+        <span class="n">course_user</span> <span class="o">=</span> <span class="n">User</span><span class="o">.</span><span class="n">objects</span><span class="o">.</span><span class="n">using</span><span class="p">(</span><span class="n">COURSE_1</span><span class="p">)</span><span class="o">.</span><span class="n">get</span><span class="p">(</span><span class="nb">id</span><span class="o">=</span><span class="n">portal_user</span><span class="o">.</span><span class="n">id</span><span class="p">)</span>
+
+        <span class="c"># Make sure the fields we care about got copied over for this user.</span>
+        <span class="k">for</span> <span class="n">field</span> <span class="ow">in</span> <span class="n">USER_FIELDS_TO_COPY</span><span class="p">:</span>
+            <span class="bp">self</span><span class="o">.</span><span class="n">assertEqual</span><span class="p">(</span><span class="nb">getattr</span><span class="p">(</span><span class="n">portal_user</span><span class="p">,</span> <span class="n">field</span><span class="p">),</span>
+                             <span class="nb">getattr</span><span class="p">(</span><span class="n">course_user</span><span class="p">,</span> <span class="n">field</span><span class="p">),</span>
+                             <span class="s">&quot;{0} not copied from {1} to {2}&quot;</span><span class="o">.</span><span class="n">format</span><span class="p">(</span>
+                                 <span class="n">field</span><span class="p">,</span> <span class="n">portal_user</span><span class="p">,</span> <span class="n">course_user</span>
+                             <span class="p">))</span>
+
+        <span class="c"># This hasattr lameness is here because we don&#39;t want this test to be</span>
+        <span class="c"># triggered when we&#39;re being run by CMS tests (Askbot doesn&#39;t exist</span>
+        <span class="c"># there, so the test will fail).</span>
+        <span class="c">#</span>
+        <span class="c"># seen_response_count isn&#39;t a field we care about, so it shouldn&#39;t have</span>
+        <span class="c"># been copied over.</span>
+        <span class="k">if</span> <span class="nb">hasattr</span><span class="p">(</span><span class="n">portal_user</span><span class="p">,</span> <span class="s">&#39;seen_response_count&#39;</span><span class="p">):</span>
+            <span class="n">portal_user</span><span class="o">.</span><span class="n">seen_response_count</span> <span class="o">=</span> <span class="mi">20</span>
+            <span class="n">replicate_user</span><span class="p">(</span><span class="n">portal_user</span><span class="p">,</span> <span class="n">COURSE_1</span><span class="p">)</span>
+            <span class="n">course_user</span> <span class="o">=</span> <span class="n">User</span><span class="o">.</span><span class="n">objects</span><span class="o">.</span><span class="n">using</span><span class="p">(</span><span class="n">COURSE_1</span><span class="p">)</span><span class="o">.</span><span class="n">get</span><span class="p">(</span><span class="nb">id</span><span class="o">=</span><span class="n">portal_user</span><span class="o">.</span><span class="n">id</span><span class="p">)</span>
+            <span class="bp">self</span><span class="o">.</span><span class="n">assertEqual</span><span class="p">(</span><span class="n">portal_user</span><span class="o">.</span><span class="n">seen_response_count</span><span class="p">,</span> <span class="mi">20</span><span class="p">)</span>
+            <span class="bp">self</span><span class="o">.</span><span class="n">assertEqual</span><span class="p">(</span><span class="n">course_user</span><span class="o">.</span><span class="n">seen_response_count</span><span class="p">,</span> <span class="mi">0</span><span class="p">)</span>
+
+        <span class="c"># Another replication should work for an email change however, since</span>
+        <span class="c"># it&#39;s a field we care about.</span>
+        <span class="n">portal_user</span><span class="o">.</span><span class="n">email</span> <span class="o">=</span> <span class="s">&quot;clyde@edx.org&quot;</span>
+        <span class="n">replicate_user</span><span class="p">(</span><span class="n">portal_user</span><span class="p">,</span> <span class="n">COURSE_1</span><span class="p">)</span>
+        <span class="n">course_user</span> <span class="o">=</span> <span class="n">User</span><span class="o">.</span><span class="n">objects</span><span class="o">.</span><span class="n">using</span><span class="p">(</span><span class="n">COURSE_1</span><span class="p">)</span><span class="o">.</span><span class="n">get</span><span class="p">(</span><span class="nb">id</span><span class="o">=</span><span class="n">portal_user</span><span class="o">.</span><span class="n">id</span><span class="p">)</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">assertEqual</span><span class="p">(</span><span class="n">portal_user</span><span class="o">.</span><span class="n">email</span><span class="p">,</span> <span class="n">course_user</span><span class="o">.</span><span class="n">email</span><span class="p">)</span>
+
+        <span class="c"># During this entire time, the user data should never have made it over</span>
+        <span class="c"># to COURSE_2</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">assertRaises</span><span class="p">(</span><span class="n">User</span><span class="o">.</span><span class="n">DoesNotExist</span><span class="p">,</span>
+                          <span class="n">User</span><span class="o">.</span><span class="n">objects</span><span class="o">.</span><span class="n">using</span><span class="p">(</span><span class="n">COURSE_2</span><span class="p">)</span><span class="o">.</span><span class="n">get</span><span class="p">,</span>
+                          <span class="nb">id</span><span class="o">=</span><span class="n">portal_user</span><span class="o">.</span><span class="n">id</span><span class="p">)</span>
+
+
+    <span class="k">def</span> <span class="nf">test_enrollment_for_existing_user_info</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
+        <span class="sd">&quot;&quot;&quot;Test the effect of Enrolling in a class if you&#39;ve already got user</span>
+<span class="sd">        data to be copied over.&quot;&quot;&quot;</span>
+        <span class="k">raise</span> <span class="n">SkipTest</span><span class="p">()</span>
+        <span class="c"># Create our User</span>
+        <span class="n">portal_user</span> <span class="o">=</span> <span class="n">User</span><span class="o">.</span><span class="n">objects</span><span class="o">.</span><span class="n">create_user</span><span class="p">(</span><span class="s">&#39;jack&#39;</span><span class="p">,</span> <span class="s">&#39;jack@edx.org&#39;</span><span class="p">,</span> <span class="s">&#39;fakepass&#39;</span><span class="p">)</span>
+        <span class="n">portal_user</span><span class="o">.</span><span class="n">first_name</span> <span class="o">=</span> <span class="s">&quot;Jack&quot;</span>
+        <span class="n">portal_user</span><span class="o">.</span><span class="n">save</span><span class="p">()</span>
+
+        <span class="c"># Set up our UserProfile info</span>
+        <span class="n">portal_user_profile</span> <span class="o">=</span> <span class="n">UserProfile</span><span class="o">.</span><span class="n">objects</span><span class="o">.</span><span class="n">create</span><span class="p">(</span>
+                                  <span class="n">user</span><span class="o">=</span><span class="n">portal_user</span><span class="p">,</span>
+                                  <span class="n">name</span><span class="o">=</span><span class="s">&quot;Jack Foo&quot;</span><span class="p">,</span>
+                                  <span class="n">level_of_education</span><span class="o">=</span><span class="bp">None</span><span class="p">,</span>
+                                  <span class="n">gender</span><span class="o">=</span><span class="s">&#39;m&#39;</span><span class="p">,</span>
+                                  <span class="n">mailing_address</span><span class="o">=</span><span class="bp">None</span><span class="p">,</span>
+                                  <span class="n">goals</span><span class="o">=</span><span class="s">&quot;World domination&quot;</span><span class="p">,</span>
+                              <span class="p">)</span>
+        <span class="n">portal_user_profile</span><span class="o">.</span><span class="n">save</span><span class="p">()</span>
+
+        <span class="c"># Now let&#39;s see if creating a CourseEnrollment copies all the relevant</span>
+        <span class="c"># data.</span>
+        <span class="n">portal_enrollment</span> <span class="o">=</span> <span class="n">CourseEnrollment</span><span class="o">.</span><span class="n">objects</span><span class="o">.</span><span class="n">create</span><span class="p">(</span><span class="n">user</span><span class="o">=</span><span class="n">portal_user</span><span class="p">,</span>
+                                                            <span class="n">course_id</span><span class="o">=</span><span class="n">COURSE_1</span><span class="p">)</span>
+        <span class="n">portal_enrollment</span><span class="o">.</span><span class="n">save</span><span class="p">()</span>
+
+        <span class="c"># Grab all the copies we expect</span>
+        <span class="n">course_user</span> <span class="o">=</span> <span class="n">User</span><span class="o">.</span><span class="n">objects</span><span class="o">.</span><span class="n">using</span><span class="p">(</span><span class="n">COURSE_1</span><span class="p">)</span><span class="o">.</span><span class="n">get</span><span class="p">(</span><span class="nb">id</span><span class="o">=</span><span class="n">portal_user</span><span class="o">.</span><span class="n">id</span><span class="p">)</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">assertEquals</span><span class="p">(</span><span class="n">portal_user</span><span class="p">,</span> <span class="n">course_user</span><span class="p">)</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">assertRaises</span><span class="p">(</span><span class="n">User</span><span class="o">.</span><span class="n">DoesNotExist</span><span class="p">,</span>
+                          <span class="n">User</span><span class="o">.</span><span class="n">objects</span><span class="o">.</span><span class="n">using</span><span class="p">(</span><span class="n">COURSE_2</span><span class="p">)</span><span class="o">.</span><span class="n">get</span><span class="p">,</span>
+                          <span class="nb">id</span><span class="o">=</span><span class="n">portal_user</span><span class="o">.</span><span class="n">id</span><span class="p">)</span>
+
+        <span class="n">course_enrollment</span> <span class="o">=</span> <span class="n">CourseEnrollment</span><span class="o">.</span><span class="n">objects</span><span class="o">.</span><span class="n">using</span><span class="p">(</span><span class="n">COURSE_1</span><span class="p">)</span><span class="o">.</span><span class="n">get</span><span class="p">(</span><span class="nb">id</span><span class="o">=</span><span class="n">portal_enrollment</span><span class="o">.</span><span class="n">id</span><span class="p">)</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">assertEquals</span><span class="p">(</span><span class="n">portal_enrollment</span><span class="p">,</span> <span class="n">course_enrollment</span><span class="p">)</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">assertRaises</span><span class="p">(</span><span class="n">CourseEnrollment</span><span class="o">.</span><span class="n">DoesNotExist</span><span class="p">,</span>
+                          <span class="n">CourseEnrollment</span><span class="o">.</span><span class="n">objects</span><span class="o">.</span><span class="n">using</span><span class="p">(</span><span class="n">COURSE_2</span><span class="p">)</span><span class="o">.</span><span class="n">get</span><span class="p">,</span>
+                          <span class="nb">id</span><span class="o">=</span><span class="n">portal_enrollment</span><span class="o">.</span><span class="n">id</span><span class="p">)</span>
+
+        <span class="n">course_user_profile</span> <span class="o">=</span> <span class="n">UserProfile</span><span class="o">.</span><span class="n">objects</span><span class="o">.</span><span class="n">using</span><span class="p">(</span><span class="n">COURSE_1</span><span class="p">)</span><span class="o">.</span><span class="n">get</span><span class="p">(</span><span class="nb">id</span><span class="o">=</span><span class="n">portal_user_profile</span><span class="o">.</span><span class="n">id</span><span class="p">)</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">assertEquals</span><span class="p">(</span><span class="n">portal_user_profile</span><span class="p">,</span> <span class="n">course_user_profile</span><span class="p">)</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">assertRaises</span><span class="p">(</span><span class="n">UserProfile</span><span class="o">.</span><span class="n">DoesNotExist</span><span class="p">,</span>
+                          <span class="n">UserProfile</span><span class="o">.</span><span class="n">objects</span><span class="o">.</span><span class="n">using</span><span class="p">(</span><span class="n">COURSE_2</span><span class="p">)</span><span class="o">.</span><span class="n">get</span><span class="p">,</span>
+                          <span class="nb">id</span><span class="o">=</span><span class="n">portal_user_profile</span><span class="o">.</span><span class="n">id</span><span class="p">)</span>
+
+        <span class="n">log</span><span class="o">.</span><span class="n">debug</span><span class="p">(</span><span class="s">&quot;Make sure our seen_response_count is not replicated.&quot;</span><span class="p">)</span>
+        <span class="k">if</span> <span class="nb">hasattr</span><span class="p">(</span><span class="n">portal_user</span><span class="p">,</span> <span class="s">&#39;seen_response_count&#39;</span><span class="p">):</span>
+            <span class="n">portal_user</span><span class="o">.</span><span class="n">seen_response_count</span> <span class="o">=</span> <span class="mi">200</span>
+            <span class="n">course_user</span> <span class="o">=</span> <span class="n">User</span><span class="o">.</span><span class="n">objects</span><span class="o">.</span><span class="n">using</span><span class="p">(</span><span class="n">COURSE_1</span><span class="p">)</span><span class="o">.</span><span class="n">get</span><span class="p">(</span><span class="nb">id</span><span class="o">=</span><span class="n">portal_user</span><span class="o">.</span><span class="n">id</span><span class="p">)</span>
+            <span class="bp">self</span><span class="o">.</span><span class="n">assertEqual</span><span class="p">(</span><span class="n">portal_user</span><span class="o">.</span><span class="n">seen_response_count</span><span class="p">,</span> <span class="mi">200</span><span class="p">)</span>
+            <span class="bp">self</span><span class="o">.</span><span class="n">assertEqual</span><span class="p">(</span><span class="n">course_user</span><span class="o">.</span><span class="n">seen_response_count</span><span class="p">,</span> <span class="mi">0</span><span class="p">)</span>
+            <span class="n">portal_user</span><span class="o">.</span><span class="n">save</span><span class="p">()</span>
+
+            <span class="n">course_user</span> <span class="o">=</span> <span class="n">User</span><span class="o">.</span><span class="n">objects</span><span class="o">.</span><span class="n">using</span><span class="p">(</span><span class="n">COURSE_1</span><span class="p">)</span><span class="o">.</span><span class="n">get</span><span class="p">(</span><span class="nb">id</span><span class="o">=</span><span class="n">portal_user</span><span class="o">.</span><span class="n">id</span><span class="p">)</span>
+            <span class="bp">self</span><span class="o">.</span><span class="n">assertEqual</span><span class="p">(</span><span class="n">portal_user</span><span class="o">.</span><span class="n">seen_response_count</span><span class="p">,</span> <span class="mi">200</span><span class="p">)</span>
+            <span class="bp">self</span><span class="o">.</span><span class="n">assertEqual</span><span class="p">(</span><span class="n">course_user</span><span class="o">.</span><span class="n">seen_response_count</span><span class="p">,</span> <span class="mi">0</span><span class="p">)</span>
+
+            <span class="n">portal_user</span><span class="o">.</span><span class="n">email</span> <span class="o">=</span> <span class="s">&#39;jim@edx.org&#39;</span>
+            <span class="n">portal_user</span><span class="o">.</span><span class="n">save</span><span class="p">()</span>
+            <span class="n">course_user</span> <span class="o">=</span> <span class="n">User</span><span class="o">.</span><span class="n">objects</span><span class="o">.</span><span class="n">using</span><span class="p">(</span><span class="n">COURSE_1</span><span class="p">)</span><span class="o">.</span><span class="n">get</span><span class="p">(</span><span class="nb">id</span><span class="o">=</span><span class="n">portal_user</span><span class="o">.</span><span class="n">id</span><span class="p">)</span>
+            <span class="bp">self</span><span class="o">.</span><span class="n">assertEqual</span><span class="p">(</span><span class="n">portal_user</span><span class="o">.</span><span class="n">email</span><span class="p">,</span> <span class="s">&#39;jim@edx.org&#39;</span><span class="p">)</span>
+            <span class="bp">self</span><span class="o">.</span><span class="n">assertEqual</span><span class="p">(</span><span class="n">course_user</span><span class="o">.</span><span class="n">email</span><span class="p">,</span> <span class="s">&#39;jim@edx.org&#39;</span><span class="p">)</span>
+
+
+
+    <span class="k">def</span> <span class="nf">test_enrollment_for_user_info_after_enrollment</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
+        <span class="sd">&quot;&quot;&quot;Test the effect of modifying User data after you&#39;ve enrolled.&quot;&quot;&quot;</span>
+        <span class="k">raise</span> <span class="n">SkipTest</span><span class="p">()</span>
+
+        <span class="c"># Create our User</span>
+        <span class="n">portal_user</span> <span class="o">=</span> <span class="n">User</span><span class="o">.</span><span class="n">objects</span><span class="o">.</span><span class="n">create_user</span><span class="p">(</span><span class="s">&#39;patty&#39;</span><span class="p">,</span> <span class="s">&#39;patty@edx.org&#39;</span><span class="p">,</span> <span class="s">&#39;fakepass&#39;</span><span class="p">)</span>
+        <span class="n">portal_user</span><span class="o">.</span><span class="n">first_name</span> <span class="o">=</span> <span class="s">&quot;Patty&quot;</span>
+        <span class="n">portal_user</span><span class="o">.</span><span class="n">save</span><span class="p">()</span>
+
+        <span class="c"># Set up our UserProfile info</span>
+        <span class="n">portal_user_profile</span> <span class="o">=</span> <span class="n">UserProfile</span><span class="o">.</span><span class="n">objects</span><span class="o">.</span><span class="n">create</span><span class="p">(</span>
+                                  <span class="n">user</span><span class="o">=</span><span class="n">portal_user</span><span class="p">,</span>
+                                  <span class="n">name</span><span class="o">=</span><span class="s">&quot;Patty Foo&quot;</span><span class="p">,</span>
+                                  <span class="n">level_of_education</span><span class="o">=</span><span class="bp">None</span><span class="p">,</span>
+                                  <span class="n">gender</span><span class="o">=</span><span class="s">&#39;f&#39;</span><span class="p">,</span>
+                                  <span class="n">mailing_address</span><span class="o">=</span><span class="bp">None</span><span class="p">,</span>
+                                  <span class="n">goals</span><span class="o">=</span><span class="s">&quot;World peace&quot;</span><span class="p">,</span>
+                              <span class="p">)</span>
+        <span class="n">portal_user_profile</span><span class="o">.</span><span class="n">save</span><span class="p">()</span>
+
+        <span class="c"># Now let&#39;s see if creating a CourseEnrollment copies all the relevant</span>
+        <span class="c"># data when things are saved.</span>
+        <span class="n">portal_enrollment</span> <span class="o">=</span> <span class="n">CourseEnrollment</span><span class="o">.</span><span class="n">objects</span><span class="o">.</span><span class="n">create</span><span class="p">(</span><span class="n">user</span><span class="o">=</span><span class="n">portal_user</span><span class="p">,</span>
+                                                            <span class="n">course_id</span><span class="o">=</span><span class="n">COURSE_1</span><span class="p">)</span>
+        <span class="n">portal_enrollment</span><span class="o">.</span><span class="n">save</span><span class="p">()</span>
+
+        <span class="n">portal_user</span><span class="o">.</span><span class="n">last_name</span> <span class="o">=</span> <span class="s">&quot;Bar&quot;</span>
+        <span class="n">portal_user</span><span class="o">.</span><span class="n">save</span><span class="p">()</span>
+        <span class="n">portal_user_profile</span><span class="o">.</span><span class="n">gender</span> <span class="o">=</span> <span class="s">&#39;m&#39;</span>
+        <span class="n">portal_user_profile</span><span class="o">.</span><span class="n">save</span><span class="p">()</span>
+
+        <span class="c"># Grab all the copies we expect, and make sure it doesn&#39;t end up in</span>
+        <span class="c"># places we don&#39;t expect.</span>
+        <span class="n">course_user</span> <span class="o">=</span> <span class="n">User</span><span class="o">.</span><span class="n">objects</span><span class="o">.</span><span class="n">using</span><span class="p">(</span><span class="n">COURSE_1</span><span class="p">)</span><span class="o">.</span><span class="n">get</span><span class="p">(</span><span class="nb">id</span><span class="o">=</span><span class="n">portal_user</span><span class="o">.</span><span class="n">id</span><span class="p">)</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">assertEquals</span><span class="p">(</span><span class="n">portal_user</span><span class="p">,</span> <span class="n">course_user</span><span class="p">)</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">assertRaises</span><span class="p">(</span><span class="n">User</span><span class="o">.</span><span class="n">DoesNotExist</span><span class="p">,</span>
+                          <span class="n">User</span><span class="o">.</span><span class="n">objects</span><span class="o">.</span><span class="n">using</span><span class="p">(</span><span class="n">COURSE_2</span><span class="p">)</span><span class="o">.</span><span class="n">get</span><span class="p">,</span>
+                          <span class="nb">id</span><span class="o">=</span><span class="n">portal_user</span><span class="o">.</span><span class="n">id</span><span class="p">)</span>
+
+        <span class="n">course_enrollment</span> <span class="o">=</span> <span class="n">CourseEnrollment</span><span class="o">.</span><span class="n">objects</span><span class="o">.</span><span class="n">using</span><span class="p">(</span><span class="n">COURSE_1</span><span class="p">)</span><span class="o">.</span><span class="n">get</span><span class="p">(</span><span class="nb">id</span><span class="o">=</span><span class="n">portal_enrollment</span><span class="o">.</span><span class="n">id</span><span class="p">)</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">assertEquals</span><span class="p">(</span><span class="n">portal_enrollment</span><span class="p">,</span> <span class="n">course_enrollment</span><span class="p">)</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">assertRaises</span><span class="p">(</span><span class="n">CourseEnrollment</span><span class="o">.</span><span class="n">DoesNotExist</span><span class="p">,</span>
+                          <span class="n">CourseEnrollment</span><span class="o">.</span><span class="n">objects</span><span class="o">.</span><span class="n">using</span><span class="p">(</span><span class="n">COURSE_2</span><span class="p">)</span><span class="o">.</span><span class="n">get</span><span class="p">,</span>
+                          <span class="nb">id</span><span class="o">=</span><span class="n">portal_enrollment</span><span class="o">.</span><span class="n">id</span><span class="p">)</span>
+
+        <span class="n">course_user_profile</span> <span class="o">=</span> <span class="n">UserProfile</span><span class="o">.</span><span class="n">objects</span><span class="o">.</span><span class="n">using</span><span class="p">(</span><span class="n">COURSE_1</span><span class="p">)</span><span class="o">.</span><span class="n">get</span><span class="p">(</span><span class="nb">id</span><span class="o">=</span><span class="n">portal_user_profile</span><span class="o">.</span><span class="n">id</span><span class="p">)</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">assertEquals</span><span class="p">(</span><span class="n">portal_user_profile</span><span class="p">,</span> <span class="n">course_user_profile</span><span class="p">)</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">assertRaises</span><span class="p">(</span><span class="n">UserProfile</span><span class="o">.</span><span class="n">DoesNotExist</span><span class="p">,</span>
+                          <span class="n">UserProfile</span><span class="o">.</span><span class="n">objects</span><span class="o">.</span><span class="n">using</span><span class="p">(</span><span class="n">COURSE_2</span><span class="p">)</span><span class="o">.</span><span class="n">get</span><span class="p">,</span>
+                          <span class="nb">id</span><span class="o">=</span><span class="n">portal_user_profile</span><span class="o">.</span><span class="n">id</span><span class="p">)</span>
+
+
+<div class="viewcode-block" id="CourseEndingTest"><a class="viewcode-back" href="../../djangoapps-common.html#student.tests.CourseEndingTest">[docs]</a><span class="k">class</span> <span class="nc">CourseEndingTest</span><span class="p">(</span><span class="n">TestCase</span><span class="p">):</span>
+    <span class="sd">&quot;&quot;&quot;Test things related to course endings: certificates, surveys, etc&quot;&quot;&quot;</span>
+
+    <span class="k">def</span> <span class="nf">test_process_survey_link</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
+        <span class="n">username</span> <span class="o">=</span> <span class="s">&quot;fred&quot;</span>
+        <span class="n">user</span> <span class="o">=</span> <span class="n">Mock</span><span class="p">(</span><span class="n">username</span><span class="o">=</span><span class="n">username</span><span class="p">)</span>
+        <span class="nb">id</span> <span class="o">=</span> <span class="n">unique_id_for_user</span><span class="p">(</span><span class="n">user</span><span class="p">)</span>
+        <span class="n">link1</span> <span class="o">=</span> <span class="s">&quot;http://www.mysurvey.com&quot;</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">assertEqual</span><span class="p">(</span><span class="n">process_survey_link</span><span class="p">(</span><span class="n">link1</span><span class="p">,</span> <span class="n">user</span><span class="p">),</span> <span class="n">link1</span><span class="p">)</span>
+
+        <span class="n">link2</span> <span class="o">=</span> <span class="s">&quot;http://www.mysurvey.com?unique={UNIQUE_ID}&quot;</span>
+        <span class="n">link2_expected</span> <span class="o">=</span> <span class="s">&quot;http://www.mysurvey.com?unique={UNIQUE_ID}&quot;</span><span class="o">.</span><span class="n">format</span><span class="p">(</span><span class="n">UNIQUE_ID</span><span class="o">=</span><span class="nb">id</span><span class="p">)</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">assertEqual</span><span class="p">(</span><span class="n">process_survey_link</span><span class="p">(</span><span class="n">link2</span><span class="p">,</span> <span class="n">user</span><span class="p">),</span> <span class="n">link2_expected</span><span class="p">)</span>
+
+    <span class="k">def</span> <span class="nf">test_cert_info</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
+        <span class="n">user</span> <span class="o">=</span> <span class="n">Mock</span><span class="p">(</span><span class="n">username</span><span class="o">=</span><span class="s">&quot;fred&quot;</span><span class="p">)</span>
+        <span class="n">survey_url</span> <span class="o">=</span> <span class="s">&quot;http://a_survey.com&quot;</span>
+        <span class="n">course</span> <span class="o">=</span> <span class="n">Mock</span><span class="p">(</span><span class="n">end_of_course_survey_url</span><span class="o">=</span><span class="n">survey_url</span><span class="p">)</span>
+
+        <span class="bp">self</span><span class="o">.</span><span class="n">assertEqual</span><span class="p">(</span><span class="n">_cert_info</span><span class="p">(</span><span class="n">user</span><span class="p">,</span> <span class="n">course</span><span class="p">,</span> <span class="bp">None</span><span class="p">),</span>
+                         <span class="p">{</span><span class="s">&#39;status&#39;</span><span class="p">:</span> <span class="s">&#39;processing&#39;</span><span class="p">,</span>
+                          <span class="s">&#39;show_disabled_download_button&#39;</span><span class="p">:</span> <span class="bp">False</span><span class="p">,</span>
+                          <span class="s">&#39;show_download_url&#39;</span><span class="p">:</span> <span class="bp">False</span><span class="p">,</span>
+                          <span class="s">&#39;show_survey_button&#39;</span><span class="p">:</span> <span class="bp">False</span><span class="p">,})</span>
+
+        <span class="n">cert_status</span> <span class="o">=</span> <span class="p">{</span><span class="s">&#39;status&#39;</span><span class="p">:</span> <span class="s">&#39;unavailable&#39;</span><span class="p">}</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">assertEqual</span><span class="p">(</span><span class="n">_cert_info</span><span class="p">(</span><span class="n">user</span><span class="p">,</span> <span class="n">course</span><span class="p">,</span> <span class="n">cert_status</span><span class="p">),</span>
+                         <span class="p">{</span><span class="s">&#39;status&#39;</span><span class="p">:</span> <span class="s">&#39;processing&#39;</span><span class="p">,</span>
+                          <span class="s">&#39;show_disabled_download_button&#39;</span><span class="p">:</span> <span class="bp">False</span><span class="p">,</span>
+                          <span class="s">&#39;show_download_url&#39;</span><span class="p">:</span> <span class="bp">False</span><span class="p">,</span>
+                          <span class="s">&#39;show_survey_button&#39;</span><span class="p">:</span> <span class="bp">False</span><span class="p">})</span>
+
+        <span class="n">cert_status</span> <span class="o">=</span> <span class="p">{</span><span class="s">&#39;status&#39;</span><span class="p">:</span> <span class="s">&#39;generating&#39;</span><span class="p">,</span> <span class="s">&#39;grade&#39;</span><span class="p">:</span> <span class="s">&#39;67&#39;</span><span class="p">}</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">assertEqual</span><span class="p">(</span><span class="n">_cert_info</span><span class="p">(</span><span class="n">user</span><span class="p">,</span> <span class="n">course</span><span class="p">,</span> <span class="n">cert_status</span><span class="p">),</span>
+                         <span class="p">{</span><span class="s">&#39;status&#39;</span><span class="p">:</span> <span class="s">&#39;generating&#39;</span><span class="p">,</span>
+                          <span class="s">&#39;show_disabled_download_button&#39;</span><span class="p">:</span> <span class="bp">True</span><span class="p">,</span>
+                          <span class="s">&#39;show_download_url&#39;</span><span class="p">:</span> <span class="bp">False</span><span class="p">,</span>
+                          <span class="s">&#39;show_survey_button&#39;</span><span class="p">:</span> <span class="bp">True</span><span class="p">,</span>
+                          <span class="s">&#39;survey_url&#39;</span><span class="p">:</span> <span class="n">survey_url</span><span class="p">,</span>
+                          <span class="s">&#39;grade&#39;</span><span class="p">:</span> <span class="s">&#39;67&#39;</span>
+                          <span class="p">})</span>
+
+        <span class="n">cert_status</span> <span class="o">=</span> <span class="p">{</span><span class="s">&#39;status&#39;</span><span class="p">:</span> <span class="s">&#39;regenerating&#39;</span><span class="p">,</span> <span class="s">&#39;grade&#39;</span><span class="p">:</span> <span class="s">&#39;67&#39;</span><span class="p">}</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">assertEqual</span><span class="p">(</span><span class="n">_cert_info</span><span class="p">(</span><span class="n">user</span><span class="p">,</span> <span class="n">course</span><span class="p">,</span> <span class="n">cert_status</span><span class="p">),</span>
+                         <span class="p">{</span><span class="s">&#39;status&#39;</span><span class="p">:</span> <span class="s">&#39;generating&#39;</span><span class="p">,</span>
+                          <span class="s">&#39;show_disabled_download_button&#39;</span><span class="p">:</span> <span class="bp">True</span><span class="p">,</span>
+                          <span class="s">&#39;show_download_url&#39;</span><span class="p">:</span> <span class="bp">False</span><span class="p">,</span>
+                          <span class="s">&#39;show_survey_button&#39;</span><span class="p">:</span> <span class="bp">True</span><span class="p">,</span>
+                          <span class="s">&#39;survey_url&#39;</span><span class="p">:</span> <span class="n">survey_url</span><span class="p">,</span>
+                          <span class="s">&#39;grade&#39;</span><span class="p">:</span> <span class="s">&#39;67&#39;</span>
+                          <span class="p">})</span>
+
+        <span class="n">download_url</span> <span class="o">=</span> <span class="s">&#39;http://s3.edx/cert&#39;</span>
+        <span class="n">cert_status</span> <span class="o">=</span> <span class="p">{</span><span class="s">&#39;status&#39;</span><span class="p">:</span> <span class="s">&#39;downloadable&#39;</span><span class="p">,</span> <span class="s">&#39;grade&#39;</span><span class="p">:</span> <span class="s">&#39;67&#39;</span><span class="p">,</span>
+                       <span class="s">&#39;download_url&#39;</span><span class="p">:</span> <span class="n">download_url</span><span class="p">}</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">assertEqual</span><span class="p">(</span><span class="n">_cert_info</span><span class="p">(</span><span class="n">user</span><span class="p">,</span> <span class="n">course</span><span class="p">,</span> <span class="n">cert_status</span><span class="p">),</span>
+                         <span class="p">{</span><span class="s">&#39;status&#39;</span><span class="p">:</span> <span class="s">&#39;ready&#39;</span><span class="p">,</span>
+                          <span class="s">&#39;show_disabled_download_button&#39;</span><span class="p">:</span> <span class="bp">False</span><span class="p">,</span>
+                          <span class="s">&#39;show_download_url&#39;</span><span class="p">:</span> <span class="bp">True</span><span class="p">,</span>
+                          <span class="s">&#39;download_url&#39;</span><span class="p">:</span> <span class="n">download_url</span><span class="p">,</span>
+                          <span class="s">&#39;show_survey_button&#39;</span><span class="p">:</span> <span class="bp">True</span><span class="p">,</span>
+                          <span class="s">&#39;survey_url&#39;</span><span class="p">:</span> <span class="n">survey_url</span><span class="p">,</span>
+                          <span class="s">&#39;grade&#39;</span><span class="p">:</span> <span class="s">&#39;67&#39;</span>
+                          <span class="p">})</span>
+
+        <span class="n">cert_status</span> <span class="o">=</span> <span class="p">{</span><span class="s">&#39;status&#39;</span><span class="p">:</span> <span class="s">&#39;notpassing&#39;</span><span class="p">,</span> <span class="s">&#39;grade&#39;</span><span class="p">:</span> <span class="s">&#39;67&#39;</span><span class="p">,</span>
+                       <span class="s">&#39;download_url&#39;</span><span class="p">:</span> <span class="n">download_url</span><span class="p">}</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">assertEqual</span><span class="p">(</span><span class="n">_cert_info</span><span class="p">(</span><span class="n">user</span><span class="p">,</span> <span class="n">course</span><span class="p">,</span> <span class="n">cert_status</span><span class="p">),</span>
+                         <span class="p">{</span><span class="s">&#39;status&#39;</span><span class="p">:</span> <span class="s">&#39;notpassing&#39;</span><span class="p">,</span>
+                          <span class="s">&#39;show_disabled_download_button&#39;</span><span class="p">:</span> <span class="bp">False</span><span class="p">,</span>
+                          <span class="s">&#39;show_download_url&#39;</span><span class="p">:</span> <span class="bp">False</span><span class="p">,</span>
+                          <span class="s">&#39;show_survey_button&#39;</span><span class="p">:</span> <span class="bp">True</span><span class="p">,</span>
+                          <span class="s">&#39;survey_url&#39;</span><span class="p">:</span> <span class="n">survey_url</span><span class="p">,</span>
+                          <span class="s">&#39;grade&#39;</span><span class="p">:</span> <span class="s">&#39;67&#39;</span>
+                          <span class="p">})</span>
+
+        <span class="c"># Test a course that doesn&#39;t have a survey specified</span>
+        <span class="n">course2</span> <span class="o">=</span> <span class="n">Mock</span><span class="p">(</span><span class="n">end_of_course_survey_url</span><span class="o">=</span><span class="bp">None</span><span class="p">)</span>
+        <span class="n">cert_status</span> <span class="o">=</span> <span class="p">{</span><span class="s">&#39;status&#39;</span><span class="p">:</span> <span class="s">&#39;notpassing&#39;</span><span class="p">,</span> <span class="s">&#39;grade&#39;</span><span class="p">:</span> <span class="s">&#39;67&#39;</span><span class="p">,</span>
+                       <span class="s">&#39;download_url&#39;</span><span class="p">:</span> <span class="n">download_url</span><span class="p">}</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">assertEqual</span><span class="p">(</span><span class="n">_cert_info</span><span class="p">(</span><span class="n">user</span><span class="p">,</span> <span class="n">course2</span><span class="p">,</span> <span class="n">cert_status</span><span class="p">),</span>
+                         <span class="p">{</span><span class="s">&#39;status&#39;</span><span class="p">:</span> <span class="s">&#39;notpassing&#39;</span><span class="p">,</span>
+                          <span class="s">&#39;show_disabled_download_button&#39;</span><span class="p">:</span> <span class="bp">False</span><span class="p">,</span>
+                          <span class="s">&#39;show_download_url&#39;</span><span class="p">:</span> <span class="bp">False</span><span class="p">,</span>
+                          <span class="s">&#39;show_survey_button&#39;</span><span class="p">:</span> <span class="bp">False</span><span class="p">,</span>
+                          <span class="s">&#39;grade&#39;</span><span class="p">:</span> <span class="s">&#39;67&#39;</span>
+                          <span class="p">})</span></div>
+</pre></div>
+
+          </div>
+        </div>
+      </div>
+      <div class="clearer"></div>
+    </div>
+    <div class="related">
+      <h3>Navigation</h3>
+      <ul>
+        <li class="right" style="margin-right: 10px">
+          <a href="../../genindex.html" title="General Index"
+             >index</a></li>
+        <li class="right" >
+          <a href="../../py-modindex.html" title="Python Module Index"
+             >modules</a> |</li>
+        <li><a href="../../index.html">MITx 1.0 documentation</a> &raquo;</li>
+          <li><a href="../index.html" >Module code</a> &raquo;</li> 
+      </ul>
+    </div>
+    <div class="footer">
+        &copy; Copyright 2012, MITx team.
+      Created using <a href="http://sphinx.pocoo.org/">Sphinx</a> 1.1.3.
+    </div>
+  </body>
+</html>

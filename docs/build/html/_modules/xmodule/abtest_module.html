@@ -1,0 +1,273 @@
+
+
+<!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Transitional//EN"
+  "http://www.w3.org/TR/xhtml1/DTD/xhtml1-transitional.dtd">
+
+
+<html xmlns="http://www.w3.org/1999/xhtml">
+  <head>
+    <meta http-equiv="Content-Type" content="text/html; charset=utf-8" />
+    
+    <title>xmodule.abtest_module &mdash; MITx 1.0 documentation</title>
+    
+    <link rel="stylesheet" href="../../_static/sphinxdoc.css" type="text/css" />
+    <link rel="stylesheet" href="../../_static/pygments.css" type="text/css" />
+    
+    <script type="text/javascript">
+      var DOCUMENTATION_OPTIONS = {
+        URL_ROOT:    '../../',
+        VERSION:     '1.0',
+        COLLAPSE_INDEX: false,
+        FILE_SUFFIX: '.html',
+        HAS_SOURCE:  true
+      };
+    </script>
+    <script type="text/javascript" src="../../_static/jquery.js"></script>
+    <script type="text/javascript" src="../../_static/underscore.js"></script>
+    <script type="text/javascript" src="../../_static/doctools.js"></script>
+    <script type="text/javascript" src="http://cdn.mathjax.org/mathjax/latest/MathJax.js?config=TeX-AMS-MML_HTMLorMML"></script>
+    <link rel="top" title="MITx 1.0 documentation" href="../../index.html" />
+    <link rel="up" title="Module code" href="../index.html" /> 
+  </head>
+  <body>
+<img src="../../_static/homepage-bg.jpg" alt="Edx logo"  width="100%;"/>
+
+    <div class="related">
+      <h3>Navigation</h3>
+      <ul>
+        <li class="right" style="margin-right: 10px">
+          <a href="../../genindex.html" title="General Index"
+             accesskey="I">index</a></li>
+        <li class="right" >
+          <a href="../../py-modindex.html" title="Python Module Index"
+             >modules</a> |</li>
+        <li><a href="../../index.html">MITx 1.0 documentation</a> &raquo;</li>
+          <li><a href="../index.html" accesskey="U">Module code</a> &raquo;</li> 
+      </ul>
+    </div>
+      <div class="sphinxsidebar">
+        <div class="sphinxsidebarwrapper">
+<div id="searchbox" style="display: none">
+  <h3>Quick search</h3>
+    <form class="search" action="../../search.html" method="get">
+      <input type="text" name="q" />
+      <input type="submit" value="Go" />
+      <input type="hidden" name="check_keywords" value="yes" />
+      <input type="hidden" name="area" value="default" />
+    </form>
+    <p class="searchtip" style="font-size: 90%">
+    Enter search terms or a module, class or function name.
+    </p>
+</div>
+<script type="text/javascript">$('#searchbox').show(0);</script>
+        </div>
+      </div>
+
+    <div class="document">
+      <div class="documentwrapper">
+        <div class="bodywrapper">
+          <div class="body">
+            
+  <h1>Source code for xmodule.abtest_module</h1><div class="highlight"><pre>
+<span class="kn">import</span> <span class="nn">json</span>
+<span class="kn">import</span> <span class="nn">random</span>
+<span class="kn">import</span> <span class="nn">logging</span>
+<span class="kn">from</span> <span class="nn">lxml</span> <span class="kn">import</span> <span class="n">etree</span>
+
+<span class="kn">from</span> <span class="nn">xmodule.x_module</span> <span class="kn">import</span> <span class="n">XModule</span>
+<span class="kn">from</span> <span class="nn">xmodule.raw_module</span> <span class="kn">import</span> <span class="n">RawDescriptor</span>
+<span class="kn">from</span> <span class="nn">xmodule.xml_module</span> <span class="kn">import</span> <span class="n">XmlDescriptor</span>
+<span class="kn">from</span> <span class="nn">xmodule.exceptions</span> <span class="kn">import</span> <span class="n">InvalidDefinitionError</span>
+
+<span class="n">DEFAULT</span> <span class="o">=</span> <span class="s">&quot;_DEFAULT_GROUP&quot;</span>
+
+
+<span class="n">log</span> <span class="o">=</span> <span class="n">logging</span><span class="o">.</span><span class="n">getLogger</span><span class="p">(</span><span class="n">__name__</span><span class="p">)</span>
+
+
+<div class="viewcode-block" id="group_from_value"><a class="viewcode-back" href="../../xmodule.html#xmodule.abtest_module.group_from_value">[docs]</a><span class="k">def</span> <span class="nf">group_from_value</span><span class="p">(</span><span class="n">groups</span><span class="p">,</span> <span class="n">v</span><span class="p">):</span>
+    <span class="sd">&quot;&quot;&quot;</span>
+<span class="sd">    Given group: ((&#39;a&#39;, 0.3), (&#39;b&#39;, 0.4), (&#39;c&#39;, 0.3)) and random value v</span>
+<span class="sd">    in [0,1], return the associated group (in the above case, return</span>
+<span class="sd">    &#39;a&#39; if v &lt; 0.3, &#39;b&#39; if 0.3 &lt;= v &lt; 0.7, and &#39;c&#39; if v &gt; 0.7</span>
+<span class="sd">    &quot;&quot;&quot;</span>
+    <span class="nb">sum</span> <span class="o">=</span> <span class="mi">0</span>
+    <span class="k">for</span> <span class="p">(</span><span class="n">g</span><span class="p">,</span> <span class="n">p</span><span class="p">)</span> <span class="ow">in</span> <span class="n">groups</span><span class="p">:</span>
+        <span class="nb">sum</span> <span class="o">=</span> <span class="nb">sum</span> <span class="o">+</span> <span class="n">p</span>
+        <span class="k">if</span> <span class="nb">sum</span> <span class="o">&gt;</span> <span class="n">v</span><span class="p">:</span>
+            <span class="k">return</span> <span class="n">g</span>
+
+    <span class="c"># Round off errors might cause us to run to the end of the list.</span>
+    <span class="c"># If the do, return the last element.</span>
+    <span class="k">return</span> <span class="n">g</span>
+
+</div>
+<div class="viewcode-block" id="ABTestModule"><a class="viewcode-back" href="../../xmodule.html#xmodule.abtest_module.ABTestModule">[docs]</a><span class="k">class</span> <span class="nc">ABTestModule</span><span class="p">(</span><span class="n">XModule</span><span class="p">):</span>
+    <span class="sd">&quot;&quot;&quot;</span>
+<span class="sd">    Implements an A/B test with an aribtrary number of competing groups</span>
+<span class="sd">    &quot;&quot;&quot;</span>
+
+    <span class="k">def</span> <span class="nf">__init__</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">system</span><span class="p">,</span> <span class="n">location</span><span class="p">,</span> <span class="n">definition</span><span class="p">,</span> <span class="n">descriptor</span><span class="p">,</span> <span class="n">instance_state</span><span class="o">=</span><span class="bp">None</span><span class="p">,</span> <span class="n">shared_state</span><span class="o">=</span><span class="bp">None</span><span class="p">,</span> <span class="o">**</span><span class="n">kwargs</span><span class="p">):</span>
+        <span class="n">XModule</span><span class="o">.</span><span class="n">__init__</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">system</span><span class="p">,</span> <span class="n">location</span><span class="p">,</span> <span class="n">definition</span><span class="p">,</span> <span class="n">descriptor</span><span class="p">,</span> <span class="n">instance_state</span><span class="p">,</span> <span class="n">shared_state</span><span class="p">,</span> <span class="o">**</span><span class="n">kwargs</span><span class="p">)</span>
+
+        <span class="k">if</span> <span class="n">shared_state</span> <span class="ow">is</span> <span class="bp">None</span><span class="p">:</span>
+
+            <span class="bp">self</span><span class="o">.</span><span class="n">group</span> <span class="o">=</span> <span class="n">group_from_value</span><span class="p">(</span>
+                <span class="bp">self</span><span class="o">.</span><span class="n">definition</span><span class="p">[</span><span class="s">&#39;data&#39;</span><span class="p">][</span><span class="s">&#39;group_portions&#39;</span><span class="p">]</span><span class="o">.</span><span class="n">items</span><span class="p">(),</span>
+                <span class="n">random</span><span class="o">.</span><span class="n">uniform</span><span class="p">(</span><span class="mi">0</span><span class="p">,</span> <span class="mi">1</span><span class="p">)</span>
+            <span class="p">)</span>
+        <span class="k">else</span><span class="p">:</span>
+            <span class="n">shared_state</span> <span class="o">=</span> <span class="n">json</span><span class="o">.</span><span class="n">loads</span><span class="p">(</span><span class="n">shared_state</span><span class="p">)</span>
+            <span class="bp">self</span><span class="o">.</span><span class="n">group</span> <span class="o">=</span> <span class="n">shared_state</span><span class="p">[</span><span class="s">&#39;group&#39;</span><span class="p">]</span>
+
+    <span class="k">def</span> <span class="nf">get_shared_state</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
+        <span class="k">return</span> <span class="n">json</span><span class="o">.</span><span class="n">dumps</span><span class="p">({</span><span class="s">&#39;group&#39;</span><span class="p">:</span> <span class="bp">self</span><span class="o">.</span><span class="n">group</span><span class="p">})</span>
+    
+    <span class="k">def</span> <span class="nf">get_children_locations</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
+        <span class="k">return</span> <span class="bp">self</span><span class="o">.</span><span class="n">definition</span><span class="p">[</span><span class="s">&#39;data&#39;</span><span class="p">][</span><span class="s">&#39;group_content&#39;</span><span class="p">][</span><span class="bp">self</span><span class="o">.</span><span class="n">group</span><span class="p">]</span>
+        
+    <span class="k">def</span> <span class="nf">displayable_items</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
+        <span class="c"># Most modules return &quot;self&quot; as the displayable_item. We never display ourself</span>
+        <span class="c"># (which is why we don&#39;t implement get_html). We only display our children.</span>
+        <span class="k">return</span> <span class="bp">self</span><span class="o">.</span><span class="n">get_children</span><span class="p">()</span>
+
+
+<span class="c"># TODO (cpennington): Use Groups should be a first class object, rather than being</span>
+<span class="c"># managed by ABTests</span></div>
+<span class="k">class</span> <span class="nc">ABTestDescriptor</span><span class="p">(</span><span class="n">RawDescriptor</span><span class="p">,</span> <span class="n">XmlDescriptor</span><span class="p">):</span>
+    <span class="n">module_class</span> <span class="o">=</span> <span class="n">ABTestModule</span>
+
+<span class="c">#    template_dir_name = &quot;abtest&quot;</span>
+
+    <span class="k">def</span> <span class="nf">__init__</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">system</span><span class="p">,</span> <span class="n">definition</span><span class="o">=</span><span class="bp">None</span><span class="p">,</span> <span class="o">**</span><span class="n">kwargs</span><span class="p">):</span>
+        <span class="sd">&quot;&quot;&quot;</span>
+<span class="sd">        definition is a dictionary with the following layout:</span>
+<span class="sd">            {&#39;data&#39;: {</span>
+<span class="sd">                &#39;experiment&#39;: &#39;the name of the experiment&#39;,</span>
+<span class="sd">                &#39;group_portions&#39;: {</span>
+<span class="sd">                    &#39;group_a&#39;: 0.1,</span>
+<span class="sd">                    &#39;group_b&#39;: 0.2</span>
+<span class="sd">                },</span>
+<span class="sd">                &#39;group_contents&#39;: {</span>
+<span class="sd">                    &#39;group_a&#39;: [</span>
+<span class="sd">                        &#39;url://for/content/module/1&#39;,</span>
+<span class="sd">                        &#39;url://for/content/module/2&#39;,</span>
+<span class="sd">                    ],</span>
+<span class="sd">                    &#39;group_b&#39;: [</span>
+<span class="sd">                        &#39;url://for/content/module/3&#39;,</span>
+<span class="sd">                    ],</span>
+<span class="sd">                    DEFAULT: [</span>
+<span class="sd">                        &#39;url://for/default/content/1&#39;</span>
+<span class="sd">                    ]</span>
+<span class="sd">                }</span>
+<span class="sd">            },</span>
+<span class="sd">            &#39;children&#39;: [</span>
+<span class="sd">                &#39;url://for/content/module/1&#39;,</span>
+<span class="sd">                &#39;url://for/content/module/2&#39;,</span>
+<span class="sd">                &#39;url://for/content/module/3&#39;,</span>
+<span class="sd">                &#39;url://for/default/content/1&#39;,</span>
+<span class="sd">            ]}</span>
+<span class="sd">        &quot;&quot;&quot;</span>
+        <span class="n">kwargs</span><span class="p">[</span><span class="s">&#39;shared_state_key&#39;</span><span class="p">]</span> <span class="o">=</span> <span class="n">definition</span><span class="p">[</span><span class="s">&#39;data&#39;</span><span class="p">][</span><span class="s">&#39;experiment&#39;</span><span class="p">]</span>
+        <span class="n">RawDescriptor</span><span class="o">.</span><span class="n">__init__</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">system</span><span class="p">,</span> <span class="n">definition</span><span class="p">,</span> <span class="o">**</span><span class="n">kwargs</span><span class="p">)</span>
+
+    <span class="nd">@classmethod</span>
+    <span class="k">def</span> <span class="nf">definition_from_xml</span><span class="p">(</span><span class="n">cls</span><span class="p">,</span> <span class="n">xml_object</span><span class="p">,</span> <span class="n">system</span><span class="p">):</span>
+        <span class="sd">&quot;&quot;&quot;</span>
+<span class="sd">        XML Format:</span>
+<span class="sd">        &lt;abtest experiment=&quot;experiment_name&quot;&gt;</span>
+<span class="sd">            &lt;group name=&quot;a&quot; portion=&quot;.1&quot;&gt;&lt;contenta/&gt;&lt;/group&gt;</span>
+<span class="sd">            &lt;group name=&quot;b&quot; portion=&quot;.2&quot;&gt;&lt;contentb/&gt;&lt;/group&gt;</span>
+<span class="sd">            &lt;default&gt;&lt;contentdefault/&gt;&lt;/default&gt;</span>
+<span class="sd">        &lt;/abtest&gt;</span>
+<span class="sd">        &quot;&quot;&quot;</span>
+        <span class="n">experiment</span> <span class="o">=</span> <span class="n">xml_object</span><span class="o">.</span><span class="n">get</span><span class="p">(</span><span class="s">&#39;experiment&#39;</span><span class="p">)</span>
+
+        <span class="k">if</span> <span class="n">experiment</span> <span class="ow">is</span> <span class="bp">None</span><span class="p">:</span>
+            <span class="k">raise</span> <span class="n">InvalidDefinitionError</span><span class="p">(</span>
+                <span class="s">&quot;ABTests must specify an experiment. Not found in:</span><span class="se">\n</span><span class="s">{xml}&quot;</span>
+                <span class="o">.</span><span class="n">format</span><span class="p">(</span><span class="n">xml</span><span class="o">=</span><span class="n">etree</span><span class="o">.</span><span class="n">tostring</span><span class="p">(</span><span class="n">xml_object</span><span class="p">,</span> <span class="n">pretty_print</span><span class="o">=</span><span class="bp">True</span><span class="p">)))</span>
+
+        <span class="n">definition</span> <span class="o">=</span> <span class="p">{</span>
+            <span class="s">&#39;data&#39;</span><span class="p">:</span> <span class="p">{</span>
+                <span class="s">&#39;experiment&#39;</span><span class="p">:</span> <span class="n">experiment</span><span class="p">,</span>
+                <span class="s">&#39;group_portions&#39;</span><span class="p">:</span> <span class="p">{},</span>
+                <span class="s">&#39;group_content&#39;</span><span class="p">:</span> <span class="p">{</span><span class="n">DEFAULT</span><span class="p">:</span> <span class="p">[]},</span>
+            <span class="p">},</span>
+            <span class="s">&#39;children&#39;</span><span class="p">:</span> <span class="p">[]}</span>
+        <span class="k">for</span> <span class="n">group</span> <span class="ow">in</span> <span class="n">xml_object</span><span class="p">:</span>
+            <span class="k">if</span> <span class="n">group</span><span class="o">.</span><span class="n">tag</span> <span class="o">==</span> <span class="s">&#39;default&#39;</span><span class="p">:</span>
+                <span class="n">name</span> <span class="o">=</span> <span class="n">DEFAULT</span>
+            <span class="k">else</span><span class="p">:</span>
+                <span class="n">name</span> <span class="o">=</span> <span class="n">group</span><span class="o">.</span><span class="n">get</span><span class="p">(</span><span class="s">&#39;name&#39;</span><span class="p">)</span>
+                <span class="n">definition</span><span class="p">[</span><span class="s">&#39;data&#39;</span><span class="p">][</span><span class="s">&#39;group_portions&#39;</span><span class="p">][</span><span class="n">name</span><span class="p">]</span> <span class="o">=</span> <span class="nb">float</span><span class="p">(</span><span class="n">group</span><span class="o">.</span><span class="n">get</span><span class="p">(</span><span class="s">&#39;portion&#39;</span><span class="p">,</span> <span class="mi">0</span><span class="p">))</span>
+
+            <span class="n">child_content_urls</span> <span class="o">=</span> <span class="p">[]</span>
+            <span class="k">for</span> <span class="n">child</span> <span class="ow">in</span> <span class="n">group</span><span class="p">:</span>
+                <span class="k">try</span><span class="p">:</span>
+                    <span class="n">child_content_urls</span><span class="o">.</span><span class="n">append</span><span class="p">(</span><span class="n">system</span><span class="o">.</span><span class="n">process_xml</span><span class="p">(</span><span class="n">etree</span><span class="o">.</span><span class="n">tostring</span><span class="p">(</span><span class="n">child</span><span class="p">))</span><span class="o">.</span><span class="n">location</span><span class="o">.</span><span class="n">url</span><span class="p">())</span>
+                <span class="k">except</span><span class="p">:</span>
+                    <span class="n">log</span><span class="o">.</span><span class="n">exception</span><span class="p">(</span><span class="s">&quot;Unable to load child when parsing ABTest. Continuing...&quot;</span><span class="p">)</span>
+                    <span class="k">continue</span>
+
+            <span class="n">definition</span><span class="p">[</span><span class="s">&#39;data&#39;</span><span class="p">][</span><span class="s">&#39;group_content&#39;</span><span class="p">][</span><span class="n">name</span><span class="p">]</span> <span class="o">=</span> <span class="n">child_content_urls</span>
+            <span class="n">definition</span><span class="p">[</span><span class="s">&#39;children&#39;</span><span class="p">]</span><span class="o">.</span><span class="n">extend</span><span class="p">(</span><span class="n">child_content_urls</span><span class="p">)</span>
+
+        <span class="n">default_portion</span> <span class="o">=</span> <span class="mi">1</span> <span class="o">-</span> <span class="nb">sum</span><span class="p">(</span>
+            <span class="n">portion</span> <span class="k">for</span> <span class="p">(</span><span class="n">name</span><span class="p">,</span> <span class="n">portion</span><span class="p">)</span> <span class="ow">in</span> <span class="n">definition</span><span class="p">[</span><span class="s">&#39;data&#39;</span><span class="p">][</span><span class="s">&#39;group_portions&#39;</span><span class="p">]</span><span class="o">.</span><span class="n">items</span><span class="p">())</span>
+
+        <span class="k">if</span> <span class="n">default_portion</span> <span class="o">&lt;</span> <span class="mi">0</span><span class="p">:</span>
+            <span class="k">raise</span> <span class="n">InvalidDefinitionError</span><span class="p">(</span><span class="s">&quot;ABTest portions must add up to less than or equal to 1&quot;</span><span class="p">)</span>
+
+        <span class="n">definition</span><span class="p">[</span><span class="s">&#39;data&#39;</span><span class="p">][</span><span class="s">&#39;group_portions&#39;</span><span class="p">][</span><span class="n">DEFAULT</span><span class="p">]</span> <span class="o">=</span> <span class="n">default_portion</span>
+        <span class="n">definition</span><span class="p">[</span><span class="s">&#39;children&#39;</span><span class="p">]</span><span class="o">.</span><span class="n">sort</span><span class="p">()</span>
+
+        <span class="k">return</span> <span class="n">definition</span>
+
+    <span class="k">def</span> <span class="nf">definition_to_xml</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">resource_fs</span><span class="p">):</span>
+        <span class="n">xml_object</span> <span class="o">=</span> <span class="n">etree</span><span class="o">.</span><span class="n">Element</span><span class="p">(</span><span class="s">&#39;abtest&#39;</span><span class="p">)</span>
+        <span class="n">xml_object</span><span class="o">.</span><span class="n">set</span><span class="p">(</span><span class="s">&#39;experiment&#39;</span><span class="p">,</span> <span class="bp">self</span><span class="o">.</span><span class="n">definition</span><span class="p">[</span><span class="s">&#39;data&#39;</span><span class="p">][</span><span class="s">&#39;experiment&#39;</span><span class="p">])</span>
+        <span class="k">for</span> <span class="n">name</span><span class="p">,</span> <span class="n">group</span> <span class="ow">in</span> <span class="bp">self</span><span class="o">.</span><span class="n">definition</span><span class="p">[</span><span class="s">&#39;data&#39;</span><span class="p">][</span><span class="s">&#39;group_content&#39;</span><span class="p">]</span><span class="o">.</span><span class="n">items</span><span class="p">():</span>
+            <span class="k">if</span> <span class="n">name</span> <span class="o">==</span> <span class="n">DEFAULT</span><span class="p">:</span>
+                <span class="n">group_elem</span> <span class="o">=</span> <span class="n">etree</span><span class="o">.</span><span class="n">SubElement</span><span class="p">(</span><span class="n">xml_object</span><span class="p">,</span> <span class="s">&#39;default&#39;</span><span class="p">)</span>
+            <span class="k">else</span><span class="p">:</span>
+                <span class="n">group_elem</span> <span class="o">=</span> <span class="n">etree</span><span class="o">.</span><span class="n">SubElement</span><span class="p">(</span><span class="n">xml_object</span><span class="p">,</span> <span class="s">&#39;group&#39;</span><span class="p">,</span> <span class="n">attrib</span><span class="o">=</span><span class="p">{</span>
+                    <span class="s">&#39;portion&#39;</span><span class="p">:</span> <span class="nb">str</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">definition</span><span class="p">[</span><span class="s">&#39;data&#39;</span><span class="p">][</span><span class="s">&#39;group_portions&#39;</span><span class="p">][</span><span class="n">name</span><span class="p">]),</span>
+                    <span class="s">&#39;name&#39;</span><span class="p">:</span> <span class="n">name</span><span class="p">,</span>
+                <span class="p">})</span>
+
+            <span class="k">for</span> <span class="n">child_loc</span> <span class="ow">in</span> <span class="n">group</span><span class="p">:</span>
+                <span class="n">child</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">system</span><span class="o">.</span><span class="n">load_item</span><span class="p">(</span><span class="n">child_loc</span><span class="p">)</span>
+                <span class="n">group_elem</span><span class="o">.</span><span class="n">append</span><span class="p">(</span><span class="n">etree</span><span class="o">.</span><span class="n">fromstring</span><span class="p">(</span><span class="n">child</span><span class="o">.</span><span class="n">export_to_xml</span><span class="p">(</span><span class="n">resource_fs</span><span class="p">)))</span>
+
+        <span class="k">return</span> <span class="n">xml_object</span>
+    
+    
+    <span class="k">def</span> <span class="nf">has_dynamic_children</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
+        <span class="k">return</span> <span class="bp">True</span>
+</pre></div>
+
+          </div>
+        </div>
+      </div>
+      <div class="clearer"></div>
+    </div>
+    <div class="related">
+      <h3>Navigation</h3>
+      <ul>
+        <li class="right" style="margin-right: 10px">
+          <a href="../../genindex.html" title="General Index"
+             >index</a></li>
+        <li class="right" >
+          <a href="../../py-modindex.html" title="Python Module Index"
+             >modules</a> |</li>
+        <li><a href="../../index.html">MITx 1.0 documentation</a> &raquo;</li>
+          <li><a href="../index.html" >Module code</a> &raquo;</li> 
+      </ul>
+    </div>
+    <div class="footer">
+        &copy; Copyright 2012, MITx team.
+      Created using <a href="http://sphinx.pocoo.org/">Sphinx</a> 1.1.3.
+    </div>
+  </body>
+</html>
