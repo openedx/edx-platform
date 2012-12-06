@@ -343,7 +343,7 @@ class StaffGrading
       meta_list.append("<li><span class='meta-info'>Pending:</span> #{@num_pending}</li>")
       meta_list.append("<li><span class='meta-info'>Graded:</span> #{@num_graded}</li>")
       meta_list.append("<li><span class='meta-info'>Needed for ML:</span> #{Math.max(@min_for_ml - @num_graded)}</li>")
-      @problem_meta_info.append(meta_list)
+      @problem_meta_info.html(meta_list)
 
       @prompt_container.html(@prompt)
       @prompt_name_container.html("#{@prompt_name}")
