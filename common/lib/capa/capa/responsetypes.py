@@ -1103,6 +1103,15 @@ class SymbolicResponse(CustomResponse):
 
 #-----------------------------------------------------------------------------
 
+"""
+valid:       Flag indicating valid score_msg format (Boolean)
+correct:     Correctness of submission (Boolean)
+score:       Points to be assigned (numeric, can be float)
+msg:         Message from grader to display to student (string)
+"""
+ScoreMessage = namedtuple('ScoreMessage',
+                          ['valid', 'correct', 'points', 'msg'])
+
 
 class CodeResponse(LoncapaResponse):
     """
@@ -1882,7 +1891,7 @@ class OpenEndedResponse(LoncapaResponse):
             # NOTE: self.system.location is valid because the capa_module
             # __init__ adds it (easiest way to get problem location into
             # response types)
-        except ValueError:
+        except TypeError, ValueError:
             log.exception("Grader payload %r is not a json object!", grader_payload)
         parsed_grader_payload.update({
             'location' : self.system.location,
@@ -1971,13 +1980,13 @@ class OpenEndedResponse(LoncapaResponse):
 
     def update_score(self, score_msg, oldcmap, queuekey):
         log.debug(score_msg)
-        (valid_score_msg, correct, points, msg) = self._parse_score_msg(score_msg)
-        if not valid_score_msg:
+        score_msg = self._parse_score_msg(score_msg)
+        if not score_msg.valid:
             oldcmap.set(self.answer_id,
                 msg = 'Invalid grader reply. Please contact the course staff.')
             return oldcmap
 
-        correctness = 'correct' if correct else 'incorrect'
+        correctness = 'correct' if score_msg.correct else 'incorrect'
 
         # TODO: Find out how this is used elsewhere, if any
         self.context['correct'] = correctness
@@ -1986,12 +1995,13 @@ class OpenEndedResponse(LoncapaResponse):
         # does not match, we keep waiting for the score_msg whose key actually matches
         if oldcmap.is_right_queuekey(self.answer_id, queuekey):
             # Sanity check on returned points
+            points = score_msg.points
             if points < 0:
                 points = 0
 
             # Queuestate is consumed, so reset it to None
             oldcmap.set(self.answer_id, npoints=points, correctness=correctness,
-                msg=msg.replace('&nbsp;', '&#160;'), queuestate=None)
+                msg = score_msg.msg.replace('&nbsp;', '&#160;'), queuestate=None)
         else:
             log.debug('OpenEndedResponse: queuekey {0} does not match for answer_id={1}.'.format(
                 queuekey, self.answer_id))
@@ -2047,6 +2057,10 @@ class OpenEndedResponse(LoncapaResponse):
             </div>
             """.format(feedback_type, value)
 
+        # TODO (vshnayder): design and document the details of this format so
+        # that we can do proper escaping here (e.g. are the graders allowed to
+        # include HTML?)
+
         for tag in ['success', 'feedback']:
             if tag not in response_items:
                 return format_feedback('errors', 'Error getting feedback')
@@ -2054,7 +2068,7 @@ class OpenEndedResponse(LoncapaResponse):
         feedback_items = response_items['feedback']
         try:
             feedback = json.loads(feedback_items)
-        except ValueError:
+        except (TypeError, ValueError):
             log.exception("feedback_items have invalid json %r", feedback_items)
             return format_feedback('errors', 'Could not parse feedback')
 
@@ -2105,45 +2119,35 @@ class OpenEndedResponse(LoncapaResponse):
             correct:         Correctness of submission (Boolean)
             score:           Points to be assigned (numeric, can be float)
         """
-        fail = (False, False, 0, '')
+        fail = ScoreMessage(valid=False, correct=False, points=0, msg='')
         try:
             score_result = json.loads(score_msg)
         except (TypeError, ValueError):
             log.error("External grader message should be a JSON-serialized dict."
                       " Received score_msg = {0}".format(score_msg))
             return fail
+
         if not isinstance(score_result, dict):
             log.error("External grader message should be a JSON-serialized dict."
                       " Received score_result = {0}".format(score_result))
             return fail
+
         for tag in ['score', 'feedback', 'grader_type', 'success']:
             if tag not in score_result:
-                log.error("External grader message is missing required tag: {0}".format(tag))
+                log.error("External grader message is missing required tag: {0}"
+                          .format(tag))
                 return fail
 
-        # Next, we need to check that the contents of the external grader message
-        #   is safe for the LMS.
-        # 1) Make sure that the message is valid XML (proper opening/closing tags)
-        # 2) TODO: Is the message actually HTML?
-
         feedback = self._format_feedback(score_result)
-
 
         # HACK: for now, just assume it's correct if you got more than 2/3.
         # Also assumes that score_result['score'] is an integer.
         score_ratio = int(score_result['score']) / self.max_score
         correct = (score_ratio >= 0.66)
 
-        log.debug(feedback)
-        try:
-            etree.fromstring(feedback)
-        except etree.XMLSyntaxError as err:
-            log.error("Unable to parse external grader message as valid"
-                      "\n Feedback : score_result['feedback'] = %r",feedback)
-            return fail
-
         #Currently ignore msg and only return feedback (which takes the place of msg)
-        return (True, correct, score_result['score'], feedback)
+        return ScoreMessage(valid=True, correct=correct,
+                            score=score_result['score'], msg=feedback)
 
 #-----------------------------------------------------------------------------
 # TEMPORARY: List of all response subclasses
