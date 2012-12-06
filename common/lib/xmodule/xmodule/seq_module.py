@@ -124,7 +124,7 @@ class SequenceDescriptor(MakoModuleDescriptor, XmlDescriptor):
         children = []
         for child in xml_object:
             try:
-                children.append(system.process_xml(etree.tostring(child)).location.url())
+                children.append(system.process_xml(etree.tostring(child, encoding='unicode')).location.url())
             except:
                 log.exception("Unable to load child when parsing Sequence. Continuing...")
                 continue

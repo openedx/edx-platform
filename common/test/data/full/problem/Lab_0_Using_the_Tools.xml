@@ -94,7 +94,7 @@ scope probes to nodes A, B and C and edit their properties so that the
 plots will be different colors. Now run a transient analysis for 5ms.
 Move the mouse over the plot until the marker (a vertical dashed line
 that follows the mouse when it's over the plot) is at approximately
-1.25ms.  Please report the measured voltages for nodes A, B and C.
+1.25ms.  Please report the measured voltages for nodes A, B and C…
 
 <br/>
 <div style="margin-left: 4em;">

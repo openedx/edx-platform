@@ -1,19 +1,20 @@
-from xmodule.x_module import (XModuleDescriptor, policy_key)
-from xmodule.modulestore import Location
-from lxml import etree
 import json
 import copy
 import logging
-import traceback
-from collections import namedtuple
-from fs.errors import ResourceNotFoundError
 import os
 import sys
+from collections import namedtuple
+from lxml import etree
+
+from xmodule.x_module import (XModuleDescriptor, policy_key)
+from xmodule.modulestore import Location
 
 log = logging.getLogger(__name__)
 
+# assume all XML files are persisted as utf-8.
 edx_xml_parser = etree.XMLParser(dtd_validation=False, load_dtd=False,
-                                 remove_comments=True, remove_blank_text=True)
+                                 remove_comments=True, remove_blank_text=True,
+                                 encoding='utf-8')
 
 def name_to_pathname(name):
     """
@@ -366,7 +367,7 @@ class XmlDescriptor(XModuleDescriptor):
             filepath = self.__class__._format_filepath(self.category, url_path)
             resource_fs.makedir(os.path.dirname(filepath), allow_recreate=True)
             with resource_fs.open(filepath, 'w') as file:
-                file.write(etree.tostring(xml_object, pretty_print=True))
+                file.write(etree.tostring(xml_object, pretty_print=True, encoding='utf-8'))
 
             # And return just a pointer with the category and filename.
             record_object = etree.Element(self.category)
@@ -381,7 +382,7 @@ class XmlDescriptor(XModuleDescriptor):
             record_object.set('org', self.location.org)
             record_object.set('course', self.location.course)
 
-        return etree.tostring(record_object, pretty_print=True)
+        return etree.tostring(record_object, pretty_print=True, encoding='utf-8')
 
     def definition_to_xml(self, resource_fs):
         """
