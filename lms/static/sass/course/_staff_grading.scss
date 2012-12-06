@@ -27,6 +27,14 @@ div.staff-grading {
         display: none;
     }
 
+    ul
+    {
+        li
+        {
+            margin: 16px 0px;
+        }
+    }
+
     .prompt-information-container,
     .submission-wrapper,
     .rubric-wrapper,
@@ -37,7 +45,9 @@ div.staff-grading {
     }
     .error-container
     {
-        background-color: $error-red;
+        background-color: #FFCCCC;
+        padding: 15px;
+        margin-left: 0px;
     }
     .ml-error-info-container,
     {
