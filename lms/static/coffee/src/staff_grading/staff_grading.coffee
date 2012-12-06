@@ -307,7 +307,7 @@ class StaffGrading
           @get_next_submission problem.location
 
   make_paragraphs: (text) ->
-    paragraph_split = text.split("\n")
+    paragraph_split = text.split(/\n\s*\n/)
     new_text = ''
     for paragraph in paragraph_split
       new_text += "<p>#{paragraph}</p>"
