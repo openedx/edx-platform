@@ -2002,57 +2002,67 @@ class OpenEndedResponse(LoncapaResponse):
     def get_initial_display(self):
         return {self.answer_id: self.initial_display}
 
-    def _convert_longform_feedback_to_html(self,response_items):
+    def _convert_longform_feedback_to_html(self, response_items):
         """
-        Take in a dictionary, and return html formatted strings appropriate for sending via xqueue.
+        Take in a dictionary, and return html strings for display to student.
         Input:
-            Dictionary with keys success, feedback, and errors
+            response_items: Dictionary with keys success, feedback.
+                if success is True, feedback should be a dictionary, with keys for
+                   types of feedback, and the corresponding feedback values.
+                if success is False, feedback is actually an error string.
+
+                NOTE: this will need to change when we integrate peer grading, because
+                that will have more complex feedback.
+
         Output:
-            String
+            String -- html that can be displayed to the student.
         """
 
-        #Tags that need to be shown at the end of the feedback block (in this order)
-        tags_displayed_last=['markup-text', 'markup_text']
-        tags_displayed_first=['spelling', 'grammar']
+        # We want to display available feedback in a particular order.
+        # This dictionary specifies which goes first--lower first.
+        priorities = {# These go at the start of the feedback
+                      'spelling': 0,
+                      'grammar': 1,
+                      # needs to be after all the other feedback
+                      'markup_text': 3}
 
-        feedback_item_start='<div class="{feedback_key}">'
-        feedback_item_end='</div>'
+        default_priority = 2
 
-        for tag in ['status', 'feedback']:
+        def get_priority(elt):
+            """
+            Args:
+                elt: a tuple of feedback-type, feedback
+            Returns:
+                the priority for this feedback type
+            """
+            return priorities.get(elt[0], default_priority)
+
+        def format_feedback(feedback_type, value):
+            return """
+            <div class="{feedback_type}">
+            {value}
+            </div>
+            """.format(feedback_type, value)
+
+        for tag in ['success', 'feedback']:
             if tag not in response_items:
-                feedback_long=feedback_item_start.format(feedback_key="errors") + "Error getting feedback." + feedback_item_end
+                return format_feedback('errors', 'Error getting feedback')
 
-        feedback_items=response_items['feedback']
+        feedback_items = response_items['feedback']
         try:
-            feedback_items=json.loads(feedback_items)
-        except:
-            pass
+            feedback = json.loads(feedback_items)
+        except ValueError:
+            log.exception("feedback_items have invalid json %r", feedback_items)
+            return format_feedback('errors', 'Could not parse feedback')
 
-        success=response_items['success']
+        if response_items['success']:
+            if len(feedback) == 0:
+                return format_feedback('errors', 'No feedback available')
 
-
-        if success:
-            feedback_long=""
-            #Add in feedback that needs to be shown first
-            for k,v in feedback_items.items():
-                if k in tags_displayed_first:
-                    feedback_long+= feedback_item_start.format(feedback_key=k) +str(v) + feedback_item_end
-            #Add in feedback whose order does not matter
-            for k,v in feedback_items.items():
-                if k not in tags_displayed_last and k not in tags_displayed_first:
-                    feedback_long+= feedback_item_start.format(feedback_key=k) +str(v) + feedback_item_end
-            #Add in feedback that needs to be displayed last
-            for k,v in feedback_items.items():
-                if k in tags_displayed_last:
-                    feedback_long+= feedback_item_start.format(feedback_key=k) +str(v) + feedback_item_end
-
-            if len(feedback_items)==0:
-                feedback_long=feedback_item_start.format(feedback_key="feedback") + "No feedback available." + feedback_item_end
-
+            feedback_lst = sorted(feedback.items(), key=get_priority)
+            return u"\n".join(format_feedback(k, v) for k, v in feedback_lst)
         else:
-            feedback_long=feedback_item_start.format(feedback_key="errors") + response_items['feedback']  + feedback_item_end
-
-        return feedback_long
+            return format_feedback('errors', response_items['feedback'])
 
 
     def _format_feedback(self, response_items):
@@ -2063,15 +2073,16 @@ class OpenEndedResponse(LoncapaResponse):
             Return error message or feedback template
         """
 
-        feedback=self._convert_longform_feedback_to_html(response_items)
+        feedback = self._convert_longform_feedback_to_html(response_items)
 
         if not response_items['success']:
-            return self.system.render_template("open_ended_error.html", {'errors' : feedback})
+            return self.system.render_template("open_ended_error.html",
+                                               {'errors' : feedback})
 
-        feedback_template=self.system.render_template("open_ended_feedback.html",{
-            'grader_type' : response_items['grader_type'],
-            'score' : response_items['score'],
-            'feedback' : feedback,
+        feedback_template = self.system.render_template("open_ended_feedback.html", {
+            'grader_type': response_items['grader_type'],
+            'score': response_items['score'],
+            'feedback': feedback,
         })
 
         return feedback_template
