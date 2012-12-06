@@ -8,21 +8,23 @@ Used by capa_problem.py
 '''
 
 # standard library imports
+import abc
 import cgi
+import hashlib
 import inspect
 import json
 import logging
 import numbers
 import numpy
+import os
 import random
 import re
 import requests
-import traceback
-import hashlib
-import abc
-import os
 import subprocess
+import traceback
 import xml.sax.saxutils as saxutils
+
+from collections import namedtuple
 from shapely.geometry import Point, MultiPoint
 
 # specific library imports
