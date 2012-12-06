@@ -77,15 +77,16 @@ class StaffGradingService(object):
     def _try_with_login(self, operation):
         """
         Call operation(), which should return a requests response object.  If
-        the response status code is 302, call _login() and try the operation
-        again.  NOTE: use requests.get(..., allow_redirects=False) to have
-        requests not auto-follow redirects.
+        the request fails with a 'login_required' error, call _login() and try
+        the operation again.
 
         Returns the result of operation().  Does not catch exceptions.
         """
         response = operation()
-        if response.status_code == 302:
-            # redirect means we aren't logged in
+        if (response.json
+            and response.json.get('success') == False
+            and response.json.get('error') == 'login_required'):
+            # apparrently we aren't logged in.  Try to fix that.
             r = self._login()
             if r and not r.get('success'):
                 log.warning("Couldn't log into staff_grading backend. Response: %s",
