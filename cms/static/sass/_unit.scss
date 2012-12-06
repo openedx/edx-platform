@@ -56,14 +56,10 @@
       margin: 20px 40px;
 
       &.new-component-item {
-        padding: 0;
+        padding: 20px;
         border: none;
-        border-radius: 0;
-
-        &.adding {
-          background-color: $blue;
-          border-color: #437fbf;
-        }
+        border-radius: 3px;
+        background: $lightGrey;
 
         .new-component-button {
           display: block;
@@ -87,14 +83,20 @@
         .new-component-type, .new-component-template {
           @include clearfix;
 
+          li {
+            display: inline-block;
+          }
+
           a {
             position: relative;
-            float: left;
+            display: inline-block;
             width: 100px;
             height: 100px;
             margin-right: 10px;
             margin-bottom: 10px;
             border-radius: 8px;
+            border: 1px solid $darkGreen;
+            background: $green;
             font-size: 13px;
             line-height: 14px;
             color: #fff;
@@ -103,7 +105,7 @@
             @include transition(background-color .15s);
 
             &:hover {
-              background-color: rgba(255, 255, 255, .2);
+              background: $brightGreen;
             }
 
             .name {
@@ -123,7 +125,15 @@
           }
         }
 
-        .new-component,
+        .new-component {          
+          text-align: center;
+
+          h5 {
+            color: $green;
+          }
+          
+        }
+        
         .new-component-templates {
           display: none;
           position: absolute;
