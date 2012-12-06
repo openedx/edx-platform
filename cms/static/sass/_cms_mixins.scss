@@ -130,18 +130,17 @@
 @mixin edit-box {
 	padding: 15px 20px;
 	border-radius: 3px;
-	border: 1px solid #5597dd;
-	@include linear-gradient(top, rgba(255, 255, 255, 0.3), rgba(255, 255, 255, 0));
-	background-color: #5597dd;
+	background-color: $lightBluishGrey;
+	color: #3c3c3c;
 	@include box-shadow(0 1px 0 rgba(255, 255, 255, .2) inset);
 
 	label {
-		color: #fff;
+		color: $baseFontColor;
 	}
 
 	input,
 	textarea {
-		border: 1px solid #3c3c3c;
+		border: 1px solid $darkGrey;
 	}
 
 	textarea {
@@ -161,14 +160,12 @@
 	}
 
 	.save-button {
-		@include orange-button;
-		border-color: #3c3c3c;
+		@include blue-button;
 		margin-top: 0;
 	}
 
 	.cancel-button {
 		@include white-button;
-		border-color: #30649C;
 		margin-top: 0;
 	}
 }

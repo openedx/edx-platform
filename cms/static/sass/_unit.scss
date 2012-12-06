@@ -156,7 +156,6 @@
     }
 
     &.editing {
-      border-color: #6696d7;
 
       .drag-handle,
       .component-actions {
@@ -203,10 +202,6 @@
     @include edit-box;
     display: none;
     padding: 20px;
-    border-radius: 2px 2px 0 0;
-    @include linear-gradient(top, rgba(0, 0, 0, 0), rgba(0, 0, 0, .1));
-    background-color: $blue;
-    color: #fff;
     @include box-shadow(none);
 
     .metadata_edit {
@@ -221,12 +216,6 @@
         display: inline-block;
         margin-right: 10px;  
       }
-    }
-
-    .CodeMirror {
-      border: 1px solid #3c3c3c;
-      background: #fff;
-      color: #3c3c3c;
     }
 
     h3 {
