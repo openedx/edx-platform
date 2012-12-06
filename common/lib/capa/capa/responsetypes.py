@@ -1845,24 +1845,18 @@ class OpenEndedResponse(LoncapaResponse):
         rubric = self.xml.find('openendedrubric')
         self._parse(oeparam, prompt, rubric)
 
-    def stringify_children(self, node, strip_tags=True):
+    @staticmethod
+    def stringify_children(node):
         """
         Modify code from stringify_children in xmodule.  Didn't import directly
         in order to avoid capa depending on xmodule (seems to be avoided in
         code)
         """
         parts=[node.text]
-        [parts.append((etree.tostring(p, with_tail=True))) for p in node.getchildren()]
-        node_string=' '.join(parts)
+        for p in node.getchildren():
+            parts.append(etree.tostring(p, with_tail=True, encoding='unicode'))
 
-        # Strip html tags from result.  This may need to be removed in order to
-        # display prompt to instructors properly.
-        # TODO: what breaks if this is removed?  The ML code can strip tags
-        # as part of its input filtering.
-        if strip_tags:
-            node_string=re.sub('<[^<]+?>', '', node_string)
-
-        return node_string
+        return ' '.join(parts)
 
     def _parse(self, oeparam, prompt, rubric):
         '''
