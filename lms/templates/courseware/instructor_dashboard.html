@@ -180,6 +180,30 @@ function goto( mode)
    </p>
 
    <p>
+     <h2>Daily activity for the past 7 days:</h2>
+     <table class="stat_table">
+     <tr><th>Day</td><th>Number of students</td></tr>
+     % for k,v in students_daily_activity_json['data'].items():
+     <tr>
+     <td>${k}</td> <td>${v}</td>
+     </tr>
+     % endfor
+     </table>
+   </p>
+
+   <p>
+     <h2>Number of students with correct problems for the past 7 days:</h2>
+     <table class="stat_table">
+     <tr><th>Problem</td><th>Number of students</td></tr>
+     % for k,v in students_per_problem_correct_json['data'].items():
+     <tr>
+     <td>${k}</td> <td>${v}</td>
+     </tr>
+     % endfor
+     </table>
+   </p>
+
+   <p>
      <h2>Students who attempted at least one exercise:</h2>
 
      <div class="divScroll">
@@ -196,7 +220,7 @@ function goto( mode)
    </p>
 
    <p>
-     <h2>Daily activity:</h2>
+     <h2>Daily activity (online version):</h2>
      <table class="stat_table">
      <tr><th>Day</td><th>Number of students</td></tr>
      % for k,v in daily_activity_json['data'].items():
