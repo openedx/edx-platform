@@ -74,4 +74,5 @@ class CMS.Views.ModuleEdit extends Backbone.View
     event.preventDefault()
     @$el.addClass('editing')
     @$component_editor().slideDown(150)
+    # $modalCover.show()
     @loadEdit()
