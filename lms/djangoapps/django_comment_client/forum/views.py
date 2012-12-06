@@ -72,7 +72,6 @@ def inline_discussion(request, course_id, discussion_id):
     """
     Renders JSON for DiscussionModules
     """
-
     course = get_course_with_access(request.user, course_id, 'load')
 
     try:
@@ -161,26 +160,26 @@ def forum_form_discussion(request, course_id):
 
 @login_required
 def single_thread(request, course_id, discussion_id, thread_id):
-
     course = get_course_with_access(request.user, course_id, 'load')
     cc_user = cc.User.from_django_user(request.user)
     user_info = cc_user.to_dict()
 
     try:
-        thread = cc.Thread.find(thread_id).retrieve(recursive=True, user_id=request.user.id)
+      thread = cc.Thread.find(thread_id).retrieve(recursive=True, user_id=request.user.id)
     except (cc.utils.CommentClientError, cc.utils.CommentClientUnknownError) as err:
-        log.error("Error loading single thread.")
-        raise Http404
+      log.error("Error loading single thread.")
+      raise Http404
 
     if request.is_ajax():
 
         courseware_context = get_courseware_context(thread, course)
-
         annotated_content_info = utils.get_annotated_content_infos(course_id, thread, request.user, user_info=user_info)
         context = {'thread': thread.to_dict(), 'course_id': course_id}
         # TODO: Remove completely or switch back to server side rendering
         # html = render_to_string('discussion/_ajax_single_thread.html', context)
         content = utils.safe_content(thread.to_dict())
+        log.debug("*************************")
+        log.debug(content)
         if courseware_context:
             content.update(courseware_context)
         return utils.JsonResponse({

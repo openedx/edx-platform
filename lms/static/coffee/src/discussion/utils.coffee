@@ -50,6 +50,8 @@ class @DiscussionUtil
       delete_thread           : "/courses/#{$$course_id}/discussion/threads/#{param}/delete"
       flagAbuse_thread        : "/courses/#{$$course_id}/discussion/threads/#{param}/flagAbuse"
       unFlagAbuse_thread      : "/courses/#{$$course_id}/discussion/threads/#{param}/unFlagAbuse"
+      flagAbuse_comment       : "/courses/#{$$course_id}/discussion/comments/#{param}/flagAbuse"
+      unFlagAbuse_comment     : "/courses/#{$$course_id}/discussion/comments/#{param}/unFlagAbuse"
       upvote_thread           : "/courses/#{$$course_id}/discussion/threads/#{param}/upvote"
       downvote_thread         : "/courses/#{$$course_id}/discussion/threads/#{param}/downvote"
       undo_vote_for_thread    : "/courses/#{$$course_id}/discussion/threads/#{param}/unvote"

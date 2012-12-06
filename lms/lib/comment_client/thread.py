@@ -26,6 +26,7 @@ class Thread(models.Model):
 
     @classmethod
     def search(cls, query_params, *args, **kwargs):
+
         default_params = {'page': 1,
                           'per_page': 20,
                           'course_id': query_params['course_id'],
@@ -65,15 +66,20 @@ class Thread(models.Model):
     # that subclasses don't need to override for this.
     def _retrieve(self, *args, **kwargs):
         url = self.url(action='get', params=self.attributes)
-
         request_params = { 
                             'recursive': kwargs.get('recursive'),
                             'user_id': kwargs.get('user_id'),
                             'mark_as_read': kwargs.get('mark_as_read', True),
                          }
  
-        
-    def flagAbuse(self, user, voteable, value):
+        # user_id may be none, in which case it shouldn't be part of the
+        # request.
+        request_params = strip_none(request_params)
+
+        response = perform_request('get', url, request_params)
+        self.update_attributes(**response)
+
+    def flagAbuse(self, user, voteable):
         if voteable.type == 'thread':
             url = _url_for_flag_abuse_thread(voteable.id)
         elif voteable.type == 'comment':
@@ -84,7 +90,7 @@ class Thread(models.Model):
         request = perform_request('put', url, params)
         voteable.update_attributes(request)    
         
-    def unFlagAbuse(self, user, voteable, value):
+    def unFlagAbuse(self, user, voteable):
         if voteable.type == 'thread':
             url = _url_for_unflag_abuse_thread(voteable.id)
         elif voteable.type == 'comment':
