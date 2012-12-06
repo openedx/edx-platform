@@ -1,5 +1,8 @@
 if Backbone?
   class @ResponseCommentShowView extends DiscussionContentView
+  
+  events:
+    "click .discussion-flag-abuse": "toggleFlagAbuse"  
 
     tagName: "li"
 
@@ -36,4 +39,12 @@ if Backbone?
         @$el.find("a.profile-link").after('<span class="community-ta-label">Community&nbsp;&nbsp;TA</span>')
         
         
-     
+    renderFlagged: =>
+      if window.user.id in @model.get("abuse_flaggers")
+        @$("[data-role=thread-flag]").addClass("flagged")  
+        @$("[data-role=thread-flag]").removeClass("notflagged")
+      else
+        @$("[data-role=thread-flag]").removeClass("flagged")  
+        @$("[data-role=thread-flag]").addClass("notflagged")      
+        
+        

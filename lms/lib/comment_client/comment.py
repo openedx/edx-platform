@@ -41,22 +41,22 @@ class Comment(models.Model):
         else:
             return super(Comment, cls).url(action, params)
             
-    def flagAbuse(self, user, voteable, value):
+    def flagAbuse(self, user, voteable):
         if voteable.type == 'thread':
             url = _url_for_flag_abuse_thread(voteable.id)
         elif voteable.type == 'comment':
-            url = _url_for_flag_comment(voteable.id)
+            url = _url_for_flag_abuse_comment(voteable.id)
         else:
             raise CommentClientError("Can only flag/unflag threads or comments")
         params = {'user_id': user.id}
         request = perform_request('put', url, params)
         voteable.update_attributes(request)    
         
-    def unFlagAbuse(self, user, voteable, value):
+    def unFlagAbuse(self, user, voteable):
         if voteable.type == 'thread':
             url = _url_for_unflag_abuse_thread(voteable.id)
         elif voteable.type == 'comment':
-            url = _url_for_unflag_comment(voteable.id)
+            url = _url_for_unflag_abuse_comment(voteable.id)
         else:
             raise CommentClientError("Can flag/unflag for threads or comments")
         params = {'user_id': user.id}
@@ -70,7 +70,7 @@ def _url_for_comment(comment_id):
     return "{prefix}/comments/{comment_id}".format(prefix=settings.PREFIX, comment_id=comment_id)
     
 def _url_for_flag_abuse_comment(comment_id):
-    return "{prefix}/threads/{comment_id}/abuse_flags".format(prefix=settings.PREFIX, thread_id=thread_id)      
+    return "{prefix}/comments/{comment_id}/abuse_flags".format(prefix=settings.PREFIX, comment_id=comment_id)      
        
-def _url_for_unflag_abuse_thread(comment_id):
-    return "{prefix}/threads/{comment_id}/abuse_unflags".format(prefix=settings.PREFIX, thread_id=thread_id) 
+def _url_for_unflag_abuse_comment(comment_id):
+    return "{prefix}/comments/{comment_id}/abuse_unflags".format(prefix=settings.PREFIX, comment_id=comment_id) 

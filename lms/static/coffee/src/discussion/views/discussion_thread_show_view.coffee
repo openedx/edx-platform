@@ -72,17 +72,7 @@ if Backbone?
 
     toggleFollowing: (event) ->
       $elem = $(event.target)
-      url = nullunFollow: ->
-      url = @model.urlFor("unFlagAbuse")
-      DiscussionUtil.safeAjax
-        $elem: @$(".discussion-flag-abuse")
-        url: url
-        type: "POST"
-        success: (response, textStatus) =>
-          if textStatus == 'success'
-            temp_array = _.clone(@model.get('abuse_flaggers'));
-            temp_array.pop(window.user.id)
-            @model.set('abuse_flaggers', temp_array)
+      url = null
       if not @model.get('subscribed')
         @model.follow()
         url = @model.urlFor("follow")
@@ -92,7 +82,7 @@ if Backbone?
       DiscussionUtil.safeAjax
         $elem: $elem
         url: url
-        type: "POST"
+        type: "POST" 
 
     vote: ->
       window.user.vote(@model)

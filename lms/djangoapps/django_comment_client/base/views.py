@@ -252,13 +252,13 @@ def un_flag_abuse_for_thread(request, course_id, thread_id):
 
 def flag_abuse_for_comment(request, course_id, comment_id):
     user = cc.User.from_django_user(request.user)
-    comment = cc.Comment.find(thread_id)
+    comment = cc.Comment.find(comment_id)
     comment.flagAbuse(user,comment)
     return JsonResponse(utils.safe_content(comment.to_dict()))
 
 def un_flag_abuse_for_comment(request, course_id, comment_id):
     user = cc.User.from_django_user(request.user)
-    comment = cc.Comment.find(thread_id)
+    comment = cc.Comment.find(comment_id)
     comment.unFlagAbuse(user,comment)
     return JsonResponse(utils.safe_content(comment.to_dict()))
 
