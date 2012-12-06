@@ -141,7 +141,7 @@
   }
 
   .component {
-    border: 1px solid #d1ddec;
+    border: 1px solid $lightBluishGrey2;
     border-radius: 3px;
     background: #fff;
     @include transition(none);
@@ -156,6 +156,7 @@
     }
 
     &.editing {
+      border: 1px solid $lightBluishGrey2;
 
       .drag-handle,
       .component-actions {
@@ -171,11 +172,6 @@
       position: absolute;
       top: 7px;
       right: 9px;
-      @include transition(opacity .15s);
-
-      a {
-        color: $darkGrey;
-      }
     }
 
     .drag-handle {
@@ -187,10 +183,10 @@
       width: 15px;
       height: 100%;
       border-radius: 0 3px 3px 0;
-      border: 1px solid #d1ddec;
-      background: url(../img/white-drag-handles.png) center no-repeat #d1ddec;
+      border: 1px solid $lightBluishGrey2;
+      background: url(../img/white-drag-handles.png) center no-repeat $lightBluishGrey2;
       cursor: move;
-      @include transition(all .15s);
+      @include transition(none);
     }
   }
 
@@ -202,6 +198,7 @@
     @include edit-box;
     display: none;
     padding: 20px;
+    border-radius: 2px 2px 0 0;
     @include box-shadow(none);
 
     .metadata_edit {

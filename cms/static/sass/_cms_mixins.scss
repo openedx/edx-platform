@@ -49,16 +49,17 @@
 
 @mixin white-button {
   @include button;
-  border: 1px solid $darkGrey;
+  border: 1px solid $mediumGrey;
   border-radius: 3px;
   @include linear-gradient(top, rgba(255, 255, 255, 0.6), rgba(255, 255, 255, 0));
   background-color: #dfe5eb;
   @include box-shadow(0 1px 0 rgba(255, 255, 255, .3) inset);
-  color: #778192;
+  color: rgb(92, 103, 122);
+  text-shadow: 0 1px 0 rgba(255, 255, 255, .5);
 
   &:hover {
-    background-color: #f2f6f9;
-    color: #778192;
+    background-color: rgb(222, 236, 247);
+    color: rgb(92, 103, 122);
   }
 }
 
@@ -88,6 +89,7 @@
 
 	&:hover {
 		background-color: #d9e3ee;
+		color: #6d788b;
 	}
 }
 
@@ -130,7 +132,7 @@
 @mixin edit-box {
 	padding: 15px 20px;
 	border-radius: 3px;
-	background-color: $lightBluishGrey;
+	background-color: $lightBluishGrey2;
 	color: #3c3c3c;
 	@include box-shadow(0 1px 0 rgba(255, 255, 255, .2) inset);
 
@@ -171,8 +173,8 @@
 }
 
 @mixin tree-view {
-	border: 1px solid #ced2db;
-	background: #edf1f5;
+	border: 1px solid $mediumGrey;
+	background: $lightGrey;
 
 	.branch {
 		margin-bottom: 10px;
@@ -232,7 +234,11 @@
 	}
 
 	a {
-		color: #2c2e33;
+		color: $baseFontColor;
+
+		&.new-unit-item {
+			color: #6d788b;
+		}
 	}
 
 	ol {
