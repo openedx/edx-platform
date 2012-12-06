@@ -1,10 +1,14 @@
 if Backbone?
   class @ResponseCommentShowView extends DiscussionContentView
   
-  events:
-    "click .discussion-flag-abuse": "toggleFlagAbuse"  
+    events:
+      "click .discussion-flag-abuse": "toggleFlagAbuse"  
 
     tagName: "li"
+    
+    initialize: ->
+        super()
+        @model.on "change", @updateModelDetails
 
     render: ->
       @template = _.template($("#response-comment-show-template").html())
@@ -14,6 +18,7 @@ if Backbone?
       @initLocal()
       @delegateEvents()
       @renderAttrs()
+      @renderFlagged()
       @markAsStaff()
       @$el.find(".timeago").timeago()
       @convertMath()
@@ -45,6 +50,9 @@ if Backbone?
         @$("[data-role=thread-flag]").removeClass("notflagged")
       else
         @$("[data-role=thread-flag]").removeClass("flagged")  
-        @$("[data-role=thread-flag]").addClass("notflagged")      
+        @$("[data-role=thread-flag]").addClass("notflagged")  
+      
+    updateModelDetails: =>
+      @renderFlagged()
         
         
