@@ -26,6 +26,7 @@ class Thread(models.Model):
 
     @classmethod
     def search(cls, query_params, *args, **kwargs):
+
         default_params = {'page': 1,
                           'per_page': 20,
                           'course_id': query_params['course_id'],
@@ -65,7 +66,6 @@ class Thread(models.Model):
     # that subclasses don't need to override for this.
     def _retrieve(self, *args, **kwargs):
         url = self.url(action='get', params=self.attributes)
-
         request_params = { 
                             'recursive': kwargs.get('recursive'),
                             'user_id': kwargs.get('user_id'),
