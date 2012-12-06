@@ -26,7 +26,7 @@ class StaffGradingBackend
           response =
             success: true
             problem_name: 'Problem 1'
-            num_left: 3
+            num_graded: 3
             num_total: 5
             prompt: '''
             	<h2>S11E3: Metal Bands</h2>
@@ -56,7 +56,7 @@ The standard chunk of Lorem Ipsum used since the 1500s is reproduced below for t
           response =
             success: true
             problem_name: 'Problem 2'
-            num_left: 2
+            num_graded: 2
             num_total: 5
             prompt: 'This is a fake second problem'
             submission: 'This is the best submission ever! ' + @mock_cnt
@@ -75,16 +75,16 @@ The standard chunk of Lorem Ipsum used since the 1500s is reproduced below for t
         @mock('get_next', {location: data.location})
     # get_problem_list
     # sends in a course_id and a grader_id
-    # should get back a list of problem_ids, problem_names, num_left, num_total
+    # should get back a list of problem_ids, problem_names, num_graded, num_total
     else if cmd == 'get_problem_list'
       @mock_cnt = 1
       response = 
         success: true
         problem_list: [
           {location: 'i4x://MITx/3.091x/problem/open_ended_demo1', \
-            problem_name: "Problem 1", num_left: 3, num_total: 5},
+            problem_name: "Problem 1", num_graded: 3, num_total: 5},
           {location: 'i4x://MITx/3.091x/problem/open_ended_demo2', \
-            problem_name: "Problem 2", num_left: 1, num_total: 5}
+            problem_name: "Problem 2", num_graded: 1, num_total: 5}
         ]
     else
       response =
@@ -97,7 +97,7 @@ The standard chunk of Lorem Ipsum used since the 1500s is reproduced below for t
           message: 'No more submissions'
 
 
-    if @mock_cnt % 7 == 0
+    if @mock_cnt % 3 == 0
       response =
         success: false
         error: 'An error for testing'
@@ -139,6 +139,7 @@ class StaffGrading
     @feedback_area = $('.feedback-area')
     @score_selection_container = $('.score-selection-container')        
     @submit_button = $('.submit-button')
+    @action_button = $('.action-button')
     @ml_error_info_container = $('.ml-error-info-container')
 
     @breadcrumbs = $('.breadcrumbs')
@@ -156,16 +157,15 @@ class StaffGrading
     @location = ''
     @prompt_name = ''
     @num_total = 0
-    @num_left = 0
+    @num_graded = 0
 
     @score = null
     @problems = null
 
     # action handlers
     @submit_button.click @submit
-
-    # render intial state
-    #@render_view()
+    # TODO: fix this to do something more intelligent
+    @action_button.click @submit
 
     # send initial request automatically
     @get_problem_list()
@@ -190,7 +190,7 @@ class StaffGrading
     
 
   set_button_text: (text) =>
-    @submit_button.attr('value', text)
+    @action_button.attr('value', text)
 
   graded_callback: (event) =>
     @score = event.target.value
@@ -207,7 +207,7 @@ class StaffGrading
       if response.problem_list
         @problems = response.problem_list
       else if response.submission
-        @data_loaded(response.prompt, response.submission, response.rubric, response.submission_id, response.max_score, response.ml_error_info, response.problem_name, response.num_left, response.num_total)
+        @data_loaded(response.prompt, response.submission, response.rubric, response.submission_id, response.max_score, response.ml_error_info, response.problem_name, response.num_graded, response.num_total)
       else
         @no_more(response.message)
     else
@@ -237,7 +237,7 @@ class StaffGrading
     @error_msg = msg
     @state = state_error
 
-  data_loaded: (prompt, submission, rubric, submission_id, max_score, ml_error_info, prompt_name, num_left, num_total) ->
+  data_loaded: (prompt, submission, rubric, submission_id, max_score, ml_error_info, prompt_name, num_graded, num_total) ->
     @prompt = prompt
     @submission = submission
     @rubric = rubric
@@ -247,7 +247,7 @@ class StaffGrading
     @score = null
     @ml_error_info=ml_error_info
     @prompt_name = prompt_name
-    @num_left = num_left
+    @num_graded = num_graded
     @num_total = num_total
     @state = state_grading
     if not @max_score?
@@ -256,7 +256,7 @@ class StaffGrading
   no_more: (message) ->
     @prompt = null
     @prompt_name = ''
-    @num_left = 0
+    @num_graded = 0
     @num_total = 0
     @submission = null
     @rubric = null
@@ -267,11 +267,6 @@ class StaffGrading
     @max_score = 0
     @state = state_no_data
 
-  hide_if_empty: (container,message) ->
-    if message == ''
-      container.hide()
-    else
-      container.html(message)
 
   render_view: () ->
     # clear the problem list and breadcrumbs
@@ -280,8 +275,10 @@ class StaffGrading
     @problem_list_container.toggle(@list_view)
     if @backend.mock_backend
       @message = @message + "<p>NOTE: Mocking backend.</p>"
-    @hide_if_empty(@message_container, @message)
-    @hide_if_empty(@error_container, @error_msg)
+    @message_container.html(@message)
+    @error_container.html(@error_msg)
+    @message_container.toggle(@message != "")
+    @error_container.toggle(@error_msg != "")
 
 
     # only show the grading elements when we are not in list view or the state
@@ -293,7 +290,7 @@ class StaffGrading
     @rubric_wrapper.toggle(show_grading_elements)
     @grading_wrapper.toggle(show_grading_elements)
     @ml_error_info_container.toggle(show_grading_elements)
-    @submit_button.hide()
+    @action_button.hide()
     
     if @list_view
       @render_list()
@@ -302,7 +299,7 @@ class StaffGrading
 
   problem_link:(problem) ->
     link = $('<a>').attr('href', "javascript:void(0)").append(
-      "#{problem.problem_name} (#{problem.num_left} left out of #{problem.num_total})")
+      "#{problem.problem_name} (#{problem.num_graded} graded out of #{problem.num_total})")
         .click =>
           @get_next_submission problem.location
 
@@ -320,6 +317,7 @@ class StaffGrading
   render_problem: () ->
     # make the view elements match the state.  Idempotent.
     show_submit_button = true
+    show_action_button = true
 
     problem_list_link = $('<a>').attr('href', 'javascript:void(0);')
       .append("< Back to problem list")
@@ -331,21 +329,24 @@ class StaffGrading
 
     if @state == state_error
       @set_button_text('Try loading again')
+      show_action_button = true
 
     else if @state == state_grading
       @ml_error_info_container.html(@ml_error_info)
       @prompt_container.html(@prompt)
-      @prompt_name_container.html("#{@prompt_name} <span class='sub-heading'>(#{@num_left} left out of #{@num_total})</span>")
+      @prompt_name_container.html("#{@prompt_name} <span class='sub-heading'>(#{@num_graded} completed out of #{@num_total})</span>")
       @submission_container.html(@make_paragraphs(@submission))
       @rubric_container.html(@rubric)
 
       # no submit button until user picks grade.
       show_submit_button = false
+      show_action_button = false
 
       @setup_score_selection()
       
     else if @state == state_graded
       @set_button_text('Submit')
+      show_action_button = false
 
     else if @state == state_no_data
       @message_container.html(@message)
@@ -355,6 +356,7 @@ class StaffGrading
       @error('System got into invalid state ' + @state)
 
     @submit_button.toggle(show_submit_button)
+    @action_button.toggle(show_action_button)
 
   submit: (event) =>
     event.preventDefault()
