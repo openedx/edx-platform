@@ -98,8 +98,19 @@ class StaffGradingService(object):
 
     def get_next(self, course_id, grader_id):
         """
-        Get the next thing to grade.  Returns json, or raises GradingServiceError
-        if there's a problem.
+        Get the next thing to grade.
+
+        Args:
+            course_id: course id to get submission for
+            grader_id: who is grading this?  The anonymous user_id of the grader.
+
+        Returns:
+            json string with the response from the service.  (Deliberately not
+            writing out the fields here--see the docs on the staff_grading view
+            in the grading_controller repo)
+
+        Raises:
+            GradingServiceError: something went wrong with the connection.
         """
         op = lambda: self.session.get(self.get_next_url,
                                       allow_redirects=False,
@@ -113,16 +124,18 @@ class StaffGradingService(object):
 
         return r.text
 
-    
+
     def save_grade(self, course_id, grader_id, submission_id, score, feedback):
         """
         Save a score and feedback for a submission.
 
-        Returns json dict with keys
-           'success': bool
-           'error': error msg, if something went wrong.
+        Returns:
+            json dict with keys
+                'success': bool
+                'error': error msg, if something went wrong.
 
-        Raises GradingServiceError if there's a problem connecting.
+        Raises:
+            GradingServiceError if there's a problem connecting.
         """
         try:
             data = {'course_id': course_id,
@@ -216,8 +229,10 @@ def _get_next(course_id, grader_id):
     try:
         return grading_service().get_next(course_id, grader_id)
     except GradingServiceError:
-        log.exception("Error from grading service")
-        return json.dumps({'success': False, 'error': 'Could not connect to grading service'})
+        log.exception("Error from grading service.  server url: {0}"
+                      .format(grading_service().url))
+        return json.dumps({'success': False,
+                           'error': 'Could not connect to grading service'})
 
 
 @expect_json
@@ -239,10 +254,12 @@ def save_grade(request, course_id):
     if request.method != 'POST':
         raise Http404
 
-    required = ('score', 'feedback', 'submission_id')
-    for k in required:
-        if k not in request.POST.keys():
-            return _err_response('Missing required key {0}'.format(k))
+    required = set('score', 'feedback', 'submission_id')
+    actual = set(request.POST.keys())
+    missing = required - actual
+    if len(missing) != 0:
+        return _err_response('Missing required keys {0}'.format(
+            ', '.join(missing)))
 
     grader_id = request.user.id
     p = request.POST
