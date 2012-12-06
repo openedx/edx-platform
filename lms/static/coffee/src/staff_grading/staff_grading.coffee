@@ -28,9 +28,27 @@ class StaffGradingBackend
             problem_name: 'Problem 1'
             num_left: 3
             num_total: 5
-            prompt: 'This is a fake prompt'
-            submission: 'submission! ' + @mock_cnt
-            rubric: 'A rubric! ' + @mock_cnt
+            prompt: '''
+            	<h2>S11E3: Metal Bands</h2>
+<p>Shown below are schematic band diagrams for two different metals. Both diagrams appear different, yet both of the elements are undisputably metallic in nature.</p>
+<img width="480" src="/static/images/LSQimages/shaded_metal_bands.png"/>
+<p>* Why is it that both sodium and magnesium behave as metals, even though the s-band of magnesium is filled? </p>
+<p>This is a self-assessed open response question. Please use as much space as you need in the box below to answer the question.</p>
+            '''
+            submission: '''
+            Contrary to popular belief, Lorem Ipsum is not simply random text. It has roots in a piece of classical Latin literature from 45 BC, making it over 2000 years old. Richard McClintock, a Latin professor at Hampden-Sydney College in Virginia, looked up one of the more obscure Latin words, consectetur, from a Lorem Ipsum passage, and going through the cites of the word in classical literature, discovered the undoubtable source. Lorem Ipsum comes from sections 1.10.32 and 1.10.33 of "de Finibus Bonorum et Malorum" (The Extremes of Good and Evil) by Cicero, written in 45 BC. This book is a treatise on the theory of ethics, very popular during the Renaissance. The first line of Lorem Ipsum, "Lorem ipsum dolor sit amet..", comes from a line in section 1.10.32.
+
+The standard chunk of Lorem Ipsum used since the 1500s is reproduced below for those interested. Sections 1.10.32 and 1.10.33 from "de Finibus Bonorum et Malorum" by Cicero are also reproduced in their exact original form, accompanied by English versions from the 1914 translation by H. Rackham.
+            '''
+            rubric: '''
+<ul>
+<li>Metals tend to be good electronic conductors, meaning that they have a large number of electrons which are able to access empty (mobile) energy states within the material.</li>
+<li>Sodium has a half-filled s-band, so there are a number of empty states immediately above the highest occupied energy levels within the band.</li>
+<li>Magnesium has a full s-band, but the the s-band and p-band overlap in magnesium. Thus are still a large number of available energy states immediately above the s-band highest occupied energy level.</li>
+</ul>
+
+<p>Please score your response according to how many of the above components you identified:</p>
+            '''
             submission_id: @mock_cnt
             max_score: 2 + @mock_cnt % 3
             ml_error_info : 'ML accuracy info: ' + @mock_cnt
@@ -116,6 +134,7 @@ class StaffGrading
 
     @rubric_container = $('.rubric-container')
     @rubric_wrapper = $('.rubric-wrapper')
+    @grading_wrapper = $('.grading-wrapper')
 
     @feedback_area = $('.feedback-area')
     @score_selection_container = $('.score-selection-container')        
@@ -176,6 +195,7 @@ class StaffGrading
   graded_callback: (event) =>
     @score = event.target.value
     @state = state_graded
+    @message = ''
     @render_view()
 
   ajax_callback: (response) =>
@@ -247,12 +267,23 @@ class StaffGrading
     @max_score = 0
     @state = state_no_data
 
+  hide_if_empty: (container,message) ->
+    if message == ''
+      container.hide()
+    else
+      container.html(message)
+
   render_view: () ->
     # clear the problem list and breadcrumbs
     @problem_list.html('')
     @breadcrumbs.html('')
     @problem_list_container.toggle(@list_view)
-    @message_container.html(@message)
+    if @backend.mock_backend
+      @message = @message + "<p>NOTE: Mocking backend.</p>"
+    @hide_if_empty(@message_container, @message)
+    @hide_if_empty(@error_container, @error_msg)
+
+
     # only show the grading elements when we are not in list view or the state
     # is invalid
     show_grading_elements = !(@list_view || @state == state_error || 
@@ -260,11 +291,10 @@ class StaffGrading
     @prompt_wrapper.toggle(show_grading_elements)
     @submission_wrapper.toggle(show_grading_elements)
     @rubric_wrapper.toggle(show_grading_elements)
+    @grading_wrapper.toggle(show_grading_elements)
     @ml_error_info_container.toggle(show_grading_elements)
     @submit_button.hide()
     
-    if @backend.mock_backend
-      @message_container.append("<p>NOTE: Mocking backend.</p>")
     if @list_view
       @render_list()
     else
@@ -276,6 +306,12 @@ class StaffGrading
         .click =>
           @get_next_submission problem.location
 
+  make_paragraphs: (text) ->
+    paragraph_split = text.split("\n")
+    new_text = ''
+    for paragraph in paragraph_split
+      new_text += "<p>#{paragraph}</p>"
+    return new_text
 
   render_list: () ->
     for problem in @problems
@@ -285,13 +321,13 @@ class StaffGrading
     # make the view elements match the state.  Idempotent.
     show_submit_button = true
 
-    @error_container.html(@error_msg)
     problem_list_link = $('<a>').attr('href', 'javascript:void(0);')
-      .append("Problem List")
+      .append("< Back to problem list")
       .click => @get_problem_list()
 
     # set up the breadcrumbing
-    @breadcrumbs.append(problem_list_link).append(" > #{@prompt_name}")
+    @breadcrumbs.append(problem_list_link)
+      
 
     if @state == state_error
       @set_button_text('Try loading again')
@@ -300,7 +336,7 @@ class StaffGrading
       @ml_error_info_container.html(@ml_error_info)
       @prompt_container.html(@prompt)
       @prompt_name_container.html("#{@prompt_name} <span class='sub-heading'>(#{@num_left} left out of #{@num_total})</span>")
-      @submission_container.html(@submission)
+      @submission_container.html(@make_paragraphs(@submission))
       @rubric_container.html(@rubric)
 
       # no submit button until user picks grade.
