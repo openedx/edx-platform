@@ -240,6 +240,10 @@ if settings.COURSEWARE_ENABLED:
             'instructor.staff_grading_service.get_next', name='staff_grading_get_next'),
         url(r'^courses/(?P<course_id>[^/]+/[^/]+/[^/]+)/staff_grading/save_grade$',
             'instructor.staff_grading_service.save_grade', name='staff_grading_save_grade'),
+        url(r'^courses/(?P<course_id>[^/]+/[^/]+/[^/]+)/staff_grading/save_grade$',
+            'instructor.staff_grading_service.save_grade', name='staff_grading_save_grade'),
+        url(r'^courses/(?P<course_id>[^/]+/[^/]+/[^/]+)/staff_grading/get_problem_list$',
+            'instructor.staff_grading_service.get_problem_list', name='staff_grading_get_problem_list'),
     )
 
     # discussion forums live within courseware, so courseware must be enabled first
