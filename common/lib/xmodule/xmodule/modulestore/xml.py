@@ -513,6 +513,18 @@ class XMLModuleStore(ModuleStoreBase):
         raise NotImplementedError("XMLModuleStores can't guarantee that definitions"
                                   " are unique. Use get_instance.")
 
+    def get_items(self, location, depth=0):
+        items = []
+        for _, modules in self.modules.iteritems():
+            for mod_loc, module in modules.iteritems():
+
+                # Locations match if each value in `location` is None or if the value from `location`
+                # matches the value from `mod_loc`
+                if all(goal is None or goal == value for goal, value in zip(location, mod_loc)):
+                    items.append(module)
+
+        return items
+
 
     def get_courses(self, depth=0):
         """
