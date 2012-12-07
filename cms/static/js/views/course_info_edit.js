@@ -41,7 +41,7 @@ CMS.Views.ClassInfoUpdateView = Backbone.View.extend({
             "/static/coffee/src/client_templates/course_info_update.html",
             function (raw_template) {
         		self.template = _.template(raw_template);
-        		self.render();                
+        		self.render();           
             }
         );
     },
@@ -68,6 +68,14 @@ CMS.Views.ClassInfoUpdateView = Backbone.View.extend({
         this.collection.add(newModel, {at : 0});
         
         var $newForm = $(this.template({ updateModel : newModel }));
+
+        var $textArea = $newForm.find(".new-update-content").first();
+        this.$codeMirror = CodeMirror.fromTextArea($textArea.get(0), {
+            mode: "text/html",
+            lineNumbers: true,
+            lineWrapping: true,
+        });
+
         var updateEle = this.$el.find("#course-update-list");
         $(updateEle).prepend($newForm);
         $newForm.addClass('editing');
@@ -85,7 +93,7 @@ CMS.Views.ClassInfoUpdateView = Backbone.View.extend({
     onSave: function(event) {
         var targetModel = this.eventModel(event);
         console.log(this.contentEntry(event).val());
-        targetModel.set({ date : this.dateEntry(event).val(), content : this.contentEntry(event).val() });
+        targetModel.set({ date : this.dateEntry(event).val(), content : this.$codeMirror.getValue() });
         // push change to display, hide the editor, submit the change        
         this.closeEditor(this);
         targetModel.save();
@@ -102,7 +110,17 @@ CMS.Views.ClassInfoUpdateView = Backbone.View.extend({
         var self = this;
         this.$currentPost = $(event.target).closest('li');
         this.$currentPost.addClass('editing');
-        $(this.editor(event)).slideDown(150);
+       
+        $(this.editor(event)).show();
+        var $textArea = this.$currentPost.find(".new-update-content").first();
+        if (this.$codeMirror == null ) {
+            this.$codeMirror = CodeMirror.fromTextArea($textArea.get(0), {
+                mode: "text/html",
+                lineNumbers: true,
+                lineWrapping: true,
+            });
+        }
+
         $modalCover.show();
         var targetModel = this.eventModel(event);
         $modalCover.bind('click', function() {
@@ -218,8 +236,16 @@ CMS.Views.ClassInfoHandoutsView = Backbone.View.extend({
     },
 
     onEdit: function(event) {
+        var self = this;
         this.$editor.val(this.$preview.html());
         this.$form.show();
+        if (this.$codeMirror == null) {
+            this.$codeMirror = CodeMirror.fromTextArea(this.$editor.get(0), {
+                mode: "text/html",
+                lineNumbers: true,
+                lineWrapping: true,
+            });
+        }
         $modalCover.show();
         $modalCover.bind('click', function() {
             self.closeEditor(self);
@@ -227,7 +253,7 @@ CMS.Views.ClassInfoHandoutsView = Backbone.View.extend({
     },
 
     onSave: function(event) {
-        this.model.set('data', this.$editor.val());
+        this.model.set('data', this.$codeMirror.getValue());
         this.render();
         this.model.save();
         this.$form.hide();

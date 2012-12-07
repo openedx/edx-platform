@@ -21,6 +21,12 @@
 		border-radius: 3px 0 0 3px;
 		border-right-color: $mediumGrey;
 	}
+
+	.CodeMirror {
+    border: 1px solid #3c3c3c;
+    background: #fff;
+    color: #3c3c3c;
+  }
 }
 
 .course-updates {
