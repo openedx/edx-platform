@@ -397,7 +397,7 @@ courseware_only_js += [
 ]
 
 main_vendor_js = [
-  'js/vendor/Requier.js',
+  'js/vendor/RequireJS.js',
   'js/vendor/jquery.min.js',
   'js/vendor/jquery-ui.min.js',
   'js/vendor/jquery.cookie.js',
