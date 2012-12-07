@@ -9,5 +9,5 @@ function github_status {
 }
 
 function github_mark_failed_on_exit {
-    trap '[ $? == "0" ] || github_status state:failed "failed"' EXIT
+    trap '[ $? == "0" ] || github_status state:failure "failed"' EXIT
 }
