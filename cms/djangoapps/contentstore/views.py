@@ -499,7 +499,7 @@ def load_preview_module(request, preview_id, descriptor, instance_state, shared_
     """
     system = preview_module_system(request, preview_id, descriptor)
     try:
-        module = descriptor.xmodule_constructor(system)(instance_state, shared_state)
+        module = descriptor.xmodule(system)
     except:
         module = ErrorDescriptor.from_descriptor(
             descriptor,

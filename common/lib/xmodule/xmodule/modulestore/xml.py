@@ -187,12 +187,13 @@ class ImportSystem(XMLParsingSystem, MakoDescriptorSystem):
                     err_msg
                 )
 
-            descriptor.metadata['data_dir'] = course_dir
+            setattr(descriptor, 'data_dir', course_dir)
 
             xmlstore.modules[course_id][descriptor.location] = descriptor
 
-            for child in descriptor.get_children():
-                parent_tracker.add_parent(child.location, descriptor.location)
+            if hasattr(descriptor, 'children'):
+                for child in descriptor.children:
+                    parent_tracker.add_parent(child.location, descriptor.location)
             return descriptor
 
         render_template = lambda: ''
@@ -425,14 +426,14 @@ class XMLModuleStore(ModuleStoreBase):
             # breaks metadata inheritance via get_children().  Instead
             # (actually, in addition to, for now), we do a final inheritance pass
             # after we have the course descriptor.
-            XModuleDescriptor.compute_inherited_metadata(course_descriptor)
+            #XModuleDescriptor.compute_inherited_metadata(course_descriptor)
 
             # now import all pieces of course_info which is expected to be stored
             # in <content_dir>/info or <content_dir>/info/<url_name>
             self.load_extra_content(system, course_descriptor, 'course_info', self.data_dir / course_dir / 'info', course_dir, url_name)
 
             # now import all static tabs which are expected to be stored in
-            # in <content_dir>/tabs or <content_dir>/tabs/<url_name>           
+            # in <content_dir>/tabs or <content_dir>/tabs/<url_name>
             self.load_extra_content(system, course_descriptor, 'static_tab', self.data_dir / course_dir / 'tabs', course_dir, url_name)
 
             self.load_extra_content(system, course_descriptor, 'custom_tag_template', self.data_dir / course_dir / 'custom_tags', course_dir, url_name)
@@ -444,30 +445,30 @@ class XMLModuleStore(ModuleStoreBase):
 
     def load_extra_content(self, system, course_descriptor, category, base_dir, course_dir, url_name):
         if url_name:
-            path =  base_dir / url_name
+            path = base_dir / url_name
 
         if not os.path.exists(path):
             path = base_dir
 
-        for filepath in glob.glob(path/ '*'):
+        for filepath in glob.glob(path / '*'):
             with open(filepath) as f:
                 try:
                     html = f.read().decode('utf-8')
                     # tabs are referenced in policy.json through a 'slug' which is just the filename without the .html suffix
                     slug = os.path.splitext(os.path.basename(filepath))[0]
                     loc = Location('i4x', course_descriptor.location.org, course_descriptor.location.course, category, slug)
-                    module = HtmlDescriptor(system, definition={'data' : html}, **{'location' : loc})
+                    module = HtmlDescriptor(system, loc, {'data': html})
                     # VS[compat]:
                     # Hack because we need to pull in the 'display_name' for static tabs (because we need to edit them)
                     # from the course policy
                     if category == "static_tab":
                         for tab in course_descriptor.tabs or []:
                             if tab.get('url_slug') == slug:
-                                module.metadata['display_name'] = tab['name']            
-                    module.metadata['data_dir'] = course_dir
-                    self.modules[course_descriptor.id][module.location] = module   
+                                module.display_name = tab['name']
+                    module.data_dir = course_dir
+                    self.modules[course_descriptor.id][module.location] = module
                 except Exception, e:
-                    logging.exception("Failed to load {0}. Skipping... Exception: {1}".format(filepath, str(e)))   
+                    logging.exception("Failed to load {0}. Skipping... Exception: {1}".format(filepath, str(e)))
                     system.error_tracker("ERROR: " + str(e))
 
     def get_instance(self, course_id, location, depth=0):

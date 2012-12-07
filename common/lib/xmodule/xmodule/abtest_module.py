@@ -7,6 +7,7 @@ from xmodule.x_module import XModule
 from xmodule.raw_module import RawDescriptor
 from xmodule.xml_module import XmlDescriptor
 from xmodule.exceptions import InvalidDefinitionError
+from .model import String, Scope
 
 DEFAULT = "_DEFAULT_GROUP"
 
@@ -68,37 +69,7 @@ class ABTestDescriptor(RawDescriptor, XmlDescriptor):
 
     template_dir_name = "abtest"
 
-    def __init__(self, system, definition=None, **kwargs):
-        """
-        definition is a dictionary with the following layout:
-            {'data': {
-                'experiment': 'the name of the experiment',
-                'group_portions': {
-                    'group_a': 0.1,
-                    'group_b': 0.2
-                },
-                'group_contents': {
-                    'group_a': [
-                        'url://for/content/module/1',
-                        'url://for/content/module/2',
-                    ],
-                    'group_b': [
-                        'url://for/content/module/3',
-                    ],
-                    DEFAULT: [
-                        'url://for/default/content/1'
-                    ]
-                }
-            },
-            'children': [
-                'url://for/content/module/1',
-                'url://for/content/module/2',
-                'url://for/content/module/3',
-                'url://for/default/content/1',
-            ]}
-        """
-        kwargs['shared_state_key'] = definition['data']['experiment']
-        RawDescriptor.__init__(self, system, definition, **kwargs)
+    experiment = String(help="Experiment that this A/B test belongs to", scope=Scope.content)
 
     @classmethod
     def definition_from_xml(cls, xml_object, system):

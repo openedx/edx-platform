@@ -74,12 +74,11 @@ class ErrorDescriptor(JSONEditingDescriptor):
         }
 
         # real metadata stays in the content, but add a display name
-        metadata = {'display_name': 'Error: ' + location.name}
+        model_data = {'display_name': 'Error: ' + location.name}
         return ErrorDescriptor(
             system,
-            definition,
-            location=location,
-            metadata=metadata
+            location,
+            model_data,
         )
 
     def get_context(self):

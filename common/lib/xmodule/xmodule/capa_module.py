@@ -19,6 +19,9 @@ from progress import Progress
 from xmodule.x_module import XModule
 from xmodule.raw_module import RawDescriptor
 from xmodule.exceptions import NotFoundError
+from .model import Int, Scope, ModuleScope, ModelType, String, Boolean, Object, Float
+
+Date = Timedelta = ModelType
 
 log = logging.getLogger("mitx.courseware")
 
@@ -77,6 +80,17 @@ class CapaModule(XModule):
     '''
     icon_class = 'problem'
 
+    attempts = Int(help="Number of attempts taken by the student on this problem", default=0, scope=Scope.student_state)
+    max_attempts = Int(help="Maximum number of attempts that a student is allowed", scope=Scope.settings)
+    due = Date(help="Date that this problem is due by", scope=Scope.settings)
+    graceperiod = Timedelta(help="Amount of time after the due date that submissions will be accepted", scope=Scope.settings)
+    show_answer = String(help="When to show the problem answer to the student", scope=Scope.settings, default="closed")
+    force_save_button = Boolean(help="Whether to force the save button to appear on the page", scope=Scope.settings)
+    rerandomize = String(help="When to rerandomize the problem", default="always")
+    data = String(help="XML data for the problem", scope=Scope.content)
+    correct_map = Object(help="Dictionary with the correctness of current student answers", scope=Scope.student_state)
+    done = Boolean(help="Whether the student has answered the problem", scope=Scope.student_state)
+
     js = {'coffee': [resource_string(__name__, 'js/src/capa/display.coffee'),
                      resource_string(__name__, 'js/src/collapsible.coffee'),
                      resource_string(__name__, 'js/src/javascript_loader.coffee'),
@@ -87,51 +101,15 @@ class CapaModule(XModule):
     js_module_name = "Problem"
     css = {'scss': [resource_string(__name__, 'css/capa/display.scss')]}
 
-    def __init__(self, system, location, definition, descriptor, instance_state=None,
-                 shared_state=None, **kwargs):
-        XModule.__init__(self, system, location, definition, descriptor, instance_state,
-                         shared_state, **kwargs)
+    def __init__(self, system, location, descriptor, model_data):
+        XModule.__init__(self, system, location, descriptor, model_data)
 
-        self.attempts = 0
-        self.max_attempts = None
-
-        dom2 = etree.fromstring(definition['data'])
-
-        display_due_date_string = self.metadata.get('due', None)
-        if display_due_date_string is not None:
-            self.display_due_date = dateutil.parser.parse(display_due_date_string)
-            #log.debug("Parsed " + display_due_date_string +
-            #          " to " + str(self.display_due_date))
-        else:
-            self.display_due_date = None
-
-        grace_period_string = self.metadata.get('graceperiod', None)
-        if grace_period_string is not None and self.display_due_date:
-            self.grace_period = parse_timedelta(grace_period_string)
-            self.close_date = self.display_due_date + self.grace_period
+        if self.graceperiod is not None and self.due:
+            self.close_date = self.due + self.graceperiod
             #log.debug("Then parsed " + grace_period_string +
             #          " to closing date" + str(self.close_date))
         else:
-            self.grace_period = None
-            self.close_date = self.display_due_date
-
-        self.max_attempts = self.metadata.get('attempts', None)
-        if self.max_attempts is not None:
-            self.max_attempts = int(self.max_attempts)
-
-        self.show_answer = self.metadata.get('showanswer', 'closed')
-
-        self.force_save_button = self.metadata.get('force_save_button', 'false')
-
-        if self.show_answer == "":
-            self.show_answer = "closed"
-
-        if instance_state is not None:
-            instance_state = json.loads(instance_state)
-        if instance_state is not None and 'attempts' in instance_state:
-            self.attempts = instance_state['attempts']
-
-        self.name = only_one(dom2.xpath('/problem/@name'))
+            self.close_date = self.due
 
         if self.rerandomize == 'never':
             self.seed = 1
@@ -148,8 +126,8 @@ class CapaModule(XModule):
         try:
             # TODO (vshnayder): move as much as possible of this work and error
             # checking to descriptor load time
-            self.lcp = LoncapaProblem(self.definition['data'], self.location.html_id(),
-                                      instance_state, seed=self.seed, system=self.system)
+            self.lcp = LoncapaProblem(self.data, self.location.html_id(),
+                                      self.correct_map, self.done, self.seed, self.system)
         except Exception as err:
             msg = 'cannot create LoncapaProblem {loc}: {err}'.format(
                 loc=self.location.url(), err=err)
@@ -168,33 +146,21 @@ class CapaModule(XModule):
                                 (self.location.url(), msg))
                 self.lcp = LoncapaProblem(
                     problem_text, self.location.html_id(),
-                    instance_state, seed=self.seed, system=self.system)
+                    self.correct_map, self.done, self.seed, self.system)
             else:
                 # add extra info and raise
                 raise Exception(msg), None, sys.exc_info()[2]
 
-    @property
-    def rerandomize(self):
-        """
-        Property accessor that returns self.metadata['rerandomize'] in a
-        canonical form
-        """
-        rerandomize = self.metadata.get('rerandomize', 'always')
-        if rerandomize in ("", "always", "true"):
-            return "always"
-        elif rerandomize in ("false", "per_student"):
-            return "per_student"
-        elif rerandomize == "never":
-            return "never"
-        elif rerandomize == "onreset":
-            return "onreset"
-        else:
-            raise Exception("Invalid rerandomize attribute " + rerandomize)
+        if self.rerandomize in ("", "true"):
+            self.rerandomize = "always"
+        elif self.rerandomize == "false":
+            self.rerandomize = "per_student"
 
-    def get_instance_state(self):
-        state = self.lcp.get_state()
-        state['attempts'] = self.attempts
-        return json.dumps(state)
+    def sync_lcp_state(self):
+        lcp_state = self.lcp.get_state()
+        self.done = lcp_state['done']
+        self.correct_map = lcp_state['correct_map']
+        self.seed = lcp_state['seed']
 
     def get_score(self):
         return self.lcp.get_score()
@@ -211,7 +177,7 @@ class CapaModule(XModule):
         if total > 0:
             try:
                 return Progress(score, total)
-            except Exception as err:
+            except Exception:
                 log.exception("Got bad progress")
                 return None
         return None
@@ -261,8 +227,8 @@ class CapaModule(XModule):
 
                 #   Next, generate a fresh LoncapaProblem
                 self.lcp = LoncapaProblem(self.definition['data'], self.location.html_id(),
-                               state=None, # Tabula rasa
                                seed=self.seed, system=self.system)
+                self.sync_lcp_state()
 
                 # Prepend a scary warning to the student
                 warning  = '<div class="capa_reset">'\
@@ -280,8 +246,8 @@ class CapaModule(XModule):
                 html = warning
                 try:
                     html += self.lcp.get_html()
-                except Exception, err: # Couldn't do it. Give up
-                    log.exception(err)
+                except Exception:  # Couldn't do it. Give up
+                    log.exception("Unable to generate html from LoncapaProblem")
                     raise
 
         content = {'name': self.display_name,
@@ -311,7 +277,7 @@ class CapaModule(XModule):
 
         # User submitted a problem, and hasn't reset. We don't want
         # more submissions.
-        if self.lcp.done and self.rerandomize == "always":
+        if self.done and self.rerandomize == "always":
             check_button = False
             save_button = False
 
@@ -320,7 +286,7 @@ class CapaModule(XModule):
             reset_button = False
 
         # User hasn't submitted an answer yet -- we don't want resets
-        if not self.lcp.done:
+        if not self.done:
             reset_button = False
 
         # We may not need a "save" button if infinite number of attempts and
@@ -406,7 +372,7 @@ class CapaModule(XModule):
             return self.attempts > 0
 
         if self.show_answer == 'answered':
-            return self.lcp.done
+            return self.done
 
         if self.show_answer == 'closed':
             return self.closed()
@@ -429,6 +395,7 @@ class CapaModule(XModule):
         queuekey = get['queuekey']
         score_msg = get['xqueue_body']
         self.lcp.update_score(score_msg, queuekey)
+        self.sync_lcp_state()
 
         return dict()  # No AJAX return is needed
 
@@ -445,8 +412,9 @@ class CapaModule(XModule):
             raise NotFoundError('Answer is not available')
         else:
             answers = self.lcp.get_question_answers()
+            self.sync_lcp_state()
 
-	    # answers (eg <solution>) may have embedded images
+        # answers (eg <solution>) may have embedded images
         #   but be careful, some problems are using non-string answer dicts
         new_answers = dict()
         for answer_id in answers:
@@ -512,7 +480,7 @@ class CapaModule(XModule):
             raise NotFoundError('Problem is closed')
 
         # Problem submitted. Student should reset before checking again
-        if self.lcp.done and self.rerandomize == "always":
+        if self.done and self.rerandomize == "always":
             event_info['failure'] = 'unreset'
             self.system.track_function('save_problem_check_fail', event_info)
             raise NotFoundError('Problem must be reset before it can be checked again')
@@ -522,14 +490,13 @@ class CapaModule(XModule):
             current_time = datetime.datetime.now()
             prev_submit_time = self.lcp.get_recentmost_queuetime()
             waittime_between_requests = self.system.xqueue['waittime']
-            if (current_time-prev_submit_time).total_seconds() < waittime_between_requests:
+            if (current_time - prev_submit_time).total_seconds() < waittime_between_requests:
                 msg = 'You must wait at least %d seconds between submissions' % waittime_between_requests
-                return {'success': msg, 'html': ''} # Prompts a modal dialog in ajax callback
+                return {'success': msg, 'html': ''}  # Prompts a modal dialog in ajax callback
 
         try:
-            old_state = self.lcp.get_state()
-            lcp_id = self.lcp.problem_id
             correct_map = self.lcp.grade_answers(answers)
+            self.sync_lcp_state()
         except StudentInputError as inst:
             log.exception("StudentInputError in capa_module:problem_check")
             return {'success': inst.message}
@@ -554,11 +521,11 @@ class CapaModule(XModule):
         #       'success' will always be incorrect
         event_info['correct_map'] = correct_map.get_dict()
         event_info['success'] = success
-	event_info['attempts'] = self.attempts
+        event_info['attempts'] = self.attempts
         self.system.track_function('save_problem_check', event_info)
 
-	if hasattr(self.system,'psychometrics_handler'):	# update PsychometricsData using callback
-		self.system.psychometrics_handler(self.get_instance_state())
+        if hasattr(self.system, 'psychometrics_handler'):  # update PsychometricsData using callback
+            self.system.psychometrics_handler(self.get_instance_state())
 
         # render problem into HTML
         html = self.get_problem_html(encapsulate=False)
@@ -589,7 +556,7 @@ class CapaModule(XModule):
 
         # Problem submitted. Student should reset before saving
         # again.
-        if self.lcp.done and self.rerandomize == "always":
+        if self.done and self.rerandomize == "always":
             event_info['failure'] = 'done'
             self.system.track_function('save_problem_fail', event_info)
             return {'success': False,
@@ -617,7 +584,7 @@ class CapaModule(XModule):
             return {'success': False,
                     'error': "Problem is closed"}
 
-        if not self.lcp.done:
+        if not self.done:
             event_info['failure'] = 'not_done'
             self.system.track_function('reset_problem_fail', event_info)
             return {'success': False,
@@ -629,9 +596,13 @@ class CapaModule(XModule):
             # in next line)
             self.lcp.seed = None
 
-        self.lcp = LoncapaProblem(self.definition['data'],
-                                  self.location.html_id(), self.lcp.get_state(),
-                                  system=self.system)
+        self.lcp = LoncapaProblem(self.data,
+                                  self.location.html_id(),
+                                  self.lcp.correct_map,
+                                  self.lcp.done,
+                                  self.lcp.seed,
+                                  self.system)
+        self.sync_lcp_state()
 
         event_info['new_state'] = self.lcp.get_state()
         self.system.track_function('reset_problem', event_info)
@@ -646,6 +617,8 @@ class CapaDescriptor(RawDescriptor):
     """
 
     module_class = CapaModule
+
+    weight = Float(help="How much to weight this problem by", scope=Scope.settings)
 
     stores_state = True
     has_score = True
@@ -665,12 +638,3 @@ class CapaDescriptor(RawDescriptor):
             'problems/' + path[8:],
             path[8:],
         ]
-
-    def __init__(self, *args, **kwargs):
-        super(CapaDescriptor, self).__init__(*args, **kwargs)
-
-        weight_string = self.metadata.get('weight', None)
-        if weight_string:
-            self.weight = float(weight_string)
-        else:
-            self.weight = None

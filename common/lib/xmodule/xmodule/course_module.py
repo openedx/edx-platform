@@ -12,6 +12,9 @@ import requests
 import time
 import copy
 
+from .model import Scope, ModelType, List, String, Object, Boolean
+
+Date = ModelType
 
 log = logging.getLogger(__name__)
 
@@ -20,6 +23,39 @@ edx_xml_parser = etree.XMLParser(dtd_validation=False, load_dtd=False,
 
 class CourseDescriptor(SequenceDescriptor):
     module_class = SequenceModule
+
+    textbooks = List(help="List of pairs of (title, url) for textbooks used in this course", default=[], scope=Scope.content)
+    wiki_slug = String(help="Slug that points to the wiki for this course", scope=Scope.content)
+    enrollment_start = Date(help="Date that enrollment for this class is opened", scope=Scope.settings)
+    enrollment_end = Date(help="Date that enrollment for this class is closed", scope=Scope.settings)
+    end = Date(help="Date that this class ends", scope=Scope.settings)
+    advertised_start = Date(help="Date that this course is advertised to start", scope=Scope.settings)
+    grading_policy = Object(help="Grading policy definition for this class", scope=Scope.content)
+
+    info_sidebar_name = String(scope=Scope.settings, default='Course Handouts')
+    
+    # An extra property is used rather than the wiki_slug/number because
+    # there are courses that change the number for different runs. This allows
+    # courses to share the same css_class across runs even if they have
+    # different numbers.
+    #
+    # TODO get rid of this as soon as possible or potentially build in a robust
+    # way to add in course-specific styling. There needs to be a discussion
+    # about the right way to do this, but arjun will address this ASAP. Also
+    # note that the courseware template needs to change when this is removed.
+    css_class = String(help="DO NOT USE THIS", scope=Scope.settings)
+
+    # TODO: This is a quick kludge to allow CS50 (and other courses) to
+    # specify their own discussion forums as external links by specifying a
+    # "discussion_link" in their policy JSON file. This should later get
+    # folded in with Syllabus, Course Info, and additional Custom tabs in a
+    # more sensible framework later.
+    discussion_link = String(help="DO NOT USE THIS", scope=Scope.settings)
+
+    # TODO: same as above, intended to let internal CS50 hide the progress tab
+    # until we get grade integration set up.
+    # Explicit comparison to True because we always want to return a bool.
+    hide_progress_tab = Boolean(help="DO NOT USE THIS", scope=Scope.settings)
 
     template_dir_name = 'course'
 
@@ -69,10 +105,11 @@ class CourseDescriptor(SequenceDescriptor):
 
             return table_of_contents
 
-    def __init__(self, system, definition=None, **kwargs):
-        super(CourseDescriptor, self).__init__(system, definition, **kwargs)
+    def __init__(self, *args, **kwargs):
+        super(CourseDescriptor, self).__init__(*args, **kwargs)
+
         self.textbooks = []
-        for title, book_url in self.definition['data']['textbooks']:
+        for title, book_url in self.textbooks:
             try:
                 self.textbooks.append(self.Textbook(title, book_url))
             except:
@@ -81,7 +118,8 @@ class CourseDescriptor(SequenceDescriptor):
                 log.exception("Couldn't load textbook ({0}, {1})".format(title, book_url))
                 continue
 
-        self.wiki_slug = self.definition['data']['wiki_slug'] or self.location.course
+        if self.wiki_slug is None:
+            self.wiki_slug = self.location.course
 
         msg = None
         if self.start is None:
@@ -98,7 +136,7 @@ class CourseDescriptor(SequenceDescriptor):
         #   disable the syllabus content for courses that do not provide a syllabus
         self.syllabus_present = self.system.resources_fs.exists(path('syllabus'))
 
-        self.set_grading_policy(self.definition['data'].get('grading_policy', None))
+        self.set_grading_policy(self.grading_policy)
 
     def defaut_grading_policy(self):
         """
@@ -203,7 +241,7 @@ class CourseDescriptor(SequenceDescriptor):
         
         # cdodge: import the grading policy information that is on disk and put into the
         # descriptor 'definition' bucket as a dictionary so that it is persisted in the DB
-        instance.definition['data']['grading_policy'] = policy
+        instance.grading_policy = policy
 
         # now set the current instance. set_grading_policy() will apply some inheritance rules
         instance.set_grading_policy(policy)
@@ -395,38 +433,14 @@ class CourseDescriptor(SequenceDescriptor):
 
     @property
     def start_date_text(self):
-        displayed_start = self._try_parse_time('advertised_start') or self.start
-        return time.strftime("%b %d, %Y", displayed_start)
+        return time.strftime("%b %d, %Y", self.advertised_start or self.start)
 
     @property
     def end_date_text(self):
         return time.strftime("%b %d, %Y", self.end)
 
-    # An extra property is used rather than the wiki_slug/number because
-    # there are courses that change the number for different runs. This allows
-    # courses to share the same css_class across runs even if they have
-    # different numbers.
-    #
-    # TODO get rid of this as soon as possible or potentially build in a robust
-    # way to add in course-specific styling. There needs to be a discussion
-    # about the right way to do this, but arjun will address this ASAP. Also
-    # note that the courseware template needs to change when this is removed.
-    @property
-    def css_class(self):
-        return self.metadata.get('css_class', '')
 
-    @property
-    def info_sidebar_name(self):
-        return self.metadata.get('info_sidebar_name', 'Course Handouts')
 
-    @property
-    def discussion_link(self):
-        """TODO: This is a quick kludge to allow CS50 (and other courses) to
-        specify their own discussion forums as external links by specifying a
-        "discussion_link" in their policy JSON file. This should later get
-        folded in with Syllabus, Course Info, and additional Custom tabs in a
-        more sensible framework later."""
-        return self.metadata.get('discussion_link', None)
 
     @property
     def forum_posts_allowed(self):
@@ -443,12 +457,6 @@ class CourseDescriptor(SequenceDescriptor):
         
         return True
 
-    @property
-    def hide_progress_tab(self):
-        """TODO: same as above, intended to let internal CS50 hide the progress tab
-        until we get grade integration set up."""
-        # Explicit comparison to True because we always want to return a bool.
-        return self.metadata.get('hide_progress_tab') == True
 
     @property
     def end_of_course_survey_url(self):

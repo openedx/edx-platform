@@ -245,7 +245,7 @@ def _get_module(user, request, location, student_module_cache, course_id, positi
                    make_psychometrics_data_update_handler(instance_module))
 
     try:
-        module = descriptor.xmodule_constructor(system)(instance_state, shared_state)
+        module = descriptor.xmodule(system)
     except:
         log.exception("Error creating module from descriptor {0}".format(descriptor))
 
@@ -259,7 +259,7 @@ def _get_module(user, request, location, student_module_cache, course_id, positi
                                                               error_msg=exc_info_to_str(sys.exc_info()))
 
         # Make an error module
-        return err_descriptor.xmodule_constructor(system)(None, None)
+        return err_descriptor.xmodule(system)
 
     _get_html = module.get_html
 

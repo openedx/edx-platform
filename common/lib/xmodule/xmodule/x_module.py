@@ -2,19 +2,41 @@ import logging
 import pkg_resources
 import yaml
 import os
+import time
 
-from functools import partial
 from lxml import etree
 from pprint import pprint
 from collections import namedtuple
 from pkg_resources import resource_listdir, resource_string, resource_isdir
 
 from xmodule.modulestore import Location
-from xmodule.timeparse import parse_time, stringify_time
+from .model import ModelMetaclass, String, Scope, ModuleScope, ModelType
 
-from xmodule.contentstore.content import StaticContent, XASSET_SRCREF_PREFIX
-from xmodule.modulestore.exceptions import ItemNotFoundError
-import time
+Date = ModelType
+
+
+class Date(ModelType):
+    time_format = "%Y-%m-%dT%H:%M"
+
+    def from_json(self, value):
+        """
+        Parse an optional metadata key containing a time: if present, complain
+        if it doesn't parse.
+        Return None if not present or invalid.
+        """
+        try:
+            return time.strptime(value, self.time_format)
+        except ValueError as e:
+            msg = "Field {0} has bad value '{1}': '{2}'".format(
+                self._name, value, e)
+            log.warning(msg)
+            return None
+
+    def to_json(self, value):
+        """
+        Convert a time struct to a string
+        """
+        return time.strftime(self.time_format, value)
 
 log = logging.getLogger('mitx.' + __name__)
 
@@ -157,6 +179,10 @@ class XModule(HTMLSnippet):
         See the HTML module for a simple example.
     '''
 
+    __metaclass__ = ModelMetaclass
+
+    display_name = String(help="Display name for this module", scope=Scope(student=False, module=ModuleScope.USAGE))
+
     # The default implementation of get_icon_class returns the icon_class
     # attribute of the class
     #
@@ -165,8 +191,7 @@ class XModule(HTMLSnippet):
     # in the module
     icon_class = 'other'
 
-    def __init__(self, system, location, definition, descriptor,
-                 instance_state=None, shared_state=None, **kwargs):
+    def __init__(self, system, location, descriptor, model_data):
         '''
         Construct a new xmodule
 
@@ -214,55 +239,17 @@ class XModule(HTMLSnippet):
         '''
         self.system = system
         self.location = Location(location)
-        self.definition = definition
         self.descriptor = descriptor
-        self.instance_state = instance_state
-        self.shared_state = shared_state
         self.id = self.location.url()
         self.url_name = self.location.name
         self.category = self.location.category
-        self.metadata = kwargs.get('metadata', {})
-        self._loaded_children = None
+        self._model_data = model_data
 
-    @property
-    def display_name(self):
-        '''
-        Return a display name for the module: use display_name if defined in
-        metadata, otherwise convert the url name.
-        '''
-        return self.metadata.get('display_name',
-                                 self.url_name.replace('_', ' '))
+        if self.display_name is None:
+            self.display_name = self.url_name.replace('_', ' ')
 
     def __unicode__(self):
         return '<x_module(id={0})>'.format(self.id)
-
-    def get_children(self):
-        '''
-        Return module instances for all the children of this module.
-        '''
-        if self._loaded_children is None:
-            child_locations = self.get_children_locations()
-            children = [self.system.get_module(loc) for loc in child_locations]
-            # get_module returns None if the current user doesn't have access
-            # to the location.
-            self._loaded_children = [c for c in children if c is not None]
-
-        return self._loaded_children
-    
-    def get_children_locations(self):
-        '''
-        Returns the locations of each of child modules.
-        
-        Overriding this changes the behavior of get_children and
-        anything that uses get_children, such as get_display_items.
-        
-        This method will not instantiate the modules of the children
-        unless absolutely necessary, so it is cheaper to call than get_children
-        
-        These children will be the same children returned by the
-        descriptor unless descriptor.has_dynamic_children() is true.
-        '''
-        return self.definition.get('children', [])
 
     def get_display_items(self):
         '''
@@ -270,7 +257,7 @@ class XModule(HTMLSnippet):
         immediately inside this module.
         '''
         items = []
-        for child in self.get_children():
+        for child in self.children():
             items.extend(child.displayable_items())
 
         return items
@@ -289,18 +276,6 @@ class XModule(HTMLSnippet):
         return self.icon_class
 
     ### Functions used in the LMS
-
-    def get_instance_state(self):
-        ''' State of the object, as stored in the database
-        '''
-        return '{}'
-
-    def get_shared_state(self):
-        '''
-        Get state that should be shared with other instances
-        using the same 'shared_state_key' attribute.
-        '''
-        return '{}'
 
     def get_score(self):
         ''' Score the student received on the problem.
@@ -391,7 +366,10 @@ class XModuleDescriptor(Plugin, HTMLSnippet, ResourceTemplates):
     """
     entry_point = "xmodule.v1"
     module_class = XModule
+    __metaclass__ = ModelMetaclass
 
+    display_name = String(help="Display name for this module", scope=Scope(student=False, module=ModuleScope.USAGE))
+    start = Date(help="Start time when this module is visible", scope=Scope(student=False, module=ModuleScope.USAGE))
     # Attributes for inspection of the descriptor
     stores_state = False  # Indicates whether the xmodule state should be
     # stored in a database (independent of shared state)
@@ -424,8 +402,8 @@ class XModuleDescriptor(Plugin, HTMLSnippet, ResourceTemplates):
     # ============================= STRUCTURAL MANIPULATION ===================
     def __init__(self,
                  system,
-                 definition=None,
-                 **kwargs):
+                 location,
+                 model_data):
         """
         Construct a new XModuleDescriptor. The only required arguments are the
         system, used for interaction with external resources, and the
@@ -467,115 +445,35 @@ class XModuleDescriptor(Plugin, HTMLSnippet, ResourceTemplates):
                     instance of the module data
         """
         self.system = system
-        self.metadata = kwargs.get('metadata', {})
-        self.definition = definition if definition is not None else {}
-        self.location = Location(kwargs.get('location'))
+        self.location = Location(location)
         self.url_name = self.location.name
         self.category = self.location.category
-        self.shared_state_key = kwargs.get('shared_state_key')
+        self._model_data = model_data
 
         self._child_instances = None
         self._inherited_metadata = set()
-
-    @property
-    def display_name(self):
-        '''
-        Return a display name for the module: use display_name if defined in
-        metadata, otherwise convert the url name.
-        '''
-        return self.metadata.get('display_name',
-                                 self.url_name.replace('_', ' '))
-
-    @property
-    def start(self):
-        """
-        If self.metadata contains start, return it.  Else return None.
-        """
-        if 'start' not in self.metadata:
-            return None
-        return self._try_parse_time('start')
-
-    @start.setter
-    def start(self, value):
-        if isinstance(value, time.struct_time):
-            self.metadata['start'] = stringify_time(value)
-        
-    @property
-    def own_metadata(self):
-        """
-        Return the metadata that is not inherited, but was defined on this module.
-        """
-        return dict((k, v) for k, v in self.metadata.items()
-                    if k not in self._inherited_metadata)
-
-    @staticmethod
-    def compute_inherited_metadata(node):
-        """Given a descriptor, traverse all of its descendants and do metadata
-        inheritance.  Should be called on a CourseDescriptor after importing a
-        course.
-
-        NOTE: This means that there is no such thing as lazy loading at the
-        moment--this accesses all the children."""
-        for c in node.get_children():
-            c.inherit_metadata(node.metadata)
-            XModuleDescriptor.compute_inherited_metadata(c)
-
-    def inherit_metadata(self, metadata):
-        """
-        Updates this module with metadata inherited from a containing module.
-        Only metadata specified in self.inheritable_metadata will
-        be inherited
-        """
-        # Set all inheritable metadata from kwargs that are
-        # in self.inheritable_metadata and aren't already set in metadata
-        for attr in self.inheritable_metadata:
-            if attr not in self.metadata and attr in metadata:
-                self._inherited_metadata.add(attr)
-                self.metadata[attr] = metadata[attr]
-
-    def get_children(self):
-        """Returns a list of XModuleDescriptor instances for the children of
-        this module"""
-        if self._child_instances is None:
-            self._child_instances = []
-            for child_loc in self.definition.get('children', []):
-                try:
-                    child = self.system.load_item(child_loc)
-                except ItemNotFoundError:
-                    log.exception('Unable to load item {loc}, skipping'.format(loc=child_loc))
-                    continue
-                # TODO (vshnayder): this should go away once we have
-                # proper inheritance support in mongo.  The xml
-                # datastore does all inheritance on course load.
-                child.inherit_metadata(self.metadata)
-                self._child_instances.append(child)
-
-        return self._child_instances
 
     def get_child_by_url_name(self, url_name):
         """
         Return a child XModuleDescriptor with the specified url_name, if it exists, and None otherwise.
         """
-        for c in self.get_children():
+        for c in self.children:
             if c.url_name == url_name:
                 return c
         return None
 
-    def xmodule_constructor(self, system):
+    def xmodule(self, system):
         """
         Returns a constructor for an XModule. This constructor takes two
         arguments: instance_state and shared_state, and returns a fully
         instantiated XModule
         """
-        return partial(
-            self.module_class,
+        return self.module_class(
             system,
             self.location,
-            self.definition,
             self,
-            metadata=self.metadata
+            system.xmodule_model_data(self.model_data),
         )
-    
     
     def has_dynamic_children(self):
         """
@@ -701,31 +599,14 @@ class XModuleDescriptor(Plugin, HTMLSnippet, ResourceTemplates):
         return eq
 
     def __repr__(self):
-        return ("{class_}({system!r}, {definition!r}, location={location!r},"
-                " metadata={metadata!r})".format(
+        return ("{class_}({system!r}, location={location!r},"
+                " model_data={model_data!r})".format(
             class_=self.__class__.__name__,
             system=self.system,
-            definition=self.definition,
             location=self.location,
-            metadata=self.metadata
+            model_data=self._model_data,
         ))
 
-    # ================================ Internal helpers =======================
-
-    def _try_parse_time(self, key):
-        """
-        Parse an optional metadata key containing a time: if present, complain
-        if it doesn't parse.
-        Return None if not present or invalid.
-        """
-        if key in self.metadata:
-            try:
-                return parse_time(self.metadata[key])
-            except ValueError as e:
-                msg = "Descriptor {0} loaded with a bad metadata key '{1}': '{2}'".format(
-                    self.location.url(), self.metadata[key], e)
-                log.warning(msg)
-        return None
 
 
 class DescriptorSystem(object):
@@ -866,6 +747,9 @@ class ModuleSystem(object):
     def set(self, attr, val):
         '''provide uniform access to attributes (like etree)'''
         self.__dict__[attr] = val
+
+    def xmodule_module_data(self, module_data):
+        return module_data
 
     def __repr__(self):
         return repr(self.__dict__)

@@ -21,20 +21,19 @@ class MakoModuleDescriptor(XModuleDescriptor):
     the descriptor as the `module` parameter to that template
     """
 
-    def __init__(self, system, definition=None, **kwargs):
+    def __init__(self, system, location, model_data):
         if getattr(system, 'render_template', None) is None:
             raise TypeError('{system} must have a render_template function'
                             ' in order to use a MakoDescriptor'.format(
                     system=system))
-        super(MakoModuleDescriptor, self).__init__(system, definition, **kwargs)
+        super(MakoModuleDescriptor, self).__init__(system, location, model_data)
 
     def get_context(self):
         """
         Return the context to render the mako template with
         """
         return {'module': self,
-                'metadata': self.metadata,
-                'editable_metadata_fields' : self.editable_metadata_fields
+                'editable_metadata_fields': self.editable_fields
                 }
 
     def get_html(self):
@@ -44,6 +43,6 @@ class MakoModuleDescriptor(XModuleDescriptor):
     # cdodge: encapsulate a means to expose "editable" metadata fields (i.e. not internal system metadata)
     @property
     def editable_metadata_fields(self):
-        subset = [name for name in self.metadata.keys() if name not in self.system_metadata_fields]
+        subset = [field.name for field in self.fields if field.name not in self.system_metadata_fields]
         return subset
 

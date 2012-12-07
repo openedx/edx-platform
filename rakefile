@@ -40,7 +40,7 @@ end
 
 def django_admin(system, env, command, *args)
     django_admin = ENV['DJANGO_ADMIN_PATH'] || select_executable('django-admin.py', 'django-admin')
-    return "#{django_admin} #{command} --settings=#{system}.envs.#{env} --pythonpath=. #{args.join(' ')}"
+    return "#{django_admin} #{command} --traceback --settings=#{system}.envs.#{env} --pythonpath=. #{args.join(' ')}"
 end
 
 def django_for_jasmine(system, django_reload)

@@ -287,9 +287,9 @@ class XmlDescriptor(XModuleDescriptor):
             filepath = cls._format_filepath(xml_object.tag, name_to_pathname(url_name))
             definition_xml = cls.load_file(filepath, system.resources_fs, location)
         else:
-            definition_xml = xml_object	# this is just a pointer, not the real definition content
+            definition_xml = xml_object  # this is just a pointer, not the real definition content
 
-        definition = cls.load_definition(definition_xml, system, location)	# note this removes metadata
+        definition = cls.load_definition(definition_xml, system, location)  # note this removes metadata
         # VS[compat] -- make Ike's github preview links work in both old and
         # new file layouts
         if is_pointer_tag(xml_object):
@@ -299,13 +299,13 @@ class XmlDescriptor(XModuleDescriptor):
         metadata = cls.load_metadata(definition_xml)
 
         # move definition metadata into dict
-        dmdata = definition.get('definition_metadata','')
+        dmdata = definition.get('definition_metadata', '')
         if dmdata:
             metadata['definition_metadata_raw'] = dmdata
             try:
                 metadata.update(json.loads(dmdata))
             except Exception as err:
-                log.debug('Error %s in loading metadata %s' % (err,dmdata))
+                log.debug('Error %s in loading metadata %s' % (err, dmdata))
                 metadata['definition_metadata_err'] = str(err)
 
         # Set/override any metadata specified by policy
@@ -313,11 +313,14 @@ class XmlDescriptor(XModuleDescriptor):
         if k in system.policy:
             cls.apply_policy(metadata, system.policy[k])
 
+        model_data = {}
+        model_data.update(metadata)
+        model_data.update(definition)
+
         return cls(
             system,
-            definition,
-            location=location,
-            metadata=metadata,
+            location,
+            model_data,
         )
 
     @classmethod

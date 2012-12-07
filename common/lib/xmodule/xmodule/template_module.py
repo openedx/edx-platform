@@ -67,10 +67,6 @@ class CustomTagDescriptor(RawDescriptor):
         return template.render(**params)
 
 
-    def __init__(self, system, definition, **kwargs):
-        '''Render and save the template for this descriptor instance'''
-        super(CustomTagDescriptor, self).__init__(system, definition, **kwargs)
-
     @property
     def rendered_html(self):
         return self.render_template(self.system, self.definition['data'])
