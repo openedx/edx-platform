@@ -3,6 +3,9 @@
 set -e
 set -x
 
+github_mark_failed_on_exit
+github_status state:pending
+
 # Reset the submodule, in case it changed
 git submodule foreach 'git reset --hard HEAD'
 
@@ -27,3 +30,5 @@ rake coverage:xml coverage:html
 
 [ $TESTS_FAILED == '0' ]
 rake autodeploy_properties
+
+github_status state:success
