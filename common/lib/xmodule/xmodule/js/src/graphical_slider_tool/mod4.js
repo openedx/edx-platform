@@ -2,7 +2,8 @@
 // define() functions from Require JS available inside the anonymous function.
 (function (requirejs, require, define) {
 
-define([], function () {
+define('mod4', [], function () {
+    console.log('we are in the mod4 callback');
     return {
         'module_status': 'OK'
     };

@@ -22,7 +22,19 @@ log = logging.getLogger("mitx.common.lib.gst_module")
 class GraphicalSliderToolModule(XModule):
     ''' Graphical-Slider-Tool Module
     '''
-    js = {'js': [resource_string(__name__, 'js/src/graphical_slider_tool/gst.js')]}
+
+    js = {
+      'js': [
+        resource_string(__name__, 'js/src/graphical_slider_tool/gst_main.js'),
+        resource_string(__name__, 'js/src/graphical_slider_tool/mod1.js'),
+        resource_string(__name__, 'js/src/graphical_slider_tool/mod2.js'),
+        resource_string(__name__, 'js/src/graphical_slider_tool/mod3.js'),
+        resource_string(__name__, 'js/src/graphical_slider_tool/mod4.js'),
+        resource_string(__name__, 'js/src/graphical_slider_tool/mod5.js'),
+
+        resource_string(__name__, 'js/src/graphical_slider_tool/gst.js')
+      ]
+    }
     js_module_name = "GraphicalSliderTool"
 
     def __init__(self, system, location, definition, descriptor, instance_state=None,
