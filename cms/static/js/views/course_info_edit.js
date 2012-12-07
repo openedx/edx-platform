@@ -15,8 +15,8 @@ CMS.Views.CourseInfoEdit = Backbone.View.extend({
     });
 
     new CMS.Views.ClassInfoHandoutsView({
-        el: this.$('#course-handouts-view')
-        // collection: this.model.get('')
+        el: this.$('#course-handouts-view'),
+        model: this.model.get('handouts')
     });
     return this;
   }
@@ -185,11 +185,17 @@ CMS.Views.ClassInfoHandoutsView = Backbone.View.extend({
 
     initialize: function() {
         var self = this;
-        window.templateLoader.loadRemoteTemplate("course_info_handouts",
-            "/static/coffee/src/client_templates/course_info_handouts.html",
-            function (raw_template) {
-                self.template = _.template(raw_template);
-                self.render();                
+        this.model.fetch(
+            {
+                complete: function() {
+                    window.templateLoader.loadRemoteTemplate("course_info_handouts",
+                        "/static/coffee/src/client_templates/course_info_handouts.html",
+                        function (raw_template) {
+                            self.template = _.template(raw_template);
+                            self.render();                
+                        }
+                    );
+                }
             }
         );
     },
@@ -197,7 +203,12 @@ CMS.Views.ClassInfoHandoutsView = Backbone.View.extend({
     render: function () {        
         var updateEle = this.$el;
         var self = this;
-        this.$el.append($(this.template()));
+        this.$el.html(
+            $(this.template( {
+                model: this.model
+                })
+            )
+        );
         this.$preview = this.$el.find('.handouts-content');
         this.$form = this.$el.find(".edit-handouts-form");
         this.$editor = this.$form.find('.handouts-content-editor');
@@ -209,7 +220,6 @@ CMS.Views.ClassInfoHandoutsView = Backbone.View.extend({
     onEdit: function(event) {
         this.$editor.val(this.$preview.html());
         this.$form.show();
-        this.$preview.hide();
         $modalCover.show();
         $modalCover.bind('click', function() {
             self.closeEditor(self);
@@ -217,6 +227,9 @@ CMS.Views.ClassInfoHandoutsView = Backbone.View.extend({
     },
 
     onSave: function(event) {
+        this.model.set('data', this.$editor.val());
+        this.render();
+        this.model.save();
         this.$form.hide();
         this.closeEditor(this);
     },
@@ -227,8 +240,6 @@ CMS.Views.ClassInfoHandoutsView = Backbone.View.extend({
     },
 
     closeEditor: function(self) {
-        this.$preview.html(this.$editor.val());
-        this.$preview.show();
         this.$form.hide();
         $modalCover.unbind('click');
         $modalCover.hide();

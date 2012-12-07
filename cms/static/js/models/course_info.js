@@ -29,6 +29,8 @@ CMS.Models.CourseUpdateCollection = Backbone.Collection.extend({
 	
 	model : CMS.Models.CourseUpdate
 });
+
+
 	
 	
 	
