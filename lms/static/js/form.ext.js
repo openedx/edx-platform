@@ -28,7 +28,7 @@
     CSRFProtection: function(xhr) {
       var token = $.cookie('csrftoken');
       if (token) xhr.setRequestHeader('X-CSRFToken', token);
-    },
+    }
   }
   $.ajaxPrefilter(function(options, originalOptions, xhr){ if ( !options.crossDomain ) { form_ext.CSRFProtection(xhr); }});
   $(document).delegate('form', 'submit', function(e) {
