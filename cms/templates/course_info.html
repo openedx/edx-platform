@@ -8,6 +8,7 @@
 <%block name="jsextra">
   <script type="text/javascript" src="${static.url('js/template_loader.js')}"></script>
   <script type="text/javascript" src="${static.url('js/models/course_info.js')}"></script>
+  <script type="text/javascript" src="${static.url('js/models/module_info.js')}"></script>
   <script type="text/javascript" src="${static.url('js/views/course_info_edit.js')}"></script>
   <link rel="stylesheet" type="text/css" href="${static.url('js/vendor/timepicker/jquery.timepicker.css')}" />
   <script src="${static.url('js/vendor/timepicker/jquery.timepicker.js')}"></script>
@@ -19,14 +20,19 @@
     var course_updates = new CMS.Models.CourseUpdateCollection();
     course_updates.reset(${course_updates|n});
     course_updates.urlbase = '${url_base}';
+
+    var course_handouts = new CMS.Models.ModuleInfo({
+        id: '${handouts_location}'
+      });
+    course_handouts.urlbase = '${url_base}';
     
     var editor = new CMS.Views.CourseInfoEdit({
       el: $('.main-wrapper'),
       model : new CMS.Models.CourseInfo({
         courseId : '${context_course.location}',
         updates : course_updates,
-        // FIXME add handouts
-        handouts : null})
+        handouts : course_handouts
+        })
     });
     editor.render();
   });

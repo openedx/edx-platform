@@ -15,8 +15,8 @@ CMS.Views.CourseInfoEdit = Backbone.View.extend({
     });
 
     new CMS.Views.ClassInfoHandoutsView({
-        el: this.$('#course-handouts-view')
-        // collection: this.model.get('')
+        el: this.$('#course-handouts-view'),
+        model: this.model.get('handouts')
     });
     return this;
   }
@@ -41,7 +41,7 @@ CMS.Views.ClassInfoUpdateView = Backbone.View.extend({
             "/static/coffee/src/client_templates/course_info_update.html",
             function (raw_template) {
         		self.template = _.template(raw_template);
-        		self.render();                
+        		self.render();           
             }
         );
     },
@@ -68,6 +68,16 @@ CMS.Views.ClassInfoUpdateView = Backbone.View.extend({
         this.collection.add(newModel, {at : 0});
         
         var $newForm = $(this.template({ updateModel : newModel }));
+
+        var $textArea = $newForm.find(".new-update-content").first();
+        if (this.$codeMirror == null ) {
+            this.$codeMirror = CodeMirror.fromTextArea($textArea.get(0), {
+                mode: "text/html",
+                lineNumbers: true,
+                lineWrapping: true,
+            });
+        }
+
         var updateEle = this.$el.find("#course-update-list");
         $(updateEle).prepend($newForm);
         $newForm.addClass('editing');
@@ -85,7 +95,7 @@ CMS.Views.ClassInfoUpdateView = Backbone.View.extend({
     onSave: function(event) {
         var targetModel = this.eventModel(event);
         console.log(this.contentEntry(event).val());
-        targetModel.set({ date : this.dateEntry(event).val(), content : this.contentEntry(event).val() });
+        targetModel.set({ date : this.dateEntry(event).val(), content : this.$codeMirror.getValue() });
         // push change to display, hide the editor, submit the change        
         this.closeEditor(this);
         targetModel.save();
@@ -102,7 +112,17 @@ CMS.Views.ClassInfoUpdateView = Backbone.View.extend({
         var self = this;
         this.$currentPost = $(event.target).closest('li');
         this.$currentPost.addClass('editing');
-        $(this.editor(event)).slideDown(150);
+       
+        $(this.editor(event)).show();
+        var $textArea = this.$currentPost.find(".new-update-content").first();
+        if (this.$codeMirror == null ) {
+            this.$codeMirror = CodeMirror.fromTextArea($textArea.get(0), {
+                mode: "text/html",
+                lineNumbers: true,
+                lineWrapping: true,
+            });
+        }
+
         $modalCover.show();
         var targetModel = this.eventModel(event);
         $modalCover.bind('click', function() {
@@ -185,11 +205,17 @@ CMS.Views.ClassInfoHandoutsView = Backbone.View.extend({
 
     initialize: function() {
         var self = this;
-        window.templateLoader.loadRemoteTemplate("course_info_handouts",
-            "/static/coffee/src/client_templates/course_info_handouts.html",
-            function (raw_template) {
-                self.template = _.template(raw_template);
-                self.render();                
+        this.model.fetch(
+            {
+                complete: function() {
+                    window.templateLoader.loadRemoteTemplate("course_info_handouts",
+                        "/static/coffee/src/client_templates/course_info_handouts.html",
+                        function (raw_template) {
+                            self.template = _.template(raw_template);
+                            self.render();                
+                        }
+                    );
+                }
             }
         );
     },
@@ -197,7 +223,12 @@ CMS.Views.ClassInfoHandoutsView = Backbone.View.extend({
     render: function () {        
         var updateEle = this.$el;
         var self = this;
-        this.$el.append($(this.template()));
+        this.$el.html(
+            $(this.template( {
+                model: this.model
+                })
+            )
+        );
         this.$preview = this.$el.find('.handouts-content');
         this.$form = this.$el.find(".edit-handouts-form");
         this.$editor = this.$form.find('.handouts-content-editor');
@@ -207,9 +238,16 @@ CMS.Views.ClassInfoHandoutsView = Backbone.View.extend({
     },
 
     onEdit: function(event) {
+        var self = this;
         this.$editor.val(this.$preview.html());
         this.$form.show();
-        this.$preview.hide();
+        if (this.$codeMirror == null) {
+            this.$codeMirror = CodeMirror.fromTextArea(this.$editor.get(0), {
+                mode: "text/html",
+                lineNumbers: true,
+                lineWrapping: true,
+            });
+        }
         $modalCover.show();
         $modalCover.bind('click', function() {
             self.closeEditor(self);
@@ -217,6 +255,9 @@ CMS.Views.ClassInfoHandoutsView = Backbone.View.extend({
     },
 
     onSave: function(event) {
+        this.model.set('data', this.$codeMirror.getValue());
+        this.render();
+        this.model.save();
         this.$form.hide();
         this.closeEditor(this);
     },
@@ -227,8 +268,6 @@ CMS.Views.ClassInfoHandoutsView = Backbone.View.extend({
     },
 
     closeEditor: function(self) {
-        this.$preview.html(this.$editor.val());
-        this.$preview.show();
         this.$form.hide();
         $modalCover.unbind('click');
         $modalCover.hide();

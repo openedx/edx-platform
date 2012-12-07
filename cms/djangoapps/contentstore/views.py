@@ -49,6 +49,7 @@ from contentstore.course_info_model import get_course_updates,\
     update_course_updates, delete_course_update
 from cache_toolbox.core import del_cached_content
 from xmodule.timeparse import stringify_time
+from contentstore.module_info_model import get_module_info, set_module_info
 
 log = logging.getLogger(__name__)
 
@@ -927,7 +928,8 @@ def course_info(request, org, course, name, provided_id=None):
         'active_tab': 'courseinfo-tab',
         'context_course': course_module,
         'url_base' : "/" + org + "/" + course + "/",
-        'course_updates' : json.dumps(get_course_updates(location))
+        'course_updates' : json.dumps(get_course_updates(location)),
+        'handouts_location': Location(['i4x', org, course, 'course_info', 'handouts']).url()
     })
         
 @expect_json
@@ -958,6 +960,31 @@ def course_info_updates(request, org, course, provided_id=None):
         return HttpResponse(json.dumps(update_course_updates(location, request.POST, provided_id)), mimetype="application/json")
     elif real_method == 'DELETE':  # coming as POST need to pull from Request Header X-HTTP-Method-Override    DELETE
         return HttpResponse(json.dumps(delete_course_update(location, request.POST, provided_id)), mimetype="application/json")
+
+
+@expect_json
+@login_required
+@ensure_csrf_cookie
+def module_info(request, module_location):
+    location = Location(module_location)
+
+    # NB: we're setting Backbone.emulateHTTP to true on the client so everything comes as a post!!!
+    if request.method == 'POST' and 'HTTP_X_HTTP_METHOD_OVERRIDE' in request.META:
+        real_method = request.META['HTTP_X_HTTP_METHOD_OVERRIDE']
+    else:
+        real_method = request.method    
+    
+    # check that logged in user has permissions to this item
+    if not has_access(request.user, location):
+        raise PermissionDenied()    
+
+    if real_method == 'GET':
+        return HttpResponse(json.dumps(get_module_info(_modulestore(location), location)), mimetype="application/json")
+    elif real_method == 'POST' or real_method == 'PUT':
+        return HttpResponse(json.dumps(set_module_info(_modulestore(location), location, request.POST)), mimetype="application/json")
+    else:
+        raise Http400
+
 
 @login_required
 @ensure_csrf_cookie
