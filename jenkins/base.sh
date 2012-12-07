@@ -1,3 +1,4 @@
+#! /bin/bash
 
 function github_status {
     gcli status create mitx mitx $GIT_COMMIT \

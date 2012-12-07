@@ -3,7 +3,7 @@
 set -e
 set -x
 
-source base.sh
+source jenkins/base.sh
 
 github_mark_failed_on_exit
 github_status state:pending
