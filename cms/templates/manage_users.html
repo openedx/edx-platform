@@ -5,17 +5,18 @@
 <%block name="content">
 <div class="main-wrapper">
   <div class="inner-wrapper">
-    <h1>Users</h1>
-
-    <article class="user-overview">
-      <div class="details">
-        <p>The following list of users have been designated as course staff. This means that these users will have permissions to modify course content. You may add additional course staff below, if you are the course instructor. Please note that they must have already registered and verified their account.</p>
-      </div>
+    <div class="page-actions">
       %if allow_actions:
       <a href="#" class="new-button new-user-button">
         <span class="plus-icon white"></span>New User
       </a>
       %endif
+    </div>
+
+    <article class="user-overview">
+      <div class="details">
+        <p>The following list of users have been designated as course staff. This means that these users will have permissions to modify course content. You may add additional course staff below, if you are the course instructor. Please note that they must have already registered and verified their account.</p>
+      </div>      
       %if allow_actions:
       <form class="new-user-form">
         <div id="result"></div>

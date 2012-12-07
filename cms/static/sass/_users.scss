@@ -4,14 +4,10 @@
     padding: 30px 40px;
   }
 
-  .new-user-button {
-    margin-bottom: 15px;
-  }
-
   .new-user-form {
     display: none;
     padding: 15px 20px;
-    background: $mediumGrey;
+    background-color: $lightBluishGrey2;
 
     #result {
       display: none;
@@ -41,12 +37,12 @@
 
     .add-button {
       @include blue-button;
-      padding: 6px 20px 8px;
+      padding: 5px 20px 9px;
     }
 
     .cancel-button {
       @include white-button;
-      padding: 6px 20px 8px;
+      padding: 5px 20px 9px;
     }
   }
 
