@@ -27,7 +27,7 @@
     <% ctx_loc = context_course.location %>
     <ul class="class-nav inner-wrapper">
       <li><a href="${reverse('course_index', kwargs=dict(org=ctx_loc.org, course=ctx_loc.course, name=ctx_loc.name))}" id='courseware-tab'>Courseware</a></li>
-      <li><a href="${reverse('edit_tabs', kwargs=dict(org=ctx_loc.org, course=ctx_loc.course, coursename=ctx_loc.name))}" id='pages-tab'>Tabs</a></li>
+      <li><a href="${reverse('edit_tabs', kwargs=dict(org=ctx_loc.org, course=ctx_loc.course, coursename=ctx_loc.name))}" id='pages-tab'>Pages</a></li>
       <li><a href="${reverse('asset_index', kwargs=dict(org=ctx_loc.org, course=ctx_loc.course, name=ctx_loc.name))}" id='assets-tab'>Assets</a></li>
       <li><a href="${reverse('course_settings', kwargs=dict(org=ctx_loc.org, course=ctx_loc.course, name=ctx_loc.name))}" id='settings-tab'>Settings</a></li>
       <li><a href="${reverse('import_course', kwargs=dict(org=ctx_loc.org, course=ctx_loc.course, name=ctx_loc.name))}" id='import-tab'>Import</a></li>

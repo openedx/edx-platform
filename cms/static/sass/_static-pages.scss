@@ -73,11 +73,16 @@
     }
   }
 
+  .new .xmodule_display {
+    background: $yellow;
+  }
+
   .xmodule_display {
     padding: 20px 20px 22px;
     font-size: 24px;
     font-weight: 300;
     background: #fff;
+    @include transition(background-color 3s);
   }
 
   .static-page-item {

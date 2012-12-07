@@ -196,7 +196,7 @@ code {
     h4 {
         padding: 6px 14px;
         border-bottom: 1px solid $mediumGrey;
-        border-radius: 3px 3px 0 0;
+        border-radius: 2px 2px 0 0;
         @include linear-gradient(top, rgba(255, 255, 255, .4), rgba(255, 255, 255, 0));
         background-color: $lightBluishGrey;
         @include box-shadow(0 1px 0 rgba(255, 255, 255, 0.2) inset);
