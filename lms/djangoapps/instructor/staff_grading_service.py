@@ -89,7 +89,6 @@ class StaffGradingService(object):
         Returns the result of operation().  Does not catch exceptions.
         """
         response = operation()
-        log.debug("first response: {0}".format(response.status_code))
         if (response.status_code == 302):
             # apparrently we aren't logged in.  Try to fix that.
             r = self._login()
@@ -123,7 +122,6 @@ class StaffGradingService(object):
                                             'grader_id': grader_id})
         try:
             r = self._try_with_login(op)
-            log.debug(r.text)
         except (RequestException, ConnectionError, HTTPError) as err:
             # reraise as promised GradingServiceError, but preserve stacktrace.
             raise GradingServiceError, str(err), sys.exc_info()[2]
@@ -255,18 +253,19 @@ def get_next(request, course_id):
     """
     _check_access(request.user, course_id)
 
-    required = set('location')
+    required = set(['location'])
     if request.method != 'POST':
         raise Http404
     actual = set(request.POST.keys())
     missing = required - actual
-    if len(missing) != 0:
+    if len(missing) > 0:
         return _err_response('Missing required keys {0}'.format(
             ', '.join(missing)))
     grader_id = request.user.id
     p = request.POST
+    location = p['location']
 
-    return HttpResponse(_get_next(course_id, request.user.id, p.location),
+    return HttpResponse(_get_next(course_id, request.user.id, location),
                         mimetype="application/json")
 
 
@@ -319,15 +318,17 @@ def save_grade(request, course_id):
     if request.method != 'POST':
         raise Http404
 
-    required = set('score', 'feedback', 'submission_id')
+    required = set(['score', 'feedback', 'submission_id', 'location'])
     actual = set(request.POST.keys())
+    log.debug(actual)
     missing = required - actual
-    if len(missing) != 0:
+    if len(missing) > 0:
         return _err_response('Missing required keys {0}'.format(
             ', '.join(missing)))
 
     grader_id = request.user.id
     p = request.POST
+    location = p['location']
 
     try:
         result_json = grading_service().save_grade(course_id,
@@ -350,6 +351,6 @@ def save_grade(request, course_id):
         return _err_response('Grading service failed')
 
     # Ok, save_grade seemed to work.  Get the next submission to grade.
-    return HttpResponse(_get_next(course_id, grader_id),
+    return HttpResponse(_get_next(course_id, grader_id, location),
                         mimetype="application/json")
 
