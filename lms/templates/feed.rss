@@ -6,7 +6,16 @@
   <link type="text/html" rel="alternate" href="http://blog.edx.org/"/>
   ##<link type="application/atom+xml" rel="self" href="https://github.com/blog.atom"/>
   <title>EdX Blog</title>
-  <updated>2012-10-14T14:08:12-07:00</updated>
+  <updated>2012-12-10T14:00:12-07:00</updated>
+  <entry>
+    <id>tag:www.edx.org,2012:Post/9</id>
+    <published>2012-12-10T14:00:00-07:00</published>
+    <updated>2012-12-10T14:00:00-07:00</updated>
+    <link type="text/html" rel="alternate" href="${reverse('press/georgetown-joins-edx')}"/>
+    <title>Georgetown University joins edX</title>
+    <content type="html">&lt;img src=&quot;${static.url('images/press/releases/georgetown-seal_240x180.png')}&quot; /&gt;
+        &lt;p&gt;Sixth institution to join global movement in year one&lt;/p&gt;</content>
+  </entry>
   <entry>
     <id>tag:www.edx.org,2012:Post/8</id>
     <published>2012-12-04T14:00:00-07:00</published>
