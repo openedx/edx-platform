@@ -98,7 +98,7 @@ The standard chunk of Lorem Ipsum used since the 1500s is reproduced below for t
           message: 'No more submissions'
 
 
-    if @mock_cnt % 3 == 0
+    if @mock_cnt % 7 == 0
       response =
         success: false
         error: 'An error for testing'
@@ -340,9 +340,9 @@ class StaffGrading
     else if @state == state_grading
       @ml_error_info_container.html(@ml_error_info)
       meta_list = $("<ul>")
-      meta_list.append("<li><span class='meta-info'>Pending:</span> #{@num_pending}</li>")
-      meta_list.append("<li><span class='meta-info'>Graded:</span> #{@num_graded}</li>")
-      meta_list.append("<li><span class='meta-info'>Needed for ML:</span> #{Math.max(@min_for_ml - @num_graded)}</li>")
+      meta_list.append("<li><span class='meta-info'>Pending - </span> #{@num_pending}</li>")
+      meta_list.append("<li><span class='meta-info'>Graded - </span> #{@num_graded}</li>")
+      meta_list.append("<li><span class='meta-info'>Needed for ML - </span> #{Math.max(@min_for_ml - @num_graded)}</li>")
       @problem_meta_info.html(meta_list)
 
       @prompt_container.html(@prompt)

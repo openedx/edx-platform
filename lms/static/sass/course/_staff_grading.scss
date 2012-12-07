@@ -1,6 +1,6 @@
 div.staff-grading {
     textarea.feedback-area {
-        height: 100px;
+        height: 75px;
         margin: 20px;
     }
 
@@ -53,7 +53,19 @@ div.staff-grading {
     {
         background-color: #eee;
         padding:15px;
-        margin-left:0px;
+        h3
+        {
+            font-size:1em;
+        }
+        ul
+        {
+            list-style-type: none;
+            font-size: .85em;
+            li
+            {
+                margin: 5px 0px;
+            }
+        }
     }
     .message-container
     {

@@ -17,14 +17,6 @@
 <section class="container">
 
 <div class="staff-grading" data-ajax_url="${ajax_url}">
-<div class="meta-info-wrapper">
-    <h3>Problem Information</h3>
-    <div class="problem-meta-info-container">
-    </div>
-    <h3>Maching Learning Information</h3>
-    <div class="ml-error-info-container">
-    </div>
-</div>
 <h1>Staff grading</h1>
 <div class="breadcrumbs">
 </div>
@@ -45,6 +37,14 @@
 
 <section class="prompt-wrapper">
 <h2 class="prompt-name"></h2>
+<div class="meta-info-wrapper">
+    <h3>Problem Information</h3>
+    <div class="problem-meta-info-container">
+    </div>
+    <h3>Maching Learning Information</h3>
+    <div class="ml-error-info-container">
+    </div>
+</div>
 <div class="prompt-information-container">
 <h3>Question</h3>
 <div class="prompt-container">
@@ -72,10 +72,10 @@
 
 <div class="grading-container">
 <div class="evaluation">
-  <textarea name="feedback" placeholder="Feedback for student..."
-            class="feedback-area" cols="70" rows="10"></textarea>
   <p class="score-selection-container">
   </p>
+  <textarea name="feedback" placeholder="Feedback for student (optional)"
+            class="feedback-area" cols="70" ></textarea>
 </div>
   
 
