@@ -1,3 +1,11 @@
+/*
+ * Please see
+ *
+ *     https://edx-wiki.atlassian.net/wiki/display/LMS/Integration+of+Require+JS+into+the+system
+ *
+ * for a discussion on integrating Require JS into the system.
+ */
+
 var RequireJS = function() {
 
 /*
