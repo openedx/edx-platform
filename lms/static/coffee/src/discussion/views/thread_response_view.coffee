@@ -77,7 +77,7 @@ if Backbone?
       body = @getWmdContent("comment-body")
       return if not body.trim().length
       @setWmdContent("comment-body", "")
-      comment = new Comment(body: body, created_at: (new Date()).toISOString(), username: window.user.get("username"), user_id: window.user.get("id"), id:"unsaved")
+      comment = new Comment(body: body, created_at: (new Date()).toISOString(), username: window.user.get("username"), abuse_flaggers:[], user_id: window.user.get("id"), id:"unsaved")
       view = @renderComment(comment)
       @hideEditorChrome()
       @trigger "comment:add", comment

@@ -44,7 +44,7 @@
       </header>
 
       <div class="post-body">${'<%- body %>'}</div>
-      <div class="discussion-flag-abuse notflagged" data-role="thread-flag" data-tooltip="flag">                
+      <div class="discussion-flag-abuse notflagged" data-role="thread-flag" data-tooltip="report misuse">                
       <i class="icon"></i><span class="flag-label">Report Misuse</span></div>      
         
         
@@ -110,7 +110,7 @@
         <p class="posted-details" title="${'<%- created_at %>'}">${'<%- created_at %>'}</p>
     </header>
     <div class="response-local"><div class="response-body">${"<%- body %>"}</div>
-    <div class="discussion-flag-abuse notflagged" data-role="thread-flag" data-tooltip="flag">                
+    <div class="discussion-flag-abuse notflagged" data-role="thread-flag" data-tooltip="report misuse">                
       <i class="icon"></i><span class="flag-label">Report Misuse</span></div>
     </div>
     <ul class="moderator-actions response-local">
@@ -135,7 +135,7 @@
 <script type="text/template" id="response-comment-show-template">
   <div id="comment_${'<%- id %>'}">
     <div class="response-body">${'<%- body %>'}</div>
-    <div class="discussion-flag-abuse notflagged" data-role="thread-flag" data-tooltip="flag">                
+    <div class="discussion-flag-abuse notflagged" data-role="thread-flag" data-tooltip="report misuse">                
       <i class="icon"></i><span class="flag-label"></span></div> 
     <p class="posted-details">&ndash;posted <span class="timeago" title="${'<%- created_at %>'}">${'<%- created_at %>'}</span> by
         ${"<% if (obj.username) { %>"}
