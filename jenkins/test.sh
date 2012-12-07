@@ -3,7 +3,17 @@
 set -e
 set -x
 
-source jenkins/base.sh
+function github_status {
+    gcli status create mitx mitx $GIT_COMMIT \
+         --params=$1 \
+                  target_url:$BUILD_URL \
+                  description:"Build #$BUILD_NUMBER $2" \
+         -f csv
+}
+
+function github_mark_failed_on_exit {
+    trap '[ $? == "0" ] || github_status state:failure "failed"' EXIT
+}
 
 github_mark_failed_on_exit
 github_status state:pending "is running"
