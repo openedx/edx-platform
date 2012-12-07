@@ -65,6 +65,9 @@
   }
 
   .component.editing {
+    border-left: 1px solid $mediumGrey;
+    border-right: 1px solid $mediumGrey;
+
     .xmodule_display {
       display: none;
     }

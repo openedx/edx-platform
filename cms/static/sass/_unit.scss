@@ -188,6 +188,7 @@
 
     &.editing {
       border: 1px solid $lightBluishGrey2;
+      z-index: 9999;
 
       .drag-handle,
       .component-actions {
