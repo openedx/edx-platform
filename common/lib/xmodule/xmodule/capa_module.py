@@ -347,7 +347,7 @@ class CapaModule(XModule):
                 id=self.location.html_id(), ajax_url=self.system.ajax_url) + html + "</div>"
 
         # now do the substitutions which are filesystem based, e.g. '/static/' prefixes
-        return self.system.replace_urls(html, self.metadata['data_dir'])
+        return self.system.replace_urls(html, self.metadata['data_dir'], course_namespace=self.location)
 
     def handle_ajax(self, dispatch, get):
         '''
@@ -451,7 +451,7 @@ class CapaModule(XModule):
         new_answers = dict()
         for answer_id in answers:
             try:
-                new_answer = {answer_id: self.system.replace_urls(answers[answer_id], self.metadata['data_dir'])}
+                new_answer = {answer_id: self.system.replace_urls(answers[answer_id], self.metadata['data_dir'], course_namespace=self.location)}
             except TypeError:
                 log.debug('Unable to perform URL substitution on answers[%s]: %s' % (answer_id, answers[answer_id]))
                 new_answer = {answer_id: answers[answer_id]}

@@ -53,6 +53,8 @@ class ImportSystem(XMLParsingSystem, MakoDescriptorSystem):
         self.unnamed = defaultdict(int)     # category -> num of new url_names for that category
         self.used_names = defaultdict(set)  # category -> set of used url_names
         self.org, self.course, self.url_name = course_id.split('/')
+        # cdodge: adding the course_id as passed in for later reference rather than having to recomine the org/course/url_name
+        self.course_id = course_id
         self.load_error_modules = load_error_modules
 
         def process_xml(xml):

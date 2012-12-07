@@ -60,6 +60,7 @@ def replace(static_url, prefix=None, course_namespace=None):
 
 
 def replace_urls(text, staticfiles_prefix=None, replace_prefix='/static/', course_namespace=None):
+
     def replace_url(static_url):
         return replace(static_url, staticfiles_prefix, course_namespace = course_namespace)
 
