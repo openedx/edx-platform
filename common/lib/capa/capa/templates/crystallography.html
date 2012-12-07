@@ -1,34 +1,28 @@
 <section id="inputtype_${id}" class="capa_inputtype" >
-     <div id="holder" style="width:${width};height:${height}"></div>
+    <div class="crystalography_problem" style="width:${width};height:${height}"></div>
+
+    <div class="input_lattice">
+        Lattice: <select></select>
+    </div>
+
     <div class="script_placeholder" data-src="/static/js/raphael.js"></div>
     <div class="script_placeholder" data-src="/static/js/sylvester.js"></div>
-    <div class="script_placeholder" data-src="/static/js/underscore-min.js"></div>
     <div class="script_placeholder" data-src="/static/js/crystallography.js"></div>
 
-
     % if status == 'unsubmitted':
-    <div class="unanswered" id="status_${id}">
+        <div class="unanswered" id="status_${id}">
     % elif status == 'correct':
-    <div class="correct" id="status_${id}">
+        <div class="correct" id="status_${id}">
     % elif status == 'incorrect':
-    <div class="incorrect" id="status_${id}">
+        <div class="incorrect" id="status_${id}">
     % elif status == 'incomplete':
-    <div class="incorrect" id="status_${id}">
-    % endif
-    % if hidden:
-      <div style="display:none;" name="${hidden}" inputid="input_${id}" />
+        <div class="incorrect" id="status_${id}">
     % endif
 
-  <input type="text" name="input_${id}" id="input_${id}" value="${value|h}"
-   % if size:
-   size="${size}"
-   % endif
-   % if hidden:
-    style="display:none;"
-   % endif
-   />
 
-      <p class="status">
+    <input type="text" name="input_${id}" id="input_${id}" value="${value|h}" style="display:none;"/>
+
+    <p class="status">
         % if status == 'unsubmitted':
         unanswered
         % elif status == 'correct':
@@ -38,14 +32,15 @@
         % elif status == 'incomplete':
         incomplete
         % endif
-      </p>
+    </p>
 
-  <p id="answer_${id}" class="answer"></p>
+    <p id="answer_${id}" class="answer"></p>
 
-  % if msg:
-      <span class="message">${msg|n}</span>
-  % endif
-% if status in ['unsubmitted', 'correct', 'incorrect', 'incomplete']:
-</div>
-% endif
+    % if msg:
+        <span class="message">${msg|n}</span>
+    % endif
+
+    % if status in ['unsubmitted', 'correct', 'incorrect', 'incomplete']:
+        </div>
+    % endif
 </section>

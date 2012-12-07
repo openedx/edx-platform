@@ -18,5 +18,6 @@ class @Courseware
         histg = new Histogram id, $(this).data('histogram')
       catch error
         histg = error
-        console.log(error)
+        if console?
+          console.log(error)
       return histg

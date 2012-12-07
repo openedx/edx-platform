@@ -1,0 +1,73 @@
+<%! from django.core.urlresolvers import reverse %>
+<%inherit file="../../main.html" />
+
+<%namespace name='static' file='../../static_content.html'/>
+
+<%block name="title"><title>Wellesley College joins edX</title></%block>
+<div id="fb-root"></div>
+<script>(function(d, s, id) {
+var js, fjs = d.getElementsByTagName(s)[0];
+if (d.getElementById(id)) return;
+js = d.createElement(s); js.id = id;
+js.src = "//connect.facebook.net/en_US/all.js#xfbml=1";
+fjs.parentNode.insertBefore(js, fjs);
+}(document, 'script', 'facebook-jssdk'));</script>
+
+<section class="pressrelease">
+  <section class="container">
+    <h1>Wellesley College becomes first liberal arts college to join edX</h1>
+    <hr class="horizontal-divider"/>
+    <article>
+      <h2>Wellesley joins edX to advance learning collaborative, broadens course options while bringing a unique small classroom experience to the world of massive open online courses</h2>
+
+      <p><strong>CAMBRIDGE, MA &ndash; December 04, 2012</strong> &mdash; edX, the online learning initiative founded by <a href="http://harvard.edu">Harvard University</a> and the <a href="http://www.mit.edu">Massachusetts Institute of Technology</a> (MIT) and launched in May, announced today the addition of Wellesley College to its group of educational leaders who are focused on providing a category-leading quality higher education experience to the global online community. <a href="http://www.wellesley.edu">Wellesley College</a> is the first liberal arts college to join edX—and the first women’s college to offer massive open online courses (MOOCs).  Wellesley College will provide a series of WellesleyX courses to the platform that are unique to the College and broaden the course offerings on edx.org.</p>
+
+      <p>According to H. Kim Bottomly, President of Wellesley College, WellesleyX provides an opportunity for the College to impact the future of higher education. “Wellesley is ready to contribute our liberal arts perspective to help shape online education, particularly as colleges work to figure out how to bring the small classroom experience to the online learning landscape. We are convinced that Wellesley and its outstanding faculty have the creativity and vision to take on this challenge.”</p>
+
+      <p>Bottomly added, “This is a grand experiment, and what we learn will benefit Wellesley students as well as students all over the world.</p>
+
+      <p>Regarded as one of the world’s finest colleges, Wellesley is known for cultivating generations of women leaders; its pedagogical innovation; and its commitment to highly personalized, discussion-based learning. With the launch of WellesleyX, the College will open access to its rigorous courses and distinguished faculty to anyone with an internet connection.</p>
+
+      <p>“We are excited that Wellesley College has chosen to join with edX,” said Anant Agarwal, President of edX. “Wellesley’s long history of educating women leaders in diplomacy, the arts, science and business provides a unique strength. We look forward to working alongside the Wellesley faculty to extend their reach to hundreds of thousands of women and men around the world.”</p>
+
+      <p>Through edX, the “X Universities” will provide interactive education wherever there is access to the Internet and will enhance teaching and learning through research about how students learn, and how technologies can facilitate effective teaching both on-campus and online. The University of California, Berkeley joined edX in July and the University of Texas System joined in October.</p>
+
+      <p>“Wellesley College is a welcome addition to edX and our efforts to fully realize the potential of online education for students on campus and online,” said Harvard President Drew Faust. “As an institution that has provided an outstanding educational experience to many thousands of women for over 100 years, Wellesley brings to edX both a unique academic perspective and a commitment to excellence in education.”</p>
+
+      <p>“Wellesley College's decision to join the edX platform is excellent news for edX and for the platform's growing number of users around the world,” said MIT President L. Rafael Reif. “Wellesley brings a distinctive history that will further enrich the efforts we are making to tailor instruction to the different ways by which people learn.”</p>
+
+      <p>WellesleyX will offer four courses on edX beginning in the fall of 2013. All of the courses will be hosted from edX’s innovative platform at <a href="http://www.edx.org">www.edx.org</a>.</p>
+
+      <h2>About edX</h2>
+
+      <p>edX is a not-for-profit enterprise of its founding partners Harvard University and the Massachusetts Institute of Technology that features learning designed specifically for interactive study via the web. Based on a long history of collaboration and their shared educational missions the founders are creating a new online-learning experience. Anant Agarwal, former Director of MIT’s Computer Science and Artificial Intelligence Laboratory, serves as the first president of edX. Along with offering online courses, the institutions will use edX to research how students learn and how technology can transform learning—both on-campus and worldwide.  EdX is based in Cambridge, Massachusetts and is governed by MIT and Harvard.</p>
+
+      <h2>About Wellesley College</h2>
+
+      <p>Since 1875, Wellesley College has been the preeminent liberal arts college for women. Known for its intellectual rigor and its remarkable track record for the cultivation of women leaders in every arena, Wellesley—only 12 miles from Boston—is home to some 2300 undergraduates from every state and 75 countries.</p>
+
+      <section class="contact">
+        <p><strong>Contact: </strong>Amanda Keane</p>
+        <p>akeane@webershandwick.com</p>
+        <p>617-520-7260</p>
+        <br/>
+      </section>
+
+      <section class="footer">
+        <hr class="horizontal-divider"/>
+        <div class="logo"></div><h3 class="date">12 - 04 - 2012</h3>
+        <div class="social-sharing">
+          <hr class="horizontal-divider"/>
+          <p>Share with friends and family:</p>
+          <a href="http://twitter.com/intent/tweet?text=Wellesley+joins+edX+to+advance+learning+collaborative,+broadens+course+options+while+bringing+a+unique+small+classroom+experience+to+the+world+of+massive+open+online+courses:+http://www.edx.org/press/wellesley-college-joins-edx" class="share">
+            <img src="${static.url('images/social/twitter-sharing.png')}"/>
+          </a>
+          <a href="mailto:?subject=Wellesley%20joins%20edX%20to%20advance%20learning%20collaborative,%20broadens%20course%20options%20while%20bringing%20a%20unique%20small%20classroom%20experience%20to%20the%20world%20of%20massive%20open%20online%20courses…http://edx.org/press/wellesley-college-joins-edx" class="share">
+            <img src="${static.url('images/social/email-sharing.png')}"/>
+          </a>
+          <div class="fb-like" data-href="http://edx.org/press/wellesley-college-joins-edx" data-send="true" data-width="450" data-show-faces="true"></div>
+        </div>
+      </section>
+    </article>
+  </section>
+</section>

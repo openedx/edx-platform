@@ -61,6 +61,7 @@ urlpatterns = ('',
     url(r'^heartbeat$', include('heartbeat.urls')),
 
     url(r'^university_profile/UTx$', 'courseware.views.static_university_profile', name="static_university_profile", kwargs={'org_id':'UTx'}),
+    url(r'^university_profile/WellesleyX$', 'courseware.views.static_university_profile', name="static_university_profile", kwargs={'org_id':'WellesleyX'}),
     url(r'^university_profile/(?P<org_id>[^/]+)$', 'courseware.views.university_profile', name="university_profile"),
 
     #Semi-static views (these need to be rendered and have the login bar, but don't change)
@@ -101,9 +102,14 @@ urlpatterns = ('',
         {'template': 'press_releases/UT_joins_edX.html'}, name="press/ut-joins-edx"),
     url(r'^press/cengage-to-provide-book-content$', 'static_template_view.views.render',
         {'template': 'press_releases/Cengage_to_provide_book_content.html'}, name="press/cengage-to-provide-book-content"),
+    url(r'^press/gates-foundation-announcement$', 'static_template_view.views.render',
+        {'template': 'press_releases/Gates_Foundation_announcement.html'}, name="press/gates-foundation-announcement"),
+    url(r'^press/wellesley-college-joins-edx$', 'static_template_view.views.render',
+        {'template': 'press_releases/Wellesley_College_joins_edX.html'}, name="press/wellesley-college-joins-edx"),
+
 
     # Should this always update to point to the latest press release?
-    (r'^pressrelease$', 'django.views.generic.simple.redirect_to', {'url': '/press/uc-berkeley-joins-edx'}),
+    (r'^pressrelease$', 'django.views.generic.simple.redirect_to', {'url': '/press/wellesley-college-joins-edx'}),
 
 
     (r'^favicon\.ico$', 'django.views.generic.simple.redirect_to', {'url': '/static/images/favicon.ico'}),

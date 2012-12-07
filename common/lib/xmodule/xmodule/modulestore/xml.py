@@ -157,7 +157,7 @@ class ImportSystem(XMLParsingSystem, MakoDescriptorSystem):
                 make_name_unique(xml_data)
 
                 descriptor = XModuleDescriptor.load_from_xml(
-                    etree.tostring(xml_data), self, self.org,
+                    etree.tostring(xml_data, encoding='unicode'), self, self.org,
                     self.course, xmlstore.default_class)
             except Exception as err:
                 print err, self.load_error_modules
@@ -419,7 +419,7 @@ class XMLModuleStore(ModuleStoreBase):
                 self.load_error_modules,
             )
 
-            course_descriptor = system.process_xml(etree.tostring(course_data))
+            course_descriptor = system.process_xml(etree.tostring(course_data, encoding='unicode'))
 
             # NOTE: The descriptors end up loading somewhat bottom up, which
             # breaks metadata inheritance via get_children().  Instead

@@ -22,7 +22,7 @@ def stringify_children(node):
     #                 next element.
     parts = [node.text]
     for c in node.getchildren():
-        parts.append(etree.tostring(c, with_tail=True))
+        parts.append(etree.tostring(c, with_tail=True, encoding='unicode'))
 
     # filter removes possible Nones in texts and tails
-    return ''.join(filter(None, parts))
+    return u''.join(filter(None, parts))

@@ -28,7 +28,7 @@ from django.core.cache import cache
 from django_future.csrf import ensure_csrf_cookie, csrf_exempt
 from student.models import (Registration, UserProfile,
                             PendingNameChange, PendingEmailChange,
-                            CourseEnrollment)
+                            CourseEnrollment, unique_id_for_user)
 
 from certificates.models import CertificateStatuses, certificate_status_for_student
 
@@ -39,6 +39,7 @@ from xmodule.modulestore.exceptions import ItemNotFoundError
 
 from datetime import date
 from collections import namedtuple
+
 from courseware.courses import get_courses_by_university
 from courseware.access import has_access
 
@@ -68,20 +69,6 @@ def index(request, extra_context={}, user=None):
     extra_context is used to allow immediate display of certain modal windows, eg signup,
     as used by external_auth.
     '''
-    feed_data = cache.get("students_index_rss_feed_data")
-    if feed_data == None:
-        if hasattr(settings, 'RSS_URL'):
-            feed_data = urllib.urlopen(settings.RSS_URL).read()
-        else:
-            feed_data = render_to_string("feed.rss", None)
-        cache.set("students_index_rss_feed_data", feed_data, settings.RSS_TIMEOUT)
-
-    feed = feedparser.parse(feed_data)
-    entries = feed['entries'][0:3]
-    for entry in entries:
-        soup = BeautifulSoup(entry.description)
-        entry.image = soup.img['src'] if soup.img else None
-        entry.summary = soup.getText()
 
     # The course selection work is done in courseware.courses.
     domain = settings.MITX_FEATURES.get('FORCE_UNIVERSITY_DOMAIN')	# normally False
@@ -89,7 +76,11 @@ def index(request, extra_context={}, user=None):
         domain = request.META.get('HTTP_HOST')
     universities = get_courses_by_university(None,
                                              domain=domain)
-    context = {'universities': universities, 'entries': entries}
+
+    # Get the 3 most recent news
+    top_news = _get_news(top=3)
+
+    context = {'universities': universities, 'news': top_news}
     context.update(extra_context)
     return render_to_response('index.html', context)
 
@@ -107,9 +98,9 @@ def get_date_for_press(publish_date):
     # strip off extra months, and just use the first:
     date = re.sub(multimonth_pattern, ", ", publish_date)
     if re.search(day_pattern, date):
-        date = datetime.datetime.strptime(date, "%B %d, %Y") 
-    else: 
-        date = datetime.datetime.strptime(date, "%B, %Y") 
+        date = datetime.datetime.strptime(date, "%B %d, %Y")
+    else:
+        date = datetime.datetime.strptime(date, "%B, %Y")
     return date
 
 def press(request):
@@ -126,6 +117,87 @@ def press(request):
     articles.sort(key=lambda item: get_date_for_press(item.publish_date), reverse=True)
     return render_to_response('static_templates/press.html', {'articles': articles})
 
+
+def process_survey_link(survey_link, user):
+    """
+    If {UNIQUE_ID} appears in the link, replace it with a unique id for the user.
+    Currently, this is sha1(user.username).  Otherwise, return survey_link.
+    """
+    return survey_link.format(UNIQUE_ID=unique_id_for_user(user))
+
+
+def cert_info(user, course):
+    """
+    Get the certificate info needed to render the dashboard section for the given
+    student and course.  Returns a dictionary with keys:
+
+    'status': one of 'generating', 'ready', 'notpassing', 'processing'
+    'show_download_url': bool
+    'download_url': url, only present if show_download_url is True
+    'show_disabled_download_button': bool -- true if state is 'generating'
+    'show_survey_button': bool
+    'survey_url': url, only if show_survey_button is True
+    'grade': if status is not 'processing'
+    """
+    if not course.has_ended():
+        return {}
+
+    return _cert_info(user, course, certificate_status_for_student(user, course.id))
+
+def _cert_info(user, course, cert_status):
+    """
+    Implements the logic for cert_info -- split out for testing.
+    """
+    default_status = 'processing'
+
+    default_info = {'status': default_status,
+                    'show_disabled_download_button': False,
+                    'show_download_url': False,
+                    'show_survey_button': False}
+
+    if cert_status is None:
+        return default_info
+
+    # simplify the status for the template using this lookup table
+    template_state = {
+        CertificateStatuses.generating: 'generating',
+        CertificateStatuses.regenerating: 'generating',
+        CertificateStatuses.downloadable: 'ready',
+        CertificateStatuses.notpassing: 'notpassing',
+        }
+
+    status = template_state.get(cert_status['status'], default_status)
+
+    d = {'status': status,
+         'show_download_url': status == 'ready',
+         'show_disabled_download_button': status == 'generating',}
+
+    if (status in ('generating', 'ready', 'notpassing') and
+        course.end_of_course_survey_url is not None):
+        d.update({
+         'show_survey_button': True,
+         'survey_url': process_survey_link(course.end_of_course_survey_url, user)})
+    else:
+        d['show_survey_button'] = False
+
+    if status == 'ready':
+        if 'download_url' not in cert_status:
+            log.warning("User %s has a downloadable cert for %s, but no download url",
+                        user.username, course.id)
+            return default_info
+        else:
+            d['download_url'] = cert_status['download_url']
+
+    if status in ('generating', 'ready', 'notpassing'):
+        if 'grade' not in cert_status:
+            # Note: as of 11/20/2012, we know there are students in this state-- cs169.1x,
+            # who need to be regraded (we weren't tracking 'notpassing' at first).
+            # We can add a log.warning here once we think it shouldn't happen.
+            return default_info
+        else:
+            d['grade'] = cert_status['grade']
+
+    return d
 
 @login_required
 @ensure_csrf_cookie
@@ -160,12 +232,10 @@ def dashboard(request):
     show_courseware_links_for = frozenset(course.id for course in courses
                                           if has_access(request.user, course, 'load'))
 
-    # TODO: workaround to not have to zip courses and certificates in the template
-    # since before there is a migration to certificates
-    if settings.MITX_FEATURES.get('CERTIFICATES_ENABLED'):
-        cert_statuses = { course.id: certificate_status_for_student(request.user, course.id) for course in courses}
-    else:
-        cert_statuses = {}
+    cert_statuses = { course.id: cert_info(request.user, course) for course in courses}
+
+    # Get the 3 most recent news
+    top_news = _get_news(top=3)
 
     context = {'courses': courses,
                'message': message,
@@ -173,6 +243,7 @@ def dashboard(request):
                'errored_courses': errored_courses,
                'show_courseware_links_for' : show_courseware_links_for,
                'cert_statuses': cert_statuses,
+               'news': top_news,
                }
 
     return render_to_response('dashboard.html', context)
@@ -820,3 +891,24 @@ def test_center_login(request):
         return redirect('/courses/MITx/6.002x/2012_Fall/courseware/Final_Exam/Final_Exam_Fall_2012/')
     else:
         return HttpResponseForbidden()
+
+
+def _get_news(top=None):
+    "Return the n top news items on settings.RSS_URL"
+
+    feed_data = cache.get("students_index_rss_feed_data")
+    if feed_data == None:
+        if hasattr(settings, 'RSS_URL'):
+            feed_data = urllib.urlopen(settings.RSS_URL).read()
+        else:
+            feed_data = render_to_string("feed.rss", None)
+        cache.set("students_index_rss_feed_data", feed_data, settings.RSS_TIMEOUT)
+
+    feed = feedparser.parse(feed_data)
+    entries = feed['entries'][0:top]  # all entries if top is None
+    for entry in entries:
+        soup = BeautifulSoup(entry.description)
+        entry.image = soup.img['src'] if soup.img else None
+        entry.summary = soup.getText()
+
+    return entries
