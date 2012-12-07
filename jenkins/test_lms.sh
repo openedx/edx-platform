@@ -3,7 +3,7 @@
 set -e
 set -x
 
-. base.sh
+source base.sh
 
 github_mark_failed_on_exit
 github_status state:pending
