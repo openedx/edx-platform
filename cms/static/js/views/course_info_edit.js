@@ -70,11 +70,13 @@ CMS.Views.ClassInfoUpdateView = Backbone.View.extend({
         var $newForm = $(this.template({ updateModel : newModel }));
 
         var $textArea = $newForm.find(".new-update-content").first();
-        this.$codeMirror = CodeMirror.fromTextArea($textArea.get(0), {
-            mode: "text/html",
-            lineNumbers: true,
-            lineWrapping: true,
-        });
+        if (this.$codeMirror == null ) {
+            this.$codeMirror = CodeMirror.fromTextArea($textArea.get(0), {
+                mode: "text/html",
+                lineNumbers: true,
+                lineWrapping: true,
+            });
+        }
 
         var updateEle = this.$el.find("#course-update-list");
         $(updateEle).prepend($newForm);
