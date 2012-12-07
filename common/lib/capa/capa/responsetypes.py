@@ -2017,6 +2017,10 @@ class OpenEndedResponse(LoncapaResponse):
             String
         """
 
+        #Tags that need to be shown at the end of the feedback block (in this order)
+        tags_displayed_last=['markup-text', 'markup_text']
+        tags_displayed_first=['spelling', 'grammar']
+
         feedback_item_start='<div class="{feedback_key}">'
         feedback_item_end='</div>'
 
@@ -2032,12 +2036,21 @@ class OpenEndedResponse(LoncapaResponse):
 
         success=response_items['success']
 
+
         if success:
             feedback_long=""
+            #Add in feedback that needs to be shown first
             for k,v in feedback_items.items():
-                feedback_long+=feedback_item_start.format(feedback_key=k)
-                feedback_long+=str(v)
-                feedback_long+=feedback_item_end
+                if k in tags_displayed_first:
+                    feedback_long+= feedback_item_start.format(feedback_key=k) +str(v) + feedback_item_end
+            #Add in feedback whose order does not matter
+            for k,v in feedback_items.items():
+                if k not in tags_displayed_last and k not in tags_displayed_first:
+                    feedback_long+= feedback_item_start.format(feedback_key=k) +str(v) + feedback_item_end
+            #Add in feedback that needs to be displayed last
+            for k,v in feedback_items.items():
+                if k in tags_displayed_last:
+                    feedback_long+= feedback_item_start.format(feedback_key=k) +str(v) + feedback_item_end
 
             if len(feedback_items)==0:
                 feedback_long=feedback_item_start.format(feedback_key="feedback") + "No feedback available." + feedback_item_end
