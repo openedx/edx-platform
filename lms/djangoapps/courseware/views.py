@@ -404,13 +404,8 @@ def course_about(request, course_id):
     show_courseware_link = (has_access(request.user, course, 'load') or
                             settings.MITX_FEATURES.get('ENABLE_LMS_MIGRATION'))
 
-<<<<<<< HEAD
-    return render_to_response('portal/course_about.html',
-                              { 'course': course,
-=======
     return render_to_response('courseware/course_about.html',
                               {'course': course,
->>>>>>> origin/master
                                'registered': registered,
                                'course_target': course_target,
                                'show_courseware_link' : show_courseware_link})
