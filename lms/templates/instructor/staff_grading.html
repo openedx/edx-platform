@@ -1,0 +1,64 @@
+<%inherit file="/main.html" />
+<%block name="bodyclass">${course.css_class}</%block>
+<%namespace name='static' file='/static_content.html'/>
+
+<%block name="headextra">
+  <%static:css group='course'/>
+</%block>
+
+<%block name="title"><title>${course.number} Staff Grading</title></%block>
+
+<%include file="/courseware/course_navigation.html" args="active_page='staff_grading'" />
+
+<%block name="js_extra">
+  <%static:js group='staff_grading'/>
+</%block>
+
+<section class="container">
+
+<div class="staff-grading" data-ajax_url="${ajax_url}">
+<h1>Staff grading</h1>
+
+<div class="error-container">
+</div>
+
+<div class="message-container">
+</div>
+
+<div class="ml-error-info-container">
+</div>
+
+<section class="prompt-wrapper">
+<h3>Question prompt</h3>
+<div class="prompt-container">
+</div>
+</section>
+
+<section class="submission-wrapper">
+<h3>Submission</h3>
+<div class="submission-container">
+</div>
+</section>
+
+<section class="rubric-wrapper">
+<h3>Rubric</h3>
+<div class="rubric-container">
+</div>
+
+<div class="evaluation">
+  
+  <textarea name="feedback" placeholder="Feedback for student..."
+            class="feedback-area" cols="70" rows="10"></textarea>
+  <p class="score-selection-container">
+  </p>
+</div>
+  
+</section>
+
+<div class="submission">
+<input type="button" value="Submit" class="submit-button" name="show"/>
+</div>
+
+</div>
+
+</section>

@@ -8,21 +8,23 @@ Used by capa_problem.py
 '''
 
 # standard library imports
+import abc
 import cgi
+import hashlib
 import inspect
 import json
 import logging
 import numbers
 import numpy
+import os
 import random
 import re
 import requests
-import traceback
-import hashlib
-import abc
-import os
 import subprocess
+import traceback
 import xml.sax.saxutils as saxutils
+
+from collections import namedtuple
 from shapely.geometry import Point, MultiPoint
 
 # specific library imports
@@ -1101,6 +1103,15 @@ class SymbolicResponse(CustomResponse):
 
 #-----------------------------------------------------------------------------
 
+"""
+valid:       Flag indicating valid score_msg format (Boolean)
+correct:     Correctness of submission (Boolean)
+score:       Points to be assigned (numeric, can be float)
+msg:         Message from grader to display to student (string)
+"""
+ScoreMessage = namedtuple('ScoreMessage',
+                          ['valid', 'correct', 'points', 'msg'])
+
 
 class CodeResponse(LoncapaResponse):
     """
@@ -1140,7 +1151,7 @@ class CodeResponse(LoncapaResponse):
         else:
             self._parse_coderesponse_xml(codeparam)
 
-    def _parse_coderesponse_xml(self,codeparam):
+    def _parse_coderesponse_xml(self, codeparam):
         '''
         Parse the new CodeResponse XML format. When successful, sets:
             self.initial_display
@@ -1152,17 +1163,9 @@ class CodeResponse(LoncapaResponse):
         grader_payload = grader_payload.text if grader_payload is not None else ''
         self.payload = {'grader_payload': grader_payload}
 
-        answer_display = codeparam.find('answer_display')
-        if answer_display is not None:
-            self.answer = answer_display.text
-        else:
-            self.answer = 'No answer provided.'
-
-        initial_display = codeparam.find('initial_display')
-        if initial_display is not None:
-            self.initial_display = initial_display.text
-        else:
-            self.initial_display = ''
+        self.initial_display = find_with_default(codeparam, 'initial_display', '')
+        self.answer = find_with_default(codeparam, 'answer_display',
+                                        'No answer provided.')
 
     def _parse_externalresponse_xml(self):
         '''
@@ -1728,9 +1731,9 @@ class ImageResponse(LoncapaResponse):
 
     Regions is list of lists [region1, region2, region3, ...] where regionN
     is disordered list of points: [[1,1], [100,100], [50,50], [20, 70]].
-    
+
     If there is only one region in the list, simpler notation can be used:
-    regions="[[10,10], [30,30], [10, 30], [30, 10]]" (without explicitly 
+    regions="[[10,10], [30,30], [10, 30], [30, 10]]" (without explicitly
         setting outer list)
 
     Returns:
@@ -1812,6 +1815,339 @@ class ImageResponse(LoncapaResponse):
         return (dict([(ie.get('id'), ie.get('rectangle')) for ie in self.ielements]),
                 dict([(ie.get('id'), ie.get('regions')) for ie in self.ielements]))
 #-----------------------------------------------------------------------------
+
+class OpenEndedResponse(LoncapaResponse):
+    """
+    Grade student open ended responses using an external grading system,
+    accessed through the xqueue system.
+
+    Expects 'xqueue' dict in ModuleSystem with the following keys that are
+    needed by OpenEndedResponse:
+
+        system.xqueue = { 'interface': XqueueInterface object,
+                          'callback_url': Per-StudentModule callback URL
+                                          where results are posted (string),
+                        }
+
+    External requests are only submitted for student submission grading
+        (i.e. and not for getting reference answers)
+
+    By default, uses the OpenEndedResponse.DEFAULT_QUEUE queue.
+    """
+
+    DEFAULT_QUEUE = 'open-ended'
+    response_tag = 'openendedresponse'
+    allowed_inputfields = ['openendedinput']
+    max_inputfields = 1
+
+    def setup_response(self):
+        '''
+        Configure OpenEndedResponse from XML.
+        '''
+        xml = self.xml
+        self.url = xml.get('url', None)
+        self.queue_name = xml.get('queuename', self.DEFAULT_QUEUE)
+
+        # The openendedparam tag encapsulates all grader settings
+        oeparam = self.xml.find('openendedparam')
+        prompt = self.xml.find('prompt')
+        rubric = self.xml.find('openendedrubric')
+        self._parse(oeparam, prompt, rubric)
+
+    @staticmethod
+    def stringify_children(node):
+        """
+        Modify code from stringify_children in xmodule.  Didn't import directly
+        in order to avoid capa depending on xmodule (seems to be avoided in
+        code)
+        """
+        parts=[node.text]
+        for p in node.getchildren():
+            parts.append(etree.tostring(p, with_tail=True, encoding='unicode'))
+
+        return ' '.join(parts)
+
+    def _parse(self, oeparam, prompt, rubric):
+        '''
+        Parse OpenEndedResponse XML:
+            self.initial_display
+            self.payload - dict containing keys --
+            'grader' : path to grader settings file, 'problem_id' : id of the problem
+
+            self.answer - What to display when show answer is clicked
+        '''
+        # Note that OpenEndedResponse is agnostic to the specific contents of grader_payload
+        prompt_string = self.stringify_children(prompt)
+        rubric_string = self.stringify_children(rubric)
+
+        grader_payload = oeparam.find('grader_payload')
+        grader_payload = grader_payload.text if grader_payload is not None else ''
+
+        #Update grader payload with student id.  If grader payload not json, error.
+        try:
+            parsed_grader_payload = json.loads(grader_payload)
+            # NOTE: self.system.location is valid because the capa_module
+            # __init__ adds it (easiest way to get problem location into
+            # response types)
+        except TypeError, ValueError:
+            log.exception("Grader payload %r is not a json object!", grader_payload)
+        parsed_grader_payload.update({
+            'location' : self.system.location,
+            'course_id' : self.system.course_id,
+            'prompt' : prompt_string,
+            'rubric' : rubric_string,
+        })
+        updated_grader_payload = json.dumps(parsed_grader_payload)
+
+        self.payload = {'grader_payload': updated_grader_payload}
+
+        self.initial_display = find_with_default(oeparam, 'initial_display', '')
+        self.answer = find_with_default(oeparam, 'answer_display', 'No answer given.')
+        try:
+            self.max_score = int(find_with_default(oeparam, 'max_score', 1))
+        except ValueError:
+            self.max_score = 1
+
+    def get_score(self, student_answers):
+
+        try:
+            submission = student_answers[self.answer_id]
+        except KeyError:
+            msg = ('Cannot get student answer for answer_id: {0}. student_answers {1}'
+                   .format(self.answer_id, student_answers))
+            log.exception(msg)
+            raise LoncapaProblemError(msg)
+
+        # Prepare xqueue request
+        #------------------------------------------------------------
+
+        qinterface = self.system.xqueue['interface']
+        qtime = datetime.strftime(datetime.now(), xqueue_interface.dateformat)
+
+        anonymous_student_id = self.system.anonymous_student_id
+
+        # Generate header
+        queuekey = xqueue_interface.make_hashkey(str(self.system.seed) + qtime +
+                                                 anonymous_student_id +
+                                                 self.answer_id)
+
+        xheader = xqueue_interface.make_xheader(lms_callback_url=self.system.xqueue['callback_url'],
+            lms_key=queuekey,
+            queue_name=self.queue_name)
+
+        self.context.update({'submission': submission})
+
+        contents = self.payload.copy()
+
+        # Metadata related to the student submission revealed to the external grader
+        student_info = {'anonymous_student_id': anonymous_student_id,
+                        'submission_time': qtime,
+                        }
+
+        #Update contents with student response and student info
+        contents.update({
+            'student_info': json.dumps(student_info),
+            'student_response': submission,
+            'max_score' : self.max_score
+            })
+
+        # Submit request. When successful, 'msg' is the prior length of the queue
+        (error, msg) = qinterface.send_to_queue(header=xheader,
+            body=json.dumps(contents))
+
+        # State associated with the queueing request
+        queuestate = {'key': queuekey,
+                      'time': qtime,}
+
+        cmap = CorrectMap()
+        if error:
+            cmap.set(self.answer_id, queuestate=None,
+                msg='Unable to deliver your submission to grader. (Reason: {0}.)'
+                    ' Please try again later.'.format(msg))
+        else:
+            # Queueing mechanism flags:
+            #   1) Backend: Non-null CorrectMap['queuestate'] indicates that
+            #      the problem has been queued
+            #   2) Frontend: correctness='incomplete' eventually trickles down
+            #      through inputtypes.textbox and .filesubmission to inform the
+            #      browser that the submission is queued (and it could e.g. poll)
+            cmap.set(self.answer_id, queuestate=queuestate,
+                     correctness='incomplete', msg=msg)
+
+        return cmap
+
+    def update_score(self, score_msg, oldcmap, queuekey):
+        log.debug(score_msg)
+        score_msg = self._parse_score_msg(score_msg)
+        if not score_msg.valid:
+            oldcmap.set(self.answer_id,
+                msg = 'Invalid grader reply. Please contact the course staff.')
+            return oldcmap
+
+        correctness = 'correct' if score_msg.correct else 'incorrect'
+
+        # TODO: Find out how this is used elsewhere, if any
+        self.context['correct'] = correctness
+
+        # Replace 'oldcmap' with new grading results if queuekey matches.  If queuekey
+        # does not match, we keep waiting for the score_msg whose key actually matches
+        if oldcmap.is_right_queuekey(self.answer_id, queuekey):
+            # Sanity check on returned points
+            points = score_msg.points
+            if points < 0:
+                points = 0
+
+            # Queuestate is consumed, so reset it to None
+            oldcmap.set(self.answer_id, npoints=points, correctness=correctness,
+                msg = score_msg.msg.replace('&nbsp;', '&#160;'), queuestate=None)
+        else:
+            log.debug('OpenEndedResponse: queuekey {0} does not match for answer_id={1}.'.format(
+                queuekey, self.answer_id))
+
+        return oldcmap
+
+    def get_answers(self):
+        anshtml = '<span class="openended-answer"><pre><code>{0}</code></pre></span>'.format(self.answer)
+        return {self.answer_id: anshtml}
+
+    def get_initial_display(self):
+        return {self.answer_id: self.initial_display}
+
+    def _convert_longform_feedback_to_html(self, response_items):
+        """
+        Take in a dictionary, and return html strings for display to student.
+        Input:
+            response_items: Dictionary with keys success, feedback.
+                if success is True, feedback should be a dictionary, with keys for
+                   types of feedback, and the corresponding feedback values.
+                if success is False, feedback is actually an error string.
+
+                NOTE: this will need to change when we integrate peer grading, because
+                that will have more complex feedback.
+
+        Output:
+            String -- html that can be displayed to the student.
+        """
+
+        # We want to display available feedback in a particular order.
+        # This dictionary specifies which goes first--lower first.
+        priorities = {# These go at the start of the feedback
+                      'spelling': 0,
+                      'grammar': 1,
+                      # needs to be after all the other feedback
+                      'markup_text': 3}
+
+        default_priority = 2
+
+        def get_priority(elt):
+            """
+            Args:
+                elt: a tuple of feedback-type, feedback
+            Returns:
+                the priority for this feedback type
+            """
+            return priorities.get(elt[0], default_priority)
+
+        def format_feedback(feedback_type, value):
+            return """
+            <div class="{feedback_type}">
+            {value}
+            </div>
+            """.format(feedback_type, value)
+
+        # TODO (vshnayder): design and document the details of this format so
+        # that we can do proper escaping here (e.g. are the graders allowed to
+        # include HTML?)
+
+        for tag in ['success', 'feedback']:
+            if tag not in response_items:
+                return format_feedback('errors', 'Error getting feedback')
+
+        feedback_items = response_items['feedback']
+        try:
+            feedback = json.loads(feedback_items)
+        except (TypeError, ValueError):
+            log.exception("feedback_items have invalid json %r", feedback_items)
+            return format_feedback('errors', 'Could not parse feedback')
+
+        if response_items['success']:
+            if len(feedback) == 0:
+                return format_feedback('errors', 'No feedback available')
+
+            feedback_lst = sorted(feedback.items(), key=get_priority)
+            return u"\n".join(format_feedback(k, v) for k, v in feedback_lst)
+        else:
+            return format_feedback('errors', response_items['feedback'])
+
+
+    def _format_feedback(self, response_items):
+        """
+        Input:
+            Dictionary called feedback.  Must contain keys seen below.
+        Output:
+            Return error message or feedback template
+        """
+
+        feedback = self._convert_longform_feedback_to_html(response_items)
+
+        if not response_items['success']:
+            return self.system.render_template("open_ended_error.html",
+                                               {'errors' : feedback})
+
+        feedback_template = self.system.render_template("open_ended_feedback.html", {
+            'grader_type': response_items['grader_type'],
+            'score': response_items['score'],
+            'feedback': feedback,
+        })
+
+        return feedback_template
+
+
+    def _parse_score_msg(self, score_msg):
+        """
+         Grader reply is a JSON-dump of the following dict
+           { 'correct': True/False,
+             'score': Numeric value (floating point is okay) to assign to answer
+             'msg': grader_msg
+             'feedback' : feedback from grader
+             }
+
+        Returns (valid_score_msg, correct, score, msg):
+            valid_score_msg: Flag indicating valid score_msg format (Boolean)
+            correct:         Correctness of submission (Boolean)
+            score:           Points to be assigned (numeric, can be float)
+        """
+        fail = ScoreMessage(valid=False, correct=False, points=0, msg='')
+        try:
+            score_result = json.loads(score_msg)
+        except (TypeError, ValueError):
+            log.error("External grader message should be a JSON-serialized dict."
+                      " Received score_msg = {0}".format(score_msg))
+            return fail
+
+        if not isinstance(score_result, dict):
+            log.error("External grader message should be a JSON-serialized dict."
+                      " Received score_result = {0}".format(score_result))
+            return fail
+
+        for tag in ['score', 'feedback', 'grader_type', 'success']:
+            if tag not in score_result:
+                log.error("External grader message is missing required tag: {0}"
+                          .format(tag))
+                return fail
+
+        feedback = self._format_feedback(score_result)
+
+        # HACK: for now, just assume it's correct if you got more than 2/3.
+        # Also assumes that score_result['score'] is an integer.
+        score_ratio = int(score_result['score']) / self.max_score
+        correct = (score_ratio >= 0.66)
+
+        #Currently ignore msg and only return feedback (which takes the place of msg)
+        return ScoreMessage(valid=True, correct=correct,
+                            score=score_result['score'], msg=feedback)
+
+#-----------------------------------------------------------------------------
 # TEMPORARY: List of all response subclasses
 # FIXME: To be replaced by auto-registration
 
@@ -1828,4 +2164,5 @@ __all__ = [CodeResponse,
            ChoiceResponse,
            MultipleChoiceResponse,
            TrueFalseResponse,
-           JavascriptResponse]
+           JavascriptResponse,
+           OpenEndedResponse]

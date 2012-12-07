@@ -165,7 +165,7 @@ if settings.COURSEWARE_ENABLED:
         # input types system so that previews can be context-specific.
         # Unfortunately, we don't have time to think through the right way to do
         # that (and implement it), and it's not a terrible thing to provide a
-        # generic chemican-equation rendering service.
+        # generic chemical-equation rendering service.
         url(r'^preview/chemcalc', 'courseware.module_render.preview_chemcalc',
             name='preview_chemcalc'),
 
@@ -234,6 +234,12 @@ if settings.COURSEWARE_ENABLED:
             'instructor.views.grade_summary', name='grade_summary'),
         url(r'^courses/(?P<course_id>[^/]+/[^/]+/[^/]+)/enroll_students$',
             'instructor.views.enroll_students', name='enroll_students'),
+        url(r'^courses/(?P<course_id>[^/]+/[^/]+/[^/]+)/staff_grading$',
+            'instructor.views.staff_grading', name='staff_grading'),
+        url(r'^courses/(?P<course_id>[^/]+/[^/]+/[^/]+)/staff_grading/get_next$',
+            'instructor.staff_grading_service.get_next', name='staff_grading_get_next'),
+        url(r'^courses/(?P<course_id>[^/]+/[^/]+/[^/]+)/staff_grading/save_grade$',
+            'instructor.staff_grading_service.save_grade', name='staff_grading_save_grade'),
     )
 
     # discussion forums live within courseware, so courseware must be enabled first

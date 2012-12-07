@@ -39,7 +39,7 @@ DATABASES = {
 }
 
 CACHES = {
-    # This is the cache used for most things. 
+    # This is the cache used for most things.
     # In staging/prod envs, the sessions also live here.
     'default': {
         'BACKEND': 'django.core.cache.backends.locmem.LocMemCache',
@@ -102,7 +102,13 @@ SUBDOMAIN_BRANDING = {
 
 COMMENTS_SERVICE_KEY = "PUT_YOUR_API_KEY_HERE"
 
+################################# Staff grading config  #####################
 
+STAFF_GRADING_INTERFACE = {
+    'url': 'http://127.0.0.1:3033/staff_grading',
+    'username': 'lms',
+    'password': 'abcd',
+    }
 
 ################################ LMS Migration #################################
 MITX_FEATURES['ENABLE_LMS_MIGRATION'] = True

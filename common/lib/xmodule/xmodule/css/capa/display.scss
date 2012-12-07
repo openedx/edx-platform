@@ -121,16 +121,6 @@ section.problem {
       }
     }
 
-    &.processing {
-      p.status {
-        @include inline-block();
-        background: url('../images/spinner.gif') center center no-repeat;
-        height: 20px;
-        width: 20px;
-        text-indent: -9999px;
-      }
-    }
-
     &.correct, &.ui-icon-check {
       p.status {
         @include inline-block();
@@ -264,6 +254,11 @@ section.problem {
         display: block;
         float: left;
         margin: -7px 7px 0 0;
+      }
+
+      .grading {
+        text-indent: 0px;
+        margin: 0px 7px 0 0;
       }
 
       p {
@@ -683,6 +678,21 @@ section.problem {
           background: url('../images/incorrect-icon.png') left 20px no-repeat;
           .result-actual-output {
             color: #B00;
+          }
+        }
+
+        .markup-text{
+          margin: 5px;
+          padding: 20px 0px 15px 50px;
+          border-top: 1px solid #DDD;
+          border-left: 20px solid #FAFAFA;
+
+          bs {
+            color: #BB0000;
+          }
+
+          bg {
+            color: #BDA046;
           }
         }
       }

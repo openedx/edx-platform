@@ -373,6 +373,14 @@ class SelfAssessmentModule(XModule):
     def save_answer(self, get):
         """
         After the answer is submitted, show the rubric.
+
+        Args:
+            get: the GET dictionary passed to the ajax request.  Should contain
+                a key 'student_answer'
+
+        Returns:
+            Dictionary with keys 'success' and either 'error' (if not success),
+            or 'rubric_html' (if success).
         """
         # Check to see if attempts are less than max
         if self.attempts > self.max_attempts:

@@ -1,0 +1,29 @@
+<section id="openended_${id}" class="openended">
+  <textarea rows="${rows}" cols="${cols}" name="input_${id}" id="input_${id}"
+       % if hidden:
+      	    style="display:none;"
+       % endif
+  >${value|h}</textarea>
+
+  <div class="grader-status">
+    % if status == 'unsubmitted':
+      <span class="unanswered" style="display:inline-block;" id="status_${id}">Unanswered</span>
+    % elif status == 'correct':
+      <span class="correct" id="status_${id}">Correct</span>
+    % elif status == 'incorrect':
+      <span class="incorrect" id="status_${id}">Incorrect</span>
+    % elif status == 'queued':
+      <span class="grading" id="status_${id}">Submitted for grading</span>
+    % endif
+
+    % if hidden:
+      <div style="display:none;" name="${hidden}" inputid="input_${id}" />
+    % endif
+  </div>
+
+  <span id="answer_${id}"></span>
+
+  <div class="external-grader-message">
+    ${msg|n}
+  </div>
+</section>

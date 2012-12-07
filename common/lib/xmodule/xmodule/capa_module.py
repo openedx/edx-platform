@@ -146,6 +146,11 @@ class CapaModule(XModule):
         else:
             self.seed = None
 
+        # Need the problem location in openendedresponse to send out.  Adding
+        # it to the system here seems like the least clunky way to get it
+        # there.
+        self.system.set('location', self.location.url())
+
         try:
             # TODO (vshnayder): move as much as possible of this work and error
             # checking to descriptor load time
