@@ -176,23 +176,16 @@ function goto( mode)
 ##----------------------------------------------------------------------------- 
 %if modeflag.get('Analytics'):
 
-   <p>Number of students enrolled: ${students_enrolled_json['data']['nb_students_enrolled']}
+   <p>
+     Number of students enrolled: ${students_enrolled_json['data']['nb_students_enrolled']}
+   </p>
+   <p>
+     Number of active students for the past 7 days: ${students_active_json['data']['nb_students_active']}
    </p>
 
    <p>
-     <h2>Daily activity for the past 7 days:</h2>
-     <table class="stat_table">
-     <tr><th>Day</td><th>Number of students</td></tr>
-     % for k,v in students_daily_activity_json['data'].items():
-     <tr>
-     <td>${k}</td> <td>${v}</td>
-     </tr>
-     % endfor
-     </table>
-   </p>
+     <p>Number of active students per problems who have this problem graded as correct:</p>
 
-   <p>
-     <h2>Number of students with correct problems for the past 7 days:</h2>
      <table class="stat_table">
      <tr><th>Problem</td><th>Number of students</td></tr>
      % for k,v in students_per_problem_correct_json['data'].items():
@@ -204,7 +197,38 @@ function goto( mode)
    </p>
 
    <p>
-     <h2>Students who attempted at least one exercise:</h2>
+     <p>Grade distribution:</p>
+
+     <div class="divScroll">
+     <table class="stat_table">
+     <tr><th>Grade</th><th>Number of students</th></tr>
+     % for k,v in overall_grade_distribution['data'].items():
+     <tr>
+     <td>${k}</td> <td>${v}</td>
+     </tr>
+     % endfor
+     </table>
+     </div>
+
+   </p>
+
+   <p>
+     <p>Number of students who dropped off per day before becoming inactive:</p>
+
+     <div class="divScroll">
+     <table class="stat_table">
+     <tr><th>Day</th><th>Number of students</th></tr>
+     % for k,v in dropoff_per_day['data'].items():
+     <tr>
+     <td>${k}</td> <td>${v}</td>
+     </tr>
+     % endfor
+     </table>
+     </div>
+   </p>
+
+   <p>
+     <p>Students who attempted at least one exercise:</p>
 
      <div class="divScroll">
      <table class="stat_table">
@@ -231,6 +255,17 @@ function goto( mode)
      </table>
    </p>
 
+   <p>
+     <h2>Daily activity for the past 7 days:</h2>
+     <table class="stat_table">
+     <tr><th>Day</td><th>Number of students</td></tr>
+     % for k,v in students_daily_activity_json['data'].items():
+     <tr>
+     <td>${k}</td> <td>${v}</td>
+     </tr>
+     % endfor
+     </table>
+   </p>
 
 %endif
 

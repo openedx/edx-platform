@@ -274,35 +274,51 @@ def instructor_dashboard(request, course_id):
 
     analytics_json = None
     students_enrolled_json = None
+    students_active_json = None
     daily_activity_json = None
     students_daily_activity_json = None
     students_per_problem_correct_json = None
+    overall_grade_distribution = None
+    dropoff_per_day = None
 
     if idash_mode == 'Analytics':
-        req = requests.get(settings.ANALYTICS_SERVER_URL + "get_analytics?aname=StudentsPerHomework&course_id=%s" % course_id)
-        analytics_json = req.json
 
-        # get the day 
+        # get current day
         to_day = datetime.today().date()
         from_day = to_day - timedelta(days=7)
-
-        # number of students active in the past 7 days (including current day)
-        req = requests.get(settings.ANALYTICS_SERVER_URL + "get_analytics?aname=StudentsDailyActivity&course_id=%s&from=%s" % (course_id,from_day))
-        students_daily_activity_json = req.json
-
-        # number of students per problem who have problem graded correct
-        req = requests.get(settings.ANALYTICS_SERVER_URL + "get_analytics?aname=StudentsPerProblemCorrect&course_id=%s&from=%s" % (course_id,from_day))
-        students_per_problem_correct_json = req.json
 
         # number of students enrolled in this course
         req = requests.get(settings.ANALYTICS_SERVER_URL + "get_analytics?aname=StudentsEnrolled&course_id=%s" % course_id)
         students_enrolled_json = req.json
 
-        # number of students active in the past 7 days (including current day) --- online version!
+        # number of students active in the past 7 days (including current day), i.e. with at least one activity for the period
+        req = requests.get(settings.ANALYTICS_SERVER_URL + "get_analytics?aname=StudentsActive&course_id=%s&from=%s" % (course_id,from_day))
+        students_active_json = req.json
+
+        # number of students per problem who have problem graded correct
+        req = requests.get(settings.ANALYTICS_SERVER_URL + "get_analytics?aname=StudentsPerProblemCorrect&course_id=%s&from=%s" % (course_id,from_day))
+        students_per_problem_correct_json = req.json
+
+        # grade distribution for the course
+        req = requests.get(settings.ANALYTICS_SERVER_URL + "get_analytics?aname=OverallGradeDistribution&course_id=%s" % (course_id,))
+        overall_grade_distribution = req.json
+
+        # number of students distribution drop off per day
+        req = requests.get(settings.ANALYTICS_SERVER_URL + "get_analytics?aname=StudentsDropoffPerDay&course_id=%s&from=%s" % (course_id,from_day))
+        dropoff_per_day = req.json
+
+        # the following is ++incorrect++ use of studentmodule table
+        req = requests.get(settings.ANALYTICS_SERVER_URL + "get_analytics?aname=StudentsDailyActivity&course_id=%s&from=%s" % (course_id,from_day))
+        students_daily_activity_json = req.json
+
+        # number of students active in the past 7 days (including current day) --- online version! experimental
         to_day = datetime.today().date()
         from_day = to_day - timedelta(days=7)
         req = requests.get(settings.ANALYTICS_SERVER_URL + "get_analytics?aname=DailyActivityAnalyzer&course_id=%s&from=%s&to=%s" % (course_id,from_day, to_day))
         daily_activity_json = req.json
+
+        req = requests.get(settings.ANALYTICS_SERVER_URL + "get_analytics?aname=StudentsPerHomework&course_id=%s" % course_id)
+        analytics_json = req.json
 
     #----------------------------------------
     # context for rendering
@@ -320,9 +336,12 @@ def instructor_dashboard(request, course_id):
                'djangopid' : os.getpid(),
                'analytics_json' : analytics_json,
                'students_enrolled_json' : students_enrolled_json,
+               'students_active_json' : students_active_json,
                'daily_activity_json' : daily_activity_json,
                'students_daily_activity_json' : students_daily_activity_json,
                'students_per_problem_correct_json' : students_per_problem_correct_json,
+               'overall_grade_distribution' : overall_grade_distribution,
+               'dropoff_per_day' : dropoff_per_day,
                }
 
     return render_to_response('courseware/instructor_dashboard.html', context)
