@@ -139,8 +139,8 @@ class GraphicalSliderToolModule(XModule):
             sliders = [sliders]
         vars = [x['@var'] for x in sliders]
 
-        slider_div = '<div class="{element_class}_slider" id="{element_id}_slider_{var}" \
-        data-var="{var}"></div>'
+        slider_div = '<span class="{element_class}_slider" id="{element_id}_slider_{var}" \
+        data-var="{var}"></span>'
 
         for var in vars:
             html_string = re.sub(r'\$slider\s+' + var + r'\$',

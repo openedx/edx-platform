@@ -25,7 +25,7 @@ define('Sliders', [], function () {
 
         function createSlider(obj) {
             var constName, constValue, rangeBlobs, valueMin, valueMax,
-                sliderDiv, sliderWidth;
+                spanEl, sliderEl, sliderWidth;
 
             // The name of the constant is obj['@var']. Multiple sliders and/or
             // inputs can represent the same constant - therefore we will get
@@ -34,7 +34,7 @@ define('Sliders', [], function () {
             // blob is the min value for the slider, the third blob is the max
             // value for the slider.
 
-            if (typeof obj['@var'] === 'undefined') {
+            if (typeof obj['@var'] !== 'string') {
                 return;
             }
 
@@ -85,13 +85,15 @@ define('Sliders', [], function () {
                 }
             }
 
-            sliderDiv = $('#' + gstId + '_slider_' + constName);
+            spanEl = $('#' + gstId + '_slider_' + constName);
 
             // If a corresponding slider  DIV for this constant does not exist,
             // do not do anything.
-            if (sliderDiv.length === 0) {
+            if (spanEl.length === 0) {
                 return;
             }
+
+            sliderEl = $('<div>');
 
             // The default slider width.
             sliderWidth = 400;
@@ -103,20 +105,22 @@ define('Sliders', [], function () {
             }
 
             // Set the new width to the slider.
-            sliderDiv.width(sliderWidth);
-            sliderDiv.css('display', 'inline-block');
+            sliderEl.width(sliderWidth);
+            sliderEl.css('display', 'inline-block');
 
             // Create a jQuery UI slider from the current DIV. We will set
             // starting parameters, and will also attach a handler to update
             // the state on the change event.
-            sliderDiv.slider({
+            sliderEl.slider({
                 'min': valueMin,
                 'max': valueMax,
                 'value': constValue,
-                'step': 0.01,
+                'step': (valueMax - valueMin) / 50.0,
 
                 'change': sliderOnChange
             });
+
+            sliderEl.appendTo(spanEl);
 
             return;
 

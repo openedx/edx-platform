@@ -27,9 +27,9 @@ define('Inputs', ['logme'], function (logme) {
         }
 
         function createInput(obj) {
-            var constName, constValue, inputDiv, textInputDiv;
+            var constName, constValue, spanEl, inputEl;
 
-            if (typeof obj['@var'] === 'undefined') {
+            if (typeof obj['@var'] !== 'string') {
                 return;
             }
 
@@ -40,19 +40,28 @@ define('Inputs', ['logme'], function (logme) {
                 constValue = 0;
             }
 
-            inputDiv = $('#' + gstId + '_input_' + constName);
+            spanEl = $('#' + gstId + '_input_' + constName);
 
-            if (inputDiv.length === 0) {
+            if (spanEl.length === 0) {
                 return;
             }
 
-            textInputDiv = $('<input type"text" />');
-            textInputDiv.width(50);
+            inputEl = $('<input type"text" />');
 
-            textInputDiv.appendTo(inputDiv);
-            textInputDiv.val(constValue);
+            // inputEl.width(50);
+            inputEl.val(constValue);
+            inputEl.bind('change', inputOnChange);
+            inputEl.button().css({
+                'font': 'inherit',
+                'color': 'inherit',
+                'text-align': 'left',
+                'outline': 'none',
+                'cursor': 'text',
+                'height': '15px',
+                'width': '50px'
+            });
 
-            textInputDiv.bind('change', inputOnChange);
+            inputEl.appendTo(spanEl);
 
             return;
 
