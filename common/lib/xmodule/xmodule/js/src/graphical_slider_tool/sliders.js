@@ -112,6 +112,7 @@ define('Sliders', [], function () {
                 'min': valueMin,
                 'max': valueMax,
                 'value': constValue,
+                'step': 0.01,
 
                 'change': sliderOnChange
             });

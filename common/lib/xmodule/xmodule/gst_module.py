@@ -129,8 +129,7 @@ class GraphicalSliderToolModule(XModule):
         """
         #substitute plot
         plot_div = '<div class="' + self.html_class + '_plot" id="' + self.html_id + '_plot" \
-        style="width: 600px; height: 600px; padding: 0px; position: relative;"> \
-        This is plot</div>'
+        style="width: 600px; height: 600px; padding: 0px; position: relative;">This is plot</div>'
         html_string = html_string.replace('$plot$', plot_div)
 
         # substitute sliders
@@ -140,7 +139,7 @@ class GraphicalSliderToolModule(XModule):
         vars = [x['@var'] for x in sliders]
 
         slider_div = '<div class="{element_class}_slider" id="{element_id}_slider_{var}" \
-        data-var="{var}">This is slider</div>'
+        data-var="{var}"></div>'
 
         for var in vars:
             html_string = re.sub(r'\$slider\s+' + var + r'\$',

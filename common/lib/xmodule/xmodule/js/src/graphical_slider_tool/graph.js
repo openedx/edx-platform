@@ -28,6 +28,8 @@ define('Graph', [], function () {
         return;
 
         function createFunctions() {
+            var c1;
+
             functions = [];
 
             if (typeof config.plot['function'] === 'undefined') {
@@ -39,7 +41,11 @@ define('Graph', [], function () {
             } else if ($.isPlainObject(config.plot['function']) === true) {
 
             } else if ($.isArray(config.plot['function'])) {
-
+                for (c1 = 0; c1 < config.plot['function'].length; c1++) {
+                    if (typeof config.plot['function'][c1] === 'string') {
+                        addFunction(config.plot['function'][c1]);
+                    }
+                }
             }
 
             return;
