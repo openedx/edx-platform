@@ -11,6 +11,11 @@ $(document).ready(function() {
     $body = $('body');
     $modal = $('.history-modal');
     $modalCover = $('<div class="modal-cover">');
+    // cdodge: this looks funny, but on AWS instances, this base.js get's wrapped in a separate scope as part of Django static
+    // pipelining (note, this doesn't happen on local runtimes). So if we set it on window, when we can access it from other
+    // scopes (namely the course-info tab)
+    window.$modalCover = $modalCover;
+
     $body.append($modalCover);
     $newComponentItem = $('.new-component-item');
     $newComponentTypePicker = $('.new-component');
