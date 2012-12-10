@@ -1853,8 +1853,12 @@ class OpenEndedResponse(LoncapaResponse):
         prompt = self.xml.find('prompt')
         rubric = self.xml.find('openendedrubric')
 
-        if not oeparam or not prompt or not rubric:
-            raise ValueError("openendedresponse missing required parameters.")
+        if oeparam is None:
+            raise ValueError("No oeparam found in problem xml.")
+        if prompt is None:
+            raise ValueError("No prompt found in problem xml.")
+        if rubric is None:
+            raise ValueError("No rubric found in problem xml.")
 
         self._parse(oeparam, prompt, rubric)
 
