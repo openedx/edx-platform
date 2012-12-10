@@ -46,7 +46,8 @@ import time
 from contentstore import course_info_model
 from contentstore.utils import get_modulestore
 from cms.djangoapps.models.settings.course_details import CourseDetails,\
-    CourseDetailsEncoder
+    CourseSettingsEncoder
+from cms.djangoapps.models.settings.course_grading import CourseGradingModel
 
 # to install PIL on MacOSX: 'easy_install http://dist.repoze.org/PIL-1.1.6.tar.gz'
 
@@ -955,7 +956,7 @@ def get_course_settings(request, org, course, name):
     return render_to_response('settings.html', {
         'active_tab': 'settings-tab', 
         'context_course': course_module,
-        'course_details' : json.dumps(course_details, cls=CourseDetailsEncoder)
+        'course_details' : json.dumps(course_details, cls=CourseSettingsEncoder)
     })
         
 @expect_json
@@ -963,7 +964,7 @@ def get_course_settings(request, org, course, name):
 @ensure_csrf_cookie
 def course_settings_updates(request, org, course, name, section):
     """
-    restful CRUD operations on course_info updates. This differs from get_course_settings by communicating purely
+    restful CRUD operations on course settings. This differs from get_course_settings by communicating purely
     through json (not rendering any html) and handles section level operations rather than whole page.
 
     org, course: Attributes of the Location for the item to edit
@@ -971,14 +972,42 @@ def course_settings_updates(request, org, course, name, section):
     """
     if section == 'details':
         manager = CourseDetails
+    elif section == 'grading':
+        manager = CourseGradingModel
     else: return
     
     if request.method == 'GET':
         # Cannot just do a get w/o knowing the course name :-(
-        return HttpResponse(json.dumps(manager.fetch(Location(['i4x', org, course, 'course',name])), cls=CourseDetailsEncoder), 
+        return HttpResponse(json.dumps(manager.fetch(Location(['i4x', org, course, 'course',name])), cls=CourseSettingsEncoder), 
                             mimetype="application/json")
     elif request.method == 'POST': # post or put, doesn't matter.
-        return HttpResponse(json.dumps(manager.update_from_json(request.POST), cls=CourseDetailsEncoder), 
+        return HttpResponse(json.dumps(manager.update_from_json(request.POST), cls=CourseSettingsEncoder), 
+                            mimetype="application/json")
+
+@expect_json
+@login_required
+@ensure_csrf_cookie
+def course_grader_updates(request, org, course, name, grader_index=None):
+    """
+    restful CRUD operations on course_info updates. This differs from get_course_settings by communicating purely
+    through json (not rendering any html) and handles section level operations rather than whole page.
+
+    org, course: Attributes of the Location for the item to edit
+    """
+    if request.method == 'POST' and 'HTTP_X_HTTP_METHOD_OVERRIDE' in request.META:
+        real_method = request.META['HTTP_X_HTTP_METHOD_OVERRIDE']
+    else:
+        real_method = request.method
+        
+    if real_method == 'GET':
+        # Cannot just do a get w/o knowing the course name :-(
+        return HttpResponse(json.dumps(CourseGradingModel.fetch_grader(Location(['i4x', org, course, 'course',name]), grader_index)), 
+                            mimetype="application/json")
+    elif real_method == "DELETE":
+        # ??? Shoudl this return anything? Perhaps success fail? 
+        CourseGradingModel.delete_grader(Location(['i4x', org, course, 'course',name]), grader_index)
+    elif request.method == 'POST': # post or put, doesn't matter.
+        return HttpResponse(json.dumps(CourseGradingModel.update_grader_from_json(Location(['i4x', org, course, 'course',name]), request.POST)),
                             mimetype="application/json")
 
 

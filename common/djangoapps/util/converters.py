@@ -6,6 +6,7 @@ def time_to_date(time_obj):
     """
     Convert a time.time_struct to a true universal time (can pass to js Date constructor)
     """
+    # TODO change to using the isoformat() function on datetime. js date can parse those
     return calendar.timegm(time_obj) * 1000
 
 def jsdate_to_time(field):

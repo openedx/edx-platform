@@ -18,6 +18,7 @@ from contentstore import utils
   <script type="text/javascript" src="${static.url('js/models/course_relative.js')}"></script>
   <script type="text/javascript" src="${static.url('js/models/settings/course_details.js')}"></script>
   <script type="text/javascript" src="${static.url('js/models/settings/course_settings.js')}"></script>
+  <script type="text/javascript" src="${static.url('js/models/settings/course_grading_policy.js')}"></script>
   <script type="text/javascript" src="${static.url('js/views/settings/main_settings_view.js')}"></script>
   
   <script type="text/javascript">
@@ -36,115 +37,6 @@ from contentstore import utils
         editor.render();
     });
       
-    // TODO move most of this into view handlers
-    var $body;
-    var $gradeBar;
-    var $draggingBar;
-    var barOrigin;
-    var barWidth;
-    var gradeThresholds;
-    var GRADES = ['A', 'B', 'C', 'D', 'F'];
-
-    (function() {
-      $body = $('body');
-      $gradeBar = $('.grade-bar');
-      // gradeThresholds = [100, 50];
-      setThresholds();
-      $('.settings-extra header').bind('click', showSettingsExtras);
-      $body.on('mousedown', '.drag-bar', startDragBar);
-      $('.new-grade-button').bind('click', addNewGrade);
-      $body.on('click', '.remove-button', removeGrade);
-      renderGradeRanges();
-
-    })();
-
-    function setThresholds() {
-      gradeThresholds = [];
-      $('.grades li').each(function(i) {
-        gradeThresholds.push(parseInt($(this)[0].style.width));
-      });
-    }
-
-    function addNewGrade(e) {
-      e.preventDefault();
-      var $grades = $('.grades');
-      var gradeLength = $('li', $grades).length;
-      if(gradeLength > 4) {
-        return;
-      }
-      var $newGradeBar = $('<li><span class="letter-grade" contenteditable>' + GRADES[gradeLength - 1] + '</span><span class="range"></span><a href="#" class="drag-bar"></a><a href="#" class="remove-button">remove</a></li>');
-      var failBarWidth = parseFloat($('.bar-fail', $grades)[0].style.width);
-      var lastBarWidth = parseFloat($('li', $grades).eq(gradeLength - 2)[0].style.width);
-      var targetWidth = failBarWidth + ((lastBarWidth - failBarWidth) / 2);
-      $newGradeBar.css('width', targetWidth + '%');
-      $('.bar-fail', $grades).before($newGradeBar);
-      setGrades();
-      setThresholds();
-      renderGradeRanges();
-    }
-
-    function removeGrade(e) {
-      e.preventDefault();
-      var index = $(this).closest('li').index();
-      gradeThresholds.splice(index, 1);
-      $(this).closest('li').remove();
-      setGrades();
-      setThresholds();
-      renderGradeRanges();
-    }
-
-    function setGrades() {
-      var $gradeBars = $('.grades li');
-      var barCount = $gradeBars.length;
-      if(barCount <= 2) {
-        $gradeBars.eq(0).find('.letter-grade').html('Pass');
-        $('.bar-fail').find('.letter-grade').html('Fail');
-      } else {
-        $gradeBars.each(function(i) {
-          $('.letter-grade', this).html(GRADES[i]);
-        });
-        $('.bar-fail').find('.letter-grade').html('F');
-      }
-    }
-
-    function showSettingsExtras(e) {
-      e.preventDefault();
-      $(this).toggleClass('active');
-      $(this).siblings.toggleClass('is-shown');
-    }
-
-    function startDragBar(e) {
-      e.preventDefault();
-      barOrigin = $gradeBar.offset().left;
-      barWidth = $gradeBar.width();
-      $draggingBar = $(e.target).closest('li').addClass('is-dragging');
-      $body.bind('mousemove', moveBar);
-      $body.bind('mouseup', stopDragBar);
-    }
-
-    function moveBar(e) {
-      var barIndex = $draggingBar.index();
-      var min = gradeThresholds[barIndex + 1] || 0;
-      var max = gradeThresholds[barIndex - 1] || 100;
-      var percentage = Math.min(Math.max((e.pageX - barOrigin) / barWidth * 100, min), max);
-      $draggingBar.css('width', percentage + '%');
-      gradeThresholds[$draggingBar.index()] = Math.round(percentage);
-      renderGradeRanges();
-    }
-
-    function stopDragBar(e) {
-      $draggingBar.removeClass('is-dragging');
-      $body.unbind('mousemove', moveBar);
-      $body.unbind('mouseup', stopDragBar);
-    }
-
-    function renderGradeRanges() {
-      $('.range').each(function(i) {
-        var min = gradeThresholds[i + 1] + 1 || 0;
-        var max = gradeThresholds[i];
-        $(this).text(min + '-' + max);
-      });
-    }
   </script>
 </%block>
 
@@ -158,7 +50,7 @@ from contentstore import utils
           <nav class="settings-page-menu">
             <ul>
               <li><a href="#" class="is-shown" data-section="details">Course Details</a></li>
-              <li><a href="#" data-section="faculty">Faculty</a></li>
+              <!-- <li><a href="#" data-section="faculty">Faculty</a></li>  -->
               <li><a href="#" data-section="grading">Grading</a></li>
               <li><a href="#" data-section="problems">Problems</a></li>
               <li><a href="#" data-section="discussions">Discussions</a></li>
@@ -493,15 +385,6 @@ from contentstore import utils
                         <li class="increment-100">100</li>
                       </ol>
                       <ol class="grades">
-                        <li class="bar-a" style="width: 100%;">
-                          <span class="letter-grade" contenteditable>Pass</span>
-                          <span class="range"></span>
-                        </li>
-                        <li class="bar-fail" style="width: 50%;">
-                          <span class="letter-grade" contenteditable>Fail</span>
-                          <span class="range"></span>
-                          <a href="#" class="drag-bar"></a>
-                        </li>
                       </ol>
                     </div>
                   </div>
@@ -515,19 +398,6 @@ from contentstore import utils
                 <h3>General Grading</h3>
                 <span class="detail">Deadlines and Requirements</span>
               </header>
-
-              <div class="row row-col2">
-                <label for="course-grading-deadline">General Assignment Deadline:</label>
-
-                <div class="field datepicker">
-                  <div class="input">
-                    <input type="text" class="time" id="course-grading-deadline" value="" placeholder="HH:MM">
-                    <span class="tip tip-stacked">Boston, MA Local Time (UTC/GMT -5 hours).<br />
-                      <a href="http://www.worldtimeserver.com/convert_time_in_UTC.aspx">Convert to your time zone</a>
-                    </span>
-                  </div>
-                </div>
-              </div>
 
               <div class="row row-col2">
                 <label for="course-grading-graceperiod">Grace Period on Deadline:</label>
@@ -549,101 +419,6 @@ from contentstore import utils
               <div class="row">
                 <div class="field enum">
                   <ul class="input-list course-grading-assignment-list">
-                    <li class="input input-existing multi course-grading-assignment-list-item">
-              <div class="row row-col2">
-                        <label for="ourse-grading-assignment-1-name">Assignment Type Name:</label>
-
-                <div class="field">
-                          <div class="input course-grading-assignment-name">
-                            <input type="text" class="long" id="course-grading-assignment-1-name">
-                            <span class="tip tip-stacked">e.g. Homework, Labs, Midterm Exams, Final Exam</span>
-                  </div>
-                </div>
-              </div>
-
-              <div class="row row-col2">
-                        <label for="course-grading-1-gradeweight">Weight of Total Grade:</label>
-
-                <div class="field">
-                          <div class="input course-grading-gradeweight">
-                            <input type="text" class="short" id="course-grading-assignment-1-gradeweight">
-                            <span class="tip tip-inline">e.g. 25%</span>                
-                  </div>
-                </div>
-              </div>
-
-              <div class="row row-col2">
-                        <label for="course-grading-assignment-1-totalassignments">Total Number:</label>
-
-                <div class="field">
-                          <div class="input course-grading-totalassignments">
-                            <input type="text" class="short" id="course-grading-assignment-1-totalassignments">
-                            <span class="tip tip-inline">total exercises assigned</span>                
-                  </div>
-                </div>
-              </div>
-
-              <div class="row row-col2">
-                        <label for="course-grading-assignment-1-droppable">Number of Droppable:</label>
-
-                <div class="field">
-                          <div class="input course-grading-droppable">
-                            <input type="text" class="short" id="course-grading-assignment-1-droppable">
-                            <span class="tip tip-inline">total exercises that won't be graded</span>               
-                  </div>
-                </div>
-              </div>
-
-                      <a href="#" class="remove-item remove-grading-data"><span class="delete-icon"></span> Delete Assignment Type</a>
-                    </li>
-
-                    <li class="input input-existing multi course-grading-assignment-list-item">
-              <div class="row row-col2">
-                        <label for="course-grading-assignment-2-name">Assignment Type Name:</label>
-
-                <div class="field">
-                          <div class="input course-grading-assignment-name">
-                            <input type="text" class="long" id="course-grading-assignment-2-name">
-                            <span class="tip tip-stacked">e.g. Homework, Labs, Midterm Exams, Final Exam</span>
-                  </div>
-                </div>
-              </div>
-
-              <div class="row row-col2">
-                        <label for="course-grading-2-gradeweight">Weight of Total Grade:</label>
-
-                <div class="field">
-                          <div class="input course-grading-gradeweight">
-                            <input type="text" class="short" id="course-grading-assignment-2-gradeweight">
-                            <span class="tip tip-inline">e.g. 25%</span>                
-                  </div>
-                </div>
-              </div>
-
-              <div class="row row-col2">
-                        <label for="course-grading-assignment-2-totalassignments">Total Number:</label>
-
-                <div class="field">
-                          <div class="input course-grading-totalassignments">
-                            <input type="text" class="short" id="course-grading-assignment-2-totalassignments">
-                            <span class="tip tip-inline">total exercises assigned</span>                
-                  </div>
-                </div>
-              </div>
-
-              <div class="row row-col2">
-                        <label for="course-grading-assignment-2-droppable">Number of Droppable:</label>
-
-                <div class="field">
-                          <div class="input course-grading-droppable">
-                            <input type="text" class="short" id="course-grading-assignment-2-droppable">
-                            <span class="tip tip-inline">total exercises that won't be graded</span>               
-                  </div>
-                </div>
-              </div>
-
-                      <a href="#" class="remove-item remove-grading-data"><span class="delete-icon"></span> Delete Assignment Type</a>
-                    </li>
                   </ul>
 
                   <a href="#" class="new-item new-course-grading-item add-grading-data">

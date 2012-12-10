@@ -7,7 +7,7 @@ from django.test.client import Client
 from django.core.urlresolvers import reverse
 from xmodule.modulestore import Location
 from cms.djangoapps.models.settings.course_details import CourseDetails,\
-    CourseDetailsEncoder
+    CourseSettingsEncoder
 import json
 from common.djangoapps.util import converters
 
@@ -87,7 +87,7 @@ class CourseDetailsTestCase(TestCase):
         
     def test_encoder(self):
         details = CourseDetails.fetch(self.course_location)
-        jsondetails = json.dumps(details, cls=CourseDetailsEncoder)
+        jsondetails = json.dumps(details, cls=CourseSettingsEncoder)
         jsondetails = json.loads(jsondetails)
         self.assertTupleEqual(Location(jsondetails['course_location']), self.course_location, "Location !=")
         # Note, start_date is being initialized someplace. I'm not sure why b/c the default will make no sense.
@@ -164,23 +164,22 @@ class CourseDetailsViewTest(TestCase):
 
     def alter_field(self, url, details, field, val):
         details[field] = val
-        jsondetails = json.dumps(details, cls=CourseDetailsEncoder)
+        jsondetails = json.dumps(details, cls=CourseSettingsEncoder)
         resp = self.client.post(url, jsondetails) 
-        self.assertDictEqual(json.loads(resp), details, field + val)
+        self.assertDictEqual(json.loads(resp.content), details.__dict__, field + val)
         
     def test_update_and_fetch(self):
         details = CourseDetails.fetch(self.course_location)
-        details_loc = self.course_location.dict().copy()
-        details_loc['section'] = 'details'
         
-        resp = self.client.get(reverse('contentstore.views.get_course_settings', kwargs=self.course_location.dict()))
+        resp = self.client.get(reverse('course_settings', kwargs={'org' : self.course_location.org, 'course' : self.course_location.course, 
+                                                                  'name' : self.course_location.name }))
         self.assertContains(resp, '<li><a href="#" class="is-shown" data-section="details">Course Details</a></li>', status_code=200, html=True)
 
         # resp s/b json from here on    
-        url = reverse('contentstore.views.course_settings_updates', kwargs=details_loc)
+        url = reverse('course_settings', kwargs={'org' : self.course_location.org, 'course' : self.course_location.course, 
+                                                 'name' : self.course_location.name, 'section' : 'details' })
         resp = self.client.get(url)
-        jsondetails = json.dumps(details, cls=CourseDetailsEncoder)
-        self.assertDictEqual(resp, jsondetails, "virgin get")
+        self.assertDictEqual(json.loads(resp.content), details.__dict__, "virgin get")
 
         self.alter_field(url, details, 'start_date', time.time() * 1000)        
         self.alter_field(url, details, 'start_date', time.time() * 1000 + 60 * 60 * 24)

@@ -6,6 +6,7 @@ from json.encoder import JSONEncoder
 import time
 from contentstore.utils import get_modulestore
 from util.converters import jsdate_to_time, time_to_date
+from cms.djangoapps.models.settings import course_grading
 
 class CourseDetails:
     def __init__(self, location):
@@ -131,10 +132,11 @@ class CourseDetails:
         # Could just generate and return a course obj w/o doing any db reads, but I put the reads in as a means to confirm
         # it persisted correctly
         return CourseDetails.fetch(course_location)
-    
-class CourseDetailsEncoder(json.JSONEncoder):
+
+# TODO move to a more general util? Is there a better way to do the isinstance model check?
+class CourseSettingsEncoder(json.JSONEncoder):
     def default(self, obj):
-        if isinstance(obj, CourseDetails):
+        if isinstance(obj, CourseDetails) or isinstance(obj, course_grading.CourseGradingModel):
             return obj.__dict__
         elif isinstance(obj, Location):
             return obj.dict()

@@ -67,7 +67,7 @@ CMS.Models.Settings.CourseDetails = Backbone.Model.extend({
 		// NOTE don't return empty errors as that will be interpreted as an error state
 	},
 	
-	urlRoot: function() {
+	url: function() {
 		var location = this.get('location');
 		return '/' + location.get('org') + "/" + location.get('course') + '/settings/' + location.get('name') + '/section/details';
 	},

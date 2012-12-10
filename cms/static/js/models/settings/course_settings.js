@@ -13,15 +13,31 @@ CMS.Models.Settings.CourseSettings = Backbone.Model.extend({
 
 	retrieve: function(submodel, callback) {
 		if (this.get(submodel)) callback();
-		else switch (submodel) {
-		case 'details':
-			this.set('details', new CMS.Models.Settings.CourseDetails({location: this.get('courseLocation')})).fetch({
-				success : callback
-			});
-			break;
+		else {
+			var cachethis = this;
+			switch (submodel) {
+			case 'details':
+				var details = new CMS.Models.Settings.CourseDetails({location: this.get('courseLocation')});
+				details.fetch( {
+					success : function(model) {
+						cachethis.set('details', model);
+						callback(model);
+					}
+				});
+				break;
+			case 'grading':
+				var grading = new CMS.Models.Settings.CourseGradingPolicy({course_location: this.get('courseLocation')});
+				grading.fetch( {
+					success : function(model) {
+						cachethis.set('grading', model);
+						callback(model);
+					}
+				});
+				break;
 
-		default:
-			break;
+			default:
+				break;
+			}
 		}
 	}
 })
