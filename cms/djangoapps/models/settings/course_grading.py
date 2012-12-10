@@ -123,7 +123,7 @@ class CourseGradingModel:
             
         get_modulestore(course_location).update_item(course_location, descriptor.definition['data'])
         
-        return grader
+        return CourseGradingModel.jsonize_grader(index, descriptor.raw_grader[index])
         
     @staticmethod
     def update_cutoffs_from_json(course_location, cutoffs):
@@ -219,10 +219,10 @@ class CourseGradingModel:
         # manual to clear out kruft
         result = {
                     "type" : json_grader["type"],
-                    "min_count" : json_grader.get('min_count', 0),
-                    "drop_count" : json_grader.get('drop_count', 0),
+                    "min_count" : int(json_grader.get('min_count', 0)),
+                    "drop_count" : int(json_grader.get('drop_count', 0)),
                     "short_label" : json_grader.get('short_label', None),
-                    "weight" : json_grader.get('weight', 0) / 100.0
+                    "weight" : float(json_grader.get('weight', 0)) / 100.0
                 }
             
         return result

@@ -20,12 +20,12 @@ CMS.Views.ValidatingView = Backbone.View.extend({
 		// Your subclass must populate this w/ all of the model keys and dom selectors 
 		// which may be the subjects of validation errors
 	},
-	_cacheValidationErrors : null,
+	_cacheValidationErrors : [],
 	handleValidationError : function(model, error) {
-		this._cacheValidationErrors = error;
 		// error is object w/ fields and error strings
 		for (var field in error) {
-			var ele = this.$el.find(this.fieldToSelectorMap[field]); 
+			var ele = this.$el.find('#' + this.fieldToSelectorMap[field]); 
+			this._cacheValidationErrors.push(ele);
 			if ($(ele).is('div')) {
 				// put error on the contained inputs
 				$(ele).find('input, textarea').addClass('error');
@@ -36,10 +36,9 @@ CMS.Views.ValidatingView = Backbone.View.extend({
 	},
 	
 	clearValidationErrors : function() {
-		if (this._cacheValidationErrors == null) return;
 		// error is object w/ fields and error strings
-		for (var field in this._cacheValidationErrors) {
-			var ele = this.$el.find(this.fieldToSelectorMap[field]); 
+		while (this._cacheValidationErrors.length > 0) {
+			var ele = this._cacheValidationErrors.pop(); 
 			if ($(ele).is('div')) {
 				// put error on the contained inputs
 				$(ele).find('input, textarea').removeClass('error');
@@ -47,7 +46,6 @@ CMS.Views.ValidatingView = Backbone.View.extend({
 			else $(ele).removeClass('error');
 			$(ele).nextAll('.message-error').remove();
 		}
-		this._cacheValidationErrors = null;
 	}
 })
 
@@ -194,7 +192,9 @@ CMS.Views.Settings.Details = CMS.Views.ValidatingView.extend({
 		var div = this.$el.find(this.fieldToSelectorMap[fieldName]);
 		var datefield = $(div).find(".date");
 		var timefield = $(div).find(".time");
+		var cachethis = this;
 		var savefield = function() { 
+			cachethis.clearValidationErrors();
 			cacheModel.save(fieldName, new Date(datefield.datepicker('getDate').getTime() 
 					+ timefield.timepicker("getSecondsFromMidnight") * 1000)); 
 		};
@@ -219,13 +219,16 @@ CMS.Views.Settings.Details = CMS.Views.ValidatingView.extend({
 			break;
 
 		case 'course-overview':
+			this.clearValidationErrors();
 			this.model.save('overview', $(event.currentTarget).val());
 			break;
 
 		case 'course-effort':
+			this.clearValidationErrors();
 			this.model.save('effort', $(event.currentTarget).val());
 			break;
 		case 'course-introduction-video':
+			this.clearValidationErrors();
 			var previewsource = this.model.save_videosource($(event.currentTarget).val());
 			this.$el.find(".current-course-introduction-video iframe").attr("src", previewsource);
 			break
@@ -324,15 +327,16 @@ CMS.Views.Settings.Grading = CMS.Views.ValidatingView.extend({
 		'grace_period' : 'course-grading-graceperiod'
 	},
 	updateModel : function(event) {
+		if (!this.selectorToField[event.currentTarget.id]) return;
+		
 		switch (this.selectorToField[event.currentTarget.id]) {
-		case null:
-			break;
-			
 		case 'grace_period':
+			this.clearValidationErrors();
 			this.model.save('grace_period',	$(event.currentTarget).timepicker('getTime'));
 			break;
 
 		default:
+			this.clearValidationErrors();
 			this.model.save(this.selectorToField[event.currentTarget.id], $(event.currentTarget).val());
 			break;
 		}
@@ -568,6 +572,7 @@ CMS.Views.Settings.GraderView = CMS.Views.ValidatingView.extend({
 			this.$el.find('#course-grading-assignment-droppable').attr('max', $(event.currentTarget).val());
 			// no break b/c want to use the default save
 		default:
+			this.clearValidationErrors();
 			this.model.save(this.selectorToField[event.currentTarget.id], $(event.currentTarget).val());
 			break;
 			

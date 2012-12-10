@@ -73,25 +73,27 @@ CMS.Models.Settings.CourseGrader = Backbone.Model.extend({
     		}
     	}
     	if (attrs['weight']) {
-    		if (!parseInt(attrs.weight)) {
+    		if (!isFinite(attrs.weight) || !parseInt(attrs.weight)) {
     			errors.weight = "Please enter an integer between 0 and 100.";
     		}
     		else {
     			attrs.weight = parseInt(attrs.weight); // see if this ensures value saved is int
     			if (this.collection && attrs.weight > 0) {
-    				// if get() doesn't get the value before the call, use previous()
-    				if ((this.collection.sumWeights() + attrs.weight - this.get('weight')) > 100)
-    					errors.weight = "The weights cannot add to more than 100.";
+    				// FIXME b/c saves don't update the models if validation fails, we should
+    				// either revert the field value to the one in the model and make them make room
+    				// or figure out a wholistic way to balance the vals across the whole
+//    				if ((this.collection.sumWeights() + attrs.weight - this.get('weight')) > 100)
+//    					errors.weight = "The weights cannot add to more than 100.";
     			}
     	}}
     	if (attrs['min_count']) {
-    		if (!parseInt(attrs.min_count)) {
+    		if (!isFinite(attrs.min_count) || !parseInt(attrs.min_count)) {
     			errors.min_count = "Please enter an integer.";
     		}
     		else attrs.min_count = parseInt(attrs.min_count);
     	}
     	if (attrs['drop_count']) {
-    		if (!parseInt(attrs.drop_count)) {
+    		if (!isFinite(attrs.drop_count) || !parseInt(attrs.drop_count)) {
     			errors.drop_count = "Please enter an integer.";
     		}
     		else attrs.drop_count = parseInt(attrs.drop_count);
