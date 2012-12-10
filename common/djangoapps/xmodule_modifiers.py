@@ -32,7 +32,7 @@ def wrap_xmodule(get_html, module, template, context=None):
     def _get_html():
         context.update({
             'content': get_html(),
-            'display_name' : module.metadata.get('display_name') if module.metadata is not None else None,
+            'display_name': module.lms.display_name,
             'class_': module.__class__.__name__,
             'module_name': module.js_module_name
         })

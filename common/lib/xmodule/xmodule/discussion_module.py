@@ -3,8 +3,7 @@ from pkg_resources import resource_string, resource_listdir
 
 from xmodule.x_module import XModule
 from xmodule.raw_module import RawDescriptor
-
-import json
+from .model import String, Scope
 
 class DiscussionModule(XModule):
     js = {'coffee':
@@ -12,18 +11,19 @@ class DiscussionModule(XModule):
             resource_string(__name__, 'js/src/discussion/display.coffee')]
         }
     js_module_name = "InlineDiscussion"
+
+    data = String(help="XML definition of inline discussion", scope=Scope.content)
+
     def get_html(self):
         context = {
             'discussion_id': self.discussion_id,
         }
         return self.system.render_template('discussion/_discussion_module.html', context)
 
-    def __init__(self, system, location, definition, descriptor, instance_state=None, shared_state=None, **kwargs):
-        XModule.__init__(self, system, location, definition, descriptor, instance_state, shared_state, **kwargs)
+    def __init__(self, *args, **kwargs):
+        XModule.__init__(self, *args, **kwargs)
 
-        if isinstance(instance_state, str):
-            instance_state = json.loads(instance_state)
-        xml_data = etree.fromstring(definition['data'])
+        xml_data = etree.fromstring(self.data)
         self.discussion_id = xml_data.attrib['id']
         self.title = xml_data.attrib['for']
         self.discussion_category = xml_data.attrib['discussion_category']

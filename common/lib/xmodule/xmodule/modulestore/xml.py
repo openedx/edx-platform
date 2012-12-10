@@ -192,7 +192,7 @@ class ImportSystem(XMLParsingSystem, MakoDescriptorSystem):
             xmlstore.modules[course_id][descriptor.location] = descriptor
 
             if hasattr(descriptor, 'children'):
-                for child in descriptor.children:
+                for child in descriptor.get_children():
                     parent_tracker.add_parent(child.location, descriptor.location)
             return descriptor
 
@@ -318,8 +318,6 @@ class XMLModuleStore(ModuleStoreBase):
             # Didn't load course.  Instead, save the errors elsewhere.
             self.errored_courses[course_dir] = errorlog
 
-
-
     def __unicode__(self):
         '''
         String representation - for debugging
@@ -345,8 +343,6 @@ class XMLModuleStore(ModuleStoreBase):
             log.warning(msg + " " + str(err))
         return {}
 
-
-
     def load_course(self, course_dir, tracker):
         """
         Load a course into this module store
@@ -363,7 +359,7 @@ class XMLModuleStore(ModuleStoreBase):
             # been imported into the cms from xml
             course_file = StringIO(clean_out_mako_templating(course_file.read()))
 
-            course_data = etree.parse(course_file,parser=edx_xml_parser).getroot()
+            course_data = etree.parse(course_file, parser=edx_xml_parser).getroot()
 
             org = course_data.get('org')
 

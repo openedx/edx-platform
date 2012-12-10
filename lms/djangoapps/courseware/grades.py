@@ -148,7 +148,7 @@ def grade(student, request, course, student_module_cache=None, keep_raw_scores=F
         format_scores = []
         for section in sections:
             section_descriptor = section['section_descriptor']
-            section_name = section_descriptor.metadata.get('display_name')
+            section_name = section_descriptor.display_name
 
             should_grade_section = False
             # If we haven't seen a single problem in the section, we don't have to grade it at all! We can assume 0%  
@@ -276,14 +276,14 @@ def progress_summary(student, request, course, student_module_cache):
     # Don't include chapters that aren't displayable (e.g. due to error)
     for chapter_module in course_module.get_display_items():
         # Skip if the chapter is hidden
-        hidden = chapter_module.metadata.get('hide_from_toc','false')
+        hidden = chapter_module._model_data.get('hide_from_toc','false')
         if hidden.lower() == 'true':
             continue
         
         sections = []
         for section_module in chapter_module.get_display_items():
             # Skip if the section is hidden
-            hidden = section_module.metadata.get('hide_from_toc','false')
+            hidden = section_module._model_data.get('hide_from_toc','false')
             if hidden.lower() == 'true':
                 continue
             

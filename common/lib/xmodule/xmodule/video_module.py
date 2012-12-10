@@ -9,6 +9,7 @@ from xmodule.raw_module import RawDescriptor
 from xmodule.modulestore.mongo import MongoModuleStore
 from xmodule.modulestore.django import modulestore
 from xmodule.contentstore.content import StaticContent
+from .model import Int, Scope, String
 
 log = logging.getLogger(__name__)
 
@@ -27,21 +28,19 @@ class VideoModule(XModule):
     css = {'scss': [resource_string(__name__, 'css/video/display.scss')]}
     js_module_name = "Video"
 
-    def __init__(self, system, location, definition, descriptor,
-                 instance_state=None, shared_state=None, **kwargs):
-        XModule.__init__(self, system, location, definition, descriptor,
-                         instance_state, shared_state, **kwargs)
-        xmltree = etree.fromstring(self.definition['data'])
+    data = String(help="XML data for the problem", scope=Scope.content)
+    position = Int(help="Current position in the video", scope=Scope.student_state)
+    display_name = String(help="Display name for this module", scope=Scope.settings)
+
+    def __init__(self, *args, **kwargs):
+        XModule.__init__(self, *args, **kwargs)
+
+        xmltree = etree.fromstring(self.data)
         self.youtube = xmltree.get('youtube')
         self.position = 0
         self.show_captions = xmltree.get('show_captions', 'true')
         self.source = self._get_source(xmltree)
         self.track = self._get_track(xmltree)
-
-        if instance_state is not None:
-            state = json.loads(instance_state)
-            if 'position' in state:
-                self.position = int(float(state['position']))
 
     def _get_source(self, xmltree):
         # find the first valid source
@@ -102,7 +101,7 @@ class VideoModule(XModule):
         else:
             # VS[compat]
             # cdodge: filesystem static content support.
-            caption_asset_path = "/static/{0}/subs/".format(self.metadata['data_dir'])
+            caption_asset_path = "/static/{0}/subs/".format(self.descriptor.data_dir)
 
         return self.system.render_template('video.html', {
             'streams': self.video_list(),
@@ -111,8 +110,6 @@ class VideoModule(XModule):
             'source': self.source,
             'track' : self.track,
             'display_name': self.display_name,
-            # TODO (cpennington): This won't work when we move to data that isn't on the filesystem
-            'data_dir': self.metadata['data_dir'],
             'caption_asset_path': caption_asset_path,
             'show_captions': self.show_captions
         })

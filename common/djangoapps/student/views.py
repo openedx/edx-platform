@@ -231,7 +231,7 @@ def change_enrollment(request):
         if not has_access(user, course, 'enroll'):
             return {'success': False,
                     'error': 'enrollment in {} not allowed at this time'
-                    .format(course.display_name)}
+                    .format(course.lms.display_name)}
 
         org, course_num, run=course_id.split("/")
         statsd.increment("common.student.enrollment",

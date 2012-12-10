@@ -27,7 +27,7 @@
       </div>
       <div class="main-column">
         <article class="unit-body window">
-          <p class="unit-name-input"><label>Display Name:</label><input type="text" value="${unit.display_name}" class="unit-display-name-input" /></p>
+          <p class="unit-name-input"><label>Display Name:</label><input type="text" value="${unit.lms.display_name}" class="unit-display-name-input" /></p>
           <ol class="components">
             % for id in components:
             <li class="component" data-id="${id}"/>
@@ -85,7 +85,7 @@
               % if release_date is not None:
                   on <strong>${release_date}</strong>
               % endif 
-              with the subsection <a href="${reverse('edit_subsection', kwargs={'location': subsection.location})}">"${subsection.display_name}"</a></p>
+              with the subsection <a href="${reverse('edit_subsection', kwargs={'location': subsection.location})}">"${subsection.lms.display_name}"</a></p>
             </div>
             <div class="row unit-actions">
               <a href="#" class="delete-draft delete-button">Delete Draft</a>
@@ -100,12 +100,12 @@
             <div><input type="text" class="url" value="/courseware/${section.url_name}/${subsection.url_name}" disabled /></div>
             <ol>
               <li>
-                <a href="#" class="section-item">${section.display_name}</a>
+                <a href="#" class="section-item">${section.lms.display_name}</a>
                 <ol>
                   <li>
                     <a href="${reverse('edit_subsection', args=[subsection.location])}" class="section-item">
                       <span class="folder-icon"></span>
-                      <span class="subsection-name"><span class="subsection-name-value">${subsection.display_name}</span></span>
+                      <span class="subsection-name"><span class="subsection-name-value">${subsection.lms.display_name}</span></span>
                     </a>
                     ${units.enum_units(subsection, actions=False, selected=unit.location)}
                   </li>

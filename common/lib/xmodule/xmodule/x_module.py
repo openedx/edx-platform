@@ -1,5 +1,4 @@
 import logging
-import pkg_resources
 import yaml
 import os
 import time
@@ -10,9 +9,9 @@ from collections import namedtuple
 from pkg_resources import resource_listdir, resource_string, resource_isdir
 
 from xmodule.modulestore import Location
-from .model import ModelMetaclass, String, Scope, ModuleScope, ModelType
 
-Date = ModelType
+from .model import ModelMetaclass, ParentModelMetaclass, NamespacesMetaclass, ModelType
+from .plugin import Plugin
 
 
 class Date(ModelType):
@@ -38,72 +37,15 @@ class Date(ModelType):
         """
         return time.strftime(self.time_format, value)
 
+
+class XModuleMetaclass(ParentModelMetaclass, NamespacesMetaclass, ModelMetaclass):
+    pass
+
 log = logging.getLogger('mitx.' + __name__)
 
 
 def dummy_track(event_type, event):
     pass
-
-
-class ModuleMissingError(Exception):
-    pass
-
-
-class Plugin(object):
-    """
-    Base class for a system that uses entry_points to load plugins.
-
-    Implementing classes are expected to have the following attributes:
-
-        entry_point: The name of the entry point to load plugins from
-    """
-
-    _plugin_cache = None
-
-    @classmethod
-    def load_class(cls, identifier, default=None):
-        """
-        Loads a single class instance specified by identifier. If identifier
-        specifies more than a single class, then logs a warning and returns the
-        first class identified.
-
-        If default is not None, will return default if no entry_point matching
-        identifier is found. Otherwise, will raise a ModuleMissingError
-        """
-        if cls._plugin_cache is None:
-            cls._plugin_cache = {}
-
-        if identifier not in cls._plugin_cache:
-            identifier = identifier.lower()
-            classes = list(pkg_resources.iter_entry_points(
-                    cls.entry_point, name=identifier))
-
-            if len(classes) > 1:
-                log.warning("Found multiple classes for {entry_point} with "
-                            "identifier {id}: {classes}. "
-                            "Returning the first one.".format(
-                    entry_point=cls.entry_point,
-                    id=identifier,
-                    classes=", ".join(
-                            class_.module_name for class_ in classes)))
-
-            if len(classes) == 0:
-                if default is not None:
-                    return default
-                raise ModuleMissingError(identifier)
-
-            cls._plugin_cache[identifier] = classes[0].load()
-        return cls._plugin_cache[identifier]
-
-    @classmethod
-    def load_classes(cls):
-        """
-        Returns a list of containing the identifiers and their corresponding classes for all
-        of the available instances of this plugin
-        """
-        return [(class_.name, class_.load())
-                for class_
-                in pkg_resources.iter_entry_points(cls.entry_point)]
 
 
 class HTMLSnippet(object):
@@ -179,9 +121,7 @@ class XModule(HTMLSnippet):
         See the HTML module for a simple example.
     '''
 
-    __metaclass__ = ModelMetaclass
-
-    display_name = String(help="Display name for this module", scope=Scope(student=False, module=ModuleScope.USAGE))
+    __metaclass__ = XModuleMetaclass
 
     # The default implementation of get_icon_class returns the icon_class
     # attribute of the class
@@ -244,9 +184,22 @@ class XModule(HTMLSnippet):
         self.url_name = self.location.name
         self.category = self.location.category
         self._model_data = model_data
+        self._loaded_children = None
 
-        if self.display_name is None:
-            self.display_name = self.url_name.replace('_', ' ')
+    def get_children(self):
+        '''
+        Return module instances for all the children of this module.
+        '''
+        if not self.has_children:
+            return []
+
+        if self._loaded_children is None:
+            children = [self.system.get_module(loc) for loc in self.children]
+            # get_module returns None if the current user doesn't have access
+            # to the location.
+            self._loaded_children = [c for c in children if c is not None]
+
+        return self._loaded_children
 
     def __unicode__(self):
         return '<x_module(id={0})>'.format(self.id)
@@ -257,7 +210,7 @@ class XModule(HTMLSnippet):
         immediately inside this module.
         '''
         items = []
-        for child in self.children():
+        for child in self.get_children():
             items.extend(child.displayable_items())
 
         return items
@@ -366,10 +319,8 @@ class XModuleDescriptor(Plugin, HTMLSnippet, ResourceTemplates):
     """
     entry_point = "xmodule.v1"
     module_class = XModule
-    __metaclass__ = ModelMetaclass
+    __metaclass__ = XModuleMetaclass
 
-    display_name = String(help="Display name for this module", scope=Scope(student=False, module=ModuleScope.USAGE))
-    start = Date(help="Start time when this module is visible", scope=Scope(student=False, module=ModuleScope.USAGE))
     # Attributes for inspection of the descriptor
     stores_state = False  # Indicates whether the xmodule state should be
     # stored in a database (independent of shared state)
@@ -430,8 +381,6 @@ class XModuleDescriptor(Plugin, HTMLSnippet, ResourceTemplates):
             metadata: A dictionary containing the following optional keys:
                 goals: A list of strings of learning goals associated with this
                     module
-                display_name: The name to use for displaying this module to the
-                    user
                 url_name: The name to use for this module in urls and other places
                     where a unique name is needed.
                 format: The format of this module ('Homework', 'Lab', etc)
@@ -452,12 +401,36 @@ class XModuleDescriptor(Plugin, HTMLSnippet, ResourceTemplates):
 
         self._child_instances = None
         self._inherited_metadata = set()
+        self._child_instances = None
+
+    def get_children(self):
+        """Returns a list of XModuleDescriptor instances for the children of
+        this module"""
+        if not self.has_children:
+            return []
+
+        if self._child_instances is None:
+            self._child_instances = []
+            for child_loc in self.children:
+                try:
+                    child = self.system.load_item(child_loc)
+                except ItemNotFoundError:
+                    log.exception('Unable to load item {loc}, skipping'.format(loc=child_loc))
+                    continue
+                # TODO (vshnayder): this should go away once we have
+                # proper inheritance support in mongo.  The xml
+                # datastore does all inheritance on course load.
+                #child.inherit_metadata(self.metadata)
+                self._child_instances.append(child)
+
+        return self._child_instances
+
 
     def get_child_by_url_name(self, url_name):
         """
         Return a child XModuleDescriptor with the specified url_name, if it exists, and None otherwise.
         """
-        for c in self.children:
+        for c in self.get_children():
             if c.url_name == url_name:
                 return c
         return None
@@ -472,7 +445,7 @@ class XModuleDescriptor(Plugin, HTMLSnippet, ResourceTemplates):
             system,
             self.location,
             self,
-            system.xmodule_model_data(self.model_data),
+            system.xmodule_model_data(self._model_data),
         )
     
     def has_dynamic_children(self):
@@ -686,6 +659,7 @@ class ModuleSystem(object):
                  get_module,
                  render_template,
                  replace_urls,
+                 xmodule_model_data,
                  user=None,
                  filestore=None,
                  debug=False,
@@ -739,6 +713,7 @@ class ModuleSystem(object):
         self.node_path = node_path
         self.anonymous_student_id = anonymous_student_id
         self.user_is_staff = user is not None and user.is_staff
+        self.xmodule_model_data = xmodule_model_data
 
     def get(self, attr):
         '''	provide uniform access to attributes (like etree).'''
@@ -747,9 +722,6 @@ class ModuleSystem(object):
     def set(self, attr, val):
         '''provide uniform access to attributes (like etree)'''
         self.__dict__[attr] = val
-
-    def xmodule_module_data(self, module_data):
-        return module_data
 
     def __repr__(self):
         return repr(self.__dict__)

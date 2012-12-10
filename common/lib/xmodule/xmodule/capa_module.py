@@ -21,8 +21,6 @@ from xmodule.raw_module import RawDescriptor
 from xmodule.exceptions import NotFoundError
 from .model import Int, Scope, ModuleScope, ModelType, String, Boolean, Object, Float
 
-Date = Timedelta = ModelType
-
 log = logging.getLogger("mitx.courseware")
 
 #-----------------------------------------------------------------------------
@@ -45,25 +43,34 @@ def only_one(lst, default="", process=lambda x: x):
         raise Exception('Malformed XML: expected at most one element in list.')
 
 
-def parse_timedelta(time_str):
-    """
-    time_str: A string with the following components:
-        <D> day[s] (optional)
-        <H> hour[s] (optional)
-        <M> minute[s] (optional)
-        <S> second[s] (optional)
+class Timedelta(ModelType):
+    def from_json(self, time_str):
+        """
+        time_str: A string with the following components:
+            <D> day[s] (optional)
+            <H> hour[s] (optional)
+            <M> minute[s] (optional)
+            <S> second[s] (optional)
 
-    Returns a datetime.timedelta parsed from the string
-    """
-    parts = TIMEDELTA_REGEX.match(time_str)
-    if not parts:
-        return
-    parts = parts.groupdict()
-    time_params = {}
-    for (name, param) in parts.iteritems():
-        if param:
-            time_params[name] = int(param)
-    return timedelta(**time_params)
+        Returns a datetime.timedelta parsed from the string
+        """
+        parts = TIMEDELTA_REGEX.match(time_str)
+        if not parts:
+            return
+        parts = parts.groupdict()
+        time_params = {}
+        for (name, param) in parts.iteritems():
+            if param:
+                time_params[name] = int(param)
+        return timedelta(**time_params)
+
+    def to_json(self, value):
+        values = []
+        for attr in ('days', 'hours', 'minutes', 'seconds'):
+            cur_value = getattr(value, attr, 0)
+            if cur_value > 0:
+                values.append("%d %s" % (cur_value, attr))
+        return ' '.join(values)
 
 
 class ComplexEncoder(json.JSONEncoder):
@@ -82,7 +89,7 @@ class CapaModule(XModule):
 
     attempts = Int(help="Number of attempts taken by the student on this problem", default=0, scope=Scope.student_state)
     max_attempts = Int(help="Maximum number of attempts that a student is allowed", scope=Scope.settings)
-    due = Date(help="Date that this problem is due by", scope=Scope.settings)
+    due = String(help="Date that this problem is due by", scope=Scope.settings)
     graceperiod = Timedelta(help="Amount of time after the due date that submissions will be accepted", scope=Scope.settings)
     show_answer = String(help="When to show the problem answer to the student", scope=Scope.settings, default="closed")
     force_save_button = Boolean(help="Whether to force the save button to appear on the page", scope=Scope.settings)
@@ -90,6 +97,7 @@ class CapaModule(XModule):
     data = String(help="XML data for the problem", scope=Scope.content)
     correct_map = Object(help="Dictionary with the correctness of current student answers", scope=Scope.student_state)
     done = Boolean(help="Whether the student has answered the problem", scope=Scope.student_state)
+    display_name = String(help="Display name for this module", scope=Scope.settings)
 
     js = {'coffee': [resource_string(__name__, 'js/src/capa/display.coffee'),
                      resource_string(__name__, 'js/src/collapsible.coffee'),
@@ -104,8 +112,13 @@ class CapaModule(XModule):
     def __init__(self, system, location, descriptor, model_data):
         XModule.__init__(self, system, location, descriptor, model_data)
 
-        if self.graceperiod is not None and self.due:
-            self.close_date = self.due + self.graceperiod
+        if self.due:
+            due_date = dateutil.parser.parse(self.due)
+        else:
+            due_date = None
+
+        if self.graceperiod is not None and due_date:
+            self.close_date = due_date + self.graceperiod
             #log.debug("Then parsed " + grace_period_string +
             #          " to closing date" + str(self.close_date))
         else:

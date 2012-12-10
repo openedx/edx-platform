@@ -8,7 +8,7 @@
       <div>${module_type}</div>
       <div>
         % for template in module_templates:
-        <a class="save" data-template-id="${template.location.url()}">${template.display_name}</a>
+        <a class="save" data-template-id="${template.location.url()}">${template.lms.display_name}</a>
         % endfor
       </div>
     </div>

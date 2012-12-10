@@ -8,7 +8,7 @@
         % if context_course:
           <% ctx_loc = context_course.location %>
           <a href="/" class="home"><span class="small-home-icon"></span></a> › 
-          <a href="${reverse('course_index', kwargs=dict(org=ctx_loc.org, course=ctx_loc.course, name=ctx_loc.name))}" class="class-name">${context_course.display_name}</a> ›
+          <a href="${reverse('course_index', kwargs=dict(org=ctx_loc.org, course=ctx_loc.course, name=ctx_loc.name))}" class="class-name">${context_course.lms.display_name}</a> ›
         % endif
       </div>
 

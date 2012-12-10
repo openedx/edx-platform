@@ -40,6 +40,6 @@ setup(
             "static_tab = xmodule.html_module:StaticTabDescriptor",
             "custom_tag_template = xmodule.raw_module:RawDescriptor",
             "about = xmodule.html_module:AboutDescriptor"
-        ]
+        ],
     }
 )

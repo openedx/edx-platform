@@ -132,9 +132,9 @@
 
             <div class="item-details" data-id="${section.location}">
               <h3 class="section-name">
-                <span data-tooltip="Edit this section's name" class="section-name-span">${section.display_name}</span>
+                <span data-tooltip="Edit this section's name" class="section-name-span">${section.lms.display_name}</span>
                 <form class="section-name-edit" style="display:none">
-                  <input type="text" value="${section.display_name}" class="edit-section-name" autocomplete="off"/>
+                  <input type="text" value="${section.lms.display_name}" class="edit-section-name" autocomplete="off"/>
                   <input type="submit" class="save-button edit-section-name-save" value="Save" />
                   <input type="button" class="cancel-button edit-section-name-cancel" value="Cancel" />
                 </form>
@@ -174,7 +174,7 @@
                     <a href="#" data-tooltip="Expand/collapse this subsection" class="expand-collapse-icon expand"></a>
                     <a href="${reverse('edit_subsection', args=[subsection.location])}">
                       <span class="folder-icon"></span>
-                      <span class="subsection-name"><span class="subsection-name-value">${subsection.display_name}</span></span>
+                      <span class="subsection-name"><span class="subsection-name-value">${subsection.lms.display_name}</span></span>
                     </a>
                   </div>
                   

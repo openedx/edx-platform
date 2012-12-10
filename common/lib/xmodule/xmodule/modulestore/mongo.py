@@ -1,6 +1,5 @@
 import pymongo
 import sys
-import logging
 
 from bson.son import SON
 from fs.osfs import OSFS
@@ -9,8 +8,8 @@ from path import path
 
 from importlib import import_module
 from xmodule.errortracker import null_error_tracker, exc_info_to_str
-from xmodule.x_module import XModuleDescriptor
 from xmodule.mako_module import MakoDescriptorSystem
+from xmodule.x_module import XModuleDescriptor
 from xmodule.error_module import ErrorDescriptor
 
 from . import ModuleStoreBase, Location

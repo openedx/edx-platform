@@ -15,6 +15,7 @@ from .html_checker import check_html
 from xmodule.modulestore import Location
 
 from xmodule.contentstore.content import XASSET_SRCREF_PREFIX, StaticContent
+from .model import Scope, String
 
 log = logging.getLogger("mitx.courseware")
 
@@ -26,15 +27,11 @@ class HtmlModule(XModule):
                     ]
          }
     js_module_name = "HTMLModule"
+
+    data = String(help="Html contents to display for this module", scope=Scope.content)
     
     def get_html(self):
-        return self.html
-
-    def __init__(self, system, location, definition, descriptor,
-                 instance_state=None, shared_state=None, **kwargs):
-        XModule.__init__(self, system, location, definition, descriptor,
-                         instance_state, shared_state, **kwargs)
-        self.html = self.definition['data']
+        return self.data
 
 
 

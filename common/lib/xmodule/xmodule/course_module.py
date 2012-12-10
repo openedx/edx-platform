@@ -13,8 +13,7 @@ import time
 import copy
 
 from .model import Scope, ModelType, List, String, Object, Boolean
-
-Date = ModelType
+from .x_module import Date
 
 log = logging.getLogger(__name__)
 
@@ -31,6 +30,10 @@ class CourseDescriptor(SequenceDescriptor):
     end = Date(help="Date that this class ends", scope=Scope.settings)
     advertised_start = Date(help="Date that this course is advertised to start", scope=Scope.settings)
     grading_policy = Object(help="Grading policy definition for this class", scope=Scope.content)
+    show_calculator = Boolean(help="Whether to show the calculator in this course", default=False, scope=Scope.settings)
+    start = Date(help="Start time when this module is visible", scope=Scope.settings)
+    display_name = String(help="Display name for this module", scope=Scope.settings)
+    has_children = True
 
     info_sidebar_name = String(scope=Scope.settings, default='Course Handouts')
     
@@ -342,10 +345,6 @@ class CourseDescriptor(SequenceDescriptor):
     def tabs(self, value):
         self.metadata['tabs'] = value
 
-    @property
-    def show_calculator(self):
-        return self.metadata.get("show_calculator", None) == "Yes"
-
     @lazyproperty
     def grading_context(self):
         """
@@ -433,6 +432,7 @@ class CourseDescriptor(SequenceDescriptor):
 
     @property
     def start_date_text(self):
+        print self.advertised_start, self.start
         return time.strftime("%b %d, %Y", self.advertised_start or self.start)
 
     @property

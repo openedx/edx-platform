@@ -115,7 +115,7 @@ def index(request):
 
     return render_to_response('index.html', {
         'new_course_template' : Location('i4x', 'edx', 'templates', 'course', 'Empty'),
-        'courses': [(course.metadata.get('display_name'),
+        'courses': [(course.title,
                     reverse('course_index', args=[
                         course.location.org,
                         course.location.course,
@@ -269,7 +269,7 @@ def edit_unit(request, location):
     for template in templates:
         if template.location.category in COMPONENT_TYPES:
             component_templates[template.location.category].append((
-                template.display_name,
+                template.lms.display_name,
                 template.location.url(),
             ))
 

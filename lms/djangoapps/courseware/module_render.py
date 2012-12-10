@@ -88,8 +88,7 @@ def toc_for_course(user, request, course, active_chapter, active_section):
 
     chapters = list()
     for chapter in course_module.get_display_items():
-        hide_from_toc = chapter.metadata.get('hide_from_toc','false').lower() == 'true'
-        if hide_from_toc:
+        if chapter.lms.hide_from_toc:
             continue
 
         sections = list()
@@ -97,18 +96,17 @@ def toc_for_course(user, request, course, active_chapter, active_section):
 
             active = (chapter.url_name == active_chapter and
                       section.url_name == active_section)
-            hide_from_toc = section.metadata.get('hide_from_toc', 'false').lower() == 'true'
 
-            if not hide_from_toc:
-                sections.append({'display_name': section.display_name,
+            if not section.lms.hide_from_toc:
+                sections.append({'display_name': section.lms.display_name,
                                  'url_name': section.url_name,
-                                 'format': section.metadata.get('format', ''),
-                                 'due': section.metadata.get('due', ''),
+                                 'format': section.lms.format,
+                                 'due': section.lms.due,
                                  'active': active,
-                                 'graded': section.metadata.get('graded', False),
+                                 'graded': section.lms.graded,
                                  })
 
-        chapters.append({'display_name': chapter.display_name,
+        chapters.append({'display_name': chapter.lms.display_name,
                          'url_name': chapter.url_name,
                          'sections': sections,
                          'active': chapter.url_name == active_chapter})
@@ -146,7 +144,8 @@ def get_module(user, request, location, student_module_cache, course_id, positio
         log.exception("Error in get_module")
         return None
 
-def _get_module(user, request, location, student_module_cache, course_id, position=None, wrap_xmodule_display = True):
+
+def _get_module(user, request, location, student_module_cache, course_id, position=None, wrap_xmodule_display=True):
     """
     Actually implement get_module.  See docstring there for details.
     """
@@ -268,7 +267,7 @@ def _get_module(user, request, location, student_module_cache, course_id, positi
 
     module.get_html = replace_static_urls(
         _get_html,
-        module.metadata['data_dir'] if 'data_dir' in module.metadata else '', 
+        getattr(module, 'data_dir', ''),
         course_namespace = module.location._replace(category=None, name=None))
 
     # Allow URLs of the form '/course/' refer to the root of multicourse directory

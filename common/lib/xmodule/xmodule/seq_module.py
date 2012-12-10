@@ -8,6 +8,7 @@ from xmodule.xml_module import XmlDescriptor
 from xmodule.x_module import XModule
 from xmodule.progress import Progress
 from xmodule.exceptions import NotFoundError
+from .model import Int, Scope
 from pkg_resources import resource_string
 
 log = logging.getLogger("mitx.common.lib.seq_module")
@@ -16,6 +17,12 @@ log = logging.getLogger("mitx.common.lib.seq_module")
 # OBSOLETE: This obsoletes 'type'
 class_priority = ['video', 'problem']
 
+def display_name(module):
+    if hasattr(module, 'display_name'):
+        return module.display_name
+
+    if hasattr(module, 'lms'):
+        return module.lms.display_name
 
 class SequenceModule(XModule):
     ''' Layout module which lays out content in a temporal sequence
@@ -26,22 +33,18 @@ class SequenceModule(XModule):
     css = {'scss': [resource_string(__name__, 'css/sequence/display.scss')]}
     js_module_name = "Sequence"
 
-    def __init__(self, system, location, definition, descriptor, instance_state=None,
-                 shared_state=None, **kwargs):
-        XModule.__init__(self, system, location, definition, descriptor,
-                         instance_state, shared_state, **kwargs)
-        # NOTE: Position is 1-indexed.  This is silly, but there are now student
-        # positions saved on prod, so it's not easy to fix.
-        self.position = 1
+    has_children = True
 
-        if instance_state is not None:
-            state = json.loads(instance_state)
-            if 'position' in state:
-                self.position = int(state['position'])
+    # NOTE: Position is 1-indexed.  This is silly, but there are now student
+    # positions saved on prod, so it's not easy to fix.
+    position = Int(help="Last tab viewed in this sequence", default=1, scope=Scope.student_state)
+
+    def __init__(self, *args, **kwargs):
+        XModule.__init__(self, *args, **kwargs)
 
         # if position is specified in system, then use that instead
-        if system.get('position'):
-            self.position = int(system.get('position'))
+        if self.system.get('position'):
+            self.position = int(self.system.get('position'))
 
         self.rendered = False
 
@@ -79,9 +82,9 @@ class SequenceModule(XModule):
             childinfo = {
                 'content': child.get_html(),
                 'title': "\n".join(
-                    grand_child.display_name.strip()
+                    display_name(grand_child)
                     for grand_child in child.get_children()
-                    if 'display_name'  in grand_child.metadata
+                    if display_name(grand_child) is not None
                 ),
                 'progress_status': Progress.to_js_status_str(progress),
                 'progress_detail': Progress.to_js_detail_str(progress),
@@ -89,7 +92,7 @@ class SequenceModule(XModule):
                 'id': child.id,
             }
             if childinfo['title']=='':
-                childinfo['title'] = child.metadata.get('display_name','')
+                childinfo['title'] = display_name(child)
             contents.append(childinfo)
 
         params = {'items': contents,
@@ -116,7 +119,8 @@ class SequenceDescriptor(MakoModuleDescriptor, XmlDescriptor):
     mako_template = 'widgets/sequence-edit.html'
     module_class = SequenceModule
 
-    stores_state = True # For remembering where in the sequence the student is
+    has_children = True
+    stores_state = True  # For remembering where in the sequence the student is
 
     js = {'coffee': [resource_string(__name__, 'js/src/sequence/edit.coffee')]}
     js_module_name = "SequenceDescriptor"
