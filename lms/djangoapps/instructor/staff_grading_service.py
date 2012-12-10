@@ -89,7 +89,9 @@ class StaffGradingService(object):
         Returns the result of operation().  Does not catch exceptions.
         """
         response = operation()
-        if (response.status_code == 302):
+        if (response.json
+            and response.json.get('success') == False
+            and response.json.get('error') == 'login_required'):
             # apparrently we aren't logged in.  Try to fix that.
             r = self._login()
             if r and not r.get('success'):
@@ -116,7 +118,7 @@ class StaffGradingService(object):
         Raises:
             GradingServiceError: something went wrong with the connection.
         """
-        op = lambda: self.session.get(self.get_problem_list_url, 
+        op = lambda: self.session.get(self.get_problem_list_url,
                                         allow_redirects = False,
                                         params={'course_id': course_id,
                                             'grader_id': grader_id})
