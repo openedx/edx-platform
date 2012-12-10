@@ -2,7 +2,10 @@
 // define() functions from Require JS available inside the anonymous function.
 (function (requirejs, require, define) {
 
-define('GstMain', ['State', 'logme', 'GeneralMethods', 'Sliders'], function (State, logme, GeneralMethods, Sliders) {
+define(
+    'GstMain',
+    ['State', 'logme', 'GeneralMethods', 'Sliders', 'Graph'],
+    function (State, logme, GeneralMethods, Sliders, Graph) {
     logme(GeneralMethods);
 
     return GstMain;
@@ -15,6 +18,8 @@ define('GstMain', ['State', 'logme', 'GeneralMethods', 'Sliders'], function (Sta
         state = State(gstId, config);
 
         Sliders(gstId, config, state);
+
+        Graph(gstId, state);
     }
 });
 

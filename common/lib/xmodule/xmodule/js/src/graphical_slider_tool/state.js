@@ -76,6 +76,8 @@ define('State', ['logme'], function (logme) {
         }
 
         function setConstValue(constName, constValue) {
+            var plotDiv;
+
             if (constants.hasOwnProperty(constName) === false) {
                 // If the name of the constant is not tracked by state, return an
                 // 'undefined' value.
@@ -90,6 +92,12 @@ define('State', ['logme'], function (logme) {
             constants[constName] = parseFloat(constValue);
 
             logme('From setConstValue: new value for "' + constName + '" is ' + constValue);
+
+            plotDiv = $('#' + gstId + '_plot');
+
+            if (plotDiv.length === 1) {
+                plotDiv.trigger('update_plot', [gstId]);
+            }
         }
 
         function addConstFromInput(obj) {

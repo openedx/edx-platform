@@ -30,7 +30,7 @@ class GraphicalSliderToolModule(XModule):
         resource_string(__name__, 'js/src/graphical_slider_tool/logme.js'),
         resource_string(__name__, 'js/src/graphical_slider_tool/general_methods.js'),
         resource_string(__name__, 'js/src/graphical_slider_tool/sliders.js'),
-        resource_string(__name__, 'js/src/graphical_slider_tool/mod5.js'),
+        resource_string(__name__, 'js/src/graphical_slider_tool/graph.js'),
 
         resource_string(__name__, 'js/src/graphical_slider_tool/gst.js')
       ]
