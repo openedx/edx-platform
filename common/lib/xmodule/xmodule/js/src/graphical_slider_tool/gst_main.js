@@ -2,11 +2,19 @@
 // define() functions from Require JS available inside the anonymous function.
 (function (requirejs, require, define) {
 
-define('GstMain', ['mod1', 'mod2', 'mod3', 'mod4'], function (mod1, mod2, mod3, mod4) {
+define('GstMain', ['State', 'logme', 'GeneralMethods', 'Sliders'], function (State, logme, GeneralMethods, Sliders) {
+    logme(GeneralMethods);
+
     return GstMain;
 
     function GstMain(gstId) {
-        console.log('The DOM ID of the current GST element is ' + gstId);
+        var config, state;
+
+        config = JSON.parse($('#' + gstId + '_json').html()).root;
+
+        state = State(gstId, config);
+
+        Sliders(gstId, config, state);
     }
 });
 

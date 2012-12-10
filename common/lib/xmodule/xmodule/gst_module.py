@@ -26,10 +26,10 @@ class GraphicalSliderToolModule(XModule):
     js = {
       'js': [
         resource_string(__name__, 'js/src/graphical_slider_tool/gst_main.js'),
-        resource_string(__name__, 'js/src/graphical_slider_tool/mod1.js'),
-        resource_string(__name__, 'js/src/graphical_slider_tool/mod2.js'),
-        resource_string(__name__, 'js/src/graphical_slider_tool/mod3.js'),
-        resource_string(__name__, 'js/src/graphical_slider_tool/mod4.js'),
+        resource_string(__name__, 'js/src/graphical_slider_tool/state.js'),
+        resource_string(__name__, 'js/src/graphical_slider_tool/logme.js'),
+        resource_string(__name__, 'js/src/graphical_slider_tool/general_methods.js'),
+        resource_string(__name__, 'js/src/graphical_slider_tool/sliders.js'),
         resource_string(__name__, 'js/src/graphical_slider_tool/mod5.js'),
 
         resource_string(__name__, 'js/src/graphical_slider_tool/gst.js')
@@ -128,7 +128,7 @@ class GraphicalSliderToolModule(XModule):
         Simple variant: slider and plot controls are not inside any tag.
         """
         #substitute plot
-        plot_div = '<div class="${element_class}_plot" id="${element_id}_plot" \
+        plot_div = '<div class="' + self.html_class + '_plot" id="' + self.html_id + '_plot" \
         style="width: 600px; height: 600px; padding: 0px; position: relative;"> \
         This is plot</div>'
         html_string = html_string.replace('$plot$', plot_div)
@@ -139,7 +139,7 @@ class GraphicalSliderToolModule(XModule):
             sliders = [sliders]
         vars = [x['@var'] for x in sliders]
 
-        slider_div = '<div class="{element_class}_slider" id="{element_id}_{var}" \
+        slider_div = '<div class="{element_class}_slider" id="{element_id}_slider_{var}" \
         data-var="{var}">This is slider</div>'
 
         for var in vars:
@@ -155,7 +155,7 @@ class GraphicalSliderToolModule(XModule):
             inputs = [inputs]
         vars = [x['@var'] for x in inputs]
 
-        input_div = '<div class="{element_class}_input" id="{element_id}_{var}" \
+        input_div = '<div class="{element_class}_input" id="{element_id}_input_{var}" \
         data-var="{var}">This is input</div>'
 
         for var in vars:

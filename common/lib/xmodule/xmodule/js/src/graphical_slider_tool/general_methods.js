@@ -2,9 +2,16 @@
 // define() functions from Require JS available inside the anonymous function.
 (function (requirejs, require, define) {
 
-define('mod4', [], function () {
-    console.log('we are in the mod4 callback');
+define('GeneralMethods', [], function () {
+    if (!String.prototype.trim) {
+        // http://blog.stevenlevithan.com/archives/faster-trim-javascript
+        String.prototype.trim = function trim(str) {
+            return str.replace(/^\s\s*/, '').replace(/\s\s*$/, '');
+        };
+    }
+
     return {
+        'module_name': 'GeneralMethods',
         'module_status': 'OK'
     };
 });
