@@ -40,6 +40,11 @@ def i_am_on_the_courses_page(step):
     world.browser.visit(django_url('/courses'))
     assert world.browser.is_element_present_by_css('section.courses')
 
+@step(u'I press the "([^"]*)" button$')
+def and_i_press_the_button(step, value):
+    button_css = 'input[value="%s"]' % value
+    world.browser.find_by_css(button_css).first.click()
+
 @step('I should see that the path is "([^"]*)"$')
 def i_should_see_that_the_path_is(step, path):
     assert world.browser.url == django_url(path)
@@ -67,6 +72,14 @@ def i_am_registered_for_a_course(step):
 def i_am_registered_for_course_by_id(step, course_id):
     create_user('robot')
     u = User.objects.get(username='robot')
+    CourseEnrollment.objects.get_or_create(user=u, course_id=course_id)
+
+@step('I am staff for course "([^"]*)"$')
+def i_am_staff_for_course_by_id(step, course_id):
+    create_user('robot')
+    u = User.objects.get(username='robot')
+    u.is_staff=True
+    u.save()
     CourseEnrollment.objects.get_or_create(user=u, course_id=course_id)
 
 @step('I log in$')
