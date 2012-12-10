@@ -29,16 +29,21 @@ class MockStaffGradingService(object):
     def __init__(self):
         self.cnt = 0
 
-    def get_next(self, course_id, grader_id):
+    def get_next(self,course_id, location, grader_id):
         self.cnt += 1
         return json.dumps({'success': True,
                            'submission_id': self.cnt,
                            'submission': 'Test submission {cnt}'.format(cnt=self.cnt),
+                           'num_graded': 3,
+                           'min_for_ml': 5,
+                           'num_pending': 4,
+                           'prompt': 'This is a fake prompt',
+                           'ml_error_info': 'ML info',
                            'max_score': 2 + self.cnt % 3,
                            'rubric': 'A rubric'})
 
     def save_grade(self, course_id, grader_id, submission_id, score, feedback):
-        return self.get_next(course_id, grader_id)
+        return self.get_next(course_id, 'fake location', grader_id)
 
 
 class StaffGradingService(object):
@@ -53,6 +58,7 @@ class StaffGradingService(object):
         self.login_url = self.url + '/login/'
         self.get_next_url = self.url + '/get_next_submission/'
         self.save_grade_url = self.url + '/save_grade/'
+        self.get_problem_list_url = self.url + '/get_problem_list/'
 
         self.session = requests.session()
 
@@ -96,13 +102,43 @@ class StaffGradingService(object):
 
         return response
 
+    def get_problem_list(self, course_id, grader_id):
+        """
+        Get the list of problems for a given course.
 
-    def get_next(self, course_id, grader_id):
+        Args:
+            course_id: course id that we want the problems of
+            grader_id: who is grading this?  The anonymous user_id of the grader.
+
+        Returns:
+            json string with the response from the service.  (Deliberately not
+            writing out the fields here--see the docs on the staff_grading view
+            in the grading_controller repo)
+
+        Raises:
+            GradingServiceError: something went wrong with the connection.
+        """
+        op = lambda: self.session.get(self.get_problem_list_url,
+                                        allow_redirects = False,
+                                        params={'course_id': course_id,
+                                            'grader_id': grader_id})
+        try:
+            r = self._try_with_login(op)
+        except (RequestException, ConnectionError, HTTPError) as err:
+            # reraise as promised GradingServiceError, but preserve stacktrace.
+            raise GradingServiceError, str(err), sys.exc_info()[2]
+
+        return r.text
+
+
+    def get_next(self, course_id, location, grader_id):
         """
         Get the next thing to grade.
 
         Args:
-            course_id: course id to get submission for
+            course_id: the course that this problem belongs to
+            location: location of the problem that we are grading and would like the
+                next submission for
             grader_id: who is grading this?  The anonymous user_id of the grader.
 
         Returns:
@@ -115,7 +151,7 @@ class StaffGradingService(object):
         """
         op = lambda: self.session.get(self.get_next_url,
                                       allow_redirects=False,
-                                      params={'course_id': course_id,
+                                      params={'location': location,
                                               'grader_id': grader_id})
         try:
             r = self._try_with_login(op)
@@ -198,7 +234,8 @@ def _check_access(user, course_id):
 
 def get_next(request, course_id):
     """
-    Get the next thing to grade for course_id.
+    Get the next thing to grade for course_id and with the location specified
+    in the .
 
     Returns a json dict with the following keys:
 
@@ -218,17 +255,45 @@ def get_next(request, course_id):
     """
     _check_access(request.user, course_id)
 
-    return HttpResponse(_get_next(course_id, request.user.id),
+    required = set(['location'])
+    if request.method != 'POST':
+        raise Http404
+    actual = set(request.POST.keys())
+    missing = required - actual
+    if len(missing) > 0:
+        return _err_response('Missing required keys {0}'.format(
+            ', '.join(missing)))
+    grader_id = request.user.id
+    p = request.POST
+    location = p['location']
+
+    return HttpResponse(_get_next(course_id, request.user.id, location),
                         mimetype="application/json")
 
 
-def _get_next(course_id, grader_id):
+def get_problem_list(request, course_id):
+    """
+    Get all the problems for the given course id
+    TODO: fill in all of this stuff
+    """
+    _check_access(request.user, course_id)
+    try:
+        response = grading_service().get_problem_list(course_id, request.user.id)
+        return HttpResponse(response,
+                mimetype="application/json")
+    except GradingServiceError:
+        log.exception("Error from grading service.  server url: {0}"
+                      .format(grading_service().url))
+        return HttpResponse(json.dumps({'success': False,
+                           'error': 'Could not connect to grading service'}))
+
+
+def _get_next(course_id, grader_id, location):
     """
     Implementation of get_next (also called from save_grade) -- returns a json string
     """
-
     try:
-        return grading_service().get_next(course_id, grader_id)
+        return grading_service().get_next(course_id, location, grader_id)
     except GradingServiceError:
         log.exception("Error from grading service.  server url: {0}"
                       .format(grading_service().url))
@@ -255,15 +320,17 @@ def save_grade(request, course_id):
     if request.method != 'POST':
         raise Http404
 
-    required = set('score', 'feedback', 'submission_id')
+    required = set(['score', 'feedback', 'submission_id', 'location'])
     actual = set(request.POST.keys())
+    log.debug(actual)
     missing = required - actual
-    if len(missing) != 0:
+    if len(missing) > 0:
         return _err_response('Missing required keys {0}'.format(
             ', '.join(missing)))
 
     grader_id = request.user.id
     p = request.POST
+    location = p['location']
 
     try:
         result_json = grading_service().save_grade(course_id,
@@ -286,6 +353,6 @@ def save_grade(request, course_id):
         return _err_response('Grading service failed')
 
     # Ok, save_grade seemed to work.  Get the next submission to grade.
-    return HttpResponse(_get_next(course_id, grader_id),
+    return HttpResponse(_get_next(course_id, grader_id, location),
                         mimetype="application/json")
 

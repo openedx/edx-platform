@@ -236,6 +236,7 @@ class TestStaffGradingService(ct.PageLoader):
         self.student = 'view@test.com'
         self.instructor = 'view2@test.com'
         self.password = 'foo'
+        self.location = 'TestLocation'
         self.create_account('u1', self.student, self.password)
         self.create_account('u2', self.instructor, self.password)
         self.activate_user(self.student)
@@ -271,8 +272,9 @@ class TestStaffGradingService(ct.PageLoader):
         self.login(self.instructor, self.password)
 
         url = reverse('staff_grading_get_next', kwargs={'course_id': self.course_id})
+        data = {'location': self.location}
 
-        r = self.check_for_get_code(200, url)
+        r = self.check_for_post_code(200, url, data)
         d = json.loads(r.content)
         self.assertTrue(d['success'])
         self.assertEquals(d['submission_id'], self.mock_service.cnt)
@@ -285,7 +287,8 @@ class TestStaffGradingService(ct.PageLoader):
 
         data = {'score': '12',
                 'feedback': 'great!',
-                'submission_id': '123'}
+                'submission_id': '123',
+                'location': self.location}
         r = self.check_for_post_code(200, url, data)
         d = json.loads(r.content)
         self.assertTrue(d['success'], str(d))
