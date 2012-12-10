@@ -121,7 +121,20 @@ define('Graph', [], function () {
         }
 
         function updatePlot() {
-            $.plot(plotDiv, dataSets);
+            $.plot(
+                plotDiv,
+                dataSets,
+                {
+                    'xaxis': {
+                        'min': 0,
+                        'max': 30
+                    },
+                    'yaxis': {
+                        'min': -5,
+                        'max': 5
+                    }
+                }
+            );
         }
     }
 });
