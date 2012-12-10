@@ -55,3 +55,4 @@ dogstatsd-python
 # MySQL-python
 sphinx
 Shapely
+ipython
