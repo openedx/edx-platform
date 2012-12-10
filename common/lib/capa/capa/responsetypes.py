@@ -1852,6 +1852,10 @@ class OpenEndedResponse(LoncapaResponse):
         oeparam = self.xml.find('openendedparam')
         prompt = self.xml.find('prompt')
         rubric = self.xml.find('openendedrubric')
+
+        if not oeparam or not prompt or not rubric:
+            raise ValueError("openendedresponse missing required parameters.")
+
         self._parse(oeparam, prompt, rubric)
 
     @staticmethod
@@ -1861,7 +1865,7 @@ class OpenEndedResponse(LoncapaResponse):
         in order to avoid capa depending on xmodule (seems to be avoided in
         code)
         """
-        parts=[node.text]
+        parts=[node.text if node.text is not None else '']
         for p in node.getchildren():
             parts.append(etree.tostring(p, with_tail=True, encoding='unicode'))
 
