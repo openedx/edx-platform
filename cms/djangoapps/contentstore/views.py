@@ -1006,6 +1006,7 @@ def course_grader_updates(request, org, course, name, grader_index=None):
     elif real_method == "DELETE":
         # ??? Shoudl this return anything? Perhaps success fail? 
         CourseGradingModel.delete_grader(Location(['i4x', org, course, 'course',name]), grader_index)
+        return HttpResponse()
     elif request.method == 'POST': # post or put, doesn't matter.
         return HttpResponse(json.dumps(CourseGradingModel.update_grader_from_json(Location(['i4x', org, course, 'course',name]), request.POST)),
                             mimetype="application/json")

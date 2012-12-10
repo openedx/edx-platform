@@ -41,8 +41,8 @@ class CourseGradingModel:
         descriptor = get_modulestore(course_location).get_item(course_location)
         # # ??? it would be good if these had the course_location in them so that they stand alone sufficiently
         # # but that would require not using CourseDescriptor's field directly. Opinions?
-        
-        # FIXME how do I tell it to ignore index? Is there another iteration mech I should use?
+
+        index = int(index)        
         if len(descriptor.raw_grader) > index: 
             return CourseGradingModel.jsonize_grader(index, descriptor.raw_grader[index])
             
@@ -113,7 +113,7 @@ class CourseGradingModel:
         # # but that would require not using CourseDescriptor's field directly. Opinions?
 
         # parse removes the id; so, grab it before parse        
-        index = grader.get('id', None)
+        index = int(grader.get('id', len(descriptor.raw_grader)))
         grader = CourseGradingModel.parse_grader(grader)
 
         if index < len(descriptor.raw_grader):
@@ -172,8 +172,11 @@ class CourseGradingModel:
             course_location = Location(course_location)
         
         descriptor = get_modulestore(course_location).get_item(course_location)
+        index = int(index)        
         if index < len(descriptor.raw_grader):
             del descriptor.raw_grader[index]
+            # force propagation to defintion
+            descriptor.raw_grader = descriptor.raw_grader
             get_modulestore(course_location).update_item(course_location, descriptor.definition['data'])
         
     # NOTE cannot delete cutoffs. May be useful to reset 

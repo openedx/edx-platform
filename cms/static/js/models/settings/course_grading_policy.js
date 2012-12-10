@@ -37,7 +37,7 @@ CMS.Models.Settings.CourseGradingPolicy = Backbone.Model.extend({
 CMS.Models.Settings.CourseGrader = Backbone.Model.extend({
 	defaults: {
         "type" : "",	// must be unique w/in collection (ie. w/in course)
-        "min_count" : 0,
+        "min_count" : 1,
         "drop_count" : 0,
         "short_label" : "",	// what to use in place of type if space is an issue 
         "weight" : 0 // int 0..100
@@ -73,7 +73,7 @@ CMS.Models.Settings.CourseGrader = Backbone.Model.extend({
     		}
     	}
     	if (attrs['weight']) {
-    		if (!isFinite(attrs.weight) || !parseInt(attrs.weight)) {
+    		if (!isFinite(attrs.weight) || /\D+/.test(attrs.weight)) {
     			errors.weight = "Please enter an integer between 0 and 100.";
     		}
     		else {
@@ -87,13 +87,13 @@ CMS.Models.Settings.CourseGrader = Backbone.Model.extend({
     			}
     	}}
     	if (attrs['min_count']) {
-    		if (!isFinite(attrs.min_count) || !parseInt(attrs.min_count)) {
+    		if (!isFinite(attrs.min_count) || /\D+/.test(attrs.min_count)) {
     			errors.min_count = "Please enter an integer.";
     		}
     		else attrs.min_count = parseInt(attrs.min_count);
     	}
     	if (attrs['drop_count']) {
-    		if (!isFinite(attrs.drop_count) || !parseInt(attrs.drop_count)) {
+    		if (!isFinite(attrs.drop_count) || /\D+/.test(attrs.drop_count)) {
     			errors.drop_count = "Please enter an integer.";
     		}
     		else attrs.drop_count = parseInt(attrs.drop_count);
@@ -109,7 +109,7 @@ CMS.Models.Settings.CourseGraderCollection = Backbone.Collection.extend({
 	model : CMS.Models.Settings.CourseGrader,
 	course_location : null, // must be set to a Location object
 	url : function() {
-		return '/' + this.course_location.get('org') + "/" + this.course_location.get('course') + '/grades/' + this.course_location.get('name');
+		return '/' + this.course_location.get('org') + "/" + this.course_location.get('course') + '/grades/' + this.course_location.get('name') + '/';
 	},
 	sumWeights : function() {
 		return this.reduce(function(subtotal, grader) { return subtotal + grader.get('weight'); }, 0);

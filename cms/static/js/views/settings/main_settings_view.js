@@ -265,7 +265,8 @@ CMS.Views.Settings.Grading = CMS.Views.ValidatingView.extend({
 		"blur span[contenteditable=true]" : "updateDesignation",
 		"click .settings-extra header" : "showSettingsExtras",
 		"click .new-grade-button" : "addNewGrade",
-		"click .remove-button" : "removeGrade"
+		"click .remove-button" : "removeGrade",
+		"click .add-grading-data" : "addAssignmentType"
 	},
 	initialize : function() {
 		//  load template for grading view
@@ -299,6 +300,8 @@ CMS.Views.Settings.Grading = CMS.Views.ValidatingView.extend({
         }
         );
 		this.model.on('error', this.handleValidationError, this);
+		this.model.get('graders').on('remove', this.render, this);
+		this.model.get('graders').on('add', this.render, this);
 		this.selectorToField = _.invert(this.fieldToSelectorMap);
 	},
 	
@@ -322,6 +325,9 @@ CMS.Views.Settings.Grading = CMS.Views.ValidatingView.extend({
 		graceEle.timepicker('setTime', (this.model.has('grace_period') ? this.model.get('grace_period') : new Date(0)));
 		
 		return this;
+	},
+	addAssignmentType : function() {
+		this.model.get('graders').push({});
 	},
 	fieldToSelectorMap : {
 		'grace_period' : 'course-grading-graceperiod'
@@ -545,7 +551,8 @@ CMS.Views.Settings.GraderView = CMS.Views.ValidatingView.extend({
 	// Model class is CMS.Models.Settings.CourseGrader
 	events : {
 		"blur input" : "updateModel",
-		"blur textarea" : "updateModel"
+		"blur textarea" : "updateModel",
+		"click .remove-grading-data" : "deleteModel"
 	},
 	initialize : function() {
 		this.model.on('error', this.handleValidationError, this);
@@ -577,6 +584,9 @@ CMS.Views.Settings.GraderView = CMS.Views.ValidatingView.extend({
 			break;
 			
 		}
+	},
+	deleteModel : function() {
+		this.model.destroy();
 	}
 	
 });
