@@ -1,7 +1,6 @@
 import json
 from django.test import TestCase
 from django.test.client import Client
-from mock import patch, Mock
 from override_settings import override_settings
 from django.conf import settings
 from django.core.urlresolvers import reverse
@@ -9,9 +8,7 @@ from path import path
 
 from student.models import Registration
 from django.contrib.auth.models import User
-from xmodule.modulestore.django import modulestore
 import xmodule.modulestore.django
-from xmodule.modulestore import Location
 from xmodule.modulestore.xml_importer import import_from_xml
 import copy
 from factories import *
@@ -23,33 +20,33 @@ def parse_json(response):
 
 
 def user(email):
-    '''look up a user by email'''
+    """look up a user by email"""
     return User.objects.get(email=email)
 
 
 def registration(email):
-    '''look up registration object by email'''
+    """look up registration object by email"""
     return Registration.objects.get(user__email=email)
 
 
 class ContentStoreTestCase(TestCase):
     def _login(self, email, pw):
-        '''Login.  View should always return 200.  The success/fail is in the
-        returned json'''
+        """Login.  View should always return 200.  The success/fail is in the
+        returned json"""
         resp = self.client.post(reverse('login_post'),
                                 {'email': email, 'password': pw})
         self.assertEqual(resp.status_code, 200)
         return resp
 
     def login(self, email, pw):
-        '''Login, check that it worked.'''
+        """Login, check that it worked."""
         resp = self._login(email, pw)
         data = parse_json(resp)
         self.assertTrue(data['success'])
         return resp
 
     def _create_account(self, username, email, pw):
-        '''Try to create an account.  No error checking'''
+        """Try to create an account.  No error checking"""
         resp = self.client.post('/create_account', {
             'username': username,
             'email': email,
@@ -63,7 +60,7 @@ class ContentStoreTestCase(TestCase):
         return resp
 
     def create_account(self, username, email, pw):
-        '''Create the account and check that it worked'''
+        """Create the account and check that it worked"""
         resp = self._create_account(username, email, pw)
         self.assertEqual(resp.status_code, 200)
         data = parse_json(resp)
@@ -75,8 +72,8 @@ class ContentStoreTestCase(TestCase):
         return resp
 
     def _activate_user(self, email):
-        '''Look up the activation key for the user, then hit the activate view.
-        No error checking'''
+        """Look up the activation key for the user, then hit the activate view.
+        No error checking"""
         activation_key = registration(email).activation_key
 
         # and now we try to activate
@@ -256,6 +253,16 @@ class ContentStoreTest(TestCase):
         self.assertEqual(resp.status_code, 200)
         self.assertEqual(data['ErrMsg'], 
             'There is already a course defined with the same organization and course number.')
+
+    def test_create_course_with_bad_organization(self):
+        """Test new course creation - error path for bad organization name"""
+        self.course_data['org'] = 'University of California, Berkeley'
+        resp = self.client.post(reverse('create_new_course'), self.course_data)
+        data = parse_json(resp)
+
+        self.assertEqual(resp.status_code, 200)
+        self.assertEqual(data['ErrMsg'],
+            "Unable to create course 'Robot Super Course'.\n\nInvalid characters in 'University of California, Berkeley'.")
 
     def test_course_index_view_with_no_courses(self):
         """Test viewing the index page with no courses"""

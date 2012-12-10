@@ -23,7 +23,7 @@ from django.core.urlresolvers import reverse
 from django.conf import settings
 
 from xmodule.modulestore import Location
-from xmodule.modulestore.exceptions import ItemNotFoundError
+from xmodule.modulestore.exceptions import ItemNotFoundError, InvalidLocationError
 from xmodule.x_module import ModuleSystem
 from xmodule.error_module import ErrorDescriptor
 from xmodule.errortracker import exc_info_to_str
@@ -1053,7 +1053,10 @@ def create_new_course(request):
     number = request.POST.get('number')  
     display_name = request.POST.get('display_name')   
 
-    dest_location = Location('i4x', org, number, 'course', Location.clean(display_name))
+    try:
+        dest_location = Location('i4x', org, number, 'course', Location.clean(display_name))
+    except InvalidLocationError as e:
+        return HttpResponse(json.dumps({'ErrMsg': "Unable to create course '" + display_name + "'.\n\n" + e.message}))
 
     # see if the course already exists
     existing_course = None
