@@ -4,9 +4,8 @@
 
 define(
     'GstMain',
-    ['State', 'logme', 'GeneralMethods', 'Sliders', 'Graph'],
-    function (State, logme, GeneralMethods, Sliders, Graph) {
-    logme(GeneralMethods);
+    ['State', 'GeneralMethods', 'Sliders', 'Graph'],
+    function (State, GeneralMethods, Sliders, Graph) {
 
     return GstMain;
 
@@ -19,7 +18,7 @@ define(
 
         Sliders(gstId, config, state);
 
-        Graph(gstId, state);
+        Graph(gstId, config, state);
     }
 });
 

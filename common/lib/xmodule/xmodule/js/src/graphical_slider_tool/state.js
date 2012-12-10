@@ -2,7 +2,7 @@
 // define() functions from Require JS available inside the anonymous function.
 (function (requirejs, require, define) {
 
-define('State', ['logme'], function (logme) {
+define('State', [], function () {
     // Since there will be (can be) multiple GST on a page, and each will have
     // a separate state, we will create a factory constructor function. The
     // constructor will expect the ID of the DIV with the GST contents, and the
@@ -56,15 +56,39 @@ define('State', ['logme'], function (logme) {
             }
         }
 
-        logme(constants);
-
         // The constructor will return an object with methods to operate on
         // it's private properties.
         return {
             'getConstValue': getConstValue,
             'setConstValue': setConstValue,
-            'bindUpdatePlotEvent': bindUpdatePlotEvent
+            'bindUpdatePlotEvent': bindUpdatePlotEvent,
+            'getAllConstantNames': getAllConstantNames,
+            'getAllConstantValues': getAllConstantValues
         };
+
+        function getAllConstantNames() {
+            var constName, allConstNames;
+
+            allConstNames = [];
+
+            for (constName in constants) {
+                allConstNames.push(constName);
+            }
+
+            return allConstNames;
+        }
+
+        function getAllConstantValues() {
+            var constName, allConstValues;
+
+            allConstValues = [];
+
+            for (constName in constants) {
+                allConstValues.push(constants[constName]);
+            }
+
+            return allConstValues;
+        }
 
         function bindUpdatePlotEvent(newPlotDiv, callback) {
             plotDiv = newPlotDiv;
@@ -95,8 +119,6 @@ define('State', ['logme'], function (logme) {
             }
 
             constants[constName] = parseFloat(constValue);
-
-            logme('From setConstValue: new value for "' + constName + '" is ' + constValue);
 
             if (plotDiv !== undefined) {
                 plotDiv.trigger('update_plot');

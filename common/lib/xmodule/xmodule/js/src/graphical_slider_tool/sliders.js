@@ -2,16 +2,10 @@
 // define() functions from Require JS available inside the anonymous function.
 (function (requirejs, require, define) {
 
-define('Sliders', ['logme'], function (logme) {
+define('Sliders', [], function () {
     return Sliders;
 
     function Sliders(gstId, config, state) {
-        logme('We are inside Sliders function.');
-
-        logme('gstId: ' + gstId);
-        logme(config);
-        logme(state);
-
         // We will go through all of the sliders. For each one, we will make a
         // jQuery UI slider for it, attach "on change" events, and set it's
         // state - initial value, max, and min parameters.
@@ -102,12 +96,8 @@ define('Sliders', ['logme'], function (logme) {
             // The default slider width.
             sliderWidth = 400;
 
-            logme('width: 0');
-            logme(obj['@width']);
             if (typeof obj['@width'] === 'string') {
-                logme('width: 1');
                 if (isNaN(parseInt(obj['@width'], 10)) === false) {
-                    logme('width: 2');
                     sliderWidth = parseInt(obj['@width'], 10);
                 }
             }
