@@ -38,7 +38,7 @@ CMS.Views.ClassInfoUpdateView = Backbone.View.extend({
         // instantiates an editor template for each update in the collection
         window.templateLoader.loadRemoteTemplate("course_info_update",
         	// TODO Where should the template reside? how to use the static.url to create the path?
-            "/static/coffee/src/client_templates/course_info_update.html",
+            "/static/client_templates/course_info_update.html",
             function (raw_template) {
         		self.template = _.template(raw_template);
         		self.render();           
@@ -209,7 +209,7 @@ CMS.Views.ClassInfoHandoutsView = Backbone.View.extend({
             {
                 complete: function() {
                     window.templateLoader.loadRemoteTemplate("course_info_handouts",
-                        "/static/coffee/src/client_templates/course_info_handouts.html",
+                        "/static/client_templates/course_info_handouts.html",
                         function (raw_template) {
                             self.template = _.template(raw_template);
                             self.render();                

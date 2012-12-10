@@ -8,7 +8,7 @@ def expect_json(view_function):
     def expect_json_with_cloned_request(request, *args, **kwargs):
         # cdodge: fix postback errors in CMS. The POST 'content-type' header can include additional information
         # e.g. 'charset', so we can't do a direct string compare
-        if request.META['CONTENT_TYPE'].lower().startswith("application/json"):
+        if request.META.get('CONTENT_TYPE','').lower().startswith("application/json"):
             cloned_request = copy.copy(request)
             cloned_request.POST = cloned_request.POST.copy()
             cloned_request.POST.update(json.loads(request.body))
