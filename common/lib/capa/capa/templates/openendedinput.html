@@ -23,6 +23,9 @@
 
   <span id="answer_${id}"></span>
 
+    % if status == 'queued':
+    <input name="reload" class="reload" type="button" value="Recheck for Feedback" onclick="document.location.reload(true);" />
+    % endif
   <div class="external-grader-message">
     ${msg|n}
   </div>
