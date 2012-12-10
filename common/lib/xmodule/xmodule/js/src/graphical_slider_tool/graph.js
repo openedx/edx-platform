@@ -19,21 +19,19 @@ define('Graph', ['logme'], function (logme) {
         plotDiv.width(300);
         plotDiv.height(300);
 
-        plotDiv.bind('update_plot', function (event, forGstId) {
-            if (forGstId !== gstId) {
-                logme('update_plot event not for current ID');
-            }
-
-            logme('redrawing plot');
-
-            generateData();
-            updatePlot();
-        });
+        state.bindUpdatePlotEvent(plotDiv, onUpdatePlot);
 
         generateData();
         updatePlot();
 
         return;
+
+        function onUpdatePlot(event) {
+            logme('redrawing plot');
+
+            generateData();
+            updatePlot();
+        }
 
         function generateData() {
             var a, b, c1;

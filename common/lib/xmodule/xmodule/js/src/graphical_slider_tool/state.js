@@ -18,7 +18,7 @@ define('State', ['logme'], function (logme) {
      *
      */
     function State(gstId, config) {
-        var constants, c1;
+        var constants, c1, plotDiv;
 
         constants = {};
 
@@ -62,8 +62,15 @@ define('State', ['logme'], function (logme) {
         // it's private properties.
         return {
             'getConstValue': getConstValue,
-            'setConstValue': setConstValue
+            'setConstValue': setConstValue,
+            'bindUpdatePlotEvent': bindUpdatePlotEvent
         };
+
+        function bindUpdatePlotEvent(newPlotDiv, callback) {
+            plotDiv = newPlotDiv;
+
+            plotDiv.bind('update_plot', callback);
+        }
 
         function getConstValue(constName) {
             if (constants.hasOwnProperty(constName) === false) {
@@ -76,8 +83,6 @@ define('State', ['logme'], function (logme) {
         }
 
         function setConstValue(constName, constValue) {
-            var plotDiv;
-
             if (constants.hasOwnProperty(constName) === false) {
                 // If the name of the constant is not tracked by state, return an
                 // 'undefined' value.
@@ -93,10 +98,8 @@ define('State', ['logme'], function (logme) {
 
             logme('From setConstValue: new value for "' + constName + '" is ' + constValue);
 
-            plotDiv = $('#' + gstId + '_plot');
-
-            if (plotDiv.length === 1) {
-                plotDiv.trigger('update_plot', [gstId]);
+            if (plotDiv !== undefined) {
+                plotDiv.trigger('update_plot');
             }
         }
 
