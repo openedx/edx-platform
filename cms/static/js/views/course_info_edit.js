@@ -83,8 +83,8 @@ CMS.Views.ClassInfoUpdateView = Backbone.View.extend({
         $newForm.addClass('editing');
         this.$currentPost = $newForm.closest('li');
 
-        $modalCover.show();
-        $modalCover.bind('click', function() {
+        window.$modalCover.show();
+        window.$modalCover.bind('click', function() {
             self.closeEditor(self, true);
         });
 
@@ -123,9 +123,9 @@ CMS.Views.ClassInfoUpdateView = Backbone.View.extend({
             });
         }
 
-        $modalCover.show();
+        window.$modalCover.show();
         var targetModel = this.eventModel(event);
-        $modalCover.bind('click', function() {
+        window.$modalCover.bind('click', function() {
             self.closeEditor(self);
         });
     },
@@ -156,8 +156,8 @@ CMS.Views.ClassInfoUpdateView = Backbone.View.extend({
         self.$currentPost.find('.update-contents').html(targetModel.get('content'));
         self.$currentPost.find('.new-update-content').val(targetModel.get('content'));
         self.$currentPost.find('form').hide();
-        $modalCover.unbind('click');
-        $modalCover.hide();
+        window.$modalCover.unbind('click');
+        window.$modalCover.hide();
     },
     
     // Dereferencing from events to screen elements    
@@ -248,8 +248,8 @@ CMS.Views.ClassInfoHandoutsView = Backbone.View.extend({
                 lineWrapping: true,
             });
         }
-        $modalCover.show();
-        $modalCover.bind('click', function() {
+        window.$modalCover.show();
+        window.$modalCover.bind('click', function() {
             self.closeEditor(self);
         });
     },
@@ -269,7 +269,7 @@ CMS.Views.ClassInfoHandoutsView = Backbone.View.extend({
 
     closeEditor: function(self) {
         this.$form.hide();
-        $modalCover.unbind('click');
-        $modalCover.hide();
+        window.$modalCover.unbind('click');
+        window.$modalCover.hide();
     }
 });
