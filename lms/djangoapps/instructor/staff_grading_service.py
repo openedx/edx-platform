@@ -42,6 +42,17 @@ class MockStaffGradingService(object):
                            'max_score': 2 + self.cnt % 3,
                            'rubric': 'A rubric'})
 
+    def get_problem_list(self, course_id, grader_id):
+        self.cnt += 1
+        return json.dumps({'success': True,
+        'problem_list': [
+          json.dumps({'location': 'i4x://MITx/3.091x/problem/open_ended_demo1', \
+            'problem_name': "Problem 1", 'num_graded': 3, 'num_pending': 5, 'min_for_ml': 10}),
+          json.dumps({'location': 'i4x://MITx/3.091x/problem/open_ended_demo2', \
+            'problem_name': "Problem 2", 'num_graded': 1, 'num_pending': 5, 'min_for_ml': 10})
+        ]})
+
+
     def save_grade(self, course_id, grader_id, submission_id, score, feedback):
         return self.get_next(course_id, 'fake location', grader_id)
 
@@ -274,7 +285,24 @@ def get_next(request, course_id):
 def get_problem_list(request, course_id):
     """
     Get all the problems for the given course id
-    TODO: fill in all of this stuff
+
+    Returns a json dict with the following keys:
+        success: bool
+
+        problem_list: a list containing json dicts with the following keys:
+            each dict represents a different problem in the course
+
+            location: the location of the problem
+
+            problem_name: the name of the problem
+
+            num_graded: the number of responses that have been graded
+
+            num_pending: the number of responses that are sitting in the queue
+
+            min_for_ml: the number of responses that need to be graded before
+                the ml can be run
+
     """
     _check_access(request.user, course_id)
     try:
