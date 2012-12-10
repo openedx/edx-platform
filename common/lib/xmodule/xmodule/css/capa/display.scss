@@ -240,6 +240,13 @@ section.problem {
       }
     }
 
+    .reload
+    {
+      float:right;
+      margin: 10px;
+    }
+
+
     .grader-status {
       padding: 9px;
       background: #F6F6F6;
@@ -257,6 +264,8 @@ section.problem {
       }
 
       .grading {
+        background: url('../images/info-icon.png') left center no-repeat;
+        padding-left: 25px;
         text-indent: 0px;
         margin: 0px 7px 0 0;
       }

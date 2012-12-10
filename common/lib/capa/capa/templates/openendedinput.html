@@ -1,5 +1,5 @@
 <section id="openended_${id}" class="openended">
-  <textarea rows="${rows}" cols="${cols}" name="input_${id}" id="input_${id}"
+  <textarea rows="${rows}" cols="${cols}" name="input_${id}" class="short-form-response" id="input_${id}"
        % if hidden:
       	    style="display:none;"
        % endif
@@ -23,6 +23,9 @@
 
   <span id="answer_${id}"></span>
 
+    % if status == 'queued':
+    <input name="reload" class="reload" type="button" value="Recheck for Feedback" onclick="document.location.reload(true);" />
+    % endif
   <div class="external-grader-message">
     ${msg|n}
   </div>
