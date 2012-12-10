@@ -104,6 +104,7 @@ define('Sliders', [], function () {
 
             // Set the new width to the slider.
             sliderDiv.width(sliderWidth);
+            sliderDiv.css('display', 'inline-block');
 
             // Create a jQuery UI slider from the current DIV. We will set
             // starting parameters, and will also attach a handler to update

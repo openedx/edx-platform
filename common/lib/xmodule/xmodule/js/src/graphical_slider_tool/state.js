@@ -107,6 +107,8 @@ define('State', [], function () {
         }
 
         function setConstValue(constName, constValue) {
+            var inputDiv;
+
             if (constants.hasOwnProperty(constName) === false) {
                 // If the name of the constant is not tracked by state, return an
                 // 'undefined' value.
@@ -122,6 +124,11 @@ define('State', [], function () {
 
             if (plotDiv !== undefined) {
                 plotDiv.trigger('update_plot');
+            }
+
+            inputDiv = $('#' + gstId + '_input_' + constName).children('input');
+            if (inputDiv.length !== 0) {
+                inputDiv.val(constValue);
             }
         }
 

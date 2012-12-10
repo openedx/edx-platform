@@ -30,6 +30,7 @@ class GraphicalSliderToolModule(XModule):
         resource_string(__name__, 'js/src/graphical_slider_tool/logme.js'),
         resource_string(__name__, 'js/src/graphical_slider_tool/general_methods.js'),
         resource_string(__name__, 'js/src/graphical_slider_tool/sliders.js'),
+        resource_string(__name__, 'js/src/graphical_slider_tool/inputs.js'),
         resource_string(__name__, 'js/src/graphical_slider_tool/graph.js'),
 
         resource_string(__name__, 'js/src/graphical_slider_tool/gst.js')
@@ -154,8 +155,8 @@ class GraphicalSliderToolModule(XModule):
             inputs = [inputs]
         vars = [x['@var'] for x in inputs]
 
-        input_div = '<div class="{element_class}_input" id="{element_id}_input_{var}" \
-        data-var="{var}">This is input</div>'
+        input_div = '<span class="{element_class}_input" id="{element_id}_input_{var}" \
+        data-var="{var}"></span>'
 
         for var in vars:
             html_string = re.sub(r'\$input\s+' + var + r'\$',

@@ -4,8 +4,8 @@
 
 define(
     'GstMain',
-    ['State', 'GeneralMethods', 'Sliders', 'Graph'],
-    function (State, GeneralMethods, Sliders, Graph) {
+    ['State', 'GeneralMethods', 'Sliders', 'Inputs', 'Graph'],
+    function (State, GeneralMethods, Sliders, Inputs, Graph) {
 
     return GstMain;
 
@@ -17,6 +17,7 @@ define(
         state = State(gstId, config);
 
         Sliders(gstId, config, state);
+        Inputs(gstId, config, state);
 
         Graph(gstId, config, state);
     }
