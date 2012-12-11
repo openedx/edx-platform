@@ -4,6 +4,10 @@
 
 define(
     'GstMain',
+
+    // Even though it is not explicitly in this module, we have to specify
+    // 'GeneralMethods' as a dependency. It expands some of the core JS objects
+    // with additional useful methods that are used in other modules.
     ['State', 'GeneralMethods', 'Sliders', 'Inputs', 'Graph'],
     function (State, GeneralMethods, Sliders, Inputs, Graph) {
 

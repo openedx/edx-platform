@@ -7,7 +7,7 @@ define('Graph', ['logme'], function (logme) {
     return Graph;
 
     function Graph(gstId, config, state) {
-        var plotDiv, dataSets, functions;
+        var plotDiv, dataSeries, functions;
 
         logme(config);
 
@@ -39,36 +39,54 @@ define('Graph', ['logme'], function (logme) {
             }
 
             if (typeof config.plot['function'] === 'string') {
+
+                // If just one function string is present.
                 addFunction(config.plot['function']);
+
             } else if ($.isPlainObject(config.plot['function']) === true) {
-                addFunction(
-                    config.plot['function']['#text'],
-                    config.plot['function']['@color'],
-                    config.plot['function']['@dot'],
-                    config.plot['function']['@label'],
-                    config.plot['function']['@line'],
-                    config.plot['function']['@point_size'],
-                    config.plot['function']['@style']
-                );
+
+                // If a function is present, but it also has properties
+                // defined.
+                callAddFunction(config.plot['function']);
+
             } else if ($.isArray(config.plot['function'])) {
+
+                // If more than one function is defined.
                 for (c1 = 0; c1 < config.plot['function'].length; c1++) {
+
+                    // For each definition, we must check if it is a simple
+                    // string definition, or a complex one with properties.
                     if (typeof config.plot['function'][c1] === 'string') {
+
+                        // Simple string.
                         addFunction(config.plot['function'][c1]);
+
                     } else if ($.isPlainObject(config.plot['function'][c1])) {
-                        addFunction(
-                            config.plot['function'][c1]['#text'],
-                            config.plot['function'][c1]['@color'],
-                            config.plot['function'][c1]['@dot'],
-                            config.plot['function'][c1]['@label'],
-                            config.plot['function'][c1]['@line'],
-                            config.plot['function'][c1]['@point_size'],
-                            config.plot['function'][c1]['@style']
-                        );
+
+                        // Properties are present.
+                        callAddFunction(config.plot['function'][c1]);
+
                     }
                 }
             }
 
             return;
+
+            // This function will reduce code duplications. We have to call
+            // the function addFunction() several times passing object
+            // properties. A parameters. Rather than writing them out every
+            // time, we will have a single point of
+            function callAddFunction(obj) {
+                addFunction(
+                    obj['#text'],
+                    obj['@color'],
+                    obj['@line'],
+                    obj['@dot'],
+                    obj['@label'],
+                    obj['@style'],
+                    obj['@point_size']
+                );
+            }
 
             function addFunction(funcString, color, line, dot, label, style, point_size) {
                 var newFunctionObject, func, constNames;
@@ -95,7 +113,7 @@ define('Graph', ['logme'], function (logme) {
                     newFunctionObject['color'] = color;
                 }
 
-                if (typeof line === 'boolean') {
+                if ((typeof line === 'boolean') || (typeof line === 'string')) {
                     if ((line === 'true') || (line === true)) {
                         newFunctionObject['line'] = true;
                     } else {
@@ -111,6 +129,9 @@ define('Graph', ['logme'], function (logme) {
                     }
                 }
 
+                // By default, if no preference was set, or if the preference
+                // is conflicting (we must have either line or dot, none is
+                // not an option), we will show line.
                 if ((newFunctionObject['dot'] === false) && (newFunctionObject['line'] === false)) {
                     newFunctionObject['line'] = true;
                 }
@@ -131,33 +152,68 @@ define('Graph', ['logme'], function (logme) {
         }
 
         function generateData() {
-            var c0, c1, datapoints, constValues, x, y;
+            var c0, c1, functionObj, seriesObj, dataPoints, constValues, x, y;
 
             constValues = state.getAllConstantValues();
 
-            dataSets = [];
+            dataSeries = [];
 
             for (c0 = 0; c0 < functions.length; c0 += 1) {
-                datapoints = [];
+                functionObj = functions[c0];
+                logme('Functions obj:', functionObj);
 
-                for (c1 = 0; c1 < 30; c1 += 0.1) {
+                seriesObj = {};
+                dataPoints = [];
+
+                for (c1 = 0; c1 < 30; c1 += 1) {
                     x = c1;
+
                     // Push the 'x' variable to the end of the parameter array.
                     constValues.push(x);
-                    y = functions[c0].func.apply(window, constValues);
+
+                    // We call the user defined function, passing all of the
+                    // available constant values. inside this function they
+                    // will be accessible by their names.
+                    y = functionObj.func.apply(window, constValues);
+
+                    // Return the constValues array to how it was before we
+                    // added 'x' variable to the end of it.
                     constValues.pop();
 
-                    datapoints.push([x, y]);
+                    // Add the generated point to the data points set.
+                    dataPoints.push([x, y]);
+
                 }
 
-                dataSets.push(datapoints);
+                // Put the entire data points set into the series object.
+                seriesObj.data = dataPoints;
+
+                // See if user defined a specific color for this function.
+                if (functionObj.hasOwnProperty('color') === true) {
+                    seriesObj.color = functionObj.color;
+                }
+
+                // See if a user defined a label for this function.
+                if (functionObj.hasOwnProperty('label') === true) {
+                    seriesObj.label = functionObj.label;
+                }
+
+                seriesObj.lines = {
+                    'show': functionObj.line
+                };
+
+                seriesObj.points = {
+                    'show': functionObj.dot
+                };
+
+                dataSeries.push(seriesObj);
             }
         }
 
         function updatePlot() {
             $.plot(
                 plotDiv,
-                dataSets,
+                dataSeries,
                 {
                     'xaxis': {
                         'min': 0,
@@ -166,9 +222,29 @@ define('Graph', ['logme'], function (logme) {
                     'yaxis': {
                         'min': -5,
                         'max': 5
+                    },
+                    'legend': {
+
+                        // To show the legend or not. Note, even if 'show' is
+                        // 'true', the legend will only show if labels are
+                        // provided for at least one of the series that are
+                        // going to be plotted.
+                        'show': true,
+
+                        // A floating point number in the range [0, 1]. The
+                        // smaller the number, the more transparent will the
+                        // legend background become.
+                        'backgroundOpacity': 0
+
                     }
                 }
             );
+
+            MathJax.Hub.Queue([
+                'Typeset',
+                MathJax.Hub,
+                plotDiv.attr('id')
+            ]);
         }
     }
 });
