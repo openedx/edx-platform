@@ -181,7 +181,8 @@ define('Sliders', [], function () {
                 'value': constValue,
                 'step': (valueMax - valueMin) / 50.0,
 
-                'change': sliderOnChange
+                // 'change': sliderOnChange,
+                'slide': sliderOnChange
             });
 
             // Append the slider DIV to the element on the page where the user

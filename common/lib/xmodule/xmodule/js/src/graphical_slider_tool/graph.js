@@ -2,12 +2,14 @@
 // define() functions from Require JS available inside the anonymous function.
 (function (requirejs, require, define) {
 
-define('Graph', [], function () {
+define('Graph', ['logme'], function (logme) {
 
     return Graph;
 
     function Graph(gstId, config, state) {
-        var plotDiv, dataSeries, functions;
+        var plotDiv, dataSeries, functions, xaxis, yaxis;
+
+        logme('config:', config);
 
         plotDiv = $('#' + gstId + '_plot');
 
@@ -15,8 +17,8 @@ define('Graph', [], function () {
             return;
         }
 
-        plotDiv.width(300);
-        plotDiv.height(300);
+        setGraphDimensions();
+        setGraphAxes();
 
         state.bindUpdatePlotEvent(plotDiv, onUpdatePlot);
 
@@ -26,6 +28,98 @@ define('Graph', [], function () {
         updatePlot();
 
         return;
+
+        function setGraphDimensions() {
+            var dimObj, width, height;
+
+            // If no dimensions are specified by the user, the graph have
+            // predefined dimensions.
+            width = 300;
+            height = 300;
+
+            // Get the user specified dimensions, if any.
+            if ($.isPlainObject(config.plot['dimensions']) === true) {
+                dimObj = config.plot['dimensions'];
+
+                if (dimObj.hasOwnProperty('@width') === true) {
+                    if (isNaN(parseInt(dimObj['@width'], 10)) === false) {
+                        width = parseInt(dimObj['@width'], 10);
+                    }
+                }
+
+                if (dimObj.hasOwnProperty('@height') === true) {
+                    if (isNaN(parseInt(dimObj['@height'], 10)) === false) {
+                        height = parseInt(dimObj['@height'], 10);
+                    }
+                }
+            }
+
+            plotDiv.width(width);
+            plotDiv.height(height);
+        }
+
+        function setGraphAxes() {
+            xaxis = {
+                'min': 0,
+                'tickSize': 3,
+                'max': 30
+            };
+
+            if (typeof config.plot['xticks'] === 'string') {
+                processTicks(config.plot['xticks'], xaxis);
+            }
+
+            yaxis = {
+                'min': -5,
+                'tickSize': 1,
+                'max': 5
+            };
+
+            if (typeof config.plot['yticks'] === 'string') {
+                processTicks(config.plot['yticks'], yaxis);
+            }
+
+            return;
+
+            function processTicks(ticksStr, ticksObj) {
+                var ticksBlobs, min, tickSize, max;
+
+                logme('Processing ticks. Ticks string is: [' + ticksStr + ']');
+                logme('Original ticks object:', ticksObj);
+
+                ticksBlobs = ticksStr.split(',');
+
+                if (ticksBlobs.length !== 3) {
+                    return;
+                }
+
+                min = parseFloat(ticksBlobs[0]);
+                if (isNaN(min) === false) {
+                    ticksObj.min = min;
+                }
+
+                tickSize = parseFloat(ticksBlobs[1]);
+                if (isNaN(tickSize) === false) {
+                    ticksObj.tickSize = tickSize;
+                }
+
+                max = parseFloat(ticksBlobs[2]);
+                if (isNaN(max) === false) {
+                    ticksObj.max = max;
+                }
+
+                if (ticksObj.min >= ticksObj.max) {
+                    ticksObj.min = 0;
+                    ticksObj.max = 10;
+                }
+
+                if (ticksObj.tickSize * 2 >= ticksObj.max - ticksObj.min) {
+                    ticksObj.tickSize = (ticksObj.max - ticksObj.min) / 10.0;
+                }
+
+                logme('Modified ticks object:', ticksObj);
+            }
+        }
 
         function createFunctions() {
             var c1;
@@ -210,14 +304,8 @@ define('Graph', [], function () {
                 plotDiv,
                 dataSeries,
                 {
-                    'xaxis': {
-                        'min': 0,
-                        'max': 30
-                    },
-                    'yaxis': {
-                        'min': -5,
-                        'max': 5
-                    },
+                    'xaxis': xaxis,
+                    'yaxis': yaxis,
                     'legend': {
 
                         // To show the legend or not. Note, even if 'show' is
