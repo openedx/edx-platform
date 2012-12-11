@@ -250,6 +250,9 @@ class @DiscussionUtil
       else if RE_DISPLAYMATH.test(text)
         text = text.replace RE_DISPLAYMATH, ($0, $1, $2, $3) ->
           processedText += $1 + processor("$$" + $2 + "$$", 'display')
+          #bug fix, ordering is off
+          #processedText =  processor("$$" + $2 + "$$", 'display') + processedText
+          #processedText = $1 + processedText
           $3
       else
         processedText += text
