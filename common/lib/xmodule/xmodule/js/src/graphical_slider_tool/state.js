@@ -12,11 +12,7 @@ define('State', [], function () {
     // This module defines and returns a factory constructor.
     return State;
 
-    /*
-     * function: State
-     *
-     *
-     */
+    // function: State
     function State(gstId, config) {
         var constants, c1, plotDiv;
 

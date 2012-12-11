@@ -33,8 +33,8 @@ define('Graph', [], function () {
 
             // If no dimensions are specified by the user, the graph have
             // predefined dimensions.
-            width = 100;
-            height = 100;
+            width = 300;
+            height = 300;
 
             // Get the user specified dimensions, if any.
             if ($.isPlainObject(config.plot['dimensions']) === true) {

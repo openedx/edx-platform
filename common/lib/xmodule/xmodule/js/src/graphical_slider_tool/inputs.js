@@ -42,7 +42,7 @@ define('Inputs', [], function () {
         }
 
         function createInput(obj) {
-            var constName, constValue, spanEl, inputEl;
+            var constName, constValue, spanEl, inputEl, readOnly;
 
             // The name of the constant is obj['@var']. If it is not specified,
             // we will skip creating a text input for this constant.
@@ -86,12 +86,34 @@ define('Inputs', [], function () {
             // Set the current constant to the text input. It will be visible
             // to the user.
             inputEl.val(constValue);
+            
+            // Before binding a 'change' event, we will check if this text
+            // input is specified as 'read only'.
+            //
+            // By default, this setting is false - the user can change the 
+            // value in the text input.
+            readonly = false;
+            if (typeof obj['@readonly'] === 'string') {
+                if (obj['@readonly'] === 'true') {
+                    readonly = true;
+                }
+            }
 
-            // Bind a function to the 'change' event. Whenever the user changes
-            // the value of this text input, and presses 'enter' (or clicks
-            // somewhere else on the page), this event will be triggered, and
-            // our callback will be called.
-            inputEl.bind('change', inputOnChange);
+            if (readonly === true) {
+            
+                // In the case of a readonly config option, configure the text
+                // inputit as read-only, and NOT bind an event to it.
+                inputEl.attr('readonly', 'readonly');
+
+            } else { // readonly !== true
+
+                // Bind a function to the 'change' event. Whenever the user changes
+                // the value of this text input, and presses 'enter' (or clicks
+                // somewhere else on the page), this event will be triggered, and
+                // our callback will be called.
+                inputEl.bind('change', inputOnChange);
+
+            }
 
             // Lets style the input element nicely. We will use the button()
             // widget for this since there is no native widget for the text
