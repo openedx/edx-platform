@@ -53,7 +53,7 @@ class MockStaffGradingService(object):
         ]})
 
 
-    def save_grade(self, course_id, grader_id, submission_id, score, feedback):
+    def save_grade(self, course_id, grader_id, submission_id, score, feedback, skipped):
         return self.get_next(course_id, 'fake location', grader_id)
 
 
@@ -109,7 +109,8 @@ class StaffGradingService(object):
                 log.warning("Couldn't log into staff_grading backend. Response: %s",
                             r)
             # try again
-            return operation()
+            response = operation()
+            response.raise_for_status()
 
         return response
 
@@ -173,7 +174,7 @@ class StaffGradingService(object):
         return r.text
 
 
-    def save_grade(self, course_id, grader_id, submission_id, score, feedback):
+    def save_grade(self, course_id, grader_id, submission_id, score, feedback, skipped):
         """
         Save a score and feedback for a submission.
 
@@ -190,7 +191,8 @@ class StaffGradingService(object):
                     'submission_id': submission_id,
                     'score': score,
                     'feedback': feedback,
-                    'grader_id': grader_id}
+                    'grader_id': grader_id,
+                    'skipped': skipped}
 
             op = lambda: self.session.post(self.save_grade_url, data=data,
                                            allow_redirects=False)
@@ -350,7 +352,6 @@ def save_grade(request, course_id):
 
     required = set(['score', 'feedback', 'submission_id', 'location'])
     actual = set(request.POST.keys())
-    log.debug(actual)
     missing = required - actual
     if len(missing) > 0:
         return _err_response('Missing required keys {0}'.format(
@@ -358,14 +359,17 @@ def save_grade(request, course_id):
 
     grader_id = request.user.id
     p = request.POST
-    location = p['location']
 
+
+    location = p['location']
+    skipped =  'skipped' in p
     try:
         result_json = grading_service().save_grade(course_id,
                                           grader_id,
                                           p['submission_id'],
                                           p['score'],
-                                          p['feedback'])
+                                          p['feedback'],
+                                          skipped)
     except GradingServiceError:
         log.exception("Error saving grade")
         return _err_response('Could not connect to grading service')
