@@ -112,6 +112,7 @@ The standard chunk of Lorem Ipsum used since the 1500s is reproduced below for t
     else
       # TODO: replace with postWithPrefix when that's loaded
       $.post(@ajax_url + cmd, data, callback)
+        .error => callback({success: false, error: "Error occured while performing this operation"})
 
 
 class StaffGrading
@@ -139,8 +140,10 @@ class StaffGrading
 
     @feedback_area = $('.feedback-area')
     @score_selection_container = $('.score-selection-container')        
+
     @submit_button = $('.submit-button')
     @action_button = $('.action-button')
+    @skip_button = $('.skip-button')
 
     @problem_meta_info = $('.problem-meta-info-container')
     @meta_info_wrapper = $('.meta-info-wrapper')
@@ -171,6 +174,7 @@ class StaffGrading
     @submit_button.click @submit
     # TODO: fix this to do something more intelligent
     @action_button.click @submit
+    @skip_button.click @skip_and_get_next
 
     # send initial request automatically
     @get_problem_list()
@@ -224,6 +228,15 @@ class StaffGrading
     @location = location
     @list_view = false
     @backend.post('get_next', {location: location}, @ajax_callback)
+
+  skip_and_get_next: () =>
+    data =
+      score: @score
+      feedback: @feedback_area.val()
+      submission_id: @submission_id
+      location: @location
+      skipped: true
+    @backend.post('save_grade', data, @ajax_callback)
 
   get_problem_list: () ->
     @list_view = true
@@ -342,7 +355,7 @@ class StaffGrading
       meta_list = $("<ul>")
       meta_list.append("<li><span class='meta-info'>Pending - </span> #{@num_pending}</li>")
       meta_list.append("<li><span class='meta-info'>Graded - </span> #{@num_graded}</li>")
-      meta_list.append("<li><span class='meta-info'>Needed for ML - </span> #{Math.max(@min_for_ml - @num_graded)}</li>")
+      meta_list.append("<li><span class='meta-info'>Needed for ML - </span> #{Math.max(@min_for_ml - @num_graded, 0)}</li>")
       @problem_meta_info.html(meta_list)
 
       @prompt_container.html(@prompt)
