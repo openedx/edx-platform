@@ -5,14 +5,11 @@ CMS.Models.Settings.CourseGradingPolicy = Backbone.Model.extend({
 		course_location : null,
 		graders : null,  // CourseGraderCollection 
 		grade_cutoffs : null,  // CourseGradeCutoff model
-        grace_period : null // either null or seconds of grace period
+        grace_period : null // either null or { hours: n, minutes: m, ...}
 	},
 	parse: function(attributes) {
 		if (attributes['course_location']) {
 			attributes.course_location = new CMS.Models.Location(attributes.course_location, {parse:true});
-		}
-		if (attributes['grace_period']) {
-			attributes.grace_period = new Date(attributes.grace_period);
 		}
 		if (attributes['graders']) {
 			var graderCollection;
@@ -31,6 +28,23 @@ CMS.Models.Settings.CourseGradingPolicy = Backbone.Model.extend({
 	url : function() {
 		var location = this.get('course_location');
 		return '/' + location.get('org') + "/" + location.get('course') + '/settings/' + location.get('name') + '/section/grading';
+	},
+	gracePeriodToDate : function() {
+		var newDate = new Date();
+		if (this.has('grace_period') && this.get('grace_period')['hours'])
+			newDate.setHours(this.get('grace_period')['hours']);
+		else newDate.setHours(0);
+		if (this.has('grace_period') && this.get('grace_period')['minutes'])
+			newDate.setMinutes(this.get('grace_period')['minutes']);
+		else newDate.setMinutes(0);
+		if (this.has('grace_period') && this.get('grace_period')['seconds'])
+			newDate.setSeconds(this.get('grace_period')['seconds']);
+		else newDate.setSeconds(0);
+		
+		return newDate;
+	},
+	dateToGracePeriod : function(date) {
+		return {hours : date.getHours(), minutes : date.getMinutes(), seconds : date.getSeconds() };
 	}
 });
 

@@ -144,24 +144,20 @@ class CourseGradingModel:
     @staticmethod
     def update_grace_period_from_json(course_location, graceperiodjson):
         """
-        Update the course's default grace period.
+        Update the course's default grace period. Incoming dict is {hours: h, minutes: m} possibly as a 
+        grace_period entry in an enclosing dict.
         """
         if not isinstance(course_location, Location):
             course_location = Location(course_location)
             
-        if not isinstance(graceperiodjson, dict):
-            graceperiodjson = {'grace_period' : graceperiodjson}
+        if 'grace_period' in graceperiodjson:
+            graceperiodjson = graceperiodjson['grace_period']
         
-        grace_time = converters.jsdate_to_time(graceperiodjson['grace_period'])
-        # NOTE: this does not handle > 24 hours
-        grace_rep = time.strftime("%H hours %M minutes %S seconds", grace_time)
+        grace_rep = " ".join(["%s %s" % (value, key) for (key, value) in graceperiodjson.iteritems()]) 
         
         descriptor = get_modulestore(course_location).get_item(course_location)
         descriptor.metadata['graceperiod'] = grace_rep  
         get_modulestore(course_location).update_metadata(course_location, descriptor.metadata)
-        
-        return graceperiodjson
-        
         
     @staticmethod
     def delete_grader(course_location, index):
@@ -212,9 +208,7 @@ class CourseGradingModel:
         rawgrace = descriptor.metadata.get('graceperiod', None)
         if rawgrace:
             parsedgrace = {str(key): val for (val, key) in re.findall('\s*(\d*)\s*(\w*)', rawgrace)}
-            gracedate = datetime.datetime.today()
-            gracedate = gracedate.replace(minute = int(parsedgrace.get('minutes',0)), hour = int(parsedgrace.get('hours',0))) 
-            return gracedate.isoformat() + 'Z'
+            return parsedgrace
         else: return None
 
     @staticmethod

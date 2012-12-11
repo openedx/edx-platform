@@ -292,8 +292,7 @@ CMS.Views.Settings.Grading = CMS.Views.ValidatingView.extend({
         // instantiates an editor template for each update in the collection
         // Because this calls render, put it after everything which render may depend upon to prevent race condition.
         window.templateLoader.loadRemoteTemplate("course_info_update",
-        		// TODO Where should the template reside? how to use the static.url to create the path?
-        		"/static/coffee/src/client_templates/course_grade_policy.html",
+        		"/static/client_templates/course_grade_policy.html",
         		function (raw_template) { 
         	self.template = _.template(raw_template);
         	self.render();
@@ -306,6 +305,9 @@ CMS.Views.Settings.Grading = CMS.Views.ValidatingView.extend({
 	},
 	
 	render: function() {
+		// prevent bootstrap race condition by event dispatch
+		if (!this.template) return;
+		
 		// Create and render the grading type subs
 		var self = this;
 		var gradelist = this.$el.find('.course-grading-assignment-list');
@@ -322,7 +324,7 @@ CMS.Views.Settings.Grading = CMS.Views.ValidatingView.extend({
 		
 		var graceEle = this.$el.find('#course-grading-graceperiod');
 		graceEle.timepicker({'timeFormat' : 'H:i'}); // init doesn't take setTime
-		graceEle.timepicker('setTime', (this.model.has('grace_period') ? this.model.get('grace_period') : new Date(0)));
+		graceEle.timepicker('setTime', this.model.gracePeriodToDate());
 		
 		return this;
 	},
@@ -338,7 +340,7 @@ CMS.Views.Settings.Grading = CMS.Views.ValidatingView.extend({
 		switch (this.selectorToField[event.currentTarget.id]) {
 		case 'grace_period':
 			this.clearValidationErrors();
-			this.model.save('grace_period',	$(event.currentTarget).timepicker('getTime'));
+			this.model.save('grace_period',	this.model.dateToGracePeriod($(event.currentTarget).timepicker('getTime')));
 			break;
 
 		default:
@@ -379,7 +381,6 @@ CMS.Views.Settings.Grading = CMS.Views.ValidatingView.extend({
 				newBar = gradelist.children().last(); // get the dom object not the unparsed string
 				newBar.resizable({
 					handles: "e",
-					// TODO perhaps add a start which sets minWidth to next element's edge
 					containment : "parent",
 					start : this.startMoveClosure(),
 					resize : this.moveBarClosure(),

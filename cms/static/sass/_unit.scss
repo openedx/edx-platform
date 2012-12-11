@@ -4,7 +4,6 @@
 }
 
 .main-column {
-  clear: both;
   float: left;
   width: 70%;
 }
@@ -55,11 +54,94 @@
       position: relative;
       z-index: 10;
       margin: 20px 40px;
+      border: 1px solid #d1ddec;
+      border-radius: 3px;
+      background: #fff;
+      @include transition(none);
+
+      &:hover {
+        border-color: #6696d7;
+
+        .drag-handle,
+        .component-actions a {
+          background-color: $blue;
+        }
+
+        .drag-handle {
+          border-color: $blue;
+        }
+      }
+
+      &.editing {
+        border-color: #6696d7;
+
+        .drag-handle,
+        .component-actions {
+          display: none;
+        }
+      }
+
+      &.component-placeholder {
+        border-color: #6696d7;
+      }
+
+      .xmodule_display {
+        padding: 40px 20px 20px;
+      }
+
+      .component-actions {
+        position: absolute;
+        top: 4px;
+        right: 4px;
+        @include transition(opacity .15s);
+      }
+
+      .edit-button,
+      .delete-button {
+        float: left;
+        padding: 3px 10px 4px;
+        margin-left: 3px;
+        border: 1px solid #fff;
+        border-radius: 3px;
+        background: #d1ddec;
+        font-size: 12px;
+        color: #fff;
+        @include transition(all .15s);
+
+        &:hover {
+          background-color: $blue;
+          color: #fff;
+        }
+
+        .edit-icon,
+        .delete-icon {
+          margin-right: 4px;
+        }
+      }
+
+      .drag-handle {
+        position: absolute;
+        display: block;
+        top: -1px;
+        right: -16px;
+        z-index: -1;
+        width: 15px;
+        height: 100%;
+        border-radius: 0 3px 3px 0;
+        border: 1px solid #d1ddec;
+        background: url(../img/white-drag-handles.png) center no-repeat #d1ddec;
+        cursor: move;
+        @include transition(all .15s);
+      }
 
       &.new-component-item {
         padding: 0;
-        border: none;
-        border-radius: 0;
+        border: 1px solid #8891a1;
+        border-radius: 3px;
+        @include linear-gradient(top, rgba(255, 255, 255, .3), rgba(255, 255, 255, 0));
+        background-color: #d1dae3;
+        @include box-shadow(0 1px 0 rgba(255, 255, 255, .2) inset);
+        @include transition(background-color .15s, border-color .15s);
 
         &.adding {
           background-color: $blue;
@@ -141,63 +223,8 @@
     }
   }
 
-  .component {
-    border: 1px solid #d1ddec;
-    border-radius: 3px;
-    background: #fff;
-    @include transition(none);
-
-    &:hover {
-      border-color: #6696d7;
-
-      .drag-handle {
-        background-color: $blue;
-        border-color: $blue;
-      }
-    }
-
-    &.editing {
-      border-color: #6696d7;
-
-      .drag-handle,
-      .component-actions {
-        display: none;
-      }
-    }
-
-    &.component-placeholder {
-      border-color: #6696d7;
-    }
-
-    .component-actions {
-      position: absolute;
-      top: 7px;
-      right: 9px;
-      @include transition(opacity .15s);
-
-      a {
-        color: $darkGrey;
-      }
-    }
-
-    .drag-handle {
-      position: absolute;
-      display: block;
-      top: -1px;
-      right: -16px;
-      z-index: -1;
-      width: 15px;
-      height: 100%;
-      border-radius: 0 3px 3px 0;
-      border: 1px solid #d1ddec;
-      background: url(../img/white-drag-handles.png) center no-repeat #d1ddec;
-      cursor: move;
-      @include transition(all .15s);
-    }
-  }
-
   .xmodule_display {
-    padding: 40px 20px 20px;
+    padding: 10px 20px;
   }
 
   .component-editor {

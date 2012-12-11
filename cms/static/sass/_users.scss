@@ -2,6 +2,11 @@
   .user-overview {
     @extend .window;
     padding: 30px 40px;
+
+    .details {
+      margin-bottom: 20px;
+      font-size: 14px;
+    }
   }
 
   .new-user-button {
