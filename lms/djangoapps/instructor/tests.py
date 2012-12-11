@@ -278,6 +278,14 @@ class TestStaffGradingService(ct.PageLoader):
         d = json.loads(r.content)
         self.assertTrue(d['success'])
         self.assertEquals(d['submission_id'], self.mock_service.cnt)
+        self.assertIsNotNone(d['submission'])
+        self.assertIsNotNone(d['num_graded'])
+        self.assertIsNotNone(d['min_for_ml'])
+        self.assertIsNotNone(d['num_pending'])
+        self.assertIsNotNone(d['prompt'])
+        self.assertIsNotNone(d['ml_error_info'])
+        self.assertIsNotNone(d['max_score'])
+        self.assertIsNotNone(d['rubric'])
 
 
     def test_save_grade(self):
@@ -293,5 +301,16 @@ class TestStaffGradingService(ct.PageLoader):
         d = json.loads(r.content)
         self.assertTrue(d['success'], str(d))
         self.assertEquals(d['submission_id'], self.mock_service.cnt)
+
+    def test_get_problem_list(self):
+        self.login(self.instructor, self.password)
+
+        url = reverse('staff_grading_get_problem_list', kwargs={'course_id': self.course_id})
+        data = {}
+
+        r = self.check_for_post_code(200, url, data)
+        d = json.loads(r.content)
+        self.assertTrue(d['success'], str(d))
+        self.assertIsNotNone(d['problem_list'])
 
 
