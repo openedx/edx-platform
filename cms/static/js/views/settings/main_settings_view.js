@@ -54,6 +54,7 @@ CMS.Views.Settings.Main = Backbone.View.extend({
 	// allow navigation between the tabs
 	events: {
 		'click .settings-page-menu a': "showSettingsTab",
+		'mouseover #timezone' : "updateTime"
 	},
 	
 	currentTab: null, 
@@ -91,6 +92,9 @@ CMS.Views.Settings.Main = Backbone.View.extend({
 			}
 		else this.subviews[this.currentTab].render();
 		
+		var dateIntrospect = new Date();
+		this.$el.find('#timezone').html("(" + dateIntrospect.getTimezone() + ")");
+		
 		return this;
 	},
 	
@@ -115,6 +119,13 @@ CMS.Views.Settings.Main = Backbone.View.extend({
 		case 'discussions':
 			break;
 		}
+	},
+	
+	updateTime : function(e) {
+		var now = new Date();
+		var hours = now.getHours();
+		var minutes = now.getMinutes();
+		$(e.currentTarget).attr('title', (hours % 12 == 0 ? 12 : hours % 12) + ":" + (minutes < 10 ? "0" : "") + now.getMinutes() + (hours < 12 ? "am" : "pm"));
 	},
 	
 	showSettingsTab: function(e) {
