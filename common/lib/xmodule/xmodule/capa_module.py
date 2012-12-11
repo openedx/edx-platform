@@ -92,12 +92,14 @@ class CapaModule(XModule):
     due = String(help="Date that this problem is due by", scope=Scope.settings)
     graceperiod = Timedelta(help="Amount of time after the due date that submissions will be accepted", scope=Scope.settings)
     show_answer = String(help="When to show the problem answer to the student", scope=Scope.settings, default="closed")
-    force_save_button = Boolean(help="Whether to force the save button to appear on the page", scope=Scope.settings)
+    force_save_button = Boolean(help="Whether to force the save button to appear on the page", scope=Scope.settings, default=False)
     rerandomize = String(help="When to rerandomize the problem", default="always")
     data = String(help="XML data for the problem", scope=Scope.content)
-    correct_map = Object(help="Dictionary with the correctness of current student answers", scope=Scope.student_state)
+    correct_map = Object(help="Dictionary with the correctness of current student answers", scope=Scope.student_state, default={})
+    student_answers = Object(help="Dictionary with the current student responses", scope=Scope.student_state)
     done = Boolean(help="Whether the student has answered the problem", scope=Scope.student_state)
     display_name = String(help="Display name for this module", scope=Scope.settings)
+    seed = Int(help="Random seed for this student", scope=Scope.student_state)
 
     js = {'coffee': [resource_string(__name__, 'js/src/capa/display.coffee'),
                      resource_string(__name__, 'js/src/collapsible.coffee'),
@@ -124,23 +126,23 @@ class CapaModule(XModule):
         else:
             self.close_date = self.due
 
-        if self.rerandomize == 'never':
-            self.seed = 1
-        elif self.rerandomize == "per_student" and hasattr(self.system, 'id'):
-            # TODO: This line is badly broken:
-            # (1) We're passing student ID to xmodule.
-            # (2) There aren't bins of students.  -- we only want 10 or 20 randomizations, and want to assign students
-            # to these bins, and may not want cohorts.  So e.g. hash(your-id, problem_id) % num_bins.
-            #     - analytics really needs small number of bins.
-            self.seed = system.id
-        else:
-            self.seed = None
+        if self.seed is None:
+            if self.rerandomize == 'never':
+                self.seed = 1
+            elif self.rerandomize == "per_student" and hasattr(self.system, 'id'):
+                # TODO: This line is badly broken:
+                # (1) We're passing student ID to xmodule.
+                # (2) There aren't bins of students.  -- we only want 10 or 20 randomizations, and want to assign students
+                # to these bins, and may not want cohorts.  So e.g. hash(your-id, problem_id) % num_bins.
+                #     - analytics really needs small number of bins.
+                self.seed = system.id
+            else:
+                self.seed = None
 
         try:
             # TODO (vshnayder): move as much as possible of this work and error
             # checking to descriptor load time
-            self.lcp = LoncapaProblem(self.data, self.location.html_id(),
-                                      self.correct_map, self.done, self.seed, self.system)
+            self.lcp = self.new_lcp(self.get_state_for_lcp())
         except Exception as err:
             msg = 'cannot create LoncapaProblem {loc}: {err}'.format(
                 loc=self.location.url(), err=err)
@@ -157,9 +159,7 @@ class CapaModule(XModule):
                 problem_text = ('<problem><text><span class="inline-error">'
                                 'Problem %s has an error:</span>%s</text></problem>' %
                                 (self.location.url(), msg))
-                self.lcp = LoncapaProblem(
-                    problem_text, self.location.html_id(),
-                    self.correct_map, self.done, self.seed, self.system)
+                self.lcp = self.new_lcp(self.get_state_for_lcp(), text=problem_text)
             else:
                 # add extra info and raise
                 raise Exception(msg), None, sys.exc_info()[2]
@@ -169,10 +169,30 @@ class CapaModule(XModule):
         elif self.rerandomize == "false":
             self.rerandomize = "per_student"
 
-    def sync_lcp_state(self):
+    def new_lcp(self, state, text=None):
+        if text is None:
+            text = self.data
+
+        return LoncapaProblem(
+            problem_text=text,
+            id=self.location.html_id(),
+            state=state,
+            system=self.system,
+        )
+
+    def get_state_for_lcp(self):
+        return {
+            'done': self.done,
+            'correct_map': self.correct_map,
+            'student_answers': self.student_answers,
+            'seed': self.seed,
+        }
+
+    def set_state_from_lcp(self):
         lcp_state = self.lcp.get_state()
         self.done = lcp_state['done']
         self.correct_map = lcp_state['correct_map']
+        self.student_answers = lcp_state['student_answers']
         self.seed = lcp_state['seed']
 
     def get_score(self):
@@ -239,9 +259,8 @@ class CapaModule(XModule):
                             student_answers.pop(answer_id)
 
                 #   Next, generate a fresh LoncapaProblem
-                self.lcp = LoncapaProblem(self.definition['data'], self.location.html_id(),
-                               seed=self.seed, system=self.system)
-                self.sync_lcp_state()
+                self.lcp = self.new_lcp(None)
+                self.set_state_from_lcp()
 
                 # Prepend a scary warning to the student
                 warning  = '<div class="capa_reset">'\
@@ -305,7 +324,7 @@ class CapaModule(XModule):
         # We may not need a "save" button if infinite number of attempts and
         # non-randomized. The problem author can force it. It's a bit weird for
         # randomization to control this; should perhaps be cleaned up.
-        if (self.force_save_button == "false") and (self.max_attempts is None and self.rerandomize != "always"):
+        if (not self.force_save_button) and (self.max_attempts is None and self.rerandomize != "always"):
             save_button = False
 
         context = {'problem': content,
@@ -326,7 +345,7 @@ class CapaModule(XModule):
                 id=self.location.html_id(), ajax_url=self.system.ajax_url) + html + "</div>"
 
         # now do the substitutions which are filesystem based, e.g. '/static/' prefixes
-        return self.system.replace_urls(html, self.metadata['data_dir'], course_namespace=self.location)
+        return self.system.replace_urls(html, self.descriptor.data_dir, course_namespace=self.location)
 
     def handle_ajax(self, dispatch, get):
         '''
@@ -408,7 +427,7 @@ class CapaModule(XModule):
         queuekey = get['queuekey']
         score_msg = get['xqueue_body']
         self.lcp.update_score(score_msg, queuekey)
-        self.sync_lcp_state()
+        self.set_state_from_lcp()
 
         return dict()  # No AJAX return is needed
 
@@ -425,14 +444,18 @@ class CapaModule(XModule):
             raise NotFoundError('Answer is not available')
         else:
             answers = self.lcp.get_question_answers()
-            self.sync_lcp_state()
+            self.set_state_from_lcp()
 
         # answers (eg <solution>) may have embedded images
         #   but be careful, some problems are using non-string answer dicts
         new_answers = dict()
         for answer_id in answers:
             try:
+<<<<<<< HEAD
                 new_answer = {answer_id: self.system.replace_urls(answers[answer_id], self.metadata['data_dir'], course_namespace=self.location)}
+=======
+                new_answer = {answer_id: self.system.replace_urls(answers[answer_id], self.descriptor.data_dir)}
+>>>>>>> WIP: Save student state via StudentModule. Inheritance doesn't work
             except TypeError:
                 log.debug('Unable to perform URL substitution on answers[%s]: %s' % (answer_id, answers[answer_id]))
                 new_answer = {answer_id: answers[answer_id]}
@@ -509,7 +532,7 @@ class CapaModule(XModule):
 
         try:
             correct_map = self.lcp.grade_answers(answers)
-            self.sync_lcp_state()
+            self.set_state_from_lcp()
         except StudentInputError as inst:
             log.exception("StudentInputError in capa_module:problem_check")
             return {'success': inst.message}
@@ -609,13 +632,8 @@ class CapaModule(XModule):
             # in next line)
             self.lcp.seed = None
 
-        self.lcp = LoncapaProblem(self.data,
-                                  self.location.html_id(),
-                                  self.lcp.correct_map,
-                                  self.lcp.done,
-                                  self.lcp.seed,
-                                  self.system)
-        self.sync_lcp_state()
+        self.set_state_from_lcp()
+        self.lcp = self.new_lcp()
 
         event_info['new_state'] = self.lcp.get_state()
         self.system.track_function('reset_problem', event_info)

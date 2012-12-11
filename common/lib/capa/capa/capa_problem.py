@@ -83,7 +83,7 @@ class LoncapaProblem(object):
     Main class for capa Problems.
     '''
 
-    def __init__(self, problem_text, id, correct_map=None, done=None, seed=None, system=None):
+    def __init__(self, problem_text, id, state=None, seed=None, system=None):
         '''
         Initializes capa Problem.
 
@@ -91,8 +91,7 @@ class LoncapaProblem(object):
 
          - problem_text (string): xml defining the problem
          - id           (string): identifier for this problem; often a filename (no spaces)
-         - correct_map  (dict): data specifying whether the student has completed the problem
-         - done         (bool): Whether the student has answered the problem
+         - state        (dict): student state
          - seed         (int): random number generator seed (int)
          - system       (ModuleSystem): ModuleSystem instance which provides OS,
                                         rendering, and user context
@@ -103,12 +102,19 @@ class LoncapaProblem(object):
         self.do_reset()
         self.problem_id = id
         self.system = system
+        if self.system is None:
+            raise Exception()
         self.seed = seed
-        self.done = done
-        self.correct_map = CorrectMap()
 
-        if correct_map is not None:
-            self.correct_map.set_dict(correct_map)
+        if state:
+            if 'seed' in state:
+                self.seed = state['seed']
+            if 'student_answers' in state:
+                self.student_answers = state['student_answers']
+            if 'correct_map' in state:
+                self.correct_map.set_dict(state['correct_map'])
+            if 'done' in state:
+                self.done = state['done']
 
         # TODO: Does this deplete the Linux entropy pool? Is this fast enough?
         if not self.seed:

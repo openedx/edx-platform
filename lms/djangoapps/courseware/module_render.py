@@ -11,6 +11,8 @@ from django.http import Http404
 from django.http import HttpResponse
 from django.views.decorators.csrf import csrf_exempt
 
+from collections import namedtuple
+
 from requests.auth import HTTPBasicAuth
 
 from capa.xqueue_interface import XQueueInterface
@@ -26,6 +28,8 @@ from xmodule.modulestore import Location
 from xmodule.modulestore.django import modulestore
 from xmodule.x_module import ModuleSystem
 from xmodule.error_module import ErrorDescriptor, NonStaffErrorDescriptor
+from xmodule.runtime import DbModel, KeyValueStore
+from xmodule.model import Scope
 from xmodule_modifiers import replace_course_urls, replace_static_urls, add_histogram, wrap_xmodule
 
 from xmodule.modulestore.exceptions import ItemNotFoundError
@@ -145,6 +149,70 @@ def get_module(user, request, location, student_module_cache, course_id, positio
         return None
 
 
+class LmsKeyValueStore(KeyValueStore):
+    def __init__(self, course_id, user, descriptor_model_data, student_module_cache):
+        self._course_id = course_id
+        self._user = user
+        self._descriptor_model_data = descriptor_model_data
+        self._student_module_cache = student_module_cache
+
+    def _student_module(self, key):
+        student_module = self._student_module_cache.lookup(
+            self._course_id, key.module_scope_id.category, key.module_scope_id.url()
+        )
+        return student_module
+
+    def get(self, key):
+        if not key.scope.student:
+            return self._descriptor_model_data[key.field_name]
+
+        if key.scope == Scope.student_state:
+            student_module = self._student_module(key)
+
+            if student_module is None:
+                raise KeyError(key.field_name)
+
+            return json.loads(student_module.state)[key.field_name]
+
+    def set(self, key, value):
+        if not key.scope.student:
+            self._descriptor_model_data[key.field_name] = value
+
+        if key.scope == Scope.student_state:
+            student_module = self._student_module(key)
+            if student_module is None:
+                student_module = StudentModule(
+                    course_id=self._course_id,
+                    student=self._user,
+                    module_type=key.module_scope_id.category,
+                    module_state_key=key.module_scope_id,
+                    state=json.dumps({})
+                )
+                self._student_module_cache.append(student_module)
+            state = json.loads(student_module.state)
+            state[key.field_name] = value
+            student_module.state = json.dumps(state)
+            student_module.save()
+
+    def delete(self, key):
+        if not key.scope.student:
+            del self._descriptor_model_data[key.field_name]
+
+        if key.scope == Scope.student_state:
+            student_module = self._student_module(key)
+
+            if student_module is None:
+                raise KeyError(key.field_name)
+
+            state = json.loads(student_module.state)
+            del state[key.field_name]
+            student_module.state = json.dumps(state)
+            student_module.save()
+
+
+LmsUsage = namedtuple('LmsUsage', 'id, def_id')
+
+
 def _get_module(user, request, location, student_module_cache, course_id, position=None, wrap_xmodule_display=True):
     """
     Actually implement get_module.  See docstring there for details.
@@ -161,23 +229,6 @@ def _get_module(user, request, location, student_module_cache, course_id, positi
     h.update(settings.SECRET_KEY)
     h.update(str(user.id))
     anonymous_student_id = h.hexdigest()
-
-    # Only check the cache if this module can possibly have state
-    instance_module = None
-    shared_module = None
-    if user.is_authenticated():
-        if descriptor.stores_state:
-            instance_module = student_module_cache.lookup(
-                course_id, descriptor.category, descriptor.location.url())
-
-        shared_state_key = getattr(descriptor, 'shared_state_key', None)
-        if shared_state_key is not None:
-            shared_module = student_module_cache.lookup(course_id,
-                                                        descriptor.category,
-                                                        shared_state_key)
-
-    instance_state = instance_module.state if instance_module is not None else None
-    shared_state = shared_module.state if shared_module is not None else None
 
     # Setup system context for module instance
     ajax_url = reverse('modx_dispatch',
@@ -218,6 +269,14 @@ def _get_module(user, request, location, student_module_cache, course_id, positi
         return get_module(user, request, location,
                                        student_module_cache, course_id, position)
 
+    def xmodule_model_data(descriptor_model_data):
+        return DbModel(
+            LmsKeyValueStore(course_id, user, descriptor_model_data, student_module_cache),
+            descriptor.module_class,
+            user.id,
+            LmsUsage(location, location)
+        )
+
     # TODO (cpennington): When modules are shared between courses, the static
     # prefix is going to have to be specific to the module, not the directory
     # that the xml was loaded from
@@ -235,6 +294,7 @@ def _get_module(user, request, location, student_module_cache, course_id, positi
                           replace_urls=replace_urls,
                           node_path=settings.NODE_PATH,
                           anonymous_student_id=anonymous_student_id,
+                          xmodule_model_data=xmodule_model_data
                           )
     # pass position specified in URL to module through ModuleSystem
     system.set('position', position)
@@ -453,19 +513,6 @@ def modx_dispatch(request, dispatch, location, course_id):
         log.debug("No module {0} for user {1}--access denied?".format(location, user))
         raise Http404
 
-    instance_module = get_instance_module(course_id, request.user, instance, student_module_cache)
-    shared_module = get_shared_instance_module(course_id, request.user, instance, student_module_cache)
-
-    # Don't track state for anonymous users (who don't have student modules)
-    if instance_module is not None:
-        oldgrade = instance_module.grade
-        # The max grade shouldn't change under normal circumstances, but
-        # sometimes the problem changes with the same name but a new max grade.
-        # This updates the module if that happens.
-        old_instance_max_grade = instance_module.max_grade
-        old_instance_state = instance_module.state
-        old_shared_state = shared_module.state if shared_module is not None else None
-
     # Let the module handle the AJAX
     try:
         ajax_return = instance.handle_ajax(dispatch, p)
@@ -475,34 +522,6 @@ def modx_dispatch(request, dispatch, location, course_id):
     except:
         log.exception("error processing ajax call")
         raise
-
-    # Save the state back to the database
-    # Don't track state for anonymous users (who don't have student modules)
-    if instance_module is not None:
-        instance_module.state = instance.get_instance_state()
-        instance_module.max_grade=instance.max_score()
-        if instance.get_score():
-            instance_module.grade = instance.get_score()['score']
-        if (instance_module.grade != oldgrade or
-            instance_module.state != old_instance_state or
-            instance_module.max_grade != old_instance_max_grade):
-            instance_module.save()
-
-            #Bin score into range and increment stats
-            score_bucket=get_score_bucket(instance_module.grade, instance_module.max_grade)
-            org, course_num, run=course_id.split("/")
-            statsd.increment("lms.courseware.question_answered",
-                            tags=["org:{0}".format(org),
-                                  "course:{0}".format(course_num),
-                                  "run:{0}".format(run),
-                                  "score_bucket:{0}".format(score_bucket),
-                                  "type:ajax"])
-
-
-    if shared_module is not None:
-        shared_module.state = instance.get_shared_state()
-        if shared_module.state != old_shared_state:
-            shared_module.save()
 
     # Return whatever the module wanted to return to the client/caller
     return HttpResponse(ajax_return)

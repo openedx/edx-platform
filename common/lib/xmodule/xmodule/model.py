@@ -10,8 +10,8 @@ class Scope(namedtuple('ScopeBase', 'student module')):
     pass
 
 Scope.content = Scope(student=False, module=ModuleScope.DEFINITION)
+Scope.settings = Scope(student=False, module=ModuleScope.USAGE)
 Scope.student_state = Scope(student=True, module=ModuleScope.USAGE)
-Scope.settings = Scope(student=True, module=ModuleScope.USAGE)
 Scope.student_preferences = Scope(student=True, module=ModuleScope.TYPE)
 Scope.student_info = Scope(student=True, module=ModuleScope.ALL)
 
@@ -54,7 +54,7 @@ class ModelType(object):
         del instance._model_data[self.name]
 
     def __repr__(self):
-        return "<{0.__class__.__name} {0.__name__}>".format(self)
+        return "<{0.__class__.__name__} {0._name}>".format(self)
 
     def __lt__(self, other):
         return self._seq < other._seq
@@ -100,9 +100,12 @@ class NamespacesMetaclass(type):
     the instance
     """
     def __new__(cls, name, bases, attrs):
+        namespaces = []
         for ns_name, namespace in Namespace.load_classes():
             if issubclass(namespace, Namespace):
                 attrs[ns_name] = NamespaceDescriptor(namespace)
+                namespaces.append(ns_name)
+        attrs['namespaces'] = namespaces
 
         return super(NamespacesMetaclass, cls).__new__(cls, name, bases, attrs)
 
@@ -114,7 +117,7 @@ class ParentModelMetaclass(type):
     """
     def __new__(cls, name, bases, attrs):
         if attrs.get('has_children', False):
-            attrs['children'] = List(help='The children of this XModule', default=[], scope=None)
+            attrs['children'] = List(help='The children of this XModule', default=[], scope=Scope.settings)
         else:
             attrs['has_children'] = False
 

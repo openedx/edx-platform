@@ -108,36 +108,33 @@ def add_histogram(get_html, module, user):
 
         # TODO (ichuang): Remove after fall 2012 LMS migration done
         if settings.MITX_FEATURES.get('ENABLE_LMS_MIGRATION'):
-            [filepath, filename] = module.definition.get('filename', ['', None])
+            [filepath, filename] = module.lms.filename
             osfs = module.system.filestore
             if filename is not None and osfs.exists(filename):
                 # if original, unmangled filename exists then use it (github
                 # doesn't like symlinks)
                 filepath = filename
             data_dir = osfs.root_path.rsplit('/')[-1]
-            giturl = module.metadata.get('giturl','https://github.com/MITx')
-            edit_link = "%s/%s/tree/master/%s" % (giturl,data_dir,filepath)
+            edit_link = "%s/%s/tree/master/%s" % (module.lms.giturl, data_dir, filepath)
         else:
             edit_link = False
             # Need to define all the variables that are about to be used
-            giturl = ""
             data_dir = ""
-        source_file = module.metadata.get('source_file','')	# source used to generate the problem XML, eg latex or word
+        source_file = module.lms.source_file  # source used to generate the problem XML, eg latex or word
 
         # useful to indicate to staff if problem has been released or not
         # TODO (ichuang): use _has_access_descriptor.can_load in lms.courseware.access, instead of now>mstart comparison here
         now = time.gmtime()
         is_released = "unknown"
-        mstart = getattr(module.descriptor,'start')
+        mstart = getattr(module.descriptor.lms,'start')
         if mstart is not None:
             is_released = "<font color='red'>Yes!</font>" if (now > mstart) else "<font color='green'>Not yet</font>"
 
-        staff_context = {'definition': module.definition.get('data'),
-                         'metadata': json.dumps(module.metadata, indent=4),
+        staff_context = {'fields': [(field.name, getattr(module, field.name)) for field in module.fields],
                          'location': module.location,
-                         'xqa_key': module.metadata.get('xqa_key',''),
+                         'xqa_key': module.lms.xqa_key,
                          'source_file' : source_file,
-                         'source_url': '%s/%s/tree/master/%s' % (giturl,data_dir,source_file),
+                         'source_url': '%s/%s/tree/master/%s' % (module.lms.giturl, data_dir, source_file),
                          'category': str(module.__class__.__name__),
                          # Template uses element_id in js function names, so can't allow dashes
                          'element_id': module.location.html_id().replace('-','_'),

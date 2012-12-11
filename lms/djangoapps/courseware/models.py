@@ -64,6 +64,9 @@ class StudentModule(models.Model):
         return '/'.join([self.course_id, self.module_type,
                          self.student.username, self.module_state_key, str(self.state)[:20]])
 
+    def __repr__(self):
+        return 'StudentModule%r' % ((self.course_id, self.module_type, self.student, self.module_state_key, str(self.state)[:20]),)
+
 
 # TODO (cpennington): Remove these once the LMS switches to using XModuleDescriptors
 
