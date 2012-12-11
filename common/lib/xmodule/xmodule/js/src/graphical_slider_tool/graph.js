@@ -2,12 +2,14 @@
 // define() functions from Require JS available inside the anonymous function.
 (function (requirejs, require, define) {
 
-define('Graph', [], function () {
+define('Graph', ['logme'], function (logme) {
 
     return Graph;
 
     function Graph(gstId, config, state) {
         var plotDiv, dataSets, functions;
+
+        logme(config);
 
         plotDiv = $('#' + gstId + '_plot');
 
@@ -39,11 +41,29 @@ define('Graph', [], function () {
             if (typeof config.plot['function'] === 'string') {
                 addFunction(config.plot['function']);
             } else if ($.isPlainObject(config.plot['function']) === true) {
-
+                addFunction(
+                    config.plot['function']['#text'],
+                    config.plot['function']['@color'],
+                    config.plot['function']['@dot'],
+                    config.plot['function']['@label'],
+                    config.plot['function']['@line'],
+                    config.plot['function']['@point_size'],
+                    config.plot['function']['@style']
+                );
             } else if ($.isArray(config.plot['function'])) {
                 for (c1 = 0; c1 < config.plot['function'].length; c1++) {
                     if (typeof config.plot['function'][c1] === 'string') {
                         addFunction(config.plot['function'][c1]);
+                    } else if ($.isPlainObject(config.plot['function'][c1])) {
+                        addFunction(
+                            config.plot['function'][c1]['#text'],
+                            config.plot['function'][c1]['@color'],
+                            config.plot['function'][c1]['@dot'],
+                            config.plot['function'][c1]['@label'],
+                            config.plot['function'][c1]['@line'],
+                            config.plot['function'][c1]['@point_size'],
+                            config.plot['function'][c1]['@style']
+                        );
                     }
                 }
             }
@@ -76,16 +96,30 @@ define('Graph', [], function () {
                 }
 
                 if (typeof line === 'boolean') {
-                    newFunctionObject['line'] = line;
+                    if ((line === 'true') || (line === true)) {
+                        newFunctionObject['line'] = true;
+                    } else {
+                        newFunctionObject['line'] = false;
+                    }
                 }
 
-                if (typeof dot === 'boolean') {
-                    newFunctionObject['dot'] = dot;
+                if ((typeof dot === 'boolean') || (typeof dot === 'string')) {
+                    if ((dot === 'true') || (dot === true)) {
+                        newFunctionObject['dot'] = true;
+                    } else {
+                        newFunctionObject['dot'] = false;
+                    }
+                }
+
+                if ((newFunctionObject['dot'] === false) && (newFunctionObject['line'] === false)) {
+                    newFunctionObject['line'] = true;
                 }
 
                 if (typeof label === 'string') {
                     newFunctionObject['label'] = label;
                 }
+
+                logme(newFunctionObject);
 
                 functions.push(newFunctionObject);
             }
