@@ -3,19 +3,31 @@ Feature: Open ended grading
   In order to complete the courseware questions
   I want the machine learning grading to be functional
 
-    Scenario: I can submit an answer for instructor grading
-    Given I am registered for course "MITx/3.091x/2012_Fall"
-    And I log in
-    And I navigate to an openended question
-    When I enter the answer "I have no idea."
-    And I press the "Check" button
-    Then I see the grader status "Submitted for grading"
-    And I see the grader message "Feedback not yet available."
+    Scenario: An answer that is too short is rejected
+    Given I navigate to an openended question
+    And I enter the answer "z"
+    When I press the "Check" button
+    And I wait for "8" seconds
+    And I see the grader status "Submitted for grading"
+    And I press the "Recheck for Feedback" button
+    Then I see the red X
+    And I see the grader score "0"
 
-    Scenario: I can submit an answer for instructor grading
-    Given I am staff for course "MITx/3.091x/2012_Fall"
-    And I log in
-    And I navigate to an openended question
+    Scenario: An answer with too many spelling errors is rejected
+    Given I navigate to an openended question
+    And I enter the answer "az"
+    When I press the "Check" button
+    And I wait for "8" seconds
+    And I see the grader status "Submitted for grading"
+    And I press the "Recheck for Feedback" button
+    Then I see the red X
+    And I see the grader score "0"
+    When I click the link for full output
+    Then I see the spelling grading message "More spelling errors than average."
+
+    Scenario: An answer makes its way to the instructor dashboard
+    Given I navigate to an openended question as staff
     When I submit the answer "I love Chemistry."
+    And I wait for "8" seconds
     And I visit the staff grading page
     Then my answer is queued for instructor grading

@@ -70,17 +70,11 @@ def i_am_registered_for_a_course(step):
 
 @step('I am registered for course "([^"]*)"$')
 def i_am_registered_for_course_by_id(step, course_id):
-    create_user('robot')
-    u = User.objects.get(username='robot')
-    CourseEnrollment.objects.get_or_create(user=u, course_id=course_id)
+    register_by_course_id(course_id)
 
 @step('I am staff for course "([^"]*)"$')
 def i_am_staff_for_course_by_id(step, course_id):
-    create_user('robot')
-    u = User.objects.get(username='robot')
-    u.is_staff=True
-    u.save()
-    CourseEnrollment.objects.get_or_create(user=u, course_id=course_id)
+    register_by_course_id(course_id, True)
 
 @step('I log in$')
 def i_log_in(step):
@@ -103,6 +97,7 @@ def create_user(uname):
 
     user_profile = UserProfileFactory(user=portal_user)
 
+@world.absorb
 def log_in(email, password):   
     world.browser.cookies.delete()
     world.browser.visit(django_url('/'))
@@ -115,6 +110,15 @@ def log_in(email, password):
 
     # wait for the page to redraw
     assert world.browser.is_element_present_by_css('.content-wrapper', 10)
+
+@world.absorb
+def register_by_course_id(course_id, is_staff=False):
+    create_user('robot')
+    u = User.objects.get(username='robot')
+    if is_staff:
+        u.is_staff=True
+        u.save()        
+    CourseEnrollment.objects.get_or_create(user=u, course_id=course_id)
 
 @world.absorb
 def save_the_html(path='/tmp'):
