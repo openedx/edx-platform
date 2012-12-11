@@ -2,14 +2,12 @@
 // define() functions from Require JS available inside the anonymous function.
 (function (requirejs, require, define) {
 
-define('Graph', ['logme'], function (logme) {
+define('Graph', [], function () {
 
     return Graph;
 
     function Graph(gstId, config, state) {
-        var plotDiv, dataSeries, functions, xaxis, yaxis;
-
-        logme('config:', config);
+        var plotDiv, dataSeries, functions, xaxis, yaxis, xrange;
 
         plotDiv = $('#' + gstId + '_plot');
 
@@ -19,6 +17,7 @@ define('Graph', ['logme'], function (logme) {
 
         setGraphDimensions();
         setGraphAxes();
+        setGraphXRange();
 
         state.bindUpdatePlotEvent(plotDiv, onUpdatePlot);
 
@@ -30,27 +29,25 @@ define('Graph', ['logme'], function (logme) {
         return;
 
         function setGraphDimensions() {
-            var dimObj, width, height;
+            var dimObj, width, height, tempInt;
 
             // If no dimensions are specified by the user, the graph have
             // predefined dimensions.
-            width = 300;
-            height = 300;
+            width = 100;
+            height = 100;
 
             // Get the user specified dimensions, if any.
             if ($.isPlainObject(config.plot['dimensions']) === true) {
                 dimObj = config.plot['dimensions'];
 
-                if (dimObj.hasOwnProperty('@width') === true) {
-                    if (isNaN(parseInt(dimObj['@width'], 10)) === false) {
-                        width = parseInt(dimObj['@width'], 10);
-                    }
+                tempInt = parseInt(dimObj['@width'], 10);
+                if (isNaN(tempInt) === false) {
+                    width = tempInt;
                 }
 
-                if (dimObj.hasOwnProperty('@height') === true) {
-                    if (isNaN(parseInt(dimObj['@height'], 10)) === false) {
-                        height = parseInt(dimObj['@height'], 10);
-                    }
+                tempInt = parseInt(dimObj['@height'], 10);
+                if (isNaN(tempInt) === false) {
+                    height = tempInt;
                 }
             }
 
@@ -84,9 +81,6 @@ define('Graph', ['logme'], function (logme) {
             function processTicks(ticksStr, ticksObj) {
                 var ticksBlobs, min, tickSize, max;
 
-                logme('Processing ticks. Ticks string is: [' + ticksStr + ']');
-                logme('Original ticks object:', ticksObj);
-
                 ticksBlobs = ticksStr.split(',');
 
                 if (ticksBlobs.length !== 3) {
@@ -116,8 +110,42 @@ define('Graph', ['logme'], function (logme) {
                 if (ticksObj.tickSize * 2 >= ticksObj.max - ticksObj.min) {
                     ticksObj.tickSize = (ticksObj.max - ticksObj.min) / 10.0;
                 }
+            }
+        }
 
-                logme('Modified ticks object:', ticksObj);
+        function setGraphXRange() {
+            var xRangeStr, xRangeBlobs, tempNum;
+
+            xrange = {
+                'start': 0,
+                'end': 30,
+                'step': 0.1
+            };
+
+            if (typeof config.plot['xrange'] === 'string') {
+                xRangeStr = config.plot['xrange'];
+                xRangeBlobs = xRangeStr.split(',');
+
+                if (xRangeBlobs.length === 2) {
+
+                    tempNum = parseFloat(xRangeBlobs[0]);
+                    if (isNaN(tempNum) === false) {
+                        xrange.start = tempNum;
+                    }
+
+                    tempNum = parseFloat(xRangeBlobs[1]);
+                    if (isNaN(tempNum) === false) {
+                        xrange.end = tempNum;
+                    }
+
+                }
+            }
+
+            if (typeof config.plot['num_points'] === 'string') {
+                tempNum = parseInt(config.plot['num_points'], 10);
+                if (isNaN(tempNum) === false) {
+                    xrange.step = (xrange.end - xrange.start) / tempNum;
+                }
             }
         }
 
@@ -242,7 +270,7 @@ define('Graph', ['logme'], function (logme) {
         }
 
         function generateData() {
-            var c0, c1, functionObj, seriesObj, dataPoints, constValues, x, y;
+            var c0, functionObj, seriesObj, dataPoints, constValues, x, y;
 
             constValues = state.getAllConstantValues();
 
@@ -254,8 +282,7 @@ define('Graph', ['logme'], function (logme) {
                 seriesObj = {};
                 dataPoints = [];
 
-                for (c1 = 0; c1 < 30; c1 += 1) {
-                    x = c1;
+                for (x = xrange.start; x <= xrange.end; x += xrange.step) {
 
                     // Push the 'x' variable to the end of the parameter array.
                     constValues.push(x);
