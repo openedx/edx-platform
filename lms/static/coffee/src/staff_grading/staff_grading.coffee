@@ -112,6 +112,7 @@ The standard chunk of Lorem Ipsum used since the 1500s is reproduced below for t
     else
       # TODO: replace with postWithPrefix when that's loaded
       $.post(@ajax_url + cmd, data, callback)
+        .error => callback({success: false, error: "Error occured while performing this operation"})
 
 
 class StaffGrading
