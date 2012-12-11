@@ -86,11 +86,11 @@ define('Inputs', [], function () {
             // Set the current constant to the text input. It will be visible
             // to the user.
             inputEl.val(constValue);
-            
+
             // Before binding a 'change' event, we will check if this text
             // input is specified as 'read only'.
             //
-            // By default, this setting is false - the user can change the 
+            // By default, this setting is false - the user can change the
             // value in the text input.
             readonly = false;
             if (typeof obj['@readonly'] === 'string') {
@@ -100,7 +100,7 @@ define('Inputs', [], function () {
             }
 
             if (readonly === true) {
-            
+
                 // In the case of a readonly config option, configure the text
                 // inputit as read-only, and NOT bind an event to it.
                 inputEl.attr('readonly', 'readonly');

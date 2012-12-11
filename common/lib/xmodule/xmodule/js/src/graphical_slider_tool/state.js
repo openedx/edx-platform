@@ -26,14 +26,17 @@ define('State', [], function () {
         if ((typeof config.inputs !== 'undefined') &&
             (typeof config.inputs.input !== 'undefined')) {
             if ($.isArray(config.inputs.input)) {
-                // config.inputs.input is an array
 
+                // config.inputs.input is an array
                 for (c1 = 0; c1 < config.inputs.input.length; c1++) {
                     addConstFromInput(config.inputs.input[c1]);
                 }
+
             } else if ($.isPlainObject(config.inputs.input)) {
+
                 // config.inputs.input is an object
                 addConstFromInput(config.inputs.input);
+
             }
         }
 
