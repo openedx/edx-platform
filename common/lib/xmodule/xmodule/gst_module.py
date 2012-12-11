@@ -97,8 +97,6 @@ class GraphicalSliderToolModule(XModule):
                 number, then only error message is displayed.
                 Sliders and numbers are optional. Plot is required.-->
               </configuration>
-              <plot_code>
-              </plot_code>
             </graphical_slider_tool>
           </vertical>
         </sequential>
@@ -116,8 +114,7 @@ class GraphicalSliderToolModule(XModule):
                   'gst_html': gst_html,
                   'element_id': self.html_id,
                   'element_class': self.html_class,
-                  'configuration_json': self.configuration_json,
-                  'plot_code': self.definition['plot_code']
+                  'configuration_json': self.configuration_json
                   }
         self.content = (self.system.render_template(
                         'graphical_slider_tool.html', params))
@@ -195,7 +192,7 @@ class GraphicalSliderToolDescriptor(MakoModuleDescriptor, XmlDescriptor):
             dict
         """
         # check for presense of required tags in xml
-        expected_children_level_0 = ['render', 'configuration', 'plot_code']
+        expected_children_level_0 = ['render', 'configuration']
         for child in expected_children_level_0:
             if len(xml_object.xpath(child)) != 1:
                 raise ValueError("Self a\ssessment definition must include \
@@ -214,8 +211,7 @@ class GraphicalSliderToolDescriptor(MakoModuleDescriptor, XmlDescriptor):
 
         return {
                     'render': parse('render'),
-                    'configuration': xml_object.xpath('configuration')[0],
-                    'plot_code': parse('plot_code'),
+                    'configuration': xml_object.xpath('configuration')[0]
                 }
 
     def definition_to_xml(self, resource_fs):
