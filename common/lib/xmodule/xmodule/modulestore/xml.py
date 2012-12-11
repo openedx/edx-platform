@@ -53,6 +53,8 @@ class ImportSystem(XMLParsingSystem, MakoDescriptorSystem):
         self.unnamed = defaultdict(int)     # category -> num of new url_names for that category
         self.used_names = defaultdict(set)  # category -> set of used url_names
         self.org, self.course, self.url_name = course_id.split('/')
+        # cdodge: adding the course_id as passed in for later reference rather than having to recomine the org/course/url_name
+        self.course_id = course_id
         self.load_error_modules = load_error_modules
 
         def process_xml(xml):
@@ -303,7 +305,7 @@ class XMLModuleStore(ModuleStoreBase):
         try:
             course_descriptor = self.load_course(course_dir, errorlog.tracker)
         except Exception as e:
-            msg = "Failed to load course '{0}': {1}".format(course_dir, str(e))
+            msg = "ERROR: Failed to load course '{0}': {1}".format(course_dir, str(e))
             log.exception(msg)
             errorlog.tracker(msg)
 
@@ -337,7 +339,7 @@ class XMLModuleStore(ModuleStoreBase):
             with open(policy_path) as f:
                 return json.load(f)
         except (IOError, ValueError) as err:
-            msg = "Error loading course policy from {0}".format(policy_path)
+            msg = "ERROR: loading course policy from {0}".format(policy_path)
             tracker(msg)
             log.warning(msg + " " + str(err))
         return {}
@@ -455,10 +457,18 @@ class XMLModuleStore(ModuleStoreBase):
                     slug = os.path.splitext(os.path.basename(filepath))[0]
                     loc = Location('i4x', course_descriptor.location.org, course_descriptor.location.course, category, slug)
                     module = HtmlDescriptor(system, definition={'data' : html}, **{'location' : loc})
+                    # VS[compat]:
+                    # Hack because we need to pull in the 'display_name' for static tabs (because we need to edit them)
+                    # from the course policy
+                    if category == "static_tab":
+                        for tab in course_descriptor.tabs or []:
+                            if tab.get('url_slug') == slug:
+                                module.metadata['display_name'] = tab['name']            
                     module.metadata['data_dir'] = course_dir
                     self.modules[course_descriptor.id][module.location] = module   
                 except Exception, e:
-                    logging.exception("Failed to load {0}. Skipping... Exception: {1}".format(filepath, str(e)))          
+                    logging.exception("Failed to load {0}. Skipping... Exception: {1}".format(filepath, str(e)))   
+                    system.error_tracker("ERROR: " + str(e))
 
     def get_instance(self, course_id, location, depth=0):
         """

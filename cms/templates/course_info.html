@@ -3,29 +3,39 @@
 
 <!-- TODO decode course # from context_course into title -->
 <%block name="title">Course Info</%block>
+<%block name="bodyclass">course-info</%block>
 
 <%block name="jsextra">
   <script type="text/javascript" src="${static.url('js/template_loader.js')}"></script>
   <script type="text/javascript" src="${static.url('js/models/course_info.js')}"></script>
+  <script type="text/javascript" src="${static.url('js/models/module_info.js')}"></script>
   <script type="text/javascript" src="${static.url('js/views/course_info_edit.js')}"></script>
+  <link rel="stylesheet" type="text/css" href="${static.url('js/vendor/timepicker/jquery.timepicker.css')}" />
+  <script src="${static.url('js/vendor/timepicker/jquery.timepicker.js')}"></script>
+  <script src="${static.url('js/vendor/timepicker/datepair.js')}"></script>
+  <script src="${static.url('js/vendor/date.js')}"></script>
   
   <script type="text/javascript" charset="utf-8">
-	$(document).ready(function(){
-	
-		var course_updates = new CMS.Models.CourseUpdateCollection();
-		course_updates.reset(${course_updates|n});
-		course_updates.urlbase = '${url_base}';
-		
-	    var editor = new CMS.Views.CourseInfoEdit({
-	    	el: $('.main-wrapper'),
-	    	model : new CMS.Models.CourseInfo({
-	    		courseId : '${context_course.location}',
-	    		updates : course_updates,
-	    		// FIXME add handouts
-	    		handouts : null})
-	    });
-	    editor.render();
-	});
+  $(document).ready(function(){
+    var course_updates = new CMS.Models.CourseUpdateCollection();
+    course_updates.reset(${course_updates|n});
+    course_updates.urlbase = '${url_base}';
+
+    var course_handouts = new CMS.Models.ModuleInfo({
+        id: '${handouts_location}'
+      });
+    course_handouts.urlbase = '${url_base}';
+    
+    var editor = new CMS.Views.CourseInfoEdit({
+      el: $('.main-wrapper'),
+      model : new CMS.Models.CourseInfo({
+        courseId : '${context_course.location}',
+        updates : course_updates,
+        handouts : course_handouts
+        })
+    });
+    editor.render();
+  });
   </script>
 </%block>
 
@@ -33,16 +43,18 @@
   <div class="main-wrapper">
     <div class="inner-wrapper">
       <h1>Course Info</h1>
-      <div class="main-column">
-		<div class="unit-body window" id="course-update-view">
-            <h2>Updates</h2>
-			<a href="#" class="new-update-button">New Update</a>
-			<ol class="update-list" id="course-update-list"></ol>
-			<!-- probably replace w/ a vertical where each element of the vertical is a separate update w/ a date and html field -->
+      <div class="course-info-wrapper">
+        <div class="main-column window">
+          <article class="course-updates" id="course-update-view">
+            <h2>Course Updates & News</h2>
+            <a href="#" class="new-update-button">New Update</a>
+            <ol class="update-list" id="course-update-list"></ol>
+            <!-- probably replace w/ a vertical where each element of the vertical is a separate update w/ a date and html field -->
+          </article>
         </div>
-	  </div>
-	  <div class="sidebar window">
-	  </div>
-	</div>
+        <div class="sidebar window course-handouts" id="course-handouts-view"></div>
+      </div>
+    </div>
+  </div>
   </div>
 </%block>

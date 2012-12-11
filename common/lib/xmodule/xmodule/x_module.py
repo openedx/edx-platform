@@ -108,7 +108,20 @@ class HTMLSnippet(object):
 
         All of these will be loaded onto the page in the CMS
         """
-        return cls.js
+        # cdodge: We've moved the xmodule.coffee script from an outside directory into the xmodule area of common
+        # this means we need to make sure that all xmodules include this dependency which had been previously implicitly 
+        # fulfilled in a different area of code
+        js = cls.js
+        
+        if js is None:
+            js = {}
+
+        if 'coffee' not in js:
+            js['coffee'] = []
+        
+        js['coffee'].append(resource_string(__name__, 'js/src/xmodule.coffee'))
+
+        return js
 
     @classmethod
     def get_css(cls):

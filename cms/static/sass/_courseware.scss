@@ -5,12 +5,7 @@ input.courseware-unit-search-input {
 }
 
 .courseware-overview {
-	.new-courseware-section-button {
-		@include grey-button;
-		display: block;
-		text-align: center;
-		padding: 12px 0;
-	}
+	
 }
 
 .courseware-section {
@@ -146,18 +141,18 @@ input.courseware-unit-search-input {
 
 	.section-name-edit {
 		input {
-			font-size: 16px;	
+			font-size: 16px;
 		}
 		
 		.save-button {
 			@include blue-button;
-			padding: 7px 20px 7px;
+			padding: 10px 20px;
 			margin-right: 5px;
 		}
 
 		.cancel-button {
 			@include white-button;
-			padding: 7px 20px 7px;
+			padding: 10px 20px;
 		}
 	}
 
@@ -205,7 +200,7 @@ input.courseware-unit-search-input {
 .new-section-name-save,
 .new-subsection-name-save {
 	@include blue-button;
-	padding: 2px 20px 5px;
+	padding: 6px 20px 8px;
 	margin: 0 5px;
 	color: #fff !important;
 }
@@ -213,7 +208,7 @@ input.courseware-unit-search-input {
 .new-section-name-cancel,
 .new-subsection-name-cancel {
 	@include white-button;
-	padding: 2px 20px 5px;
+	padding: 6px 20px 8px;
 	color: #8891a1 !important;
 }
 

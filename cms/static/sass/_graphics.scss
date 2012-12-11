@@ -137,6 +137,10 @@
 	height: 11px;
 	margin-right: 8px;
 	background: url(../img/plus-icon.png) no-repeat;
+
+	&.white {
+		background: url(../img/plus-icon-white.png) no-repeat;
+	}
 }
 
 .plus-icon-small {

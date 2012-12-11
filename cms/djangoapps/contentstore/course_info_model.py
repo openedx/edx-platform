@@ -4,7 +4,6 @@ from xmodule.modulestore.django import modulestore
 from lxml import etree
 import re
 from django.http import HttpResponseBadRequest
-from contentstore.utils import get_modulestore
 
 ## TODO store as array of { date, content } and override  course_info_module.definition_from_xml
 ## This should be in a class which inherits from XmlDescriptor
@@ -14,10 +13,10 @@ def get_course_updates(location):
     [{id : location.url() + idx to make unique, date : string, content : html string}]
     """
     try:
-        course_updates = get_modulestore(location).get_item(location)
+        course_updates = modulestore('direct').get_item(location)
     except ItemNotFoundError:
         template = Location(['i4x', 'edx', "templates", 'course_info', "Empty"])
-        course_updates = get_modulestore(location).clone_item(template, Location(location))
+        course_updates = modulestore('direct').clone_item(template, Location(location))
 
     # current db rep: {"_id" : locationjson, "definition" : { "data" : "<ol>[<li><h2>date</h2>content</li>]</ol>"} "metadata" : ignored}
     location_base = course_updates.location.url()
@@ -54,7 +53,7 @@ def update_course_updates(location, update, passed_id=None):
     into the html structure. 
     """
     try:
-        course_updates = get_modulestore(location).get_item(location)
+        course_updates = modulestore('direct').get_item(location)
     except ItemNotFoundError:
         return HttpResponseBadRequest
     
@@ -94,13 +93,13 @@ def update_course_updates(location, update, passed_id=None):
             date_element = etree.SubElement(element, "h2")
             date_element.text = update['date']
             if new_html_parsed is not None:
-                element[1] = new_html_parsed
+                element.append(new_html_parsed)
             else:
                 date_element.tail = update['content']
         
         # update db record
         course_updates.definition['data'] = etree.tostring(course_html_parsed)
-        get_modulestore(location).update_item(location, course_updates.definition['data'])
+        modulestore('direct').update_item(location, course_updates.definition['data'])
         
         return {"id" : passed_id,
                 "date" : update['date'],
@@ -115,7 +114,7 @@ def delete_course_update(location, update, passed_id):
         return HttpResponseBadRequest
         
     try:
-        course_updates = get_modulestore(location).get_item(location)
+        course_updates = modulestore('direct').get_item(location)
     except ItemNotFoundError:
         return HttpResponseBadRequest
     
@@ -134,7 +133,7 @@ def delete_course_update(location, update, passed_id):
 
         # update db record
         course_updates.definition['data'] = etree.tostring(course_html_parsed)
-        store = get_modulestore(location)
+        store = modulestore('direct')
         store.update_item(location, course_updates.definition['data'])  
           
     return get_course_updates(location)

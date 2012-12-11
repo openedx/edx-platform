@@ -13,7 +13,11 @@ CMS.Views.CourseInfoEdit = Backbone.View.extend({
         el: this.$('#course-update-view'),
         collection: this.model.get('updates')
     });
-    // TODO instantiate the handouts view
+
+    new CMS.Views.ClassInfoHandoutsView({
+        el: this.$('#course-handouts-view'),
+        model: this.model.get('handouts')
+    });
     return this;
   }
 });
@@ -34,11 +38,11 @@ CMS.Views.ClassInfoUpdateView = Backbone.View.extend({
         // instantiates an editor template for each update in the collection
         window.templateLoader.loadRemoteTemplate("course_info_update",
         	// TODO Where should the template reside? how to use the static.url to create the path?
-            "/static/coffee/src/client_templates/course_info_update.html",
-            function (raw_template) { 
+            "/static/client_templates/course_info_update.html",
+            function (raw_template) {
         		self.template = _.template(raw_template);
-        		self.render();
-        }
+        		self.render();           
+            }
         );
     },
         
@@ -53,28 +57,47 @@ CMS.Views.ClassInfoUpdateView = Backbone.View.extend({
               $(updateEle).append(newEle);
           });
           this.$el.find(".new-update-form").hide();
+          this.$el.find('.date').datepicker({ 'dateFormat': 'MM d, yy' });
           return this;
     },
     
     onNew: function(event) {
+        var self = this;
         // create new obj, insert into collection, and render this one ele overriding the hidden attr
         var newModel = new CMS.Models.CourseUpdate();
         this.collection.add(newModel, {at : 0});
         
-        var newForm = this.template({ updateModel : newModel });
+        var $newForm = $(this.template({ updateModel : newModel }));
+
+        var $textArea = $newForm.find(".new-update-content").first();
+        if (this.$codeMirror == null ) {
+            this.$codeMirror = CodeMirror.fromTextArea($textArea.get(0), {
+                mode: "text/html",
+                lineNumbers: true,
+                lineWrapping: true,
+            });
+        }
+
         var updateEle = this.$el.find("#course-update-list");
-        $(updateEle).append(newForm);
-        $(newForm).find(".new-update-form").show();
+        $(updateEle).prepend($newForm);
+        $newForm.addClass('editing');
+        this.$currentPost = $newForm.closest('li');
+
+        window.$modalCover.show();
+        window.$modalCover.bind('click', function() {
+            self.closeEditor(self, true);
+        });
+
+        $('.date').datepicker('destroy');
+        $('.date').datepicker({ 'dateFormat': 'MM d, yy' });
     },
     
     onSave: function(event) {
         var targetModel = this.eventModel(event);
-        targetModel.set({ date : this.dateEntry(event).val(), content : this.contentEntry(event).val() });
-        // push change to display, hide the editor, submit the change
-        $(this.dateDisplay(event)).val(targetModel.get('date'));
-        $(this.contentDisplay(event)).val(targetModel.get('content'));
-        $(this.editor(event)).hide();
-        
+        console.log(this.contentEntry(event).val());
+        targetModel.set({ date : this.dateEntry(event).val(), content : this.$codeMirror.getValue() });
+        // push change to display, hide the editor, submit the change        
+        this.closeEditor(this);
         targetModel.save();
     },
     
@@ -82,14 +105,31 @@ CMS.Views.ClassInfoUpdateView = Backbone.View.extend({
         // change editor contents back to model values and hide the editor
         $(this.editor(event)).hide();
         var targetModel = this.eventModel(event);
-        $(this.dateEntry(event)).val(targetModel.get('date'));
-        $(this.contentEntry(event)).val(targetModel.get('content'));
+        this.closeEditor(this, !targetModel.id);
     },
     
     onEdit: function(event) {
+        var self = this;
+        this.$currentPost = $(event.target).closest('li');
+        this.$currentPost.addClass('editing');
+       
         $(this.editor(event)).show();
+        var $textArea = this.$currentPost.find(".new-update-content").first();
+        if (this.$codeMirror == null ) {
+            this.$codeMirror = CodeMirror.fromTextArea($textArea.get(0), {
+                mode: "text/html",
+                lineNumbers: true,
+                lineWrapping: true,
+            });
+        }
+
+        window.$modalCover.show();
+        var targetModel = this.eventModel(event);
+        window.$modalCover.bind('click', function() {
+            self.closeEditor(self);
+        });
     },
-        
+
     onDelete: function(event) {
         // TODO ask for confirmation
         // remove the dom element and delete the model
@@ -100,6 +140,24 @@ CMS.Views.ClassInfoUpdateView = Backbone.View.extend({
             cacheThis.collection.fetch({success : function() {cacheThis.render();}});
         }
         });
+    },
+
+    closeEditor: function(self, removePost) {
+        var targetModel = self.collection.getByCid(self.$currentPost.attr('name'));
+
+        if(removePost) {
+            self.$currentPost.remove();
+        }
+
+        // close the modal and insert the appropriate data
+        self.$currentPost.removeClass('editing');
+        self.$currentPost.find('.date-display').html(targetModel.get('date'));
+        self.$currentPost.find('.date').val(targetModel.get('date'));
+        self.$currentPost.find('.update-contents').html(targetModel.get('content'));
+        self.$currentPost.find('.new-update-content').val(targetModel.get('content'));
+        self.$currentPost.find('form').hide();
+        window.$modalCover.unbind('click');
+        window.$modalCover.hide();
     },
     
     // Dereferencing from events to screen elements    
@@ -119,7 +177,7 @@ CMS.Views.ClassInfoUpdateView = Backbone.View.extend({
 
     dateEntry: function(event) {
     	var li = $(event.currentTarget).closest("li");
-    	if (li) return $(li).find("#date-entry").first();
+    	if (li) return $(li).find(".date").first();
     },
 
     contentEntry: function(event) {
@@ -135,4 +193,83 @@ CMS.Views.ClassInfoUpdateView = Backbone.View.extend({
     }
         
 });
+
+// the handouts view is dumb right now; it needs tied to a model and all that jazz
+CMS.Views.ClassInfoHandoutsView = Backbone.View.extend({
+    // collection is CourseUpdateCollection
+    events: {
+        "click .save-button" : "onSave",
+        "click .cancel-button" : "onCancel",
+        "click .edit-button" : "onEdit"
+    },
+
+    initialize: function() {
+        var self = this;
+        this.model.fetch(
+            {
+                complete: function() {
+                    window.templateLoader.loadRemoteTemplate("course_info_handouts",
+                        "/static/client_templates/course_info_handouts.html",
+                        function (raw_template) {
+                            self.template = _.template(raw_template);
+                            self.render();                
+                        }
+                    );
+                }
+            }
+        );
+    },
         
+    render: function () {        
+        var updateEle = this.$el;
+        var self = this;
+        this.$el.html(
+            $(this.template( {
+                model: this.model
+                })
+            )
+        );
+        this.$preview = this.$el.find('.handouts-content');
+        this.$form = this.$el.find(".edit-handouts-form");
+        this.$editor = this.$form.find('.handouts-content-editor');
+        this.$form.hide();
+
+        return this;
+    },
+
+    onEdit: function(event) {
+        var self = this;
+        this.$editor.val(this.$preview.html());
+        this.$form.show();
+        if (this.$codeMirror == null) {
+            this.$codeMirror = CodeMirror.fromTextArea(this.$editor.get(0), {
+                mode: "text/html",
+                lineNumbers: true,
+                lineWrapping: true,
+            });
+        }
+        window.$modalCover.show();
+        window.$modalCover.bind('click', function() {
+            self.closeEditor(self);
+        });
+    },
+
+    onSave: function(event) {
+        this.model.set('data', this.$codeMirror.getValue());
+        this.render();
+        this.model.save();
+        this.$form.hide();
+        this.closeEditor(this);
+    },
+
+    onCancel: function(event) {
+        this.$form.hide();
+        this.closeEditor(this);
+    },
+
+    closeEditor: function(self) {
+        this.$form.hide();
+        window.$modalCover.unbind('click');
+        window.$modalCover.hide();
+    }
+});

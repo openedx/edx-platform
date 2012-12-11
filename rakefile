@@ -3,6 +3,8 @@ require 'tempfile'
 require 'net/http'
 require 'launchy'
 require 'colorize'
+require 'erb'
+require 'tempfile'
 
 # Build Constants
 REPO_ROOT = File.dirname(__FILE__)
@@ -47,7 +49,7 @@ def django_for_jasmine(system, django_reload)
     end
 
     django_pid = fork do
-        exec(*django_admin(system, 'jasmine', 'runserver', "12345", reload_arg).split(' '))
+        exec(*django_admin(system, 'jasmine', 'runserver', '-v', '0', "12345", reload_arg).split(' '))
     end
     jasmine_url = 'http://localhost:12345/_jasmine/'
     up = false
@@ -78,6 +80,31 @@ def django_for_jasmine(system, django_reload)
         Process.wait(django_pid)
     end
 end
+
+def template_jasmine_runner(lib)
+    coffee_files = Dir["#{lib}/**/js/**/*.coffee", "common/static/coffee/src/**/*.coffee"]
+    if !coffee_files.empty?
+        sh("coffee -c #{coffee_files.join(' ')}")
+    end
+    phantom_jasmine_path = File.expand_path("common/test/phantom-jasmine")
+    common_js_root = File.expand_path("common/static/js")
+    common_coffee_root = File.expand_path("common/static/coffee/src")
+
+    # Get arrays of spec and source files, ordered by how deep they are nested below the library
+    # (and then alphabetically) and expanded from a relative to an absolute path
+    spec_glob = File.join("#{lib}", "**", "spec", "**", "*.js")
+    src_glob = File.join("#{lib}", "**", "src", "**", "*.js")
+    js_specs = Dir[spec_glob].sort_by {|p| [p.split('/').length, p]} .map {|f| File.expand_path(f)}
+    js_source = Dir[src_glob].sort_by {|p| [p.split('/').length, p]} .map {|f| File.expand_path(f)}
+
+    template = ERB.new(File.read("#{lib}/jasmine_test_runner.html.erb"))
+    template_output = "#{lib}/jasmine_test_runner.html"
+    File.open(template_output, 'w') do |f|
+        f.write(template.result(binding))
+    end
+    yield File.expand_path(template_output)
+end
+
 
 def report_dir_path(dir)
     return File.join(REPORT_DIR, dir.to_s)
@@ -126,22 +153,6 @@ end
     end
     task :pylint => "pylint_#{system}"
 
-    desc "Open jasmine tests in your default browser"
-    task "browse_jasmine_#{system}" do
-        django_for_jasmine(system, true) do |jasmine_url|
-            Launchy.open(jasmine_url)
-            puts "Press ENTER to terminate".red
-            $stdin.gets
-        end
-    end
-
-    desc "Use phantomjs to run jasmine tests from the console"
-    task "phantomjs_jasmine_#{system}" do
-        phantomjs = ENV['PHANTOMJS_PATH'] || 'phantomjs'
-        django_for_jasmine(system, false) do |jasmine_url|
-            sh("#{phantomjs} common/test/phantom-jasmine/lib/run_jasmine_test.coffee #{jasmine_url}")
-        end
-    end
 end
 
 $failed_tests = 0
@@ -210,6 +221,23 @@ TEST_TASK_DIRS = []
             end
         end
     end
+
+    desc "Open jasmine tests for #{system} in your default browser"
+    task "browse_jasmine_#{system}" do
+        django_for_jasmine(system, true) do |jasmine_url|
+            Launchy.open(jasmine_url)
+            puts "Press ENTER to terminate".red
+            $stdin.gets
+        end
+    end
+
+    desc "Use phantomjs to run jasmine tests for #{system} from the console"
+    task "phantomjs_jasmine_#{system}" do
+        phantomjs = ENV['PHANTOMJS_PATH'] || 'phantomjs'
+        django_for_jasmine(system, false) do |jasmine_url|
+            sh("#{phantomjs} common/test/phantom-jasmine/lib/run_jasmine_test.coffee #{jasmine_url}")
+        end
+    end
 end
 
 desc "Reset the relational database used by django. WARNING: this will delete all of your existing users"
@@ -245,6 +273,22 @@ Dir["common/lib/*"].select{|lib| File.directory?(lib)}.each do |lib|
         sh("nosetests #{lib}")
     end
 
+    desc "Open jasmine tests for #{lib} in your default browser"
+    task "browse_jasmine_#{lib}" do
+        template_jasmine_runner(lib) do |f|
+            sh("python -m webbrowser -t 'file://#{f}'")
+            puts "Press ENTER to terminate".red
+            $stdin.gets
+        end
+    end
+
+    desc "Use phantomjs to run jasmine tests for #{lib} from the console"
+    task "phantomjs_jasmine_#{lib}" do
+        phantomjs = ENV['PHANTOMJS_PATH'] || 'phantomjs'
+        template_jasmine_runner(lib) do |f|
+            sh("#{phantomjs} common/test/phantom-jasmine/lib/run_jasmine_test.coffee #{f}")
+        end
+    end
 end
 
 task :report_dirs
@@ -357,6 +401,20 @@ namespace :cms do
   task :import do
     if ENV['DATA_DIR']
       sh(django_admin(:cms, :dev, :import, ENV['DATA_DIR']))
+    else
+      raise "Please specify a DATA_DIR variable that point to your data directory.\n" +
+        "Example: \`rake cms:import DATA_DIR=../data\`"
+    end
+  end
+end
+
+namespace :cms do
+  desc "Import course data within the given DATA_DIR variable"
+  task :xlint do
+    if ENV['DATA_DIR'] and ENV['COURSE_DIR']
+      sh(django_admin(:cms, :dev, :xlint, ENV['DATA_DIR'], ENV['COURSE_DIR']))
+    elsif ENV['DATA_DIR']
+      sh(django_admin(:cms, :dev, :xlint, ENV['DATA_DIR']))
     else
       raise "Please specify a DATA_DIR variable that point to your data directory.\n" +
         "Example: \`rake cms:import DATA_DIR=../data\`"

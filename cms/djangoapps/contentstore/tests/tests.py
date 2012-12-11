@@ -1,7 +1,6 @@
 import json
 from django.test import TestCase
 from django.test.client import Client
-from mock import patch, Mock
 from override_settings import override_settings
 from django.conf import settings
 from django.core.urlresolvers import reverse
@@ -9,11 +8,10 @@ from path import path
 
 from student.models import Registration
 from django.contrib.auth.models import User
-from xmodule.modulestore.django import modulestore
 import xmodule.modulestore.django
-from xmodule.modulestore import Location
 from xmodule.modulestore.xml_importer import import_from_xml
 import copy
+from factories import *
 
 
 def parse_json(response):
@@ -22,33 +20,33 @@ def parse_json(response):
 
 
 def user(email):
-    '''look up a user by email'''
+    """look up a user by email"""
     return User.objects.get(email=email)
 
 
 def registration(email):
-    '''look up registration object by email'''
+    """look up registration object by email"""
     return Registration.objects.get(user__email=email)
 
 
 class ContentStoreTestCase(TestCase):
     def _login(self, email, pw):
-        '''Login.  View should always return 200.  The success/fail is in the
-        returned json'''
+        """Login.  View should always return 200.  The success/fail is in the
+        returned json"""
         resp = self.client.post(reverse('login_post'),
                                 {'email': email, 'password': pw})
         self.assertEqual(resp.status_code, 200)
         return resp
 
     def login(self, email, pw):
-        '''Login, check that it worked.'''
+        """Login, check that it worked."""
         resp = self._login(email, pw)
         data = parse_json(resp)
         self.assertTrue(data['success'])
         return resp
 
     def _create_account(self, username, email, pw):
-        '''Try to create an account.  No error checking'''
+        """Try to create an account.  No error checking"""
         resp = self.client.post('/create_account', {
             'username': username,
             'email': email,
@@ -62,7 +60,7 @@ class ContentStoreTestCase(TestCase):
         return resp
 
     def create_account(self, username, email, pw):
-        '''Create the account and check that it worked'''
+        """Create the account and check that it worked"""
         resp = self._create_account(username, email, pw)
         self.assertEqual(resp.status_code, 200)
         data = parse_json(resp)
@@ -74,8 +72,8 @@ class ContentStoreTestCase(TestCase):
         return resp
 
     def _activate_user(self, email):
-        '''Look up the activation key for the user, then hit the activate view.
-        No error checking'''
+        """Look up the activation key for the user, then hit the activate view.
+        No error checking"""
         activation_key = registration(email).activation_key
 
         # and now we try to activate
@@ -220,12 +218,6 @@ class ContentStoreTest(TestCase):
             'display_name': 'Robot Super Course',
             }
 
-        self.section_data = {
-            'parent_location' : 'i4x://MITx/999/course/Robot_Super_Course',
-            'template' : 'i4x://edx/templates/chapter/Empty',
-            'display_name': 'Section One',
-            }
-
     def tearDown(self):
         # Make sure you flush out the test modulestore after the end
         # of the last test because otherwise on the next run
@@ -262,6 +254,16 @@ class ContentStoreTest(TestCase):
         self.assertEqual(data['ErrMsg'], 
             'There is already a course defined with the same organization and course number.')
 
+    def test_create_course_with_bad_organization(self):
+        """Test new course creation - error path for bad organization name"""
+        self.course_data['org'] = 'University of California, Berkeley'
+        resp = self.client.post(reverse('create_new_course'), self.course_data)
+        data = parse_json(resp)
+
+        self.assertEqual(resp.status_code, 200)
+        self.assertEqual(data['ErrMsg'],
+            "Unable to create course 'Robot Super Course'.\n\nInvalid characters in 'University of California, Berkeley'.")
+
     def test_course_index_view_with_no_courses(self):
         """Test viewing the index page with no courses"""
         # Create a course so there is something to view
@@ -271,20 +273,27 @@ class ContentStoreTest(TestCase):
             status_code=200,
             html=True)
 
+    def test_course_factory(self):
+        course = CourseFactory.create()
+        self.assertIsInstance(course, xmodule.course_module.CourseDescriptor)
+
+    def test_item_factory(self):
+        course = CourseFactory.create()
+        item = ItemFactory.create(parent_location=course.location)
+        self.assertIsInstance(item, xmodule.seq_module.SequenceDescriptor)
+
     def test_course_index_view_with_course(self):
         """Test viewing the index page with an existing course"""
-        # Create a course so there is something to view
-        resp = self.client.post(reverse('create_new_course'), self.course_data)
+        CourseFactory.create(display_name='Robot Super Educational Course')
         resp = self.client.get(reverse('index'))
         self.assertContains(resp,
-            '<span class="class-name">Robot Super Course</span>',
+            '<span class="class-name">Robot Super Educational Course</span>',
             status_code=200,
             html=True)
 
     def test_course_overview_view_with_course(self):
         """Test viewing the course overview page with an existing course"""
-        # Create a course so there is something to view
-        resp = self.client.post(reverse('create_new_course'), self.course_data)
+        CourseFactory.create(org='MITx', course='999', display_name='Robot Super Course')
 
         data = {
                 'org': 'MITx',
@@ -300,8 +309,15 @@ class ContentStoreTest(TestCase):
 
     def test_clone_item(self):
         """Test cloning an item. E.g. creating a new section"""
-        resp = self.client.post(reverse('create_new_course'), self.course_data)
-        resp = self.client.post(reverse('clone_item'), self.section_data)
+        CourseFactory.create(org='MITx', course='999', display_name='Robot Super Course')
+
+        section_data = {
+            'parent_location' : 'i4x://MITx/999/course/Robot_Super_Course',
+            'template' : 'i4x://edx/templates/chapter/Empty',
+            'display_name': 'Section One',
+            }
+
+        resp = self.client.post(reverse('clone_item'), section_data)
 
         self.assertEqual(resp.status_code, 200)
         data = parse_json(resp)
@@ -322,4 +338,5 @@ class ContentStoreTest(TestCase):
 
     def test_edit_unit_full(self):
         self.check_edit_unit('full')
+
 

@@ -1,53 +1,59 @@
-from .utils import get_course_location_for_item, get_lms_link_for_item, \
-    compute_unit_state, get_date_display, UnitState
-# to install PIL on MacOSX: 'easy_install http://dist.repoze.org/PIL-1.1.6.tar.gz'
-from PIL import Image
-from auth.authz import INSTRUCTOR_ROLE_NAME, STAFF_ROLE_NAME, \
-    create_all_course_groups, get_user_by_email, add_user_to_course_group, \
-    remove_user_from_course_group, is_user_in_course_group_role, \
-    get_users_in_course_group_by_role
-from cache_toolbox.core import del_cached_content
-from collections import defaultdict
-from datetime import datetime
-from django.conf import settings
-from django.contrib.auth.decorators import login_required
-from django.core.context_processors import csrf
-from django.core.exceptions import PermissionDenied
-from django.core.urlresolvers import reverse
-from django.http import HttpResponse, Http404, HttpResponseBadRequest, \
-    HttpResponseForbidden
-from django_future.csrf import ensure_csrf_cookie
-from external_auth.views import ssl_login_shortcut
-from functools import partial
-from mitxmako.shortcuts import render_to_response, render_to_string
-from path import path
-from static_replace import replace_urls
 from util.json_request import expect_json
-from uuid import uuid4
-from xmodule.contentstore.content import StaticContent
-from xmodule.contentstore.django import contentstore
-from xmodule.error_module import ErrorDescriptor
-from xmodule.errortracker import exc_info_to_str
-from xmodule.exceptions import NotFoundError
-from xmodule.modulestore import Location
-from xmodule.modulestore.django import modulestore
-from xmodule.modulestore.exceptions import ItemNotFoundError
-from xmodule.modulestore.xml_importer import import_from_xml
-from xmodule.timeparse import stringify_time
-from xmodule.x_module import ModuleSystem
-from xmodule_modifiers import replace_static_urls, wrap_xmodule
 import json
 import logging
 import os
-import shutil
 import sys
-import tarfile
 import time
-from contentstore import course_info_model
-from contentstore.utils import get_modulestore
+import tarfile
+import shutil
+from datetime import datetime
+from collections import defaultdict
+from uuid import uuid4
+from path import path
+
+# to install PIL on MacOSX: 'easy_install http://dist.repoze.org/PIL-1.1.6.tar.gz'
+from PIL import Image
+
+from django.http import HttpResponse, Http404, HttpResponseBadRequest, HttpResponseForbidden
+from django.contrib.auth.decorators import login_required
+from django.core.exceptions import PermissionDenied
+from django.core.context_processors import csrf
+from django_future.csrf import ensure_csrf_cookie
+from django.core.urlresolvers import reverse
+from django.conf import settings
+
+from xmodule.modulestore import Location
+from xmodule.modulestore.exceptions import ItemNotFoundError, InvalidLocationError
+from xmodule.x_module import ModuleSystem
+from xmodule.error_module import ErrorDescriptor
+from xmodule.errortracker import exc_info_to_str
+from static_replace import replace_urls
+from external_auth.views import ssl_login_shortcut
+
+from mitxmako.shortcuts import render_to_response, render_to_string
+from xmodule.modulestore.django import modulestore
+from xmodule_modifiers import replace_static_urls, wrap_xmodule
+from xmodule.exceptions import NotFoundError
+from functools import partial
+
+from xmodule.contentstore.django import contentstore
+from xmodule.contentstore.content import StaticContent
+
+from auth.authz import is_user_in_course_group_role, get_users_in_course_group_by_role
+from auth.authz import get_user_by_email, add_user_to_course_group, remove_user_from_course_group
+from auth.authz import INSTRUCTOR_ROLE_NAME, STAFF_ROLE_NAME, create_all_course_groups
+from .utils import get_course_location_for_item, get_lms_link_for_item, compute_unit_state, get_date_display, UnitState, get_course_for_item
+
+from xmodule.modulestore.xml_importer import import_from_xml
+from contentstore.course_info_model import get_course_updates,\
+    update_course_updates, delete_course_update
+from cache_toolbox.core import del_cached_content
+from xmodule.timeparse import stringify_time
+from contentstore.module_info_model import get_module_info, set_module_info
 from cms.djangoapps.models.settings.course_details import CourseDetails,\
     CourseSettingsEncoder
 from cms.djangoapps.models.settings.course_grading import CourseGradingModel
+from cms.djangoapps.contentstore.utils import get_modulestore
 
 # to install PIL on MacOSX: 'easy_install http://dist.repoze.org/PIL-1.1.6.tar.gz'
 
@@ -474,11 +480,20 @@ def load_preview_module(request, preview_id, descriptor, instance_state, shared_
             error_msg=exc_info_to_str(sys.exc_info())
         ).xmodule_constructor(system)(None, None)
 
-    module.get_html = wrap_xmodule(
-        module.get_html,
-        module,
-        "xmodule_display.html",
-    )
+    # cdodge: Special case 
+    if module.location.category == 'static_tab':
+        module.get_html = wrap_xmodule(
+            module.get_html,
+            module,
+            "xmodule_tab_display.html",
+        )
+    else:        
+        module.get_html = wrap_xmodule(
+            module.get_html,
+            module,
+            "xmodule_display.html",
+        )
+        
     module.get_html = replace_static_urls(
         module.get_html,
         module.metadata.get('data_dir', module.location.course),
@@ -905,7 +920,8 @@ def course_info(request, org, course, name, provided_id=None):
         'active_tab': 'courseinfo-tab',
         'context_course': course_module,
         'url_base' : "/" + org + "/" + course + "/",
-        'course_updates' : json.dumps(course_info_model.get_course_updates(location))
+        'course_updates' : json.dumps(get_course_updates(location)),
+        'handouts_location': Location(['i4x', org, course, 'course_info', 'handouts']).url()
     })
         
 @expect_json
@@ -928,13 +944,38 @@ def course_info_updates(request, org, course, provided_id=None):
         real_method = request.method
         
     if request.method == 'GET':
-        return HttpResponse(json.dumps(course_info_model.get_course_updates(location)), mimetype="application/json")
+        return HttpResponse(json.dumps(get_course_updates(location)), mimetype="application/json")
     elif real_method == 'POST':
-        return HttpResponse(json.dumps(course_info_model.update_course_updates(location, request.POST, provided_id)), mimetype="application/json")
+        # new instance (unless django makes PUT a POST): updates are coming as POST. Not sure why.
+        return HttpResponse(json.dumps(update_course_updates(location, request.POST, provided_id)), mimetype="application/json")
     elif real_method == 'PUT':
-        return HttpResponse(json.dumps(course_info_model.update_course_updates(location, request.POST, provided_id)), mimetype="application/json")
-    elif real_method == 'DELETE':  
-        return HttpResponse(json.dumps(course_info_model.delete_course_update(location, request.POST, provided_id)), mimetype="application/json")
+        return HttpResponse(json.dumps(update_course_updates(location, request.POST, provided_id)), mimetype="application/json")
+    elif real_method == 'DELETE':  # coming as POST need to pull from Request Header X-HTTP-Method-Override    DELETE
+        return HttpResponse(json.dumps(delete_course_update(location, request.POST, provided_id)), mimetype="application/json")
+
+
+@expect_json
+@login_required
+@ensure_csrf_cookie
+def module_info(request, module_location):
+    location = Location(module_location)
+
+    # NB: we're setting Backbone.emulateHTTP to true on the client so everything comes as a post!!!
+    if request.method == 'POST' and 'HTTP_X_HTTP_METHOD_OVERRIDE' in request.META:
+        real_method = request.META['HTTP_X_HTTP_METHOD_OVERRIDE']
+    else:
+        real_method = request.method    
+    
+    # check that logged in user has permissions to this item
+    if not has_access(request.user, location):
+        raise PermissionDenied()    
+
+    if real_method == 'GET':
+        return HttpResponse(json.dumps(get_module_info(get_modulestore(location), location)), mimetype="application/json")
+    elif real_method == 'POST' or real_method == 'PUT':
+        return HttpResponse(json.dumps(set_module_info(get_modulestore(location), location, request.POST)), mimetype="application/json")
+    else:
+        return HttpResponseBadRequest
 
 @login_required
 @ensure_csrf_cookie
@@ -1079,7 +1120,10 @@ def create_new_course(request):
     number = request.POST.get('number')  
     display_name = request.POST.get('display_name')   
 
-    dest_location = Location('i4x', org, number, 'course', Location.clean(display_name))
+    try:
+        dest_location = Location('i4x', org, number, 'course', Location.clean(display_name))
+    except InvalidLocationError as e:
+        return HttpResponse(json.dumps({'ErrMsg': "Unable to create course '" + display_name + "'.\n\n" + e.message}))
 
     # see if the course already exists
     existing_course = None

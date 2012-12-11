@@ -21,6 +21,7 @@ def wrap_xmodule(get_html, module, template, context=None):
     module: An XModule
     template: A template that takes the variables:
         content: the results of get_html,
+        display_name: the display name of the xmodule, if available (None otherwise)
         class_: the module class name
         module_name: the js_module_name of the module
     """
@@ -31,6 +32,7 @@ def wrap_xmodule(get_html, module, template, context=None):
     def _get_html():
         context.update({
             'content': get_html(),
+            'display_name' : module.metadata.get('display_name') if module.metadata is not None else None,
             'class_': module.__class__.__name__,
             'module_name': module.js_module_name
         })
