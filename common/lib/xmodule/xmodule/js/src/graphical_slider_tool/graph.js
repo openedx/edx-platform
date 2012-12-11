@@ -2,14 +2,12 @@
 // define() functions from Require JS available inside the anonymous function.
 (function (requirejs, require, define) {
 
-define('Graph', ['logme'], function (logme) {
+define('Graph', [], function () {
 
     return Graph;
 
     function Graph(gstId, config, state) {
         var plotDiv, dataSeries, functions;
-
-        logme(config);
 
         plotDiv = $('#' + gstId + '_plot');
 
@@ -140,8 +138,6 @@ define('Graph', ['logme'], function (logme) {
                     newFunctionObject['label'] = label;
                 }
 
-                logme(newFunctionObject);
-
                 functions.push(newFunctionObject);
             }
         }
@@ -160,7 +156,6 @@ define('Graph', ['logme'], function (logme) {
 
             for (c0 = 0; c0 < functions.length; c0 += 1) {
                 functionObj = functions[c0];
-                logme('Functions obj:', functionObj);
 
                 seriesObj = {};
                 dataPoints = [];
