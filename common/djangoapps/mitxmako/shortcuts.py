@@ -12,10 +12,6 @@
 #   See the License for the specific language governing permissions and
 #   limitations under the License.
 
-import logging
-
-log = logging.getLogger("mitx." + __name__)
-
 from django.template import Context
 from django.http import HttpResponse
 
@@ -42,7 +38,7 @@ def render_to_string(template_name, dictionary, context=None, namespace='main'):
         context_dictionary.update(context)
     # fetch and render template
     template = middleware.lookup[namespace].get_template(template_name)
-    return template.render(**context_dictionary)
+    return template.render_unicode(**context_dictionary)
 
 
 def render_to_response(template_name, dictionary, context_instance=None, namespace='main', **kwargs):

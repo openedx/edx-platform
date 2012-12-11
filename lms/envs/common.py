@@ -322,6 +322,13 @@ WIKI_USE_BOOTSTRAP_SELECT_WIDGET = False
 WIKI_LINK_LIVE_LOOKUPS = False
 WIKI_LINK_DEFAULT_LEVEL = 2
 
+################################# Staff grading config  #####################
+
+STAFF_GRADING_INTERFACE = None
+# Used for testing, debugging
+MOCK_STAFF_GRADING = False
+
+
 ################################# Jasmine ###################################
 JASMINE_TEST_DIRECTORY = PROJECT_ROOT + '/static/coffee'
 
@@ -397,6 +404,7 @@ courseware_only_js += [
 ]
 
 main_vendor_js = [
+  'js/vendor/json2.js',
   'js/vendor/jquery.min.js',
   'js/vendor/jquery-ui.min.js',
   'js/vendor/jquery.cookie.js',
@@ -405,6 +413,9 @@ main_vendor_js = [
 ]
 
 discussion_js = sorted(glob2.glob(PROJECT_ROOT / 'static/coffee/src/discussion/**/*.coffee'))
+
+staff_grading_js = sorted(glob2.glob(PROJECT_ROOT / 'static/coffee/src/staff_grading/**/*.coffee'))
+
 
 # Load javascript from all of the available xmodules, and
 # prep it for use in pipeline js
@@ -468,7 +479,8 @@ with open(module_styles_path, 'w') as module_styles:
 
 PIPELINE_JS = {
     'application': {
-        # Application will contain all paths not in courseware_only_js
+        # Application will contain all paths not in courseware_only_js or
+        # discussion_js or staff_grading_js
         'source_filenames': [
             pth.replace(COMMON_ROOT / 'static/', '')
             for pth
@@ -476,7 +488,9 @@ PIPELINE_JS = {
         ] + [
             pth.replace(PROJECT_ROOT / 'static/', '')
             for pth in sorted(glob2.glob(PROJECT_ROOT / 'static/coffee/src/**/*.coffee'))\
-            if pth not in courseware_only_js and pth not in discussion_js
+            if (pth not in courseware_only_js and
+                pth not in discussion_js and
+                pth not in staff_grading_js)
         ] + [
             'js/form.ext.js',
             'js/my_courses_dropdown.js',
@@ -505,7 +519,12 @@ PIPELINE_JS = {
     'discussion' : {
         'source_filenames': [pth.replace(PROJECT_ROOT / 'static/', '')  for pth in discussion_js],
         'output_filename': 'js/discussion.js'
+    },
+    'staff_grading' : {
+        'source_filenames': [pth.replace(PROJECT_ROOT / 'static/', '')  for pth in staff_grading_js],
+        'output_filename': 'js/staff_grading.js'
     }
+
 }
 
 PIPELINE_DISABLE_WRAPPER = True

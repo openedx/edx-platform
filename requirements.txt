@@ -8,11 +8,11 @@ lxml
 boto
 mako
 python-memcached
-python-openid 
+python-openid
 path.py
 django_debug_toolbar
 fs
-beautifulsoup 
+beautifulsoup
 beautifulsoup4
 feedparser
 requests
@@ -37,7 +37,7 @@ django-jasmine
 django-keyedcache
 django-mako
 django-masquerade
-django-openid-auth 
+django-openid-auth
 django-robots
 django-ses
 django-storages
@@ -54,3 +54,5 @@ dogstatsd-python
 # Taking out MySQL-python for now because it requires mysql to be installed, so breaks updates on content folks' envs.
 # MySQL-python
 sphinx
+Shapely
+ipython

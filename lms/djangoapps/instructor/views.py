@@ -1,59 +1,56 @@
 # ======== Instructor views =============================================================================
 
+from collections import defaultdict
 import csv
-import itertools
-import json
 import logging
 import os
 import urllib
 
-import track.views
-
-from functools import partial
-from collections import defaultdict
-
 from django.conf import settings
-from django.core.context_processors import csrf
-from django.core.urlresolvers import reverse
 from django.contrib.auth.models import User, Group
-from django.contrib.auth.decorators import login_required
-from django.http import Http404, HttpResponse
-from django.shortcuts import redirect
-from mitxmako.shortcuts import render_to_response, render_to_string
-#from django.views.decorators.csrf import ensure_csrf_cookie
+from django.http import HttpResponse
 from django_future.csrf import ensure_csrf_cookie
 from django.views.decorators.cache import cache_control
+from mitxmako.shortcuts import render_to_response
+from django.core.urlresolvers import reverse
 
 from courseware import grades
 from courseware.access import has_access, get_access_group_name
-from courseware.courses import (get_course_with_access, get_courses_by_university)
+from courseware.courses import get_course_with_access 
+from django_comment_client.models import Role, FORUM_ROLE_ADMINISTRATOR, FORUM_ROLE_MODERATOR, FORUM_ROLE_COMMUNITY_TA
+from django_comment_client.utils import has_forum_access
 from psychometrics import psychoanalyze
-from student.models import UserProfile
-
-from student.models import UserTestGroup, CourseEnrollment
-from util.cache import cache, cache_if_anonymous
+from student.models import CourseEnrollment
 from xmodule.course_module import CourseDescriptor
 from xmodule.modulestore import Location
 from xmodule.modulestore.django import modulestore
 from xmodule.modulestore.exceptions import InvalidLocationError, ItemNotFoundError, NoPathToItem
 from xmodule.modulestore.search import path_to_location
+import track.views
 
-log = logging.getLogger("mitx.courseware")
+from .grading import StaffGrading
+
+
+log = logging.getLogger(__name__)
 
 template_imports = {'urllib': urllib}
 
+# internal commands for managing forum roles:
+FORUM_ROLE_ADD = 'add'
+FORUM_ROLE_REMOVE = 'remove'
 
 @ensure_csrf_cookie
 @cache_control(no_cache=True, no_store=True, must_revalidate=True)
+
 def instructor_dashboard(request, course_id):
     """Display the instructor dashboard for a course."""
     course = get_course_with_access(request.user, course_id, 'staff')
 
     instructor_access = has_access(request.user, course, 'instructor')   # an instructor can manage staff lists
+    
+    forum_admin_access = has_forum_access(request.user, course_id, FORUM_ROLE_ADMINISTRATOR)
 
     msg = ''
-    #msg += ('POST=%s' % dict(request.POST)).replace('<','&lt;')
-
     problems = []
     plots = []
 
@@ -81,7 +78,7 @@ def instructor_dashboard(request, course_id):
 
     def return_csv(fn, datatable):
         response = HttpResponse(mimetype='text/csv')
-        response['Content-Disposition'] = 'attachment; filename=%s' % fn
+        response['Content-Disposition'] = 'attachment; filename={0}'.format(fn)
         writer = csv.writer(response, dialect='excel', quotechar='"', quoting=csv.QUOTE_ALL)
         writer.writerow(datatable['header'])
         for datarow in datatable['data']:
@@ -94,7 +91,7 @@ def instructor_dashboard(request, course_id):
         try:
             group = Group.objects.get(name=staffgrp)
         except Group.DoesNotExist:
-            group = Group(name=staffgrp)		# create the group
+            group = Group(name=staffgrp)     # create the group
             group.save()
         return group
 
@@ -104,75 +101,75 @@ def instructor_dashboard(request, course_id):
     if settings.MITX_FEATURES['ENABLE_MANUAL_GIT_RELOAD']:
         if 'GIT pull' in action:
             data_dir = course.metadata['data_dir']
-            log.debug('git pull %s' % (data_dir))
+            log.debug('git pull {0}'.format(data_dir))
             gdir = settings.DATA_DIR / data_dir
             if not os.path.exists(gdir):
-                msg += "====> ERROR in gitreload - no such directory %s" % gdir
+                msg += "====> ERROR in gitreload - no such directory {0}".format(gdir)
             else:
-                cmd = "cd %s; git reset --hard HEAD; git clean -f -d; git pull origin; chmod g+w course.xml" % gdir
-                msg += "git pull on %s:<p>" % data_dir
-                msg += "<pre>%s</pre></p>" % escape(os.popen(cmd).read())
-                track.views.server_track(request, 'git pull %s' % data_dir, {}, page='idashboard')
+                cmd = "cd {0}; git reset --hard HEAD; git clean -f -d; git pull origin; chmod g+w course.xml".format(gdir)
+                msg += "git pull on {0}:<p>".format(data_dir)
+                msg += "<pre>{0}</pre></p>".format(escape(os.popen(cmd).read()))
+                track.views.server_track(request, 'git pull {0}'.format(data_dir), {}, page='idashboard')
 
         if 'Reload course' in action:
-            log.debug('reloading %s (%s)' % (course_id, course))
+            log.debug('reloading {0} ({1})'.format(course_id, course))
             try:
                 data_dir = course.metadata['data_dir']
                 modulestore().try_load_course(data_dir)
-                msg += "<br/><p>Course reloaded from %s</p>" % data_dir
-                track.views.server_track(request, 'reload %s' % data_dir, {}, page='idashboard')
+                msg += "<br/><p>Course reloaded from {0}</p>".format(data_dir)
+                track.views.server_track(request, 'reload {0}'.format(data_dir), {}, page='idashboard')
                 course_errors = modulestore().get_item_errors(course.location)
                 msg += '<ul>'
                 for cmsg, cerr in course_errors:
-                    msg += "<li>%s: <pre>%s</pre>" % (cmsg,escape(cerr))
+                    msg += "<li>{0}: <pre>{1}</pre>".format(cmsg,escape(cerr))
                 msg += '</ul>'
             except Exception as err:
-                msg += '<br/><p>Error: %s</p>' % escape(err)
+                msg += '<br/><p>Error: {0}</p>'.format(escape(err))
 
     if action == 'Dump list of enrolled students':
         log.debug(action)
         datatable = get_student_grade_summary_data(request, course, course_id, get_grades=False)
-        datatable['title'] = 'List of students enrolled in %s' % course_id
+        datatable['title'] = 'List of students enrolled in {0}'.format(course_id)
         track.views.server_track(request, 'list-students', {}, page='idashboard')
 
     elif 'Dump Grades' in action:
         log.debug(action)
         datatable = get_student_grade_summary_data(request, course, course_id, get_grades=True)
-        datatable['title'] = 'Summary Grades of students enrolled in %s' % course_id
+        datatable['title'] = 'Summary Grades of students enrolled in {0}'.format(course_id)
         track.views.server_track(request, 'dump-grades', {}, page='idashboard')
 
     elif 'Dump all RAW grades' in action:
         log.debug(action)
         datatable = get_student_grade_summary_data(request, course, course_id, get_grades=True,
                                                    get_raw_scores=True)
-        datatable['title'] = 'Raw Grades of students enrolled in %s' % course_id
+        datatable['title'] = 'Raw Grades of students enrolled in {0}'.format(course_id)
         track.views.server_track(request, 'dump-grades-raw', {}, page='idashboard')
 
     elif 'Download CSV of all student grades' in action:
         track.views.server_track(request, 'dump-grades-csv', {}, page='idashboard')
-        return return_csv('grades_%s.csv' % course_id,
+        return return_csv('grades_{0}.csv'.format(course_id),
                           get_student_grade_summary_data(request, course, course_id))
 
     elif 'Download CSV of all RAW grades' in action:
         track.views.server_track(request, 'dump-grades-csv-raw', {}, page='idashboard')
-        return return_csv('grades_%s_raw.csv' % course_id,
+        return return_csv('grades_{0}_raw.csv'.format(course_id),
                           get_student_grade_summary_data(request, course, course_id, get_raw_scores=True))
 
     elif 'Download CSV of answer distributions' in action:
         track.views.server_track(request, 'dump-answer-dist-csv', {}, page='idashboard')
-        return return_csv('answer_dist_%s.csv' % course_id, get_answers_distribution(request, course_id))
+        return return_csv('answer_dist_{0}.csv'.format(course_id), get_answers_distribution(request, course_id))
 
     #----------------------------------------
     # Admin
 
     elif 'List course staff' in action:
         group = get_staff_group(course)
-        msg += 'Staff group = %s' % group.name
-        log.debug('staffgrp=%s' % group.name)
+        msg += 'Staff group = {0}'.format(group.name)
+        log.debug('staffgrp={0}'.format(group.name))
         uset = group.user_set.all()
         datatable = {'header': ['Username', 'Full name']}
         datatable['data'] = [[x.username, x.profile.name] for x in uset]
-        datatable['title'] = 'List of Staff in course %s' % course_id
+        datatable['title'] = 'List of Staff in course {0}'.format(course_id)
         track.views.server_track(request, 'list-staff', {}, page='idashboard')
 
     elif action == 'Add course staff':
@@ -180,28 +177,86 @@ def instructor_dashboard(request, course_id):
         try:
             user = User.objects.get(username=uname)
         except User.DoesNotExist:
-            msg += '<font color="red">Error: unknown username "%s"</font>' % uname
+            msg += '<font color="red">Error: unknown username "{0}"</font>'.format(uname)
             user = None
         if user is not None:
             group = get_staff_group(course)
-            msg += '<font color="green">Added %s to staff group = %s</font>' % (user, group.name)
-            log.debug('staffgrp=%s' % group.name)
+            msg += '<font color="green">Added {0} to staff group = {1}</font>'.format(user, group.name)
+            log.debug('staffgrp={0}'.format(group.name))
             user.groups.add(group)
-            track.views.server_track(request, 'add-staff %s' % user, {}, page='idashboard')
+            track.views.server_track(request, 'add-staff {0}'.format(user), {}, page='idashboard')
 
     elif action == 'Remove course staff':
         uname = request.POST['staffuser']
         try:
             user = User.objects.get(username=uname)
         except User.DoesNotExist:
-            msg += '<font color="red">Error: unknown username "%s"</font>' % uname
+            msg += '<font color="red">Error: unknown username "{0}"</font>'.format(uname)
             user = None
         if user is not None:
             group = get_staff_group(course)
-            msg += '<font color="green">Removed %s from staff group = %s</font>' % (user, group.name)
-            log.debug('staffgrp=%s' % group.name)
+            msg += '<font color="green">Removed {0} from staff group = {1}</font>'.format(user, group.name)
+            log.debug('staffgrp={0}'.format(group.name))
             user.groups.remove(group)
-            track.views.server_track(request, 'remove-staff %s' % user, {}, page='idashboard')
+            track.views.server_track(request, 'remove-staff {0}'.format(user), {}, page='idashboard')
+
+    #----------------------------------------
+    # forum administration
+  
+    elif action == 'List course forum admins':
+        rolename = FORUM_ROLE_ADMINISTRATOR
+        datatable = {}
+        msg += _list_course_forum_members(course_id, rolename, datatable)
+        track.views.server_track(request, 'list-{0}'.format(rolename), {}, page='idashboard')
+        
+    
+    elif action == 'Remove forum admin':
+        uname = request.POST['forumadmin']
+        msg += _update_forum_role_membership(uname, course, FORUM_ROLE_ADMINISTRATOR, FORUM_ROLE_REMOVE)
+        track.views.server_track(request, '{0} {1} as {2} for {3}'.format(FORUM_ROLE_REMOVE, uname, FORUM_ROLE_ADMINISTRATOR, course_id), 
+                                 {}, page='idashboard')
+
+    elif action == 'Add forum admin':
+        uname = request.POST['forumadmin']
+        msg += _update_forum_role_membership(uname, course, FORUM_ROLE_ADMINISTRATOR, FORUM_ROLE_ADD)
+        track.views.server_track(request, '{0} {1} as {2} for {3}'.format(FORUM_ROLE_ADD, uname, FORUM_ROLE_ADMINISTRATOR, course_id), 
+                                 {}, page='idashboard')
+
+    elif action == 'List course forum moderators':
+        rolename = FORUM_ROLE_MODERATOR
+        datatable = {}
+        msg += _list_course_forum_members(course_id, rolename, datatable)
+        track.views.server_track(request, 'list-{0}'.format(rolename), {}, page='idashboard')
+    
+    elif action == 'Remove forum moderator':
+        uname = request.POST['forummoderator']
+        msg += _update_forum_role_membership(uname, course, FORUM_ROLE_MODERATOR, FORUM_ROLE_REMOVE)
+        track.views.server_track(request, '{0} {1} as {2} for {3}'.format(FORUM_ROLE_REMOVE, uname, FORUM_ROLE_MODERATOR, course_id), 
+                                 {}, page='idashboard')
+    
+    elif action == 'Add forum moderator':
+        uname = request.POST['forummoderator']
+        msg += _update_forum_role_membership(uname, course, FORUM_ROLE_MODERATOR, FORUM_ROLE_ADD)
+        track.views.server_track(request, '{0} {1} as {2} for {3}'.format(FORUM_ROLE_ADD, uname, FORUM_ROLE_MODERATOR, course_id), 
+                                 {}, page='idashboard')
+    
+    elif action == 'List course forum community TAs':
+        rolename = FORUM_ROLE_COMMUNITY_TA
+        datatable = {}
+        msg += _list_course_forum_members(course_id, rolename, datatable)
+        track.views.server_track(request, 'list-{0}'.format(rolename), {}, page='idashboard')
+    
+    elif action == 'Remove forum community TA':
+        uname = request.POST['forummoderator']
+        msg += _update_forum_role_membership(uname, course, FORUM_ROLE_COMMUNITY_TA, FORUM_ROLE_REMOVE)
+        track.views.server_track(request, '{0} {1} as {2} for {3}'.format(FORUM_ROLE_REMOVE, uname, FORUM_ROLE_COMMUNITY_TA, course_id), 
+                                 {}, page='idashboard')
+    
+    elif action == 'Add forum community TA':
+        uname = request.POST['forummoderator']
+        msg += _update_forum_role_membership(uname, course, FORUM_ROLE_COMMUNITY_TA, FORUM_ROLE_ADD)
+        track.views.server_track(request, '{0} {1} as {2} for {3}'.format(FORUM_ROLE_ADD, uname, FORUM_ROLE_COMMUNITY_TA, course_id), 
+                                 {}, page='idashboard')
 
     #----------------------------------------
     # psychometrics
@@ -210,10 +265,12 @@ def instructor_dashboard(request, course_id):
         problem = request.POST['Problem']
         nmsg, plots = psychoanalyze.generate_plots_for_problem(problem)
         msg += nmsg
-        track.views.server_track(request, 'psychometrics %s' % problem, {}, page='idashboard')
+        track.views.server_track(request, 'psychometrics {0}'.format(problem), {}, page='idashboard')
 
     if idash_mode=='Psychometrics':
         problems = psychoanalyze.problems_with_psychometric_data(course_id)
+
+
 
     #----------------------------------------
     # context for rendering
@@ -221,6 +278,7 @@ def instructor_dashboard(request, course_id):
                'staff_access': True,
                'admin_access': request.user.is_staff,
                'instructor_access': instructor_access,
+               'forum_admin_access': forum_admin_access,
                'datatable': datatable,
                'msg': msg,
                'modeflag': {idash_mode: 'selectedmode'},
@@ -232,6 +290,75 @@ def instructor_dashboard(request, course_id):
 
     return render_to_response('courseware/instructor_dashboard.html', context)
 
+def _list_course_forum_members(course_id, rolename, datatable):
+    ''' 
+    Fills in datatable with forum membership information, for a given role,
+    so that it will be displayed on instructor dashboard.
+    
+      course_ID = course's ID string
+      rolename = one of "Administrator", "Moderator", "Community TA"
+    
+    Returns message status string to append to displayed message, if role is unknown.
+    '''
+    # make sure datatable is set up properly for display first, before checking for errors
+    datatable['header'] = ['Username', 'Full name', 'Roles']
+    datatable['title'] = 'List of Forum {0}s in course {1}'.format(rolename, course_id)
+    datatable['data'] = [];
+    try:
+        role = Role.objects.get(name=rolename, course_id=course_id)
+    except Role.DoesNotExist:
+        return '<font color="red">Error: unknown rolename "{0}"</font>'.format(rolename)
+    uset = role.users.all().order_by('username')
+    msg = 'Role = {0}'.format(rolename)
+    log.debug('role={0}'.format(rolename))
+    datatable['data'] = [[x.username, x.profile.name, ', '.join([r.name for r in x.roles.filter(course_id=course_id).order_by('name')])] for x in uset]
+    return msg
+
+
+def _update_forum_role_membership(uname, course, rolename, add_or_remove):
+    '''
+    Supports adding a user to a course's forum role
+    
+      uname = username string for user
+      course = course object 
+      rolename = one of "Administrator", "Moderator", "Community TA"
+      add_or_remove = one of "add" or "remove"
+      
+    Returns message status string to append to displayed message,  Status is returned if user 
+    or role is unknown, or if entry already exists when adding, or if entry doesn't exist when removing.
+    '''
+    # check that username and rolename are valid:
+    try:
+        user = User.objects.get(username=uname)
+    except User.DoesNotExist:
+        return '<font color="red">Error: unknown username "{0}"</font>'.format(uname)
+    try:
+        role = Role.objects.get(name=rolename, course_id=course.id)
+    except Role.DoesNotExist:
+        return '<font color="red">Error: unknown rolename "{0}"</font>'.format(rolename)
+
+    # check whether role already has the specified user:
+    alreadyexists = role.users.filter(username=uname).exists()
+    msg = ''
+    log.debug('rolename={0}'.format(rolename))
+    if add_or_remove == FORUM_ROLE_REMOVE:
+        if not alreadyexists:
+            msg ='<font color="red">Error: user "{0}" does not have rolename "{1}", cannot remove</font>'.format(uname, rolename)
+        else: 
+            user.roles.remove(role)
+            msg = '<font color="green">Removed "{0}" from "{1}" forum role = "{2}"</font>'.format(user, course.id, rolename)
+    else:
+        if alreadyexists:
+            msg = '<font color="red">Error: user "{0}" already has rolename "{1}", cannot add</font>'.format(uname, rolename)
+        else: 
+            if (rolename == FORUM_ROLE_ADMINISTRATOR and not has_access(user, course, 'staff')):   
+                msg = '<font color="red">Error: user "{0}" should first be added as staff before adding as a forum administrator, cannot add</font>'.format(uname)
+            else:
+                user.roles.add(role)
+                msg = '<font color="green">Added "{0}" to "{1}" forum role = "{2}"</font>'.format(user, course.id, rolename)
+
+    return msg
+    
 
 def get_student_grade_summary_data(request, course, course_id, get_grades=True, get_raw_scores=False):
     '''
@@ -254,10 +381,10 @@ def get_student_grade_summary_data(request, course, course_id, get_grades=True, 
     enrolled_students = User.objects.filter(courseenrollment__course_id=course_id).prefetch_related("groups").order_by('username')
 
     header = ['ID', 'Username', 'Full Name', 'edX email', 'External email']
-    if get_grades:
+    if get_grades and enrolled_students.count() > 0:
         # just to construct the header
         gradeset = grades.grade(enrolled_students[0], request, course, keep_raw_scores=get_raw_scores)
-        # log.debug('student %s gradeset %s' % (enrolled_students[0], gradeset))
+        # log.debug('student {0} gradeset {1}'.format(enrolled_students[0], gradeset))
         if get_raw_scores:
             header += [score.section for score in gradeset['raw_scores']]
         else:
@@ -275,7 +402,7 @@ def get_student_grade_summary_data(request, course, course_id, get_grades=True, 
 
         if get_grades:
             gradeset = grades.grade(student, request, course, keep_raw_scores=get_raw_scores)
-            # log.debug('student=%s, gradeset=%s' % (student,gradeset))
+            # log.debug('student={0}, gradeset={1}'.format(student,gradeset))
             if get_raw_scores:
                 datarow += [score.earned for score in gradeset['raw_scores']]
             else:
@@ -284,6 +411,29 @@ def get_student_grade_summary_data(request, course, course_id, get_grades=True, 
         data.append(datarow)
     datatable['data'] = data
     return datatable
+
+
+
+@cache_control(no_cache=True, no_store=True, must_revalidate=True)
+def staff_grading(request, course_id):
+    """
+    Show the instructor grading interface.
+    """
+    course = get_course_with_access(request.user, course_id, 'staff')
+
+    grading = StaffGrading(course)
+
+    ajax_url = reverse('staff_grading', kwargs={'course_id': course_id})
+    if not ajax_url.endswith('/'):
+        ajax_url += '/'
+        
+    return render_to_response('instructor/staff_grading.html', {
+        'view_html': grading.get_html(),
+        'course': course,
+        'course_id': course_id,
+        'ajax_url': ajax_url,
+        # Checked above
+        'staff_access': True, })
 
 
 @cache_control(no_cache=True, no_store=True, must_revalidate=True)

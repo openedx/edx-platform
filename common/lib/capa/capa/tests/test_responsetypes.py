@@ -52,23 +52,56 @@ class ImageResponseTest(unittest.TestCase):
     def test_ir_grade(self):
         imageresponse_file = os.path.dirname(__file__) + "/test_files/imageresponse.xml"
         test_lcp = lcp.LoncapaProblem(open(imageresponse_file).read(), '1', system=test_system)
-        correct_answers = {'1_2_1': '(490,11)-(556,98)',
-                           '1_2_2': '(242,202)-(296,276)',
-                           '1_2_3': '(490,11)-(556,98);(242,202)-(296,276)',
-                           '1_2_4': '(490,11)-(556,98);(242,202)-(296,276)',
-                           '1_2_5': '(490,11)-(556,98);(242,202)-(296,276)',
+        # testing regions only
+        correct_answers = {
+           #regions
+           '1_2_1': '(490,11)-(556,98)',
+           '1_2_2': '(242,202)-(296,276)',
+           '1_2_3': '(490,11)-(556,98);(242,202)-(296,276)',
+           '1_2_4': '(490,11)-(556,98);(242,202)-(296,276)',
+           '1_2_5': '(490,11)-(556,98);(242,202)-(296,276)',
+           #testing regions and rectanges
+           '1_3_1': 'rectangle="(490,11)-(556,98)" \
+           regions="[[[10,10], [20,10], [20, 30]], [[100,100], [120,100], [120,150]]]"',
+           '1_3_2': 'rectangle="(490,11)-(556,98)" \
+           regions="[[[10,10], [20,10], [20, 30]], [[100,100], [120,100], [120,150]]]"',
+           '1_3_3': 'regions="[[[10,10], [20,10], [20, 30]], [[100,100], [120,100], [120,150]]]"',
+           '1_3_4': 'regions="[[[10,10], [20,10], [20, 30]], [[100,100], [120,100], [120,150]]]"',
+           '1_3_5': 'regions="[[[10,10], [20,10], [20, 30]]]"',
+           '1_3_6': 'regions="[[10,10], [30,30], [15, 15]]"',
+           '1_3_7': 'regions="[[10,10], [30,30], [10, 30], [30, 10]]"',
                           }
-        test_answers = {'1_2_1': '[500,20]',
-                        '1_2_2': '[250,300]',
-                        '1_2_3': '[500,20]',
-                        '1_2_4': '[250,250]',
-                        '1_2_5': '[10,10]',
+        test_answers = {
+            '1_2_1': '[500,20]',
+            '1_2_2': '[250,300]',
+            '1_2_3': '[500,20]',
+            '1_2_4': '[250,250]',
+            '1_2_5': '[10,10]',
+
+            '1_3_1': '[500,20]',
+            '1_3_2': '[15,15]',
+            '1_3_3': '[500,20]',
+            '1_3_4': '[115,115]',
+            '1_3_5': '[15,15]',
+            '1_3_6': '[20,20]',
+            '1_3_7': '[20,15]',
                         }
+
+        # regions
         self.assertEquals(test_lcp.grade_answers(test_answers).get_correctness('1_2_1'), 'correct')
         self.assertEquals(test_lcp.grade_answers(test_answers).get_correctness('1_2_2'), 'incorrect')
         self.assertEquals(test_lcp.grade_answers(test_answers).get_correctness('1_2_3'), 'correct')
         self.assertEquals(test_lcp.grade_answers(test_answers).get_correctness('1_2_4'), 'correct')
         self.assertEquals(test_lcp.grade_answers(test_answers).get_correctness('1_2_5'), 'incorrect')
+
+        # regions and rectangles
+        self.assertEquals(test_lcp.grade_answers(test_answers).get_correctness('1_3_1'), 'correct')
+        self.assertEquals(test_lcp.grade_answers(test_answers).get_correctness('1_3_2'), 'correct')
+        self.assertEquals(test_lcp.grade_answers(test_answers).get_correctness('1_3_3'), 'incorrect')
+        self.assertEquals(test_lcp.grade_answers(test_answers).get_correctness('1_3_4'), 'correct')
+        self.assertEquals(test_lcp.grade_answers(test_answers).get_correctness('1_3_5'), 'correct')
+        self.assertEquals(test_lcp.grade_answers(test_answers).get_correctness('1_3_6'), 'incorrect')
+        self.assertEquals(test_lcp.grade_answers(test_answers).get_correctness('1_3_7'), 'correct')
 
 
 class SymbolicResponseTest(unittest.TestCase):

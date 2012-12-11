@@ -1,28 +1,22 @@
 import time
-import logging
 from collections import defaultdict
-from importlib import import_module
+import logging
+import time
+import urllib
 
-from courseware.models import StudentModuleCache
-from courseware.module_render import get_module
+from django.contrib.auth.models import User
+from django.core.urlresolvers import reverse
+from django.db import connection
+from django.http import HttpResponse
+from django.utils import simplejson
+from django_comment_client.models import Role
+from django_comment_client.permissions import check_permissions_by_view
+from mitxmako import middleware
+import pystache_custom as pystache
+
 from xmodule.modulestore import Location
 from xmodule.modulestore.django import modulestore
 from xmodule.modulestore.search import path_to_location
-from django.http import HttpResponse
-from django.utils import simplejson
-from django.db import connection
-from django.conf import settings
-from django.core.urlresolvers import reverse
-from django.contrib.auth.models import User
-from django_comment_client.permissions import check_permissions_by_view
-from django_comment_client.models import Role
-from mitxmako import middleware
-
-import logging
-import operator
-import itertools
-import urllib
-import pystache_custom as pystache
 
 
 # TODO these should be cached via django's caching rather than in-memory globals
@@ -48,8 +42,15 @@ def get_role_ids(course_id):
     staff = list(User.objects.filter(is_staff=True).values_list('id', flat=True))
     roles_with_ids = {'Staff': staff}
     for role in roles:
-      roles_with_ids[role.name] = list(role.users.values_list('id', flat=True))
+        roles_with_ids[role.name] = list(role.users.values_list('id', flat=True))
     return roles_with_ids
+
+def has_forum_access(uname, course_id, rolename):
+    try:
+        role = Role.objects.get(name=rolename, course_id=course_id)
+    except Role.DoesNotExist:
+        return False
+    return role.users.filter(username=uname).exists()
 
 def get_full_modules():
     global _FULLMODULES
@@ -133,8 +134,6 @@ def initialize_discussion_info(course):
         return
 
     course_id = course.id
-    url_course_id = course_id.replace('/', '_').replace('.', '_')
-
     all_modules = get_full_modules()[course_id]
 
     discussion_id_map = {}

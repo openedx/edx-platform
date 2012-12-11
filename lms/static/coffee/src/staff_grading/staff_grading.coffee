@@ -1,0 +1,391 @@
+# wrap everything in a class in case we want to use inside xmodules later
+
+get_random_int: (min, max) ->
+  return Math.floor(Math.random() * (max - min + 1)) + min
+
+# states
+state_grading = "grading"
+state_graded = "graded"
+state_no_data = "no_data"
+state_error = "error"
+
+class StaffGradingBackend
+  constructor: (ajax_url, mock_backend) ->
+    @ajax_url = ajax_url
+    @mock_backend = mock_backend
+    if @mock_backend
+      @mock_cnt = 0
+
+  mock: (cmd, data) ->
+    # Return a mock response to cmd and data
+    # should take a location as an argument
+    if cmd == 'get_next'
+      @mock_cnt++
+      switch data.location
+        when 'i4x://MITx/3.091x/problem/open_ended_demo1'
+          response =
+            success: true
+            problem_name: 'Problem 1'
+            num_graded: 3
+            min_for_ml: 5
+            num_pending: 4
+            prompt: '''
+            	<h2>S11E3: Metal Bands</h2>
+<p>Shown below are schematic band diagrams for two different metals. Both diagrams appear different, yet both of the elements are undisputably metallic in nature.</p>
+<img width="480" src="/static/images/LSQimages/shaded_metal_bands.png"/>
+<p>* Why is it that both sodium and magnesium behave as metals, even though the s-band of magnesium is filled? </p>
+<p>This is a self-assessed open response question. Please use as much space as you need in the box below to answer the question.</p>
+            '''
+            submission: '''
+            Contrary to popular belief, Lorem Ipsum is not simply random text. It has roots in a piece of classical Latin literature from 45 BC, making it over 2000 years old. Richard McClintock, a Latin professor at Hampden-Sydney College in Virginia, looked up one of the more obscure Latin words, consectetur, from a Lorem Ipsum passage, and going through the cites of the word in classical literature, discovered the undoubtable source. Lorem Ipsum comes from sections 1.10.32 and 1.10.33 of "de Finibus Bonorum et Malorum" (The Extremes of Good and Evil) by Cicero, written in 45 BC. This book is a treatise on the theory of ethics, very popular during the Renaissance. The first line of Lorem Ipsum, "Lorem ipsum dolor sit amet..", comes from a line in section 1.10.32.
+
+The standard chunk of Lorem Ipsum used since the 1500s is reproduced below for those interested. Sections 1.10.32 and 1.10.33 from "de Finibus Bonorum et Malorum" by Cicero are also reproduced in their exact original form, accompanied by English versions from the 1914 translation by H. Rackham.
+            '''
+            rubric: '''
+<ul>
+<li>Metals tend to be good electronic conductors, meaning that they have a large number of electrons which are able to access empty (mobile) energy states within the material.</li>
+<li>Sodium has a half-filled s-band, so there are a number of empty states immediately above the highest occupied energy levels within the band.</li>
+<li>Magnesium has a full s-band, but the the s-band and p-band overlap in magnesium. Thus are still a large number of available energy states immediately above the s-band highest occupied energy level.</li>
+</ul>
+
+<p>Please score your response according to how many of the above components you identified:</p>
+            '''
+            submission_id: @mock_cnt
+            max_score: 2 + @mock_cnt % 3
+            ml_error_info : 'ML accuracy info: ' + @mock_cnt
+        when 'i4x://MITx/3.091x/problem/open_ended_demo2'
+          response =
+            success: true
+            problem_name: 'Problem 2'
+            num_graded: 2
+            min_for_ml: 5
+            num_pending: 4
+            prompt: 'This is a fake second problem'
+            submission: 'This is the best submission ever! ' + @mock_cnt
+            rubric: 'I am a rubric for grading things! ' + @mock_cnt
+            submission_id: @mock_cnt
+            max_score: 2 + @mock_cnt % 3
+            ml_error_info : 'ML accuracy info: ' + @mock_cnt
+        else
+          response = 
+            success: false
+          
+
+    else if cmd == 'save_grade'
+      console.log("eval: #{data.score} pts,  Feedback: #{data.feedback}")
+      response =
+        @mock('get_next', {location: data.location})
+    # get_problem_list
+    # should get back a list of problem_ids, problem_names, num_graded, min_for_ml
+    else if cmd == 'get_problem_list'
+      @mock_cnt = 1
+      response = 
+        success: true
+        problem_list: [
+          {location: 'i4x://MITx/3.091x/problem/open_ended_demo1', \
+            problem_name: "Problem 1", num_graded: 3, num_pending: 5, min_for_ml: 10},
+          {location: 'i4x://MITx/3.091x/problem/open_ended_demo2', \
+            problem_name: "Problem 2", num_graded: 1, num_pending: 5, min_for_ml: 10}
+        ]
+    else
+      response =
+        success: false
+        error: 'Unknown command ' + cmd
+
+    if @mock_cnt % 5 == 0
+        response = 
+          success: true
+          message: 'No more submissions'
+
+
+    if @mock_cnt % 7 == 0
+      response =
+        success: false
+        error: 'An error for testing'
+        
+    return response
+
+
+  post: (cmd, data, callback) ->
+    if @mock_backend
+      callback(@mock(cmd, data))
+    else
+      # TODO: replace with postWithPrefix when that's loaded
+      $.post(@ajax_url + cmd, data, callback)
+
+
+class StaffGrading
+  constructor: (backend) ->
+    @backend = backend
+
+    # all the jquery selectors
+
+    @problem_list_container = $('.problem-list-container')
+    @problem_list = $('.problem-list')
+
+    @error_container = $('.error-container')
+    @message_container = $('.message-container')
+
+    @prompt_name_container = $('.prompt-name')
+    @prompt_container = $('.prompt-container')
+    @prompt_wrapper = $('.prompt-wrapper')
+
+    @submission_container = $('.submission-container')
+    @submission_wrapper = $('.submission-wrapper')
+
+    @rubric_container = $('.rubric-container')
+    @rubric_wrapper = $('.rubric-wrapper')
+    @grading_wrapper = $('.grading-wrapper')
+
+    @feedback_area = $('.feedback-area')
+    @score_selection_container = $('.score-selection-container')        
+    @submit_button = $('.submit-button')
+    @action_button = $('.action-button')
+
+    @problem_meta_info = $('.problem-meta-info-container')
+    @meta_info_wrapper = $('.meta-info-wrapper')
+    @ml_error_info_container = $('.ml-error-info-container')
+
+    @breadcrumbs = $('.breadcrumbs')
+    
+    # model state
+    @state = state_no_data
+    @submission_id = null
+    @prompt = ''
+    @submission = ''
+    @rubric = ''
+    @error_msg = ''
+    @message = ''
+    @max_score = 0
+    @ml_error_info= ''
+    @location = ''
+    @prompt_name = ''
+    @min_for_ml = 0
+    @num_graded = 0
+    @num_pending = 0
+
+    @score = null
+    @problems = null
+
+    # action handlers
+    @submit_button.click @submit
+    # TODO: fix this to do something more intelligent
+    @action_button.click @submit
+
+    # send initial request automatically
+    @get_problem_list()
+
+
+  setup_score_selection: =>
+    # first, get rid of all the old inputs, if any.
+    @score_selection_container.html('Choose score: ')
+
+    # Now create new labels and inputs for each possible score.
+    for score in [0..@max_score]
+      id = 'score-' + score
+      label = """<label for="#{id}">#{score}</label>"""
+      
+      input = """
+              <input type="radio" name="score-selection" id="#{id}" value="#{score}"/>
+              """       # "  fix broken parsing in emacs
+      @score_selection_container.append(input + label)
+
+    # And now hook up an event handler again
+    $("input[name='score-selection']").change @graded_callback
+    
+
+  set_button_text: (text) =>
+    @action_button.attr('value', text)
+
+  graded_callback: (event) =>
+    @score = event.target.value
+    @state = state_graded
+    @message = ''
+    @render_view()
+
+  ajax_callback: (response) =>
+    # always clear out errors and messages on transition.
+    @error_msg = ''
+    @message = ''
+    
+    if response.success
+      if response.problem_list
+        @problems = response.problem_list
+      else if response.submission
+        @data_loaded(response)
+      else
+        @no_more(response.message)
+    else
+      @error(response.error)
+
+    @render_view()
+       
+  get_next_submission: (location) ->
+    @location = location
+    @list_view = false
+    @backend.post('get_next', {location: location}, @ajax_callback)
+
+  get_problem_list: () ->
+    @list_view = true
+    @backend.post('get_problem_list', {}, @ajax_callback)
+
+  submit_and_get_next: () ->
+    data =
+      score: @score
+      feedback: @feedback_area.val()
+      submission_id: @submission_id
+      location: @location
+    
+    @backend.post('save_grade', data, @ajax_callback)
+
+  error: (msg) ->
+    @error_msg = msg
+    @state = state_error
+
+  data_loaded: (response) ->
+    @prompt = response.prompt
+    @submission = response.submission
+    @rubric = response.rubric
+    @submission_id = response.submission_id
+    @feedback_area.val('')
+    @max_score = response.max_score
+    @score = null
+    @ml_error_info=response.ml_error_info
+    @prompt_name = response.problem_name
+    @num_graded = response.num_graded
+    @min_for_ml = response.min_for_ml
+    @num_pending = response.num_pending
+    @state = state_grading
+    if not @max_score?
+      @error("No max score specified for submission.")
+
+  no_more: (message) ->
+    @prompt = null
+    @prompt_name = ''
+    @num_graded = 0
+    @min_for_ml = 0
+    @submission = null
+    @rubric = null
+    @ml_error_info = null
+    @submission_id = null
+    @message = message
+    @score = null
+    @max_score = 0
+    @state = state_no_data
+
+
+  render_view: () ->
+    # clear the problem list and breadcrumbs
+    @problem_list.html('')
+    @breadcrumbs.html('')
+    @problem_list_container.toggle(@list_view)
+    if @backend.mock_backend
+      @message = @message + "<p>NOTE: Mocking backend.</p>"
+    @message_container.html(@message)
+    @error_container.html(@error_msg)
+    @message_container.toggle(@message != "")
+    @error_container.toggle(@error_msg != "")
+
+
+    # only show the grading elements when we are not in list view or the state
+    # is invalid
+    show_grading_elements = !(@list_view || @state == state_error || 
+      @state == state_no_data)
+    @prompt_wrapper.toggle(show_grading_elements)
+    @submission_wrapper.toggle(show_grading_elements)
+    @rubric_wrapper.toggle(show_grading_elements)
+    @grading_wrapper.toggle(show_grading_elements)
+    @meta_info_wrapper.toggle(show_grading_elements)
+    @action_button.hide()
+    
+    if @list_view
+      @render_list()
+    else
+      @render_problem()
+
+  problem_link:(problem) ->
+    link = $('<a>').attr('href', "javascript:void(0)").append(
+      "#{problem.problem_name} (#{problem.num_graded} graded, #{problem.num_pending} pending)")
+        .click =>
+          @get_next_submission problem.location
+
+  make_paragraphs: (text) ->
+    paragraph_split = text.split(/\n\s*\n/)
+    new_text = ''
+    for paragraph in paragraph_split
+      new_text += "<p>#{paragraph}</p>"
+    return new_text
+
+  render_list: () ->
+    for problem in @problems
+      @problem_list.append($('<li>').append(@problem_link(problem)))
+
+  render_problem: () ->
+    # make the view elements match the state.  Idempotent.
+    show_submit_button = true
+    show_action_button = true
+
+    problem_list_link = $('<a>').attr('href', 'javascript:void(0);')
+      .append("< Back to problem list")
+      .click => @get_problem_list()
+
+    # set up the breadcrumbing
+    @breadcrumbs.append(problem_list_link)
+      
+
+    if @state == state_error
+      @set_button_text('Try loading again')
+      show_action_button = true
+
+    else if @state == state_grading
+      @ml_error_info_container.html(@ml_error_info)
+      meta_list = $("<ul>")
+      meta_list.append("<li><span class='meta-info'>Pending - </span> #{@num_pending}</li>")
+      meta_list.append("<li><span class='meta-info'>Graded - </span> #{@num_graded}</li>")
+      meta_list.append("<li><span class='meta-info'>Needed for ML - </span> #{Math.max(@min_for_ml - @num_graded)}</li>")
+      @problem_meta_info.html(meta_list)
+
+      @prompt_container.html(@prompt)
+      @prompt_name_container.html("#{@prompt_name}")
+      @submission_container.html(@make_paragraphs(@submission))
+      @rubric_container.html(@rubric)
+
+      # no submit button until user picks grade.
+      show_submit_button = false
+      show_action_button = false
+
+      @setup_score_selection()
+      
+    else if @state == state_graded
+      @set_button_text('Submit')
+      show_action_button = false
+
+    else if @state == state_no_data
+      @message_container.html(@message)
+      @set_button_text('Re-check for submissions')
+
+    else
+      @error('System got into invalid state ' + @state)
+
+    @submit_button.toggle(show_submit_button)
+    @action_button.toggle(show_action_button)
+
+  submit: (event) =>
+    event.preventDefault()
+    
+    if @state == state_error
+      @get_next_submission(@location)
+    else if @state == state_graded
+      @submit_and_get_next()
+    else if @state == state_no_data
+      @get_next_submission(@location)
+    else
+      @error('System got into invalid state for submission: ' + @state)
+  
+
+# for now, just create an instance and load it...
+mock_backend = false
+ajax_url = $('.staff-grading').data('ajax_url')
+backend = new StaffGradingBackend(ajax_url, mock_backend)
+
+$(document).ready(() -> new StaffGrading(backend))

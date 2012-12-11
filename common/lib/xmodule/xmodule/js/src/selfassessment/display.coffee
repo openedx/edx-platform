@@ -120,7 +120,7 @@ class @SelfAssessment
     if @state == 'done'
       $.postWithPrefix "#{@ajax_url}/reset", {}, (response) =>
         if response.success
-          @answer_area.html('')
+          @answer_area.val('')
           @rubric_wrapper.html('')
           @hint_wrapper.html('')
           @message_wrapper.html('')

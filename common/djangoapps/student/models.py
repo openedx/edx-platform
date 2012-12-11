@@ -36,7 +36,7 @@ file and check it in at the same time as your model changes. To do that,
 3. Add the migration file created in mitx/common/djangoapps/student/migrations/
 """
 from datetime import datetime
-from hashlib import sha1
+import hashlib
 import json
 import logging
 import uuid
@@ -197,14 +197,13 @@ def unique_id_for_user(user):
     """
     Return a unique id for a user, suitable for inserting into
     e.g. personalized survey links.
-
-    Currently happens to be implemented as a sha1 hash of the username
-    (and thus assumes that usernames don't change).
     """
-    # Using the user id as the salt because it's sort of random, and is already
-    # in the db.
-    salt = str(user.id)
-    return sha1(salt + user.username).hexdigest()
+    # include the secret key as a salt, and to make the ids unique accross
+    # different LMS installs.    
+    h = hashlib.md5()
+    h.update(settings.SECRET_KEY)
+    h.update(str(user.id))
+    return h.hexdigest()
 
 
 ## TODO: Should be renamed to generic UserGroup, and possibly

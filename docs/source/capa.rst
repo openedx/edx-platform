@@ -1,8 +1,14 @@
 *******************************************
 Capa module
 *******************************************
+Contents:
 
 .. module:: capa
+
+.. toctree::
+    :maxdepth: 2
+
+    chem.rst
 
 Calc
 ====
