@@ -14,6 +14,8 @@ from django.core.urlresolvers import reverse
 from override_settings import override_settings
 
 import xmodule.modulestore.django
+from xmodule.modulestore.mongo import MongoModuleStore
+
 
 # Need access to internal func to put users in the right group
 from courseware import grades
@@ -74,6 +76,7 @@ def xml_store_config(data_dir):
 
 TEST_DATA_DIR = settings.COMMON_TEST_DATA_ROOT
 TEST_DATA_XML_MODULESTORE = xml_store_config(TEST_DATA_DIR)
+TEST_DATA_MONGO_MODULESTORE = mongo_store_config(TEST_DATA_DIR)
 
 class ActivateLoginTestCase(TestCase):
     '''Check that we can activate and log in'''
@@ -221,17 +224,9 @@ class PageLoader(ActivateLoginTestCase):
                          .format(resp.status_code, url, code))
 
 
-    def check_pages_load(self, course_name, data_dir, modstore):
+    def check_pages_load(self, module_store):
         """Make all locations in course load"""
-        print "Checking course {0} in {1}".format(course_name, data_dir)
-        default_class='xmodule.hidden_module.HiddenDescriptor'
-        load_error_modules=True
-        module_store = XMLModuleStore(
-                                      data_dir,
-                                      default_class=default_class,
-                                      course_dirs=[course_name],
-                                      load_error_modules=load_error_modules,
-                                      )
+
 
        # enroll in the course before trying to access pages
         courses = module_store.get_courses()
@@ -243,7 +238,7 @@ class PageLoader(ActivateLoginTestCase):
         n = 0
         num_bad = 0
         all_ok = True
-        for descriptor in modstore.get_items(
+        for descriptor in module_store.get_items(
                 Location(None, None, None, None, None)):
 
             n += 1
@@ -274,6 +269,8 @@ class PageLoader(ActivateLoginTestCase):
                     msg = "ERROR " + msg
                     all_ok = False
                     num_bad += 1  
+            elif descriptor.location.category == 'custom_tag_template':
+                pass
             else:
                 #print descriptor.__class__, descriptor.location
                 resp = self.client.get(reverse('jump_to',
@@ -282,13 +279,9 @@ class PageLoader(ActivateLoginTestCase):
                 msg = str(resp.status_code)
 
                 if resp.status_code != 302:
-                    # cdodge: we're adding 'custom_tag_template' which is the Mako template used to render
-                    # the custom tag. We can't 'jump-to' this module. Unfortunately, we also can't test render
-                    # it easily
-                    if descriptor.location.category not in ['custom_tag_template'] or resp.status_code != 404:
-                        msg = "ERROR " + msg
-                        all_ok = False
-                        num_bad += 1
+                    msg = "ERROR " + msg
+                    all_ok = False
+                    num_bad += 1
             print msg
             self.assertTrue(all_ok)  # fail fast
 
@@ -299,21 +292,51 @@ class PageLoader(ActivateLoginTestCase):
 
 
 @override_settings(MODULESTORE=TEST_DATA_XML_MODULESTORE)
-class TestCoursesLoadTestCase(PageLoader):
+class TestCoursesLoadTestCase_XmlModulestore(PageLoader):
     '''Check that all pages in test courses load properly'''
 
     def setUp(self):
         ActivateLoginTestCase.setUp(self)
         xmodule.modulestore.django._MODULESTORES = {}
-#        xmodule.modulestore.django.modulestore().collection.drop()
-#        store = xmodule.modulestore.django.modulestore()
-        # is there a way to empty the store?
         
     def test_toy_course_loads(self):
-        self.check_pages_load('toy', TEST_DATA_DIR, modulestore())
+        module_store = XMLModuleStore(
+                                      TEST_DATA_DIR,
+                                      default_class='xmodule.hidden_module.HiddenDescriptor',
+                                      course_dirs=['toy'],
+                                      load_error_modules=True,
+                                      )
+
+        self.check_pages_load(module_store)
 
     def test_full_course_loads(self):
-        self.check_pages_load('full', TEST_DATA_DIR, modulestore())
+        module_store = XMLModuleStore(
+                                      TEST_DATA_DIR,
+                                      default_class='xmodule.hidden_module.HiddenDescriptor',
+                                      course_dirs=['full'],
+                                      load_error_modules=True,
+                                      )
+        self.check_pages_load(module_store)
+
+
+@override_settings(MODULESTORE=TEST_DATA_MONGO_MODULESTORE)
+class TestCoursesLoadTestCase_MongoModulestore(PageLoader):
+    '''Check that all pages in test courses load properly'''
+
+    def setUp(self):
+        ActivateLoginTestCase.setUp(self)
+        xmodule.modulestore.django._MODULESTORES = {}
+        modulestore().collection.drop()
+        
+    def test_toy_course_loads(self):
+        module_store = modulestore()
+        import_from_xml(module_store, TEST_DATA_DIR, ['toy'])
+        self.check_pages_load(module_store)
+
+    def test_full_course_loads(self):
+        module_store = modulestore()
+        import_from_xml(module_store, TEST_DATA_DIR, ['full'])
+        self.check_pages_load(module_store)
 
 
 @override_settings(MODULESTORE=TEST_DATA_XML_MODULESTORE)

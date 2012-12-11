@@ -192,7 +192,8 @@ class CourseDescriptor(SequenceDescriptor):
         instance = super(CourseDescriptor, cls).from_xml(xml_data, system, org, course)
 
         # bleh, have to parse the XML here to just pull out the url_name attribute
-        course_file = StringIO(xml_data)
+        # I don't think it's stored anywhere in the instance.
+        course_file = StringIO(xml_data.encode('ascii','ignore'))
         xml_obj = etree.parse(course_file,parser=edx_xml_parser).getroot()
 
         policy_dir = None
