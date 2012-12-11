@@ -2061,7 +2061,7 @@ class OpenEndedResponse(LoncapaResponse):
             <div class="{feedback_type}">
             {value}
             </div>
-            """.format(feedback_type, value)
+            """.format(feedback_type=feedback_type, value=value)
 
         # TODO (vshnayder): design and document the details of this format so
         # that we can do proper escaping here (e.g. are the graders allowed to
@@ -2153,7 +2153,7 @@ class OpenEndedResponse(LoncapaResponse):
 
         #Currently ignore msg and only return feedback (which takes the place of msg)
         return ScoreMessage(valid=True, correct=correct,
-                            score=score_result['score'], msg=feedback)
+                            points=score_result['score'], msg=feedback)
 
 #-----------------------------------------------------------------------------
 # TEMPORARY: List of all response subclasses
