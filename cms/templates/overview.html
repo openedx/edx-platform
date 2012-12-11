@@ -22,7 +22,7 @@
   <script type="text/template" id="new-section-template">
     <section class="courseware-section branch new-section">
       <header>
-        <a href="#" class="expand-collapse-icon collapse"></a>
+        <a href="#"  data-tooltip="Collapse/expand this section" class="expand-collapse-icon collapse"></a>
         <div class="item-details">
           <h3 class="section-name">
           <form class="section-name-form">
@@ -38,7 +38,7 @@
   <script type="text/template" id="blank-slate-template">
     <section class="courseware-section branch new-section">
       <header>
-        <a href="#" class="expand-collapse-icon collapse"></a>
+        <a href="#"  data-tooltip="Collapse/expand this section" class="expand-collapse-icon collapse"></a>
         <div class="item-details">
           <h3 class="section-name">
           <span class="section-name-span">Click here to set the section name</span>
@@ -49,8 +49,8 @@
           </form>
         </div>
         <div class="item-actions">
-          <a href="#" class="delete-button delete-section-button"><span class="delete-icon"></span></a>
-          <a href="#" class="drag-handle"></a>
+          <a href="#" data-tooltip="Delete this section" class="delete-button delete-section-button"><span class="delete-icon"></span></a>
+          <a href="#" data-tooltip="Drag to re-order" class="drag-handle"></a>
         </div>
       </header>
     </section>
@@ -105,10 +105,10 @@
         % for section in sections:
         <section class="courseware-section branch" data-id="${section.location}">
           <header>
-            <a href="#" class="expand-collapse-icon collapse"></a>
+            <a href="#" data-tooltip="Collapse/expand this section" class="expand-collapse-icon collapse"></a>
             <div class="item-details" data-id="${section.location}">
               <h3 class="section-name">
-                <span class="section-name-span">${section.display_name}</span>
+                <span data-tooltip="Edit this section's name" class="section-name-span">${section.display_name}</span>
                 <form class="section-name-edit" style="display:none">
                   <input type="text" value="${section.display_name}" class="edit-section-name" autocomplete="off"/>
                   <input type="submit" class="save-button edit-section-name-save" value="Save" />
@@ -131,8 +131,8 @@
               </div>
             </div>
             <div class="item-actions">
-              <a href="#" class="delete-button delete-section-button"><span class="delete-icon"></span></a>
-              <a href="#" class="drag-handle"></a>
+              <a href="#" data-tooltip="Delete this section" class="delete-button delete-section-button"><span class="delete-icon"></span></a>
+              <a href="#" data-tooltip="Drag to reorder" class="drag-handle"></a>
             </div>
           </header>
           <div class="subsection-list">
@@ -146,15 +146,15 @@
               <li class="branch collapsed" data-id="${subsection.location}">
                 <div class="section-item">
                   <div>
-                    <a href="#" class="expand-collapse-icon expand"></a>
+                    <a href="#" data-tooltip="Collapse/expand this subsection" class="expand-collapse-icon expand"></a>
                     <a href="${reverse('edit_subsection', args=[subsection.location])}">
                       <span class="folder-icon"></span>
                       <span class="subsection-name"><span class="subsection-name-value">${subsection.display_name}</span></span>
                     </a>
                   </div>
                   <div class="item-actions">
-                    <a href="#" class="delete-button delete-subsection-button"><span class="delete-icon"></span></a>                    
-                    <a href="#" class="drag-handle"></a>
+                    <a href="#" data-tooltip="Delete this subsection" class="delete-button delete-subsection-button"><span class="delete-icon"></span></a>                    
+                    <a href="#" data-tooltip="Drag to reorder" class="drag-handle"></a>
                   </div>
                 </div>
                 ${units.enum_units(subsection)}
