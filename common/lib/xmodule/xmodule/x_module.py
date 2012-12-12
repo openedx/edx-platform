@@ -417,14 +417,9 @@ class XModuleDescriptor(Plugin, HTMLSnippet, ResourceTemplates):
                 except ItemNotFoundError:
                     log.exception('Unable to load item {loc}, skipping'.format(loc=child_loc))
                     continue
-                # TODO (vshnayder): this should go away once we have
-                # proper inheritance support in mongo.  The xml
-                # datastore does all inheritance on course load.
-                #child.inherit_metadata(self.metadata)
                 self._child_instances.append(child)
 
         return self._child_instances
-
 
     def get_child_by_url_name(self, url_name):
         """

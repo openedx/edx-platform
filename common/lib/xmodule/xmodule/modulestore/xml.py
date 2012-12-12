@@ -422,7 +422,32 @@ class XMLModuleStore(ModuleStoreBase):
             # breaks metadata inheritance via get_children().  Instead
             # (actually, in addition to, for now), we do a final inheritance pass
             # after we have the course descriptor.
-            #XModuleDescriptor.compute_inherited_metadata(course_descriptor)
+            def compute_inherited_metadata(descriptor):
+                """Given a descriptor, traverse all of its descendants and do metadata
+                inheritance.  Should be called on a CourseDescriptor after importing a
+                course.
+
+                NOTE: This means that there is no such thing as lazy loading at the
+                moment--this accesses all the children."""
+                for child in descriptor.get_children():
+                    inherit_metadata(child, descriptor.metadata)
+                    compute_inherited_metadata(child)
+
+            def inherit_metadata(descriptor, metadata):
+                """
+                Updates this module with metadata inherited from a containing module.
+                Only metadata specified in self.inheritable_metadata will
+                be inherited
+                """
+                # Set all inheritable metadata from kwargs that are
+                # in self.inheritable_metadata and aren't already set in metadata
+                for attr in self.inheritable_metadata:
+                    if attr not in self.metadata and attr in metadata:
+                        self._inherited_metadata.add(attr)
+                        self.metadata[attr] = metadata[attr]
+
+
+            compute_inherited_metadata(course_descriptor)
 
             # now import all pieces of course_info which is expected to be stored
             # in <content_dir>/info or <content_dir>/info/<url_name>
