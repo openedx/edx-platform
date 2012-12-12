@@ -1836,6 +1836,7 @@ class OpenEndedResponse(LoncapaResponse):
     """
 
     DEFAULT_QUEUE = 'open-ended'
+    DEFAULT_MESSAGE_QUEUE = 'open-ended-message'
     response_tag = 'openendedresponse'
     allowed_inputfields = ['openendedinput']
     max_inputfields = 1

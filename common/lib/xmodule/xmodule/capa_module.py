@@ -380,6 +380,7 @@ class CapaModule(XModule):
             'problem_save': self.save_problem,
             'problem_show': self.get_answer,
             'score_update': self.update_score,
+            'message_post' : self.message_post,
             }
 
         if dispatch not in handlers:
@@ -393,6 +394,19 @@ class CapaModule(XModule):
             'progress_status': Progress.to_js_status_str(after),
             })
         return json.dumps(d, cls=ComplexEncoder)
+
+    def feedback_post(self, get):
+        """
+        Posts a message from a form to an appropriate location
+        """
+        event_info = dict()
+        event_info['state'] = self.lcp.get_state()
+        event_info['problem_id'] = self.location.url()
+
+        answers = self.make_dict_of_responses(get)
+        log.debug(answers)
+
+
 
     def closed(self):
         ''' Is the student still allowed to submit answers? '''

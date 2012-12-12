@@ -28,5 +28,12 @@
     % endif
   <div class="external-grader-message">
     ${msg|n}
+    % if status in ['correct','incorrect']:
+    <section id="evaluation">
+        Score Evaluation:
+        <textarea rows="${rows}" cols="${cols}" name="feedback-on-feedback" class="feedback-on-feedback">Please enter some comments about the score/feedback you received here.</textarea>
+        <input name="submit-message" class="submit-message" type="button" value="Submit your message"/>
+    </section>
+    % endif
   </div>
 </section>

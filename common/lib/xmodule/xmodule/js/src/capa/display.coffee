@@ -25,6 +25,7 @@ class @Problem
     @$('section.action input.reset').click @reset
     @$('section.action input.show').click @show
     @$('section.action input.save').click @save
+    @$('section.evaluation input.submit-message').click @message_post
 
     # Collapsibles
     Collapsible.setCollapsibles(@el)
@@ -196,6 +197,11 @@ class @Problem
             @el.removeClass 'showed'
         else
           @gentle_alert response.success
+
+  message_post: =>
+    Logger.log 'message_post', @answers
+    $.postWithPrefix "#{@url}/message_post", @answers, (response) =>
+        @gentle_alert response.success
 
   reset: =>
     Logger.log 'problem_reset', @answers
