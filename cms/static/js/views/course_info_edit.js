@@ -158,6 +158,8 @@ CMS.Views.ClassInfoUpdateView = Backbone.View.extend({
         self.$currentPost.find('form').hide();
         window.$modalCover.unbind('click');
         window.$modalCover.hide();
+        if (this.$codeMirror != null)
+            this.$codeMirror.remove();
         this.$codeMirror = null;
     },
     
@@ -272,6 +274,8 @@ CMS.Views.ClassInfoHandoutsView = Backbone.View.extend({
         this.$form.hide();
         window.$modalCover.unbind('click');
         window.$modalCover.hide();
+        if (this.$codeMirror != null)
+            this.$codeMirror.remove();
         this.$codeMirror = null;
     }
 });
