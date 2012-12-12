@@ -186,6 +186,14 @@ class LoncapaProblem(object):
             maxscore += responder.get_max_score()
         return maxscore
 
+    def message_post(self,event_info):
+        """
+        Handle an ajax post that contains feedback on feedback
+        """
+        for responder in self.responders.values():
+            if hasattr(responder, 'message_post'):
+                responder.message_post(event_info)
+
     def get_score(self):
         """
         Compute score for this problem.  The score is the number of points awarded.

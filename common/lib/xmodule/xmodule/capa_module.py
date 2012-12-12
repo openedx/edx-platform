@@ -402,10 +402,10 @@ class CapaModule(XModule):
         event_info = dict()
         event_info['state'] = self.lcp.get_state()
         event_info['problem_id'] = self.location.url()
-        event_info['student_id'] = self.system.anonymous_system_id
+        event_info['student_id'] = self.system.anonymous_student_id
         event_info['survey_responses']= get
 
-        log.debug(event_info)
+        success_dict = self.lcp.message_post(event_info)
 
         return {'success' : True}
 

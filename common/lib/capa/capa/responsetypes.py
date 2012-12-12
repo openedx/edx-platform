@@ -1854,6 +1854,10 @@ class OpenEndedResponse(LoncapaResponse):
         prompt = self.xml.find('prompt')
         rubric = self.xml.find('openendedrubric')
 
+        #This is needed to attach feedback to specific responses later
+        self.submission_id=None
+        self.grader_id=None
+
         if oeparam is None:
             raise ValueError("No oeparam found in problem xml.")
         if prompt is None:
@@ -2139,13 +2143,15 @@ class OpenEndedResponse(LoncapaResponse):
                       " Received score_result = {0}".format(score_result))
             return fail
 
-        for tag in ['score', 'feedback', 'grader_type', 'success']:
+        for tag in ['score', 'feedback', 'grader_type', 'success', 'grader_id', 'submission_id']:
             if tag not in score_result:
                 log.error("External grader message is missing required tag: {0}"
                           .format(tag))
                 return fail
 
         feedback = self._format_feedback(score_result)
+        self.submission_id=score_result['submission_id']
+        self.grader_id=score_result['grader_id']
 
         # HACK: for now, just assume it's correct if you got more than 2/3.
         # Also assumes that score_result['score'] is an integer.

@@ -203,7 +203,7 @@ class @Problem
 
     fd = new FormData()
     feedback = @$('section.evaluation textarea.feedback-on-feedback')[0]
-    fd.append(feedback.class, feedback.value)
+    fd.append('feedback', feedback.value)
 
     settings =
       type: "POST"
