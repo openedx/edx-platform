@@ -32,7 +32,7 @@ def import_static_content(modules, course_loc, course_data_path, static_content_
                 with open(content_path, 'rb') as f:
                     data = f.read()
 
-                content = StaticContent(content_loc, filename, mime_type, data)
+                content = StaticContent(content_loc, filename, mime_type, data, import_path = fullname_with_subpath)
 
                 # first let's save a thumbnail so we can get back a thumbnail location
                 thumbnail_content = static_content_store.generate_thumbnail(content)
@@ -66,7 +66,7 @@ def verify_content_links(module, base_dir, static_content_store, link, remap_dic
                 with open(static_pathname, 'rb') as f:
                     data = f.read()
 
-                content = StaticContent(content_loc, filename, mime_type, data) 
+                content = StaticContent(content_loc, filename, mime_type, data, import_path = path) 
 
                 # first let's save a thumbnail so we can get back a thumbnail location
                 thumbnail_content = static_content_store.generate_thumbnail(content)

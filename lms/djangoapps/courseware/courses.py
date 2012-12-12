@@ -148,7 +148,7 @@ def get_course_about_section(course, section_key):
             request = get_request_for_thread()
 
             loc = course.location._replace(category='about', name=section_key)
-            course_module = get_module(request.user, request, loc, None, course.id, not_found_ok = True, wrap_xmodule_display = False)
+            course_module = get_module(request.user, request, loc, None, course.id, not_found_ok = True, wrap_xmodule_display = True)
 
             html = ''
 
@@ -186,7 +186,7 @@ def get_course_info_section(request, cache, course, section_key):
 
 
     loc = Location(course.location.tag, course.location.org, course.location.course, 'course_info', section_key)
-    course_module = get_module(request.user, request, loc, cache, course.id, wrap_xmodule_display = False)
+    course_module = get_module(request.user, request, loc, cache, course.id, wrap_xmodule_display = True)
     html = ''
 
     if course_module is not None:

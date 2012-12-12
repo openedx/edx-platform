@@ -98,7 +98,7 @@ class XmlDescriptor(XModuleDescriptor):
 
     metadata_to_strip = ('data_dir', 
             # cdodge: @TODO: We need to figure out a way to export out 'tabs' and 'grading_policy' which is on the course
-            'tabs', 'grading_policy',
+            'tabs', 'grading_policy', 'is_draft', 'published_by', 'published_date', 
            # VS[compat] -- remove the below attrs once everything is in the CMS
            'course', 'org', 'url_name', 'filename')
 

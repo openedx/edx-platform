@@ -11,6 +11,7 @@ import logging
 
 from .content import StaticContent, ContentStore
 from xmodule.exceptions import NotFoundError
+from fs.osfs import OSFS
 
 
 class MongoContentStore(ContentStore):
@@ -33,7 +34,7 @@ class MongoContentStore(ContentStore):
             self.fs.delete(id)
 
         with self.fs.new_file(_id = id, filename=content.get_url_path(), content_type=content.content_type, 
-            displayname=content.name, thumbnail_location=content.thumbnail_location) as fp:
+            displayname=content.name, thumbnail_location=content.thumbnail_location, import_path=content.import_path) as fp:
 
             fp.write(content.data)
         
@@ -45,9 +46,17 @@ class MongoContentStore(ContentStore):
         try:
             with self.fs.get(id) as fp:
                 return StaticContent(location, fp.displayname, fp.content_type, fp.read(), 
-                    fp.uploadDate, thumbnail_location = fp.thumbnail_location if 'thumbnail_location' in fp else None)
+                    fp.uploadDate, thumbnail_location = fp.thumbnail_location if 'thumbnail_location' in fp else None,
+                    import_path = fp.import_path if 'import_path' in fp else None)
         except NoFile:
             raise NotFoundError()
+
+    def export(self, location, output_directory):
+        content = self.find(location)
+        disk_fs = OSFS(output_directory)
+
+        with disk_fs.open('course.xml', 'wb') as course_xml:
+            course_xml.write(content.data)
 
     def get_all_content_thumbnails_for_course(self, location):
         return self._get_all_content_for_course(location, get_thumbnails = True)
