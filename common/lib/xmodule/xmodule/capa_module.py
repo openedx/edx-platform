@@ -21,6 +21,16 @@ from xmodule.raw_module import RawDescriptor
 from xmodule.exceptions import NotFoundError
 from .model import Int, Scope, ModuleScope, ModelType, String, Boolean, Object, Float
 
+
+class StringyInt(Int):
+    """
+    A model type that converts from strings to integers when reading from json
+    """
+    def from_json(self, value):
+        if isinstance(value, basestring):
+            return int(value)
+        return value
+
 log = logging.getLogger("mitx.courseware")
 
 #-----------------------------------------------------------------------------
@@ -88,7 +98,7 @@ class CapaModule(XModule):
     icon_class = 'problem'
 
     attempts = Int(help="Number of attempts taken by the student on this problem", default=0, scope=Scope.student_state)
-    max_attempts = Int(help="Maximum number of attempts that a student is allowed", scope=Scope.settings)
+    max_attempts = StringyInt(help="Maximum number of attempts that a student is allowed", scope=Scope.settings)
     due = String(help="Date that this problem is due by", scope=Scope.settings)
     graceperiod = Timedelta(help="Amount of time after the due date that submissions will be accepted", scope=Scope.settings)
     show_answer = String(help="When to show the problem answer to the student", scope=Scope.settings, default="closed")
