@@ -488,8 +488,8 @@ class TestViewAuth(PageLoader):
 
         # Make courses start in the future
         tomorrow = time.time() + 24*3600
-        self.toy.metadata['start'] = stringify_time(time.gmtime(tomorrow))
-        self.full.metadata['start'] = stringify_time(time.gmtime(tomorrow))
+        self.toy.lms.start = time.gmtime(tomorrow)
+        self.full.lms.start = time.gmtime(tomorrow)
 
         self.assertFalse(self.toy.has_started())
         self.assertFalse(self.full.has_started())

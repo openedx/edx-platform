@@ -670,6 +670,11 @@ class CapaDescriptor(RawDescriptor):
     # actually use type and points?
     metadata_attributes = RawDescriptor.metadata_attributes + ('type', 'points')
 
+    # The capa format specifies that what we call max_attempts in the code
+    # is the attribute `attempts`. This will do that conversion
+    metadata_translations = dict(RawDescriptor.metadata_translations)
+    metadata_translations['attempts'] = 'max_attempts'
+
     # VS[compat]
     # TODO (cpennington): Delete this method once all fall 2012 course are being
     # edited in the cms

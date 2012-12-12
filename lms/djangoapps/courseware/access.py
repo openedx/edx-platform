@@ -155,7 +155,7 @@ def _has_access_course_desc(user, course, action):
         if settings.MITX_FEATURES.get('ACCESS_REQUIRE_STAFF_FOR_COURSE'):
             # if this feature is on, only allow courses that have ispublic set to be
             # seen by non-staff
-            if course.metadata.get('ispublic'):
+            if course.lms.ispublic:
                 debug("Allow: ACCESS_REQUIRE_STAFF_FOR_COURSE and ispublic")
                 return True
             return _has_staff_access_to_descriptor(user, course)

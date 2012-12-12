@@ -15,7 +15,7 @@ class LmsNamespace(Namespace):
     format = String(
         help="What format this module is in (used for deciding which "
              "grader to apply, and what to show in the TOC)",
-        scope=Scope.settings
+        scope=Scope.settings,
     )
 
     display_name = String(
@@ -29,3 +29,4 @@ class LmsNamespace(Namespace):
     source_file = String(help="DO NOT USE", scope=Scope.settings)
     giturl = String(help="DO NOT USE", scope=Scope.settings, default='https://github.com/MITx')
     xqa_key = String(help="DO NOT USE", scope=Scope.settings)
+    ispublic = Boolean(help="Whether this course is open to the public, or only to admins", scope=Scope.settings)

@@ -33,6 +33,9 @@ class CourseDescriptor(SequenceDescriptor):
     show_calculator = Boolean(help="Whether to show the calculator in this course", default=False, scope=Scope.settings)
     start = Date(help="Start time when this module is visible", scope=Scope.settings)
     display_name = String(help="Display name for this module", scope=Scope.settings)
+    tabs = List(help="List of tabs to enable in this course", scope=Scope.settings)
+    end_of_course_survey_url = String(help="Url for the end-of-course survey", scope=Scope.settings)
+    discussion_blackouts = List(help="List of pairs of start/end dates for discussion blackouts", scope=Scope.settings, default=[])
     has_children = True
 
     info_sidebar_name = String(scope=Scope.settings, default='Course Handouts')
@@ -128,7 +131,7 @@ class CourseDescriptor(SequenceDescriptor):
         if self.start is None:
             msg = "Course loaded without a valid start date. id = %s" % self.id
             # hack it -- start in 1970
-            self.metadata['start'] = stringify_time(time.gmtime(0))
+            self.lms.start = time.gmtime(0)
             log.critical(msg)
             system.error_tracker(msg)
 
@@ -198,8 +201,6 @@ class CourseDescriptor(SequenceDescriptor):
         grading_policy['GRADER'] = grader_from_conf(grading_policy['GRADER'])
         self._grading_policy = grading_policy
 
-
-
     @classmethod
     def read_grading_policy(cls, paths, system):
         """Load a grading policy from the specified paths, in order, if it exists."""
@@ -221,14 +222,13 @@ class CourseDescriptor(SequenceDescriptor):
 
         return policy_str
 
-    
     @classmethod
     def from_xml(cls, xml_data, system, org=None, course=None):
         instance = super(CourseDescriptor, cls).from_xml(xml_data, system, org, course)
 
         # bleh, have to parse the XML here to just pull out the url_name attribute
         course_file = StringIO(xml_data)
-        xml_obj = etree.parse(course_file,parser=edx_xml_parser).getroot()
+        xml_obj = etree.parse(course_file, parser=edx_xml_parser).getroot()
 
         policy_dir = None
         url_name = xml_obj.get('url_name', xml_obj.get('slug'))
@@ -241,7 +241,7 @@ class CourseDescriptor(SequenceDescriptor):
             paths = [policy_dir + '/grading_policy.json'] + paths
 
         policy = json.loads(cls.read_grading_policy(paths, system))
-        
+
         # cdodge: import the grading policy information that is on disk and put into the
         # descriptor 'definition' bucket as a dictionary so that it is persisted in the DB
         instance.grading_policy = policy
@@ -250,7 +250,6 @@ class CourseDescriptor(SequenceDescriptor):
         instance.set_grading_policy(policy)
 
         return instance
-    
 
     @classmethod
     def definition_from_xml(cls, xml_object, system):
@@ -334,17 +333,6 @@ class CourseDescriptor(SequenceDescriptor):
         self.definition['data'].setdefault('grading_policy',{})['GRADE_CUTOFFS'] = value
     
 
-    @property
-    def tabs(self):
-        """
-        Return the tabs config, as a python object, or None if not specified.
-        """
-        return self.metadata.get('tabs')
-
-    @tabs.setter
-    def tabs(self, value):
-        self.metadata['tabs'] = value
-
     @lazyproperty
     def grading_context(self):
         """
@@ -383,14 +371,14 @@ class CourseDescriptor(SequenceDescriptor):
         for c in self.get_children():
             sections = []
             for s in c.get_children():
-                if s.metadata.get('graded', False):
+                if s.lms.graded:
                     xmoduledescriptors = list(yield_descriptor_descendents(s))
                     xmoduledescriptors.append(s)
 
                     # The xmoduledescriptors included here are only the ones that have scores.
                     section_description = { 'section_descriptor' : s, 'xmoduledescriptors' : filter(lambda child: child.has_score, xmoduledescriptors) }
 
-                    section_format = s.metadata.get('format', "")
+                    section_format = s.lms.format
                     graded_sections[ section_format ] = graded_sections.get( section_format, [] ) + [section_description]
 
                     all_descriptors.extend(xmoduledescriptors)
@@ -447,7 +435,7 @@ class CourseDescriptor(SequenceDescriptor):
         try:
             blackout_periods = [(parse_time(start), parse_time(end))
                                 for start, end
-                                in self.metadata.get('discussion_blackouts', [])]
+                                in self.discussion_blackouts]
             now = time.gmtime()
             for start, end in blackout_periods:
                 if start <= now <= end:
@@ -456,17 +444,6 @@ class CourseDescriptor(SequenceDescriptor):
             log.exception("Error parsing discussion_blackouts for course {0}".format(self.id))
         
         return True
-
-
-    @property
-    def end_of_course_survey_url(self):
-        """
-        Pull from policy.  Once we have our own survey module set up, can change this to point to an automatically
-        created survey for each class.
-
-        Returns None if no url specified.
-        """
-        return self.metadata.get('end_of_course_survey_url')
 
     @property
     def title(self):

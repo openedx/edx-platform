@@ -430,10 +430,10 @@ class XMLModuleStore(ModuleStoreBase):
                 NOTE: This means that there is no such thing as lazy loading at the
                 moment--this accesses all the children."""
                 for child in descriptor.get_children():
-                    inherit_metadata(child, descriptor.metadata)
+                    inherit_metadata(child, descriptor._model_data)
                     compute_inherited_metadata(child)
 
-            def inherit_metadata(descriptor, metadata):
+            def inherit_metadata(descriptor, model_data):
                 """
                 Updates this module with metadata inherited from a containing module.
                 Only metadata specified in self.inheritable_metadata will
@@ -441,11 +441,10 @@ class XMLModuleStore(ModuleStoreBase):
                 """
                 # Set all inheritable metadata from kwargs that are
                 # in self.inheritable_metadata and aren't already set in metadata
-                for attr in self.inheritable_metadata:
-                    if attr not in self.metadata and attr in metadata:
-                        self._inherited_metadata.add(attr)
-                        self.metadata[attr] = metadata[attr]
-
+                for attr in descriptor.inheritable_metadata:
+                    if attr not in descriptor._model_data and attr in model_data:
+                        descriptor._inherited_metadata.add(attr)
+                        descriptor._model_data[attr] = model_data[attr]
 
             compute_inherited_metadata(course_descriptor)
 
@@ -485,7 +484,7 @@ class XMLModuleStore(ModuleStoreBase):
                     if category == "static_tab":
                         for tab in course_descriptor.tabs or []:
                             if tab.get('url_slug') == slug:
-                                module.display_name = tab['name']
+                                module.lms.display_name = tab['name']
                     module.data_dir = course_dir
                     self.modules[course_descriptor.id][module.location] = module
                 except Exception, e:

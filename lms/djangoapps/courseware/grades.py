@@ -179,12 +179,12 @@ def grade(student, request, course, student_module_cache=None, keep_raw_scores=F
                         else:
                             correct = total
 
-                    graded = module_descriptor.metadata.get("graded", False)
+                    graded = module_descriptor.lms.graded
                     if not total > 0:
                         #We simply cannot grade a problem that is 12/0, because we might need it as a percentage
                         graded = False
 
-                    scores.append(Score(correct, total, graded, module_descriptor.metadata.get('display_name')))
+                    scores.append(Score(correct, total, graded, module_descriptor.lms.display_name))
 
                 section_total, graded_total = graders.aggregate_scores(scores, section_name)
                 if keep_raw_scores:
@@ -288,7 +288,7 @@ def progress_summary(student, request, course, student_module_cache):
                 continue
             
             # Same for sections
-            graded = section_module.metadata.get('graded', False)
+            graded = section_module.lms.graded
             scores = []
             
             module_creator = lambda descriptor : section_module.system.get_module(descriptor.location)
@@ -301,20 +301,20 @@ def progress_summary(student, request, course, student_module_cache):
                     continue
 
                 scores.append(Score(correct, total, graded,
-                    module_descriptor.metadata.get('display_name')))
+                    module_descriptor.lms.display_name))
 
             scores.reverse()
             section_total, graded_total = graders.aggregate_scores(
-                scores, section_module.metadata.get('display_name'))
+                scores, section_module.lms.display_name)
 
-            format = section_module.metadata.get('format', "")
+            format = section_module.lms.format
             sections.append({
                 'display_name': section_module.display_name,
                 'url_name': section_module.url_name,
                 'scores': scores,
                 'section_total': section_total,
                 'format': format,
-                'due': section_module.metadata.get("due", ""),
+                'due': section_module.due,
                 'graded': graded,
             })
 

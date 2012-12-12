@@ -142,9 +142,9 @@ def initialize_discussion_info(course):
 
     for location, module in all_modules.items():
         if location.category == 'discussion':
-            id = module.metadata['id']
-            category = module.metadata['discussion_category']
-            title = module.metadata['for']
+            id = module.discussion_id
+            category = module.discussion_category
+            title = module.discussion_target
             sort_key = module.metadata.get('sort_key', title)
             category = " / ".join([x.strip() for x in category.split("/")])
             last_category = category.split("/")[-1]
