@@ -200,8 +200,20 @@ class @Problem
 
   message_post: =>
     Logger.log 'message_post', @answers
-    $.postWithPrefix "#{@url}/message_post", @answers, (response) =>
-        @gentle_alert response.success
+
+    fd = new FormData()
+    feedback = @$('section.evaluation textarea.feedback-on-feedback')[0]
+    fd.append(feedback.class, feedback.value)
+
+    settings =
+      type: "POST"
+      data: fd
+      processData: false
+      contentType: false
+      success: (response) =>
+          @gentle_alert response.success
+
+    $.ajaxWithPrefix("#{@url}/message_post", settings)
 
   reset: =>
     Logger.log 'problem_reset', @answers
