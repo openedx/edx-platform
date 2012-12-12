@@ -220,7 +220,7 @@ CMS.Views.Settings.Details = CMS.Views.ValidatingView.extend({
 		timefield.on('changeTime', savefield);
 		
 		datefield.datepicker('setDate', this.model.get(fieldName));
-		timefield.timepicker('setTime', this.model.get(fieldName));
+		if (this.model.has(fieldName)) timefield.timepicker('setTime', this.model.get(fieldName));
 	},
 	
 	updateModel: function(event) {
@@ -352,7 +352,7 @@ CMS.Views.Settings.Grading = CMS.Views.ValidatingView.extend({
 		
 		var graceEle = this.$el.find('#course-grading-graceperiod');
 		graceEle.timepicker({'timeFormat' : 'H:i'}); // init doesn't take setTime
-		graceEle.timepicker('setTime', this.model.gracePeriodToDate());
+		if (this.model.has('grace_period')) graceEle.timepicker('setTime', this.model.gracePeriodToDate());
 		
 		return this;
 	},
