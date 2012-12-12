@@ -407,7 +407,7 @@ class CapaModule(XModule):
 
         success, message = self.lcp.message_post(event_info)
 
-        return {'success' : success}
+        return {'success' : success, 'message' : message}
 
     def closed(self):
         ''' Is the student still allowed to submit answers? '''

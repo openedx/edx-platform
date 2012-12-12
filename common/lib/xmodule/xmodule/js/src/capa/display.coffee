@@ -215,7 +215,10 @@ class @Problem
       processData: false
       contentType: false
       success: (response) =>
-          @gentle_alert response.success
+        @gentle_alert response.message
+        switch response.success
+          when 'True', 'true'
+            @$('section.evaluation input.submit-message').hide()
 
     $.ajaxWithPrefix("#{@url}/message_post", settings)
 

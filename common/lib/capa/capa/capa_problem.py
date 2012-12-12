@@ -195,7 +195,7 @@ class LoncapaProblem(object):
         TODO: Handle multiple problems on one page sync issues.
         """
         success=False
-        message = ""
+        message = "Could not find a valid responder."
         log.debug("in lcp")
         for responder in self.responders.values():
             if hasattr(responder, 'handle_message_post'):
