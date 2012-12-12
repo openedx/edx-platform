@@ -9,29 +9,39 @@ define('Graph', [], function () {
     function Graph(gstId, config, state) {
         var plotDiv, dataSeries, functions, xaxis, yaxis, xrange;
 
+        // We must have a graph container DIV element available in order to
+        // proceed.
         plotDiv = $('#' + gstId + '_plot');
-
         if (plotDiv.length === 0) {
             return;
         }
 
+        // Configure some settings for the graph.
         setGraphDimensions();
         setGraphAxes();
         setGraphXRange();
 
-        state.bindUpdatePlotEvent(plotDiv, onUpdatePlot);
-
+        // Get the user defined functions. If there aren't any, don't do
+        // anything else.
         createFunctions();
+        if (functions.length === 0) {
+            return;
+        }
 
+        // Create the initial graph and plot it for the user to see.
         generateData();
         updatePlot();
+
+        // Bind an event. Whenever some constant changes, the graph will be
+        // redrawn
+        state.bindUpdatePlotEvent(plotDiv, onUpdatePlot);
 
         return;
 
         function setGraphDimensions() {
             var dimObj, width, height, tempInt;
 
-            // If no dimensions are specified by the user, the graph have
+            // If no dimensions are specified by the user, the graph will have
             // predefined dimensions.
             width = 300;
             height = 300;
@@ -51,27 +61,30 @@ define('Graph', [], function () {
                 }
             }
 
+            // Apply the dimensions to the graph container DIV element.
             plotDiv.width(width);
             plotDiv.height(height);
         }
 
         function setGraphAxes() {
+            // Define the xaxis Flot configuration, and then see if the user
+            // supplied custom values.
             xaxis = {
                 'min': 0,
-                'tickSize': 3,
-                'max': 30
+                'tickSize': 1,
+                'max': 10
             };
-
             if (typeof config.plot['xticks'] === 'string') {
                 processTicks(config.plot['xticks'], xaxis);
             }
 
+            // Define the yaxis Flot configuration, and then see if the user
+            // supplied custom values.
             yaxis = {
-                'min': -5,
+                'min': 0,
                 'tickSize': 1,
-                'max': 5
+                'max': 10
             };
-
             if (typeof config.plot['yticks'] === 'string') {
                 processTicks(config.plot['yticks'], yaxis);
             }
@@ -79,34 +92,41 @@ define('Graph', [], function () {
             return;
 
             function processTicks(ticksStr, ticksObj) {
-                var ticksBlobs, min, tickSize, max;
+                var ticksBlobs, tempFloat;
 
+                // The 'ticks' setting is a string containing 3 floating-point
+                // numbers.
                 ticksBlobs = ticksStr.split(',');
 
                 if (ticksBlobs.length !== 3) {
                     return;
                 }
 
-                min = parseFloat(ticksBlobs[0]);
-                if (isNaN(min) === false) {
-                    ticksObj.min = min;
+                tempFloat = parseFloat(ticksBlobs[0]);
+                if (isNaN(tempFloat) === false) {
+                    ticksObj.min = tempFloat;
                 }
 
-                tickSize = parseFloat(ticksBlobs[1]);
-                if (isNaN(tickSize) === false) {
-                    ticksObj.tickSize = tickSize;
+                tempFloat = parseFloat(ticksBlobs[1]);
+                if (isNaN(tempFloat) === false) {
+                    ticksObj.tickSize = tempFloat;
                 }
 
-                max = parseFloat(ticksBlobs[2]);
-                if (isNaN(max) === false) {
-                    ticksObj.max = max;
+                tempFloat = parseFloat(ticksBlobs[2]);
+                if (isNaN(tempFloat) === false) {
+                    ticksObj.max = tempFloat;
                 }
 
+                // Is the starting tick to the left of the ending tick (on the
+                // x-axis)? If not, set default starting and ending tick.
                 if (ticksObj.min >= ticksObj.max) {
                     ticksObj.min = 0;
                     ticksObj.max = 10;
                 }
 
+                // Make sure the range makes sense - i.e. that there are at
+                // least 3 ticks. If not, set a tickSize which will produce
+                // 11 ticks. tickSize is the spacing between the ticks.
                 if (ticksObj.tickSize * 2 >= ticksObj.max - ticksObj.min) {
                     ticksObj.tickSize = (ticksObj.max - ticksObj.min) / 10.0;
                 }
@@ -118,10 +138,13 @@ define('Graph', [], function () {
 
             xrange = {
                 'start': 0,
-                'end': 30,
+                'end': 10,
                 'step': 0.1
             };
 
+            // The 'xrange' is a string containing two floating point numbers
+            // separated by a comma. The first number is the starting
+            // x-coordinate , the second number is the ending x-coordinate
             if (typeof config.plot['xrange'] === 'string') {
                 xRangeStr = config.plot['xrange'];
                 xRangeBlobs = xRangeStr.split(',');
@@ -138,13 +161,25 @@ define('Graph', [], function () {
                         xrange.end = tempNum;
                     }
 
+                    if (xrange.start >= xrange.end) {
+                        xrange.start = 0;
+                        xrange.end = 10;
+                    }
+
                 }
             }
 
+            // The user can specify the number of points. However, internally
+            // we will use it to generate a 'step' - i.e. the distance (on
+            // x-axis) between two adjacent points.
             if (typeof config.plot['num_points'] === 'string') {
                 tempNum = parseInt(config.plot['num_points'], 10);
-                if (isNaN(tempNum) === false) {
-                    xrange.step = (xrange.end - xrange.start) / tempNum;
+                if (
+                    (isNaN(tempNum) === false) &&
+                    (tempNum >= 2) &&
+                    (tempNum <= 500)
+                ) {
+                    xrange.step = (xrange.end - xrange.start) / (tempNum - 1);
                 }
             }
         }
@@ -192,67 +227,97 @@ define('Graph', [], function () {
 
             return;
 
-            // This function will reduce code duplications. We have to call
+            // This function will reduce code duplication. We have to call
             // the function addFunction() several times passing object
-            // properties. A parameters. Rather than writing them out every
-            // time, we will have a single point of
+            // properties as parameters. Rather than writing them out every
+            // time, we will have a single place where it is done.
             function callAddFunction(obj) {
                 addFunction(
                     obj['#text'],
                     obj['@color'],
                     obj['@line'],
                     obj['@dot'],
-                    obj['@label'],
-                    obj['@style'],
-                    obj['@point_size']
+                    obj['@label']
                 );
             }
 
-            function addFunction(funcString, color, line, dot, label, style, point_size) {
+            function addFunction(funcString, color, line, dot, label) {
                 var newFunctionObject, func, constNames;
 
+                // The main requirement is function string. Without it we can't
+                // create a function, and the series cannot be calculated.
                 if (typeof funcString !== 'string') {
                     return;
                 }
 
-                newFunctionObject = {};
+                // Some defaults. If no options are set for the graph, we will
+                // make sure that at least a line is drawn for a function.
+                newFunctionObject = {
+                    'line': true,
+                    'dot': false
+                };
 
+                // Get all of the constant names defined by the user in the
+                // XML.
                 constNames = state.getAllConstantNames();
 
                 // The 'x' is always one of the function parameters.
                 constNames.push('x');
 
                 // Must make sure that the function body also gets passed to
-                // the Function cosntructor.
+                // the Function constructor.
                 constNames.push(funcString);
 
-                func = Function.apply(null, constNames);
+                // Create the function from the function string, and all of the
+                // available constants + the 'x' variable as it's parameters.
+                // For this we will use the built-in Function object
+                // constructor.
+                //
+                // If something goes wrong during this step, most
+                // likely the user supplied an invalid JavaScript function body
+                // string. In this case we will not proceed.
+                try {
+                    func = Function.apply(null, constNames);
+                } catch (err) {
+                    // Let's tell the user. He will see a nice red error
+                    // message instead of a graph.
+                    plotDiv.html(
+                        '<span style="color: red;">' +
+                            'Error while parsing JavaScript function body string!' +
+                        '</span>'
+                    );
+
+                    return;
+                }
+
                 newFunctionObject['func'] = func;
 
                 if (typeof color === 'string') {
                     newFunctionObject['color'] = color;
                 }
 
-                if ((typeof line === 'boolean') || (typeof line === 'string')) {
-                    if ((line === 'true') || (line === true)) {
+                if (typeof line === 'string') {
+                    if (line === 'true') {
                         newFunctionObject['line'] = true;
-                    } else {
+                    } else if (line === 'false') {
                         newFunctionObject['line'] = false;
                     }
                 }
 
-                if ((typeof dot === 'boolean') || (typeof dot === 'string')) {
-                    if ((dot === 'true') || (dot === true)) {
+                if (typeof dot === 'string') {
+                    if (dot === 'true') {
                         newFunctionObject['dot'] = true;
-                    } else {
+                    } else if (dot === 'false') {
                         newFunctionObject['dot'] = false;
                     }
                 }
 
-                // By default, if no preference was set, or if the preference
-                // is conflicting (we must have either line or dot, none is
-                // not an option), we will show line.
-                if ((newFunctionObject['dot'] === false) && (newFunctionObject['line'] === false)) {
+                // If the preference is conflicting (we must have either line
+                // or dot, none is not an option), we will show line.
+                if (
+                    (newFunctionObject['dot'] === false) &&
+                    (newFunctionObject['line'] === false)
+                ) {
                     newFunctionObject['line'] = true;
                 }
 
@@ -264,6 +329,8 @@ define('Graph', [], function () {
             }
         }
 
+        // The callback that will be called whenever a constant changes (gets
+        // updated via a slider or a text input).
         function onUpdatePlot(event) {
             generateData();
             updatePlot();
@@ -282,6 +349,7 @@ define('Graph', [], function () {
                 seriesObj = {};
                 dataPoints = [];
 
+                // Generate the data points.
                 for (x = xrange.start; x <= xrange.end; x += xrange.step) {
 
                     // Push the 'x' variable to the end of the parameter array.
@@ -314,19 +382,25 @@ define('Graph', [], function () {
                     seriesObj.label = functionObj.label;
                 }
 
+                // Should the data points be connected by a line?
                 seriesObj.lines = {
                     'show': functionObj.line
                 };
 
+                // Should each data point be represented by a point on the
+                // graph?
                 seriesObj.points = {
                     'show': functionObj.dot
                 };
 
+                // Add the newly created series object to the series set which
+                // will be plotted by Flot.
                 dataSeries.push(seriesObj);
             }
         }
 
         function updatePlot() {
+            // Tell Flot to draw the graph to our specification.
             $.plot(
                 plotDiv,
                 dataSeries,
@@ -350,6 +424,13 @@ define('Graph', [], function () {
                 }
             );
 
+            // The first time that the graph gets added to the page, the legend
+            // is created from scratch. When it appears, MathJax works some
+            // magic, and all of the specially marked TeX gets rendered nicely.
+            // The next time when we update the graph, no such thing happens.
+            // We must ask MathJax to typeset the legend again (well, we will
+            // ask it to look at our entire graph DIV), the next time it's
+            // worker queue is available.
             MathJax.Hub.Queue([
                 'Typeset',
                 MathJax.Hub,

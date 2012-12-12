@@ -16,13 +16,21 @@ define(
     function GstMain(gstId) {
         var config, state;
 
+        // Get the JSON configuration, and parse it, and store as an object.
         config = JSON.parse($('#' + gstId + '_json').html()).root;
 
+        // Parse the configuration settings for sliders and text inputs, and
+        // extract all of the defined constants (their names along with their
+        // initial values).
         state = State(gstId, config);
 
+        // Create the sliders and the text inputs, attaching them to
+        // approriate constants.
         Sliders(gstId, config, state);
         Inputs(gstId, config, state);
 
+        // Configure and display the loop. Attach event for the graph to be
+        // updated on any change of a slider or a text input.
         Graph(gstId, config, state);
     }
 });
