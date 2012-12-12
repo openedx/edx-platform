@@ -26,11 +26,12 @@ class ModelType(object):
     """
     sequence = 0
 
-    def __init__(self, help=None, default=None, scope=Scope.content):
+    def __init__(self, help=None, default=None, scope=Scope.content, computed_default=None):
         self._seq = self.sequence
         self._name = "unknown"
         self.help = help
         self.default = default
+        self.computed_default = computed_default
         self.scope = scope
         ModelType.sequence += 1
 
@@ -43,6 +44,9 @@ class ModelType(object):
             return self
 
         if self.name not in instance._model_data:
+            if self.default is None and self.computed_default is not None:
+                return self.computed_default(instance)
+
             return self.default
 
         return self.from_json(instance._model_data[self.name])
@@ -136,17 +140,44 @@ class NamespaceDescriptor(object):
 
 class Namespace(Plugin):
     """
-    A baseclass that sets up machinery for ModelType fields that proxies the contained fields
-    requests for _model_data to self._container._model_data.
+    A baseclass that sets up machinery for ModelType fields that makes those fields be called
+    with the container as the field instance
     """
     __metaclass__ = ModelMetaclass
-    __slots__ = ['container']
 
     entry_point = 'xmodule.namespace'
 
     def __init__(self, container):
         self._container = container
 
-    @property
-    def _model_data(self):
-        return self._container._model_data
+    def __getattribute__(self, name):
+        container = super(Namespace, self).__getattribute__('_container')
+        namespace_attr = getattr(type(self), name, None)
+
+        if namespace_attr is None or not isinstance(namespace_attr, ModelType):
+            return super(Namespace, self).__getattribute__(name)
+
+        return namespace_attr.__get__(container, type(container))
+
+    def __setattr__(self, name, value):
+        try:
+            container = super(Namespace, self).__getattribute__('_container')
+        except AttributeError:
+            super(Namespace, self).__setattr__(name, value)
+            return
+
+        container_class_attr = getattr(type(container), name, None)
+
+        if container_class_attr is None or not isinstance(container_class_attr, ModelType):
+            return super(Namespace, self).__setattr__(name, value)
+
+        return container_class_attr.__set__(container)
+
+    def __delattr__(self, name):
+        container = super(Namespace, self).__getattribute__('_container')
+        container_class_attr = getattr(type(container), name, None)
+
+        if container_class_attr is None or not isinstance(container_class_attr, ModelType):
+            return super(Namespace, self).__detattr__(name)
+
+        return container_class_attr.__delete__(container)

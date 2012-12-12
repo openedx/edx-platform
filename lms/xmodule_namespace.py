@@ -18,7 +18,11 @@ class LmsNamespace(Namespace):
         scope=Scope.settings
     )
 
-    display_name = String(help="Display name for this module", scope=Scope.settings)
+    display_name = String(
+        help="Display name for this module",
+        scope=Scope.settings,
+        computed_default=lambda module: module.url_name.replace('_', ' ')
+    )
     start = Date(help="Start time when this module is visible", scope=Scope.settings)
     due = String(help="Date that this problem is due by", scope=Scope.settings, default='')
     filename = List(help="DO NOT USE", scope=Scope.content, default=['', None])
