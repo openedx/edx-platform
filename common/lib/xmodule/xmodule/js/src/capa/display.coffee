@@ -202,8 +202,12 @@ class @Problem
     Logger.log 'message_post', @answers
 
     fd = new FormData()
-    feedback = @$('section.evaluation textarea.feedback-on-feedback')[0]
-    fd.append('feedback', feedback.value)
+    feedback = @$('section.evaluation textarea.feedback-on-feedback')[0].value
+    submission_id = $('div.external-grader-message div.submission_id')[0].innerHTML
+    grader_id = $('div.external-grader-message div.grader_id')[0].innerHTML
+    fd.append('feedback', feedback)
+    fd.append('submission_id', submission_id)
+    fd.append('grader_id', grader_id)
 
     settings =
       type: "POST"

@@ -405,9 +405,9 @@ class CapaModule(XModule):
         event_info['student_id'] = self.system.anonymous_student_id
         event_info['survey_responses']= get
 
-        success_dict = self.lcp.message_post(event_info)
+        success, message = self.lcp.message_post(event_info)
 
-        return {'success' : True}
+        return {'success' : success}
 
     def closed(self):
         ''' Is the student still allowed to submit answers? '''

@@ -189,10 +189,20 @@ class LoncapaProblem(object):
     def message_post(self,event_info):
         """
         Handle an ajax post that contains feedback on feedback
+        Returns a boolean success variable
+        Note:  This only allows for feedback to be posted back to the grading controller for the first
+        open ended response problem on each page.  Multiple problems will cause some sync issues.
+        TODO: Handle multiple problems on one page sync issues.
         """
+        success=False
+        message = ""
+        log.debug("in lcp")
         for responder in self.responders.values():
-            if hasattr(responder, 'message_post'):
-                responder.message_post(event_info)
+            if hasattr(responder, 'handle_message_post'):
+                success, message = responder.handle_message_post(event_info)
+                if success:
+                    break
+        return success, message
 
     def get_score(self):
         """

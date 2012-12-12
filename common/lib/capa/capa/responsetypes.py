@@ -1848,6 +1848,7 @@ class OpenEndedResponse(LoncapaResponse):
         xml = self.xml
         self.url = xml.get('url', None)
         self.queue_name = xml.get('queuename', self.DEFAULT_QUEUE)
+        self.message_queue_name = xml.get('message-queuename', self.DEFAULT_MESSAGE_QUEUE)
 
         # The openendedparam tag encapsulates all grader settings
         oeparam = self.xml.find('openendedparam')
@@ -1920,6 +1921,52 @@ class OpenEndedResponse(LoncapaResponse):
             self.max_score = int(find_with_default(oeparam, 'max_score', 1))
         except ValueError:
             self.max_score = 1
+
+    def handle_message_post(self,event_info):
+        """
+        Handles a student message post (a reaction to the grade they received from an open ended grader type)
+        Returns a boolean success/fail and an error message
+        """
+        survey_responses=event_info['survey_responses']
+        for tag in ['feedback', 'submission_id', 'grader_id']:
+            if tag not in survey_responses:
+                return False, "Could not find needed tag {0}".format(tag)
+        try:
+            submission_id=int(survey_responses['submission_id'][0])
+            grader_id = int(survey_responses['grader_id'][0])
+            feedback = str(survey_responses['feedback'][0])
+        except:
+            error_message="Could not parse submission id, grader id, or feedback from message_post ajax call."
+            log.exception(error_message)
+            return False, error_message
+
+        qinterface = self.system.xqueue['interface']
+        qtime = datetime.strftime(datetime.now(), xqueue_interface.dateformat)
+        anonymous_student_id = self.system.anonymous_student_id
+        queuekey = xqueue_interface.make_hashkey(str(self.system.seed) + qtime +
+                                                 anonymous_student_id +
+                                                 self.answer_id)
+
+        xheader = xqueue_interface.make_xheader(lms_key=queuekey,queue_name=self.message_queue_name)
+        student_info = {'anonymous_student_id': anonymous_student_id,
+                        'submission_time': qtime,
+                        }
+        contents= {
+            'feedback' : feedback,
+            'submission_id' : submission_id,
+            'grader_id' : grader_id,
+            'student_info' : json.dumps(student_info),
+        }
+
+        (error, msg) = qinterface.send_to_queue(header=xheader,
+            body=json.dumps(contents))
+
+        #Convert error to a success value
+        success=True
+        if error:
+            success=False
+
+        return success, "Successfully sent to queue."
 
     def get_score(self, student_answers):
 
@@ -2068,11 +2115,18 @@ class OpenEndedResponse(LoncapaResponse):
             </div>
             """.format(feedback_type=feedback_type, value=value)
 
+        def format_feedback_hidden(feedback_type , value):
+            return """
+            <div class="{feedback_type}" style="display: none;">
+            {value}
+            </div>
+            """.format(feedback_type=feedback_type, value=value)
+
         # TODO (vshnayder): design and document the details of this format so
         # that we can do proper escaping here (e.g. are the graders allowed to
         # include HTML?)
 
-        for tag in ['success', 'feedback']:
+        for tag in ['success', 'feedback', 'submission_id', 'grader_id']:
             if tag not in response_items:
                 return format_feedback('errors', 'Error getting feedback')
 
@@ -2088,10 +2142,12 @@ class OpenEndedResponse(LoncapaResponse):
                 return format_feedback('errors', 'No feedback available')
 
             feedback_lst = sorted(feedback.items(), key=get_priority)
-            return u"\n".join(format_feedback(k, v) for k, v in feedback_lst)
+            feedback_list_part1 = u"\n".join(format_feedback(k, v) for k, v in feedback_lst)
         else:
-            return format_feedback('errors', response_items['feedback'])
+            feedback_list_part1 = format_feedback('errors', response_items['feedback'])
 
+        feedback_list_part2=u"\n".join([format_feedback_hidden(k,response_items[k]) for k in response_items.keys() if k in ['submission_id', 'grader_id']])
+        return u"\n".join([feedback_list_part1,feedback_list_part2])
 
     def _format_feedback(self, response_items):
         """
