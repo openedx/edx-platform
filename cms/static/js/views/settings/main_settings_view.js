@@ -125,7 +125,8 @@ CMS.Views.Settings.Main = Backbone.View.extend({
 		var now = new Date();
 		var hours = now.getHours();
 		var minutes = now.getMinutes();
-		$(e.currentTarget).attr('title', (hours % 12 == 0 ? 12 : hours % 12) + ":" + (minutes < 10 ? "0" : "") + now.getMinutes() + (hours < 12 ? "am" : "pm"));
+		$(e.currentTarget).attr('title', (hours % 12 == 0 ? 12 : hours % 12) + ":" + (minutes < 10 ? "0" : "") 
+				+ now.getMinutes() + (hours < 12 ? "am" : "pm") + " (current local time)");
 	},
 	
 	showSettingsTab: function(e) {
@@ -147,7 +148,8 @@ CMS.Views.Settings.Details = CMS.Views.ValidatingView.extend({
 		"blur textarea" : "updateModel",
 		'click .remove-course-syllabus' : "removeSyllabus",
 		'click .new-course-syllabus' : 'assetSyllabus',
-		'click .remove-course-introduction-video' : "removeVideo"
+		'click .remove-course-introduction-video' : "removeVideo",
+		'focus #course-overview' : "codeMirrorize"
 	},
 	initialize : function() {
 		// TODO move the html frag to a loaded asset
@@ -263,6 +265,21 @@ CMS.Views.Settings.Details = CMS.Views.ValidatingView.extend({
 			this.model.save_videosource(null);
 			this.$el.find(".current-course-introduction-video iframe").attr("src", "");
 			this.$el.find(this.fieldToSelectorMap['intro_video']).val("");
+		}
+	},
+	codeMirrors : {},
+	codeMirrorize : function(e) {
+		if (!this.codeMirrors[e.currentTarget.id]) {
+			var cachethis = this;
+			var field = this.selectorToField['#' + e.currentTarget.id];
+			this.codeMirrors[e.currentTarget.id] = CodeMirror.fromTextArea(e.currentTarget, {
+				mode: "text/html", lineNumbers: true, lineWrapping: true,
+				onBlur : function(mirror) {
+					mirror.save();
+					cachethis.clearValidationErrors();
+					cachethis.model.save(field, mirror.getValue());
+				}
+			});
 		}
 	}
 	
