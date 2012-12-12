@@ -2,7 +2,7 @@ from xmodule.modulestore import Location
 from contentstore.utils import get_modulestore
 import datetime
 import re
-from common.djangoapps.util import converters
+from util import converters
 import time
 
 
