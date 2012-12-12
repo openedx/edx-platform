@@ -3,4 +3,5 @@
   -webkit-box-sizing: $box;
      -moz-box-sizing: $box;
           box-sizing: $box;
+          box-sizing: $box; *behavior: url(/static/scripts/boxsizing.htc);
 }
