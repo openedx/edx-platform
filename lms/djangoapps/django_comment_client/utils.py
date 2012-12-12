@@ -17,6 +17,7 @@ from xmodule.modulestore import Location
 from xmodule.modulestore.django import modulestore
 from xmodule.modulestore.search import path_to_location
 
+log = logging.getLogger(__name__)
 
 # TODO these should be cached via django's caching rather than in-memory globals
 _FULLMODULES = None
@@ -141,6 +142,15 @@ def initialize_discussion_info(course):
 
     for location, module in all_modules.items():
         if location.category == 'discussion':
+            skip_module = False
+            for key in ('id', 'discussion_category', 'for'):
+                if key not in module.metadata:
+                    log.warning("Required key '%s' not in discussion %s, leaving out of category map" % (key, module.location))
+                    skip_module = True
+
+            if skip_module:
+                continue
+
             id = module.metadata['id']
             category = module.metadata['discussion_category']
             title = module.metadata['for']
@@ -245,7 +255,7 @@ class QueryCountDebugMiddleware(object):
                     query_time = query.get('duration', 0) / 1000
                 total_time += float(query_time)
 
-            logging.info('%s queries run, total %s seconds' % (len(connection.queries), total_time))
+            log.info('%s queries run, total %s seconds' % (len(connection.queries), total_time))
         return response
 
 def get_ability(course_id, content, user):
@@ -317,7 +327,7 @@ def extend_content(content):
             user = User.objects.get(pk=content['user_id'])
             roles = dict(('name', role.name.lower()) for role in user.roles.filter(course_id=content['course_id']))
         except user.DoesNotExist:
-            logging.error('User ID {0} in comment content {1} but not in our DB.'.format(content.get('user_id'), content.get('id')))
+            log.error('User ID {0} in comment content {1} but not in our DB.'.format(content.get('user_id'), content.get('id')))
 
     content_info = {
         'displayed_title': content.get('highlighted_title') or content.get('title', ''),
