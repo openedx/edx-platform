@@ -67,10 +67,10 @@ input.courseware-unit-search-input {
 		@include clearfix();
 
 		.item-details, .section-published-date {
-			display: inline-block;
 		}
 
 		.item-details {
+			float: none;
 			padding: 20px 0 10px 0;
 			@include clearfix();
 
@@ -93,6 +93,10 @@ input.courseware-unit-search-input {
 			}
 
 			.section-name-edit {
+				position: relative;
+				width: 400px;
+				background: $white;
+
 				input {
 					font-size: 16px;	
 				}
@@ -110,9 +114,9 @@ input.courseware-unit-search-input {
 			}
 
 			.section-published-date {
-				float: left;
+				float: right;
 				width: 265px;
-				margin-right: 10px;
+				margin-right: 220px;
 				padding: 4px 10px;
 				@include border-radius(3px);
 				background: $lightGrey;
@@ -167,7 +171,7 @@ input.courseware-unit-search-input {
 			.menu-toggle {
 				z-index: 10;
 				position: absolute;
-				top: 0;
+				top: 2px;
 				right: 5px;
 				padding: 5px;
 				color: $lightGrey;
