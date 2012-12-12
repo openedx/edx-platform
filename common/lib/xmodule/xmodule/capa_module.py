@@ -395,7 +395,7 @@ class CapaModule(XModule):
             })
         return json.dumps(d, cls=ComplexEncoder)
 
-    def feedback_post(self, get):
+    def message_post(self, get):
         """
         Posts a message from a form to an appropriate location
         """
@@ -405,8 +405,7 @@ class CapaModule(XModule):
 
         answers = self.make_dict_of_responses(get)
         log.debug(answers)
-
-
+        log.debug(event_info)
 
     def closed(self):
         ''' Is the student still allowed to submit answers? '''
