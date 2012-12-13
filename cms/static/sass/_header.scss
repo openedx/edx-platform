@@ -83,6 +83,7 @@ body.no-header {
 
 	.class {
 		@include clearfix;
+		height: 100%;
 		font-size: 12px;
 		color: rgb(163, 171, 184);
 		@include linear-gradient(top, rgba(255, 255, 255, 0), rgba(255, 255, 255, .1));
