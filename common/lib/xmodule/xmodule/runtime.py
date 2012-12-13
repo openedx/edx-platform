@@ -11,13 +11,13 @@ class KeyValueStore(object):
     # data.
     Key = namedtuple("Key", "scope, student_id, module_scope_id, field_name")
 
-    def get(key):
+    def get(self, key):
         pass
 
-    def set(key, value):
+    def set(self, key, value):
         pass
 
-    def delete(key):
+    def delete(self, key):
         pass
 
 
@@ -50,7 +50,7 @@ class DbModel(MutableMapping):
         for namespace_name in self._module_cls.namespaces:
             namespace = getattr(self._module_cls, namespace_name)
             namespace_field = getattr(type(namespace), name, None)
-            if namespace_field is not None and isinstance(module_field, ModelType):
+            if namespace_field is not None and isinstance(namespace_field, ModelType):
                 return namespace_field
 
         # Not in the class or in any of the namespaces, so name
@@ -59,7 +59,6 @@ class DbModel(MutableMapping):
 
     def _key(self, name):
         field = self._getfield(name)
-        print name, field
         module = field.scope.module
 
         if module == ModuleScope.ALL:
@@ -69,7 +68,7 @@ class DbModel(MutableMapping):
         elif module == ModuleScope.DEFINITION:
             module_id = self._usage.def_id
         elif module == ModuleScope.TYPE:
-            module_id = self.module_type.__name__
+            module_id = self._module_cls.__name__
 
         if field.scope.student:
             student_id = self._student_id

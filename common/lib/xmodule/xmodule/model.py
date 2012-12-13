@@ -133,8 +133,6 @@ class NamespaceDescriptor(object):
         self._namespace = namespace
 
     def __get__(self, instance, owner):
-        if owner is None:
-            return self
         return self._namespace(instance)
 
 
