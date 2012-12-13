@@ -384,6 +384,13 @@ body.show-wip {
   }
 }
 
+.delete-button.standard {
+
+    &:hover {
+      background-color: tint($orange, 75%);
+    }
+}
+
 .tooltip {
   position: absolute;
   top: 0;
