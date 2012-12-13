@@ -463,3 +463,22 @@
     display: none;
   }
 }
+
+// editing units from courseware
+body.unit {
+
+  .component {
+      padding-top: 30px;
+
+      .component-actions {
+        @include box-sizing(border-box);
+        position: absolute;
+        width: 811px;
+        padding: 15px;
+        top: 0;
+        left: 0;
+        border-bottom: 1px solid $lightBluishGrey2;
+        background: $lightGrey;
+      }
+    }
+}
