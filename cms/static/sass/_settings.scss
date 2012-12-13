@@ -144,17 +144,19 @@
         min-width: 75px !important;
       }
 
-      &:focus {
-        @include linear-gradient(tint($blue, 80%), tint($blue, 90%));
-        border-color: $blue;
-        outline: 0;
-      }
-
       &:disabled {
-        border-color: $mediumGrey;
-        color: $mediumGrey;
+        border: none;
+        @include box-shadow(none);
+        padding: 0;
+        color: $darkGrey;
+        font-weight: bold;
         background: #fff;
       }
+    }
+
+    textarea.tinymce {
+      border: 1px solid $darkGrey;
+      height: 300px;
     }
 
     input[type="checkbox"], input[type="radio"] {
@@ -241,7 +243,7 @@
           &.multi {
             display: block;
             background: tint($lightGrey, 50%);
-            padding: 20px 15px;
+            padding: 20px;
             @include border-radius(4px);
             @include box-sizing(border-box);
 

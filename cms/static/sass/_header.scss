@@ -31,7 +31,15 @@ body.no-header {
 		@include active;
 	}
 
+	&.active-tab-settings #settings-tab {
+		@include active;
+	}
+
 	&.active-tab-import #import-tab {
+		@include active;
+	}
+
+	&.active-tab-export #export-tab {
 		@include active;
 	}
 
