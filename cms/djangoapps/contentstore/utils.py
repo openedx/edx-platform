@@ -116,3 +116,12 @@ def compute_unit_state(unit):
 
 def get_date_display(date):
     return date.strftime("%d %B, %Y at %I:%M %p")
+
+def update_item(location, value):
+    """
+    If value is None, delete the db entry. Otherwise, update it using the correct modulestore.
+    """
+    if value is None:
+        get_modulestore(location).delete_item(location)
+    else:
+        get_modulestore(location).update_item(location, value)
