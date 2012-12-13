@@ -462,7 +462,6 @@ CMS.Views.Settings.Grading = CMS.Views.ValidatingView.extend({
 		// 0th ele doesn't have a bar; so, will never invoke this
 		var cachethis = this;
 		return function(event, ui) {
-			ui.element.height("50px");
 			var barIndex = ui.element.index();
 			// min and max represent limits not labels (note, can's make smaller than 3 points wide)
 			var min = (barIndex < cachethis.descendingCutoffs.length ? cachethis.descendingCutoffs[barIndex]['cutoff'] + 3 : 3);
@@ -488,7 +487,6 @@ CMS.Views.Settings.Grading = CMS.Views.ValidatingView.extend({
 		var cachethis = this;
 		return function(event, ui) {
 			// for some reason the resize is setting height to 0
-			ui.element.height("50px");
 			cachethis.saveCutoffs();
 		}
 	},
