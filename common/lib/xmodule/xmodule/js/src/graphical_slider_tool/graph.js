@@ -2,7 +2,7 @@
 // define() functions from Require JS available inside the anonymous function.
 (function (requirejs, require, define) {
 
-define('Graph', [], function () {
+define('Graph', ['logme'], function (logme) {
 
     return Graph;
 
@@ -141,46 +141,72 @@ define('Graph', [], function () {
                 'end': 10,
                 'step': 0.1
             };
+            logme('Default xrange:', xrange);
 
             // The 'xrange' is a string containing two floating point numbers
             // separated by a comma. The first number is the starting
             // x-coordinate , the second number is the ending x-coordinate
             if (typeof config.plot['xrange'] === 'string') {
+                logme('xrange is a string; xrange = "' + config.plot['xrange'] + '".');
+
                 xRangeStr = config.plot['xrange'];
                 xRangeBlobs = xRangeStr.split(',');
 
                 if (xRangeBlobs.length === 2) {
+                    logme('xrange contains 2 blobs; 1 -> "' + xRangeBlobs[0] + '", 2 -> "' + xRangeBlobs[1] + '".');
 
                     tempNum = parseFloat(xRangeBlobs[0]);
                     if (isNaN(tempNum) === false) {
                         xrange.start = tempNum;
+
+                        logme('First blob was parsed as a float. xrange.start = "' + xrange.start + '".');
+                    } else {
+                        logme('ERROR: First blob was parsed as a NaN.');
                     }
 
                     tempNum = parseFloat(xRangeBlobs[1]);
                     if (isNaN(tempNum) === false) {
                         xrange.end = tempNum;
+
+                        logme('Second blob was parsed as a float. xrange.end = "' + xrange.end + '".');
+                    } else {
+                        logme('ERROR: Second blob was parsed as a NaN.');
                     }
 
                     if (xrange.start >= xrange.end) {
                         xrange.start = 0;
                         xrange.end = 10;
+
+                        logme('xrange.start is greater than xrange.end - will set defaults. xrange.start = "' + xrange.start + '". xrange.end = "' + xrange.end + '".');
                     }
 
+                } else {
+                    logme('ERROR: xrange does not contain 2 blobs.');
                 }
+            } else {
+                logme('ERROR: xrange is not a string.');
             }
 
             // The user can specify the number of points. However, internally
             // we will use it to generate a 'step' - i.e. the distance (on
             // x-axis) between two adjacent points.
             if (typeof config.plot['num_points'] === 'string') {
+                logme('num_points is a string. num_points = "' + config.plot['num_points'] + '".');
+
                 tempNum = parseInt(config.plot['num_points'], 10);
                 if (
-                    (isNaN(tempNum) === false) &&
+                    (isNaN(tempNum) === false) ||
                     (tempNum >= 2) &&
                     (tempNum <= 500)
                 ) {
+                    logme('num_points was parsed as a number. num_points = "' + tempNum + '".');
                     xrange.step = (xrange.end - xrange.start) / (tempNum - 1);
+                    logme('xrange.step = "' + xrange.step + '".');
+                } else {
+                    logme('ERROR: num_points was not parsed as a number, or num_points < 2, or num_points > 500.');
                 }
+            } else {
+                logme('ERROR: num_points is not a string.');
             }
         }
 
