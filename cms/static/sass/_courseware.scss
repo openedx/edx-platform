@@ -67,10 +67,12 @@ input.courseware-unit-search-input {
 		@include clearfix();
 
 		.item-details, .section-published-date {
+
 		}
 
 		.item-details {
 			float: none;
+			display: inline-block;
 			padding: 20px 0 10px 0;
 			@include clearfix();
 
