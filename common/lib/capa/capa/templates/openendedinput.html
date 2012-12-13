@@ -27,8 +27,12 @@
     <input name="reload" class="reload" type="button" value="Recheck for Feedback" onclick="document.location.reload(true);" />
     % endif
   <div class="external-grader-message">
-    ${msg|n}
+      ${msg|n}
     % if status in ['correct','incorrect']:
+    <div class="collapsible evaluation-response">
+      <header>
+      <a href="#">Respond to Feedback</a>
+      </header>
     <section id="evaluation_${id}" class="evaluation">
     How accurate do you think this grading is?
         <div class="evaluation-scoring">
@@ -46,6 +50,7 @@
             <input name="submit-message" class="submit-message" type="button" value="Submit your message"/>
         </div>
     </section>
+    </div>
     % endif
   </div>
 </section>

@@ -311,6 +311,15 @@ section.problem {
         margin-right: 20px;
     }
 
+    .evaluation-response {
+        header {
+            text-align: right;
+            a {
+                font-size: .85em;
+            }
+        }
+    }
+
     .evaluation-scoring {
         .scoring-list {
             list-style-type: none;
@@ -670,6 +679,10 @@ section.problem {
       color: #2C2C2C;
       font-family: monospace;
       font-size: 1em;
+      padding-top: 10px;
+      header {
+          font-size: 1.4em;
+      }
 
       .shortform {
         font-weight: bold;
