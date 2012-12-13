@@ -1,3 +1,4 @@
+
 input.courseware-unit-search-input {
 	float: left;
 	width: 260px;
@@ -189,6 +190,17 @@ input.courseware-unit-search-input {
 		.expand-collapse-icon {
 			visibility: hidden;
 		}
+	}
+}
+
+.collapse-all-button {
+	float: right;
+	margin-top: 10px;
+	font-size: 13px;
+	color: $darkGrey;
+
+	.collapse-all-icon {
+		margin-right: 6px;
 	}
 }
 
