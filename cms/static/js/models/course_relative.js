@@ -8,11 +8,11 @@ CMS.Models.Location = Backbone.Model.extend({
 	},
 	toUrl: function(overrides) {
 		return
-			(overrides['tag'] ? overrides['tag'] : this.get('tag')) + "://" +
-			(overrides['org'] ? overrides['org'] : this.get('org')) + "/" +
-			(overrides['course'] ? overrides['course'] : this.get('course')) + "/" +
-			(overrides['category'] ? overrides['category'] : this.get('category')) + "/" +
-			(overrides['name'] ? overrides['name'] : this.get('name')) + "/";
+			(overrides && overrides['tag'] ? overrides['tag'] : this.get('tag')) + "://" +
+			(overrides && overrides['org'] ? overrides['org'] : this.get('org')) + "/" +
+			(overrides && overrides['course'] ? overrides['course'] : this.get('course')) + "/" +
+			(overrides && overrides['category'] ? overrides['category'] : this.get('category')) + "/" +
+			(overrides && overrides['name'] ? overrides['name'] : this.get('name')) + "/";
 	},
 	_tagPattern : /[^:]+/g,
 	_fieldPattern : new RegExp('[^/]+','g'),
@@ -28,6 +28,7 @@ CMS.Models.Location = Backbone.Model.extend({
 			}
 		}
 		else if (_.isString(payload)) {
+			this._tagPattern.lastIndex = 0; // odd regex behavior requires this to be reset sometimes
 			var foundTag = this._tagPattern.exec(payload);
 			if (foundTag) {
 				this._fieldPattern.lastIndex = this._tagPattern.lastIndex + 1; // skip over the colon
@@ -36,6 +37,7 @@ CMS.Models.Location = Backbone.Model.extend({
 					org: this._fieldPattern.exec(payload)[0],
 					course: this._fieldPattern.exec(payload)[0],
 					category: this._fieldPattern.exec(payload)[0],
+					// FIXME handle no trailing /
 					name: this._fieldPattern.exec(payload)[0]
 				}
 			}

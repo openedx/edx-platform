@@ -203,6 +203,27 @@ class CourseGradingModel:
         get_modulestore(course_location).update_metadata(course_location, descriptor.metadata)
         
     @staticmethod
+    def get_section_grader_type(location):
+        """
+        
+        """
+        if not isinstance(location, Location):
+            location = Location(location)
+            
+        # TODO impl to return {grader-type, location, id (random)}
+        
+    @staticmethod
+    def update_section_grader_type(location, jsondict):
+        """
+        
+        """
+        if not isinstance(location, Location):
+            location = Location(location)
+            
+        # TODO impl to return {grader-type, location, id (random)}
+        
+        
+    @staticmethod
     def convert_set_grace_period(descriptor):
         # 5 hours 59 minutes 59 seconds => converted to iso format
         rawgrace = descriptor.metadata.get('graceperiod', None)

@@ -17,41 +17,23 @@
   <script src="${static.url('js/vendor/timepicker/datepair.js')}"></script>
   <script src="${static.url('js/vendor/date.js')}"></script>
   <script type="text/javascript" src="${static.url('js/models/settings/course_grading_policy.js')}"></script>
+  <script type="text/javascript" src="${static.url('js/models/course_relative.js')}"></script>
 
   <script type="text/javascript">
-    (function() {
-      $body = $('body');  
-      $('.gradable-status .menu-toggle').bind('click', showGradeMenu);
-      $('.gradable-status .menu').bind('click', selectGradeType);
-    })();
-
-    function showGradeMenu(e) {
-
-      $section = $(this).closest('.gradable-status');
-      e.preventDefault();
-      $section.toggleClass('is-active');
-    }
-
-    function selectGradeType(e) {
-      e.preventDefault();
-
-      var $section = $(this).closest('.gradable-status');
-      $section.find('.menu li a').removeClass('is-selected');
-
-
-      var $target = $(e.target).addClass('is-selected');
-      var $label = $section.find('.status-label');
-
-      $section.removeClass('is-active');      
-      $label.html($target.html());
-
-      if ($target.hasClass('gradable-status-notgraded')) {
-        $section.removeClass('is-set');
-      }
-      else {
-        $section.addClass('is-set');
-      }
-    }
+  $(document).ready(function(){
+    // TODO figure out whether these should be in window or someplace else?
+    window.graderTypes = new CMS.Models.Settings.CourseGraderCollection();
+    window.graderTypes.reset(${course_graders|n});
+    window.graderTypes.course_location(new CMS.Models.Location('${parent_location}'));
+    
+    $(".gradable-status").each(function(index, ele) {
+        var gradeView = new CMS.Views.OverviewAssignmentGrader({
+            el : ele,
+            graders : window.graderTypes
+        });
+    });
+  });
+  
   </script>
 </%block>
 
@@ -167,21 +149,7 @@
               </div>              
             </div>
             
-            <div class="gradable-status">
-              <h4 class="status-label">Not Graded</h4>
-              
-              <a data-tooltip="Mark/unmark this section as graded" class="menu-toggle" href="#">
-                <span class="ss-icon ss-standard">&#x2713;</span>
-              </a>
-                              
-              <ul class="menu">
-                <li><a class="is-selected" href="#">Homework</a></li>
-                <li><a href="#">Finger Exercises</a></li>
-                <li><a href="#">Lab</a></li>
-                <li><a href="#">Midterm Exam</a></li>
-                <li><a href="#">Final Exam</a></li>
-                <li><a class="gradable-status-notgraded" href="#">Not Graded</a></li>
-              </ul>
+            <div class="gradable-status" data-initial-status="${section.metadata.get('format', 'Not Graded')}">
             </div>
             
             <div class="item-actions">
@@ -207,21 +175,7 @@
                     </a>
                   </div>
                   
-                  <div class="gradable-status">
-                    <h4 class="status-label">Not Graded</h4>
-                    
-                    <a data-tooltip="Mark/unmark this subsection as graded" class="menu-toggle" href="#">
-                      <span class="ss-icon ss-standard">&#x2713;</span>
-                    </a>
-                                    
-                    <ul class="menu">
-                      <li><a class="is-selected" href="#">Homework</a></li>
-                      <li><a href="#">Finger Exercises</a></li>
-                      <li><a href="#">Lab</a></li>
-                      <li><a href="#">Midterm Exam</a></li>
-                      <li><a href="#">Final Exam</a></li>
-                      <li><a class="gradable-status-notgraded" href="#">Not Graded</a></li>
-                    </ul>
+                  <div class="gradable-status" data-initial-status="${subsection.metadata.get('format', 'Not Graded')}">
                   </div>
                   
                   <div class="item-actions">
