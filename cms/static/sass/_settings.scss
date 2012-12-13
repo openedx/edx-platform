@@ -139,8 +139,8 @@
       }
 
       &.time {
-        width: 75px !important;
-        min-width: 75px !important;
+        width: 85px !important;
+        min-width: 85px !important;
       }
 
       &:disabled {
@@ -482,6 +482,13 @@
     }
 
     .settings-grading {
+
+      .setting-grading-assignment-types {
+
+        .row .field.enum {
+          width: 684px;
+        }
+      }
 
       .course-grading-assignment-list-item {
 
