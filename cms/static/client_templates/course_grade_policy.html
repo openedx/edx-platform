@@ -1,0 +1,69 @@
+<li class="input input-existing multi course-grading-assignment-list-item">
+	<div class="row row-col2">
+		<label for="course-grading-assignment-name">Assignment Type	Name:</label>
+
+		<div class="field">
+			<div class="input course-grading-assignment-name">
+				<input type="text" class="long"
+					id="course-grading-assignment-name" value="<%= model.get('type') %>"> 
+					<span class="tip tip-stacked">e.g. Homework, Labs, Midterm Exams, Final Exam</span>
+			</div>
+		</div>
+	</div>
+
+	<div class="row row-col2">
+		<label for="course-grading-shortname">Abbreviation:</label>
+
+		<div class="field">
+			<div class="input course-grading-shortname">
+				<input type="text" class="short"
+					id="course-grading-assignment-shortname"
+					value="<%= model.get('short_label') %>"> 
+					<span class="tip tip-inline">e.g. HW, Midterm, Final</span>
+			</div>
+		</div>
+	</div>
+
+	<div class="row row-col2">
+		<label for="course-grading-gradeweight">Weight of Total
+			Grade:</label>
+
+		<div class="field">
+			<div class="input course-grading-gradeweight">
+				<input type="text" class="short"
+					id="course-grading-assignment-gradeweight"
+					value = "<%= model.get('weight') %>"> 
+					<span class="tip tip-inline">e.g. 25%</span>
+			</div>
+		</div>
+	</div>
+
+	<div class="row row-col2">
+		<label for="course-grading-assignment-totalassignments">Total
+			Number:</label>
+
+		<div class="field">
+			<div class="input course-grading-totalassignments">
+				<input type="text" class="short"
+					id="course-grading-assignment-totalassignments"
+                    value = "<%= model.get('min_count') %>"> 
+                    <span class="tip tip-inline">total exercises assigned</span>
+			</div>
+		</div>
+	</div>
+
+	<div class="row row-col2">
+		<label for="course-grading-assignment-droppable">Number of
+			Droppable:</label>
+
+		<div class="field">
+			<div class="input course-grading-droppable">
+				<input type="text" class="short"
+					id="course-grading-assignment-droppable"
+                    value = "<%= model.get('drop_count') %>"> 
+                    <span class="tip tip-inline">total exercises that won't be graded</span>
+			</div>
+		</div>
+	</div> <a href="#" class="remove-item remove-grading-data"><span
+		class="delete-icon"></span> Delete Assignment Type</a>
+</li>

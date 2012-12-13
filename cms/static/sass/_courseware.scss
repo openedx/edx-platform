@@ -146,13 +146,13 @@ input.courseware-unit-search-input {
 		
 		.save-button {
 			@include blue-button;
-			padding: 10px 20px;
+			padding: 7px 20px 7px;
 			margin-right: 5px;
 		}
 
 		.cancel-button {
 			@include white-button;
-			padding: 10px 20px;
+			padding: 7px 20px 7px;
 		}
 	}
 
@@ -208,7 +208,7 @@ input.courseware-unit-search-input {
 .new-section-name-cancel,
 .new-subsection-name-cancel {
 	@include white-button;
-	padding: 6px 20px 8px;
+	padding: 2px 20px 5px;
 	color: #8891a1 !important;
 }
 

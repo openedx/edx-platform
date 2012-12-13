@@ -50,26 +50,20 @@ from contentstore.course_info_model import get_course_updates,\
 from cache_toolbox.core import del_cached_content
 from xmodule.timeparse import stringify_time
 from contentstore.module_info_model import get_module_info, set_module_info
+from cms.djangoapps.models.settings.course_details import CourseDetails,\
+    CourseSettingsEncoder
+from cms.djangoapps.models.settings.course_grading import CourseGradingModel
+from cms.djangoapps.contentstore.utils import get_modulestore
+
+# to install PIL on MacOSX: 'easy_install http://dist.repoze.org/PIL-1.1.6.tar.gz'
 
 log = logging.getLogger(__name__)
 
 
 COMPONENT_TYPES = ['customtag', 'discussion', 'html', 'problem', 'video']
 
-DIRECT_ONLY_CATEGORIES = ['course', 'chapter', 'sequential', 'about', 'static_tab', 'course_info']
-
 # cdodge: these are categories which should not be parented, they are detached from the hierarchy
 DETACHED_CATEGORIES = ['about', 'static_tab', 'course_info']
-
-
-def _modulestore(location):
-    """
-    Returns the correct modulestore to use for modifying the specified location
-    """
-    if location.category in DIRECT_ONLY_CATEGORIES:
-        return modulestore('direct')
-    else:
-        return modulestore()
 
 
 # ==== Public views ==================================================
@@ -499,7 +493,7 @@ def load_preview_module(request, preview_id, descriptor, instance_state, shared_
             module,
             "xmodule_display.html",
         )
-
+        
     module.get_html = replace_static_urls(
         module.get_html,
         module.metadata.get('data_dir', module.location.course),
@@ -548,7 +542,7 @@ def delete_item(request):
 
     item = modulestore().get_item(item_location)
 
-    store = _modulestore(item_loc)
+    store = get_modulestore(item_loc)
 
 
     # @TODO: this probably leaves draft items dangling. My preferance would be for the semantic to be
@@ -579,7 +573,7 @@ def save_item(request):
     if not has_access(request.user, item_location):
         raise PermissionDenied()
 
-    store = _modulestore(Location(item_location));
+    store = get_modulestore(Location(item_location));
 
     if request.POST.get('data') is not None:
         data = request.POST['data']
@@ -669,8 +663,6 @@ def unpublish_unit(request):
 
     return HttpResponse()
 
-
-
 @login_required
 @expect_json
 def clone_item(request):
@@ -682,10 +674,10 @@ def clone_item(request):
     if not has_access(request.user, parent_location):
         raise PermissionDenied()
 
-    parent = _modulestore(template).get_item(parent_location)
+    parent = get_modulestore(template).get_item(parent_location)
     dest_location = parent_location._replace(category=template.category, name=uuid4().hex)
 
-    new_item = _modulestore(template).clone_item(template, dest_location)
+    new_item = get_modulestore(template).clone_item(template, dest_location)
 
     # TODO: This needs to be deleted when we have proper storage for static content
     new_item.metadata['data_dir'] = parent.metadata['data_dir']
@@ -694,10 +686,10 @@ def clone_item(request):
     if display_name is not None:
         new_item.metadata['display_name'] = display_name
 
-    _modulestore(template).update_metadata(new_item.location.url(), new_item.own_metadata)
+    get_modulestore(template).update_metadata(new_item.location.url(), new_item.own_metadata)
 
     if new_item.location.category not in DETACHED_CATEGORIES:
-        _modulestore(parent.location).update_children(parent_location, parent.definition.get('children', []) + [new_item.location.url()])
+        get_modulestore(parent.location).update_children(parent_location, parent.definition.get('children', []) + [new_item.location.url()])
 
     return HttpResponse(json.dumps({'id': dest_location.url()}))
 
@@ -979,11 +971,86 @@ def module_info(request, module_location):
         raise PermissionDenied()    
 
     if real_method == 'GET':
-        return HttpResponse(json.dumps(get_module_info(_modulestore(location), location)), mimetype="application/json")
+        return HttpResponse(json.dumps(get_module_info(get_modulestore(location), location)), mimetype="application/json")
     elif real_method == 'POST' or real_method == 'PUT':
-        return HttpResponse(json.dumps(set_module_info(_modulestore(location), location, request.POST)), mimetype="application/json")
+        return HttpResponse(json.dumps(set_module_info(get_modulestore(location), location, request.POST)), mimetype="application/json")
     else:
-        raise Http400
+        return HttpResponseBadRequest
+
+@login_required
+@ensure_csrf_cookie
+def get_course_settings(request, org, course, name):
+    """
+    Send models and views as well as html for editing the course settings to the client.
+
+    org, course, name: Attributes of the Location for the item to edit
+    """
+    location = ['i4x', org, course, 'course', name]
+    
+    # check that logged in user has permissions to this item
+    if not has_access(request.user, location):
+        raise PermissionDenied()
+    
+    course_module = modulestore().get_item(location)
+    course_details = CourseDetails.fetch(location)
+    
+    return render_to_response('settings.html', {
+        'active_tab': 'settings-tab', 
+        'context_course': course_module,
+        'course_details' : json.dumps(course_details, cls=CourseSettingsEncoder)
+    })
+        
+@expect_json
+@login_required
+@ensure_csrf_cookie
+def course_settings_updates(request, org, course, name, section):
+    """
+    restful CRUD operations on course settings. This differs from get_course_settings by communicating purely
+    through json (not rendering any html) and handles section level operations rather than whole page.
+
+    org, course: Attributes of the Location for the item to edit
+    section: one of details, faculty, grading, problems, discussions
+    """
+    if section == 'details':
+        manager = CourseDetails
+    elif section == 'grading':
+        manager = CourseGradingModel
+    else: return
+    
+    if request.method == 'GET':
+        # Cannot just do a get w/o knowing the course name :-(
+        return HttpResponse(json.dumps(manager.fetch(Location(['i4x', org, course, 'course',name])), cls=CourseSettingsEncoder), 
+                            mimetype="application/json")
+    elif request.method == 'POST': # post or put, doesn't matter.
+        return HttpResponse(json.dumps(manager.update_from_json(request.POST), cls=CourseSettingsEncoder), 
+                            mimetype="application/json")
+
+@expect_json
+@login_required
+@ensure_csrf_cookie
+def course_grader_updates(request, org, course, name, grader_index=None):
+    """
+    restful CRUD operations on course_info updates. This differs from get_course_settings by communicating purely
+    through json (not rendering any html) and handles section level operations rather than whole page.
+
+    org, course: Attributes of the Location for the item to edit
+    """
+    if request.method == 'POST' and 'HTTP_X_HTTP_METHOD_OVERRIDE' in request.META:
+        real_method = request.META['HTTP_X_HTTP_METHOD_OVERRIDE']
+    else:
+        real_method = request.method
+        
+    if real_method == 'GET':
+        # Cannot just do a get w/o knowing the course name :-(
+        return HttpResponse(json.dumps(CourseGradingModel.fetch_grader(Location(['i4x', org, course, 'course',name]), grader_index)), 
+                            mimetype="application/json")
+    elif real_method == "DELETE":
+        # ??? Shoudl this return anything? Perhaps success fail? 
+        CourseGradingModel.delete_grader(Location(['i4x', org, course, 'course',name]), grader_index)
+        return HttpResponse()
+    elif request.method == 'POST': # post or put, doesn't matter.
+        return HttpResponse(json.dumps(CourseGradingModel.update_grader_from_json(Location(['i4x', org, course, 'course',name]), request.POST)),
+                            mimetype="application/json")
 
 
 @login_required

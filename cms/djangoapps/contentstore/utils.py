@@ -3,6 +3,19 @@ from xmodule.modulestore import Location
 from xmodule.modulestore.django import modulestore
 from xmodule.modulestore.exceptions import ItemNotFoundError
 
+DIRECT_ONLY_CATEGORIES = ['course', 'chapter', 'sequential', 'about', 'static_tab', 'course_info']
+
+def get_modulestore(location):
+    """
+    Returns the correct modulestore to use for modifying the specified location
+    """
+    if not isinstance(location, Location):
+        location = Location(location)
+        
+    if location.category in DIRECT_ONLY_CATEGORIES:
+        return modulestore('direct')
+    else:
+        return modulestore()
 
 def get_course_location_for_item(location):
     '''
