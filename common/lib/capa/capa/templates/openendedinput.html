@@ -30,9 +30,21 @@
     ${msg|n}
     % if status in ['correct','incorrect']:
     <section id="evaluation_${id}" class="evaluation">
-        Score Evaluation:
+    How accurate do you think this grading is?
+        <div class="evaluation-scoring">
+            <ul class="scoring-list">
+                <li><input type="radio" name="evaluation-score" id="evaluation-score-5" value="5" /> <label for="evaluation-score-5"> Excellent</label></li>
+                <li><input type="radio" name="evaluation-score" id="evaluation-score-4" value="4" /> <label for="evaluation-score-4"> Good</label></li>
+                <li><input type="radio" name="evaluation-score" id="evaluation-score-3" value="3" /> <label for="evaluation-score-3"> Okay</label></li>
+                <li><input type="radio" name="evaluation-score" id="evaluation-score-2" value="2" /> <label for="evaluation-score-2"> Poor</label></li>
+                <li><input type="radio" name="evaluation-score" id="evaluation-score-1" value="1" /> <label for="evaluation-score-1"> Awful</label></li>
+            </ul>
+        </div>
+        Additional comments:
         <textarea rows="${rows}" cols="${cols}" name="feedback_${id}" class="feedback-on-feedback" id="feedback_${id}"></textarea>
-        <input name="submit-message" class="submit-message" type="button" value="Submit your message"/>
+        <div class="submit-message-container">
+            <input name="submit-message" class="submit-message" type="button" value="Submit your message"/>
+        </div>
     </section>
     % endif
   </div>
