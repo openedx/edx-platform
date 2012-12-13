@@ -93,7 +93,6 @@ from contentstore import utils
                 <div class="field">
                   <div class="input">
                     <input type="text" class="short" id="course-number" value="[Course No.]" disabled="disabled">
-                    <span class="tip tip-inline">e.g. 101x</span>
                     <span class="tip tip-stacked">This is used in <a href="${utils.get_lms_link_for_item(context_course.location, True)}">your course URL</a>, and cannot be changed</span>
                   </div>
                 </div>
@@ -231,8 +230,8 @@ from contentstore import utils
                   </div>
 
                   <div class="input">
-                    <input type="text" class="new-item new-course-introduction-video add-video-data" id="course-introduction-video" value="" placeholder="speed:id,speed:id" autocomplete="off">
-                    <span class="tip tip-inline">Video restrictions go here</span>          
+                    <input type="text" class="long new-course-introduction-video add-video-data" id="course-introduction-video" value="" placeholder="speed:id,speed:id" autocomplete="off">
+                    <span class="tip tip-stacked">Video restrictions go here</span>
                   </div>
                 </div>
               </div>
@@ -251,7 +250,7 @@ from contentstore import utils
                 <div class="field">
                   <div class="input">
                     <input type="text" class="short time" id="course-effort" placeholder="HH:MM">
-                    <span class="tip tip-stacked">Time students should spend on all course work</span>
+                    <span class="tip tip-inline">Time spent on all course work</span>
                   </div>
                 </div>
               </div>
@@ -405,7 +404,7 @@ from contentstore import utils
                 <div class="field">
                   <div class="input">
                     <input type="text" class="short time" id="course-grading-graceperiod" value="0:00" placeholder="e.g. 10 minutes">
-                    <span class="tip tip-stacked">leeway on due dates</span>
+                    <span class="tip tip-inline">leeway on due dates</span>
                   </div>
                 </div>
               </div>
@@ -421,8 +420,8 @@ from contentstore import utils
                   <ul class="input-list course-grading-assignment-list">
                   </ul>
 
-                  <a href="#" class="new-item new-course-grading-item add-grading-data">
-                    <span class="plus-icon"></span>New Assignment Type
+                  <a href="#" class="new-button new-course-grading-item add-grading-data">
+                    <span class="plus-icon white"></span>New Assignment Type
                   </a>
                   </div>
                 </div>
@@ -727,4 +726,5 @@ from contentstore import utils
       </article>
     </div>
   </div>
+  <footer></footer>
 </%block>

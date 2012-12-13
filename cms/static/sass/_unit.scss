@@ -57,14 +57,10 @@
       margin: 20px 40px;
 
       &.new-component-item {
-        padding: 0;
+        padding: 20px;
         border: none;
-        border-radius: 0;
-
-        &.adding {
-          background-color: $blue;
-          border-color: #437fbf;
-        }
+        border-radius: 3px;
+        background: $lightGrey;
 
         .new-component-button {
           display: block;
@@ -85,12 +81,13 @@
           border-radius: 3px 3px 0 0;
         }
 
-        .new-component-type, .new-component-template {
-          @include clearfix;
+        .new-component-type {
+          a,
+          li {
+            display: inline-block;
+          }
 
           a {
-            position: relative;
-            float: left;
             width: 100px;
             height: 100px;
             margin-right: 10px;
@@ -98,14 +95,8 @@
             border-radius: 8px;
             font-size: 13px;
             line-height: 14px;
-            color: #fff;
             text-align: center;
-            @include box-shadow(0 1px 1px rgba(0, 0, 0, .4), 0 1px 0 rgba(255, 255, 255, .4) inset);
-            @include transition(background-color .15s);
-
-            &:hover {
-              background-color: rgba(255, 255, 255, .2);
-            }
+            @include box-shadow(0 1px 1px rgba(0, 0, 0, .2), 0 1px 0 rgba(255, 255, 255, .4) inset);
 
             .name {
               position: absolute;
@@ -118,23 +109,62 @@
           }
         }
 
+        .new-component-type,
         .new-component-template {
+          @include clearfix;
+
           a {
-            height: 60px;
+            position: relative;            
+            border: 1px solid $darkGreen;
+            background: $green;
+            color: #fff;            
+            @include transition(background-color .15s);
+
+            &:hover {
+              background: $brightGreen;
+            }
           }
         }
 
-        .new-component,
+        .new-component-template {
+          margin-bottom: 20px;
+
+          li:first-child {
+            a {
+              border-radius: 3px 3px 0 0;
+            }
+          }
+
+          li:last-child {
+            a {
+              border-radius: 0 0 3px 3px;
+            }
+          }
+
+          a {
+            display: block;
+            padding: 7px 20px;
+            border-bottom: none;
+            font-weight: 300;
+          }
+        }
+
+        .new-component {          
+          text-align: center;
+
+          h5 {
+            color: $green;
+          }
+          
+        }
+        
         .new-component-templates {
           display: none;
-          position: absolute;
-          width: 100%;
           padding: 20px;
           @include clearfix;
 
           .cancel-button {
-            @include blue-button;
-            border-color: #30649c;
+            @include white-button;
           }
         }
       }
@@ -142,7 +172,7 @@
   }
 
   .component {
-    border: 1px solid #d1ddec;
+    border: 1px solid $lightBluishGrey2;
     border-radius: 3px;
     background: #fff;
     @include transition(none);
@@ -157,7 +187,8 @@
     }
 
     &.editing {
-      border-color: #6696d7;
+      border: 1px solid $lightBluishGrey2;
+      z-index: 9999;
 
       .drag-handle,
       .component-actions {
@@ -173,11 +204,6 @@
       position: absolute;
       top: 7px;
       right: 9px;
-      @include transition(opacity .15s);
-
-      a {
-        color: $darkGrey;
-      }
     }
 
     .drag-handle {
@@ -189,10 +215,10 @@
       width: 15px;
       height: 100%;
       border-radius: 0 3px 3px 0;
-      border: 1px solid #d1ddec;
-      background: url(../img/white-drag-handles.png) center no-repeat #d1ddec;
+      border: 1px solid $lightBluishGrey2;
+      background: url(../img/white-drag-handles.png) center no-repeat $lightBluishGrey2;
       cursor: move;
-      @include transition(all .15s);
+      @include transition(none);
     }
   }
 
@@ -205,9 +231,6 @@
     display: none;
     padding: 20px;
     border-radius: 2px 2px 0 0;
-    @include linear-gradient(top, rgba(0, 0, 0, 0), rgba(0, 0, 0, .1));
-    background-color: $blue;
-    color: #fff;
     @include box-shadow(none);
 
     .metadata_edit {
@@ -222,12 +245,6 @@
         display: inline-block;
         margin-right: 10px;  
       }
-    }
-
-    .CodeMirror {
-      border: 1px solid #3c3c3c;
-      background: #fff;
-      color: #3c3c3c;
     }
 
     h3 {
@@ -445,4 +462,23 @@
   .view-button {
     display: none;
   }
+}
+
+// editing units from courseware
+body.unit {
+
+  .component {
+      padding-top: 30px;
+
+      .component-actions {
+        @include box-sizing(border-box);
+        position: absolute;
+        width: 811px;
+        padding: 15px;
+        top: 0;
+        left: 0;
+        border-bottom: 1px solid $lightBluishGrey2;
+        background: $lightGrey;
+      }
+    }
 }

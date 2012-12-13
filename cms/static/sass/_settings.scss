@@ -139,22 +139,23 @@
       }
 
       &.time {
-        display: block !important;
-        width: 75px !important;
-        min-width: 75px !important;
-      }
-
-      &:focus {
-        @include linear-gradient(tint($blue, 80%), tint($blue, 90%));
-        border-color: $blue;
-        outline: 0;
+        width: 85px !important;
+        min-width: 85px !important;
       }
 
       &:disabled {
-        border-color: $mediumGrey;
-        color: $mediumGrey;
+        border: none;
+        @include box-shadow(none);
+        padding: 0;
+        color: $darkGrey !important;
+        font-weight: bold;
         background: #fff;
       }
+    }
+
+    textarea.tinymce {
+      border: 1px solid $darkGrey;
+      height: 300px;
     }
 
     input[type="checkbox"], input[type="radio"] {
@@ -241,7 +242,7 @@
           &.multi {
             display: block;
             background: tint($lightGrey, 50%);
-            padding: 20px 15px;
+            padding: 20px;
             @include border-radius(4px);
             @include box-sizing(border-box);
 
@@ -290,10 +291,6 @@
                 width: 100%;
               }
             }
-
-            .remove-item {
-              float: right;
-            }       
           }
         }
 
@@ -304,6 +301,7 @@
             margin-bottom: 15px;
             padding-bottom: 15px;
             border-bottom: 1px dotted $lightGrey;
+            @include clearfix();
 
             &:last-child {
               border: 0;
@@ -392,20 +390,8 @@
 
 
     // editing controls - removing
-    .remove-item {
-      clear: both;
-      display: block;
-      margin-top: 10px;
-      opacity: 0.75;
-      font-size: 13px;
-      text-align: right;
-      @include transition(opacity 0.25s ease-in-out);
-
-
-      &:hover {
-        color: $blue;
-        opacity: 0.99;
-      }
+    .delete-button {
+      float: right;
     }
 
     // editing controls - preview
@@ -497,13 +483,15 @@
 
     .settings-grading {
 
+      .setting-grading-assignment-types {
+
+        .row .field.enum {
+          width: 684px;
+        }
+      }
+
       .course-grading-assignment-list-item {
 
-        .row:nth-child(4) {
-          border: none;
-          margin-bottom: 0;
-          padding-bottom: 0;
-        }
       }
 
       .input-list {
@@ -718,7 +706,7 @@
       }
       
       .grade-specific-bar {
-        height: 50px;
+        height: 50px !important;
       }
 
       .grades {

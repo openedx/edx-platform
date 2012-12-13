@@ -34,6 +34,14 @@
 	background: url(../img/video-icon.png) no-repeat;
 }
 
+.upload-icon {
+	display: inline-block;
+	width: 22px;
+	height: 13px;
+	margin-right: 5px;
+	background: url(../img/upload-icon.png) no-repeat;
+}
+
 .list-icon {
 	display: inline-block;
 	width: 14px;
@@ -54,6 +62,27 @@
 	width: 19px;
 	height: 16px;
 	background: url(../img/home-icon.png) no-repeat;
+}
+
+.small-home-icon {
+	display: inline-block;
+	width: 16px;
+	height: 14px;
+	background: url(../img/small-home-icon.png) no-repeat;
+}
+
+.log-out-icon {
+	display: inline-block;
+	width: 15px;
+	height: 13px;
+	background: url(../img/log-out-icon.png) no-repeat;
+}
+
+.collapse-all-icon {
+	display: inline-block;
+	width: 15px;
+	height: 9px;
+	background: url(../img/collapse-all-icon.png) no-repeat;
 }
 
 .calendar-icon {
