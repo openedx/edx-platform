@@ -326,7 +326,7 @@ class XmlDescriptor(XModuleDescriptor):
         NOTE: Do not override this without a good reason.  It is here
         specifically for customtag...
         """
-        return True
+        return False
 
 
     def export_to_xml(self, resource_fs):

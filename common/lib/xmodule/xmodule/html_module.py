@@ -149,10 +149,15 @@ class HtmlDescriptor(XmlDescriptor, EditingDescriptor):
         write just <html filename="" [meta-attrs="..."]> to filename.xml, and the html
         string to filename.html.
         '''
+        # If the file is a single html document, just use it directly
         try:
             return etree.fromstring(self.definition['data'])
         except etree.XMLSyntaxError:
-            pass
+            # Otherwise, try wrapping it in a single html tag, and returning that
+            try:
+                return etree.fromstring("<html>%s</html>" % self.definition['data'])
+            except etree.XMLSyntaxError:
+                pass
 
         # Not proper format.  Write html to file, return an empty tag
         pathname = name_to_pathname(self.url_name)
