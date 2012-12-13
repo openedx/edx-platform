@@ -69,6 +69,9 @@ CMS.Views.ClassInfoUpdateView = Backbone.View.extend({
         
         var $newForm = $(this.template({ updateModel : newModel }));
 
+        var updateEle = this.$el.find("#course-update-list");
+        $(updateEle).prepend($newForm);
+
         var $textArea = $newForm.find(".new-update-content").first();
         if (this.$codeMirror == null ) {
             this.$codeMirror = CodeMirror.fromTextArea($textArea.get(0), {
@@ -77,9 +80,7 @@ CMS.Views.ClassInfoUpdateView = Backbone.View.extend({
                 lineWrapping: true,
             });
         }
-
-        var updateEle = this.$el.find("#course-update-list");
-        $(updateEle).prepend($newForm);
+        
         $newForm.addClass('editing');
         this.$currentPost = $newForm.closest('li');
 
@@ -94,11 +95,10 @@ CMS.Views.ClassInfoUpdateView = Backbone.View.extend({
     
     onSave: function(event) {
         var targetModel = this.eventModel(event);
-        console.log(this.contentEntry(event).val());
         targetModel.set({ date : this.dateEntry(event).val(), content : this.$codeMirror.getValue() });
         // push change to display, hide the editor, submit the change        
-        this.closeEditor(this);
         targetModel.save();
+        this.closeEditor(this);
     },
     
     onCancel: function(event) {
@@ -158,9 +158,8 @@ CMS.Views.ClassInfoUpdateView = Backbone.View.extend({
         self.$currentPost.find('form').hide();
         window.$modalCover.unbind('click');
         window.$modalCover.hide();
-        if (this.$codeMirror != null)
-            this.$codeMirror.remove();
         this.$codeMirror = null;
+        self.$currentPost.find('.CodeMirror').remove();
     },
     
     // Dereferencing from events to screen elements    
@@ -274,8 +273,7 @@ CMS.Views.ClassInfoHandoutsView = Backbone.View.extend({
         this.$form.hide();
         window.$modalCover.unbind('click');
         window.$modalCover.hide();
-        if (this.$codeMirror != null)
-            this.$codeMirror.remove();
+        self.$form.find('.CodeMirror').remove();
         this.$codeMirror = null;
     }
 });
