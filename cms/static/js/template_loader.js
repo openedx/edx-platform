@@ -5,7 +5,7 @@
 	if (typeof window.templateLoader == 'function') return;
 	
     var templateLoader = {
-      templateVersion: "0.0.9",
+      templateVersion: "0.0.11",
       templates: {},
       loadRemoteTemplate: function(templateName, filename, callback) {
         if (!this.templates[templateName]) {

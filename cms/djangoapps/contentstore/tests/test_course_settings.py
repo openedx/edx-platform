@@ -9,7 +9,7 @@ from xmodule.modulestore import Location
 from cms.djangoapps.models.settings.course_details import CourseDetails,\
     CourseSettingsEncoder
 import json
-from common.djangoapps.util import converters
+from util import converters
 import calendar
 
 # YYYY-MM-DDThh:mm:ss.s+/-HH:MM
