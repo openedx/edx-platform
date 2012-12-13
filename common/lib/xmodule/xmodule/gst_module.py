@@ -41,65 +41,8 @@ class GraphicalSliderToolModule(XModule):
     def __init__(self, system, location, definition, descriptor, instance_state=None,
                  shared_state=None, **kwargs):
         """
-        Definition  should have....
-        sliders, text, module
+        For XML file format please look at documentation.
 
-        Sample file:
-
-        <sequential>
-          <vertical>
-            <graphical_slider_tool>
-              <render>
-                <p>Graphic slider tool html.</p>
-                <p>Can include 'input', 'slider' and 'plot' tags.
-                They will be replaced by proper number, slider and plot
-                widgets. </p>
-                For example: $slider a$, second $slider b$,
-                  number $input a$, and, plot:
-                  $plot$
-
-                  <!-- Sliders, and plot cannot be inside <p> -->
-              </render>
-              <configuration>
-                <sliders>
-                  <!-- optional: width=100 (in pixels), default is 400,
-                  show_value=[editable, not-editable], default is disabled.-->
-                  <slider var="a" range="-100, 1, 100" />
-                  <slider var="b" range="-1000, 100, 1000" witdh="300"/>
-                </sliders>
-                <inputs>
-                  <!-- optional: width=100 (in pixels), readonly=[true|false] -->
-                  <input var="a" initial="1"/>
-                </inputs>
-                <plot>
-                  <!-- optional: color=[standard web]; line=[true|false], default true;
-                  dot=[true|false], default false; label="string",
-                  style of line =[normal, dashed], default normal,
-                  point size-->
-                  <function y="x^2 + a" />
-                  <function y="3*x + b" color="red"/>
-                  <!-- asymtotes are functions,
-                  optional: name="string" -->
-                  <function y="b" color="red" style="dashed" name="b"/>
-                  <function y="b/2" color="red" style="dashed" name="b/2"/>
-                  <!-- xrange: min, max, yrange is calculated automatically -->
-                  <xrange>-10, 10</xrange>
-                  <!-- optional number of points, default is 300 -->
-                  <numpoints>60</numpoints>
-                  <!-- xticks and yticks are optional: min, step, max -->
-                  <xticks>-9, 1, 9</xticks>
-                  <yticks>-9, 1, 9</yticks>
-                  <!-- xaxis and xaxis are optional -->
-                  <xaxis unit="cm"/>
-                  <yaxis unit="s"/>
-                </plot>
-                <!-- if some parameter in function is not related to any slider or
-                number, then only error message is displayed.
-                Sliders and numbers are optional. Plot is required.-->
-              </configuration>
-            </graphical_slider_tool>
-          </vertical>
-        </sequential>
         """
         XModule.__init__(self, system, location, definition, descriptor,
                          instance_state, shared_state, **kwargs)
@@ -130,37 +73,39 @@ class GraphicalSliderToolModule(XModule):
         style="width: 600px; height: 600px; padding: 0px; position: relative;">This is plot</div>'
         html_string = html_string.replace('$plot$', plot_div)
 
-        # substitute sliders
-        sliders = json.loads(self.configuration_json)['root']['sliders']['slider']
-        if type(sliders) == dict:
-            sliders = [sliders]
-        vars = [x['@var'] for x in sliders]
+        # substitute sliders if we have them
+        if json.loads(self.configuration_json)['root'].get('sliders'):
+            sliders = json.loads(self.configuration_json)['root']['sliders']['slider']
+            if type(sliders) == dict:
+                sliders = [sliders]
+            vars = [x['@var'] for x in sliders]
 
-        slider_div = '<span class="{element_class}_slider" id="{element_id}_slider_{var}" \
-        data-var="{var}"></span>'
+            slider_div = '<span class="{element_class}_slider" id="{element_id}_slider_{var}" \
+            data-var="{var}"></span>'
 
-        for var in vars:
-            html_string = re.sub(r'\$slider\s+' + var + r'\$',
-                                slider_div.format(element_class=self.html_class,
-                                                  element_id=self.html_id,
-                                                  var=var),
-                                html_string, flags=re.IGNORECASE | re.UNICODE)
+            for var in vars:
+                html_string = re.sub(r'\$slider\s+' + var + r'\$',
+                                    slider_div.format(element_class=self.html_class,
+                                                      element_id=self.html_id,
+                                                      var=var),
+                                    html_string, flags=re.IGNORECASE | re.UNICODE)
 
-        # substitute numbers
-        inputs = json.loads(self.configuration_json)['root']['inputs']['input']
-        if type(inputs) == dict:
-            inputs = [inputs]
-        vars = [x['@var'] for x in inputs]
+        # substitute numbers if we have them
+        if json.loads(self.configuration_json)['root'].get('inputs'):
+            inputs = json.loads(self.configuration_json)['root']['inputs']['input']
+            if type(inputs) == dict:
+                inputs = [inputs]
+            vars = [x['@var'] for x in inputs]
 
-        input_div = '<span class="{element_class}_input" id="{element_id}_input_{var}" \
-        data-var="{var}"></span>'
+            input_div = '<span class="{element_class}_input" id="{element_id}_input_{var}" \
+            data-var="{var}"></span>'
 
-        for var in vars:
-            html_string = re.sub(r'\$input\s+' + var + r'\$',
-                                input_div.format(element_class=self.html_class,
-                                                 element_id=self.html_id,
-                                                 var=var),
-                                html_string, flags=re.IGNORECASE | re.UNICODE)
+            for var in vars:
+                html_string = re.sub(r'\$input\s+' + var + r'\$',
+                                    input_div.format(element_class=self.html_class,
+                                                     element_id=self.html_id,
+                                                     var=var),
+                                    html_string, flags=re.IGNORECASE | re.UNICODE)
         # import ipdb; ipdb.set_trace()
         return html_string
 
