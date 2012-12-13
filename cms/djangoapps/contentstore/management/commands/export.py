@@ -1,0 +1,35 @@
+###
+### Script for exporting courseware from Mongo to a tar.gz file
+###
+import os
+
+from django.core.management.base import BaseCommand, CommandError
+from xmodule.modulestore.xml_exporter import export_to_xml
+from xmodule.modulestore.django import modulestore
+from xmodule.contentstore.django import contentstore
+from xmodule.modulestore import Location
+from xmodule.course_module import CourseDescriptor
+
+
+unnamed_modules = 0
+
+
+class Command(BaseCommand):
+    help = \
+'''Import the specified data directory into the default ModuleStore'''
+
+    def handle(self, *args, **options):
+        if len(args) != 2:
+            raise CommandError("import requires two arguments: <course location> <output path>")
+
+        course_id = args[0]
+        output_path = args[1]
+
+        print "Exporting course id = {0} to {1}".format(course_id, output_path)
+
+        location = CourseDescriptor.id_to_location(course_id)
+
+        root_dir = os.path.dirname(output_path)
+        course_dir = os.path.splitext(os.path.basename(output_path))[0]
+
+        export_to_xml(modulestore('direct'), contentstore(), location, root_dir, course_dir)

@@ -102,6 +102,8 @@ class XmlDescriptor(XModuleDescriptor):
            # VS[compat] -- remove the below attrs once everything is in the CMS
            'course', 'org', 'url_name', 'filename')
 
+    metadata_to_export_to_policy = ('discussion_topics')
+
     # A dictionary mapping xml attribute names AttrMaps that describe how
     # to import and export them
     # Allow json to specify either the string "true", or the bool True.  The string is preferred.
@@ -112,6 +114,7 @@ class XmlDescriptor(XModuleDescriptor):
         # type conversion: want True/False in python, "true"/"false" in xml
         'graded': bool_map,
         'hide_progress_tab': bool_map,
+        'allow_anonymous': bool_map
     }
 
 
@@ -359,8 +362,9 @@ class XmlDescriptor(XModuleDescriptor):
         # Add the non-inherited metadata
         for attr in sorted(self.own_metadata):
             # don't want e.g. data_dir
-            if attr not in self.metadata_to_strip:
+            if attr not in self.metadata_to_strip and attr not in self.metadata_to_export_to_policy:
                 val = val_for_xml(attr)
+                # logging.debug('location.category = {0}, attr = {1}'.format(self.location.category, attr))
                 xml_object.set(attr, val)
 
         if self.export_to_file():
