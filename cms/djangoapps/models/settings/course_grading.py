@@ -1,9 +1,7 @@
 from xmodule.modulestore import Location
 from contentstore.utils import get_modulestore
-import datetime
 import re
 from util import converters
-import time
 
 
 class CourseGradingModel:
@@ -145,19 +143,23 @@ class CourseGradingModel:
     def update_grace_period_from_json(course_location, graceperiodjson):
         """
         Update the course's default grace period. Incoming dict is {hours: h, minutes: m} possibly as a 
-        grace_period entry in an enclosing dict.
+        grace_period entry in an enclosing dict. It is also safe to call this method with a value of
+        None for graceperiodjson.
         """
         if not isinstance(course_location, Location):
             course_location = Location(course_location)
-            
-        if 'grace_period' in graceperiodjson:
-            graceperiodjson = graceperiodjson['grace_period']
-        
-        grace_rep = " ".join(["%s %s" % (value, key) for (key, value) in graceperiodjson.iteritems()]) 
-        
-        descriptor = get_modulestore(course_location).get_item(course_location)
-        descriptor.metadata['graceperiod'] = grace_rep  
-        get_modulestore(course_location).update_metadata(course_location, descriptor.metadata)
+
+        # Before a graceperiod has ever been created, it will be None (once it has been
+        # created, it cannot be set back to None).
+        if graceperiodjson is not None:
+            if 'grace_period' in graceperiodjson:
+                graceperiodjson = graceperiodjson['grace_period']
+
+            grace_rep = " ".join(["%s %s" % (value, key) for (key, value) in graceperiodjson.iteritems()])
+
+            descriptor = get_modulestore(course_location).get_item(course_location)
+            descriptor.metadata['graceperiod'] = grace_rep
+            get_modulestore(course_location).update_metadata(course_location, descriptor.metadata)
         
     @staticmethod
     def delete_grader(course_location, index):
@@ -171,7 +173,7 @@ class CourseGradingModel:
         index = int(index)        
         if index < len(descriptor.raw_grader):
             del descriptor.raw_grader[index]
-            # force propagation to defintion
+            # force propagation to definition
             descriptor.raw_grader = descriptor.raw_grader
             get_modulestore(course_location).update_item(course_location, descriptor.definition['data'])
         
