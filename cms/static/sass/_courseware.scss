@@ -35,39 +35,6 @@ input.courseware-unit-search-input {
 		margin-left: 10px;
 	}
 
-	.section-published-date {
-		position: absolute;
-		top: 19px;
-		right: 90px;
-		padding: 4px 10px;
-		border-radius: 3px;
-		background: $lightGrey;
-		text-align: right;
-
-		.published-status {
-			font-size: 12px;
-			margin-right: 15px;
-
-			strong {
-				font-weight: 700;
-			}
-		}
-
-		.schedule-button {
-			@include blue-button;
-		}
-
-		.edit-button {
-			@include blue-button;
-		}
-
-		.schedule-button,
-		.edit-button {
-			font-size: 11px;
-			padding: 3px 15px 5px;
-		}
-	}
-
 	.datepair .date,
 	.datepair .time {
 		padding-left: 0;
@@ -76,7 +43,7 @@ input.courseware-unit-search-input {
 		background: none;
 		@include box-shadow(none);
 		font-size: 13px;
-		font-weight: 700;
+		font-weight: bold;
 		color: $blue;
 		cursor: pointer;
 	}
@@ -96,14 +63,198 @@ input.courseware-unit-search-input {
 	}
 
 	header {
-		height: 75px;
+		min-height: 75px;
+		@include clearfix();
 
-		.item-details {
-			float: left;
-			padding: 21px 0 0;
+		.item-details, .section-published-date {
+
 		}
 
-		.item-actions {			
+		.item-details {
+			float: none;
+			display: inline-block;
+			padding: 20px 0 10px 0;
+			@include clearfix();
+
+			.section-name {
+				float: left;
+				margin-right: 10px;
+				width: 350px;
+				font-size: 19px;
+				font-weight: bold;
+				color: $blue;
+			}
+
+			.section-name-span {
+				cursor: pointer;
+				@include transition(color .15s);
+
+				&:hover {
+					color: $orange;
+				}
+			}
+
+			.section-name-edit {
+				position: relative;
+				width: 400px;
+				background: $white;
+
+				input {
+					font-size: 16px;	
+				}
+				
+				.save-button {
+					@include blue-button;
+					padding: 7px 20px 7px;
+					margin-right: 5px;
+				}
+
+				.cancel-button {
+					@include white-button;
+					padding: 7px 20px 7px;
+				}
+			}
+
+			.section-published-date {
+				float: right;
+				width: 265px;
+				margin-right: 220px;
+				padding: 4px 10px;
+				@include border-radius(3px);
+				background: $lightGrey;
+
+				.published-status {
+					font-size: 12px;
+					margin-right: 15px;
+
+					strong {
+						font-weight: bold;
+					}
+				}
+
+				.schedule-button {
+					@include blue-button;
+				}
+
+				.edit-button {
+					@include blue-button;
+				}
+
+				.schedule-button,
+				.edit-button {
+					font-size: 11px;
+					padding: 3px 15px 5px;
+				}
+			}
+		}
+
+		.gradable-status {
+			position: absolute;
+			top: 20px;
+			right: 70px;
+			width: 145px;
+
+			.status-label {
+				position: absolute;
+				top: 0;
+				right: 2px;
+				display: none;
+				width: 100px;
+				padding: 10px 35px 10px 10px;
+				@include border-radius(3px);
+				background: $lightGrey;
+				color: $lightGrey;
+				text-align: right;
+				font-size: 12px;
+				font-weight: bold;
+				line-height: 16px;
+			}
+
+			.menu-toggle {
+				z-index: 10;
+				position: absolute;
+				top: 2px;
+				right: 5px;
+				padding: 5px;
+				color: $lightGrey;
+
+				&:hover, &.is-active {
+					color: $blue;
+				}
+			}
+
+			.menu {
+				z-index: 1;
+				display: none;
+				opacity: 0.0;
+				position: absolute;
+				top: -1px;
+				left: 2px;
+				margin: 0;
+				padding: 8px 12px;
+				background: $white;
+				border: 1px solid $mediumGrey;
+				font-size: 12px;
+				@include border-radius(4px);
+				@include box-shadow(0 1px 2px rgba(0, 0, 0, .2));
+				@include transition(opacity .15s);
+				@include transition(display .15s);
+
+
+				li {
+					width: 115px;
+					margin-bottom: 3px;
+					padding-bottom: 3px;
+					border-bottom: 1px solid $lightGrey;
+
+					&:last-child {
+						margin-bottom: 0;
+						padding-bottom: 0;
+						border: none;
+
+						a {
+							color: $darkGrey;
+						}
+					}
+				}
+
+				a {
+
+					&.is-selected {
+						font-weight: bold;
+					}
+				}
+			}
+
+			// dropdown state
+			&.is-active {
+
+				.menu {
+					z-index: 1000;
+					display: block;
+					opacity: 1.0;
+				}
+
+				.menu-toggle {
+					z-index: 10000;
+				}
+			}
+
+			// set state
+			&.is-set {
+
+				.menu-toggle {
+					color: $blue;
+				}
+
+				.status-label {
+					display: block;
+					color: $blue;
+				}
+			}
+		}
+
+		.item-actions {	
 			margin-top: 21px;
 			margin-right: 12px;
 
@@ -122,13 +273,6 @@ input.courseware-unit-search-input {
 		.drag-handle {
 			margin-left: 11px;
 		}
-	}
-
-	h3 {
-		font-size: 19px;
-		font-weight: 700;
-		color: $blue;
-	}
 
 	.section-name-span {
 		cursor: pointer;
@@ -160,8 +304,9 @@ input.courseware-unit-search-input {
 		font-size: 12px;
 		color: #878e9d;
 
-		strong {
-			font-weight: 700;
+			strong {
+				font-weight: bold;
+			}
 		}
 	}
 
@@ -178,12 +323,130 @@ input.courseware-unit-search-input {
 			@include tree-view;
 			border-top-width: 0;
 		}
+
+		.branch {
+
+			.section-item {
+				@include clearfix();
+
+				.details {
+					float: left;
+					width: 650px;
+				}
+
+				.gradable-status {
+					float: right;
+					position: relative;
+					top: -4px;
+					right: 50px;
+					width: 145px;
+
+					.status-label {
+						position: absolute;
+						top: 2px;
+						right: -5px;
+						display: none;
+						width: 110px;
+						padding: 5px 40px 5px 10px;
+						@include border-radius(3px);
+						color: $lightGrey;
+						text-align: right;
+						font-size: 12px;
+						font-weight: bold;
+						line-height: 16px;
+					}
+
+					.menu-toggle {
+						z-index: 10;
+						position: absolute;
+						top: 0;
+						right: 5px;
+						padding: 5px;
+						color: $mediumGrey;
+
+						&:hover, &.is-active {
+							color: $blue;
+						}
+					}
+
+					.menu {
+						z-index: 1;
+						display: none;
+						opacity: 0.0;
+						position: absolute;
+						top: -1px;
+						left: 5px;
+						margin: 0;
+						padding: 8px 12px;
+						background: $white;
+						border: 1px solid $mediumGrey;
+						font-size: 12px;
+						@include border-radius(4px);
+						@include box-shadow(0 1px 2px rgba(0, 0, 0, .2));
+						@include transition(opacity .15s);
+
+
+						li {
+							width: 115px;
+							margin-bottom: 3px;
+							padding-bottom: 3px;
+							border-bottom: 1px solid $lightGrey;
+
+							&:last-child {
+								margin-bottom: 0;
+								padding-bottom: 0;
+								border: none;
+
+								a {
+									color: $darkGrey;
+								}
+							}
+						}
+
+						a {
+							color: $blue;
+
+							&.is-selected {
+								font-weight: bold;
+							}
+						}
+					}
+
+					// dropdown state
+					&.is-active {
+
+						.menu {
+							z-index: 1000;
+							display: block;
+							opacity: 1.0;
+						}
+
+						.menu-toggle {
+							z-index: 10000;
+						}
+					}
+
+					// set state
+					&.is-set {
+
+						.menu-toggle {
+							color: $blue;
+						}
+
+						.status-label {
+							display: block;
+							color: $blue;
+						}
+					}
+				}
+			}
+		}
 	}
 
 	&.new-section {
 		header {
 			height: auto;
-			@include clearfix;
+			@include clearfix();
 		}
 
 		.expand-collapse-icon {
@@ -270,7 +533,7 @@ input.courseware-unit-search-input {
 	}
 
 	strong {
-		font-weight: 700;
+		font-weight: bold;
 	}
 
 	.start-date,

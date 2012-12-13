@@ -84,6 +84,28 @@
             <a href="#" class="sync-date no-spinner">Sync to ${parent_item.display_name}.</a></p>
         % endif
       </div>
+    
+    <div class="row gradable">
+      <label>Graded as:</label>
+      
+      <div class="gradable-status">
+        <h4 class="status-label">Not Graded</h4>
+        
+        <a class="menu-toggle" href="#">
+          
+        </a>
+                        
+        <ul class="menu">
+          <li><a class="is-selected" href="#">Homework</a></li>
+          <li><a href="#">Finger Exercises</a></li>
+          <li><a href="#">Lab</a></li>
+          <li><a href="#">Midterm Exam</a></li>
+          <li><a href="#">Final Exam</a></li>
+          <li><a class="gradable-status-notgraded" href="#">Not Graded</a></li>
+        </ul>        
+      </div>
+    </div>
+    
     <div class="due-date-input row">
       <label>Due date:</label>
       <a href="#" class="set-date">Set a due date</a>
@@ -117,6 +139,12 @@
 <script src="${static.url('js/vendor/timepicker/datepair.js')}"></script>
 <script src="${static.url('js/vendor/date.js')}"></script>
 <script type="text/javascript">
+    (function() {
+      $body = $('body');  
+      $('.gradable-status .menu-toggle').bind('click', showGradeMenu);
+      $('.gradable-status .menu').bind('click', selectGradeType);
+    })();
+
     $(document).ready(function() {
         // expand the due-date area if the values are set
         if ($('#due_date').val() != '') {
@@ -125,5 +153,35 @@
             $block.find('.date-setter').show();
         }
     })
+
+    // grading status
+    function showGradeMenu(e) {
+
+      $section = $(this).closest('.gradable-status');
+
+      e.preventDefault();
+      $section.toggleClass('is-active');
+    }
+
+    function selectGradeType(e) {
+      e.preventDefault();
+
+      var $section = $(this).closest('.gradable-status');
+      $section.find('.menu li a').removeClass('is-selected');
+
+
+      var $target = $(e.target).addClass('is-selected');
+      var $label = $section.find('.status-label');
+
+      $section.removeClass('is-active');      
+      $label.html($target.html());
+
+      if ($target.hasClass('gradable-status-notgraded')) {
+        $section.removeClass('is-set');
+      }
+      else {
+        $section.addClass('is-set');
+      }
+    }
 </script>
 </%block>
