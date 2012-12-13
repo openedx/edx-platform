@@ -155,3 +155,31 @@ header.global ol.user > li.primary a.dropdown {
 .ie-banner {
   display: block !important;
 }
+
+div.course-wrapper {
+  display: block !important;
+
+  section.course-content,
+  section.course-index {
+    display: block !important;
+    float: left;
+  }
+
+  section.course-content {
+    width: 71.27%;
+  }
+}
+
+.sidebar {
+  float: left !important;
+  display: block !important;
+}
+
+.sequence-nav ol {
+  display: block !important;
+
+  li {
+    float: left !important;
+    width: 50px;
+  }
+}
