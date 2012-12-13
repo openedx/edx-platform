@@ -35,7 +35,8 @@
       
       localStorageAvailable: function() {
        try {
-          return 'localStorage' in window && window['localStorage'] !== null;
+    	   // window.cachetemplates is global set in base.js to turn caching on/off
+          return window.cachetemplates && 'localStorage' in window && window['localStorage'] !== null;
         } catch (e) {
           return false;
         }

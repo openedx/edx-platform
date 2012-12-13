@@ -15,6 +15,10 @@ $(document).ready(function() {
     // pipelining (note, this doesn't happen on local runtimes). So if we set it on window, when we can access it from other
     // scopes (namely the course-info tab)
     window.$modalCover = $modalCover;
+    
+    // Control whether template caching in local memory occurs (see template_loader.js). Caching screws up development but may
+    // be a good optimization in production (it works fairly well)
+    window.cachetemplates = false;
 
     $body.append($modalCover);
     $newComponentItem = $('.new-component-item');
