@@ -91,8 +91,10 @@ class ImportTestCase(unittest.TestCase):
         self.assertEqual(re_import_descriptor.__class__.__name__,
                          'ErrorDescriptor')
 
-        self.assertEqual(descriptor.definition['data'],
-                         re_import_descriptor.definition['data'])
+        self.assertEqual(descriptor.contents,
+                         re_import_descriptor.contents)
+        self.assertEqual(descriptor.error_msg,
+                         re_import_descriptor.error_msg)
 
     def test_fixed_xml_tag(self):
         """Make sure a tag that's been fixed exports as the original tag type"""
@@ -126,23 +128,19 @@ class ImportTestCase(unittest.TestCase):
         url_name = 'test1'
         start_xml = '''
         <course org="{org}" course="{course}"
-                graceperiod="{grace}" url_name="{url_name}" unicorn="purple">
+                due="{due}" url_name="{url_name}" unicorn="purple">
             <chapter url="hi" url_name="ch" display_name="CH">
                 <html url_name="h" display_name="H">Two houses, ...</html>
             </chapter>
-        </course>'''.format(grace=v, org=ORG, course=COURSE, url_name=url_name)
+        </course>'''.format(due=v, org=ORG, course=COURSE, url_name=url_name)
         descriptor = system.process_xml(start_xml)
 
-        print descriptor, descriptor.metadata
-        self.assertEqual(descriptor.metadata['graceperiod'], v)
-        self.assertEqual(descriptor.metadata['unicorn'], 'purple')
+        print descriptor, descriptor._model_data
+        self.assertEqual(descriptor.lms.due, v)
 
-        # Check that the child inherits graceperiod correctly
+        # Check that the child inherits due correctly
         child = descriptor.get_children()[0]
-        self.assertEqual(child.metadata['graceperiod'], v)
-
-        # check that the child does _not_ inherit any unicorns
-        self.assertTrue('unicorn' not in child.metadata)
+        self.assertEqual(child.lms.due, v)
 
         # Now export and check things
         resource_fs = MemoryFS()
@@ -169,12 +167,12 @@ class ImportTestCase(unittest.TestCase):
         # did we successfully strip the url_name from the definition contents?
         self.assertTrue('url_name' not in course_xml.attrib)
 
-        # Does the chapter tag now have a graceperiod attribute?
+        # Does the chapter tag now have a due attribute?
         # hardcoded path to child
         with resource_fs.open('chapter/ch.xml') as f:
             chapter_xml = etree.fromstring(f.read())
         self.assertEqual(chapter_xml.tag, 'chapter')
-        self.assertFalse('graceperiod' in chapter_xml.attrib)
+        self.assertFalse('due' in chapter_xml.attrib)
 
     def test_is_pointer_tag(self):
         """
@@ -216,7 +214,7 @@ class ImportTestCase(unittest.TestCase):
         def check_for_key(key, node):
             "recursive check for presence of key"
             print "Checking {0}".format(node.location.url())
-            self.assertTrue(key in node.metadata)
+            self.assertTrue(key in node._model_data)
             for c in node.get_children():
                 check_for_key(key, c)
 
@@ -244,15 +242,15 @@ class ImportTestCase(unittest.TestCase):
         toy_ch = toy.get_children()[0]
         two_toys_ch = two_toys.get_children()[0]
 
-        self.assertEqual(toy_ch.display_name, "Overview")
-        self.assertEqual(two_toys_ch.display_name, "Two Toy Overview")
+        self.assertEqual(toy_ch.lms.display_name, "Overview")
+        self.assertEqual(two_toys_ch.lms.display_name, "Two Toy Overview")
 
         # Also check that the grading policy loaded
         self.assertEqual(two_toys.grade_cutoffs['C'], 0.5999)
 
         # Also check that keys from policy are run through the
         # appropriate attribute maps -- 'graded' should be True, not 'true'
-        self.assertEqual(toy.metadata['graded'], True)
+        self.assertEqual(toy.lms.graded, True)
 
 
     def test_definition_loading(self):
@@ -271,8 +269,8 @@ class ImportTestCase(unittest.TestCase):
         location = Location(["i4x", "edX", "toy", "video", "Welcome"])
         toy_video = modulestore.get_instance(toy_id, location)
         two_toy_video =  modulestore.get_instance(two_toy_id, location)
-        self.assertEqual(toy_video.metadata['youtube'], "1.0:p2Q6BrNhdh8")
-        self.assertEqual(two_toy_video.metadata['youtube'], "1.0:p2Q6BrNhdh9")
+        self.assertEqual(toy_video.youtube, "1.0:p2Q6BrNhdh8")
+        self.assertEqual(two_toy_video.youtube, "1.0:p2Q6BrNhdh9")
 
 
     def test_colon_in_url_name(self):
@@ -306,7 +304,7 @@ class ImportTestCase(unittest.TestCase):
         cloc = course.location
         loc = Location(cloc.tag, cloc.org, cloc.course, 'html', 'secret:toylab')
         html = modulestore.get_instance(course_id, loc)
-        self.assertEquals(html.display_name, "Toy lab")
+        self.assertEquals(html.lms.display_name, "Toy lab")
 
     def test_url_name_mangling(self):
         """
@@ -351,4 +349,4 @@ class ImportTestCase(unittest.TestCase):
         location = Location(["i4x", "edX", "sa_test", "selfassessment", "SampleQuestion"])
         sa_sample = modulestore.get_instance(sa_id, location)
         #10 attempts is hard coded into SampleQuestion, which is the url_name of a selfassessment xml tag
-        self.assertEqual(sa_sample.metadata['attempts'], '10')
+        self.assertEqual(sa_sample.max_attempts, '10')

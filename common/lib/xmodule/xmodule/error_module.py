@@ -8,6 +8,7 @@ from xmodule.x_module import XModule
 from xmodule.editing_module import JSONEditingDescriptor
 from xmodule.errortracker import exc_info_to_str
 from xmodule.modulestore import Location
+from .model import String, Scope
 
 
 log = logging.getLogger(__name__)
@@ -52,6 +53,10 @@ class ErrorDescriptor(JSONEditingDescriptor):
     """
     module_class = ErrorModule
 
+    contents = String(scope=Scope.content)
+    error_msg = String(scope=Scope.content)
+    display_name = String(scope=Scope.settings)
+
     @classmethod
     def _construct(self, system, contents, error_msg, location):
 
@@ -66,15 +71,12 @@ class ErrorDescriptor(JSONEditingDescriptor):
                 name=hashlib.sha1(contents).hexdigest()
             )
 
-        definition = {
-            'data': {
-                'error_msg': str(error_msg),
-                'contents': contents,
-            }
-        }
-
         # real metadata stays in the content, but add a display name
-        model_data = {'display_name': 'Error: ' + location.name}
+        model_data = {
+            'error_msg': str(error_msg),
+            'contents': contents,
+            'display_name': 'Error: ' + location.name
+        }
         return ErrorDescriptor(
             system,
             location,
@@ -84,7 +86,7 @@ class ErrorDescriptor(JSONEditingDescriptor):
     def get_context(self):
         return {
             'module': self,
-            'data': self.definition['data']['contents'],
+            'data': self.contents,
         }
 
     @classmethod
@@ -100,10 +102,7 @@ class ErrorDescriptor(JSONEditingDescriptor):
     def from_descriptor(cls, descriptor, error_msg='Error not available'):
         return cls._construct(
             descriptor.system,
-            json.dumps({
-                'definition': descriptor.definition,
-                'metadata': descriptor.metadata,
-            }, indent=4),
+            json.dumps(descriptor._model_data, indent=4),
             error_msg,
             location=descriptor.location,
         )
@@ -147,14 +146,14 @@ class ErrorDescriptor(JSONEditingDescriptor):
         files, etc.  That would just get re-wrapped on import.
         '''
         try:
-            xml = etree.fromstring(self.definition['data']['contents'])
+            xml = etree.fromstring(self.contents)
             return etree.tostring(xml)
         except etree.XMLSyntaxError:
             # still not valid.
             root = etree.Element('error')
-            root.text = self.definition['data']['contents']
+            root.text = self.contents
             err_node = etree.SubElement(root, 'error_msg')
-            err_node.text = self.definition['data']['error_msg']
+            err_node.text = self.error_msg
             return etree.tostring(root)
 
 

@@ -8,6 +8,7 @@ from .xml import XMLModuleStore
 from .exceptions import DuplicateItemError
 from xmodule.modulestore import Location
 from xmodule.contentstore.content import StaticContent, XASSET_SRCREF_PREFIX
+from xmodule.model import Scope
 
 log = logging.getLogger(__name__)
 
@@ -123,7 +124,7 @@ def import_from_xml(store, data_dir, course_dirs=None,
         # Quick scan to get course Location as well as the course_data_path
         for module in module_store.modules[course_id].itervalues():
             if module.category == 'course':
-                course_data_path = path(data_dir) / module.metadata['data_dir']
+                course_data_path = path(data_dir) / module.data_dir
                 course_location = module.location
 
         if static_content_store is not None:
@@ -159,18 +160,17 @@ def import_from_xml(store, data_dir, course_dirs=None,
 
                     module.definition['children'] = new_locs
 
-
             if module.category == 'course':
                 # HACK: for now we don't support progress tabs. There's a special metadata configuration setting for this.
-                module.metadata['hide_progress_tab'] = True
+                module.hide_progress_tab = True
 
-                # cdodge: more hacks (what else). Seems like we have a problem when importing a course (like 6.002) which 
-                # does not have any tabs defined in the policy file. The import goes fine and then displays fine in LMS, 
-                # but if someone tries to add a new tab in the CMS, then the LMS barfs because it expects that - 
+                # cdodge: more hacks (what else). Seems like we have a problem when importing a course (like 6.002) which
+                # does not have any tabs defined in the policy file. The import goes fine and then displays fine in LMS,
+                # but if someone tries to add a new tab in the CMS, then the LMS barfs because it expects that -
                 # if there is *any* tabs - then there at least needs to be some predefined ones
                 if module.tabs is None or len(module.tabs) == 0:
-                    module.tabs = [{"type": "courseware"}, 
-                        {"type": "course_info", "name": "Course Info"}, 
+                    module.tabs = [{"type": "courseware"},
+                        {"type": "course_info", "name": "Course Info"},
                         {"type": "discussion", "name": "Discussion"},
                         {"type": "wiki", "name": "Wiki"}]  # note, add 'progress' when we can support it on Edge
 
@@ -180,39 +180,43 @@ def import_from_xml(store, data_dir, course_dirs=None,
 
                 course_items.append(module)
 
-            if 'data' in module.definition:
-                module_data = module.definition['data']
-
+            if hasattr(module, 'data'):
                 # cdodge: now go through any link references to '/static/' and make sure we've imported
                 # it as a StaticContent asset
-                try:   
+                try:
                     remap_dict = {}
 
                     # use the rewrite_links as a utility means to enumerate through all links
                     # in the module data. We use that to load that reference into our asset store
                     # IMPORTANT: There appears to be a bug in lxml.rewrite_link which makes us not be able to
                     # do the rewrites natively in that code.
-                    # For example, what I'm seeing is <img src='foo.jpg' />   ->   <img src='bar.jpg'>  
+                    # For example, what I'm seeing is <img src='foo.jpg' />   ->   <img src='bar.jpg'>
                     # Note the dropped element closing tag. This causes the LMS to fail when rendering modules - that's
                     # no good, so we have to do this kludge
-                    if isinstance(module_data, str) or isinstance(module_data, unicode):   # some module 'data' fields are non strings which blows up the link traversal code
-                        lxml_rewrite_links(module_data, lambda link: verify_content_links(module, course_data_path, 
-                            static_content_store, link, remap_dict))                     
+                    if isinstance(module.data, str) or isinstance(module.data, unicode):   # some module 'data' fields are non strings which blows up the link traversal code
+                        lxml_rewrite_links(module.data, lambda link: verify_content_links(module, course_data_path,
+                            static_content_store, link, remap_dict))
 
                         for key in remap_dict.keys():
-                            module_data = module_data.replace(key, remap_dict[key])
+                            module.data = module.data.replace(key, remap_dict[key])
 
-                except Exception, e:
+                except Exception:
                     logging.exception("failed to rewrite links on {0}. Continuing...".format(module.location))
 
-                store.update_item(module.location, module_data)
+                store.update_item(module.location, module.data)
 
-            if 'children' in module.definition:
-                store.update_children(module.location, module.definition['children'])
+            if module.has_children:
+                store.update_children(module.location, module.children)
 
-            # NOTE: It's important to use own_metadata here to avoid writing
-            # inherited metadata everywhere.
-            store.update_metadata(module.location, dict(module.own_metadata))
+            metadata = {}
+            for field in module.fields + module.lms.fields:
+                # Only save metadata that wasn't inherited
+                if (field.scope == Scope.settings and
+                    field.name in module._inherited_metadata and
+                    field.name in module._model_data):
+                
+                    metadata[field.name] = module._model_data[field.name]
+            store.update_metadata(module.location, metadata)
 
     return module_store, course_items
 

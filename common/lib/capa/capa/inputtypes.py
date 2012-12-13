@@ -44,7 +44,7 @@ import sys
 
 from registry import TagRegistry
 
-log = logging.getLogger('mitx.' + __name__)
+log = logging.getLogger(__name__)
 
 #########################################################################
 

@@ -551,8 +551,7 @@ class CapaModule(XModule):
                 msg = "Error checking problem: " + str(err)
                 msg += '\nTraceback:\n' + traceback.format_exc()
                 return {'success': msg}
-            log.exception("Error in capa_module problem checking")
-            raise Exception("error in capa_module")
+            raise
 
         self.attempts = self.attempts + 1
         self.lcp.done = True

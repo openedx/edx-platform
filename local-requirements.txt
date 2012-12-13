@@ -1,4 +1,4 @@
 # Python libraries to install that are local to the mitx repo
 -e common/lib/capa
 -e common/lib/xmodule
--e lms
+-e .

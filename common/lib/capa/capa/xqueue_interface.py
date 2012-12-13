@@ -7,7 +7,7 @@ import logging
 import requests
 
 
-log = logging.getLogger('mitx.' + __name__)
+log = logging.getLogger(__name__)
 dateformat = '%Y%m%d%H%M%S'
 
 def make_hashkey(seed):

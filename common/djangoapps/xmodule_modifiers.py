@@ -131,6 +131,7 @@ def add_histogram(get_html, module, user):
             is_released = "<font color='red'>Yes!</font>" if (now > mstart) else "<font color='green'>Not yet</font>"
 
         staff_context = {'fields': [(field.name, getattr(module, field.name)) for field in module.fields],
+                         'lms_fields': [(field.name, getattr(module.lms, field.name)) for field in module.lms.fields],
                          'location': module.location,
                          'xqa_key': module.lms.xqa_key,
                          'source_file' : source_file,

@@ -28,7 +28,7 @@ edx_xml_parser = etree.XMLParser(dtd_validation=False, load_dtd=False,
 
 etree.set_default_parser(edx_xml_parser)
 
-log = logging.getLogger('mitx.' + __name__)
+log = logging.getLogger(__name__)
 
 
 # VS[compat]
@@ -160,7 +160,6 @@ class ImportSystem(XMLParsingSystem, MakoDescriptorSystem):
                     etree.tostring(xml_data), self, self.org,
                     self.course, xmlstore.default_class)
             except Exception as err:
-                print err, self.load_error_modules
                 if not self.load_error_modules:
                     raise
 

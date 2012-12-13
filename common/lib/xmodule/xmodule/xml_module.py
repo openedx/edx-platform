@@ -311,11 +311,13 @@ class XmlDescriptor(XModuleDescriptor):
         # Set/override any metadata specified by policy
         k = policy_key(location)
         if k in system.policy:
+            if k == 'video/labintro': print k, metadata, system.policy[k]
             cls.apply_policy(metadata, system.policy[k])
 
         model_data = {}
         model_data.update(metadata)
         model_data.update(definition)
+        if k == 'video/labintro': print model_data
 
         return cls(
             system,

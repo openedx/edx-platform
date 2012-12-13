@@ -1,8 +1,17 @@
 from xmodule.model import Namespace, Boolean, Scope, String, List
-from xmodule.x_module import Date
+from xmodule.fields import Date
+
+
+class StringyBoolean(Boolean):
+    def from_json(self, value):
+        print "StringyBoolean ", value
+        if isinstance(value, basestring):
+            return value.lower() == 'true'
+        return value
+
 
 class LmsNamespace(Namespace):
-    hide_from_toc = Boolean(
+    hide_from_toc = StringyBoolean(
         help="Whether to display this module in the table of contents",
         default=False,
         scope=Scope.settings
@@ -16,6 +25,7 @@ class LmsNamespace(Namespace):
         help="What format this module is in (used for deciding which "
              "grader to apply, and what to show in the TOC)",
         scope=Scope.settings,
+        default='',
     )
 
     display_name = String(

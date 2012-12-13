@@ -131,9 +131,9 @@ class CourseDescriptor(SequenceDescriptor):
         if self.start is None:
             msg = "Course loaded without a valid start date. id = %s" % self.id
             # hack it -- start in 1970
-            self.lms.start = time.gmtime(0)
+            self.start = time.gmtime(0)
             log.critical(msg)
-            system.error_tracker(msg)
+            self.system.error_tracker(msg)
 
         # NOTE: relies on the modulestore to call set_grading_policy() right after
         # init.  (Modulestore is in charge of figuring out where to load the policy from)

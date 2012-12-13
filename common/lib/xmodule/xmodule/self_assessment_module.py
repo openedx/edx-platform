@@ -25,6 +25,7 @@ from .stringify import stringify_children
 from .x_module import XModule
 from .xml_module import XmlDescriptor
 from xmodule.modulestore import Location
+from .model import List, String, Scope, Int
 
 log = logging.getLogger("mitx.courseware")
 
@@ -61,67 +62,21 @@ class SelfAssessmentModule(XModule):
     js = {'coffee': [resource_string(__name__, 'js/src/selfassessment/display.coffee')]}
     js_module_name = "SelfAssessment"
 
-    def __init__(self, system, location, definition, descriptor,
-                 instance_state=None, shared_state=None, **kwargs):
-        XModule.__init__(self, system, location, definition, descriptor,
-            instance_state, shared_state, **kwargs)
+    student_answers = List(scope=Scope.student_state, default=[])
+    scores = List(scope=Scope.student_state, default=[])
+    hints = List(scope=Scope.student_state, default=[])
+    state = String(scope=Scope.student_state, default=INITIAL)
 
-        """
-        Definition file should have 4 blocks -- prompt, rubric, submitmessage, hintprompt,
-        and two optional attributes:
-        attempts, which should be an integer that defaults to 1.
-        If it's > 1, the student will be able to re-submit after they see
-        the rubric.
-        max_score, which should be an integer that defaults to 1.
-        It defines the maximum number of points a student can get.  Assumed to be integer scale
-        from 0 to max_score, with an interval of 1.
+    # Used for progress / grading.  Currently get credit just for
+    # completion (doesn't matter if you self-assessed correct/incorrect).
+    max_score = Int(scope=Scope.settings, default=MAX_SCORE)
 
-        Note: all the submissions are stored.
-
-        Sample file:
-
-        <selfassessment attempts="1" max_score="1">
-            <prompt>
-                Insert prompt text here.  (arbitrary html)
-            </prompt>
-            <rubric>
-                Insert grading rubric here.  (arbitrary html)
-            </rubric>
-            <hintprompt>
-                Please enter a hint below: (arbitrary html)
-            </hintprompt>
-            <submitmessage>
-                Thanks for submitting!  (arbitrary html)
-            </submitmessage>
-        </selfassessment>
-        """
-
-        # Load instance state
-        if instance_state is not None:
-            instance_state = json.loads(instance_state)
-        else:
-            instance_state = {}
-
-        # Note: score responses are on scale from 0 to max_score
-        self.student_answers = instance_state.get('student_answers', [])
-        self.scores = instance_state.get('scores', [])
-        self.hints = instance_state.get('hints', [])
-
-        self.state = instance_state.get('state', 'initial')
-
-        # Used for progress / grading.  Currently get credit just for
-        # completion (doesn't matter if you self-assessed correct/incorrect).
-
-        self._max_score = int(self.metadata.get('max_score', MAX_SCORE))
-
-        self.attempts = instance_state.get('attempts', 0)
-
-        self.max_attempts = int(self.metadata.get('attempts', MAX_ATTEMPTS))
-
-        self.rubric = definition['rubric']
-        self.prompt = definition['prompt']
-        self.submit_message = definition['submitmessage']
-        self.hint_prompt = definition['hintprompt']
+    attempts = Int(scope=Scope.student_state, default=0), Int
+    max_attempts = Int(scope=Scope.settings, default=MAX_ATTEMPTS)
+    rubric = String(scope=Scope.content)
+    prompt = String(scope=Scope.content)
+    submit_message = String(scope=Scope.content)
+    hint_prompt = String(scope=Scope.content)
 
     def _allow_reset(self):
         """Can the module be reset?"""
@@ -431,6 +386,21 @@ class SelfAssessmentDescriptor(XmlDescriptor, EditingDescriptor):
 
     js = {'coffee': [resource_string(__name__, 'js/src/html/edit.coffee')]}
     js_module_name = "HTMLEditingDescriptor"
+
+    # The capa format specifies that what we call max_attempts in the code
+    # is the attribute `attempts`. This will do that conversion
+    metadata_translations = dict(XmlDescriptor.metadata_translations)
+    metadata_translations['attempts'] = 'max_attempts'
+
+    # Used for progress / grading.  Currently get credit just for
+    # completion (doesn't matter if you self-assessed correct/incorrect).
+    max_score = Int(scope=Scope.settings, default=MAX_SCORE)
+
+    max_attempts = Int(scope=Scope.settings, default=MAX_ATTEMPTS)
+    rubric = String(scope=Scope.content)
+    prompt = String(scope=Scope.content)
+    submit_message = String(scope=Scope.content)
+    hint_prompt = String(scope=Scope.content)
 
     @classmethod
     def definition_from_xml(cls, xml_object, system):

@@ -33,19 +33,33 @@ class DbModel(MutableMapping):
     def __repr__(self):
         return "<{0.__class__.__name__} {0._module_cls!r}>".format(self)
 
-    def __str__(self):
-        return str(dict(self.iteritems()))
-
     def _getfield(self, name):
-        if (not hasattr(self._module_cls, name) or
-            not isinstance(getattr(self._module_cls, name), ModelType)):
+        # First, get the field from the class, if defined
+        module_field = getattr(self._module_cls, name, None)
+        if module_field is not None and isinstance(module_field, ModelType):
+            return module_field
 
-            raise KeyError(name)
+        # If the class doesn't have the field, and it also
+        # doesn't have any namespaces, then the the name isn't a field
+        # so KeyError
+        if not hasattr(self._module_cls, 'namespaces'):
+            return KeyError(name)
 
-        return getattr(self._module_cls, name)
+        # Resolve the field name in the first namespace where it's
+        # available
+        for namespace_name in self._module_cls.namespaces:
+            namespace = getattr(self._module_cls, namespace_name)
+            namespace_field = getattr(type(namespace), name, None)
+            if namespace_field is not None and isinstance(module_field, ModelType):
+                return namespace_field
+
+        # Not in the class or in any of the namespaces, so name
+        # really doesn't name a field
+        raise KeyError(name)
 
     def _key(self, name):
         field = self._getfield(name)
+        print name, field
         module = field.scope.module
 
         if module == ModuleScope.ALL:
@@ -88,5 +102,5 @@ class DbModel(MutableMapping):
     def keys(self):
         fields = [field.name for field in self._module_cls.fields]
         for namespace_name in self._module_cls.namespaces:
-            fields.extend(field.name for field in getattr(self._module_cls, namespace_name))
+            fields.extend(field.name for field in getattr(self._module_cls, namespace_name).fields)
         return fields

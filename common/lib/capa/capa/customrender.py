@@ -17,7 +17,7 @@ from lxml import etree
 import xml.sax.saxutils as saxutils
 from registry import TagRegistry
 
-log = logging.getLogger('mitx.' + __name__)
+log = logging.getLogger(__name__)
 
 registry = TagRegistry()
 

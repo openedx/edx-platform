@@ -76,7 +76,7 @@ def instructor_dashboard(request, course_id):
     data = [['# Enrolled', CourseEnrollment.objects.filter(course_id=course_id).count()]]
     data += compute_course_stats(course).items()
     if request.user.is_staff:
-        data.append(['metadata', escape(str(course.metadata))])
+        data.append(['metadata', escape(str(course._model_data))])
     datatable['data'] = data
 
     def return_csv(fn, datatable):

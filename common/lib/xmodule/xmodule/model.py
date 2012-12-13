@@ -43,13 +43,13 @@ class ModelType(object):
         if instance is None:
             return self
 
-        if self.name not in instance._model_data:
+        try:
+            return self.from_json(instance._model_data[self.name])
+        except KeyError:
             if self.default is None and self.computed_default is not None:
                 return self.computed_default(instance)
 
             return self.default
-
-        return self.from_json(instance._model_data[self.name])
 
     def __set__(self, instance, value):
         instance._model_data[self.name] = self.to_json(value)
@@ -166,18 +166,18 @@ class Namespace(Plugin):
             super(Namespace, self).__setattr__(name, value)
             return
 
-        container_class_attr = getattr(type(container), name, None)
+        namespace_attr = getattr(type(self), name, None)
 
-        if container_class_attr is None or not isinstance(container_class_attr, ModelType):
+        if namespace_attr is None or not isinstance(namespace_attr, ModelType):
             return super(Namespace, self).__setattr__(name, value)
 
-        return container_class_attr.__set__(container)
+        return namespace_attr.__set__(container, value)
 
     def __delattr__(self, name):
         container = super(Namespace, self).__getattribute__('_container')
-        container_class_attr = getattr(type(container), name, None)
+        namespace_attr = getattr(type(self), name, None)
 
-        if container_class_attr is None or not isinstance(container_class_attr, ModelType):
+        if namespace_attr is None or not isinstance(namespace_attr, ModelType):
             return super(Namespace, self).__detattr__(name)
 
-        return container_class_attr.__delete__(container)
+        return namespace_attr.__delete__(container)

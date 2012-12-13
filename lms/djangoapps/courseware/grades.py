@@ -148,7 +148,7 @@ def grade(student, request, course, student_module_cache=None, keep_raw_scores=F
         format_scores = []
         for section in sections:
             section_descriptor = section['section_descriptor']
-            section_name = section_descriptor.display_name
+            section_name = section_descriptor.lms.display_name
 
             should_grade_section = False
             # If we haven't seen a single problem in the section, we don't have to grade it at all! We can assume 0%  
@@ -276,15 +276,13 @@ def progress_summary(student, request, course, student_module_cache):
     # Don't include chapters that aren't displayable (e.g. due to error)
     for chapter_module in course_module.get_display_items():
         # Skip if the chapter is hidden
-        hidden = chapter_module._model_data.get('hide_from_toc','false')
-        if hidden.lower() == 'true':
+        if chapter_module.lms.hide_from_toc:
             continue
         
         sections = []
         for section_module in chapter_module.get_display_items():
             # Skip if the section is hidden
-            hidden = section_module._model_data.get('hide_from_toc','false')
-            if hidden.lower() == 'true':
+            if section_module.lms.hide_from_toc:
                 continue
             
             # Same for sections
@@ -309,17 +307,17 @@ def progress_summary(student, request, course, student_module_cache):
 
             format = section_module.lms.format
             sections.append({
-                'display_name': section_module.display_name,
+                'display_name': section_module.lms.display_name,
                 'url_name': section_module.url_name,
                 'scores': scores,
                 'section_total': section_total,
                 'format': format,
-                'due': section_module.due,
+                'due': section_module.lms.due,
                 'graded': graded,
             })
 
-        chapters.append({'course': course.display_name,
-                         'display_name': chapter_module.display_name,
+        chapters.append({'course': course.lms.display_name,
+                         'display_name': chapter_module.lms.display_name,
                          'url_name': chapter_module.url_name,
                          'sections': sections})
 

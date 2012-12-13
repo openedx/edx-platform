@@ -33,7 +33,7 @@ from lxml import etree
 from lxml.html.soupparser import fromstring as fromstring_bs	 # uses Beautiful Soup!!! FIXME?
 import xqueue_interface
 
-log = logging.getLogger('mitx.' + __name__)
+log = logging.getLogger(__name__)
 
 
 #-----------------------------------------------------------------------------

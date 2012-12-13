@@ -92,6 +92,7 @@ def toc_for_course(user, request, course, active_chapter, active_section):
 
     chapters = list()
     for chapter in course_module.get_display_items():
+        print chapter, chapter._model_data, chapter._model_data.get('hide_from_toc'), chapter.lms.hide_from_toc
         if chapter.lms.hide_from_toc:
             continue
 
