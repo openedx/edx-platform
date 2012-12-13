@@ -356,7 +356,8 @@ CMS.Views.Settings.Grading = CMS.Views.ValidatingView.extend({
 		
 		return this;
 	},
-	addAssignmentType : function() {
+	addAssignmentType : function(e) {
+		e.preventDefault();
 		this.model.get('graders').push({});
 	},
 	fieldToSelectorMap : {
@@ -503,6 +504,7 @@ CMS.Views.Settings.Grading = CMS.Views.ValidatingView.extend({
 	},
 	
 	addNewGrade: function(e) {
+		e.preventDefault();
 		var gradeLength = this.descendingCutoffs.length; // cutoffs doesn't include fail/f so this is only the passing grades
 		if(gradeLength > 3) {
 			// TODO shouldn't we disable the button
@@ -541,6 +543,7 @@ CMS.Views.Settings.Grading = CMS.Views.ValidatingView.extend({
 	},
 	
 	removeGrade: function(e) {
+		e.preventDefault();
 		var domElement = $(e.currentTarget).closest('li');
 		var index = domElement.index();
 		// copy the boundary up to the next higher grade then remove
@@ -614,8 +617,9 @@ CMS.Views.Settings.GraderView = CMS.Views.ValidatingView.extend({
 			
 		}
 	},
-	deleteModel : function() {
+	deleteModel : function(e) {
 		this.model.destroy();
+		e.preventDefault();
 	}
 	
 });
