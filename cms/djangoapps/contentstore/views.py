@@ -849,7 +849,8 @@ def remove_user(request, location):
 def landing(request, org, course, coursename):
     return render_to_response('temp-course-landing.html', {})
 
-
+@login_required
+@ensure_csrf_cookie
 def static_pages(request, org, course, coursename):
 
     location = ['i4x', org, course, 'course', coursename]
@@ -869,11 +870,16 @@ def static_pages(request, org, course, coursename):
 def edit_static(request, org, course, coursename):
     return render_to_response('edit-static-page.html', {})
 
-
+@login_required
+@ensure_csrf_cookie
 def edit_tabs(request, org, course, coursename):
     location = ['i4x', org, course, 'course', coursename]    
     course_item = modulestore().get_item(location)
     static_tabs_loc = Location('i4x', org, course, 'static_tab', None)
+
+    # check that logged in user has permissions to this item
+    if not has_access(request.user, location):
+        raise PermissionDenied()
 
     static_tabs = modulestore('direct').get_items(static_tabs_loc)
 
@@ -937,6 +943,11 @@ def course_info_updates(request, org, course, provided_id=None):
     # ??? No way to check for access permission afaik
     # get current updates
     location = ['i4x', org, course, 'course_info', "updates"]
+
+    # check that logged in user has permissions to this item
+    if not has_access(request.user, location):
+        raise PermissionDenied()
+
     # NB: we're setting Backbone.emulateHTTP to true on the client so everything comes as a post!!!
     if request.method == 'POST' and 'HTTP_X_HTTP_METHOD_OVERRIDE' in request.META:
         real_method = request.META['HTTP_X_HTTP_METHOD_OVERRIDE']
@@ -959,6 +970,10 @@ def course_info_updates(request, org, course, provided_id=None):
 @ensure_csrf_cookie
 def module_info(request, module_location):
     location = Location(module_location)
+    
+    # check that logged in user has permissions to this item
+    if not has_access(request.user, location):
+        raise PermissionDenied()
 
     # NB: we're setting Backbone.emulateHTTP to true on the client so everything comes as a post!!!
     if request.method == 'POST' and 'HTTP_X_HTTP_METHOD_OVERRIDE' in request.META:
@@ -1011,6 +1026,12 @@ def course_settings_updates(request, org, course, name, section):
     org, course: Attributes of the Location for the item to edit
     section: one of details, faculty, grading, problems, discussions
     """
+    location = ['i4x', org, course, 'course', name]
+
+    # check that logged in user has permissions to this item
+    if not has_access(request.user, location):
+        raise PermissionDenied()
+
     if section == 'details':
         manager = CourseDetails
     elif section == 'grading':
@@ -1035,6 +1056,13 @@ def course_grader_updates(request, org, course, name, grader_index=None):
 
     org, course: Attributes of the Location for the item to edit
     """
+    
+    location = ['i4x', org, course, 'course', name]
+
+    # check that logged in user has permissions to this item
+    if not has_access(request.user, location):
+        raise PermissionDenied()
+
     if request.method == 'POST' and 'HTTP_X_HTTP_METHOD_OVERRIDE' in request.META:
         real_method = request.META['HTTP_X_HTTP_METHOD_OVERRIDE']
     else:
