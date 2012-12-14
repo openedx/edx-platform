@@ -70,42 +70,79 @@ class GraphicalSliderToolModule(XModule):
         """
         #substitute plot
         plot_div = '<div class="' + self.html_class + '_plot" id="' + self.html_id + '_plot"></div>'
-        html_string = html_string.replace('$plot$', plot_div)
+        html_string = re.sub(r'\$[^\$]*plot[^\$]*\$',
+                plot_div, html_string, flags=re.IGNORECASE | re.UNICODE)
 
-        # substitute sliders if we have them
-        if json.loads(self.configuration_json)['root'].get('sliders'):
-            sliders = json.loads(self.configuration_json)['root']['sliders']['slider']
-            if type(sliders) == dict:
-                sliders = [sliders]
-            vars = [x['@var'] for x in sliders]
+        # get variables
+        if json.loads(self.configuration_json)['root'].get('parameters'):
+            variables = json.loads(self.configuration_json)['root']['parameters']['param']
+            if type(variables) == dict:
+                variables = [variables]
+            variables = [x['@var'] for x in variables]
+        else:
+            return html_string
 
-            slider_div = '<span class="{element_class}_slider" id="{element_id}_slider_{var}" \
-            data-var="{var}" data-el_width="120"></span>'
+        #substitute sliders
+        slider_div = '<div class="{element_class}_slider" \
+                                   id="{element_id}_slider_{var}" \
+                                   data-var="{var}" data-el_width="{width}"\
+                     </div>'
+        for var in variables:
+            # find $slider var='var' ... $
+            instances = re.findall(r'\$slider\s+(?=.*var\=[\"\']' + var + '[\"\'])' \
+                          + r'[^\$]*\$', html_string)
+            if instances:  # if presented
+                slider_def = instances[0]  # get $slider var='var' ... $ string
+                # get width
+                width = re.search(r'(?=.*width\=[\"\'](\d+)[\"\'])', slider_def)
+                if width:
+                    width = width.groups()[0]
+                else:  # no width parameter
+                    width = ''
+                # substitue parameters to slider div
+                replacement = slider_div.format(element_class=self.html_class,
+                                            element_id=self.html_id,
+                                            var=var,
+                                            width=width)
+                # subsitute $slider var='var' ... $ in html_srting to proper
+                # html div element
+                html_string = re.sub(r'\$slider\s+(?=.*var\=[\"\'](' + \
+                    var + ')[\"\'])' + r'[^\$]*\$',
+                replacement, html_string, flags=re.IGNORECASE | re.UNICODE)
 
-            for var in vars:
-                html_string = re.sub(r'\$slider\s+' + var + r'\$',
-                                    slider_div.format(element_class=self.html_class,
-                                                      element_id=self.html_id,
-                                                      var=var),
-                                    html_string, flags=re.IGNORECASE | re.UNICODE)
+        # substitute inputs if we have them
+        input_el = '<input class="{element_class}_input" \
+                                  id="{element_id}_input_{var}" \
+                                   data-var="{var}" data-el_width="{width}" \
+                                   data-el_readonly="{readonly}"> \
+                     </input>'
 
-        # substitute numbers if we have them
-        if json.loads(self.configuration_json)['root'].get('inputs'):
-            inputs = json.loads(self.configuration_json)['root']['inputs']['input']
-            if type(inputs) == dict:
-                inputs = [inputs]
-            vars = [x['@var'] for x in inputs]
+        input_index = 0  # make multiple inputs for same variable have
+        # different id
 
-            input_div = '<span class="{element_class}_input" id="{element_id}_input_{var}" \
-            data-var="{var}" data-el_width="60"></span>'
+        for var in variables:  # multiple inputs test
+            input_index = +1
+            instances = re.findall(r'\$input\s+(?=.*var\=[\"\']' + var + '[\"\'])' \
+                          + r'[^\$]*\$', html_string)
+            # import ipdb; ipdb.set_trace()
+            for input_def in instances:
+                width = re.search(r'(?=.*width\=[\"\'](\d+)[\"\'])', input_def)
+                if width:
+                    width = width.groups()[0]
+                else:
+                    width = ''
+                readonly = re.search(r'(?=.*readonly\=[\"\'](\w+)[\"\'])', input_def)
+                if readonly:
+                    readonly = readonly.groups()[0]
+                else:
+                    readonly = ''
 
-            for var in vars:
-                html_string = re.sub(r'\$input\s+' + var + r'\$',
-                                    input_div.format(element_class=self.html_class,
-                                                     element_id=self.html_id,
-                                                     var=var),
-                                    html_string, flags=re.IGNORECASE | re.UNICODE)
-        # import ipdb; ipdb.set_trace()
+                replacement = input_el.format(element_class=self.html_class,
+                        element_id=self.html_id + '_' + str(input_index),
+                        var=var, width=width, readonly=readonly)
+                html_string = re.sub(r'\$input\s+(?=.*var\=[\"\'](' + \
+                                     var + ')[\"\'])' + r'[^\$]*\$',
+                replacement, html_string, flags=re.IGNORECASE | re.UNICODE)
         return html_string
 
     def get_configuration(self):
