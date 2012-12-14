@@ -31,21 +31,6 @@
           <label>Units:</label>
           ${units.enum_units(subsection, subsection_units=subsection_units)}
         </div>
-        <div>
-          <label>Policy:</label>
-          <ol class='policy-list'>
-              % for policy_name in policy_metadata.keys():
-              <li class="policy-list-element">
-                  <input type="text" class="policy-list-name" name="${policy_name}" value="${policy_name}" disabled size="15"/>:&nbsp;<input type="text" class="policy-list-value" name="${policy_metadata[policy_name]}" value="${policy_metadata[policy_name]}" size="40"/>
-                  <a href="#" class="cancel-button">Cancel</a>
-                  <a href="#" class="delete-icon remove-policy-data"></a>
-              </li>
-              % endfor
-        <a href="#" class="new-policy-item add-policy-data">
-          <span class="plus-icon-small"></span>New Policy Data
-        </a>
-          </ol>
-        </div>                    
       </article>
     </div>
 
@@ -85,7 +70,7 @@
         % endif
       </div>
     
-    <div class="row gradable">
+   <!--  <div class="row gradable">
       <label>Graded as:</label>
       
       <div class="gradable-status">
@@ -104,7 +89,7 @@
           <li><a class="gradable-status-notgraded" href="#">Not Graded</a></li>
         </ul>        
       </div>
-    </div>
+    </div> -->
     
     <div class="due-date-input row">
       <label>Due date:</label>

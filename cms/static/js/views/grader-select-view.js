@@ -28,7 +28,7 @@ CMS.Views.OverviewAssignmentGrader = Backbone.View.extend({
 	// instantiate w/ { graders : CourseGraderCollection, el : <the gradable-status div> }
 	events : {
 		"click .menu-toggle" : "showGradeMenu",
-		"click .menu" : "selectGradeType"
+		"click .menu li" : "selectGradeType"
 	},
 	initialize : function() {
 		// call template w/ {assignmentType : formatname, graders : CourseGraderCollection instance }
@@ -49,6 +49,13 @@ CMS.Views.OverviewAssignmentGrader = Backbone.View.extend({
 			graderType : this.$el.data('initial-status')});
 		// TODO throw exception if graders is null
 		this.graders = this.options['graders'];
+		var cachethis = this;
+		// defining here to get closure around this
+		this.removeMenu = function(e) {
+			e.preventDefault();
+			cachethis.$el.removeClass('is-active');
+			$(document).off('click', cachethis.removeMenu);
+		}
 		this.render();
 	},
 	render : function() {
@@ -62,12 +69,16 @@ CMS.Views.OverviewAssignmentGrader = Backbone.View.extend({
 	},
 	showGradeMenu : function(e) {
 		e.preventDefault();
-		this.$el.toggleClass('is-active');
+		// I sure hope this doesn't break anything but it's needed to keep the removeMenu from activating
+		e.stopPropagation();
+		// nasty global event trap :-(
+		$(document).on('click', this.removeMenu);
+		this.$el.addClass('is-active');
 	},
 	selectGradeType : function(e) {
 	      e.preventDefault();
 	      
-	      this.$el.toggleClass('is-active');
+	      this.removeMenu(e);
 
 	      // TODO I'm not happy with this string fetch via the html for what should be an id. I'd rather use the id attr
 	      // of the CourseGradingPolicy model or null for Not Graded (NOTE, change template's if check for is-selected accordingly)
