@@ -61,7 +61,7 @@ CMS.Models.Settings.CourseDetails = Backbone.Model.extend({
 				// GET "http://gdata.youtube.com/feeds/api/videos/" + videokey
 			}
 			if (!_.isEmpty(vid_errors)) {
-				errors.intro_video = vid_errors.join('/n');
+				errors.intro_video = vid_errors.join(' ');
 			}
 		}
 		if (!_.isEmpty(errors)) return errors;
