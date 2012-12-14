@@ -42,7 +42,7 @@
   }
 
   h2 {
-    margin: 30px 40px;
+    margin: 30px 40px 30px 0;
     color: #646464;
     font-size: 19px;
     font-weight: 300;
@@ -468,17 +468,21 @@
 body.unit {
 
   .component {
-      padding-top: 30px;
+    padding-top: 30px;
 
-      .component-actions {
-        @include box-sizing(border-box);
-        position: absolute;
-        width: 811px;
-        padding: 15px;
-        top: 0;
-        left: 0;
-        border-bottom: 1px solid $lightBluishGrey2;
-        background: $lightGrey;
-      }
+    .component-actions {
+      @include box-sizing(border-box);
+      position: absolute;
+      width: 811px;
+      padding: 15px;
+      top: 0;
+      left: 0;
+      border-bottom: 1px solid $lightBluishGrey2;
+      background: $lightGrey;
     }
+
+    &.editing {
+      padding-top: 0;
+    }
+  }
 }

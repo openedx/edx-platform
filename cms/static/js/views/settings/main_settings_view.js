@@ -175,6 +175,7 @@ CMS.Views.Settings.Details = CMS.Views.ValidatingView.extend({
 		}
 		
 		this.$el.find(this.fieldToSelectorMap['overview']).val(this.model.get('overview'));
+		this.codeMirrorize(null, $('#course-overview')[0]);
 		
 		this.$el.find('.current-course-introduction-video iframe').attr('src', this.model.videosourceSample());
 		if (this.model.has('intro_video')) {
@@ -272,11 +273,18 @@ CMS.Views.Settings.Details = CMS.Views.ValidatingView.extend({
 		}
 	},
 	codeMirrors : {},
-	codeMirrorize : function(e) {
-		if (!this.codeMirrors[e.currentTarget.id]) {
+	codeMirrorize : function(e, forcedTarget) {
+		if (forcedTarget) {
+			thisTarget = forcedTarget;
+			thisTarget.id = $(thisTarget).attr('id');
+		} else {
+			thisTarget = e.currentTarget;
+		}
+
+		if (!this.codeMirrors[thisTarget.id]) {
 			var cachethis = this;
-			var field = this.selectorToField['#' + e.currentTarget.id];
-			this.codeMirrors[e.currentTarget.id] = CodeMirror.fromTextArea(e.currentTarget, {
+			var field = this.selectorToField['#' + thisTarget.id];
+			this.codeMirrors[thisTarget.id] = CodeMirror.fromTextArea(thisTarget, {
 				mode: "text/html", lineNumbers: true, lineWrapping: true,
 				onBlur : function(mirror) {
 					mirror.save();
