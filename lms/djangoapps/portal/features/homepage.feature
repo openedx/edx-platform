@@ -35,11 +35,13 @@ Feature: Homepage for web users
     Then I should see "<Partner>" in the Partners section
 
     Examples:
-    | Partner   |
-    | MITx      |
-    | HarvardX  |
-    | BerkeleyX |
-    | UTx       |    
+    | Partner     |
+    | MITx        |
+    | HarvardX    |
+    | BerkeleyX   |
+    | UTx         |    
+    | WellesleyX  |
+    | GeorgetownX |  
 
   # # TODO: Add scenario that tests the courses available
   # # using a policy or a configuration file

@@ -2,7 +2,7 @@
 #  MITx/3.091x/2012_Fall
 #  MITx/6.002x/2012_Fall
 #  MITx/6.00x/2012_Fall
-#  HarvardX/CS50x/2012
+#  HarvardX/CS50x/2012 (we will not be testing this, as it is anomolistic)
 #  HarvardX/PH207x/2012_Fall
 #  BerkeleyX/CS169.1x/2012_Fall
 #  BerkeleyX/CS169.2x/2012_Fall
@@ -13,7 +13,6 @@
 #  git clone https://github.com/MITx/6.00x.git
 #  git clone https://github.com/MITx/content-mit-6002x.git
 #  git clone https://github.com/MITx/content-mit-6002x.git
-#  git clone https://github.com/MITx/cs50.git
 #  git clone https://github.com/MITx/content-harvard-id270x.git
 #  git clone https://github.com/MITx/content-berkeley-cs169x.git
 #  git clone https://github.com/MITx/content-berkeley-cs169.2x.git
@@ -36,11 +35,6 @@ Feature: There are courses on the homepage
 
   Scenario: Navigate through course MITx/6.00x/2012_Fall
     Given I am registered for course "MITx/6.00x/2012_Fall"
-    And I log in
-    Then I verify all the content of each course
-
-  Scenario: Navigate through course HarvardX/CS50x/2012
-    Given I am registered for course "HarvardX/CS50x/2012"
     And I log in
     Then I verify all the content of each course
 
