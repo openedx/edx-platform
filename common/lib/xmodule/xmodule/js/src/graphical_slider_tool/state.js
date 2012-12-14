@@ -83,19 +83,48 @@ define('State', ['logme'], function (logme) {
             plotDiv.bind('update_plot', callback);
         }
 
-        function getParameterValue(constName) {
+        function getParameterValue(paramName) {
 
-
-            if (constants.hasOwnProperty(constName) === false) {
-                // If the name of the constant is not tracked by state, return an
-                // 'undefined' value.
+            // If the name of the constant is not tracked by state, return an
+            // 'undefined' value.
+            if (parameters.hasOwnProperty(paramName) === false) {
                 return;
             }
 
-            return constants[constName];
+            return parameters[paramname].value;
         }
 
-        function setConstValue(constName, constValue) {
+        // ####################################################################
+        //
+        // Function: setParameterValue(paramName, paramValue, element)
+        // --------------------------------------------------
+        //
+        // This function can be called from a callback, registered by a slider
+        // or a text input, when specific events ('slide' or 'change') are
+        // triggered.
+        //
+        // The 'paramName' is the name of the parameter in 'parameters' object
+        // whose value must be updated to the new value of 'paramValue'.
+        //
+        // Before we update the value, we must check that:
+        //
+        //     1.) the parameter named as 'paramName' actually exists in the
+        //         'parameters' object;
+        //     2.) the value 'paramValue' is a valid floating-point number, and
+        //         it lies within the range specified by the 'min' and 'max'
+        //         properties of the stored parameter object.
+        //
+        // If 'paramName' and 'paramValue' turn out to be valid, we will update
+        // the stored value in the parameter with the new value, and also
+        // update all of the text inputs and the slider that correspond to this
+        // parameter (if any), so that they reflect the new parameter's value.
+        //
+        // If something went wrong (for example the new value is outside the
+        // allowed range), then we will reset the 'element' to display the
+        // original value.
+        //
+        // ####################################################################
+        function setParameterValue(paramName, paramValue, element) {
             var inputDiv;
 
             if (constants.hasOwnProperty(constName) === false) {
@@ -119,7 +148,7 @@ define('State', ['logme'], function (logme) {
             if (inputDiv.length !== 0) {
                 inputDiv.val(constValue);
             }
-        }
+        } // End-of: function setParameterValue
 
         // ####################################################################
         //
@@ -154,27 +183,30 @@ define('State', ['logme'], function (logme) {
         //
         // ####################################################################
         function processParameter(obj) {
-            var newParamObj;
+            var paramName, newParamObj;
 
             if (typeof obj['@var'] !== 'string') {
                 logme(
-                    '[ERROR] state.processParameter(obj): obj["' + attrName + '"] is not a string.'
+                    '[ERROR] State.processParameter(obj): obj["@var"] is not a string.',
+                    obj['@var'],
+                    '---> Not adding a parameter.'
                 );
-            }
 
-            newParamObj = {};
-
-            processString('@var', 'name');
-
-            processFloat('@min', 'min');
-            processFloat('@max', 'max');
-            processFloat('@initial', 'value');
-
-            if (checkRequired('name', 'min', 'max', 'value') === false) {
-                logme('Not creating a parameter.');
                 return;
             }
 
+            paramName = obj['@var'];
+            newParamObj = {};
+
+            if (
+                (processFloat('@min', 'min') === false) ||
+                (processFloat('@max', 'max') === false) ||
+                (processFloat('@initial', 'value') === false)
+            ) {
+                logme('---> Not adding a parameter named "' + paramName + '".');
+
+                return;
+            }
 
             constants[constName] = constValue;
 
@@ -185,10 +217,11 @@ define('State', ['logme'], function (logme) {
 
                 if (typeof obj[attrName] !== 'string') {
                     logme(
-                        '[ERROR] state.processParameter(obj): obj["' + attrName + '"] is not a string.'
+                        '[ERROR] state.processParameter(obj): obj["' + attrName + '"] is not a string.',
+                        obj[attrName]
                     );
 
-                    return;
+                    return false;
                 } else {
                     attrValue = parseFloat(obj[attrName]);
 
@@ -197,62 +230,15 @@ define('State', ['logme'], function (logme) {
                             '[ERROR] state.processParameter(obj): for attrName = "' + attrName + '" attrValue is NaN.'
                         );
 
-                        return;
+                        return false;
                     }
                 }
 
                 newParamObj[newAttrName] = paramValue;
-            }
 
-            function processString(attrName, newAttrName) {
-                if (typeof obj[attrName] !== 'string') {
-                    logme(
-                        '[ERROR] state.processParameter(obj): obj["' + attrName + '"] is not a string.'
-                    );
-
-                    return;
-                }
-
-                newParamObj[newAttrName] = obj[attrName];
-            }
-        }
-
-        function addConstFromSlider(obj) {
-            var constName, constValue, rangeBlobs;
-
-            // The name of the constant is obj['@var']. The value (initial) of
-            // the constant is the second blob of the 'range' parameter of the
-            // slider which is obj['@range']. Multiple sliders and/or inputs
-            // can represent the same constant - therefore 'initial' is in
-            // brackets. The range is a string composed of 3 blobs, separated
-            // by commas.
-
-            if (typeof obj['@var'] === 'undefined') {
-                return;
-            }
-
-            constName = obj['@var'];
-
-            if (typeof obj['@range'] !== 'string') {
-                constValue = 0;
-            } else {
-                rangeBlobs = obj['@range'].split(',');
-
-                // We must have gotten exactly 3 blobs (pieces) from the split.
-                if (rangeBlobs.length !== 3) {
-                    constValue = 0;
-                } else {
-                    // Get the second blob from the split string.
-                    constValue = parseFloat(rangeBlobs[1]);
-
-                    if (isNaN(constValue) === true) {
-                        constValue = 0;
-                    }
-                }
-            }
-
-            constants[constName] = constValue;
-        }
+                return true;
+            } // End-of: function processFloat
+        } // End-of: function processParameter
     } // End-of: function State
 });
 
