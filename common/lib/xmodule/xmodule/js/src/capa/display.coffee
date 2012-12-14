@@ -211,7 +211,7 @@ class @Problem
     fd.append('grader_id', grader_id)
     if(!score)
       @gentle_alert "You need to pick a rating before you can submit."
-      return 
+      return
     else
       fd.append('score', score)
 
