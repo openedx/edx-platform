@@ -7,6 +7,7 @@ import time
 from contentstore.utils import get_modulestore
 from util.converters import jsdate_to_time, time_to_date
 from cms.djangoapps.models.settings import course_grading
+from cms.djangoapps.contentstore.utils import update_item
 
 class CourseDetails:
     def __init__(self, location):
@@ -117,16 +118,16 @@ class CourseDetails:
         # NOTE: below auto writes to the db w/o verifying that any of the fields actually changed
         # to make faster, could compare against db or could have client send over a list of which fields changed.
         temploc = Location(course_location)._replace(category='about', name='syllabus')
-        get_modulestore(temploc).update_item(temploc, jsondict['syllabus'])
+        update_item(temploc, jsondict['syllabus'])
 
         temploc = temploc._replace(name='overview')
-        get_modulestore(temploc).update_item(temploc, jsondict['overview'])
+        update_item(temploc, jsondict['overview'])
         
         temploc = temploc._replace(name='effort')
-        get_modulestore(temploc).update_item(temploc, jsondict['effort'])
+        update_item(temploc, jsondict['effort'])
         
         temploc = temploc._replace(name='video')
-        get_modulestore(temploc).update_item(temploc, jsondict['intro_video'])
+        update_item(temploc, jsondict['intro_video'])
         
                     
         # Could just generate and return a course obj w/o doing any db reads, but I put the reads in as a means to confirm
