@@ -356,7 +356,8 @@ CMS.Views.Settings.Grading = CMS.Views.ValidatingView.extend({
 		
 		return this;
 	},
-	addAssignmentType : function() {
+	addAssignmentType : function(e) {
+		e.preventDefault();
 		this.model.get('graders').push({});
 	},
 	fieldToSelectorMap : {
@@ -461,7 +462,6 @@ CMS.Views.Settings.Grading = CMS.Views.ValidatingView.extend({
 		// 0th ele doesn't have a bar; so, will never invoke this
 		var cachethis = this;
 		return function(event, ui) {
-			ui.element.height("50px");
 			var barIndex = ui.element.index();
 			// min and max represent limits not labels (note, can's make smaller than 3 points wide)
 			var min = (barIndex < cachethis.descendingCutoffs.length ? cachethis.descendingCutoffs[barIndex]['cutoff'] + 3 : 3);
@@ -487,7 +487,6 @@ CMS.Views.Settings.Grading = CMS.Views.ValidatingView.extend({
 		var cachethis = this;
 		return function(event, ui) {
 			// for some reason the resize is setting height to 0
-			ui.element.height("50px");
 			cachethis.saveCutoffs();
 		}
 	},
@@ -503,6 +502,7 @@ CMS.Views.Settings.Grading = CMS.Views.ValidatingView.extend({
 	},
 	
 	addNewGrade: function(e) {
+		e.preventDefault();
 		var gradeLength = this.descendingCutoffs.length; // cutoffs doesn't include fail/f so this is only the passing grades
 		if(gradeLength > 3) {
 			// TODO shouldn't we disable the button
@@ -541,6 +541,7 @@ CMS.Views.Settings.Grading = CMS.Views.ValidatingView.extend({
 	},
 	
 	removeGrade: function(e) {
+		e.preventDefault();
 		var domElement = $(e.currentTarget).closest('li');
 		var index = domElement.index();
 		// copy the boundary up to the next higher grade then remove
@@ -614,8 +615,9 @@ CMS.Views.Settings.GraderView = CMS.Views.ValidatingView.extend({
 			
 		}
 	},
-	deleteModel : function() {
+	deleteModel : function(e) {
 		this.model.destroy();
+		e.preventDefault();
 	}
 	
 });

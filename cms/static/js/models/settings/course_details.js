@@ -56,11 +56,12 @@ CMS.Models.Settings.CourseDetails = Backbone.Model.extend({
 			for (var i=0; i<videos.length; i++) {
 				// doesn't call parseFloat or Number b/c they stop on first non parsable and return what they have
 				if (!isFinite(videos[i].speed)) vid_errors.push(videos[i].speed + " is not a valid speed.");
+				else if (!videos[i].key) vid_errors.push(videos[i].speed + " does not have a video id");
 				// can't use get from client to test if video exists b/c of CORS (crossbrowser get not allowed)
 				// GET "http://gdata.youtube.com/feeds/api/videos/" + videokey
 			}
 			if (!_.isEmpty(vid_errors)) {
-				errors.intro_video = vid_errors.join('/n');
+				errors.intro_video = vid_errors.join(' ');
 			}
 		}
 		if (!_.isEmpty(errors)) return errors;
@@ -75,8 +76,8 @@ CMS.Models.Settings.CourseDetails = Backbone.Model.extend({
 	_videoprefix : /\s*<video\s*youtube="/g,
 	// the below is lax to enable validation
 	_videospeedparse : /[^:]*/g, // /\d+\.?\d*(?=:)/g,
-	_videokeyparse : /([^,\/]+)/g,
-	_videonosuffix : /[^\"]+/g,
+	_videokeyparse : /([^,\/>]+)/g,
+	_videonosuffix : /[^"\/>]+/g,
 	_getNextMatch : function (regex, string, cursor) {
 		regex.lastIndex = cursor;
 		var result = regex.exec(string);
@@ -112,13 +113,15 @@ CMS.Models.Settings.CourseDetails = Backbone.Model.extend({
 				cursor = this._videokeyparse.lastIndex + 1;
 				while (cursor < videostring.length && bestspeed != 1.0) {
 					parsedspeed = this._getNextMatch(this._videospeedparse, videostring, cursor);
-					cursor = this._videospeedparse.lastIndex + 1;
+					if (parsedspeed) cursor = this._videospeedparse.lastIndex + 1;
+					else break;
 					if (Math.abs(Number(parsedspeed) - 1.0) < Math.abs(bestspeed - 1.0)) {
 						bestspeed = Number(parsedspeed);
 						bestkey = this._getNextMatch(this._videokeyparse, videostring, cursor);
 					}
 					else this._getNextMatch(this._videokeyparse, videostring, cursor);
-					cursor = this._videokeyparse.lastIndex + 1;
+					if (this._videokeyparse.lastIndex > cursor)	cursor = this._videokeyparse.lastIndex + 1;
+					else cursor++;
 				}
 			}
 			else {
@@ -141,12 +144,13 @@ CMS.Models.Settings.CourseDetails = Backbone.Model.extend({
 		cursor = 0;
 		// parsed to "fff:kkk,fff:kkk"
 		var result = new Array();
+		if (!videostring || videostring.length == 0) return result;
 		while (cursor < videostring.length) {
 			var speed = this._getNextMatch(this._videospeedparse, videostring, cursor);
 			if (speed) cursor = this._videospeedparse.lastIndex + 1;
 			else return result;
 			var key = this._getNextMatch(this._videokeyparse, videostring, cursor);
-			cursor = this._videokeyparse.lastIndex + 1;
+			if (key) cursor = this._videokeyparse.lastIndex + 1;
 			// See the WTF above
 			if (_.isArray(key)) key = key[0];
 			result.push({speed: speed, key: key});

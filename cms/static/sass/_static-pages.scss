@@ -7,7 +7,12 @@
   }
 
   .unit-body {
-    padding: 30px 40px;
+    padding: 0;
+  }
+
+  .component-editor {
+    border: none;
+    border-radius: 0;
   }
 
   .components > li {
@@ -36,7 +41,7 @@
       }
 
       .drag-handle {
-        background: url(../img/drag-handles.png) center no-repeat $lightGrey;
+        background: url(../img/drag-handles.png) center no-repeat #fff;
       }
     }
 
@@ -46,10 +51,10 @@
       z-index: 11;
       width: 35px;
       border: none;
-      background: url(../img/drag-handles.png) center no-repeat $lightGrey;
+      background: url(../img/drag-handles.png) center no-repeat #fff;
 
       &:hover {
-        background: url(../img/drag-handles.png) center no-repeat $lightGrey;
+        background: url(../img/drag-handles.png) center no-repeat #fff;
       }
     }
 
@@ -60,16 +65,24 @@
   }
 
   .component.editing {
+    border-left: 1px solid $mediumGrey;
+    border-right: 1px solid $mediumGrey;
+
     .xmodule_display {
       display: none;
     }
+  }
+
+  .new .xmodule_display {
+    background: $yellow;
   }
 
   .xmodule_display {
     padding: 20px 20px 22px;
     font-size: 24px;
     font-weight: 300;
-    background: $lightGrey;
+    background: #fff;
+    @include transition(background-color 3s);
   }
 
   .static-page-item {

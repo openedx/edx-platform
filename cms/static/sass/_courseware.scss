@@ -1,21 +1,18 @@
+
 input.courseware-unit-search-input {
 	float: left;
 	width: 260px;
 	background-color: #fff;
 }
 
-.courseware-overview {
-	
-}
-
 .courseware-section {
 	position: relative;
 	background: #fff;
-	border: 1px solid $darkGrey;
 	border-radius: 3px;
-	margin: 10px 0;
+	border: 1px solid $mediumGrey;
+	margin-top: 15px;
 	padding-bottom: 12px;
-	@include box-shadow(0 1px 2px rgba(0, 0, 0, .1));
+	@include box-shadow(0 1px 1px rgba(0, 0, 0, 0.1));
 
 	&:first-child {
 		margin-top: 0;
@@ -139,6 +136,10 @@ input.courseware-unit-search-input {
 		}
 	}
 
+	.section-name-form {
+		margin-bottom: 15px;
+	}
+
 	.section-name-edit {
 		input {
 			font-size: 16px;
@@ -192,6 +193,17 @@ input.courseware-unit-search-input {
 	}
 }
 
+.collapse-all-button {
+	float: right;
+	margin-top: 10px;
+	font-size: 13px;
+	color: $darkGrey;
+
+	.collapse-all-icon {
+		margin-right: 6px;
+	}
+}
+
 .new-section-name,
 .new-subsection-name-input {
 	width: 515px;
@@ -200,7 +212,7 @@ input.courseware-unit-search-input {
 .new-section-name-save,
 .new-subsection-name-save {
 	@include blue-button;
-	padding: 6px 20px 8px;
+	padding: 4px 20px 7px;
 	margin: 0 5px;
 	color: #fff !important;
 }
@@ -208,7 +220,7 @@ input.courseware-unit-search-input {
 .new-section-name-cancel,
 .new-subsection-name-cancel {
 	@include white-button;
-	padding: 2px 20px 5px;
+	padding: 4px 20px 7px;
 	color: #8891a1 !important;
 }
 
@@ -291,4 +303,11 @@ input.courseware-unit-search-input {
 	.cancel-button {
 		font-size: 16px;
 	}
+}
+
+.collapse-all-button {
+	float: right;
+	margin-top: 10px;
+	font-size: 13px;
+	color: $darkGrey;
 }

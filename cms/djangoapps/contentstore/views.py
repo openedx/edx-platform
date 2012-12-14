@@ -995,7 +995,7 @@ def get_course_settings(request, org, course, name):
     course_details = CourseDetails.fetch(location)
     
     return render_to_response('settings.html', {
-        'active_tab': 'settings-tab', 
+        'active_tab': 'settings', 
         'context_course': course_module,
         'course_details' : json.dumps(course_details, cls=CourseSettingsEncoder)
     })

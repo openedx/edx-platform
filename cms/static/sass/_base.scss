@@ -6,11 +6,15 @@
 
 body {
     min-width: 980px;
-    background: #f3f4f5;
-    font-family: 'Open Sans', sans-serif;
+    background: rgb(240, 241, 245);
     font-size: 16px;
     line-height: 1.6;
-    color: #3c3c3c;
+    color: $baseFontColor;
+}
+
+body,
+input {
+    font-family: 'Open Sans', sans-serif;
 }
 
 a {
@@ -26,7 +30,8 @@ a {
 h1 {
     float: left;
     font-size: 28px;
-    margin: 36px 6px;
+    font-weight: 300;
+    margin: 24px 6px;
 }
 
 .waiting {
@@ -34,8 +39,7 @@ h1 {
 }
 
 .page-actions {
-    float: right;
-    margin-top: 42px;
+    margin-bottom: 30px;
 }
 
 .main-wrapper {
@@ -51,13 +55,6 @@ h1 {
     > article {
         clear: both;
     }
-}
-
-.window {
-    background: #fff;
-    border: 1px solid $darkGrey;
-    border-radius: 3px;
-    @include box-shadow(0 1px 2px rgba(0, 0, 0, .1));
 }
 
 .sidebar {
@@ -80,23 +77,29 @@ footer {
 
 input[type="text"],
 input[type="email"],
-input[type="password"] {
+input[type="password"],
+textarea.text {
     padding: 6px 8px 8px;
     @include box-sizing(border-box);
-    border: 1px solid #b0b6c2;
+    border: 1px solid $mediumGrey;
     border-radius: 2px;
-    @include linear-gradient(top, rgba(255, 255, 255, 0), rgba(255, 255, 255, .3));
-    background-color: #edf1f5;
+    @include linear-gradient($lightGrey, tint($lightGrey, 90%));
+    background-color: $lightGrey;
     @include box-shadow(0 1px 2px rgba(0, 0, 0, .1) inset);
     font-family: 'Open Sans', sans-serif;
     font-size: 11px;
-    color: #3c3c3c;
+    color: $baseFontColor;
     outline: 0;
 
     &::-webkit-input-placeholder,
     &:-moz-placeholder,
     &:-ms-input-placeholder {
         color: #979faf;
+    }
+
+    &:focus {
+      @include linear-gradient($paleYellow, tint($paleYellow, 90%));
+      outline: 0;
     }
 }
 
@@ -107,7 +110,7 @@ input.search {
     border-radius: 20px;
     background: url(../img/search-icon.png) no-repeat 8px 7px #edf1f5;
     font-family: 'Open Sans', sans-serif;
-    color: #3c3c3c;
+    color: $baseFontColor;
     outline: 0;
 
     &::-webkit-input-placeholder {
@@ -126,12 +129,18 @@ code {
     font-family: Monaco, monospace;
 }
 
+.CodeMirror {
+    font-size: 13px;
+    border: 1px solid $darkGrey;
+    background: #fff;
+}
+
 .text-editor {
     width: 100%;
     min-height: 80px;
     padding: 10px;
     @include box-sizing(border-box);
-    border: 1px solid #b0b6c2;
+    border: 1px solid $mediumGrey;
     @include linear-gradient(top, rgba(255, 255, 255, 0), rgba(255, 255, 255, 0.3));
     background-color:  #edf1f5;
     @include box-shadow(0 1px 2px rgba(0, 0, 0, 0.1) inset);
@@ -173,27 +182,32 @@ code {
     padding: 10px 0;
 }
 
+.details {
+    display: none;
+    margin-bottom: 30px;
+    font-size: 14px;
+}
+
 .window {
     margin-bottom: 20px;
+    border: 1px solid $mediumGrey;
+    border-radius: 3px;
+    background: #fff;
+    @include box-shadow(0 1px 1px rgba(0, 0, 0, 0.1));
 
     .window-contents {
         padding: 20px;
     }
 
-    .details {
-      margin-bottom: 30px;
-      font-size: 14px;
-    }
-
     h4 {
         padding: 6px 14px;
-        border-bottom: 1px solid #cbd1db;
-        border-radius: 3px 3px 0 0;
-        @include linear-gradient(top, rgba(255, 255, 255, .3), rgba(255, 255, 255, 0) 70%);
-        background-color: #edf1f5;
-        @include box-shadow(0 1px 0 rgba(255, 255, 255, .7) inset);
+        border-bottom: 1px solid $mediumGrey;
+        border-radius: 2px 2px 0 0;
+        @include linear-gradient(top, rgba(255, 255, 255, .4), rgba(255, 255, 255, 0));
+        background-color: $lightBluishGrey;
+        @include box-shadow(0 1px 0 rgba(255, 255, 255, 0.2) inset);
         font-size: 14px;
-        font-weight: 600;
+        text-shadow: 0 1px 0 rgba(255, 255, 255, 0.3);
     }
 
     label {
@@ -345,8 +359,9 @@ body.show-wip {
 }
 
 .new-button {
-    @include grey-button;
-    padding: 20px 0;
+    @include green-button;
+    font-size: 13px;
+    padding: 8px 20px 10px;
     text-align: center;
 
     &.big {
@@ -367,6 +382,13 @@ body.show-wip {
   .delete-icon {
     margin-right: 4px;
   }
+}
+
+.delete-button.standard {
+
+    &:hover {
+      background-color: tint($orange, 75%);
+    }
 }
 
 .tooltip {

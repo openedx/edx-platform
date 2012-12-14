@@ -5,18 +5,15 @@ body.no-header {
 }
 
 @mixin active {
-	@include linear-gradient(top, rgba(0, 0, 0, 0.6), rgba(0, 0, 0, 0.3));
-	@include box-shadow(0 2px 8px rgba(0, 0, 0, .7) inset);
+	@include linear-gradient(top, rgba(255, 255, 255, .4), rgba(255, 255, 255, 0));
+	background-color: rgba(255, 255, 255, .3);
+	@include box-shadow(0 -1px 0 rgba(0, 0, 0, .2) inset, 0 1px 0 #fff inset);
+	text-shadow: 0 1px 0 rgba(255, 255, 255, 0.5);
 }
 
 .primary-header {
 	width: 100%;
-	height: 36px;
-	border-bottom: 1px solid #2c2e33;
-	@include linear-gradient(top, #686b76, #54565e);
-	font-size: 13px;
-	color: #fff;
-	@include box-shadow(0 1px 1px rgba(0, 0, 0, 0.2), 0 -1px 0px rgba(255, 255, 255, 0.05) inset);
+	margin-bottom: 30px;
 
 	&.active-tab-courseware #courseware-tab {
 		@include active;
@@ -34,23 +31,16 @@ body.no-header {
 		@include active;
 	}
 
+	&.active-tab-settings #settings-tab {
+		@include active;
+	}
+
 	&.active-tab-import #import-tab {
 		@include active;
 	}
 
-	#import-tab {
-		@include box-shadow(1px 0 0 #787981 inset, -1px 0 0 #3d3e44 inset, 1px 0 0 #787981, -1px 0 0 #3d3e44);
-	}
-
-	.left {
-		width: 750px;
-	}
-
-	.class-name {
-		max-width: 350px;
-		text-overflow: ellipsis;
-    white-space: nowrap;
-    overflow: hidden;
+	&.active-tab-export #export-tab {
+		@include active;
 	}
 
 	.drop-icon {
@@ -63,26 +53,57 @@ body.no-header {
 		line-height: 18px;
 	}
 
-	a,
-	.username {
-		float: left;
-		display: inline-block;
-		height: 29px;
-		padding: 7px 15px 0;
-		color: #e4e6ee;
+	.class-nav-bar {
+		clear: both;
+		@include linear-gradient(top, rgba(255, 255, 255, .4), rgba(255, 255, 255, 0));
+		background-color: $lightBluishGrey;
+		@include box-shadow(0 1px 0 rgba(255, 255, 255, 0.2) inset, 0 -1px 0 rgba(0, 0, 0, 0.2) inset);
 	}
 
-	.class-nav,
-	.class-nav li {
-		float: left;
-	}
+	.class-nav {
+		@include clearfix;		
 
-	a {
-		@include box-shadow(1px 0 0 #787981 inset, -1px 0 0 #3d3e44 inset, 1px 0 0 #787981, -1px 0 0 #3d3e44);
+		a {
+			float: left;
+			display: inline-block;
+			padding: 15px 25px 17px;
+			font-size: 15px;
+			color: #3c3c3c;
+			text-shadow: 0 1px 0 rgba(255, 255, 255, 0.3);
 
-		&:hover {
-			background: rgba(255, 255, 255, .1);
+			&:hover {
+				@include linear-gradient(top, rgba(255, 255, 255, .2), rgba(255, 255, 255, 0));
+			}
 		}
 
+		li {
+			float: left;
+		}
+	}
+
+	.class {
+		@include clearfix;
+		height: 100%;
+		font-size: 12px;
+		color: rgb(163, 171, 184);
+		@include linear-gradient(top, rgba(255, 255, 255, 0), rgba(255, 255, 255, .1));
+		background-color: rgb(47, 53, 63);
+
+		a {
+			display: inline-block;
+			height: 20px;
+			padding: 5px 10px 6px;
+			color: rgb(163, 171, 184);			
+		}
+
+		.home {
+			position: relative;
+			top: 1px;
+		}
+
+		.log-out {
+			position: relative;
+			top: 3px;
+		}
 	}
 }
