@@ -209,8 +209,8 @@ class @Problem
     fd.append('feedback', feedback)
     fd.append('submission_id', submission_id)
     fd.append('grader_id', grader_id)
-    if(score)
-      fd.append('score', score)
+    if(score && parseInt(score) != NaN)
+      fd.append('score', parseInt(score))
 
 
     settings =
