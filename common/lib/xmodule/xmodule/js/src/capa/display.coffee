@@ -209,9 +209,11 @@ class @Problem
     fd.append('feedback', feedback)
     fd.append('submission_id', submission_id)
     fd.append('grader_id', grader_id)
-    if(!score || parseInt(score) == NaN)
-      @gentle_alert "You need to pick a rating to submit."
+    if(!score)
+      @gentle_alert "You need to pick a rating before you can submit."
       return 
+    else
+      fd.append('score', score)
 
 
     settings =
