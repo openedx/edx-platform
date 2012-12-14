@@ -124,11 +124,11 @@
 <script src="${static.url('js/vendor/timepicker/datepair.js')}"></script>
 <script src="${static.url('js/vendor/date.js')}"></script>
 <script type="text/javascript">
-    (function() {
-      $body = $('body');  
-      $('.gradable-status .menu-toggle').bind('click', showGradeMenu);
-      $('.gradable-status .menu').bind('click', selectGradeType);
-    })();
+//    (function() {
+//      $body = $('body');  
+//      $('.gradable-status .menu-toggle').bind('click', showGradeMenu);
+//      $('.gradable-status .menu').bind('click', selectGradeType);
+//    })();
 
     $(document).ready(function() {
         // expand the due-date area if the values are set
@@ -140,33 +140,25 @@
     })
 
     // grading status
-    function showGradeMenu(e) {
+//    function selectGradeType(e) {
+//      e.preventDefault();
 
-      $section = $(this).closest('.gradable-status');
-
-      e.preventDefault();
-      $section.toggleClass('is-active');
-    }
-
-    function selectGradeType(e) {
-      e.preventDefault();
-
-      var $section = $(this).closest('.gradable-status');
-      $section.find('.menu li a').removeClass('is-selected');
+//      var $section = $(this).closest('.gradable-status');
+//      $section.find('.menu li a').removeClass('is-selected');
 
 
-      var $target = $(e.target).addClass('is-selected');
-      var $label = $section.find('.status-label');
+//      var $target = $(e.target).addClass('is-selected');
+//      var $label = $section.find('.status-label');
 
-      $section.removeClass('is-active');      
-      $label.html($target.html());
+//      $section.removeClass('is-active');      
+//      $label.html($target.html());
 
-      if ($target.hasClass('gradable-status-notgraded')) {
-        $section.removeClass('is-set');
-      }
-      else {
-        $section.addClass('is-set');
-      }
-    }
+//      if ($target.hasClass('gradable-status-notgraded')) {
+//        $section.removeClass('is-set');
+//      }
+//      else {
+//        $section.addClass('is-set');
+//      }
+//    }
 </script>
 </%block>

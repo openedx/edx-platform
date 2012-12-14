@@ -37,7 +37,6 @@ CMS.Models.Location = Backbone.Model.extend({
 					org: this._fieldPattern.exec(payload)[0],
 					course: this._fieldPattern.exec(payload)[0],
 					category: this._fieldPattern.exec(payload)[0],
-					// FIXME handle no trailing /
 					name: this._fieldPattern.exec(payload)[0]
 				}
 			}

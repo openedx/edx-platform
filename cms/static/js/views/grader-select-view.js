@@ -1,5 +1,4 @@
 CMS.Models.AssignmentGrade = Backbone.Model.extend({
-	idAttribute : "cid",	// not sure if this is kosher
 	defaults : {
 		graderType : null, // the type label (string). May be "Not Graded" which implies None. I'd like to use id but that's ephemeral
 		location : null	// A location object
@@ -35,7 +34,7 @@ CMS.Views.OverviewAssignmentGrader = Backbone.View.extend({
 		this.template = _.template(
 				// TODO move to a template file
 				'<h4 class="status-label"><%= assignmentType %></h4>' +
-				'<a data-tooltip="Mark/unmark this section as graded" class="menu-toggle" href="#">' +
+				'<a data-tooltip="Mark/unmark this subsection as graded" class="menu-toggle" href="#">' +
 					'<span class="ss-icon ss-standard">&#x2713;</span>' +
 				'</a>' +
 				'<ul class="menu">' + 

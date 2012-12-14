@@ -352,7 +352,6 @@ def assignment_type_update(request, org, course, category, name):
         raise HttpResponseForbidden()
     
     if request.method == 'GET':
-        # Cannot just do a get w/o knowing the course name :-(
         return HttpResponse(json.dumps(CourseGradingModel.get_section_grader_type(location)), 
                             mimetype="application/json")
     elif request.method == 'POST': # post or put, doesn't matter.
