@@ -56,10 +56,6 @@ CMS.Models.Settings.CourseGrader = Backbone.Model.extend({
         "short_label" : "",	// what to use in place of type if space is an issue 
         "weight" : 0 // int 0..100
     },
-    initialize: function() {
-    	if (!this.collection)
-    		console.log("damn");
-    },
     parse : function(attrs) {
     	if (attrs['weight']) {
     		if (!_.isNumber(attrs.weight)) attrs.weight = parseInt(attrs.weight);

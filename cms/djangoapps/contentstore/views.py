@@ -167,6 +167,7 @@ def course_index(request, org, course, name):
         'active_tab': 'courseware',
         'context_course': course,
         'sections': sections,
+        'course_graders': json.dumps(CourseGradingModel.fetch(course.location).graders),
         'parent_location': course.location,
         'new_section_template': Location('i4x', 'edx', 'templates', 'chapter', 'Empty'),
         'new_subsection_template': Location('i4x', 'edx', 'templates', 'sequential', 'Empty'),  # for now they are the same, but the could be different at some point...
@@ -339,6 +340,24 @@ def preview_component(request, location):
         'editor': wrap_xmodule(component.get_html, component, 'xmodule_edit.html')(),
     })
 
+@expect_json
+@login_required
+@ensure_csrf_cookie
+def assignment_type_update(request, org, course, category, name):
+    '''
+    CRUD operations on assignment types for sections and subsections and anything else gradable.
+    '''
+    location = Location(['i4x', org, course, category, name])
+    if not has_access(request.user, location):
+        raise HttpResponseForbidden()
+    
+    if request.method == 'GET':
+        return HttpResponse(json.dumps(CourseGradingModel.get_section_grader_type(location)), 
+                            mimetype="application/json")
+    elif request.method == 'POST': # post or put, doesn't matter.
+        return HttpResponse(json.dumps(CourseGradingModel.update_section_grader_type(location, request.POST)),  
+                            mimetype="application/json")
+    
 
 def user_author_string(user):
     '''Get an author string for commits by this user.  Format:

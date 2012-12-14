@@ -16,6 +16,28 @@
   <script src="${static.url('js/vendor/timepicker/jquery.timepicker.js')}"></script>
   <script src="${static.url('js/vendor/timepicker/datepair.js')}"></script>
   <script src="${static.url('js/vendor/date.js')}"></script>
+  <script type="text/javascript" src="${static.url('js/models/course_relative.js')}"></script>
+  <script type="text/javascript" src="${static.url('js/views/grader-select-view.js')}"></script>
+  <script type="text/javascript" src="${static.url('js/models/settings/course_grading_policy.js')}"></script>
+
+  <script type="text/javascript">
+  $(document).ready(function(){
+    // TODO figure out whether these should be in window or someplace else or whether they're only needed as local vars
+    // I believe that current (New Section/New Subsection) cause full page reloads which means these aren't needed globally
+    // but we really should change that behavior.
+    window.graderTypes = new CMS.Models.Settings.CourseGraderCollection();
+    window.graderTypes.course_location = new CMS.Models.Location('${parent_location}');
+    window.graderTypes.reset(${course_graders|n});
+    
+    $(".gradable-status").each(function(index, ele) {
+        var gradeView = new CMS.Views.OverviewAssignmentGrader({
+            el : ele,
+            graders : window.graderTypes
+        });
+    });
+  });
+  
+  </script>
 </%block>
 
 <%block name="header_extras">
@@ -77,8 +99,6 @@
       </ol>
     </li>
   </script>
-
-
 </%block>
 
 <%block name="content">
@@ -106,7 +126,8 @@
         % for section in sections:
         <section class="courseware-section branch" data-id="${section.location}">
           <header>
-            <a href="#" data-tooltip="Collapse/expand this section" class="expand-collapse-icon collapse"></a>
+            <a href="#" data-tooltip="Expand/collapse this section" class="expand-collapse-icon collapse"></a>
+
             <div class="item-details" data-id="${section.location}">
               <h3 class="section-name">
                 <span data-tooltip="Edit this section's name" class="section-name-span">${section.display_name}</span>
@@ -129,8 +150,13 @@
                   <span class="published-status"><strong>Will Release:</strong> ${start_date_str} at ${start_time_str}</span>
                   <a href="#" class="edit-button" data-date="${start_date_str}" data-time="${start_time_str}" data-id="${section.location}">Edit</a>
                 %endif
-              </div>
+              </div>              
             </div>
+            
+           <!-- temporarily disable until we figure out inheritance
+            <div class="gradable-status" data-initial-status="${section.metadata.get('format', 'Not Graded')}">
+            </div> -->
+            
             <div class="item-actions">
               <a href="#" data-tooltip="Delete this section" class="delete-button delete-section-button"><span class="delete-icon"></span></a>
               <a href="#" data-tooltip="Drag to reorder" class="drag-handle"></a>
@@ -146,13 +172,17 @@
               % for subsection in section.get_children():
               <li class="branch collapsed" data-id="${subsection.location}">
                 <div class="section-item">
-                  <div>
-                    <a href="#" data-tooltip="Collapse/expand this subsection" class="expand-collapse-icon expand"></a>
+                  <div class="details">
+                    <a href="#" data-tooltip="Expand/collapse this subsection" class="expand-collapse-icon expand"></a>
                     <a href="${reverse('edit_subsection', args=[subsection.location])}">
                       <span class="folder-icon"></span>
                       <span class="subsection-name"><span class="subsection-name-value">${subsection.display_name}</span></span>
                     </a>
                   </div>
+                  
+                  <div class="gradable-status" data-initial-status="${subsection.metadata.get('format', 'Not Graded')}">
+                  </div>
+                  
                   <div class="item-actions">
                     <a href="#" data-tooltip="Delete this subsection" class="delete-button delete-subsection-button"><span class="delete-icon"></span></a>                    
                     <a href="#" data-tooltip="Drag to reorder" class="drag-handle"></a>

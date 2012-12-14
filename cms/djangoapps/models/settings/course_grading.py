@@ -201,8 +201,36 @@ class CourseGradingModel:
             course_location = Location(course_location)
             
         descriptor = get_modulestore(course_location).get_item(course_location)
-        del descriptor.metadata['graceperiod']   
+        if 'graceperiod' in descriptor.metadata: del descriptor.metadata['graceperiod']   
         get_modulestore(course_location).update_metadata(course_location, descriptor.metadata)
+        
+    @staticmethod
+    def get_section_grader_type(location):
+        if not isinstance(location, Location):
+            location = Location(location)
+            
+        descriptor = get_modulestore(location).get_item(location)
+        return {
+                "graderType" : descriptor.metadata.get('format', u"Not Graded"),
+                "location" : location,
+                "id" : 99   # just an arbitrary value to 
+                }
+        
+    @staticmethod
+    def update_section_grader_type(location, jsondict):
+        if not isinstance(location, Location):
+            location = Location(location)
+          
+        descriptor = get_modulestore(location).get_item(location)
+        if 'graderType' in jsondict and jsondict['graderType'] != u"Not Graded":
+            descriptor.metadata['format'] = jsondict.get('graderType')
+            descriptor.metadata['graded'] = True
+        else:
+            if 'format' in descriptor.metadata: del descriptor.metadata['format'] 
+            if 'graded' in descriptor.metadata: del descriptor.metadata['graded'] 
+            
+        get_modulestore(location).update_metadata(location, descriptor.metadata)  
+        
         
     @staticmethod
     def convert_set_grace_period(descriptor):

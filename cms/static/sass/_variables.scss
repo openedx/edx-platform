@@ -10,6 +10,9 @@ $fg-min-width: 810px;
 $sans-serif: 'Open Sans', $verdana;
 $body-line-height: golden-ratio(.875em, 1);
 
+$white: rgb(255,255,255);
+$black: rgb(0,0,0);
+
 $pink: rgb(182,37,104);
 $error-red: rgb(253, 87, 87);
 
@@ -18,6 +21,12 @@ $offBlack: #3c3c3c;
 $black: rgb(0,0,0);
 $white: rgb(255,255,255);
 $blue: #5597dd;
+$lightBlue: tint($blue, 75%);
+$extraLightBlue: tint($lightBlue, 75%);
+$darkBlue: shade($blue, 25%);
+$extraDarkBlue: shade($darkBlue, 25%);
+$lightTransparentBlue: rgba(167, 192, 221, 0.3);
+
 $orange: #edbd3c;
 $red: #b20610;
 $green: #108614;
