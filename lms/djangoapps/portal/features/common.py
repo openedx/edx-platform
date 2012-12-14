@@ -45,21 +45,8 @@ def the_page_title_should_be(step, title):
 
 @step('I am logged in$')
 def i_am_logged_in(step):
-
-    # This is a workaround for now, until askbot is removed
-    # because askbot is messing with the user and auth tables.
-    call_command('loaddata', '/tmp/fixtures/robot_user_active.json')
-    world.browser.cookies.delete()
-    world.browser.visit(django_url('/'))
-    world.browser.is_element_present_by_css('header.global', 10)       
-    world.browser.click_link_by_href('#login-modal')
-    login_form = world.browser.find_by_css('form#login_form')
-    login_form.find_by_name('email').fill('robot@edx.org')
-    login_form.find_by_name('password').fill('test')
-    login_form.find_by_name('submit').click()
-
-    # wait for the page to redraw
-    assert world.browser.is_element_present_by_css('.content-wrapper', 5)
+    world.create_user('robot')
+    world.log_in('robot@edx.org', 'test')
 
 @step('I am not logged in$')
 def i_am_not_logged_in(step):
@@ -67,33 +54,15 @@ def i_am_not_logged_in(step):
 
 @step(u'I am registered for a course$')
 def i_am_registered_for_a_course(step):
-    u = User.objects.get(username='robot2')
+    world.create_user('robot')
+    u = User.objects.get(username='robot')
     CourseEnrollment.objects.create(user=u, course_id='MITx/6.002x/2012_Fall')
-
+    world.log_in('robot@edx.org', 'test')
+    
 @step(u'I am an edX user$')
 def i_am_an_edx_user(step):
-    call_command('loaddata', '/tmp/fixtures/robot_user_active.json')
+    world.create_user('robot')
 
-###########  USER CREATION ##############
 @step(u'User "([^"]*)" is an edX user$')
 def registered_edx_user(step, uname):
-    # This user factory stuff should work after we kill askbot
-    # portal_user = UserFactory.build(username=uname, email=uname + '@edx.org')
-    # portal_user.set_password('test')
-    # portal_user.save()
-
-    # registration = RegistrationFactory(user=portal_user)
-    # registration.register(portal_user)
-    # registration.activate()
-
-    # user_profile = UserProfileFactory(user=portal_user)
-
-    # This is a workaround for now, until askbot is removed
-    # because askbot is messing with the user and auth tables.
-    call_command('loaddata', '/tmp/fixtures/robot_user_active.json')
-
-###########  DEBUGGING ##############
-@step(u'I save a screenshot to "(.*)"')
-def save_screenshot_to(step, filename):
-    world.browser.driver.save_screenshot(filename)
-    
+    world.create_user(uname)

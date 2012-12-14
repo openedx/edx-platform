@@ -85,6 +85,7 @@ def i_am_an_edx_user(step):
     create_user('robot')
 
 #### helper functions
+@world.absorb
 def create_user(uname):
     # This user factory stuff should work after we kill askbot
     portal_user = UserFactory.build(username=uname, email=uname + '@edx.org')
@@ -171,7 +172,3 @@ def save_the_course_content(path='/tmp'):
     f.write(output)
     f.close
 
-###########  DEBUGGING ##############
-@step(u'I save a screenshot to "(.*)"')
-def save_screenshot_to(step, filename):
-    world.browser.driver.save_screenshot(filename)
