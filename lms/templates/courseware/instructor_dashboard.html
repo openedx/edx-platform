@@ -177,10 +177,10 @@ function goto( mode)
 %if modeflag.get('Analytics'):
 
    <p>
-     Number of students enrolled: ${students_enrolled_json['data']['nb_students_enrolled']}
+     Number of students enrolled: ${students_enrolled_json['data']['value']}
    </p>
    <p>
-     Number of active students for the past 7 days: ${students_active_json['data']['nb_students_active']}
+     Number of active students for the past 7 days: ${students_active_json['data']['value']}
    </p>
 
    <p>
@@ -233,7 +233,7 @@ function goto( mode)
      <div class="divScroll">
      <table class="stat_table">
      <tr><th>Module</th><th>Number of students</th></tr>
-     % for k,v in analytics_json['data'].items():
+     % for k,v in attempted_problems['data'].items():
      <tr>
      <td>${k}</td> <td>${v}</td>
      </tr>
@@ -248,18 +248,6 @@ function goto( mode)
      <table class="stat_table">
      <tr><th>Day</td><th>Number of students</td></tr>
      % for k,v in daily_activity_json['data'].items():
-     <tr>
-     <td>${k}</td> <td>${v}</td>
-     </tr>
-     % endfor
-     </table>
-   </p>
-
-   <p>
-     <h2>Daily activity for the past 7 days:</h2>
-     <table class="stat_table">
-     <tr><th>Day</td><th>Number of students</td></tr>
-     % for k,v in students_daily_activity_json['data'].items():
      <tr>
      <td>${k}</td> <td>${v}</td>
      </tr>
