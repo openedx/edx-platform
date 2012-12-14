@@ -198,87 +198,107 @@
             course_target = reverse('about_course', args=[course.id])
           %>
 
-          <a href="${course_target}">
-            <section class="cover" style="background-image: url('${course_image_url(course)}')">
-              <div class="shade"></div>
-              <div class="arrow">&#10095;</div>
-            </section>
 
-            <section class="info">
-              <hgroup>
-                <h2 class="university">${get_course_about_section(course, 'university')}</h2>
-                <h3>${course.number} ${course.title}</h3>
-              </hgroup>
-              <section class="course-status course-status-completed">
-              <p>
+          
+          <a href="${course_target}" class="cover">
+            <img src="${course_image_url(course)}" />
+          </a>
+
+          <section class="info">
+            <hgroup>
+              <p class="date-block">
               % if course.has_ended():
-              Course Completed - <span>${course.end_date_text}</span>
+              Course Completed - ${course.end_date_text}
               % elif course.has_started():
-              Course Started - <span>${course.start_date_text}</span>
+              Course Started - ${course.start_date_text}
               % else:   # hasn't started yet
-              Course Starts - <span>${course.start_date_text}</span>
+              Course Starts - ${course.start_date_text}
               % endif
               </p>
-              </section>
-              % if course.id in show_courseware_links_for:
-                <p class="enter-course">View Courseware</p>
-              % endif
-            </section>
-          </a>
-        </article>
+              <h2 class="university">${get_course_about_section(course, 'university')}</h2>
+              <h3><a href="${course_target}">${course.number} ${course.title}</a></h3>
+            </hgroup>
 
-        <%
-        cert_status = cert_statuses.get(course.id)
-        %>
-        % if course.has_ended() and cert_status:
-            <%
-            if cert_status['status'] == 'generating':
-                status_css_class = 'course-status-certrendering'
-            elif cert_status['status'] == 'ready':
-                status_css_class = 'course-status-certavailable'
-            elif cert_status['status'] == 'notpassing':
-                status_css_class = 'course-status-certnotavailable'
-            else:
-                status_css_class = 'course-status-processing'
-            %>
-            <div class="message message-status ${status_css_class} is-shown">
-
-            % if cert_status['status'] == 'processing':
-                  <p class="message-copy">Final course details are being wrapped up at
-                  this time. Your final standing will be available shortly.</p>
-            % elif cert_status['status'] in ('generating', 'ready', 'notpassing'):
-                  <p class="message-copy">Your final grade:
-                  <span class="grade-value">${"{0:.0f}%".format(float(cert_status['grade'])*100)}</span>.
-                  % if cert_status['status'] == 'notpassing':
-                     Grade required for a certificate: <span class="grade-value">
-                       ${"{0:.0f}%".format(float(course.lowest_passing_grade)*100)}</span>.
-                  % endif
-                  </p>
-            % endif
-
-            % if cert_status['show_disabled_download_button'] or cert_status['show_download_url'] or cert_status['show_survey_button']:
-              <ul class="actions">
-                % if cert_status['show_disabled_download_button']:
-                  <li class="action"><span class="btn disabled" href="">
-                      Your Certificate is Generating</span></li>
-                % elif cert_status['show_download_url']:
-                  <li class="action">
-                  <a class="btn" href="${cert_status['download_url']}"
-                     title="This link will open/download a PDF document">
-                     Download Your PDF Certificate</a></li>
-                % endif
-
-                % if cert_status['show_survey_button']:
-                  <li class="action"><a class="cta" href="${cert_status['survey_url']}">
-                         Complete our course feedback survey</a></li>
-                % endif
-              </ul>
-            % endif
+            <div class="message message-status is-shown exam-register">
+              <a href="#" class="exam-button">Register for Pearson exam</a>
+              <p class="message-copy">Registration for the Pearson exam is now open.</p>
             </div>
 
-        % endif
+            <div class="message message-status is-shown">
+              <p class="message-copy">Your registration for the Pearson exam is pending. Within a few days, you should receive a confirmation number, which can be used to schedule your exam.</p>
+            </div>
 
-        <a href="#unenroll-modal" class="unenroll" rel="leanModal" data-course-id="${course.id}" data-course-number="${course.number}">Unregister</a>
+            <div class="message message-status is-shown exam-schedule">
+              <a href="#" class="exam-button">Schedule Pearson exam</a>
+              <p class="exam-registration-number">Registration number: <strong>edx00015879548</strong></p>
+              <p class="message-copy">Write this down! You’ll need it to schedule your exam.</p>
+            </div>
+
+            
+
+            <%
+            cert_status = cert_statuses.get(course.id)
+            %>
+            % if course.has_ended() and cert_status:
+                <%
+                if cert_status['status'] == 'generating':
+                    status_css_class = 'course-status-certrendering'
+                elif cert_status['status'] == 'ready':
+                    status_css_class = 'course-status-certavailable'
+                elif cert_status['status'] == 'notpassing':
+                    status_css_class = 'course-status-certnotavailable'
+                else:
+                    status_css_class = 'course-status-processing'
+                %>
+                <div class="message message-status ${status_css_class} is-shown">
+
+                % if cert_status['status'] == 'processing':
+                      <p class="message-copy">Final course details are being wrapped up at
+                      this time. Your final standing will be available shortly.</p>
+                % elif cert_status['status'] in ('generating', 'ready', 'notpassing'):
+                      <p class="message-copy">Your final grade:
+                      <span class="grade-value">${"{0:.0f}%".format(float(cert_status['grade'])*100)}</span>.
+                      % if cert_status['status'] == 'notpassing':
+                         Grade required for a certificate: <span class="grade-value">
+                           ${"{0:.0f}%".format(float(course.lowest_passing_grade)*100)}</span>.
+                      % endif
+                      </p>
+                % endif
+
+                % if cert_status['show_disabled_download_button'] or cert_status['show_download_url'] or cert_status['show_survey_button']:
+                  <ul class="actions">
+                    % if cert_status['show_disabled_download_button']:
+                      <li class="action"><span class="disabled">
+                          Your Certificate is Generating</span></li>
+                    % elif cert_status['show_download_url']:
+                      <li class="action">
+                      <a class="btn" href="${cert_status['download_url']}"
+                         title="This link will open/download a PDF document">
+                         Download Your PDF Certificate</a></li>
+                    % endif
+
+                    % if cert_status['show_survey_button']:
+                      <li class="action"><a class="cta" href="${cert_status['survey_url']}">
+                             Complete our course feedback survey</a></li>
+                    % endif
+                  </ul>
+                % endif
+                </div>
+
+            % endif
+
+            % if course.id in show_courseware_links_for:
+              % if course.has_ended():
+                <a href="${course_target}" class="enter-course archived">View Archived Course</a>
+              % else:
+                <a href="${course_target}" class="enter-course">View Course</a>
+              % endif              
+            % endif
+            <a href="#unenroll-modal" class="unenroll" rel="leanModal" data-course-id="${course.id}" data-course-number="${course.number}">Unregister</a>
+          </section>
+        </article>
+
+        
 
       % endfor
     % else:
