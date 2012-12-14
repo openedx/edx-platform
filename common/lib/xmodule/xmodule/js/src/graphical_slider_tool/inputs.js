@@ -124,8 +124,8 @@ define('Inputs', [], function () {
                 'text-align': 'left',
                 'outline': 'none',
                 'cursor': 'text',
-                'height': '15px',
-                'width': '50px'
+                'height': '15px'
+                // 'width': '50px'
             });
 
             // And finally, publish the text input element to the page.

@@ -69,8 +69,7 @@ class GraphicalSliderToolModule(XModule):
         Simple variant: slider and plot controls are not inside any tag.
         """
         #substitute plot
-        plot_div = '<div class="' + self.html_class + '_plot" id="' + self.html_id + '_plot" \
-        style="width: 600px; height: 600px; padding: 0px; position: relative;">This is plot</div>'
+        plot_div = '<div class="' + self.html_class + '_plot" id="' + self.html_id + '_plot"></div>'
         html_string = html_string.replace('$plot$', plot_div)
 
         # substitute sliders if we have them
@@ -81,7 +80,7 @@ class GraphicalSliderToolModule(XModule):
             vars = [x['@var'] for x in sliders]
 
             slider_div = '<span class="{element_class}_slider" id="{element_id}_slider_{var}" \
-            data-var="{var}"></span>'
+            data-var="{var}" data-el_width="120"></span>'
 
             for var in vars:
                 html_string = re.sub(r'\$slider\s+' + var + r'\$',
@@ -98,7 +97,7 @@ class GraphicalSliderToolModule(XModule):
             vars = [x['@var'] for x in inputs]
 
             input_div = '<span class="{element_class}_input" id="{element_id}_input_{var}" \
-            data-var="{var}"></span>'
+            data-var="{var}" data-el_width="60"></span>'
 
             for var in vars:
                 html_string = re.sub(r'\$input\s+' + var + r'\$',

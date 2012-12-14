@@ -164,7 +164,15 @@ define('Sliders', [], function () {
             }
 
             // Set the defined width to the slider.
-            sliderEl.width(sliderWidth);
+            // sliderEl.width(sliderWidth);
+
+            console.log('[Before]');
+            console.log('sliderEl.width: ' + sliderEl.width());
+
+            sliderEl.width(spanEl.data('el_width'));
+
+            console.log('[After]');
+            console.log('sliderEl.width: ' + sliderEl.width());
 
             // And make sure that it gets added to the page as an
             // 'inline-block' element. This will allow for the insertion of the
