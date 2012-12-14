@@ -2,7 +2,7 @@
 // define() functions from Require JS available inside the anonymous function.
 (function (requirejs, require, define) {
 
-define('State', [], function () {
+define('State', ['logme'], function (logme) {
     // Since there will be (can be) multiple GST on a page, and each will have
     // a separate state, we will create a factory constructor function. The
     // constructor will expect the ID of the DIV with the GST contents, and the
@@ -14,79 +14,67 @@ define('State', [], function () {
 
     // function: State
     function State(gstId, config) {
-        var constants, c1, plotDiv;
+        var parameters, allParameterNames, allParameterValues, plotDiv;
 
-        constants = {};
+        parameters = {};
 
-        // We must go through all of the input, and slider elements and
-        // retrieve all of the available constants. These will be added to an
-        // object as it's properties.
-        //
-        // First we will go through all of the inputs.
-        if ((typeof config.inputs !== 'undefined') &&
-            (typeof config.inputs.input !== 'undefined')) {
-            if ($.isArray(config.inputs.input)) {
+        if (
+            (typeof config.parameters !== 'undefined') &&
+            (typeof config.parameters.param !== 'undefined')
+        ) {
 
-                // config.inputs.input is an array
-                for (c1 = 0; c1 < config.inputs.input.length; c1++) {
-                    addConstFromInput(config.inputs.input[c1]);
-                }
-
-            } else if ($.isPlainObject(config.inputs.input)) {
-
-                // config.inputs.input is an object
-                addConstFromInput(config.inputs.input);
-
+            // If config.parameters.param is an array, pass it to the processor
+            // element by element.
+            if ($.isArray(config.parameters.param) === true) {
+                (function (c1) {
+                    while (c1 < config.parameters.param.length) {
+                        addConstFromInput(config.parameters.param[c1]);
+                        c1 += 1;
+                    }
+                }(0));
             }
-        }
 
-        // Now we will go through all of the sliders.
-        if ((typeof config.sliders !== 'undefined') &&
-            (typeof config.sliders.slider !== 'undefined')) {
-            if ($.isArray(config.sliders.slider)) {
-                // config.sliders.slider is an array
-
-                for (c1 = 0; c1 < config.sliders.slider.length; c1++) {
-                    addConstFromSlider(config.sliders.slider[c1]);
-                }
-            } else if ($.isPlainObject(config.sliders.slider)) {
-                // config.sliders.slider is an object
-                addConstFromSlider(config.sliders.slider);
+            // If config.parameters.param is an object, pass this object to the
+            // processor directly.
+            else if ($.isPlainObject(config.inputs.input) === true) {
+                addConstFromInput(config.parameters.param);
             }
+
         }
 
         // The constructor will return an object with methods to operate on
         // it's private properties.
         return {
-            'getConstValue': getConstValue,
-            'setConstValue': setConstValue,
-            'bindUpdatePlotEvent': bindUpdatePlotEvent,
-            'getAllConstantNames': getAllConstantNames,
-            'getAllConstantValues': getAllConstantValues
+            'getParameterValue': getParameterValue,
+            'setParameterValue': setParameterValue,
+
+            'getAllParameterNames': getAllParameterNames,
+            'getAllParameterValues': getAllParameterValues,
+
+            'bindUpdatePlotEvent': bindUpdatePlotEvent
         };
 
-        function getAllConstantNames() {
-            var constName, allConstNames;
+        // ####################################################################
+        //
+        // To get all parameter names, you would do:
+        //
+        //     allParamNames = getAllParameterProperties('name');
+        //
+        // To get all parameter values, you would do:
+        //
+        //     allParamValues = getAllParameterProperties('value');
+        //
+        // ####################################################################
+        function getAllParameterProperties(propertyName) {
+            var paramName, allParamProperties;
 
-            allConstNames = [];
+            allParamProperties = [];
 
-            for (constName in constants) {
-                allConstNames.push(constName);
+            for (paramName in parameters) {
+                allParamProperties.push(parameters[paramName][propertyName]);
             }
 
-            return allConstNames;
-        }
-
-        function getAllConstantValues() {
-            var constName, allConstValues;
-
-            allConstValues = [];
-
-            for (constName in constants) {
-                allConstValues.push(constants[constName]);
-            }
-
-            return allConstValues;
+            return allParamProperties;
         }
 
         function bindUpdatePlotEvent(newPlotDiv, callback) {
@@ -95,7 +83,9 @@ define('State', [], function () {
             plotDiv.bind('update_plot', callback);
         }
 
-        function getConstValue(constName) {
+        function getParameterValue(constName) {
+
+
             if (constants.hasOwnProperty(constName) === false) {
                 // If the name of the constant is not tracked by state, return an
                 // 'undefined' value.
@@ -131,31 +121,100 @@ define('State', [], function () {
             }
         }
 
-        function addConstFromInput(obj) {
-            var constName, constValue;
+        // ####################################################################
+        //
+        // Function: processParameter(obj)
+        // -------------------------------
+        //
+        //
+        // This function will be run once for each instance of a GST.
+        //
+        // 'newParamObj' must be empty from the start for each invocation of
+        // this function, that's why we will declare it locally.
+        //
+        // We will parse the passed object 'obj' and populate the 'newParamObj'
+        // object with required properties.
+        //
+        // Since there will be many properties that are of type floating-point
+        // number, we will have a separate function for parsing them.
+        //
+        // processParameter() will fail right away if 'obj' does not have a
+        // '@var' property which represents the name of the parameter we want
+        // to process.
+        //
+        // If, after all of the properties have been processed, we reached the
+        // end of the function successfully, the 'newParamObj' will be added to
+        // the 'parameters' object (that is defined in the scope of State()
+        // function) as a property named as the name of the parameter.
+        //
+        // If at least one of the properties from 'obj' does not get correctly
+        // parsed, then the parameter represented by 'obj' will be disregarded.
+        // It will not be available to user-defined plotting functions, and
+        // things will most likely break. We will notify the user about this.
+        //
+        // ####################################################################
+        function processParameter(obj) {
+            var newParamObj;
 
-            // The name of the constant is obj['@var']. The value (initial) of
-            // the constant is obj['@initial']. I have taken the word 'initial'
-            // into brackets, because multiple inputs and/or sliders can
-            // represent the state of a single constant.
+            if (typeof obj['@var'] !== 'string') {
+                logme(
+                    '[ERROR] state.processParameter(obj): obj["' + attrName + '"] is not a string.'
+                );
+            }
 
-            if (typeof obj['@var'] === 'undefined') {
+            newParamObj = {};
+
+            processString('@var', 'name');
+
+            processFloat('@min', 'min');
+            processFloat('@max', 'max');
+            processFloat('@initial', 'value');
+
+            if (checkRequired('name', 'min', 'max', 'value') === false) {
+                logme('Not creating a parameter.');
                 return;
             }
 
-            constName = obj['@var'];
-
-            if (typeof obj['@initial'] === 'undefined') {
-                constValue = 0;
-            } else {
-                constValue = parseFloat(obj['@initial']);
-
-                if (isNaN(constValue) === true) {
-                    constValue = 0;
-                }
-            }
 
             constants[constName] = constValue;
+
+            return;
+
+            function processFloat(attrName, newAttrName) {
+                var attrValue;
+
+                if (typeof obj[attrName] !== 'string') {
+                    logme(
+                        '[ERROR] state.processParameter(obj): obj["' + attrName + '"] is not a string.'
+                    );
+
+                    return;
+                } else {
+                    attrValue = parseFloat(obj[attrName]);
+
+                    if (isNaN(attrValue) === true) {
+                        logme(
+                            '[ERROR] state.processParameter(obj): for attrName = "' + attrName + '" attrValue is NaN.'
+                        );
+
+                        return;
+                    }
+                }
+
+                newParamObj[newAttrName] = paramValue;
+            }
+
+            function processString(attrName, newAttrName) {
+                if (typeof obj[attrName] !== 'string') {
+                    logme(
+                        '[ERROR] state.processParameter(obj): obj["' + attrName + '"] is not a string.'
+                    );
+
+                    return;
+                }
+
+                newParamObj[newAttrName] = obj[attrName];
+            }
         }
 
         function addConstFromSlider(obj) {
