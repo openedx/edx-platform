@@ -1,4 +1,4 @@
-if (!CMS.Views['Settings']) CMS.Views.Settings = new Object();
+if (!CMS.Views['Settings']) CMS.Views.Settings = {};
 
 // TODO move to common place
 CMS.Views.ValidatingView = Backbone.View.extend({
@@ -47,7 +47,7 @@ CMS.Views.ValidatingView = Backbone.View.extend({
 			$(ele).nextAll('.message-error').remove();
 		}
 	}
-})
+});
 
 CMS.Views.Settings.Main = Backbone.View.extend({
 	// Model class is CMS.Models.Settings.CourseSettings
@@ -105,7 +105,6 @@ CMS.Views.Settings.Main = Backbone.View.extend({
 				el: this.$el.find('.settings-' + this.currentTab),
 				model: this.model.get(this.currentTab)
 			});
-			break;
 		case 'faculty':
 			break;
 		case 'grading':
@@ -113,7 +112,6 @@ CMS.Views.Settings.Main = Backbone.View.extend({
 				el: this.$el.find('.settings-' + this.currentTab),
 				model: this.model.get(this.currentTab)
 			});
-			break;
 		case 'problems':
 			break;
 		case 'discussions':
@@ -125,8 +123,8 @@ CMS.Views.Settings.Main = Backbone.View.extend({
 		var now = new Date();
 		var hours = now.getHours();
 		var minutes = now.getMinutes();
-		$(e.currentTarget).attr('title', (hours % 12 == 0 ? 12 : hours % 12) + ":" + (minutes < 10 ? "0" : "") 
-				+ now.getMinutes() + (hours < 12 ? "am" : "pm") + " (current local time)");
+		$(e.currentTarget).attr('title', (hours % 12 === 0 ? 12 : hours % 12) + ":" + (minutes < 10 ? "0" : "")  +
+				now.getMinutes() + (hours < 12 ? "am" : "pm") + " (current local time)");
 	},
 	
 	showSettingsTab: function(e) {
@@ -159,10 +157,10 @@ CMS.Views.Settings.Details = CMS.Views.ValidatingView.extend({
 	},
 	
 	render: function() {
-		this.setupDatePicker('start_date')
-		this.setupDatePicker('end_date')
-		this.setupDatePicker('enrollment_start')
-		this.setupDatePicker('enrollment_end')
+		this.setupDatePicker('start_date');
+		this.setupDatePicker('end_date');
+		this.setupDatePicker('enrollment_start');
+		this.setupDatePicker('enrollment_end');
 		
 		if (this.model.has('syllabus')) {
 			this.$el.find(this.fieldToSelectorMap['syllabus']).html(
@@ -208,8 +206,14 @@ CMS.Views.Settings.Details = CMS.Views.ValidatingView.extend({
 		var cachethis = this;
 		var savefield = function() { 
 			cachethis.clearValidationErrors();
-			cacheModel.save(fieldName, new Date(datefield.datepicker('getDate').getTime() 
-					+ timefield.timepicker("getSecondsFromMidnight") * 1000)); 
+            var date = datefield.datepicker('getDate');
+            if (date) {
+                var time = timefield.timepicker("getSecondsFromMidnight");
+                if (!time) {
+                    time = 0;
+                }
+                cacheModel.save(fieldName, new Date(date.getTime() + time * 1000));
+            }
 		};
 		
 		// instrument as date and time pickers
@@ -244,7 +248,7 @@ CMS.Views.Settings.Details = CMS.Views.ValidatingView.extend({
 			this.clearValidationErrors();
 			var previewsource = this.model.save_videosource($(event.currentTarget).val());
 			this.$el.find(".current-course-introduction-video iframe").attr("src", previewsource);
-			break
+			break;
 			
 		default:
 			break;
@@ -299,29 +303,29 @@ CMS.Views.Settings.Grading = CMS.Views.ValidatingView.extend({
 	initialize : function() {
 		//  load template for grading view
     	var self = this;
-        this.gradeCutoffTemplate = _.template('<li class="grade-specific-bar" style="width:<%= width %>%"><span class="letter-grade" contenteditable>' + 
-        		'<%= descriptor %>' + 
+        this.gradeCutoffTemplate = _.template('<li class="grade-specific-bar" style="width:<%= width %>%"><span class="letter-grade" contenteditable>' +
+        		'<%= descriptor %>' +
         		'</span><span class="range"></span>' +
         		'<% if (removable) {%><a href="#" class="remove-button">remove</a><% ;} %>' +
         		'</li>');
-        
+
         // Instrument grading scale
         // convert cutoffs to inversely ordered list
         var modelCutoffs = this.model.get('grade_cutoffs');
-        for (cutoff in modelCutoffs) {
+        for (var cutoff in modelCutoffs) {
         	this.descendingCutoffs.push({designation: cutoff, cutoff: Math.round(modelCutoffs[cutoff] * 100)});
         }
-        this.descendingCutoffs = _.sortBy(this.descendingCutoffs, 
+        this.descendingCutoffs = _.sortBy(this.descendingCutoffs,
         		function (gradeEle) { return -gradeEle['cutoff']; });
-        
+
         // Instrument grace period
         this.$el.find('#course-grading-graceperiod').timepicker();
-        
+
         // instantiates an editor template for each update in the collection
         // Because this calls render, put it after everything which render may depend upon to prevent race condition.
         window.templateLoader.loadRemoteTemplate("course_info_update",
         		"/static/client_templates/course_grade_policy.html",
-        		function (raw_template) { 
+        		function (raw_template) {
         	self.template = _.template(raw_template);
         	self.render();
         }
@@ -365,7 +369,7 @@ CMS.Views.Settings.Grading = CMS.Views.ValidatingView.extend({
 	},
 	updateModel : function(event) {
 		if (!this.selectorToField[event.currentTarget.id]) return;
-		
+
 		switch (this.selectorToField[event.currentTarget.id]) {
 		case 'grace_period':
 			this.clearValidationErrors();
@@ -398,7 +402,9 @@ CMS.Views.Settings.Grading = CMS.Views.ValidatingView.extend({
 		// HACK fixing a duplicate call issue by undoing previous call effect. Need to figure out why called 2x
 		gradelist.empty();
 		var nextWidth = 100; // first width is 100%
-		var draggable = removable = false; // first and last are not removable, first is not draggable
+        // Can probably be simplified to one variable now.
+        var removable = false;
+        var draggable = false; // first and last are not removable, first is not draggable
 		_.each(this.descendingCutoffs, 
 				function(cutoff, index) {
 			var newBar = this.gradeCutoffTemplate({ 
@@ -455,7 +461,7 @@ CMS.Views.Settings.Grading = CMS.Views.ValidatingView.extend({
 			// minus 2 b/c minus 1 is the element we're effecting. It's max is just shy of the next one above it
 			var max = (barIndex >= 2 ? cachethis.descendingCutoffs[barIndex - 2]['cutoff'] - 3 : 97);
 			ui.element.resizable("option",{minWidth : min * widthPerPoint, maxWidth : max * widthPerPoint});
-		}
+		};
 	},
 
 	moveBarClosure : function() {
@@ -470,7 +476,7 @@ CMS.Views.Settings.Grading = CMS.Views.ValidatingView.extend({
 			var percentage = Math.min(Math.max(ui.size.width / cachethis.gradeBarWidth * 100, min), max);
 			cachethis.descendingCutoffs[barIndex - 1]['cutoff'] = Math.round(percentage);
 			cachethis.renderGradeRanges();
-		}
+		};
 	},
 	
 	renderGradeRanges: function() {
@@ -488,7 +494,7 @@ CMS.Views.Settings.Grading = CMS.Views.ValidatingView.extend({
 		return function(event, ui) {
 			// for some reason the resize is setting height to 0
 			cachethis.saveCutoffs();
-		}
+		};
 	},
 	
 	saveCutoffs: function() {
@@ -498,7 +504,7 @@ CMS.Views.Settings.Grading = CMS.Views.ValidatingView.extend({
 					object[cutoff['designation']] = cutoff['cutoff'] / 100.0;
 					return object;
 				}, 
-				new Object()));
+				{}));
 	},
 	
 	addNewGrade: function(e) {
@@ -512,7 +518,7 @@ CMS.Views.Settings.Grading = CMS.Views.ValidatingView.extend({
 		// going to split the grade above the insertion point in half leaving fail in same place
 		var nextGradeTop = (gradeLength > 1 ? this.descendingCutoffs[gradeLength - 2]['cutoff'] : 100);
 		var targetWidth = failBarWidth + ((nextGradeTop - failBarWidth) / 2);
-		this.descendingCutoffs.push({designation: this.GRADES[gradeLength], cutoff: failBarWidth})
+		this.descendingCutoffs.push({designation: this.GRADES[gradeLength], cutoff: failBarWidth});
 		this.descendingCutoffs[gradeLength - 1]['cutoff'] = Math.round(targetWidth);
 		
 		var $newGradeBar = this.gradeCutoffTemplate({ descriptor : this.GRADES[gradeLength], 
@@ -530,7 +536,7 @@ CMS.Views.Settings.Grading = CMS.Views.ValidatingView.extend({
 		
 		// Munge existing grade labels?
 		// If going from Pass/Fail to 3 levels, change to Pass to A
-		if (gradeLength == 1 && this.descendingCutoffs[0]['designation'] == 'Pass') {
+		if (gradeLength === 1 && this.descendingCutoffs[0]['designation'] === 'Pass') {
 			this.descendingCutoffs[0]['designation'] = this.GRADES[0];
 			this.setTopGradeLabel();
 		}
@@ -549,7 +555,7 @@ CMS.Views.Settings.Grading = CMS.Views.ValidatingView.extend({
 		this.descendingCutoffs.splice(index, 1);
 		domElement.remove();
 		
-		if (this.descendingCutoffs.length == 1 && this.descendingCutoffs[0]['designation'] == this.GRADES[0]) {
+		if (this.descendingCutoffs.length === 1 && this.descendingCutoffs[0]['designation'] === this.GRADES[0]) {
 			this.descendingCutoffs[0]['designation'] = 'Pass';
 			this.setTopGradeLabel();
 		}
@@ -565,7 +571,7 @@ CMS.Views.Settings.Grading = CMS.Views.ValidatingView.extend({
 	},
 
 	failLabel: function() {
-		if (this.descendingCutoffs.length == 1) return 'Fail';
+		if (this.descendingCutoffs.length === 1) return 'Fail';
 		else return 'F';
 	},
 	setFailLabel: function() {
@@ -601,9 +607,6 @@ CMS.Views.Settings.GraderView = CMS.Views.ValidatingView.extend({
 		'weight' : 'course-grading-assignment-gradeweight'
 	},
 	updateModel : function(event) {
-		if (!this.model.collection)
-			console.log("Huh?");
-		
 		switch (event.currentTarget.id) {
 		case 'course-grading-assignment-totalassignments':
 			this.$el.find('#course-grading-assignment-droppable').attr('max', $(event.currentTarget).val());
@@ -612,7 +615,7 @@ CMS.Views.Settings.GraderView = CMS.Views.ValidatingView.extend({
 			this.clearValidationErrors();
 			this.model.save(this.selectorToField[event.currentTarget.id], $(event.currentTarget).val());
 			break;
-			
+
 		}
 	},
 	deleteModel : function(e) {
