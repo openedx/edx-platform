@@ -34,7 +34,7 @@
       <a href="#">Respond to Feedback</a>
       </header>
     <section id="evaluation_${id}" class="evaluation">
-    How accurate do you think this grading is?
+    <p>How accurate do you think this feedback is?</p>
         <div class="evaluation-scoring">
             <ul class="scoring-list">
                 <li><input type="radio" name="evaluation-score" id="evaluation-score-5" value="5" /> <label for="evaluation-score-5"> Excellent</label></li>
@@ -44,7 +44,7 @@
                 <li><input type="radio" name="evaluation-score" id="evaluation-score-1" value="1" /> <label for="evaluation-score-1"> Awful</label></li>
             </ul>
         </div>
-        Additional comments:
+        <p>Additional comments:</p>
         <textarea rows="${rows}" cols="${cols}" name="feedback_${id}" class="feedback-on-feedback" id="feedback_${id}"></textarea>
         <div class="submit-message-container">
             <input name="submit-message" class="submit-message" type="button" value="Submit your message"/>

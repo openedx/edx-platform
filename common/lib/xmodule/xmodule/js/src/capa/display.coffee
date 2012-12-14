@@ -205,9 +205,13 @@ class @Problem
     feedback = @$('section.evaluation textarea.feedback-on-feedback')[0].value
     submission_id = $('div.external-grader-message div.submission_id')[0].innerHTML
     grader_id = $('div.external-grader-message div.grader_id')[0].innerHTML
+    score = $(".evaluation-scoring input:radio[name='evaluation-score']:checked").val()
     fd.append('feedback', feedback)
     fd.append('submission_id', submission_id)
     fd.append('grader_id', grader_id)
+    if(score)
+      fd.append('score', score)
+
 
     settings =
       type: "POST"
@@ -216,7 +220,7 @@ class @Problem
       contentType: false
       success: (response) =>
         @gentle_alert response.message
-        @$('section.evaluation input.submit-message').hide()
+        @$('section.evaluation').slideToggle()
 
     $.ajaxWithPrefix("#{@url}/message_post", settings)
 
