@@ -36,6 +36,11 @@ class CourseDescriptor(SequenceDescriptor):
     tabs = List(help="List of tabs to enable in this course", scope=Scope.settings)
     end_of_course_survey_url = String(help="Url for the end-of-course survey", scope=Scope.settings)
     discussion_blackouts = List(help="List of pairs of start/end dates for discussion blackouts", scope=Scope.settings, default=[])
+    discussion_topics = Object(
+        help="Map of topics names to ids",
+        scope=Scope.settings,
+        computed_default=lambda c: {'General': {'id': c.location.html_id()}},
+        )
     has_children = True
 
     info_sidebar_name = String(scope=Scope.settings, default='Course Handouts')

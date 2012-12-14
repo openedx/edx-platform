@@ -145,12 +145,12 @@ def initialize_discussion_info(course):
             id = module.discussion_id
             category = module.discussion_category
             title = module.discussion_target
-            sort_key = module.metadata.get('sort_key', title)
+            sort_key = module.sort_key
             category = " / ".join([x.strip() for x in category.split("/")])
             last_category = category.split("/")[-1]
             discussion_id_map[id] = {"location": location, "title": last_category + " / " + title}
             unexpanded_category_map[category].append({"title": title, "id": id,
-                "sort_key": sort_key, "start_date": module.start})
+                "sort_key": sort_key, "start_date": module.lms.start})
 
     category_map = {"entries": defaultdict(dict), "subcategories": defaultdict(dict)}
     for category_path, entries in unexpanded_category_map.items():
@@ -189,9 +189,7 @@ def initialize_discussion_info(course):
                                                       "sort_key": entry["sort_key"],
                                                       "start_date": entry["start_date"]}
 
-    default_topics = {'General': {'id' :course.location.html_id()}}
-    discussion_topics = course.metadata.get('discussion_topics', default_topics)
-    for topic, entry in discussion_topics.items():
+    for topic, entry in course.discussion_topics.items():
         category_map['entries'][topic] = {"id": entry["id"],
                                           "sort_key": entry.get("sort_key", topic),
                                           "start_date": time.gmtime()}

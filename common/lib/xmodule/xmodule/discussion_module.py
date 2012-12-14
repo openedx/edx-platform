@@ -15,6 +15,7 @@ class DiscussionModule(XModule):
     discussion_id = String(scope=Scope.settings)
     discussion_category = String(scope=Scope.settings)
     discussion_target = String(scope=Scope.settings)
+    sort_key = String(scope=Scope.settings)
 
     data = String(help="XML definition of inline discussion", scope=Scope.content)
 
@@ -42,3 +43,8 @@ class DiscussionDescriptor(RawDescriptor):
     metadata_translations = dict(RawDescriptor.metadata_translations)
     metadata_translations['id'] = 'discussion_id'
     metadata_translations['for'] = 'discussion_target'
+
+    discussion_id = String(scope=Scope.settings)
+    discussion_category = String(scope=Scope.settings)
+    discussion_target = String(scope=Scope.settings)
+    sort_key = String(scope=Scope.settings)
