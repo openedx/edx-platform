@@ -61,7 +61,7 @@ CMS.Models.Settings.CourseDetails = Backbone.Model.extend({
 				// GET "http://gdata.youtube.com/feeds/api/videos/" + videokey
 			}
 			if (!_.isEmpty(vid_errors)) {
-				errors.intro_video = vid_errors.join('/n');
+				errors.intro_video = vid_errors.join(' ');
 			}
 		}
 		if (!_.isEmpty(errors)) return errors;
@@ -76,8 +76,8 @@ CMS.Models.Settings.CourseDetails = Backbone.Model.extend({
 	_videoprefix : /\s*<video\s*youtube="/g,
 	// the below is lax to enable validation
 	_videospeedparse : /[^:]*/g, // /\d+\.?\d*(?=:)/g,
-	_videokeyparse : /([^,\/]+)/g,
-	_videonosuffix : /[^\"\/\>]+/g,
+	_videokeyparse : /([^,\/>]+)/g,
+	_videonosuffix : /[^"\/>]+/g,
 	_getNextMatch : function (regex, string, cursor) {
 		regex.lastIndex = cursor;
 		var result = regex.exec(string);
@@ -113,13 +113,15 @@ CMS.Models.Settings.CourseDetails = Backbone.Model.extend({
 				cursor = this._videokeyparse.lastIndex + 1;
 				while (cursor < videostring.length && bestspeed != 1.0) {
 					parsedspeed = this._getNextMatch(this._videospeedparse, videostring, cursor);
-					cursor = this._videospeedparse.lastIndex + 1;
+					if (parsedspeed) cursor = this._videospeedparse.lastIndex + 1;
+					else break;
 					if (Math.abs(Number(parsedspeed) - 1.0) < Math.abs(bestspeed - 1.0)) {
 						bestspeed = Number(parsedspeed);
 						bestkey = this._getNextMatch(this._videokeyparse, videostring, cursor);
 					}
 					else this._getNextMatch(this._videokeyparse, videostring, cursor);
-					cursor = this._videokeyparse.lastIndex + 1;
+					if (this._videokeyparse.lastIndex > cursor)	cursor = this._videokeyparse.lastIndex + 1;
+					else cursor++;
 				}
 			}
 			else {
