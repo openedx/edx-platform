@@ -204,23 +204,30 @@ class CourseGradingModel:
         
     @staticmethod
     def get_section_grader_type(location):
-        """
-        
-        """
         if not isinstance(location, Location):
             location = Location(location)
             
-        # TODO impl to return {grader-type, location, id (random)}
+        descriptor = get_modulestore(location).get_item(location)
+        return {
+                "grader-type" : descriptor.metadata.get('format', "Not Graded"),
+                "location" : location,
+                "id" : 99   # just an arbitrary value to 
+                }
         
     @staticmethod
     def update_section_grader_type(location, jsondict):
-        """
-        
-        """
         if not isinstance(location, Location):
             location = Location(location)
+          
+        descriptor = get_modulestore(location).get_item(location)
+        if 'grader-type' in jsondict:
+            descriptor.metadata['format'] = jsondict.get('grader-type')
+            descriptor.metadata['graded'] = True
+        else:
+            del descriptor.metadata['format']
+            descriptor.metadata['graded'] = False
             
-        # TODO impl to return {grader-type, location, id (random)}
+        get_modulestore(location).update_metadata(location, descriptor.metadata)  
         
         
     @staticmethod
