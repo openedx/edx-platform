@@ -62,6 +62,7 @@ CMS.Views.ClassInfoUpdateView = Backbone.View.extend({
     },
     
     onNew: function(event) {
+        event.preventDefault();
         var self = this;
         // create new obj, insert into collection, and render this one ele overriding the hidden attr
         var newModel = new CMS.Models.CourseUpdate();
@@ -94,6 +95,7 @@ CMS.Views.ClassInfoUpdateView = Backbone.View.extend({
     },
     
     onSave: function(event) {
+        event.preventDefault();
         var targetModel = this.eventModel(event);
         targetModel.set({ date : this.dateEntry(event).val(), content : this.$codeMirror.getValue() });
         // push change to display, hide the editor, submit the change        
@@ -102,6 +104,7 @@ CMS.Views.ClassInfoUpdateView = Backbone.View.extend({
     },
     
     onCancel: function(event) {
+        event.preventDefault();
         // change editor contents back to model values and hide the editor
         $(this.editor(event)).hide();
         var targetModel = this.eventModel(event);
@@ -109,6 +112,7 @@ CMS.Views.ClassInfoUpdateView = Backbone.View.extend({
     },
     
     onEdit: function(event) {
+        event.preventDefault();
         var self = this;
         this.$currentPost = $(event.target).closest('li');
         this.$currentPost.addClass('editing');
@@ -131,6 +135,7 @@ CMS.Views.ClassInfoUpdateView = Backbone.View.extend({
     },
 
     onDelete: function(event) {
+        event.preventDefault();
         // TODO ask for confirmation
         // remove the dom element and delete the model
         var targetModel = this.eventModel(event);
