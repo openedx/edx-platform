@@ -331,7 +331,7 @@ CMS.Views.Settings.Grading = CMS.Views.ValidatingView.extend({
 
         // instantiates an editor template for each update in the collection
         // Because this calls render, put it after everything which render may depend upon to prevent race condition.
-        window.templateLoader.loadRemoteTemplate("course_info_update",
+        window.templateLoader.loadRemoteTemplate("course_grade_policy",
         		"/static/client_templates/course_grade_policy.html",
         		function (raw_template) {
         	self.template = _.template(raw_template);

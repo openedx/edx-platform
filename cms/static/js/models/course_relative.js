@@ -34,16 +34,24 @@ CMS.Models.Location = Backbone.Model.extend({
 				this._fieldPattern.lastIndex = this._tagPattern.lastIndex + 1; // skip over the colon
 				return {
 					tag: foundTag[0],
-					org: this._fieldPattern.exec(payload)[0],
-					course: this._fieldPattern.exec(payload)[0],
-					category: this._fieldPattern.exec(payload)[0],
-					name: this._fieldPattern.exec(payload)[0]
+					org: this.getNextField(payload),
+					course: this.getNextField(payload),
+					category: this.getNextField(payload),
+					name: this.getNextField(payload)
 				}
 			}
 			else return null;
 		}
 		else {
 			return payload;
+		}
+	},
+	getNextField : function(payload) {
+		try {
+			return this._fieldPattern.exec(payload)[0];
+		}
+		catch (err) {
+			return "";
 		}
 	}
 });

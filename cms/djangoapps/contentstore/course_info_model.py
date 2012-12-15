@@ -30,20 +30,21 @@ def get_course_updates(location):
     # Confirm that root is <ol>, iterate over <li>, pull out <h2> subs and then rest of val
     course_upd_collection = []
     if course_html_parsed.tag == 'ol':
-        # 0 is the oldest so that new ones get unique idx
-        for idx, update in enumerate(course_html_parsed.iter("li")):
+        # 0 is the newest
+        for idx, update in enumerate(course_html_parsed):
             if (len(update) == 0):
                 continue
             elif (len(update) == 1):
-                content = update.find("h2").tail
+                # could enforce that update[0].tag == 'h2'
+                content = update[0].tail
             else:
                 content = etree.tostring(update[1])
                 
-            course_upd_collection.append({"id" : location_base + "/" + str(idx),
+            # make the id on the client be 1..len w/ 1 being the oldest and len being the newest
+            course_upd_collection.append({"id" : location_base + "/" + str(len(course_html_parsed) - idx),
                                           "date" : update.findtext("h2"),
                                           "content" : content})
-    # return newest to oldest
-    course_upd_collection.reverse()
+            
     return course_upd_collection
 
 def update_course_updates(location, update, passed_id=None):
@@ -72,7 +73,9 @@ def update_course_updates(location, update, passed_id=None):
     if course_html_parsed.tag == 'ol':
         # ??? Should this use the id in the json or in the url or does it matter?
         if passed_id:
-            element = course_html_parsed.findall("li")[get_idx(passed_id)]
+            idx = get_idx(passed_id)
+            # idx is count from end of list
+            element = course_html_parsed[-idx]
             element[0].text = update['date']
             if (len(element) == 1):
                 if new_html_parsed is not None:
@@ -87,15 +90,17 @@ def update_course_updates(location, update, passed_id=None):
                     element.pop(1)
                     element[0].tail = update['content']
         else:
-            idx = len(course_html_parsed.findall("li"))
-            passed_id = course_updates.location.url() + "/" + str(idx)
-            element =  etree.SubElement(course_html_parsed, "li")
+            element =  etree.Element("li")
+            course_html_parsed.insert(0, element)
             date_element = etree.SubElement(element, "h2")
             date_element.text = update['date']
             if new_html_parsed is not None:
                 element.append(new_html_parsed)
             else:
                 date_element.tail = update['content']
+
+            idx = len(course_html_parsed)
+            passed_id = course_updates.location.url() + "/" + str(idx)
         
         # update db record
         course_updates.definition['data'] = etree.tostring(course_html_parsed)
@@ -127,9 +132,11 @@ def delete_course_update(location, update, passed_id):
         
     if course_html_parsed.tag == 'ol':
         # ??? Should this use the id in the json or in the url or does it matter?
-        element_to_delete = course_html_parsed.xpath('/ol/li[position()=' + str(get_idx(passed_id) + 1) + "]")
+        idx = get_idx(passed_id)
+        # idx is count from end of list
+        element_to_delete = course_html_parsed[-idx]
         if element_to_delete:
-            course_html_parsed.remove(element_to_delete[0])
+            course_html_parsed.remove(element_to_delete)
 
         # update db record
         course_updates.definition['data'] = etree.tostring(course_html_parsed)
@@ -143,6 +150,6 @@ def get_idx(passed_id):
     From the url w/ idx appended, get the idx.
     """
     # TODO compile this regex into a class static and reuse for each call
-    idx_matcher = re.search(r'.*/(\d)+$', passed_id)
+    idx_matcher = re.search(r'.*/(\d+)$', passed_id)
     if idx_matcher:
         return int(idx_matcher.group(1))
