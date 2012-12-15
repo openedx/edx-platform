@@ -48,17 +48,17 @@
 }
 
 @mixin green-button {
-	@include button;
-	border: 1px solid #0d7011;
-	border-radius: 3px;
-	@include linear-gradient(top, rgba(255, 255, 255, .3), rgba(255, 255, 255, 0));
-	background-color: $green;
-	color: #fff;
+  @include button;
+  border: 1px solid #0d7011;
+  border-radius: 3px;
+  @include linear-gradient(top, rgba(255, 255, 255, .3), rgba(255, 255, 255, 0));
+  background-color: $green;
+  color: #fff;
 
-	&:hover {
-		background-color: #129416;
-		color: #fff;
-	}
+  &:hover {
+  background-color: #129416;
+  color: #fff;
+  }
 }
 
 @mixin white-button {
@@ -277,12 +277,12 @@
 }
 
 @mixin sr-text {
-	border: 0; 
-	clip: rect(0 0 0 0); 
-	height: 1px; 
-	margin: -1px; 
-	overflow: hidden; 
-	padding: 0; 
-	position: absolute; 
-	width: 1px;
+  border: 0; 
+  clip: rect(0 0 0 0); 
+  height: 1px; 
+  margin: -1px; 
+  overflow: hidden; 
+  padding: 0; 
+  position: absolute; 
+  width: 1px;
 }
