@@ -2,108 +2,60 @@
 // define() functions from Require JS available inside the anonymous function.
 (function (requirejs, require, define) {
 
-define('Inputs', [], function () {
+define('Inputs', ['logme'], function (logme) {
     return Inputs;
 
-    function Inputs(gstId, config, state) {
-        var constNamesUsed;
+    function Inputs(gstId, gstClass, state) {
+        var c1, paramName, allParamNames;
 
-        // There should not be more than one text input per a constant. This
-        // just does not make sense. However, nothing really prevents the user
-        // from specifying more than one text input for the same constant name.
-        // That's why we have to track which constant names already have
-        // text inputs for them, and prevent adding further text inputs to
-        // these constants.
-        //
-        // constNamesUsed is an object to which we will add properties having
-        // the name of the constant to which we are adding a text input to.
-        // When creating a new text input, we must consult with this object, to
-        // see if the constant name is not defined as it's property.
-        constNamesUsed = {};
+        allParamNames = state.getAllParameterNames();
 
-        // We will go thorugh all of the inputs, and those that have a valid
-        // '@var' property will be added to the page as a HTML text input
-        // element.
-        if ((typeof config.inputs !== 'undefined') &&
-            (typeof config.inputs.input !== 'undefined')) {
-            if ($.isArray(config.inputs.input)) {
+        console.log(allParamNames);
 
-                // config.inputs.input is an array. For each element, we will
-                // add a text input.
-                for (c1 = 0; c1 < config.inputs.input.length; c1++) {
-                    createInput(config.inputs.input[c1]);
+        for (c1 = 0; c1 < allParamNames.length; c1 += 1) {
+            $('#' + gstId).children('.' + gstClass + '_input').each(function (index, value) {
+                var inputDiv, paramName;
+
+                paramName = allParamNames[c1];
+
+                inputDiv = $(value);
+
+                if (paramName === inputDiv.data('var')) {
+                    createInput(inputDiv, paramName);
                 }
-            } else if ($.isPlainObject(config.inputs.input)) {
-
-                // config.inputs.input is an object. Add a text input for it.
-                createInput(config.inputs.input);
-
-            }
+            });
         }
 
-        function createInput(obj) {
-            var constName, constValue, spanEl, inputEl, readOnly;
+        return;
 
-            // The name of the constant is obj['@var']. If it is not specified,
-            // we will skip creating a text input for this constant.
-            if (typeof obj['@var'] !== 'string') {
-                return;
-            }
-            constName = obj['@var'];
+        function createInput(inputDiv, paramName) {
+            var paramObj, inputWidth, readOnly;
 
-            // We will not add a text input for a constant which already has a
-            // text input defined for it.
-            //
-            // We will add the constant name to the 'constNamesUsed' object in
-            // the end, when everything went successfully.
-            if (constNamesUsed.hasOwnProperty(constName)) {
-                return;
+            paramObj = state.getParamObj(paramName);
+
+            // We will define the width of the slider to a sensible default.
+            inputWidth = 400;
+
+            // See if it was specified by the user.
+            if (isFinite(parseInt(inputDiv.data('el_width'))) === true) {
+                inputWidth = parseInt(inputDiv.data('el_width'));
             }
 
-            // Multiple sliders and/or inputs can represent the same constant.
-            // Therefore we will get the most recent const value from the state
-            // object. If it is undefined, we will skip creating a text input
-            // for this constant.
-            constValue = state.getConstValue(constName);
-            if (constValue === undefined) {
-                return;
+            // Set the width of the element.
+            inputDiv.width(inputWidth);
+
+            inputDiv.css('display', 'inline-block');
+
+            readOnly = false;
+            if (inputDiv.attr('data-el_readonly').toLowerCase() === 'true') {
+                readOnly = true;
             }
 
-            // With the constant name, and the constant value being defined,
-            // lets get the element on the page into which the text input will
-            // be inserted.
-            spanEl = $('#' + gstId + '_input_' + constName);
-
-            // If a corresponding element for this constant does not exist on
-            // the page, we will not be making a text input.
-            if (spanEl.length === 0) {
-                return;
-            }
-
-            // Create the text input element.
-            inputEl = $('<input type"text" />');
-
-            // Set the current constant to the text input. It will be visible
-            // to the user.
-            inputEl.val(constValue);
-
-            // Before binding a 'change' event, we will check if this text
-            // input is specified as 'read only'.
-            //
-            // By default, this setting is false - the user can change the
-            // value in the text input.
-            readonly = false;
-            if (typeof obj['@readonly'] === 'string') {
-                if (obj['@readonly'] === 'true') {
-                    readonly = true;
-                }
-            }
-
-            if (readonly === true) {
+            if (readOnly === true) {
 
                 // In the case of a readonly config option, configure the text
                 // inputit as read-only, and NOT bind an event to it.
-                inputEl.attr('readonly', 'readonly');
+                inputDiv.attr('readonly', 'readonly');
 
             } else { // readonly !== true
 
@@ -111,14 +63,16 @@ define('Inputs', [], function () {
                 // the value of this text input, and presses 'enter' (or clicks
                 // somewhere else on the page), this event will be triggered, and
                 // our callback will be called.
-                inputEl.bind('change', inputOnChange);
+                inputDiv.bind('change', inputOnChange);
 
             }
+
+            inputDiv.val(paramObj.value);
 
             // Lets style the input element nicely. We will use the button()
             // widget for this since there is no native widget for the text
             // input.
-            inputEl.button().css({
+            inputDiv.button().css({
                 'font': 'inherit',
                 'color': 'inherit',
                 'text-align': 'left',
@@ -128,19 +82,22 @@ define('Inputs', [], function () {
                 // 'width': '50px'
             });
 
-            // And finally, publish the text input element to the page.
-            inputEl.appendTo(spanEl);
-
-            // Don't forget to add the constant to the list of used constants.
-            // Next time a slider for this constant will not be created.
-            constNamesUsed[constName] = true;
+            paramObj.inputDivs.push(inputDiv);
 
             return;
 
-            // When the user changes the value of this text input, the 'state'
-            // will be updated, forcing the plot to be redrawn.
+            // Update the 'state' - i.e. set the value of the parameter this
+            // input is attached to to a new value.
+            //
+            // This will cause the plot to be redrawn each time after the user
+            // changes the value in the input. Note that he has to either press
+            // 'Enter', or click somewhere else on the page in order for the
+            // 'change' event to be tiggered.
             function inputOnChange(event) {
-                state.setConstValue(constName, $(this).val());
+                var inputDiv;
+
+                inputDiv = $(this);
+                state.setParameterValue(paramName, inputDiv.val(), inputDiv);
             }
         }
     }

@@ -13,11 +13,22 @@ define('State', ['logme'], function (logme) {
     return State;
 
     // function: State
-    function State(gstId, config) {
-        var parameters, allParameterNames, allParameterValues, plotDiv;
+    function State(gstId, gstClass, config) {
+        var parameters, allParameterNames, allParameterValues,
+            plotDiv;
 
+        // Initially, there are no parameters to track. So, we will instantiate
+        // an empty object.
+        //
+        // As we parse the JSON config object, we will add parameters as
+        // named properties (for example
+        //
+        //     parameters.a = {...};
+        //
+        // for the parameter 'a'.
         parameters = {};
 
+        // Check that the required object is available.
         if (
             (typeof config.parameters !== 'undefined') &&
             (typeof config.parameters.param !== 'undefined')
@@ -28,7 +39,7 @@ define('State', ['logme'], function (logme) {
             if ($.isArray(config.parameters.param) === true) {
                 (function (c1) {
                     while (c1 < config.parameters.param.length) {
-                        addConstFromInput(config.parameters.param[c1]);
+                        processParameter(config.parameters.param[c1]);
                         c1 += 1;
                     }
                 }(0));
@@ -37,10 +48,24 @@ define('State', ['logme'], function (logme) {
             // If config.parameters.param is an object, pass this object to the
             // processor directly.
             else if ($.isPlainObject(config.inputs.input) === true) {
-                addConstFromInput(config.parameters.param);
+                processParameter(config.parameters.param);
             }
 
         }
+
+        // Instead of building these arrays every time when some component
+        // requests them, we will create them in the beginning, and then update
+        // by element when some parameter's value changes.
+        //
+        // Then we can just return the required array, instead of iterating
+        // over all of the properties of the 'parameters' object, and
+        // extracting their names/values one by one.
+        allParameterNames = [];
+        allParameterValues = [];
+
+        generateHelperArrays();
+
+        logme(parameters, allParameterNames, allParameterValues);
 
         // The constructor will return an object with methods to operate on
         // it's private properties.
@@ -48,33 +73,28 @@ define('State', ['logme'], function (logme) {
             'getParameterValue': getParameterValue,
             'setParameterValue': setParameterValue,
 
+            'getParamObj': getParamObj,
+
             'getAllParameterNames': getAllParameterNames,
             'getAllParameterValues': getAllParameterValues,
 
             'bindUpdatePlotEvent': bindUpdatePlotEvent
         };
 
-        // ####################################################################
-        //
-        // To get all parameter names, you would do:
-        //
-        //     allParamNames = getAllParameterProperties('name');
-        //
-        // To get all parameter values, you would do:
-        //
-        //     allParamValues = getAllParameterProperties('value');
-        //
-        // ####################################################################
-        function getAllParameterProperties(propertyName) {
-            var paramName, allParamProperties;
+        function getAllParameterNames() {
+            return allParameterNames;
+        }
 
-            allParamProperties = [];
+        function getAllParameterValues() {
+            return allParameterValues;
+        }
 
-            for (paramName in parameters) {
-                allParamProperties.push(parameters[paramName][propertyName]);
+        function getParamObj(paramName) {
+            if (parameters.hasOwnProperty(paramName) === false) {
+                return;
             }
 
-            return allParamProperties;
+            return parameters[paramName];
         }
 
         function bindUpdatePlotEvent(newPlotDiv, callback) {
@@ -118,6 +138,8 @@ define('State', ['logme'], function (logme) {
         // the stored value in the parameter with the new value, and also
         // update all of the text inputs and the slider that correspond to this
         // parameter (if any), so that they reflect the new parameter's value.
+        // Finally, the helper array 'allParameterValues' will also be updated
+        // to reflect the change.
         //
         // If something went wrong (for example the new value is outside the
         // allowed range), then we will reset the 'element' to display the
@@ -125,29 +147,50 @@ define('State', ['logme'], function (logme) {
         //
         // ####################################################################
         function setParameterValue(paramName, paramValue, element) {
-            var inputDiv;
+            var paramValueNum, c1;
 
-            if (constants.hasOwnProperty(constName) === false) {
-                // If the name of the constant is not tracked by state, return an
-                // 'undefined' value.
+            // If a parameter with the name specified by the 'paramName'
+            // parameter is not tracked by state, do not do anything.
+            if (parameters.hasOwnProperty(paramName) === false) {
                 return;
             }
 
-            if (isNaN(parseFloat(constValue)) === true) {
-                // We are interested only in valid float values.
+            // Try to convert the passed value to a valid floating-point
+            // number.
+            paramValueNum = parseFloat(paramValue);
+
+            if (
+                // We are interested only in valid float values. NaN, -INF,
+                // +INF we will disregard.
+                (isFinite(paramValueNum) === false) ||
+
+                // If the new parameter's value is valid, but lies outised of
+                // the parameter's allowed range, we will also disregard it.
+                (paramValueNum < parameters[paramName].min) ||
+                (paramValueNum > parameters[paramName].max)
+            ) {
+                // We will also change the element's value back to the current
+                // parameter's value.
+                element.val(parameters[paramName].value);
+
                 return;
             }
 
-            constants[constName] = parseFloat(constValue);
+            parameters[paramName].value = paramValueNum;
 
             if (plotDiv !== undefined) {
                 plotDiv.trigger('update_plot');
             }
 
-            inputDiv = $('#' + gstId + '_input_' + constName).children('input');
-            if (inputDiv.length !== 0) {
-                inputDiv.val(constValue);
+            for (c1 = 0; c1 < parameters[paramName].inputDivs.length; c1 += 1) {
+                parameters[paramName].inputDivs[c1].val(paramValueNum);
             }
+
+            if (parameters[paramName].sliderDiv !== null) {
+                parameters[paramName].sliderDiv.slider('value', paramValueNum);
+            }
+
+            allParameterValues[parameters[paramName].helperArrayIndex] = paramValueNum;
         } // End-of: function setParameterValue
 
         // ####################################################################
@@ -156,7 +199,8 @@ define('State', ['logme'], function (logme) {
         // -------------------------------
         //
         //
-        // This function will be run once for each instance of a GST.
+        // This function will be run once for each instance of a GST when
+        // parsing the JSON config object.
         //
         // 'newParamObj' must be empty from the start for each invocation of
         // this function, that's why we will declare it locally.
@@ -201,6 +245,7 @@ define('State', ['logme'], function (logme) {
             if (
                 (processFloat('@min', 'min') === false) ||
                 (processFloat('@max', 'max') === false) ||
+                (processFloat('@step', 'step') === false) ||
                 (processFloat('@initial', 'value') === false)
             ) {
                 logme('---> Not adding a parameter named "' + paramName + '".');
@@ -208,7 +253,10 @@ define('State', ['logme'], function (logme) {
                 return;
             }
 
-            constants[constName] = constValue;
+            newParamObj.inputDivs = [];
+            newParamObj.sliderDiv = null;
+
+            parameters[paramName] = newParamObj;
 
             return;
 
@@ -234,11 +282,29 @@ define('State', ['logme'], function (logme) {
                     }
                 }
 
-                newParamObj[newAttrName] = paramValue;
+                newParamObj[newAttrName] = attrValue;
 
                 return true;
             } // End-of: function processFloat
         } // End-of: function processParameter
+
+        // Populate 'allParameterNames' and 'allParameterValues' with data.
+        // Link each parameter object with the corresponding helper array via
+        // an index ('helperArrayIndex'). It will be the same for both of the
+        // arrays.
+        function generateHelperArrays() {
+            var paramName, c1;
+
+            c1 = 0;
+            for (paramName in parameters) {
+                allParameterNames.push(paramName);
+                allParameterValues.push(parameters[paramName].value);
+
+                parameters[paramName].helperArrayIndex = c1;
+
+                c1 += 1;
+            }
+        }
     } // End-of: function State
 });
 

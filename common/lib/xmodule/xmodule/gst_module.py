@@ -85,7 +85,7 @@ class GraphicalSliderToolModule(XModule):
         #substitute sliders
         slider_div = '<div class="{element_class}_slider" \
                                    id="{element_id}_slider_{var}" \
-                                   data-var="{var}" data-el_width="{width}"\
+                                   data-var="{var}" data-el_width="{width}">\
                      </div>'
         for var in variables:
             # find $slider var='var' ... $
@@ -151,7 +151,7 @@ class GraphicalSliderToolModule(XModule):
         """
         # root added for interface compatibility with xmltodict.parse
         self.configuration_json = json.dumps(
-                xmltodict.parse('<root>' +
+                xmltodict.parse('<root class="' + self.location.category + '">' +
                 stringify_children(self.definition['configuration'])
                              + '</root>'))
         return self.configuration_json

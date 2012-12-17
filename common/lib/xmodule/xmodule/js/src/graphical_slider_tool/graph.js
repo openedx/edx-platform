@@ -268,7 +268,7 @@ define('Graph', ['logme'], function (logme) {
             }
 
             function addFunction(funcString, color, line, dot, label) {
-                var newFunctionObject, func, constNames;
+                var newFunctionObject, func, paramNames;
 
                 // The main requirement is function string. Without it we can't
                 // create a function, and the series cannot be calculated.
@@ -283,19 +283,19 @@ define('Graph', ['logme'], function (logme) {
                     'dot': false
                 };
 
-                // Get all of the constant names defined by the user in the
+                // Get all of the parameter names defined by the user in the
                 // XML.
-                constNames = state.getAllConstantNames();
+                paramNames = state.getAllParameterNames();
 
                 // The 'x' is always one of the function parameters.
-                constNames.push('x');
+                paramNames.push('x');
 
                 // Must make sure that the function body also gets passed to
                 // the Function constructor.
-                constNames.push(funcString);
+                paramNames.push(funcString);
 
                 // Create the function from the function string, and all of the
-                // available constants + the 'x' variable as it's parameters.
+                // available parameters AND the 'x' variable as it's parameters.
                 // For this we will use the built-in Function object
                 // constructor.
                 //
@@ -303,7 +303,7 @@ define('Graph', ['logme'], function (logme) {
                 // likely the user supplied an invalid JavaScript function body
                 // string. In this case we will not proceed.
                 try {
-                    func = Function.apply(null, constNames);
+                    func = Function.apply(null, paramNames);
                 } catch (err) {
                     // Let's tell the user. He will see a nice red error
                     // message instead of a graph.
@@ -363,9 +363,9 @@ define('Graph', ['logme'], function (logme) {
         }
 
         function generateData() {
-            var c0, functionObj, seriesObj, dataPoints, constValues, x, y;
+            var c0, functionObj, seriesObj, dataPoints, paramValues, x, y;
 
-            constValues = state.getAllConstantValues();
+            paramValues = state.getAllParameterValues();
 
             dataSeries = [];
 
@@ -379,16 +379,16 @@ define('Graph', ['logme'], function (logme) {
                 for (x = xrange.start; x <= xrange.end; x += xrange.step) {
 
                     // Push the 'x' variable to the end of the parameter array.
-                    constValues.push(x);
+                    paramValues.push(x);
 
                     // We call the user defined function, passing all of the
-                    // available constant values. inside this function they
+                    // available parameter values. Inside this function they
                     // will be accessible by their names.
-                    y = functionObj.func.apply(window, constValues);
+                    y = functionObj.func.apply(window, paramValues);
 
-                    // Return the constValues array to how it was before we
+                    // Return the paramValues array to how it was before we
                     // added 'x' variable to the end of it.
-                    constValues.pop();
+                    paramValues.pop();
 
                     // Add the generated point to the data points set.
                     dataPoints.push([x, y]);
