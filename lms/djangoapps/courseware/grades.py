@@ -9,7 +9,7 @@ from django.conf import settings
 from django.contrib.auth.models import User
 
 from models import StudentModuleCache
-from module_render import get_module, get_instance_module
+from module_render import get_module
 from xmodule import graders
 from xmodule.capa_module import CapaModule
 from xmodule.course_module import CourseDescriptor
@@ -338,6 +338,9 @@ def get_score(course_id, user, problem_descriptor, module_creator, student_modul
            Can return None if user doesn't have access, or if something else went wrong.
     cache: A StudentModuleCache
     """
+    if not user.is_authenticated():
+        return (None, None)
+
     if not (problem_descriptor.stores_state and problem_descriptor.has_score):
         # These are not problems, and do not have a score
         return (None, None)
@@ -347,29 +350,29 @@ def get_score(course_id, user, problem_descriptor, module_creator, student_modul
     instance_module = student_module_cache.lookup(
         course_id, problem_descriptor.category, problem_descriptor.location.url())
 
-    if not instance_module:
+    if instance_module:
+        if instance_module.max_grade is None:
+            return (None, None)
+
+        correct = instance_module.grade if instance_module.grade is not None else 0
+        total = instance_module.max_grade
+    else:
         # If the problem was not in the cache, we need to instantiate the problem.
         # Otherwise, the max score (cached in instance_module) won't be available
         problem = module_creator(problem_descriptor)
         if problem is None:
             return (None, None)
-        instance_module = get_instance_module(course_id, user, problem, student_module_cache)
 
-    # If this problem is ungraded/ungradable, bail
-    if not instance_module or instance_module.max_grade is None:
-        return (None, None)
+        correct = 0
+        total = problem.max_score()
 
-    correct = instance_module.grade if instance_module.grade is not None else 0
-    total = instance_module.max_grade
-
-    if correct is not None and total is not None:
-        #Now we re-weight the problem, if specified
-        weight = getattr(problem_descriptor, 'weight', None)
-        if weight is not None:
-            if total == 0:
-                log.exception("Cannot reweight a problem with zero total points. Problem: " + str(instance_module))
-                return (correct, total)
-            correct = correct * weight / total
-            total = weight
+    #Now we re-weight the problem, if specified
+    weight = getattr(problem_descriptor, 'weight', None)
+    if weight is not None:
+        if total == 0:
+            log.exception("Cannot reweight a problem with zero total points. Problem: " + str(instance_module))
+            return (correct, total)
+        correct = correct * weight / total
+        total = weight
 
     return (correct, total)
