@@ -50,11 +50,11 @@ CMS.Views.ValidatingView = Backbone.View.extend({
 	
 	saveIfChanged : function(event) {
 		// returns true if the value changed and was thus sent to server
-		this.clearValidationErrors();
 		var field = this.selectorToField[event.currentTarget.id];
 		var currentVal = this.model.get(field);
 		var newVal = $(event.currentTarget).val();
 		if (currentVal != newVal) {
+			this.clearValidationErrors();
 			this.model.save(field, newVal);
 			return true;
 		}
@@ -645,7 +645,7 @@ CMS.Views.Settings.GraderView = CMS.Views.ValidatingView.extend({
 			break;
 		case 'course-grading-assignment-name':
 			var oldName = this.model.get('type');
-			if (this.saveIfChanged(event)) {
+			if (this.saveIfChanged(event) && !_.isEmpty(oldName)) {
 				// overload the error display logic
 				this._cacheValidationErrors.push(event.currentTarget);
 				$(event.currentTarget).parent().append(
