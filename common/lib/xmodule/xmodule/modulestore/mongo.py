@@ -380,7 +380,6 @@ class MongoModuleStore(ModuleStoreBase):
                     tab['name'] = metadata.get('display_name')
                     break
             course.tabs = existing_tabs
-            self.update_metadata(course.location, course.metadata)
 
         self._update_single_item(location, {'metadata': metadata})
 
