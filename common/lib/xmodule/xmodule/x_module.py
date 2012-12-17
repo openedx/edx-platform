@@ -456,7 +456,7 @@ class XModuleDescriptor(Plugin, HTMLSnippet, ResourceTemplates):
 
         system: A DescriptorSystem for interacting with external resources
         """
-        return cls(system=system, **json_data)
+        return cls(system=system, location=json_data['location'], model_data=json_data)
 
     # ================================= XML PARSING ============================
     @staticmethod
