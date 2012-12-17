@@ -186,7 +186,7 @@ class LmsKeyValueStore(KeyValueStore):
                     course_id=self._course_id,
                     student=self._user,
                     module_type=key.module_scope_id.category,
-                    module_state_key=key.module_scope_id,
+                    module_state_key=key.module_scope_id.url(),
                     state=json.dumps({})
                 )
                 self._student_module_cache.append(student_module)
