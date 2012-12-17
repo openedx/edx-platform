@@ -24,7 +24,7 @@ from courseware.access import has_access
 from courseware.courses import (get_course_with_access, get_courses_by_university)
 import courseware.tabs as tabs
 from courseware.models import StudentModuleCache
-from module_render import toc_for_course, get_module, get_instance_module
+from module_render import toc_for_course, get_module
 from student.models import UserProfile
 
 from multicourse import multicourse_settings

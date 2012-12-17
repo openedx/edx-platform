@@ -341,65 +341,6 @@ def _get_module(user, request, location, student_module_cache, course_id, positi
 
     return module
 
-# TODO (vshnayder): Rename this?  It's very confusing.
-def get_instance_module(course_id, user, module, student_module_cache):
-    """
-    Returns the StudentModule specific to this module for this student,
-        or None if this is an anonymous user
-    """
-    if user.is_authenticated():
-        if not module.descriptor.stores_state:
-            log.exception("Attempted to get the instance_module for a module "
-                          + str(module.id) + " which does not store state.")
-            return None
-
-        instance_module = student_module_cache.lookup(
-            course_id, module.category, module.location.url())
-
-        if not instance_module:
-            instance_module = StudentModule(
-                course_id=course_id,
-                student=user,
-                module_type=module.category,
-                module_state_key=module.id,
-                state=module.get_instance_state(),
-                max_grade=module.max_score())
-            instance_module.save()
-            student_module_cache.append(instance_module)
-
-        return instance_module
-    else:
-        return None
-
-def get_shared_instance_module(course_id, user, module, student_module_cache):
-    """
-    Return shared_module is a StudentModule specific to all modules with the same
-        'shared_state_key' attribute, or None if the module does not elect to
-        share state
-    """
-    if user.is_authenticated():
-        # To get the shared_state_key, we need to descriptor
-        descriptor = modulestore().get_instance(course_id, module.location)
-
-        shared_state_key = getattr(module, 'shared_state_key', None)
-        if shared_state_key is not None:
-            shared_module = student_module_cache.lookup(module.category,
-                                                        shared_state_key)
-            if not shared_module:
-                shared_module = StudentModule(
-                    course_id=course_id,
-                    student=user,
-                    module_type=descriptor.category,
-                    module_state_key=shared_state_key,
-                    state=module.get_shared_state())
-                shared_module.save()
-                student_module_cache.append(shared_module)
-        else:
-            shared_module = None
-
-        return shared_module
-    else:
-        return None
 
 @csrf_exempt
 def xqueue_callback(request, course_id, userid, id, dispatch):
