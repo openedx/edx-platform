@@ -452,7 +452,7 @@ def modx_dispatch(request, dispatch, location, course_id):
     if instance is None:
         # Either permissions just changed, or someone is trying to be clever
         # and load something they shouldn't have access to.
-        log.debug("No module {0} for user {1}--access denied?".format(location, user))
+        log.debug("No module {0} for user {1}--access denied?".format(location, request.user))
         raise Http404
 
     # Let the module handle the AJAX
