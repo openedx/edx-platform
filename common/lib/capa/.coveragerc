@@ -7,6 +7,7 @@ source = common/lib/capa
 ignore_errors = True
 
 [html]
+title = Capa Python Test Coverage Report
 directory = reports/common/lib/capa/cover
 
 [xml]
