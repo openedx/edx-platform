@@ -69,18 +69,19 @@ class GraphicalSliderToolModule(XModule):
         Simple variant: slider and plot controls are not inside any tag.
         """
         #substitute plot
-        plot_div = '<div class="{element_class}__plot" id="{element_id}_plot \
+        plot_div = '<div class="{element_class}_plot" id="{element_id}_plot" \
                     style="{style}"></div>'
         # extract css style from plot
-        plot_def = re.findall(r'\$\s+plot[^\$]*\$', html_string)
-        style = re.search(r'(?=.*width\=[\"\'](.*)[\"\'])', plot_def)
+        plot_def = re.search(r'\$\s*plot[^\$]*\$', html_string).group()
+        style = re.search(r'(?=.*style\=[\"\'](.*)[\"\'])', plot_def)
         if style:
             style = style.groups()[0]
         else:  # no style parameter
             style = ''
         replacement = plot_div.format(element_class=self.html_class,
+                                      element_id=self.html_id,
                                             style=style)
-        html_string = re.sub(r'\$\s+plot[^\$]*\$', replacement, html_string,
+        html_string = re.sub(r'\$\s*plot[^\$]*\$', replacement, html_string,
                         flags=re.IGNORECASE | re.UNICODE)
 
         # get variables
@@ -99,13 +100,13 @@ class GraphicalSliderToolModule(XModule):
                      </div>'
         for var in variables:
             # find $slider var='var' ... $
-            instances = re.findall(r'\$\s+slider\s+(?=.*var\=[\"\']' + var + '[\"\'])' \
+            instances = re.findall(r'\$\s*slider\s+(?=.*var\=[\"\']' + var + '[\"\'])' \
                           + r'[^\$]*\$', html_string)
             if instances:  # if presented, only one slider per var
                 slider_def = instances[0]  # get $slider var='var' ... $ string
                 # extract var for proper style extraction further
                 var_substring = re.search(r'(var\=[\"\']' + var + r'[\"\'])',
-                                          slider_def)
+                                          slider_def).group()
                 slider_def = slider_def.replace(var_substring, '')
                 # get style
                 style = re.search(r'(?=.*style\=[\"\'](.*)[\"\'])', slider_def)
@@ -119,7 +120,7 @@ class GraphicalSliderToolModule(XModule):
                                             var=var, style=style)
                 # subsitute $slider var='var' ... $ in html_srting to proper
                 # html div element
-                html_string = re.sub(r'\$\s+slider\s+(?=.*var\=[\"\'](' + \
+                html_string = re.sub(r'\$\s*slider\s+(?=.*var\=[\"\'](' + \
                     var + ')[\"\'])' + r'[^\$]*\$',
                 replacement, html_string, flags=re.IGNORECASE | re.UNICODE)
 
@@ -127,26 +128,25 @@ class GraphicalSliderToolModule(XModule):
         input_el = '<input class="{element_class}_input" \
                                   id="{element_id}_input_{var}" \
                                    data-var="{var}" data-el_style="{style}" \
-                                   data-el_readonly="{readonly}"> \
-                     </input>'
+                                   data-el_readonly="{readonly}"/>'
 
         input_index = 0  # make multiple inputs for same variable have
         # different id
 
         for var in variables:
             input_index = +1
-            instances = re.findall(r'\$\s+input\s+(?=.*var\=[\"\']' + var + '[\"\'])' \
+            instances = re.findall(r'\$\s*input\s+(?=.*var\=[\"\']' + var + '[\"\'])' \
                           + r'[^\$]*\$', html_string)
             # import ipdb; ipdb.set_trace()
             for input_def in instances:  # for multiple inputs per var
                 # extract var and readonly before style!
                 var_substring = re.search(r'(var\=[\"\']' + var + r'[\"\'])',
-                                          input_def)
+                                          input_def).group()
                 input_def = input_def.replace(var_substring, '')
                 readonly = re.search(r'(?=.*(readonly\=[\"\'](\w+)[\"\']))', input_def)
                 if readonly:
-                    readonly = readonly.groups()[1]
                     input_def = input_def.replace(readonly.groups()[0], '')
+                    readonly = readonly.groups()[1]
                 else:
                     readonly = ''
                 style = re.search(r'(?=.*style\=[\"\'](.*)[\"\'])', input_def)
@@ -158,9 +158,10 @@ class GraphicalSliderToolModule(XModule):
                 replacement = input_el.format(element_class=self.html_class,
                         element_id=self.html_id + '_' + str(input_index),
                         var=var, readonly=readonly, style=style)
-                html_string = re.sub(r'\$\s+input\s+(?=.*var\=[\"\'](' + \
+                # import ipdb; ipdb.set_trace()
+                html_string = re.sub(r'\$\s*input\s+(?=.*var\=[\"\'](' + \
                                      var + ')[\"\'])' + r'[^\$]*\$',
-                replacement, html_string, flags=re.IGNORECASE | re.UNICODE)
+                replacement, html_string, count=1, flags=re.IGNORECASE | re.UNICODE)
         return html_string
 
     def get_configuration(self):
