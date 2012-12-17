@@ -51,6 +51,9 @@ class CachingDescriptorSystem(MakoDescriptorSystem):
         self.modulestore = modulestore
         self.module_data = module_data
         self.default_class = default_class
+        # cdodge: other Systems have a course_id attribute defined. To keep things consistent, let's
+        # define an attribute here as well, even though it's None
+        self.course_id = None
 
     def load_item(self, location):
         location = Location(location)
