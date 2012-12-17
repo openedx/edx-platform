@@ -162,8 +162,10 @@ CMS.Models.Settings.CourseDetails = Backbone.Model.extend({
 		// returns the videosource for the preview which iss the key whose speed is closest to 1
 		if (newsource == null) this.save({'intro_video': null}); 
 		// TODO remove all whitespace w/in string
-		else if (this._getNextMatch(this._videoprefix, newsource, 0)) this.save('intro_video', newsource);
-		else this.save('intro_video', '<video youtube="' + newsource + '"/>');
+		else {
+			var newVal = ((this._getNextMatch(this._videoprefix, newsource, 0)) ? newsource : '<video youtube="' + newsource + '"/>');
+			if (this.get('intro_video') != newVal) this.save('intro_video', newVal);
+		}
 		
 		return this.videosourceSample();
 	}

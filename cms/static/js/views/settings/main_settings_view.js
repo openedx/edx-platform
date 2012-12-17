@@ -46,6 +46,19 @@ CMS.Views.ValidatingView = Backbone.View.extend({
 			else $(ele).removeClass('error');
 			$(ele).nextAll('.message-error').remove();
 		}
+	},
+	
+	saveIfChanged : function(event) {
+		// returns true if the value changed and was thus sent to server
+		this.clearValidationErrors();
+		var field = this.selectorToField[event.currentTarget.id];
+		var currentVal = this.model.get(field);
+		var newVal = $(event.currentTarget).val();
+		if (currentVal != newVal) {
+			this.model.save(field, newVal);
+			return true;
+		}
+		else return false;
 	}
 });
 
@@ -170,38 +183,38 @@ CMS.Views.Settings.Details = CMS.Views.ValidatingView.extend({
 			this.$el.find('.remove-course-syllabus').show();
 		}
 		else {
-			this.$el.find(this.fieldToSelectorMap['syllabus']).html("");
+			this.$el.find('#' + this.fieldToSelectorMap['syllabus']).html("");
 			this.$el.find('.remove-course-syllabus').hide();
 		}
 		
-		this.$el.find(this.fieldToSelectorMap['overview']).val(this.model.get('overview'));
+		this.$el.find('#' + this.fieldToSelectorMap['overview']).val(this.model.get('overview'));
 		this.codeMirrorize(null, $('#course-overview')[0]);
 		
 		this.$el.find('.current-course-introduction-video iframe').attr('src', this.model.videosourceSample());
 		if (this.model.has('intro_video')) {
 			this.$el.find('.remove-course-introduction-video').show();
-			this.$el.find(this.fieldToSelectorMap['intro_video']).val(this.model.getVideoSource());
+			this.$el.find('#' + this.fieldToSelectorMap['intro_video']).val(this.model.getVideoSource());
 		}
 		else this.$el.find('.remove-course-introduction-video').hide();
 		
-		this.$el.find(this.fieldToSelectorMap['effort']).val(this.model.get('effort'));
+		this.$el.find('#' + this.fieldToSelectorMap['effort']).val(this.model.get('effort'));
 		
 		return this;
 	},
 	fieldToSelectorMap : {
-		'start_date' : "#course-start",
-		'end_date' : '#course-end',
-		'enrollment_start' : '#enrollment-start',
-		'enrollment_end' : '#enrollment-end',
+		'start_date' : "course-start",
+		'end_date' : 'course-end',
+		'enrollment_start' : 'enrollment-start',
+		'enrollment_end' : 'enrollment-end',
 		'syllabus' : '.current-course-syllabus .doc-filename',
-		'overview' : '#course-overview',
-		'intro_video' : '#course-introduction-video',
-		'effort' : "#course-effort"
+		'overview' : 'course-overview',
+		'intro_video' : 'course-introduction-video',
+		'effort' : "course-effort"
 	},
 	
 	setupDatePicker : function(fieldName) {
 		var cacheModel = this.model;
-		var div = this.$el.find(this.fieldToSelectorMap[fieldName]);
+		var div = this.$el.find('#' + this.fieldToSelectorMap[fieldName]);
 		var datefield = $(div).find(".date");
 		var timefield = $(div).find(".time");
 		var cachethis = this;
@@ -213,7 +226,8 @@ CMS.Views.Settings.Details = CMS.Views.ValidatingView.extend({
                 if (!time) {
                     time = 0;
                 }
-                cacheModel.save(fieldName, new Date(date.getTime() + time * 1000));
+                var newVal = new Date(date.getTime() + time * 1000);
+                if (cacheModel.get(fieldName) != newVal) cacheModel.save(fieldName, newVal);
             }
 		};
 		
@@ -237,13 +251,11 @@ CMS.Views.Settings.Details = CMS.Views.ValidatingView.extend({
 			break;
 
 		case 'course-overview':
-			this.clearValidationErrors();
-			this.model.save('overview', $(event.currentTarget).val());
+			// handled via code mirror
 			break;
 
 		case 'course-effort':
-			this.clearValidationErrors();
-			this.model.save('effort', $(event.currentTarget).val());
+			this.saveIfChanged(event);
 			break;
 		case 'course-introduction-video':
 			this.clearValidationErrors();
@@ -269,7 +281,7 @@ CMS.Views.Settings.Details = CMS.Views.ValidatingView.extend({
 		if (this.model.has('intro_video')) {
 			this.model.save_videosource(null);
 			this.$el.find(".current-course-introduction-video iframe").attr("src", "");
-			this.$el.find(this.fieldToSelectorMap['intro_video']).val("");
+			this.$el.find('#' + this.fieldToSelectorMap['intro_video']).val("");
 		}
 	},
 	codeMirrors : {},
@@ -283,13 +295,14 @@ CMS.Views.Settings.Details = CMS.Views.ValidatingView.extend({
 
 		if (!this.codeMirrors[thisTarget.id]) {
 			var cachethis = this;
-			var field = this.selectorToField['#' + thisTarget.id];
+			var field = this.selectorToField[thisTarget.id];
 			this.codeMirrors[thisTarget.id] = CodeMirror.fromTextArea(thisTarget, {
 				mode: "text/html", lineNumbers: true, lineWrapping: true,
 				onBlur : function(mirror) {
 					mirror.save();
 					cachethis.clearValidationErrors();
-					cachethis.model.save(field, mirror.getValue());
+					var newVal = mirror.getValue();
+					if (cachethis.model.get(field) != newVal) cachethis.model.save(field, newVal);
 				}
 			});
 		}
@@ -340,6 +353,7 @@ CMS.Views.Settings.Grading = CMS.Views.ValidatingView.extend({
         );
 		this.model.on('error', this.handleValidationError, this);
 		this.model.get('graders').on('remove', this.render, this);
+		this.model.get('graders').on('reset', this.render, this);
 		this.model.get('graders').on('add', this.render, this);
 		this.selectorToField = _.invert(this.fieldToSelectorMap);
 	},
@@ -353,10 +367,12 @@ CMS.Views.Settings.Grading = CMS.Views.ValidatingView.extend({
 		var gradelist = this.$el.find('.course-grading-assignment-list');
 		// Undo the double invocation error. At some point, fix the double invocation
 		$(gradelist).empty();
-		this.model.get('graders').each(function(gradeModel) {
+		var gradeCollection = this.model.get('graders');
+		gradeCollection.each(function(gradeModel) {
 			$(gradelist).append(self.template({model : gradeModel }));
 			var newEle = gradelist.children().last();
-			var newView = new CMS.Views.Settings.GraderView({el: newEle, model : gradeModel});
+			var newView = new CMS.Views.Settings.GraderView({el: newEle, 
+				model : gradeModel, collection : gradeCollection });
 		});
 		
 		// render the grade cutoffs
@@ -381,12 +397,12 @@ CMS.Views.Settings.Grading = CMS.Views.ValidatingView.extend({
 		switch (this.selectorToField[event.currentTarget.id]) {
 		case 'grace_period':
 			this.clearValidationErrors();
-			this.model.save('grace_period',	this.model.dateToGracePeriod($(event.currentTarget).timepicker('getTime')));
+			var newVal = this.model.dateToGracePeriod($(event.currentTarget).timepicker('getTime'));
+			if (this.model.get('grace_period') != newVal) this.model.save('grace_period', newVal);
 			break;
 
 		default:
-			this.clearValidationErrors();
-			this.model.save(this.selectorToField[event.currentTarget.id], $(event.currentTarget).val());
+			this.saveIfChanged(event);
 			break;
 		}
 	},
@@ -615,15 +631,31 @@ CMS.Views.Settings.GraderView = CMS.Views.ValidatingView.extend({
 		'weight' : 'course-grading-assignment-gradeweight'
 	},
 	updateModel : function(event) {
+		// HACK to fix model sometimes losing its pointer to the collection [I think I fixed this but leaving
+		// this in out of paranoia. If this error ever happens, the user will get a warning that they cannot
+		// give 2 assignments the same name.]
+		if (!this.model.collection) {
+			this.model.collection = this.collection;
+		}
+		
 		switch (event.currentTarget.id) {
 		case 'course-grading-assignment-totalassignments':
 			this.$el.find('#course-grading-assignment-droppable').attr('max', $(event.currentTarget).val());
-			// no break b/c want to use the default save
-		default:
-			this.clearValidationErrors();
-			this.model.save(this.selectorToField[event.currentTarget.id], $(event.currentTarget).val());
+			this.saveIfChanged(event);
 			break;
-
+		case 'course-grading-assignment-name':
+			var oldName = this.model.get('type');
+			if (this.saveIfChanged(event)) {
+				// overload the error display logic
+				this._cacheValidationErrors.push(event.currentTarget);
+				$(event.currentTarget).parent().append(
+						this.errorTemplate({message : 'For grading to work, you must change all "' + oldName +
+							'" subsections to "' + this.model.get('type') + '".'}));
+			};
+			break;
+		default:
+			this.saveIfChanged(event);
+			break;
 		}
 	},
 	deleteModel : function(e) {
