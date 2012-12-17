@@ -60,13 +60,17 @@ class StudentModule(models.Model):
     created = models.DateTimeField(auto_now_add=True, db_index=True)
     modified = models.DateTimeField(auto_now=True, db_index=True)
 
-    def __unicode__(self):
-        return '/'.join([self.course_id, self.module_type,
-                         self.student.username, self.module_state_key, str(self.state)[:20]])
-
     def __repr__(self):
-        return 'StudentModule%r' % ((self.course_id, self.module_type, self.student, self.module_state_key, str(self.state)[:20]),)
+        return 'StudentModule<%r>' % ({
+            'course_id': self.course_id,
+            'module_type': self.module_type,
+            'student': self.student.username,
+            'module_state_key': self.module_state_key,
+            'state': str(self.state)[:20],
+        },)
 
+    def __unicode__(self):
+        return unicode(repr(self))
 
 # TODO (cpennington): Remove these once the LMS switches to using XModuleDescriptors
 
