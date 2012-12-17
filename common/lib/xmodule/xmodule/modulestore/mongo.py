@@ -314,10 +314,10 @@ class MongoModuleStore(ModuleStoreBase):
         # make sure we found exactly one match on this above course search
         found_cnt = len(courses)
         if found_cnt == 0:
-            raise BaseException('Could not find course at {0}'.format(course_search_location))
+            raise Exception('Could not find course at {0}'.format(course_search_location))
 
         if found_cnt > 1:
-            raise BaseException('Found more than one course at {0}. There should only be one!!! Dump = {1}'.format(course_search_location, courses))
+            raise Exception('Found more than one course at {0}. There should only be one!!! Dump = {1}'.format(course_search_location, courses))
 
         return courses[0]
 

@@ -49,7 +49,7 @@ def replace(static_url, prefix=None, course_namespace=None):
         # use the utility functions in StaticContent.py
         if static_url.group('prefix') == '/static/' and not isinstance(modulestore(), XMLModuleStore):
             if course_namespace is None:
-                raise BaseException('You must pass in course_namespace when remapping static content urls with MongoDB stores')
+                raise Exception('You must pass in course_namespace when remapping static content urls with MongoDB stores')
             url = StaticContent.convert_legacy_static_url(static_url.group('rest'), course_namespace)
         else:
             url = try_staticfiles_lookup(prefix + static_url.group('rest'))
