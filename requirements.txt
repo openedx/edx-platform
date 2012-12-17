@@ -15,7 +15,7 @@ fs
 beautifulsoup
 beautifulsoup4
 feedparser
-requests
+requests==0.12.1
 http://sympy.googlecode.com/files/sympy-0.7.1.tar.gz
 newrelic
 glob2
