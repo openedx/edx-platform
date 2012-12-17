@@ -742,11 +742,11 @@ class TestCourseGrader(PageLoader):
         """
         problem_location = "i4x://edX/graded/problem/{0}".format(problem_url_name)
         
-        modx_url = reverse('modx_dispatch', 
+        modx_url = reverse('modx_dispatch',
                             kwargs={
-                                'course_id' : self.graded_course.id,
-                                'location' : problem_location,
-                                'dispatch' : 'problem_check', }
+                                'course_id': self.graded_course.id,
+                                'location': problem_location,
+                                'dispatch': 'problem_check', }
                           )
         
         resp = self.client.post(modx_url, {
