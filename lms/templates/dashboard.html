@@ -219,8 +219,9 @@
               <h3><a href="${course_target}">${course.number} ${course.title}</a></h3>
             </hgroup>
 
+	    <!-- TODO: need to add logic to select which of the following to display.  Like certs? -->
             <div class="message message-status is-shown exam-register">
-              <a href="#" class="exam-button">Register for Pearson exam</a>
+              <a href="#exam_register" rel="leanModal" class="exam-button" id="exam_register_button">Register for Pearson exam</a>
               <p class="message-copy">Registration for the Pearson exam is now open.</p>
             </div>
 
