@@ -126,19 +126,18 @@ class GraphicalSliderToolModule(XModule):
 
         # substitute inputs if we have them
         input_el = '<input class="{element_class}_input" \
-                                  id="{element_id}_input_{var}" \
+                                  id="{element_id}_input_{var}_{input_index}" \
                                    data-var="{var}" style="{style}" \
                                    data-el_readonly="{readonly}"/>'
 
-        input_index = 0  # make multiple inputs for same variable have
-        # different id
-
         for var in variables:
-            input_index = +1
+            input_index = 0  # make multiple inputs for same variable have
+                # different id
             instances = re.findall(r'\$\s*input\s+(?=.*var\=[\"\']' + var + '[\"\'])' \
                           + r'[^\$]*\$', html_string)
             # import ipdb; ipdb.set_trace()
             for input_def in instances:  # for multiple inputs per var
+                input_index += 1
                 # extract var and readonly before style!
                 var_substring = re.search(r'(var\=[\"\']' + var + r'[\"\'])',
                                           input_def).group()
@@ -154,10 +153,11 @@ class GraphicalSliderToolModule(XModule):
                     style = style.groups()[0]
                 else:
                     style = ''
-
+                # import ipdb; ipdb.set_trace()
                 replacement = input_el.format(element_class=self.html_class,
-                        element_id=self.html_id + '_' + str(input_index),
-                        var=var, readonly=readonly, style=style)
+                        element_id=self.html_id,
+                        var=var, readonly=readonly, style=style,
+                        input_index=input_index)
                 # import ipdb; ipdb.set_trace()
                 html_string = re.sub(r'\$\s*input\s+(?=.*var\=[\"\'](' + \
                                      var + ')[\"\'])' + r'[^\$]*\$',
