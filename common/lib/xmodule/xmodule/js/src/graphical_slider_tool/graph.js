@@ -63,7 +63,7 @@ define('Graph', ['logme'], function (logme) {
                 'max': 10
             };
             if (typeof config.plot['xticks'] === 'string') {
-                processTicks(config.plot['xticks'], xaxis);
+                processTicks(config.plot['xticks'], xaxis, 'xunits');
             } else {
                 logme('MESSAGE: "xticks" were not specified. Using defaults.');
             }
@@ -76,14 +76,14 @@ define('Graph', ['logme'], function (logme) {
                 'max': 10
             };
             if (typeof config.plot['yticks'] === 'string') {
-                processTicks(config.plot['yticks'], yaxis);
+                processTicks(config.plot['yticks'], yaxis, 'yunits');
             } else {
                 logme('MESSAGE: "yticks" were not specified. Using defaults.');
             }
 
             return;
 
-            function processTicks(ticksStr, ticksObj) {
+            function processTicks(ticksStr, ticksObj, unitsType) {
                 var ticksBlobs, tempFloat;
 
                 // The 'ticks' setting is a string containing 3 floating-point
@@ -133,6 +133,17 @@ define('Graph', ['logme'], function (logme) {
                     logme('ERROR: tickSize * 2 >= max - min. Setting defaults.');
 
                     ticksObj.tickSize = (ticksObj.max - ticksObj.min) / 10.0;
+                }
+
+                //  units: change last tick to units
+                if (typeof config.plot[unitsType] === 'string') {
+                    var ticks =  _.map(_.range(ticksObj.min,
+                        ticksObj.max + ticksObj.tickSize, ticksObj.tickSize),
+                        function(x){  return [x,
+                        x > ticksObj.max - ticksObj.tickSize ? config.plot[unitsType] : x];
+                                    });
+                    ticksObj.tickSize = null;
+                    ticksObj.ticks = ticks;
                 }
             }
         }
