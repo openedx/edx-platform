@@ -317,6 +317,18 @@ class CourseDescriptor(SequenceDescriptor):
         return self.metadata.get('end_of_course_survey_url')
 
     @property
+    def testcenter_info(self):
+        """
+        Pull from policy.
+        
+        TODO: decide if we expect this entry to be a single test, or if multiple tests are possible
+        per course.
+
+        Returns None if no testcenter info specified.
+        """
+        return self.metadata.get('testcenter_info')
+    
+    @property
     def title(self):
         return self.display_name
 

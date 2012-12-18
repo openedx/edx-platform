@@ -304,7 +304,7 @@ def change_enrollment(request):
         try:
             course = course_from_id(course_id)
         except ItemNotFoundError:
-            log.warning("User {0} tried to enroll in non-existant course {1}"
+            log.warning("User {0} tried to enroll in non-existent course {1}"
                       .format(user.username, enrollment.course_id))
             return {'success': False, 'error': 'The course requested does not exist.'}
 
@@ -594,6 +594,92 @@ def create_account(request, post_override=None):
 
     js = {'success': True}
     return HttpResponse(json.dumps(js), mimetype="application/json")
+
+@login_required
+@ensure_csrf_cookie
+def begin_test_registration(request, course_id):
+    user = request.user    
+    
+    # we want to populate the registration page with the relevant information,
+    # if it already exists.  Create an empty object otherwise.
+    try:
+        testcenteruser = TestCenterUser.objects.get(user=user)
+    except TestCenterUser.DoesNotExist:
+        testcenteruser = TestCenterUser()
+        testcenteruser.user = user
+    
+    try:
+        course = (course_from_id(course_id))
+    except ItemNotFoundError:
+        log.error("User {0} enrolled in non-existent course {1}"
+                      .format(user.username, course_id))
+
+    # placeholder for possible messages...
+    message = ""
+    if not user.is_active:
+        message = render_to_string('registration/activate_account_notice.html', {'email': user.email})
+
+    context = {'course': course,
+               'user': user,
+               'message': message,
+               'testcenteruser': testcenteruser,
+               }
+
+    return render_to_response('test_center_register.html', context)
+
+
+def _do_create_or_update_test_center_user(post_vars):
+    """
+    Given cleaned post variables, create the TestCenterUser and UserProfile objects, as well as the
+    registration for this user.
+
+    Returns a tuple (User, UserProfile, TestCenterUser).
+
+    Note: this function is also used for creating test users.
+    """
+    user = User(username=post_vars['username'],
+             email=post_vars['email'],
+             is_active=False)
+    user.set_password(post_vars['password'])
+    registration = Registration()
+    # TODO: Rearrange so that if part of the process fails, the whole process fails.
+    # Right now, we can have e.g. no registration e-mail sent out and a zombie account
+    try:
+        user.save()
+    except IntegrityError:
+        js = {'success': False}
+        # Figure out the cause of the integrity error
+        if len(User.objects.filter(username=post_vars['username'])) > 0:
+            js['value'] = "An account with this username already exists."
+            js['field'] = 'username'
+            return HttpResponse(json.dumps(js))
+
+        if len(User.objects.filter(email=post_vars['email'])) > 0:
+            js['value'] = "An account with this e-mail already exists."
+            js['field'] = 'email'
+            return HttpResponse(json.dumps(js))
+
+        raise
+
+    registration.register(user)
+
+    profile = UserProfile(user=user)
+    profile.name = post_vars['name']
+    profile.level_of_education = post_vars.get('level_of_education')
+    profile.gender = post_vars.get('gender')
+    profile.mailing_address = post_vars.get('mailing_address')
+    profile.goals = post_vars.get('goals')
+
+    try:
+        profile.year_of_birth = int(post_vars['year_of_birth'])
+    except (ValueError, KeyError):
+        profile.year_of_birth = None  # If they give us garbage, just ignore it instead
+                                # of asking them to put an integer.
+    try:
+        profile.save()
+    except Exception:
+        log.exception("UserProfile creation failed for user {0}.".format(user.id))
+    return (user, profile, registration)
 
 @ensure_csrf_cookie
 def create_test_registration(request, post_override=None):
