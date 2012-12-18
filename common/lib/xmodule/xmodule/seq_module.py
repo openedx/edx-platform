@@ -37,7 +37,7 @@ class SequenceModule(XModule):
 
     # NOTE: Position is 1-indexed.  This is silly, but there are now student
     # positions saved on prod, so it's not easy to fix.
-    position = Int(help="Last tab viewed in this sequence", default=1, scope=Scope.student_state)
+    position = Int(help="Last tab viewed in this sequence", scope=Scope.student_state)
 
     def __init__(self, *args, **kwargs):
         XModule.__init__(self, *args, **kwargs)
@@ -45,6 +45,13 @@ class SequenceModule(XModule):
         # if position is specified in system, then use that instead
         if self.system.get('position'):
             self.position = int(self.system.get('position'))
+
+        # Default to the first child
+        # Don't set 1 as the default in the property definition, because
+        # there is code that looks for the existance of the position value
+        # to determine if the student has visited the sequence before or not
+        if self.position is None:
+            self.position = 1
 
         self.rendered = False
 
