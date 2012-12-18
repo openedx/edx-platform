@@ -4,7 +4,7 @@ from path import path # NOTE (THK): Only used for detecting presence of syllabus
 from xmodule.graders import grader_from_conf
 from xmodule.modulestore import Location
 from xmodule.seq_module import SequenceDescriptor, SequenceModule
-from xmodule.timeparse import parse_time, stringify_time
+from xmodule.timeparse import parse_time
 from xmodule.util.decorators import lazyproperty
 import json
 import logging
@@ -20,10 +20,79 @@ log = logging.getLogger(__name__)
 edx_xml_parser = etree.XMLParser(dtd_validation=False, load_dtd=False,
                                  remove_comments=True, remove_blank_text=True)
 
+class Textbook(object):
+    def __init__(self, title, book_url):
+        self.title = title
+        self.book_url = book_url
+        self.start_page = int(self.table_of_contents[0].attrib['page'])
+
+        # The last page should be the last element in the table of contents,
+        # but it may be nested. So recurse all the way down the last element
+        last_el = self.table_of_contents[-1]
+        while last_el.getchildren():
+            last_el = last_el[-1]
+
+        self.end_page = int(last_el.attrib['page'])
+
+    @lazyproperty
+    def table_of_contents(self):
+        """
+        Accesses the textbook's table of contents (default name "toc.xml") at the URL self.book_url
+
+        Returns XML tree representation of the table of contents
+        """
+        toc_url = self.book_url + 'toc.xml'
+
+        # Get the table of contents from S3
+        log.info("Retrieving textbook table of contents from %s" % toc_url)
+        try:
+            r = requests.get(toc_url)
+        except Exception as err:
+            msg = 'Error %s: Unable to retrieve textbook table of contents at %s' % (err, toc_url)
+            log.error(msg)
+            raise Exception(msg)
+
+        # TOC is XML. Parse it
+        try:
+            table_of_contents = etree.fromstring(r.text)
+        except Exception as err:
+            msg = 'Error %s: Unable to parse XML for textbook table of contents at %s' % (err, toc_url)
+            log.error(msg)
+            raise Exception(msg)
+
+        return table_of_contents
+
+
+class TextbookList(ModelType):
+    def from_json(self, values):
+        textbooks = []
+        for title, book_url in values:
+            try:
+                textbooks.append(Textbook(title, book_url))
+            except:
+                # If we can't get to S3 (e.g. on a train with no internet), don't break
+                # the rest of the courseware.
+                log.exception("Couldn't load textbook ({0}, {1})".format(title, book_url))
+                continue
+
+        return textbooks
+
+    def to_json(self, values):
+        json_data = []
+        for val in values:
+            if isinstance(val, Textbook):
+                json_data.append((textbook.title, textbook.book_url))
+            elif isinstance(val, tuple):
+                json_data.append(val)
+            else:
+                continue
+        return json_data
+
+
 class CourseDescriptor(SequenceDescriptor):
     module_class = SequenceModule
 
-    textbooks = List(help="List of pairs of (title, url) for textbooks used in this course", default=[], scope=Scope.content)
+    textbooks = TextbookList(help="List of pairs of (title, url) for textbooks used in this course", default=[], scope=Scope.content)
     wiki_slug = String(help="Slug that points to the wiki for this course", scope=Scope.content)
     enrollment_start = Date(help="Date that enrollment for this class is opened", scope=Scope.settings)
     enrollment_end = Date(help="Date that enrollment for this class is closed", scope=Scope.settings)
@@ -70,64 +139,9 @@ class CourseDescriptor(SequenceDescriptor):
 
     template_dir_name = 'course'
 
-    class Textbook:
-        def __init__(self, title, book_url):
-            self.title = title
-            self.book_url = book_url
-            self.table_of_contents = self._get_toc_from_s3()
-            self.start_page = int(self.table_of_contents[0].attrib['page'])
-
-            # The last page should be the last element in the table of contents,
-            # but it may be nested. So recurse all the way down the last element
-            last_el = self.table_of_contents[-1]
-            while last_el.getchildren():
-                last_el = last_el[-1]
-
-            self.end_page = int(last_el.attrib['page'])
-
-        @property
-        def table_of_contents(self):
-            return self.table_of_contents
-
-        def _get_toc_from_s3(self):
-            """
-            Accesses the textbook's table of contents (default name "toc.xml") at the URL self.book_url
-
-            Returns XML tree representation of the table of contents
-            """
-            toc_url = self.book_url + 'toc.xml'
-
-            # Get the table of contents from S3
-            log.info("Retrieving textbook table of contents from %s" % toc_url)
-            try:
-                r = requests.get(toc_url)
-            except Exception as err:
-                msg = 'Error %s: Unable to retrieve textbook table of contents at %s' % (err, toc_url)
-                log.error(msg)
-                raise Exception(msg)
-
-            # TOC is XML. Parse it
-            try:
-                table_of_contents = etree.fromstring(r.text)
-            except Exception as err:
-                msg = 'Error %s: Unable to parse XML for textbook table of contents at %s' % (err, toc_url)
-                log.error(msg)
-                raise Exception(msg)
-
-            return table_of_contents
 
     def __init__(self, *args, **kwargs):
         super(CourseDescriptor, self).__init__(*args, **kwargs)
-
-        self.textbooks = []
-        for title, book_url in self.textbooks:
-            try:
-                self.textbooks.append(self.Textbook(title, book_url))
-            except:
-                # If we can't get to S3 (e.g. on a train with no internet), don't break
-                # the rest of the courseware.
-                log.exception("Couldn't load textbook ({0}, {1})".format(title, book_url))
-                continue
 
         if self.wiki_slug is None:
             self.wiki_slug = self.location.course
@@ -272,8 +286,8 @@ class CourseDescriptor(SequenceDescriptor):
 
         definition, children = super(CourseDescriptor, cls).definition_from_xml(xml_object, system)
 
-        definition.setdefault('data', {})['textbooks'] = textbooks
-        definition['data']['wiki_slug'] = wiki_slug
+        definition['textbooks'] = textbooks
+        definition['wiki_slug'] = wiki_slug
 
         return definition, children
 
