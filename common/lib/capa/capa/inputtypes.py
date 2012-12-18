@@ -783,3 +783,102 @@ class OpenEndedInput(InputTypeBase):
 registry.register(OpenEndedInput)
 
 #-----------------------------------------------------------------------------
+
+class RubricInput(InputTypeBase):
+    """
+    This is the logic for parsing and displaying a rubric of type
+    """
+
+    template = "rubricinput.html"
+    tags = ['rubric']
+
+    # pulled out for testing
+    submitted_msg = ("Feedback not yet available.  Reload to check again. "
+                     "Once the problem is graded, this message will be "
+                     "replaced with the grader's feedback.")
+
+    @classmethod
+    def get_attributes(cls):
+        """
+        Convert options to a convenient format.
+        """
+        return [
+                ]
+
+    def _extra_context(self):
+        """
+        Add in the various bits and pieces of the 
+        """
+        return {}
+
+    def setup(self):
+
+        extract_categories(self.xml)
+
+    @staticmethod
+    def extract_categories(element):
+        '''
+        Contstruct a list of categories such that the structure looks like:
+        [ { category: "Category 1 Name",
+            options: [{text: "Option 1 Name", points: 0}, {text:"Option 2 Name", points: 5}]
+            },
+           { category: "Category 2 Name",
+             options: [{text: "Option 1 Name", points: 0}, 
+                         {text: "Option 2 Name", points: 1}, 
+                         {text: "Option 3 Name", points: 2]}]
+
+        '''
+        categories = []
+        for category in element:
+            if category.tag != 'category':
+                raise Exception("[capa.inputtypes.extract_categories] Expected a <category> tag: got {0} instead".format(category.tag))
+            else:
+                categories.append(extract_category(category))
+        self.categories = categories
+
+
+    @staticmethod
+    def extract_category(category):
+        ''' 
+        construct an individual category
+        {category: "Category 1 Name",
+         options: [{text: "Option 1 text", points: 1},
+                   {text: "Option 2 text", points: 2}]}
+
+        all sorting and auto-point generation occurs in this function
+        '''
+        descriptionxml = category[0]
+        optionsxml = category[1:]
+
+        # parse description
+        if descriptionxml.tag != 'description':
+            raise Exception("[extract_category: expected description tag, got {0} instead".format(descriptionxml.tag))
+
+        description = descriptionxml.text
+
+        cur_points = 0
+        options = []
+        # parse options
+        for option in optionsxml:
+            if option.tag != 'option': 
+                raise Exception("[extract_category: expected option tag, got {0} instead".format(option.tag))
+            else:
+                pointstr = option.get("points")
+                if(pointstr):
+                    # try to parse this into an int
+                    try:
+                        points = int(pointstr)
+                    except ValueError:
+                        raise Exception("[extract_category: expected int to have points, got {0} instead".format(pointstr))
+                else:
+                    # use the generated one
+                    points = cur_points
+                    cur_points = cur_points + 1
+                optiontext = option.text
+                options.append({'text': option.text, 'points': points})
+
+        return {'description': description, 'options': options}
+
+registry.register(RubricInput)
+
+#-----------------------------------------------------------------------------
