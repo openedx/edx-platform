@@ -26,7 +26,7 @@ from bs4 import BeautifulSoup
 from django.core.cache import cache
 
 from django_future.csrf import ensure_csrf_cookie, csrf_exempt
-from student.models import (Registration, UserProfile, TestCenterUser,
+from student.models import (Registration, UserProfile, TestCenterUser, TestCenterRegistration,
                             PendingNameChange, PendingEmailChange,
                             CourseEnrollment, unique_id_for_user)
 
@@ -614,7 +614,7 @@ def begin_test_registration(request, course_id):
         log.error("User {0} enrolled in non-existent course {1}"
                       .format(user.username, course_id))
 
-    # placeholder for possible messages...
+    # TODO: placeholder for possible messages...
     message = ""
     if not user.is_active:
         message = render_to_string('registration/activate_account_notice.html', {'email': user.email})
@@ -634,52 +634,68 @@ def _do_create_or_update_test_center_user(post_vars):
     registration for this user.
 
     Returns a tuple (User, UserProfile, TestCenterUser).
-
-    Note: this function is also used for creating test users.
+  
     """
-    user = User(username=post_vars['username'],
-             email=post_vars['email'],
-             is_active=False)
-    user.set_password(post_vars['password'])
-    registration = Registration()
+    
+    # first determine if we need to create a new TestCenterUser, or if we are making any update 
+    # to an existing TestCenterUser.
+    username=post_vars['username']
+    user = User.objects.get(username=username)
+    
+    needs_saving = False
+    try:
+        testcenter_user = TestCenterUser.objects.get(user=user)
+        # found a TestCenterUser, so check to see if it has changed
+        needs_updating = any([testcenter_user.__getattribute__(fieldname) != post_vars[fieldname]
+                              for fieldname in TestCenterUser.user_provided_fields()])
+            
+        if needs_updating:
+            # TODO: what do we set a timestamp to, in order to get now()?
+            testcenter_user.user_updated_at = datetime.datetime.now()
+            # Now do the update:
+            for fieldname in TestCenterUser.user_provided_fields():
+                testcenter_user.__setattr__(fieldname, post_vars[fieldname])
+            needs_saving = True
+        
+    except TestCenterUser.DoesNotExist:
+        # did not find the TestCenterUser, so create a new one 
+        testcenter_user = TestCenterUser(user=user)
+        # testcenter_user.user = user
+        for fieldname in TestCenterUser.user_provided_fields():
+            testcenter_user.__setattr__(fieldname, post_vars[fieldname])
+        # testcenter_user.candidate_id remains unset    
+        testcenter_user.client_candidate_id = 'edx' + '123456'  # some unique value  
+        testcenter_user.user_updated_at = datetime.datetime.now()
+        needs_saving = True
+
+    # additional validation occurs at save time, so handle exceptions
     # TODO: Rearrange so that if part of the process fails, the whole process fails.
     # Right now, we can have e.g. no registration e-mail sent out and a zombie account
-    try:
-        user.save()
-    except IntegrityError:
-        js = {'success': False}
-        # Figure out the cause of the integrity error
-        if len(User.objects.filter(username=post_vars['username'])) > 0:
-            js['value'] = "An account with this username already exists."
-            js['field'] = 'username'
-            return HttpResponse(json.dumps(js))
+    if needs_saving:
+        try:
+            testcenter_user.save()
+        except IntegrityError:
+            js = {'success': False}
+            # TODO: Figure out the cause of the integrity error
+            if len(User.objects.filter(username=post_vars['username'])) > 0:
+                js['value'] = "An account with this username already exists."
+                js['field'] = 'username'
+                return HttpResponse(json.dumps(js))
+            
+            if len(User.objects.filter(email=post_vars['email'])) > 0:
+                js['value'] = "An account with this e-mail already exists."
+                js['field'] = 'email'
+                return HttpResponse(json.dumps(js))
 
-        if len(User.objects.filter(email=post_vars['email'])) > 0:
-            js['value'] = "An account with this e-mail already exists."
-            js['field'] = 'email'
-            return HttpResponse(json.dumps(js))
+            raise
+            
+    
+    registration = TestCenterRegistration(testcenter_user = testcenter_user)
+    # registration.register(user)
 
-        raise
+    registration.accommodation_request = post_vars['accommodations']
 
-    registration.register(user)
-
-    profile = UserProfile(user=user)
-    profile.name = post_vars['name']
-    profile.level_of_education = post_vars.get('level_of_education')
-    profile.gender = post_vars.get('gender')
-    profile.mailing_address = post_vars.get('mailing_address')
-    profile.goals = post_vars.get('goals')
-
-    try:
-        profile.year_of_birth = int(post_vars['year_of_birth'])
-    except (ValueError, KeyError):
-        profile.year_of_birth = None  # If they give us garbage, just ignore it instead
-                                # of asking them to put an integer.
-    try:
-        profile.save()
-    except Exception:
-        log.exception("UserProfile creation failed for user {0}.".format(user.id))
-    return (user, profile, registration)
+    return (user, testcenter_user, registration)
 
 @ensure_csrf_cookie
 def create_test_registration(request, post_override=None):
@@ -718,7 +734,7 @@ def create_test_registration(request, post_override=None):
         return ret
 
 
-    (user, profile, testcenter_user, testcenter_registration) = ret
+    (user, testcenter_user, testcenter_registration) = ret
 
 
     # only do the following if there is accommodation text to send,
@@ -742,17 +758,6 @@ def create_test_registration(request, post_override=None):
             js['value'] = 'Could not send accommodation e-mail.'
             return HttpResponse(json.dumps(js))
 
-
-    if DoExternalAuth:
-        eamap.user = login_user
-        eamap.dtsignup = datetime.datetime.now()
-        eamap.save()
-        log.debug('Updated ExternalAuthMap for %s to be %s' % (post_vars['username'],eamap))
-
-        if settings.MITX_FEATURES.get('BYPASS_ACTIVATION_EMAIL_FOR_EXTAUTH'):
-            log.debug('bypassing activation email')
-            login_user.is_active = True
-            login_user.save()
 
     # statsd.increment("common.student.account_created")
 

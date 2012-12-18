@@ -189,10 +189,25 @@ class TestCenterUser(models.Model):
     # Company
     company_name = models.CharField(max_length=50, blank=True)
 
+    @staticmethod
+    def user_provided_fields():
+        return [ 'first_name', 'middle_name', 'last_name', 'suffix', 'salutation', 
+                'address_1', 'address_2', 'address_3', 'city', 'state', 'postal_code', 'country', 
+                'phone', 'extension', 'phone_country_code', 'fax', 'fax_country_code', 'company_name']
+        
     @property
     def email(self):
         return self.user.email
 
+class TestCenterRegistration(models.Model):
+    testcenter_user = models.ForeignKey(TestCenterUser, unique=True, default=None)
+    created_at = models.DateTimeField(auto_now_add=True, db_index=True)
+    updated_at = models.DateTimeField(auto_now=True, db_index=True)
+    accommodation_request = models.CharField(max_length=1024)
+    # TODO: this should be an enumeration:
+    accommodation_code = models.CharField(max_length=64)
+    
+    
 def unique_id_for_user(user):
     """
     Return a unique id for a user, suitable for inserting into
