@@ -47,6 +47,7 @@ define('Inputs', ['logme'], function (logme) {
                 // In the case of a readonly config option, configure the text
                 // inputit as read-only, and NOT bind an event to it.
                 inputDiv.attr('readonly', 'readonly');
+                inputDiv.css('background-color', '#D3D3D3');
 
             } else { // readonly !== true
 
@@ -63,14 +64,14 @@ define('Inputs', ['logme'], function (logme) {
             // Lets style the input element nicely. We will use the button()
             // widget for this since there is no native widget for the text
             // input.
-            inputDiv.button().css({
-                'font': 'inherit',
-                'color': 'inherit',
-                'text-align': 'left',
-                'outline': 'none',
-                'cursor': 'text',
-                'height': '15px'
-            });
+            // inputDiv.button().css({
+            //     'font': 'inherit',
+            //     'color': 'inherit',
+            //     'text-align': 'left',
+            //     'outline': 'none',
+            //     'cursor': 'text',
+            //     'height': '15px'
+            // });
 
             // Tell the parameter object from state that we are attaching a
             // text input to it. Next time the parameter will be updated with

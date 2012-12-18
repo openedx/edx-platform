@@ -96,7 +96,7 @@ class GraphicalSliderToolModule(XModule):
         #substitute sliders
         slider_div = '<div class="{element_class}_slider" \
                                    id="{element_id}_slider_{var}" \
-                                   data-var="{var}" data-el_style="{style}">\
+                                   data-var="{var}" style="{style}">\
                      </div>'
         for var in variables:
             # find $slider var='var' ... $
@@ -127,7 +127,7 @@ class GraphicalSliderToolModule(XModule):
         # substitute inputs if we have them
         input_el = '<input class="{element_class}_input" \
                                   id="{element_id}_input_{var}" \
-                                   data-var="{var}" data-el_style="{style}" \
+                                   data-var="{var}" style="{style}" \
                                    data-el_readonly="{readonly}"/>'
 
         input_index = 0  # make multiple inputs for same variable have
