@@ -27,8 +27,8 @@ define('Graph', ['logme'], function (logme) {
         }
 
         // Configure some settings for the graph.
-        setGraphAxes();
         setGraphXRange();
+        setGraphAxes();
 
         // Get the user defined functions. If there aren't any, don't do
         // anything else.
@@ -135,15 +135,29 @@ define('Graph', ['logme'], function (logme) {
         function setGraphXRange() {
             var xRangeStr, xRangeBlobs, tempNum;
 
-            xrange = {
-                'start': 0,
-                'end': 10,
-                'step': 0.1
-            };
+            xrange = {};
 
-            // The 'xrange' is a string containing two floating point numbers
-            // separated by a comma. The first number is the starting
-            // x-coordinate , the second number is the ending x-coordinate
+            if ($.isPlainObject(config.plot.xrange) === false) {
+                logme('ERROR: Expected config.plot.xrange to be an object. It is not.');
+                logme('config.plot.xrange = ', config.plot.xrange);
+
+                return false;
+            }
+
+            if (typeof config.plot.xrange.min !== 'string') {
+                logme('ERROR: Expected config.plot.xrange.min to be a string. It is not.');
+                logme('config.plot.xrange.min = ', config.plot.xrange.min);
+
+                return false;
+            }
+
+            if (typeof config.plot.xrange.max !== 'string') {
+                logme('ERROR: Expected config.plot.xrange.max to be a string. It is not.');
+                logme('config.plot.xrange.max = ', config.plot.xrange.max);
+
+                return false;
+            }
+
             if (typeof config.plot['xrange'] === 'string') {
                 xRangeStr = config.plot['xrange'];
                 xRangeBlobs = xRangeStr.split(',');
@@ -193,6 +207,8 @@ define('Graph', ['logme'], function (logme) {
             } else {
                 logme('ERROR: num_points is not a string.');
             }
+
+            return true;
         }
 
         function createFunctions() {
