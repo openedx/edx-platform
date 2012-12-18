@@ -11,7 +11,7 @@ define('Inputs', ['logme'], function (logme) {
         allParamNames = state.getAllParameterNames();
 
         for (c1 = 0; c1 < allParamNames.length; c1 += 1) {
-            $('#' + gstId).children('.' + gstClass + '_input').each(function (index, value) {
+            $('#' + gstId).find('.' + gstClass + '_input').each(function (index, value) {
                 var inputDiv, paramName;
 
                 paramName = allParamNames[c1];
