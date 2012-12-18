@@ -9,6 +9,7 @@ from util.converters import jsdate_to_time, time_to_date
 from cms.djangoapps.models.settings import course_grading
 from cms.djangoapps.contentstore.utils import update_item
 import re
+import logging
 
 
 class CourseDetails:
@@ -155,7 +156,7 @@ class CourseDetails:
         if keystring_matcher:
             return keystring_matcher.group(0)
         else:
-            # TODO should this be None or the raw_video? It would be good to at least log this
+            logging.warn("ignoring the content because it doesn't not conform to expected pattern: " + raw_video)
             return None
     
     @staticmethod

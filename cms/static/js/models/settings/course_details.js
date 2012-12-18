@@ -49,7 +49,7 @@ CMS.Models.Settings.CourseDetails = Backbone.Model.extend({
 		if (newattrs.end_date && newattrs.enrollment_end && newattrs.end_date < newattrs.enrollment_end) {
 			errors.enrollment_end = "The enrollment end date cannot be after the course end date.";
 		}
-		if (newattrs.intro_video && newattrs.intro_video != this.get('intro_video')) {
+		if (newattrs.intro_video && newattrs.intro_video !== this.get('intro_video')) {
 			if (this._videokey_illegal_chars.exec(newattrs.intro_video)) {
 				errors.intro_video = "Key should only contain letters, numbers, _, or -";
 			}
@@ -71,7 +71,7 @@ CMS.Models.Settings.CourseDetails = Backbone.Model.extend({
 		if (_.isEmpty(newsource) && !_.isEmpty(this.get('intro_video'))) this.save({'intro_video': null}); 
 		// TODO remove all whitespace w/in string
 		else {
-			if (this.get('intro_video') != newsource) this.save('intro_video', newsource);
+			if (this.get('intro_video') !== newsource) this.save('intro_video', newsource);
 		}
 		
 		return this.videosourceSample();

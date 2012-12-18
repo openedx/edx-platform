@@ -4,6 +4,7 @@ from xmodule.modulestore.django import modulestore
 from lxml import etree
 import re
 from django.http import HttpResponseBadRequest
+import logging
 
 ## TODO store as array of { date, content } and override  course_info_module.definition_from_xml
 ## This should be in a class which inherits from XmlDescriptor
@@ -65,9 +66,11 @@ def update_course_updates(location, update, passed_id=None):
         course_html_parsed = etree.fromstring("<ol></ol>")
 
     try:
-        new_html_parsed = etree.fromstring(update['content'], etree.XMLParser(remove_blank_text=True))
+        new_html_parsed = etree.fromstring('<li><h2>' + update['date'] + '</h2>' + update['content'] + '</li>', 
+                                           etree.XMLParser(remove_blank_text=True))
     except etree.XMLSyntaxError:
-        new_html_parsed = None
+        logging.debug("Mashing malformed update")
+        new_html_parsed = '<li><h2>' + update['date'] + '</h2>' + update['content'] + '</li>'
         
     # Confirm that root is <ol>, iterate over <li>, pull out <h2> subs and then rest of val
     if course_html_parsed.tag == 'ol':
@@ -75,29 +78,9 @@ def update_course_updates(location, update, passed_id=None):
         if passed_id:
             idx = get_idx(passed_id)
             # idx is count from end of list
-            element = course_html_parsed[-idx]
-            element[0].text = update['date']
-            if (len(element) == 1):
-                if new_html_parsed is not None:
-                    element[0].tail = None
-                    element.append(new_html_parsed)
-                else:
-                    element[0].tail = update['content']
-            else:
-                if new_html_parsed is not None:
-                    element[1] = new_html_parsed
-                else:
-                    element.pop(1)
-                    element[0].tail = update['content']
+            course_html_parsed[-idx] = new_html_parsed
         else:
-            element =  etree.Element("li")
-            course_html_parsed.insert(0, element)
-            date_element = etree.SubElement(element, "h2")
-            date_element.text = update['date']
-            if new_html_parsed is not None:
-                element.append(new_html_parsed)
-            else:
-                date_element.tail = update['content']
+            course_html_parsed.insert(0, new_html_parsed)
 
             idx = len(course_html_parsed)
             passed_id = course_updates.location.url() + "/" + str(idx)
