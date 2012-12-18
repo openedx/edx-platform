@@ -27,7 +27,12 @@ define('Graph', ['logme'], function (logme) {
         }
 
         // Configure some settings for the graph.
-        setGraphXRange();
+        if (setGraphXRange() === false) {
+            logme('ERROR: could not configure the xrange. Will not continue.');
+
+            return;
+        }
+
         setGraphAxes();
 
         // Get the user defined functions. If there aren't any, don't do
@@ -133,7 +138,7 @@ define('Graph', ['logme'], function (logme) {
         }
 
         function setGraphXRange() {
-            var xRangeStr, xRangeBlobs, tempNum;
+            var xRangeStr, xRangeBlobs, tempNum, allParamNames;
 
             xrange = {};
 
@@ -158,54 +163,60 @@ define('Graph', ['logme'], function (logme) {
                 return false;
             }
 
-            if (typeof config.plot['xrange'] === 'string') {
-                xRangeStr = config.plot['xrange'];
-                xRangeBlobs = xRangeStr.split(',');
+            allParamNames = state.getAllParameterNames();
 
-                if (xRangeBlobs.length === 2) {
-                    tempNum = parseFloat(xRangeBlobs[0]);
-                    if (isNaN(tempNum) === false) {
-                        xrange.start = tempNum;
-                    } else {
-                        logme('ERROR: First blob was parsed as a NaN.');
-                    }
+            allParamNames.push(config.plot.xrange.min);
+            try {
+                xrange.min = Function.apply(null, allParamNames);
+            } catch (err) {
+                logme('ERROR: could not create a function from the string "' + config.plot.xrange.min + '" for xrange.min.');
 
-                    tempNum = parseFloat(xRangeBlobs[1]);
-                    if (isNaN(tempNum) === false) {
-                        xrange.end = tempNum;
-                    } else {
-                        logme('ERROR: Second blob was parsed as a NaN.');
-                    }
-
-                    if (xrange.start >= xrange.end) {
-                        xrange.start = 0;
-                        xrange.end = 10;
-                    }
-
-                } else {
-                    logme('ERROR: xrange does not contain 2 blobs. xRangeBlobs.length = ' + xRangeBlobs.length);
-                }
-            } else {
-                logme('ERROR: xrange is not a string. config.plot["xrange"] = ', config.plot['xrange']);
+                return false;
             }
+            allParamNames.pop();
+
+            allParamNames.push(config.plot.xrange.max);
+            try {
+                xrange.max = Function.apply(null, allParamNames);
+            } catch (err) {
+                logme('ERROR: could not create a function from the string "' + config.plot.xrange.min + '" for xrange.min.');
+
+                return false;
+            }
+            allParamNames.pop();
+
+            logme('xrange = ', xrange);
 
             // The user can specify the number of points. However, internally
             // we will use it to generate a 'step' - i.e. the distance (on
             // x-axis) between two adjacent points.
-            if (typeof config.plot['num_points'] === 'string') {
-                tempNum = parseInt(config.plot['num_points'], 10);
-                if (
-                    (isNaN(tempNum) === false) ||
-                    (tempNum >= 2) &&
-                    (tempNum <= 1000)
-                ) {
-                    numPoints = tempNum;
-                    xrange.step = (xrange.end - xrange.start) / (numPoints - 1);
-                } else {
-                    logme('ERROR: num_points was not parsed as a number, or num_points < 2, or num_points > 500.');
+            if (typeof config.plot.num_points === 'string') {
+                tempNum = parseInt(config.plot.num_points, 10);
+                if (isNaN(tempNum) === true) {
+                    logme('ERROR: Could not parse the number of points.');
+                    logme('config.plot.num_points = ', config.plot.num_points);
+
+                    return false;
                 }
+
+                if (
+                    (tempNum < 2) &&
+                    (tempNum > 1000)
+                ) {
+                    logme('ERROR: Number of points is outside the allowed range [2, 1000]');
+                    logme('config.plot.num_points = ' + tempNum);
+
+                    return false;
+                }
+
+                numPoints = tempNum;
             } else {
-                logme('ERROR: num_points is not a string.');
+                logme('MESSAGE: config.plot.num_points is not a string.');
+                logme('Will set number of points to {width of graph} / 10.');
+
+                numPoints = plotDiv.width() / 10.0;
+
+                logme('numPoints = ' + numPoints);
             }
 
             return true;
@@ -282,7 +293,15 @@ define('Graph', ['logme'], function (logme) {
                 if (typeof funcString !== 'string') {
                     return;
                 }
+
+                // Make sure that any HTML entities that were escaped will be
+                // unescaped. This is done because if a string with escaped
+                // HTML entities is passed to the Function() constructor, it
+                // will break.
                 funcString = $('<div>').html(funcString).text();
+
+                logme('funcString = ' + funcString);
+
                 // Some defaults. If no options are set for the graph, we will
                 // make sure that at least a line is drawn for a function.
                 newFunctionObject = {
@@ -294,12 +313,16 @@ define('Graph', ['logme'], function (logme) {
                 // XML.
                 paramNames = state.getAllParameterNames();
 
+                logme('allParamNames = ', paramNames);
+
                 // The 'x' is always one of the function parameters.
                 paramNames.push('x');
 
                 // Must make sure that the function body also gets passed to
                 // the Function constructor.
                 paramNames.push(funcString);
+
+                console.log('paramNames = ', paramNames);
 
                 // Create the function from the function string, and all of the
                 // available parameters AND the 'x' variable as it's parameters.
@@ -322,6 +345,11 @@ define('Graph', ['logme'], function (logme) {
 
                     return;
                 }
+
+                // Return the array back to original state. Remember that it is
+                // a pointer to original array which is stored in state object.
+                paramNames.pop();
+                paramNames.pop();
 
                 newFunctionObject['func'] = func;
 
@@ -370,7 +398,8 @@ define('Graph', ['logme'], function (logme) {
         }
 
         function generateData() {
-            var c0, c1, functionObj, seriesObj, dataPoints, paramValues, x, y;
+            var c0, c1, functionObj, seriesObj, dataPoints, paramValues, x, y,
+                start, end, step;
 
             paramValues = state.getAllParameterValues();
 
@@ -387,8 +416,14 @@ define('Graph', ['logme'], function (logme) {
                 // JSON.
                 c1 = 0;
 
+                start = xrange.min.apply(window, paramValues);
+                end = xrange.max.apply(window, paramValues);
+                step = (end - start) / (numPoints - 1);
+
+                logme('start = ' + start + ', end = ' + end + ', step = ' + step);
+
                 // Generate the data points.
-                for (x = xrange.start; x <= xrange.end; x += xrange.step) {
+                for (x = start; x <= end; x += step) {
 
                     // Push the 'x' variable to the end of the parameter array.
                     paramValues.push(x);
@@ -413,7 +448,7 @@ define('Graph', ['logme'], function (logme) {
                 // of floating-point number addition, then we will include it
                 // manually.
                 if (c1 != numPoints) {
-                    x = xrange.end;
+                    x = end;
                     paramValues.push(x);
                     y = functionObj.func.apply(window, paramValues);
                     paramValues.pop();
