@@ -6,14 +6,13 @@ define('State', ['logme'], function (logme) {
     // Since there will be (can be) multiple GST on a page, and each will have
     // a separate state, we will create a factory constructor function. The
     // constructor will expect the ID of the DIV with the GST contents, and the
-    // configuration object (parsed from a JSON string). It will return and
+    // configuration object (parsed from a JSON string). It will return an
     // object containing methods to set and get the private state properties.
 
     // This module defines and returns a factory constructor.
     return State;
 
-    // function: State
-    function State(gstId, gstClass, config) {
+    function State(gstId, config) {
         var parameters, allParameterNames, allParameterValues,
             plotDiv;
 
@@ -21,41 +20,50 @@ define('State', ['logme'], function (logme) {
         // an empty object.
         //
         // As we parse the JSON config object, we will add parameters as
-        // named properties (for example
+        // named properties. For example
         //
         //     parameters.a = {...};
         //
-        // for the parameter 'a'.
+        // will be created for the parameter 'a'.
         parameters = {};
 
-        // Check that the required object is available.
-        if (
-            (typeof config.parameters !== 'undefined') &&
-            (typeof config.parameters.param !== 'undefined')
-        ) {
+        // Check that the required parameters config object is available.
+        if ($.isPlainObject(config.parameters) === false) {
+            logme('ERROR: Expected config.parameters to be an object. It is not.');
+            logme('config.parameters = ', config.parameters);
 
-            // If config.parameters.param is an array, pass it to the processor
-            // element by element.
-            if ($.isArray(config.parameters.param) === true) {
-                (function (c1) {
-                    while (c1 < config.parameters.param.length) {
-                        processParameter(config.parameters.param[c1]);
-                        c1 += 1;
-                    }
-                }(0));
-            }
+            return;
+        }
 
-            // If config.parameters.param is an object, pass this object to the
-            // processor directly.
-            else if ($.isPlainObject(config.inputs.input) === true) {
-                processParameter(config.parameters.param);
-            }
+        // If config.parameters.param is an array, pass it to the processor
+        // element by element.
+        if ($.isArray(config.parameters.param) === true) {
+            (function (c1) {
+                while (c1 < config.parameters.param.length) {
+                    processParameter(config.parameters.param[c1]);
+                    c1 += 1;
+                }
+            }(0));
+        }
 
+        // If config.parameters.param is an object, pass this object to the
+        // processor directly.
+        else if ($.isPlainObject(config.inputs.input) === true) {
+            processParameter(config.parameters.param);
+        }
+
+        // If config.parameters.param is some other type, report an error and
+        // do not continue.
+        else {
+            logme('ERROR: config.parameters.param is of an unsupported type.');
+            logme('config.parameters.param = ', config.parameters.param);
+
+            return;
         }
 
         // Instead of building these arrays every time when some component
         // requests them, we will create them in the beginning, and then update
-        // by element when some parameter's value changes.
+        // each element individually when some parameter's value changes.
         //
         // Then we can just return the required array, instead of iterating
         // over all of the properties of the 'parameters' object, and
@@ -63,9 +71,8 @@ define('State', ['logme'], function (logme) {
         allParameterNames = [];
         allParameterValues = [];
 
+        // Populate 'allParameterNames', and 'allParameterValues' with data.
         generateHelperArrays();
-
-        logme(parameters, allParameterNames, allParameterValues);
 
         // The constructor will return an object with methods to operate on
         // it's private properties.
@@ -91,6 +98,8 @@ define('State', ['logme'], function (logme) {
 
         function getParamObj(paramName) {
             if (parameters.hasOwnProperty(paramName) === false) {
+                logme('ERROR: Object parameters does not have a property named "' + paramName + '".');
+
                 return;
             }
 
@@ -108,6 +117,8 @@ define('State', ['logme'], function (logme) {
             // If the name of the constant is not tracked by state, return an
             // 'undefined' value.
             if (parameters.hasOwnProperty(paramName) === false) {
+                logme('ERROR: Object parameters does not have a property named "' + paramName + '".');
+
                 return;
             }
 
@@ -118,6 +129,7 @@ define('State', ['logme'], function (logme) {
         //
         // Function: setParameterValue(paramName, paramValue, element)
         // --------------------------------------------------
+        //
         //
         // This function can be called from a callback, registered by a slider
         // or a text input, when specific events ('slide' or 'change') are
@@ -146,12 +158,14 @@ define('State', ['logme'], function (logme) {
         // original value.
         //
         // ####################################################################
-        function setParameterValue(paramName, paramValue, element) {
+        function setParameterValue(paramName, paramValue, element, slider) {
             var paramValueNum, c1;
 
             // If a parameter with the name specified by the 'paramName'
             // parameter is not tracked by state, do not do anything.
             if (parameters.hasOwnProperty(paramName) === false) {
+                logme('ERROR: Object parameters does not have a property named "' + paramName + '".');
+
                 return;
             }
 
@@ -159,38 +173,65 @@ define('State', ['logme'], function (logme) {
             // number.
             paramValueNum = parseFloat(paramValue);
 
-            if (
-                // We are interested only in valid float values. NaN, -INF,
-                // +INF we will disregard.
-                (isFinite(paramValueNum) === false) ||
+            // We are interested only in valid float values. NaN, -INF,
+            // +INF we will disregard.
+            if (isFinite(paramValueNum) === false) {
+                logme('ERROR: New parameter value is not a floating-point number.');
+                logme('paramValue = ', paramValue);
 
-                // If the new parameter's value is valid, but lies outised of
-                // the parameter's allowed range, we will also disregard it.
+                return;
+            }
+
+            // If the new parameter's value is valid, but lies outised of
+            // the parameter's allowed range, we will disregard it.
+            //
+            // We will also change the element's value back to the current
+            // parameter's value.
+            if (
                 (paramValueNum < parameters[paramName].min) ||
                 (paramValueNum > parameters[paramName].max)
             ) {
-                // We will also change the element's value back to the current
-                // parameter's value.
-                element.val(parameters[paramName].value);
+                logme('ERROR: New parameter\'s value lies outside of the allowed range.');
+                logme('Range is: min = ' + parameters[paramName].min + ', max = ' + parameters[paramName].max);
+                logme('paramValueNum = ' + paramValueNum);
+
+                // If element is a slider, the value must be set in a special
+                // way.
+                if (slider === true) {
+                    logme('Changing back the slider.');
+                    element.slider('value', parameters[paramName].value);
+                }
+
+                // If element is a text input, standard jQuery val() function
+                // will work.
+                else {
+                    element.val(parameters[paramName].value);
+                }
 
                 return;
             }
 
             parameters[paramName].value = paramValueNum;
 
+            // If we have a plot DIV to work with, tell to update.
             if (plotDiv !== undefined) {
                 plotDiv.trigger('update_plot');
             }
 
+            // Update all text inputs with the new parameter's value.
             for (c1 = 0; c1 < parameters[paramName].inputDivs.length; c1 += 1) {
                 parameters[paramName].inputDivs[c1].val(paramValueNum);
             }
 
+            // Update the single slider with the new parameter's value.
             if (parameters[paramName].sliderDiv !== null) {
                 parameters[paramName].sliderDiv.slider('value', paramValueNum);
             }
 
+            // Update the helper array with the new parameter's value.
             allParameterValues[parameters[paramName].helperArrayIndex] = paramValueNum;
+
+            return true;
         } // End-of: function setParameterValue
 
         // ####################################################################
@@ -230,11 +271,8 @@ define('State', ['logme'], function (logme) {
             var paramName, newParamObj;
 
             if (typeof obj['@var'] !== 'string') {
-                logme(
-                    '[ERROR] State.processParameter(obj): obj["@var"] is not a string.',
-                    obj['@var'],
-                    '---> Not adding a parameter.'
-                );
+                logme('ERROR: Expected obj["@var"] to be a string. It is not.');
+                logme('obj["@var"] = ', obj['@var']);
 
                 return;
             }
@@ -248,14 +286,19 @@ define('State', ['logme'], function (logme) {
                 (processFloat('@step', 'step') === false) ||
                 (processFloat('@initial', 'value') === false)
             ) {
-                logme('---> Not adding a parameter named "' + paramName + '".');
+                logme('ERROR: A required property is missing. Not creating parameter "' + paramName + '"');
 
                 return;
             }
 
+            // Pointers to text input and slider DIV elements that this
+            // parameter will be attached to. Initially there are none. When we
+            // will create text inputs and sliders, we will update these
+            // properties.
             newParamObj.inputDivs = [];
             newParamObj.sliderDiv = null;
 
+            // Everything went well, so save the new parameter object.
             parameters[paramName] = newParamObj;
 
             return;
@@ -264,19 +307,16 @@ define('State', ['logme'], function (logme) {
                 var attrValue;
 
                 if (typeof obj[attrName] !== 'string') {
-                    logme(
-                        '[ERROR] state.processParameter(obj): obj["' + attrName + '"] is not a string.',
-                        obj[attrName]
-                    );
+                    logme('ERROR: Expected obj["' + attrName + '"] to be a string. It is not.');
+                    logme('obj["' + attrName + '"] = ', obj[attrName]);
 
                     return false;
                 } else {
                     attrValue = parseFloat(obj[attrName]);
 
-                    if (isNaN(attrValue) === true) {
-                        logme(
-                            '[ERROR] state.processParameter(obj): for attrName = "' + attrName + '" attrValue is NaN.'
-                        );
+                    if (isFinite(attrValue) === false) {
+                        logme('ERROR: Expected obj["' + attrName + '"] to be a valid floating-point number. It is not.');
+                        logme('obj["' + attrName + '"] = ', obj[attrName]);
 
                         return false;
                     }
@@ -288,10 +328,22 @@ define('State', ['logme'], function (logme) {
             } // End-of: function processFloat
         } // End-of: function processParameter
 
+        // ####################################################################
+        //
+        // Function: generateHelperArrays()
+        // -------------------------------
+        //
+        //
         // Populate 'allParameterNames' and 'allParameterValues' with data.
         // Link each parameter object with the corresponding helper array via
-        // an index ('helperArrayIndex'). It will be the same for both of the
+        // an index 'helperArrayIndex'. It will be the same for both of the
         // arrays.
+        //
+        // NOTE: It is important to remember to update these helper arrays
+        // whenever a new parameter is added (or one is removed), or when a
+        // parameter's value changes.
+        //
+        // ####################################################################
         function generateHelperArrays() {
             var paramName, c1;
 

@@ -16,23 +16,47 @@ define(
     function GstMain(gstId) {
         var config, gstClass, state;
 
-        // Get the JSON configuration, and parse it, and store as an object.
-        config = JSON.parse($('#' + gstId + '_json').html()).root;
+        // Get the JSON configuration, parse it, and store as an object.
+        try {
+            config = JSON.parse($('#' + gstId + '_json').html()).root;
+        } catch (err) {
+            logme('ERROR: could not parse config JSON.');
+            logme('$("#" + gstId + "_json").html() = ', $('#' + gstId + '_json').html());
+            logme('JSON.parse(...) = ', JSON.parse($('#' + gstId + '_json').html()));
+            logme('config = ', config);
 
+            return;
+        }
+
+        // Get the class name of the GST. All elements are assigned a class
+        // name that is based on the class name of the GST. For example, inputs
+        // are assigned a class name '{GST class name}_input'.
+        if (typeof config['@class'] !== 'string') {
+            logme('ERROR: Could not get the class name of GST.');
+            logme('config["@class"] = ', config['@class']);
+
+            return;
+        }
         gstClass = config['@class'];
-        logme('gstClass: ' + gstClass);
 
-        // Parse the configuration settings for sliders and text inputs, and
-        // extract all of the defined constants (their names along with their
-        // initial values).
-        state = State(gstId, gstClass, config);
+        // Parse the configuration settings for parameters, and store them in a
+        // state object.
+        state = State(gstId, config);
+
+        // It is possible that something goes wrong while extracting parameters
+        // from the JSON config object. In this case, we will not continue.
+        if (state === undefined) {
+            logme('ERROR: The state object was not initialized properly.');
+
+            return;
+        }
 
         // Create the sliders and the text inputs, attaching them to
-        // approriate constants.
-        Sliders(gstId, gstClass, state);
+        // appropriate parameters.
+        Sliders(gstId, state);
         Inputs(gstId, gstClass, state);
 
-        // Configure and display the loop. Attach event for the graph to be
+        // Configure and display the graph. Attach event for the graph to be
         // updated on any change of a slider or a text input.
         Graph(gstId, config, state);
     }

@@ -5,7 +5,7 @@
 define('Sliders', ['logme'], function (logme) {
     return Sliders;
 
-    function Sliders(gstId, gstClass, state) {
+    function Sliders(gstId, state) {
         var c1, paramName, allParamNames, sliderDiv;
 
         allParamNames = state.getAllParameterNames();
@@ -13,38 +13,33 @@ define('Sliders', ['logme'], function (logme) {
         for (c1 = 0; c1 < allParamNames.length; c1 += 1) {
             paramName = allParamNames[c1];
 
-            logme('Looking for slider with ID: ' + gstId + '_slider_' + paramName);
             sliderDiv = $('#' + gstId + '_slider_' + paramName);
 
             if (sliderDiv.length === 1) {
-                logme('Found one slider DIV with such an ID.');
                 createSlider(sliderDiv, paramName);
+            } else if (sliderDiv.length > 1) {
+                logme('ERROR: Found more than one slider for the parameter "' + paramName + '".');
+                logme('sliderDiv.length = ', sliderDiv.length);
             } else {
-                logme('Did not find such a slider.');
+                logme('MESSAGE: Did not find a slider for the parameter "' + paramName + '".');
             }
         }
 
         function createSlider(sliderDiv, paramName) {
-            var paramObj, sliderWidth;
+            var paramObj;
 
             paramObj = state.getParamObj(paramName);
 
-            // We will define the width of the slider to a sensible default.
-            sliderWidth = 400;
+            // Check that the retrieval went OK.
+            if (paramObj === undefined) {
+                logme('ERROR: Could not get a paramObj for parameter "' + paramName + '".');
 
-            // See if it was specified by the user.
-            if (isFinite(parseInt(sliderDiv.data('el_width'))) === true) {
-                sliderWidth = parseInt(sliderDiv.data('el_width'));
+                return;
             }
-
-            // Set the width of the element.
-            sliderDiv.width(sliderWidth);
-
-            sliderDiv.css('display', 'inline-block');
 
             // Create a jQuery UI slider from the slider DIV. We will set
             // starting parameters, and will also attach a handler to update
-            // the 'state' on the 'change' event.
+            // the 'state' on the 'slide' event.
             sliderDiv.slider({
                 'min': paramObj.min,
                 'max': paramObj.max,
@@ -55,6 +50,9 @@ define('Sliders', ['logme'], function (logme) {
                 'slide': sliderOnSlide
             });
 
+            // Tell the parameter object stored in state that we have a slider
+            // that is attached to it. Next time when the parameter changes, it
+            // will also update the value of this slider.
             paramObj.sliderDiv = sliderDiv;
 
             return;
@@ -65,7 +63,15 @@ define('Sliders', ['logme'], function (logme) {
             // This will cause the plot to be redrawn each time after the user
             // drags the slider handle and releases it.
             function sliderOnSlide(event, ui) {
-                state.setParameterValue(paramName, ui.value, sliderDiv);
+
+                // Last parameter passed to setParameterValue() will be 'true'
+                // so that the function knows we are a slider, and it can
+                // change the our value back in the case when the new value is
+                // invalid for some reason.
+                if (state.setParameterValue(paramName, ui.value, sliderDiv, true) === undefined) {
+                    logme('ERROR: Could not update the parameter named "' + paramName + '" with the value "' + ui.value + '".');
+                }
+
             }
         }
     }

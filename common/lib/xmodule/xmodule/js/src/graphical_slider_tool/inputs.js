@@ -10,14 +10,11 @@ define('Inputs', ['logme'], function (logme) {
 
         allParamNames = state.getAllParameterNames();
 
-        console.log(allParamNames);
-
         for (c1 = 0; c1 < allParamNames.length; c1 += 1) {
             $('#' + gstId).children('.' + gstClass + '_input').each(function (index, value) {
                 var inputDiv, paramName;
 
                 paramName = allParamNames[c1];
-
                 inputDiv = $(value);
 
                 if (paramName === inputDiv.data('var')) {
@@ -29,22 +26,16 @@ define('Inputs', ['logme'], function (logme) {
         return;
 
         function createInput(inputDiv, paramName) {
-            var paramObj, inputWidth, readOnly;
+            var paramObj, readOnly;
 
             paramObj = state.getParamObj(paramName);
 
-            // We will define the width of the slider to a sensible default.
-            inputWidth = 400;
+            // Check that the retrieval went OK.
+            if (paramObj === undefined) {
+                logme('ERROR: Could not get a paramObj for parameter "' + paramName + '".');
 
-            // See if it was specified by the user.
-            if (isFinite(parseInt(inputDiv.data('el_width'))) === true) {
-                inputWidth = parseInt(inputDiv.data('el_width'));
+                return;
             }
-
-            // Set the width of the element.
-            inputDiv.width(inputWidth);
-
-            inputDiv.css('display', 'inline-block');
 
             readOnly = false;
             if (inputDiv.attr('data-el_readonly').toLowerCase() === 'true') {
@@ -79,9 +70,11 @@ define('Inputs', ['logme'], function (logme) {
                 'outline': 'none',
                 'cursor': 'text',
                 'height': '15px'
-                // 'width': '50px'
             });
 
+            // Tell the parameter object from state that we are attaching a
+            // text input to it. Next time the parameter will be updated with
+            // a new value, tis input will also be updated.
             paramObj.inputDivs.push(inputDiv);
 
             return;
