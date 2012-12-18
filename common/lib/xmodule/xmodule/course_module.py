@@ -291,30 +291,6 @@ class CourseDescriptor(SequenceDescriptor):
         return time.gmtime() > self.start
 
     @property
-    def end(self):
-        return self._try_parse_time("end")
-    @end.setter
-    def end(self, value):
-        if isinstance(value, time.struct_time):
-            self.metadata['end'] = stringify_time(value)
-    @property
-    def enrollment_start(self):
-        return self._try_parse_time("enrollment_start")
-        
-    @enrollment_start.setter
-    def enrollment_start(self, value):
-        if isinstance(value, time.struct_time):
-            self.metadata['enrollment_start'] = stringify_time(value)
-    @property
-    def enrollment_end(self):        
-        return self._try_parse_time("enrollment_end")
-        
-    @enrollment_end.setter
-    def enrollment_end(self, value):
-        if isinstance(value, time.struct_time):
-            self.metadata['enrollment_end'] = stringify_time(value)
-        
-    @property
     def grader(self):
         return self._grading_policy['GRADER']
     
@@ -326,7 +302,7 @@ class CourseDescriptor(SequenceDescriptor):
     def raw_grader(self, value):
         # NOTE WELL: this change will not update the processed graders. If we need that, this needs to call grader_from_conf
         self._grading_policy['RAW_GRADER'] = value
-        self.definition['data'].setdefault('grading_policy',{})['GRADER'] = value
+        self.grading_policy['GRADER'] = value
 
     @property
     def grade_cutoffs(self):
@@ -335,7 +311,7 @@ class CourseDescriptor(SequenceDescriptor):
     @grade_cutoffs.setter
     def grade_cutoffs(self, value):
         self._grading_policy['GRADE_CUTOFFS'] = value
-        self.definition['data'].setdefault('grading_policy',{})['GRADE_CUTOFFS'] = value
+        self.grading_policy['GRADE_CUTOFFS'] = value
     
 
     @lazyproperty

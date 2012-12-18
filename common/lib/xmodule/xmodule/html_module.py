@@ -43,6 +43,8 @@ class HtmlDescriptor(XmlDescriptor, EditingDescriptor):
     module_class = HtmlModule
     filename_extension = "xml"
     template_dir_name = "html"
+    
+    data = String(help="Html contents to display for this module", scope=Scope.content)
 
     js = {'coffee': [resource_string(__name__, 'js/src/html/edit.coffee')]}
     js_module_name = "HTMLEditingDescriptor"

@@ -355,7 +355,11 @@ class CapaModule(XModule):
                 id=self.location.html_id(), ajax_url=self.system.ajax_url) + html + "</div>"
 
         # now do the substitutions which are filesystem based, e.g. '/static/' prefixes
-        return self.system.replace_urls(html, self.descriptor.data_dir, course_namespace=self.location)
+        return self.system.replace_urls(
+            html,
+            getattr(self.descriptor, 'data_dir', ''),
+            course_namespace=self.location
+        )
 
     def handle_ajax(self, dispatch, get):
         '''
@@ -462,10 +466,20 @@ class CapaModule(XModule):
         for answer_id in answers:
             try:
 <<<<<<< HEAD
+<<<<<<< HEAD
                 new_answer = {answer_id: self.system.replace_urls(answers[answer_id], self.metadata['data_dir'], course_namespace=self.location)}
 =======
                 new_answer = {answer_id: self.system.replace_urls(answers[answer_id], self.descriptor.data_dir)}
 >>>>>>> WIP: Save student state via StudentModule. Inheritance doesn't work
+=======
+                new_answer = {
+                    answer_id: self.system.replace_urls(
+                        answers[answer_id],
+                        getattr(self, 'data_dir', ''),
+                        course_namespace=self.location
+                    )
+                }
+>>>>>>> Fix more errors in tests
             except TypeError:
                 log.debug('Unable to perform URL substitution on answers[%s]: %s' % (answer_id, answers[answer_id]))
                 new_answer = {answer_id: answers[answer_id]}
