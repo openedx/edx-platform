@@ -902,6 +902,10 @@ def edit_tabs(request, org, course, coursename):
 
     static_tabs = modulestore('direct').get_items(static_tabs_loc)
 
+    # see tabs have been uninitialized (e.g. supporing courses created before tab support in studio)
+    if course_item.tabs is None or len(course_item.tabs) == 0:
+        initialize_course_tabs(course_item)
+
     components = [
         static_tab.location.url()
         for static_tab
@@ -1199,22 +1203,25 @@ def create_new_course(request):
     # set a default start date to now
     new_course.metadata['start'] = stringify_time(time.gmtime())
 
+    initialize_course_tabs(new_course)
+
+    create_all_course_groups(request.user, new_course.location)
+
+    return HttpResponse(json.dumps({'id': new_course.location.url()}))
+
+def initialize_course_tabs(course):
     # set up the default tabs
     # I've added this because when we add static tabs, the LMS either expects a None for the tabs list or
     # at least a list populated with the minimal times
     # @TODO: I don't like the fact that the presentation tier is away of these data related constraints, let's find a better
     # place for this. Also rather than using a simple list of dictionaries a nice class model would be helpful here
-    new_course.tabs = [{"type": "courseware"}, 
+    course.tabs = [{"type": "courseware"}, 
         {"type": "course_info", "name": "Course Info"}, 
         {"type": "discussion", "name": "Discussion"},
         {"type": "wiki", "name": "Wiki"},
         {"type": "progress", "name": "Progress"}]
 
-    modulestore('direct').update_metadata(new_course.location.url(), new_course.own_metadata)   
-
-    create_all_course_groups(request.user, new_course.location)
-
-    return HttpResponse(json.dumps({'id': new_course.location.url()}))
+    modulestore('direct').update_metadata(course.location.url(), course.own_metadata)   
 
 @ensure_csrf_cookie
 @login_required
