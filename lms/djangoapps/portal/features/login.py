@@ -1,5 +1,4 @@
 from lettuce import step, world
-from salad.steps.everything import *
 from django.contrib.auth.models import User
 
 @step('I am an unactivated user$')

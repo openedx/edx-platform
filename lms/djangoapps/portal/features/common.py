@@ -1,7 +1,7 @@
 from lettuce import world, step#, before, after
 from factories import *
 from django.core.management import call_command
-from salad.steps.everything import *
+from nose.tools import assert_equals, assert_in
 from lettuce.django import django_url
 from django.conf import settings
 from django.contrib.auth.models import User
@@ -25,6 +25,10 @@ def i_visit_the_dashboard(step):
     world.browser.visit(django_url('/dashboard'))
     assert world.browser.is_element_present_by_css('section.container.dashboard', 5)
 
+@step(r'click (?:the|a) link (?:called|with the text) "([^"]*)"$')
+def click_the_link_called(step, text):
+    world.browser.find_link_by_text(text).click()
+
 @step('I should be on the dashboard page$')
 def i_should_be_on_the_dashboard(step):
     assert world.browser.is_element_present_by_css('section.container.dashboard', 5)
@@ -42,6 +46,18 @@ def i_should_see_that_the_path_is(step, path):
 @step(u'the page title should be "([^"]*)"$')
 def the_page_title_should_be(step, title):
     assert world.browser.title == title
+
+@step(r'should see that the url is "([^"]*)"$')
+def should_have_the_url(step, url):
+    assert_equals(world.browser.url, url)
+
+@step(r'should see (?:the|a) link (?:called|with the text) "([^"]*)"$')
+def should_see_a_link_called(step, text):
+    assert len(world.browser.find_link_by_text(text)) > 0
+
+@step(r'should see "(.*)" (?:somewhere|anywhere) in (?:the|this) page')
+def should_see_in_the_page(step, text):
+    assert_in(text, world.browser.html)
 
 @step('I am logged in$')
 def i_am_logged_in(step):

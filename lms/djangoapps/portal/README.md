@@ -1,13 +1,12 @@
 ## acceptance_testing
 
 This fake django app is here to support acceptance testing using <a href="http://lettuce.it/">lettuce</a> + 
-<a href="https://github.com/wieden-kennedy/salad">salad</a> 
-(which uses <a href="http://splinter.cobrateam.info/">splinter</a> wrapping <a href="http://selenium.googlecode.com/svn/trunk/docs/api/py/index.html">selenium</a>). 
+<a href="http://splinter.cobrateam.info/">splinter</a> (which wraps <a href="http://selenium.googlecode.com/svn/trunk/docs/api/py/index.html">selenium</a>).
 
 Some documentation for our efforts are located in basecamp at <a href="https://basecamp.com/1892446/projects/841513-release/documents/1015202-staging-tests">this link</a>.
 
 First you need to make sure that you've installed the requirements. 
-This includes lettuce, salad, selenium, splinter, etc.
+This includes lettuce, selenium, splinter, etc.
 Do this with:
 ```pip install -r test-requirements.txt```
 

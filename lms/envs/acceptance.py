@@ -1,30 +1,29 @@
 """
-This config file is a copy of dev environment without the Debug
-Toolbar. I it suitable to run against acceptance tests.
-
+This config file extends the test environment configuration 
+so that we can run the lettuce acceptance tests.
 """
-from .dev import *
+from .test import *
 
-#  REMOVE DEBUG TOOLBAR
+# You need to start the server in debug mode,
+# otherwise the browser will not render the pages correctly
+DEBUG = True
 
-INSTALLED_APPS = tuple(e for e in INSTALLED_APPS if e != 'debug_toolbar')
-MIDDLEWARE_CLASSES = tuple(e for e in MIDDLEWARE_CLASSES \
-                           if e != 'debug_toolbar.middleware.DebugToolbarMiddleware')
+# We need to apply the SOUTH migrations to set up the 
+# auth tables correctly. Otherwise you'll get an error like this:
+# DatabaseError: no such table: auth_registration
+SOUTH_TESTS_MIGRATE = True
 
-########################### OPEN GRADING TESTING ##########################
-XQUEUE_INTERFACE = {
-    "url": 'http://127.0.0.1:3032',
-    "django_auth": {
-        "username": "lms",
-        "password": "abcd"
-    },
-    "basic_auth": ('anant', 'agarwal'),
+# Set this up so that rake lms[acceptance] and running the 
+# harvest command both use the same (test) database
+# which they can flush without messing up your dev db
+DATABASES = {
+    'default': {
+        'ENGINE': 'django.db.backends.sqlite3',
+        'NAME': ENV_ROOT / "db" / "test_mitx.db",
+        'TEST_NAME': ENV_ROOT / "db" / "test_mitx.db",     
+    }
 }
 
-
-########################### LETTUCE TESTING ##########################
 MITX_FEATURES['DISPLAY_TOY_COURSES'] = True
-
 INSTALLED_APPS += ('lettuce.django',)
-
 LETTUCE_APPS = ('portal',)  # dummy app covers the home page, login, registration, and course enrollment

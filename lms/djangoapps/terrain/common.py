@@ -1,7 +1,6 @@
 from lettuce import world, step
 from factories import *
 from django.core.management import call_command
-from salad.steps.everything import *
 from lettuce.django import django_url
 from django.conf import settings
 from django.contrib.auth.models import User
@@ -87,7 +86,6 @@ def i_am_an_edx_user(step):
 #### helper functions
 @world.absorb
 def create_user(uname):
-    # This user factory stuff should work after we kill askbot
     portal_user = UserFactory.build(username=uname, email=uname + '@edx.org')
     portal_user.set_password('test')
     portal_user.save()
@@ -136,7 +134,7 @@ def save_the_course_content(path='/tmp'):
     soup = BeautifulSoup(html)
 
     # get rid of the header, we only want to compare the body
-    # soup.head.decompose()
+    soup.head.decompose()
 
     # for now, remove the data-id attributes, because they are 
     # causing mismatches between cms-master and master
@@ -166,9 +164,8 @@ def save_the_course_content(path='/tmp'):
 
     if not os.path.exists(path):
         os.makedirs(path)
-          
+
     filename = '%s.html' % (quote_plus(section_url))
     f = open('%s/%s' % (path, filename), 'w')
     f.write(output)
     f.close
-
