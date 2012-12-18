@@ -143,10 +143,9 @@ def redirect_to_course_position(course_module, first_time):
                                                           'chapter': chapter.url_name,
                                                           'section': section.url_name}))
 
-def save_child_position(seq_module, child_name, instance_module):
+def save_child_position(seq_module, child_name):
     """
     child_name: url_name of the child
-    instance_module: the StudentModule object for the seq_module
     """
     for i, c in enumerate(seq_module.get_display_items()):
         if c.url_name == child_name:
@@ -155,8 +154,6 @@ def save_child_position(seq_module, child_name, instance_module):
             # Only save if position changed
             if position != seq_module.position:
                 seq_module.position = position
-                instance_module.state = seq_module.get_instance_state()
-                instance_module.save()
 
 @login_required
 @ensure_csrf_cookie
@@ -222,8 +219,7 @@ def index(request, course_id, chapter=None, section=None,
 
         chapter_descriptor = course.get_child_by_url_name(chapter)
         if chapter_descriptor is not None:
-            instance_module = get_instance_module(course_id, request.user, course_module, student_module_cache)
-            save_child_position(course_module, chapter, instance_module)
+            save_child_position(course_module, chapter)
         else:
             raise Http404
 
@@ -250,8 +246,7 @@ def index(request, course_id, chapter=None, section=None,
                 raise Http404
 
             # Save where we are in the chapter
-            instance_module = get_instance_module(course_id, request.user, chapter_module, student_module_cache)
-            save_child_position(chapter_module, section, instance_module)
+            save_child_position(chapter_module, section)
 
 
             context['content'] = section_module.get_html()

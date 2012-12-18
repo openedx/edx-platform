@@ -22,6 +22,10 @@ log = logging.getLogger(__name__)
 
 
 class ErrorModule(XModule):
+
+    contents = String(scope=Scope.content)
+    error_msg = String(scope=Scope.content)
+
     def get_html(self):
         '''Show an error to staff.
         TODO (vshnayder): proper style, divs, etc.
@@ -29,8 +33,8 @@ class ErrorModule(XModule):
         # staff get to see all the details
         return self.system.render_template('module-error.html', {
             'staff_access': True,
-            'data': self.definition['data']['contents'],
-            'error': self.definition['data']['error_msg'],
+            'data': self.contents,
+            'error': self.error_msg,
             })
 
 
