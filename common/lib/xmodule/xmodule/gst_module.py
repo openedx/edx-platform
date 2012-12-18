@@ -72,7 +72,7 @@ class GraphicalSliderToolModule(XModule):
         plot_div = '<div class="{element_class}_plot" id="{element_id}_plot" \
                     style="{style}"></div>'
         # extract css style from plot
-        plot_def = re.search(r'\$\s*plot[^\$]*\$', html_string).group()
+        plot_def = re.search(r'\$plot[^\$]*\$', html_string).group()
         style = re.search(r'(?=.*style\=[\"\'](.*)[\"\'])', plot_def)
         if style:
             style = style.groups()[0]
@@ -81,8 +81,8 @@ class GraphicalSliderToolModule(XModule):
         replacement = plot_div.format(element_class=self.html_class,
                                       element_id=self.html_id,
                                             style=style)
-        html_string = re.sub(r'\$\s*plot[^\$]*\$', replacement, html_string,
-                        flags=re.IGNORECASE | re.UNICODE)
+        html_string = re.sub(r'\$plot[^\$]*\$', replacement, html_string,
+                        flags=re.UNICODE)
 
         # get variables
         if json.loads(self.configuration_json)['root'].get('parameters'):
@@ -92,7 +92,8 @@ class GraphicalSliderToolModule(XModule):
             variables = [x['@var'] for x in variables]
         else:
             return html_string
-
+        # if variables[0] == 'v':
+        #     import ipdb; ipdb.set_trace()
         #substitute sliders
         slider_div = '<div class="{element_class}_slider" \
                                    id="{element_id}_slider_{var}" \
@@ -100,7 +101,7 @@ class GraphicalSliderToolModule(XModule):
                      </div>'
         for var in variables:
             # find $slider var='var' ... $
-            instances = re.findall(r'\$\s*slider\s+(?=.*var\=[\"\']' + var + '[\"\'])' \
+            instances = re.findall(r'\$slider\s+(?=.*var\=[\"\']' + var + '[\"\'])' \
                           + r'[^\$]*\$', html_string)
             if instances:  # if presented, only one slider per var
                 slider_def = instances[0]  # get $slider var='var' ... $ string
@@ -120,9 +121,9 @@ class GraphicalSliderToolModule(XModule):
                                             var=var, style=style)
                 # subsitute $slider var='var' ... $ in html_srting to proper
                 # html div element
-                html_string = re.sub(r'\$\s*slider\s+(?=.*var\=[\"\'](' + \
+                html_string = re.sub(r'\$slider\s+(?=.*var\=[\"\'](' + \
                     var + ')[\"\'])' + r'[^\$]*\$',
-                replacement, html_string, flags=re.IGNORECASE | re.UNICODE)
+                replacement, html_string, flags=re.UNICODE)
 
         # substitute inputs if we have them
         input_el = '<input class="{element_class}_input" \
@@ -133,7 +134,7 @@ class GraphicalSliderToolModule(XModule):
         for var in variables:
             input_index = 0  # make multiple inputs for same variable have
                 # different id
-            instances = re.findall(r'\$\s*input\s+(?=.*var\=[\"\']' + var + '[\"\'])' \
+            instances = re.findall(r'\$input\s+(?=.*var\=[\"\']' + var + '[\"\'])' \
                           + r'[^\$]*\$', html_string)
             # import ipdb; ipdb.set_trace()
             for input_def in instances:  # for multiple inputs per var
@@ -159,9 +160,9 @@ class GraphicalSliderToolModule(XModule):
                         var=var, readonly=readonly, style=style,
                         input_index=input_index)
                 # import ipdb; ipdb.set_trace()
-                html_string = re.sub(r'\$\s*input\s+(?=.*var\=[\"\'](' + \
+                html_string = re.sub(r'\$input\s+(?=.*var\=[\"\'](' + \
                                      var + ')[\"\'])' + r'[^\$]*\$',
-                replacement, html_string, count=1, flags=re.IGNORECASE | re.UNICODE)
+                replacement, html_string, count=1, flags=re.UNICODE)
         return html_string
 
     def get_configuration(self):
