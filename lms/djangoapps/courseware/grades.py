@@ -36,8 +36,6 @@ def yield_dynamic_descriptor_descendents(descriptor, module_creator):
     def get_dynamic_descriptor_children(descriptor):
         if descriptor.has_dynamic_children():
             module = module_creator(descriptor)
-            if module is None:
-                print "FOO", descriptor
             child_locations = module.get_children_locations()
             return [descriptor.system.load_item(child_location) for child_location in child_locations ]
         else:

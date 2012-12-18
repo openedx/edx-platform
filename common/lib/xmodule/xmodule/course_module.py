@@ -401,7 +401,6 @@ class CourseDescriptor(SequenceDescriptor):
 
     @property
     def start_date_text(self):
-        print self.advertised_start, self.start
         return time.strftime("%b %d, %Y", self.advertised_start or self.start)
 
     @property

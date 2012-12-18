@@ -4,7 +4,6 @@ from xmodule.fields import Date
 
 class StringyBoolean(Boolean):
     def from_json(self, value):
-        print "StringyBoolean ", value
         if isinstance(value, basestring):
             return value.lower() == 'true'
         return value
