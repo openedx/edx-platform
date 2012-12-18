@@ -220,7 +220,7 @@ class XmlDescriptor(XModuleDescriptor):
 
         definition_metadata = get_metadata_from_xml(definition_xml)
         cls.clean_metadata_from_xml(definition_xml)
-        definition = cls.definition_from_xml(definition_xml, system)
+        definition, children = cls.definition_from_xml(definition_xml, system)
         if definition_metadata:
             definition['definition_metadata'] = definition_metadata
 
@@ -228,7 +228,7 @@ class XmlDescriptor(XModuleDescriptor):
         # for Fall 2012 LMS migration: keep filename (and unmangled filename)
         definition['filename'] = [ filepath, filename ]
 
-        return definition
+        return definition, children
 
     @classmethod
     def load_metadata(cls, xml_object):
@@ -289,7 +289,7 @@ class XmlDescriptor(XModuleDescriptor):
         else:
             definition_xml = xml_object  # this is just a pointer, not the real definition content
 
-        definition = cls.load_definition(definition_xml, system, location)  # note this removes metadata
+        definition, children = cls.load_definition(definition_xml, system, location)  # note this removes metadata
         # VS[compat] -- make Ike's github preview links work in both old and
         # new file layouts
         if is_pointer_tag(xml_object):
@@ -311,13 +311,12 @@ class XmlDescriptor(XModuleDescriptor):
         # Set/override any metadata specified by policy
         k = policy_key(location)
         if k in system.policy:
-            if k == 'video/labintro': print k, metadata, system.policy[k]
             cls.apply_policy(metadata, system.policy[k])
 
         model_data = {}
         model_data.update(metadata)
         model_data.update(definition)
-        if k == 'video/labintro': print model_data
+        model_data['children'] = children
 
         return cls(
             system,

@@ -226,9 +226,9 @@ def _has_access_descriptor(user, descriptor, action, course_context=None):
             return True
 
         # Check start date
-        if descriptor.start is not None:
+        if descriptor.lms.start is not None:
             now = time.gmtime()
-            if now > descriptor.start:
+            if now > descriptor.lms.start:
                 # after start date, everyone can see it
                 debug("Allow: now > start date")
                 return True

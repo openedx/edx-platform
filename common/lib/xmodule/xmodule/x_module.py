@@ -165,11 +165,8 @@ class XModule(HTMLSnippet):
         '''
         Return module instances for all the children of this module.
         '''
-        if not self.has_children:
-            return []
-
         if self._loaded_children is None:
-            children = [self.system.get_module(loc) for loc in self.children]
+            children = [self.system.get_module(loc) for loc in self.get_children_locations()]
             # get_module returns None if the current user doesn't have access
             # to the location.
             self._loaded_children = [c for c in children if c is not None]
@@ -178,6 +175,24 @@ class XModule(HTMLSnippet):
 
     def __unicode__(self):
         return '<x_module(id={0})>'.format(self.id)
+
+    def get_children_locations(self):
+        '''
+        Returns the locations of each of child modules.
+        
+        Overriding this changes the behavior of get_children and
+        anything that uses get_children, such as get_display_items.
+       
+        This method will not instantiate the modules of the children
+        unless absolutely necessary, so it is cheaper to call than get_children
+        
+        These children will be the same children returned by the
+        descriptor unless descriptor.has_dynamic_children() is true.
+        '''
+        if not self.has_children:
+            return []
+
+        return self.children
 
     def get_display_items(self):
         '''
@@ -437,7 +452,7 @@ class XModuleDescriptor(Plugin, HTMLSnippet, ResourceTemplates):
         on the contents of json_data.
 
         json_data must contain a 'location' element, and must be suitable to be
-        passed into the subclasses `from_json` method.
+        passed into the subclasses `from_json` method as model_data
         """
         class_ = XModuleDescriptor.load_class(
             json_data['location']['category'],
@@ -451,12 +466,35 @@ class XModuleDescriptor(Plugin, HTMLSnippet, ResourceTemplates):
         Creates an instance of this descriptor from the supplied json_data.
         This may be overridden by subclasses
 
-        json_data: A json object specifying the definition and any optional
-            keyword arguments for the XModuleDescriptor
+        json_data: A json object with the keys 'definition' and 'metadata',
+            definition: A json object with the keys 'data' and 'children'
+                data: A json value
+                children: A list of edX Location urls
+            metadata: A json object with any keys
+
+        This json_data is transformed to model_data using the following rules:
+            1) The model data contains all of the fields from metadata
+            2) The model data contains the 'children' array
+            3) If 'definition.data' is a json object, model data contains all of its fields
+               Otherwise, it contains the single field 'data'
+            4) Any value later in this list overrides a value earlier in this list
 
         system: A DescriptorSystem for interacting with external resources
         """
-        return cls(system=system, location=json_data['location'], model_data=json_data)
+        model_data = {}
+        model_data.update(json_data.get('metadata', {}))
+
+        definition = json_data.get('definition', {})
+        if 'children' in definition:
+            model_data['children'] = definition['children']
+
+        if 'data' in definition:
+            if isinstance(definition['data'], dict):
+                model_data.update(definition['data'])
+            else:
+                model_data['data'] = definition['data']
+
+        return cls(system=system, location=json_data['location'], model_data=model_data)
 
     # ================================= XML PARSING ============================
     @staticmethod

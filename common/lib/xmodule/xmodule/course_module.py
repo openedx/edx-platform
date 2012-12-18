@@ -270,12 +270,12 @@ class CourseDescriptor(SequenceDescriptor):
             wiki_slug = wiki_tag.attrib.get("slug", default=None)
             xml_object.remove(wiki_tag)
 
-        definition = super(CourseDescriptor, cls).definition_from_xml(xml_object, system)
+        definition, children = super(CourseDescriptor, cls).definition_from_xml(xml_object, system)
 
         definition.setdefault('data', {})['textbooks'] = textbooks
         definition['data']['wiki_slug'] = wiki_slug
 
-        return definition
+        return definition, children
 
     def has_ended(self):
         """

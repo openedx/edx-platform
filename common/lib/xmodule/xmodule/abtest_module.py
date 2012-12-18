@@ -79,7 +79,6 @@ class ABTestDescriptor(RawDescriptor, XmlDescriptor):
 
     experiment = String(help="Experiment that this A/B test belongs to", scope=Scope.content)
     group_portions = Object(help="What proportions of students should go in each group", default={})
-    group_assignments = Object(help="What group this user belongs to", scope=Scope(student=True, module=ModuleScope.TYPE), default={})
     group_content = Object(help="What content to display to each group", scope=Scope.content, default={DEFAULT: []})
 
     @classmethod
@@ -99,12 +98,16 @@ class ABTestDescriptor(RawDescriptor, XmlDescriptor):
                 "ABTests must specify an experiment. Not found in:\n{xml}"
                 .format(xml=etree.tostring(xml_object, pretty_print=True)))
 
+        group_portions = {}
+        group_content = {}
+        children = []
+
         for group in xml_object:
             if group.tag == 'default':
                 name = DEFAULT
             else:
                 name = group.get('name')
-                self.group_portions[name] = float(group.get('portion', 0))
+                group_portions[name] = float(group.get('portion', 0))
 
             child_content_urls = []
             for child in group:
@@ -114,19 +117,23 @@ class ABTestDescriptor(RawDescriptor, XmlDescriptor):
                     log.exception("Unable to load child when parsing ABTest. Continuing...")
                     continue
 
-            self.group_content[name] = child_content_urls
-            self.children.extend(child_content_urls)
+            group_content[name] = child_content_urls
+            children.extend(child_content_urls)
 
         default_portion = 1 - sum(
-            portion for (name, portion) in definition['data']['group_portions'].items())
+            portion for (name, portion) in group_portions.items()
+        )
 
         if default_portion < 0:
             raise InvalidDefinitionError("ABTest portions must add up to less than or equal to 1")
 
-        self.group_portions[DEFAULT] = default_portion
-        self.children.sort()
+        group_portions[DEFAULT] = default_portion
+        children.sort()
 
-        return definition
+        return {
+            'group_portions': group_portions,
+            'group_content': group_content,
+        }, children
 
     def definition_to_xml(self, resource_fs):
         xml_object = etree.Element('abtest')

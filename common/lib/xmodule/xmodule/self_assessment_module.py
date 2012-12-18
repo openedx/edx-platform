@@ -428,7 +428,7 @@ class SelfAssessmentDescriptor(XmlDescriptor, EditingDescriptor):
                 'prompt': parse('prompt'),
                 'submitmessage': parse('submitmessage'),
                 'hintprompt': parse('hintprompt'),
-                }
+                }, []
 
 
     def definition_to_xml(self, resource_fs):

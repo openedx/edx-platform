@@ -87,7 +87,7 @@ class HtmlDescriptor(XmlDescriptor, EditingDescriptor):
         if filename is None:
             definition_xml = copy.deepcopy(xml_object)
             cls.clean_metadata_from_xml(definition_xml)
-            return {'data': stringify_children(definition_xml)}
+            return {'data': stringify_children(definition_xml)}, []
         else:
             # html is special.  cls.filename_extension is 'xml', but
             # if 'filename' is in the definition, that means to load
@@ -131,7 +131,7 @@ class HtmlDescriptor(XmlDescriptor, EditingDescriptor):
                     # for Fall 2012 LMS migration: keep filename (and unmangled filename)
                     definition['filename'] = [ filepath, filename ]
 
-                    return definition
+                    return definition, []
 
             except (ResourceNotFoundError) as err:
                 msg = 'Unable to load file contents at path {0}: {1} '.format(
