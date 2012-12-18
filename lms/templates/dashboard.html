@@ -7,6 +7,7 @@
 <%inherit file="main.html" />
 
 <%namespace name='static' file='static_content.html'/>
+<%include file="test_center_register_modal.html" />
 
 <%block name="title"><title>Dashboard</title></%block>
 
@@ -221,7 +222,7 @@
 
 	    <!-- TODO: need to add logic to select which of the following to display.  Like certs? -->
             <div class="message message-status is-shown exam-register">
-              <a href="#exam_register" rel="leanModal" class="exam-button" id="exam_register_button">Register for Pearson exam</a>
+              <a href="#testcenter-register-modal" rel="leanModal" class="exam-button" id="exam_register_button">Register for Pearson exam</a>
               <p class="message-copy">Registration for the Pearson exam is now open.</p>
             </div>
 

@@ -26,7 +26,7 @@ from bs4 import BeautifulSoup
 from django.core.cache import cache
 
 from django_future.csrf import ensure_csrf_cookie, csrf_exempt
-from student.models import (Registration, UserProfile,
+from student.models import (Registration, UserProfile, TestCenterUser,
                             PendingNameChange, PendingEmailChange,
                             CourseEnrollment, unique_id_for_user)
 
@@ -205,6 +205,14 @@ def dashboard(request):
     user = request.user
     enrollments = CourseEnrollment.objects.filter(user=user)
 
+    # we want to populate the registration page with the relevant information,
+    # if it already exists.  Create an empty object otherwise.
+    try:
+        testcenteruser = TestCenterUser.objects.get(user=user)
+    except TestCenterUser.DoesNotExist:
+        testcenteruser = TestCenterUser()
+        testcenteruser.user = user
+    
     # Build our courses list for the user, but ignore any courses that no longer
     # exist (because the course IDs have changed). Still, we don't delete those
     # enrollments, because it could have been a data push snafu.
@@ -244,6 +252,7 @@ def dashboard(request):
                'show_courseware_links_for' : show_courseware_links_for,
                'cert_statuses': cert_statuses,
                'news': top_news,
+               'testcenteruser': testcenteruser,
                }
 
     return render_to_response('dashboard.html', context)
@@ -586,6 +595,83 @@ def create_account(request, post_override=None):
     js = {'success': True}
     return HttpResponse(json.dumps(js), mimetype="application/json")
 
+@ensure_csrf_cookie
+def create_test_registration(request, post_override=None):
+    '''
+    JSON call to create test registration.
+    Used by form in test_center_register_modal.html, which is included 
+    into dashboard.html
+    '''
+    js = {'success': False}
+
+    post_vars = post_override if post_override else request.POST
+
+    # Confirm we have a properly formed request
+    for a in ['first_name', 'last_name', 'address_1', 'city', 'country']:
+        if a not in post_vars:
+            js['value'] = "Error (401 {field}). E-mail us.".format(field=a)
+            js['field'] = a
+            return HttpResponse(json.dumps(js))
+
+    # Confirm appropriate fields are there.
+    for a in ['first_name', 'last_name', 'address_1', 'city', 'country']:
+        if len(post_vars[a]) < 2:
+            error_str = {'first_name': 'First name must be minimum of two characters long.',
+                         'last_name': 'Last name must be minimum of two characters long.',
+                         'address_1': 'Last name must be minimum of two characters long.',
+                         'city': 'Last name must be minimum of two characters long.',
+                         'country': 'Last name must be minimum of two characters long.',
+                         }
+            js['value'] = error_str[a]
+            js['field'] = a
+            return HttpResponse(json.dumps(js))
+
+    # Once the test_center_user information has been validated, create the entries:
+    ret = _do_create_or_update_test_center_user(post_vars)
+    if isinstance(ret,HttpResponse):		# if there was an error then return that
+        return ret
+
+
+    (user, profile, testcenter_user, testcenter_registration) = ret
+
+
+    # only do the following if there is accommodation text to send,
+    # and a destination to which to send it:
+    if 'accommodation' in post_vars and settings.MITX_FEATURES.get('ACCOMMODATION_EMAIL'):
+        d = {'accommodation': post_vars['accommodation']
+             }
+        
+        # composes accommodation email
+        subject = render_to_string('emails/accommodation_email_subject.txt', d)
+        # Email subject *must not* contain newlines
+        subject = ''.join(subject.splitlines())
+        message = render_to_string('emails/accommodation_email.txt', d)
+
+        # skip if destination email address is not specified
+        try:
+            dest_addr = settings.MITX_FEATURES['ACCOMMODATION_EMAIL']
+            send_mail(subject, message, settings.DEFAULT_FROM_EMAIL, [dest_addr], fail_silently=False)
+        except:
+            log.exception(sys.exc_info())
+            js['value'] = 'Could not send accommodation e-mail.'
+            return HttpResponse(json.dumps(js))
+
+
+    if DoExternalAuth:
+        eamap.user = login_user
+        eamap.dtsignup = datetime.datetime.now()
+        eamap.save()
+        log.debug('Updated ExternalAuthMap for %s to be %s' % (post_vars['username'],eamap))
+
+        if settings.MITX_FEATURES.get('BYPASS_ACTIVATION_EMAIL_FOR_EXTAUTH'):
+            log.debug('bypassing activation email')
+            login_user.is_active = True
+            login_user.save()
+
+    # statsd.increment("common.student.account_created")
+
+    js = {'success': True}
+    return HttpResponse(json.dumps(js), mimetype="application/json")
 
 def get_random_post_override():
     """
@@ -641,7 +727,7 @@ def password_reset(request):
 
     # By default, Django doesn't allow Users with is_active = False to reset their passwords,
     # but this bites people who signed up a long time ago, never activated, and forgot their
-    # password. So for their sake, we'll auto-activate a user for whome password_reset is called.
+    # password. So for their sake, we'll auto-activate a user for whom password_reset is called.
     try:
         user = User.objects.get(email=request.POST['email'])
         user.is_active = True

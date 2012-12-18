@@ -17,6 +17,10 @@
         <div class="notice"></div>
         <div id="register_error" class="modal-form-error" name="register_error"></div>
         <div id="register_error" name="register_error"></div>
+	<!-- include these as pass-throughs -->
+        <input id="id_email" type="hidden" name="email" maxlength="75" value="${user.email}" />
+        <input id="id_username" type="hidden" name="username" maxlength="75" value="${user.username}" />
+	<!-- TODO: add the course somehow... -->
 
 	<!-- we should first start with information that we already know about the user,
 	     though we should also give them the option to fix it. 
@@ -24,50 +28,50 @@
 	     or candidate_id. 
 	  -->
         <div class="input-group">
-          <label data-field="firstname">First Name*</label>
-          <input name="firstname" type="text" value="${firstname}" placeholder="e.g. Jane">
-          <label data-field="lastname">Last Name*</label>
-          <input name="lastname" type="text" value="${lastname}" placeholder="e.g. Smith">
-          <label data-field="middlename">Middle Name</label>
-          <input name="middlename" type="text" value="${middlename}" placeholder="e.g. Michael">
+          <label data-field="first_name">First Name*</label>
+          <input name="first_name" type="text" value="${testcenteruser.first_name}" maxlength="30" placeholder="e.g. Jane">
+          <label data-field="last_name">Last Name*</label>
+          <input name="last_name" type="text" value="${testcenteruser.last_name}" placeholder="e.g. Smith">
+          <label data-field="middle_name">Middle Name</label>
+          <input name="middle_name" type="text" value="${testcenteruser.middle_name}" placeholder="e.g. Michael">
           <label data-field="suffix">Suffix</label>
-          <input name="suffix" type="text" value="${suffix}" placeholder="e.g. Jr.">
+          <input name="suffix" type="text" value="${testcenteruser.suffix}" placeholder="e.g. Jr.">
           <label data-field="salutation">Salutation</label>
-          <input name="salutation" type="text" value="${salutation}" placeholder="e.g. Dr.">
+          <input name="salutation" type="text" value="${testcenteruser.salutation}" placeholder="e.g. Dr.">
         </div>
 
         <div class="input-group">
-          <label data-field="address1">Address1*</label>
-          <input name="address1" type="text" value="${address1}" placeholder="123 Main St.">
-          <label data-field="address2">Address2</label>
-          <input name="address2" type="text" value="${address2}" placeholder="Apartment 2B.">
-          <label data-field="address3">Address3</label>
-          <input name="address3" type="text" value="${address3}" placeholder="Attention: John Smith">
+          <label data-field="address_1">Address1*</label>
+          <input name="address_1" type="text" value="${testcenteruser.address_1}" placeholder="123 Main St.">
+          <label data-field="address_2">Address2</label>
+          <input name="address_2" type="text" value="${testcenteruser.address_2}" placeholder="Apartment 2B.">
+          <label data-field="address_3">Address3</label>
+          <input name="address_3" type="text" value="${testcenteruser.address_3}" placeholder="Attention: John Smith">
 
           <label data-field="city">City</label>
-          <input name="city" type="text" value="${city}" placeholder="Our Fair City">
+          <input name="city" type="text" value="${testcenteruser.city}" placeholder="Our Fair City">
           <label data-field="state">State/Province</label>
-          <input name="state" type="text" value="${state}" placeholder="MA">
+          <input name="state" type="text" value="${testcenteruser.state}" placeholder="MA">
           <label data-field="postal_code">Postal Code</label>
-          <input name="postal_code" type="text" value="${postal_code}" placeholder="02138">
+          <input name="postal_code" type="text" value="${testcenteruser.postal_code}" placeholder="02138">
           <label data-field="country">Country Code*</label>
-          <input name="country" type="text" value="${country}" placeholder="USA">
+          <input name="country" type="text" value="${testcenteruser.country}" placeholder="USA">
         </div>
 
 	<!-- for now, just leave off the phone and company information -->
         <div class="input-group">
           <label data-field="phone">Phone*</label>
-          <input name="phone" type="text" value="${phone}" placeholder="1-23-456-7890">
+          <input name="phone" type="text" value="${testcenteruser.phone}" placeholder="1-23-456-7890">
           <label data-field="phone">Extension</label>
-          <input name="extension" type="text" value="${extension}" placeholder="x123">
-          <label data-field="phone-country">Phone Country Code*</label>
-          <input name="phone-country" type="text" value="${phone_country}" placeholder="ABC">
+          <input name="extension" type="text" value="${testcenteruser.extension}" placeholder="x123">
+          <label data-field="phone_country_code">Phone Country Code*</label>
+          <input name="phone_country_code" type="text" value="${testcenteruser.phone_country_code}" placeholder="ABC">
           <label data-field="fax">Fax</label>
-          <input name="fax" type="text" value="${fax}" placeholder="1-23-456-7891">
-          <label data-field="fax-country">Fax Country Code*</label>
-          <input name="fax-country" type="text" value="${fax_country}" placeholder="ABC">
-          <label data-field="company">Company</label>
-          <input name="company" type="text" value="${company}" placeholder="Acme Corporation">
+          <input name="fax" type="text" value="${testcenteruser.fax}" placeholder="1-23-456-7891">
+          <label data-field="fax_country_code">Fax Country Code*</label>
+          <input name="fax_country_code" type="text" value="${testcenteruser.fax_country_code}" placeholder="ABC">
+          <label data-field="company_name">Company</label>
+          <input name="company_name" type="text" value="${testcenteruser.company_name}" placeholder="Acme Corporation">
         </div>
 
         <div class="input-group">
