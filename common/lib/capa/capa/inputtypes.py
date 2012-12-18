@@ -852,32 +852,57 @@ class RubricInput(InputTypeBase):
 
         # parse description
         if descriptionxml.tag != 'description':
-            raise Exception("[extract_category: expected description tag, got {0} instead".format(descriptionxml.tag))
+            raise Exception("[extract_category]: expected description tag, got {0} instead".format(descriptionxml.tag))
 
         description = descriptionxml.text
 
         cur_points = 0
         options = []
+        autonumbering = True
         # parse options
         for option in optionsxml:
             if option.tag != 'option': 
-                raise Exception("[extract_category: expected option tag, got {0} instead".format(option.tag))
+                raise Exception("[extract_category]: expected option tag, got {0} instead".format(option.tag))
             else:
                 pointstr = option.get("points")
-                if(pointstr):
+                if pointstr:
+                    autonumbering = False
                     # try to parse this into an int
                     try:
                         points = int(pointstr)
                     except ValueError:
-                        raise Exception("[extract_category: expected int to have points, got {0} instead".format(pointstr))
-                else:
-                    # use the generated one
+                        raise Exception("[extract_category]: expected points to have int, got {0} instead".format(pointstr))
+                elif autonumbering:
+                    # use the generated one if we're in the right mode
                     points = cur_points
                     cur_points = cur_points + 1
+                else:
+                    raise Exception("[extract_category]: missing points attribute. Cannot continue to auto-create points values after a points value is explicitly dfined.")
                 optiontext = option.text
                 options.append({'text': option.text, 'points': points})
 
+        # sort and check for duplicates
+        options = sorted(options, key=lambda option: option['points'])
+        validate_options(options)
+
         return {'description': description, 'options': options}
+        
+    @staticmethod
+    def validate_options(options):
+        '''
+        Validates a set of options. This can and should be extended to filter out other bad edge cases
+        '''
+        if len(options) == 0:
+            raise Exception("[extract_category]: no options associated with this category")
+        if len(options) == 1:
+            return
+        prev = options[0]['points']
+        for option in options[1:]:
+            if prev == option['points']:
+                raise Exception("[extract_category]: found duplicate point values between two different options")
+            else:
+                prev = option['points']
+
 
 registry.register(RubricInput)
 
