@@ -7,17 +7,26 @@ define('Graph', ['logme'], function (logme) {
     return Graph;
 
     function Graph(gstId, config, state) {
-        var plotDiv, dataSeries, functions, xaxis, yaxis, xrange;
+        var plotDiv, dataSeries, functions, xaxis, yaxis, numPoints, xrange;
 
         // We must have a graph container DIV element available in order to
         // proceed.
         plotDiv = $('#' + gstId + '_plot');
         if (plotDiv.length === 0) {
+            logme('ERROR: Could not find the plot DIV with ID "' + gstId + '_plot".');
+
             return;
         }
 
+        if (plotDiv.width() === 0) {
+            plotDiv.width(300);
+        }
+
+        if (plotDiv.height() === 0) {
+            plotDiv.height(plotDiv.width());
+        }
+
         // Configure some settings for the graph.
-        setGraphDimensions();
         setGraphAxes();
         setGraphXRange();
 
@@ -25,6 +34,8 @@ define('Graph', ['logme'], function (logme) {
         // anything else.
         createFunctions();
         if (functions.length === 0) {
+            logme('ERROR: No functions were specified, or something went wrong.');
+
             return;
         }
 
@@ -38,34 +49,6 @@ define('Graph', ['logme'], function (logme) {
 
         return;
 
-        function setGraphDimensions() {
-            var dimObj, width, height, tempInt;
-
-            // If no dimensions are specified by the user, the graph will have
-            // predefined dimensions.
-            width = 300;
-            height = 300;
-
-            // Get the user specified dimensions, if any.
-            if ($.isPlainObject(config.plot['dimensions']) === true) {
-                dimObj = config.plot['dimensions'];
-
-                tempInt = parseInt(dimObj['@width'], 10);
-                if (isNaN(tempInt) === false) {
-                    width = tempInt;
-                }
-
-                tempInt = parseInt(dimObj['@height'], 10);
-                if (isNaN(tempInt) === false) {
-                    height = tempInt;
-                }
-            }
-
-            // Apply the dimensions to the graph container DIV element.
-            plotDiv.width(width);
-            plotDiv.height(height);
-        }
-
         function setGraphAxes() {
             // Define the xaxis Flot configuration, and then see if the user
             // supplied custom values.
@@ -76,6 +59,8 @@ define('Graph', ['logme'], function (logme) {
             };
             if (typeof config.plot['xticks'] === 'string') {
                 processTicks(config.plot['xticks'], xaxis);
+            } else {
+                logme('MESSAGE: "xticks" were not specified. Using defaults.');
             }
 
             // Define the yaxis Flot configuration, and then see if the user
@@ -87,6 +72,8 @@ define('Graph', ['logme'], function (logme) {
             };
             if (typeof config.plot['yticks'] === 'string') {
                 processTicks(config.plot['yticks'], yaxis);
+            } else {
+                logme('MESSAGE: "yticks" were not specified. Using defaults.');
             }
 
             return;
@@ -99,27 +86,37 @@ define('Graph', ['logme'], function (logme) {
                 ticksBlobs = ticksStr.split(',');
 
                 if (ticksBlobs.length !== 3) {
+                    logme('ERROR: Did not get 3 blobs from ticksStr = "' + ticksStr + '".');
+
                     return;
                 }
 
                 tempFloat = parseFloat(ticksBlobs[0]);
                 if (isNaN(tempFloat) === false) {
                     ticksObj.min = tempFloat;
+                } else {
+                    logme('ERROR: Invalid "min". ticksBlobs[0] = ', ticksBlobs[0]);
                 }
 
                 tempFloat = parseFloat(ticksBlobs[1]);
                 if (isNaN(tempFloat) === false) {
                     ticksObj.tickSize = tempFloat;
+                } else {
+                    logme('ERROR: Invalid "tickSize". ticksBlobs[1] = ', ticksBlobs[1]);
                 }
 
                 tempFloat = parseFloat(ticksBlobs[2]);
                 if (isNaN(tempFloat) === false) {
                     ticksObj.max = tempFloat;
+                } else {
+                    logme('ERROR: Invalid "max". ticksBlobs[2] = ', ticksBlobs[2]);
                 }
 
                 // Is the starting tick to the left of the ending tick (on the
                 // x-axis)? If not, set default starting and ending tick.
                 if (ticksObj.min >= ticksObj.max) {
+                    logme('ERROR: min >= max. Setting defaults.');
+
                     ticksObj.min = 0;
                     ticksObj.max = 10;
                 }
@@ -128,6 +125,8 @@ define('Graph', ['logme'], function (logme) {
                 // least 3 ticks. If not, set a tickSize which will produce
                 // 11 ticks. tickSize is the spacing between the ticks.
                 if (ticksObj.tickSize * 2 >= ticksObj.max - ticksObj.min) {
+                    logme('ERROR: tickSize * 2 >= max - min. Setting defaults.');
+
                     ticksObj.tickSize = (ticksObj.max - ticksObj.min) / 10.0;
                 }
             }
@@ -170,10 +169,10 @@ define('Graph', ['logme'], function (logme) {
                     }
 
                 } else {
-                    logme('ERROR: xrange does not contain 2 blobs.');
+                    logme('ERROR: xrange does not contain 2 blobs. xRangeBlobs.length = ' + xRangeBlobs.length);
                 }
             } else {
-                logme('ERROR: xrange is not a string.');
+                logme('ERROR: xrange is not a string. config.plot["xrange"] = ', config.plot['xrange']);
             }
 
             // The user can specify the number of points. However, internally
@@ -184,9 +183,10 @@ define('Graph', ['logme'], function (logme) {
                 if (
                     (isNaN(tempNum) === false) ||
                     (tempNum >= 2) &&
-                    (tempNum <= 500)
+                    (tempNum <= 1000)
                 ) {
-                    xrange.step = (xrange.end - xrange.start) / (tempNum - 1);
+                    numPoints = tempNum;
+                    xrange.step = (xrange.end - xrange.start) / (numPoints - 1);
                 } else {
                     logme('ERROR: num_points was not parsed as a number, or num_points < 2, or num_points > 500.');
                 }
@@ -201,6 +201,8 @@ define('Graph', ['logme'], function (logme) {
             functions = [];
 
             if (typeof config.plot['function'] === 'undefined') {
+                logme('ERROR: config.plot["function"] is undefined.');
+
                 return;
             }
 
@@ -234,6 +236,10 @@ define('Graph', ['logme'], function (logme) {
 
                     }
                 }
+            } else {
+                logme('ERROR: config.plot["function"] is of an unsupported type.');
+
+                return;
             }
 
             return;
@@ -348,7 +354,7 @@ define('Graph', ['logme'], function (logme) {
         }
 
         function generateData() {
-            var c0, functionObj, seriesObj, dataPoints, paramValues, x, y;
+            var c0, c1, functionObj, seriesObj, dataPoints, paramValues, x, y;
 
             paramValues = state.getAllParameterValues();
 
@@ -359,6 +365,11 @@ define('Graph', ['logme'], function (logme) {
 
                 seriesObj = {};
                 dataPoints = [];
+
+                // For counting number of points added. In the end we will
+                // compare this number to 'numPoints' specified in the config
+                // JSON.
+                c1 = 0;
 
                 // Generate the data points.
                 for (x = xrange.start; x <= xrange.end; x += xrange.step) {
@@ -378,6 +389,19 @@ define('Graph', ['logme'], function (logme) {
                     // Add the generated point to the data points set.
                     dataPoints.push([x, y]);
 
+                    c1 += 1;
+
+                }
+
+                // If the last point did not get included because of rounding
+                // of floating-point number addition, then we will include it
+                // manually.
+                if (c1 != numPoints) {
+                    x = xrange.end;
+                    paramValues.push(x);
+                    y = functionObj.func.apply(window, paramValues);
+                    paramValues.pop();
+                    dataPoints.push([x, y]);
                 }
 
                 // Put the entire data points set into the series object.

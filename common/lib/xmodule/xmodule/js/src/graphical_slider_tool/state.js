@@ -3,11 +3,15 @@
 (function (requirejs, require, define) {
 
 define('State', ['logme'], function (logme) {
+    var stateInst;
+
     // Since there will be (can be) multiple GST on a page, and each will have
     // a separate state, we will create a factory constructor function. The
     // constructor will expect the ID of the DIV with the GST contents, and the
     // configuration object (parsed from a JSON string). It will return an
     // object containing methods to set and get the private state properties.
+
+    stateInst = 0;
 
     // This module defines and returns a factory constructor.
     return State;
@@ -15,6 +19,9 @@ define('State', ['logme'], function (logme) {
     function State(gstId, config) {
         var parameters, allParameterNames, allParameterValues,
             plotDiv;
+
+        stateInst += 1;
+        logme('MESSAGE: Creating state instance # ' + stateInst + '.');
 
         // Initially, there are no parameters to track. So, we will instantiate
         // an empty object.
@@ -48,7 +55,7 @@ define('State', ['logme'], function (logme) {
 
         // If config.parameters.param is an object, pass this object to the
         // processor directly.
-        else if ($.isPlainObject(config.inputs.input) === true) {
+        else if ($.isPlainObject(config.parameters.param) === true) {
             processParameter(config.parameters.param);
         }
 
