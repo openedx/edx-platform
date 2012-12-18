@@ -65,12 +65,9 @@ def update_course_updates(location, update, passed_id=None):
     except etree.XMLSyntaxError:
         course_html_parsed = etree.fromstring("<ol></ol>")
 
-    try:
-        new_html_parsed = etree.fromstring('<li><h2>' + update['date'] + '</h2>' + update['content'] + '</li>', 
-                                           etree.XMLParser(remove_blank_text=True))
-    except etree.XMLSyntaxError:
-        logging.debug("Mashing malformed update")
-        new_html_parsed = '<li><h2>' + update['date'] + '</h2>' + update['content'] + '</li>'
+    # No try/catch b/c failure generates an error back to client
+    new_html_parsed = etree.fromstring('<li><h2>' + update['date'] + '</h2>' + update['content'] + '</li>', 
+                                       etree.XMLParser(remove_blank_text=True))
         
     # Confirm that root is <ol>, iterate over <li>, pull out <h2> subs and then rest of val
     if course_html_parsed.tag == 'ol':

@@ -99,7 +99,10 @@ CMS.Views.ClassInfoUpdateView = Backbone.View.extend({
         var targetModel = this.eventModel(event);
         targetModel.set({ date : this.dateEntry(event).val(), content : this.$codeMirror.getValue() });
         // push change to display, hide the editor, submit the change        
-        targetModel.save();
+        targetModel.save({}, {error : function(model, xhr) {
+        	// TODO use a standard component
+        	window.alert(xhr.responseText);
+        }});
         this.closeEditor(this);
     },
     

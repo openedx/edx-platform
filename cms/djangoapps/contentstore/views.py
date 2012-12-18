@@ -54,6 +54,7 @@ from cms.djangoapps.models.settings.course_details import CourseDetails,\
     CourseSettingsEncoder
 from cms.djangoapps.models.settings.course_grading import CourseGradingModel
 from cms.djangoapps.contentstore.utils import get_modulestore
+from lxml import etree
 
 # to install PIL on MacOSX: 'easy_install http://dist.repoze.org/PIL-1.1.6.tar.gz'
 
@@ -979,13 +980,13 @@ def course_info_updates(request, org, course, provided_id=None):
         
     if request.method == 'GET':
         return HttpResponse(json.dumps(get_course_updates(location)), mimetype="application/json")
-    elif real_method == 'POST':
-        # new instance (unless django makes PUT a POST): updates are coming as POST. Not sure why.
-        return HttpResponse(json.dumps(update_course_updates(location, request.POST, provided_id)), mimetype="application/json")
-    elif real_method == 'PUT':
-        return HttpResponse(json.dumps(update_course_updates(location, request.POST, provided_id)), mimetype="application/json")
     elif real_method == 'DELETE':  # coming as POST need to pull from Request Header X-HTTP-Method-Override    DELETE
         return HttpResponse(json.dumps(delete_course_update(location, request.POST, provided_id)), mimetype="application/json")
+    elif request.method == 'POST':
+        try:
+            return HttpResponse(json.dumps(update_course_updates(location, request.POST, provided_id)), mimetype="application/json")
+        except etree.XMLSyntaxError:
+            return HttpResponse("Failed to save: malformed html", status=515, content_type="text/plain")
 
 
 @expect_json
