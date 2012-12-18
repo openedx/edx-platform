@@ -193,7 +193,7 @@ CMS.Views.Settings.Details = CMS.Views.ValidatingView.extend({
 		this.$el.find('.current-course-introduction-video iframe').attr('src', this.model.videosourceSample());
 		if (this.model.has('intro_video')) {
 			this.$el.find('.remove-course-introduction-video').show();
-			this.$el.find('#' + this.fieldToSelectorMap['intro_video']).val(this.model.getVideoSource());
+			this.$el.find('#' + this.fieldToSelectorMap['intro_video']).val(this.model.get('intro_video'));
 		}
 		else this.$el.find('.remove-course-introduction-video').hide();
 		
@@ -261,6 +261,12 @@ CMS.Views.Settings.Details = CMS.Views.ValidatingView.extend({
 			this.clearValidationErrors();
 			var previewsource = this.model.save_videosource($(event.currentTarget).val());
 			this.$el.find(".current-course-introduction-video iframe").attr("src", previewsource);
+			if (this.model.has('intro_video')) {
+				this.$el.find('.remove-course-introduction-video').show();
+			}
+			else {
+				this.$el.find('.remove-course-introduction-video').hide();
+			}
 			break;
 			
 		default:
@@ -282,6 +288,7 @@ CMS.Views.Settings.Details = CMS.Views.ValidatingView.extend({
 			this.model.save_videosource(null);
 			this.$el.find(".current-course-introduction-video iframe").attr("src", "");
 			this.$el.find('#' + this.fieldToSelectorMap['intro_video']).val("");
+			this.$el.find('.remove-course-introduction-video').hide();
 		}
 	},
 	codeMirrors : {},
