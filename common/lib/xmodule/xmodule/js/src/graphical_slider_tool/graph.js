@@ -266,7 +266,7 @@ define('Graph', ['logme'], function (logme) {
                 if (typeof funcString !== 'string') {
                     return;
                 }
-
+                funcString = $('<div>').html(funcString).text();
                 // Some defaults. If no options are set for the graph, we will
                 // make sure that at least a line is drawn for a function.
                 newFunctionObject = {
