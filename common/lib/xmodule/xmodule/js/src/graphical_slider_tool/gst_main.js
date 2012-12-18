@@ -16,6 +16,14 @@ define(
     function GstMain(gstId) {
         var config, gstClass, state;
 
+        if ($('#' + gstId).attr('data-processed') !== 'processed') {
+            $('#' + gstId).attr('data-processed', 'processed');
+        } else {
+            logme('MESSAGE: Already processed GST with ID ' + gstId + '. Skipping.');
+
+            return;
+        }
+
         // Get the JSON configuration, parse it, and store as an object.
         try {
             config = JSON.parse($('#' + gstId + '_json').html()).root;
