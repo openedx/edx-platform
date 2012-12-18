@@ -147,7 +147,7 @@ def import_module_from_xml(modulestore, static_content_store, course_data_path, 
     for field in module.fields + module.lms.fields:
         # Only save metadata that wasn't inherited
         if (field.scope == Scope.settings and
-            field.name in module._inherited_metadata and
+            field.name not in module._inherited_metadata and
             field.name in module._model_data):
 
             metadata[field.name] = module._model_data[field.name]
