@@ -71,12 +71,9 @@
 
         <!-- TODO: need to add logic to select which of the following to display.  Like certs? -->
             <%
-            testcenter_info = course.testcenter_info
+            exam_info = course.testcenter_info
             %>
-            % if testcenter_info is not None:
-                <%
-                    exam_info = testcenter_info.get('Final_Exam')
-                %>
+            % if exam_info is not None:
                 <p>Exam Series Code: ${exam_info.get('Exam_Series_Code')}</p>
                 <p>First Eligible Appointment Date: ${exam_info.get('First_Eligible_Appointment_Date')}</p>
                 <p>Last Eligible Appointment Date: ${exam_info.get('Last_Eligible_Appointment_Date')}</p>

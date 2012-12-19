@@ -141,6 +141,9 @@ class TestCenterUser(models.Model):
     The field names and lengths are modeled on the conventions and constraints
     of Pearson's data import system, including oddities such as suffix having
     a limit of 255 while last_name only gets 50.
+    
+    Also storing here the confirmation information received from Pearson (if any) 
+    as to the success or failure of the upload.  (VCDC file)
     """
     # Our own record keeping...
     user = models.ForeignKey(User, unique=True, default=None)
@@ -155,7 +158,7 @@ class TestCenterUser(models.Model):
     # we first create the User entry, and is assigned by Pearson later.
     candidate_id = models.IntegerField(null=True, db_index=True)
 
-    # Unique ID we assign our user for a the Test Center.
+    # Unique ID we assign our user for the Test Center.
     client_candidate_id = models.CharField(max_length=50, db_index=True)
 
     # Name
@@ -189,6 +192,11 @@ class TestCenterUser(models.Model):
     # Company
     company_name = models.CharField(max_length=50, blank=True)
 
+    # Confirmation
+    upload_status = models.CharField(max_length=20, blank=True)  # 'Error' or 'Accepted'
+    confirmed_at = models.DateTimeField(null=True, db_index=True)
+    upload_error_message = models.CharField(max_length=512, blank=True)
+    
     @staticmethod
     def user_provided_fields():
         return [ 'first_name', 'middle_name', 'last_name', 'suffix', 'salutation', 
@@ -212,17 +220,38 @@ class TestCenterRegistration(models.Model):
     The field names and lengths are modeled on the conventions and constraints
     of Pearson's data import system.
     """
-    # TODO: Check the spec to find out lengths specified by Pearson
-
+    # to find an exam registration, we key off of the user and course_id.
+    # If multiple exams per course are possible, we would also need to add the 
+    # exam_series_code.
     testcenter_user = models.ForeignKey(TestCenterUser, unique=True, default=None)
+    course_id = models.CharField(max_length=128, db_index=True)
+    
     created_at = models.DateTimeField(auto_now_add=True, db_index=True)
     updated_at = models.DateTimeField(auto_now=True, db_index=True)
-    course_id = models.CharField(max_length=128, db_index=True)
+    # user_updated_at happens only when the user makes a change to their data,
+    # and is something Pearson needs to know to manage updates. Unlike
+    # updated_at, this will not get incremented when we do a batch data import.
+    # The appointment dates, the exam count, and the accommodation codes can be updated, 
+    # but hopefully this won't happen often.
+    user_updated_at = models.DateTimeField(db_index=True)
+    # "client_authorization_id" is the client's unique identifier for the authorization.  
+    # This must be present for an update or delete to be sent to Pearson.
+    client_authorization_id = models.CharField(max_length=20, unique=True, db_index=True)
+
+    # information about the test, from the course policy:
+    exam_series_code = models.CharField(max_length=15, db_index=True)
+    eligibility_appointment_date_first = models.DateField(db_index=True)
+    eligibility_appointment_date_last = models.DateField(db_index=True)
+    # TODO: this should be an enumeration:
+    accommodation_code = models.CharField(max_length=64, blank=True)
     
     # store the original text of the accommodation request.
     accommodation_request = models.CharField(max_length=1024, blank=True)
-    # TODO: this should be an enumeration:
-    accommodation_code = models.CharField(max_length=64, blank=True)
+
+    # Confirmation
+    upload_status = models.CharField(max_length=20, blank=True)  # 'Error' or 'Accepted'
+    confirmed_at = models.DateTimeField(db_index=True)
+    upload_error_message = models.CharField(max_length=512, blank=True)
 
     @property
     def candidate_id(self):
@@ -231,6 +260,15 @@ class TestCenterRegistration(models.Model):
     @property
     def client_candidate_id(self):
         return self.testcenter_user.client_candidate_id
+    
+    
+
+def get_testcenter_registrations_for_user_and_course(user, course_id):
+    try:
+        tcu = TestCenterUser.objects.get(user=user)
+    except User.DoesNotExist:
+        return []
+    return TestCenterRegistration.objects.filter(testcenter_user=tcu, course_id=course_id)
     
 def unique_id_for_user(user):
     """

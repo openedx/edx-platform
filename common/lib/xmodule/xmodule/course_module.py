@@ -315,7 +315,7 @@ class CourseDescriptor(SequenceDescriptor):
         Returns None if no url specified.
         """
         return self.metadata.get('end_of_course_survey_url')
-
+    
     @property
     def testcenter_info(self):
         """
@@ -324,10 +324,17 @@ class CourseDescriptor(SequenceDescriptor):
         TODO: decide if we expect this entry to be a single test, or if multiple tests are possible
         per course.
 
-        Returns None if no testcenter info specified.
+        For now we expect this entry to be a single test.
+
+        Returns None if no testcenter info specified, or if no exam is included.
         """
-        return self.metadata.get('testcenter_info')
-    
+        info = self.metadata.get('testcenter_info')
+        if info is None or len(info) == 0:
+            return None;
+        else:
+            return info.values()[0]
+            
+
     @property
     def title(self):
         return self.display_name

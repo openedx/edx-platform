@@ -1,12 +1,12 @@
 import datetime
 import feedparser
-import itertools
+#import itertools
 import json
 import logging
 import random
 import string
 import sys
-import time
+#import time
 import urllib
 import uuid
 
@@ -19,7 +19,8 @@ from django.core.context_processors import csrf
 from django.core.mail import send_mail
 from django.core.validators import validate_email, validate_slug, ValidationError
 from django.db import IntegrityError
-from django.http import HttpResponse, HttpResponseForbidden, Http404
+from django.http import HttpResponse, HttpResponseForbidden, Http404,\
+    HttpResponseRedirect
 from django.shortcuts import redirect
 from mitxmako.shortcuts import render_to_response, render_to_string
 from bs4 import BeautifulSoup
@@ -37,13 +38,14 @@ from xmodule.modulestore.exceptions import ItemNotFoundError
 from xmodule.modulestore.django import modulestore
 from xmodule.modulestore.exceptions import ItemNotFoundError
 
-from datetime import date
+#from datetime import date
 from collections import namedtuple
 
 from courseware.courses import get_courses_by_university
 from courseware.access import has_access
 
 from statsd import statsd
+from django.contrib.localflavor.ie.ie_counties import IE_COUNTY_CHOICES
 
 log = logging.getLogger("mitx.student")
 Article = namedtuple('Article', 'title url author image deck publication publish_date')
@@ -640,9 +642,11 @@ def _do_create_or_update_test_center_user(post_vars):
     
     # first determine if we need to create a new TestCenterUser, or if we are making any update 
     # to an existing TestCenterUser.
-    username=post_vars['username']
+    username = post_vars['username']
     user = User.objects.get(username=username)
-    
+    course_id = post_vars['course_id']
+    course = (course_from_id(course_id))  # assume it will be found....
+        
     needs_saving = False
     try:
         testcenter_user = TestCenterUser.objects.get(user=user)
@@ -651,9 +655,8 @@ def _do_create_or_update_test_center_user(post_vars):
                               for fieldname in TestCenterUser.user_provided_fields()])
             
         if needs_updating:
-            # TODO: what do we set a timestamp to, in order to get now()?
+            # leave user and client_candidate_id as before
             testcenter_user.user_updated_at = datetime.datetime.now()
-            # Now do the update:
             for fieldname in TestCenterUser.user_provided_fields():
                 testcenter_user.__setattr__(fieldname, post_vars[fieldname])
             needs_saving = True
@@ -661,7 +664,6 @@ def _do_create_or_update_test_center_user(post_vars):
     except TestCenterUser.DoesNotExist:
         # did not find the TestCenterUser, so create a new one 
         testcenter_user = TestCenterUser(user=user)
-        # testcenter_user.user = user
         for fieldname in TestCenterUser.user_provided_fields():
             testcenter_user.__setattr__(fieldname, post_vars[fieldname])
         # testcenter_user.candidate_id remains unset    
@@ -670,31 +672,43 @@ def _do_create_or_update_test_center_user(post_vars):
         needs_saving = True
 
     # additional validation occurs at save time, so handle exceptions
-    # TODO: Rearrange so that if part of the process fails, the whole process fails.
-    # Right now, we can have e.g. no registration e-mail sent out and a zombie account
     if needs_saving:
         try:
             testcenter_user.save()
-        except IntegrityError:
-            js = {'success': False}
-            # TODO: Figure out the cause of the integrity error
-            if len(User.objects.filter(username=post_vars['username'])) > 0:
-                js['value'] = "An account with this username already exists."
-                js['field'] = 'username'
-                return HttpResponse(json.dumps(js))
+        except IntegrityError, ie:
+            message = ie
+            context = {'course': course,
+                       'user': user,
+                       'message': message,
+                       'testcenteruser': testcenter_user,
+                       }
+            return render_to_response('test_center_register.html', context)
             
-            if len(User.objects.filter(email=post_vars['email'])) > 0:
-                js['value'] = "An account with this e-mail already exists."
-                js['field'] = 'email'
-                return HttpResponse(json.dumps(js))
-
-            raise
-            
-    
+    # create and save the registration:
     registration = TestCenterRegistration(testcenter_user = testcenter_user)
-    # registration.register(user)
     registration.course_id = post_vars['course_id']
     registration.accommodation_request = post_vars['accommodations']
+    exam_info = course.testcenter_info
+    registration.exam_series_code = exam_info.get('Exam_Series_Code')
+    registration.eligibility_appointment_date_first = exam_info.get('First_Eligible_Appointment_Date')
+    registration.eligibility_appointment_date_last = exam_info.get('Last_Eligible_Appointment_Date')
+    # accommodation_code remains blank for now, along with Pearson confirmation
+    registration.user_updated_at = datetime.datetime.now()
+
+    # "client_authorization_id" is the client's unique identifier for the authorization.  
+    # This must be present for an update or delete to be sent to Pearson.
+    registration.client_authorization_id = "1"
+    try:
+        registration.save()
+    except IntegrityError, ie:
+        message = ie
+        context = {'course': course,
+                   'user': user,
+                   'message': message,
+                   'testcenteruser': testcenter_user,
+                   }
+        return render_to_response('test_center_register.html', context)
+        
 
     return (user, testcenter_user, registration)
 
@@ -759,11 +773,12 @@ def create_test_registration(request, post_override=None):
             js['value'] = 'Could not send accommodation e-mail.'
             return HttpResponse(json.dumps(js))
 
-
+    # TODO: enable appropriate stat
     # statsd.increment("common.student.account_created")
 
-    js = {'success': True}
-    return HttpResponse(json.dumps(js), mimetype="application/json")
+#    js = {'success': True}
+#    return HttpResponse(json.dumps(js), mimetype="application/json")
+    return HttpResponseRedirect('/dashboard')
 
 def get_random_post_override():
     """

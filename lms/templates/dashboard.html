@@ -3,6 +3,7 @@
   from courseware.courses import course_image_url, get_course_about_section
   from courseware.access import has_access
   from certificates.models import CertificateStatuses
+  from student.models import get_testcenter_registrations_for_user_and_course
 %>
 <%inherit file="main.html" />
 
@@ -222,20 +223,26 @@
 	    <!-- TODO: need to add logic to select which of the following to display.  Like certs? -->
             <%
             testcenter_info = course.testcenter_info
+            testcenter_register_target = reverse('begin_test_registration', args=[course.id])
             %>
             % if testcenter_info is not None:
-	    
-	           <% 
-	               testcenter_register_target = reverse('begin_test_registration', args=[course.id])
-               %>
+
+                <!-- see if there is already a registration object
+                	TODO: need to add logic for when registration can begin. -->
+                <%
+                    registrations = get_testcenter_registrations_for_user_and_course(user, course.id)
+                %>
+                % if len(registrations) == 0:	    
                 <div class="message message-status is-shown exam-register">
 <!--                  <a href="#testcenter-register-modal" rel="leanModal" class="exam-button" data-course-id="${course.id}" data-course-number="${course.number}" id="exam_register_button">Register for Pearson exam</a>
 -->                  <a href="${testcenter_register_target}" class="exam-button" id="exam_register_button">Register for Pearson exam</a>
                       <p class="message-copy">Registration for the Pearson exam is now open.</p>
                 </div>
-
+                % else:     
                 <div class="message message-status is-shown">
-                  <p class="message-copy">Your registration for the Pearson exam is pending. Within a few days, you should receive a confirmation number, which can be used to schedule your exam.</p>
+                  <p class="message-copy">Your 
+                    <a href="${testcenter_register_target}" id="exam_register_link">registration for the Pearson exam</a>
+     is pending. Within a few days, you should see a confirmation number here, which can be used to schedule your exam.</p>
                 </div>
 
                 <div class="message message-status is-shown exam-schedule">
@@ -244,6 +251,7 @@
                    <p class="exam-registration-number">Registration number: <strong>edx00015879548</strong></p>
                    <p class="message-copy">Write this down! You’ll need it to schedule your exam.</p>
                 </div>
+                % endif
 
             % endif   
 
