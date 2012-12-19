@@ -73,10 +73,10 @@ class GraphicalSliderToolModule(XModule):
         plot_div = '<div class="{element_class}_plot" id="{element_id}_plot" \
                     style="{style}"></div>'
         # extract css style from plot
-        plot_def = re.search(r'\$plot[^\$]*\$', html_string)
+        plot_def = re.search(r'<plot[^<>]*/>', html_string)
         if plot_def:
             plot_def = plot_def.group()
-            style = re.search(r'(?=[^\$]*style\=[\"\'](.*)[\"\'])', plot_def,
+            style = re.search(r'(?=.*style\=[\"\'](.*)[\"\'])', plot_def,
                 flags=re.UNICODE | re.DOTALL)
             if style:
                 style = style.groups()[0]
@@ -85,7 +85,7 @@ class GraphicalSliderToolModule(XModule):
             replacement = plot_div.format(element_class=self.html_class,
                                           element_id=self.html_id,
                                                 style=style)
-            html_string = re.sub(r'\$plot[^\$]*\$', replacement, html_string,
+            html_string = re.sub(r'<plot[^<>]*/>', replacement, html_string,
                             flags=re.UNICODE)
 
         # get variables
@@ -104,17 +104,17 @@ class GraphicalSliderToolModule(XModule):
                                    data-var="{var}" style="{style}">\
                      </div>'
         for var in variables:
-            # find $slider var='var' ... $
-            instances = re.findall(r'\$slider\s+(?=[^\$]*var\=[\"\']' + var + '[\"\'])' \
-                          + r'[^\$]*\$', html_string, flags=re.UNICODE | re.DOTALL)
+            # find <slider var='var' ... >
+            instances = re.findall(r'<slider\s+(?=[^<>]*var\=[\"\']' + var + '[\"\'])' \
+                          + r'[^<>]*/>', html_string, flags=re.UNICODE | re.DOTALL)
             if instances:  # if presented, only one slider per var
-                slider_def = instances[0]  # get $slider var='var' ... $ string
+                slider_def = instances[0]  # get <slider var='var' ... > string
                 # extract var for proper style extraction further
                 var_substring = re.search(r'(var\=[\"\']' + var + r'[\"\'])',
                                           slider_def).group()
                 slider_def = slider_def.replace(var_substring, '')
                 # get style
-                style = re.search(r'(?=[^\$]*style\=[\"\'](.*)[\"\'])', slider_def,
+                style = re.search(r'(?=[^<>]*style\=[\"\'](.*)[\"\'])', slider_def,
                     flags=re.UNICODE | re.DOTALL)
                 if style:
                     style = style.groups()[0]
@@ -124,10 +124,10 @@ class GraphicalSliderToolModule(XModule):
                 replacement = slider_div.format(element_class=self.html_class,
                                             element_id=self.html_id,
                                             var=var, style=style)
-                # subsitute $slider var='var' ... $ in html_srting to proper
+                # subsitute <slider var='var' ... > in html_srting to proper
                 # html div element
-                html_string = re.sub(r'\$slider\s+(?=[^\$]*var\=[\"\'](' + \
-                    var + ')[\"\'])' + r'[^\$]*\$',
+                html_string = re.sub(r'<slider\s+(?=[^<>]*var\=[\"\'](' + \
+                    var + ')[\"\'])' + r'[^<>]*/>',
                 replacement, html_string, flags=re.UNICODE | re.DOTALL)
 
         # substitute inputs if we have them
@@ -139,8 +139,8 @@ class GraphicalSliderToolModule(XModule):
         for var in variables:
             input_index = 0  # make multiple inputs for same variable have
                 # different id
-            instances = re.findall(r'\$input\s+(?=[^\$]*var\=[\"\']' + var + '[\"\'])' \
-                          + r'[^\$]*\$', html_string, flags=re.UNICODE | re.DOTALL)
+            instances = re.findall(r'<textbox\s+(?=[^<>]*var\=[\"\']' + var + '[\"\'])' \
+                          + r'[^<>]*/>', html_string, flags=re.UNICODE | re.DOTALL)
             # import ipdb; ipdb.set_trace()
             for input_def in instances:  # for multiple inputs per var
                 input_index += 1
@@ -149,14 +149,14 @@ class GraphicalSliderToolModule(XModule):
                 var_substring = re.search(r'(var\=[\"\']' + var + r'[\"\'])',
                                           input_def).group()
                 input_def = input_def.replace(var_substring, '')
-                readonly = re.search(r'(?=[^\$]*(readonly\=[\"\'](\w+)[\"\']))', 
+                readonly = re.search(r'(?=[^<>]*(readonly\=[\"\'](\w+)[\"\']))', 
                     input_def, flags=re.UNICODE | re.DOTALL)
                 if readonly:
                     input_def = input_def.replace(readonly.groups()[0], '')
                     readonly = readonly.groups()[1]
                 else:
                     readonly = ''
-                style = re.search(r'(?=[^\$]*style\=[\"\'](.*)[\"\'])', input_def,
+                style = re.search(r'(?=[^<>]*style\=[\"\'](.*)[\"\'])', input_def,
                     flags=re.UNICODE | re.DOTALL)
                 if style:
                     style = style.groups()[0]
@@ -168,8 +168,8 @@ class GraphicalSliderToolModule(XModule):
                         var=var, readonly=readonly, style=style,
                         input_index=input_index)
                 # import ipdb; ipdb.set_trace()
-                html_string = re.sub(r'\$input\s+(?=[^\$]*var\=[\"\'](' + \
-                                     var + ')[\"\'])' + r'[^\$]*\$',
+                html_string = re.sub(r'<textbox\s+(?=[^<>]*var\=[\"\'](' + \
+                                     var + ')[\"\'])' + r'[^<>]*/>',
                 replacement, html_string, count=1, flags=re.UNICODE | re.DOTALL)
         return html_string
 
