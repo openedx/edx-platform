@@ -251,7 +251,20 @@ class CourseDescriptor(SequenceDescriptor):
 
     @property
     def start_date_text(self):
-        displayed_start = self._try_parse_time('advertised_start') or self.start
+        parsed_advertised_start = self._try_parse_time('advertised_start')
+
+        # If the advertised start isn't a real date string, we assume it's free
+        # form text...
+        if parsed_advertised_start is None and \
+           ('advertised_start' in self.metadata):
+           return self.metadata['advertised_start']
+
+        displayed_start = parsed_advertised_start or self.start
+
+        # If we have neither an advertised start or a real start, just return TBD
+        if not displayed_start:
+            return "TBD"
+
         return time.strftime("%b %d, %Y", displayed_start)
 
     @property
