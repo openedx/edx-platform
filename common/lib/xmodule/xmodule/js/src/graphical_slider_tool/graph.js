@@ -299,10 +299,10 @@ define('Graph', ['logme'], function (logme) {
             allParamNames.pop();
 
             if (typeof config.plot.num_points !== 'string') {
-                logme('ERROR: config.plot.num_points is not a string.');
-                logme('config.plot.num_points = ', config.plot.num_points);
+                // logme('ERROR: config.plot.num_points is not a string.');
+                // logme('config.plot.num_points = ', config.plot.num_points);
 
-                return false;
+                tempNum = plotDiv.width() / 5.0;
             }
 
             tempNum = parseInt(config.plot.num_points, 10);
