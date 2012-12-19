@@ -103,7 +103,7 @@ class CapaModule(XModule):
     graceperiod = Timedelta(help="Amount of time after the due date that submissions will be accepted", scope=Scope.settings)
     show_answer = String(help="When to show the problem answer to the student", scope=Scope.settings, default="closed")
     force_save_button = Boolean(help="Whether to force the save button to appear on the page", scope=Scope.settings, default=False)
-    rerandomize = String(help="When to rerandomize the problem", default="always")
+    rerandomize = String(help="When to rerandomize the problem", default="always", scope=Scope.settings)
     data = String(help="XML data for the problem", scope=Scope.content)
     correct_map = Object(help="Dictionary with the correctness of current student answers", scope=Scope.student_state, default={})
     student_answers = Object(help="Dictionary with the current student responses", scope=Scope.student_state)
@@ -442,6 +442,7 @@ class CapaModule(XModule):
         score_msg = get['xqueue_body']
         self.lcp.update_score(score_msg, queuekey)
         self.set_state_from_lcp()
+        self.publish_grade()
 
         return dict()  # No AJAX return is needed
 
@@ -519,6 +520,19 @@ class CapaModule(XModule):
 
         return answers
 
+    def publish_grade(self):
+        """
+        Publishes the student's current grade to the system as an event
+        """
+        score = self.lcp.get_score()
+        print score
+        self.system.publish({
+            'event_name': 'grade',
+            'value': score['score'],
+            'max_value': score['total'],
+        })
+
+
     def check_problem(self, get):
         ''' Checks whether answers to a problem are correct, and
             returns a map of correct/incorrect answers:
@@ -569,6 +583,9 @@ class CapaModule(XModule):
 
         self.attempts = self.attempts + 1
         self.lcp.done = True
+
+        self.set_state_from_lcp()
+        self.publish_grade()
 
         # success = correct if ALL questions in this problem are correct
         success = 'correct'

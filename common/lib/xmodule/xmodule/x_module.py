@@ -672,6 +672,7 @@ class ModuleSystem(object):
                  filestore=None,
                  debug=False,
                  xqueue=None,
+                 publish=None,
                  node_path="",
                  anonymous_student_id=''):
         '''
@@ -722,6 +723,12 @@ class ModuleSystem(object):
         self.anonymous_student_id = anonymous_student_id
         self.user_is_staff = user is not None and user.is_staff
         self.xmodule_model_data = xmodule_model_data
+
+        if publish is None:
+            publish = lambda e: None
+
+        self.publish = publish
+
 
     def get(self, attr):
         '''	provide uniform access to attributes (like etree).'''

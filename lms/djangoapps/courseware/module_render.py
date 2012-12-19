@@ -277,6 +277,26 @@ def _get_module(user, request, location, student_module_cache, course_id, positi
             LmsUsage(location, location)
         )
 
+    def publish(event):
+        if event.get('event_name') != 'grade':
+            return
+
+        student_module = student_module_cache.lookup(
+            course_id, descriptor.location.category, descriptor.location.url()
+        )
+        if student_module is None:
+            student_module = StudentModule(
+                course_id=course_id,
+                student=user,
+                module_type=descriptor.location.category,
+                module_state_key=descriptor.location.url(),
+                state=json.dumps({})
+            )
+            student_module_cache.append(student_module)
+        student_module.grade = event.get('value')
+        student_module.max_grade = event.get('max_value')
+        student_module.save()
+
     # TODO (cpennington): When modules are shared between courses, the static
     # prefix is going to have to be specific to the module, not the directory
     # that the xml was loaded from
@@ -294,7 +314,8 @@ def _get_module(user, request, location, student_module_cache, course_id, positi
                           replace_urls=replace_urls,
                           node_path=settings.NODE_PATH,
                           anonymous_student_id=anonymous_student_id,
-                          xmodule_model_data=xmodule_model_data
+                          xmodule_model_data=xmodule_model_data,
+                          publish=publish,
                           )
     # pass position specified in URL to module through ModuleSystem
     system.set('position', position)
