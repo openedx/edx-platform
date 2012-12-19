@@ -73,17 +73,19 @@ class GraphicalSliderToolModule(XModule):
         plot_div = '<div class="{element_class}_plot" id="{element_id}_plot" \
                     style="{style}"></div>'
         # extract css style from plot
-        plot_def = re.search(r'\$plot[^\$]*\$', html_string).group()
-        style = re.search(r'(?=.*style\=[\"\'](.*)[\"\'])', plot_def)
-        if style:
-            style = style.groups()[0]
-        else:  # no style parameter
-            style = ''
-        replacement = plot_div.format(element_class=self.html_class,
-                                      element_id=self.html_id,
-                                            style=style)
-        html_string = re.sub(r'\$plot[^\$]*\$', replacement, html_string,
-                        flags=re.UNICODE)
+        plot_def = re.search(r'\$plot[^\$]*\$', html_string)
+        if plot_def:
+            plot_def = plot_def.group()
+            style = re.search(r'(?=.*style\=[\"\'](.*)[\"\'])', plot_def)
+            if style:
+                style = style.groups()[0]
+            else:  # no style parameter
+                style = ''
+            replacement = plot_div.format(element_class=self.html_class,
+                                          element_id=self.html_id,
+                                                style=style)
+            html_string = re.sub(r'\$plot[^\$]*\$', replacement, html_string,
+                            flags=re.UNICODE)
 
         # get variables
         if json.loads(self.configuration_json)['root'].get('parameters'):
