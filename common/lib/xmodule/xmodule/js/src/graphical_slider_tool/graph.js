@@ -228,11 +228,11 @@ define('Graph', ['logme'], function (logme) {
                     else {
                         tn1 = Math.abs(num);
 
-                        if (digitsAfter > c1) {
-                            tn1 = tn1.toPrecision(digitsBefore + c1);
-                        } else {
-                            tn1 = tn1.toPrecision(digitsBefore + digitsAfter);
-                        }
+                        // if (digitsAfter > c1) {
+                            tn1 = tn1.toFixed(c1);
+                        // } else {
+                        //     tn1 = tn1.toPrecision(digitsBefore + digitsAfter);
+                        // }
                     }
 
                     if (num < 0) {
