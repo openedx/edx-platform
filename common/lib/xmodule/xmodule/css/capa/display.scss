@@ -20,50 +20,6 @@ h2 {
   color: darken($error-red, 10%);
 }
 
-.rubric {
-    tr {
-        margin:10px 0px;
-        height: 100%;
-    }
-    td {
-        padding: 20px 0px;
-        margin: 10px 0px;
-        height: 100%;
-    }
-    th {
-        padding: 5px;
-        margin: 5px;
-    }
-    label,
-    .view-only {
-        margin:10px;
-        position: relative;
-        padding: 15px;
-        width: 175px;
-        height:100%;
-        display: inline-block;
-        min-height: 50px;
-        min-width: 50px;
-        background-color: #CCC;
-        text-size: 1.5em;
-    }
-    .grade {
-      position: absolute;
-      bottom:0px;
-      right:0px;
-      margin:10px;
-    }
-    .selected-grade {
-      background: #666;
-      color: white; 
-    }
-    input[type=radio]:checked + label {
-      background: #666;
-      color: white; }
-    input[class='score-selection'] {
-      display: none; 
-    }
-}
 
 section.problem {
   @media print {
@@ -751,5 +707,50 @@ section.problem {
         }
       }
     }
+  }
+
+  .rubric {
+      tr {
+          margin:10px 0px;
+          height: 100%;
+      }
+      td {
+          padding: 20px 0px;
+          margin: 10px 0px;
+          height: 100%;
+      }
+      th {
+          padding: 5px;
+          margin: 5px;
+      }
+      label,
+      .view-only {
+          margin:10px;
+          position: relative;
+          padding: 15px;
+          width: 200px;
+          height:100%;
+          display: inline-block;
+          min-height: 50px;
+          min-width: 50px;
+          background-color: #CCC;
+          text-size: 1.5em;
+      }
+      .grade {
+        position: absolute;
+        bottom:0px;
+        right:0px;
+        margin:10px;
+      }
+      .selected-grade {
+        background: #666;
+        color: white; 
+      }
+      input[type=radio]:checked + label {
+        background: #666;
+        color: white; }
+      input[class='score-selection'] {
+        display: none; 
+      }
   }
 }
