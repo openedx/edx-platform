@@ -55,7 +55,7 @@ class ABTestModule(XModule):
 
     @group.setter
     def group(self, value):
-        self.group_assigments[self.experiment] = value
+        self.group_assignments[self.experiment] = value
 
     @group.deleter
     def group(self):
