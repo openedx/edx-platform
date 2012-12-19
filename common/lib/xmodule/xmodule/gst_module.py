@@ -73,7 +73,7 @@ class GraphicalSliderToolModule(XModule):
         plot_div = '<div class="{element_class}_plot" id="{element_id}_plot" \
                     style="{style}"></div>'
         # extract css style from plot
-        plot_def = re.search(r'\<plot[^\$]*\>', html_string)
+        plot_def = re.search(r'\$plot[^\$]*\$', html_string)
         if plot_def:
             plot_def = plot_def.group()
             style = re.search(r'(?=[^\$]*style\=[\"\'](.*)[\"\'])', plot_def,
