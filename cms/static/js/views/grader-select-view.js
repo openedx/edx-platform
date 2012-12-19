@@ -35,7 +35,7 @@ CMS.Views.OverviewAssignmentGrader = Backbone.View.extend({
 				// TODO move to a template file
 				'<h4 class="status-label"><%= assignmentType %></h4>' +
 				'<a data-tooltip="Mark/unmark this subsection as graded" class="menu-toggle" href="#">' +
-					'<span class="ss-icon ss-standard">&#x2713;</span>' +
+					'<% if (!hideSymbol) {%><span class="ss-icon ss-standard">&#x2713;</span><%};%>' +
 				'</a>' +
 				'<ul class="menu">' + 
 					'<% graders.each(function(option) { %>' +
@@ -44,7 +44,7 @@ CMS.Views.OverviewAssignmentGrader = Backbone.View.extend({
 					'<li><a class="gradable-status-notgraded" href="#">Not Graded</a></li>' +
 				'</ul>');
 		this.assignmentGrade = new CMS.Models.AssignmentGrade({
-			assignmentUrl : this.$el.closest('.branch').data('id'), 
+			assignmentUrl : this.$el.closest('.id-holder').data('id'), 
 			graderType : this.$el.data('initial-status')});
 		// TODO throw exception if graders is null
 		this.graders = this.options['graders'];
@@ -55,10 +55,12 @@ CMS.Views.OverviewAssignmentGrader = Backbone.View.extend({
 			cachethis.$el.removeClass('is-active');
 			$(document).off('click', cachethis.removeMenu);
 		}
+		this.hideSymbol = this.options['hideSymbol'];
 		this.render();
 	},
 	render : function() {
-		this.$el.html(this.template({ assignmentType : this.assignmentGrade.get('graderType'), graders : this.graders }));
+		this.$el.html(this.template({ assignmentType : this.assignmentGrade.get('graderType'), graders : this.graders,
+			hideSymbol : this.hideSymbol }));
 		if (this.assignmentGrade.has('graderType') && this.assignmentGrade.get('graderType') != "Not Graded") {
 			this.$el.addClass('is-set');
 		}
