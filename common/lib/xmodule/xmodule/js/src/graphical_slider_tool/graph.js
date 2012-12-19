@@ -270,6 +270,7 @@ define('Graph', ['logme'], function (logme) {
                 xrange.min = Function.apply(null, allParamNames);
             } catch (err) {
                 logme('ERROR: could not create a function from the string "' + config.plot.xrange.min + '" for xrange.min.');
+                logme('Error message: "' + err.message + '"');
 
                 return false;
             }
@@ -280,6 +281,7 @@ define('Graph', ['logme'], function (logme) {
                 xrange.max = Function.apply(null, allParamNames);
             } catch (err) {
                 logme('ERROR: could not create a function from the string "' + config.plot.xrange.max + '" for xrange.max.');
+                logme('Error message: "' + err.message + '"');
 
                 return false;
             }
@@ -447,6 +449,7 @@ define('Graph', ['logme'], function (logme) {
                         funcString +
                         '" was not converted by the Function constructor.'
                     );
+                    logme('Error message: "' + err.message + '"');
 
                     paramNames.pop();
                     paramNames.pop();
@@ -529,8 +532,22 @@ define('Graph', ['logme'], function (logme) {
                 // JSON.
                 c1 = 0;
 
-                start = xrange.min.apply(window, paramValues);
-                end = xrange.max.apply(window, paramValues);
+                try {
+                    start = xrange.min.apply(window, paramValues);
+                } catch (err) {
+                    logme('ERROR: Could not determine xrange start.');
+                    logme('Error message: "' + err.message + '".');
+
+                    return false;
+                }
+                try {
+                    end = xrange.max.apply(window, paramValues);
+                } catch (err) {
+                    logme('ERROR: Could not determine xrange end.');
+                    logme('Error message: "' + err.message + '".');
+
+                    return false;
+                }
                 step = (end - start) / (numPoints - 1);
 
                 // Generate the data points.
@@ -568,7 +585,14 @@ define('Graph', ['logme'], function (logme) {
                 if (c1 != numPoints) {
                     x = end;
                     paramValues.push(x);
-                    y = functionObj.func.apply(window, paramValues);
+                    try {
+                        y = functionObj.func.apply(window, paramValues);
+                    } catch (err) {
+                        logme('ERROR: Could not generate data.');
+                        logme('Error message: "' + err.message + '".');
+
+                        return false;
+                    }
                     paramValues.pop();
                     dataPoints.push([x, y]);
                 }
