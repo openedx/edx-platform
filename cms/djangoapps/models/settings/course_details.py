@@ -163,8 +163,10 @@ class CourseDetails:
     def recompose_video_tag(video_key):
         # TODO should this use a mako template? Of course, my hope is that this is a short-term workaround for the db not storing
         # the right thing
-        result = '<iframe width="560" height="315" src="http://www.youtube.com/embed/' + \
-            video_key + '?autoplay=1&rel=0" frameborder="0" allowfullscreen=""></iframe>'
+        result = None
+        if video_key:
+            result = '<iframe width="560" height="315" src="http://www.youtube.com/embed/' + \
+                video_key + '?autoplay=1&rel=0" frameborder="0" allowfullscreen=""></iframe>'
         return result
 
     

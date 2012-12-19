@@ -986,7 +986,7 @@ def course_info_updates(request, org, course, provided_id=None):
         try:
             return HttpResponse(json.dumps(update_course_updates(location, request.POST, provided_id)), mimetype="application/json")
         except etree.XMLSyntaxError:
-            return HttpResponse("Failed to save: malformed html", status=515, content_type="text/plain")
+            return HttpResponseBadRequest("Failed to save: malformed html", content_type="text/plain")
 
 
 @expect_json
