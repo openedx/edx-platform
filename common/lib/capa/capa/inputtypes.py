@@ -803,17 +803,19 @@ class RubricInput(InputTypeBase):
         Convert options to a convenient format.
         """
         return [
-                ]
+            Attribute('height', None),
+            Attribute('width', None)]
 
     def _extra_context(self):
         """
-        Add in the various bits and pieces of the 
+        Add in the various bits and pieces that we need
         """
-        return {}
+        return {'categories': self.categories,
+                'view_only': False}
 
     def setup(self):
-
-        extract_categories(self.xml)
+        # set the categories
+        self.categories = self.extract_categories(self.xml)
 
     @staticmethod
     def extract_categories(element):
@@ -833,8 +835,8 @@ class RubricInput(InputTypeBase):
             if category.tag != 'category':
                 raise Exception("[capa.inputtypes.extract_categories] Expected a <category> tag: got {0} instead".format(category.tag))
             else:
-                categories.append(extract_category(category))
-        self.categories = categories
+                categories.append(RubricInput.extract_category(category))
+        return categories
 
 
     @staticmethod
@@ -883,7 +885,7 @@ class RubricInput(InputTypeBase):
 
         # sort and check for duplicates
         options = sorted(options, key=lambda option: option['points'])
-        validate_options(options)
+        RubricInput.validate_options(options)
 
         return {'description': description, 'options': options}
         

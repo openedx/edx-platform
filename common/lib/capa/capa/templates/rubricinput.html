@@ -1,5 +1,25 @@
-<section id="rubric_${id}" class="rubric-section">
+<form class="rubric-template" id="inputtype_${id}">
     <table class="rubric">
-
+        % for i in range(len(categories)):
+            <% category = categories[i] %>
+        <tr>
+            <th>${category['description']}</th>
+            % for j in range(len(category['options'])):
+                <% option = category['options'][j] %>
+            <td>
+                <!--TODO: figure out the state variables/selected info -->
+                % if view_only:
+                <div class="view-only">
+                    ${option['text']}
+                    <div class="grade">[${option['points']} points]</div>
+                </div>
+                % else:
+                    <input type="radio" class="score-selection" name="score-selection-${i}" id="score-${i}-${j}" value="${option['points']}"/>
+                    <label for="score-${i}-${j}">${option['text']}</label>
+                % endif
+            </td>
+            % endfor
+        </tr>
+        % endfor
     </table>
-</section>
+</form>
