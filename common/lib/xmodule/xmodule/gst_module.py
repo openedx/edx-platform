@@ -25,6 +25,8 @@ class GraphicalSliderToolModule(XModule):
 
     js = {
       'js': [
+        resource_string(__name__, 'js/src/graphical_slider_tool/jstat-1.0.0.min.js'),
+
         resource_string(__name__, 'js/src/graphical_slider_tool/gst_main.js'),
         resource_string(__name__, 'js/src/graphical_slider_tool/state.js'),
         resource_string(__name__, 'js/src/graphical_slider_tool/logme.js'),

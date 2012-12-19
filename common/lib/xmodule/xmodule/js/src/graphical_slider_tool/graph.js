@@ -403,11 +403,12 @@ define('Graph', ['logme'], function (logme) {
                     obj['@line'],
                     obj['@dot'],
                     obj['@label'],
-                    obj['@point_size']
+                    obj['@point_size'],
+                    obj['@fill_area']
                 );
             }
 
-            function addFunction(funcString, color, line, dot, label, pointSize) {
+            function addFunction(funcString, color, line, dot, label, pointSize, fillArea) {
                 var newFunctionObject, func, paramNames;
 
                 // The main requirement is function string. Without it we can't
@@ -421,6 +422,8 @@ define('Graph', ['logme'], function (logme) {
                 // HTML entities is passed to the Function() constructor, it
                 // will break.
                 funcString = $('<div>').html(funcString).text();
+
+                logme('graph: funcstr = "' + funcString + '"');
 
                 // Some defaults. If no options are set for the graph, we will
                 // make sure that at least a line is drawn for a function.
@@ -476,17 +479,17 @@ define('Graph', ['logme'], function (logme) {
                 }
 
                 if (typeof line === 'string') {
-                    if (line === 'true') {
+                    if (line.toLowerCase() === 'true') {
                         newFunctionObject['line'] = true;
-                    } else if (line === 'false') {
+                    } else if (line.toLowerCase() === 'false') {
                         newFunctionObject['line'] = false;
                     }
                 }
 
                 if (typeof dot === 'string') {
-                    if (dot === 'true') {
+                    if (dot.toLowerCase() === 'true') {
                         newFunctionObject['dot'] = true;
-                    } else if (dot === 'false') {
+                    } else if (dot.toLowerCase() === 'false') {
                         newFunctionObject['dot'] = false;
                     }
                 }
@@ -502,6 +505,21 @@ define('Graph', ['logme'], function (logme) {
                     (newFunctionObject['line'] === false)
                 ) {
                     newFunctionObject['line'] = true;
+                }
+
+                if (newFunctionObject['line'] === true) {
+                    if (typeof fillArea === 'string') {
+                        if (fillArea.toLowerCase() === 'true') {
+                            newFunctionObject['fillArea'] = true;
+                        } else if (fillArea.toLowerCase() === 'false') {
+                            newFunctionObject['fillArea'] = false;
+                        } else {
+                            logme('ERROR: The attribute fill_area should be either "true" or "false".');
+                            logme('fill_area = "' + fillArea + '".');
+
+                            return;
+                        }
+                    }
                 }
 
                 if (typeof label === 'string') {
@@ -621,6 +639,10 @@ define('Graph', ['logme'], function (logme) {
                 seriesObj.lines = {
                     'show': functionObj.line
                 };
+
+                if (functionObj.hasOwnProperty('fillArea') === true) {
+                    seriesObj.lines.fill = functionObj.fillArea;
+                }
 
                 // Should each data point be represented by a point on the
                 // graph?
