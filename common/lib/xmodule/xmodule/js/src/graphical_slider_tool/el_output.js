@@ -77,7 +77,7 @@ define('ElOutput', ['logme'], function (logme) {
                 logme('Error message: "' + err.message + '".');
 
                 $('#' + gstId).html('<div style="color: red;">' + 'ERROR IN XML: Could not create a function from string "' + funcString + '".' + '</div>');
-                $('#' + gstId).html('<div style="color: red;">' + 'Error message: "' + err.message + '".' + '</div>');
+                $('#' + gstId).append('<div style="color: red;">' + 'Error message: "' + err.message + '".' + '</div>');
 
                 paramNames.pop();
 
