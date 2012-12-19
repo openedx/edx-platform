@@ -109,10 +109,11 @@ urlpatterns = ('',
         {'template': 'press_releases/Wellesley_College_joins_edX.html'}, name="press/wellesley-college-joins-edx"),
     url(r'^press/georgetown-joins-edx$', 'static_template_view.views.render',
         {'template': 'press_releases/Georgetown_joins_edX.html'}, name="press/georgetown-joins-edx"),
-
+    url(r'^press/spring-courses$', 'static_template_view.views.render',
+        {'template': 'press_releases/Spring_2013_course_announcements.html'}, name="press/spring-courses"),
 
     # Should this always update to point to the latest press release?
-    (r'^pressrelease$', 'django.views.generic.simple.redirect_to', {'url': '/press/georgetown-joins-edx'}),
+    (r'^pressrelease$', 'django.views.generic.simple.redirect_to', {'url': '/press/spring-courses'}),
 
 
     (r'^favicon\.ico$', 'django.views.generic.simple.redirect_to', {'url': '/static/images/favicon.ico'}),
