@@ -303,10 +303,12 @@ define('Graph', ['logme'], function (logme) {
 
             tempNum = parseInt(config.plot.num_points, 10);
             if (isFinite(tempNum) === false) {
-                logme('ERROR: Expected config.plot.num_points to be a a valid integer. It is not.');
-                logme('config.plot.num_points = ', config.plot.num_points);
+                // logme('ERROR: Expected config.plot.num_points to be a a valid integer. It is not.');
+                // logme('config.plot.num_points = ', config.plot.num_points);
 
-                return false;
+                // return false;
+
+                tempNum = plotDiv.width() / 5.0;
             }
 
             if (
