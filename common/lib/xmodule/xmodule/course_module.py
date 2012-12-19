@@ -100,7 +100,8 @@ class CourseDescriptor(SequenceDescriptor):
         """Parse the policy specified in policy_str, and save it"""
         try:
             self._grading_policy = load_grading_policy(policy_str)
-        except:
+        except Exception, err:
+            log.exception('Failed to load grading policy:')
             self.system.error_tracker("Failed to load grading policy")
             # Setting this to an empty dictionary will lead to errors when
             # grading needs to happen, but should allow course staff to see
