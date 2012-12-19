@@ -49,20 +49,11 @@ CMS.Models.Settings.CourseDetails = Backbone.Model.extend({
 		if (newattrs.end_date && newattrs.enrollment_end && newattrs.end_date < newattrs.enrollment_end) {
 			errors.enrollment_end = "The enrollment end date cannot be after the course end date.";
 		}
-		if (newattrs.intro_video && newattrs.intro_video != this.get('intro_video')) {
-			var videos = this.parse_videosource(newattrs.intro_video);
-			var vid_errors = new Array();
-			var cachethis = this;
-			for (var i=0; i<videos.length; i++) {
-				// doesn't call parseFloat or Number b/c they stop on first non parsable and return what they have
-				if (!isFinite(videos[i].speed)) vid_errors.push(videos[i].speed + " is not a valid speed.");
-				else if (!videos[i].key) vid_errors.push(videos[i].speed + " does not have a video id");
-				// can't use get from client to test if video exists b/c of CORS (crossbrowser get not allowed)
-				// GET "http://gdata.youtube.com/feeds/api/videos/" + videokey
+		if (newattrs.intro_video && newattrs.intro_video !== this.get('intro_video')) {
+			if (this._videokey_illegal_chars.exec(newattrs.intro_video)) {
+				errors.intro_video = "Key should only contain letters, numbers, _, or -";
 			}
-			if (!_.isEmpty(vid_errors)) {
-				errors.intro_video = vid_errors.join(' ');
-			}
+			// TODO check if key points to a real video using google's youtube api
 		}
 		if (!_.isEmpty(errors)) return errors;
 		// NOTE don't return empty errors as that will be interpreted as an error state
@@ -73,98 +64,20 @@ CMS.Models.Settings.CourseDetails = Backbone.Model.extend({
 		return '/' + location.get('org') + "/" + location.get('course') + '/settings/' + location.get('name') + '/section/details';
 	},
 	
-	_videoprefix : /\s*<video\s*youtube="/g,
-	// the below is lax to enable validation
-	_videospeedparse : /[^:]*/g, // /\d+\.?\d*(?=:)/g,
-	_videokeyparse : /([^,\/>]+)/g,
-	_videonosuffix : /[^"\/>]+/g,
-	_getNextMatch : function (regex, string, cursor) {
-		regex.lastIndex = cursor;
-		var result = regex.exec(string);
-		if (_.isArray(result)) return result[0];
-		else return result;
-	},
-	// the whole string for editing (put in edit box)
-	getVideoSource: function() {
-		if (this.get('intro_video')) {
-			var cursor = 0;
-			var videostring = this.get('intro_video');
-			this._getNextMatch(this._videoprefix, videostring, cursor);
-			cursor = this._videoprefix.lastIndex;
-			return this._getNextMatch(this._videonosuffix, videostring, cursor);
-		}
-		else return "";
-	},
-	// the source closest to 1.0 speed
-	videosourceSample: function() {
-		if (this.get('intro_video')) {
-			var cursor = 0;
-			var videostring = this.get('intro_video');
-			this._getNextMatch(this._videoprefix, videostring, cursor);
-			cursor = this._videoprefix.lastIndex;
-			
-			// parse from [speed:id,/s?]* to find 1.0 or take first
-			var parsedspeed = this._getNextMatch(this._videospeedparse, videostring, cursor);
-			var bestkey;
-			if (parsedspeed) {
-				cursor = this._videospeedparse.lastIndex + 1;
-				var bestspeed = Number(parsedspeed);
-				bestkey = this._getNextMatch(this._videokeyparse, videostring, cursor);
-				cursor = this._videokeyparse.lastIndex + 1;
-				while (cursor < videostring.length && bestspeed != 1.0) {
-					parsedspeed = this._getNextMatch(this._videospeedparse, videostring, cursor);
-					if (parsedspeed) cursor = this._videospeedparse.lastIndex + 1;
-					else break;
-					if (Math.abs(Number(parsedspeed) - 1.0) < Math.abs(bestspeed - 1.0)) {
-						bestspeed = Number(parsedspeed);
-						bestkey = this._getNextMatch(this._videokeyparse, videostring, cursor);
-					}
-					else this._getNextMatch(this._videokeyparse, videostring, cursor);
-					if (this._videokeyparse.lastIndex > cursor)	cursor = this._videokeyparse.lastIndex + 1;
-					else cursor++;
-				}
-			}
-			else {
-				bestkey = this._getNextMatch(this._videokeyparse, videostring, cursor);
-			}
-			if (bestkey) {
-				// WTF? for some reason bestkey is an array [key, key] (same one repeated)
-				if (_.isArray(bestkey)) bestkey = bestkey[0];
-				return "http://www.youtube.com/embed/" + bestkey;
-			}
-			else return "";
-		}
-	},
-	parse_videosource: function(videostring) {
-		// used to validate before set so cannot get from model attr. Returns [{ speed: fff, key: sss }]
-		var cursor = 0;
-		this._getNextMatch(this._videoprefix, videostring, cursor);
-		cursor = this._videoprefix.lastIndex;
-		videostring = this._getNextMatch(this._videonosuffix, videostring, cursor);
-		cursor = 0;
-		// parsed to "fff:kkk,fff:kkk"
-		var result = new Array();
-		if (!videostring || videostring.length == 0) return result;
-		while (cursor < videostring.length) {
-			var speed = this._getNextMatch(this._videospeedparse, videostring, cursor);
-			if (speed) cursor = this._videospeedparse.lastIndex + 1;
-			else return result;
-			var key = this._getNextMatch(this._videokeyparse, videostring, cursor);
-			if (key) cursor = this._videokeyparse.lastIndex + 1;
-			// See the WTF above
-			if (_.isArray(key)) key = key[0];
-			result.push({speed: speed, key: key});
-		}
-		return result;
-	},
+	_videokey_illegal_chars : /[^a-zA-Z0-9_-]/g,
 	save_videosource: function(newsource) {
 		// newsource either is <video youtube="speed:key, *"/> or just the "speed:key, *" string
 		// returns the videosource for the preview which iss the key whose speed is closest to 1
-		if (newsource == null) this.save({'intro_video': null}); 
+		if (_.isEmpty(newsource) && !_.isEmpty(this.get('intro_video'))) this.save({'intro_video': null}); 
 		// TODO remove all whitespace w/in string
-		else if (this._getNextMatch(this._videoprefix, newsource, 0)) this.save('intro_video', newsource);
-		else this.save('intro_video', '<video youtube="' + newsource + '"/>');
+		else {
+			if (this.get('intro_video') !== newsource) this.save('intro_video', newsource);
+		}
 		
 		return this.videosourceSample();
+	},
+	videosourceSample : function() {
+		 if (this.has('intro_video')) return "http://www.youtube.com/embed/" + this.get('intro_video');
+		 else return "";
 	}
 });

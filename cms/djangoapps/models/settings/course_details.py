@@ -8,6 +8,9 @@ from contentstore.utils import get_modulestore
 from util.converters import jsdate_to_time, time_to_date
 from cms.djangoapps.models.settings import course_grading
 from cms.djangoapps.contentstore.utils import update_item
+import re
+import logging
+
 
 class CourseDetails:
     def __init__(self, location):
@@ -58,7 +61,8 @@ class CourseDetails:
         
         temploc = temploc._replace(name='video')
         try:
-            course.intro_video = get_modulestore(temploc).get_item(temploc).definition['data']
+            raw_video = get_modulestore(temploc).get_item(temploc).definition['data']
+            course.intro_video = CourseDetails.parse_video_tag(raw_video) 
         except ItemNotFoundError:
             pass
         
@@ -127,12 +131,43 @@ class CourseDetails:
         update_item(temploc, jsondict['effort'])
         
         temploc = temploc._replace(name='video')
-        update_item(temploc, jsondict['intro_video'])
+        recomposed_video_tag = CourseDetails.recompose_video_tag(jsondict['intro_video'])
+        update_item(temploc, recomposed_video_tag)
         
                     
         # Could just generate and return a course obj w/o doing any db reads, but I put the reads in as a means to confirm
         # it persisted correctly
         return CourseDetails.fetch(course_location)
+    
+    @staticmethod
+    def parse_video_tag(raw_video):
+        """
+        Because the client really only wants the author to specify the youtube key, that's all we send to and get from the client.
+        The problem is that the db stores the html markup as well (which, of course, makes any sitewide changes to how we do videos
+        next to impossible.)
+        """
+        if not raw_video:
+            return None
+         
+        keystring_matcher = re.search('(?<=embed/)[a-zA-Z0-9_-]+', raw_video)
+        if keystring_matcher is None:
+            keystring_matcher = re.search('<?=\d+:[a-zA-Z0-9_-]+', raw_video)
+        
+        if keystring_matcher:
+            return keystring_matcher.group(0)
+        else:
+            logging.warn("ignoring the content because it doesn't not conform to expected pattern: " + raw_video)
+            return None
+    
+    @staticmethod
+    def recompose_video_tag(video_key):
+        # TODO should this use a mako template? Of course, my hope is that this is a short-term workaround for the db not storing
+        # the right thing
+        result = '<iframe width="560" height="315" src="http://www.youtube.com/embed/' + \
+            video_key + '?autoplay=1&rel=0" frameborder="0" allowfullscreen=""></iframe>'
+        return result
+
+    
 
 # TODO move to a more general util? Is there a better way to do the isinstance model check?
 class CourseSettingsEncoder(json.JSONEncoder):
