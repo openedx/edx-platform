@@ -11,6 +11,11 @@ define('Graph', ['logme'], function (logme) {
 
         logme(config);
 
+        // We need plot configuration settings. Without them we can't continue.
+        if ($.isPlainObject(config.plot) === false) {
+            return;
+        }
+
         // We must have a graph container DIV element available in order to
         // proceed.
         plotDiv = $('#' + gstId + '_plot');
