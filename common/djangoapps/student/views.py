@@ -207,11 +207,11 @@ def dashboard(request):
 
     # we want to populate the registration page with the relevant information,
     # if it already exists.  Create an empty object otherwise.
-    try:
-        testcenteruser = TestCenterUser.objects.get(user=user)
-    except TestCenterUser.DoesNotExist:
-        testcenteruser = TestCenterUser()
-        testcenteruser.user = user
+#    try:
+#        testcenteruser = TestCenterUser.objects.get(user=user)
+#    except TestCenterUser.DoesNotExist:
+#        testcenteruser = TestCenterUser()
+#        testcenteruser.user = user
     
     # Build our courses list for the user, but ignore any courses that no longer
     # exist (because the course IDs have changed). Still, we don't delete those
@@ -252,7 +252,8 @@ def dashboard(request):
                'show_courseware_links_for' : show_courseware_links_for,
                'cert_statuses': cert_statuses,
                'news': top_news,
-               'testcenteruser': testcenteruser,
+# No longer needed here...move to begin_registration               
+#               'testcenteruser': testcenteruser,
                }
 
     return render_to_response('dashboard.html', context)
@@ -692,7 +693,7 @@ def _do_create_or_update_test_center_user(post_vars):
     
     registration = TestCenterRegistration(testcenter_user = testcenter_user)
     # registration.register(user)
-
+    registration.course_id = post_vars['course_id']
     registration.accommodation_request = post_vars['accommodations']
 
     return (user, testcenter_user, registration)

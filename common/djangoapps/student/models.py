@@ -200,13 +200,37 @@ class TestCenterUser(models.Model):
         return self.user.email
 
 class TestCenterRegistration(models.Model):
+    """
+    This is our representation of a user's registration for in-person testing,
+    and specifically for Pearson at this point. A few things to note:
+
+    * Pearson only supports Latin-1, so we have to make sure that the data we
+      capture here will work with that encoding.  This is less of an issue
+      than for the TestCenterUser.
+    * Registrations are only created here when a user registers to take an exam in person.
+
+    The field names and lengths are modeled on the conventions and constraints
+    of Pearson's data import system.
+    """
+    # TODO: Check the spec to find out lengths specified by Pearson
+
     testcenter_user = models.ForeignKey(TestCenterUser, unique=True, default=None)
     created_at = models.DateTimeField(auto_now_add=True, db_index=True)
     updated_at = models.DateTimeField(auto_now=True, db_index=True)
-    accommodation_request = models.CharField(max_length=1024)
-    # TODO: this should be an enumeration:
-    accommodation_code = models.CharField(max_length=64)
+    course_id = models.CharField(max_length=128, db_index=True)
     
+    # store the original text of the accommodation request.
+    accommodation_request = models.CharField(max_length=1024, blank=True)
+    # TODO: this should be an enumeration:
+    accommodation_code = models.CharField(max_length=64, blank=True)
+
+    @property
+    def candidate_id(self):
+        return self.testcenter_user.candidate_id
+    
+    @property
+    def client_candidate_id(self):
+        return self.testcenter_user.client_candidate_id
     
 def unique_id_for_user(user):
     """
