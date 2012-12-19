@@ -2,8 +2,6 @@ var $body;
 var $modal;
 var $modalCover;
 var $newComponentItem;
-var $newComponentStep1;
-var $newComponentStep2;
 var $changedInput;
 var $spinner;
 
@@ -111,15 +109,12 @@ $(document).ready(function() {
     $('.edit-section-start-cancel').bind('click', cancelSetSectionScheduleDate);
     $('.edit-section-start-save').bind('click', saveSetSectionScheduleDate);
 
-    // modal upload asset dialog. Bind it in the initializer otherwise multiple hanlders will get registered causing
-    // pretty wacky stuff to happen
-    $('.file-input').bind('change', startUpload);
     $('.upload-modal .choose-file-button').bind('click', showFileSelectionMenu);
 
     $body.on('click', '.section-published-date .edit-button', editSectionPublishDate);
     $body.on('click', '.section-published-date .schedule-button', editSectionPublishDate);
     $body.on('click', '.edit-subsection-publish-settings .save-button', saveSetSectionScheduleDate);
-    $body.on('click', '.edit-subsection-publish-settings .cancel-button', hideModal)
+    $body.on('click', '.edit-subsection-publish-settings .cancel-button', hideModal);
     $body.on('change', '.edit-subsection-publish-settings .start-date', function() {
         if($('.edit-subsection-publish-settings').find('.start-time').val() == '') {
             $('.edit-subsection-publish-settings').find('.start-time').val('12:00am');    
@@ -314,7 +309,7 @@ function checkForNewValue(e) {
 
         this.saveTimer = setTimeout(function() {
             $changedInput = $(e.target);
-            saveSubsection()
+            saveSubsection();
             this.saveTimer = null;
         }, 500);
     }
@@ -327,7 +322,7 @@ function autosaveInput(e) {
 
     this.saveTimer = setTimeout(function() {        
         $changedInput = $(e.target);
-        saveSubsection()
+        saveSubsection();
         this.saveTimer = null;
     }, 500);
 }
@@ -349,23 +344,22 @@ function saveSubsection() {
     // pull all 'normalized' metadata editable fields on page
     var metadata_fields = $('input[data-metadata-name]');
     
-    metadata = {};
+    var metadata = {};
     for(var i=0; i< metadata_fields.length;i++) {
-	   el = metadata_fields[i];
+	   var el = metadata_fields[i];
 	   metadata[$(el).data("metadata-name")] = el.value;
     } 
 
     // now add 'free-formed' metadata which are presented to the user as dual input fields (name/value)
     $('ol.policy-list > li.policy-list-element').each( function(i, element) {
-        name = $(element).children('.policy-list-name').val();
-        val = $(element).children('.policy-list-value').val();
-        metadata[name] = val;
+        var name = $(element).children('.policy-list-name').val();
+        metadata[name] = $(element).children('.policy-list-value').val();
     });
 
     // now add any 'removed' policy metadata which is stored in a separate hidden div
     // 'null' presented to the server means 'remove'
     $("#policy-to-delete > li.policy-list-element").each(function(i, element) {
-        name = $(element).children('.policy-list-name').val();
+        var name = $(element).children('.policy-list-name').val();
         if (name != "")
            metadata[name] = null;
     });
@@ -401,7 +395,7 @@ function createNewUnit(e) {
     $.post('/clone_item',
 	   {'parent_location' : parent,
 		   'template' : template,
-		   'display_name': 'New Unit',
+		   'display_name': 'New Unit'
 		   },
 	   function(data) {
 	       // redirect to the edit page
@@ -491,7 +485,7 @@ function displayFinishedUpload(xhr) {
 
     var template = $('#new-asset-element').html();
     var html = Mustache.to_html(template, resp);
-    $('table > tbody > tr:first').before(html);
+    $('table > tbody').prepend(html);
 
 }
 
@@ -504,6 +498,7 @@ function hideModal(e) {
     if(e) {
         e.preventDefault();
     }
+    $('.file-input').unbind('change', startUpload);
     $modal.hide();
     $modalCover.hide();
 }
@@ -680,7 +675,7 @@ function saveNewCourse(e) {
         'template' : template,
         'org' : org,
         'number' : number,
-        'display_name': display_name,
+        'display_name': display_name
         },
         function(data) {
             if (data.id != undefined) {
@@ -709,7 +704,7 @@ function addNewSubsection(e) {
 
     var parent = $(this).parents("section.branch").data("id");
 
-    $saveButton.data('parent', parent)
+    $saveButton.data('parent', parent);
     $saveButton.data('template', $(this).data('template'));
 
     $newSubsection.find('.new-subsection-form').bind('submit', saveNewSubsection);
@@ -774,7 +769,7 @@ function saveEditSectionName(e) {
     $spinner.show();
 
     if (display_name == '') {
-        alert("You must specify a name before saving.")
+        alert("You must specify a name before saving.");
         return;
     }
 
@@ -811,13 +806,12 @@ function cancelSetSectionScheduleDate(e) {
 function saveSetSectionScheduleDate(e) {
     e.preventDefault();
 
-    input_date = $('.edit-subsection-publish-settings .start-date').val();
-    input_time = $('.edit-subsection-publish-settings .start-time').val();
+    var input_date = $('.edit-subsection-publish-settings .start-date').val();
+    var input_time = $('.edit-subsection-publish-settings .start-time').val();
 
-    start = getEdxTimeFromDateTimeVals(input_date, input_time);
+    var start = getEdxTimeFromDateTimeVals(input_date, input_time);
 
-    id = $modal.attr('data-id');
-    var $_this = $(this);
+    var id = $modal.attr('data-id');
 
     // call into server to commit the new order
     $.ajax({
