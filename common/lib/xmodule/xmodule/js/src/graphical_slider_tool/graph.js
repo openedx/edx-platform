@@ -9,8 +9,6 @@ define('Graph', ['logme'], function (logme) {
     function Graph(gstId, config, state) {
         var plotDiv, dataSeries, functions, xaxis, yaxis, numPoints, xrange;
 
-        logme(config);
-
         // We need plot configuration settings. Without them we can't continue.
         if ($.isPlainObject(config.plot) === false) {
             return;
@@ -430,8 +428,6 @@ define('Graph', ['logme'], function (logme) {
                 // HTML entities is passed to the Function() constructor, it
                 // will break.
                 funcString = $('<div>').html(funcString).text();
-
-                logme('graph: funcstr = "' + funcString + '"');
 
                 // Some defaults. If no options are set for the graph, we will
                 // make sure that at least a line is drawn for a function.
