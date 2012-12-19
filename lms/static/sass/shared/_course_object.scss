@@ -24,6 +24,31 @@
       width: 100%;
       @include transition(all, 0.15s, linear);
 
+      .status {
+        background: $blue;
+        color: white;
+        font-size: 10px;
+        left: 10px;
+        padding: 2px 10px;
+        @include border-radius(2px);
+        position: absolute;
+        text-transform: uppercase;
+        top: -6px;
+        z-index: 100;
+      }
+
+      .status:after {
+        border-bottom: 6px solid shade($blue, 50%);
+        border-right: 6px solid transparent;
+        content: "";
+        display: block;
+        height: 0;
+        position: absolute;
+        right: -6px;
+        top: 0;
+        width: 0;
+      }
+
       a:hover {
         text-decoration: none;
       }

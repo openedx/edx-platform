@@ -5,6 +5,7 @@
 %>
 <%page args="course" />
 <article id="${course.id}" class="course">
+  <span class="status">New</span>
   <a href="${reverse('about_course', args=[course.id])}">
   <div class="inner-wrapper">
       <header class="course-preview">
