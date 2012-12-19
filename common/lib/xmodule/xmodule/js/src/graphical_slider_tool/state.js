@@ -18,7 +18,9 @@ define('State', ['logme'], function (logme) {
 
     function State(gstId, config) {
         var parameters, allParameterNames, allParameterValues,
-            plotDiv;
+            plotDiv, dynamicEl;
+
+        dynamicEl = [];
 
         stateInst += 1;
         logme('MESSAGE: Creating state instance # ' + stateInst + '.');
@@ -92,7 +94,8 @@ define('State', ['logme'], function (logme) {
             'getAllParameterNames': getAllParameterNames,
             'getAllParameterValues': getAllParameterValues,
 
-            'bindUpdatePlotEvent': bindUpdatePlotEvent
+            'bindUpdatePlotEvent': bindUpdatePlotEvent,
+            'addDynamicEl': addDynamicEl
         };
 
         function getAllParameterNames() {
@@ -117,6 +120,13 @@ define('State', ['logme'], function (logme) {
             plotDiv = newPlotDiv;
 
             plotDiv.bind('update_plot', callback);
+        }
+
+        function addDynamicEl(outputEl, func) {
+            dynamicEl.push({
+                'outputEl': outputEl,
+                'func': func
+            });
         }
 
         function getParameterValue(paramName) {
@@ -237,6 +247,10 @@ define('State', ['logme'], function (logme) {
 
             // Update the helper array with the new parameter's value.
             allParameterValues[parameters[paramName].helperArrayIndex] = paramValueNum;
+
+            for (c1 = 0; c1 < dynamicEl.length; c1++) {
+                dynamicEl[c1].outputEl.html(dynamicEl[c1].func.apply(window, allParameterValues));
+            }
 
             return true;
         } // End-of: function setParameterValue

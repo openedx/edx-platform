@@ -8,8 +8,8 @@ define(
     // Even though it is not explicitly in this module, we have to specify
     // 'GeneralMethods' as a dependency. It expands some of the core JS objects
     // with additional useful methods that are used in other modules.
-    ['State', 'GeneralMethods', 'Sliders', 'Inputs', 'Graph', 'logme'],
-    function (State, GeneralMethods, Sliders, Inputs, Graph, logme) {
+    ['State', 'GeneralMethods', 'Sliders', 'Inputs', 'Graph', 'ElOutput', 'logme'],
+    function (State, GeneralMethods, Sliders, Inputs, Graph, ElOutput, logme) {
 
     return GstMain;
 
@@ -67,6 +67,9 @@ define(
         // Configure and display the graph. Attach event for the graph to be
         // updated on any change of a slider or a text input.
         Graph(gstId, config, state);
+
+        // Configure functions that output to an element instead of the graph.
+        ElOutput(config, state);
     }
 });
 

@@ -32,16 +32,21 @@ define('Graph', ['logme'], function (logme) {
 
         // Configure some settings for the graph.
         if (setGraphXRange() === false) {
-            logme('ERROR: could not configure the xrange. Will not continue.');
+            logme('ERROR: Could not configure the xrange. Will not continue.');
 
             return;
         }
 
-        setGraphAxes();
+        if (setGraphAxes() === false) {
+            logme('ERROR: Could not process configuration for the axes.');
+
+            return;
+        }
 
         // Get the user defined functions. If there aren't any, don't do
         // anything else.
         createFunctions();
+
         if (functions.length === 0) {
             logme('ERROR: No functions were specified, or something went wrong.');
 
@@ -49,8 +54,9 @@ define('Graph', ['logme'], function (logme) {
         }
 
         // Create the initial graph and plot it for the user to see.
-        generateData();
-        updatePlot();
+        if (generateData() === true) {
+            updatePlot();
+        }
 
         // Bind an event. Whenever some constant changes, the graph will be
         // redrawn
@@ -59,33 +65,33 @@ define('Graph', ['logme'], function (logme) {
         return;
 
         function setGraphAxes() {
-            // Define the xaxis Flot configuration, and then see if the user
-            // supplied custom values.
-            xaxis = {
-                'min': 0,
-                'tickSize': 1,
-                'max': 10
-            };
+            xaxis = {};
             if (typeof config.plot['xticks'] === 'string') {
-                processTicks(config.plot['xticks'], xaxis, 'xunits');
+                if (processTicks(config.plot['xticks'], xaxis, 'xunits') === false) {
+                    logme('ERROR: Could not process the ticks for x-axis.');
+
+                    return false;
+                }
             } else {
                 logme('MESSAGE: "xticks" were not specified. Using defaults.');
+
+                return false;
             }
 
-            // Define the yaxis Flot configuration, and then see if the user
-            // supplied custom values.
-            yaxis = {
-                'min': 0,
-                'tickSize': 1,
-                'max': 10
-            };
+            yaxis = {};
             if (typeof config.plot['yticks'] === 'string') {
-                processTicks(config.plot['yticks'], yaxis, 'yunits');
+                if (processTicks(config.plot['yticks'], yaxis, 'yunits') === false) {
+                    logme('ERROR: Could not process the ticks for y-axis.');
+
+                    return false;
+                }
             } else {
                 logme('MESSAGE: "yticks" were not specified. Using defaults.');
+
+                return false;
             }
 
-            return;
+            return true;
 
             function processTicks(ticksStr, ticksObj, unitsType) {
                 var ticksBlobs, tempFloat, tempTicks, c1, c2;
@@ -97,7 +103,7 @@ define('Graph', ['logme'], function (logme) {
                 if (ticksBlobs.length !== 3) {
                     logme('ERROR: Did not get 3 blobs from ticksStr = "' + ticksStr + '".');
 
-                    return;
+                    return false;
                 }
 
                 tempFloat = parseFloat(ticksBlobs[0]);
@@ -105,6 +111,8 @@ define('Graph', ['logme'], function (logme) {
                     ticksObj.min = tempFloat;
                 } else {
                     logme('ERROR: Invalid "min". ticksBlobs[0] = ', ticksBlobs[0]);
+
+                    return false;
                 }
 
                 tempFloat = parseFloat(ticksBlobs[1]);
@@ -112,6 +120,8 @@ define('Graph', ['logme'], function (logme) {
                     ticksObj.tickSize = tempFloat;
                 } else {
                     logme('ERROR: Invalid "tickSize". ticksBlobs[1] = ', ticksBlobs[1]);
+
+                    return false;
                 }
 
                 tempFloat = parseFloat(ticksBlobs[2]);
@@ -119,24 +129,25 @@ define('Graph', ['logme'], function (logme) {
                     ticksObj.max = tempFloat;
                 } else {
                     logme('ERROR: Invalid "max". ticksBlobs[2] = ', ticksBlobs[2]);
+
+                    return false;
                 }
 
                 // Is the starting tick to the left of the ending tick (on the
                 // x-axis)? If not, set default starting and ending tick.
                 if (ticksObj.min >= ticksObj.max) {
-                    logme('ERROR: min >= max. Setting defaults.');
+                    logme('ERROR: Ticks min >= max.');
 
-                    ticksObj.min = 0;
-                    ticksObj.max = 10;
+                    return false;
                 }
 
                 // Make sure the range makes sense - i.e. that there are at
                 // least 3 ticks. If not, set a tickSize which will produce
                 // 11 ticks. tickSize is the spacing between the ticks.
-                if (ticksObj.tickSize * 2 >= ticksObj.max - ticksObj.min) {
-                    logme('ERROR: tickSize * 2 >= max - min. Setting defaults.');
+                if (ticksObj.tickSize > ticksObj.max - ticksObj.min) {
+                    logme('ERROR: tickSize > max - min.');
 
-                    ticksObj.tickSize = (ticksObj.max - ticksObj.min) / 10.0;
+                    return false;
                 }
 
                 //  units: change last tick to units
@@ -158,7 +169,11 @@ define('Graph', ['logme'], function (logme) {
                     ticksObj.ticks = tempTicks;
                 }
 
-                return;
+                // ticksObj.font = {
+                //     'size': '16px'
+                // };
+
+                return true;
 
                 function roundToPrec(num, prec) {
                     var c1, tn1, tn2, digitsBefore, digitsAfter;
@@ -354,16 +369,36 @@ define('Graph', ['logme'], function (logme) {
             // properties as parameters. Rather than writing them out every
             // time, we will have a single place where it is done.
             function callAddFunction(obj) {
+                if (typeof obj['@output'] === 'string') {
+
+                    // If this function is meant to be calculated for an
+                    // element then skip it.
+                    if (obj['@output'].toLowerCase() === 'element') {
+                        return;
+                    }
+
+                    // It is an error if "output" is not "element" or "graph".
+                    // Though you can ommit the "output" attribute.
+                    else if (obj['@output'].toLowerCase() !== 'graph') {
+                        logme('ERROR: Function "output" attribute can be either "div" or "graph".');
+
+                        return;
+                    }
+                }
+
+                // The user did not specify an "output" attribute, or it is
+                // "graph".
                 addFunction(
                     obj['#text'],
                     obj['@color'],
                     obj['@line'],
                     obj['@dot'],
-                    obj['@label']
+                    obj['@label'],
+                    obj['@point_size']
                 );
             }
 
-            function addFunction(funcString, color, line, dot, label) {
+            function addFunction(funcString, color, line, dot, label, pointSize) {
                 var newFunctionObject, func, paramNames;
 
                 // The main requirement is function string. Without it we can't
@@ -407,13 +442,14 @@ define('Graph', ['logme'], function (logme) {
                 try {
                     func = Function.apply(null, paramNames);
                 } catch (err) {
-                    // Let's tell the user. He will see a nice red error
-                    // message instead of a graph.
-                    plotDiv.html(
-                        '<span style="color: red;">' +
-                            'Error while parsing JavaScript function body string!' +
-                        '</span>'
+                    logme(
+                        'ERROR: The function body "' +
+                        funcString +
+                        '" was not converted by the Function constructor.'
                     );
+
+                    paramNames.pop();
+                    paramNames.pop();
 
                     return;
                 }
@@ -445,6 +481,10 @@ define('Graph', ['logme'], function (logme) {
                     }
                 }
 
+                if (typeof pointSize === 'string') {
+                    newFunctionObject['pointSize'] = pointSize;
+                }
+
                 // If the preference is conflicting (we must have either line
                 // or dot, none is not an option), we will show line.
                 if (
@@ -465,8 +505,9 @@ define('Graph', ['logme'], function (logme) {
         // The callback that will be called whenever a constant changes (gets
         // updated via a slider or a text input).
         function onUpdatePlot(event) {
-            generateData();
-            updatePlot();
+            if (generateData() === true) {
+                updatePlot();
+            }
         }
 
         function generateData() {
@@ -501,7 +542,14 @@ define('Graph', ['logme'], function (logme) {
                     // We call the user defined function, passing all of the
                     // available parameter values. Inside this function they
                     // will be accessible by their names.
-                    y = functionObj.func.apply(window, paramValues);
+                    try {
+                        y = functionObj.func.apply(window, paramValues);
+                    } catch (err) {
+                        logme('ERROR: Could not generate data.');
+                        logme('Error message: "' + err.message + '".');
+
+                        return false;
+                    }
 
                     // Return the paramValues array to how it was before we
                     // added 'x' variable to the end of it.
@@ -549,14 +597,21 @@ define('Graph', ['logme'], function (logme) {
                     'show': functionObj.dot
                 };
 
+                if (functionObj.hasOwnProperty('pointSize')) {
+                    seriesObj.points.radius = functionObj.pointSize;
+                }
+
                 // Add the newly created series object to the series set which
                 // will be plotted by Flot.
                 dataSeries.push(seriesObj);
             }
-        }
+
+            return true;
+        } // End-of: function generateData
 
         function updatePlot() {
             // Tell Flot to draw the graph to our specification.
+
             $.plot(
                 plotDiv,
                 dataSeries,
