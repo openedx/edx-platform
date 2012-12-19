@@ -187,6 +187,9 @@ DEBUG_TRACK_LOG = False
 
 MITX_ROOT_URL = ''
 
+LOGIN_REDIRECT_URL = MITX_ROOT_URL + '/accounts/login'
+LOGIN_URL = MITX_ROOT_URL + '/accounts/login'
+
 COURSE_NAME = "6.002_Spring_2012"
 COURSE_NUMBER = "6.002x"
 COURSE_TITLE = "Circuits and Electronics"
