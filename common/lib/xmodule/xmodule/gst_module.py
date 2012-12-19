@@ -173,6 +173,7 @@ class GraphicalSliderToolModule(XModule):
         via json.
         """
         # root added for interface compatibility with xmltodict.parse
+        # import ipdb; ipdb.set_trace()
         self.configuration_json = json.dumps(
                 xmltodict.parse('<root class="' + self.location.category + '">' +
                 stringify_children(self.definition['configuration'])
@@ -199,13 +200,13 @@ class GraphicalSliderToolDescriptor(MakoModuleDescriptor, XmlDescriptor):
         expected_children_level_0 = ['render', 'configuration']
         for child in expected_children_level_0:
             if len(xml_object.xpath(child)) != 1:
-                raise ValueError("Self a\ssessment definition must include \
+                raise ValueError("Graphical Slider Tool definition must include \
                     exactly one '{0}' tag".format(child))
 
-        expected_children_level_1 = ['plot']
+        expected_children_level_1 = ['functions']
         for child in expected_children_level_1:
             if len(xml_object.xpath('configuration')[0].xpath(child)) != 1:
-                raise ValueError("Self a\ssessment definition must include \
+                raise ValueError("Graphical Slider Tool definition must include \
                     exactly one '{0}' tag".format(child))
         # finished
 
