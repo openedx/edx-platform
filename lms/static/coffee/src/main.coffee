@@ -37,3 +37,11 @@ $ ->
   $('#signup').click ->
     $('#signup-modal input[name="email"]').focus()
     false
+
+  # fix for ie
+  if !Array::indexOf
+  	Array::indexOf = (obj, start = 0) ->
+  		for ele, i in this[start..]
+            if ele is obj
+                return i + start
+        return -1
