@@ -22,6 +22,10 @@ define('Graph', ['logme'], function (logme) {
             plotDiv.width(300);
         }
 
+        // Sometimes, when height is not explicitly set via CSS (or by some
+        // other means), it is 0 pixels by default. When Flot will try to plot
+        // a graph in this DIV with 0 height, then it will raise an error. To
+        // prevent this, we will set it to be equal to the width.
         if (plotDiv.height() === 0) {
             plotDiv.height(plotDiv.width());
         }
@@ -84,7 +88,7 @@ define('Graph', ['logme'], function (logme) {
             return;
 
             function processTicks(ticksStr, ticksObj, unitsType) {
-                var ticksBlobs, tempFloat;
+                var ticksBlobs, tempFloat, tempTicks, c1, c2;
 
                 // The 'ticks' setting is a string containing 3 floating-point
                 // numbers.
@@ -137,13 +141,83 @@ define('Graph', ['logme'], function (logme) {
 
                 //  units: change last tick to units
                 if (typeof config.plot[unitsType] === 'string') {
-                    var ticks =  _.map(_.range(ticksObj.min,
-                        ticksObj.max + ticksObj.tickSize, ticksObj.tickSize),
-                        function(x){  return [x,
-                        x > ticksObj.max - ticksObj.tickSize ? config.plot[unitsType] : x];
-                                    });
+                    tempTicks = [];
+
+                    for (c1 = ticksObj.min; c1 <= ticksObj.max; c1 += ticksObj.tickSize) {
+                        c2 = roundToPrec(c1, ticksObj.tickSize);
+                        tempTicks.push([c2, c2]);
+                    }
+
+                    tempTicks.pop();
+                    tempTicks.push([
+                        roundToPrec(ticksObj.max, ticksObj.tickSize),
+                        config.plot[unitsType]
+                    ]);
+
                     ticksObj.tickSize = null;
-                    ticksObj.ticks = ticks;
+                    ticksObj.ticks = tempTicks;
+                }
+
+                return;
+
+                function roundToPrec(num, prec) {
+                    var c1, tn1, tn2, digitsBefore, digitsAfter;
+
+                    tn1 = Math.abs(num);
+                    tn2 = Math.abs(prec);
+
+                    // Find out number of digits BEFORE the decimal point.
+                    c1 = 0;
+                    tn1 = Math.abs(num);
+                    while (tn1 >= 1) {
+                        c1 += 1;
+
+                        tn1 /= 10;
+                    }
+                    digitsBefore = c1;
+
+                    // Find out number of digits AFTER the decimal point.
+                    c1 = 0;
+                    tn1 = Math.abs(num);
+                    while (Math.round(tn1) !== tn1) {
+                        c1 += 1;
+
+                        tn1 *= 10;
+                    }
+                    digitsAfter = c1;
+
+                    // For precision, find out number of digits AFTER the
+                    // decimal point.
+                    c1 = 0;
+                    while (Math.round(tn2) !== tn2) {
+                        c1 += 1;
+
+                        tn2 *= 10;
+                    }
+
+                    // If precision is more than 1 (no digits after decimal
+                    // points).
+                    if (c1 === 0) {
+                        return num;
+                    }
+
+                    // If the precision contains digits after the decimal
+                    // point, we apply special rules.
+                    else {
+                        tn1 = Math.abs(num);
+
+                        if (digitsAfter > c1) {
+                            tn1 = tn1.toPrecision(digitsBefore + c1);
+                        } else {
+                            tn1 = tn1.toPrecision(digitsBefore + digitsAfter);
+                        }
+                    }
+
+                    if (num < 0) {
+                        return -tn1;
+                    }
+
+                    return tn1;
                 }
             }
         }
@@ -190,45 +264,38 @@ define('Graph', ['logme'], function (logme) {
             try {
                 xrange.max = Function.apply(null, allParamNames);
             } catch (err) {
-                logme('ERROR: could not create a function from the string "' + config.plot.xrange.min + '" for xrange.min.');
+                logme('ERROR: could not create a function from the string "' + config.plot.xrange.max + '" for xrange.max.');
 
                 return false;
             }
             allParamNames.pop();
 
-            logme('xrange = ', xrange);
+            if (typeof config.plot.num_points !== 'string') {
+                logme('ERROR: config.plot.num_points is not a string.');
+                logme('config.plot.num_points = ', config.plot.num_points);
 
-            // The user can specify the number of points. However, internally
-            // we will use it to generate a 'step' - i.e. the distance (on
-            // x-axis) between two adjacent points.
-            if (typeof config.plot.num_points === 'string') {
-                tempNum = parseInt(config.plot.num_points, 10);
-                if (isNaN(tempNum) === true) {
-                    logme('ERROR: Could not parse the number of points.');
-                    logme('config.plot.num_points = ', config.plot.num_points);
-
-                    return false;
-                }
-
-                if (
-                    (tempNum < 2) &&
-                    (tempNum > 1000)
-                ) {
-                    logme('ERROR: Number of points is outside the allowed range [2, 1000]');
-                    logme('config.plot.num_points = ' + tempNum);
-
-                    return false;
-                }
-
-                numPoints = tempNum;
-            } else {
-                logme('MESSAGE: config.plot.num_points is not a string.');
-                logme('Will set number of points to {width of graph} / 10.');
-
-                numPoints = plotDiv.width() / 10.0;
-
-                logme('numPoints = ' + numPoints);
+                return false;
             }
+
+            tempNum = parseInt(config.plot.num_points, 10);
+            if (isFinite(tempNum) === false) {
+                logme('ERROR: Expected config.plot.num_points to be a a valid integer. It is not.');
+                logme('config.plot.num_points = ', config.plot.num_points);
+
+                return false;
+            }
+
+            if (
+                (tempNum < 2) &&
+                (tempNum > 1000)
+            ) {
+                logme('ERROR: Number of points is outside the allowed range [2, 1000]');
+                logme('config.plot.num_points = ' + tempNum);
+
+                return false;
+            }
+
+            numPoints = tempNum;
 
             return true;
         }
@@ -311,8 +378,6 @@ define('Graph', ['logme'], function (logme) {
                 // will break.
                 funcString = $('<div>').html(funcString).text();
 
-                logme('funcString = ' + funcString);
-
                 // Some defaults. If no options are set for the graph, we will
                 // make sure that at least a line is drawn for a function.
                 newFunctionObject = {
@@ -324,16 +389,12 @@ define('Graph', ['logme'], function (logme) {
                 // XML.
                 paramNames = state.getAllParameterNames();
 
-                logme('allParamNames = ', paramNames);
-
                 // The 'x' is always one of the function parameters.
                 paramNames.push('x');
 
                 // Must make sure that the function body also gets passed to
                 // the Function constructor.
                 paramNames.push(funcString);
-
-                console.log('paramNames = ', paramNames);
 
                 // Create the function from the function string, and all of the
                 // available parameters AND the 'x' variable as it's parameters.
@@ -430,8 +491,6 @@ define('Graph', ['logme'], function (logme) {
                 start = xrange.min.apply(window, paramValues);
                 end = xrange.max.apply(window, paramValues);
                 step = (end - start) / (numPoints - 1);
-
-                logme('start = ' + start + ', end = ' + end + ', step = ' + step);
 
                 // Generate the data points.
                 for (x = start; x <= end; x += step) {
