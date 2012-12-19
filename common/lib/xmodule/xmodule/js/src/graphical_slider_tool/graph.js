@@ -279,6 +279,9 @@ define('Graph', ['logme'], function (logme) {
                 logme('ERROR: could not create a function from the string "' + config.plot.xrange.min + '" for xrange.min.');
                 logme('Error message: "' + err.message + '"');
 
+                $('#' + gstId).html('<div style="color: red;">' + 'ERROR IN XML: Could not create a function from the string "' + config.plot.xrange.min + '" for xrange.min.' + '</div>');
+                $('#' + gstId).append('<div style="color: red;">' + 'Error message: "' + err.message + '".' + '</div>');
+
                 return false;
             }
             allParamNames.pop();
@@ -289,6 +292,9 @@ define('Graph', ['logme'], function (logme) {
             } catch (err) {
                 logme('ERROR: could not create a function from the string "' + config.plot.xrange.max + '" for xrange.max.');
                 logme('Error message: "' + err.message + '"');
+
+                $('#' + gstId).html('<div style="color: red;">' + 'ERROR IN XML: Could not create a function from the string "' + config.plot.xrange.max + '" for xrange.max.' + '</div>');
+                $('#' + gstId).append('<div style="color: red;">' + 'Error message: "' + err.message + '".' + '</div>');
 
                 return false;
             }
@@ -463,6 +469,9 @@ define('Graph', ['logme'], function (logme) {
                     );
                     logme('Error message: "' + err.message + '"');
 
+                    $('#' + gstId).html('<div style="color: red;">' + 'ERROR IN XML: Could not create a function from the string "' + funcString + '".' + '</div>');
+                    $('#' + gstId).append('<div style="color: red;">' + 'Error message: "' + err.message + '".' + '</div>');
+
                     paramNames.pop();
                     paramNames.pop();
 
@@ -565,6 +574,9 @@ define('Graph', ['logme'], function (logme) {
                     logme('ERROR: Could not determine xrange start.');
                     logme('Error message: "' + err.message + '".');
 
+                    $('#' + gstId).html('<div style="color: red;">' + 'ERROR IN XML: Could not determine xrange start from defined function.' + '</div>');
+                    $('#' + gstId).append('<div style="color: red;">' + 'Error message: "' + err.message + '".' + '</div>');
+
                     return false;
                 }
                 try {
@@ -572,6 +584,9 @@ define('Graph', ['logme'], function (logme) {
                 } catch (err) {
                     logme('ERROR: Could not determine xrange end.');
                     logme('Error message: "' + err.message + '".');
+
+                    $('#' + gstId).html('<div style="color: red;">' + 'ERROR IN XML: Could not determine xrange end from defined function.' + '</div>');
+                    $('#' + gstId).append('<div style="color: red;">' + 'Error message: "' + err.message + '".' + '</div>');
 
                     return false;
                 }
@@ -591,6 +606,9 @@ define('Graph', ['logme'], function (logme) {
                     } catch (err) {
                         logme('ERROR: Could not generate data.');
                         logme('Error message: "' + err.message + '".');
+
+                        $('#' + gstId).html('<div style="color: red;">' + 'ERROR IN XML: Could not generate data from defined function.' + '</div>');
+                        $('#' + gstId).append('<div style="color: red;">' + 'Error message: "' + err.message + '".' + '</div>');
 
                         return false;
                     }
@@ -617,6 +635,9 @@ define('Graph', ['logme'], function (logme) {
                     } catch (err) {
                         logme('ERROR: Could not generate data.');
                         logme('Error message: "' + err.message + '".');
+
+                        $('#' + gstId).html('<div style="color: red;">' + 'ERROR IN XML: Could not generate data from function.' + '</div>');
+                        $('#' + gstId).append('<div style="color: red;">' + 'Error message: "' + err.message + '".' + '</div>');g
 
                         return false;
                     }

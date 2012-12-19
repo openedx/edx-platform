@@ -74,6 +74,10 @@ define('ElOutput', ['logme'], function (logme) {
                         funcString +
                         '" was not converted by the Function constructor.'
                 );
+                logme('Error message: "' + err.message + '".');
+
+                $('#' + gstId).html('<div style="color: red;">' + 'ERROR IN XML: Could not create a function from string "' + funcString + '".' + '</div>');
+                $('#' + gstId).html('<div style="color: red;">' + 'Error message: "' + err.message + '".' + '</div>');
 
                 paramNames.pop();
 
