@@ -8,13 +8,13 @@ define('ElOutput', ['logme'], function (logme) {
 
     function ElOutput(config, state) {
 
-        if ($.isPlainObject(config.plot.function)) {
-            processFuncObj(config.plot.function);
-        } else if ($.isArray(config.plot.function)) {
+        if ($.isPlainObject(config.functions.function)) {
+            processFuncObj(config.functions.function);
+        } else if ($.isArray(config.functions.function)) {
             (function (c1) {
-                while (c1 < config.plot.function.length) {
-                    if ($.isPlainObject(config.plot.function[c1])) {
-                        processFuncObj(config.plot.function[c1]);
+                while (c1 < config.functions.function.length) {
+                    if ($.isPlainObject(config.functions.function[c1])) {
+                        processFuncObj(config.functions.function[c1]);
                     }
 
                     c1 += 1;

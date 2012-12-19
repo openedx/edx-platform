@@ -9,6 +9,8 @@ define('Graph', ['logme'], function (logme) {
     function Graph(gstId, config, state) {
         var plotDiv, dataSeries, functions, xaxis, yaxis, numPoints, xrange;
 
+        logme(config);
+
         // We must have a graph container DIV element available in order to
         // proceed.
         plotDiv = $('#' + gstId + '_plot');
@@ -322,44 +324,44 @@ define('Graph', ['logme'], function (logme) {
 
             functions = [];
 
-            if (typeof config.plot['function'] === 'undefined') {
-                logme('ERROR: config.plot["function"] is undefined.');
+            if (typeof config.functions === 'undefined') {
+                logme('ERROR: config.functions is undefined.');
 
                 return;
             }
 
-            if (typeof config.plot['function'] === 'string') {
+            if (typeof config.functions.function === 'string') {
 
                 // If just one function string is present.
-                addFunction(config.plot['function']);
+                addFunction(config.functions.function);
 
-            } else if ($.isPlainObject(config.plot['function']) === true) {
+            } else if ($.isPlainObject(config.functions.function) === true) {
 
                 // If a function is present, but it also has properties
                 // defined.
-                callAddFunction(config.plot['function']);
+                callAddFunction(config.functions.function);
 
-            } else if ($.isArray(config.plot['function'])) {
+            } else if ($.isArray(config.functions.function)) {
 
                 // If more than one function is defined.
-                for (c1 = 0; c1 < config.plot['function'].length; c1++) {
+                for (c1 = 0; c1 < config.functions.function.length; c1++) {
 
                     // For each definition, we must check if it is a simple
                     // string definition, or a complex one with properties.
-                    if (typeof config.plot['function'][c1] === 'string') {
+                    if (typeof config.functions.function[c1] === 'string') {
 
                         // Simple string.
-                        addFunction(config.plot['function'][c1]);
+                        addFunction(config.functions.function[c1]);
 
-                    } else if ($.isPlainObject(config.plot['function'][c1])) {
+                    } else if ($.isPlainObject(config.functions.function[c1])) {
 
                         // Properties are present.
-                        callAddFunction(config.plot['function'][c1]);
+                        callAddFunction(config.functions.function[c1]);
 
                     }
                 }
             } else {
-                logme('ERROR: config.plot["function"] is of an unsupported type.');
+                logme('ERROR: config.functions.function is of an unsupported type.');
 
                 return;
             }
