@@ -2,7 +2,7 @@
   <h2> ${display_name} </h2>
 % endif
 
-%if settings.MITX_FEATURES['DISPLAY_TOY_COURSES']:
+%if settings.MITX_FEATURES['STUB_VIDEO_FOR_TESTING']:
   <div id="stub_out_video_for_testing"></div>
 %else:
   <div id="video_${id}" class="video" data-streams="${streams}" data-caption-data-dir="${data_dir}" data-show-captions="${show_captions}">

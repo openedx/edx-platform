@@ -4,25 +4,20 @@ from logging import getLogger
 import time
 
 logger = getLogger(__name__)
-logger.info("Loading the terrain file...")
+logger.info("Loading the lettuce acceptance testing terrain file...")
 
 from django.core.management import call_command
 
 @before.harvest
 def initial_setup(server):
-
-    # Sync the test database defined in the settings.py file
-    # then apply the SOUTH migrations
-    call_command('syncdb', interactive=False)
-    call_command('migrate', interactive=False)
-
     # Launch firefox
     world.browser = Browser('firefox')
 
 @before.each_scenario
 def reset_data(scenario):
-    # Clean up the django database
-    logger.info("Flushing the test database...")
+    # Clean out the django test database defined in the 
+    # envs/acceptance.py file: mitx_all/db/test_mitx.db
+    logger.debug("Flushing the test database...")
     call_command('flush', interactive=False)
 
 @after.all

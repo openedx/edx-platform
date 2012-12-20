@@ -8,10 +8,18 @@ from .test import *
 # otherwise the browser will not render the pages correctly
 DEBUG = True
 
-# We need to apply the SOUTH migrations to set up the 
-# auth tables correctly. Otherwise you'll get an error like this:
-# DatabaseError: no such table: auth_registration
-SOUTH_TESTS_MIGRATE = True
+# Show the courses that are in the data directory
+COURSES_ROOT = ENV_ROOT / "data"
+DATA_DIR = COURSES_ROOT
+MODULESTORE = {
+    'default': {
+        'ENGINE': 'xmodule.modulestore.xml.XMLModuleStore',
+        'OPTIONS': {
+            'data_dir': DATA_DIR,
+            'default_class': 'xmodule.hidden_module.HiddenDescriptor',
+        }
+    }
+}
 
 # Set this up so that rake lms[acceptance] and running the 
 # harvest command both use the same (test) database
@@ -24,6 +32,10 @@ DATABASES = {
     }
 }
 
-MITX_FEATURES['DISPLAY_TOY_COURSES'] = True
+# Do not display the YouTube videos in the browser while running the
+# acceptance tests. This makes them faster and more reliable
+MITX_FEATURES['STUB_VIDEO_FOR_TESTING'] = True
+
+# Include the lettuce app for acceptance testing, including the 'harvest' django-admin command
 INSTALLED_APPS += ('lettuce.django',)
 LETTUCE_APPS = ('portal',)  # dummy app covers the home page, login, registration, and course enrollment
