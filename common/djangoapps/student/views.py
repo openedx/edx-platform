@@ -336,12 +336,8 @@ def change_enrollment(request):
 @ensure_csrf_cookie
 def accounts_login(request, error=""):
 
-    return_to = ''
 
-    return render_to_response('accounts_login.html', {
-        'error': error,
-        'return_to': return_to
-    })
+    return render_to_response('accounts_login.html', { 'error': error })
 
 
 
