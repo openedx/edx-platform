@@ -226,6 +226,8 @@ def edit_subsection(request, location):
                                'create_new_unit_template': Location('i4x', 'edx', 'templates', 'vertical', 'Empty'),
                                'lms_link': lms_link,
                                'preview_link': preview_link,
+                                'course_graders': json.dumps(CourseGradingModel.fetch(course.location).graders),
+                                'parent_location': course.location,
                                'parent_item': parent,
                                'policy_metadata' : policy_metadata,
                                'subsection_units' : subsection_units,
