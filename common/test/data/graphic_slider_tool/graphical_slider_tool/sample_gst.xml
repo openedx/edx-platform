@@ -1,18 +1,7 @@
-<vertical>
+
     <graphical_slider_tool>
       <render>
-        <h2>Graphic slider tool: Dynamic range and implicit functions.</h2>
-
-        <p>You can make x range (not ticks of x axis) of functions to depend on
-          parameter value. This can be useful when function domain depends
-          on parameter.</p>
-        <p>Also implicit functons like circle can be plotted as 2 separate
-            functions of same color.</p>
-         <div style="height:50px;">
-         <slider var='a' style="width:400px;float:left;"/>
-         <textbox var='a' style="float:left;width:60px;margin-left:15px;"/>
-       </div>
-        <plot style="margin-top:15px;margin-bottom:15px;"/>
+<slider var='a' style="width:400px;float:left;"/><plot style="margin-top:15px;margin-bottom:15px;"/>
       </render>
       <configuration>
         <parameters>
@@ -38,4 +27,4 @@
         </plot>
       </configuration>
     </graphical_slider_tool>
-</vertical>
+

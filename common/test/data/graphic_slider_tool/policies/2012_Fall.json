@@ -8,7 +8,7 @@
     "chapter/Overview": {
         "display_name": "Overview"
     },
-    "gst/sample_gst": {
+    "graphical_slider_tool/sample_gst": {
         "display_name": "Sample GST",
     },
 }

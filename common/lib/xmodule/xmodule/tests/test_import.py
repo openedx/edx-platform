@@ -349,6 +349,23 @@ class ImportTestCase(unittest.TestCase):
 
         sa_id = "edX/sa_test/2012_Fall"
         location = Location(["i4x", "edX", "sa_test", "selfassessment", "SampleQuestion"])
+        # import ipdb; ipdb.set_trace()
         sa_sample = modulestore.get_instance(sa_id, location)
         #10 attempts is hard coded into SampleQuestion, which is the url_name of a selfassessment xml tag
         self.assertEqual(sa_sample.metadata['attempts'], '10')
+
+    def test_graphicslidertool_import(self):
+        '''
+        Check to see if definition_from_xml in gst_module.py
+        works properly.  Pulls data from the graphic_slider_tool directory
+        in the test data directory.
+        '''
+        modulestore = XMLModuleStore(DATA_DIR, course_dirs=['graphic_slider_tool'])
+
+        sa_id = "edX/gst_test/2012_Fall"
+        location = Location(["i4x", "edX", "gst_test", "graphical_slider_tool", "sample_gst"])
+        gst_sample = modulestore.get_instance(sa_id, location)
+        render_string_from_sample_gst_xml = """
+        <slider var="a" style="width:400px;float:left;"/>\
+<plot style="margin-top:15px;margin-bottom:15px;"/>""".strip()
+        self.assertEqual(gst_sample.definition['render'], render_string_from_sample_gst_xml)
