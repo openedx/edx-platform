@@ -418,6 +418,10 @@
         font-size: 13px;
         margin: 0;
 
+        a {
+          font-family: $sans-serif;
+        }
+
         .grade-value {
           font-size: 1.2rem;
           font-weight: bold;

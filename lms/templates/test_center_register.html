@@ -9,7 +9,7 @@
 
 <%namespace name='static' file='static_content.html'/>
 
-<%block name="title"><title>Sign Up for Pearson VUE Test Center Proctoring</title></%block>
+<%block name="title"><title>Pearson VUE Test Center Proctoring - Sign Up</title></%block>
 
 <%block name="js_extra">
   <script type="text/javascript">
@@ -35,45 +35,37 @@
   </script>
 </%block>
 
-<section id="testcenter-register" class="">    
+<section class="testcenter-register container">    
 
-  <div class="inner-wrapper">
-    <div id="register">
-      <header>
-        <h2></h2>
-        <hr>
-      </header>
+  <!-- display stuff about the exam and the course for which the user is registering.  
+       If the user has already registered in the past for a test center, then also display
+       their ID. -->
 
-      <!-- display stuff about the exam and the course for which the user is registering.  
-           If the user has already registered in the past for a test center, then also display
-           their ID. -->
+  <section class="info">
+    <hgroup>
+      <p class="date-block">
+        % if course.has_ended():
+        Course Completed - ${course.end_date_text}
+        % elif course.has_started():
+        Course Started - ${course.start_date_text}
+        % else:   # hasn't started yet
+        Course Starts - ${course.start_date_text}
+        % endif
+        </p>
+        <h2 class="university">${get_course_about_section(course, 'university')}</h2>
+        <h3>${course.number} ${course.title}</h3>
+    </hgroup>
 
-      <section class="info">
-        <hgroup>
-          <p class="date-block">
-              % if course.has_ended():
-              Course Completed - ${course.end_date_text}
-              % elif course.has_started():
-              Course Started - ${course.start_date_text}
-              % else:   # hasn't started yet
-              Course Starts - ${course.start_date_text}
-              % endif
-              </p>
-              <h2 class="university">${get_course_about_section(course, 'university')}</h2>
-              <h3>${course.number} ${course.title}</h3>
-        </hgroup>
-
-        <!-- TODO: need to add logic to select which of the following to display.  Like certs? -->
-            <%
-            exam_info = course.testcenter_info
-            %>
-            % if exam_info is not None:
-                <p>Exam Series Code: ${exam_info.get('Exam_Series_Code')}</p>
-                <p>First Eligible Appointment Date: ${exam_info.get('First_Eligible_Appointment_Date')}</p>
-                <p>Last Eligible Appointment Date: ${exam_info.get('Last_Eligible_Appointment_Date')}</p>
-            % endif
-
-      </section>
+    <!-- TODO: need to add logic to select which of the following to display.  Like certs? -->
+    <%
+    exam_info = course.testcenter_info
+    %>
+    % if exam_info is not None:
+        <p>Exam Series Code: ${exam_info.get('Exam_Series_Code')}</p>
+        <p>First Eligible Appointment Date: ${exam_info.get('First_Eligible_Appointment_Date')}</p>
+        <p>Last Eligible Appointment Date: ${exam_info.get('Last_Eligible_Appointment_Date')}</p>
+    % endif
+  </section>
 
 	<!-- check to see if the user has already registering, or
 	 	 is registering for the first time -->
@@ -86,40 +78,41 @@
 		 	registration = registrations[0]
 		%>	
 
-		<section><div>Already Registered</div>
-			<p>Here is the current state of your registration, for debugging purposes:</p>
-			<l>
-				<li>id: ${registration.id}</li>
-				<li>testcenter_user_id: ${registration.testcenter_user_id}</li>
-				<li>course_id: ${registration.course_id}</li>
-				<li>accommodation codes: ${registration.accommodation_code}</li>
-				<li>accommodation request: ${registration.accommodation_request}</li>
-				<li>created_at: ${registration.created_at}</li>
-				<li>updated_at: ${registration.updated_at}</li>
-				<li>user_updated_at: ${registration.user_updated_at}</li>
-				<li>upload_status: ${registration.upload_status}</li>
-				<li>upload_error_message: ${registration.upload_error_message}</li>
-			</l>
+	<section><div>Already Registered</div>
+		<p>Here is the current state of your registration, for debugging purposes:</p>
+		<l>
+			<li>id: ${registration.id}</li>
+			<li>testcenter_user_id: ${registration.testcenter_user_id}</li>
+			<li>course_id: ${registration.course_id}</li>
+			<li>accommodation codes: ${registration.accommodation_code}</li>
+			<li>accommodation request: ${registration.accommodation_request}</li>
+			<li>created_at: ${registration.created_at}</li>
+			<li>updated_at: ${registration.updated_at}</li>
+			<li>user_updated_at: ${registration.user_updated_at}</li>
+			<li>upload_status: ${registration.upload_status}</li>
+			<li>upload_error_message: ${registration.upload_error_message}</li>
+		</l>
+		
+		
+		<!-- determine status of registration 
+				doing here for now, but will move into model or view -->
+		<%
+			regstatus = "registration pending acknowledgement by Pearson"
 			
-			
-			<!-- determine status of registration 
-					doing here for now, but will move into model or view -->
-			<%
-				regstatus = "registration pending acknowledgement by Pearson"
-				
-				if registration.upload_status == 'Accepted':
-					regstatus = "registration approved by Pearson"
-				elif registration.upload_status == 'Error':
-					regstatus = "registration rejected by Pearson: %s" % registration.upload_error_message
-				elif len(registration.accommodation_request) > 0 and registration.accommodation_code == '':
-					regstatus = "pending approval of accommodation request"
-			%>
-			<p>Current status: ${regstatus}</p>				
-			
-			<p>The demographic information provided below was used to register
-			for the exam listed above.  Changes to this information 
-			may be submitted below.</p>
-		</section>
+			if registration.upload_status == 'Accepted':
+				regstatus = "registration approved by Pearson"
+			elif registration.upload_status == 'Error':
+				regstatus = "registration rejected by Pearson: %s" % registration.upload_error_message
+			elif len(registration.accommodation_request) > 0 and registration.accommodation_code == '':
+				regstatus = "pending approval of accommodation request"
+		%>
+		<p>Current status: ${regstatus}</p>				
+		
+		<p>The demographic information provided below was used to register
+		for the exam listed above.  Changes to this information 
+		may be submitted below.</p>
+	</section>
+  
 	% else:
 			<p>The demographic information must be provided below in order to register
 			for the exam listed above.</p>
@@ -127,106 +120,94 @@
 
 	<!-- provide mechanism for error messages to appear -->
   % if message:
-    <section class="">
-      <p>${message}</p>
-    </section>
+  <div id="register_error" name="register_error">
+    <p>${message}</p>
+  </div> 
   % endif
 	
-      <form id="test_register_form" class="test_register_form" method="post" data-remote="true" action="/create_test_registration">
-        <div class="notice"></div>
-        <!-- TODO: why are both of these here? -->
-        <div id="register_error" class="modal-form-error" name="register_error"></div>
-        <div id="register_error" name="register_error"></div>
-
-        <!-- include these as pass-throughs -->
-        <input id="id_email" type="hidden" name="email" maxlength="75" value="${user.email}" />
-        <input id="id_username" type="hidden" name="username" maxlength="75" value="${user.username}" />
-        <input id="id_course_id" type="hidden" name="course_id" maxlength="75" value="${course.id}" />
-
-        <div class="input-group">
-          <label data-field="salutation">Salutation</label>
-          <input name="salutation" type="text" value="${testcenteruser.salutation}" placeholder="e.g. Dr.">
-          <br>
-          <label data-field="first_name">First Name*</label>
-          <input name="first_name" type="text" value="${testcenteruser.first_name}" maxlength="30" placeholder="e.g. Jane">
-          <br>
-          <label data-field="middle_name">Middle Name</label>
-          <input name="middle_name" type="text" value="${testcenteruser.middle_name}" placeholder="e.g. Michael">
-          <br>
-          <label data-field="last_name">Last Name*</label>
-          <input name="last_name" type="text" value="${testcenteruser.last_name}" placeholder="e.g. Smith">
-          <br>
-          <label data-field="suffix">Suffix</label>
-          <input name="suffix" type="text" value="${testcenteruser.suffix}" placeholder="e.g. Jr.">
-          <br>
-        </div>
-
-        <div class="input-group">
-          <label data-field="address_1">Address1*</label>
-          <input name="address_1" type="text" value="${testcenteruser.address_1}" placeholder="123 Main St.">
-          <br>
-          <label data-field="address_2">Address2</label>
-          <input name="address_2" type="text" value="${testcenteruser.address_2}" placeholder="Apartment 2B.">
-          <br>
-          <label data-field="address_3">Address3</label>
-          <input name="address_3" type="text" value="${testcenteruser.address_3}" placeholder="Attention: John Smith">
-          <br>
-
-          <label data-field="city">City</label>
-          <input name="city" type="text" value="${testcenteruser.city}" placeholder="Our Fair City">
-          <label data-field="state">State/Province</label>
-          <input name="state" type="text" value="${testcenteruser.state}" placeholder="MA">
-          <br>
-          <label data-field="postal_code">Postal Code</label>
-          <input name="postal_code" type="text" value="${testcenteruser.postal_code}" placeholder="02138">
-          <label data-field="country">Country Code*</label>
-          <input name="country" type="text" value="${testcenteruser.country}" placeholder="USA">
-        </div>
-
-        <div class="input-group">
-          <label data-field="phone">Phone*</label>
-          <input name="phone" type="text" value="${testcenteruser.phone}" placeholder="1-23-456-7890">
-          <label data-field="phone">Extension</label>
-          <input name="extension" type="text" value="${testcenteruser.extension}" placeholder="x123">
-          <label data-field="phone_country_code">Phone Country Code*</label>
-          <input name="phone_country_code" type="text" value="${testcenteruser.phone_country_code}" placeholder="ABC">
-          <br>
-          <label data-field="fax">Fax</label>
-          <input name="fax" type="text" value="${testcenteruser.fax}" placeholder="1-23-456-7891">
-          <label data-field="fax_country_code">Fax Country Code*</label>
-          <input name="fax_country_code" type="text" value="${testcenteruser.fax_country_code}" placeholder="ABC">
-          <br>
-          <label data-field="company_name">Company</label>
-          <input name="company_name" type="text" value="${testcenteruser.company_name}" placeholder="Acme Corporation">
-        </div>
-		<div><p>The following is included here just so it can be input within the form.  But it
-			is not part of the demographics, and it is not something that can be changed once input.</p>
-        </div>
-        <div class="input-group">
-          <label data-field="accommodations">Accommodations Requested</label>
-          <textarea name="accommodations"></textarea>
-        </div>
-
-	% if len(registrations) > 0:
-        <div class="submit">
-          <input name="submit" type="submit" value="Update demographics">
-        </div>
-    % else: 
-        <div class="submit">
-          <input name="submit" type="submit" value="Register for Test">
-        </div>
-    % endif
+  <form id="testcenter-register-form" method="post" data-remote="true" action="/create_test_registration">
     
-      </form>
+    <!-- include these as pass-throughs -->
+    <input id="id_email" type="hidden" name="email" maxlength="75" value="${user.email}" />
+    <input id="id_username" type="hidden" name="username" maxlength="75" value="${user.username}" />
+    <input id="id_course_id" type="hidden" name="course_id" maxlength="75" value="${course.id}" />
 
+    <div class="input-group">
+      <label data-field="salutation">Salutation</label>
+      <input name="salutation" type="text" value="${testcenteruser.salutation}" placeholder="e.g. Dr.">
+      <br>
+      <label data-field="first_name">First Name*</label>
+      <input name="first_name" type="text" value="${testcenteruser.first_name}" maxlength="30" placeholder="e.g. Jane">
+      <br>
+      <label data-field="middle_name">Middle Name</label>
+      <input name="middle_name" type="text" value="${testcenteruser.middle_name}" placeholder="e.g. Michael">
+      <br>
+      <label data-field="last_name">Last Name*</label>
+      <input name="last_name" type="text" value="${testcenteruser.last_name}" placeholder="e.g. Smith">
+      <br>
+      <label data-field="suffix">Suffix</label>
+      <input name="suffix" type="text" value="${testcenteruser.suffix}" placeholder="e.g. Jr.">
+      <br>
     </div>
-<!--
-    <div class="close-modal">
-      <div class="inner">
-        <p>&#10005;</p>
-      </div>
-    </div> -->
+
+    <div class="input-group">
+      <label data-field="address_1">Address1*</label>
+      <input name="address_1" type="text" value="${testcenteruser.address_1}" placeholder="123 Main St.">
+      <br>
+      <label data-field="address_2">Address2</label>
+      <input name="address_2" type="text" value="${testcenteruser.address_2}" placeholder="Apartment 2B.">
+      <br>
+      <label data-field="address_3">Address3</label>
+      <input name="address_3" type="text" value="${testcenteruser.address_3}" placeholder="Attention: John Smith">
+      <br>
+
+      <label data-field="city">City</label>
+      <input name="city" type="text" value="${testcenteruser.city}" placeholder="Our Fair City">
+      <label data-field="state">State/Province</label>
+      <input name="state" type="text" value="${testcenteruser.state}" placeholder="MA">
+      <br>
+      <label data-field="postal_code">Postal Code</label>
+      <input name="postal_code" type="text" value="${testcenteruser.postal_code}" placeholder="02138">
+      <label data-field="country">Country Code*</label>
+      <input name="country" type="text" value="${testcenteruser.country}" placeholder="USA">
+    </div>
+
+    <div class="input-group">
+      <label data-field="phone">Phone*</label>
+      <input name="phone" type="text" value="${testcenteruser.phone}" placeholder="1-23-456-7890">
+      <label data-field="phone">Extension</label>
+      <input name="extension" type="text" value="${testcenteruser.extension}" placeholder="x123">
+      <label data-field="phone_country_code">Phone Country Code*</label>
+      <input name="phone_country_code" type="text" value="${testcenteruser.phone_country_code}" placeholder="ABC">
+      <br>
+      <label data-field="fax">Fax</label>
+      <input name="fax" type="text" value="${testcenteruser.fax}" placeholder="1-23-456-7891">
+      <label data-field="fax_country_code">Fax Country Code*</label>
+      <input name="fax_country_code" type="text" value="${testcenteruser.fax_country_code}" placeholder="ABC">
+      <br>
+      <label data-field="company_name">Company</label>
+      <input name="company_name" type="text" value="${testcenteruser.company_name}" placeholder="Acme Corporation">
+    </div>
+	<div>
+   
+  <p>The following is included here just so it can be input within the form.  But it is not part of the demographics, and it is not something that can be changed once input.</p>
+  
+  <div class="input-group">
+    <label data-field="accommodations">Accommodations Requested</label>
+    <textarea name="accommodations"></textarea>
   </div>
+
+% if len(registrations) > 0:
+  <div class="submit">
+    <input name="submit" type="submit" value="Update demographics">
+  </div>
+  % else: 
+  <div class="submit">
+    <input name="submit" type="submit" value="Register for Test">
+  </div>
+  % endif
+    
+  </form>
 </section>
 
 
