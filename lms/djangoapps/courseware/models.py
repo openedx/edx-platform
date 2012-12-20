@@ -72,6 +72,132 @@ class StudentModule(models.Model):
     def __unicode__(self):
         return unicode(repr(self))
 
+
+class XModuleContentField(models.Model):
+    """
+    Stores data set in the Scope.content scope by an xmodule field
+    """
+
+    class Meta:
+        unique_together = (('definition_id', 'field_name'),)
+
+    # The name of the field
+    field_name = models.CharField(max_length=64, db_index=True)
+
+    # The definition id for the module
+    definition_id = models.CharField(max_length=255, db_index=True)
+
+    # The value of the field. Defaults to None dumped as json
+    value = models.TextField(default='null')
+
+    created = models.DateTimeField(auto_now_add=True, db_index=True)
+    modified = models.DateTimeField(auto_now=True, db_index=True)
+
+    def __repr__(self):
+        return 'XModuleContentField<%r>' % ({
+            'field_name': self.field_name,
+            'definition_id': self.definition_id,
+            'value': self.value,
+        },)
+
+    def __unicode__(self):
+        return unicode(repr(self))
+
+
+class XModuleSettingsField(models.Model):
+    """
+    Stores data set in the Scope.settings scope by an xmodule field
+    """
+
+    class Meta:
+        unique_together = (('usage_id', 'field_name'),)
+
+    # The name of the field
+    field_name = models.CharField(max_length=64, db_index=True)
+
+    # The usage id for the module
+    usage_id = models.CharField(max_length=255, db_index=True)
+
+    # The value of the field. Defaults to None, dumped as json
+    value = models.TextField(default='null')
+
+    created = models.DateTimeField(auto_now_add=True, db_index=True)
+    modified = models.DateTimeField(auto_now=True, db_index=True)
+
+    def __repr__(self):
+        return 'XModuleSettingsField<%r>' % ({
+            'field_name': self.field_name,
+            'usage_id': self.usage_id,
+            'value': self.value,
+        },)
+
+    def __unicode__(self):
+        return unicode(repr(self))
+
+
+class XModuleStudentPrefsField(models.Model):
+    """
+    Stores data set in the Scope.student_preferences scope by an xmodule field
+    """
+
+    class Meta:
+        unique_together = (('student', 'module_type', 'field_name'),)
+
+    # The name of the field
+    field_name = models.CharField(max_length=64, db_index=True)
+
+    # The type of the module for these preferences
+    module_type = models.CharField(max_length=64, db_index=True)
+
+    # The value of the field. Defaults to None dumped as json
+    value = models.TextField(default='null')
+
+    student = models.ForeignKey(User, db_index=True)
+
+    created = models.DateTimeField(auto_now_add=True, db_index=True)
+    modified = models.DateTimeField(auto_now=True, db_index=True)
+
+    def __repr__(self):
+        return 'XModuleStudentPrefsField<%r>' % ({
+            'field_name': self.field_name,
+            'module_type': self.module_type,
+            'student': self.student.username,
+            'value': self.value,
+        },)
+
+    def __unicode__(self):
+        return unicode(repr(self))
+
+
+class XModuleStudentInfoField(models.Model):
+    """
+    Stores data set in the Scope.student_preferences scope by an xmodule field
+    """
+
+    class Meta:
+        unique_together = (('student', 'field_name'),)
+
+    # The name of the field
+    field_name = models.CharField(max_length=64, db_index=True)
+
+    # The value of the field. Defaults to None dumped as json
+    value = models.TextField(default='null')
+
+    student = models.ForeignKey(User, db_index=True)
+
+    created = models.DateTimeField(auto_now_add=True, db_index=True)
+    modified = models.DateTimeField(auto_now=True, db_index=True)
+
+    def __repr__(self):
+        return 'XModuleStudentInfoField<%r>' % ({
+            'field_name': self.field_name,
+            'student': self.student.username,
+            'value': self.value,
+        },)
+
+    def __unicode__(self):
+        return unicode(repr(self))
+
 # TODO (cpennington): Remove these once the LMS switches to using XModuleDescriptors
 
 

@@ -11,8 +11,6 @@ from django.http import Http404
 from django.http import HttpResponse
 from django.views.decorators.csrf import csrf_exempt
 
-from collections import namedtuple
-
 from requests.auth import HTTPBasicAuth
 
 from capa.xqueue_interface import XQueueInterface
@@ -28,9 +26,9 @@ from xmodule.modulestore import Location
 from xmodule.modulestore.django import modulestore
 from xmodule.x_module import ModuleSystem
 from xmodule.error_module import ErrorDescriptor, NonStaffErrorDescriptor
-from xmodule.runtime import DbModel, KeyValueStore
-from xmodule.model import Scope
+from xmodule.runtime import DbModel
 from xmodule_modifiers import replace_course_urls, replace_static_urls, add_histogram, wrap_xmodule
+from .model_data import LmsKeyValueStore, LmsUsage
 
 from xmodule.modulestore.exceptions import ItemNotFoundError
 from statsd import statsd
@@ -147,70 +145,6 @@ def get_module(user, request, location, student_module_cache, course_id, positio
         # Something has gone terribly wrong, but still not letting it turn into a 500.
         log.exception("Error in get_module")
         return None
-
-
-class LmsKeyValueStore(KeyValueStore):
-    def __init__(self, course_id, user, descriptor_model_data, student_module_cache):
-        self._course_id = course_id
-        self._user = user
-        self._descriptor_model_data = descriptor_model_data
-        self._student_module_cache = student_module_cache
-
-    def _student_module(self, key):
-        student_module = self._student_module_cache.lookup(
-            self._course_id, key.module_scope_id.category, key.module_scope_id.url()
-        )
-        return student_module
-
-    def get(self, key):
-        if not key.scope.student:
-            return self._descriptor_model_data[key.field_name]
-
-        if key.scope == Scope.student_state:
-            student_module = self._student_module(key)
-
-            if student_module is None:
-                raise KeyError(key.field_name)
-
-            return json.loads(student_module.state)[key.field_name]
-
-    def set(self, key, value):
-        if not key.scope.student:
-            self._descriptor_model_data[key.field_name] = value
-
-        if key.scope == Scope.student_state:
-            student_module = self._student_module(key)
-            if student_module is None:
-                student_module = StudentModule(
-                    course_id=self._course_id,
-                    student=self._user,
-                    module_type=key.module_scope_id.category,
-                    module_state_key=key.module_scope_id.url(),
-                    state=json.dumps({})
-                )
-                self._student_module_cache.append(student_module)
-            state = json.loads(student_module.state)
-            state[key.field_name] = value
-            student_module.state = json.dumps(state)
-            student_module.save()
-
-    def delete(self, key):
-        if not key.scope.student:
-            del self._descriptor_model_data[key.field_name]
-
-        if key.scope == Scope.student_state:
-            student_module = self._student_module(key)
-
-            if student_module is None:
-                raise KeyError(key.field_name)
-
-            state = json.loads(student_module.state)
-            del state[key.field_name]
-            student_module.state = json.dumps(state)
-            student_module.save()
-
-
-LmsUsage = namedtuple('LmsUsage', 'id, def_id')
 
 
 def _get_module(user, request, location, student_module_cache, course_id, position=None, wrap_xmodule_display=True):
