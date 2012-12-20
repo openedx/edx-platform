@@ -24,7 +24,7 @@ def get_course_updates(location):
     
     # purely to handle free formed updates not done via editor. Actually kills them, but at least doesn't break.
     try:
-        course_html_parsed = etree.fromstring(course_updates.definition['data'], etree.XMLParser(remove_blank_text=True))
+        course_html_parsed = etree.fromstring(course_updates.definition['data'])
     except etree.XMLSyntaxError:
         course_html_parsed = etree.fromstring("<ol></ol>")
         
@@ -39,7 +39,7 @@ def get_course_updates(location):
                 # could enforce that update[0].tag == 'h2'
                 content = update[0].tail
             else:
-                content = etree.tostring(update[1])
+                content = "\n".join([etree.tostring(ele) for ele in update[1:]])
                 
             # make the id on the client be 1..len w/ 1 being the oldest and len being the newest
             course_upd_collection.append({"id" : location_base + "/" + str(len(course_html_parsed) - idx),
@@ -61,13 +61,12 @@ def update_course_updates(location, update, passed_id=None):
     
     # purely to handle free formed updates not done via editor. Actually kills them, but at least doesn't break.
     try:
-        course_html_parsed = etree.fromstring(course_updates.definition['data'], etree.XMLParser(remove_blank_text=True))
+        course_html_parsed = etree.fromstring(course_updates.definition['data'])
     except etree.XMLSyntaxError:
         course_html_parsed = etree.fromstring("<ol></ol>")
 
     # No try/catch b/c failure generates an error back to client
-    new_html_parsed = etree.fromstring('<li><h2>' + update['date'] + '</h2>' + update['content'] + '</li>', 
-                                       etree.XMLParser(remove_blank_text=True))
+    new_html_parsed = etree.fromstring('<li><h2>' + update['date'] + '</h2>' + update['content'] + '</li>')
         
     # Confirm that root is <ol>, iterate over <li>, pull out <h2> subs and then rest of val
     if course_html_parsed.tag == 'ol':
@@ -106,7 +105,7 @@ def delete_course_update(location, update, passed_id):
     # TODO use delete_blank_text parser throughout and cache as a static var in a class
     # purely to handle free formed updates not done via editor. Actually kills them, but at least doesn't break.
     try:
-        course_html_parsed = etree.fromstring(course_updates.definition['data'], etree.XMLParser(remove_blank_text=True))
+        course_html_parsed = etree.fromstring(course_updates.definition['data'])
     except etree.XMLSyntaxError:
         course_html_parsed = etree.fromstring("<ol></ol>")
         
@@ -115,7 +114,7 @@ def delete_course_update(location, update, passed_id):
         idx = get_idx(passed_id)
         # idx is count from end of list
         element_to_delete = course_html_parsed[-idx]
-        if element_to_delete:
+        if element_to_delete is not None:
             course_html_parsed.remove(element_to_delete)
 
         # update db record
