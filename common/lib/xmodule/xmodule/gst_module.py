@@ -55,14 +55,15 @@ class GraphicalSliderToolModule(XModule):
     def get_html(self):
         """ Renders parameters to template. """
 
-        # these both will be used in class methods
+        # these 3 will be used in class methods
         self.html_id = self.location.html_id()
         self.html_class = self.location.category
+        self.configuration_json = self.build_configuration_json()
         params = {
                   'gst_html': self.substitute_controls(self.definition['render']),
                   'element_id': self.html_id,
                   'element_class': self.html_class,
-                  'configuration_json': self.build_configuration_json()
+                  'configuration_json': self.configuration_json
                   }
         self.content = (self.system.render_template(
                         'graphical_slider_tool.html', params))
