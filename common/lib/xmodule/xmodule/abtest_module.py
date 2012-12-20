@@ -37,7 +37,7 @@ class ABTestModule(XModule):
     """
 
     group_portions = Object(help="What proportions of students should go in each group", default={DEFAULT: 1}, scope=Scope.content)
-    group_assignments = Object(help="What group this user belongs to", scope=Scope(student=True, module=ModuleScope.TYPE), default={})
+    group_assignments = Object(help="What group this user belongs to", scope=Scope.student_preferences, default={})
     group_content = Object(help="What content to display to each group", scope=Scope.content, default={DEFAULT: []})
 
     def __init__(self, *args, **kwargs):
