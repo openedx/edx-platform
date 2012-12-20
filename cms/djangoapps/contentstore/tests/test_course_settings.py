@@ -11,6 +11,7 @@ from cms.djangoapps.models.settings.course_details import CourseDetails,\
 import json
 from util import converters
 import calendar
+from contentstore.settings.course_details import CourseDetailsEncoder
 
 # YYYY-MM-DDThh:mm:ss.s+/-HH:MM
 class ConvertersTestCase(TestCase):
@@ -104,7 +105,7 @@ class CourseDetailsTestCase(TestCase):
         ## NOTE: I couldn't figure out how to validly test time setting w/ all the conversions
         jsondetails = CourseDetails.fetch(self.course_location)
         jsondetails.syllabus = "<a href='foo'>bar</a>"
-        self.assertEqual(CourseDetails.update_from_json(jsondetails.__dict__).syllabus,
+        self.assertEqual(CourseDetails.update_from_json(json.dumps(jsondetails, encoding=CourseDetailsEncoder)).syllabus,
                              jsondetails.syllabus, "After set syllabus")
         jsondetails.overview = "Overview"
         self.assertEqual(CourseDetails.update_from_json(jsondetails.__dict__).overview,
@@ -166,7 +167,7 @@ class CourseDetailsViewTest(TestCase):
     def alter_field(self, url, details, field, val):
         setattr(details, field, val)
 #        jsondetails = json.dumps(details, cls=CourseSettingsEncoder)
-        resp = self.client.post(url, details) 
+        resp = self.client.post(url, details.__dict__) 
         self.compare_details_with_encoding(json.loads(resp.content), details.__dict__, field + val)
         
     def test_update_and_fetch(self):
@@ -182,16 +183,15 @@ class CourseDetailsViewTest(TestCase):
         resp = self.client.get(url)
         self.compare_details_with_encoding(json.loads(resp.content), details.__dict__, "virgin get")
 
-#        self.alter_field(url, details, 'start_date', time.time() * 1000)        
-#        self.alter_field(url, details, 'start_date', time.time() * 1000 + 60 * 60 * 24)
-#        self.alter_field(url, details, 'end_date', time.time() * 1000 + 60 * 60 * 24 * 100)
-#        self.alter_field(url, details, 'enrollment_start', time.time() * 1000)
-#
-#        self.alter_field(url, details, 'enrollment_end', time.time() * 1000 + 60 * 60 * 24 * 8)
-#        self.alter_field(url, details, 'syllabus', "<a href='foo'>bar</a>")
-#        self.alter_field(url, details, 'overview', "Overview")
-#        self.alter_field(url, details, 'intro_video', "intro_video")
-#        self.alter_field(url, details, 'effort', "effort")
+        self.alter_field(url, details, 'start_date', time.time() * 1000)        
+        self.alter_field(url, details, 'start_date', time.time() * 1000 + 60 * 60 * 24)
+        self.alter_field(url, details, 'end_date', time.time() * 1000 + 60 * 60 * 24 * 100)
+        self.alter_field(url, details, 'enrollment_start', time.time() * 1000)
+
+        self.alter_field(url, details, 'enrollment_end', time.time() * 1000 + 60 * 60 * 24 * 8)
+        self.alter_field(url, details, 'overview', "Overview")
+        self.alter_field(url, details, 'intro_video', "intro_video")
+        self.alter_field(url, details, 'effort', "effort")
 
     def compare_details_with_encoding(self, encoded, details, context):
         self.compare_date_fields(details, encoded, context, 'start_date')
