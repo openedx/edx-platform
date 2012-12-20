@@ -13,6 +13,23 @@
       }
     }
 
+    .courses-listing {
+      @include clearfix();
+      margin: 0;
+      padding: 0;
+      list-style: none;
+
+      .courses-listing-item {
+        width: flex-grid(4);
+        margin-right: flex-gutter();
+        float: left;
+
+        &:nth-child(3n+3) {
+          margin-right: 0;
+        }
+      }
+    }
+
     .course {
       background: rgb(250,250,250);
       border: 1px solid rgb(180,180,180);
