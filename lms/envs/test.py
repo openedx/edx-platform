@@ -8,7 +8,6 @@ sessions. Assumes structure:
         /log  # Where we're going to write log files
 """
 from .common import *
-from logsettings import get_logger_config
 import os
 from path import path
 
@@ -43,12 +42,6 @@ STATUS_MESSAGE_PATH = TEST_ROOT / "status_message.json"
 
 COURSES_ROOT = TEST_ROOT / "data"
 DATA_DIR = COURSES_ROOT
-
-LOGGING = get_logger_config(TEST_ROOT / "log",
-                            logging_env="dev",
-                            tracking_filename="tracking.log",
-                            dev_env=True,
-                            debug=True)
 
 COMMON_TEST_DATA_ROOT = COMMON_ROOT / "test" / "data"
 # Where the content data is checked out.  This may not exist on jenkins.
