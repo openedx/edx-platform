@@ -55,6 +55,22 @@ def create_new_course_group(creator, location, role):
 
     return
 
+'''
+This is to be called only by either a command line code path or through a app which has already
+asserted permissions
+'''
+def _delete_course_group(location):
+    # remove all memberships
+    instructors = Group.objects.get(name=get_course_groupname_for_role(location, INSTRUCTOR_ROLE_NAME))
+    for user in instructors.user_set.all():
+        user.groups.remove(instructors)
+        user.save()
+
+    staff = Group.objects.get(name=get_course_groupname_for_role(location, STAFF_ROLE_NAME))
+    for user in staff.user_set.all():
+        user.groups.remove(staff)
+        user.save()
+
 
 def add_user_to_course_group(caller, user, location, role):
     # only admins can add/remove other users
