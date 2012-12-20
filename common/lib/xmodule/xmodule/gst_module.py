@@ -25,6 +25,8 @@ class GraphicalSliderToolModule(XModule):
 
     js = {
       'js': [
+        # 3rd party libraries used by graphic slider tool.
+        # TODO - where to store them - outside xmodule?
         resource_string(__name__, 'js/src/graphical_slider_tool/jstat-1.0.0.min.js'),
 
         resource_string(__name__, 'js/src/graphical_slider_tool/gst_main.js'),
@@ -44,32 +46,40 @@ class GraphicalSliderToolModule(XModule):
     def __init__(self, system, location, definition, descriptor, instance_state=None,
                  shared_state=None, **kwargs):
         """
-        For XML file format please look at documentation.
-
+        For XML file format please look at documentation. TODO - receive
+        information where to store XML documentation.
         """
         XModule.__init__(self, system, location, definition, descriptor,
                          instance_state, shared_state, **kwargs)
 
     def get_html(self):
-        self.get_configuration()
+        """ Renders parameters to template. """
+
+        # these both will be used in class methods
         self.html_id = self.location.html_id()
         self.html_class = self.location.category
-        gst_html = self.substitute_controls(self.definition['render'].strip())
-        # import ipdb; ipdb.set_trace()
         params = {
-                  'gst_html': gst_html,
+                  'gst_html': self.substitute_controls(self.definition['render']),
                   'element_id': self.html_id,
                   'element_class': self.html_class,
-                  'configuration_json': self.configuration_json
+                  'configuration_json': self.build_configuration_json()
                   }
         self.content = (self.system.render_template(
                         'graphical_slider_tool.html', params))
-        # import ipdb; ipdb.set_trace()
         return self.content
 
     def substitute_controls(self, html_string):
-        """ Substitue control element via their divs.
-        Simple variant: slider and plot controls are not inside any tag.
+        """ Substitutes control elements via their divs.
+        TODO: change regexps to html parsing via beautiful soup  or something
+        similar (aim : simpler support).
+
+        Args:
+            html_string: rendered html string with controls as xml tags
+            (<slider var="a"/>)
+
+        Returns:
+            html_string with control tags replaced by proper divs
+            (<slider var="a"/> -> <div class="....slider" > </div>)
         """
         #substitute plot
         plot_div = '<div class="{element_class}_plot" id="{element_id}_plot" \
@@ -98,8 +108,7 @@ class GraphicalSliderToolModule(XModule):
             variables = [x['@var'] for x in variables]
         else:
             return html_string
-        # if variables[0] == 'v':
-        #     import ipdb; ipdb.set_trace()
+
         #substitute sliders
         slider_div = '<div class="{element_class}_slider" \
                                    id="{element_id}_slider_{var}" \
@@ -143,11 +152,9 @@ class GraphicalSliderToolModule(XModule):
                 # different id
             instances = re.findall(r'<textbox\s+(?=[^<>]*var\=[\"\']' + var + '[\"\'])' \
                           + r'[^<>]*/>', html_string, flags=re.UNICODE | re.DOTALL)
-            # import ipdb; ipdb.set_trace()
             for input_def in instances:  # for multiple inputs per var
                 input_index += 1
                 # extract var and readonly before style!
-                # import ipdb; ipdb.set_trace()
                 var_substring = re.search(r'(var\=[\"\']' + var + r'[\"\'])',
                                           input_def).group()
                 input_def = input_def.replace(var_substring, '')
@@ -164,28 +171,28 @@ class GraphicalSliderToolModule(XModule):
                     style = style.groups()[0]
                 else:
                     style = ''
-                # import ipdb; ipdb.set_trace()
                 replacement = input_el.format(element_class=self.html_class,
                         element_id=self.html_id,
                         var=var, readonly=readonly, style=style,
                         input_index=input_index)
-                # import ipdb; ipdb.set_trace()
                 html_string = re.sub(r'<textbox\s+(?=[^<>]*var\=[\"\'](' + \
                                      var + ')[\"\'])' + r'[^<>]*/>',
                 replacement, html_string, count=1, flags=re.UNICODE | re.DOTALL)
         return html_string
 
-    def get_configuration(self):
-        """Parse self.definition['configuration'] and transfer it to javascript
-        via json.
+    def build_configuration_json(self):
+        """Creates json element from xml element (with aim to transfer later
+         directly to javascript via hidden field in template). Steps:
+
+            1. Convert xml tree to python dict.
+
+            2. Dump dict to json.
+
         """
-        # root added for interface compatibility with xmltodict.parse
-        # import ipdb; ipdb.set_trace()
-        self.configuration_json = json.dumps(
-                xmltodict.parse('<root class="' + self.location.category + '">' +
-                stringify_children(self.definition['configuration'])
-                             + '</root>'))
-        return self.configuration_json
+        # <root> added for interface compatibility with xmltodict.parse
+        # class added for javascript's part purposes
+        return json.dumps(xmltodict.parse('<root class="' + self.html_class +
+                '">' + self.definition['configuration'] + '</root>'))
 
 
 class GraphicalSliderToolDescriptor(MakoModuleDescriptor, XmlDescriptor):
@@ -220,25 +227,21 @@ class GraphicalSliderToolDescriptor(MakoModuleDescriptor, XmlDescriptor):
         def parse(k):
             """Assumes that xml_object has child k"""
             return stringify_children(xml_object.xpath(k)[0])
-
         return {
                     'render': parse('render'),
-                    'configuration': xml_object.xpath('configuration')[0]
+                    'configuration': parse('configuration')
                 }
 
     def definition_to_xml(self, resource_fs):
-        '''Return an xml element representing this definition.
-        Not implemented'''
-        # import ipdb; ipdb.set_trace()
-        xml_object = etree.Element('gst')
+        '''Return an xml element representing this definition.'''
+        xml_object = etree.Element('graphical_slider_tool')
 
         def add_child(k):
-            # child_str = '<{tag}>{body}</{tag}>'.format(tag=k, body=self.definition[k])
-            child_str = child.export_to_xml(resource_fs)
+            child_str = '<{tag}>{body}</{tag}>'.format(tag=k, body=self.definition[k])
             child_node = etree.fromstring(child_str)
             xml_object.append(child_node)
 
-        for child in self.get_children():
+        for child in ['render', 'configuration']:
             add_child(child)
 
         return xml_object
