@@ -77,6 +77,8 @@ DATABASES = {
     }
 }
 
+LMS_BASE = "localhost:8000"
+
 CACHES = {
     # This is the cache used for most things. Askbot will not work without a 
     # functioning cache -- it relies on caching to load its settings in places.
