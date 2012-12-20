@@ -315,7 +315,7 @@ task :showdocs do
         if RUBY_PLATFORM.include? 'darwin'  #  mac os
             sh('open index.html')
         elsif RUBY_PLATFORM.include? 'linux'  # make more ubuntu specific?
-            sh('sens-browser index.html')  # ubuntu
+            sh('sensible-browser index.html')  # ubuntu
         else
             raise "\nUndefined how to run browser on your machine.
 Please use 'rake builddocs' and then manually open
