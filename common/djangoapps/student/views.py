@@ -10,6 +10,7 @@ import sys
 import urllib
 import uuid
 
+
 from django.conf import settings
 from django.contrib.auth import logout, authenticate, login
 from django.contrib.auth.forms import PasswordResetForm
@@ -17,6 +18,7 @@ from django.contrib.auth.models import User
 from django.contrib.auth.decorators import login_required
 from django.core.context_processors import csrf
 from django.core.mail import send_mail
+from django.core.urlresolvers import reverse
 from django.core.validators import validate_email, validate_slug, ValidationError
 from django.db import IntegrityError
 from django.http import HttpResponse, HttpResponseForbidden, Http404,\
@@ -29,7 +31,8 @@ from django.core.cache import cache
 from django_future.csrf import ensure_csrf_cookie, csrf_exempt
 from student.models import (Registration, UserProfile, TestCenterUser, TestCenterRegistration,
                             PendingNameChange, PendingEmailChange,
-                            CourseEnrollment, unique_id_for_user)
+                            CourseEnrollment, unique_id_for_user,
+                            get_testcenter_registrations_for_user_and_course)
 
 from certificates.models import CertificateStatuses, certificate_status_for_student
 
@@ -617,11 +620,7 @@ def begin_test_registration(request, course_id):
         log.error("User {0} enrolled in non-existent course {1}"
                       .format(user.username, course_id))
 
-    # TODO: placeholder for possible messages...
     message = ""
-    if not user.is_active:
-        message = render_to_string('registration/activate_account_notice.html', {'email': user.email})
-
     context = {'course': course,
                'user': user,
                'message': message,
@@ -676,7 +675,7 @@ def _do_create_or_update_test_center_user(post_vars):
         try:
             testcenter_user.save()
         except IntegrityError, ie:
-            message = ie
+            message = "%s" % ie
             context = {'course': course,
                        'user': user,
                        'message': message,
@@ -685,31 +684,45 @@ def _do_create_or_update_test_center_user(post_vars):
             return render_to_response('test_center_register.html', context)
             
     # create and save the registration:
-    registration = TestCenterRegistration(testcenter_user = testcenter_user)
-    registration.course_id = post_vars['course_id']
-    registration.accommodation_request = post_vars['accommodations']
-    exam_info = course.testcenter_info
-    registration.exam_series_code = exam_info.get('Exam_Series_Code')
-    registration.eligibility_appointment_date_first = exam_info.get('First_Eligible_Appointment_Date')
-    registration.eligibility_appointment_date_last = exam_info.get('Last_Eligible_Appointment_Date')
-    # accommodation_code remains blank for now, along with Pearson confirmation
-    registration.user_updated_at = datetime.datetime.now()
-
-    # "client_authorization_id" is the client's unique identifier for the authorization.  
-    # This must be present for an update or delete to be sent to Pearson.
-    registration.client_authorization_id = "1"
-    try:
-        registration.save()
-    except IntegrityError, ie:
-        message = ie
-        context = {'course': course,
-                   'user': user,
-                   'message': message,
-                   'testcenteruser': testcenter_user,
-                   }
-        return render_to_response('test_center_register.html', context)
+    needs_saving = False
+    registrations = get_testcenter_registrations_for_user_and_course(user, course.id)
+    # In future, this should check the exam series code of the registrations, if there
+    # were multiple.
+    if len(registrations) > 0:
+        registration = registrations[0]
+        # check to see if registration changed.  Should check appointment dates too...
+        # And later should check changes in accommodation_code.
+        # But at the moment, we don't expect anything to cause this to change
+        # right now.
         
-
+    else:
+        registration = TestCenterRegistration(testcenter_user = testcenter_user)
+        registration.course_id = post_vars['course_id']
+        registration.accommodation_request = post_vars['accommodations']
+        exam_info = course.testcenter_info
+        registration.exam_series_code = exam_info.get('Exam_Series_Code')
+        registration.eligibility_appointment_date_first = exam_info.get('First_Eligible_Appointment_Date')
+        registration.eligibility_appointment_date_last = exam_info.get('Last_Eligible_Appointment_Date')
+        # accommodation_code remains blank for now, along with Pearson confirmation
+        registration.user_updated_at = datetime.datetime.now()
+        needs_saving = True
+        
+    # "client_authorization_id" is the client's unique identifier for the authorization.  
+    # This must be present for an update or delete to be sent to Pearson.  
+    # Can we just use the id field of the registration?  Lets...
+    
+    if needs_saving:
+        try:
+            registration.save()
+        except IntegrityError, ie:
+            message = "%s" % ie
+            context = {'course': course,
+                       'user': user,
+                       'message': message,
+                       'testcenteruser': testcenter_user,
+                       }
+            return render_to_response('test_center_register.html', context)
+        
     return (user, testcenter_user, registration)
 
 @ensure_csrf_cookie
@@ -778,7 +791,7 @@ def create_test_registration(request, post_override=None):
 
 #    js = {'success': True}
 #    return HttpResponse(json.dumps(js), mimetype="application/json")
-    return HttpResponseRedirect('/dashboard')
+    return HttpResponseRedirect(reverse('dashboard'))
 
 def get_random_post_override():
     """

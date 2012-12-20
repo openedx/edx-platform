@@ -234,8 +234,7 @@
                 %>
                 % if len(registrations) == 0:	    
                 <div class="message message-status is-shown exam-register">
-<!--                  <a href="#testcenter-register-modal" rel="leanModal" class="exam-button" data-course-id="${course.id}" data-course-number="${course.number}" id="exam_register_button">Register for Pearson exam</a>
--->                  <a href="${testcenter_register_target}" class="exam-button" id="exam_register_button">Register for Pearson exam</a>
+                      <a href="${testcenter_register_target}" class="exam-button" id="exam_register_button">Register for Pearson exam</a>
                       <p class="message-copy">Registration for the Pearson exam is now open.</p>
                 </div>
                 % else:     

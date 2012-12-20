@@ -194,7 +194,7 @@ class TestCenterUser(models.Model):
 
     # Confirmation
     upload_status = models.CharField(max_length=20, blank=True)  # 'Error' or 'Accepted'
-    confirmed_at = models.DateTimeField(null=True, db_index=True)
+    uploaded_at = models.DateTimeField(null=True, db_index=True)
     upload_error_message = models.CharField(max_length=512, blank=True)
     
     @staticmethod
@@ -236,7 +236,7 @@ class TestCenterRegistration(models.Model):
     user_updated_at = models.DateTimeField(db_index=True)
     # "client_authorization_id" is the client's unique identifier for the authorization.  
     # This must be present for an update or delete to be sent to Pearson.
-    client_authorization_id = models.CharField(max_length=20, unique=True, db_index=True)
+    # client_authorization_id = models.CharField(max_length=20, unique=True, db_index=True)
 
     # information about the test, from the course policy:
     exam_series_code = models.CharField(max_length=15, db_index=True)
@@ -250,7 +250,7 @@ class TestCenterRegistration(models.Model):
 
     # Confirmation
     upload_status = models.CharField(max_length=20, blank=True)  # 'Error' or 'Accepted'
-    confirmed_at = models.DateTimeField(db_index=True)
+    uploaded_at = models.DateTimeField(null=True, db_index=True)
     upload_error_message = models.CharField(max_length=512, blank=True)
 
     @property
@@ -261,12 +261,15 @@ class TestCenterRegistration(models.Model):
     def client_candidate_id(self):
         return self.testcenter_user.client_candidate_id
     
-    
+    @property
+    def client_authorization_id(self):
+        # TODO: make this explicitly into a string object:
+        return self.id
 
 def get_testcenter_registrations_for_user_and_course(user, course_id):
     try:
         tcu = TestCenterUser.objects.get(user=user)
-    except User.DoesNotExist:
+    except TestCenterUser.DoesNotExist:
         return []
     return TestCenterRegistration.objects.filter(testcenter_user=tcu, course_id=course_id)
     
