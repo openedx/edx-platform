@@ -35,13 +35,17 @@
   </script>
 </%block>
 
+<%
+exam_info = course.testcenter_info
+%>
+
 <section class="testcenter-register container">    
 
   <!-- display stuff about the exam and the course for which the user is registering.  
        If the user has already registered in the past for a test center, then also display
        their ID. -->
 
-  <section class="info">
+  <section class="output-raw">
     <hgroup>
       <p class="date-block">
         % if course.has_ended():
@@ -57,66 +61,86 @@
     </hgroup>
 
     <!-- TODO: need to add logic to select which of the following to display.  Like certs? -->
-    <%
-    exam_info = course.testcenter_info
-    %>
     % if exam_info is not None:
         <p>Exam Series Code: ${exam_info.get('Exam_Series_Code')}</p>
         <p>First Eligible Appointment Date: ${exam_info.get('First_Eligible_Appointment_Date')}</p>
         <p>Last Eligible Appointment Date: ${exam_info.get('Last_Eligible_Appointment_Date')}</p>
     % endif
+    
+    <!-- check to see if the user has already registering, or
+       is registering for the first time -->
+    <%     
+      registrations = get_testcenter_registrations_for_user_and_course(user, course.id)
+    %>  
+     
+    % if len(registrations) > 0:
+      <%     
+        registration = registrations[0]
+      %>  
+
+    <section><div>Already Registered</div>
+      <p>Here is the current state of your registration, for debugging purposes:</p>
+      <l>
+        <li>id: ${registration.id}</li>
+        <li>testcenter_user_id: ${registration.testcenter_user_id}</li>
+        <li>course_id: ${registration.course_id}</li>
+        <li>accommodation codes: ${registration.accommodation_code}</li>
+        <li>accommodation request: ${registration.accommodation_request}</li>
+        <li>created_at: ${registration.created_at}</li>
+        <li>updated_at: ${registration.updated_at}</li>
+        <li>user_updated_at: ${registration.user_updated_at}</li>
+        <li>upload_status: ${registration.upload_status}</li>
+        <li>upload_error_message: ${registration.upload_error_message}</li>
+      </l>
+      
+      
+      <!-- determine status of registration 
+          doing here for now, but will move into model or view -->
+      <%
+        regstatus = "registration pending acknowledgement by Pearson"
+        
+        if registration.upload_status == 'Accepted':
+          regstatus = "registration approved by Pearson"
+        elif registration.upload_status == 'Error':
+          regstatus = "registration rejected by Pearson: %s" % registration.upload_error_message
+        elif len(registration.accommodation_request) > 0 and registration.accommodation_code == '':
+          regstatus = "pending approval of accommodation request"
+      %>
+      <p>Current status: ${regstatus}</p>       
+      
+      <p>The demographic information provided below was used to register
+      for the exam listed above.  Changes to this information 
+      may be submitted below.</p>
+    </section>
+     
+    % else:
+        <p>The demographic information must be provided below in order to register
+        for the exam listed above.</p>
+    % endif
   </section>
-
-	<!-- check to see if the user has already registering, or
-	 	 is registering for the first time -->
-	<%	 	 
-	 	registrations = get_testcenter_registrations_for_user_and_course(user, course.id)
-	%>	
-	 
-	% if len(registrations) > 0:
-		<%	 	 
-		 	registration = registrations[0]
-		%>	
-
-	<section><div>Already Registered</div>
-		<p>Here is the current state of your registration, for debugging purposes:</p>
-		<l>
-			<li>id: ${registration.id}</li>
-			<li>testcenter_user_id: ${registration.testcenter_user_id}</li>
-			<li>course_id: ${registration.course_id}</li>
-			<li>accommodation codes: ${registration.accommodation_code}</li>
-			<li>accommodation request: ${registration.accommodation_request}</li>
-			<li>created_at: ${registration.created_at}</li>
-			<li>updated_at: ${registration.updated_at}</li>
-			<li>user_updated_at: ${registration.user_updated_at}</li>
-			<li>upload_status: ${registration.upload_status}</li>
-			<li>upload_error_message: ${registration.upload_error_message}</li>
-		</l>
-		
-		
-		<!-- determine status of registration 
-				doing here for now, but will move into model or view -->
-		<%
-			regstatus = "registration pending acknowledgement by Pearson"
-			
-			if registration.upload_status == 'Accepted':
-				regstatus = "registration approved by Pearson"
-			elif registration.upload_status == 'Error':
-				regstatus = "registration rejected by Pearson: %s" % registration.upload_error_message
-			elif len(registration.accommodation_request) > 0 and registration.accommodation_code == '':
-				regstatus = "pending approval of accommodation request"
-		%>
-		<p>Current status: ${regstatus}</p>				
-		
-		<p>The demographic information provided below was used to register
-		for the exam listed above.  Changes to this information 
-		may be submitted below.</p>
-	</section>
   
-	% else:
-			<p>The demographic information must be provided below in order to register
-			for the exam listed above.</p>
-	% endif
+  <section class="introduction">
+    <header>
+      <hgroup>
+        <h2>${get_course_about_section(course, 'university')} ${course.number} ${course.title}</h2>      
+        <h1>Register for a Pearson VUE Proctored Exam</h1>
+      </hgroup>
+      
+      <span class="date">
+        % if course.has_ended():
+        <span class="date-title">Course Completed:</span> <span class="date-value">${course.end_date_text}</span>
+        % elif course.has_started():
+        <span class="date-title">Course Started:</span> <span class="date-value">${course.start_date_text}</span>
+        % else:   # hasn't started yet
+        <span class="date-title">Course Starts:</span> <span class="date-value">${course.start_date_text}</span>
+        % endif
+      </span>    
+    </header>
+    
+    <div class="status">
+      
+    </div>
+  </section>
 
 	<!-- provide mechanism for error messages to appear -->
   % if message:
