@@ -233,21 +233,7 @@ def get_courses(user, domain=None):
     courses = branding.get_visible_courses(domain)
     courses = [c for c in courses if has_access(user, c, 'see_exists')]
 
-    return courses
-
-
-def get_courses_by_start_date(user, domain=None):
-    """
-    Returns a list of courses available, sorted by start date
-    """
-    visible_courses = get_courses(user, domain)
-    courses = _sort_courses_and_mark_new(visible_courses)
-
-    return courses
-
-
-def _sort_courses_and_mark_new(courses):
-    """Sort by course start date and mark which have not started yet"""
+    # Add metadata about the start day and if the course is new
     for course in courses:
         days_to_start = _get_course_days_to_start(course)
 
@@ -255,9 +241,7 @@ def _sort_courses_and_mark_new(courses):
         metadata['days_to_start'] = days_to_start
         metadata['is_new'] = course.metadata.get('is_new', days_to_start > 1)
 
-    key = lambda c: c.metadata['days_to_start']
-    courses = sorted(courses, key=key, reverse=True)
-
+    courses = sorted(courses, key=lambda course:course.number)
     return courses
 
 

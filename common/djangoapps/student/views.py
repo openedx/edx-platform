@@ -40,7 +40,7 @@ from xmodule.modulestore.exceptions import ItemNotFoundError
 from datetime import date
 from collections import namedtuple
 
-from courseware.courses import get_courses_by_start_date
+from courseware.courses import get_courses
 from courseware.access import has_access
 
 from statsd import statsd
@@ -75,7 +75,11 @@ def index(request, extra_context={}, user=None):
     if domain==False:				# do explicit check, because domain=None is valid
         domain = request.META.get('HTTP_HOST')
 
-    courses = get_courses_by_start_date(None, domain=domain)
+    courses = get_courses(None, domain=domain)
+
+    # Sort courses by how far are they from they start day
+    key = lambda course: course.metadata['days_to_start']
+    courses = sorted(courses, key=key, reverse=True)
 
     # Get the 3 most recent news
     top_news = _get_news(top=3)
