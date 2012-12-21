@@ -123,117 +123,260 @@ exam_info = course.testcenter_info
     <header>
       <hgroup>
         <h2>${get_course_about_section(course, 'university')} ${course.number} ${course.title}</h2>      
+        
+        % if len(registrations) > 0:
+        <h1>Your Pearson VUE Proctored Exam Registration</h1>
+        % else: 
         <h1>Register for a Pearson VUE Proctored Exam</h1>
-      </hgroup>
-      
-      <span class="date">
-        % if course.has_ended():
-        <span class="date-title">Course Completed:</span> <span class="date-value">${course.end_date_text}</span>
-        % elif course.has_started():
-        <span class="date-title">Course Started:</span> <span class="date-value">${course.start_date_text}</span>
-        % else:   # hasn't started yet
-        <span class="date-title">Course Starts:</span> <span class="date-value">${course.start_date_text}</span>
         % endif
-      </span>    
+      </hgroup>
     </header>
+  </section>
+  
+  <section class="status">
     
-    <div class="status">
-      
+    <!-- NOTE: BT - registration data updated confirmation message - in case upon successful submit we're directing folks back to this view -->
+    <div class="message message-status submission-saved is-shown">
+      <p class="message-copy">Your registration data has been updated and saved.</p>
+    </div>
+    
+    <!-- NOTE: BT - registration error message  -->
+    <!-- provide mechanism for error messages to appear -->
+    % if message:
+    <div class="message message-status submission-error">
+      <p class="message-copy">${message}</p>
+    </div> 
+    % endif
+    
+    <!-- NOTE: BT - Sample markup for error message -->
+    <div class="message message-status submission-error is-shown">
+      <p class="message-copy">We're Sorry, but there was an error with the information you provided below:</p>
     </div>
   </section>
-
-	<!-- provide mechanism for error messages to appear -->
-  % if message:
-  <div id="register_error" name="register_error">
-    <p>${message}</p>
-  </div> 
-  % endif
-	
-  <form id="testcenter-register-form" method="post" data-remote="true" action="/create_test_registration">
-    
-    <!-- include these as pass-throughs -->
-    <input id="id_email" type="hidden" name="email" maxlength="75" value="${user.email}" />
-    <input id="id_username" type="hidden" name="username" maxlength="75" value="${user.username}" />
-    <input id="id_course_id" type="hidden" name="course_id" maxlength="75" value="${course.id}" />
-
-    <div class="input-group">
-      <label data-field="salutation">Salutation</label>
-      <input name="salutation" type="text" value="${testcenteruser.salutation}" placeholder="e.g. Dr.">
-      <br>
-      <label data-field="first_name">First Name*</label>
-      <input name="first_name" type="text" value="${testcenteruser.first_name}" maxlength="30" placeholder="e.g. Jane">
-      <br>
-      <label data-field="middle_name">Middle Name</label>
-      <input name="middle_name" type="text" value="${testcenteruser.middle_name}" placeholder="e.g. Michael">
-      <br>
-      <label data-field="last_name">Last Name*</label>
-      <input name="last_name" type="text" value="${testcenteruser.last_name}" placeholder="e.g. Smith">
-      <br>
-      <label data-field="suffix">Suffix</label>
-      <input name="suffix" type="text" value="${testcenteruser.suffix}" placeholder="e.g. Jr.">
-      <br>
-    </div>
-
-    <div class="input-group">
-      <label data-field="address_1">Address1*</label>
-      <input name="address_1" type="text" value="${testcenteruser.address_1}" placeholder="123 Main St.">
-      <br>
-      <label data-field="address_2">Address2</label>
-      <input name="address_2" type="text" value="${testcenteruser.address_2}" placeholder="Apartment 2B.">
-      <br>
-      <label data-field="address_3">Address3</label>
-      <input name="address_3" type="text" value="${testcenteruser.address_3}" placeholder="Attention: John Smith">
-      <br>
-
-      <label data-field="city">City</label>
-      <input name="city" type="text" value="${testcenteruser.city}" placeholder="Our Fair City">
-      <label data-field="state">State/Province</label>
-      <input name="state" type="text" value="${testcenteruser.state}" placeholder="MA">
-      <br>
-      <label data-field="postal_code">Postal Code</label>
-      <input name="postal_code" type="text" value="${testcenteruser.postal_code}" placeholder="02138">
-      <label data-field="country">Country Code*</label>
-      <input name="country" type="text" value="${testcenteruser.country}" placeholder="USA">
-    </div>
-
-    <div class="input-group">
-      <label data-field="phone">Phone*</label>
-      <input name="phone" type="text" value="${testcenteruser.phone}" placeholder="1-23-456-7890">
-      <label data-field="phone">Extension</label>
-      <input name="extension" type="text" value="${testcenteruser.extension}" placeholder="x123">
-      <label data-field="phone_country_code">Phone Country Code*</label>
-      <input name="phone_country_code" type="text" value="${testcenteruser.phone_country_code}" placeholder="ABC">
-      <br>
-      <label data-field="fax">Fax</label>
-      <input name="fax" type="text" value="${testcenteruser.fax}" placeholder="1-23-456-7891">
-      <label data-field="fax_country_code">Fax Country Code*</label>
-      <input name="fax_country_code" type="text" value="${testcenteruser.fax_country_code}" placeholder="ABC">
-      <br>
-      <label data-field="company_name">Company</label>
-      <input name="company_name" type="text" value="${testcenteruser.company_name}" placeholder="Acme Corporation">
-    </div>
-	<div>
-   
-  <p>The following is included here just so it can be input within the form.  But it is not part of the demographics, and it is not something that can be changed once input.</p>
   
-  <div class="input-group">
-    <label data-field="accommodations">Accommodations Requested</label>
-    <textarea name="accommodations"></textarea>
-  </div>
+  <section class="content">
+    <header>
+      <h3 class="is-hidden">Registration Form</h3>
+    </header>      
+    <form id="testcenter-register-form" method="post" data-remote="true" action="/create_test_registration">
+      
+      % if len(registrations) > 0:
+      <p class="instructions">
+        Please complete the following form to update your demographic information used in your Pearson VUE Porctored Exam. Required fields are noted by <strong>bold text and an asterisk (*)</strong>. 
+      </p>
+      % else: 
+      <p class="instructions">
+        Please provide the following demographic information to register for a Pearson VUE Porctored Exam. Required fields are noted by <strong>bold text and an asterisk (*)</strong>.
+      </p>
+      % endif
+            
+      <!-- include these as pass-throughs -->
+      <input id="id_email" type="hidden" name="email" maxlength="75" value="${user.email}" />
+      <input id="id_username" type="hidden" name="username" maxlength="75" value="${user.username}" />
+      <input id="id_course_id" type="hidden" name="course_id" maxlength="75" value="${course.id}" />
 
-% if len(registrations) > 0:
-  <div class="submit">
-    <input name="submit" type="submit" value="Update demographics">
-  </div>
-  % else: 
-  <div class="submit">
-    <input name="submit" type="submit" value="Register for Test">
-  </div>
-  % endif
+      <div class="form-fields-primary">
+        <fieldset class="group group-form group-form-personalinformation">
+          <legend class="is-hidden">Personal Information</legend>
+          
+          <ol class="list-input">
+            <li class="field">
+              <label for="salutation">Salutation</label>
+              <input class="short" id="salutation" type="text" value="${testcenteruser.salutation}" placeholder="e.g. Mr., Ms., Mrs., Dr." />              
+            </li>
+            <!-- NOTE: BT - to inform a user of what field the error occured on, add a class of .error to the .field element -->
+            <li class="field required">
+              <label for="name-first">First Name </label>
+              <input id="name-first" type="text" value="${testcenteruser.first_name}" placeholder="e.g. Albert" />
+            </li>
+            <li class="field">
+              <label for="name-middle">Middle Name</label>
+              <input id="name-middle" type="text" value="${testcenteruser.middle_name}" placeholder="" />
+            </li>
+            <li class="field required">
+              <label for="name-last">Last Name</label>
+              <input id="name-last" type="text" value="${testcenteruser.last_name}" placeholder="e.g. Einstein" />
+            </li>
+            <li class="field">
+              <label for="name-suffix">Suffix</label>
+              <input class="short" id="name-suffix" type="text" value="${testcenteruser.suffix}" placeholder="e.g. Jr., Sr. " />
+            </li>
+          </ol>
+        </fieldset>
+        
+        <fieldset class="group group-form group-form-mailingaddress">
+          <legend class="is-hidden">Mailing Address</legend>
+          
+          <ol class="list-input">
+            <li class="field">
+              <label class="long" for="address-1">Address Line #1</label>
+              <input id="address-1" type="text" value="${testcenteruser.address_1}" placeholder="e.g. 112 Mercer Street" />              
+            </li>
+            <li class="field-group addresses">
+              <div class="field">
+                <label for="address-2">Address Line #2</label>
+                <input id="address-2" class="long" type="text" value="${testcenteruser.address_2}" placeholder="e.g. Apartment 123" />
+              </div>
+              <div class="field">
+                <label for="address-3">Address Line #3</label>
+                <input id="address-3" class="long" type="text" value="${testcenteruser.address_3}" placeholder="e.g. Attention: Albert Einstein" />
+              </div>
+            </li>            
+            <li class="field-group postal">
+              <div class="field">
+                <label for="state">State/Province</label>
+                <input id="state" class="short" type="text" value="${testcenteruser.state}" placeholder="e.g. NJ" />
+              </div>
+              <div class="field">
+                <label for="postal-code">Postal Code</label>
+                <input id="postal-code" class="short" type="text" value="${testcenteruser.postal_code}" placeholder="e.g. 08540" />
+              </div>
+              <div class="field required">
+                <label class="short" for="country-code">Country Code</label>
+                <input id="country-code" class="short" type="text" value="${testcenteruser.country}" placeholder="e.g. USA" />
+              </div>
+            </li>
+          </ol>
+        </fieldset>
+        
+        <fieldset class="group group-form group-form-contactinformation">
+          <legend class="is-hidden">Contact &amp; Other Information</legend>
+          
+          <ol class="list-input">
+            <li class="field-group phoneinfo">
+              <div class="field required">
+                <label for="phone">Phone Number</label>
+                <input id="phone" type="text" value="${testcenteruser.phone}" placeholder="e.g. 1-55-555-5555" />              
+              </div>
+              <div class="field">
+                <label for="phone-extension">Extension</label>
+                <input id="phone-extension" class="short" type="text" value="${testcenteruser.extension}" placeholder="e.g. 555" />
+              </div>
+              <div class="field required">
+                <label for="phone-countrycode">Phone Country Code</label>
+                <input id="phone-countrycode" class="short" type="text" value="${testcenteruser.phone_country_code}" placeholder="e.g. USA" />
+              </div>
+            </li>
+            <li class="field-group faxinfo">
+              <div class="field">
+                <label for="fax">Fax Number</label>
+                <input id="fax" type="text" class="short" value="${testcenteruser.fax}" placeholder="e.g. 1-55-555-5555" />
+              </div>
+              <div class="field">
+                <label for="fax-countrycode">Fax Country Code</label>
+                <input id="fax-countrycode" class="short" type="text" value="${testcenteruser.fax_country_code}" placeholder="e.g. USA" />
+              </div>
+            </li>
+            <li class="field">
+              <label for="company">Company</label>
+              <input id="company" type="text" value="${testcenteruser.company_name}" placeholder="e.g. American Association of University Professors" />
+            </li>
+          </ol>
+        </fieldset>
+      </div>
+      
+      <div class="form-fields-secondary">
+        <!-- NOTE: BT - Assuming accomodations cannot be edited after a user originally submits registration, I've disabled the field and provided different text. Correct if this is not the case. -->
+        % if len(registrations) > 0:
+        <p class="instructions">Fields below this point are not part of the demographics, and are not editable currently.</p>
+        % else: 
+        <p class="instructions">Fields below this point are not part of the demographics, and cannot be changed once submitted.</p>
+        % endif
+                  
+        <fieldset class="group group-form group-form-optional">
+          <legend class="is-hidden">Optional Information</legend>
+          
+          <ol class="list-input">
+            % if len(registrations) > 0:
+            <li class="field disabled">
+              <label for="accommodations">Accommodations Requested</label>
+              <textarea class="long" id="accommodations"value="" placeholder="" disabled="disabled"></textarea>
+            </li>
+            % else: 
+            <li class="field">
+              <label for="accommodations">Accommodations Requested</label>
+              <textarea class="long" id="accommodations"value="" placeholder=""></textarea>             
+            </li>
+            % endif
+          </ol>
+        </fieldset>
+      </div>
+      
+      <div class="form-actions">
+        % if len(registrations) > 0:
+        <button type="submit" id="submit" class="action action-primary action-update">Update Demographics</button>
+        % else: 
+        <button type="submit" id="submit" class="action action-primary action-register">Register for Pearson VUE Test</button>
+        % endif
+      </div>        
+    </form>
+  </section>
     
-  </form>
+  <aside>
+    <h3 class="is-hidden">Registration Details</h3>
+    
+    <%
+      regstatus = "registration pending acknowledgement by Pearson"
+      
+      if registration.upload_status == 'Accepted':
+        regstatus = "Registration approved by Pearson"
+      elif registration.upload_status == 'Error':
+        regstatus = "rRgistration rejected by Pearson: %s" % registration.upload_error_message
+      elif len(registration.accommodation_request) > 0 and registration.accommodation_code == '':
+        regstatus = "Pending approval of accommodation request"
+    %>
+    
+    <!-- NOTE: BT - state for if registration is accepted -->
+    <div class="message message-status registration-accepted is-shown">
+      <p class="registration-status"><span class="label">Registration Status: </span><span class="value">${regstatus}</span></p>
+      <p class="registration-number"><span class="label">Registration number: </span> <span class="value">edx00015879548</span></p>
+      <p class="message-copy">Write this down! You’ll need it to schedule your exam.</p>
+      <a href="https://www1.pearsonvue.com/testtaker/signin/SignInPage/EDX" class="button exam-button">Schedule Pearson exam</a>
+    </div>
+    
+    <!-- NOTE: BT - state for if registration is rejected -->
+    <div class="message message-status registration-rejected is-shown">
+      <p class="registration-status"><span class="label">Registration Status: </span><span class="value">${regstatus}</span></p>
+      <p class="message-copy">Your registration for the Pearson exam has been rejected. Please contact Pearson VUE for further information regarding your registration.</p>
+    </div>
+    
+    <!-- NOTE: BT - state for if registration is pending -->
+    <div class="message message-status registration-pending is-shown">
+      <p class="registration-status"><span class="label">Registration Status: </span><span class="value">${regstatus}</span></p>
+      <p class="message-copy">Your registration for the Pearson exam is pending. Within a few days, you should see a confirmation number here, which can be used to schedule your exam.</p>
+    </div>
+    
+    <div class="details details-course">
+      <!-- NOTE: showing course details -->
+      <h4>About ${get_course_about_section(course, 'university')} ${course.number}</h4>
+      <p>
+      % if course.has_ended():
+      <span class="label">Course Completed:</span> <span class="value">${course.end_date_text}</span>
+      % elif course.has_started():
+      <span class="label">Course Started:</span> <span class="value">${course.start_date_text}</span>
+      % else:   # hasn't started yet
+      <span class="label">Course Starts:</span> <span class="value">${course.start_date_text}</span>
+      % endif
+      </p>
+    </div>
+
+    <div class="details details-registration">
+      <!-- NOTE: showing test details -->
+      <h4>Pearson VUE Test Details</h4>
+      % if exam_info is not None:
+        <!-- TODO: BT - Can we obtain a more human readable value for test-type (e.g. "Final Exam" or "Midterm Exam")? -->
+        <ul>
+          <li>
+            <span class="label">Exam Series Code:</span> <span class="value">${exam_info.get('Exam_Series_Code')}</span>
+          </li>
+          <li>
+            <span class="label">First Eligible Appointment Date:</span> <span class="value">${exam_info.get('First_Eligible_Appointment_Date')}</span>
+          </li>
+          <li>
+            <span class="label">Last Eligible Appointment Date:</span> <span class="value">${exam_info.get('Last_Eligible_Appointment_Date')}</span>
+          </li>            
+        </ul>
+      % endif
+    </div>
+  </aside>
 </section>
-
-
- 
- 

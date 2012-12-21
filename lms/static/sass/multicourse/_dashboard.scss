@@ -478,9 +478,14 @@
       .exam-registration-number {
         font-family: $sans-serif;
         font-size: 18px;
+
+        a {
+          font-family: $sans-serif;
+        }
       }
 
       &.exam-register {
+
         .message-copy {
           margin-top: 5px;
         }
