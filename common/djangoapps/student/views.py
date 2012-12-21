@@ -333,6 +333,14 @@ def change_enrollment(request):
     return {'success': False, 'error': 'We weren\'t able to unenroll you. Please try again.'}
 
 
+@ensure_csrf_cookie
+def accounts_login(request, error=""):
+
+
+    return render_to_response('accounts_login.html', { 'error': error })
+
+
+
 # Need different levels of logging
 @ensure_csrf_cookie
 def login_user(request, error=""):
