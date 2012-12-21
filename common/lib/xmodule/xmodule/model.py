@@ -121,7 +121,7 @@ class ParentModelMetaclass(type):
     """
     def __new__(cls, name, bases, attrs):
         if attrs.get('has_children', False):
-            attrs['children'] = List(help='The children of this XModule', default=[], scope=Scope.settings)
+            attrs['children'] = List(help='The children of this XModule', default=[], scope=None)
         else:
             attrs['has_children'] = False
 

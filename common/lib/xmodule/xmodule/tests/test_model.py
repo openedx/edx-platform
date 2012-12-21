@@ -36,7 +36,7 @@ def test_parent_metaclass():
     assert not hasattr(WithoutChildren, 'children')
 
     assert isinstance(HasChildren.children, List)
-    assert_equals(Scope.settings, HasChildren.children.scope)
+    assert_equals(None, HasChildren.children.scope)
 
 
 def test_field_access():
