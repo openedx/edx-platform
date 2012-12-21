@@ -303,8 +303,7 @@ class XModuleDescriptor(Plugin, HTMLSnippet, ResourceTemplates):
     
     # A list of descriptor attributes that must be equal for the descriptors to
     # be equal
-    equality_attributes = ('definition', 'metadata', 'location',
-                           'shared_state_key', '_inherited_metadata')
+    equality_attributes = ('_model_data', 'location')
 
     # Name of resource directory to load templates from
     template_dir_name = "default"
