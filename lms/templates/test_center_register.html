@@ -15,19 +15,13 @@
   <script type="text/javascript">
   (function() {
 
-    $(".unenroll").click(function(event) {
-      $("#unenroll_course_id").val( $(event.target).data("course-id") );
-      $("#unenroll_course_number").text( $(event.target).data("course-number") );
-    });
-
-    $(document).delegate('#unenroll_form', 'ajax:success', function(data, json, xhr) {
+    $(document).on('ajax:success', '#test_register_form', function(data, json, xhr) {
       if(json.success) {
         location.href="${reverse('dashboard')}";
       } else {
-        if($('#unenroll_error').length == 0) {
-          $('#unenroll_form').prepend('<div id="unenroll_error" class="modal-form-error"></div>');
-        }
-        $('#unenroll_error').text(json.error).stop().css("display", "block");
+        $(".field.error").removeClass('error');
+        $('#register_error').html(json.value).stop().css("display", "block");
+        $("[data-field='"+json.field+"']").addClass('field-error')
       }
     });
 
@@ -147,7 +141,6 @@ exam_info = course.testcenter_info
     </div>
     
     <!-- NOTE: BT - registration error message  -->
-    <!-- provide mechanism for error messages to appear -->
     % if message:
     <div class="message message-status submission-error">
       <p class="message-copy">${message}</p>
@@ -327,7 +320,7 @@ exam_info = course.testcenter_info
       if registration.upload_status == 'Accepted':
         regstatus = "Registration approved by Pearson"
       elif registration.upload_status == 'Error':
-        regstatus = "rRgistration rejected by Pearson: %s" % registration.upload_error_message
+        regstatus = "Registration rejected by Pearson: %s" % registration.upload_error_message
       elif len(registration.accommodation_request) > 0 and registration.accommodation_code == '':
         regstatus = "Pending approval of accommodation request"
     %>
@@ -365,7 +358,7 @@ exam_info = course.testcenter_info
       % endif
       </p>
     </div>
-
+    
     <div class="details details-registration">
       <!-- NOTE: showing test details -->
       <h4>Pearson VUE Test Details</h4>

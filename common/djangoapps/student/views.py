@@ -675,13 +675,18 @@ def _do_create_or_update_test_center_user(post_vars):
         try:
             testcenter_user.save()
         except IntegrityError, ie:
-            message = "%s" % ie
-            context = {'course': course,
-                       'user': user,
-                       'message': message,
-                       'testcenteruser': testcenter_user,
-                       }
-            return render_to_response('test_center_register.html', context)
+            js = {'success': False}
+            error_msg = unicode(ie);
+            # attempt to find a field name to signal    
+            for fieldname in TestCenterUser.user_provided_fields():
+                if error_msg.find(fieldname) >= 0: 
+                    js['value'] = error_msg
+                    js['field'] = fieldname
+                    return HttpResponse(json.dumps(js))
+            # otherwise just return the error message        
+            js['value'] = error_msg
+            js['field'] = "General Error"
+            return HttpResponse(json.dumps(js))
             
     # create and save the registration:
     needs_saving = False
@@ -715,13 +720,7 @@ def _do_create_or_update_test_center_user(post_vars):
         try:
             registration.save()
         except IntegrityError, ie:
-            message = "%s" % ie
-            context = {'course': course,
-                       'user': user,
-                       'message': message,
-                       'testcenteruser': testcenter_user,
-                       }
-            return render_to_response('test_center_register.html', context)
+            raise
         
     return (user, testcenter_user, registration)
 
@@ -743,14 +742,14 @@ def create_test_registration(request, post_override=None):
             js['field'] = a
             return HttpResponse(json.dumps(js))
 
-    # Confirm appropriate fields are there.
+    # Confirm appropriate fields are filled in with something for now
     for a in ['first_name', 'last_name', 'address_1', 'city', 'country']:
         if len(post_vars[a]) < 2:
             error_str = {'first_name': 'First name must be minimum of two characters long.',
                          'last_name': 'Last name must be minimum of two characters long.',
-                         'address_1': 'Last name must be minimum of two characters long.',
-                         'city': 'Last name must be minimum of two characters long.',
-                         'country': 'Last name must be minimum of two characters long.',
+                         'address_1': 'Address must be minimum of two characters long.',
+                         'city': 'City must be minimum of two characters long.',
+                         'country': 'Country must be minimum of two characters long.',
                          }
             js['value'] = error_str[a]
             js['field'] = a
@@ -789,9 +788,8 @@ def create_test_registration(request, post_override=None):
     # TODO: enable appropriate stat
     # statsd.increment("common.student.account_created")
 
-#    js = {'success': True}
-#    return HttpResponse(json.dumps(js), mimetype="application/json")
-    return HttpResponseRedirect(reverse('dashboard'))
+    js = {'success': True}
+    return HttpResponse(json.dumps(js), mimetype="application/json")
 
 def get_random_post_override():
     """
