@@ -18,13 +18,11 @@ from progress import Progress
 
 from pkg_resources import resource_string
 
-from .capa_module import only_one, ComplexEncoder
+from .capa_module import ComplexEncoder
 from .editing_module import EditingDescriptor
-from .html_checker import check_html
 from .stringify import stringify_children
 from .x_module import XModule
 from .xml_module import XmlDescriptor
-from xmodule.modulestore import Location
 from .model import List, String, Scope, Int
 
 log = logging.getLogger("mitx.courseware")
@@ -436,7 +434,7 @@ class SelfAssessmentDescriptor(XmlDescriptor, EditingDescriptor):
         elt = etree.Element('selfassessment')
 
         def add_child(k):
-            child_str = '<{tag}>{body}</{tag}>'.format(tag=k, body=self.definition[k])
+            child_str = '<{tag}>{body}</{tag}>'.format(tag=k, body=getattr(self, k))
             child_node = etree.fromstring(child_str)
             elt.append(child_node)
 

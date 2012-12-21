@@ -201,7 +201,7 @@ class CourseGradingModel:
             course_location = Location(course_location)
             
         descriptor = get_modulestore(course_location).get_item(course_location)
-        if 'graceperiod' in descriptor.metadata: del descriptor.metadata['graceperiod']   
+        if 'graceperiod' in descriptor.metadata: del descriptor.metadata['graceperiod']
         get_modulestore(course_location).update_metadata(course_location, descriptor.metadata)
         
     @staticmethod
@@ -226,20 +226,30 @@ class CourseGradingModel:
             descriptor.metadata['format'] = jsondict.get('graderType')
             descriptor.metadata['graded'] = True
         else:
-            if 'format' in descriptor.metadata: del descriptor.metadata['format'] 
-            if 'graded' in descriptor.metadata: del descriptor.metadata['graded'] 
+            if 'format' in descriptor.metadata: del descriptor.metadata['format']
+            if 'graded' in descriptor.metadata: del descriptor.metadata['graded']
             
-        get_modulestore(location).update_metadata(location, descriptor.metadata)  
+        get_modulestore(location).update_metadata(location, descriptor.metadata)
         
         
     @staticmethod
     def convert_set_grace_period(descriptor):
         # 5 hours 59 minutes 59 seconds => converted to iso format
-        rawgrace = descriptor.metadata.get('graceperiod', None)
+        rawgrace = descriptor.lms.graceperiod
         if rawgrace:
-            parsedgrace = {str(key): val for (val, key) in re.findall('\s*(\d+)\s*(\w+)', rawgrace)}
-            return parsedgrace
-        else: return None
+            hours_from_day = rawgrace.days*24
+            seconds = rawgrace.seconds
+            hours_from_seconds = int(seconds / 3600)
+            seconds -= hours_from_seconds * 3600
+            minutes = int(seconds / 60)
+            seconds -= minutes * 60
+            return {
+                'hours': hourse_from_days + hours_from_seconds,
+                'minutes': minutes_from_seconds,
+                'seconds': seconds,
+            }
+        else:
+            return None
 
     @staticmethod
     def parse_grader(json_grader):

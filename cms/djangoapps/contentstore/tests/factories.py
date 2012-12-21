@@ -38,10 +38,9 @@ class XModuleCourseFactory(Factory):
 
         # This metadata code was copied from cms/djangoapps/contentstore/views.py
         if display_name is not None:
-            new_course.metadata['display_name'] = display_name
+            new_course.lms.display_name = display_name
 
-        new_course.metadata['data_dir'] = uuid4().hex
-        new_course.metadata['start'] = stringify_time(gmtime())
+        new_course.start = gmtime()
         new_course.tabs = [{"type": "courseware"}, 
             {"type": "course_info", "name": "Course Info"}, 
             {"type": "discussion", "name": "Discussion"},
@@ -89,17 +88,14 @@ class XModuleItemFactory(Factory):
 
         new_item = store.clone_item(template, dest_location)
 
-        # TODO: This needs to be deleted when we have proper storage for static content
-        new_item.metadata['data_dir'] = parent.metadata['data_dir']
-
         # replace the display name with an optional parameter passed in from the caller
         if display_name is not None:
-            new_item.metadata['display_name'] = display_name
+            new_item.lms.display_name = display_name
 
         store.update_metadata(new_item.location.url(), own_metadata(new_item))
 
         if new_item.location.category not in DETACHED_CATEGORIES:
-            store.update_children(parent_location, parent.definition.get('children', []) + [new_item.location.url()])
+            store.update_children(parent_location, parent.children + [new_item.location.url()])
 
         return new_item
 

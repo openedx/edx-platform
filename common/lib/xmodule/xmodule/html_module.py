@@ -149,7 +149,7 @@ class HtmlDescriptor(XmlDescriptor, EditingDescriptor):
         string to filename.html.
         '''
         try:
-            return etree.fromstring(self.definition['data'])
+            return etree.fromstring(self.data)
         except etree.XMLSyntaxError:
             pass
 
@@ -161,7 +161,7 @@ class HtmlDescriptor(XmlDescriptor, EditingDescriptor):
 
         resource_fs.makedir(os.path.dirname(filepath), recursive=True, allow_recreate=True)
         with resource_fs.open(filepath, 'w') as file:
-            file.write(self.definition['data'])
+            file.write(self.data)
 
         # write out the relative name
         relname = path(pathname).basename()

@@ -44,25 +44,25 @@ class CourseDetails:
         
         temploc = course_location._replace(category='about', name='syllabus')
         try:
-            course.syllabus = get_modulestore(temploc).get_item(temploc).definition['data']
+            course.syllabus = get_modulestore(temploc).get_item(temploc).data
         except ItemNotFoundError:
             pass
 
         temploc = temploc._replace(name='overview')
         try:
-            course.overview = get_modulestore(temploc).get_item(temploc).definition['data']
+            course.overview = get_modulestore(temploc).get_item(temploc).data
         except ItemNotFoundError:
             pass
         
         temploc = temploc._replace(name='effort')
         try:
-            course.effort = get_modulestore(temploc).get_item(temploc).definition['data']
+            course.effort = get_modulestore(temploc).get_item(temploc).data
         except ItemNotFoundError:
             pass
         
         temploc = temploc._replace(name='video')
         try:
-            raw_video = get_modulestore(temploc).get_item(temploc).definition['data']
+            raw_video = get_modulestore(temploc).get_item(temploc).data
             course.intro_video = CourseDetails.parse_video_tag(raw_video) 
         except ItemNotFoundError:
             pass

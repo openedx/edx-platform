@@ -1,5 +1,5 @@
 from xmodule.model import Namespace, Boolean, Scope, String, List
-from xmodule.fields import Date
+from xmodule.fields import Date, Timedelta
 
 
 class StringyBoolean(Boolean):
@@ -39,3 +39,4 @@ class LmsNamespace(Namespace):
     giturl = String(help="DO NOT USE", scope=Scope.settings, default='https://github.com/MITx')
     xqa_key = String(help="DO NOT USE", scope=Scope.settings)
     ispublic = Boolean(help="Whether this course is open to the public, or only to admins", scope=Scope.settings)
+    graceperiod = Timedelta(help="Amount of time after the due date that submissions will be accepted", scope=Scope.settings)

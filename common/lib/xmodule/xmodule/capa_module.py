@@ -5,10 +5,8 @@ import dateutil.parser
 import json
 import logging
 import traceback
-import re
 import sys
 
-from datetime import timedelta
 from lxml import etree
 from pkg_resources import resource_string
 
@@ -20,6 +18,9 @@ from xmodule.x_module import XModule
 from xmodule.raw_module import RawDescriptor
 from xmodule.exceptions import NotFoundError
 from .model import Int, Scope, ModuleScope, ModelType, String, Boolean, Object, Float
+from .fields import Timedelta
+
+log = logging.getLogger("mitx.courseware")
 
 
 class StringyInt(Int):
@@ -30,57 +31,6 @@ class StringyInt(Int):
         if isinstance(value, basestring):
             return int(value)
         return value
-
-log = logging.getLogger("mitx.courseware")
-
-#-----------------------------------------------------------------------------
-TIMEDELTA_REGEX = re.compile(r'^((?P<days>\d+?) day(?:s?))?(\s)?((?P<hours>\d+?) hour(?:s?))?(\s)?((?P<minutes>\d+?) minute(?:s)?)?(\s)?((?P<seconds>\d+?) second(?:s)?)?$')
-
-
-def only_one(lst, default="", process=lambda x: x):
-    """
-    If lst is empty, returns default
-
-    If lst has a single element, applies process to that element and returns it.
-
-    Otherwise, raises an exception.
-    """
-    if len(lst) == 0:
-        return default
-    elif len(lst) == 1:
-        return process(lst[0])
-    else:
-        raise Exception('Malformed XML: expected at most one element in list.')
-
-
-class Timedelta(ModelType):
-    def from_json(self, time_str):
-        """
-        time_str: A string with the following components:
-            <D> day[s] (optional)
-            <H> hour[s] (optional)
-            <M> minute[s] (optional)
-            <S> second[s] (optional)
-
-        Returns a datetime.timedelta parsed from the string
-        """
-        parts = TIMEDELTA_REGEX.match(time_str)
-        if not parts:
-            return
-        parts = parts.groupdict()
-        time_params = {}
-        for (name, param) in parts.iteritems():
-            if param:
-                time_params[name] = int(param)
-        return timedelta(**time_params)
-
-    def to_json(self, value):
-        values = []
-        for attr in ('days', 'hours', 'minutes', 'seconds'):
-            cur_value = getattr(value, attr, 0)
-            if cur_value > 0:
-                values.append("%d %s" % (cur_value, attr))
-        return ' '.join(values)
 
 
 class Randomization(String):

@@ -706,17 +706,14 @@ def clone_item(request):
 
     new_item = get_modulestore(template).clone_item(template, dest_location)
 
-    # TODO: This needs to be deleted when we have proper storage for static content
-    new_item.metadata['data_dir'] = parent.metadata['data_dir']
-
     # replace the display name with an optional parameter passed in from the caller
     if display_name is not None:
-        new_item.metadata['display_name'] = display_name
+        new_item.lms.display_name = display_name
 
     get_modulestore(template).update_metadata(new_item.location.url(), own_metadata(new_item))
 
     if new_item.location.category not in DETACHED_CATEGORIES:
-        get_modulestore(parent.location).update_children(parent_location, parent.definition.get('children', []) + [new_item.location.url()])
+        get_modulestore(parent.location).update_children(parent_location, parent.children + [new_item.location.url()])
 
     return HttpResponse(json.dumps({'id': dest_location.url()}))
 
@@ -1206,13 +1203,10 @@ def create_new_course(request):
     new_course = modulestore('direct').clone_item(template, dest_location)
 
     if display_name is not None:
-        new_course.metadata['display_name'] = display_name
-
-    # we need a 'data_dir' for legacy reasons
-    new_course.metadata['data_dir'] = uuid4().hex
+        new_course.display_name = display_name
 
     # set a default start date to now
-    new_course.metadata['start'] = stringify_time(time.gmtime())
+    new_course.start = time.gmtime()
 
     initialize_course_tabs(new_course)
 
