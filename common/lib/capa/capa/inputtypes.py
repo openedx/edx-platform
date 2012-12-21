@@ -816,9 +816,11 @@ class DragAndDropInput(InputTypeBase):
         try:
             images_list = self.system.filestore.listdir(os.path.join('static',
                                                     'images', imagepath))
+            images_list = ['/static/images/' + img for img in images_list]
         except:
             images_list = []
         self.loaded_attributes['images_list'] = images_list
+        self.to_render.add('images_list')
 
 registry.register(DragAndDropInput)
 
