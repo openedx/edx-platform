@@ -345,26 +345,27 @@ def get_score(course_id, user, problem_descriptor, module_creator, student_modul
         # These are not problems, and do not have a score
         return (None, None)
 
-    correct = 0.0
-
     instance_module = student_module_cache.lookup(
         course_id, problem_descriptor.category, problem_descriptor.location.url())
 
-    if instance_module:
-        if instance_module.max_grade is None:
-            return (None, None)
-
+    if instance_module is not None and instance_module.max_grade is not None:
         correct = instance_module.grade if instance_module.grade is not None else 0
         total = instance_module.max_grade
     else:
-        # If the problem was not in the cache, we need to instantiate the problem.
+        # If the problem was not in the cache, or hasn't been graded yet,
+        # we need to instantiate the problem.
         # Otherwise, the max score (cached in instance_module) won't be available
         problem = module_creator(problem_descriptor)
         if problem is None:
             return (None, None)
 
-        correct = 0
+        correct = 0.0
         total = problem.max_score()
+
+        # Problem may be an error module (if something in the problem builder failed)
+        # In which case total might be None
+        if total is None:
+            return (None, None)
 
     #Now we re-weight the problem, if specified
     weight = getattr(problem_descriptor, 'weight', None)
