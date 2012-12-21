@@ -677,7 +677,7 @@ class CapaModule(XModule):
             self.lcp.seed = None
 
         self.set_state_from_lcp()
-        self.lcp = self.new_lcp()
+        self.lcp = self.new_lcp(self.get_state_for_lcp())
 
         event_info['new_state'] = self.lcp.get_state()
         self.system.track_function('reset_problem', event_info)
