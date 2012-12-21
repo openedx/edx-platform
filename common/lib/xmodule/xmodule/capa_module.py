@@ -83,6 +83,16 @@ class Timedelta(ModelType):
         return ' '.join(values)
 
 
+class Randomization(String):
+    def from_json(self, value):
+        if value in ("", "true"):
+            return "always"
+        elif value == "false":
+            return "per_student"
+
+    to_json = from_json
+
+
 class ComplexEncoder(json.JSONEncoder):
     def default(self, obj):
         if isinstance(obj, complex):
@@ -103,7 +113,7 @@ class CapaModule(XModule):
     graceperiod = Timedelta(help="Amount of time after the due date that submissions will be accepted", scope=Scope.settings)
     show_answer = String(help="When to show the problem answer to the student", scope=Scope.settings, default="closed")
     force_save_button = Boolean(help="Whether to force the save button to appear on the page", scope=Scope.settings, default=False)
-    rerandomize = String(help="When to rerandomize the problem", default="always", scope=Scope.settings)
+    rerandomize = Randomization(help="When to rerandomize the problem", default="always", scope=Scope.settings)
     data = String(help="XML data for the problem", scope=Scope.content)
     correct_map = Object(help="Dictionary with the correctness of current student answers", scope=Scope.student_state, default={})
     student_answers = Object(help="Dictionary with the current student responses", scope=Scope.student_state)
@@ -173,11 +183,6 @@ class CapaModule(XModule):
             else:
                 # add extra info and raise
                 raise Exception(msg), None, sys.exc_info()[2]
-
-        if self.rerandomize in ("", "true"):
-            self.rerandomize = "always"
-        elif self.rerandomize == "false":
-            self.rerandomize = "per_student"
 
     def new_lcp(self, state, text=None):
         if text is None:
