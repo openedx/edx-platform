@@ -39,13 +39,15 @@ class ABTestModule(XModule):
     group_portions = Object(help="What proportions of students should go in each group", default={DEFAULT: 1}, scope=Scope.content)
     group_assignments = Object(help="What group this user belongs to", scope=Scope.student_preferences, default={})
     group_content = Object(help="What content to display to each group", scope=Scope.content, default={DEFAULT: []})
+    experiment = String(help="Experiment that this A/B test belongs to", scope=Scope.content)
+    has_children = True
 
     def __init__(self, *args, **kwargs):
         XModule.__init__(self, *args, **kwargs)
 
         if self.group is None:
             self.group = group_from_value(
-                self.group_portions,
+                self.group_portions.items(),
                 random.uniform(0, 1)
             )
 
@@ -80,6 +82,7 @@ class ABTestDescriptor(RawDescriptor, XmlDescriptor):
     experiment = String(help="Experiment that this A/B test belongs to", scope=Scope.content)
     group_portions = Object(help="What proportions of students should go in each group", default={})
     group_content = Object(help="What content to display to each group", scope=Scope.content, default={DEFAULT: []})
+    has_children = True
 
     @classmethod
     def definition_from_xml(cls, xml_object, system):
