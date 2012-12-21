@@ -33,7 +33,7 @@ from correctmap import CorrectMap
 from datetime import datetime
 from util import *
 from lxml import etree
-from lxml.html.soupparser import fromstring as fromstring_bs	 # uses Beautiful Soup!!! FIXME?
+from lxml.html.soupparser import fromstring as fromstring_bs     # uses Beautiful Soup!!! FIXME?
 import xqueue_interface
 
 log = logging.getLogger('mitx.' + __name__)
@@ -869,7 +869,9 @@ def sympy_check2():
 
     response_tag = 'customresponse'
 
-    allowed_inputfields = ['textline', 'textbox', 'crystallography', 'chemicalequationinput', 'vsepr_input']
+    allowed_inputfields = ['textline', 'textbox', 'crystallography',
+                            'chemicalequationinput', 'vsepr_input',
+                            'drag_and_drop']
 
     def setup_response(self):
         xml = self.xml
@@ -1044,7 +1046,7 @@ def sympy_check2():
                                          pretty_print=True)
                     #msg = etree.tostring(fromstring_bs(msg),pretty_print=True)
                     msg = msg.replace('&#13;', '')
-                    #msg = re.sub('<html>(.*)</html>','\\1',msg,flags=re.M|re.DOTALL)	# python 2.7
+                    #msg = re.sub('<html>(.*)</html>','\\1',msg,flags=re.M|re.DOTALL)   # python 2.7
                     msg = re.sub('(?ms)<html>(.*)</html>', '\\1', msg)
 
                 messages[0] = msg
@@ -1763,7 +1765,7 @@ class ImageResponse(LoncapaResponse):
     def get_score(self, student_answers):
         correct_map = CorrectMap()
         expectedset = self.get_answers()
-        for aid in self.answer_ids:	 # loop through IDs of <imageinput>
+        for aid in self.answer_ids:  # loop through IDs of <imageinput>
         #  fields in our stanza
             given = student_answers[aid]  # this should be a string of the form '[x,y]'
             correct_map.set(aid, 'incorrect')

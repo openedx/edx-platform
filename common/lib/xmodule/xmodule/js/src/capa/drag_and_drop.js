@@ -1,0 +1,1 @@
+alert('drag-and-drop js is loaded')
