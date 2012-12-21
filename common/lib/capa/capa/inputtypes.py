@@ -44,6 +44,7 @@ from lxml import etree
 import re
 import shlex  # for splitting quoted strings
 import sys
+import os
 
 from registry import TagRegistry
 
@@ -802,11 +803,22 @@ class DragAndDropInput(InputTypeBase):
         """
         Note: height, width, images_directory_path are required.
         """
-        images_directory_path =  Attribute('images_directory_path')
+        # import ipdb; ipdb.set_trace()
         return [Attribute('height'),
                 Attribute('width'),
-                images_directory_path,
+                Attribute('images_directory_path'),
                 ]
+
+    def setup(self):
+        # import ipdb; ipdb.set_trace()
+        imagepath = self.loaded_attributes['images_directory_path']
+        # import ipdb; ipdb.set_trace()
+        try:
+            images_list = self.system.filestore.listdir(os.path.join('static',
+                                                    'images', imagepath))
+        except:
+            images_list = []
+        self.loaded_attributes['images_list'] = images_list
 
 registry.register(DragAndDropInput)
 

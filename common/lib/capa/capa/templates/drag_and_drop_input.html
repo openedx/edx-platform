@@ -1,9 +1,10 @@
 <section id="inputtype_${id}" class="capa_inputtype" >
     <div class="drag_and_drop_problem" id="drag_and_drop_div_${id}"
     style="width:${width};height:${height}">
-        % if item
+    <p>${images_list}</p>
+        % if images_list:
             <ul>
-                % for item in images_directory_path:
+                % for item in images_list:
                     <li>${item}</li>
                 % endfor
             </ul>
