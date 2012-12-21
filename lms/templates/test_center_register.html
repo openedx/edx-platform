@@ -15,19 +15,13 @@
   <script type="text/javascript">
   (function() {
 
-    $(".unenroll").click(function(event) {
-      $("#unenroll_course_id").val( $(event.target).data("course-id") );
-      $("#unenroll_course_number").text( $(event.target).data("course-number") );
-    });
-
-    $(document).delegate('#unenroll_form', 'ajax:success', function(data, json, xhr) {
+    $(document).on('ajax:success', '#test_register_form', function(data, json, xhr) {
       if(json.success) {
         location.href="${reverse('dashboard')}";
       } else {
-        if($('#unenroll_error').length == 0) {
-          $('#unenroll_form').prepend('<div id="unenroll_error" class="modal-form-error"></div>');
-        }
-        $('#unenroll_error').text(json.error).stop().css("display", "block");
+        $(".field-error").removeClass('field-error');
+        $('#register_error').html(json.value).stop().css("display", "block");
+        $("[data-field='"+json.field+"']").addClass('field-error')
       }
     });
 
