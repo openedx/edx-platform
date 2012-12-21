@@ -1,0 +1,412 @@
+// ==========
+
+$baseline: 20px;
+$yellow: rgb(255, 235, 169);
+$red: rgb(178, 6, 16);
+
+// ==========
+
+.testcenter-register {
+	@include clearfix;
+	padding: 60px 0px 120px;
+
+	// basic layout
+	.introduction {
+		width: flex-grid(12);
+	}
+
+	.message-status-registration {
+		width: flex-grid(12);
+	}
+
+	.content, aside {
+		@include box-sizing(border-box);
+	}
+
+	.content {
+		margin-right: flex-gutter();
+		width: flex-grid(8);
+		float: left;
+	}
+
+	aside {
+		margin: 0;
+		width: flex-grid(4);
+		float: left;
+	}
+
+	// introduction
+	.introduction {
+
+		header {
+			
+			h2 {
+				margin: 0;
+				font-family: $sans-serif;
+				font-size: 16px;
+				color: $lighter-base-font-color;
+			}
+
+			h1 {
+				font-family: $sans-serif;
+				font-size: 34px;
+				text-align: left;
+			}			
+		}
+	}
+
+	// content
+	.content {
+		background: rgb(255,255,255);
+	}
+
+	// form
+	.form-fields-primary, .form-fields-secondary {
+		border-bottom: 1px solid rgba(0,0,0,0.25);
+		@include box-shadow(0 1px 2px 0 rgba(0,0,0, 0.1));
+	}
+
+	form {
+		border: 1px solid rgb(216, 223, 230);
+		@include border-radius(3px);
+		@include box-shadow(0 1px 2px 0 rgba(0,0,0, 0.2));
+
+		.instructions {
+			margin: 0;
+			padding: ($baseline*1.5) ($baseline*1.5) 0 ($baseline*1.5);
+			font-family: $sans-serif;
+			font-size: 14px;
+		}
+
+		fieldset {
+			border-bottom: 1px solid rgba(216, 223, 230, 0.50);
+			padding: ($baseline*1.5);
+		}
+
+		.form-actions {
+			padding: ($baseline*1.5);
+
+			button[type="submit"] {
+				display: block;
+				width: 100%;
+				@include button(simple, $blue);
+				@include box-sizing(border-box);
+				@include border-radius(3px);
+				font: bold 15px/1.6rem $sans-serif;
+				letter-spacing: 0;
+				padding: ($baseline*0.75) $baseline;
+				text-align: center;
+			}
+		}
+
+		.list-input {
+			margin: 0;
+			padding: 0;
+			list-style: none;
+
+			.field {
+				border-bottom: 1px dotted rgba(216, 223, 230, 0.5);
+				margin: 0 0 $baseline 0;
+				padding: 0 0 $baseline 0;
+
+				&:last-child {
+					border: none;
+					margin-bottom: 0;
+					padding-bottom: 0;
+				}
+
+				&.disabled {
+					color: rgba(0,0,0,.25);
+
+					label {
+						color: rgba(0,0,0,.25);
+
+						&:after {
+							content: "(Disabled Currently)";
+							margin-left: ($baseline/4);
+						}
+					}
+
+					textarea, input {
+						background: rgb(255,255,255);
+						color: rgba(0,0,0,.25);
+					}
+				}
+
+				&.error {
+
+					label {
+						color: $red;
+					}
+
+					input, textarea {
+						border-color: tint($red,50%);
+					}
+				}
+
+				&.required {
+
+					label {
+						font-weight: bold;
+					}
+
+					label:after {
+						margin-left: ($baseline/4);
+						content: "*";
+					}
+				}
+
+				label, input, textarea {
+					display: block;
+					font-family: $sans-serif;
+					font-style: normal;
+				}
+
+				label {
+					margin: 0 0 ($baseline/4) 0;
+					@include transition(color, 0.15s, ease-in-out);
+
+					&.is-focused {
+						color: $blue;
+					}
+				}
+
+				input, textarea {
+					width: 100%;
+					padding: $baseline ($baseline*.75);					
+
+					&.long {
+						width: 100%;
+					}
+
+					&.short {
+						width: 25%;
+					}
+				}
+
+				textarea.long {
+					height: ($baseline*5);
+				}
+			}
+
+			.field-group {
+				@include clearfix();
+				border-bottom: 1px dotted rgba(216, 223, 230, 0.5);
+				margin: 0 0 $baseline 0;
+				padding: 0 0 $baseline 0;
+
+				.field {
+					display: block;
+					float: left;
+					border-bottom: none;
+					margin: 0 ($baseline) 0 0;
+					padding-bottom: 0;
+
+					input, textarea {
+						width: 100%;
+					}
+				}
+
+				&.addresses {
+
+					.field {
+						width: 45%;
+					}
+				}
+
+				&.postal {
+					border-bottom: none;
+					margin-bottom: 0;
+					padding-bottom: 0;
+
+				}
+
+				&.phoneinfo {
+
+				}
+			}
+		}
+	}
+
+
+	// aside
+	aside {
+		padding-left: $baseline;
+
+		.message-status {
+			@include border-radius(3px);
+			margin: 0 0 ($baseline*2) 0;
+			padding: $baseline;
+			border: 1px solid #ccc;
+			background: tint($yellow,85%);
+
+			p {
+				margin: 0 0 ($baseline/4) 0;
+				padding: 0;
+				font-size: 13px;
+				font-family: $sans-serif;
+			}
+
+			.label, .value {
+				display: block;
+			}
+
+			.label {
+				margin-right: ($baseline/4);
+				text-transform: uppercase;
+				letter-spacing: 1px;
+			}
+
+			.value {
+				color: rgba(0,0,0,0.9);
+				font-size: 14px;
+			}
+
+			.registration-status {
+				margin: 0 0 ($baseline/2) 0;
+
+				.label {
+					margin: 0 0 ($baseline/2) 0;
+					color: #ccc;
+				}
+			}
+
+			.registration-number {
+
+				.label {
+					text-transform: none;
+					letter-spacing: 0;
+				}
+
+				.label, .value {
+					display: inline-block
+				}
+			}
+
+			.message-copy {
+				margin: 0;
+				color: rgba(0,0,0,0.65);
+			}
+		}
+
+		.registration-accepted {
+
+			.message-copy {
+				margin: 0 0 ($baseline/2) 0;
+			}
+
+			.exam-button {
+			  @include button(simple, $pink);
+			  display: block;
+			  padding: ($baseline/2) $baseline;
+			  font-size: 13px;
+			  font-weight: bold;
+
+			  &:hover {
+			    text-decoration: none;
+			  }
+			}
+		}
+
+		.details {
+			border-bottom: 1px solid rgba(216, 223, 230, 0.5);
+			margin: 0 0 $baseline 0;
+			padding: 0 0 $baseline 0;
+			font-family: $sans-serif;
+			font-size: 14px;
+
+			&:last-child {
+				border: none;
+				margin-bottom: 0;
+				padding-bottom: 0;
+			}
+
+			h4 {
+				margin: 0 0 ($baseline/2) 0;
+				font-family: $sans-serif;
+				font-size: 14px;
+				text-transform: uppercase;
+				letter-spacing: 0.5px;
+				color: #ccc;
+			}
+
+			.label, .value {
+				display: inline-block;
+			}
+
+			.label {
+				color: rgba(0,0,0,.65);
+				margin-right: ($baseline/2);
+			}
+
+			.value {
+				color: rgb(0,0,0);
+			}
+		}
+
+		.details-course {
+
+		}
+
+		.details-registration {
+
+			ul {
+				margin: 0;
+				padding: 0;
+				list-style: none;
+
+				li {
+					margin: 0 0 ($baseline/4) 0;
+				}
+			}
+		}
+	}
+
+	// status messages
+	.message {
+		@include border-radius(3px);
+		display: none;
+		margin: $baseline 0;
+		padding: ($baseline/2) $baseline;
+
+		&.is-shown {
+			display: block;
+		}
+
+		.message-copy {
+			font-family: $sans-serif;
+			font-size: 14px;
+		}
+
+		// submission error
+		&.submission-error {
+			border: 1px solid tint($red,85%);
+			background: tint($red,95%);
+
+			p {
+				color: $red;
+			}
+		}
+
+		// submission success
+		&.submission-saved {
+			border: 1px solid tint($blue,85%);
+			background: tint($blue,95%);
+
+			.message-copy {
+				color: $blue;
+			}
+		}
+	}
+
+
+	// hidden
+	.is-hidden {
+		display: none;
+	}
+
+	// temp
+	.output-raw {
+		display: none;
+	}
+}
