@@ -44,12 +44,6 @@ STATUS_MESSAGE_PATH = TEST_ROOT / "status_message.json"
 COURSES_ROOT = TEST_ROOT / "data"
 DATA_DIR = COURSES_ROOT
 
-LOGGING = get_logger_config(TEST_ROOT / "log",
-                            logging_env="dev",
-                            tracking_filename="tracking.log",
-                            dev_env=True,
-                            debug=True)
-
 COMMON_TEST_DATA_ROOT = COMMON_ROOT / "test" / "data"
 # Where the content data is checked out.  This may not exist on jenkins.
 GITHUB_REPO_ROOT = ENV_ROOT / "data"
