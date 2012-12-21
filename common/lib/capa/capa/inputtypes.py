@@ -800,12 +800,12 @@ class DragAndDropInput(InputTypeBase):
     @classmethod
     def get_attributes(cls):
         """
-        Note: height, width, template and images are required.
+        Note: height, width, images_directory_path are required.
         """
+        images_directory_path =  Attribute('images_directory_path')
         return [Attribute('height'),
                 Attribute('width'),
-                Attribute('template'),
-                Attribute('images'),
+                images_directory_path,
                 ]
 
 registry.register(DragAndDropInput)

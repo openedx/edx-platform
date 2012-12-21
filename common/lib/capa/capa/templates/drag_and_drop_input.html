@@ -1,7 +1,14 @@
 <section id="inputtype_${id}" class="capa_inputtype" >
     <div class="drag_and_drop_problem" id="drag_and_drop_div_${id}"
-    style="width:${width};height:${height}"
-    data-template="${template}" data-images="${images}"></div>
+    style="width:${width};height:${height}">
+        % if item
+            <ul>
+                % for item in images_directory_path:
+                    <li>${item}</li>
+                % endfor
+            </ul>
+        % endif
+    </div>
 
     <div class="script_placeholder" data-src="/static/js/raphael.js"></div>
 
