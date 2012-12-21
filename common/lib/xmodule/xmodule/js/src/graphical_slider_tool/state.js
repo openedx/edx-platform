@@ -199,33 +199,10 @@ define('State', ['logme'], function (logme) {
                 return;
             }
 
-            // If the new parameter's value is valid, but lies outised of
-            // the parameter's allowed range, we will disregard it.
-            //
-            // We will also change the element's value back to the current
-            // parameter's value.
-            if (
-                (paramValueNum < parameters[paramName].min) ||
-                (paramValueNum > parameters[paramName].max)
-            ) {
-                logme('ERROR: New parameter\'s value lies outside of the allowed range.');
-                logme('Range is: min = ' + parameters[paramName].min + ', max = ' + parameters[paramName].max);
-                logme('paramValueNum = ' + paramValueNum);
-
-                // If element is a slider, the value must be set in a special
-                // way.
-                if (slider === true) {
-                    logme('Changing back the slider.');
-                    element.slider('value', parameters[paramName].value);
-                }
-
-                // If element is a text input, standard jQuery val() function
-                // will work.
-                else {
-                    element.val(parameters[paramName].value);
-                }
-
-                return;
+            if (paramValueNum < parameters[paramName].min) {
+                paramValueNum = parameters[paramName].min;
+            } else if (paramValueNum > parameters[paramName].max) {
+                paramValueNum = parameters[paramName].max;
             }
 
             parameters[paramName].value = paramValueNum;
