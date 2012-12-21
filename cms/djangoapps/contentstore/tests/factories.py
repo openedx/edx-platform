@@ -1,6 +1,7 @@
 from factory import Factory
 from xmodule.modulestore import Location
 from xmodule.modulestore.django import modulestore
+from xmodule.modulestore.inheritance import own_metadata
 from time import gmtime
 from uuid import uuid4
 from xmodule.timeparse import stringify_time
@@ -48,7 +49,7 @@ class XModuleCourseFactory(Factory):
             {"type": "progress", "name": "Progress"}]
 
         # Update the data in the mongo datastore
-        store.update_metadata(new_course.location.url(), new_course.own_metadata)   
+        store.update_metadata(new_course.location.url(), own_metadata(new_course))
 
         return new_course
 
@@ -95,7 +96,7 @@ class XModuleItemFactory(Factory):
         if display_name is not None:
             new_item.metadata['display_name'] = display_name
 
-        store.update_metadata(new_item.location.url(), new_item.own_metadata)
+        store.update_metadata(new_item.location.url(), own_metadata(new_item))
 
         if new_item.location.category not in DETACHED_CATEGORIES:
             store.update_children(parent_location, parent.definition.get('children', []) + [new_item.location.url()])

@@ -22,6 +22,7 @@ from xmodule.html_module import HtmlDescriptor
 
 from . import ModuleStoreBase, Location
 from .exceptions import ItemNotFoundError
+from .inheritance import compute_inherited_metadata
 
 edx_xml_parser = etree.XMLParser(dtd_validation=False, load_dtd=False,
                                  remove_comments=True, remove_blank_text=True)
@@ -421,30 +422,6 @@ class XMLModuleStore(ModuleStoreBase):
             # breaks metadata inheritance via get_children().  Instead
             # (actually, in addition to, for now), we do a final inheritance pass
             # after we have the course descriptor.
-            def compute_inherited_metadata(descriptor):
-                """Given a descriptor, traverse all of its descendants and do metadata
-                inheritance.  Should be called on a CourseDescriptor after importing a
-                course.
-
-                NOTE: This means that there is no such thing as lazy loading at the
-                moment--this accesses all the children."""
-                for child in descriptor.get_children():
-                    inherit_metadata(child, descriptor._model_data)
-                    compute_inherited_metadata(child)
-
-            def inherit_metadata(descriptor, model_data):
-                """
-                Updates this module with metadata inherited from a containing module.
-                Only metadata specified in self.inheritable_metadata will
-                be inherited
-                """
-                # Set all inheritable metadata from kwargs that are
-                # in self.inheritable_metadata and aren't already set in metadata
-                for attr in descriptor.inheritable_metadata:
-                    if attr not in descriptor._model_data and attr in model_data:
-                        descriptor._inherited_metadata.add(attr)
-                        descriptor._model_data[attr] = model_data[attr]
-
             compute_inherited_metadata(course_descriptor)
 
             # now import all pieces of course_info which is expected to be stored

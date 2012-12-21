@@ -8,7 +8,7 @@ from .xml import XMLModuleStore
 from .exceptions import DuplicateItemError
 from xmodule.modulestore import Location
 from xmodule.contentstore.content import StaticContent, XASSET_SRCREF_PREFIX
-from xmodule.model import Scope
+from .inheritance import own_metadata
 
 log = logging.getLogger(__name__)
 
@@ -143,15 +143,7 @@ def import_module_from_xml(modulestore, static_content_store, course_data_path, 
     if module.has_children:
         modulestore.update_children(module.location, module.children)
 
-    metadata = {}
-    for field in module.fields + module.lms.fields:
-        # Only save metadata that wasn't inherited
-        if (field.scope == Scope.settings and
-            field.name not in module._inherited_metadata and
-            field.name in module._model_data):
-
-            metadata[field.name] = module._model_data[field.name]
-    modulestore.update_metadata(module.location, metadata)
+    modulestore.update_metadata(module.location, own_metadata(module))
 
 
 def import_course_from_xml(modulestore, static_content_store, course_data_path, module, target_location_namespace=None):

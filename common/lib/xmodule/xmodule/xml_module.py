@@ -1,5 +1,6 @@
 from xmodule.x_module import (XModuleDescriptor, policy_key)
 from xmodule.modulestore import Location
+from xmodule.modulestore.inheritance import own_metadata
 from lxml import etree
 import json
 import copy
@@ -368,10 +369,10 @@ class XmlDescriptor(XModuleDescriptor):
             (Possible format conversion through an AttrMap).
              """
             attr_map = self.xml_attribute_map.get(attr, AttrMap())
-            return attr_map.to_xml(self.own_metadata[attr])
+            return attr_map.to_xml(self._model_data[attr])
 
         # Add the non-inherited metadata
-        for attr in sorted(self.own_metadata):
+        for attr in sorted(own_metadata(self)):
             # don't want e.g. data_dir
             if attr not in self.metadata_to_strip and attr not in self.metadata_to_export_to_policy:
                 val = val_for_xml(attr)

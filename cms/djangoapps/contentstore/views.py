@@ -28,6 +28,7 @@ from django.conf import settings
 
 from xmodule.modulestore import Location
 from xmodule.modulestore.exceptions import ItemNotFoundError, InvalidLocationError
+from xmodule.modulestore.inheritance import own_metadata
 from xmodule.x_module import ModuleSystem
 from xmodule.error_module import ErrorDescriptor
 from xmodule.errortracker import exc_info_to_str
@@ -712,7 +713,7 @@ def clone_item(request):
     if display_name is not None:
         new_item.metadata['display_name'] = display_name
 
-    get_modulestore(template).update_metadata(new_item.location.url(), new_item.own_metadata)
+    get_modulestore(template).update_metadata(new_item.location.url(), own_metadata(new_item))
 
     if new_item.location.category not in DETACHED_CATEGORIES:
         get_modulestore(parent.location).update_children(parent_location, parent.definition.get('children', []) + [new_item.location.url()])
@@ -1231,7 +1232,7 @@ def initialize_course_tabs(course):
         {"type": "wiki", "name": "Wiki"},
         {"type": "progress", "name": "Progress"}]
 
-    modulestore('direct').update_metadata(course.location.url(), course.own_metadata)   
+    modulestore('direct').update_metadata(course.location.url(), own_metadata(new_course))
 
 @ensure_csrf_cookie
 @login_required

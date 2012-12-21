@@ -51,7 +51,7 @@ def node_metadata(node):
                  'start', 'due', 'graded', 'hide_from_toc',
                  'ispublic', 'xqa_key')
 
-    orig = node.own_metadata
+    orig = own_metadata(node)
     d = {k: orig[k] for k in to_export if k in orig}
     return d
 

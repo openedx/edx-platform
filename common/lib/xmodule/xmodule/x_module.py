@@ -114,43 +114,12 @@ class XModule(HTMLSnippet):
 
         location: Something Location-like that identifies this xmodule
 
-        definition: A dictionary containing 'data' and 'children'. Both are
-        optional
-
-            'data': is JSON-like (string, dictionary, list, bool, or None,
-                optionally nested).
-
-                This defines all of the data necessary for a problem to display
-                that is intrinsic to the problem.  It should not include any
-                data that would vary between two courses using the same problem
-                (due dates, grading policy, randomization, etc.)
-
-            'children': is a list of Location-like values for child modules that
-                this module depends on
-
         descriptor: the XModuleDescriptor that this module is an instance of.
             TODO (vshnayder): remove the definition parameter and location--they
             can come from the descriptor.
 
-        instance_state: A string of serialized json that contains the state of
-                this module for current student accessing the system, or None if
-                no state has been saved
-
-        shared_state: A string of serialized json that contains the state that
-            is shared between this module and any modules of the same type with
-            the same shared_state_key. This state is only shared per-student,
-            not across different students
-
-        kwargs: Optional arguments. Subclasses should always accept kwargs and
-            pass them to the parent class constructor.
-
-            Current known uses of kwargs:
-
-                metadata: SCAFFOLDING - This dictionary will be split into
-                    several different types of metadata in the future (course
-                    policy, modification history, etc).  A dictionary containing
-                    data that specifies information that is particular to a
-                    problem in the context of a course
+        model_data: A dictionary-like object that maps field names to values
+            for those fields.
         '''
         self.system = system
         self.location = Location(location)
@@ -357,31 +326,10 @@ class XModuleDescriptor(Plugin, HTMLSnippet, ResourceTemplates):
 
         system: A DescriptorSystem for interacting with external resources
 
-        definition: A dict containing `data` and `children` representing the
-        problem definition
+        location: Something Location-like that identifies this xmodule
 
-        Current arguments passed in kwargs:
-
-            location: A xmodule.modulestore.Location object indicating the name
-                and ownership of this problem
-
-            shared_state_key: The key to use for sharing StudentModules with
-                other modules of this type
-
-            metadata: A dictionary containing the following optional keys:
-                goals: A list of strings of learning goals associated with this
-                    module
-                url_name: The name to use for this module in urls and other places
-                    where a unique name is needed.
-                format: The format of this module ('Homework', 'Lab', etc)
-                graded (bool): Whether this module is should be graded or not
-                start (string): The date for which this module will be available
-                due (string): The due date for this module
-                graceperiod (string): The amount of grace period to allow when
-                    enforcing the due date
-                showanswer (string): When to show answers for this module
-                rerandomize (string): When to generate a newly randomized
-                    instance of the module data
+        model_data: A dictionary-like object that maps field names to values
+            for those fields.
         """
         self.system = system
         self.location = Location(location)
@@ -390,7 +338,6 @@ class XModuleDescriptor(Plugin, HTMLSnippet, ResourceTemplates):
         self._model_data = model_data
 
         self._child_instances = None
-        self._inherited_metadata = set()
         self._child_instances = None
 
     def get_children(self):

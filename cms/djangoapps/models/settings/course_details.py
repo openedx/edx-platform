@@ -1,6 +1,7 @@
 from xmodule.modulestore.django import modulestore
 from xmodule.modulestore import Location
 from xmodule.modulestore.exceptions import ItemNotFoundError
+from xmodule.modulestore.inheritance import own_metadata
 import json
 from json.encoder import JSONEncoder
 import time
@@ -117,7 +118,7 @@ class CourseDetails:
             descriptor.enrollment_end = converted
             
         if dirty:
-            get_modulestore(course_location).update_metadata(course_location, descriptor.metadata)
+            get_modulestore(course_location).update_metadata(course_location, own_metadata(descriptor))
             
         # NOTE: below auto writes to the db w/o verifying that any of the fields actually changed
         # to make faster, could compare against db or could have client send over a list of which fields changed.
