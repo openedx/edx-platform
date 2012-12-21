@@ -59,21 +59,25 @@ class DbModel(MutableMapping):
 
     def _key(self, name):
         field = self._getfield(name)
-        module = field.scope.module
-
-        if module == ModuleScope.ALL:
+        if field.scope is None:
             module_id = None
-        elif module == ModuleScope.USAGE:
-            module_id = self._usage.id
-        elif module == ModuleScope.DEFINITION:
-            module_id = self._usage.def_id
-        elif module == ModuleScope.TYPE:
-            module_id = self._module_cls.__name__
-
-        if field.scope.student:
-            student_id = self._student_id
-        else:
             student_id = None
+        else:
+            module = field.scope.module
+
+            if module == ModuleScope.ALL:
+                module_id = None
+            elif module == ModuleScope.USAGE:
+                module_id = self._usage.id
+            elif module == ModuleScope.DEFINITION:
+                module_id = self._usage.def_id
+            elif module == ModuleScope.TYPE:
+                module_id = self._module_cls.__name__
+
+            if field.scope.student:
+                student_id = self._student_id
+            else:
+                student_id = None
 
         key = KeyValueStore.Key(
             scope=field.scope,
