@@ -251,11 +251,12 @@ def _sort_courses_and_mark_new(courses):
     for course in courses:
         days_to_start = _get_course_days_to_start(course)
 
-        # Add values as attributes, so they can be used in templates
-        setattr(course, '_days_to_start', days_to_start)
-        setattr(course, 'is_new', days_to_start > 1)
+        metadata = course.metadata
+        metadata['days_to_start'] = days_to_start
+        metadata['is_new'] = course.metadata.get('is_new', days_to_start > 1)
 
-    courses = sorted(courses, key=lambda d: d._days_to_start, reverse=True)
+    key = lambda c: c.metadata['days_to_start']
+    courses = sorted(courses, key=key, reverse=True)
 
     return courses
 
