@@ -193,6 +193,8 @@ TEST_TASK_DIRS = []
         run_tests(system, report_dir, args.stop_on_failure)
     end
 
+    task :fasttest => "fasttest_#{system}"
+
     TEST_TASK_DIRS << system
 
     desc <<-desc
