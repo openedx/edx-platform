@@ -40,3 +40,6 @@ class LmsNamespace(Namespace):
     xqa_key = String(help="DO NOT USE", scope=Scope.settings)
     ispublic = Boolean(help="Whether this course is open to the public, or only to admins", scope=Scope.settings)
     graceperiod = Timedelta(help="Amount of time after the due date that submissions will be accepted", scope=Scope.settings)
+    showanswer = String(help="When to show the problem answer to the student", scope=Scope.settings, default="closed")
+    rerandomize = String(help="When to rerandomize the problem", default="always", scope=Scope.settings)
+

@@ -12,6 +12,7 @@ from xmodule.errortracker import make_error_tracker
 from xmodule.modulestore import Location
 from xmodule.modulestore.xml import ImportSystem, XMLModuleStore
 from xmodule.modulestore.exceptions import ItemNotFoundError
+from xmodule.modulestore.inheritance import compute_inherited_metadata
 
 from .test_export import DATA_DIR
 
@@ -134,6 +135,7 @@ class ImportTestCase(unittest.TestCase):
             </chapter>
         </course>'''.format(due=v, org=ORG, course=COURSE, url_name=url_name)
         descriptor = system.process_xml(start_xml)
+        compute_inherited_metadata(descriptor)
 
         print descriptor, descriptor._model_data
         self.assertEqual(descriptor.lms.due, v)

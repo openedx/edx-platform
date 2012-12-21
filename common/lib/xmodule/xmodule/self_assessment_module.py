@@ -73,8 +73,8 @@ class SelfAssessmentModule(XModule):
     max_attempts = Int(scope=Scope.settings, default=MAX_ATTEMPTS)
     rubric = String(scope=Scope.content)
     prompt = String(scope=Scope.content)
-    submit_message = String(scope=Scope.content)
-    hint_prompt = String(scope=Scope.content)
+    submitmessage = String(scope=Scope.content)
+    hintprompt = String(scope=Scope.content)
 
     def _allow_reset(self):
         """Can the module be reset?"""
@@ -209,7 +209,7 @@ class SelfAssessmentModule(XModule):
         else:
             hint = ''
 
-        context = {'hint_prompt': self.hint_prompt,
+        context = {'hint_prompt': self.hintprompt,
                    'hint': hint}
 
         if self.state == self.REQUEST_HINT:
@@ -228,7 +228,7 @@ class SelfAssessmentModule(XModule):
         if self.state != self.DONE:
             return ""
 
-        return """<div class="save_message">{0}</div>""".format(self.submit_message)
+        return """<div class="save_message">{0}</div>""".format(self.submitmessage)
 
 
     def save_answer(self, get):
@@ -397,8 +397,8 @@ class SelfAssessmentDescriptor(XmlDescriptor, EditingDescriptor):
     max_attempts = Int(scope=Scope.settings, default=MAX_ATTEMPTS)
     rubric = String(scope=Scope.content)
     prompt = String(scope=Scope.content)
-    submit_message = String(scope=Scope.content)
-    hint_prompt = String(scope=Scope.content)
+    submitmessage = String(scope=Scope.content)
+    hintprompt = String(scope=Scope.content)
 
     @classmethod
     def definition_from_xml(cls, xml_object, system):

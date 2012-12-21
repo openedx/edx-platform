@@ -61,7 +61,7 @@ class CapaModule(XModule):
     max_attempts = StringyInt(help="Maximum number of attempts that a student is allowed", scope=Scope.settings)
     due = String(help="Date that this problem is due by", scope=Scope.settings)
     graceperiod = Timedelta(help="Amount of time after the due date that submissions will be accepted", scope=Scope.settings)
-    show_answer = String(help="When to show the problem answer to the student", scope=Scope.settings, default="closed")
+    showanswer = String(help="When to show the problem answer to the student", scope=Scope.settings, default="closed")
     force_save_button = Boolean(help="Whether to force the save button to appear on the page", scope=Scope.settings, default=False)
     rerandomize = Randomization(help="When to rerandomize the problem", default="always", scope=Scope.settings)
     data = String(help="XML data for the problem", scope=Scope.content)
@@ -359,26 +359,26 @@ class CapaModule(XModule):
     def answer_available(self):
         ''' Is the user allowed to see an answer?
         '''
-        if self.show_answer == '':
+        if self.showanswer == '':
             return False
 
-        if self.show_answer == "never":
+        if self.showanswer == "never":
             return False
 
         # Admins can see the answer, unless the problem explicitly prevents it
         if self.system.user_is_staff:
             return True
 
-        if self.show_answer == 'attempted':
+        if self.showanswer == 'attempted':
             return self.attempts > 0
 
-        if self.show_answer == 'answered':
+        if self.showanswer == 'answered':
             return self.done
 
-        if self.show_answer == 'closed':
+        if self.showanswer == 'closed':
             return self.closed()
 
-        if self.show_answer == 'always':
+        if self.showanswer == 'always':
             return True
 
         return False
@@ -409,7 +409,7 @@ class CapaModule(XModule):
         '''
         event_info = dict()
         event_info['problem_id'] = self.location.url()
-        self.system.track_function('show_answer', event_info)
+        self.system.track_function('showanswer', event_info)
         if not self.answer_available():
             raise NotFoundError('Answer is not available')
         else:

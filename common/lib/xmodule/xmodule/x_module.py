@@ -281,21 +281,15 @@ class XModuleDescriptor(Plugin, HTMLSnippet, ResourceTemplates):
     __metaclass__ = XModuleMetaclass
 
     # Attributes for inspection of the descriptor
-    stores_state = False  # Indicates whether the xmodule state should be
+    
+    # Indicates whether the xmodule state should be
     # stored in a database (independent of shared state)
-    has_score = False  # This indicates whether the xmodule is a problem-type.
+    stores_state = False
+
+    # This indicates whether the xmodule is a problem-type.
     # It should respond to max_score() and grade(). It can be graded or ungraded
     # (like a practice problem).
-
-    # A list of metadata that this module can inherit from its parent module
-    inheritable_metadata = (
-        'graded', 'start', 'due', 'graceperiod', 'showanswer', 'rerandomize',
-        # TODO (ichuang): used for Fall 2012 xqa server access
-        'xqa_key',
-        # TODO: This is used by the XMLModuleStore to provide for locations for
-        # static files, and will need to be removed when that code is removed
-        'data_dir'
-    )
+    has_score = False
 
     # cdodge: this is a list of metadata names which are 'system' metadata
     # and should not be edited by an end-user

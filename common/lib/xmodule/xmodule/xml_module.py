@@ -1,6 +1,7 @@
 from xmodule.x_module import (XModuleDescriptor, policy_key)
 from xmodule.modulestore import Location
 from xmodule.modulestore.inheritance import own_metadata
+from xmodule.model import Object, Scope
 from lxml import etree
 import json
 import copy
@@ -78,6 +79,8 @@ class XmlDescriptor(XModuleDescriptor):
     Mixin class for standardized parsing of from xml
     """
 
+    xml_attributes = Object(help="Map of unhandled xml attributes, used only for storage between import and export", default={}, scope=Scope.settings)
+
     # Extension to append to filename paths
     filename_extension = 'xml'
 
@@ -102,7 +105,9 @@ class XmlDescriptor(XModuleDescriptor):
             'tabs', 'grading_policy', 'is_draft', 'published_by', 'published_date', 
             'discussion_blackouts',
            # VS[compat] -- remove the below attrs once everything is in the CMS
-           'course', 'org', 'url_name', 'filename')
+           'course', 'org', 'url_name', 'filename',
+           # Used for storing xml attributes between import and export, for roundtrips
+           'xml_attributes')
 
     metadata_to_export_to_policy = ('discussion_topics')
 
@@ -319,6 +324,11 @@ class XmlDescriptor(XModuleDescriptor):
         model_data.update(definition)
         model_data['children'] = children
 
+        model_data['xml_attributes'] = {}
+        for key, value in metadata.items():
+            if key not in set(f.name for f in cls.fields + cls.lms.fields):
+                model_data['xml_attributes'][key] = value
+
         return cls(
             system,
             location,
@@ -343,7 +353,7 @@ class XmlDescriptor(XModuleDescriptor):
 
     def export_to_xml(self, resource_fs):
         """
-        Returns an xml string representing this module, and all modules
+        Returns an xml string representign this module, and all modules
         underneath it.  May also write required resources out to resource_fs
 
         Assumes that modules have single parentage (that no module appears twice
@@ -378,6 +388,10 @@ class XmlDescriptor(XModuleDescriptor):
                 val = val_for_xml(attr)
                 #logging.debug('location.category = {0}, attr = {1}'.format(self.location.category, attr))
                 xml_object.set(attr, val)
+
+        for key, value in self.xml_attributes.items():
+            if key not in self.metadata_to_strip:
+                xml_object.set(key, value)
 
         if self.export_to_file():
             # Write the definition to a file

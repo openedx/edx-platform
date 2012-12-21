@@ -1,5 +1,14 @@
 from xmodule.model import Scope
 
+# A list of metadata that this module can inherit from its parent module
+INHERITABLE_METADATA = (
+    'graded', 'start', 'due', 'graceperiod', 'showanswer', 'rerandomize',
+    # TODO (ichuang): used for Fall 2012 xqa server access
+    'xqa_key',
+    # TODO: This is used by the XMLModuleStore to provide for locations for
+    # static files, and will need to be removed when that code is removed
+    'data_dir'
+)
 
 def compute_inherited_metadata(descriptor):
     """Given a descriptor, traverse all of its descendants and do metadata
@@ -24,7 +33,7 @@ def inherit_metadata(descriptor, model_data):
 
     # Set all inheritable metadata from kwargs that are
     # in self.inheritable_metadata and aren't already set in metadata
-    for attr in descriptor.inheritable_metadata:
+    for attr in INHERITABLE_METADATA:
         if attr not in descriptor._model_data and attr in model_data:
             descriptor._inherited_metadata.add(attr)
             descriptor._model_data[attr] = model_data[attr]
