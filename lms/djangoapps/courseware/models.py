@@ -282,16 +282,7 @@ class StudentModuleCache(object):
         descriptor_filter is a function that accepts a descriptor and return wether the StudentModule
             should be cached
         '''
-        keys = []
-        for descriptor in descriptors:
-            if descriptor.stores_state:
-                keys.append(descriptor.location.url())
-
-            shared_state_key = getattr(descriptor, 'shared_state_key', None)
-            if shared_state_key is not None:
-                keys.append(shared_state_key)
-
-        return keys
+        return [descriptor.location.url() for descriptor in descriptors if descriptor.stores_state]
 
     def lookup(self, course_id, module_type, module_state_key):
         '''
