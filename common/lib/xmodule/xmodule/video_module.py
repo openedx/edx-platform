@@ -28,41 +28,13 @@ class VideoModule(XModule):
     css = {'scss': [resource_string(__name__, 'css/video/display.scss')]}
     js_module_name = "Video"
 
-    data = String(help="XML data for the problem", scope=Scope.content)
-    position = Int(help="Current position in the video", scope=Scope.student_state)
+    youtube = String(help="Youtube ids for each speed, in the format <speed>:<id>[,<speed>:<id> ...]", scope=Scope.content)
+    show_captions = String(help="Whether to display captions with this video", scope=Scope.content)
+    source = String(help="External source for this video", scope=Scope.content)
+    track = String(help="Subtitle file", scope=Scope.content)
+    position = Int(help="Current position in the video", scope=Scope.student_state, default=0)
     display_name = String(help="Display name for this module", scope=Scope.settings)
 
-    def __init__(self, *args, **kwargs):
-        XModule.__init__(self, *args, **kwargs)
-
-        xmltree = etree.fromstring(self.data)
-        self.youtube = xmltree.get('youtube')
-        self.position = 0
-        self.show_captions = xmltree.get('show_captions', 'true')
-        self.source = self._get_source(xmltree)
-        self.track = self._get_track(xmltree)
-
-    def _get_source(self, xmltree):
-        # find the first valid source
-        return self._get_first_external(xmltree, 'source')
-        
-    def _get_track(self, xmltree):
-        # find the first valid track
-        return self._get_first_external(xmltree, 'track')
-        
-    def _get_first_external(self, xmltree, tag):
-        """
-        Will return the first valid element
-        of the given tag.
-        'valid' means has a non-empty 'src' attribute
-        """
-        result = None
-        for element in xmltree.findall(tag):
-            src = element.get('src')
-            if src:
-                result = src
-                break
-        return result
 
     def handle_ajax(self, dispatch, get):
         '''
@@ -115,7 +87,50 @@ class VideoModule(XModule):
         })
 
 
+
 class VideoDescriptor(RawDescriptor):
     module_class = VideoModule
     stores_state = True
     template_dir_name = "video"
+
+    youtube = String(help="Youtube ids for each speed, in the format <speed>:<id>[,<speed>:<id> ...]", scope=Scope.content)
+    show_captions = String(help="Whether to display captions with this video", scope=Scope.content)
+    source = String(help="External source for this video", scope=Scope.content)
+    track = String(help="Subtitle file", scope=Scope.content)
+    
+    @classmethod
+    def definition_from_xml(cls, xml_object, system):
+        return {
+            'youtube': xml_object.get('youtube'),
+            'show_captions': xml_object.get('show_captions', 'true'),
+            'source': _get_first_external(xml_object, 'source'),
+            'track': _get_first_external(xml_object, 'track'),
+        }, []
+
+    def definition_to_xml(self, resource_fs):
+        xml_object = etree.Element('video', {
+            'youtube': self.youtube,
+            'show_captions': self.show_captions,
+        })
+
+        if self.source is not None:
+            SubElement(xml_object, 'source', {'src': self.source})
+
+        if self.track is not None:
+            SubElement(xml_object, 'track', {'src': self.track})
+
+        return xml_object
+    
+def _get_first_external(xmltree, tag):
+    """
+    Will return the first valid element
+    of the given tag.
+    'valid' means has a non-empty 'src' attribute
+    """
+    result = None
+    for element in xmltree.findall(tag):
+        src = element.get('src')
+        if src:
+            result = src
+            break
+    return result
