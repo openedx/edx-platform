@@ -511,7 +511,7 @@ class DragAndDropTest(unittest.TestCase):
         height = '12'
         width = '33'
         template = "path to template"
-        images = "path to images"
+        images = "list of pathes to images"
 
         xml_str = """<drag_and_drop id="prob_1_2"
         height="{h}"

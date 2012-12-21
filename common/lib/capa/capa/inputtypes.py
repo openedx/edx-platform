@@ -695,7 +695,7 @@ class VseprInput(InputTypeBase):
     @classmethod
     def get_attributes(cls):
         """
-        Note: height, width are required.
+        Note: height, width, molecules and geometries are required.
         """
         return [Attribute('height'),
                 Attribute('width'),
@@ -781,7 +781,7 @@ class OpenEndedInput(InputTypeBase):
 
     def _extra_context(self):
         """Defined queue_len, add it """
-        return {'queue_len': self.queue_len,}
+        return {'queue_len': self.queue_len, }
 
 registry.register(OpenEndedInput)
 
@@ -794,13 +794,13 @@ class DragAndDropInput(InputTypeBase):
     pick structure and label positions with atoms or electron pairs.
     """
 
-    template = 'drag_and_drop.html'
+    template = 'drag_and_drop_input.html'
     tags = ['drag_and_drop_input']
 
     @classmethod
     def get_attributes(cls):
         """
-        Note: height, width are required.
+        Note: height, width, template and images are required.
         """
         return [Attribute('height'),
                 Attribute('width'),
