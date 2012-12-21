@@ -9,7 +9,7 @@ TODO:
 - check rendering -- e.g. msg should appear in the rendered output.  If possible, test that
   templates are escaping things properly.
 
-  
+
 - test unicode in values, parameters, etc.
 - test various html escapes
 - test funny xml chars -- should never get xml parse error if things are escaped properly.
@@ -501,3 +501,43 @@ class ChemicalEquationTest(unittest.TestCase):
                     }
         self.assertEqual(context, expected)
 
+
+class DragAndDropTest(unittest.TestCase):
+    '''
+    Check that drag and drop inputs work
+    '''
+
+    def test_rendering(self):
+        height = '12'
+        width = '33'
+        template = "path to template"
+        images = "path to images"
+
+        xml_str = """<drag_and_drop id="prob_1_2"
+        height="{h}"
+        width="{w}"
+        template="{t}"
+        images="{i}"
+        />""".format(h=height, w=width, t=template, i=images)
+
+        element = etree.fromstring(xml_str)
+
+        value = 'abc'
+        state = {'value': value,
+                 'status': 'unsubmitted'}
+
+        the_input = lookup_tag('drag_and_drop')(test_system, element, state)
+
+        context = the_input._get_render_context()
+
+        expected = {'id': 'prob_1_2',
+                    'value': value,
+                    'status': 'unsubmitted',
+                    'msg': '',
+                    'width': width,
+                    'height': height,
+                    'template': template,
+                    'images': images,
+                   }
+
+        self.assertEqual(context, expected)

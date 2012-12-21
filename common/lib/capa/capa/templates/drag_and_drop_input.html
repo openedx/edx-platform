@@ -1,6 +1,7 @@
 <section id="inputtype_${id}" class="capa_inputtype" >
     <div class="drag_and_drop_problem" id="drag_and_drop_div_${id}"
-    style="width:${width};height:${height}"></div>
+    style="width:${width};height:${height}"
+    data-template="${template}" data-images="${images}"></div>
 
     <div class="script_placeholder" data-src="/static/js/raphael.js"></div>
 
@@ -15,7 +16,8 @@
     % endif
 
 
-    <input type="text" name="input_${id}" id="input_${id}" value="${value|h}" style="display:none;"/>
+    <input type="text" name="input_${id}" id="input_${id}" value="${value|h}"
+    style="display:none;"/>
 
     <p class="status">
         % if status == 'unsubmitted':

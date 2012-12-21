@@ -13,6 +13,9 @@ Module containing the problem elements which render into input objects
 - imageinput  (for clickable image)
 - optioninput (for option list)
 - filesubmission (upload a file)
+- crystallography
+- vsepr_input
+- drag_and_drop
 
 These are matched by *.html files templates/*.html which are mako templates with the
 actual html.
@@ -782,4 +785,29 @@ class OpenEndedInput(InputTypeBase):
 
 registry.register(OpenEndedInput)
 
-#-----------------------------------------------------------------------------
+# -------------------------------------------------------------------------
+
+
+class DragAndDropInput(InputTypeBase):
+    """
+    Input for molecular geometry--show possible structures, let student
+    pick structure and label positions with atoms or electron pairs.
+    """
+
+    template = 'drag_and_drop.html'
+    tags = ['drag_and_drop_input']
+
+    @classmethod
+    def get_attributes(cls):
+        """
+        Note: height, width are required.
+        """
+        return [Attribute('height'),
+                Attribute('width'),
+                Attribute('template'),
+                Attribute('images'),
+                ]
+
+registry.register(DragAndDropInput)
+
+#--------------------------------------------------------------------------------------------------------------------
