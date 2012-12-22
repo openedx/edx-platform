@@ -361,7 +361,7 @@ class XmlDescriptor(XModuleDescriptor):
             # don't want e.g. data_dir
             if attr not in self.metadata_to_strip:
                 val = val_for_xml(attr)
-                xml_object.set(attr, val)
+                xml_object.set(attr, str(val))
 
         if self.export_to_file():
             # Write the definition to a file
