@@ -6,26 +6,33 @@
 
 define(
     ['logme', 'state', 'config_parser', 'target', 'draggables'],
-    function (logme, State, configParser, Target, raggables) {
+    function (logme, State, configParser, Target, Draggables) {
     return Main;
 
     function Main() {
-        $('.drag_and_drop_problem').each(processProblem);
+        $('.drag_and_drop_problem_div').each(processProblem);
     }
 
     // $(value) - get the element of the entire problem
     function processProblem(index, value) {
-        var problemId, config, state;
+        var problemId, imageDir, config, state;
 
         problemId = $(value).attr('data-plain-id');
         if (typeof problemId !== 'string') {
-            logme('ERROR: Could not find a problem DOM element ID.');
+            logme('ERROR: Could not find the ID of the problem DOM element.');
+
+            return;
+        }
+
+        imageDir = $(value).attr('data-plain-id');
+        if (typeof imageDir !== 'string') {
+            logme('ERROR: Could not find the name of the image directory.');
 
             return;
         }
 
         try {
-            config = JSON.parse($(value).html());
+            config = JSON.parse($('#drag_and_drop_json_' + problemId).html());
         } catch (err) {
             logme('ERROR: Could not parse the JSON configuration options.');
             logme('Error message: "' + err.message + '".');
@@ -35,9 +42,13 @@ define(
 
         state = State(problemId);
 
-        configParser(config, state);
+        if (configParser(config, imageDir, state) !== true) {
+            logme('ERROR: Could not make sense of the JSON configuration options.');
 
-        // Container(state);
+            return;
+        }
+
+        Container(state);
         Target(state);
         // Scroller(state);
         Draggables(state);

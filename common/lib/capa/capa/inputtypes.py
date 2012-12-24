@@ -822,7 +822,7 @@ class DragAndDropInput(InputTypeBase):
                 try:
                     dic[attr_name] = Attribute(attr_name).parse_from_xml(x)
                 except ValueError:
-                    dic[attr_name] = None
+                    dic[attr_name] = ""
             dic['name'] = dic['name'] or slugify(dic['label'])
             dic['label'] = dic['label'] or dic['name']
 

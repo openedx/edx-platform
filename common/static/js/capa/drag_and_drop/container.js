@@ -4,28 +4,11 @@
 // See https://edx-wiki.atlassian.net/wiki/display/LMS/Integration+of+Require+JS+into+the+system
 (function (requirejs, require, define) {
 
-define([], function () {
-    var debugMode;
+define(['logme'], function (logme) {
+    return Container;
 
-    debugMode = true;
+    function Container(state) {
 
-    return logme;
-
-    function logme() {
-        var i;
-
-        if (
-            (debugMode !== true) ||
-            (typeof window.console === 'undefined')
-        ) {
-            return;
-        }
-
-        i = 0;
-        while (i < arguments.length) {
-            window.console.log(arguments[i]);
-            i += 1;
-        }
     }
 });
 
