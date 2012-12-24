@@ -4,20 +4,12 @@
 // See https://edx-wiki.atlassian.net/wiki/display/LMS/Integration+of+Require+JS+into+the+system
 (function (requirejs, require, define) {
 
-requirejs.config({
-    'baseUrl': '/static/js/capa/drag_and_drop/',
+define([], function () {
+    return Main;
 
-    'paths': {
-
-    },
-
-    'shim': {
-
+    function Main() {
+        alert('This is a drag-and-drop demo.');
     }
-});
-
-requirejs(['main'], function (Main) {
-    Main();
 });
 
 // End of wrapper for RequireJS. As you can see, we are passing
