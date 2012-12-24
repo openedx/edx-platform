@@ -349,7 +349,6 @@ class ImportTestCase(unittest.TestCase):
 
         sa_id = "edX/sa_test/2012_Fall"
         location = Location(["i4x", "edX", "sa_test", "selfassessment", "SampleQuestion"])
-        # import ipdb; ipdb.set_trace()
         sa_sample = modulestore.get_instance(sa_id, location)
         #10 attempts is hard coded into SampleQuestion, which is the url_name of a selfassessment xml tag
         self.assertEqual(sa_sample.metadata['attempts'], '10')
