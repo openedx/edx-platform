@@ -65,8 +65,8 @@ class GraphicalSliderToolModule(XModule):
                   'element_class': self.html_class,
                   'configuration_json': self.configuration_json
                   }
-        self.content = (self.system.render_template(
-                        'graphical_slider_tool.html', params))
+        self.content = self.system.render_template(
+                        'graphical_slider_tool.html', params)
         return self.content
 
     def substitute_controls(self, html_string):
