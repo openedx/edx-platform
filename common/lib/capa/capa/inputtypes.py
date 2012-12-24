@@ -45,6 +45,7 @@ import re
 import shlex  # for splitting quoted strings
 import sys
 import os
+import unidecode
 
 from registry import TagRegistry
 
@@ -798,29 +799,44 @@ class DragAndDropInput(InputTypeBase):
     template = 'drag_and_drop_input.html'
     tags = ['drag_and_drop_input']
 
-    @classmethod
-    def get_attributes(cls):
-        """
-        Note: height, width, images_directory_path are required.
-        """
-        # import ipdb; ipdb.set_trace()
-        return [Attribute('height'),
-                Attribute('width'),
-                Attribute('images_directory_path'),
-                ]
-
     def setup(self):
-        # import ipdb; ipdb.set_trace()
-        imagepath = self.loaded_attributes['images_directory_path']
-        # import ipdb; ipdb.set_trace()
-        try:
-            images_list = self.system.filestore.listdir(os.path.join('static',
-                                                    'images', imagepath))
-            images_list = ['/static/images/' + img for img in images_list]
-        except:
-            images_list = []
-        self.loaded_attributes['images_list'] = images_list
-        self.to_render.add('images_list')
+
+        def slugify(s):
+            """Makes slug from string"""
+            s = unidecode.unidecode(s).lower()
+            return re.sub(r'\W+', '-', s)
+
+        def parse(x):
+            """Parses <draggable/> xml element to dictionary.
+
+                Args:
+                    xml etree element <draggable...> with optional
+                    name or label or icon attributes. At least one
+                    attribute must be presented.
+
+                Returns:
+                    dict{'name': smth, 'label': smth, 'icon': smth}.
+            """
+            dic = dict()
+            for attr_name in ('name', 'label', 'icon'):
+                try:
+                    dic[attr_name] = Attribute(attr_name).parse_from_xml(x)
+                except ValueError:
+                    dic[attr_name] = None
+            dic['name'] = dic['name'] or slugify(dic['label'])
+            dic['label'] = dic['label'] or dic['name']
+
+            return dic
+
+        to_js = dict()
+        to_js['target'] = Attribute('img').parse_from_xml(self.xml)
+        to_js['draggable'] = [parse(draggable) for draggable in
+                                                    self.xml.getchildren()]
+
+        self.loaded_attributes['drag_and_drop_json'] = json.dumps(to_js)
+        self.to_render.add('drag_and_drop_json')
+        self.loaded_attributes['course_folder'] = self.system.course_id.split('/')[1]
+        self.to_render.add('course_folder')
 
 registry.register(DragAndDropInput)
 
