@@ -83,8 +83,7 @@ class CapaModule(XModule):
                      resource_string(__name__, 'js/src/javascript_loader.coffee'),
                     ],
           'js': [resource_string(__name__, 'js/src/capa/imageinput.js'),
-                 resource_string(__name__, 'js/src/capa/schematic.js'),
-                 resource_string(__name__, 'js/src/capa/drag_and_drop.js')
+                 resource_string(__name__, 'js/src/capa/schematic.js')
                  ]}
 
     js_module_name = "Problem"
