@@ -4,11 +4,45 @@
 // See https://edx-wiki.atlassian.net/wiki/display/LMS/Integration+of+Require+JS+into+the+system
 (function (requirejs, require, define) {
 
-define([], function () {
+define(
+    ['logme', 'state', 'config_parser', 'target', 'draggables'],
+    function (logme, State, configParser, Target, raggables) {
     return Main;
 
     function Main() {
-        alert('This is a drag-and-drop demo.');
+        $('.drag_and_drop_problem').each(processProblem);
+    }
+
+    // $(value) - get the element of the entire problem
+    function processProblem(index, value) {
+        var problemId, config, state;
+
+        problemId = $(value).attr('data-plain-id');
+        if (typeof problemId !== 'string') {
+            logme('ERROR: Could not find a problem DOM element ID.');
+
+            return;
+        }
+
+        try {
+            config = JSON.parse($(value).html());
+        } catch (err) {
+            logme('ERROR: Could not parse the JSON configuration options.');
+            logme('Error message: "' + err.message + '".');
+
+            return;
+        }
+
+        state = State(problemId);
+
+        configParser(config, state);
+
+        // Container(state);
+        Target(state);
+        // Scroller(state);
+        Draggables(state);
+
+        logme(state);
     }
 });
 
