@@ -16,7 +16,7 @@ from xmodule.stringify import stringify_children
 from pkg_resources import resource_string
 
 
-log = logging.getLogger("mitx.common.lib.gst_module")
+log = logging.getLogger(__name__)
 
 
 class GraphicalSliderToolModule(XModule):
