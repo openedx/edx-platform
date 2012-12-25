@@ -801,37 +801,56 @@ class DragAndDropInput(InputTypeBase):
 
     def setup(self):
 
-        def slugify(s):
-            """Makes slug from string"""
-            s = unidecode.unidecode(s).lower()
-            return re.sub(r'\W+', '-', s)
-
-        def parse(x):
-            """Parses <draggable/> xml element to dictionary.
+        def parse(tag, tag_type):
+            """Parses <tag ... /> xml element to dictionary.
 
                 Args:
-                    xml etree element <draggable...> with optional
-                    name or label or icon attributes. At least one
-                    attribute must be presented.
+                    tag: xml etree element <tag...> with attributes
+
+                    tag_type: type of tag: 'draggable' or 'target'.
+
+                    If tag_type is 'draggable' : all attributes (name or label or
+                    icon) are optional, but at least one attribute must be
+                    presented.
+
+                    If tag_type is 'target' all attributes (name, x, y, w, h)
+                    are requred. (x, y) - coordinates of center of target,
+                    w, h - weight and height of target.
 
                 Returns:
+                    Dictionary of vaues of attributes:
                     dict{'name': smth, 'label': smth, 'icon': smth}.
             """
+            tag_attrs = dict()
+            tag_attrs['draggable'] = {'id': Attribute._sentinel,
+                                      'label': "", 'icon': ""}
+            tag_attrs['target'] = {'id': Attribute._sentinel,
+                                    'x': Attribute._sentinel,
+                                    'y': Attribute._sentinel,
+                                    'w': Attribute._sentinel,
+                                    'h': Attribute._sentinel}
+
             dic = dict()
-            for attr_name in ('name', 'label', 'icon'):
-                try:
-                    dic[attr_name] = Attribute(attr_name).parse_from_xml(x)
-                except ValueError:
-                    dic[attr_name] = ""
-            dic['name'] = dic['name'] or slugify(dic['label'])
-            dic['label'] = dic['label'] or dic['name']
+
+            for attr_name in tag_attrs[tag_type].keys():
+                dic[attr_name] = Attribute(attr_name,
+                    default=tag_attrs[tag_type][attr_name]).parse_from_xml(tag)
+
+            if tag_type == 'draggable':
+                dic['label'] = dic['label'] or dic['id']
 
             return dic
 
         to_js = dict()
-        to_js['target'] = Attribute('img').parse_from_xml(self.xml)
-        to_js['draggable'] = [parse(draggable) for draggable in
-                                                    self.xml.getchildren()]
+        to_js['target_container'] = Attribute('img').parse_from_xml(self.xml)
+        to_js['target_outline'] = Attribute('target_outline',
+                                        default="False").parse_from_xml(self.xml)
+        to_js['one_per_garget'] = Attribute('one_per_target',
+                                        default="True").parse_from_xml(self.xml)
+        to_js['draggable'] = [parse(draggable, 'draggable') for draggable in
+                                                self.xml.iterchildren('draggable')]
+        to_js['targets'] = [parse(target, 'target') for target in
+                                                self.xml.iterchildren('target')]
 
         self.loaded_attributes['drag_and_drop_json'] = json.dumps(to_js)
         self.to_render.add('drag_and_drop_json')
