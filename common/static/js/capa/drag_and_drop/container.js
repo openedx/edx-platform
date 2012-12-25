@@ -12,7 +12,7 @@ define(['logme'], function (logme) {
             '<div ' +
                 'style=" ' +
                     'border: 1px solid black; ' +
-                    'overflow: hidden; ' +
+                    // 'overflow: hidden; ' +
                     'clear: both; ' +
                 '" ' +
             '></div>'

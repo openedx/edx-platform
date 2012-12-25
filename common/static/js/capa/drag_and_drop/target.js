@@ -48,6 +48,8 @@ define(['logme'], function (logme) {
         mouseMoveDiv.appendTo(targetElContainer);
 
         targetElContainer.appendTo(state.containerEl);
+
+        state.targetElOffset = state.targetEl.offset();
     }
 });
 

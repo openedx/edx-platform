@@ -37,7 +37,7 @@ define(['logme'], function (logme) {
         moveLeftEl.appendTo(parentEl);
 
         moveLeftEl.click(function () {
-            state.showElLeftMargin -= 100;
+            state.showElLeftMargin += 100;
             state.sliderEl.animate({
                 'margin-left': state.showElLeftMargin + 'px'
             });
@@ -82,7 +82,7 @@ define(['logme'], function (logme) {
         moveRightEl.appendTo(parentEl);
 
         moveRightEl.click(function () {
-            state.showElLeftMargin += 100;
+            state.showElLeftMargin -= 100;
             state.sliderEl.animate({
                 'margin-left': state.showElLeftMargin + 'px'
             });
