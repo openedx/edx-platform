@@ -81,11 +81,11 @@ def export_course(request, org, course, name):
     log.debug('action=%s' % action)
 
     if request.method == 'POST' and action=='Set Git Repository Info':
-        git_repo = request.POST['git_repo']
-        git_branch = request.POST['git_branch']
+        git_repo = request.POST['git_repo'].replace(';','_').replace('\n','')
+        git_branch = request.POST['git_branch'].replace(';','_').replace('\n','')
         exportinfo['git_repo'] = git_repo
         exportinfo['git_branch'] = git_branch
-        log.debug('set export info')
+        log.debug('set export info (%s, %s)' % (git_repo, git_branch))
 
         m = re.search('/([^/]+)\.git$',git_repo)	# get local_dir from git_repo
         if m:
