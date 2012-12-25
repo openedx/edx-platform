@@ -5,8 +5,8 @@
 (function (requirejs, require, define) {
 
 define(
-    ['logme', 'state', 'config_parser', 'container', 'target', 'scroller', 'draggables'],
-    function (logme, State, configParser, Container, Target, Scroller, Draggables) {
+    ['logme', 'state', 'config_parser', 'container', 'target_container', 'scroller', 'draggables', 'targets'],
+    function (logme, State, configParser, Container, TargetContainer, Scroller, Draggables, Targets) {
     return Main;
 
     function Main() {
@@ -57,9 +57,10 @@ define(
         }
 
         Container(state);
-        Target(state);
+        TargetContainer(state);
         Scroller(state);
         Draggables(state);
+        Targets(state);
 
         logme('config', config);
         logme('state', state);

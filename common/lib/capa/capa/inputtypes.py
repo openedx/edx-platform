@@ -845,7 +845,7 @@ class DragAndDropInput(InputTypeBase):
         to_js['target_container'] = Attribute('img').parse_from_xml(self.xml)
         to_js['target_outline'] = Attribute('target_outline',
                                         default="False").parse_from_xml(self.xml)
-        to_js['one_per_garget'] = Attribute('one_per_target',
+        to_js['one_per_target'] = Attribute('one_per_target',
                                         default="True").parse_from_xml(self.xml)
         to_js['draggable'] = [parse(draggable, 'draggable') for draggable in
                                                 self.xml.iterchildren('draggable')]

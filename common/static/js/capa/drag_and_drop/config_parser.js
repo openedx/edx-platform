@@ -15,7 +15,8 @@ define(['logme'], function (logme) {
         state.config = {
             'imageDir': '/static/' + imageDir + '/images',
             'draggable': [],
-            'target': ''
+            'targets': [],
+            'target_container': ''
         };
 
         if ($.isArray(config.draggable) === true) {
@@ -39,30 +40,108 @@ define(['logme'], function (logme) {
         if (typeof config.target_container === 'string') {
             state.config.target_container = config.target_container;
         } else {
-            logme('ERROR: Property config.target is not of type "string".');
+            logme('ERROR: Property config.target_container is not of type "string".');
+            returnStatus = false;
+        }
+
+        if ($.isArray(config.targets) === true) {
+            (function (i) {
+                while (i < config.targets.length) {
+                    if (processTarget(config.targets[i]) !== true) {
+                        returnStatus = false;
+                    }
+                    i += 1;
+                }
+            }(0));
+        } else if ($.isPlainObject(config.targets) === true) {
+            if (processTarget(config.targets) !== true) {
+                returnStatus = false;
+            }
+        } else if (typeof config.targets !== 'undefined') {
+            logme('ERROR: Property config.targets is not of a supported type.');
+            returnStatus = false;
+        }
+
+        if (typeof config.one_per_target === 'string') {
+            if (config.one_per_target.toLowerCase() === 'true') {
+                state.config.one_per_target = true;
+            } else if (config.one_per_target.toLowerCase() === 'false') {
+                state.config.one_per_target = false;
+            } else {
+                logme('ERROR: Property config.one_per_target can either be "true", or "false".');
+                returnStatus = false;
+            }
+        } else if (typeof config.one_per_target !== 'undefined') {
+            logme('ERROR: Property config.one_per_target is not of a supported type.');
+            returnStatus = false;
+        }
+
+        if (typeof config.target_outline === 'string') {
+            if (config.target_outline.toLowerCase() === 'true') {
+                state.config.target_outline = true;
+            } else if (config.target_outline.toLowerCase() === 'false') {
+                state.config.target_outline = false;
+            } else {
+                logme('ERROR: Property config.target_outline can either be "true", or "false".');
+                returnStatus = false;
+            }
+        } else if (typeof config.target_outline !== 'undefined') {
+            logme('ERROR: Property config.target_outline is not of a supported type.');
             returnStatus = false;
         }
 
         return true;
 
         function processDraggable(obj) {
-            if (typeof obj.icon !== 'string') {
-                logme('ERROR: Attribute "obj.icon" is not a string.');
+            if (!attrIsString(obj, 'id')) { return false; }
 
-                return false;
-            } else if (typeof obj.label !== 'string') {
-                logme('ERROR: Attribute "obj.label" is not a string.');
-
-                return false;
-            } else if (typeof obj.id !== 'string') {
-                logme('ERROR: Attribute "obj.id" is not a string.');
-
-                return false;
-            }
+            if (!attrIsString(obj, 'icon')) { return false; }
+            if (!attrIsString(obj, 'label')) { return false; }
 
             state.config.draggable.push(obj);
 
             true;
+        }
+
+        function processTarget(obj) {
+            if (!attrIsString(obj, 'id')) { return false; }
+
+            if (!attrIsInteger(obj, 'w')) { return false; }
+            if (!attrIsInteger(obj, 'h')) { return false; }
+
+            if (!attrIsInteger(obj, 'x')) { return false; }
+            if (!attrIsInteger(obj, 'y')) { return false; }
+
+            state.config.targets.push(obj);
+
+            true;
+
+        }
+
+        function attrIsString(obj, attr) {
+            if (typeof obj[attr] !== 'string') {
+                logme('ERROR: Attribute "obj.' + attr + '" is not a string.');
+
+                return false;
+            }
+
+            return true;
+        }
+
+        function attrIsInteger(obj, attr) {
+            var tempInt;
+
+            tempInt = parseInt(obj[attr], 10);
+
+            if (isFinite(tempInt) === false) {
+                logme('ERROR: Attribute "obj.' + attr + '" is not an integer.');
+
+                return false;
+            }
+
+            obj[attr] = tempInt;
+
+            return true;
         }
     }
 });
