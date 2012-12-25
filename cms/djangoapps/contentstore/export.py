@@ -137,9 +137,11 @@ def export_course(request, org, course, name):
             msg = "import from studio %s by %s" % (datetime.now(),request.user)
             cmd = '('
             cmd += 'cd %s' % course_dir
-            cmd += '; git add .' 
+            cmd += '; git checkout master'		# start with master
+            cmd += '; git checkout -b %s' % git_branch	# may fail, that is ok
+            cmd += '; git add .'
             cmd += '; git commit -a -m "%s"' % msg
-            cmd += '; hub push origin %s' % git_branch
+            cmd += '; git push -u origin %s' % git_branch
             cmd += '; sleep 2'	# wait for github to update
             cmd += '; hub pull-request "%s" -b master' % msg
             cmd += ') 2>&1'
