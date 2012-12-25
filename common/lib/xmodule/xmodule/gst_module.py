@@ -8,7 +8,6 @@ import logging
 from lxml import etree
 from lxml import html
 import xmltodict
-import re
 
 from xmodule.mako_module import MakoModuleDescriptor
 from xmodule.xml_module import XmlDescriptor
@@ -71,17 +70,19 @@ class GraphicalSliderToolModule(XModule):
         return self.content
 
     def substitute_controls(self, html_string):
-        """ Substitutes control elements via their divs.
-        TODO: change regexps to html parsing via beautiful soup  or something
-        similar (aim : simpler support).
+        """ Substitutes control elements (slider, textbox and plot) in
+        html_string with their divs. Html_string is content of <render> tag
+        inside <graphical_slider_tool> tag. Documentation on how information in
+        <render> tag is organized and processed is located in:
+        mitx/docs/build/html/graphical_slider_tool.html.
 
         Args:
-            html_string: rendered html string with controls as xml tags
-            (<slider var="a"/>)
+            html_string: content of <render> tag, with controls as xml tags,
+                         e.g. <slider var="a"/>.
 
         Returns:
-            html_string with control tags replaced by proper divs
-            (<slider var="a"/> -> <div class="....slider" > </div>)
+                html_string with control tags replaced by proper divs
+                (<slider var="a"/> -> <div class="....slider" > </div>)
         """
 
         xml = html.fromstring(html_string)
