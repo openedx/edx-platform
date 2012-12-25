@@ -8,7 +8,17 @@ define(['logme'], function (logme) {
     return Container;
 
     function Container(state) {
+        state.containerEl = $(
+            '<div ' +
+                'style=" ' +
+                    'border: 1px solid black; ' +
+                    'overflow: hidden; ' +
+                    'clear: both; ' +
+                '" ' +
+            '></div>'
+        );
 
+        $('#inputtype_' + state.problemId).before(state.containerEl);
     }
 });
 

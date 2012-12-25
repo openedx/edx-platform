@@ -4,11 +4,50 @@
 // See https://edx-wiki.atlassian.net/wiki/display/LMS/Integration+of+Require+JS+into+the+system
 (function (requirejs, require, define) {
 
-define([], function () {
+define(['logme'], function (logme) {
     return Target;
 
     function Target(state) {
-        state.target = 1;
+        var targetImgSrc, targetElContainer, mouseMoveDiv;
+
+        targetImgSrc = state.config.imageDir + '/' + state.config.target;
+
+        targetElContainer = $(
+            '<div ' +
+                'style=" ' +
+                    'text-align: center; ' +
+                '" ' +
+            '></div>'
+        );
+
+        state.targetEl = $(
+            '<img ' +
+                'src="' + targetImgSrc + '" ' +
+            '/>'
+        );
+        state.targetEl.appendTo(targetElContainer);
+
+        state.targetEl.mousemove(
+            function (event) {
+                mouseMoveDiv.html(
+                    '[' + event.offsetX + ', ' + event.offsetY + ']'
+                );
+            }
+        );
+
+        mouseMoveDiv = $(
+            '<div ' +
+                'style=" ' +
+                    'clear: both; ' +
+                    'width: auto; ' +
+                    'height: 25px; ' +
+                    'text-align: center; ' +
+                '" ' +
+            '>[0, 0]</div>'
+        );
+        mouseMoveDiv.appendTo(targetElContainer);
+
+        targetElContainer.appendTo(state.containerEl);
     }
 });
 

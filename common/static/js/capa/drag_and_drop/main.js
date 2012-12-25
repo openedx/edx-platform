@@ -5,8 +5,8 @@
 (function (requirejs, require, define) {
 
 define(
-    ['logme', 'state', 'config_parser', 'target', 'draggables'],
-    function (logme, State, configParser, Target, Draggables) {
+    ['logme', 'state', 'config_parser', 'container', 'target', 'scroller', 'draggables'],
+    function (logme, State, configParser, Container, Target, Scroller, Draggables) {
     return Main;
 
     function Main() {
@@ -17,6 +17,14 @@ define(
     function processProblem(index, value) {
         var problemId, imageDir, config, state;
 
+        if ($(value).attr('data-problem-processed') === 'true') {
+            // This problem was already processed by us before, so we will
+            // skip it.
+
+            return;
+        }
+        $(value).attr('data-problem-processed', 'true');
+
         problemId = $(value).attr('data-plain-id');
         if (typeof problemId !== 'string') {
             logme('ERROR: Could not find the ID of the problem DOM element.');
@@ -24,7 +32,7 @@ define(
             return;
         }
 
-        imageDir = $(value).attr('data-plain-id');
+        imageDir = $(value).attr('data-course-folder');
         if (typeof imageDir !== 'string') {
             logme('ERROR: Could not find the name of the image directory.');
 
@@ -50,7 +58,7 @@ define(
 
         Container(state);
         Target(state);
-        // Scroller(state);
+        Scroller(state);
         Draggables(state);
 
         logme(state);
