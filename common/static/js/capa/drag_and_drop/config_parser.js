@@ -36,8 +36,8 @@ define(['logme'], function (logme) {
             returnStatus = false;
         }
 
-        if (typeof config.target === 'string') {
-            state.config.target = config.target;
+        if (typeof config.target_container === 'string') {
+            state.config.target_container = config.target_container;
         } else {
             logme('ERROR: Property config.target is not of type "string".');
             returnStatus = false;
@@ -54,8 +54,8 @@ define(['logme'], function (logme) {
                 logme('ERROR: Attribute "obj.label" is not a string.');
 
                 return false;
-            } else if (typeof obj.name !== 'string') {
-                logme('ERROR: Attribute "obj.name" is not a string.');
+            } else if (typeof obj.id !== 'string') {
+                logme('ERROR: Attribute "obj.id" is not a string.');
 
                 return false;
             }

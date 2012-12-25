@@ -10,7 +10,7 @@ define(['logme'], function (logme) {
     function Target(state) {
         var targetImgSrc, targetElContainer, mouseMoveDiv;
 
-        targetImgSrc = state.config.imageDir + '/' + state.config.target;
+        targetImgSrc = state.config.imageDir + '/' + state.config.target_container;
 
         targetElContainer = $(
             '<div ' +
