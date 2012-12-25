@@ -106,7 +106,7 @@ After processing plot tags will be replaced by Flot plot with applied
 HTML tags with id
 .................
 
-Any html tag with id, i.e. ``<span id="answer_span_1">`` will be counted as
+Any html tag with id, e.g. ``<span id="answer_span_1">`` will be counted as
 place where result of function can be rendered. To render function result to
 element, element id must be included in ``function`` tag as ``el_id`` attribute
 and ``output`` value must be ``"element"``::
