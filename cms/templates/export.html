@@ -50,11 +50,43 @@
       </%doc>
     </article>
   </div>
+
+  <div class="inner-wrapper">
+    <article class="export-overview2">
+      <div class="description2">
+        <h2>Please <a href="https://edge.edx.org/courses/edX/edx101/edX_Studio_Reference/about" target="_blank">read the documentation</a> before attempting an export!</h2>
+        <p><strong>The exported course content will be stored in a
+specific branch of a github repository for the course.</strong></p>
+      </div>
+      <form action="${reverse('export_course', kwargs=dict(org=context_course.location.org, course=context_course.location.course, name=context_course.location.name))}" method="post" enctype="multipart/form-data" class="export-form">
+        <h2></h2>
+        <p class="error-block"></p>
+
+       <p>
+        <hr width=50%>
+        <ul>
+          <li>git repository location (ssh): <input type="text" size="60" name="git_repo" value="${git_repo}"></li>
+          <li>branch to use: <input type="text" size="60" name="git_branch" value="${git_branch}"></li>
+	</ul>
+        <input type="submit" name="submit" value="Set Git Repository Info" class="submit-button">
+       </p>
+        <hr width=50%>
+       <p>
+        <input type="submit" name="submit" value="Export Now" class="submit-button">
+	<input type="hidden" name="csrfmiddlewaretoken" value="${ csrf_token }">
+       </p>
+      </form>
+
+      <p><hr width="100%"><pre>${message|h}</pre><hr width="100%"></p>
+
+    </article>
+  </div>
 </div>
 </%block>
 
 <%block name="jsextra">
 <script>
+
 (function() {
     
 var bar = $('.progress-bar');
