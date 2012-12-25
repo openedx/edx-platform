@@ -6,6 +6,7 @@ understand functional dependencies.
 import json
 import logging
 from lxml import etree
+from lxml import html
 import xmltodict
 import re
 
@@ -82,104 +83,49 @@ class GraphicalSliderToolModule(XModule):
             html_string with control tags replaced by proper divs
             (<slider var="a"/> -> <div class="....slider" > </div>)
         """
-        #substitute plot
+
+        xml = html.fromstring(html_string)
+
+        #substitute plot, if presented
         plot_div = '<div class="{element_class}_plot" id="{element_id}_plot" \
                     style="{style}"></div>'
-        # extract css style from plot
-        plot_def = re.search(r'<plot[^<>]*/>', html_string)
-        if plot_def:
-            plot_def = plot_def.group()
-            style = re.search(r'(?=.*style\=[\"\'](.*)[\"\'])', plot_def,
-                flags=re.UNICODE | re.DOTALL)
-            if style:
-                style = style.groups()[0]
-            else:  # no style parameter
-                style = ''
-            replacement = plot_div.format(element_class=self.html_class,
-                                          element_id=self.html_id,
-                                                style=style)
-            html_string = re.sub(r'<plot[^<>]*/>', replacement, html_string,
-                            flags=re.UNICODE)
-
-        # get variables
-        if json.loads(self.configuration_json)['root'].get('parameters'):
-            variables = json.loads(self.configuration_json)['root']['parameters']['param']
-            if type(variables) == dict:
-                variables = [variables]
-            variables = [x['@var'] for x in variables]
-        else:
-            return html_string
+        plot_el = xml.xpath('//plot')
+        if plot_el:
+            plot_el = plot_el[0]
+            plot_el.getparent().replace(plot_el, html.fromstring(
+                                plot_div.format(element_class=self.html_class,
+                                               element_id=self.html_id,
+                                               style=plot_el.get('style', ""))))
 
         #substitute sliders
         slider_div = '<div class="{element_class}_slider" \
                                    id="{element_id}_slider_{var}" \
                                    data-var="{var}" style="{style}">\
                      </div>'
-        for var in variables:
-            # find <slider var='var' ... >
-            instances = re.findall(r'<slider\s+(?=[^<>]*var\=[\"\']' + var + '[\"\'])' \
-                          + r'[^<>]*/>', html_string, flags=re.UNICODE | re.DOTALL)
-            if instances:  # if presented, only one slider per var
-                slider_def = instances[0]  # get <slider var='var' ... > string
-                # extract var for proper style extraction further
-                var_substring = re.search(r'(var\=[\"\']' + var + r'[\"\'])',
-                                          slider_def).group()
-                slider_def = slider_def.replace(var_substring, '')
-                # get style
-                style = re.search(r'(?=[^<>]*style\=[\"\'](.*)[\"\'])', slider_def,
-                    flags=re.UNICODE | re.DOTALL)
-                if style:
-                    style = style.groups()[0]
-                else:  # no style parameter
-                    style = ''
-                # substitute parameters to slider div
-                replacement = slider_div.format(element_class=self.html_class,
+        slider_els = xml.xpath('//slider')
+        for slider_el in slider_els:
+            slider_el.getparent().replace(slider_el, html.fromstring(
+                                slider_div.format(element_class=self.html_class,
                                             element_id=self.html_id,
-                                            var=var, style=style)
-                # subsitute <slider var='var' ... > in html_srting to proper
-                # html div element
-                html_string = re.sub(r'<slider\s+(?=[^<>]*var\=[\"\'](' + \
-                    var + ')[\"\'])' + r'[^<>]*/>',
-                replacement, html_string, flags=re.UNICODE | re.DOTALL)
+                                            var=slider_el.get('var', ""),
+                                            style=slider_el.get('style', ""))))
 
-        # substitute inputs if we have them
-        input_el = '<input class="{element_class}_input" \
+        # substitute inputs aka textboxes
+        input_div = '<input class="{element_class}_input" \
                                   id="{element_id}_input_{var}_{input_index}" \
                                    data-var="{var}" style="{style}" \
                                    data-el_readonly="{readonly}"/>'
+        input_els = xml.xpath('//textbox')
+        for input_index, input_el in enumerate(input_els):
+            input_el.getparent().replace(input_el, html.fromstring(
+                                input_div.format(element_class=self.html_class,
+                                        element_id=self.html_id,
+                                        var=input_el.get('var', ""),
+                                        readonly=input_el.get('readonly', ''),
+                                        style=input_el.get('style', ""),
+                                        input_index=input_index)))
 
-        for var in variables:
-            input_index = 0  # make multiple inputs for same variable have
-                # different id
-            instances = re.findall(r'<textbox\s+(?=[^<>]*var\=[\"\']' + var + '[\"\'])' \
-                          + r'[^<>]*/>', html_string, flags=re.UNICODE | re.DOTALL)
-            for input_def in instances:  # for multiple inputs per var
-                input_index += 1
-                # extract var and readonly before style!
-                var_substring = re.search(r'(var\=[\"\']' + var + r'[\"\'])',
-                                          input_def).group()
-                input_def = input_def.replace(var_substring, '')
-                readonly = re.search(r'(?=[^<>]*(readonly\=[\"\'](\w+)[\"\']))', 
-                    input_def, flags=re.UNICODE | re.DOTALL)
-                if readonly:
-                    input_def = input_def.replace(readonly.groups()[0], '')
-                    readonly = readonly.groups()[1]
-                else:
-                    readonly = ''
-                style = re.search(r'(?=[^<>]*style\=[\"\'](.*)[\"\'])', input_def,
-                    flags=re.UNICODE | re.DOTALL)
-                if style:
-                    style = style.groups()[0]
-                else:
-                    style = ''
-                replacement = input_el.format(element_class=self.html_class,
-                        element_id=self.html_id,
-                        var=var, readonly=readonly, style=style,
-                        input_index=input_index)
-                html_string = re.sub(r'<textbox\s+(?=[^<>]*var\=[\"\'](' + \
-                                     var + ')[\"\'])' + r'[^<>]*/>',
-                replacement, html_string, count=1, flags=re.UNICODE | re.DOTALL)
-        return html_string
+        return html.tostring(xml)
 
     def build_configuration_json(self):
         """Creates json element from xml element (with aim to transfer later
