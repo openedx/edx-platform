@@ -153,8 +153,8 @@ define(['logme'], function (logme) {
 
                 (function (c1) {
                     while (c1 < _draggables.length) {
-                        if (draggableContainerEl.attr('data-old-z-index') < _draggables[c1].css('z-index')) {
-                            _draggables[c1].css('z-index', _draggables[c1].css('z-index') - 1);
+                        if (parseInt(draggableContainerEl.attr('data-old-z-index'), 10) < parseInt(_draggables[c1].css('z-index'), 10)) {
+                            _draggables[c1].css('z-index', parseInt(_draggables[c1].css('z-index'), 10) - 1);
                         }
                         c1 += 1;
                     }
