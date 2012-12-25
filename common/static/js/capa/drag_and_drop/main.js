@@ -61,7 +61,8 @@ define(
         Scroller(state);
         Draggables(state);
 
-        logme(state);
+        logme('config', config);
+        logme('state', state);
     }
 });
 

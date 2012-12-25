@@ -8,6 +8,10 @@ define(['logme'], function (logme) {
     return Draggables;
 
     function Draggables(state) {
+        var _draggables;
+
+        _draggables = [];
+
         (function (i) {
             while (i < state.config.draggable.length) {
                 processDraggable(state.config.draggable[i], i + 1);
@@ -15,9 +19,10 @@ define(['logme'], function (logme) {
             }
         }(0));
 
+        return;
+
         function processDraggable(obj, index) {
-            var draggableContainerEl, imgEl, inContainer,
-                mouseDown;
+            var draggableContainerEl, imgEl, inContainer, ousePressed;
 
             draggableContainerEl = $(
                 '<div ' +
@@ -27,6 +32,7 @@ define(['logme'], function (logme) {
                         'display: inline; ' +
                         'float: left; ' +
                         'overflow: hidden; ' +
+                        'z-index: ' + index + '; ' +
                     '" ' +
                     'data-draggable-position-index="' + index + '" ' +
                     '></div>'
@@ -49,89 +55,114 @@ define(['logme'], function (logme) {
             }
 
             draggableContainerEl.appendTo(state.sliderEl);
+            _draggables.push(draggableContainerEl);
 
             inContainer = true;
-            mouseDown = false;
+            mousePressed = false;
 
-            draggableContainerEl.mousedown(function (event) {
-                if (mouseDown === false) {
+            draggableContainerEl.mousedown(mouseDown);
+            draggableContainerEl.mouseup(mouseUp);
+            draggableContainerEl.mousemove(mouseMove);
+            draggableContainerEl.mouseleave(mouseLeave);
+
+            return;
+
+            function mouseDown(event) {
+                if (mousePressed === false) {
                     if (inContainer === true) {
                         draggableContainerEl.detach();
                         draggableContainerEl.css('position', 'absolute');
-                        draggableContainerEl.css('left', (event.pageX - 50));
-                        draggableContainerEl.css('top', (event.pageY - 50));
+                        draggableContainerEl.css('left', event.pageX - 50);
+                        draggableContainerEl.css('top', event.pageY - 50);
                         draggableContainerEl.appendTo(state.containerEl);
 
                         inContainer = false;
                     }
 
-                    mouseDown = true;
+                    draggableContainerEl.attr('data-old-z-index', draggableContainerEl.css('z-index'));
+                    draggableContainerEl.css('z-index', '1000');
+
+                    mousePressed = true;
                     event.preventDefault();
                 }
-            });
+            }
 
-            draggableContainerEl.mouseup(function (event) {
-                if (mouseDown === true) {
-                    mouseDown = false;
+            function mouseUp(event) {
+                if (mousePressed === true) {
                     checkLandingElement(event);
-                    event.preventDefault();
                 }
-            });
+            }
 
-            draggableContainerEl.mousemove(function (event) {
-                if (mouseDown === true) {
+            function mouseMove(event) {
+                if (mousePressed === true) {
                     draggableContainerEl.css('left', (event.pageX - 50));
                     draggableContainerEl.css('top', (event.pageY - 50));
                     event.preventDefault();
                 }
-            });
+            }
 
-            draggableContainerEl.mouseleave(function (event) {
-                if (mouseDown === true) {
-                    mouseDown = false;
+            function mouseLeave(event) {
+                if (mousePressed === true) {
                     checkLandingElement(event);
-                    event.preventDefault();
                 }
-            });
-
-            return;
+            }
 
             function checkLandingElement(event) {
-                var offsetDE, children;
+                var offsetDE, offsetTE, indexes, DEindex;
+
+                mousePressed = false;
 
                 offsetDE = draggableContainerEl.offset();
+                offsetTE = state.targetEl.offset();
 
                 if (
-                    (offsetDE.left < state.targetEl.offset().left) ||
-                    (offsetDE.left + 100 > state.targetEl.offset().left + state.targetEl.width()) ||
-                    (offsetDE.top < state.targetEl.offset().top) ||
-                    (offsetDE.top + 100 > state.targetEl.offset().top + state.targetEl.height())
+                    (offsetDE.left < offsetTE.left) ||
+                    (offsetDE.left + 100 > offsetTE.left + state.targetEl.width()) ||
+                    (offsetDE.top < offsetTE.top) ||
+                    (offsetDE.top + 100 > offsetTE.top + state.targetEl.height())
                 ) {
                     draggableContainerEl.detach();
                     draggableContainerEl.css('position', 'static');
 
-                    children = state.sliderEl.children();
+                    indexes = [];
+                    DEindex = parseInt(draggableContainerEl.attr('data-draggable-position-index'), 10);
 
-                    if (children.length === 0) {
-                        draggableContainerEl.appendTo(state.sliderEl);
-                    } else {
-                        state.sliderEl.children().each(function (index, value) {
-                            if (inContainer === false) {
-                                if (parseInt($(value).attr('data-draggable-position-index'), 10) + 1 === parseInt(draggableContainerEl.attr('data-draggable-position-index'), 10)) {
-                                    $(value).after(draggableContainerEl);
-                                    inContainer = true;
-                                } else if (parseInt($(value).attr('data-draggable-position-index'), 10) - 1 === parseInt(draggableContainerEl.attr('data-draggable-position-index'), 10)) {
-                                    $(value).before(draggableContainerEl);
-                                    inContainer = true;
-                                }
-                            }
+                    state.sliderEl.children().each(function (index, value) {
+                        indexes.push({
+                            'index': parseInt($(value).attr('data-draggable-position-index'), 10),
+                            'el': $(value)
                         });
-                    }
+                    });
+
+                    (function (c1) {
+                        while (c1 < indexes.length) {
+                            if ((inContainer === false) && (indexes[c1].index > DEindex)) {
+                                indexes[c1].el.before(draggableContainerEl);
+                                inContainer = true;
+                            }
+
+                            c1 += 1;
+                        }
+                    }(0));
 
                     if (inContainer === false) {
                         draggableContainerEl.appendTo(state.sliderEl);
+                        inContainer = true;
                     }
                 }
+
+                (function (c1) {
+                    while (c1 < _draggables.length) {
+                        if (draggableContainerEl.attr('data-old-z-index') < _draggables[c1].css('z-index')) {
+                            _draggables[c1].css('z-index', _draggables[c1].css('z-index') - 1);
+                        }
+                        c1 += 1;
+                    }
+
+                    draggableContainerEl.css('z-index', c1);
+                }(0));
+
+                event.preventDefault();
             }
         }
 
