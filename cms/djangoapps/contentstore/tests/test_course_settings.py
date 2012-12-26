@@ -11,16 +11,18 @@ from cms.djangoapps.models.settings.course_details import CourseDetails,\
 import json
 from util import converters
 import calendar
-from contentstore.settings.course_details import CourseDetailsEncoder
+from util.converters import jsdate_to_time
+from django.utils.timezone import UTC
 
 # YYYY-MM-DDThh:mm:ss.s+/-HH:MM
 class ConvertersTestCase(TestCase):
-    def struct_to_datetime(self, struct_time):
+    @staticmethod
+    def struct_to_datetime(struct_time):
         return datetime.datetime(struct_time.tm_year, struct_time.tm_mon, struct_time.tm_mday, struct_time.tm_hour, struct_time.tm_min, struct_time.tm_sec)
         
     def compare_dates(self, date1, date2, expected_delta):
-        dt1 = self.struct_to_datetime(date1)
-        dt2 = self.struct_to_datetime(date2)
+        dt1 = ConvertersTestCase.struct_to_datetime(date1)
+        dt2 = ConvertersTestCase.struct_to_datetime(date2)
         self.assertEqual(dt1 - dt2, expected_delta, str(date1) + "-" + str(date2) + "!=" + str(expected_delta))
         
     def test_iso_to_struct(self):
@@ -105,7 +107,8 @@ class CourseDetailsTestCase(TestCase):
         ## NOTE: I couldn't figure out how to validly test time setting w/ all the conversions
         jsondetails = CourseDetails.fetch(self.course_location)
         jsondetails.syllabus = "<a href='foo'>bar</a>"
-        self.assertEqual(CourseDetails.update_from_json(json.dumps(jsondetails, encoding=CourseDetailsEncoder)).syllabus,
+        # encode - decode to convert date fields and other data which changes form
+        self.assertEqual(CourseDetails.update_from_json(jsondetails.__dict__).syllabus,
                              jsondetails.syllabus, "After set syllabus")
         jsondetails.overview = "Overview"
         self.assertEqual(CourseDetails.update_from_json(jsondetails.__dict__).overview,
@@ -166,9 +169,9 @@ class CourseDetailsViewTest(TestCase):
 
     def alter_field(self, url, details, field, val):
         setattr(details, field, val)
-#        jsondetails = json.dumps(details, cls=CourseSettingsEncoder)
-        resp = self.client.post(url, details.__dict__) 
-        self.compare_details_with_encoding(json.loads(resp.content), details.__dict__, field + val)
+        # FIXME post is not invoking views.course_settings_updates
+        resp = self.client.post(url, details.__dict__, "application/json") 
+        self.compare_details_with_encoding(json.loads(resp.content), details.__dict__, field + str(val))
         
     def test_update_and_fetch(self):
         details = CourseDetails.fetch(self.course_location)
@@ -183,12 +186,13 @@ class CourseDetailsViewTest(TestCase):
         resp = self.client.get(url)
         self.compare_details_with_encoding(json.loads(resp.content), details.__dict__, "virgin get")
 
-        self.alter_field(url, details, 'start_date', time.time() * 1000)        
-        self.alter_field(url, details, 'start_date', time.time() * 1000 + 60 * 60 * 24)
-        self.alter_field(url, details, 'end_date', time.time() * 1000 + 60 * 60 * 24 * 100)
-        self.alter_field(url, details, 'enrollment_start', time.time() * 1000)
+        utc = UTC()
+        self.alter_field(url, details, 'start_date', datetime.datetime(2012,11,12,1,30, tzinfo=utc))        
+        self.alter_field(url, details, 'start_date', datetime.datetime(2012,11,1,13,30, tzinfo=utc))
+        self.alter_field(url, details, 'end_date', datetime.datetime(2013,2,12,1,30, tzinfo=utc))
+        self.alter_field(url, details, 'enrollment_start', datetime.datetime(2012,10,12,1,30, tzinfo=utc))
 
-        self.alter_field(url, details, 'enrollment_end', time.time() * 1000 + 60 * 60 * 24 * 8)
+        self.alter_field(url, details, 'enrollment_end', datetime.datetime(2012,11,15,1,30, tzinfo=utc))
         self.alter_field(url, details, 'overview', "Overview")
         self.alter_field(url, details, 'intro_video', "intro_video")
         self.alter_field(url, details, 'effort', "effort")
@@ -205,7 +209,12 @@ class CourseDetailsViewTest(TestCase):
     def compare_date_fields(self, details, encoded, context, field):
         if details[field] is not None:
             if field in encoded and encoded[field] is not None:
-                self.assertEqual(encoded[field] / 1000, calendar.timegm(details[field]), "dates not == at " + context)
+                encoded_encoded = jsdate_to_time(encoded[field])
+                details_encoded = jsdate_to_time(details[field])
+                dt1 = ConvertersTestCase.struct_to_datetime(encoded_encoded)
+                dt2 = ConvertersTestCase.struct_to_datetime(details_encoded)
+                expected_delta =  datetime.timedelta(0)
+                self.assertEqual(dt1 - dt2, expected_delta, str(encoded_encoded) + "!=" + str(details_encoded) + " at " + context)
             else:
                 self.fail(field + " missing from encoded but in details at " + context)
         elif field in encoded and encoded[field] is not None:
