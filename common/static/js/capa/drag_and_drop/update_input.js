@@ -16,31 +16,31 @@ define(['logme'], function (logme) {
             for (c1 = 0; c1 < state.draggables.length; c1++) {
                 if (state.draggables[c1].x !== -1) {
                     tempObj = {};
-                    tempObj[state.draggables[c1].id] = {
-                        'x': state.draggables[c1].x,
-                        'y': state.draggables[c1].y
-                    };
+                    tempObj[state.draggables[c1].id] = [
+                        state.draggables[c1].x,
+                        state.draggables[c1].y
+                    ];
 
                     draggables.push(tempObj);
                 }
             }
 
             stateStr = JSON.stringify({
-                'targets': false,
+                'use_targets': false,
                 'draggables': draggables
             });
         } else {
             for (c1 = 0; c1 < state.targets.length; c1++) {
                 for (c2 = 0; c2 < state.targets[c1].draggable.length; c2++) {
                     tempObj = {};
-                    tempObj[state.targets[c1].draggable[c2]] = state.draggables[c1].id;
+                    tempObj[state.targets[c1].draggable[c2]] = state.targets[c1].id;
 
                     draggables.push(tempObj);
                 }
             }
 
             stateStr = JSON.stringify({
-                'targets': true,
+                'use_targets': true,
                 'draggables': draggables
             });
         }
