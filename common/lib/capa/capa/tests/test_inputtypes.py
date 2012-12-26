@@ -513,7 +513,7 @@ class DragAndDropTest(unittest.TestCase):
         template = "path to template"
         images = "list of pathes to images"
 
-        xml_str = """<drag_and_drop id="prob_1_2"
+        xml_str = """<drag_and_drop_input id="prob_1_2"
         height="{h}"
         width="{w}"
         template="{t}"
@@ -526,7 +526,7 @@ class DragAndDropTest(unittest.TestCase):
         state = {'value': value,
                  'status': 'unsubmitted'}
 
-        the_input = lookup_tag('drag_and_drop')(test_system, element, state)
+        the_input = lookup_tag('drag_and_drop_input')(test_system, element, state)
 
         context = the_input._get_render_context()
 
