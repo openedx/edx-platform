@@ -33,7 +33,7 @@ define(['logme', 'update_input'], function (logme, updateInput) {
 
             borderCss = '';
             if (state.config.target_outline === true) {
-                borderCss = 'border: 1px solid black; ';
+                borderCss = 'border: 1px dashed gray; ';
             }
 
             tEl = $(

@@ -13,9 +13,8 @@ define(['logme'], function (logme) {
         parentEl = $(
             '<div ' +
                 'style=" ' +
-                    'width: 95%; ' +
-                    'height: 100px; ' +
-                    'border: 1px solid black; ' +
+                    'width: 100%; ' +
+                    'height: 102px; ' +
                     'margin-left: auto; ' +
                     'margin-right: auto; ' +
                 '" ' +
@@ -26,27 +25,74 @@ define(['logme'], function (logme) {
             '<div ' +
                 'style=" ' +
                     'width: 6%; ' +
-                    'height: 100px; ' +
+                    'height: 102px; ' +
                     'display: inline; ' +
                     'float: left; ' +
-                    'background: url(\'/static/images/arrow-left.png\') center center no-repeat; ' +
                 '" ' +
-            '></div>'
+            '>' +
+                '<div ' +
+                    'style=" ' +
+                        'width: 80%; ' +
+                        'height: 50px; '+
+                        'margin-left: auto; ' +
+                        'margin-right: auto; ' +
+                        'margin-top: 26px; ' +
+
+                        'border: 1px solid #CCC; ' +
+                        'background-color: #EEE; ' +
+                        'background-image: -webkit-linear-gradient(top, #EEE, #DDD); ' +
+                        'background-image: -moz-linear-gradient(top, #EEE, #DDD); ' +
+                        'background-image: -ms-linear-gradient(top, #EEE, #DDD); ' +
+                        'background-image: -o-linear-gradient(top, #EEE, #DDD); ' +
+                        'background-image: linear-gradient(top, #EEE, #DDD); ' +
+                        '-webkit-box-shadow: 0 1px 0 rgba(255, 255, 255, 0.7) inset; ' +
+                        'box-shadow: 0 1px 0 rgba(255, 255, 255, 0.7) inset; ' +
+
+                        'background-image: url(\'/static/images/arrow-left.png\'); ' +
+                        'background-position: center center; ' +
+                        'background-repeat: no-repeat; ' +
+
+                        'border-radius: 35px 0 0 35px; ' +
+                    '" ' +
+                '></div>' +
+            '</div>'
         );
         moveLeftEl.appendTo(parentEl);
 
+/*
+position: absolute;
+margin-bottom: 0;
+height: 44px;
+width: 70px;
+border: 1px solid #CCC;
+background-color: #EEE;
+background-image: -webkit-gradient(linear, left top, left bottom, color-stop(0%, #EEE), color-stop(100%, #DDD));
+background-image: -webkit-linear-gradient(top, #EEE, #DDD);
+background-image: -moz-linear-gradient(top, #EEE, #DDD);
+background-image: -ms-linear-gradient(top, #EEE, #DDD);
+background-image: -o-linear-gradient(top, #EEE, #DDD);
+background-image: linear-gradient(top, #EEE, #DDD);
+-webkit-box-shadow: 0 1px 0 rgba(255, 255, 255, 0.7) inset;
+-moz-box-shadow: 0 1px 0 rgba(255, 255, 255, 0.7) inset;
+box-shadow: 0 1px 0 rgba(255, 255, 255, 0.7) inset;
+*/
+
         moveLeftEl.click(function () {
-            showElLeftMargin += 100;
+            if (showElLeftMargin > -102) {
+                return;
+            }
+
+            showElLeftMargin += 102;
             state.sliderEl.animate({
                 'margin-left': showElLeftMargin + 'px'
-            });
+            }, 100);
         });
 
         showEl = $(
             '<div ' +
                 'style=" ' +
-                    'width: 88%; ' +
-                    'height: 100px; ' +
+                    'width: 714px; ' +
+                    'height: 102px; ' +
                     'overflow: hidden; ' +
                     'display: inline; ' +
                     'float: left; ' +
@@ -60,8 +106,8 @@ define(['logme'], function (logme) {
         state.sliderEl = $(
             '<div ' +
                 'style=" ' +
-                    'width: 800px; ' +
-                    'height: 100px; ' +
+                    'width: 20000px; ' +
+                    'height: 102px; ' +
                 '" ' +
             '></div>'
         );
@@ -71,20 +117,50 @@ define(['logme'], function (logme) {
             '<div ' +
                 'style=" ' +
                     'width: 6%; ' +
-                    'height: 100px; ' +
+                    'height: 102px; ' +
                     'display: inline; ' +
                     'float: left; ' +
-                    'background: url(\'/static/images/arrow-right.png\') center center no-repeat; ' +
+                    // 'background: url(\'/static/images/arrow-right.png\') center center no-repeat; ' +
                 '" ' +
-            '></div>'
+            '>' +
+                '<div ' +
+                    'style=" ' +
+                        'width: 80%; ' +
+                        'height: 50px; '+
+                        'margin-left: auto; ' +
+                        'margin-right: auto; ' +
+                        'margin-top: 26px; ' +
+
+                        'border: 1px solid #CCC; ' +
+                        'background-color: #EEE; ' +
+                        'background-image: -webkit-linear-gradient(top, #EEE, #DDD); ' +
+                        'background-image: -moz-linear-gradient(top, #EEE, #DDD); ' +
+                        'background-image: -ms-linear-gradient(top, #EEE, #DDD); ' +
+                        'background-image: -o-linear-gradient(top, #EEE, #DDD); ' +
+                        'background-image: linear-gradient(top, #EEE, #DDD); ' +
+                        '-webkit-box-shadow: 0 1px 0 rgba(255, 255, 255, 0.7) inset; ' +
+                        'box-shadow: 0 1px 0 rgba(255, 255, 255, 0.7) inset; ' +
+
+                        'background-image: url(\'/static/images/arrow-right.png\'); ' +
+                        'background-position: center center; ' +
+                        'background-repeat: no-repeat; ' +
+
+                        'border-radius: 0 35px 35px 0; ' +
+                    '" ' +
+                '></div>' +
+            '</div>'
         );
         moveRightEl.appendTo(parentEl);
 
         moveRightEl.click(function () {
-            showElLeftMargin -= 100;
+            if (showElLeftMargin < -102 * (state.sliderEl.children().length - 8)) {
+                return;
+            }
+
+            showElLeftMargin -= 102;
             state.sliderEl.animate({
                 'margin-left': showElLeftMargin + 'px'
-            });
+            }, 100);
         });
 
         parentEl.appendTo(state.containerEl);

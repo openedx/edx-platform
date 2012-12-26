@@ -11,8 +11,6 @@ define(['logme'], function (logme) {
         state.containerEl = $(
             '<div ' +
                 'style=" ' +
-                    'border: 1px solid black; ' +
-                    // 'overflow: hidden; ' +
                     'clear: both; ' +
                 '" ' +
             '></div>'
