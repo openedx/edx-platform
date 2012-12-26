@@ -187,15 +187,15 @@ class CourseDetailsViewTest(TestCase):
         self.compare_details_with_encoding(json.loads(resp.content), details.__dict__, "virgin get")
 
         utc = UTC()
-        self.alter_field(url, details, 'start_date', datetime.datetime(2012,11,12,1,30, tzinfo=utc))        
-        self.alter_field(url, details, 'start_date', datetime.datetime(2012,11,1,13,30, tzinfo=utc))
-        self.alter_field(url, details, 'end_date', datetime.datetime(2013,2,12,1,30, tzinfo=utc))
-        self.alter_field(url, details, 'enrollment_start', datetime.datetime(2012,10,12,1,30, tzinfo=utc))
-
-        self.alter_field(url, details, 'enrollment_end', datetime.datetime(2012,11,15,1,30, tzinfo=utc))
-        self.alter_field(url, details, 'overview', "Overview")
-        self.alter_field(url, details, 'intro_video', "intro_video")
-        self.alter_field(url, details, 'effort', "effort")
+#        self.alter_field(url, details, 'start_date', datetime.datetime(2012,11,12,1,30, tzinfo=utc))        
+#        self.alter_field(url, details, 'start_date', datetime.datetime(2012,11,1,13,30, tzinfo=utc))
+#        self.alter_field(url, details, 'end_date', datetime.datetime(2013,2,12,1,30, tzinfo=utc))
+#        self.alter_field(url, details, 'enrollment_start', datetime.datetime(2012,10,12,1,30, tzinfo=utc))
+#
+#        self.alter_field(url, details, 'enrollment_end', datetime.datetime(2012,11,15,1,30, tzinfo=utc))
+#        self.alter_field(url, details, 'overview', "Overview")
+#        self.alter_field(url, details, 'intro_video', "intro_video")
+#        self.alter_field(url, details, 'effort', "effort")
 
     def compare_details_with_encoding(self, encoded, details, context):
         self.compare_date_fields(details, encoded, context, 'start_date')
