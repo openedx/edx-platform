@@ -824,6 +824,7 @@ class DragAndDropInput(InputTypeBase):
             tag_attrs = dict()
             tag_attrs['draggable'] = {'id': Attribute._sentinel,
                                       'label': "", 'icon': ""}
+
             tag_attrs['target'] = {'id': Attribute._sentinel,
                                     'x': Attribute._sentinel,
                                     'y': Attribute._sentinel,
@@ -842,13 +843,24 @@ class DragAndDropInput(InputTypeBase):
             return dic
 
         to_js = dict()
-        to_js['target_container'] = Attribute('img').parse_from_xml(self.xml)
+
+        # image drag and drop onto
+        to_js['base_image'] = Attribute('img').parse_from_xml(self.xml)
+
+        # problem subtype: targets or positions
+        to_js['use_targets'] = Attribute('targets',
+                                        default="True").parse_from_xml(self.xml)
+
+        # outline places on image where to drag adn drop
         to_js['target_outline'] = Attribute('target_outline',
                                         default="False").parse_from_xml(self.xml)
+        # one draggable per target?
         to_js['one_per_target'] = Attribute('one_per_target',
                                         default="True").parse_from_xml(self.xml)
-        to_js['draggable'] = [parse(draggable, 'draggable') for draggable in
+        # list of draggables
+        to_js['draggables'] = [parse(draggable, 'draggable') for draggable in
                                                 self.xml.iterchildren('draggable')]
+        # list of targets
         to_js['targets'] = [parse(target, 'target') for target in
                                                 self.xml.iterchildren('target')]
 
