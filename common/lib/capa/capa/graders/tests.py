@@ -5,9 +5,16 @@ import draganddrop
 
 class Test_DragAndDrop(unittest.TestCase):
 
-    def test_1(self):
-        user_input = '{"laice": "bcc", "points": [["0.00", "1.00", "0.00"], ["1.00", "1.00", "0.00"], ["0.00", "0.00", "1.00"]]}'
-        correct_answer = {}
+    def test_targets_true(self):
+        user_input = '{"use_targets": "true", "draggables": \
+        ["1": "t1", "name_with_icon": "t2"]}'
+        correct_answer = {'1':              't1', 'name_with_icon': 't2'}
+        self.assertTrue(draganddrop.grade(user_input, correct_answer))
+
+        def test_targets_true(self):
+        user_input = '{"use_targets": "true", "draggables": \
+        ["1": "t1", "name_with_icon": "t2"]}'
+        correct_answer = {'1':              't1', 'name_with_icon': 't2'}
         self.assertTrue(draganddrop.grade(user_input, correct_answer))
 
 
