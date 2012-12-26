@@ -28,7 +28,6 @@ values are (x,y) coordinates of centers of dragged images.
 """
 
 import json
-import math
 
 
 def grade(user_input, correct_answer):
@@ -58,28 +57,29 @@ def grade(user_input, correct_answer):
     if len(correct_answer.keys()) != len(user_answer['draggables']):
         return False
 
-    key = ['position']
-
     def is_equal(user_answer, correct_answer):
         """ Checks if user_answer is  equal to correct_answer inside radius
         of forgiveness (default 10 px).
 
             Args:
-                user_answer: (x, y) tuple of floats;
-                correct_answer is one of variants:
-                    - (x, y) tuple of floats
-                    - [(x, y), r], r - radius of forgiveness;
+                user_answer:    [x, y]  - list of floats;
+                correct_answer: [x, y] or [[x, y], r], where
+                                r is radius of forgiveness;
 
             Returns: bool.
         """
+        if not isinstance(correct_answer, list) or \
+           not isinstance(user_answer, list):
+            return False
+
         r = 10
-        if type(correct_answer) is type(()):  # (x, y) case
-            corr_x = correct_answer[0]
-            corr_y = correct_answer[1]
-        else:  # [(x, y), r] case
+        if isinstance(correct_answer[0], list):  # [(x, y), r] case
             r = correct_answer[1]
             corr_x = correct_answer[0][0]
             corr_y = correct_answer[0][1]
+        else:  # (x, y) case
+            corr_x = correct_answer[0]
+            corr_y = correct_answer[1]
 
         if ((user_answer[0] - corr_x) ** 2 +
             (user_answer[1] - corr_y) ** 2) > r * r:
@@ -88,11 +88,12 @@ def grade(user_input, correct_answer):
         return True
 
     if user_answer["use_targets"]:
-        key = ['target_id']
-        is_equal = lambda x, y: x == y
+        is_equal = lambda user, correct: user == correct if (
+             isinstance(user, unicode) and isinstance(correct, str)) else False
 
     for draggable in user_answer['draggables']:
-        if not is_equal(draggable[key], correct_answer[key]):
+        if not is_equal(draggable.values()[0],
+                        correct_answer[draggable.keys()[0]]):
             return False
 
     return True
