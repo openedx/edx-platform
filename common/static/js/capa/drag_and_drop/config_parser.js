@@ -90,6 +90,12 @@ define(['logme'], function (logme) {
             returnStatus = false;
         }
 
+        if (state.config.targets.length === 0) {
+            state.individualTargets = false;
+        } else {
+            state.individualTargets = true;
+        }
+
         return true;
 
         function processDraggable(obj) {

@@ -4,17 +4,10 @@
 // See https://edx-wiki.atlassian.net/wiki/display/LMS/Integration+of+Require+JS+into+the+system
 (function (requirejs, require, define) {
 
-define(['logme'], function (logme) {
+define(['logme', 'update_input'], function (logme, updateInput) {
     return Targets;
 
     function Targets(state) {
-        if (state.config.targets.length === 0) {
-            state.individualTargets = false;
-
-            return;
-        }
-
-        state.individualTargets = true;
         state.targets = [];
 
         (function (c1) {
@@ -68,6 +61,10 @@ define(['logme'], function (logme) {
                 'el': tEl,
                 'draggable': []
             });
+
+            if (state.individualTargets === true) {
+                updateInput(state);
+            }
         }
     }
 });

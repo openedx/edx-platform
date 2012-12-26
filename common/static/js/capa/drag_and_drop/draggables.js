@@ -4,13 +4,14 @@
 // See https://edx-wiki.atlassian.net/wiki/display/LMS/Integration+of+Require+JS+into+the+system
 (function (requirejs, require, define) {
 
-define(['logme'], function (logme) {
+define(['logme', 'update_input'], function (logme, updateInput) {
     return Draggables;
 
     function Draggables(state) {
         var _draggables;
 
         _draggables = [];
+        state.draggables = [];
 
         (function (i) {
             while (i < state.config.draggable.length) {
@@ -23,7 +24,7 @@ define(['logme'], function (logme) {
 
         function processDraggable(obj, index) {
             var draggableContainerEl, imgEl, inContainer, ousePressed,
-                onTarget;
+                onTarget, draggableObj;
 
             draggableContainerEl = $(
                 '<div ' +
@@ -63,10 +64,21 @@ define(['logme'], function (logme) {
 
             onTarget = null;
 
+            draggableObj = {
+                'id': obj.id,
+                'x': -1,
+                'y': -1
+            };
+            state.draggables.push(draggableObj);
+
             draggableContainerEl.mousedown(mouseDown);
             draggableContainerEl.mouseup(mouseUp);
             draggableContainerEl.mousemove(mouseMove);
             draggableContainerEl.mouseleave(mouseLeave);
+
+            if (state.individualTargets === false) {
+                updateInput(state);
+            }
 
             return;
 
@@ -126,8 +138,14 @@ define(['logme'], function (logme) {
                         (offsetDE.top + 100 > offsetTE.top + state.targetEl.height())
                     ) {
                         moveBackToSlider();
+
+                        draggableObj.x = -1;
+                        draggableObj.y = -1;
                     } else {
                         correctZIndexes();
+
+                        draggableObj.x = offsetDE.left + 50 - offsetTE.left;
+                        draggableObj.y = offsetDE.top + 50 - offsetTE.top;
                     }
                 } else if (state.individualTargets === true) {
                     targetFound = false;
@@ -141,6 +159,8 @@ define(['logme'], function (logme) {
                         removeObjIdFromTarget();
                     }
                 }
+
+                updateInput(state);
 
                 return;
 
