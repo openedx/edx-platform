@@ -207,11 +207,6 @@ define('State', ['logme'], function (logme) {
 
             parameters[paramName].value = paramValueNum;
 
-            // If we have a plot DIV to work with, tell to update.
-            if (plotDiv !== undefined) {
-                plotDiv.trigger('update_plot');
-            }
-
             // Update all text inputs with the new parameter's value.
             for (c1 = 0; c1 < parameters[paramName].inputDivs.length; c1 += 1) {
                 parameters[paramName].inputDivs[c1].val(paramValueNum);
@@ -227,6 +222,11 @@ define('State', ['logme'], function (logme) {
 
             for (c1 = 0; c1 < dynamicEl.length; c1++) {
                 dynamicEl[c1].outputEl.html(dynamicEl[c1].func.apply(window, allParameterValues));
+            }
+
+            // If we have a plot DIV to work with, tell to update.
+            if (plotDiv !== undefined) {
+                plotDiv.trigger('update_plot');
             }
 
             return true;
