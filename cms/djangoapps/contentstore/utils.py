@@ -73,20 +73,38 @@ def get_course_for_item(location):
 
 
 def get_lms_link_for_item(location, preview=False):
-    location = Location(location)
     if settings.LMS_BASE is not None:
         lms_link = "//{preview}{lms_base}/courses/{course_id}/jump_to/{location}".format(
             preview='preview.' if preview else '',
             lms_base=settings.LMS_BASE,
-            # TODO: These will need to be changed to point to the particular instance of this problem in the particular course
-            course_id=modulestore().get_containing_courses(location)[0].id,
-            location=location,
+            course_id=get_course_id(location),
+            location=Location(location)
         )
     else:
         lms_link = None
 
     return lms_link
 
+def get_lms_link_for_about_page(location):
+    """
+    Returns the url to the course about page from the location tuple.
+    """
+    if settings.LMS_BASE is not None:
+        lms_link = "//{lms_base}/courses/{course_id}/about".format(
+            lms_base=settings.LMS_BASE,
+            course_id=get_course_id(location)
+        )
+    else:
+        lms_link = None
+
+    return lms_link
+
+def get_course_id(location):
+    """
+    Returns the course_id from a given the location tuple.
+    """
+    # TODO: These will need to be changed to point to the particular instance of this problem in the particular course
+    return modulestore().get_containing_courses(Location(location))[0].id
 
 class UnitState(object):
     draft = 'draft'
