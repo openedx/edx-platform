@@ -9,6 +9,17 @@ define('Graph', ['logme'], function (logme) {
     function Graph(gstId, config, state) {
         var plotDiv, dataSeries, functions, xaxis, yaxis, numPoints, xrange;
 
+        state.barsConfig = {
+            'N': 0,
+            'delta': 0,
+            'diff': 0,
+            'width': 0,
+            'width_perc': 0.8,
+            'margin': 0.1,
+            'total': 0.4,
+            'total_half': 0.2
+        };
+
         // We need plot configuration settings. Without them we can't continue.
         if ($.isPlainObject(config.plot) === false) {
             return;
@@ -410,11 +421,13 @@ define('Graph', ['logme'], function (logme) {
                     obj['@dot'],
                     obj['@label'],
                     obj['@point_size'],
-                    obj['@fill_area']
+                    obj['@fill_area'],
+                    obj['@bar']
                 );
             }
 
-            function addFunction(funcString, color, line, dot, label, pointSize, fillArea) {
+            function addFunction(funcString, color, line, dot, label,
+                                 pointSize, fillArea, bar) {
                 var newFunctionObject, func, paramNames;
 
                 // The main requirement is function string. Without it we can't
@@ -433,7 +446,8 @@ define('Graph', ['logme'], function (logme) {
                 // make sure that at least a line is drawn for a function.
                 newFunctionObject = {
                     'line': true,
-                    'dot': false
+                    'dot': false,
+                    'bars': false
                 };
 
                 // Get all of the parameter names defined by the user in the
@@ -505,9 +519,21 @@ define('Graph', ['logme'], function (logme) {
                     newFunctionObject['pointSize'] = pointSize;
                 }
 
-                // If the preference is conflicting (we must have either line
-                // or dot, none is not an option), we will show line.
-                if (
+                if (typeof bar === 'string') {
+                    if (bar.toLowerCase() === 'true') {
+                        newFunctionObject['bars'] = true;
+                    } else if (bar.toLowerCase() === 'false') {
+                        newFunctionObject['bars'] = false;
+                    }
+                }
+
+                if (newFunctionObject['bars'] === true) {
+                    newFunctionObject['line'] = false;
+                    newFunctionObject['dot'] = false;
+
+                    newFunctionObject.barIndex = state.barsConfig.N;
+                    state.barsConfig.N += 1;
+                } else if (
                     (newFunctionObject['dot'] === false) &&
                     (newFunctionObject['line'] === false)
                 ) {
@@ -547,7 +573,7 @@ define('Graph', ['logme'], function (logme) {
 
         function generateData() {
             var c0, c1, functionObj, seriesObj, dataPoints, paramValues, x, y,
-                start, end, step;
+                start, end, step, tempX;
 
             paramValues = state.getAllParameterValues();
 
@@ -588,6 +614,9 @@ define('Graph', ['logme'], function (logme) {
                 }
                 step = (end - start) / (numPoints - 1);
 
+                state.barsConfig.delta = (step * state.barsConfig.total) / state.barsConfig.N;
+                state.barsConfig.diff = step * state.barsConfig.total_half;
+
                 // Generate the data points.
                 for (x = start; x <= end; x += step) {
 
@@ -609,12 +638,18 @@ define('Graph', ['logme'], function (logme) {
                         return false;
                     }
 
+                    if (functionObj.bars === true) {
+                        tempX = x - state.barsConfig.diff + (functionObj.barIndex + state.barsConfig.margin) * state.barsConfig.delta;
+                    } else {
+                        tempX = x;
+                    }
+
                     // Return the paramValues array to how it was before we
                     // added 'x' variable to the end of it.
                     paramValues.pop();
 
                     // Add the generated point to the data points set.
-                    dataPoints.push([x, y]);
+                    dataPoints.push([tempX, y]);
 
                     c1 += 1;
 
@@ -667,6 +702,11 @@ define('Graph', ['logme'], function (logme) {
                 // graph?
                 seriesObj.points = {
                     'show': functionObj.dot
+                };
+
+                seriesObj.bars = {
+                    'show': functionObj.bars,
+                    'barWidth': state.barsConfig.delta * state.barsConfig.width_perc
                 };
 
                 if (functionObj.hasOwnProperty('pointSize')) {
