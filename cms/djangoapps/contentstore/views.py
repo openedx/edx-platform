@@ -1289,6 +1289,18 @@ def import_course(request, org, course, name):
         module_store, course_items = import_from_xml(modulestore('direct'), settings.GITHUB_REPO_ROOT,
             [local_dir], load_error_modules=False, static_content_store=contentstore(), target_location_namespace = Location(location))
 
+        # update metadata with github import info
+        course_module = modulestore().get_item(location)
+        metadata = course_module.metadata
+        if 'import' not in metadata:
+            metadata['import'] = {}
+        importinfo = metadata['import']
+        importinfo['local_dir'] = local_dir
+        importinfo['git_repo'] = git_repo
+        importinfo['git_branch'] = git_branch
+        store = get_modulestore(Location(location));
+        store.update_metadata(location, course_module.metadata)	# save in mongodb store
+
         # grab error log from import and show that?
         
         message += 'Import done.'
