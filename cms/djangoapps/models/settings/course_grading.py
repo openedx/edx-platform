@@ -237,7 +237,7 @@ class CourseGradingModel:
         # 5 hours 59 minutes 59 seconds => converted to iso format
         rawgrace = descriptor.metadata.get('graceperiod', None)
         if rawgrace:
-            parsedgrace = {str(key): val for (val, key) in re.findall('\s*(\d*)\s*(\w*)', rawgrace)}
+            parsedgrace = {str(key): val for (val, key) in re.findall('\s*(\d+)\s*(\w+)', rawgrace)}
             return parsedgrace
         else: return None
 

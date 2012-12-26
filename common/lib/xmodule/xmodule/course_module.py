@@ -116,7 +116,6 @@ class CourseDescriptor(SequenceDescriptor):
                     "type" : "Lab",
                     "min_count" : 12,
                     "drop_count" : 2,
-                    "category" : "Labs",
                     "weight" : 0.15
                 },
                 {

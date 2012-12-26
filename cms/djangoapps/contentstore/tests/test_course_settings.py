@@ -13,6 +13,9 @@ from util import converters
 import calendar
 from util.converters import jsdate_to_time
 from django.utils.timezone import UTC
+from cms.djangoapps.models.settings.course_grading import CourseGradingModel
+from cms.djangoapps.contentstore.utils import get_modulestore
+import copy
 
 # YYYY-MM-DDThh:mm:ss.s+/-HH:MM
 class ConvertersTestCase(TestCase):
@@ -31,7 +34,8 @@ class ConvertersTestCase(TestCase):
         self.compare_dates(converters.jsdate_to_time("2013-01-01T00:00"), converters.jsdate_to_time("2012-12-31T23:59"), datetime.timedelta(minutes=1))
         self.compare_dates(converters.jsdate_to_time("2013-01-01T00:00:00"), converters.jsdate_to_time("2012-12-31T23:59:59"), datetime.timedelta(seconds=1))
     
-class CourseDetailsTestCase(TestCase):
+    
+class CourseTestCase(TestCase):
     def setUp(self):
         uname = 'testuser'
         email = 'test+courses@edx.org'
@@ -78,6 +82,7 @@ class CourseDetailsTestCase(TestCase):
         """Create new course"""
         self.client.post(reverse('create_new_course'), self.course_data)
 
+class CourseDetailsTestCase(CourseTestCase):
     def test_virgin_fetch(self):
         details = CourseDetails.fetch(self.course_location)
         self.assertEqual(details.course_location, self.course_location, "Location not copied into")
@@ -120,53 +125,7 @@ class CourseDetailsTestCase(TestCase):
         self.assertEqual(CourseDetails.update_from_json(jsondetails.__dict__).effort,
                              jsondetails.effort, "After set effort")
 
-class CourseDetailsViewTest(TestCase):
-    def setUp(self):
-        uname = 'testuser'
-        email = 'test+courses@edx.org'
-        password = 'foo'
-
-        # Create the use so we can log them in.
-        self.user = User.objects.create_user(uname, email, password)
-
-        # Note that we do not actually need to do anything
-        # for registration if we directly mark them active.
-        self.user.is_active = True
-        # Staff has access to view all courses
-        self.user.is_staff = True
-        self.user.save()
-
-        # Flush and initialize the module store
-        # It needs the templates because it creates new records
-        # by cloning from the template.
-        # Note that if your test module gets in some weird state
-        # (though it shouldn't), do this manually
-        # from the bash shell to drop it:
-        # $ mongo test_xmodule --eval "db.dropDatabase()"
-        xmodule.modulestore.django._MODULESTORES = {}
-        xmodule.modulestore.django.modulestore().collection.drop()
-        xmodule.templates.update_templates()
-
-        self.client = Client()
-        self.client.login(username=uname, password=password)
-
-        self.course_data = {
-            'template': 'i4x://edx/templates/course/Empty',
-            'org': 'MITx',
-            'number': '999',
-            'display_name': 'Robot Super Course',
-            }
-        self.course_location = Location('i4x', 'MITx', '999', 'course', 'Robot_Super_Course')
-        self.create_course()
-
-    def tearDown(self):
-        xmodule.modulestore.django._MODULESTORES = {}
-        xmodule.modulestore.django.modulestore().collection.drop()
-
-    def create_course(self):
-        """Create new course"""
-        self.client.post(reverse('create_new_course'), self.course_data)
-
+class CourseDetailsViewTest(CourseTestCase):
     def alter_field(self, url, details, field, val):
         setattr(details, field, val)
         # FIXME post is not invoking views.course_settings_updates
@@ -219,4 +178,65 @@ class CourseDetailsViewTest(TestCase):
                 self.fail(field + " missing from encoded but in details at " + context)
         elif field in encoded and encoded[field] is not None:
             self.fail(field + " included in encoding but missing from details at " + context)
+    
+class CourseGradingTest(CourseTestCase):
+    def test_initial_grader(self):
+        descriptor = get_modulestore(self.course_location).get_item(self.course_location)
+        test_grader = CourseGradingModel(descriptor)
+        # ??? How much should this test bake in expectations about defaults and thus fail if defaults change?
+        self.assertEqual(self.course_location, test_grader.course_location, "Course locations")
+        self.assertIsNotNone(test_grader.graders, "No graders")
+        self.assertIsNotNone(test_grader.grade_cutoffs, "No cutoffs")
+
+    def test_fetch_grader(self):
+        test_grader = CourseGradingModel.fetch(self.course_location.url())
+        self.assertEqual(self.course_location, test_grader.course_location, "Course locations")
+        self.assertIsNotNone(test_grader.graders, "No graders")
+        self.assertIsNotNone(test_grader.grade_cutoffs, "No cutoffs")
+
+        test_grader = CourseGradingModel.fetch(self.course_location)
+        self.assertEqual(self.course_location, test_grader.course_location, "Course locations")
+        self.assertIsNotNone(test_grader.graders, "No graders")
+        self.assertIsNotNone(test_grader.grade_cutoffs, "No cutoffs")
+        
+        for i, grader in enumerate(test_grader.graders):
+            subgrader = CourseGradingModel.fetch_grader(self.course_location, i)
+            self.assertDictEqual(grader, subgrader, str(i) + "th graders not equal")
+            
+        subgrader = CourseGradingModel.fetch_grader(self.course_location.list(), 0)
+        self.assertDictEqual(test_grader.graders[0], subgrader, "failed with location as list")
+        
+    def test_fetch_cutoffs(self):
+        test_grader = CourseGradingModel.fetch_cutoffs(self.course_location)
+        # ??? should this check that it's at least a dict? (expected is { "pass" : 0.5 } I think)
+        self.assertIsNotNone(test_grader, "No cutoffs via fetch")
+        
+        test_grader = CourseGradingModel.fetch_cutoffs(self.course_location.url())
+        self.assertIsNotNone(test_grader, "No cutoffs via fetch with url")
+        
+    def test_fetch_grace(self):
+        test_grader = CourseGradingModel.fetch_grace_period(self.course_location)
+        # almost a worthless test
+        self.assertIn('grace_period', test_grader, "No grace via fetch")
+        
+        test_grader = CourseGradingModel.fetch_grace_period(self.course_location.url())
+        self.assertIn('grace_period', test_grader, "No cutoffs via fetch with url")
+        
+    def test_update_from_json(self):
+        test_grader = CourseGradingModel.fetch(self.course_location)
+        altered_grader = CourseGradingModel.update_from_json(test_grader.__dict__)
+        self.assertDictEqual(test_grader.__dict__, altered_grader.__dict__, "Noop update")
+        
+        test_grader.graders[0]['weight'] = test_grader.graders[0].get('weight') * 2
+        altered_grader = CourseGradingModel.update_from_json(test_grader.__dict__)
+        self.assertDictEqual(test_grader.__dict__, altered_grader.__dict__, "Weight[0] * 2")
+        
+        test_grader.grade_cutoffs['D'] = 0.3
+        altered_grader = CourseGradingModel.update_from_json(test_grader.__dict__)
+        self.assertDictEqual(test_grader.__dict__, altered_grader.__dict__, "cutoff add D")
+        
+        test_grader.grace_period = {'hours' :  '4'}
+        altered_grader = CourseGradingModel.update_from_json(test_grader.__dict__)
+        self.assertDictEqual(test_grader.__dict__, altered_grader.__dict__, "4 hour grace period")
+        
         
