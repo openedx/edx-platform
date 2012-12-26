@@ -47,7 +47,6 @@ define(['logme'], function (logme) {
 
         inputEl = $('#input_' + state.problemId);
         inputEl.val(stateStr);
-        logme(inputEl.val());
     }
 
 });

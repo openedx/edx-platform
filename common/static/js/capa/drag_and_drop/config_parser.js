@@ -14,33 +14,33 @@ define(['logme'], function (logme) {
 
         state.config = {
             'imageDir': '/static/' + imageDir + '/images',
-            'draggable': [],
+            'draggables': [],
             'targets': [],
-            'target_container': ''
+            'base_image': ''
         };
 
-        if ($.isArray(config.draggable) === true) {
+        if ($.isArray(config.draggables) === true) {
             (function (i) {
-                while (i < config.draggable.length) {
-                    if (processDraggable(config.draggable[i]) !== true) {
+                while (i < config.draggables.length) {
+                    if (processDraggable(config.draggables[i]) !== true) {
                         returnStatus = false;
                     }
                     i += 1;
                 }
             }(0));
-        } else if ($.isPlainObject(config.draggable) === true) {
-            if (processDraggable(config.draggable) !== true) {
+        } else if ($.isPlainObject(config.draggables) === true) {
+            if (processDraggable(config.draggables) !== true) {
                 returnStatus = false;
             }
         } else {
-            logme('ERROR: The type of config.draggable is no supported.');
+            logme('ERROR: The type of config.draggables is no supported.');
             returnStatus = false;
         }
 
-        if (typeof config.target_container === 'string') {
-            state.config.target_container = config.target_container;
+        if (typeof config.base_image === 'string') {
+            state.config.base_image = config.base_image;
         } else {
-            logme('ERROR: Property config.target_container is not of type "string".');
+            logme('ERROR: Property config.base_image is not of type "string".');
             returnStatus = false;
         }
 
@@ -104,7 +104,7 @@ define(['logme'], function (logme) {
             if (!attrIsString(obj, 'icon')) { return false; }
             if (!attrIsString(obj, 'label')) { return false; }
 
-            state.config.draggable.push(obj);
+            state.config.draggables.push(obj);
 
             true;
         }

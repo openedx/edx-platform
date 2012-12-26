@@ -14,8 +14,8 @@ define(['logme', 'update_input'], function (logme, updateInput) {
         state.draggables = [];
 
         (function (i) {
-            while (i < state.config.draggable.length) {
-                processDraggable(state.config.draggable[i], i + 1);
+            while (i < state.config.draggables.length) {
+                processDraggable(state.config.draggables[i], i + 1);
                 i += 1;
             }
         }(0));

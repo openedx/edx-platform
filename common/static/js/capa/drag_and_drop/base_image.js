@@ -5,12 +5,12 @@
 (function (requirejs, require, define) {
 
 define(['logme'], function (logme) {
-    return TargetContainer;
+    return BaseImage;
 
-    function TargetContainer(state) {
+    function BaseImage(state) {
         var targetImgSrc, targetElContainer, mouseMoveDiv;
 
-        targetImgSrc = state.config.imageDir + '/' + state.config.target_container;
+        targetImgSrc = state.config.imageDir + '/' + state.config.base_image;
 
         targetElContainer = $(
             '<div ' +
