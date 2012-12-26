@@ -8,6 +8,15 @@ define(['logme'], function (logme) {
     return Targets;
 
     function Targets(state) {
+        if (state.config.targets.length === 0) {
+            state.individualTargets = false;
+
+            return;
+        }
+
+        state.individualTargets = true;
+        state.targets = [];
+
         (function (c1) {
             while (c1 < state.config.targets.length) {
                 processTarget(state.config.targets[c1]);
@@ -18,17 +27,21 @@ define(['logme'], function (logme) {
         return;
 
         function processTarget(obj) {
-            var targetElOffset, tEl, left, top;
+            var targetElOffset, tEl, left, borderCss;
 
-            if (state.targetEl_loaded === false) {
+            if (state.targetElWidth === null) {
                 window.setTimeout(function () {
                     processTarget(obj);
                 }, 50);
                 return;
             }
 
-            left = obj.x + 0.5 * (state.targetEl.parent().width() - state.targetEl_width);
-            top = obj.y
+            left = obj.x + 0.5 * (state.targetEl.parent().width() - state.targetElWidth);
+
+            borderCss = '';
+            if (state.config.target_outline === true) {
+                borderCss = 'border: 1px solid black; ';
+            }
 
             tEl = $(
                 '<div ' +
@@ -37,15 +50,24 @@ define(['logme'], function (logme) {
                         'position: absolute; ' +
                         'width: ' + obj.w + 'px; ' +
                         'height: ' + obj.h + 'px; ' +
-                        'top: ' + top + 'px; ' +
+                        'top: ' + obj.y + 'px; ' +
                         'left: ' + left + 'px; ' +
-                        'border: 1px solid black; ' +
+                        borderCss +
                     '" ' +
                     'data-target-id="' + obj.id + '" ' +
                 '></div>'
             );
 
             tEl.appendTo(state.targetEl.parent());
+
+            state.targets.push({
+                'id': obj.id,
+                'offset': tEl.offset(),
+                'w': obj.w,
+                'h': obj.h,
+                'el': tEl,
+                'draggable': []
+            });
         }
     }
 });

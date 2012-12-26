@@ -8,8 +8,7 @@ define(['logme'], function (logme) {
     return Scroller;
 
     function Scroller(state) {
-        var parentEl, moveLeftEl, showEl, moveRightEL,
-            moveRightEl_leftMargin;
+        var parentEl, moveLeftEl, showEl, moveRightEL, showElLeftMargin;
 
         parentEl = $(
             '<div ' +
@@ -37,9 +36,9 @@ define(['logme'], function (logme) {
         moveLeftEl.appendTo(parentEl);
 
         moveLeftEl.click(function () {
-            state.showElLeftMargin += 100;
+            showElLeftMargin += 100;
             state.sliderEl.animate({
-                'margin-left': state.showElLeftMargin + 'px'
+                'margin-left': showElLeftMargin + 'px'
             });
         });
 
@@ -56,7 +55,7 @@ define(['logme'], function (logme) {
         );
         showEl.appendTo(parentEl);
 
-        state.showElLeftMargin = 0;
+        showElLeftMargin = 0;
 
         state.sliderEl = $(
             '<div ' +
@@ -82,9 +81,9 @@ define(['logme'], function (logme) {
         moveRightEl.appendTo(parentEl);
 
         moveRightEl.click(function () {
-            state.showElLeftMargin -= 100;
+            showElLeftMargin -= 100;
             state.sliderEl.animate({
-                'margin-left': state.showElLeftMargin + 'px'
+                'margin-left': showElLeftMargin + 'px'
             });
         });
 

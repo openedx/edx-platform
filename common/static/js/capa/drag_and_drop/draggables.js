@@ -22,7 +22,8 @@ define(['logme'], function (logme) {
         return;
 
         function processDraggable(obj, index) {
-            var draggableContainerEl, imgEl, inContainer, ousePressed;
+            var draggableContainerEl, imgEl, inContainer, ousePressed,
+                onTarget;
 
             draggableContainerEl = $(
                 '<div ' +
@@ -60,6 +61,8 @@ define(['logme'], function (logme) {
             inContainer = true;
             mousePressed = false;
 
+            onTarget = null;
+
             draggableContainerEl.mousedown(mouseDown);
             draggableContainerEl.mouseup(mouseUp);
             draggableContainerEl.mousemove(mouseMove);
@@ -87,40 +90,149 @@ define(['logme'], function (logme) {
                 }
             }
 
-            function mouseUp(event) {
+            function mouseUp() {
                 if (mousePressed === true) {
-                    checkLandingElement(event);
+                    checkLandingElement();
                 }
             }
 
-            function mouseMove(event) {
+            function mouseMove() {
                 if (mousePressed === true) {
                     draggableContainerEl.css('left', (event.pageX - 50));
                     draggableContainerEl.css('top', (event.pageY - 50));
-                    event.preventDefault();
                 }
             }
 
-            function mouseLeave(event) {
+            function mouseLeave() {
                 if (mousePressed === true) {
-                    checkLandingElement(event);
+                    checkLandingElement();
                 }
             }
 
-            function checkLandingElement(event) {
-                var offsetDE, offsetTE, indexes, DEindex;
+            function checkLandingElement() {
+                var offsetDE, offsetTE, indexes, DEindex, targetFound;
 
                 mousePressed = false;
 
                 offsetDE = draggableContainerEl.offset();
-                offsetTE = state.targetEl.offset();
 
-                if (
-                    (offsetDE.left < offsetTE.left) ||
-                    (offsetDE.left + 100 > offsetTE.left + state.targetEl.width()) ||
-                    (offsetDE.top < offsetTE.top) ||
-                    (offsetDE.top + 100 > offsetTE.top + state.targetEl.height())
-                ) {
+                if (state.individualTargets === false) {
+                    offsetTE = state.targetEl.offset();
+
+                    if (
+                        (offsetDE.left < offsetTE.left) ||
+                        (offsetDE.left + 100 > offsetTE.left + state.targetEl.width()) ||
+                        (offsetDE.top < offsetTE.top) ||
+                        (offsetDE.top + 100 > offsetTE.top + state.targetEl.height())
+                    ) {
+                        moveBackToSlider();
+                    } else {
+                        correctZIndexes();
+                    }
+                } else if (state.individualTargets === true) {
+                    targetFound = false;
+
+                    checkIfOnTarget();
+
+                    if (targetFound === true) {
+                        correctZIndexes();
+                    } else {
+                        moveBackToSlider();
+                        removeObjIdFromTarget();
+                    }
+                }
+
+                return;
+
+                function removeObjIdFromTarget() {
+                    var c1;
+
+                    if (onTarget !== null) {
+                        c1 = 0;
+
+                        while (c1 < onTarget.draggable.length) {
+                            if (onTarget.draggable[c1] === obj.id) {
+                                onTarget.draggable.splice(c1, 1);
+
+                                break;
+                            }
+                            c1 += 1;
+                        }
+
+                        onTarget = null;
+                    }
+                }
+
+                function checkIfOnTarget() {
+                    var c1, c2, target;
+
+                    c1 = 0;
+
+                    while (c1 < state.targets.length) {
+                        target = state.targets[c1];
+
+                        if (offsetDE.top + 50 < target.offset.top) {
+                            c1 += 1;
+                            continue;
+                        }
+                        if (offsetDE.top + 50 > target.offset.top + target.h) {
+                            c1 += 1;
+                            continue;
+                        }
+                        if (offsetDE.left + 50 < target.offset.left) {
+                            c1 += 1;
+                            continue;
+                        }
+                        if (offsetDE.left + 50 > target.offset.left + target.w) {
+                            c1 += 1;
+                            continue;
+                        }
+
+                        if (state.config.one_per_target === true) {
+                            if (
+                                (target.draggable.length === 1) &&
+                                (target.draggable[0] !== obj.id)
+                            ) {
+                                c1 += 1;
+                                continue;
+                            }
+                        }
+
+                        targetFound = true;
+
+                        removeObjIdFromTarget();
+                        onTarget = target;
+
+                        target.draggable.push(obj.id);
+                        snapToTarget(target);
+
+                        break;
+                    }
+                }
+
+                function snapToTarget(target) {
+                    draggableContainerEl.css('left', (target.offset.left + 0.5 * target.w - 50));
+                    draggableContainerEl.css('top', (target.offset.top + 0.5 * target.h - 50));
+                }
+
+                function correctZIndexes() {
+                    var c1;
+
+                    c1 = 0;
+
+                    while (c1 < _draggables.length) {
+                        if (parseInt(draggableContainerEl.attr('data-old-z-index'), 10) < parseInt(_draggables[c1].css('z-index'), 10)) {
+                            _draggables[c1].css('z-index', parseInt(_draggables[c1].css('z-index'), 10) - 1);
+                        }
+                        c1 += 1;
+                    }
+
+                    draggableContainerEl.css('z-index', c1);
+                }
+
+                function moveBackToSlider() {
+                    var c1;
+
                     draggableContainerEl.detach();
                     draggableContainerEl.css('position', 'static');
 
@@ -134,35 +246,22 @@ define(['logme'], function (logme) {
                         });
                     });
 
-                    (function (c1) {
-                        while (c1 < indexes.length) {
-                            if ((inContainer === false) && (indexes[c1].index > DEindex)) {
-                                indexes[c1].el.before(draggableContainerEl);
-                                inContainer = true;
-                            }
+                    c1 = 0;
 
-                            c1 += 1;
+                    while (c1 < indexes.length) {
+                        if ((inContainer === false) && (indexes[c1].index > DEindex)) {
+                            indexes[c1].el.before(draggableContainerEl);
+                            inContainer = true;
                         }
-                    }(0));
+
+                        c1 += 1;
+                    }
 
                     if (inContainer === false) {
                         draggableContainerEl.appendTo(state.sliderEl);
                         inContainer = true;
                     }
                 }
-
-                (function (c1) {
-                    while (c1 < _draggables.length) {
-                        if (parseInt(draggableContainerEl.attr('data-old-z-index'), 10) < parseInt(_draggables[c1].css('z-index'), 10)) {
-                            _draggables[c1].css('z-index', parseInt(_draggables[c1].css('z-index'), 10) - 1);
-                        }
-                        c1 += 1;
-                    }
-
-                    draggableContainerEl.css('z-index', c1);
-                }(0));
-
-                event.preventDefault();
             }
         }
 

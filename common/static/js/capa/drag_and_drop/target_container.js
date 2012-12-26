@@ -28,15 +28,11 @@ define(['logme'], function (logme) {
         );
         state.targetEl.appendTo(targetElContainer);
 
-        state.targetEl_loaded = false;
-
-        $("<img/>") // Make in memory copy of image to avoid css issues.
-            .attr("src", state.targetEl.attr("src"))
-            .load(function() {
-                state.targetEl_height = this.height;
-                state.targetEl_width = this.width;
-
-                state.targetEl_loaded = true;
+        state.targetElWidth = null;
+        $('<img/>') // Make in memory copy of image to avoid css issues.
+            .attr('src', state.targetEl.attr('src'))
+            .load(function () {
+                state.targetElWidth = this.width;
             });
 
         state.targetEl.mousemove(
