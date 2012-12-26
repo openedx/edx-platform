@@ -33,6 +33,7 @@
       <li><a href="${reverse('asset_index', kwargs=dict(org=ctx_loc.org, course=ctx_loc.course, name=ctx_loc.name))}" id='assets-tab'>Assets</a></li>
       <li><a href="${reverse('course_settings', kwargs=dict(org=ctx_loc.org, course=ctx_loc.course, name=ctx_loc.name))}" id='settings-tab'>Settings</a></li>
       <li><a href="${reverse('import_course', kwargs=dict(org=ctx_loc.org, course=ctx_loc.course, name=ctx_loc.name))}" id='import-tab'>Import</a></li>
+      <li><a href="${reverse('export_course', kwargs=dict(org=ctx_loc.org, course=ctx_loc.course, name=ctx_loc.name))}" id='export-tab'>Export</a></li>
     </ul>
     % endif
   </nav>

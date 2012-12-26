@@ -1302,3 +1302,17 @@ def import_course(request, org, course, name):
                         course_module.location.course,
                         course_module.location.name])
         })
+
+def export_course(request, org, course, name):
+
+    location = ['i4x', org, course, 'course', name]
+    course_module = modulestore().get_item(location)
+    # check that logged in user has permissions to this item
+    if not has_access(request.user, location):
+        raise PermissionDenied()
+
+    return render_to_response('export.html', {
+        'context_course': course_module,
+        'active_tab': 'export',
+        'successful_import_redirect_url' : ''
+    })
