@@ -5,6 +5,7 @@ import os
 import sys
 import time
 import tarfile
+import re
 import shutil
 from datetime import datetime
 from collections import defaultdict
@@ -1236,7 +1237,63 @@ def import_course(request, org, course, name):
     if not has_access(request.user, location):
         raise PermissionDenied()
 
-    if request.method == 'POST':
+    course_module = modulestore().get_item(location)
+    message = ''
+
+    if request.method == 'POST' and 'do_github_import' in request.POST:
+        message = "hello world"
+        git_repo = request.POST['git_repo'].replace(';','_').replace('\n','')
+        git_branch = request.POST['git_branch'].replace(';','_').replace('\n','')
+        metadata = course_module.metadata
+        if 'import' not in metadata:
+            metadata['import'] = {}
+        importinfo = metadata['import']
+        importinfo['git_repo'] = git_repo
+        importinfo['git_branch'] = git_branch
+        log.debug('set export info (%s, %s)' % (git_repo, git_branch))
+
+        m = re.search('/([^/]+)\.git$',git_repo)	# get local_dir from git_repo
+        if m:
+            local_dir = m.group(1)
+            importinfo['local_dir'] = local_dir
+
+        store = get_modulestore(Location(location));
+        store.update_metadata(location, course_module.metadata)	# save in mongodb store
+        message = "Git repository information updated"
+        message += "\nlocal_dir = %s" % local_dir
+
+        # do import from github by pulling then doing XML import
+        
+        log.debug('doing import now to %s' % location)
+        data_root = path(settings.GITHUB_REPO_ROOT)
+
+        course_dir = data_root / local_dir
+        message += 'importing course to %s\n' % course_dir
+        log.debug(message)
+
+        if os.path.exists(course_dir) and request.POST.get('purge')=='yes':
+            message += 'directory exists, purging contents\n'
+            shutil.rmtree(course_dir)
+            # message += os.popen('rm -rf "%s" 2>&1' % course_dir).read()
+
+        if not os.path.exists(course_dir):
+            message += "Creating course directory %s\n" % course_dir
+            message += os.popen('(cd "%s"; git clone %s) 2>&1' % (data_root, git_repo)).read()
+
+        if not os.path.exists(course_dir):
+            message += "Failed to create course directory!"
+            
+        cmd = '(cd "%s"; git checkout %s; git pull -u) 2>&1' % (course_dir, git_branch)
+        message += os.popen(cmd).read()
+
+        module_store, course_items = import_from_xml(modulestore('direct'), settings.GITHUB_REPO_ROOT,
+            [local_dir], load_error_modules=False, static_content_store=contentstore(), target_location_namespace = Location(location))
+
+        # grab error log from import and show that?
+        
+        message += 'Import done.'
+
+    elif request.method == 'POST':
         filename = request.FILES['course-data'].name
 
         if not filename.endswith('.tar.gz'):
@@ -1291,12 +1348,13 @@ def import_course(request, org, course, name):
         create_all_course_groups(request.user, course_items[0].location)
 
         return HttpResponse(json.dumps({'Status': 'OK'}))
-    else:
-        course_module = modulestore().get_item(location)
 
-        return render_to_response('import.html', {
+    # return page to render
+
+    return render_to_response('import.html', {
             'context_course': course_module,
             'active_tab': 'import',
+            'message' : message,
             'successful_import_redirect_url' : reverse('course_index', args=[
                         course_module.location.org,
                         course_module.location.course,
