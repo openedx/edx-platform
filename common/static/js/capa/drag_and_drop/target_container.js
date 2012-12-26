@@ -35,13 +35,13 @@ define(['logme'], function (logme) {
                 state.targetElWidth = this.width;
             });
 
-        state.targetEl.mousemove(
-            function (event) {
-                mouseMoveDiv.html(
-                    '[' + event.offsetX + ', ' + event.offsetY + ']'
-                );
-            }
-        );
+        // state.targetEl.mousemove(
+        //     function (event) {
+        //         mouseMoveDiv.html(
+        //             '[' + event.offsetX + ', ' + event.offsetY + ']'
+        //         );
+        //     }
+        // );
 
         mouseMoveDiv = $(
             '<div ' +
@@ -51,7 +51,7 @@ define(['logme'], function (logme) {
                     'height: 25px; ' +
                     'text-align: center; ' +
                 '" ' +
-            '>[0, 0]</div>'
+            '></div>'
         );
         mouseMoveDiv.appendTo(targetElContainer);
 

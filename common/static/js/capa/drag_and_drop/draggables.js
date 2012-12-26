@@ -24,7 +24,7 @@ define(['logme', 'update_input'], function (logme, updateInput) {
 
         function processDraggable(obj, index) {
             var draggableContainerEl, imgEl, inContainer, ousePressed,
-                onTarget, draggableObj;
+                onTarget, draggableObj, marginCss;
 
             draggableContainerEl = $(
                 '<div ' +
@@ -52,8 +52,14 @@ define(['logme', 'update_input'], function (logme, updateInput) {
             }
 
             if (obj.label.length > 0) {
+                marginCss = '';
+
+                if (obj.icon.length === 0) {
+                    marginCss = 'margin-top: 38px;';
+                }
+
                 draggableContainerEl.append(
-                    $('<div style="clear: both; text-align: center;">' + obj.label + '</div>')
+                    $('<div style="clear: both; text-align: center; ' + marginCss + ' ">' + obj.label + '</div>')
                 );
             }
 

@@ -59,24 +59,6 @@ define(['logme'], function (logme) {
         );
         moveLeftEl.appendTo(parentEl);
 
-/*
-position: absolute;
-margin-bottom: 0;
-height: 44px;
-width: 70px;
-border: 1px solid #CCC;
-background-color: #EEE;
-background-image: -webkit-gradient(linear, left top, left bottom, color-stop(0%, #EEE), color-stop(100%, #DDD));
-background-image: -webkit-linear-gradient(top, #EEE, #DDD);
-background-image: -moz-linear-gradient(top, #EEE, #DDD);
-background-image: -ms-linear-gradient(top, #EEE, #DDD);
-background-image: -o-linear-gradient(top, #EEE, #DDD);
-background-image: linear-gradient(top, #EEE, #DDD);
--webkit-box-shadow: 0 1px 0 rgba(255, 255, 255, 0.7) inset;
--moz-box-shadow: 0 1px 0 rgba(255, 255, 255, 0.7) inset;
-box-shadow: 0 1px 0 rgba(255, 255, 255, 0.7) inset;
-*/
-
         moveLeftEl.click(function () {
             if (showElLeftMargin > -102) {
                 return;
@@ -120,7 +102,6 @@ box-shadow: 0 1px 0 rgba(255, 255, 255, 0.7) inset;
                     'height: 102px; ' +
                     'display: inline; ' +
                     'float: left; ' +
-                    // 'background: url(\'/static/images/arrow-right.png\') center center no-repeat; ' +
                 '" ' +
             '>' +
                 '<div ' +
