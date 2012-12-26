@@ -10,6 +10,7 @@
   <div class="inner-wrapper">
     <article class="import-overview">
       <div class="description">
+        <h2>Import from .tar.gz file</h2>
         <h2>Please <a href="https://edge.edx.org/courses/edX/edx101/edX_Studio_Reference/about" target="_blank">read the documentation</a> before attempting an import!</h2>
         <p><strong>Importing a new course will delete all content currently associated with your course
         and replace it with the contents of the uploaded file.</strong></p>
@@ -17,7 +18,7 @@
         <p>Please note that if your course has any problems with auto-generated <code>url_name</code> nodes,
         re-importing your course could cause the loss of student data associated with those problems.</p>
       </div>
-      <form action="${reverse('import_course', kwargs=dict(org=context_course.location.org, course=context_course.location.course, name=context_course.location.name))}" method="post" enctype="multipart/form-data" class="import-form">
+      <form id="importform" action="${reverse('import_course', kwargs=dict(org=context_course.location.org, course=context_course.location.course, name=context_course.location.name))}" method="post" enctype="multipart/form-data" class="import-form">
         <h2>Course to import:</h2>
         <p class="error-block"></p>
         <a href="#" class="choose-file-button">Choose File</a>        
@@ -31,6 +32,42 @@
       </form>
     </article>
   </div>
+
+
+  <div class="inner-wrapper">
+    <article class="import-overview">
+      <div class="description">
+        <h2>Import from github</h2>
+        <p><strong>Importing a new course will delete all content currently associated with your course
+        and replace it with the contents of the uploaded file.</strong></p>
+        <p>You may import from a specific branch of a github repository.</p>
+	% if message:
+	    <br/>
+            <p><hr width="100%"><pre>${message|h}</pre><hr width="100%"></p>
+	% endif
+      </div>
+      <form action="${reverse('import_course', kwargs=dict(org=context_course.location.org, course=context_course.location.course, name=context_course.location.name))}" method="post" class="import-form">
+        <ul>
+	  <%
+              md = context_course.metadata
+	      importinfo = md.get('import',{})
+              git_repo = importinfo.get('git_repo','')
+              git_branch = importinfo.get('git_branch','')
+	  %>
+          <li>git repository location (ssh): <input type="text" size="53" name="git_repo" value="${git_repo}"></li>
+          <li>branch to use: <input type="text" size="53" name="git_branch" value="${git_branch}"></li>
+	  <li><input type="checkbox" name="purge" value="yes"> Purge existing import files?</li>
+	</ul>
+	<br/>
+	<p>
+          <input type="submit" name="do_github_import" value="Import from Git Repository" class="submit-button2">
+	</p>
+	<input type="hidden" name="csrfmiddlewaretoken" value="${ csrf_token }">
+      </form>
+    </article>
+  </div>
+
+
 </div>
 </%block>
 
@@ -44,7 +81,7 @@ var percent = $('.percent');
 var status = $('#status');
 var submitBtn = $('.submit-button');
    
-$('form').ajaxForm({
+$('#importform').ajaxForm({
     beforeSend: function() {
         status.empty();
         var percentVal = '0%';
