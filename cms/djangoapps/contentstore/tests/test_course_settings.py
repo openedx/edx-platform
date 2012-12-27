@@ -21,7 +21,8 @@ import copy
 class ConvertersTestCase(TestCase):
     @staticmethod
     def struct_to_datetime(struct_time):
-        return datetime.datetime(struct_time.tm_year, struct_time.tm_mon, struct_time.tm_mday, struct_time.tm_hour, struct_time.tm_min, struct_time.tm_sec)
+        return datetime.datetime(struct_time.tm_year, struct_time.tm_mon, struct_time.tm_mday, struct_time.tm_hour, 
+                                 struct_time.tm_min, struct_time.tm_sec, tzinfo = UTC())
         
     def compare_dates(self, date1, date2, expected_delta):
         dt1 = ConvertersTestCase.struct_to_datetime(date1)
@@ -128,9 +129,23 @@ class CourseDetailsTestCase(CourseTestCase):
 class CourseDetailsViewTest(CourseTestCase):
     def alter_field(self, url, details, field, val):
         setattr(details, field, val)
-        # FIXME post is not invoking views.course_settings_updates
-        resp = self.client.post(url, details.__dict__, "application/json") 
+        # Need to partially serialize payload b/c the mock doesn't handle it correctly
+        payload = copy.copy(details.__dict__)
+        payload['course_location'] = details.course_location.url()
+        payload['start_date'] = CourseDetailsViewTest.convert_datetime_to_iso(details.start_date)
+        payload['end_date'] = CourseDetailsViewTest.convert_datetime_to_iso(details.end_date)
+        payload['enrollment_start'] = CourseDetailsViewTest.convert_datetime_to_iso(details.enrollment_start)
+        payload['enrollment_end'] = CourseDetailsViewTest.convert_datetime_to_iso(details.enrollment_end)
+        resp = self.client.post(url, json.dumps(payload), "application/json") 
         self.compare_details_with_encoding(json.loads(resp.content), details.__dict__, field + str(val))
+    
+    @staticmethod
+    def convert_datetime_to_iso(datetime):
+        if datetime is not None:
+            return datetime.isoformat("T")
+        else:
+            return None
+
         
     def test_update_and_fetch(self):
         details = CourseDetails.fetch(self.course_location)
@@ -146,15 +161,15 @@ class CourseDetailsViewTest(CourseTestCase):
         self.compare_details_with_encoding(json.loads(resp.content), details.__dict__, "virgin get")
 
         utc = UTC()
-#        self.alter_field(url, details, 'start_date', datetime.datetime(2012,11,12,1,30, tzinfo=utc))        
-#        self.alter_field(url, details, 'start_date', datetime.datetime(2012,11,1,13,30, tzinfo=utc))
-#        self.alter_field(url, details, 'end_date', datetime.datetime(2013,2,12,1,30, tzinfo=utc))
-#        self.alter_field(url, details, 'enrollment_start', datetime.datetime(2012,10,12,1,30, tzinfo=utc))
-#
-#        self.alter_field(url, details, 'enrollment_end', datetime.datetime(2012,11,15,1,30, tzinfo=utc))
-#        self.alter_field(url, details, 'overview', "Overview")
-#        self.alter_field(url, details, 'intro_video', "intro_video")
-#        self.alter_field(url, details, 'effort', "effort")
+        self.alter_field(url, details, 'start_date', datetime.datetime(2012,11,12,1,30, tzinfo=utc))        
+        self.alter_field(url, details, 'start_date', datetime.datetime(2012,11,1,13,30, tzinfo=utc))
+        self.alter_field(url, details, 'end_date', datetime.datetime(2013,2,12,1,30, tzinfo=utc))
+        self.alter_field(url, details, 'enrollment_start', datetime.datetime(2012,10,12,1,30, tzinfo=utc))
+
+        self.alter_field(url, details, 'enrollment_end', datetime.datetime(2012,11,15,1,30, tzinfo=utc))
+        self.alter_field(url, details, 'overview', "Overview")
+        self.alter_field(url, details, 'intro_video', "intro_video")
+        self.alter_field(url, details, 'effort', "effort")
 
     def compare_details_with_encoding(self, encoded, details, context):
         self.compare_date_fields(details, encoded, context, 'start_date')
@@ -169,11 +184,16 @@ class CourseDetailsViewTest(CourseTestCase):
         if details[field] is not None:
             if field in encoded and encoded[field] is not None:
                 encoded_encoded = jsdate_to_time(encoded[field])
-                details_encoded = jsdate_to_time(details[field])
                 dt1 = ConvertersTestCase.struct_to_datetime(encoded_encoded)
-                dt2 = ConvertersTestCase.struct_to_datetime(details_encoded)
+
+                if isinstance(details[field], datetime.datetime):
+                    dt2 = details[field]
+                else:
+                    details_encoded = jsdate_to_time(details[field])
+                    dt2 = ConvertersTestCase.struct_to_datetime(details_encoded)
+                    
                 expected_delta =  datetime.timedelta(0)
-                self.assertEqual(dt1 - dt2, expected_delta, str(encoded_encoded) + "!=" + str(details_encoded) + " at " + context)
+                self.assertEqual(dt1 - dt2, expected_delta, str(dt1) + "!=" + str(dt2) + " at " + context)
             else:
                 self.fail(field + " missing from encoded but in details at " + context)
         elif field in encoded and encoded[field] is not None:
@@ -238,5 +258,18 @@ class CourseGradingTest(CourseTestCase):
         test_grader.grace_period = {'hours' :  '4'}
         altered_grader = CourseGradingModel.update_from_json(test_grader.__dict__)
         self.assertDictEqual(test_grader.__dict__, altered_grader.__dict__, "4 hour grace period")
+        
+    def test_update_grader_from_json(self):
+        test_grader = CourseGradingModel.fetch(self.course_location)
+        altered_grader = CourseGradingModel.update_grader_from_json(test_grader.course_location, test_grader.graders[1])
+        self.assertDictEqual(test_grader.graders[1], altered_grader, "Noop update")
+        
+        test_grader.graders[1]['min_count'] = test_grader.graders[1].get('min_count') + 2
+        altered_grader = CourseGradingModel.update_grader_from_json(test_grader.course_location, test_grader.graders[1])
+        self.assertDictEqual(test_grader.graders[1], altered_grader, "min_count[1] + 2")
+        
+        test_grader.graders[1]['drop_count'] = test_grader.graders[1].get('drop_count') + 1
+        altered_grader = CourseGradingModel.update_grader_from_json(test_grader.course_location, test_grader.graders[1])
+        self.assertDictEqual(test_grader.graders[1], altered_grader, "drop_count[1] + 2")
         
         
