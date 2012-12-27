@@ -213,38 +213,30 @@ define(['logme', 'update_input'], function (logme, updateInput) {
                 }
 
                 function checkIfOnTarget() {
-                    var c1, c2, target;
+                    var c1, target;
 
-                    c1 = 0;
-
-                    while (c1 < state.targets.length) {
+                    for (c1 = 0; c1 < state.targets.length; c1++) {
                         target = state.targets[c1];
 
                         if (offsetDE.top + 50 < target.offset.top) {
-                            c1 += 1;
                             continue;
                         }
                         if (offsetDE.top + 50 > target.offset.top + target.h) {
-                            c1 += 1;
                             continue;
                         }
                         if (offsetDE.left + 50 < target.offset.left) {
-                            c1 += 1;
                             continue;
                         }
                         if (offsetDE.left + 50 > target.offset.left + target.w) {
-                            c1 += 1;
                             continue;
                         }
 
-                        if (state.config.one_per_target === true) {
-                            if (
-                                (target.draggable.length === 1) &&
-                                (target.draggable[0] !== obj.id)
-                            ) {
-                                c1 += 1;
-                                continue;
-                            }
+                        if (
+                            (state.config.one_per_target === true) &&
+                            (target.draggable.length === 1) &&
+                            (target.draggable[0] !== obj.id)
+                        ) {
+                            continue;
                         }
 
                         targetFound = true;
