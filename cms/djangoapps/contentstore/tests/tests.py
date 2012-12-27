@@ -13,6 +13,10 @@ from xmodule.modulestore.xml_importer import import_from_xml
 import copy
 from factories import *
 
+from xmodule.modulestore.store_utilities import clone_course
+from xmodule.modulestore.store_utilities import delete_course
+from xmodule.modulestore.django import modulestore
+from xmodule.contentstore.django import contentstore
 
 def parse_json(response):
     """Parse response, which is assumed to be json"""
@@ -338,5 +342,30 @@ class ContentStoreTest(TestCase):
 
     def test_edit_unit_full(self):
         self.check_edit_unit('full')
+
+    def test_clone_course(self):
+        import_from_xml(modulestore(), 'common/test/data/', ['full'])
+
+        CourseFactory.create(org='edX', course='1001', display_name='Clone target')
+
+        ms = modulestore('direct')
+        cs = contentstore()
+
+        source_location = CourseDescriptor.id_to_location('edX/full/6.002_Spring_2012')
+        dest_location = CourseDescriptor.id_to_location('edX/1001/Clone_target')
+
+        clone_course(ms, cs, source_location, dest_location)
+
+        # now loop through all the units in the course and verify that the clone can render them, which 
+        # means the objects are at least present
+        items = ms.get_items(Location('edX', 'full', 'vertical', None, None))
+        self.assertGreater(len(items), 0)
+        clone_items = ms.get_items(Location('edX','1001','Clone_target'))
+        self.assertGreater(len(clone_items), 0)
+        for descriptor in items:
+            new_loc = descriptor.location._update({'course':'1001'})
+            print "Checking {0} should now also be at {1}".format(descriptor.location.url(), new_loc.url())
+            resp = self.client.get(reverse('edit_unit', kwargs={'location': new_loc.url()}))
+            self.assertEqual(resp.status_code, 200)
 
 
