@@ -71,6 +71,23 @@ def _delete_course_group(location):
         user.groups.remove(staff)
         user.save()
 
+'''
+This is to be called only by either a command line code path or through an app which has already
+asserted permissions to do this action
+'''
+def _copy_course_group(source, dest):
+    instructors = Group.objects.get(name=get_course_groupname_for_role(source, INSTRUCTOR_ROLE_NAME))
+    new_instructors_group = Group.objects.get(name=get_course_groupname_for_role(dest, INSTRUCTOR_ROLE_NAME))
+    for user in instructors.user_set.all():
+        user.groups.add(new_instructors_group)
+        user.save()
+
+    staff = Group.objects.get(name=get_course_groupname_for_role(source, STAFF_ROLE_NAME))
+    new_staff_group = Group.objects.get(name=get_course_groupname_for_role(dest, STAFF_ROLE_NAME))
+    for user in staff.user_set.all():
+        user.groups.add(new_staff_group)
+        user.save()    
+
 
 def add_user_to_course_group(caller, user, location, role):
     # only admins can add/remove other users

@@ -81,13 +81,14 @@ def clone_course(modulestore, contentstore, source_location, dest_location, dele
 
     # be sure to update the pointer to the thumbnail
     if content.thumbnail_location is not None:
-      content.thumbnail_location._replace(tag = dest_location.tag, org = dest_location.org, 
+      content.thumbnail_location = content.thumbnail_location._replace(org = dest_location.org, 
         course = dest_location.course)
-
 
     print "Cloning asset {0} to {1}".format(asset_loc, content.location)
 
     contentstore.save(content)
+
+  return True
 
 def delete_course(modulestore, contentstore, source_location):
     # first check to see if the modulestore is Mongo backed

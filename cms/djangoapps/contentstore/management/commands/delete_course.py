@@ -21,14 +21,18 @@ class Command(BaseCommand):
 
     def handle(self, *args, **options):
         if len(args) != 1:
-            raise CommandError("delete_course requires one arguments: <location>")
+            raise CommandError("delete_course requires one argument: <location>")
 
         loc_str = args[0]
+
+        ms = modulestore('direct')
+        cs = contentstore()
 
         if query_yes_no("Deleting course {0}. Confirm?".format(loc_str), default="no"):
           if query_yes_no("Are you sure. This action cannot be undone!", default="no"):
             loc = CourseDescriptor.id_to_location(loc_str)
-            if delete_course(modulestore('direct'), contentstore(), loc) == True:
+            if delete_course(ms, cs, loc) == True:
+              print 'removing User permissions from course....'
               # in the django layer, we need to remove all the user permissions groups associated with this course
               _delete_course_group(loc)            
 
