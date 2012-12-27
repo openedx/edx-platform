@@ -20,3 +20,5 @@ def jsdate_to_time(field):
         return d.utctimetuple()
     elif isinstance(field, int) or isinstance(field, float):
         return time.gmtime(field / 1000)
+    elif isinstance(field, time.struct_time):
+        return field
