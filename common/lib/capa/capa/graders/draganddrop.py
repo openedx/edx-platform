@@ -92,8 +92,11 @@ def grade(user_input, correct_answer):
              isinstance(user, unicode) and isinstance(correct, str)) else False
 
     for draggable in user_answer['draggables']:
-        if not is_equal(draggable.values()[0],
-                        correct_answer[draggable.keys()[0]]):
+        user_img_location = draggable.values()[0]
+        corr_img_location = correct_answer.get(draggable.keys()[0], None)
+        if not corr_img_location:
+            return False
+        if not is_equal(user_img_location, corr_img_location):
             return False
 
     return True
