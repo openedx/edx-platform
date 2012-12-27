@@ -399,6 +399,7 @@ end
 namespace :cms do
   desc "Clone existing MongoDB based course"
   task :clone do
+
     if ENV['SOURCE_LOC'] and ENV['DEST_LOC']
       sh(django_admin(:cms, :dev, :clone, ENV['SOURCE_LOC'], ENV['DEST_LOC']))
     else

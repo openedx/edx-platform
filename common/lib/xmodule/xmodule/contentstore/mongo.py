@@ -47,7 +47,7 @@ class MongoContentStore(ContentStore):
         try:
             with self.fs.get(id) as fp:
                 return StaticContent(location, fp.displayname, fp.content_type, fp.read(), 
-                    fp.uploadDate, thumbnail_location = fp.thumbnail_location if 'thumbnail_location' in fp else None)
+                    fp.uploadDate, thumbnail_location = fp.thumbnail_location if hasattr(fp, 'thumbnail_location') else None)
         except NoFile:
             raise NotFoundError()
 

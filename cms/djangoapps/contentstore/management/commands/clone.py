@@ -8,6 +8,8 @@ from xmodule.contentstore.django import contentstore
 from xmodule.modulestore import Location
 from xmodule.course_module import CourseDescriptor
 
+from auth.authz import _copy_course_group
+
 #
 # To run from command line: rake cms:clone SOURCE_LOC=MITx/111/Foo1 DEST_LOC=MITx/135/Foo3
 #
@@ -18,14 +20,19 @@ class Command(BaseCommand):
 
     def handle(self, *args, **options):
         if len(args) != 2:
-            raise CommandError("clone requires two arguments: <source-location> <dest-location>")
+            raise CommandError("clone requires either two or six arguments: <source-location> <dest-location>")
 
         source_location_str = args[0]
         dest_location_str = args[1]
+
+        ms = modulestore('direct')
+        cs = contentstore()
 
         print "Cloning course {0} to {1}".format(source_location_str, dest_location_str)
 
         source_location = CourseDescriptor.id_to_location(source_location_str)
         dest_location = CourseDescriptor.id_to_location(dest_location_str)
 
-        clone_course(modulestore('direct'), contentstore(), source_location, dest_location)
+        if clone_course(ms, cs, source_location, dest_location):
+            print "copying User permissions..."
+            _copy_course_group(source_location, dest_location)
