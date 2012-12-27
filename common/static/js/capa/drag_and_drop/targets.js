@@ -20,16 +20,16 @@ define(['logme', 'update_input'], function (logme, updateInput) {
         return;
 
         function processTarget(obj) {
-            var targetElOffset, tEl, left, borderCss;
+            var baseImageElOffset, tEl, left, borderCss;
 
-            if (state.targetElWidth === null) {
+            if (state.baseImageElWidth === null) {
                 window.setTimeout(function () {
                     processTarget(obj);
                 }, 50);
                 return;
             }
 
-            left = obj.x + 0.5 * (state.targetEl.parent().width() - state.targetElWidth);
+            left = obj.x + 0.5 * (state.baseImageEl.parent().width() - state.baseImageElWidth);
 
             borderCss = '';
             if (state.config.target_outline === true) {
@@ -51,11 +51,11 @@ define(['logme', 'update_input'], function (logme, updateInput) {
                 '></div>'
             );
 
-            tEl.appendTo(state.targetEl.parent());
+            tEl.appendTo(state.baseImageEl.parent());
 
             state.targets.push({
                 'id': obj.id,
-                'offset': tEl.offset(),
+                'offset': tEl.position(),
                 'w': obj.w,
                 'h': obj.h,
                 'el': tEl,

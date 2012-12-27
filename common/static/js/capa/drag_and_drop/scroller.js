@@ -13,7 +13,7 @@ define(['logme'], function (logme) {
         parentEl = $(
             '<div ' +
                 'style=" ' +
-                    'width: 100%; ' +
+                    'width: 665px; ' +
                     'height: 102px; ' +
                     'margin-left: auto; ' +
                     'margin-right: auto; ' +
@@ -24,7 +24,7 @@ define(['logme'], function (logme) {
         moveLeftEl = $(
             '<div ' +
                 'style=" ' +
-                    'width: 6%; ' +
+                    'width: 40px; ' +
                     'height: 102px; ' +
                     'display: inline; ' +
                     'float: left; ' +
@@ -67,13 +67,15 @@ define(['logme'], function (logme) {
             showElLeftMargin += 102;
             state.sliderEl.animate({
                 'margin-left': showElLeftMargin + 'px'
-            }, 100);
+            }, 100, function () {
+                // Check if at the end, and make arrow less visible.
+            });
         });
 
         showEl = $(
             '<div ' +
                 'style=" ' +
-                    'width: 714px; ' +
+                    'width: 585px; ' +
                     'height: 102px; ' +
                     'overflow: hidden; ' +
                     'display: inline; ' +
@@ -98,7 +100,7 @@ define(['logme'], function (logme) {
         moveRightEl = $(
             '<div ' +
                 'style=" ' +
-                    'width: 6%; ' +
+                    'width: 40px; ' +
                     'height: 102px; ' +
                     'display: inline; ' +
                     'float: left; ' +
@@ -134,14 +136,16 @@ define(['logme'], function (logme) {
         moveRightEl.appendTo(parentEl);
 
         moveRightEl.click(function () {
-            if (showElLeftMargin < -102 * (state.sliderEl.children().length - 8)) {
+            if (showElLeftMargin < -102 * (state.sliderEl.children().length - 6)) {
                 return;
             }
 
             showElLeftMargin -= 102;
             state.sliderEl.animate({
                 'margin-left': showElLeftMargin + 'px'
-            }, 100);
+            }, 100, function () {
+                // Check if at the end, and make arrow less visible.
+            });
         });
 
         parentEl.appendTo(state.containerEl);

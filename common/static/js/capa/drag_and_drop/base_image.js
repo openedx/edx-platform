@@ -8,34 +8,34 @@ define(['logme'], function (logme) {
     return BaseImage;
 
     function BaseImage(state) {
-        var targetImgSrc, targetElContainer, mouseMoveDiv;
+        var targetImgSrc, baseImageElContainer, mouseMoveDiv;
 
         targetImgSrc = state.config.imageDir + '/' + state.config.base_image;
 
-        targetElContainer = $(
+        baseImageElContainer = $(
             '<div ' +
+                'class="base_image_container" ' +
                 'style=" ' +
                     'position: relative; ' +
-                    'text-align: center; ' +
                 '" ' +
             '></div>'
         );
 
-        state.targetEl = $(
+        state.baseImageEl = $(
             '<img ' +
                 'src="' + targetImgSrc + '" ' +
             '/>'
         );
-        state.targetEl.appendTo(targetElContainer);
+        state.baseImageEl.appendTo(baseImageElContainer);
 
-        state.targetElWidth = null;
+        state.baseImageElWidth = null;
         $('<img/>') // Make in memory copy of image to avoid css issues.
-            .attr('src', state.targetEl.attr('src'))
+            .attr('src', state.baseImageEl.attr('src'))
             .load(function () {
-                state.targetElWidth = this.width;
+                state.baseImageElWidth = this.width;
             });
 
-        // state.targetEl.mousemove(
+        // state.baseImageEl.mousemove(
         //     function (event) {
         //         mouseMoveDiv.html(
         //             '[' + event.offsetX + ', ' + event.offsetY + ']'
@@ -53,9 +53,9 @@ define(['logme'], function (logme) {
                 '" ' +
             '></div>'
         );
-        mouseMoveDiv.appendTo(targetElContainer);
+        mouseMoveDiv.appendTo(baseImageElContainer);
 
-        targetElContainer.appendTo(state.containerEl);
+        baseImageElContainer.appendTo(state.containerEl);
     }
 });
 

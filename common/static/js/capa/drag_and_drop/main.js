@@ -32,18 +32,18 @@ define(
             return;
         }
 
-        imageDir = $(value).attr('data-course-folder');
-        if (typeof imageDir !== 'string') {
-            logme('ERROR: Could not find the name of the image directory.');
-
-            return;
-        }
-
         try {
             config = JSON.parse($('#drag_and_drop_json_' + problemId).html());
         } catch (err) {
             logme('ERROR: Could not parse the JSON configuration options.');
             logme('Error message: "' + err.message + '".');
+
+            return;
+        }
+
+        imageDir = $(value).attr('data-course-folder');
+        if (typeof imageDir !== 'string') {
+            logme('ERROR: Could not find the name of the image directory.');
 
             return;
         }

@@ -20,6 +20,17 @@ define(['logme', 'update_input'], function (logme, updateInput) {
             }
         }(0));
 
+        state.currentMovingDraggable = null;
+
+        $(document).mousemove(function (event) {
+            normalizeEvent(event);
+
+            if (state.currentMovingDraggable !== null) {
+                state.currentMovingDraggable.css('left', event.pageX - state.baseImageEl.offset().left - 50);
+                state.currentMovingDraggable.css('top', event.pageY - state.baseImageEl.offset().top - 50);
+            }
+        });
+
         return;
 
         function processDraggable(obj, index) {
@@ -81,7 +92,7 @@ define(['logme', 'update_input'], function (logme, updateInput) {
             draggableContainerEl.mousedown(mouseDown);
             draggableContainerEl.mouseup(mouseUp);
             draggableContainerEl.mousemove(mouseMove);
-            draggableContainerEl.mouseleave(mouseLeave);
+            // draggableContainerEl.mouseleave(mouseLeave);
 
             if (state.individualTargets === false) {
                 updateInput(state);
@@ -91,12 +102,16 @@ define(['logme', 'update_input'], function (logme, updateInput) {
 
             function mouseDown(event) {
                 if (mousePressed === false) {
+                    state.currentMovingDraggable = draggableContainerEl;
+                    normalizeEvent(event);
+
                     if (inContainer === true) {
                         draggableContainerEl.detach();
+                        draggableContainerEl.css('border', 'none');
                         draggableContainerEl.css('position', 'absolute');
-                        draggableContainerEl.css('left', event.pageX - 50);
-                        draggableContainerEl.css('top', event.pageY - 50);
-                        draggableContainerEl.appendTo(state.containerEl);
+                        draggableContainerEl.css('left', event.pageX - state.baseImageEl.offset().left - 50);
+                        draggableContainerEl.css('top', event.pageY - state.baseImageEl.offset().top - 50);
+                        draggableContainerEl.appendTo(state.baseImageEl.parent());
 
                         inContainer = false;
                     }
@@ -109,40 +124,43 @@ define(['logme', 'update_input'], function (logme, updateInput) {
                 }
             }
 
-            function mouseUp() {
+            function mouseUp(event) {
                 if (mousePressed === true) {
-                    checkLandingElement();
+                    state.currentMovingDraggable = null;
+                    normalizeEvent(event);
+
+                    checkLandingElement(event);
                 }
             }
 
             function mouseMove() {
                 if (mousePressed === true) {
-                    draggableContainerEl.css('left', (event.pageX - 50));
-                    draggableContainerEl.css('top', (event.pageY - 50));
+                    draggableContainerEl.css('left', event.pageX - state.baseImageEl.offset().left - 50);
+                    draggableContainerEl.css('top', event.pageY - state.baseImageEl.offset().top - 50);
                 }
             }
 
-            function mouseLeave() {
-                if (mousePressed === true) {
-                    checkLandingElement();
-                }
-            }
+            // function mouseLeave(event) {
+            //     if (mousePressed === true) {
+            //         normalizeEvent(event);
+            //
+            //         checkLandingElement(event);
+            //     }
+            // }
 
-            function checkLandingElement() {
-                var offsetDE, offsetTE, indexes, DEindex, targetFound;
+            function checkLandingElement(event) {
+                var offsetDE, indexes, DEindex, targetFound;
 
                 mousePressed = false;
 
-                offsetDE = draggableContainerEl.offset();
+                offsetDE = draggableContainerEl.position();
 
                 if (state.individualTargets === false) {
-                    offsetTE = state.targetEl.offset();
-
                     if (
-                        (offsetDE.left < offsetTE.left) ||
-                        (offsetDE.left + 100 > offsetTE.left + state.targetEl.width()) ||
-                        (offsetDE.top < offsetTE.top) ||
-                        (offsetDE.top + 100 > offsetTE.top + state.targetEl.height())
+                        (offsetDE.left < 0) ||
+                        (offsetDE.left + 100 > state.baseImageEl.width()) ||
+                        (offsetDE.top < 0) ||
+                        (offsetDE.top + 100 > state.baseImageEl.height())
                     ) {
                         moveBackToSlider();
 
@@ -151,8 +169,8 @@ define(['logme', 'update_input'], function (logme, updateInput) {
                     } else {
                         correctZIndexes();
 
-                        draggableObj.x = offsetDE.left + 50 - offsetTE.left;
-                        draggableObj.y = offsetDE.top + 50 - offsetTE.top;
+                        draggableObj.x = offsetDE.left + 50;
+                        draggableObj.y = offsetDE.top + 50;
                     }
                 } else if (state.individualTargets === true) {
                     targetFound = false;
@@ -238,8 +256,8 @@ define(['logme', 'update_input'], function (logme, updateInput) {
                 }
 
                 function snapToTarget(target) {
-                    draggableContainerEl.css('left', (target.offset.left + 0.5 * target.w - 50));
-                    draggableContainerEl.css('top', (target.offset.top + 0.5 * target.h - 50));
+                    draggableContainerEl.css('left', target.offset.left + 0.5 * target.w - 50);
+                    draggableContainerEl.css('top', target.offset.top + 0.5 * target.h - 50);
                 }
 
                 function correctZIndexes() {
@@ -288,10 +306,19 @@ define(['logme', 'update_input'], function (logme, updateInput) {
                         draggableContainerEl.appendTo(state.sliderEl);
                         inContainer = true;
                     }
+
+                    draggableContainerEl.css('border', '1px solid gray');
                 }
             }
         }
 
+        function normalizeEvent(event) {
+            if(!event.offsetX) {
+                event.offsetX = (event.pageX - $(event.target).offset().left);
+                event.offsetY = (event.pageY - $(event.target).offset().top);
+            }
+            return event;
+        }
     }
 });
 

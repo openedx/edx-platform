@@ -12,6 +12,9 @@ define(['logme'], function (logme) {
             '<div ' +
                 'style=" ' +
                     'clear: both; ' +
+                    'width: 665px; ' +
+                    'margin-left: auto; ' +
+                    'margin-right: auto; ' +
                 '" ' +
             '></div>'
         );
