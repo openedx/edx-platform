@@ -59,7 +59,16 @@ define(['logme'], function (logme) {
         );
         moveLeftEl.appendTo(parentEl);
 
-        moveLeftEl.click(function () {
+        // The below is necessary to prevent the browser thinking that we want
+        // to perform a drag operation, or a highlight operation. If we don't
+        // do this, the browser will then highlight with a gray shade the
+        // element.
+        moveLeftEl.mousemove(function (event) { event.preventDefault(); });
+        moveLeftEl.mousedown(function (event) { event.preventDefault(); });
+
+        moveLeftEl.mouseup(function (event) {
+            event.preventDefault();
+
             if (showElLeftMargin > -102) {
                 return;
             }
@@ -135,7 +144,16 @@ define(['logme'], function (logme) {
         );
         moveRightEl.appendTo(parentEl);
 
-        moveRightEl.click(function () {
+        // The below is necessary to prevent the browser thinking that we want
+        // to perform a drag operation, or a highlight operation. If we don't
+        // do this, the browser will then highlight with a gray shade the
+        // element.
+        moveRightEl.mousemove(function (event) { event.preventDefault(); });
+        moveRightEl.mousedown(function (event) { event.preventDefault(); });
+
+        moveRightEl.mouseup(function (event) {
+            event.preventDefault();
+
             if (showElLeftMargin < -102 * (state.sliderEl.children().length - 6)) {
                 return;
             }

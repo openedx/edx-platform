@@ -8,15 +8,20 @@ define(['logme', 'update_input'], function (logme, updateInput) {
     return Draggables;
 
     function Draggables(state) {
-        var _draggables;
+        var _draggables, numDraggables;
 
+        numDraggables = state.config.draggables.length;
         _draggables = [];
         state.draggables = [];
 
         (function (i) {
-            while (i < state.config.draggables.length) {
+            while (i < numDraggables) {
                 processDraggable(state.config.draggables[i], i + 1);
                 i += 1;
+            }
+
+            if (state.individualTargets === false) {
+                updateInput(state, true);
             }
         }(0));
 
@@ -33,7 +38,7 @@ define(['logme', 'update_input'], function (logme, updateInput) {
 
         return;
 
-        function processDraggable(obj, index) {
+        function processDraggable(obj, objIndex) {
             var draggableContainerEl, imgEl, inContainer, ousePressed,
                 onTarget, draggableObj, marginCss;
 
@@ -45,10 +50,10 @@ define(['logme', 'update_input'], function (logme, updateInput) {
                         'display: inline; ' +
                         'float: left; ' +
                         'overflow: hidden; ' +
-                        'z-index: ' + index + '; ' +
+                        'z-index: ' + objIndex + '; ' +
                         'border: 1px solid gray; ' +
                     '" ' +
-                    'data-draggable-position-index="' + index + '" ' +
+                    'data-draggable-position-index="' + objIndex + '" ' +
                     '></div>'
             );
 
@@ -84,18 +89,21 @@ define(['logme', 'update_input'], function (logme, updateInput) {
 
             draggableObj = {
                 'id': obj.id,
+                'el': draggableContainerEl,
                 'x': -1,
-                'y': -1
+                'y': -1,
+
+                'setInContainer': function (val) { inContainer = val; },
+                'setOnTarget': function (val) { onTarget = val; },
             };
             state.draggables.push(draggableObj);
 
             draggableContainerEl.mousedown(mouseDown);
             draggableContainerEl.mouseup(mouseUp);
             draggableContainerEl.mousemove(mouseMove);
-            // draggableContainerEl.mouseleave(mouseLeave);
 
-            if (state.individualTargets === false) {
-                updateInput(state);
+            if (objIndex + 1 === numDraggables) {
+                state.draggablesLoaded = true;
             }
 
             return;
@@ -139,14 +147,6 @@ define(['logme', 'update_input'], function (logme, updateInput) {
                     draggableContainerEl.css('top', event.pageY - state.baseImageEl.offset().top - 50);
                 }
             }
-
-            // function mouseLeave(event) {
-            //     if (mousePressed === true) {
-            //         normalizeEvent(event);
-            //
-            //         checkLandingElement(event);
-            //     }
-            // }
 
             function checkLandingElement(event) {
                 var offsetDE, indexes, DEindex, targetFound;

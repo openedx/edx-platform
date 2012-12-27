@@ -7,8 +7,14 @@
 define(['logme'], function (logme) {
     return updateInput;
 
-    function updateInput(state) {
+    function updateInput(state, checkFirst) {
         var inputEl, stateStr, targets, draggables, c1, c2, tempObj;
+
+        if (checkFirst === true) {
+            if (checkIfHasAnswer() === true) {
+                return;
+            }
+        }
 
         draggables = [];
 
@@ -47,8 +53,134 @@ define(['logme'], function (logme) {
 
         inputEl = $('#input_' + state.problemId);
         inputEl.val(stateStr);
-    }
 
+        return;
+
+        // Check if input has an answer from server. If yes, then position
+        // all draggables according to answer.
+        function checkIfHasAnswer() {
+            var inputElVal;
+
+            inputElVal = $('#input_' + state.problemId).val();
+            if (inputElVal.length === 0) {
+                return false;
+            }
+
+            repositionDraggables(JSON.parse(inputElVal));
+
+            return true;
+        }
+
+        function repositionDraggables(answer) {
+            var draggableId, draggable, targetId, target, draggablePosition,
+                c1;
+
+            if (
+                ((state.individualTargets === true) && (state.targetsLoaded === false)) ||
+                (state.draggablesLoaded === false)
+            ) {
+                window.setTimeout(function () {
+                    repositionDraggables(answer);
+                }, 50);
+
+                return;
+            }
+
+            if (
+                ((typeof answer.use_targets === 'boolean') && (answer.use_targets === true)) ||
+                ((typeof answer.use_targets === 'string') && (answer.use_targets === 'true'))
+            ) {
+                for (c1 = 0; c1 < answer.draggables.length; c1++) {
+                    for (draggableId in answer.draggables[c1]) {
+                        if ((draggable = getDraggableById(draggableId)) === null) {
+                            logme('ERROR: In answer there exists a draggable ID "' + draggableId + '". No draggable with this ID could be found.');
+
+                            continue;
+                        }
+
+                        targetId = answer.draggables[c1][draggableId];
+                        if ((target = getTargetById(targetId)) === null) {
+                            logme('ERROR: In answer there exists a target ID "' + targetId + '". No target with this ID could be found.');
+
+                            continue;
+                        }
+
+
+                        draggable.setInContainer(false);
+
+                        draggable.el.detach();
+                        draggable.el.css('border', 'none');
+                        draggable.el.css('position', 'absolute');
+                        draggable.el.css('left', answer.draggables[c1][draggableId][0] - 50);
+                        draggable.el.css('top', answer.draggables[c1][draggableId][1] - 50);
+
+                        draggable.el.css('left', target.offset.left + 0.5 * target.w - 50);
+                        draggable.el.css('top', target.offset.top + 0.5 * target.h - 50);
+
+                        draggable.el.appendTo(state.baseImageEl.parent());
+
+                        draggable.setOnTarget(target);
+                        target.draggable.push(draggableId);
+                    }
+                }
+            } else if (
+                ((typeof answer.use_targets === 'boolean') && (answer.use_targets === false)) ||
+                ((typeof answer.use_targets === 'string') && (answer.use_targets === 'false'))
+            ) {
+                for (c1 = 0; c1 < answer.draggables.length; c1++) {
+                    for (draggableId in answer.draggables[c1]) {
+                        if ((draggable = getDraggableById(draggableId)) === null) {
+                            logme('ERROR: In answer there exists a draggable ID "' + draggableId + '". No draggable with this ID could be found.');
+
+                            continue;
+                        }
+
+                        draggable.setInContainer(false);
+
+                        draggable.el.detach();
+                        draggable.el.css('border', 'none');
+                        draggable.el.css('position', 'absolute');
+                        draggable.el.css('left', answer.draggables[c1][draggableId][0] - 50);
+                        draggable.el.css('top', answer.draggables[c1][draggableId][1] - 50);
+                        draggable.el.appendTo(state.baseImageEl.parent());
+
+                        draggable.x = answer.draggables[c1][draggableId][0];
+                        draggable.y = answer.draggables[c1][draggableId][1];
+                    }
+                }
+            } else {
+                logme('ERROR: The type of answer.targets is not supported. answer.targets = ', answer.targets);
+
+                return;
+            }
+        }
+
+        return;
+
+        function getDraggableById(id) {
+            var c1;
+
+            for (c1 = 0; c1 < state.draggables.length; c1 += 1) {
+                if (state.draggables[c1].id === id) {
+                    return state.draggables[c1];
+                }
+            }
+
+            return null;
+        }
+
+        function getTargetById(id) {
+            var c1;
+
+            for (c1 = 0; c1 < state.targets.length; c1 += 1) {
+                if (state.targets[c1].id === id) {
+                    return state.targets[c1];
+                }
+            }
+
+            return null;
+        }
+    }
 });
 
 // End of wrapper for RequireJS. As you can see, we are passing

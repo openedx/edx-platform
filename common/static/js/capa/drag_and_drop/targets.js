@@ -8,28 +8,37 @@ define(['logme', 'update_input'], function (logme, updateInput) {
     return Targets;
 
     function Targets(state) {
+        var numTargets;
+
+        numTargets = state.config.targets.length;
         state.targets = [];
 
         (function (c1) {
-            while (c1 < state.config.targets.length) {
-                processTarget(state.config.targets[c1]);
+            while (c1 < numTargets) {
+                processTarget(state.config.targets[c1], c1);
                 c1 += 1;
+            }
+
+            if (state.individualTargets === true) {
+                updateInput(state, true);
             }
         }(0));
 
         return;
 
-        function processTarget(obj) {
+        function processTarget(obj, objIndex) {
             var baseImageElOffset, tEl, left, borderCss;
 
-            if (state.baseImageElWidth === null) {
-                window.setTimeout(function () {
-                    processTarget(obj);
-                }, 50);
-                return;
-            }
+            // if (state.baseImageElWidth === null) {
+            //     window.setTimeout(function () {
+            //         processTarget(obj);
+            //     }, 50);
+            //
+            //     return;
+            // }
 
-            left = obj.x + 0.5 * (state.baseImageEl.parent().width() - state.baseImageElWidth);
+            // left = obj.x + 0.5 * (state.baseImageEl.parent().width() - state.baseImageElWidth);
+            left = obj.x;
 
             borderCss = '';
             if (state.config.target_outline === true) {
@@ -62,8 +71,8 @@ define(['logme', 'update_input'], function (logme, updateInput) {
                 'draggable': []
             });
 
-            if (state.individualTargets === true) {
-                updateInput(state);
+            if (objIndex + 1 === numTargets) {
+                state.targetsLoaded = true;
             }
         }
     }

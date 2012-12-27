@@ -9,7 +9,10 @@ define([], function () {
 
     function State(problemId) {
         return {
-            'problemId': problemId
+            'problemId': problemId,
+
+            'targetsLoaded': false,
+            'draggablesLoaded': false
         };
     }
 });
