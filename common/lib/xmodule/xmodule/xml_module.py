@@ -98,9 +98,12 @@ class XmlDescriptor(XModuleDescriptor):
 
     metadata_to_strip = ('data_dir', 
             # cdodge: @TODO: We need to figure out a way to export out 'tabs' and 'grading_policy' which is on the course
-            'tabs', 'grading_policy',
+            'tabs', 'grading_policy', 'is_draft', 'published_by', 'published_date', 
+            'discussion_blackouts',
            # VS[compat] -- remove the below attrs once everything is in the CMS
            'course', 'org', 'url_name', 'filename')
+
+    metadata_to_export_to_policy = ('discussion_topics')
 
     # A dictionary mapping xml attribute names AttrMaps that describe how
     # to import and export them
@@ -108,10 +111,17 @@ class XmlDescriptor(XModuleDescriptor):
     to_bool = lambda val: val == 'true' or val == True
     from_bool = lambda val: str(val).lower()
     bool_map = AttrMap(to_bool, from_bool)
+
+    to_int = lambda val: int(val)
+    from_int = lambda val: str(val) 
+    int_map = AttrMap(to_int, from_int)
     xml_attribute_map = {
         # type conversion: want True/False in python, "true"/"false" in xml
         'graded': bool_map,
         'hide_progress_tab': bool_map,
+        'allow_anonymous': bool_map,
+        'allow_anonymous_to_peers': bool_map,
+        'weight':int_map
     }
 
 
@@ -359,8 +369,9 @@ class XmlDescriptor(XModuleDescriptor):
         # Add the non-inherited metadata
         for attr in sorted(self.own_metadata):
             # don't want e.g. data_dir
-            if attr not in self.metadata_to_strip:
+            if attr not in self.metadata_to_strip and attr not in self.metadata_to_export_to_policy:
                 val = val_for_xml(attr)
+                #logging.debug('location.category = {0}, attr = {1}'.format(self.location.category, attr))
                 xml_object.set(attr, val)
 
         if self.export_to_file():

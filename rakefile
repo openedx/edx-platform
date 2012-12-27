@@ -445,6 +445,18 @@ namespace :cms do
   end
 end
 
+namespace :cms do
+  desc "Export course data to a tar.gz file"
+  task :export do
+    if ENV['COURSE_ID'] and ENV['OUTPUT_PATH']
+      sh(django_admin(:cms, :dev, :export, ENV['COURSE_ID'], ENV['OUTPUT_PATH']))
+    else
+      raise "Please specify a COURSE_ID and OUTPUT_PATH.\n" +
+        "Example: \`rake cms:export COURSE_ID=MITx/12345/name OUTPUT_PATH=foo.tar.gz\`"
+    end
+  end
+end
+
 desc "Build a properties file used to trigger autodeploy builds"
 task :autodeploy_properties do
     File.open("autodeploy.properties", "w") do |file|

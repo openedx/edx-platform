@@ -10,6 +10,10 @@ from datetime import datetime
 from collections import defaultdict
 from uuid import uuid4
 from path import path
+from xmodule.modulestore.xml_exporter import export_to_xml
+from tempfile import mkdtemp
+from django.core.servers.basehttp import FileWrapper
+from django.core.files.temp import NamedTemporaryFile
 
 # to install PIL on MacOSX: 'easy_install http://dist.repoze.org/PIL-1.1.6.tar.gz'
 from PIL import Image
@@ -1302,3 +1306,55 @@ def import_course(request, org, course, name):
                         course_module.location.course,
                         course_module.location.name])
         })
+
+@ensure_csrf_cookie
+@login_required
+def generate_export_course(request, org, course, name):
+    location = ['i4x', org, course, 'course', name]
+    course_module = modulestore().get_item(location)
+    # check that logged in user has permissions to this item
+    if not has_access(request.user, location):
+        raise PermissionDenied()
+
+    loc = Location(location)
+    export_file = NamedTemporaryFile(prefix=name+'.', suffix=".tar.gz")
+
+    root_dir = path(mkdtemp())
+
+    # export out to a tempdir
+    
+    logging.debug('root = {0}'.format(root_dir))
+
+    export_to_xml(modulestore('direct'), contentstore(), loc, root_dir, name)
+    #filename = root_dir / name + '.tar.gz'
+
+    logging.debug('tar file being generated at {0}'.format(export_file.name))
+    tf = tarfile.open(name=export_file.name, mode='w:gz')
+    tf.add(root_dir/name, arcname=name)
+    tf.close()
+
+    # remove temp dir
+    shutil.rmtree(root_dir/name) 
+
+    wrapper = FileWrapper(export_file)
+    response = HttpResponse(wrapper, content_type='application/x-tgz')
+    response['Content-Disposition'] = 'attachment; filename=%s' % os.path.basename(export_file.name)
+    response['Content-Length'] = os.path.getsize(export_file.name)
+    return response
+
+
+@ensure_csrf_cookie
+@login_required
+def export_course(request, org, course, name):
+
+    location = ['i4x', org, course, 'course', name]
+    course_module = modulestore().get_item(location)
+    # check that logged in user has permissions to this item
+    if not has_access(request.user, location):
+        raise PermissionDenied()
+
+    return render_to_response('export.html', {
+        'context_course': course_module,
+        'active_tab': 'export',
+        'successful_import_redirect_url' : ''
+    })
