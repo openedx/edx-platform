@@ -71,6 +71,12 @@ class Test_DragAndDrop(unittest.TestCase):
         correct_answer = {'1': [[40, 10], 29], 'name_with_icon': [20, 20]}
         self.assertFalse(draganddrop.grade(user_input, correct_answer))
 
+    def test_correct_answer_not_has_key_from_user_answer(self):
+        user_input = '{"use_targets": true, "draggables": [{"1": "t1"}, \
+        {"name_with_icon": "t2"}]}'
+        correct_answer = {'3':   't3', 'name_with_icon': 't2'}
+        self.assertFalse(draganddrop.grade(user_input, correct_answer))
+
 
 def suite():
 
