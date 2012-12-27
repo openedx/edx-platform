@@ -40,7 +40,7 @@ from xmodule.modulestore.exceptions import ItemNotFoundError
 from datetime import date
 from collections import namedtuple
 
-from courseware.courses import get_courses_by_university
+from courseware.courses import get_courses
 from courseware.access import has_access
 
 from statsd import statsd
@@ -74,15 +74,20 @@ def index(request, extra_context={}, user=None):
     domain = settings.MITX_FEATURES.get('FORCE_UNIVERSITY_DOMAIN')	# normally False
     if domain==False:				# do explicit check, because domain=None is valid
         domain = request.META.get('HTTP_HOST')
-    universities = get_courses_by_university(None,
-                                             domain=domain)
+
+    courses = get_courses(None, domain=domain)
+
+    # Sort courses by how far are they from they start day
+    key = lambda course: course.metadata['days_to_start']
+    courses = sorted(courses, key=key, reverse=True)
 
     # Get the 3 most recent news
     top_news = _get_news(top=3)
 
-    context = {'universities': universities, 'news': top_news}
+    context = {'courses': courses, 'news': top_news}
     context.update(extra_context)
     return render_to_response('index.html', context)
+
 
 def course_from_id(course_id):
     """Return the CourseDescriptor corresponding to this course_id"""

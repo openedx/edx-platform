@@ -17,7 +17,7 @@ from track.models import TrackingLog
 
 log = logging.getLogger("tracking")
 
-LOGFIELDS = ['username','ip','event_source','event_type','event','agent','page','time']
+LOGFIELDS = ['username','ip','event_source','event_type','event','agent','page','time','host']
 
 def log_event(event):
     event_str = json.dumps(event)
@@ -58,6 +58,7 @@ def user_track(request):
         "agent": agent,
         "page": request.GET['page'],
         "time": datetime.datetime.utcnow().isoformat(),
+        "host": request.META['SERVER_NAME'],
         }
     log_event(event)
     return HttpResponse('success')
@@ -83,6 +84,7 @@ def server_track(request, event_type, event, page=None):
         "agent": agent,
         "page": page,
         "time": datetime.datetime.utcnow().isoformat(),
+        "host": request.META['SERVER_NAME'],
         }
 
     if event_type.startswith("/event_logs") and request.user.is_staff:	# don't log
