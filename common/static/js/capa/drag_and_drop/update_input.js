@@ -54,6 +54,8 @@ define(['logme'], function (logme) {
         inputEl = $('#input_' + state.problemId);
         inputEl.val(stateStr);
 
+        logme(inputEl.val());
+
         return;
 
         // Check if input has an answer from server. If yes, then position
@@ -75,16 +77,7 @@ define(['logme'], function (logme) {
             var draggableId, draggable, targetId, target, draggablePosition,
                 c1;
 
-            if (
-                ((state.individualTargets === true) && (state.targetsLoaded === false)) ||
-                (state.draggablesLoaded === false)
-            ) {
-                window.setTimeout(function () {
-                    repositionDraggables(answer);
-                }, 50);
-
-                return;
-            }
+            logme(answer);
 
             if (
                 ((typeof answer.use_targets === 'boolean') && (answer.use_targets === true)) ||

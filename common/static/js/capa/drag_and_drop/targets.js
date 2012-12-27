@@ -4,48 +4,29 @@
 // See https://edx-wiki.atlassian.net/wiki/display/LMS/Integration+of+Require+JS+into+the+system
 (function (requirejs, require, define) {
 
-define(['logme', 'update_input'], function (logme, updateInput) {
+define(['logme'], function (logme) {
     return Targets;
 
     function Targets(state) {
-        var numTargets;
+        var c1;
 
-        numTargets = state.config.targets.length;
         state.targets = [];
 
-        (function (c1) {
-            while (c1 < numTargets) {
-                processTarget(state.config.targets[c1], c1);
-                c1 += 1;
-            }
-
-            if (state.individualTargets === true) {
-                updateInput(state, true);
-            }
-        }(0));
+        for (c1 = 0; c1 < state.config.targets.length; c1++) {
+            processTarget(state.config.targets[c1]);
+        }
 
         return;
 
-        function processTarget(obj, objIndex) {
-            var baseImageElOffset, tEl, left, borderCss;
-
-            // if (state.baseImageElWidth === null) {
-            //     window.setTimeout(function () {
-            //         processTarget(obj);
-            //     }, 50);
-            //
-            //     return;
-            // }
-
-            // left = obj.x + 0.5 * (state.baseImageEl.parent().width() - state.baseImageElWidth);
-            left = obj.x;
+        function processTarget(obj) {
+            var targetEl, borderCss;
 
             borderCss = '';
-            if (state.config.target_outline === true) {
+            if (state.config.targetOutline === true) {
                 borderCss = 'border: 1px dashed gray; ';
             }
 
-            tEl = $(
+            targetEl = $(
                 '<div ' +
                     'style=" ' +
                         'display: block; ' +
@@ -53,27 +34,26 @@ define(['logme', 'update_input'], function (logme, updateInput) {
                         'width: ' + obj.w + 'px; ' +
                         'height: ' + obj.h + 'px; ' +
                         'top: ' + obj.y + 'px; ' +
-                        'left: ' + left + 'px; ' +
+                        'left: ' + obj.x + 'px; ' +
                         borderCss +
                     '" ' +
                     'data-target-id="' + obj.id + '" ' +
                 '></div>'
             );
 
-            tEl.appendTo(state.baseImageEl.parent());
+            targetEl.appendTo(state.baseImageEl.parent());
 
             state.targets.push({
                 'id': obj.id,
-                'offset': tEl.position(),
+
                 'w': obj.w,
                 'h': obj.h,
-                'el': tEl,
+
+                'el': targetEl,
+                'offset': targetEl.position(),
+
                 'draggable': []
             });
-
-            if (objIndex + 1 === numTargets) {
-                state.targetsLoaded = true;
-            }
         }
     }
 });

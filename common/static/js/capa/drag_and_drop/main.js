@@ -5,8 +5,10 @@
 (function (requirejs, require, define) {
 
 define(
-    ['logme', 'state', 'config_parser', 'container', 'base_image', 'scroller', 'draggables', 'targets'],
-    function (logme, State, configParser, Container, BaseImage, Scroller, Draggables, Targets) {
+    ['logme', 'state', 'config_parser', 'container', 'base_image', 'scroller',
+     'draggables', 'targets', 'update_input'],
+    function (logme, State, configParser, Container, BaseImage, Scroller,
+              Draggables, Targets, updateInput) {
     return Main;
 
     function Main() {
@@ -58,12 +60,13 @@ define(
 
         Container(state);
         BaseImage(state);
+        Targets(state);
         Scroller(state);
         Draggables(state);
-        Targets(state);
 
-        logme('config', config);
-        logme('state', state);
+        // Update the input element, checking first that it is not filled with
+        // an answer from the server.
+        updateInput(state, true);
     }
 });
 

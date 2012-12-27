@@ -61,14 +61,20 @@ define(['logme'], function (logme) {
         moveLeftEl.mousemove(function (event) { event.preventDefault(); });
         moveLeftEl.mousedown(function (event) { event.preventDefault(); });
 
+        // This event will be responsible for moving the scroller left.
+        // Hidden draggables will be shown.
         moveLeftEl.mouseup(function (event) {
             event.preventDefault();
 
+            // When there are no more hidden draggables, prevent from
+            // scrolling infinitely.
             if (showElLeftMargin > -102) {
                 return;
             }
 
             showElLeftMargin += 102;
+
+            // We scroll by changing the 'margin-left' CSS property smoothly.
             state.sliderEl.animate({
                 'margin-left': showElLeftMargin + 'px'
             }, 100, function () {
@@ -91,6 +97,10 @@ define(['logme'], function (logme) {
 
         showElLeftMargin = 0;
 
+        // Element where the draggables will be contained. It is very long
+        // so that any SANE number of draggables will fit in a single row. It
+        // will be contained in a parent element whose 'overflow' CSS value
+        // will be hidden, preventing the long row from fully being visible.
         state.sliderEl = $(
             '<div ' +
                 'style=" ' +
@@ -141,15 +151,20 @@ define(['logme'], function (logme) {
         moveRightEl.mousemove(function (event) { event.preventDefault(); });
         moveRightEl.mousedown(function (event) { event.preventDefault(); });
 
+        // This event will be responsible for moving the scroller right.
+        // Hidden draggables will be shown.
         moveRightEl.mouseup(function (event) {
             event.preventDefault();
 
+            // When there are no more hidden draggables, prevent from
+            // scrolling infinitely.
             if (showElLeftMargin < -102 * (state.sliderEl.children().length - 6)) {
                 return;
             }
 
             showElLeftMargin -= 102;
 
+            // We scroll by changing the 'margin-left' CSS property smoothly.
             state.sliderEl.animate({
                 'margin-left': showElLeftMargin + 'px'
             }, 100, function () {
@@ -159,6 +174,16 @@ define(['logme'], function (logme) {
 
         parentEl.appendTo(state.containerEl);
 
+        // Make the function available throughout the application. We need to
+        // call it in several places:
+        //
+        // 1.) When initially reading answer from server, if draggables will be
+        // positioned on the base image, the scroller's right and left arrows
+        // opacity must be updated.
+        //
+        // 2.) When creating draggable elements, the scroller's right and left
+        // arrows opacity must be updated according to the number of
+        // draggables.
         state.updateArrowOpacity = updateArrowOpacity;
 
         return;

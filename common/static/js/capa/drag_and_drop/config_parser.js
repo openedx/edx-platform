@@ -78,9 +78,9 @@ define(['logme'], function (logme) {
 
         if (typeof config.target_outline === 'string') {
             if (config.target_outline.toLowerCase() === 'true') {
-                state.config.target_outline = true;
+                state.config.targetOutline = true;
             } else if (config.target_outline.toLowerCase() === 'false') {
-                state.config.target_outline = false;
+                state.config.targetOutline = false;
             } else {
                 logme('ERROR: Property config.target_outline can either be "true", or "false".');
                 returnStatus = false;
