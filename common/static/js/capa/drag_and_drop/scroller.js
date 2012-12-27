@@ -8,7 +8,7 @@ define(['logme'], function (logme) {
     return Scroller;
 
     function Scroller(state) {
-        var parentEl, moveLeftEl, showEl, moveRightEL, showElLeftMargin;
+        var parentEl, moveLeftEl, showEl, moveRightEl, showElLeftMargin;
 
         parentEl = $(
             '<div ' +
@@ -32,11 +32,8 @@ define(['logme'], function (logme) {
             '>' +
                 '<div ' +
                     'style=" ' +
-                        'width: 80%; ' +
-                        'height: 50px; '+
-                        'margin-left: auto; ' +
-                        'margin-right: auto; ' +
-                        'margin-top: 26px; ' +
+                        'width: 38px; ' +
+                        'height: 100px; '+
 
                         'border: 1px solid #CCC; ' +
                         'background-color: #EEE; ' +
@@ -51,8 +48,6 @@ define(['logme'], function (logme) {
                         'background-image: url(\'/static/images/arrow-left.png\'); ' +
                         'background-position: center center; ' +
                         'background-repeat: no-repeat; ' +
-
-                        'border-radius: 35px 0 0 35px; ' +
                     '" ' +
                 '></div>' +
             '</div>'
@@ -77,7 +72,10 @@ define(['logme'], function (logme) {
             state.sliderEl.animate({
                 'margin-left': showElLeftMargin + 'px'
             }, 100, function () {
-                // Check if at the end, and make arrow less visible.
+                // Check if at the end, and make arrow less visibl.
+                logme('showElLeftMargin = ' + showElLeftMargin);
+
+                updateArrowOpacity();
             });
         });
 
@@ -117,11 +115,8 @@ define(['logme'], function (logme) {
             '>' +
                 '<div ' +
                     'style=" ' +
-                        'width: 80%; ' +
-                        'height: 50px; '+
-                        'margin-left: auto; ' +
-                        'margin-right: auto; ' +
-                        'margin-top: 26px; ' +
+                        'width: 38px; ' +
+                        'height: 100px; '+
 
                         'border: 1px solid #CCC; ' +
                         'background-color: #EEE; ' +
@@ -136,8 +131,6 @@ define(['logme'], function (logme) {
                         'background-image: url(\'/static/images/arrow-right.png\'); ' +
                         'background-position: center center; ' +
                         'background-repeat: no-repeat; ' +
-
-                        'border-radius: 0 35px 35px 0; ' +
                     '" ' +
                 '></div>' +
             '</div>'
@@ -159,15 +152,36 @@ define(['logme'], function (logme) {
             }
 
             showElLeftMargin -= 102;
+
             state.sliderEl.animate({
                 'margin-left': showElLeftMargin + 'px'
             }, 100, function () {
                 // Check if at the end, and make arrow less visible.
+                logme('showElLeftMargin = ' + showElLeftMargin);
+                logme('-102 * (state.sliderEl.children().length - 6) = ' + (-102 * (state.sliderEl.children().length - 6)));
+
+                updateArrowOpacity();
             });
         });
 
         parentEl.appendTo(state.containerEl);
-    }
+
+        state.updateArrowOpacity = updateArrowOpacity;
+
+        return;
+
+        function updateArrowOpacity() {
+            moveLeftEl.children('div').css('opacity', '1');
+            moveRightEl.children('div').css('opacity', '1');
+
+            if (showElLeftMargin < -102 * (state.sliderEl.children().length - 6)) {
+                moveRightEl.children('div').css('opacity', '.4');
+            }
+            if (showElLeftMargin > -102) {
+                moveLeftEl.children('div').css('opacity', '.4');
+            }
+        }
+    } // End-of: function Scroller(state)
 });
 
 // End of wrapper for RequireJS. As you can see, we are passing

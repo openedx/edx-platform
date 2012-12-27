@@ -104,6 +104,8 @@ define(['logme', 'update_input'], function (logme, updateInput) {
 
             if (objIndex + 1 === numDraggables) {
                 state.draggablesLoaded = true;
+
+                state.updateArrowOpacity();
             }
 
             return;
@@ -184,6 +186,8 @@ define(['logme', 'update_input'], function (logme, updateInput) {
                         removeObjIdFromTarget();
                     }
                 }
+
+                state.updateArrowOpacity();
 
                 updateInput(state);
 

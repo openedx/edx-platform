@@ -153,6 +153,8 @@ define(['logme'], function (logme) {
 
                 return;
             }
+
+            state.updateArrowOpacity();
         }
 
         return;
