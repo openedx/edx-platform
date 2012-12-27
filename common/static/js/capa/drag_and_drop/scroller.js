@@ -72,9 +72,6 @@ define(['logme'], function (logme) {
             state.sliderEl.animate({
                 'margin-left': showElLeftMargin + 'px'
             }, 100, function () {
-                // Check if at the end, and make arrow less visibl.
-                logme('showElLeftMargin = ' + showElLeftMargin);
-
                 updateArrowOpacity();
             });
         });
@@ -156,10 +153,6 @@ define(['logme'], function (logme) {
             state.sliderEl.animate({
                 'margin-left': showElLeftMargin + 'px'
             }, 100, function () {
-                // Check if at the end, and make arrow less visible.
-                logme('showElLeftMargin = ' + showElLeftMargin);
-                logme('-102 * (state.sliderEl.children().length - 6) = ' + (-102 * (state.sliderEl.children().length - 6)));
-
                 updateArrowOpacity();
             });
         });
