@@ -1268,7 +1268,7 @@ def import_course(request, org, course, name):
         data_root = path(settings.GITHUB_REPO_ROOT)
 
         course_dir = data_root / local_dir
-        message += 'importing course to %s\n' % course_dir
+        message += '\nimporting course to %s\n' % course_dir
         log.debug(message)
 
         if os.path.exists(course_dir) and request.POST.get('purge')=='yes':
