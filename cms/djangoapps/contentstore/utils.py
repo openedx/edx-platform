@@ -2,13 +2,8 @@ from django.conf import settings
 from xmodule.modulestore import Location
 from xmodule.modulestore.django import modulestore
 from xmodule.modulestore.exceptions import ItemNotFoundError
-import os, tempfile, zipfile
-from django.http import HttpResponse
-from django.core.servers.basehttp import FileWrapper
 
 DIRECT_ONLY_CATEGORIES = ['course', 'chapter', 'sequential', 'about', 'static_tab', 'course_info']
-
-
 
 def get_modulestore(location):
     """
