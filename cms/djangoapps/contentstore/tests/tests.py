@@ -1,10 +1,12 @@
 import json
+import shutil
 from django.test import TestCase
 from django.test.client import Client
 from override_settings import override_settings
 from django.conf import settings
 from django.core.urlresolvers import reverse
 from path import path
+from tempfile import mkdtemp
 
 from student.models import Registration
 from django.contrib.auth.models import User
@@ -18,6 +20,7 @@ from xmodule.modulestore.store_utilities import delete_course
 from xmodule.modulestore.django import modulestore
 from xmodule.contentstore.django import contentstore
 from xmodule.course_module import CourseDescriptor
+from xmodule.modulestore.xml_exporter import export_to_xml
 
 def parse_json(response):
     """Parse response, which is assumed to be json"""
@@ -384,5 +387,36 @@ class ContentStoreTest(TestCase):
 
         items = ms.get_items(Location(['i4x','edX', 'full', 'vertical', None]))
         self.assertEqual(len(items), 0)
+
+    def test_export_course(self):
+        ms = modulestore('direct')
+        cs = contentstore() 
+
+        import_from_xml(ms, 'common/test/data/', ['full'])
+        location = CourseDescriptor.id_to_location('edX/full/6.002_Spring_2012')
+
+        root_dir = path(mkdtemp())
+
+        print 'Exporting to tempdir = {0}'.format(root_dir)
+
+        # export out to a tempdir
+        export_to_xml(ms, cs, location, root_dir, 'test_export')
+
+        # remove old course
+        delete_course(ms, cs, location)
+
+        # reimport
+        import_from_xml(ms, root_dir, ['test_export'])
+
+        items = ms.get_items(Location(['i4x','edX', 'full', 'vertical', None]))
+        self.assertGreater(len(items), 0)
+        for descriptor in items:
+            print "Checking {0}....".format(descriptor.location.url())
+            resp = self.client.get(reverse('edit_unit', kwargs={'location': descriptor.location.url()}))
+            self.assertEqual(resp.status_code, 200)
+
+        shutil.rmtree(root_dir)        
+
+
 
 
