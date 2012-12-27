@@ -1,31 +1,8 @@
 .users {
-  .user-overview {
-    @extend .window;
-    padding: 30px 40px;
-  }
-
-  .new-user-button {
-    @include grey-button;
-    margin: 5px 8px;
-    padding: 3px 10px 4px 10px;
-    font-size: 12px;
-
-    .plus-icon {
-      position: relative;
-      top: 1px;
-    }
-  }
-
-  .list-header {
-    @include linear-gradient(top, transparent, rgba(0, 0, 0, .1));
-    background-color: #ced2db;
-    border-radius: 3px 3px 0 0;
-  }
-
   .new-user-form {
     display: none;
     padding: 15px 20px;
-    background: $mediumGrey;
+    background-color: $lightBluishGrey2;
 
     #result {
       display: none;
@@ -55,21 +32,22 @@
 
     .add-button {
       @include blue-button;
+      padding: 5px 20px 9px;
     }
 
     .cancel-button {
       @include white-button;
+      padding: 5px 20px 9px;
     }
   }
 
   .user-list {
     border: 1px solid $mediumGrey;
-    border-top: none;
-    background: $lightGrey;
+    background: #fff;
 
     li {
       position: relative;
-      padding: 10px 20px;
+      padding: 20px;
       border-bottom: 1px solid $mediumGrey;
 
       &:last-child {
@@ -81,12 +59,19 @@
       }
 
       .user-name {
-        width: 30%;
-        font-weight: 700;
+        margin-right: 10px;
+        font-size: 24px;
+        font-weight: 300;
+      }
+
+      .user-email {
+        font-size: 14px;
+        font-style: italic;
+        color: $mediumGrey;
       }
 
       .item-actions {
-        top: 9px;
+        top: 24px;
       }
     }
   }

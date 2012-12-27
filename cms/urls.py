@@ -35,9 +35,13 @@ urlpatterns = ('',
     url(r'^(?P<org>[^/]+)/(?P<course>[^/]+)/course/(?P<name>[^/]+)/remove_user$',
         'contentstore.views.remove_user', name='remove_user'),
     url(r'^(?P<org>[^/]+)/(?P<course>[^/]+)/info/(?P<name>[^/]+)$', 'contentstore.views.course_info', name='course_info'),
-    # ??? Is the following necessary or will the one below work w/ id=None if not sent?
-    # url(r'^(?P<org>[^/]+)/(?P<course>[^/]+)/course_info/updates$', 'contentstore.views.course_info_updates', name='course_info'),
     url(r'^(?P<org>[^/]+)/(?P<course>[^/]+)/course_info/updates/(?P<provided_id>.*)$', 'contentstore.views.course_info_updates', name='course_info'),
+    url(r'^(?P<org>[^/]+)/(?P<course>[^/]+)/settings/(?P<name>[^/]+)$', 'contentstore.views.get_course_settings', name='course_settings'),
+    url(r'^(?P<org>[^/]+)/(?P<course>[^/]+)/settings/(?P<name>[^/]+)/section/(?P<section>[^/]+).*$', 'contentstore.views.course_settings_updates', name='course_settings'),
+    url(r'^(?P<org>[^/]+)/(?P<course>[^/]+)/grades/(?P<name>[^/]+)/(?P<grader_index>.*)$', 'contentstore.views.course_grader_updates', name='course_settings'),
+
+    url(r'^(?P<org>[^/]+)/(?P<course>[^/]+)/(?P<category>[^/]+)/(?P<name>[^/]+)/gradeas.*$', 'contentstore.views.assignment_type_update', name='assignment_type_update'),
+
     url(r'^pages/(?P<org>[^/]+)/(?P<course>[^/]+)/course/(?P<coursename>[^/]+)$', 'contentstore.views.static_pages', 
         name='static_pages'),
     url(r'^edit_static/(?P<org>[^/]+)/(?P<course>[^/]+)/course/(?P<coursename>[^/]+)$', 'contentstore.views.edit_static', name='edit_static'),

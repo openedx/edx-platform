@@ -4,6 +4,7 @@ from xmodule.modulestore.django import modulestore
 from lxml import etree
 import re
 from django.http import HttpResponseBadRequest
+import logging
 
 ## TODO store as array of { date, content } and override  course_info_module.definition_from_xml
 ## This should be in a class which inherits from XmlDescriptor
@@ -23,27 +24,28 @@ def get_course_updates(location):
     
     # purely to handle free formed updates not done via editor. Actually kills them, but at least doesn't break.
     try:
-        course_html_parsed = etree.fromstring(course_updates.definition['data'], etree.XMLParser(remove_blank_text=True))
+        course_html_parsed = etree.fromstring(course_updates.definition['data'])
     except etree.XMLSyntaxError:
         course_html_parsed = etree.fromstring("<ol></ol>")
         
     # Confirm that root is <ol>, iterate over <li>, pull out <h2> subs and then rest of val
     course_upd_collection = []
     if course_html_parsed.tag == 'ol':
-        # 0 is the oldest so that new ones get unique idx
-        for idx, update in enumerate(course_html_parsed.iter("li")):
+        # 0 is the newest
+        for idx, update in enumerate(course_html_parsed):
             if (len(update) == 0):
                 continue
             elif (len(update) == 1):
-                content = update.find("h2").tail
+                # could enforce that update[0].tag == 'h2'
+                content = update[0].tail
             else:
-                content = etree.tostring(update[1])
+                content = "\n".join([etree.tostring(ele) for ele in update[1:]])
                 
-            course_upd_collection.append({"id" : location_base + "/" + str(idx),
+            # make the id on the client be 1..len w/ 1 being the oldest and len being the newest
+            course_upd_collection.append({"id" : location_base + "/" + str(len(course_html_parsed) - idx),
                                           "date" : update.findtext("h2"),
                                           "content" : content})
-    # return newest to oldest
-    course_upd_collection.reverse()
+            
     return course_upd_collection
 
 def update_course_updates(location, update, passed_id=None):
@@ -59,43 +61,25 @@ def update_course_updates(location, update, passed_id=None):
     
     # purely to handle free formed updates not done via editor. Actually kills them, but at least doesn't break.
     try:
-        course_html_parsed = etree.fromstring(course_updates.definition['data'], etree.XMLParser(remove_blank_text=True))
+        course_html_parsed = etree.fromstring(course_updates.definition['data'])
     except etree.XMLSyntaxError:
         course_html_parsed = etree.fromstring("<ol></ol>")
 
-    try:
-        new_html_parsed = etree.fromstring(update['content'], etree.XMLParser(remove_blank_text=True))
-    except etree.XMLSyntaxError:
-        new_html_parsed = None
+    # No try/catch b/c failure generates an error back to client
+    new_html_parsed = etree.fromstring('<li><h2>' + update['date'] + '</h2>' + update['content'] + '</li>')
         
     # Confirm that root is <ol>, iterate over <li>, pull out <h2> subs and then rest of val
     if course_html_parsed.tag == 'ol':
         # ??? Should this use the id in the json or in the url or does it matter?
         if passed_id:
-            element = course_html_parsed.findall("li")[get_idx(passed_id)]
-            element[0].text = update['date']
-            if (len(element) == 1):
-                if new_html_parsed is not None:
-                    element[0].tail = None
-                    element.append(new_html_parsed)
-                else:
-                    element[0].tail = update['content']
-            else:
-                if new_html_parsed is not None:
-                    element[1] = new_html_parsed
-                else:
-                    element.pop(1)
-                    element[0].tail = update['content']
+            idx = get_idx(passed_id)
+            # idx is count from end of list
+            course_html_parsed[-idx] = new_html_parsed
         else:
-            idx = len(course_html_parsed.findall("li"))
+            course_html_parsed.insert(0, new_html_parsed)
+
+            idx = len(course_html_parsed)
             passed_id = course_updates.location.url() + "/" + str(idx)
-            element =  etree.SubElement(course_html_parsed, "li")
-            date_element = etree.SubElement(element, "h2")
-            date_element.text = update['date']
-            if new_html_parsed is not None:
-                element.append(new_html_parsed)
-            else:
-                date_element.tail = update['content']
         
         # update db record
         course_updates.definition['data'] = etree.tostring(course_html_parsed)
@@ -121,15 +105,17 @@ def delete_course_update(location, update, passed_id):
     # TODO use delete_blank_text parser throughout and cache as a static var in a class
     # purely to handle free formed updates not done via editor. Actually kills them, but at least doesn't break.
     try:
-        course_html_parsed = etree.fromstring(course_updates.definition['data'], etree.XMLParser(remove_blank_text=True))
+        course_html_parsed = etree.fromstring(course_updates.definition['data'])
     except etree.XMLSyntaxError:
         course_html_parsed = etree.fromstring("<ol></ol>")
         
     if course_html_parsed.tag == 'ol':
         # ??? Should this use the id in the json or in the url or does it matter?
-        element_to_delete = course_html_parsed.xpath('/ol/li[position()=' + str(get_idx(passed_id) + 1) + "]")
-        if element_to_delete:
-            course_html_parsed.remove(element_to_delete[0])
+        idx = get_idx(passed_id)
+        # idx is count from end of list
+        element_to_delete = course_html_parsed[-idx]
+        if element_to_delete is not None:
+            course_html_parsed.remove(element_to_delete)
 
         # update db record
         course_updates.definition['data'] = etree.tostring(course_html_parsed)
@@ -143,6 +129,6 @@ def get_idx(passed_id):
     From the url w/ idx appended, get the idx.
     """
     # TODO compile this regex into a class static and reuse for each call
-    idx_matcher = re.search(r'.*/(\d)+$', passed_id)
+    idx_matcher = re.search(r'.*/(\d+)$', passed_id)
     if idx_matcher:
         return int(idx_matcher.group(1))

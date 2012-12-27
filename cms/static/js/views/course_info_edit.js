@@ -62,12 +62,16 @@ CMS.Views.ClassInfoUpdateView = Backbone.View.extend({
     },
     
     onNew: function(event) {
+        event.preventDefault();
         var self = this;
         // create new obj, insert into collection, and render this one ele overriding the hidden attr
         var newModel = new CMS.Models.CourseUpdate();
         this.collection.add(newModel, {at : 0});
         
         var $newForm = $(this.template({ updateModel : newModel }));
+
+        var updateEle = this.$el.find("#course-update-list");
+        $(updateEle).prepend($newForm);
 
         var $textArea = $newForm.find(".new-update-content").first();
         if (this.$codeMirror == null ) {
@@ -77,9 +81,7 @@ CMS.Views.ClassInfoUpdateView = Backbone.View.extend({
                 lineWrapping: true,
             });
         }
-
-        var updateEle = this.$el.find("#course-update-list");
-        $(updateEle).prepend($newForm);
+        
         $newForm.addClass('editing');
         this.$currentPost = $newForm.closest('li');
 
@@ -93,15 +95,19 @@ CMS.Views.ClassInfoUpdateView = Backbone.View.extend({
     },
     
     onSave: function(event) {
+        event.preventDefault();
         var targetModel = this.eventModel(event);
-        console.log(this.contentEntry(event).val());
         targetModel.set({ date : this.dateEntry(event).val(), content : this.$codeMirror.getValue() });
         // push change to display, hide the editor, submit the change        
+        targetModel.save({}, {error : function(model, xhr) {
+        	// TODO use a standard component
+        	window.alert(xhr.responseText);
+        }});
         this.closeEditor(this);
-        targetModel.save();
     },
     
     onCancel: function(event) {
+        event.preventDefault();
         // change editor contents back to model values and hide the editor
         $(this.editor(event)).hide();
         var targetModel = this.eventModel(event);
@@ -109,6 +115,7 @@ CMS.Views.ClassInfoUpdateView = Backbone.View.extend({
     },
     
     onEdit: function(event) {
+        event.preventDefault();
         var self = this;
         this.$currentPost = $(event.target).closest('li');
         this.$currentPost.addClass('editing');
@@ -131,6 +138,7 @@ CMS.Views.ClassInfoUpdateView = Backbone.View.extend({
     },
 
     onDelete: function(event) {
+        event.preventDefault();
         // TODO ask for confirmation
         // remove the dom element and delete the model
         var targetModel = this.eventModel(event);
@@ -158,6 +166,8 @@ CMS.Views.ClassInfoUpdateView = Backbone.View.extend({
         self.$currentPost.find('form').hide();
         window.$modalCover.unbind('click');
         window.$modalCover.hide();
+        this.$codeMirror = null;
+        self.$currentPost.find('.CodeMirror').remove();
     },
     
     // Dereferencing from events to screen elements    
@@ -271,5 +281,7 @@ CMS.Views.ClassInfoHandoutsView = Backbone.View.extend({
         this.$form.hide();
         window.$modalCover.unbind('click');
         window.$modalCover.hide();
+        self.$form.find('.CodeMirror').remove();
+        this.$codeMirror = null;
     }
 });

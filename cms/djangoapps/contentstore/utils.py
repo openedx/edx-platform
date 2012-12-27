@@ -3,6 +3,19 @@ from xmodule.modulestore import Location
 from xmodule.modulestore.django import modulestore
 from xmodule.modulestore.exceptions import ItemNotFoundError
 
+DIRECT_ONLY_CATEGORIES = ['course', 'chapter', 'sequential', 'about', 'static_tab', 'course_info']
+
+def get_modulestore(location):
+    """
+    Returns the correct modulestore to use for modifying the specified location
+    """
+    if not isinstance(location, Location):
+        location = Location(location)
+        
+    if location.category in DIRECT_ONLY_CATEGORIES:
+        return modulestore('direct')
+    else:
+        return modulestore()
 
 def get_course_location_for_item(location):
     '''
@@ -60,20 +73,38 @@ def get_course_for_item(location):
 
 
 def get_lms_link_for_item(location, preview=False):
-    location = Location(location)
     if settings.LMS_BASE is not None:
         lms_link = "//{preview}{lms_base}/courses/{course_id}/jump_to/{location}".format(
             preview='preview.' if preview else '',
             lms_base=settings.LMS_BASE,
-            # TODO: These will need to be changed to point to the particular instance of this problem in the particular course
-            course_id=modulestore().get_containing_courses(location)[0].id,
-            location=location,
+            course_id=get_course_id(location),
+            location=Location(location)
         )
     else:
         lms_link = None
 
     return lms_link
 
+def get_lms_link_for_about_page(location):
+    """
+    Returns the url to the course about page from the location tuple.
+    """
+    if settings.LMS_BASE is not None:
+        lms_link = "//{lms_base}/courses/{course_id}/about".format(
+            lms_base=settings.LMS_BASE,
+            course_id=get_course_id(location)
+        )
+    else:
+        lms_link = None
+
+    return lms_link
+
+def get_course_id(location):
+    """
+    Returns the course_id from a given the location tuple.
+    """
+    # TODO: These will need to be changed to point to the particular instance of this problem in the particular course
+    return modulestore().get_containing_courses(Location(location))[0].id
 
 class UnitState(object):
     draft = 'draft'
@@ -103,3 +134,12 @@ def compute_unit_state(unit):
 
 def get_date_display(date):
     return date.strftime("%d %B, %Y at %I:%M %p")
+
+def update_item(location, value):
+    """
+    If value is None, delete the db entry. Otherwise, update it using the correct modulestore.
+    """
+    if value is None:
+        get_modulestore(location).delete_item(location)
+    else:
+        get_modulestore(location).update_item(location, value)

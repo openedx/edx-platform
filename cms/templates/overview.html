@@ -16,13 +16,37 @@
   <script src="${static.url('js/vendor/timepicker/jquery.timepicker.js')}"></script>
   <script src="${static.url('js/vendor/timepicker/datepair.js')}"></script>
   <script src="${static.url('js/vendor/date.js')}"></script>
+  <script type="text/javascript" src="${static.url('js/models/course_relative.js')}"></script>
+  <script type="text/javascript" src="${static.url('js/views/grader-select-view.js')}"></script>
+  <script type="text/javascript" src="${static.url('js/models/settings/course_grading_policy.js')}"></script>
+
+  <script type="text/javascript">
+  $(document).ready(function(){
+    // TODO figure out whether these should be in window or someplace else or whether they're only needed as local vars
+    // I believe that current (New Section/New Subsection) cause full page reloads which means these aren't needed globally
+    // but we really should change that behavior.
+    if (!window.graderTypes) {
+	    window.graderTypes = new CMS.Models.Settings.CourseGraderCollection();
+	    window.graderTypes.course_location = new CMS.Models.Location('${parent_location}');
+	    window.graderTypes.reset(${course_graders|n});
+    }
+    
+    $(".gradable-status").each(function(index, ele) {
+        var gradeView = new CMS.Views.OverviewAssignmentGrader({
+            el : ele,
+            graders : window.graderTypes
+        });
+    });
+  });
+  
+  </script>
 </%block>
 
 <%block name="header_extras">
   <script type="text/template" id="new-section-template">
     <section class="courseware-section branch new-section">
       <header>
-        <a href="#" class="expand-collapse-icon collapse"></a>
+        <a href="#"  data-tooltip="Collapse/expand this section" class="expand-collapse-icon collapse"></a>
         <div class="item-details">
           <h3 class="section-name">
           <form class="section-name-form">
@@ -38,7 +62,7 @@
   <script type="text/template" id="blank-slate-template">
     <section class="courseware-section branch new-section">
       <header>
-        <a href="#" class="expand-collapse-icon collapse"></a>
+        <a href="#"  data-tooltip="Collapse/expand this section" class="expand-collapse-icon collapse"></a>
         <div class="item-details">
           <h3 class="section-name">
           <span class="section-name-span">Click here to set the section name</span>
@@ -49,8 +73,8 @@
           </form>
         </div>
         <div class="item-actions">
-          <a href="#" class="delete-button delete-section-button"><span class="delete-icon"></span></a>
-          <a href="#" class="drag-handle"></a>
+          <a href="#" data-tooltip="Delete this section" class="delete-button delete-section-button"><span class="delete-icon"></span></a>
+          <a href="#" data-tooltip="Drag to re-order" class="drag-handle"></a>
         </div>
       </header>
     </section>
@@ -77,8 +101,6 @@
       </ol>
     </li>
   </script>
-
-
 </%block>
 
 <%block name="content">
@@ -89,7 +111,7 @@
         <input class="start-date date" type="text" name="start_date" value="" placeholder="MM/DD/YYYY" class="date" size='15' autocomplete="off"/>
         <input class="start-time time" type="text" name="start_time" value="" placeholder="HH:MM" class="time" size='10' autocomplete="off"/>
         <div class="description">
-          <p>On the date set above, this section – <strong class="section-name"></strong> – will be released to students along with the 5 subsections within it. Any units marked private will only be visible to admins.</p>
+          <p>On the date set above, this section – <strong class="section-name"></strong> – will be released to students. Any units marked private will only be visible to admins.</p>
         </div>
       </div>
       <a href="#" class="save-button">Save</a><a href="#" class="cancel-button">Cancel</a>
@@ -98,17 +120,19 @@
 
   <div class="main-wrapper">
     <div class="inner-wrapper">
-      <h1>Courseware</h1>
-      <div class="page-actions"></div>
-      <article class="courseware-overview" data-course-id="${context_course.location.url()}">
-        <a href="#" class="new-button big new-courseware-section-button"><span class="plus-icon"></span> New Section</a>
+      <div class="page-actions">
+        <a href="#" class="new-button new-courseware-section-button"><span class="plus-icon white"></span> New Section</a>
+        <a href="#" class="collapse-all-button"><span class="collapse-all-icon"></span>Collapse All</a>
+      </div>
+      <article class="courseware-overview" data-course-id="${context_course.location.url()}">        
         % for section in sections:
         <section class="courseware-section branch" data-id="${section.location}">
           <header>
-            <a href="#" class="expand-collapse-icon collapse"></a>
+            <a href="#" data-tooltip="Expand/collapse this section" class="expand-collapse-icon collapse"></a>
+
             <div class="item-details" data-id="${section.location}">
               <h3 class="section-name">
-                <span class="section-name-span">${section.display_name}</span>
+                <span data-tooltip="Edit this section's name" class="section-name-span">${section.display_name}</span>
                 <form class="section-name-edit" style="display:none">
                   <input type="text" value="${section.display_name}" class="edit-section-name" autocomplete="off"/>
                   <input type="submit" class="save-button edit-section-name-save" value="Save" />
@@ -128,11 +152,12 @@
                   <span class="published-status"><strong>Will Release:</strong> ${start_date_str} at ${start_time_str}</span>
                   <a href="#" class="edit-button" data-date="${start_date_str}" data-time="${start_time_str}" data-id="${section.location}">Edit</a>
                 %endif
-              </div>
+              </div>              
             </div>
+            
             <div class="item-actions">
-              <a href="#" class="delete-button delete-section-button"><span class="delete-icon"></span></a>
-              <a href="#" class="drag-handle"></a>
+              <a href="#" data-tooltip="Delete this section" class="delete-button delete-section-button"><span class="delete-icon"></span></a>
+              <a href="#" data-tooltip="Drag to reorder" class="drag-handle"></a>
             </div>
           </header>
           <div class="subsection-list">
@@ -143,18 +168,22 @@
             </div>
             <ol data-section-id="${section.location.url()}">
               % for subsection in section.get_children():
-              <li class="branch collapsed" data-id="${subsection.location}">
+              <li class="branch collapsed id-holder" data-id="${subsection.location}">
                 <div class="section-item">
-                  <div>
-                    <a href="#" class="expand-collapse-icon expand"></a>
+                  <div class="details">
+                    <a href="#" data-tooltip="Expand/collapse this subsection" class="expand-collapse-icon expand"></a>
                     <a href="${reverse('edit_subsection', args=[subsection.location])}">
                       <span class="folder-icon"></span>
                       <span class="subsection-name"><span class="subsection-name-value">${subsection.display_name}</span></span>
                     </a>
                   </div>
+                  
+                  <div class="gradable-status" data-initial-status="${subsection.metadata.get('format', 'Not Graded')}">
+                  </div>
+                  
                   <div class="item-actions">
-                    <a href="#" class="delete-button delete-subsection-button"><span class="delete-icon"></span></a>                    
-                    <a href="#" class="drag-handle"></a>
+                    <a href="#" data-tooltip="Delete this subsection" class="delete-button delete-subsection-button"><span class="delete-icon"></span></a>                    
+                    <a href="#" data-tooltip="Drag to reorder" class="drag-handle"></a>
                   </div>
                 </div>
                 ${units.enum_units(subsection)}

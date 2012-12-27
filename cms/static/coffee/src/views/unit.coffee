@@ -4,7 +4,6 @@ class CMS.Views.UnitEdit extends Backbone.View
     'click .new-component .cancel-button': 'closeNewComponent'
     'click .new-component-templates .new-component-template a': 'saveNewComponent'
     'click .new-component-templates .cancel-button': 'closeNewComponent'
-    'click .new-component-button': 'showNewComponentForm'
     'click .delete-draft': 'deleteDraft'
     'click .create-draft': 'createDraft'
     'click .publish-draft': 'publishDraft'
@@ -54,30 +53,20 @@ class CMS.Views.UnitEdit extends Backbone.View
         )
     )
 
-  # New component creation
-  showNewComponentForm: (event) =>
-    event.preventDefault()
-    @$newComponentItem.addClass('adding')
-    $(event.target).fadeOut(150)
-    @$newComponentItem.css('height', @$newComponentTypePicker.outerHeight())
-    @$newComponentTypePicker.slideDown(250)
-
   showComponentTemplates: (event) =>
     event.preventDefault()
 
     type = $(event.currentTarget).data('type')
-    @$newComponentTypePicker.fadeOut(250)
-    @$(".new-component-#{type}").fadeIn(250)
+    @$newComponentTypePicker.slideUp(250)
+    @$(".new-component-#{type}").slideDown(250)
 
   closeNewComponent: (event) =>
     event.preventDefault()
 
-    @$newComponentTypePicker.slideUp(250)
+    @$newComponentTypePicker.slideDown(250)
     @$newComponentTemplatePickers.slideUp(250)
-    @$newComponentButton.fadeIn(250)
     @$newComponentItem.removeClass('adding')
     @$newComponentItem.find('.rendered-component').remove()
-    @$newComponentItem.css('height', @$newComponentButton.outerHeight())
 
   saveNewComponent: (event) =>
     event.preventDefault()

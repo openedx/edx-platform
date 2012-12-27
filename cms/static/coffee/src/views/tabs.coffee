@@ -33,6 +33,10 @@ class CMS.Views.TabsEdit extends Backbone.View
     )
 
     $('.new-component-item').before(editor.$el)
+    editor.$el.addClass('new')
+    setTimeout(=>
+      editor.$el.removeClass('new')
+    , 500)
 
     editor.cloneTemplate(
       @model.get('id'),

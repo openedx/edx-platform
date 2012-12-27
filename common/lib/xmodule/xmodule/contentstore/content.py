@@ -18,7 +18,7 @@ class StaticContent(object):
         self.content_type = content_type
         self.data = data
         self.last_modified_at = last_modified_at
-        self.thumbnail_location = thumbnail_location
+        self.thumbnail_location = Location(thumbnail_location)
         # optional information about where this file was imported from. This is needed to support import/export 
         # cycles
         self.import_path = import_path

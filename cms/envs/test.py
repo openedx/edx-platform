@@ -59,6 +59,14 @@ MODULESTORE = {
     }
 }
 
+CONTENTSTORE = {
+    'ENGINE': 'xmodule.contentstore.mongo.MongoContentStore',
+    'OPTIONS': {
+        'host': 'localhost',
+        'db' : 'xcontent',
+    }
+}
+
 DATABASES = {
     'default': {
         'ENGINE': 'django.db.backends.sqlite3',
@@ -76,6 +84,8 @@ DATABASES = {
         'NAME': ENV_ROOT / "db" / "course2.db",
     }
 }
+
+LMS_BASE = "localhost:8000"
 
 CACHES = {
     # This is the cache used for most things. Askbot will not work without a 

@@ -47,19 +47,34 @@
 	}
 }
 
-@mixin white-button {
-	@include button;
-	border: 1px solid $darkGrey;
-	border-radius: 3px;
-	@include linear-gradient(top, rgba(255, 255, 255, 0.6), rgba(255, 255, 255, 0));
-	background-color: #dfe5eb;
-	@include box-shadow(0 1px 0 rgba(255, 255, 255, .3) inset);
-	color: #778192;
+@mixin green-button {
+  @include button;
+  border: 1px solid #0d7011;
+  border-radius: 3px;
+  @include linear-gradient(top, rgba(255, 255, 255, .3), rgba(255, 255, 255, 0));
+  background-color: $green;
+  color: #fff;
 
-	&:hover {
-		background-color: #f2f6f9;
-		color: #778192;
-	}
+  &:hover {
+  background-color: #129416;
+  color: #fff;
+  }
+}
+
+@mixin white-button {
+  @include button;
+  border: 1px solid $mediumGrey;
+  border-radius: 3px;
+  @include linear-gradient(top, rgba(255, 255, 255, 0.6), rgba(255, 255, 255, 0));
+  background-color: #dfe5eb;
+  @include box-shadow(0 1px 0 rgba(255, 255, 255, .3) inset);
+  color: rgb(92, 103, 122);
+  text-shadow: 0 1px 0 rgba(255, 255, 255, .5);
+
+  &:hover {
+    background-color: rgb(222, 236, 247);
+    color: rgb(92, 103, 122);
+  }
 }
 
 @mixin orange-button {
@@ -92,6 +107,28 @@
 	}
 }
 
+@mixin green-button {
+	@include button;
+	border: 1px solid $darkGreen;
+	border-radius: 3px;
+	@include linear-gradient(top, rgba(255, 255, 255, .3), rgba(255, 255, 255, 0));
+	background-color: $green;
+	@include box-shadow(0 1px 0 rgba(255, 255, 255, .3) inset);
+	color: #fff;
+
+	&:hover {
+		background-color: $brightGreen;
+		color: #fff;
+	}
+
+	&.disabled {
+		border: 1px solid $disabledGreen !important;
+		background: $disabledGreen !important;
+		color: #fff !important;
+		@include box-shadow(none);
+	}
+}
+
 @mixin dark-grey-button {
 	@include button;
 	border: 1px solid #1c1e20;
@@ -109,18 +146,17 @@
 @mixin edit-box {
 	padding: 15px 20px;
 	border-radius: 3px;
-	border: 1px solid #5597dd;
-	@include linear-gradient(top, rgba(255, 255, 255, 0.3), rgba(255, 255, 255, 0));
-	background-color: #5597dd;
+	background-color: $lightBluishGrey2;
+	color: #3c3c3c;
 	@include box-shadow(0 1px 0 rgba(255, 255, 255, .2) inset);
 
 	label {
-		color: #fff;
+		color: $baseFontColor;
 	}
 
 	input,
 	textarea {
-		border: 1px solid #3c3c3c;
+		border: 1px solid $darkGrey;
 	}
 
 	textarea {
@@ -140,21 +176,19 @@
 	}
 
 	.save-button {
-		@include orange-button;
-		border-color: #3c3c3c;
+		@include blue-button;
 		margin-top: 0;
 	}
 
 	.cancel-button {
 		@include white-button;
-		border-color: #30649C;
 		margin-top: 0;
 	}
 }
 
 @mixin tree-view {
-	border: 1px solid #ced2db;
-	background: #edf1f5;
+	border: 1px solid $mediumGrey;
+	background: $lightGrey;
 
 	.branch {
 		margin-bottom: 10px;
@@ -200,15 +234,10 @@
 			content: "- draft";
 		}
 
-		.public-item:after {
-			content: "- public";
-		}
-
 		.private-item:after {
 			content: "- private";
 		}
 
-		.public-item,
 		.private-item {
 			color: #a4aab7;
 		}
@@ -219,7 +248,11 @@
 	}
 
 	a {
-		color: #2c2e33;
+		color: $baseFontColor;
+
+		&.new-unit-item {
+			color: #6d788b;
+		}
 	}
 
 	ol {
@@ -241,4 +274,15 @@
 			margin-left: 96px;
 		}
 	}
+}
+
+@mixin sr-text {
+  border: 0; 
+  clip: rect(0 0 0 0); 
+  height: 1px; 
+  margin: -1px; 
+  overflow: hidden; 
+  padding: 0; 
+  position: absolute; 
+  width: 1px;
 }

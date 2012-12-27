@@ -40,11 +40,8 @@ def set_module_info(store, location, post_data):
     module = store.clone_item(template_location, location)
     isNew = True
 
-  logging.debug('post = {0}'.format(post_data))
-
   if post_data.get('data') is not None:
       data = post_data['data']
-      logging.debug('data = {0}'.format(data))
       store.update_item(location, data)
      
   # cdodge: note calling request.POST.get('children') will return None if children is an empty array

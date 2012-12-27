@@ -56,6 +56,7 @@ class CMS.Views.ModuleEdit extends Backbone.View
     event.preventDefault()
     data = @module.save()
     data.metadata = @metadata()
+    $modalCover.hide()
     @model.save(data).done( =>
     #   # showToastMessage("Your changes have been saved.", null, 3)
       @module = null
@@ -69,9 +70,11 @@ class CMS.Views.ModuleEdit extends Backbone.View
     event.preventDefault()
     @$el.removeClass('editing')
     @$component_editor().slideUp(150)
+    $modalCover.hide()
 
   clickEditButton: (event) ->
     event.preventDefault()
     @$el.addClass('editing')
+    $modalCover.show()
     @$component_editor().slideDown(150)
     @loadEdit()

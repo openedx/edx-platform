@@ -5,7 +5,7 @@
 	if (typeof window.templateLoader == 'function') return;
 	
     var templateLoader = {
-      templateVersion: "0.0.8",
+      templateVersion: "0.0.12",
       templates: {},
       loadRemoteTemplate: function(templateName, filename, callback) {
         if (!this.templates[templateName]) {
@@ -35,7 +35,8 @@
       
       localStorageAvailable: function() {
        try {
-          return 'localStorage' in window && window['localStorage'] !== null;
+    	   // window.cachetemplates is global set in base.js to turn caching on/off
+          return window.cachetemplates && 'localStorage' in window && window['localStorage'] !== null;
         } catch (e) {
           return false;
         }

@@ -31,8 +31,7 @@ class MongoContentStore(ContentStore):
         id = content.get_id()
 
         # Seems like with the GridFS we can't update existing ID's we have to do a delete/add pair
-        if self.fs.exists({"_id" : id}):
-            self.fs.delete(id)
+        self.delete(id)
 
         with self.fs.new_file(_id = id, filename=content.get_url_path(), content_type=content.content_type, 
             displayname=content.name, thumbnail_location=content.thumbnail_location, import_path=content.import_path) as fp:
@@ -41,13 +40,16 @@ class MongoContentStore(ContentStore):
         
         return content
         
-    
+    def delete(self, id):
+        if self.fs.exists({"_id" : id}):
+            self.fs.delete(id)
+
     def find(self, location):
         id = StaticContent.get_id_from_location(location)
         try:
             with self.fs.get(id) as fp:
                 return StaticContent(location, fp.displayname, fp.content_type, fp.read(), 
-                    fp.uploadDate, thumbnail_location = fp.thumbnail_location if 'thumbnail_location' in fp else None,
+                    fp.uploadDate, thumbnail_location = fp.thumbnail_location if hasattr(fp, 'thumbnail_location') else None,
                     import_path = fp.import_path if hasattr(fp, 'import_path') else None)
         except NoFile:
             raise NotFoundError()
