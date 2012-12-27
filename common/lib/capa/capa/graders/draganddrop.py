@@ -46,7 +46,7 @@ def grade(user_input, correct_answer):
             if use_targets is True:
                 {'1': 't1',  'name_with_icon': 't2'}
             else:
-                {'1': '(10, 10)',  'name_with_icon': '[(10, 10), 20]'}
+                {'1': '[10, 10]',  'name_with_icon': '[[10, 10], 20]'}
 
     Returns:
         True or False.
@@ -68,8 +68,7 @@ def grade(user_input, correct_answer):
 
             Returns: bool.
         """
-        if not isinstance(correct_answer, list) or \
-           not isinstance(user_answer, list):
+        if not isinstance(correct_answer, list) or isinstance(user_answer, list):
             return False
 
         r = 10
