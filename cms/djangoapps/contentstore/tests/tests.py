@@ -428,6 +428,7 @@ class ContentStoreTest(TestCase):
 
         resp = self.client.get(reverse('module_info', kwargs={'module_location': handout_location}))
 
+        # make sure we got a successful response
         self.assertEqual(resp.status_code, 200)
 
         # check that /static/ has been converted to the full path
