@@ -38,6 +38,7 @@ class CombinedOpenEndedModule(XModule):
     # states
     INITIAL = 'initial'
     ASSESSING = 'assessing'
+    INTERMEDIATE_DONE='intermediate_done'
     DONE = 'done'
     TASK_TYPES=["self", "ml", "instructor", "peer"]
 
@@ -72,7 +73,8 @@ class CombinedOpenEndedModule(XModule):
         # None for any element, and score and hint can be None for the last (current)
         # element.
         # Scores are on scale from 0 to max_score
-        self.current_task = instance_state.get('current_task', 0)
+        self.current_task_number = instance_state.get('current_task_number', 0)
+        self.tasks = instance_state.get('tasks', [])
 
         self.state = instance_state.get('state', 'initial')
         self.problems = instance_state.get('problems', [])
@@ -84,16 +86,31 @@ class CombinedOpenEndedModule(XModule):
         # completion (doesn't matter if you self-assessed correct/incorrect).
         self._max_score = int(self.metadata.get('max_score', MAX_SCORE))
 
-        self.tasks=definition['tasks']
-        log.debug(self.tasks)
+        self.task_xml=definition['task_xml']
+        self.setup_next_task()
+
+    def get_tag_name(self, xml):
+        tag=etree.fromstring(xml).tag
+        return tag
 
     def setup_next_task(self):
-        pass
+        if self.state in [self.ASSESSING, self.DONE]:
+            self.current_task=self.tasks[len(self.tasks)-1]
+            return True
+
+        self.current_task_xml=self.task_xml[self.current_task_number]
+        current_task_type=self.get_tag_name(self.current_task_xml)
+        if current_task_type=="selfassessment":
+            self.current_task_descriptor=self_assessment_module.SelfAssessmentDescriptor(self.system)
+            self.current_task_parsed_xml=self.current_task_descriptor.definition_from_xml(self.current_task_xml,self.system)
+            self.current_task=self_assessment_module.SelfAssessmentModule(self.system, self.location, self.current_task_parsed_xml, self.current_task_descriptor)
+        return True
 
     def get_html(self):
-        html = "<html><head></head><body></body></html>"
+        return self.current_task.get_html()
 
-        return rewrite_links(html, self.rewrite_content_links)
+    def handle_ajax(self, dispatch, get):
+        return self.current_task.handle_ajax(dispatch,get)
 
 class CombinedOpenEndedDescriptor(XmlDescriptor, EditingDescriptor):
     """
@@ -132,7 +149,7 @@ class CombinedOpenEndedDescriptor(XmlDescriptor, EditingDescriptor):
             """Assumes that xml_object has child k"""
             return [stringify_children(xml_object.xpath(k)[i]) for i in xrange(0,len(xml_object.xpath(k)))]
 
-        return {'tasks': parse('task')}
+        return {'task_xml': parse('task')}
 
 
     def definition_to_xml(self, resource_fs):
