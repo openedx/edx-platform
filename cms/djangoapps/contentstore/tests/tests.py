@@ -7,6 +7,7 @@ from django.conf import settings
 from django.core.urlresolvers import reverse
 from path import path
 from tempfile import mkdtemp
+import json
 
 from student.models import Registration
 from django.contrib.auth.models import User
@@ -416,6 +417,29 @@ class ContentStoreTest(TestCase):
             self.assertEqual(resp.status_code, 200)
 
         shutil.rmtree(root_dir)        
+
+    def test_course_handouts_rewrites(self):
+        ms = modulestore('direct')
+        cs = contentstore() 
+
+        import_from_xml(ms, 'common/test/data/', ['full'])     
+
+        handout_location= Location(['i4x', 'edX', 'full', 'course_info', 'handouts'])
+
+        resp = self.client.get(reverse('module_info', kwargs={'module_location': handout_location}))
+
+        self.assertEqual(resp.status_code, 200)
+
+        # check that /static/ has been converted to the full path
+        self.assertContains(resp, '/c4x/edX/full/asset/handouts_schematic_tutorial.pdf')
+
+
+
+
+
+
+        
+
 
 
 

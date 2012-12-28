@@ -1009,14 +1009,17 @@ def module_info(request, module_location):
     if request.method == 'POST' and 'HTTP_X_HTTP_METHOD_OVERRIDE' in request.META:
         real_method = request.META['HTTP_X_HTTP_METHOD_OVERRIDE']
     else:
-        real_method = request.method    
+        real_method = request.method
+
+    rewrite_static_links = request.GET.get('rewrite_url_links','True') in ['True', 'true']
+    logging.debug('rewrite_static_links = {0} {1}'.format(request.GET.get('rewrite_url_links','False'), rewrite_static_links))
     
     # check that logged in user has permissions to this item
     if not has_access(request.user, location):
         raise PermissionDenied()    
 
     if real_method == 'GET':
-        return HttpResponse(json.dumps(get_module_info(get_modulestore(location), location)), mimetype="application/json")
+        return HttpResponse(json.dumps(get_module_info(get_modulestore(location), location, rewrite_static_links=rewrite_static_links)), mimetype="application/json")
     elif real_method == 'POST' or real_method == 'PUT':
         return HttpResponse(json.dumps(set_module_info(get_modulestore(location), location, request.POST)), mimetype="application/json")
     else:
