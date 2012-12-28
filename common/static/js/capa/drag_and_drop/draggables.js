@@ -43,6 +43,7 @@ define(['logme', 'update_input'], function (logme, updateInput) {
                         'overflow: hidden; ' +
                         'z-index: ' + objIndex + '; ' +
                         'border: 1px solid #CCC; ' +
+                        'text-align: center; ' +
                     '" ' +
                     'data-draggable-position-index="' + objIndex + '" ' +
                     '></div>'
