@@ -600,6 +600,7 @@ INSTALLED_APPS = (
     'util',
     'certificates',
     'instructor',
+    'open_ended_grading',
     'psychometrics',
     'licenses',
 
