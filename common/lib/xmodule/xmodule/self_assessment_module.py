@@ -38,7 +38,7 @@ MAX_ATTEMPTS = 1
 # Overriden by max_score specified in xml.
 MAX_SCORE = 1
 
-class SelfAssessmentModule(XModule):
+class SelfAssessmentModule():
     """
     States:
 
@@ -66,9 +66,6 @@ class SelfAssessmentModule(XModule):
 
     def __init__(self, system, location, definition, descriptor,
                  instance_state=None, shared_state=None, **kwargs):
-        XModule.__init__(self, system, location, definition, descriptor,
-            instance_state, shared_state, **kwargs)
-
         """
         Definition file should have 4 blocks -- prompt, rubric, submitmessage, hintprompt,
         and two optional attributes:
@@ -116,11 +113,11 @@ class SelfAssessmentModule(XModule):
         self.state = instance_state.get('state', 'initial')
 
         self.attempts = instance_state.get('attempts', 0)
-        self.max_attempts = int(self.metadata.get('attempts', MAX_ATTEMPTS))
+        self.max_attempts = int(instance_state.get('attempts', MAX_ATTEMPTS))
 
         # Used for progress / grading.  Currently get credit just for
         # completion (doesn't matter if you self-assessed correct/incorrect).
-        self._max_score = int(self.metadata.get('max_score', MAX_SCORE))
+        self._max_score = int(instance_state.get('max_score', MAX_SCORE))
 
         self.rubric = definition['rubric']
         self.prompt = definition['prompt']
@@ -224,7 +221,7 @@ class SelfAssessmentModule(XModule):
         """Can the module be reset?"""
         return self.state == self.DONE and self.attempts < self.max_attempts
 
-    def get_html(self):
+    def get_html(self, system):
         #set context variables and render template
         if self.state != self.INITIAL:
             latest = self.latest_answer()
@@ -235,17 +232,16 @@ class SelfAssessmentModule(XModule):
         context = {
             'prompt': self.prompt,
             'previous_answer': previous_answer,
-            'ajax_url': self.system.ajax_url,
+            'ajax_url': system.ajax_url,
             'initial_rubric': self.get_rubric_html(),
             'initial_hint': self.get_hint_html(),
             'initial_message': self.get_message_html(),
             'state': self.state,
             'allow_reset': self._allow_reset(),
         }
-        html = self.system.render_template('self_assessment_prompt.html', context)
 
-        # cdodge: perform link substitutions for any references to course static content (e.g. images)
-        return rewrite_links(html, self.rewrite_content_links)
+        html = system.render_template('self_assessment_prompt.html', context)
+        return html
 
     def max_score(self):
         """

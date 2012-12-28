@@ -29,7 +29,6 @@ setup(
             "problem = xmodule.capa_module:CapaDescriptor",
             "problemset = xmodule.seq_module:SequenceDescriptor",
             "section = xmodule.backcompat_module:SemanticSectionDescriptor",
-            "selfassessment = xmodule.self_assessment_module:SelfAssessmentDescriptor",
             "sequential = xmodule.seq_module:SequenceDescriptor",
             "slides = xmodule.backcompat_module:TranslateCustomTagDescriptor",
             "vertical = xmodule.vertical_module:VerticalDescriptor",

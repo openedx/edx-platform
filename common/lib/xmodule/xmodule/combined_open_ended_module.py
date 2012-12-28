@@ -107,7 +107,8 @@ class CombinedOpenEndedModule(XModule):
         return True
 
     def get_html(self):
-        return self.current_task.get_html()
+        html = self.current_task.get_html(self.system)
+        return rewrite_links(html, self.rewrite_content_links)
 
     def handle_ajax(self, dispatch, get):
         return self.current_task.handle_ajax(dispatch,get)
