@@ -250,6 +250,11 @@ if settings.COURSEWARE_ENABLED:
             'open_ended_grading.staff_grading_service.save_grade', name='staff_grading_save_grade'),
         url(r'^courses/(?P<course_id>[^/]+/[^/]+/[^/]+)/staff_grading/get_problem_list$',
             'open_ended_grading.staff_grading_service.get_problem_list', name='staff_grading_get_problem_list'),
+        url(r'^courses/(?P<course_id>[^/]+/[^/]+/[^/]+)/peer_grading/get_next_submission$',
+            'open_ended_grading.peer_grading_service.get_next_submission', name='peer_grading_get_next_submission'),
+        url(r'^courses/(?P<course_id>[^/]+/[^/]+/[^/]+)/peer_grading$',
+            'open_ended_grading.views.peer_grading', name='peer_grading'),
+
     )
 
     # discussion forums live within courseware, so courseware must be enabled first

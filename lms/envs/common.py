@@ -418,6 +418,7 @@ main_vendor_js = [
 discussion_js = sorted(glob2.glob(PROJECT_ROOT / 'static/coffee/src/discussion/**/*.coffee'))
 
 staff_grading_js = sorted(glob2.glob(PROJECT_ROOT / 'static/coffee/src/staff_grading/**/*.coffee'))
+peer_grading_js = sorted(glob2.glob(PROJECT_ROOT / 'static/coffee/src/peer_grading/**/*.coffee'))
 
 
 # Load javascript from all of the available xmodules, and
@@ -526,8 +527,11 @@ PIPELINE_JS = {
     'staff_grading' : {
         'source_filenames': [pth.replace(PROJECT_ROOT / 'static/', '')  for pth in staff_grading_js],
         'output_filename': 'js/staff_grading.js'
+    },
+    'peer_grading' : {
+        'source_filenames': [pth.replace(PROJECT_ROOT / 'static/', '')  for pth in peer_grading_js],
+        'output_filename': 'js/peer_grading.js'
     }
-
 }
 
 PIPELINE_DISABLE_WRAPPER = True

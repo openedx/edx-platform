@@ -48,10 +48,30 @@ def staff_grading(request, course_id):
         ajax_url += '/'
         
     return render_to_response('instructor/staff_grading.html', {
-        'view_html': grading.get_html(),
+        'view_html': '',
         'course': course,
         'course_id': course_id,
         'ajax_url': ajax_url,
         # Checked above
         'staff_access': True, })
+
+
+def peer_grading(request, course_id):
+    '''
+    Show a peer grading interface
+    '''
+    course = get_course_with_access(request.user, course_id, 'load')
+
+    ajax_url = reverse('peer_grading', kwargs={'course_id': course_id})
+    if not ajax_url.endswith('/'):
+        ajax_url += '/'
+
+    return render_to_response('peer_grading/peer_grading.html', { 
+        'view_html': '',
+        'course': course,
+        'course_id': course_id,
+        'ajax_url': ajax_url,
+        # Checked above
+        'staff_access': False, })
+    
 

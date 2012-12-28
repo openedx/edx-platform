@@ -36,5 +36,59 @@ class PeerGradingService(GradingService):
                 'submission_id' : submission_id,
                 'score' : score,
                 'feedback' : feedback,
-                'submission_key', submission_key}
+                'submission_key': submission_key}
         return self.post(self.save_grade_url, False, data)
+
+
+def peer_grading_service():
+    """
+    Return a peer grading service instance--if settings.MOCK_PEER_GRADING is True,
+    returns a mock one, otherwise a real one.
+
+    Caches the result, so changing the setting after the first call to this
+    function will have no effect.
+    """
+    global _service
+    if _service is not None:
+        return _service
+
+    _service = PeerGradingService(settings.PEER_GRADING_INTERFACE)
+
+    return _service
+
+def _err_response(msg):
+    """
+    Return a HttpResponse with a json dump with success=False, and the given error message.
+    """
+    return HttpResponse(json.dumps({'success': False, 'error': msg}),
+                        mimetype="application/json")
+
+def get_next_submission(request, course_id):
+    required = set(['location'])
+    if request.method != 'POST':
+        raise Http404
+    actual = set(request.POST.keys())
+    missing = required - actual
+    if len(missing) > 0:
+        return _err_response('Missing required keys {0}'.format(
+            ', '.join(missing)))
+    grader_id = request.user.id
+    p = request.POST
+    location = p['location']
+
+    return HttpResponse(_get_next(course_id, request.user.id, location),
+                        mimetype="application/json")
+
+def _get_next_submission(course_id, grader_id, location):
+    """
+    Implementation of get_next (also called from save_grade) -- returns a json string
+    """
+    try:
+        return peer_grading_service().get_next_submission(location, grader_id)
+    except GradingServiceError:
+        log.exception("Error from grading service.  server url: {0}"
+                      .format(staff_grading_service().url))
+        return json.dumps({'success': False,
+                           'error': 'Could not connect to grading service'})
+
+
