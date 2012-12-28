@@ -431,7 +431,8 @@ class ContentStoreTest(TestCase):
         self.assertEqual(resp.status_code, 200)
 
         # check that /static/ has been converted to the full path
-        self.assertContains(resp, '/c4x/edX/full/asset/handouts_schematic_tutorial.pdf')
+        # note, we know the link it should be because that's what in the 'full' course in the test data
+        self.assertContains(resp, '/c4x/edX/full/asset/handouts_schematic_tutorial.pdf') 
 
 
 
