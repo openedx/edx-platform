@@ -83,17 +83,8 @@ class StaffGradingService(GradingService):
         Raises:
             GradingServiceError: something went wrong with the connection.
         """
-        op = lambda: self.session.get(self.get_problem_list_url,
-                                        allow_redirects = False,
-                                        params={'course_id': course_id,
-                                            'grader_id': grader_id})
-        try:
-            r = self._try_with_login(op)
-        except (RequestException, ConnectionError, HTTPError) as err:
-            # reraise as promised GradingServiceError, but preserve stacktrace.
-            raise GradingServiceError, str(err), sys.exc_info()[2]
-
-        return r.text
+        params = {'course_id': course_id,'grader_id': grader_id}
+        return self.get(self.get_problem_list_url, False, params)
 
 
     def get_next(self, course_id, location, grader_id):
@@ -114,17 +105,10 @@ class StaffGradingService(GradingService):
         Raises:
             GradingServiceError: something went wrong with the connection.
         """
-        op = lambda: self.session.get(self.get_next_url,
+        return self.get(self.get_next_url,
                                       allow_redirects=False,
                                       params={'location': location,
                                               'grader_id': grader_id})
-        try:
-            r = self._try_with_login(op)
-        except (RequestException, ConnectionError, HTTPError) as err:
-            # reraise as promised GradingServiceError, but preserve stacktrace.
-            raise GradingServiceError, str(err), sys.exc_info()[2]
-
-        return r.text
 
 
     def save_grade(self, course_id, grader_id, submission_id, score, feedback, skipped):
@@ -139,22 +123,15 @@ class StaffGradingService(GradingService):
         Raises:
             GradingServiceError if there's a problem connecting.
         """
-        try:
-            data = {'course_id': course_id,
-                    'submission_id': submission_id,
-                    'score': score,
-                    'feedback': feedback,
-                    'grader_id': grader_id,
-                    'skipped': skipped}
+        data = {'course_id': course_id,
+                'submission_id': submission_id,
+                'score': score,
+                'feedback': feedback,
+                'grader_id': grader_id,
+                'skipped': skipped}
 
-            op = lambda: self.session.post(self.save_grade_url, data=data,
-                                           allow_redirects=False)
-            r = self._try_with_login(op)
-        except (RequestException, ConnectionError, HTTPError) as err:
-            # reraise as promised GradingServiceError, but preserve stacktrace.
-            raise GradingServiceError, str(err), sys.exc_info()[2]
-
-        return r.text
+        return self.post(self.save_grade_url, data=data,
+                                       allow_redirects=False)
 
 # don't initialize until staff_grading_service() is called--means that just
 # importing this file doesn't create objects that may not have the right config

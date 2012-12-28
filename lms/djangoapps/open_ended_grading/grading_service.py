@@ -1,5 +1,4 @@
-# This class gives a common interface for logging into
-# the graing controller
+# This class gives a common interface for logging into the grading controller
 import json
 import logging
 import requests
@@ -45,6 +44,35 @@ class GradingService(object):
 
         return response.json
 
+    def post(self, url, allow_redirects, data): 
+        """
+        Make a post request to the grading controller
+        """
+        try:
+            op = lambda: self.session.post(url, data=data,
+                                           allow_redirects=allow_redirects)
+            r = self._try_with_login(op)
+        except (RequestException, ConnectionError, HTTPError) as err:
+            # reraise as promised GradingServiceError, but preserve stacktrace.
+            raise GradingServiceError, str(err), sys.exc_info()[2]
+
+        return r.text
+
+    def get(self, url, allow_redirects, params):
+        """
+        Make a get request to the grading controller
+        """
+        op = lambda: self.session.get(url,
+                                      allow_redirects=allow_redirects,
+                                      params=params)
+        try:
+            r = self._try_with_login(op)
+        except (RequestException, ConnectionError, HTTPError) as err:
+            # reraise as promised GradingServiceError, but preserve stacktrace.
+            raise GradingServiceError, str(err), sys.exc_info()[2]
+
+        return r.text
+        
 
     def _try_with_login(self, operation):
         """
