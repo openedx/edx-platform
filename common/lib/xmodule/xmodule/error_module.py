@@ -106,7 +106,7 @@ class ErrorDescriptor(JSONEditingDescriptor):
     def from_descriptor(cls, descriptor, error_msg='Error not available'):
         return cls._construct(
             descriptor.system,
-            json.dumps(descriptor._model_data, indent=4),
+            descriptor._model_data,
             error_msg,
             location=descriptor.location,
         )

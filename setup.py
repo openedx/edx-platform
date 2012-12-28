@@ -12,7 +12,8 @@ setup(
     # for a description of entry_points
     entry_points={
         'xmodule.namespace': [
-            'lms = lms.xmodule_namespace:LmsNamespace'
+            'lms = lms.xmodule_namespace:LmsNamespace',
+            'cms = cms.xmodule_namespace:CmsNamespace',
         ],
     }
 )

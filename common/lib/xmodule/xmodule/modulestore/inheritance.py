@@ -52,6 +52,11 @@ def own_metadata(module):
             field.name not in inherited_metadata and
             field.name in module._model_data):
 
-            metadata[field.name] = module._model_data[field.name]
+            try:
+                metadata[field.name] = module._model_data[field.name]
+            except KeyError:
+                # Ignore any missing keys in _model_data
+                pass
+
 
     return metadata

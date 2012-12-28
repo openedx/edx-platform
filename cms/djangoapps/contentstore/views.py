@@ -29,11 +29,14 @@ from django.conf import settings
 from xmodule.modulestore import Location
 from xmodule.modulestore.exceptions import ItemNotFoundError, InvalidLocationError
 from xmodule.modulestore.inheritance import own_metadata
+from xmodule.model import Scope
+from xmodule.runtime import KeyValueStore, DbModel, InvalidScopeError
 from xmodule.x_module import ModuleSystem
 from xmodule.error_module import ErrorDescriptor
 from xmodule.errortracker import exc_info_to_str
 from static_replace import replace_urls
 from external_auth.views import ssl_login_shortcut
+from xmodule.modulestore.mongo import MongoUsage
 
 from mitxmako.shortcuts import render_to_response, render_to_string
 from xmodule.modulestore.django import modulestore
@@ -214,8 +217,13 @@ def edit_subsection(request, location):
 
     # remove all metadata from the generic dictionary that is presented in a more normalized UI
 
-    policy_metadata = dict((key,value) for key, value in item.metadata.iteritems() 
-        if key not in ['display_name', 'start', 'due', 'format'] and key not in item.system_metadata_fields)
+    policy_metadata = dict(
+        (key,value)
+        for field
+        in item.fields
+        if field.name not in ['display_name', 'start', 'due', 'format'] and
+           field.scope == Scope.settings
+    )
 
     can_view_live = False
     subsection_units = item.get_children()
@@ -312,11 +320,6 @@ def edit_unit(request, location):
 
     unit_state = compute_unit_state(item)
 
-    try:
-        published_date = time.strftime('%B %d, %Y', item.metadata.get('published_date'))
-    except TypeError:
-        published_date = None
-
     return render_to_response('unit.html', {
         'context_course': course,
         'active_tab': 'courseware',
@@ -327,11 +330,11 @@ def edit_unit(request, location):
         'draft_preview_link': preview_lms_link,
         'published_preview_link': lms_link,
         'subsection': containing_subsection,
-        'release_date': get_date_display(datetime.fromtimestamp(time.mktime(containing_subsection.start))) if containing_subsection.start is not None else None,
+        'release_date': get_date_display(datetime.fromtimestamp(time.mktime(containing_subsection.lms.start))) if containing_subsection.lms.start is not None else None,
         'section': containing_section,
         'create_new_unit_template': Location('i4x', 'edx', 'templates', 'vertical', 'Empty'),
         'unit_state': unit_state,
-        'published_date': published_date,
+        'published_date': item.cms.published_date.strftime('%B %d, %Y') if item.cms.published_date is not None else None,
     })
 
 
@@ -395,9 +398,8 @@ def preview_dispatch(request, preview_id, location, dispatch=None):
     dispatch: The action to execute
     """
 
-    instance_state, shared_state = load_preview_state(request, preview_id, location)
     descriptor = modulestore().get_item(location)
-    instance = load_preview_module(request, preview_id, descriptor, instance_state, shared_state)
+    instance = load_preview_module(request, preview_id, descriptor)
     # Let the module handle the AJAX
     try:
         ajax_return = instance.handle_ajax(dispatch, request.POST)
@@ -408,40 +410,9 @@ def preview_dispatch(request, preview_id, location, dispatch=None):
         log.exception("error processing ajax call")
         raise
 
-    save_preview_state(request, preview_id, location, instance.get_instance_state(), instance.get_shared_state())
+    print request.session.items()
+
     return HttpResponse(ajax_return)
-
-
-def load_preview_state(request, preview_id, location):
-    """
-    Load the state of a preview module from the request
-
-    preview_id (str): An identifier specifying which preview this module is used for
-    location: The Location of the module to dispatch to
-    """
-    if 'preview_states' not in request.session:
-        request.session['preview_states'] = defaultdict(dict)
-
-    instance_state = request.session['preview_states'][preview_id, location].get('instance')
-    shared_state = request.session['preview_states'][preview_id, location].get('shared')
-
-    return instance_state, shared_state
-
-
-def save_preview_state(request, preview_id, location, instance_state, shared_state):
-    """
-    Save the state of a preview module to the request
-
-    preview_id (str): An identifier specifying which preview this module is used for
-    location: The Location of the module to dispatch to
-    instance_state: The instance state to save
-    shared_state: The shared state to save
-    """
-    if 'preview_states' not in request.session:
-        request.session['preview_states'] = defaultdict(dict)
-
-    request.session['preview_states'][preview_id, location]['instance'] = instance_state
-    request.session['preview_states'][preview_id, location]['shared'] = shared_state
 
 
 def render_from_lms(template_name, dictionary, context=None, namespace='main'):
@@ -449,6 +420,30 @@ def render_from_lms(template_name, dictionary, context=None, namespace='main'):
     Render a template using the LMS MAKO_TEMPLATES
     """
     return render_to_string(template_name, dictionary, context, namespace="lms." + namespace)
+
+
+class SessionKeyValueStore(KeyValueStore):
+    def __init__(self, request, model_data):
+        self._model_data = model_data
+        self._session = request.session
+
+    def get(self, key):
+        try:
+            return self._model_data[key.field_name]
+        except (KeyError, InvalidScopeError):
+            return self._session[tuple(key)]
+
+    def set(self, key, value):
+        try:
+            self._model_data[key.field_name] = value
+        except (KeyError, InvalidScopeError):
+            self._session[tuple(key)] = value
+
+    def delete(self, key):
+        try:
+            del self._model_data[key.field_name]
+        except (KeyError, InvalidScopeError):
+            del self._session[tuple(key)]
 
 
 def preview_module_system(request, preview_id, descriptor):
@@ -461,6 +456,14 @@ def preview_module_system(request, preview_id, descriptor):
     descriptor: An XModuleDescriptor
     """
 
+    def preview_model_data(model_data):
+        return DbModel(
+            SessionKeyValueStore(request, model_data),
+            descriptor.module_class,
+            preview_id,
+            MongoUsage(preview_id, descriptor.location.url()),
+        )
+
     return ModuleSystem(
         ajax_url=reverse('preview_dispatch', args=[preview_id, descriptor.location.url(), '']).rstrip('/'),
         # TODO (cpennington): Do we want to track how instructors are using the preview problems?
@@ -471,6 +474,7 @@ def preview_module_system(request, preview_id, descriptor):
         debug=True,
         replace_urls=replace_urls,
         user=request.user,
+        xmodule_model_data=preview_model_data,
     )
 
 
@@ -484,11 +488,10 @@ def get_preview_module(request, preview_id, location):
     location: A Location
     """
     descriptor = modulestore().get_item(location)
-    instance_state, shared_state = descriptor.get_sample_state()[0]
-    return load_preview_module(request, preview_id, descriptor, instance_state, shared_state)
+    return load_preview_module(request, preview_id, descriptor)
 
 
-def load_preview_module(request, preview_id, descriptor, instance_state, shared_state):
+def load_preview_module(request, preview_id, descriptor):
     """
     Return a preview XModule instantiated from the supplied descriptor, instance_state, and shared_state
 
@@ -502,10 +505,11 @@ def load_preview_module(request, preview_id, descriptor, instance_state, shared_
     try:
         module = descriptor.xmodule(system)
     except:
+        log.debug("Unable to load preview module", exc_info=True)
         module = ErrorDescriptor.from_descriptor(
             descriptor,
             error_msg=exc_info_to_str(sys.exc_info())
-        ).xmodule_constructor(system)(None, None)
+        ).xmodule(system)
 
     # cdodge: Special case 
     if module.location.category == 'static_tab':
@@ -523,11 +527,9 @@ def load_preview_module(request, preview_id, descriptor, instance_state, shared_
         
     module.get_html = replace_static_urls(
         module.get_html,
-        module.metadata.get('data_dir', module.location.course),
+        getattr(module, 'data_dir', module.location.course),
         course_namespace = Location([module.location.tag, module.location.org, module.location.course, None, None])
     )
-    save_preview_state(request, preview_id, descriptor.location.url(),
-        module.get_instance_state(), module.get_shared_state())
 
     return module
 
@@ -541,7 +543,7 @@ def get_module_previews(request, descriptor):
     """
     preview_html = []
     for idx, (instance_state, shared_state) in enumerate(descriptor.get_sample_state()):
-        module = load_preview_module(request, str(idx), descriptor, instance_state, shared_state)
+        module = load_preview_module(request, str(idx), descriptor)
         preview_html.append(module.get_html())
     return preview_html
 
@@ -625,23 +627,26 @@ def save_item(request):
 
         # update existing metadata with submitted metadata (which can be partial)
         # IMPORTANT NOTE: if the client passed pack 'null' (None) for a piece of metadata that means 'remove it'
-        for metadata_key in posted_metadata.keys():
+        for metadata_key, value in posted_metadata.items():
 
             # let's strip out any metadata fields from the postback which have been identified as system metadata
             # and therefore should not be user-editable, so we should accept them back from the client
             if metadata_key in existing_item.system_metadata_fields:
                 del posted_metadata[metadata_key]
             elif posted_metadata[metadata_key] is None:
+                print "DELETING", metadata_key, value
+                print metadata_key in existing_item._model_data
                 # remove both from passed in collection as well as the collection read in from the modulestore
-                if metadata_key in existing_item.metadata:
-                    del existing_item.metadata[metadata_key]
+                if metadata_key in existing_item._model_data:
+                    del existing_item._model_data[metadata_key]
                 del posted_metadata[metadata_key]
-
-        # overlay the new metadata over the modulestore sourced collection to support partial updates
-        existing_item.metadata.update(posted_metadata)
+            else:
+                existing_item._model_data[metadata_key] = value
 
         # commit to datastore
-        store.update_metadata(item_location, existing_item.metadata)
+        # TODO (cpennington): This really shouldn't have to do this much reaching in to get the metadata
+        print existing_item._model_data._kvs._metadata
+        store.update_metadata(item_location, existing_item._model_data._kvs._metadata)
 
     return HttpResponse()
 

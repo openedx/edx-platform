@@ -3,6 +3,13 @@ from collections import MutableMapping, namedtuple
 from .model import ModuleScope, ModelType
 
 
+class InvalidScopeError(Exception):
+    """
+    Raised to indicated that operating on the supplied scope isn't allowed by a KeyValueStore
+    """
+    pass
+
+
 class KeyValueStore(object):
     """The abstract interface for Key Value Stores."""
 
@@ -102,8 +109,12 @@ class DbModel(MutableMapping):
     def __len__(self):
         return len(self.keys())
 
+    def __contains__(self, item):
+        return item in self.keys()
+
     def keys(self):
         fields = [field.name for field in self._module_cls.fields]
         for namespace_name in self._module_cls.namespaces:
             fields.extend(field.name for field in getattr(self._module_cls, namespace_name).fields)
+        print fields
         return fields

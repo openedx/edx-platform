@@ -122,7 +122,7 @@ def compute_unit_state(unit):
     'private' content is editabled and not visible in the LMS
     """
 
-    if unit.metadata.get('is_draft', False):
+    if unit.cms.is_draft:
         try:
             modulestore('direct').get_item(unit.location)
             return UnitState.draft

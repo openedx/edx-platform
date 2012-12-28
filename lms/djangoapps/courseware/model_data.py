@@ -8,12 +8,9 @@ from .models import (
     XModuleStudentInfoField
 )
 
-from xmodule.runtime import DbModel, KeyValueStore
+from xmodule.runtime import KeyValueStore, InvalidScopeError
 from xmodule.model import Scope
 
-
-class InvalidScopeError(Exception):
-    pass
 
 class InvalidWriteError(Exception):
     pass

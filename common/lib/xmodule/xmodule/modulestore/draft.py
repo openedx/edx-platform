@@ -15,11 +15,11 @@ def as_draft(location):
 
 def wrap_draft(item):
     """
-    Sets `item.metadata['is_draft']` to `True` if the item is a
-    draft, and false otherwise. Sets the item's location to the
+    Sets `item.cms.is_draft` to `True` if the item is a
+    draft, and `False` otherwise. Sets the item's location to the
     non-draft location in either case
     """
-    item.metadata['is_draft'] = item.location.revision == DRAFT
+    item.cms.is_draft = item.location.revision == DRAFT
     item.location = item.location._replace(revision=None)
     return item
 
@@ -112,7 +112,7 @@ class DraftModuleStore(ModuleStoreBase):
         """
         draft_loc = as_draft(location)
         draft_item = self.get_item(location)
-        if not draft_item.metadata['is_draft']:
+        if not draft_item.cms.is_draft:
             self.clone_item(location, draft_loc)
 
         return super(DraftModuleStore, self).update_item(draft_loc, data)
@@ -127,7 +127,7 @@ class DraftModuleStore(ModuleStoreBase):
         """
         draft_loc = as_draft(location)
         draft_item = self.get_item(location)
-        if not draft_item.metadata['is_draft']:
+        if not draft_item.cms.is_draft:
             self.clone_item(location, draft_loc)
 
         return super(DraftModuleStore, self).update_children(draft_loc, children)
@@ -143,7 +143,7 @@ class DraftModuleStore(ModuleStoreBase):
         draft_loc = as_draft(location)
         draft_item = self.get_item(location)
 
-        if not draft_item.metadata['is_draft']:
+        if not draft_item.cms.is_draft:
             self.clone_item(location, draft_loc)
 
         if 'is_draft' in metadata:
@@ -175,8 +175,8 @@ class DraftModuleStore(ModuleStoreBase):
         draft = self.get_item(location)
         metadata = {}
         metadata.update(draft.metadata)
-        metadata['published_date'] = tuple(datetime.utcnow().timetuple())
-        metadata['published_by'] = published_by_id
+        metadata.cms.published_date = datetime.utcnow()
+        metadata.cms.published_by = published_by_id
         super(DraftModuleStore, self).update_item(location, draft.definition.get('data', {}))
         super(DraftModuleStore, self).update_children(location, draft.definition.get('children', []))
         super(DraftModuleStore, self).update_metadata(location, metadata)

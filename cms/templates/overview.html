@@ -141,7 +141,7 @@
               </h3>
               <div class="section-published-date">
                 <%
-                  start_date = datetime.fromtimestamp(mktime(section.start)) if section.start is not None else None
+                  start_date = datetime.fromtimestamp(mktime(section.lms.start)) if section.lms.start is not None else None
                   start_date_str = start_date.strftime('%m/%d/%Y') if start_date is not None else ''
                   start_time_str = start_date.strftime('%H:%M') if start_date is not None else ''
                 %>
@@ -178,7 +178,7 @@
                     </a>
                   </div>
                   
-                  <div class="gradable-status" data-initial-status="${subsection.metadata.get('format', 'Not Graded')}">
+                  <div class="gradable-status" data-initial-status="${subsection.lms.format if section.lms.format is not None else 'Not Graded'}">
                   </div>
                   
                   <div class="item-actions">

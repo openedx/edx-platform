@@ -1,7 +1,9 @@
 import pymongo
 import sys
+import logging
 
 from bson.son import SON
+from collections import namedtuple
 from fs.osfs import OSFS
 from itertools import repeat
 from path import path
@@ -11,15 +13,77 @@ from xmodule.errortracker import null_error_tracker, exc_info_to_str
 from xmodule.mako_module import MakoDescriptorSystem
 from xmodule.x_module import XModuleDescriptor
 from xmodule.error_module import ErrorDescriptor
+from xmodule.runtime import DbModel, KeyValueStore, InvalidScopeError
+from xmodule.model import Scope
 
 from . import ModuleStoreBase, Location
 from .draft import DraftModuleStore
 from .exceptions import (ItemNotFoundError,
                          DuplicateItemError)
 
+
+log = logging.getLogger(__name__)
+
 # TODO (cpennington): This code currently operates under the assumption that
 # there is only one revision for each item. Once we start versioning inside the CMS,
 # that assumption will have to change
+
+
+class MongoKeyValueStore(KeyValueStore):
+    """
+    A KeyValueStore that maps keyed data access to one of the 3 data areas
+    known to the MongoModuleStore (data, children, and metadata)
+    """
+    def __init__(self, data, children, metadata):
+        self._data = data
+        self._children = children
+        self._metadata = metadata
+
+    def get(self, key):
+        print "GET", key
+        if key.field_name == 'children':
+            return self._children
+        elif key.scope == Scope.settings:
+            return self._metadata[key.field_name]
+        elif key.scope == Scope.content:
+            if key.field_name == 'data' and not isinstance(self._data, dict):
+                return self._data
+            else:
+                return self._data[key.field_name]
+        else:
+            raise InvalidScopeError(key.scope)
+
+    def set(self, key, value):
+        print "SET", key, value
+        if key.field_name == 'children':
+            self._children = value
+        elif key.scope == Scope.settings:
+            self._metadata[key.field_name] = value
+        elif key.scope == Scope.content:
+            if key.field_name == 'data' and not isinstance(self._data, dict):
+                self._data = value
+            else:
+                self._data[key.field_name] = value
+        else:
+            raise InvalidScopeError(key.scope)
+
+    def delete(self, key):
+        print "DELETE", key
+        if key.field_name == 'children':
+            self._children = []
+        elif key.scope == Scope.settings:
+            if key.field_name in self._metadata:
+                del self._metadata[key.field_name]
+        elif key.scope == Scope.content:
+            if key.field_name == 'data' and not isinstance(self._data, dict):
+                self._data = None
+            else:
+                del self._data[key.field_name]
+        else:
+            raise InvalidScopeError(key.scope)
+
+
+MongoUsage = namedtuple('MongoUsage', 'id, def_id')
 
 
 class CachingDescriptorSystem(MakoDescriptorSystem):
@@ -64,8 +128,21 @@ class CachingDescriptorSystem(MakoDescriptorSystem):
             # always load an entire course.  We're punting on this until after launch, and then
             # will build a proper course policy framework.
             try:
-                return XModuleDescriptor.load_from_json(json_data, self, self.default_class)
+                class_ = XModuleDescriptor.load_class(
+                    json_data['location']['category'],
+                    self.default_class
+                )
+                definition = json_data.get('definition', {})
+                kvs = MongoKeyValueStore(
+                    definition.get('data', {}),
+                    definition.get('children', []),
+                    json_data.get('metadata', {}),
+                )
+
+                model_data = DbModel(kvs, class_, None, MongoUsage(self.course_id, location))
+                return class_(self, location, model_data)
             except:
+                log.debug("Failed to load descriptor", exc_info=True)
                 return ErrorDescriptor.from_json(
                     json_data,
                     self,

@@ -1,5 +1,6 @@
 from pkg_resources import resource_string
 from xmodule.mako_module import MakoModuleDescriptor
+from xmodule.model import Scope, String
 import logging
 
 log = logging.getLogger(__name__)
@@ -14,13 +15,15 @@ class EditingDescriptor(MakoModuleDescriptor):
     """
     mako_template = "widgets/raw-edit.html"
 
+    data = String(scope=Scope.content, default='')
+
     # cdodge: a little refactoring here, since we're basically doing the same thing
     # here as with our parent class, let's call into it to get the basic fields
     # set and then add our additional fields. Trying to keep it DRY.
     def get_context(self):
         _context = MakoModuleDescriptor.get_context(self)
         # Add our specific template information (the raw data body)
-        _context.update({'data': self.definition.get('data', '')})
+        _context.update({'data': self.data})
         return _context
 
 

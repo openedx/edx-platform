@@ -32,9 +32,7 @@ class MakoModuleDescriptor(XModuleDescriptor):
         """
         Return the context to render the mako template with
         """
-        return {'module': self,
-                'editable_metadata_fields': self.editable_fields
-                }
+        return {'module': self}
 
     def get_html(self):
         return self.system.render_template(
