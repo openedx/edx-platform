@@ -74,10 +74,9 @@ class CombinedOpenEndedModule(XModule):
         # element.
         # Scores are on scale from 0 to max_score
         self.current_task_number = instance_state.get('current_task_number', 0)
-        self.tasks = instance_state.get('tasks', [])
+        self.task_states= instance_state.get('task_states', [])
 
         self.state = instance_state.get('state', 'initial')
-        self.problems = instance_state.get('problems', [])
 
         self.attempts = instance_state.get('attempts', 0)
         self.max_attempts = int(self.metadata.get('attempts', MAX_ATTEMPTS))
@@ -94,24 +93,51 @@ class CombinedOpenEndedModule(XModule):
         return tag
 
     def setup_next_task(self):
+        current_task_state=None
         if self.state in [self.ASSESSING, self.DONE]:
-            self.current_task=self.tasks[len(self.tasks)-1]
-            return True
+            current_task_state=self.task_states[len(self.task_states)-1]
+
+        log.debug(self.task_states)
 
         self.current_task_xml=self.task_xml[self.current_task_number]
         current_task_type=self.get_tag_name(self.current_task_xml)
         if current_task_type=="selfassessment":
             self.current_task_descriptor=self_assessment_module.SelfAssessmentDescriptor(self.system)
             self.current_task_parsed_xml=self.current_task_descriptor.definition_from_xml(etree.fromstring(self.current_task_xml),self.system)
-            self.current_task=self_assessment_module.SelfAssessmentModule(self.system, self.location, self.current_task_parsed_xml, self.current_task_descriptor)
+            if current_task_state is None:
+                self.current_task=self_assessment_module.SelfAssessmentModule(self.system, self.location, self.current_task_parsed_xml, self.current_task_descriptor)
+                self.task_states.append(self.current_task.get_instance_state())
+                self.state=self.ASSESSING
+            else:
+                self.current_task=self_assessment_module.SelfAssessmentModule(self.system, self.location, self.current_task_parsed_xml, self.current_task_descriptor, instance_state=current_task_state)
+
         return True
 
     def get_html(self):
         html = self.current_task.get_html(self.system)
-        return rewrite_links(html, self.rewrite_content_links)
+        return_html = rewrite_links(html, self.rewrite_content_links)
+        self.task_states[len(self.task_states)-1] = self.current_task.get_instance_state()
+        return return_html
 
     def handle_ajax(self, dispatch, get):
-        return self.current_task.handle_ajax(dispatch,get, self.system)
+        return_html = self.current_task.handle_ajax(dispatch,get, self.system)
+        self.task_states[len(self.task_states)-1] = self.current_task.get_instance_state()
+        return return_html
+
+    def get_instance_state(self):
+        """
+        Get the current score and state
+        """
+
+        state = {
+            'version': self.STATE_VERSION,
+            'current_task_number': self.current_task_number,
+            'state': self.state,
+            'task_states': self.task_states,
+            'attempts': self.attempts,
+            }
+
+        return json.dumps(state)
 
 class CombinedOpenEndedDescriptor(XmlDescriptor, EditingDescriptor):
     """
