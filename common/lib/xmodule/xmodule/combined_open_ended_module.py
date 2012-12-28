@@ -102,7 +102,7 @@ class CombinedOpenEndedModule(XModule):
         current_task_type=self.get_tag_name(self.current_task_xml)
         if current_task_type=="selfassessment":
             self.current_task_descriptor=self_assessment_module.SelfAssessmentDescriptor(self.system)
-            self.current_task_parsed_xml=self.current_task_descriptor.definition_from_xml(self.current_task_xml,self.system)
+            self.current_task_parsed_xml=self.current_task_descriptor.definition_from_xml(etree.fromstring(self.current_task_xml),self.system)
             self.current_task=self_assessment_module.SelfAssessmentModule(self.system, self.location, self.current_task_parsed_xml, self.current_task_descriptor)
         return True
 
