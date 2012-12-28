@@ -233,8 +233,8 @@ class SelfAssessmentModule():
             'prompt': self.prompt,
             'previous_answer': previous_answer,
             'ajax_url': system.ajax_url,
-            'initial_rubric': self.get_rubric_html(),
-            'initial_hint': self.get_hint_html(),
+            'initial_rubric': self.get_rubric_html(system),
+            'initial_hint': self.get_hint_html(system),
             'initial_message': self.get_message_html(),
             'state': self.state,
             'allow_reset': self._allow_reset(),
@@ -270,7 +270,7 @@ class SelfAssessmentModule():
         return None
 
 
-    def handle_ajax(self, dispatch, get):
+    def handle_ajax(self, dispatch, get, system):
         """
         This is called by courseware.module_render, to handle an AJAX call.
         "get" is request.POST.
@@ -292,7 +292,7 @@ class SelfAssessmentModule():
             return 'Error'
 
         before = self.get_progress()
-        d = handlers[dispatch](get)
+        d = handlers[dispatch](get, system)
         after = self.get_progress()
         d.update({
             'progress_changed': after != before,
@@ -309,7 +309,7 @@ class SelfAssessmentModule():
         return {'success': False,
                 'error': 'The problem state got out-of-sync'}
 
-    def get_rubric_html(self):
+    def get_rubric_html(self,system):
         """
         Return the appropriate version of the rubric, based on the state.
         """
@@ -328,9 +328,9 @@ class SelfAssessmentModule():
         else:
             raise ValueError("Illegal state '%r'" % self.state)
 
-        return self.system.render_template('self_assessment_rubric.html', context)
+        return system.render_template('self_assessment_rubric.html', context)
 
-    def get_hint_html(self):
+    def get_hint_html(self,system):
         """
         Return the appropriate version of the hint view, based on state.
         """
@@ -354,7 +354,7 @@ class SelfAssessmentModule():
         else:
             raise ValueError("Illegal state '%r'" % self.state)
 
-        return self.system.render_template('self_assessment_hint.html', context)
+        return system.render_template('self_assessment_hint.html', context)
 
     def get_message_html(self):
         """
@@ -366,7 +366,7 @@ class SelfAssessmentModule():
         return """<div class="save_message">{0}</div>""".format(self.submit_message)
 
 
-    def save_answer(self, get):
+    def save_answer(self, get, system):
         """
         After the answer is submitted, show the rubric.
 
@@ -397,10 +397,10 @@ class SelfAssessmentModule():
 
         return {
             'success': True,
-            'rubric_html': self.get_rubric_html()
+            'rubric_html': self.get_rubric_html(system)
             }
 
-    def save_assessment(self, get):
+    def save_assessment(self, get, system):
         """
         Save the assessment.  If the student said they're right, don't ask for a
         hint, and go straight to the done state.  Otherwise, do ask for a hint.
@@ -433,13 +433,13 @@ class SelfAssessmentModule():
             d['allow_reset'] = self._allow_reset()
         else:
             self.change_state(self.REQUEST_HINT)
-            d['hint_html'] = self.get_hint_html()
+            d['hint_html'] = self.get_hint_html(system)
 
         d['state'] = self.state
         return d
 
 
-    def save_hint(self, get):
+    def save_hint(self, get, system):
         '''
         Save the hint.
         Returns a dict { 'success': bool,
@@ -465,7 +465,6 @@ class SelfAssessmentModule():
                 'history': self.history,
                 }
             }
-        self.system.track_function('save_hint', event_info)
 
         return {'success': True,
                 'message_html': self.get_message_html(),

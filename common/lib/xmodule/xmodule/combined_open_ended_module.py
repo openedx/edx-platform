@@ -43,7 +43,7 @@ class CombinedOpenEndedModule(XModule):
     TASK_TYPES=["self", "ml", "instructor", "peer"]
 
     js = {'coffee': [resource_string(__name__, 'js/src/selfassessment/display.coffee')]}
-    js_module_name = "CombinedOpenEnded"
+    js_module_name = "SelfAssessment"
 
     def __init__(self, system, location, definition, descriptor,
                  instance_state=None, shared_state=None, **kwargs):
@@ -111,7 +111,7 @@ class CombinedOpenEndedModule(XModule):
         return rewrite_links(html, self.rewrite_content_links)
 
     def handle_ajax(self, dispatch, get):
-        return self.current_task.handle_ajax(dispatch,get)
+        return self.current_task.handle_ajax(dispatch,get, self.system)
 
 class CombinedOpenEndedDescriptor(XmlDescriptor, EditingDescriptor):
     """
