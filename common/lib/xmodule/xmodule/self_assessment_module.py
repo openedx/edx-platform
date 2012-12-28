@@ -457,21 +457,12 @@ class SelfAssessmentModule():
         self.record_latest_hint(get['hint'])
         self.change_state(self.DONE)
 
-        # To the tracking logs!
-        event_info = {
-            'selfassessment_id': self.location.url(),
-            'state': {
-                'version': self.STATE_VERSION,
-                'history': self.history,
-                }
-            }
-
         return {'success': True,
                 'message_html': self.get_message_html(),
                 'allow_reset': self._allow_reset()}
 
 
-    def reset(self, get):
+    def reset(self, get, system):
         """
         If resetting is allowed, reset the state.
 
