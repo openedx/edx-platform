@@ -1,5 +1,5 @@
 import logging
-
+from static_replace import replace_urls
 from xmodule.modulestore.exceptions import ItemNotFoundError
 from xmodule.modulestore import Location
 from xmodule.modulestore.django import modulestore
@@ -7,7 +7,7 @@ from lxml import etree
 import re
 from django.http import HttpResponseBadRequest, Http404
 
-def get_module_info(store, location, parent_location = None):
+def get_module_info(store, location, parent_location = None, rewrite_static_links = False):
   try:
     if location.revision is None:
         module = store.get_item(location)
@@ -16,9 +16,13 @@ def get_module_info(store, location, parent_location = None):
   except ItemNotFoundError:
     raise Http404
 
+  data = module.definition['data']
+  if rewrite_static_links:
+    data = replace_urls(module.definition['data'], course_namespace = Location([module.location.tag, module.location.org, module.location.course, None, None]))
+
   return {
         'id': module.location.url(),
-        'data': module.definition['data'],
+        'data': data,
         'metadata': module.metadata
     }
 
