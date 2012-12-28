@@ -1,0 +1,188 @@
+<problem display_name="Drag and drop demo" >
+
+<text>
+    <p>
+      Drag and drop pictures to proper positions.
+    </p>
+    <p>
+      Drag images to the cow)).
+    </p>
+</text>
+
+<customresponse>
+    <text>
+        <h3>Individual targets with outlines. One draggable per target.</h3>
+        <p> Drag ant to first and star to 3rd. </p>
+        <br />
+    </text>
+
+    <drag_and_drop_input img="cow.png" target_outline="true">
+        <draggable id="1" label="Label 1"/>
+        <draggable id="name_with_icon" label="Ant" icon="images_list/ant.jpg"/>
+        <draggable id="with_icon" label="Cloud" icon="images_list/cloud.jpg" />
+        <draggable id="5" label="Label2" />
+        <draggable id="2" label="Drop" icon="images_list/drop.jpg" />
+        <draggable id="name_label_icon3" label="Grass" icon="images_list/grass.jpg" />
+        <draggable id="name4" label="Star" icon="images_list/star.png" />
+        <draggable id="7" label="Label3" />
+
+        <target id="t1" x="20" y="20" w="90" h="90"/>
+        <target id="t2" x="300" y="100" w="90" h="90"/>
+        <target id="t3" x="150" y="40" w="50" h="50"/>
+
+    </drag_and_drop_input>
+
+    <answer type="loncapa/python"><![CDATA[
+correct_answer = {'name_with_icon': 't1', 'name4': 't2'}
+if draganddrop.grade(submission[0], correct_answer):
+    correct = ['correct']
+else:
+    correct = ['incorrect']
+]]></answer>
+</customresponse>
+
+<customresponse>
+    <text>
+        <h3>
+            Individual targets WITHOUT outlines. Move Star to the
+            volcano opening, and Label3 on to the right ear of the cow.
+            One draggable per target.
+        </h3>
+        <br />
+    </text>
+
+    <drag_and_drop_input img="cow.png" target_outline="false">
+        <draggable id="1" label="Label 1"/>
+        <draggable id="name_with_icon" label="Ant" icon="images_list/ant.jpg"/>
+        <draggable id="with_icon" label="Cloud" icon="images_list/cloud.jpg" />
+        <draggable id="5" label="Label2" />
+        <draggable id="2" label="Drop" icon="images_list/drop.jpg" />
+        <draggable id="name_label_icon3" label="Grass" icon="images_list/grass.jpg" />
+        <draggable id="name4" label="Star" icon="images_list/star.png" />
+        <draggable id="7" label="Label3" />
+
+        <target id="t1" x="210" y="90" w="90" h="90"/>
+        <target id="t2" x="400" y="190" w="90" h="90"/>
+
+    </drag_and_drop_input>
+
+    <answer type="loncapa/python"><![CDATA[
+correct_answer = {'name4': 't1',
+                '7': 't2'}
+if draganddrop.grade(submission[0], correct_answer):
+    correct = ['correct']
+else:
+    correct = ['incorrect']
+]]></answer>
+</customresponse>
+
+<customresponse>
+    <text>
+        <h3>Many draggable per target. Move star and ant to most left target
+            and lable 3 and label 2 to most right target.</h3>
+        <br />
+    </text>
+
+    <drag_and_drop_input img="cow.png" target_outline="true" one_per_target="false">
+        <draggable id="1" label="Label 1"/>
+        <draggable id="name_with_icon" label="Ant" icon="images_list/ant.jpg"/>
+        <draggable id="with_icon" label="Cloud" icon="images_list/cloud.jpg" />
+        <draggable id="5" label="Label2" />
+        <draggable id="2" label="Drop" icon="images_list/drop.jpg" />
+        <draggable id="name_label_icon3" label="Grass" icon="images_list/grass.jpg" />
+        <draggable id="name4" label="Star" icon="images_list/star.png" />
+        <draggable id="7" label="Label3" />
+
+        <target id="t1" x="20" y="20" w="90" h="90"/>
+        <target id="t2" x="300" y="100" w="90" h="90"/>
+        <target id="t3" x="150" y="40" w="50" h="50"/>
+
+    </drag_and_drop_input>
+
+    <answer type="loncapa/python"><![CDATA[
+correct_answer = {'name4': 't1',
+                'name_with_icon': 't1',
+                '5': 't2',
+                '7':'t2'}
+if draganddrop.grade(submission[0], correct_answer):
+    correct = ['correct']
+else:
+    correct = ['incorrect']
+]]></answer>
+</customresponse>
+
+<customresponse>
+    <text>
+        <h3>Draggables can be places anywhere on base image.
+            Place grass in the middle of the image and ant in the
+            right upper corner.</h3>
+        <br />
+    </text>
+
+    <drag_and_drop_input img="cow.png" >
+        <draggable id="1" label="Label 1"/>
+        <draggable id="ant" label="Ant" icon="images_list/ant.jpg"/>
+        <draggable id="with_icon" label="Cloud" icon="images_list/cloud.jpg" />
+        <draggable id="5" label="Label2" />
+        <draggable id="2" label="Drop" icon="images_list/drop.jpg" />
+        <draggable id="grass" label="Grass" icon="images_list/grass.jpg" />
+        <draggable id="name4" label="Star" icon="images_list/star.png" />
+        <draggable id="7" label="Label3" />
+
+    </drag_and_drop_input>
+
+    <answer type="loncapa/python"><![CDATA[
+correct_answer = {'grass':     [[300, 200], 200],
+                  'ant': [[500, 0], 200]}
+if draganddrop.grade(submission[0], correct_answer):
+    correct = ['correct']
+else:
+    correct = ['incorrect']
+]]></answer>
+</customresponse>
+
+<customresponse>
+    <text>
+        <h3>Please identify the Carbon and Oxygen atoms in the molecule.</h3>
+        <br />
+    </text>
+
+    <drag_and_drop_input img="images_list/ethglycol.jpg" target_outline="true" one_per_target="true">
+        <draggable id="l1_c" label="Carbon" />
+        <draggable id="l2" label="Methane"/>
+        <draggable id="l3_o" label="Oxygen" />
+        <draggable id="l4" label="Calcium" />
+        <draggable id="l5" label="Methane"/>
+        <draggable id="l6" label="Calcium" />
+        <draggable id="l7" label="Hydrogen" />
+        <draggable id="l8_c" label="Carbon" />
+        <draggable id="l9" label="Hydrogen" />
+        <draggable id="l10_o" label="Oxygen" />
+
+        <target id="t1_o" x="10" y="67" w="100" h="100"/>
+        <target id="t2" x="133" y="3" w="70" h="70"/>
+        <target id="t3" x="2" y="384" w="70" h="70"/>
+        <target id="t4" x="95" y="386" w="70" h="70"/>
+        <target id="t5_c" x="94" y="293" w="91" h="91"/>
+        <target id="t6_c" x="328" y="294" w="91" h="91"/>
+        <target id="t7" x="393" y="463" w="70" h="70"/>
+        <target id="t8" x="344" y="214" w="70" h="70"/>
+        <target id="t9_o" x="445" y="162" w="100" h="100"/>
+        <target id="t10" x="591" y="132" w="70" h="70"/>
+
+    </drag_and_drop_input>
+
+    <answer type="loncapa/python"><![CDATA[
+correct_answer = {'l3_o': 't1_o',
+                  'l10_o': 't9_o',
+
+                  'l1_c': 't5_c',
+                  'l8_c': 't6_c'}
+if draganddrop.grade(submission[0], correct_answer):
+    correct = ['correct']
+else:
+    correct = ['incorrect']
+]]></answer>
+</customresponse>
+
+</problem>
