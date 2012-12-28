@@ -33,7 +33,62 @@ MAX_ATTEMPTS = 1
 MAX_SCORE = 1
 
 class CombinedOpenEndedModule(XModule):
-    pass
+    STATE_VERSION = 1
+
+    # states
+    INITIAL = 'initial'
+    ASSESSING = 'assessing'
+    DONE = 'done'
+    TASK_TYPES=["self", "ml", "instructor", "peer"]
+
+    js = {'coffee': [resource_string(__name__, 'js/src/selfassessment/display.coffee')]}
+    js_module_name = "SelfAssessment"
+
+    def __init__(self, system, location, definition, descriptor,
+                 instance_state=None, shared_state=None, **kwargs):
+        XModule.__init__(self, system, location, definition, descriptor,
+            instance_state, shared_state, **kwargs)
+
+        """
+        Definition file should have multiple task blocks:
+
+        Sample file:
+
+        <combinedopenended>
+            <task type="self">
+                <selfassessment>
+                </selfassessment>
+            </task>
+        </combinedopenended>
+        """
+
+        # Load instance state
+        if instance_state is not None:
+            instance_state = json.loads(instance_state)
+        else:
+            instance_state = {}
+
+        instance_state = self.convert_state_to_current_format(instance_state)
+
+        # History is a list of tuples of (answer, score, hint), where hint may be
+        # None for any element, and score and hint can be None for the last (current)
+        # element.
+        # Scores are on scale from 0 to max_score
+        self.history = instance_state.get('history', [])
+
+        self.state = instance_state.get('state', 'initial')
+
+        self.attempts = instance_state.get('attempts', 0)
+        self.max_attempts = int(self.metadata.get('attempts', MAX_ATTEMPTS))
+
+        # Used for progress / grading.  Currently get credit just for
+        # completion (doesn't matter if you self-assessed correct/incorrect).
+        self._max_score = int(self.metadata.get('max_score', MAX_SCORE))
+
+        self.rubric = definition['rubric']
+        self.prompt = definition['prompt']
+        self.submit_message = definition['submitmessage']
+        self.hint_prompt = definition['hintprompt']
 
 class CombinedOpenEndedDescriptor(XmlDescriptor, EditingDescriptor):
     """
