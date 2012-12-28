@@ -42,7 +42,7 @@ class CombinedOpenEndedModule(XModule):
     TASK_TYPES=["self", "ml", "instructor", "peer"]
 
     js = {'coffee': [resource_string(__name__, 'js/src/selfassessment/display.coffee')]}
-    js_module_name = "SelfAssessment"
+    js_module_name = "CombinedOpenEnded"
 
     def __init__(self, system, location, definition, descriptor,
                  instance_state=None, shared_state=None, **kwargs):
@@ -54,7 +54,7 @@ class CombinedOpenEndedModule(XModule):
 
         Sample file:
 
-        <combinedopenended>
+        <combinedopenended max_score="1" attempts="1">
             <task type="self">
                 <selfassessment>
                 </selfassessment>
@@ -68,15 +68,14 @@ class CombinedOpenEndedModule(XModule):
         else:
             instance_state = {}
 
-        instance_state = self.convert_state_to_current_format(instance_state)
-
         # History is a list of tuples of (answer, score, hint), where hint may be
         # None for any element, and score and hint can be None for the last (current)
         # element.
         # Scores are on scale from 0 to max_score
-        self.history = instance_state.get('history', [])
+        self.current_task = instance_state.get('current_task', 0)
 
         self.state = instance_state.get('state', 'initial')
+        self.problems = instance_state.get('problems', [])
 
         self.attempts = instance_state.get('attempts', 0)
         self.max_attempts = int(self.metadata.get('attempts', MAX_ATTEMPTS))
@@ -85,10 +84,16 @@ class CombinedOpenEndedModule(XModule):
         # completion (doesn't matter if you self-assessed correct/incorrect).
         self._max_score = int(self.metadata.get('max_score', MAX_SCORE))
 
-        self.rubric = definition['rubric']
-        self.prompt = definition['prompt']
-        self.submit_message = definition['submitmessage']
-        self.hint_prompt = definition['hintprompt']
+        self.tasks=definition['tasks']
+        log.debug(self.tasks)
+
+    def setup_next_task(self):
+        pass
+
+    def get_html(self):
+        html = "<html><head></head><body></body></html>"
+
+        return rewrite_links(html, self.rewrite_content_links)
 
 class CombinedOpenEndedDescriptor(XmlDescriptor, EditingDescriptor):
     """
@@ -125,9 +130,9 @@ class CombinedOpenEndedDescriptor(XmlDescriptor, EditingDescriptor):
 
         def parse(k):
             """Assumes that xml_object has child k"""
-            return stringify_children(xml_object.xpath(k)[0])
+            return [stringify_children(xml_object.xpath(k)[i]) for i in xrange(0,len(xml_object.xpath(k)))]
 
-        return {'task': parse('task')}
+        return {'tasks': parse('task')}
 
 
     def definition_to_xml(self, resource_fs):
