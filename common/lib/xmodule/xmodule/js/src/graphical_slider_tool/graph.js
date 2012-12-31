@@ -7,7 +7,8 @@ define('Graph', ['logme'], function (logme) {
     return Graph;
 
     function Graph(gstId, config, state) {
-        var plotDiv, dataSeries, functions, xaxis, yaxis, numPoints, xrange;
+        var plotDiv, dataSeries, functions, xaxis, yaxis, numPoints, xrange,
+            asymptotes;
 
         state.barsConfig = {
             'N': 0,
@@ -69,6 +70,8 @@ define('Graph', ['logme'], function (logme) {
             return;
         }
 
+        createMarkingsFunctions();
+
         // Create the initial graph and plot it for the user to see.
         if (generateData() === true) {
             updatePlot();
@@ -79,6 +82,93 @@ define('Graph', ['logme'], function (logme) {
         state.bindUpdatePlotEvent(plotDiv, onUpdatePlot);
 
         return;
+
+        function createMarkingsFunctions() {
+            var c1, paramNames;
+
+            asymptotes = [];
+            paramNames = state.getAllParameterNames();
+
+            if ($.isPlainObject(config.plot.asymptote)) {
+                processAsymptote(config.plot.asymptote);
+            } else if ($.isArray(config.plot.asymptote)) {
+                for (c1 = 0; c1 < config.plot.asymptote.length; c1 += 1) {
+                    processAsymptote(config.plot.asymptote[c1]);
+                }
+            }
+
+            return;
+
+            // Read configuration options for asymptotes, and store them as
+            // an array of objects. Each object will have 3 properties:
+            //
+            //    - color: the color of the asymptote line
+            //    - type: 'x' (vertical), or 'y' (horizontal)
+            //    - func: the function that will generate the value at which
+            //            the asymptote will be plotted; i.e. x = func(), or
+            //            y = func(); for now only horizontal and vertical
+            //            asymptotes are supported
+            //
+            // Since each asymptote can have a variable function - function
+            // that relies on some parameter specified in the config - we will
+            // generate each asymptote just before we draw the graph. See:
+            //
+            //     function updatePlot()
+            //     function generateMarkings()
+            //
+            // Asymptotes are really thin rectangles implemented via the Flot's
+            // markings option.
+            function processAsymptote(asyObj) {
+                var newAsyObj, funcString, func;
+
+                newAsyObj = {};
+
+                if (typeof asyObj['@type'] === 'string') {
+                    if (asyObj['@type'].toLowerCase() === 'x') {
+                        newAsyObj.type = 'x';
+                    } else if (asyObj['@type'].toLowerCase() === 'y') {
+                        newAsyObj.type = 'y';
+                    } else {
+                        logme('ERROR: Attribute "type" for asymptote can be "x" or "y".');
+
+                        return;
+                    }
+                } else {
+                    logme('ERROR: Attribute "type" for asymptote is not specified.');
+
+                    return;
+                }
+
+                if (typeof asyObj['#text'] === 'string') {
+                    funcString = asyObj['#text'];
+                } else {
+                    logme('ERROR: Function body for asymptote is not specified.');
+
+                    return;
+                }
+
+                newAsyObj.color = '#000';
+                if (typeof asyObj['@color'] === 'string') {
+                    newAsyObj.color = asyObj['@color'];
+                }
+
+                paramNames.push(funcString);
+
+                try {
+                    func = Function.apply(null, paramNames);
+                } catch (err) {
+                    logme('ERROR: Asymptote function body could not be converted to function object.');
+                    logme('Error message: "".' + err.message);
+
+                    return;
+                }
+
+                paramNames.pop();
+
+                newAsyObj.func = func;
+                asymptotes.push(newAsyObj);
+            }
+        }
 
         function setGraphAxes() {
             xaxis = {};
@@ -366,7 +456,7 @@ define('Graph', ['logme'], function (logme) {
             } else if ($.isArray(config.functions.function)) {
 
                 // If more than one function is defined.
-                for (c1 = 0; c1 < config.functions.function.length; c1++) {
+                for (c1 = 0; c1 < config.functions.function.length; c1 += 1) {
 
                     // For each definition, we must check if it is a simple
                     // string definition, or a complex one with properties.
@@ -722,6 +812,10 @@ define('Graph', ['logme'], function (logme) {
         } // End-of: function generateData
 
         function updatePlot() {
+            var paramValues;
+
+            paramValues = state.getAllParameterValues();
+
             // Tell Flot to draw the graph to our specification.
 
             $.plot(
@@ -743,6 +837,9 @@ define('Graph', ['logme'], function (logme) {
                         // legend background become.
                         'backgroundOpacity': 0
 
+                    },
+                    'grid': {
+                        'markings': generateMarkings()
                     }
                 }
             );
@@ -759,6 +856,55 @@ define('Graph', ['logme'], function (logme) {
                 MathJax.Hub,
                 plotDiv.attr('id')
             ]);
+
+            return;
+
+            // Generate markings to represent asymptotes defined by the user.
+            // See the following function for more details:
+            //
+            //     function processAsymptote()
+            //
+            function generateMarkings() {
+                var c1, asymptote, markings, val;
+
+                markings = [];
+
+                for (c1 = 0; c1 < asymptotes.length; c1 += 1) {
+                    asymptote = asymptotes[c1];
+
+                    try {
+                        val = asymptote.func.apply(window, paramValues);
+                    } catch (err) {
+                        logme('ERROR: Could not generate value from asymptote function.');
+                        logme('Error message: ', err.message);
+
+                        continue;
+                    }
+
+                    if (asymptote.type === 'x') {
+                        markings.push({
+                            'color': asymptote.color,
+                            'lineWidth': 1,
+                            'xaxis': {
+                                'from': val,
+                                'to': val
+                            }
+                        });
+                    } else {
+                        markings.push({
+                            'color': asymptote.color,
+                            'lineWidth': 1,
+                            'yaxis': {
+                                'from': val,
+                                'to': val
+                            }
+                        });
+
+                    }
+                }
+
+                return markings;
+            }
         }
     }
 });
