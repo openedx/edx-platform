@@ -74,9 +74,10 @@ def get_course_for_item(location):
 
 def get_lms_link_for_item(location, preview=False):
     if settings.LMS_BASE is not None:
-        lms_link = "//{preview}{lms_base}/courses/{course_id}/jump_to/{location}".format(
+        lms_base = settings.MITX_FEATURES.get('PREVIEW_LMS_BASE','preview.' + settings.LMS_BASE) if preview else settings.LMS_BASE
+        lms_link = "//{lms_base}/courses/{course_id}/jump_to/{location}".format(
+            lms_base=lms_base,
             preview='preview.' if preview else '',
-            lms_base=settings.LMS_BASE,
             course_id=get_course_id(location),
             location=Location(location)
         )

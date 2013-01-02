@@ -101,6 +101,7 @@ def login_page(request):
 
 # ==== Views for any logged-in user ==================================
 
+@ssl_login_shortcut
 @login_required
 @ensure_csrf_cookie
 def index(request):
@@ -304,9 +305,10 @@ def edit_unit(request, location):
             break
         index = index + 1
 
-    preview_lms_link = '//{preview}{lms_base}/courses/{org}/{course}/{course_name}/courseware/{section}/{subsection}/{index}'.format(
-            preview='preview.',
-            lms_base=settings.LMS_BASE,            
+    preview_base = settings.MITX_FEATURES.get('PREVIEW_LMS_BASE','preview.' + settings.LMS_BASE)
+
+    preview_lms_link = '//{preview_base}/courses/{org}/{course}/{course_name}/courseware/{section}/{subsection}/{index}'.format(
+            preview_base=preview_base,
             org=course.location.org,
             course=course.location.course, 
             course_name=course.location.name, 
