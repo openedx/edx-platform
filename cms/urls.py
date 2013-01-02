@@ -25,14 +25,8 @@ urlpatterns = ('',
         'contentstore.views.course_index', name='course_index'),
     url(r'^(?P<org>[^/]+)/(?P<course>[^/]+)/import/(?P<name>[^/]+)$',
         'contentstore.views.import_course', name='import_course'),
-
-#    url(r'^(?P<org>[^/]+)/(?P<course>[^/]+)/export/(?P<name>[^/]+)$',
-#        'contentstore.export.export_course', name='export_course'),
-
     url(r'^(?P<org>[^/]+)/(?P<course>[^/]+)/export/(?P<name>[^/]+)$',
-        'contentstore.views.export_course', name='export_course'),
-    url(r'^(?P<org>[^/]+)/(?P<course>[^/]+)/generate_export/(?P<name>[^/]+)$',
-        'contentstore.views.generate_export_course', name='generate_export_course'),
+        'contentstore.export.export_course', name='export_course'),
 
     url(r'^(?P<org>[^/]+)/(?P<course>[^/]+)/export/(?P<name>[^/]+)$',
         'contentstore.export.export_course', name='export_course'),
