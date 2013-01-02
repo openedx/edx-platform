@@ -42,8 +42,6 @@ from cms.djangoapps.models.settings.course_details import CourseDetails,\
     CourseSettingsEncoder
 from cms.djangoapps.contentstore.utils import get_modulestore
 
-# from lxml import etree
-
 log = logging.getLogger(__name__)
 
 
@@ -80,24 +78,23 @@ def export_course(request, org, course, name):
     action = request.POST.get('submit','')
     log.debug('action=%s' % action)
 
-    if request.method == 'POST' and action=='Set Git Repository Info':
+    if request.method == 'POST' and action=='Export to Github Repository':
         git_repo = request.POST['git_repo'].replace(';','_').replace('\n','')
         git_branch = request.POST['git_branch'].replace(';','_').replace('\n','')
         exportinfo['git_repo'] = git_repo
         exportinfo['git_branch'] = git_branch
         log.debug('set export info (%s, %s)' % (git_repo, git_branch))
 
-        m = re.search('/([^/]+)\.git$',git_repo)	# get local_dir from git_repo
+        m = re.search('/([^/]+)\.git$',git_repo)        # get local_dir from git_repo
         if m:
             local_dir = m.group(1)
             exportinfo['local_dir'] = local_dir
 
         store = get_modulestore(Location(location));
-        store.update_metadata(location, course_module.metadata)	# save in mongodb store
+        store.update_metadata(location, course_module.metadata) # save in mongodb store
         message = "Git repository information updated"
         message += "\nlocal_dir = %s" % local_dir
-            
-    elif request.method == 'POST' and action=='Export Now':
+
         log.debug('doing export now')
         data_root = path(settings.GITHUB_REPO_ROOT)
 
@@ -122,9 +119,9 @@ def export_course(request, org, course, name):
             xml = course_module.export_to_xml(fs)
             with fs.open('course.xml', mode='w') as f:
                 f.write(xml)
-            with fs.open('metadata.json', mode='w') as f:	# dump course metadata
+            with fs.open('metadata.json', mode='w') as f:       # dump course metadata
                 f.write(json.dumps(course_module.metadata))
-            with fs.open('settings.json', mode='w') as f:	# dump course settings (about page, ...)
+            with fs.open('settings.json', mode='w') as f:       # dump course settings (about page, ...)
                 f.write(json.dumps(course_details, cls=CourseSettingsEncoder))
             success = True
         except:
@@ -137,10 +134,12 @@ def export_course(request, org, course, name):
             msg = "import from studio %s by %s" % (datetime.now(),request.user)
             cmd = '('
             cmd += 'cd %s' % course_dir
-            cmd += '; git add .' 
+            cmd += '; git checkout master'              # start with master
+            cmd += '; git checkout -b %s' % git_branch  # may fail, that is ok
+            cmd += '; git add .'
             cmd += '; git commit -a -m "%s"' % msg
-            cmd += '; hub push origin %s' % git_branch
-            cmd += '; sleep 2'	# wait for github to update
+            cmd += '; git push -u origin %s' % git_branch
+            cmd += '; sleep 2'  # wait for github to update
             cmd += '; hub pull-request "%s" -b master' % msg
             cmd += ') 2>&1'
             ret = os.popen(cmd).read()
@@ -148,15 +147,12 @@ def export_course(request, org, course, name):
             log.debug('return from command = %s' % ret)
             message += '\n' + ret
 
-        #return HttpResponse(json.dumps({'Status': 'Msg', 'ErrMsg': ret}))
-
-        # return HttpResponse(json.dumps({'Status': 'OK'}))
-
     context = {'git_repo' : git_repo,
                'git_branch' : git_branch,
                'context_course': course_module,
                'message' : message,
                'active_tab': 'export',
+               'successful_import_redirect_url' : ''
                }
     return render_to_response('export.html', context)
 

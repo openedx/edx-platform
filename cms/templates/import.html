@@ -34,6 +34,7 @@
   </div>
 
 
+% if settings.MITX_FEATURES['GITHUB_EXPORT_AND_INPORT']:
   <div class="inner-wrapper">
     <article class="import-overview">
       <div class="description">
@@ -66,7 +67,7 @@
       </form>
     </article>
   </div>
-
+% endif
 
 </div>
 </%block>

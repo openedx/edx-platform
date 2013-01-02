@@ -8,6 +8,7 @@ from .dev import *
 import socket
 
 MITX_FEATURES['AUTH_USE_MIT_CERTIFICATES'] = True
+MITX_FEATURES['GITHUB_EXPORT_AND_INPORT'] = True
 
 MITX_FEATURES['USE_DJANGO_PIPELINE']=False      # don't recompile scss
 
