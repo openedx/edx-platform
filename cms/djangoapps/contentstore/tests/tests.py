@@ -426,6 +426,7 @@ class ContentStoreTest(TestCase):
 
         handout_location= Location(['i4x', 'edX', 'full', 'course_info', 'handouts'])
 
+        # get module info
         resp = self.client.get(reverse('module_info', kwargs={'module_location': handout_location}))
 
         # make sure we got a successful response
