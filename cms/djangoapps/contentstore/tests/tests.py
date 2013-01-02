@@ -422,6 +422,7 @@ class ContentStoreTest(TestCase):
         ms = modulestore('direct')
         cs = contentstore() 
 
+        # import a test course
         import_from_xml(ms, 'common/test/data/', ['full'])     
 
         handout_location= Location(['i4x', 'edX', 'full', 'course_info', 'handouts'])
