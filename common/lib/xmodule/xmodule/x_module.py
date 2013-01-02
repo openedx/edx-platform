@@ -8,6 +8,7 @@ from collections import namedtuple
 from pkg_resources import resource_listdir, resource_string, resource_isdir
 
 from xmodule.modulestore import Location
+from xmodule.modulestore.exceptions import ItemNotFoundError
 
 from .model import ModelMetaclass, ParentModelMetaclass, NamespacesMetaclass
 from .plugin import Plugin

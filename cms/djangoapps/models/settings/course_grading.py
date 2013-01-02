@@ -230,13 +230,13 @@ class CourseGradingModel:
           
         descriptor = get_modulestore(location).get_item(location)
         if 'graderType' in jsondict and jsondict['graderType'] != u"Not Graded":
-            descriptor.metadata['format'] = jsondict.get('graderType')
-            descriptor.metadata['graded'] = True
+            descriptor.lms.format = jsondict.get('graderType')
+            descriptor.lms.graded = True
         else:
-            if 'format' in descriptor.metadata: del descriptor.metadata['format']
-            if 'graded' in descriptor.metadata: del descriptor.metadata['graded']
+            del descriptor.lms.format
+            del descriptor.lms.graded
             
-        get_modulestore(location).update_metadata(location, descriptor.metadata)
+        get_modulestore(location).update_metadata(location, descriptor._model_data._kvs._data)
         
         
     @staticmethod

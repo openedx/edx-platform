@@ -173,13 +173,11 @@ class DraftModuleStore(ModuleStoreBase):
         Save a current draft to the underlying modulestore
         """
         draft = self.get_item(location)
-        metadata = {}
-        metadata.update(draft.metadata)
-        metadata.cms.published_date = datetime.utcnow()
-        metadata.cms.published_by = published_by_id
-        super(DraftModuleStore, self).update_item(location, draft.definition.get('data', {}))
-        super(DraftModuleStore, self).update_children(location, draft.definition.get('children', []))
-        super(DraftModuleStore, self).update_metadata(location, metadata)
+        draft.cms.published_date = datetime.utcnow()
+        draft.cms.published_by = published_by_id
+        super(DraftModuleStore, self).update_item(location, draft._model_data._kvs._data)
+        super(DraftModuleStore, self).update_children(location, draft._model_data._kvs._children)
+        super(DraftModuleStore, self).update_metadata(location, draft._model_data._kvs._metadata)
         self.delete_item(location)
 
     def unpublish(self, location):

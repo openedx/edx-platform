@@ -24,7 +24,7 @@ def get_course_updates(location):
     
     # purely to handle free formed updates not done via editor. Actually kills them, but at least doesn't break.
     try:
-        course_html_parsed = etree.fromstring(course_updates.definition['data'])
+        course_html_parsed = etree.fromstring(course_updates.data)
     except etree.XMLSyntaxError:
         course_html_parsed = etree.fromstring("<ol></ol>")
         
@@ -61,7 +61,7 @@ def update_course_updates(location, update, passed_id=None):
     
     # purely to handle free formed updates not done via editor. Actually kills them, but at least doesn't break.
     try:
-        course_html_parsed = etree.fromstring(course_updates.definition['data'])
+        course_html_parsed = etree.fromstring(course_updates.data)
     except etree.XMLSyntaxError:
         course_html_parsed = etree.fromstring("<ol></ol>")
 
@@ -82,8 +82,8 @@ def update_course_updates(location, update, passed_id=None):
             passed_id = course_updates.location.url() + "/" + str(idx)
         
         # update db record
-        course_updates.definition['data'] = etree.tostring(course_html_parsed)
-        modulestore('direct').update_item(location, course_updates.definition['data'])
+        course_updates.data = etree.tostring(course_html_parsed)
+        modulestore('direct').update_item(location, course_updates.data)
         
         return {"id" : passed_id,
                 "date" : update['date'],
@@ -105,7 +105,7 @@ def delete_course_update(location, update, passed_id):
     # TODO use delete_blank_text parser throughout and cache as a static var in a class
     # purely to handle free formed updates not done via editor. Actually kills them, but at least doesn't break.
     try:
-        course_html_parsed = etree.fromstring(course_updates.definition['data'])
+        course_html_parsed = etree.fromstring(course_updates.data)
     except etree.XMLSyntaxError:
         course_html_parsed = etree.fromstring("<ol></ol>")
         
@@ -118,9 +118,9 @@ def delete_course_update(location, update, passed_id):
             course_html_parsed.remove(element_to_delete)
 
         # update db record
-        course_updates.definition['data'] = etree.tostring(course_html_parsed)
+        course_updates.data = etree.tostring(course_html_parsed)
         store = modulestore('direct')
-        store.update_item(location, course_updates.definition['data'])  
+        store.update_item(location, course_updates.data)
           
     return get_course_updates(location)
     

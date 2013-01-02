@@ -250,7 +250,7 @@ class MongoModuleStore(ModuleStoreBase):
         """
         Load an XModuleDescriptor from item, using the children stored in data_cache
         """
-        data_dir = item.get('metadata', {}).get('data_dir', item['location']['course'])
+        data_dir = getattr(item, 'data_dir', item['location']['course'])
         root = self.fs_root / data_dir
 
         if not root.isdir():
@@ -361,9 +361,9 @@ class MongoModuleStore(ModuleStoreBase):
             if location.category == 'static_tab':
                 course = self.get_course_for_item(item.location)
                 existing_tabs = course.tabs or []
-                existing_tabs.append({'type':'static_tab', 'name' : item.metadata.get('display_name'), 'url_slug' : item.location.name})
+                existing_tabs.append({'type':'static_tab', 'name' : item.lms.display_name, 'url_slug' : item.location.name})
                 course.tabs = existing_tabs
-                self.update_metadata(course.location, course.metadata)
+                self.update_metadata(course.location, course._model_data._kvs._metadata)
 
             return item
         except pymongo.errors.DuplicateKeyError:

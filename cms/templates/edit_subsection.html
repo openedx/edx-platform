@@ -73,7 +73,7 @@
     <div class="row gradable">
       <label>Graded as:</label>
       
-    <div class="gradable-status" data-initial-status="${subsection.metadata.get('format', 'Not Graded')}">
+    <div class="gradable-status" data-initial-status="${subsection.lms.format if subsection.lms.format is None else 'Not Graded'}">
     </div>
     
     <div class="due-date-input row">

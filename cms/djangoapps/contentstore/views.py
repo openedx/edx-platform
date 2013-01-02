@@ -218,7 +218,7 @@ def edit_subsection(request, location):
     # remove all metadata from the generic dictionary that is presented in a more normalized UI
 
     policy_metadata = dict(
-        (key,value)
+        (field.name, field.read_from(item))
         for field
         in item.fields
         if field.name not in ['display_name', 'start', 'due', 'format'] and

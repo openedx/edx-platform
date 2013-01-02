@@ -1,4 +1,5 @@
-from x_module import XModuleDescriptor, DescriptorSystem
+from .x_module import XModuleDescriptor, DescriptorSystem
+from .model import Scope
 import logging
 
 
@@ -32,7 +33,10 @@ class MakoModuleDescriptor(XModuleDescriptor):
         """
         Return the context to render the mako template with
         """
-        return {'module': self}
+        return {
+            'module': self,
+            'editable_metadata_fields': self.editable_metadata_fields,
+        }
 
     def get_html(self):
         return self.system.render_template(
@@ -41,6 +45,24 @@ class MakoModuleDescriptor(XModuleDescriptor):
     # cdodge: encapsulate a means to expose "editable" metadata fields (i.e. not internal system metadata)
     @property
     def editable_metadata_fields(self):
-        subset = [field.name for field in self.fields if field.name not in self.system_metadata_fields]
-        return subset
+        fields = {}
+        for field in self.fields:
+            if field.scope != Scope.settings:
+                continue
+
+            if field.name in self.system_metadata_fields:
+                continue
+
+            fields[field.name] = field.read_from(self)
+
+        for field in self.lms.fields:
+            if field.scope != Scope.settings:
+                continue
+
+            if field.name in self.system_metadata_fields:
+                continue
+
+            fields[field.name] = field.read_from(self)
+
+        return fields
 
