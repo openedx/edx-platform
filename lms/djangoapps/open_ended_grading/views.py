@@ -26,6 +26,10 @@ from xmodule.modulestore import Location
 from xmodule.modulestore.django import modulestore
 from xmodule.modulestore.exceptions import InvalidLocationError, ItemNotFoundError, NoPathToItem
 from xmodule.modulestore.search import path_to_location
+
+from peer_grading_service import PeerGradingService
+from grading_service import GradingServiceError
+import json
 import track.views
 
 from .staff_grading import StaffGrading
@@ -34,6 +38,8 @@ from .staff_grading import StaffGrading
 log = logging.getLogger(__name__)
 
 template_imports = {'urllib': urllib}
+peer_gs = PeerGradingService(settings.PEER_GRADING_INTERFACE)
+
 @cache_control(no_cache=True, no_store=True, must_revalidate=True)
 def staff_grading(request, course_id):
     """
@@ -62,6 +68,22 @@ def peer_grading(request, course_id):
     '''
     course = get_course_with_access(request.user, course_id, 'load')
 
+    # call problem list service
+    success = False
+    error_text = ""
+    try:
+        problem_list_text = peer_gs.get_problem_list(course_id, request.user.id)
+        problem_list_json = json.loads(problem_list_text)
+        success = problem_list_json['success']
+        if 'error' in problem_list_json:
+            error_text = problem_list_json['error']
+
+        problem_list = problem_list_json['problem_list']
+
+    except GradingServiceError:
+        error_text = "Error occured while contacting the grading service"
+        success = False
+
     ajax_url = reverse('peer_grading', kwargs={'course_id': course_id})
     if not ajax_url.endswith('/'):
         ajax_url += '/'
@@ -71,6 +93,52 @@ def peer_grading(request, course_id):
         'course': course,
         'course_id': course_id,
         'ajax_url': ajax_url,
+        'success': success,
+        'problem_list': problem_list,
+        'error_text': error_text,
+        # Checked above
+        'staff_access': False, })
+    
+
+def peer_grading_problem(request, course_id, problem_location):
+    '''
+    Show individual problem interface
+    '''
+    course = get_course_with_access(request.user, course_id, 'load')
+
+    # TODO: make sure that we show calibration or next submission correctly
+    # TODO: figure out if we want to make this page pure ajax or not
+
+    problem_info_text = ""
+    error_text = ""
+    # if we are still in calibration
+
+    # show a calibration essay
+
+    # else, show an actual problem
+    try:
+        problem_info_text = peer_gs.get_next_submission(problem_location, request.user.id)
+        log.debug(problem_info_text)
+        problem_info = json.loads(problem_info_text)
+        success = problem_info['success']
+        if 'error' in problem_info:
+            error_text = problem_info['error']
+    except GradingServiceError:
+        success = False
+
+
+    ajax_url = reverse('peer_grading', kwargs={'course_id': course_id})
+    if not ajax_url.endswith('/'):
+        ajax_url += '/'
+
+    return render_to_response('peer_grading/peer_grading_problem.html', { 
+        'view_html': '',
+        'course': course,
+        'course_id': course_id,
+        'success' : success,
+        'problem_info': problem_info_text,
+        'ajax_url': ajax_url,
+        'error_text': error_text,
         # Checked above
         'staff_access': False, })
     

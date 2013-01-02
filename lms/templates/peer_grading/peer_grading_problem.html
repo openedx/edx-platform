@@ -1,3 +1,4 @@
+
 <%inherit file="/main.html" />
 <%block name="bodyclass">${course.css_class}</%block>
 <%namespace name='static' file='/static_content.html'/>
@@ -6,7 +7,7 @@
   <%static:css group='course'/>
 </%block>
 
-<%block name="title"><title>${course.number} Peer Grading</title></%block>
+<%block name="title"><title>${course.number} Peer Grading.</title></%block>
 
 <%include file="/courseware/course_navigation.html" args="active_page='staff_grading'" />
 
@@ -17,17 +18,5 @@
 <section class="container">
     <div class="peer-grading" data-ajax_url="${ajax_url}">
         <div class="error-container">${error_text}</div>
-        <h1>Peer Grading</h1>
-        <h2>Instructions</h2>
-        <p></p>
-        % if success:
-        <ul class="problem-list">
-            %for problem in problem_list:
-            <li>
-            <a href="${ajax_url}/problem/${problem.location}">${problem.location} (${problem.num_graded} graded, ${problem.num_pending} pending)</a>
-            </li>
-            %endfor
-        </ul>
-        %endif
     </div>
 </section>

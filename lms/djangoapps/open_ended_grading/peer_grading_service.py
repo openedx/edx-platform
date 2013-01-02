@@ -24,12 +24,14 @@ class PeerGradingService(GradingService):
         self.get_next_submission_url = self.url + '/get_next_submission/'
         self.save_grade_url = self.url + '/save_grade/'
         self.is_student_calibrated_url = self.url + '/is_student_calibrated/'
-        self.show_calibration_essay = self.url + '/show_calibration_essay/'
-        self.save_calibration_essay = self.url + '/save_calibration_essay/'
+        self.show_calibration_essay_url = self.url + '/show_calibration_essay/'
+        self.save_calibration_essay_url = self.url + '/save_calibration_essay/'
+        self.get_problem_list_url = self.url + '/get_problem_list/'
 
     def get_next_submission(self, problem_location, grader_id):
-        return self.get(self.get_next_submission_url, False, 
+        response = self.get(self.get_next_submission_url, False, 
                 {'location': problem_location, 'grader_id': grader_id})
+        return response
 
     def save_grade(self, grader_id, submission_id, score, feedback, submission_key):
         data = {'grader_id' : grader_id,
@@ -38,6 +40,29 @@ class PeerGradingService(GradingService):
                 'feedback' : feedback,
                 'submission_key': submission_key}
         return self.post(self.save_grade_url, False, data)
+
+    def is_student_calibrated(self, problem_location, grader_id):
+        params = {'problem_id' : problem_location, 'student_id': grader_id}
+        return self.get(self.is_student_calibrated_url, False, params)
+    
+    def show_calibration_essay(self, problem_location, grader_id):
+        params = {'problem_id' : problem_location, 'student_id': grader_id}
+        return self.get(self.show_calibration_essay_url, False, params)
+
+    def save_calibration_essay(self, problem_location, grader_id, calibration_essay_id, submission_key, score, feedback):
+        data = {'location': problem_location, 
+                'student_id': grader_id, 
+                'calibration_essay_id': calibration_essay_id,
+                'submission_key': submission_key,
+                'score': score,
+                'feedback': feedback}
+        return self.post(self.save_calibration_essay_url, False, data)
+
+    def get_problem_list(self, course_id, grader_id):
+        params = {'course_id': course_id, 'student_id': grader_id}
+        response = self.get(self.get_problem_list_url, False, params)
+        log.debug("Response! {0}".format(response))
+        return response
 
 
 def peer_grading_service():
@@ -64,6 +89,9 @@ def _err_response(msg):
                         mimetype="application/json")
 
 def get_next_submission(request, course_id):
+    """
+    TODO: fill in this documentation
+    """
     required = set(['location'])
     if request.method != 'POST':
         raise Http404
@@ -90,5 +118,4 @@ def _get_next_submission(course_id, grader_id, location):
                       .format(staff_grading_service().url))
         return json.dumps({'success': False,
                            'error': 'Could not connect to grading service'})
-
 
