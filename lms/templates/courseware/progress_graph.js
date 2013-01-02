@@ -1,4 +1,4 @@
-<%page args="grade_summary, grade_cutoffs, graph_div_id, **kwargs"/>
+<%page args="grade_summary, grade_cutoffs, graph_div_id, show_grade_breakdown = True, show_grade_cutoffs = True, **kwargs"/>
 <%!
   import json
   import math
@@ -70,25 +70,26 @@ $(function () {
   series = categories.values()
   overviewBarX = tickIndex
   extraColorIndex = len(categories) #Keeping track of the next color to use for categories not in categories[]
-
-  for section in grade_summary['grade_breakdown']:
-      if section['percent'] > 0:
-          if section['category'] in categories:
-              color = categories[ section['category'] ]['color']
-          else:
-              color = colors[ extraColorIndex % len(colors) ]
-              extraColorIndex += 1
-        
-          series.append({
-              'label' : section['category'] + "-grade_breakdown",
-              'data' : [ [overviewBarX, section['percent']] ],
-              'color' : color
-          })
-            
-          detail_tooltips[section['category'] + "-grade_breakdown"] = [ section['detail'] ]
   
-  ticks += [ [overviewBarX, "Total"] ]
-  tickIndex += 1 + sectionSpacer
+  if show_grade_breakdown:    
+    for section in grade_summary['grade_breakdown']:
+        if section['percent'] > 0:
+            if section['category'] in categories:
+                color = categories[ section['category'] ]['color']
+            else:
+                color = colors[ extraColorIndex % len(colors) ]
+                extraColorIndex += 1
+        
+            series.append({
+                'label' : section['category'] + "-grade_breakdown",
+                'data' : [ [overviewBarX, section['percent']] ],
+                'color' : color
+            })
+            
+            detail_tooltips[section['category'] + "-grade_breakdown"] = [ section['detail'] ]
+  
+    ticks += [ [overviewBarX, "Total"] ]
+    tickIndex += 1 + sectionSpacer
   
   totalScore = grade_summary['percent']
   detail_tooltips['Dropped Scores'] = dropped_score_tooltips
@@ -97,10 +98,14 @@ $(function () {
   ## ----------------------------- Grade cutoffs ------------------------- ##
   
   grade_cutoff_ticks = [ [1, "100%"], [0, "0%"] ]
-  descending_grades = sorted(grade_cutoffs, key=lambda x: grade_cutoffs[x], reverse=True)
-  for grade in descending_grades:
-      percent = grade_cutoffs[grade]
-      grade_cutoff_ticks.append( [ percent, "{0} {1:.0%}".format(grade, percent) ] )
+  if show_grade_cutoffs:
+    grade_cutoff_ticks = [ [1, "100%"], [0, "0%"] ]
+    descending_grades = sorted(grade_cutoffs, key=lambda x: grade_cutoffs[x], reverse=True)
+    for grade in descending_grades:
+        percent = grade_cutoffs[grade]
+        grade_cutoff_ticks.append( [ percent, "{0} {1:.0%}".format(grade, percent) ] )
+  else:
+    grade_cutoff_ticks = [ ]
   %>
   
   var series = ${ json.dumps( series ) };
@@ -135,9 +140,11 @@ $(function () {
   var $grade_detail_graph = $("#${graph_div_id}");
   if ($grade_detail_graph.length > 0) {
     var plot = $.plot($grade_detail_graph, series, options);
-    //We need to put back the plotting of the percent here
-    var o = plot.pointOffset({x: ${overviewBarX} , y: ${totalScore}});
-    $grade_detail_graph.append('<div style="position:absolute;left:' + (o.left - 12) + 'px;top:' + (o.top - 20) + 'px">${"{totalscore:.0%}".format(totalscore=totalScore)}</div>');
+    
+    %if show_grade_breakdown:
+      var o = plot.pointOffset({x: ${overviewBarX} , y: ${totalScore}});
+      $grade_detail_graph.append('<div style="position:absolute;left:' + (o.left - 12) + 'px;top:' + (o.top - 20) + 'px">${"{totalscore:.0%}".format(totalscore=totalScore)}</div>');
+    %endif
   }
       
   var previousPoint = null;
