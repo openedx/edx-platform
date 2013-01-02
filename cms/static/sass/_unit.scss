@@ -211,7 +211,7 @@
       display: block;
       top: -1px;
       right: -16px;
-      z-index: -1;
+      z-index: 10;
       width: 15px;
       height: 100%;
       border-radius: 0 3px 3px 0;
@@ -224,6 +224,7 @@
 
   .xmodule_display {
     padding: 40px 20px 20px;
+    overflow-x: auto;
   }
 
   .component-editor {
@@ -473,7 +474,7 @@ body.unit {
     .component-actions {
       @include box-sizing(border-box);
       position: absolute;
-      width: 811px;
+      width: 100%;
       padding: 15px;
       top: 0;
       left: 0;
