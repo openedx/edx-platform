@@ -29,7 +29,7 @@ from bs4 import BeautifulSoup
 from django.core.cache import cache
 
 from django_future.csrf import ensure_csrf_cookie, csrf_exempt
-from student.models import (Registration, UserProfile, TestCenterUser, TestCenterRegistration,
+from student.models import (Registration, UserProfile, TestCenterUser, TestCenterUserForm, TestCenterRegistration,
                             PendingNameChange, PendingEmailChange,
                             CourseEnrollment, unique_id_for_user,
                             get_testcenter_registrations_for_user_and_course)
@@ -650,29 +650,41 @@ def _do_create_or_update_test_center_user(post_vars):
     try:
         testcenter_user = TestCenterUser.objects.get(user=user)
         # found a TestCenterUser, so check to see if it has changed
-        needs_updating = any([testcenter_user.__getattribute__(fieldname) != post_vars[fieldname]
-                              for fieldname in TestCenterUser.user_provided_fields()])
-            
+#        needs_updating = any([testcenter_user.__getattribute__(fieldname) != post_vars[fieldname]
+#                              for fieldname in TestCenterUser.user_provided_fields()])
+        needs_updating = testcenter_user.needs_update(post_vars)    
         if needs_updating:
-            # leave user and client_candidate_id as before
-            testcenter_user.user_updated_at = datetime.datetime.now()
-            for fieldname in TestCenterUser.user_provided_fields():
-                testcenter_user.__setattr__(fieldname, post_vars[fieldname])
+#            # leave user and client_candidate_id as before
+#            testcenter_user.user_updated_at = datetime.datetime.now()
+#            for fieldname in TestCenterUser.user_provided_fields():
+#                testcenter_user.__setattr__(fieldname, post_vars[fieldname])
+            testcenter_user.update(post_vars)
             needs_saving = True
         
     except TestCenterUser.DoesNotExist:
         # did not find the TestCenterUser, so create a new one 
-        testcenter_user = TestCenterUser(user=user)
-        for fieldname in TestCenterUser.user_provided_fields():
-            testcenter_user.__setattr__(fieldname, post_vars[fieldname])
-        # testcenter_user.candidate_id remains unset    
-        testcenter_user.client_candidate_id = 'edx' + '123456'  # some unique value  
-        testcenter_user.user_updated_at = datetime.datetime.now()
+        testcenter_user = TestCenterUser.create(user, post_vars)
+#        testcenter_user = TestCenterUser(user=user)
+#        testcenter_user.update(post_vars)
+##        for fieldname in TestCenterUser.user_provided_fields():
+##            testcenter_user.__setattr__(fieldname, post_vars[fieldname])
+#        # testcenter_user.candidate_id remains unset    
+#        testcenter_user.client_candidate_id = 'edx' + '123456'  # some unique value  
+##        testcenter_user.user_updated_at = datetime.datetime.now()
         needs_saving = True
 
-    # additional validation occurs at save time, so handle exceptions
     if needs_saving:
         try:
+            # first perform validation on the user information 
+            # using a Django Form.
+            form = TestCenterUserForm(testcenter_user)
+            if not form.is_valid():
+                response_data = {'success': False}
+                # return a list of errors...
+                response_data['field_errors'] = form.errors
+                response_data['non_field_errors'] = form.non_field_errors()
+                return HttpResponse(json.dumps(response_data))
+                
             testcenter_user.save()
         except IntegrityError, ie:
             js = {'success': False}
@@ -728,7 +740,7 @@ def _do_create_or_update_test_center_user(post_vars):
 def create_test_registration(request, post_override=None):
     '''
     JSON call to create test registration.
-    Used by form in test_center_register_modal.html, which is included 
+    Used by form in test_center_register.html, which is called from 
     into dashboard.html
     '''
     js = {'success': False}
@@ -736,24 +748,24 @@ def create_test_registration(request, post_override=None):
     post_vars = post_override if post_override else request.POST
 
     # Confirm we have a properly formed request
-    for a in ['first_name', 'last_name', 'address_1', 'city', 'country']:
-        if a not in post_vars:
-            js['value'] = "Error (401 {field}). E-mail us.".format(field=a)
-            js['field'] = a
-            return HttpResponse(json.dumps(js))
-
-    # Confirm appropriate fields are filled in with something for now
-    for a in ['first_name', 'last_name', 'address_1', 'city', 'country']:
-        if len(post_vars[a]) < 2:
-            error_str = {'first_name': 'First name must be minimum of two characters long.',
-                         'last_name': 'Last name must be minimum of two characters long.',
-                         'address_1': 'Address must be minimum of two characters long.',
-                         'city': 'City must be minimum of two characters long.',
-                         'country': 'Country must be minimum of two characters long.',
-                         }
-            js['value'] = error_str[a]
-            js['field'] = a
-            return HttpResponse(json.dumps(js))
+#    for a in ['first_name', 'last_name', 'address_1', 'city', 'country']:
+#        if a not in post_vars:
+#            js['value'] = "Error (401 {field}). E-mail us.".format(field=a)
+#            js['field'] = a
+#            return HttpResponse(json.dumps(js))
+#
+#    # Confirm appropriate fields are filled in with something for now
+#    for a in ['first_name', 'last_name', 'address_1', 'city', 'country']:
+#        if len(post_vars[a]) < 2:
+#            error_str = {'first_name': 'First name must be minimum of two characters long.',
+#                         'last_name': 'Last name must be minimum of two characters long.',
+#                         'address_1': 'Address must be minimum of two characters long.',
+#                         'city': 'City must be minimum of two characters long.',
+#                         'country': 'Country must be minimum of two characters long.',
+#                         }
+#            js['value'] = error_str[a]
+#            js['field'] = a
+#            return HttpResponse(json.dumps(js))
 
     # Once the test_center_user information has been validated, create the entries:
     ret = _do_create_or_update_test_center_user(post_vars)
@@ -790,6 +802,7 @@ def create_test_registration(request, post_override=None):
 
     js = {'success': True}
     return HttpResponse(json.dumps(js), mimetype="application/json")
+
 
 def get_random_post_override():
     """

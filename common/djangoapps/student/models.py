@@ -47,6 +47,7 @@ from django.contrib.auth.models import User
 from django.db import models
 from django.db.models.signals import post_save
 from django.dispatch import receiver
+from django.forms import ModelForm
 
 import comment_client as cc
 from django_comment_client.models import Role
@@ -194,7 +195,7 @@ class TestCenterUser(models.Model):
 
     # Confirmation
     upload_status = models.CharField(max_length=20, blank=True)  # 'Error' or 'Accepted'
-    uploaded_at = models.DateTimeField(null=True, db_index=True)
+    uploaded_at = models.DateTimeField(null=True, blank=True, db_index=True)
     upload_error_message = models.CharField(max_length=512, blank=True)
     
     @staticmethod
@@ -206,7 +207,56 @@ class TestCenterUser(models.Model):
     @property
     def email(self):
         return self.user.email
+    
+    def needs_update(self, dict):
+#        needs_updating = any([__getattribute__(fieldname) != dict[fieldname]
+#                              for fieldname in TestCenterUser.user_provided_fields()])
+        for fieldname in TestCenterUser.user_provided_fields():
+            if self.__getattribute__(fieldname) != dict[fieldname]:
+                return True
+            
+        return False    
+                              
+    def update(self, dict):
+        # leave user and client_candidate_id as before
+        self.user_updated_at = datetime.now()
+        for fieldname in TestCenterUser.user_provided_fields():
+            self.__setattr__(fieldname, dict[fieldname])
 
+    @staticmethod
+    def create(user, dict):
+        testcenter_user = TestCenterUser(user=user)
+        testcenter_user.update(dict)
+        # testcenter_user.candidate_id remains unset    
+        # TODO: assign an ID of our own:
+        testcenter_user.client_candidate_id = 'edx' + '123456'  # some unique value  
+        
+
+class TestCenterUserForm(ModelForm):
+    class Meta:
+        model = TestCenterUser
+        fields = ( 'first_name', 'middle_name', 'last_name', 'suffix', 'salutation', 
+                'address_1', 'address_2', 'address_3', 'city', 'state', 'postal_code', 'country', 
+                'phone', 'extension', 'phone_country_code', 'fax', 'fax_country_code', 'company_name')
+        
+        
+        
+        
+        
+   
+ACCOMODATION_CODES = (
+                      ('EQPMNT', 'Equipment'),
+                      ('ET12ET', 'Extra Time - 1/2 Exam Time'),
+                      ('ET30MN', 'Extra Time - 30 Minutes'),
+                      ('ETDBTM', 'Extra Time - Double Time'),
+                      ('SEPRMM', 'Separate Room'),
+                      ('SRREAD', 'Separate Room & Reader'),
+                      ('SRRERC', 'Separate Room & Reader/Recorder'),
+                      ('SRRECR', 'Separate Room & Recorder'),
+                      ('SRSEAN', 'Separate Room & Service Animal'),
+                      ('SRSGNR', 'Separate Room & Sign Lang Interp'), 
+                      )
+    
 class TestCenterRegistration(models.Model):
     """
     This is our representation of a user's registration for in-person testing,
@@ -242,7 +292,8 @@ class TestCenterRegistration(models.Model):
     exam_series_code = models.CharField(max_length=15, db_index=True)
     eligibility_appointment_date_first = models.DateField(db_index=True)
     eligibility_appointment_date_last = models.DateField(db_index=True)
-    # TODO: this should be an enumeration:
+
+    # this is really a list of codes, using an '*' as a delimiter.
     accommodation_code = models.CharField(max_length=64, blank=True)
     
     # store the original text of the accommodation request.
@@ -250,7 +301,7 @@ class TestCenterRegistration(models.Model):
 
     # Confirmation
     upload_status = models.CharField(max_length=20, blank=True)  # 'Error' or 'Accepted'
-    uploaded_at = models.DateTimeField(null=True, db_index=True)
+    uploaded_at = models.DateTimeField(null=True, blank=True, db_index=True)
     upload_error_message = models.CharField(max_length=512, blank=True)
 
     @property

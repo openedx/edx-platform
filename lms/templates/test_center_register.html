@@ -45,6 +45,13 @@ exam_info = course.testcenter_info
        If the user has already registered in the past for a test center, then also display
        their ID. -->
 
+    <!-- check to see if the user has already registering, or
+       is registering for the first time -->
+  <%     
+    registrations = get_testcenter_registrations_for_user_and_course(user, course.id)
+  %>  
+     
+
   <section class="output-raw">
     <hgroup>
       <p class="date-block">
@@ -67,12 +74,6 @@ exam_info = course.testcenter_info
         <p>Last Eligible Appointment Date: ${exam_info.get('Last_Eligible_Appointment_Date')}</p>
     % endif
     
-    <!-- check to see if the user has already registering, or
-       is registering for the first time -->
-    <%     
-      registrations = get_testcenter_registrations_for_user_and_course(user, course.id)
-    %>  
-     
     % if len(registrations) > 0:
       <%     
         registration = registrations[0]
@@ -161,14 +162,14 @@ exam_info = course.testcenter_info
       
       % if len(registrations) > 0:
       <p class="instructions">
-        Please complete the following form to update your demographic information used in your Pearson VUE Porctored Exam. Required fields are noted by <strong>bold text and an asterisk (*)</strong>. 
+        Please complete the following form to update your demographic information used in your Pearson VUE Proctored Exam. Required fields are noted by <strong>bold text and an asterisk (*)</strong>. 
       </p>
       % else: 
       <p class="instructions">
-        Please provide the following demographic information to register for a Pearson VUE Porctored Exam. Required fields are noted by <strong>bold text and an asterisk (*)</strong>.
+        Please provide the following demographic information to register for a Pearson VUE Proctored Exam. Required fields are noted by <strong>bold text and an asterisk (*)</strong>.
       </p>
       % endif
-            
+
       <!-- include these as pass-throughs -->
       <input id="id_email" type="hidden" name="email" maxlength="75" value="${user.email}" />
       <input id="id_username" type="hidden" name="username" maxlength="75" value="${user.username}" />
@@ -181,24 +182,24 @@ exam_info = course.testcenter_info
           <ol class="list-input">
             <li class="field">
               <label for="salutation">Salutation</label>
-              <input class="short" id="salutation" type="text" value="${testcenteruser.salutation}" placeholder="e.g. Mr., Ms., Mrs., Dr." />              
+              <input class="short" id="salutation" type="text" name="salutation" value="${testcenteruser.salutation}" placeholder="e.g. Mr., Ms., Mrs., Dr." />              
             </li>
             <!-- NOTE: BT - to inform a user of what field the error occured on, add a class of .error to the .field element -->
             <li class="field required">
               <label for="name-first">First Name </label>
-              <input id="name-first" type="text" value="${testcenteruser.first_name}" placeholder="e.g. Albert" />
+              <input id="name-first" type="text" name="first_name" value="${testcenteruser.first_name}" placeholder="e.g. Albert" />
             </li>
             <li class="field">
               <label for="name-middle">Middle Name</label>
-              <input id="name-middle" type="text" value="${testcenteruser.middle_name}" placeholder="" />
+              <input id="name-middle" type="text" name="middle_name" value="${testcenteruser.middle_name}" placeholder="" />
             </li>
             <li class="field required">
               <label for="name-last">Last Name</label>
-              <input id="name-last" type="text" value="${testcenteruser.last_name}" placeholder="e.g. Einstein" />
+              <input id="name-last" type="text" name="last_name" value="${testcenteruser.last_name}" placeholder="e.g. Einstein" />
             </li>
             <li class="field">
               <label for="name-suffix">Suffix</label>
-              <input class="short" id="name-suffix" type="text" value="${testcenteruser.suffix}" placeholder="e.g. Jr., Sr. " />
+              <input class="short" id="name-suffix" type="text" name="suffix" value="${testcenteruser.suffix}" placeholder="e.g. Jr., Sr. " />
             </li>
           </ol>
         </fieldset>
@@ -209,30 +210,34 @@ exam_info = course.testcenter_info
           <ol class="list-input">
             <li class="field">
               <label class="long" for="address-1">Address Line #1</label>
-              <input id="address-1" type="text" value="${testcenteruser.address_1}" placeholder="e.g. 112 Mercer Street" />              
+              <input id="address-1" type="text" name="address_1" value="${testcenteruser.address_1}" placeholder="e.g. 112 Mercer Street" />              
             </li>
             <li class="field-group addresses">
               <div class="field">
                 <label for="address-2">Address Line #2</label>
-                <input id="address-2" class="long" type="text" value="${testcenteruser.address_2}" placeholder="e.g. Apartment 123" />
+                <input id="address-2" class="long" type="text" name="address_2" value="${testcenteruser.address_2}" placeholder="e.g. Apartment 123" />
               </div>
               <div class="field">
                 <label for="address-3">Address Line #3</label>
-                <input id="address-3" class="long" type="text" value="${testcenteruser.address_3}" placeholder="e.g. Attention: Albert Einstein" />
+                <input id="address-3" class="long" type="text" name="address_3" value="${testcenteruser.address_3}" placeholder="e.g. Attention: Albert Einstein" />
               </div>
             </li>            
             <li class="field-group postal">
               <div class="field">
+                <label for="city">City</label>
+                <input id="city" class="short" type="text" name="city" value="${testcenteruser.city}" placeholder="e.g. Newark" />
+              </div>
+              <div class="field">
                 <label for="state">State/Province</label>
-                <input id="state" class="short" type="text" value="${testcenteruser.state}" placeholder="e.g. NJ" />
+                <input id="state" class="short" type="text" name="state" value="${testcenteruser.state}" placeholder="e.g. NJ" />
               </div>
               <div class="field">
                 <label for="postal-code">Postal Code</label>
-                <input id="postal-code" class="short" type="text" value="${testcenteruser.postal_code}" placeholder="e.g. 08540" />
+                <input id="postal-code" class="short" type="text" name="postal_code" value="${testcenteruser.postal_code}" placeholder="e.g. 08540" />
               </div>
               <div class="field required">
                 <label class="short" for="country-code">Country Code</label>
-                <input id="country-code" class="short" type="text" value="${testcenteruser.country}" placeholder="e.g. USA" />
+                <input id="country-code" class="short" type="text" name="country" value="${testcenteruser.country}" placeholder="e.g. USA" />
               </div>
             </li>
           </ol>
@@ -245,30 +250,30 @@ exam_info = course.testcenter_info
             <li class="field-group phoneinfo">
               <div class="field required">
                 <label for="phone">Phone Number</label>
-                <input id="phone" type="text" value="${testcenteruser.phone}" placeholder="e.g. 1-55-555-5555" />              
+                <input id="phone" type="text" name="phone" value="${testcenteruser.phone}" placeholder="e.g. 1-55-555-5555" />              
               </div>
               <div class="field">
                 <label for="phone-extension">Extension</label>
-                <input id="phone-extension" class="short" type="text" value="${testcenteruser.extension}" placeholder="e.g. 555" />
+                <input id="phone-extension" class="short" type="text" name="extension" value="${testcenteruser.extension}" placeholder="e.g. 555" />
               </div>
               <div class="field required">
                 <label for="phone-countrycode">Phone Country Code</label>
-                <input id="phone-countrycode" class="short" type="text" value="${testcenteruser.phone_country_code}" placeholder="e.g. USA" />
+                <input id="phone-countrycode" class="short" type="text" name="phone_country_code" value="${testcenteruser.phone_country_code}" placeholder="e.g. USA" />
               </div>
             </li>
             <li class="field-group faxinfo">
               <div class="field">
                 <label for="fax">Fax Number</label>
-                <input id="fax" type="text" class="short" value="${testcenteruser.fax}" placeholder="e.g. 1-55-555-5555" />
+                <input id="fax" type="text" class="short" name="fax" value="${testcenteruser.fax}" placeholder="e.g. 1-55-555-5555" />
               </div>
               <div class="field">
                 <label for="fax-countrycode">Fax Country Code</label>
-                <input id="fax-countrycode" class="short" type="text" value="${testcenteruser.fax_country_code}" placeholder="e.g. USA" />
+                <input id="fax-countrycode" class="short" type="text" name="fax_country_code" value="${testcenteruser.fax_country_code}" placeholder="e.g. USA" />
               </div>
             </li>
             <li class="field">
               <label for="company">Company</label>
-              <input id="company" type="text" value="${testcenteruser.company_name}" placeholder="e.g. American Association of University Professors" />
+              <input id="company" type="text" name="company_name" value="${testcenteruser.company_name}" placeholder="e.g. American Association of University Professors" />
             </li>
           </ol>
         </fieldset>
@@ -312,38 +317,51 @@ exam_info = course.testcenter_info
   </section>
     
   <aside>
+   % if len(registrations) > 0:
     <h3 class="is-hidden">Registration Details</h3>
     
     <%
-      regstatus = "registration pending acknowledgement by Pearson"
+      registration = registrations[0]
       
       if registration.upload_status == 'Accepted':
         regstatus = "Registration approved by Pearson"
       elif registration.upload_status == 'Error':
         regstatus = "Registration rejected by Pearson: %s" % registration.upload_error_message
       elif len(registration.accommodation_request) > 0 and registration.accommodation_code == '':
-        regstatus = "Pending approval of accommodation request"
+        regstatus = "Registration pending approval of accommodation request"
+      else:
+        regstatus = "Registration pending acknowledgement by Pearson"
     %>
     
     <!-- NOTE: BT - state for if registration is accepted -->
+    % if registration.upload_status == 'Accepted':
+      <% regstatus = "Registration approved by Pearson" %>
     <div class="message message-status registration-accepted is-shown">
       <p class="registration-status"><span class="label">Registration Status: </span><span class="value">${regstatus}</span></p>
       <p class="registration-number"><span class="label">Registration number: </span> <span class="value">edx00015879548</span></p>
       <p class="message-copy">Write this down! You’ll need it to schedule your exam.</p>
       <a href="https://www1.pearsonvue.com/testtaker/signin/SignInPage/EDX" class="button exam-button">Schedule Pearson exam</a>
     </div>
+    % endif
     
+    % if registration.upload_status == 'Error':
     <!-- NOTE: BT - state for if registration is rejected -->
+      <% regstatus = "Registration rejected by Pearson: %s" % registration.upload_error_message %>
     <div class="message message-status registration-rejected is-shown">
       <p class="registration-status"><span class="label">Registration Status: </span><span class="value">${regstatus}</span></p>
       <p class="message-copy">Your registration for the Pearson exam has been rejected. Please contact Pearson VUE for further information regarding your registration.</p>
     </div>
+    % endif
     
+    % if len(registration.accommodation_request) > 0 and registration.accommodation_code == '':
+        <% regstatus = "Registration pending approval of accommodation request" %>
     <!-- NOTE: BT - state for if registration is pending -->
     <div class="message message-status registration-pending is-shown">
       <p class="registration-status"><span class="label">Registration Status: </span><span class="value">${regstatus}</span></p>
       <p class="message-copy">Your registration for the Pearson exam is pending. Within a few days, you should see a confirmation number here, which can be used to schedule your exam.</p>
     </div>
+    % endif
+   % endif
     
     <div class="details details-course">
       <!-- NOTE: showing course details -->
