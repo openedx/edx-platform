@@ -242,9 +242,9 @@ def edit_subsection(request, location):
                                 'course_graders': json.dumps(CourseGradingModel.fetch(course.location).graders),
                                 'parent_location': course.location,
                                'parent_item': parent,
-                               'policy_metadata' : policy_metadata,
-                               'subsection_units' : subsection_units,
-                               'can_view_live' : can_view_live
+                               'policy_metadata': policy_metadata,
+                               'subsection_units': subsection_units,
+                               'can_view_live': can_view_live
                                })
 
 
