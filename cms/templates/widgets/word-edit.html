@@ -1,0 +1,209 @@
+##
+## high-level source file editing: word file
+##
+## the actual processing is done by a studio-input-filter xserver application.
+## this file contains html and javascript which (1) provides a download link to the user
+## for the current version of the source code (a word RTF file), and (2) receives
+## an uploaded file, sends that to the xserver for conversion to xml, then uploads
+## the xml and new source code to the cms.
+##
+## beware this uses a cross-domain ajax call, so the studio-input-filter server
+## needs to be configured with the appropriate Access-Control-Allow-* lines.
+
+<%
+  import hashlib
+  sourceurl = module.location.url()
+  hlskey = hashlib.md5(sourceurl).hexdigest()
+%>
+
+  <section id="hls-modal-${hlskey}" class="upload-modal modal" style="width:90%!important; left:5%!important; margin-left:0px!important; height:90%; overflow:auto; background:#ECF7D3; font-size:large;" >
+  <a href="#" class="close-button"><span class="close-icon"></span></a>
+  <div id="hls-div">
+    <header>
+      <h2>Word Source Editing</h2>
+    </header>
+
+    <div id="dropzone">
+    <h3>Instructions:</h3>
+    <p>1. Download the 
+          <a href="/get_source/${sourceurl}">Word-format Source File</a> 
+	  for this problem</p>
+
+    <p>2. Edit the file locally.</p>
+
+    <p>3. Save the file as one in <font color="red">Rich Text Format (.rtf)</font>.  Do NOT save as .doc or .docx format.</p>
+
+    <p>4. Upload the resulting *.rtf file.</p>
+
+    <form id="hls-form" enctype="multipart/form-data">
+            <p>Upload file: <input type="file" name="wordfile" id="wordfile" />  </p>
+            <p>Or drag/drop your *.rtf file anywhere in this window.</p>
+      <div style="font-size:large;" class="progress" id="progress"></div>
+    </form>
+##    <p>Current problem source code:</p>
+##      <section class="source-edit">
+## omit this so that metadata['source_code'] is not overwritten in save_edit
+## instead, it is written by the AJAX post to the save_module_source_metadata function
+##          <textarea name="" data-metadata-name="source_code" class="source-edit-box hls-data" rows="10" cols="90">${metadata['source_code']|h}</textarea>
+##      </section>
+
+      </div>
+  </div>
+  </section>
+    
+<script type="text/javascript">
+     $('#hls-trig-${hlskey}').leanModal({ top:40, overlay:0.8, closeButton: ".close-button"});
+
+     // convert automatically immediately after file is chosen
+
+  $('#hls-modal-${hlskey}').find('#dropzone')
+     .on("dragenter", onDragEnter)
+     .on("dragover", onDragOver)
+     .on("dragleave", onDragLeave)
+     .on("drop", onDrop);
+
+var onDragEnter = function(event) {
+    event.preventDefault();
+    $(this).addClass("dragover");
+}, 
+
+onDragOver = function(event) {
+    event.preventDefault(); 
+    if(!$(this).hasClass("dragover"))
+        $(this).addClass("dragover");
+}, 
+
+onDragLeave = function(event) {
+    event.preventDefault();
+    $(this).removeClass("dragover");
+},
+
+onDrop = function(event) {
+    console.log('onDrop');
+    event.preventDefault();
+    $(this).removeClass("dragover");
+    var file = event.originalEvent.dataTransfer.files[0];
+    console.log("file=");
+    console.log(file);
+    el = $(this).closest('.upload-modal');
+    process_file(el, "${sourceurl}", file);
+    console.log('onDrop done');
+    // console.log(el);
+}
+
+  $('#hls-modal-${hlskey}').find('#wordfile').change(function() {
+     console.log('handler for wordfile input called');
+     // alert('Handler for wordfile input called.');
+     var file = $('#hls-modal-${hlskey}').find('#wordfile')[0].files[0];
+     el = $('#hls-modal-${hlskey}');
+     process_file(el, "${sourceurl}", file);
+    });
+
+  function set_status(el, msg, spinon){
+     if (spinon){
+         msg = msg + '<span class="spinner-in-field-icon"></span>';
+     }
+     el.find("#progress")[0].innerHTML = msg;
+  }
+
+  function process_file(el, location, file){
+
+     set_status(el, "Processing file " + file.name + "...", true);
+
+     console.log('wordfile:');
+     console.log(file);
+
+     $.ajax({
+        url: "https://studio-input-filter.mitx.mit.edu/word2edx?raw=1",
+        type: "POST",
+        data: file,
+        crossDomain: true,
+        processData: false,
+        success: function(data){
+                     console.log('word2edx success!');
+                     console.log(data);
+                     xml = data.xml;
+                     if (xml.length==0){
+                         alert('Conversion failed!  error:'+ data.message);
+                         set_status(el, "Conversion failed - please try another file", false);
+                     }else{
+                         set_status(el, "Done!  uploading images...", true);
+                         post_images(el, location, data, file);
+                         // post_source_code(el, location, file);
+                     }
+                 },
+        error: function() {
+                  alert('Error: cannot connect to word2edx server');
+                  console.log('error!');
+              }
+    });
+  }
+
+  function post_images(el, location, data, file){
+     $.ajax({
+        url: "/put_source_images/" + location,
+        type: "POST",
+        data: JSON.stringify(data),
+        processData: false,
+        success: function(immap){
+                    console.log('images uploaded successfully');
+                    console.log(immap);
+                    for (idx in immap){
+                        imurlmap = immap[idx];
+                        //console.log('imurlmap = ');
+                        //console.log(imurlmap);
+                        ## map /static/html/foo-fig001.png to /c4x/mitx/0.1/asset/problem-X14AZ-fig001.png etc.
+                        data.xml = data.xml.replace(RegExp(imurlmap['imurl'],'g'),imurlmap['conurl']);
+                    }
+                    // console.log('new xml = ' + data.xml);
+                    word_set_raw_edit_box(el, data.xml);
+                    set_status(el, "Done!  uploading xml...", true);
+                    post_source_code(el, location, file);
+                 },
+        error: function() {
+                  alert('Error: image upload failed!');
+                  set_status(el, "Image upload failed!  Please try again, or try another file.", false);
+                  console.log('error!');
+              }
+    });
+  }
+
+  function post_source_code(el, location, file){
+            // from https://developer.mozilla.org/en-US/docs/Using_files_from_web_applications
+            var uri = "/put_source/" + location;
+            var xhr = new XMLHttpRequest();
+            var fd = new FormData();
+             
+            xhr.open("POST", uri, true);
+            xhr.onreadystatechange = function() {
+                if (xhr.readyState == 4 && xhr.status == 200) {
+                    // Handle response.
+                    // alert(xhr.responseText); // handle response.
+                    console.log('source_code uploaded successfully');
+                    set_status(el, "Done!  closing...", false);
+                    save_and_close(el);
+                }
+               // else{
+               //    alert(xhr.responseText); // handle response.
+               // }
+            };
+            fd.append('source_code', file);
+            // Initiate a multipart/form-data upload
+            xhr.setRequestHeader("X-CSRFToken", "${csrf_token}");
+            xhr.send(fd);
+    }
+ 
+   function word_set_raw_edit_box(el,xml){
+         // get the codemirror editor for the raw-edit-box
+         // it's a CodeMirror-wrap class element
+     console.log('el='+el);
+         el.closest('.component').find('.CodeMirror-wrap')[0].CodeMirror.setValue(xml);
+   }
+
+   // save button
+
+   function save_and_close(el){
+          el.closest('.component').find('.save-button').click();
+   }
+
+</script>

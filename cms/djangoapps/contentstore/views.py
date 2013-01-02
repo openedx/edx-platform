@@ -1,4 +1,6 @@
 from util.json_request import expect_json
+import base64
+import gzip
 import json
 import logging
 import os
@@ -11,6 +13,8 @@ from datetime import datetime
 from collections import defaultdict
 from uuid import uuid4
 from path import path
+from StringIO import StringIO
+
 from xmodule.modulestore.xml_exporter import export_to_xml
 from tempfile import mkdtemp
 from django.core.servers.basehttp import FileWrapper
@@ -1418,16 +1422,153 @@ def generate_export_course(request, org, course, name):
 
 @ensure_csrf_cookie
 @login_required
-def export_course(request, org, course, name):
-
-    location = ['i4x', org, course, 'course', name]
-    course_module = modulestore().get_item(location)
+def get_module_source_metadata(request, module_location):
+    """
+    Return source for module from module metadata, if it exists (and if user
+    has suitable access permissions).  This is used for client downloading
+    the source file, eg the word-format source for a problem, to edit.
+    """
+    location = Location(module_location)
+    
     # check that logged in user has permissions to this item
     if not has_access(request.user, location):
         raise PermissionDenied()
 
-    return render_to_response('export.html', {
-        'context_course': course_module,
-        'active_tab': 'export',
-        'successful_import_redirect_url' : ''
-    })
+    item_module = modulestore().get_item(location)
+
+    metadata = item_module.metadata
+    if 'source_code' not in metadata:
+        return HttpResponseBadRequest
+
+    scode = metadata['source_code']
+    encoding = metadata.get('source_code_encoding','')
+    if 'base64' in encoding:
+        scode = base64.b64decode(scode)
+    if 'gzip' in encoding:
+        scode = gzip.GzipFile(fileobj=StringIO(scode)).read()
+    mimetype = metadata.get('source_code_mimetype','application/msword')
+    fn = metadata.get('display_name','problem.doc')
+    #if not fn.endswith('.rtf'):
+    #    fn += '.rtf'
+    response = HttpResponse(mimetype=mimetype)
+    response['Content-Disposition'] = 'attachment; filename=%s' % fn
+    
+    response.write(scode)
+    return response
+
+
+@ensure_csrf_cookie
+@login_required
+def save_module_source_metadata(request, module_location):
+    """
+    save metadata source_code for a specified problem.
+    """
+    location = Location(module_location)
+    
+    # check that logged in user has permissions to this item
+    if not has_access(request.user, location):
+        raise PermissionDenied()
+
+    item_module = modulestore().get_item(location)
+
+    metadata = item_module.metadata
+
+    scode_file = request.FILES.get('source_code','')
+    if not scode_file:
+        log.debug('Error, missing source_code in POST')
+        return HttpResponseBadRequest
+
+    # use specified source code encoding
+    encoding = metadata.get('source_code_encoding','')
+    
+    scode = scode_file.read()
+    log.debug('scode len=%d' % len(scode))
+
+
+    if 'gzip' in encoding:
+        hdr = scode[:2]
+        if [ord(hdr[x]) for x in range(2)]==[31,139]:
+            log.debug("input already gzipped!")
+        else:
+            buf = StringIO()
+            gzip.GzipFile(fileobj=buf,mode='w').write(scode)
+            scode = buf.getvalue()
+
+    if 'base64' in encoding:
+        scode = base64.b64encode(scode)
+    
+    metadata['source_code'] = scode
+
+    # commit to datastore
+    store = get_modulestore(Location(module_location));
+    store.update_metadata(module_location, metadata)
+
+    log.debug('save_module_source_metadata succeeded, len=%d' % len(scode))
+
+    return HttpResponse(json.dumps({'Status': 'OK'}))
+    
+
+@ensure_csrf_cookie
+@login_required
+def save_module_source_images(request, module_location):
+    """
+    Save images for a specific problem module by uploading them as assets.
+    The images are provided in a POST as a json array of 
+       {'imurl': ..., 'imdata': ..., 'imfn': ...}
+    dicts.  The imdata is base64 encoded.  imfn is the image filename (local
+    to this specific problem, eg fig001.png).  imurl is the url used in the
+    xml definition (prior to substitution by the c4x url location).
+    """
+    location = Location(module_location)
+    
+    # check that logged in user has permissions to this item
+    if not has_access(request.user, location):
+        raise PermissionDenied()
+
+    item_module = modulestore().get_item(location)
+    metadata = item_module.metadata
+
+    ## TODO: we need a smarter way to figure out what course an item is in
+    #for course in modulestore().get_courses():
+    #    if (course.location.org == item.location.org and
+    #        course.location.course == item.location.course):
+    #        break
+    #
+    #coursename = course.location.name
+
+    if (0):
+        log.debug('-----------------------------------------------------------------------------')
+        log.debug('body:')
+        log.debug(request.body)
+        log.debug('-----------------------------------------------------------------------------')
+
+    imtabs = json.loads(request.body).get('images')
+    immap = []
+    
+    for imtab in imtabs:
+        imfn = imtab['imfn']
+        filedata = base64.b64decode(imtab['imdata'])
+        mime_type = imtab['imtype']
+
+        filename = "%s-%s-%s" % (metadata.get('display_name','problem'),location.name, imfn)
+
+        content_loc = StaticContent.compute_location(location.org, location.course, filename)
+        content = StaticContent(content_loc, filename, mime_type, filedata)
+
+        # first let's save a thumbnail so we can get back a thumbnail location
+        thumbnail_content = contentstore().generate_thumbnail(content)
+
+        if thumbnail_content is not None:
+            content.thumbnail_location = thumbnail_content.location
+            del_cached_content(thumbnail_content.location)
+
+        # then commit the content 
+        contentstore().save(content)
+        del_cached_content(content.location)
+        
+        immap.append(dict(imurl=imtab['imurl'], 
+                            conurl=StaticContent.get_url_path_from_location(content.location)))
+
+    log.debug('save_module_source_images immap=%s' % immap)
+    return HttpResponse(json.dumps(immap))
+    
