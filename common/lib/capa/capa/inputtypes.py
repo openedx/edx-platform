@@ -45,7 +45,6 @@ import re
 import shlex  # for splitting quoted strings
 import sys
 import os
-import unidecode
 
 from registry import TagRegistry
 
