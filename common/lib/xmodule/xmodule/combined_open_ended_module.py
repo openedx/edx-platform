@@ -116,12 +116,15 @@ class CombinedOpenEndedModule(XModule):
     def get_html(self):
         html = self.current_task.get_html(self.system)
         return_html = rewrite_links(html, self.rewrite_content_links)
-        self.task_states[len(self.task_states)-1] = self.current_task.get_instance_state()
+        self.update_task_states()
         return return_html
+
+    def update_task_states(self):
+        self.task_states[len(self.task_states)-1] = self.current_task.get_instance_state()
 
     def handle_ajax(self, dispatch, get):
         return_html = self.current_task.handle_ajax(dispatch,get, self.system)
-        self.task_states[len(self.task_states)-1] = self.current_task.get_instance_state()
+        self.update_task_states()
         return return_html
 
     def get_instance_state(self):
