@@ -1,6 +1,7 @@
 class CMS.Views.UnitEdit extends Backbone.View
   events:
-    'click .new-component .new-component-type a': 'showComponentTemplates'
+    # 'click .new-component .new-component-type a': 'showComponentTemplates'
+    'click .new-component .new-component-type a': 'addNewComponent'
     'click .new-component .cancel-button': 'closeNewComponent'
     'click .new-component-templates .new-component-template a': 'saveNewComponent'
     'click .new-component-templates .cancel-button': 'closeNewComponent'
@@ -67,6 +68,52 @@ class CMS.Views.UnitEdit extends Backbone.View
     @$newComponentTemplatePickers.slideUp(250)
     @$newComponentItem.removeClass('adding')
     @$newComponentItem.find('.rendered-component').remove()
+
+  addNewComponent: (event) =>
+    event.preventDefault()
+
+    @$componentItem = $('<li>').addClass('editing')
+    type = $(event.currentTarget).data('type')
+
+    switch type
+      when 'video'
+        @$editor = $($('#video-editor').html())
+        $preview = $($('#video-preview').html())
+      when 'problem'
+        @$editor = $($('#problem-editor').html())
+        $preview = $($('#problem-preview').html())
+        initProblemEditors(@$editor, $preview)
+      when 'html'
+        @$editor = $($('#html-editor').html())
+        $preview = $('<div class="html-preview"></div>')
+        initHTMLEditor(@$editor, $preview)
+      when 'discussion'
+        @$editor = $($('#discussion-editor').html())
+        $preview = $($('#discussion-preview').html())        
+
+    @$editor.find('.save-button, .cancel-button').bind('click', =>
+      @$componentItem.removeClass('editing')
+      @closeEditor()
+    )
+
+    $componentActions = $($('#component-actions').html())
+
+    @$componentItem.append(@$editor)
+    @$componentItem.append($preview)
+
+    @$componentItem.append($componentActions)
+    @$componentItem.hide()
+    @$newComponentItem.before(@$componentItem)
+    @$componentItem.show()
+    $modalCover.fadeIn(200)
+    $modalCover.bind('click', @closeEditor)
+
+  closeEditor: (event) =>
+    @$editor.slideUp(150)
+    $modalCover.fadeOut(150)
+    $modalCover.unbind('click', @closeEditor)
+    @$editor.slideUp(150)
+    @$componentItem.removeClass('editing')
 
   saveNewComponent: (event) =>
     event.preventDefault()

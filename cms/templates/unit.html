@@ -12,6 +12,495 @@
         state: '${unit_state}'
       })
     });
+
+    $body = $('body');
+    $body.on('click', '.editor-tabs .tab', setEditorTab);
+
+    function setEditorTab(e) {
+      e.preventDefault();
+      $('.editor-tabs .current').removeClass('current');
+      $(this).addClass('current');
+      switch($(this).attr('data-tab')) {
+        case 'simple':
+          currentEditor = simpleEditor;
+          $(simpleEditor.getWrapperElement()).show();
+          $(xmlEditor.getWrapperElement()).hide();
+          $(simpleEditor).focus();
+          onSimpleEditorUpdate();
+          break;
+        case 'xml':
+          currentEditor = xmlEditor;
+          $(simpleEditor.getWrapperElement()).hide();
+          $(xmlEditor.getWrapperElement()).show();
+          $(xmlEditor).focus();
+          xmlEditor.refresh();
+          break;
+        case 'visual':
+          currentEditor = visualEditor;
+          convertHTMLToVisual();
+          $('table.mceToolbar').show();
+          $(htmlEditor.getWrapperElement()).hide();
+          break;
+        case 'html':
+          currentEditor = htmlEditor;
+          $('table.mceToolbar').hide();
+          $(htmlEditor.getWrapperElement()).show();
+          $(htmlEditor).focus();
+          convertVisualToHTML();
+          htmlEditor.refresh();
+          break;
+      }      
+    }
+  </script>
+
+  <script src="/static/js/speed-editor.js"></script>
+  <script src="/static/js/html-editor.js"></script>
+  <script src="/static/js/tiny_mce/tiny_mce.js"></script>
+  <script src="/static/js/tiny_mce/jquery.tinymce.js"></script>
+
+  <script type="text/template" id="asset-library-widget">
+    <article class="asset-library widget">
+      <a href="#" class="close-button">
+        <span class="close-icon"></span>
+      </a>
+
+      <div class="upload-form">
+        <h1>Upload New File</h1>
+        <p class="file-name"></p>
+        <div class="progress-bar">
+          <div class="progress-fill"></div>
+        </div>
+        <div class="embeddable">
+          <label>Embeddable XML:</label>
+          <input type="text" class="embeddable-xml-input" value="&lt;img src=&quot;&quot;/&gt;">
+        </div>
+        <form class="file-chooser" action="/Giannattasio/313/course/Photoshop_for_Monkeys/upload_asset" method="post" enctype="multipart/form-data">
+          <a href="#" class="choose-file-button">Choose File</a>
+          <input type="file" class="file-input" name="file">
+        </form>
+      </div>
+
+      <header>
+        <a href="#" class="upload-button">Upload New File</a>
+        <input type="text" class="search">
+      </header>
+      <table class="library-list">
+        <thead>
+          <tr>
+            <th class="thumb-col"></th>
+            <th class="name-col"><a href="#">Name <span class="sort-icon down"></span></a></th>
+            <th class="date-col"><a href="#">Date Added</a></th>
+            <th class="insert-col"></th>
+          </tr>
+        </thead>
+        <tbody id="asset_table_body">
+          <tr data-id="id">
+            <td class="thumb-col">
+              <div class="thumb">
+                <img src="/">
+              </div>
+            </td>
+            <td class="name-col">
+              <a href="#" class="filename">ut-logo-350-150.png</a>
+              <div class="embeddable-xml"></div>
+            </td>
+            <td class="date-col">
+              30 October, 2012 at 07:17 PM
+            </td>
+            <td class="insert-col">
+              <a href="#" class="insert-asset-button" data-markup="<img src='/c4x/Giannattasio/313/asset/ut-logo-350-150.png'/>">Insert</a>
+            </td>
+          </tr>
+          <tr data-id="id">
+            <td class="thumb-col">
+              <div class="thumb">
+                <img src="/">
+              </div>
+            </td>
+            <td class="name-col">
+              <a href="#" class="filename">ut-logo-350-150.png</a>
+              <div class="embeddable-xml"></div>
+            </td>
+            <td class="date-col">
+              30 October, 2012 at 07:17 PM
+            </td>
+            <td class="insert-col">
+              <a href="#" class="insert-asset-button" data-markup="<img src='/c4x/Giannattasio/313/asset/ut-logo-350-150.png'/>">Insert</a>
+            </td>
+          </tr>
+          <tr data-id="id">
+            <td class="thumb-col">
+              <div class="thumb">
+                <img src="/">
+              </div>
+            </td>
+            <td class="name-col">
+              <a href="#" class="filename">ut-logo-350-150.png</a>
+              <div class="embeddable-xml"></div>
+            </td>
+            <td class="date-col">
+              30 October, 2012 at 07:17 PM
+            </td>
+            <td class="insert-col">
+              <a href="#" class="insert-asset-button" data-markup="<img src='/c4x/Giannattasio/313/asset/ut-logo-350-150.png'/>">Insert</a>
+            </td>
+          </tr>
+          <tr data-id="id">
+            <td class="thumb-col">
+              <div class="thumb">
+                <img src="/">
+              </div>
+            </td>
+            <td class="name-col">
+              <a href="#" class="filename">ut-logo-350-150.png</a>
+              <div class="embeddable-xml"></div>
+            </td>
+            <td class="date-col">
+              30 October, 2012 at 07:17 PM
+            </td>
+            <td class="insert-col">
+              <a href="#" class="insert-asset-button" data-markup="<img src='/c4x/Giannattasio/313/asset/ut-logo-350-150.png'/>">Insert</a>
+            </td>
+          </tr>
+          <tr data-id="id">
+            <td class="thumb-col">
+              <div class="thumb">
+                <img src="/">
+              </div>
+            </td>
+            <td class="name-col">
+              <a href="#" class="filename">ut-logo-350-150.png</a>
+              <div class="embeddable-xml"></div>
+            </td>
+            <td class="date-col">
+              30 October, 2012 at 07:17 PM
+            </td>
+            <td class="insert-col">
+              <a href="#" class="insert-asset-button" data-markup="<img src='/c4x/Giannattasio/313/asset/ut-logo-350-150.png'/>">Insert</a>
+            </td>
+          </tr>
+          <tr data-id="id">
+            <td class="thumb-col">
+              <div class="thumb">
+                <img src="/">
+              </div>
+            </td>
+            <td class="name-col">
+              <a href="#" class="filename">ut-logo-350-150.png</a>
+              <div class="embeddable-xml"></div>
+            </td>
+            <td class="date-col">
+              30 October, 2012 at 07:17 PM
+            </td>
+            <td class="insert-col">
+              <a href="#" class="insert-asset-button" data-markup="<img src='/c4x/Giannattasio/313/asset/ut-logo-350-150.png'/>">Insert</a>
+            </td>
+          </tr>
+          <tr data-id="id">
+            <td class="thumb-col">
+              <div class="thumb">
+                <img src="/">
+              </div>
+            </td>
+            <td class="name-col">
+              <a href="#" class="filename">ut-logo-350-150.png</a>
+              <div class="embeddable-xml"></div>
+            </td>
+            <td class="date-col">
+              30 October, 2012 at 07:17 PM
+            </td>
+            <td class="insert-col">
+              <a href="#" class="insert-asset-button" data-markup="<img src='/c4x/Giannattasio/313/asset/ut-logo-350-150.png'/>">Insert</a>
+            </td>
+          </tr>
+          <tr data-id="id">
+            <td class="thumb-col">
+              <div class="thumb">
+                <img src="/">
+              </div>
+            </td>
+            <td class="name-col">
+              <a href="#" class="filename">ut-logo-350-150.png</a>
+              <div class="embeddable-xml"></div>
+            </td>
+            <td class="date-col">
+              30 October, 2012 at 07:17 PM
+            </td>
+            <td class="insert-col">
+              <a href="#" class="insert-asset-button" data-markup="<img src='/c4x/Giannattasio/313/asset/ut-logo-350-150.png'/>">Insert</a>
+            </td>
+          </tr>
+          <tr data-id="id">
+            <td class="thumb-col">
+              <div class="thumb">
+                <img src="/">
+              </div>
+            </td>
+            <td class="name-col">
+              <a href="#" class="filename">ut-logo-350-150.png</a>
+              <div class="embeddable-xml"></div>
+            </td>
+            <td class="date-col">
+              30 October, 2012 at 07:17 PM
+            </td>
+            <td class="insert-col">
+              <a href="#" class="insert-asset-button" data-markup="<img src='/c4x/Giannattasio/313/asset/ut-logo-350-150.png'/>">Insert</a>
+            </td>
+          </tr>
+          <tr data-id="id">
+            <td class="thumb-col">
+              <div class="thumb">
+                <img src="/">
+              </div>
+            </td>
+            <td class="name-col">
+              <a href="#" class="filename">ut-logo-350-150.png</a>
+              <div class="embeddable-xml"></div>
+            </td>
+            <td class="date-col">
+              30 October, 2012 at 07:17 PM
+            </td>
+            <td class="insert-col">
+              <a href="#" class="insert-asset-button" data-markup="<img src='/c4x/Giannattasio/313/asset/ut-logo-350-150.png'/>">Insert</a>
+            </td>
+          </tr>
+        </tbody>
+      </table>
+      <nav class="pagination wip-box">
+        Page: 
+        <ol class="pages">
+          <li>1</li>
+          <li><a href="#">2</a></li>
+          <li><a href="#">3</a></li>
+          <li><a href="#">4</a></li>
+          <li><a href="#">5</a></li>
+        </ol>
+        <a href="#" class="next">»</a>
+      </nav>
+    </article>
+  </script>
+
+  <script type="text/template" id="simple-editor-cheatsheet">
+    <article class="simple-editor-cheatsheet">
+      <div class="cheatsheet-wrapper">
+        <div class="row">
+          <h6>Multiple Choice</h6>
+          <div class="col sample">
+            <img src="/static/img/choice-example.png" />
+          </div>
+          <div class="col">
+            <pre><code>( ) red
+( ) green
+(x) blue</code></pre>
+          </div>
+        </div>
+        <div class="row">
+          <h6>Multiple Check</h6>
+          <div class="col sample">
+            <img src="/static/img/multi-example.png" />
+          </div>
+          <div class="col">
+            <pre><code>[ ] earth
+[ ] wind
+[x] water</code></pre>
+          </div>
+        </div>
+        <div class="row">
+          <h6>String Response</h6>
+          <div class="col sample">
+            <img src="/static/img/string-example.png" />
+          </div>
+          <div class="col">
+            <pre><code>= dog</code></pre>
+          </div>
+        </div>
+        <div class="row">
+          <h6>Numerical Response</h6>
+          <div class="col sample">
+            <img src="/static/img/number-example.png" />
+          </div>
+          <div class="col">
+            <pre><code>= 3.14 +- 2%</code></pre>
+          </div>
+        </div>
+        <div class="row">
+          <h6>Option Response</h6>
+          <div class="col sample">
+            <img src="/static/img/select-example.png" />
+          </div>
+          <div class="col">
+            <pre><code>[[wrong, (right)]]</code></pre>
+          </div>
+        </div>
+      </div>
+    </article>
+  </script>
+
+  <script type="text/template" id="component-actions">
+    <div class="component-actions">
+      <a href="#" class="edit-button"><span class="edit-icon white"></span>Edit</a>
+      <a href="#" class="delete-button"><span class="delete-icon white"></span>Delete</a>
+    </div>
+    <a href="#" class="drag-handle"></a>
+  </script>
+
+  <script type="text/template" id="problem-editor">
+    <div class="problem-editor editor">
+      <div class="row">
+        <div class="editor-bar">
+          <ul class="format-buttons">
+            <li><a href="#" class="multiple-choice-button" data-tooltip="Multiple Choice"><span class="problem-editor-icon multiple-choice"></span></a></li>
+            <li><a href="#" class="checks-button" data-tooltip="Check Multiple"><span class="problem-editor-icon checks"></span></a></li>
+            <li><a href="#" class="string-button" data-tooltip="String Response"><span class="problem-editor-icon string"></span></a></li>
+            <li><a href="#" class="number-button" data-tooltip="Numerical Response"><span class="problem-editor-icon number"></span></a></li>
+            <li><a href="#" class="dropdown-button" data-tooltip="Dropdown"><span class="problem-editor-icon dropdown"></span></a></li>
+          </ul>
+          <ul class="editor-tabs">
+            <li><a href="#" class="simple-tab tab current" data-tab="simple">Simple</a></li>
+            <li><a href="#" class="xml-tab tab" data-tab="xml">XML</a></li>
+            <li><a href="#" class="cheatsheet-toggle" data-tooltip="Toggle Cheatsheet">?</a></li>
+          </ul>
+        </div>
+        <textarea class="edit-box"></textarea>
+        <textarea class="xml-box"></textarea>
+      </div>
+      <div class="row">
+        <div class="problem-settings">
+          <div class="row">
+            <label>Show Answer:</label>
+            <select>
+              <option>attempted</option>
+              <option>always</option>
+              <option>never</option>
+              <option>closed</option>
+            </select>
+          </div>
+          <div class="row">
+            <label>Rerandomize:</label>
+            <select>
+              <option>always</option>
+              <option>never</option>
+              <option>per_student</option>
+            </select>
+          </div>
+        </div>
+        <a href="#" class="problem-settings-button"><span class="settings-icon"></span><span class="button-label">Show Advanced Settings</span></a>
+      </div>
+      <div class="row">
+        <a href="#" class="save-button">Save</a><a href="#" class="cancel-button">Cancel</a>
+      </div>
+    </div>    
+  </script>
+
+  <script type="text/template" id="problem-preview">
+    <section class="xmodule_display xmodule_CapaModule" data-type="Problem">
+      <section id="problem_i4x-Giannattasio-313-problem-9e62f3fb1fa14ba6a671b3de73c02eab" class="problems-wrapper" data-problem-id="i4x://Giannattasio/313/problem/9e62f3fb1fa14ba6a671b3de73c02eab" data-url="/preview/modx/0/i4x://Giannattasio/313/problem/9e62f3fb1fa14ba6a671b3de73c02eab">
+
+        <section class="problem"></section>
+
+        <section class="action">
+          <input type="hidden" name="problem_id" value="Option Response">
+          <input class="check Check" type="button" value="Check">
+          <input class="show" type="button" value="Show Answer">
+        </section>
+      </section>
+    </section>
+  </script>
+
+  <script type="text/template" id="html-editor">
+    <div class="html-editor editor">
+      <ul class="editor-tabs">
+        <li><a href="#" class="visual-tab tab current" data-tab="visual">Visual</a></li>
+        <li><a href="#" class="html-tab tab" data-tab="html">HTML</a></li>
+      </ul>
+      <div class="row">
+        <textarea class="edit-box tinymce"></textarea>
+        <textarea class="html-box"></textarea>
+      </div>      
+      <div class="row">
+        <a href="#" class="save-button">Save</a><a href="#" class="cancel-button">Cancel</a>
+      </div>
+    </div>    
+  </script>
+
+  <script type="text/template" id="discussion-editor">
+    <div class="discussion-editor editor">
+      <div class="row">
+        <label>Category Name:</label>
+        <input type="text" value="Discussion Topic" class="discussion-id-field">
+      </div>     
+      <div class="row">
+        <a href="#" class="save-button">Save</a><a href="#" class="cancel-button">Cancel</a>
+      </div>
+    </div>
+  </script>
+
+  <script type="text/template" id="discussion-preview">
+    <div class="discussion-preview">
+      <div class="discussion-module" data-discussion-id="">
+        <a class="discussion-show control-button" href="#" data-discussion-id=""><span class="show-hide-discussion-icon"></span><span class="button-text">Show Discussion</span></a>
+        <a href="#" class="new-post-btn"><span class="new-post-icon"></span>New Post</a>
+      </div>
+    </div>
+  </script>
+
+  <script type="text/template" id="video-editor">
+    <div class="video-editor editor">
+      <div class="row">
+        <label>YouTube ID(s):</label>
+        <input type="text" value="0.75:JMD_ifUUfsU,1.0:OEoXaMPEzfM,1.25:AKqURZnYqpk,1.50:DYpADpL7jAY" class="video-id-field">
+        <a href="#" class="browse-button">Browse…</a>
+      </div>
+      <div class="row">
+        <label>Transcript:</label>
+        <input type="text" class="transcript-field">
+        <a href="#" class="browse-button">Browse…</a>
+      </div>
+      <div class="row">
+        <a href="#" class="save-button">Save</a><a href="#" class="cancel-button">Cancel</a>
+      </div>
+    </div>
+  </script>
+
+  <script type="text/template" id="video-preview">
+    <div class="video-preview">
+      <section class="xmodule_display xmodule_VideoModule" data-type="Video">
+        <div id="video_i4x-Giannattasio-313-video-39532ac1a90742bbbd70148122a8fcfa" class="video video-load-complete" data-streams="0.75:JMD_ifUUfsU,1.0:OEoXaMPEzfM,1.25:AKqURZnYqpk,1.50:DYpADpL7jAY" data-caption-data-dir="0458bf5495cf4072adde09918f6a9941" data-show-captions="true">
+          <div class="tc-wrapper">
+            <article class="video-wrapper">
+              <section class="video-player">
+                <iframe frameborder="0" allowfullscreen="" id="i4x-Giannattasio-313-video-39532ac1a90742bbbd70148122a8fcfa" title="YouTube video player" height="390" width="640" src="http://www.youtube.com/embed/OEoXaMPEzfM?controls=0&amp;wmode=transparent&amp;rel=0&amp;showinfo=0&amp;enablejsapi=1&amp;modestbranding=1&amp;origin=http%3A%2F%2Flocalhost%3A8001"></iframe>
+              </section>
+
+              <section class="video-controls"><div class="slider ui-slider ui-slider-horizontal ui-widget ui-widget-content ui-corner-all"><div class="ui-slider-range ui-widget-header ui-slider-range-min" style="width: 2.586206896551724%; "></div><a class="ui-slider-handle ui-state-default ui-corner-all" href="#" style="left: 2.586206896551724%; "></a></div>
+        <div>
+          <ul class="vcr">
+            <li><a class="video_control play" href="#">Play</a></li>
+            <li>
+              <div class="vidtime">0:02 / 1:56</div>
+            </li>
+          </ul>
+          <div class="secondary-controls"><div class="speeds">
+          <a href="#">
+            <h3>Speed</h3>
+            <p class="active">1.0x</p>
+          </a>
+          <ol class="video_speeds"><li data-speed="1.50"><a href="#">1.50x</a></li><li data-speed="1.25"><a href="#">1.25x</a></li><li data-speed="1.0" class="active"><a href="#">1.0x</a></li><li data-speed="0.75"><a href="#">0.75x</a></li></ol>
+        </div><div class="volume">
+          <a href="#"></a>
+          <div class="volume-slider-container">
+            <div class="volume-slider ui-slider ui-slider-vertical ui-widget ui-widget-content ui-corner-all"><div class="ui-slider-range ui-widget-header ui-slider-range-min" style="height: 100%; "></div><a class="ui-slider-handle ui-state-default ui-corner-all" href="#" style="bottom: 100%; "></a></div>
+          </div>
+        </div>
+            <a href="#" class="add-fullscreen" oldtitle="Fill browser">Fill Browser</a>
+          <a href="#" class="quality_control" title="HD">HD</a><a href="#" class="hide-subtitles" oldtitle="Turn off captions">Captions</a></div>
+        </div></section>
+            </article><ol class="subtitles" style="max-height: 342px; "></ol>
+          </div>
+        </div>
+
+        </section>
+      </div>
   </script>
 </%block>
 <%block name="content">
@@ -46,20 +535,6 @@
                   % endfor
                 </ul>
               </div>
-              % for type, templates in sorted(component_templates.items()):
-              <div class="new-component-templates new-component-${type}">
-                <ul class="new-component-template">
-                  % for name, location in templates:
-                  <li>
-                    <a href="#" data-location="${location}">
-                      <span class="name">${name}</span>
-                    </a>
-                  </li>
-                  % endfor
-                </ul>
-                <a href="#" class="cancel-button">Cancel</a>
-              </div>
-              % endfor
             </li>
           </ol>
         </article>

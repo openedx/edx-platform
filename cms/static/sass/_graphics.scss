@@ -310,3 +310,60 @@
   vertical-align: middle;
   background: url(../img/spinner-in-field.gif) no-repeat;
 }
+
+.problem-editor-icon {
+	display: inline-block;
+  width: 26px;
+  height: 21px;
+  vertical-align: middle;
+  background: url(../img/problem-editor-icons.png) no-repeat;
+}
+
+.problem-editor-icon.multiple-choice {
+	background-position: 0 0;
+}
+
+.problem-editor-icon.checks {
+	background-position: -56px 0;
+}
+
+.problem-editor-icon.string {
+	width: 28px;
+	background-position: -111px 0;
+}
+
+.problem-editor-icon.number {
+	width: 24px;
+	background-position: -168px 0;
+}
+
+.problem-editor-icon.dropdown {
+	width: 17px;
+	background-position: -220px 0;
+}
+
+.settings-icon {
+	display: inline-block;
+	width: 20px;
+	height: 20px;
+	vertical-align: middle;
+	background: url(../img/problem-settings-icon.png) no-repeat;
+}
+
+.sort-icon {
+	font-size: 7px;
+	vertical-align: middle;
+
+	&.down:before {
+		content: '▼';
+	}
+
+	&.up:before {
+		content: '▲';
+	}
+}
+
+
+
+
+

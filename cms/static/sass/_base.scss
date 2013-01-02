@@ -34,6 +34,30 @@ h1 {
     margin: 24px 6px;
 }
 
+strong {
+    font-weight: 700;
+}
+
+em {
+    font-style: italic;
+}
+
+p + p,
+p + ul,
+p + ol {
+    margin-top: 20px;
+}
+
+code {
+    margin: 0 2px;
+    padding: 0px 5px;
+    border-radius: 3px;
+    border: 1px solid #eaeaea;
+    font-family: Monaco, monospace;
+    font-size: 12px;
+    background-color: #f8f8f8;
+}
+
 .waiting {
     opacity: 0.1;
 }
