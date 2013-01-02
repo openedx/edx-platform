@@ -42,10 +42,6 @@ ${module_content}
     <div class="staff_info" style="display:block">
 is_released = ${is_released}
 location = ${location | h}
-github = <a href="${edit_link}">${edit_link | h}</a>
-%if source_file:
-source_url = <a href="${source_url}">${source_file | h}</a>
-%endif
 <table>
   <tr><th>Module Fields</th></tr>
   %for name, field in fields:

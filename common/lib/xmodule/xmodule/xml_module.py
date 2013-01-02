@@ -230,10 +230,6 @@ class XmlDescriptor(XModuleDescriptor):
         if definition_metadata:
             definition['definition_metadata'] = definition_metadata
 
-        # TODO (ichuang): remove this after migration
-        # for Fall 2012 LMS migration: keep filename (and unmangled filename)
-        definition['filename'] = [ filepath, filename ]
-
         return definition, children
 
     @classmethod

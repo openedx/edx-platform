@@ -106,20 +106,6 @@ def add_histogram(get_html, module, user):
         histogram = grade_histogram(module_id)
         render_histogram = len(histogram) > 0
 
-        # TODO (ichuang): Remove after fall 2012 LMS migration done
-        if settings.MITX_FEATURES.get('ENABLE_LMS_MIGRATION'):
-            [filepath, filename] = module.lms.filename
-            osfs = module.system.filestore
-            if filename is not None and osfs.exists(filename):
-                # if original, unmangled filename exists then use it (github
-                # doesn't like symlinks)
-                filepath = filename
-            data_dir = osfs.root_path.rsplit('/')[-1]
-            edit_link = "%s/%s/tree/master/%s" % (module.lms.giturl, data_dir, filepath)
-        else:
-            edit_link = False
-            # Need to define all the variables that are about to be used
-            data_dir = ""
         source_file = module.lms.source_file  # source used to generate the problem XML, eg latex or word
 
         # useful to indicate to staff if problem has been released or not
@@ -135,11 +121,9 @@ def add_histogram(get_html, module, user):
                          'location': module.location,
                          'xqa_key': module.lms.xqa_key,
                          'source_file' : source_file,
-                         'source_url': '%s/%s/tree/master/%s' % (module.lms.giturl, data_dir, source_file),
                          'category': str(module.__class__.__name__),
                          # Template uses element_id in js function names, so can't allow dashes
                          'element_id': module.location.html_id().replace('-','_'),
-                         'edit_link': edit_link,
                          'user': user,
                          'xqa_server' : settings.MITX_FEATURES.get('USE_XQA_SERVER','http://xqa:server@content-qa.mitx.mit.edu/xqa'),
                          'histogram': json.dumps(histogram),

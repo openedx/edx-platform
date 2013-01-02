@@ -21,8 +21,6 @@ function sendlog(element_id, edit_link, staff_context){
 			entry: $('#' + element_id + '_xqa_entry').val()
 		};
 			
-	if (edit_link) xqaLog["giturl"] = edit_link;
-
 	$.ajax({
 		url: '${xqa_server}/log',
 		type: 'GET',
