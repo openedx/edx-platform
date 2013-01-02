@@ -706,7 +706,8 @@ def clone_item(request):
         raise PermissionDenied()
 
     parent = get_modulestore(template).get_item(parent_location)
-    dest_location = parent_location._replace(category=template.category, name=uuid4().hex)
+    name = (display_name or '')[:16].replace(' ','_')+uuid4().hex	# human-readable name
+    dest_location = parent_location._replace(category=template.category, name=name)
 
     new_item = get_modulestore(template).clone_item(template, dest_location)
 
