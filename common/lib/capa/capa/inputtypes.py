@@ -836,10 +836,14 @@ class DragAndDropInput(InputTypeBase):
                 dic[attr_name] = Attribute(attr_name,
                     default=tag_attrs[tag_type][attr_name]).parse_from_xml(tag)
 
-            if tag_type == 'draggable':
+            if tag_type == 'draggable' and not self.no_labels:
                 dic['label'] = dic['label'] or dic['id']
 
             return dic
+
+        # add labels to images:
+        self.no_labels = Attribute('no_labels',
+                                        default="False").parse_from_xml(self.xml)
 
         to_js = dict()
 
