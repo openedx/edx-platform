@@ -15,8 +15,58 @@
   <%static:js group='peer_grading'/>
 </%block>
 
+
 <section class="container">
-    <div class="peer-grading" data-ajax_url="${ajax_url}">
-        <div class="error-container">${error_text}</div>
+    <div class="peer-grading" data-ajax_url="${ajax_url}" location="${problem_location}">
+        <div class="error-container"></div>
+        <div class="message-container"></div>
+
+        <div class="instructions-panel">
+            <div class="calibration-panel">
+                <h3>Calibration</h3>
+            </div>
+            <div class="grading-panel">
+                <h3>Grading</h3>
+            </div>
+        </div>
+
+        <section class="prompt-wrapper">
+            <div class="prompt-information-container">
+            <h3>Question</h3>
+                <div class="prompt-container">
+                </div>
+            </div>
+            <div class="rubric-wrapper">
+            <h3>Grading Rubric</h3>
+                <div class="rubric-container">
+                </div>
+            </div>
+
+        </section>
+
+
+    <section class="grading-wrapper">
+    <h2>Grading</h2>
+
+    <div class="grading-container">
+        <div class="submission-wrapper">
+            <h3></h3>
+            <div class="submission-container">
+            </div>
+        </div>
+        <div class="evaluation">
+          <p class="score-selection-container">
+          </p>
+          <textarea name="feedback" placeholder="Feedback for student (optional)"
+                    class="feedback-area" cols="70" ></textarea>
+        </div>
+          
+
+        <div class="submission">
+            <input type="button" value="Submit" class="submit-button" name="show"/>
+        </div>
+
+        </div>
+
     </div>
 </section>

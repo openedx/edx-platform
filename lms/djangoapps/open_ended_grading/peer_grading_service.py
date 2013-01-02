@@ -88,18 +88,28 @@ def _err_response(msg):
     return HttpResponse(json.dumps({'success': False, 'error': msg}),
                         mimetype="application/json")
 
+def _check_required(request, required):
+    actual = set(request.POST.keys())
+    missing = required - actual
+    if len(missing) > 0:
+        return False, "Missing required keys: {0}".format(', '.join(missing))
+    else:
+        return True, ""
+
+def _check_post(request):
+    if request.method != 'POST':
+        raise Http404
+
+
 def get_next_submission(request, course_id):
     """
     TODO: fill in this documentation
     """
+    _check_post(request)
     required = set(['location'])
-    if request.method != 'POST':
-        raise Http404
-    actual = set(request.POST.keys())
-    missing = required - actual
-    if len(missing) > 0:
-        return _err_response('Missing required keys {0}'.format(
-            ', '.join(missing)))
+    success, message = _check_required(request, required)
+    if not success:
+        return _err_response(message)
     grader_id = request.user.id
     p = request.POST
     location = p['location']
@@ -113,6 +123,30 @@ def _get_next_submission(course_id, grader_id, location):
     """
     try:
         return peer_grading_service().get_next_submission(location, grader_id)
+    except GradingServiceError:
+        log.exception("Error from grading service.  server url: {0}"
+                      .format(staff_grading_service().url))
+        return json.dumps({'success': False,
+                           'error': 'Could not connect to grading service'})
+
+
+def show_calibration_essay(request, course_id):
+    """
+    TODO: fill in this documentation
+    """
+    _check_post(request)
+
+    required = set(['location'])
+    success, message = _check_required(request, required)
+    if not success:
+        return _err_response(message)
+
+    grader_id = request.user.id
+    p = request.POST
+    location = p['location']
+    try:
+        response = peer_grading_service().show_calibration_essay(location, grader_id)
+        return HttpResponse(response, mimetype="application/json")
     except GradingServiceError:
         log.exception("Error from grading service.  server url: {0}"
                       .format(staff_grading_service().url))

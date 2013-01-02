@@ -106,27 +106,6 @@ def peer_grading_problem(request, course_id, problem_location):
     '''
     course = get_course_with_access(request.user, course_id, 'load')
 
-    # TODO: make sure that we show calibration or next submission correctly
-    # TODO: figure out if we want to make this page pure ajax or not
-
-    problem_info_text = ""
-    error_text = ""
-    # if we are still in calibration
-
-    # show a calibration essay
-
-    # else, show an actual problem
-    try:
-        problem_info_text = peer_gs.get_next_submission(problem_location, request.user.id)
-        log.debug(problem_info_text)
-        problem_info = json.loads(problem_info_text)
-        success = problem_info['success']
-        if 'error' in problem_info:
-            error_text = problem_info['error']
-    except GradingServiceError:
-        success = False
-
-
     ajax_url = reverse('peer_grading', kwargs={'course_id': course_id})
     if not ajax_url.endswith('/'):
         ajax_url += '/'
@@ -134,11 +113,9 @@ def peer_grading_problem(request, course_id, problem_location):
     return render_to_response('peer_grading/peer_grading_problem.html', { 
         'view_html': '',
         'course': course,
+        'problem_location': problem_location,
         'course_id': course_id,
-        'success' : success,
-        'problem_info': problem_info_text,
         'ajax_url': ajax_url,
-        'error_text': error_text,
         # Checked above
         'staff_access': False, })
     
