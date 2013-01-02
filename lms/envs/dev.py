@@ -110,6 +110,13 @@ STAFF_GRADING_INTERFACE = {
     'password': 'abcd',
     }
 
+################################# Peer grading config  #####################
+
+PEER_GRADING_INTERFACE = {
+    'url': 'http://127.0.0.1:3033/peer_grading',
+    'username': 'lms',
+    'password': 'abcd',
+    }
 ################################ LMS Migration #################################
 MITX_FEATURES['ENABLE_LMS_MIGRATION'] = True
 MITX_FEATURES['ACCESS_REQUIRE_STAFF_FOR_COURSE'] = False   # require that user be in the staff_* group to be able to enroll
