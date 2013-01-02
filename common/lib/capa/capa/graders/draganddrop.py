@@ -47,13 +47,13 @@ class PositionsCompare(list):
             return False
 
         # check correct input types
-        if (not isinstance(self[0], (str, unicode, list, int)) or
-            not isinstance(other[0], (str, unicode, list, int))):
+        if (not isinstance(self[0], (str, unicode, list, int, float)) or
+            not isinstance(other[0], (str, unicode, list, int, float))):
             print 'Incorrect input type'
             return False
 
-        if (isinstance(self[0], (list, int)) and
-            isinstance(other[0], (list, int))):
+        if (isinstance(self[0], (list, int, float)) and
+            isinstance(other[0], (list, int, float))):
             print 'Numerical position compare'
             return self.coordinate_positions_compare(other)
         elif (isinstance(self[0], (unicode, str)) and
@@ -81,7 +81,6 @@ class PositionsCompare(list):
             Returns: bool.
         """
         print 'I am called',  self, other
-
         # get max radius of forgiveness
         if isinstance(self[0], list):  # [(x, y), r] case
             r = max(self[1], r)
@@ -136,9 +135,8 @@ class DragAndDrop(object):
         for groupname, draggable_ids in self.correct_groups.items():
             if sorted(draggable_ids) != sorted(self.user_groups[groupname]):
                 return False
-
-        # from now self.groups and self.user_groups are equal
-        assert self.correct_groups == self.user_groups
+        # from now self.correct_groups and self.user_groups are equal if
+        # order is ignored
 
         # Check fo every group that positions of every group element are equal
         # with positions
@@ -153,7 +151,7 @@ class DragAndDrop(object):
                                           all_user_positions, flag='denied'):
             return False
 
-        no_exact, no_allowed = False, False
+        no_exact, no_allowed, no_anyof = False, False, False
         # 'exact' rule
         for groupname in self.correct_groups:
             if self.correct_positions[groupname].get('exact', []):
@@ -174,28 +172,49 @@ class DragAndDrop(object):
             else:
                 no_allowed = True
 
-        if no_allowed and no_exact:
+        # 'anyof' rule
+        for groupname in self.correct_groups:
+            if self.correct_positions[groupname].get('anyof', []):
+                if not self.compare_positions(
+                        self.correct_positions[groupname]['anyof'],
+                        self.user_positions[groupname]['user'], flag='anyof'):
+                    return False
+            else:
+                no_anyof = True
+
+        if no_allowed and no_exact and no_anyof:
             return False
 
         return True
 
-    def compare_positions(self, list1, list2, flag):
+    def compare_positions(self, correct, user, flag):
+        """ order of correct/user is matter only in anyof_flag"""
         # import ipdb; ipdb.set_trace()
         if flag == 'denied':
-            for el1 in list1:
-                for el2 in list2:
+            for el1 in correct:
+                for el2 in user:
                     if PositionsCompare(el1) == PositionsCompare(el2):
                         return False
 
         if flag == 'allowed':
-            for el1, el2 in zip(sorted(list1), sorted(list2)):
+            for el1, el2 in zip(sorted(correct), sorted(user)):
                 if PositionsCompare(el1) != PositionsCompare(el2):
                     return False
 
         if flag == 'exact':
-            for el1, el2 in zip(list1, list2):
+            for el1, el2 in zip(correct, user):
                 if PositionsCompare(el1) != PositionsCompare(el2):
                     return False
+
+        if flag == 'anyof':
+            count = 0
+            for u_el in user:
+                for c_el in correct:
+                    if PositionsCompare(u_el) == PositionsCompare(c_el):
+                        count += 1
+                        continue
+            if count != len(user):
+                return False
 
         return True
 
@@ -232,6 +251,8 @@ def grade(user_input, correct_answer):
     """ Support 2 interfaces"""
     if isinstance(correct_answer, dict):
         dnd = DragAndDrop()
+    else:
+        dnd = correct_answer
 
     dnd.populate(correct_answer=correct_answer, user_answer=user_input)
     return dnd.grade()
