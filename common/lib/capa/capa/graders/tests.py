@@ -86,6 +86,72 @@ class Test_DragAndDrop(unittest.TestCase):
         correct_answer = {'grass':     [[300, 200], 200], 'ant': [[500, 0], 200]}
         self.assertTrue(draganddrop.grade(user_input, correct_answer))
 
+    def test_lcao_correct(self):
+        """Describe carbon molecule in LCAO-MO"""
+        user_input = '{"use_targets":true,"draggables":[{"1":"s_left"}, \
+        {"5":"s_right"},{"4":"s_sigma"},{"6":"s_sigma_star"},{"7":"p_left_1"}, \
+        {"8":"p_left_2"},{"10":"p_right_1"},{"9":"p_right_2"}, \
+        {"2":"p_pi_1"},{"3":"p_pi_2"},{"11":"s_sigma_name"}, \
+        {"13":"s_sigma_star_name"},{"15":"p_pi_name"},{"16":"p_pi_star_name"}, \
+        {"12":"p_sigma_name"},{"14":"p_sigma_star_name"}]}'
+        correct_answer = draganddrop.DragAndDrop()
+        correct_answer.correct_groups['filled_levels'] = ['1', '2', '3', '4', '5', '6']
+        correct_answer.correct_positions['filled_levels'] = {'allowed': [
+        's_left', 's_right', 's_sigma', 's_sigma_star', 'p_pi_1', 'p_pi_2']}
+
+        correct_answer.correct_groups['spin_up'] = ['7', '8', '9', '10']
+        correct_answer.correct_positions['spin_up'] = {'allowed':
+            ['p_left_1', 'p_left_2', 'p_right_1', 'p_right_2']}
+
+        correct_answer.correct_groups['sigma'] = ['11', '12']
+        correct_answer.correct_positions['sigma'] = {'allowed':
+            ['s_sigma_name', 'p_sigma_name']}
+
+        correct_answer.correct_groups['sigma_star'] = ['13', '14']
+        correct_answer.correct_positions['sigma_star'] = {'allowed':
+            ['s_sigma_star_name', 'p_sigma_star_name']}
+
+        correct_answer.correct_groups['pi'] = ['15']
+        correct_answer.correct_positions['pi'] = {'allowed': ['p_pi_name']}
+
+        correct_answer.correct_groups['pi_star'] = ['16']
+        correct_answer.correct_positions['pi_star'] = {'allowed': ['p_pi_star_name']}
+
+        self.assertTrue(draganddrop.grade(user_input, correct_answer))
+
+    def test_lcao_extra_element_incorrect(self):
+        """Describe carbon molecule in LCAO-MO"""
+        user_input = '{"use_targets":true,"draggables":[{"1":"s_left"}, \
+        {"5":"s_right"},{"4":"s_sigma"},{"6":"s_sigma_star"},{"7":"p_left_1"}, \
+        {"8":"p_left_2"},{"17":"p_left_3"},{"10":"p_right_1"},{"9":"p_right_2"}, \
+        {"2":"p_pi_1"},{"3":"p_pi_2"},{"11":"s_sigma_name"}, \
+        {"13":"s_sigma_star_name"},{"15":"p_pi_name"},{"16":"p_pi_star_name"}, \
+        {"12":"p_sigma_name"},{"14":"p_sigma_star_name"}]}'
+        correct_answer = draganddrop.DragAndDrop()
+        correct_answer.correct_groups['filled_levels'] = ['1', '2', '3', '4', '5', '6']
+        correct_answer.correct_positions['filled_levels'] = {'allowed': [
+        's_left', 's_right', 's_sigma', 's_sigma_star', 'p_pi_1', 'p_pi_2']}
+
+        correct_answer.correct_groups['spin_up'] = ['7', '8', '9', '10']
+        correct_answer.correct_positions['spin_up'] = {'allowed':
+            ['p_left_1', 'p_left_2', 'p_right_1', 'p_right_2']}
+
+        correct_answer.correct_groups['sigma'] = ['11', '12']
+        correct_answer.correct_positions['sigma'] = {'allowed':
+            ['s_sigma_name', 'p_sigma_name']}
+
+        correct_answer.correct_groups['sigma_star'] = ['13', '14']
+        correct_answer.correct_positions['sigma_star'] = {'allowed':
+            ['s_sigma_star_name', 'p_sigma_star_name']}
+
+        correct_answer.correct_groups['pi'] = ['15']
+        correct_answer.correct_positions['pi'] = {'allowed': ['p_pi_name']}
+
+        correct_answer.correct_groups['pi_star'] = ['16']
+        correct_answer.correct_positions['pi_star'] = {'allowed': ['p_pi_star_name']}
+
+        self.assertFalse(draganddrop.grade(user_input, correct_answer))
+
 
 def suite():
 

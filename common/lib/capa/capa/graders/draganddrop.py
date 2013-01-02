@@ -107,6 +107,7 @@ class DragAndDrop(object):
         self.correct_positions = OrderedDict()  # positions of comparing
         self.user_groups = OrderedDict()
         self.user_positions = OrderedDict()
+        self.incorrect = False
 
     def grade(self):
         '''
@@ -129,9 +130,12 @@ class DragAndDrop(object):
         Returns:
             True or False.
         '''
-        if sorted(self.correct_groups.keys()) != sorted(self.user_groups.keys()):
+
+        if self.incorrect:
             return False
 
+        if sorted(self.correct_groups.keys()) != sorted(self.user_groups.keys()):
+            return False
         for groupname, draggable_ids in self.correct_groups.items():
             if sorted(draggable_ids) != sorted(self.user_groups[groupname]):
                 return False
@@ -142,11 +146,10 @@ class DragAndDrop(object):
         # with positions
 
         # 'denied' rule
-        # import ipdb; ipdb.set_trace()
-        denied_positions = [self.correct_positions[g].get('denied', [])
-                               for g in self.correct_groups.keys()]
-        all_user_positions = [self.user_positions[g]['user']
-                                for g in self.correct_groups.keys()]
+        denied_positions = [item for g in self.correct_groups.keys()
+                        for item in self.correct_positions[g].get('denied', [])]
+        all_user_positions = [item for g in self.correct_groups.keys()
+                                for item in self.user_positions[g]['user']]
         if not self.compare_positions(denied_positions,
                                           all_user_positions, flag='denied'):
             return False
@@ -229,10 +232,12 @@ class DragAndDrop(object):
         user_answer = json.loads(user_answer)
         self.use_targets = user_answer.get('use_targets')
 
+        # check if we have draggables that are not in correct answer:
+        check_extra_draggables = {}
+
         # create identical data structures
         # user groups must mirror correct_groups
-        # and positions  must reflect order in groups
-
+        # and positions  must reflect order in group
         for groupname in self.correct_groups:
             self.user_groups[groupname] = []
             self.user_positions[groupname] = {'user': []}
@@ -243,7 +248,14 @@ class DragAndDrop(object):
                     self.user_groups[groupname].append(draggable_name)
                     self.user_positions[groupname]['user'].append(
                                             draggable_dict[draggable_name])
+                    check_extra_draggables[draggable_name] = True
+                else:
+                    check_extra_draggables[draggable_name] = \
+                    check_extra_draggables.get(draggable_name, False)
 
+        for draggable in check_extra_draggables:
+            if not check_extra_draggables[draggable]:
+                self.incorrect = True
         # import ipdb; ipdb.set_trace()
 
 
