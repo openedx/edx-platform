@@ -57,7 +57,7 @@ def update_course_updates(location, update, passed_id=None):
     try:
         course_updates = modulestore('direct').get_item(location)
     except ItemNotFoundError:
-        return HttpResponseBadRequest
+        return HttpResponseBadRequest()
     
     # purely to handle free formed updates not done via editor. Actually kills them, but at least doesn't break.
     try:
@@ -95,12 +95,12 @@ def delete_course_update(location, update, passed_id):
     Returns the resulting course_updates b/c their ids change.
     """
     if not passed_id:
-        return HttpResponseBadRequest
+        return HttpResponseBadRequest()
         
     try:
         course_updates = modulestore('direct').get_item(location)
     except ItemNotFoundError:
-        return HttpResponseBadRequest
+        return HttpResponseBadRequest()
     
     # TODO use delete_blank_text parser throughout and cache as a static var in a class
     # purely to handle free formed updates not done via editor. Actually kills them, but at least doesn't break.
