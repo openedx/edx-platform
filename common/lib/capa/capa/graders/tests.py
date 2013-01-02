@@ -77,6 +77,15 @@ class Test_DragAndDrop(unittest.TestCase):
         correct_answer = {'3':   't3', 'name_with_icon': 't2'}
         self.assertFalse(draganddrop.grade(user_input, correct_answer))
 
+    def test_anywhere(self):
+        """Draggables can be places anywhere on base image.
+            Place grass in the middle of the image and ant in the
+            right upper corner."""
+        user_input = '{"use_targets": false, "draggables": \
+        [{"ant":[610.5,57.449951171875]},{"grass":[322.5,199.449951171875]}]}'
+        correct_answer = {'grass':     [[300, 200], 200], 'ant': [[500, 0], 200]}
+        self.assertTrue(draganddrop.grade(user_input, correct_answer))
+
 
 def suite():
 
