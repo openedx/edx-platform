@@ -421,13 +421,6 @@ class CapaModule(XModule):
         new_answers = dict()
         for answer_id in answers:
             try:
-<<<<<<< HEAD
-<<<<<<< HEAD
-                new_answer = {answer_id: self.system.replace_urls(answers[answer_id], self.metadata['data_dir'], course_namespace=self.location)}
-=======
-                new_answer = {answer_id: self.system.replace_urls(answers[answer_id], self.descriptor.data_dir)}
->>>>>>> WIP: Save student state via StudentModule. Inheritance doesn't work
-=======
                 new_answer = {
                     answer_id: self.system.replace_urls(
                         answers[answer_id],
@@ -435,7 +428,6 @@ class CapaModule(XModule):
                         course_namespace=self.location
                     )
                 }
->>>>>>> Fix more errors in tests
             except TypeError:
                 log.debug('Unable to perform URL substitution on answers[%s]: %s' % (answer_id, answers[answer_id]))
                 new_answer = {answer_id: answers[answer_id]}

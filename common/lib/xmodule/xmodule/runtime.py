@@ -116,5 +116,4 @@ class DbModel(MutableMapping):
         fields = [field.name for field in self._module_cls.fields]
         for namespace_name in self._module_cls.namespaces:
             fields.extend(field.name for field in getattr(self._module_cls, namespace_name).fields)
-        print fields
         return fields

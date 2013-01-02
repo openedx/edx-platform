@@ -13,7 +13,7 @@ import time
 import copy
 
 from .model import Scope, ModelType, List, String, Object, Boolean
-from .x_module import Date
+from .fields import Date
 
 log = logging.getLogger(__name__)
 
@@ -99,7 +99,7 @@ class CourseDescriptor(SequenceDescriptor):
     start = Date(help="Start time when this module is visible", scope=Scope.settings)
     end = Date(help="Date that this class ends", scope=Scope.settings)
     advertised_start = Date(help="Date that this course is advertised to start", scope=Scope.settings)
-    grading_policy = Object(help="Grading policy definition for this class", scope=Scope.content)
+    grading_policy = Object(help="Grading policy definition for this class", scope=Scope.content, default={})
     show_calculator = Boolean(help="Whether to show the calculator in this course", default=False, scope=Scope.settings)
     display_name = String(help="Display name for this module", scope=Scope.settings)
     tabs = List(help="List of tabs to enable in this course", scope=Scope.settings)

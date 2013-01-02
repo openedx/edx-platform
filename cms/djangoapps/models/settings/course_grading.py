@@ -2,6 +2,7 @@ from xmodule.modulestore import Location
 from contentstore.utils import get_modulestore
 import re
 from util import converters
+from datetime import timedelta
 
 
 class CourseGradingModel:
@@ -91,7 +92,7 @@ class CourseGradingModel:
         descriptor.raw_grader = graders_parsed
         descriptor.grade_cutoffs = jsondict['grade_cutoffs']
         
-        get_modulestore(course_location).update_item(course_location, descriptor.definition['data'])
+        get_modulestore(course_location).update_item(course_location, descriptor._model_data._kvs._data)
         CourseGradingModel.update_grace_period_from_json(course_location, jsondict['grace_period'])
         
         return CourseGradingModel.fetch(course_location)
@@ -119,7 +120,7 @@ class CourseGradingModel:
         else:
             descriptor.raw_grader.append(grader)
             
-        get_modulestore(course_location).update_item(course_location, descriptor.definition['data'])
+        get_modulestore(course_location).update_item(course_location, descriptor._model_data._kvs._data)
         
         return CourseGradingModel.jsonize_grader(index, descriptor.raw_grader[index])
         
@@ -155,11 +156,17 @@ class CourseGradingModel:
             if 'grace_period' in graceperiodjson:
                 graceperiodjson = graceperiodjson['grace_period']
 
-            grace_rep = " ".join(["%s %s" % (value, key) for (key, value) in graceperiodjson.iteritems()])
+            timedelta_kwargs = dict(
+                (key, float(val))
+                for key, val
+                in graceperiodjson.items()
+                if key in ('days', 'seconds', 'minutes', 'hours')
+            )
+            grace_rep = timedelta(**timedelta_kwargs)
 
             descriptor = get_modulestore(course_location).get_item(course_location)
-            descriptor.metadata['graceperiod'] = grace_rep
-            get_modulestore(course_location).update_metadata(course_location, descriptor.metadata)
+            descriptor.lms.graceperiod = grace_rep
+            get_modulestore(course_location).update_metadata(course_location, descriptor._model_data._kvs._metadata)
         
     @staticmethod
     def delete_grader(course_location, index):
@@ -170,12 +177,12 @@ class CourseGradingModel:
             course_location = Location(course_location)
         
         descriptor = get_modulestore(course_location).get_item(course_location)
-        index = int(index)        
+        index = int(index)
         if index < len(descriptor.raw_grader):
             del descriptor.raw_grader[index]
             # force propagation to definition
             descriptor.raw_grader = descriptor.raw_grader
-            get_modulestore(course_location).update_item(course_location, descriptor.definition['data'])
+            get_modulestore(course_location).update_item(course_location, descriptor._model_data._kvs._data)
         
     # NOTE cannot delete cutoffs. May be useful to reset 
     @staticmethod
@@ -188,7 +195,7 @@ class CourseGradingModel:
         
         descriptor = get_modulestore(course_location).get_item(course_location)
         descriptor.grade_cutoffs = descriptor.defaut_grading_policy['GRADE_CUTOFFS']
-        get_modulestore(course_location).update_item(course_location, descriptor.definition['data'])
+        get_modulestore(course_location).update_item(course_location, descriptor._model_data._kvs._data)
         
         return descriptor.grade_cutoffs
         
@@ -202,7 +209,7 @@ class CourseGradingModel:
             
         descriptor = get_modulestore(course_location).get_item(course_location)
         if 'graceperiod' in descriptor.metadata: del descriptor.metadata['graceperiod']
-        get_modulestore(course_location).update_metadata(course_location, descriptor.metadata)
+        get_modulestore(course_location).update_metadata(course_location, descriptor._model_data._kvs._data)
         
     @staticmethod
     def get_section_grader_type(location):
@@ -240,14 +247,22 @@ class CourseGradingModel:
             hours_from_days = rawgrace.days*24
             seconds = rawgrace.seconds
             hours_from_seconds = int(seconds / 3600)
+            hours = hours_from_days + hours_from_seconds
             seconds -= hours_from_seconds * 3600
             minutes = int(seconds / 60)
             seconds -= minutes * 60
-            return {
-                'hours': hours_from_days + hours_from_seconds,
-                'minutes': minutes,
-                'seconds': seconds,
-            }
+
+            graceperiod = {}
+            if hours > 0:
+                graceperiod['hours'] = str(hours)
+
+            if minutes > 0:
+                graceperiod['minutes'] = str(minutes)
+
+            if seconds > 0:
+                graceperiod['seconds'] = str(seconds)
+
+            return graceperiod
         else:
             return None
 

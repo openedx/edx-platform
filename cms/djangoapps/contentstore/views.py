@@ -410,8 +410,6 @@ def preview_dispatch(request, preview_id, location, dispatch=None):
         log.exception("error processing ajax call")
         raise
 
-    print request.session.items()
-
     return HttpResponse(ajax_return)
 
 
@@ -634,8 +632,6 @@ def save_item(request):
             if metadata_key in existing_item.system_metadata_fields:
                 del posted_metadata[metadata_key]
             elif posted_metadata[metadata_key] is None:
-                print "DELETING", metadata_key, value
-                print metadata_key in existing_item._model_data
                 # remove both from passed in collection as well as the collection read in from the modulestore
                 if metadata_key in existing_item._model_data:
                     del existing_item._model_data[metadata_key]
@@ -645,7 +641,6 @@ def save_item(request):
 
         # commit to datastore
         # TODO (cpennington): This really shouldn't have to do this much reaching in to get the metadata
-        print existing_item._model_data._kvs._metadata
         store.update_metadata(item_location, existing_item._model_data._kvs._metadata)
 
     return HttpResponse()
@@ -1231,7 +1226,7 @@ def initialize_course_tabs(course):
         {"type": "wiki", "name": "Wiki"},
         {"type": "progress", "name": "Progress"}]
 
-    modulestore('direct').update_metadata(course.location.url(), own_metadata(new_course))
+    modulestore('direct').update_metadata(course.location.url(), own_metadata(course))
 
 @ensure_csrf_cookie
 @login_required

@@ -20,6 +20,7 @@ from . import ModuleStoreBase, Location
 from .draft import DraftModuleStore
 from .exceptions import (ItemNotFoundError,
                          DuplicateItemError)
+from .inheritance import own_metadata
 
 
 log = logging.getLogger(__name__)
@@ -40,7 +41,6 @@ class MongoKeyValueStore(KeyValueStore):
         self._metadata = metadata
 
     def get(self, key):
-        print "GET", key
         if key.field_name == 'children':
             return self._children
         elif key.scope == Scope.settings:
@@ -54,7 +54,6 @@ class MongoKeyValueStore(KeyValueStore):
             raise InvalidScopeError(key.scope)
 
     def set(self, key, value):
-        print "SET", key, value
         if key.field_name == 'children':
             self._children = value
         elif key.scope == Scope.settings:
@@ -68,7 +67,6 @@ class MongoKeyValueStore(KeyValueStore):
             raise InvalidScopeError(key.scope)
 
     def delete(self, key):
-        print "DELETE", key
         if key.field_name == 'children':
             self._children = []
         elif key.scope == Scope.settings:
@@ -457,6 +455,7 @@ class MongoModuleStore(ModuleStoreBase):
                     tab['name'] = metadata.get('display_name')
                     break
             course.tabs = existing_tabs
+            self.update_metadata(course.location, own_metadata(course))
 
         self._update_single_item(location, {'metadata': metadata})
 
@@ -474,7 +473,7 @@ class MongoModuleStore(ModuleStoreBase):
             course = self.get_course_for_item(item.location)
             existing_tabs = course.tabs or []
             course.tabs = [tab for tab in existing_tabs if tab.get('url_slug') != location.name]
-            self.update_metadata(course.location, course.metadata)
+            self.update_metadata(course.location, own_metadata(course))
 
         self.collection.remove({'_id': Location(location).dict()})
 

@@ -40,22 +40,24 @@ def clone_course(modulestore, contentstore, source_location, dest_location, dele
 
     print "Cloning module {0} to {1}....".format(original_loc, module.location)
 
-    if 'data' in module.definition:
-      modulestore.update_item(module.location, module.definition['data'])
+    modulestore.update_item(module.location, module._model_data._kvs._data)
 
     # repoint children
-    if 'children' in module.definition:
+    if module.has_children:
       new_children = []
-      for child_loc_url in module.definition['children']:
+      for child_loc_url in module.children:
         child_loc = Location(child_loc_url)
-        child_loc = child_loc._replace(tag = dest_location.tag, org = dest_location.org, 
-        course = dest_location.course)
-        new_children = new_children + [child_loc.url()]
+        child_loc = child_loc._replace(
+          tag = dest_location.tag,
+          org = dest_location.org,
+          course = dest_location.course
+        )
+        new_children.append(child_loc.url())
 
       modulestore.update_children(module.location, new_children)
 
     # save metadata
-    modulestore.update_metadata(module.location, module.metadata)
+    modulestore.update_metadata(module.location, module._model_data._kvs._metadata)
 
   # now iterate through all of the assets and clone them
   # first the thumbnails

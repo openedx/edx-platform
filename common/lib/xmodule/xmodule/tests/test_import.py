@@ -271,8 +271,8 @@ class ImportTestCase(unittest.TestCase):
         location = Location(["i4x", "edX", "toy", "video", "Welcome"])
         toy_video = modulestore.get_instance(toy_id, location)
         two_toy_video =  modulestore.get_instance(two_toy_id, location)
-        self.assertEqual(toy_video.youtube, "1.0:p2Q6BrNhdh8")
-        self.assertEqual(two_toy_video.youtube, "1.0:p2Q6BrNhdh9")
+        self.assertEqual(etree.fromstring(toy_video.data).get('youtube'), "1.0:p2Q6BrNhdh8")
+        self.assertEqual(etree.fromstring(two_toy_video.data).get('youtube'), "1.0:p2Q6BrNhdh9")
 
 
     def test_colon_in_url_name(self):
