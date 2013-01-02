@@ -8,7 +8,7 @@ class DateTuple(ModelType):
     ModelType that stores datetime objects as time tuples
     """
     def from_json(self, value):
-        return datetime.datetime(*value)
+        return datetime.datetime(*value[0:6])
 
     def to_json(self, value):
         return list(value.timetuple())
