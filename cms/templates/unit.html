@@ -54,9 +54,6 @@
   </script>
 
   <script src="/static/js/speed-editor.js"></script>
-  <script src="/static/js/html-editor.js"></script>
-  <script src="/static/js/tiny_mce/tiny_mce.js"></script>
-  <script src="/static/js/tiny_mce/jquery.tinymce.js"></script>
 
   <script type="text/template" id="asset-library-widget">
     <article class="asset-library widget">
@@ -342,124 +339,6 @@
       <a href="#" class="delete-button"><span class="delete-icon white"></span>Delete</a>
     </div>
     <a href="#" class="drag-handle"></a>
-  </script>
-
-  <script type="text/template" id="problem-editor">
-    <div class="problem-editor editor">
-      <div class="row">
-        <div class="editor-bar">
-          <ul class="format-buttons">
-            <li><a href="#" class="multiple-choice-button" data-tooltip="Multiple Choice"><span class="problem-editor-icon multiple-choice"></span></a></li>
-            <li><a href="#" class="checks-button" data-tooltip="Check Multiple"><span class="problem-editor-icon checks"></span></a></li>
-            <li><a href="#" class="string-button" data-tooltip="String Response"><span class="problem-editor-icon string"></span></a></li>
-            <li><a href="#" class="number-button" data-tooltip="Numerical Response"><span class="problem-editor-icon number"></span></a></li>
-            <li><a href="#" class="dropdown-button" data-tooltip="Dropdown"><span class="problem-editor-icon dropdown"></span></a></li>
-          </ul>
-          <ul class="editor-tabs">
-            <li><a href="#" class="simple-tab tab current" data-tab="simple">Simple</a></li>
-            <li><a href="#" class="xml-tab tab" data-tab="xml">XML</a></li>
-            <li><a href="#" class="cheatsheet-toggle" data-tooltip="Toggle Cheatsheet">?</a></li>
-          </ul>
-        </div>
-        <textarea class="edit-box"></textarea>
-        <textarea class="xml-box"></textarea>
-      </div>
-      <div class="row">
-        <div class="problem-settings">
-          <div class="row">
-            <label>Show Answer:</label>
-            <select>
-              <option>attempted</option>
-              <option>always</option>
-              <option>never</option>
-              <option>closed</option>
-            </select>
-          </div>
-          <div class="row">
-            <label>Rerandomize:</label>
-            <select>
-              <option>always</option>
-              <option>never</option>
-              <option>per_student</option>
-            </select>
-          </div>
-        </div>
-        <a href="#" class="problem-settings-button"><span class="settings-icon"></span><span class="button-label">Show Advanced Settings</span></a>
-      </div>
-      <div class="row">
-        <a href="#" class="save-button">Save</a><a href="#" class="cancel-button">Cancel</a>
-      </div>
-    </div>    
-  </script>
-
-  <script type="text/template" id="problem-preview">
-    <section class="xmodule_display xmodule_CapaModule" data-type="Problem">
-      <section id="problem_i4x-Giannattasio-313-problem-9e62f3fb1fa14ba6a671b3de73c02eab" class="problems-wrapper" data-problem-id="i4x://Giannattasio/313/problem/9e62f3fb1fa14ba6a671b3de73c02eab" data-url="/preview/modx/0/i4x://Giannattasio/313/problem/9e62f3fb1fa14ba6a671b3de73c02eab">
-
-        <section class="problem"></section>
-
-        <section class="action">
-          <input type="hidden" name="problem_id" value="Option Response">
-          <input class="check Check" type="button" value="Check">
-          <input class="show" type="button" value="Show Answer">
-        </section>
-      </section>
-    </section>
-  </script>
-
-  <script type="text/template" id="html-editor">
-    <div class="html-editor editor">
-      <ul class="editor-tabs">
-        <li><a href="#" class="visual-tab tab current" data-tab="visual">Visual</a></li>
-        <li><a href="#" class="html-tab tab" data-tab="html">HTML</a></li>
-      </ul>
-      <div class="row">
-        <textarea class="edit-box tinymce"></textarea>
-        <textarea class="html-box"></textarea>
-      </div>      
-      <div class="row">
-        <a href="#" class="save-button">Save</a><a href="#" class="cancel-button">Cancel</a>
-      </div>
-    </div>    
-  </script>
-
-  <script type="text/template" id="discussion-editor">
-    <div class="discussion-editor editor">
-      <div class="row">
-        <label>Category Name:</label>
-        <input type="text" value="Discussion Topic" class="discussion-id-field">
-      </div>     
-      <div class="row">
-        <a href="#" class="save-button">Save</a><a href="#" class="cancel-button">Cancel</a>
-      </div>
-    </div>
-  </script>
-
-  <script type="text/template" id="discussion-preview">
-    <div class="discussion-preview">
-      <div class="discussion-module" data-discussion-id="">
-        <a class="discussion-show control-button" href="#" data-discussion-id=""><span class="show-hide-discussion-icon"></span><span class="button-text">Show Discussion</span></a>
-        <a href="#" class="new-post-btn"><span class="new-post-icon"></span>New Post</a>
-      </div>
-    </div>
-  </script>
-
-  <script type="text/template" id="video-editor">
-    <div class="video-editor editor">
-      <div class="row">
-        <label>YouTube ID(s):</label>
-        <input type="text" value="0.75:JMD_ifUUfsU,1.0:OEoXaMPEzfM,1.25:AKqURZnYqpk,1.50:DYpADpL7jAY" class="video-id-field">
-        <a href="#" class="browse-button">Browse…</a>
-      </div>
-      <div class="row">
-        <label>Transcript:</label>
-        <input type="text" class="transcript-field">
-        <a href="#" class="browse-button">Browse…</a>
-      </div>
-      <div class="row">
-        <a href="#" class="save-button">Save</a><a href="#" class="cancel-button">Cancel</a>
-      </div>
-    </div>
   </script>
 
   <script type="text/template" id="video-preview">

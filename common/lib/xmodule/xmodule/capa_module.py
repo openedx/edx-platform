@@ -650,6 +650,7 @@ class CapaDescriptor(RawDescriptor):
     stores_state = True
     has_score = True
     template_dir_name = 'problem'
+    mako_template = "widgets/problem-edit.html"
 
     # Capa modules have some additional metadata:
     # TODO (vshnayder): do problems have any other metadata?  Do they
