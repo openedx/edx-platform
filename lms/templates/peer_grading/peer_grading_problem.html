@@ -17,7 +17,7 @@
 
 
 <section class="container">
-    <div class="peer-grading" data-ajax_url="${ajax_url}" location="${problem_location}">
+    <div class="peer-grading" data-ajax_url="${ajax_url}" data-location="${problem_location}">
         <div class="error-container"></div>
         <div class="message-container"></div>
 
@@ -53,6 +53,8 @@
             <h3></h3>
             <div class="submission-container">
             </div>
+            <input type="hidden" name="submission-key" value="" />
+            <input type="hidden" name="essay-id" value="" />
         </div>
         <div class="evaluation">
           <p class="score-selection-container">
