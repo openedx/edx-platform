@@ -614,6 +614,8 @@ def begin_test_registration(request, course_id, form=None, message=''):
         registration = registrations[0]
     else:
         registration = None
+
+    log.info("User {0} enrolled in course {1} calls for test registration page".format(user.username, course_id))
         
     # we want to populate the registration page with the relevant information,
     # if it already exists.  Create an empty object otherwise.
@@ -654,44 +656,31 @@ def create_test_registration(request, post_override=None):
     user = User.objects.get(username=username)
     course_id = post_vars['course_id']
     course = (course_from_id(course_id))  # assume it will be found....
+    log.info("User {0} enrolled in course {1} clicked on enter/update demographic info for test registration".format(user.username, course_id))
         
-#    needs_saving = False
     try:
         testcenter_user = TestCenterUser.objects.get(user=user)
     except TestCenterUser.DoesNotExist:
-        testcenter_user = TestCenterUser(user=user)
+        # do additional initialization here:
+        testcenter_user = TestCenterUser.create(user)
 
     needs_updating = testcenter_user.needs_update(post_vars)    
-#        if needs_updating:
-#            testcenter_user.update(post_vars)
-#            needs_saving = True
-        
- #   except TestCenterUser.DoesNotExist:
-        # did not find the TestCenterUser, so create a new one 
-#        testcenter_user = TestCenterUser.create(user, post_vars)
-#        needs_saving = True
 
     # perform validation:
     if needs_updating:
+        log.info("User {0} enrolled in course {1} updating demographic info for test registration".format(user.username, course_id))
         try:
             # first perform validation on the user information 
             # using a Django Form.
             form = TestCenterUserForm(instance=testcenter_user, data=post_vars)
             if not form.is_valid():
-                return begin_test_registration(request, course_id, form, 'failed to validate')
-#                response_data = {'success': False}
-#                # return a list of errors...
-#                response_data['field_errors'] = form.errors
-#                response_data['non_field_errors'] = form.non_field_errors()
-#                return HttpResponse(json.dumps(response_data))
-        
-            new_user = form.save(commit=False)
-            # create additional values here:
-            new_user.user_updated_at = datetime.datetime.now()
-            # TODO: create client value....
-            new_user.save()
-                
-            # testcenter_user.save()
+#                return begin_test_registration(request, course_id, form, 'failed to validate')
+                response_data = {'success': False}
+                # return a list of errors...
+                response_data['field_errors'] = form.errors
+                response_data['non_field_errors'] = form.non_field_errors()
+                return HttpResponse(json.dumps(response_data), mimetype="application/json")
+            form.update_and_save()
         except IntegrityError, ie:
             js = {'success': False}
             error_msg = unicode(ie);
@@ -700,15 +689,16 @@ def create_test_registration(request, post_override=None):
                 if error_msg.find(fieldname) >= 0: 
                     js['value'] = error_msg
                     js['field'] = fieldname
-                    return HttpResponse(json.dumps(js))
+                    return HttpResponse(json.dumps(js), mimetype="application/json")
             # otherwise just return the error message        
             js['value'] = error_msg
             js['field'] = "General Error"
-            return HttpResponse(json.dumps(js))
+            return HttpResponse(json.dumps(js), mimetype="application/json")
             
     # create and save the registration:
     needs_saving = False
-    registrations = get_testcenter_registrations_for_user_and_course(user, course.id)
+    exam_info = course.testcenter_info
+    registrations = get_testcenter_registrations_for_user_and_course(user, course_id)
     # In future, this should check the exam series code of the registrations, if there
     # were multiple.
     if len(registrations) > 0:
@@ -719,15 +709,8 @@ def create_test_registration(request, post_override=None):
         # right now.
         
     else:
-        registration = TestCenterRegistration(testcenter_user = testcenter_user)
-        registration.course_id = post_vars['course_id']
-        registration.accommodation_request = post_vars.get('accommodations','')
-        exam_info = course.testcenter_info
-        registration.exam_series_code = exam_info.get('Exam_Series_Code')
-        registration.eligibility_appointment_date_first = exam_info.get('First_Eligible_Appointment_Date')
-        registration.eligibility_appointment_date_last = exam_info.get('Last_Eligible_Appointment_Date')
-        # accommodation_code remains blank for now, along with Pearson confirmation
-        registration.user_updated_at = datetime.datetime.now()
+        accommodation_request = post_vars.get('accommodations','')
+        registration = TestCenterRegistration.create(testcenter_user, course_id, exam_info, accommodation_request)
         needs_saving = True
         
     # "client_authorization_id" is the client's unique identifier for the authorization.  
@@ -790,14 +773,17 @@ def create_test_registration(request, post_override=None):
         except:
             log.exception(sys.exc_info())
             js['value'] = 'Could not send accommodation e-mail.'
-            return HttpResponse(json.dumps(js))
+            return HttpResponse(json.dumps(js), mimetype="application/json")
 
     # TODO: enable appropriate stat
     # statsd.increment("common.student.account_created")
 
-#    js = {'success': True}
-#    return HttpResponse(json.dumps(js), mimetype="application/json")
-    return HttpResponseRedirect(reverse('dashboard'))
+    log.info("User {0} enrolled in course {1} returning from enter/update demographic info for test registration".format(user.username, course_id))
+
+    js = {'success': True}
+    return HttpResponse(json.dumps(js), mimetype="application/json")
+#    return HttpResponseRedirect(reverse('dashboard'))
+    #return HttpResponse("Hello world")
 
 
 def get_random_post_override():

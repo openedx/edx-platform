@@ -10,7 +10,7 @@
 <%namespace name='static' file='static_content.html'/>
 
 <%block name="title"><title>Pearson VUE Test Center Proctoring - Sign Up</title></%block>
-<%doc>
+
 <%block name="js_extra">
   <script type="text/javascript">
   (function() {
@@ -19,9 +19,20 @@
       if(json.success) {
         location.href="${reverse('dashboard')}";
       } else {
-        $(".field.error").removeClass('error');
+          var field_errors = json.field_errors;
+          var non_field_errors = json.non_field_errors;
+          var fieldname;
+          var field_errorlist;
+          var field_error;
+          $(".field.error").removeClass('error');
+          for (fieldname in field_errors) {
+              field_errorlist = field_errors[fieldname];      
+              for (i=0; i < field_errorlist.length; i+= 1) {
+                  field_error = field_errorlist[i];
+              }
+              $("[data-field='"+fieldname+"']").addClass('error')
+          }
         $('#register_error').html(json.value).stop().css("display", "block");
-        $("[data-field='"+json.field+"']").addClass('error')
       }
     });
 
@@ -31,11 +42,20 @@
       $("label").removeClass("is-focused");
     });
 
+    $(document).delegate('#testcenter_register_form', 'ajax:success', function(data, json, xhr) {
+      if(json.success) {
+        location.href="${reverse('dashboard')}";
+      } else {
+        if($('#testcenter_register_error').length == 0) {
+          $('#testcenter_register_form').prepend('<div id="testcenter_register_error" class="modal-form-error"></div>');
+        }
+        $('#testcenter_register_error').text(json.field_errors).stop().css("display", "block");
+      }
+    });
+
   })(this)
   </script>
 </%block>
-</%doc>
-
 
 <section class="testcenter-register container">    
   
@@ -80,7 +100,7 @@
     <header>
       <h3 class="is-hidden">Registration Form</h3>
     </header>      
-    <form id="testcenter-register-form" method="post" data-remote="true" action="/create_test_registration">
+    <form id="testcenter_register_form" method="post" data-remote="true" action="/create_test_registration">
       
       % if registration:
       <p class="instructions">
@@ -103,11 +123,11 @@
           
           <ol class="list-input">
             <li class="field">
-              <label for="id-salutation">Salutation:</label>
+              <label for="id_salutation">Salutation:</label>
  	         	${form['salutation']}
             </li>
             <li class="field required">
-              <label for="id-first_name">First Name:</label>
+              <label for="id_first_name">First Name:</label>
  	         	${form['first_name']}
             </li>
 <!--            <li class="field">
@@ -153,19 +173,19 @@
               </div>
             </li>            
             <li class="field-group postal">
-              <div class="field">
+              <div data-field="city" class="field">
                 <label for="city">City</label>
                 <input id="city" class="short" type="text" name="city" value="${testcenteruser.city}" placeholder="e.g. Newark" />
               </div>
-              <div class="field">
+              <div data-field="state" class="field">
                 <label for="state">State/Province</label>
                 <input id="state" class="short" type="text" name="state" value="${testcenteruser.state}" placeholder="e.g. NJ" />
               </div>
-              <div class="field">
+              <div data-field="postal_code" class="field">
                 <label for="postal-code">Postal Code</label>
                 <input id="postal-code" class="short" type="text" name="postal_code" value="${testcenteruser.postal_code}" placeholder="e.g. 08540" />
               </div>
-              <div class="field required">
+              <div data-field="country" class="field required">
                 <label class="short" for="country-code">Country Code</label>
                 <input id="country-code" class="short" type="text" name="country" value="${testcenteruser.country}" placeholder="e.g. USA" />
               </div>

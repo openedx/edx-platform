@@ -217,20 +217,26 @@ class TestCenterUser(models.Model):
             
         return False    
                               
-    def update(self, dict):
-        # leave user and client_candidate_id as before
-        self.user_updated_at = datetime.now()
-        for fieldname in TestCenterUser.user_provided_fields():
-            self.__setattr__(fieldname, dict[fieldname])
+#    def update(self, dict):
+#        # leave user and client_candidate_id as before
+#        self.user_updated_at = datetime.now()
+#        for fieldname in TestCenterUser.user_provided_fields():
+#            self.__setattr__(fieldname, dict[fieldname])
 
-    @staticmethod
-    def create(user, dict):
-        testcenter_user = TestCenterUser(user=user)
-        testcenter_user.update(dict)
-        # testcenter_user.candidate_id remains unset    
-        # TODO: assign an ID of our own:
-        testcenter_user.client_candidate_id = 'edx' + '123456'  # some unique value  
+#    @staticmethod
+#    def create(user, dict):
+#        testcenter_user = TestCenterUser(user=user)
+#        testcenter_user.update(dict)
+#        # testcenter_user.candidate_id remains unset    
+#        # TODO: assign an ID of our own:
+#        testcenter_user.client_candidate_id = 'edx' + unique_id_for_user(user)  # some unique value  
         
+    @staticmethod
+    def create(user):
+        testcenter_user = TestCenterUser(user=user)
+        # testcenter_user.candidate_id remains unset    
+        # assign an ID of our own:
+        testcenter_user.client_candidate_id = 'edx' + unique_id_for_user(user)  # some unique value  
 
 class TestCenterUserForm(ModelForm):
     class Meta:
@@ -239,8 +245,11 @@ class TestCenterUserForm(ModelForm):
                 'address_1', 'address_2', 'address_3', 'city', 'state', 'postal_code', 'country', 
                 'phone', 'extension', 'phone_country_code', 'fax', 'fax_country_code', 'company_name')
         
-        
-        
+    def update_and_save(self):
+        new_user = self.save(commit=False)
+        # create additional values here:
+        new_user.user_updated_at = datetime.now()
+        new_user.save()
         
         
    
@@ -286,7 +295,7 @@ class TestCenterRegistration(models.Model):
     user_updated_at = models.DateTimeField(db_index=True)
     # "client_authorization_id" is the client's unique identifier for the authorization.  
     # This must be present for an update or delete to be sent to Pearson.
-    # client_authorization_id = models.CharField(max_length=20, unique=True, db_index=True)
+    #client_authorization_id = models.CharField(max_length=20, unique=True, db_index=True)
 
     # information about the test, from the course policy:
     exam_series_code = models.CharField(max_length=15, db_index=True)
@@ -312,24 +321,50 @@ class TestCenterRegistration(models.Model):
     def client_candidate_id(self):
         return self.testcenter_user.client_candidate_id
     
-    @property
-    def client_authorization_id(self):
-        # TODO: make this explicitly into a string object:
-        return self.id
+    @staticmethod
+    def create(testcenter_user, course_id, exam_info, accommodation_request):
+        registration = TestCenterRegistration(testcenter_user = testcenter_user)
+        registration.course_id = course_id
+        registration.accommodation_request = accommodation_request
+        registration.exam_series_code = exam_info.get('Exam_Series_Code')
+        registration.eligibility_appointment_date_first = exam_info.get('First_Eligible_Appointment_Date')
+        registration.eligibility_appointment_date_last = exam_info.get('Last_Eligible_Appointment_Date')
+        # accommodation_code remains blank for now, along with Pearson confirmation
+        registration.user_updated_at = datetime.now()
+        #registration.client_authorization_id = registration._create_client_authorization_id()
+        return registration
+    
+    def _create_client_authorization_id(self):
+        """
+        Return a unique id for a registration, suitable for inserting into
+        e.g. personalized survey links.
+        """
+        # include the secret key as a salt, and to make the ids unique across
+        # different LMS installs.  Then add in (user, course, exam), which should 
+        # be unique.  
+        h = hashlib.md5()
+        h.update(settings.SECRET_KEY)
+        h.update(str(self.testcenter_user.user.id))
+        h.update(str(self.course_id))
+        h.update(str(self.exam_series_code))
+        return h.hexdigest()
 
-def get_testcenter_registrations_for_user_and_course(user, course_id):
+def get_testcenter_registrations_for_user_and_course(user, course_id, exam_series_code=None):
     try:
         tcu = TestCenterUser.objects.get(user=user)
     except TestCenterUser.DoesNotExist:
         return []
-    return TestCenterRegistration.objects.filter(testcenter_user=tcu, course_id=course_id)
-    
+    if exam_series_code is None:
+        return TestCenterRegistration.objects.filter(testcenter_user=tcu, course_id=course_id)
+    else:
+        return TestCenterRegistration.objects.filter(testcenter_user=tcu, course_id=course_id, exam_series_code=exam_series_code)
+        
 def unique_id_for_user(user):
     """
     Return a unique id for a user, suitable for inserting into
     e.g. personalized survey links.
     """
-    # include the secret key as a salt, and to make the ids unique accross
+    # include the secret key as a salt, and to make the ids unique across
     # different LMS installs.    
     h = hashlib.md5()
     h.update(settings.SECRET_KEY)
