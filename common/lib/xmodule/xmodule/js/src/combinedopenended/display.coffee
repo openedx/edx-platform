@@ -129,7 +129,7 @@ class @CombinedOpenEnded
           @rubric_wrapper.html('')
           @hint_wrapper.html('')
           @message_wrapper.html('')
-          @state = 'initial'
+          @child_state = 'initial'
           @rebind()
           @reset_button.hide()
         else
