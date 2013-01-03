@@ -105,7 +105,9 @@ define(['logme'], function (logme) {
             '<div ' +
                 'style=" ' +
                     'width: 20000px; ' +
-                    'height: 102px; ' +
+                    'height: 100px; ' +
+                    'border-top: 1px solid #CCC; ' +
+                    'border-bottom: 1px solid #CCC; ' +
                 '" ' +
             '></div>'
         );
@@ -158,7 +160,7 @@ define(['logme'], function (logme) {
 
             // When there are no more hidden draggables, prevent from
             // scrolling infinitely.
-            if (showElLeftMargin < -102 * (state.sliderEl.children().length - 6)) {
+            if (showElLeftMargin < -102 * (state.numDraggablesInSlider - 6)) {
                 return;
             }
 
@@ -192,7 +194,7 @@ define(['logme'], function (logme) {
             moveLeftEl.children('div').css('opacity', '1');
             moveRightEl.children('div').css('opacity', '1');
 
-            if (showElLeftMargin < -102 * (state.sliderEl.children().length - 6)) {
+            if (showElLeftMargin < -102 * (state.numDraggablesInSlider - 6)) {
                 moveRightEl.children('div').css('opacity', '.4');
             }
             if (showElLeftMargin > -102) {

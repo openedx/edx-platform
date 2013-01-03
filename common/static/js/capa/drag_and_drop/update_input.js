@@ -75,7 +75,12 @@ define(['logme'], function (logme) {
 
         function repositionDraggables(answer) {
             var draggableId, draggable, targetId, target, draggablePosition,
-                c1;
+                c1, offset;
+
+            offset = 0;
+            if (state.config.targetOutline === true) {
+                offset = 1;
+            }
 
             logme(answer);
 
@@ -98,22 +103,47 @@ define(['logme'], function (logme) {
                             continue;
                         }
 
+                        (function (c1, draggableId, draggable) {
+                            moveDraggableToBaseImage();
+                            return;
 
-                        draggable.setInContainer(false);
+                            function moveDraggableToBaseImage() {
+                                if (draggable.hasLoaded === false) {
+                                    setTimeout(moveDraggableToBaseImage, 50);
+                                    return;
+                                }
 
-                        draggable.el.detach();
-                        draggable.el.css('border', 'none');
-                        draggable.el.css('position', 'absolute');
-                        draggable.el.css('left', answer.draggables[c1][draggableId][0] - 50);
-                        draggable.el.css('top', answer.draggables[c1][draggableId][1] - 50);
+                                draggable.setInContainer(false);
+                                draggable.containerEl.hide();
 
-                        draggable.el.css('left', target.offset.left + 0.5 * target.w - 50);
-                        draggable.el.css('top', target.offset.top + 0.5 * target.h - 50);
+                                draggable.iconEl.detach();
 
-                        draggable.el.appendTo(state.baseImageEl.parent());
+                                draggable.iconEl.css('width', draggable.iconWidth);
+                                draggable.iconEl.css('height', draggable.iconHeight);
+                                draggable.iconEl.css(
+                                    'left',
+                                    target.offset.left + 0.5 * target.w - draggable.iconWidth * 0.5 + offset
+                                );
+                                draggable.iconEl.css(
+                                    'top',
+                                    target.offset.top + 0.5 * target.h - draggable.iconHeight * 0.5 + offset
+                                );
 
-                        draggable.setOnTarget(target);
-                        target.draggable.push(draggableId);
+                                draggable.iconEl.appendTo(state.baseImageEl.parent());
+
+                                if (draggable.labelEl !== null) {
+                                    draggable.labelEl.detach();
+
+                                    draggable.labelEl.css('left', target.offset.left + 0.5 * target.w - draggable.labelWidth * 0.5 + offset);
+                                    draggable.labelEl.css('top', target.offset.top + 0.5 * target.h + draggable.iconHeight * 0.5 + 5 + offset);
+
+                                    draggable.labelEl.appendTo(state.baseImageEl.parent());
+                                }
+
+                                draggable.setOnTarget(target);
+                                target.draggable.push(draggableId);
+                            }
+                        }(c1, draggableId, draggable));
                     }
                 }
             } else if (
@@ -128,17 +158,47 @@ define(['logme'], function (logme) {
                             continue;
                         }
 
-                        draggable.setInContainer(false);
+                        (function (c1, draggableId, draggable) {
+                            moveDraggableToBaseImage();
+                            return;
 
-                        draggable.el.detach();
-                        draggable.el.css('border', 'none');
-                        draggable.el.css('position', 'absolute');
-                        draggable.el.css('left', answer.draggables[c1][draggableId][0] - 50);
-                        draggable.el.css('top', answer.draggables[c1][draggableId][1] - 50);
-                        draggable.el.appendTo(state.baseImageEl.parent());
+                            function moveDraggableToBaseImage() {
+                                if (draggable.hasLoaded === false) {
+                                    setTimeout(moveDraggableToBaseImage, 50);
+                                    return;
+                                }
 
-                        draggable.x = answer.draggables[c1][draggableId][0];
-                        draggable.y = answer.draggables[c1][draggableId][1];
+                                draggable.setInContainer(false);
+                                draggable.containerEl.hide();
+
+                                draggable.iconEl.detach();
+
+                                draggable.iconEl.css('width', draggable.iconWidth);
+                                draggable.iconEl.css('height', draggable.iconHeight);
+                                draggable.iconEl.css(
+                                    'left',
+                                    answer.draggables[c1][draggableId][0] - draggable.iconWidth * 0.5 + offset
+                                );
+                                draggable.iconEl.css(
+                                    'top',
+                                    answer.draggables[c1][draggableId][0] - draggable.iconHeight * 0.5 + offset
+                                );
+
+                                draggable.iconEl.appendTo(state.baseImageEl.parent());
+
+                                if (draggable.labelEl !== null) {
+                                    draggable.labelEl.detach();
+
+                                    draggable.labelEl.css('left', answer.draggables[c1][draggableId][0] - draggable.iconWidth * 0.5 - draggable.labelWidth * 0.5 + offset);
+                                    draggable.labelEl.css('top', answer.draggables[c1][draggableId][0] - draggable.iconHeight * 0.5 + draggable.iconHeight + 5 + offset);
+
+                                    draggable.labelEl.appendTo(state.baseImageEl.parent());
+                                }
+
+                                draggable.x = answer.draggables[c1][draggableId][0];
+                                draggable.y = answer.draggables[c1][draggableId][1];
+                            }
+                        }(c1, draggableId, draggable));
                     }
                 }
             } else {
@@ -147,6 +207,7 @@ define(['logme'], function (logme) {
                 return;
             }
 
+            state.numDraggablesInSlider -= 1;
             state.updateArrowOpacity();
         }
 

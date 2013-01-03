@@ -14,7 +14,9 @@ define([], function () {
             // Will indicate when all targetsand draggables have been loaded,
             // processed, and postioned intially.
             'targetsLoaded': false,
-            'draggablesLoaded': false
+            'draggablesLoaded': false,
+
+            'numDraggablesInSlider': 0
         };
     }
 });

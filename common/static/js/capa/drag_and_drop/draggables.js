@@ -11,11 +11,13 @@ define(['logme', 'update_input'], function (logme, updateInput) {
         var c1;
 
         state.draggables = [];
+        state.numDraggablesInSlider = 0;
 
         for (c1 = 0; c1 < state.config.draggables.length; c1 += 1) {
             processDraggable(state.config.draggables[c1], c1 + 1);
         }
 
+        state.updateArrowOpacity();
         state.currentMovingDraggable = null;
 
         $(document).mousemove(function (event) {
@@ -34,17 +36,35 @@ define(['logme', 'update_input'], function (logme, updateInput) {
                         state.baseImageEl.offset().top -
                         state.currentMovingDraggable.iconHeight * 0.5
                 );
+
+                if (state.currentMovingDraggable.labelEl !== null) {
+                    state.currentMovingDraggable.labelEl.css(
+                        'top',
+                        event.pageY -
+                            state.baseImageEl.offset().top +
+                            state.currentMovingDraggable.iconHeight * 0.5 +
+                            5
+                    );
+                    state.currentMovingDraggable.labelEl.css(
+                        'left',
+                        event.pageX -
+                            state.baseImageEl.offset().left -
+                            state.currentMovingDraggable.labelWidth * 0.5
+                    );
+                }
             }
         });
 
         return;
 
         function processDraggable(obj, objIndex) {
-            var inContainer, mousePressed, onTarget, draggableObj, marginCss;
+            var inContainer, mousePressed, onTarget, draggableObj;
 
-            draggableObj = {};
-
-            draggableObj.zIndex = objIndex;
+            draggableObj = {
+                'zIndex': objIndex,
+                'labelEl': null,
+                'hasLoaded': false
+            };
 
             draggableObj.containerEl = $(
                 '<div ' +
@@ -55,15 +75,19 @@ define(['logme', 'update_input'], function (logme, updateInput) {
                         'float: left; ' +
                         'overflow: hidden; ' +
                         'z-index: ' + objIndex + '; ' +
-                        'border: 1px solid #CCC; ' +
+                        'border-left: 1px solid #CCC; ' +
+                        'border-right: 1px solid #CCC; ' +
                         'text-align: center; ' +
                         'position: relative; ' +
                     '" ' +
                     '></div>'
             );
+
             draggableObj.containerEl.appendTo(state.sliderEl);
 
             if (obj.icon.length > 0) {
+                draggableObj.hasIcon = true;
+
                 draggableObj.iconEl = $('<img />');
                 draggableObj.iconEl.attr(
                     'src',
@@ -73,32 +97,90 @@ define(['logme', 'update_input'], function (logme, updateInput) {
                     draggableObj.iconWidth = this.width;
                     draggableObj.iconHeight = this.height;
 
+                    if (draggableObj.iconWidth >= draggableObj.iconHeight) {
+                        draggableObj.iconWidthSmall = 60;
+                        draggableObj.iconHeightSmall = draggableObj.iconWidthSmall * (draggableObj.iconHeight / draggableObj.iconWidth);
+                    } else {
+                        draggableObj.iconHeightSmall = 60;
+                        draggableObj.iconWidthSmall = draggableObj.iconHeightSmall * (draggableObj.iconWidth / draggableObj.iconHeight);
+                    }
+
                     draggableObj.iconEl.css('position', 'absolute');
-                    draggableObj.iconEl.css('top', (50 - this.height * 0.5) + 'px');
-                    draggableObj.iconEl.css('left', (50 - this.width * 0.5) + 'px');
+
+                    draggableObj.iconEl.css('width', draggableObj.iconWidthSmall);
+                    draggableObj.iconEl.css('height', draggableObj.iconHeightSmall);
+
+                    draggableObj.iconEl.css('left', 50 - draggableObj.iconWidthSmall * 0.5);
+
+                    if (obj.label.length > 0) {
+                        draggableObj.iconEl.css('top', 5);
+                    } else {
+                        draggableObj.iconEl.css('top', 50 - draggableObj.iconHeightSmall * 0.5);
+                    }
 
                     draggableObj.iconEl.appendTo(draggableObj.containerEl);
-                });
 
-                draggableObj.iconEl.mousedown(mouseDown);
-                draggableObj.iconEl.mouseup(mouseUp);
-                draggableObj.iconEl.mousemove(mouseMove);
+                    if (obj.label.length > 0) {
+                        draggableObj.labelEl = $(
+                            '<div ' +
+                                'style=" ' +
+                                    'position: absolute; ' +
+                                '" ' +
+                            '>' +
+                                obj.label +
+                            '</div>'
+                        );
+
+                        draggableObj.labelEl.appendTo(draggableObj.containerEl);
+
+                        draggableObj.labelWidth = draggableObj.labelEl.width();
+
+                        draggableObj.labelEl.css('left', 50 - draggableObj.labelWidth * 0.5);
+                        draggableObj.labelEl.css('top', 5 + draggableObj.iconHeightSmall + 5);
+
+                        draggableObj.labelEl.mousedown(mouseDown);
+                        draggableObj.labelEl.mouseup(mouseUp);
+                        draggableObj.labelEl.mousemove(mouseMove);
+                    }
+
+                    draggableObj.hasLoaded = true;
+                });
             } else {
-                // Must fix - add +label support, and just label support.
-                return;
+                // To make life easier, if there is no icon, but there is a
+                // label, we will create a label and store it as if it was an
+                // icon. All the existing code will work, and the user will
+                // see a label instead of an icon.
+                if (obj.label.length > 0) {
+                    logme('We have a label length > 0.');
+
+                    draggableObj.iconEl = $(
+                        '<div ' +
+                            'style=" ' +
+                                'position: absolute; ' +
+                            '" ' +
+                        '>' +
+                            obj.label +
+                        '</div>'
+                    );
+
+                    draggableObj.iconEl.appendTo(draggableObj.containerEl);
+
+                    draggableObj.iconWidth = draggableObj.iconEl.width();
+                    draggableObj.iconHeight = draggableObj.iconEl.height();
+                    draggableObj.iconWidthSmall = draggableObj.iconWidth;
+                    draggableObj.iconHeightSmall = draggableObj.iconHeight;
+
+                    draggableObj.iconEl.css('left', 50 - draggableObj.iconWidthSmall * 0.5);
+                    draggableObj.iconEl.css('top', 50 - draggableObj.iconHeightSmall * 0.5);
+                } else {
+                    // If no icon and no label, don't create a draggable.
+                    return;
+                }
             }
 
-            // if (obj.label.length > 0) {
-            //     marginCss = '';
-            //
-            //     if (obj.icon.length === 0) {
-            //         marginCss = 'margin-top: 38px;';
-            //     }
-
-            //     draggableContainerEl.append(
-            //         $('<div style="clear: both; text-align: center; ' + marginCss + ' ">' + obj.label + '</div>')
-            //     );
-            // }
+            draggableObj.iconEl.mousedown(mouseDown);
+            draggableObj.iconEl.mouseup(mouseUp);
+            draggableObj.iconEl.mousemove(mouseMove);
 
             inContainer = true;
             mousePressed = false;
@@ -114,6 +196,12 @@ define(['logme', 'update_input'], function (logme, updateInput) {
 
             state.draggables.push(draggableObj);
 
+            state.numDraggablesInSlider += 1;
+
+            if (obj.icon.length === 0) {
+                draggableObj.hasLoaded = true;
+            }
+
             return;
 
             function mouseDown(event) {
@@ -125,11 +213,23 @@ define(['logme', 'update_input'], function (logme, updateInput) {
                         draggableObj.containerEl.hide();
 
                         draggableObj.iconEl.detach();
+
+                        draggableObj.iconEl.css('width', draggableObj.iconWidth);
+                        draggableObj.iconEl.css('height', draggableObj.iconHeight);
+
                         draggableObj.iconEl.css('left', event.pageX - state.baseImageEl.offset().left - draggableObj.iconWidth * 0.5);
                         draggableObj.iconEl.css('top', event.pageY - state.baseImageEl.offset().top - draggableObj.iconHeight * 0.5);
                         draggableObj.iconEl.appendTo(state.baseImageEl.parent());
 
+                        if (draggableObj.labelEl !== null) {
+                            draggableObj.labelEl.detach();
+                            draggableObj.labelEl.css('left', event.pageX - state.baseImageEl.offset().left - draggableObj.labelWidth * 0.5);
+                            draggableObj.labelEl.css('top', event.pageY - state.baseImageEl.offset().top + draggableObj.iconHeight * 0.5 + 5);
+                            draggableObj.labelEl.appendTo(state.baseImageEl.parent());
+                        }
+
                         inContainer = false;
+                        state.numDraggablesInSlider -= 1;
                     }
 
                     draggableObj.oldZIndex = draggableObj.zIndex;
@@ -178,6 +278,8 @@ define(['logme', 'update_input'], function (logme, updateInput) {
                     } else {
                         moveBackToSlider();
                         removeObjIdFromTarget();
+
+                        state.numDraggablesInSlider += 1;
                     }
                 } else {
                     if (
@@ -190,6 +292,8 @@ define(['logme', 'update_input'], function (logme, updateInput) {
 
                         draggableObj.x = -1;
                         draggableObj.y = -1;
+
+                        state.numDraggablesInSlider += 1;
                     } else {
                         correctZIndexes();
 
@@ -283,6 +387,11 @@ define(['logme', 'update_input'], function (logme, updateInput) {
 
                     draggableObj.iconEl.css('left', target.offset.left + 0.5 * target.w - draggableObj.iconWidth * 0.5 + offset);
                     draggableObj.iconEl.css('top', target.offset.top + 0.5 * target.h - draggableObj.iconHeight * 0.5 + offset);
+
+                    if (draggableObj.labelEl !== null) {
+                        draggableObj.labelEl.css('left', target.offset.left + 0.5 * target.w - draggableObj.labelWidth * 0.5 + offset);
+                        draggableObj.labelEl.css('top', target.offset.top + 0.5 * target.h + draggableObj.iconHeight * 0.5 + 5 + offset);
+                    }
                 }
 
                 // Go through all of the draggables subtract 1 from the z-index
@@ -316,16 +425,29 @@ define(['logme', 'update_input'], function (logme, updateInput) {
                 // move it back to the slider, placing it in the same position
                 // that it was dragged out of.
                 function moveBackToSlider() {
-                    var c1;
-
                     draggableObj.containerEl.show();
 
                     draggableObj.iconEl.detach();
 
-                    draggableObj.iconEl.css('top', (50 - draggableObj.iconHeight * 0.5) + 'px');
-                    draggableObj.iconEl.css('left', (50 - draggableObj.iconWidth * 0.5) + 'px');
+                    draggableObj.iconEl.css('width', draggableObj.iconWidthSmall);
+                    draggableObj.iconEl.css('height', draggableObj.iconHeightSmall);
+
+                    draggableObj.iconEl.css('left', 50 - draggableObj.iconWidthSmall * 0.5);
+
+                    if (draggableObj.labelEl !== null) {
+                        draggableObj.iconEl.css('top', 5);
+                    } else {
+                        draggableObj.iconEl.css('top', 50 - draggableObj.iconHeightSmall * 0.5);
+                    }
 
                     draggableObj.iconEl.appendTo(draggableObj.containerEl);
+
+                    if (draggableObj.labelEl !== null) {
+                        draggableObj.labelEl.detach();
+                        draggableObj.labelEl.css('left', 50 - draggableObj.labelWidth * 0.5);
+                        draggableObj.labelEl.css('top', 5 + draggableObj.iconHeightSmall + 5);
+                        draggableObj.labelEl.appendTo(draggableObj.containerEl);
+                    }
 
                     inContainer = true;
                 }
