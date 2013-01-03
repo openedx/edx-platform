@@ -39,7 +39,6 @@ from certificates.models import CertificateStatuses, certificate_status_for_stud
 from xmodule.course_module import CourseDescriptor
 from xmodule.modulestore.exceptions import ItemNotFoundError
 from xmodule.modulestore.django import modulestore
-from xmodule.modulestore.exceptions import ItemNotFoundError
 
 #from datetime import date
 from collections import namedtuple
@@ -209,14 +208,6 @@ def _cert_info(user, course, cert_status):
 def dashboard(request):
     user = request.user
     enrollments = CourseEnrollment.objects.filter(user=user)
-
-    # we want to populate the registration page with the relevant information,
-    # if it already exists.  Create an empty object otherwise.
-#    try:
-#        testcenteruser = TestCenterUser.objects.get(user=user)
-#    except TestCenterUser.DoesNotExist:
-#        testcenteruser = TestCenterUser()
-#        testcenteruser.user = user
     
     # Build our courses list for the user, but ignore any courses that no longer
     # exist (because the course IDs have changed). Still, we don't delete those
@@ -603,9 +594,27 @@ def create_account(request, post_override=None):
 
 @login_required
 @ensure_csrf_cookie
-def begin_test_registration(request, course_id):
-    user = request.user    
-    
+def begin_test_registration(request, course_id, form=None, message=''):
+    user = request.user
+
+    try:
+        course = (course_from_id(course_id))
+    except ItemNotFoundError:
+        log.error("User {0} enrolled in non-existent course {1}"
+                      .format(user.username, course_id))
+
+    # get the exam to be registered for:
+    # (For now, we just assume there is one at most.)
+    exam_info = course.testcenter_info
+
+    # figure out if the user is already registered for this exam:   
+    # (Again, for now we assume that any registration that exists is for this exam.) 
+    registrations = get_testcenter_registrations_for_user_and_course(user, course_id)
+    if len(registrations) > 0:
+        registration = registrations[0]
+    else:
+        registration = None
+        
     # we want to populate the registration page with the relevant information,
     # if it already exists.  Create an empty object otherwise.
     try:
@@ -613,31 +622,31 @@ def begin_test_registration(request, course_id):
     except TestCenterUser.DoesNotExist:
         testcenteruser = TestCenterUser()
         testcenteruser.user = user
-    
-    try:
-        course = (course_from_id(course_id))
-    except ItemNotFoundError:
-        log.error("User {0} enrolled in non-existent course {1}"
-                      .format(user.username, course_id))
 
-    message = ""
+    if form is None:
+        form = TestCenterUserForm(instance=testcenteruser)
+        
     context = {'course': course,
                'user': user,
                'message': message,
                'testcenteruser': testcenteruser,
+               'registration': registration,
+               'form': form,
+               'exam_info': exam_info,
                }
 
     return render_to_response('test_center_register.html', context)
 
+@ensure_csrf_cookie
+def create_test_registration(request, post_override=None):
+    '''
+    JSON call to create test registration.
+    Used by form in test_center_register.html, which is called from 
+    into dashboard.html
+    '''
+ #   js = {'success': False}
 
-def _do_create_or_update_test_center_user(post_vars):
-    """
-    Given cleaned post variables, create the TestCenterUser and UserProfile objects, as well as the
-    registration for this user.
-
-    Returns a tuple (User, UserProfile, TestCenterUser).
-  
-    """
+    post_vars = post_override if post_override else request.POST
     
     # first determine if we need to create a new TestCenterUser, or if we are making any update 
     # to an existing TestCenterUser.
@@ -646,46 +655,43 @@ def _do_create_or_update_test_center_user(post_vars):
     course_id = post_vars['course_id']
     course = (course_from_id(course_id))  # assume it will be found....
         
-    needs_saving = False
+#    needs_saving = False
     try:
         testcenter_user = TestCenterUser.objects.get(user=user)
-        # found a TestCenterUser, so check to see if it has changed
-#        needs_updating = any([testcenter_user.__getattribute__(fieldname) != post_vars[fieldname]
-#                              for fieldname in TestCenterUser.user_provided_fields()])
-        needs_updating = testcenter_user.needs_update(post_vars)    
-        if needs_updating:
-#            # leave user and client_candidate_id as before
-#            testcenter_user.user_updated_at = datetime.datetime.now()
-#            for fieldname in TestCenterUser.user_provided_fields():
-#                testcenter_user.__setattr__(fieldname, post_vars[fieldname])
-            testcenter_user.update(post_vars)
-            needs_saving = True
-        
     except TestCenterUser.DoesNotExist:
-        # did not find the TestCenterUser, so create a new one 
-        testcenter_user = TestCenterUser.create(user, post_vars)
-#        testcenter_user = TestCenterUser(user=user)
-#        testcenter_user.update(post_vars)
-##        for fieldname in TestCenterUser.user_provided_fields():
-##            testcenter_user.__setattr__(fieldname, post_vars[fieldname])
-#        # testcenter_user.candidate_id remains unset    
-#        testcenter_user.client_candidate_id = 'edx' + '123456'  # some unique value  
-##        testcenter_user.user_updated_at = datetime.datetime.now()
-        needs_saving = True
+        testcenter_user = TestCenterUser(user=user)
 
-    if needs_saving:
+    needs_updating = testcenter_user.needs_update(post_vars)    
+#        if needs_updating:
+#            testcenter_user.update(post_vars)
+#            needs_saving = True
+        
+ #   except TestCenterUser.DoesNotExist:
+        # did not find the TestCenterUser, so create a new one 
+#        testcenter_user = TestCenterUser.create(user, post_vars)
+#        needs_saving = True
+
+    # perform validation:
+    if needs_updating:
         try:
             # first perform validation on the user information 
             # using a Django Form.
-            form = TestCenterUserForm(testcenter_user)
+            form = TestCenterUserForm(instance=testcenter_user, data=post_vars)
             if not form.is_valid():
-                response_data = {'success': False}
-                # return a list of errors...
-                response_data['field_errors'] = form.errors
-                response_data['non_field_errors'] = form.non_field_errors()
-                return HttpResponse(json.dumps(response_data))
+                return begin_test_registration(request, course_id, form, 'failed to validate')
+#                response_data = {'success': False}
+#                # return a list of errors...
+#                response_data['field_errors'] = form.errors
+#                response_data['non_field_errors'] = form.non_field_errors()
+#                return HttpResponse(json.dumps(response_data))
+        
+            new_user = form.save(commit=False)
+            # create additional values here:
+            new_user.user_updated_at = datetime.datetime.now()
+            # TODO: create client value....
+            new_user.save()
                 
-            testcenter_user.save()
+            # testcenter_user.save()
         except IntegrityError, ie:
             js = {'success': False}
             error_msg = unicode(ie);
@@ -715,7 +721,7 @@ def _do_create_or_update_test_center_user(post_vars):
     else:
         registration = TestCenterRegistration(testcenter_user = testcenter_user)
         registration.course_id = post_vars['course_id']
-        registration.accommodation_request = post_vars['accommodations']
+        registration.accommodation_request = post_vars.get('accommodations','')
         exam_info = course.testcenter_info
         registration.exam_series_code = exam_info.get('Exam_Series_Code')
         registration.eligibility_appointment_date_first = exam_info.get('First_Eligible_Appointment_Date')
@@ -734,18 +740,8 @@ def _do_create_or_update_test_center_user(post_vars):
         except IntegrityError, ie:
             raise
         
-    return (user, testcenter_user, registration)
+#    return (user, testcenter_user, registration)
 
-@ensure_csrf_cookie
-def create_test_registration(request, post_override=None):
-    '''
-    JSON call to create test registration.
-    Used by form in test_center_register.html, which is called from 
-    into dashboard.html
-    '''
-    js = {'success': False}
-
-    post_vars = post_override if post_override else request.POST
 
     # Confirm we have a properly formed request
 #    for a in ['first_name', 'last_name', 'address_1', 'city', 'country']:
@@ -768,13 +764,12 @@ def create_test_registration(request, post_override=None):
 #            return HttpResponse(json.dumps(js))
 
     # Once the test_center_user information has been validated, create the entries:
-    ret = _do_create_or_update_test_center_user(post_vars)
-    if isinstance(ret,HttpResponse):		# if there was an error then return that
-        return ret
-
-
-    (user, testcenter_user, testcenter_registration) = ret
-
+#    ret = _do_create_or_update_test_center_user(post_vars)
+#    if isinstance(ret,HttpResponse):		# if there was an error then return that
+#        return ret
+#
+#
+#    (user, testcenter_user, testcenter_registration) = ret
 
     # only do the following if there is accommodation text to send,
     # and a destination to which to send it:
@@ -800,8 +795,9 @@ def create_test_registration(request, post_override=None):
     # TODO: enable appropriate stat
     # statsd.increment("common.student.account_created")
 
-    js = {'success': True}
-    return HttpResponse(json.dumps(js), mimetype="application/json")
+#    js = {'success': True}
+#    return HttpResponse(json.dumps(js), mimetype="application/json")
+    return HttpResponseRedirect(reverse('dashboard'))
 
 
 def get_random_post_override():

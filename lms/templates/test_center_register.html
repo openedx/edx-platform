@@ -10,18 +10,18 @@
 <%namespace name='static' file='static_content.html'/>
 
 <%block name="title"><title>Pearson VUE Test Center Proctoring - Sign Up</title></%block>
-
+<%doc>
 <%block name="js_extra">
   <script type="text/javascript">
   (function() {
 
-    $(document).on('ajax:success', '#test_register_form', function(data, json, xhr) {
+    $(document).on('ajax:success', '#testcenter_register_form', function(data, json, xhr) {
       if(json.success) {
         location.href="${reverse('dashboard')}";
       } else {
         $(".field.error").removeClass('error');
         $('#register_error').html(json.value).stop().css("display", "block");
-        $("[data-field='"+json.field+"']").addClass('field-error')
+        $("[data-field='"+json.field+"']").addClass('error')
       }
     });
 
@@ -34,98 +34,17 @@
   })(this)
   </script>
 </%block>
+</%doc>
 
-<%
-exam_info = course.testcenter_info
-%>
 
 <section class="testcenter-register container">    
-
-  <!-- display stuff about the exam and the course for which the user is registering.  
-       If the user has already registered in the past for a test center, then also display
-       their ID. -->
-
-    <!-- check to see if the user has already registering, or
-       is registering for the first time -->
-  <%     
-    registrations = get_testcenter_registrations_for_user_and_course(user, course.id)
-  %>  
-     
-
-  <section class="output-raw">
-    <hgroup>
-      <p class="date-block">
-        % if course.has_ended():
-        Course Completed - ${course.end_date_text}
-        % elif course.has_started():
-        Course Started - ${course.start_date_text}
-        % else:   # hasn't started yet
-        Course Starts - ${course.start_date_text}
-        % endif
-        </p>
-        <h2 class="university">${get_course_about_section(course, 'university')}</h2>
-        <h3>${course.number} ${course.title}</h3>
-    </hgroup>
-
-    <!-- TODO: need to add logic to select which of the following to display.  Like certs? -->
-    % if exam_info is not None:
-        <p>Exam Series Code: ${exam_info.get('Exam_Series_Code')}</p>
-        <p>First Eligible Appointment Date: ${exam_info.get('First_Eligible_Appointment_Date')}</p>
-        <p>Last Eligible Appointment Date: ${exam_info.get('Last_Eligible_Appointment_Date')}</p>
-    % endif
-    
-    % if len(registrations) > 0:
-      <%     
-        registration = registrations[0]
-      %>  
-
-    <section><div>Already Registered</div>
-      <p>Here is the current state of your registration, for debugging purposes:</p>
-      <l>
-        <li>id: ${registration.id}</li>
-        <li>testcenter_user_id: ${registration.testcenter_user_id}</li>
-        <li>course_id: ${registration.course_id}</li>
-        <li>accommodation codes: ${registration.accommodation_code}</li>
-        <li>accommodation request: ${registration.accommodation_request}</li>
-        <li>created_at: ${registration.created_at}</li>
-        <li>updated_at: ${registration.updated_at}</li>
-        <li>user_updated_at: ${registration.user_updated_at}</li>
-        <li>upload_status: ${registration.upload_status}</li>
-        <li>upload_error_message: ${registration.upload_error_message}</li>
-      </l>
-      
-      
-      <!-- determine status of registration 
-          doing here for now, but will move into model or view -->
-      <%
-        regstatus = "registration pending acknowledgement by Pearson"
-        
-        if registration.upload_status == 'Accepted':
-          regstatus = "registration approved by Pearson"
-        elif registration.upload_status == 'Error':
-          regstatus = "registration rejected by Pearson: %s" % registration.upload_error_message
-        elif len(registration.accommodation_request) > 0 and registration.accommodation_code == '':
-          regstatus = "pending approval of accommodation request"
-      %>
-      <p>Current status: ${regstatus}</p>       
-      
-      <p>The demographic information provided below was used to register
-      for the exam listed above.  Changes to this information 
-      may be submitted below.</p>
-    </section>
-     
-    % else:
-        <p>The demographic information must be provided below in order to register
-        for the exam listed above.</p>
-    % endif
-  </section>
   
   <section class="introduction">
     <header>
       <hgroup>
         <h2>${get_course_about_section(course, 'university')} ${course.number} ${course.title}</h2>      
         
-        % if len(registrations) > 0:
+        % if registration:
         <h1>Your Pearson VUE Proctored Exam Registration</h1>
         % else: 
         <h1>Register for a Pearson VUE Proctored Exam</h1>
@@ -136,8 +55,9 @@ exam_info = course.testcenter_info
   
   <section class="status">
     
-    <!-- NOTE: BT - registration data updated confirmation message - in case upon successful submit we're directing folks back to this view -->
-    <div class="message message-status submission-saved is-shown">
+    <!-- NOTE: BT - registration data updated confirmation message - in case upon successful submit we're directing
+    	 folks back to this view.  To display, add "is-shown" class to div -->
+    <div class="message message-status submission-saved">
       <p class="message-copy">Your registration data has been updated and saved.</p>
     </div>
     
@@ -148,10 +68,12 @@ exam_info = course.testcenter_info
     </div> 
     % endif
     
-    <!-- NOTE: BT - Sample markup for error message -->
+    <!-- NOTE: BT - Sample markup for error message.  To display, add "is-shown" class to div -->
+    % if form.errors and len(form.errors) > 0:
     <div class="message message-status submission-error is-shown">
       <p class="message-copy">We're Sorry, but there was an error with the information you provided below:</p>
     </div>
+    % endif 
   </section>
   
   <section class="content">
@@ -160,7 +82,7 @@ exam_info = course.testcenter_info
     </header>      
     <form id="testcenter-register-form" method="post" data-remote="true" action="/create_test_registration">
       
-      % if len(registrations) > 0:
+      % if registration:
       <p class="instructions">
         Please complete the following form to update your demographic information used in your Pearson VUE Proctored Exam. Required fields are noted by <strong>bold text and an asterisk (*)</strong>. 
       </p>
@@ -181,15 +103,23 @@ exam_info = course.testcenter_info
           
           <ol class="list-input">
             <li class="field">
+              <label for="id-salutation">Salutation:</label>
+ 	         	${form['salutation']}
+            </li>
+            <li class="field required">
+              <label for="id-first_name">First Name:</label>
+ 	         	${form['first_name']}
+            </li>
+<!--            <li class="field">
               <label for="salutation">Salutation</label>
               <input class="short" id="salutation" type="text" name="salutation" value="${testcenteruser.salutation}" placeholder="e.g. Mr., Ms., Mrs., Dr." />              
             </li>
-            <!-- NOTE: BT - to inform a user of what field the error occured on, add a class of .error to the .field element -->
-            <li class="field required">
+   -->         <!-- NOTE: BT - to inform a user of what field the error occurred on, add a class of .error to the .field element -->
+<!--            <li class="field required">
               <label for="name-first">First Name </label>
               <input id="name-first" type="text" name="first_name" value="${testcenteruser.first_name}" placeholder="e.g. Albert" />
             </li>
-            <li class="field">
+ -->           <li class="field">
               <label for="name-middle">Middle Name</label>
               <input id="name-middle" type="text" name="middle_name" value="${testcenteruser.middle_name}" placeholder="" />
             </li>
@@ -281,7 +211,7 @@ exam_info = course.testcenter_info
       
       <div class="form-fields-secondary">
         <!-- NOTE: BT - Assuming accomodations cannot be edited after a user originally submits registration, I've disabled the field and provided different text. Correct if this is not the case. -->
-        % if len(registrations) > 0:
+        % if registration:
         <p class="instructions">Fields below this point are not part of the demographics, and are not editable currently.</p>
         % else: 
         <p class="instructions">Fields below this point are not part of the demographics, and cannot be changed once submitted.</p>
@@ -291,7 +221,7 @@ exam_info = course.testcenter_info
           <legend class="is-hidden">Optional Information</legend>
           
           <ol class="list-input">
-            % if len(registrations) > 0:
+            % if registration:
             <li class="field disabled">
               <label for="accommodations">Accommodations Requested</label>
               <textarea class="long" id="accommodations"value="" placeholder="" disabled="disabled"></textarea>
@@ -307,7 +237,7 @@ exam_info = course.testcenter_info
       </div>
       
       <div class="form-actions">
-        % if len(registrations) > 0:
+        % if registration:
         <button type="submit" id="submit" class="action action-primary action-update">Update Demographics</button>
         % else: 
         <button type="submit" id="submit" class="action action-primary action-register">Register for Pearson VUE Test</button>
@@ -317,12 +247,10 @@ exam_info = course.testcenter_info
   </section>
     
   <aside>
-   % if len(registrations) > 0:
+   % if registration:
     <h3 class="is-hidden">Registration Details</h3>
     
-    <%
-      registration = registrations[0]
-      
+    <%      
       if registration.upload_status == 'Accepted':
         regstatus = "Registration approved by Pearson"
       elif registration.upload_status == 'Error':
