@@ -557,5 +557,4 @@ class DragAndDropTest(unittest.TestCase):
 [{"y": "90", "x": "210", "id": "t1", "w": "90", "h": "90"}, \
 {"y": "160", "x": "370", "id": "t2", "w": "90", "h": "90"}]}',
                     }
-        # import ipdb; ipdb.set_trace()
         self.assertEqual(context, expected)
