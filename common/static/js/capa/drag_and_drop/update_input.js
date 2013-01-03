@@ -74,8 +74,7 @@ define(['logme'], function (logme) {
         }
 
         function repositionDraggables(answer) {
-            var draggableId, draggable, targetId, target, draggablePosition,
-                c1, offset;
+            var draggableId, draggable, targetId, target, c1, offset;
 
             offset = 0;
             if (state.config.targetOutline === true) {
@@ -104,7 +103,7 @@ define(['logme'], function (logme) {
                             continue;
                         }
 
-                        (function (c1, draggableId, draggable, targetId, target) {
+                        (function (draggableId, draggable, targetId, target) {
                             moveDraggableToBaseImage();
                             return;
 
@@ -146,7 +145,7 @@ define(['logme'], function (logme) {
                                 draggable.setOnTarget(target);
                                 target.draggable.push(draggableId);
                             }
-                        }(c1, draggableId, draggable, targetId, target));
+                        }(draggableId, draggable, targetId, target));
                     }
                 }
             } else if (
@@ -187,7 +186,7 @@ define(['logme'], function (logme) {
                                 );
                                 draggable.iconEl.css(
                                     'top',
-                                    answer.draggables[c1][draggableId][0] - draggable.iconHeight * 0.5 + offset
+                                    answer.draggables[c1][draggableId][1] - draggable.iconHeight * 0.5 + offset
                                 );
 
                                 draggable.iconEl.appendTo(state.baseImageEl.parent());
@@ -196,7 +195,7 @@ define(['logme'], function (logme) {
                                     draggable.labelEl.detach();
 
                                     draggable.labelEl.css('left', answer.draggables[c1][draggableId][0] - draggable.iconWidth * 0.5 - draggable.labelWidth * 0.5 + offset);
-                                    draggable.labelEl.css('top', answer.draggables[c1][draggableId][0] - draggable.iconHeight * 0.5 + draggable.iconHeight + 5 + offset);
+                                    draggable.labelEl.css('top', answer.draggables[c1][draggableId][1] - draggable.iconHeight * 0.5 + draggable.iconHeight + 5 + offset);
 
                                     draggable.labelEl.appendTo(state.baseImageEl.parent());
                                 }
