@@ -2108,19 +2108,30 @@ class OpenEndedResponse(LoncapaResponse):
             """
             return priorities.get(elt[0], default_priority)
 
+        def encode_values(feedback_type,value):
+            feedback_type=str(feedback_type).encode('ascii', 'ignore')
+            if not isinstance(value,basestring):
+                value=str(value)
+            value=value.encode('ascii', 'ignore')
+            return feedback_type,value
+
         def format_feedback(feedback_type, value):
-            return """
+            feedback_type,value=encode_values(feedback_type,value)
+            feedback= """
             <div class="{feedback_type}">
             {value}
             </div>
             """.format(feedback_type=feedback_type, value=value)
+            return cgi.escape(feedback)
 
         def format_feedback_hidden(feedback_type , value):
-            return """
+            feedback_type,value=encode_values(feedback_type,value)
+            feedback = """
             <div class="{feedback_type}" style="display: none;">
             {value}
             </div>
             """.format(feedback_type=feedback_type, value=value)
+            return cgi.escape(feedback)
 
         # TODO (vshnayder): design and document the details of this format so
         # that we can do proper escaping here (e.g. are the graders allowed to
