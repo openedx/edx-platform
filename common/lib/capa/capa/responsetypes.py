@@ -1932,13 +1932,13 @@ class OpenEndedResponse(LoncapaResponse):
             if tag not in survey_responses:
                 return False, "Could not find needed tag {0}".format(tag)
         try:
-            log.debug(survey_responses['submission_id'])
             submission_id=int(survey_responses['submission_id'])
             grader_id = int(survey_responses['grader_id'])
             feedback = str(survey_responses['feedback'])
             score = int(survey_responses['score'])
         except:
-            error_message="Could not parse submission id, grader id, or feedback from message_post ajax call."
+            error_message=("Could not parse submission id, grader id, "
+                           "or feedback from message_post ajax call.  Here is the message data: {0}".format(survey_responses))
             log.exception(error_message)
             return False, error_message
 
@@ -2130,7 +2130,7 @@ class OpenEndedResponse(LoncapaResponse):
             {value}
             </div>
             """.format(feedback_type=feedback_type, value=value)
-            return cgi.escape(feedback)
+            return feedback
 
         def format_feedback_hidden(feedback_type , value):
             feedback_type,value=encode_values(feedback_type,value)
@@ -2139,7 +2139,7 @@ class OpenEndedResponse(LoncapaResponse):
             {value}
             </div>
             """.format(feedback_type=feedback_type, value=value)
-            return cgi.escape(feedback)
+            return feedback
 
         # TODO (vshnayder): design and document the details of this format so
         # that we can do proper escaping here (e.g. are the graders allowed to
@@ -2165,7 +2165,10 @@ class OpenEndedResponse(LoncapaResponse):
         else:
             feedback_list_part1 = format_feedback('errors', response_items['feedback'])
 
-        feedback_list_part2=u"\n".join([format_feedback_hidden(k,response_items[k]) for k in response_items.keys() if k in ['submission_id', 'grader_id']])
+        feedback_list_part2=(u"\n".join([format_feedback_hidden(feedback_type,value)
+                                         for feedback_type,value in response_items.items()
+                                         if feedback_type in ['submission_id', 'grader_id']]))
+
         return u"\n".join([feedback_list_part1,feedback_list_part2])
 
     def _format_feedback(self, response_items):
