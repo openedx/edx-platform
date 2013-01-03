@@ -344,16 +344,11 @@
       }
 
       a {
-        color: $lighter-base-font-color;
         float: right;
-        font-style: italic;
+        font-size: 1.1em;
         font-family: $serif;
         padding-top: 3px;
         text-shadow: 0 1px rgba(255,255,255, 0.6);
-
-        &:hover {
-          color: $base-font-color;
-        }
       }
     }
 

@@ -1,0 +1,68 @@
+.container.press-kit {
+  padding: 60px 30px 120px;
+
+  .intro {
+    @include clearfix;
+    margin-bottom: 20px;
+    position: relative;
+
+    .message {
+      float: left;
+      width: flex-grid(7);
+
+      p {
+        margin-left: 0;
+        line-height: 1.6;
+        font-size: 1.1em;
+        color: #666;
+      }
+    }
+
+    .logo-sidebar {
+      @include box-sizing(border-box);
+      border: 3px solid rgb(220,220,220);
+      float: left;
+      padding: 20px;
+
+      img {
+        height: 200px;
+      }
+
+      figcaption {
+        text-align: center;
+      }
+    }
+  }
+
+  .media-library {
+    @include clearfix;
+    float: left;
+    width: flex-grid(12);
+    margin-right: flex-gutter();
+
+    > h2 {
+      display: none;
+      margin-bottom: 60px;
+      padding-bottom: 20px;
+    }
+
+    .media-listing {
+      figure {
+        width: flex-grid(4);
+
+        border-bottom: 1px solid rgb(220,220,220);
+        padding: 40px 0px;
+
+        img {
+          text-align: center;
+        }
+
+        figcaption {
+          padding: 10px;
+          font-size: 0.95em;
+          color: #666;
+        }
+      }
+    }
+  }
+}

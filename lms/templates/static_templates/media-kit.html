@@ -1,0 +1,63 @@
+<%namespace name='static' file='../static_content.html'/>
+<%inherit file="../main.html" />
+
+<%block name="title"><title>EdX Media Kit</title></%block>
+
+<section class="container press-kit">
+  <h1>EdX Media Kit</h1>
+
+  <section class="intro">
+    <header>
+      <h2>Welcome to the edX Media Kit</h2>
+    </header>
+    <div class="message">
+      <p>Need images for a news story?  Feel free to download high-resolution versions of the photos below by clicking on the thumbnail.  Please credit edX in your use.</p>
+      <p>We’ve included visual guidelines on how to use the edX logo within the download zip which also includes Adobe Illustrator and eps versions of the logo. </p>
+      <p>For more information about edX, please contact Dan O’Connell Associate Director of Communications via <a href="mailto:oconnell@edx.org">oconnell@edx.org</a>.</p>
+    </div>
+    <section class="logo-sidebar">
+      <h2>The edX Logo</h2>
+      <figure class="logo">
+        <img src="${static.url('images/edx.png')}" />
+        <figcaption> <a href="${static.url('files/edx-identity.zip')}">&gt; download now</a></figcaption>
+      </figure>
+    </section>
+  </section>
+
+  <section class="media-library">
+    <header>
+      <h2>The edX Media Library</h2>
+    </header>
+    <div class="media-listing">
+      <figure>
+        <img src="${static.url('images/press-kit/anant-agarwal_x200.jpg')}"/>
+        <figcaption>Ananat Agarwal, President of edX, in his office in Cambridge, MA. The computer screen behind him shows a portion of a video lecture from 6.002x, Circuits &amp; Electronics, the MITx course taught by Agarwal. <a href="${static.url('images/press-kit/anant-agarwal_high-res.jpg')}"> &gt; high-res</a></figcaption>
+      </figure>
+
+      <figure>
+        <img src="${static.url('images/press-kit/anant-tablet_x200.jpg')}"/>
+        <figcaption>Anant Agarwal creating a tablet-based lecture for 6.002x, Circuits & Electronics. <a href="${static.url('images/press-kit/anant-tablet_high-res.jpg')}"> &gt; high-res</a></figcaption>
+      </figure>
+
+      <figure>
+        <img src="${static.url('images/press-kit/piotr-mitros_x200.jpg')}"/>
+        <figcaption>Piotr Mitros, Chief Scientist at edX, uses a Rostrum camera to create an overhead camera-based lecture. During this process, voice and video are recorded for an interactive tutorial. <a href="${static.url('images/press-kit/piotr-mitros_high-res.jpg')}"> &gt; high-res</a></figcaption>
+      </figure>
+
+      <figure>
+        <img src="${static.url('images/press-kit/edx-video-editing_x200.jpg')}"/>
+        <figcaption>One of edX’s video editors edits a lecture in a video suite. <a href="${static.url('images/press-kit/edx-video-editing_high-res.jpg')}"> &gt; high-res</a></figcaption>
+      </figure>
+
+      <figure>
+        <img src="${static.url('images/press-kit/6.002x_x200.jpg')}"/>
+        <figcaption>Screenshot of 6.002x Circuits and Elecronics course. <a href="${static.url('images/press-kit/6.002x_high-res.png')}"> &gt; high-res</a></figcaption>
+      </figure>
+
+      <figure>
+        <img src="${static.url('images/press-kit/3.091x_x200.jpg')}"/>
+        <figcaption>Screenshot of 6.00x: Introduction to Computer Science and Programming. <a href="${static.url('images/press-kit/3.091x_high-res.png')}"> &gt; high-res</a></figcaption>
+      </figure>
+    </div>
+  </section>
+</section>
