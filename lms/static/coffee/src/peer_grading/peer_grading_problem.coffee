@@ -16,7 +16,7 @@ class PeerGradingProblemBackend
       # change to test each version
       response = 
         success: true 
-        calibrated: false
+        calibrated: true
     else if cmd == 'show_calibration_essay'
       #response = 
       #  success: false
@@ -38,7 +38,12 @@ class PeerGradingProblemBackend
         prompt: 'Answer this question'
         rubric: 'This is a rubric.'
         max_score: 4
-
+    else if cmd == 'save_calibration_essay'
+      response = 
+        success: true
+    else if cmd == 'save_grade'
+      response = 
+        success: true
 
         
     return response
@@ -61,13 +66,15 @@ class PeerGradingProblem
     @submission_container = $('.submission-container')
     @prompt_container = $('.prompt-container')
     @rubric_container = $('.rubric-container')
-    @instructions_panel = $('.instructions-panel')
+    @calibration_panel = $('.calibration-panel')
+    @grading_panel = $('.grading-panel')
     @content_panel = $('.content-panel')
 
     @error_container = $('.error-container')
 
     @submission_key_input = $("input[name='submission-key']")
     @essay_id_input = $("input[name='essay-id']")
+    @feedback_area = $('.feedback-area')
 
     @score_selection_container = $('.score-selection-container')
     @score = null
@@ -94,11 +101,23 @@ class PeerGradingProblem
   fetch_submission_essay: () =>
     @backend.post('get_next_submission', {location: @location}, @render_submission)
 
-  submit_calibration_essay: ()->
-    #TODO: onclick of the submit button. submits the calibration essay grade
+  construct_data: () =>
+    data =
+      score: @score
+      location: @location
+      submission_id: @essay_id_input.val()
+      submission_key: @submission_key_input.val()
+      feedback: @feedback_area.val() 
+    return data
 
-  submit_grade: () ->
-    #TODO: onclick of the submit button. submits the grade
+
+  submit_calibration_essay: ()=>
+    data = @construct_data()
+    @backend.post('save_calibration_essay', data, @submission_callback)
+
+  submit_grade: () =>
+    data = @construct_data()
+    @backend.post('save_grade', data, @submission_callback)
     
 
   ##########
@@ -110,7 +129,7 @@ class PeerGradingProblem
     if response.success
       # check whether or not we're still calibrating
        if response.calibrated
-         @fetch_submission()
+         @fetch_submission_essay()
          @calibration = false
        else
          @fetch_calibration_essay()
@@ -147,18 +166,55 @@ class PeerGradingProblem
       # load in all the data
       @submission_container.html("<h3>Calibration Essay</h3>")
       @render_submission_data(response)
-
       # TODO: indicate that we're in calibration mode 
+      @calibration_panel.addClass('current-state')
+      @grading_panel.removeClass('current-state')
 
+      # clear out all of the existing text
+      @calibration_panel.find('p').remove()
+      @grading_panel.find('p').remove()
+
+      # add in new text
+
+
+      @submit_button.click @submit_calibration_essay
+
+    else if response.error
+      @render_error(response.error)
     else
-      if response.error
-        @render_error(response.error)
-      else
-        @render_error("An error occurred while contacting the grading server")
+      @render_error("An error occurred while retrieving the next calibration essay")
+
+  render_submission: (response) =>
+    if response.success
+      #TODO: fill this in
+      @submit_button.hide()
+      @submission_container.html("<h3>Submitted Essay</h3>")
+      @render_submission_data(response)
+
+      @calibration_panel.removeClass('current-state')
+      @grading_panel.addClass('current-state')
+
+      # clear out all of the existing text
+      @calibration_panel.find('p').remove()
+      @grading_panel.find('p').remove()
+
+      @submit_button.click @submit_grade
+    else if response.error
+      @render_error(response.error)
+    else
+      @render_error("An error occured when retrieving the next submission.")
+
+
+  make_paragraphs: (text) ->
+    paragraph_split = text.split(/\n\s*\n/)
+    new_text = ''
+    for paragraph in paragraph_split
+      new_text += "<p>#{paragraph}</p>"
+    return new_text
 
   render_submission_data: (response) =>
     @content_panel.show()
-    @submission_container.append(response.student_response)
+    @submission_container.append(@make_paragraphs(response.student_response))
     @prompt_container.html(response.prompt)
     @rubric_container.html(response.rubric)
     @submission_key_input.val(response.submission_key)
@@ -168,10 +224,6 @@ class PeerGradingProblem
     @action_button.hide()
 
 
-  render_submission: (response) =>
-    #TODO: fill this in
-    @submit_button.hide()
-    @render_submission_data(response)
     
   render_error: (error_message) =>
       @error_container.show()

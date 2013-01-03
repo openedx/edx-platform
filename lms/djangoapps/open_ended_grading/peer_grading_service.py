@@ -132,7 +132,7 @@ def save_grade(request, course_id):
     TODO: fill in this documentation
     """
     _check_post(request)
-    required = set(['location', 'grader_id', 'submission_id', 'submission_key', 'score', 'feedback'])
+    required = set(['location', 'submission_id', 'submission_key', 'score', 'feedback'])
     success, message = _check_required(request, required)
     if not success:
         return _err_response(message)
@@ -211,14 +211,14 @@ def save_calibration_essay(request, course_id):
     """
     _check_post(request)
 
-    required = set(['location', 'calibration_essay_id', 'submission_key', 'score', 'feedback'])
+    required = set(['location', 'submission_id', 'submission_key', 'score', 'feedback'])
     success, message = _check_required(request, required)
     if not success:
         return _err_response(message)
     grader_id = request.user.id
     p = request.POST
     location = p['location']
-    calibration_essay_id = p['calibration_essay_id']
+    calibration_essay_id = p['submission_id']
     submission_key = p['submission_key']
     score = p['score']
     feedback = p['feedback']
