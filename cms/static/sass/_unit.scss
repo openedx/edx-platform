@@ -492,69 +492,6 @@
     width: 350px;
   }
 
-  .discussion-module {
-    position: relative;
-    margin: 20px 0;
-    padding: 20px;
-    height: 40px;
-    background: #f6f6f6 !important;
-    border-radius: 3px;
-
-    .discussion-show {
-      position: relative;
-      top: 3px;
-      font-size: 14px;
-      text-align: center;
-      color: #3c3c3c;
-
-      &.shown {
-        .show-hide-discussion-icon {
-          background-position: 0 0;
-        }
-      }
-
-      .show-hide-discussion-icon {
-        display: inline-block;
-        position: relative;
-        top: 5px;
-        margin-right: 6px;
-        width: 21px;
-        height: 19px;
-        background: url(../img/show-hide-discussion-icon.png) no-repeat;
-        background-position: -21px 0;
-      }
-    }
-
-    .new-post-btn {
-      display: inline-block;
-      float: right;
-      height: 35px;
-      padding: 0 15px;
-      border-radius: 3px;
-      border: 1px solid #2d81ad;
-      @include linear-gradient(top, #6dccf1, #38a8e5);
-      font-size: 13px;
-      font-weight: 700;
-      line-height: 32px;
-      color: #fff;
-      text-shadow: 0 1px 0 rgba(0, 0, 0, .3);
-      box-shadow: 0 1px 0 rgba(255, 255, 255, 0.4) inset, 0 1px 1px rgba(0, 0, 0, .15);
-
-      &:hover {
-        border-color: #297095;
-        @include linear-gradient(top, #4fbbe4, #2090d0);
-      }
-    }
-
-    .new-post-icon {
-      display: block;
-      float: left;
-      width: 16px;
-      height: 17px;
-      margin: 7px 7px 0 0;
-      background: url(../img/new-post-icon.png) no-repeat;
-    }
-  }  
 
   .component-editor {
     @include edit-box;
