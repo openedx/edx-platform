@@ -65,6 +65,7 @@ class PeerGradingService(GradingService):
         return response
 
 
+_service = None
 def peer_grading_service():
     """
     Return a peer grading service instance--if settings.MOCK_PEER_GRADING is True,
