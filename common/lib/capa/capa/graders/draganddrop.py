@@ -163,19 +163,14 @@ class DragAndDrop(object):
         return True
 
     def compare_positions(self, correct, user, flag):
-        """ order of correct/user is matter only in anyof_flag"""
-        # import ipdb; ipdb.set_trace()
-        # if flag == 'denied':
-        #     for el1 in correct:
-        #         for el2 in user:
-        #             if PositionsCompare(el1) == PositionsCompare(el2):
-        #                 return False
+        """ Compares two lists of positions with flag rules. Order of
+        correct/user arguments is matter only in 'anyof' flag.
 
-        # if flag == 'allowed':
-        #     for el1, el2 in zip(sorted(correct), sorted(user)):
-        #         if PositionsCompare(el1) != PositionsCompare(el2):
-        #             return False
+        Args:
+            correst, user: lists of positions
 
+        Returns: True if within rule lists are equal, otherwise False.
+        """
         if flag == 'exact':
             for el1, el2 in zip(correct, user):
                 if PositionsCompare(el1) != PositionsCompare(el2):
@@ -194,7 +189,44 @@ class DragAndDrop(object):
         return True
 
     def populate(self, correct_answer, user_answer):
-        """  """
+        """ Populates DragAndDrop variables from user_answer and correct_answer.
+        If correct_answer is dict, converts it to list.
+        Correct answer in dict form is simpe structure for fast and simple
+        grading. Example of corrrect answer dict example::
+
+            correct_answer = {'name4': 't1',
+                            'name_with_icon': 't1',
+                            '5': 't2',
+                            '7':'t2'}
+
+            It is draggable_name: dragable_position mapping
+
+        Correct answer in list form is designed for complex cases::
+
+        correct_answers = [
+        {
+        'draggables': ['1', '2', '3', '4', '5', '6'],
+        'targets': [
+           's_left', 's_right', 's_sigma', 's_sigma_star', 'p_pi_1',  'p_pi_2'],
+        'rule': 'anyof'},
+        {
+        'draggables': ['7', '8', '9', '10'],
+        'targets': ['p_left_1', 'p_left_2', 'p_right_1', 'p_right_2'],
+        'rule': 'anyof'
+        }
+                        ]
+        Correct answer in list form is list of dicts, and every dict must have
+        3 keys: 'draggables', 'targets' and 'rule'. 'Draggables' value is
+        list of draggables ids, 'targes' values are list of targets ids, 'rule'
+        value is 'exact' or 'anyof'.
+
+        Args:
+            user_answer: json
+            correct_answer: dict  or list
+
+        Returns: None
+
+         """
         # convert from dict answer format to list format
         if isinstance(correct_answer, dict):
             tmp = []
@@ -211,13 +243,12 @@ class DragAndDrop(object):
         # check if we have draggables that are not in correct answer:
         check_extra_draggables = {}
 
-        # create identical data structures
-        # user groups must mirror correct_groups
-        # and positions  must reflect order in group
+        # create identical data structures from user answer and correct answer
         for i in xrange(0, len(correct_answer)):
             groupname = str(i)
             self.correct_groups[groupname] = correct_answer[i]['draggables']
-            self.correct_positions[groupname] = {correct_answer[i]['rule']: correct_answer[i]['targets']}
+            self.correct_positions[groupname] = {correct_answer[i]['rule']:
+                                                correct_answer[i]['targets']}
             self.user_groups[groupname] = []
             self.user_positions[groupname] = {'user': []}
             for draggable_dict in user_answer['draggables']:
@@ -235,7 +266,6 @@ class DragAndDrop(object):
         for draggable in check_extra_draggables:
             if not check_extra_draggables[draggable]:
                 self.incorrect = True
-        # import ipdb; ipdb.set_trace()
 
 
 def grade(user_input, correct_answer):
