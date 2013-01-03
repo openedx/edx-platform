@@ -199,6 +199,11 @@ class Test_DragAndDrop(unittest.TestCase):
         self.assertFalse(draganddrop.grade(user_input, correct_answer))
 
 
+        #test for every function in DND
+
+        # test for different denied-allowed positions inised
+        # different groups
+
 def suite():
 
     testcases = [Test_DragAndDrop]
