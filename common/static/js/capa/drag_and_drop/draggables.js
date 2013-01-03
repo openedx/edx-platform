@@ -193,8 +193,8 @@ define(['logme', 'update_input'], function (logme, updateInput) {
                     } else {
                         correctZIndexes();
 
-                        draggableObj.x = offsetDE.left + 50;
-                        draggableObj.y = offsetDE.top + 50;
+                        draggableObj.x = offsetIE.left + draggableObj.iconWidth * 0.5;
+                        draggableObj.y = offsetIE.top + draggableObj.iconHeight * 0.5;
                     }
                 }
 
