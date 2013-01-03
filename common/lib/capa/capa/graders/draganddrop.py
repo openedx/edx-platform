@@ -142,28 +142,22 @@ class DragAndDrop(object):
         # from now self.correct_groups and self.user_groups are equal if
         # order is ignored
 
-        # Checks in every group that user positions of every element are equal
+        # Next check in every group that user positions of every element are equal
         # with correct positions for every rule
-
-        # for group in self.correct_groups:  # 'denied' rule
-        #     if not self.compare_positions(self.correct_positions[group].get(
-        #     'denied', []), self.user_positions[group]['user'], flag='denied'):
-        #         return False
 
         passed_rules = dict()
         for rule in ('exact', 'anyof'):
-            passed_rules[rule] = True
+            passed_rules[rule] = 0
             for groupname in self.correct_groups:
                 if self.correct_positions[groupname].get(rule, []):
                     if not self.compare_positions(
                             self.correct_positions[groupname][rule],
                             self.user_positions[groupname]['user'], flag=rule):
                         return False
-                else:
-                    passed_rules[rule] = False
+                    passed_rules[rule] += 1
 
-        # if all passed rules are false
-        if not reduce(lambda x, y: x or y, passed_rules):
+        # if no rule was executed for all groups
+        if sum(passed_rules.values()) == 0:
             return False
 
         return True
@@ -201,7 +195,7 @@ class DragAndDrop(object):
 
     def populate(self, correct_answer, user_answer):
         """  """
-        # convert from dict format to list format
+        # convert from dict answer format to list format
         if isinstance(correct_answer, dict):
             tmp = []
             for key, value in correct_answer.items():
