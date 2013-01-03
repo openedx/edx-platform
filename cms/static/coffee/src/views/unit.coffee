@@ -76,20 +76,10 @@ class CMS.Views.UnitEdit extends Backbone.View
     type = $(event.currentTarget).data('type')
 
     switch type
-      when 'video'
-        @$editor = $($('#video-editor').html())
-        $preview = $($('#video-preview').html())
       when 'problem'
         @$editor = $($('#problem-editor').html())
         $preview = $($('#problem-preview').html())
         initProblemEditors(@$editor, $preview)
-      when 'html'
-        @$editor = $($('#html-editor').html())
-        $preview = $('<div class="html-preview"></div>')
-        initHTMLEditor(@$editor, $preview)
-      when 'discussion'
-        @$editor = $($('#discussion-editor').html())
-        $preview = $($('#discussion-preview').html())        
 
     @$editor.find('.save-button, .cancel-button').bind('click', =>
       @$componentItem.removeClass('editing')
