@@ -29,7 +29,6 @@ class @SelfAssessment
     # rebind to the appropriate function for the current state
     @submit_button.unbind('click')
     @submit_button.show()
-    @reset_button.hide()
     @hint_area.attr('disabled', false)
     if @state == 'initial'
       @answer_area.attr("disabled", false)
@@ -47,10 +46,6 @@ class @SelfAssessment
       @answer_area.attr("disabled", true)
       @hint_area.attr('disabled', true)
       @submit_button.hide()
-      if @allow_reset
-        @reset_button.show()
-      else
-        @reset_button.hide()
 
 
   find_assessment_elements: ->
