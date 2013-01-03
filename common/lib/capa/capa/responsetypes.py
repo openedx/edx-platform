@@ -1905,18 +1905,22 @@ class OpenEndedResponse(LoncapaResponse):
             # response types)
         except TypeError, ValueError:
             log.exception("Grader payload %r is not a json object!", grader_payload)
+
+        self.initial_display = find_with_default(oeparam, 'initial_display', '')
+        self.answer = find_with_default(oeparam, 'answer_display', 'No answer given.')
+
         parsed_grader_payload.update({
             'location' : self.system.location,
             'course_id' : self.system.course_id,
             'prompt' : prompt_string,
             'rubric' : rubric_string,
-        })
+            'initial_display' : self.initial_display,
+            'answer' : self.answer,
+            })
         updated_grader_payload = json.dumps(parsed_grader_payload)
 
         self.payload = {'grader_payload': updated_grader_payload}
 
-        self.initial_display = find_with_default(oeparam, 'initial_display', '')
-        self.answer = find_with_default(oeparam, 'answer_display', 'No answer given.')
         try:
             self.max_score = int(find_with_default(oeparam, 'max_score', 1))
         except ValueError:
@@ -2016,7 +2020,7 @@ class OpenEndedResponse(LoncapaResponse):
         contents.update({
             'student_info': json.dumps(student_info),
             'student_response': submission,
-            'max_score' : self.max_score
+            'max_score' : self.max_score,
             })
 
         # Submit request. When successful, 'msg' is the prior length of the queue
