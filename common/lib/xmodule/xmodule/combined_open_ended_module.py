@@ -42,7 +42,8 @@ class CombinedOpenEndedModule(XModule):
     DONE = 'done'
     TASK_TYPES=["self", "ml", "instructor", "peer"]
 
-    js = {'coffee': [resource_string(__name__, 'js/src/selfassessment/display.coffee'), resource_string(__name__, 'js/src/combinedopenended/display.coffee'), resource_string(__name__, 'js/src/openended/display.coffee')]}
+    #, resource_string(__name__, 'js/src/combinedopenended/display.coffee'), resource_string(__name__, 'js/src/openended/display.coffee')
+    js = {'coffee': [resource_string(__name__, 'js/src/selfassessment/display.coffee')]}
     js_module_name = "SelfAssessment"
 
     def __init__(self, system, location, definition, descriptor,
