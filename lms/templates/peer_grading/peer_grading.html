@@ -21,13 +21,19 @@
         <h2>Instructions</h2>
         <p>Here are a list of problems that need to be peer graded for this course.</p>
         % if success:
-        <ul class="problem-list">
-            %for problem in problem_list:
-            <li>
-            <a href="${ajax_url}/problem/${problem.location}">${problem.location} (${problem.num_graded} graded, ${problem.num_pending} pending)</a>
-            </li>
-            %endfor
-        </ul>
+            % if len(problem_list) == 0:
+            <div class="message-container">
+                Nothing to grade!
+            </div>
+            %else:
+                <ul class="problem-list">
+                %for problem in problem_list:
+                    <li>
+                    <a href="${ajax_url}/problem/${problem.location}">${problem.problem_name} (${problem.num_graded} graded, ${problem.num_pending} pending)</a>
+                    </li>
+                %endfor
+                </ul>
+            %endif
         %endif
     </div>
 </section>
