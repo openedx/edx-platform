@@ -7,6 +7,7 @@ class @CombinedOpenEnded
     @allow_reset = @el.data('allow_reset')
     @reset_button = @$('.reset-button')
     @reset_button.click @reset
+    @combined_open_ended= @$('.combined-open-ended')
     # valid states: 'initial', 'assessing', 'request_hint', 'done'
 
     # Where to put the rubric once we load it
@@ -19,6 +20,8 @@ class @CombinedOpenEnded
     @message_wrapper = @$('.message-wrapper')
     @submit_button = @$('.submit-button')
     @child_state = @el.data('state')
+
+    @open_ended_child= @$('.open-ended-child')
 
     @find_assessment_elements()
     @find_hint_elements()
