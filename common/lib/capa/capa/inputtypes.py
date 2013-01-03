@@ -791,8 +791,8 @@ registry.register(OpenEndedInput)
 
 class DragAndDropInput(InputTypeBase):
     """
-    Input for molecular geometry--show possible structures, let student
-    pick structure and label positions with atoms or electron pairs.
+    Input for drag and drop problems. Allows student to drag and drop images and
+    labels to base image.
     """
 
     template = 'drag_and_drop_input.html'
@@ -801,12 +801,14 @@ class DragAndDropInput(InputTypeBase):
     def setup(self):
 
         def parse(tag, tag_type):
-            """Parses <tag ... /> xml element to dictionary.
+            """Parses <tag ... /> xml element to dictionary. Stores
+                'draggable' and 'target' tags with attributes to dictionary and
+                returns last.
 
                 Args:
                     tag: xml etree element <tag...> with attributes
 
-                    tag_type: type of tag: 'draggable' or 'target'.
+                    tag_type: 'draggable' or 'target'.
 
                     If tag_type is 'draggable' : all attributes (name or label or
                     icon) are optional, but at least one attribute must be
@@ -841,7 +843,7 @@ class DragAndDropInput(InputTypeBase):
 
             return dic
 
-        # add labels to images:
+        # add labels to images?:
         self.no_labels = Attribute('no_labels',
                                         default="False").parse_from_xml(self.xml)
 
@@ -869,7 +871,6 @@ class DragAndDropInput(InputTypeBase):
 
         self.loaded_attributes['drag_and_drop_json'] = json.dumps(to_js)
         self.to_render.add('drag_and_drop_json')
-        # import ipdb; ipdb.set_trace()
         try:  # for tests and mock up, work normally not in tets
             self.loaded_attributes['course_folder'] = \
                 self.system.course_id.split('/')[1]
