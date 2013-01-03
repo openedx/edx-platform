@@ -6,11 +6,12 @@ class @MarkdownEditingDescriptor extends XModule.Descriptor
     lineWrapping: true
     })
 
-    @markdown_editor = CodeMirror.fromTextArea($(".edit-box", @element)[0], {
-    lineWrapping: true
-    mode: null
-    onChange: @onMarkdownEditorUpdate
-    })
+    if $(".markdown-box", @element).length != 0
+      @markdown_editor = CodeMirror.fromTextArea($(".markdown-box", @element)[0], {
+      lineWrapping: true
+      mode: null
+      onChange: @onMarkdownEditorUpdate
+      })
 
   onMarkdownEditorUpdate: ->
     console.log('update')
