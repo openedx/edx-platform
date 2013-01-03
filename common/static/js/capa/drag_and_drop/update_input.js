@@ -82,6 +82,7 @@ define(['logme'], function (logme) {
                 offset = 1;
             }
 
+            logme('!!!!!!!!!!!!!!!! answer');
             logme(answer);
 
             if (
@@ -103,7 +104,7 @@ define(['logme'], function (logme) {
                             continue;
                         }
 
-                        (function (c1, draggableId, draggable) {
+                        (function (c1, draggableId, draggable, targetId, target) {
                             moveDraggableToBaseImage();
                             return;
 
@@ -112,6 +113,8 @@ define(['logme'], function (logme) {
                                     setTimeout(moveDraggableToBaseImage, 50);
                                     return;
                                 }
+
+                                logme('use_targets = false; draggableId: ' + draggableId);
 
                                 draggable.setInContainer(false);
                                 draggable.containerEl.hide();
@@ -143,7 +146,7 @@ define(['logme'], function (logme) {
                                 draggable.setOnTarget(target);
                                 target.draggable.push(draggableId);
                             }
-                        }(c1, draggableId, draggable));
+                        }(c1, draggableId, draggable, targetId, target));
                     }
                 }
             } else if (
@@ -164,9 +167,12 @@ define(['logme'], function (logme) {
 
                             function moveDraggableToBaseImage() {
                                 if (draggable.hasLoaded === false) {
+                                    logme('draggable.hasLoaded === false');
                                     setTimeout(moveDraggableToBaseImage, 50);
                                     return;
                                 }
+
+                                logme('use_targets = false; draggableId: ' + draggableId);
 
                                 draggable.setInContainer(false);
                                 draggable.containerEl.hide();
