@@ -128,28 +128,34 @@ class Test_DragAndDrop(unittest.TestCase):
         {"2":"p_pi_1"},{"3":"p_pi_2"},{"11":"s_sigma_name"}, \
         {"13":"s_sigma_star_name"},{"15":"p_pi_name"},{"16":"p_pi_star_name"}, \
         {"12":"p_sigma_name"},{"14":"p_sigma_star_name"}]}'
-        correct_answer = draganddrop.DragAndDrop()
-        correct_answer.correct_groups['filled_levels'] = ['1', '2', '3', '4', '5', '6']
-        correct_answer.correct_positions['filled_levels'] = {'allowed': [
-        's_left', 's_right', 's_sigma', 's_sigma_star', 'p_pi_1', 'p_pi_2']}
 
-        correct_answer.correct_groups['spin_up'] = ['7', '8', '9', '10']
-        correct_answer.correct_positions['spin_up'] = {'allowed':
-            ['p_left_1', 'p_left_2', 'p_right_1', 'p_right_2']}
-
-        correct_answer.correct_groups['sigma'] = ['11', '12']
-        correct_answer.correct_positions['sigma'] = {'allowed':
-            ['s_sigma_name', 'p_sigma_name']}
-
-        correct_answer.correct_groups['sigma_star'] = ['13', '14']
-        correct_answer.correct_positions['sigma_star'] = {'allowed':
-            ['s_sigma_star_name', 'p_sigma_star_name']}
-
-        correct_answer.correct_groups['pi'] = ['15']
-        correct_answer.correct_positions['pi'] = {'allowed': ['p_pi_name']}
-
-        correct_answer.correct_groups['pi_star'] = ['16']
-        correct_answer.correct_positions['pi_star'] = {'allowed': ['p_pi_star_name']}
+        correct_answers = [{
+        'draggables': ['1', '2', '3', '4', '5', '6'],
+        'targets': [
+            's_left', 's_right', 's_sigma', 's_sigma_star', 'p_pi_1', 'p_pi_2'
+        ],
+        'rule': 'anyof'
+    }, {
+        'draggables': ['7','8', '9', '10'],
+        'targets': ['p_left_1', 'p_left_2', 'p_right_1','p_right_2'],
+        'rule': 'anyof'
+    }, {
+        'draggables': ['11', '12'],
+        'targets': ['s_sigma_name', 'p_sigma_name'],
+        'rule': 'anyof'
+    }, {
+        'draggables': ['13', '14'],
+        'targets': ['s_sigma_star_name', 'p_sigma_star_name'],
+        'rule': 'anyof'
+    }, {
+        'draggables': ['15'],
+        'targets': ['p_pi_name'],
+        'rule': 'anyof'
+    }, {
+        'draggables': ['16'],
+        'targets': ['p_pi_star_name'],
+        'rule': 'anyof'
+    }]
 
         self.assertTrue(draganddrop.grade(user_input, correct_answer))
 
@@ -161,28 +167,34 @@ class Test_DragAndDrop(unittest.TestCase):
         {"2":"p_pi_1"},{"3":"p_pi_2"},{"11":"s_sigma_name"}, \
         {"13":"s_sigma_star_name"},{"15":"p_pi_name"},{"16":"p_pi_star_name"}, \
         {"12":"p_sigma_name"},{"14":"p_sigma_star_name"}]}'
-        correct_answer = draganddrop.DragAndDrop()
-        correct_answer.correct_groups['filled_levels'] = ['1', '2', '3', '4', '5', '6']
-        correct_answer.correct_positions['filled_levels'] = {'allowed': [
-        's_left', 's_right', 's_sigma', 's_sigma_star', 'p_pi_1', 'p_pi_2']}
 
-        correct_answer.correct_groups['spin_up'] = ['7', '8', '9', '10']
-        correct_answer.correct_positions['spin_up'] = {'allowed':
-            ['p_left_1', 'p_left_2', 'p_right_1', 'p_right_2']}
-
-        correct_answer.correct_groups['sigma'] = ['11', '12']
-        correct_answer.correct_positions['sigma'] = {'allowed':
-            ['s_sigma_name', 'p_sigma_name']}
-
-        correct_answer.correct_groups['sigma_star'] = ['13', '14']
-        correct_answer.correct_positions['sigma_star'] = {'allowed':
-            ['s_sigma_star_name', 'p_sigma_star_name']}
-
-        correct_answer.correct_groups['pi'] = ['15']
-        correct_answer.correct_positions['pi'] = {'allowed': ['p_pi_name']}
-
-        correct_answer.correct_groups['pi_star'] = ['16']
-        correct_answer.correct_positions['pi_star'] = {'allowed': ['p_pi_star_name']}
+        correct_answers = [{
+        'draggables': ['1', '2', '3', '4', '5', '6'],
+        'targets': [
+            's_left', 's_right', 's_sigma', 's_sigma_star', 'p_pi_1', 'p_pi_2'
+        ],
+        'rule': 'anyof'
+    }, {
+        'draggables': ['7','8', '9', '10'],
+        'targets': ['p_left_1', 'p_left_2', 'p_right_1','p_right_2'],
+        'rule': 'anyof'
+    }, {
+        'draggables': ['11', '12'],
+        'targets': ['s_sigma_name', 'p_sigma_name'],
+        'rule': 'anyof'
+    }, {
+        'draggables': ['13', '14'],
+        'targets': ['s_sigma_star_name', 'p_sigma_star_name'],
+        'rule': 'anyof'
+    }, {
+        'draggables': ['15'],
+        'targets': ['p_pi_name'],
+        'rule': 'anyof'
+    }, {
+        'draggables': ['16'],
+        'targets': ['p_pi_star_name'],
+        'rule': 'anyof'
+    }]
 
         self.assertFalse(draganddrop.grade(user_input, correct_answer))
 
