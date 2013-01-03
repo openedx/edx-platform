@@ -21,7 +21,8 @@ function initProblemEditors($editor, $prev) {
   $currentEditor = $editor;
   simpleEditor = CodeMirror.fromTextArea($editor.find('.edit-box')[0], {
     lineWrapping: true,
-    extraKeys: {
+//    TODO: I left out the extra keys for now.
+      extraKeys: {
       'Ctrl-N': newUnit,
       'Ctrl-H': makeHeader,
       'Ctrl-V': makeVideo,
