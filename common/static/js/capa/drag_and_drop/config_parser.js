@@ -12,8 +12,6 @@ define(['logme'], function (logme) {
 
         returnStatus = true;
 
-        logme('imageDir', imageDir);
-
         state.config = {
             'imageDir': '/static/' + imageDir + '/images',
             'draggables': [],

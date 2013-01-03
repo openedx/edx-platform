@@ -54,8 +54,6 @@ define(['logme'], function (logme) {
         inputEl = $('#input_' + state.problemId);
         inputEl.val(stateStr);
 
-        logme(inputEl.val());
-
         return;
 
         // Check if input has an answer from server. If yes, then position
@@ -80,9 +78,6 @@ define(['logme'], function (logme) {
             if (state.config.targetOutline === true) {
                 offset = 1;
             }
-
-            logme('!!!!!!!!!!!!!!!! answer');
-            logme(answer);
 
             if (
                 ((typeof answer.use_targets === 'boolean') && (answer.use_targets === true)) ||
@@ -113,8 +108,6 @@ define(['logme'], function (logme) {
                                     return;
                                 }
 
-                                logme('use_targets = false; draggableId: ' + draggableId);
-
                                 draggable.setInContainer(false);
                                 draggable.containerEl.hide();
 
@@ -144,6 +137,9 @@ define(['logme'], function (logme) {
 
                                 draggable.setOnTarget(target);
                                 target.draggable.push(draggableId);
+
+                                state.numDraggablesInSlider -= 1;
+                                state.updateArrowOpacity();
                             }
                         }(draggableId, draggable, targetId, target));
                     }
@@ -166,12 +162,9 @@ define(['logme'], function (logme) {
 
                             function moveDraggableToBaseImage() {
                                 if (draggable.hasLoaded === false) {
-                                    logme('draggable.hasLoaded === false');
                                     setTimeout(moveDraggableToBaseImage, 50);
                                     return;
                                 }
-
-                                logme('use_targets = false; draggableId: ' + draggableId);
 
                                 draggable.setInContainer(false);
                                 draggable.containerEl.hide();
@@ -202,6 +195,9 @@ define(['logme'], function (logme) {
 
                                 draggable.x = answer.draggables[c1][draggableId][0];
                                 draggable.y = answer.draggables[c1][draggableId][1];
+
+                                state.numDraggablesInSlider -= 1;
+                                state.updateArrowOpacity();
                             }
                         }(c1, draggableId, draggable));
                     }
@@ -211,9 +207,6 @@ define(['logme'], function (logme) {
 
                 return;
             }
-
-            state.numDraggablesInSlider -= 1;
-            state.updateArrowOpacity();
         }
 
         return;

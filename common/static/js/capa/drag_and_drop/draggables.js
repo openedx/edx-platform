@@ -151,8 +151,6 @@ define(['logme', 'update_input'], function (logme, updateInput) {
                 // icon. All the existing code will work, and the user will
                 // see a label instead of an icon.
                 if (obj.label.length > 0) {
-                    logme('We have a label length > 0.');
-
                     draggableObj.iconEl = $(
                         '<div ' +
                             'style=" ' +
