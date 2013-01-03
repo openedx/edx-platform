@@ -114,12 +114,13 @@ class CombinedOpenEndedModule(XModule):
         return True
 
     def get_html(self):
+        self.update_task_states()
         html = self.current_task.get_html(self.system)
         return_html = rewrite_links(html, self.rewrite_content_links)
-        self.update_task_states()
         return return_html
 
     def update_task_states(self):
+        changed=False
         self.task_states[len(self.task_states)-1] = self.current_task.get_instance_state()
         current_task_state=json.loads(self.task_states[len(self.task_states)-1])
         if current_task_state['state']==self.DONE:
@@ -129,13 +130,19 @@ class CombinedOpenEndedModule(XModule):
                 self.current_task_number=self.current_task_number-1
             else:
                 self.state=self.INTERMEDIATE_DONE
+            changed=True
             self.setup_next_task()
+        return changed
 
+    def update_task_states_ajax(self,return_html):
+        changed=self.update_task_states()
+        if changed():
+            return_html=self.get_html()
+        return return_html
 
     def handle_ajax(self, dispatch, get):
         return_html = self.current_task.handle_ajax(dispatch,get, self.system)
-        self.update_task_states()
-        return return_html
+        return self.update_task_states_ajax(return_html)
 
     def get_instance_state(self):
         """
