@@ -11,6 +11,8 @@ import logging
 
 from .content import StaticContent, ContentStore
 from xmodule.exceptions import NotFoundError
+from fs.osfs import OSFS
+import os
 
 
 class MongoContentStore(ContentStore):
@@ -29,25 +31,49 @@ class MongoContentStore(ContentStore):
         id = content.get_id()
 
         # Seems like with the GridFS we can't update existing ID's we have to do a delete/add pair
-        if self.fs.exists({"_id" : id}):
-            self.fs.delete(id)
+        self.delete(id)
 
         with self.fs.new_file(_id = id, filename=content.get_url_path(), content_type=content.content_type, 
-            displayname=content.name, thumbnail_location=content.thumbnail_location) as fp:
+            displayname=content.name, thumbnail_location=content.thumbnail_location, import_path=content.import_path) as fp:
 
             fp.write(content.data)
         
         return content
         
-    
+    def delete(self, id):
+        if self.fs.exists({"_id" : id}):
+            self.fs.delete(id)
+
     def find(self, location):
         id = StaticContent.get_id_from_location(location)
         try:
             with self.fs.get(id) as fp:
                 return StaticContent(location, fp.displayname, fp.content_type, fp.read(), 
-                    fp.uploadDate, thumbnail_location = fp.thumbnail_location if 'thumbnail_location' in fp else None)
+                    fp.uploadDate, thumbnail_location = fp.thumbnail_location if hasattr(fp, 'thumbnail_location') else None,
+                    import_path = fp.import_path if hasattr(fp, 'import_path') else None)
         except NoFile:
             raise NotFoundError()
+
+    def export(self, location, output_directory):
+        content = self.find(location)
+
+        if content.import_path is not None:
+            output_directory = output_directory + '/' + os.path.dirname(content.import_path)
+
+        if not os.path.exists(output_directory):
+            os.makedirs(output_directory)
+
+        disk_fs = OSFS(output_directory)
+
+        with disk_fs.open(content.name, 'wb') as asset_file:
+            asset_file.write(content.data)
+
+    def export_all_for_course(self, course_location, output_directory):
+        assets = self.get_all_content_for_course(course_location)
+
+        for asset in assets:
+            asset_location = Location(asset['_id'])
+            self.export(asset_location, output_directory)
 
     def get_all_content_thumbnails_for_course(self, location):
         return self._get_all_content_for_course(location, get_thumbnails = True)

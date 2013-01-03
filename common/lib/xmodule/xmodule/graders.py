@@ -1,6 +1,5 @@
 import abc
 import inspect
-import json
 import logging
 import random
 import sys
@@ -66,17 +65,27 @@ def grader_from_conf(conf):
     for subgraderconf in conf:
         subgraderconf = subgraderconf.copy()
         weight = subgraderconf.pop("weight", 0)
+        # NOTE: 'name' used to exist in SingleSectionGrader. We are deprecating SingleSectionGrader
+        # and converting everything into an AssignmentFormatGrader by adding 'min_count' and
+        # 'drop_count'. AssignmentFormatGrader does not expect 'name', so if it appears
+        # in bad_args, go ahead remove it (this causes no errors). Eventually, SingleSectionGrader
+        # should be completely removed.
+        name = 'name'
         try:
             if 'min_count' in subgraderconf:
                 #This is an AssignmentFormatGrader
                 subgrader_class = AssignmentFormatGrader
-            elif 'name' in subgraderconf:
+            elif name in subgraderconf:
                 #This is an SingleSectionGrader
                 subgrader_class = SingleSectionGrader
             else:
                 raise ValueError("Configuration has no appropriate grader class.")
             
             bad_args = invalid_args(subgrader_class.__init__, subgraderconf)
+            # See note above concerning 'name'.
+            if bad_args.issuperset({name}):
+                bad_args = bad_args - {name}
+                del subgraderconf[name]
             if len(bad_args) > 0:
                 log.warning("Invalid arguments for a subgrader: %s", bad_args)
                 for key in bad_args:

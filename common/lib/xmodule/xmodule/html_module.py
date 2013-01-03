@@ -159,7 +159,7 @@ class HtmlDescriptor(XmlDescriptor, EditingDescriptor):
         filepath = u'{category}/{pathname}.html'.format(category=self.category,
                                                     pathname=pathname)
 
-        resource_fs.makedir(os.path.dirname(filepath), allow_recreate=True)
+        resource_fs.makedir(os.path.dirname(filepath), recursive=True, allow_recreate=True)
         with resource_fs.open(filepath, 'w') as file:
             file.write(self.definition['data'].encode('utf-8'))
 

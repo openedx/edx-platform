@@ -1,21 +1,27 @@
 import json
+import shutil
 from django.test import TestCase
 from django.test.client import Client
-from mock import patch, Mock
 from override_settings import override_settings
 from django.conf import settings
 from django.core.urlresolvers import reverse
 from path import path
+from tempfile import mkdtemp
+import json
 
 from student.models import Registration
 from django.contrib.auth.models import User
-from xmodule.modulestore.django import modulestore
 import xmodule.modulestore.django
-from xmodule.modulestore import Location
 from xmodule.modulestore.xml_importer import import_from_xml
 import copy
 from factories import *
 
+from xmodule.modulestore.store_utilities import clone_course
+from xmodule.modulestore.store_utilities import delete_course
+from xmodule.modulestore.django import modulestore
+from xmodule.contentstore.django import contentstore
+from xmodule.course_module import CourseDescriptor
+from xmodule.modulestore.xml_exporter import export_to_xml
 
 def parse_json(response):
     """Parse response, which is assumed to be json"""
@@ -23,33 +29,33 @@ def parse_json(response):
 
 
 def user(email):
-    '''look up a user by email'''
+    """look up a user by email"""
     return User.objects.get(email=email)
 
 
 def registration(email):
-    '''look up registration object by email'''
+    """look up registration object by email"""
     return Registration.objects.get(user__email=email)
 
 
 class ContentStoreTestCase(TestCase):
     def _login(self, email, pw):
-        '''Login.  View should always return 200.  The success/fail is in the
-        returned json'''
+        """Login.  View should always return 200.  The success/fail is in the
+        returned json"""
         resp = self.client.post(reverse('login_post'),
                                 {'email': email, 'password': pw})
         self.assertEqual(resp.status_code, 200)
         return resp
 
     def login(self, email, pw):
-        '''Login, check that it worked.'''
+        """Login, check that it worked."""
         resp = self._login(email, pw)
         data = parse_json(resp)
         self.assertTrue(data['success'])
         return resp
 
     def _create_account(self, username, email, pw):
-        '''Try to create an account.  No error checking'''
+        """Try to create an account.  No error checking"""
         resp = self.client.post('/create_account', {
             'username': username,
             'email': email,
@@ -63,7 +69,7 @@ class ContentStoreTestCase(TestCase):
         return resp
 
     def create_account(self, username, email, pw):
-        '''Create the account and check that it worked'''
+        """Create the account and check that it worked"""
         resp = self._create_account(username, email, pw)
         self.assertEqual(resp.status_code, 200)
         data = parse_json(resp)
@@ -75,8 +81,8 @@ class ContentStoreTestCase(TestCase):
         return resp
 
     def _activate_user(self, email):
-        '''Look up the activation key for the user, then hit the activate view.
-        No error checking'''
+        """Look up the activation key for the user, then hit the activate view.
+        No error checking"""
         activation_key = registration(email).activation_key
 
         # and now we try to activate
@@ -257,6 +263,16 @@ class ContentStoreTest(TestCase):
         self.assertEqual(data['ErrMsg'], 
             'There is already a course defined with the same organization and course number.')
 
+    def test_create_course_with_bad_organization(self):
+        """Test new course creation - error path for bad organization name"""
+        self.course_data['org'] = 'University of California, Berkeley'
+        resp = self.client.post(reverse('create_new_course'), self.course_data)
+        data = parse_json(resp)
+
+        self.assertEqual(resp.status_code, 200)
+        self.assertEqual(data['ErrMsg'],
+            "Unable to create course 'Robot Super Course'.\n\nInvalid characters in 'University of California, Berkeley'.")
+
     def test_course_index_view_with_no_courses(self):
         """Test viewing the index page with no courses"""
         # Create a course so there is something to view
@@ -331,5 +347,104 @@ class ContentStoreTest(TestCase):
 
     def test_edit_unit_full(self):
         self.check_edit_unit('full')
+
+    def test_clone_course(self):
+        import_from_xml(modulestore(), 'common/test/data/', ['full'])
+
+        resp = self.client.post(reverse('create_new_course'), self.course_data)
+        self.assertEqual(resp.status_code, 200)
+        data = parse_json(resp)
+        self.assertEqual(data['id'], 'i4x://MITx/999/course/Robot_Super_Course')
+
+        ms = modulestore('direct')
+        cs = contentstore()
+
+        source_location = CourseDescriptor.id_to_location('edX/full/6.002_Spring_2012')
+        dest_location = CourseDescriptor.id_to_location('MITx/999/Robot_Super_Course')
+
+        clone_course(ms, cs, source_location, dest_location)
+
+        # now loop through all the units in the course and verify that the clone can render them, which 
+        # means the objects are at least present
+        items = ms.get_items(Location(['i4x','edX', 'full', 'vertical', None]))
+        self.assertGreater(len(items), 0)
+        clone_items = ms.get_items(Location(['i4x', 'MITx','999','vertical', None]))
+        self.assertGreater(len(clone_items), 0)
+        for descriptor in items:
+            new_loc = descriptor.location._replace(org = 'MITx', course='999')
+            print "Checking {0} should now also be at {1}".format(descriptor.location.url(), new_loc.url())
+            resp = self.client.get(reverse('edit_unit', kwargs={'location': new_loc.url()}))
+            self.assertEqual(resp.status_code, 200)
+
+    def test_delete_course(self):
+        import_from_xml(modulestore(), 'common/test/data/', ['full'])
+
+        ms = modulestore('direct')
+        cs = contentstore()
+
+        location = CourseDescriptor.id_to_location('edX/full/6.002_Spring_2012')
+
+        delete_course(ms, cs, location)
+
+        items = ms.get_items(Location(['i4x','edX', 'full', 'vertical', None]))
+        self.assertEqual(len(items), 0)
+
+    def test_export_course(self):
+        ms = modulestore('direct')
+        cs = contentstore() 
+
+        import_from_xml(ms, 'common/test/data/', ['full'])
+        location = CourseDescriptor.id_to_location('edX/full/6.002_Spring_2012')
+
+        root_dir = path(mkdtemp())
+
+        print 'Exporting to tempdir = {0}'.format(root_dir)
+
+        # export out to a tempdir
+        export_to_xml(ms, cs, location, root_dir, 'test_export')
+
+        # remove old course
+        delete_course(ms, cs, location)
+
+        # reimport
+        import_from_xml(ms, root_dir, ['test_export'])
+
+        items = ms.get_items(Location(['i4x','edX', 'full', 'vertical', None]))
+        self.assertGreater(len(items), 0)
+        for descriptor in items:
+            print "Checking {0}....".format(descriptor.location.url())
+            resp = self.client.get(reverse('edit_unit', kwargs={'location': descriptor.location.url()}))
+            self.assertEqual(resp.status_code, 200)
+
+        shutil.rmtree(root_dir)        
+
+    def test_course_handouts_rewrites(self):
+        ms = modulestore('direct')
+        cs = contentstore() 
+
+        # import a test course
+        import_from_xml(ms, 'common/test/data/', ['full'])     
+
+        handout_location= Location(['i4x', 'edX', 'full', 'course_info', 'handouts'])
+
+        # get module info
+        resp = self.client.get(reverse('module_info', kwargs={'module_location': handout_location}))
+
+        # make sure we got a successful response
+        self.assertEqual(resp.status_code, 200)
+
+        # check that /static/ has been converted to the full path
+        # note, we know the link it should be because that's what in the 'full' course in the test data
+        self.assertContains(resp, '/c4x/edX/full/asset/handouts_schematic_tutorial.pdf') 
+
+
+
+
+
+
+        
+
+
+
 
 

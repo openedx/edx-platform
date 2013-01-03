@@ -36,13 +36,6 @@
 	}
 }
 
-.new-course-button {
-	@include grey-button;
-	display: block;
-	padding: 20px;
-	text-align: center;
-}
-
 .new-course {
 	padding: 15px 25px;
 	margin-top: 20px;
@@ -89,7 +82,6 @@
 
 	.new-course-save {
 		@include blue-button;
-		// padding: ;
 	}
 
 	.new-course-cancel {

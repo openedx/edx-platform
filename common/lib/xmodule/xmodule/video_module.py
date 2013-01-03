@@ -25,7 +25,8 @@ class VideoModule(XModule):
          resource_string(__name__, 'js/src/video/display.coffee')] +
         [resource_string(__name__, 'js/src/video/display/' + filename)
          for filename
-         in sorted(resource_listdir(__name__, 'js/src/video/display'))]}
+         in sorted(resource_listdir(__name__, 'js/src/video/display'))
+         if filename.endswith('.coffee')]}
     css = {'scss': [resource_string(__name__, 'css/video/display.scss')]}
     js_module_name = "Video"
 

@@ -2,8 +2,6 @@ var $body;
 var $modal;
 var $modalCover;
 var $newComponentItem;
-var $newComponentStep1;
-var $newComponentStep2;
 var $changedInput;
 var $spinner;
 
@@ -11,6 +9,15 @@ $(document).ready(function() {
     $body = $('body');
     $modal = $('.history-modal');
     $modalCover = $('<div class="modal-cover">');
+    // cdodge: this looks funny, but on AWS instances, this base.js get's wrapped in a separate scope as part of Django static
+    // pipelining (note, this doesn't happen on local runtimes). So if we set it on window, when we can access it from other
+    // scopes (namely the course-info tab)
+    window.$modalCover = $modalCover;
+    
+    // Control whether template caching in local memory occurs (see template_loader.js). Caching screws up development but may
+    // be a good optimization in production (it works fairly well)
+    window.cachetemplates = false;
+
     $body.append($modalCover);
     $newComponentItem = $('.new-component-item');
     $newComponentTypePicker = $('.new-component');
@@ -33,6 +40,8 @@ $(document).ready(function() {
 
     $('.unit .item-actions .delete-button').bind('click', deleteUnit);
     $('.new-unit-item').bind('click', createNewUnit);
+
+    $('.collapse-all-button').bind('click', collapseAll);
 
     // autosave when a field is updated on the subsection page
     $body.on('keyup', '.subsection-display-name-input, .unit-subtitle, .policy-list-value', checkForNewValue);
@@ -100,15 +109,12 @@ $(document).ready(function() {
     $('.edit-section-start-cancel').bind('click', cancelSetSectionScheduleDate);
     $('.edit-section-start-save').bind('click', saveSetSectionScheduleDate);
 
-    // modal upload asset dialog. Bind it in the initializer otherwise multiple hanlders will get registered causing
-    // pretty wacky stuff to happen
-    $('.file-input').bind('change', startUpload);
     $('.upload-modal .choose-file-button').bind('click', showFileSelectionMenu);
 
     $body.on('click', '.section-published-date .edit-button', editSectionPublishDate);
     $body.on('click', '.section-published-date .schedule-button', editSectionPublishDate);
     $body.on('click', '.edit-subsection-publish-settings .save-button', saveSetSectionScheduleDate);
-    $body.on('click', '.edit-subsection-publish-settings .cancel-button', hideModal)
+    $body.on('click', '.edit-subsection-publish-settings .cancel-button', hideModal);
     $body.on('change', '.edit-subsection-publish-settings .start-date', function() {
         if($('.edit-subsection-publish-settings').find('.start-time').val() == '') {
             $('.edit-subsection-publish-settings').find('.start-time').val('12:00am');    
@@ -118,6 +124,11 @@ $(document).ready(function() {
         $('.edit-subsection-publish-settings').find('.save-button').show();
     });
 });
+
+function collapseAll(e) {
+    $('.branch').addClass('collapsed');
+    $('.expand-collapse-icon').removeClass('collapse').addClass('expand');
+}
 
 function editSectionPublishDate(e) {
     e.preventDefault();
@@ -298,7 +309,7 @@ function checkForNewValue(e) {
 
         this.saveTimer = setTimeout(function() {
             $changedInput = $(e.target);
-            saveSubsection()
+            saveSubsection();
             this.saveTimer = null;
         }, 500);
     }
@@ -311,7 +322,7 @@ function autosaveInput(e) {
 
     this.saveTimer = setTimeout(function() {        
         $changedInput = $(e.target);
-        saveSubsection()
+        saveSubsection();
         this.saveTimer = null;
     }, 500);
 }
@@ -333,23 +344,22 @@ function saveSubsection() {
     // pull all 'normalized' metadata editable fields on page
     var metadata_fields = $('input[data-metadata-name]');
     
-    metadata = {};
+    var metadata = {};
     for(var i=0; i< metadata_fields.length;i++) {
-	   el = metadata_fields[i];
+	   var el = metadata_fields[i];
 	   metadata[$(el).data("metadata-name")] = el.value;
     } 
 
     // now add 'free-formed' metadata which are presented to the user as dual input fields (name/value)
     $('ol.policy-list > li.policy-list-element').each( function(i, element) {
-        name = $(element).children('.policy-list-name').val();
-        val = $(element).children('.policy-list-value').val();
-        metadata[name] = val;
+        var name = $(element).children('.policy-list-name').val();
+        metadata[name] = $(element).children('.policy-list-value').val();
     });
 
     // now add any 'removed' policy metadata which is stored in a separate hidden div
     // 'null' presented to the server means 'remove'
     $("#policy-to-delete > li.policy-list-element").each(function(i, element) {
-        name = $(element).children('.policy-list-name').val();
+        var name = $(element).children('.policy-list-name').val();
         if (name != "")
            metadata[name] = null;
     });
@@ -385,7 +395,7 @@ function createNewUnit(e) {
     $.post('/clone_item',
 	   {'parent_location' : parent,
 		   'template' : template,
-		   'display_name': 'New Unit',
+		   'display_name': 'New Unit'
 		   },
 	   function(data) {
 	       // redirect to the edit page
@@ -475,7 +485,7 @@ function displayFinishedUpload(xhr) {
 
     var template = $('#new-asset-element').html();
     var html = Mustache.to_html(template, resp);
-    $('table > tbody > tr:first').before(html);
+    $('table > tbody').prepend(html);
 
 }
 
@@ -488,6 +498,7 @@ function hideModal(e) {
     if(e) {
         e.preventDefault();
     }
+    $('.file-input').unbind('change', startUpload);
     $modal.hide();
     $modalCover.hide();
 }
@@ -588,9 +599,11 @@ function hideToastMessage(e) {
 function addNewSection(e, isTemplate) {
     e.preventDefault();
 
+    $(e.target).addClass('disabled');
+
     var $newSection = $($('#new-section-template').html());
     var $cancelButton = $newSection.find('.new-section-name-cancel');
-    $('.new-courseware-section-button').after($newSection);
+    $('.courseware-overview').prepend($newSection);
     $newSection.find('.new-section-name').focus().select();
     $newSection.find('.section-name-form').bind('submit', saveNewSection);
     $cancelButton.bind('click', cancelNewSection);
@@ -627,11 +640,14 @@ function saveNewSection(e) {
 
 function cancelNewSection(e) {
     e.preventDefault();
+    $('.new-courseware-section-button').removeClass('disabled');
     $(this).parents('section.new-section').remove();
 }
 
 function addNewCourse(e) {
     e.preventDefault();
+
+    $(e.target).hide();
     var $newCourse = $($('#new-course-template').html());
     var $cancelButton = $newCourse.find('.new-course-cancel');
     $('.new-course-button').after($newCourse);
@@ -659,7 +675,7 @@ function saveNewCourse(e) {
         'template' : template,
         'org' : org,
         'number' : number,
-        'display_name': display_name,
+        'display_name': display_name
         },
         function(data) {
             if (data.id != undefined) {
@@ -672,6 +688,7 @@ function saveNewCourse(e) {
 
 function cancelNewCourse(e) {
     e.preventDefault();
+    $('.new-course-button').show();
     $(this).parents('section.new-course').remove();
 }
 
@@ -687,7 +704,7 @@ function addNewSubsection(e) {
 
     var parent = $(this).parents("section.branch").data("id");
 
-    $saveButton.data('parent', parent)
+    $saveButton.data('parent', parent);
     $saveButton.data('template', $(this).data('template'));
 
     $newSubsection.find('.new-subsection-form').bind('submit', saveNewSubsection);
@@ -752,7 +769,7 @@ function saveEditSectionName(e) {
     $spinner.show();
 
     if (display_name == '') {
-        alert("You must specify a name before saving.")
+        alert("You must specify a name before saving.");
         return;
     }
 
@@ -789,13 +806,12 @@ function cancelSetSectionScheduleDate(e) {
 function saveSetSectionScheduleDate(e) {
     e.preventDefault();
 
-    input_date = $('.edit-subsection-publish-settings .start-date').val();
-    input_time = $('.edit-subsection-publish-settings .start-time').val();
+    var input_date = $('.edit-subsection-publish-settings .start-date').val();
+    var input_time = $('.edit-subsection-publish-settings .start-time').val();
 
-    start = getEdxTimeFromDateTimeVals(input_date, input_time);
+    var start = getEdxTimeFromDateTimeVals(input_date, input_time);
 
-    id = $modal.attr('data-id');
-    var $_this = $(this);
+    var id = $modal.attr('data-id');
 
     // call into server to commit the new order
     $.ajax({

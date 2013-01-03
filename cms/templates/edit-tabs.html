@@ -17,13 +17,18 @@
 <%block name="content">
 <div class="main-wrapper">
   <div class="inner-wrapper">
-    <div>
-      <h1>Static Tabs</h1>
-    </div>
-    <article class="unit-body window">
+    <article class="unit-body">
       <div class="details">
-        <p>Here you can add and manage additional pages for your course. These pages will be added to the primary navigation menu alongside Courseware, Course Info, Discussion, etc.</p>
+        <h2>Here you can add and manage additional pages for your course</h2> 
+        <p>These pages will be added to the primary navigation menu alongside Courseware, Course Info, Discussion, etc.</p>
       </div>
+
+      <div class="page-actions">
+        <a href="#" class="new-button new-tab">
+          <span class="plus-icon white"></span>New Page
+        </a>
+      </div>
+      
       <div class="tab-list">
         <ol class='components'>
           % for id in components:
@@ -31,9 +36,7 @@
           % endfor
                    
           <li class="new-component-item">
-            <a href="#" class="new-button big new-tab">
-              <span class="plus-icon"></span>New Tab
-            </a>
+            
           </li>
         </ol>      
       </div>

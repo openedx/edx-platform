@@ -1,18 +1,17 @@
-from fs.errors import ResourceNotFoundError
-import logging
-import json
+from cStringIO import StringIO
 from lxml import etree
 from path import path # NOTE (THK): Only used for detecting presence of syllabus
-import requests
-import time
-from cStringIO import StringIO
-
-from xmodule.util.decorators import lazyproperty
+from xmodule.graders import grader_from_conf
 from xmodule.modulestore import Location
 from xmodule.seq_module import SequenceDescriptor, SequenceModule
-from xmodule.xml_module import XmlDescriptor
 from xmodule.timeparse import parse_time, stringify_time
-from xmodule.graders import grader_from_conf
+from xmodule.util.decorators import lazyproperty
+import json
+import logging
+import requests
+import time
+import copy
+
 
 log = logging.getLogger(__name__)
 
@@ -92,10 +91,6 @@ class CourseDescriptor(SequenceDescriptor):
             log.critical(msg)
             system.error_tracker(msg)
 
-        self.enrollment_start = self._try_parse_time("enrollment_start")
-        self.enrollment_end = self._try_parse_time("enrollment_end")
-        self.end = self._try_parse_time("end")
-
         # NOTE: relies on the modulestore to call set_grading_policy() right after
         # init.  (Modulestore is in charge of figuring out where to load the policy from)
 
@@ -105,19 +100,11 @@ class CourseDescriptor(SequenceDescriptor):
 
         self.set_grading_policy(self.definition['data'].get('grading_policy', None))
 
-
-    def set_grading_policy(self, course_policy):
-        if course_policy is None:
-            course_policy = {}
-
+    def defaut_grading_policy(self):
         """
-        The JSON object can have the keys GRADER and GRADE_CUTOFFS. If either is
-        missing, it reverts to the default.
+        Return a dict which is a copy of the default grading policy
         """
-
-        default_policy_string = """
-        {
-            "GRADER" : [
+        default = {"GRADER" : [
                 {
                     "type" : "Homework",
                     "min_count" : 12,
@@ -129,37 +116,44 @@ class CourseDescriptor(SequenceDescriptor):
                     "type" : "Lab",
                     "min_count" : 12,
                     "drop_count" : 2,
-                    "category" : "Labs",
                     "weight" : 0.15
                 },
                 {
-                    "type" : "Midterm",
-                    "name" : "Midterm Exam",
+                    "type" : "Midterm Exam",
                     "short_label" : "Midterm",
+                    "min_count" : 1,
+                    "drop_count" : 0,
                     "weight" : 0.3
                 },
                 {
-                    "type" : "Final",
-                    "name" : "Final Exam",
+                    "type" : "Final Exam",
                     "short_label" : "Final",
+                    "min_count" : 1,
+                    "drop_count" : 0,
                     "weight" : 0.4
                 }
             ],
             "GRADE_CUTOFFS" : {
-                "A" : 0.87,
-                "B" : 0.7,
-                "C" : 0.6
-            }
-        }
+                "Pass" : 0.5
+            }}
+        return copy.deepcopy(default)
+
+    def set_grading_policy(self, course_policy):
         """
+        The JSON object can have the keys GRADER and GRADE_CUTOFFS. If either is
+        missing, it reverts to the default.
+        """
+        if course_policy is None:
+            course_policy = {}
 
         # Load the global settings as a dictionary
-        grading_policy = json.loads(default_policy_string)
+        grading_policy = self.defaut_grading_policy()
 
         # Override any global settings with the course settings
         grading_policy.update(course_policy)
 
         # Here is where we should parse any configurations, so that we can fail early
+        grading_policy['RAW_GRADER'] = grading_policy['GRADER']  # used for cms access
         grading_policy['GRADER'] = grader_from_conf(grading_policy['GRADER'])
         self._grading_policy = grading_policy
 
@@ -168,8 +162,8 @@ class CourseDescriptor(SequenceDescriptor):
     @classmethod
     def read_grading_policy(cls, paths, system):
         """Load a grading policy from the specified paths, in order, if it exists."""
-        # Default to a blank policy
-        policy_str = '""'
+        # Default to a blank policy dict
+        policy_str = '{}'
 
         for policy_path in paths:
             if not system.resources_fs.exists(policy_path):
@@ -253,12 +247,52 @@ class CourseDescriptor(SequenceDescriptor):
         return time.gmtime() > self.start
 
     @property
+    def end(self):
+        return self._try_parse_time("end")
+    @end.setter
+    def end(self, value):
+        if isinstance(value, time.struct_time):
+            self.metadata['end'] = stringify_time(value)
+    @property
+    def enrollment_start(self):
+        return self._try_parse_time("enrollment_start")
+        
+    @enrollment_start.setter
+    def enrollment_start(self, value):
+        if isinstance(value, time.struct_time):
+            self.metadata['enrollment_start'] = stringify_time(value)
+    @property
+    def enrollment_end(self):        
+        return self._try_parse_time("enrollment_end")
+        
+    @enrollment_end.setter
+    def enrollment_end(self, value):
+        if isinstance(value, time.struct_time):
+            self.metadata['enrollment_end'] = stringify_time(value)
+        
+    @property
     def grader(self):
         return self._grading_policy['GRADER']
+    
+    @property
+    def raw_grader(self):
+        return self._grading_policy['RAW_GRADER']
+    
+    @raw_grader.setter
+    def raw_grader(self, value):
+        # NOTE WELL: this change will not update the processed graders. If we need that, this needs to call grader_from_conf
+        self._grading_policy['RAW_GRADER'] = value
+        self.definition['data'].setdefault('grading_policy',{})['GRADER'] = value
 
     @property
     def grade_cutoffs(self):
         return self._grading_policy['GRADE_CUTOFFS']
+    
+    @grade_cutoffs.setter
+    def grade_cutoffs(self, value):
+        self._grading_policy['GRADE_CUTOFFS'] = value
+        self.definition['data'].setdefault('grading_policy',{})['GRADE_CUTOFFS'] = value
+    
 
     @property
     def lowest_passing_grade(self):

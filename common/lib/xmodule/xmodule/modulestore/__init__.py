@@ -153,7 +153,7 @@ class Location(_LocationBase):
             def check(val, regexp):
                 if val is not None and regexp.search(val) is not None:
                     log.debug('invalid characters val="%s", list_="%s"' % (val, list_))
-                    raise InvalidLocationError(location)
+                    raise InvalidLocationError("Invalid characters in '%s'." % (val))
 
             list_ = list(list_)
             for val in list_[:4] + [list_[5]]:

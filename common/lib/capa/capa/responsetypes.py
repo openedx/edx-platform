@@ -1145,7 +1145,13 @@ class CodeResponse(LoncapaResponse):
         xml = self.xml
         # TODO: XML can override external resource (grader/queue) URL
         self.url = xml.get('url', None)
-        self.queue_name = xml.get('queuename', self.system.xqueue['default_queuename'])
+
+        # We do not support xqueue within Studio.
+        if self.system.xqueue is not None:
+            default_queuename = self.system.xqueue['default_queuename']
+        else:
+            default_queuename = None
+        self.queue_name = xml.get('queuename', default_queuename)
 
         # VS[compat]:
         #   Check if XML uses the ExternalResponse format or the generic CodeResponse format
@@ -1233,6 +1239,13 @@ class CodeResponse(LoncapaResponse):
                       ' student_answers=%s' %
                 (err, self.answer_id, convert_files_to_filenames(student_answers)))
             raise Exception(err)
+
+        # We do not support xqueue within Studio.
+        if self.system.xqueue is None:
+            cmap = CorrectMap()
+            cmap.set(self.answer_id, queuestate=None,
+                msg='Error checking problem: no external queueing server is configured.')
+            return cmap
 
         # Prepare xqueue request
         #------------------------------------------------------------

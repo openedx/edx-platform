@@ -31,21 +31,6 @@
           <label>Units:</label>
           ${units.enum_units(subsection, subsection_units=subsection_units)}
         </div>
-        <div>
-          <label>Policy:</label>
-          <ol class='policy-list'>
-              % for policy_name in policy_metadata.keys():
-              <li class="policy-list-element">
-                  <input type="text" class="policy-list-name" name="${policy_name}" value="${policy_name}" disabled size="15"/>:&nbsp;<input type="text" class="policy-list-value" name="${policy_metadata[policy_name]}" value="${policy_metadata[policy_name]}" size="40"/>
-                  <a href="#" class="cancel-button">Cancel</a>
-                  <a href="#" class="delete-icon remove-policy-data"></a>
-              </li>
-              % endfor
-        <a href="#" class="new-policy-item add-policy-data">
-          <span class="plus-icon-small"></span>New Policy Data
-        </a>
-          </ol>
-        </div>                    
       </article>
     </div>
 
@@ -62,7 +47,7 @@
     </div>
 
     <div class="sidebar">
-      <div class="unit-settings window">
+      <div class="unit-settings window id-holder" data-id="${subsection.location}">
     <h4>Subsection Settings</h4>
     <div class="window-contents">
       <div class="scheduled-date-input row">
@@ -84,6 +69,13 @@
             <a href="#" class="sync-date no-spinner">Sync to ${parent_item.display_name}.</a></p>
         % endif
       </div>
+    
+    <div class="row gradable">
+      <label>Graded as:</label>
+      
+    <div class="gradable-status" data-initial-status="${subsection.metadata.get('format', 'Not Graded')}">
+    </div>
+    
     <div class="due-date-input row">
       <label>Due date:</label>
       <a href="#" class="set-date">Set a due date</a>
@@ -116,6 +108,10 @@
 <script src="${static.url('js/vendor/timepicker/jquery.timepicker.js')}"></script>
 <script src="${static.url('js/vendor/timepicker/datepair.js')}"></script>
 <script src="${static.url('js/vendor/date.js')}"></script>
+  <script type="text/javascript" src="${static.url('js/models/course_relative.js')}"></script>
+  <script type="text/javascript" src="${static.url('js/views/grader-select-view.js')}"></script>
+  <script type="text/javascript" src="${static.url('js/models/settings/course_grading_policy.js')}"></script>
+
 <script type="text/javascript">
     $(document).ready(function() {
         // expand the due-date area if the values are set
@@ -124,6 +120,23 @@
             $('.set-date').hide();
             $block.find('.date-setter').show();
         }
+        // TODO figure out whether these should be in window or someplace else or whether they're only needed as local vars
+        // I believe that current (New Section/New Subsection) cause full page reloads which means these aren't needed globally
+        // but we really should change that behavior.
+	    if (!window.graderTypes) {
+	        window.graderTypes = new CMS.Models.Settings.CourseGraderCollection();
+	        window.graderTypes.course_location = new CMS.Models.Location('${parent_location}');
+	        window.graderTypes.reset(${course_graders|n});
+	    }
+	    
+	    $(".gradable-status").each(function(index, ele) {
+	        var gradeView = new CMS.Views.OverviewAssignmentGrader({
+	            el : ele,
+	            graders : window.graderTypes,
+	            hideSymbol : true
+	        });
+	    });
     })
+
 </script>
 </%block>
