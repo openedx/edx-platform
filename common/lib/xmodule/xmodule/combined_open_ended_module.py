@@ -124,6 +124,20 @@ class CombinedOpenEndedModule(XModule):
         return True
 
     def get_html(self):
+        task_html=self.get_html_base()
+        #set context variables and render template
+
+        context = {
+            'items': [{'content' : task_html}],
+            'ajax_url': self.system.ajax_url,
+            'allow_reset': True,
+            }
+
+        html = system.render_template('combined_open_ended.html', context)
+        return html
+
+
+    def get_html_base(self):
         self.update_task_states()
         html = self.current_task.get_html(self.system)
         return_html = rewrite_links(html, self.rewrite_content_links)
