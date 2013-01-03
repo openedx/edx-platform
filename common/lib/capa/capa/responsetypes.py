@@ -1836,6 +1836,7 @@ class OpenEndedResponse(LoncapaResponse):
     """
 
     DEFAULT_QUEUE = 'open-ended'
+    DEFAULT_MESSAGE_QUEUE = 'open-ended-message'
     response_tag = 'openendedresponse'
     allowed_inputfields = ['openendedinput']
     max_inputfields = 1
@@ -1847,11 +1848,16 @@ class OpenEndedResponse(LoncapaResponse):
         xml = self.xml
         self.url = xml.get('url', None)
         self.queue_name = xml.get('queuename', self.DEFAULT_QUEUE)
+        self.message_queue_name = xml.get('message-queuename', self.DEFAULT_MESSAGE_QUEUE)
 
         # The openendedparam tag encapsulates all grader settings
         oeparam = self.xml.find('openendedparam')
         prompt = self.xml.find('prompt')
         rubric = self.xml.find('openendedrubric')
+
+        #This is needed to attach feedback to specific responses later
+        self.submission_id=None
+        self.grader_id=None
 
         if oeparam is None:
             raise ValueError("No oeparam found in problem xml.")
@@ -1899,22 +1905,80 @@ class OpenEndedResponse(LoncapaResponse):
             # response types)
         except TypeError, ValueError:
             log.exception("Grader payload %r is not a json object!", grader_payload)
+
+        self.initial_display = find_with_default(oeparam, 'initial_display', '')
+        self.answer = find_with_default(oeparam, 'answer_display', 'No answer given.')
+
         parsed_grader_payload.update({
             'location' : self.system.location,
             'course_id' : self.system.course_id,
             'prompt' : prompt_string,
             'rubric' : rubric_string,
-        })
+            'initial_display' : self.initial_display,
+            'answer' : self.answer,
+            })
         updated_grader_payload = json.dumps(parsed_grader_payload)
 
         self.payload = {'grader_payload': updated_grader_payload}
 
-        self.initial_display = find_with_default(oeparam, 'initial_display', '')
-        self.answer = find_with_default(oeparam, 'answer_display', 'No answer given.')
         try:
             self.max_score = int(find_with_default(oeparam, 'max_score', 1))
         except ValueError:
             self.max_score = 1
+
+    def handle_message_post(self,event_info):
+        """
+        Handles a student message post (a reaction to the grade they received from an open ended grader type)
+        Returns a boolean success/fail and an error message
+        """
+        survey_responses=event_info['survey_responses']
+        for tag in ['feedback', 'submission_id', 'grader_id', 'score']:
+            if tag not in survey_responses:
+                return False, "Could not find needed tag {0}".format(tag)
+        try:
+            submission_id=int(survey_responses['submission_id'])
+            grader_id = int(survey_responses['grader_id'])
+            feedback = str(survey_responses['feedback'].encode('ascii', 'ignore'))
+            score = int(survey_responses['score'])
+        except:
+            error_message=("Could not parse submission id, grader id, "
+                           "or feedback from message_post ajax call.  Here is the message data: {0}".format(survey_responses))
+            log.exception(error_message)
+            return False, "There was an error saving your feedback.  Please contact course staff."
+
+        qinterface = self.system.xqueue['interface']
+        qtime = datetime.strftime(datetime.now(), xqueue_interface.dateformat)
+        anonymous_student_id = self.system.anonymous_student_id
+        queuekey = xqueue_interface.make_hashkey(str(self.system.seed) + qtime +
+                                                 anonymous_student_id +
+                                                 self.answer_id)
+
+        xheader = xqueue_interface.make_xheader(
+            lms_callback_url=self.system.xqueue['callback_url'],
+            lms_key=queuekey,
+            queue_name=self.message_queue_name
+        )
+
+        student_info = {'anonymous_student_id': anonymous_student_id,
+                        'submission_time': qtime,
+                        }
+        contents= {
+            'feedback' : feedback,
+            'submission_id' : submission_id,
+            'grader_id' : grader_id,
+            'score': score,
+            'student_info' : json.dumps(student_info),
+        }
+
+        (error, msg) = qinterface.send_to_queue(header=xheader,
+            body=json.dumps(contents))
+
+        #Convert error to a success value
+        success=True
+        if error:
+            success=False
+
+        return success, "Successfully submitted your feedback."
 
     def get_score(self, student_answers):
 
@@ -1956,7 +2020,7 @@ class OpenEndedResponse(LoncapaResponse):
         contents.update({
             'student_info': json.dumps(student_info),
             'student_response': submission,
-            'max_score' : self.max_score
+            'max_score' : self.max_score,
             })
 
         # Submit request. When successful, 'msg' is the prior length of the queue
@@ -2056,18 +2120,36 @@ class OpenEndedResponse(LoncapaResponse):
             """
             return priorities.get(elt[0], default_priority)
 
+        def encode_values(feedback_type,value):
+            feedback_type=str(feedback_type).encode('ascii', 'ignore')
+            if not isinstance(value,basestring):
+                value=str(value)
+            value=value.encode('ascii', 'ignore')
+            return feedback_type,value
+
         def format_feedback(feedback_type, value):
-            return """
+            feedback_type,value=encode_values(feedback_type,value)
+            feedback= """
             <div class="{feedback_type}">
             {value}
             </div>
             """.format(feedback_type=feedback_type, value=value)
+            return feedback
+
+        def format_feedback_hidden(feedback_type , value):
+            feedback_type,value=encode_values(feedback_type,value)
+            feedback = """
+            <div class="{feedback_type}" style="display: none;">
+            {value}
+            </div>
+            """.format(feedback_type=feedback_type, value=value)
+            return feedback
 
         # TODO (vshnayder): design and document the details of this format so
         # that we can do proper escaping here (e.g. are the graders allowed to
         # include HTML?)
 
-        for tag in ['success', 'feedback']:
+        for tag in ['success', 'feedback', 'submission_id', 'grader_id']:
             if tag not in response_items:
                 return format_feedback('errors', 'Error getting feedback')
 
@@ -2083,10 +2165,15 @@ class OpenEndedResponse(LoncapaResponse):
                 return format_feedback('errors', 'No feedback available')
 
             feedback_lst = sorted(feedback.items(), key=get_priority)
-            return u"\n".join(format_feedback(k, v) for k, v in feedback_lst)
+            feedback_list_part1 = u"\n".join(format_feedback(k, v) for k, v in feedback_lst)
         else:
-            return format_feedback('errors', response_items['feedback'])
+            feedback_list_part1 = format_feedback('errors', response_items['feedback'])
 
+        feedback_list_part2=(u"\n".join([format_feedback_hidden(feedback_type,value)
+                                         for feedback_type,value in response_items.items()
+                                         if feedback_type in ['submission_id', 'grader_id']]))
+
+        return u"\n".join([feedback_list_part1,feedback_list_part2])
 
     def _format_feedback(self, response_items):
         """
@@ -2104,7 +2191,7 @@ class OpenEndedResponse(LoncapaResponse):
 
         feedback_template = self.system.render_template("open_ended_feedback.html", {
             'grader_type': response_items['grader_type'],
-            'score': response_items['score'],
+            'score': "{0} / {1}".format(response_items['score'], self.max_score),
             'feedback': feedback,
         })
 
@@ -2138,17 +2225,19 @@ class OpenEndedResponse(LoncapaResponse):
                       " Received score_result = {0}".format(score_result))
             return fail
 
-        for tag in ['score', 'feedback', 'grader_type', 'success']:
+        for tag in ['score', 'feedback', 'grader_type', 'success', 'grader_id', 'submission_id']:
             if tag not in score_result:
                 log.error("External grader message is missing required tag: {0}"
                           .format(tag))
                 return fail
 
         feedback = self._format_feedback(score_result)
+        self.submission_id=score_result['submission_id']
+        self.grader_id=score_result['grader_id']
 
         # HACK: for now, just assume it's correct if you got more than 2/3.
         # Also assumes that score_result['score'] is an integer.
-        score_ratio = int(score_result['score']) / self.max_score
+        score_ratio = int(score_result['score']) / float(self.max_score)
         correct = (score_ratio >= 0.66)
 
         #Currently ignore msg and only return feedback (which takes the place of msg)
