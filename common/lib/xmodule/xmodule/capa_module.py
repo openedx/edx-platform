@@ -659,6 +659,12 @@ class CapaDescriptor(RawDescriptor):
     # actually use type and points?
     metadata_attributes = RawDescriptor.metadata_attributes + ('type', 'points')
 
+    def get_context(self):
+        _context = RawDescriptor.get_context(self)
+        _context.update({'markdown': self.metadata.get('markdown', '')})
+        return _context
+
+
     # VS[compat]
     # TODO (cpennington): Delete this method once all fall 2012 course are being
     # edited in the cms
