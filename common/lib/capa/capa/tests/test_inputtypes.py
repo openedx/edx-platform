@@ -508,17 +508,24 @@ class DragAndDropTest(unittest.TestCase):
     '''
 
     def test_rendering(self):
-        height = '12'
-        width = '33'
-        template = "path to template"
-        images = "list of pathes to images"
+        path_to_images = '/static/images/'
 
-        xml_str = """<drag_and_drop_input id="prob_1_2"
-        height="{h}"
-        width="{w}"
-        template="{t}"
-        images="{i}"
-        />""".format(h=height, w=width, t=template, i=images)
+        xml_str = """
+        <drag_and_drop_input id="prob_1_2" img="{path}about_1.png" target_outline="false">
+            <draggable id="1" label="Label 1"/>
+            <draggable id="name_with_icon" label="cc" icon="{path}cc.jpg"/>
+            <draggable id="with_icon" label="arrow-left" icon="{path}arrow-left.png" />
+            <draggable id="5" label="Label2" />
+            <draggable id="2" label="Mute" icon="{path}mute.png" />
+            <draggable id="name_label_icon3" label="spinner" icon="{path}spinner.gif" />
+            <draggable id="name4" label="Star" icon="{path}volume.png" />
+            <draggable id="7" label="Label3" />
+
+            <target id="t1" x="210" y="90" w="90" h="90"/>
+            <target id="t2" x="370" y="160" w="90" h="90"/>
+
+        </drag_and_drop_input>
+        """.format(path=path_to_images)
 
         element = etree.fromstring(xml_str)
 
@@ -529,15 +536,26 @@ class DragAndDropTest(unittest.TestCase):
         the_input = lookup_tag('drag_and_drop_input')(test_system, element, state)
 
         context = the_input._get_render_context()
-
         expected = {'id': 'prob_1_2',
                     'value': value,
                     'status': 'unsubmitted',
+                    'course_folder': 'mock',
                     'msg': '',
-                    'width': width,
-                    'height': height,
-                    'template': template,
-                    'images': images,
-                   }
-
+                    'drag_and_drop_json': '{"use_targets": "True", \
+"target_outline": "false", "one_per_target": "True", \
+"draggables": [{"label": "Label 1", "id": "1", "icon": ""}, \
+{"label": "cc", "id": "name_with_icon", "icon": \
+"/static/images/cc.jpg"}, {"label": "arrow-left", "id": \
+"with_icon", "icon": "/static/images/arrow-left.png"}, \
+{"label": "Label2", "id": "5", "icon": ""}, {"label": \
+"Mute", "id": "2", "icon": "/static/images/mute.png"}, \
+{"label": "spinner", "id": "name_label_icon3", "icon": \
+"/static/images/spinner.gif"}, {"label": "Star", "id": \
+"name4", "icon": "/static/images/volume.png"}, {"label": \
+"Label3", "id": "7", "icon": ""}], "base_image": \
+"/static/images/about_1.png", "targets": \
+[{"y": "90", "x": "210", "id": "t1", "w": "90", "h": "90"}, \
+{"y": "160", "x": "370", "id": "t2", "w": "90", "h": "90"}]}',
+                    }
+        # import ipdb; ipdb.set_trace()
         self.assertEqual(context, expected)
