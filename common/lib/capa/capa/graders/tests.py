@@ -129,7 +129,7 @@ class Test_DragAndDrop(unittest.TestCase):
         {"13":"s_sigma_star_name"},{"15":"p_pi_name"},{"16":"p_pi_star_name"}, \
         {"12":"p_sigma_name"},{"14":"p_sigma_star_name"}]}'
 
-        correct_answers = [{
+        correct_answer = [{
         'draggables': ['1', '2', '3', '4', '5', '6'],
         'targets': [
             's_left', 's_right', 's_sigma', 's_sigma_star', 'p_pi_1', 'p_pi_2'
@@ -168,7 +168,7 @@ class Test_DragAndDrop(unittest.TestCase):
         {"13":"s_sigma_star_name"},{"15":"p_pi_name"},{"16":"p_pi_star_name"}, \
         {"12":"p_sigma_name"},{"14":"p_sigma_star_name"}]}'
 
-        correct_answers = [{
+        correct_answer = [{
         'draggables': ['1', '2', '3', '4', '5', '6'],
         'targets': [
             's_left', 's_right', 's_sigma', 's_sigma_star', 'p_pi_1', 'p_pi_2'
