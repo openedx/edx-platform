@@ -45,7 +45,6 @@ class PeerGradingProblemBackend
       response = 
         success: true
 
-        
     return response
 
 
@@ -101,9 +100,9 @@ class PeerGradingProblem
   fetch_submission_essay: () =>
     @backend.post('get_next_submission', {location: @location}, @render_submission)
 
-  construct_data: () =>
+  construct_data: () ->
     data =
-      score: @score
+      score: $('input[name="score-selection"]:checked').val()
       location: @location
       submission_id: @essay_id_input.val()
       submission_key: @submission_key_input.val()
@@ -254,7 +253,7 @@ class PeerGradingProblem
 
 
 
-mock_backend = true
+mock_backend = false
 ajax_url = $('.peer-grading').data('ajax_url')
 backend = new PeerGradingProblemBackend(ajax_url, mock_backend)
 $(document).ready(() -> new PeerGradingProblem(backend))

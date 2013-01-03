@@ -33,12 +33,13 @@ class PeerGradingService(GradingService):
                 {'location': problem_location, 'grader_id': grader_id})
         return response
 
-    def save_grade(self, grader_id, submission_id, score, feedback, submission_key):
+    def save_grade(self, location, grader_id, submission_id, score, feedback, submission_key):
         data = {'grader_id' : grader_id,
                 'submission_id' : submission_id,
                 'score' : score,
                 'feedback' : feedback,
-                'submission_key': submission_key}
+                'submission_key': submission_key,
+                'location': location}
         return self.post(self.save_grade_url, False, data)
 
     def is_student_calibrated(self, problem_location, grader_id):
@@ -61,7 +62,6 @@ class PeerGradingService(GradingService):
     def get_problem_list(self, course_id, grader_id):
         params = {'course_id': course_id, 'student_id': grader_id}
         response = self.get(self.get_problem_list_url, False, params)
-        log.debug("Response! {0}".format(response))
         return response
 
 
@@ -115,7 +115,7 @@ def get_next_submission(request, course_id):
     p = request.POST
     location = p['location']
 
-    return HttpResponse(_get_next(course_id, request.user.id, location),
+    return HttpResponse(_get_next_submission(course_id, request.user.id, location),
                         mimetype="application/json")
 
 def _get_next_submission(course_id, grader_id, location):
@@ -144,7 +144,7 @@ def save_grade(request, course_id):
     feedback = p['feedback']
     submission_key = p['submission_key']
     try:
-        response = peer_grading_service().save_grade(grader_id, submission_id, 
+        response = peer_grading_service().save_grade(location, grader_id, submission_id, 
                 score, feedback, submission_key)
         return HttpResponse(response, mimetype="application/json")
     except GradingServiceError:
