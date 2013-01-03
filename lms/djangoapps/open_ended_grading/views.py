@@ -71,6 +71,7 @@ def peer_grading(request, course_id):
     # call problem list service
     success = False
     error_text = ""
+    problem_list = []
     try:
         problem_list_text = peer_gs.get_problem_list(course_id, request.user.id)
         problem_list_json = json.loads(problem_list_text)
@@ -82,6 +83,9 @@ def peer_grading(request, course_id):
 
     except GradingServiceError:
         error_text = "Error occured while contacting the grading service"
+        success = False
+    except ValueError:
+        error_text = "Could not get problem list"
         success = False
 
     ajax_url = reverse('peer_grading', kwargs={'course_id': course_id})
@@ -100,11 +104,12 @@ def peer_grading(request, course_id):
         'staff_access': False, })
     
 
-def peer_grading_problem(request, course_id, problem_location):
+def peer_grading_problem(request, course_id):
     '''
     Show individual problem interface
     '''
     course = get_course_with_access(request.user, course_id, 'load')
+    problem_location = request.GET.get("location")
 
     ajax_url = reverse('peer_grading', kwargs={'course_id': course_id})
     if not ajax_url.endswith('/'):
