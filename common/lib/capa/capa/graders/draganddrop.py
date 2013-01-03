@@ -18,13 +18,12 @@ If use_targets is false:
  {
     "use_targets": false,
     "draggable": [
-        { "image1": "(10, 20)"  },
-        { "ant": "(30, 40)"  },
-        { "molecule": "(100, 200)"  },
+        { "image1": "[10, 20]"  },
+        { "ant": "[30, 40]"  },
+        { "molecule": "[100, 200]"  },
                 ]
 }
 values are (x,y) coordinates of centers of dragged images.
-
 """
 
 import json
@@ -32,55 +31,58 @@ from collections import OrderedDict
 
 
 class PositionsCompare(list):
-    """Inputs are: "abc" - target
+    """ Class for comparing positions.
+
+        Args:
+                list or string::
+                    "abc" - target
                     [10, 20] - list of integers
                     [[10,20], 200] list of list and integer
 
     """
     def __eq__(self, other):
-        # Default lists behaviour is convers "abc" to ["a", "b", "c"].
-        # We will use that.
-        # import ipdb; ipdb.set_trace()
+        """ Compares two arguments.
 
-        #check if self or other is not empty list (empty lists  = false)
+        Default lists behavior is conversion of string "abc" to  list
+        ["a", "b", "c"]. We will use that.
+
+        If self or other is empty - returns False.
+
+        Args:
+                self, other: str, unicode, list, int, float
+
+        Returns: bool
+        """
+        # checks if self or other is not empty list (empty lists  = false)
         if not self or not other:
-            return False
-
-        # check correct input types
-        if (not isinstance(self[0], (str, unicode, list, int, float)) or
-            not isinstance(other[0], (str, unicode, list, int, float))):
-            print 'Incorrect input type'
             return False
 
         if (isinstance(self[0], (list, int, float)) and
             isinstance(other[0], (list, int, float))):
-            print 'Numerical position compare'
             return self.coordinate_positions_compare(other)
+
         elif (isinstance(self[0], (unicode, str)) and
               isinstance(other[0], (unicode, str))):
-            print 'Targets compare'
             return ''.join(self) == ''.join(other)
-        else:
-            # we do not have ints or lists of lists or two string/unicode lists
-            # on both sides
-            print type(self[0]), type(other[0]), "not correct"
+        else:  # improper argument types
+            # Now we have no (float / int or lists of list and float / int pair)
+            # or two string / unicode lists pair
             return False
 
     def __ne__(self, other):
         return not self.__eq__(other)
 
     def coordinate_positions_compare(self, other, r=10):
-        """ Checks if pos1 is  equal to pos2 inside radius
-        of forgiveness (default 10 px).
+        """ Checks if self is equal to other inside radius of forgiveness
+            (default 10 px).
 
             Args:
-                self, other: [x, y] or [[x, y], r], where
-                             r is radius of forgiveness;
+                self, other: [x, y] or [[x, y], r], where r is radius of
+                             forgiveness;
                              x, y, r: int
 
             Returns: bool.
         """
-        print 'I am called',  self, other
         # get max radius of forgiveness
         if isinstance(self[0], list):  # [(x, y), r] case
             r = max(self[1], r)
@@ -101,62 +103,56 @@ class PositionsCompare(list):
 
 
 class DragAndDrop(object):
+    """ Grader for drag and drop inputtype.
+    """
 
     def __init__(self):
-        self.correct_groups = OrderedDict()  # groups
-        self.correct_positions = OrderedDict()  # positions of comparing
-        self.user_groups = OrderedDict()
-        self.user_positions = OrderedDict()
+        self.correct_groups = OrderedDict()  # correct groups from xml
+        self.correct_positions = OrderedDict()  # correct positions for comparing
+        self.user_groups = OrderedDict()  # will be populated from user answer
+        self.user_positions = OrderedDict()  # will be populated from user answer
+
+        # flag to check if user answer has more draggables than correct answer
         self.incorrect = False
 
     def grade(self):
-        '''
-        Grade drag and drop problem.
-        If use_targets is True - checks if image placed on proper target.
-        If use_targets is False - checks if image placed on proper coordinates,
-        with setted radius of forgiveness (default is 10)
+        ''' Grader user answer.
 
-        Args:
-            user_input, correct_answer: json. Format:
+        If use_targets is True - checks if every draggable isplaced on proper
+         target.
 
-            user_input: see module docstring
+        If use_targets is False - checks if every draggable is placed on proper
+         coordinates within radius of forgiveness (default is 10).
 
-            correct_answer:
-                if use_targets is True:
-                    {'1': 't1',  'name_with_icon': 't2'}
-                else:
-                    {'1': '[10, 10]',  'name_with_icon': '[[10, 10], 20]'}
-
-        Returns:
-            True or False.
+        Returns: bool.
         '''
 
-        if self.incorrect:
+        if self.incorrect:  # user answer has more draggables than correct answer
             return False
 
+        # checks if we have same groups of draggables
         if sorted(self.correct_groups.keys()) != sorted(self.user_groups.keys()):
             return False
+
+        # checks if for every groups draggables names are same
         for groupname, draggable_ids in self.correct_groups.items():
             if sorted(draggable_ids) != sorted(self.user_groups[groupname]):
                 return False
+
         # from now self.correct_groups and self.user_groups are equal if
         # order is ignored
 
-        # Check fo every group that positions of every group element are equal
-        # with positions
+        # Checks in every group that user positions of every element are equal
+        # with correct positions for every rule
 
-        # 'denied' rule
-        denied_positions = [item for g in self.correct_groups.keys()
-                        for item in self.correct_positions[g].get('denied', [])]
-        all_user_positions = [item for g in self.correct_groups.keys()
-                                for item in self.user_positions[g]['user']]
-        if not self.compare_positions(denied_positions,
-                                          all_user_positions, flag='denied'):
-            return False
+        for group in self.correct_groups:  # 'denied' rule
+            if not self.compare_positions(self.correct_positions[group].get(
+            'denied', []), self.user_positions[group]['user'], flag='denied'):
+                return False
 
         no_exact, no_allowed, no_anyof = False, False, False
-        # 'exact' rule
-        for groupname in self.correct_groups:
+
+        for groupname in self.correct_groups:  # 'exact' rule
             if self.correct_positions[groupname].get('exact', []):
                 if not self.compare_positions(
                         self.correct_positions[groupname]['exact'],
@@ -165,8 +161,7 @@ class DragAndDrop(object):
             else:
                 no_exact = True
 
-        # 'allowed' rule
-        for groupname in self.correct_groups:
+        for groupname in self.correct_groups:  # 'allowed' rule
             if self.correct_positions[groupname].get('allowed', []):
                 if not self.compare_positions(
                         self.correct_positions[groupname]['allowed'],
@@ -260,7 +255,17 @@ class DragAndDrop(object):
 
 
 def grade(user_input, correct_answer):
-    """ Support 2 interfaces"""
+    """Args:
+            user_input, correct_answer: json. Format:
+
+            user_input: see module docstring
+
+            correct_answer:
+                if use_targets is True:
+                    {'1': 't1',  'name_with_icon': 't2'}
+                else:
+                    {'1': '[10, 10]',  'name_with_icon': '[[10, 10], 20]'}
+    Support 2 interfaces"""
     if isinstance(correct_answer, dict):
         dnd = DragAndDrop()
     else:
