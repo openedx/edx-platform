@@ -12,6 +12,7 @@ from django.http import HttpResponse
 from django_future.csrf import ensure_csrf_cookie
 from django.views.decorators.cache import cache_control
 from mitxmako.shortcuts import render_to_response
+from django.core.urlresolvers import reverse
 
 from courseware import grades
 from courseware.access import has_access, get_access_group_name
@@ -27,7 +28,10 @@ from xmodule.modulestore.exceptions import InvalidLocationError, ItemNotFoundErr
 from xmodule.modulestore.search import path_to_location
 import track.views
 
-log = logging.getLogger("mitx.courseware")
+from .grading import StaffGrading
+
+
+log = logging.getLogger(__name__)
 
 template_imports = {'urllib': urllib}
 
@@ -87,7 +91,7 @@ def instructor_dashboard(request, course_id):
         try:
             group = Group.objects.get(name=staffgrp)
         except Group.DoesNotExist:
-            group = Group(name=staffgrp)		# create the group
+            group = Group(name=staffgrp)     # create the group
             group.save()
         return group
 
@@ -377,7 +381,7 @@ def get_student_grade_summary_data(request, course, course_id, get_grades=True, 
     enrolled_students = User.objects.filter(courseenrollment__course_id=course_id).prefetch_related("groups").order_by('username')
 
     header = ['ID', 'Username', 'Full Name', 'edX email', 'External email']
-    if get_grades:
+    if get_grades and enrolled_students.count() > 0:
         # just to construct the header
         gradeset = grades.grade(enrolled_students[0], request, course, keep_raw_scores=get_raw_scores)
         # log.debug('student {0} gradeset {1}'.format(enrolled_students[0], gradeset))
@@ -407,6 +411,29 @@ def get_student_grade_summary_data(request, course, course_id, get_grades=True, 
         data.append(datarow)
     datatable['data'] = data
     return datatable
+
+
+
+@cache_control(no_cache=True, no_store=True, must_revalidate=True)
+def staff_grading(request, course_id):
+    """
+    Show the instructor grading interface.
+    """
+    course = get_course_with_access(request.user, course_id, 'staff')
+
+    grading = StaffGrading(course)
+
+    ajax_url = reverse('staff_grading', kwargs={'course_id': course_id})
+    if not ajax_url.endswith('/'):
+        ajax_url += '/'
+        
+    return render_to_response('instructor/staff_grading.html', {
+        'view_html': grading.get_html(),
+        'course': course,
+        'course_id': course_id,
+        'ajax_url': ajax_url,
+        # Checked above
+        'staff_access': True, })
 
 
 @cache_control(no_cache=True, no_store=True, must_revalidate=True)

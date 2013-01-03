@@ -36,7 +36,7 @@ file and check it in at the same time as your model changes. To do that,
 3. Add the migration file created in mitx/common/djangoapps/student/migrations/
 """
 from datetime import datetime
-from hashlib import sha1
+import hashlib
 import json
 import logging
 import uuid
@@ -49,7 +49,6 @@ from django.db.models.signals import post_save
 from django.dispatch import receiver
 
 import comment_client as cc
-from django_comment_client.models import Role
 
 
 log = logging.getLogger(__name__)
@@ -197,14 +196,13 @@ def unique_id_for_user(user):
     """
     Return a unique id for a user, suitable for inserting into
     e.g. personalized survey links.
-
-    Currently happens to be implemented as a sha1 hash of the username
-    (and thus assumes that usernames don't change).
     """
-    # Using the user id as the salt because it's sort of random, and is already
-    # in the db.
-    salt = str(user.id)
-    return sha1(salt + user.username).hexdigest()
+    # include the secret key as a salt, and to make the ids unique accross
+    # different LMS installs.    
+    h = hashlib.md5()
+    h.update(settings.SECRET_KEY)
+    h.update(str(user.id))
+    return h.hexdigest()
 
 
 ## TODO: Should be renamed to generic UserGroup, and possibly
@@ -263,15 +261,6 @@ class CourseEnrollment(models.Model):
         return "[CourseEnrollment] %s: %s (%s)" % (self.user, self.course_id, self.created)
 
 
-@receiver(post_save, sender=CourseEnrollment)
-def assign_default_role(sender, instance, **kwargs):
-    if instance.user.is_staff:
-        role = Role.objects.get_or_create(course_id=instance.course_id, name="Moderator")[0]
-    else:
-        role = Role.objects.get_or_create(course_id=instance.course_id, name="Student")[0]
-
-    logging.info("assign_default_role: adding %s as %s" % (instance.user, role))
-    instance.user.roles.add(role)
 
 #cache_relation(User.profile)
 

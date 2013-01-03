@@ -829,7 +829,8 @@ class ModuleSystem(object):
                  debug=False,
                  xqueue=None,
                  node_path="",
-                 anonymous_student_id=''):
+                 anonymous_student_id='',
+                 course_id=None):
         '''
         Create a closure around the system environment.
 
@@ -864,6 +865,8 @@ class ModuleSystem(object):
                          ajax results.
 
         anonymous_student_id - Used for tracking modules with student id
+
+        course_id - the course_id containing this module
         '''
         self.ajax_url = ajax_url
         self.xqueue = xqueue
@@ -876,6 +879,7 @@ class ModuleSystem(object):
         self.replace_urls = replace_urls
         self.node_path = node_path
         self.anonymous_student_id = anonymous_student_id
+        self.course_id = course_id
         self.user_is_staff = user is not None and user.is_staff
 
     def get(self, attr):

@@ -44,12 +44,6 @@ STATUS_MESSAGE_PATH = TEST_ROOT / "status_message.json"
 COURSES_ROOT = TEST_ROOT / "data"
 DATA_DIR = COURSES_ROOT
 
-LOGGING = get_logger_config(TEST_ROOT / "log",
-                            logging_env="dev",
-                            tracking_filename="tracking.log",
-                            dev_env=True,
-                            debug=True)
-
 COMMON_TEST_DATA_ROOT = COMMON_ROOT / "test" / "data"
 # Where the content data is checked out.  This may not exist on jenkins.
 GITHUB_REPO_ROOT = ENV_ROOT / "data"
@@ -64,6 +58,10 @@ XQUEUE_INTERFACE = {
     "basic_auth": ('anant', 'agarwal'),
 }
 XQUEUE_WAITTIME_BETWEEN_REQUESTS = 5 # seconds
+
+
+# Don't rely on a real staff grading backend
+MOCK_STAFF_GRADING = True
 
 # TODO (cpennington): We need to figure out how envs/test.py can inject things
 # into common.py so that we don't have to repeat this sort of thing
@@ -99,7 +97,7 @@ DATABASES = {
 }
 
 CACHES = {
-    # This is the cache used for most things. 
+    # This is the cache used for most things.
     # In staging/prod envs, the sessions also live here.
     'default': {
         'BACKEND': 'django.core.cache.backends.locmem.LocMemCache',

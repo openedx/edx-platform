@@ -7,6 +7,7 @@ source = common/lib/xmodule
 ignore_errors = True
 
 [html]
+title = XModule Python Test Coverage Report
 directory = reports/common/lib/xmodule/cover
 
 [xml]

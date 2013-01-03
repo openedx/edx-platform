@@ -2,6 +2,9 @@ import logging
 
 from django.db import models
 from django.contrib.auth.models import User
+from student.models import CourseEnrollment
+from django.db.models.signals import post_save
+from django.dispatch import receiver
 
 from courseware.courses import get_course_by_id
 
@@ -9,6 +12,18 @@ FORUM_ROLE_ADMINISTRATOR = 'Administrator'
 FORUM_ROLE_MODERATOR = 'Moderator'
 FORUM_ROLE_COMMUNITY_TA = 'Community TA'
 FORUM_ROLE_STUDENT = 'Student'
+
+
+@receiver(post_save, sender=CourseEnrollment)
+def assign_default_role(sender, instance, **kwargs):
+    if instance.user.is_staff:
+        role = Role.objects.get_or_create(course_id=instance.course_id, name="Moderator")[0]
+    else:
+        role = Role.objects.get_or_create(course_id=instance.course_id, name="Student")[0]
+
+    logging.info("assign_default_role: adding %s as %s" % (instance.user, role))
+    instance.user.roles.add(role)
+
 
 class Role(models.Model):
     name = models.CharField(max_length=30, null=False, blank=False)

@@ -1,0 +1,86 @@
+div.staff-grading {
+    textarea.feedback-area {
+        height: 75px;
+        margin: 20px;
+    }
+
+    div {
+        margin: 10px;
+    }
+
+    label {
+        margin: 10px;
+        padding: 5px;
+        display: inline-block;
+        min-width: 50px;
+        background-color: #CCC;
+        text-size: 1.5em;
+    }
+    
+    /* Toggled State */
+    input[type=radio]:checked + label {
+        background: #666;
+        color: white;
+    }
+
+    input[name='score-selection'] {
+        display: none;
+    }
+
+    ul
+    {
+        li
+        {
+            margin: 16px 0px;
+        }
+    }
+
+    .prompt-information-container,
+    .submission-wrapper,
+    .rubric-wrapper,
+    .grading-container
+    {
+        border: 1px solid gray;
+        padding: 15px;
+    }
+    .error-container
+    {
+        background-color: #FFCCCC;
+        padding: 15px;
+        margin-left: 0px;
+    }
+    .meta-info-wrapper
+    {
+        background-color: #eee;
+        padding:15px;
+        h3
+        {
+            font-size:1em;
+        }
+        ul
+        {
+            list-style-type: none;
+            font-size: .85em;
+            li
+            {
+                margin: 5px 0px;
+            }
+        }
+    }
+    .message-container
+    {
+        background-color: $yellow;
+        padding: 10px;
+        margin-left:0px;
+    }
+    
+    .breadcrumbs
+    {
+        margin-top:20px;
+        margin-left:0px;
+        margin-bottom:5px;
+        font-size: .8em;
+    }
+    
+    padding: 40px;
+}
