@@ -202,14 +202,14 @@ class DragAndDrop(object):
     def populate(self, correct_answer, user_answer):
         """  """
         # convert from dict format to list format
-        tmp = []
         if isinstance(correct_answer, dict):
+            tmp = []
             for key, value in correct_answer.items():
                 tmp_dict = {'draggables': [], 'targets': [], 'rule': 'exact'}
                 tmp_dict['draggables'].append(key)
                 tmp_dict['targets'].append(value)
                 tmp.append(tmp_dict)
-        correct_answer = tmp
+            correct_answer = tmp
 
         user_answer = json.loads(user_answer)
         self.use_targets = user_answer.get('use_targets')
@@ -222,9 +222,7 @@ class DragAndDrop(object):
         # and positions  must reflect order in group
         for i in xrange(0, len(correct_answer)):
             groupname = str(i)
-            self.correct_groups = OrderedDict()
             self.correct_groups[groupname] = correct_answer[i]['draggables']
-            self.correct_positions = OrderedDict()
             self.correct_positions[groupname] = {correct_answer[i]['rule']: correct_answer[i]['targets']}
             self.user_groups[groupname] = []
             self.user_positions[groupname] = {'user': []}
@@ -258,6 +256,8 @@ def grade(user_input, correct_answer):
                 else:
                     {'1': '[10, 10]',  'name_with_icon': '[[10, 10], 20]'}
     Support 2 interfaces"""
+    # import ipdb; ipdb.set_trace()
     dnd = DragAndDrop()
+    # import ipdb; ipdb.set_trace()
     dnd.populate(correct_answer=correct_answer, user_answer=user_input)
     return dnd.grade()
