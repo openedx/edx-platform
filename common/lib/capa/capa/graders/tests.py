@@ -1,6 +1,40 @@
 import unittest
 
 import draganddrop
+from draganddrop import PositionsCompare
+
+
+class Test_PositionsCompare(unittest.TestCase):
+
+    def test_nested_list_and_list1(self):
+        self.assertEqual(PositionsCompare([[1, 2], 40]), PositionsCompare([1, 3]))
+
+    def test_nested_list_and_list2(self):
+        self.assertNotEqual(PositionsCompare([1, 12]), PositionsCompare([1, 1]))
+
+    def test_list_and_list1(self):
+        self.assertNotEqual(PositionsCompare([[1, 2], 12]), PositionsCompare([1, 15]))
+
+    def test_list_and_list2(self):
+        self.assertEqual(PositionsCompare([1, 11]), PositionsCompare([1, 1]))
+
+    def test_numerical_list_and_string_list(self):
+        self.assertNotEqual(PositionsCompare([1, 2]), PositionsCompare(["1"]))
+
+    def test_string_and_string_list1(self):
+        self.assertEqual(PositionsCompare("1"), PositionsCompare(["1"]))
+
+    def test_string_and_string_list2(self):
+        self.assertEqual(PositionsCompare("abc"), PositionsCompare("abc"))
+
+    def test_string_and_string_list3(self):
+        self.assertNotEqual(PositionsCompare("abd"), PositionsCompare("abe"))
+
+    def test_float_and_string(self):
+        self.assertNotEqual(PositionsCompare([3.5, 5.7]), PositionsCompare(["1"]))
+
+    def test_floats_and_ints(self):
+        self.assertEqual(PositionsCompare([3.5, 4.5]), PositionsCompare([5, 7]))
 
 
 class Test_DragAndDrop(unittest.TestCase):
