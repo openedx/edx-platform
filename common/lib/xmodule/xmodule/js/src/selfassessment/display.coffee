@@ -15,8 +15,6 @@ class @SelfAssessment
     @hint_wrapper = @$('.hint-wrapper')
     @message_wrapper = @$('.message-wrapper')
     @submit_button = @$('.submit-button')
-    @reset_button = @$('.reset-button')
-    @reset_button.click @reset
 
     @find_assessment_elements()
     @find_hint_elements()

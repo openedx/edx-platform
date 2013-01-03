@@ -42,7 +42,7 @@ class CombinedOpenEndedModule(XModule):
     DONE = 'done'
     TASK_TYPES=["self", "ml", "instructor", "peer"]
 
-    js = {'coffee': [resource_string(__name__, 'js/src/selfassessment/display.coffee')]}
+    js = {'coffee': [resource_string(__name__, 'js/src/selfassessment/display.coffee'), resource_string(__name__, 'js/src/combinedopenended/display.coffee'), resource_string(__name__, 'js/src/openended/display.coffee')]}
     js_module_name = "SelfAssessment"
 
     def __init__(self, system, location, definition, descriptor,
@@ -92,6 +92,7 @@ class CombinedOpenEndedModule(XModule):
         tag=etree.fromstring(xml).tag
         return tag
 
+
     def setup_next_task(self):
         current_task_state=None
         if self.state in [self.ASSESSING, self.DONE]:
@@ -104,8 +105,16 @@ class CombinedOpenEndedModule(XModule):
         if current_task_type=="selfassessment":
             self.current_task_descriptor=self_assessment_module.SelfAssessmentDescriptor(self.system)
             self.current_task_parsed_xml=self.current_task_descriptor.definition_from_xml(etree.fromstring(self.current_task_xml),self.system)
-            if current_task_state is None:
+            if current_task_state is None and self.current_task_number==0:
                 self.current_task=self_assessment_module.SelfAssessmentModule(self.system, self.location, self.current_task_parsed_xml, self.current_task_descriptor)
+                self.task_states.append(self.current_task.get_instance_state())
+                self.state=self.ASSESSING
+            elif current_task_state is None and self.current_task_number>0:
+                last_response=self.get_last_response(self.current_task_number-1)
+                current_task_state = ('{"state": "assessing", "version": 1, "max_score": {max_score}, '
+                                      '"attempts": 0, "history": [{"answer": "{answer}"}]}'
+                                      .format(max_score=self._max_score, answer=last_response))
+                self.current_task=self_assessment_module.SelfAssessmentModule(self.system, self.location, self.current_task_parsed_xml, self.current_task_descriptor, instance_state=current_task_state)
                 self.task_states.append(self.current_task.get_instance_state())
                 self.state=self.ASSESSING
             else:
@@ -118,6 +127,21 @@ class CombinedOpenEndedModule(XModule):
         html = self.current_task.get_html(self.system)
         return_html = rewrite_links(html, self.rewrite_content_links)
         return return_html
+
+    def get_last_response(self, task_number):
+        last_response=""
+        task_state = self.task_states[task_number]
+        task_xml=self.task_xml[task_number]
+        task_type=self.get_tag_name(task_xml)
+
+        if task_type=="selfassessment":
+            task_descriptor=self_assessment_module.SelfAssessmentDescriptor(self.system)
+            task_parsed_xml=task_descriptor.definition_from_xml(etree.fromstring(task_xml),self.system)
+            task=self_assessment_module.SelfAssessmentModule(self.system, self.location, task_parsed_xml, task_descriptor, instance_state=task_state)
+            last_response=task.latest_answer()
+            last_score = task.latest_score()
+
+        return last_response, last_score
 
     def update_task_states(self):
         changed=False
@@ -136,7 +160,7 @@ class CombinedOpenEndedModule(XModule):
 
     def update_task_states_ajax(self,return_html):
         changed=self.update_task_states()
-        if changed():
+        if changed:
             return_html=self.get_html()
         return return_html
 
