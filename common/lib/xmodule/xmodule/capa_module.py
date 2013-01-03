@@ -658,6 +658,8 @@ class CapaDescriptor(RawDescriptor):
     # TODO (vshnayder): do problems have any other metadata?  Do they
     # actually use type and points?
     metadata_attributes = RawDescriptor.metadata_attributes + ('type', 'points')
+    
+    system_metadata_fields = RawDescriptor.system_metadata_fields + ['markdown']
 
     def get_context(self):
         _context = RawDescriptor.get_context(self)
