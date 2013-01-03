@@ -2165,7 +2165,7 @@ class OpenEndedResponse(LoncapaResponse):
 
         feedback_template = self.system.render_template("open_ended_feedback.html", {
             'grader_type': response_items['grader_type'],
-            'score': response_items['score'],
+            'score': "{0} / {1}".format(response_items['score'], self.max_score),
             'feedback': feedback,
         })
 
