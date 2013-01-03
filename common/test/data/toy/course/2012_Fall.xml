@@ -3,6 +3,7 @@
     <videosequence url_name="Toy_Videos">
       <html url_name="secret:toylab"/>
       <video url_name="Video_Resources" youtube="1.0:1bK-WdDi6Qw"/>
+      <poll url_name="test_poll" display_name="Test Poll"/>
     </videosequence>
     <video url_name="Welcome" youtube="1.0:p2Q6BrNhdh8"/>
     <video url_name="video_123456789012" youtube="1.0:p2Q6BrNhdh8"/>

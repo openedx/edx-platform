@@ -231,6 +231,18 @@ def _get_module(user, request, location, student_module_cache, course_id, positi
         student_module.max_grade = event.get('max_value')
         student_module.save()
 
+        #Bin score into range and increment stats
+        score_bucket = get_score_bucket(student_module.grade, student_module.max_grade)
+        org, course_num, run = course_id.split("/")
+        statsd.increment("lms.courseware.question_answered",
+                        tags=["org:{0}".format(org),
+                              "course:{0}".format(course_num),
+                              "run:{0}".format(run),
+                              "score_bucket:{0}".format(score_bucket),
+                              "type:ajax"])
+
+
+
     # TODO (cpennington): When modules are shared between courses, the static
     # prefix is going to have to be specific to the module, not the directory
     # that the xml was loaded from

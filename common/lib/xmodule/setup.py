@@ -39,7 +39,8 @@ setup(
             "course_info = xmodule.html_module:CourseInfoDescriptor",
             "static_tab = xmodule.html_module:StaticTabDescriptor",
             "custom_tag_template = xmodule.raw_module:RawDescriptor",
-            "about = xmodule.html_module:AboutDescriptor"
+            "about = xmodule.html_module:AboutDescriptor",
+            "poll = xmodule.poll_module:PollDescriptor",
         ],
     }
 )
