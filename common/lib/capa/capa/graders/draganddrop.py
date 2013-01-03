@@ -201,11 +201,15 @@ class DragAndDrop(object):
 
     def populate(self, correct_answer, user_answer):
         """  """
-
+        # convert from dict format to list format
+        tmp = []
         if isinstance(correct_answer, dict):
             for key, value in correct_answer.items():
-                self.correct_groups[key] = [key]
-                self.correct_positions[key] = {'exact': [value]}
+                tmp_dict = {'draggables': [], 'targets': [], 'rule': 'exact'}
+                tmp_dict['draggables'].append(key)
+                tmp_dict['targets'].append(value)
+                tmp.append(tmp_dict)
+        correct_answer = tmp
 
         user_answer = json.loads(user_answer)
         self.use_targets = user_answer.get('use_targets')
@@ -216,7 +220,12 @@ class DragAndDrop(object):
         # create identical data structures
         # user groups must mirror correct_groups
         # and positions  must reflect order in group
-        for groupname in self.correct_groups:
+        for i in xrange(0, len(correct_answer)):
+            groupname = str(i)
+            self.correct_groups = OrderedDict()
+            self.correct_groups[groupname] = correct_answer[i]['draggables']
+            self.correct_positions = OrderedDict()
+            self.correct_positions[groupname] = {correct_answer[i]['rule']: correct_answer[i]['targets']}
             self.user_groups[groupname] = []
             self.user_positions[groupname] = {'user': []}
             for draggable_dict in user_answer['draggables']:
@@ -249,10 +258,6 @@ def grade(user_input, correct_answer):
                 else:
                     {'1': '[10, 10]',  'name_with_icon': '[[10, 10], 20]'}
     Support 2 interfaces"""
-    if isinstance(correct_answer, dict):
-        dnd = DragAndDrop()
-    else:
-        dnd = correct_answer
-
+    dnd = DragAndDrop()
     dnd.populate(correct_answer=correct_answer, user_answer=user_input)
     return dnd.grade()
