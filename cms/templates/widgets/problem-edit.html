@@ -1,21 +1,28 @@
 <%include file="metadata-edit.html" />
 <section class="problem-editor editor">
-  <div class="row">
-    <div class="editor-bar">
-      <ul class="format-buttons">
-        <li><a href="#" class="multiple-choice-button" data-tooltip="Multiple Choice"><span class="problem-editor-icon multiple-choice"></span></a></li>
-        <li><a href="#" class="checks-button" data-tooltip="Check Multiple"><span class="problem-editor-icon checks"></span></a></li>
-        <li><a href="#" class="string-button" data-tooltip="String Response"><span class="problem-editor-icon string"></span></a></li>
-        <li><a href="#" class="number-button" data-tooltip="Numerical Response"><span class="problem-editor-icon number"></span></a></li>
-        <li><a href="#" class="dropdown-button" data-tooltip="Dropdown"><span class="problem-editor-icon dropdown"></span></a></li>
-      </ul>
-      <ul class="editor-tabs">
-        <li><a href="#" class="simple-tab tab current" data-tab="simple">Simple</a></li>
-        <li><a href="#" class="xml-tab tab" data-tab="xml">XML</a></li>
-        <li><a href="#" class="cheatsheet-toggle" data-tooltip="Toggle Cheatsheet">?</a></li>
-      </ul>
+    <div class="row">
+        %if markdown != '' or data == '':
+        <div class="editor-bar">
+            <ul class="format-buttons">
+                <li><a href="#" class="multiple-choice-button" data-tooltip="Multiple Choice"><span
+                        class="problem-editor-icon multiple-choice"></span></a></li>
+                <li><a href="#" class="checks-button" data-tooltip="Check Multiple"><span
+                        class="problem-editor-icon checks"></span></a></li>
+                <li><a href="#" class="string-button" data-tooltip="String Response"><span
+                        class="problem-editor-icon string"></span></a></li>
+                <li><a href="#" class="number-button" data-tooltip="Numerical Response"><span
+                        class="problem-editor-icon number"></span></a></li>
+                <li><a href="#" class="dropdown-button" data-tooltip="Dropdown"><span
+                        class="problem-editor-icon dropdown"></span></a></li>
+            </ul>
+            <ul class="editor-tabs">
+                <li><a href="#" class="simple-tab tab current" data-tab="simple">Simple</a></li>
+                <li><a href="#" class="xml-tab tab" data-tab="xml">XML</a></li>
+                <li><a href="#" class="cheatsheet-toggle" data-tooltip="Toggle Cheatsheet">?</a></li>
+            </ul>
+        </div>
+        <textarea class="edit-box">${markdown}</textarea>
+        %endif
+        <textarea class="xml-box" rows="8" cols="40">${data | h}</textarea>
     </div>
-    <textarea class="edit-box">${markdown}</textarea>
-    <textarea class="xml-box">${data | h}</textarea>
-  </div>
 </section>    
