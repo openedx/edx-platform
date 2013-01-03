@@ -651,6 +651,8 @@ class CapaDescriptor(RawDescriptor):
     has_score = True
     template_dir_name = 'problem'
     mako_template = "widgets/problem-edit.html"
+    js = {'coffee': [resource_string(__name__, 'js/src/problem/markdown.coffee')]}
+    js_module_name = "MarkdownEditingDescriptor"
 
     # Capa modules have some additional metadata:
     # TODO (vshnayder): do problems have any other metadata?  Do they
