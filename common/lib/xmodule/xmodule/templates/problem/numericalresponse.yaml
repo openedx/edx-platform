@@ -3,6 +3,7 @@ metadata:
     display_name: Numerical Response
     rerandomize: never
     showanswer: always
+    markdown: 
 data: |
    <problem>
    <p>
