@@ -815,7 +815,7 @@ class DragAndDropInput(InputTypeBase):
                     presented.
 
                     If tag_type is 'target' all attributes (name, x, y, w, h)
-                    are requred. (x, y) - coordinates of center of target,
+                    are required. (x, y) - coordinates of center of target,
                     w, h - weight and height of target.
 
                 Returns:
