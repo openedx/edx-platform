@@ -6,3 +6,4 @@ pep8
 lettuce
 selenium
 factory_boy
+splinter
