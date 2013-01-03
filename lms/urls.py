@@ -261,7 +261,12 @@ if settings.COURSEWARE_ENABLED:
             'open_ended_grading.peer_grading_service.get_next_submission', name='peer_grading_get_next_submission'),
         url(r'^courses/(?P<course_id>[^/]+/[^/]+/[^/]+)/peer_grading/show_calibration_essay$',
             'open_ended_grading.peer_grading_service.show_calibration_essay', name='peer_grading_show_calibration_essay'),
-
+        url(r'^courses/(?P<course_id>[^/]+/[^/]+/[^/]+)/peer_grading/is_student_calibrated$',
+            'open_ended_grading.peer_grading_service.is_student_calibrated', name='peer_grading_is_student_calibrated'),
+        url(r'^courses/(?P<course_id>[^/]+/[^/]+/[^/]+)/peer_grading/save_grade$',
+            'open_ended_grading.peer_grading_service.save_grade', name='peer_grading_save_grade'),
+        url(r'^courses/(?P<course_id>[^/]+/[^/]+/[^/]+)/peer_grading/save_calibration_essay$',
+            'open_ended_grading.peer_grading_service.save_calibration_essay', name='peer_grading_save_calibration_essay'),
     )
 
     # discussion forums live within courseware, so courseware must be enabled first

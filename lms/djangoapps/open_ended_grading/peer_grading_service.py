@@ -118,9 +118,6 @@ def get_next_submission(request, course_id):
                         mimetype="application/json")
 
 def _get_next_submission(course_id, grader_id, location):
-    """
-    Implementation of get_next (also called from save_grade) -- returns a json string
-    """
     try:
         return peer_grading_service().get_next_submission(location, grader_id)
     except GradingServiceError:
@@ -128,6 +125,57 @@ def _get_next_submission(course_id, grader_id, location):
                       .format(staff_grading_service().url))
         return json.dumps({'success': False,
                            'error': 'Could not connect to grading service'})
+
+def save_grade(request, course_id):
+    """
+    TODO: fill in this documentation
+    """
+    _check_post(request)
+    required = set(['location', 'grader_id', 'submission_id', 'submission_key', 'score', 'feedback'])
+    success, message = _check_required(request, required)
+    if not success:
+        return _err_response(message)
+    grader_id = request.user.id
+    p = request.POST
+    location = p['location']
+    submission_id = p['submission_id']
+    score = p['score']
+    feedback = p['feedback']
+    submission_key = p['submission_key']
+    try:
+        response = peer_grading_service().save_grade(grader_id, submission_id, 
+                score, feedback, submission_key)
+        return HttpResponse(response, mimetype="application/json")
+    except GradingServiceError:
+        log.exception("Error from grading service.  server url: {0}"
+                      .format(staff_grading_service().url))
+        return json.dumps({'success': False,
+                           'error': 'Could not connect to grading service'})
+
+
+
+def is_student_calibrated(request, course_id):
+    """
+    TODO: fill in this documentation
+    """
+    _check_post(request)
+    required = set(['location'])
+    success, message = _check_required(request, required)
+    if not success:
+        return _err_response(message)
+    grader_id = request.user.id
+    p = request.POST
+    location = p['location']
+
+    try:
+        response = peer_grading_service().is_student_calibrated(location, grader_id)
+        return HttpResponse(response, mimetype="application/json")
+    except GradingServiceError:
+        log.exception("Error from grading service.  server url: {0}"
+                      .format(staff_grading_service().url))
+        return json.dumps({'success': False,
+                           'error': 'Could not connect to grading service'})
+
 
 
 def show_calibration_essay(request, course_id):
@@ -144,12 +192,39 @@ def show_calibration_essay(request, course_id):
     grader_id = request.user.id
     p = request.POST
     location = p['location']
+    return HttpResponse(_next_calibration_essay(course_id, grader_id, location), 
+            mimetype="application/json")
+
+def _next_calibration_essay(course_id, grader_id, location):
     try:
-        response = peer_grading_service().show_calibration_essay(location, grader_id)
-        return HttpResponse(response, mimetype="application/json")
+        return peer_grading_service().show_calibration_essay(location, grader_id)
     except GradingServiceError:
         log.exception("Error from grading service.  server url: {0}"
                       .format(staff_grading_service().url))
         return json.dumps({'success': False,
                            'error': 'Could not connect to grading service'})
 
+
+def save_calibration_essay(request, course_id):
+    """
+    """
+    _check_post(request)
+
+    required = set(['location', 'calibration_essay_id', 'submission_key', 'score', 'feedback'])
+    success, message = _check_required(request, required)
+    if not success:
+        return _err_response(message)
+    grader_id = request.user.id
+    p = request.POST
+    location = p['location']
+    calibration_essay_id = p['calibration_essay_id']
+    submission_key = p['submission_key']
+    score = p['score']
+    feedback = p['feedback']
+
+    try:
+        response = peer_grading_service().save_calibration_essay(location, grader_id, calibration_essay_id, submission_key, score, feedback)
+        return HttpResponse(response, mimetype="application/json")
+    except GradingServiceError:
+        log.exception("Error saving calibration grade")
+        return _err_response('Could not connect to grading service')
