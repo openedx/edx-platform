@@ -1938,13 +1938,13 @@ class OpenEndedResponse(LoncapaResponse):
         try:
             submission_id=int(survey_responses['submission_id'])
             grader_id = int(survey_responses['grader_id'])
-            feedback = str(survey_responses['feedback'])
+            feedback = str(survey_responses['feedback'].encode('ascii', 'ignore'))
             score = int(survey_responses['score'])
         except:
             error_message=("Could not parse submission id, grader id, "
                            "or feedback from message_post ajax call.  Here is the message data: {0}".format(survey_responses))
             log.exception(error_message)
-            return False, error_message
+            return False, "There was an error saving your feedback.  Please contact course staff."
 
         qinterface = self.system.xqueue['interface']
         qtime = datetime.strftime(datetime.now(), xqueue_interface.dateformat)
