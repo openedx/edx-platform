@@ -1,3 +1,0 @@
-class @SelfAssessment
-  constructor: (element) ->
-

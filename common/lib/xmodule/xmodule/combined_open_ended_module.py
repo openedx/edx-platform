@@ -112,9 +112,8 @@ class CombinedOpenEndedModule(XModule):
                 self.state=self.ASSESSING
             elif current_task_state is None and self.current_task_number>0:
                 last_response=self.get_last_response(self.current_task_number-1)
-                current_task_state = ('{"state": "assessing", "version": 1, "max_score": {max_score}, '
-                                      '"attempts": 0, "history": [{"answer": "{answer}"}]}'
-                                      .format(max_score=self._max_score, answer=last_response))
+                current_task_state = ("{'state': 'assessing', 'version': 1, 'max_score': {" + str(self._max_score) + "}, " +
+                                      "'attempts': 0, 'history': [{'answer': '{" + str(last_response) + "}'}]}")
                 self.current_task=self_assessment_module.SelfAssessmentModule(self.system, self.location, self.current_task_parsed_xml, self.current_task_descriptor, instance_state=current_task_state)
                 self.task_states.append(self.current_task.get_instance_state())
                 self.state=self.ASSESSING

@@ -61,9 +61,6 @@ class SelfAssessmentModule():
     REQUEST_HINT = 'request_hint'
     DONE = 'done'
 
-    js = {'coffee': [resource_string(__name__, 'js/src/selfassessment/display.coffee')]}
-    js_module_name = "SelfAssessment"
-
     def __init__(self, system, location, definition, descriptor,
                  instance_state=None, shared_state=None, **kwargs):
         """
