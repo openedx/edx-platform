@@ -1928,13 +1928,15 @@ class OpenEndedResponse(LoncapaResponse):
         Returns a boolean success/fail and an error message
         """
         survey_responses=event_info['survey_responses']
-        for tag in ['feedback', 'submission_id', 'grader_id']:
+        for tag in ['feedback', 'submission_id', 'grader_id', 'score']:
             if tag not in survey_responses:
                 return False, "Could not find needed tag {0}".format(tag)
         try:
-            submission_id=int(survey_responses['submission_id'][0])
-            grader_id = int(survey_responses['grader_id'][0])
-            feedback = str(survey_responses['feedback'][0])
+            log.debug(survey_responses['submission_id'])
+            submission_id=int(survey_responses['submission_id'])
+            grader_id = int(survey_responses['grader_id'])
+            feedback = str(survey_responses['feedback'])
+            score = int(survey_responses['score'])
         except:
             error_message="Could not parse submission id, grader id, or feedback from message_post ajax call."
             log.exception(error_message)
@@ -1947,7 +1949,12 @@ class OpenEndedResponse(LoncapaResponse):
                                                  anonymous_student_id +
                                                  self.answer_id)
 
-        xheader = xqueue_interface.make_xheader(lms_key=queuekey,queue_name=self.message_queue_name)
+        xheader = xqueue_interface.make_xheader(
+            lms_callback_url=self.system.xqueue['callback_url'],
+            lms_key=queuekey,
+            queue_name=self.message_queue_name
+        )
+
         student_info = {'anonymous_student_id': anonymous_student_id,
                         'submission_time': qtime,
                         }
@@ -1955,6 +1962,7 @@ class OpenEndedResponse(LoncapaResponse):
             'feedback' : feedback,
             'submission_id' : submission_id,
             'grader_id' : grader_id,
+            'score': score,
             'student_info' : json.dumps(student_info),
         }
 
@@ -1966,7 +1974,7 @@ class OpenEndedResponse(LoncapaResponse):
         if error:
             success=False
 
-        return success, "Successfully sent to queue."
+        return success, "Successfully submitted your feedback."
 
     def get_score(self, student_answers):
 
