@@ -1,0 +1,64 @@
+.editor-bar {
+  position: relative;
+  @include linear-gradient(top, #d4dee8, #c9d5e2);
+  padding: 5px;
+  border: 1px solid #3c3c3c;
+  border-radius: 3px 3px 0 0;
+  border-bottom-color: #a5aaaf;
+  @include clearfix;
+
+  a {
+    display: block;
+    float: left;
+    padding: 3px 10px 7px;
+    margin-left: 7px;
+    border-radius: 2px;
+
+    &:hover {
+      background: rgba(255, 255, 255, .5);
+    }
+  }
+
+  .editor-tabs {
+    position: absolute;
+    top: 10px;
+    right: 10px;
+
+    li {
+      float: left;
+    }
+
+    .tab {
+      height: 24px;
+      padding: 7px 20px 3px;
+      border: 1px solid #a5aaaf;
+      border-radius: 3px 3px 0 0;
+      @include linear-gradient(top, rgba(0, 0, 0, 0) 87%, rgba(0, 0, 0, .06));
+      background-color: #e5ecf3;
+      font-size: 13px;
+      color: #3c3c3c;
+      box-shadow: 1px -1px 1px rgba(0, 0, 0, .05);
+
+      &.current {
+        background: #fff;
+        border-bottom-color: #fff;
+      }
+    }
+
+    .cheatsheet-toggle {
+      width: 21px;
+      height: 21px;
+      padding: 0;
+      margin: 3px 5px 0 16px;
+      border-radius: 22px;
+      border: 1px solid #a5aaaf;
+      background: #e5ecf3;
+      font-size: 13px;
+      font-weight: 700;
+      color: #565d64;
+      text-align: center;
+    }
+  }
+}
+
+
