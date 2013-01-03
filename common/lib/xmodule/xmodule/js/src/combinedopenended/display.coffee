@@ -119,7 +119,7 @@ class @CombinedOpenEnded
   reset: (event) =>
     event.preventDefault()
     @errors_area.html('Problem state got out of sync.  Try reloading the page.')
-    if @state == 'done'
+    if @child_state == 'done'
       $.postWithPrefix "#{@ajax_url}/reset", {}, (response) =>
         if response.success
           @answer_area.val('')
