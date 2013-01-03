@@ -873,7 +873,7 @@ class DragAndDropInput(InputTypeBase):
         self.to_render.add('drag_and_drop_json')
         try:  # for tests and mock up, work normally not in tets
             self.loaded_attributes['course_folder'] = \
-                self.system.course_id.split('/')[1]
+                self.system.location.split('/')[3]
         except:
             self.loaded_attributes['course_folder'] = 'mock'
         self.to_render.add('course_folder')
