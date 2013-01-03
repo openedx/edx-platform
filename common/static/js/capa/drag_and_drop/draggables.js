@@ -22,18 +22,31 @@ define(['logme', 'update_input'], function (logme, updateInput) {
             normalizeEvent(event);
 
             if (state.currentMovingDraggable !== null) {
-                state.currentMovingDraggable.css('left', event.pageX - state.baseImageEl.offset().left - 50);
-                state.currentMovingDraggable.css('top', event.pageY - state.baseImageEl.offset().top - 50);
+                state.currentMovingDraggable.iconEl.css(
+                    'left',
+                    event.pageX -
+                        state.baseImageEl.offset().left -
+                        state.currentMovingDraggable.iconWidth * 0.5
+                );
+                state.currentMovingDraggable.iconEl.css(
+                    'top',
+                    event.pageY -
+                        state.baseImageEl.offset().top -
+                        state.currentMovingDraggable.iconHeight * 0.5
+                );
             }
         });
 
         return;
 
         function processDraggable(obj, objIndex) {
-            var draggableContainerEl, inContainer, mousePressed, onTarget,
-                draggableObj, marginCss;
+            var inContainer, mousePressed, onTarget, draggableObj, marginCss;
 
-            draggableContainerEl = $(
+            draggableObj = {};
+
+            draggableObj.zIndex = objIndex;
+
+            draggableObj.containerEl = $(
                 '<div ' +
                     'style=" ' +
                         'width: 100px; ' +
@@ -44,71 +57,84 @@ define(['logme', 'update_input'], function (logme, updateInput) {
                         'z-index: ' + objIndex + '; ' +
                         'border: 1px solid #CCC; ' +
                         'text-align: center; ' +
+                        'position: relative; ' +
                     '" ' +
-                    'data-draggable-position-index="' + objIndex + '" ' +
                     '></div>'
             );
+            draggableObj.containerEl.appendTo(state.sliderEl);
 
             if (obj.icon.length > 0) {
-                draggableContainerEl.append(
-                    $('<img src="' + state.config.imageDir + '/' + obj.icon + '" />')
+                draggableObj.iconEl = $('<img />');
+                draggableObj.iconEl.attr(
+                    'src',
+                    state.config.imageDir + '/' + obj.icon
                 );
+                draggableObj.iconEl.load(function () {
+                    draggableObj.iconWidth = this.width;
+                    draggableObj.iconHeight = this.height;
+
+                    draggableObj.iconEl.css('position', 'absolute');
+                    draggableObj.iconEl.css('top', (50 - this.height * 0.5) + 'px');
+                    draggableObj.iconEl.css('left', (50 - this.width * 0.5) + 'px');
+
+                    draggableObj.iconEl.appendTo(draggableObj.containerEl);
+                });
+
+                draggableObj.iconEl.mousedown(mouseDown);
+                draggableObj.iconEl.mouseup(mouseUp);
+                draggableObj.iconEl.mousemove(mouseMove);
+            } else {
+                // Must fix - add +label support, and just label support.
+                return;
             }
 
-            if (obj.label.length > 0) {
-                marginCss = '';
+            // if (obj.label.length > 0) {
+            //     marginCss = '';
+            //
+            //     if (obj.icon.length === 0) {
+            //         marginCss = 'margin-top: 38px;';
+            //     }
 
-                if (obj.icon.length === 0) {
-                    marginCss = 'margin-top: 38px;';
-                }
-
-                draggableContainerEl.append(
-                    $('<div style="clear: both; text-align: center; ' + marginCss + ' ">' + obj.label + '</div>')
-                );
-            }
-
-            draggableContainerEl.appendTo(state.sliderEl);
+            //     draggableContainerEl.append(
+            //         $('<div style="clear: both; text-align: center; ' + marginCss + ' ">' + obj.label + '</div>')
+            //     );
+            // }
 
             inContainer = true;
             mousePressed = false;
 
             onTarget = null;
 
-            draggableObj = {
-                'id': obj.id,
-                'el': draggableContainerEl,
-                'x': -1,
-                'y': -1,
+            draggableObj.id = obj.id;
+            draggableObj.x = -1;
+            draggableObj.y = -1;
 
-                'setInContainer': function (val) { inContainer = val; },
-                'setOnTarget': function (val) { onTarget = val; },
-            };
+            draggableObj.setInContainer = function (val) { inContainer = val; };
+            draggableObj.setOnTarget = function (val) { onTarget = val; };
+
             state.draggables.push(draggableObj);
-
-            draggableContainerEl.mousedown(mouseDown);
-            draggableContainerEl.mouseup(mouseUp);
-            draggableContainerEl.mousemove(mouseMove);
 
             return;
 
             function mouseDown(event) {
                 if (mousePressed === false) {
-                    state.currentMovingDraggable = draggableContainerEl;
+                    state.currentMovingDraggable = draggableObj;
                     normalizeEvent(event);
 
                     if (inContainer === true) {
-                        draggableContainerEl.detach();
-                        draggableContainerEl.css('border', 'none');
-                        draggableContainerEl.css('position', 'absolute');
-                        draggableContainerEl.css('left', event.pageX - state.baseImageEl.offset().left - 50);
-                        draggableContainerEl.css('top', event.pageY - state.baseImageEl.offset().top - 50);
-                        draggableContainerEl.appendTo(state.baseImageEl.parent());
+                        draggableObj.containerEl.hide();
+
+                        draggableObj.iconEl.detach();
+                        draggableObj.iconEl.css('left', event.pageX - state.baseImageEl.offset().left - draggableObj.iconWidth * 0.5);
+                        draggableObj.iconEl.css('top', event.pageY - state.baseImageEl.offset().top - draggableObj.iconHeight * 0.5);
+                        draggableObj.iconEl.appendTo(state.baseImageEl.parent());
 
                         inContainer = false;
                     }
 
-                    draggableContainerEl.attr('data-old-z-index', draggableContainerEl.css('z-index'));
-                    draggableContainerEl.css('z-index', '1000');
+                    draggableObj.oldZIndex = draggableObj.zIndex;
+                    draggableObj.zIndex = 1000;
+                    draggableObj.iconEl.css('z-index', '1000');
 
                     mousePressed = true;
                     event.preventDefault();
@@ -119,14 +145,14 @@ define(['logme', 'update_input'], function (logme, updateInput) {
                 if (mousePressed === true) {
                     state.currentMovingDraggable = null;
 
-                    checkLandingElement(event);
+                    checkLandingElement();
                 }
             }
 
             function mouseMove() {
                 if (mousePressed === true) {
-                    draggableContainerEl.css('left', event.pageX - state.baseImageEl.offset().left - 50);
-                    draggableContainerEl.css('top', event.pageY - state.baseImageEl.offset().top - 50);
+                    draggableObj.iconEl.css('left', event.pageX - state.baseImageEl.offset().left - draggableObj.iconWidth * 0.5);
+                    draggableObj.iconEl.css('top', event.pageY - state.baseImageEl.offset().top - draggableObj.iconHeight * 0.5);
                 }
             }
 
@@ -136,11 +162,11 @@ define(['logme', 'update_input'], function (logme, updateInput) {
             // the input with the user's answer (X-Y position of the draggable,
             // or the ID of the target where it landed.
             function checkLandingElement() {
-                var offsetDE, indexes, DEindex, targetFound;
+                var offsetIE, targetFound;
 
                 mousePressed = false;
 
-                offsetDE = draggableContainerEl.position();
+                offsetIE = draggableObj.iconEl.position();
 
                 if (state.individualTargets === true) {
                     targetFound = false;
@@ -155,10 +181,10 @@ define(['logme', 'update_input'], function (logme, updateInput) {
                     }
                 } else {
                     if (
-                        (offsetDE.left < 0) ||
-                        (offsetDE.left + 100 > state.baseImageEl.width()) ||
-                        (offsetDE.top < 0) ||
-                        (offsetDE.top + 100 > state.baseImageEl.height())
+                        (offsetIE.left < 0) ||
+                        (offsetIE.left + draggableObj.iconWidth > state.baseImageEl.width()) ||
+                        (offsetIE.top < 0) ||
+                        (offsetIE.top + draggableObj.iconHeight > state.baseImageEl.height())
                     ) {
                         moveBackToSlider();
 
@@ -182,7 +208,7 @@ define(['logme', 'update_input'], function (logme, updateInput) {
 
                     if (onTarget !== null) {
                         for (c1 = 0; c1 < onTarget.draggable.length; c1 += 1) {
-                            if (onTarget.draggable[c1] === obj.id) {
+                            if (onTarget.draggable[c1] === draggableObj.id) {
                                 onTarget.draggable.splice(c1, 1);
 
                                 break;
@@ -203,23 +229,23 @@ define(['logme', 'update_input'], function (logme, updateInput) {
                     for (c1 = 0; c1 < state.targets.length; c1 += 1) {
                         target = state.targets[c1];
 
-                        if (offsetDE.top + 50 < target.offset.top) {
+                        if (offsetIE.top + draggableObj.iconHeight * 0.5 < target.offset.top) {
                             continue;
                         }
-                        if (offsetDE.top + 50 > target.offset.top + target.h) {
+                        if (offsetIE.top + draggableObj.iconHeight * 0.5 > target.offset.top + target.h) {
                             continue;
                         }
-                        if (offsetDE.left + 50 < target.offset.left) {
+                        if (offsetIE.left + draggableObj.iconWidth * 0.5 < target.offset.left) {
                             continue;
                         }
-                        if (offsetDE.left + 50 > target.offset.left + target.w) {
+                        if (offsetIE.left + draggableObj.iconWidth * 0.5 > target.offset.left + target.w) {
                             continue;
                         }
 
                         if (
                             (state.config.one_per_target === true) &&
                             (target.draggable.length === 1) &&
-                            (target.draggable[0] !== obj.id)
+                            (target.draggable[0] !== draggableObj.id)
                         ) {
                             continue;
                         }
@@ -233,10 +259,10 @@ define(['logme', 'update_input'], function (logme, updateInput) {
                         if ((onTarget !== null) && (onTarget.id !== target.id)) {
                             removeObjIdFromTarget();
                             onTarget = target;
-                            target.draggable.push(obj.id);
+                            target.draggable.push(draggableObj.id);
                         } else if (onTarget === null) {
                             onTarget = target;
-                            target.draggable.push(obj.id);
+                            target.draggable.push(draggableObj.id);
                         }
 
                         // Reposition the draggable so that it's center
@@ -248,8 +274,15 @@ define(['logme', 'update_input'], function (logme, updateInput) {
                 }
 
                 function snapToTarget(target) {
-                    draggableContainerEl.css('left', target.offset.left + 0.5 * target.w - 50);
-                    draggableContainerEl.css('top', target.offset.top + 0.5 * target.h - 50);
+                    var offset;
+
+                    offset = 0;
+                    if (state.config.targetOutline === true) {
+                        offset = 1;
+                    }
+
+                    draggableObj.iconEl.css('left', target.offset.left + 0.5 * target.w - draggableObj.iconWidth * 0.5 + offset);
+                    draggableObj.iconEl.css('top', target.offset.top + 0.5 * target.h - draggableObj.iconHeight * 0.5 + offset);
                 }
 
                 // Go through all of the draggables subtract 1 from the z-index
@@ -266,18 +299,17 @@ define(['logme', 'update_input'], function (logme, updateInput) {
                     var c1;
 
                     for (c1 = 0; c1 < state.draggables.length; c1++) {
-                        if (
-                            parseInt(draggableContainerEl.attr('data-old-z-index'), 10) <
-                            parseInt(state.draggables[c1].el.css('z-index'), 10)
-                        ) {
-                            state.draggables[c1].el.css(
+                        if (draggableObj.oldZIndex < state.draggables[c1].zIndex) {
+                            state.draggables[c1].zIndex -= 1;
+                            state.draggables[c1].iconEl.css(
                                 'z-index',
-                                parseInt(state.draggables[c1].el.css('z-index'), 10) - 1
+                                state.draggables[c1].zIndex
                             );
                         }
                     }
 
-                    draggableContainerEl.css('z-index', c1);
+                    draggableObj.zIndex = c1;
+                    draggableObj.iconEl.css('z-index', c1);
                 }
 
                 // If a draggable was released in a wrong positione, we will
@@ -286,47 +318,16 @@ define(['logme', 'update_input'], function (logme, updateInput) {
                 function moveBackToSlider() {
                     var c1;
 
-                    draggableContainerEl.detach();
-                    draggableContainerEl.css('position', 'static');
+                    draggableObj.containerEl.show();
 
-                    // Get the position indexes of all draggables that are
-                    // currently in the slider, along with the corresponding
-                    // jQuery element.
-                    indexes = [];
-                    state.sliderEl.children().each(function (index, value) {
-                        indexes.push({
-                            'index': parseInt($(value).attr('data-draggable-position-index'), 10),
-                            'el': $(value)
-                        });
-                    });
+                    draggableObj.iconEl.detach();
 
-                    // Get the position index of the element that we are
-                    // inserting back into the slider.
-                    DEindex = parseInt(draggableContainerEl.attr('data-draggable-position-index'), 10);
+                    draggableObj.iconEl.css('top', (50 - draggableObj.iconHeight * 0.5) + 'px');
+                    draggableObj.iconEl.css('left', (50 - draggableObj.iconWidth * 0.5) + 'px');
 
-                    // Starting from the first position index that we
-                    // retrieved, and going up, if we find a position index
-                    // that is more than 'DEindex', we know that we must insert
-                    // the current element before the element with the greater
-                    // position index.
-                    for (c1 = 0; c1 < indexes.length; c1 += 1) {
-                        if ((inContainer === false) && (indexes[c1].index > DEindex)) {
-                            indexes[c1].el.before(draggableContainerEl);
-                            inContainer = true;
-                        }
-                    }
-
-                    // If we did not find a greater postion index, then either
-                    // there are no elements in the slider, or all of them
-                    // have a lesser position index. In both cases we add the
-                    // current draggable to the end.
-                    if (inContainer === false) {
-                        draggableContainerEl.appendTo(state.sliderEl);
-                    }
+                    draggableObj.iconEl.appendTo(draggableObj.containerEl);
 
                     inContainer = true;
-
-                    draggableContainerEl.css('border', '1px solid gray');
                 }
             }
         }
