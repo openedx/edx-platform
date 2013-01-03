@@ -2211,7 +2211,7 @@ class OpenEndedResponse(LoncapaResponse):
 
         # HACK: for now, just assume it's correct if you got more than 2/3.
         # Also assumes that score_result['score'] is an integer.
-        score_ratio = int(score_result['score']) / self.max_score
+        score_ratio = int(score_result['score']) / float(self.max_score)
         correct = (score_ratio >= 0.66)
 
         #Currently ignore msg and only return feedback (which takes the place of msg)
