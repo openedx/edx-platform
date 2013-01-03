@@ -659,12 +659,19 @@ class CapaDescriptor(RawDescriptor):
     # actually use type and points?
     metadata_attributes = RawDescriptor.metadata_attributes + ('type', 'points')
     
-    system_metadata_fields = RawDescriptor.system_metadata_fields + ['markdown']
-
     def get_context(self):
         _context = RawDescriptor.get_context(self)
         _context.update({'markdown': self.metadata.get('markdown', '')})
         return _context
+    
+    # overriding super's definition in a way which may get out of sync. It could call the super definition and
+    # then remove the 'markdown' property, but that seems expensive. Can't add markdown to system_metadata_fields
+    # because that prevents save_item from saving changes to it. We may want a list of metadata fields that are
+    # editable only via specific editors?
+    @property
+    def editable_metadata_fields(self):
+        subset = [name for name in self.metadata.keys() if name != 'markdown' and name not in self.system_metadata_fields]
+        return subset
 
 
     # VS[compat]
