@@ -3,3 +3,6 @@ coverage
 nosexcover
 pylint
 pep8
+lettuce
+selenium
+factory_boy
