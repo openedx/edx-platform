@@ -145,42 +145,25 @@ class DragAndDrop(object):
         # Checks in every group that user positions of every element are equal
         # with correct positions for every rule
 
-        for group in self.correct_groups:  # 'denied' rule
-            if not self.compare_positions(self.correct_positions[group].get(
-            'denied', []), self.user_positions[group]['user'], flag='denied'):
-                return False
+        # for group in self.correct_groups:  # 'denied' rule
+        #     if not self.compare_positions(self.correct_positions[group].get(
+        #     'denied', []), self.user_positions[group]['user'], flag='denied'):
+        #         return False
 
-        no_exact, no_allowed, no_anyof = False, False, False
+        passed_rules = dict()
+        for rule in ('exact', 'anyof'):
+            passed_rules[rule] = True
+            for groupname in self.correct_groups:
+                if self.correct_positions[groupname].get(rule, []):
+                    if not self.compare_positions(
+                            self.correct_positions[groupname][rule],
+                            self.user_positions[groupname]['user'], flag=rule):
+                        return False
+                else:
+                    passed_rules[rule] = False
 
-        for groupname in self.correct_groups:  # 'exact' rule
-            if self.correct_positions[groupname].get('exact', []):
-                if not self.compare_positions(
-                        self.correct_positions[groupname]['exact'],
-                        self.user_positions[groupname]['user'], flag='exact'):
-                    return False
-            else:
-                no_exact = True
-
-        for groupname in self.correct_groups:  # 'allowed' rule
-            if self.correct_positions[groupname].get('allowed', []):
-                if not self.compare_positions(
-                        self.correct_positions[groupname]['allowed'],
-                        self.user_positions[groupname]['user'], flag='allowed'):
-                    return False
-            else:
-                no_allowed = True
-
-        # 'anyof' rule
-        for groupname in self.correct_groups:
-            if self.correct_positions[groupname].get('anyof', []):
-                if not self.compare_positions(
-                        self.correct_positions[groupname]['anyof'],
-                        self.user_positions[groupname]['user'], flag='anyof'):
-                    return False
-            else:
-                no_anyof = True
-
-        if no_allowed and no_exact and no_anyof:
+        # if all passed rules are false
+        if not reduce(lambda x, y: x or y, passed_rules):
             return False
 
         return True
@@ -188,16 +171,16 @@ class DragAndDrop(object):
     def compare_positions(self, correct, user, flag):
         """ order of correct/user is matter only in anyof_flag"""
         # import ipdb; ipdb.set_trace()
-        if flag == 'denied':
-            for el1 in correct:
-                for el2 in user:
-                    if PositionsCompare(el1) == PositionsCompare(el2):
-                        return False
+        # if flag == 'denied':
+        #     for el1 in correct:
+        #         for el2 in user:
+        #             if PositionsCompare(el1) == PositionsCompare(el2):
+        #                 return False
 
-        if flag == 'allowed':
-            for el1, el2 in zip(sorted(correct), sorted(user)):
-                if PositionsCompare(el1) != PositionsCompare(el2):
-                    return False
+        # if flag == 'allowed':
+        #     for el1, el2 in zip(sorted(correct), sorted(user)):
+        #         if PositionsCompare(el1) != PositionsCompare(el2):
+        #             return False
 
         if flag == 'exact':
             for el1, el2 in zip(correct, user):
@@ -210,7 +193,7 @@ class DragAndDrop(object):
                 for c_el in correct:
                     if PositionsCompare(u_el) == PositionsCompare(c_el):
                         count += 1
-                        continue
+                        break
             if count != len(user):
                 return False
 
