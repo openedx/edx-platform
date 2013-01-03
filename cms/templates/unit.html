@@ -13,8 +13,6 @@
       })
     });
 
-    $body = $('body');
-    $body.on('click', '.editor-tabs .tab', setEditorTab);
 
     function setEditorTab(e) {
       e.preventDefault();
@@ -53,229 +51,6 @@
     }
   </script>
 
-  <script src="/static/js/speed-editor.js"></script>
-
-  <script type="text/template" id="asset-library-widget">
-    <article class="asset-library widget">
-      <a href="#" class="close-button">
-        <span class="close-icon"></span>
-      </a>
-
-      <div class="upload-form">
-        <h1>Upload New File</h1>
-        <p class="file-name"></p>
-        <div class="progress-bar">
-          <div class="progress-fill"></div>
-        </div>
-        <div class="embeddable">
-          <label>Embeddable XML:</label>
-          <input type="text" class="embeddable-xml-input" value="&lt;img src=&quot;&quot;/&gt;">
-        </div>
-        <form class="file-chooser" action="/Giannattasio/313/course/Photoshop_for_Monkeys/upload_asset" method="post" enctype="multipart/form-data">
-          <a href="#" class="choose-file-button">Choose File</a>
-          <input type="file" class="file-input" name="file">
-        </form>
-      </div>
-
-      <header>
-        <a href="#" class="upload-button">Upload New File</a>
-        <input type="text" class="search">
-      </header>
-      <table class="library-list">
-        <thead>
-          <tr>
-            <th class="thumb-col"></th>
-            <th class="name-col"><a href="#">Name <span class="sort-icon down"></span></a></th>
-            <th class="date-col"><a href="#">Date Added</a></th>
-            <th class="insert-col"></th>
-          </tr>
-        </thead>
-        <tbody id="asset_table_body">
-          <tr data-id="id">
-            <td class="thumb-col">
-              <div class="thumb">
-                <img src="/">
-              </div>
-            </td>
-            <td class="name-col">
-              <a href="#" class="filename">ut-logo-350-150.png</a>
-              <div class="embeddable-xml"></div>
-            </td>
-            <td class="date-col">
-              30 October, 2012 at 07:17 PM
-            </td>
-            <td class="insert-col">
-              <a href="#" class="insert-asset-button" data-markup="<img src='/c4x/Giannattasio/313/asset/ut-logo-350-150.png'/>">Insert</a>
-            </td>
-          </tr>
-          <tr data-id="id">
-            <td class="thumb-col">
-              <div class="thumb">
-                <img src="/">
-              </div>
-            </td>
-            <td class="name-col">
-              <a href="#" class="filename">ut-logo-350-150.png</a>
-              <div class="embeddable-xml"></div>
-            </td>
-            <td class="date-col">
-              30 October, 2012 at 07:17 PM
-            </td>
-            <td class="insert-col">
-              <a href="#" class="insert-asset-button" data-markup="<img src='/c4x/Giannattasio/313/asset/ut-logo-350-150.png'/>">Insert</a>
-            </td>
-          </tr>
-          <tr data-id="id">
-            <td class="thumb-col">
-              <div class="thumb">
-                <img src="/">
-              </div>
-            </td>
-            <td class="name-col">
-              <a href="#" class="filename">ut-logo-350-150.png</a>
-              <div class="embeddable-xml"></div>
-            </td>
-            <td class="date-col">
-              30 October, 2012 at 07:17 PM
-            </td>
-            <td class="insert-col">
-              <a href="#" class="insert-asset-button" data-markup="<img src='/c4x/Giannattasio/313/asset/ut-logo-350-150.png'/>">Insert</a>
-            </td>
-          </tr>
-          <tr data-id="id">
-            <td class="thumb-col">
-              <div class="thumb">
-                <img src="/">
-              </div>
-            </td>
-            <td class="name-col">
-              <a href="#" class="filename">ut-logo-350-150.png</a>
-              <div class="embeddable-xml"></div>
-            </td>
-            <td class="date-col">
-              30 October, 2012 at 07:17 PM
-            </td>
-            <td class="insert-col">
-              <a href="#" class="insert-asset-button" data-markup="<img src='/c4x/Giannattasio/313/asset/ut-logo-350-150.png'/>">Insert</a>
-            </td>
-          </tr>
-          <tr data-id="id">
-            <td class="thumb-col">
-              <div class="thumb">
-                <img src="/">
-              </div>
-            </td>
-            <td class="name-col">
-              <a href="#" class="filename">ut-logo-350-150.png</a>
-              <div class="embeddable-xml"></div>
-            </td>
-            <td class="date-col">
-              30 October, 2012 at 07:17 PM
-            </td>
-            <td class="insert-col">
-              <a href="#" class="insert-asset-button" data-markup="<img src='/c4x/Giannattasio/313/asset/ut-logo-350-150.png'/>">Insert</a>
-            </td>
-          </tr>
-          <tr data-id="id">
-            <td class="thumb-col">
-              <div class="thumb">
-                <img src="/">
-              </div>
-            </td>
-            <td class="name-col">
-              <a href="#" class="filename">ut-logo-350-150.png</a>
-              <div class="embeddable-xml"></div>
-            </td>
-            <td class="date-col">
-              30 October, 2012 at 07:17 PM
-            </td>
-            <td class="insert-col">
-              <a href="#" class="insert-asset-button" data-markup="<img src='/c4x/Giannattasio/313/asset/ut-logo-350-150.png'/>">Insert</a>
-            </td>
-          </tr>
-          <tr data-id="id">
-            <td class="thumb-col">
-              <div class="thumb">
-                <img src="/">
-              </div>
-            </td>
-            <td class="name-col">
-              <a href="#" class="filename">ut-logo-350-150.png</a>
-              <div class="embeddable-xml"></div>
-            </td>
-            <td class="date-col">
-              30 October, 2012 at 07:17 PM
-            </td>
-            <td class="insert-col">
-              <a href="#" class="insert-asset-button" data-markup="<img src='/c4x/Giannattasio/313/asset/ut-logo-350-150.png'/>">Insert</a>
-            </td>
-          </tr>
-          <tr data-id="id">
-            <td class="thumb-col">
-              <div class="thumb">
-                <img src="/">
-              </div>
-            </td>
-            <td class="name-col">
-              <a href="#" class="filename">ut-logo-350-150.png</a>
-              <div class="embeddable-xml"></div>
-            </td>
-            <td class="date-col">
-              30 October, 2012 at 07:17 PM
-            </td>
-            <td class="insert-col">
-              <a href="#" class="insert-asset-button" data-markup="<img src='/c4x/Giannattasio/313/asset/ut-logo-350-150.png'/>">Insert</a>
-            </td>
-          </tr>
-          <tr data-id="id">
-            <td class="thumb-col">
-              <div class="thumb">
-                <img src="/">
-              </div>
-            </td>
-            <td class="name-col">
-              <a href="#" class="filename">ut-logo-350-150.png</a>
-              <div class="embeddable-xml"></div>
-            </td>
-            <td class="date-col">
-              30 October, 2012 at 07:17 PM
-            </td>
-            <td class="insert-col">
-              <a href="#" class="insert-asset-button" data-markup="<img src='/c4x/Giannattasio/313/asset/ut-logo-350-150.png'/>">Insert</a>
-            </td>
-          </tr>
-          <tr data-id="id">
-            <td class="thumb-col">
-              <div class="thumb">
-                <img src="/">
-              </div>
-            </td>
-            <td class="name-col">
-              <a href="#" class="filename">ut-logo-350-150.png</a>
-              <div class="embeddable-xml"></div>
-            </td>
-            <td class="date-col">
-              30 October, 2012 at 07:17 PM
-            </td>
-            <td class="insert-col">
-              <a href="#" class="insert-asset-button" data-markup="<img src='/c4x/Giannattasio/313/asset/ut-logo-350-150.png'/>">Insert</a>
-            </td>
-          </tr>
-        </tbody>
-      </table>
-      <nav class="pagination wip-box">
-        Page: 
-        <ol class="pages">
-          <li>1</li>
-          <li><a href="#">2</a></li>
-          <li><a href="#">3</a></li>
-          <li><a href="#">4</a></li>
-          <li><a href="#">5</a></li>
-        </ol>
-        <a href="#" class="next">»</a>
-      </nav>
-    </article>
-  </script>
 
   <script type="text/template" id="simple-editor-cheatsheet">
     <article class="simple-editor-cheatsheet">
@@ -374,6 +149,20 @@
                   % endfor
                 </ul>
               </div>
+                % for type, templates in sorted(component_templates.items()):
+                <div class="new-component-templates new-component-${type}">
+                    <ul class="new-component-template">
+                        % for name, location in templates:
+                        <li>
+                            <a href="#" data-location="${location}">
+                                <span class="name">${name}</span>
+                            </a>
+                        </li>
+                        %endfor
+                    </ul>
+                    <a href="#" class="cancel-button">Cancel</a>
+                </div>
+                % endfor
             </li>
           </ol>
         </article>
