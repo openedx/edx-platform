@@ -222,20 +222,53 @@ class Test_DragAndDrop_Populate(unittest.TestCase):
 
 class Test_DraAndDrop_Compare_Positions(unittest.TestCase):
 
-    def test_exact_1(self):
-        self.assertTrue(1)
+    def test_1(self):
+        dnd = draganddrop.DragAndDrop()
+        self.assertTrue(dnd.compare_positions(correct=[[1, 1], [2, 3]],
+                                              user=[[2, 3], [1, 1]],
+                                              flag='anyof'))
 
-    def test_exact_2(self):
-        self.assertTrue(1)
+    def test_2a(self):
+        dnd = draganddrop.DragAndDrop()
+        self.assertTrue(dnd.compare_positions(correct=[[1, 1], [2, 3]],
+                                               user=[[2, 3], [1, 1]],
+                                               flag='exact'))
 
-    def test_anyof_1(self):
-        self.assertTrue(1)
+    def test_2b(self):
+        dnd = draganddrop.DragAndDrop()
+        self.assertFalse(dnd.compare_positions(correct=[[1, 1], [2, 3]],
+                                               user=[[2, 13], [1, 1]],
+                                               flag='exact'))
 
-    def test_anyof_2(self):
-        self.assertTrue(1)
+    def test_3(self):
+        dnd = draganddrop.DragAndDrop()
+        self.assertFalse(dnd.compare_positions(correct=["a", "b"],
+                                               user=["a", "b", "c"],
+                                               flag='anyof'))
+
+    def test_4(self):
+        dnd = draganddrop.DragAndDrop()
+        self.assertTrue(dnd.compare_positions(correct=["a", "b", "c"],
+                                              user=["a", "b"],
+                                              flag='anyof'))
 
     def test_5(self):
-        self.assertTrue(1)
+        dnd = draganddrop.DragAndDrop()
+        self.assertFalse(dnd.compare_positions(correct=["a", "b", "c"],
+                                               user=["a", "c", "b"],
+                                               flag='exact'))
+
+    def test_6(self):
+        dnd = draganddrop.DragAndDrop()
+        self.assertTrue(dnd.compare_positions(correct=["a", "b", "c"],
+                                               user=["a", "c", "b"],
+                                               flag='anyof'))
+
+    def test_7(self):
+        dnd = draganddrop.DragAndDrop()
+        self.assertFalse(dnd.compare_positions(correct=["a", "b", "b"],
+                                               user=["a", "c", "b"],
+                                               flag='anyof'))
 
 
 def suite():
