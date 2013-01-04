@@ -539,7 +539,6 @@ class DragAndDropTest(unittest.TestCase):
         expected = {'id': 'prob_1_2',
                     'value': value,
                     'status': 'unsubmitted',
-                    'course_folder': 'mock',
                     'msg': '',
                     'drag_and_drop_json': '{"use_targets": "True", \
 "target_outline": "false", "one_per_target": "True", \
