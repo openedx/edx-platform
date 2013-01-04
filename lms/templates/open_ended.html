@@ -9,9 +9,9 @@
   <div class="message-wrapper">
     % if state == 'initial':
       <span class="unanswered" style="display:inline-block;" id="status_${id}">Unanswered</span>
-    % elif state in ['done', 'post_assessment'] and correct == 'incorrect':
-      <span class="correct" id="status_${id}">Correct</span>
     % elif state in ['done', 'post_assessment'] and correct == 'correct':
+      <span class="correct" id="status_${id}">Correct</span>
+    % elif state in ['done', 'post_assessment'] and correct == 'incorrect':
       <span class="incorrect" id="status_${id}">Incorrect</span>
     % elif state == 'assessing':
       <span class="grading" id="status_${id}">Submitted for grading</span>
