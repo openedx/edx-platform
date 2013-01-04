@@ -497,6 +497,7 @@ PIPELINE_JS = {
             for pth in sorted(glob2.glob(PROJECT_ROOT / 'static/coffee/src/**/*.coffee'))\
             if (pth not in courseware_only_js and
                 pth not in discussion_js and
+                pth not in peer_grading_js and
                 pth not in staff_grading_js)
         ] + [
             'js/form.ext.js',

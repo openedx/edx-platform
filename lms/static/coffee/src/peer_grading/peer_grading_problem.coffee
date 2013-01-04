@@ -16,7 +16,7 @@ class PeerGradingProblemBackend
       # change to test each version
       response = 
         success: true 
-        calibrated: true
+        calibrated: false
     else if cmd == 'show_calibration_essay'
       #response = 
       #  success: false
@@ -41,6 +41,7 @@ class PeerGradingProblemBackend
     else if cmd == 'save_calibration_essay'
       response = 
         success: true
+        correct_score: 2
     else if cmd == 'save_grade'
       response = 
         success: true
@@ -70,6 +71,7 @@ class PeerGradingProblem
     @content_panel = $('.content-panel')
 
     @grading_wrapper =$('.grading-wrapper')
+    @calibration_feedback_panel = $('.calibration-feedback')
 
     @error_container = $('.error-container')
 
@@ -81,8 +83,14 @@ class PeerGradingProblem
 
     @submit_button = $('.submit-button')
     @action_button = $('.action-button')
+    @calibration_feedback_button = $('.calibration-feedback-button')
 
+    Collapsible.setCollapsibles(@content_panel)
     @action_button.click -> document.location.reload(true)
+    @calibration_feedback_button.click => 
+      @calibration_feedback_panel.hide()
+      @grading_wrapper.show()
+      @is_calibrated_check
 
     @is_calibrated_check()
 
@@ -113,7 +121,7 @@ class PeerGradingProblem
 
   submit_calibration_essay: ()=>
     data = @construct_data()
-    @backend.post('save_calibration_essay', data, @submission_callback)
+    @backend.post('save_calibration_essay', data, @calibration_callback)
 
   submit_grade: () =>
     data = @construct_data()
@@ -143,6 +151,8 @@ class PeerGradingProblem
     if response.success
       # display correct grade
       @grading_wrapper.hide()
+      @calibration_feedback_panel.show()
+      @calibration_feedback_panel.prepend("<p>The correct grade is: #{response.correct_score}</p>")
       
     else if response.error
       @render_error(response.error)
@@ -233,6 +243,7 @@ class PeerGradingProblem
     @setup_score_selection(response.max_score)
     @submit_button.hide()
     @action_button.hide()
+    @calibration_feedback_panel.hide()
 
 
     
@@ -263,7 +274,7 @@ class PeerGradingProblem
 
 
 
-mock_backend = false
+mock_backend = true
 ajax_url = $('.peer-grading').data('ajax_url')
 backend = new PeerGradingProblemBackend(ajax_url, mock_backend)
 $(document).ready(() -> new PeerGradingProblem(backend))

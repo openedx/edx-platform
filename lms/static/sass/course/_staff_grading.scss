@@ -37,7 +37,6 @@ div.peer-grading{
     }
 
     .prompt-information-container,
-    .submission-wrapper,
     .rubric-wrapper,
     .grading-container
     {
@@ -49,6 +48,10 @@ div.peer-grading{
         background-color: #FFCCCC;
         padding: 15px;
         margin-left: 0px;
+    }
+    .submission-wrapper
+    {
+        padding: 15px;
     }
     .meta-info-wrapper
     {
