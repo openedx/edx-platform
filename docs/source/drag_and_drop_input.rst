@@ -29,6 +29,9 @@ be specified for this tag::
     one_per_target - Specify whether to allow more than one draggable to be
           placed onto a single target. It can be either 'true' or 'false'. If
           not specified, the default value is 'true'.
+    no_labels - default is false, in default behaviour if label is not set, label
+          is obtained from id. If no_labels is true, labels are not automatically
+          populated from id, and one can not set labels and obtain only icons.
 
 draggable tag
 -------------
@@ -49,7 +52,8 @@ In order for the grader to work, it is essential that a unique ID
 is provided. Otherwise, there will be no way to tell which draggable is at what
 coordinate, or over what target. Label and icon attributes are optional. If
 they are provided they will be used, otherwise, you can have an empty
-draggable. The path is relative to 'course_folder/static/images/' folder.
+draggable. The path is relative to 'course_folder' folder, for example,
+/static/images/img1.png.
 
 target tag
 ----------
@@ -76,6 +80,7 @@ the slider.
 
 If no targets are provided, then a draggable can be dragged and placed anywhere
 on the base image.
+
 
 Example
 =======

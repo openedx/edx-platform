@@ -151,6 +151,42 @@ class DragAndDrop(object):
         """ Compares two lists of positions with flag rules. Order of
         correct/user arguments is matter only in 'anyof' flag.
 
+        Rules description:
+
+            'exact' means 1-1 ordered relationship::
+
+                [el1, el2, el3] is 'exact' equal to [el5, el6, el7] when
+                el1 == el5, el2 == el6, el3 == el7.
+                Equality function is custom, see below.
+
+
+            'anyof' means subset relationship::
+
+                user = [el1, el2] is 'anyof' equal to correct = [el1, el2, el3]
+                when
+                        set(user) <= set(correct).
+
+                'anyof' is ordered relationship. It always checks if user
+                is subset of correct
+
+                Equality function is custom, see below.
+
+                Examples:
+
+                     - many draggables per position:
+                    user ['1','2','2','2'] is 'anyof' equal to ['1', '2', '3']
+
+                     - draggables can be placed in any order:
+                    user ['1','2','3','4'] is 'anyof' equal to ['4', '2', '1', 3']
+
+        Equality functions:
+
+        Equality functon depends on type of element. They declared in
+        PositionsCompare class. For position like targets
+        ids ("t1", "t2", etc..) it is string equality function. For coordinate
+        positions ([1,2] or [[1,2], 15]) it is coordinate_positions_compare
+        function (see docstrings in PositionsCompare class)
+
         Args:
             correst, user: lists of positions
 
