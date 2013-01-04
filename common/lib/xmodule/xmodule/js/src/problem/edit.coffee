@@ -1,7 +1,7 @@
 class @MarkdownEditingDescriptor extends XModule.Descriptor
   constructor: (element) ->
-#    $body.on('click', '.editor-tabs .tab', @changeEditor)
-    $('.editor-tabs .tab').bind 'click', (event) => @changeEditor(event)
+    $body.on('click', '.editor-tabs .tab', @changeEditor)
+
     @xml_editor = CodeMirror.fromTextArea($(".xml-box", element)[0], {
     mode: "xml"
     lineNumbers: true
@@ -20,10 +20,10 @@ class @MarkdownEditingDescriptor extends XModule.Descriptor
   onMarkdownEditorUpdate:  ->
     console.log('update')
 
-  changeEditor: (e) ->
+  changeEditor: (e) =>
     e.preventDefault();
     $('.editor-tabs .current').removeClass('current')
-    $(this).addClass('current');
+    $(e.currentTarget).addClass('current')
     if (@current_editor == @xml_editor)
       @setCurrentEditor(@markdown_editor)
     else
@@ -53,6 +53,5 @@ class @MarkdownEditingDescriptor extends XModule.Descriptor
     $(@current_editor).focus();
 
   save: ->
-#    TODO: make sure this gets unregistered correctly (changed how registration works)
     $body.off('click', '.editor-tabs .tab', @changeEditor)
     data: @xml_editor.getValue()
