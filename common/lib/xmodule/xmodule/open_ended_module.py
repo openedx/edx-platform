@@ -248,6 +248,8 @@ class OpenEndedModule():
         if error:
             success=False
 
+        self.state=self.DONE
+
         return {'success' : success, 'msg' : "Successfully submitted your feedback."}
 
     def get_score(self, submission, system):

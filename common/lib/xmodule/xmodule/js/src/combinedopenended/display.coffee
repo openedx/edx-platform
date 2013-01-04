@@ -196,6 +196,10 @@ class @CombinedOpenEnded
       success: (response) =>
         @gentle_alert response.message
         @$('section.evaluation').slideToggle()
+        @message_wrapper.html(response.message_html)
+        @child_state = 'done'
+        @allow_reset = response.allow_reset
+        @rebind()
 
     $.ajaxWithPrefix("#{@ajax_url}/save_post_assessment", settings)
 
