@@ -132,7 +132,7 @@ class DragAndDrop(object):
                 return False
 
         # Check that in every group, for rule of that group, user positions of
-        #every element are equal with correct positions
+        # every element are equal with correct positions
         for groupname in self.correct_groups:
             rules_executed = 0
             for rule in ('exact', 'anyof'):   # every group has only one rule
