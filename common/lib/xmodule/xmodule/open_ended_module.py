@@ -640,7 +640,6 @@ class OpenEndedDescriptor(XmlDescriptor, EditingDescriptor):
 
     js = {'coffee': [resource_string(__name__, 'js/src/html/edit.coffee')]}
     js_module_name = "HTMLEditingDescriptor"
-    expected_children = ['rubric', 'prompt', 'oeparam']
 
     @classmethod
     def definition_from_xml(cls, xml_object, system):
@@ -656,7 +655,7 @@ class OpenEndedDescriptor(XmlDescriptor, EditingDescriptor):
         }
         """
 
-        for child in self.expected_children:
+        for child in ['rubric', 'prompt', 'oeparam']:
             if len(xml_object.xpath(child)) != 1:
                 raise ValueError("Open Ended definition must include exactly one '{0}' tag".format(child))
 
@@ -679,7 +678,7 @@ class OpenEndedDescriptor(XmlDescriptor, EditingDescriptor):
             child_node = etree.fromstring(child_str)
             elt.append(child_node)
 
-        for child in self.expected_children:
+        for child in ['rubric', 'prompt', 'oeparam']:
             add_child(child)
 
         return elt
