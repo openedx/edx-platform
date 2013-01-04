@@ -12,7 +12,6 @@ import sys
 from pkg_resources import resource_string
 
 from .capa_module import only_one, ComplexEncoder
-from common.lib.xmodule.xmodule import open_ended_module
 from .editing_module import EditingDescriptor
 from .html_checker import check_html
 from progress import Progress
@@ -21,6 +20,7 @@ from .x_module import XModule
 from .xml_module import XmlDescriptor
 from xmodule.modulestore import Location
 import self_assessment_module
+import open_ended_module
 
 log = logging.getLogger("mitx.courseware")
 
