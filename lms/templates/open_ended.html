@@ -1,12 +1,16 @@
 <section id="openended_${id}" class="open-ended-child" data-state="${state}">
+
+   <div class="error"></div>
+   <div class="prompt">
     ${prompt|n}
-  <textarea rows="${rows}" cols="${cols}" name="input_${id}" class="short-form-response" id="input_${id}"
+   </prompt>
+  <textarea rows="${rows}" cols="${cols}" name="answer" class="answer short-form-response" id="input_${id}"
        % if hidden:
       	    style="display:none;"
        % endif
   >${previous_answer|h}</textarea>
 
-  <div class="grader-status">
+  <div class="message-wrapper">
     % if state == 'initial':
       <span class="unanswered" style="display:inline-block;" id="status_${id}">Unanswered</span>
     % elif state == 'done':

@@ -30,6 +30,8 @@ from .xml_module import XmlDescriptor
 from xmodule.modulestore import Location
 from capa.util import *
 
+from datetime import datetime
+
 log = logging.getLogger("mitx.courseware")
 
 # Set the default number of max attempts.  Should be 1 for production
@@ -261,7 +263,7 @@ class OpenEndedModule():
         # Generate header
         queuekey = xqueue_interface.make_hashkey(str(system.seed) + qtime +
                                                  anonymous_student_id +
-                                                 self.answer_id)
+                                                 1)
 
         xheader = xqueue_interface.make_xheader(lms_callback_url=system.xqueue['callback_url'],
             lms_key=queuekey,
@@ -499,10 +501,11 @@ class OpenEndedModule():
           'progress' : 'none'/'in_progress'/'done',
           <other request-specific values here > }
         '''
+        log.debug(get)
         handlers = {
             'problem_get': self.get_problem,
             'problem_reset': self.reset_problem,
-            'problem_save': self.save_problem,
+            'save_answer': self.save_answer,
             'score_update': self.update_score,
             'message_post' : self.message_post,
             }
@@ -526,7 +529,7 @@ class OpenEndedModule():
         self.change_state(self.INITIAL)
         return {'success': True}
 
-    def save_problem(self, get, system):
+    def save_answer(self, get, system):
         if self.attempts > self.max_attempts:
             # If too many attempts, prevent student from saving answer and
             # seeing rubric.  In normal use, students shouldn't see this because
@@ -653,14 +656,6 @@ class OpenEndedModule():
         Return max_score
         """
         return self._max_score
-
-    def get_score(self):
-        """
-        Returns the last score in the list
-        """
-        score = self.latest_score()
-        return {'score': score if score is not None else 0,
-                'total': self._max_score}
 
     def get_progress(self):
         '''
