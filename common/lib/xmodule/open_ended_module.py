@@ -594,9 +594,14 @@ class OpenEndedModule():
         context={'rows' : 30,
                  'cols' : 80,
                  'hidden' : '',
+                 'id' : 'open_ended',
+                 'msg' : self.msg,
+                 'status' : self.status,
+                 'queue_len' : self.queue_len,
+                 'value' : self.value,
                  }
 
-        html=self.system.render_template("openendedinput.html", context)
+        html=self.system.render_template("open_ended.html", context)
 
     def _extra_context(self):
         """Defined queue_len, add it """
