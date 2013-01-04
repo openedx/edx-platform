@@ -95,6 +95,30 @@ class CombinedOpenEndedModule(XModule):
         tag=etree.fromstring(xml).tag
         return tag
 
+    def overwrite_state(self, current_task_state):
+        last_response, last_score=self.get_last_response(self.current_task_number-1)
+        loaded_task_state=json.loads(current_task_state)
+        if loaded_task_state['state']== self.INITIAL:
+            loaded_task_state['state']=self.ASSESSING
+            loaded_task_state['created'] = "True"
+            loaded_task_state['history'].append({'answer' : last_response})
+            current_task_state=json.dumps(loaded_task_state)
+        return current_task_state
+
+    def child_modules(self):
+        child_modules={
+            'openended' : open_ended_module.OpenEndedModule,
+            'selfassessment' : self_assessment_module.SelfAssessmentModule,
+        }
+        child_descriptors={
+            'openended' : open_ended_module.OpenEndedDescriptor,
+            'selfassessment' : self_assessment_module.SelfAssessmentDescriptor,
+        }
+        children={
+            'modules' : child_modules,
+            'descriptors' : child_descriptors,
+        }
+        return children
 
     def setup_next_task(self):
         current_task_state=None
@@ -103,55 +127,26 @@ class CombinedOpenEndedModule(XModule):
 
         self.current_task_xml=self.task_xml[self.current_task_number]
         current_task_type=self.get_tag_name(self.current_task_xml)
-        if current_task_type=="selfassessment":
-            self.current_task_descriptor=self_assessment_module.SelfAssessmentDescriptor(self.system)
-            self.current_task_parsed_xml=self.current_task_descriptor.definition_from_xml(etree.fromstring(self.current_task_xml),self.system)
-            if current_task_state is None and self.current_task_number==0:
-                self.current_task=self_assessment_module.SelfAssessmentModule(self.system, self.location, self.current_task_parsed_xml, self.current_task_descriptor)
-                self.task_states.append(self.current_task.get_instance_state())
-                self.state=self.ASSESSING
-            elif current_task_state is None and self.current_task_number>0:
-                last_response, last_score=self.get_last_response(self.current_task_number-1)
-                current_task_state = ('{"state": "assessing", "version": 1, "max_score": ' + str(self._max_score) + ', ' +
-                                      '"attempts": 0, "created": "True", "history": [{"answer": "' + str(last_response) + '"}]}')
-                self.current_task=self_assessment_module.SelfAssessmentModule(self.system, self.location, self.current_task_parsed_xml, self.current_task_descriptor, instance_state=current_task_state)
-                self.task_states.append(self.current_task.get_instance_state())
-                self.state=self.ASSESSING
-            else:
-                if self.current_task_number>0:
-                    last_response, last_score=self.get_last_response(self.current_task_number-1)
-                    loaded_task_state=json.loads(current_task_state)
-                    if loaded_task_state['state']== self.INITIAL:
-                        loaded_task_state['state']=self.ASSESSING
-                        loaded_task_state['created'] = "True"
-                        loaded_task_state['history'].append({'answer' : last_response})
-                        current_task_state=json.dumps(loaded_task_state)
-                self.current_task=self_assessment_module.SelfAssessmentModule(self.system, self.location, self.current_task_parsed_xml, self.current_task_descriptor, instance_state=current_task_state)
 
-        elif current_task_type=="openended":
-            self.current_task_descriptor= open_ended_module.OpenEndedDescriptor(self.system)
-            self.current_task_parsed_xml=self.current_task_descriptor.definition_from_xml(etree.fromstring(self.current_task_xml),self.system)
-            if current_task_state is None and self.current_task_number==0:
-                self.current_task=open_ended_module.OpenEndedModule(self.system, self.location, self.current_task_parsed_xml, self.current_task_descriptor)
-                self.task_states.append(self.current_task.get_instance_state())
-                self.state=self.ASSESSING
-            elif current_task_state is None and self.current_task_number>0:
-                last_response, last_score=self.get_last_response(self.current_task_number-1)
-                current_task_state = ('{"state": "assessing", "version": 1, "max_score": ' + str(self._max_score) + ', ' +
-                                      '"attempts": 0, "created": "True", "history": [{"answer": "' + str(last_response) + '"}]}')
-                self.current_task=open_ended_module.OpenEndedModule(self.system, self.location, self.current_task_parsed_xml, self.current_task_descriptor, instance_state=current_task_state)
-                self.task_states.append(self.current_task.get_instance_state())
-                self.state=self.ASSESSING
-            else:
-                if self.current_task_number>0:
-                    last_response, last_score=self.get_last_response(self.current_task_number-1)
-                    loaded_task_state=json.loads(current_task_state)
-                    if loaded_task_state['state']== self.INITIAL:
-                        loaded_task_state['state']=self.ASSESSING
-                        loaded_task_state['created'] = "True"
-                        loaded_task_state['history'].append({'answer' : last_response})
-                        current_task_state=json.dumps(loaded_task_state)
-                self.current_task=open_ended_module.OpenEndedModule(self.system, self.location, self.current_task_parsed_xml, self.current_task_descriptor, instance_state=current_task_state)
+        children=self.child_modules()
+
+        self.current_task_descriptor=children['descriptors'][current_task_type](self.system)
+        self.current_task_parsed_xml=self.current_task_descriptor.definition_from_xml(etree.fromstring(self.current_task_xml),self.system)
+        if current_task_state is None and self.current_task_number==0:
+            self.current_task=children['modules'][current_task_type](self.system, self.location, self.current_task_parsed_xml, self.current_task_descriptor)
+            self.task_states.append(self.current_task.get_instance_state())
+            self.state=self.ASSESSING
+        elif current_task_state is None and self.current_task_number>0:
+            last_response, last_score=self.get_last_response(self.current_task_number-1)
+            current_task_state = ('{"state": "assessing", "version": 1, "max_score": ' + str(self._max_score) + ', ' +
+                                  '"attempts": 0, "created": "True", "history": [{"answer": "' + str(last_response) + '"}]}')
+            self.current_task=children['modules'][current_task_type](self.system, self.location, self.current_task_parsed_xml, self.current_task_descriptor, instance_state=current_task_state)
+            self.task_states.append(self.current_task.get_instance_state())
+            self.state=self.ASSESSING
+        else:
+            if self.current_task_number>0:
+                current_task_state=self.overwrite_state(current_task_state)
+            self.current_task=children['modules'][current_task_type](self.system, self.location, self.current_task_parsed_xml, self.current_task_descriptor, instance_state=current_task_state)
 
         log.debug(self.current_task.get_instance_state())
         return True
@@ -270,6 +265,7 @@ class CombinedOpenEndedModule(XModule):
             self.setup_next_task()
             self.current_task.reset(self.system)
         self.current_task_number=0
+        self.setup_next_task()
         return {'success': True}
 
 
