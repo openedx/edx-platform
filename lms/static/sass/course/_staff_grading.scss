@@ -36,8 +36,8 @@ div.peer-grading{
         }
     }
 
-    .prompt-container,
-    .rubric-container,
+    .prompt-information-container,
+    .rubric-wrapper,
     .calibration-feedback-wrapper,
     .grading-container
     {
@@ -102,11 +102,17 @@ div.peer-grading{
         {
             padding: 10px;
             margin: 0px;
-            border: 1px solid black;
+            background: #eee;
+            height: 10em;
             h3
             {
                 text-align:center;
                 text-transform:uppercase;
+                color: #777;
+            }
+            p
+            {
+                color: #777;
             }
         }
         .calibration-panel
@@ -121,7 +127,11 @@ div.peer-grading{
         }
         .current-state
         {
-            background: #eee;
+            background: #0F6B8A;
+            h3, p
+            {
+                color: white;
+            }
         }
         &:after
         {
@@ -145,5 +155,9 @@ div.peer-grading{
         }
     }
     
+    .interstitial-grading
+    {
+    }
     padding: 40px;
 }
+

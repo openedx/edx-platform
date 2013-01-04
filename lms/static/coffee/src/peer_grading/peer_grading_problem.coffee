@@ -54,8 +54,21 @@ The standard chunk of Lorem Ipsum used since the 1500s is reproduced below for t
         submission_id: 1
         submission_key: 'abcd'
         student_response: 'I am a fake student response'
-        prompt: 'Answer this question'
-        rubric: 'This is a rubric.'
+        prompt: '''
+            	<h2>S11E3: Metal Bands</h2>
+<p>Shown below are schematic band diagrams for two different metals. Both diagrams appear different, yet both of the elements are undisputably metallic in nature.</p>
+<p>* Why is it that both sodium and magnesium behave as metals, even though the s-band of magnesium is filled? </p>
+<p>This is a self-assessed open response question. Please use as much space as you need in the box below to answer the question.</p>
+            '''
+        rubric: '''
+<ul>
+<li>Metals tend to be good electronic conductors, meaning that they have a large number of electrons which are able to access empty (mobile) energy states within the material.</li>
+<li>Sodium has a half-filled s-band, so there are a number of empty states immediately above the highest occupied energy levels within the band.</li>
+<li>Magnesium has a full s-band, but the the s-band and p-band overlap in magnesium. Thus are still a large number of available energy states immediately above the s-band highest occupied energy level.</li>
+</ul>
+
+<p>Please score your response according to how many of the above components you identified:</p>
+            '''
         max_score: 4
     else if cmd == 'save_calibration_essay'
       response = 
@@ -208,7 +221,7 @@ class PeerGradingProblem
     if response.success
 
       # load in all the data
-      @submission_container.html("<h3>Calibration Essay</h3>")
+      @submission_container.html("<h3>Training Essay</h3>")
       @render_submission_data(response)
       # TODO: indicate that we're in calibration mode 
       @calibration_panel.addClass('current-state')
@@ -288,7 +301,7 @@ class PeerGradingProblem
       calibration_wrapper.append("<p>Congratulations! Your score matches the actual one!</p>")
     else
       calibration_wrapper.append("<p>Please try to understand the grading critera better so that you will be more accurate next time.</p>") 
-
+    @submit_button.hide()
     
   render_interstitial_page: () =>
     @content_panel.hide()
