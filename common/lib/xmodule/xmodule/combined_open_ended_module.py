@@ -20,6 +20,7 @@ from .x_module import XModule
 from .xml_module import XmlDescriptor
 from xmodule.modulestore import Location
 import self_assessment_module
+import open_ended_module
 
 log = logging.getLogger("mitx.courseware")
 
@@ -120,6 +121,24 @@ class CombinedOpenEndedModule(XModule):
                 self.state=self.ASSESSING
             else:
                 self.current_task=self_assessment_module.SelfAssessmentModule(self.system, self.location, self.current_task_parsed_xml, self.current_task_descriptor, instance_state=current_task_state)
+        elif current_task_type=="openended":
+            self.current_task_descriptor=open_ended_module.OpenEndedDescriptor(self.system)
+            self.current_task_parsed_xml=self.current_task_descriptor.definition_from_xml(etree.fromstring(self.current_task_xml),self.system)
+            if current_task_state is None and self.current_task_number==0:
+                self.current_task=open_ended_module.OpenEndedModule(self.system, self.location, self.current_task_parsed_xml, self.current_task_descriptor)
+                self.task_states.append(self.current_task.get_instance_state())
+                self.state=self.ASSESSING
+            elif current_task_state is None and self.current_task_number>0:
+                last_response, last_score=self.get_last_response(self.current_task_number-1)
+                current_task_state = ('{"state": "assessing", "version": 1, "max_score": ' + str(self._max_score) + ', ' +
+                                      '"attempts": 0, "history": [{"answer": "' + str(last_response) + '"}]}')
+                {"state": "done", "version": 1, "max_score": 1, "attempts": 1, "history": [{"answer": "gdgddg", "score": 0, "hint": "dfdfdf"}]}
+                self.current_task=open_ended_module.OpenEndedModule(self.system, self.location, self.current_task_parsed_xml, self.current_task_descriptor, instance_state=current_task_state)
+                self.task_states.append(self.current_task.get_instance_state())
+                self.state=self.ASSESSING
+            else:
+                self.current_task=open_ended_module.OpenEndedModule(self.system, self.location, self.current_task_parsed_xml, self.current_task_descriptor, instance_state=current_task_state)
+
 
         return True
 
@@ -156,6 +175,12 @@ class CombinedOpenEndedModule(XModule):
             task_descriptor=self_assessment_module.SelfAssessmentDescriptor(self.system)
             task_parsed_xml=task_descriptor.definition_from_xml(etree.fromstring(task_xml),self.system)
             task=self_assessment_module.SelfAssessmentModule(self.system, self.location, task_parsed_xml, task_descriptor, instance_state=task_state)
+            last_response=task.latest_answer()
+            last_score = task.latest_score()
+        elif task_type=="openended":
+            task_descriptor=open_ended_module.OpenEndedDescriptor(self.system)
+            task_parsed_xml=task_descriptor.definition_from_xml(etree.fromstring(task_xml),self.system)
+            task=open_ended_module.OpenEndedModule(self.system, self.location, task_parsed_xml, task_descriptor, instance_state=task_state)
             last_response=task.latest_answer()
             last_score = task.latest_score()
 
@@ -291,7 +316,7 @@ class CombinedOpenEndedDescriptor(XmlDescriptor, EditingDescriptor):
 
     def definition_to_xml(self, resource_fs):
         '''Return an xml element representing this definition.'''
-        elt = etree.Element('selfassessment')
+        elt = etree.Element('combinedopenended')
 
         def add_child(k):
             child_str = '<{tag}>{body}</{tag}>'.format(tag=k, body=self.definition[k])

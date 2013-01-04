@@ -742,7 +742,7 @@ class OpenEndedInput(InputTypeBase):
     etc.
     """
 
-    template =
+    template = "openendedinput.html"
     tags = ['openendedinput']
 
     # pulled out for testing
