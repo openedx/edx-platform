@@ -5,6 +5,7 @@ from draganddrop import PositionsCompare
 
 
 class Test_PositionsCompare(unittest.TestCase):
+    """ describe"""
 
     def test_nested_list_and_list1(self):
         self.assertEqual(PositionsCompare([[1, 2], 40]), PositionsCompare([1, 3]))
@@ -137,7 +138,7 @@ class Test_DragAndDrop_Grade(unittest.TestCase):
             'rule': 'anyof'
         }, {
             'draggables': ['7', '8', '9', '10'],
-            'targets': ['p_left_1', 'p_left_2', 'p_right_1','p_right_2'],
+            'targets': ['p_left_1', 'p_left_2', 'p_right_1', 'p_right_2'],
             'rule': 'anyof'
         }, {
             'draggables': ['11', '12'],
@@ -200,10 +201,23 @@ class Test_DragAndDrop_Grade(unittest.TestCase):
 
 
 class Test_DragAndDrop_Populate(unittest.TestCase):
-        #test for every function in DND
 
-    def test1(self):
-            self.assertTrue(1)
+    def test_1(self):
+        dnd = draganddrop.DragAndDrop()
+        correct_answer = {'1': [[40, 10], 29], 'name_with_icon': [20, 20]}
+        user_input = '{"use_targets": false, "draggables": \
+        [{"1": [10, 10]}, {"name_with_icon": [20, 20]}]}'
+        dnd.populate(correct_answer, user_input)
+
+        correct_groups = {'1': ['name_with_icon'], '0': ['1']}
+        correct_positions = {'1': {'exact': [[20, 20]]}, '0': {'exact': [[[40, 10], 29]]}}
+        user_groups = {'1': [u'name_with_icon'], '0': [u'1']}
+        user_positions = {'1': {'user': [[20, 20]]}, '0': {'user': [[10, 10]]}}
+
+        self.assertEqual(correct_groups, dnd.correct_groups)
+        self.assertEqual(correct_positions, dnd.correct_positions)
+        self.assertEqual(user_groups, dnd.user_groups)
+        self.assertEqual(user_positions, dnd.user_positions)
 
 
 class Test_DraAndDrop_Compare_Positions(unittest.TestCase):
