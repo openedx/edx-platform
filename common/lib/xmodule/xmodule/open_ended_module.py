@@ -188,7 +188,7 @@ class OpenEndedModule():
         except ValueError:
             self.max_score = 1
 
-    def handle_message_post(self,get, system):
+    def message_post(self,get, system):
         """
         Handles a student message post (a reaction to the grade they received from an open ended grader type)
         Returns a boolean success/fail and an error message
@@ -248,14 +248,7 @@ class OpenEndedModule():
 
         return success, "Successfully submitted your feedback."
 
-    def get_score(self, student_answers, system):
-        try:
-            submission = student_answers[self.answer_id]
-        except KeyError:
-            msg = ('Cannot get student answer for answer_id: {0}. student_answers {1}'
-                   .format(self.answer_id, student_answers))
-            log.exception(msg)
-            raise LoncapaProblemError(msg)
+    def get_score(self, submission, system):
 
         # Prepare xqueue request
         #------------------------------------------------------------
@@ -297,23 +290,7 @@ class OpenEndedModule():
         # State associated with the queueing request
         queuestate = {'key': queuekey,
                       'time': qtime,}
-
-        cmap = CorrectMap()
-        if error:
-            cmap.set(self.answer_id, queuestate=None,
-                msg='Unable to deliver your submission to grader. (Reason: {0}.)'
-                    ' Please try again later.'.format(msg))
-        else:
-            # Queueing mechanism flags:
-            #   1) Backend: Non-null CorrectMap['queuestate'] indicates that
-            #      the problem has been queued
-            #   2) Frontend: correctness='incomplete' eventually trickles down
-            #      through inputtypes.textbox and .filesubmission to inform the
-            #      browser that the submission is queued (and it could e.g. poll)
-            cmap.set(self.answer_id, queuestate=queuestate,
-                correctness='incomplete', msg=msg)
-
-        return cmap
+        return True
 
     def _update_score(self, score_msg, oldcmap, queuekey):
         log.debug(score_msg)
@@ -550,7 +527,24 @@ class OpenEndedModule():
         return {'success': True}
 
     def save_problem(self, get, system):
-        pass
+        if self.attempts > self.max_attempts:
+            # If too many attempts, prevent student from saving answer and
+            # seeing rubric.  In normal use, students shouldn't see this because
+            # they won't see the reset button once they're out of attempts.
+            return {
+                'success': False,
+                'error': 'Too many attempts.'
+            }
+
+        if self.state != self.INITIAL:
+            return self.out_of_sync_error(get)
+
+        # add new history element with answer and empty score and hint.
+        self.new_history_entry(get['student_answer'])
+        self.get_score(get['student_answer'], system)
+        self.change_state(self.ASSESSING)
+
+        return {'success': True,}
 
     def update_score(self, get, system):
         """
