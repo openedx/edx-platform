@@ -96,18 +96,18 @@ function updateXML() {
   var xml = val;
 
   // replace headers
-  xml = xml.replace(/(^.*)\n(?=\=\=+)/g, '<h1>$1</h1>');
-  xml = xml.replace(/\=\=+/g, '');
+  xml = xml.replace(/(^.*?$)(?=\n\=\=+$)/gm, '<h1>$1</h1>');
+  xml = xml.replace(/\n^\=\=+$/gm, '');
 
   // group multiple choice answers
-  xml = xml.replace(/(\(.?\).*\n*)+/g, function(match, p) {
+  xml = xml.replace(/(^\s*\(.?\).*?$\n*)+/gm, function(match, p) {
     var groupString = '<multiplechoiceresponse>\n';
     groupString += '  <choicegroup type="MultipleChoice">\n';
     var options = match.split('\n');
     for(var i = 0; i < options.length; i++) {
       if(options[i].length > 0) {
-        var value = options[i].split(/\)\s*/)[1];
-        var correct = /\(x\)/i.test(options[i]);
+        var value = options[i].split(/^\s*\(.?\)\s*/)[1];
+        var correct = /^\s*\(x\)/i.test(options[i]);
         groupString += '    <choice correct="' + correct + '">' + value + '</choice>\n';
       }
     }          
@@ -117,14 +117,14 @@ function updateXML() {
   });
 
   // group check answers
-  xml = xml.replace(/(\[.?\].*\n*)+/g, function(match, p) {
+  xml = xml.replace(/(^\s*\[.?\].*?$\n*)+/gm, function(match, p) {
     var groupString = '<multiplechoiceresponse>\n';
     groupString += '  <choicegroup type="MultipleChoiceChecks">\n';
     var options = match.split('\n');
     for(var i = 0; i < options.length; i++) {
       if(options[i].length > 0) {
-        var value = options[i].split(/\]\s*/)[1];
-        var correct = /\[x\]/i.test(options[i]);
+        var value = options[i].split(/^\s*\[.?\]\s*/)[1];
+        var correct = /^\s*\[x\]/i.test(options[i]);
         groupString += '    <choice correct="' + correct + '">' + value + '</choice>\n';
       }
     }          
@@ -134,12 +134,12 @@ function updateXML() {
   });
 
   // replace videos
-  xml = xml.replace(/\{\{video\s(.*)\}\}/g, '<video youtube="1.0:$1" />\n\n');
+  xml = xml.replace(/\{\{video\s(.*?)\}\}/g, '<video youtube="1.0:$1" />\n\n');
 
   // replace string and numerical
-  xml = xml.replace(/(?:\n|^)\=\s*(.*)/g, function(match, p) {
+  xml = xml.replace(/^\=\s*(.*?$)/gm, function(match, p) {
     var string;
-    var params = /(.*)\+\-\s*(.*)/.exec(p);
+    var params = /(.*?)\+\-\s*(.*?)/.exec(p);
     if(parseFloat(p)) {      
       if(params) {
         string = '<numericalresponse answer="' + params[1] + '">\n';
@@ -156,22 +156,23 @@ function updateXML() {
   });
 
   // replace selects
-  xml = xml.replace(/\[\[(.+)\]\]/g, function(match, p) {
+  xml = xml.replace(/\[\[(.+?)\]\]/g, function(match, p) {
     var selectString = '\n<optionresponse>\n';
     selectString += '  <optioninput options="(';
     var options = p.split(/\,\s*/g);
     for(var i = 0; i < options.length; i++) {            
-      selectString += "'" + options[i].replace(/\((.*)\)/g, '$1') + "'" + (i < options.length -1 ? ',' : '');
+      selectString += "'" + options[i].replace(/\((.*?)\)/g, '$1') + "'" + (i < options.length -1 ? ',' : '');
     }
     selectString += ')" correct="';
-    selectString += p.split(/\(/)[1].split(/\)/)[0];
+    var correct = /\((.*?)\)/g.exec(p);
+    if (correct) selectString += correct[1];
     selectString += '"></optioninput>\n';
     selectString += '</optionresponse>\n\n';
     return selectString;
   });
 
   // split scripts and wrap paragraphs
-  var splits = xml.split(/(\<\/?script.*\>)/g);
+  var splits = xml.split(/(\<\/?script.*?\>)/g);
   var scriptFlag = false;
   for(var i = 0; i < splits.length; i++) {
     if(/\<script/.test(splits[i])) {
