@@ -871,12 +871,6 @@ class DragAndDropInput(InputTypeBase):
 
         self.loaded_attributes['drag_and_drop_json'] = json.dumps(to_js)
         self.to_render.add('drag_and_drop_json')
-        try:  # for tests and mock up, work normally not in tets
-            self.loaded_attributes['course_folder'] = \
-                self.system.filestore.root_path.split('/')[-1]
-        except:
-            self.loaded_attributes['course_folder'] = 'mock'
-        self.to_render.add('course_folder')
 
 registry.register(DragAndDropInput)
 
