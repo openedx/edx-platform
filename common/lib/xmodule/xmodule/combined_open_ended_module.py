@@ -47,6 +47,8 @@ class CombinedOpenEndedModule(XModule):
     js = {'coffee': [resource_string(__name__, 'js/src/combinedopenended/display.coffee')]}
     js_module_name = "CombinedOpenEnded"
 
+    css = {'scss': [resource_string(__name__, 'css/combinedopenended/display.scss')]}
+
     def __init__(self, system, location, definition, descriptor,
                  instance_state=None, shared_state=None, **kwargs):
         XModule.__init__(self, system, location, definition, descriptor,

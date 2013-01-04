@@ -3,15 +3,15 @@
    <div class="error"></div>
    <div class="prompt">
     ${prompt|n}
-   </prompt>
+   </div>
   <textarea rows="${rows}" cols="${cols}" name="answer" class="answer short-form-response" id="input_${id}">${previous_answer|h}</textarea>
 
   <div class="message-wrapper">
     % if state == 'initial':
       <span class="unanswered" style="display:inline-block;" id="status_${id}">Unanswered</span>
-    % elif state == 'done' and correct=='incorrect':
+    % elif state in ['done', 'post_assessment'] and correct == 'incorrect':
       <span class="correct" id="status_${id}">Correct</span>
-    % elif state == 'done' and correct=='correct':
+    % elif state in ['done', 'post_assessment'] and correct == 'correct':
       <span class="incorrect" id="status_${id}">Incorrect</span>
     % elif state == 'assessing':
       <span class="grading" id="status_${id}">Submitted for grading</span>
@@ -26,9 +26,7 @@
 
   <span id="answer_${id}"></span>
 
-    % if state == 'assessing':
-    <input name="reload" class="reload" type="button" value="Recheck for Feedback" onclick="document.location.reload(true);" />
-    % endif
+  <input name="reload" class="reload-button" type="button" value="Recheck for Feedback" onclick="document.location.reload(true);" />
   <div class="external-grader-message">
       ${msg|n}
     % if state == 'post_assessment':

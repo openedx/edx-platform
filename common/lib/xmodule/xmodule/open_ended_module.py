@@ -474,8 +474,10 @@ class OpenEndedModule():
         return {'valid' : True, 'score' : score_result['score'], 'feedback' : feedback}
 
     def is_submission_correct(self, score):
-        score_ratio = int(score) / float(self.max_score)
-        correct = (score_ratio >= 0.66)
+        correct=False
+        if(isinstance(score,(int, long, float, complex))):
+            score_ratio = int(score) / float(self.max_score)
+            correct = (score_ratio >= 0.66)
         return correct
 
     def handle_ajax(self, dispatch, get, system):
@@ -631,7 +633,7 @@ class OpenEndedModule():
             previous_answer = latest if latest is not None else self.initial_display
             feedback = self.latest_feedback()
             score= self.latest_score()
-            correct = "correct" if is_submission_correct else 'incorrect'
+            correct = 'correct' if self.is_submission_correct(score) else 'incorrect'
         else:
             feedback=""
             correct=""
@@ -649,7 +651,7 @@ class OpenEndedModule():
             'child_type' : 'openended',
             'correct' : correct,
             }
-
+        log.debug(context)
         html = system.render_template('open_ended.html', context)
         return html
 
