@@ -576,20 +576,20 @@ class OpenEndedModule():
     def latest_answer(self):
         """None if not available"""
         if not self.history:
-            return None
-        return self.history[-1].get('answer')
+            return ""
+        return self.history[-1].get('answer', "")
 
     def latest_score(self):
         """None if not available"""
         if not self.history:
-            return None
-        return self.history[-1].get('score')
+            return ""
+        return self.history[-1].get('score', "")
 
     def latest_feedback(self):
         """None if not available"""
         if not self.history:
-            return None
-        return self.history[-1].get('feedback')
+            return ""
+        return self.history[-1].get('feedback', "")
 
     def new_history_entry(self, answer):
         self.history.append({'answer': answer})
