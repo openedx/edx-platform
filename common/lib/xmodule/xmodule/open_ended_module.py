@@ -629,7 +629,12 @@ class OpenEndedModule():
         if self.state != self.INITIAL:
             latest = self.latest_answer()
             previous_answer = latest if latest is not None else self.initial_display
+            feedback = self.latest_feedback()
+            score= self.latest_score()
+            correct = "correct" if is_submission_correct else 'incorrect'
         else:
+            feedback=""
+            correct=""
             previous_answer = self.initial_display
 
         context = {
@@ -640,8 +645,9 @@ class OpenEndedModule():
             'rows' : 30,
             'cols' : 80,
             'id' : 'open_ended',
-            'msg' : self.latest_feedback(),
+            'msg' : feedback,
             'child_type' : 'openended',
+            'correct' : correct,
             }
 
         html = system.render_template('open_ended.html', context)
