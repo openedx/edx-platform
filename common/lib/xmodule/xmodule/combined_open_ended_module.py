@@ -133,7 +133,7 @@ class CombinedOpenEndedModule(XModule):
             'allow_reset': True,
             'state' : self.state,
             'task_count' : len(self.task_xml),
-            'task_number' : self.current_task_number,
+            'task_number' : self.current_task_number+1,
             }
 
         html = self.system.render_template('combined_open_ended.html', context)

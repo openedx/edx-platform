@@ -4,6 +4,9 @@ class @CombinedOpenEnded
     @id = @el.data('id')
     @ajax_url = @el.data('ajax-url')
     @state = @el.data('state')
+    @task_count = @el.data('task-count')
+    @task_number = @el.data('task-number')
+
     @allow_reset = @el.data('allow_reset')
     @reset_button = @$('.reset-button')
     @reset_button.click @reset
@@ -57,15 +60,15 @@ class @CombinedOpenEnded
       @answer_area.attr("disabled", true)
       @hint_area.attr('disabled', true)
       @submit_button.hide()
-      if @state != 'done'
+      if @task_number<@task_count
         @next_problem_button.show()
       else
         @next_problem_button.hide()
-      if @state == 'done'
         if @allow_reset
           @reset_button.show()
         else
           @reset_button.hide()
+
 
   find_assessment_elements: ->
     @assessment = @$('select.assessment')
