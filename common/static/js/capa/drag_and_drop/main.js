@@ -17,7 +17,7 @@ define(
 
     // $(value) - get the element of the entire problem
     function processProblem(index, value) {
-        var problemId, imageDir, config, state;
+        var problemId, config, state;
 
         if ($(value).attr('data-problem-processed') === 'true') {
             // This problem was already processed by us before, so we will
@@ -43,16 +43,9 @@ define(
             return;
         }
 
-        imageDir = $(value).attr('data-course-folder');
-        if (typeof imageDir !== 'string') {
-            logme('ERROR: Could not find the name of the image directory.');
-
-            return;
-        }
-
         state = State(problemId);
 
-        if (configParser(config, imageDir, state) !== true) {
+        if (configParser(config, state) !== true) {
             logme('ERROR: Could not make sense of the JSON configuration options.');
 
             return;

@@ -26,7 +26,7 @@ define(['logme'], function (logme) {
 
         state.baseImageEl.attr(
             'src',
-            state.config.imageDir + '/' + state.config.base_image
+            state.config.base_image
         );
         state.baseImageEl.load(function () {
             baseImageElContainer.css('width', this.width);
@@ -39,13 +39,11 @@ define(['logme'], function (logme) {
         });
         state.baseImageEl.error(function () {
             logme(
-                'ERROR: Image "' + state.config.imageDir + '/' +
-                state.config.base_image + '" was not found!'
+                'ERROR: Image "' + state.config.base_image + '" was not found!'
             );
             baseImageElContainer.html(
                 '<span style="color: red;">' +
-                    'ERROR: Image "' + state.config.imageDir + '/' +
-                    state.config.base_image + '" was not found!' +
+                    'ERROR: Image "' + state.config.base_image + '" was not found!' +
                 '</span>'
             );
             baseImageElContainer.appendTo(state.containerEl);

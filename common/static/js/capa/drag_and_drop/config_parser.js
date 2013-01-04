@@ -7,13 +7,12 @@
 define(['logme'], function (logme) {
     return configParser;
 
-    function configParser(config, imageDir, state) {
+    function configParser(config, state) {
         var returnStatus;
 
         returnStatus = true;
 
         state.config = {
-            'imageDir': '/static/' + imageDir + '/images',
             'draggables': [],
             'targets': [],
             'base_image': ''

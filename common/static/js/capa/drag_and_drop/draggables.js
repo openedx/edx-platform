@@ -89,7 +89,7 @@ define(['logme', 'update_input'], function (logme, updateInput) {
                 draggableObj.iconEl = $('<img />');
                 draggableObj.iconEl.attr(
                     'src',
-                    state.config.imageDir + '/' + obj.icon
+                    obj.icon
                 );
                 draggableObj.iconEl.load(function () {
                     draggableObj.iconWidth = this.width;
@@ -358,11 +358,10 @@ define(['logme', 'update_input'], function (logme, updateInput) {
             // the input with the user's answer (X-Y position of the draggable,
             // or the ID of the target where it landed.
             function checkLandingElement() {
-                var offsetIE, targetFound;
+                var positionIE, targetFound;
 
                 mousePressed = false;
-
-                offsetIE = draggableObj.iconEl.position();
+                positionIE = draggableObj.iconEl.position();
 
                 if (state.individualTargets === true) {
                     targetFound = false;
@@ -378,20 +377,15 @@ define(['logme', 'update_input'], function (logme, updateInput) {
                         state.numDraggablesInSlider += 1;
                     }
                 } else {
-                    logme(
-                        'baseImageEl.width = ' + state.baseImageEl.width() + '; ' +
-                        'baseImageEl.height = ' + state.baseImageEl.height()
-                    );
-
                     if (
-                        (offsetIE.left < 0) ||
+                        (positionIE.left < 0) ||
                         (
-                            offsetIE.left + draggableObj.iconWidth >
+                            positionIE.left + draggableObj.iconWidth >
                             state.baseImageEl.width()
                         ) ||
-                        (offsetIE.top < 0) ||
+                        (positionIE.top < 0) ||
                         (
-                            offsetIE.top + draggableObj.iconHeight >
+                            positionIE.top + draggableObj.iconHeight >
                             state.baseImageEl.height()
                         )
                     ) {
@@ -405,9 +399,9 @@ define(['logme', 'update_input'], function (logme, updateInput) {
                         correctZIndexes();
 
                         draggableObj.x =
-                            offsetIE.left + draggableObj.iconWidth * 0.5;
+                            positionIE.left + draggableObj.iconWidth * 0.5;
                         draggableObj.y =
-                            offsetIE.top + draggableObj.iconHeight * 0.5;
+                            positionIE.top + draggableObj.iconHeight * 0.5;
                     }
                 }
 
@@ -432,41 +426,26 @@ define(['logme', 'update_input'], function (logme, updateInput) {
                     }
                 }
 
+                //
                 // Determine if a draggable, after it was relased, ends up on a
                 // target. We do this by iterating over all of the targets, and
                 // for each one we check whether the draggable's center is
                 // within the target's dimensions.
+                //
+                // positionIE is the object as returned by
+                //
+                //     draggableObj.iconEl.position()
+                //
                 function checkIfOnTarget() {
                     var c1, target;
 
                     for (c1 = 0; c1 < state.targets.length; c1 += 1) {
                         target = state.targets[c1];
 
-                        if (
-                            offsetIE.top + draggableObj.iconHeight * 0.5 <
-                            target.offset.top
-                        ) {
-                            continue;
-                        }
-                        if (
-                            offsetIE.top + draggableObj.iconHeight * 0.5 >
-                            target.offset.top + target.h
-                        ) {
-                            continue;
-                        }
-                        if (
-                            offsetIE.left + draggableObj.iconWidth * 0.5 <
-                            target.offset.left
-                        ) {
-                            continue;
-                        }
-                        if (
-                            offsetIE.left + draggableObj.iconWidth * 0.5 >
-                            target.offset.left + target.w
-                        ) {
-                            continue;
-                        }
-
+                        // If only one draggable per target is allowed, and
+                        // the current target already has a draggable on it
+                        // (with an ID different from the one we are checking
+                        // against), then go to next target.
                         if (
                             (state.config.one_per_target === true) &&
                             (target.draggable.length === 1) &&
@@ -475,6 +454,35 @@ define(['logme', 'update_input'], function (logme, updateInput) {
                             continue;
                         }
 
+                        // Check if the draggable's center coordinate is within
+                        // the target's dimensions. If not, go to next target.
+                        if (
+                            positionIE.top + draggableObj.iconHeight * 0.5 <
+                            target.offset.top
+                        ) {
+                            continue;
+                        }
+                        if (
+                            positionIE.top + draggableObj.iconHeight * 0.5 >
+                            target.offset.top + target.h
+                        ) {
+                            continue;
+                        }
+                        if (
+                            positionIE.left + draggableObj.iconWidth * 0.5 <
+                            target.offset.left
+                        ) {
+                            continue;
+                        }
+                        if (
+                            positionIE.left + draggableObj.iconWidth * 0.5 >
+                            target.offset.left + target.w
+                        ) {
+                            continue;
+                        }
+
+                        // If we got here, then our draggable is on top of a
+                        // target.
                         targetFound = true;
 
                         // If the draggable was moved from one target to
@@ -488,7 +496,11 @@ define(['logme', 'update_input'], function (logme, updateInput) {
                             removeObjIdFromTarget();
                             onTarget = target;
                             target.draggable.push(draggableObj.id);
-                        } else if (onTarget === null) {
+                        }
+                        // If the draggable was moved from the slider to a
+                        // target, remember the target, and add ID to the
+                        // target's draggables list.
+                        else if (onTarget === null) {
                             onTarget = target;
                             target.draggable.push(draggableObj.id);
                         }
