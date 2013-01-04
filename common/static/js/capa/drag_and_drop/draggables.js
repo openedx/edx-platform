@@ -208,6 +208,10 @@ define(['logme', 'update_input'], function (logme, updateInput) {
             draggableObj.iconEl.mouseup(mouseUp);
             draggableObj.iconEl.mousemove(mouseMove);
 
+            draggableObj.containerEl.mousedown(mouseDown);
+            draggableObj.containerEl.mouseup(mouseUp);
+            draggableObj.containerEl.mousemove(mouseMove);
+
             inContainer = true;
             mousePressed = false;
 
