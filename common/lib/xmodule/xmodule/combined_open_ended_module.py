@@ -131,6 +131,7 @@ class CombinedOpenEndedModule(XModule):
             'items': [{'content' : task_html}],
             'ajax_url': self.system.ajax_url,
             'allow_reset': True,
+            'state' : self.state,
             }
 
         html = self.system.render_template('combined_open_ended.html', context)
@@ -201,12 +202,32 @@ class CombinedOpenEndedModule(XModule):
             return self.update_task_states_ajax(return_html)
 
     def next_problem(self):
-        pass
+        self.setup_next_task()
+        return {'success' : True}
 
     def reset(self):
-        pass
+        """
+        If resetting is allowed, reset the state.
 
-    def get_instance_state(self):
+        Returns {'success': bool, 'error': msg}
+        (error only present if not success)
+        """
+        if self.state != self.DONE:
+            return self.out_of_sync_error(get)
+
+        if self.attempts > self.max_attempts:
+            return {
+                'success': False,
+                'error': 'Too many attempts.'
+            }
+        self.state=self.INITIAL
+        self.current_task_number=0
+        self.setup_next_task()
+        self.current_task.reset(self.system)
+        return {'success': True}
+
+
+def get_instance_state(self):
         """
         Get the current score and state
         """

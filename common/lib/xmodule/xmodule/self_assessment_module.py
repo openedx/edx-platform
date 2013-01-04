@@ -459,7 +459,7 @@ class SelfAssessmentModule():
                 'allow_reset': self._allow_reset()}
 
 
-    def reset(self, get, system):
+    def reset(self, system):
         """
         If resetting is allowed, reset the state.
 

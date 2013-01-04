@@ -59,6 +59,7 @@ class @CombinedOpenEnded
       @submit_button.hide()
       if !@state == 'done'
         @next_problem_button.show()
+      if @state == 'done'
         if @allow_reset
           @reset_button.show()
         else
@@ -127,7 +128,7 @@ class @CombinedOpenEnded
   reset: (event) =>
     event.preventDefault()
     @errors_area.html('Problem state got out of sync.  Try reloading the page.')
-    if @child_state == 'done'
+    if @state == 'done'
       $.postWithPrefix "#{@ajax_url}/reset", {}, (response) =>
         if response.success
           @answer_area.val('')
@@ -142,7 +143,7 @@ class @CombinedOpenEnded
     else
       @errors_area.html('Problem state got out of sync.  Try reloading the page.')
 
-  next_problem (event) =>
+  next_problem: (event) =>
     event.preventDefault()
     @errors_area.html('Problem state got out of sync.  Try reloading the page.')
     if @child_state == 'done'
