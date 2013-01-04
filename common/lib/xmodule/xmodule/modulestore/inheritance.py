@@ -1,4 +1,4 @@
-from xmodule.model import Scope
+from xblock.core import Scope
 
 # A list of metadata that this module can inherit from its parent module
 INHERITABLE_METADATA = (

@@ -13,8 +13,8 @@ from xmodule.errortracker import null_error_tracker, exc_info_to_str
 from xmodule.mako_module import MakoDescriptorSystem
 from xmodule.x_module import XModuleDescriptor
 from xmodule.error_module import ErrorDescriptor
-from xmodule.runtime import DbModel, KeyValueStore, InvalidScopeError
-from xmodule.model import Scope
+from xblock.runtime import DbModel, KeyValueStore, InvalidScopeError
+from xblock.core import Scope
 
 from . import ModuleStoreBase, Location
 from .draft import DraftModuleStore
@@ -41,8 +41,10 @@ class MongoKeyValueStore(KeyValueStore):
         self._metadata = metadata
 
     def get(self, key):
-        if key.field_name == 'children':
+        if key.scope == Scope.children:
             return self._children
+        elif key.scope == Scope.parent:
+            return None
         elif key.scope == Scope.settings:
             return self._metadata[key.field_name]
         elif key.scope == Scope.content:
@@ -54,7 +56,7 @@ class MongoKeyValueStore(KeyValueStore):
             raise InvalidScopeError(key.scope)
 
     def set(self, key, value):
-        if key.field_name == 'children':
+        if key.scope == Scope.children:
             self._children = value
         elif key.scope == Scope.settings:
             self._metadata[key.field_name] = value
@@ -67,7 +69,7 @@ class MongoKeyValueStore(KeyValueStore):
             raise InvalidScopeError(key.scope)
 
     def delete(self, key):
-        if key.field_name == 'children':
+        if key.scope == Scope.children:
             self._children = []
         elif key.scope == Scope.settings:
             if key.field_name in self._metadata:

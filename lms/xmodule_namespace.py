@@ -1,4 +1,4 @@
-from xmodule.model import Namespace, Boolean, Scope, String, List
+from xblock.core import Namespace, Boolean, Scope, String, List
 from xmodule.fields import Date, Timedelta
 
 

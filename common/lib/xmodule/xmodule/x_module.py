@@ -10,12 +10,7 @@ from pkg_resources import resource_listdir, resource_string, resource_isdir
 from xmodule.modulestore import Location
 from xmodule.modulestore.exceptions import ItemNotFoundError
 
-from .model import ModelMetaclass, ParentModelMetaclass, NamespacesMetaclass
-from .plugin import Plugin
-
-
-class XModuleMetaclass(ParentModelMetaclass, NamespacesMetaclass, ModelMetaclass):
-    pass
+from xblock.core import XBlock
 
 log = logging.getLogger(__name__)
 
@@ -88,7 +83,7 @@ class HTMLSnippet(object):
                                   .format(self.__class__))
 
 
-class XModule(HTMLSnippet):
+class XModule(HTMLSnippet, XBlock):
     ''' Implements a generic learning module.
 
         Subclasses must at a minimum provide a definition for get_html in order
@@ -96,8 +91,6 @@ class XModule(HTMLSnippet):
 
         See the HTML module for a simple example.
     '''
-
-    __metaclass__ = XModuleMetaclass
 
     # The default implementation of get_icon_class returns the icon_class
     # attribute of the class
@@ -266,7 +259,7 @@ class ResourceTemplates(object):
         return templates
 
 
-class XModuleDescriptor(Plugin, HTMLSnippet, ResourceTemplates):
+class XModuleDescriptor(HTMLSnippet, ResourceTemplates, XBlock):
     """
     An XModuleDescriptor is a specification for an element of a course. This
     could be a problem, an organizational element (a group of content), or a
@@ -279,7 +272,6 @@ class XModuleDescriptor(Plugin, HTMLSnippet, ResourceTemplates):
     """
     entry_point = "xmodule.v1"
     module_class = XModule
-    __metaclass__ = XModuleMetaclass
 
     # Attributes for inspection of the descriptor
     
@@ -371,7 +363,7 @@ class XModuleDescriptor(Plugin, HTMLSnippet, ResourceTemplates):
             system,
             self.location,
             self,
-            system.xmodule_model_data(self._model_data),
+            system.xblock_model_data(self._model_data),
         )
     
     def has_dynamic_children(self):
@@ -608,7 +600,7 @@ class ModuleSystem(object):
                  get_module,
                  render_template,
                  replace_urls,
-                 xmodule_model_data,
+                 xblock_model_data,
                  user=None,
                  filestore=None,
                  debug=False,
@@ -663,7 +655,7 @@ class ModuleSystem(object):
         self.node_path = node_path
         self.anonymous_student_id = anonymous_student_id
         self.user_is_staff = user is not None and user.is_staff
-        self.xmodule_model_data = xmodule_model_data
+        self.xblock_model_data = xblock_model_data
 
         if publish is None:
             publish = lambda e: None

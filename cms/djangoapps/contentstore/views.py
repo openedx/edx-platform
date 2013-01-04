@@ -29,8 +29,8 @@ from django.conf import settings
 from xmodule.modulestore import Location
 from xmodule.modulestore.exceptions import ItemNotFoundError, InvalidLocationError
 from xmodule.modulestore.inheritance import own_metadata
-from xmodule.model import Scope
-from xmodule.runtime import KeyValueStore, DbModel, InvalidScopeError
+from xblock.core import Scope
+from xblock.runtime import KeyValueStore, DbModel, InvalidScopeError
 from xmodule.x_module import ModuleSystem
 from xmodule.error_module import ErrorDescriptor
 from xmodule.errortracker import exc_info_to_str
@@ -472,7 +472,7 @@ def preview_module_system(request, preview_id, descriptor):
         debug=True,
         replace_urls=replace_urls,
         user=request.user,
-        xmodule_model_data=preview_model_data,
+        xblock_model_data=preview_model_data,
     )
 
 

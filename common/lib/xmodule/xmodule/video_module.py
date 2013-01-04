@@ -9,7 +9,7 @@ from xmodule.raw_module import RawDescriptor
 from xmodule.modulestore.mongo import MongoModuleStore
 from xmodule.modulestore.django import modulestore
 from xmodule.contentstore.content import StaticContent
-from .model import Int, Scope, String
+from xblock.core import Integer, Scope, String
 
 log = logging.getLogger(__name__)
 
@@ -29,7 +29,7 @@ class VideoModule(XModule):
     js_module_name = "Video"
 
     data = String(help="XML data for the problem", scope=Scope.content)
-    position = Int(help="Current position in the video", scope=Scope.student_state)
+    position = Integer(help="Current position in the video", scope=Scope.student_state)
     display_name = String(help="Display name for this module", scope=Scope.settings)
 
     def __init__(self, *args, **kwargs):

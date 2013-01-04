@@ -8,8 +8,8 @@ from .models import (
     XModuleStudentInfoField
 )
 
-from xmodule.runtime import KeyValueStore, InvalidScopeError
-from xmodule.model import Scope
+from xblock.runtime import KeyValueStore, InvalidScopeError
+from xblock.core import Scope
 
 
 class InvalidWriteError(Exception):
@@ -45,20 +45,20 @@ class LmsKeyValueStore(KeyValueStore):
 
     def _student_module(self, key):
         student_module = self._student_module_cache.lookup(
-            self._course_id, key.module_scope_id.category, key.module_scope_id.url()
+            self._course_id, key.block_scope_id.category, key.block_scope_id.url()
         )
         return student_module
 
     def _field_object(self, key):
         if key.scope == Scope.content:
-            return XModuleContentField, {'field_name': key.field_name, 'definition_id': key.module_scope_id}
+            return XModuleContentField, {'field_name': key.field_name, 'definition_id': key.block_scope_id}
         elif key.scope == Scope.settings:
             return XModuleSettingsField, {
                 'field_name': key.field_name,
-                'usage_id': '%s-%s' % (self._course_id, key.module_scope_id)
+                'usage_id': '%s-%s' % (self._course_id, key.block_scope_id)
             }
         elif key.scope == Scope.student_preferences:
-            return XModuleStudentPrefsField, {'field_name': key.field_name, 'student': self._user, 'module_type': key.module_scope_id}
+            return XModuleStudentPrefsField, {'field_name': key.field_name, 'student': self._user, 'module_type': key.block_scope_id}
         elif key.scope == Scope.student_info:
             return XModuleStudentInfoField, {'field_name': key.field_name, 'student': self._user}
 
@@ -67,6 +67,9 @@ class LmsKeyValueStore(KeyValueStore):
     def get(self, key):
         if key.field_name in self._descriptor_model_data:
             return self._descriptor_model_data[key.field_name]
+
+        if key.scope == Scope.parent:
+            return None
 
         if key.scope == Scope.student_state:
             student_module = self._student_module(key)
@@ -92,8 +95,8 @@ class LmsKeyValueStore(KeyValueStore):
                 student_module = StudentModule(
                     course_id=self._course_id,
                     student=self._user,
-                    module_type=key.module_scope_id.category,
-                    module_state_key=key.module_scope_id.url(),
+                    module_type=key.block_scope_id.category,
+                    module_state_key=key.block_scope_id.url(),
                     state=json.dumps({})
                 )
                 self._student_module_cache.append(student_module)

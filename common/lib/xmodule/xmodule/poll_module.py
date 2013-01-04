@@ -6,7 +6,7 @@ from pkg_resources import resource_string, resource_listdir
 
 from xmodule.x_module import XModule
 from xmodule.raw_module import RawDescriptor
-from .model import Int, Scope, Boolean
+from xblock.core import Integer, Scope, Boolean
 
 log = logging.getLogger(__name__)
 
@@ -16,8 +16,8 @@ class PollModule(XModule):
     js = {'coffee': [resource_string(__name__, 'js/src/poll/display.coffee')]}
     js_module_name = "PollModule"
 
-    upvotes = Int(help="Number of upvotes this poll has recieved", scope=Scope.content, default=0)
-    downvotes = Int(help="Number of downvotes this poll has recieved", scope=Scope.content, default=0)
+    upvotes = Integer(help="Number of upvotes this poll has recieved", scope=Scope.content, default=0)
+    downvotes = Integer(help="Number of downvotes this poll has recieved", scope=Scope.content, default=0)
     voted = Boolean(help="Whether this student has voted on the poll", scope=Scope.student_state, default=False)
 
     def handle_ajax(self, dispatch, get):

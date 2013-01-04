@@ -17,13 +17,13 @@ from progress import Progress
 from xmodule.x_module import XModule
 from xmodule.raw_module import RawDescriptor
 from xmodule.exceptions import NotFoundError
-from .model import Int, Scope, ModuleScope, ModelType, String, Boolean, Object, Float
+from xblock.core import Integer, Scope, BlockScope, ModelType, String, Boolean, Object, Float
 from .fields import Timedelta
 
 log = logging.getLogger("mitx.courseware")
 
 
-class StringyInt(Int):
+class StringyInteger(Integer):
     """
     A model type that converts from strings to integers when reading from json
     """
@@ -57,8 +57,8 @@ class CapaModule(XModule):
     '''
     icon_class = 'problem'
 
-    attempts = Int(help="Number of attempts taken by the student on this problem", default=0, scope=Scope.student_state)
-    max_attempts = StringyInt(help="Maximum number of attempts that a student is allowed", scope=Scope.settings)
+    attempts = Integer(help="Number of attempts taken by the student on this problem", default=0, scope=Scope.student_state)
+    max_attempts = StringyInteger(help="Maximum number of attempts that a student is allowed", scope=Scope.settings)
     due = String(help="Date that this problem is due by", scope=Scope.settings)
     graceperiod = Timedelta(help="Amount of time after the due date that submissions will be accepted", scope=Scope.settings)
     showanswer = String(help="When to show the problem answer to the student", scope=Scope.settings, default="closed")
@@ -69,7 +69,7 @@ class CapaModule(XModule):
     student_answers = Object(help="Dictionary with the current student responses", scope=Scope.student_state)
     done = Boolean(help="Whether the student has answered the problem", scope=Scope.student_state)
     display_name = String(help="Display name for this module", scope=Scope.settings)
-    seed = Int(help="Random seed for this student", scope=Scope.student_state)
+    seed = Integer(help="Random seed for this student", scope=Scope.student_state)
 
     js = {'coffee': [resource_string(__name__, 'js/src/capa/display.coffee'),
                      resource_string(__name__, 'js/src/collapsible.coffee'),

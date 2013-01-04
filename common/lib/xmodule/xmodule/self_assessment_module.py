@@ -23,7 +23,7 @@ from .editing_module import EditingDescriptor
 from .stringify import stringify_children
 from .x_module import XModule
 from .xml_module import XmlDescriptor
-from .model import List, String, Scope, Int
+from xblock.core import List, String, Scope, Integer
 
 log = logging.getLogger("mitx.courseware")
 
@@ -67,10 +67,10 @@ class SelfAssessmentModule(XModule):
 
     # Used for progress / grading.  Currently get credit just for
     # completion (doesn't matter if you self-assessed correct/incorrect).
-    max_score = Int(scope=Scope.settings, default=MAX_SCORE)
+    max_score = Integer(scope=Scope.settings, default=MAX_SCORE)
 
-    attempts = Int(scope=Scope.student_state, default=0), Int
-    max_attempts = Int(scope=Scope.settings, default=MAX_ATTEMPTS)
+    attempts = Integer(scope=Scope.student_state, default=0)
+    max_attempts = Integer(scope=Scope.settings, default=MAX_ATTEMPTS)
     rubric = String(scope=Scope.content)
     prompt = String(scope=Scope.content)
     submitmessage = String(scope=Scope.content)
@@ -392,9 +392,9 @@ class SelfAssessmentDescriptor(XmlDescriptor, EditingDescriptor):
 
     # Used for progress / grading.  Currently get credit just for
     # completion (doesn't matter if you self-assessed correct/incorrect).
-    max_score = Int(scope=Scope.settings, default=MAX_SCORE)
+    max_score = Integer(scope=Scope.settings, default=MAX_SCORE)
 
-    max_attempts = Int(scope=Scope.settings, default=MAX_ATTEMPTS)
+    max_attempts = Integer(scope=Scope.settings, default=MAX_ATTEMPTS)
     rubric = String(scope=Scope.content)
     prompt = String(scope=Scope.content)
     submitmessage = String(scope=Scope.content)

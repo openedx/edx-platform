@@ -8,7 +8,7 @@ from xmodule.xml_module import XmlDescriptor
 from xmodule.x_module import XModule
 from xmodule.progress import Progress
 from xmodule.exceptions import NotFoundError
-from .model import Int, Scope
+from xblock.core import Integer, Scope
 from pkg_resources import resource_string
 
 log = logging.getLogger("mitx.common.lib.seq_module")
@@ -37,7 +37,7 @@ class SequenceModule(XModule):
 
     # NOTE: Position is 1-indexed.  This is silly, but there are now student
     # positions saved on prod, so it's not easy to fix.
-    position = Int(help="Last tab viewed in this sequence", scope=Scope.student_state)
+    position = Integer(help="Last tab viewed in this sequence", scope=Scope.student_state)
 
     def __init__(self, *args, **kwargs):
         XModule.__init__(self, *args, **kwargs)

@@ -1,6 +1,6 @@
 import datetime
 
-from xmodule.model import Namespace, Boolean, Scope, ModelType, String
+from xblock.core import Namespace, Boolean, Scope, ModelType, String
 
 
 class DateTuple(ModelType):

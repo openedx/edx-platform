@@ -7,7 +7,7 @@ from functools import partial
 
 from courseware.model_data import LmsKeyValueStore, InvalidWriteError, InvalidScopeError
 from courseware.models import StudentModule, XModuleContentField, XModuleSettingsField, XModuleStudentInfoField, XModuleStudentPrefsField, StudentModuleCache
-from xmodule.model import Scope, ModuleScope
+from xblock.core import Scope, BlockScope
 from xmodule.modulestore import Location
 
 from django.test import TestCase
@@ -112,9 +112,9 @@ class TestInvalidScopes(TestCase):
         self.kvs = LmsKeyValueStore(course_id, UserFactory.build(), self.desc_md, None)
 
     def test_invalid_scopes(self):
-        for scope in (Scope(student=True, module=ModuleScope.DEFINITION),
-                      Scope(student=False, module=ModuleScope.TYPE),
-                      Scope(student=False, module=ModuleScope.ALL)):
+        for scope in (Scope(student=True, block=BlockScope.DEFINITION),
+                      Scope(student=False, block=BlockScope.TYPE),
+                      Scope(student=False, block=BlockScope.ALL)):
             self.assertRaises(InvalidScopeError, self.kvs.get, LmsKeyValueStore.Key(scope, None, None, 'field'))
             self.assertRaises(InvalidScopeError, self.kvs.set, LmsKeyValueStore.Key(scope, None, None, 'field'), 'value')
             self.assertRaises(InvalidScopeError, self.kvs.delete, LmsKeyValueStore.Key(scope, None, None, 'field'))

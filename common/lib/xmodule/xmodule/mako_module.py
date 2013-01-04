@@ -1,5 +1,5 @@
 from .x_module import XModuleDescriptor, DescriptorSystem
-from .model import Scope
+from xblock.core import Scope
 import logging
 
 

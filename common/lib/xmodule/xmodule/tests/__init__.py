@@ -31,7 +31,7 @@ i4xs = ModuleSystem(
     xqueue={'interface':None, 'callback_url':'/', 'default_queuename': 'testqueue', 'waittime': 10},
     node_path=os.environ.get("NODE_PATH", "/usr/local/lib/node_modules"),
     anonymous_student_id = 'student',
-    xmodule_model_data = lambda x: x,
+    xblock_model_data = lambda x: x,
 )
 
 

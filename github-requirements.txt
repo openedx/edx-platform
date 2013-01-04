@@ -3,3 +3,4 @@
 -e git://github.com/MITx/django-pipeline.git#egg=django-pipeline
 -e git://github.com/MITx/django-wiki.git@e2e84558#egg=django-wiki
 -e git://github.com/dementrock/pystache_custom.git@776973740bdaad83a3b029f96e415a7d1e8bec2f#egg=pystache_custom-dev
+-e git+ssh://git@github.com/MITx/xmodule-debugger@ada10f2991cdd61c60ec223b4e0b9b4e06d7cdc3#egg=XBlock

@@ -12,7 +12,7 @@ import requests
 import time
 import copy
 
-from .model import Scope, ModelType, List, String, Object, Boolean
+from xblock.core import Scope, ModelType, List, String, Object, Boolean
 from .fields import Date
 
 log = logging.getLogger(__name__)

@@ -1,6 +1,6 @@
 from pkg_resources import resource_string
 from xmodule.mako_module import MakoModuleDescriptor
-from xmodule.model import Scope, String
+from xblock.core import Scope, String
 import logging
 
 log = logging.getLogger(__name__)

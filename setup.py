@@ -7,11 +7,11 @@ setup(
     requires=[
         'xmodule',
     ],
-    py_modules=['lms.xmodule_namespace'],
+    py_modules=['lms.xmodule_namespace', 'cms.xmodule_namespace'],
     # See http://guide.python-distribute.org/creation.html#entry-points
     # for a description of entry_points
     entry_points={
-        'xmodule.namespace': [
+        'xblock.namespace': [
             'lms = lms.xmodule_namespace:LmsNamespace',
             'cms = cms.xmodule_namespace:CmsNamespace',
         ],

@@ -3,7 +3,7 @@ from pkg_resources import resource_string, resource_listdir
 
 from xmodule.x_module import XModule
 from xmodule.raw_module import RawDescriptor
-from .model import String, Scope
+from xblock.core import String, Scope
 
 class DiscussionModule(XModule):
     js = {'coffee':

@@ -1,7 +1,7 @@
 from xmodule.x_module import (XModuleDescriptor, policy_key)
 from xmodule.modulestore import Location
 from xmodule.modulestore.inheritance import own_metadata
-from xmodule.model import Object, Scope
+from xblock.core import Object, Scope
 from lxml import etree
 import json
 import copy

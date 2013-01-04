@@ -6,7 +6,7 @@ from xmodule.x_module import XModule
 from xmodule.raw_module import RawDescriptor
 from xmodule.xml_module import XmlDescriptor
 from xmodule.exceptions import InvalidDefinitionError
-from .model import String, Scope, Object, ModuleScope
+from xblock.core import String, Scope, Object, BlockScope
 
 DEFAULT = "_DEFAULT_GROUP"
 

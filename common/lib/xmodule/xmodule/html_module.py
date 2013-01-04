@@ -15,7 +15,7 @@ from .html_checker import check_html
 from xmodule.modulestore import Location
 
 from xmodule.contentstore.content import XASSET_SRCREF_PREFIX, StaticContent
-from .model import Scope, String
+from xblock.core import Scope, String
 
 log = logging.getLogger("mitx.courseware")
 

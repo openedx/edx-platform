@@ -8,7 +8,7 @@ from xmodule.x_module import XModule
 from xmodule.editing_module import JSONEditingDescriptor
 from xmodule.errortracker import exc_info_to_str
 from xmodule.modulestore import Location
-from .model import String, Scope
+from xblock.core import String, Scope
 
 
 log = logging.getLogger(__name__)

@@ -3,7 +3,7 @@ from xmodule.editing_module import XMLEditingDescriptor
 from xmodule.xml_module import XmlDescriptor
 import logging
 import sys
-from .model import String, Scope
+from xblock.core import String, Scope
 
 log = logging.getLogger(__name__)
 

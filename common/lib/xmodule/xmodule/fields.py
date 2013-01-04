@@ -3,7 +3,7 @@ import logging
 import re
 
 from datetime import timedelta
-from .model import ModelType
+from xblock.core import ModelType
 
 log = logging.getLogger(__name__)
 
