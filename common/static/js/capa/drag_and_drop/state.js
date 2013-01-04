@@ -11,10 +11,7 @@ define([], function () {
         return {
             'problemId': problemId,
 
-            // Will indicate when all targetsand draggables have been loaded,
-            // processed, and postioned intially.
-            'targetsLoaded': false,
-            'draggablesLoaded': false,
+            'baseImageLoaded': false,
 
             'numDraggablesInSlider': 0
         };

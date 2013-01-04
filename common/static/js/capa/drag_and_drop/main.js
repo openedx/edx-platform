@@ -60,13 +60,22 @@ define(
 
         Container(state);
         BaseImage(state);
-        Targets(state);
-        Scroller(state);
-        Draggables(state);
 
-        // Update the input element, checking first that it is not filled with
-        // an answer from the server.
-        updateInput(state, true);
+        (function addContent() {
+            if (state.baseImageLoaded !== true) {
+                setTimeout(addContent, 50);
+
+                return;
+            }
+
+            Targets(state);
+            Scroller(state);
+            Draggables(state);
+
+            // Update the input element, checking first that it is not filled with
+            // an answer from the server.
+            updateInput(state, true);
+        }());
     }
 });
 

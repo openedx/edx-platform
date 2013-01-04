@@ -39,7 +39,8 @@ define(['logme'], function (logme) {
             for (c1 = 0; c1 < state.targets.length; c1++) {
                 for (c2 = 0; c2 < state.targets[c1].draggable.length; c2++) {
                     tempObj = {};
-                    tempObj[state.targets[c1].draggable[c2]] = state.targets[c1].id;
+                    tempObj[state.targets[c1].draggable[c2]] =
+                        state.targets[c1].id;
 
                     draggables.push(tempObj);
                 }
@@ -80,20 +81,37 @@ define(['logme'], function (logme) {
             }
 
             if (
-                ((typeof answer.use_targets === 'boolean') && (answer.use_targets === true)) ||
-                ((typeof answer.use_targets === 'string') && (answer.use_targets === 'true'))
+                (
+                    (typeof answer.use_targets === 'boolean') &&
+                    (answer.use_targets === true)
+                ) ||
+                (
+                    (typeof answer.use_targets === 'string') &&
+                    (answer.use_targets === 'true')
+                )
             ) {
                 for (c1 = 0; c1 < answer.draggables.length; c1++) {
                     for (draggableId in answer.draggables[c1]) {
-                        if ((draggable = getDraggableById(draggableId)) === null) {
-                            logme('ERROR: In answer there exists a draggable ID "' + draggableId + '". No draggable with this ID could be found.');
+                        if (
+                            (draggable = getDraggableById(draggableId)) ===
+                            null
+                        ) {
+                            logme(
+                                'ERROR: In answer there exists a ' +
+                                'draggable ID "' + draggableId + '". No ' +
+                                'draggable with this ID could be found.'
+                            );
 
                             continue;
                         }
 
                         targetId = answer.draggables[c1][draggableId];
                         if ((target = getTargetById(targetId)) === null) {
-                            logme('ERROR: In answer there exists a target ID "' + targetId + '". No target with this ID could be found.');
+                            logme(
+                                'ERROR: In answer there exists a target ' +
+                                'ID "' + targetId + '". No target with this ' +
+                                'ID could be found.'
+                            );
 
                             continue;
                         }
@@ -112,27 +130,44 @@ define(['logme'], function (logme) {
                                 draggable.containerEl.hide();
 
                                 draggable.iconEl.detach();
-
-                                draggable.iconEl.css('width', draggable.iconWidth);
-                                draggable.iconEl.css('height', draggable.iconHeight);
+                                draggable.iconEl.css(
+                                    'width',
+                                    draggable.iconWidth
+                                );
+                                draggable.iconEl.css(
+                                    'height',
+                                    draggable.iconHeight
+                                );
                                 draggable.iconEl.css(
                                     'left',
-                                    target.offset.left + 0.5 * target.w - draggable.iconWidth * 0.5 + offset
+                                    target.offset.left + 0.5 * target.w -
+                                        draggable.iconWidth * 0.5 + offset
                                 );
                                 draggable.iconEl.css(
                                     'top',
-                                    target.offset.top + 0.5 * target.h - draggable.iconHeight * 0.5 + offset
+                                    target.offset.top + 0.5 * target.h -
+                                        draggable.iconHeight * 0.5 + offset
                                 );
-
-                                draggable.iconEl.appendTo(state.baseImageEl.parent());
+                                draggable.iconEl.appendTo(
+                                    state.baseImageEl.parent()
+                                );
 
                                 if (draggable.labelEl !== null) {
                                     draggable.labelEl.detach();
-
-                                    draggable.labelEl.css('left', target.offset.left + 0.5 * target.w - draggable.labelWidth * 0.5 + offset);
-                                    draggable.labelEl.css('top', target.offset.top + 0.5 * target.h + draggable.iconHeight * 0.5 + 5 + offset);
-
-                                    draggable.labelEl.appendTo(state.baseImageEl.parent());
+                                    draggable.labelEl.css(
+                                        'left',
+                                        target.offset.left + 0.5 * target.w -
+                                            draggable.labelWidth * 0.5 + offset
+                                    );
+                                    draggable.labelEl.css(
+                                        'top',
+                                        target.offset.top + 0.5 * target.h +
+                                            draggable.iconHeight * 0.5 + 5 +
+                                            offset
+                                    );
+                                    draggable.labelEl.appendTo(
+                                        state.baseImageEl.parent()
+                                    );
                                 }
 
                                 draggable.setOnTarget(target);
@@ -145,13 +180,26 @@ define(['logme'], function (logme) {
                     }
                 }
             } else if (
-                ((typeof answer.use_targets === 'boolean') && (answer.use_targets === false)) ||
-                ((typeof answer.use_targets === 'string') && (answer.use_targets === 'false'))
+                (
+                    (typeof answer.use_targets === 'boolean') &&
+                    (answer.use_targets === false)
+                ) ||
+                (
+                    (typeof answer.use_targets === 'string') &&
+                    (answer.use_targets === 'false')
+                )
             ) {
                 for (c1 = 0; c1 < answer.draggables.length; c1++) {
                     for (draggableId in answer.draggables[c1]) {
-                        if ((draggable = getDraggableById(draggableId)) === null) {
-                            logme('ERROR: In answer there exists a draggable ID "' + draggableId + '". No draggable with this ID could be found.');
+                        if (
+                            (draggable = getDraggableById(draggableId)) ===
+                            null
+                           ) {
+                            logme(
+                                'ERROR: In answer there exists a ' +
+                                'draggable ID "' + draggableId + '". No ' +
+                                'draggable with this ID could be found.'
+                            );
 
                             continue;
                         }
@@ -170,31 +218,50 @@ define(['logme'], function (logme) {
                                 draggable.containerEl.hide();
 
                                 draggable.iconEl.detach();
-
-                                draggable.iconEl.css('width', draggable.iconWidth);
-                                draggable.iconEl.css('height', draggable.iconHeight);
+                                draggable.iconEl.css(
+                                    'width',
+                                    draggable.iconWidth
+                                );
+                                draggable.iconEl.css(
+                                    'height',
+                                    draggable.iconHeight
+                                );
                                 draggable.iconEl.css(
                                     'left',
-                                    answer.draggables[c1][draggableId][0] - draggable.iconWidth * 0.5 + offset
+                                    answer.draggables[c1][draggableId][0] -
+                                        draggable.iconWidth * 0.5 + offset
                                 );
                                 draggable.iconEl.css(
                                     'top',
-                                    answer.draggables[c1][draggableId][1] - draggable.iconHeight * 0.5 + offset
+                                    answer.draggables[c1][draggableId][1] -
+                                        draggable.iconHeight * 0.5 + offset
                                 );
-
-                                draggable.iconEl.appendTo(state.baseImageEl.parent());
+                                draggable.iconEl.appendTo(
+                                    state.baseImageEl.parent()
+                                );
 
                                 if (draggable.labelEl !== null) {
                                     draggable.labelEl.detach();
-
-                                    draggable.labelEl.css('left', answer.draggables[c1][draggableId][0] - draggable.iconWidth * 0.5 - draggable.labelWidth * 0.5 + offset);
-                                    draggable.labelEl.css('top', answer.draggables[c1][draggableId][1] - draggable.iconHeight * 0.5 + draggable.iconHeight + 5 + offset);
-
-                                    draggable.labelEl.appendTo(state.baseImageEl.parent());
+                                    draggable.labelEl.css(
+                                        'left',
+                                        answer.draggables[c1][draggableId][0] -
+                                            draggable.labelWidth * 0.5 + offset
+                                    );
+                                    draggable.labelEl.css(
+                                        'top',
+                                        answer.draggables[c1][draggableId][1] -
+                                            draggable.iconHeight * 0.5 +
+                                            draggable.iconHeight + 5 + offset
+                                    );
+                                    draggable.labelEl.appendTo(
+                                        state.baseImageEl.parent()
+                                    );
                                 }
 
-                                draggable.x = answer.draggables[c1][draggableId][0];
-                                draggable.y = answer.draggables[c1][draggableId][1];
+                                draggable.x =
+                                    answer.draggables[c1][draggableId][0];
+                                draggable.y =
+                                    answer.draggables[c1][draggableId][1];
 
                                 state.numDraggablesInSlider -= 1;
                                 state.updateArrowOpacity();
@@ -203,7 +270,10 @@ define(['logme'], function (logme) {
                     }
                 }
             } else {
-                logme('ERROR: The type of answer.targets is not supported. answer.targets = ', answer.targets);
+                logme(
+                    'ERROR: The type of answer.targets is not supported. ' +
+                    'answer.targets = ', answer.targets
+                );
 
                 return;
             }
