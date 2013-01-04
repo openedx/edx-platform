@@ -204,7 +204,7 @@ class OpenEndedModule():
         survey_responses=event_info['survey_responses']
         for tag in ['feedback', 'submission_id', 'grader_id', 'score']:
             if tag not in survey_responses:
-                return False, "Could not find needed tag {0}".format(tag)
+                return {'success' : False, 'msg' : "Could not find needed tag {0}".format(tag)}
         try:
             submission_id=int(survey_responses['submission_id'])
             grader_id = int(survey_responses['grader_id'])
@@ -214,7 +214,7 @@ class OpenEndedModule():
             error_message=("Could not parse submission id, grader id, "
                            "or feedback from message_post ajax call.  Here is the message data: {0}".format(survey_responses))
             log.exception(error_message)
-            return False, "There was an error saving your feedback.  Please contact course staff."
+            return {'success' : False, 'msg' : "There was an error saving your feedback.  Please contact course staff."}
 
         qinterface = system.xqueue['interface']
         qtime = datetime.strftime(datetime.now(), xqueue_interface.dateformat)
@@ -248,7 +248,7 @@ class OpenEndedModule():
         if error:
             success=False
 
-        return success, "Successfully submitted your feedback."
+        return {'success' : success, 'msg' : "Successfully submitted your feedback."}
 
     def get_score(self, submission, system):
 

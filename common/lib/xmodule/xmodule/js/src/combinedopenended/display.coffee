@@ -56,7 +56,10 @@ class @CombinedOpenEnded
     else if @child_state == 'post_assessment'
       @answer_area.attr("disabled", true)
       @submit_button.prop('value', 'Submit post-assessment')
-      @submit_button.click @save_hint
+      if @child_type=="selfassessment"
+         @submit_button.click @save_hint
+      else
+        @submit_button.click @message_post
     else if @child_state == 'done'
       @answer_area.attr("disabled", true)
       @hint_area.attr('disabled', true)
@@ -76,7 +79,6 @@ class @CombinedOpenEnded
 
   find_hint_elements: ->
     @hint_area = @$('textarea.post_assessment')
-    @hint_box = @$('')
 
   save_answer: (event) =>
     event.preventDefault()
@@ -195,4 +197,10 @@ class @CombinedOpenEnded
         @gentle_alert response.message
         @$('section.evaluation').slideToggle()
 
-    $.ajaxWithPrefix("#{@url}/message_post", settings)
+    $.ajaxWithPrefix("#{@ajax_url}/save_post_assessment", settings)
+
+  gentle_alert: (msg) =>
+    if @el.find('.open-ended-alert').length
+      @el.find('.open-ended-alert').remove()
+    alert_elem = "<div class='open-ended-alert'>" + msg + "</div>"
+    @el.find('.open-ended-alert').css(opacity: 0).animate(opacity: 1, 700)
