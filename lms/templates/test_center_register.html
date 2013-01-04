@@ -17,22 +17,48 @@
 
     $(document).on('ajax:success', '#testcenter_register_form', function(data, json, xhr) {
       if(json.success) {
+        // when a form is successfully filled out, return back to the dashboard.
         location.href="${reverse('dashboard')}";
       } else {
-          var field_errors = json.field_errors;
-          var non_field_errors = json.non_field_errors;
-          var fieldname;
-          var field_errorlist;
-          var field_error;
-          $(".field.error").removeClass('error');
-          for (fieldname in field_errors) {
-              field_errorlist = field_errors[fieldname];      
-              for (i=0; i < field_errorlist.length; i+= 1) {
-                  field_error = field_errorlist[i];
-              }
-              $("[data-field='"+fieldname+"']").addClass('error')
+    	// 	This is performed by the following code that parses the errors returned as json by the 
+    	// 	registration form validation. 
+        var field_errors = json.field_errors;
+        var non_field_errors = json.non_field_errors;
+        var fieldname;
+        var field_errorlist;
+        var field_error;
+        var error_msg;
+        var num_errors = 0;
+        var error_html = '';
+        // first get rid of any errors that are already present:
+        $(".field.error").removeClass('error');
+        $("#submission-error-list").html(error_html);
+		// start to display new errors:
+        $(".submission-error").addClass("is-shown");
+        for (fieldname in field_errors) {
+          // to inform a user of what field the error occurred on, add a class of .error to the .field element.
+          // for convenience, use the "data-field" attribute to identify the one matching the errant field's name.
+          $("[data-field='"+fieldname+"']").addClass('error')
+          field_errorlist = field_errors[fieldname];      
+          for (i=0; i < field_errorlist.length; i+= 1) {
+            field_error = field_errorlist[i];
+            error_msg = fieldname + ": " + field_error;
+          	error_html =  error_html + '<li class="to-be-determined">' + error_msg + '</li>';
+          	num_errors += 1;
           }
-        $('#register_error').html(json.value).stop().css("display", "block");
+        }
+        for (i=0; i < non_field_errors.length; i+= 1) {
+          error_msg = non_field_errors[i];
+      	  error_html = error_html + '<li class="to-be-determined">' + error_msg + '</li>';
+       	  num_errors += 1;
+        }
+        if (num_errors == 1) {
+        	error_msg = 'was an error';
+		} else {
+        	error_msg = 'were ' + num_errors + ' errors';
+		}
+	    $('#submission-error-heading').text("We're sorry, but there " + error_msg + " in the information you provided below:")
+        $("#submission-error-list").html(error_html);
       }
     });
 
@@ -80,20 +106,12 @@
     <div class="message message-status submission-saved">
       <p class="message-copy">Your registration data has been updated and saved.</p>
     </div>
-    
-    <!-- NOTE: BT - registration error message  -->
-    % if message:
-    <div class="message message-status submission-error">
-      <p class="message-copy">${message}</p>
-    </div> 
-    % endif
-    
+        
     <!-- NOTE: BT - Sample markup for error message.  To display, add "is-shown" class to div -->
-    % if form.errors and len(form.errors) > 0:
-    <div class="message message-status submission-error is-shown">
-      <p class="message-copy">We're Sorry, but there was an error with the information you provided below:</p>
+    <div class="message message-status submission-error">
+      <p id="submission-error-heading" class="message-copy"></p>
+      <ul id="submission-error-list"/>
     </div>
-    % endif 
   </section>
   
   <section class="content">
@@ -122,32 +140,23 @@
           <legend class="is-hidden">Personal Information</legend>
           
           <ol class="list-input">
-            <li class="field">
-              <label for="id_salutation">Salutation:</label>
- 	         	${form['salutation']}
-            </li>
-            <li class="field required">
-              <label for="id_first_name">First Name:</label>
- 	         	${form['first_name']}
-            </li>
-<!--            <li class="field">
+            <li data-field="salutation" class="field">
               <label for="salutation">Salutation</label>
               <input class="short" id="salutation" type="text" name="salutation" value="${testcenteruser.salutation}" placeholder="e.g. Mr., Ms., Mrs., Dr." />              
             </li>
-   -->         <!-- NOTE: BT - to inform a user of what field the error occurred on, add a class of .error to the .field element -->
-<!--            <li class="field required">
+            <li data-field="first_name" class="field required">
               <label for="name-first">First Name </label>
               <input id="name-first" type="text" name="first_name" value="${testcenteruser.first_name}" placeholder="e.g. Albert" />
             </li>
- -->           <li class="field">
+            <li data-field="middle_name" class="field">
               <label for="name-middle">Middle Name</label>
               <input id="name-middle" type="text" name="middle_name" value="${testcenteruser.middle_name}" placeholder="" />
             </li>
-            <li class="field required">
+            <li data-field="last_name" class="field required">
               <label for="name-last">Last Name</label>
               <input id="name-last" type="text" name="last_name" value="${testcenteruser.last_name}" placeholder="e.g. Einstein" />
             </li>
-            <li class="field">
+            <li data-field="suffix" class="field">
               <label for="name-suffix">Suffix</label>
               <input class="short" id="name-suffix" type="text" name="suffix" value="${testcenteruser.suffix}" placeholder="e.g. Jr., Sr. " />
             </li>
@@ -158,22 +167,22 @@
           <legend class="is-hidden">Mailing Address</legend>
           
           <ol class="list-input">
-            <li class="field">
+            <li data-field="address_1" class="field required">
               <label class="long" for="address-1">Address Line #1</label>
               <input id="address-1" type="text" name="address_1" value="${testcenteruser.address_1}" placeholder="e.g. 112 Mercer Street" />              
             </li>
             <li class="field-group addresses">
-              <div class="field">
+              <div data-field="address_2" class="field">
                 <label for="address-2">Address Line #2</label>
                 <input id="address-2" class="long" type="text" name="address_2" value="${testcenteruser.address_2}" placeholder="e.g. Apartment 123" />
               </div>
-              <div class="field">
+              <div data-field="address_3" class="field">
                 <label for="address-3">Address Line #3</label>
                 <input id="address-3" class="long" type="text" name="address_3" value="${testcenteruser.address_3}" placeholder="e.g. Attention: Albert Einstein" />
               </div>
             </li>            
             <li class="field-group postal">
-              <div data-field="city" class="field">
+              <div data-field="city" class="field required">
                 <label for="city">City</label>
                 <input id="city" class="short" type="text" name="city" value="${testcenteruser.city}" placeholder="e.g. Newark" />
               </div>
@@ -198,30 +207,30 @@
           
           <ol class="list-input">
             <li class="field-group phoneinfo">
-              <div class="field required">
+              <div data-field="phone" class="field required">
                 <label for="phone">Phone Number</label>
                 <input id="phone" type="text" name="phone" value="${testcenteruser.phone}" placeholder="e.g. 1-55-555-5555" />              
               </div>
-              <div class="field">
+              <div data-field="extension" class="field">
                 <label for="phone-extension">Extension</label>
                 <input id="phone-extension" class="short" type="text" name="extension" value="${testcenteruser.extension}" placeholder="e.g. 555" />
               </div>
-              <div class="field required">
+              <div data-field="phone_country_code" class="field required">
                 <label for="phone-countrycode">Phone Country Code</label>
                 <input id="phone-countrycode" class="short" type="text" name="phone_country_code" value="${testcenteruser.phone_country_code}" placeholder="e.g. USA" />
               </div>
             </li>
             <li class="field-group faxinfo">
-              <div class="field">
+              <div data-field="fax" class="field">
                 <label for="fax">Fax Number</label>
                 <input id="fax" type="text" class="short" name="fax" value="${testcenteruser.fax}" placeholder="e.g. 1-55-555-5555" />
               </div>
-              <div class="field">
+              <div data-field="fax_country_code" class="field">
                 <label for="fax-countrycode">Fax Country Code</label>
                 <input id="fax-countrycode" class="short" type="text" name="fax_country_code" value="${testcenteruser.fax_country_code}" placeholder="e.g. USA" />
               </div>
             </li>
-            <li class="field">
+            <li data-field="company_name" class="field">
               <label for="company">Company</label>
               <input id="company" type="text" name="company_name" value="${testcenteruser.company_name}" placeholder="e.g. American Association of University Professors" />
             </li>
@@ -230,7 +239,7 @@
       </div>
       
       <div class="form-fields-secondary">
-        <!-- NOTE: BT - Assuming accomodations cannot be edited after a user originally submits registration, I've disabled the field and provided different text. Correct if this is not the case. -->
+        <!-- NOTE: BT - Assuming accommodations cannot be edited after a user originally submits registration, I've disabled the field and provided different text. Correct if this is not the case. -->
         % if registration:
         <p class="instructions">Fields below this point are not part of the demographics, and are not editable currently.</p>
         % else: 
@@ -240,16 +249,22 @@
         <fieldset class="group group-form group-form-optional">
           <legend class="is-hidden">Optional Information</legend>
           
+          <!-- Only display an accommodation request if one had been specified at registration time. 
+               So only prompt for an accommodation request if no registration exists. 
+               BW: Bug.  It is not enough to set the value of the disabled control.  It does
+               not display any text.  Perhaps we can use a different control. -->
           <ol class="list-input">
             % if registration:
+              % if registration.accommodation_request and len(registration.accommodation_request) > 0:
             <li class="field disabled">
               <label for="accommodations">Accommodations Requested</label>
-              <textarea class="long" id="accommodations"value="" placeholder="" disabled="disabled"></textarea>
+              <textarea class="long" id="accommodations" value="${registration.accommodation_request}" placeholder="" disabled="disabled"></textarea>
             </li>
+              % endif
             % else: 
             <li class="field">
               <label for="accommodations">Accommodations Requested</label>
-              <textarea class="long" id="accommodations"value="" placeholder=""></textarea>             
+              <textarea class="long" id="accommodations" name="accommodations" value="" placeholder=""></textarea>             
             </li>
             % endif
           </ol>
@@ -270,19 +285,8 @@
    % if registration:
     <h3 class="is-hidden">Registration Details</h3>
     
-    <%      
-      if registration.upload_status == 'Accepted':
-        regstatus = "Registration approved by Pearson"
-      elif registration.upload_status == 'Error':
-        regstatus = "Registration rejected by Pearson: %s" % registration.upload_error_message
-      elif len(registration.accommodation_request) > 0 and registration.accommodation_code == '':
-        regstatus = "Registration pending approval of accommodation request"
-      else:
-        regstatus = "Registration pending acknowledgement by Pearson"
-    %>
-    
     <!-- NOTE: BT - state for if registration is accepted -->
-    % if registration.upload_status == 'Accepted':
+    % if registration.is_accepted():
       <% regstatus = "Registration approved by Pearson" %>
     <div class="message message-status registration-accepted is-shown">
       <p class="registration-status"><span class="label">Registration Status: </span><span class="value">${regstatus}</span></p>
@@ -292,7 +296,7 @@
     </div>
     % endif
     
-    % if registration.upload_status == 'Error':
+    % if registration.is_rejected():
     <!-- NOTE: BT - state for if registration is rejected -->
       <% regstatus = "Registration rejected by Pearson: %s" % registration.upload_error_message %>
     <div class="message message-status registration-rejected is-shown">
@@ -301,14 +305,25 @@
     </div>
     % endif
     
-    % if len(registration.accommodation_request) > 0 and registration.accommodation_code == '':
+    % if registration.is_pending_accommodation():
         <% regstatus = "Registration pending approval of accommodation request" %>
+    <!-- NOTE: BT - state for if registration is pending -->
+    <div class="message message-status registration-pending is-shown">
+      <p class="registration-status"><span class="label">Registration Status: </span><span class="value">${regstatus}</span></p>
+      <p class="message-copy">Your registration for the Pearson exam is pending. Within a few days, you should see confirmation here of granted accommodations.
+      	At that point, your registration will be forwarded to Pearson.</p>
+    </div>
+    % endif
+
+    % if registration.is_pending_acknowledgement():
+        <% regstatus = "Registration pending acknowledgement by Pearson" %>
     <!-- NOTE: BT - state for if registration is pending -->
     <div class="message message-status registration-pending is-shown">
       <p class="registration-status"><span class="label">Registration Status: </span><span class="value">${regstatus}</span></p>
       <p class="message-copy">Your registration for the Pearson exam is pending. Within a few days, you should see a confirmation number here, which can be used to schedule your exam.</p>
     </div>
     % endif
+
    % endif
     
     <div class="details details-course">

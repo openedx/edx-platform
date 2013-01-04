@@ -594,7 +594,7 @@ def create_account(request, post_override=None):
 
 @login_required
 @ensure_csrf_cookie
-def begin_test_registration(request, course_id, form=None, message=''):
+def begin_test_registration(request, course_id):
     user = request.user
 
     try:
@@ -605,6 +605,8 @@ def begin_test_registration(request, course_id, form=None, message=''):
 
     # get the exam to be registered for:
     # (For now, we just assume there is one at most.)
+    # TODO: this should be an object, including the course_id and the
+    # exam info for a particular exam from the course.
     exam_info = course.testcenter_info
 
     # figure out if the user is already registered for this exam:   
@@ -624,16 +626,11 @@ def begin_test_registration(request, course_id, form=None, message=''):
     except TestCenterUser.DoesNotExist:
         testcenteruser = TestCenterUser()
         testcenteruser.user = user
-
-    if form is None:
-        form = TestCenterUserForm(instance=testcenteruser)
         
     context = {'course': course,
                'user': user,
-               'message': message,
                'testcenteruser': testcenteruser,
                'registration': registration,
-               'form': form,
                'exam_info': exam_info,
                }
 
@@ -669,32 +666,18 @@ def create_test_registration(request, post_override=None):
     # perform validation:
     if needs_updating:
         log.info("User {0} enrolled in course {1} updating demographic info for test registration".format(user.username, course_id))
-        try:
-            # first perform validation on the user information 
-            # using a Django Form.
-            form = TestCenterUserForm(instance=testcenter_user, data=post_vars)
-            if not form.is_valid():
-#                return begin_test_registration(request, course_id, form, 'failed to validate')
-                response_data = {'success': False}
-                # return a list of errors...
-                response_data['field_errors'] = form.errors
-                response_data['non_field_errors'] = form.non_field_errors()
-                return HttpResponse(json.dumps(response_data), mimetype="application/json")
+        # first perform validation on the user information 
+        # using a Django Form.
+        form = TestCenterUserForm(instance=testcenter_user, data=post_vars)
+        if form.is_valid():
             form.update_and_save()
-        except IntegrityError, ie:
-            js = {'success': False}
-            error_msg = unicode(ie);
-            # attempt to find a field name to signal    
-            for fieldname in TestCenterUser.user_provided_fields():
-                if error_msg.find(fieldname) >= 0: 
-                    js['value'] = error_msg
-                    js['field'] = fieldname
-                    return HttpResponse(json.dumps(js), mimetype="application/json")
-            # otherwise just return the error message        
-            js['value'] = error_msg
-            js['field'] = "General Error"
-            return HttpResponse(json.dumps(js), mimetype="application/json")
-            
+        else:
+            response_data = {'success': False}
+            # return a list of errors...
+            response_data['field_errors'] = form.errors
+            response_data['non_field_errors'] = form.non_field_errors()
+            return HttpResponse(json.dumps(response_data), mimetype="application/json")
+        
     # create and save the registration:
     needs_saving = False
     exam_info = course.testcenter_info
@@ -712,53 +695,17 @@ def create_test_registration(request, post_override=None):
         accommodation_request = post_vars.get('accommodations','')
         registration = TestCenterRegistration.create(testcenter_user, course_id, exam_info, accommodation_request)
         needs_saving = True
-        
-    # "client_authorization_id" is the client's unique identifier for the authorization.  
-    # This must be present for an update or delete to be sent to Pearson.  
-    # Can we just use the id field of the registration?  Lets...
-    
+
+    # TODO: add validation of registration.  (Mainly whether an accommodation request is too long.)        
     if needs_saving:
-        try:
-            registration.save()
-        except IntegrityError, ie:
-            raise
+        registration.save()
         
-#    return (user, testcenter_user, registration)
-
-
-    # Confirm we have a properly formed request
-#    for a in ['first_name', 'last_name', 'address_1', 'city', 'country']:
-#        if a not in post_vars:
-#            js['value'] = "Error (401 {field}). E-mail us.".format(field=a)
-#            js['field'] = a
-#            return HttpResponse(json.dumps(js))
-#
-#    # Confirm appropriate fields are filled in with something for now
-#    for a in ['first_name', 'last_name', 'address_1', 'city', 'country']:
-#        if len(post_vars[a]) < 2:
-#            error_str = {'first_name': 'First name must be minimum of two characters long.',
-#                         'last_name': 'Last name must be minimum of two characters long.',
-#                         'address_1': 'Address must be minimum of two characters long.',
-#                         'city': 'City must be minimum of two characters long.',
-#                         'country': 'Country must be minimum of two characters long.',
-#                         }
-#            js['value'] = error_str[a]
-#            js['field'] = a
-#            return HttpResponse(json.dumps(js))
-
-    # Once the test_center_user information has been validated, create the entries:
-#    ret = _do_create_or_update_test_center_user(post_vars)
-#    if isinstance(ret,HttpResponse):		# if there was an error then return that
-#        return ret
-#
-#
-#    (user, testcenter_user, testcenter_registration) = ret
 
     # only do the following if there is accommodation text to send,
-    # and a destination to which to send it:
-    if 'accommodation' in post_vars and settings.MITX_FEATURES.get('ACCOMMODATION_EMAIL'):
-        d = {'accommodation': post_vars['accommodation']
-             }
+    # and a destination to which to send it.
+    # TODO: still need to create the accommodation email templates
+    if 'accommodations' in post_vars and settings.MITX_FEATURES.get('ACCOMMODATION_EMAIL'):
+        d = {'accommodations': post_vars['accommodations'] }
         
         # composes accommodation email
         subject = render_to_string('emails/accommodation_email_subject.txt', d)
@@ -772,8 +719,9 @@ def create_test_registration(request, post_override=None):
             send_mail(subject, message, settings.DEFAULT_FROM_EMAIL, [dest_addr], fail_silently=False)
         except:
             log.exception(sys.exc_info())
-            js['value'] = 'Could not send accommodation e-mail.'
-            return HttpResponse(json.dumps(js), mimetype="application/json")
+            response_data = {'success': False}
+            response_data['non_field_errors'] =  [ 'Could not send accommodation e-mail.', ]
+            return HttpResponse(json.dumps(response_data), mimetype="application/json")
 
     # TODO: enable appropriate stat
     # statsd.increment("common.student.account_created")
@@ -782,8 +730,6 @@ def create_test_registration(request, post_override=None):
 
     js = {'success': True}
     return HttpResponse(json.dumps(js), mimetype="application/json")
-#    return HttpResponseRedirect(reverse('dashboard'))
-    #return HttpResponse("Hello world")
 
 
 def get_random_post_override():

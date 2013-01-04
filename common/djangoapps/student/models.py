@@ -303,6 +303,7 @@ class TestCenterRegistration(models.Model):
     eligibility_appointment_date_last = models.DateField(db_index=True)
 
     # this is really a list of codes, using an '*' as a delimiter.
+    # So it's not a choice list.
     accommodation_code = models.CharField(max_length=64, blank=True)
     
     # store the original text of the accommodation request.
@@ -348,6 +349,19 @@ class TestCenterRegistration(models.Model):
         h.update(str(self.course_id))
         h.update(str(self.exam_series_code))
         return h.hexdigest()
+
+    def is_accepted(self):
+        return self.upload_status == 'Accepted'
+  
+    def is_rejected(self):
+        return self.upload_status == 'Error'
+    
+    def is_pending_accommodation(self):
+        return len(self.accommodation_request) > 0 and self.accommodation_code == ''
+        
+    def is_pending_acknowledgement(self):
+        return self.upload_status == '' and not self.is_pending_accommodation()
+
 
 def get_testcenter_registrations_for_user_and_course(user, course_id, exam_series_code=None):
     try:
