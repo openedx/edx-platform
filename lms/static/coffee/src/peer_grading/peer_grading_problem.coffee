@@ -69,6 +69,8 @@ class PeerGradingProblem
     @grading_panel = $('.grading-panel')
     @content_panel = $('.content-panel')
 
+    @grading_wrapper =$('.grading-wrapper')
+
     @error_container = $('.error-container')
 
     @submission_key_input = $("input[name='submission-key']")
@@ -76,7 +78,6 @@ class PeerGradingProblem
     @feedback_area = $('.feedback-area')
 
     @score_selection_container = $('.score-selection-container')
-    @score = null
 
     @submit_button = $('.submit-button')
     @action_button = $('.action-button')
@@ -138,6 +139,13 @@ class PeerGradingProblem
     else
       @render_error("Error contacting the grading service")
 
+  calibration_callback: (response) =>
+    if response.success
+      # display correct grade
+      @grading_wrapper.hide()
+      
+    else if response.error
+      @render_error(response.error)
 
   submission_callback: (response) =>
     if response.success
@@ -149,7 +157,6 @@ class PeerGradingProblem
         @render_error("Error occurred while submitting grade")
 
   graded_callback: (event) =>
-    @score = event.target.value
     @show_submit_button()
 
   
@@ -170,12 +177,14 @@ class PeerGradingProblem
       @grading_panel.removeClass('current-state')
 
       # clear out all of the existing text
-      @calibration_panel.find('p').remove()
-      @grading_panel.find('p').remove()
+      @calibration_panel.find('.calibration-text').show()
+      @grading_panel.find('.calibration-text').show()
+      @calibration_panel.find('.grading-text').hide()
+      @grading_panel.find('.grading-text').hide()
 
-      # add in new text
+      # TODO: add in new text
 
-
+      @submit_button.unbind('click')
       @submit_button.click @submit_calibration_essay
 
     else if response.error
@@ -194,9 +203,12 @@ class PeerGradingProblem
       @grading_panel.addClass('current-state')
 
       # clear out all of the existing text
-      @calibration_panel.find('p').remove()
-      @grading_panel.find('p').remove()
+      @calibration_panel.find('.calibration-text').hide()
+      @grading_panel.find('.calibration-text').hide()
+      @calibration_panel.find('.grading-text').show()
+      @grading_panel.find('.grading-text').show()
 
+      @submit_button.unbind('click')
       @submit_button.click @submit_grade
     else if response.error
       @render_error(response.error)
@@ -248,8 +260,6 @@ class PeerGradingProblem
 
     # And now hook up an event handler again
     $("input[name='score-selection']").change @graded_callback
-
-
 
 
 

@@ -83,10 +83,39 @@ div.peer-grading{
         font-size: .8em;
     }
 
-    .current-state
+    .instructions-panel
     {
-        background: #eee;
+
+        > div
+        {
+            padding: 10px;
+            margin: 0px;
+            border: 1px solid black;
+        }
+        .calibration-panel
+        {
+            float:left;
+            width:47%;
+        }
+        .grading-panel
+        {
+            float:right;
+            width: 47%;
+        }
+        .current-state
+        {
+            background: #eee;
+        }
+        &:after
+        {
+            content:".";
+            display:block;
+            height:0;
+            visibility: hidden;
+            clear:both;
+        }
     }
+
     
     padding: 40px;
 }
