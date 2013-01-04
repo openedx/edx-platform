@@ -573,25 +573,26 @@ class OpenEndedModule():
         Implement special logic: handle queueing state, and default input.
         """
         # if no student input yet, then use the default input given by the problem
-        if not self.value:
-            self.value = self.xml.text
+        latest_answer=self.latest_answer()
+        if latest_answer is None:
+            value = self.initial_display
 
         # Check if problem has been queued
         self.queue_len = 0
         # Flag indicating that the problem has been queued, 'msg' is length of queue
-        if self.status == 'incomplete':
-            self.status = 'queued'
-            self.queue_len = self.msg
-            self.msg = self.submitted_msg
+        if self.state == self.ASSESSING:
+            #self.queue_len = self.msg
+            #self.msg = self.submitted_msg
+            pass
 
         context={'rows' : 30,
                  'cols' : 80,
                  'hidden' : '',
                  'id' : 'open_ended',
-                 'msg' : self.msg,
-                 'status' : self.status,
+                 'msg' : "This is a message",
+                 'state' : self.state,
                  'queue_len' : self.queue_len,
-                 'value' : self.value,
+                 'value' : value,
                  }
 
         html=system.render_template("open_ended.html", context)
@@ -623,6 +624,37 @@ class OpenEndedModule():
             'attempts': self.attempts,
             }
         return json.dumps(state)
+
+    def latest_answer(self):
+        """None if not available"""
+        if not self.history:
+            return None
+        return self.history[-1].get('answer')
+
+    def latest_score(self):
+        """None if not available"""
+        if not self.history:
+            return None
+        return self.history[-1].get('score')
+
+    def latest_hint(self):
+        """None if not available"""
+        if not self.history:
+            return None
+        return self.history[-1].get('hint')
+
+    def new_history_entry(self, answer):
+        self.history.append({'answer': answer})
+
+    def record_latest_score(self, score):
+        """Assumes that state is right, so we're adding a score to the latest
+        history element"""
+        self.history[-1]['score'] = score
+
+    def record_latest_hint(self, hint):
+        """Assumes that state is right, so we're adding a score to the latest
+        history element"""
+        self.history[-1]['hint'] = hint
 
 
 class OpenEndedDescriptor(XmlDescriptor, EditingDescriptor):
