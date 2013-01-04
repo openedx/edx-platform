@@ -25,9 +25,26 @@ class PeerGradingProblemBackend
         success: true
         submission_id: 1
         submission_key: 'abcd'
-        student_response: 'I am a fake calibration response'
-        prompt: 'Answer this question'
-        rubric: 'This is a rubric.'
+        student_response: '''
+            Contrary to popular belief, Lorem Ipsum is not simply random text. It has roots in a piece of classical Latin literature from 45 BC, making it over 2000 years old. Richard McClintock, a Latin professor at Hampden-Sydney College in Virginia, looked up one of the more obscure Latin words, consectetur, from a Lorem Ipsum passage, and going through the cites of the word in classical literature, discovered the undoubtable source. Lorem Ipsum comes from sections 1.10.32 and 1.10.33 of "de Finibus Bonorum et Malorum" (The Extremes of Good and Evil) by Cicero, written in 45 BC. This book is a treatise on the theory of ethics, very popular during the Renaissance. The first line of Lorem Ipsum, "Lorem ipsum dolor sit amet..", comes from a line in section 1.10.32.
+
+The standard chunk of Lorem Ipsum used since the 1500s is reproduced below for those interested. Sections 1.10.32 and 1.10.33 from "de Finibus Bonorum et Malorum" by Cicero are also reproduced in their exact original form, accompanied by English versions from the 1914 translation by H. Rackham.
+            '''
+        prompt: '''
+            	<h2>S11E3: Metal Bands</h2>
+<p>Shown below are schematic band diagrams for two different metals. Both diagrams appear different, yet both of the elements are undisputably metallic in nature.</p>
+<p>* Why is it that both sodium and magnesium behave as metals, even though the s-band of magnesium is filled? </p>
+<p>This is a self-assessed open response question. Please use as much space as you need in the box below to answer the question.</p>
+            '''
+        rubric: '''
+<ul>
+<li>Metals tend to be good electronic conductors, meaning that they have a large number of electrons which are able to access empty (mobile) energy states within the material.</li>
+<li>Sodium has a half-filled s-band, so there are a number of empty states immediately above the highest occupied energy levels within the band.</li>
+<li>Magnesium has a full s-band, but the the s-band and p-band overlap in magnesium. Thus are still a large number of available energy states immediately above the s-band highest occupied energy level.</li>
+</ul>
+
+<p>Please score your response according to how many of the above components you identified:</p>
+            '''
         max_score: 4
     else if cmd == 'get_next_submission'
       response = 
@@ -80,6 +97,7 @@ class PeerGradingProblem
     @feedback_area = $('.feedback-area')
 
     @score_selection_container = $('.score-selection-container')
+    @score = null
 
     @submit_button = $('.submit-button')
     @action_button = $('.action-button')
@@ -90,7 +108,7 @@ class PeerGradingProblem
     @calibration_feedback_button.click => 
       @calibration_feedback_panel.hide()
       @grading_wrapper.show()
-      @is_calibrated_check
+      @is_calibrated_check()
 
     @is_calibrated_check()
 
@@ -111,7 +129,7 @@ class PeerGradingProblem
 
   construct_data: () ->
     data =
-      score: $('input[name="score-selection"]:checked').val()
+      score: @score
       location: @location
       submission_id: @essay_id_input.val()
       submission_key: @submission_key_input.val()
@@ -149,11 +167,7 @@ class PeerGradingProblem
 
   calibration_callback: (response) =>
     if response.success
-      # display correct grade
-      @grading_wrapper.hide()
-      @calibration_feedback_panel.show()
-      @calibration_feedback_panel.prepend("<p>The correct grade is: #{response.correct_score}</p>")
-      
+      @render_calibration_feedback(response)
     else if response.error
       @render_error(response.error)
 
@@ -167,6 +181,7 @@ class PeerGradingProblem
         @render_error("Error occurred while submitting grade")
 
   graded_callback: (event) =>
+    @score = event.target.value
     @show_submit_button()
 
   
@@ -245,6 +260,20 @@ class PeerGradingProblem
     @action_button.hide()
     @calibration_feedback_panel.hide()
 
+
+  render_calibration_feedback: (response) =>
+      # display correct grade
+    #@grading_wrapper.hide()
+      @calibration_feedback_panel.show()
+      calibration_wrapper = $('.calibration-feedback-wrapper')
+      calibration_wrapper.html("<p>The score you gave was: #{@score}. The correct score is: #{response.correct_score}</p>")
+      score = parseInt(@score)
+      correct_score = parseInt(response.correct_score)
+
+      if score == correct_score
+        calibration_wrapper.append("<p>Congratulations! Your score matches the correct one!</p>")
+      else
+        calibration_wrapper.append("<p>Please try to understand the grading critera better so that you will be more accurate next time.</p>") 
 
     
   render_error: (error_message) =>
