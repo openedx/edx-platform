@@ -26,7 +26,7 @@ class @CombinedOpenEnded
     @submit_button = @$('.submit-button')
     @child_state = @el.data('state')
     @child_type = @el.data('child-type')
-    if @child_type="openended"
+    if @child_type=="openended"
       @reload_button = @$('.reload-button')
 
     @open_ended_child= @$('.open-ended-child')
