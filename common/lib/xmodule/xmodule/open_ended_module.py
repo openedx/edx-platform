@@ -296,13 +296,10 @@ class OpenEndedModule():
         log.debug(score_msg)
         score_msg = self._parse_score_msg(score_msg)
         if not score_msg['valid']:
-               score_msg['msg'] = 'Invalid grader reply. Please contact the course staff.'
-            return oldcmap
+            score_msg['feedback'] = 'Invalid grader reply. Please contact the course staff.'
 
-        correctness = 'correct' if score_msg.correct else 'incorrect'
-
-        self._record_latest_score(score_msg['points'])
-        self._record_latest_feedback(score_msg['msg'])
+        self._record_latest_score(score_msg['score'])
+        self._record_latest_feedback(score_msg['feedback'])
         self.state=self.POST_ASSESSMENT
 
         return True
@@ -465,13 +462,12 @@ class OpenEndedModule():
         self.submission_id=score_result['submission_id']
         self.grader_id=score_result['grader_id']
 
-        # HACK: for now, just assume it's correct if you got more than 2/3.
-        # Also assumes that score_result['score'] is an integer.
-        score_ratio = int(score_result['score']) / float(self.max_score)
-        correct = (score_ratio >= 0.66)
+        return {'valid' : True, 'score' : score_result['score'], 'feedback' : feedback}
 
-        #Currently ignore msg and only return feedback (which takes the place of msg)
-        return {'valid' : True, 'correct' : correct, 'points' : score_result['score'], 'msg' : feedback}
+    def is_submission_correct(self, score):
+        score_ratio = int(score) / float(self.max_score)
+        correct = (score_ratio >= 0.66)
+        return correct
 
     def handle_ajax(self, dispatch, get, system):
         '''
