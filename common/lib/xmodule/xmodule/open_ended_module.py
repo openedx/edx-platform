@@ -292,9 +292,9 @@ class OpenEndedModule():
                       'time': qtime,}
         return True
 
-    def _update_score(self, score_msg, oldcmap, queuekey):
+    def _update_score(self, score_msg, queuekey, system):
         log.debug(score_msg)
-        score_msg = self._parse_score_msg(score_msg)
+        score_msg = self._parse_score_msg(score_msg, system)
         if not score_msg['valid']:
             score_msg['feedback'] = 'Invalid grader reply. Please contact the course staff.'
 
@@ -402,7 +402,7 @@ class OpenEndedModule():
 
         return u"\n".join([feedback_list_part1,feedback_list_part2])
 
-    def _format_feedback(self, response_items):
+    def _format_feedback(self, response_items, system):
         """
         Input:
             Dictionary called feedback.  Must contain keys seen below.
@@ -413,10 +413,10 @@ class OpenEndedModule():
         feedback = self._convert_longform_feedback_to_html(response_items)
 
         if not response_items['success']:
-            return self.system.render_template("open_ended_error.html",
+            return system.render_template("open_ended_error.html",
                 {'errors' : feedback})
 
-        feedback_template = self.system.render_template("open_ended_feedback.html", {
+        feedback_template = system.render_template("open_ended_feedback.html", {
             'grader_type': response_items['grader_type'],
             'score': "{0} / {1}".format(response_items['score'], self.max_score),
             'feedback': feedback,
@@ -425,7 +425,7 @@ class OpenEndedModule():
         return feedback_template
 
 
-    def _parse_score_msg(self, score_msg):
+    def _parse_score_msg(self, score_msg, system):
         """
          Grader reply is a JSON-dump of the following dict
            { 'correct': True/False,
@@ -458,7 +458,7 @@ class OpenEndedModule():
                 .format(tag))
                 return fail
 
-        feedback = self._format_feedback(score_result)
+        feedback = self._format_feedback(score_result, system)
         self.submission_id=score_result['submission_id']
         self.grader_id=score_result['grader_id']
 
