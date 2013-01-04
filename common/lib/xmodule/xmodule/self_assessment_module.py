@@ -93,11 +93,6 @@ class SelfAssessmentModule():
         </selfassessment>
         """
 
-        self.xml = xml
-        self.inputfields = inputfields
-        self.context = context
-        self.system = system
-
         # Load instance state
         if instance_state is not None:
             instance_state = json.loads(instance_state)

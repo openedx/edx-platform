@@ -64,7 +64,7 @@ class OpenEndedModule():
     # states
     INITIAL = 'initial'
     ASSESSING = 'assessing'
-    REQUEST_HINT = 'post_assessment'
+    POST_ASSESSMENT = 'post_assessment'
     DONE = 'done'
 
     def __init__(self, system, location, definition, descriptor,
@@ -122,7 +122,56 @@ class OpenEndedModule():
         # completion (doesn't matter if you self-assessed correct/incorrect).
         self._max_score = int(instance_state.get('max_score', MAX_SCORE))
 
-        self.rubric = definition['rubric']
-        self.prompt = definition['prompt']
-        self.submit_message = definition['submitmessage']
-        self.hint_prompt = definition['hintprompt']
+        oeparam = definition['openendedparam']
+        prompt = definition['prompt']
+        rubric = definition['rubric']
+
+        self.url = definition.get('url', None)
+        self.queue_name = definition.get('queuename', self.DEFAULT_QUEUE)
+        self.message_queue_name = definition.get('message-queuename', self.DEFAULT_MESSAGE_QUEUE)
+
+        #This is needed to attach feedback to specific responses later
+        self.submission_id=None
+        self.grader_id=None
+
+        if oeparam is None:
+            raise ValueError("No oeparam found in problem xml.")
+        if prompt is None:
+            raise ValueError("No prompt found in problem xml.")
+        if rubric is None:
+            raise ValueError("No rubric found in problem xml.")
+
+        self._parse(oeparam, prompt, rubric)
+
+
+    def handle_ajax(self, dispatch, get):
+        '''
+        This is called by courseware.module_render, to handle an AJAX call.
+        "get" is request.POST.
+
+        Returns a json dictionary:
+        { 'progress_changed' : True/False,
+          'progress' : 'none'/'in_progress'/'done',
+          <other request-specific values here > }
+        '''
+        handlers = {
+            'problem_get': self.get_problem,
+            'problem_check': self.check_problem,
+            'problem_reset': self.reset_problem,
+            'problem_save': self.save_problem,
+            'problem_show': self.get_answer,
+            'score_update': self.update_score,
+            'message_post' : self.message_post,
+            }
+
+        if dispatch not in handlers:
+            return 'Error'
+
+        before = self.get_progress()
+        d = handlers[dispatch](get)
+        after = self.get_progress()
+        d.update({
+            'progress_changed': after != before,
+            'progress_status': Progress.to_js_status_str(after),
+            })
+        return json.dumps(d, cls=ComplexEncoder)
