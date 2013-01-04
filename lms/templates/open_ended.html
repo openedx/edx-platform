@@ -4,11 +4,7 @@
    <div class="prompt">
     ${prompt|n}
    </prompt>
-  <textarea rows="${rows}" cols="${cols}" name="answer" class="answer short-form-response" id="input_${id}"
-       % if hidden:
-      	    style="display:none;"
-       % endif
-  >${previous_answer|h}</textarea>
+  <textarea rows="${rows}" cols="${cols}" name="answer" class="answer short-form-response" id="input_${id}">${previous_answer|h}</textarea>
 
   <div class="message-wrapper">
     % if state == 'initial':
