@@ -347,7 +347,7 @@
       .action.action-mediakit {
         float: right;
         position: relative;
-        top: 5px;
+        top: 1px;
         font-family: $sans-serif;
         font-size: 14px;
         text-shadow: 0 1px rgba(255,255,255, 0.6);
@@ -359,6 +359,12 @@
           margin: 0 0 0 5px;
           content: "➤";
           font-size: 11px;
+        }
+
+        .org-name {
+          color: $blue;
+          font-family: $sans-serif;
+          text-transform: none;
         }
       }
     }

@@ -224,7 +224,7 @@ $white: rgb(255,255,255);
           @include box-sizing(border-box);
           @include box-shadow(0 1px 2px 0 rgba(0,0,0, 0.1));
           display: block;
-          min-height: 400px;
+          min-height: 380px;
           border: 2px solid tint($light-gray,75%);
           padding: $baseline;
 

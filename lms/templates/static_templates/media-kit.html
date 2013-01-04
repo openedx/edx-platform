@@ -23,10 +23,10 @@
       <aside>
         <h3>The <span class="org-name">edX</span> Logo</h3>
         <figure class="logo">
-          <a class="action action-download" href="${static.url('files/edx-identity.zip')}">
+          <a rel="asset" class="action action-download" href="${static.url('files/edx-identity.zip')}">
             <img src="${static.url('images/edx.png')}" />
             <figcaption>.zip file containing Adobe Illustrator and .eps formats of logo alongside visual guidelines for use</figcaption>
-            <span class="note">Download</span>
+            <span class="note">Download (.zip file)</span>
           </a>
         </figure>
       </aside>
@@ -42,83 +42,70 @@
         <ul class="listing listing-media-items">
           <li>
             <figure>
-              <a class="action action-download" href="${static.url('images/press-kit/anant-agarwal_high-res.jpg')}">
+              <a rel="asset" class="action action-download" href="${static.url('images/press-kit/anant-agarwal_high-res.jpg')}">
                 <img src="${static.url('images/press-kit/anant-agarwal_x200.jpg')}"/>
                 <figcaption>Ananat Agarwal, President of edX, in his office in Cambridge, MA. The computer screen behind him shows a portion of a video lecture from 6.002x, Circuits &amp; Electronics, the MITx course taught by Agarwal.</figcaption>
-                <span class="note">High Resolution Photo</span>
+                <span class="note">Download (High Resolution Photo)</span>
               </a>
             </figure>
           </li>
           <li>
             <figure>
-              <a class="action action-download" href="${static.url('images/press-kit/anant-tablet_high-res.jpg')}">
+              <a rel="asset" class="action action-download" href="${static.url('images/press-kit/anant-tablet_high-res.jpg')}">
                 <img src="${static.url('images/press-kit/anant-tablet_x200.jpg')}"/>
                 <figcaption>Anant Agarwal creating a tablet-based lecture for 6.002x, Circuits & Electronics.</figcaption>
-                <span class="note">High Resolution Photo</span>
+                <span class="note">Download (High Resolution Photo)</span>
               </a>
             </figure>
           </li>
           <li>
             <figure>
-              <a class="action action-download" href="${static.url('images/press-kit/piotr-mitros_high-res.jpg')}">
+              <a rel="asset" class="action action-download" href="${static.url('images/press-kit/piotr-mitros_high-res.jpg')}">
                 <img src="${static.url('images/press-kit/piotr-mitros_x200.jpg')}"/>
                 <figcaption>Piotr Mitros, Chief Scientist at edX, uses a Rostrum camera to create an overhead camera-based lecture. During this process, voice and video are recorded for an interactive tutorial.</figcaption>
-                <span class="note">High Resolution Photo</span>
+                <span class="note">Download (High Resolution Photo)</span>
               </a>
             </figure>
           </li>
           <li>
             <figure>
-              <a class="action action-download" href="${static.url('images/press-kit/edx-video-editing_high-res.jpg')}">
+              <a rel="asset" class="action action-download" href="${static.url('images/press-kit/edx-video-editing_high-res.jpg')}">
                 <img src="${static.url('images/press-kit/edx-video-editing_x200.jpg')}"/>
                 <figcaption>One of edX’s video editors edits a lecture in a video suite.</figcaption>
-                <span class="note">High Resolution Photo</span>
+                <span class="note">Download (High Resolution Photo)</span>
               </a>
             </figure>
           </li>
           <li>
             <figure>
-              <a class="action action-download" href="${static.url('images/press-kit/6.002x_high-res.png')}">
+              <a rel="asset" class="action action-download" href="${static.url('images/press-kit/6.002x_high-res.png')}">
                 <img src="${static.url('images/press-kit/6.002x_x200.jpg')}"/>
                 <figcaption>Screenshot of 6.002x Circuits and Elecronics course.</figcaption>
-                <span class="note">High Resolution Photo</span>
+                <span class="note">Download (High Resolution Photo)</span>
               </a>
             </figure>
           </li>
           <li>
             <figure>
-              <a class="action action-download" href="${static.url('images/press-kit/3.091x_high-res.png')}">
+              <a rel="asset" class="action action-download" href="${static.url('images/press-kit/3.091x_high-res.png')}">
                 <img src="${static.url('images/press-kit/3.091x_x200.jpg')}"/>
           <figcaption>Screenshot of 6.00x: Introduction to Computer Science and Programming.</figcaption>
-                <span class="note">High Resolution Photo</span>
+                <span class="note">Download (High Resolution Photo)</span>
               </a>
             </figure>
           </li>
         </ul>
       </article>
     </section>
-
-    <!-- <section class="share">
-      <header>
-        <h2>Share with friends and family:</h2>
-      </header>
-
-      <article>
-        <ul class="listing listing-share">
-          <li class="action action-twitter">
-            <a href="">
-
-            </a>
-          </li>
-          <li class="action action-email">
-            <a href="">
-
-            </a>
-          </li>
-          <li class="action action-facebook">
-          </li>
-        </ul>
-      </article>
-    </section> -->
   </div>
 </section>
+
+<%block name="js_extra">
+   <script type="text/javascript">
+      $('a[rel="external"],a[rel="asset"]').click( function() {
+        window.open( $(this).attr('href') );
+        $(this).attr('title','This link will open a new browser window/tab')
+        return false;
+      });
+   </script>
+</%block>
