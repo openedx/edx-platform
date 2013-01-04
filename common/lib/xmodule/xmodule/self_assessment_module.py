@@ -93,15 +93,18 @@ class SelfAssessmentModule():
         </selfassessment>
         """
 
+        self.xml = xml
+        self.inputfields = inputfields
+        self.context = context
+        self.system = system
+
         # Load instance state
         if instance_state is not None:
             instance_state = json.loads(instance_state)
         else:
             instance_state = {}
 
-        instance_state = self.convert_state_to_current_format(instance_state)
-
-        # History is a list of tuples of (answer, score, hint), where hint may be
+        # History is a list of tuples of (answer, score, feedback), where hint may be
         # None for any element, and score and hint can be None for the last (current)
         # element.
         # Scores are on scale from 0 to max_score
