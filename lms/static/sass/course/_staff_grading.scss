@@ -80,7 +80,8 @@ div.peer-grading{
             }
         }
     }
-    .message-container
+    .message-container,
+    .grading-message
     {
         background-color: $yellow;
         padding: 10px;
@@ -98,6 +99,7 @@ div.peer-grading{
     .instructions-panel
     {
 
+        margin-right:20px;
         > div
         {
             padding: 10px;

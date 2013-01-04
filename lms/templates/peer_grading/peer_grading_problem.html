@@ -19,7 +19,6 @@
 <section class="container">
     <div class="peer-grading" data-ajax_url="${ajax_url}" data-location="${problem_location}">
         <div class="error-container"></div>
-        <div class="message-container"></div>
 
         <section class="content-panel">
         <h1>Peer Grading </h1>
@@ -87,9 +86,13 @@
         </div>
 
     </div>
+    <div class="grading-message">
+    </div>
 
     </section>
     </section>
+
+    <!-- Calibration feedback: Shown after a calibration is sent -->
     <section class="calibration-feedback">
     <h2>How did I do?</h2>
     <div class="calibration-feedback-wrapper">
@@ -97,6 +100,7 @@
         <input type="button" class="calibration-feedback-button" value="Continue" name="calibration-feedback-button" />
     </section>
 
+    <!-- Interstitial Page: Shown between calibration and grading steps -->
     <section class="interstitial-page">
         <h1>Congratulations!</h1>
         <p> You have now completed the calibration step. You are now ready to start grading.</p>

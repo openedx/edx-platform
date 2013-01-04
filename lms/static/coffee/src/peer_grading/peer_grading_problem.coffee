@@ -53,7 +53,11 @@ The standard chunk of Lorem Ipsum used since the 1500s is reproduced below for t
         success: true
         submission_id: 1
         submission_key: 'abcd'
-        student_response: 'I am a fake student response'
+        student_response: '''Lorem ipsum dolor sit amet, consectetur adipiscing elit. Sed nec tristique ante. Proin at mauris sapien, quis varius leo. Morbi laoreet leo nisi. Morbi aliquam lacus ante. Cras iaculis velit sed diam mattis a fermentum urna luctus. Duis consectetur nunc vitae felis facilisis eget vulputate risus viverra. Cras consectetur ullamcorper lobortis. Nam eu gravida lorem. Nulla facilisi. Nullam quis felis enim. Mauris orci lectus, dictum id cursus in, vulputate in massa.
+
+Phasellus non varius sem. Nullam commodo lacinia odio sit amet egestas. Donec ullamcorper sapien sagittis arcu volutpat placerat. Phasellus ut pretium ante. Nam dictum pulvinar nibh dapibus tristique. Sed at tellus mi, fringilla convallis justo. Lorem ipsum dolor sit amet, consectetur adipiscing elit. Phasellus tristique rutrum nulla sed eleifend. Praesent at nunc arcu. Mauris condimentum faucibus nibh, eget commodo quam viverra sed. Morbi in tincidunt dolor. Morbi sed augue et augue interdum fermentum.
+
+Curabitur tristique purus ac arcu consequat cursus. Cras diam felis, dignissim quis placerat at, aliquet ac metus. Mauris vulputate est eu nibh imperdiet varius. Cras aliquet rhoncus elit a laoreet. Mauris consectetur erat et erat scelerisque eu faucibus dolor consequat. Nam adipiscing sagittis nisl, eu mollis massa tempor ac. Nulla scelerisque tempus blandit. Phasellus ac ipsum eros, id posuere arcu. Nullam non sapien arcu. Vivamus sit amet lorem justo, ac tempus turpis. Suspendisse pharetra gravida imperdiet. Pellentesque lacinia mi eu elit luctus pellentesque. Sed accumsan libero a magna elementum varius. Nunc eget pellentesque metus. '''
         prompt: '''
             	<h2>S11E3: Metal Bands</h2>
 <p>Shown below are schematic band diagrams for two different metals. Both diagrams appear different, yet both of the elements are undisputably metallic in nature.</p>
@@ -101,6 +105,8 @@ class PeerGradingProblem
     @calibration_panel = $('.calibration-panel')
     @grading_panel = $('.grading-panel')
     @content_panel = $('.content-panel')
+    @grading_message = $('.grading-message')
+    @grading_message.hide()
 
     @grading_wrapper =$('.grading-wrapper')
     @calibration_feedback_panel = $('.calibration-feedback')
@@ -176,10 +182,12 @@ class PeerGradingProblem
   ##########
   calibration_check_callback: (response) =>
     if response.success
-      # check whether or not we're still calibrating
+      # if we haven't been calibrating before
        if response.calibrated and (@calibration == null or @calibration == false)
          @calibration = false
          @fetch_submission_essay()
+      # If we were calibrating before and no longer need to,
+      # show the interstitial page
        else if response.calibrated and @calibration == true
          @calibration = false
          @render_interstitial_page()
@@ -200,6 +208,8 @@ class PeerGradingProblem
   submission_callback: (response) =>
     if response.success
       @is_calibrated_check()
+      @grading_message.fadeIn()
+      @grading_message.html("<p>Grade sent successfully.</p>")
     else
       if response.error
         @render_error(response.error)
@@ -207,6 +217,7 @@ class PeerGradingProblem
         @render_error("Error occurred while submitting grade")
 
   graded_callback: (event) =>
+    @grading_message.hide()
     @score = event.target.value
     @show_submit_button()
 
@@ -217,6 +228,7 @@ class PeerGradingProblem
   #  Rendering methods and helpers
   #
   ##########
+  # renders a calibration essay
   render_calibration: (response) =>
     if response.success
 
@@ -227,13 +239,12 @@ class PeerGradingProblem
       @calibration_panel.addClass('current-state')
       @grading_panel.removeClass('current-state')
 
-      # clear out all of the existing text
+      # Display the right text
       @calibration_panel.find('.calibration-text').show()
       @grading_panel.find('.calibration-text').show()
       @calibration_panel.find('.grading-text').hide()
       @grading_panel.find('.grading-text').hide()
 
-      # TODO: add in new text
 
       @submit_button.unbind('click')
       @submit_button.click @submit_calibration_essay
@@ -243,9 +254,9 @@ class PeerGradingProblem
     else
       @render_error("An error occurred while retrieving the next calibration essay")
 
+  # Renders a student submission to be graded
   render_submission: (response) =>
     if response.success
-      #TODO: fill this in
       @submit_button.hide()
       @submission_container.html("<h3>Submitted Essay</h3>")
       @render_submission_data(response)
@@ -253,7 +264,7 @@ class PeerGradingProblem
       @calibration_panel.removeClass('current-state')
       @grading_panel.addClass('current-state')
 
-      # clear out all of the existing text
+      # Display the correct text
       @calibration_panel.find('.calibration-text').hide()
       @grading_panel.find('.calibration-text').hide()
       @calibration_panel.find('.grading-text').show()
@@ -276,12 +287,14 @@ class PeerGradingProblem
 
   render_submission_data: (response) =>
     @content_panel.show()
+
     @submission_container.append(@make_paragraphs(response.student_response))
     @prompt_container.html(response.prompt)
     @rubric_container.html(response.rubric)
     @submission_key_input.val(response.submission_key)
     @essay_id_input.val(response.submission_id)
     @setup_score_selection(response.max_score)
+
     @submit_button.hide()
     @action_button.hide()
     @calibration_feedback_panel.hide()
@@ -290,17 +303,21 @@ class PeerGradingProblem
   render_calibration_feedback: (response) =>
     # display correct grade
     #@grading_wrapper.hide()
-    @calibration_feedback_panel.show()
+    @calibration_feedback_panel.slideDown()
     calibration_wrapper = $('.calibration-feedback-wrapper')
     calibration_wrapper.html("<p>The score you gave was: #{@score}. The actual score is: #{response.actual_score}</p>")
+
+
     score = parseInt(@score)
     actual_score = parseInt(response.actual_score)
-    #TODO: maybe do another variation depending on whether or not students are close to correct
 
     if score == actual_score
-      calibration_wrapper.append("<p>Congratulations! Your score matches the actual one!</p>")
+      calibration_wrapper.append("<p>Congratulations! Your score matches the actual score!</p>")
     else
       calibration_wrapper.append("<p>Please try to understand the grading critera better so that you will be more accurate next time.</p>") 
+
+    # disable score selection and submission from the grading interface
+    $("input[name='score-selection']").attr('disabled', true)
     @submit_button.hide()
     
   render_interstitial_page: () =>
