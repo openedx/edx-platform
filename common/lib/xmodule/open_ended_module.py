@@ -200,7 +200,7 @@ class OpenEndedModule():
         event_info['problem_id'] = self.location.url()
         event_info['student_id'] = self.system.anonymous_student_id
         event_info['survey_responses']= get
-        
+
         survey_responses=event_info['survey_responses']
         for tag in ['feedback', 'submission_id', 'grader_id', 'score']:
             if tag not in survey_responses:
@@ -318,7 +318,7 @@ class OpenEndedModule():
 
         return cmap
 
-    def update_score(self, score_msg, oldcmap, queuekey):
+    def _update_score(self, score_msg, oldcmap, queuekey):
         log.debug(score_msg)
         score_msg = self._parse_score_msg(score_msg)
         if not score_msg.valid:
@@ -530,7 +530,6 @@ class OpenEndedModule():
             'problem_check': self.check_problem,
             'problem_reset': self.reset_problem,
             'problem_save': self.save_problem,
-            'problem_show': self.get_answer,
             'score_update': self.update_score,
             'message_post' : self.message_post,
             }
@@ -546,3 +545,60 @@ class OpenEndedModule():
             'progress_status': Progress.to_js_status_str(after),
             })
         return json.dumps(d, cls=ComplexEncoder)
+
+    def get_problem:
+        return {'html': self.get_problem_html(encapsulate=False)}
+
+    def check_problem:
+        pass
+
+    def reset_problem:
+        pass
+
+    def save_problem:
+        pass
+
+    def update_score:
+        """
+        Delivers grading response (e.g. from asynchronous code checking) to
+            the capa problem, so its score can be updated
+
+        'get' must have a field 'response' which is a string that contains the
+            grader's response
+
+        No ajax return is needed. Return empty dict.
+        """
+        queuekey = get['queuekey']
+        score_msg = get['xqueue_body']
+        #TODO: Remove need for cmap
+        self._update_score(score_msg, queuekey)
+
+        return dict()  # No AJAX return is needed
+
+    def get_html(self):
+        """
+        Implement special logic: handle queueing state, and default input.
+        """
+        # if no student input yet, then use the default input given by the problem
+        if not self.value:
+            self.value = self.xml.text
+
+        # Check if problem has been queued
+        self.queue_len = 0
+        # Flag indicating that the problem has been queued, 'msg' is length of queue
+        if self.status == 'incomplete':
+            self.status = 'queued'
+            self.queue_len = self.msg
+            self.msg = self.submitted_msg
+
+        context={'rows' : 30,
+                 'cols' : 80,
+                 'hidden' : '',
+                 }
+
+        html=self.system.render_template("openendedinput.html", context)
+
+    def _extra_context(self):
+        """Defined queue_len, add it """
+        return {'queue_len': self.queue_len,}
+
