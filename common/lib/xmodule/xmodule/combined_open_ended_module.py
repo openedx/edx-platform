@@ -101,7 +101,6 @@ class CombinedOpenEndedModule(XModule):
         if self.state in [self.ASSESSING, self.DONE]:
             current_task_state=self.task_states[len(self.task_states)-1]
 
-
         self.current_task_xml=self.task_xml[self.current_task_number]
         current_task_type=self.get_tag_name(self.current_task_xml)
         if current_task_type=="selfassessment":
@@ -119,7 +118,14 @@ class CombinedOpenEndedModule(XModule):
                 self.task_states.append(self.current_task.get_instance_state())
                 self.state=self.ASSESSING
             else:
+                if self.current_task_number>0:
+                    last_response, last_score=self.get_last_response(self.current_task_number-1)
+                    loaded_task_state=json.loads(current_task_state)
+                    loaded_task_state['state']=self.ASSESSING
+                    loaded_task_state['created'] = "True"
+                    loaded_task_state['history'].append({'answer' : last_response})
                 self.current_task=self_assessment_module.SelfAssessmentModule(self.system, self.location, self.current_task_parsed_xml, self.current_task_descriptor, instance_state=current_task_state)
+
         elif current_task_type=="openended":
             self.current_task_descriptor= open_ended_module.OpenEndedDescriptor(self.system)
             self.current_task_parsed_xml=self.current_task_descriptor.definition_from_xml(etree.fromstring(self.current_task_xml),self.system)
@@ -131,14 +137,19 @@ class CombinedOpenEndedModule(XModule):
                 last_response, last_score=self.get_last_response(self.current_task_number-1)
                 current_task_state = ('{"state": "assessing", "version": 1, "max_score": ' + str(self._max_score) + ', ' +
                                       '"attempts": 0, "created": "True", "history": [{"answer": "' + str(last_response) + '"}]}')
-                log.debug(current_task_state)
                 self.current_task=open_ended_module.OpenEndedModule(self.system, self.location, self.current_task_parsed_xml, self.current_task_descriptor, instance_state=current_task_state)
                 self.task_states.append(self.current_task.get_instance_state())
                 self.state=self.ASSESSING
             else:
+                if self.current_task_number>0:
+                    last_response, last_score=self.get_last_response(self.current_task_number-1)
+                    loaded_task_state=json.loads(current_task_state)
+                    loaded_task_state['state']=self.ASSESSING
+                    loaded_task_state['created'] = "True"
+                    loaded_task_state['history'].append({'answer' : last_response})
                 self.current_task=open_ended_module.OpenEndedModule(self.system, self.location, self.current_task_parsed_xml, self.current_task_descriptor, instance_state=current_task_state)
 
-
+        log.debug(self.current_task.get_instance_state())
         return True
 
     def get_html(self):
@@ -231,7 +242,7 @@ class CombinedOpenEndedModule(XModule):
         return json.dumps(d,cls=ComplexEncoder)
 
     def next_problem(self, get):
-        self.setup_next_task()
+        self.update_task_states()
         return {'success' : True}
 
     def reset(self, get):
