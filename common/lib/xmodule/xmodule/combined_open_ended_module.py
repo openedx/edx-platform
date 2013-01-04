@@ -120,7 +120,7 @@ class CombinedOpenEndedModule(XModule):
         }
         return children
 
-    def setup_next_task(self):
+    def setup_next_task(self, reset=False):
         current_task_state=None
         if len(self.task_states)>self.current_task_number:
             current_task_state=self.task_states[self.current_task_number]
@@ -144,7 +144,7 @@ class CombinedOpenEndedModule(XModule):
             self.task_states.append(self.current_task.get_instance_state())
             self.state=self.ASSESSING
         else:
-            if self.current_task_number>0:
+            if self.current_task_number>0 and not reset:
                 current_task_state=self.overwrite_state(current_task_state)
             self.current_task=children['modules'][current_task_type](self.system, self.location, self.current_task_parsed_xml, self.current_task_descriptor, instance_state=current_task_state)
 
@@ -257,7 +257,7 @@ class CombinedOpenEndedModule(XModule):
         self.state=self.INITIAL
         for i in xrange(0,len(self.task_xml)):
             self.current_task_number=i
-            self.setup_next_task()
+            self.setup_next_task(reset=True)
             self.current_task.reset(self.system)
         self.current_task_number=0
         self.setup_next_task()
