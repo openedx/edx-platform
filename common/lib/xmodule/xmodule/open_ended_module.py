@@ -263,13 +263,11 @@ class OpenEndedModule():
         # Generate header
         queuekey = xqueue_interface.make_hashkey(str(system.seed) + qtime +
                                                  anonymous_student_id +
-                                                 1)
+                                                 str(len(self.history)))
 
         xheader = xqueue_interface.make_xheader(lms_callback_url=system.xqueue['callback_url'],
             lms_key=queuekey,
             queue_name=self.queue_name)
-
-        self.context.update({'submission': submission})
 
         contents = self.payload.copy()
 
@@ -657,13 +655,21 @@ class OpenEndedModule():
         """
         return self._max_score
 
+    def get_score_value(self):
+        """
+        Returns the last score in the list
+        """
+        score = self.latest_score()
+        return {'score': score if score is not None else 0,
+                'total': self._max_score}
+
     def get_progress(self):
         '''
         For now, just return last score / max_score
         '''
         if self._max_score > 0:
             try:
-                return Progress(self.get_score()['score'], self._max_score)
+                return Progress(self.get_score_value()['score'], self._max_score)
             except Exception as err:
                 log.exception("Got bad progress")
                 return None
