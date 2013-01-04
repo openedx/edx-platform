@@ -23,6 +23,7 @@ define(['logme'], function (logme) {
         );
 
         state.baseImageEl = $('<img />');
+
         state.baseImageEl.attr(
             'src',
             state.config.imageDir + '/' + state.config.base_image
@@ -35,6 +36,19 @@ define(['logme'], function (logme) {
             baseImageElContainer.appendTo(state.containerEl);
 
             state.baseImageLoaded = true;
+        });
+        state.baseImageEl.error(function () {
+            logme(
+                'ERROR: Image "' + state.config.imageDir + '/' +
+                state.config.base_image + '" was not found!'
+            );
+            baseImageElContainer.html(
+                '<span style="color: red;">' +
+                    'ERROR: Image "' + state.config.imageDir + '/' +
+                    state.config.base_image + '" was not found!' +
+                '</span>'
+            );
+            baseImageElContainer.appendTo(state.containerEl);
         });
     }
 });
