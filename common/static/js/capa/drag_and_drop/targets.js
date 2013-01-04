@@ -43,6 +43,10 @@ define(['logme'], function (logme) {
 
             targetEl.appendTo(state.baseImageEl.parent());
 
+            targetEl.mousedown(function (event) {
+                event.preventDefault();
+            });
+
             state.targets.push({
                 'id': obj.id,
 

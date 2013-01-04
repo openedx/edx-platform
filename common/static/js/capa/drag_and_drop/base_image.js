@@ -35,6 +35,10 @@ define(['logme'], function (logme) {
             state.baseImageEl.appendTo(baseImageElContainer);
             baseImageElContainer.appendTo(state.containerEl);
 
+            state.baseImageEl.mousedown(function (event) {
+                event.preventDefault();
+            });
+
             state.baseImageLoaded = true;
         });
         state.baseImageEl.error(function () {

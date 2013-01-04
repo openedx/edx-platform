@@ -113,6 +113,10 @@ define(['logme'], function (logme) {
         );
         state.sliderEl.appendTo(showEl);
 
+        state.sliderEl.mousedown(function (event) {
+            event.preventDefault();
+        });
+
         moveRightEl = $(
             '<div ' +
                 'style=" ' +
