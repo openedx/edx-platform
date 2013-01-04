@@ -485,7 +485,7 @@ class OpenEndedModule():
             'problem_reset': self.reset_problem,
             'save_answer': self.save_answer,
             'score_update': self.update_score,
-            'message_post' : self.message_post,
+            'save_post_assessment' : self.message_post,
             }
 
         if dispatch not in handlers:
@@ -624,6 +624,7 @@ class OpenEndedModule():
             'hidden' : '',
             'id' : 'open_ended',
             'msg' : self.latest_feedback(),
+            'child_type' : 'openended',
             }
 
         html = system.render_template('open_ended.html', context)

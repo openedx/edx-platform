@@ -235,6 +235,7 @@ class SelfAssessmentModule():
             'initial_message': self.get_message_html(),
             'state': self.state,
             'allow_reset': self._allow_reset(),
+            'child_type' : 'selfassessment',
         }
 
         html = system.render_template('self_assessment_prompt.html', context)
@@ -281,7 +282,7 @@ class SelfAssessmentModule():
         handlers = {
             'save_answer': self.save_answer,
             'save_assessment': self.save_assessment,
-            'save_hint': self.save_hint,
+            'save_post_assessment': self.save_hint,
             'reset': self.reset,
         }
 

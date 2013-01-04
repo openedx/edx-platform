@@ -1,4 +1,4 @@
-<section id="openended_${id}" class="open-ended-child" data-state="${state}">
+<section id="openended_${id}" class="open-ended-child" data-state="${state}" data-child-type="${child_type}">
 
    <div class="error"></div>
    <div class="prompt">
@@ -35,7 +35,7 @@
     % endif
   <div class="external-grader-message">
       ${msg|n}
-    % if state == 'done':
+    % if state == 'post_assessment':
     <div class="collapsible evaluation-response">
       <header>
       <a href="#">Respond to Feedback</a>
@@ -53,9 +53,6 @@
         </div>
         <p>Additional comments:</p>
         <textarea rows="${rows}" cols="${cols}" name="feedback_${id}" class="feedback-on-feedback" id="feedback_${id}"></textarea>
-        <div class="submit-message-container">
-            <input name="submit-message" class="submit-message" type="button" value="Submit your message"/>
-        </div>
     </section>
     </div>
     % endif

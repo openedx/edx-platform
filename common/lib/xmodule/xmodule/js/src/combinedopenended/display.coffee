@@ -25,6 +25,7 @@ class @CombinedOpenEnded
     @message_wrapper = @$('.message-wrapper')
     @submit_button = @$('.submit-button')
     @child_state = @el.data('state')
+    @child_type = @el.data('child-type')
 
     @open_ended_child= @$('.open-ended-child')
 
@@ -54,7 +55,7 @@ class @CombinedOpenEnded
       @submit_button.click @save_assessment
     else if @child_state == 'post_assessment'
       @answer_area.attr("disabled", true)
-      @submit_button.prop('value', 'Submit hint')
+      @submit_button.prop('value', 'Submit post-assessment')
       @submit_button.click @save_hint
     else if @child_state == 'done'
       @answer_area.attr("disabled", true)
@@ -74,7 +75,8 @@ class @CombinedOpenEnded
     @assessment = @$('select.assessment')
 
   find_hint_elements: ->
-    @hint_area = @$('textarea.hint')
+    @hint_area = @$('textarea.post_assessment')
+    @hint_box = @$('')
 
   save_answer: (event) =>
     event.preventDefault()
@@ -118,7 +120,7 @@ class @CombinedOpenEnded
     if @child_state == 'post_assessment'
       data = {'hint' : @hint_area.val()}
 
-      $.postWithPrefix "#{@ajax_url}/save_hint", data, (response) =>
+      $.postWithPrefix "#{@ajax_url}/save_post_assessment", data, (response) =>
         if response.success
           @message_wrapper.html(response.message_html)
           @child_state = 'done'
@@ -165,3 +167,32 @@ class @CombinedOpenEnded
           @errors_area.html(response.error)
     else
       @errors_area.html('Problem state got out of sync.  Try reloading the page.')
+
+  message_post: =>
+    Logger.log 'message_post', @answers
+
+    fd = new FormData()
+    feedback = @$('section.evaluation textarea.feedback-on-feedback')[0].value
+    submission_id = $('div.external-grader-message div.submission_id')[0].innerHTML
+    grader_id = $('div.external-grader-message div.grader_id')[0].innerHTML
+    score = $(".evaluation-scoring input:radio[name='evaluation-score']:checked").val()
+    fd.append('feedback', feedback)
+    fd.append('submission_id', submission_id)
+    fd.append('grader_id', grader_id)
+    if(!score)
+      @gentle_alert "You need to pick a rating before you can submit."
+      return
+    else
+      fd.append('score', score)
+
+
+    settings =
+      type: "POST"
+      data: fd
+      processData: false
+      contentType: false
+      success: (response) =>
+        @gentle_alert response.message
+        @$('section.evaluation').slideToggle()
+
+    $.ajaxWithPrefix("#{@url}/message_post", settings)
