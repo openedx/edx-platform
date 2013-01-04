@@ -623,7 +623,7 @@ class OpenEndedModule():
             'cols' : 80,
             'hidden' : '',
             'id' : 'open_ended',
-            'msg' : "",
+            'msg' : self.latest_feedback(),
             }
 
         html = system.render_template('open_ended.html', context)
