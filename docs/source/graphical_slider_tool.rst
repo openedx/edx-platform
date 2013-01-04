@@ -266,6 +266,12 @@ Optional parameters::
             with id set in 'el_id' attribute.
     el_id:  Id of html element, defined in 'render' section. Value of
             function will be rendered to content of this element.
+    disable_auto_return: By default, if JavaScript function string is written
+                         without a "return" statement, one will be prepended
+                         to it. Set to "true" to disable this functionality.
+                         This is done so that simple functions can be defined
+                         in an easy fashion (for example, "a", which will be
+                         translated into "return a").
 
 With ``output`` and ``el_id`` set together you can update html elements with
 function value, also function will not be plotted.

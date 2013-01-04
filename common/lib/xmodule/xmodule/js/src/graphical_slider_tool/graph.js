@@ -512,12 +512,13 @@ define('Graph', ['logme'], function (logme) {
                     obj['@label'],
                     obj['@point_size'],
                     obj['@fill_area'],
-                    obj['@bar']
+                    obj['@bar'],
+                    obj['@disable_auto_return']
                 );
             }
 
             function addFunction(funcString, color, line, dot, label,
-                                 pointSize, fillArea, bar) {
+                                 pointSize, fillArea, bar, disableAutoReturn) {
                 var newFunctionObject, func, paramNames;
 
                 // The main requirement is function string. Without it we can't
@@ -531,6 +532,30 @@ define('Graph', ['logme'], function (logme) {
                 // HTML entities is passed to the Function() constructor, it
                 // will break.
                 funcString = $('<div>').html(funcString).text();
+
+                // If the user did not specifically turn off this feature,
+                // check if the function string contains a 'return', and
+                // prepend a 'return ' to the string if one, or more, is not
+                // found.
+                if (
+                    (disableAutoReturn === undefined) ||
+                    (
+                        (typeof disableAutoReturn === 'string') &&
+                        (disableAutoReturn.toLowerCase() !== 'true')
+                    )
+                ) {
+                    if (funcString.search(/return/i) === -1) {
+                        funcString = 'return ' + funcString;
+                    }
+                } else {
+                    if (funcString.search(/return/i) === -1) {
+                        logme(
+                            'ERROR: You have specified a JavaScript ' +
+                            'function without a "return" statemnt. Your ' +
+                            'function will return "undefined" by default.'
+                        );
+                    }
+                }
 
                 // Some defaults. If no options are set for the graph, we will
                 // make sure that at least a line is drawn for a function.
