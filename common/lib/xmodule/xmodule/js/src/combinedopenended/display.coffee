@@ -7,6 +7,8 @@ class @CombinedOpenEnded
     @allow_reset = @el.data('allow_reset')
     @reset_button = @$('.reset-button')
     @reset_button.click @reset
+    @next_problem_button = @$('.next-step-button')
+    @next_problem_button.click @next_problem
     @combined_open_ended= @$('.combined-open-ended')
     # valid states: 'initial', 'assessing', 'post_assessment', 'done'
 
@@ -37,6 +39,7 @@ class @CombinedOpenEnded
     @submit_button.unbind('click')
     @submit_button.show()
     @reset_button.hide()
+    @next_problem_button.hide()
     @hint_area.attr('disabled', false)
     if @child_state == 'initial'
       @answer_area.attr("disabled", false)
@@ -54,10 +57,12 @@ class @CombinedOpenEnded
       @answer_area.attr("disabled", true)
       @hint_area.attr('disabled', true)
       @submit_button.hide()
-      if @allow_reset
-        @reset_button.show()
-      else
-        @reset_button.hide()
+      if !@state == 'done'
+        @next_problem_button.show()
+        if @allow_reset
+          @reset_button.show()
+        else
+          @reset_button.hide()
 
   find_assessment_elements: ->
     @assessment = @$('select.assessment')
