@@ -49,6 +49,7 @@ function initProblemEditors($editor, $prev) {
     'background': '#fff'
   }).hide();
 
+//    TODO: is this necessary??
   $(simpleEditor.getWrapperElement()).bind('click', setFocus);
   $preview = $prev.find('.problem');
 }

@@ -61,4 +61,86 @@
   }
 }
 
+.simple-editor-cheatsheet {
+  position: absolute;
+  top: 0;
+  left: 100%;
+  width: 0;
+  border-radius: 0 3px 3px 0;
+  @include linear-gradient(left, rgba(0, 0, 0, .1), rgba(0, 0, 0, 0) 15px);
+  background-color: #fff;
+  overflow: hidden;
+  @include transition(width .3s);
+
+  &.shown {
+    width: 300px;
+  }
+
+  .cheatsheet-wrapper {
+    width: 240px;
+    padding: 20px 30px;
+  }
+
+  h6 {
+    margin-bottom: 7px;
+    font-size: 15px;
+    font-weight: 700;
+  }
+
+  .row {
+    @include clearfix;
+    padding-bottom: 5px !important;
+    margin-bottom: 10px !important;
+    border-bottom: 1px solid #ddd !important;
+
+    &:last-child {
+      border-bottom: none !important;
+      margin-bottom: 0 !important;
+    }
+  }
+
+  .col {
+    float: left;
+
+    &.sample {
+      width: 60px;
+      margin-right: 30px;
+    }
+  }
+
+  pre {
+    font-size: 12px;
+    line-height: 18px;
+  }
+
+  code {
+    padding: 0;
+    background: none;
+  }
+}
+
+.tiny-link-dialog {
+  position: fixed;
+  top: 40px;
+  left: 50%;
+  z-index: 99999;
+  width: 600px;
+  margin-left: -300px;
+  background: #fff;
+
+  .close-button {
+    @include white-button;
+    position: absolute;
+    top: 0;
+    right: 15px;
+    width: 29px;
+    height: 29px;
+    padding: 0 !important;
+    border-radius: 17px !important;
+    line-height: 29px;
+    text-align: center;
+  }
+}
+
+
 
