@@ -221,7 +221,7 @@ class OpenEndedModule():
         anonymous_student_id = system.anonymous_student_id
         queuekey = xqueue_interface.make_hashkey(str(system.seed) + qtime +
                                                  anonymous_student_id +
-                                                 self.answer_id)
+                                                 str(len(self.history)))
 
         xheader = xqueue_interface.make_xheader(
             lms_callback_url=system.xqueue['callback_url'],
