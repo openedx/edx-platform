@@ -105,8 +105,6 @@ class OpenEndedModule():
         else:
             instance_state = {}
 
-        instance_state = self.convert_state_to_current_format(instance_state)
-
         # History is a list of tuples of (answer, score, hint), where hint may be
         # None for any element, and score and hint can be None for the last (current)
         # element.
@@ -122,7 +120,7 @@ class OpenEndedModule():
         # completion (doesn't matter if you self-assessed correct/incorrect).
         self._max_score = int(instance_state.get('max_score', MAX_SCORE))
 
-        oeparam = definition['openendedparam']
+        oeparam = definition['oeparam']
         prompt = definition['prompt']
         rubric = definition['rubric']
 

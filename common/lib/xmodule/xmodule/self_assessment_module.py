@@ -99,7 +99,9 @@ class SelfAssessmentModule():
         else:
             instance_state = {}
 
-        # History is a list of tuples of (answer, score, feedback), where hint may be
+        instance_state = self.convert_state_to_current_format(instance_state)
+
+        # History is a list of tuples of (answer, score, hint), where hint may be
         # None for any element, and score and hint can be None for the last (current)
         # element.
         # Scores are on scale from 0 to max_score
