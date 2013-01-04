@@ -107,6 +107,8 @@ class SelfAssessmentModule():
         # Scores are on scale from 0 to max_score
         self.history = instance_state.get('history', [])
 
+        self.created = instance_state.get('created', False)
+
         self.state = instance_state.get('state', 'initial')
 
         self.attempts = instance_state.get('attempts', 0)
@@ -489,6 +491,7 @@ class SelfAssessmentModule():
                  'state': self.state,
                  'max_score': self._max_score,
                  'attempts': self.attempts,
+                 'created' : self.created,
         }
         return json.dumps(state)
 

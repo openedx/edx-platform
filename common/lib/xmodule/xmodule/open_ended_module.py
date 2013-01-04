@@ -116,6 +116,14 @@ class OpenEndedModule():
 
         self.state = instance_state.get('state', 'initial')
 
+        self.created = instance_state.get('created', False)
+
+        if self.created and self.state == self.ASSESSING:
+            self.created=False
+            self.get_score(self.latest_answer(), system)
+
+        self.created=False
+
         self.attempts = instance_state.get('attempts', 0)
         self.max_attempts = int(instance_state.get('attempts', MAX_ATTEMPTS))
 
@@ -532,11 +540,7 @@ class OpenEndedModule():
             return self.out_of_sync_error(get)
 
         # add new history element with answer and empty score and hint.
-        if(len(self.history)>0):
-            if(len(self.history[-1].keys())>1):
-                self.new_history_entry(get['student_answer'])
-            else:
-                get['student_answer']=self.latest_answer()
+        self.new_history_entry(get['student_answer'])
         self.get_score(get['student_answer'], system)
         self.change_state(self.ASSESSING)
 
@@ -583,6 +587,7 @@ class OpenEndedModule():
             'state': self.state,
             'max_score': self._max_score,
             'attempts': self.attempts,
+            'created' : self.created,
             }
         return json.dumps(state)
 
