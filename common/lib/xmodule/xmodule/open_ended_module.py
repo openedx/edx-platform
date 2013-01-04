@@ -295,32 +295,17 @@ class OpenEndedModule():
     def _update_score(self, score_msg, oldcmap, queuekey):
         log.debug(score_msg)
         score_msg = self._parse_score_msg(score_msg)
-        if not score_msg.valid:
-            oldcmap.set(self.answer_id,
-                msg = 'Invalid grader reply. Please contact the course staff.')
+        if not score_msg['valid']:
+               score_msg['msg'] = 'Invalid grader reply. Please contact the course staff.'
             return oldcmap
 
         correctness = 'correct' if score_msg.correct else 'incorrect'
 
-        # TODO: Find out how this is used elsewhere, if any
-        self.context['correct'] = correctness
+        self._record_latest_score(score_msg['points'])
+        self._record_latest_feedback(score_msg['msg'])
+        self.state=self.POST_ASSESSMENT
 
-        # Replace 'oldcmap' with new grading results if queuekey matches.  If queuekey
-        # does not match, we keep waiting for the score_msg whose key actually matches
-        if oldcmap.is_right_queuekey(self.answer_id, queuekey):
-            # Sanity check on returned points
-            points = score_msg.points
-            if points < 0:
-                points = 0
-
-            # Queuestate is consumed, so reset it to None
-            oldcmap.set(self.answer_id, npoints=points, correctness=correctness,
-                msg = score_msg.msg.replace('&nbsp;', '&#160;'), queuestate=None)
-        else:
-            log.debug('OpenEndedResponse: queuekey {0} does not match for answer_id={1}.'.format(
-                queuekey, self.answer_id))
-
-        return oldcmap
+        return True
 
 
     def get_answers(self):
@@ -602,11 +587,11 @@ class OpenEndedModule():
             return None
         return self.history[-1].get('score')
 
-    def latest_hint(self):
+    def latest_feedback(self):
         """None if not available"""
         if not self.history:
             return None
-        return self.history[-1].get('hint')
+        return self.history[-1].get('feedback')
 
     def new_history_entry(self, answer):
         self.history.append({'answer': answer})
@@ -616,10 +601,10 @@ class OpenEndedModule():
         history element"""
         self.history[-1]['score'] = score
 
-    def record_latest_hint(self, hint):
+    def record_latest_feedback(self, feedback):
         """Assumes that state is right, so we're adding a score to the latest
         history element"""
-        self.history[-1]['hint'] = hint
+        self.history[-1]['feedback'] = feedback
 
     def _allow_reset(self):
         """Can the module be reset?"""
@@ -699,8 +684,7 @@ class OpenEndedDescriptor(XmlDescriptor, EditingDescriptor):
         {
         'rubric': 'some-html',
         'prompt': 'some-html',
-        'submitmessage': 'some-html'
-        'hintprompt': 'some-html'
+        'oeparam': 'some-html'
         }
         """
 
