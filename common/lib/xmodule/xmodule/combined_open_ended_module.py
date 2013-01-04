@@ -180,18 +180,13 @@ class CombinedOpenEndedModule(XModule):
         task_xml=self.task_xml[task_number]
         task_type=self.get_tag_name(task_xml)
 
-        if task_type=="selfassessment":
-            task_descriptor=self_assessment_module.SelfAssessmentDescriptor(self.system)
-            task_parsed_xml=task_descriptor.definition_from_xml(etree.fromstring(task_xml),self.system)
-            task=self_assessment_module.SelfAssessmentModule(self.system, self.location, task_parsed_xml, task_descriptor, instance_state=task_state)
-            last_response=task.latest_answer()
-            last_score = task.latest_score()
-        elif task_type=="openended":
-            task_descriptor=open_ended_module.OpenEndedDescriptor(self.system)
-            task_parsed_xml=task_descriptor.definition_from_xml(etree.fromstring(task_xml),self.system)
-            task=open_ended_module.OpenEndedModule(self.system, self.location, task_parsed_xml, task_descriptor, instance_state=task_state)
-            last_response=task.latest_answer()
-            last_score = task.latest_score()
+        children=self.child_modules()
+
+        task_descriptor=children['descriptors'][task_type](self.system)
+        task_parsed_xml=task_descriptor.definition_from_xml(etree.fromstring(task_xml),self.system)
+        task=children['modules'][task_type](self.system, self.location, task_parsed_xml, task_descriptor, instance_state=task_state)
+        last_response=task.latest_answer()
+        last_score = task.latest_score()
 
         return last_response, last_score
 
