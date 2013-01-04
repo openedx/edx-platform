@@ -283,7 +283,6 @@ class SelfAssessmentModule():
             'save_answer': self.save_answer,
             'save_assessment': self.save_assessment,
             'save_post_assessment': self.save_hint,
-            'reset': self.reset,
         }
 
         if dispatch not in handlers:

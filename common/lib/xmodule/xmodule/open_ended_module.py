@@ -484,7 +484,6 @@ class OpenEndedModule():
         log.debug(get)
         handlers = {
             'problem_get': self.get_problem,
-            'problem_reset': self.reset_problem,
             'save_answer': self.save_answer,
             'score_update': self.update_score,
             'save_post_assessment' : self.message_post,
@@ -508,6 +507,16 @@ class OpenEndedModule():
     def reset_problem(self, get, system):
         self.change_state(self.INITIAL)
         return {'success': True}
+
+    def out_of_sync_error(self, get, msg=''):
+        """
+        return dict out-of-sync error message, and also log.
+        """
+        log.warning("Assessment module state out sync. state: %r, get: %r. %s",
+            self.state, get, msg)
+        return {'success': False,
+                'error': 'The problem state got out-of-sync'}
+
 
     def save_answer(self, get, system):
         if self.attempts > self.max_attempts:
@@ -657,6 +666,16 @@ class OpenEndedModule():
                 log.exception("Got bad progress")
                 return None
         return None
+
+    def reset(self, system):
+        """
+        If resetting is allowed, reset the state.
+
+        Returns {'success': bool, 'error': msg}
+        (error only present if not success)
+        """
+        self.change_state(self.INITIAL)
+        return {'success': True}
 
 
 class OpenEndedDescriptor(XmlDescriptor, EditingDescriptor):
