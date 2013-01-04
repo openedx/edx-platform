@@ -101,7 +101,6 @@ class CombinedOpenEndedModule(XModule):
         if self.state in [self.ASSESSING, self.DONE]:
             current_task_state=self.task_states[len(self.task_states)-1]
 
-        log.debug(self.task_states)
 
         self.current_task_xml=self.task_xml[self.current_task_number]
         current_task_type=self.get_tag_name(self.current_task_xml)
@@ -115,7 +114,7 @@ class CombinedOpenEndedModule(XModule):
             elif current_task_state is None and self.current_task_number>0:
                 last_response, last_score=self.get_last_response(self.current_task_number-1)
                 current_task_state = ('{"state": "assessing", "version": 1, "max_score": ' + str(self._max_score) + ', ' +
-                                      '"attempts": 0, "created": True, "history": [{"answer": "' + str(last_response) + '"}]}')
+                                      '"attempts": 0, "created": "True", "history": [{"answer": "' + str(last_response) + '"}]}')
                 self.current_task=self_assessment_module.SelfAssessmentModule(self.system, self.location, self.current_task_parsed_xml, self.current_task_descriptor, instance_state=current_task_state)
                 self.task_states.append(self.current_task.get_instance_state())
                 self.state=self.ASSESSING
@@ -131,7 +130,8 @@ class CombinedOpenEndedModule(XModule):
             elif current_task_state is None and self.current_task_number>0:
                 last_response, last_score=self.get_last_response(self.current_task_number-1)
                 current_task_state = ('{"state": "assessing", "version": 1, "max_score": ' + str(self._max_score) + ', ' +
-                                      '"attempts": 0, "created": True, "history": [{"answer": "' + str(last_response) + '"}]}')
+                                      '"attempts": 0, "created": "True", "history": [{"answer": "' + str(last_response) + '"}]}')
+                log.debug(current_task_state)
                 self.current_task=open_ended_module.OpenEndedModule(self.system, self.location, self.current_task_parsed_xml, self.current_task_descriptor, instance_state=current_task_state)
                 self.task_states.append(self.current_task.get_instance_state())
                 self.state=self.ASSESSING

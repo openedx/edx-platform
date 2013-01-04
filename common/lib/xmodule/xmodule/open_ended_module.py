@@ -104,6 +104,7 @@ class OpenEndedModule():
 
         # Load instance state
         if instance_state is not None:
+            log.debug(instance_state)
             instance_state = json.loads(instance_state)
         else:
             instance_state = {}
@@ -116,13 +117,7 @@ class OpenEndedModule():
 
         self.state = instance_state.get('state', 'initial')
 
-        self.created = instance_state.get('created', False)
-
-        if self.created and self.state == self.ASSESSING:
-            self.created=False
-            self.get_score(self.latest_answer(), system)
-
-        self.created=False
+        self.created = instance_state.get('created', "False")
 
         self.attempts = instance_state.get('attempts', 0)
         self.max_attempts = int(instance_state.get('attempts', MAX_ATTEMPTS))
@@ -151,6 +146,11 @@ class OpenEndedModule():
             raise ValueError("No rubric found in problem xml.")
 
         self._parse(oeparam, prompt, rubric, system)
+
+        if self.created=="True" and self.state == self.ASSESSING:
+            self.created="False"
+            self.get_score(self.latest_answer(), system)
+            self.created="False"
 
     def _parse(self, oeparam, prompt, rubric, system):
         '''
@@ -303,7 +303,6 @@ class OpenEndedModule():
         return True
 
     def _update_score(self, score_msg, queuekey, system):
-        log.debug(score_msg)
         score_msg = self._parse_score_msg(score_msg, system)
         if not score_msg['valid']:
             score_msg['feedback'] = 'Invalid grader reply. Please contact the course staff.'
@@ -489,7 +488,6 @@ class OpenEndedModule():
           'progress' : 'none'/'in_progress'/'done',
           <other request-specific values here > }
         '''
-        log.debug(get)
         handlers = {
             'problem_get': self.get_problem,
             'save_answer': self.save_answer,
@@ -587,7 +585,7 @@ class OpenEndedModule():
             'state': self.state,
             'max_score': self._max_score,
             'attempts': self.attempts,
-            'created' : self.created,
+            'created' : "False",
             }
         return json.dumps(state)
 
