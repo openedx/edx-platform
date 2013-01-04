@@ -12,6 +12,7 @@ import sys
 from pkg_resources import resource_string
 
 from .capa_module import only_one, ComplexEncoder
+from common.lib.xmodule.xmodule import open_ended_module
 from .editing_module import EditingDescriptor
 from .html_checker import check_html
 from progress import Progress
@@ -20,7 +21,6 @@ from .x_module import XModule
 from .xml_module import XmlDescriptor
 from xmodule.modulestore import Location
 import self_assessment_module
-import open_ended_module
 
 log = logging.getLogger("mitx.courseware")
 
@@ -122,7 +122,7 @@ class CombinedOpenEndedModule(XModule):
             else:
                 self.current_task=self_assessment_module.SelfAssessmentModule(self.system, self.location, self.current_task_parsed_xml, self.current_task_descriptor, instance_state=current_task_state)
         elif current_task_type=="openended":
-            self.current_task_descriptor=open_ended_module.OpenEndedDescriptor(self.system)
+            self.current_task_descriptor= open_ended_module.OpenEndedDescriptor(self.system)
             self.current_task_parsed_xml=self.current_task_descriptor.definition_from_xml(etree.fromstring(self.current_task_xml),self.system)
             if current_task_state is None and self.current_task_number==0:
                 self.current_task=open_ended_module.OpenEndedModule(self.system, self.location, self.current_task_parsed_xml, self.current_task_descriptor)

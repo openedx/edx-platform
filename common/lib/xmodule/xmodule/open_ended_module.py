@@ -544,18 +544,17 @@ class OpenEndedModule():
             })
         return json.dumps(d, cls=ComplexEncoder)
 
-    def get_problem:
+    def get_problem(self, get):
         return self.get_html()
 
-    def reset_problem:
+    def reset_problem(self, get):
         self.change_state(self.INITIAL)
         return {'success': True}
 
-
-    def save_problem:
+    def save_problem(self, get):
         pass
 
-    def update_score:
+    def update_score(self, get):
         """
         Delivers grading response (e.g. from asynchronous code checking) to
             the capa problem, so its score can be updated
@@ -602,10 +601,10 @@ class OpenEndedModule():
         return html
 
     def change_state(self, new_state):
-            """
-            A centralized place for state changes--allows for hooks.  If the
-            current state matches the old state, don't run any hooks.
-            """
+        """
+        A centralized place for state changes--allows for hooks.  If the
+        current state matches the old state, don't run any hooks.
+        """
         if self.state == new_state:
             return
 
@@ -639,7 +638,7 @@ class OpenEndedDescriptor(XmlDescriptor, EditingDescriptor):
 
     stores_state = True
     has_score = True
-    template_dir_name = openended"
+    template_dir_name = "openended"
 
     js = {'coffee': [resource_string(__name__, 'js/src/html/edit.coffee')]}
     js_module_name = "HTMLEditingDescriptor"
