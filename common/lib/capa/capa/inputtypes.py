@@ -852,10 +852,6 @@ class DragAndDropInput(InputTypeBase):
         # image drag and drop onto
         to_js['base_image'] = Attribute('img').parse_from_xml(self.xml)
 
-        # problem subtype: targets or positions
-        to_js['use_targets'] = Attribute('targets',
-                                        default="True").parse_from_xml(self.xml)
-
         # outline places on image where to drag adn drop
         to_js['target_outline'] = Attribute('target_outline',
                                         default="False").parse_from_xml(self.xml)
