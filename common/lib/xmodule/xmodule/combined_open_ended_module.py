@@ -27,7 +27,7 @@ log = logging.getLogger("mitx.courseware")
 # Set the default number of max attempts.  Should be 1 for production
 # Set higher for debugging/testing
 # attempts specified in xml definition overrides this.
-MAX_ATTEMPTS = 1
+MAX_ATTEMPTS = 10000
 
 # Set maximum available number of points.
 # Overriden by max_score specified in xml.
@@ -149,6 +149,7 @@ class CombinedOpenEndedModule(XModule):
             self.current_task=children['modules'][current_task_type](self.system, self.location, self.current_task_parsed_xml, self.current_task_descriptor, instance_state=current_task_state)
 
         log.debug(self.current_task.get_instance_state())
+        log.debug(self.get_instance_state())
         return True
 
     def get_html(self):
@@ -192,15 +193,15 @@ class CombinedOpenEndedModule(XModule):
 
     def update_task_states(self):
         changed=False
-        self.task_states[len(self.task_states)-1] = self.current_task.get_instance_state()
-        current_task_state=json.loads(self.task_states[len(self.task_states)-1])
+        self.task_states[self.current_task_number] = self.current_task.get_instance_state()
+        current_task_state=json.loads(self.task_states[self.current_task_number])
         if current_task_state['state']==self.DONE:
             self.current_task_number+=1
-            if self.current_task_number==len(self.task_xml):
+            if self.current_task_number>=(len(self.task_xml)):
                 self.state=self.DONE
-                self.current_task_number=self.current_task_number-1
+                self.current_task_number=len(self.task_xml)-1
             else:
-                self.state=self.INTERMEDIATE_DONE
+                self.state=self.INITIAL
             changed=True
             self.setup_next_task()
         return changed
@@ -259,6 +260,7 @@ class CombinedOpenEndedModule(XModule):
             self.current_task_number=i
             self.setup_next_task(reset=True)
             self.current_task.reset(self.system)
+            self.task_states[self.current_task_number]=self.current_task.get_instance_state()
         self.current_task_number=0
         self.setup_next_task()
         return {'success': True}
