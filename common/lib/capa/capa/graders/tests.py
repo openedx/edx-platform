@@ -37,7 +37,7 @@ class Test_PositionsCompare(unittest.TestCase):
         self.assertEqual(PositionsCompare([3.5, 4.5]), PositionsCompare([5, 7]))
 
 
-class Test_DragAndDrop(unittest.TestCase):
+class Test_DragAndDrop_Grade(unittest.TestCase):
 
     def test_targets_true(self):
         user_input = '{"use_targets": true, "draggables": [{"1": "t1"}, \
@@ -134,28 +134,28 @@ class Test_DragAndDrop(unittest.TestCase):
         'targets': [
             's_left', 's_right', 's_sigma', 's_sigma_star', 'p_pi_1', 'p_pi_2'
         ],
-        'rule': 'anyof'
-    }, {
-        'draggables': ['7','8', '9', '10'],
-        'targets': ['p_left_1', 'p_left_2', 'p_right_1','p_right_2'],
-        'rule': 'anyof'
-    }, {
-        'draggables': ['11', '12'],
-        'targets': ['s_sigma_name', 'p_sigma_name'],
-        'rule': 'anyof'
-    }, {
-        'draggables': ['13', '14'],
-        'targets': ['s_sigma_star_name', 'p_sigma_star_name'],
-        'rule': 'anyof'
-    }, {
-        'draggables': ['15'],
-        'targets': ['p_pi_name'],
-        'rule': 'anyof'
-    }, {
-        'draggables': ['16'],
-        'targets': ['p_pi_star_name'],
-        'rule': 'anyof'
-    }]
+            'rule': 'anyof'
+        }, {
+            'draggables': ['7', '8', '9', '10'],
+            'targets': ['p_left_1', 'p_left_2', 'p_right_1','p_right_2'],
+            'rule': 'anyof'
+        }, {
+            'draggables': ['11', '12'],
+            'targets': ['s_sigma_name', 'p_sigma_name'],
+            'rule': 'anyof'
+        }, {
+            'draggables': ['13', '14'],
+            'targets': ['s_sigma_star_name', 'p_sigma_star_name'],
+            'rule': 'anyof'
+        }, {
+            'draggables': ['15'],
+            'targets': ['p_pi_name'],
+            'rule': 'anyof'
+        }, {
+            'draggables': ['16'],
+            'targets': ['p_pi_star_name'],
+            'rule': 'anyof'
+        }]
 
         self.assertTrue(draganddrop.grade(user_input, correct_answer))
 
@@ -172,41 +172,64 @@ class Test_DragAndDrop(unittest.TestCase):
         'draggables': ['1', '2', '3', '4', '5', '6'],
         'targets': [
             's_left', 's_right', 's_sigma', 's_sigma_star', 'p_pi_1', 'p_pi_2'
-        ],
-        'rule': 'anyof'
-    }, {
-        'draggables': ['7','8', '9', '10'],
-        'targets': ['p_left_1', 'p_left_2', 'p_right_1','p_right_2'],
-        'rule': 'anyof'
-    }, {
-        'draggables': ['11', '12'],
-        'targets': ['s_sigma_name', 'p_sigma_name'],
-        'rule': 'anyof'
-    }, {
-        'draggables': ['13', '14'],
-        'targets': ['s_sigma_star_name', 'p_sigma_star_name'],
-        'rule': 'anyof'
-    }, {
-        'draggables': ['15'],
-        'targets': ['p_pi_name'],
-        'rule': 'anyof'
-    }, {
-        'draggables': ['16'],
-        'targets': ['p_pi_star_name'],
-        'rule': 'anyof'
-    }]
+            ],
+            'rule': 'anyof'
+        }, {
+            'draggables': ['7', '8', '9', '10'],
+            'targets': ['p_left_1', 'p_left_2', 'p_right_1','p_right_2'],
+            'rule': 'anyof'
+        }, {
+            'draggables': ['11', '12'],
+            'targets': ['s_sigma_name', 'p_sigma_name'],
+            'rule': 'anyof'
+        }, {
+            'draggables': ['13', '14'],
+            'targets': ['s_sigma_star_name', 'p_sigma_star_name'],
+            'rule': 'anyof'
+        }, {
+            'draggables': ['15'],
+            'targets': ['p_pi_name'],
+            'rule': 'anyof'
+        }, {
+            'draggables': ['16'],
+            'targets': ['p_pi_star_name'],
+            'rule': 'anyof'
+        }]
 
         self.assertFalse(draganddrop.grade(user_input, correct_answer))
 
 
+class Test_DragAndDrop_Populate(unittest.TestCase):
         #test for every function in DND
 
-        # test for different denied-allowed positions inised
-        # different groups
+    def test1(self):
+            self.assertTrue(1)
+
+
+class Test_DraAndDrop_Compare_Positions(unittest.TestCase):
+
+    def test_exact_1(self):
+        self.assertTrue(1)
+
+    def test_exact_2(self):
+        self.assertTrue(1)
+
+    def test_anyof_1(self):
+        self.assertTrue(1)
+
+    def test_anyof_2(self):
+        self.assertTrue(1)
+
+    def test_5(self):
+        self.assertTrue(1)
+
 
 def suite():
 
-    testcases = [Test_DragAndDrop]
+    testcases = [Test_PositionsCompare,
+                 Test_DragAndDrop_Populate,
+                 Test_DragAndDrop_Grade,
+                 Test_DraAndDrop_Compare_Positions]
     suites = []
     for testcase in testcases:
         suites.append(unittest.TestLoader().loadTestsFromTestCase(testcase))
