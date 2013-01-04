@@ -655,7 +655,7 @@ class OpenEndedDescriptor(XmlDescriptor, EditingDescriptor):
         }
         """
 
-        for child in ['rubric', 'prompt', 'oeparam']:
+        for child in ['openendedrubric', 'prompt', 'openendedparam']:
             if len(xml_object.xpath(child)) != 1:
                 raise ValueError("Open Ended definition must include exactly one '{0}' tag".format(child))
 
@@ -663,9 +663,9 @@ class OpenEndedDescriptor(XmlDescriptor, EditingDescriptor):
             """Assumes that xml_object has child k"""
             return stringify_children(xml_object.xpath(k)[0])
 
-        return {'rubric': parse('rubric'),
+        return {'rubric': parse('openendedrubric'),
                 'prompt': parse('prompt'),
-                'oeparam': parse('oeparam'),
+                'oeparam': parse('openendedparam'),
                 }
 
 
@@ -678,7 +678,7 @@ class OpenEndedDescriptor(XmlDescriptor, EditingDescriptor):
             child_node = etree.fromstring(child_str)
             elt.append(child_node)
 
-        for child in ['rubric', 'prompt', 'oeparam']:
+        for child in ['openendedrubric', 'prompt', 'openendedparam']:
             add_child(child)
 
         return elt
