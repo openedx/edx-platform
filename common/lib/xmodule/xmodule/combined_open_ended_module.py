@@ -98,8 +98,8 @@ class CombinedOpenEndedModule(XModule):
 
     def setup_next_task(self):
         current_task_state=None
-        if self.state in [self.ASSESSING, self.DONE]:
-            current_task_state=self.task_states[len(self.task_states)-1]
+        if len(self.task_states)>self.current_task_number:
+            current_task_state=self.task_states[self.current_task_number]
 
         self.current_task_xml=self.task_xml[self.current_task_number]
         current_task_type=self.get_tag_name(self.current_task_xml)
@@ -121,9 +121,11 @@ class CombinedOpenEndedModule(XModule):
                 if self.current_task_number>0:
                     last_response, last_score=self.get_last_response(self.current_task_number-1)
                     loaded_task_state=json.loads(current_task_state)
-                    loaded_task_state['state']=self.ASSESSING
-                    loaded_task_state['created'] = "True"
-                    loaded_task_state['history'].append({'answer' : last_response})
+                    if loaded_task_state['state']== self.INITIAL:
+                        loaded_task_state['state']=self.ASSESSING
+                        loaded_task_state['created'] = "True"
+                        loaded_task_state['history'].append({'answer' : last_response})
+                        current_task_state=json.dumps(loaded_task_state)
                 self.current_task=self_assessment_module.SelfAssessmentModule(self.system, self.location, self.current_task_parsed_xml, self.current_task_descriptor, instance_state=current_task_state)
 
         elif current_task_type=="openended":
@@ -144,9 +146,11 @@ class CombinedOpenEndedModule(XModule):
                 if self.current_task_number>0:
                     last_response, last_score=self.get_last_response(self.current_task_number-1)
                     loaded_task_state=json.loads(current_task_state)
-                    loaded_task_state['state']=self.ASSESSING
-                    loaded_task_state['created'] = "True"
-                    loaded_task_state['history'].append({'answer' : last_response})
+                    if loaded_task_state['state']== self.INITIAL:
+                        loaded_task_state['state']=self.ASSESSING
+                        loaded_task_state['created'] = "True"
+                        loaded_task_state['history'].append({'answer' : last_response})
+                        current_task_state=json.dumps(loaded_task_state)
                 self.current_task=open_ended_module.OpenEndedModule(self.system, self.location, self.current_task_parsed_xml, self.current_task_descriptor, instance_state=current_task_state)
 
         log.debug(self.current_task.get_instance_state())
