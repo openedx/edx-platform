@@ -64,10 +64,10 @@ class @CombinedOpenEnded
         @next_problem_button.show()
       else
         @next_problem_button.hide()
-        if @allow_reset
-          @reset_button.show()
-        else
-          @reset_button.hide()
+        #if @allow_reset
+        @reset_button.show()
+        #else
+        #  @reset_button.hide()
 
 
   find_assessment_elements: ->
@@ -132,8 +132,7 @@ class @CombinedOpenEnded
 
   reset: (event) =>
     event.preventDefault()
-    @errors_area.html('Problem state got out of sync.  Try reloading the page.')
-    if @state == 'done'
+    if @child_state == 'done'
       $.postWithPrefix "#{@ajax_url}/reset", {}, (response) =>
         if response.success
           @answer_area.val('')
@@ -151,7 +150,6 @@ class @CombinedOpenEnded
 
   next_problem: (event) =>
     event.preventDefault()
-    @errors_area.html('Problem state got out of sync.  Try reloading the page.')
     if @child_state == 'done'
       $.postWithPrefix "#{@ajax_url}/next_problem", {}, (response) =>
         if response.success
@@ -161,7 +159,7 @@ class @CombinedOpenEnded
           @message_wrapper.html('')
           @child_state = 'initial'
           @rebind()
-          @reset_button.hide()
+          @next_problem_button.hide()
           location.reload()
         else
           @errors_area.html(response.error)
