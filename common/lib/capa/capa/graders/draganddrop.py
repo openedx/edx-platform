@@ -27,7 +27,6 @@ values are (x,y) coordinates of centers of dragged images.
 """
 
 import json
-from collections import OrderedDict
 
 
 class PositionsCompare(list):
@@ -105,10 +104,10 @@ class DragAndDrop(object):
     """ Grader class for drag and drop inputtype.
     """
     def __init__(self):
-        self.correct_groups = OrderedDict()  # correct groups from xml
-        self.correct_positions = OrderedDict()  # correct positions for comparing
-        self.user_groups = OrderedDict()  # will be populated from user answer
-        self.user_positions = OrderedDict()  # will be populated from user answer
+        self.correct_groups = dict()  # correct groups from xml
+        self.correct_positions = dict()  # correct positions for comparing
+        self.user_groups = dict()  # will be populated from user answer
+        self.user_positions = dict()  # will be populated from user answer
 
     def grade(self):
         ''' Grader user answer.
