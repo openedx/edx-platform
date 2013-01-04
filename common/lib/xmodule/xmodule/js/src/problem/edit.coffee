@@ -19,6 +19,9 @@ class @MarkdownEditingDescriptor extends XModule.Descriptor
 
   onMarkdownEditorUpdate:  ->
     console.log('update')
+    @updateXML()
+
+  updateXML: ->
 
   changeEditor: (e) =>
     e.preventDefault();
@@ -26,25 +29,10 @@ class @MarkdownEditingDescriptor extends XModule.Descriptor
     $(e.currentTarget).addClass('current')
     if (@current_editor == @xml_editor)
       @setCurrentEditor(@markdown_editor)
+      #    onMarkdownEditorUpdate();
     else
       @setCurrentEditor(@xml_editor)
-
-
-#    switch($(this).attr('data-tab')) {
-#    case 'simple':
-#    currentEditor = simpleEditor;
-#    $(simpleEditor.getWrapperElement()).show();
-#    $(xmlEditor.getWrapperElement()).hide();
-#    $(simpleEditor).focus();
-#    onSimpleEditorUpdate();
-#    break;
-#    case 'xml':
-#    currentEditor = xmlEditor;
-#    $(simpleEditor.getWrapperElement()).hide();
-#    $(xmlEditor.getWrapperElement()).show();
-#    $(xmlEditor).focus();
-#    xmlEditor.refresh();
-#    break;
+      #    xmlEditor.refresh();
 
   setCurrentEditor: (editor) ->
     $(@current_editor.getWrapperElement()).hide()
