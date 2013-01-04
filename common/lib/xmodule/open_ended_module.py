@@ -527,7 +527,6 @@ class OpenEndedModule():
         '''
         handlers = {
             'problem_get': self.get_problem,
-            'problem_check': self.check_problem,
             'problem_reset': self.reset_problem,
             'problem_save': self.save_problem,
             'score_update': self.update_score,
@@ -547,13 +546,12 @@ class OpenEndedModule():
         return json.dumps(d, cls=ComplexEncoder)
 
     def get_problem:
-        return {'html': self.get_problem_html(encapsulate=False)}
-
-    def check_problem:
-        pass
+        return self.get_html()
 
     def reset_problem:
-        pass
+        self.change_state(self.INITIAL)
+        return {'success': True}
+
 
     def save_problem:
         pass
@@ -602,8 +600,92 @@ class OpenEndedModule():
                  }
 
         html=self.system.render_template("open_ended.html", context)
+        return html
 
-    def _extra_context(self):
-        """Defined queue_len, add it """
-        return {'queue_len': self.queue_len,}
+    def change_state(self, new_state):
+            """
+            A centralized place for state changes--allows for hooks.  If the
+            current state matches the old state, don't run any hooks.
+            """
+        if self.state == new_state:
+            return
+
+        self.state = new_state
+
+        if self.state == self.DONE:
+            self.attempts += 1
+
+    def get_instance_state(self):
+        """
+        Get the current score and state
+        """
+
+        state = {
+            'version': self.STATE_VERSION,
+            'history': self.history,
+            'state': self.state,
+            'max_score': self._max_score,
+            'attempts': self.attempts,
+            }
+        return json.dumps(state)
+
+
+class OpenEndedDescriptor(XmlDescriptor, EditingDescriptor):
+    """
+    Module for adding self assessment questions to courses
+    """
+    mako_template = "widgets/html-edit.html"
+    module_class = OpenEndedModule
+    filename_extension = "xml"
+
+    stores_state = True
+    has_score = True
+    template_dir_name = openended"
+
+    js = {'coffee': [resource_string(__name__, 'js/src/html/edit.coffee')]}
+    js_module_name = "HTMLEditingDescriptor"
+    expected_children = ['rubric', 'prompt', 'oeparam']
+
+    @classmethod
+    def definition_from_xml(cls, xml_object, system):
+        """
+        Pull out the rubric, prompt, and submitmessage into a dictionary.
+
+        Returns:
+        {
+        'rubric': 'some-html',
+        'prompt': 'some-html',
+        'submitmessage': 'some-html'
+        'hintprompt': 'some-html'
+        }
+        """
+
+        for child in self.expected_children:
+            if len(xml_object.xpath(child)) != 1:
+                raise ValueError("Open Ended definition must include exactly one '{0}' tag".format(child))
+
+        def parse(k):
+            """Assumes that xml_object has child k"""
+            return stringify_children(xml_object.xpath(k)[0])
+
+        return {'rubric': parse('rubric'),
+                'prompt': parse('prompt'),
+                'oeparam': parse('oeparam'),
+                }
+
+
+    def definition_to_xml(self, resource_fs):
+        '''Return an xml element representing this definition.'''
+        elt = etree.Element('openended')
+
+        def add_child(k):
+            child_str = '<{tag}>{body}</{tag}>'.format(tag=k, body=self.definition[k])
+            child_node = etree.fromstring(child_str)
+            elt.append(child_node)
+
+        for child in self.expected_children:
+            add_child(child)
+
+        return elt
+
 
