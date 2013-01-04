@@ -298,6 +298,51 @@ section.problem {
           float: left;
         }
       }
+
+    }
+    .evaluation {
+        p {
+            margin-bottom: 4px;
+        }
+    }
+
+
+    .feedback-on-feedback {
+        height: 100px;
+        margin-right: 20px;
+    }
+
+    .evaluation-response {
+        header {
+            text-align: right;
+            a {
+                font-size: .85em;
+            }
+        }
+    }
+
+    .evaluation-scoring {
+        .scoring-list {
+            list-style-type: none;
+            margin-left: 3px;
+
+            li {
+                &:first-child {
+                    margin-left: 0px;
+                }
+                display:inline;
+                margin-left: 50px;
+
+                label {
+                    font-size: .9em;
+                }
+
+            }
+        }
+
+    }
+    .submit-message-container {
+        margin: 10px 0px ;
     }
   }
 
@@ -635,6 +680,10 @@ section.problem {
       color: #2C2C2C;
       font-family: monospace;
       font-size: 1em;
+      padding-top: 10px;
+      header {
+          font-size: 1.4em;
+      }
 
       .shortform {
         font-weight: bold;

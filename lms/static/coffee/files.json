@@ -1,5 +1,6 @@
 {
   "js_files": [
+    "/static/js/vendor/RequireJS.js",
     "/static/js/vendor/jquery.min.js",
     "/static/js/vendor/jquery-ui.min.js",
     "/static/js/vendor/jquery.leanModal.min.js",

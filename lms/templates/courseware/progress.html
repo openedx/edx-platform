@@ -18,7 +18,7 @@
 <script type="text/javascript" src="${static.url('js/vendor/flot/jquery.flot.stack.js')}"></script>
 <script type="text/javascript" src="${static.url('js/vendor/flot/jquery.flot.symbol.js')}"></script>
 <script>
-${progress_graph.body(grade_summary, course.grade_cutoffs, "grade-detail-graph")}
+${progress_graph.body(grade_summary, course.grade_cutoffs, "grade-detail-graph", not course.metadata.get("no_grade", False), not course.metadata.get("no_grade", False))}
 </script>
 </%block>
 
