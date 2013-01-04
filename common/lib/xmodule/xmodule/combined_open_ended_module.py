@@ -201,11 +201,14 @@ class CombinedOpenEndedModule(XModule):
             return_html = self.current_task.handle_ajax(dispatch,get, self.system)
             return self.update_task_states_ajax(return_html)
 
-    def next_problem(self):
+        d = handlers[dispatch](get)
+        return json.dumps(d,cls=ComplexEncoder)
+
+    def next_problem(self, get):
         self.setup_next_task()
         return {'success' : True}
 
-    def reset(self):
+    def reset(self, get):
         """
         If resetting is allowed, reset the state.
 
@@ -221,13 +224,15 @@ class CombinedOpenEndedModule(XModule):
                 'error': 'Too many attempts.'
             }
         self.state=self.INITIAL
+        for i in xrange(0,len(self.task_xml)):
+            self.current_task_number=i
+            self.setup_next_task()
+            self.current_task.reset(self.system)
         self.current_task_number=0
-        self.setup_next_task()
-        self.current_task.reset(self.system)
         return {'success': True}
 
 
-def get_instance_state(self):
+    def get_instance_state(self):
         """
         Get the current score and state
         """
