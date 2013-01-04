@@ -457,7 +457,7 @@ class OpenEndedModule():
             correct:         Correctness of submission (Boolean)
             score:           Points to be assigned (numeric, can be float)
         """
-        fail = ScoreMessage(valid=False, correct=False, points=0, msg='')
+        fail = {'valid' : False, 'correct' : False, 'points' : 0, 'msg' : ''}
         try:
             score_result = json.loads(score_msg)
         except (TypeError, ValueError):
@@ -486,8 +486,7 @@ class OpenEndedModule():
         correct = (score_ratio >= 0.66)
 
         #Currently ignore msg and only return feedback (which takes the place of msg)
-        return ScoreMessage(valid=True, correct=correct,
-            points=score_result['score'], msg=feedback)
+        return {'valid' : True, 'correct' : correct, 'points' : score_result['score'], 'msg' : feedback}
 
     def handle_ajax(self, dispatch, get, system):
         '''
