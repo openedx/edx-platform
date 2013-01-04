@@ -250,8 +250,7 @@ class OpenEndedModule():
 
         return success, "Successfully submitted your feedback."
 
-        def get_score(self, student_answers):
-
+    def get_score(self, student_answers):
         try:
             submission = student_answers[self.answer_id]
         except KeyError:
