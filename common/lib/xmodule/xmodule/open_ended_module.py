@@ -298,8 +298,8 @@ class OpenEndedModule():
         if not score_msg['valid']:
             score_msg['feedback'] = 'Invalid grader reply. Please contact the course staff.'
 
-        self._record_latest_score(score_msg['score'])
-        self._record_latest_feedback(score_msg['feedback'])
+        self.record_latest_score(score_msg['score'])
+        self.record_latest_feedback(score_msg['feedback'])
         self.state=self.POST_ASSESSMENT
 
         return True
