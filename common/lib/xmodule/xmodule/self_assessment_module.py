@@ -58,7 +58,7 @@ class SelfAssessmentModule():
     # states
     INITIAL = 'initial'
     ASSESSING = 'assessing'
-    REQUEST_HINT = 'request_hint'
+    REQUEST_HINT = 'post_assessment'
     DONE = 'done'
 
     def __init__(self, system, location, definition, descriptor,

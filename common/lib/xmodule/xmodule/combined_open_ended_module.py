@@ -176,12 +176,35 @@ class CombinedOpenEndedModule(XModule):
     def update_task_states_ajax(self,return_html):
         changed=self.update_task_states()
         if changed:
-            return_html=self.get_html()
+            #return_html=self.get_html()
+            pass
         return return_html
 
     def handle_ajax(self, dispatch, get):
-        return_html = self.current_task.handle_ajax(dispatch,get, self.system)
-        return self.update_task_states_ajax(return_html)
+        """
+        This is called by courseware.module_render, to handle an AJAX call.
+        "get" is request.POST.
+
+        Returns a json dictionary:
+        { 'progress_changed' : True/False,
+        'progress': 'none'/'in_progress'/'done',
+        <other request-specific values here > }
+        """
+
+        handlers = {
+            'next_problem': self.next_problem,
+            'reset': self.reset,
+            }
+
+        if dispatch not in handlers:
+            return_html = self.current_task.handle_ajax(dispatch,get, self.system)
+            return self.update_task_states_ajax(return_html)
+
+    def next_problem(self):
+        pass
+
+    def reset(self):
+        pass
 
     def get_instance_state(self):
         """

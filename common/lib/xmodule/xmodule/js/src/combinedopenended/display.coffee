@@ -8,7 +8,7 @@ class @CombinedOpenEnded
     @reset_button = @$('.reset-button')
     @reset_button.click @reset
     @combined_open_ended= @$('.combined-open-ended')
-    # valid states: 'initial', 'assessing', 'request_hint', 'done'
+    # valid states: 'initial', 'assessing', 'post_assessment', 'done'
 
     # Where to put the rubric once we load it
     @el = $(element).find('section.open-ended-child')
@@ -46,7 +46,7 @@ class @CombinedOpenEnded
       @answer_area.attr("disabled", true)
       @submit_button.prop('value', 'Submit assessment')
       @submit_button.click @save_assessment
-    else if @child_state == 'request_hint'
+    else if @child_state == 'post_assessment'
       @answer_area.attr("disabled", true)
       @submit_button.prop('value', 'Submit hint')
       @submit_button.click @save_hint
@@ -88,7 +88,7 @@ class @CombinedOpenEnded
         if response.success
           @child_state = response.state
 
-          if @child_state == 'request_hint'
+          if @child_state == 'post_assessment'
             @hint_wrapper.html(response.hint_html)
             @find_hint_elements()
           else if @child_state == 'done'
@@ -104,7 +104,7 @@ class @CombinedOpenEnded
 
   save_hint:  (event) =>
     event.preventDefault()
-    if @child_state == 'request_hint'
+    if @child_state == 'post_assessment'
       data = {'hint' : @hint_area.val()}
 
       $.postWithPrefix "#{@ajax_url}/save_hint", data, (response) =>
@@ -124,6 +124,24 @@ class @CombinedOpenEnded
     @errors_area.html('Problem state got out of sync.  Try reloading the page.')
     if @child_state == 'done'
       $.postWithPrefix "#{@ajax_url}/reset", {}, (response) =>
+        if response.success
+          @answer_area.val('')
+          @rubric_wrapper.html('')
+          @hint_wrapper.html('')
+          @message_wrapper.html('')
+          @child_state = 'initial'
+          @rebind()
+          @reset_button.hide()
+        else
+          @errors_area.html(response.error)
+    else
+      @errors_area.html('Problem state got out of sync.  Try reloading the page.')
+
+  next_problem (event) =>
+    event.preventDefault()
+    @errors_area.html('Problem state got out of sync.  Try reloading the page.')
+    if @child_state == 'done'
+      $.postWithPrefix "#{@ajax_url}/next_problem", {}, (response) =>
         if response.success
           @answer_area.val('')
           @rubric_wrapper.html('')
