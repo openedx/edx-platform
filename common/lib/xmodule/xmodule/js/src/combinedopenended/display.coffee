@@ -57,8 +57,10 @@ class @CombinedOpenEnded
       @answer_area.attr("disabled", true)
       @hint_area.attr('disabled', true)
       @submit_button.hide()
-      if !@state == 'done'
+      if @state != 'done'
         @next_problem_button.show()
+      else
+        @next_problem_button.hide()
       if @state == 'done'
         if @allow_reset
           @reset_button.show()
@@ -138,6 +140,7 @@ class @CombinedOpenEnded
           @child_state = 'initial'
           @rebind()
           @reset_button.hide()
+          location.reload()
         else
           @errors_area.html(response.error)
     else
@@ -156,6 +159,7 @@ class @CombinedOpenEnded
           @child_state = 'initial'
           @rebind()
           @reset_button.hide()
+          location.reload()
         else
           @errors_area.html(response.error)
     else

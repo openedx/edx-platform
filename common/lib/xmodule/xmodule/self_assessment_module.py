@@ -466,14 +466,14 @@ class SelfAssessmentModule():
         Returns {'success': bool, 'error': msg}
         (error only present if not success)
         """
-        if self.state != self.DONE:
-            return self.out_of_sync_error(get)
+        #if self.state != self.DONE:
+        #    return self.out_of_sync_error(get)
 
-        if self.attempts > self.max_attempts:
-            return {
-                'success': False,
-                'error': 'Too many attempts.'
-            }
+        #if self.attempts > self.max_attempts:
+        #    return {
+        #        'success': False,
+        #        'error': 'Too many attempts.'
+        #    }
         self.change_state(self.INITIAL)
         return {'success': True}
 
