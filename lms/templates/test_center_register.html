@@ -68,17 +68,6 @@
       $("label").removeClass("is-focused");
     });
 
-    $(document).delegate('#testcenter_register_form', 'ajax:success', function(data, json, xhr) {
-      if(json.success) {
-        location.href="${reverse('dashboard')}";
-      } else {
-        if($('#testcenter_register_error').length == 0) {
-          $('#testcenter_register_form').prepend('<div id="testcenter_register_error" class="modal-form-error"></div>');
-        }
-        $('#testcenter_register_error').text(json.field_errors).stop().css("display", "block");
-      }
-    });
-
   })(this)
   </script>
 </%block>
@@ -262,9 +251,9 @@
             </li>
               % endif
             % else: 
-            <li class="field">
+            <li data-field="accommodation_request" class="field">
               <label for="accommodations">Accommodations Requested</label>
-              <textarea class="long" id="accommodations" name="accommodations" value="" placeholder=""></textarea>             
+              <textarea class="long" id="accommodations" name="accommodation_request" value="" placeholder=""></textarea>             
             </li>
             % endif
           </ol>
@@ -290,7 +279,7 @@
       <% regstatus = "Registration approved by Pearson" %>
     <div class="message message-status registration-accepted is-shown">
       <p class="registration-status"><span class="label">Registration Status: </span><span class="value">${regstatus}</span></p>
-      <p class="registration-number"><span class="label">Registration number: </span> <span class="value">edx00015879548</span></p>
+      <p class="registration-number"><span class="label">Registration number: </span> <span class="value">${registration.client_authorization_id}</span></p>
       <p class="message-copy">Write this down! You’ll need it to schedule your exam.</p>
       <a href="https://www1.pearsonvue.com/testtaker/signin/SignInPage/EDX" class="button exam-button">Schedule Pearson exam</a>
     </div>

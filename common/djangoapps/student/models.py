@@ -40,6 +40,7 @@ import hashlib
 import json
 import logging
 import uuid
+from random import randint
 
 
 from django.conf import settings
@@ -47,10 +48,12 @@ from django.contrib.auth.models import User
 from django.db import models
 from django.db.models.signals import post_save
 from django.dispatch import receiver
-from django.forms import ModelForm
+from django.forms import ModelForm, forms
 
 import comment_client as cc
 from django_comment_client.models import Role
+from feedparser import binascii
+import os
 
 
 log = logging.getLogger(__name__)
@@ -160,7 +163,7 @@ class TestCenterUser(models.Model):
     candidate_id = models.IntegerField(null=True, db_index=True)
 
     # Unique ID we assign our user for the Test Center.
-    client_candidate_id = models.CharField(max_length=50, db_index=True)
+    client_candidate_id = models.CharField(unique=True, max_length=50, db_index=True)
 
     # Name
     first_name = models.CharField(max_length=30, db_index=True)
@@ -191,10 +194,10 @@ class TestCenterUser(models.Model):
     fax_country_code = models.CharField(max_length=3, blank=True)
 
     # Company
-    company_name = models.CharField(max_length=50, blank=True)
+    company_name = models.CharField(max_length=50, blank=True, db_index=True)
 
     # Confirmation
-    upload_status = models.CharField(max_length=20, blank=True)  # 'Error' or 'Accepted'
+    upload_status = models.CharField(max_length=20, blank=True, db_index=True)  # 'Error' or 'Accepted'
     uploaded_at = models.DateTimeField(null=True, blank=True, db_index=True)
     upload_error_message = models.CharField(max_length=512, blank=True)
     
@@ -217,26 +220,21 @@ class TestCenterUser(models.Model):
             
         return False    
                               
-#    def update(self, dict):
-#        # leave user and client_candidate_id as before
-#        self.user_updated_at = datetime.now()
-#        for fieldname in TestCenterUser.user_provided_fields():
-#            self.__setattr__(fieldname, dict[fieldname])
-
-#    @staticmethod
-#    def create(user, dict):
-#        testcenter_user = TestCenterUser(user=user)
-#        testcenter_user.update(dict)
-#        # testcenter_user.candidate_id remains unset    
-#        # TODO: assign an ID of our own:
-#        testcenter_user.client_candidate_id = 'edx' + unique_id_for_user(user)  # some unique value  
+    @staticmethod
+    def _generate_candidate_id():
+        NUM_DIGITS = 12
+        return u"edX%0d" % randint(1, 10**NUM_DIGITS-1) # binascii.hexlify(os.urandom(8))
         
     @staticmethod
     def create(user):
         testcenter_user = TestCenterUser(user=user)
         # testcenter_user.candidate_id remains unset    
         # assign an ID of our own:
-        testcenter_user.client_candidate_id = 'edx' + unique_id_for_user(user)  # some unique value  
+        cand_id = TestCenterUser._generate_candidate_id()
+        while TestCenterUser.objects.filter(client_candidate_id=cand_id).exists():
+            cand_id = TestCenterUser._generate_candidate_id()
+        testcenter_user.client_candidate_id = cand_id  
+        return testcenter_user
 
 class TestCenterUserForm(ModelForm):
     class Meta:
@@ -250,6 +248,60 @@ class TestCenterUserForm(ModelForm):
         # create additional values here:
         new_user.user_updated_at = datetime.now()
         new_user.save()
+        
+    # add validation:
+    
+    @staticmethod
+    def can_encode_as_latin(fieldvalue):
+        try:
+            fieldvalue.encode('iso-8859-1')
+        except UnicodeEncodeError:
+            return False
+        return True
+    
+    def check_country_code(self, fieldname):
+        code = self.cleaned_data[fieldname]
+        if code and len(code) != 3:
+            raise forms.ValidationError(u'Must be three characters (ISO 3166-1):  e.g. USA, CAN, MNG')
+        return code
+        
+    def clean_country(self):
+        return self.check_country_code('country')
+        
+    def clean_phone_country_code(self):
+        return self.check_country_code('phone_country_code')
+
+    def clean_fax_country_code(self):
+        return self.check_country_code('fax_country_code')
+        
+    def clean(self):
+        cleaned_data = super(TestCenterUserForm, self).clean()
+        
+        # check for interactions between fields:
+        if 'country' in cleaned_data:
+            country = cleaned_data.get('country')
+            if country == 'USA' or country == 'CAN':
+                if 'state' in cleaned_data and len(cleaned_data['state']) == 0:
+                    self._errors['state'] = self.error_class([u'Required if country is USA or CAN.'])                
+                    del cleaned_data['state']
+
+                if 'postal_code' in cleaned_data and len(cleaned_data['postal_code']) == 0:
+                    self._errors['postal_code'] = self.error_class([u'Required if country is USA or CAN.'])                
+                    del cleaned_data['postal_code']
+                    
+        if 'fax' in cleaned_data and len(cleaned_data['fax']) > 0 and 'fax_country_code' in cleaned_data and len(cleaned_data['fax_country_code']) == 0:
+            self._errors['fax_country_code'] = self.error_class([u'Required if fax is specified.'])                
+            del cleaned_data['fax_country_code']
+
+        # check encoding for all fields:
+        cleaned_data_fields = [fieldname for fieldname in cleaned_data]
+        for fieldname in cleaned_data_fields:
+            if not TestCenterUserForm.can_encode_as_latin(cleaned_data[fieldname]):
+                self._errors[fieldname] = self.error_class([u'Must only use characters in Latin-1 encoding'])                
+                del cleaned_data[fieldname]
+
+        # Always return the full collection of cleaned data.
+        return cleaned_data
         
         
    
@@ -282,7 +334,7 @@ class TestCenterRegistration(models.Model):
     # to find an exam registration, we key off of the user and course_id.
     # If multiple exams per course are possible, we would also need to add the 
     # exam_series_code.
-    testcenter_user = models.ForeignKey(TestCenterUser, unique=True, default=None)
+    testcenter_user = models.ForeignKey(TestCenterUser, default=None)
     course_id = models.CharField(max_length=128, db_index=True)
     
     created_at = models.DateTimeField(auto_now_add=True, db_index=True)
@@ -295,7 +347,7 @@ class TestCenterRegistration(models.Model):
     user_updated_at = models.DateTimeField(db_index=True)
     # "client_authorization_id" is the client's unique identifier for the authorization.  
     # This must be present for an update or delete to be sent to Pearson.
-    #client_authorization_id = models.CharField(max_length=20, unique=True, db_index=True)
+    client_authorization_id = models.CharField(max_length=20, unique=True, db_index=True)
 
     # information about the test, from the course policy:
     exam_series_code = models.CharField(max_length=15, db_index=True)
@@ -311,7 +363,7 @@ class TestCenterRegistration(models.Model):
 
     # Confirmation
     upload_status = models.CharField(max_length=20, blank=True)  # 'Error' or 'Accepted'
-    uploaded_at = models.DateTimeField(null=True, blank=True, db_index=True)
+    uploaded_at = models.DateTimeField(null=True, db_index=True)
     upload_error_message = models.CharField(max_length=512, blank=True)
 
     @property
@@ -331,25 +383,26 @@ class TestCenterRegistration(models.Model):
         registration.eligibility_appointment_date_first = exam_info.get('First_Eligible_Appointment_Date')
         registration.eligibility_appointment_date_last = exam_info.get('Last_Eligible_Appointment_Date')
         # accommodation_code remains blank for now, along with Pearson confirmation
-        registration.user_updated_at = datetime.now()
-        #registration.client_authorization_id = registration._create_client_authorization_id()
+        registration.client_authorization_id = registration._create_client_authorization_id()
         return registration
+
+    @staticmethod
+    def _generate_authorization_id():
+        NUM_DIGITS = 12
+        return u"edX%0d" % randint(1, 10**NUM_DIGITS-1) # binascii.hexlify(os.urandom(8))
+    
     
     def _create_client_authorization_id(self):
         """
-        Return a unique id for a registration, suitable for inserting into
-        e.g. personalized survey links.
+        Return a unique id for a registration, suitable for using as an authorization code
+        for Pearson.  It must fit within 20 characters.
         """
-        # include the secret key as a salt, and to make the ids unique across
-        # different LMS installs.  Then add in (user, course, exam), which should 
-        # be unique.  
-        h = hashlib.md5()
-        h.update(settings.SECRET_KEY)
-        h.update(str(self.testcenter_user.user.id))
-        h.update(str(self.course_id))
-        h.update(str(self.exam_series_code))
-        return h.hexdigest()
-
+        # generate a random value, and check to see if it already is in use here
+        auth_id = TestCenterRegistration._generate_authorization_id()
+        while TestCenterRegistration.objects.filter(client_authorization_id=auth_id).exists():
+            auth_id = TestCenterRegistration._generate_authorization_id()
+        return auth_id
+            
     def is_accepted(self):
         return self.upload_status == 'Accepted'
   
@@ -362,7 +415,21 @@ class TestCenterRegistration(models.Model):
     def is_pending_acknowledgement(self):
         return self.upload_status == '' and not self.is_pending_accommodation()
 
+class TestCenterRegistrationForm(ModelForm):
+    class Meta:
+        model = TestCenterRegistration
+        fields = ( 'accommodation_request', )
+        
+    def update_and_save(self):
+        registration = self.save(commit=False)
+        # create additional values here:
+        registration.user_updated_at = datetime.now()
+        registration.save()
 
+    # TODO: add validation code for values added to accommodation_code field.
+    
+    
+    
 def get_testcenter_registrations_for_user_and_course(user, course_id, exam_series_code=None):
     try:
         tcu = TestCenterUser.objects.get(user=user)

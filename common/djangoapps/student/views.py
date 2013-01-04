@@ -18,18 +18,17 @@ from django.contrib.auth.models import User
 from django.contrib.auth.decorators import login_required
 from django.core.context_processors import csrf
 from django.core.mail import send_mail
-from django.core.urlresolvers import reverse
 from django.core.validators import validate_email, validate_slug, ValidationError
 from django.db import IntegrityError
-from django.http import HttpResponse, HttpResponseForbidden, Http404,\
-    HttpResponseRedirect
+from django.http import HttpResponse, HttpResponseForbidden, Http404
 from django.shortcuts import redirect
 from mitxmako.shortcuts import render_to_response, render_to_string
 from bs4 import BeautifulSoup
 from django.core.cache import cache
 
 from django_future.csrf import ensure_csrf_cookie, csrf_exempt
-from student.models import (Registration, UserProfile, TestCenterUser, TestCenterUserForm, TestCenterRegistration,
+from student.models import (Registration, UserProfile, TestCenterUser, TestCenterUserForm, 
+                            TestCenterRegistration, TestCenterRegistrationForm,
                             PendingNameChange, PendingEmailChange,
                             CourseEnrollment, unique_id_for_user,
                             get_testcenter_registrations_for_user_and_course)
@@ -248,8 +247,6 @@ def dashboard(request):
                'show_courseware_links_for' : show_courseware_links_for,
                'cert_statuses': cert_statuses,
                'news': top_news,
-# No longer needed here...move to begin_registration               
-#               'testcenteruser': testcenteruser,
                }
 
     return render_to_response('dashboard.html', context)
@@ -657,11 +654,12 @@ def create_test_registration(request, post_override=None):
         
     try:
         testcenter_user = TestCenterUser.objects.get(user=user)
+        needs_updating = testcenter_user.needs_update(post_vars)    
     except TestCenterUser.DoesNotExist:
         # do additional initialization here:
         testcenter_user = TestCenterUser.create(user)
+        needs_updating = True
 
-    needs_updating = testcenter_user.needs_update(post_vars)    
 
     # perform validation:
     if needs_updating:
@@ -692,20 +690,28 @@ def create_test_registration(request, post_override=None):
         # right now.
         
     else:
-        accommodation_request = post_vars.get('accommodations','')
+        accommodation_request = post_vars.get('accommodation_request','')
         registration = TestCenterRegistration.create(testcenter_user, course_id, exam_info, accommodation_request)
         needs_saving = True
 
-    # TODO: add validation of registration.  (Mainly whether an accommodation request is too long.)        
     if needs_saving:
-        registration.save()
-        
+        # do validation of registration.  (Mainly whether an accommodation request is too long.)        
+        form = TestCenterRegistrationForm(instance=registration, data=post_vars)
+        if form.is_valid():
+            form.update_and_save()
+        else:
+            response_data = {'success': False}
+            # return a list of errors...
+            response_data['field_errors'] = form.errors
+            response_data['non_field_errors'] = form.non_field_errors()
+            return HttpResponse(json.dumps(response_data), mimetype="application/json")
+         
 
     # only do the following if there is accommodation text to send,
     # and a destination to which to send it.
     # TODO: still need to create the accommodation email templates
-    if 'accommodations' in post_vars and settings.MITX_FEATURES.get('ACCOMMODATION_EMAIL'):
-        d = {'accommodations': post_vars['accommodations'] }
+    if 'accommodation_request' in post_vars and settings.MITX_FEATURES.get('ACCOMMODATION_EMAIL'):
+        d = {'accommodation_request': post_vars['accommodation_request'] }
         
         # composes accommodation email
         subject = render_to_string('emails/accommodation_email_subject.txt', d)
