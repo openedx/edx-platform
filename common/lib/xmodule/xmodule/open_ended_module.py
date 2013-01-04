@@ -154,6 +154,7 @@ class OpenEndedModule():
         # Note that OpenEndedResponse is agnostic to the specific contents of grader_payload
         prompt_string = stringify_children(prompt)
         rubric_string = stringify_children(rubric)
+        self.prompt=prompt_string
 
         grader_payload = oeparam.find('grader_payload')
         grader_payload = grader_payload.text if grader_payload is not None else ''
@@ -568,36 +569,6 @@ class OpenEndedModule():
 
         return dict()  # No AJAX return is needed
 
-    def get_html(self, system):
-        """
-        Implement special logic: handle queueing state, and default input.
-        """
-        # if no student input yet, then use the default input given by the problem
-        latest_answer=self.latest_answer()
-        if latest_answer is None:
-            value = self.initial_display
-
-        # Check if problem has been queued
-        self.queue_len = 0
-        # Flag indicating that the problem has been queued, 'msg' is length of queue
-        if self.state == self.ASSESSING:
-            #self.queue_len = self.msg
-            #self.msg = self.submitted_msg
-            pass
-
-        context={'rows' : 30,
-                 'cols' : 80,
-                 'hidden' : '',
-                 'id' : 'open_ended',
-                 'msg' : "This is a message",
-                 'state' : self.state,
-                 'queue_len' : self.queue_len,
-                 'value' : value,
-                 }
-
-        html=system.render_template("open_ended.html", context)
-        return html
-
     def change_state(self, new_state):
         """
         A centralized place for state changes--allows for hooks.  If the
@@ -655,6 +626,58 @@ class OpenEndedModule():
         """Assumes that state is right, so we're adding a score to the latest
         history element"""
         self.history[-1]['hint'] = hint
+
+    def _allow_reset(self):
+        """Can the module be reset?"""
+        return self.state == self.DONE and self.attempts < self.max_attempts
+
+    def get_html(self, system):
+        #set context variables and render template
+        if self.state != self.INITIAL:
+            latest = self.latest_answer()
+            previous_answer = latest if latest is not None else ''
+        else:
+            previous_answer = ''
+
+        context = {
+            'prompt': self.prompt,
+            'previous_answer': previous_answer,
+            'state': self.state,
+            'allow_reset': self._allow_reset(),
+            'rows' : 30,
+            'cols' : 80,
+            'hidden' : '',
+            'id' : 'open_ended',
+            }
+
+        html = system.render_template('open_ended.html', context)
+        return html
+
+    def max_score(self):
+        """
+        Return max_score
+        """
+        return self._max_score
+
+    def get_score(self):
+        """
+        Returns the last score in the list
+        """
+        score = self.latest_score()
+        return {'score': score if score is not None else 0,
+                'total': self._max_score}
+
+    def get_progress(self):
+        '''
+        For now, just return last score / max_score
+        '''
+        if self._max_score > 0:
+            try:
+                return Progress(self.get_score()['score'], self._max_score)
+            except Exception as err:
+                log.exception("Got bad progress")
+                return None
+        return None
 
 
 class OpenEndedDescriptor(XmlDescriptor, EditingDescriptor):
