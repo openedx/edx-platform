@@ -36,8 +36,8 @@ div.peer-grading{
         }
     }
 
-    .prompt-information-container,
-    .rubric-wrapper,
+    .prompt-container,
+    .rubric-container,
     .calibration-feedback-wrapper,
     .grading-container
     {
@@ -103,6 +103,11 @@ div.peer-grading{
             padding: 10px;
             margin: 0px;
             border: 1px solid black;
+            h3
+            {
+                text-align:center;
+                text-transform:uppercase;
+            }
         }
         .calibration-panel
         {

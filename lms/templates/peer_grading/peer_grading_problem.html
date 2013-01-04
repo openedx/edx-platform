@@ -43,23 +43,22 @@
             </div>
         </div>
 
-        <div class="prompt-wrapper collapsible">
-            <header>
-            <a href="javascript:void(0);">Show Problem Details</a>
-            </header>
-            <section>
-            <div class="prompt-information-container">
-            <h3>Question</h3>
+        <div class="prompt-wrapper">
+            <div class="prompt-information-container collapsible">
+                <header><a href="javascript:void(0)">View Question</a></header>
+                <section>
                 <div class="prompt-container">
                 </div>
+            </section>
             </div>
-            <div class="rubric-wrapper">
-            <h3>Grading Rubric</h3>
+            <div class="rubric-wrapper collapsible">
+                <header><a href="javascript:void(0)">View Rubric</a></header>
+                <section>
                 <div class="rubric-container">
                 </div>
+            </section>
             </div>
 
-        </section>
     </div>
 
 
@@ -96,6 +95,13 @@
     </div>
         <input type="button" class="calibration-feedback-button" value="Continue" name="calibration-feedback-button" />
     </section>
+
+    <section class="interstitial-page">
+        <h1>Congratulations!</h1>
+        <p> You have now completed calibration. You are now ready to start grading.</p>
+        <input type="button" class="interstitial-page-button" value="Start Grading!" name="interstitial-page-button" />
+    </section>
+
     <input type="button" value="Reload page" class="action-button" name="reload" />
     </div>
 </section>

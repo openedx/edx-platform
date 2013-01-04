@@ -2,6 +2,7 @@ class PeerGradingProblemBackend
   constructor: (ajax_url, mock_backend) ->
     @mock_backend = mock_backend
     @ajax_url = ajax_url
+    @mock_cnt = 0
 
   post: (cmd, data, callback) ->
     if @mock_backend
@@ -16,11 +17,12 @@ class PeerGradingProblemBackend
       # change to test each version
       response = 
         success: true 
-        calibrated: false
+        calibrated: @mock_cnt >= 2
     else if cmd == 'show_calibration_essay'
       #response = 
       #  success: false
       #  error: "There was an error"
+      @mock_cnt++
       response = 
         success: true
         submission_id: 1
@@ -58,7 +60,7 @@ The standard chunk of Lorem Ipsum used since the 1500s is reproduced below for t
     else if cmd == 'save_calibration_essay'
       response = 
         success: true
-        correct_score: 2
+        actual_score: 2
     else if cmd == 'save_grade'
       response = 
         success: true
@@ -89,6 +91,8 @@ class PeerGradingProblem
 
     @grading_wrapper =$('.grading-wrapper')
     @calibration_feedback_panel = $('.calibration-feedback')
+    @interstitial_page = $('.interstitial-page')
+    @interstitial_page.hide()
 
     @error_container = $('.error-container')
 
@@ -98,16 +102,22 @@ class PeerGradingProblem
 
     @score_selection_container = $('.score-selection-container')
     @score = null
+    @calibration = null
 
     @submit_button = $('.submit-button')
     @action_button = $('.action-button')
     @calibration_feedback_button = $('.calibration-feedback-button')
+    @interstitial_page_button = $('.interstitial-page-button')
 
     Collapsible.setCollapsibles(@content_panel)
     @action_button.click -> document.location.reload(true)
     @calibration_feedback_button.click => 
       @calibration_feedback_panel.hide()
       @grading_wrapper.show()
+      @is_calibrated_check()
+
+    @interstitial_page_button.click =>
+      @interstitial_page.hide()
       @is_calibrated_check()
 
     @is_calibrated_check()
@@ -154,12 +164,15 @@ class PeerGradingProblem
   calibration_check_callback: (response) =>
     if response.success
       # check whether or not we're still calibrating
-       if response.calibrated
-         @fetch_submission_essay()
+       if response.calibrated and (@calibration == null or @calibration == false)
          @calibration = false
+         @fetch_submission_essay()
+       else if response.calibrated and @calibration == true
+         @calibration = false
+         @render_interstitial_page()
        else
-         @fetch_calibration_essay()
          @calibration = true
+         @fetch_calibration_essay()
     else if response.error
       @render_error(response.error)
     else
@@ -262,20 +275,24 @@ class PeerGradingProblem
 
 
   render_calibration_feedback: (response) =>
-      # display correct grade
+    # display correct grade
     #@grading_wrapper.hide()
-      @calibration_feedback_panel.show()
-      calibration_wrapper = $('.calibration-feedback-wrapper')
-      calibration_wrapper.html("<p>The score you gave was: #{@score}. The correct score is: #{response.correct_score}</p>")
-      score = parseInt(@score)
-      correct_score = parseInt(response.correct_score)
+    @calibration_feedback_panel.show()
+    calibration_wrapper = $('.calibration-feedback-wrapper')
+    calibration_wrapper.html("<p>The score you gave was: #{@score}. The actual score is: #{response.actual_score}</p>")
+    score = parseInt(@score)
+    actual_score = parseInt(response.actual_score)
+    #TODO: maybe do another variation depending on whether or not students are close to correct
 
-      if score == correct_score
-        calibration_wrapper.append("<p>Congratulations! Your score matches the correct one!</p>")
-      else
-        calibration_wrapper.append("<p>Please try to understand the grading critera better so that you will be more accurate next time.</p>") 
+    if score == actual_score
+      calibration_wrapper.append("<p>Congratulations! Your score matches the actual one!</p>")
+    else
+      calibration_wrapper.append("<p>Please try to understand the grading critera better so that you will be more accurate next time.</p>") 
 
     
+  render_interstitial_page: () =>
+    @content_panel.hide()
+    @interstitial_page.show()
   render_error: (error_message) =>
       @error_container.show()
       @error_container.html(error_message)
