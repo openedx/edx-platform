@@ -512,6 +512,29 @@ input.courseware-unit-search-input {
 	}
 }
 
+.toggle-button-sections {
+	position: relative;
+	float: right;
+	margin-top: 10px;
+
+	font-size: 13px;
+	color: $darkGrey;
+
+	.ss-icon {
+		@include border-radius(20px);
+		position: relative;
+		top: -1px;
+		display: inline-block;
+		margin-right: 2px;
+		line-height: 5px;
+		font-size: 11px;
+	}
+
+	.label {
+		display: inline-block;
+	}
+}
+
 .new-section-name,
 .new-subsection-name-input {
 	width: 515px;

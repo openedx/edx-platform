@@ -42,6 +42,7 @@ $(document).ready(function() {
     $('.new-unit-item').bind('click', createNewUnit);
 
     $('.collapse-all-button').bind('click', collapseAll);
+    $('.toggle-button-sections').bind('click', toggleSections);
 
     // autosave when a field is updated on the subsection page
     $body.on('keyup', '.subsection-display-name-input, .unit-subtitle, .policy-list-value', checkForNewValue);
@@ -128,6 +129,19 @@ $(document).ready(function() {
 function collapseAll(e) {
     $('.branch').addClass('collapsed');
     $('.expand-collapse-icon').removeClass('collapse').addClass('expand');
+}
+
+function toggleSections(e) {
+  e.preventDefault();
+
+  $section = $('.courseware-section');
+  $button = $(this);
+  $labelCollapsed = $('<i class="ss-icon ss-symbolicons-block">up</i> <span class="label">Collapse All Sections</span>');
+  $labelExpanded = $('<i class="ss-icon ss-symbolicons-block">down</i> <span class="label">Expand All Sections</span>');
+
+  $section.toggleClass('collapsed');
+  var buttonLabel = $section.hasClass('collapsed') ? $labelExpanded : $labelCollapsed;
+  $button.toggleClass('is-activated').html(buttonLabel);
 }
 
 function editSectionPublishDate(e) {
