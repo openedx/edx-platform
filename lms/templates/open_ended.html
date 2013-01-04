@@ -1,9 +1,10 @@
 <section id="openended_${id}" class="open-ended-child" data-state="${state}">
+    ${prompt|n}
   <textarea rows="${rows}" cols="${cols}" name="input_${id}" class="short-form-response" id="input_${id}"
        % if hidden:
       	    style="display:none;"
        % endif
-  >${value|h}</textarea>
+  >${previous_answer|h}</textarea>
 
   <div class="grader-status">
     % if state == 'initial':
@@ -21,14 +22,16 @@
     % endif
   </div>
 
+  <input type="button" value="Submit" class="submit-button" name="show"/>
+    
   <span id="answer_${id}"></span>
 
-    % if status == 'queued':
+    % if state == 'assessing':
     <input name="reload" class="reload" type="button" value="Recheck for Feedback" onclick="document.location.reload(true);" />
     % endif
   <div class="external-grader-message">
       ${msg|n}
-    % if status in ['correct','incorrect']:
+    % if state == 'done':
     <div class="collapsible evaluation-response">
       <header>
       <a href="#">Respond to Feedback</a>

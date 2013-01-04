@@ -635,9 +635,9 @@ class OpenEndedModule():
         #set context variables and render template
         if self.state != self.INITIAL:
             latest = self.latest_answer()
-            previous_answer = latest if latest is not None else ''
+            previous_answer = latest if latest is not None else self.initial_display
         else:
-            previous_answer = ''
+            previous_answer = self.initial_display
 
         context = {
             'prompt': self.prompt,
@@ -648,6 +648,7 @@ class OpenEndedModule():
             'cols' : 80,
             'hidden' : '',
             'id' : 'open_ended',
+            'msg' : "",
             }
 
         html = system.render_template('open_ended.html', context)
