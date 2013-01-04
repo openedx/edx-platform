@@ -28,6 +28,7 @@ from .stringify import stringify_children
 from .x_module import XModule
 from .xml_module import XmlDescriptor
 from xmodule.modulestore import Location
+from capa.util import *
 
 log = logging.getLogger("mitx.courseware")
 
@@ -139,9 +140,9 @@ class OpenEndedModule():
         if rubric is None:
             raise ValueError("No rubric found in problem xml.")
 
-        self._parse(oeparam, prompt, rubric)
+        self._parse(oeparam, prompt, rubric, system)
 
-    def _parse(self, oeparam, prompt, rubric):
+    def _parse(self, oeparam, prompt, rubric, system):
         '''
         Parse OpenEndedResponse XML:
             self.initial_display
@@ -151,8 +152,8 @@ class OpenEndedModule():
             self.answer - What to display when show answer is clicked
         '''
         # Note that OpenEndedResponse is agnostic to the specific contents of grader_payload
-        prompt_string = self.stringify_children(prompt)
-        rubric_string = self.stringify_children(rubric)
+        prompt_string = stringify_children(prompt)
+        rubric_string = stringify_children(rubric)
 
         grader_payload = oeparam.find('grader_payload')
         grader_payload = grader_payload.text if grader_payload is not None else ''
@@ -170,8 +171,8 @@ class OpenEndedModule():
         self.answer = find_with_default(oeparam, 'answer_display', 'No answer given.')
 
         parsed_grader_payload.update({
-            'location' : self.system.location,
-            'course_id' : self.system.course_id,
+            'location' : system.location,
+            'course_id' : system.course_id,
             'prompt' : prompt_string,
             'rubric' : rubric_string,
             'initial_display' : self.initial_display,
@@ -186,15 +187,15 @@ class OpenEndedModule():
         except ValueError:
             self.max_score = 1
 
-    def handle_message_post(self,get):
+    def handle_message_post(self,get, system):
         """
         Handles a student message post (a reaction to the grade they received from an open ended grader type)
         Returns a boolean success/fail and an error message
         """
 
         event_info = dict()
-        event_info['problem_id'] = self.location.url()
-        event_info['student_id'] = self.system.anonymous_student_id
+        event_info['problem_id'] = system.location.url()
+        event_info['student_id'] = system.anonymous_student_id
         event_info['survey_responses']= get
 
         survey_responses=event_info['survey_responses']
@@ -212,15 +213,15 @@ class OpenEndedModule():
             log.exception(error_message)
             return False, "There was an error saving your feedback.  Please contact course staff."
 
-        qinterface = self.system.xqueue['interface']
+        qinterface = system.xqueue['interface']
         qtime = datetime.strftime(datetime.now(), xqueue_interface.dateformat)
-        anonymous_student_id = self.system.anonymous_student_id
-        queuekey = xqueue_interface.make_hashkey(str(self.system.seed) + qtime +
+        anonymous_student_id = system.anonymous_student_id
+        queuekey = xqueue_interface.make_hashkey(str(system.seed) + qtime +
                                                  anonymous_student_id +
                                                  self.answer_id)
 
         xheader = xqueue_interface.make_xheader(
-            lms_callback_url=self.system.xqueue['callback_url'],
+            lms_callback_url=system.xqueue['callback_url'],
             lms_key=queuekey,
             queue_name=self.message_queue_name
         )
@@ -246,7 +247,7 @@ class OpenEndedModule():
 
         return success, "Successfully submitted your feedback."
 
-    def get_score(self, student_answers):
+    def get_score(self, student_answers, system):
         try:
             submission = student_answers[self.answer_id]
         except KeyError:
@@ -258,17 +259,17 @@ class OpenEndedModule():
         # Prepare xqueue request
         #------------------------------------------------------------
 
-        qinterface = self.system.xqueue['interface']
+        qinterface = system.xqueue['interface']
         qtime = datetime.strftime(datetime.now(), xqueue_interface.dateformat)
 
-        anonymous_student_id = self.system.anonymous_student_id
+        anonymous_student_id = system.anonymous_student_id
 
         # Generate header
-        queuekey = xqueue_interface.make_hashkey(str(self.system.seed) + qtime +
+        queuekey = xqueue_interface.make_hashkey(str(system.seed) + qtime +
                                                  anonymous_student_id +
                                                  self.answer_id)
 
-        xheader = xqueue_interface.make_xheader(lms_callback_url=self.system.xqueue['callback_url'],
+        xheader = xqueue_interface.make_xheader(lms_callback_url=system.xqueue['callback_url'],
             lms_key=queuekey,
             queue_name=self.queue_name)
 
@@ -510,7 +511,7 @@ class OpenEndedModule():
         return ScoreMessage(valid=True, correct=correct,
             points=score_result['score'], msg=feedback)
 
-    def handle_ajax(self, dispatch, get):
+    def handle_ajax(self, dispatch, get, system):
         '''
         This is called by courseware.module_render, to handle an AJAX call.
         "get" is request.POST.
@@ -532,7 +533,7 @@ class OpenEndedModule():
             return 'Error'
 
         before = self.get_progress()
-        d = handlers[dispatch](get)
+        d = handlers[dispatch](get, system)
         after = self.get_progress()
         d.update({
             'progress_changed': after != before,
@@ -540,17 +541,17 @@ class OpenEndedModule():
             })
         return json.dumps(d, cls=ComplexEncoder)
 
-    def get_problem(self, get):
-        return self.get_html()
+    def get_problem(self, get, system):
+        return self.get_html(system)
 
-    def reset_problem(self, get):
+    def reset_problem(self, get, system):
         self.change_state(self.INITIAL)
         return {'success': True}
 
-    def save_problem(self, get):
+    def save_problem(self, get, system):
         pass
 
-    def update_score(self, get):
+    def update_score(self, get, system):
         """
         Delivers grading response (e.g. from asynchronous code checking) to
             the capa problem, so its score can be updated
@@ -563,11 +564,11 @@ class OpenEndedModule():
         queuekey = get['queuekey']
         score_msg = get['xqueue_body']
         #TODO: Remove need for cmap
-        self._update_score(score_msg, queuekey)
+        self._update_score(score_msg, queuekey, system)
 
         return dict()  # No AJAX return is needed
 
-    def get_html(self):
+    def get_html(self, system):
         """
         Implement special logic: handle queueing state, and default input.
         """
@@ -593,7 +594,7 @@ class OpenEndedModule():
                  'value' : self.value,
                  }
 
-        html=self.system.render_template("open_ended.html", context)
+        html=system.render_template("open_ended.html", context)
         return html
 
     def change_state(self, new_state):
@@ -659,7 +660,7 @@ class OpenEndedDescriptor(XmlDescriptor, EditingDescriptor):
 
         def parse(k):
             """Assumes that xml_object has child k"""
-            return stringify_children(xml_object.xpath(k)[0])
+            return xml_object.xpath(k)[0]
 
         return {'rubric': parse('openendedrubric'),
                 'prompt': parse('prompt'),
