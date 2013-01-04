@@ -75,6 +75,7 @@ class CombinedOpenEndedModule(XModule):
         # None for any element, and score and hint can be None for the last (current)
         # element.
         # Scores are on scale from 0 to max_score
+        system.set('location', location)
         self.current_task_number = instance_state.get('current_task_number', 0)
         self.task_states= instance_state.get('task_states', [])
 
