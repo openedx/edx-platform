@@ -31,6 +31,7 @@ from external_auth.views import ssl_login_shortcut
 
 from mitxmako.shortcuts import render_to_response, render_to_string
 from xmodule.modulestore.django import modulestore
+from xmodule.modulestore.xml_exporter import export_to_xml
 from xmodule_modifiers import replace_static_urls, wrap_xmodule
 from xmodule.exceptions import NotFoundError
 from functools import partial
@@ -50,6 +51,7 @@ log = logging.getLogger(__name__)
 def export_course(request, org, course, name):
 
     location = ['i4x', org, course, 'course', name]
+    loc = Location(location)
 
     log.debug('in export_course')
 
@@ -116,9 +118,11 @@ def export_course(request, org, course, name):
         course_details = CourseDetails.fetch(location)
         success = False
         try:
+            # export_to_xml(modulestore('direct'), contentstore(), loc, course_dir, name)
             xml = course_module.export_to_xml(fs)
             with fs.open('course.xml', mode='w') as f:
                 f.write(xml)
+            contentstore().export_all_for_course(loc, course_dir + '/static/')            # export the static assets
             with fs.open('metadata.json', mode='w') as f:       # dump course metadata
                 f.write(json.dumps(course_module.metadata))
             with fs.open('settings.json', mode='w') as f:       # dump course settings (about page, ...)
