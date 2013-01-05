@@ -115,7 +115,9 @@ def toc_for_course(user, request, course, active_chapter, active_section):
     return chapters
 
 
-def get_module(user, request, location, student_module_cache, course_id, position=None, not_found_ok = False, wrap_xmodule_display = True):
+def get_module(user, request, location, student_module_cache, course_id,
+               position=None, not_found_ok = False, wrap_xmodule_display=True,
+               grade_bucket_type=None):
     """
     Get an instance of the xmodule class identified by location,
     setting the state based on an existing StudentModule, or creating one if none
@@ -147,7 +149,8 @@ def get_module(user, request, location, student_module_cache, course_id, positio
         return None
 
 
-def _get_module(user, request, location, student_module_cache, course_id, position=None, wrap_xmodule_display=True):
+def _get_module(user, request, location, student_module_cache, course_id,
+                position=None, wrap_xmodule_display=True, grade_bucket_type=None):
     """
     Actually implement get_module.  See docstring there for details.
     """
@@ -234,14 +237,16 @@ def _get_module(user, request, location, student_module_cache, course_id, positi
         #Bin score into range and increment stats
         score_bucket = get_score_bucket(student_module.grade, student_module.max_grade)
         org, course_num, run = course_id.split("/")
-        statsd.increment("lms.courseware.question_answered",
-                        tags=["org:{0}".format(org),
-                              "course:{0}".format(course_num),
-                              "run:{0}".format(run),
-                              "score_bucket:{0}".format(score_bucket),
-                              "type:ajax"])
 
+        tags = ["org:{0}".format(org),
+                "course:{0}".format(course_num),
+                "run:{0}".format(run),
+                "score_bucket:{0}".format(score_bucket)]
 
+        if grade_bucket_type is not None:
+            tags.append('type:%s' % grade_bucket_type)
+
+        statsd.increment("lms.courseware.question_answered", tags=tags)
 
     # TODO (cpennington): When modules are shared between courses, the static
     # prefix is going to have to be specific to the module, not the directory
@@ -332,19 +337,10 @@ def xqueue_callback(request, course_id, userid, id, dispatch):
 
     student_module_cache = StudentModuleCache.cache_for_descriptor_descendents(course_id,
         user, modulestore().get_instance(course_id, id), depth=0, select_for_update=True)
-    instance = get_module(user, request, id, student_module_cache, course_id)
+    instance = get_module(user, request, id, student_module_cache, course_id, grade_bucket_type='xqueue')
     if instance is None:
         log.debug("No module {0} for user {1}--access denied?".format(id, user))
         raise Http404
-
-    instance_module = get_instance_module(course_id, user, instance, student_module_cache)
-
-    if instance_module is None:
-        log.debug("Couldn't find instance of module '%s' for user '%s'", id, user)
-        raise Http404
-
-    oldgrade = instance_module.grade
-    old_instance_state = instance_module.state
 
     # Transfer 'queuekey' from xqueue response header to 'get'. This is required to
     #   use the interface defined by 'handle_ajax'
@@ -359,22 +355,6 @@ def xqueue_callback(request, course_id, userid, id, dispatch):
         log.exception("error processing ajax call")
         raise
 
-    # Save state back to database
-    instance_module.state = instance.get_instance_state()
-    if instance.get_score():
-        instance_module.grade = instance.get_score()['score']
-    if instance_module.grade != oldgrade or instance_module.state != old_instance_state:
-        instance_module.save()
-
-        #Bin score into range and increment stats
-        score_bucket=get_score_bucket(instance_module.grade, instance_module.max_grade)
-        org, course_num, run=course_id.split("/")
-        statsd.increment("lms.courseware.question_answered",
-                        tags=["org:{0}".format(org),
-                              "course:{0}".format(course_num),
-                              "run:{0}".format(run),
-                              "score_bucket:{0}".format(score_bucket),
-                              "type:xqueue"])
     return HttpResponse("")
 
 
@@ -417,7 +397,7 @@ def modx_dispatch(request, dispatch, location, course_id):
     student_module_cache = StudentModuleCache.cache_for_descriptor_descendents(course_id,
         request.user, modulestore().get_instance(course_id, location))
 
-    instance = get_module(request.user, request, location, student_module_cache, course_id)
+    instance = get_module(request.user, request, location, student_module_cache, course_id, grade_bucket_type='ajax')
     if instance is None:
         # Either permissions just changed, or someone is trying to be clever
         # and load something they shouldn't have access to.
