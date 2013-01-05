@@ -94,11 +94,17 @@ def instructor_dashboard(request, course_id):
         return response
 
     def get_staff_group(course):
-        staffgrp = get_access_group_name(course, 'staff')
+        return get_group(course, 'staff')
+
+    def get_instructor_group(course):
+        return get_group(course, 'instructor')
+
+    def get_group(course, groupname):
+        grpname = get_access_group_name(course, groupname)
         try:
-            group = Group.objects.get(name=staffgrp)
+            group = Group.objects.get(name=grpname)
         except Group.DoesNotExist:
-            group = Group(name=staffgrp)     # create the group
+            group = Group(name=grpname)     # create the group
             group.save()
         return group
 
@@ -239,6 +245,16 @@ def instructor_dashboard(request, course_id):
         datatable['title'] = 'List of Staff in course {0}'.format(course_id)
         track.views.server_track(request, 'list-staff', {}, page='idashboard')
 
+    elif 'List course instructors' in action:
+        group = get_instructor_group(course)
+        msg += 'Instructor group = {0}'.format(group.name)
+        log.debug('instructor grp={0}'.format(group.name))
+        uset = group.user_set.all()
+        datatable = {'header': ['Username', 'Full name']}
+        datatable['data'] = [[x.username, x.profile.name] for x in uset]
+        datatable['title'] = 'List of Instructors in course {0}'.format(course_id)
+        track.views.server_track(request, 'list-instructors', {}, page='idashboard')
+
     elif action == 'Add course staff':
         uname = request.POST['staffuser']
         try:
@@ -253,6 +269,20 @@ def instructor_dashboard(request, course_id):
             user.groups.add(group)
             track.views.server_track(request, 'add-staff {0}'.format(user), {}, page='idashboard')
 
+    elif action == 'Add instructor':
+        uname = request.POST['instructor']
+        try:
+            user = User.objects.get(username=uname)
+        except User.DoesNotExist:
+            msg += '<font color="red">Error: unknown username "{0}"</font>'.format(uname)
+            user = None
+        if user is not None:
+            group = get_instructor_group(course)
+            msg += '<font color="green">Added {0} to instructor group = {1}</font>'.format(user, group.name)
+            log.debug('staffgrp={0}'.format(group.name))
+            user.groups.add(group)
+            track.views.server_track(request, 'add-instructor {0}'.format(user), {}, page='idashboard')
+
     elif action == 'Remove course staff':
         uname = request.POST['staffuser']
         try:
@@ -266,6 +296,20 @@ def instructor_dashboard(request, course_id):
             log.debug('staffgrp={0}'.format(group.name))
             user.groups.remove(group)
             track.views.server_track(request, 'remove-staff {0}'.format(user), {}, page='idashboard')
+
+    elif action == 'Remove instructor':
+        uname = request.POST['instructor']
+        try:
+            user = User.objects.get(username=uname)
+        except User.DoesNotExist:
+            msg += '<font color="red">Error: unknown username "{0}"</font>'.format(uname)
+            user = None
+        if user is not None:
+            group = get_instructor_group(course)
+            msg += '<font color="green">Removed {0} from instructor group = {1}</font>'.format(user, group.name)
+            log.debug('instructorgrp={0}'.format(group.name))
+            user.groups.remove(group)
+            track.views.server_track(request, 'remove-instructor {0}'.format(user), {}, page='idashboard')
 
     #----------------------------------------
     # forum administration

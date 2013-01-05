@@ -171,13 +171,19 @@ def _has_access_course_desc(user, course, action):
 
     return _dispatch(checkers, action, user, course)
 
+
 def _get_access_group_name_course_desc(course, action):
     '''
-    Return name of group which gives staff access to course.  Only understands action = 'staff'
+    Return name of group which gives staff access to course.  Only understands action = 'staff' and 'instructor'
     '''
-    if not action=='staff':
-        return []
-    return _course_staff_group_name(course.location)
+    if action=='staff':
+        return _course_staff_group_name(course.location)
+    elif action=='instructor':
+        return _course_instructor_group_name(course.location)
+
+    return []
+
+
 
 def _has_access_error_desc(user, descriptor, action):
     """
