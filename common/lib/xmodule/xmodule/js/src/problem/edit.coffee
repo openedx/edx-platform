@@ -13,15 +13,8 @@ class @MarkdownEditingDescriptor extends XModule.Descriptor
       @markdown_editor = CodeMirror.fromTextArea($(".markdown-box", element)[0], {
       lineWrapping: true
       mode: null
-      onChange: @onMarkdownEditorUpdate
       })
       @setCurrentEditor(@markdown_editor)
-
-  onMarkdownEditorUpdate: ->
-    console.log('update')
-    @updateXML()
-
-  updateXML: ->
 
   changeEditor: (e) =>
     e.preventDefault();
@@ -32,7 +25,7 @@ class @MarkdownEditingDescriptor extends XModule.Descriptor
       #    onMarkdownEditorUpdate();
     else
       @setCurrentEditor(@xml_editor)
-  #    xmlEditor.refresh();
+      @xml_editor.setValue(MarkdownEditingDescriptor.markdownToXml(@markdown_editor.getValue()))
 
   setCurrentEditor: (editor) ->
     $(@current_editor.getWrapperElement()).hide()
