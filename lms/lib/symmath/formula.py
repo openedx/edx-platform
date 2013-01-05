@@ -422,7 +422,8 @@ class formula(object):
 
     def GetContentMathML(self, asciimath, mathml):
         # URL = 'http://192.168.1.2:8080/snuggletex-webapp-1.2.2/ASCIIMathMLUpConversionDemo'
-        URL = 'http://127.0.0.1:8080/snuggletex-webapp-1.2.2/ASCIIMathMLUpConversionDemo'
+        # URL = 'http://127.0.0.1:8080/snuggletex-webapp-1.2.2/ASCIIMathMLUpConversionDemo'
+        URL = 'http://math-xserver.mitx.mit.edu/snuggletex-webapp-1.2.2/ASCIIMathMLUpConversionDemo'
 
         if 1:
             payload = {'asciiMathInput': asciimath,
