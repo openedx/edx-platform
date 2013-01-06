@@ -3,7 +3,6 @@
   from courseware.courses import course_image_url, get_course_about_section
   from courseware.access import has_access
   from certificates.models import CertificateStatuses
-  from student.models import get_testcenter_registrations_for_user_and_course
 %>
 <%inherit file="main.html" />
 
@@ -91,12 +90,15 @@
   <section class="status">
     
     <!-- NOTE: BT - registration data updated confirmation message - in case upon successful submit we're directing
-    	 folks back to this view.  To display, add "is-shown" class to div -->
+    	 folks back to this view.  To display, add "is-shown" class to div.
+    	 NOTE: BW - not planning to do this, but instead returning user to student dashboard.  
     <div class="message message-status submission-saved">
       <p class="message-copy">Your registration data has been updated and saved.</p>
     </div>
+     -->
         
-    <!-- NOTE: BT - Sample markup for error message.  To display, add "is-shown" class to div -->
+    <!-- Markup for error message will be written here by ajax handler.  To display, it adds "is-shown" class to div,
+    	 and adds specific error messages under the list. -->
     <div class="message message-status submission-error">
       <p id="submission-error-heading" class="message-copy"></p>
       <ul id="submission-error-list"/>
@@ -123,6 +125,7 @@
       <input id="id_email" type="hidden" name="email" maxlength="75" value="${user.email}" />
       <input id="id_username" type="hidden" name="username" maxlength="75" value="${user.username}" />
       <input id="id_course_id" type="hidden" name="course_id" maxlength="75" value="${course.id}" />
+      <input id="id_course_id" type="hidden" name="exam_series_code" maxlength="75" value="${exam_info.exam_series_code}" />
 
       <div class="form-fields-primary">
         <fieldset class="group group-form group-form-personalinformation">
@@ -240,14 +243,17 @@
           
           <!-- Only display an accommodation request if one had been specified at registration time. 
                So only prompt for an accommodation request if no registration exists. 
-               BW: Bug.  It is not enough to set the value of the disabled control.  It does
-               not display any text.  Perhaps we can use a different control. -->
+               BW to BT: It is not enough to set the value of the disabled control.  It does
+               not display any text.  Perhaps we can use a different markup instead of a control. -->
           <ol class="list-input">
             % if registration:
               % if registration.accommodation_request and len(registration.accommodation_request) > 0:
             <li class="field disabled">
               <label for="accommodations">Accommodations Requested</label>
+              <!--
               <textarea class="long" id="accommodations" value="${registration.accommodation_request}" placeholder="" disabled="disabled"></textarea>
+              -->
+              <p id="accommodations">${registration.accommodation_request}</p>
             </li>
               % endif
             % else: 
@@ -274,30 +280,30 @@
    % if registration:
     <h3 class="is-hidden">Registration Details</h3>
     
-    <!-- NOTE: BT - state for if registration is accepted -->
     % if registration.is_accepted():
-      <% regstatus = "Registration approved by Pearson" %>
     <div class="message message-status registration-accepted is-shown">
+      <% regstatus = "Registration approved by Pearson" %>
       <p class="registration-status"><span class="label">Registration Status: </span><span class="value">${regstatus}</span></p>
       <p class="registration-number"><span class="label">Registration number: </span> <span class="value">${registration.client_authorization_id}</span></p>
       <p class="message-copy">Write this down! You’ll need it to schedule your exam.</p>
+      <!-- TODO: pull this link out into some settable parameter. -->
       <a href="https://www1.pearsonvue.com/testtaker/signin/SignInPage/EDX" class="button exam-button">Schedule Pearson exam</a>
     </div>
     % endif
     
     % if registration.is_rejected():
-    <!-- NOTE: BT - state for if registration is rejected -->
-      <% regstatus = "Registration rejected by Pearson: %s" % registration.upload_error_message %>
+    <!-- TODO: the registration may be failed because of the upload of the demographics or of the upload of the registration.
+    	Fix this so that the correct upload error message is displayed. -->
     <div class="message message-status registration-rejected is-shown">
+      <% regstatus = "Registration rejected by Pearson: %s" % registration.upload_error_message %>
       <p class="registration-status"><span class="label">Registration Status: </span><span class="value">${regstatus}</span></p>
       <p class="message-copy">Your registration for the Pearson exam has been rejected. Please contact Pearson VUE for further information regarding your registration.</p>
     </div>
     % endif
     
     % if registration.is_pending_accommodation():
-        <% regstatus = "Registration pending approval of accommodation request" %>
-    <!-- NOTE: BT - state for if registration is pending -->
     <div class="message message-status registration-pending is-shown">
+      <% regstatus = "Registration pending approval of accommodation request" %>
       <p class="registration-status"><span class="label">Registration Status: </span><span class="value">${regstatus}</span></p>
       <p class="message-copy">Your registration for the Pearson exam is pending. Within a few days, you should see confirmation here of granted accommodations.
       	At that point, your registration will be forwarded to Pearson.</p>
@@ -305,9 +311,8 @@
     % endif
 
     % if registration.is_pending_acknowledgement():
-        <% regstatus = "Registration pending acknowledgement by Pearson" %>
-    <!-- NOTE: BT - state for if registration is pending -->
     <div class="message message-status registration-pending is-shown">
+      <% regstatus = "Registration pending acknowledgement by Pearson" %>
       <p class="registration-status"><span class="label">Registration Status: </span><span class="value">${regstatus}</span></p>
       <p class="message-copy">Your registration for the Pearson exam is pending. Within a few days, you should see a confirmation number here, which can be used to schedule your exam.</p>
     </div>
@@ -333,16 +338,18 @@
       <!-- NOTE: showing test details -->
       <h4>Pearson VUE Test Details</h4>
       % if exam_info is not None:
-        <!-- TODO: BT - Can we obtain a more human readable value for test-type (e.g. "Final Exam" or "Midterm Exam")? -->
         <ul>
           <li>
-            <span class="label">Exam Series Code:</span> <span class="value">${exam_info.get('Exam_Series_Code')}</span>
+            <span class="label">Exam Name:</span> <span class="value">${exam_info.display_name}</span>
           </li>
           <li>
-            <span class="label">First Eligible Appointment Date:</span> <span class="value">${exam_info.get('First_Eligible_Appointment_Date')}</span>
+            <span class="label">First Eligible Appointment Date:</span> <span class="value">${exam_info.first_eligible_appointment_date_text}</span>
           </li>
           <li>
-            <span class="label">Last Eligible Appointment Date:</span> <span class="value">${exam_info.get('Last_Eligible_Appointment_Date')}</span>
+            <span class="label">Last Eligible Appointment Date:</span> <span class="value">${exam_info.last_eligible_appointment_date_text}</span>
+          </li>            
+          <li>
+            <span class="label">Registration End Date:</span> <span class="value">${exam_info.registration_end_date_text}</span>
           </li>            
         </ul>
       % endif

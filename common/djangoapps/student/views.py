@@ -31,7 +31,7 @@ from student.models import (Registration, UserProfile, TestCenterUser, TestCente
                             TestCenterRegistration, TestCenterRegistrationForm,
                             PendingNameChange, PendingEmailChange,
                             CourseEnrollment, unique_id_for_user,
-                            get_testcenter_registrations_for_user_and_course)
+                            get_testcenter_registration)
 
 from certificates.models import CertificateStatuses, certificate_status_for_student
 
@@ -237,6 +237,8 @@ def dashboard(request):
 
     cert_statuses = { course.id: cert_info(request.user, course) for course in courses}
 
+    exam_registrations = { course.id: exam_registration_info(request.user, course) for course in courses}
+
     # Get the 3 most recent news
     top_news = _get_news(top=3)
 
@@ -247,6 +249,7 @@ def dashboard(request):
                'show_courseware_links_for' : show_courseware_links_for,
                'cert_statuses': cert_statuses,
                'news': top_news,
+               'exam_registrations': exam_registrations,
                }
 
     return render_to_response('dashboard.html', context)
@@ -589,32 +592,45 @@ def create_account(request, post_override=None):
     js = {'success': True}
     return HttpResponse(json.dumps(js), mimetype="application/json")
 
+def exam_registration_info(user, course):
+    """ Returns a Registration object if the user is currently registered for a current
+    exam of the course.  Returns None if the user is not registered, or if there is no
+    current exam for the course.
+    """
+    exam_info = course.current_test_center_exam
+    if exam_info is None:
+        return None
+    
+    exam_code = exam_info.exam_series_code
+    registrations = get_testcenter_registration(user, course.id, exam_code)
+    if len(registrations) > 0:
+        registration = registrations[0]
+    else:
+        registration = None
+    return registration
+    
 @login_required
 @ensure_csrf_cookie
 def begin_test_registration(request, course_id):
+    """ Handles request to register the user for the current
+    test center exam of the specified course.  Called by form
+    in dashboard.html.
+    """
     user = request.user
 
     try:
         course = (course_from_id(course_id))
     except ItemNotFoundError:
+        # TODO: do more than just log!!  The rest will fail, so we should fail right now.
         log.error("User {0} enrolled in non-existent course {1}"
                       .format(user.username, course_id))
 
     # get the exam to be registered for:
     # (For now, we just assume there is one at most.)
-    # TODO: this should be an object, including the course_id and the
-    # exam info for a particular exam from the course.
-    exam_info = course.testcenter_info
+    exam_info = course.current_test_center_exam
 
-    # figure out if the user is already registered for this exam:   
-    # (Again, for now we assume that any registration that exists is for this exam.) 
-    registrations = get_testcenter_registrations_for_user_and_course(user, course_id)
-    if len(registrations) > 0:
-        registration = registrations[0]
-    else:
-        registration = None
-
-    log.info("User {0} enrolled in course {1} calls for test registration page".format(user.username, course_id))
+    # determine if the user is registered for this course:
+    registration = exam_registration_info(user, course)
         
     # we want to populate the registration page with the relevant information,
     # if it already exists.  Create an empty object otherwise.
@@ -636,12 +652,9 @@ def begin_test_registration(request, course_id):
 @ensure_csrf_cookie
 def create_test_registration(request, post_override=None):
     '''
-    JSON call to create test registration.
-    Used by form in test_center_register.html, which is called from 
-    into dashboard.html
+    JSON call to create a test center exam registration.
+    Called by form in test_center_register.html
     '''
- #   js = {'success': False}
-
     post_vars = post_override if post_override else request.POST
     
     # first determine if we need to create a new TestCenterUser, or if we are making any update 
@@ -660,7 +673,6 @@ def create_test_registration(request, post_override=None):
         testcenter_user = TestCenterUser.create(user)
         needs_updating = True
 
-
     # perform validation:
     if needs_updating:
         log.info("User {0} enrolled in course {1} updating demographic info for test registration".format(user.username, course_id))
@@ -678,20 +690,19 @@ def create_test_registration(request, post_override=None):
         
     # create and save the registration:
     needs_saving = False
-    exam_info = course.testcenter_info
-    registrations = get_testcenter_registrations_for_user_and_course(user, course_id)
-    # In future, this should check the exam series code of the registrations, if there
-    # were multiple.
+    exam = course.current_test_center_exam
+    exam_code = exam.exam_series_code
+    registrations = get_testcenter_registration(user, course_id, exam_code)
     if len(registrations) > 0:
         registration = registrations[0]
-        # check to see if registration changed.  Should check appointment dates too...
+        # TODO: check to see if registration changed.  Should check appointment dates too...
         # And later should check changes in accommodation_code.
         # But at the moment, we don't expect anything to cause this to change
-        # right now.
+        # because of the registration form.
         
     else:
         accommodation_request = post_vars.get('accommodation_request','')
-        registration = TestCenterRegistration.create(testcenter_user, course_id, exam_info, accommodation_request)
+        registration = TestCenterRegistration.create(testcenter_user, exam, accommodation_request)
         needs_saving = True
 
     if needs_saving:
@@ -731,8 +742,6 @@ def create_test_registration(request, post_override=None):
 
     # TODO: enable appropriate stat
     # statsd.increment("common.student.account_created")
-
-    log.info("User {0} enrolled in course {1} returning from enter/update demographic info for test registration".format(user.username, course_id))
 
     js = {'success': True}
     return HttpResponse(json.dumps(js), mimetype="application/json")

@@ -41,6 +41,7 @@ import json
 import logging
 import uuid
 from random import randint
+from time import strftime
 
 
 from django.conf import settings
@@ -236,6 +237,15 @@ class TestCenterUser(models.Model):
         testcenter_user.client_candidate_id = cand_id  
         return testcenter_user
 
+    def is_accepted(self):
+        return self.upload_status == 'Accepted'
+  
+    def is_rejected(self):
+        return self.upload_status == 'Error'
+    
+    def is_pending(self):
+        return self.upload_status == ''
+
 class TestCenterUserForm(ModelForm):
     class Meta:
         model = TestCenterUser
@@ -373,15 +383,15 @@ class TestCenterRegistration(models.Model):
     @property
     def client_candidate_id(self):
         return self.testcenter_user.client_candidate_id
-    
+
     @staticmethod
-    def create(testcenter_user, course_id, exam_info, accommodation_request):
+    def create(testcenter_user, exam, accommodation_request):
         registration = TestCenterRegistration(testcenter_user = testcenter_user)
-        registration.course_id = course_id
+        registration.course_id = exam.course_id
         registration.accommodation_request = accommodation_request
-        registration.exam_series_code = exam_info.get('Exam_Series_Code')
-        registration.eligibility_appointment_date_first = exam_info.get('First_Eligible_Appointment_Date')
-        registration.eligibility_appointment_date_last = exam_info.get('Last_Eligible_Appointment_Date')
+        registration.exam_series_code = exam.exam_series_code # .get('Exam_Series_Code')
+        registration.eligibility_appointment_date_first = strftime("%Y-%m-%d", exam.first_eligible_appointment_date)
+        registration.eligibility_appointment_date_last = strftime("%Y-%m-%d", exam.last_eligible_appointment_date)
         # accommodation_code remains blank for now, along with Pearson confirmation
         registration.client_authorization_id = registration._create_client_authorization_id()
         return registration
@@ -404,16 +414,16 @@ class TestCenterRegistration(models.Model):
         return auth_id
             
     def is_accepted(self):
-        return self.upload_status == 'Accepted'
+        return self.upload_status == 'Accepted' and self.testcenter_user.is_accepted()
   
     def is_rejected(self):
-        return self.upload_status == 'Error'
+        return self.upload_status == 'Error' or self.testcenter_user.is_rejected()
     
     def is_pending_accommodation(self):
         return len(self.accommodation_request) > 0 and self.accommodation_code == ''
         
     def is_pending_acknowledgement(self):
-        return self.upload_status == '' and not self.is_pending_accommodation()
+        return (self.upload_status == '' or self.testcenter_user.is_pending()) and not self.is_pending_accommodation()
 
 class TestCenterRegistrationForm(ModelForm):
     class Meta:
@@ -430,15 +440,12 @@ class TestCenterRegistrationForm(ModelForm):
     
     
     
-def get_testcenter_registrations_for_user_and_course(user, course_id, exam_series_code=None):
+def get_testcenter_registration(user, course_id, exam_series_code):
     try:
         tcu = TestCenterUser.objects.get(user=user)
     except TestCenterUser.DoesNotExist:
         return []
-    if exam_series_code is None:
-        return TestCenterRegistration.objects.filter(testcenter_user=tcu, course_id=course_id)
-    else:
-        return TestCenterRegistration.objects.filter(testcenter_user=tcu, course_id=course_id, exam_series_code=exam_series_code)
+    return TestCenterRegistration.objects.filter(testcenter_user=tcu, course_id=course_id, exam_series_code=exam_series_code)
         
 def unique_id_for_user(user):
     """
