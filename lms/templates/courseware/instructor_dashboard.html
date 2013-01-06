@@ -57,10 +57,13 @@ function goto( mode)
             <a href="#" onclick="goto('Psychometrics');" class="${modeflag.get('Psychometrics')}">Psychometrics</a> | 
           %endif
           <a href="#" onclick="goto('Admin');" class="${modeflag.get('Admin')}">Admin</a> |
-          <a href="#" onclick="goto('Forum Admin');" class="${modeflag.get('Forum Admin')}">Forum Admin</a> ]
+          <a href="#" onclick="goto('Forum Admin');" class="${modeflag.get('Forum Admin')}">Forum Admin</a> |
+          <a href="#" onclick="goto('Enrollment');" class="${modeflag.get('Enrollment')}">Enrollment</a>
+	 ]
     </h2>
 
-  <div style="text-align:right" id="djangopid">${djangopid}</div>
+  <div style="text-align:right"><span id="djangopid">${djangopid}</span>
+  | <span id="mitxver">${mitx_version}</span></div>
 
     <form name="idashform" method="POST">
     <input type="hidden" name="csrfmiddlewaretoken" value="${ csrf_token }">
@@ -163,10 +166,52 @@ function goto( mode)
   %endif
 %endif
 
+##----------------------------------------------------------------------------- 
+%if modeflag.get('Enrollment'):
+
+    <hr width="40%" style="align:left">
+    <p>
+    <input type="submit" name="action" value="List enrolled students">
+    <input type="submit" name="action" value="List students who may enroll but may not have yet signed up">
+    <p>
+    Student Email: <input type="text" name="enstudent"> <input type="submit" name="action" value="Un-enroll student">
+    <input type="submit" name="action" value="Enroll student">
+    <input type="submit" name="action" value="Un-enroll ALL students">
+    <hr width="40%" style="align:left">
+
+  %if settings.MITX_FEATURES.get('REMOTE_GRADEBOOK_URL','') and instructor_access:
+  
+    <%
+        rg = course.metadata.get('remote_gradebook',{})
+    %>
+
+    <p>Pull enrollment from remote gradebook</p>
+    <ul>
+    <li>Gradebook name: <input type="text" name="gradebook_name" size=40 value="${rg.get('name','')}"></li>
+    <li>Section: <input type="text" name="gradebook_section" size=40 value="${rg.get('section','')}"></li>
+    </ul>
+    <input type="submit" name="action" value="List sections available in remote gradebook">
+    <input type="submit" name="action" value="List students in section in remote gradebook">
+    <input type="submit" name="action" value="Overload enrollment list using remote gradebook">
+    <input type="submit" name="action" value="Merge enrollment list with remote gradebook">
+    <hr width="40%" style="align:left">
+  
+  %endif
+
+  <p>Add students: enter emails, separated by returns or commas;</p>
+  <textarea rows="6" cols="70" name="enroll_multiple"></textarea>
+  <input type="submit" name="action" value="Enroll multiple students">
+
+%endif
+
+##----------------------------------------------------------------------------- 
+
     </form>
 
 ##----------------------------------------------------------------------------- 
-%if modeflag.get('Psychometrics') is None:
+##----------------------------------------------------------------------------- 
+
+%if datatable and modeflag.get('Psychometrics') is None:
 
     <br/>
     <br/>

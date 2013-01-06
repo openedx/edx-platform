@@ -2,8 +2,10 @@
 
 from collections import defaultdict
 import csv
+import json
 import logging
 import os
+import requests
 import urllib
 
 from django.conf import settings
@@ -20,7 +22,7 @@ from courseware.courses import get_course_with_access
 from django_comment_client.models import Role, FORUM_ROLE_ADMINISTRATOR, FORUM_ROLE_MODERATOR, FORUM_ROLE_COMMUNITY_TA
 from django_comment_client.utils import has_forum_access
 from psychometrics import psychoanalyze
-from student.models import CourseEnrollment
+from student.models import CourseEnrollment, CourseEnrollmentAllowed
 from xmodule.course_module import CourseDescriptor
 from xmodule.modulestore import Location
 from xmodule.modulestore.django import modulestore
@@ -125,7 +127,7 @@ def instructor_dashboard(request, course_id):
             except Exception as err:
                 msg += '<br/><p>Error: {0}</p>'.format(escape(err))
 
-    if action == 'Dump list of enrolled students':
+    if action == 'Dump list of enrolled students' or action=='List enrolled students':
         log.debug(action)
         datatable = get_student_grade_summary_data(request, course, course_id, get_grades=False)
         datatable['title'] = 'List of students enrolled in {0}'.format(course_id)
@@ -258,6 +260,70 @@ def instructor_dashboard(request, course_id):
                                  {}, page='idashboard')
 
     #----------------------------------------
+    # enrollment
+
+    elif action == 'List students who may enroll but may not have yet signed up':
+        ceaset = CourseEnrollmentAllowed.objects.filter(course_id=course_id)
+        datatable = {'header': ['StudentEmail']}
+        datatable['data'] = [[x.email] for x in ceaset]
+        datatable['title'] = action
+
+    elif action == 'Enroll student':
+
+        student = request.POST.get('enstudent','')
+        datatable = {}
+        try:
+            nce = CourseEnrollment(user=User.objects.get(email=student), course_id=course_id)
+            nce.save()
+            msg += "Enrolled student with email '%s'" % student
+        except Exception as err:
+            msg += "Error!  Failed to enroll student with email '%s'\n" % student
+            msg += str(err) + '\n'
+
+    elif action == 'Un-enroll student':
+
+        student = request.POST.get('enstudent','')
+        datatable = {}
+        try:
+            nce = CourseEnrollment.objects.get(user=User.objects.get(email=student), course_id=course_id)
+            nce.delete()
+            msg += "Un-enrolled student with email '%s'" % student
+        except Exception as err:
+            msg += "Error!  Failed to un-enroll student with email '%s'\n" % student
+            msg += str(err) + '\n'
+
+    elif action == 'Un-enroll ALL students':
+
+        ret = _do_enroll_students(course, course_id, '', overload=True)
+        datatable = ret['datatable']
+
+    elif action == 'Enroll multiple students':
+
+        students = request.POST.get('enroll_multiple','')
+        ret = _do_enroll_students(course, course_id, students)
+        datatable = ret['datatable']
+
+    elif action == 'List sections available in remote gradebook':
+
+        msg2, datatable = _do_remote_gradebook(course, 'get-sections')
+        msg += msg2
+
+    elif action in ['List students in section in remote gradebook', 
+                    'Overload enrollment list using remote gradebook',
+                    'Merge enrollment list with remote gradebook']:
+
+        section = request.POST.get('gradebook_section','')
+        msg2, datatable = _do_remote_gradebook(course, 'get-membership', dict(section=section) )
+        msg += msg2
+
+        if not 'List' in action:
+            students = ','.join([x['email'] for x in datatable['retdata']])
+            overload = 'Overload' in action
+            ret = _do_enroll_students(course, course_id, students, overload=overload)
+            datatable = ret['datatable']
+        
+
+    #----------------------------------------
     # psychometrics
 
     elif action == 'Generate Histogram and IRT Plot':
@@ -270,9 +336,9 @@ def instructor_dashboard(request, course_id):
         problems = psychoanalyze.problems_with_psychometric_data(course_id)
 
 
-
     #----------------------------------------
     # context for rendering
+
     context = {'course': course,
                'staff_access': True,
                'admin_access': request.user.is_staff,
@@ -285,16 +351,65 @@ def instructor_dashboard(request, course_id):
                'plots': plots,			# psychometrics
                'course_errors': modulestore().get_item_errors(course.location),
                'djangopid' : os.getpid(),
+               'mitx_version' : getattr(settings,'MITX_VERSION_STRING','')
                }
 
     return render_to_response('courseware/instructor_dashboard.html', context)
+
+
+def _do_remote_gradebook(course, action, args=None):
+    '''
+    Perform remote gradebook action.  Returns msg, datatable.
+    '''
+    rg = course.metadata.get('remote_gradebook','')
+    if not rg:
+        msg = "No remote gradebook defined in course metadata"
+        return msg, {}
+    
+    rgurl = settings.MITX_FEATURES.get('REMOTE_GRADEBOOK_URL','')
+    if not rgurl:
+        msg = "No remote gradebook url defined in settings.MITX_FEATURES"
+        return msg, {}
+    
+    rgname = rg.get('name','')
+    if not rgname:
+        msg = "No gradebook name defined in course remote_gradebook metadata"
+        return msg, {}
+    
+    if args is None:
+        args = {}
+    data = dict(submit=action, gradebook=rgname)
+    data.update(args)
+
+    try:
+        resp = requests.post(rgurl, data=data, verify=False)
+        retdict = json.loads(resp.content)
+    except Exception as err:
+        msg = "Failed to communicate with gradebook server at %s<br/>" % rgurl
+        msg += "Error: %s" % err
+        msg += "<br/>resp=%s" % resp.content
+        msg += "<br/>data=%s" % data
+        return msg, {}
+
+    msg = '<pre>%s</pre>' % retdict['msg'].replace('\n','<br/>')
+    retdata = retdict['data']
+
+    if retdata:
+        datatable = {'header': retdata[0].keys()}
+        datatable['data'] = [x.values() for x in retdata]
+        datatable['title'] = 'Remote gradebook response for %s' % action
+        datatable['retdata'] = retdata
+    else:
+        datatable = {}
+
+    return msg, datatable
 
 def _list_course_forum_members(course_id, rolename, datatable):
     ''' 
     Fills in datatable with forum membership information, for a given role,
     so that it will be displayed on instructor dashboard.
     
-      course_ID = course's ID string
+      course_ID = the ID string for a course
       rolename = one of "Administrator", "Moderator", "Community TA"
     
     Returns message status string to append to displayed message, if role is unknown.
@@ -455,6 +570,68 @@ def grade_summary(request, course_id):
     return render_to_response('courseware/grade_summary.html', context)
 
 
+def _do_enroll_students(course, course_id, students, overload=False):
+    """Do the actual work of enrolling multiple students, presented as a string
+    of emails separated by commas or returns"""
+
+    ns = [x.split('\n') for x in students.split(',')]
+    new_students = [item for sublist in ns for item in sublist]
+    new_students = [str(s.strip()) for s in new_students]
+    new_students_lc = [x.lower() for x in new_students]
+
+    if '' in new_students:
+        new_students.remove('')
+
+    status = dict([x,'unprocessed'] for x in new_students)
+
+    if overload:	# delete all but staff
+        todelete = CourseEnrollment.objects.filter(course_id=course_id)
+        for ce in todelete:
+            if not has_access(ce.user, course, 'staff') and ce.user.email.lower() not in new_students_lc:
+                status[ce.user.email] = 'deleted'
+                ce.delete()
+            else:
+                status[ce.user.email] = 'is staff'
+        ceaset = CourseEnrollmentAllowed.objects.filter(course_id=course_id)
+        for cea in ceaset:
+            status[cea.email] = 'removed from pending enrollment list'
+        ceaset.delete()
+
+    for student in new_students:
+        try:
+            user=User.objects.get(email=student)
+        except User.DoesNotExist:
+            # user not signed up yet, put in pending enrollment allowed table
+            if CourseEnrollmentAllowed.objects.filter(email=student, course_id=course_id):
+                status[student] = 'user does not exist, enrollment already allowed, pending'
+                continue
+            cea = CourseEnrollmentAllowed(email=student, course_id=course_id)
+            cea.save()
+            status[student] = 'user does not exist, enrollment allowed, pending'
+            continue
+
+        if CourseEnrollment.objects.filter(user=user, course_id=course_id):
+            status[student] = 'already enrolled'
+            continue
+        try:
+            nce = CourseEnrollment(user=user, course_id=course_id)
+            nce.save()
+            status[student] = 'added'
+        except:
+            status[student] = 'rejected'
+
+    datatable = {'header': ['StudentEmail', 'action']}
+    datatable['data'] = [[x, status[x]] for x in status]
+    datatable['title'] = 'Enrollment of students'
+
+    def sf(stat): return [x for x in status if status[x]==stat]
+
+    data = dict(added=sf('added'), rejected=sf('rejected')+sf('exists'), 
+                deleted=sf('deleted'), datatable=datatable)
+
+    return data
+
+
 @ensure_csrf_cookie
 @cache_control(no_cache=True, no_store=True, must_revalidate=True)
 def enroll_students(request, course_id):
@@ -473,22 +650,10 @@ def enroll_students(request, course_id):
     course = get_course_with_access(request.user, course_id, 'staff')
     existing_students = [ce.user.email for ce in CourseEnrollment.objects.filter(course_id=course_id)]
 
-    if 'new_students' in request.POST:
-        new_students = request.POST['new_students'].split('\n')
-    else:
-        new_students = []
-    new_students = [s.strip() for s in new_students]
-
-    added_students = []
-    rejected_students = []
-
-    for student in new_students:
-        try:
-            nce = CourseEnrollment(user=User.objects.get(email=student), course_id=course_id)
-            nce.save()
-            added_students.append(student)
-        except:
-            rejected_students.append(student)
+    new_students = request.POST.get('new_students')
+    ret = _do_enroll_students(course, course_id, new_students)
+    added_students = ret['added']
+    rejected_students = ret['rejected']
 
     return render_to_response("enroll_students.html", {'course': course_id,
                                                        'existing_students': existing_students,

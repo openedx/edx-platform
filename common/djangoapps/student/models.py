@@ -262,6 +262,24 @@ class CourseEnrollment(models.Model):
         return "[CourseEnrollment] %s: %s (%s)" % (self.user, self.course_id, self.created)
 
 
+class CourseEnrollmentAllowed(models.Model):
+    """
+    Table of users (specified by email address strings) who are allowed to enroll in a specified course.
+    The user may or may not (yet) exist.  Enrollment by users listed in this table is allowed
+    even if the enrollment time window is past.
+    """
+    email = models.CharField(max_length=255, db_index=True)
+    course_id = models.CharField(max_length=255, db_index=True)
+
+    created = models.DateTimeField(auto_now_add=True, null=True, db_index=True)
+
+    class Meta:
+        unique_together = (('email', 'course_id'), )
+
+    def __unicode__(self):
+        return "[CourseEnrollmentAllowed] %s: %s (%s)" % (self.email, self.course_id, self.created)
+
+
 @receiver(post_save, sender=CourseEnrollment)
 def assign_default_role(sender, instance, **kwargs):
     if instance.user.is_staff:
