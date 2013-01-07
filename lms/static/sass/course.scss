@@ -43,7 +43,10 @@
 @import "course/profile";
 @import "course/gradebook";
 @import "course/tabs";
+@import "course/staff_grading";
 
 // instructor
 @import "course/instructor/instructor";
 
+// discussion
+@import "course/discussion/form-wmd-toolbar";

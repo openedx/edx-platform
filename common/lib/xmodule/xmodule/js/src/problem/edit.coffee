@@ -1,6 +1,7 @@
 class @MarkdownEditingDescriptor extends XModule.Descriptor
   constructor: (element) ->
     $body.on('click', '.editor-tabs .tab', @changeEditor)
+    $body.on('click', '.editor-bar a', @onToolbarButton);
 
     @xml_editor = CodeMirror.fromTextArea($(".xml-box", element)[0], {
     mode: "xml"
@@ -27,6 +28,16 @@ class @MarkdownEditingDescriptor extends XModule.Descriptor
       @setCurrentEditor(@xml_editor)
       @xml_editor.setValue(MarkdownEditingDescriptor.markdownToXml(@markdown_editor.getValue()))
 
+  onToolbarButton: (e) =>
+    e.preventDefault();
+    switch $(e.currentTarget).attr('class')
+      when "multiple-choice-button" then console.log("multiple choice")
+      when "string-button" then console.log("string-button")
+      when "number-button" then console.log("number-button")
+      when "checks-button" then console.log("checks-button")
+      when "dropdown-button" then console.log("dropdown-button")
+      else console.log("unknown option")
+
   setCurrentEditor: (editor) ->
     $(@current_editor.getWrapperElement()).hide()
     @current_editor = editor
@@ -35,6 +46,7 @@ class @MarkdownEditingDescriptor extends XModule.Descriptor
 
   save: ->
     $body.off('click', '.editor-tabs .tab', @changeEditor)
+    $body.off('click', '.editor-bar a', @onToolbarButton);
     data: @xml_editor.getValue()
 
   @markdownToXml: (markdown)->

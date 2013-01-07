@@ -186,7 +186,8 @@ class CourseDescriptor(SequenceDescriptor):
         instance = super(CourseDescriptor, cls).from_xml(xml_data, system, org, course)
 
         # bleh, have to parse the XML here to just pull out the url_name attribute
-        course_file = StringIO(xml_data)
+        # I don't think it's stored anywhere in the instance.
+        course_file = StringIO(xml_data.encode('ascii','ignore'))
         xml_obj = etree.parse(course_file,parser=edx_xml_parser).getroot()
 
         policy_dir = None
@@ -294,6 +295,10 @@ class CourseDescriptor(SequenceDescriptor):
     
 
     @property
+    def lowest_passing_grade(self):
+        return min(self._grading_policy['GRADE_CUTOFFS'].values())
+
+    @property
     def tabs(self):
         """
         Return the tabs config, as a python object, or None if not specified.
@@ -395,7 +400,20 @@ class CourseDescriptor(SequenceDescriptor):
 
     @property
     def start_date_text(self):
-        displayed_start = self._try_parse_time('advertised_start') or self.start
+        parsed_advertised_start = self._try_parse_time('advertised_start')
+
+        # If the advertised start isn't a real date string, we assume it's free
+        # form text...
+        if parsed_advertised_start is None and \
+           ('advertised_start' in self.metadata):
+           return self.metadata['advertised_start']
+
+        displayed_start = parsed_advertised_start or self.start
+
+        # If we have neither an advertised start or a real start, just return TBD
+        if not displayed_start:
+            return "TBD"
+
         return time.strftime("%b %d, %Y", displayed_start)
 
     @property
@@ -440,7 +458,7 @@ class CourseDescriptor(SequenceDescriptor):
                     return False
         except:
             log.exception("Error parsing discussion_blackouts for course {0}".format(self.id))
-        
+
         return True
 
     @property

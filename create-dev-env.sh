@@ -90,16 +90,17 @@ clone_repos() {
     fi
 }
 
+### START
+
 PROG=${0##*/}
 BASE="$HOME/mitx_all"
 PYTHON_DIR="$BASE/python"
 RUBY_DIR="$BASE/ruby"
 RUBY_VER="1.9.3"
-NUMPY_VER="1.6.2"
-SCIPY_VER="0.10.1"
-BREW_FILE="$BASE/mitx/brew-formulas.txt"
 LOG="/var/tmp/install-$(date +%Y%m%d-%H%M%S).log"
-APT_PKGS="pkg-config curl git python-virtualenv build-essential python-dev gfortran liblapack-dev libfreetype6-dev libpng12-dev libxml2-dev libxslt-dev yui-compressor nodejs npm graphviz graphviz-dev mysql-server libmysqlclient-dev"
+
+
+# Read arguments
 
 if [[ $EUID -eq 0 ]]; then
     error "This script should not be run using sudo or as the root user"
@@ -162,18 +163,14 @@ info
 output "Press return to begin or control-C to abort"
 read dummy
 
-# log all stdout and stderr
+
+# Log all stdout and stderr
+
 exec > >(tee $LOG)
 exec 2>&1
 
-if ! grep -q "export rvm_path=$RUBY_DIR" ~/.rvmrc; then
-    if [[ -f $HOME/.rvmrc ]]; then
-        output "Copying existing .rvmrc to .rvmrc.bak"
-        cp $HOME/.rvmrc $HOME/.rvmrc.bak
-    fi
-    output "Creating $HOME/.rvmrc so rvm uses $RUBY_DIR"
-    echo "export rvm_path=$RUBY_DIR" > $HOME/.rvmrc
-fi
+
+# Install basic system requirements
 
 mkdir -p $BASE
 case `uname -s` in
@@ -182,17 +179,11 @@ case `uname -s` in
             error "Please install lsb-release."
             exit 1
         }
+
         distro=`lsb_release -cs`
         case $distro in
             maya|lisa|natty|oneiric|precise|quantal)
-                output "Installing ubuntu requirements"
-                sudo apt-get install python-software-properties
-                sudo add-apt-repository ppa:chris-lea/node.js
-                sudo apt-get -y update
-                # DEBIAN_FRONTEND=noninteractive is required for silent mysql-server installation
-                sudo DEBIAN_FRONTEND=noninteractive apt-get -y install $APT_PKGS
-                sudo npm install coffee-script
-                clone_repos
+                sudo apt-get install git
                 ;;
             *)
                 error "Unsupported distribution - $distro"
@@ -200,8 +191,8 @@ case `uname -s` in
                ;;
         esac
         ;;
-    Darwin)
 
+    Darwin)
         if [[ ! -w /usr/local ]]; then
             cat<<EO
 
@@ -228,39 +219,6 @@ EO
             brew install git
         }
 
-        clone_repos
-
-        output "Installing OSX requirements"
-        if [[ ! -r $BREW_FILE ]]; then
-            error "$BREW_FILE does not exist, needed to install brew deps"
-            exit 1
-        fi
-        # brew errors if the package is already installed
-        for pkg in $(cat $BREW_FILE); do
-            grep $pkg <(brew list) &>/dev/null || {
-                output "Installing $pkg"
-                brew install $pkg
-            }
-        done
-
-        # paths where brew likes to install python scripts
-        PATH=/usr/local/share/python:/usr/local/bin:$PATH
-
-        command -v pip &>/dev/null || {
-            output "Installing pip"
-            easy_install pip
-        }
-
-        if ! grep -Eq ^1.7 <(virtualenv --version 2>/dev/null); then
-            output "Installing virtualenv >1.7"
-            pip install 'virtualenv>1.7' virtualenvwrapper
-        fi
-
-        command -v coffee &>/dev/null || {
-            output "Installing coffee script"
-            curl --insecure https://npmjs.org/install.sh | sh
-            npm install -g coffee-script
-        }
         ;;
     *)
         error "Unsupported platform"
@@ -268,19 +226,54 @@ EO
         ;;
 esac
 
+
+# Clone MITx repositories
+
+clone_repos
+
+
+# Install system-level dependencies
+
+bash $BASE/mitx/install-system-req.sh
+
+
+# Install Ruby RVM
+
 output "Installing rvm and ruby"
+
+if ! grep -q "export rvm_path=$RUBY_DIR" ~/.rvmrc; then
+    if [[ -f $HOME/.rvmrc ]]; then
+        output "Copying existing .rvmrc to .rvmrc.bak"
+        cp $HOME/.rvmrc $HOME/.rvmrc.bak
+    fi
+    output "Creating $HOME/.rvmrc so rvm uses $RUBY_DIR"
+    echo "export rvm_path=$RUBY_DIR" > $HOME/.rvmrc
+fi
+
 curl -sL get.rvm.io | bash -s -- --version 1.15.7
 source $RUBY_DIR/scripts/rvm
-# skip the intro
-LESS="-E" rvm install $RUBY_VER
+LESS="-E" rvm install $RUBY_VER --with-readline
+
 output "Installing gem bundler"
 gem install bundler
+
 output "Installing ruby packages"
 # hack :(
 cd $BASE/mitx  || true
 bundle install
 
-cd $BASE
+
+# Install Python virtualenv
+
+output "Installing python virtualenv"
+
+case `uname -s` in
+    Darwin)
+        # Add brew's path
+        PATH=/usr/local/share/python:/usr/local/bin:$PATH
+        ;;
+esac
+
 if [[ $systempkgs ]]; then
     virtualenv --system-site-packages "$PYTHON_DIR"
 else
@@ -289,8 +282,13 @@ else
     virtualenv  "$PYTHON_DIR"
 fi
 
-# change to mitx python virtualenv
+# activate mitx python virtualenv
 source $PYTHON_DIR/bin/activate
+
+# compile numpy and scipy if requested
+
+NUMPY_VER="1.6.2"
+SCIPY_VER="0.10.1"
 
 if [[ -n $compile ]]; then
     output "Downloading numpy and scipy"
@@ -323,17 +321,24 @@ case `uname -s` in
 esac
 
 output "Installing MITx pre-requirements"
-pip install -r mitx/pre-requirements.txt
-# Need to be in the mitx dir to get the paths to local modules right
+pip install -r $BASE/mitx/pre-requirements.txt
+
 output "Installing MITx requirements"
-cd mitx
+# Need to be in the mitx dir to get the paths to local modules right
+cd $BASE/mitx
 pip install -r requirements.txt
 
 mkdir "$BASE/log" || true
 mkdir "$BASE/db" || true
 
+
+# Configure Git
+
 output "Fixing your git default settings"
 git config --global push.default current
+
+
+### DONE
 
 cat<<END
    Success!!

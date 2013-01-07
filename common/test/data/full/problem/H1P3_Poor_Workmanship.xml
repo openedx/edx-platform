@@ -78,7 +78,8 @@ So the total heating power in Joe's shop was:
 <numericalresponse answer="$Pbad"><responseparam type="tolerance" default="5%" name="tol" description="Numerical Tolerance"/><textline/></numericalresponse>
 <startouttext/>
 <br/>
-No wonder Joe was cold.
+<!-- add non-ascii utf-8 character here -->
+No wonder Joe was cold…
 <endouttext/>
 
 </problem>

@@ -407,13 +407,11 @@ class CrystallographyTest(unittest.TestCase):
     def test_rendering(self):
         height = '12'
         width = '33'
-        size = '10'
 
         xml_str = """<crystallography id="prob_1_2"
         height="{h}"
         width="{w}"
-        size="{s}"
-        />""".format(h=height, w=width, s=size)
+        />""".format(h=height, w=width)
 
         element = etree.fromstring(xml_str)
 
@@ -428,9 +426,7 @@ class CrystallographyTest(unittest.TestCase):
         expected = {'id': 'prob_1_2',
                     'value': value,
                     'status': 'unsubmitted',
-                    'size': size,
                     'msg': '',
-                    'hidden': '',
                     'width': width,
                     'height': height,
                    }
