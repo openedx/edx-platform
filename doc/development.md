@@ -19,6 +19,11 @@ Use the MacPorts package `mongodb` or the Homebrew formula `mongodb`
 
 ## Initializing Mongodb
 
+First start up the mongo daemon. E.g. to start it up in the background
+using a config file:
+
+    mongod --config /usr/local/etc/mongod.conf &
+
 Check out the course data directories that you want to work with into the
 `GITHUB_REPO_ROOT` (by default, `../data`). Then run the following command:
 
