@@ -283,9 +283,13 @@ $red: rgb(178, 6, 16);
 		.message-status {
 			@include border-radius(3px);
 			margin: 0 0 ($baseline*2) 0;
-			padding: $baseline;
 			border: 1px solid #ccc;
-			background: tint($yellow,85%);
+			padding: 0;
+			background: tint($yellow,90%);
+
+			> * {
+				padding: $baseline;
+			}
 
 			p {
 				margin: 0 0 ($baseline/4) 0;
@@ -298,23 +302,169 @@ $red: rgb(178, 6, 16);
 				display: block;
 			}
 
-			.label {
-				margin-right: ($baseline/4);
-				text-transform: uppercase;
-				letter-spacing: 1px;
+			h3, h4, h5 {
+				font-family: $sans-serif;
 			}
 
-			.value {
-				color: rgba(0,0,0,0.9);
+			h3 {
+				border-bottom: 1px solid tint(rgb(0,0,0), 90%);
+				padding-bottom: ($baseline*0.75);
+			}
+
+			h4 {
+				margin-bottom: ($baseline/4);
+			}
+
+			.status-list {
+				list-style: none;
+				margin: 0;
+				padding: $baseline;
+
+				> .item {
+					@include clearfix();
+					margin: 0 0 ($baseline*0.75) 0;
+					border-bottom: 1px solid tint(rgb(0,0,0), 95%);
+					padding: 0 0 ($baseline/2) 0;
+
+					&:last-child {
+						margin-bottom: 0;
+						border-bottom: none;
+						padding-bottom: 0;
+					}
+
+					.title {
+						margin-bottom: ($baseline/4);
+						position: relative;
+						font-weight: bold;
+						font-size: 14px;
+
+						&:after {
+							position: absolute;
+							top: 0;
+							right: $baseline;
+							margin-left: $baseline;
+							content: "testing";
+							text-transform: uppercase;
+							font-size: 11px;
+							font-weight: normal;
+							opacity: 0.5;
+						}
+					}
+
+					.details, .item {
+						@include transition(opacity, 0.10s, ease-in-out);
+						font-size: 13px;
+						opacity: 0.65;
+					}
+
+					&:before {
+						@include border-radius($baseline);
+						position: relative;
+						top: 3px;
+						display: block;
+						float: left;
+						width: ($baseline/2);
+						height: ($baseline/2);
+						margin: 0 ($baseline/2) 0 0;
+						background: $dark-gray;
+						content: "";
+					}
+
+					// specific states
+					&.status-accepted {
+
+						&:before {
+							background: green;
+						}
+
+						.title:after {
+							color: green;
+							content: "accepted";
+						}
+					}
+
+					&.status-pending {
+
+						&:before {
+							background: transparent;
+							border: 1px dotted gray;
+						}
+
+						.title:after {
+							color: gray;
+							content: "pending";
+						}
+					}
+
+					&.status-rejected {
+
+						&:before {
+							background: $red;
+						}
+
+						.title:after {
+							color: red;
+							content: "rejected";
+						}
+					}
+
+					&:hover {
+
+						.details, .item {
+							opacity: 1.0;
+						}
+					}
+				}
+
+				// sub menus
+				.accommodations-list {
+					list-style: none;
+					margin: ($baseline/2) 0;
+					padding: 0;
+					font-size: 13px;
+
+					.item {
+						margin: 0 0 ($baseline/4) 0;
+						padding: 0;
+					}
+				}
+			}
+
+			// actions
+			.actions {
+				@include box-shadow(inset 0 1px 1px 0px rgba(0,0,0,0.2));
+				border-top: 1px solid tint(rgb(0,0,0), 90%);
+				padding-top: ($baseline*0.75);
+				background: tint($yellow,70%);
 				font-size: 14px;
-			}
 
-			.registration-status {
-				margin: 0 0 ($baseline/2) 0;
+				.label, .value {
+					display: inline-block;					
+				}
 
 				.label {
-					margin: 0 0 ($baseline/2) 0;
-					color: #ccc;
+					margin-right: ($baseline/4);
+				}
+
+				.value {
+					font-weight: bold;
+				}
+
+				.message-copy {
+					font-size: 13px;
+				}
+
+				.exam-button {
+				  @include button(simple, $pink);
+				  display: block;
+				  margin: ($baseline/2) 0 0 0;
+				  padding: ($baseline/2) $baseline;
+				  font-size: 13px;
+				  font-weight: bold;
+
+				  &:hover {
+				    text-decoration: none;
+				  }
 				}
 			}
 
@@ -325,40 +475,21 @@ $red: rgb(178, 6, 16);
 					letter-spacing: 0;
 				}
 
-				.label, .value {
-					display: inline-block
+				
+			}
+
+			.registration-accepted {
+
+				.message-copy {
+					margin: 0 0 ($baseline/2) 0;
 				}
 			}
-
-			.message-copy {
-				margin: 0;
-				color: rgba(0,0,0,0.65);
-			}
 		}
 
-		.registration-accepted {
-
-			.message-copy {
-				margin: 0 0 ($baseline/2) 0;
-			}
-
-			.exam-button {
-			  @include button(simple, $pink);
-			  display: block;
-			  padding: ($baseline/2) $baseline;
-			  font-size: 13px;
-			  font-weight: bold;
-
-			  &:hover {
-			    text-decoration: none;
-			  }
-			}
-		}
-
-		.details {
+		> .details {
 			border-bottom: 1px solid rgba(216, 223, 230, 0.5);
 			margin: 0 0 $baseline 0;
-			padding: 0 0 $baseline 0;
+			padding: 0 $baseline $baseline $baseline;
 			font-family: $sans-serif;
 			font-size: 14px;
 

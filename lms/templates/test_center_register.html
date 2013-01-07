@@ -290,45 +290,79 @@
     
   <aside>
    % if registration:
-    <h3 class="is-hidden">Registration Details</h3>
     
-    % if registration.is_accepted():
-    <div class="message message-status registration-accepted is-shown">
-      <% regstatus = "Registration approved by Pearson" %>
-      <p class="registration-status"><span class="label">Registration Status: </span><span class="value">${regstatus}</span></p>
-      <p class="registration-number"><span class="label">Registration number: </span> <span class="value">${registration.client_authorization_id}</span></p>
-      <p class="message-copy">Write this down! You’ll need it to schedule your exam.</p>
-      <!-- TODO: pull this link out into some settable parameter. -->
-      <a href="https://www1.pearsonvue.com/testtaker/signin/SignInPage/EDX" class="button exam-button">Schedule Pearson exam</a>
-    </div>
-    % endif
-    
-    % if registration.is_rejected():
-    <!-- TODO: the registration may be failed because of the upload of the demographics or of the upload of the registration.
-    	Fix this so that the correct upload error message is displayed. -->
-    <div class="message message-status registration-rejected is-shown">
-      <% regstatus = "Registration rejected by Pearson: %s" % registration.upload_error_message %>
-      <p class="registration-status"><span class="label">Registration Status: </span><span class="value">${regstatus}</span></p>
-      <p class="message-copy">Your registration for the Pearson exam has been rejected. Please contact Pearson VUE for further information regarding your registration.</p>
-    </div>
-    % endif
-    
-    % if registration.is_pending_accommodation():
+    <!-- REG: Dem accepted, Accom pending, Registration pending --> 
     <div class="message message-status registration-pending is-shown">
-      <% regstatus = "Registration pending approval of accommodation request" %>
-      <p class="registration-status"><span class="label">Registration Status: </span><span class="value">${regstatus}</span></p>
-      <p class="message-copy">Your registration for the Pearson exam is pending. Within a few days, you should see confirmation here of granted accommodations.
-      	At that point, your registration will be forwarded to Pearson.</p>
-    </div>
-    % endif
+      <h3>Pearson Exam Registration Status</h3>
 
-    % if registration.is_pending_acknowledgement():
-    <div class="message message-status registration-pending is-shown">
-      <% regstatus = "Registration pending acknowledgement by Pearson" %>
-      <p class="registration-status"><span class="label">Registration Status: </span><span class="value">${regstatus}</span></p>
-      <p class="message-copy">Your registration for the Pearson exam is pending. Within a few days, you should see a confirmation number here, which can be used to schedule your exam.</p>
+      <ol class="status-list">
+        <li class="item status status-accepted status-demographics">
+          <h4 class="title">Demographic Information</h4>
+          <p class="details">The demographic information you most recently provided has been accepted</p>
+        </li>
+        <li class="item status status-pending status-accommodations">
+          <h4 class="title">Accommodations Request</h4>
+          <p class="details">Your requested accommodations are pending. Within a few days, you should see confirmation here of granted accommodations.</p>
+        </li>
+        <li class="item status status-pending status-registration">
+          <h4 class="title">Registration Request</h4>
+          <p class="details">Your exam registration is pending. Once all of the above steps are accepted your registration will be forwarded to Pearson and you will be able to schedule an exam.</p>
+        </li>
+      </ol>
     </div>
-    % endif
+
+    <!-- REG: Dem accepted, Accom accepted, Registration accepted --> 
+    <div class="message message-status registration-accepted is-shown">
+      <h3>Pearson Exam Registration Status</h3>
+
+      <ol class="status-list">
+        <li class="item status status-accepted status-demographics">
+          <h4 class="title">Demographic Information</h4>
+          <p class="details">The demographic information you most recently provided has been accepted</p>
+        </li>
+        <li class="item status status-accepted status-accommodations">
+          <h4 class="title">Accommodations Request</h4>
+          <p class="details">Your requested accommodations have been accepted and include:</p>
+
+          <ul class="accommodations-list">
+            <li class="item">Extra Time - Double Time</li>
+            <li class="item">Separate Room & Reader/Recorder</li>
+            <li class="item">Equipment</li>
+          </ul>  
+        </li>
+        <li class="item status status-accepted status-registration">
+          <h4 class="title">Registration Request</h4>
+          <p class="details">Your exam registration has been accepted and has been forwarded to Pearson. You are now able to schedule an exam.</p>
+        </li>
+      </ol>
+
+      <div class="actions">
+        <span class="label">Registration number: </span> <span class="value">12345678901</span>
+        <p class="message-copy">Write this down! You’ll need it to schedule your exam.</p>
+        <a href="https://www1.pearsonvue.com/testtaker/signin/SignInPage/EDX" class="button exam-button">Schedule Pearson exam</a>
+      </div>
+    </div>
+
+    <!-- REG: Dem rejected, Accom none, Registration rejected --> 
+    <div class="message message-status registration-rejected is-shown">
+      <h3>Pearson Exam Registration Status</h3>
+
+      <ol class="status-list">
+        <li class="item status status-rejected status-demographics">
+          <h4 class="title">Demographic Information</h4>
+          <p class="details">The demographic information you most recently provided has been rejected by Pearson. You can correct it and submit again</p>
+        </li>
+        <li class="item status status-rejected status-registration">
+          <h4 class="title">Registration Request</h4>
+          <p class="details">Your exam registration has been rejected by Pearson. <strong>You currently cannot schedule an exam</strong>.</p>
+        </li>
+      </ol>
+
+      <div class="actions">
+        <span class="label">Pearson Testing Support</span> <span class="value">1-800-555-5555</span>
+        <p class="message-copy">Please contact the number above for further questions about your test</p>
+      </div>
+    </div>
 
    % endif
     

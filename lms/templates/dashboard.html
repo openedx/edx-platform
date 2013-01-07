@@ -229,7 +229,7 @@
                 % if registration is None and testcenter_exam_info.is_registering():	    
                 <div class="message message-status is-shown exam-register">
                       <a href="${testcenter_register_target}" class="exam-button" id="exam_register_button">Register for Pearson exam</a>
-                      <p class="message-copy">Registration for the Pearson exam is now open.</p>
+                      <p class="message-copy">Registration for the Pearson exam is now open and will close on <strong>${testcenter_exam_info.registration_end_date_text}</strong></p>
                 </div>
                 % endif
                 <!-- display a registration for a current exam, even if the registration period is over -->
