@@ -1,24 +1,21 @@
-import copy
+import logging
+log = logging.getLogger("mitx." + __name__)
+
 import json
-import os
-import sys
 import time
 
-from nose import SkipTest
-from path import path
-from pprint import pprint
 from urlparse import urlsplit, urlunsplit
 
 from django.contrib.auth.models import User, Group
-from django.core.handlers.wsgi import WSGIRequest
 from django.test import TestCase
-from django.test.client import Client, RequestFactory
+from django.test.client import RequestFactory
 from django.conf import settings
 from django.core.urlresolvers import reverse
-from mock import patch, Mock
 from override_settings import override_settings
 
 import xmodule.modulestore.django
+from xmodule.modulestore.mongo import MongoModuleStore
+
 
 # Need access to internal func to put users in the right group
 from courseware import grades
@@ -26,9 +23,11 @@ from courseware.access import _course_staff_group_name
 from courseware.models import StudentModuleCache
 
 from student.models import Registration
+from xmodule.error_module import ErrorDescriptor
 from xmodule.modulestore.django import modulestore
 from xmodule.modulestore import Location
 from xmodule.modulestore.xml_importer import import_from_xml
+from xmodule.modulestore.xml import XMLModuleStore
 from xmodule.timeparse import stringify_time
 
 def parse_json(response):
@@ -44,7 +43,6 @@ def user(email):
 def registration(email):
     '''look up registration object by email'''
     return Registration.objects.get(user__email=email)
-
 
 # A bit of a hack--want mongo modulestore for these tests, until
 # jump_to works with the xmlmodulestore or we have an even better solution
@@ -76,13 +74,9 @@ def xml_store_config(data_dir):
     }
 }
 
-
 TEST_DATA_DIR = settings.COMMON_TEST_DATA_ROOT
-TEST_DATA_MONGO_MODULESTORE = mongo_store_config(TEST_DATA_DIR)
 TEST_DATA_XML_MODULESTORE = xml_store_config(TEST_DATA_DIR)
-
-REAL_DATA_DIR = settings.GITHUB_REPO_ROOT
-REAL_DATA_MODULESTORE = mongo_store_config(REAL_DATA_DIR)
+TEST_DATA_MONGO_MODULESTORE = mongo_store_config(TEST_DATA_DIR)
 
 class ActivateLoginTestCase(TestCase):
     '''Check that we can activate and log in'''
@@ -221,22 +215,35 @@ class PageLoader(ActivateLoginTestCase):
 
     def check_for_get_code(self, code, url):
         """
-        Check that we got the expected code.  Hacks around our broken 404
-        handling.
+        Check that we got the expected code when accessing url via GET.
+        Returns the response.
         """
         resp = self.client.get(url)
         self.assertEqual(resp.status_code, code,
                          "got code {0} for url '{1}'. Expected code {2}"
                          .format(resp.status_code, url, code))
+        return resp
 
 
-    def check_pages_load(self, course_name, data_dir, modstore):
+    def check_for_post_code(self, code, url, data={}):
+        """
+        Check that we got the expected code when accessing url via POST.
+        Returns the response.
+        """
+        resp = self.client.post(url, data)
+        self.assertEqual(resp.status_code, code,
+                         "got code {0} for url '{1}'. Expected code {2}"
+                         .format(resp.status_code, url, code))
+        return resp
+
+
+
+    def check_pages_load(self, module_store):
         """Make all locations in course load"""
-        print "Checking course {0} in {1}".format(course_name, data_dir)
-        import_from_xml(modstore, data_dir, [course_name])
 
-        # enroll in the course before trying to access pages
-        courses = modstore.get_courses()
+
+       # enroll in the course before trying to access pages
+        courses = module_store.get_courses()
         self.assertEqual(len(courses), 1)
         course = courses[0]
         self.enroll(course)
@@ -245,7 +252,7 @@ class PageLoader(ActivateLoginTestCase):
         n = 0
         num_bad = 0
         all_ok = True
-        for descriptor in modstore.get_items(
+        for descriptor in module_store.get_items(
                 Location(None, None, None, None, None)):
 
             n += 1
@@ -276,6 +283,8 @@ class PageLoader(ActivateLoginTestCase):
                     msg = "ERROR " + msg
                     all_ok = False
                     num_bad += 1  
+            elif descriptor.location.category == 'custom_tag_template':
+                pass
             else:
                 #print descriptor.__class__, descriptor.location
                 resp = self.client.get(reverse('jump_to',
@@ -284,34 +293,64 @@ class PageLoader(ActivateLoginTestCase):
                 msg = str(resp.status_code)
 
                 if resp.status_code != 302:
-                    # cdodge: we're adding 'custom_tag_template' which is the Mako template used to render
-                    # the custom tag. We can't 'jump-to' this module. Unfortunately, we also can't test render
-                    # it easily
-                    if descriptor.location.category not in ['custom_tag_template'] or resp.status_code != 404:
-                        msg = "ERROR " + msg
-                        all_ok = False
-                        num_bad += 1
+                    msg = "ERROR " + msg
+                    all_ok = False
+                    num_bad += 1
             print msg
             self.assertTrue(all_ok)  # fail fast
 
         print "{0}/{1} good".format(n - num_bad, n)
+        log.info( "{0}/{1} good".format(n - num_bad, n))
         self.assertTrue(all_ok)
 
 
-@override_settings(MODULESTORE=TEST_DATA_MONGO_MODULESTORE)
-class TestCoursesLoadTestCase(PageLoader):
+
+@override_settings(MODULESTORE=TEST_DATA_XML_MODULESTORE)
+class TestCoursesLoadTestCase_XmlModulestore(PageLoader):
     '''Check that all pages in test courses load properly'''
 
     def setUp(self):
         ActivateLoginTestCase.setUp(self)
         xmodule.modulestore.django._MODULESTORES = {}
-        xmodule.modulestore.django.modulestore().collection.drop()
-
+        
     def test_toy_course_loads(self):
-        self.check_pages_load('toy', TEST_DATA_DIR, modulestore())
+        module_store = XMLModuleStore(
+                                      TEST_DATA_DIR,
+                                      default_class='xmodule.hidden_module.HiddenDescriptor',
+                                      course_dirs=['toy'],
+                                      load_error_modules=True,
+                                      )
+
+        self.check_pages_load(module_store)
 
     def test_full_course_loads(self):
-        self.check_pages_load('full', TEST_DATA_DIR, modulestore())
+        module_store = XMLModuleStore(
+                                      TEST_DATA_DIR,
+                                      default_class='xmodule.hidden_module.HiddenDescriptor',
+                                      course_dirs=['full'],
+                                      load_error_modules=True,
+                                      )
+        self.check_pages_load(module_store)
+
+
+@override_settings(MODULESTORE=TEST_DATA_MONGO_MODULESTORE)
+class TestCoursesLoadTestCase_MongoModulestore(PageLoader):
+    '''Check that all pages in test courses load properly'''
+
+    def setUp(self):
+        ActivateLoginTestCase.setUp(self)
+        xmodule.modulestore.django._MODULESTORES = {}
+        modulestore().collection.drop()
+        
+    def test_toy_course_loads(self):
+        module_store = modulestore()
+        import_from_xml(module_store, TEST_DATA_DIR, ['toy'])
+        self.check_pages_load(module_store)
+
+    def test_full_course_loads(self):
+        module_store = modulestore()
+        import_from_xml(module_store, TEST_DATA_DIR, ['full'])
+        self.check_pages_load(module_store)
 
 
 @override_settings(MODULESTORE=TEST_DATA_XML_MODULESTORE)
@@ -320,14 +359,10 @@ class TestNavigation(PageLoader):
 
     def setUp(self):
         xmodule.modulestore.django._MODULESTORES = {}
-        courses = modulestore().get_courses()
 
-        def find_course(course_id):
-            """Assumes the course is present"""
-            return [c for c in courses if c.id==course_id][0]
-
-        self.full = find_course("edX/full/6.002_Spring_2012")
-        self.toy = find_course("edX/toy/2012_Fall")
+        # Assume courses are there
+        self.full = modulestore().get_course("edX/full/6.002_Spring_2012")
+        self.toy = modulestore().get_course("edX/toy/2012_Fall")
 
         # Create two accounts
         self.student = 'view@test.com'
@@ -378,14 +413,9 @@ class TestViewAuth(PageLoader):
 
     def setUp(self):
         xmodule.modulestore.django._MODULESTORES = {}
-        courses = modulestore().get_courses()
 
-        def find_course(course_id):
-            """Assumes the course is present"""
-            return [c for c in courses if c.id==course_id][0]
-
-        self.full = find_course("edX/full/6.002_Spring_2012")
-        self.toy = find_course("edX/toy/2012_Fall")
+        self.full = modulestore().get_course("edX/full/6.002_Spring_2012")
+        self.toy = modulestore().get_course("edX/toy/2012_Fall")
 
         # Create two accounts
         self.student = 'view@test.com'
@@ -647,35 +677,6 @@ class TestViewAuth(PageLoader):
         self.unenroll(self.toy)
         self.assertTrue(self.try_enroll(self.toy))
 
-
-@override_settings(MODULESTORE=REAL_DATA_MODULESTORE)
-class RealCoursesLoadTestCase(PageLoader):
-    '''Check that all pages in real courses load properly'''
-
-    def setUp(self):
-        ActivateLoginTestCase.setUp(self)
-        xmodule.modulestore.django._MODULESTORES = {}
-        xmodule.modulestore.django.modulestore().collection.drop()
-
-    def test_real_courses_loads(self):
-        '''See if any real courses are available at the REAL_DATA_DIR.
-        If they are, check them.'''
-
-        # TODO: Disabled test for now..  Fix once things are cleaned up.
-        raise SkipTest
-        # TODO: adjust staticfiles_dirs
-        if not os.path.isdir(REAL_DATA_DIR):
-            # No data present.  Just pass.
-            return
-
-        courses = [course_dir for course_dir in os.listdir(REAL_DATA_DIR)
-                   if os.path.isdir(REAL_DATA_DIR / course_dir)]
-        for course in courses:
-            self.check_pages_load(course, REAL_DATA_DIR, modulestore())
-
-
-    # ========= TODO: check ajax interaction here too?
-
 @override_settings(MODULESTORE=TEST_DATA_XML_MODULESTORE)
 class TestCourseGrader(PageLoader):
     """Check that a course gets graded properly"""
@@ -692,46 +693,46 @@ class TestCourseGrader(PageLoader):
             return [c for c in courses if c.id==course_id][0]
 
         self.graded_course = find_course("edX/graded/2012_Fall")
-        
+
         # create a test student
         self.student = 'view@test.com'
         self.password = 'foo'
         self.create_account('u1', self.student, self.password)
         self.activate_user(self.student)
         self.enroll(self.graded_course)
-        
+
         self.student_user = user(self.student)
-        
+
         self.factory = RequestFactory()
-    
+
     def get_grade_summary(self):
         student_module_cache = StudentModuleCache.cache_for_descriptor_descendents(
             self.graded_course.id, self.student_user, self.graded_course)
-        
-        fake_request = self.factory.get(reverse('progress',
-                                       kwargs={'course_id': self.graded_course.id}))
-        
-        return grades.grade(self.student_user, fake_request, 
-                            self.graded_course, student_module_cache)
-    
-    def get_homework_scores(self):
-        return self.get_grade_summary()['totaled_scores']['Homework']
-    
-    def get_progress_summary(self):
-        student_module_cache = StudentModuleCache.cache_for_descriptor_descendents(
-            self.graded_course.id, self.student_user, self.graded_course)
-        
+
         fake_request = self.factory.get(reverse('progress',
                                        kwargs={'course_id': self.graded_course.id}))
 
-        progress_summary = grades.progress_summary(self.student_user, fake_request, 
+        return grades.grade(self.student_user, fake_request,
+                            self.graded_course, student_module_cache)
+
+    def get_homework_scores(self):
+        return self.get_grade_summary()['totaled_scores']['Homework']
+
+    def get_progress_summary(self):
+        student_module_cache = StudentModuleCache.cache_for_descriptor_descendents(
+            self.graded_course.id, self.student_user, self.graded_course)
+
+        fake_request = self.factory.get(reverse('progress',
+                                       kwargs={'course_id': self.graded_course.id}))
+
+        progress_summary = grades.progress_summary(self.student_user, fake_request,
                                                    self.graded_course, student_module_cache)
         return progress_summary
-        
+
     def check_grade_percent(self, percent):
         grade_summary = self.get_grade_summary()
         self.assertEqual(grade_summary['percent'], percent)
-    
+
     def submit_question_answer(self, problem_url_name, responses):
         """
         The field names of a problem are hard to determine. This method only works
@@ -741,96 +742,96 @@ class TestCourseGrader(PageLoader):
         input_i4x-edX-graded-problem-H1P3_2_2
         """
         problem_location = "i4x://edX/graded/problem/{0}".format(problem_url_name)
-        
-        modx_url = reverse('modx_dispatch', 
+
+        modx_url = reverse('modx_dispatch',
                             kwargs={
                                 'course_id' : self.graded_course.id,
                                 'location' : problem_location,
                                 'dispatch' : 'problem_check', }
                           )
-        
+
         resp = self.client.post(modx_url, {
             'input_i4x-edX-graded-problem-{0}_2_1'.format(problem_url_name): responses[0],
             'input_i4x-edX-graded-problem-{0}_2_2'.format(problem_url_name): responses[1],
             })
         print "modx_url" , modx_url, "responses" , responses
         print "resp" , resp
-        
+
         return resp
-    
+
     def problem_location(self, problem_url_name):
         return "i4x://edX/graded/problem/{0}".format(problem_url_name)
-    
+
     def reset_question_answer(self, problem_url_name):
         problem_location = self.problem_location(problem_url_name)
-        
-        modx_url = reverse('modx_dispatch', 
+
+        modx_url = reverse('modx_dispatch',
                             kwargs={
                                 'course_id' : self.graded_course.id,
                                 'location' : problem_location,
                                 'dispatch' : 'problem_reset', }
                           )
-        
+
         resp = self.client.post(modx_url)
-        return resp    
-     
+        return resp
+
     def test_get_graded(self):
         #### Check that the grader shows we have 0% in the course
         self.check_grade_percent(0)
-        
+
         #### Submit the answers to a few problems as ajax calls
         def earned_hw_scores():
             """Global scores, each Score is a Problem Set"""
             return [s.earned for s in self.get_homework_scores()]
-        
+
         def score_for_hw(hw_url_name):
             hw_section = [section for section
                           in self.get_progress_summary()[0]['sections']
                           if section.get('url_name') == hw_url_name][0]
             return [s.earned for s in hw_section['scores']]
-        
+
         # Only get half of the first problem correct
         self.submit_question_answer('H1P1', ['Correct', 'Incorrect'])
         self.check_grade_percent(0.06)
         self.assertEqual(earned_hw_scores(), [1.0, 0, 0]) # Order matters
         self.assertEqual(score_for_hw('Homework1'), [1.0, 0.0])
-        
+
         # Get both parts of the first problem correct
         self.reset_question_answer('H1P1')
         self.submit_question_answer('H1P1', ['Correct', 'Correct'])
         self.check_grade_percent(0.13)
         self.assertEqual(earned_hw_scores(), [2.0, 0, 0])
         self.assertEqual(score_for_hw('Homework1'), [2.0, 0.0])
-        
+
         # This problem is shown in an ABTest
         self.submit_question_answer('H1P2', ['Correct', 'Correct'])
         self.check_grade_percent(0.25)
         self.assertEqual(earned_hw_scores(), [4.0, 0.0, 0])
-        self.assertEqual(score_for_hw('Homework1'), [2.0, 2.0])        
-        
+        self.assertEqual(score_for_hw('Homework1'), [2.0, 2.0])
+
         # This problem is hidden in an ABTest. Getting it correct doesn't change total grade
         self.submit_question_answer('H1P3', ['Correct', 'Correct'])
         self.check_grade_percent(0.25)
         self.assertEqual(score_for_hw('Homework1'), [2.0, 2.0])
-        
+
         # On the second homework, we only answer half of the questions.
         # Then it will be dropped when homework three becomes the higher percent
         # This problem is also weighted to be 4 points (instead of default of 2)
-        # If the problem was unweighted the percent would have been 0.38 so we 
+        # If the problem was unweighted the percent would have been 0.38 so we
         # know it works.
         self.submit_question_answer('H2P1', ['Correct', 'Correct'])
         self.check_grade_percent(0.42)
-        self.assertEqual(earned_hw_scores(), [4.0, 4.0, 0])        
-        
+        self.assertEqual(earned_hw_scores(), [4.0, 4.0, 0])
+
         # Third homework
         self.submit_question_answer('H3P1', ['Correct', 'Correct'])
         self.check_grade_percent(0.42) # Score didn't change
-        self.assertEqual(earned_hw_scores(), [4.0, 4.0, 2.0])        
-        
+        self.assertEqual(earned_hw_scores(), [4.0, 4.0, 2.0])
+
         self.submit_question_answer('H3P2', ['Correct', 'Correct'])
         self.check_grade_percent(0.5) # Now homework2 dropped. Score changes
-        self.assertEqual(earned_hw_scores(), [4.0, 4.0, 4.0])                
-        
+        self.assertEqual(earned_hw_scores(), [4.0, 4.0, 4.0])
+
         # Now we answer the final question (worth half of the grade)
         self.submit_question_answer('FinalQuestion', ['Correct', 'Correct'])
         self.check_grade_percent(1.0) # Hooray! We got 100%

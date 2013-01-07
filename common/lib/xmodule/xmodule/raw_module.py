@@ -13,7 +13,7 @@ class RawDescriptor(XmlDescriptor, XMLEditingDescriptor):
     """
     @classmethod
     def definition_from_xml(cls, xml_object, system):
-        return {'data': etree.tostring(xml_object, pretty_print=True)}
+        return {'data': etree.tostring(xml_object, pretty_print=True,encoding='unicode')}
 
     def definition_to_xml(self, resource_fs):
         try:

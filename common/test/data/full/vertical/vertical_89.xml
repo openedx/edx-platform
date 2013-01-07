@@ -1,6 +1,7 @@
 <sequential>
   <html slug="html_90">
-    <h1> </h1>
+    <!-- UTF-8 characters are acceptable… HTML entities are not -->
+    <h1>Inline content…</h1>
   </html>
   <video youtube="1.50:vl9xrfxcr38,1.25:qxNX4REGqx4,1.0:BGU1poJDgOY,0.75:8rK9vnpystQ" slug="S1V14_Summary" name="S1V14: Summary"/>
   <customtag tag="S1" slug="discuss_91" impl="discuss"/>

@@ -10,6 +10,9 @@ from xmodule.modulestore.mongo import MongoModuleStore
 from xmodule.modulestore.django import modulestore
 from xmodule.contentstore.content import StaticContent
 
+import datetime
+import time
+
 log = logging.getLogger(__name__)
 
 
@@ -37,6 +40,7 @@ class VideoModule(XModule):
         self.show_captions = xmltree.get('show_captions', 'true')
         self.source = self._get_source(xmltree)
         self.track = self._get_track(xmltree)
+        self.start_time, self.end_time = self._get_timeframe(xmltree)
 
         if instance_state is not None:
             state = json.loads(instance_state)
@@ -46,11 +50,11 @@ class VideoModule(XModule):
     def _get_source(self, xmltree):
         # find the first valid source
         return self._get_first_external(xmltree, 'source')
-        
+
     def _get_track(self, xmltree):
         # find the first valid track
         return self._get_first_external(xmltree, 'track')
-        
+
     def _get_first_external(self, xmltree, tag):
         """
         Will return the first valid element
@@ -64,6 +68,23 @@ class VideoModule(XModule):
                 result = src
                 break
         return result
+
+    def _get_timeframe(self, xmltree):
+        """ Converts 'from' and 'to' parameters in video tag to seconds.
+        If there are no parameters, returns empty string. """
+
+        def parse_time(s):
+            """Converts s in '12:34:45' format to seconds. If s is
+            None, returns empty string"""
+            if s is None:
+                return ''
+            else:
+                x = time.strptime(s, '%H:%M:%S')
+                return datetime.timedelta(hours=x.tm_hour,
+                                      minutes=x.tm_min,
+                                      seconds=x.tm_sec).total_seconds()
+
+        return parse_time(xmltree.get('from')), parse_time(xmltree.get('to'))
 
     def handle_ajax(self, dispatch, get):
         '''
@@ -109,12 +130,14 @@ class VideoModule(XModule):
             'id': self.location.html_id(),
             'position': self.position,
             'source': self.source,
-            'track' : self.track,
+            'track': self.track,
             'display_name': self.display_name,
             # TODO (cpennington): This won't work when we move to data that isn't on the filesystem
             'data_dir': self.metadata['data_dir'],
             'caption_asset_path': caption_asset_path,
-            'show_captions': self.show_captions
+            'show_captions': self.show_captions,
+            'start': self.start_time,
+            'end': self.end_time
         })
 
 
