@@ -30,6 +30,8 @@ class @CombinedOpenEnded
     @hint_wrapper = @$('.hint-wrapper')
     @message_wrapper = @$('.message-wrapper')
     @submit_button = @$('.submit-button')
+    @submit_evaluation_button = @$('.submit-evaluation-button')
+    @submit_evaluation_button.click @message_post
     @child_state = @el.data('state')
     @child_type = @el.data('child-type')
     if @child_type=="openended"
@@ -133,7 +135,6 @@ class @CombinedOpenEnded
           @errors_area.html(response.error)
     else
       @errors_area.html('Problem state got out of sync.  Try reloading the page.')
-
 
   save_hint:  (event) =>
     event.preventDefault()

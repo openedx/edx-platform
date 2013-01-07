@@ -404,6 +404,11 @@ class OpenEndedModule(openendedchild.OpenEndedChild):
             correct = (score_ratio >= 0.66)
         return correct
 
+    def format_feedback_with_evaluation(self,feedback):
+        context={'msg' : feedback, id : "1", rows : 30, cols : 30}
+        html= render_to_string('open_ended_evaluation.html', context)
+        return html
+
     def handle_ajax(self, dispatch, get, system):
         '''
         This is called by courseware.module_render, to handle an AJAX call.
