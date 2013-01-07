@@ -21,6 +21,7 @@ h2 {
 }
 
 section.combined-open-ended {
+  margin-right:20px;
   .status-container
   {
       float:right;
@@ -30,6 +31,15 @@ section.combined-open-ended {
   {
       float:left;
       width: 63%;
+  }
+
+  &:after
+  {
+      content:".";
+      display:block;
+      height:0;
+      visibility: hidden;
+      clear:both;
   }
 }
 
