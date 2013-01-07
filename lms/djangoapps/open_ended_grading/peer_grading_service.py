@@ -15,6 +15,26 @@ from xmodule.course_module import CourseDescriptor
 
 log = logging.getLogger(__name__)
 
+class MockPeerGradingService(object):
+    # TODO: make this return real results
+    def get_next_submission(self, problem_location, grader_id):
+        return {'success': true}
+
+    def save_grade(self, location, grader_id, submission_id, score, feedback, submission_key):
+        return {'success': true}
+
+    def is_student_calibrated(self, problem_location, grader_id):
+        return {'success': true}
+    
+    def show_calibration_essay(self, problem_location, grader_id):
+        return {'success': true}
+
+    def save_calibration_essay(self, problem_location, grader_id, calibration_essay_id, submission_key, score, feedback):
+        return {'success': true}
+
+    def get_problem_list(self, course_id, grader_id):
+        return {'success': true}
+
 class PeerGradingService(GradingService):
     """
     Interface with the grading controller for peer grading
@@ -78,7 +98,10 @@ def peer_grading_service():
     if _service is not None:
         return _service
 
-    _service = PeerGradingService(settings.PEER_GRADING_INTERFACE)
+    if settings.MOCK_PEER_GRADING:
+        _service = MockPeerGradingService()
+    else:
+        _service = PeerGradingService(settings.PEER_GRADING_INTERFACE)
 
     return _service
 

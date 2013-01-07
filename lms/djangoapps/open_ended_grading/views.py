@@ -28,6 +28,7 @@ from xmodule.modulestore.exceptions import InvalidLocationError, ItemNotFoundErr
 from xmodule.modulestore.search import path_to_location
 
 from peer_grading_service import PeerGradingService
+from peer_grading_service import MockPeerGradingService
 from grading_service import GradingServiceError
 import json
 import track.views
@@ -38,7 +39,10 @@ from .staff_grading import StaffGrading
 log = logging.getLogger(__name__)
 
 template_imports = {'urllib': urllib}
-peer_gs = PeerGradingService(settings.PEER_GRADING_INTERFACE)
+if settings.MOCK_PEER_GRADING:
+    peer_gs = MockPeerGradingService() 
+else:
+    peer_gs = PeerGradingService(settings.PEER_GRADING_INTERFACE)
 
 @cache_control(no_cache=True, no_store=True, must_revalidate=True)
 def staff_grading(request, course_id):
@@ -62,6 +66,7 @@ def staff_grading(request, course_id):
         'staff_access': True, })
 
 
+@cache_control(no_cache=True, no_store=True, must_revalidate=True)
 def peer_grading(request, course_id):
     '''
     Show a peer grading interface
@@ -104,6 +109,7 @@ def peer_grading(request, course_id):
         'staff_access': False, })
     
 
+@cache_control(no_cache=True, no_store=True, must_revalidate=True)
 def peer_grading_problem(request, course_id):
     '''
     Show individual problem interface

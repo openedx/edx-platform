@@ -6,7 +6,7 @@ Replace this with more appropriate tests for your application.
 """
 
 from django.test import TestCase
-from instructor import staff_grading_service
+from open_ended_grading import staff_grading_service
 from django.core.urlresolvers import reverse
 from django.contrib.auth.models import Group
 
@@ -14,6 +14,11 @@ from courseware.access import _course_staff_group_name
 import courseware.tests.tests as ct
 from xmodule.modulestore.django import modulestore
 import xmodule.modulestore.django
+from nose import SkipTest
+from mock import patch, Mock
+import json
+
+from override_settings import override_settings
 
 _mock_service = staff_grading_service.MockStaffGradingService()
 
@@ -45,7 +50,7 @@ class TestStaffGradingService(ct.PageLoader):
 
         make_instructor(self.toy)
 
-        self.mock_service = staff_grading_service.grading_service()
+        self.mock_service = staff_grading_service.staff_grading_service()
 
         self.logout()
 
