@@ -19,6 +19,7 @@ class @CombinedOpenEnded
     @next_problem_button = @$('.next-step-button')
     @next_problem_button.click @next_problem
     # valid states: 'initial', 'assessing', 'post_assessment', 'done'
+    Collapsible.setCollapsibles(@el)
 
     # Where to put the rubric once we load it
     @el = $(element).find('section.open-ended-child')
