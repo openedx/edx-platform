@@ -1,4 +1,10 @@
 class @MarkdownEditingDescriptor extends XModule.Descriptor
+  @multipleChoiceTemplate : "( ) incorrect\n( ) incorrect\n(x) correct\n"
+  @checkboxChoiceTemplate: "[x] correct\n[ ] incorrect\n[x] correct\n"
+  @stringInputTemplate: "= answer\n"
+  @numberInputTemplate: "= answer +- x%\n"
+  @selectTemplate: "[[incorrect, (correct), incorrect]]\n"
+
   constructor: (element) ->
     $body.on('click', '.editor-tabs .tab', @changeEditor)
     $body.on('click', '.editor-bar a', @onToolbarButton);
@@ -19,24 +25,32 @@ class @MarkdownEditingDescriptor extends XModule.Descriptor
 
   changeEditor: (e) =>
     e.preventDefault();
-    $('.editor-tabs .current').removeClass('current')
-    $(e.currentTarget).addClass('current')
-    if (@current_editor == @xml_editor)
-      @setCurrentEditor(@markdown_editor)
-      #    onMarkdownEditorUpdate();
-    else
-      @setCurrentEditor(@xml_editor)
-      @xml_editor.setValue(MarkdownEditingDescriptor.markdownToXml(@markdown_editor.getValue()))
+    if not $(e.currentTarget).hasClass('current')
+      $('.editor-tabs .current').removeClass('current')
+      $(e.currentTarget).addClass('current')
+      if (@current_editor == @xml_editor)
+        @setCurrentEditor(@markdown_editor)
+      else
+        @setCurrentEditor(@xml_editor)
+        @xml_editor.setValue(MarkdownEditingDescriptor.markdownToXml(@markdown_editor.getValue()))
 
   onToolbarButton: (e) =>
     e.preventDefault();
+    selection = @markdown_editor.getSelection()
+
+    revisedSelection = null
     switch $(e.currentTarget).attr('class')
-      when "multiple-choice-button" then console.log("multiple choice")
-      when "string-button" then console.log("string-button")
-      when "number-button" then console.log("number-button")
-      when "checks-button" then console.log("checks-button")
-      when "dropdown-button" then console.log("dropdown-button")
-      else console.log("unknown option")
+      when "multiple-choice-button" then revisedSelection = MarkdownEditingDescriptor.insertMultipleChoice(selection)
+      when "string-button" then revisedSelection = MarkdownEditingDescriptor.insertStringInput(selection)
+      when "number-button" then revisedSelection = MarkdownEditingDescriptor.insertNumberInput(selection)
+      when "checks-button" then revisedSelection = MarkdownEditingDescriptor.insertCheckboxChoice(selection)
+      when "dropdown-button" then revisedSelection = MarkdownEditingDescriptor.insertSelect(selection)
+      else # do nothing
+
+    if revisedSelection != null
+      @markdown_editor.replaceSelection(revisedSelection)
+      @markdown_editor.focus()
+
 
   setCurrentEditor: (editor) ->
     $(@current_editor.getWrapperElement()).hide()
@@ -48,6 +62,54 @@ class @MarkdownEditingDescriptor extends XModule.Descriptor
     $body.off('click', '.editor-tabs .tab', @changeEditor)
     $body.off('click', '.editor-bar a', @onToolbarButton);
     data: @xml_editor.getValue()
+
+  @insertMultipleChoice: (selectedText) ->
+    return MarkdownEditingDescriptor.insertGenericChoice(selectedText, '(', ')', MarkdownEditingDescriptor.multipleChoiceTemplate)
+
+  @insertCheckboxChoice: (selectedText) ->
+    return MarkdownEditingDescriptor.insertGenericChoice(selectedText, '[', ']', MarkdownEditingDescriptor.checkboxChoiceTemplate)
+
+  @insertGenericChoice: (selectedText, choiceStart, choiceEnd, template) ->
+    if selectedText.length > 0
+      # Replace adjacent newlines with a single newline
+      cleanSelectedText = selectedText.replace(/\n+/g, '\n')
+      lines =  cleanSelectedText.split('\n')
+      revisedLines = ''
+      for line in lines
+        revisedLines += choiceStart
+        # This is looking for a x before text to mark as selected.
+        if /x\s/i.test(line)
+          # Remove the x and any initial whitespace
+          lineWithoutX = line.replace(/^(\s+)?x/i, '')
+          # Check if any non-whitespace chars remain on the line
+          if not /^\s+$/.test(lineWithoutX)
+            # Remove initial whitespace, x, and space immediately after
+            line = line.replace(/^(\s+)?x\s/i, '')
+            revisedLines += 'x'
+          else
+            revisedLines += ' '
+        else
+          revisedLines += ' '
+        revisedLines += choiceEnd + ' ' + line + '\n'
+      return revisedLines
+    else
+      return template
+
+  @insertStringInput: (selectedText) ->
+    return MarkdownEditingDescriptor.insertGenericInput(selectedText, '= ', '', MarkdownEditingDescriptor.stringInputTemplate)
+
+  @insertNumberInput: (selectedText) ->
+    return MarkdownEditingDescriptor.insertGenericInput(selectedText, '= ', '', MarkdownEditingDescriptor.numberInputTemplate)
+
+  @insertSelect: (selectedText) ->
+    return MarkdownEditingDescriptor.insertGenericInput(selectedText, '[[', ']]', MarkdownEditingDescriptor.selectTemplate)
+
+  @insertGenericInput: (selectedText, lineStart, lineEnd, template) ->
+    if selectedText.length > 0
+      # TODO: should this insert a newline afterwards?
+      return lineStart + selectedText + lineEnd
+    else
+      return template
 
   @markdownToXml: (markdown)->
     toXml = `function(markdown) {
