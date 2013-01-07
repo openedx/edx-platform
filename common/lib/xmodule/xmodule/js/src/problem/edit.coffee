@@ -135,6 +135,9 @@ class @MarkdownEditingDescriptor extends XModule.Descriptor
 
       // rid white space
       xml = xml.replace(/\n\n\n/g, '\n');
+      
+      // surround w/ problem tag
+      xml = '<problem>\n' + xml + '\n</problem>';
 
       return xml;
     }
