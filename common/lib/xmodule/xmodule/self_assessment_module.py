@@ -131,7 +131,7 @@ class SelfAssessmentModule(openendedchild.OpenEndedChild):
         handlers = {
             'save_answer': self.save_answer,
             'save_assessment': self.save_assessment,
-            'save_post_assessment': self.save_post_assessment,
+            'save_post_assessment': self.save_hint,
         }
 
         if dispatch not in handlers:
