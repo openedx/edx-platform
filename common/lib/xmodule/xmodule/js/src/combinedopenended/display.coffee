@@ -35,7 +35,7 @@ class @CombinedOpenEnded
     if @child_type=="openended"
       @reload_button = @$('.reload-button')
       @skip_button = @$('.skip-button')
-      @skip_button.click @skip_post_assessment()
+      @skip_button.click @skip_post_assessment
 
     @open_ended_child= @$('.open-ended-child')
 
