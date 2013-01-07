@@ -42,8 +42,12 @@ This runs all the tests (long, uses collectstatic):
 
 If if you aren't changing static files, can run `rake test` once, then run
 
-    rake fasttest_{lms,cms}
+    rake fasttest_lms
 
+or
+
+    rake fasttest_cms
+    
 xmodule can be tested independently, with this:
 
     rake test_common/lib/xmodule
