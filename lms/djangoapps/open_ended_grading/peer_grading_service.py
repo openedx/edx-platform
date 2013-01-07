@@ -16,24 +16,41 @@ from xmodule.course_module import CourseDescriptor
 log = logging.getLogger(__name__)
 
 class MockPeerGradingService(object):
-    # TODO: make this return real results
     def get_next_submission(self, problem_location, grader_id):
-        return {'success': true}
+        return json.dumps({'success': True,
+                'submission_id':1,
+                'submission_key': "",
+                'student_response': 'fake student response',
+                'prompt': 'fake submission prompt',
+                'rubric': 'fake rubric',
+                'max_score': 4})
 
     def save_grade(self, location, grader_id, submission_id, score, feedback, submission_key):
-        return {'success': true}
+        return json.dumps({'success': True})
 
     def is_student_calibrated(self, problem_location, grader_id):
-        return {'success': true}
+        return json.dumps({'success': True, 'calibrated': True})
     
     def show_calibration_essay(self, problem_location, grader_id):
-        return {'success': true}
+        return json.dumps({'success': True,
+                'submission_id':1,
+                'submission_key': '',
+                'student_response': 'fake student response',
+                'prompt': 'fake submission prompt',
+                'rubric': 'fake rubric',
+                'max_score': 4})
 
     def save_calibration_essay(self, problem_location, grader_id, calibration_essay_id, submission_key, score, feedback):
-        return {'success': true}
+        return {'success': True, 'actual_score': 2}
 
     def get_problem_list(self, course_id, grader_id):
-        return {'success': true}
+        return json.dumps({'success': True,
+        'problem_list': [
+          json.dumps({'location': 'i4x://MITx/3.091x/problem/open_ended_demo1', \
+            'problem_name': "Problem 1", 'num_graded': 3, 'num_pending': 5}),
+          json.dumps({'location': 'i4x://MITx/3.091x/problem/open_ended_demo2', \
+            'problem_name': "Problem 2", 'num_graded': 1, 'num_pending': 5})
+        ]})
 
 class PeerGradingService(GradingService):
     """
