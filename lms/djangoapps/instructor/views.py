@@ -8,6 +8,8 @@ import os
 import requests
 import urllib
 
+from StringIO import StringIO
+
 from django.conf import settings
 from django.contrib.auth.models import User, Group
 from django.http import HttpResponse
@@ -77,9 +79,12 @@ def instructor_dashboard(request, course_id):
         data.append(['metadata', escape(str(course.metadata))])
     datatable['data'] = data
 
-    def return_csv(fn, datatable):
-        response = HttpResponse(mimetype='text/csv')
-        response['Content-Disposition'] = 'attachment; filename={0}'.format(fn)
+    def return_csv(fn, datatable, fp=None):
+        if fp is None:
+            response = HttpResponse(mimetype='text/csv')
+            response['Content-Disposition'] = 'attachment; filename={0}'.format(fn)
+        else:
+            response = fp
         writer = csv.writer(response, dialect='excel', quotechar='"', quoting=csv.QUOTE_ALL)
         writer.writerow(datatable['header'])
         for datarow in datatable['data']:
@@ -159,6 +164,65 @@ def instructor_dashboard(request, course_id):
     elif 'Download CSV of answer distributions' in action:
         track.views.server_track(request, 'dump-answer-dist-csv', {}, page='idashboard')
         return return_csv('answer_dist_{0}.csv'.format(course_id), get_answers_distribution(request, course_id))
+
+    #----------------------------------------
+    # export grades to remote gradebook
+
+    elif action=='List assignments available in remote gradebook':
+        msg2, datatable = _do_remote_gradebook(request.user, course, 'get-assignments')
+        msg += msg2
+
+    elif action=='List assignments available for this course':
+        log.debug(action)
+        allgrades = get_student_grade_summary_data(request, course, course_id, get_grades=True)
+
+        assignments = [[x] for x in allgrades['assignments']]
+        datatable = {'header': ['Assignment Name']}
+        datatable['data'] = assignments
+        datatable['title'] = action
+
+        msg += 'assignments=<pre>%s</pre>' % assignments
+
+    elif action=='List enrolled students matching remote gradebook':
+        stud_data = get_student_grade_summary_data(request, course, course_id, get_grades=False)
+        msg2, rg_stud_data = _do_remote_gradebook(request.user, course, 'get-membership')
+        datatable = {'header': ['Student  email', 'Match?']}
+        rg_students = [ x['email'] for x in rg_stud_data['retdata'] ]
+        def domatch(x):
+            return '<font color="green">yes</font>' if x.email in rg_students else '<font color="red">No</font>'
+        datatable['data'] = [[x.email, domatch(x)] for x in stud_data['students']]
+        datatable['title'] = action
+
+    elif action in ['Display grades for assignment', 'Export grades for assignment to remote gradebook',
+                    'Export CSV file of grades for assignment']:
+
+        log.debug(action)
+        datatable = {}
+        aname = request.POST.get('assignment_name','')
+        if not aname:
+            msg += "<font color='red'>Please enter an assignment name</font>"
+        else:
+            allgrades = get_student_grade_summary_data(request, course, course_id, get_grades=True)
+            if aname not in allgrades['assignments']:
+                msg += "<font color='red'>Invalid assignment name '%s'</font>" % aname
+            else:
+                aidx = allgrades['assignments'].index(aname)
+                datatable = {'header': ['External email', aname]}
+                datatable['data'] = [[x.email, x.grades[aidx]] for x in allgrades['students']]
+                datatable['title'] = 'Grades for assignment "%s"' % aname
+
+                if 'Export CSV' in action:
+                    # generate and return CSV file
+                    return return_csv('grades %s.csv' % aname, datatable)
+
+                elif 'remote gradebook' in action:
+                    fp = StringIO()
+                    return_csv('', datatable, fp=fp)
+                    fp.seek(0)
+                    files = {'datafile': fp}
+                    msg2, dataset = _do_remote_gradebook(request.user, course, 'post-grades', files=files)
+                    msg += msg2
+
 
     #----------------------------------------
     # Admin
@@ -305,7 +369,7 @@ def instructor_dashboard(request, course_id):
 
     elif action == 'List sections available in remote gradebook':
 
-        msg2, datatable = _do_remote_gradebook(course, 'get-sections')
+        msg2, datatable = _do_remote_gradebook(request.user, course, 'get-sections')
         msg += msg2
 
     elif action in ['List students in section in remote gradebook', 
@@ -313,7 +377,7 @@ def instructor_dashboard(request, course_id):
                     'Merge enrollment list with remote gradebook']:
 
         section = request.POST.get('gradebook_section','')
-        msg2, datatable = _do_remote_gradebook(course, 'get-membership', dict(section=section) )
+        msg2, datatable = _do_remote_gradebook(request.user, course, 'get-membership', dict(section=section) )
         msg += msg2
 
         if not 'List' in action:
@@ -357,7 +421,7 @@ def instructor_dashboard(request, course_id):
     return render_to_response('courseware/instructor_dashboard.html', context)
 
 
-def _do_remote_gradebook(course, action, args=None):
+def _do_remote_gradebook(user, course, action, args=None, files=None):
     '''
     Perform remote gradebook action.  Returns msg, datatable.
     '''
@@ -378,11 +442,11 @@ def _do_remote_gradebook(course, action, args=None):
     
     if args is None:
         args = {}
-    data = dict(submit=action, gradebook=rgname)
+    data = dict(submit=action, gradebook=rgname, user=user.email)
     data.update(args)
 
     try:
-        resp = requests.post(rgurl, data=data, verify=False)
+        resp = requests.post(rgurl, data=data, verify=False, files=files)
         retdict = json.loads(resp.content)
     except Exception as err:
         msg = "Failed to communicate with gradebook server at %s<br/>" % rgurl
@@ -392,7 +456,7 @@ def _do_remote_gradebook(course, action, args=None):
         return msg, {}
 
     msg = '<pre>%s</pre>' % retdict['msg'].replace('\n','<br/>')
-    retdata = retdict['data']
+    retdata = retdict['data']	# a list of dicts
 
     if retdata:
         datatable = {'header': retdata[0].keys()}
@@ -495,16 +559,18 @@ def get_student_grade_summary_data(request, course, course_id, get_grades=True, 
     enrolled_students = User.objects.filter(courseenrollment__course_id=course_id).prefetch_related("groups").order_by('username')
 
     header = ['ID', 'Username', 'Full Name', 'edX email', 'External email']
+    assignments = []
     if get_grades and enrolled_students.count() > 0:
         # just to construct the header
         gradeset = grades.grade(enrolled_students[0], request, course, keep_raw_scores=get_raw_scores)
         # log.debug('student {0} gradeset {1}'.format(enrolled_students[0], gradeset))
         if get_raw_scores:
-            header += [score.section for score in gradeset['raw_scores']]
+            assignments += [score.section for score in gradeset['raw_scores']]
         else:
-            header += [x['label'] for x in gradeset['section_breakdown']]
+            assignments += [x['label'] for x in gradeset['section_breakdown']]
+    header += assignments
 
-    datatable = {'header': header}
+    datatable = {'header': header, 'assignments': assignments, 'students': enrolled_students}
     data = []
 
     for student in enrolled_students:
@@ -518,9 +584,11 @@ def get_student_grade_summary_data(request, course, course_id, get_grades=True, 
             gradeset = grades.grade(student, request, course, keep_raw_scores=get_raw_scores)
             # log.debug('student={0}, gradeset={1}'.format(student,gradeset))
             if get_raw_scores:
-                datarow += [score.earned for score in gradeset['raw_scores']]
+                student_grades = [score.earned for score in gradeset['raw_scores']]
             else:
-                datarow += [x['percent'] for x in gradeset['section_breakdown']]
+                student_grades = [x['percent'] for x in gradeset['section_breakdown']]
+            datarow += student_grades
+            student.grades = student_grades	# store in student object
 
         data.append(datarow)
     datatable['data'] = data

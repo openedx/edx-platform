@@ -96,6 +96,42 @@ function goto( mode)
     <p>
     <input type="submit" name="action" value="Download CSV of answer distributions">
     </p>
+    <hr width="40%" style="align:left">
+
+  %if settings.MITX_FEATURES.get('REMOTE_GRADEBOOK_URL','') and instructor_access:
+  
+    <%
+        rg = course.metadata.get('remote_gradebook',{})
+    %>
+
+    <h3>Export grades to remote gradebook</h3>
+    <p>The assignments defined for this course should match the ones
+    stored in the gradebook, for this to work properly!</p>
+
+    <ul>
+    <li>Gradebook name: <font color="green">${rg.get('name','None defined!')}</font>
+    <br/>
+    <br/>
+    <input type="submit" name="action" value="List assignments available in remote gradebook">
+    <input type="submit" name="action" value="List enrolled students matching remote gradebook">
+    <br/>
+    <br/>
+    </li>
+    <li><input type="submit" name="action" value="List assignments available for this course">
+    <br/>
+    <br/>
+    </li>
+    <li>Assignment name: <input type="text" name="assignment_name" size=40 >
+    <br/>
+    <br/>
+    <input type="submit" name="action" value="Display grades for assignment">
+    <input type="submit" name="action" value="Export grades for assignment to remote gradebook">
+    <input type="submit" name="action" value="Export CSV file of grades for assignment">
+    </li>
+    </ul>
+
+  %endif
+
  %endif
 
 ##----------------------------------------------------------------------------- 
@@ -187,7 +223,7 @@ function goto( mode)
 
     <p>Pull enrollment from remote gradebook</p>
     <ul>
-    <li>Gradebook name: <input type="text" name="gradebook_name" size=40 value="${rg.get('name','')}"></li>
+    <li>Gradebook name: <font color="green">${rg.get('name','None defined!')}</font>
     <li>Section: <input type="text" name="gradebook_section" size=40 value="${rg.get('section','')}"></li>
     </ul>
     <input type="submit" name="action" value="List sections available in remote gradebook">
