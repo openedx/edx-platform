@@ -25,7 +25,6 @@ from .editing_module import EditingDescriptor
 from .html_checker import check_html
 from progress import Progress
 from .stringify import stringify_children
-from .x_module import XModule
 from .xml_module import XmlDescriptor
 from xmodule.modulestore import Location
 from capa.util import *

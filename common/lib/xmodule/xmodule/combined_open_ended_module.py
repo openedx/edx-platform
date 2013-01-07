@@ -43,7 +43,6 @@ class CombinedOpenEndedModule(XModule):
     DONE = 'done'
     TASK_TYPES=["self", "ml", "instructor", "peer"]
 
-    #,  resource_string(__name__, 'js/src/openended/display.coffee')
     js = {'coffee': [resource_string(__name__, 'js/src/combinedopenended/display.coffee')]}
     js_module_name = "CombinedOpenEnded"
 
