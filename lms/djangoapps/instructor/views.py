@@ -335,26 +335,27 @@ def instructor_dashboard(request, course_id):
     elif action == 'Enroll student':
 
         student = request.POST.get('enstudent','')
-        datatable = {}
-        try:
-            nce = CourseEnrollment(user=User.objects.get(email=student), course_id=course_id)
-            nce.save()
-            msg += "Enrolled student with email '%s'" % student
-        except Exception as err:
-            msg += "Error!  Failed to enroll student with email '%s'\n" % student
-            msg += str(err) + '\n'
+        ret = _do_enroll_students(course, course_id, student)
+        datatable = ret['datatable']
 
     elif action == 'Un-enroll student':
 
         student = request.POST.get('enstudent','')
         datatable = {}
+        isok = False
+        cea = CourseEnrollmentAllowed.objects.filter(course_id=course_id, email=student)
+        if cea:
+            cea.delete()
+            msg += "Un-enrolled student with email '%s'" % student
+            isok = True
         try:
             nce = CourseEnrollment.objects.get(user=User.objects.get(email=student), course_id=course_id)
             nce.delete()
             msg += "Un-enrolled student with email '%s'" % student
         except Exception as err:
-            msg += "Error!  Failed to un-enroll student with email '%s'\n" % student
-            msg += str(err) + '\n'
+            if not isok:
+                msg += "Error!  Failed to un-enroll student with email '%s'\n" % student
+                msg += str(err) + '\n'
 
     elif action == 'Un-enroll ALL students':
 
@@ -582,7 +583,7 @@ def get_student_grade_summary_data(request, course, course_id, get_grades=True, 
 
         if get_grades:
             gradeset = grades.grade(student, request, course, keep_raw_scores=get_raw_scores)
-            # log.debug('student={0}, gradeset={1}'.format(student,gradeset))
+            log.debug('student={0}, gradeset={1}'.format(student,gradeset))
             if get_raw_scores:
                 student_grades = [score.earned for score in gradeset['raw_scores']]
             else:

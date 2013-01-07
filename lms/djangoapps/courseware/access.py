@@ -5,6 +5,8 @@ like DISABLE_START_DATES"""
 import logging
 import time
 
+import student.models
+
 from django.conf import settings
 
 from xmodule.course_module import CourseDescriptor
@@ -122,6 +124,10 @@ def _has_access_course_desc(user, course, action):
         if (start is None or now > start) and (end is None or now < end):
             # in enrollment period, so any user is allowed to enroll.
             debug("Allow: in enrollment period")
+            return True
+
+        # if user is in CourseEnrollmentAllowed with right course_id then can also enroll
+        if user is not None and student.models.CourseEnrollmentAllowed.objects.filter(email=user.email, course_id=course.id):
             return True
 
         # otherwise, need staff access
