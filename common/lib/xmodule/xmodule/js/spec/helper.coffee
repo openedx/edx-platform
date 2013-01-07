@@ -1,3 +1,13 @@
+# Stub Youtube API
+window.YT =
+  PlayerState:
+    UNSTARTED: -1
+    ENDED: 0
+    PLAYING: 1
+    PAUSED: 2
+    BUFFERING: 3
+    CUED: 5
+
 jasmine.getFixtures().fixturesPath = 'xmodule/js/fixtures'
 
 jasmine.stubbedMetadata =
@@ -55,16 +65,6 @@ jasmine.stubVideoPlayer = (context, enableParts, createPlayer=true) ->
     return new VideoPlayer(video: context.video)
 
 spyOn(window, 'onunload')
-
-# Stub Youtube API
-window.YT =
-  PlayerState:
-    UNSTARTED: -1
-    ENDED: 0
-    PLAYING: 1
-    PAUSED: 2
-    BUFFERING: 3
-    CUED: 5
 
 # Stub jQuery.cookie
 $.cookie = jasmine.createSpy('jQuery.cookie').andReturn '1.0'
