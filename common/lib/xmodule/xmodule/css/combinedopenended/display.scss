@@ -20,7 +20,7 @@ h2 {
   color: darken($error-red, 10%);
 }
 
-section.open-ended-child {
+section.open-ended-child, section.combined-open-ended-status {
   @media print {
     display: block;
     width: auto;
@@ -396,7 +396,7 @@ section.open-ended-child {
     }
   }
 
-  div.capa_alert {
+  div.open-ended-alert {
     padding: 8px 12px;
     border: 1px solid #EBE8BF;
     border-radius: 3px;
