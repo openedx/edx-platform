@@ -165,6 +165,7 @@ class CombinedOpenEndedModule(XModule):
             'state' : self.state,
             'task_count' : len(self.task_xml),
             'task_number' : self.current_task_number+1,
+            'status' : "temporary status."
             }
 
         html = self.system.render_template('combined_open_ended.html', context)
