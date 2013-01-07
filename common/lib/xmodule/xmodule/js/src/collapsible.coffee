@@ -22,7 +22,7 @@ class @Collapsible
     if $(event.target).text() == 'See full output'
       new_text = 'Hide output'
     else
-      new_text = 'See full ouput'
+      new_text = 'See full output'
     $(event.target).text(new_text)
 
   @toggleHint: (event) =>
