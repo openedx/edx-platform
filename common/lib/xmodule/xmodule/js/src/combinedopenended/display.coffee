@@ -34,6 +34,7 @@ class @CombinedOpenEnded
     @child_type = @el.data('child-type')
     if @child_type=="openended"
       @reload_button = @$('.reload-button')
+      @skip_button = @$('.skip-button')
 
     @open_ended_child= @$('.open-ended-child')
 
@@ -52,6 +53,7 @@ class @CombinedOpenEnded
     @submit_button.show()
     @reset_button.hide()
     @next_problem_button.hide()
+    @skip_button.hide()
     @hint_area.attr('disabled', false)
     if @child_type=="openended"
       @reload_button.hide()
@@ -69,6 +71,7 @@ class @CombinedOpenEnded
     else if @child_state == 'post_assessment'
       if @child_type=="openended"
         @reload_button.hide()
+        @skip_button.show()
       @answer_area.attr("disabled", true)
       @submit_button.prop('value', 'Submit post-assessment')
       if @child_type=="selfassessment"
@@ -79,6 +82,7 @@ class @CombinedOpenEnded
       @answer_area.attr("disabled", true)
       @hint_area.attr('disabled', true)
       @submit_button.hide()
+      @skip_button.hide()
       if @task_number<@task_count
         @next_problem()
       else

@@ -106,6 +106,10 @@ class OpenEndedModule(openendedchild.OpenEndedChild):
 
         self.payload = {'grader_payload': updated_grader_payload}
 
+    def skip_post_assessment(self, get, system):
+        self.state=self.DONE
+        return {'success' : True}
+
     def message_post(self,get, system):
         """
         Handles a student message post (a reaction to the grade they received from an open ended grader type)
@@ -389,8 +393,8 @@ class OpenEndedModule(openendedchild.OpenEndedChild):
         feedback_dict = self._parse_score_msg(self.history[-1].get('post_assessment', ""))
         if not short_feedback:
             return feedback_dict['feedback'] if feedback_dict['valid'] else ''
-
-        short_feedback = self._convert_longform_feedback_to_html(json.loads(self.history[-1].get('post_assessment', "")))
+        if feedback_dict['valid']:
+            short_feedback = self._convert_longform_feedback_to_html(json.loads(self.history[-1].get('post_assessment', "")))
         return short_feedback if feedback_dict['valid'] else ''
 
     def is_submission_correct(self, score):
@@ -414,6 +418,7 @@ class OpenEndedModule(openendedchild.OpenEndedChild):
             'save_answer': self.save_answer,
             'score_update': self.update_score,
             'save_post_assessment' : self.message_post,
+            'skip_post_assessment' : self.skip_post_assessment(),
             }
 
         if dispatch not in handlers:
