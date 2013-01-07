@@ -1,9 +1,11 @@
 <section id="combined-open-ended-status" class="combined-open-ended-status">
     %for status in status_list:
     <div class="statusitem">
-        Step ${status['task_number']} (${status['state']}) : ${status['score']} / ${status['max_score']}
+        Step ${status['task_number']} (${status['human_state']}) : ${status['score']} / ${status['max_score']}
         %if status['type']=="openended":
-            ${status['post_assessment']}
+            <div class="collapsible open-ended-short-feedback">
+                ${status['post_assessment']}
+            </div>
         %endif
     </div>
     %endfor

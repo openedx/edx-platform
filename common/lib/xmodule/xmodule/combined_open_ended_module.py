@@ -213,11 +213,13 @@ class CombinedOpenEndedModule(XModule):
         last_response=task.latest_answer()
         last_score = task.latest_score()
         last_post_assessment = task.latest_post_assessment()
+        if task_type=="openended":
+            last_post_assessment = task.latest_post_assessment(short_feedback=True)
         max_score = task.max_score()
         state = task.state
         last_response_dict={'response' : last_response, 'score' : last_score,
                             'post_assessment' : last_post_assessment,
-                            'type' : task_type, 'max_score' : max_score, 'state' : state}
+                            'type' : task_type, 'max_score' : max_score, 'state' : state, 'human_state' : task.HUMAN_NAMES[state]}
 
         return last_response_dict
 

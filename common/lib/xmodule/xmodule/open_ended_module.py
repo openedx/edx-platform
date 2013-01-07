@@ -381,12 +381,17 @@ class OpenEndedModule(openendedchild.OpenEndedChild):
 
         return {'valid' : True, 'score' : score_result['score'], 'feedback' : feedback}
 
-    def latest_post_assessment(self):
+    def latest_post_assessment(self, short_feedback=False):
         """None if not available"""
         if not self.history:
             return ""
+
         feedback_dict = self._parse_score_msg(self.history[-1].get('post_assessment', ""))
-        return feedback_dict['feedback'] if feedback_dict['valid'] else ''
+        if not short_feedback:
+            return feedback_dict['feedback'] if feedback_dict['valid'] else ''
+
+        short_feedback = self._convert_longform_feedback_to_html(json.loads(self.history[-1].get('post_assessment', "")))
+        return short_feedback if feedback_dict['valid'] else ''
 
     def is_submission_correct(self, score):
         correct=False

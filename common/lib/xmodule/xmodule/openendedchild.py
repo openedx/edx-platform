@@ -69,6 +69,13 @@ class OpenEndedChild():
     POST_ASSESSMENT = 'post_assessment'
     DONE = 'done'
 
+    HUMAN_NAMES={
+        'initial' : 'Started',
+        'assessing' : 'Being scored',
+        'post_assessment' : 'Scoring finished',
+        'done' : 'Problem complete',
+    }
+
     def __init__(self, system, location, definition, descriptor, static_data,
                  instance_state=None, shared_state=None, **kwargs):
         """
