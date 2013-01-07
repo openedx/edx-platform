@@ -1,12 +1,14 @@
 import codecs
 from fractions import Fraction
-from pyparsing import ParseException
 import unittest
 
 from chemcalc import (compare_chemical_expression, divide_chemical_expression,
                       render_to_html, chemical_equations_equal)
 
+import miller
+
 local_debug = None
+
 
 def log(s, output_type=None):
     if local_debug:
@@ -37,7 +39,6 @@ class Test_Compare_Equations(unittest.TestCase):
         self.assertFalse(chemical_equations_equal('2H2 + O2 -> H2O2',
                                                  '2O2 + 2H2 -> 2H2O2'))
 
-
     def test_different_arrows(self):
         self.assertTrue(chemical_equations_equal('H2 + O2 -> H2O2',
                                                  '2O2 + 2H2 -> 2H2O2'))
@@ -55,7 +56,6 @@ class Test_Compare_Equations(unittest.TestCase):
         # order still doesn't matter
         self.assertTrue(chemical_equations_equal('H2 + O2 -> H2O2',
                                                  'O2 + H2 -> H2O2', exact=True))
-
 
     def test_syntax_errors(self):
         self.assertFalse(chemical_equations_equal('H2 + O2 a-> H2O2',
@@ -311,7 +311,6 @@ class Test_Render_Equations(unittest.TestCase):
         log(out + ' ------- ' + correct, 'html')
         self.assertEqual(out, correct)
 
-        
     def test_render_eq3(self):
         s = "H^+ + OH^- <= H2O"   # unsupported arrow
         out = render_to_html(s)
@@ -320,10 +319,148 @@ class Test_Render_Equations(unittest.TestCase):
         self.assertEqual(out, correct)
 
 
+class Test_Crystallography_Miller(unittest.TestCase):
+    ''' Tests  for crystallography grade function.'''
+
+    def test_empty_points(self):
+        user_input = '{"lattice": "bcc", "points": []}'
+        self.assertFalse(miller.grade(user_input, {'miller': '(2,2,2)', 'lattice': 'bcc'}))
+
+    def test_only_one_point(self):
+        user_input = '{"lattice": "bcc", "points": [["0.50", "0.00", "0.00"]]}'
+        self.assertFalse(miller.grade(user_input, {'miller': '(2,2,2)', 'lattice': 'bcc'}))
+
+    def test_only_two_points(self):
+        user_input = '{"lattice": "bcc", "points": [["0.50", "0.00", "0.00"], ["0.00", "0.50", "0.00"]]}'
+        self.assertFalse(miller.grade(user_input, {'miller': '(2,2,2)', 'lattice': 'bcc'}))
+
+    def test_1(self):
+        user_input = '{"lattice": "bcc", "points": [["0.50", "0.00", "0.00"], ["0.00", "0.50", "0.00"], ["0.00", "0.00", "0.50"]]}'
+        self.assertTrue(miller.grade(user_input, {'miller': '(2,2,2)', 'lattice': 'bcc'}))
+
+    def test_2(self):
+        user_input = '{"lattice": "bcc", "points": [["1.00", "0.00", "0.00"], ["0.00", "1.00", "0.00"], ["0.00", "0.00", "1.00"]]}'
+        self.assertTrue(miller.grade(user_input, {'miller': '(1,1,1)', 'lattice': 'bcc'}))
+
+    def test_3(self):
+        user_input = '{"lattice": "bcc", "points": [["1.00", "0.50", "1.00"], ["1.00", "1.00", "0.50"], ["0.50", "1.00", "1.00"]]}'
+        self.assertTrue(miller.grade(user_input, {'miller': '(2,2,2)', 'lattice': 'bcc'}))
+
+    def test_4(self):
+        user_input = '{"lattice": "bcc", "points": [["0.33", "1.00", "0.00"], ["0.00", "0.664", "0.00"], ["0.00", "1.00", "0.33"]]}'
+        self.assertTrue(miller.grade(user_input, {'miller': '(-3, 3, -3)', 'lattice': 'bcc'}))
+
+    def test_5(self):
+        """ return true only in case points coordinates are exact.
+        But if they transform to closest 0.05 value it is not true"""
+        user_input = '{"lattice": "bcc", "points": [["0.33", "1.00", "0.00"], ["0.00", "0.33", "0.00"], ["0.00", "1.00", "0.33"]]}'
+        self.assertFalse(miller.grade(user_input, {'miller': '(-6,3,-6)', 'lattice': 'bcc'}))
+
+    def test_6(self):
+        user_input = '{"lattice": "bcc", "points": [["0.00", "0.25", "0.00"], ["0.25", "0.00", "0.00"], ["0.00", "0.00", "0.25"]]}'
+        self.assertTrue(miller.grade(user_input, {'miller': '(4,4,4)', 'lattice': 'bcc'}))
+
+    def test_7(self):  # goes throug origin
+        user_input = '{"lattice": "bcc", "points": [["0.00", "1.00", "0.00"], ["1.00", "0.00", "0.00"], ["0.50", "1.00", "0.00"]]}'
+        self.assertTrue(miller.grade(user_input, {'miller': '(0,0,-1)', 'lattice': 'bcc'}))
+
+    def test_8(self):
+        user_input = '{"lattice": "bcc", "points": [["0.00", "1.00", "0.50"], ["1.00", "0.00", "0.50"], ["0.50", "1.00", "0.50"]]}'
+        self.assertTrue(miller.grade(user_input, {'miller': '(0,0,2)', 'lattice': 'bcc'}))
+
+    def test_9(self):
+        user_input = '{"lattice": "bcc", "points": [["1.00", "0.00", "1.00"], ["0.00", "1.00", "1.00"], ["1.00", "0.00", "0.00"]]}'
+        self.assertTrue(miller.grade(user_input, {'miller': '(1,1,0)', 'lattice': 'bcc'}))
+
+    def test_10(self):
+        user_input = '{"lattice": "bcc", "points": [["1.00", "0.00", "1.00"], ["0.00", "0.00", "0.00"], ["0.00", "1.00", "1.00"]]}'
+        self.assertTrue(miller.grade(user_input, {'miller': '(1,1,-1)', 'lattice': 'bcc'}))
+
+    def test_11(self):
+        user_input = '{"lattice": "bcc", "points": [["1.00", "0.00", "0.50"], ["1.00", "1.00", "0.00"], ["0.00", "1.00", "0.00"]]}'
+        self.assertTrue(miller.grade(user_input, {'miller': '(0,1,2)', 'lattice': 'bcc'}))
+
+    def test_12(self):
+        user_input = '{"lattice": "bcc", "points": [["1.00", "0.00", "0.50"], ["0.00", "0.00", "0.50"], ["1.00", "1.00", "1.00"]]}'
+        self.assertTrue(miller.grade(user_input, {'miller': '(0,1,-2)', 'lattice': 'bcc'}))
+
+    def test_13(self):
+        user_input = '{"lattice": "bcc", "points": [["0.50", "0.00", "0.00"], ["0.50", "1.00", "0.00"], ["0.00", "0.00", "1.00"]]}'
+        self.assertTrue(miller.grade(user_input, {'miller': '(2,0,1)', 'lattice': 'bcc'}))
+
+    def test_14(self):
+        user_input = '{"lattice": "bcc", "points": [["0.00", "0.00", "0.00"], ["0.00", "0.00", "1.00"], ["0.50", "1.00", "0.00"]]}'
+        self.assertTrue(miller.grade(user_input, {'miller': '(2,-1,0)', 'lattice': 'bcc'}))
+
+    def test_15(self):
+        user_input = '{"lattice": "bcc", "points": [["0.00", "0.00", "0.00"], ["1.00", "1.00", "0.00"], ["0.00", "1.00", "1.00"]]}'
+        self.assertTrue(miller.grade(user_input, {'miller': '(1,-1,1)', 'lattice': 'bcc'}))
+
+    def test_16(self):
+        user_input = '{"lattice": "bcc", "points": [["1.00", "0.00", "0.00"], ["0.00", "1.00", "0.00"], ["1.00", "1.00", "1.00"]]}'
+        self.assertTrue(miller.grade(user_input, {'miller': '(1,1,-1)', 'lattice': 'bcc'}))
+
+    def test_17(self):
+        user_input = '{"lattice": "bcc", "points": [["0.00", "0.00", "0.00"], ["1.00", "0.00", "1.00"], ["1.00", "1.00", "0.00"]]}'
+        self.assertTrue(miller.grade(user_input, {'miller': '(-1,1,1)', 'lattice': 'bcc'}))
+
+    def test_18(self):
+        user_input = '{"lattice": "bcc", "points": [["0.00", "0.00", "0.00"], ["1.00", "1.00", "0.00"], ["0.00", "1.00", "1.00"]]}'
+        self.assertTrue(miller.grade(user_input, {'miller': '(1,-1,1)', 'lattice': 'bcc'}))
+
+    def test_19(self):
+        user_input = '{"lattice": "bcc", "points": [["0.00", "0.00", "0.00"], ["1.00", "1.00", "0.00"], ["0.00", "0.00", "1.00"]]}'
+        self.assertTrue(miller.grade(user_input, {'miller': '(-1,1,0)', 'lattice': 'bcc'}))
+
+    def test_20(self):
+        user_input = '{"lattice": "bcc", "points": [["1.00", "0.00", "0.00"], ["1.00", "1.00", "0.00"], ["0.00", "0.00", "1.00"]]}'
+        self.assertTrue(miller.grade(user_input, {'miller': '(1,0,1)', 'lattice': 'bcc'}))
+
+    def test_21(self):
+        user_input = '{"lattice": "bcc", "points": [["0.00", "0.00", "0.00"], ["0.00", "1.00", "0.00"], ["1.00", "0.00", "1.00"]]}'
+        self.assertTrue(miller.grade(user_input, {'miller': '(-1,0,1)', 'lattice': 'bcc'}))
+
+    def test_22(self):
+        user_input = '{"lattice": "bcc", "points": [["0.00", "1.00", "0.00"], ["1.00", "1.00", "0.00"], ["0.00", "0.00", "1.00"]]}'
+        self.assertTrue(miller.grade(user_input, {'miller': '(0,1,1)', 'lattice': 'bcc'}))
+
+    def test_23(self):
+        user_input = '{"lattice": "bcc", "points": [["0.00", "0.00", "0.00"], ["1.00", "0.00", "0.00"], ["1.00", "1.00", "1.00"]]}'
+        self.assertTrue(miller.grade(user_input, {'miller': '(0,-1,1)', 'lattice': 'bcc'}))
+
+    def test_24(self):
+        user_input = '{"lattice": "bcc", "points": [["0.66", "0.00", "0.00"], ["0.00", "0.66", "0.00"], ["0.00", "0.00", "0.66"]]}'
+        self.assertTrue(miller.grade(user_input, {'miller': '(3,3,3)', 'lattice': 'bcc'}))
+
+    def test_25(self):
+        user_input = u'{"lattice":"","points":[["0.00","0.00","0.01"],["1.00","1.00","0.01"],["0.00","1.00","1.00"]]}'
+        self.assertTrue(miller.grade(user_input, {'miller': '(1,-1,1)', 'lattice': ''}))
+
+    def test_26(self):
+        user_input = u'{"lattice":"","points":[["0.00","0.01","0.00"],["1.00","0.00","0.00"],["0.00","0.00","1.00"]]}'
+        self.assertTrue(miller.grade(user_input, {'miller': '(0,-1,0)', 'lattice': ''}))
+
+    def test_27(self):
+        """ rounding to 0.35"""
+        user_input = u'{"lattice":"","points":[["0.33","0.00","0.00"],["0.00","0.33","0.00"],["0.00","0.00","0.33"]]}'
+        self.assertTrue(miller.grade(user_input, {'miller': '(3,3,3)', 'lattice': ''}))
+
+    def test_28(self):
+        """ rounding to 0.30"""
+        user_input = u'{"lattice":"","points":[["0.30","0.00","0.00"],["0.00","0.30","0.00"],["0.00","0.00","0.30"]]}'
+        self.assertTrue(miller.grade(user_input, {'miller': '(10,10,10)', 'lattice': ''}))
+
+    def test_wrong_lattice(self):
+        user_input = '{"lattice": "bcc", "points": [["0.00", "0.00", "0.00"], ["1.00", "0.00", "0.00"], ["1.00", "1.00", "1.00"]]}'
+        self.assertFalse(miller.grade(user_input, {'miller': '(3,3,3)', 'lattice': 'fcc'}))
+
 
 def suite():
 
-    testcases = [Test_Compare_Expressions, Test_Divide_Expressions, Test_Render_Equations]
+    testcases = [Test_Compare_Expressions,
+                 Test_Divide_Expressions,
+                 Test_Render_Equations,
+                 Test_Crystallography_Miller]
     suites = []
     for testcase in testcases:
         suites.append(unittest.TestLoader().loadTestsFromTestCase(testcase))

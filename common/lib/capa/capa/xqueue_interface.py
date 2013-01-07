@@ -49,6 +49,7 @@ def parse_xreply(xreply):
 
     return_code = xreply['return_code']
     content = xreply['content']
+
     return (return_code, content)
 
 
@@ -80,7 +81,11 @@ class XQueueInterface(object):
 
         # Log in, then try again
         if error and (msg == 'login_required'):
-            self._login()
+            (error, content) = self._login()
+            if error != 0:
+                # when the login fails
+                log.debug("Failed to login to queue: %s", content)
+                return (error, content)
             if files_to_upload is not None:
                 # Need to rewind file pointers
                 for f in files_to_upload:

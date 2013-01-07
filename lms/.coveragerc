@@ -2,11 +2,13 @@
 [run]
 data_file = reports/lms/.coverage
 source = lms
+omit = lms/envs/*
 
 [report]
 ignore_errors = True
 
 [html]
+title = LMS Python Test Coverage Report
 directory = reports/lms/cover
 
 [xml]

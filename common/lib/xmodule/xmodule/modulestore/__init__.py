@@ -352,6 +352,12 @@ class ModuleStore(object):
         course_filter = Location("i4x", category="course")
         return self.get_items(course_filter)
 
+    def get_course(self, course_id):
+        '''
+        Look for a specific course id.  Returns the course descriptor, or None if not found.
+        '''
+        raise NotImplementedError
+
     def get_parent_locations(self, location):
         '''Find all locations that are the parents of this location.  Needed
         for path_to_location().
@@ -413,3 +419,10 @@ class ModuleStoreBase(ModuleStore):
 
         errorlog = self._get_errorlog(location)
         return errorlog.errors
+
+    def get_course(self, course_id):
+        """Default impl--linear search through course list"""
+        for c in self.get_courses():
+            if c.id == course_id:
+                return c
+        return None

@@ -1953,7 +1953,7 @@ cktsim = (function() {
 	var module = {
 	    'Circuit': Circuit,
 	    'parse_number': parse_number,
-	    'parse_source': parse_source,
+	    'parse_source': parse_source
 	}
 	return module;
     }());
@@ -2068,7 +2068,7 @@ schematic = (function() {
 	    'n': [NFet, 'NFet'],
 	    'p': [PFet, 'PFet'],
 	    's': [Probe, 'Voltage Probe'],
-	    'a': [Ammeter, 'Current Probe'],
+	    'a': [Ammeter, 'Current Probe']
 	};
 
 	// global clipboard
@@ -5502,7 +5502,7 @@ schematic = (function() {
 	    'magenta' : 'rgb(255,64,255)',
 	    'yellow': 'rgb(255,255,64)',
 	    'black': 'rgb(0,0,0)',
-	    'x-axis': undefined,
+	    'x-axis': undefined
 	};
 
 	function Probe(x,y,rotation,color,offset) {
@@ -6100,7 +6100,7 @@ schematic = (function() {
 		    'Amplitude',
 		    'Frequency (Hz)',
 		    'Delay until sin starts (secs)',
-		    'Phase offset (degrees)'],
+		    'Phase offset (degrees)']
 	}
 
 	// build property editor div
@@ -6300,7 +6300,7 @@ schematic = (function() {
 
 	var module = {
 	    'Schematic': Schematic,
-	    'component_slider': component_slider,
+	    'component_slider': component_slider
 	}
 	return module;
     }());
