@@ -335,6 +335,7 @@ MOCK_STAFF_GRADING = False
 
 ################################# Peer grading config  #####################
 PEER_GRADING_INTERFACE = None
+MOCK_PEER_GRADING = False
 
 ################################# Jasmine ###################################
 JASMINE_TEST_DIRECTORY = PROJECT_ROOT + '/static/coffee'
