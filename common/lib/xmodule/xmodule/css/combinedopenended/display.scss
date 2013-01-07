@@ -20,6 +20,19 @@ h2 {
   color: darken($error-red, 10%);
 }
 
+section.combined-open-ended {
+  .status-container
+  {
+      float:right;
+      width:30%;
+  }
+  .item-container
+  {
+      float:left;
+      width: 63%;
+  }
+}
+
 section.open-ended-child, section.combined-open-ended-status {
   @media print {
     display: block;
