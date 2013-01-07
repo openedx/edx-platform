@@ -418,7 +418,7 @@ class OpenEndedModule(openendedchild.OpenEndedChild):
             'save_answer': self.save_answer,
             'score_update': self.update_score,
             'save_post_assessment' : self.message_post,
-            'skip_post_assessment' : self.skip_post_assessment(),
+            'skip_post_assessment' : self.skip_post_assessment,
             }
 
         if dispatch not in handlers:

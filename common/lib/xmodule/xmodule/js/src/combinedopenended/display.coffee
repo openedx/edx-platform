@@ -35,6 +35,7 @@ class @CombinedOpenEnded
     if @child_type=="openended"
       @reload_button = @$('.reload-button')
       @skip_button = @$('.skip-button')
+      @skip_button.click @skip_post_assessment()
 
     @open_ended_child= @$('.open-ended-child')
 
@@ -148,6 +149,19 @@ class @CombinedOpenEnded
     else
       @errors_area.html('Problem state got out of sync.  Try reloading the page.')
 
+  skip_post_assessment: (event) =>
+    event.preventDefault()
+    if @child_state == 'post_assessment'
+
+      $.postWithPrefix "#{@ajax_url}/skip_post_assessment", data, (response) =>
+        if response.success
+          @child_state = 'done'
+          @allow_reset = response.allow_reset
+          @rebind()
+        else
+          @errors_area.html(response.error)
+    else
+      @errors_area.html('Problem state got out of sync.  Try reloading the page.')
 
   reset: (event) =>
     event.preventDefault()
