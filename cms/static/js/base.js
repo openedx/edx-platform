@@ -41,7 +41,12 @@ $(document).ready(function() {
     $('.unit .item-actions .delete-button').bind('click', deleteUnit);
     $('.new-unit-item').bind('click', createNewUnit);
 
-    $('.collapse-all-button').bind('click', collapseAll);
+    // toggling overview section details
+    $(function(){
+      if($('.courseware-section').length > 0) {
+        $('.toggle-button-sections').addClass('is-shown');
+      }
+    });
     $('.toggle-button-sections').bind('click', toggleSections);
 
     // autosave when a field is updated on the subsection page
@@ -135,13 +140,17 @@ function toggleSections(e) {
   e.preventDefault();
 
   $section = $('.courseware-section');
+  sectionCount = $section.length;
   $button = $(this);
   $labelCollapsed = $('<i class="ss-icon ss-symbolicons-block">up</i> <span class="label">Collapse All Sections</span>');
   $labelExpanded = $('<i class="ss-icon ss-symbolicons-block">down</i> <span class="label">Expand All Sections</span>');
 
-  $section.toggleClass('collapsed');
-  var buttonLabel = $section.hasClass('collapsed') ? $labelExpanded : $labelCollapsed;
-  $button.toggleClass('is-activated').html(buttonLabel);
+  if (sectionCount > 0) {
+    $section.toggleClass('collapsed');
+    $section.find('.expand-collapse-icon').toggleClass('collapse expand');
+    var buttonLabel = $section.hasClass('collapsed') ? $labelExpanded : $labelCollapsed;
+    $button.toggleClass('is-activated').html(buttonLabel);
+  }
 }
 
 function editSectionPublishDate(e) {

@@ -422,6 +422,14 @@ input.courseware-unit-search-input {
 			float: left;
 			margin: 29px 6px 16px 16px;
 			@include transition(none);
+
+			&.expand {
+				background-position: 0 0;
+			}
+
+			&.collapsed {
+				
+			}
 		}
 
 		.drag-handle {
@@ -501,24 +509,18 @@ input.courseware-unit-search-input {
 	}
 }
 
-.collapse-all-button {
-	float: right;
-	margin-top: 10px;
-	font-size: 13px;
-	color: $darkGrey;
-
-	.collapse-all-icon {
-		margin-right: 6px;
-	}
-}
-
 .toggle-button-sections {
+	display: none;
 	position: relative;
 	float: right;
 	margin-top: 10px;
 
 	font-size: 13px;
 	color: $darkGrey;
+
+	&.is-shown {
+		display: block;
+	}
 
 	.ss-icon {
 		@include border-radius(20px);
