@@ -119,10 +119,10 @@ class @MarkdownEditingDescriptor extends XModule.Descriptor
         selectString += '  <optioninput options="(';
         var options = p.split(/\,\s*/g);
         for(var i = 0; i < options.length; i++) {
-          selectString += "'" + options[i].replace(/\((.*?)\)/g, '$1') + "'" + (i < options.length -1 ? ',' : '');
+          selectString += "'" + options[i].replace(/(?:^|,)\s*\((.*?)\)\s*(?:$|,)/g, '$1') + "'" + (i < options.length -1 ? ',' : '');
         }
         selectString += ')" correct="';
-        var correct = /\((.*?)\)/g.exec(p);
+        var correct = /(?:^|,)\s*\((.*?)\)\s*(?:$|,)/g.exec(p);
         if (correct) selectString += correct[1];
         selectString += '"></optioninput>\n';
         selectString += '</optionresponse>\n\n';
