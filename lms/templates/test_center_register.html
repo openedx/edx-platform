@@ -14,6 +14,15 @@
   <script type="text/javascript">
   (function() {
 
+    $(".form-fields-secondary-visibility").click(function(e){
+      console.log("clicked");
+      e.preventDefault();
+      $(this).addClass("is-hidden");
+
+      $(".form-fields-secondary").addClass("is-shown");
+    });
+
+
     $(document).on('ajax:success', '#testcenter_register_form', function(data, json, xhr) {
       if(json.success) {
         // when a form is successfully filled out, return back to the dashboard.
@@ -30,19 +39,24 @@
         var num_errors = 0;
         var error_html = '';
         // first get rid of any errors that are already present:
-        $(".field.error").removeClass('error');
+        $(".field.error", ".form-actions").removeClass('error');
         $("#submission-error-list").html(error_html);
 		// start to display new errors:
+        $(".form-actions").addClass("error");
         $(".submission-error").addClass("is-shown");
         for (fieldname in field_errors) {
           // to inform a user of what field the error occurred on, add a class of .error to the .field element.
           // for convenience, use the "data-field" attribute to identify the one matching the errant field's name.
-          $("[data-field='"+fieldname+"']").addClass('error')
+          var field_id = "field-" + fieldname;
+          var field_label = $("[id='"+field_id+"'] label").text();
+
+          $("[id='"+field_id+"']").addClass('error');
+
           field_errorlist = field_errors[fieldname];      
           for (i=0; i < field_errorlist.length; i+= 1) {
             field_error = field_errorlist[i];
-            error_msg = fieldname + ": " + field_error;
-          	error_html =  error_html + '<li class="to-be-determined">' + error_msg + '</li>';
+            error_msg = '<span class="field-name">' + field_label + ':</span>' + '<span class="field-error">' + field_error + '</span>';
+          	error_html =  error_html + '<li>' + '<a href="#field-' + fieldname + '">' + error_msg + '</a></li>';
           	num_errors += 1;
           }
         }
@@ -89,20 +103,6 @@
   
   <section class="status">
     
-    <!-- NOTE: BT - registration data updated confirmation message - in case upon successful submit we're directing
-    	 folks back to this view.  To display, add "is-shown" class to div.
-    	 NOTE: BW - not planning to do this, but instead returning user to student dashboard.  
-    <div class="message message-status submission-saved">
-      <p class="message-copy">Your registration data has been updated and saved.</p>
-    </div>
-     -->
-        
-    <!-- Markup for error message will be written here by ajax handler.  To display, it adds "is-shown" class to div,
-    	 and adds specific error messages under the list. -->
-    <div class="message message-status submission-error">
-      <p id="submission-error-heading" class="message-copy"></p>
-      <ul id="submission-error-list"/>
-    </div>
   </section>
   
   <section class="content">
@@ -132,25 +132,25 @@
           <legend class="is-hidden">Personal Information</legend>
           
           <ol class="list-input">
-            <li data-field="salutation" class="field">
+            <li data-field="salutation" class="field" id="field-salutation">
               <label for="salutation">Salutation</label>
               <input class="short" id="salutation" type="text" name="salutation" value="${testcenteruser.salutation}" placeholder="e.g. Mr., Ms., Mrs., Dr." />              
             </li>
-            <li data-field="first_name" class="field required">
-              <label for="name-first">First Name </label>
-              <input id="name-first" type="text" name="first_name" value="${testcenteruser.first_name}" placeholder="e.g. Albert" />
+            <li data-field="first_name" class="field required" id="field-first_name">
+              <label for="first_name">First Name </label>
+              <input id="first_name" type="text" name="first_name" value="${testcenteruser.first_name}" placeholder="e.g. Albert" />
             </li>
-            <li data-field="middle_name" class="field">
-              <label for="name-middle">Middle Name</label>
-              <input id="name-middle" type="text" name="middle_name" value="${testcenteruser.middle_name}" placeholder="" />
+            <li data-field="middle_name" class="field" id="field-middle_name">
+              <label for="middle_name">Middle Name</label>
+              <input id="middle_name" type="text" name="middle_name" value="${testcenteruser.middle_name}" placeholder="" />
             </li>
-            <li data-field="last_name" class="field required">
-              <label for="name-last">Last Name</label>
-              <input id="name-last" type="text" name="last_name" value="${testcenteruser.last_name}" placeholder="e.g. Einstein" />
+            <li data-field="last_name" class="field required" id="field-last_name">
+              <label for="last_name">Last Name</label>
+              <input id="last_name" type="text" name="last_name" value="${testcenteruser.last_name}" placeholder="e.g. Einstein" />
             </li>
-            <li data-field="suffix" class="field">
-              <label for="name-suffix">Suffix</label>
-              <input class="short" id="name-suffix" type="text" name="suffix" value="${testcenteruser.suffix}" placeholder="e.g. Jr., Sr. " />
+            <li data-field="suffix" class="field" id="field-suffix">
+              <label for="suffix">Suffix</label>
+              <input class="short" id="suffix" type="text" name="suffix" value="${testcenteruser.suffix}" placeholder="e.g. Jr., Sr. " />
             </li>
           </ol>
         </fieldset>
@@ -159,36 +159,36 @@
           <legend class="is-hidden">Mailing Address</legend>
           
           <ol class="list-input">
-            <li data-field="address_1" class="field required">
-              <label class="long" for="address-1">Address Line #1</label>
-              <input id="address-1" type="text" name="address_1" value="${testcenteruser.address_1}" placeholder="e.g. 112 Mercer Street" />              
+            <li data-field="address_1" class="field required" id="field-address_1">
+              <label class="long" for="address_1">Address Line #1</label>
+              <input id="address_1" type="text" name="address_1" value="${testcenteruser.address_1}" placeholder="e.g. 112 Mercer Street" />              
             </li>
             <li class="field-group addresses">
-              <div data-field="address_2" class="field">
-                <label for="address-2">Address Line #2</label>
-                <input id="address-2" class="long" type="text" name="address_2" value="${testcenteruser.address_2}" placeholder="e.g. Apartment 123" />
+              <div data-field="address_2" class="field" id="field-address_2">
+                <label for="address_2">Address Line #2</label>
+                <input id="address_2" class="long" type="text" name="address_2" value="${testcenteruser.address_2}" placeholder="e.g. Apartment 123" />
               </div>
-              <div data-field="address_3" class="field">
-                <label for="address-3">Address Line #3</label>
-                <input id="address-3" class="long" type="text" name="address_3" value="${testcenteruser.address_3}" placeholder="e.g. Attention: Albert Einstein" />
+              <div data-field="address_3" class="field" id="field-address_3">
+                <label for="address_3">Address Line #3</label>
+                <input id="address_3" class="long" type="text" name="address_3" value="${testcenteruser.address_3}" placeholder="e.g. Attention: Albert Einstein" />
               </div>
             </li>            
             <li class="field-group postal">
-              <div data-field="city" class="field required">
+              <div data-field="city" class="field required" id="field-city">
                 <label for="city">City</label>
                 <input id="city" class="short" type="text" name="city" value="${testcenteruser.city}" placeholder="e.g. Newark" />
               </div>
-              <div data-field="state" class="field">
+              <div data-field="state" class="field" id="field-state">
                 <label for="state">State/Province</label>
                 <input id="state" class="short" type="text" name="state" value="${testcenteruser.state}" placeholder="e.g. NJ" />
               </div>
-              <div data-field="postal_code" class="field">
-                <label for="postal-code">Postal Code</label>
-                <input id="postal-code" class="short" type="text" name="postal_code" value="${testcenteruser.postal_code}" placeholder="e.g. 08540" />
+              <div data-field="postal_code" class="field" id="field-postal_code">
+                <label for="postal_code">Postal Code</label>
+                <input id="postal_code" class="short" type="text" name="postal_code" value="${testcenteruser.postal_code}" placeholder="e.g. 08540" />
               </div>
-              <div data-field="country" class="field required">
-                <label class="short" for="country-code">Country Code</label>
-                <input id="country-code" class="short" type="text" name="country" value="${testcenteruser.country}" placeholder="e.g. USA" />
+              <div data-field="country" class="field required" id="field-country">
+                <label class="short" for="country">Country Code</label>
+                <input id="country" class="short" type="text" name="country" value="${testcenteruser.country}" placeholder="e.g. USA" />
               </div>
             </li>
           </ol>
@@ -199,67 +199,66 @@
           
           <ol class="list-input">
             <li class="field-group phoneinfo">
-              <div data-field="phone" class="field required">
+              <div data-field="phone" class="field required" id="field-phone">
                 <label for="phone">Phone Number</label>
                 <input id="phone" type="text" name="phone" value="${testcenteruser.phone}" placeholder="e.g. 1-55-555-5555" />              
               </div>
-              <div data-field="extension" class="field">
-                <label for="phone-extension">Extension</label>
-                <input id="phone-extension" class="short" type="text" name="extension" value="${testcenteruser.extension}" placeholder="e.g. 555" />
+              <div data-field="extension" class="field" id="field-extension">
+                <label for="extension">Extension</label>
+                <input id="extension" class="short" type="text" name="extension" value="${testcenteruser.extension}" placeholder="e.g. 555" />
               </div>
-              <div data-field="phone_country_code" class="field required">
-                <label for="phone-countrycode">Phone Country Code</label>
-                <input id="phone-countrycode" class="short" type="text" name="phone_country_code" value="${testcenteruser.phone_country_code}" placeholder="e.g. USA" />
+              <div data-field="phone_country_code" class="field required" id="field-phone_country_code">
+                <label for="phone_country_code">Phone Country Code</label>
+                <input id="phone_country_code" class="short" type="text" name="phone_country_code" value="${testcenteruser.phone_country_code}" placeholder="e.g. USA" />
               </div>
             </li>
             <li class="field-group faxinfo">
-              <div data-field="fax" class="field">
+              <div data-field="fax" class="field" id="field-fax">
                 <label for="fax">Fax Number</label>
                 <input id="fax" type="text" class="short" name="fax" value="${testcenteruser.fax}" placeholder="e.g. 1-55-555-5555" />
               </div>
-              <div data-field="fax_country_code" class="field">
-                <label for="fax-countrycode">Fax Country Code</label>
-                <input id="fax-countrycode" class="short" type="text" name="fax_country_code" value="${testcenteruser.fax_country_code}" placeholder="e.g. USA" />
+              <div data-field="fax_country_code" class="field" id="field-fax_country_code">
+                <label for="fax_country_code">Fax Country Code</label>
+                <input id="fax_country_code" class="short" type="text" name="fax_country_code" value="${testcenteruser.fax_country_code}" placeholder="e.g. USA" />
               </div>
             </li>
-            <li data-field="company_name" class="field">
-              <label for="company">Company</label>
-              <input id="company" type="text" name="company_name" value="${testcenteruser.company_name}" placeholder="e.g. American Association of University Professors" />
+            <li data-field="company_name" class="field" id="field-company_name">
+              <label for="company_name">Company</label>
+              <input id="company_name" type="text" name="company_name" value="${testcenteruser.company_name}" placeholder="e.g. American Association of University Professors" />
             </li>
           </ol>
         </fieldset>
       </div>
       
-      <div class="form-fields-secondary">
-        <!-- NOTE: BT - Assuming accommodations cannot be edited after a user originally submits registration, I've disabled the field and provided different text. Correct if this is not the case. -->
+      % if registration:
+        % if registration.accommodation_request and len(registration.accommodation_request) > 0:
+      <div class="form-fields-secondary is-shown" id="form-fields-secondary">
+        % endif
+      % else: 
+      <div class="form-fields-secondary" id="form-fields-secondary">
+      % endif
+
         % if registration:
-        <p class="instructions">Fields below this point are not part of the demographics, and are not editable currently.</p>
+        <p class="instructions">Fields below this point are not part of your demographic information, and <strong>are not editable currently</strong>.</p>
         % else: 
-        <p class="instructions">Fields below this point are not part of the demographics, and cannot be changed once submitted.</p>
+        <p class="instructions">Fields below this point are not part of your demographic information, <strong>and cannot be changed once submitted</strong>.</p>
         % endif
                   
         <fieldset class="group group-form group-form-optional">
           <legend class="is-hidden">Optional Information</legend>
           
-          <!-- Only display an accommodation request if one had been specified at registration time. 
-               So only prompt for an accommodation request if no registration exists. 
-               BW to BT: It is not enough to set the value of the disabled control.  It does
-               not display any text.  Perhaps we can use a different markup instead of a control. -->
           <ol class="list-input">
             % if registration:
               % if registration.accommodation_request and len(registration.accommodation_request) > 0:
-            <li class="field disabled">
-              <label for="accommodations">Accommodations Requested</label>
-              <!--
-              <textarea class="long" id="accommodations" value="${registration.accommodation_request}" placeholder="" disabled="disabled"></textarea>
-              -->
-              <p id="accommodations">${registration.accommodation_request}</p>
+            <li data-field="accommodation_request" class="field submitted" id="field-accommodation_request">
+              <label for="accommodation_request">Accommodations Requested</label>
+              <p class="value" id="accommodations">${registration.accommodation_request}</p>
             </li>
               % endif
             % else: 
-            <li data-field="accommodation_request" class="field">
-              <label for="accommodations">Accommodations Requested</label>
-              <textarea class="long" id="accommodations" name="accommodation_request" value="" placeholder=""></textarea>             
+            <li data-field="accommodation_request" class="field" id="field-accommodation_request">
+              <label for="accommodation_request">Accommodations Requested</label>
+              <textarea class="long" id="accommodation_request" name="accommodation_request" value="" placeholder=""></textarea>             
             </li>
             % endif
           </ol>
@@ -272,8 +271,21 @@
         % else: 
         <button type="submit" id="submit" class="action action-primary action-register">Register for Pearson VUE Test</button>
         % endif
-      </div>        
+
+        <div class="message message-status submission-error">
+          <p id="submission-error-heading" class="message-copy"></p>
+          <ul id="submission-error-list"></ul>
+        </div>
+      </div>      
     </form>
+
+    % if registration:
+      % if registration.accommodation_request and len(registration.accommodation_request) > 0:
+    <a class="actions form-fields-secondary-visibility is-hidden" href="#form-fields-secondary">Looking for Optional Accomodations?</a>
+      % endif
+    % else: 
+    <a class="actions form-fields-secondary-visibility" href="#form-fields-secondary">Looking for Optional Accomodations?</a>
+    % endif
   </section>
     
   <aside>

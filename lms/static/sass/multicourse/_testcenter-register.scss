@@ -97,6 +97,10 @@ $red: rgb(178, 6, 16);
 				padding: ($baseline*0.75) $baseline;
 				text-align: center;
 			}
+
+			&.error {
+
+			}
 		}
 
 		.list-input {
@@ -115,14 +119,13 @@ $red: rgb(178, 6, 16);
 					padding-bottom: 0;
 				}
 
-				&.disabled {
+				&.disabled, &.submitted {
 					color: rgba(0,0,0,.25);
 
 					label {
-						color: rgba(0,0,0,.25);
+						cursor: text;
 
 						&:after {
-							content: "(Disabled Currently)";
 							margin-left: ($baseline/4);
 						}
 					}
@@ -130,6 +133,28 @@ $red: rgb(178, 6, 16);
 					textarea, input {
 						background: rgb(255,255,255);
 						color: rgba(0,0,0,.25);
+					}
+				}
+
+				&.disabled {
+					label:after {
+						color: rgba(0,0,0,.35);
+						content: "(Disabled Currently)";
+					}
+				}
+
+				&.submitted {
+
+					label:after {
+						content: "(Previously Submitted and Not Editable)";
+					}
+
+					.value {
+						@include border-radius(3px);
+						border: 1px solid #C8C8C8;
+						padding: $baseline ($baseline*0.75);
+						background: #FAFAFA;
+						font-family: $sans-serif;
 					}
 				}
 
@@ -225,6 +250,28 @@ $red: rgb(178, 6, 16);
 
 				}
 			}
+		}
+	}
+
+	// form - specifics
+	.form-fields-secondary {
+		display: none;
+
+		&.is-shown {
+			display: block;
+		}
+	}
+
+	.form-fields-secondary-visibility {
+		display: block;
+		margin: 0;
+		padding: $baseline ($baseline*1.5) 0 ($baseline*1.5);
+		font-family: $sans-serif;
+		font-size: 13px;
+		text-align: right;
+
+		&.is-hidden {
+			display: none;
 		}
 	}
 
@@ -382,9 +429,53 @@ $red: rgb(178, 6, 16);
 		&.submission-error {
 			border: 1px solid tint($red,85%);
 			background: tint($red,95%);
+			font-size: 14px;
+
+			#submission-error-heading {
+				margin-bottom: ($baseline/2);
+				border-bottom: 1px solid tint($red, 85%);
+				padding-bottom: ($baseline/2);
+				font-weight: bold;
+			}
+
+			.field-name, .field-error {
+				display: inline-block;
+			}
+
+			.field-name {
+				margin-right: ($baseline/4);
+			}
+
+			.field-error {
+				color: tint($red, 55%);
+			}
 
 			p {
 				color: $red;
+			}
+
+			ul {
+				margin: 0 0 ($baseline/2) 0;
+				padding: 0;
+				list-style: none;
+
+				li {
+					margin-bottom: ($baseline/2);
+					padding: 0;
+
+					span {
+						color: $red;
+					}
+
+					a {
+						color: $red;
+						text-decoration: none;
+
+						&:hover, &:active {
+							text-decoration: underline;
+						}
+					}
+				}
 			}
 		}
 
