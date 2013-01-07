@@ -26,6 +26,7 @@ from .stringify import stringify_children
 from .x_module import XModule
 from .xml_module import XmlDescriptor
 from xmodule.modulestore import Location
+import openendedchild
 
 log = logging.getLogger("mitx.courseware")
 
@@ -38,91 +39,13 @@ MAX_ATTEMPTS = 1
 # Overriden by max_score specified in xml.
 MAX_SCORE = 1
 
-class SelfAssessmentModule():
-    """
-    States:
+class SelfAssessmentModule(openendedchild.OpenEndedChild):
 
-    initial (prompt, textbox shown)
-         |
-    assessing (read-only textbox, rubric + assessment input shown)
-         |
-    request_hint (read-only textbox, read-only rubric and assessment, hint input box shown)
-         |
-    done (submitted msg, green checkmark, everything else read-only.  If attempts < max, shows
-         a reset button that goes back to initial state.  Saves previous
-         submissions too.)
-    """
-
-    STATE_VERSION = 1
-
-    # states
-    INITIAL = 'initial'
-    ASSESSING = 'assessing'
-    REQUEST_HINT = 'post_assessment'
-    DONE = 'done'
-
-    def __init__(self, system, location, definition, descriptor,
-                 instance_state=None, shared_state=None, **kwargs):
-        """
-        Definition file should have 4 blocks -- prompt, rubric, submitmessage, hintprompt,
-        and two optional attributes:
-        attempts, which should be an integer that defaults to 1.
-        If it's > 1, the student will be able to re-submit after they see
-        the rubric.
-        max_score, which should be an integer that defaults to 1.
-        It defines the maximum number of points a student can get.  Assumed to be integer scale
-        from 0 to max_score, with an interval of 1.
-
-        Note: all the submissions are stored.
-
-        Sample file:
-
-        <selfassessment attempts="1" max_score="1">
-            <prompt>
-                Insert prompt text here.  (arbitrary html)
-            </prompt>
-            <rubric>
-                Insert grading rubric here.  (arbitrary html)
-            </rubric>
-            <hintprompt>
-                Please enter a hint below: (arbitrary html)
-            </hintprompt>
-            <submitmessage>
-                Thanks for submitting!  (arbitrary html)
-            </submitmessage>
-        </selfassessment>
-        """
-
-        # Load instance state
-        if instance_state is not None:
-            instance_state = json.loads(instance_state)
-        else:
-            instance_state = {}
-
-        instance_state = self.convert_state_to_current_format(instance_state)
-
-        # History is a list of tuples of (answer, score, hint), where hint may be
-        # None for any element, and score and hint can be None for the last (current)
-        # element.
-        # Scores are on scale from 0 to max_score
-        self.history = instance_state.get('history', [])
-
-        self.created = instance_state.get('created', "False")
-
-        self.state = instance_state.get('state', 'initial')
-
-        self.attempts = instance_state.get('attempts', 0)
-        self.max_attempts = int(instance_state.get('attempts', MAX_ATTEMPTS))
-
-        # Used for progress / grading.  Currently get credit just for
-        # completion (doesn't matter if you self-assessed correct/incorrect).
-        self._max_score = int(instance_state.get('max_score', MAX_SCORE))
-
+    def setup_response(self, system, location, definition, descriptor):
         self.rubric = definition['rubric']
         self.prompt = definition['prompt']
         self.submit_message = definition['submitmessage']
         self.hint_prompt = definition['hintprompt']
-
 
     def latest_answer(self):
         """None if not available"""

@@ -283,6 +283,9 @@ class CombinedOpenEndedModule(XModule):
 
         return json.dumps(state)
 
+    def get_status(self):
+        pass
+
 class CombinedOpenEndedDescriptor(XmlDescriptor, EditingDescriptor):
     """
     Module for adding self assessment questions to courses
