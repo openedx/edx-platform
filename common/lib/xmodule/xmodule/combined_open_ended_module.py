@@ -47,6 +47,7 @@ class CombinedOpenEndedModule(XModule):
 
     js = {'coffee': [resource_string(__name__, 'js/src/combinedopenended/display.coffee'),
                      resource_string(__name__, 'js/src/collapsible.coffee'),
+                     resource_string(__name__, 'js/src/javascript_loader.coffee'),
                      ]}
     js_module_name = "CombinedOpenEnded"
 

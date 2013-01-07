@@ -63,7 +63,6 @@ section.open-ended-child {
     }
   }
 
-  div {
     p {
       &.answer {
         margin-top: -2px;
@@ -74,7 +73,7 @@ section.open-ended-child {
       }
     }
 
-    &.unanswered {
+    div.unanswered {
       p.status {
         @include inline-block();
         background: url('../images/unanswered-icon.png') center center no-repeat;
@@ -83,7 +82,7 @@ section.open-ended-child {
       }
     }
 
-    &.correct, &.ui-icon-check {
+    div.correct, div.ui-icon-check {
       p.status {
         @include inline-block();
         background: url('../images/correct-icon.png') center center no-repeat;
@@ -96,7 +95,7 @@ section.open-ended-child {
       }
     }
 
-    &.processing {
+    div.processing {
       p.status {
         @include inline-block();
         background: url('../images/spinner.gif') center center no-repeat;
@@ -109,7 +108,7 @@ section.open-ended-child {
       }
     }
 
-    &.incorrect, &.ui-icon-close {
+    div.incorrect, div.ui-icon-close {
       p.status {
         @include inline-block();
         background: url('../images/incorrect-icon.png') center center no-repeat;
@@ -287,7 +286,6 @@ section.open-ended-child {
     .submit-message-container {
         margin: 10px 0px ;
     }
-  }
 
   form.option-input {
     margin: -10px 0 20px;
