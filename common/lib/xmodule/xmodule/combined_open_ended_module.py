@@ -98,7 +98,9 @@ class CombinedOpenEndedModule(XModule):
         return tag
 
     def overwrite_state(self, current_task_state):
-        last_response, last_score=self.get_last_response(self.current_task_number-1)
+        last_response_data=self.get_last_response(self.current_task_number-1)
+        last_response = last_response_data['response']
+
         loaded_task_state=json.loads(current_task_state)
         if loaded_task_state['state']== self.INITIAL:
             loaded_task_state['state']=self.ASSESSING
@@ -139,7 +141,8 @@ class CombinedOpenEndedModule(XModule):
             self.task_states.append(self.current_task.get_instance_state())
             self.state=self.ASSESSING
         elif current_task_state is None and self.current_task_number>0:
-            last_response, last_score=self.get_last_response(self.current_task_number-1)
+            last_response_data =self.get_last_response(self.current_task_number-1)
+            last_response = last_response_data['response']
             current_task_state = ('{"state": "assessing", "version": 1, "max_score": ' + str(self._max_score) + ', ' +
                                   '"attempts": 0, "created": "True", "history": [{"answer": "' + str(last_response) + '"}]}')
             self.current_task=children['modules'][current_task_type](self.system, self.location, self.current_task_parsed_xml, self.current_task_descriptor, instance_state=current_task_state)
@@ -191,8 +194,10 @@ class CombinedOpenEndedModule(XModule):
         task=children['modules'][task_type](self.system, self.location, task_parsed_xml, task_descriptor, instance_state=task_state)
         last_response=task.latest_answer()
         last_score = task.latest_score()
+        last_post_response = task.latest_post_response()
+        last_response_dict={'response' : last_response, 'score' : last_score, 'post_response' : post_response, 'type' : task_type}
 
-        return last_response, last_score
+        return last_response_dict
 
     def update_task_states(self):
         changed=False
@@ -285,7 +290,12 @@ class CombinedOpenEndedModule(XModule):
         return json.dumps(state)
 
     def get_status(self):
-        pass
+        status=[]
+        for i in xrange(0,self.current_task_number):
+            task_data = self.get_last_response(i)
+            status.append(task_data)
+        context = {'status_list' : status}
+        status_html = self.system.render_template("combined_open_ended_status.html", context)
 
 class CombinedOpenEndedDescriptor(XmlDescriptor, EditingDescriptor):
     """

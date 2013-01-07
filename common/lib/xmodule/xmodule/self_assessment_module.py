@@ -296,7 +296,6 @@ class SelfAssessmentDescriptor(XmlDescriptor, EditingDescriptor):
                 'hintprompt': parse('hintprompt'),
                 }
 
-
     def definition_to_xml(self, resource_fs):
         '''Return an xml element representing this definition.'''
         elt = etree.Element('selfassessment')
