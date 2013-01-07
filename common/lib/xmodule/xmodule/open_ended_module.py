@@ -411,7 +411,6 @@ class OpenEndedModule(openendedchild.OpenEndedChild):
           <other request-specific values here > }
         '''
         handlers = {
-            'problem_get': self.get_problem,
             'save_answer': self.save_answer,
             'score_update': self.update_score,
             'save_post_assessment' : self.message_post,
@@ -428,23 +427,6 @@ class OpenEndedModule(openendedchild.OpenEndedChild):
             'progress_status': Progress.to_js_status_str(after),
             })
         return json.dumps(d, cls=ComplexEncoder)
-
-    def get_problem(self, get, system):
-        return self.get_html(system)
-
-    def reset_problem(self, get, system):
-        self.change_state(self.INITIAL)
-        return {'success': True}
-
-    def out_of_sync_error(self, get, msg=''):
-        """
-        return dict out-of-sync error message, and also log.
-        """
-        log.warning("Assessment module state out sync. state: %r, get: %r. %s",
-            self.state, get, msg)
-        return {'success': False,
-                'error': 'The problem state got out-of-sync'}
-
 
     def save_answer(self, get, system):
         if self.attempts > self.max_attempts:
@@ -483,19 +465,6 @@ class OpenEndedModule(openendedchild.OpenEndedChild):
 
         return dict()  # No AJAX return is needed
 
-    def change_state(self, new_state):
-        """
-        A centralized place for state changes--allows for hooks.  If the
-        current state matches the old state, don't run any hooks.
-        """
-        if self.state == new_state:
-            return
-
-        self.state = new_state
-
-        if self.state == self.DONE:
-            self.attempts += 1
-
     def get_html(self, system):
         #set context variables and render template
         if self.state != self.INITIAL:
@@ -524,29 +493,6 @@ class OpenEndedModule(openendedchild.OpenEndedChild):
         log.debug(context)
         html = system.render_template('open_ended.html', context)
         return html
-
-    def get_progress(self):
-        '''
-        For now, just return last score / max_score
-        '''
-        if self._max_score > 0:
-            try:
-                return Progress(self.get_score()['score'], self._max_score)
-            except Exception as err:
-                log.exception("Got bad progress")
-                return None
-        return None
-
-    def reset(self, system):
-        """
-        If resetting is allowed, reset the state.
-
-        Returns {'success': bool, 'error': msg}
-        (error only present if not success)
-        """
-        self.change_state(self.INITIAL)
-        return {'success': True}
-
 
 class OpenEndedDescriptor(XmlDescriptor, EditingDescriptor):
     """

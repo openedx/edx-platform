@@ -116,18 +116,6 @@ class SelfAssessmentModule(openendedchild.OpenEndedChild):
         html = system.render_template('self_assessment_prompt.html', context)
         return html
 
-    def get_progress(self):
-        '''
-        For now, just return last score / max_score
-        '''
-        if self._max_score > 0:
-            try:
-                return Progress(self.get_score()['score'], self._max_score)
-            except Exception as err:
-                log.exception("Got bad progress")
-                return None
-        return None
-
 
     def handle_ajax(self, dispatch, get, system):
         """
@@ -157,15 +145,6 @@ class SelfAssessmentModule(openendedchild.OpenEndedChild):
             'progress_status': Progress.to_js_status_str(after),
         })
         return json.dumps(d, cls=ComplexEncoder)
-
-    def out_of_sync_error(self, get, msg=''):
-        """
-        return dict out-of-sync error message, and also log.
-        """
-        log.warning("Assessment module state out sync. state: %r, get: %r. %s",
-                    self.state, get, msg)
-        return {'success': False,
-                'error': 'The problem state got out-of-sync'}
 
     def get_rubric_html(self,system):
         """
@@ -296,7 +275,6 @@ class SelfAssessmentModule(openendedchild.OpenEndedChild):
         d['state'] = self.state
         return d
 
-
     def save_hint(self, get, system):
         '''
         Save the hint.
@@ -318,25 +296,6 @@ class SelfAssessmentModule(openendedchild.OpenEndedChild):
         return {'success': True,
                 'message_html': self.get_message_html(),
                 'allow_reset': self._allow_reset()}
-
-
-    def reset(self, system):
-        """
-        If resetting is allowed, reset the state.
-
-        Returns {'success': bool, 'error': msg}
-        (error only present if not success)
-        """
-        #if self.state != self.DONE:
-        #    return self.out_of_sync_error(get)
-
-        #if self.attempts > self.max_attempts:
-        #    return {
-        #        'success': False,
-        #        'error': 'Too many attempts.'
-        #    }
-        self.change_state(self.INITIAL)
-        return {'success': True}
 
 
 

@@ -206,5 +206,43 @@ class OpenEndedChild():
         return {'score': score if score is not None else 0,
                 'total': self._max_score}
 
+    def reset(self, system):
+        """
+        If resetting is allowed, reset the state.
+
+        Returns {'success': bool, 'error': msg}
+        (error only present if not success)
+        """
+        self.change_state(self.INITIAL)
+        return {'success': True}
+
+    def get_progress(self):
+        '''
+        For now, just return last score / max_score
+        '''
+        if self._max_score > 0:
+            try:
+                return Progress(self.get_score()['score'], self._max_score)
+            except Exception as err:
+                log.exception("Got bad progress")
+                return None
+        return None
+
+    def out_of_sync_error(self, get, msg=''):
+        """
+        return dict out-of-sync error message, and also log.
+        """
+        log.warning("Assessment module state out sync. state: %r, get: %r. %s",
+            self.state, get, msg)
+        return {'success': False,
+                'error': 'The problem state got out-of-sync'}
+
+    def get_html(self):
+        pass
+
+    def handle_ajax(self):
+        pass
+
+
 
 
