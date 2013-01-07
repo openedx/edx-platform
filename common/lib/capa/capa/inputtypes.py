@@ -829,3 +829,32 @@ class DragAndDropInput(InputTypeBase):
 registry.register(DragAndDropInput)
 
 #--------------------------------------------------------------------------------------------------------------------
+
+
+class EditAMoleculeInput(InputTypeBase):
+    """
+    An input type for edit-a-molecule.  Integrates with the molecule editor java applet.
+
+    Example:
+
+    <editamolecule size="50"/>
+
+    options: size -- width of the textbox.
+    """
+
+    template = "editamolecule.html"
+    tags = ['editamoleculeinput']
+
+    @classmethod
+    def get_attributes(cls):
+        """
+        Can set size of text field.
+        """
+        return [Attribute('file'),]
+
+    def _extra_context(self):
+        """
+        """
+        return {'applet_loader': '/static/js/capa/edit_a_molecule.js',}
+
+registry.register(EditAMoleculeInput)
