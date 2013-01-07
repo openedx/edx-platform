@@ -23,12 +23,13 @@
   </div>
 
   <input type="button" value="Submit" class="submit-button" name="show"/>
+  <input name="skip" class="skip-button" type="button" value="Skip Post-Assessment"/>
 
   <div class="open-ended-action"></div>
   <div class="open-ended-alert"></div>
 
   <span id="answer_${id}"></span>
-  <input name="skip" class="skip-button" type="button" value="Skip Post-Assessment"/>
+
   <input name="reload" class="reload-button" type="button" value="Recheck for Feedback" onclick="document.location.reload(true);" />
   <div class="external-grader-message">
       ${msg|n}
