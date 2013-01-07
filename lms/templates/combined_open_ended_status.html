@@ -4,7 +4,12 @@
         Step ${status['task_number']} (${status['human_state']}) : ${status['score']} / ${status['max_score']}
         %if status['type']=="openended":
             <div class="collapsible open-ended-short-feedback">
-                ${status['post_assessment']}
+                <header>
+                    <a href="#">Show Feedback</a>
+                </header>
+                <section id="post-assessment">
+                    ${status['post_assessment']}
+                </section>
             </div>
         %endif
     </div>
