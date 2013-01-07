@@ -47,52 +47,6 @@ class SelfAssessmentModule(openendedchild.OpenEndedChild):
         self.submit_message = definition['submitmessage']
         self.hint_prompt = definition['hintprompt']
 
-    @staticmethod
-    def convert_state_to_current_format(old_state):
-        """
-        This module used to use a problematic state representation. This method
-        converts that into the new format.
-
-        Args:
-            old_state: dict of state, as passed in.  May be old.
-
-        Returns:
-            new_state: dict of new state
-        """
-        if old_state.get('version', 0) == SelfAssessmentModule.STATE_VERSION:
-            # already current
-            return old_state
-
-        # for now, there's only one older format.
-
-        new_state = {'version': SelfAssessmentModule.STATE_VERSION}
-
-        def copy_if_present(key):
-            if key in old_state:
-                new_state[key] = old_state[key]
-
-        for to_copy in ['attempts', 'state']:
-            copy_if_present(to_copy)
-
-        # The answers, scores, and hints need to be kept together to avoid them
-        # getting out of sync.
-
-        # NOTE: Since there's only one problem with a few hundred submissions
-        # in production so far, not trying to be smart about matching up hints
-        # and submissions in cases where they got out of sync.
-
-        student_answers = old_state.get('student_answers', [])
-        scores = old_state.get('scores', [])
-        hints = old_state.get('hints', [])
-
-        new_state['history'] = [
-            {'answer': answer,
-             'score': score,
-             'hint': hint}
-             for answer, score, hint in itertools.izip_longest(
-                     student_answers, scores, hints)]
-        return new_state
-
     def get_html(self, system):
         #set context variables and render template
         if self.state != self.INITIAL:
