@@ -1,6 +1,11 @@
 class @CombinedOpenEnded
   constructor: (element) ->
+    @element=element
+    @reinitialize(element)
+
+  reinitialize: (element) ->
     @el = $(element).find('section.combined-open-ended')
+    @combined_open_ended=$(element).find('section.combined-open-ended')
     @id = @el.data('id')
     @ajax_url = @el.data('ajax-url')
     @state = @el.data('state')
@@ -12,7 +17,6 @@ class @CombinedOpenEnded
     @reset_button.click @reset
     @next_problem_button = @$('.next-step-button')
     @next_problem_button.click @next_problem
-    @combined_open_ended= @$('.combined-open-ended')
     # valid states: 'initial', 'assessing', 'post_assessment', 'done'
 
     # Where to put the rubric once we load it
@@ -74,7 +78,7 @@ class @CombinedOpenEnded
       @hint_area.attr('disabled', true)
       @submit_button.hide()
       if @task_number<@task_count
-        @next_problem
+        @next_problem()
       else
         @reset_button.show()
 
@@ -166,9 +170,11 @@ class @CombinedOpenEnded
           @hint_wrapper.html('')
           @message_wrapper.html('')
           @child_state = 'initial'
+          @combined_open_ended.html(response.html)
+          @reinitialize(@element)
           @rebind()
           @next_problem_button.hide()
-          location.reload()
+          @gentle_alert "Moved to next step."
         else
           @errors_area.html(response.error)
     else

@@ -255,7 +255,7 @@ class CombinedOpenEndedModule(XModule):
 
     def next_problem(self, get):
         self.update_task_states()
-        return {'success' : True}
+        return {'success' : True, 'html' : self.get_html()}
 
     def reset(self, get):
         """
