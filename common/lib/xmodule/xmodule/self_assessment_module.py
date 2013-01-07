@@ -160,7 +160,7 @@ class SelfAssessmentModule(openendedchild.OpenEndedChild):
 
         if self.state == self.ASSESSING:
             context['read_only'] = False
-        elif self.state in (self.REQUEST_HINT, self.DONE):
+        elif self.state in (self.POST_ASSESSMENT, self.DONE):
             context['read_only'] = True
         else:
             raise ValueError("Illegal state '%r'" % self.state)
@@ -184,7 +184,7 @@ class SelfAssessmentModule(openendedchild.OpenEndedChild):
         context = {'hint_prompt': self.hint_prompt,
                    'hint': hint}
 
-        if self.state == self.REQUEST_HINT:
+        if self.state == self.POST_ASSESSMENT:
             context['read_only'] = False
         elif self.state == self.DONE:
             context['read_only'] = True
@@ -269,7 +269,7 @@ class SelfAssessmentModule(openendedchild.OpenEndedChild):
             d['message_html'] = self.get_message_html()
             d['allow_reset'] = self._allow_reset()
         else:
-            self.change_state(self.REQUEST_HINT)
+            self.change_state(self.POST_ASSESSMENT)
             d['hint_html'] = self.get_hint_html(system)
 
         d['state'] = self.state
@@ -285,7 +285,7 @@ class SelfAssessmentModule(openendedchild.OpenEndedChild):
         with the error key only present if success is False and message_html
         only if True.
         '''
-        if self.state != self.REQUEST_HINT:
+        if self.state != self.POST_ASSESSMENT:
             # Note: because we only ask for hints on wrong answers, may not have
             # the same number of hints and answers.
             return self.out_of_sync_error(get)
