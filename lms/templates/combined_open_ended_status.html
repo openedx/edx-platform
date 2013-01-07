@@ -3,7 +3,7 @@
     <div class="statusitem">
         Step ${status['task_number']} (${status['human_state']}) : ${status['score']} / ${status['max_score']}
         %if status['type']=="openended":
-            <div class="collapsible open-ended-short-feedback">
+            <div class="collapsible external-grader-message">
                 <header>
                     <a href="#">Show feedback from step ${status['task_number']}</a>
                 </header>

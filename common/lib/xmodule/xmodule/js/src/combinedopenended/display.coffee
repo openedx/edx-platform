@@ -54,10 +54,10 @@ class @CombinedOpenEnded
     @submit_button.show()
     @reset_button.hide()
     @next_problem_button.hide()
-    @skip_button.hide()
     @hint_area.attr('disabled', false)
     if @child_type=="openended"
       @reload_button.hide()
+      @skip_button.hide()
     if @child_state == 'initial'
       @answer_area.attr("disabled", false)
       @submit_button.prop('value', 'Submit')
@@ -73,6 +73,7 @@ class @CombinedOpenEnded
       if @child_type=="openended"
         @reload_button.hide()
         @skip_button.show()
+        @skip_post_assessment()
       @answer_area.attr("disabled", true)
       @submit_button.prop('value', 'Submit post-assessment')
       if @child_type=="selfassessment"
@@ -83,7 +84,8 @@ class @CombinedOpenEnded
       @answer_area.attr("disabled", true)
       @hint_area.attr('disabled', true)
       @submit_button.hide()
-      @skip_button.hide()
+      if @child_type=="openended"
+        @skip_button.hide()
       if @task_number<@task_count
         @next_problem()
       else
@@ -149,8 +151,7 @@ class @CombinedOpenEnded
     else
       @errors_area.html('Problem state got out of sync.  Try reloading the page.')
 
-  skip_post_assessment: (event) =>
-    event.preventDefault()
+  skip_post_assessment: =>
     if @child_state == 'post_assessment'
 
       $.postWithPrefix "#{@ajax_url}/skip_post_assessment", {}, (response) =>
