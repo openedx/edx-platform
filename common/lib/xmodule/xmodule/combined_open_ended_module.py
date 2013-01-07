@@ -168,7 +168,7 @@ class CombinedOpenEndedModule(XModule):
             'state' : self.state,
             'task_count' : len(self.task_xml),
             'task_number' : self.current_task_number+1,
-            'status' : "temporary status."
+            'status' : self.get_status(),
             }
 
         html = self.system.render_template('combined_open_ended.html', context)
@@ -194,8 +194,9 @@ class CombinedOpenEndedModule(XModule):
         task=children['modules'][task_type](self.system, self.location, task_parsed_xml, task_descriptor, instance_state=task_state)
         last_response=task.latest_answer()
         last_score = task.latest_score()
-        last_post_response = task.latest_post_response()
-        last_response_dict={'response' : last_response, 'score' : last_score, 'post_response' : post_response, 'type' : task_type}
+        last_post_assessment = task.latest_post_assessment()
+        max_score = task.max_score()
+        last_response_dict={'response' : last_response, 'score' : last_score, 'post_assessment' : last_post_assessment, 'type' : task_type, 'max_score' : max_score}
 
         return last_response_dict
 
@@ -273,7 +274,6 @@ class CombinedOpenEndedModule(XModule):
         self.setup_next_task()
         return {'success': True}
 
-
     def get_instance_state(self):
         """
         Get the current score and state
@@ -293,9 +293,12 @@ class CombinedOpenEndedModule(XModule):
         status=[]
         for i in xrange(0,self.current_task_number):
             task_data = self.get_last_response(i)
+            task_data.update({'task_number' : i+1})
             status.append(task_data)
         context = {'status_list' : status}
         status_html = self.system.render_template("combined_open_ended_status.html", context)
+
+        return status_html
 
 class CombinedOpenEndedDescriptor(XmlDescriptor, EditingDescriptor):
     """

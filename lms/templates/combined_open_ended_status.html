@@ -1,3 +1,10 @@
 <section id="combined-open-ended-status" class="combined-open-ended-status">
-
+    %for status in status_list:
+    <statusitem>
+        Step ${status['task_number']} : ${status['score']} / ${status['max_score']}
+        %if status['type']=="openended":
+            ${status['post_assessment']}
+        %endif
+    </statusitem>
+    %endfor
 </section>

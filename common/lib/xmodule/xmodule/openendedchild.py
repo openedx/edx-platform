@@ -243,9 +243,5 @@ class OpenEndedChild():
     def handle_ajax(self):
         pass
 
-    def type(self):
-        pass
-
-
 
 
