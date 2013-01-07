@@ -69,7 +69,7 @@ class OpenEndedChild():
     POST_ASSESSMENT = 'post_assessment'
     DONE = 'done'
 
-    def __init__(self, system, location, definition, descriptor,
+    def __init__(self, system, location, definition, descriptor, static_data,
                  instance_state=None, shared_state=None, **kwargs):
         """
         Definition file should have 4 blocks -- prompt, rubric, submitmessage, hintprompt,
@@ -118,11 +118,11 @@ class OpenEndedChild():
         self.created = instance_state.get('created', "False")
 
         self.attempts = instance_state.get('attempts', 0)
-        self.max_attempts = int(instance_state.get('attempts', MAX_ATTEMPTS))
+        self.max_attempts = static_data['max_attempts']
 
         # Used for progress / grading.  Currently get credit just for
         # completion (doesn't matter if you self-assessed correct/incorrect).
-        self._max_score = int(instance_state.get('max_score', MAX_SCORE))
+        self._max_score = static_data['max_score']
 
         self.setup_response(system, location, definition, descriptor)
 

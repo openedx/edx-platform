@@ -34,15 +34,6 @@ from datetime import datetime
 
 log = logging.getLogger("mitx.courseware")
 
-# Set the default number of max attempts.  Should be 1 for production
-# Set higher for debugging/testing
-# attempts specified in xml definition overrides this.
-MAX_ATTEMPTS = 1
-
-# Set maximum available number of points.
-# Overriden by max_score specified in xml.
-MAX_SCORE = 1
-
 class OpenEndedModule(openendedchild.OpenEndedChild):
 
     def setup_response(self, system, location, definition, descriptor):
@@ -112,11 +103,6 @@ class OpenEndedModule(openendedchild.OpenEndedChild):
         updated_grader_payload = json.dumps(parsed_grader_payload)
 
         self.payload = {'grader_payload': updated_grader_payload}
-
-        try:
-            self.max_score = int(find_with_default(oeparam, 'max_score', 1))
-        except ValueError:
-            self.max_score = 1
 
     def message_post(self,get, system):
         """

@@ -90,6 +90,11 @@ class CombinedOpenEndedModule(XModule):
         # completion (doesn't matter if you self-assessed correct/incorrect).
         self._max_score = int(self.metadata.get('max_score', MAX_SCORE))
 
+        self.static_data = {
+            'max_score' : self._max_score,
+            'max_attempts' : self.max_attempts,
+        }
+
         self.task_xml=definition['task_xml']
         self.setup_next_task()
 
@@ -137,7 +142,7 @@ class CombinedOpenEndedModule(XModule):
         self.current_task_descriptor=children['descriptors'][current_task_type](self.system)
         self.current_task_parsed_xml=self.current_task_descriptor.definition_from_xml(etree.fromstring(self.current_task_xml),self.system)
         if current_task_state is None and self.current_task_number==0:
-            self.current_task=children['modules'][current_task_type](self.system, self.location, self.current_task_parsed_xml, self.current_task_descriptor)
+            self.current_task=children['modules'][current_task_type](self.system, self.location, self.current_task_parsed_xml, self.current_task_descriptor, self.static_data)
             self.task_states.append(self.current_task.get_instance_state())
             self.state=self.ASSESSING
         elif current_task_state is None and self.current_task_number>0:
@@ -145,13 +150,13 @@ class CombinedOpenEndedModule(XModule):
             last_response = last_response_data['response']
             current_task_state = ('{"state": "assessing", "version": 1, "max_score": ' + str(self._max_score) + ', ' +
                                   '"attempts": 0, "created": "True", "history": [{"answer": "' + str(last_response) + '"}]}')
-            self.current_task=children['modules'][current_task_type](self.system, self.location, self.current_task_parsed_xml, self.current_task_descriptor, instance_state=current_task_state)
+            self.current_task=children['modules'][current_task_type](self.system, self.location, self.current_task_parsed_xml, self.current_task_descriptor, self.static_data, instance_state=current_task_state)
             self.task_states.append(self.current_task.get_instance_state())
             self.state=self.ASSESSING
         else:
             if self.current_task_number>0 and not reset:
                 current_task_state=self.overwrite_state(current_task_state)
-            self.current_task=children['modules'][current_task_type](self.system, self.location, self.current_task_parsed_xml, self.current_task_descriptor, instance_state=current_task_state)
+            self.current_task=children['modules'][current_task_type](self.system, self.location, self.current_task_parsed_xml, self.current_task_descriptor, self.static_data, instance_state=current_task_state)
 
         log.debug(self.current_task.get_instance_state())
         log.debug(self.get_instance_state())
@@ -191,12 +196,15 @@ class CombinedOpenEndedModule(XModule):
 
         task_descriptor=children['descriptors'][task_type](self.system)
         task_parsed_xml=task_descriptor.definition_from_xml(etree.fromstring(task_xml),self.system)
-        task=children['modules'][task_type](self.system, self.location, task_parsed_xml, task_descriptor, instance_state=task_state)
+        task=children['modules'][task_type](self.system, self.location, task_parsed_xml, task_descriptor, self.static_data, instance_state=task_state)
         last_response=task.latest_answer()
         last_score = task.latest_score()
         last_post_assessment = task.latest_post_assessment()
         max_score = task.max_score()
-        last_response_dict={'response' : last_response, 'score' : last_score, 'post_assessment' : last_post_assessment, 'type' : task_type, 'max_score' : max_score}
+        state = task.state
+        last_response_dict={'response' : last_response, 'score' : last_score,
+                            'post_assessment' : last_post_assessment,
+                            'type' : task_type, 'max_score' : max_score, 'state' : state}
 
         return last_response_dict
 
@@ -291,7 +299,7 @@ class CombinedOpenEndedModule(XModule):
 
     def get_status(self):
         status=[]
-        for i in xrange(0,self.current_task_number):
+        for i in xrange(0,self.current_task_number+1):
             task_data = self.get_last_response(i)
             task_data.update({'task_number' : i+1})
             status.append(task_data)
