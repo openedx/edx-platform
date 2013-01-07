@@ -3,7 +3,8 @@ metadata:
     display_name: Numerical Response
     rerandomize: never
     showanswer: always
-    markdown: "A numerical response problem accepts a line of text input from the
+    markdown: |
+       A numerical response problem accepts a line of text input from the
        student, and evaluates the input for correctness based on its
        numerical value.  
 
@@ -18,7 +19,6 @@ metadata:
     
        Enter the number of fingers on a human hand: 
        = 5
-        "
 data: |
    <problem>
    <p>
