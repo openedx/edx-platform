@@ -1,12 +1,12 @@
 <section id="openended_${id}" class="open-ended-child" data-state="${state}" data-child-type="${child_type}">
-
    <div class="error"></div>
    <div class="prompt">
     ${prompt|n}
    </div>
   <textarea rows="${rows}" cols="${cols}" name="answer" class="answer short-form-response" id="input_${id}">${previous_answer|h}</textarea>
 
-  <div class="message-wrapper">
+  <div class="message-wrapper"></div>
+  <div class="grader-status">
     % if state == 'initial':
       <span class="unanswered" style="display:inline-block;" id="status_${id}">Unanswered</span>
     % elif state in ['done', 'post_assessment'] and correct == 'correct':

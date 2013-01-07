@@ -45,7 +45,9 @@ class CombinedOpenEndedModule(XModule):
     DONE = 'done'
     TASK_TYPES=["self", "ml", "instructor", "peer"]
 
-    js = {'coffee': [resource_string(__name__, 'js/src/combinedopenended/display.coffee')]}
+    js = {'coffee': [resource_string(__name__, 'js/src/combinedopenended/display.coffee'),
+                     resource_string(__name__, 'js/src/collapsible.coffee'),
+                     ]}
     js_module_name = "CombinedOpenEnded"
 
     css = {'scss': [resource_string(__name__, 'css/combinedopenended/display.scss')]}
