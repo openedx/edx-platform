@@ -69,7 +69,7 @@ class OpenEndedModule(openendedchild.OpenEndedChild):
 
         if self.created=="True" and self.state == self.ASSESSING:
             self.created="False"
-            self.get_score(self.latest_answer(), system)
+            self.send_to_grader(self.latest_answer(), system)
             self.created="False"
 
     def _parse(self, oeparam, prompt, rubric, system):
@@ -180,7 +180,7 @@ class OpenEndedModule(openendedchild.OpenEndedChild):
 
         return {'success' : success, 'msg' : "Successfully submitted your feedback."}
 
-    def get_score(self, submission, system):
+    def send_to_grader(self, submission, system):
 
         # Prepare xqueue request
         #------------------------------------------------------------
@@ -228,7 +228,7 @@ class OpenEndedModule(openendedchild.OpenEndedChild):
             score_msg['feedback'] = 'Invalid grader reply. Please contact the course staff.'
 
         self.record_latest_score(score_msg['score'])
-        self.record_latest_feedback(score_msg['feedback'])
+        self.record_latest_post_assessment(score_msg['feedback'])
         self.state=self.POST_ASSESSMENT
 
         return True
@@ -461,7 +461,7 @@ class OpenEndedModule(openendedchild.OpenEndedChild):
 
         # add new history element with answer and empty score and hint.
         self.new_history_entry(get['student_answer'])
-        self.get_score(get['student_answer'], system)
+        self.send_to_grader(get['student_answer'], system)
         self.change_state(self.ASSESSING)
 
         return {'success': True,}
@@ -496,66 +496,16 @@ class OpenEndedModule(openendedchild.OpenEndedChild):
         if self.state == self.DONE:
             self.attempts += 1
 
-    def get_instance_state(self):
-        """
-        Get the current score and state
-        """
-
-        state = {
-            'version': self.STATE_VERSION,
-            'history': self.history,
-            'state': self.state,
-            'max_score': self._max_score,
-            'attempts': self.attempts,
-            'created' : "False",
-            }
-        return json.dumps(state)
-
-    def latest_answer(self):
-        """None if not available"""
-        if not self.history:
-            return ""
-        return self.history[-1].get('answer', "")
-
-    def latest_score(self):
-        """None if not available"""
-        if not self.history:
-            return ""
-        return self.history[-1].get('score', "")
-
-    def latest_feedback(self):
-        """None if not available"""
-        if not self.history:
-            return ""
-        return self.history[-1].get('feedback', "")
-
-    def new_history_entry(self, answer):
-        self.history.append({'answer': answer})
-
-    def record_latest_score(self, score):
-        """Assumes that state is right, so we're adding a score to the latest
-        history element"""
-        self.history[-1]['score'] = score
-
-    def record_latest_feedback(self, feedback):
-        """Assumes that state is right, so we're adding a score to the latest
-        history element"""
-        self.history[-1]['feedback'] = feedback
-
-    def _allow_reset(self):
-        """Can the module be reset?"""
-        return self.state == self.DONE and self.attempts < self.max_attempts
-
     def get_html(self, system):
         #set context variables and render template
         if self.state != self.INITIAL:
             latest = self.latest_answer()
             previous_answer = latest if latest is not None else self.initial_display
-            feedback = self.latest_feedback()
+            post_assessment = self.latest_post_assessment()
             score= self.latest_score()
             correct = 'correct' if self.is_submission_correct(score) else 'incorrect'
         else:
-            feedback=""
+            post_assessment=""
             correct=""
             previous_answer = self.initial_display
 
@@ -567,7 +517,7 @@ class OpenEndedModule(openendedchild.OpenEndedChild):
             'rows' : 30,
             'cols' : 80,
             'id' : 'open_ended',
-            'msg' : feedback,
+            'msg' : post_assessment,
             'child_type' : 'openended',
             'correct' : correct,
             }
@@ -575,27 +525,13 @@ class OpenEndedModule(openendedchild.OpenEndedChild):
         html = system.render_template('open_ended.html', context)
         return html
 
-    def max_score(self):
-        """
-        Return max_score
-        """
-        return self._max_score
-
-    def get_score_value(self):
-        """
-        Returns the last score in the list
-        """
-        score = self.latest_score()
-        return {'score': score if score is not None else 0,
-                'total': self._max_score}
-
     def get_progress(self):
         '''
         For now, just return last score / max_score
         '''
         if self._max_score > 0:
             try:
-                return Progress(self.get_score_value()['score'], self._max_score)
+                return Progress(self.get_score()['score'], self._max_score)
             except Exception as err:
                 log.exception("Got bad progress")
                 return None

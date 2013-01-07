@@ -128,3 +128,83 @@ class OpenEndedChild():
 
     def setup_response(self, system, location, definition, descriptor):
         pass
+
+    def latest_answer(self):
+        """None if not available"""
+        if not self.history:
+            return ""
+        return self.history[-1].get('answer', "")
+
+    def latest_score(self):
+        """None if not available"""
+        if not self.history:
+            return None
+        return self.history[-1].get('score')
+
+    def latest_post_assessment(self):
+        """None if not available"""
+        if not self.history:
+            return ""
+        return self.history[-1].get('post_assessment', "")
+
+    def new_history_entry(self, answer):
+        self.history.append({'answer': answer})
+
+    def record_latest_score(self, score):
+        """Assumes that state is right, so we're adding a score to the latest
+        history element"""
+        self.history[-1]['score'] = score
+
+    def record_latest_post_assessment(self, post_assessment):
+        """Assumes that state is right, so we're adding a score to the latest
+        history element"""
+        self.history[-1]['post_assessment'] = post_assessment
+
+    def change_state(self, new_state):
+        """
+        A centralized place for state changes--allows for hooks.  If the
+        current state matches the old state, don't run any hooks.
+        """
+        if self.state == new_state:
+            return
+
+        self.state = new_state
+
+        if self.state == self.DONE:
+            self.attempts += 1
+
+    def get_instance_state(self):
+        """
+        Get the current score and state
+        """
+
+        state = {
+            'version': self.STATE_VERSION,
+            'history': self.history,
+            'state': self.state,
+            'max_score': self._max_score,
+            'attempts': self.attempts,
+            'created' : "False",
+            }
+        return json.dumps(state)
+
+    def _allow_reset(self):
+        """Can the module be reset?"""
+        return self.state == self.DONE and self.attempts < self.max_attempts
+
+    def max_score(self):
+        """
+        Return max_score
+        """
+        return self._max_score
+
+    def get_score(self):
+        """
+        Returns the last score in the list
+        """
+        score = self.latest_score()
+        return {'score': score if score is not None else 0,
+                'total': self._max_score}
+
+
+

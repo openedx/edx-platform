@@ -47,51 +47,6 @@ class SelfAssessmentModule(openendedchild.OpenEndedChild):
         self.submit_message = definition['submitmessage']
         self.hint_prompt = definition['hintprompt']
 
-    def latest_answer(self):
-        """None if not available"""
-        if not self.history:
-            return None
-        return self.history[-1].get('answer')
-
-    def latest_score(self):
-        """None if not available"""
-        if not self.history:
-            return None
-        return self.history[-1].get('score')
-
-    def latest_hint(self):
-        """None if not available"""
-        if not self.history:
-            return None
-        return self.history[-1].get('hint')
-
-    def new_history_entry(self, answer):
-        self.history.append({'answer': answer})
-
-    def record_latest_score(self, score):
-        """Assumes that state is right, so we're adding a score to the latest
-        history element"""
-        self.history[-1]['score'] = score
-
-    def record_latest_hint(self, hint):
-        """Assumes that state is right, so we're adding a score to the latest
-        history element"""
-        self.history[-1]['hint'] = hint
-
-
-    def change_state(self, new_state):
-        """
-        A centralized place for state changes--allows for hooks.  If the
-        current state matches the old state, don't run any hooks.
-        """
-        if self.state == new_state:
-            return
-
-        self.state = new_state
-
-        if self.state == self.DONE:
-            self.attempts += 1
-
     @staticmethod
     def convert_state_to_current_format(old_state):
         """
@@ -138,11 +93,6 @@ class SelfAssessmentModule(openendedchild.OpenEndedChild):
                      student_answers, scores, hints)]
         return new_state
 
-
-    def _allow_reset(self):
-        """Can the module be reset?"""
-        return self.state == self.DONE and self.attempts < self.max_attempts
-
     def get_html(self, system):
         #set context variables and render template
         if self.state != self.INITIAL:
@@ -165,20 +115,6 @@ class SelfAssessmentModule(openendedchild.OpenEndedChild):
 
         html = system.render_template('self_assessment_prompt.html', context)
         return html
-
-    def max_score(self):
-        """
-        Return max_score
-        """
-        return self._max_score
-
-    def get_score(self):
-        """
-        Returns the last score in the list
-        """
-        score = self.latest_score()
-        return {'score': score if score is not None else 0,
-                'total': self._max_score}
 
     def get_progress(self):
         '''
@@ -207,7 +143,7 @@ class SelfAssessmentModule(openendedchild.OpenEndedChild):
         handlers = {
             'save_answer': self.save_answer,
             'save_assessment': self.save_assessment,
-            'save_post_assessment': self.save_hint,
+            'save_post_assessment': self.save_post_assessment,
         }
 
         if dispatch not in handlers:
@@ -261,7 +197,7 @@ class SelfAssessmentModule(openendedchild.OpenEndedChild):
 
         if self.state == self.DONE:
             # display the previous hint
-            latest = self.latest_hint()
+            latest = self.latest_post_assessment()
             hint = latest if latest is not None else ''
         else:
             hint = ''
@@ -376,7 +312,7 @@ class SelfAssessmentModule(openendedchild.OpenEndedChild):
             # the same number of hints and answers.
             return self.out_of_sync_error(get)
 
-        self.record_latest_hint(get['hint'])
+        self.record_latest_post_assessment(get['hint'])
         self.change_state(self.DONE)
 
         return {'success': True,
@@ -402,21 +338,6 @@ class SelfAssessmentModule(openendedchild.OpenEndedChild):
         self.change_state(self.INITIAL)
         return {'success': True}
 
-
-    def get_instance_state(self):
-        """
-        Get the current score and state
-        """
-
-        state = {
-                 'version': self.STATE_VERSION,
-                 'history': self.history,
-                 'state': self.state,
-                 'max_score': self._max_score,
-                 'attempts': self.attempts,
-                 'created' : "False",
-        }
-        return json.dumps(state)
 
 
 class SelfAssessmentDescriptor(XmlDescriptor, EditingDescriptor):
