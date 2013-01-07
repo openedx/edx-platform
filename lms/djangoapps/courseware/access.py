@@ -5,8 +5,6 @@ like DISABLE_START_DATES"""
 import logging
 import time
 
-import student.models
-
 from django.conf import settings
 
 from xmodule.course_module import CourseDescriptor
@@ -14,6 +12,13 @@ from xmodule.error_module import ErrorDescriptor
 from xmodule.modulestore import Location
 from xmodule.timeparse import parse_time
 from xmodule.x_module import XModule, XModuleDescriptor
+
+# student.models imports Role, which imports courseware.access ; use a try, to break the circular import
+try:
+    from student.models import CourseEnrollmentAllowed
+except Exception as err:
+    CourseEnrollmentAllowed = None
+
 
 DEBUG_ACCESS = False
 
@@ -127,8 +132,9 @@ def _has_access_course_desc(user, course, action):
             return True
 
         # if user is in CourseEnrollmentAllowed with right course_id then can also enroll
-        if user is not None and student.models.CourseEnrollmentAllowed.objects.filter(email=user.email, course_id=course.id):
-            return True
+        if user is not None and CourseEnrollmentAllowed:
+            if CourseEnrollmentAllowed.objects.filter(email=user.email, course_id=course.id):
+                return True
 
         # otherwise, need staff access
         return _has_staff_access_to_descriptor(user, course)

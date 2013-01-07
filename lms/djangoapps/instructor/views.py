@@ -32,7 +32,8 @@ from xmodule.modulestore.exceptions import InvalidLocationError, ItemNotFoundErr
 from xmodule.modulestore.search import path_to_location
 import track.views
 
-
+from .grading import StaffGrading
+from .offline_gradecalc import student_grades, offline_grades_available
 
 log = logging.getLogger(__name__)
 
@@ -103,6 +104,7 @@ def instructor_dashboard(request, course_id):
 
     # process actions from form POST
     action = request.POST.get('action', '')
+    use_offline = request.POST.get('use_offline_grades',False)
 
     if settings.MITX_FEATURES['ENABLE_MANUAL_GIT_RELOAD']:
         if 'GIT pull' in action:
@@ -134,32 +136,32 @@ def instructor_dashboard(request, course_id):
 
     if action == 'Dump list of enrolled students' or action=='List enrolled students':
         log.debug(action)
-        datatable = get_student_grade_summary_data(request, course, course_id, get_grades=False)
+        datatable = get_student_grade_summary_data(request, course, course_id, get_grades=False, use_offline=use_offline)
         datatable['title'] = 'List of students enrolled in {0}'.format(course_id)
         track.views.server_track(request, 'list-students', {}, page='idashboard')
 
     elif 'Dump Grades' in action:
         log.debug(action)
-        datatable = get_student_grade_summary_data(request, course, course_id, get_grades=True)
+        datatable = get_student_grade_summary_data(request, course, course_id, get_grades=True, use_offline=use_offline)
         datatable['title'] = 'Summary Grades of students enrolled in {0}'.format(course_id)
         track.views.server_track(request, 'dump-grades', {}, page='idashboard')
 
     elif 'Dump all RAW grades' in action:
         log.debug(action)
         datatable = get_student_grade_summary_data(request, course, course_id, get_grades=True,
-                                                   get_raw_scores=True)
+                                                   get_raw_scores=True, use_offline=use_offline)
         datatable['title'] = 'Raw Grades of students enrolled in {0}'.format(course_id)
         track.views.server_track(request, 'dump-grades-raw', {}, page='idashboard')
 
     elif 'Download CSV of all student grades' in action:
         track.views.server_track(request, 'dump-grades-csv', {}, page='idashboard')
         return return_csv('grades_{0}.csv'.format(course_id),
-                          get_student_grade_summary_data(request, course, course_id))
+                          get_student_grade_summary_data(request, course, course_id, use_offline=use_offline))
 
     elif 'Download CSV of all RAW grades' in action:
         track.views.server_track(request, 'dump-grades-csv-raw', {}, page='idashboard')
         return return_csv('grades_{0}_raw.csv'.format(course_id),
-                          get_student_grade_summary_data(request, course, course_id, get_raw_scores=True))
+                          get_student_grade_summary_data(request, course, course_id, get_raw_scores=True, use_offline=use_offline))
 
     elif 'Download CSV of answer distributions' in action:
         track.views.server_track(request, 'dump-answer-dist-csv', {}, page='idashboard')
@@ -174,7 +176,7 @@ def instructor_dashboard(request, course_id):
 
     elif action=='List assignments available for this course':
         log.debug(action)
-        allgrades = get_student_grade_summary_data(request, course, course_id, get_grades=True)
+        allgrades = get_student_grade_summary_data(request, course, course_id, get_grades=True, use_offline=use_offline)
 
         assignments = [[x] for x in allgrades['assignments']]
         datatable = {'header': ['Assignment Name']}
@@ -184,7 +186,7 @@ def instructor_dashboard(request, course_id):
         msg += 'assignments=<pre>%s</pre>' % assignments
 
     elif action=='List enrolled students matching remote gradebook':
-        stud_data = get_student_grade_summary_data(request, course, course_id, get_grades=False)
+        stud_data = get_student_grade_summary_data(request, course, course_id, get_grades=False, use_offline=use_offline)
         msg2, rg_stud_data = _do_remote_gradebook(request.user, course, 'get-membership')
         datatable = {'header': ['Student  email', 'Match?']}
         rg_students = [ x['email'] for x in rg_stud_data['retdata'] ]
@@ -202,7 +204,7 @@ def instructor_dashboard(request, course_id):
         if not aname:
             msg += "<font color='red'>Please enter an assignment name</font>"
         else:
-            allgrades = get_student_grade_summary_data(request, course, course_id, get_grades=True)
+            allgrades = get_student_grade_summary_data(request, course, course_id, get_grades=True, use_offline=use_offline)
             if aname not in allgrades['assignments']:
                 msg += "<font color='red'>Invalid assignment name '%s'</font>" % aname
             else:
@@ -402,6 +404,12 @@ def instructor_dashboard(request, course_id):
 
 
     #----------------------------------------
+    # offline grades?
+    
+    if use_offline:
+        msg += "<br/><font color='orange'>Grades from %s</font>" % offline_grades_available(course_id)
+
+    #----------------------------------------
     # context for rendering
 
     context = {'course': course,
@@ -416,7 +424,8 @@ def instructor_dashboard(request, course_id):
                'plots': plots,			# psychometrics
                'course_errors': modulestore().get_item_errors(course.location),
                'djangopid' : os.getpid(),
-               'mitx_version' : getattr(settings,'MITX_VERSION_STRING','')
+               'mitx_version' : getattr(settings,'MITX_VERSION_STRING',''),
+               'offline_grade_log' : offline_grades_available(course_id),
                }
 
     return render_to_response('courseware/instructor_dashboard.html', context)
@@ -539,7 +548,7 @@ def _update_forum_role_membership(uname, course, rolename, add_or_remove):
     return msg
     
 
-def get_student_grade_summary_data(request, course, course_id, get_grades=True, get_raw_scores=False):
+def get_student_grade_summary_data(request, course, course_id, get_grades=True, get_raw_scores=False, use_offline=False):
     '''
     Return data arrays with student identity and grades for specified course.
 
@@ -563,7 +572,7 @@ def get_student_grade_summary_data(request, course, course_id, get_grades=True, 
     assignments = []
     if get_grades and enrolled_students.count() > 0:
         # just to construct the header
-        gradeset = grades.grade(enrolled_students[0], request, course, keep_raw_scores=get_raw_scores)
+        gradeset = student_grades(enrolled_students[0], request, course, keep_raw_scores=get_raw_scores, use_offline=use_offline)
         # log.debug('student {0} gradeset {1}'.format(enrolled_students[0], gradeset))
         if get_raw_scores:
             assignments += [score.section for score in gradeset['raw_scores']]
@@ -582,20 +591,22 @@ def get_student_grade_summary_data(request, course, course_id, get_grades=True, 
             datarow.append('')
 
         if get_grades:
-            gradeset = grades.grade(student, request, course, keep_raw_scores=get_raw_scores)
+            gradeset = student_grades(student, request, course, keep_raw_scores=get_raw_scores, use_offline=use_offline)
             log.debug('student={0}, gradeset={1}'.format(student,gradeset))
             if get_raw_scores:
-                student_grades = [score.earned for score in gradeset['raw_scores']]
+                # TODO (ichuang) encode Score as dict instead of as list, so score[0] -> score['earned']
+                sgrades = [(getattr(score,'earned','') or score[0]) for score in gradeset['raw_scores']]
             else:
-                student_grades = [x['percent'] for x in gradeset['section_breakdown']]
-            datarow += student_grades
-            student.grades = student_grades	# store in student object
+                sgrades = [x['percent'] for x in gradeset['section_breakdown']]
+            datarow += sgrades
+            student.grades = sgrades	# store in student object
 
         data.append(datarow)
     datatable['data'] = data
     return datatable
 
-
+#-----------------------------------------------------------------------------
+# Staff grading
 
 
 
@@ -616,7 +627,7 @@ def gradebook(request, course_id):
     student_info = [{'username': student.username,
                      'id': student.id,
                      'email': student.email,
-                     'grade_summary': grades.grade(student, request, course),
+                     'grade_summary': student_grades(student, request, course),
                      'realname': student.profile.name,
                      }
                      for student in enrolled_students]
@@ -637,6 +648,10 @@ def grade_summary(request, course_id):
     context = {'course': course,
                'staff_access': True, }
     return render_to_response('courseware/grade_summary.html', context)
+
+
+#-----------------------------------------------------------------------------
+# enrollment
 
 
 def _do_enroll_students(course, course_id, students, overload=False):
@@ -730,6 +745,9 @@ def enroll_students(request, course_id):
                                                        'rejected_students': rejected_students,
                                                        'debug': new_students})
 
+
+#-----------------------------------------------------------------------------
+# answer distribution
 
 def get_answers_distribution(request, course_id):
     """

@@ -71,6 +71,12 @@ function goto( mode)
 
 ##----------------------------------------------------------------------------- 
 %if modeflag.get('Grades'):
+
+    %if offline_grade_log:
+      <p><font color='orange'>Pre-computed grades ${offline_grade_log} available: Use?
+          <input type='checkbox' name='use_offline_grades' value='yes'></font> </p>
+    %endif
+
     <p>
     <a href="${reverse('gradebook', kwargs=dict(course_id=course.id))}">Gradebook</a>
     </p>
