@@ -74,13 +74,9 @@ class @CombinedOpenEnded
       @hint_area.attr('disabled', true)
       @submit_button.hide()
       if @task_number<@task_count
-        @next_problem_button.show()
+        @next_problem
       else
-        @next_problem_button.hide()
-        #if @allow_reset
         @reset_button.show()
-        #else
-        #  @reset_button.hide()
 
 
   find_assessment_elements: ->
@@ -161,8 +157,7 @@ class @CombinedOpenEnded
     else
       @errors_area.html('Problem state got out of sync.  Try reloading the page.')
 
-  next_problem: (event) =>
-    event.preventDefault()
+  next_problem: =>
     if @child_state == 'done'
       $.postWithPrefix "#{@ajax_url}/next_problem", {}, (response) =>
         if response.success
@@ -203,7 +198,7 @@ class @CombinedOpenEnded
       processData: false
       contentType: false
       success: (response) =>
-        @gentle_alert response.message
+        @gentle_alert response.msg
         @$('section.evaluation').slideToggle()
         @message_wrapper.html(response.message_html)
         @child_state = 'done'
@@ -216,4 +211,5 @@ class @CombinedOpenEnded
     if @el.find('.open-ended-alert').length
       @el.find('.open-ended-alert').remove()
     alert_elem = "<div class='open-ended-alert'>" + msg + "</div>"
+    @el.find('.open-ended-action').after(alert_elem)
     @el.find('.open-ended-alert').css(opacity: 0).animate(opacity: 1, 700)
