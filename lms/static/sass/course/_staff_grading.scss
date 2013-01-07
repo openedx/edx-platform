@@ -157,8 +157,13 @@ div.peer-grading{
         }
     }
     
-    .interstitial-grading
+    .interstitial-page
     {
+        text-align: center;
+        input[type=button]
+        {
+            margin-top: 20px;
+        }
     }
     padding: 40px;
 }
