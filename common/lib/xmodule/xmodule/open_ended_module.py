@@ -215,8 +215,8 @@ class OpenEndedModule(openendedchild.OpenEndedChild):
         if not new_score_msg['valid']:
             score_msg['feedback'] = 'Invalid grader reply. Please contact the course staff.'
 
-        self.record_latest_score(score_msg['score'])
-        self.record_latest_post_assessment(score_msg['feedback'])
+        self.record_latest_score(new_score_msg['score'])
+        self.record_latest_post_assessment(score_msg)
         self.state=self.POST_ASSESSMENT
 
         return True
@@ -385,7 +385,8 @@ class OpenEndedModule(openendedchild.OpenEndedChild):
         """None if not available"""
         if not self.history:
             return ""
-        return self._parse_score_msg(self.history[-1].get('post_assessment', ""))
+        feedback_dict = self._parse_score_msg(self.history[-1].get('post_assessment', ""))
+        return feedback_dict['feedback'] if feedback_dict['valid'] else ''
 
     def is_submission_correct(self, score):
         correct=False
