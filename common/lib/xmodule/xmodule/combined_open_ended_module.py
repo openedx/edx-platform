@@ -22,6 +22,8 @@ from xmodule.modulestore import Location
 import self_assessment_module
 import open_ended_module
 
+from mitxmako.shortcuts import render_to_string
+
 log = logging.getLogger("mitx.courseware")
 
 # Set the default number of max attempts.  Should be 1 for production
@@ -162,7 +164,7 @@ class CombinedOpenEndedModule(XModule):
         log.debug(self.get_instance_state())
         return True
 
-    def get_html(self):
+    def get_context(self):
         task_html=self.get_html_base()
         #set context variables and render template
 
@@ -176,9 +178,17 @@ class CombinedOpenEndedModule(XModule):
             'status' : self.get_status(),
             }
 
+        return context
+
+    def get_html(self):
+        context=self.get_context()
         html = self.system.render_template('combined_open_ended.html', context)
         return html
 
+    def get_html_nonsystem(self):
+        context=self.get_context()
+        html = render_to_string('combined_open_ended.html', context)
+        return html
 
     def get_html_base(self):
         self.update_task_states()
@@ -255,7 +265,7 @@ class CombinedOpenEndedModule(XModule):
 
     def next_problem(self, get):
         self.update_task_states()
-        return {'success' : True, 'html' : self.get_html()}
+        return {'success' : True, 'html' : self.get_html_nonsystem()}
 
     def reset(self, get):
         """
@@ -280,7 +290,7 @@ class CombinedOpenEndedModule(XModule):
             self.task_states[self.current_task_number]=self.current_task.get_instance_state()
         self.current_task_number=0
         self.setup_next_task()
-        return {'success': True}
+        return {'success': True, 'html' : self.get_html_nonsystem()}
 
     def get_instance_state(self):
         """

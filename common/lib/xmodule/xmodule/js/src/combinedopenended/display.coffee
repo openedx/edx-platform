@@ -4,6 +4,7 @@ class @CombinedOpenEnded
     @reinitialize(element)
 
   reinitialize: (element) ->
+    @wrapper=$(element).find('section.xmodule_CombinedOpenEndedModule')
     @el = $(element).find('section.combined-open-ended')
     @combined_open_ended=$(element).find('section.combined-open-ended')
     @id = @el.data('id')
@@ -153,9 +154,10 @@ class @CombinedOpenEnded
           @hint_wrapper.html('')
           @message_wrapper.html('')
           @child_state = 'initial'
+          @combined_open_ended.after(response.html).remove()
+          @reinitialize(@element)
           @rebind()
           @reset_button.hide()
-          location.reload()
         else
           @errors_area.html(response.error)
     else
@@ -170,7 +172,7 @@ class @CombinedOpenEnded
           @hint_wrapper.html('')
           @message_wrapper.html('')
           @child_state = 'initial'
-          @combined_open_ended.html(response.html)
+          @combined_open_ended.after(response.html).remove()
           @reinitialize(@element)
           @rebind()
           @next_problem_button.hide()
