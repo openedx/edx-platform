@@ -77,6 +77,7 @@ class CombinedOpenEndedModule(XModule):
         # element.
         # Scores are on scale from 0 to max_score
         system.set('location', location)
+        log.debug(system.location)
         self.current_task_number = instance_state.get('current_task_number', 0)
         self.task_states= instance_state.get('task_states', [])
 

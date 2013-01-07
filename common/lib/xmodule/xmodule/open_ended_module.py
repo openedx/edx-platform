@@ -179,9 +179,9 @@ class OpenEndedModule():
 
         self.initial_display = find_with_default(oeparam, 'initial_display', '')
         self.answer = find_with_default(oeparam, 'answer_display', 'No answer given.')
-
+        
         parsed_grader_payload.update({
-            'location' : system.location,
+            'location' : system.location.url(),
             'course_id' : system.course_id,
             'prompt' : prompt_string,
             'rubric' : rubric_string,
