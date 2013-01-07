@@ -200,7 +200,7 @@ def edit_subsection(request, location):
 
     # make sure that location references a 'sequential', otherwise return BadRequest
     if item.location.category != 'sequential':
-        return HttpResponseBadRequest
+        return HttpResponseBadRequest()
 
     parent_locs = modulestore().get_parent_locations(location)
 
@@ -1023,7 +1023,7 @@ def module_info(request, module_location):
     elif real_method == 'POST' or real_method == 'PUT':
         return HttpResponse(json.dumps(set_module_info(get_modulestore(location), location, request.POST)), mimetype="application/json")
     else:
-        return HttpResponseBadRequest
+        return HttpResponseBadRequest()
 
 @login_required
 @ensure_csrf_cookie
