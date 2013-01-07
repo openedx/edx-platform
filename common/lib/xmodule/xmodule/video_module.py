@@ -13,6 +13,9 @@ from xmodule.contentstore.content import StaticContent
 import datetime
 import time
 
+import datetime
+import time
+
 log = logging.getLogger(__name__)
 
 
