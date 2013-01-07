@@ -153,7 +153,7 @@ class @CombinedOpenEnded
     event.preventDefault()
     if @child_state == 'post_assessment'
 
-      $.postWithPrefix "#{@ajax_url}/skip_post_assessment", data, (response) =>
+      $.postWithPrefix "#{@ajax_url}/skip_post_assessment", {}, (response) =>
         if response.success
           @child_state = 'done'
           @allow_reset = response.allow_reset
