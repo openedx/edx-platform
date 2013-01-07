@@ -3,7 +3,7 @@ metadata:
     display_name: Multiple Choice
     rerandomize: never
     showanswer: always
-    markdown: "
+    markdown: |
        A multiple choice problem presents radio buttons for student input. Students can only select a single 
        option presented. Multiple Choice questions have been the subject of many areas of research due to the early 
        invention and adoption of bubble sheets.
@@ -19,7 +19,6 @@ metadata:
             ( ) The vegetable peeler
             ( ) Android
             ( ) The Beatles
-        "
 data: |
    <problem>
    <p>
