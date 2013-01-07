@@ -97,7 +97,7 @@ class @MarkdownEditingDescriptor extends XModule.Descriptor
       // replace string and numerical
       xml = xml.replace(/^\=\s*(.*?$)/gm, function(match, p) {
         var string;
-        var params = /(.*?)\+\-\s*(.*?)/.exec(p);
+        var params = /(.*?)\+\-\s*(.*?$)/.exec(p);
         if(parseFloat(p)) {
           if(params) {
             string = '<numericalresponse answer="' + params[1] + '">\n';
