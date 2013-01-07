@@ -40,7 +40,7 @@ end
 
 def django_admin(system, env, command, *args)
     django_admin = ENV['DJANGO_ADMIN_PATH'] || select_executable('django-admin.py', 'django-admin')
-    return "#{django_admin} #{command} --settings=#{system}.envs.#{env} --pythonpath=. #{args.join(' ')}"
+    return "#{django_admin} #{command} --traceback --settings=#{system}.envs.#{env} --pythonpath=. #{args.join(' ')}"
 end
 
 def django_for_jasmine(system, django_reload)
@@ -121,8 +121,7 @@ default_options = {
 
 task :predjango do
     sh("find . -type f -name *.pyc -delete")
-    sh('pip install -q --upgrade -r local-requirements.txt')
-    sh('git submodule update --init')
+    sh('pip install -q --upgrade --no-deps -r local-requirements.txt')
 end
 
 task :clean_test_files do
@@ -269,7 +268,7 @@ Dir["common/lib/*"].select{|lib| File.directory?(lib)}.each do |lib|
     TEST_TASK_DIRS << lib
 
     desc "Run tests for common lib #{lib} (without coverage)"
-    task "fasttest_#{lib}" do 
+    task "fasttest_#{lib}" do
         sh("nosetests #{lib}")
     end
 
@@ -474,16 +473,22 @@ task :builddocs do
     end
 end
 
-desc "Show doc in browser (mac only for now) TODO add linux support"
+desc "Show docs in browser (mac and ubuntu)."
 task :showdocs do
     Dir.chdir('docs/build/html') do
-        sh('open index.html')
+        if RUBY_PLATFORM.include? 'darwin'  #  mac os
+            sh('open index.html')
+        elsif RUBY_PLATFORM.include? 'linux'  # make more ubuntu specific?
+            sh('sensible-browser index.html')  # ubuntu
+        else
+            raise "\nUndefined how to run browser on your machine.
+Please use 'rake builddocs' and then manually open
+'mitx/docs/build/html/index.html."
+        end
     end
 end
 
 desc "Build docs and show them in browser"
 task :doc => :builddocs do
-    Dir.chdir('docs/build/html') do
-        sh('open index.html')
-    end
+    Rake::Task["showdocs"].invoke
 end

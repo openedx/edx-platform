@@ -23,6 +23,10 @@
       color: $base-font-color;
       font: normal 1em/1.6em $serif;
       margin: 0px;
+
+      a {
+        font: 1em $serif;
+      }
     }
 
     li + li {

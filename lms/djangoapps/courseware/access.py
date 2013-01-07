@@ -43,7 +43,8 @@ def has_access(user, obj, action, course_context=None):
 
     user: a Django user object. May be anonymous.
 
-    obj: The object to check access for.  For now, a module or descriptor.
+    obj: The object to check access for.  A module, descriptor, location, or
+                    certain special strings (e.g. 'global')
 
     action: A string specifying the action that the client is trying to perform.
 
