@@ -196,7 +196,7 @@ class OpenEndedModule(openendedchild.OpenEndedChild):
         contents.update({
             'student_info': json.dumps(student_info),
             'student_response': submission,
-            'max_score' : self.max_score,
+            'max_score' : self.max_score(),
             })
 
         # Submit request. When successful, 'msg' is the prior length of the queue
@@ -333,7 +333,7 @@ class OpenEndedModule(openendedchild.OpenEndedChild):
 
         feedback_template = system.render_template("open_ended_feedback.html", {
             'grader_type': response_items['grader_type'],
-            'score': "{0} / {1}".format(response_items['score'], self.max_score),
+            'score': "{0} / {1}".format(response_items['score'], self.max_score()),
             'feedback': feedback,
             })
 
@@ -382,7 +382,7 @@ class OpenEndedModule(openendedchild.OpenEndedChild):
     def is_submission_correct(self, score):
         correct=False
         if(isinstance(score,(int, long, float, complex))):
-            score_ratio = int(score) / float(self.max_score)
+            score_ratio = int(score) / float(self.max_score())
             correct = (score_ratio >= 0.66)
         return correct
 
