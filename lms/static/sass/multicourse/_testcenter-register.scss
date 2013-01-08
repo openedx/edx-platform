@@ -635,6 +635,7 @@ $red: rgb(178, 6, 16);
 				padding: ($baseline/2) $baseline;
 				font-size: 13px;
 				font-weight: bold;
+				letter-spacing: 0;
 
 				&:hover {
 				  text-decoration: none;
@@ -652,6 +653,9 @@ $red: rgb(178, 6, 16);
 
 		// submission error
 		&.submission-error {
+			@include box-sizing(border-box);
+			float: left;
+			width: flex-grid(8,8);
 			border: 1px solid tint($red,85%);
 			background: tint($red,95%);
 			font-size: 14px;
