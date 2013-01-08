@@ -29,7 +29,7 @@ class VideoModule(XModule):
     js_module_name = "Video"
 
     data = String(help="XML data for the problem", scope=Scope.content)
-    position = Integer(help="Current position in the video", scope=Scope.student_state)
+    position = Integer(help="Current position in the video", scope=Scope.student_state, default=0)
     display_name = String(help="Display name for this module", scope=Scope.settings)
 
     def __init__(self, *args, **kwargs):
@@ -37,7 +37,6 @@ class VideoModule(XModule):
 
         xmltree = etree.fromstring(self.data)
         self.youtube = xmltree.get('youtube')
-        self.position = 0
         self.show_captions = xmltree.get('show_captions', 'true')
         self.source = self._get_source(xmltree)
         self.track = self._get_track(xmltree)
