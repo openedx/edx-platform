@@ -30,6 +30,7 @@ section.combined-open-ended {
   {
       float:left;
       width: 53%;
+      padding-bottom: 20px;
   }
 
   .result-container
@@ -49,7 +50,7 @@ section.combined-open-ended {
   }
 }
 
-section.open-ended-child, section.combined-open-ended-status {
+section.combined-open-ended-status {
 
     .statusitem {
       background-color: #FAFAFA;
@@ -66,9 +67,11 @@ section.open-ended-child, section.combined-open-ended-status {
      font-size: 1em;
      padding-top: 10px;
   }
+}
 
+div.result-container {
 
-   .evaluation {
+ .evaluation {
         p {
             margin-bottom: 1px;
         }
@@ -84,7 +87,7 @@ section.open-ended-child, section.combined-open-ended-status {
         header {
             text-align: right;
             a {
-                font-size: .7em;
+                font-size: .85em;
             }
         }
     }
@@ -97,7 +100,7 @@ section.open-ended-child, section.combined-open-ended-status {
                 &:first-child {
                     margin-left: 0px;
                 }
-                display:block;
+                display:inline;
                 margin-left: 0px;
 
                 label {

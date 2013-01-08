@@ -215,7 +215,7 @@ class CombinedOpenEndedModule(XModule):
         last_post_assessment = task.latest_post_assessment()
         last_post_feedback=""
         if task_type=="openended":
-            last_post_assessment = task.latest_post_assessment(short_feedback=True)
+            last_post_assessment = task.latest_post_assessment(short_feedback=False)
             last_post_evaluation = task.format_feedback_with_evaluation(last_post_assessment)
             last_post_assessment = last_post_evaluation
         max_score = task.max_score()
@@ -249,12 +249,12 @@ class CombinedOpenEndedModule(XModule):
         return return_html
 
     def get_results(self, get):
-        task_number=get['task_number']
+        task_number=int(get['task_number'])
         self.update_task_states()
         response_dict=self.get_last_response(task_number)
         context = {'results' : response_dict['post_assessment']}
         html = render_to_string('combined_open_ended_results.html', context)
-        return html
+        return {'html' : html, 'success' : True}
 
     def handle_ajax(self, dispatch, get):
         """

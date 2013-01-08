@@ -62,6 +62,7 @@ class @CombinedOpenEnded
     $.postWithPrefix "#{@ajax_url}/get_results", data, (response) =>
       if response.success
         @results_container.after(response.html).remove()
+        @results_container = $('.result-container')
         @Collapsible.setCollapsibles(@results_container)
       else
         @errors_area.html(response.error)
