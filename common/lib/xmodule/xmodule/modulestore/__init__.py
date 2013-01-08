@@ -345,7 +345,7 @@ class ModuleStore(object):
         '''
         raise NotImplementedError
 
-    def get_parent_locations(self, location):
+    def get_parent_locations(self, location, course_id):
         '''Find all locations that are the parents of this location.  Needed
         for path_to_location().
 
