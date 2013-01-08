@@ -405,7 +405,7 @@ class OpenEndedModule(openendedchild.OpenEndedChild):
         return correct
 
     def format_feedback_with_evaluation(self,feedback):
-        context={'msg' : feedback, id : "1", rows : 30, cols : 30}
+        context={'msg' : feedback, 'id' : "1", 'rows' : 30, 'cols' : 30}
         html= render_to_string('open_ended_evaluation.html', context)
         return html
 

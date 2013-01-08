@@ -20,6 +20,8 @@ class @CombinedOpenEnded
     @next_problem_button.click @next_problem
     # valid states: 'initial', 'assessing', 'post_assessment', 'done'
     Collapsible.setCollapsibles(@el)
+    @submit_evaluation_button = $('.submit-evaluation-button')
+    @submit_evaluation_button.click @message_post
 
     # Where to put the rubric once we load it
     @el = $(element).find('section.open-ended-child')
@@ -30,8 +32,6 @@ class @CombinedOpenEnded
     @hint_wrapper = @$('.hint-wrapper')
     @message_wrapper = @$('.message-wrapper')
     @submit_button = @$('.submit-button')
-    @submit_evaluation_button = @$('.submit-evaluation-button')
-    @submit_evaluation_button.click @message_post
     @child_state = @el.data('state')
     @child_type = @el.data('child-type')
     if @child_type=="openended"
@@ -207,7 +207,7 @@ class @CombinedOpenEnded
     Logger.log 'message_post', @answers
 
     fd = new FormData()
-    feedback = @$('section.evaluation textarea.feedback-on-feedback')[0].value
+    feedback = $('section.evaluation textarea.feedback-on-feedback')[0].value
     submission_id = $('div.external-grader-message div.submission_id')[0].innerHTML
     grader_id = $('div.external-grader-message div.grader_id')[0].innerHTML
     score = $(".evaluation-scoring input:radio[name='evaluation-score']:checked").val()
