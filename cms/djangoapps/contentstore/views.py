@@ -271,7 +271,8 @@ def edit_unit(request, location):
             component_templates[template.location.category].append((
                 template.display_name,
                 template.location.url(),
-                'markdown' in template.metadata
+                'markdown' in template.metadata,
+                template.location.name == 'Empty'
             ))
 
     components = [
