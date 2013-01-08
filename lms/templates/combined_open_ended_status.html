@@ -1,17 +1,23 @@
 <section id="combined-open-ended-status" class="combined-open-ended-status">
-    %for status in status_list:
-    <div class="statusitem">
-        Step ${status['task_number']} (${status['human_state']}) : ${status['score']} / ${status['max_score']}
-        %if status['type']=="openended":
-            <div class="collapsible external-grader-message">
-                <header>
-                    <a href="#">Show feedback from step ${status['task_number']}</a>
-                </header>
-                <section id="post-assessment">
-                    ${status['post_assessment']}
-                </section>
-            </div>
+    %for i in xrange(0,len(status_list)):
+        <%status=status_list[i]%>
+        %if i==len(status_list)-1:
+            <div class="statusitem-current" data-status-number="${i}">
+        %else:
+            <div class="statusitem" data-status-number="${i}">
         %endif
-    </div>
+
+            Step ${status['task_number']} (${status['human_state']}) : ${status['score']} / ${status['max_score']}
+            %if status['type']=="openended":
+                <div class="collapsible external-grader-message">
+                    <header>
+                        <a href="#">Show feedback from step ${status['task_number']}</a>
+                    </header>
+                    <section id="post-assessment">
+                        ${status['post_assessment']}
+                    </section>
+                </div>
+            %endif
+        </div>
     %endfor
 </section>

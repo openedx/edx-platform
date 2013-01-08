@@ -21,7 +21,6 @@ h2 {
 }
 
 section.combined-open-ended {
-  margin-right:20px;
   .status-container
   {
       float:right;
@@ -44,6 +43,23 @@ section.combined-open-ended {
 }
 
 section.open-ended-child, section.combined-open-ended-status {
+
+    .statusitem {
+      background-color: #FAFAFA;
+      color: #2C2C2C;
+      font-family: monospace;
+      font-size: 1em;
+      padding-top: 10px;
+   }
+
+   .statusitem-current {
+     background-color: #BEBEBE;
+     color: #2C2C2C;
+     font-family: monospace;
+     font-size: 1em;
+     padding-top: 10px;
+  }
+
 
    .evaluation {
         p {
