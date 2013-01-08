@@ -250,5 +250,16 @@ class OpenEndedChild():
     def handle_ajax(self):
         pass
 
+    def is_submission_correct(self, score):
+        correct=False
+        if(isinstance(score,(int, long, float, complex))):
+            score_ratio = int(score) / float(self.max_score())
+            correct = (score_ratio >= 0.66)
+        return correct
+
+    def is_last_response_correct(self):
+        score=self.get_score()
+        return self.is_submission_correct(score)
+
 
 

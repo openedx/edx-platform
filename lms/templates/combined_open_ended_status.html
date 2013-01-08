@@ -8,7 +8,7 @@
         %endif
 
             Step ${status['task_number']} (${status['human_state']}) : ${status['score']} / ${status['max_score']}
-            %if status['type']=="openended":
+            %if status['type']=="openended" and status['state'] in ['done', 'post_assessment']:
                 <div class="show-results">
                     <a href="#" class="show-results-button">Show results from step ${status['task_number']}</a>
                 </div>

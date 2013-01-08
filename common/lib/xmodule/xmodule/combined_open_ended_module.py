@@ -218,11 +218,19 @@ class CombinedOpenEndedModule(XModule):
             last_post_assessment = task.latest_post_assessment(short_feedback=False)
             last_post_evaluation = task.format_feedback_with_evaluation(last_post_assessment)
             last_post_assessment = last_post_evaluation
+        last_correctness = task.is_last_response_correct()
         max_score = task.max_score()
         state = task.state
-        last_response_dict={'response' : last_response, 'score' : last_score,
-                            'post_assessment' : last_post_assessment,
-                            'type' : task_type, 'max_score' : max_score, 'state' : state, 'human_state' : task.HUMAN_NAMES[state]}
+        last_response_dict={
+            'response' : last_response,
+            'score' : last_score,
+            'post_assessment' : last_post_assessment,
+            'type' : task_type,
+            'max_score' : max_score,
+            'state' : state,
+            'human_state' : task.HUMAN_NAMES[state],
+            'correct' : last_correctness
+        }
 
         return last_response_dict
 
@@ -252,7 +260,7 @@ class CombinedOpenEndedModule(XModule):
         task_number=int(get['task_number'])
         self.update_task_states()
         response_dict=self.get_last_response(task_number)
-        context = {'results' : response_dict['post_assessment']}
+        context = {'results' : response_dict['post_assessment'], 'task_number' : task_number+1}
         html = render_to_string('combined_open_ended_results.html', context)
         return {'html' : html, 'success' : True}
 

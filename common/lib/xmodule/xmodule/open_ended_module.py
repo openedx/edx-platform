@@ -397,13 +397,6 @@ class OpenEndedModule(openendedchild.OpenEndedChild):
             short_feedback = self._convert_longform_feedback_to_html(json.loads(self.history[-1].get('post_assessment', "")))
         return short_feedback if feedback_dict['valid'] else ''
 
-    def is_submission_correct(self, score):
-        correct=False
-        if(isinstance(score,(int, long, float, complex))):
-            score_ratio = int(score) / float(self.max_score())
-            correct = (score_ratio >= 0.66)
-        return correct
-
     def format_feedback_with_evaluation(self,feedback):
         context={'msg' : feedback, 'id' : "1", 'rows' : 50, 'cols' : 50}
         html= render_to_string('open_ended_evaluation.html', context)
