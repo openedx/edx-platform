@@ -611,14 +611,18 @@ class CapaModule(XModule):
             return {'success': False,
                     'error': "Refresh the page and make an attempt before resetting."}
 
-        self.lcp.do_reset()
         if self.rerandomize in ["always", "onreset"]:
             # reset random number generator seed (note the self.lcp.get_state()
             # in next line)
-            self.lcp.seed = None
+            seed = None
+        else:
+            seed = self.lcp.seed
 
+        # Generate a new problem with either the previous seed or a new seed
+        self.lcp = self.new_lcp({'seed': seed})
+
+        # Pull in the new problem seed
         self.set_state_from_lcp()
-        self.lcp = self.new_lcp(self.get_state_for_lcp())
 
         event_info['new_state'] = self.lcp.get_state()
         self.system.track_function('reset_problem', event_info)
