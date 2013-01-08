@@ -39,6 +39,7 @@ class Randomization(String):
             return "always"
         elif value == "false":
             return "per_student"
+        return value
 
     to_json = from_json
 
