@@ -8,7 +8,9 @@ define('Graph', ['logme'], function (logme) {
 
     function Graph(gstId, config, state) {
         var plotDiv, dataSeries, functions, xaxis, yaxis, numPoints, xrange,
-            asymptotes;
+            asymptotes, plotObj;
+
+        plotObj = null;
 
         state.barsConfig = {
             'N': 0,
@@ -519,7 +521,7 @@ define('Graph', ['logme'], function (logme) {
 
             function addFunction(funcString, color, line, dot, label,
                                  pointSize, fillArea, bar, disableAutoReturn) {
-                var newFunctionObject, func, paramNames;
+                var newFunctionObject, func, paramNames, matches;
 
                 // The main requirement is function string. Without it we can't
                 // create a function, and the series cannot be calculated.
@@ -671,6 +673,17 @@ define('Graph', ['logme'], function (logme) {
                 }
 
                 if (typeof label === 'string') {
+                    matches = label.match(/%%_[^%]*%%/g);
+
+                    if (
+                        ($.isArray(matches) === true) &&
+                        (matches.length > 0)
+                    ) {
+                        newFunctionObject['specialLabel'] = true;
+                    } else {
+                        newFunctionObject['specialLabel'] = false;
+                    }
+
                     newFunctionObject['label'] = label;
                 }
 
@@ -688,7 +701,7 @@ define('Graph', ['logme'], function (logme) {
 
         function generateData() {
             var c0, c1, functionObj, seriesObj, dataPoints, paramValues, x, y,
-                start, end, step, tempX;
+                start, end, step, tempX, matches;
 
             paramValues = state.getAllParameterValues();
 
@@ -801,7 +814,35 @@ define('Graph', ['logme'], function (logme) {
 
                 // See if a user defined a label for this function.
                 if (functionObj.hasOwnProperty('label') === true) {
-                    seriesObj.label = functionObj.label;
+                    if (functionObj.specialLabel === true) {
+                        matches = functionObj.label.match(/%%_[^%]*%%/g);
+
+                        if ($.isArray(matches) === true) {
+                            (function (c1) {
+                                var el_id, func, tempLabel;
+
+                                tempLabel = functionObj.label;
+
+                                while (c1 < matches.length) {
+                                    el_id = matches[c1].replace(/%/g, '');
+                                    func = state.getFuncForSpecialLabel(el_id);
+
+                                    if (func !== null) {
+                                        tempLabel = tempLabel.replace(
+                                            matches[c1],
+                                            func.apply(window, state.getAllParameterValues())
+                                        );
+                                    }
+
+                                    c1 += 1;
+                                }
+
+                                seriesObj.label = tempLabel;
+                            }(0));
+                        }
+                    } else {
+                        seriesObj.label = functionObj.label;
+                    }
                 }
 
                 // Should the data points be connected by a line?
@@ -841,33 +882,41 @@ define('Graph', ['logme'], function (logme) {
 
             paramValues = state.getAllParameterValues();
 
-            // Tell Flot to draw the graph to our specification.
+            // Tell Flot to draw the graph to our specification. If this is the
+            // first time, then call $.plot.
+            if (plotObj === null) {
+                plotObj = $.plot(
+                    plotDiv,
+                    dataSeries,
+                    {
+                        'xaxis': xaxis,
+                        'yaxis': yaxis,
+                        'legend': {
 
-            $.plot(
-                plotDiv,
-                dataSeries,
-                {
-                    'xaxis': xaxis,
-                    'yaxis': yaxis,
-                    'legend': {
+                            // To show the legend or not. Note, even if 'show' is
+                            // 'true', the legend will only show if labels are
+                            // provided for at least one of the series that are
+                            // going to be plotted.
+                            'show': true,
 
-                        // To show the legend or not. Note, even if 'show' is
-                        // 'true', the legend will only show if labels are
-                        // provided for at least one of the series that are
-                        // going to be plotted.
-                        'show': true,
+                            // A floating point number in the range [0, 1]. The
+                            // smaller the number, the more transparent will the
+                            // legend background become.
+                            'backgroundOpacity': 0
 
-                        // A floating point number in the range [0, 1]. The
-                        // smaller the number, the more transparent will the
-                        // legend background become.
-                        'backgroundOpacity': 0
-
-                    },
-                    'grid': {
-                        'markings': generateMarkings()
+                        },
+                        'grid': {
+                            'markings': generateMarkings()
+                        }
                     }
-                }
-            );
+                );
+            }
+            // Otherwise, use stored plot object.
+            else {
+                plotObj.setData(dataSeries);
+                plotObj.setupGrid();
+                plotObj.draw();
+            }
 
             // The first time that the graph gets added to the page, the legend
             // is created from scratch. When it appears, MathJax works some
@@ -909,7 +958,7 @@ define('Graph', ['logme'], function (logme) {
                     if (asymptote.type === 'x') {
                         markings.push({
                             'color': asymptote.color,
-                            'lineWidth': 1,
+                            'lineWidth': 2,
                             'xaxis': {
                                 'from': val,
                                 'to': val
@@ -918,7 +967,7 @@ define('Graph', ['logme'], function (logme) {
                     } else {
                         markings.push({
                             'color': asymptote.color,
-                            'lineWidth': 1,
+                            'lineWidth': 2,
                             'yaxis': {
                                 'from': val,
                                 'to': val

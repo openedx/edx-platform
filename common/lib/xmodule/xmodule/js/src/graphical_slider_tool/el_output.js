@@ -25,15 +25,14 @@ define('ElOutput', ['logme'], function (logme) {
         return;
 
         function processFuncObj(obj) {
-            var outputEl, paramNames, funcString, func;
+            var paramNames, funcString, func, special, el;
 
             // We are only interested in functions that are meant for output to an
             // element.
-            if (typeof obj['@output'] !== 'string') {
-                return;
-            }
-
-            if (obj['@output'].toLowerCase() !== 'element') {
+            if (
+                (typeof obj['@output'] !== 'string') ||
+                (obj['@output'].toLowerCase() !== 'element')
+            ) {
                 return;
             }
 
@@ -54,14 +53,6 @@ define('ElOutput', ['logme'], function (logme) {
             // Make sure that all HTML entities are converted to their proper
             // ASCII text equivalents.
             funcString = $('<div>').html(funcString).text();
-
-            outputEl = $('#' + obj['@el_id']);
-
-            if (outputEl.length !== 1) {
-                logme('ERROR: The element with id "' + obj['@el_id'] + '" was not found.');
-
-                return;
-            }
 
             paramNames = state.getAllParameterNames();
             paramNames.push(funcString);
@@ -86,9 +77,25 @@ define('ElOutput', ['logme'], function (logme) {
 
             paramNames.pop();
 
-            outputEl.html(func.apply(window, state.getAllParameterValues()));
+            special = false;
+            if (obj['@el_id'][0] === '_') {
+                special = true;
+            } else {
+                el = $('#' + obj['@el_id']);
 
-            state.addDynamicEl(outputEl, func);
+                if (el.length !== 1) {
+                    logme(
+                        'ERROR: DOM element with ID "' + obj['@el_id'] + '" ' +
+                        'not found. Dynamic element not created.'
+                    );
+
+                    return;
+                }
+
+                el.html(func.apply(window, state.getAllParameterValues()));
+            }
+
+            state.addDynamicEl(el, func, obj['@el_id'], special);
         }
 
     }

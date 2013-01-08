@@ -18,9 +18,10 @@ define('State', ['logme'], function (logme) {
 
     function State(gstId, config) {
         var parameters, allParameterNames, allParameterValues,
-            plotDiv, dynamicEl;
+            plotDiv, dynamicEl, dynamicElByElId;
 
         dynamicEl = [];
+        dynamicElByElId = {};
 
         stateInst += 1;
         logme('MESSAGE: Creating state instance # ' + stateInst + '.');
@@ -95,7 +96,9 @@ define('State', ['logme'], function (logme) {
             'getAllParameterValues': getAllParameterValues,
 
             'bindUpdatePlotEvent': bindUpdatePlotEvent,
-            'addDynamicEl': addDynamicEl
+            'addDynamicEl': addDynamicEl,
+
+            'getFuncForSpecialLabel': getFuncForSpecialLabel
         };
 
         function getAllParameterNames() {
@@ -122,11 +125,33 @@ define('State', ['logme'], function (logme) {
             plotDiv.bind('update_plot', callback);
         }
 
-        function addDynamicEl(outputEl, func) {
-            dynamicEl.push({
-                'outputEl': outputEl,
-                'func': func
+        function addDynamicEl(el, func, elId, special) {
+            var newLength;
+
+            newLength = dynamicEl.push({
+                'el': el,
+                'func': func,
+                'elId': elId,
+                'special': special
             });
+
+            if (typeof dynamicElByElId[elId] !== 'undefined') {
+                logme(
+                    'ERROR: Duplicate dynamic element ID "' + elId + '" found.'
+                );
+            } else {
+                dynamicElByElId[elId] = dynamicEl[newLength - 1];
+            }
+        }
+
+        function getFuncForSpecialLabel(elId) {
+            if (typeof dynamicElByElId[elId] === 'undefined') {
+                logme('ERROR: Special label with ID "' + elId + '" does not exist.');
+
+                return null;
+            }
+
+            return dynamicElByElId[elId].func;
         }
 
         function getParameterValue(paramName) {
@@ -221,7 +246,9 @@ define('State', ['logme'], function (logme) {
             allParameterValues[parameters[paramName].helperArrayIndex] = paramValueNum;
 
             for (c1 = 0; c1 < dynamicEl.length; c1++) {
-                dynamicEl[c1].outputEl.html(dynamicEl[c1].func.apply(window, allParameterValues));
+                if (dynamicEl[c1].special !== true) {
+                    dynamicEl[c1].el.html(dynamicEl[c1].func.apply(window, allParameterValues));
+                }
             }
 
             // If we have a plot DIV to work with, tell to update.

@@ -64,12 +64,12 @@ define(
         Sliders(gstId, state);
         Inputs(gstId, gstClass, state);
 
+        // Configure functions that output to an element instead of the graph.
+        ElOutput(config, state);
+
         // Configure and display the graph. Attach event for the graph to be
         // updated on any change of a slider or a text input.
         Graph(gstId, config, state);
-
-        // Configure functions that output to an element instead of the graph.
-        ElOutput(config, state);
     }
 });
 
