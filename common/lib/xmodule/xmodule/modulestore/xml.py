@@ -275,7 +275,6 @@ class XMLModuleStore(ModuleStoreBase):
             class_ = getattr(import_module(module_path), class_name)
             self.default_class = class_
 
-        # self.parent_tracker = ParentTracker()
         self.parent_trackers = defaultdict(ParentTracker)
 
         # If we are specifically asked for missing courses, that should
