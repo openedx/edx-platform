@@ -152,12 +152,15 @@
                 % for type, templates in sorted(component_templates.items()):
                 <div class="new-component-templates new-component-${type}">
                     <ul class="new-component-template">
-                        % for name, location, has_markdown in templates:
+                        % for name, location, has_markdown, is_empty in templates:
                         <li>
                             <a href="#" data-location="${location}">
                                 <span class="name">${name} 
                                 % if has_markdown:
                                      MD
+                                % endif
+                                % if is_empty:
+                                    <i>rasa</i>
                                 % endif
                                 </span>
                             </a>
