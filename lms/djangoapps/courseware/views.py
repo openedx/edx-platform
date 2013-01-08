@@ -133,7 +133,7 @@ def redirect_to_course_position(course_module, first_time):
     chapter = get_current_child(course_module)
     if chapter is None:
         # oops.  Something bad has happened.
-        raise Http404
+        raise Http404("No chapter found when loading current position in course")
     if not first_time:
         return redirect(reverse('courseware_chapter', kwargs={'course_id': course_id,
                                                               'chapter': chapter.url_name}))
