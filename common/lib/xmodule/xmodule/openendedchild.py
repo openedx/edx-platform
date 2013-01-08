@@ -258,9 +258,9 @@ class OpenEndedChild():
         return correct
 
     def is_last_response_correct(self):
-        score=self.get_score()
+        score=self.get_score()['score']
         correctness = 'correct' if self.is_submission_correct(score) else 'incorrect'
-        return
+        return correctness
 
 
 
