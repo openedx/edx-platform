@@ -107,8 +107,6 @@ class CapaModule(XModule):
                 # to these bins, and may not want cohorts.  So e.g. hash(your-id, problem_id) % num_bins.
                 #     - analytics really needs small number of bins.
                 self.seed = system.id
-            else:
-                self.seed = None
 
         try:
             # TODO (vshnayder): move as much as possible of this work and error
