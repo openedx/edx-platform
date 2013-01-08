@@ -245,7 +245,7 @@ class OpenEndedModule(openendedchild.OpenEndedChild):
                 that will have more complex feedback.
 
         Output:
-            String -- html that can be displayed to the student.
+            String -- html that can be displayincorrect-icon.pnged to the student.
         """
 
         # We want to display available feedback in a particular order.
