@@ -25,4 +25,60 @@
         %endif
         <textarea class="xml-box" rows="8" cols="40">${data | h}</textarea>
     </div>
-</section>    
+</section>
+
+<script type="text/template" id="simple-editor-cheatsheet">
+    <article class="simple-editor-cheatsheet">
+        <div class="cheatsheet-wrapper">
+            <div class="row">
+                <h6>Multiple Choice</h6>
+                <div class="col sample">
+                    <img src="/static/img/choice-example.png" />
+                </div>
+                <div class="col">
+            <pre><code>( ) red
+                ( ) green
+                (x) blue</code></pre>
+                </div>
+            </div>
+            <div class="row">
+                <h6>Multiple Check</h6>
+                <div class="col sample">
+                    <img src="/static/img/multi-example.png" />
+                </div>
+                <div class="col">
+            <pre><code>[ ] earth
+                [ ] wind
+                [x] water</code></pre>
+                </div>
+            </div>
+            <div class="row">
+                <h6>String Response</h6>
+                <div class="col sample">
+                    <img src="/static/img/string-example.png" />
+                </div>
+                <div class="col">
+                    <pre><code>= dog</code></pre>
+                </div>
+            </div>
+            <div class="row">
+                <h6>Numerical Response</h6>
+                <div class="col sample">
+                    <img src="/static/img/number-example.png" />
+                </div>
+                <div class="col">
+                    <pre><code>= 3.14 +- 2%</code></pre>
+                </div>
+            </div>
+            <div class="row">
+                <h6>Option Response</h6>
+                <div class="col sample">
+                    <img src="/static/img/select-example.png" />
+                </div>
+                <div class="col">
+                    <pre><code>[[wrong, (right)]]</code></pre>
+                </div>
+            </div>
+        </div>
+    </article>
+</script>

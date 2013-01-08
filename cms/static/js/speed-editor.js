@@ -13,7 +13,9 @@ var commandDown;
 (function() {
   $body.on('click', '.editor-bar a', onEditorButton);
   $body.on('click', '.cheatsheet-toggle', toggleCheatsheet);
+// NOTE: we are showing metadata in the standard way, not in an "Advanced" section below.
   $body.on('click', '.problem-settings-button', toggleProblemSettings);
+// NOTE: not doing keybindings at this time.
   $(document).bind('keyup', onKeyboard);
 })();
 
@@ -21,7 +23,7 @@ function initProblemEditors($editor, $prev) {
   $currentEditor = $editor;
   simpleEditor = CodeMirror.fromTextArea($editor.find('.edit-box')[0], {
     lineWrapping: true,
-//    TODO: I left out the extra keys for now.
+//    NOTE: keybindings have been left out at this point. Needs further work.
       extraKeys: {
       'Ctrl-N': newUnit,
       'Ctrl-H': makeHeader,
@@ -44,13 +46,15 @@ function initProblemEditors($editor, $prev) {
 
   currentEditor = simpleEditor;
 
+// NOTE: I left out setting the background color. Does not appear necessary.
   $(simpleEditor.getWrapperElement()).css('background', '#fff');
   $(xmlEditor.getWrapperElement()).css({
     'background': '#fff'
   }).hide();
 
-//    TODO: is this necessary??
+// NOTE: I left this out, doesn't seem to be necessary.
   $(simpleEditor.getWrapperElement()).bind('click', setFocus);
+// NOTE: we are not supporting preview at this time.
   $preview = $prev.find('.problem');
 }
 
