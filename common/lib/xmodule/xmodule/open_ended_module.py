@@ -405,7 +405,7 @@ class OpenEndedModule(openendedchild.OpenEndedChild):
         return correct
 
     def format_feedback_with_evaluation(self,feedback):
-        context={'msg' : feedback, 'id' : "1", 'rows' : 30, 'cols' : 30}
+        context={'msg' : feedback, 'id' : "1", 'rows' : 50, 'cols' : 50}
         html= render_to_string('open_ended_evaluation.html', context)
         return html
 
@@ -424,6 +424,7 @@ class OpenEndedModule(openendedchild.OpenEndedChild):
             'score_update': self.update_score,
             'save_post_assessment' : self.message_post,
             'skip_post_assessment' : self.skip_post_assessment,
+            'check_for_score' : self.check_for_score,
             }
 
         if dispatch not in handlers:
@@ -437,6 +438,10 @@ class OpenEndedModule(openendedchild.OpenEndedChild):
             'progress_status': Progress.to_js_status_str(after),
             })
         return json.dumps(d, cls=ComplexEncoder)
+
+    def check_for_score(self, get, system):
+        state = self.state
+        return {'state' : state}
 
     def save_answer(self, get, system):
         if self.attempts > self.max_attempts:

@@ -24,12 +24,12 @@ section.combined-open-ended {
   .status-container
   {
       float:right;
-      width:30%;
+      width:40%;
   }
   .item-container
   {
       float:left;
-      width: 63%;
+      width: 53%;
   }
 
   &:after
@@ -68,8 +68,8 @@ section.open-ended-child, section.combined-open-ended-status {
     }
 
     .feedback-on-feedback {
-        height: 100px;
-        width: 150px;
+        height: 150px;
+        width: 250px;
         margin-right: 0px;
     }
 

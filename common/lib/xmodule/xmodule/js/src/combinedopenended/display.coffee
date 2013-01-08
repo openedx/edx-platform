@@ -35,7 +35,6 @@ class @CombinedOpenEnded
     @child_state = @el.data('state')
     @child_type = @el.data('child-type')
     if @child_type=="openended"
-      @reload_button = @$('.reload-button')
       @skip_button = @$('.skip-button')
       @skip_button.click @skip_post_assessment
 
@@ -58,7 +57,6 @@ class @CombinedOpenEnded
     @next_problem_button.hide()
     @hint_area.attr('disabled', false)
     if @child_type=="openended"
-      @reload_button.hide()
       @skip_button.hide()
     if @child_state == 'initial'
       @answer_area.attr("disabled", false)
@@ -70,10 +68,9 @@ class @CombinedOpenEnded
       @submit_button.click @save_assessment
       if @child_type == "openended"
         @submit_button.hide()
-        @reload_button.show()
+        @queueing()
     else if @child_state == 'post_assessment'
       if @child_type=="openended"
-        @reload_button.hide()
         @skip_button.show()
         @skip_post_assessment()
       @answer_area.attr("disabled", true)
@@ -238,3 +235,17 @@ class @CombinedOpenEnded
     alert_elem = "<div class='open-ended-alert'>" + msg + "</div>"
     @el.find('.open-ended-action').after(alert_elem)
     @el.find('.open-ended-alert').css(opacity: 0).animate(opacity: 1, 700)
+
+  queueing: =>
+    if @child_state=="assessing" and @child_type=="openended"
+      if window.queuePollerID # Only one poller 'thread' per Problem
+        window.clearTimeout(window.queuePollerID)
+      window.queuePollerID = window.setTimeout(@poll, 10000)
+
+  poll: =>
+    $.postWithPrefix "#{@ajax_url}/check_for_score", (response) =>
+      if response.state == "done" or response.state=="post_assessment"
+        delete window.queuePollerID
+        location.reload()
+      else
+        window.queuePollerID = window.setTimeout(@poll, 10000)
