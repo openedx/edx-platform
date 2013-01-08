@@ -220,7 +220,6 @@ class @CombinedOpenEnded
     else
       fd.append('score', score)
 
-
     settings =
       type: "POST"
       data: fd
@@ -228,11 +227,8 @@ class @CombinedOpenEnded
       contentType: false
       success: (response) =>
         @gentle_alert response.msg
-        @$('section.evaluation').slideToggle()
+        $('section.evaluation').slideToggle()
         @message_wrapper.html(response.message_html)
-        @child_state = 'done'
-        @allow_reset = response.allow_reset
-        @rebind()
 
     $.ajaxWithPrefix("#{@ajax_url}/save_post_assessment", settings)
 
