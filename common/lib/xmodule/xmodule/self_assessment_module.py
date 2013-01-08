@@ -35,6 +35,8 @@ class SelfAssessmentModule(openendedchild.OpenEndedChild):
     def setup_response(self, system, location, definition, descriptor):
         self.submit_message = definition['submitmessage']
         self.hint_prompt = definition['hintprompt']
+        self.prompt = stringify_children(prompt)
+        self.rubric = stringify_children(rubric)
 
     def get_html(self, system):
         #set context variables and render template
@@ -270,7 +272,7 @@ class SelfAssessmentDescriptor(XmlDescriptor, EditingDescriptor):
         'hintprompt': 'some-html'
         }
         """
-        expected_children = ['rubric', 'prompt', 'submitmessage', 'hintprompt']
+        expected_children = ['submitmessage', 'hintprompt']
         for child in expected_children:
             if len(xml_object.xpath(child)) != 1:
                 raise ValueError("Self assessment definition must include exactly one '{0}' tag".format(child))
@@ -279,9 +281,7 @@ class SelfAssessmentDescriptor(XmlDescriptor, EditingDescriptor):
             """Assumes that xml_object has child k"""
             return stringify_children(xml_object.xpath(k)[0])
 
-        return {'rubric': parse('rubric'),
-                'prompt': parse('prompt'),
-                'submitmessage': parse('submitmessage'),
+        return {'submitmessage': parse('submitmessage'),
                 'hintprompt': parse('hintprompt'),
                 }
 
@@ -294,7 +294,7 @@ class SelfAssessmentDescriptor(XmlDescriptor, EditingDescriptor):
             child_node = etree.fromstring(child_str)
             elt.append(child_node)
 
-        for child in ['rubric', 'prompt', 'submitmessage', 'hintprompt']:
+        for child in ['submitmessage', 'hintprompt']:
             add_child(child)
 
         return elt

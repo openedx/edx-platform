@@ -76,6 +76,7 @@ class OpenEndedModule(openendedchild.OpenEndedChild):
         prompt_string = stringify_children(prompt)
         rubric_string = stringify_children(rubric)
         self.prompt=prompt_string
+        self.rubric=rubric_string
 
         grader_payload = oeparam.find('grader_payload')
         grader_payload = grader_payload.text if grader_payload is not None else ''
