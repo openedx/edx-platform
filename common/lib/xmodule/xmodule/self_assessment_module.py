@@ -35,8 +35,8 @@ class SelfAssessmentModule(openendedchild.OpenEndedChild):
     def setup_response(self, system, location, definition, descriptor):
         self.submit_message = definition['submitmessage']
         self.hint_prompt = definition['hintprompt']
-        self.prompt = stringify_children(prompt)
-        self.rubric = stringify_children(rubric)
+        self.prompt = stringify_children(self.prompt)
+        self.rubric = stringify_children(self.rubric)
 
     def get_html(self, system):
         #set context variables and render template
