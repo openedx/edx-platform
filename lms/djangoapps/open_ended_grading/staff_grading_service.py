@@ -178,7 +178,7 @@ def _check_access(user, course_id):
 def get_next(request, course_id):
     """
     Get the next thing to grade for course_id and with the location specified
-    in the .
+    in the request.
 
     Returns a json dict with the following keys:
 

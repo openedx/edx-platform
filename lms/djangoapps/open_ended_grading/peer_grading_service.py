@@ -144,7 +144,21 @@ def _check_post(request):
 
 def get_next_submission(request, course_id):
     """
-    TODO: fill in this documentation
+    Makes a call to the grading controller for the next essay that should be graded
+    Returns a json dict with the following keys:
+
+    'success': bool
+
+    'submission_id': a unique identifier for the submission, to be passed back
+                     with the grade.
+
+    'submission': the submission, rendered as read-only html for grading
+
+    'rubric': the rubric, also rendered as html.
+
+    'submission_key': a key associated with the submission for validation reasons
+
+    'error': if success is False, will have an error message with more info.
     """
     _check_post(request)
     required = set(['location'])
@@ -155,12 +169,10 @@ def get_next_submission(request, course_id):
     p = request.POST
     location = p['location']
 
-    return HttpResponse(_get_next_submission(course_id, request.user.id, location),
-                        mimetype="application/json")
-
-def _get_next_submission(course_id, grader_id, location):
     try:
-        return peer_grading_service().get_next_submission(location, grader_id)
+        response = peer_grading_service().get_next_submission(location, grader_id)
+        return HttpResponse(response,
+                        mimetype="application/json")
     except GradingServiceError:
         log.exception("Error from grading service.  server url: {0}"
                       .format(staff_grading_service().url))
@@ -169,7 +181,18 @@ def _get_next_submission(course_id, grader_id, location):
 
 def save_grade(request, course_id):
     """
-    TODO: fill in this documentation
+    Saves the grade of a given submission.
+    Input:
+        The request should have the following keys:
+        location - problem location
+        submission_id - id associated with this submission
+        submission_key - submission key given for validation purposes
+        score - the grade that was given to the submission
+        feedback - the feedback from the student
+    Returns
+        A json object with the following keys:
+        success: bool indicating whether the save was a success
+        error: if there was an error in the submission, this is the error message
     """
     _check_post(request)
     required = set(['location', 'submission_id', 'submission_key', 'score', 'feedback'])
@@ -197,7 +220,20 @@ def save_grade(request, course_id):
 
 def is_student_calibrated(request, course_id):
     """
-    TODO: fill in this documentation
+    Calls the grading controller to see if the given student is calibrated
+    on the given problem
+
+    Input:
+        In the request, we need the following arguments:
+        location - problem location
+
+    Returns:
+        Json object with the following keys
+        success - bool indicating whether or not the call was successful
+        calibrated - true if the grader has fully calibrated and can now move on to grading
+                   - false if the grader is still working on calibration problems
+        total_calibrated_on_so_far - the number of calibration essays for this problem 
+            that this grader has graded
     """
     _check_post(request)
     required = set(['location'])
@@ -221,7 +257,26 @@ def is_student_calibrated(request, course_id):
 
 def show_calibration_essay(request, course_id):
     """
-    TODO: fill in this documentation
+    Fetch the next calibration essay from the grading controller and return it
+    Inputs:
+        In the request
+        location - problem location
+
+    Returns:
+        A json dict with the following keys
+        'success': bool
+
+        'submission_id': a unique identifier for the submission, to be passed back
+                         with the grade.
+
+        'submission': the submission, rendered as read-only html for grading
+
+        'rubric': the rubric, also rendered as html.
+
+        'submission_key': a key associated with the submission for validation reasons
+
+        'error': if success is False, will have an error message with more info.
+
     """
     _check_post(request)
 
@@ -233,12 +288,9 @@ def show_calibration_essay(request, course_id):
     grader_id = request.user.id
     p = request.POST
     location = p['location']
-    return HttpResponse(_next_calibration_essay(course_id, grader_id, location), 
-            mimetype="application/json")
-
-def _next_calibration_essay(course_id, grader_id, location):
     try:
-        return peer_grading_service().show_calibration_essay(location, grader_id)
+        response = peer_grading_service().show_calibration_essay(location, grader_id)
+        return HttpResponse(response, mimetype="application/json")
     except GradingServiceError:
         log.exception("Error from grading service.  server url: {0}"
                       .format(staff_grading_service().url))
@@ -248,6 +300,20 @@ def _next_calibration_essay(course_id, grader_id, location):
 
 def save_calibration_essay(request, course_id):
     """
+    Saves the grader's grade of a given calibration.
+    Input:
+        The request should have the following keys:
+        location - problem location
+        submission_id - id associated with this submission
+        submission_key - submission key given for validation purposes
+        score - the grade that was given to the submission
+        feedback - the feedback from the student
+    Returns
+        A json object with the following keys:
+        success: bool indicating whether the save was a success
+        error: if there was an error in the submission, this is the error message
+        actual_score: the score that the instructor gave to this calibration essay 
+
     """
     _check_post(request)
 
