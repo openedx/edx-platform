@@ -187,7 +187,7 @@ class @CombinedOpenEnded
 
   reset: (event) =>
     event.preventDefault()
-    if @child_state == 'done'
+    if @child_state == 'done' or @allow_reset=="True"
       $.postWithPrefix "#{@ajax_url}/reset", {}, (response) =>
         if response.success
           @answer_area.val('')
@@ -196,6 +196,7 @@ class @CombinedOpenEnded
           @message_wrapper.html('')
           @child_state = 'initial'
           @combined_open_ended.after(response.html).remove()
+          @allow_reset="False"
           @reinitialize(@element)
           @rebind()
           @reset_button.hide()

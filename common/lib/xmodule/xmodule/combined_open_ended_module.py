@@ -142,17 +142,18 @@ class CombinedOpenEndedModule(XModule):
             current_task_state=self.task_states[self.current_task_number]
 
         self.current_task_xml=self.task_xml[self.current_task_number]
+
+        if self.current_task_number>0:
+            self.allow_reset=self.check_allow_reset()
+            if self.allow_reset:
+                self.current_task_number=self.current_task_number-1
+
         current_task_type=self.get_tag_name(self.current_task_xml)
 
         children=self.child_modules()
 
         self.current_task_descriptor=children['descriptors'][current_task_type](self.system)
         etree_xml=etree.fromstring(self.current_task_xml)
-
-        if self.current_task_number>0:
-            self.allow_reset=self.check_allow_reset()
-            if self.allow_reset:
-                return False
 
         self.current_task_parsed_xml=self.current_task_descriptor.definition_from_xml(etree_xml,self.system)
         if current_task_state is None and self.current_task_number==0:
@@ -175,13 +176,14 @@ class CombinedOpenEndedModule(XModule):
         return True
 
     def check_allow_reset(self):
-        if self.current_task_number>0:
-            last_response_data=self.get_last_response(self.current_task_number-1)
-            current_response_data=self.get_current_attributes(self.current_task_number)
+        if not self.allow_reset:
+            if self.current_task_number>0:
+                last_response_data=self.get_last_response(self.current_task_number-1)
+                current_response_data=self.get_current_attributes(self.current_task_number)
 
-            if current_response_data['min_score_to_attempt']>last_response_data['score'] or current_response_data['max_score_to_attempt']<last_response_data['score']:
-                self.state=self.DONE
-                self.allow_reset=True
+                if current_response_data['min_score_to_attempt']>last_response_data['score'] or current_response_data['max_score_to_attempt']<last_response_data['score']:
+                    self.state=self.DONE
+                    self.allow_reset=True
 
         return self.allow_reset
 
@@ -198,6 +200,7 @@ class CombinedOpenEndedModule(XModule):
             'task_number' : self.current_task_number+1,
             'status' : self.get_status(),
             }
+        log.debug(context)
 
         return context
 
@@ -268,20 +271,18 @@ class CombinedOpenEndedModule(XModule):
 
     def update_task_states(self):
         changed=False
-        local_task_number=self.current_task_number
-        if self.allow_reset:
-            local_task_number=local_task_number-1
-        self.task_states[local_task_number] = self.current_task.get_instance_state()
-        current_task_state=json.loads(self.task_states[local_task_number])
-        if current_task_state['state']==self.DONE and not self.allow_reset:
-            self.current_task_number+=1
-            if self.current_task_number>=(len(self.task_xml)):
-                self.state=self.DONE
-                self.current_task_number=len(self.task_xml)-1
-            else:
-                self.state=self.INITIAL
-            changed=True
-            self.setup_next_task()
+        if not self.allow_reset:
+            self.task_states[self.current_task_number] = self.current_task.get_instance_state()
+            current_task_state=json.loads(self.task_states[self.current_task_number])
+            if current_task_state['state']==self.DONE:
+                self.current_task_number+=1
+                if self.current_task_number>=(len(self.task_xml)):
+                    self.state=self.DONE
+                    self.current_task_number=len(self.task_xml)-1
+                else:
+                    self.state=self.INITIAL
+                changed=True
+                self.setup_next_task()
         return changed
 
     def update_task_states_ajax(self,return_html):
@@ -335,7 +336,8 @@ class CombinedOpenEndedModule(XModule):
         (error only present if not success)
         """
         if self.state != self.DONE:
-            return self.out_of_sync_error(get)
+            if not self.allow_reset:
+                return self.out_of_sync_error(get)
 
         if self.attempts > self.max_attempts:
             return {
@@ -350,6 +352,7 @@ class CombinedOpenEndedModule(XModule):
             self.current_task.reset(self.system)
             self.task_states[self.current_task_number]=self.current_task.get_instance_state()
         self.current_task_number=0
+        self.allow_reset=False
         self.setup_next_task()
         return {'success': True, 'html' : self.get_html_nonsystem()}
 
