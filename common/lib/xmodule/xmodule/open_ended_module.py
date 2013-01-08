@@ -528,7 +528,6 @@ class OpenEndedDescriptor(XmlDescriptor, EditingDescriptor):
         'oeparam': 'some-html'
         }
         """
-
         for child in ['openendedparam']:
             if len(xml_object.xpath(child)) != 1:
                 raise ValueError("Open Ended definition must include exactly one '{0}' tag".format(child))

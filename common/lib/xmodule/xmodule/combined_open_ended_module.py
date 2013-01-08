@@ -82,7 +82,6 @@ class CombinedOpenEndedModule(XModule):
         # element.
         # Scores are on scale from 0 to max_score
         system.set('location', location)
-        log.debug(system.location)
         self.current_task_number = instance_state.get('current_task_number', 0)
         self.task_states= instance_state.get('task_states', [])
 
@@ -147,7 +146,13 @@ class CombinedOpenEndedModule(XModule):
         children=self.child_modules()
 
         self.current_task_descriptor=children['descriptors'][current_task_type](self.system)
-        self.current_task_parsed_xml=self.current_task_descriptor.definition_from_xml(etree.fromstring(self.current_task_xml),self.system)
+        etree_xml=etree.fromstring(self.current_task_xml)
+        min_score_to_attempt=int(etree_xml.attrib.get('min_score_to_attempt',0))
+        max_score_to_attempt=int(etree_xml.attrib.get('min_score_to_attempt',self._max_score))
+        if self.current_task_number>0:
+            last_response_data=self.get_last_response(self.current_task_number-1)
+
+        self.current_task_parsed_xml=self.current_task_descriptor.definition_from_xml(etree_xml,self.system)
         if current_task_state is None and self.current_task_number==0:
             self.current_task=children['modules'][current_task_type](self.system, self.location, self.current_task_parsed_xml, self.current_task_descriptor, self.static_data)
             self.task_states.append(self.current_task.get_instance_state())
@@ -165,8 +170,6 @@ class CombinedOpenEndedModule(XModule):
                 current_task_state=self.overwrite_state(current_task_state)
             self.current_task=children['modules'][current_task_type](self.system, self.location, self.current_task_parsed_xml, self.current_task_descriptor, self.static_data, instance_state=current_task_state)
 
-        log.debug(self.current_task.get_instance_state())
-        log.debug(self.get_instance_state())
         return True
 
     def get_context(self):
