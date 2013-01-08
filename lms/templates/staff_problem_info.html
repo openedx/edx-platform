@@ -67,7 +67,6 @@ category = ${category | h}
 
 <script type="text/javascript">
 // assumes courseware.html's loaded this method.
-% if staff_access:
 $(function() {
     setup_debug('${element_id}',
         %if edit_link:
@@ -83,5 +82,4 @@ $(function() {
         }
     );
 });
-% endif
 </script>
