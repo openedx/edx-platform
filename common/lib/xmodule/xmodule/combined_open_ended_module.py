@@ -482,8 +482,9 @@ class CombinedOpenEndedModule(XModule):
 
     def get_status(self):
         """
-        Input:
-        Output:
+        Gets the status panel to be displayed at the top right.
+        Input: None
+        Output: The status html to be rendered
         """
         status=[]
         for i in xrange(0,self.current_task_number+1):
@@ -497,7 +498,7 @@ class CombinedOpenEndedModule(XModule):
 
 class CombinedOpenEndedDescriptor(XmlDescriptor, EditingDescriptor):
     """
-    Module for adding self assessment questions to courses
+    Module for adding combined open ended questions
     """
     mako_template = "widgets/html-edit.html"
     module_class = CombinedOpenEndedModule
@@ -513,14 +514,13 @@ class CombinedOpenEndedDescriptor(XmlDescriptor, EditingDescriptor):
     @classmethod
     def definition_from_xml(cls, xml_object, system):
         """
-        Pull out the rubric, prompt, and submitmessage into a dictionary.
+        Pull out the individual tasks, the rubric, and the prompt, and parse
 
         Returns:
         {
         'rubric': 'some-html',
         'prompt': 'some-html',
-        'submitmessage': 'some-html'
-        'hintprompt': 'some-html'
+        'task_xml': dictionary of xml strings,
         }
         """
         expected_children = ['task', 'rubric', 'prompt']
