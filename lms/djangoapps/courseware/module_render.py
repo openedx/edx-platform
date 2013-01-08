@@ -17,7 +17,7 @@ from capa.xqueue_interface import XQueueInterface
 from capa.chem import chemcalc
 from courseware.access import has_access
 from mitxmako.shortcuts import render_to_string
-from models import StudentModule, StudentModuleCache
+from models import StudentModule
 from psychometrics.psychoanalyze import make_psychometrics_data_update_handler
 from static_replace import replace_urls
 from xmodule.errortracker import exc_info_to_str
@@ -28,7 +28,7 @@ from xmodule.x_module import ModuleSystem
 from xmodule.error_module import ErrorDescriptor, NonStaffErrorDescriptor
 from xblock.runtime import DbModel
 from xmodule_modifiers import replace_course_urls, replace_static_urls, add_histogram, wrap_xmodule
-from .model_data import LmsKeyValueStore, LmsUsage
+from .model_data import LmsKeyValueStore, LmsUsage, ModelDataCache
 
 from xmodule.modulestore.exceptions import ItemNotFoundError
 from statsd import statsd
@@ -60,7 +60,7 @@ def make_track_function(request):
     return f
 
 
-def toc_for_course(user, request, course, active_chapter, active_section):
+def toc_for_course(user, request, course, active_chapter, active_section, model_data_cache):
     '''
     Create a table of contents from the module store
 
@@ -80,11 +80,11 @@ def toc_for_course(user, request, course, active_chapter, active_section):
 
     NOTE: assumes that if we got this far, user has access to course.  Returns
     None if this is not the case.
+
+    model_data_cache must include data from the course module and 2 levels of its descendents
     '''
 
-    student_module_cache = StudentModuleCache.cache_for_descriptor_descendents(
-        course.id, user, course, depth=2)
-    course_module = get_module(user, request, course.location, student_module_cache, course.id)
+    course_module = get_module(user, request, course.location, model_data_cache, course.id)
     if course_module is None:
         return None
 
@@ -115,7 +115,7 @@ def toc_for_course(user, request, course, active_chapter, active_section):
     return chapters
 
 
-def get_module(user, request, location, student_module_cache, course_id,
+def get_module(user, request, location, model_data_cache, course_id,
                position=None, not_found_ok = False, wrap_xmodule_display=True,
                grade_bucket_type=None):
     """
@@ -128,7 +128,7 @@ def get_module(user, request, location, student_module_cache, course_id,
       - request               : current django HTTPrequest.  Note: request.user isn't used for anything--all auth
                                 and such works based on user.
       - location              : A Location-like object identifying the module to load
-      - student_module_cache  : a StudentModuleCache
+      - model_data_cache      : a ModelDataCache
       - course_id             : the course_id in the context of which to load module
       - position              : extra information from URL for user-specified
                                 position within module
@@ -138,7 +138,7 @@ def get_module(user, request, location, student_module_cache, course_id,
     if possible.  If not possible, return None.
     """
     try:
-        return _get_module(user, request, location, student_module_cache, course_id, position, wrap_xmodule_display)
+        return _get_module(user, request, location, model_data_cache, course_id, position, wrap_xmodule_display)
     except ItemNotFoundError:
         if not not_found_ok:
             log.exception("Error in get_module")
@@ -149,7 +149,7 @@ def get_module(user, request, location, student_module_cache, course_id,
         return None
 
 
-def _get_module(user, request, location, student_module_cache, course_id,
+def _get_module(user, request, location, model_data_cache, course_id,
                 position=None, wrap_xmodule_display=True, grade_bucket_type=None):
     """
     Actually implement get_module.  See docstring there for details.
@@ -204,11 +204,11 @@ def _get_module(user, request, location, student_module_cache, course_id,
         Delegate to get_module.  It does an access check, so may return None
         """
         return get_module(user, request, location,
-                                       student_module_cache, course_id, position)
+                                       model_data_cache, course_id, position)
 
     def xblock_model_data(descriptor):
         return DbModel(
-            LmsKeyValueStore(course_id, user, descriptor._model_data, student_module_cache),
+            LmsKeyValueStore(descriptor._model_data, model_data_cache),
             descriptor.module_class,
             user.id,
             LmsUsage(location, location)
@@ -218,18 +218,13 @@ def _get_module(user, request, location, student_module_cache, course_id,
         if event.get('event_name') != 'grade':
             return
 
-        student_module = student_module_cache.lookup(
-            course_id, descriptor.location.category, descriptor.location.url()
+        student_module, created = StudentModule.objects.get_or_create(
+            course_id=course_id,
+            student=user,
+            module_type=descriptor.location.category,
+            module_state_key=descriptor.location.url(),
+            defaults={'state': '{}'},
         )
-        if student_module is None:
-            student_module = StudentModule(
-                course_id=course_id,
-                student=user,
-                module_type=descriptor.location.category,
-                module_state_key=descriptor.location.url(),
-                state=json.dumps({})
-            )
-            student_module_cache.append(student_module)
         student_module.grade = event.get('value')
         student_module.max_grade = event.get('max_value')
         student_module.save()
@@ -335,9 +330,9 @@ def xqueue_callback(request, course_id, userid, id, dispatch):
     # Retrieve target StudentModule
     user = User.objects.get(id=userid)
 
-    student_module_cache = StudentModuleCache.cache_for_descriptor_descendents(course_id,
+    model_data_cache = ModelDataCache.cache_for_descriptor_descendents(course_id,
         user, modulestore().get_instance(course_id, id), depth=0, select_for_update=True)
-    instance = get_module(user, request, id, student_module_cache, course_id, grade_bucket_type='xqueue')
+    instance = get_module(user, request, id, model_data_cache, course_id, grade_bucket_type='xqueue')
     if instance is None:
         log.debug("No module {0} for user {1}--access denied?".format(id, user))
         raise Http404
@@ -394,10 +389,10 @@ def modx_dispatch(request, dispatch, location, course_id):
                     return HttpResponse(json.dumps({'success': file_too_big_msg}))
             p[fileinput_id] = inputfiles
 
-    student_module_cache = StudentModuleCache.cache_for_descriptor_descendents(course_id,
+    model_data_cache = ModelDataCache.cache_for_descriptor_descendents(course_id,
         request.user, modulestore().get_instance(course_id, location))
 
-    instance = get_module(request.user, request, location, student_module_cache, course_id, grade_bucket_type='ajax')
+    instance = get_module(request.user, request, location, model_data_cache, course_id, grade_bucket_type='ajax')
     if instance is None:
         # Either permissions just changed, or someone is trying to be clever
         # and load something they shouldn't have access to.

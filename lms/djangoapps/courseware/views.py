@@ -23,7 +23,7 @@ from courseware import grades
 from courseware.access import has_access
 from courseware.courses import (get_course_with_access, get_courses_by_university)
 import courseware.tabs as tabs
-from courseware.models import StudentModuleCache
+from courseware.model_data import ModelDataCache
 from module_render import toc_for_course, get_module
 from student.models import UserProfile
 
@@ -81,7 +81,7 @@ def courses(request):
     return render_to_response("courses.html", {'universities': universities})
 
 
-def render_accordion(request, course, chapter, section):
+def render_accordion(request, course, chapter, section, model_data_cache):
     ''' Draws navigation bar. Takes current position in accordion as
         parameter.
 
@@ -92,7 +92,7 @@ def render_accordion(request, course, chapter, section):
         Returns the html string'''
 
     # grab the table of contents
-    toc = toc_for_course(request.user, request, course, chapter, section)
+    toc = toc_for_course(request.user, request, course, chapter, section, model_data_cache)
 
     context = dict([('toc', toc),
                     ('course_id', course.id),
@@ -191,24 +191,21 @@ def index(request, course_id, chapter=None, section=None,
         return redirect(reverse('about_course', args=[course.id]))
 
     try:
-        student_module_cache = StudentModuleCache.cache_for_descriptor_descendents(
+        model_data_cache = ModelDataCache.cache_for_descriptor_descendents(
             course.id, request.user, course, depth=2)
 
-        # Has this student been in this course before?
-        first_time = student_module_cache.lookup(course_id, 'course', course.location.url()) is None
-
-        course_module = get_module(request.user, request, course.location, student_module_cache, course.id)
+        course_module = get_module(request.user, request, course.location, model_data_cache, course.id)
         if course_module is None:
             log.warning('If you see this, something went wrong: if we got this'
                         ' far, should have gotten a course module for this user')
             return redirect(reverse('about_course', args=[course.id]))
 
         if chapter is None:
-            return redirect_to_course_position(course_module, first_time)
+            return redirect_to_course_position(course_module, course_module.first_time_user)
 
         context = {
             'csrf': csrf(request)['csrf_token'],
-            'accordion': render_accordion(request, course, chapter, section),
+            'accordion': render_accordion(request, course, chapter, section, model_data_cache),
             'COURSE_TITLE': course.title,
             'course': course,
             'init': '',
@@ -224,7 +221,7 @@ def index(request, course_id, chapter=None, section=None,
             raise Http404
 
         chapter_module = get_module(request.user, request, chapter_descriptor.location,
-                                    student_module_cache, course_id)
+                                    model_data_cache, course_id)
         if chapter_module is None:
             # User may be trying to access a chapter that isn't live yet
             raise Http404
@@ -235,11 +232,11 @@ def index(request, course_id, chapter=None, section=None,
                 # Specifically asked-for section doesn't exist
                 raise Http404
 
-            section_student_module_cache = StudentModuleCache.cache_for_descriptor_descendents(
+            section_model_data_cache = ModelDataCache.cache_for_descriptor_descendents(
                 course_id, request.user, section_descriptor)
             section_module = get_module(request.user, request,
                                 section_descriptor.location,
-                                section_student_module_cache, course_id, position)
+                                section_model_data_cache, course_id, position)
             if section_module is None:
                 # User may be trying to be clever and access something
                 # they don't have access to.
@@ -491,12 +488,12 @@ def progress(request, course_id, student_id=None):
     # additional DB lookup (this kills the Progress page in particular).
     student = User.objects.prefetch_related("groups").get(id=student.id)
 
-    student_module_cache = StudentModuleCache.cache_for_descriptor_descendents(
+    model_data_cache = ModelDataCache.cache_for_descriptor_descendents(
         course_id, student, course)
 
     courseware_summary = grades.progress_summary(student, request, course,
-                                                 student_module_cache)
-    grade_summary = grades.grade(student, request, course, student_module_cache)
+                                                 model_data_cache)
+    grade_summary = grades.grade(student, request, course, model_data_cache)
 
     if courseware_summary is None:
         #This means the student didn't have access to the course (which the instructor requested)

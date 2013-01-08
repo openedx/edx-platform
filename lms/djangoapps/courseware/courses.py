@@ -19,10 +19,10 @@ from xmodule.contentstore.content import StaticContent
 from xmodule.modulestore.xml import XMLModuleStore
 from xmodule.modulestore.exceptions import ItemNotFoundError
 from xmodule.x_module import XModule
+from courseware.model_data import ModelDataCache
 from static_replace import replace_urls, try_staticfiles_lookup
 from courseware.access import has_access
 import branding
-from courseware.models import StudentModuleCache
 from xmodule.modulestore.exceptions import ItemNotFoundError
 
 log = logging.getLogger(__name__)
@@ -148,12 +148,23 @@ def get_course_about_section(course, section_key):
             request = get_request_for_thread()
 
             loc = course.location._replace(category='about', name=section_key)
-            course_module = get_module(request.user, request, loc, None, course.id, not_found_ok = True, wrap_xmodule_display = True)
+
+            # Use an empty cache
+            model_data_cache = ModelDataCache([], course.id, request.user)
+            about_module = get_module(
+                request.user,
+                request,
+                loc,
+                model_data_cache,
+                course.id,
+                not_found_ok=True,
+                wrap_xmodule_display=True
+            )
 
             html = ''
 
-            if course_module is not None:
-                html = course_module.get_html()
+            if about_module is not None:
+                html = about_module.get_html()
 
             return html
 
@@ -174,7 +185,7 @@ def get_course_about_section(course, section_key):
 
 
 
-def get_course_info_section(request, cache, course, section_key):
+def get_course_info_section(request, course, section_key):
     """
     This returns the snippet of html to be rendered on the course info page,
     given the key for the section.
@@ -188,11 +199,22 @@ def get_course_info_section(request, cache, course, section_key):
 
 
     loc = Location(course.location.tag, course.location.org, course.location.course, 'course_info', section_key)
-    course_module = get_module(request.user, request, loc, cache, course.id, wrap_xmodule_display = True)
+
+    # Use an empty cache
+    model_data_cache = ModelDataCache([], course.id, request.user)
+    info_module = get_module(
+        request.user,
+        request,
+        loc,
+        model_data_cache,
+        course.id,
+        wrap_xmodule_display=True
+    )
+
     html = ''
 
-    if course_module is not None:
-        html = course_module.get_html()
+    if info_module is not None:
+        html = info_module.get_html()
 
     return html
 

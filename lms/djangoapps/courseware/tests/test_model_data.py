@@ -5,18 +5,26 @@ from django.contrib.auth.models import User
 
 from functools import partial
 
-from courseware.model_data import LmsKeyValueStore, InvalidWriteError, InvalidScopeError
-from courseware.models import StudentModule, XModuleContentField, XModuleSettingsField, XModuleStudentInfoField, XModuleStudentPrefsField, StudentModuleCache
+from courseware.model_data import LmsKeyValueStore, InvalidWriteError, InvalidScopeError, ModelDataCache
+from courseware.models import StudentModule, XModuleContentField, XModuleSettingsField, XModuleStudentInfoField, XModuleStudentPrefsField
 from xblock.core import Scope, BlockScope
 from xmodule.modulestore import Location
 
 from django.test import TestCase
 
 
-def mock_descriptor():
+def mock_field(scope, name):
+    field = Mock()
+    field.scope = scope
+    field.name = name
+    return field
+
+def mock_descriptor(fields=[], lms_fields=[]):
     descriptor = Mock()
     descriptor.stores_state = True
     descriptor.location = location('def_id')
+    descriptor.module_class.fields = fields
+    descriptor.module_class.lms.fields = lms_fields
     return descriptor
 
 location = partial(Location, 'i4x', 'edX', 'test_course', 'problem')
@@ -85,7 +93,7 @@ class TestDescriptorFallback(TestCase):
             'field_a': 'content',
             'field_b': 'settings',
         }
-        self.kvs = LmsKeyValueStore(course_id, UserFactory.build(), self.desc_md, None)
+        self.kvs = LmsKeyValueStore(self.desc_md, None)
 
     def test_get_from_descriptor(self):
         self.assertEquals('content', self.kvs.get(content_key('field_a')))
@@ -103,13 +111,11 @@ class TestDescriptorFallback(TestCase):
         self.assertEquals('settings', self.desc_md['field_b'])
 
 
-class TestStudentStateFields(TestCase):
-    pass
-
 class TestInvalidScopes(TestCase):
     def setUp(self):
         self.desc_md = {}
-        self.kvs = LmsKeyValueStore(course_id, UserFactory.build(), self.desc_md, None)
+        self.mdc = ModelDataCache([mock_descriptor([mock_field(Scope.student_state, 'a_field')])], course_id, self.user)
+        self.kvs = LmsKeyValueStore(self.desc_md, self.mdc)
 
     def test_invalid_scopes(self):
         for scope in (Scope(student=True, block=BlockScope.DEFINITION),
@@ -123,12 +129,10 @@ class TestInvalidScopes(TestCase):
 class TestStudentModuleStorage(TestCase):
 
     def setUp(self):
-        student_module = StudentModuleFactory.create(state=json.dumps({'a_field': 'a_value'}))
-        self.user = student_module.student
         self.desc_md = {}
-        self.smc = StudentModuleCache(course_id, self.user, [mock_descriptor()])
-        self.kvs = LmsKeyValueStore(course_id, self.user, self.desc_md, self.smc)
-
+        self.mdc = Mock()
+        self.mdc.find.return_value.state = json.dumps({'a_field': 'a_value'})
+        self.kvs = LmsKeyValueStore(self.desc_md, self.mdc)
 
     def test_get_existing_field(self):
         "Test that getting an existing field in an existing StudentModule works"
@@ -154,7 +158,7 @@ class TestStudentModuleStorage(TestCase):
         "Test that deleting an existing field removes it from the StudentModule"
         self.kvs.delete(student_state_key('a_field'))
         self.assertEquals(1, StudentModule.objects.all().count())
-        self.assertEquals({}, json.loads(StudentModule.objects.all()[0].state))
+        self.assertEquals({}, self.mdc.find.return_value.state)
 
     def test_delete_missing_field(self):
         "Test that deleting a missing field from an existing StudentModule raises a KeyError"
@@ -167,8 +171,8 @@ class TestMissingStudentModule(TestCase):
     def setUp(self):
         self.user = UserFactory.create()
         self.desc_md = {}
-        self.smc = StudentModuleCache(course_id, self.user, [mock_descriptor()])
-        self.kvs = LmsKeyValueStore(course_id, self.user, self.desc_md, self.smc)
+        self.mdc = ModelDataCache([mock_descriptor()], course_id, self.user)
+        self.kvs = LmsKeyValueStore(self.desc_md, self.mdc)
 
     def test_get_field_from_missing_student_module(self):
         "Test that getting a field from a missing StudentModule raises a KeyError"
@@ -176,12 +180,12 @@ class TestMissingStudentModule(TestCase):
 
     def test_set_field_in_missing_student_module(self):
         "Test that setting a field in a missing StudentModule creates the student module"
-        self.assertEquals(0, len(self.smc.cache))
+        self.assertEquals(0, len(self.mdc.cache))
         self.assertEquals(0, StudentModule.objects.all().count())
 
         self.kvs.set(student_state_key('a_field'), 'a_value')
 
-        self.assertEquals(1, len(self.smc.cache))
+        self.assertEquals(1, len(self.mdc.cache))
         self.assertEquals(1, StudentModule.objects.all().count())
 
         student_module = StudentModule.objects.all()[0]
@@ -201,8 +205,8 @@ class TestSettingsStorage(TestCase):
         settings = SettingsFactory.create()
         self.user = UserFactory.create()
         self.desc_md = {}
-        self.smc = StudentModuleCache(course_id, self.user, [])
-        self.kvs = LmsKeyValueStore(course_id, self.user, self.desc_md, self.smc)
+        self.mdc = ModelDataCache([mock_descriptor()], course_id, self.user)
+        self.kvs = LmsKeyValueStore(self.desc_md, self.mdc)
 
     def test_get_existing_field(self):
         "Test that getting an existing field in an existing SettingsField works"
@@ -242,8 +246,8 @@ class TestContentStorage(TestCase):
         content = ContentFactory.create()
         self.user = UserFactory.create()
         self.desc_md = {}
-        self.smc = StudentModuleCache(course_id, self.user, [])
-        self.kvs = LmsKeyValueStore(course_id, self.user, self.desc_md, self.smc)
+        self.mdc = ModelDataCache([mock_descriptor()], course_id, self.user)
+        self.kvs = LmsKeyValueStore(self.desc_md, self.mdc)
 
     def test_get_existing_field(self):
         "Test that getting an existing field in an existing ContentField works"
@@ -283,8 +287,11 @@ class TestStudentPrefsStorage(TestCase):
         student_pref = StudentPrefsFactory.create()
         self.user = student_pref.student
         self.desc_md = {}
-        self.smc = StudentModuleCache(course_id, self.user, [])
-        self.kvs = LmsKeyValueStore(course_id, self.user, self.desc_md, self.smc)
+        self.mdc = ModelDataCache([mock_descriptor([
+            mock_field(Scope.student_preferences, 'student_pref_field'),
+            mock_field(Scope.student_preferences, 'not_student_pref_field'),
+        ])], course_id, self.user)
+        self.kvs = LmsKeyValueStore(self.desc_md, self.mdc)
 
     def test_get_existing_field(self):
         "Test that getting an existing field in an existing StudentPrefsField works"
@@ -309,7 +316,6 @@ class TestStudentPrefsStorage(TestCase):
 
     def test_delete_existing_field(self):
         "Test that deleting an existing field removes it"
-        print list(XModuleStudentPrefsField.objects.all())
         self.kvs.delete(student_prefs_key('student_pref_field'))
         self.assertEquals(0, XModuleStudentPrefsField.objects.all().count())
 
@@ -325,8 +331,11 @@ class TestStudentInfoStorage(TestCase):
         student_info = StudentInfoFactory.create()
         self.user = student_info.student
         self.desc_md = {}
-        self.smc = StudentModuleCache(course_id, self.user, [])
-        self.kvs = LmsKeyValueStore(course_id, self.user, self.desc_md, self.smc)
+        self.mdc = ModelDataCache([mock_descriptor([
+            mock_field(Scope.student_info, 'student_info_field'),
+            mock_field(Scope.student_info, 'not_student_info_field'),
+        ])], course_id, self.user)
+        self.kvs = LmsKeyValueStore(self.desc_md, self.mdc)
 
     def test_get_existing_field(self):
         "Test that getting an existing field in an existing StudentInfoField works"

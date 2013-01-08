@@ -23,7 +23,7 @@ import xmodule.modulestore.django
 # Need access to internal func to put users in the right group
 from courseware import grades
 from courseware.access import _course_staff_group_name
-from courseware.models import StudentModuleCache
+from courseware.model_data import ModelDataCache
 
 from student.models import Registration
 from xmodule.modulestore.django import modulestore
@@ -705,27 +705,27 @@ class TestCourseGrader(PageLoader):
         self.factory = RequestFactory()
     
     def get_grade_summary(self):
-        student_module_cache = StudentModuleCache.cache_for_descriptor_descendents(
+        model_data_cache = ModelDataCache.cache_for_descriptor_descendents(
             self.graded_course.id, self.student_user, self.graded_course)
         
         fake_request = self.factory.get(reverse('progress',
                                        kwargs={'course_id': self.graded_course.id}))
         
         return grades.grade(self.student_user, fake_request, 
-                            self.graded_course, student_module_cache)
+                            self.graded_course, model_data_cache)
     
     def get_homework_scores(self):
         return self.get_grade_summary()['totaled_scores']['Homework']
     
     def get_progress_summary(self):
-        student_module_cache = StudentModuleCache.cache_for_descriptor_descendents(
+        model_data_cache = ModelDataCache.cache_for_descriptor_descendents(
             self.graded_course.id, self.student_user, self.graded_course)
         
         fake_request = self.factory.get(reverse('progress',
                                        kwargs={'course_id': self.graded_course.id}))
 
         progress_summary = grades.progress_summary(self.student_user, fake_request, 
-                                                   self.graded_course, student_module_cache)
+                                                   self.graded_course, model_data_cache)
         return progress_summary
         
     def check_grade_percent(self, percent):
