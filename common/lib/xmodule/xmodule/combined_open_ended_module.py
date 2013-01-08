@@ -147,10 +147,11 @@ class CombinedOpenEndedModule(XModule):
 
         self.current_task_descriptor=children['descriptors'][current_task_type](self.system)
         etree_xml=etree.fromstring(self.current_task_xml)
-        min_score_to_attempt=int(etree_xml.attrib.get('min_score_to_attempt',0))
-        max_score_to_attempt=int(etree_xml.attrib.get('min_score_to_attempt',self._max_score))
+
         if self.current_task_number>0:
-            last_response_data=self.get_last_response(self.current_task_number-1)
+            allow_reset=self.check_allow_reset()
+            if allow_reset:
+                return False
 
         self.current_task_parsed_xml=self.current_task_descriptor.definition_from_xml(etree_xml,self.system)
         if current_task_state is None and self.current_task_number==0:
@@ -172,6 +173,17 @@ class CombinedOpenEndedModule(XModule):
 
         return True
 
+    def check_allow_reset(self):
+        allow_reset=False
+        if self.current_task_number>0:
+            last_response_data=self.get_last_response(self.current_task_number-1)
+            current_response_data=self.get_last_response(self.current_task_number)
+
+        if current_response_data['min_score_to_attempt']>last_response_data['score'] or current_response_data['max_score_to_attempt']<last_response_data['score']:
+            allow_reset=True
+
+        return allow_rest
+
     def get_context(self):
         task_html=self.get_html_base()
         #set context variables and render template
@@ -179,7 +191,7 @@ class CombinedOpenEndedModule(XModule):
         context = {
             'items': [{'content' : task_html}],
             'ajax_url': self.system.ajax_url,
-            'allow_reset': True,
+            'allow_reset': self.check_allow_reset(),
             'state' : self.state,
             'task_count' : len(self.task_xml),
             'task_number' : self.current_task_number+1,
@@ -210,10 +222,17 @@ class CombinedOpenEndedModule(XModule):
         task_xml=self.task_xml[task_number]
         task_type=self.get_tag_name(task_xml)
 
+
+
         children=self.child_modules()
 
         task_descriptor=children['descriptors'][task_type](self.system)
-        task_parsed_xml=task_descriptor.definition_from_xml(etree.fromstring(task_xml),self.system)
+        etree_xml=etree.fromstring(task_xml)
+
+        min_score_to_attempt=int(etree_xml.attrib.get('min_score_to_attempt',0))
+        max_score_to_attempt=int(etree_xml.attrib.get('min_score_to_attempt',self._max_score))
+
+        task_parsed_xml=task_descriptor.definition_from_xml(etree_xml,self.system)
         task=children['modules'][task_type](self.system, self.location, task_parsed_xml, task_descriptor, self.static_data, instance_state=task_state)
         last_response=task.latest_answer()
         last_score = task.latest_score()
@@ -234,7 +253,9 @@ class CombinedOpenEndedModule(XModule):
             'max_score' : max_score,
             'state' : state,
             'human_state' : task.HUMAN_NAMES[state],
-            'correct' : last_correctness
+            'correct' : last_correctness,
+            'min_score_to_attempt' : min_score_to_attempt,
+            'max_score_to_attempt' : max_score_to_attempt,
         }
 
         return last_response_dict

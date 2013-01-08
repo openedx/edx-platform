@@ -200,7 +200,7 @@ class OpenEndedChild():
 
     def _allow_reset(self):
         """Can the module be reset?"""
-        return self.state == self.DONE and self.attempts < self.max_attempts
+        return (self.state == self.DONE and self.attempts < self.max_attempts)
 
     def max_score(self):
         """

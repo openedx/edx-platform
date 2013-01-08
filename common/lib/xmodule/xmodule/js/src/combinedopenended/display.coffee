@@ -76,9 +76,15 @@ class @CombinedOpenEnded
     @reset_button.hide()
     @next_problem_button.hide()
     @hint_area.attr('disabled', false)
+
     if @child_type=="openended"
       @skip_button.hide()
-    if @child_state == 'initial'
+    if @allow_reset
+      @reset_button.show()
+      @submit_button.hide()
+      @answer_area.attr("disabled", true)
+      @hint_area.attr('disabled', true)
+    else if @child_state == 'initial'
       @answer_area.attr("disabled", false)
       @submit_button.prop('value', 'Submit')
       @submit_button.click @save_answer
@@ -145,7 +151,6 @@ class @CombinedOpenEnded
             @find_hint_elements()
           else if @child_state == 'done'
             @message_wrapper.html(response.message_html)
-            @allow_reset = response.allow_reset
 
           @rebind()
         else
@@ -162,7 +167,6 @@ class @CombinedOpenEnded
         if response.success
           @message_wrapper.html(response.message_html)
           @child_state = 'done'
-          @allow_reset = response.allow_reset
           @rebind()
         else
           @errors_area.html(response.error)
@@ -175,7 +179,6 @@ class @CombinedOpenEnded
       $.postWithPrefix "#{@ajax_url}/skip_post_assessment", {}, (response) =>
         if response.success
           @child_state = 'done'
-          @allow_reset = response.allow_reset
           @rebind()
         else
           @errors_area.html(response.error)
