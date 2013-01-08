@@ -71,7 +71,7 @@ def update_course_updates(location, update, passed_id=None):
     # Confirm that root is <ol>, iterate over <li>, pull out <h2> subs and then rest of val
     if course_html_parsed.tag == 'ol':
         # ??? Should this use the id in the json or in the url or does it matter?
-        if passed_id:
+        if passed_id is not None:
             idx = get_idx(passed_id)
             # idx is count from end of list
             course_html_parsed[-idx] = new_html_parsed
