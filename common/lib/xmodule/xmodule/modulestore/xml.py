@@ -279,7 +279,9 @@ class XMLModuleStore(ModuleStoreBase):
 
         # If we are specifically asked for missing courses, that should
         # be an error.  If we are asked for "all" courses, find the ones
-        # that have a course.xml
+        # that have a course.xml. We sort the dirs in alpha order so we always
+        # read things in the same order (OS differences in load order have
+        # bitten us in the past.)
         if course_dirs is None:
             course_dirs = sorted([d for d in os.listdir(self.data_dir) if
                                   os.path.exists(self.data_dir / d / "course.xml")])
@@ -542,8 +544,8 @@ class XMLModuleStore(ModuleStoreBase):
         raise NotImplementedError("XMLModuleStores are read-only")
 
     def get_parent_locations(self, location, course_id):
-        '''Find all locations that are the parents of this location.  Needed
-        for path_to_location().
+        '''Find all locations that are the parents of this location in this 
+        course.  Needed for path_to_location().
 
         If there is no data at location in this modulestore, raise
             ItemNotFoundError.
