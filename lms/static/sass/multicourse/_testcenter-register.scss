@@ -397,7 +397,7 @@ $red: rgb(178, 6, 16);
 					}
 
 					// specific states
-					&.status-accepted {
+					&.status-processed {
 
 						&:before {
 							background: green;
@@ -405,7 +405,7 @@ $red: rgb(178, 6, 16);
 
 						.title:after {
 							color: green;
-							content: "accepted";
+							content: "processed";
 						}
 					}
 
@@ -520,7 +520,7 @@ $red: rgb(178, 6, 16);
 				
 			}
 
-			.registration-accepted {
+			.registration-processed {
 
 				.message-copy {
 					margin: 0 0 ($baseline/2) 0;

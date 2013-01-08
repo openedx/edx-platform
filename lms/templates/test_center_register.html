@@ -110,9 +110,9 @@
     <a href="mailto:exam-help@edx.org?subject=Pearson VUE Exam - ${get_course_about_section(course, 'university')} ${course.number}" class="button contact-button">Contact exam-help@edx.org</a>
   </section>
 
-  <!-- NOTE: reg accepted -->
-  <section class="status message message-flash registration-accepted message-action">
-    <h3 class="message-title">Your registration for the Pearson exam has been accepted</h3>
+  <!-- NOTE: reg processed -->
+  <section class="status message message-flash registration-processed message-action">
+    <h3 class="message-title">Your registration for the Pearson exam has been processed</h3>
     <p class="message-copy">Your registration number is <strong>12345678901</strong> (Write this down! You’ll need it to schedule your exam.)</p>
     <a href="https://www1.pearsonvue.com/testtaker/signin/SignInPage/EDX" class="button exam-button">Schedule Pearson exam</a>
   </section>
@@ -120,7 +120,7 @@
   <!-- NOTE: reg pending -->
   <section class="status message message-flash registration-pending">
     <h3 class="message-title">Your registration for the Pearson exam is pending</h3>
-    <p class="message-copy">Once your information is accepted, it will be forwarded to Pearson and you will be able to schedule an exam.</p>
+    <p class="message-copy">Once your information is processed, it will be forwarded to Pearson and you will be able to schedule an exam.</p>
   </section>
   % endif
   
@@ -312,14 +312,14 @@
   <aside>
    % if registration:
 
-    <!-- NOTE: Dem accepted, Accom pending, Registration pending --> 
+    <!-- NOTE: Dem processed, Accom pending, Registration pending --> 
     <div class="message message-status registration-pending is-shown">
       <h3>Pearson Exam Registration Status</h3>
 
       <ol class="status-list">
-        <li class="item status status-accepted status-demographics">
+        <li class="item status status-processed status-demographics">
           <h4 class="title">Demographic Information</h4>
-          <p class="details">The demographic information you most recently provided has been accepted. You may edit this information at any point before exam registration closes on <strong>${exam_info.registration_end_date_text}</strong></p>
+          <p class="details">The demographic information you most recently provided has been processed. You may edit this information at any point before exam registration closes on <strong>${exam_info.registration_end_date_text}</strong></p>
         </li>
         <li class="item status status-pending status-accommodations">
           <h4 class="title">Accommodations Request</h4>
@@ -327,23 +327,23 @@
         </li>
         <li class="item status status-pending status-registration">
           <h4 class="title">Registration Request</h4>
-          <p class="details">Your exam registration is pending. Once your information is accepted, it will be forwarded to Pearson and you will be able to schedule an exam.</p>
+          <p class="details">Your exam registration is pending. Once your information is processed, it will be forwarded to Pearson and you will be able to schedule an exam.</p>
         </li>
       </ol>
     </div>
 
-    <!-- NOTE: Dem accepted, Accom accepted, Registration accepted --> 
-    <div class="message message-status registration-accepted is-shown">
+    <!-- NOTE: Dem processed, Accom processed, Registration processed --> 
+    <div class="message message-status registration-processed is-shown">
       <h3>Pearson Exam Registration Status</h3>
 
       <ol class="status-list">
-        <li class="item status status-accepted status-demographics">
+        <li class="item status status-processed status-demographics">
           <h4 class="title">Demographic Information</h4>
-          <p class="details">The demographic information you most recently provided has been accepted. You may edit this information at any point before exam registration closes on <strong>${exam_info.registration_end_date_text}</strong></p>
+          <p class="details">The demographic information you most recently provided has been processed. You may edit this information at any point before exam registration closes on <strong>${exam_info.registration_end_date_text}</strong></p>
         </li>
-        <li class="item status status-accepted status-accommodations">
+        <li class="item status status-processed status-accommodations">
           <h4 class="title">Accommodations Request</h4>
-          <p class="details">Your requested accommodations have been accepted and include:</p>
+          <p class="details">Your requested accommodations have been reviewed and processed. You are allowed:</p>
 
           <ul class="accommodations-list">
             <li class="item">Extra Time - Double Time</li>
@@ -351,9 +351,9 @@
             <li class="item">Equipment</li>
           </ul>  
         </li>
-        <li class="item status status-accepted status-registration">
+        <li class="item status status-processed status-registration">
           <h4 class="title">Registration Request</h4>
-          <p class="details">Your exam registration has been accepted and has been forwarded to Pearson. You are now able to schedule an exam.</p>
+          <p class="details">Your exam registration has been processed and has been forwarded to Pearson. You are now able to schedule an exam.</p>
         </li>
       </ol>
     </div>
