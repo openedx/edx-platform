@@ -70,9 +70,17 @@ class @MarkdownEditingDescriptor extends XModule.Descriptor
 
   save: ->
     $body.off('click', '.editor-tabs .tab', @changeEditor)
-    $body.off('click', '.editor-bar a', @onToolbarButton);
-    $body.off('click', '.cheatsheet-toggle', @toggleCheatsheet);
-    data: @xml_editor.getValue()
+    $body.off('click', '.editor-bar a', @onToolbarButton)
+    $body.off('click', '.cheatsheet-toggle', @toggleCheatsheet)
+    # TODO when logic is in place to remove the markdown if xml is edited, ensure this doesn't overwrite that
+    if @current_editor == @markdown_editor
+        {
+            data: MarkdownEditingDescriptor.markdownToXml(@markdown_editor.getValue())
+            metadata:
+            	markdown: @markdown_editor.getValue()
+        }
+    else
+        data: @xml_editor.getValue()
 
   @insertMultipleChoice: (selectedText) ->
     return MarkdownEditingDescriptor.insertGenericChoice(selectedText, '(', ')', MarkdownEditingDescriptor.multipleChoiceTemplate)
