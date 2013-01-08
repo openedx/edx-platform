@@ -98,6 +98,8 @@ class CombinedOpenEndedModule(XModule):
         self.static_data = {
             'max_score' : self._max_score,
             'max_attempts' : self.max_attempts,
+            'prompt' : definition['prompt'],
+            'rubric' : definition['rubric']
         }
 
         self.task_xml=definition['task_xml']
@@ -371,16 +373,20 @@ class CombinedOpenEndedDescriptor(XmlDescriptor, EditingDescriptor):
         'hintprompt': 'some-html'
         }
         """
-        expected_children = ['task']
+        expected_children = ['task', 'rubric', 'prompt']
         for child in expected_children:
             if len(xml_object.xpath(child)) == 0 :
                 raise ValueError("Combined Open Ended definition must include at least one '{0}' tag".format(child))
 
-        def parse(k):
+        def parse_task(k):
             """Assumes that xml_object has child k"""
             return [stringify_children(xml_object.xpath(k)[i]) for i in xrange(0,len(xml_object.xpath(k)))]
 
-        return {'task_xml': parse('task')}
+        def parse(k):
+            """Assumes that xml_object has child k"""
+            return xml_object.xpath(k)[0]
+
+        return {'task_xml': parse_task('task'), 'prompt' : parse('prompt'), 'rubric' : parse('rubric')}
 
 
     def definition_to_xml(self, resource_fs):

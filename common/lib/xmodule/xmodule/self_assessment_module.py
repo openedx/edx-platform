@@ -33,8 +33,6 @@ log = logging.getLogger("mitx.courseware")
 class SelfAssessmentModule(openendedchild.OpenEndedChild):
 
     def setup_response(self, system, location, definition, descriptor):
-        self.rubric = definition['rubric']
-        self.prompt = definition['prompt']
         self.submit_message = definition['submitmessage']
         self.hint_prompt = definition['hintprompt']
 

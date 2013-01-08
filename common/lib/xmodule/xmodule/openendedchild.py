@@ -127,6 +127,9 @@ class OpenEndedChild():
         self.attempts = instance_state.get('attempts', 0)
         self.max_attempts = static_data['max_attempts']
 
+        self.prompt = static_data['prompt']
+        self.rubric = static_data['rubric']
+
         # Used for progress / grading.  Currently get credit just for
         # completion (doesn't matter if you self-assessed correct/incorrect).
         self._max_score = static_data['max_score']

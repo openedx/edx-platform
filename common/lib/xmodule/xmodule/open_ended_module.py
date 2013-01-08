@@ -40,8 +40,6 @@ class OpenEndedModule(openendedchild.OpenEndedChild):
 
     def setup_response(self, system, location, definition, descriptor):
         oeparam = definition['oeparam']
-        prompt = definition['prompt']
-        rubric = definition['rubric']
 
         self.url = definition.get('url', None)
         self.queue_name = definition.get('queuename', self.DEFAULT_QUEUE)
@@ -53,12 +51,12 @@ class OpenEndedModule(openendedchild.OpenEndedChild):
 
         if oeparam is None:
             raise ValueError("No oeparam found in problem xml.")
-        if prompt is None:
+        if self.prompt is None:
             raise ValueError("No prompt found in problem xml.")
-        if rubric is None:
+        if self.rubric is None:
             raise ValueError("No rubric found in problem xml.")
 
-        self._parse(oeparam, prompt, rubric, system)
+        self._parse(oeparam, self.prompt, self.rubric, system)
 
         if self.created=="True" and self.state == self.ASSESSING:
             self.created="False"
@@ -530,7 +528,7 @@ class OpenEndedDescriptor(XmlDescriptor, EditingDescriptor):
         }
         """
 
-        for child in ['openendedrubric', 'prompt', 'openendedparam']:
+        for child in ['openendedparam']:
             if len(xml_object.xpath(child)) != 1:
                 raise ValueError("Open Ended definition must include exactly one '{0}' tag".format(child))
 
@@ -538,10 +536,7 @@ class OpenEndedDescriptor(XmlDescriptor, EditingDescriptor):
             """Assumes that xml_object has child k"""
             return xml_object.xpath(k)[0]
 
-        return {'rubric': parse('openendedrubric'),
-                'prompt': parse('prompt'),
-                'oeparam': parse('openendedparam'),
-                }
+        return {'oeparam': parse('openendedparam'),}
 
 
     def definition_to_xml(self, resource_fs):
@@ -553,7 +548,7 @@ class OpenEndedDescriptor(XmlDescriptor, EditingDescriptor):
             child_node = etree.fromstring(child_str)
             elt.append(child_node)
 
-        for child in ['openendedrubric', 'prompt', 'openendedparam']:
+        for child in ['openendedparam']:
             add_child(child)
 
         return elt
