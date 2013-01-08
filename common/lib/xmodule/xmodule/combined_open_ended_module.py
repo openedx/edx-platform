@@ -248,6 +248,14 @@ class CombinedOpenEndedModule(XModule):
             pass
         return return_html
 
+    def get_results(self, get):
+        task_number=get['task_number']
+        self.update_task_states()
+        response_dict=self.get_last_response(task_number)
+        context = {'results' : response_dict['post_assessment']}
+        html = render_to_string('combined_open_ended_results.html', context)
+        return html
+
     def handle_ajax(self, dispatch, get):
         """
         This is called by courseware.module_render, to handle an AJAX call.
@@ -262,6 +270,7 @@ class CombinedOpenEndedModule(XModule):
         handlers = {
             'next_problem': self.next_problem,
             'reset': self.reset,
+            'get_results' : self.get_results
             }
 
         if dispatch not in handlers:

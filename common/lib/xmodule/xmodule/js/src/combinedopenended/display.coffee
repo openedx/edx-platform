@@ -18,10 +18,16 @@ class @CombinedOpenEnded
     @reset_button.click @reset
     @next_problem_button = @$('.next-step-button')
     @next_problem_button.click @next_problem
+
+    @show_results_button=@$('.show-results-button')
+    @show_results_button.click @show_results
+
     # valid states: 'initial', 'assessing', 'post_assessment', 'done'
     Collapsible.setCollapsibles(@el)
     @submit_evaluation_button = $('.submit-evaluation-button')
     @submit_evaluation_button.click @message_post
+
+    @results_container = $('.result-container')
 
     # Where to put the rubric once we load it
     @el = $(element).find('section.open-ended-child')
@@ -48,6 +54,17 @@ class @CombinedOpenEnded
   # locally scoped jquery.
   $: (selector) ->
     $(selector, @el)
+
+  show_results: (event) =>
+    status_item = $(event.target).parent().parent()
+    status_number = status_item.data('status-number')
+    data = {'task_number' : status_number}
+    $.postWithPrefix "#{@ajax_url}/get_results", data, (response) =>
+      if response.success
+        @results_container.after(response.html).remove()
+        @Collapsible.setCollapsibles(@results_container)
+      else
+        @errors_area.html(response.error)
 
   rebind: () =>
     # rebind to the appropriate function for the current state

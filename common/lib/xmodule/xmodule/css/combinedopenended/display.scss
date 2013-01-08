@@ -32,6 +32,13 @@ section.combined-open-ended {
       width: 53%;
   }
 
+  .result-container
+  {
+      float:left;
+      width: 93%;
+      position:relative;
+  }
+
   &:after
   {
       content:".";
