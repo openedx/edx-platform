@@ -325,6 +325,7 @@ class PeerGradingProblem
     @interstitial_page.show()
   render_error: (error_message) =>
       @error_container.show()
+      @calibration_feedback_panel.hide()
       @error_container.html(error_message)
       @content_panel.hide()
 
@@ -350,7 +351,7 @@ class PeerGradingProblem
 
 
 
-mock_backend = true
+mock_backend = false
 ajax_url = $('.peer-grading').data('ajax_url')
 backend = new PeerGradingProblemBackend(ajax_url, mock_backend)
 $(document).ready(() -> new PeerGradingProblem(backend))
