@@ -44,6 +44,136 @@ section.combined-open-ended {
 }
 
 section.open-ended-child, section.combined-open-ended-status {
+
+   .evaluation {
+        p {
+            margin-bottom: 1px;
+        }
+    }
+
+    .feedback-on-feedback {
+        height: 100px;
+        width: 150px;
+        margin-right: 0px;
+    }
+
+    .evaluation-response {
+        header {
+            text-align: right;
+            a {
+                font-size: .7em;
+            }
+        }
+    }
+    .evaluation-scoring {
+        .scoring-list {
+            list-style-type: none;
+            margin-left: 3px;
+
+            li {
+                &:first-child {
+                    margin-left: 0px;
+                }
+                display:block;
+                margin-left: 0px;
+
+                label {
+                    font-size: .9em;
+                }
+            }
+        }
+    }
+    .submit-message-container {
+        margin: 10px 0px ;
+    }
+
+     .external-grader-message {
+        section {
+          padding-left: 20px;
+          background-color: #FAFAFA;
+          color: #2C2C2C;
+          font-family: monospace;
+          font-size: 1em;
+          padding-top: 10px;
+          header {
+              font-size: 1.4em;
+          }
+
+          .shortform {
+            font-weight: bold;
+          }
+
+          .longform {
+            padding: 0px;
+            margin: 0px;
+
+            .result-errors {
+              margin: 5px;
+              padding: 10px 10px 10px 40px;
+              background: url('../images/incorrect-icon.png') center left no-repeat;
+              li {
+                color: #B00;
+                }
+            }
+
+            .result-output {
+              margin: 5px;
+              padding: 20px 0px 15px 50px;
+              border-top: 1px solid #DDD;
+              border-left: 20px solid #FAFAFA;
+
+              h4 {
+                font-family: monospace;
+                font-size: 1em;
+              }
+
+              dl {
+                margin: 0px;
+              }
+
+              dt {
+                margin-top: 20px;
+              }
+
+              dd {
+                margin-left: 24pt;
+              }
+            }
+
+            .result-correct {
+              background: url('../images/correct-icon.png') left 20px no-repeat;
+              .result-actual-output {
+                color: #090;
+              }
+            }
+
+            .result-incorrect {
+              background: url('../images/incorrect-icon.png') left 20px no-repeat;
+              .result-actual-output {
+                color: #B00;
+              }
+            }
+
+            .markup-text{
+              margin: 5px;
+              padding: 20px 0px 15px 50px;
+              border-top: 1px solid #DDD;
+              border-left: 20px solid #FAFAFA;
+
+              bs {
+                color: #BB0000;
+              }
+
+              bg {
+                color: #BDA046;
+              }
+            }
+          }
+        }
+      }
+}
+
+section.open-ended-child {
   @media print {
     display: block;
     width: auto;
@@ -265,50 +395,6 @@ section.open-ended-child, section.combined-open-ended-status {
       }
 
     }
-    .evaluation {
-        p {
-            margin-bottom: 4px;
-        }
-    }
-
-
-    .feedback-on-feedback {
-        height: 100px;
-        margin-right: 20px;
-    }
-
-    .evaluation-response {
-        header {
-            text-align: right;
-            a {
-                font-size: .85em;
-            }
-        }
-    }
-
-    .evaluation-scoring {
-        .scoring-list {
-            list-style-type: none;
-            margin-left: 3px;
-
-            li {
-                &:first-child {
-                    margin-left: 0px;
-                }
-                display:inline;
-                margin-left: 50px;
-
-                label {
-                    font-size: .9em;
-                }
-
-            }
-        }
-
-    }
-    .submit-message-container {
-        margin: 10px 0px ;
-    }
 
   form.option-input {
     margin: -10px 0 20px;
@@ -444,88 +530,4 @@ section.open-ended-child, section.combined-open-ended-status {
     font-size: 0.9em;
   }
 
-  .external-grader-message {
-    section {
-      padding-left: 20px;
-      background-color: #FAFAFA;
-      color: #2C2C2C;
-      font-family: monospace;
-      font-size: 1em;
-      padding-top: 10px;
-      header {
-          font-size: 1.4em;
-      }
-
-      .shortform {
-        font-weight: bold;
-      }
-
-      .longform {
-        padding: 0px;
-        margin: 0px;
-
-        .result-errors {
-          margin: 5px;
-          padding: 10px 10px 10px 40px;
-          background: url('../images/incorrect-icon.png') center left no-repeat;
-          li {
-            color: #B00;
-            }
-        }
-
-        .result-output {
-          margin: 5px;
-          padding: 20px 0px 15px 50px;
-          border-top: 1px solid #DDD;
-          border-left: 20px solid #FAFAFA;
-
-          h4 {
-            font-family: monospace;
-            font-size: 1em;
-          }
-
-          dl {
-            margin: 0px;
-          }
-
-          dt {
-            margin-top: 20px;
-          }
-
-          dd {
-            margin-left: 24pt;
-          }
-        }
-
-        .result-correct {
-          background: url('../images/correct-icon.png') left 20px no-repeat;
-          .result-actual-output {
-            color: #090;
-          }
-        }
-
-        .result-incorrect {
-          background: url('../images/incorrect-icon.png') left 20px no-repeat;
-          .result-actual-output {
-            color: #B00;
-          }
-        }
-
-        .markup-text{
-          margin: 5px;
-          padding: 20px 0px 15px 50px;
-          border-top: 1px solid #DDD;
-          border-left: 20px solid #FAFAFA;
-
-          bs {
-            color: #BB0000;
-          }
-
-          bg {
-            color: #BDA046;
-          }
-        }
-      }
-    }
-  }
 }
