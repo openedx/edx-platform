@@ -79,7 +79,7 @@ class @CombinedOpenEnded
 
     if @child_type=="openended"
       @skip_button.hide()
-    if @allow_reset
+    if @allow_reset=="True"
       @reset_button.show()
       @submit_button.hide()
       @answer_area.attr("disabled", true)

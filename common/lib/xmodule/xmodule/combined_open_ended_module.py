@@ -88,6 +88,7 @@ class CombinedOpenEndedModule(XModule):
         self.state = instance_state.get('state', 'initial')
 
         self.attempts = instance_state.get('attempts', 0)
+        self.allow_reset = instance_state.get('ready_to_reset', False)
         self.max_attempts = int(self.metadata.get('attempts', MAX_ATTEMPTS))
 
         # Used for progress / grading.  Currently get credit just for
@@ -149,8 +150,8 @@ class CombinedOpenEndedModule(XModule):
         etree_xml=etree.fromstring(self.current_task_xml)
 
         if self.current_task_number>0:
-            allow_reset=self.check_allow_reset()
-            if allow_reset:
+            self.allow_reset=self.check_allow_reset()
+            if self.allow_reset:
                 return False
 
         self.current_task_parsed_xml=self.current_task_descriptor.definition_from_xml(etree_xml,self.system)
@@ -174,15 +175,15 @@ class CombinedOpenEndedModule(XModule):
         return True
 
     def check_allow_reset(self):
-        allow_reset=False
         if self.current_task_number>0:
             last_response_data=self.get_last_response(self.current_task_number-1)
-            current_response_data=self.get_last_response(self.current_task_number)
+            current_response_data=self.get_current_attributes(self.current_task_number)
 
-        if current_response_data['min_score_to_attempt']>last_response_data['score'] or current_response_data['max_score_to_attempt']<last_response_data['score']:
-            allow_reset=True
+            if current_response_data['min_score_to_attempt']>last_response_data['score'] or current_response_data['max_score_to_attempt']<last_response_data['score']:
+                self.state=self.DONE
+                self.allow_reset=True
 
-        return allow_rest
+        return self.allow_reset
 
     def get_context(self):
         task_html=self.get_html_base()
@@ -191,7 +192,7 @@ class CombinedOpenEndedModule(XModule):
         context = {
             'items': [{'content' : task_html}],
             'ajax_url': self.system.ajax_url,
-            'allow_reset': self.check_allow_reset(),
+            'allow_reset': self.allow_reset,
             'state' : self.state,
             'task_count' : len(self.task_xml),
             'task_number' : self.current_task_number+1,
@@ -216,13 +217,18 @@ class CombinedOpenEndedModule(XModule):
         return_html = rewrite_links(html, self.rewrite_content_links)
         return return_html
 
+    def get_current_attributes(self, task_number):
+        task_xml=self.task_xml[task_number]
+        etree_xml=etree.fromstring(task_xml)
+        min_score_to_attempt=int(etree_xml.attrib.get('min_score_to_attempt',0))
+        max_score_to_attempt=int(etree_xml.attrib.get('max_score_to_attempt',self._max_score))
+        return {'min_score_to_attempt' : min_score_to_attempt, 'max_score_to_attempt' : max_score_to_attempt}
+
     def get_last_response(self, task_number):
         last_response=""
         task_state = self.task_states[task_number]
         task_xml=self.task_xml[task_number]
         task_type=self.get_tag_name(task_xml)
-
-
 
         children=self.child_modules()
 
@@ -230,7 +236,7 @@ class CombinedOpenEndedModule(XModule):
         etree_xml=etree.fromstring(task_xml)
 
         min_score_to_attempt=int(etree_xml.attrib.get('min_score_to_attempt',0))
-        max_score_to_attempt=int(etree_xml.attrib.get('min_score_to_attempt',self._max_score))
+        max_score_to_attempt=int(etree_xml.attrib.get('max_score_to_attempt',self._max_score))
 
         task_parsed_xml=task_descriptor.definition_from_xml(etree_xml,self.system)
         task=children['modules'][task_type](self.system, self.location, task_parsed_xml, task_descriptor, self.static_data, instance_state=task_state)
@@ -262,9 +268,12 @@ class CombinedOpenEndedModule(XModule):
 
     def update_task_states(self):
         changed=False
-        self.task_states[self.current_task_number] = self.current_task.get_instance_state()
-        current_task_state=json.loads(self.task_states[self.current_task_number])
-        if current_task_state['state']==self.DONE:
+        local_task_number=self.current_task_number
+        if self.allow_reset:
+            local_task_number=local_task_number-1
+        self.task_states[local_task_number] = self.current_task.get_instance_state()
+        current_task_state=json.loads(self.task_states[local_task_number])
+        if current_task_state['state']==self.DONE and not self.allow_reset:
             self.current_task_number+=1
             if self.current_task_number>=(len(self.task_xml)):
                 self.state=self.DONE
@@ -334,6 +343,7 @@ class CombinedOpenEndedModule(XModule):
                 'error': 'Too many attempts.'
             }
         self.state=self.INITIAL
+        self.allow_reset=False
         for i in xrange(0,len(self.task_xml)):
             self.current_task_number=i
             self.setup_next_task(reset=True)
@@ -354,6 +364,7 @@ class CombinedOpenEndedModule(XModule):
             'state': self.state,
             'task_states': self.task_states,
             'attempts': self.attempts,
+            'ready_to_reset' : self.allow_reset,
             }
 
         return json.dumps(state)
