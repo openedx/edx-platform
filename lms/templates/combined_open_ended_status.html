@@ -8,6 +8,15 @@
         %endif
 
             Step ${status['task_number']} (${status['human_state']}) : ${status['score']} / ${status['max_score']}
+            % if state == 'initial':
+                <span class="unanswered" style="display:inline;" id="status_${id}">Unanswered</span>
+            % elif state in ['done', 'post_assessment'] and correct == 'correct':
+                <span class="correct" id="status_${id}">Correct</span>
+            % elif state in ['done', 'post_assessment'] and correct == 'incorrect':
+                <span class="incorrect" id="status_${id}">Incorrect</span>
+            % elif state == 'assessing':
+                <span class="grading" id="status_${id}">Submitted for grading</span>
+            % endif
             %if status['type']=="openended" and status['state'] in ['done', 'post_assessment']:
                 <div class="show-results">
                     <a href="#" class="show-results-button">Show results from step ${status['task_number']}</a>
