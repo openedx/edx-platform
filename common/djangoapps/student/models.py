@@ -131,6 +131,9 @@ class UserProfile(models.Model):
     def set_meta(self, js):
         self.meta = json.dumps(js)
 
+TEST_CENTER_STATUS_ACCEPTED = "Accepted"
+TEST_CENTER_STATUS_ERROR = "Error"
+
 class TestCenterUser(models.Model):
     """This is our representation of the User for in-person testing, and
     specifically for Pearson at this point. A few things to note:
@@ -158,10 +161,6 @@ class TestCenterUser(models.Model):
     # and is something Pearson needs to know to manage updates. Unlike
     # updated_at, this will not get incremented when we do a batch data import.
     user_updated_at = models.DateTimeField(db_index=True)
-
-    # Unique ID given to us for this User by the Testing Center. It's null when
-    # we first create the User entry, and is assigned by Pearson later.
-    candidate_id = models.IntegerField(null=True, db_index=True)
 
     # Unique ID we assign our user for the Test Center.
     client_candidate_id = models.CharField(unique=True, max_length=50, db_index=True)
@@ -197,10 +196,21 @@ class TestCenterUser(models.Model):
     # Company
     company_name = models.CharField(max_length=50, blank=True, db_index=True)
 
-    # Confirmation
-    upload_status = models.CharField(max_length=20, blank=True, db_index=True)  # 'Error' or 'Accepted'
+    # time at which edX sent the registration to the test center
     uploaded_at = models.DateTimeField(null=True, blank=True, db_index=True)
+
+    # confirmation back from the test center, as well as timestamps
+    # on when they processed the request, and when we received 
+    # confirmation back.
+    processed_at = models.DateTimeField(null=True, db_index=True)
+    upload_status = models.CharField(max_length=20, blank=True, db_index=True)  # 'Error' or 'Accepted'
     upload_error_message = models.CharField(max_length=512, blank=True)
+    # Unique ID given to us for this User by the Testing Center. It's null when
+    # we first create the User entry, and may be assigned by Pearson later.
+    # (However, it may never be set if we are always initiating such candidate creation.)
+    candidate_id = models.IntegerField(null=True, db_index=True)
+    confirmed_at = models.DateTimeField(null=True, db_index=True)
+
     
     @staticmethod
     def user_provided_fields():
@@ -237,14 +247,17 @@ class TestCenterUser(models.Model):
         testcenter_user.client_candidate_id = cand_id  
         return testcenter_user
 
+    @property
     def is_accepted(self):
-        return self.upload_status == 'Accepted'
+        return self.upload_status == TEST_CENTER_STATUS_ACCEPTED
   
+    @property
     def is_rejected(self):
-        return self.upload_status == 'Error'
+        return self.upload_status == TEST_CENTER_STATUS_ERROR
     
+    @property
     def is_pending(self):
-        return self.upload_status == ''
+        return not self.is_accepted and not self.is_rejected
 
 class TestCenterUserForm(ModelForm):
     class Meta:
@@ -313,19 +326,21 @@ class TestCenterUserForm(ModelForm):
         # Always return the full collection of cleaned data.
         return cleaned_data
         
-        
+# our own code to indicate that a request has been rejected. 
+ACCOMMODATION_REJECTED_CODE = 'NONE'        
    
 ACCOMODATION_CODES = (
+                      (ACCOMMODATION_REJECTED_CODE, 'No Accommodation Granted'), 
                       ('EQPMNT', 'Equipment'),
                       ('ET12ET', 'Extra Time - 1/2 Exam Time'),
                       ('ET30MN', 'Extra Time - 30 Minutes'),
                       ('ETDBTM', 'Extra Time - Double Time'),
                       ('SEPRMM', 'Separate Room'),
-                      ('SRREAD', 'Separate Room & Reader'),
-                      ('SRRERC', 'Separate Room & Reader/Recorder'),
-                      ('SRRECR', 'Separate Room & Recorder'),
-                      ('SRSEAN', 'Separate Room & Service Animal'),
-                      ('SRSGNR', 'Separate Room & Sign Lang Interp'), 
+                      ('SRREAD', 'Separate Room and Reader'),
+                      ('SRRERC', 'Separate Room and Reader/Recorder'),
+                      ('SRRECR', 'Separate Room and Recorder'),
+                      ('SRSEAN', 'Separate Room and Service Animal'),
+                      ('SRSGNR', 'Separate Room and Sign Language Interpreter'), 
                       )
     
 class TestCenterRegistration(models.Model):
@@ -355,7 +370,7 @@ class TestCenterRegistration(models.Model):
     # The appointment dates, the exam count, and the accommodation codes can be updated, 
     # but hopefully this won't happen often.
     user_updated_at = models.DateTimeField(db_index=True)
-    # "client_authorization_id" is the client's unique identifier for the authorization.  
+    # "client_authorization_id" is our unique identifier for the authorization.  
     # This must be present for an update or delete to be sent to Pearson.
     client_authorization_id = models.CharField(max_length=20, unique=True, db_index=True)
 
@@ -365,17 +380,28 @@ class TestCenterRegistration(models.Model):
     eligibility_appointment_date_last = models.DateField(db_index=True)
 
     # this is really a list of codes, using an '*' as a delimiter.
-    # So it's not a choice list.
+    # So it's not a choice list.  We use the special value of ACCOMMODATION_REJECTED_CODE 
+    # to indicate the rejection of an accommodation request.
     accommodation_code = models.CharField(max_length=64, blank=True)
     
     # store the original text of the accommodation request.
-    accommodation_request = models.CharField(max_length=1024, blank=True)
+    accommodation_request = models.CharField(max_length=1024, blank=True, db_index=True)
 
-    # Confirmation
-    upload_status = models.CharField(max_length=20, blank=True)  # 'Error' or 'Accepted'
+    # time at which edX sent the registration to the test center
     uploaded_at = models.DateTimeField(null=True, db_index=True)
-    upload_error_message = models.CharField(max_length=512, blank=True)
 
+    # confirmation back from the test center, as well as timestamps
+    # on when they processed the request, and when we received 
+    # confirmation back.
+    processed_at = models.DateTimeField(null=True, db_index=True)
+    upload_status = models.CharField(max_length=20, blank=True, db_index=True)  # 'Error' or 'Accepted'
+    upload_error_message = models.CharField(max_length=512, blank=True)
+    # Unique ID given to us for this registration by the Testing Center. It's null when
+    # we first create the registration entry, and may be assigned by Pearson later.
+    # (However, it may never be set if we are always initiating such candidate creation.)
+    authorization_id = models.IntegerField(null=True, db_index=True)
+    confirmed_at = models.DateTimeField(null=True, db_index=True)
+    
     @property
     def candidate_id(self):
         return self.testcenter_user.candidate_id
@@ -389,11 +415,11 @@ class TestCenterRegistration(models.Model):
         registration = TestCenterRegistration(testcenter_user = testcenter_user)
         registration.course_id = exam.course_id
         registration.accommodation_request = accommodation_request
-        registration.exam_series_code = exam.exam_series_code # .get('Exam_Series_Code')
+        registration.exam_series_code = exam.exam_series_code
         registration.eligibility_appointment_date_first = strftime("%Y-%m-%d", exam.first_eligible_appointment_date)
         registration.eligibility_appointment_date_last = strftime("%Y-%m-%d", exam.last_eligible_appointment_date)
-        # accommodation_code remains blank for now, along with Pearson confirmation
-        registration.client_authorization_id = registration._create_client_authorization_id()
+        registration.client_authorization_id = TestCenterRegistration._create_client_authorization_id()
+        # accommodation_code remains blank for now, along with Pearson confirmation information
         return registration
 
     @staticmethod
@@ -402,7 +428,8 @@ class TestCenterRegistration(models.Model):
         return u"edX%0d" % randint(1, 10**NUM_DIGITS-1) # binascii.hexlify(os.urandom(8))
     
     
-    def _create_client_authorization_id(self):
+    @staticmethod
+    def _create_client_authorization_id():
         """
         Return a unique id for a registration, suitable for using as an authorization code
         for Pearson.  It must fit within 20 characters.
@@ -413,17 +440,68 @@ class TestCenterRegistration(models.Model):
             auth_id = TestCenterRegistration._generate_authorization_id()
         return auth_id
             
-    def is_accepted(self):
-        return self.upload_status == 'Accepted' and self.testcenter_user.is_accepted()
+    # methods for providing registration status details on registration page:        
+    @property
+    def demographics_is_accepted(self):
+        return self.testcenter_user.is_accepted
+
+    @property
+    def demographics_is_rejected(self):
+        return self.testcenter_user.is_rejected
+                
+    @property
+    def demographics_is_pending(self):
+        return self.testcenter_user.is_pending
+
+    @property
+    def accommodation_is_accepted(self):
+        return len(self.accommodation_request) > 0 and len(self.accommodation_code) > 0 and self.accommodation_code != ACCOMMODATION_REJECTED_CODE
+
+    @property
+    def accommodation_is_rejected(self):
+        return len(self.accommodation_request) > 0 and self.accommodation_code == ACCOMMODATION_REJECTED_CODE
+            
+    @property
+    def accommodation_is_pending(self):
+        return len(self.accommodation_request) > 0 and len(self.accommodation_code) == 0
+
+    @property
+    def accommodation_is_skipped(self):
+        return len(self.accommodation_request) == 0
+
+    @property
+    def registration_is_accepted(self):
+        return self.upload_status == TEST_CENTER_STATUS_ACCEPTED
   
-    def is_rejected(self):
-        return self.upload_status == 'Error' or self.testcenter_user.is_rejected()
+    @property
+    def registration_is_rejected(self):
+        return self.upload_status == TEST_CENTER_STATUS_ERROR
     
+    @property
+    def registration_is_pending(self):
+        return not self.registration_is_accepted and not self.registration_is_rejected
+
+    # methods for providing registration status summary on dashboard page:        
+    @property
+    def is_accepted(self):
+        return self.registration_is_accepted and self.demographics_is_accepted
+  
+    @property
+    def is_rejected(self):
+        return self.registration_is_rejected or self.demographics_is_rejected
+
+    @property
+    def is_pending(self):
+        return not self.is_accepted and not self.is_rejected
+    
+    @property
     def is_pending_accommodation(self):
-        return len(self.accommodation_request) > 0 and self.accommodation_code == ''
+        return self.accommodation_is_pending
         
+    @property
     def is_pending_acknowledgement(self):
-        return (self.upload_status == '' or self.testcenter_user.is_pending()) and not self.is_pending_accommodation()
+        return (not self.is_accepted and not self.is_rejected) and not self.is_pending_accommodation
+
 
 class TestCenterRegistrationForm(ModelForm):
     class Meta:
