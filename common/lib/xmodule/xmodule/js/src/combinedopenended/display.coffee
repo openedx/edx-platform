@@ -62,8 +62,10 @@ class @CombinedOpenEnded
     $.postWithPrefix "#{@ajax_url}/get_results", data, (response) =>
       if response.success
         @results_container.after(response.html).remove()
-        @results_container = $('.result-container')
-        @Collapsible.setCollapsibles(@results_container)
+        @results_container = $('div.result-container')
+        @submit_evaluation_button = $('.submit-evaluation-button')
+        @submit_evaluation_button.click @message_post
+        Collapsible.setCollapsibles(@results_container)
       else
         @errors_area.html(response.error)
 
