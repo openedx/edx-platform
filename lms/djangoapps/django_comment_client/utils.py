@@ -2,7 +2,6 @@ import time
 from collections import defaultdict
 from importlib import import_module
 
-from courseware.models import StudentModuleCache
 from courseware.module_render import get_module
 from xmodule.modulestore import Location
 from xmodule.modulestore.django import modulestore
