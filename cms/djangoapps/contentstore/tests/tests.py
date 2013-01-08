@@ -22,6 +22,8 @@ from xmodule.modulestore.django import modulestore
 from xmodule.contentstore.django import contentstore
 from xmodule.course_module import CourseDescriptor
 from xmodule.modulestore.xml_exporter import export_to_xml
+from cms.djangoapps.contentstore.utils import get_modulestore
+from xmodule.capa_module import CapaDescriptor
 
 def parse_json(response):
     """Parse response, which is assumed to be json"""
@@ -438,13 +440,23 @@ class ContentStoreTest(TestCase):
         self.assertContains(resp, '/c4x/edX/full/asset/handouts_schematic_tutorial.pdf') 
 
 
+    def test_capa_module(self):
+        """Test that a problem w/ markdown has markdown and uses the right html etc"""
+        CourseFactory.create(org='MITx', course='999', display_name='Robot Super Course')
 
+        problem_data = {
+            'parent_location' : 'i4x://MITx/999/course/Robot_Super_Course',
+            'template' : 'i4x://edx/templates/problem/Empty'
+            }
 
+        resp = self.client.post(reverse('clone_item'), problem_data)
 
-
-        
-
-
-
-
-
+        self.assertEqual(resp.status_code, 200)
+        payload = parse_json(resp)
+        problem_loc = payload['id']
+        problem = get_modulestore(problem_loc).get_item(problem_loc)
+        # should be a CapaDescriptor
+        self.assertIsInstance(problem, CapaDescriptor, "New problem is not a CapaDescriptor")
+        context = problem.get_context()
+        self.assertIn('markdown', context, "markdown is missing")
+        self.assertNotIn('markdown', problem.editable_metadata_fields, "Markdown slipped into the editable metadata fields")

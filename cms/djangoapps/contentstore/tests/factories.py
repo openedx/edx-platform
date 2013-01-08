@@ -73,6 +73,10 @@ class XModuleItemFactory(Factory):
 
     @classmethod
     def _create(cls, target_class, *args, **kwargs):
+        """
+        kwargs must include parent_location, template. Can contain display_name
+        target_class is ignored
+        """
 
         DETACHED_CATEGORIES = ['about', 'static_tab', 'course_info']
         
