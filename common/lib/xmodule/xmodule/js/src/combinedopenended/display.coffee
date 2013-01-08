@@ -218,7 +218,10 @@ class @CombinedOpenEnded
           @reinitialize(@element)
           @rebind()
           @next_problem_button.hide()
-          @gentle_alert "Moved to next step."
+          if response.allow_reset=="False"
+            @gentle_alert "Moved to next step."
+          else
+            @gentle_alert "Your score did not meet the criteria to move to the next step."
         else
           @errors_area.html(response.error)
     else
