@@ -1,4 +1,5 @@
 <section id="editamoleculeinput_${id}" class="editamoleculeinput">
+    <div class="script_placeholder" data-src="/static/js/capa/jsmolcalc/jsmolcalc.nocache.js"/>
     <div class="script_placeholder" data-src="${applet_loader}"/>
 
     % if status == 'unsubmitted':
@@ -11,26 +12,29 @@
     <div class="incorrect" id="status_${id}">
     % endif
 
-  <input type="text" name="input_${id}" id="input_${id}" value="${value|h}"/>
+    <!-- <object type="application/x-java-applet" id="applet_${id}" class="applet" height="400" width="500"> -->
+    <!--   <param name="archive" value="/static/applets/capa/edit-a-molecule.jar" /> -->
+    <!--   <param name="code" value="JME.class" /> -->
+    <!--   <param name="file" value="${file}" /> -->
+    <!--   Applet failed to run.  No Java plug-in was found. -->
+    <!-- </object> -->
 
-      <p class="status">
-        % if status == 'unsubmitted':
-        unanswered
-        % elif status == 'correct':
-        correct
-        % elif status == 'incorrect':
-        incorrect
-        % elif status == 'incomplete':
-        incomplete
-        % endif
-      </p>
+    <input type="hidden" name="input_${id}" id="input_${id}" value="${value|h}"/>
 
-      <div id="input_${id}_preview" class="equation">
-      </div>
-      
-  <p id="answer_${id}" class="answer"></p>
+    <p class="status">
+      % if status == 'unsubmitted':
+      unanswered
+      % elif status == 'correct':
+      correct
+      % elif status == 'incorrect':
+      incorrect
+      % elif status == 'incomplete':
+      incomplete
+      % endif
+    </p>
 
-% if status in ['unsubmitted', 'correct', 'incorrect', 'incomplete']:
-</div>
+    <p id="answer_${id}" class="answer"></p>
+  % if status in ['unsubmitted', 'correct', 'incorrect', 'incomplete']:
+  </div>
 % endif
 </section>

@@ -1,28 +1,36 @@
-$(document).ready(function(){
-    var applet = $("#JME")[0];
-    var template = _.template($("#task-template").text());
+(function () {
     var timeout = 1000;
 
-    function waitForApplet() {
+    function initializeApplet(applet) {
+        console.log("Initializing " + applet);
+        waitForApplet(applet);
+    }
+
+    function waitForApplet(applet) {
         if (applet.isActive && applet.isActive()) {
             console.log("Applet is ready.");
-            loadInitialData();
+            requestAppletData(applet);
         } else if (timeout > 30 * 1000) {
             console.error("Applet did not load on time.");
         } else {
             console.log("Waiting for applet...");
-            setTimeout(waitForApplet, timeout);
+            setTimeout(function() { waitForApplet(applet); }, timeout);
         }
     }
 
-    function loadInitialData() {
+    function requestAppletData(applet) {
+        var file = $(applet).find('param[name=file]').attr('value');
+
+        console.log("Getting file url...");
+        console.log(file);
+
         console.log("Loading mol data...");
         jQuery.ajax({
-            url: "dopamine.mol",
+            url: file,
             dataType: "text",
             success: function(data) {
                 console.log("Done.");
-                setup(data);
+                loadAppletData(applet, data);
             },
             error: function() {
                 console.error("Cannot load mol data.");
@@ -30,44 +38,18 @@ $(document).ready(function(){
         });
     }
 
-    function setup(data) {
+    function loadAppletData(applet, data) {
         applet.readMolFile(data);
-
-        setupTasks();
-
-        $("#update").click(updateInfo);
-        updateInfo();
+        updateAppletInfo(applet);
     }
 
-    function setupTasks() {
-        console.log("Getting initial tasks...");
-
-        var tasks = getTasks();
-
-        jQuery.each(tasks, function(index, task) {
-            var value = task.toString();
-            var fragment = $(template({task:value}));
-            $("#tasks").append(fragment);
-            fragment.find("button").click(function() {
-                checkTask(task, index);
-            });
-        });
-        console.log("Done.");
-    }
-
-    function updateInfo() {
-        var info = getInfo();
-        $("#properties").html(info.toString());
+    function updateAppletInfo(applet) {
+        var info = getAppletInfo(applet);
+        console.log(info.toString());
         return info;
     }
 
-    function checkTask(task, index) {
-        var info = updateInfo();
-        var value = task.check(info);
-        $("#tasks li span.result").eq(index).html(value);
-    }
-
-    function getInfo() {
+    function getAppletInfo(applet) {
         var mol = applet.molFile();
         var smiles = applet.smiles();
         var jme = applet.jmeFile();
@@ -75,13 +57,22 @@ $(document).ready(function(){
         return jsmol.API.getInfo(mol, smiles, jme);
     }
 
-    function getTasks() {
-        var mol = applet.molFile();
-        var smiles = applet.smiles();
-        var jme = applet.jmeFile();
+    console.log('EDIT A MOLECULE');
 
-        return jsmol.API.getTasks(mol, smiles, jme);
-    }
+    // FIXME: [rocha] This should be called automatically by the GWT
+    // script loader, but for some reason it is not.
+    jsmolcalc.onInjectionDone('jsmolcalc');
 
-    waitForApplet();
-});
+    // FIXME: [rocha] This is a hack to capture the click on the check
+    // button and update the hidden field with the applet values
+    var check = $('.editamoleculeinput').parents('.problem').find('input.check');
+    check.on('click', function() {console.log("CLICK");});
+
+    // TODO: [rocha] add function to update hidden field
+    // TODO: [rocha] load state from hidden field if available
+
+    // initialize applet
+    var applets = $('.editamoleculeinput object');
+    applets.each(function(i, el) { initializeApplet(el); });
+
+}).call(this);

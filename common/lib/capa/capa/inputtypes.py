@@ -850,11 +850,16 @@ class EditAMoleculeInput(InputTypeBase):
         """
         Can set size of text field.
         """
-        return [Attribute('file'),]
+        return [Attribute('file'),
+                Attribute('missing', None)]
 
     def _extra_context(self):
         """
         """
-        return {'applet_loader': '/static/js/capa/edit_a_molecule.js',}
+        context = {
+            'applet_loader': '/static/js/capa/edit-a-molecule.js',
+        }
+
+        return context
 
 registry.register(EditAMoleculeInput)
