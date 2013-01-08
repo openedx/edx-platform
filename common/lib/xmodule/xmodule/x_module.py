@@ -3,7 +3,6 @@ import yaml
 import os
 
 from lxml import etree
-from pprint import pprint
 from collections import namedtuple
 from pkg_resources import resource_listdir, resource_string, resource_isdir
 
@@ -502,12 +501,6 @@ class XModuleDescriptor(HTMLSnippet, ResourceTemplates, XBlock):
         eq = (self.__class__ == other.__class__ and
                 all(getattr(self, attr, None) == getattr(other, attr, None)
                     for attr in self.equality_attributes))
-
-        if not eq:
-            for attr in self.equality_attributes:
-                pprint((getattr(self, attr, None),
-                       getattr(other, attr, None),
-                       getattr(self, attr, None) == getattr(other, attr, None)))
 
         return eq
 
