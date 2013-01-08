@@ -410,7 +410,7 @@
       margin: 20px 0 10px;
       padding: 15px 20px;
       font-family: $sans-serif;
-      background: #fffcf0;
+      background: tint($yellow,70%);
       border: 1px solid #ccc;
 
       .message-copy {
@@ -498,17 +498,27 @@
         }
       }
 
+      .contact-button {
+        @include button(simple, $blue);
+      }
+
       .exam-button {
         @include button(simple, $pink);
+      }
+
+      .button {
         float: right;
         padding: 9px 18px 10px;
         font-size: 13px;
-        font-weight: 400;
+        font-weight: bold;
+        letter-spacing: 0;
 
         &:hover {
           text-decoration: none;
         }
       }
+
+
 
       &.is-shown {
         display: block;

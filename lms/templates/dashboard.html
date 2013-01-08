@@ -228,8 +228,8 @@
 
                 % if registration is None and testcenter_exam_info.is_registering():	    
                 <div class="message message-status is-shown exam-register">
-                      <a href="${testcenter_register_target}" class="exam-button" id="exam_register_button">Register for Pearson exam</a>
-                      <p class="message-copy">Registration for the Pearson exam is now open and will close on <strong>${testcenter_exam_info.registration_end_date_text}</strong></p>
+                  <a href="${testcenter_register_target}" class="button exam-button" id="exam_register_button">Register for Pearson exam</a>
+                  <p class="message-copy">Registration for the Pearson exam is now open and will close on <strong>${testcenter_exam_info.registration_end_date_text}</strong></p>
                 </div>
                 % endif
                 <!-- display a registration for a current exam, even if the registration period is over -->
@@ -245,10 +245,12 @@
                     % if  registration.is_rejected():	    
                 	<!-- TODO: revise rejection text -->
                 <div class="message message-status is-shown exam-schedule">
+                  <a href="mailto:exam-help@edx.org?subject=Pearson VUE Exam - ${get_course_about_section(course, 'university')} ${course.number}" class="button contact-button">Contact exam-help@edx.org</a>
                   <p class="message-copy">Your 
                     <a href="${testcenter_register_target}" id="exam_register_link">registration for the Pearson exam</a>
      has been rejected. Please check the information you provided, and try to correct any demographic errors.  Otherwise
      contact someone at edX or Pearson, or just scream for help.</p>
+                   
                 </div>
                     % endif
                    	% if not registration.is_accepted() and not registration.is_rejected():	    

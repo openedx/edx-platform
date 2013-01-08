@@ -90,7 +90,7 @@
   <section class="introduction">
     <header>
       <hgroup>
-        <h2>${get_course_about_section(course, 'university')} ${course.number} ${course.title}</h2>      
+        <h2><a href="${reverse('dashboard')}">${get_course_about_section(course, 'university')} ${course.number} ${course.title}</a></h2>      
         
         % if registration:
         <h1>Your Pearson VUE Proctored Exam Registration</h1>
@@ -101,9 +101,28 @@
     </header>
   </section>
   
-  <section class="status">
-    
+  % if registration:
+
+  <!-- NOTE: reg rejected -->
+  <section class="status message message-flash registration-rejected message-action">
+    <h3 class="message-title">Your registration for the Pearson exam has been rejected</h3>
+    <p class="message-copy">Please check the information you provided, and try to correct any demographic errors.  Otherwise contact someone at edX or Pearson, or just scream for help.</p>
+    <a href="mailto:exam-help@edx.org?subject=Pearson VUE Exam - ${get_course_about_section(course, 'university')} ${course.number}" class="button contact-button">Contact exam-help@edx.org</a>
   </section>
+
+  <!-- NOTE: reg accepted -->
+  <section class="status message message-flash registration-accepted message-action">
+    <h3 class="message-title">Your registration for the Pearson exam has been accepted</h3>
+    <p class="message-copy">Your registration number is <strong>12345678901</strong> (Write this down! You’ll need it to schedule your exam.)</p>
+    <a href="https://www1.pearsonvue.com/testtaker/signin/SignInPage/EDX" class="button exam-button">Schedule Pearson exam</a>
+  </section>
+
+  <!-- NOTE: reg pending -->
+  <section class="status message message-flash registration-pending">
+    <h3 class="message-title">Your registration for the Pearson exam is pending</h3>
+    <p class="message-copy">Once your information is accepted, it will be forwarded to Pearson and you will be able to schedule an exam.</p>
+  </section>
+  % endif
   
   <section class="content">
     <header>
@@ -113,11 +132,11 @@
       
       % if registration:
       <p class="instructions">
-        Please complete the following form to update your demographic information used in your Pearson VUE Proctored Exam. Required fields are noted by <strong>bold text and an asterisk (*)</strong>. 
+        Please complete the following form to update your demographic information used in your Pearson VUE Proctored Exam. Required fields are noted by <strong class="indicator">bold text and an asterisk (*)</strong>. 
       </p>
       % else: 
       <p class="instructions">
-        Please provide the following demographic information to register for a Pearson VUE Proctored Exam. Required fields are noted by <strong>bold text and an asterisk (*)</strong>.
+        Please provide the following demographic information to register for a Pearson VUE Proctored Exam. Required fields are noted by <strong class="indicator">bold text and an asterisk (*)</strong>.
       </p>
       % endif
 
@@ -132,23 +151,23 @@
           <legend class="is-hidden">Personal Information</legend>
           
           <ol class="list-input">
-            <li data-field="salutation" class="field" id="field-salutation">
+            <li class="field" id="field-salutation">
               <label for="salutation">Salutation</label>
               <input class="short" id="salutation" type="text" name="salutation" value="${testcenteruser.salutation}" placeholder="e.g. Mr., Ms., Mrs., Dr." />              
             </li>
-            <li data-field="first_name" class="field required" id="field-first_name">
+            <li class="field required" id="field-first_name">
               <label for="first_name">First Name </label>
               <input id="first_name" type="text" name="first_name" value="${testcenteruser.first_name}" placeholder="e.g. Albert" />
             </li>
-            <li data-field="middle_name" class="field" id="field-middle_name">
+            <li class="field" id="field-middle_name">
               <label for="middle_name">Middle Name</label>
               <input id="middle_name" type="text" name="middle_name" value="${testcenteruser.middle_name}" placeholder="" />
             </li>
-            <li data-field="last_name" class="field required" id="field-last_name">
+            <li class="field required" id="field-last_name">
               <label for="last_name">Last Name</label>
               <input id="last_name" type="text" name="last_name" value="${testcenteruser.last_name}" placeholder="e.g. Einstein" />
             </li>
-            <li data-field="suffix" class="field" id="field-suffix">
+            <li class="field" id="field-suffix">
               <label for="suffix">Suffix</label>
               <input class="short" id="suffix" type="text" name="suffix" value="${testcenteruser.suffix}" placeholder="e.g. Jr., Sr. " />
             </li>
@@ -159,34 +178,34 @@
           <legend class="is-hidden">Mailing Address</legend>
           
           <ol class="list-input">
-            <li data-field="address_1" class="field required" id="field-address_1">
+            <li class="field required" id="field-address_1">
               <label class="long" for="address_1">Address Line #1</label>
               <input id="address_1" type="text" name="address_1" value="${testcenteruser.address_1}" placeholder="e.g. 112 Mercer Street" />              
             </li>
             <li class="field-group addresses">
-              <div data-field="address_2" class="field" id="field-address_2">
+              <div class="field" id="field-address_2">
                 <label for="address_2">Address Line #2</label>
                 <input id="address_2" class="long" type="text" name="address_2" value="${testcenteruser.address_2}" placeholder="e.g. Apartment 123" />
               </div>
-              <div data-field="address_3" class="field" id="field-address_3">
+              <div class="field" id="field-address_3">
                 <label for="address_3">Address Line #3</label>
                 <input id="address_3" class="long" type="text" name="address_3" value="${testcenteruser.address_3}" placeholder="e.g. Attention: Albert Einstein" />
               </div>
-            </li>            
-            <li class="field-group postal">
-              <div data-field="city" class="field required" id="field-city">
-                <label for="city">City</label>
-                <input id="city" class="short" type="text" name="city" value="${testcenteruser.city}" placeholder="e.g. Newark" />
-              </div>
-              <div data-field="state" class="field" id="field-state">
+            </li>
+            <li class="field required postal-1" id="field-city">
+              <label for="city">City</label>
+              <input id="city" class="long" type="text" name="city" value="${testcenteruser.city}" placeholder="e.g. Newark" />
+            </li>         
+            <li class="field-group postal-2">
+              <div class="field" id="field-state">
                 <label for="state">State/Province</label>
                 <input id="state" class="short" type="text" name="state" value="${testcenteruser.state}" placeholder="e.g. NJ" />
               </div>
-              <div data-field="postal_code" class="field" id="field-postal_code">
+              <div class="field" id="field-postal_code">
                 <label for="postal_code">Postal Code</label>
                 <input id="postal_code" class="short" type="text" name="postal_code" value="${testcenteruser.postal_code}" placeholder="e.g. 08540" />
               </div>
-              <div data-field="country" class="field required" id="field-country">
+              <div class="field required" id="field-country">
                 <label class="short" for="country">Country Code</label>
                 <input id="country" class="short" type="text" name="country" value="${testcenteruser.country}" placeholder="e.g. USA" />
               </div>
@@ -199,30 +218,30 @@
           
           <ol class="list-input">
             <li class="field-group phoneinfo">
-              <div data-field="phone" class="field required" id="field-phone">
+              <div class="field required" id="field-phone">
                 <label for="phone">Phone Number</label>
                 <input id="phone" type="text" name="phone" value="${testcenteruser.phone}" placeholder="e.g. 1-55-555-5555" />              
               </div>
-              <div data-field="extension" class="field" id="field-extension">
+              <div class="field" id="field-extension">
                 <label for="extension">Extension</label>
                 <input id="extension" class="short" type="text" name="extension" value="${testcenteruser.extension}" placeholder="e.g. 555" />
               </div>
-              <div data-field="phone_country_code" class="field required" id="field-phone_country_code">
+              <div class="field required" id="field-phone_country_code">
                 <label for="phone_country_code">Phone Country Code</label>
                 <input id="phone_country_code" class="short" type="text" name="phone_country_code" value="${testcenteruser.phone_country_code}" placeholder="e.g. USA" />
               </div>
             </li>
             <li class="field-group faxinfo">
-              <div data-field="fax" class="field" id="field-fax">
+              <div class="field" id="field-fax">
                 <label for="fax">Fax Number</label>
                 <input id="fax" type="text" class="short" name="fax" value="${testcenteruser.fax}" placeholder="e.g. 1-55-555-5555" />
               </div>
-              <div data-field="fax_country_code" class="field" id="field-fax_country_code">
+              <div class="field" id="field-fax_country_code">
                 <label for="fax_country_code">Fax Country Code</label>
                 <input id="fax_country_code" class="short" type="text" name="fax_country_code" value="${testcenteruser.fax_country_code}" placeholder="e.g. USA" />
               </div>
             </li>
-            <li data-field="company_name" class="field" id="field-company_name">
+            <li class="field" id="field-company_name">
               <label for="company_name">Company</label>
               <input id="company_name" type="text" name="company_name" value="${testcenteruser.company_name}" placeholder="e.g. American Association of University Professors" />
             </li>
@@ -239,9 +258,9 @@
       % endif
 
         % if registration:
-        <p class="instructions">Fields below this point are not part of your demographic information, and <strong>are not editable currently</strong>.</p>
+        <p class="note"><span class="title">Note</span>: Accomodation requests, which need to be reviewed in detail, <strong>will add significant delay to the registration process</strong>.</p>
         % else: 
-        <p class="instructions">Fields below this point are not part of your demographic information, <strong>and cannot be changed once submitted</strong>.</p>
+        <p class="note"><span class="title">Note</span>: Accommodation requests are not part of your demographic information, <strong>and cannot be changed once submitted</strong>. Accomodation requests, which need to be reviewed in detail, <strong>will add significant delay to the registration process</strong>.</p>
         % endif
                   
         <fieldset class="group group-form group-form-optional">
@@ -268,8 +287,10 @@
       <div class="form-actions">
         % if registration:
         <button type="submit" id="submit" class="action action-primary action-update">Update Demographics</button>
+        <a href="${reverse('dashboard')}" class="action action-secondary action-cancel">Cancel Update</a>
         % else: 
         <button type="submit" id="submit" class="action action-primary action-register">Register for Pearson VUE Test</button>
+        <a href="${reverse('dashboard')}" class="action action-secondary action-cancel">Cancel Registration</a>
         % endif
 
         <div class="message message-status submission-error">
@@ -290,15 +311,15 @@
     
   <aside>
    % if registration:
-    
-    <!-- REG: Dem accepted, Accom pending, Registration pending --> 
+
+    <!-- NOTE: Dem accepted, Accom pending, Registration pending --> 
     <div class="message message-status registration-pending is-shown">
       <h3>Pearson Exam Registration Status</h3>
 
       <ol class="status-list">
         <li class="item status status-accepted status-demographics">
           <h4 class="title">Demographic Information</h4>
-          <p class="details">The demographic information you most recently provided has been accepted</p>
+          <p class="details">The demographic information you most recently provided has been accepted. You may edit this information at any point before exam registration closes on <strong>${exam_info.registration_end_date_text}</strong></p>
         </li>
         <li class="item status status-pending status-accommodations">
           <h4 class="title">Accommodations Request</h4>
@@ -306,19 +327,19 @@
         </li>
         <li class="item status status-pending status-registration">
           <h4 class="title">Registration Request</h4>
-          <p class="details">Your exam registration is pending. Once all of the above steps are accepted your registration will be forwarded to Pearson and you will be able to schedule an exam.</p>
+          <p class="details">Your exam registration is pending. Once your information is accepted, it will be forwarded to Pearson and you will be able to schedule an exam.</p>
         </li>
       </ol>
     </div>
 
-    <!-- REG: Dem accepted, Accom accepted, Registration accepted --> 
+    <!-- NOTE: Dem accepted, Accom accepted, Registration accepted --> 
     <div class="message message-status registration-accepted is-shown">
       <h3>Pearson Exam Registration Status</h3>
 
       <ol class="status-list">
         <li class="item status status-accepted status-demographics">
           <h4 class="title">Demographic Information</h4>
-          <p class="details">The demographic information you most recently provided has been accepted</p>
+          <p class="details">The demographic information you most recently provided has been accepted. You may edit this information at any point before exam registration closes on <strong>${exam_info.registration_end_date_text}</strong></p>
         </li>
         <li class="item status status-accepted status-accommodations">
           <h4 class="title">Accommodations Request</h4>
@@ -335,33 +356,22 @@
           <p class="details">Your exam registration has been accepted and has been forwarded to Pearson. You are now able to schedule an exam.</p>
         </li>
       </ol>
-
-      <div class="actions">
-        <span class="label">Registration number: </span> <span class="value">12345678901</span>
-        <p class="message-copy">Write this down! You’ll need it to schedule your exam.</p>
-        <a href="https://www1.pearsonvue.com/testtaker/signin/SignInPage/EDX" class="button exam-button">Schedule Pearson exam</a>
-      </div>
     </div>
 
-    <!-- REG: Dem rejected, Accom none, Registration rejected --> 
+    <!-- NOTE: Dem rejected, Accom none, Registration rejected --> 
     <div class="message message-status registration-rejected is-shown">
       <h3>Pearson Exam Registration Status</h3>
 
       <ol class="status-list">
         <li class="item status status-rejected status-demographics">
           <h4 class="title">Demographic Information</h4>
-          <p class="details">The demographic information you most recently provided has been rejected by Pearson. You can correct it and submit again</p>
+          <p class="details">The demographic information you most recently provided has been rejected by Pearson. You can correct and submit it again before the exam registration closes on <strong>${exam_info.registration_end_date_text}</strong>.</p>
         </li>
         <li class="item status status-rejected status-registration">
           <h4 class="title">Registration Request</h4>
           <p class="details">Your exam registration has been rejected by Pearson. <strong>You currently cannot schedule an exam</strong>.</p>
         </li>
       </ol>
-
-      <div class="actions">
-        <span class="label">Pearson Testing Support</span> <span class="value">1-800-555-5555</span>
-        <p class="message-copy">Please contact the number above for further questions about your test</p>
-      </div>
     </div>
 
    % endif
