@@ -39,6 +39,14 @@ log = logging.getLogger("mitx.courseware")
 class OpenEndedModule(openendedchild.OpenEndedChild):
     """
     The open ended module supports all external open ended grader problems.
+    Sample XML file:
+    <openended min_score_to_attempt="1" max_score_to_attempt="1">
+        <openendedparam>
+            <initial_display>Enter essay here.</initial_display>
+            <answer_display>This is the answer.</answer_display>
+            <grader_payload>{"grader_settings" : "ml_grading.conf", "problem_id" : "6.002x/Welcome/OETest"}</grader_payload>
+        </openendedparam>
+    </openended>
     """
     def setup_response(self, system, location, definition, descriptor):
         """
@@ -562,7 +570,7 @@ class OpenEndedModule(openendedchild.OpenEndedChild):
 
 class OpenEndedDescriptor(XmlDescriptor, EditingDescriptor):
     """
-    Module for adding self assessment questions to courses
+    Module for adding open ended response questions to courses
     """
     mako_template = "widgets/html-edit.html"
     module_class = OpenEndedModule
@@ -578,12 +586,10 @@ class OpenEndedDescriptor(XmlDescriptor, EditingDescriptor):
     @classmethod
     def definition_from_xml(cls, xml_object, system):
         """
-        Pull out the rubric, prompt, and submitmessage into a dictionary.
+        Pull out the open ended parameters into a dictionary.
 
         Returns:
         {
-        'rubric': 'some-html',
-        'prompt': 'some-html',
         'oeparam': 'some-html'
         }
         """

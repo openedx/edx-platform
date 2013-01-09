@@ -1,10 +1,3 @@
-"""
-A Self Assessment module that allows students to write open-ended responses,
-submit, then see a rubric and rate themselves.  Persists student supplied
-hints, answers, and assessment judgment (currently only correct/incorrect).
-Parses xml definition file--see below for exact format.
-"""
-
 import copy
 from fs.errors import ResourceNotFoundError
 import itertools
@@ -48,9 +41,9 @@ class OpenEndedChild():
 
     initial (prompt, textbox shown)
          |
-    assessing (read-only textbox, rubric + assessment input shown)
+    assessing (read-only textbox, rubric + assessment input shown for self assessment, response queued for open ended)
          |
-    request_hint (read-only textbox, read-only rubric and assessment, hint input box shown)
+    post_assessment (read-only textbox, read-only rubric and assessment, hint input box shown)
          |
     done (submitted msg, green checkmark, everything else read-only.  If attempts < max, shows
          a reset button that goes back to initial state.  Saves previous
@@ -69,6 +62,7 @@ class OpenEndedChild():
     POST_ASSESSMENT = 'post_assessment'
     DONE = 'done'
 
+    #This is used to tell students where they are at in the module
     HUMAN_NAMES={
         'initial' : 'Started',
         'assessing' : 'Being scored',
@@ -78,35 +72,6 @@ class OpenEndedChild():
 
     def __init__(self, system, location, definition, descriptor, static_data,
                  instance_state=None, shared_state=None, **kwargs):
-        """
-        Definition file should have 4 blocks -- prompt, rubric, submitmessage, hintprompt,
-        and two optional attributes:
-        attempts, which should be an integer that defaults to 1.
-        If it's > 1, the student will be able to re-submit after they see
-        the rubric.
-        max_score, which should be an integer that defaults to 1.
-        It defines the maximum number of points a student can get.  Assumed to be integer scale
-        from 0 to max_score, with an interval of 1.
-
-        Note: all the submissions are stored.
-
-        Sample file:
-
-        <selfassessment attempts="1" max_score="1">
-            <prompt>
-                Insert prompt text here.  (arbitrary html)
-            </prompt>
-            <rubric>
-                Insert grading rubric here.  (arbitrary html)
-            </rubric>
-            <hintprompt>
-                Please enter a hint below: (arbitrary html)
-            </hintprompt>
-            <submitmessage>
-                Thanks for submitting!  (arbitrary html)
-            </submitmessage>
-        </selfassessment>
-        """
 
         # Load instance state
         if instance_state is not None:

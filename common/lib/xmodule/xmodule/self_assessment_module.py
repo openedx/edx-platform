@@ -1,10 +1,3 @@
-"""
-A Self Assessment module that allows students to write open-ended responses,
-submit, then see a rubric and rate themselves.  Persists student supplied
-hints, answers, and assessment judgment (currently only correct/incorrect).
-Parses xml definition file--see below for exact format.
-"""
-
 import copy
 from fs.errors import ResourceNotFoundError
 import itertools
@@ -31,14 +24,42 @@ import openendedchild
 log = logging.getLogger("mitx.courseware")
 
 class SelfAssessmentModule(openendedchild.OpenEndedChild):
+    """
+    A Self Assessment module that allows students to write open-ended responses,
+    submit, then see a rubric and rate themselves.  Persists student supplied
+    hints, answers, and assessment judgment (currently only correct/incorrect).
+    Parses xml definition file--see below for exact format.
 
+    Sample XML format:
+    <selfassessment>
+        <hintprompt>
+            What hint about this problem would you give to someone?
+        </hintprompt>
+        <submitmessage>
+            Save Succcesful.  Thanks for participating!
+        </submitmessage>
+    </selfassessment>
+    """
     def setup_response(self, system, location, definition, descriptor):
+        """
+        Sets up the module
+        @param system: Modulesystem
+        @param location: location, to let the module know where it is.
+        @param definition: XML definition of the module.
+        @param descriptor: SelfAssessmentDescriptor
+        @return: None
+        """
         self.submit_message = definition['submitmessage']
         self.hint_prompt = definition['hintprompt']
         self.prompt = stringify_children(self.prompt)
         self.rubric = stringify_children(self.rubric)
 
     def get_html(self, system):
+        """
+        Gets context and renders HTML that represents the module
+        @param system: Modulesystem
+        @return: Rendered HTML
+        """
         #set context variables and render template
         if self.state != self.INITIAL:
             latest = self.latest_answer()
@@ -266,8 +287,6 @@ class SelfAssessmentDescriptor(XmlDescriptor, EditingDescriptor):
 
         Returns:
         {
-        'rubric': 'some-html',
-        'prompt': 'some-html',
         'submitmessage': 'some-html'
         'hintprompt': 'some-html'
         }
