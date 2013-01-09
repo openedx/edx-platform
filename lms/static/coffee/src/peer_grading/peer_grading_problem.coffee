@@ -129,6 +129,8 @@ class PeerGradingProblem
     @interstitial_page_button = $('.interstitial-page-button')
 
     Collapsible.setCollapsibles(@content_panel)
+
+    # Set up the click event handlers
     @action_button.click -> document.location.reload(true)
     @calibration_feedback_button.click => 
       @calibration_feedback_panel.hide()

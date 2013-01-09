@@ -120,29 +120,22 @@ div.peer-grading{
         .calibration-panel
         {
             float:left;
-            width:47%;
+            width:48%;
         }
         .grading-panel
         {
             float:right;
-            width: 47%;
+            width: 48%;
         }
         .current-state
         {
-            background: #0F6B8A;
+            background: #1D9DD9;
             h3, p
             {
                 color: white;
             }
         }
-        &:after
-        {
-            content:".";
-            display:block;
-            height:0;
-            visibility: hidden;
-            clear:both;
-        }
+        @include clearfix;
     }
 
 
