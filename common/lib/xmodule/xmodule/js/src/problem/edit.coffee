@@ -125,23 +125,17 @@ class @MarkdownEditingDescriptor extends XModule.Descriptor
 
   @insertGenericChoice: (selectedText, choiceStart, choiceEnd, template) ->
     if selectedText.length > 0
-      # Replace adjacent newlines with a single newline
-      cleanSelectedText = selectedText.replace(/\n+/g, '\n')
+      # Replace adjacent newlines with a single newline, strip any trailing newline
+      cleanSelectedText = selectedText.replace(/\n+/g, '\n').replace(/\n$/,'')
       lines =  cleanSelectedText.split('\n')
       revisedLines = ''
       for line in lines
         revisedLines += choiceStart
-        # This is looking for a x before text to mark as selected.
-        if /x\s/i.test(line)
-          # Remove the x and any initial whitespace
-          lineWithoutX = line.replace(/^(\s+)?x/i, '')
-          # Check if any non-whitespace chars remain on the line
-          if not /^\s+$/.test(lineWithoutX)
-            # Remove initial whitespace, x, and space immediately after
-            line = line.replace(/^(\s+)?x\s/i, '')
-            revisedLines += 'x'
-          else
-            revisedLines += ' '
+        # a stand alone x before other text implies that this option is "correct"
+        if /^\s*x\s*(\S)/i.test(line)
+          # Remove the x and any initial whitespace as long as there's more text on the line
+          line = line.replace(/^\s*x\s*(\S)/i, '$1')
+          revisedLines += 'x'
         else
           revisedLines += ' '
         revisedLines += choiceEnd + ' ' + line + '\n'
