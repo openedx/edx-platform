@@ -8,6 +8,7 @@ class @MarkdownEditingDescriptor extends XModule.Descriptor
   constructor: (element) ->
     $body.on('click', '.editor-tabs .tab', @changeEditor)
     $body.on('click', '.editor-bar a', @onToolbarButton);
+    $body.on('click', '.cheatsheet-toggle', @toggleCheatsheet);
 
     @xml_editor = CodeMirror.fromTextArea($(".xml-box", element)[0], {
     mode: "xml"
@@ -51,6 +52,15 @@ class @MarkdownEditingDescriptor extends XModule.Descriptor
       @markdown_editor.replaceSelection(revisedSelection)
       @markdown_editor.focus()
 
+  toggleCheatsheet: (e) =>
+    e.preventDefault();
+
+#    TODO: don't base off of current_editor
+    if !$(@current_editor.getWrapperElement()).find('.simple-editor-cheatsheet')[0]
+      @cheatsheet = $($('#simple-editor-cheatsheet').html())
+      $(@current_editor.getWrapperElement()).append(@cheatsheet)
+
+    setTimeout (=> @cheatsheet.toggleClass('shown')), 10
 
   setCurrentEditor: (editor) ->
     $(@current_editor.getWrapperElement()).hide()
@@ -60,15 +70,16 @@ class @MarkdownEditingDescriptor extends XModule.Descriptor
 
   save: ->
     $body.off('click', '.editor-tabs .tab', @changeEditor)
-    $body.off('click', '.editor-bar a', @onToolbarButton);
+    $body.off('click', '.editor-bar a', @onToolbarButton)
+    $body.off('click', '.cheatsheet-toggle', @toggleCheatsheet)
     # TODO when logic is in place to remove the markdown if xml is edited, ensure this doesn't overwrite that
     if @current_editor == @markdown_editor
         {
             data: MarkdownEditingDescriptor.markdownToXml(@markdown_editor.getValue())
-            metadata: 
+            metadata:
             	markdown: @markdown_editor.getValue()
         }
-    else 
+    else
         data: @xml_editor.getValue()
 
   @insertMultipleChoice: (selectedText) ->
@@ -119,6 +130,21 @@ class @MarkdownEditingDescriptor extends XModule.Descriptor
     else
       return template
 
+# We may wish to add insertHeader and insertVideo. Here is Tom's code.
+# function makeHeader() {
+#  var selection = simpleEditor.getSelection();
+#  var revisedSelection = selection + '\n';
+#  for(var i = 0; i < selection.length; i++) {
+#revisedSelection += '=';
+#  }
+#  simpleEditor.replaceSelection(revisedSelection);
+#}
+#
+#function makeVideo() {
+#var selection = simpleEditor.getSelection();
+#simpleEditor.replaceSelection('{{video ' + selection + '}}');
+#}
+#
   @markdownToXml: (markdown)->
     toXml = `function(markdown) {
       var xml = markdown;
