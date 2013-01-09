@@ -284,7 +284,7 @@ class ModuleStore(object):
         """
         raise NotImplementedError
 
-    def get_items(self, location, depth=0):
+    def get_items(self, location, course_id=None, depth=0):
         """
         Returns a list of XModuleDescriptor instances for the items
         that match location. Any element of location that is None is treated
