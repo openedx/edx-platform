@@ -37,8 +37,18 @@ from datetime import datetime
 log = logging.getLogger("mitx.courseware")
 
 class OpenEndedModule(openendedchild.OpenEndedChild):
-
+    """
+    The open ended module supports all external open ended grader problems.
+    """
     def setup_response(self, system, location, definition, descriptor):
+        """
+        Sets up the response type.
+        @param system: Modulesystem object
+        @param location: The location of the problem
+        @param definition: The xml definition of the problem
+        @param descriptor: The OpenEndedDescriptor associated with this
+        @return: None
+        """
         oeparam = definition['oeparam']
 
         self.url = definition.get('url', None)
@@ -106,6 +116,12 @@ class OpenEndedModule(openendedchild.OpenEndedChild):
         self.payload = {'grader_payload': updated_grader_payload}
 
     def skip_post_assessment(self, get, system):
+        """
+        Ajax function that allows one to skip the post assessment phase
+        @param get: AJAX dictionary
+        @param system: ModuleSystem
+        @return: Success indicator
+        """
         self.state=self.DONE
         return {'success' : True}
 
@@ -172,6 +188,12 @@ class OpenEndedModule(openendedchild.OpenEndedChild):
         return {'success' : success, 'msg' : "Successfully submitted your feedback."}
 
     def send_to_grader(self, submission, system):
+        """
+        Send a given submission to the grader, via the xqueue
+        @param submission: The student submission to send to the grader
+        @param system: Modulesystem
+        @return: Boolean true (not useful right now)
+        """
 
         # Prepare xqueue request
         #------------------------------------------------------------
@@ -214,6 +236,13 @@ class OpenEndedModule(openendedchild.OpenEndedChild):
         return True
 
     def _update_score(self, score_msg, queuekey, system):
+        """
+        Called by xqueue to update the score
+        @param score_msg: The message from xqueue
+        @param queuekey: The key sent by xqueue
+        @param system: Modulesystem
+        @return: Boolean True (not useful currently)
+        """
         new_score_msg = self._parse_score_msg(score_msg)
         if not new_score_msg['valid']:
             score_msg['feedback'] = 'Invalid grader reply. Please contact the course staff.'
@@ -226,10 +255,18 @@ class OpenEndedModule(openendedchild.OpenEndedChild):
 
 
     def get_answers(self):
+        """
+        Gets and shows the answer for this problem.
+        @return: Answer html
+        """
         anshtml = '<span class="openended-answer"><pre><code>{0}</code></pre></span>'.format(self.answer)
         return {self.answer_id: anshtml}
 
     def get_initial_display(self):
+        """
+        Gets and shows the initial display for the input box.
+        @return: Initial display html
+        """
         return {self.answer_id: self.initial_display}
 
     def _convert_longform_feedback_to_html(self, response_items):
@@ -385,7 +422,11 @@ class OpenEndedModule(openendedchild.OpenEndedChild):
         return {'valid' : True, 'score' : score_result['score'], 'feedback' : feedback}
 
     def latest_post_assessment(self, short_feedback=False):
-        """None if not available"""
+        """
+        Gets the latest feedback, parses, and returns
+        @param short_feedback: If the long feedback is wanted or not
+        @return: Returns formatted feedback
+        """
         if not self.history:
             return ""
 
@@ -397,6 +438,11 @@ class OpenEndedModule(openendedchild.OpenEndedChild):
         return short_feedback if feedback_dict['valid'] else ''
 
     def format_feedback_with_evaluation(self,feedback):
+        """
+        Renders a given html feedback into an evaluation template
+        @param feedback: HTML feedback
+        @return: Rendered html
+        """
         context={'msg' : feedback, 'id' : "1", 'rows' : 50, 'cols' : 50}
         html= render_to_string('open_ended_evaluation.html', context)
         return html
@@ -432,10 +478,22 @@ class OpenEndedModule(openendedchild.OpenEndedChild):
         return json.dumps(d, cls=ComplexEncoder)
 
     def check_for_score(self, get, system):
+        """
+        Checks to see if a score has been received yet.
+        @param get: AJAX get dictionary
+        @param system: Modulesystem (needed to align with other ajax functions)
+        @return: Returns the current state
+        """
         state = self.state
         return {'state' : state}
 
     def save_answer(self, get, system):
+        """
+        Saves a student answer
+        @param get: AJAX get dictionary
+        @param system: modulesystem
+        @return: Success indicator
+        """
         if self.attempts > self.max_attempts:
             # If too many attempts, prevent student from saving answer and
             # seeing rubric.  In normal use, students shouldn't see this because
@@ -457,13 +515,9 @@ class OpenEndedModule(openendedchild.OpenEndedChild):
 
     def update_score(self, get, system):
         """
-        Delivers grading response (e.g. from asynchronous code checking) to
-            the capa problem, so its score can be updated
-
-        'get' must have a field 'response' which is a string that contains the
-            grader's response
-
-        No ajax return is needed. Return empty dict.
+        Updates the current score via ajax.  Called by xqueue.
+        Input: AJAX get dictionary, modulesystem
+        Output: None
         """
         queuekey = get['queuekey']
         score_msg = get['xqueue_body']
@@ -473,6 +527,11 @@ class OpenEndedModule(openendedchild.OpenEndedChild):
         return dict()  # No AJAX return is needed
 
     def get_html(self, system):
+        """
+        Gets the HTML for this problem and renders it
+        Input: Modulesystem object
+        Output: Rendered HTML
+        """
         #set context variables and render template
         if self.state != self.INITIAL:
             latest = self.latest_answer()
