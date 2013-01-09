@@ -178,7 +178,7 @@ define(['logme', 'update_input'], function (logme, updateInput) {
                 // icon. All the existing code will work, and the user will
                 // see a label instead of an icon.
                 if (obj.label.length > 0) {
-                    draggableObj.iconElBGColor = 'yellow';
+                    draggableObj.iconElBGColor = state.config.labelBgColor;
                     draggableObj.iconElPadding = 8;
                     draggableObj.iconElBorder = '1px solid black';
                     draggableObj.iconElLeftOffset = 9;
@@ -301,7 +301,7 @@ define(['logme', 'update_input'], function (logme, updateInput) {
                         if (draggableObj.labelEl !== null) {
                             draggableObj.labelEl.detach();
                             draggableObj.labelEl.css(
-                                'background-color', 'yellow'
+                                'background-color', state.config.labelBgColor
                             );
                             draggableObj.labelEl.css(
                                 'padding-left', 8

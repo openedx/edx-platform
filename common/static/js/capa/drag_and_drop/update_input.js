@@ -168,7 +168,7 @@ define(['logme'], function (logme) {
                                 if (draggable.labelEl !== null) {
                                     draggable.labelEl.detach();
                                     draggable.labelEl.css(
-                                        'background-color', 'yellow'
+                                        'background-color', state.config.labelBgColor
                                     );
                                     draggable.labelEl.css(
                                         'padding-left', 8
@@ -282,7 +282,7 @@ define(['logme'], function (logme) {
                                 if (draggable.labelEl !== null) {
                                     draggable.labelEl.detach();
                                     draggable.labelEl.css(
-                                        'background-color', 'yellow'
+                                        'background-color', state.config.labelBgColor
                                     );
                                     draggable.labelEl.css(
                                         'padding-left', 8

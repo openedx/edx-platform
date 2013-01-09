@@ -89,6 +89,14 @@ define(['logme'], function (logme) {
             returnStatus = false;
         }
 
+        state.config.labelBgColor = 'yellow';
+        if (typeof config.label_bg_color === 'string') {
+            state.config.labelBgColor = config.label_bg_color;
+        } else if (typeof config.label_bg_color !== 'undefined') {
+            logme('ERROR: Property config.label_bg_color is not of a supported type.');
+            returnStatus = false;
+        }
+
         if (state.config.targets.length === 0) {
             state.individualTargets = false;
         } else {
