@@ -144,6 +144,8 @@ define(['logme', 'update_input'], function (logme, updateInput) {
                             '<div ' +
                                 'style=" ' +
                                     'position: absolute; ' +
+                                    'color: black; ' +
+                                    'font-size: 0.95em; ' +
                                 '" ' +
                             '>' +
                                 obj.label +
@@ -187,6 +189,8 @@ define(['logme', 'update_input'], function (logme, updateInput) {
                         '<div ' +
                             'style=" ' +
                                 'position: absolute; ' +
+                                'color: black; ' +
+                                'font-size: 0.95em; ' +
                             '" ' +
                         '>' +
                             obj.label +
@@ -261,18 +265,18 @@ define(['logme', 'update_input'], function (logme, updateInput) {
                         draggableObj.containerEl.hide();
 
                         draggableObj.iconEl.detach();
-                            draggableObj.iconEl.css(
-                                'background-color', draggableObj.iconElBGColor
-                            );
-                            draggableObj.iconEl.css(
-                                'padding-left', draggableObj.iconElPadding
-                            );
-                            draggableObj.iconEl.css(
-                                'padding-right', draggableObj.iconElPadding
-                            );
-                            draggableObj.iconEl.css(
-                                'border', draggableObj.iconElBorder
-                            );
+                        draggableObj.iconEl.css(
+                            'background-color', draggableObj.iconElBGColor
+                        );
+                        draggableObj.iconEl.css(
+                            'padding-left', draggableObj.iconElPadding
+                        );
+                        draggableObj.iconEl.css(
+                            'padding-right', draggableObj.iconElPadding
+                        );
+                        draggableObj.iconEl.css(
+                            'border', draggableObj.iconElBorder
+                        );
                         draggableObj.iconEl.css(
                             'width',
                             draggableObj.iconWidth

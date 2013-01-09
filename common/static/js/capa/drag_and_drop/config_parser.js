@@ -89,7 +89,7 @@ define(['logme'], function (logme) {
             returnStatus = false;
         }
 
-        state.config.labelBgColor = 'yellow';
+        state.config.labelBgColor = '#d6d6d6';
         if (typeof config.label_bg_color === 'string') {
             state.config.labelBgColor = config.label_bg_color;
         } else if (typeof config.label_bg_color !== 'undefined') {
