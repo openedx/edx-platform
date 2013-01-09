@@ -12,6 +12,106 @@
         state: '${unit_state}'
       })
     });
+  
+    (function() {
+      $('.new-component-template').each(function(){
+          $emptyEditor = $(this).find('.empty');
+          $(this).prepend($emptyEditor);
+        });
+    })();
+    
+    function setEditorTab(e) {
+      e.preventDefault();
+      $('.editor-tabs .current').removeClass('current');
+      $(this).addClass('current');
+      switch($(this).attr('data-tab')) {
+        case 'simple':
+          currentEditor = simpleEditor;
+          $(simpleEditor.getWrapperElement()).show();
+          $(xmlEditor.getWrapperElement()).hide();
+          $(simpleEditor).focus();
+          onSimpleEditorUpdate();
+          break;
+        case 'xml':
+          currentEditor = xmlEditor;
+          $(simpleEditor.getWrapperElement()).hide();
+          $(xmlEditor.getWrapperElement()).show();
+          $(xmlEditor).focus();
+          xmlEditor.refresh();
+          break;
+        case 'visual':
+          currentEditor = visualEditor;
+          convertHTMLToVisual();
+          $('table.mceToolbar').show();
+          $(htmlEditor.getWrapperElement()).hide();
+          break;
+        case 'html':
+          currentEditor = htmlEditor;
+          $('table.mceToolbar').hide();
+          $(htmlEditor.getWrapperElement()).show();
+          $(htmlEditor).focus();
+          convertVisualToHTML();
+          htmlEditor.refresh();
+          break;
+      }      
+    }
+  </script>
+
+
+  <script type="text/template" id="simple-editor-cheatsheet">
+    <article class="simple-editor-cheatsheet">
+      <div class="cheatsheet-wrapper">
+        <div class="row">
+          <h6>Multiple Choice</h6>
+          <div class="col sample">
+            <img src="/static/img/choice-example.png" />
+          </div>
+          <div class="col">
+            <pre><code>( ) red
+( ) green
+(x) blue</code></pre>
+          </div>
+        </div>
+        <div class="row">
+          <h6>Multiple Check</h6>
+          <div class="col sample">
+            <img src="/static/img/multi-example.png" />
+          </div>
+          <div class="col">
+            <pre><code>[ ] earth
+[ ] wind
+[x] water</code></pre>
+          </div>
+        </div>
+        <div class="row">
+          <h6>String Response</h6>
+          <div class="col sample">
+            <img src="/static/img/string-example.png" />
+          </div>
+          <div class="col">
+            <pre><code>= dog</code></pre>
+          </div>
+        </div>
+        <div class="row">
+          <h6>Numerical Response</h6>
+          <div class="col sample">
+            <img src="/static/img/number-example.png" />
+          </div>
+          <div class="col">
+            <pre><code>= 3.14 +- 2%</code></pre>
+          </div>
+        </div>
+        <div class="row">
+          <h6>Option Response</h6>
+          <div class="col sample">
+            <img src="/static/img/select-example.png" />
+          </div>
+          <div class="col">
+            <pre><code>[[wrong, (right)]]</code></pre>
+          </div>
+        </div>
+      </div>
+    </article>
   </script>
 
   <script type="text/template" id="component-actions">
@@ -57,20 +157,36 @@
               </div>
                 % for type, templates in sorted(component_templates.items()):
                 <div class="new-component-templates new-component-${type}">
+                    <h3 class="title">Select <span class="type">${type}</span> component type:</h3>
+
                     <ul class="new-component-template">
                         % for name, location, has_markdown, is_empty in templates:
-                        <li>
-                            <a href="#" data-location="${location}">
-                                <span class="name">${name} 
-                                % if has_markdown:
-                                     MD
-                                % endif
-                                % if is_empty:
-                                    <i>rasa</i>
-                                % endif
-                                </span>
-                            </a>
-                        </li>
+
+                          % if is_empty:
+                            <li class="editor-md empty">
+                              <a href="#" data-location="${location}">
+                                <span class="name"><i class="ss-icon ss-symbolicons-block">&#xE714;</i> ${name}</span>
+                                <span class="editor-indicator">Simple <span class="sr">Editor</span></span>
+                              </a>
+                            </li>
+
+                          % elif has_markdown:
+                            <li class="editor-md">
+                              <a href="#" data-location="${location}">
+                                <span class="name"><i class="ss-icon ss-symbolicons-block">&#xE714;</i> ${name}</span>
+                                <span class="editor-indicator">Simple <span class="sr">Editor</span></span>
+                              </a>
+                            </li>
+
+                          % else:
+                            <li class="editor-manual">
+                              <a href="#" data-location="${location}">
+                                <span class="name"><i class="ss-icon ss-symbolicons-block">&#x1F527;</i> ${name}</span>
+                                <span class="editor-indicator">Advanced <span class="sr">Editor</span></span>
+                              </a>
+                            </li>
+                          % endif
+
                         %endfor
                     </ul>
                     <a href="#" class="cancel-button">Cancel</a>
