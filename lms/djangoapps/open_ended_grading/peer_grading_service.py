@@ -12,6 +12,7 @@ from grading_service import GradingServiceError
 from courseware.access import has_access
 from util.json_request import expect_json
 from xmodule.course_module import CourseDescriptor
+from student.models import unique_id_for_user
 
 log = logging.getLogger(__name__)
 
@@ -165,7 +166,7 @@ def get_next_submission(request, course_id):
     success, message = _check_required(request, required)
     if not success:
         return _err_response(message)
-    grader_id = request.user.id
+    grader_id = unique_id_for_user(request.user)
     p = request.POST
     location = p['location']
 
@@ -199,7 +200,7 @@ def save_grade(request, course_id):
     success, message = _check_required(request, required)
     if not success:
         return _err_response(message)
-    grader_id = request.user.id
+    grader_id = unique_id_for_user(request.user)
     p = request.POST
     location = p['location']
     submission_id = p['submission_id']
@@ -240,7 +241,7 @@ def is_student_calibrated(request, course_id):
     success, message = _check_required(request, required)
     if not success:
         return _err_response(message)
-    grader_id = request.user.id
+    grader_id = unique_id_for_user(request.user)
     p = request.POST
     location = p['location']
 
@@ -285,7 +286,7 @@ def show_calibration_essay(request, course_id):
     if not success:
         return _err_response(message)
 
-    grader_id = request.user.id
+    grader_id = unique_id_for_user(request.user)
     p = request.POST
     location = p['location']
     try:
@@ -321,7 +322,7 @@ def save_calibration_essay(request, course_id):
     success, message = _check_required(request, required)
     if not success:
         return _err_response(message)
-    grader_id = request.user.id
+    grader_id = unique_id_for_user(request.user)
     p = request.POST
     location = p['location']
     calibration_essay_id = p['submission_id']
