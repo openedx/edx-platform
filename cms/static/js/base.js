@@ -131,10 +131,10 @@ $(document).ready(function() {
     });
 });
 
-function collapseAll(e) {
-    $('.branch').addClass('collapsed');
-    $('.expand-collapse-icon').removeClass('collapse').addClass('expand');
-}
+// function collapseAll(e) {
+//     $('.branch').addClass('collapsed');
+//     $('.expand-collapse-icon').removeClass('collapse').addClass('expand');
+// }
 
 function toggleSections(e) {
   e.preventDefault();
@@ -145,11 +145,15 @@ function toggleSections(e) {
   $labelCollapsed = $('<i class="ss-icon ss-symbolicons-block">up</i> <span class="label">Collapse All Sections</span>');
   $labelExpanded = $('<i class="ss-icon ss-symbolicons-block">down</i> <span class="label">Expand All Sections</span>');
 
-  if (sectionCount > 0) {
-    $section.toggleClass('collapsed');
-    $section.find('.expand-collapse-icon').toggleClass('collapse expand');
-    var buttonLabel = $section.hasClass('collapsed') ? $labelExpanded : $labelCollapsed;
-    $button.toggleClass('is-activated').html(buttonLabel);
+  var buttonLabel = $button.hasClass('is-activated') ? $labelCollapsed : $labelExpanded;
+  $button.toggleClass('is-activated').html(buttonLabel);
+
+  if($button.hasClass('is-activated')) {
+      $section.addClass('collapsed');
+      $section.find('.expand-collapse-icon').removeClass('collapsed').addClass('expand');
+  } else {
+      $section.removeClass('collapsed');
+      $section.find('.expand-collapse-icon').removeClass('expand').addClass('collapse');
   }
 }
 
