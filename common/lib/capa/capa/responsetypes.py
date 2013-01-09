@@ -188,7 +188,7 @@ class LoncapaResponse(object):
         # problem author can make this span display:inline
         if self.xml.get('inline',''):
             tree.set('class','inline')
-            
+
         for item in self.xml:
             # call provided procedure to do the rendering
             item_xhtml = renderer(item)
@@ -875,7 +875,8 @@ def sympy_check2():
 
     allowed_inputfields = ['textline', 'textbox', 'crystallography',
                             'chemicalequationinput', 'vsepr_input',
-                            'drag_and_drop_input', 'editamoleculeinput']
+                            'drag_and_drop_input', 'editamoleculeinput',
+                            'designprotein2dinput']
 
     def setup_response(self):
         xml = self.xml

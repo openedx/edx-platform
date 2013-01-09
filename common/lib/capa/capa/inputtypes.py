@@ -863,3 +863,39 @@ class EditAMoleculeInput(InputTypeBase):
         return context
 
 registry.register(EditAMoleculeInput)
+
+#-----------------------------------------------------------------------------
+
+class DesignProtein2dInput(InputTypeBase):
+    """
+    An input type for design of a protein in 2D. Integrates with the Protex java applet.
+
+    Example:
+
+    <designprotein2d width="800" hight="500" target_shape="E;NE;NW;W;SW;E;none" />
+    """
+
+    template = "designprotein2dinput.html"
+    tags = ['designprotein2dinput']
+
+    @classmethod
+    def get_attributes(cls):
+        """
+        Note: width, hight, and target_shape are required.
+        """
+        return [Attribute('width'),
+                Attribute('height'),
+                Attribute('target_shape')
+                ]
+
+    def _extra_context(self):
+        """
+        """
+        context = {
+            'applet_loader': '/static/js/capa/design-protein-2d.js',
+        }
+
+        return context
+
+registry.register(DesignProtein2dInput)
+
