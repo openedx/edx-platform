@@ -76,8 +76,8 @@ class @CombinedOpenEnded
 
     fd = new FormData()
     feedback = evaluation_scoring.find('textarea.feedback-on-feedback')[0].value
-    submission_id = external_grader_message.find('div.submission_id')[0].innerHTML
-    grader_id = external_grader_message.find('div.grader_id')[0].innerHTML
+    submission_id = external_grader_message.find('input.submission_id')[0].value
+    grader_id = external_grader_message.find('input.grader_id')[0].value
     score = evaluation_scoring.find("input:radio[name='evaluation-score']:checked").val()
 
     fd.append('feedback', feedback)

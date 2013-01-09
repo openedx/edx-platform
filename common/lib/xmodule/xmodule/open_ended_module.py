@@ -332,9 +332,7 @@ class OpenEndedModule(openendedchild.OpenEndedChild):
         def format_feedback_hidden(feedback_type , value):
             feedback_type,value=encode_values(feedback_type,value)
             feedback = """
-            <div class="{feedback_type}" style="display: none;">
-            {value}
-            </div>
+            <input class="{feedback_type}" type="hidden" value="{value}" />
             """.format(feedback_type=feedback_type, value=value)
             return feedback
 
