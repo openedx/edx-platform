@@ -441,11 +441,12 @@ class OpenEndedModule(openendedchild.OpenEndedChild):
         else:
             #This is for instructor and ML grading
             feedback = self._format_feedback(score_result)
+            score=score_result['score']
 
         self.submission_id=score_result['submission_id']
         self.grader_id=score_result['grader_id']
 
-        return {'valid' : True, 'score' : score_result['score'], 'feedback' : feedback}
+        return {'valid' : True, 'score' : score, 'feedback' : feedback}
 
     def latest_post_assessment(self, short_feedback=False):
         """
