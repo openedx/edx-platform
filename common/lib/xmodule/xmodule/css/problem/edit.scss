@@ -119,29 +119,6 @@
   }
 }
 
-.tiny-link-dialog {
-  position: fixed;
-  top: 40px;
-  left: 50%;
-  z-index: 99999;
-  width: 600px;
-  margin-left: -300px;
-  background: #fff;
-
-  .close-button {
-    @include white-button;
-    position: absolute;
-    top: 0;
-    right: 15px;
-    width: 29px;
-    height: 29px;
-    padding: 0 !important;
-    border-radius: 17px !important;
-    line-height: 29px;
-    text-align: center;
-  }
-}
-
 .problem-editor-icon {
   display: inline-block;
   width: 26px;
