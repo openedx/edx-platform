@@ -208,6 +208,9 @@ class TestCenterUser(models.Model):
     candidate_id = models.IntegerField(null=True, db_index=True)
     confirmed_at = models.DateTimeField(null=True, db_index=True)
 
+    @property
+    def needs_uploading(self):
+        return self.uploaded_at is None or self.uploaded_at < self.user_updated_at
     
     @staticmethod
     def user_provided_fields():
@@ -223,7 +226,7 @@ class TestCenterUser(models.Model):
 #        needs_updating = any([__getattribute__(fieldname) != dict[fieldname]
 #                              for fieldname in TestCenterUser.user_provided_fields()])
         for fieldname in TestCenterUser.user_provided_fields():
-            if self.__getattribute__(fieldname) != dict[fieldname]:
+            if fieldname in dict and self.__getattribute__(fieldname) != dict[fieldname]:
                 return True
             
         return False    
@@ -231,7 +234,7 @@ class TestCenterUser(models.Model):
     @staticmethod
     def _generate_candidate_id():
         NUM_DIGITS = 12
-        return u"edX%0d" % randint(1, 10**NUM_DIGITS-1) # binascii.hexlify(os.urandom(8))
+        return u"edX%0d" % randint(1, 10**NUM_DIGITS-1)
         
     @staticmethod
     def create(user):
@@ -266,7 +269,7 @@ class TestCenterUserForm(ModelForm):
     def update_and_save(self):
         new_user = self.save(commit=False)
         # create additional values here:
-        new_user.user_updated_at = datetime.now()
+        new_user.user_updated_at = datetime.utcnow()
         new_user.save()
         
     # add validation:
@@ -505,7 +508,7 @@ class TestCenterRegistrationForm(ModelForm):
     def update_and_save(self):
         registration = self.save(commit=False)
         # create additional values here:
-        registration.user_updated_at = datetime.now()
+        registration.user_updated_at = datetime.utcnow()
         registration.save()
 
     # TODO: add validation code for values added to accommodation_code field.

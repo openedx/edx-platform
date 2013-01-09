@@ -1,20 +1,13 @@
-import uuid
-from datetime import datetime
 from optparse import make_option
 
 from django.contrib.auth.models import User
-from django.core.management.base import BaseCommand, CommandError
+from django.core.management.base import BaseCommand
 
-from student.models import TestCenterUser
+from student.models import TestCenterUser, TestCenterUserForm
 
 class Command(BaseCommand):
     option_list = BaseCommand.option_list + (
-        make_option(
-            '--client_candidate_id',
-            action='store',
-            dest='client_candidate_id',
-            help='ID we assign a user to identify them to Pearson'
-        ),        
+        # demographics:     
         make_option(
             '--first_name',
             action='store',
@@ -64,6 +57,25 @@ class Command(BaseCommand):
             dest='phone_country_code',
             help='Phone country code, just "1" for the USA'
         ),
+        # internal values:
+        make_option(
+            '--client_candidate_id',
+            action='store',
+            dest='client_candidate_id',
+            help='ID we assign a user to identify them to Pearson'
+        ),   
+        make_option(
+            '--upload_status',
+            action='store',
+            dest='upload_status',
+            help='status value assigned by Pearson'
+        ),   
+        make_option(
+            '--upload_error_message',
+            action='store',
+            dest='upload_error_message',
+            help='error message provided by Pearson on a failure.'
+        ),   
     )
     args = "<student_username>"
     help = "Create a TestCenterUser entry for a given Student"
@@ -79,7 +91,41 @@ class Command(BaseCommand):
         print username
 
         our_options = dict((k, v) for k, v in options.items()
-                           if Command.is_valid_option(k))
+                           if Command.is_valid_option(k) and v is not None)
         student = User.objects.get(username=username)
-        student.test_center_user = TestCenterUser(**our_options)
-        student.test_center_user.save()
+        try:
+            testcenter_user = TestCenterUser.objects.get(user=student)
+            needs_updating = testcenter_user.needs_update(our_options)    
+        except TestCenterUser.DoesNotExist:
+            # do additional initialization here:
+            testcenter_user = TestCenterUser.create(student)
+            needs_updating = True
+        
+        if needs_updating:
+            form = TestCenterUserForm(instance=testcenter_user, data=our_options)
+            if form.is_valid():
+                form.update_and_save()
+            else:
+                if (len(form.errors) > 0):
+                    print "Field Form errors encountered:"
+                for fielderror in form.errors:
+                    print "Field Form Error:  %s" % fielderror
+                    if (len(form.non_field_errors()) > 0):
+                        print "Non-field Form errors encountered:"
+                        for nonfielderror in form.non_field_errors:
+                            print "Non-field Form Error:  %s" % nonfielderror
+                    
+        else:
+            print "No changes necessary to make to existing user's demographics."
+            
+        # override internal values:
+        change_internal = False
+        testcenter_user = TestCenterUser.objects.get(user=student)
+        for internal_field in [ 'upload_error_message', 'upload_status', 'client_candidate_id']:
+            if internal_field in our_options:
+                testcenter_user = our_options[internal_field]
+                change_internal = True
+                
+        if change_internal:
+            testcenter_user.save()
+            
