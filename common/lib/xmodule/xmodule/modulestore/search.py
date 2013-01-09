@@ -64,7 +64,7 @@ def path_to_location(modulestore, course_id, location):
             # isn't found so we don't have to do it explicitly.  Call this
             # first to make sure the location is there (even if it's a course, and
             # we would otherwise immediately exit).
-            parents = modulestore.get_parent_locations(loc)
+            parents = modulestore.get_parent_locations(loc, course_id)
 
             # print 'Processing loc={0}, path={1}'.format(loc, path)
             if loc.category == "course":
