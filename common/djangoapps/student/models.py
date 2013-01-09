@@ -53,9 +53,6 @@ from django.forms import ModelForm, forms
 
 import comment_client as cc
 from django_comment_client.models import Role
-from feedparser import binascii
-import os
-
 
 log = logging.getLogger(__name__)
 
@@ -329,7 +326,7 @@ class TestCenterUserForm(ModelForm):
 # our own code to indicate that a request has been rejected. 
 ACCOMMODATION_REJECTED_CODE = 'NONE'        
    
-ACCOMODATION_CODES = (
+ACCOMMODATION_CODES = (
                       (ACCOMMODATION_REJECTED_CODE, 'No Accommodation Granted'), 
                       ('EQPMNT', 'Equipment'),
                       ('ET12ET', 'Extra Time - 1/2 Exam Time'),
@@ -342,6 +339,8 @@ ACCOMODATION_CODES = (
                       ('SRSEAN', 'Separate Room and Service Animal'),
                       ('SRSGNR', 'Separate Room and Sign Language Interpreter'), 
                       )
+
+ACCOMMODATION_CODE_DICT = { code : name for (code, name) in ACCOMMODATION_CODES }
     
 class TestCenterRegistration(models.Model):
     """
@@ -494,14 +493,11 @@ class TestCenterRegistration(models.Model):
     def is_pending(self):
         return not self.is_accepted and not self.is_rejected
     
-    @property
-    def is_pending_accommodation(self):
-        return self.accommodation_is_pending
-        
-    @property
-    def is_pending_acknowledgement(self):
-        return (not self.is_accepted and not self.is_rejected) and not self.is_pending_accommodation
+    def get_accommodation_codes(self):
+        return self.accommodation_code.split('*')
 
+    def get_accommodation_names(self):
+        return [ ACCOMMODATION_CODE_DICT.get(code, "Unknown code " + code) for code in self.get_accommodation_codes() ]         
 
 class TestCenterRegistrationForm(ModelForm):
     class Meta:

@@ -102,12 +102,14 @@
   </section>
   
   % if registration:
+  
+   <% exam_help_href = "mailto:exam-help@edx.org?subject=Pearson VUE Exam - %s %s".format(get_course_about_section(course, 'university'), course.number) %>
 
    % if  registration.is_rejected:      
   <section class="status message message-flash registration-rejected message-action">
     <h3 class="message-title">Your registration for the Pearson exam has been rejected</h3>
-    <p class="message-copy">Please check the information you provided, and try to correct any demographic errors.  Otherwise contact someone at edX or Pearson, or just scream for help.</p>
-    <a href="mailto:exam-help@edx.org?subject=Pearson VUE Exam - ${get_course_about_section(course, 'university')} ${course.number}" class="button contact-button">Contact exam-help@edx.org</a>
+    <p class="message-copy">Please check the information you provided, and try to correct any demographic errors.  Otherwise contact edX at exam-help@edx.org.</p>
+    <a href="${exam_help_href}" class="button contact-button">Contact exam-help@edx.org</a>
   </section>
    % endif
 
@@ -344,7 +346,10 @@
         % if registration.demographics_is_rejected:     
         <li class="item status status-rejected status-demographics">
           <h4 class="title">Demographic Information</h4>
-          <p class="details">The demographic information you most recently provided has been rejected by Pearson. You can correct and submit it again before the exam registration closes on <strong>${exam_info.registration_end_date_text}</strong>.</p>
+          <p class="details">The demographic information you most recently provided has been rejected by Pearson. You can correct and submit it again before the exam registration closes on <strong>${exam_info.registration_end_date_text}</strong>.
+          The error message is:</p>
+          <p class="details">${registration.testcenter_user.upload_error_message}.</p>
+          <p class="details">If the error is not correctable by revising demographic information and resubmitting, please contact edX at <a href="${exam_help_href}">exam-help@edx.org</a>.</p>
         </li>
         % endif     
 
@@ -361,9 +366,9 @@
           <p class="details">Your requested accommodations have been reviewed and processed. You are allowed:</p>
 
           <ul class="accommodations-list">
-            <li class="item">Extra Time - Double Time</li>
-            <li class="item">Separate Room & Reader/Recorder</li>
-            <li class="item">Equipment</li>
+            % for accommodation_name in registration.get_accommodation_names():
+            <li class="item">${accommodation_name}</li>
+            % endfor
           </ul>  
         </li>
         % endif     
@@ -390,7 +395,9 @@
         % if registration.registration_is_rejected:     
         <li class="item status status-rejected status-registration">
           <h4 class="title">Registration Request</h4>
-          <p class="details">Your exam registration has been rejected by Pearson. <strong>You currently cannot schedule an exam</strong>.</p>
+          <p class="details">Your exam registration has been rejected by Pearson. <strong>You currently cannot schedule an exam</strong>.
+          Please contact edX at <a href="${exam_help_href}">exam-help@edx.org</a>.  The error message is:</p>
+          <p class="details">${registration.upload_error_message}.</p>
         </li>
         % endif     
 
@@ -398,67 +405,6 @@
    
    </div>
    
-    <!-- NOTE: Dem processed, Accom pending, Registration pending --> 
-    <div class="message message-status registration-pending is-shown">
-      <h3>Pearson Exam Registration Status</h3>
-
-      <ol class="status-list">
-        <li class="item status status-processed status-demographics">
-          <h4 class="title">Demographic Information</h4>
-          <p class="details">The demographic information you most recently provided has been processed. You may edit this information at any point before exam registration closes on <strong>${exam_info.registration_end_date_text}</strong></p>
-        </li>
-        <li class="item status status-pending status-accommodations">
-          <h4 class="title">Accommodations Request</h4>
-          <p class="details">Your requested accommodations are pending. Within a few days, you should see confirmation here of granted accommodations.</p>
-        </li>
-        <li class="item status status-pending status-registration">
-          <h4 class="title">Registration Request</h4>
-          <p class="details">Your exam registration is pending. Once your information is processed, it will be forwarded to Pearson and you will be able to schedule an exam.</p>
-        </li>
-      </ol>
-    </div>
-
-    <!-- NOTE: Dem processed, Accom processed, Registration processed --> 
-    <div class="message message-status registration-processed is-shown">
-      <h3>Pearson Exam Registration Status</h3>
-
-      <ol class="status-list">
-        <li class="item status status-processed status-demographics">
-          <h4 class="title">Demographic Information</h4>
-          <p class="details">The demographic information you most recently provided has been processed. You may edit this information at any point before exam registration closes on <strong>${exam_info.registration_end_date_text}</strong></p>
-        </li>
-        <li class="item status status-processed status-accommodations">
-          <h4 class="title">Accommodations Request</h4>
-          <p class="details">Your requested accommodations have been reviewed and processed. You are allowed:</p>
-
-          <ul class="accommodations-list">
-            <li class="item">Extra Time - Double Time</li>
-            <li class="item">Separate Room & Reader/Recorder</li>
-            <li class="item">Equipment</li>
-          </ul>  
-        </li>
-        <li class="item status status-processed status-registration">
-          <h4 class="title">Registration Request</h4>
-          <p class="details">Your exam registration has been processed and has been forwarded to Pearson. You are now able to schedule an exam.</p>
-        </li>
-      </ol>
-    </div>
-
-    <!-- NOTE: Dem rejected, Accom none, Registration rejected --> 
-    <div class="message message-status registration-rejected is-shown">
-      <h3>Pearson Exam Registration Status</h3>
-
-      <ol class="status-list">
-        <li class="item status status-rejected status-demographics">
-          <h4 class="title">Demographic Information</h4>
-          <p class="details">The demographic information you most recently provided has been rejected by Pearson. You can correct and submit it again before the exam registration closes on <strong>${exam_info.registration_end_date_text}</strong>.</p>
-        </li>
-        <li class="item status status-rejected status-registration">
-          <h4 class="title">Registration Request</h4>
-          <p class="details">Your exam registration has been rejected by Pearson. <strong>You currently cannot schedule an exam</strong>.</p>
-        </li>
-      </ol>
-    </div>
 
    % endif
     
