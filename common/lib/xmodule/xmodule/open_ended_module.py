@@ -437,6 +437,7 @@ class OpenEndedModule(openendedchild.OpenEndedChild):
                 feedback_items.append(self._format_feedback(new_score_result))
             feedback="".join(feedback_items)
         else:
+            #This is for instructor and ML grading
             feedback = self._format_feedback(score_result)
         self.submission_id=score_result['submission_id']
         self.grader_id=score_result['grader_id']
