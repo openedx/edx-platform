@@ -458,5 +458,6 @@ class ContentStoreTest(TestCase):
         # should be a CapaDescriptor
         self.assertIsInstance(problem, CapaDescriptor, "New problem is not a CapaDescriptor")
         context = problem.get_context()
-        self.assertIn('markdown', context, "markdown is missing")
+        self.assertIn('markdown', context, "markdown is missing from context")
+        self.assertIn('markdown', problem.metadata, "markdown is missing from metadata")
         self.assertNotIn('markdown', problem.editable_metadata_fields, "Markdown slipped into the editable metadata fields")
