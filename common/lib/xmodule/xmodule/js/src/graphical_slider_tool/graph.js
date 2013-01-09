@@ -154,6 +154,11 @@ define('Graph', ['logme'], function (logme) {
                     newAsyObj.color = asyObj['@color'];
                 }
 
+                newAsyObj.label = false;
+                if (typeof asyObj['@label'] === 'string') {
+                    newAsyObj.label = asyObj['@label'];
+                }
+
                 paramNames.push(funcString);
 
                 try {
@@ -874,6 +879,16 @@ define('Graph', ['logme'], function (logme) {
                 dataSeries.push(seriesObj);
             }
 
+            for (c0 = 0; c0 < asymptotes.length; c0 += 1) {
+                if (typeof asymptotes[c0].label === 'string') {
+                    dataSeries.push({
+                        'data': [],
+                        'label': asymptotes[c0].label,
+                        'color': asymptotes[c0].color
+                    });
+                }
+            }
+
             return true;
         } // End-of: function generateData
 
@@ -882,41 +897,32 @@ define('Graph', ['logme'], function (logme) {
 
             paramValues = state.getAllParameterValues();
 
-            // Tell Flot to draw the graph to our specification. If this is the
-            // first time, then call $.plot.
-            if (plotObj === null) {
-                plotObj = $.plot(
-                    plotDiv,
-                    dataSeries,
-                    {
-                        'xaxis': xaxis,
-                        'yaxis': yaxis,
-                        'legend': {
+            // Tell Flot to draw the graph to our specification.
+            $.plot(
+                plotDiv,
+                dataSeries,
+                {
+                    'xaxis': xaxis,
+                    'yaxis': yaxis,
+                    'legend': {
 
-                            // To show the legend or not. Note, even if 'show' is
-                            // 'true', the legend will only show if labels are
-                            // provided for at least one of the series that are
-                            // going to be plotted.
-                            'show': true,
+                        // To show the legend or not. Note, even if 'show' is
+                        // 'true', the legend will only show if labels are
+                        // provided for at least one of the series that are
+                        // going to be plotted.
+                        'show': true,
 
-                            // A floating point number in the range [0, 1]. The
-                            // smaller the number, the more transparent will the
-                            // legend background become.
-                            'backgroundOpacity': 0
+                        // A floating point number in the range [0, 1]. The
+                        // smaller the number, the more transparent will the
+                        // legend background become.
+                        'backgroundOpacity': 0
 
-                        },
-                        'grid': {
-                            'markings': generateMarkings()
-                        }
+                    },
+                    'grid': {
+                        'markings': generateMarkings()
                     }
-                );
-            }
-            // Otherwise, use stored plot object.
-            else {
-                plotObj.setData(dataSeries);
-                plotObj.setupGrid();
-                plotObj.draw();
-            }
+                }
+            );
 
             // The first time that the graph gets added to the page, the legend
             // is created from scratch. When it appears, MathJax works some
