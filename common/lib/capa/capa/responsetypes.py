@@ -629,7 +629,7 @@ class MultipleChoiceResponse(LoncapaResponse):
         # define correct choices (after calling secondary setup)
         xml = self.xml
         cxml = xml.xpath('//*[@id=$id]//choice[@correct="true"]', id=xml.get('id'))
-        self.correct_choices = [choice.get('name') for choice in cxml]
+        self.correct_choices = [contextualize_text(choice.get('name'), self.context) for choice in cxml]
 
     def mc_setup_response(self):
         '''
@@ -723,7 +723,7 @@ class OptionResponse(LoncapaResponse):
         return cmap
 
     def get_answers(self):
-        amap = dict([(af.get('id'), af.get('correct')) for af in self.answer_fields])
+        amap = dict([(af.get('id'), contextualize_text(af.get('correct'), self.context)) for af in self.answer_fields])
         # log.debug('%s: expected answers=%s' % (unicode(self),amap))
         return amap
 
