@@ -866,7 +866,8 @@ class DragAndDropInput(InputTypeBase):
                                                 self.xml.iterchildren('target')]
 
         # custom background color for labels:
-        label_bg_color = Attribute('label_bg_color').parse_from_xml(self.xml)
+        label_bg_color = Attribute('label_bg_color',
+                                   default=None).parse_from_xml(self.xml)
         if label_bg_color:
             to_js['label_bg_color'] = label_bg_color
 
