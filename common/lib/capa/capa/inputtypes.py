@@ -857,7 +857,7 @@ class EditAMoleculeInput(InputTypeBase):
         """
         """
         context = {
-            'applet_loader': '/static/js/capa/edit-a-molecule.js',
+            'applet_loader': '/static/js/capa/editamolecule.js',
         }
 
         return context

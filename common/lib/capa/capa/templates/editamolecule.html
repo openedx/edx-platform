@@ -13,11 +13,12 @@
     % endif
 
     <object type="application/x-java-applet" id="applet_${id}" class="applet" height="400" width="500">
-      <param name="archive" value="/static/applets/capa/edit-a-molecule.jar" />
+      <param name="archive" value="/static/applets/capa/editamolecule/JME.jar" />
       <param name="code" value="JME.class" />
       <param name="file" value="${file}" />
       Applet failed to run.  No Java plug-in was found.
     </object>
+
 
     <input type="hidden" name="input_${id}" id="input_${id}" value="${value|h}"/>
 
