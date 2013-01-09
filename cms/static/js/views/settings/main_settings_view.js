@@ -388,6 +388,9 @@ CMS.Views.Settings.Grading = CMS.Views.ValidatingView.extend({
 		var graceEle = this.$el.find('#course-grading-graceperiod');
 		graceEle.timepicker({'timeFormat' : 'H:i'}); // init doesn't take setTime
 		if (this.model.has('grace_period')) graceEle.timepicker('setTime', this.model.gracePeriodToDate());
+		// remove any existing listeners to keep them from piling on b/c render gets called frequently
+		graceEle.off('change', this.setGracePeriod);
+		graceEle.on('change', this, this.setGracePeriod);
 		
 		return this;
 	},
@@ -398,14 +401,16 @@ CMS.Views.Settings.Grading = CMS.Views.ValidatingView.extend({
 	fieldToSelectorMap : {
 		'grace_period' : 'course-grading-graceperiod'
 	},
+	setGracePeriod : function(event) {
+		event.data.clearValidationErrors();
+		var newVal = event.data.model.dateToGracePeriod($(event.currentTarget).timepicker('getTime'));
+		if (event.data.model.get('grace_period') != newVal) event.data.model.save('grace_period', newVal);
+	},
 	updateModel : function(event) {
 		if (!this.selectorToField[event.currentTarget.id]) return;
 
 		switch (this.selectorToField[event.currentTarget.id]) {
-		case 'grace_period':
-			this.clearValidationErrors();
-			var newVal = this.model.dateToGracePeriod($(event.currentTarget).timepicker('getTime'));
-			if (this.model.get('grace_period') != newVal) this.model.save('grace_period', newVal);
+		case 'grace_period': // handled above
 			break;
 
 		default:
