@@ -427,7 +427,7 @@ class OpenEndedModule(openendedchild.OpenEndedChild):
                 error_message=("External grader message is missing required tag: {0}"
                 .format(tag))
                 log.error(error_message)
-                fail['feedback']=error _message
+                fail['feedback']=error_message
                 return fail
         #This is to support peer grading
         if isinstance(score_result['score'], list):
