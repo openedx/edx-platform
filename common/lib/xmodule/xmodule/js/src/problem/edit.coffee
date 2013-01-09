@@ -7,16 +7,6 @@ class @MarkdownEditingDescriptor extends XModule.Descriptor
 
   constructor: (element) ->
     @element = element
-    @element.on('click', '.xml-tab', @showXMLEditor)
-    @element.on('click', '.format-buttons a', @onToolbarButton);
-    @element.on('click', '.cheatsheet-toggle', @toggleCheatsheet);
-
-    @xml_editor = CodeMirror.fromTextArea($(".xml-box", element)[0], {
-    mode: "xml"
-    lineNumbers: true
-    lineWrapping: true
-    })
-    @current_editor = @xml_editor
 
     if $(".markdown-box", @element).length != 0
       @markdown_editor = CodeMirror.fromTextArea($(".markdown-box", element)[0], {
@@ -24,36 +14,51 @@ class @MarkdownEditingDescriptor extends XModule.Descriptor
       mode: null
       })
       @setCurrentEditor(@markdown_editor)
+      # Add listeners for toolbar buttons (only present for markdown editor)
+      @element.on('click', '.xml-tab', @onShowXMLButton)
+      @element.on('click', '.format-buttons a', @onToolbarButton)
+      @element.on('click', '.cheatsheet-toggle', @toggleCheatsheet)
+      # Hide the XML text area
+      $(@element.find('.xml-box')).hide()
     else
-      @hideMarkdownElements()
+      @createXMLEditor()
 
   ###
-  Hides the toolbar buttons, as they only apply to the markdown editor.
+  Creates the XML Editor and sets it as the current editor. If text is passed in,
+  it will replace the text present in the HTML template.
+
+  text: optional argument to override the text passed in via the HTML template
   ###
-  hideMarkdownElements: () ->
-    $(@element.find('.editor-bar')).hide()
-    $(@element.find('.editor-tabs')).hide()
+  createXMLEditor: (text) ->
+    @xml_editor = CodeMirror.fromTextArea($(".xml-box", @element)[0], {
+    mode: "xml"
+    lineNumbers: true
+    lineWrapping: true
+    })
+    if text
+      @xml_editor.setValue(text)
+    @setCurrentEditor(@xml_editor)
 
   ###
   User has clicked to show the XML editor. Before XML editor is swapped in,
   the user will need to confirm the one-way conversion.
   ###
-  showXMLEditor: (e) =>
+  onShowXMLButton: (e) =>
     e.preventDefault();
     if @confirmConversionToXml()
-      @xml_editor.setValue(MarkdownEditingDescriptor.markdownToXml(@markdown_editor.getValue()))
-      @setCurrentEditor(@xml_editor)
-      # Need this to get line numbers to display properly (and put caret position to 0)
+      @createXMLEditor(MarkdownEditingDescriptor.markdownToXml(@markdown_editor.getValue()))
+      # Need to refresh to get line numbers to display properly (and put cursor position to 0)
       @xml_editor.setCursor(0)
       @xml_editor.refresh()
-      @hideMarkdownElements()
+      # Hide markdown-specific toolbar buttons
+      $(@element.find('.editor-bar')).hide()
 
   ###
   Have the user confirm the one-way conversion to XML.
   Returns true if the user clicked OK, else false.
   ###
   confirmConversionToXml: ->
-#   TODO: use something besides a JavaScript confirm dialog?
+    # TODO: use something besides a JavaScript confirm dialog?
     return confirm("If you convert to the XML source representation, you cannot go back to using markdown.\n\nProceed with conversion to XML?")
 
   ###
@@ -90,7 +95,8 @@ class @MarkdownEditingDescriptor extends XModule.Descriptor
   Stores the current editor and hides the one that is not displayed.
   ###
   setCurrentEditor: (editor) ->
-    $(@current_editor.getWrapperElement()).hide()
+    if @current_editor
+      $(@current_editor.getWrapperElement()).hide()
     @current_editor = editor
     $(@current_editor.getWrapperElement()).show()
     $(@current_editor).focus();
