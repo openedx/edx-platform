@@ -991,7 +991,7 @@ def course_info_updates(request, org, course, provided_id=None):
     elif request.method == 'POST':
         try:
             return HttpResponse(json.dumps(update_course_updates(location, request.POST, provided_id)), mimetype="application/json")
-        except etree.XMLSyntaxError:
+        except:
             return HttpResponseBadRequest("Failed to save: malformed html", content_type="text/plain")
 
 
