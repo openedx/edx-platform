@@ -224,6 +224,7 @@ class CombinedOpenEndedModule(XModule):
                 current_task_state=self.overwrite_state(current_task_state)
             self.current_task=children['modules'][current_task_type](self.system, self.location, self.current_task_parsed_xml, self.current_task_descriptor, self.static_data, instance_state=current_task_state)
 
+        log.debug(current_task_state)
         return True
 
     def check_allow_reset(self):

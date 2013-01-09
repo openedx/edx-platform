@@ -405,23 +405,29 @@ class OpenEndedModule(openendedchild.OpenEndedChild):
             correct:         Correctness of submission (Boolean)
             score:           Points to be assigned (numeric, can be float)
         """
-        fail = {'valid' : False, 'correct' : False, 'points' : 0, 'msg' : ''}
+        fail = {'valid' : False, 'score' : 0, 'feedback' : ''}
         try:
             score_result = json.loads(score_msg)
         except (TypeError, ValueError):
-            log.error("External grader message should be a JSON-serialized dict."
-                      " Received score_msg = {0}".format(score_msg))
+            error_message=("External grader message should be a JSON-serialized dict."
+            " Received score_msg = {0}".format(score_msg))
+            log.error(error_message)
+            fail['feedback']=error_message
             return fail
 
         if not isinstance(score_result, dict):
-            log.error("External grader message should be a JSON-serialized dict."
-                      " Received score_result = {0}".format(score_result))
+            error_message=("External grader message should be a JSON-serialized dict."
+            " Received score_result = {0}".format(score_result))
+            log.error(error_message)
+            fail['feedback']=error_message
             return fail
 
         for tag in ['score', 'feedback', 'grader_type', 'success', 'grader_id', 'submission_id']:
             if tag not in score_result:
-                log.error("External grader message is missing required tag: {0}"
+                error_message=("External grader message is missing required tag: {0}"
                 .format(tag))
+                log.error(error_message)
+                fail['feedback']=error _message
                 return fail
         #This is to support peer grading
         if isinstance(score_result['score'], list):
