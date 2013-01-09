@@ -422,8 +422,22 @@ class OpenEndedModule(openendedchild.OpenEndedChild):
                 log.error("External grader message is missing required tag: {0}"
                 .format(tag))
                 return fail
-
-        feedback = self._format_feedback(score_result)
+        #This is to support peer grading
+        if isinstance(score_result['score'], list):
+            feedback_items=[]
+            for i in xrange(0,len(score_result['score'])):
+                new_score_result={
+                    'score' : score_result['score'][i],
+                    'feedback' : score_result['feedback'][i],
+                    'grader_type' : score_result['grader_type'],
+                    'success' : score_result['success'],
+                    'grader_id' : score_result['grader_id'][i],
+                    'submission_id' : score_result['submission_id']
+                    }
+                feedback_items.append(self._format_feedback(new_score_result))
+            feedback="".join(feedback_items)
+        else:
+            feedback = self._format_feedback(score_result)
         self.submission_id=score_result['submission_id']
         self.grader_id=score_result['grader_id']
 
