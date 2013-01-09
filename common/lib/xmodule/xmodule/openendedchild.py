@@ -72,7 +72,6 @@ class OpenEndedChild():
 
     def __init__(self, system, location, definition, descriptor, static_data,
                  instance_state=None, shared_state=None, **kwargs):
-
         # Load instance state
         if instance_state is not None:
             instance_state = json.loads(instance_state)
@@ -102,6 +101,14 @@ class OpenEndedChild():
         self.setup_response(system, location, definition, descriptor)
 
     def setup_response(self, system, location, definition, descriptor):
+        """
+        Needs to be implemented by the inheritors of this module.  Sets up additional fields used by the child modules.
+        @param system: Modulesystem
+        @param location: Module location
+        @param definition: XML definition
+        @param descriptor: Descriptor of the module
+        @return: None
+        """
         pass
 
     def latest_answer(self):
@@ -123,6 +130,11 @@ class OpenEndedChild():
         return self.history[-1].get('post_assessment', "")
 
     def new_history_entry(self, answer):
+        """
+        Adds a new entry to the history dictionary
+        @param answer: The student supplied answer
+        @return: None
+        """
         self.history.append({'answer': answer})
 
     def record_latest_score(self, score):
@@ -213,12 +225,25 @@ class OpenEndedChild():
                 'error': 'The problem state got out-of-sync'}
 
     def get_html(self):
+        """
+         Needs to be implemented by inheritors.  Renders the HTML that students see.
+        @return:
+        """
         pass
 
     def handle_ajax(self):
+        """
+        Needs to be implemented by child modules.  Handles AJAX events.
+        @return:
+        """
         pass
 
     def is_submission_correct(self, score):
+        """
+        Checks to see if a given score makes the answer correct.  Very naive right now (>66% is correct)
+        @param score: Numeric score.
+        @return: Boolean correct.
+        """
         correct=False
         if(isinstance(score,(int, long, float, complex))):
             score_ratio = int(score) / float(self.max_score())
@@ -226,6 +251,10 @@ class OpenEndedChild():
         return correct
 
     def is_last_response_correct(self):
+        """
+        Checks to see if the last response in the module is correct.
+        @return: 'correct' if correct, otherwise 'incorrect'
+        """
         score=self.get_score()['score']
         correctness = 'correct' if self.is_submission_correct(score) else 'incorrect'
         return correctness
