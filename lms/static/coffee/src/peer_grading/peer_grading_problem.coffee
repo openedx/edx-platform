@@ -129,7 +129,7 @@ class PeerGradingProblem
     @interstitial_page_button = $('.interstitial-page-button')
 
     Collapsible.setCollapsibles(@content_panel)
-    @action_button.click -> document.location.reload(true)
+    @action_button.click -> history.back()
     @calibration_feedback_button.click => 
       @calibration_feedback_panel.hide()
       @grading_wrapper.show()
