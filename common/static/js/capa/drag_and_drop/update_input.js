@@ -199,6 +199,10 @@ define(['logme'], function (logme) {
                                 draggable.setOnTarget(target);
                                 target.draggable.push(draggableId);
 
+                                if (target.numTextEl !== null) {
+                                    target.updateNumTextEl();
+                                }
+
                                 state.numDraggablesInSlider -= 1;
                                 state.updateArrowOpacity();
                             }
