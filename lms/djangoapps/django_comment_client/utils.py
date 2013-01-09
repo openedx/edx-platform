@@ -127,6 +127,7 @@ def sort_map_entries(category_map):
         sort_map_entries(category_map["subcategories"][title])
     category_map["children"] = [x[0] for x in sorted(things, key=lambda x: x[1]["sort_key"])]
 
+
 def initialize_discussion_info(course):
 
     global _DISCUSSIONINFO
@@ -134,32 +135,34 @@ def initialize_discussion_info(course):
         return
 
     course_id = course.id
-    all_modules = get_full_modules()[course_id]
 
     discussion_id_map = {}
-
     unexpanded_category_map = defaultdict(list)
 
-    for location, module in all_modules.items():
-        if location.category == 'discussion':
-            skip_module = False
-            for key in ('id', 'discussion_category', 'for'):
-                if key not in module.metadata:
-                    log.warning("Required key '%s' not in discussion %s, leaving out of category map" % (key, module.location))
-                    skip_module = True
+    #all_modules = get_full_modules()[course_id]
 
-            if skip_module:
-                continue
+    all_modules = modulestore().get_items(['i4x', course.location.org, course.location.course, 'discussion', None], course_id=course_id)
 
-            id = module.metadata['id']
-            category = module.metadata['discussion_category']
-            title = module.metadata['for']
-            sort_key = module.metadata.get('sort_key', title)
-            category = " / ".join([x.strip() for x in category.split("/")])
-            last_category = category.split("/")[-1]
-            discussion_id_map[id] = {"location": location, "title": last_category + " / " + title}
-            unexpanded_category_map[category].append({"title": title, "id": id,
-                "sort_key": sort_key, "start_date": module.start})
+    for module in all_modules:
+        logging.debug('{0}'.format(module.location))
+        skip_module = False
+        for key in ('id', 'discussion_category', 'for'):
+            if key not in module.metadata:
+                log.warning("Required key '%s' not in discussion %s, leaving out of category map" % (key, module.location))
+                skip_module = True
+
+        if skip_module:
+            continue
+
+        id = module.metadata['id']
+        category = module.metadata['discussion_category']
+        title = module.metadata['for']
+        sort_key = module.metadata.get('sort_key', title)
+        category = " / ".join([x.strip() for x in category.split("/")])
+        last_category = category.split("/")[-1]
+        discussion_id_map[id] = {"location": module.location, "title": last_category + " / " + title}
+        unexpanded_category_map[category].append({"title": title, "id": id,
+            "sort_key": sort_key, "start_date": module.start})
 
     category_map = {"entries": defaultdict(dict), "subcategories": defaultdict(dict)}
     for category_path, entries in unexpanded_category_map.items():
