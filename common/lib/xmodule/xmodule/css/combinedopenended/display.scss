@@ -21,6 +21,7 @@ h2 {
 }
 
 section.combined-open-ended {
+  @include clearfix;
   .status-container
   {
       float:right;
@@ -40,14 +41,6 @@ section.combined-open-ended {
       position:relative;
   }
 
-  &:after
-  {
-      content:".";
-      display:block;
-      height:0;
-      visibility: hidden;
-      clear:both;
-  }
 }
 
 section.combined-open-ended-status {
