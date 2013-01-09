@@ -391,7 +391,7 @@ class OpenEndedModule(openendedchild.OpenEndedChild):
         return feedback_template
 
 
-    def _parse_score_msg(self, score_msg):
+    def _parse_score_msg(self, score_msg, join_feedback=True):
         """
          Grader reply is a JSON-dump of the following dict
            { 'correct': True/False,
@@ -442,7 +442,10 @@ class OpenEndedModule(openendedchild.OpenEndedChild):
                     'submission_id' : score_result['submission_id']
                     }
                 feedback_items.append(self._format_feedback(new_score_result))
-            feedback="".join(feedback_items)
+            if join_feedback:
+                feedback="".join(feedback_items)
+            else:
+                feedback=feedback_items
             score = int(median(score_result['score']))
         else:
             #This is for instructor and ML grading
@@ -454,7 +457,7 @@ class OpenEndedModule(openendedchild.OpenEndedChild):
 
         return {'valid' : True, 'score' : score, 'feedback' : feedback}
 
-    def latest_post_assessment(self, short_feedback=False):
+    def latest_post_assessment(self, short_feedback=False, join_feedback=True):
         """
         Gets the latest feedback, parses, and returns
         @param short_feedback: If the long feedback is wanted or not
@@ -463,7 +466,7 @@ class OpenEndedModule(openendedchild.OpenEndedChild):
         if not self.history:
             return ""
 
-        feedback_dict = self._parse_score_msg(self.history[-1].get('post_assessment', ""))
+        feedback_dict = self._parse_score_msg(self.history[-1].get('post_assessment', ""), join_feedback=join_feedback)
         if not short_feedback:
             return feedback_dict['feedback'] if feedback_dict['valid'] else ''
         if feedback_dict['valid']:
