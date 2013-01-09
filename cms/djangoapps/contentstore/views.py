@@ -973,6 +973,11 @@ def course_info_updates(request, org, course, provided_id=None):
     # ??? No way to check for access permission afaik
     # get current updates
     location = ['i4x', org, course, 'course_info', "updates"]
+    
+    # Hmmm, provided_id is coming as empty string on create whereas I believe it used to be None :-(
+    # Possibly due to my removing the seemingly redundant pattern in urls.py
+    if provided_id == '':
+        provided_id = None
 
     # check that logged in user has permissions to this item
     if not has_access(request.user, location):
