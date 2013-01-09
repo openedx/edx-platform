@@ -9,19 +9,26 @@
     function waitForApplet(applet) {
         if (applet.isActive && applet.isActive()) {
             console.log("Applet is ready.");
-            var answerStr = applet.checkAnswer();
-            console.log(answerStr);
-            var input = $('.designprotein2dinput input');
-            console.log(input);
-            input.val(answerStr);
-        } else if (timeout > 30 * 1000) {
-            console.error("Applet did not load on time.");
+
+            // FIXME: [rocha] This is a hack to capture the click on the check
+            // button and update the hidden field with the applet values
+            var input_field = $('.designprotein2dinput input');
+
+            var problem = $(applet).parents('.problem');
+            var check_button = problem.find('input.check');
+            check_button.on('click', function() {
+                var answerStr = applet.checkAnswer();
+                console.log(answerStr);
+                input_field.val(answerStr);
+            });
+
         } else {
             console.log("Waiting for applet...");
             setTimeout(function() { waitForApplet(applet); }, timeout);
         }
     }
-    
+
     var applets = $('.designprotein2dinput object');
     applets.each(function(i, el) { initializeApplet(el); });
+
 }).call(this);
