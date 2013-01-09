@@ -287,13 +287,7 @@ class TestCenterUserForm(ModelForm):
         
     def clean_country(self):
         return self.check_country_code('country')
-        
-    def clean_phone_country_code(self):
-        return self.check_country_code('phone_country_code')
-
-    def clean_fax_country_code(self):
-        return self.check_country_code('fax_country_code')
-        
+                
     def clean(self):
         cleaned_data = super(TestCenterUserForm, self).clean()
         
@@ -317,7 +311,7 @@ class TestCenterUserForm(ModelForm):
         cleaned_data_fields = [fieldname for fieldname in cleaned_data]
         for fieldname in cleaned_data_fields:
             if not TestCenterUserForm.can_encode_as_latin(cleaned_data[fieldname]):
-                self._errors[fieldname] = self.error_class([u'Must only use characters in Latin-1 encoding'])                
+                self._errors[fieldname] = self.error_class([u'Must only use characters in Latin-1 (iso-8859-1) encoding'])                
                 del cleaned_data[fieldname]
 
         # Always return the full collection of cleaned data.
