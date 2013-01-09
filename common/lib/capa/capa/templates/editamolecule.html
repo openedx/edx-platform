@@ -15,7 +15,7 @@
     <object type="application/x-java-applet" id="applet_${id}" class="applet" height="400" width="500">
       <param name="archive" value="/static/applets/capa/editamolecule/JME.jar" />
       <param name="code" value="JME.class" />
-      <param name="file" value="${file}" />
+      <param name="molfile" value="${file}" />
       Applet failed to run.  No Java plug-in was found.
     </object>
 
@@ -34,8 +34,11 @@
       % endif
     </p>
 
+    <br/>
+    <button id="reset_${id}" class="reset">Reset</button>
+
     <p id="answer_${id}" class="answer"></p>
   % if status in ['unsubmitted', 'correct', 'incorrect', 'incomplete']:
   </div>
-% endif
+  % endif
 </section>

@@ -1,32 +1,81 @@
 (function () {
-    var timeout = 1000;
+    var timeout = 100;
 
-    function initializeApplet(applet) {
-        console.log("Initializing " + applet);
-        waitForApplet(applet);
+    var applets = $('.editamoleculeinput object');
+    var input_field = $('.editamoleculeinput input');
+    var reset_button = $('.editamoleculeinput button.reset');
+
+    console.log('EDIT A MOLECULE');
+
+    waitForJSMolCalc();
+
+    // FIXME: [rocha] jsmolcalc and jsmol.API should be initialized
+    // automatically by the GWT script loader. However, it is not
+    // working correcly when including them inside the
+    // courseware.
+    function waitForJSMolCalc() {
+        if (typeof(jsmolcalc) != "undefined" && jsmolcalc)
+        {
+            // FIXME: [rocha] this should be called automatically by
+            // GWT at the end of the loader. However it is not.
+            jsmolcalc.onInjectionDone('jsmolcalc');
+        }
+
+        if (typeof(jsmol) != "undefined") {
+            // ready, initialize applets,
+            applets.each(function(i, el) { initializeApplet(el); });
+        } else if (timeout > 30 * 1000) {
+            console.error("JSMolCalc did not load on time.");
+        } else {
+            console.log("Waiting for JSMolCalc...");
+            setTimeout(function() {
+                waitForJSMolCalc(); }, timeout);
+        }
     }
 
-    function waitForApplet(applet) {
+    function initializeApplet(applet) {
+        console.log("Initializing applet..." );
+        waitForApplet(applet, configureApplet);
+    }
+
+    function waitForApplet(applet, callback) {
         if (applet.isActive && applet.isActive()) {
             console.log("Applet is ready.");
-            requestAppletData(applet);
+            callback(applet);
         } else if (timeout > 30 * 1000) {
             console.error("Applet did not load on time.");
         } else {
             console.log("Waiting for applet...");
-            setTimeout(function() { waitForApplet(applet); }, timeout);
+            setTimeout(function() {
+                waitForApplet(applet, callback); }, timeout);
         }
     }
 
+    function configureApplet(applet) {
+        var value = input_field.val();
+
+        if (value) {
+            console.log('Loading previous mol data...');
+            var data = JSON.parse(value)["mol"];
+            loadAppletData(applet, data);
+        } else {
+            requestAppletData(applet);
+        }
+
+        reset_button.on('click', function() { requestAppletData(applet); });
+
+        // FIXME: [rocha] This is a hack to capture the click on the check
+        // button and update the hidden field with the applet values
+        var check_button = $(applet).parents('.problem').find('input.check');
+        check_button.on('click', function() { updateInput(applet); });
+    }
+
     function requestAppletData(applet) {
-        var file = $(applet).find('param[name=file]').attr('value');
+        var molFile = $(applet).find('param[name=molfile]').attr('value');
 
-        console.log("Getting file url...");
-        console.log(file);
-
-        console.log("Loading mol data...");
+        console.log("Loading mol data from " + molFile + " ...");
         jQuery.ajax({
-            url: file,
+            url: molFile,
             dataType: "text",
             success: function(data) {
                 console.log("Done.");
@@ -40,13 +89,7 @@
 
     function loadAppletData(applet, data) {
         applet.readMolFile(data);
-        updateAppletInfo(applet);
-    }
-
-    function updateAppletInfo(applet) {
-        var info = getAppletInfo(applet);
-        console.log(info.toString());
-        return info;
+        updateInput(applet);
     }
 
     function getAppletInfo(applet) {
@@ -57,22 +100,31 @@
         return jsmol.API.getInfo(mol, smiles, jme);
     }
 
-    console.log('EDIT A MOLECULE');
+    function updateInput(applet) {
+        var mol = applet.molFile();
+        var smiles = applet.smiles();
+        var jme = applet.jmeFile();
 
-    // FIXME: [rocha] This should be called automatically by the GWT
-    // script loader, but for some reason it is not.
-    jsmolcalc.onInjectionDone('jsmolcalc');
+        var info = formatInfo(jsmol.API.getInfo(mol, smiles, jme).toString());
+        var value = { mol: mol, info: info };
 
-    // FIXME: [rocha] This is a hack to capture the click on the check
-    // button and update the hidden field with the applet values
-    var check = $('.editamoleculeinput').parents('.problem').find('input.check');
-    check.on('click', function() {console.log("CLICK");});
+        console.log("Molecule info:");
+        console.log(info);
 
-    // TODO: [rocha] add function to update hidden field
-    // TODO: [rocha] load state from hidden field if available
+        input_field.val(JSON.stringify(value));
 
-    // initialize applet
-    var applets = $('.editamoleculeinput object');
-    applets.each(function(i, el) { initializeApplet(el); });
+        return value;
+    }
+
+    function formatInfo(info) {
+        var results = [];
+        // create a te
+        var fragment = $('<div>').append(info);
+        fragment.find('font').each(function () {
+            results.push($(this).html());
+        });
+
+        return results;
+    }
 
 }).call(this);
