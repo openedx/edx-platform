@@ -441,7 +441,7 @@ class ContentStoreTest(TestCase):
 
 
     def test_capa_module(self):
-        """Test that a problem w/ markdown has markdown and uses the right html etc"""
+        """Test that a problem treats markdown specially."""
         CourseFactory.create(org='MITx', course='999', display_name='Robot Super Course')
 
         problem_data = {
