@@ -422,7 +422,8 @@ class formula(object):
 
     def GetContentMathML(self, asciimath, mathml):
         # URL = 'http://192.168.1.2:8080/snuggletex-webapp-1.2.2/ASCIIMathMLUpConversionDemo'
-        URL = 'http://127.0.0.1:8080/snuggletex-webapp-1.2.2/ASCIIMathMLUpConversionDemo'
+        # URL = 'http://127.0.0.1:8080/snuggletex-webapp-1.2.2/ASCIIMathMLUpConversionDemo'
+        URL = 'https://math-xserver.mitx.mit.edu/snuggletex-webapp-1.2.2/ASCIIMathMLUpConversionDemo'
 
         if 1:
             payload = {'asciiMathInput': asciimath,
@@ -430,7 +431,7 @@ class formula(object):
                        #'asciiMathML':unicode(mathml).encode('utf-8'),
                        }
             headers = {'User-Agent': "Mozilla/5.0 (Windows; U; Windows NT 5.1; en-US; rv:1.8.1.13) Gecko/20080311 Firefox/2.0.0.13"}
-            r = requests.post(URL, data=payload, headers=headers)
+            r = requests.post(URL, data=payload, headers=headers, verify=False)
             r.encoding = 'utf-8'
             ret = r.text
             #print "encoding: ",r.encoding
