@@ -1,6 +1,7 @@
 <%include file="metadata-edit.html" />
 <section class="problem-editor editor">
     <div class="row">
+        %if markdown != '' or data == '<problem>\n</problem>\n':
         <div class="editor-bar">
             <ul class="format-buttons">
                 <li><a href="#" class="multiple-choice-button" data-tooltip="Multiple Choice"><span
@@ -19,7 +20,6 @@
                 <li><a href="#" class="cheatsheet-toggle" data-tooltip="Toggle Cheatsheet">?</a></li>
             </ul>
         </div>
-        %if markdown != '' or data == '<problem>\n</problem>\n':
         <textarea class="markdown-box">${markdown}</textarea>
         %endif
         <textarea class="xml-box" rows="8" cols="40">${data | h}</textarea>
