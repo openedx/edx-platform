@@ -358,6 +358,12 @@ class ModuleStore(object):
         '''
         raise NotImplementedError
 
+    def get_course(self, course_id):
+        '''
+        Look for a specific course id.  Returns the course descriptor, or None if not found.
+        '''
+        raise NotImplementedError
+
     def get_parent_locations(self, location):
         '''Find all locations that are the parents of this location.  Needed
         for path_to_location().

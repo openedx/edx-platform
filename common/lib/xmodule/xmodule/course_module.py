@@ -97,7 +97,6 @@ class CourseDescriptor(SequenceDescriptor):
         # NOTE (THK): This is a last-minute addition for Fall 2012 launch to dynamically
         #   disable the syllabus content for courses that do not provide a syllabus
         self.syllabus_present = self.system.resources_fs.exists(path('syllabus'))
-
         self.set_grading_policy(self.definition['data'].get('grading_policy', None))
 
     def defaut_grading_policy(self):
@@ -210,7 +209,7 @@ class CourseDescriptor(SequenceDescriptor):
         instance.set_grading_policy(policy)
 
         return instance
-    
+
 
     @classmethod
     def definition_from_xml(cls, xml_object, system):
