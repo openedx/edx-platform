@@ -499,6 +499,10 @@ class TestCenterRegistration(models.Model):
     def get_accommodation_names(self):
         return [ ACCOMMODATION_CODE_DICT.get(code, "Unknown code " + code) for code in self.get_accommodation_codes() ]         
 
+    @property
+    def registration_signup_url(self):
+        return settings.PEARSONVUE_SIGNINPAGE_URL
+    
 class TestCenterRegistrationForm(ModelForm):
     class Meta:
         model = TestCenterRegistration

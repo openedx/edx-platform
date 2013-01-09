@@ -328,6 +328,9 @@ STAFF_GRADING_INTERFACE = None
 # Used for testing, debugging
 MOCK_STAFF_GRADING = False
 
+################################# Pearson TestCenter config  ################
+
+PEARSONVUE_SIGNINPAGE_URL = "https://www1.pearsonvue.com/testtaker/signin/SignInPage/EDX"
 
 ################################# Jasmine ###################################
 JASMINE_TEST_DIRECTORY = PROJECT_ROOT + '/static/coffee'

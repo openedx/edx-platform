@@ -46,7 +46,7 @@
         $(".submission-error").addClass("is-shown");
         for (fieldname in field_errors) {
           // to inform a user of what field the error occurred on, add a class of .error to the .field element.
-          // for convenience, use the "data-field" attribute to identify the one matching the errant field's name.
+          // for convenience, use the "id" attribute to identify the one matching the errant field's name.
           var field_id = "field-" + fieldname;
           var field_label = $("[id='"+field_id+"'] label").text();
 
@@ -117,7 +117,7 @@
   <section class="status message message-flash registration-processed message-action">
     <h3 class="message-title">Your registration for the Pearson exam has been processed</h3>
     <p class="message-copy">Your registration number is <strong>${registration.client_authorization_id}</strong> (Write this down! You’ll need it to schedule your exam.)</p>
-    <a href="https://www1.pearsonvue.com/testtaker/signin/SignInPage/EDX" class="button exam-button">Schedule Pearson exam</a>
+    <a href="${registration.registration_signup_url}" class="button exam-button">Schedule Pearson exam</a>
   </section>
    % endif
 
@@ -138,7 +138,7 @@
       
       % if registration:
       <p class="instructions">
-        Please complete the following form to update your demographic information used in your Pearson VUE Proctored Exam. Required fields are noted by <strong class="indicator">bold text and an asterisk (*)</strong>. 
+        Please use the following form if you need to update your demographic information used in your Pearson VUE Proctored Exam. Required fields are noted by <strong class="indicator">bold text and an asterisk (*)</strong>. 
       </p>
       % else: 
       <p class="instructions">
@@ -264,7 +264,9 @@
       % endif
 
         % if registration:
+          % if registration.accommodation_request and len(registration.accommodation_request) > 0:
         <p class="note"><span class="title">Note</span>: Accomodation requests, which need to be reviewed in detail, <strong>will add significant delay to the registration process</strong>.</p>
+          % endif
         % else: 
         <p class="note"><span class="title">Note</span>: Accommodation requests are not part of your demographic information, <strong>and cannot be changed once submitted</strong>. Accomodation requests, which need to be reviewed in detail, <strong>will add significant delay to the registration process</strong>.</p>
         % endif
@@ -275,13 +277,13 @@
           <ol class="list-input">
             % if registration:
               % if registration.accommodation_request and len(registration.accommodation_request) > 0:
-            <li data-field="accommodation_request" class="field submitted" id="field-accommodation_request">
+            <li class="field submitted" id="field-accommodation_request">
               <label for="accommodation_request">Accommodations Requested</label>
               <p class="value" id="accommodations">${registration.accommodation_request}</p>
             </li>
               % endif
             % else: 
-            <li data-field="accommodation_request" class="field" id="field-accommodation_request">
+            <li class="field" id="field-accommodation_request">
               <label for="accommodation_request">Accommodations Requested</label>
               <textarea class="long" id="accommodation_request" name="accommodation_request" value="" placeholder=""></textarea>             
             </li>
