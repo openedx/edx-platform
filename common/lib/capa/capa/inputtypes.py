@@ -865,6 +865,11 @@ class DragAndDropInput(InputTypeBase):
         to_js['targets'] = [parse(target, 'target') for target in
                                                 self.xml.iterchildren('target')]
 
+        # custom background color for labels:
+        label_bg_color = Attribute('label_bg_color').parse_from_xml(self.xml)
+        if label_bg_color:
+            to_js['label_bg_color'] = label_bg_color
+
         self.loaded_attributes['drag_and_drop_json'] = json.dumps(to_js)
         self.to_render.add('drag_and_drop_json')
 
