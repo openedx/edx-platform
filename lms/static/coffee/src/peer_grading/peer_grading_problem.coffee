@@ -330,6 +330,7 @@ class PeerGradingProblem
       @calibration_feedback_panel.hide()
       @error_container.html(error_message)
       @content_panel.hide()
+      @action_button.show()
 
   show_submit_button: () =>
     @submit_button.show()
