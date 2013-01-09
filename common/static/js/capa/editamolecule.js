@@ -1,12 +1,6 @@
 (function () {
     var timeout = 100;
 
-    var applets = $('.editamoleculeinput object');
-    var input_field = $('.editamoleculeinput input');
-    var reset_button = $('.editamoleculeinput button.reset');
-
-    console.log('EDIT A MOLECULE');
-
     waitForJSMolCalc();
 
     // FIXME: [rocha] jsmolcalc and jsmol.API should be initialized
@@ -22,64 +16,80 @@
         }
 
         if (typeof(jsmol) != "undefined") {
-            // ready, initialize applets,
-            applets.each(function(i, el) { initializeApplet(el); });
-        } else if (timeout > 30 * 1000) {
-            console.error("JSMolCalc did not load on time.");
+            // ready, initialize applets
+            initializeApplets();
         } else {
-            console.log("Waiting for JSMolCalc...");
-            setTimeout(function() {
-                waitForJSMolCalc(); }, timeout);
+            setTimeout(function() { waitForJSMolCalc(); }, timeout);
         }
     }
 
-    function initializeApplet(applet) {
-        console.log("Initializing applet..." );
-        waitForApplet(applet, configureApplet);
+    function initializeApplets() {
+        var applets = $('.editamoleculeinput object');
+        applets.each(function(i, element) {
+            var applet = $(element);
+            if (!applet.hasClass('initialized')) {
+                applet.addClass("initialized");
+                waitForApplet(applet, configureApplet);
+            }
+        });
     }
 
     function waitForApplet(applet, callback) {
-        if (applet.isActive && applet.isActive()) {
-            console.log("Applet is ready.");
+        if (applet[0].isActive && applet[0].isActive()) {
             callback(applet);
-        } else if (timeout > 30 * 1000) {
-            console.error("Applet did not load on time.");
         } else {
-            console.log("Waiting for applet...");
             setTimeout(function() {
                 waitForApplet(applet, callback); }, timeout);
         }
     }
 
     function configureApplet(applet) {
+        // Traverse up the DOM tree and get the other relevant elements
+        var parent = applet.parent();
+        var input_field = parent.find('input[type=hidden]');
+        var reset_button = parent.find('button.reset');
+
+        console.log(input_field.toArray());
+        console.log(input_field.toArray().length);
+
+        // Load initial data
         var value = input_field.val();
 
+        value = false;
         if (value) {
-            console.log('Loading previous mol data...');
+            console.log('loading old');
             var data = JSON.parse(value)["mol"];
-            loadAppletData(applet, data);
+            console.log(data);
+            loadAppletData(applet, data, input_field);
         } else {
-            requestAppletData(applet);
+            console.log('loading preset');
+            requestAppletData(applet, input_field);
         }
 
-        reset_button.on('click', function() { requestAppletData(applet); });
+        reset_button.on('click', function() {
+            console.log('reseting');
+            requestAppletData(applet, input_field);
+        });
 
         // FIXME: [rocha] This is a hack to capture the click on the check
         // button and update the hidden field with the applet values
-        var check_button = $(applet).parents('.problem').find('input.check');
-        check_button.on('click', function() { updateInput(applet); });
+        var problem = applet.parents('.problem');
+        var check_button = problem.find('input.check');
+        check_button.on('click', function() {
+            console.log('check');
+            updateInput(applet, input_field);
+        });
     }
 
-    function requestAppletData(applet) {
-        var molFile = $(applet).find('param[name=molfile]').attr('value');
+    function requestAppletData(applet, input_field) {
+        var molFile = applet.find('param[name=molfile]').attr('value');
 
-        console.log("Loading mol data from " + molFile + " ...");
         jQuery.ajax({
             url: molFile,
             dataType: "text",
             success: function(data) {
                 console.log("Done.");
-                loadAppletData(applet, data);
+                loadAppletData(applet, data, input_field);
             },
             error: function() {
                 console.error("Cannot load mol data.");
@@ -87,23 +97,15 @@
         });
     }
 
-    function loadAppletData(applet, data) {
-        applet.readMolFile(data);
-        updateInput(applet);
+    function loadAppletData(applet, data, input_field) {
+        applet[0].readMolFile(data);
+        updateInput(applet, input_field);
     }
 
-    function getAppletInfo(applet) {
-        var mol = applet.molFile();
-        var smiles = applet.smiles();
-        var jme = applet.jmeFile();
-
-        return jsmol.API.getInfo(mol, smiles, jme);
-    }
-
-    function updateInput(applet) {
-        var mol = applet.molFile();
-        var smiles = applet.smiles();
-        var jme = applet.jmeFile();
+    function updateInput(applet, input_field) {
+        var mol = applet[0].molFile();
+        var smiles = applet[0].smiles();
+        var jme = applet[0].jmeFile();
 
         var info = formatInfo(jsmol.API.getInfo(mol, smiles, jme).toString());
         var value = { mol: mol, info: info };
@@ -118,7 +120,7 @@
 
     function formatInfo(info) {
         var results = [];
-        // create a te
+
         var fragment = $('<div>').append(info);
         fragment.find('font').each(function () {
             results.push($(this).html());
