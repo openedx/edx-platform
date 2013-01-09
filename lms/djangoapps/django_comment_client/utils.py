@@ -139,12 +139,10 @@ def initialize_discussion_info(course):
     discussion_id_map = {}
     unexpanded_category_map = defaultdict(list)
 
-    #all_modules = get_full_modules()[course_id]
-
+    # get all discussion models within this course_id
     all_modules = modulestore().get_items(['i4x', course.location.org, course.location.course, 'discussion', None], course_id=course_id)
 
     for module in all_modules:
-        logging.debug('{0}'.format(module.location))
         skip_module = False
         for key in ('id', 'discussion_category', 'for'):
             if key not in module.metadata:
