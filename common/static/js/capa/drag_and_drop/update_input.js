@@ -131,6 +131,18 @@ define(['logme'], function (logme) {
 
                                 draggable.iconEl.detach();
                                 draggable.iconEl.css(
+                                    'background-color', draggable.iconElBGColor
+                                );
+                                draggable.iconEl.css(
+                                    'padding-left', draggable.iconElPadding
+                                );
+                                draggable.iconEl.css(
+                                    'padding-right', draggable.iconElPadding
+                                );
+                                draggable.iconEl.css(
+                                    'border', draggable.iconElBorder
+                                );
+                                draggable.iconEl.css(
                                     'width',
                                     draggable.iconWidth
                                 );
@@ -142,6 +154,7 @@ define(['logme'], function (logme) {
                                     'left',
                                     target.offset.left + 0.5 * target.w -
                                         draggable.iconWidth * 0.5 + offset
+                                        - draggable.iconElLeftOffset
                                 );
                                 draggable.iconEl.css(
                                     'top',
@@ -155,9 +168,22 @@ define(['logme'], function (logme) {
                                 if (draggable.labelEl !== null) {
                                     draggable.labelEl.detach();
                                     draggable.labelEl.css(
+                                        'background-color', 'yellow'
+                                    );
+                                    draggable.labelEl.css(
+                                        'padding-left', 8
+                                    );
+                                    draggable.labelEl.css(
+                                        'padding-right', 8
+                                    );
+                                    draggable.labelEl.css(
+                                        'border', '1px solid black'
+                                    );
+                                    draggable.labelEl.css(
                                         'left',
                                         target.offset.left + 0.5 * target.w -
                                             draggable.labelWidth * 0.5 + offset
+                                            - 9 // Account for padding, border.
                                     );
                                     draggable.labelEl.css(
                                         'top',
@@ -219,6 +245,18 @@ define(['logme'], function (logme) {
 
                                 draggable.iconEl.detach();
                                 draggable.iconEl.css(
+                                    'background-color', draggable.iconElBGColor
+                                );
+                                draggable.iconEl.css(
+                                    'padding-left', draggable.iconElPadding
+                                );
+                                draggable.iconEl.css(
+                                    'padding-right', draggable.iconElPadding
+                                );
+                                draggable.iconEl.css(
+                                    'border', draggable.iconElBorder
+                                );
+                                draggable.iconEl.css(
                                     'width',
                                     draggable.iconWidth
                                 );
@@ -230,6 +268,7 @@ define(['logme'], function (logme) {
                                     'left',
                                     answer.draggables[c1][draggableId][0] -
                                         draggable.iconWidth * 0.5 + offset
+                                        - draggable.iconElLeftOffset
                                 );
                                 draggable.iconEl.css(
                                     'top',
@@ -243,9 +282,22 @@ define(['logme'], function (logme) {
                                 if (draggable.labelEl !== null) {
                                     draggable.labelEl.detach();
                                     draggable.labelEl.css(
+                                        'background-color', 'yellow'
+                                    );
+                                    draggable.labelEl.css(
+                                        'padding-left', 8
+                                    );
+                                    draggable.labelEl.css(
+                                        'padding-right', 8
+                                    );
+                                    draggable.labelEl.css(
+                                        'border', '1px solid black'
+                                    );
+                                    draggable.labelEl.css(
                                         'left',
                                         answer.draggables[c1][draggableId][0] -
                                             draggable.labelWidth * 0.5 + offset
+                                            - 9 // Account for padding, border.
                                     );
                                     draggable.labelEl.css(
                                         'top',

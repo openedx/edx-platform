@@ -27,6 +27,7 @@ define(['logme', 'update_input'], function (logme, updateInput) {
                     event.pageX -
                         state.baseImageEl.offset().left -
                         state.currentMovingDraggable.iconWidth * 0.5
+                        - state.currentMovingDraggable.iconElLeftOffset
                 );
                 state.currentMovingDraggable.iconEl.css(
                     'top',
@@ -41,6 +42,7 @@ define(['logme', 'update_input'], function (logme, updateInput) {
                         event.pageX -
                             state.baseImageEl.offset().left -
                             state.currentMovingDraggable.labelWidth * 0.5
+                            - 9 // Account for padding, border.
                     );
                     state.currentMovingDraggable.labelEl.css(
                         'top',
@@ -84,7 +86,10 @@ define(['logme', 'update_input'], function (logme, updateInput) {
             draggableObj.containerEl.appendTo(state.sliderEl);
 
             if (obj.icon.length > 0) {
-                draggableObj.hasIcon = true;
+                draggableObj.iconElBGColor = 'transparent';
+                draggableObj.iconElPadding = 0;
+                draggableObj.iconElBorder = 'none';
+                draggableObj.iconElLeftOffset = 0;
 
                 draggableObj.iconEl = $('<img />');
                 draggableObj.iconEl.attr(
@@ -173,6 +178,11 @@ define(['logme', 'update_input'], function (logme, updateInput) {
                 // icon. All the existing code will work, and the user will
                 // see a label instead of an icon.
                 if (obj.label.length > 0) {
+                    draggableObj.iconElBGColor = 'yellow';
+                    draggableObj.iconElPadding = 8;
+                    draggableObj.iconElBorder = '1px solid black';
+                    draggableObj.iconElLeftOffset = 9;
+
                     draggableObj.iconEl = $(
                         '<div ' +
                             'style=" ' +
@@ -251,6 +261,18 @@ define(['logme', 'update_input'], function (logme, updateInput) {
                         draggableObj.containerEl.hide();
 
                         draggableObj.iconEl.detach();
+                            draggableObj.iconEl.css(
+                                'background-color', draggableObj.iconElBGColor
+                            );
+                            draggableObj.iconEl.css(
+                                'padding-left', draggableObj.iconElPadding
+                            );
+                            draggableObj.iconEl.css(
+                                'padding-right', draggableObj.iconElPadding
+                            );
+                            draggableObj.iconEl.css(
+                                'border', draggableObj.iconElBorder
+                            );
                         draggableObj.iconEl.css(
                             'width',
                             draggableObj.iconWidth
@@ -264,6 +286,7 @@ define(['logme', 'update_input'], function (logme, updateInput) {
                             event.pageX -
                                 state.baseImageEl.offset().left -
                                 draggableObj.iconWidth * 0.5
+                                - draggableObj.iconElLeftOffset
                         );
                         draggableObj.iconEl.css(
                             'top',
@@ -278,10 +301,23 @@ define(['logme', 'update_input'], function (logme, updateInput) {
                         if (draggableObj.labelEl !== null) {
                             draggableObj.labelEl.detach();
                             draggableObj.labelEl.css(
+                                'background-color', 'yellow'
+                            );
+                            draggableObj.labelEl.css(
+                                'padding-left', 8
+                            );
+                            draggableObj.labelEl.css(
+                                'padding-right', 8
+                            );
+                            draggableObj.labelEl.css(
+                                'border', '1px solid black'
+                            );
+                            draggableObj.labelEl.css(
                                 'left',
                                 event.pageX -
                                     state.baseImageEl.offset().left -
                                     draggableObj.labelWidth * 0.5
+                                    - 9 // Account for padding, border.
                             );
                             draggableObj.labelEl.css(
                                 'top',
@@ -330,6 +366,7 @@ define(['logme', 'update_input'], function (logme, updateInput) {
                         event.pageX -
                             state.baseImageEl.offset().left -
                             draggableObj.iconWidth * 0.5
+                            - draggableObj.iconElLeftOffset
                     );
                     draggableObj.iconEl.css(
                         'top',
@@ -344,6 +381,7 @@ define(['logme', 'update_input'], function (logme, updateInput) {
                             event.pageX -
                                 state.baseImageEl.offset().left -
                                 draggableObj.labelWidth * 0.5
+                                - 9 // Acoount for padding, border.
                         );
                         draggableObj.labelEl.css(
                             'top',
@@ -529,6 +567,7 @@ define(['logme', 'update_input'], function (logme, updateInput) {
                         'left',
                         target.offset.left + 0.5 * target.w -
                             draggableObj.iconWidth * 0.5 + offset
+                            - draggableObj.iconElLeftOffset
                     );
                     draggableObj.iconEl.css(
                         'top',
@@ -541,6 +580,7 @@ define(['logme', 'update_input'], function (logme, updateInput) {
                             'left',
                             target.offset.left + 0.5 * target.w -
                                 draggableObj.labelWidth * 0.5 + offset
+                                - 9 // Acoount for padding, border.
                         );
                         draggableObj.labelEl.css(
                             'top',
@@ -587,7 +627,10 @@ define(['logme', 'update_input'], function (logme, updateInput) {
                     draggableObj.containerEl.show();
 
                     draggableObj.iconEl.detach();
-
+                    draggableObj.iconEl.css('border', 'none');
+                    draggableObj.iconEl.css('background-color', 'transparent');
+                    draggableObj.iconEl.css('padding-left', 0);
+                    draggableObj.iconEl.css('padding-right', 0);
                     draggableObj.iconEl.css(
                         'width',
                         draggableObj.iconWidthSmall
@@ -596,12 +639,10 @@ define(['logme', 'update_input'], function (logme, updateInput) {
                         'height',
                         draggableObj.iconHeightSmall
                     );
-
                     draggableObj.iconEl.css(
                         'left',
                         50 - draggableObj.iconWidthSmall * 0.5
                     );
-
                     if (draggableObj.labelEl !== null) {
                         draggableObj.iconEl.css('top', 5);
                     } else {
@@ -615,6 +656,10 @@ define(['logme', 'update_input'], function (logme, updateInput) {
 
                     if (draggableObj.labelEl !== null) {
                         draggableObj.labelEl.detach();
+                        draggableObj.labelEl.css('border', 'none');
+                        draggableObj.labelEl.css('background-color', 'transparent');
+                        draggableObj.labelEl.css('padding-left', 0);
+                        draggableObj.labelEl.css('padding-right', 0);
                         draggableObj.labelEl.css(
                             'left',
                             50 - draggableObj.labelWidth * 0.5
