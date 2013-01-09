@@ -74,6 +74,8 @@ MITX_FEATURES = {
 
     'DISABLE_LOGIN_BUTTON': False,  # used in systems where login is automatic, eg MIT SSL
 
+    'STUB_VIDEO_FOR_TESTING': False, # do not display video when running automated acceptance tests
+
     # extrernal access methods
     'ACCESS_REQUIRE_STAFF_FOR_COURSE': False,
     'AUTH_USE_OPENID': False,
@@ -397,6 +399,7 @@ courseware_js = (
 )
 
 main_vendor_js = [
+  'js/vendor/RequireJS.js',
   'js/vendor/json2.js',
   'js/vendor/jquery.min.js',
   'js/vendor/jquery-ui.min.js',
@@ -407,6 +410,7 @@ main_vendor_js = [
 ]
 
 discussion_js = sorted(rooted_glob(PROJECT_ROOT / 'static', 'coffee/src/discussion/**/*.coffee'))
+
 
 staff_grading_js = sorted(rooted_glob(PROJECT_ROOT / 'static', 'coffee/src/staff_grading/**/*.coffee'))
 
@@ -440,7 +444,6 @@ PIPELINE_JS = {
                 rooted_glob(PROJECT_ROOT / 'static', 'coffee/src/**/*.coffee')) -
             set(courseware_js + discussion_js + staff_grading_js) 
         ) + [
-
             'js/form.ext.js',
             'js/my_courses_dropdown.js',
             'js/toggle_login_modal.js',
@@ -469,6 +472,7 @@ PIPELINE_JS = {
         'source_filenames': staff_grading_js,
         'output_filename': 'js/staff_grading.js'
     }
+
 }
 
 PIPELINE_DISABLE_WRAPPER = True

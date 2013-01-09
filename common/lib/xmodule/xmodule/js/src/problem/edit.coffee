@@ -6,8 +6,10 @@ class @MarkdownEditingDescriptor extends XModule.Descriptor
   @selectTemplate: "[[incorrect, (correct), incorrect]]\n"
 
   constructor: (element) ->
-    $body.on('click', '.editor-tabs .tab', @changeEditor)
-    $body.on('click', '.editor-bar a', @onToolbarButton);
+    @element = element
+    @element.on('click', '.xml-tab', @showXMLEditor)
+    @element.on('click', '.format-buttons a', @onToolbarButton);
+    @element.on('click', '.cheatsheet-toggle', @toggleCheatsheet);
 
     @xml_editor = CodeMirror.fromTextArea($(".xml-box", element)[0], {
     mode: "xml"
@@ -16,28 +18,50 @@ class @MarkdownEditingDescriptor extends XModule.Descriptor
     })
     @current_editor = @xml_editor
 
-    if $(".markdown-box", element).length != 0
+    if $(".markdown-box", @element).length != 0
       @markdown_editor = CodeMirror.fromTextArea($(".markdown-box", element)[0], {
       lineWrapping: true
       mode: null
       })
       @setCurrentEditor(@markdown_editor)
+    else
+      @hideMarkdownElements()
 
-  changeEditor: (e) =>
+  ###
+  Hides the toolbar buttons, as they only apply to the markdown editor.
+  ###
+  hideMarkdownElements: () ->
+    $(@element.find('.editor-bar')).hide()
+    $(@element.find('.editor-tabs')).hide()
+
+  ###
+  User has clicked to show the XML editor. Before XML editor is swapped in,
+  the user will need to confirm the one-way conversion.
+  ###
+  showXMLEditor: (e) =>
     e.preventDefault();
-    if not $(e.currentTarget).hasClass('current')
-      $('.editor-tabs .current').removeClass('current')
-      $(e.currentTarget).addClass('current')
-      if (@current_editor == @xml_editor)
-        @setCurrentEditor(@markdown_editor)
-      else
-        @setCurrentEditor(@xml_editor)
-        @xml_editor.setValue(MarkdownEditingDescriptor.markdownToXml(@markdown_editor.getValue()))
+    if @confirmConversionToXml()
+      @xml_editor.setValue(MarkdownEditingDescriptor.markdownToXml(@markdown_editor.getValue()))
+      @setCurrentEditor(@xml_editor)
+      # Need this to get line numbers to display properly (and put caret position to 0)
+      @xml_editor.setCursor(0)
+      @xml_editor.refresh()
+      @hideMarkdownElements()
 
+  ###
+  Have the user confirm the one-way conversion to XML.
+  Returns true if the user clicked OK, else false.
+  ###
+  confirmConversionToXml: ->
+#   TODO: use something besides a JavaScript confirm dialog?
+    return confirm("If you convert to the XML source representation, you cannot go back to using markdown.\n\nProceed with conversion to XML?")
+
+  ###
+  Event listener for toolbar buttons (only possible when markdown editor is visible).
+  ###
   onToolbarButton: (e) =>
     e.preventDefault();
     selection = @markdown_editor.getSelection()
-
     revisedSelection = null
     switch $(e.currentTarget).attr('class')
       when "multiple-choice-button" then revisedSelection = MarkdownEditingDescriptor.insertMultipleChoice(selection)
@@ -45,31 +69,53 @@ class @MarkdownEditingDescriptor extends XModule.Descriptor
       when "number-button" then revisedSelection = MarkdownEditingDescriptor.insertNumberInput(selection)
       when "checks-button" then revisedSelection = MarkdownEditingDescriptor.insertCheckboxChoice(selection)
       when "dropdown-button" then revisedSelection = MarkdownEditingDescriptor.insertSelect(selection)
-      else # do nothing
+      else # ignore click
 
     if revisedSelection != null
       @markdown_editor.replaceSelection(revisedSelection)
       @markdown_editor.focus()
 
+  ###
+  Event listener for toggling cheatsheet (only possible when markdown editor is visible).
+  ###
+  toggleCheatsheet: (e) =>
+    e.preventDefault();
+    if !$(@markdown_editor.getWrapperElement()).find('.simple-editor-cheatsheet')[0]
+      @cheatsheet = $($('#simple-editor-cheatsheet').html())
+      $(@markdown_editor.getWrapperElement()).append(@cheatsheet)
 
+    setTimeout (=> @cheatsheet.toggleClass('shown')), 10
+
+  ###
+  Stores the current editor and hides the one that is not displayed.
+  ###
   setCurrentEditor: (editor) ->
     $(@current_editor.getWrapperElement()).hide()
     @current_editor = editor
     $(@current_editor.getWrapperElement()).show()
     $(@current_editor).focus();
 
+  ###
+  Called when save is called. Listeners are unregistered because editing the block again will
+  result in a new instance of the descriptor. Note that this is NOT the case for cancel--
+  when cancel is called the instance of the descriptor is reused if edit is selected again.
+  ###
   save: ->
-    $body.off('click', '.editor-tabs .tab', @changeEditor)
-    $body.off('click', '.editor-bar a', @onToolbarButton);
-    # TODO when logic is in place to remove the markdown if xml is edited, ensure this doesn't overwrite that
+    @element.off('click', '.xml-tab', @changeEditor)
+    @element.off('click', '.format-buttons a', @onToolbarButton)
+    @element.off('click', '.cheatsheet-toggle', @toggleCheatsheet)
     if @current_editor == @markdown_editor
         {
             data: MarkdownEditingDescriptor.markdownToXml(@markdown_editor.getValue())
-            metadata: 
+            metadata:
             	markdown: @markdown_editor.getValue()
         }
-    else 
-        data: @xml_editor.getValue()
+    else
+       {
+            data: @xml_editor.getValue()
+            metadata:
+               markdown: null
+       }
 
   @insertMultipleChoice: (selectedText) ->
     return MarkdownEditingDescriptor.insertGenericChoice(selectedText, '(', ')', MarkdownEditingDescriptor.multipleChoiceTemplate)
@@ -119,6 +165,21 @@ class @MarkdownEditingDescriptor extends XModule.Descriptor
     else
       return template
 
+# We may wish to add insertHeader and insertVideo. Here is Tom's code.
+# function makeHeader() {
+#  var selection = simpleEditor.getSelection();
+#  var revisedSelection = selection + '\n';
+#  for(var i = 0; i < selection.length; i++) {
+#revisedSelection += '=';
+#  }
+#  simpleEditor.replaceSelection(revisedSelection);
+#}
+#
+#function makeVideo() {
+#var selection = simpleEditor.getSelection();
+#simpleEditor.replaceSelection('{{video ' + selection + '}}');
+#}
+#
   @markdownToXml: (markdown)->
     toXml = `function(markdown) {
       var xml = markdown;
