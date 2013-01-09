@@ -142,5 +142,35 @@
   }
 }
 
+.problem-editor-icon {
+  display: inline-block;
+  width: 26px;
+  height: 21px;
+  vertical-align: middle;
+  background: url(../img/problem-editor-icons.png) no-repeat;
+}
+
+.problem-editor-icon.multiple-choice {
+  background-position: 0 0;
+}
+
+.problem-editor-icon.checks {
+  background-position: -56px 0;
+}
+
+.problem-editor-icon.string {
+  width: 28px;
+  background-position: -111px 0;
+}
+
+.problem-editor-icon.number {
+  width: 24px;
+  background-position: -168px 0;
+}
+
+.problem-editor-icon.dropdown {
+  width: 17px;
+  background-position: -220px 0;
+}
 
 

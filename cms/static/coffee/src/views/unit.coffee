@@ -68,13 +68,6 @@ class CMS.Views.UnitEdit extends Backbone.View
     @$newComponentItem.removeClass('adding')
     @$newComponentItem.find('.rendered-component').remove()
 
-  closeEditor: (event) =>
-    @$editor.slideUp(150)
-    $modalCover.fadeOut(150)
-    $modalCover.unbind('click', @closeEditor)
-    @$editor.slideUp(150)
-    @$componentItem.removeClass('editing')
-
   saveNewComponent: (event) =>
     event.preventDefault()
 
