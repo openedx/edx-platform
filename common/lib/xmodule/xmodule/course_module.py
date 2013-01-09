@@ -6,6 +6,7 @@ from xmodule.modulestore import Location
 from xmodule.seq_module import SequenceDescriptor, SequenceModule
 from xmodule.timeparse import parse_time, stringify_time
 from xmodule.util.decorators import lazyproperty
+from datetime import datetime
 import json
 import logging
 import requests
@@ -17,6 +18,8 @@ log = logging.getLogger(__name__)
 
 edx_xml_parser = etree.XMLParser(dtd_validation=False, load_dtd=False,
                                  remove_comments=True, remove_blank_text=True)
+
+_cached_toc = {}
 
 class CourseDescriptor(SequenceDescriptor):
     module_class = SequenceModule
@@ -50,6 +53,17 @@ class CourseDescriptor(SequenceDescriptor):
             """
             toc_url = self.book_url + 'toc.xml'
 
+            try:
+                # see if we already fetched this
+                if toc_url in _cached_toc:
+                    (table_of_contents, timestamp) = _cached_toc[toc_url]
+                    age = datetime.now() - timestamp
+                    # expire every 10 minutes
+                    if age.seconds < 600:
+                        return table_of_contents
+            except Exception as err:
+                pass
+
             # Get the table of contents from S3
             log.info("Retrieving textbook table of contents from %s" % toc_url)
             try:
@@ -62,6 +76,7 @@ class CourseDescriptor(SequenceDescriptor):
             # TOC is XML. Parse it
             try:
                 table_of_contents = etree.fromstring(r.text)
+                _cached_toc[toc_url] = (table_of_contents, datetime.now())
             except Exception as err:
                 msg = 'Error %s: Unable to parse XML for textbook table of contents at %s' % (err, toc_url)
                 log.error(msg)
