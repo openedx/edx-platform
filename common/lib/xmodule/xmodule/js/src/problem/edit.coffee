@@ -138,9 +138,9 @@ class @MarkdownEditingDescriptor extends XModule.Descriptor
       for line in lines
         revisedLines += choiceStart
         # a stand alone x before other text implies that this option is "correct"
-        if /^\s*x\s*(\S)/i.test(line)
+        if /^\s*x\s+(\S)/i.test(line)
           # Remove the x and any initial whitespace as long as there's more text on the line
-          line = line.replace(/^\s*x\s*(\S)/i, '$1')
+          line = line.replace(/^\s*x\s+(\S)/i, '$1')
           revisedLines += 'x'
         else
           revisedLines += ' '
