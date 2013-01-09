@@ -53,6 +53,13 @@ class CourseDescriptor(SequenceDescriptor):
             """
             toc_url = self.book_url + 'toc.xml'
 
+            # cdodge: I've added this caching of TOC because in Mongo-backed instances (but not Filesystem stores)
+            # course modules have a very short lifespan and are constantly being created and torn down.
+            # Since this module in the __init__() method does a synchronous call to AWS to get the TOC
+            # this is causing a big performance problem. So let's be a bit smarter about this and cache
+            # each fetch and store in-mem for 10 minutes.
+            # NOTE: I have to get this onto sandbox ASAP as we're having runtime failures. I'd like to swing back and
+            # rewrite to use the traditional Django in-memory cache.
             try:
                 # see if we already fetched this
                 if toc_url in _cached_toc:
