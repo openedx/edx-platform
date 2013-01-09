@@ -5,6 +5,7 @@
 <%block name="title">CMS Unit</%block>
 <%block name="jsextra">
   <script type='text/javascript'>
+  $(document).ready(function() {
     new CMS.Views.UnitEdit({
       el: $('.main-wrapper'),
       model: new CMS.Models.Module({
@@ -13,12 +14,11 @@
       })
     });
   
-    (function() {
-      $('.new-component-template').each(function(){
-          $emptyEditor = $(this).find('.empty');
-          $(this).prepend($emptyEditor);
-        });
-    })();
+    $('.new-component-template').each(function(){
+        $emptyEditor = $(this).find('.empty');
+        $(this).prepend($emptyEditor);
+      });
+    });
   </script>
 
 </%block>
