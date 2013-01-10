@@ -44,7 +44,7 @@ class GradingService(object):
 
         return response.json
 
-    def post(self, url, allow_redirects, data): 
+    def post(self, url, data, allow_redirects=False): 
         """
         Make a post request to the grading controller
         """
@@ -58,7 +58,7 @@ class GradingService(object):
 
         return r.text
 
-    def get(self, url, allow_redirects, params):
+    def get(self, url, params, allow_redirects=False):
         """
         Make a get request to the grading controller
         """

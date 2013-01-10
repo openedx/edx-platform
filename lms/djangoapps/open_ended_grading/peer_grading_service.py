@@ -16,6 +16,10 @@ from student.models import unique_id_for_user
 
 log = logging.getLogger(__name__)
 
+"""
+This is a mock peer grading service that can be used for unit tests
+without making actual service calls to the grading controller
+"""
 class MockPeerGradingService(object):
     def get_next_submission(self, problem_location, grader_id):
         return json.dumps({'success': True,
@@ -26,7 +30,8 @@ class MockPeerGradingService(object):
                 'rubric': 'fake rubric',
                 'max_score': 4})
 
-    def save_grade(self, location, grader_id, submission_id, score, feedback, submission_key):
+    def save_grade(self, location, grader_id, submission_id, 
+            score, feedback, submission_key):
         return json.dumps({'success': True})
 
     def is_student_calibrated(self, problem_location, grader_id):
@@ -41,15 +46,16 @@ class MockPeerGradingService(object):
                 'rubric': 'fake rubric',
                 'max_score': 4})
 
-    def save_calibration_essay(self, problem_location, grader_id, calibration_essay_id, submission_key, score, feedback):
+    def save_calibration_essay(self, problem_location, grader_id, 
+            calibration_essay_id, submission_key, score, feedback):
         return {'success': True, 'actual_score': 2}
 
     def get_problem_list(self, course_id, grader_id):
         return json.dumps({'success': True,
         'problem_list': [
-          json.dumps({'location': 'i4x://MITx/3.091x/problem/open_ended_demo1', \
+          json.dumps({'location': 'i4x://MITx/3.091x/problem/open_ended_demo1',
             'problem_name': "Problem 1", 'num_graded': 3, 'num_pending': 5}),
-          json.dumps({'location': 'i4x://MITx/3.091x/problem/open_ended_demo2', \
+          json.dumps({'location': 'i4x://MITx/3.091x/problem/open_ended_demo2',
             'problem_name': "Problem 2", 'num_graded': 1, 'num_pending': 5})
         ]})
 
@@ -78,15 +84,15 @@ class PeerGradingService(GradingService):
                 'feedback' : feedback,
                 'submission_key': submission_key,
                 'location': location}
-        return self.post(self.save_grade_url, False, data)
+        return self.post(self.save_grade_url, data)
 
     def is_student_calibrated(self, problem_location, grader_id):
         params = {'problem_id' : problem_location, 'student_id': grader_id}
-        return self.get(self.is_student_calibrated_url, False, params)
+        return self.get(self.is_student_calibrated_url, params)
     
     def show_calibration_essay(self, problem_location, grader_id):
         params = {'problem_id' : problem_location, 'student_id': grader_id}
-        return self.get(self.show_calibration_essay_url, False, params)
+        return self.get(self.show_calibration_essay_url, params)
 
     def save_calibration_essay(self, problem_location, grader_id, calibration_essay_id, submission_key, score, feedback):
         data = {'location': problem_location, 
@@ -95,11 +101,11 @@ class PeerGradingService(GradingService):
                 'submission_key': submission_key,
                 'score': score,
                 'feedback': feedback}
-        return self.post(self.save_calibration_essay_url, False, data)
+        return self.post(self.save_calibration_essay_url, data)
 
     def get_problem_list(self, course_id, grader_id):
         params = {'course_id': course_id, 'student_id': grader_id}
-        response = self.get(self.get_problem_list_url, False, params)
+        response = self.get(self.get_problem_list_url, params)
         return response
 
 
