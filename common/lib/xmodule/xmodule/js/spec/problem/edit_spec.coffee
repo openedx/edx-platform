@@ -1,4 +1,24 @@
 describe 'MarkdownEditingDescriptor', ->
+  describe 'save stores the correct data', ->
+    it 'saves markdown from markdown editor', ->
+      loadFixtures 'problem-with-markdown.html'
+      @descriptor = new MarkdownEditingDescriptor($('.problem-editor'))
+      saveResult = @descriptor.save()
+      expect(saveResult.metadata.markdown).toEqual('markdown')
+      expect(saveResult.data).toEqual('<problem>\n<p>markdown</p>\n</problem>')
+    it 'clears markdown when xml editor is selected', ->
+      loadFixtures 'problem-with-markdown.html'
+      @descriptor = new MarkdownEditingDescriptor($('.problem-editor'))
+      @descriptor.createXMLEditor('replace with markdown')
+      saveResult = @descriptor.save()
+      expect(saveResult.metadata.markdown).toEqual(null)
+      expect(saveResult.data).toEqual('replace with markdown')
+    it 'saves xml from the xml editor', ->
+      loadFixtures 'problem-without-markdown.html'
+      @descriptor = new MarkdownEditingDescriptor($('.problem-editor'))
+      saveResult = @descriptor.save()
+      expect(saveResult.metadata.markdown).toEqual(null)
+      expect(saveResult.data).toEqual('xml only')
 
   describe 'insertMultipleChoice', ->
     it 'inserts the template if selection is empty', ->
