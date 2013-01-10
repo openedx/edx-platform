@@ -333,6 +333,9 @@ STAFF_GRADING_INTERFACE = None
 # Used for testing, debugging
 MOCK_STAFF_GRADING = False
 
+################################# Peer grading config  #####################
+PEER_GRADING_INTERFACE = None
+MOCK_PEER_GRADING = False
 
 ################################# Jasmine ###################################
 JASMINE_TEST_DIRECTORY = PROJECT_ROOT + '/static/coffee'
@@ -421,6 +424,7 @@ main_vendor_js = [
 discussion_js = sorted(glob2.glob(PROJECT_ROOT / 'static/coffee/src/discussion/**/*.coffee'))
 
 staff_grading_js = sorted(glob2.glob(PROJECT_ROOT / 'static/coffee/src/staff_grading/**/*.coffee'))
+peer_grading_js = sorted(glob2.glob(PROJECT_ROOT / 'static/coffee/src/peer_grading/**/*.coffee'))
 
 
 # Load javascript from all of the available xmodules, and
@@ -496,6 +500,7 @@ PIPELINE_JS = {
             for pth in sorted(glob2.glob(PROJECT_ROOT / 'static/coffee/src/**/*.coffee'))\
             if (pth not in courseware_only_js and
                 pth not in discussion_js and
+                pth not in peer_grading_js and
                 pth not in staff_grading_js)
         ] + [
             'js/form.ext.js',
@@ -529,8 +534,11 @@ PIPELINE_JS = {
     'staff_grading' : {
         'source_filenames': [pth.replace(PROJECT_ROOT / 'static/', '')  for pth in staff_grading_js],
         'output_filename': 'js/staff_grading.js'
+    },
+    'peer_grading' : {
+        'source_filenames': [pth.replace(PROJECT_ROOT / 'static/', '')  for pth in peer_grading_js],
+        'output_filename': 'js/peer_grading.js'
     }
-
 }
 
 PIPELINE_DISABLE_WRAPPER = True
@@ -603,6 +611,7 @@ INSTALLED_APPS = (
     'util',
     'certificates',
     'instructor',
+    'open_ended_grading',
     'psychometrics',
     'licenses',
 

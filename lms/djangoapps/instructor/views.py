@@ -28,7 +28,6 @@ from xmodule.modulestore.exceptions import InvalidLocationError, ItemNotFoundErr
 from xmodule.modulestore.search import path_to_location
 import track.views
 
-from .grading import StaffGrading
 
 
 log = logging.getLogger(__name__)
@@ -414,26 +413,6 @@ def get_student_grade_summary_data(request, course, course_id, get_grades=True, 
 
 
 
-@cache_control(no_cache=True, no_store=True, must_revalidate=True)
-def staff_grading(request, course_id):
-    """
-    Show the instructor grading interface.
-    """
-    course = get_course_with_access(request.user, course_id, 'staff')
-
-    grading = StaffGrading(course)
-
-    ajax_url = reverse('staff_grading', kwargs={'course_id': course_id})
-    if not ajax_url.endswith('/'):
-        ajax_url += '/'
-        
-    return render_to_response('instructor/staff_grading.html', {
-        'view_html': grading.get_html(),
-        'course': course,
-        'course_id': course_id,
-        'ajax_url': ajax_url,
-        # Checked above
-        'staff_access': True, })
 
 
 @cache_control(no_cache=True, no_store=True, must_revalidate=True)
