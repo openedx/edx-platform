@@ -498,16 +498,19 @@
         }
       }
 
-      .contact-button {
-        @include button(simple, $blue);
+      .exam-button {
+        @include button(simple, $pink);
+        margin-top: 0;
+        float: right;
       }
 
-      .exam-button {
+      .contact-button {
         @include button(simple, $pink);
       }
 
       .button {
-        float: right;
+        display: inline-block;
+        margin-top: 10px;
         padding: 9px 18px 10px;
         font-size: 13px;
         font-weight: bold;
@@ -517,8 +520,6 @@
           text-decoration: none;
         }
       }
-
-
 
       &.is-shown {
         display: block;
