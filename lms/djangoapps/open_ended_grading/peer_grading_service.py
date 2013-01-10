@@ -1,3 +1,11 @@
+"""
+This module provides an interface on the grading-service backend
+for peer grading
+
+Use peer_grading_service() to get the version specified
+in settings.PEER_GRADING_INTERFACE
+
+"""
 import json
 import logging
 import requests
