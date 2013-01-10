@@ -120,47 +120,16 @@ def import_from_xml(store, data_dir, course_dirs=None,
 
         course_data_path = None
         course_location = None
-        # Quick scan to get course Location as well as the course_data_path
+
+        # Quick scan to get course module as we need some info from there. Also we need to make sure that the
+        # course module is committed first into the store
         for module in module_store.modules[course_id].itervalues():
             if module.category == 'course':
                 course_data_path = path(data_dir) / module.metadata['data_dir']
                 course_location = module.location
 
-        if static_content_store is not None:
-            _namespace_rename = target_location_namespace if target_location_namespace is not None else  module_store.modules[course_id].location
-            
-            # first pass to find everything in /static/
-            import_static_content(module_store.modules[course_id], course_location, course_data_path, static_content_store, 
-                _namespace_rename, subpath='static')
+                module = remap_namespace(module, target_location_namespace)
 
-        for module in module_store.modules[course_id].itervalues():
-
-            # remap module to the new namespace
-            if target_location_namespace is not None:
-                # This looks a bit wonky as we need to also change the 'name' of the imported course to be what
-                # the caller passed in
-                if module.location.category != 'course':
-                    module.location = module.location._replace(tag=target_location_namespace.tag, org=target_location_namespace.org, 
-                        course=target_location_namespace.course)
-                else:
-                    module.location = module.location._replace(tag=target_location_namespace.tag, org=target_location_namespace.org, 
-                        course=target_location_namespace.course, name=target_location_namespace.name)
-
-                # then remap children pointers since they too will be re-namespaced
-                children_locs = module.definition.get('children')
-                if children_locs is not None:
-                    new_locs = []
-                    for child in children_locs:
-                        child_loc = Location(child)
-                        new_child_loc = child_loc._replace(tag=target_location_namespace.tag, org=target_location_namespace.org, 
-                            course=target_location_namespace.course)
-
-                        new_locs.append(new_child_loc.url())
-
-                    module.definition['children'] = new_locs
-
-
-            if module.category == 'course':
                 # HACK: for now we don't support progress tabs. There's a special metadata configuration setting for this.
                 module.metadata['hide_progress_tab'] = True
 
@@ -174,11 +143,40 @@ def import_from_xml(store, data_dir, course_dirs=None,
                         {"type": "discussion", "name": "Discussion"},
                         {"type": "wiki", "name": "Wiki"}]  # note, add 'progress' when we can support it on Edge
 
+
+                store.update_item(module.location, module.definition['data'])
+                if 'children' in module.definition:
+                    store.update_children(module.location, module.definition['children'])
+                store.update_metadata(module.location, dict(module.own_metadata))
+
                 # a bit of a hack, but typically the "course image" which is shown on marketing pages is hard coded to /images/course_image.jpg
                 # so let's make sure we import in case there are no other references to it in the modules
                 verify_content_links(module, course_data_path, static_content_store, '/static/images/course_image.jpg')
 
                 course_items.append(module)
+
+
+                
+        # then import all the static content
+        if static_content_store is not None:
+            _namespace_rename = target_location_namespace if target_location_namespace is not None else  module_store.modules[course_id].location
+            
+            # first pass to find everything in /static/
+            import_static_content(module_store.modules[course_id], course_location, course_data_path, static_content_store, 
+                _namespace_rename, subpath='static')
+
+        # finally loop through all the modules
+        for module in module_store.modules[course_id].itervalues():
+
+            if module.category == 'course':
+                # we've already saved the course module up at the top of the loop
+                # so just skip over it in the inner loop
+                continue
+
+            # remap module to the new namespace
+            if target_location_namespace is not None:
+                module = remap_namespace(module, target_location_namespace)
+
 
             if 'data' in module.definition:
                 module_data = module.definition['data']
@@ -216,6 +214,33 @@ def import_from_xml(store, data_dir, course_dirs=None,
 
     return module_store, course_items
 
+def remap_namespace(module, target_location_namespace):
+    if target_location_namespace is None:
+        return module
+        
+    # This looks a bit wonky as we need to also change the 'name' of the imported course to be what
+    # the caller passed in
+    if module.location.category != 'course':
+        module.location = module.location._replace(tag=target_location_namespace.tag, org=target_location_namespace.org, 
+            course=target_location_namespace.course)
+    else:
+        module.location = module.location._replace(tag=target_location_namespace.tag, org=target_location_namespace.org, 
+            course=target_location_namespace.course, name=target_location_namespace.name)
+
+    # then remap children pointers since they too will be re-namespaced
+    children_locs = module.definition.get('children')
+    if children_locs is not None:
+        new_locs = []
+        for child in children_locs:
+            child_loc = Location(child)
+            new_child_loc = child_loc._replace(tag=target_location_namespace.tag, org=target_location_namespace.org, 
+                course=target_location_namespace.course)
+
+            new_locs.append(new_child_loc.url())
+
+        module.definition['children'] = new_locs    
+
+    return module
 
 def validate_category_hierarcy(module_store, course_id, parent_category, expected_child_category):
     err_cnt = 0
