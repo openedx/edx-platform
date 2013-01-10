@@ -1,39 +1,20 @@
 # Grading Views
 
-from collections import defaultdict
-import csv
 import logging
-import os
 import urllib
 
 from django.conf import settings
-from django.contrib.auth.models import User, Group
-from django.http import HttpResponse
-from django_future.csrf import ensure_csrf_cookie
 from django.views.decorators.cache import cache_control
 from mitxmako.shortcuts import render_to_response
 from django.core.urlresolvers import reverse
 
-from courseware import grades
-from courseware.access import has_access, get_access_group_name
-from courseware.courses import get_course_with_access 
-from django_comment_client.models import Role, FORUM_ROLE_ADMINISTRATOR, FORUM_ROLE_MODERATOR, FORUM_ROLE_COMMUNITY_TA
-from django_comment_client.utils import has_forum_access
-from psychometrics import psychoanalyze
-from student.models import CourseEnrollment
 from student.models import unique_id_for_user
-from xmodule.course_module import CourseDescriptor
-from xmodule.modulestore import Location
-from xmodule.modulestore.django import modulestore
-from xmodule.modulestore.exceptions import InvalidLocationError, ItemNotFoundError, NoPathToItem
-from xmodule.modulestore.search import path_to_location
+from courseware.courses import get_course_with_access 
 
 from peer_grading_service import PeerGradingService
 from peer_grading_service import MockPeerGradingService
 from grading_service import GradingServiceError
 import json
-import track.views
-
 from .staff_grading import StaffGrading
 
 
@@ -45,6 +26,18 @@ if settings.MOCK_PEER_GRADING:
 else:
     peer_gs = PeerGradingService(settings.PEER_GRADING_INTERFACE)
 
+"""
+Reverses the URL from the name and the course id, and then adds a trailing slash if
+it does not exist yet
+
+"""
+def _reverse_with_slash(url_name, course_id):
+    ajax_url = reverse(url_name, kwargs={'course_id': course_id})
+    if not ajax_url.endswith('/'):
+        ajax_url += '/'
+    return ajax_url
+
+
 @cache_control(no_cache=True, no_store=True, must_revalidate=True)
 def staff_grading(request, course_id):
     """
@@ -52,14 +45,9 @@ def staff_grading(request, course_id):
     """
     course = get_course_with_access(request.user, course_id, 'staff')
 
-    grading = StaffGrading(course)
-
-    ajax_url = reverse('staff_grading', kwargs={'course_id': course_id})
-    if not ajax_url.endswith('/'):
-        ajax_url += '/'
+    ajax_url = _reverse_with_slash('staff_grading', course_id)
         
     return render_to_response('instructor/staff_grading.html', {
-        'view_html': '',
         'course': course,
         'course_id': course_id,
         'ajax_url': ajax_url,
@@ -79,27 +67,25 @@ def peer_grading(request, course_id):
     error_text = ""
     problem_list = []
     try:
-        problem_list_text = peer_gs.get_problem_list(course_id, unique_id_for_user(request.user))
-        problem_list_json = json.loads(problem_list_text)
-        success = problem_list_json['success']
-        if 'error' in problem_list_json:
-            error_text = problem_list_json['error']
+        problem_list_json = peer_gs.get_problem_list(course_id, unique_id_for_user(request.user))
+        problem_list_dict = json.loads(problem_list_json)
+        success = problem_list_dict['success']
+        if 'error' in problem_list_dict:
+            error_text = problem_list_dict['error']
 
-        problem_list = problem_list_json['problem_list']
+        problem_list = problem_list_dict['problem_list']
 
     except GradingServiceError:
         error_text = "Error occured while contacting the grading service"
         success = False
+    # catch error if if the json loads fails
     except ValueError:
         error_text = "Could not get problem list"
         success = False
 
-    ajax_url = reverse('peer_grading', kwargs={'course_id': course_id})
-    if not ajax_url.endswith('/'):
-        ajax_url += '/'
+    ajax_url = _reverse_with_slash('peer_grading', course_id)
 
     return render_to_response('peer_grading/peer_grading.html', { 
-        'view_html': '',
         'course': course,
         'course_id': course_id,
         'ajax_url': ajax_url,
@@ -118,9 +104,7 @@ def peer_grading_problem(request, course_id):
     course = get_course_with_access(request.user, course_id, 'load')
     problem_location = request.GET.get("location")
 
-    ajax_url = reverse('peer_grading', kwargs={'course_id': course_id})
-    if not ajax_url.endswith('/'):
-        ajax_url += '/'
+    ajax_url = _reverse_with_slash('peer_grading', course_id)
 
     return render_to_response('peer_grading/peer_grading_problem.html', { 
         'view_html': '',

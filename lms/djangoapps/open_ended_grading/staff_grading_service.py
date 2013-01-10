@@ -85,7 +85,7 @@ class StaffGradingService(GradingService):
             GradingServiceError: something went wrong with the connection.
         """
         params = {'course_id': course_id,'grader_id': grader_id}
-        return self.get(self.get_problem_list_url, False, params)
+        return self.get(self.get_problem_list_url, params)
 
 
     def get_next(self, course_id, location, grader_id):
@@ -107,7 +107,6 @@ class StaffGradingService(GradingService):
             GradingServiceError: something went wrong with the connection.
         """
         return self.get(self.get_next_url,
-                                      allow_redirects=False,
                                       params={'location': location,
                                               'grader_id': grader_id})
 
@@ -131,8 +130,7 @@ class StaffGradingService(GradingService):
                 'grader_id': grader_id,
                 'skipped': skipped}
 
-        return self.post(self.save_grade_url, data=data,
-                                       allow_redirects=False)
+        return self.post(self.save_grade_url, data=data)
 
 # don't initialize until staff_grading_service() is called--means that just
 # importing this file doesn't create objects that may not have the right config

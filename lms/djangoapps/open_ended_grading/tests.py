@@ -1,8 +1,7 @@
 """
-This file demonstrates writing tests using the unittest module. These will pass
-when you run "manage.py test".
+Tests for open ended grading interfaces
 
-Replace this with more appropriate tests for your application.
+django-admin.py test --settings=lms.envs.test --pythonpath=. lms/djangoapps/open_ended_grading
 """
 
 from django.test import TestCase

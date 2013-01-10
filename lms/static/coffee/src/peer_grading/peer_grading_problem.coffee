@@ -1,3 +1,20 @@
+##################################
+#
+#  This is the JS that renders the peer grading problem page.
+#  Fetches the correct problem and/or calibration essay
+#  and sends back the grades
+#
+#  Should not be run when we don't have a location to send back
+#  to the server
+#
+#  PeerGradingProblemBackend - 
+#   makes all the ajax requests and provides a mock interface
+#   for testing purposes
+#
+#  PeerGradingProblem -
+#   handles the rendering and user interactions with the interface
+#
+##################################
 class PeerGradingProblemBackend
   constructor: (ajax_url, mock_backend) ->
     @mock_backend = mock_backend
@@ -8,7 +25,7 @@ class PeerGradingProblemBackend
     if @mock_backend
       callback(@mock(cmd, data))
     else
-      # TODO: replace with postWithPrefix when that's loaded
+      # if this post request fails, the error callback will catch it
       $.post(@ajax_url + cmd, data, callback)
         .error => callback({success: false, error: "Error occured while performing this operation"})
 
@@ -90,13 +107,13 @@ class PeerGradingProblem
     @prompt_wrapper = $('.prompt-wrapper')
     @backend = backend
     
-    # ugly hack to prevent this code from trying to run on the
-    # general peer grading page
-    if( @prompt_wrapper.length == 0)
-      return
 
     # get the location of the problem
     @location = $('.peer-grading').data('location')
+    # prevent this code from trying to run 
+    # when we don't have a location
+    if(!@location)
+      return
 
     # get the other elements we want to fill in
     @submission_container = $('.submission-container')
@@ -182,6 +199,8 @@ class PeerGradingProblem
   #  Callbacks for various events
   #
   ##########
+
+  # called after we perform an is_student_calibrated check
   calibration_check_callback: (response) =>
     if response.success
       # if we haven't been calibrating before
@@ -201,12 +220,17 @@ class PeerGradingProblem
     else
       @render_error("Error contacting the grading service")
 
+
+  # called after we submit a calibration score
   calibration_callback: (response) =>
     if response.success
       @render_calibration_feedback(response)
     else if response.error
       @render_error(response.error)
+    else 
+      @render_error("Error saving calibration score")
 
+  # called after we submit a submission score
   submission_callback: (response) =>
     if response.success
       @is_calibrated_check()
@@ -218,6 +242,7 @@ class PeerGradingProblem
       else
         @render_error("Error occurred while submitting grade")
 
+  # called after a grade is selected on the interface
   graded_callback: (event) =>
     @grading_message.hide()
     @score = event.target.value
@@ -242,6 +267,8 @@ class PeerGradingProblem
       @grading_panel.removeClass('current-state')
 
       # Display the right text
+      # both versions of the text are written into the template itself
+      # we only need to show/hide the correct ones at the correct time
       @calibration_panel.find('.calibration-text').show()
       @grading_panel.find('.calibration-text').show()
       @calibration_panel.find('.grading-text').hide()
@@ -267,6 +294,8 @@ class PeerGradingProblem
       @grading_panel.addClass('current-state')
 
       # Display the correct text
+      # both versions of the text are written into the template itself
+      # we only need to show/hide the correct ones at the correct time
       @calibration_panel.find('.calibration-text').hide()
       @grading_panel.find('.calibration-text').hide()
       @calibration_panel.find('.grading-text').show()
@@ -287,6 +316,7 @@ class PeerGradingProblem
       new_text += "<p>#{paragraph}</p>"
     return new_text
 
+  # render common information between calibration and grading
   render_submission_data: (response) =>
     @content_panel.show()
 
@@ -304,7 +334,6 @@ class PeerGradingProblem
 
   render_calibration_feedback: (response) =>
     # display correct grade
-    #@grading_wrapper.hide()
     @calibration_feedback_panel.slideDown()
     calibration_wrapper = $('.calibration-feedback-wrapper')
     calibration_wrapper.html("<p>The score you gave was: #{@score}. The actual score is: #{response.actual_score}</p>")
@@ -316,7 +345,7 @@ class PeerGradingProblem
     if score == actual_score
       calibration_wrapper.append("<p>Congratulations! Your score matches the actual score!</p>")
     else
-      calibration_wrapper.append("<p>Please try to understand the grading critera better so that you will be more accurate next time.</p>") 
+      calibration_wrapper.append("<p>Please try to understand the grading critera better to be more accurate next time.</p>") 
 
     # disable score selection and submission from the grading interface
     $("input[name='score-selection']").attr('disabled', true)
@@ -325,6 +354,7 @@ class PeerGradingProblem
   render_interstitial_page: () =>
     @content_panel.hide()
     @interstitial_page.show()
+
   render_error: (error_message) =>
       @error_container.show()
       @calibration_feedback_panel.hide()
