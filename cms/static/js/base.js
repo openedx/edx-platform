@@ -39,7 +39,13 @@ $(document).ready(function() {
     $('.unit .item-actions .delete-button').bind('click', deleteUnit);
     $('.new-unit-item').bind('click', createNewUnit);
 
-    $('.collapse-all-button').bind('click', collapseAll);
+    // toggling overview section details
+    $(function(){
+      if($('.courseware-section').length > 0) {
+        $('.toggle-button-sections').addClass('is-shown');
+      }
+    });
+    $('.toggle-button-sections').bind('click', toggleSections);
 
     // autosave when a field is updated on the subsection page
     $body.on('keyup', '.subsection-display-name-input, .unit-subtitle, .policy-list-value', checkForNewValue);
@@ -123,9 +129,30 @@ $(document).ready(function() {
     });
 });
 
-function collapseAll(e) {
-    $('.branch').addClass('collapsed');
-    $('.expand-collapse-icon').removeClass('collapse').addClass('expand');
+// function collapseAll(e) {
+//     $('.branch').addClass('collapsed');
+//     $('.expand-collapse-icon').removeClass('collapse').addClass('expand');
+// }
+
+function toggleSections(e) {
+  e.preventDefault();
+
+  $section = $('.courseware-section');
+  sectionCount = $section.length;
+  $button = $(this);
+  $labelCollapsed = $('<i class="ss-icon ss-symbolicons-block">up</i> <span class="label">Collapse All Sections</span>');
+  $labelExpanded = $('<i class="ss-icon ss-symbolicons-block">down</i> <span class="label">Expand All Sections</span>');
+
+  var buttonLabel = $button.hasClass('is-activated') ? $labelCollapsed : $labelExpanded;
+  $button.toggleClass('is-activated').html(buttonLabel);
+
+  if($button.hasClass('is-activated')) {
+      $section.addClass('collapsed');
+      $section.find('.expand-collapse-icon').removeClass('collapsed').addClass('expand');
+  } else {
+      $section.removeClass('collapsed');
+      $section.find('.expand-collapse-icon').removeClass('expand').addClass('collapse');
+  }
 }
 
 function editSectionPublishDate(e) {
