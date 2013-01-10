@@ -72,8 +72,12 @@ define('Graph', ['logme'], function (logme) {
             return;
         }
 
-        createMarkingsFunctions();
-        createMovingLabelFunctions();
+        if (createMarkingsFunctions() === false) {
+            return;
+        }
+        if (createMovingLabelFunctions() === false) {
+            return;
+        }
 
         // Create the initial graph and plot it for the user to see.
         if (generateData() === true) {
@@ -87,21 +91,26 @@ define('Graph', ['logme'], function (logme) {
         return;
 
         function createMovingLabelFunctions() {
-            var c1;
+            var c1, returnStatus;
 
+            returnStatus = true;
             movingLabels = [];
 
             if (config.plot.hasOwnProperty('moving_label') !== true) {
-                return ;
-            }
-
-            if ($.isPlainObject(config.plot.moving_label) === true) {
-                processMovingLabel(config.plot.moving_label);
+                returnStatus = true;
+            } else if ($.isPlainObject(config.plot.moving_label) === true) {
+                if (processMovingLabel(config.plot.moving_label) === false) {
+                    returnStatus = false;
+                }
             } else if ($.isArray(config.plot.moving_label) === true) {
                 for (c1 = 0; c1 < config.plot.moving_label.length; c1++) {
-                    processMovingLabel(config.plot.moving_label[c1]);
+                    if (processMovingLabel(config.plot.moving_label[c1]) === false) {
+                        returnStatus = false;
+                    }
                 }
             }
+
+            return returnStatus;
         }
 
         function processMovingLabel(obj) {
@@ -111,24 +120,24 @@ define('Graph', ['logme'], function (logme) {
             if (obj.hasOwnProperty('@text') === false) {
                 logme('ERROR: You did not define a "text" attribute for the moving_label.');
 
-                return;
+                return false;
             }
             if (typeof obj['@text'] !== 'string') {
                 logme('ERROR: "text" attribute is not a string.');
 
-                return;
+                return false;
             }
             labelText = obj['@text'];
 
             if (obj.hasOwnProperty('#text') === false) {
                 logme('ERROR: moving_label is missing function declaration.');
 
-                return;
+                return false;
             }
             if (typeof obj['#text'] !== 'string') {
                 logme('ERROR: Function declaration is not a string.');
 
-                return;
+                return false;
             }
             funcString = obj['#text'];
 
@@ -197,7 +206,7 @@ define('Graph', ['logme'], function (logme) {
 
                 paramNames.pop();
 
-                return;
+                return false;
             }
 
             paramNames.pop();
@@ -209,23 +218,31 @@ define('Graph', ['logme'], function (logme) {
                 'fontColor': fontColor,
                 'fontWeight': fontWeight
             });
+
+            return true;
         }
 
         function createMarkingsFunctions() {
-            var c1, paramNames;
+            var c1, paramNames, returnStatus;
+
+            returnStatus = true;
 
             asymptotes = [];
             paramNames = state.getAllParameterNames();
 
             if ($.isPlainObject(config.plot.asymptote)) {
-                processAsymptote(config.plot.asymptote);
+                if (processAsymptote(config.plot.asymptote) === false) {
+                    returnStatus = false;
+                }
             } else if ($.isArray(config.plot.asymptote)) {
                 for (c1 = 0; c1 < config.plot.asymptote.length; c1 += 1) {
-                    processAsymptote(config.plot.asymptote[c1]);
+                    if (processAsymptote(config.plot.asymptote[c1]) === false) {
+                        returnStatus = false;
+                    }
                 }
             }
 
-            return;
+            return returnStatus;
 
             // Read configuration options for asymptotes, and store them as
             // an array of objects. Each object will have 3 properties:
@@ -259,12 +276,12 @@ define('Graph', ['logme'], function (logme) {
                     } else {
                         logme('ERROR: Attribute "type" for asymptote can be "x" or "y".');
 
-                        return;
+                        return false;
                     }
                 } else {
                     logme('ERROR: Attribute "type" for asymptote is not specified.');
 
-                    return;
+                    return false;
                 }
 
                 if (typeof asyObj['#text'] === 'string') {
@@ -272,7 +289,7 @@ define('Graph', ['logme'], function (logme) {
                 } else {
                     logme('ERROR: Function body for asymptote is not specified.');
 
-                    return;
+                    return false;
                 }
 
                 newAsyObj.color = '#000';
@@ -288,6 +305,29 @@ define('Graph', ['logme'], function (logme) {
                     newAsyObj.label = asyObj['@label'];
                 }
 
+                funcString = $('<div>').html(funcString).text();
+
+                disableAutoReturn = asyObj['@disable_auto_return'];
+                if (
+                    (disableAutoReturn === undefined) ||
+                    (
+                        (typeof disableAutoReturn === 'string') &&
+                        (disableAutoReturn.toLowerCase() !== 'true')
+                    )
+                ) {
+                    if (funcString.search(/return/i) === -1) {
+                        funcString = 'return ' + funcString;
+                    }
+                } else {
+                    if (funcString.search(/return/i) === -1) {
+                        logme(
+                            'ERROR: You have specified a JavaScript ' +
+                            'function without a "return" statemnt. Your ' +
+                            'function will return "undefined" by default.'
+                        );
+                    }
+                }
+
                 paramNames.push(funcString);
 
                 try {
@@ -296,13 +336,15 @@ define('Graph', ['logme'], function (logme) {
                     logme('ERROR: Asymptote function body could not be converted to function object.');
                     logme('Error message: "".' + err.message);
 
-                    return;
+                    return false;
                 }
 
                 paramNames.pop();
 
                 newAsyObj.func = func;
                 asymptotes.push(newAsyObj);
+
+                return true;
             }
         }
 
@@ -480,75 +522,187 @@ define('Graph', ['logme'], function (logme) {
         }
 
         function setGraphXRange() {
-            var xRangeStr, xRangeBlobs, tempNum, allParamNames;
+            var xRangeStr, xRangeBlobs, tempNum, allParamNames, funcString,
+                disableAutoReturn;
 
             xrange = {};
 
             if ($.isPlainObject(config.plot.xrange) === false) {
-                logme('ERROR: Expected config.plot.xrange to be an object. It is not.');
+                logme(
+                    'ERROR: Expected config.plot.xrange to be an object. ' +
+                    'It is not.'
+                );
                 logme('config.plot.xrange = ', config.plot.xrange);
 
                 return false;
             }
 
-            if (typeof config.plot.xrange.min !== 'string') {
-                logme('ERROR: Expected config.plot.xrange.min to be a string. It is not.');
-                logme('config.plot.xrange.min = ', config.plot.xrange.min);
+            if (config.plot.xrange.hasOwnProperty('min') === false) {
+                logme(
+                    'ERROR: Expected config.plot.xrange.min to be ' +
+                    'present. It is not.'
+                );
 
                 return false;
             }
 
-            if (typeof config.plot.xrange.max !== 'string') {
-                logme('ERROR: Expected config.plot.xrange.max to be a string. It is not.');
-                logme('config.plot.xrange.max = ', config.plot.xrange.max);
+            disableAutoReturn = false;
+            if (typeof config.plot.xrange.min === 'string') {
+                funcString = config.plot.xrange.min;
+            } else if (
+                ($.isPlainObject(config.plot.xrange.min) === true) &&
+                (config.plot.xrange.min.hasOwnProperty('#text') === true) &&
+                (typeof config.plot.xrange.min['#text'] === 'string')
+            ) {
+                funcString = config.plot.xrange.min['#text'];
+
+                disableAutoReturn =
+                    config.plot.xrange.min['@disable_auto_return'];
+                if (
+                    (disableAutoReturn === undefined) ||
+                    (
+                        (typeof disableAutoReturn === 'string') &&
+                        (disableAutoReturn.toLowerCase() !== 'true')
+                    )
+                ) {
+                    disableAutoReturn = false;
+                } else {
+                    disableAutoReturn = true;
+                }
+            } else {
+                logme(
+                    'ERROR: Could not get a function definition for ' +
+                    'xrange.min property.'
+                );
 
                 return false;
+            }
+
+            funcString = $('<div>').html(funcString).text();
+
+            if (disableAutoReturn === false) {
+                if (funcString.search(/return/i) === -1) {
+                    funcString = 'return ' + funcString;
+                }
+            } else {
+                if (funcString.search(/return/i) === -1) {
+                    logme(
+                        'ERROR: You have specified a JavaScript ' +
+                        'function without a "return" statemnt. Your ' +
+                        'function will return "undefined" by default.'
+                    );
+                }
             }
 
             allParamNames = state.getAllParameterNames();
 
-            allParamNames.push(config.plot.xrange.min);
+            allParamNames.push(funcString);
             try {
                 xrange.min = Function.apply(null, allParamNames);
             } catch (err) {
-                logme('ERROR: could not create a function from the string "' + config.plot.xrange.min + '" for xrange.min.');
+                logme(
+                    'ERROR: could not create a function from the string "' +
+                    funcString + '" for xrange.min.'
+                );
                 logme('Error message: "' + err.message + '"');
 
-                $('#' + gstId).html('<div style="color: red;">' + 'ERROR IN XML: Could not create a function from the string "' + config.plot.xrange.min + '" for xrange.min.' + '</div>');
-                $('#' + gstId).append('<div style="color: red;">' + 'Error message: "' + err.message + '".' + '</div>');
+                $('#' + gstId).html(
+                    '<div style="color: red;">' + 'ERROR IN ' +
+                    'XML: Could not create a function from the string "' +
+                    funcString + '" for xrange.min.' + '</div>'
+                );
+                $('#' + gstId).append(
+                    '<div style="color: red;">' + 'Error ' +
+                    'message: "' + err.message + '".' + '</div>'
+                );
 
                 return false;
             }
             allParamNames.pop();
 
-            allParamNames.push(config.plot.xrange.max);
+            if (config.plot.xrange.hasOwnProperty('max') === false) {
+                logme(
+                    'ERROR: Expected config.plot.xrange.max to be ' +
+                    'present. It is not.'
+                );
+
+                return false;
+            }
+
+            disableAutoReturn = false;
+            if (typeof config.plot.xrange.max === 'string') {
+                funcString = config.plot.xrange.max;
+            } else if (
+                ($.isPlainObject(config.plot.xrange.max) === true) &&
+                (config.plot.xrange.max.hasOwnProperty('#text') === true) &&
+                (typeof config.plot.xrange.max['#text'] === 'string')
+            ) {
+                funcString = config.plot.xrange.max['#text'];
+
+                disableAutoReturn =
+                    config.plot.xrange.max['@disable_auto_return'];
+                if (
+                    (disableAutoReturn === undefined) ||
+                    (
+                        (typeof disableAutoReturn === 'string') &&
+                        (disableAutoReturn.toLowerCase() !== 'true')
+                    )
+                ) {
+                    disableAutoReturn = false;
+                } else {
+                    disableAutoReturn = true;
+                }
+            } else {
+                logme(
+                    'ERROR: Could not get a function definition for ' +
+                    'xrange.max property.'
+                );
+
+                return false;
+            }
+
+            funcString = $('<div>').html(funcString).text();
+
+            if (disableAutoReturn === false) {
+                if (funcString.search(/return/i) === -1) {
+                    funcString = 'return ' + funcString;
+                }
+            } else {
+                if (funcString.search(/return/i) === -1) {
+                    logme(
+                        'ERROR: You have specified a JavaScript ' +
+                        'function without a "return" statemnt. Your ' +
+                        'function will return "undefined" by default.'
+                    );
+                }
+            }
+
+            allParamNames.push(funcString);
             try {
                 xrange.max = Function.apply(null, allParamNames);
             } catch (err) {
-                logme('ERROR: could not create a function from the string "' + config.plot.xrange.max + '" for xrange.max.');
+                logme(
+                    'ERROR: could not create a function from the string "' +
+                    funcString + '" for xrange.max.'
+                );
                 logme('Error message: "' + err.message + '"');
 
-                $('#' + gstId).html('<div style="color: red;">' + 'ERROR IN XML: Could not create a function from the string "' + config.plot.xrange.max + '" for xrange.max.' + '</div>');
-                $('#' + gstId).append('<div style="color: red;">' + 'Error message: "' + err.message + '".' + '</div>');
+                $('#' + gstId).html(
+                    '<div style="color: red;">' + 'ERROR IN ' +
+                    'XML: Could not create a function from the string "' +
+                    funcString + '" for xrange.max.' + '</div>'
+                );
+                $('#' + gstId).append(
+                    '<div style="color: red;">' + 'Error message: "' +
+                    err.message + '".' + '</div>'
+                );
 
                 return false;
             }
             allParamNames.pop();
 
-            if (typeof config.plot.num_points !== 'string') {
-                // logme('ERROR: config.plot.num_points is not a string.');
-                // logme('config.plot.num_points = ', config.plot.num_points);
-
-                tempNum = plotDiv.width() / 5.0;
-            }
-
             tempNum = parseInt(config.plot.num_points, 10);
             if (isFinite(tempNum) === false) {
-                // logme('ERROR: Expected config.plot.num_points to be a a valid integer. It is not.');
-                // logme('config.plot.num_points = ', config.plot.num_points);
-
-                // return false;
-
                 tempNum = plotDiv.width() / 5.0;
             }
 
@@ -556,7 +710,10 @@ define('Graph', ['logme'], function (logme) {
                 (tempNum < 2) &&
                 (tempNum > 1000)
             ) {
-                logme('ERROR: Number of points is outside the allowed range [2, 1000]');
+                logme(
+                    'ERROR: Number of points is outside the allowed range ' +
+                    '[2, 1000]'
+                );
                 logme('config.plot.num_points = ' + tempNum);
 
                 return false;
@@ -954,7 +1111,7 @@ define('Graph', ['logme'], function (logme) {
                         logme('Error message: "' + err.message + '".');
 
                         $('#' + gstId).html('<div style="color: red;">' + 'ERROR IN XML: Could not generate data from function.' + '</div>');
-                        $('#' + gstId).append('<div style="color: red;">' + 'Error message: "' + err.message + '".' + '</div>');g
+                        $('#' + gstId).append('<div style="color: red;">' + 'Error message: "' + err.message + '".' + '</div>');
 
                         return false;
                     }
