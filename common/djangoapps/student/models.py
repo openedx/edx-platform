@@ -49,7 +49,6 @@ from django.db.models.signals import post_save
 from django.dispatch import receiver
 
 import comment_client as cc
-from django_comment_client.models import Role
 
 
 log = logging.getLogger(__name__)
@@ -279,16 +278,6 @@ class CourseEnrollmentAllowed(models.Model):
     def __unicode__(self):
         return "[CourseEnrollmentAllowed] %s: %s (%s)" % (self.email, self.course_id, self.created)
 
-
-@receiver(post_save, sender=CourseEnrollment)
-def assign_default_role(sender, instance, **kwargs):
-    if instance.user.is_staff:
-        role = Role.objects.get_or_create(course_id=instance.course_id, name="Moderator")[0]
-    else:
-        role = Role.objects.get_or_create(course_id=instance.course_id, name="Student")[0]
-
-    logging.info("assign_default_role: adding %s as %s" % (instance.user, role))
-    instance.user.roles.add(role)
 
 #cache_relation(User.profile)
 
