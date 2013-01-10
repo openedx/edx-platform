@@ -29,9 +29,7 @@ $(document).ready(function() {
     $('.expand-collapse-icon').bind('click', toggleSubmodules);
     $('.visibility-options').bind('change', setVisibility);
 
-    $('.unit-history ol a').bind('click', showHistoryModal);
     $modal.bind('click', hideModal);
-    $modalCover.bind('click', hideHistoryModal);
     $modalCover.bind('click', hideModal);
     $('.assets .upload-button').bind('click', showUploadModal);
     $('.upload-modal .close-button').bind('click', hideModal);
@@ -498,9 +496,14 @@ function hideModal(e) {
     if(e) {
         e.preventDefault();
     }
-    $('.file-input').unbind('change', startUpload);
-    $modal.hide();
-    $modalCover.hide();
+    // Unit editors do not want the modal cover to hide when users click outside
+    // of the editor. Users must press Cancel or Save to exit the editor.
+    // module_edit adds and removes the "is-fixed" class.
+    if (!$modalCover.hasClass("is-fixed")) {
+        $('.file-input').unbind('change', startUpload);
+        $modal.hide();
+        $modalCover.hide();
+    }
 }
 
 function onKeyUp(e) {
@@ -528,21 +531,6 @@ function editComponent(e) {
 function closeComponentEditor(e) {
     e.preventDefault();
     $(this).closest('.xmodule_edit').removeClass('editing').find('.component-editor').slideUp(150);
-}
-
-
-function showHistoryModal(e) {
-    e.preventDefault();
-
-    $modal.show();
-    $modalCover.show();
-}
-
-function hideHistoryModal(e) {
-    e.preventDefault();
-
-    $modal.hide();
-    $modalCover.hide();
 }
 
 function showDateSetter(e) {
