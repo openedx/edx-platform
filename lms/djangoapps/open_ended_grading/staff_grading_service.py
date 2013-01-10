@@ -16,6 +16,7 @@ from django.http import HttpResponse, Http404
 from courseware.access import has_access
 from util.json_request import expect_json
 from xmodule.course_module import CourseDescriptor
+from student.models import unique_id_for_user
 
 log = logging.getLogger(__name__)
 
@@ -206,11 +207,11 @@ def get_next(request, course_id):
     if len(missing) > 0:
         return _err_response('Missing required keys {0}'.format(
             ', '.join(missing)))
-    grader_id = request.user.id
+    grader_id = unique_id_for_user(request.user)
     p = request.POST
     location = p['location']
 
-    return HttpResponse(_get_next(course_id, request.user.id, location),
+    return HttpResponse(_get_next(course_id, grader_id, location),
                         mimetype="application/json")
 
 
@@ -238,7 +239,7 @@ def get_problem_list(request, course_id):
     """
     _check_access(request.user, course_id)
     try:
-        response = staff_grading_service().get_problem_list(course_id, request.user.id)
+        response = staff_grading_service().get_problem_list(course_id, unique_id_for_user(request.user))
         return HttpResponse(response,
                 mimetype="application/json")
     except GradingServiceError:
@@ -287,7 +288,7 @@ def save_grade(request, course_id):
         return _err_response('Missing required keys {0}'.format(
             ', '.join(missing)))
 
-    grader_id = request.user.id
+    grader_id = unique_id_for_user(request.user)
     p = request.POST
 
 
