@@ -8,9 +8,7 @@ define('Graph', ['logme'], function (logme) {
 
     function Graph(gstId, config, state) {
         var plotDiv, dataSeries, functions, xaxis, yaxis, numPoints, xrange,
-            asymptotes, plotObj;
-
-        plotObj = null;
+            asymptotes, movingLabels;
 
         state.barsConfig = {
             'N': 0,
@@ -49,6 +47,8 @@ define('Graph', ['logme'], function (logme) {
             plotDiv.height(plotDiv.width());
         }
 
+        plotDiv.css('position', 'relative');
+
         // Configure some settings for the graph.
         if (setGraphXRange() === false) {
             logme('ERROR: Could not configure the xrange. Will not continue.');
@@ -73,6 +73,7 @@ define('Graph', ['logme'], function (logme) {
         }
 
         createMarkingsFunctions();
+        createMovingLabelFunctions();
 
         // Create the initial graph and plot it for the user to see.
         if (generateData() === true) {
@@ -84,6 +85,105 @@ define('Graph', ['logme'], function (logme) {
         state.bindUpdatePlotEvent(plotDiv, onUpdatePlot);
 
         return;
+
+        function createMovingLabelFunctions() {
+            var c1;
+
+            movingLabels = [];
+
+            if (config.plot.hasOwnProperty('moving_label') !== true) {
+                return ;
+            }
+
+            if ($.isPlainObject(config.plot.moving_label) === true) {
+                processMovingLabel(config.plot.moving_label);
+            } else if ($.isArray(config.plot.moving_label) === true) {
+                for (c1 = 0; c1 < config.plot.moving_label.length; c1++) {
+                    processMovingLabel(config.plot.moving_label[c1]);
+                }
+            }
+        }
+
+        function processMovingLabel(obj) {
+            var labelText, funcString, disableAutoReturn, paramNames, func;
+
+            if (obj.hasOwnProperty('@text') === false) {
+                logme('ERROR: You did not define a "text" attribute for the moving_label.');
+
+                return;
+            }
+            if (typeof obj['@text'] !== 'string') {
+                logme('ERROR: "text" attribute is not a string.');
+
+                return;
+            }
+            labelText = obj['@text'];
+
+            if (obj.hasOwnProperty('#text') === false) {
+                logme('ERROR: moving_label is missing function declaration.');
+
+                return;
+            }
+            if (typeof obj['#text'] !== 'string') {
+                logme('ERROR: Function declaration is not a string.');
+
+                return;
+            }
+            funcString = obj['#text'];
+
+            disableAutoReturn = obj['@disable_auto_return'];
+
+            funcString = $('<div>').html(funcString).text();
+
+            if (
+                (disableAutoReturn === undefined) ||
+                    (
+                        (typeof disableAutoReturn === 'string') &&
+                            (disableAutoReturn.toLowerCase() !== 'true')
+                    )
+            ) {
+                if (funcString.search(/return/i) === -1) {
+                    funcString = 'return ' + funcString;
+                }
+            } else {
+                if (funcString.search(/return/i) === -1) {
+                    logme(
+                        'ERROR: You have specified a JavaScript ' +
+                        'function without a "return" statemnt. Your ' +
+                        'function will return "undefined" by default.'
+                    );
+                }
+            }
+
+            paramNames = state.getAllParameterNames();
+            paramNames.push(funcString);
+
+            try {
+                func = Function.apply(null, paramNames);
+            } catch (err) {
+                logme(
+                    'ERROR: The function body "' +
+                        funcString +
+                        '" was not converted by the Function constructor.'
+                );
+                logme('Error message: "' + err.message + '"');
+
+                $('#' + gstId).html('<div style="color: red;">' + 'ERROR IN XML: Could not create a function from the string "' + funcString + '".' + '</div>');
+                $('#' + gstId).append('<div style="color: red;">' + 'Error message: "' + err.message + '".' + '</div>');
+
+                paramNames.pop();
+
+                return;
+            }
+
+            paramNames.pop();
+
+            movingLabels.push({
+                'labelText': labelText,
+                'func': func,
+                'el': null
+            });
+        }
 
         function createMarkingsFunctions() {
             var c1, paramNames;
@@ -923,12 +1023,12 @@ define('Graph', ['logme'], function (logme) {
         } // End-of: function generateData
 
         function updatePlot() {
-            var paramValues;
+            var paramValues, plotObj;
 
             paramValues = state.getAllParameterValues();
 
             // Tell Flot to draw the graph to our specification.
-            $.plot(
+            plotObj = $.plot(
                 plotDiv,
                 dataSeries,
                 {
@@ -954,6 +1054,8 @@ define('Graph', ['logme'], function (logme) {
                 }
             );
 
+            updateMovingLabels();
+
             // The first time that the graph gets added to the page, the legend
             // is created from scratch. When it appears, MathJax works some
             // magic, and all of the specially marked TeX gets rendered nicely.
@@ -968,6 +1070,35 @@ define('Graph', ['logme'], function (logme) {
             ]);
 
             return;
+
+            function updateMovingLabels() {
+                var c1, labelCoord, pointOffset;
+
+                for (c1 = 0; c1 < movingLabels.length; c1 += 1) {
+                    if (movingLabels[c1].el === null) {
+                        movingLabels[c1].el = $(
+                            '<div>' +
+                                movingLabels[c1].labelText +
+                            '</div>'
+                        );
+                        movingLabels[c1].el.css('position', 'absolute');
+                        movingLabels[c1].el.appendTo(plotDiv);
+
+                        movingLabels[c1].elWidth = movingLabels[c1].el.width();
+                        movingLabels[c1].elHeight = movingLabels[c1].el.height();
+                    } else {
+                        movingLabels[c1].el.detach();
+                        movingLabels[c1].el.appendTo(plotDiv);
+                    }
+
+                    labelCoord = movingLabels[c1].func.apply(window, paramValues);
+
+                    pointOffset = plotObj.pointOffset({'x': labelCoord.x, 'y': labelCoord.y});
+
+                    movingLabels[c1].el.css('left', pointOffset.left - 0.5 * movingLabels[c1].elWidth);
+                    movingLabels[c1].el.css('top', pointOffset.top - 0.5 * movingLabels[c1].elHeight);
+                }
+            }
 
             // Generate markings to represent asymptotes defined by the user.
             // See the following function for more details:
