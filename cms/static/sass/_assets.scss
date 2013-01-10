@@ -98,69 +98,69 @@
 }
 
 .upload-modal {
-	display: none;	
-	width: 640px !important;
-	margin-left: -320px !important;
+  display: none;  
+  width: 640px !important;
+  margin-left: -320px !important;
 
-	.modal-body {
-		height: auto !important;
-		overflow-y: auto !important;
-		text-align: center;
-	}
+  .modal-body {
+    height: auto !important;
+    overflow-y: auto !important;
+    text-align: center;
+  }
 
-	.file-input {
-		display: none;
-	}
+  .file-input {
+    display: none;
+  }
 
-	.choose-file-button {
-		@include blue-button;
-		padding: 10px 82px 12px;
-		font-size: 17px;
-	}
+  .choose-file-button {
+    @include blue-button;
+    padding: 10px 82px 12px;
+    font-size: 17px;
+  }
 
-	.progress-bar {
-		display: none;
-		width: 350px;
-		height: 50px;
-		margin: 30px auto 10px;
-		border: 1px solid $blue;
+  .progress-bar {
+    display: none;
+    width: 350px;
+    height: 50px;
+    margin: 30px auto 10px;
+    border: 1px solid $blue;
 
-		&.loaded {
-			border-color: #66b93d;
+    &.loaded {
+      border-color: #66b93d;
 
-			.progress-fill {
-				background: #66b93d;
-			}
-		}
-	}
+      .progress-fill {
+        background: #66b93d;
+      }
+    }
+  }
 
-	.progress-fill {
-		width: 0%;
-		height: 50px;
-		background: $blue;
-		color: #fff;
-		line-height: 48px;
-	}
+  .progress-fill {
+    width: 0%;
+    height: 50px;
+    background: $blue;
+    color: #fff;
+    line-height: 48px;
+  }
 
-	h1 {
-		float: none;
-		margin: 40px 0 30px;
-		font-size: 34px;
-		font-weight: 300;
-	}
+  h1 {
+    float: none;
+    margin: 40px 0 30px;
+    font-size: 34px;
+    font-weight: 300;
+  }
 
-	.close-button {
-		@include white-button;
-		position: absolute;
-		top: 0;
-		right: 15px;
-		width: 29px;
-		height: 29px;
-		padding: 0 !important;
-		border-radius: 17px !important;
-		line-height: 29px;
-		text-align: center;
-	}
+  .close-button {
+    @include white-button;
+    position: absolute;
+    top: 0;
+    right: 15px;
+    width: 29px;
+    height: 29px;
+    padding: 0 !important;
+    border-radius: 17px !important;
+    line-height: 29px;
+    text-align: center;
+  }
 
   .embeddable {
     display: none;
@@ -178,9 +178,9 @@
     width: 400px;
   }
 
-	.copy-button {
-		@include white-button;
-		display: none;
-		margin-bottom: 100px;
-	}
+  .copy-button {
+    @include white-button;
+    display: none;
+    margin-bottom: 100px;
+  }
 }

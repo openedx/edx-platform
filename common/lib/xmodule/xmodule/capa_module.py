@@ -670,11 +670,29 @@ class CapaDescriptor(RawDescriptor):
     stores_state = True
     has_score = True
     template_dir_name = 'problem'
+    mako_template = "widgets/problem-edit.html"
+    js = {'coffee': [resource_string(__name__, 'js/src/problem/edit.coffee')]}
+    js_module_name = "MarkdownEditingDescriptor"
+    css = {'scss': [resource_string(__name__, 'css/problem/edit.scss')]}
 
     # Capa modules have some additional metadata:
     # TODO (vshnayder): do problems have any other metadata?  Do they
     # actually use type and points?
     metadata_attributes = RawDescriptor.metadata_attributes + ('type', 'points')
+    
+    def get_context(self):
+        _context = RawDescriptor.get_context(self)
+        _context.update({'markdown': self.metadata.get('markdown', '')})
+        return _context
+    
+    @property
+    def editable_metadata_fields(self):
+        """Remove metadata from the editable fields since it has its own editor"""
+        subset = super(CapaDescriptor,self).editable_metadata_fields
+        if 'markdown' in subset:
+            subset.remove('markdown') 
+        return subset
+
 
     # VS[compat]
     # TODO (cpennington): Delete this method once all fall 2012 course are being

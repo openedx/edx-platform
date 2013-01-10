@@ -142,7 +142,7 @@ describe 'Problem', ->
     xdescribe 'when the response is undetermined', ->
       it 'alert the response', ->
         spyOn window, 'alert'
-        spyOn($, 'postWithPrefix').andCallFake (url, answers, callback) -> 
+        spyOn($, 'postWithPrefix').andCallFake (url, answers, callback) ->
           callback(success: 'Number Only!')
         @problem.check()
         expect(window.alert).toHaveBeenCalledWith 'Number Only!'
