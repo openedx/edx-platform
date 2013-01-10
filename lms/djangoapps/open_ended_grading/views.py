@@ -21,6 +21,7 @@ from django_comment_client.models import Role, FORUM_ROLE_ADMINISTRATOR, FORUM_R
 from django_comment_client.utils import has_forum_access
 from psychometrics import psychoanalyze
 from student.models import CourseEnrollment
+from student.models import unique_id_for_user
 from xmodule.course_module import CourseDescriptor
 from xmodule.modulestore import Location
 from xmodule.modulestore.django import modulestore
@@ -78,7 +79,7 @@ def peer_grading(request, course_id):
     error_text = ""
     problem_list = []
     try:
-        problem_list_text = peer_gs.get_problem_list(course_id, request.user.id)
+        problem_list_text = peer_gs.get_problem_list(course_id, unique_id_for_user(request.user))
         problem_list_json = json.loads(problem_list_text)
         success = problem_list_json['success']
         if 'error' in problem_list_json:
