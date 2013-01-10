@@ -42,28 +42,31 @@ def get_request_for_thread():
         del frame
 
 
-def get_course_by_id(course_id):
+def get_course_by_id(course_id, depth=0):
     """
     Given a course id, return the corresponding course descriptor.
 
     If course_id is not valid, raises a 404.
+    depth: The number of levels of children for the modulestore to cache. None means infinite depth
     """
     try:
         course_loc = CourseDescriptor.id_to_location(course_id)
-        return modulestore().get_instance(course_id, course_loc)
+        return modulestore().get_instance(course_id, course_loc, depth=depth)
     except (KeyError, ItemNotFoundError):
         raise Http404("Course not found.")
 
 
-def get_course_with_access(user, course_id, action):
+def get_course_with_access(user, course_id, action, depth=0):
     """
     Given a course_id, look up the corresponding course descriptor,
     check that the user has the access to perform the specified action
     on the course, and return the descriptor.
 
     Raises a 404 if the course_id is invalid, or the user doesn't have access.
+
+    depth: The number of levels of children for the modulestore to cache. None means infinite depth
     """
-    course = get_course_by_id(course_id)
+    course = get_course_by_id(course_id, depth=depth)
     if not has_access(user, course, action):
         # Deliberately return a non-specific error message to avoid
         # leaking info about access control settings

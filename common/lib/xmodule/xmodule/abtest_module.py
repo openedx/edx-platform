@@ -52,9 +52,10 @@ class ABTestModule(XModule):
     def get_shared_state(self):
         return json.dumps({'group': self.group})
     
-    def get_children_locations(self):
-        return self.definition['data']['group_content'][self.group]
-        
+    def get_child_descriptors(self):
+        active_locations = set(self.definition['data']['group_content'][self.group])
+        return [desc for desc in self.descriptor.get_children() if desc.location.url() in active_locations]
+
     def displayable_items(self):
         # Most modules return "self" as the displayable_item. We never display ourself
         # (which is why we don't implement get_html). We only display our children.

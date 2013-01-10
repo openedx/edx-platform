@@ -291,7 +291,7 @@ def progress_summary(student, request, course, student_module_cache):
             graded = section_module.metadata.get('graded', False)
             scores = []
             
-            module_creator = lambda descriptor : section_module.system.get_module(descriptor.location)
+            module_creator = section_module.system.get_module
             
             for module_descriptor in yield_dynamic_descriptor_descendents(section_module.descriptor, module_creator):
                 
