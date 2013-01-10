@@ -23,7 +23,7 @@ define('GLabelElOutput', ['logme'], function (logme) {
         return;
 
         function processFuncObj(obj) {
-            var paramNames, funcString, func;
+            var paramNames, funcString, func, disableAutoReturn;
 
             // We are only interested in functions that are meant for output to an
             // element.
@@ -46,7 +46,29 @@ define('GLabelElOutput', ['logme'], function (logme) {
                 return;
             }
 
+            disableAutoReturn = obj['@disable_auto_return'];
+
             funcString = obj['#text'];
+
+            if (
+                (disableAutoReturn === undefined) ||
+                    (
+                        (typeof disableAutoReturn === 'string') &&
+                        (disableAutoReturn.toLowerCase() !== 'true')
+                    )
+            ) {
+                if (funcString.search(/return/i) === -1) {
+                    funcString = 'return ' + funcString;
+                }
+            } else {
+                if (funcString.search(/return/i) === -1) {
+                    logme(
+                        'ERROR: You have specified a JavaScript ' +
+                        'function without a "return" statemnt. Your ' +
+                        'function will return "undefined" by default.'
+                    );
+                }
+            }
 
             // Make sure that all HTML entities are converted to their proper
             // ASCII text equivalents.
