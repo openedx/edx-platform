@@ -105,7 +105,8 @@ define('Graph', ['logme'], function (logme) {
         }
 
         function processMovingLabel(obj) {
-            var labelText, funcString, disableAutoReturn, paramNames, func;
+            var labelText, funcString, disableAutoReturn, paramNames, func,
+                fontWeight, fontColor;
 
             if (obj.hasOwnProperty('@text') === false) {
                 logme('ERROR: You did not define a "text" attribute for the moving_label.');
@@ -130,6 +131,29 @@ define('Graph', ['logme'], function (logme) {
                 return;
             }
             funcString = obj['#text'];
+
+            fontColor = 'black';
+            if (
+                (obj.hasOwnProperty('@color') === true) &&
+                (typeof obj['@color'] === 'string')
+            ) {
+                fontColor = obj['@color'];
+            }
+
+            fontWeight = 'normal';
+            if (
+                (obj.hasOwnProperty('@weight') === true) &&
+                (typeof obj['@weight'] === 'string')
+            ) {
+                if (
+                    (obj['@weight'].toLowerCase() === 'normal') ||
+                    (obj['@weight'].toLowerCase() === 'bold')
+                ) {
+                    fontWeight = obj['@weight'];
+                } else {
+                    logme('ERROR: Moving label can have a weight property of "normal" or "bold".');
+                }
+            }
 
             disableAutoReturn = obj['@disable_auto_return'];
 
@@ -181,7 +205,9 @@ define('Graph', ['logme'], function (logme) {
             movingLabels.push({
                 'labelText': labelText,
                 'func': func,
-                'el': null
+                'el': null,
+                'fontColor': fontColor,
+                'fontWeight': fontWeight
             });
         }
 
@@ -1082,6 +1108,8 @@ define('Graph', ['logme'], function (logme) {
                             '</div>'
                         );
                         movingLabels[c1].el.css('position', 'absolute');
+                        movingLabels[c1].el.css('color', movingLabels[c1].fontColor);
+                        movingLabels[c1].el.css('font-weight', movingLabels[c1].fontWeight);
                         movingLabels[c1].el.appendTo(plotDiv);
 
                         movingLabels[c1].elWidth = movingLabels[c1].el.width();
