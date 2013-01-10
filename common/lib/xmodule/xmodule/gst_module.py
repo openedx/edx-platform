@@ -37,6 +37,7 @@ class GraphicalSliderToolModule(XModule):
         resource_string(__name__, 'js/src/graphical_slider_tool/inputs.js'),
         resource_string(__name__, 'js/src/graphical_slider_tool/graph.js'),
         resource_string(__name__, 'js/src/graphical_slider_tool/el_output.js'),
+        resource_string(__name__, 'js/src/graphical_slider_tool/g_label_el_output.js'),
 
         resource_string(__name__, 'js/src/graphical_slider_tool/gst.js')
       ]

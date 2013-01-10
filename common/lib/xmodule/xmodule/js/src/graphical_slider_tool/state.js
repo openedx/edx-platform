@@ -98,7 +98,10 @@ define('State', ['logme'], function (logme) {
             'bindUpdatePlotEvent': bindUpdatePlotEvent,
             'addDynamicEl': addDynamicEl,
 
-            'getFuncForSpecialLabel': getFuncForSpecialLabel
+            'getFuncForSpecialLabel': getFuncForSpecialLabel,
+
+            // plde is an abbreviation for Plot Label Dynamic Elements.
+            plde: []
         };
 
         function getAllParameterNames() {

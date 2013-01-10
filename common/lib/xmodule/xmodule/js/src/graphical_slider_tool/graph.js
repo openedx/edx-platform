@@ -155,7 +155,10 @@ define('Graph', ['logme'], function (logme) {
                 }
 
                 newAsyObj.label = false;
-                if (typeof asyObj['@label'] === 'string') {
+                if (
+                    (asyObj.hasOwnProperty('@label') === true) &&
+                    (typeof asyObj['@label'] === 'string')
+                ) {
                     newAsyObj.label = asyObj['@label'];
                 }
 
@@ -492,7 +495,10 @@ define('Graph', ['logme'], function (logme) {
             // properties as parameters. Rather than writing them out every
             // time, we will have a single place where it is done.
             function callAddFunction(obj) {
-                if (typeof obj['@output'] === 'string') {
+                if (
+                    (obj.hasOwnProperty('@output')) &&
+                    (typeof obj['@output'] === 'string')
+                ) {
 
                     // If this function is meant to be calculated for an
                     // element then skip it.
@@ -500,13 +506,24 @@ define('Graph', ['logme'], function (logme) {
                         return;
                     }
 
-                    // It is an error if "output" is not "element" or "graph".
-                    // Though you can ommit the "output" attribute.
+                    // If this function is meant to be calculated for a
+                    // dynamic element in a label then skip it.
+                    else if (obj['@output'].toLowerCase() === 'plot_label') {
+                        return;
+                    }
+
+                    // It is an error if '@output' is not 'element',
+                    // 'plot_label', or 'graph'. However, if the '@output'
+                    // attribute is omitted, we will not have reached this.
                     else if (obj['@output'].toLowerCase() !== 'graph') {
-                        logme('ERROR: Function "output" attribute can be either "div" or "graph".');
+                        logme(
+                            'ERROR: Function "output" attribute can be ' +
+                            'either "element", "plot_label",  or "graph".'
+                        );
 
                         return;
                     }
+
                 }
 
                 // The user did not specify an "output" attribute, or it is
@@ -525,8 +542,9 @@ define('Graph', ['logme'], function (logme) {
             }
 
             function addFunction(funcString, color, line, dot, label,
-                                 pointSize, fillArea, bar, disableAutoReturn) {
-                var newFunctionObject, func, paramNames, matches;
+                pointSize, fillArea, bar, disableAutoReturn) {
+
+                var newFunctionObject, func, paramNames, c1, rgxp;
 
                 // The main requirement is function string. Without it we can't
                 // create a function, and the series cannot be calculated.
@@ -678,18 +696,27 @@ define('Graph', ['logme'], function (logme) {
                 }
 
                 if (typeof label === 'string') {
-                    matches = label.match(/%%_[^%]*%%/g);
 
-                    if (
-                        ($.isArray(matches) === true) &&
-                        (matches.length > 0)
-                    ) {
-                        newFunctionObject['specialLabel'] = true;
-                    } else {
-                        newFunctionObject['specialLabel'] = false;
+                    newFunctionObject.specialLabel = false;
+                    newFunctionObject.pldeHash = [];
+
+                    // Let's check the label against all of the plde objects.
+                    // plde is an abbreviation for Plot Label Dynamic Elements.
+                    for (c1 = 0; c1 < state.plde.length; c1 += 1) {
+                        rgxp = new RegExp(state.plde[c1].elId, 'g');
+
+                        // If we find a dynamic element in the label, we will
+                        // hash the current plde object, and indicate that this
+                        // is a special label.
+                        if (rgxp.test(label) === true) {
+                            newFunctionObject.specialLabel = true;
+                            newFunctionObject.pldeHash.push(state.plde[c1]);
+                        }
                     }
 
-                    newFunctionObject['label'] = label;
+                    newFunctionObject.label = label;
+                } else {
+                    newFunctionObject.label = false;
                 }
 
                 functions.push(newFunctionObject);
@@ -706,7 +733,7 @@ define('Graph', ['logme'], function (logme) {
 
         function generateData() {
             var c0, c1, functionObj, seriesObj, dataPoints, paramValues, x, y,
-                start, end, step, tempX, matches;
+                start, end, step, tempX;
 
             paramValues = state.getAllParameterValues();
 
@@ -818,33 +845,27 @@ define('Graph', ['logme'], function (logme) {
                 }
 
                 // See if a user defined a label for this function.
-                if (functionObj.hasOwnProperty('label') === true) {
+                if (functionObj.label !== false) {
                     if (functionObj.specialLabel === true) {
-                        matches = functionObj.label.match(/%%_[^%]*%%/g);
+                        (function (c1) {
+                            var tempLabel;
 
-                        if ($.isArray(matches) === true) {
-                            (function (c1) {
-                                var el_id, func, tempLabel;
+                            tempLabel = functionObj.label;
 
-                                tempLabel = functionObj.label;
+                            while (c1 < functionObj.pldeHash.length) {
+                                tempLabel = tempLabel.replace(
+                                    functionObj.pldeHash[c1].elId,
+                                    functionObj.pldeHash[c1].func.apply(
+                                        window,
+                                        state.getAllParameterValues()
+                                    )
+                                );
 
-                                while (c1 < matches.length) {
-                                    el_id = matches[c1].replace(/%/g, '');
-                                    func = state.getFuncForSpecialLabel(el_id);
+                                c1 += 1;
+                            }
 
-                                    if (func !== null) {
-                                        tempLabel = tempLabel.replace(
-                                            matches[c1],
-                                            func.apply(window, state.getAllParameterValues())
-                                        );
-                                    }
-
-                                    c1 += 1;
-                                }
-
-                                seriesObj.label = tempLabel;
-                            }(0));
-                        }
+                            seriesObj.label = tempLabel;
+                        }(0));
                     } else {
                         seriesObj.label = functionObj.label;
                     }
@@ -880,13 +901,22 @@ define('Graph', ['logme'], function (logme) {
             }
 
             for (c0 = 0; c0 < asymptotes.length; c0 += 1) {
-                if (typeof asymptotes[c0].label === 'string') {
+
+                // If the user defined a label for this asympote, then the
+                // property 'label' will be a string (in the other case it is
+                // a boolean value 'false'). We will create an empty data set,
+                // and add to it a label. This solution is a bit _wrong_ , but
+                // it will have to do for now. Flot JS does not provide a way
+                // to add labels to markings, and we use markings to generate
+                // asymptotes.
+                if (asymptotes[c0].label !== false) {
                     dataSeries.push({
                         'data': [],
                         'label': asymptotes[c0].label,
                         'color': asymptotes[c0].color
                     });
                 }
+
             }
 
             return true;
