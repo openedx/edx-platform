@@ -262,16 +262,6 @@ class CourseEnrollment(models.Model):
         return "[CourseEnrollment] %s: %s (%s)" % (self.user, self.course_id, self.created)
 
 
-@receiver(post_save, sender=CourseEnrollment)
-def assign_default_role(sender, instance, **kwargs):
-    if instance.user.is_staff:
-        role = Role.objects.get_or_create(course_id=instance.course_id, name="Moderator")[0]
-    else:
-        role = Role.objects.get_or_create(course_id=instance.course_id, name="Student")[0]
-
-    logging.info("assign_default_role: adding %s as %s" % (instance.user, role))
-    instance.user.roles.add(role)
-
 #cache_relation(User.profile)
 
 #### Helper methods for use from python manage.py shell.
