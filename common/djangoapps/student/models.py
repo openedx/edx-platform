@@ -406,6 +406,18 @@ class TestCenterRegistration(models.Model):
     def client_candidate_id(self):
         return self.testcenter_user.client_candidate_id
 
+    @property
+    def authorization_transaction_type(self):
+        if self.uploaded_at is None:
+            return 'Add'
+        else:
+            return 'Update'
+        
+    @property
+    def exam_authorization_count(self):
+        # TODO: figure out if this should really go in the database (with a default value).
+        return 1
+    
     @staticmethod
     def create(testcenter_user, exam, accommodation_request):
         registration = TestCenterRegistration(testcenter_user = testcenter_user)
