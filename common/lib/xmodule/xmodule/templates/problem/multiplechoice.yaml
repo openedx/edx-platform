@@ -29,19 +29,10 @@ metadata:
             ( ) The Beatles
             
             
-       <solution>
-       
-           <div class='detailed-solution'>
-           
-               Explanation
-               
-               
-               The release of the iPod allowed consumers to carry their entire music library with them in a 
-               format that did not rely on fragile and energy-intensive spinning disks.
-               
-           </div>
-           
-       </solution>
+       [Explanation]
+       The release of the iPod allowed consumers to carry their entire music library with them in a 
+       format that did not rely on fragile and energy-intensive spinning disks.
+       [Explanation]
        "
 data: |
    <problem>
