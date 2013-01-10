@@ -245,8 +245,8 @@
 
     &.editing {
       border: 1px solid $lightBluishGrey2;
-      z-index: 9999;
-
+      z-index: auto;
+      
       .drag-handle,
       .component-actions {
         display: none;
@@ -284,12 +284,17 @@
     overflow-x: auto;
   }
 
+  .wrapper-component-editor {
+    z-index: 9999;
+    position: relative;
+  }
+
   .component-editor {
     @include edit-box;
+    @include box-shadow(none);
     display: none;
     padding: 20px;
     border-radius: 2px 2px 0 0;
-    @include box-shadow(none);
 
     .metadata_edit {
       margin-bottom: 20px;
