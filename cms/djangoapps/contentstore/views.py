@@ -1,15 +1,20 @@
 from util.json_request import expect_json
+import base64
+import gzip
 import json
 import logging
 import os
 import sys
 import time
 import tarfile
+import re
 import shutil
 from datetime import datetime
 from collections import defaultdict
 from uuid import uuid4
 from path import path
+from StringIO import StringIO
+
 from xmodule.modulestore.xml_exporter import export_to_xml
 from tempfile import mkdtemp
 from django.core.servers.basehttp import FileWrapper
@@ -96,6 +101,7 @@ def login_page(request):
 
 # ==== Views for any logged-in user ==================================
 
+@ssl_login_shortcut
 @login_required
 @ensure_csrf_cookie
 def index(request):
@@ -299,9 +305,10 @@ def edit_unit(request, location):
             break
         index = index + 1
 
-    preview_lms_link = '//{preview}{lms_base}/courses/{org}/{course}/{course_name}/courseware/{section}/{subsection}/{index}'.format(
-            preview='preview.',
-            lms_base=settings.LMS_BASE,            
+    preview_base = settings.MITX_FEATURES.get('PREVIEW_LMS_BASE','preview.' + settings.LMS_BASE)
+
+    preview_lms_link = '//{preview_base}/courses/{org}/{course}/{course_name}/courseware/{section}/{subsection}/{index}'.format(
+            preview_base=preview_base,
             org=course.location.org,
             course=course.location.course, 
             course_name=course.location.name, 
@@ -701,7 +708,8 @@ def clone_item(request):
         raise PermissionDenied()
 
     parent = get_modulestore(template).get_item(parent_location)
-    dest_location = parent_location._replace(category=template.category, name=uuid4().hex)
+    name = (display_name or '')[:16].replace(' ','_')+uuid4().hex	# human-readable name
+    dest_location = parent_location._replace(category=template.category, name=name)
 
     new_item = get_modulestore(template).clone_item(template, dest_location)
 
@@ -1243,7 +1251,75 @@ def import_course(request, org, course, name):
     if not has_access(request.user, location):
         raise PermissionDenied()
 
-    if request.method == 'POST':
+    course_module = modulestore().get_item(location)
+    message = ''
+
+    if request.method == 'POST' and 'do_github_import' in request.POST:
+        message = "hello world"
+        git_repo = request.POST['git_repo'].replace(';','_').replace('\n','')
+        git_branch = request.POST['git_branch'].replace(';','_').replace('\n','')
+        metadata = course_module.metadata
+        if 'import' not in metadata:
+            metadata['import'] = {}
+        importinfo = metadata['import']
+        importinfo['git_repo'] = git_repo
+        importinfo['git_branch'] = git_branch
+        log.debug('set export info (%s, %s)' % (git_repo, git_branch))
+
+        m = re.search('/([^/]+)\.git$',git_repo)	# get local_dir from git_repo
+        if m:
+            local_dir = m.group(1)
+            importinfo['local_dir'] = local_dir
+
+        store = get_modulestore(Location(location));
+        store.update_metadata(location, course_module.metadata)	# save in mongodb store
+        message = "Git repository information updated"
+        message += "\nlocal_dir = %s" % local_dir
+
+        # do import from github by pulling then doing XML import
+        
+        log.debug('doing import now to %s' % location)
+        data_root = path(settings.GITHUB_REPO_ROOT)
+
+        course_dir = data_root / local_dir
+        message += '\nimporting course to %s\n' % course_dir
+        log.debug(message)
+
+        if os.path.exists(course_dir) and request.POST.get('purge')=='yes':
+            message += 'directory exists, purging contents\n'
+            shutil.rmtree(course_dir)
+            # message += os.popen('rm -rf "%s" 2>&1' % course_dir).read()
+
+        if not os.path.exists(course_dir):
+            message += "Creating course directory %s\n" % course_dir
+            message += os.popen('(cd "%s"; git clone %s) 2>&1' % (data_root, git_repo)).read()
+
+        if not os.path.exists(course_dir):
+            message += "Failed to create course directory!"
+            
+        cmd = '(cd "%s"; git checkout %s; git pull -u) 2>&1' % (course_dir, git_branch)
+        message += os.popen(cmd).read()
+
+        module_store, course_items = import_from_xml(modulestore('direct'), settings.GITHUB_REPO_ROOT,
+            [local_dir], load_error_modules=False, static_content_store=contentstore(), target_location_namespace = Location(location))
+
+        # update metadata with github import info
+        course_module = modulestore().get_item(location)
+        metadata = course_module.metadata
+        if 'import' not in metadata:
+            metadata['import'] = {}
+        importinfo = metadata['import']
+        importinfo['local_dir'] = local_dir
+        importinfo['git_repo'] = git_repo
+        importinfo['git_branch'] = git_branch
+        store = get_modulestore(Location(location));
+        store.update_metadata(location, course_module.metadata)	# save in mongodb store
+
+        # grab error log from import and show that?
+        
+        message += 'Import done.'
+
+    elif request.method == 'POST':
         filename = request.FILES['course-data'].name
 
         if not filename.endswith('.tar.gz'):
@@ -1298,12 +1374,13 @@ def import_course(request, org, course, name):
         create_all_course_groups(request.user, course_items[0].location)
 
         return HttpResponse(json.dumps({'Status': 'OK'}))
-    else:
-        course_module = modulestore().get_item(location)
 
-        return render_to_response('import.html', {
+    # return page to render
+
+    return render_to_response('import.html', {
             'context_course': course_module,
             'active_tab': 'import',
+            'message' : message,
             'successful_import_redirect_url' : reverse('course_index', args=[
                         course_module.location.org,
                         course_module.location.course,
@@ -1348,16 +1425,153 @@ def generate_export_course(request, org, course, name):
 
 @ensure_csrf_cookie
 @login_required
-def export_course(request, org, course, name):
-
-    location = ['i4x', org, course, 'course', name]
-    course_module = modulestore().get_item(location)
+def get_module_source_metadata(request, module_location):
+    """
+    Return source for module from module metadata, if it exists (and if user
+    has suitable access permissions).  This is used for client downloading
+    the source file, eg the word-format source for a problem, to edit.
+    """
+    location = Location(module_location)
+    
     # check that logged in user has permissions to this item
     if not has_access(request.user, location):
         raise PermissionDenied()
 
-    return render_to_response('export.html', {
-        'context_course': course_module,
-        'active_tab': 'export',
-        'successful_import_redirect_url' : ''
-    })
+    item_module = modulestore().get_item(location)
+
+    metadata = item_module.metadata
+    if 'source_code' not in metadata:
+        return HttpResponseBadRequest
+
+    scode = metadata['source_code']
+    encoding = metadata.get('source_code_encoding','')
+    if 'base64' in encoding:
+        scode = base64.b64decode(scode)
+    if 'gzip' in encoding:
+        scode = gzip.GzipFile(fileobj=StringIO(scode)).read()
+    mimetype = metadata.get('source_code_mimetype','application/msword')
+    fn = metadata.get('display_name','problem.doc')
+    #if not fn.endswith('.rtf'):
+    #    fn += '.rtf'
+    response = HttpResponse(mimetype=mimetype)
+    response['Content-Disposition'] = 'attachment; filename=%s' % fn
+    
+    response.write(scode)
+    return response
+
+
+@ensure_csrf_cookie
+@login_required
+def save_module_source_metadata(request, module_location):
+    """
+    save metadata source_code for a specified problem.
+    """
+    location = Location(module_location)
+    
+    # check that logged in user has permissions to this item
+    if not has_access(request.user, location):
+        raise PermissionDenied()
+
+    item_module = modulestore().get_item(location)
+
+    metadata = item_module.metadata
+
+    scode_file = request.FILES.get('source_code','')
+    if not scode_file:
+        log.debug('Error, missing source_code in POST')
+        return HttpResponseBadRequest
+
+    # use specified source code encoding
+    encoding = metadata.get('source_code_encoding','')
+    
+    scode = scode_file.read()
+    log.debug('scode len=%d' % len(scode))
+
+
+    if 'gzip' in encoding:
+        hdr = scode[:2]
+        if [ord(hdr[x]) for x in range(2)]==[31,139]:
+            log.debug("input already gzipped!")
+        else:
+            buf = StringIO()
+            gzip.GzipFile(fileobj=buf,mode='w').write(scode)
+            scode = buf.getvalue()
+
+    if 'base64' in encoding:
+        scode = base64.b64encode(scode)
+    
+    metadata['source_code'] = scode
+
+    # commit to datastore
+    store = get_modulestore(Location(module_location));
+    store.update_metadata(module_location, metadata)
+
+    log.debug('save_module_source_metadata succeeded, len=%d' % len(scode))
+
+    return HttpResponse(json.dumps({'Status': 'OK'}))
+    
+
+@ensure_csrf_cookie
+@login_required
+def save_module_source_images(request, module_location):
+    """
+    Save images for a specific problem module by uploading them as assets.
+    The images are provided in a POST as a json array of 
+       {'imurl': ..., 'imdata': ..., 'imfn': ...}
+    dicts.  The imdata is base64 encoded.  imfn is the image filename (local
+    to this specific problem, eg fig001.png).  imurl is the url used in the
+    xml definition (prior to substitution by the c4x url location).
+    """
+    location = Location(module_location)
+    
+    # check that logged in user has permissions to this item
+    if not has_access(request.user, location):
+        raise PermissionDenied()
+
+    item_module = modulestore().get_item(location)
+    metadata = item_module.metadata
+
+    ## TODO: we need a smarter way to figure out what course an item is in
+    #for course in modulestore().get_courses():
+    #    if (course.location.org == item.location.org and
+    #        course.location.course == item.location.course):
+    #        break
+    #
+    #coursename = course.location.name
+
+    if (0):
+        log.debug('-----------------------------------------------------------------------------')
+        log.debug('body:')
+        log.debug(request.body)
+        log.debug('-----------------------------------------------------------------------------')
+
+    imtabs = json.loads(request.body).get('images')
+    immap = []
+    
+    for imtab in imtabs:
+        imfn = imtab['imfn']
+        filedata = base64.b64decode(imtab['imdata'])
+        mime_type = imtab['imtype']
+
+        filename = "%s-%s-%s" % (metadata.get('display_name','problem'),location.name, imfn)
+
+        content_loc = StaticContent.compute_location(location.org, location.course, filename)
+        content = StaticContent(content_loc, filename, mime_type, filedata)
+
+        # first let's save a thumbnail so we can get back a thumbnail location
+        thumbnail_content = contentstore().generate_thumbnail(content)
+
+        if thumbnail_content is not None:
+            content.thumbnail_location = thumbnail_content.location
+            del_cached_content(thumbnail_content.location)
+
+        # then commit the content 
+        contentstore().save(content)
+        del_cached_content(content.location)
+        
+        immap.append(dict(imurl=imtab['imurl'], 
+                            conurl=StaticContent.get_url_path_from_location(content.location)))
+
+    log.debug('save_module_source_images immap=%s' % immap)
+    return HttpResponse(json.dumps(immap))
+    

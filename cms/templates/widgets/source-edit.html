@@ -52,9 +52,49 @@
 
      // compile & save button
 
-     $('#hls-modal-${hlskey}').find('.hls-compile').click(compile_hls_${hlskey});
+     //  $('#hls-modal-${hlskey}').find('.hls-compile').click(compile_hls_${hlskey});
+     $('#hls-modal-${hlskey}').find('.hls-compile').click(function(){
+         el = $('#hls-modal-${hlskey}');
+         compile_hls(el);
+     });
      
-     function compile_hls_${hlskey}(){
+     // connect to server using POST (requires cross-domain-access)
+
+     function compile_hls(el){	
+          editor = el.data('editor')
+          hlsdata = editor.getValue();
+	  // console.log('hlsdata=' + hlsdata);
+
+          $.ajax({
+             url: "https://studio-input-filter.mitx.mit.edu/latex2edx?raw=1",
+             type: "POST",
+             data: ""+hlsdata,
+             crossDomain: true,
+             processData: false,
+             success: function(data){
+                          console.log('latex2edx success!');
+                          console.log(data);
+                          xml = data.xml;
+                          if (xml.length==0){
+                              alert('Conversion failed!  error:'+ data.message);
+                              //set_status(el, "Conversion failed - please try another file", false);
+                          }else{
+			      //set_status(el, "Done!", true);
+                              // post_images(el, location, data, file);
+                              // post_source_code(el, location, file);
+			      el.closest('.component').find('.CodeMirror-wrap')[0].CodeMirror.setValue(xml);
+			      save_hls(el);
+                          }
+                      },
+             error: function() {
+                       alert('Error: cannot connect to word2edx server');
+                       console.log('error!');
+                   }
+         });
+     }
+
+     ## this version uses JSONP and GET, which limits file sizes
+     function old_compile_hls_${hlskey}(){	
 
           editor = $('#hls-modal-${hlskey}').data('editor')
           var myquery = { latexin: editor.getValue() };

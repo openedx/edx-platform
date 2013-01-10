@@ -34,6 +34,7 @@ MITX_FEATURES = {
     'GITHUB_PUSH': False,
     'ENABLE_DISCUSSION_SERVICE': False,
     'AUTH_USE_MIT_CERTIFICATES' : False,
+    'GITHUB_EXPORT_AND_INPORT' : True,
 }
 ENABLE_JASMINE = False
 
@@ -178,6 +179,9 @@ LANGUAGE_CODE = 'en'            # http://www.i18nguy.com/unicode/language-identi
 USE_I18N = True
 USE_L10N = True
 
+# Tracking
+TRACK_MAX_EVENT = 10000
+
 # Messages
 MESSAGE_STORAGE = 'django.contrib.messages.storage.session.SessionStorage'
 
@@ -281,6 +285,9 @@ INSTALLED_APPS = (
     'auth',
     'student',  # misleading name due to sharing with lms
 
+    # tracking
+    'track',
+    
     # For asset pipelining
     'pipeline',
     'staticfiles',

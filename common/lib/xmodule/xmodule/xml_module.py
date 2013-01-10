@@ -371,8 +371,8 @@ class XmlDescriptor(XModuleDescriptor):
             # don't want e.g. data_dir
             if attr not in self.metadata_to_strip and attr not in self.metadata_to_export_to_policy:
                 val = val_for_xml(attr)
+                xml_object.set(attr, str(val))
                 #logging.debug('location.category = {0}, attr = {1}'.format(self.location.category, attr))
-                xml_object.set(attr, val)
 
         if self.export_to_file():
             # Write the definition to a file

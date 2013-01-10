@@ -18,7 +18,11 @@
   </ul>
 
   % if 'source_code' in editable_metadata_fields:
-  <%include file="source-edit.html" />
+    % if 'msword' in metadata.get('source_code_mimetype',''):
+        <%include file="word-edit.html" />
+    % else:
+        <%include file="source-edit.html" />
+    % endif
   % endif
 
 </section>

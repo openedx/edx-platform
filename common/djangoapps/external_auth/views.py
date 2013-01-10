@@ -134,14 +134,14 @@ def external_login_or_signup(request,
     internal_user = eamap.user
     if internal_user is None:
         log.debug('No user for %s yet, doing signup' % eamap.external_email)
-        return signup(request, eamap)
+        return signup(request, eamap, retfun)
 
     uname = internal_user.username
     user = authenticate(username=uname, password=eamap.internal_password)
     if user is None:
         log.warning("External Auth Login failed for %s / %s" %
                     (uname, eamap.internal_password))
-        return signup(request, eamap)
+        return signup(request, eamap, retfun)
 
     if not user.is_active:
         log.warning("User %s is not active" % (uname))
@@ -160,7 +160,7 @@ def external_login_or_signup(request,
 
 @ensure_csrf_cookie
 @cache_if_anonymous
-def signup(request, eamap=None):
+def signup(request, eamap=None, retfun=None):
     """
     Present form to complete for signup via external authentication.
     Even though the user has external credentials, he/she still needs
@@ -169,13 +169,36 @@ def signup(request, eamap=None):
 
     eamap is an ExteralAuthMap object, specifying the external user
     for which to complete the signup.
+    
+    retfun is a function to execute for the return value, if immediate
+    signup is used.  That allows @ssl_login_shortcut() to work.
     """
+
+    if hasattr(settings,'SIGNUP_REDIRECT_URL'):
+        return redirect(settings.SIGNUP_REDIRECT_URL)
 
     if eamap is None:
         pass
 
     # save this for use by student.views.create_account
     request.session['ExternalAuthMap'] = eamap
+
+    if settings.MITX_FEATURES.get('AUTH_USE_MIT_CERTIFICATES_IMMEDIATE_SIGNUP',''):
+        # do signin immediately, by calling create_account, instead of asking
+        # student to fill in form.  MIT students already have information filed.
+        username = eamap.external_email.split('@',1)[0]
+        username = username.replace('.','_')
+        post_vars = dict(username = username,
+                         honor_code = u'true',
+                         terms_of_service = u'true',
+                         )
+        ret = student_views.create_account(request, post_vars)
+        log.debug('doing immediate signup for %s, ret=%s' % (username, ret))
+        # should check return content for successful completion before continuing
+        if retfun is not None:
+            return retfun()
+        else:
+            return ret
 
     # default conjoin name, no spaces
     username = eamap.external_name.replace(' ', '')
@@ -254,12 +277,17 @@ def ssl_login_shortcut(fn):
             return fn(*args, **kwargs)
 
         (user, email, fullname) = ssl_dn_extract_info(cert)
+
+        def continue_login():
+            return fn(*args, **kwargs)
+
         return external_login_or_signup(request,
                                         external_id=email,
                                         external_domain="ssl:MIT",
                                         credentials=cert,
                                         email=email,
-                                        fullname=fullname)
+                                        fullname=fullname,
+                                        retfun=continue_login)
     return wrapped
 
 

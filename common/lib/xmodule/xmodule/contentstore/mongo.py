@@ -12,6 +12,7 @@ import logging
 from .content import StaticContent, ContentStore
 from xmodule.exceptions import NotFoundError
 from fs.osfs import OSFS
+from fs.errors import ResourceNotFoundError
 import os
 
 
@@ -73,7 +74,11 @@ class MongoContentStore(ContentStore):
 
         for asset in assets:
             asset_location = Location(asset['_id'])
-            self.export(asset_location, output_directory)
+            try:
+                self.export(asset_location, output_directory)
+            except ResourceNotFoundError as err:
+                logging.error('error in export: %s' % err)
+                continue
 
     def get_all_content_thumbnails_for_course(self, location):
         return self._get_all_content_for_course(location, get_thumbnails = True)
