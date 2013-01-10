@@ -146,6 +146,8 @@ class PeerGradingProblem
     @interstitial_page_button = $('.interstitial-page-button')
 
     Collapsible.setCollapsibles(@content_panel)
+
+    # Set up the click event handlers
     @action_button.click -> history.back()
     @calibration_feedback_button.click => 
       @calibration_feedback_panel.hide()
@@ -358,6 +360,7 @@ class PeerGradingProblem
       @calibration_feedback_panel.hide()
       @error_container.html(error_message)
       @content_panel.hide()
+      @action_button.show()
 
   show_submit_button: () =>
     @submit_button.show()
