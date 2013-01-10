@@ -102,7 +102,15 @@ class Command(BaseCommand):
             needs_updating = True
         
         if needs_updating:
-            form = TestCenterUserForm(instance=testcenter_user, data=our_options)
+            # the registration form normally populates the data dict with 
+            # all values from the testcenter_user.  But here we only want to
+            # specify those values that change, so update the dict with existing
+            # values.
+            form_options = dict(our_options)
+            for propname in TestCenterUser.user_provided_fields():
+                if propname not in form_options: 
+                    form_options[propname] = testcenter_user.__getattribute__(propname)
+            form = TestCenterUserForm(instance=testcenter_user, data=form_options)
             if form.is_valid():
                 form.update_and_save()
             else:
@@ -123,7 +131,7 @@ class Command(BaseCommand):
         testcenter_user = TestCenterUser.objects.get(user=student)
         for internal_field in [ 'upload_error_message', 'upload_status', 'client_candidate_id']:
             if internal_field in our_options:
-                testcenter_user = our_options[internal_field]
+                testcenter_user.__setattr__(internal_field, our_options[internal_field])
                 change_internal = True
                 
         if change_internal:
