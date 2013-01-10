@@ -3,6 +3,36 @@ metadata:
     display_name: Option Response
     rerandomize: never
     showanswer: always
+    markdown: 
+        "OptionResponse gives a limited set of options for students to respond with, and presents those options
+        in a format that encourages them to search for a specific answer rather than being immediately presented 
+        with options from which to recognize the correct answer.
+        
+
+        The answer options and the identification of the correct answer is defined in the <b>optioninput</b> tag.
+        
+
+        Translation between Option Response and __________ is extremely straightforward:
+        
+        [[(Multiple Choice), String Response, Numerical Response, External Response, Image Response]]
+
+
+        <solution>
+        
+            <div class='detailed-solution'>
+            
+            Explanation
+            
+            
+            Multiple Choice also allows students to select from a variety of pre-written responses, although the 
+            format makes it easier for students to read very long response options. Optionresponse also differs 
+            slightly because students are more likely to think of an answer and then search for it rather than 
+            relying purely on recognition to answer the question.
+            
+            </div>
+            
+        </solution>
+        "
 data: |
   <problem>
   <p>OptionResponse gives a limited set of options for students to respond with, and presents those options

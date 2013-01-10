@@ -262,7 +262,7 @@ class AssignmentFormatGrader(CourseGrader):
     min_count = 2 would produce the labels "Assignment 3", "Assignment 4"
 
     """
-    def __init__(self, type, min_count, drop_count, category=None, section_type=None, short_label=None, show_only_average=False, starting_index=1):
+    def __init__(self, type, min_count, drop_count, category=None, section_type=None, short_label=None, show_only_average=False, hide_average=False, starting_index=1):
         self.type = type
         self.min_count = min_count
         self.drop_count = drop_count
@@ -271,6 +271,7 @@ class AssignmentFormatGrader(CourseGrader):
         self.short_label = short_label or self.type
         self.show_only_average = show_only_average
         self.starting_index = starting_index
+        self.hide_average = hide_average
 
     def grade(self, grade_sheet, generate_random_scores=False):
         def totalWithDrops(breakdown, drop_count):
@@ -331,7 +332,8 @@ class AssignmentFormatGrader(CourseGrader):
         if self.show_only_average:
             breakdown = []
         
-        breakdown.append({'percent': total_percent, 'label': total_label, 'detail': total_detail, 'category': self.category, 'prominent': True})
+        if not self.hide_average:
+            breakdown.append({'percent': total_percent, 'label': total_label, 'detail': total_detail, 'category': self.category, 'prominent': True})
         
         return {'percent': total_percent,
                 'section_breakdown': breakdown,

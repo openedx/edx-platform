@@ -200,7 +200,7 @@ def edit_subsection(request, location):
 
     # make sure that location references a 'sequential', otherwise return BadRequest
     if item.location.category != 'sequential':
-        return HttpResponseBadRequest
+        return HttpResponseBadRequest()
 
     parent_locs = modulestore().get_parent_locations(location)
 
@@ -271,6 +271,8 @@ def edit_unit(request, location):
             component_templates[template.location.category].append((
                 template.display_name,
                 template.location.url(),
+                'markdown' in template.metadata,
+                template.location.name == 'Empty'
             ))
 
     components = [
@@ -973,6 +975,11 @@ def course_info_updates(request, org, course, provided_id=None):
     # ??? No way to check for access permission afaik
     # get current updates
     location = ['i4x', org, course, 'course_info', "updates"]
+    
+    # Hmmm, provided_id is coming as empty string on create whereas I believe it used to be None :-(
+    # Possibly due to my removing the seemingly redundant pattern in urls.py
+    if provided_id == '':
+        provided_id = None
 
     # check that logged in user has permissions to this item
     if not has_access(request.user, location):
@@ -991,7 +998,7 @@ def course_info_updates(request, org, course, provided_id=None):
     elif request.method == 'POST':
         try:
             return HttpResponse(json.dumps(update_course_updates(location, request.POST, provided_id)), mimetype="application/json")
-        except etree.XMLSyntaxError:
+        except:
             return HttpResponseBadRequest("Failed to save: malformed html", content_type="text/plain")
 
 
@@ -1023,7 +1030,7 @@ def module_info(request, module_location):
     elif real_method == 'POST' or real_method == 'PUT':
         return HttpResponse(json.dumps(set_module_info(get_modulestore(location), location, request.POST)), mimetype="application/json")
     else:
-        return HttpResponseBadRequest
+        return HttpResponseBadRequest()
 
 @login_required
 @ensure_csrf_cookie

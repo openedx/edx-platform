@@ -2,7 +2,8 @@
 <problem display_name="L4 Problem 1">
   <text>
     <p>
-      <b class="bfseries">Part 1: Function Types</b>
+      <!-- include ellipses to test non-ascii characters -->
+      <b class="bfseries">Part 1: Function Types…</b>
     </p>
     <p>
 For each of the following functions, specify the type of its <b class="bfseries">output</b>. You can assume each function is called with an appropriate argument, as specified by its docstring. </p>

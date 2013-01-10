@@ -5,7 +5,7 @@ import unittest
 from xmodule.progress import Progress
 from xmodule import x_module
 
-from . import i4xs
+from . import test_system
 
 class ProgressTest(unittest.TestCase):
     ''' Test that basic Progress objects work.  A Progress represents a
@@ -133,6 +133,6 @@ class ModuleProgressTest(unittest.TestCase):
     '''
     def test_xmodule_default(self):
         '''Make sure default get_progress exists, returns None'''
-        xm = x_module.XModule(i4xs, 'a://b/c/d/e', None, {})
+        xm = x_module.XModule(test_system, 'a://b/c/d/e', None, {})
         p = xm.get_progress()
         self.assertEqual(p, None)

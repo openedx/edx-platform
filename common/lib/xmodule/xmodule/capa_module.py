@@ -145,6 +145,11 @@ class CapaModule(XModule):
         else:
             self.seed = None
 
+        # Need the problem location in openendedresponse to send out.  Adding
+        # it to the system here seems like the least clunky way to get it
+        # there.
+        self.system.set('location', self.location.url())
+
         try:
             # TODO (vshnayder): move as much as possible of this work and error
             # checking to descriptor load time
@@ -366,6 +371,7 @@ class CapaModule(XModule):
             'problem_save': self.save_problem,
             'problem_show': self.get_answer,
             'score_update': self.update_score,
+            'message_post' : self.message_post,
             }
 
         if dispatch not in handlers:
@@ -379,6 +385,20 @@ class CapaModule(XModule):
             'progress_status': Progress.to_js_status_str(after),
             })
         return json.dumps(d, cls=ComplexEncoder)
+
+    def message_post(self, get):
+        """
+        Posts a message from a form to an appropriate location
+        """
+        event_info = dict()
+        event_info['state'] = self.lcp.get_state()
+        event_info['problem_id'] = self.location.url()
+        event_info['student_id'] = self.system.anonymous_student_id
+        event_info['survey_responses']= get
+
+        success, message = self.lcp.message_post(event_info)
+
+        return {'success' : success, 'message' : message}
 
     def closed(self):
         ''' Is the student still allowed to submit answers? '''
@@ -650,11 +670,29 @@ class CapaDescriptor(RawDescriptor):
     stores_state = True
     has_score = True
     template_dir_name = 'problem'
+    mako_template = "widgets/problem-edit.html"
+    js = {'coffee': [resource_string(__name__, 'js/src/problem/edit.coffee')]}
+    js_module_name = "MarkdownEditingDescriptor"
+    css = {'scss': [resource_string(__name__, 'css/problem/edit.scss')]}
 
     # Capa modules have some additional metadata:
     # TODO (vshnayder): do problems have any other metadata?  Do they
     # actually use type and points?
     metadata_attributes = RawDescriptor.metadata_attributes + ('type', 'points')
+    
+    def get_context(self):
+        _context = RawDescriptor.get_context(self)
+        _context.update({'markdown': self.metadata.get('markdown', '')})
+        return _context
+    
+    @property
+    def editable_metadata_fields(self):
+        """Remove metadata from the editable fields since it has its own editor"""
+        subset = super(CapaDescriptor,self).editable_metadata_fields
+        if 'markdown' in subset:
+            subset.remove('markdown') 
+        return subset
+
 
     # VS[compat]
     # TODO (cpennington): Delete this method once all fall 2012 course are being

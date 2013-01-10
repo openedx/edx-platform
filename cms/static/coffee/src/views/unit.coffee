@@ -59,6 +59,9 @@ class CMS.Views.UnitEdit extends Backbone.View
     type = $(event.currentTarget).data('type')
     @$newComponentTypePicker.slideUp(250)
     @$(".new-component-#{type}").slideDown(250)
+    $('html, body').animate({ 
+      scrollTop: @$(".new-component-#{type}").offset().top 
+    }, 500)
 
   closeNewComponent: (event) =>
     event.preventDefault()

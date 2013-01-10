@@ -418,6 +418,10 @@ If you want to customize the courseware tabs displayed for your course, specify 
 * "external_link".  Parameters "name", "link".
 * "textbooks".  No parameters--generates tab names from book titles.
 * "progress".  Parameter "name".
+* "static_tab".  Parameters "name", 'url_slug'--will look for tab contents in
+                       'tabs/{course_url_name}/{tab url_slug}.html'
+* "staff_grading". No parameters.  If specified, displays the staff grading tab for instructors.
+
 
 # Tips for content developers
 
@@ -429,9 +433,7 @@ before the week 1 material to make it easy to find in the file.
 
 * Come up with a consistent pattern for url_names, so that it's easy to know where to look for any piece of content.  It will also help to come up with a standard way of splitting your content files.  As a point of departure, we suggest splitting chapters, sequences, html, and problems into separate files.
 
-* A heads up: our content management system will allow you to develop content through a web browser, but will be backed by this same xml at first.  Once that happens, every element will be in its own file to make access and updates faster.
-
-* Prefer the most "semantic" name for containers: e.g., use problemset rather than vertical for a problem set.  That way, if we decide to display problem sets differently, we don't have to change the xml.
+* Prefer the most "semantic" name for containers: e.g., use problemset rather than sequential for a problem set.  That way, if we decide to display problem sets differently, we don't have to change the xml.
 
 # Other file locations (info and about)
 

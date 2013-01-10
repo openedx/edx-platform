@@ -157,7 +157,7 @@ class ImportSystem(XMLParsingSystem, MakoDescriptorSystem):
                 make_name_unique(xml_data)
 
                 descriptor = XModuleDescriptor.load_from_xml(
-                    etree.tostring(xml_data), self, self.org,
+                    etree.tostring(xml_data, encoding='unicode'), self, self.org,
                     self.course, xmlstore.default_class)
             except Exception as err:
                 print err, self.load_error_modules
@@ -419,7 +419,7 @@ class XMLModuleStore(ModuleStoreBase):
                 self.load_error_modules,
             )
 
-            course_descriptor = system.process_xml(etree.tostring(course_data))
+            course_descriptor = system.process_xml(etree.tostring(course_data, encoding='unicode'))
 
             # NOTE: The descriptors end up loading somewhat bottom up, which
             # breaks metadata inheritance via get_children().  Instead
@@ -512,6 +512,24 @@ class XMLModuleStore(ModuleStoreBase):
         """
         raise NotImplementedError("XMLModuleStores can't guarantee that definitions"
                                   " are unique. Use get_instance.")
+
+    def get_items(self, location, course_id=None, depth=0):
+        items = []
+
+        def _add_get_items(self, location, modules):
+            for mod_loc, module in modules.iteritems():
+                # Locations match if each value in `location` is None or if the value from `location`
+                # matches the value from `mod_loc`
+                if all(goal is None or goal == value for goal, value in zip(location, mod_loc)):
+                    items.append(module)
+
+        if course_id is None:
+            for _, modules in self.modules.iteritems():
+                _add_get_items(self, location, modules)
+        else:
+            _add_get_items(self, location, self.modules[course_id])
+
+        return items
 
 
     def get_courses(self, depth=0):

@@ -74,6 +74,8 @@ MITX_FEATURES = {
 
     'DISABLE_LOGIN_BUTTON': False,  # used in systems where login is automatic, eg MIT SSL
 
+    'STUB_VIDEO_FOR_TESTING': False, # do not display video when running automated acceptance tests
+
     # extrernal access methods
     'ACCESS_REQUIRE_STAFF_FOR_COURSE': False,
     'AUTH_USE_OPENID': False,
@@ -184,6 +186,9 @@ TRACK_MAX_EVENT = 10000
 DEBUG_TRACK_LOG = False
 
 MITX_ROOT_URL = ''
+
+LOGIN_REDIRECT_URL = MITX_ROOT_URL + '/accounts/login'
+LOGIN_URL = MITX_ROOT_URL + '/accounts/login'
 
 COURSE_NAME = "6.002_Spring_2012"
 COURSE_NUMBER = "6.002x"
@@ -321,6 +326,13 @@ WIKI_USE_BOOTSTRAP_SELECT_WIDGET = False
 WIKI_LINK_LIVE_LOOKUPS = False
 WIKI_LINK_DEFAULT_LEVEL = 2
 
+################################# Staff grading config  #####################
+
+STAFF_GRADING_INTERFACE = None
+# Used for testing, debugging
+MOCK_STAFF_GRADING = False
+
+
 ################################# Jasmine ###################################
 JASMINE_TEST_DIRECTORY = PROJECT_ROOT + '/static/coffee'
 
@@ -387,6 +399,8 @@ courseware_js = (
 )
 
 main_vendor_js = [
+  'js/vendor/RequireJS.js',
+  'js/vendor/json2.js',
   'js/vendor/jquery.min.js',
   'js/vendor/jquery-ui.min.js',
   'js/vendor/jquery.cookie.js',
@@ -396,6 +410,9 @@ main_vendor_js = [
 ]
 
 discussion_js = sorted(rooted_glob(PROJECT_ROOT / 'static', 'coffee/src/discussion/**/*.coffee'))
+
+
+staff_grading_js = sorted(rooted_glob(PROJECT_ROOT / 'static', 'coffee/src/staff_grading/**/*.coffee'))
 
 PIPELINE_CSS = {
     'application': {
@@ -425,7 +442,7 @@ PIPELINE_JS = {
         'source_filenames': sorted(
             set(rooted_glob(COMMON_ROOT / 'static', 'coffee/src/**/*.coffee') +
                 rooted_glob(PROJECT_ROOT / 'static', 'coffee/src/**/*.coffee')) -
-            set(courseware_js + discussion_js)
+            set(courseware_js + discussion_js + staff_grading_js) 
         ) + [
             'js/form.ext.js',
             'js/my_courses_dropdown.js',
@@ -451,8 +468,12 @@ PIPELINE_JS = {
         'source_filenames': discussion_js,
         'output_filename': 'js/discussion.js'
     },
-}
+    'staff_grading' : {
+        'source_filenames': staff_grading_js,
+        'output_filename': 'js/staff_grading.js'
+    }
 
+}
 
 PIPELINE_DISABLE_WRAPPER = True
 

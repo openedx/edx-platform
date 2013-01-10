@@ -56,6 +56,15 @@
       z-index: 10;
       margin: 20px 40px;
 
+
+      .title {
+        margin: 0 0 15px 0;
+        color: $mediumGrey;
+
+        .value {
+        }
+      }
+
       &.new-component-item {
         padding: 20px;
         border: none;
@@ -116,7 +125,7 @@
           a {
             position: relative;            
             border: 1px solid $darkGreen;
-            background: $green;
+            background: tint($green,20%);
             color: #fff;            
             @include transition(background-color .15s);
 
@@ -129,23 +138,71 @@
         .new-component-template {
           margin-bottom: 20px;
 
-          li:first-child {
+          li:last-child {
+            a {
+              border-radius: 0 0 3px 3px;
+              border-bottom: 1px solid $darkGreen;
+            }
+          }
+
+          li:nth-child(2) {
             a {
               border-radius: 3px 3px 0 0;
             }
           }
 
-          li:last-child {
-            a {
-              border-radius: 0 0 3px 3px;
-            }
-          }
-
           a {
+            @include clearfix();
             display: block;
             padding: 7px 20px;
             border-bottom: none;
             font-weight: 300;
+
+            .name {
+              float: left;
+
+              .ss-icon {
+                @include transition(opacity .15s);
+                position: relative;
+                top: 1px;
+                font-size: 13px;
+                margin-right: 5px;
+                opacity: 0.5;
+              }
+            }
+
+            .editor-indicator {
+              @include transition(opacity .15s);
+              float: right;
+              position: relative;
+              top: 3px;
+              font-size: 12px;
+              opacity: 0.1;
+            }
+
+            &:hover {
+
+              .ss-icon {
+                opacity: 1.0;
+              }
+
+              .editor-indicator {
+                opacity: 1.0;
+              }
+            }
+          }
+
+          // specific editor types 
+          .empty {
+            @include box-shadow(0 1px 3px rgba(0,0,0,0.2));
+            margin-bottom: 10px;
+
+            a {
+              border-bottom: 1px solid $darkGreen;
+              border-radius: 3px;
+              font-weight: 500;
+              background: $green;
+            }
           }
         }
 
@@ -188,8 +245,8 @@
 
     &.editing {
       border: 1px solid $lightBluishGrey2;
-      z-index: 9999;
-
+      z-index: auto;
+      
       .drag-handle,
       .component-actions {
         display: none;
@@ -211,7 +268,7 @@
       display: block;
       top: -1px;
       right: -16px;
-      z-index: -1;
+      z-index: 10;
       width: 15px;
       height: 100%;
       border-radius: 0 3px 3px 0;
@@ -224,14 +281,20 @@
 
   .xmodule_display {
     padding: 40px 20px 20px;
+    overflow-x: auto;
+  }
+
+  .wrapper-component-editor {
+    z-index: 9999;
+    position: relative;
   }
 
   .component-editor {
     @include edit-box;
+    @include box-shadow(none);
     display: none;
     padding: 20px;
     border-radius: 2px 2px 0 0;
-    @include box-shadow(none);
 
     .metadata_edit {
       margin-bottom: 20px;
@@ -473,7 +536,7 @@ body.unit {
     .component-actions {
       @include box-sizing(border-box);
       position: absolute;
-      width: 811px;
+      width: 100%;
       padding: 15px;
       top: 0;
       left: 0;

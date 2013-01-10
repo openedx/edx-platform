@@ -75,7 +75,9 @@ def certificate_status_for_student(student, course_id):
     This returns a dictionary with a key for status, and other information.
     The status is one of the following:
 
-    unavailable  - A student is not eligible for a certificate.
+    unavailable  - No entry for this student--if they are actually in
+                   the course, they probably have not been graded for
+                   certificate generation yet.
     generating   - A request has been made to generate a certificate,
                    but it has not been generated yet.
     regenerating - A request has been made to regenerate a certificate,
@@ -90,7 +92,7 @@ def certificate_status_for_student(student, course_id):
     "download_url".
 
     If the student has been graded, the dictionary also contains their
-    grade for the course.
+    grade for the course with the key "grade".
     '''
 
     try:

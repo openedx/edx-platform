@@ -671,17 +671,14 @@ class Crystallography(InputTypeBase):
         """
         Note: height, width are required.
         """
-        return [Attribute('size', None),
-                Attribute('height'),
+        return [Attribute('height'),
                 Attribute('width'),
-
-                # can probably be removed (textline should prob be always-hidden)
-                Attribute('hidden', ''),
                 ]
 
 registry.register(Crystallography)
 
 # -------------------------------------------------------------------------
+
 
 class VseprInput(InputTypeBase):
     """
@@ -736,3 +733,53 @@ class ChemicalEquationInput(InputTypeBase):
         return {'previewer': '/static/js/capa/chemical_equation_preview.js',}
 
 registry.register(ChemicalEquationInput)
+
+#-----------------------------------------------------------------------------
+
+class OpenEndedInput(InputTypeBase):
+    """
+    A text area input for code--uses codemirror, does syntax highlighting, special tab handling,
+    etc.
+    """
+
+    template = "openendedinput.html"
+    tags = ['openendedinput']
+
+    # pulled out for testing
+    submitted_msg = ("Feedback not yet available.  Reload to check again. "
+                     "Once the problem is graded, this message will be "
+                     "replaced with the grader's feedback.")
+
+    @classmethod
+    def get_attributes(cls):
+        """
+        Convert options to a convenient format.
+        """
+        return [Attribute('rows', '30'),
+                Attribute('cols', '80'),
+                Attribute('hidden', ''),
+                ]
+
+    def setup(self):
+        """
+        Implement special logic: handle queueing state, and default input.
+        """
+        # if no student input yet, then use the default input given by the problem
+        if not self.value:
+            self.value = self.xml.text
+
+        # Check if problem has been queued
+        self.queue_len = 0
+        # Flag indicating that the problem has been queued, 'msg' is length of queue
+        if self.status == 'incomplete':
+            self.status = 'queued'
+            self.queue_len = self.msg
+            self.msg = self.submitted_msg
+
+    def _extra_context(self):
+        """Defined queue_len, add it """
+        return {'queue_len': self.queue_len,}
+
+registry.register(OpenEndedInput)
+
+#-----------------------------------------------------------------------------

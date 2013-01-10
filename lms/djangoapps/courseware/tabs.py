@@ -45,7 +45,7 @@ CourseTab = namedtuple('CourseTab', 'name link is_active')
 #    wrong.  (e.g. "is there a 'name' field?).  Validators can assume
 #    that the type field is valid.
 #
-#  - a function that takes a config, a user, and a course, and active_page and
+#  - a function that takes a config, a user, and a course, an active_page and
 #    return a list of CourseTabs.  (e.g. "return a CourseTab with specified
 #    name, link to courseware, and is_active=True/False").  The function can
 #    assume that it is only called with configs of the appropriate type that
@@ -106,6 +106,14 @@ def _textbooks(tab, user, course, active_page):
                 for index, textbook in enumerate(course.textbooks)]
     return []
 
+
+def _staff_grading(tab, user, course, active_page):
+    if has_access(user, course, 'staff'):
+        link = reverse('staff_grading', args=[course.id])
+        return [CourseTab('Staff grading', link, active_page == "staff_grading")]
+    return []
+
+
 #### Validators
 
 
@@ -141,6 +149,7 @@ VALID_TAB_TYPES = {
     'textbooks': TabImpl(null_validator, _textbooks),
     'progress': TabImpl(need_name, _progress),
     'static_tab': TabImpl(key_checker(['name', 'url_slug']), _static_tab),
+    'staff_grading': TabImpl(null_validator, _staff_grading),
     }
 
 

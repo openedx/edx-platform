@@ -1,18 +1,17 @@
 .ui-timepicker-list {
 	overflow-y: auto;
 	height: 150px;
-	width: 7.5em;
+	width: 6.5em;
 	background: #fff;
-	border: 1px solid #8891a1;
+	border: 1px solid #ddd;
 	margin: 0;
 	padding: 0;
 	list-style: none;
-	-webkit-box-shadow: 0 5px 10px rgba(0,0,0,0.1);
-	-moz-box-shadow: 0 5px 10px rgba(0,0,0,0.1);
-	box-shadow: 0 5px 10px rgba(0,0,0,0.1);
+	-webkit-box-shadow:0 5px 10px rgba(0,0,0,0.2);
+	-moz-box-shadow:0 5px 10px rgba(0,0,0,0.2);
+	box-shadow:0 5px 10px rgba(0,0,0,0.2);
 	outline: none;
-	z-index: 100001;
-	font-size: 12px;
+	z-index: 10001;
 }
 
 .ui-timepicker-list.ui-timepicker-with-duration {

@@ -262,7 +262,7 @@ class MongoModuleStore(ModuleStoreBase):
         """
         return self.get_item(location)
 
-    def get_items(self, location, depth=0):
+    def get_items(self, location, course_id=None, depth=0):
         items = self.collection.find(
             location_to_query(location),
             sort=[('revision', pymongo.ASCENDING)],

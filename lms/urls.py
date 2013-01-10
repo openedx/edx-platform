@@ -37,6 +37,8 @@ urlpatterns = ('',
     url(r'^event$', 'track.views.user_track'),
     url(r'^t/(?P<template>[^/]*)$', 'static_template_view.views.index'), # TODO: Is this used anymore? What is STATIC_GRAB?
 
+    url(r'^accounts/login$', 'student.views.accounts_login', name="accounts_login"),
+
     url(r'^login$', 'student.views.login_user', name="login"),
     url(r'^login/(?P<error>[^/]*)$', 'student.views.login_user'),
     url(r'^logout$', 'student.views.logout_user', name='logout'),
@@ -61,6 +63,8 @@ urlpatterns = ('',
     url(r'^heartbeat$', include('heartbeat.urls')),
 
     url(r'^university_profile/UTx$', 'courseware.views.static_university_profile', name="static_university_profile", kwargs={'org_id':'UTx'}),
+    url(r'^university_profile/WellesleyX$', 'courseware.views.static_university_profile', name="static_university_profile", kwargs={'org_id':'WellesleyX'}),
+    url(r'^university_profile/GeorgetownX$', 'courseware.views.static_university_profile', name="static_university_profile", kwargs={'org_id':'GeorgetownX'}),
     url(r'^university_profile/(?P<org_id>[^/]+)$', 'courseware.views.university_profile', name="university_profile"),
 
     #Semi-static views (these need to be rendered and have the login bar, but don't change)
@@ -73,6 +77,8 @@ urlpatterns = ('',
     url(r'^contact$', 'static_template_view.views.render',
         {'template': 'contact.html'}, name="contact"),
     url(r'^press$', 'student.views.press', name="press"),
+    url(r'^media-kit$', 'static_template_view.views.render',
+        {'template': 'media-kit.html'}, name="media-kit"),
     url(r'^faq$', 'static_template_view.views.render',
         {'template': 'faq.html'}, name="faq_edx"),
     url(r'^help$', 'static_template_view.views.render',
@@ -101,9 +107,17 @@ urlpatterns = ('',
         {'template': 'press_releases/UT_joins_edX.html'}, name="press/ut-joins-edx"),
     url(r'^press/cengage-to-provide-book-content$', 'static_template_view.views.render',
         {'template': 'press_releases/Cengage_to_provide_book_content.html'}, name="press/cengage-to-provide-book-content"),
+    url(r'^press/gates-foundation-announcement$', 'static_template_view.views.render',
+        {'template': 'press_releases/Gates_Foundation_announcement.html'}, name="press/gates-foundation-announcement"),
+    url(r'^press/wellesley-college-joins-edx$', 'static_template_view.views.render',
+        {'template': 'press_releases/Wellesley_College_joins_edX.html'}, name="press/wellesley-college-joins-edx"),
+    url(r'^press/georgetown-joins-edx$', 'static_template_view.views.render',
+        {'template': 'press_releases/Georgetown_joins_edX.html'}, name="press/georgetown-joins-edx"),
+    url(r'^press/spring-courses$', 'static_template_view.views.render',
+        {'template': 'press_releases/Spring_2013_course_announcements.html'}, name="press/spring-courses"),
 
     # Should this always update to point to the latest press release?
-    (r'^pressrelease$', 'django.views.generic.simple.redirect_to', {'url': '/press/uc-berkeley-joins-edx'}),
+    (r'^pressrelease$', 'django.views.generic.simple.redirect_to', {'url': '/press/spring-courses'}),
 
 
     (r'^favicon\.ico$', 'django.views.generic.simple.redirect_to', {'url': '/static/images/favicon.ico'}),
@@ -159,7 +173,7 @@ if settings.COURSEWARE_ENABLED:
         # input types system so that previews can be context-specific.
         # Unfortunately, we don't have time to think through the right way to do
         # that (and implement it), and it's not a terrible thing to provide a
-        # generic chemican-equation rendering service.
+        # generic chemical-equation rendering service.
         url(r'^preview/chemcalc', 'courseware.module_render.preview_chemcalc',
             name='preview_chemcalc'),
 
@@ -228,6 +242,16 @@ if settings.COURSEWARE_ENABLED:
             'instructor.views.grade_summary', name='grade_summary'),
         url(r'^courses/(?P<course_id>[^/]+/[^/]+/[^/]+)/enroll_students$',
             'instructor.views.enroll_students', name='enroll_students'),
+        url(r'^courses/(?P<course_id>[^/]+/[^/]+/[^/]+)/staff_grading$',
+            'instructor.views.staff_grading', name='staff_grading'),
+        url(r'^courses/(?P<course_id>[^/]+/[^/]+/[^/]+)/staff_grading/get_next$',
+            'instructor.staff_grading_service.get_next', name='staff_grading_get_next'),
+        url(r'^courses/(?P<course_id>[^/]+/[^/]+/[^/]+)/staff_grading/save_grade$',
+            'instructor.staff_grading_service.save_grade', name='staff_grading_save_grade'),
+        url(r'^courses/(?P<course_id>[^/]+/[^/]+/[^/]+)/staff_grading/save_grade$',
+            'instructor.staff_grading_service.save_grade', name='staff_grading_save_grade'),
+        url(r'^courses/(?P<course_id>[^/]+/[^/]+/[^/]+)/staff_grading/get_problem_list$',
+            'instructor.staff_grading_service.get_problem_list', name='staff_grading_get_problem_list'),
     )
 
     # discussion forums live within courseware, so courseware must be enabled first

@@ -33,6 +33,7 @@ from xml.sax.saxutils import unescape
 import chem
 import chem.chemcalc
 import chem.chemtools
+import chem.miller
 
 import calc
 from correctmap import CorrectMap
@@ -52,7 +53,7 @@ response_tag_dict = dict([(x.response_tag, x) for x in responsetypes.__all__])
 solution_tags = ['solution']
 
 # these get captured as student responses
-response_properties = ["codeparam", "responseparam", "answer"]
+response_properties = ["codeparam", "responseparam", "answer", "openendedparam"]
 
 # special problem tags which should be turned into innocuous HTML
 html_transforms = {'problem': {'tag': 'div'},
@@ -67,10 +68,11 @@ global_context = {'random': random,
                   'calc': calc,
                   'eia': eia,
                   'chemcalc': chem.chemcalc,
-                  'chemtools': chem.chemtools}
+                  'chemtools': chem.chemtools,
+                  'miller': chem.miller}
 
 # These should be removed from HTML output, including all subelements
-html_problem_semantics = ["codeparam", "responseparam", "answer", "script", "hintgroup"]
+html_problem_semantics = ["codeparam", "responseparam", "answer", "script", "hintgroup", "openendedparam","openendedrubric"]
 
 log = logging.getLogger('mitx.' + __name__)
 
@@ -183,6 +185,24 @@ class LoncapaProblem(object):
         for response, responder in self.responders.iteritems():
             maxscore += responder.get_max_score()
         return maxscore
+
+    def message_post(self,event_info):
+        """
+        Handle an ajax post that contains feedback on feedback
+        Returns a boolean success variable
+        Note:  This only allows for feedback to be posted back to the grading controller for the first
+        open ended response problem on each page.  Multiple problems will cause some sync issues.
+        TODO: Handle multiple problems on one page sync issues.
+        """
+        success=False
+        message = "Could not find a valid responder."
+        log.debug("in lcp")
+        for responder in self.responders.values():
+            if hasattr(responder, 'handle_message_post'):
+                success, message = responder.handle_message_post(event_info)
+                if success:
+                    break
+        return success, message
 
     def get_score(self):
         """
