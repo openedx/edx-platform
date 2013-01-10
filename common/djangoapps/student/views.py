@@ -78,7 +78,7 @@ def index(request, extra_context={}, user=None):
     courses = get_courses(None, domain=domain)
 
     # Sort courses by how far are they from they start day
-    key = lambda course: course.metadata['days_to_start']
+    key = lambda course: course.days_until_start
     courses = sorted(courses, key=key, reverse=True)
 
     # Get the 3 most recent news
