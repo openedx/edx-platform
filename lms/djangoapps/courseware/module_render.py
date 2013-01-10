@@ -140,21 +140,12 @@ def get_module(user, request, location, student_module_cache, course_id,
     module.  If there's an error, will try to return an instance of ErrorModule
     if possible.  If not possible, return None.
     """
-    location = Location(location)
-    descriptor = modulestore().get_instance(course_id, location, depth=depth)
-    return get_module_for_descriptor(user, request, descriptor, student_module_cache, course_id,
-                                     position=position, not_found_ok=not_found_ok,
-                                     wrap_xmodule_display=wrap_xmodule_display)
-
-
-def get_module_for_descriptor(user, request, descriptor, student_module_cache, course_id,
-                              position=None, not_found_ok=False, wrap_xmodule_display=True):
-    """
-    Actually implement get_module. See docstring there for details.
-    """
     try:
-        return _get_module(user, request, descriptor, student_module_cache, course_id,
-                           position=position, wrap_xmodule_display=wrap_xmodule_display)
+        location = Location(location)
+        descriptor = modulestore().get_instance(course_id, location, depth=depth)
+        return get_module_for_descriptor(user, request, descriptor, student_module_cache, course_id,
+                                         position=position, not_found_ok=not_found_ok,
+                                         wrap_xmodule_display=wrap_xmodule_display)
     except ItemNotFoundError:
         if not not_found_ok:
             log.exception("Error in get_module")
@@ -164,6 +155,14 @@ def get_module_for_descriptor(user, request, descriptor, student_module_cache, c
         log.exception("Error in get_module")
         return None
 
+
+def get_module_for_descriptor(user, request, descriptor, student_module_cache, course_id,
+                              position=None, not_found_ok=False, wrap_xmodule_display=True):
+    """
+    Actually implement get_module. See docstring there for details.
+    """
+    return _get_module(user, request, descriptor, student_module_cache, course_id,
+                       position=position, wrap_xmodule_display=wrap_xmodule_display)
 
 def _get_module(user, request, descriptor, student_module_cache, course_id,
                 position=None, wrap_xmodule_display=True):
