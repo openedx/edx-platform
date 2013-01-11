@@ -1,9 +1,12 @@
 class @MarkdownEditingDescriptor extends XModule.Descriptor
+  # TODO really, these templates should come from or also feed the cheatsheet
   @multipleChoiceTemplate : "( ) incorrect\n( ) incorrect\n(x) correct\n"
   @checkboxChoiceTemplate: "[x] correct\n[ ] incorrect\n[x] correct\n"
   @stringInputTemplate: "= answer\n"
   @numberInputTemplate: "= answer +- x%\n"
   @selectTemplate: "[[incorrect, (correct), incorrect]]\n"
+  @headerTemplate: "Header\n=====\n"
+  @explanationTemplate: "[explanation]\nShort explanation\n[explanation]\n"
 
   constructor: (element) ->
     @element = element
@@ -59,7 +62,7 @@ class @MarkdownEditingDescriptor extends XModule.Descriptor
   ###
   confirmConversionToXml: ->
     # TODO: use something besides a JavaScript confirm dialog?
-    return confirm("If you convert to the XML source representation, which is used by the Advanced Editor, you cannot go back to using the Simple Editor.\n\nProceed with conversion to XML?")
+    return confirm("If you use the Advanced Editor, this problem will be converted to XML and you will not be able to return to the Simple Editor Interface.\n\nProceed to the Advanced Editor and convert this problem to XML?")
 
   ###
   Event listener for toolbar buttons (only possible when markdown editor is visible).
@@ -74,6 +77,8 @@ class @MarkdownEditingDescriptor extends XModule.Descriptor
       when "number-button" then revisedSelection = MarkdownEditingDescriptor.insertNumberInput(selection)
       when "checks-button" then revisedSelection = MarkdownEditingDescriptor.insertCheckboxChoice(selection)
       when "dropdown-button" then revisedSelection = MarkdownEditingDescriptor.insertSelect(selection)
+      when "header-button" then revisedSelection = MarkdownEditingDescriptor.insertHeader(selection)
+      when "explanation-button" then revisedSelection = MarkdownEditingDescriptor.insertExplanation(selection)
       else # ignore click
 
     if revisedSelection != null
@@ -157,6 +162,12 @@ class @MarkdownEditingDescriptor extends XModule.Descriptor
 
   @insertSelect: (selectedText) ->
     return MarkdownEditingDescriptor.insertGenericInput(selectedText, '[[', ']]', MarkdownEditingDescriptor.selectTemplate)
+
+  @insertHeader: (selectedText) ->
+    return MarkdownEditingDescriptor.insertGenericInput(selectedText, '', '\n====\n', MarkdownEditingDescriptor.headerTemplate)
+
+  @insertExplanation: (selectedText) ->
+    return MarkdownEditingDescriptor.insertGenericInput(selectedText, '[explanation]\n', '\n[explanation]', MarkdownEditingDescriptor.explanationTemplate)
 
   @insertGenericInput: (selectedText, lineStart, lineEnd, template) ->
     if selectedText.length > 0
