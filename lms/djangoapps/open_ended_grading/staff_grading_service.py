@@ -7,6 +7,8 @@ import logging
 import requests
 from requests.exceptions import RequestException, ConnectionError, HTTPError
 import sys
+from grading_service import GradingService
+from grading_service import GradingServiceError
 
 from django.conf import settings
 from django.http import HttpResponse, Http404
@@ -14,12 +16,10 @@ from django.http import HttpResponse, Http404
 from courseware.access import has_access
 from util.json_request import expect_json
 from xmodule.course_module import CourseDescriptor
+from student.models import unique_id_for_user
 
 log = logging.getLogger(__name__)
 
-
-class GradingServiceError(Exception):
-    pass
 
 
 class MockStaffGradingService(object):
@@ -57,62 +57,16 @@ class MockStaffGradingService(object):
         return self.get_next(course_id, 'fake location', grader_id)
 
 
-class StaffGradingService(object):
+class StaffGradingService(GradingService):
     """
     Interface to staff grading backend.
     """
     def __init__(self, config):
-        self.username = config['username']
-        self.password = config['password']
-        self.url = config['url']
-
-        self.login_url = self.url + '/login/'
+        super(StaffGradingService, self).__init__(config)
         self.get_next_url = self.url + '/get_next_submission/'
         self.save_grade_url = self.url + '/save_grade/'
         self.get_problem_list_url = self.url + '/get_problem_list/'
 
-        self.session = requests.session()
-
-
-    def _login(self):
-        """
-        Log into the staff grading service.
-
-        Raises requests.exceptions.HTTPError if something goes wrong.
-
-        Returns the decoded json dict of the response.
-        """
-        response = self.session.post(self.login_url,
-                                     {'username': self.username,
-                                      'password': self.password,})
-
-        response.raise_for_status()
-
-        return response.json
-
-
-    def _try_with_login(self, operation):
-        """
-        Call operation(), which should return a requests response object.  If
-        the request fails with a 'login_required' error, call _login() and try
-        the operation again.
-
-        Returns the result of operation().  Does not catch exceptions.
-        """
-        response = operation()
-        if (response.json
-            and response.json.get('success') == False
-            and response.json.get('error') == 'login_required'):
-            # apparrently we aren't logged in.  Try to fix that.
-            r = self._login()
-            if r and not r.get('success'):
-                log.warning("Couldn't log into staff_grading backend. Response: %s",
-                            r)
-            # try again
-            response = operation()
-            response.raise_for_status()
-
-        return response
 
     def get_problem_list(self, course_id, grader_id):
         """
@@ -130,17 +84,8 @@ class StaffGradingService(object):
         Raises:
             GradingServiceError: something went wrong with the connection.
         """
-        op = lambda: self.session.get(self.get_problem_list_url,
-                                        allow_redirects = False,
-                                        params={'course_id': course_id,
-                                            'grader_id': grader_id})
-        try:
-            r = self._try_with_login(op)
-        except (RequestException, ConnectionError, HTTPError) as err:
-            # reraise as promised GradingServiceError, but preserve stacktrace.
-            raise GradingServiceError, str(err), sys.exc_info()[2]
-
-        return r.text
+        params = {'course_id': course_id,'grader_id': grader_id}
+        return self.get(self.get_problem_list_url, params)
 
 
     def get_next(self, course_id, location, grader_id):
@@ -161,17 +106,9 @@ class StaffGradingService(object):
         Raises:
             GradingServiceError: something went wrong with the connection.
         """
-        op = lambda: self.session.get(self.get_next_url,
-                                      allow_redirects=False,
+        return self.get(self.get_next_url,
                                       params={'location': location,
                                               'grader_id': grader_id})
-        try:
-            r = self._try_with_login(op)
-        except (RequestException, ConnectionError, HTTPError) as err:
-            # reraise as promised GradingServiceError, but preserve stacktrace.
-            raise GradingServiceError, str(err), sys.exc_info()[2]
-
-        return r.text
 
 
     def save_grade(self, course_id, grader_id, submission_id, score, feedback, skipped):
@@ -186,28 +123,20 @@ class StaffGradingService(object):
         Raises:
             GradingServiceError if there's a problem connecting.
         """
-        try:
-            data = {'course_id': course_id,
-                    'submission_id': submission_id,
-                    'score': score,
-                    'feedback': feedback,
-                    'grader_id': grader_id,
-                    'skipped': skipped}
+        data = {'course_id': course_id,
+                'submission_id': submission_id,
+                'score': score,
+                'feedback': feedback,
+                'grader_id': grader_id,
+                'skipped': skipped}
 
-            op = lambda: self.session.post(self.save_grade_url, data=data,
-                                           allow_redirects=False)
-            r = self._try_with_login(op)
-        except (RequestException, ConnectionError, HTTPError) as err:
-            # reraise as promised GradingServiceError, but preserve stacktrace.
-            raise GradingServiceError, str(err), sys.exc_info()[2]
+        return self.post(self.save_grade_url, data=data)
 
-        return r.text
-
-# don't initialize until grading_service() is called--means that just
+# don't initialize until staff_grading_service() is called--means that just
 # importing this file doesn't create objects that may not have the right config
 _service = None
 
-def grading_service():
+def staff_grading_service():
     """
     Return a staff grading service instance--if settings.MOCK_STAFF_GRADING is True,
     returns a mock one, otherwise a real one.
@@ -248,7 +177,7 @@ def _check_access(user, course_id):
 def get_next(request, course_id):
     """
     Get the next thing to grade for course_id and with the location specified
-    in the .
+    in the request.
 
     Returns a json dict with the following keys:
 
@@ -276,11 +205,11 @@ def get_next(request, course_id):
     if len(missing) > 0:
         return _err_response('Missing required keys {0}'.format(
             ', '.join(missing)))
-    grader_id = request.user.id
+    grader_id = unique_id_for_user(request.user)
     p = request.POST
     location = p['location']
 
-    return HttpResponse(_get_next(course_id, request.user.id, location),
+    return HttpResponse(_get_next(course_id, grader_id, location),
                         mimetype="application/json")
 
 
@@ -308,12 +237,12 @@ def get_problem_list(request, course_id):
     """
     _check_access(request.user, course_id)
     try:
-        response = grading_service().get_problem_list(course_id, request.user.id)
+        response = staff_grading_service().get_problem_list(course_id, unique_id_for_user(request.user))
         return HttpResponse(response,
                 mimetype="application/json")
     except GradingServiceError:
         log.exception("Error from grading service.  server url: {0}"
-                      .format(grading_service().url))
+                      .format(staff_grading_service().url))
         return HttpResponse(json.dumps({'success': False,
                            'error': 'Could not connect to grading service'}))
 
@@ -323,10 +252,10 @@ def _get_next(course_id, grader_id, location):
     Implementation of get_next (also called from save_grade) -- returns a json string
     """
     try:
-        return grading_service().get_next(course_id, location, grader_id)
+        return staff_grading_service().get_next(course_id, location, grader_id)
     except GradingServiceError:
         log.exception("Error from grading service.  server url: {0}"
-                      .format(grading_service().url))
+                      .format(staff_grading_service().url))
         return json.dumps({'success': False,
                            'error': 'Could not connect to grading service'})
 
@@ -357,14 +286,14 @@ def save_grade(request, course_id):
         return _err_response('Missing required keys {0}'.format(
             ', '.join(missing)))
 
-    grader_id = request.user.id
+    grader_id = unique_id_for_user(request.user)
     p = request.POST
 
 
     location = p['location']
     skipped =  'skipped' in p
     try:
-        result_json = grading_service().save_grade(course_id,
+        result_json = staff_grading_service().save_grade(course_id,
                                           grader_id,
                                           p['submission_id'],
                                           p['score'],

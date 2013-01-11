@@ -70,7 +70,7 @@ def courses(request):
     courses = get_courses(request.user, domain=request.META.get('HTTP_HOST'))
 
     # Sort courses by how far are they from they start day
-    key = lambda course: course.metadata['days_to_start']
+    key = lambda course: course.days_until_start
     courses = sorted(courses, key=key, reverse=True)
 
     return render_to_response("courseware/courses.html", {'courses': courses})
@@ -439,7 +439,7 @@ def university_profile(request, org_id):
                                         domain=request.META.get('HTTP_HOST'))[org_id]
 
     # Sort courses by how far are they from they start day
-    key = lambda course: course.metadata['days_to_start']
+    key = lambda course: course.days_until_start
     courses = sorted(courses, key=key, reverse=True)
 
     context = dict(courses=courses, org_id=org_id)

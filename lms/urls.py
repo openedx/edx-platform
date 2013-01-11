@@ -243,15 +243,32 @@ if settings.COURSEWARE_ENABLED:
         url(r'^courses/(?P<course_id>[^/]+/[^/]+/[^/]+)/enroll_students$',
             'instructor.views.enroll_students', name='enroll_students'),
         url(r'^courses/(?P<course_id>[^/]+/[^/]+/[^/]+)/staff_grading$',
-            'instructor.views.staff_grading', name='staff_grading'),
+            'open_ended_grading.views.staff_grading', name='staff_grading'),
         url(r'^courses/(?P<course_id>[^/]+/[^/]+/[^/]+)/staff_grading/get_next$',
-            'instructor.staff_grading_service.get_next', name='staff_grading_get_next'),
+            'open_ended_grading.staff_grading_service.get_next', name='staff_grading_get_next'),
         url(r'^courses/(?P<course_id>[^/]+/[^/]+/[^/]+)/staff_grading/save_grade$',
-            'instructor.staff_grading_service.save_grade', name='staff_grading_save_grade'),
+            'open_ended_grading.staff_grading_service.save_grade', name='staff_grading_save_grade'),
         url(r'^courses/(?P<course_id>[^/]+/[^/]+/[^/]+)/staff_grading/save_grade$',
-            'instructor.staff_grading_service.save_grade', name='staff_grading_save_grade'),
+            'open_ended_grading.staff_grading_service.save_grade', name='staff_grading_save_grade'),
         url(r'^courses/(?P<course_id>[^/]+/[^/]+/[^/]+)/staff_grading/get_problem_list$',
-            'instructor.staff_grading_service.get_problem_list', name='staff_grading_get_problem_list'),
+            'open_ended_grading.staff_grading_service.get_problem_list', name='staff_grading_get_problem_list'),
+
+
+        # Peer Grading
+        url(r'^courses/(?P<course_id>[^/]+/[^/]+/[^/]+)/peer_grading$',
+            'open_ended_grading.views.peer_grading', name='peer_grading'),
+        url(r'^courses/(?P<course_id>[^/]+/[^/]+/[^/]+)/peer_grading/problem$',
+            'open_ended_grading.views.peer_grading_problem', name='peer_grading_problem'),
+        url(r'^courses/(?P<course_id>[^/]+/[^/]+/[^/]+)/peer_grading/get_next_submission$',
+            'open_ended_grading.peer_grading_service.get_next_submission', name='peer_grading_get_next_submission'),
+        url(r'^courses/(?P<course_id>[^/]+/[^/]+/[^/]+)/peer_grading/show_calibration_essay$',
+            'open_ended_grading.peer_grading_service.show_calibration_essay', name='peer_grading_show_calibration_essay'),
+        url(r'^courses/(?P<course_id>[^/]+/[^/]+/[^/]+)/peer_grading/is_student_calibrated$',
+            'open_ended_grading.peer_grading_service.is_student_calibrated', name='peer_grading_is_student_calibrated'),
+        url(r'^courses/(?P<course_id>[^/]+/[^/]+/[^/]+)/peer_grading/save_grade$',
+            'open_ended_grading.peer_grading_service.save_grade', name='peer_grading_save_grade'),
+        url(r'^courses/(?P<course_id>[^/]+/[^/]+/[^/]+)/peer_grading/save_calibration_essay$',
+            'open_ended_grading.peer_grading_service.save_calibration_essay', name='peer_grading_save_calibration_essay'),
     )
 
     # discussion forums live within courseware, so courseware must be enabled first

@@ -402,6 +402,7 @@ class MongoModuleStore(ModuleStoreBase):
 
         self._update_single_item(location, {'metadata': metadata})
 
+
     def delete_item(self, location):
         """
         Delete an item from this modulestore
@@ -420,12 +421,10 @@ class MongoModuleStore(ModuleStoreBase):
 
         self.collection.remove({'_id': Location(location).dict()})
 
-    def get_parent_locations(self, location):
-        '''Find all locations that are the parents of this location.  Needed
-        for path_to_location().
 
-        returns an iterable of things that can be passed to Location.  This may
-        be empty if there are no parents.
+    def get_parent_locations(self, location, course_id):
+        '''Find all locations that are the parents of this location in this 
+        course.  Needed for path_to_location().
         '''
         location = Location.ensure_fully_specified(location)
         items = self.collection.find({'definition.children': location.url()},

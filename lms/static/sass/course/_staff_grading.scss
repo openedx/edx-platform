@@ -1,4 +1,5 @@
-div.staff-grading {
+div.staff-grading,
+div.peer-grading{
     textarea.feedback-area {
         height: 75px;
         margin: 20px;
@@ -36,8 +37,8 @@ div.staff-grading {
     }
 
     .prompt-information-container,
-    .submission-wrapper,
     .rubric-wrapper,
+    .calibration-feedback-wrapper,
     .grading-container
     {
         border: 1px solid gray;
@@ -48,6 +49,18 @@ div.staff-grading {
         background-color: #FFCCCC;
         padding: 15px;
         margin-left: 0px;
+    }
+    .submission-wrapper
+    {
+        h3
+        {
+            margin-bottom: 15px;
+        }
+        p
+        {
+            margin-left:10px;
+        }
+        padding: 15px;
     }
     .meta-info-wrapper
     {
@@ -67,7 +80,8 @@ div.staff-grading {
             }
         }
     }
-    .message-container
+    .message-container,
+    .grading-message
     {
         background-color: $yellow;
         padding: 10px;
@@ -81,6 +95,69 @@ div.staff-grading {
         margin-bottom:5px;
         font-size: .8em;
     }
+
+    .instructions-panel
+    {
+
+        margin-right:20px;
+        > div
+        {
+            padding: 10px;
+            margin: 0px;
+            background: #eee;
+            height: 10em;
+            h3
+            {
+                text-align:center;
+                text-transform:uppercase;
+                color: #777;
+            }
+            p
+            {
+                color: #777;
+            }
+        }
+        .calibration-panel
+        {
+            float:left;
+            width:48%;
+        }
+        .grading-panel
+        {
+            float:right;
+            width: 48%;
+        }
+        .current-state
+        {
+            background: #1D9DD9;
+            h3, p
+            {
+                color: white;
+            }
+        }
+        @include clearfix;
+    }
+
+
+    .collapsible
+    {
+        margin-left: 0px;
+        header
+        {
+            margin-top:20px;
+            margin-bottom:20px;
+            font-size: 1.2em;
+        }
+    }
     
+    .interstitial-page
+    {
+        text-align: center;
+        input[type=button]
+        {
+            margin-top: 20px;
+        }
+    }
     padding: 40px;
 }
+
