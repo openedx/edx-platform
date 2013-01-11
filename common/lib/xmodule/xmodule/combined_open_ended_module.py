@@ -173,7 +173,7 @@ class CombinedOpenEndedModule(XModule):
         loaded_task_state = json.loads(current_task_state)
         if loaded_task_state['state'] == self.INITIAL:
             loaded_task_state['state'] = self.ASSESSING
-            loaded_task_state['created'] = "True"
+            loaded_task_state['created'] = True
             loaded_task_state['history'].append({'answer': last_response})
             current_task_state = json.dumps(loaded_task_state)
         return current_task_state
