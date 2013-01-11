@@ -14,8 +14,8 @@
             <!-- make text and input or slider at the same line -->
             <div>
               <p style="float:left;"> Currently \(a\) is</p>
-              <!-- readonly input for b -->
-              <textbox var="a" style="width:50px; float:left; margin-left:10px;" readonly="false"/>
+              <!-- readonly input for a -->
+              <span id="a_readonly" style="width:50px; float:left; margin-left:10px;"/>
             </div>
             <!-- clear:left will make next text to begin from new line -->
             <p style="clear:left">   This one
@@ -26,7 +26,7 @@
             </p>
             <div>
               <p style="float:left;">Currently \(b\) is </p>
-              <textbox var="b" readonly="true" style="width:50px; float:left; margin-left:10px;"/>
+              <textbox var="b" style="width:50px; float:left; margin-left:10px;"/>
             </div>
             <div style="clear:left;">
               <p style="float:left;">To change \(a\) use:</p>
@@ -57,7 +57,8 @@
             return 10.0 * b * Math.sin(a * x) * Math.sin(b * x) / (Math.cos(b * x) + 10);
           </function>
           <function color="red" line="true" dot="false" label="\(y_2\)">
-            return Math.sin(a * x);
+            <!-- works w/o return, if function is single line -->
+            Math.sin(a * x);
           </function>
           <function color="#FFFF00" line="false" dot="false" label="unknown">
             function helperFunc(c1) {
@@ -66,13 +67,15 @@
 
             return helperFunc(x + 10 * a * b) + Math.sin(a - x);
           </function>
+          <function output="element" el_id="a_readonly">a</function>
         </functions>
 
         <plot>
 
           <xrange>
               <min>return 0;</min>
-              <max>return 30;</max>
+              <!-- works w/o return -->
+              <max>30</max>
           </xrange>
 
           <num_points>120</num_points>
