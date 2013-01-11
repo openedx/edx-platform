@@ -55,7 +55,7 @@ class CMS.Views.ModuleEdit extends Backbone.View
   clickSaveButton: (event) =>
     event.preventDefault()
     data = @module.save()
-    data.metadata = _.extend(data.metadata, @metadata())
+    data.metadata = _.extend(data.metadata || {}, @metadata())
     @hideModal()
     @model.save(data).done( =>
     #   # showToastMessage("Your changes have been saved.", null, 3)
