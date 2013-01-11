@@ -237,16 +237,20 @@ define('State', ['logme'], function (logme) {
             allParameterValues[parameters[paramName].helperArrayIndex] = paramValueNum;
 
             for (c1 = 0; c1 < dynamicEl.length; c1++) {
-                if (dynamicEl[c1].el === null) {
-                    dynamicEl[c1].func.apply(window, allParameterValues);
-                    continue;
-                }
-
                 if (
                     ((updateOnEvent !== undefined) && (dynamicEl[c1].updateOnEvent === updateOnEvent)) ||
                     (updateOnEvent === undefined)
                 ) {
-                    dynamicEl[c1].el.html(dynamicEl[c1].func.apply(window, allParameterValues));
+                    // If we have a DOM element, call the function "paste" the answer into the DIV.
+                    if (dynamicEl[c1].el !== null) {
+                        dynamicEl[c1].el.html(dynamicEl[c1].func.apply(window, allParameterValues));
+                    }
+                    // If we DO NOT have an element, simply call the function. The function can then
+                    // manipulate all the DOM elements it wants, without the fear of them being overwritten
+                    // by us afterwards.
+                    else {
+                        dynamicEl[c1].func.apply(window, allParameterValues);
+                    }
                 }
             }
 
