@@ -441,8 +441,12 @@ def save_preview_state(request, preview_id, location, instance_state, shared_sta
     if 'preview_states' not in request.session:
         request.session['preview_states'] = defaultdict(dict)
 
-    request.session['preview_states'][preview_id, location]['instance'] = instance_state
-    request.session['preview_states'][preview_id, location]['shared'] = shared_state
+    # request.session doesn't notice indirect changes; so, must set its dict w/ every change to get
+    # it to persist: http://www.djangobook.com/en/2.0/chapter14.html
+    preview_states = request.session['preview_states']
+    preview_states[preview_id, location]['instance'] = instance_state
+    preview_states[preview_id, location]['shared'] = shared_state
+    request.session['preview_states'] = preview_states  # make session mgmt notice the update
 
 
 def render_from_lms(template_name, dictionary, context=None, namespace='main'):
