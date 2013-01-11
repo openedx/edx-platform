@@ -1,3 +1,4 @@
+// TODO: this code is a subset of what is in problem editor's CSS. Should share.
 .editor-bar {
   position: relative;
   @include linear-gradient(top, #d4dee8, #c9d5e2);
@@ -6,6 +7,8 @@
   border-radius: 3px 3px 0 0;
   border-bottom-color: #a5aaaf;
   @include clearfix;
+  // TODO: I added this -- Brian to fix roperly
+  height: 34px;
 
   a {
     display: block;
