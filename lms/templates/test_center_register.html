@@ -8,7 +8,7 @@
 
 <%namespace name='static' file='static_content.html'/>
 
-<%block name="title"><title>Pearson VUE Test Center Proctoring - Sign Up</title></%block>
+<%block name="title"><title>Pearson VUE Test Center Proctoring - Registration</title></%block>
 
 <%block name="js_extra">
   <script type="text/javascript">
@@ -350,8 +350,12 @@
           <h4 class="title">Demographic Information</h4>
           <p class="details">The demographic information you most recently provided has been rejected by Pearson. You can correct and submit it again before the exam registration closes on <strong>${exam_info.registration_end_date_text}</strong>.
           The error message is:</p>
-          <p class="details">${registration.testcenter_user.upload_error_message}.</p>
-          <p class="details">If the error is not correctable by revising demographic information and resubmitting, please contact edX at <a href="${exam_help_href}">exam-help@edx.org</a>.</p>
+          
+          <ul class="error-list">
+            <li class="item">${registration.testcenter_user.upload_error_message}.</li>
+          </ul>
+          
+          <p class="instructions">If the error is not correctable by revising demographic information and resubmitting, please contact edX at <a class="contact-link" href="${exam_help_href}">exam-help@edx.org</a>.</p>
         </li>
         % endif     
 
@@ -398,8 +402,11 @@
         <li class="item status status-rejected status-registration">
           <h4 class="title">Registration Request</h4>
           <p class="details">Your exam registration has been rejected by Pearson. <strong>You currently cannot schedule an exam</strong>.
-          Please contact edX at <a href="${exam_help_href}">exam-help@edx.org</a>.  The error message is:</p>
-          <p class="details">${registration.upload_error_message}.</p>
+          Please contact edX at <a class="contact-link" href="${exam_help_href}">exam-help@edx.org</a>.  The errors found include:</p>
+          
+          <ul class="error-list">
+            <li class="item">${registration.upload_error_message}.</li>
+          </ul>
         </li>
         % endif     
 

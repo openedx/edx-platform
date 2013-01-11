@@ -377,7 +377,7 @@ $red: rgb(178, 6, 16);
 						}
 					}
 
-					.details, .item {
+					.details, .item, .instructions {
 						@include transition(opacity, 0.10s, ease-in-out);
 						font-size: 13px;
 						opacity: 0.65;
@@ -432,6 +432,10 @@ $red: rgb(178, 6, 16);
 							color: red;
 							content: "rejected";
 						}
+
+						.call-link {
+							font-weight: bold;
+						}
 					}
 
 					&.status-initial {
@@ -448,14 +452,14 @@ $red: rgb(178, 6, 16);
 
 					&:hover {
 
-						.details, .item {
+						.details, .item, .instructions {
 							opacity: 1.0;
 						}
 					}
 				}
 
 				// sub menus
-				.accommodations-list {
+				.accommodations-list, .error-list {
 					list-style: none;
 					margin: ($baseline/2) 0;
 					padding: 0;
