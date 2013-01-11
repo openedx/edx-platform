@@ -160,13 +160,13 @@ class DraftModuleStore(ModuleStoreBase):
         return super(DraftModuleStore, self).delete_item(as_draft(location))
 
 
-    def get_parent_locations(self, location):
+    def get_parent_locations(self, location, course_id):
         '''Find all locations that are the parents of this location.  Needed
         for path_to_location().
 
         returns an iterable of things that can be passed to Location.
         '''
-        return super(DraftModuleStore, self).get_parent_locations(location)
+        return super(DraftModuleStore, self).get_parent_locations(location, course_id)
 
     def publish(self, location, published_by_id):
         """

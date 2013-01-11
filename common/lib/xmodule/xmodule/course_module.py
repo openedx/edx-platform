@@ -6,7 +6,6 @@ import requests
 import time
 from datetime import datetime
 
-from xmodule.graders import load_grading_policy
 from xmodule.modulestore import Location
 from xmodule.seq_module import SequenceDescriptor, SequenceModule
 from xmodule.timeparse import parse_time, stringify_time
