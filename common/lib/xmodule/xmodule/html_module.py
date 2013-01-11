@@ -48,6 +48,7 @@ class HtmlDescriptor(XmlDescriptor, EditingDescriptor):
 
     js = {'coffee': [resource_string(__name__, 'js/src/html/edit.coffee')]}
     js_module_name = "HTMLEditingDescriptor"
+    css = {'scss': [resource_string(__name__, 'css/html/edit.scss')]}
 
     # VS[compat] TODO (cpennington): Delete this method once all fall 2012 course
     # are being edited in the cms

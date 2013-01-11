@@ -1,13 +1,16 @@
 class @HTMLEditingDescriptor
-  constructor: (@element) ->
+  constructor: (element) ->
+    @element = element;
     text = $(".edit-box", @element)[0];
     replace_func = (elt) -> text.parentNode.replaceChild(elt, text)
-    @edit_box = CodeMirror(replace_func, {
+    @advanced_editor = CodeMirror(replace_func, {
       value: text.innerHTML
       mode: "text/html"
       lineNumbers: true
       lineWrapping: true})
-    @tiny_mce = $(".tiny-mce").tinymce({
+    $(@advanced_editor.getWrapperElement()).hide()
+
+    @tiny_mce = $(".tiny-mce", @element).tinymce({
       script_url : '/static/js/vendor/tiny_mce/tiny_mce.js',
       theme : "advanced",
       #skin: 'studio',
@@ -21,7 +24,13 @@ class @HTMLEditingDescriptor
       theme_advanced_blockformats : "p,code,h2,h3,blockquote",
       width: '100%',
       height: '400px'
-    });
+    })
+#    @tiny_mce.focus()
+#    /tinyMCE.activeEditor.setContent(text, {format : 'raw'});
+#    @tiny = tinyMCE.get($('.tiny-mce', this.element).attr('id'))
+#    @tiny.setContent(@edit_box.getValue(), {format : 'raw'});
+#    @tiny_mce.html(@edit_box.getValue())
+    @visual_editor = tinyMCE.get($('.tiny-mce', this.element).attr('id'))
 
   save: ->
-    data: @edit_box.getValue()
+    data: @advanced_editor.getValue()
