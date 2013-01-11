@@ -49,7 +49,6 @@ from django.db.models.signals import post_save
 from django.dispatch import receiver
 
 import comment_client as cc
-from django_comment_client.models import Role
 
 
 log = logging.getLogger(__name__)
