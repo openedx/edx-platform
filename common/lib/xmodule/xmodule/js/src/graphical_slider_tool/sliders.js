@@ -6,7 +6,7 @@ define('Sliders', ['logme'], function (logme) {
     return Sliders;
 
     function Sliders(gstId, state) {
-        var c1, paramName, allParamNames, sliderDiv;
+        var c1, paramName, allParamNames, sliderDiv, onEvent;
 
         allParamNames = state.getAllParameterNames();
 
@@ -16,7 +16,11 @@ define('Sliders', ['logme'], function (logme) {
             sliderDiv = $('#' + gstId + '_slider_' + paramName);
 
             if (sliderDiv.length === 1) {
-                createSlider(sliderDiv, paramName);
+                onEvent = 'slide';
+                if (sliderDiv.attr('data-on_event') === 'change') {
+                    onEvent = 'change';
+                }
+                createSlider(sliderDiv, paramName, onEvent);
             } else if (sliderDiv.length > 1) {
                 logme('ERROR: Found more than one slider for the parameter "' + paramName + '".');
                 logme('sliderDiv.length = ', sliderDiv.length);
@@ -25,7 +29,7 @@ define('Sliders', ['logme'], function (logme) {
             }
         }
 
-        function createSlider(sliderDiv, paramName) {
+        function createSlider(sliderDiv, paramName, onEvent) {
             var paramObj;
 
             paramObj = state.getParamObj(paramName);
@@ -46,8 +50,7 @@ define('Sliders', ['logme'], function (logme) {
                 'value': paramObj.value,
                 'step': paramObj.step,
 
-                // 'change': sliderOnChange,
-                'slide': sliderOnSlide
+                onEvent: sliderOnSlide
             });
 
             // Tell the parameter object stored in state that we have a slider
