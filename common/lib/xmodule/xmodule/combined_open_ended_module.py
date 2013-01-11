@@ -52,6 +52,11 @@ class CombinedOpenEndedModule(XModule):
         'reset' -- resets the whole combined open ended module and returns to the first child module
         'next_problem' -- moves to the next child module
         'get_results' -- gets results from a given child module
+
+    Types of children. Task is synonymous with child module, so each combined open ended module
+    incorporates multiple children (tasks):
+        openendedmodule
+        selfassessmentmodule
     """
     STATE_VERSION = 1
 
@@ -60,7 +65,6 @@ class CombinedOpenEndedModule(XModule):
     ASSESSING = 'assessing'
     INTERMEDIATE_DONE = 'intermediate_done'
     DONE = 'done'
-    TASK_TYPES = ["self", "ml", "instructor", "peer"]
 
     js = {'coffee': [resource_string(__name__, 'js/src/combinedopenended/display.coffee'),
                      resource_string(__name__, 'js/src/collapsible.coffee'),
@@ -216,23 +220,33 @@ class CombinedOpenEndedModule(XModule):
         current_task_type = self.get_tag_name(self.current_task_xml)
 
         children = self.child_modules()
+        child_task_module = children['modules'][current_task_type]
 
         self.current_task_descriptor = children['descriptors'][current_task_type](self.system)
+
+        #This is the xml object created from the xml definition of the current task
         etree_xml = etree.fromstring(self.current_task_xml)
 
+        #This sends the etree_xml object through the descriptor module of the current task, and
+        #returns the xml parsed by the descriptor
         self.current_task_parsed_xml = self.current_task_descriptor.definition_from_xml(etree_xml, self.system)
         if current_task_state is None and self.current_task_number == 0:
-            self.current_task = children['modules'][current_task_type](self.system, self.location,
+            self.current_task = child_task_module(self.system, self.location,
                 self.current_task_parsed_xml, self.current_task_descriptor, self.static_data)
             self.task_states.append(self.current_task.get_instance_state())
             self.state = self.ASSESSING
         elif current_task_state is None and self.current_task_number > 0:
             last_response_data = self.get_last_response(self.current_task_number - 1)
             last_response = last_response_data['response']
-            current_task_state = (
-            '{"state": "' + str(self.ASSESSING) + '", "version": 1, "max_score": ' + str(self._max_score) + ', ' +
-            '"attempts": 0, "created": "True", "history": [{"answer": "' + str(last_response) + '"}]}')
-            self.current_task = children['modules'][current_task_type](self.system, self.location,
+            current_task_state=json.dumps({
+                'state' : self.assessing,
+                'version' : self.STATE_VERSION,
+                'max_score' : self._max_score,
+                'attempts' : 0,
+                'created' : True,
+                'history' : [{'answer' : str(last_response)}],
+            })
+            self.current_task = child_task_module(self.system, self.location,
                 self.current_task_parsed_xml, self.current_task_descriptor, self.static_data,
                 instance_state=current_task_state)
             self.task_states.append(self.current_task.get_instance_state())
@@ -240,7 +254,7 @@ class CombinedOpenEndedModule(XModule):
         else:
             if self.current_task_number > 0 and not reset:
                 current_task_state = self.overwrite_state(current_task_state)
-            self.current_task = children['modules'][current_task_type](self.system, self.location,
+            self.current_task = child_task_module(self.system, self.location,
                 self.current_task_parsed_xml, self.current_task_descriptor, self.static_data,
                 instance_state=current_task_state)
 

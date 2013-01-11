@@ -86,7 +86,7 @@ class OpenEndedChild():
 
         self.state = instance_state.get('state', self.INITIAL)
 
-        self.created = instance_state.get('created', "False")
+        self.created = instance_state.get('created', False)
 
         self.attempts = instance_state.get('attempts', 0)
         self.max_attempts = static_data['max_attempts']
@@ -171,7 +171,7 @@ class OpenEndedChild():
             'state': self.state,
             'max_score': self._max_score,
             'attempts': self.attempts,
-            'created': "False",
+            'created': False,
         }
         return json.dumps(state)
 

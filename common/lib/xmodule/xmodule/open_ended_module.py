@@ -78,10 +78,10 @@ class OpenEndedModule(openendedchild.OpenEndedChild):
 
         self._parse(oeparam, self.prompt, self.rubric, system)
 
-        if self.created == "True" and self.state == self.ASSESSING:
-            self.created = "False"
+        if self.created == True and self.state == self.ASSESSING:
+            self.created = False
             self.send_to_grader(self.latest_answer(), system)
-            self.created = "False"
+            self.created = False
 
     def _parse(self, oeparam, prompt, rubric, system):
         '''
@@ -379,7 +379,7 @@ class OpenEndedModule(openendedchild.OpenEndedChild):
         log.debug(response_items)
         rubric_feedback=""
         feedback = self._convert_longform_feedback_to_html(response_items)
-        if response_items['rubric_scores_complete']:
+        if response_items['rubric_scores_complete']==True:
             rubric_feedback = self.render_rubric(response_items['rubric_xml'])
 
         if not response_items['success']:

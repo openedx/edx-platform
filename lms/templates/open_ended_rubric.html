@@ -3,7 +3,7 @@
     <% category = rubric_categories[i] %>
     <tr>
         <th>${category['description']}</th>
-        <td>${category['score']}</td>
+        <td>Your Score: ${category['score']}  </td>
         % for j in range(len(category['options'])):
         <% option = category['options'][j] %>
         <td>
