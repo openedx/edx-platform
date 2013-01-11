@@ -237,6 +237,10 @@ define('State', ['logme'], function (logme) {
             allParameterValues[parameters[paramName].helperArrayIndex] = paramValueNum;
 
             for (c1 = 0; c1 < dynamicEl.length; c1++) {
+                if (dynamicEl[c1].el === null) {
+                    continue;
+                }
+
                 if (
                     ((updateOnEvent !== undefined) && (dynamicEl[c1].updateOnEvent === updateOnEvent)) ||
                     (updateOnEvent === undefined)

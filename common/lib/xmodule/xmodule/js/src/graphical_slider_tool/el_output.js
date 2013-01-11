@@ -31,7 +31,7 @@ define('ElOutput', ['logme'], function (logme) {
             // element.
             if (
                 (typeof obj['@output'] !== 'string') ||
-                (obj['@output'].toLowerCase() !== 'element')
+                ((obj['@output'].toLowerCase() !== 'element') && (obj['@output'].toLowerCase() !== 'none'))
             ) {
                 return;
             }
@@ -108,18 +108,22 @@ define('ElOutput', ['logme'], function (logme) {
 
             paramNames.pop();
 
-            el = $('#' + obj['@el_id']);
+            if (obj['@output'].toLowerCase() !== 'none') {
+                el = $('#' + obj['@el_id']);
 
-            if (el.length !== 1) {
-                logme(
-                    'ERROR: DOM element with ID "' + obj['@el_id'] + '" ' +
-                    'not found. Dynamic element not created.'
-                );
+                if (el.length !== 1) {
+                    logme(
+                        'ERROR: DOM element with ID "' + obj['@el_id'] + '" ' +
+                        'not found. Dynamic element not created.'
+                    );
 
-                return;
+                    return;
+                }
+
+                el.html(func.apply(window, state.getAllParameterValues()));
+            } else {
+                el = null;
             }
-
-            el.html(func.apply(window, state.getAllParameterValues()));
 
             state.addDynamicEl(el, func, obj['@el_id'], updateOnEvent);
         }
