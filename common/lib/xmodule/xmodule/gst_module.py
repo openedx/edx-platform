@@ -102,15 +102,18 @@ class GraphicalSliderToolModule(XModule):
         #substitute sliders
         slider_div = '<div class="{element_class}_slider" \
                                    id="{element_id}_slider_{var}" \
-                                   data-var="{var}" style="{style}">\
+                                   data-var="{var}" \
+                                   data-on_event="{on_event}" \
+                                   style="{style}">\
                      </div>'
         slider_els = xml.xpath('//slider')
         for slider_el in slider_els:
             slider_el.getparent().replace(slider_el, html.fromstring(
                                 slider_div.format(element_class=self.html_class,
-                                            element_id=self.html_id,
-                                            var=slider_el.get('var', ""),
-                                            style=slider_el.get('style', ""))))
+                                    element_id=self.html_id,
+                                    var=slider_el.get('var', ""),
+                                    on_event=slider_el.get('on_event', 'slide'),
+                                    style=slider_el.get('style', ""))))
 
         # substitute inputs aka textboxes
         input_div = '<input class="{element_class}_input" \
