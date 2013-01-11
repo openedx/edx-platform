@@ -17,6 +17,10 @@ from courseware.access import has_access
 from util.json_request import expect_json
 from xmodule.course_module import CourseDescriptor
 from student.models import unique_id_for_user
+from xmodule.x_module import ModuleSystem
+from mitxmako.shortcuts import render_to_string
+from capa import inputtypes
+from lxml import etree
 
 log = logging.getLogger(__name__)
 
@@ -136,6 +140,8 @@ class StaffGradingService(GradingService):
 # importing this file doesn't create objects that may not have the right config
 _service = None
 
+module_system = ModuleSystem("", None, None, render_to_string, None)
+
 def staff_grading_service():
     """
     Return a staff grading service instance--if settings.MOCK_STAFF_GRADING is True,
@@ -252,12 +258,24 @@ def _get_next(course_id, grader_id, location):
     Implementation of get_next (also called from save_grade) -- returns a json string
     """
     try:
-        return staff_grading_service().get_next(course_id, location, grader_id)
+        response = staff_grading_service().get_next(course_id, location, grader_id)
+        response_json = json.loads(response)
+        rubric = response_json['rubric']
+        rubric_input = inputtypes.RubricInput(module_system, etree.XML(rubric), {'id': location})
+        rubric_html = etree.tostring(rubric_input.get_html())
+        response_json['rubric'] = rubric_html
+        return json.dumps(response_json)
     except GradingServiceError:
         log.exception("Error from grading service.  server url: {0}"
                       .format(staff_grading_service().url))
         return json.dumps({'success': False,
                            'error': 'Could not connect to grading service'})
+    # if we can't parse the rubric into HTML, 
+    except etree.XMLSyntaxError:
+        log.exception("Cannot parse rubric string. Raw string: {0}"
+                      .format(rubric))
+        return json.dumps({'success': False,
+                           'error': 'Error displaying submission'})
 
 
 @expect_json

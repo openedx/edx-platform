@@ -42,14 +42,49 @@ class StaffGradingBackend
 The standard chunk of Lorem Ipsum used since the 1500s is reproduced below for those interested. Sections 1.10.32 and 1.10.33 from "de Finibus Bonorum et Malorum" by Cicero are also reproduced in their exact original form, accompanied by English versions from the 1914 translation by H. Rackham.
             '''
             rubric: '''
-<ul>
-<li>Metals tend to be good electronic conductors, meaning that they have a large number of electrons which are able to access empty (mobile) energy states within the material.</li>
-<li>Sodium has a half-filled s-band, so there are a number of empty states immediately above the highest occupied energy levels within the band.</li>
-<li>Magnesium has a full s-band, but the the s-band and p-band overlap in magnesium. Thus are still a large number of available energy states immediately above the s-band highest occupied energy level.</li>
-</ul>
-
-<p>Please score your response according to how many of the above components you identified:</p>
-            '''
+<table class="rubric"><tbody><tr><th>Purpose</th>
+                
+            <td>
+                <!--TODO: figure out the state variables/selected info -->
+                    <input type="radio" class="score-selection" name="score-selection-0" id="score-0-0" value="0"><label for="score-0-0">No product</label>
+            </td>
+                
+            <td>
+                <!--TODO: figure out the state variables/selected info -->
+                    <input type="radio" class="score-selection" name="score-selection-0" id="score-0-1" value="1"><label for="score-0-1">Unclear purpose or main idea</label>
+            </td>
+                
+            <td>
+                <!--TODO: figure out the state variables/selected info -->
+                    <input type="radio" class="score-selection" name="score-selection-0" id="score-0-2" value="2"><label for="score-0-2">Communicates an identifiable purpose and/or main idea for an audience</label>
+            </td>
+                
+            <td>
+                <!--TODO: figure out the state variables/selected info -->
+                    <input type="radio" class="score-selection" name="score-selection-0" id="score-0-3" value="3"><label for="score-0-3">Achieves a clear and distinct purpose for a targeted audience and communicates main ideas with effectively used techniques to introduce and represent ideas and insights</label>
+            </td>
+        </tr><tr><th>Organization</th>
+                
+            <td>
+                <!--TODO: figure out the state variables/selected info -->
+                    <input type="radio" class="score-selection" name="score-selection-1" id="score-1-0" value="0"><label for="score-1-0">No product</label>
+            </td>
+                
+            <td>
+                <!--TODO: figure out the state variables/selected info -->
+                    <input type="radio" class="score-selection" name="score-selection-1" id="score-1-1" value="1"><label for="score-1-1">Organization is unclear; introduction, body, and/or conclusion are underdeveloped, missing or confusing.</label>
+            </td>
+                
+            <td>
+                <!--TODO: figure out the state variables/selected info -->
+                    <input type="radio" class="score-selection" name="score-selection-1" id="score-1-2" value="2"><label for="score-1-2">Organization is occasionally unclear; introduction, body or conclusion may be underdeveloped.</label>
+            </td>
+                
+            <td>
+                <!--TODO: figure out the state variables/selected info -->
+                    <input type="radio" class="score-selection" name="score-selection-1" id="score-1-3" value="3"><label for="score-1-3">Organization is clear and easy to follow; introduction, body and conclusion are defined and aligned with purpose.</label>
+            </td>
+        </tr></tbody></table>'''
             submission_id: @mock_cnt
             max_score: 2 + @mock_cnt % 3
             ml_error_info : 'ML accuracy info: ' + @mock_cnt
@@ -166,8 +201,8 @@ class StaffGrading
     @min_for_ml = 0
     @num_graded = 0
     @num_pending = 0
+    @score_lst = []
 
-    @score = null
     @problems = null
 
     # action handlers
@@ -181,31 +216,36 @@ class StaffGrading
 
 
   setup_score_selection: =>
-    # first, get rid of all the old inputs, if any.
-    @score_selection_container.html('Choose score: ')
+    @score_selection_container.html(@rubric)
+    $('.score-selection').click => @graded_callback()
 
-    # Now create new labels and inputs for each possible score.
-    for score in [0..@max_score]
-      id = 'score-' + score
-      label = """<label for="#{id}">#{score}</label>"""
+  graded_callback: () =>
+    # check to see whether or not any categories have not been scored
+    num_categories = $('table.rubric tr').length
+    for i in [0..(num_categories-1)]
+      score = $("input[name='score-selection-#{i}']:checked").val()
+      if score == undefined
+        return
+    # show button if we have scores for all categories
+    @submit_button.show()
       
-      input = """
-              <input type="radio" name="score-selection" id="#{id}" value="#{score}"/>
-              """       # "  fix broken parsing in emacs
-      @score_selection_container.append(input + label)
 
-    # And now hook up an event handler again
-    $("input[name='score-selection']").change @graded_callback
-    
 
   set_button_text: (text) =>
     @action_button.attr('value', text)
 
-  graded_callback: (event) =>
-    @score = event.target.value
-    @state = state_graded
-    @message = ''
-    @render_view()
+  # finds the scores for each rubric category
+  get_score_list: () =>
+    # find the number of categories:
+    num_categories = $('table.rubric tr').length
+
+    score_lst = []
+    # get the score for each one
+    for i in [0..(num_categories-1)]
+      score = $("input[name='score-selection-#{i}']:checked").val()
+      score_lst.append(score)
+
+    return score_lst
 
   ajax_callback: (response) =>
     # always clear out errors and messages on transition.
@@ -231,7 +271,7 @@ class StaffGrading
 
   skip_and_get_next: () =>
     data =
-      score: @score
+      rubric_scores: @get_score_list()
       feedback: @feedback_area.val()
       submission_id: @submission_id
       location: @location
@@ -244,7 +284,7 @@ class StaffGrading
 
   submit_and_get_next: () ->
     data =
-      score: @score
+      rubric_scores: @get_score_list()
       feedback: @feedback_area.val()
       submission_id: @submission_id
       location: @location
@@ -261,8 +301,6 @@ class StaffGrading
     @rubric = response.rubric
     @submission_id = response.submission_id
     @feedback_area.val('')
-    @max_score = response.max_score
-    @score = null
     @ml_error_info=response.ml_error_info
     @prompt_name = response.problem_name
     @num_graded = response.num_graded
@@ -282,8 +320,6 @@ class StaffGrading
     @ml_error_info = null
     @submission_id = null
     @message = message
-    @score = null
-    @max_score = 0
     @state = state_no_data
 
 
@@ -361,8 +397,6 @@ class StaffGrading
       @prompt_container.html(@prompt)
       @prompt_name_container.html("#{@prompt_name}")
       @submission_container.html(@make_paragraphs(@submission))
-      @rubric_container.html(@rubric)
-
       # no submit button until user picks grade.
       show_submit_button = false
       show_action_button = false
@@ -397,7 +431,7 @@ class StaffGrading
   
 
 # for now, just create an instance and load it...
-mock_backend = false
+mock_backend = true
 ajax_url = $('.staff-grading').data('ajax_url')
 backend = new StaffGradingBackend(ajax_url, mock_backend)
 
