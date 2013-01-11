@@ -13,12 +13,7 @@ from xmodule.modulestore import Location
 from xmodule.timeparse import parse_time
 from xmodule.x_module import XModule, XModuleDescriptor
 
-# student.models imports Role, which imports courseware.access ; use a try, to break the circular import
-try:
-    from student.models import CourseEnrollmentAllowed
-except Exception as err:
-    CourseEnrollmentAllowed = None
-
+from student.models import CourseEnrollmentAllowed
 
 DEBUG_ACCESS = False
 
