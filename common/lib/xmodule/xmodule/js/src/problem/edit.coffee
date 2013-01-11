@@ -59,7 +59,7 @@ class @MarkdownEditingDescriptor extends XModule.Descriptor
   ###
   confirmConversionToXml: ->
     # TODO: use something besides a JavaScript confirm dialog?
-    return confirm("If you convert to the XML source representation, which is used by the Advanced Editor, you cannot go back to using the Simple Editor.\n\nProceed with conversion to XML?")
+    return confirm("If you use the Advanced Editor, this problem will be converted to XML and you will not be able to return to the Simple Editor Interface.\n\nProceed to the Advanced Editor and convert this problem to XML?")
 
   ###
   Event listener for toolbar buttons (only possible when markdown editor is visible).
