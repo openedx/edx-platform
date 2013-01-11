@@ -82,15 +82,24 @@ def location_to_query(location, wildcard=True):
     If `wildcard` is True, then a None in a location is treated as a wildcard
     query. Otherwise, it is searched for literally
     """
-    query = SON()
-    # Location dict is ordered by specificity, and SON
-    # will preserve that order for queries
-    for key, val in Location(location).dict().iteritems():
-        if wildcard and val is None:
-            continue
-        query['_id.{key}'.format(key=key)] = val
+    query = namedtuple_to_son(Location(location), prefix='_id.')
+
+    if wildcard:
+        for key, value in query.items():
+            if value is None:
+                del query[key]
 
     return query
+
+
+def namedtuple_to_son(namedtuple, prefix=''):
+    """
+    Converts a namedtuple into a SON object with the same key order
+    """
+    son = SON()
+    for idx, field_name in enumerate(namedtuple._fields):
+        son[prefix + field_name] = namedtuple[idx]
+    return son
 
 
 class MongoModuleStore(ModuleStoreBase):
@@ -149,6 +158,7 @@ class MongoModuleStore(ModuleStoreBase):
         If depth is None, will load all the children.
         This will make a number of queries that is linear in the depth.
         """
+
         data = {}
         to_process = list(items)
         while to_process and depth is None or depth >= 0:
@@ -162,8 +172,10 @@ class MongoModuleStore(ModuleStoreBase):
             # http://www.mongodb.org/display/DOCS/Advanced+Queries#AdvancedQueries-%24or
             # for or-query syntax
             if children:
-                to_process = list(self.collection.find(
-                    {'_id': {'$in': [Location(child).dict() for child in children]}}))
+                query = {
+                    '_id': {'$in': [namedtuple_to_son(Location(child)) for child in children]}
+                }
+                to_process = self.collection.find(query)
             else:
                 to_process = []
             # If depth is None, then we just recurse until we hit all the descendents
@@ -255,12 +267,17 @@ class MongoModuleStore(ModuleStoreBase):
         item = self._find_one(location)
         return self._load_items([item], depth)[0]
 
-    def get_instance(self, course_id, location):
+    def get_instance(self, course_id, location, depth=0):
         """
         TODO (vshnayder): implement policy tracking in mongo.
         For now, just delegate to get_item and ignore policy.
+
+        depth (int): An argument that some module stores may use to prefetch
+            descendents of the queried modules for more efficient results later
+            in the request. The depth is counted in the number of
+            calls to get_children() to cache. None indicates to cache all descendents.
         """
-        return self.get_item(location)
+        return self.get_item(location, depth=depth)
 
     def get_items(self, location, course_id=None, depth=0):
         items = self.collection.find(

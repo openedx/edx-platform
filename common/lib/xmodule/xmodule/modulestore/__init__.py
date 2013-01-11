@@ -265,7 +265,7 @@ class ModuleStore(object):
         """
         raise NotImplementedError
 
-    def get_instance(self, course_id, location):
+    def get_instance(self, course_id, location, depth=0):
         """
         Get an instance of this location, with policy for course_id applied.
         TODO (vshnayder): this may want to live outside the modulestore eventually

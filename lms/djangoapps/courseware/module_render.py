@@ -82,7 +82,8 @@ def toc_for_course(user, request, course, active_chapter, active_section):
 
     student_module_cache = StudentModuleCache.cache_for_descriptor_descendents(
         course.id, user, course, depth=2)
-    course_module = get_module(user, request, course.location, student_module_cache, course.id)
+    course_module = get_module_for_descriptor(user, request, course,
+                                              student_module_cache, course.id)
     if course_module is None:
         return None
 
@@ -115,7 +116,9 @@ def toc_for_course(user, request, course, active_chapter, active_section):
     return chapters
 
 
-def get_module(user, request, location, student_module_cache, course_id, position=None, not_found_ok = False, wrap_xmodule_display = True):
+def get_module(user, request, location, student_module_cache, course_id,
+               position=None, not_found_ok=False, wrap_xmodule_display=True,
+               depth=0):
     """
     Get an instance of the xmodule class identified by location,
     setting the state based on an existing StudentModule, or creating one if none
@@ -130,13 +133,19 @@ def get_module(user, request, location, student_module_cache, course_id, positio
       - course_id             : the course_id in the context of which to load module
       - position              : extra information from URL for user-specified
                                 position within module
+      - depth                 : number of levels of descendents to cache when loading this module.
+                                None means cache all descendents
 
     Returns: xmodule instance, or None if the user does not have access to the
     module.  If there's an error, will try to return an instance of ErrorModule
     if possible.  If not possible, return None.
     """
     try:
-        return _get_module(user, request, location, student_module_cache, course_id, position, wrap_xmodule_display)
+        location = Location(location)
+        descriptor = modulestore().get_instance(course_id, location, depth=depth)
+        return get_module_for_descriptor(user, request, descriptor, student_module_cache, course_id,
+                                         position=position, not_found_ok=not_found_ok,
+                                         wrap_xmodule_display=wrap_xmodule_display)
     except ItemNotFoundError:
         if not not_found_ok:
             log.exception("Error in get_module")
@@ -146,12 +155,20 @@ def get_module(user, request, location, student_module_cache, course_id, positio
         log.exception("Error in get_module")
         return None
 
-def _get_module(user, request, location, student_module_cache, course_id, position=None, wrap_xmodule_display = True):
+
+def get_module_for_descriptor(user, request, descriptor, student_module_cache, course_id,
+                              position=None, not_found_ok=False, wrap_xmodule_display=True):
+    """
+    Actually implement get_module. See docstring there for details.
+    """
+    return _get_module(user, request, descriptor, student_module_cache, course_id,
+                       position=position, wrap_xmodule_display=wrap_xmodule_display)
+
+def _get_module(user, request, descriptor, student_module_cache, course_id,
+                position=None, wrap_xmodule_display=True):
     """
     Actually implement get_module.  See docstring there for details.
     """
-    location = Location(location)
-    descriptor = modulestore().get_instance(course_id, location)
 
     # Short circuit--if the user shouldn't have access, bail without doing any work
     if not has_access(user, descriptor, 'load', course_id):
@@ -206,12 +223,12 @@ def _get_module(user, request, location, student_module_cache, course_id, positi
               'waittime': settings.XQUEUE_WAITTIME_BETWEEN_REQUESTS
              }
 
-    def inner_get_module(location):
+    def inner_get_module(descriptor):
         """
         Delegate to get_module.  It does an access check, so may return None
         """
-        return get_module(user, request, location,
-                                       student_module_cache, course_id, position)
+        return get_module_for_descriptor(user, request, descriptor,
+                                         student_module_cache, course_id, position)
 
     # TODO (cpennington): When modules are shared between courses, the static
     # prefix is going to have to be specific to the module, not the directory
@@ -246,7 +263,7 @@ def _get_module(user, request, location, student_module_cache, course_id, positi
 
         # make an ErrorDescriptor -- assuming that the descriptor's system is ok
         import_system = descriptor.system
-        if has_access(user, location, 'staff', course_id):
+        if has_access(user, descriptor.location, 'staff', course_id):
             err_descriptor = ErrorDescriptor.from_xml(str(descriptor), import_system,
                                                       error_msg=exc_info_to_str(sys.exc_info()))
         else:

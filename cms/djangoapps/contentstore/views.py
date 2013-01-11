@@ -475,7 +475,7 @@ def preview_module_system(request, preview_id, descriptor):
     )
 
 
-def get_preview_module(request, preview_id, location):
+def get_preview_module(request, preview_id, descriptor):
     """
     Returns a preview XModule at the specified location. The preview_data is chosen arbitrarily
     from the set of preview data for the descriptor specified by Location
@@ -484,7 +484,6 @@ def get_preview_module(request, preview_id, location):
     preview_id (str): An identifier specifying which preview this module is used for
     location: A Location
     """
-    descriptor = modulestore().get_item(location)
     instance_state, shared_state = descriptor.get_sample_state()[0]
     return load_preview_module(request, preview_id, descriptor, instance_state, shared_state)
 
