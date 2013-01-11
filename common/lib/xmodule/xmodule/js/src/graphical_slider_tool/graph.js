@@ -888,7 +888,8 @@ define('Graph', ['logme'], function (logme) {
 
                     // If this function is meant to be calculated for an
                     // element then skip it.
-                    if (obj['@output'].toLowerCase() === 'element') {
+                    if ((obj['@output'].toLowerCase() === 'element') ||
+                        (obj['@output'].toLowerCase() === 'none')) {
                         return;
                     }
 
@@ -904,7 +905,7 @@ define('Graph', ['logme'], function (logme) {
                     else if (obj['@output'].toLowerCase() !== 'graph') {
                         logme(
                             'ERROR: Function "output" attribute can be ' +
-                            'either "element", "plot_label",  or "graph".'
+                            'either "element", "plot_label", "none" or "graph".'
                         );
 
                         return;
