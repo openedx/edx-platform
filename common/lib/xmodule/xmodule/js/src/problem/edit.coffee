@@ -1,9 +1,12 @@
 class @MarkdownEditingDescriptor extends XModule.Descriptor
+  # TODO really, these templates should come from or also feed the cheatsheet
   @multipleChoiceTemplate : "( ) incorrect\n( ) incorrect\n(x) correct\n"
   @checkboxChoiceTemplate: "[x] correct\n[ ] incorrect\n[x] correct\n"
   @stringInputTemplate: "= answer\n"
   @numberInputTemplate: "= answer +- x%\n"
   @selectTemplate: "[[incorrect, (correct), incorrect]]\n"
+  @headerTemplate: "Header\n=====\n"
+  @explanationTemplate: "[explanation]\nShort explanation\n[explanation]\n"
 
   constructor: (element) ->
     @element = element
@@ -74,6 +77,8 @@ class @MarkdownEditingDescriptor extends XModule.Descriptor
       when "number-button" then revisedSelection = MarkdownEditingDescriptor.insertNumberInput(selection)
       when "checks-button" then revisedSelection = MarkdownEditingDescriptor.insertCheckboxChoice(selection)
       when "dropdown-button" then revisedSelection = MarkdownEditingDescriptor.insertSelect(selection)
+      when "header-button" then revisedSelection = MarkdownEditingDescriptor.insertHeader(selection)
+      when "explanation-button" then revisedSelection = MarkdownEditingDescriptor.insertExplanation(selection)
       else # ignore click
 
     if revisedSelection != null
@@ -157,6 +162,12 @@ class @MarkdownEditingDescriptor extends XModule.Descriptor
 
   @insertSelect: (selectedText) ->
     return MarkdownEditingDescriptor.insertGenericInput(selectedText, '[[', ']]', MarkdownEditingDescriptor.selectTemplate)
+
+  @insertHeader: (selectedText) ->
+    return MarkdownEditingDescriptor.insertGenericInput(selectedText, '', '\n====\n', MarkdownEditingDescriptor.headerTemplate)
+
+  @insertExplanation: (selectedText) ->
+    return MarkdownEditingDescriptor.insertGenericInput(selectedText, '[explanation]\n', '\n[explanation]', MarkdownEditingDescriptor.explanationTemplate)
 
   @insertGenericInput: (selectedText, lineStart, lineEnd, template) ->
     if selectedText.length > 0
