@@ -606,7 +606,7 @@ class OpenEndedModule(openendedchild.OpenEndedChild):
 
     def render_rubric(self, rubric_xml):
         rubric_categories = OpenEndedModule.extract_rubric_categories(rubric_xml)
-        html = render_to_string('open_ended_rubric.html', rubric_categories)
+        html = render_to_string('open_ended_rubric.html', {'rubric_categories'  : rubric_categories})
         return html
 
     @staticmethod

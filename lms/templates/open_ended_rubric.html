@@ -1,8 +1,9 @@
 <table class="rubric">
-    % for i in range(len(categories)):
-    <% category = categories[i] %>
+    % for i in range(len(rubric_categories)):
+    <% category = rubric_categories[i] %>
     <tr>
         <th>${category['description']}</th>
+        <td>${category['score']}</td>
         % for j in range(len(category['options'])):
         <% option = category['options'][j] %>
         <td>
