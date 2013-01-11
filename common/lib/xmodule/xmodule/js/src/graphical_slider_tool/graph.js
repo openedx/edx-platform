@@ -8,18 +8,7 @@ define('Graph', ['logme'], function (logme) {
 
     function Graph(gstId, config, state) {
         var plotDiv, dataSeries, functions, xaxis, yaxis, numPoints, xrange,
-            asymptotes, movingLabels, xTicksNames, yTicksNames;
-
-        state.barsConfig = {
-            'N': 0,
-            'delta': 0,
-            'diff': 0,
-            'width': 0,
-            'width_perc': 0.8,
-            'margin': 0.1,
-            'total': 0.4,
-            'total_half': 0.2
-        };
+            asymptotes, movingLabels, xTicksNames, yTicksNames, graphBarWidth, graphBarAlign;
 
         // We need plot configuration settings. Without them we can't continue.
         if ($.isPlainObject(config.plot) === false) {
@@ -62,6 +51,15 @@ define('Graph', ['logme'], function (logme) {
             return;
         }
 
+        graphBarWidth = 1;
+        graphBarAlign = null;
+
+        getBarWidth();
+        getBarAlign();
+
+        logme('graphBarWidth = ' + graphBarWidth);
+        logme('graphBarAlign = ' + graphBarAlign);
+
         // Get the user defined functions. If there aren't any, don't do
         // anything else.
         createFunctions();
@@ -89,6 +87,52 @@ define('Graph', ['logme'], function (logme) {
         state.bindUpdatePlotEvent(plotDiv, onUpdatePlot);
 
         return;
+
+        function getBarWidth() {
+            if (config.plot.hasOwnProperty('bar_width') === false) {
+                return;
+            }
+
+            if (typeof config.plot.bar_width !== 'string') {
+                logme('ERROR: The parameter config.plot.bar_width must be a string.');
+
+                return;
+            }
+
+            if (isFinite(graphBarWidth = parseFloat(config.plot.bar_width)) === false) {
+                logme('ERROR: The parameter config.plot.bar_width is not a valid floating number.');
+                graphBarWidth = 1;
+
+                return;
+            }
+
+            return;
+        }
+
+        function getBarAlign() {
+            if (config.plot.hasOwnProperty('bar_align') === false) {
+                return;
+            }
+
+            if (typeof config.plot.bar_align !== 'string') {
+                logme('ERROR: The parameter config.plot.bar_align must be a string.');
+
+                return;
+            }
+
+            if (
+                (config.plot.bar_align.toLowerCase() !== 'left') &&
+                (config.plot.bar_align.toLowerCase() !== 'center')
+            ) {
+                logme('ERROR: Property config.plot.bar_align can be one of "left", or "center".');
+
+                return;
+            }
+
+            graphBarAlign = config.plot.bar_align.toLowerCase();
+
+            return;
+        }
 
         function createMovingLabelFunctions() {
             var c1, returnStatus;
@@ -1015,9 +1059,7 @@ define('Graph', ['logme'], function (logme) {
                 if (newFunctionObject['bars'] === true) {
                     newFunctionObject['line'] = false;
                     newFunctionObject['dot'] = false;
-
-                    newFunctionObject.barIndex = state.barsConfig.N;
-                    state.barsConfig.N += 1;
+                    // To do: See if need to do anything here.
                 } else if (
                     (newFunctionObject['dot'] === false) &&
                     (newFunctionObject['line'] === false)
@@ -1078,7 +1120,7 @@ define('Graph', ['logme'], function (logme) {
 
         function generateData() {
             var c0, c1, functionObj, seriesObj, dataPoints, paramValues, x, y,
-                start, end, step, tempX;
+                start, end, step, numNotUndefined;
 
             paramValues = state.getAllParameterValues();
 
@@ -1086,14 +1128,6 @@ define('Graph', ['logme'], function (logme) {
 
             for (c0 = 0; c0 < functions.length; c0 += 1) {
                 functionObj = functions[c0];
-
-                seriesObj = {};
-                dataPoints = [];
-
-                // For counting number of points added. In the end we will
-                // compare this number to 'numPoints' specified in the config
-                // JSON.
-                c1 = 0;
 
                 try {
                     start = xrange.min.apply(window, paramValues);
@@ -1117,10 +1151,16 @@ define('Graph', ['logme'], function (logme) {
 
                     return false;
                 }
-                step = (end - start) / (numPoints - 1);
 
-                state.barsConfig.delta = (step * state.barsConfig.total) / state.barsConfig.N;
-                state.barsConfig.diff = step * state.barsConfig.total_half;
+                seriesObj = {};
+                dataPoints = [];
+
+                // For counting number of points added. In the end we will
+                // compare this number to 'numPoints' specified in the config
+                // JSON.
+                c1 = 0;
+
+                step = (end - start) / (numPoints - 1);
 
                 // Generate the data points.
                 for (x = start; x <= end; x += step) {
@@ -1143,18 +1183,12 @@ define('Graph', ['logme'], function (logme) {
                         return false;
                     }
 
-                    if (functionObj.bars === true) {
-                        tempX = x - state.barsConfig.diff + (functionObj.barIndex + state.barsConfig.margin) * state.barsConfig.delta;
-                    } else {
-                        tempX = x;
-                    }
-
                     // Return the paramValues array to how it was before we
                     // added 'x' variable to the end of it.
                     paramValues.pop();
 
                     // Add the generated point to the data points set.
-                    dataPoints.push([tempX, y]);
+                    dataPoints.push([x, y]);
 
                     c1 += 1;
 
@@ -1233,8 +1267,12 @@ define('Graph', ['logme'], function (logme) {
 
                 seriesObj.bars = {
                     'show': functionObj.bars,
-                    'barWidth': state.barsConfig.delta * state.barsConfig.width_perc
+                    'barWidth': graphBarWidth
                 };
+
+                if (graphBarAlign !== null) {
+                    seriesObj.bars.align = graphBarAlign;
+                }
 
                 if (functionObj.hasOwnProperty('pointSize')) {
                     seriesObj.points.radius = functionObj.pointSize;
@@ -1243,6 +1281,27 @@ define('Graph', ['logme'], function (logme) {
                 // Add the newly created series object to the series set which
                 // will be plotted by Flot.
                 dataSeries.push(seriesObj);
+            }
+
+            if (graphBarAlign === null) {
+                for (c0 = 0; c0 < numPoints; c0 += 1) {
+                    // Number of points that have a value other than 'undefined' (undefined).
+                    numNotUndefined = 0;
+
+                    for (c1 = 0; c1 < dataSeries.length; c1 += 1) {
+                        logme('c1 = ' + c1 + ', dataSeries[c1].data[c0][1] = ' + dataSeries[c1].data[c0][1]);
+
+                        if (isFinite(parseInt(dataSeries[c1].data[c0][1])) === true) {
+                            numNotUndefined += 1;
+                        }
+                    }
+
+                    logme('Point number = ' + c0 + ', numNotUndefined = ' + numNotUndefined);
+
+                    for (c1 = 0; c1 < dataSeries.length; c1 += 1) {
+                        dataSeries[c1].data[c0][0] -= graphBarWidth * (0.5 * numNotUndefined - c1);
+                    }
+                }
             }
 
             for (c0 = 0; c0 < asymptotes.length; c0 += 1) {
