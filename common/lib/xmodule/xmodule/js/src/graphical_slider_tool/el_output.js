@@ -25,7 +25,7 @@ define('ElOutput', ['logme'], function (logme) {
         return;
 
         function processFuncObj(obj) {
-            var paramNames, funcString, func, special, el, disableAutoReturn;
+            var paramNames, funcString, func, el, disableAutoReturn, updateOnEvent;
 
             // We are only interested in functions that are meant for output to an
             // element.
@@ -46,6 +46,15 @@ define('ElOutput', ['logme'], function (logme) {
                 logme('ERROR: Function body is not defined.');
 
                 return;
+            }
+
+            updateOnEvent = 'slide';
+            if (
+                (obj.hasOwnProperty('@update_on') === true) &&
+                (typeof obj['@update_on'] === 'string') &&
+                ((obj['@update_on'].toLowerCase() === 'slide') || (obj['@update_on'].toLowerCase() === 'change'))
+            ) {
+                updateOnEvent = obj['@update_on'].toLowerCase();
             }
 
             disableAutoReturn = obj['@disable_auto_return'];
@@ -99,25 +108,20 @@ define('ElOutput', ['logme'], function (logme) {
 
             paramNames.pop();
 
-            special = false;
-            if (obj['@el_id'][0] === '_') {
-                special = true;
-            } else {
-                el = $('#' + obj['@el_id']);
+            el = $('#' + obj['@el_id']);
 
-                if (el.length !== 1) {
-                    logme(
-                        'ERROR: DOM element with ID "' + obj['@el_id'] + '" ' +
-                        'not found. Dynamic element not created.'
-                    );
+            if (el.length !== 1) {
+                logme(
+                    'ERROR: DOM element with ID "' + obj['@el_id'] + '" ' +
+                    'not found. Dynamic element not created.'
+                );
 
-                    return;
-                }
-
-                el.html(func.apply(window, state.getAllParameterValues()));
+                return;
             }
 
-            state.addDynamicEl(el, func, obj['@el_id'], special);
+            el.html(func.apply(window, state.getAllParameterValues()));
+
+            state.addDynamicEl(el, func, obj['@el_id'], updateOnEvent);
         }
 
     }

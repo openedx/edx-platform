@@ -98,8 +98,6 @@ define('State', ['logme'], function (logme) {
             'bindUpdatePlotEvent': bindUpdatePlotEvent,
             'addDynamicEl': addDynamicEl,
 
-            'getFuncForSpecialLabel': getFuncForSpecialLabel,
-
             // plde is an abbreviation for Plot Label Dynamic Elements.
             plde: []
         };
@@ -128,14 +126,14 @@ define('State', ['logme'], function (logme) {
             plotDiv.bind('update_plot', callback);
         }
 
-        function addDynamicEl(el, func, elId, special) {
+        function addDynamicEl(el, func, elId, updateOnEvent) {
             var newLength;
 
             newLength = dynamicEl.push({
                 'el': el,
                 'func': func,
                 'elId': elId,
-                'special': special
+                'updateOnEvent': updateOnEvent
             });
 
             if (typeof dynamicElByElId[elId] !== 'undefined') {
@@ -145,16 +143,6 @@ define('State', ['logme'], function (logme) {
             } else {
                 dynamicElByElId[elId] = dynamicEl[newLength - 1];
             }
-        }
-
-        function getFuncForSpecialLabel(elId) {
-            if (typeof dynamicElByElId[elId] === 'undefined') {
-                logme('ERROR: Special label with ID "' + elId + '" does not exist.');
-
-                return null;
-            }
-
-            return dynamicElByElId[elId].func;
         }
 
         function getParameterValue(paramName) {
@@ -203,7 +191,7 @@ define('State', ['logme'], function (logme) {
         // original value.
         //
         // ####################################################################
-        function setParameterValue(paramName, paramValue, element, slider) {
+        function setParameterValue(paramName, paramValue, element, slider, updateOnEvent) {
             var paramValueNum, c1;
 
             // If a parameter with the name specified by the 'paramName'
@@ -249,7 +237,10 @@ define('State', ['logme'], function (logme) {
             allParameterValues[parameters[paramName].helperArrayIndex] = paramValueNum;
 
             for (c1 = 0; c1 < dynamicEl.length; c1++) {
-                if (dynamicEl[c1].special !== true) {
+                if (
+                    ((updateOnEvent !== undefined) && (dynamicEl[c1].updateOnEvent === updateOnEvent)) ||
+                    (updateOnEvent === undefined)
+                ) {
                     dynamicEl[c1].el.html(dynamicEl[c1].func.apply(window, allParameterValues));
                 }
             }

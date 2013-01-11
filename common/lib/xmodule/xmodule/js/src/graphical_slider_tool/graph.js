@@ -57,9 +57,6 @@ define('Graph', ['logme'], function (logme) {
         getBarWidth();
         getBarAlign();
 
-        logme('graphBarWidth = ' + graphBarWidth);
-        logme('graphBarAlign = ' + graphBarAlign);
-
         // Get the user defined functions. If there aren't any, don't do
         // anything else.
         createFunctions();
@@ -1119,7 +1116,7 @@ define('Graph', ['logme'], function (logme) {
         }
 
         function generateData() {
-            var c0, c1, functionObj, seriesObj, dataPoints, paramValues, x, y,
+            var c0, c1, c3, functionObj, seriesObj, dataPoints, paramValues, x, y,
                 start, end, step, numNotUndefined;
 
             paramValues = state.getAllParameterValues();
@@ -1289,17 +1286,18 @@ define('Graph', ['logme'], function (logme) {
                     numNotUndefined = 0;
 
                     for (c1 = 0; c1 < dataSeries.length; c1 += 1) {
-                        logme('c1 = ' + c1 + ', dataSeries[c1].data[c0][1] = ' + dataSeries[c1].data[c0][1]);
-
                         if (isFinite(parseInt(dataSeries[c1].data[c0][1])) === true) {
                             numNotUndefined += 1;
                         }
                     }
 
-                    logme('Point number = ' + c0 + ', numNotUndefined = ' + numNotUndefined);
-
+                    c3 = 0;
                     for (c1 = 0; c1 < dataSeries.length; c1 += 1) {
-                        dataSeries[c1].data[c0][0] -= graphBarWidth * (0.5 * numNotUndefined - c1);
+                        dataSeries[c1].data[c0][0] -= graphBarWidth * (0.5 * numNotUndefined - c3);
+
+                        if (isFinite(parseInt(dataSeries[c1].data[c0][1])) === true) {
+                            c3 += 1;
+                        }
                     }
                 }
             }
