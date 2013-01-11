@@ -245,7 +245,7 @@ def instructor_dashboard(request, course_id):
         datatable['title'] = 'List of Staff in course {0}'.format(course_id)
         track.views.server_track(request, 'list-staff', {}, page='idashboard')
 
-    elif 'List course instructors' in action:
+    elif 'List course instructors' in action and request.user.is_staff:
         group = get_instructor_group(course)
         msg += 'Instructor group = {0}'.format(group.name)
         log.debug('instructor grp={0}'.format(group.name))
@@ -269,7 +269,7 @@ def instructor_dashboard(request, course_id):
             user.groups.add(group)
             track.views.server_track(request, 'add-staff {0}'.format(user), {}, page='idashboard')
 
-    elif action == 'Add instructor':
+    elif action == 'Add instructor' and request.user.is_staff:
         uname = request.POST['instructor']
         try:
             user = User.objects.get(username=uname)
@@ -297,7 +297,7 @@ def instructor_dashboard(request, course_id):
             user.groups.remove(group)
             track.views.server_track(request, 'remove-staff {0}'.format(user), {}, page='idashboard')
 
-    elif action == 'Remove instructor':
+    elif action == 'Remove instructor' and request.user.is_staff:
         uname = request.POST['instructor']
         try:
             user = User.objects.get(username=uname)
