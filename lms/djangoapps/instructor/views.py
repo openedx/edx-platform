@@ -649,9 +649,6 @@ def get_student_grade_summary_data(request, course, course_id, get_grades=True, 
     return datatable
 
 #-----------------------------------------------------------------------------
-# Staff grading
-
-
 
 @cache_control(no_cache=True, no_store=True, must_revalidate=True)
 def gradebook(request, course_id):
