@@ -28,23 +28,6 @@
       float: left;
     }
 
-    .tab {
-      height: 24px;
-      padding: 7px 20px 3px;
-      border: 1px solid #a5aaaf;
-      border-radius: 3px 3px 0 0;
-      @include linear-gradient(top, rgba(0, 0, 0, 0) 87%, rgba(0, 0, 0, .06));
-      background-color: #e5ecf3;
-      font-size: 13px;
-      color: #3c3c3c;
-      box-shadow: 1px -1px 1px rgba(0, 0, 0, .05);
-
-      &.current {
-        background: #fff;
-        border-bottom-color: #fff;
-      }
-    }
-
     .advanced-toggle {
       @include white-button;
       height: auto;
