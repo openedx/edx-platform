@@ -39,6 +39,19 @@ class CombinedOpenEndedModule(XModule):
     """
     This is a module that encapsulates all open ended grading (self assessment, peer assessment, etc).
     It transitions between problems, and support arbitrary ordering.
+    Each combined open ended module contains one or multiple "child" modules.
+    Child modules track their own state, and can transition between states.  They also implement get_html and
+    handle_ajax.
+    The combined open ended module transitions between child modules as appropriate, tracks its own state, and passess
+    ajax requests from the browser to the child module or handles them itself (in the cases of reset and next problem)
+    ajax actions implemented by all children are:
+        'save_answer' -- Saves the student answer
+        'save_assessment' -- Saves the student assessment (or external grader assessment)
+        'save_post_assessment' -- saves a post assessment (hint, feedback on feedback, etc)
+    ajax actions implemented by combined open ended module are:
+        'reset' -- resets the whole combined open ended module and returns to the first child module
+        'next_problem' -- moves to the next child module
+        'get_results' -- gets results from a given child module
     """
     STATE_VERSION = 1
 
@@ -163,7 +176,7 @@ class CombinedOpenEndedModule(XModule):
 
     def child_modules(self):
         """
-        Returns the functions associated with the child modules in a dictionary.  This makes writing functions
+        Returns the constructors associated with the child modules in a dictionary.  This makes writing functions
         simpler (saves code duplication)
         Input: None
         Output: A dictionary of dictionaries containing the descriptor functions and module functions
