@@ -28,7 +28,7 @@ metadata:
        = 5
        
 
-       [Explanation]
+       [explanation]
        Pi, or the the ratio between a circle's circumference to its diameter, is an irrational number 
        known to extreme precision. It is value is approximately equal to 3.14.
                
@@ -37,7 +37,7 @@ metadata:
        can use any estimation technique that you like.
        
        If you look at your hand, you can count that you have five fingers.
-       [Explanation]
+       [explanation]
        "
 
 data: |
