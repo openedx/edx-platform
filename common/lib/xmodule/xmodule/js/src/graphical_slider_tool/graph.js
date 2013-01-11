@@ -8,7 +8,7 @@ define('Graph', ['logme'], function (logme) {
 
     function Graph(gstId, config, state) {
         var plotDiv, dataSeries, functions, xaxis, yaxis, numPoints, xrange,
-            asymptotes, movingLabels;
+            asymptotes, movingLabels, xTicksNames, yTicksNames;
 
         state.barsConfig = {
             'N': 0,
@@ -349,7 +349,10 @@ define('Graph', ['logme'], function (logme) {
         }
 
         function setGraphAxes() {
-            xaxis = {};
+            xaxis = {
+                'tickFormatter': null
+            };
+
             if (typeof config.plot['xticks'] === 'string') {
                 if (processTicks(config.plot['xticks'], xaxis, 'xunits') === false) {
                     logme('ERROR: Could not process the ticks for x-axis.');
@@ -362,7 +365,9 @@ define('Graph', ['logme'], function (logme) {
                 return false;
             }
 
-            yaxis = {};
+            yaxis = {
+                'tickFormatter': null
+            };
             if (typeof config.plot['yticks'] === 'string') {
                 if (processTicks(config.plot['yticks'], yaxis, 'yunits') === false) {
                     logme('ERROR: Could not process the ticks for y-axis.');
@@ -375,7 +380,68 @@ define('Graph', ['logme'], function (logme) {
                 return false;
             }
 
+            xTicksNames = null;
+            yTicksNames = null;
+
+            if (checkForTicksNames('x') === false) {
+                return false;
+            }
+
+            if (checkForTicksNames('y') === false) {
+                return false;
+            }
+
             return true;
+
+            //
+            // function checkForTicksNames(axisName)
+            //
+            // The parameter "axisName" can be either "x" or "y" (string). Depending on it, the function
+            // will set "xTicksNames" or "yTicksNames" private variable.
+            //
+            // This function does not return anything. It sets the private variable "xTicksNames" ("yTicksNames")
+            // to the object converted by JSON.parse from the XML parameter "plot.xticks_names" ("plot.yticks_names").
+            // If the "plot.xticks_names" ("plot.yticks_names") is missing or it is not a valid JSON string, then
+            // "xTicksNames" ("yTicksNames") will be set to "null".
+            //
+            // Depending on the "xTicksNames" ("yTicksNames") being "null" or an object, the plot will either draw
+            // number ticks, or use the names specified by the opbject.
+            //
+            function checkForTicksNames(axisName) {
+                var tmpObj;
+
+                if ((axisName !== 'x') && (axisName !== 'y')) {
+                    // This is not an error. This funcion should simply stop executing.
+
+                    return true;
+                }
+
+                if (
+                    (config.plot.hasOwnProperty(axisName + 'ticks_names') === true) ||
+                    (typeof config.plot[axisName + 'ticks_names'] === 'string')
+                ) {
+                    try {
+                        tmpObj = JSON.parse(config.plot[axisName + 'ticks_names']);
+                    } catch (err) {
+                        logme(
+                            'ERROR: plot.' + axisName + 'ticks_names is not a valid JSON string.',
+                            'Error message: "' + err.message + '".'
+                        );
+
+                        return false;
+                    }
+
+                    if (axisName === 'x') {
+                        xTicksNames = tmpObj;
+                        xaxis.tickFormatter = xAxisTickFormatter;
+                    }
+                    // At this point, we are certain that axisName = 'y'.
+                    else {
+                        yTicksNames = tmpObj;
+                        yaxis.tickFormatter = yAxisTickFormatter;
+                    }
+                }
+            }
 
             function processTicks(ticksStr, ticksObj, unitsType) {
                 var ticksBlobs, tempFloat, tempTicks, c1, c2;
@@ -452,10 +518,6 @@ define('Graph', ['logme'], function (logme) {
                     ticksObj.tickSize = null;
                     ticksObj.ticks = tempTicks;
                 }
-
-                // ticksObj.font = {
-                //     'size': '16px'
-                // };
 
                 return true;
 
@@ -1210,6 +1272,14 @@ define('Graph', ['logme'], function (logme) {
 
             paramValues = state.getAllParameterValues();
 
+            if (xaxis.tickFormatter !== null) {
+                xaxis.ticks = null;
+            }
+
+            if (yaxis.tickFormatter !== null) {
+                yaxis.ticks = null;
+            }
+
             // Tell Flot to draw the graph to our specification.
             plotObj = $.plot(
                 plotDiv,
@@ -1332,7 +1402,25 @@ define('Graph', ['logme'], function (logme) {
                 return markings;
             }
         }
+
+        function xAxisTickFormatter(val, axis) {
+            if (xTicksNames.hasOwnProperty(val.toFixed(axis.tickDecimals)) === true) {
+                return xTicksNames[val.toFixed(axis.tickDecimals)];
+            }
+
+            return '';
+        }
+
+        function yAxisTickFormatter(val, axis) {
+            if (yTicksNames.hasOwnProperty(val.toFixed(axis.tickDecimals)) === true) {
+                return yTicksNames[val.toFixed(axis.tickDecimals)];
+            }
+
+            return '';
+        }
     }
+
+
 });
 
 // End of wrapper for RequireJS. As you can see, we are passing
