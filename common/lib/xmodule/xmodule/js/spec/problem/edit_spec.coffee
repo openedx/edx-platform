@@ -257,8 +257,6 @@ describe 'MarkdownEditingDescriptor', ->
         [(] distractor
         [] no space
         
-        {{video abcd1s}}
-        
         Option with multiple correct ones
         [[one option, (correct one), (should not be correct)]]
         
@@ -311,8 +309,6 @@ describe 'MarkdownEditingDescriptor', ->
             <choice correct="false">no space</choice>
           </choicegroup>
         </multiplechoiceresponse>
-        
-        <video youtube="1.0:abcd1s" />
         
         <p>Option with multiple correct ones</p>
         
