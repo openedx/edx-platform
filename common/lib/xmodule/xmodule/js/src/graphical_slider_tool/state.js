@@ -238,7 +238,7 @@ define('State', ['logme'], function (logme) {
 
             for (c1 = 0; c1 < dynamicEl.length; c1++) {
                 if (dynamicEl[c1].el === null) {
-                    continue;
+                    dynamicEl[c1].func.apply(window, allParameterValues);
                 }
 
                 if (
