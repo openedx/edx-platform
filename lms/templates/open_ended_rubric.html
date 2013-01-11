@@ -1,0 +1,17 @@
+<table class="rubric">
+    % for i in range(len(categories)):
+    <% category = categories[i] %>
+    <tr>
+        <th>${category['description']}</th>
+        % for j in range(len(category['options'])):
+        <% option = category['options'][j] %>
+        <td>
+            <div class="view-only">
+                ${option['text']}
+                <div class="grade">[${option['points']} points]</div>
+            </div>
+        </td>
+        % endfor
+    </tr>
+    % endfor
+</table>
