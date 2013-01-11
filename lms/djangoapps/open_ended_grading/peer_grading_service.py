@@ -81,7 +81,7 @@ class PeerGradingService(GradingService):
         self.get_problem_list_url = self.url + '/get_problem_list/'
 
     def get_next_submission(self, problem_location, grader_id):
-        response = self.get(self.get_next_submission_url, False, 
+        response = self.get(self.get_next_submission_url,
                 {'location': problem_location, 'grader_id': grader_id})
         return response
 
