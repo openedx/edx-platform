@@ -45,11 +45,32 @@
       }
     }
 
+    .advanced-toggle {
+      @include white-button;
+      height: auto;
+      margin-top: -1px;
+      padding: 3px 9px;
+      font-size: 12px;
+
+      &.current {
+        border: 1px solid $lightGrey !important;
+        border-radius: 3px !important;
+        background: $lightGrey !important;
+        color: $darkGrey !important;
+        pointer-events: none;
+        cursor: none;
+        
+        &:hover {
+          box-shadow: 0 0 0 0 !important;
+        }
+      }
+    }
+
     .cheatsheet-toggle {
       width: 21px;
       height: 21px;
       padding: 0;
-      margin: 3px 5px 0 16px;
+      margin: 0 5px 0 15px;
       border-radius: 22px;
       border: 1px solid #a5aaaf;
       background: #e5ecf3;
