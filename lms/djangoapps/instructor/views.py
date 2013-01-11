@@ -32,7 +32,6 @@ from xmodule.modulestore.exceptions import InvalidLocationError, ItemNotFoundErr
 from xmodule.modulestore.search import path_to_location
 import track.views
 
-from .grading import StaffGrading
 from .offline_gradecalc import student_grades, offline_grades_available
 
 log = logging.getLogger(__name__)
