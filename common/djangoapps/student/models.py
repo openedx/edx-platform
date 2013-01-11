@@ -230,11 +230,15 @@ class TestCenterUser(models.Model):
                 return True
             
         return False    
-                              
+                       
+    @staticmethod
+    def _generate_edx_id():
+        NUM_DIGITS = 12
+        return u"edX{:012}".format(randint(1, 10**NUM_DIGITS-1))
+    
     @staticmethod
     def _generate_candidate_id():
-        NUM_DIGITS = 12
-        return u"edX%0d" % randint(1, 10**NUM_DIGITS-1)
+        return TestCenterUser._generate_edx_id()
         
     @staticmethod
     def create(user):
@@ -408,9 +412,19 @@ class TestCenterRegistration(models.Model):
 
     @property
     def authorization_transaction_type(self):
-        if self.uploaded_at is None:
+        if self.authorization_id is not None:
+            return 'Update'
+        elif self.uploaded_at is None:
             return 'Add'
         else:
+            # TODO: decide what to send when we have uploaded an initial version,
+            # but have not received confirmation back from that upload.  If the 
+            # registration here has been changed, then we don't know if this changed
+            # registration should be submitted as an 'add' or an 'update'. 
+            #
+            # If the first registration were lost or in error (e.g. bad code), 
+            # the second should be an "Add".  If the first were processed successfully,
+            # then the second should be an "Update".  We just don't know....
             return 'Update'
         
     @property
@@ -432,10 +446,8 @@ class TestCenterRegistration(models.Model):
 
     @staticmethod
     def _generate_authorization_id():
-        NUM_DIGITS = 12
-        return u"edX%0d" % randint(1, 10**NUM_DIGITS-1) # binascii.hexlify(os.urandom(8))
-    
-    
+        return TestCenterUser._generate_edx_id()
+        
     @staticmethod
     def _create_client_authorization_id():
         """
@@ -515,7 +527,7 @@ class TestCenterRegistration(models.Model):
 class TestCenterRegistrationForm(ModelForm):
     class Meta:
         model = TestCenterRegistration
-        fields = ( 'accommodation_request', )
+        fields = ( 'accommodation_request', 'accommodation_code' )
         
     def update_and_save(self):
         registration = self.save(commit=False)

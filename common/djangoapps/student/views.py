@@ -46,7 +46,6 @@ from courseware.courses import get_courses_by_university
 from courseware.access import has_access
 
 from statsd import statsd
-from django.contrib.localflavor.ie.ie_counties import IE_COUNTY_CHOICES
 
 log = logging.getLogger("mitx.student")
 Article = namedtuple('Article', 'title url author image deck publication publish_date')

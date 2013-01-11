@@ -80,6 +80,8 @@ class Command(BaseCommand):
                                   for csv_field, model_field
                                   in Command.CSV_TO_MODEL_FIELDS.items())
                     record["LastUpdate"] = record["LastUpdate"].strftime("%Y/%m/%d %H:%M:%S")
+                    record["EligibilityApptDateFirst"] = record["EligibilityApptDateFirst"].strftime("%Y/%m/%d")
+                    record["EligibilityApptDateLast"] = record["EligibilityApptDateLast"].strftime("%Y/%m/%d")
                     if kwargs['force_add']:
                         record['AuthorizationTransactionType'] = 'Add'
 

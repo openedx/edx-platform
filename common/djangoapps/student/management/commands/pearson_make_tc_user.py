@@ -136,4 +136,7 @@ class Command(BaseCommand):
                 
         if change_internal:
             testcenter_user.save()
+            print "Updated  confirmation information in existing user's demographics."
+        else:
+            print "No changes necessary to make to confirmation information in existing user's demographics."
             
