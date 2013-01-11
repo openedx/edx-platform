@@ -295,7 +295,8 @@ def instructor_dashboard(request, course_id):
         students_enrolled_json = json.loads(req.content, object_pairs_hook=OrderedDict)
 
         # number of students active in the past 7 days (including current day), i.e. with at least one activity for the period
-        req = requests.get(settings.ANALYTICS_SERVER_URL + "get_analytics?aname=StudentsActive&course_id=%s&from=%s" % (course_id,from_day))
+        #req = requests.get(settings.ANALYTICS_SERVER_URL + "get_analytics?aname=StudentsActive&course_id=%s&from=%s" % (course_id,from_day))
+        req = requests.get(settings.ANALYTICS_SERVER_URL + "get_analytics?aname=StudentsActive&course_id=%s" % (course_id,))    # default is active past 7 days
         students_active_json = json.loads(req.content, object_pairs_hook=OrderedDict)
 
         # number of students per problem who have problem graded correct

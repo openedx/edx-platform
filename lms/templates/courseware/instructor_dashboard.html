@@ -6,6 +6,8 @@
   <%static:css group='course'/>
   <script type="text/javascript" src="${static.url('js/vendor/flot/jquery.flot.js')}"></script>
   <script type="text/javascript" src="${static.url('js/vendor/flot/jquery.flot.axislabels.js')}"></script>
+  <script type="text/javascript" src="${static.url('js/vendor/jquery-jvectormap-1.1.1/jquery-jvectormap-1.1.1.min.js')}"></script>
+  <script type="text/javascript" src="${static.url('js/vendor/jquery-jvectormap-1.1.1/jquery-jvectormap-world-mill-en.js')}"></script>
 </%block>
 
 <%include file="/courseware/course_navigation.html" args="active_page='instructor'" />
@@ -39,6 +41,45 @@ table.stat_table td {
 }  
 
 a.selectedmode { background-color: yellow; }
+
+
+.jvectormap-label {
+    position: absolute;
+    display: none;
+    border: solid 1px #CDCDCD;
+    -webkit-border-radius: 3px;
+    -moz-border-radius: 3px;
+    border-radius: 3px;
+    background: #292929;
+    color: white;
+    font-family: sans-serif, Verdana;
+    font-size: smaller;
+    padding: 3px;
+}
+
+.jvectormap-zoomin, .jvectormap-zoomout {
+    position: absolute;
+    left: 10px;
+    -webkit-border-radius: 3px;
+    -moz-border-radius: 3px;
+    border-radius: 3px;
+    background: #292929;
+    padding: 3px;
+    color: white;
+    width: 10px;
+    height: 10px;
+    cursor: pointer;
+    line-height: 10px;
+    text-align: center;
+}
+
+.jvectormap-zoomin {
+    top: 10px;
+}
+
+.jvectormap-zoomout {
+    top: 30px;
+}
 
 </style>
 
@@ -182,6 +223,36 @@ function goto( mode)
    <p>
      Number of active students for the past 7 days: ${students_active_json['data']['value']}
    </p>
+
+   <p>
+     Student distribution per country, all courses, Sep-12 to Oct-17, 1 server (shown here as an example):
+   </p>
+
+<div id="posts-list" class="clearfix">
+<figure>
+    <div id="world-map-students" style="width: 720px; height: 400px"></div>
+    <script>
+      var student_data = {BD : '300', BE : '156', BF : '7', BG : '246', BA : '62', BB : '1', BN : '7', BO : '61', JP : '153', BI : '4', BJ : '6', BT : '11', JM : '32', JO : '67', WS : '1', BR : '1941', BS : '5', JE : '6', BY : '166', BZ : '4', RU : '1907', RW : '50', RS : '128', TL : '1', RE : '2', A2 : '59', TJ : '9', RO : '232', GU : '3', GT : '76', GR : '565', BH : '22', GY : '6', GG : '2', GF : '1', GE : '22', GD : '7', GB : '2023', GA : '4', GM : '18', GL : '2', GI : '1', GH : '393', OM : '25', TN : '143', BW : '26', HR : '76', HT : '38', HU : '259', HK : '103', HN : '51', AD : '1', PR : '40', PS : '38', PT : '487', PY : '38', PA : '21', PG : '11', PE : '342', PK : '1833', PH : '571', TM : '1', PL : '736', ZM : '61', EE : '67', EG : '961', ZA : '184', EC : '118', AL : '44', AO : '10', SB : '2', EU : '183', ET : '153', SO : '1', ZW : '42', KY : '3', ES : '1954', ER : '3', ME : '6', MD : '26', MG : '10', UY : '64', UZ : '40', MM : '21', ML : '4', MO : '3', MN : '49', US : '11899', MU : '11', MT : '15', MW : '41', MV : '5', MP : '4', MR : '1', IM : '2', UG : '133', MY : '207', MX : '844', AT : '83', FR : '446', MA : '175', A1 : '167', AX : '1', FI : '97', FJ : '9', NI : '23', NL : '240', NO : '110', NA : '27', NC : '1', NE : '4', NG : '753', NZ : '98', NP : '200', CI : '9', CH : '144', CO : '851', CN : '282', CM : '82', CL : '243', CA : '1129', CD : '7', CZ : '161', CY : '26', CR : '137', CV : '11', CU : '15', SZ : '6', SY : '58', KG : '47', KE : '282', SR : '5', KI : '1', KH : '40', SV : '155', KM : '1', ST : '1', SK : '66', KR : '141', SI : '70', KP : '1', KW : '28', SN : '16', SL : '11', KZ : '174', SA : '352', SG : '217', SE : '172', SD : '61', DO : '104', DM : '5', DJ : '6', DK : '105', DE : '941', YE : '90', DZ : '281', MK : '28', TZ : '124', LC : '5', LA : '7', TW : '115', TT : '33', TR : '288', LK : '96', LV : '52', TO : '2', LT : '114', LU : '21', LR : '9', LS : '9', TH : '84', TG : '11', LY : '15', VC : '6', AE : '151', VE : '180', AG : '1', AF : '21', IQ : '29', VI : '1', IS : '14', IR : '153', AM : '37', IT : '365', VN : '269', AP : '23', AR : '258', AU : '661', IL : '159', AW : '3', IN : '7836', LB : '28', AZ : '22', IE : '210', ID : '382', UA : '860', QA : '23', MZ : '8'};
+      $(function(){
+        $('#world-map-students').vectorMap({
+          map: 'world_mill_en',
+          backgroundColor: '#eeeeee',
+          series: {
+            regions: [{
+              values: student_data,
+              scale: ['#C8EEFF', '#0071A4'],
+              normalizeFunction: 'polynomial'
+            }]
+          },
+          onRegionLabelShow: function(event, label, code){
+            label.text(label.text() + ': ' + (student_data[code] != null ? student_data[code] : 0));
+          }
+        });
+      });
+    </script>
+</figure>
+</div>
+
 
    <p>
      <p>Number of active students per problems who have this problem graded as correct:</p>
