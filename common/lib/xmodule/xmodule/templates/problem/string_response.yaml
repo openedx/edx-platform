@@ -19,20 +19,10 @@ metadata:
         = Michigan
         
 
-            <solution>
-            
-                <div class='detailed-solution'>
-                
-                    Explanation
-                    
-                    
-                    Lansing is the capital of Michigan, although it is not Michgan's largest city, 
-                    or even the seat of the county in which it resides.
-                    
-                    
-                </div>
-                
-            </solution>
+        [Explanation]
+        Lansing is the capital of Michigan, although it is not Michgan's largest city, 
+        or even the seat of the county in which it resides.
+        [Explanation]
         "
 data: |
     <problem showanswer="always">
