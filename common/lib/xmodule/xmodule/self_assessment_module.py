@@ -40,6 +40,7 @@ class SelfAssessmentModule(openendedchild.OpenEndedChild):
         </submitmessage>
     </selfassessment>
     """
+
     def setup_response(self, system, location, definition, descriptor):
         """
         Sets up the module
@@ -76,7 +77,7 @@ class SelfAssessmentModule(openendedchild.OpenEndedChild):
             'initial_message': self.get_message_html(),
             'state': self.state,
             'allow_reset': self._allow_reset(),
-            'child_type' : 'selfassessment',
+            'child_type': 'selfassessment',
         }
 
         html = system.render_template('self_assessment_prompt.html', context)
@@ -112,7 +113,7 @@ class SelfAssessmentModule(openendedchild.OpenEndedChild):
         })
         return json.dumps(d, cls=ComplexEncoder)
 
-    def get_rubric_html(self,system):
+    def get_rubric_html(self, system):
         """
         Return the appropriate version of the rubric, based on the state.
         """
@@ -121,8 +122,8 @@ class SelfAssessmentModule(openendedchild.OpenEndedChild):
 
         # we'll render it
         context = {'rubric': self.rubric,
-                   'max_score' : self._max_score,
-                   }
+                   'max_score': self._max_score,
+        }
 
         if self.state == self.ASSESSING:
             context['read_only'] = False
@@ -133,7 +134,7 @@ class SelfAssessmentModule(openendedchild.OpenEndedChild):
 
         return system.render_template('self_assessment_rubric.html', context)
 
-    def get_hint_html(self,system):
+    def get_hint_html(self, system):
         """
         Return the appropriate version of the hint view, based on state.
         """
@@ -201,7 +202,7 @@ class SelfAssessmentModule(openendedchild.OpenEndedChild):
         return {
             'success': True,
             'rubric_html': self.get_rubric_html(system)
-            }
+        }
 
     def save_assessment(self, get, system):
         """
@@ -228,7 +229,7 @@ class SelfAssessmentModule(openendedchild.OpenEndedChild):
 
         self.record_latest_score(score)
 
-        d = {'success': True,}
+        d = {'success': True, }
 
         if score == self.max_score():
             self.change_state(self.DONE)
@@ -262,7 +263,6 @@ class SelfAssessmentModule(openendedchild.OpenEndedChild):
         return {'success': True,
                 'message_html': self.get_message_html(),
                 'allow_reset': self._allow_reset()}
-
 
 
 class SelfAssessmentDescriptor(XmlDescriptor, EditingDescriptor):
@@ -302,7 +302,7 @@ class SelfAssessmentDescriptor(XmlDescriptor, EditingDescriptor):
 
         return {'submitmessage': parse('submitmessage'),
                 'hintprompt': parse('hintprompt'),
-                }
+        }
 
     def definition_to_xml(self, resource_fs):
         '''Return an xml element representing this definition.'''

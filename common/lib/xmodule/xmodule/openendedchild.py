@@ -63,11 +63,11 @@ class OpenEndedChild():
     DONE = 'done'
 
     #This is used to tell students where they are at in the module
-    HUMAN_NAMES={
-        'initial' : 'Started',
-        'assessing' : 'Being scored',
-        'post_assessment' : 'Scoring finished',
-        'done' : 'Problem complete',
+    HUMAN_NAMES = {
+        'initial': 'Started',
+        'assessing': 'Being scored',
+        'post_assessment': 'Scoring finished',
+        'done': 'Problem complete',
     }
 
     def __init__(self, system, location, definition, descriptor, static_data,
@@ -84,7 +84,7 @@ class OpenEndedChild():
         # Scores are on scale from 0 to max_score
         self.history = instance_state.get('history', [])
 
-        self.state = instance_state.get('state', 'initial')
+        self.state = instance_state.get('state', self.INITIAL)
 
         self.created = instance_state.get('created', "False")
 
@@ -171,8 +171,8 @@ class OpenEndedChild():
             'state': self.state,
             'max_score': self._max_score,
             'attempts': self.attempts,
-            'created' : "False",
-            }
+            'created': "False",
+        }
         return json.dumps(state)
 
     def _allow_reset(self):
@@ -244,8 +244,8 @@ class OpenEndedChild():
         @param score: Numeric score.
         @return: Boolean correct.
         """
-        correct=False
-        if(isinstance(score,(int, long, float, complex))):
+        correct = False
+        if(isinstance(score, (int, long, float, complex))):
             score_ratio = int(score) / float(self.max_score())
             correct = (score_ratio >= 0.66)
         return correct
@@ -255,7 +255,7 @@ class OpenEndedChild():
         Checks to see if the last response in the module is correct.
         @return: 'correct' if correct, otherwise 'incorrect'
         """
-        score=self.get_score()['score']
+        score = self.get_score()['score']
         correctness = 'correct' if self.is_submission_correct(score) else 'incorrect'
         return correctness
 
