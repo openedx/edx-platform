@@ -18,8 +18,9 @@ define('Sliders', ['logme'], function (logme) {
             if (sliderDiv.length === 1) {
                 onEvent = 'slide';
                 if (sliderDiv.attr('data-on_event') === 'change') {
-                    onEvent = 'change';
+                    onEvent = 'slidechange';
                 }
+
                 createSlider(sliderDiv, paramName, onEvent);
             } else if (sliderDiv.length > 1) {
                 logme('ERROR: Found more than one slider for the parameter "' + paramName + '".');
@@ -48,15 +49,16 @@ define('Sliders', ['logme'], function (logme) {
                 'min': paramObj.min,
                 'max': paramObj.max,
                 'value': paramObj.value,
-                'step': paramObj.step,
-
-                onEvent: sliderOnSlide
+                'step': paramObj.step
             });
 
             // Tell the parameter object stored in state that we have a slider
             // that is attached to it. Next time when the parameter changes, it
             // will also update the value of this slider.
             paramObj.sliderDiv = sliderDiv;
+
+            // Atach a callback to update the slider's parameter.
+            paramObj.sliderDiv.on(onEvent, sliderOnSlide);
 
             return;
 
@@ -66,7 +68,6 @@ define('Sliders', ['logme'], function (logme) {
             // This will cause the plot to be redrawn each time after the user
             // drags the slider handle and releases it.
             function sliderOnSlide(event, ui) {
-
                 // Last parameter passed to setParameterValue() will be 'true'
                 // so that the function knows we are a slider, and it can
                 // change the our value back in the case when the new value is

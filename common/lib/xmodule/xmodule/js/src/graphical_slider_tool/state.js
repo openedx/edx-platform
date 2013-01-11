@@ -241,7 +241,7 @@ define('State', ['logme'], function (logme) {
             }
 
             // Update the single slider with the new parameter's value.
-            if (parameters[paramName].sliderDiv !== null) {
+            if ((slider === false) && (parameters[paramName].sliderDiv !== null)) {
                 parameters[paramName].sliderDiv.slider('value', paramValueNum);
             }
 
