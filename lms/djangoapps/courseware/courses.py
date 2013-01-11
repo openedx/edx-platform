@@ -255,35 +255,5 @@ def get_courses(user, domain=None):
     courses = branding.get_visible_courses(domain)
     courses = [c for c in courses if has_access(user, c, 'see_exists')]
 
-    # Add metadata about the start day and if the course is new
-    for course in courses:
-        days_to_start = _get_course_days_to_start(course)
-
-        metadata = course.metadata
-        metadata['days_to_start'] = days_to_start
-        metadata['is_new'] = course.metadata.get('is_new', days_to_start > 1)
-
     courses = sorted(courses, key=lambda course:course.number)
     return courses
-
-
-def _get_course_days_to_start(course):
-    from datetime import datetime as dt
-    from time import mktime, gmtime
-
-    convert_to_datetime = lambda ts: dt.fromtimestamp(mktime(ts))
-
-    start_date = convert_to_datetime(course.start)
-
-    # If the course has a valid advertised date, use that instead
-    advertised_start = course.metadata.get('advertised_start', None)
-    if advertised_start:
-        try:
-            start_date = dt.strptime(advertised_start, "%Y-%m-%dT%H:%M")
-        except ValueError:
-            pass # Invalid date, keep using course.start
-
-    now = convert_to_datetime(gmtime())
-    days_to_start = (start_date - now).days
-
-    return days_to_start

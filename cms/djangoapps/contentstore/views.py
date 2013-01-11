@@ -202,7 +202,7 @@ def edit_subsection(request, location):
     if item.location.category != 'sequential':
         return HttpResponseBadRequest()
 
-    parent_locs = modulestore().get_parent_locations(location)
+    parent_locs = modulestore().get_parent_locations(location, None)
 
     # we're for now assuming a single parent
     if len(parent_locs) != 1:
@@ -285,10 +285,10 @@ def edit_unit(request, location):
     # this will need to change to check permissions correctly so as
     # to pick the correct parent subsection
 
-    containing_subsection_locs = modulestore().get_parent_locations(location)
+    containing_subsection_locs = modulestore().get_parent_locations(location, None)
     containing_subsection = modulestore().get_item(containing_subsection_locs[0])
 
-    containing_section_locs = modulestore().get_parent_locations(containing_subsection.location)
+    containing_section_locs = modulestore().get_parent_locations(containing_subsection.location, None)
     containing_section = modulestore().get_item(containing_section_locs[0])
 
     # cdodge hack. We're having trouble previewing drafts via jump_to redirect
