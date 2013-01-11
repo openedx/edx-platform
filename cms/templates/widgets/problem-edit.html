@@ -14,9 +14,13 @@
                         class="problem-editor-icon number"></span></a></li>
                 <li><a href="#" class="dropdown-button" data-tooltip="Option Response"><span
                         class="problem-editor-icon dropdown"></span></a></li>
+                <li><a href="#" class="header-button" data-tooltip="Header"><span
+                        class="problem-editor-icon dropdown"></span></a></li>
+                <li><a href="#" class="explanation-button" data-tooltip="Explanation (aka Solution)"><span
+                        class="problem-editor-icon dropdown"></span></a></li>
             </ul>
             <ul class="editor-tabs">
-                <li><a href="#" class="xml-tab tab" data-tab="xml">Use Advanced Editor</a></li>
+                <li><a href="#" class="xml-tab tab advanced-toggle" data-tab="xml">Advanced Editor</a></li>
                 <li><a href="#" class="cheatsheet-toggle" data-tooltip="Toggle Cheatsheet">?</a></li>
             </ul>
         </div>
@@ -29,6 +33,17 @@
 <script type="text/template" id="simple-editor-cheatsheet">
     <article class="simple-editor-cheatsheet">
         <div class="cheatsheet-wrapper">
+            <div class="row">
+                <h6>Header</h6>
+                <div class="col sample">
+                    <img src="/static/img/header-example.png" />
+                </div>
+                <div class="col">
+<pre><code>H1
+=====
+</pre>
+                </div>
+            </div>
             <div class="row">
                 <h6>Multiple Choice</h6>
                 <div class="col sample">
@@ -76,6 +91,18 @@
                 </div>
                 <div class="col">
                     <pre><code>[[wrong, (right)]]</code></pre>
+                </div>
+            </div>
+            <div class="row">
+                <h6>Explanation</h6>
+                <div class="col sample">
+                    <img src="/static/img/explanation-example.png" />
+                </div>
+                <div class="col">
+<pre><code>[explanation]
+A short explanation of the answer.
+[explanation]
+</code></pre>
                 </div>
             </div>
         </div>

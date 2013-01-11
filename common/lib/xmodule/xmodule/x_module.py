@@ -241,17 +241,17 @@ class XModule(HTMLSnippet):
         Return module instances for all the children of this module.
         '''
         if self._loaded_children is None:
-            child_locations = self.get_children_locations()
-            children = [self.system.get_module(loc) for loc in child_locations]
+            child_descriptors = self.get_child_descriptors()
+            children = [self.system.get_module(descriptor) for descriptor in child_descriptors]
             # get_module returns None if the current user doesn't have access
             # to the location.
             self._loaded_children = [c for c in children if c is not None]
 
         return self._loaded_children
 
-    def get_children_locations(self):
+    def get_child_descriptors(self):
         '''
-        Returns the locations of each of child modules.
+        Returns the descriptors of the child modules
 
         Overriding this changes the behavior of get_children and
         anything that uses get_children, such as get_display_items.
@@ -262,7 +262,16 @@ class XModule(HTMLSnippet):
         These children will be the same children returned by the
         descriptor unless descriptor.has_dynamic_children() is true.
         '''
-        return self.definition.get('children', [])
+        return self.descriptor.get_children()
+
+    def get_child_by(self, selector):
+        """
+        Return a child XModuleDescriptor with the specified url_name, if it exists, and None otherwise.
+        """
+        for child in self.get_children():
+            if selector(child):
+                return child
+        return None
 
     def get_display_items(self):
         '''
@@ -577,13 +586,13 @@ class XModuleDescriptor(Plugin, HTMLSnippet, ResourceTemplates):
 
         return self._child_instances
 
-    def get_child_by_url_name(self, url_name):
+    def get_child_by(self, selector):
         """
         Return a child XModuleDescriptor with the specified url_name, if it exists, and None otherwise.
         """
-        for c in self.get_children():
-            if c.url_name == url_name:
-                return c
+        for child in self.get_children():
+            if selector(child):
+                return child
         return None
 
     def xmodule_constructor(self, system):
@@ -847,7 +856,7 @@ class ModuleSystem(object):
                          TODO: Not used, and has inconsistent args in different
                          files.  Update or remove.
 
-        get_module - function that takes (location) and returns a corresponding
+        get_module - function that takes a descriptor and returns a corresponding
                          module instance object.  If the current user does not have
                          access to that location, returns None.
 

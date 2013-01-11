@@ -59,15 +59,15 @@ class DraftModuleStore(ModuleStoreBase):
         except ItemNotFoundError:
             return wrap_draft(super(DraftModuleStore, self).get_item(location, depth))
 
-    def get_instance(self, course_id, location):
+    def get_instance(self, course_id, location, depth=0):
         """
         Get an instance of this location, with policy for course_id applied.
         TODO (vshnayder): this may want to live outside the modulestore eventually
         """
         try:
-            return wrap_draft(super(DraftModuleStore, self).get_instance(course_id, as_draft(location)))
+            return wrap_draft(super(DraftModuleStore, self).get_instance(course_id, as_draft(location), depth=depth))
         except ItemNotFoundError:
-            return wrap_draft(super(DraftModuleStore, self).get_instance(course_id, location))
+            return wrap_draft(super(DraftModuleStore, self).get_instance(course_id, location, depth=depth))
 
     def get_items(self, location, depth=0):
         """

@@ -21,12 +21,12 @@ Feature: Overview Toggle Section
 		Then I see the "Collapse All Sections" link
 		And all sections are expanded
 
-	Scenario: Collapse link is removed after last section of a course is deleted
+	Scenario: Collapse link is not removed after last section of a course is deleted
 		Given I have a course with 1 section
 		And I navigate to the course overview page
 	    When I press the "section" delete icon
 	    And I confirm the alert
-		Then I do not see the "Collapse All Sections" link
+		Then I see the "Collapse All Sections" link
 
 	Scenario: Collapsing all sections when all sections are expanded
 		Given I navigate to the courseware page of a course with multiple sections
