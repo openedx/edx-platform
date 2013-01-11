@@ -259,6 +259,12 @@ class @MarkdownEditingDescriptor extends XModule.Descriptor
         selectString += '</optionresponse>\n\n';
         return selectString;
       });
+      
+      // replace explanations
+      xml = xml.replace(/\[explanation\]\n?([^\]]*)\[\/?explanation\]/gmi, function(match, p1) {
+          var selectString = '<solution>\n<div class="detailed-solution">\nExplanation\n\n' + p1 + '\n</div>\n</solution>';
+          return selectString;
+      });
 
       // split scripts and wrap paragraphs
       var splits = xml.split(/(\<\/?script.*?\>)/g);

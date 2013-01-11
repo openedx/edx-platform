@@ -41,11 +41,14 @@ def i_press_the_category_delete_icon(step, category):
 ####### HELPER FUNCTIONS ##############
 def create_studio_user(
         uname='robot',
-        em='robot+studio@edx.org',
-        password='test'): 
+        email='robot+studio@edx.org',
+        password='test',
+        is_staff=False): 
     studio_user = UserFactory.build(
         username=uname, 
-        email=em)
+        email=email,
+        password=password,
+        is_staff=is_staff)
     studio_user.set_password(password)
     studio_user.save()
 
@@ -91,11 +94,12 @@ def fill_in_course_info(
 def log_into_studio(
         uname='robot',
         email='robot+studio@edx.org',
-        password='test'):
-    create_studio_user(uname, email)
+        password='test',
+        is_staff=False):
+    create_studio_user(uname=uname, email=email, is_staff=is_staff)
     world.browser.cookies.delete()
     world.browser.visit(django_url('/'))
-    world.browser.is_element_present_by_css('body.no-header', 10)       
+    world.browser.is_element_present_by_css('body.no-header', 10)
 
     login_form = world.browser.find_by_css('form#login_form')
     login_form.find_by_name('email').fill(email)

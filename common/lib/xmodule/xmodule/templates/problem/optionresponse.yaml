@@ -17,21 +17,12 @@ metadata:
         [[(Multiple Choice), String Response, Numerical Response, External Response, Image Response]]
 
 
-        <solution>
-        
-            <div class='detailed-solution'>
-            
-            Explanation
-            
-            
-            Multiple Choice also allows students to select from a variety of pre-written responses, although the 
-            format makes it easier for students to read very long response options. Optionresponse also differs 
-            slightly because students are more likely to think of an answer and then search for it rather than 
-            relying purely on recognition to answer the question.
-            
-            </div>
-            
-        </solution>
+        [Explanation]
+        Multiple Choice also allows students to select from a variety of pre-written responses, although the 
+        format makes it easier for students to read very long response options. Optionresponse also differs 
+        slightly because students are more likely to think of an answer and then search for it rather than 
+        relying purely on recognition to answer the question.
+        [Explanation]
         "
 data: |
   <problem>
