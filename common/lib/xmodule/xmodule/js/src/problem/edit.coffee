@@ -165,7 +165,7 @@ class @MarkdownEditingDescriptor extends XModule.Descriptor
     else
       return template
 
-# We may wish to add insertHeader and insertVideo. Here is Tom's code.
+# We may wish to add insertHeader. Here is Tom's code.
 # function makeHeader() {
 #  var selection = simpleEditor.getSelection();
 #  var revisedSelection = selection + '\n';
@@ -173,11 +173,6 @@ class @MarkdownEditingDescriptor extends XModule.Descriptor
 #revisedSelection += '=';
 #  }
 #  simpleEditor.replaceSelection(revisedSelection);
-#}
-#
-#function makeVideo() {
-#var selection = simpleEditor.getSelection();
-#simpleEditor.replaceSelection('{{video ' + selection + '}}');
 #}
 #
   @markdownToXml: (markdown)->
@@ -221,9 +216,6 @@ class @MarkdownEditingDescriptor extends XModule.Descriptor
         groupString += '</multiplechoiceresponse>\n\n';
         return groupString;
       });
-
-      // replace videos
-      xml = xml.replace(/\{\{video\s(.*?)\}\}/g, '<video youtube="1.0:$1" />\n\n');
 
       // replace string and numerical
       xml = xml.replace(/^\=\s*(.*?$)/gm, function(match, p) {
