@@ -123,6 +123,7 @@ define('ElOutput', ['logme'], function (logme) {
                 el.html(func.apply(window, state.getAllParameterValues()));
             } else {
                 el = null;
+                func.apply(window, state.getAllParameterValues());
             }
 
             state.addDynamicEl(el, func, obj['@el_id'], updateOnEvent);
