@@ -17,7 +17,8 @@ import xmodule.modulestore.django
 
 # Need access to internal func to put users in the right group
 from courseware import grades
-from courseware.access import _course_staff_group_name
+from courseware.access import (has_access, _course_staff_group_name,
+                               _course_beta_test_group_name)
 from courseware.models import StudentModuleCache
 
 from student.models import Registration
@@ -238,7 +239,7 @@ class PageLoader(ActivateLoginTestCase):
         n = 0
         num_bad = 0
         all_ok = True
-        for descriptor in module_store.modules[course_id].itervalues(): 
+        for descriptor in module_store.modules[course_id].itervalues():
             n += 1
             print "Checking ", descriptor.location.url()
             #print descriptor.__class__, descriptor.location
@@ -259,11 +260,11 @@ class PageLoader(ActivateLoginTestCase):
             # check content to make sure there were no rendering failures
             content = resp.content
             if content.find("this module is temporarily unavailable")>=0:
-                msg = "ERROR unavailable module " 
+                msg = "ERROR unavailable module "
                 all_ok = False
                 num_bad += 1
             elif isinstance(descriptor, ErrorDescriptor):
-                msg = "ERROR error descriptor loaded: " 
+                msg = "ERROR error descriptor loaded: "
                 msg = msg + descriptor.definition['data']['error_msg']
                 all_ok = False
                 num_bad += 1
@@ -286,7 +287,7 @@ class TestCoursesLoadTestCase(PageLoader):
 #        xmodule.modulestore.django.modulestore().collection.drop()
 #        store = xmodule.modulestore.django.modulestore()
         # is there a way to empty the store?
-        
+
     def test_toy_course_loads(self):
         self.check_pages_load('toy', TEST_DATA_DIR, modulestore())
 
@@ -453,6 +454,9 @@ class TestViewAuth(PageLoader):
         """Check that enrollment periods work"""
         self.run_wrapped(self._do_test_enrollment_period)
 
+    def test_beta_period(self):
+        """Check that beta-test access works"""
+        self.run_wrapped(self._do_test_beta_period)
 
     def _do_test_dark_launch(self):
         """Actually do the test, relying on settings to be right."""
@@ -617,6 +621,38 @@ class TestViewAuth(PageLoader):
         # unenroll and try again
         self.unenroll(self.toy)
         self.assertTrue(self.try_enroll(self.toy))
+
+    def _do_test_beta_period(self):
+        """Actually test beta periods, relying on settings to be right."""
+
+        # trust, but verify :)
+        self.assertFalse(settings.MITX_FEATURES['DISABLE_START_DATES'])
+
+        # Make courses start in the future
+        tomorrow = time.time() + 24 * 3600
+        nextday = tomorrow + 24 * 3600
+        yesterday = time.time() - 24 * 3600
+
+        # toy course's hasn't started
+        self.toy.metadata['start'] = stringify_time(time.gmtime(tomorrow))
+        self.assertFalse(self.toy.has_started())
+
+        # but should be accessible for beta testers
+        self.toy.metadata['days_early_for_beta'] = '2'
+
+        # student user shouldn't see it
+        student_user = user(self.student)
+        self.assertFalse(has_access(student_user, self.toy, 'load'))
+
+        # now add the student to the beta test group
+        group_name = _course_beta_test_group_name(self.toy.location)
+        g = Group.objects.create(name=group_name)
+        g.user_set.add(student_user)
+
+        # now the student should see it
+        self.assertTrue(has_access(student_user, self.toy, 'load'))
+
+
 
 @override_settings(MODULESTORE=TEST_DATA_XML_MODULESTORE)
 class TestCourseGrader(PageLoader):

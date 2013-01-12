@@ -414,7 +414,11 @@ class XModuleDescriptor(Plugin, HTMLSnippet, ResourceTemplates):
         'xqa_key',
         # TODO: This is used by the XMLModuleStore to provide for locations for
         # static files, and will need to be removed when that code is removed
-        'data_dir'
+        'data_dir',
+        # How many days early to show a course element to beta testers (float)
+        # intended to be set per-course, but can be overridden in for specific
+        # elements.  Can be a float.
+        'days_early_for_beta'
     )
 
     # cdodge: this is a list of metadata names which are 'system' metadata
@@ -497,11 +501,22 @@ class XModuleDescriptor(Plugin, HTMLSnippet, ResourceTemplates):
     @property
     def start(self):
         """
-        If self.metadata contains start, return it.  Else return None.
+        If self.metadata contains a valid start time, return it as a time struct.
+        Else return None.
         """
         if 'start' not in self.metadata:
             return None
         return self._try_parse_time('start')
+
+    @property
+    def days_early_for_beta(self):
+        """
+        If self.metadata contains start, return the number, as a float.  Else return None.
+        """
+        if 'days_early_for_beta' not in self.metadata:
+            return None
+        return float(self.metadata['days_early_for_beta'])
+
 
     @property
     def own_metadata(self):
@@ -715,7 +730,8 @@ class XModuleDescriptor(Plugin, HTMLSnippet, ResourceTemplates):
         """
         Parse an optional metadata key containing a time: if present, complain
         if it doesn't parse.
-        Return None if not present or invalid.
+        
+        Returns a time_struct, or None if metadata key is not present or is invalid.
         """
         if key in self.metadata:
             try:
