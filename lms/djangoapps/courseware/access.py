@@ -378,6 +378,9 @@ def _adjust_start_date_for_beta_testers(user, descriptor):
     NOTE: For now, this function assumes that the descriptor's location is in the course
     the user is looking at.  Once we have proper usages and definitions per the XBlock
     design, this should use the course the usage is in.
+
+    NOTE: If testing manually, make sure MITX_FEATURES['DISABLE_START_DATES'] = False
+    in envs/dev.py!
     """
     if descriptor.days_early_for_beta is None:
         # bail early if no beta testing is set up
