@@ -103,7 +103,9 @@
   
   % if registration:
   
-   <% exam_help_href = "mailto:exam-help@edx.org?subject=Pearson VUE Exam - %s %s".format(get_course_about_section(course, 'university'), course.number) %>
+   <% 
+     exam_help_href = "mailto:exam-help@edx.org?subject=Pearson VUE Exam - " + get_course_about_section(course, 'university') + " - " + course.number 
+   %>
 
    % if  registration.is_rejected:      
   <section class="status message message-flash registration-rejected message-action">
@@ -234,7 +236,7 @@
               </div>
               <div class="field required" id="field-phone_country_code">
                 <label for="phone_country_code">Phone Country Code</label>
-                <input id="phone_country_code" class="short" type="text" name="phone_country_code" value="${testcenteruser.phone_country_code}" placeholder="e.g. USA" />
+                <input id="phone_country_code" class="short" type="text" name="phone_country_code" value="${testcenteruser.phone_country_code}" placeholder="e.g. 1, 44, 976" />
               </div>
             </li>
             <li class="field-group faxinfo">
@@ -244,7 +246,7 @@
               </div>
               <div class="field" id="field-fax_country_code">
                 <label for="fax_country_code">Fax Country Code</label>
-                <input id="fax_country_code" class="short" type="text" name="fax_country_code" value="${testcenteruser.fax_country_code}" placeholder="e.g. USA" />
+                <input id="fax_country_code" class="short" type="text" name="fax_country_code" value="${testcenteruser.fax_country_code}" placeholder="e.g. 1, 44, 976" />
               </div>
             </li>
             <li class="field" id="field-company_name">
