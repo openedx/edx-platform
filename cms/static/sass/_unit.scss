@@ -282,6 +282,10 @@
   .xmodule_display {
     padding: 40px 20px 20px;
     overflow-x: auto;
+
+    h1 {
+      float: none;
+    }
   }
 
   .wrapper-component-editor {
