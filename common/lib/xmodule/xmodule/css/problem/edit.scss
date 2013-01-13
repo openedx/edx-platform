@@ -131,6 +131,11 @@
   background: url(../img/problem-editor-icons.png) no-repeat;
 }
 
+.problem-editor-icon.header {
+  width: 18px;
+  background-position: -265px 0;
+}
+
 .problem-editor-icon.multiple-choice {
   background-position: 0 0;
 }
@@ -152,6 +157,11 @@
 .problem-editor-icon.dropdown {
   width: 17px;
   background-position: -220px 0;
+}
+
+.problem-editor-icon.explanation {
+  width: 17px;
+  background-position: -307px 0;
 }
 
 
