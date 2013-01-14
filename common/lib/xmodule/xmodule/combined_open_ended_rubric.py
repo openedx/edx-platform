@@ -22,7 +22,6 @@ class CombinedOpenEndedRubric:
     def render_rubric(self, rubric_xml):
         success = False
         try:
-            rubric_xml = rubric_xml.encode('ascii', 'ignore')
             rubric_categories = self.extract_categories(rubric_xml)
             html = render_to_string('open_ended_rubric.html', 
                     {'categories'  : rubric_categories,
@@ -53,7 +52,8 @@ class CombinedOpenEndedRubric:
                          {text: "Option 3 Name", points: 2]}]
 
         '''
-        element = etree.fromstring(element)
+        if isinstance(element, basestring):
+            element = etree.fromstring(element)
         categories = []
         for category in element:
             if category.tag != 'category':
