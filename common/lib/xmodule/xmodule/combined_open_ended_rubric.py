@@ -1,4 +1,8 @@
 from mitxmako.shortcuts import render_to_string
+import logging
+from lxml import etree
+
+log=logging.getLogger(__name__)
 
 class CombinedOpenEndedRubric:
 
@@ -8,6 +12,7 @@ class CombinedOpenEndedRubric:
             rubric_categories = CombinedOpenEndedRubric.extract_rubric_categories(rubric_xml)
             html = render_to_string('open_ended_rubric.html', {'rubric_categories'  : rubric_categories})
         except:
+            log.exception("Could not parse the rubric.")
             html = rubric_xml
         return html
 
@@ -47,7 +52,7 @@ class CombinedOpenEndedRubric:
         has_score=False
         descriptionxml = category[0]
         scorexml = category[1]
-        if score_xml.tag == "option":
+        if scorexml.tag == "option":
             optionsxml = category[1:]
         else:
             optionsxml = category[2:]
