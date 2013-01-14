@@ -2,12 +2,12 @@
     % for i in range(len(rubric_categories)):
     <% category = rubric_categories[i] %>
     <tr>
-        <th>${category['description']}</th>
-        % if category['has_score'] == True:
-            <td>
-                  Your Score: ${category['score']}
-            </td>
-        % endif
+        <th>
+            ${category['description']}
+            % if category['has_score'] == True:
+                (Your score: ${category['score']})
+            % endif
+        </th>
         % for j in range(len(category['options'])):
         <% option = category['options'][j] %>
         <td>
