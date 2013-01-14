@@ -11,6 +11,7 @@ actually generates the CourseTab.
 
 from collections import namedtuple
 import logging
+import json
 
 from django.conf import settings
 from django.core.urlresolvers import reverse
@@ -20,6 +21,9 @@ from fs.errors import ResourceNotFoundError
 from courseware.access import has_access
 from static_replace import replace_urls
 
+from open_ended_grading.peer_grading_service import PeerGradingService
+from student.models import unique_id_for_user
+
 log = logging.getLogger(__name__)
 
 class InvalidTabsException(Exception):
@@ -28,7 +32,10 @@ class InvalidTabsException(Exception):
     """
     pass
 
-CourseTab = namedtuple('CourseTab', 'name link is_active')
+CourseTabBase = namedtuple('CourseTab', 'name link is_active has_img img')
+
+def CourseTab(name, link, is_active, has_img=False, img=""):
+    return CourseTabBase(name, link, is_active, has_img, img)
 
 # encapsulate implementation for a tab:
 #  - a validation function: takes the config dict and raises
@@ -104,6 +111,30 @@ def _staff_grading(tab, user, course, active_page):
         return [CourseTab('Staff grading', link, active_page == "staff_grading")]
     return []
 
+def _peer_grading(tab, user, course, active_page):
+    link = reverse('peer_grading', args=[course.id])
+    peer_gs = PeerGradingService(settings.PEER_GRADING_INTERFACE)
+    pending_grading=False
+    try:
+        notifications = json.loads(peer_gs.get_notifications(course.id,unique_id_for_user(user)))
+        log.debug(notifications)
+
+        if notifications['success']:
+            if notifications['student_needs_to_peer_grade']:
+                pending_grading=True
+    except:
+        #Non catastrophic error, so no real action
+        log.info("Problem with getting notifications from peer grading service.")
+
+    if pending_grading:
+        tab_name = "Peer grading (Pending)"
+        img_path = "/static/images/unanswered-icon.png"
+    else:
+        tab_name = "Peer Grading"
+        img_path= ""
+
+    tab = [CourseTab(tab_name, link, active_page == "peer_grading", True, img_path)]
+    return tab
 
 #### Validators
 
@@ -141,6 +172,7 @@ VALID_TAB_TYPES = {
     'progress': TabImpl(need_name, _progress),
     'static_tab': TabImpl(key_checker(['name', 'url_slug']), _static_tab),
     'staff_grading': TabImpl(null_validator, _staff_grading),
+    'peer_grading': TabImpl(null_validator, _peer_grading),
     }
 
 
