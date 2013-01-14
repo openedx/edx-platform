@@ -115,6 +115,8 @@ def _peer_grading(tab, user, course, active_page):
     link = reverse('peer_grading', args=[course.id])
     peer_gs = PeerGradingService(settings.PEER_GRADING_INTERFACE)
     pending_grading=False
+    tab_name = "Peer grading"
+    img_path= ""
     try:
         notifications = json.loads(peer_gs.get_notifications(course.id,unique_id_for_user(user)))
         log.debug(notifications)
@@ -127,11 +129,7 @@ def _peer_grading(tab, user, course, active_page):
         log.info("Problem with getting notifications from peer grading service.")
 
     if pending_grading:
-        tab_name = "Peer grading"
         img_path = "/static/images/slider-handle.png"
-    else:
-        tab_name = "Peer grading"
-        img_path= ""
 
     tab = [CourseTab(tab_name, link, active_page == "peer_grading", True, img_path)]
     return tab
