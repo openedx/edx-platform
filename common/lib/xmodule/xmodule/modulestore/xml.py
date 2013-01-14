@@ -442,33 +442,39 @@ class XMLModuleStore(ModuleStoreBase):
             log.debug('========> Done with course import from {0}'.format(course_dir))
             return course_descriptor
 
-    def load_extra_content(self, system, course_descriptor, category, base_dir, course_dir, url_name):
-        if url_name:
-            path =  base_dir / url_name
 
-        if not os.path.exists(path):
-            path = base_dir
+    def load_extra_content(self, system, course_descriptor, category, base_dir, course_dir, url_name):
+
+        self._load_extra_content(system, course_descriptor, category, base_dir, course_dir)
+
+         # then look in a override folder based on the course run
+        if os.path.isdir(base_dir / url_name):
+            self._load_extra_content(system, course_descriptor, category, base_dir / url_name, course_dir)       
+
+
+    def _load_extra_content(self, system, course_descriptor, category, path, course_dir):
 
         for filepath in glob.glob(path/ '*'):
-            with open(filepath) as f:
-                try:
-                    html = f.read().decode('utf-8')
-                    # tabs are referenced in policy.json through a 'slug' which is just the filename without the .html suffix
-                    slug = os.path.splitext(os.path.basename(filepath))[0]
-                    loc = Location('i4x', course_descriptor.location.org, course_descriptor.location.course, category, slug)
-                    module = HtmlDescriptor(system, definition={'data' : html}, **{'location' : loc})
-                    # VS[compat]:
-                    # Hack because we need to pull in the 'display_name' for static tabs (because we need to edit them)
-                    # from the course policy
-                    if category == "static_tab":
-                        for tab in course_descriptor.tabs or []:
-                            if tab.get('url_slug') == slug:
-                                module.metadata['display_name'] = tab['name']            
-                    module.metadata['data_dir'] = course_dir
-                    self.modules[course_descriptor.id][module.location] = module   
-                except Exception, e:
-                    logging.exception("Failed to load {0}. Skipping... Exception: {1}".format(filepath, str(e)))   
-                    system.error_tracker("ERROR: " + str(e))
+            if not os.path.isdir(filepath):
+                with open(filepath) as f:
+                    try:
+                        html = f.read().decode('utf-8')
+                        # tabs are referenced in policy.json through a 'slug' which is just the filename without the .html suffix
+                        slug = os.path.splitext(os.path.basename(filepath))[0]
+                        loc = Location('i4x', course_descriptor.location.org, course_descriptor.location.course, category, slug)
+                        module = HtmlDescriptor(system, definition={'data' : html}, **{'location' : loc})
+                        # VS[compat]:
+                        # Hack because we need to pull in the 'display_name' for static tabs (because we need to edit them)
+                        # from the course policy
+                        if category == "static_tab":
+                            for tab in course_descriptor.tabs or []:
+                                if tab.get('url_slug') == slug:
+                                    module.metadata['display_name'] = tab['name']            
+                        module.metadata['data_dir'] = course_dir
+                        self.modules[course_descriptor.id][module.location] = module   
+                    except Exception, e:
+                        logging.exception("Failed to load {0}. Skipping... Exception: {1}".format(filepath, str(e)))   
+                        system.error_tracker("ERROR: " + str(e))
 
     def get_instance(self, course_id, location, depth=0):
         """
