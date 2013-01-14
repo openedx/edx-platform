@@ -28,20 +28,24 @@
       float: left;
     }
 
-    .tab {
-      height: 24px;
-      padding: 7px 20px 3px;
-      border: 1px solid #a5aaaf;
-      border-radius: 3px 3px 0 0;
-      @include linear-gradient(top, rgba(0, 0, 0, 0) 87%, rgba(0, 0, 0, .06));
-      background-color: #e5ecf3;
-      font-size: 13px;
-      color: #3c3c3c;
-      box-shadow: 1px -1px 1px rgba(0, 0, 0, .05);
+    .advanced-toggle {
+      @include white-button;
+      height: auto;
+      margin-top: -1px;
+      padding: 3px 9px;
+      font-size: 12px;
 
       &.current {
-        background: #fff;
-        border-bottom-color: #fff;
+        border: 1px solid $lightGrey !important;
+        border-radius: 3px !important;
+        background: $lightGrey !important;
+        color: $darkGrey !important;
+        pointer-events: none;
+        cursor: none;
+        
+        &:hover {
+          box-shadow: 0 0 0 0 !important;
+        }
       }
     }
 
@@ -49,7 +53,7 @@
       width: 21px;
       height: 21px;
       padding: 0;
-      margin: 3px 5px 0 16px;
+      margin: 0 5px 0 15px;
       border-radius: 22px;
       border: 1px solid #a5aaaf;
       background: #e5ecf3;
@@ -67,13 +71,15 @@
   left: 100%;
   width: 0;
   border-radius: 0 3px 3px 0;
-  @include linear-gradient(left, rgba(0, 0, 0, .1), rgba(0, 0, 0, 0) 15px);
+  @include linear-gradient(left, rgba(0, 0, 0, .1), rgba(0, 0, 0, 0) 4px);
   background-color: #fff;
   overflow: hidden;
   @include transition(width .3s);
 
   &.shown {
     width: 300px;
+    height: 100%;
+    overflow-y: scroll;
   }
 
   .cheatsheet-wrapper {
@@ -127,6 +133,11 @@
   background: url(../img/problem-editor-icons.png) no-repeat;
 }
 
+.problem-editor-icon.header {
+  width: 18px;
+  background-position: -265px 0;
+}
+
 .problem-editor-icon.multiple-choice {
   background-position: 0 0;
 }
@@ -148,6 +159,11 @@
 .problem-editor-icon.dropdown {
   width: 17px;
   background-position: -220px 0;
+}
+
+.problem-editor-icon.explanation {
+  width: 17px;
+  background-position: -307px 0;
 }
 
 

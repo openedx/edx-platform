@@ -70,6 +70,22 @@ describe 'MarkdownEditingDescriptor', ->
       revisedSelection = MarkdownEditingDescriptor.insertSelect('my text')
       expect(revisedSelection).toEqual('[[my text]]')
 
+  describe 'insertHeader', ->
+    it 'inserts the template if selection is empty', ->
+      revisedSelection = MarkdownEditingDescriptor.insertHeader('')
+      expect(revisedSelection).toEqual(MarkdownEditingDescriptor.headerTemplate)
+    it 'wraps existing text', ->
+      revisedSelection = MarkdownEditingDescriptor.insertHeader('my text')
+      expect(revisedSelection).toEqual('my text\n====\n')
+
+  describe 'insertExplanation', ->
+    it 'inserts the template if selection is empty', ->
+      revisedSelection = MarkdownEditingDescriptor.insertExplanation('')
+      expect(revisedSelection).toEqual(MarkdownEditingDescriptor.explanationTemplate)
+    it 'wraps existing text', ->
+      revisedSelection = MarkdownEditingDescriptor.insertExplanation('my text')
+      expect(revisedSelection).toEqual('[explanation]\nmy text\n[explanation]')
+
   describe 'markdownToXml', ->
     it 'converts raw text to paragraph', ->
       data = MarkdownEditingDescriptor.markdownToXml('foo')
