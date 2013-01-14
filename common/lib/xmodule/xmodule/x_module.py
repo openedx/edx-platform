@@ -515,7 +515,10 @@ class XModuleDescriptor(Plugin, HTMLSnippet, ResourceTemplates):
         """
         if 'days_early_for_beta' not in self.metadata:
             return None
-        return float(self.metadata['days_early_for_beta'])
+        try:
+            return float(self.metadata['days_early_for_beta'])
+        except ValueError:
+            return None
 
 
     @property
@@ -730,7 +733,7 @@ class XModuleDescriptor(Plugin, HTMLSnippet, ResourceTemplates):
         """
         Parse an optional metadata key containing a time: if present, complain
         if it doesn't parse.
-        
+
         Returns a time_struct, or None if metadata key is not present or is invalid.
         """
         if key in self.metadata:
