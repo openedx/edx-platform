@@ -14,12 +14,15 @@
   <script type="text/javascript">
   (function() {
 
-    $(".form-fields-secondary-visibility").click(function(e){
-      console.log("clicked");
+    // if form is disabled or registration is closed
+    $('#testcenter_register_form.disabled').find('input, textarea, button').attr('disabled','disabled');
+
+    // toggling accommodations elements
+    $('.form-fields-secondary-visibility').click(function(e){
       e.preventDefault();
       $(this).addClass("is-hidden");
 
-      $(".form-fields-secondary").addClass("is-shown");
+      $('.form-fields-secondary').addClass("is-shown");
     });
 
 
@@ -101,18 +104,16 @@
     </header>
   </section>
   
+  <% 
+    exam_help_href = "mailto:exam-help@edx.org?subject=Pearson VUE Exam - " + get_course_about_section(course, 'university') + " - " + course.number 
+  %>
+
   % if registration:
   
-   <% 
-     exam_help_href = "mailto:exam-help@edx.org?subject=Pearson VUE Exam - " + get_course_about_section(course, 'university') + " - " + course.number 
-   %>
-
    % if  registration.is_rejected:      
   <section class="status message message-flash registration-rejected message-action">
     <h3 class="message-title">Your registration for the Pearson exam has been rejected</h3>
-    <p class="message-copy">Please check the information you provided, and try to correct any demographic errors.  Otherwise contact edX at exam-help@edx.org.</p>
-    <a href="${exam_help_href}" class="button contact-button">Contact exam-help@edx.org</a>
-  </section>
+    <p class="message-copy">Please see your registration status details for more information.</p>
    % endif
 
    % if  registration.is_accepted:
@@ -129,6 +130,18 @@
     <p class="message-copy">Once your information is processed, it will be forwarded to Pearson and you will be able to schedule an exam.</p>
   </section>
    % endif
+   
+   <!-- TODO: add logic for demographic error/rejected state (add this message to the page) -->
+   <section class="status message message-flash demographics-rejected message-action">
+     <h3 class="message-title">Your demographic information contained an error and was rejected</h3>
+     <p class="message-copy">Please check the information you provided, and correct the errors noted below.
+   </section>
+   
+   <!-- TODO: add logic for registration closed state (add this message to the page) -->
+   <section class="status message message-flash registration-closed">
+     <h3 class="message-title">Registration for this Pearson exam is closed</h3>
+     <p class="message-copy">Your registration status and previous information is available below, however you may not edit any of the information.
+   </section>
 
   % endif
   
@@ -137,6 +150,9 @@
       <h3 class="is-hidden">Registration Form</h3>
     </header>      
     <form id="testcenter_register_form" method="post" data-remote="true" action="/create_test_registration">
+    
+    <!-- TODO: add logic for registration closed state (add class of disabled to <form>) -->
+    <!-- <form id="testcenter_register_form" method="post" data-remote="true" action="/create_test_registration" class="disabled"> -->
       
       % if registration:
       <p class="instructions">
@@ -228,11 +244,11 @@
             <li class="field-group phoneinfo">
               <div class="field required" id="field-phone">
                 <label for="phone">Phone Number</label>
-                <input id="phone" type="text" name="phone" value="${testcenteruser.phone}" placeholder="e.g. 1-55-555-5555" />              
+                <input id="phone" type="tel" name="phone" value="${testcenteruser.phone}" placeholder="e.g. 1-55-555-5555" />              
               </div>
               <div class="field" id="field-extension">
                 <label for="extension">Extension</label>
-                <input id="extension" class="short" type="text" name="extension" value="${testcenteruser.extension}" placeholder="e.g. 555" />
+                <input id="extension" class="short" type="tel" name="extension" value="${testcenteruser.extension}" placeholder="e.g. 555" />
               </div>
               <div class="field required" id="field-phone_country_code">
                 <label for="phone_country_code">Phone Country Code</label>
@@ -242,7 +258,7 @@
             <li class="field-group faxinfo">
               <div class="field" id="field-fax">
                 <label for="fax">Fax Number</label>
-                <input id="fax" type="text" class="short" name="fax" value="${testcenteruser.fax}" placeholder="e.g. 1-55-555-5555" />
+                <input id="fax" type="tel" class="short" name="fax" value="${testcenteruser.fax}" placeholder="e.g. 1-55-555-5555" />
               </div>
               <div class="field" id="field-fax_country_code">
                 <label for="fax_country_code">Fax Country Code</label>
@@ -259,7 +275,7 @@
       
       % if registration:
         % if registration.accommodation_request and len(registration.accommodation_request) > 0:
-      <div class="form-fields-secondary is-shown" id="form-fields-secondary">
+      <div class="form-fields-secondary is-shown disabled" id="form-fields-secondary">
         % endif
       % else: 
       <div class="form-fields-secondary" id="form-fields-secondary">
@@ -267,10 +283,10 @@
 
         % if registration:
           % if registration.accommodation_request and len(registration.accommodation_request) > 0:
-        <p class="note"><span class="title">Note</span>: Accomodation requests, which need to be reviewed in detail, <strong>will add significant delay to the registration process</strong>.</p>
+        <p class="note"><span class="title">Note</span>: Your previously accomodation requests below need to be reviewed in detail <strong>and will add asignificant delay to your registration process</strong>.</p>
           % endif
         % else: 
-        <p class="note"><span class="title">Note</span>: Accommodation requests are not part of your demographic information, <strong>and cannot be changed once submitted</strong>. Accomodation requests, which need to be reviewed in detail, <strong>will add significant delay to the registration process</strong>.</p>
+        <p class="note"><span class="title">Note</span>: Accommodation requests are not part of your demographic information, <strong>and cannot be changed once submitted</strong>. Accomodation requests, which are reviewed on a case-by-case basis, <strong>will add significant delay to the registration process</strong>.</p>
         % endif
                   
         <fieldset class="group group-form group-form-optional">
@@ -312,10 +328,10 @@
 
     % if registration:
       % if registration.accommodation_request and len(registration.accommodation_request) > 0:
-    <a class="actions form-fields-secondary-visibility is-hidden" href="#form-fields-secondary">Looking for Optional Accomodations?</a>
+    <a class="actions form-fields-secondary-visibility is-hidden" href="#form-fields-secondary">Special (<abbr title="Americans with Disabilities Act">ADA</abbr>) Accommdations</a>
       % endif
     % else: 
-    <a class="actions form-fields-secondary-visibility" href="#form-fields-secondary">Looking for Optional Accomodations?</a>
+    <a class="actions form-fields-secondary-visibility" href="#form-fields-secondary">Special (<abbr title="Americans with Disabilities Act">ADA</abbr>) Accommdations</a>
     % endif
   </section>
     
@@ -357,7 +373,7 @@
             <li class="item">${registration.testcenter_user.upload_error_message}.</li>
           </ul>
           
-          <p class="instructions">If the error is not correctable by revising demographic information and resubmitting, please contact edX at <a class="contact-link" href="${exam_help_href}">exam-help@edx.org</a>.</p>
+          <p class="action">If the error is not correctable by revising your demographic information, please <a class="contact-link" href="${exam_help_href}">contact edX at exam-help@edx.org</a>.</p>
         </li>
         % endif     
 
@@ -377,13 +393,15 @@
             % for accommodation_name in registration.get_accommodation_names():
             <li class="item">${accommodation_name}</li>
             % endfor
-          </ul>  
+          </ul> 
         </li>
         % endif     
         % if registration.accommodation_is_rejected:     
         <li class="item status status-processed status-accommodations">
           <h4 class="title">Accommodations Request</h4>
           <p class="details">Your requested accommodations have been reviewed and processed. You are allowed no accommodations.</p>
+          
+          <p class="action">Please <a class="contact-link" href="${exam_help_href}">contact edX at exam-help@edx.org</a> if you have any questions.</p>
         </li>
         % endif     
 
@@ -397,21 +415,21 @@
         % if registration.registration_is_accepted:     
         <li class="item status status-processed status-registration">
           <h4 class="title">Registration Request</h4>
-          <p class="details">Your exam registration has been processed and has been forwarded to Pearson. You are now able to schedule an exam.</p>
+          <p class="details">Your exam registration has been processed and has been forwarded to Pearson. <strong>You are now able to <a href="${registration.registration_signup_url}" class="exam-link">schedule a Pearson exam</a></strong>.</p>
         </li>
         % endif     
         % if registration.registration_is_rejected:     
         <li class="item status status-rejected status-registration">
           <h4 class="title">Registration Request</h4>
-          <p class="details">Your exam registration has been rejected by Pearson. <strong>You currently cannot schedule an exam</strong>.
-          Please contact edX at <a class="contact-link" href="${exam_help_href}">exam-help@edx.org</a>.  The errors found include:</p>
+          <p class="details">Your exam registration has been rejected by Pearson. <strong>You currently cannot schedule an exam</strong>. The errors found include:</p>
           
           <ul class="error-list">
-            <li class="item">${registration.upload_error_message}.</li>
+            <li class="item">${registration.upload_error_message}</li>
           </ul>
+          
+          <p class="action">Please <a class="contact-link" href="${exam_help_href}">contact edX at exam-help@edx.org</a>.</p>
         </li>
-        % endif     
-
+        % endif
       </ol>
    
    </div>
@@ -420,7 +438,6 @@
    % endif
     
     <div class="details details-course">
-      <!-- NOTE: showing course details -->
       <h4>About ${get_course_about_section(course, 'university')} ${course.number}</h4>
       <p>
       % if course.has_ended():
@@ -434,7 +451,6 @@
     </div>
     
     <div class="details details-registration">
-      <!-- NOTE: showing test details -->
       <h4>Pearson VUE Test Details</h4>
       % if exam_info is not None:
         <ul>
@@ -452,6 +468,11 @@
           </li>            
         </ul>
       % endif
+    </div>
+    
+    <div class="details details-contact">
+      <h4>Questions</h4>
+      <p>If you have a specific question pertaining to your registration, you may contact <a class="contact-link" href="${exam_help_href}">exam-help@edx.org</a>.</p>
     </div>
   </aside>
 </section>
