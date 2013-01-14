@@ -694,10 +694,13 @@ def create_test_registration(request, post_override=None):
     registrations = get_testcenter_registration(user, course_id, exam_code)
     if len(registrations) > 0:
         registration = registrations[0]
-        # TODO: check to see if registration changed.  Should check appointment dates too...
-        # And later should check changes in accommodation_code.
-        # But at the moment, we don't expect anything to cause this to change
-        # because of the registration form.
+        # NOTE: we do not bother to check here to see if the registration has changed,
+        # because at the moment there is no way for a user to change anything about their
+        # registration.  They only provide an optional accommodation request once, and 
+        # cannot make changes to it thereafter.
+        # It is possible that the exam_info content has been changed, such as the
+        # scheduled exam dates, but those kinds of changes should not be handled through
+        # this registration screen.   
         
     else:
         accommodation_request = post_vars.get('accommodation_request','')
@@ -720,27 +723,25 @@ def create_test_registration(request, post_override=None):
     # only do the following if there is accommodation text to send,
     # and a destination to which to send it.
     # TODO: still need to create the accommodation email templates
-    if 'accommodation_request' in post_vars and settings.MITX_FEATURES.get('ACCOMMODATION_EMAIL'):
-        d = {'accommodation_request': post_vars['accommodation_request'] }
-        
-        # composes accommodation email
-        subject = render_to_string('emails/accommodation_email_subject.txt', d)
-        # Email subject *must not* contain newlines
-        subject = ''.join(subject.splitlines())
-        message = render_to_string('emails/accommodation_email.txt', d)
+#    if 'accommodation_request' in post_vars and 'TESTCENTER_ACCOMMODATION_REQUEST_EMAIL' in settings:
+#        d = {'accommodation_request': post_vars['accommodation_request'] }
+#        
+#        # composes accommodation email
+#        subject = render_to_string('emails/accommodation_email_subject.txt', d)
+#        # Email subject *must not* contain newlines
+#        subject = ''.join(subject.splitlines())
+#        message = render_to_string('emails/accommodation_email.txt', d)
+#
+#        try:
+#            dest_addr = settings['TESTCENTER_ACCOMMODATION_REQUEST_EMAIL']
+#            from_addr = user.email
+#            send_mail(subject, message, from_addr, [dest_addr], fail_silently=False)
+#        except:
+#            log.exception(sys.exc_info())
+#            response_data = {'success': False}
+#            response_data['non_field_errors'] =  [ 'Could not send accommodation e-mail.', ]
+#            return HttpResponse(json.dumps(response_data), mimetype="application/json")
 
-        # skip if destination email address is not specified
-        try:
-            dest_addr = settings.MITX_FEATURES['ACCOMMODATION_EMAIL']
-            send_mail(subject, message, settings.DEFAULT_FROM_EMAIL, [dest_addr], fail_silently=False)
-        except:
-            log.exception(sys.exc_info())
-            response_data = {'success': False}
-            response_data['non_field_errors'] =  [ 'Could not send accommodation e-mail.', ]
-            return HttpResponse(json.dumps(response_data), mimetype="application/json")
-
-    # TODO: enable appropriate stat
-    # statsd.increment("common.student.account_created")
 
     js = {'success': True}
     return HttpResponse(json.dumps(js), mimetype="application/json")

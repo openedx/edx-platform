@@ -223,8 +223,6 @@ class TestCenterUser(models.Model):
         return self.user.email
     
     def needs_update(self, dict):
-#        needs_updating = any([__getattribute__(fieldname) != dict[fieldname]
-#                              for fieldname in TestCenterUser.user_provided_fields()])
         for fieldname in TestCenterUser.user_provided_fields():
             if fieldname in dict and self.__getattribute__(fieldname) != dict[fieldname]:
                 return True
@@ -275,6 +273,7 @@ class TestCenterUserForm(ModelForm):
         # create additional values here:
         new_user.user_updated_at = datetime.utcnow()
         new_user.save()
+        log.info("Updated demographic information for user's test center exam registration: username \"{}\" ".format(new_user.username)) 
         
     # add validation:
     
@@ -534,6 +533,7 @@ class TestCenterRegistrationForm(ModelForm):
         # create additional values here:
         registration.user_updated_at = datetime.utcnow()
         registration.save()
+        log.info("Updated registration information for user's test center exam registration: username \"{}\" course \"{}\", examcode \"{}\"".format(registration.testcenter_user.username, registration.course_id, registration.exam_series_code)) 
 
     # TODO: add validation code for values added to accommodation_code field.
     

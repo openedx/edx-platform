@@ -14,14 +14,39 @@ class Command(BaseCommand):
             dest='first_name',
         ),        
         make_option(
+            '--middle_name',
+            action='store',
+            dest='middle_name',
+        ),        
+        make_option(
             '--last_name',
             action='store',
             dest='last_name',
         ),        
         make_option(
+            '--suffix',
+            action='store',
+            dest='suffix',
+        ),        
+        make_option(
+            '--salutation',
+            action='store',
+            dest='salutation',
+        ),        
+        make_option(
             '--address_1',
             action='store',
             dest='address_1',
+        ),        
+        make_option(
+            '--address_2',
+            action='store',
+            dest='address_2',
+        ),        
+        make_option(
+            '--address_3',
+            action='store',
+            dest='address_3',
         ),        
         make_option(
             '--city',
@@ -52,11 +77,33 @@ class Command(BaseCommand):
             help='Pretty free-form (parens, spaces, dashes), but no country code'
         ),        
         make_option(
+            '--extension',
+            action='store',
+            dest='extension',
+        ),        
+        make_option(
             '--phone_country_code',
             action='store',
             dest='phone_country_code',
             help='Phone country code, just "1" for the USA'
         ),
+        make_option(
+            '--fax',
+            action='store',
+            dest='fax',
+            help='Pretty free-form (parens, spaces, dashes), but no country code'
+        ),        
+        make_option(
+            '--fax_country_code',
+            action='store',
+            dest='fax_country_code',
+            help='Fax country code, just "1" for the USA'
+        ),
+        make_option(
+            '--company_name',
+            action='store',
+            dest='company_name',
+        ),        
         # internal values:
         make_option(
             '--client_candidate_id',

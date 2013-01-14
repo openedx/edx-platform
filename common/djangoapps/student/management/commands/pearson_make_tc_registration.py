@@ -1,4 +1,5 @@
 from optparse import make_option
+from time import strftime
 
 from django.contrib.auth.models import User
 from django.core.management.base import BaseCommand, CommandError
@@ -6,6 +7,7 @@ from django.core.management.base import BaseCommand, CommandError
 from student.models import TestCenterUser, TestCenterRegistration, TestCenterRegistrationForm, get_testcenter_registration
 from student.views import course_from_id
 from xmodule.course_module import CourseDescriptor
+from xmodule.modulestore.exceptions import ItemNotFoundError
 
 class Command(BaseCommand):
     option_list = BaseCommand.option_list + (
@@ -91,14 +93,14 @@ class Command(BaseCommand):
             raise CommandError("User {%s} does not exist".format(student))
             
         # check to see if a course_id was specified, and use information from that:
-        course = course_from_id(course_id)
-        if course is not None:
+        try:
+            course = course_from_id(course_id)
             if 'ignore_registration_dates' in our_options:
                 examlist = [exam for exam in course.test_center_exams if exam.exam_series_code == our_options.get('exam_series_code')]
                 exam = examlist[0] if len(examlist) > 0 else None
             else:
                 exam = course.current_test_center_exam
-        else: 
+        except ItemNotFoundError: 
             # otherwise use explicit values (so we don't have to define a course):    
             exam_name = "Dummy Placeholder Name"
             exam_info = { 'Exam_Series_Code': our_options['exam_series_code'],
@@ -106,6 +108,10 @@ class Command(BaseCommand):
                           'Last_Eligible_Appointment_Date' : our_options['eligibility_appointment_date_last'],
                           }
             exam = CourseDescriptor.TestCenterExam(course_id, exam_name, exam_info)
+            # update option values for date_first and date_last to use YYYY-MM-DD format
+            # instead of YYYY-MM-DDTHH:MM
+            our_options['eligibility_appointment_date_first'] = strftime("%Y-%m-%d", exam.first_eligible_appointment_date)
+            our_options['eligibility_appointment_date_last'] = strftime("%Y-%m-%d", exam.last_eligible_appointment_date)
 
         if exam is None:
             raise CommandError("Exam for course_id {%s} does not exist".format(course_id))
@@ -167,6 +173,8 @@ class Command(BaseCommand):
             
         # override internal values:
         change_internal = False
+        if 'exam_series_code' in our_options:
+            exam_code = our_options['exam_series_code']
         registration = get_testcenter_registration(student, course_id, exam_code)[0]
         for internal_field in [ 'upload_error_message', 'upload_status', 'authorization_id']:
             if internal_field in our_options:
