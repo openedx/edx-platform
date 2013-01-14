@@ -239,7 +239,7 @@ class CombinedOpenEndedModule(XModule):
             last_response_data = self.get_last_response(self.current_task_number - 1)
             last_response = last_response_data['response']
             current_task_state=json.dumps({
-                'state' : self.assessing,
+                'state' : self.ASSESSING,
                 'version' : self.STATE_VERSION,
                 'max_score' : self._max_score,
                 'attempts' : 0,
