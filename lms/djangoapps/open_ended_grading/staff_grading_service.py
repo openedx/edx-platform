@@ -264,8 +264,7 @@ def _get_next(course_id, grader_id, location):
         response_json = json.loads(response)
         rubric = response_json['rubric']
         rubric_renderer = CombinedOpenEndedRubric(False)
-        rubric_xml = etree.XML(rubric)
-        rubric_html = rubric_renderer.render_rubric(rubric_xml)
+        rubric_html = rubric_renderer.render_rubric(rubric)
         response_json['rubric'] = rubric_html
         return json.dumps(response_json)
     except GradingServiceError:

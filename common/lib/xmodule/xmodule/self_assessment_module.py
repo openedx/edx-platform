@@ -122,7 +122,9 @@ class SelfAssessmentModule(openendedchild.OpenEndedChild):
         if self.state == self.INITIAL:
             return ''
 
-        rubric_html  = CombinedOpenEndedRubric.render_rubric(self.rubric)
+        rubric_renderer = CombinedOpenEndedRubric(True)
+
+        rubric_html  = rubric_renderer.render_rubric(self.rubric)
 
         # we'll render it
         context = {'rubric': rubric_html,

@@ -10,6 +10,15 @@ class CombinedOpenEndedRubric:
         self.has_score = False
         self.view_only = view_only
 
+    '''
+    render_rubric: takes in an xml string and outputs the corresponding
+        html for that xml, given the type of rubric we're generating
+    Input:
+        rubric_xml: an string that has not been parsed into xml that
+            represents this particular rubric
+    Output:
+        html: the html that corresponds to the xml given
+    '''
     def render_rubric(self, rubric_xml):
         try:
             rubric_categories = self.extract_categories(rubric_xml)
@@ -34,11 +43,9 @@ class CombinedOpenEndedRubric:
                          {text: "Option 3 Name", points: 2]}]
 
         '''
-        if element.tag != 'rubric':
-            raise Exception("[extract_categories] Expected a <rubric> tag: got {0} instead".format(element.tag))
-        categorylist = list(element)
+        element = etree.fromstring(element)
         categories = []
-        for category in categorylist:
+        for category in element:
             if category.tag != 'category':
                 raise Exception("[extract_categories] Expected a <category> tag: got {0} instead".format(category.tag))
             else:
