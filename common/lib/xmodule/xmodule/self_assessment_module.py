@@ -21,6 +21,8 @@ from .xml_module import XmlDescriptor
 from xmodule.modulestore import Location
 import openendedchild
 
+from combined_open_ended_rubric import CombinedOpenEndedRubric
+
 log = logging.getLogger("mitx.courseware")
 
 class SelfAssessmentModule(openendedchild.OpenEndedChild):
@@ -120,8 +122,10 @@ class SelfAssessmentModule(openendedchild.OpenEndedChild):
         if self.state == self.INITIAL:
             return ''
 
+        rubric_html  = CombinedOpenEndedRubric.render_rubric(self.rubric)
+
         # we'll render it
-        context = {'rubric': self.rubric,
+        context = {'rubric': rubric_html,
                    'max_score': self._max_score,
         }
 

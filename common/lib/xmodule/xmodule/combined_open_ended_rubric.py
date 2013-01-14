@@ -2,9 +2,13 @@ from mitxmako.shortcuts import render_to_string
 
 class CombinedOpenEndedRubric:
 
-    def render_rubric(self, rubric_xml):
-        rubric_categories = CombinedOpenEndedRubric.extract_rubric_categories(rubric_xml)
-        html = render_to_string('open_ended_rubric.html', {'rubric_categories'  : rubric_categories})
+    @staticmethod
+    def render_rubric(rubric_xml):
+        try:
+            rubric_categories = CombinedOpenEndedRubric.extract_rubric_categories(rubric_xml)
+            html = render_to_string('open_ended_rubric.html', {'rubric_categories'  : rubric_categories})
+        except:
+            html = rubric_xml
         return html
 
     @staticmethod
