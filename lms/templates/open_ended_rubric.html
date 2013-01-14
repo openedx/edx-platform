@@ -4,9 +4,9 @@
     <tr>
         <th>${category['description']}</th>
         % if category['has_score'] == True:
-        <div class="view-only">
-            <td>Your Score: ${category['score']}  </td>
-        </div>
+            <td>
+                  Your Score: ${category['score']}
+            </td>
         % endif
         % for j in range(len(category['options'])):
         <% option = category['options'][j] %>
