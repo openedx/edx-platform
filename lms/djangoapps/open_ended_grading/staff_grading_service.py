@@ -19,7 +19,7 @@ from xmodule.course_module import CourseDescriptor
 from student.models import unique_id_for_user
 from xmodule.x_module import ModuleSystem
 from mitxmako.shortcuts import render_to_string
-from capa import inputtypes
+from xmodule.combined_open_ended_rubric import CombinedOpenEndedRubric
 from lxml import etree
 
 log = logging.getLogger(__name__)
@@ -263,8 +263,9 @@ def _get_next(course_id, grader_id, location):
         response = staff_grading_service().get_next(course_id, location, grader_id)
         response_json = json.loads(response)
         rubric = response_json['rubric']
-        rubric_input = inputtypes.RubricInput(module_system, etree.XML(rubric), {'id': location})
-        rubric_html = etree.tostring(rubric_input.get_html())
+        rubric_renderer = CombinedOpenEndedRubric(False)
+        rubric_xml = etree.XML(rubric)
+        rubric_html = rubric_renderer.render_rubric(rubric_xml)
         response_json['rubric'] = rubric_html
         return json.dumps(response_json)
     except GradingServiceError:

@@ -1,30 +1,37 @@
-<table class="rubric">
-    % for i in range(len(rubric_categories)):
-    <% category = rubric_categories[i] %>
-    <tr>
-        <th>
-            ${category['description']}
-            % if category['has_score'] == True:
-                (Your score: ${category['score']})
-            % endif
-        </th>
-        % for j in range(len(category['options'])):
-        <% option = category['options'][j] %>
-        <td>
-            <div class="view-only">
-                ${option['text']}
-                % if option.has_key('selected'):
-                    % if option['selected'] == True:
-                        <div class="selected-grade">[${option['points']} points]</div>
-                    %else:
-                        <div class="grade">[${option['points']} points]</div>
+<form class="rubric-template" id="inputtype_${id}">
+    <h3>Rubric</h3>
+    % if view_only and has_score:
+    <p>This is the rubric that was used to grade your submission.The highlighted selection matches how the grader feels you performed in each category.</p>
+    % elif view_only:
+    <p>Use the below rubric to rate this submission.</p>
+    % else:
+    <p>Select the criteria you feel best represents this submission in each category.</p>
+    % endif
+    <table class="rubric">
+        % for i in range(len(categories)):
+            <% category = categories[i] %>
+        <tr>
+            <th>${category['description']}</th>
+            % for j in range(len(category['options'])):
+                <% option = category['options'][j] %>
+            <td>
+                % if view_only:
+                    ## if this is the selected rubric block, show it
+                    % if option['selected']:
+                        <div class="view-only selected-grade">
+                    % else:
+                        <div class="view-only">
                     % endif
+                        ${option['text']}
+                        <div class="grade">[${option['points']} points]</div>
+                        </div>
                 % else:
-                    <div class="grade">[${option['points']} points]</div>
-                %endif
-            </div>
-        </td>
+                    <input type="radio" class="score-selection" name="score-selection-${i}" id="score-${i}-${j}" value="${option['points']}"/>
+                    <label for="score-${i}-${j}">${option['text']}</label>
+                % endif
+            </td>
+            % endfor
+        </tr>
         % endfor
-    </tr>
-    % endfor
-</table>
+    </table>
+</form>
