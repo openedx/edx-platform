@@ -329,12 +329,28 @@ WIKI_LINK_DEFAULT_LEVEL = 2
 
 ################################# Staff grading config  #####################
 
-STAFF_GRADING_INTERFACE = None
+#By setting up the default settings with an incorrect user name and password,
+# will get an error when attempting to connect
+STAFF_GRADING_INTERFACE = {
+    'url': 'http://sandbox-grader-001.m.edx.org/staff_grading',
+    'username': 'incorrect_user',
+    'password': 'incorrect_pass',
+    }
+
 # Used for testing, debugging
 MOCK_STAFF_GRADING = False
 
 ################################# Peer grading config  #####################
-PEER_GRADING_INTERFACE = None
+
+#By setting up the default settings with an incorrect user name and password,
+# will get an error when attempting to connect
+PEER_GRADING_INTERFACE = {
+    'url': 'http://sandbox-grader-001.m.edx.org/peer_grading',
+    'username': 'incorrect_user',
+    'password': 'incorrect_pass',
+    }
+
+# Used for testing, debugging
 MOCK_PEER_GRADING = False
 
 ################################# Jasmine ###################################
