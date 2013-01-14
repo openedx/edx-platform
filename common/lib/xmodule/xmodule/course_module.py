@@ -228,7 +228,11 @@ class CourseDescriptor(SequenceDescriptor):
         if policy_dir:
             paths = [policy_dir + '/grading_policy.json'] + paths
 
-        policy = json.loads(cls.read_grading_policy(paths, system))
+        try:
+            policy = json.loads(cls.read_grading_policy(paths, system))
+        except ValueError:
+            system.error_tracker("Unable to decode grading policy as json")
+            policy = None
         
         # cdodge: import the grading policy information that is on disk and put into the
         # descriptor 'definition' bucket as a dictionary so that it is persisted in the DB
