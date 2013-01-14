@@ -350,6 +350,13 @@ class ContentStoreTest(TestCase):
     def test_edit_unit_full(self):
         self.check_edit_unit('full')
 
+    def test_about_overrides(self):
+        import_from_xml(modulestore(), 'common/test/data/', ['full'])
+        ms = modulestore('direct')
+        effort = ms.get_item(Location(['i4x','edX','full','about','effort', None]))
+        self.assertEqual(effort.definition['data'],'6 hours')
+
+
     def test_clone_course(self):
         import_from_xml(modulestore(), 'common/test/data/', ['full'])
 
