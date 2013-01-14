@@ -311,14 +311,19 @@ def instructor_dashboard(request, course_id):
         track.views.server_track(request, 'list-beta-testers', {}, page='idashboard')
 
     elif action == 'Add beta testers':
-        uname = request.POST['betausers']
+        users = request.POST['betausers']
+        log.debug("users: {0!r}".format(users))
         group = get_beta_group(course)
-        msg += add_user_to_group(request, uname, group, 'beta testers', 'beta-tester')
+        for username_or_email in users.split():
+            msg += "<p>{0}</p>".format(
+                add_user_to_group(request, username_or_email, group, 'beta testers', 'beta-tester'))
 
     elif action == 'Remove beta testers':
-        uname = request.POST['betausers']
+        users = request.POST['betausers']
         group = get_beta_group(course)
-        msg += remove_user_from_group(request, uname, group, 'beta testers', 'beta-tester')
+        for username_or_email in users.split():
+            msg += "<p>{0}</p>".format(
+                remove_user_from_group(request, username_or_email, group, 'beta testers', 'beta-tester'))
 
     #----------------------------------------
     # forum administration
@@ -620,6 +625,38 @@ def _group_members_table(group, title, course_id):
     datatable['title'] = '{0} in course {1}'.format(title, course_id)
     return datatable
 
+
+def _add_or_remove_user_group(request, username_or_email, group, group_title, event_name, do_add):
+    """
+    Implementation for both add and remove functions, to get rid of shared code.  do_add is bool that determines which
+    to do.
+    """
+    user = None
+    try:
+        if '@' in username_or_email:
+            user = User.objects.get(email=username_or_email)
+        else:
+            user = User.objects.get(username=username_or_email)
+    except User.DoesNotExist:
+        msg = '<font color="red">Error: unknown username or email "{0}"</font>'.format(username_or_email)
+        user = None
+
+    if user is not None:
+        action = "Added" if do_add else "Removed"
+        prep = "to" if do_add else "from"
+        msg = '<font color="green">{action} {0} {prep} {1} group = {2}</font>'.format(user, group_title, group.name,
+                                                                                  action=action, prep=prep)
+        if do_add:
+            user.groups.add(group)
+        else:
+            user.groups.remove(group)
+        event = "add" if do_add else "remove"
+        track.views.server_track(request, '{event}-{0} {1}'.format(event_name, user, event=event),
+                                 {}, page='idashboard')
+
+    return msg
+
+
 def add_user_to_group(request, username_or_email, group, group_title, event_name):
     """
     Look up the given user by username (if no '@') or email (otherwise), and add them to group.
@@ -634,22 +671,7 @@ def add_user_to_group(request, username_or_email, group, group_title, event_name
     Returns:
        html to insert in the message field
     """
-    user = None
-    try:
-        if '@' in username_or_email:
-            user = User.objects.get(email=username_or_email)
-        else:
-            user = User.objects.get(username=username_or_email)
-    except User.DoesNotExist:
-        msg = '<font color="red">Error: unknown username "{0}"</font>'.format(uname)
-        user = None
-
-    if user is not None:
-        msg = '<font color="green">Added {0} to {1} group = {2}</font>'.format(user, group_title, group.name)
-        user.groups.add(group)
-        track.views.server_track(request, 'add-{0} {1}'.format(event_name, user), {}, page='idashboard')
-
-    return msg
+    return _add_or_remove_user_group(request, username_or_email, group, group_title, event_name, True)
 
 def remove_user_from_group(request, username_or_email, group, group_title, event_name):
     """
@@ -665,22 +687,7 @@ def remove_user_from_group(request, username_or_email, group, group_title, event
     Returns:
        html to insert in the message field
     """
-    user = None
-    try:
-        if '@' in username_or_email:
-            user = User.objects.get(email=username_or_email)
-        else:
-            user = User.objects.get(username=username_or_email)
-    except User.DoesNotExist:
-        msg = '<font color="red">Error: unknown username "{0}"</font>'.format(uname)
-        user = None
-
-    if user is not None:
-        msg = '<font color="green">Removed {0} from {1} group = {2}</font>'.format(user, group_title, group.name)
-        user.groups.remove(group)
-        track.views.server_track(request, 'remove-{0} {1}'.format(event_name, user), {}, page='idashboard')
-
-    return msg
+    return _add_or_remove_user_group(request, username_or_email, group, group_title, event_name, False)
 
 
 def get_student_grade_summary_data(request, course, course_id, get_grades=True, get_raw_scores=False, use_offline=False):
