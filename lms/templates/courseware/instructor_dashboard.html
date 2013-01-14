@@ -36,6 +36,9 @@ table.stat_table td {
 
 a.selectedmode { background-color: yellow; }
 
+textarea {
+  height: 200px;
+}
 </style>
 
 <script language="JavaScript" type="text/javascript">
@@ -267,9 +270,11 @@ function goto( mode)
     <p>
     Enter usernames or emails for students who should be beta-testers.  They will get to see course materials early, as configured via the <tt>days_early_for_beta</tt> option in the course policy.
     </p>
-    <input type="textarea" name="betausers">
-    <input type="submit" name="action" value="Add beta testers">
+    <p>
+    <textarea cols="50" row="30" name="betausers"></textarea>
     <input type="submit" name="action" value="Remove beta testers">
+    <input type="submit" name="action" value="Add beta testers">
+    </p>
     <hr width="40%" style="align:left">
   %endif
 %endif
