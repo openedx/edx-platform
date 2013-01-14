@@ -4,14 +4,24 @@
     <tr>
         <th>${category['description']}</th>
         % if category['has_score'] == True:
+        <div class="view-only">
             <td>Your Score: ${category['score']}  </td>
+        </div>
         % endif
         % for j in range(len(category['options'])):
         <% option = category['options'][j] %>
         <td>
             <div class="view-only">
                 ${option['text']}
-                <div class="grade">[${option['points']} points]</div>
+                % if option.has_key('selected'):
+                    % if option['selected'] == True:
+                        <div class="selected-grade">[${option['points']} points]</div>
+                    %else:
+                        <div class="grade">[${option['points']} points]</div>
+                    % endif
+                % else:
+                    <div class="grade">[${option['points']} points]</div>
+                %endif
             </div>
         </td>
         % endfor

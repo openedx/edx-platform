@@ -219,6 +219,53 @@ div.result-container {
       }
 }
 
+div.result-container, section.open-ended-child {
+    .rubric {
+            tr {
+                margin:10px 0px;
+                height: 100%;
+            }
+            td {
+                padding: 20px 0px;
+                margin: 10px 0px;
+                height: 100%;
+            }
+            th {
+                padding: 5px;
+                margin: 5px;
+            }
+            label,
+            .view-only {
+                margin:10px;
+                position: relative;
+                padding: 15px;
+                width: 200px;
+                height:100%;
+                display: inline-block;
+                min-height: 50px;
+                min-width: 50px;
+                background-color: #CCC;
+                font-size: 1em;
+            }
+            .grade {
+              position: absolute;
+              bottom:0px;
+              right:0px;
+              margin:10px;
+            }
+            .selected-grade {
+              background: #666;
+              color: white;
+            }
+            input[type=radio]:checked + label {
+              background: #666;
+              color: white; }
+            input[class='score-selection'] {
+              display: none;
+            }
+        }
+}
+
 section.open-ended-child {
   @media print {
     display: block;
@@ -575,50 +622,5 @@ section.open-ended-child {
   .capa_reset li {
     font-size: 0.9em;
   }
-
-  .rubric {
-        tr {
-            margin:10px 0px;
-            height: 100%;
-        }
-        td {
-            padding: 20px 0px;
-            margin: 10px 0px;
-            height: 100%;
-        }
-        th {
-            padding: 5px;
-            margin: 5px;
-        }
-        label,
-        .view-only {
-            margin:10px;
-            position: relative;
-            padding: 15px;
-            width: 200px;
-            height:100%;
-            display: inline-block;
-            min-height: 50px;
-            min-width: 50px;
-            background-color: #CCC;
-            font-size: 1em;
-        }
-        .grade {
-          position: absolute;
-          bottom:0px;
-          right:0px;
-          margin:10px;
-        }
-        .selected-grade {
-          background: #666;
-          color: white;
-        }
-        input[type=radio]:checked + label {
-          background: #666;
-          color: white; }
-        input[class='score-selection'] {
-          display: none;
-        }
-    }
 
 }

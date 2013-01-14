@@ -100,7 +100,11 @@ class CombinedOpenEndedRubric:
                 else:
                     raise Exception("[extract_category]: missing points attribute. Cannot continue to auto-create points values after a points value is explicitly dfined.")
                 optiontext = option.text
-                options.append({'text': option.text, 'points': points})
+                selected = False
+                if has_score:
+                    if points == score:
+                        selected = True
+                options.append({'text': option.text, 'points': points, 'selected' : selected})
 
         # sort and check for duplicates
         options = sorted(options, key=lambda option: option['points'])
