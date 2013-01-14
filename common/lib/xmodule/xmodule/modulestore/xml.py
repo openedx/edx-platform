@@ -13,6 +13,7 @@ from importlib import import_module
 from lxml import etree
 from path import path
 
+from xmodule.error_module import ErrorDescriptor
 from xmodule.errortracker import make_error_tracker, exc_info_to_str
 from xmodule.course_module import CourseDescriptor
 from xmodule.mako_module import MakoDescriptorSystem
@@ -167,8 +168,6 @@ class ImportSystem(XMLParsingSystem, MakoDescriptorSystem):
                 # Didn't load properly.  Fall back on loading as an error
                 # descriptor.  This should never error due to formatting.
 
-                # Put import here to avoid circular import errors
-                from xmodule.error_module import ErrorDescriptor
 
                 msg = "Error loading from xml. " + str(err)[:200]
                 log.warning(msg)
@@ -311,7 +310,7 @@ class XMLModuleStore(ModuleStoreBase):
             log.exception(msg)
             errorlog.tracker(msg)
 
-        if course_descriptor is not None:
+        if course_descriptor is not None and not isinstance(course_descriptor, ErrorDescriptor):
             self.courses[course_dir] = course_descriptor
             self._location_errors[course_descriptor.location] = errorlog
             self.parent_trackers[course_descriptor.id].make_known(course_descriptor.location)
@@ -423,6 +422,10 @@ class XMLModuleStore(ModuleStoreBase):
 
             course_descriptor = system.process_xml(etree.tostring(course_data, encoding='unicode'))
 
+            # If we fail to load the course, then skip the rest of the loading steps
+            if isinstance(course_descriptor, ErrorDescriptor):
+                return course_descriptor
+
             # NOTE: The descriptors end up loading somewhat bottom up, which
             # breaks metadata inheritance via get_children().  Instead
             # (actually, in addition to, for now), we do a final inheritance pass
@@ -471,11 +474,11 @@ class XMLModuleStore(ModuleStoreBase):
                         if category == "static_tab":
                             for tab in course_descriptor.tabs or []:
                                 if tab.get('url_slug') == slug:
-                                    module.metadata['display_name'] = tab['name']            
+                                    module.metadata['display_name'] = tab['name']
                         module.metadata['data_dir'] = course_dir
-                        self.modules[course_descriptor.id][module.location] = module   
+                        self.modules[course_descriptor.id][module.location] = module
                     except Exception, e:
-                        logging.exception("Failed to load {0}. Skipping... Exception: {1}".format(filepath, str(e)))   
+                        logging.exception("Failed to load {0}. Skipping... Exception: {1}".format(filepath, str(e)))
                         system.error_tracker("ERROR: " + str(e))
 
     def get_instance(self, course_id, location, depth=0):
