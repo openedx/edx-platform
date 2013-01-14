@@ -234,7 +234,8 @@ class StaffGrading
 
   graded_callback: () =>
     @grade = $("input[name='grade-selection']:checked").val()
-
+    if score == undefined
+      return
     # check to see whether or not any categories have not been scored
     num_categories = $('table.rubric tr').length
     for i in [0..(num_categories-1)]
