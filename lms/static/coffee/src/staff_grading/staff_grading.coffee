@@ -286,6 +286,7 @@ class StaffGrading
   submit_and_get_next: () ->
     data =
       rubric_scores: @get_score_list()
+      score: 0
       feedback: @feedback_area.val()
       submission_id: @submission_id
       location: @location
