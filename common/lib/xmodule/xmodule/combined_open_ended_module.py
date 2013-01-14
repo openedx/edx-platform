@@ -21,6 +21,7 @@ from .xml_module import XmlDescriptor
 from xmodule.modulestore import Location
 import self_assessment_module
 import open_ended_module
+from combined_open_ended_rubric import CombinedOpenEndedRubric
 
 from mitxmako.shortcuts import render_to_string
 
@@ -140,6 +141,12 @@ class CombinedOpenEndedModule(XModule):
         # completion (doesn't matter if you self-assessed correct/incorrect).
         self._max_score = int(self.metadata.get('max_score', MAX_SCORE))
 
+        rubric_renderer = CombinedOpenEndedRubric(True)
+        success, rubric_feedback = rubric_renderer.render_rubric(True, definition['rubric'])
+        if not success:
+            error_message="Could not parse rubric : {0}".format(definition['rubric'])
+            log.exception(error_message)
+            raise Exception(error_message)
         #Static data is passed to the child modules to render
         self.static_data = {
             'max_score': self._max_score,

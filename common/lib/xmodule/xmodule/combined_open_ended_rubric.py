@@ -20,16 +20,26 @@ class CombinedOpenEndedRubric:
         html: the html that corresponds to the xml given
     '''
     def render_rubric(self, rubric_xml):
+        success = False
         try:
+            rubric_xml = rubric_xml.encode('ascii', 'ignore')
             rubric_categories = self.extract_categories(rubric_xml)
             html = render_to_string('open_ended_rubric.html', 
                     {'categories'  : rubric_categories,
                      'has_score': self.has_score,
                      'view_only': self.view_only})
+            success = True
         except:
             log.exception("Could not parse the rubric.")
-            html = etree.tostring(rubric_xml, pretty_print=True)
-        return html
+            try:
+                html = etree.tostring(rubric_xml, pretty_print=True)
+            except:
+                log.exception("Rubric XML is a string, not an XML object : {0}".format(rubric_xml))
+                if isinstance(rubric_xml, basestring):
+                    html = rubric_xml
+                else:
+                    html = "Invalid rubric.  Please contact course staff."
+        return success, html
 
     def extract_categories(self, element):
         '''

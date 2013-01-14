@@ -264,7 +264,12 @@ def _get_next(course_id, grader_id, location):
         response_json = json.loads(response)
         rubric = response_json['rubric']
         rubric_renderer = CombinedOpenEndedRubric(False)
-        rubric_html = rubric_renderer.render_rubric(rubric)
+        success, rubric_html = rubric_renderer.render_rubric(rubric)
+        if not success:
+            error_message = "Could not render rubric: {0}".format(rubric)
+            log.exception(error_message)
+            return json.dumps({'success': False,
+                               'error': error_message})
         response_json['rubric'] = rubric_html
         return json.dumps(response_json)
     except GradingServiceError:
