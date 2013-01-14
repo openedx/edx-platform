@@ -203,7 +203,7 @@ class StaffGrading
     @num_graded = 0
     @num_pending = 0
     @score_lst = []
-    @score = null
+    @grade = null
 
     @problems = null
 
@@ -233,7 +233,7 @@ class StaffGrading
     $('.score-selection').click => @graded_callback()
 
   graded_callback: () =>
-    @grade = $("input[name='grade-selection']:selected").val()
+    @grade = $("input[name='grade-selection']:checked").val()
 
     # check to see whether or not any categories have not been scored
     num_categories = $('table.rubric tr').length
