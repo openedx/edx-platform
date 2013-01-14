@@ -8,6 +8,10 @@ describe 'HTMLEditingDescriptor', ->
 #     However, we currently have no working Selenium tests.
       loadFixtures 'html-edit-formattingbug.html'
       @descriptor = new HTMLEditingDescriptor($('.html-edit'))
+      visualEditorStub =
+        isDirty: () -> false
+      spyOn(@descriptor, 'getVisualEditor').andCallFake () ->
+        visualEditorStub
       data = @descriptor.save().data
       expect(data).toEqual("""&lt;problem&gt;
                               &lt;p&gt;&lt;/p&gt;
@@ -15,3 +19,73 @@ describe 'HTMLEditingDescriptor', ->
                               <pre>&lt;problem&gt;
                                   &lt;p&gt;&lt;/p&gt;</pre>
                               <div><foo>bar</foo></div>""")
+  describe 'Saves HTML', ->
+    beforeEach ->
+      loadFixtures 'html-edit.html'
+      @descriptor = new HTMLEditingDescriptor($('.html-edit'))
+    it 'Returns data from Advanced Editor if Visual Editor is not dirty', ->
+      visualEditorStub =
+        isDirty: () -> false
+      spyOn(@descriptor, 'getVisualEditor').andCallFake () ->
+        visualEditorStub
+      expect(@descriptor.showingVisualEditor).toEqual(true)
+      data = @descriptor.save().data
+      expect(data).toEqual('Advanced Editor Text')
+    it 'Returns data from Advanced Editor if Visual Editor is not showing (even if Visual Editor is dirty)', ->
+      visualEditorStub =
+        isDirty: () -> true
+      spyOn(@descriptor, 'getVisualEditor').andCallFake () ->
+        visualEditorStub
+      @descriptor.showingVisualEditor = false
+      data = @descriptor.save().data
+      expect(data).toEqual('Advanced Editor Text')
+    it 'Returns data from Visual Editor if Visual Editor is dirty and showing', ->
+      visualEditorStub =
+        isDirty: () -> true
+        getContent: () -> 'from visual editor'
+      spyOn(@descriptor, 'getVisualEditor').andCallFake () ->
+        visualEditorStub
+      expect(@descriptor.showingVisualEditor).toEqual(true)
+      data = @descriptor.save().data
+      expect(data).toEqual('from visual editor')
+  describe 'Can switch to Advanced Editor', ->
+    beforeEach ->
+      loadFixtures 'html-edit.html'
+      @descriptor = new HTMLEditingDescriptor($('.html-edit'))
+    it 'Populates from Advanced Editor if Advanced Editor is dirty', ->
+      expect(@descriptor.showingVisualEditor).toEqual(true)
+      visualEditorStub =
+        isDirty: () -> true
+        getContent: () -> 'from visual editor'
+      @descriptor.showAdvancedEditor(visualEditorStub)
+      expect(@descriptor.showingVisualEditor).toEqual(false)
+      expect(@descriptor.advanced_editor.getValue()).toEqual('from visual editor')
+    it 'Does not populate from Advanced Editor if Advanced Editor is not dirty', ->
+      expect(@descriptor.showingVisualEditor).toEqual(true)
+      visualEditorStub =
+        isDirty: () -> false
+        getContent: () -> 'from visual editor'
+      @descriptor.showAdvancedEditor(visualEditorStub)
+      expect(@descriptor.showingVisualEditor).toEqual(false)
+      expect(@descriptor.advanced_editor.getValue()).toEqual('Advanced Editor Text')
+  describe 'Can switch to Visual Editor', ->
+    it 'Always populates from the Advanced Editor', ->
+      loadFixtures 'html-edit.html'
+      @descriptor = new HTMLEditingDescriptor($('.html-edit'))
+      @descriptor.showingVisualEditor = false
+
+      visualEditorStub =
+        isNotDirty: false
+        content: 'not set'
+        startContent: 'not set',
+        show: () -> true
+        focus: () -> true
+        isDirty: () -> not @isNotDirty
+        setContent: (x) -> @content = x
+        getContent: -> @content
+
+      @descriptor.showVisualEditor(visualEditorStub)
+      expect(@descriptor.showingVisualEditor).toEqual(true)
+      expect(visualEditorStub.isDirty()).toEqual(false)
+      expect(visualEditorStub.getContent()).toEqual('Advanced Editor Text')
+      expect(visualEditorStub.startContent).toEqual('Advanced Editor Text')

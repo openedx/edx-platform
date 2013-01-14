@@ -25,6 +25,9 @@ class @HTMLEditingDescriptor
       theme_advanced_blockformats : "p,code,h2,h3,blockquote",
       width: '100%',
       height: '400px',
+      # Cannot get access to tinyMCE Editor instance (for focusing) until after it is rendered.
+      # The tinyMCE callback passes in the editor as a paramter.
+      init_instance_callback: @focusVisualEditor
     })
 
     @showingVisualEditor = true
@@ -36,28 +39,39 @@ class @HTMLEditingDescriptor
     if not $(e.currentTarget).hasClass('current')
       $('.editor-tabs .current').removeClass('current')
       $(e.currentTarget).addClass('current')
-      tinyMCE = @getVisualEditor()
+      visualEditor = @getVisualEditor()
 
       if $(e.currentTarget).attr('data-tab') is 'visual'
         $(@advanced_editor.getWrapperElement()).hide()
-        tinyMCE.show()
-        tinyMCE.setContent(@advanced_editor.getValue())
-        # In order for tinyMCE.isDirty() to return true ONLY if edits have been made after setting the text,
-        # both the startContent must be sync'ed up and the dirty flag set to false.
-        tinyMCE.startContent = tinyMCE.getContent({format: "raw", no_events: 1});
-        tinyMCE.isNotDirty = true
-        @showingVisualEditor = true
+        @showVisualEditor(visualEditor)
       else
-        tinyMCE.hide()
+        visualEditor.hide()
         @tiny_mce_textarea.hide()
-        $(@advanced_editor.getWrapperElement()).show()
-        if tinyMCE.isDirty()
-          console.log('was dirty! setting text')
-          @advanced_editor.setValue(tinyMCE.getContent({no_events: 1}))
-          @advanced_editor.setCursor(0)
-        @advanced_editor.refresh()
-        @advanced_editor.focus()
-        @showingVisualEditor = false
+        @showAdvancedEditor(visualEditor)
+
+  # Show the Advanced (codemirror) Editor. Pulled out as a helper method for unit testing.
+  showAdvancedEditor: (visualEditor) ->
+    $(@advanced_editor.getWrapperElement()).show()
+    if visualEditor.isDirty()
+      @advanced_editor.setValue(visualEditor.getContent({no_events: 1}))
+      @advanced_editor.setCursor(0)
+    @advanced_editor.refresh()
+    @advanced_editor.focus()
+    @showingVisualEditor = false
+
+  # Show the Visual (tinyMCE) Editor. Pulled out as a helper method for unit testing.
+  showVisualEditor: (visualEditor) ->
+    visualEditor.show()
+    visualEditor.setContent(@advanced_editor.getValue())
+    # In order for isDirty() to return true ONLY if edits have been made after setting the text,
+    # both the startContent must be sync'ed up and the dirty flag set to false.
+    visualEditor.startContent = visualEditor.getContent({format: "raw", no_events: 1});
+    visualEditor.isNotDirty = true
+    @focusVisualEditor(visualEditor)
+    @showingVisualEditor = true
+
+  focusVisualEditor: (visualEditor) ->
+    visualEditor.focus()
 
   getVisualEditor: ->
     ###
@@ -69,10 +83,7 @@ class @HTMLEditingDescriptor
   save: ->
     @element.off('click', '.editor-tabs .tab', @onSwitchEditor)
     text = @advanced_editor.getValue()
-    tinyMCE = @getVisualEditor()
-    if @showingVisualEditor and tinyMCE.isDirty()
-      console.log('persist from visual editor')
-      text = tinyMCE.getContent({no_events: 1})
-    else
-      console.log('persist from HTML editor')
+    visualEditor = @getVisualEditor()
+    if @showingVisualEditor and visualEditor.isDirty()
+      text = visualEditor.getContent({no_events: 1})
     data: text
