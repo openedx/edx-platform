@@ -19,9 +19,13 @@ from mitxmako.shortcuts import render_to_response
 from django.core.urlresolvers import reverse
 
 from courseware import grades
-from courseware.access import has_access, get_access_group_name
-from courseware.courses import get_course_with_access 
-from django_comment_client.models import Role, FORUM_ROLE_ADMINISTRATOR, FORUM_ROLE_MODERATOR, FORUM_ROLE_COMMUNITY_TA
+from courseware.access import (has_access, get_access_group_name,
+                               course_beta_test_group_name)
+from courseware.courses import get_course_with_access
+from django_comment_client.models import (Role,
+                                          FORUM_ROLE_ADMINISTRATOR,
+                                          FORUM_ROLE_MODERATOR,
+                                          FORUM_ROLE_COMMUNITY_TA)
 from django_comment_client.utils import has_forum_access
 from psychometrics import psychoanalyze
 from student.models import CourseEnrollment, CourseEnrollmentAllowed
@@ -44,13 +48,12 @@ FORUM_ROLE_REMOVE = 'remove'
 
 @ensure_csrf_cookie
 @cache_control(no_cache=True, no_store=True, must_revalidate=True)
-
 def instructor_dashboard(request, course_id):
     """Display the instructor dashboard for a course."""
     course = get_course_with_access(request.user, course_id, 'staff')
 
     instructor_access = has_access(request.user, course, 'instructor')   # an instructor can manage staff lists
-    
+
     forum_admin_access = has_forum_access(request.user, course_id, FORUM_ROLE_ADMINISTRATOR)
 
     msg = ''
@@ -105,6 +108,16 @@ def instructor_dashboard(request, course_id):
         except Group.DoesNotExist:
             group = Group(name=grpname)     # create the group
             group.save()
+
+    def get_beta_group(course):
+        """
+        Get the group for beta testers of course.
+        """
+        # Not using get_group because there is no access control action called
+        # 'beta', so adding it to get_access_group_name doesn't really make
+        # sense.
+        name = course_beta_test_group_name(course.location)
+        (group, created) = Group.objects.get_or_create(name=name)
         return group
 
     # process actions from form POST
@@ -311,25 +324,63 @@ def instructor_dashboard(request, course_id):
             track.views.server_track(request, 'remove-instructor {0}'.format(user), {}, page='idashboard')
 
     #----------------------------------------
+    # Group management
+
+    elif 'List beta testers' in action:
+        group = get_beta_group(course)
+        msg += 'Beta test group = {0}'.format(group.name)
+        datatable = _group_members_table(group, "List of beta_testers", course_id)
+        track.views.server_track(request, 'list-beta-testers', {}, page='idashboard')
+
+    elif action == 'Add beta testers':
+        uname = request.POST['betausers']
+        try:
+            user = User.objects.get(username=uname)
+        except User.DoesNotExist:
+            msg += '<font color="red">Error: unknown username "{0}"</font>'.format(uname)
+            user = None
+        if user is not None:
+            group = get_beta_group(course)
+            msg += '<font color="green">Added {0} to beta testers group = {1}</font>'.format(user, group.name)
+            log.debug('staffgrp={0}'.format(group.name))
+            user.groups.add(group)
+            track.views.server_track(request, 'add-beta-tester {0}'.format(user), {}, page='idashboard')
+
+    elif action == 'Remove beta testers':
+        uname = request.POST['betausers']
+        try:
+            user = User.objects.get(username=uname)
+        except User.DoesNotExist:
+            msg += '<font color="red">Error: unknown username "{0}"</font>'.format(uname)
+            user = None
+        if user is not None:
+            group = get_beta_group(course)
+            msg += '<font color="green">Removed {0} from beta tester group = {1}</font>'.format(user, group.name)
+            log.debug('staffgrp={0}'.format(group.name))
+            user.groups.remove(group)
+            track.views.server_track(request, 'remove-beta-tester {0}'.format(user), {}, page='idashboard')
+
+
+    #----------------------------------------
     # forum administration
-  
+
     elif action == 'List course forum admins':
         rolename = FORUM_ROLE_ADMINISTRATOR
         datatable = {}
         msg += _list_course_forum_members(course_id, rolename, datatable)
         track.views.server_track(request, 'list-{0}'.format(rolename), {}, page='idashboard')
-        
-    
+
+
     elif action == 'Remove forum admin':
         uname = request.POST['forumadmin']
         msg += _update_forum_role_membership(uname, course, FORUM_ROLE_ADMINISTRATOR, FORUM_ROLE_REMOVE)
-        track.views.server_track(request, '{0} {1} as {2} for {3}'.format(FORUM_ROLE_REMOVE, uname, FORUM_ROLE_ADMINISTRATOR, course_id), 
+        track.views.server_track(request, '{0} {1} as {2} for {3}'.format(FORUM_ROLE_REMOVE, uname, FORUM_ROLE_ADMINISTRATOR, course_id),
                                  {}, page='idashboard')
 
     elif action == 'Add forum admin':
         uname = request.POST['forumadmin']
         msg += _update_forum_role_membership(uname, course, FORUM_ROLE_ADMINISTRATOR, FORUM_ROLE_ADD)
-        track.views.server_track(request, '{0} {1} as {2} for {3}'.format(FORUM_ROLE_ADD, uname, FORUM_ROLE_ADMINISTRATOR, course_id), 
+        track.views.server_track(request, '{0} {1} as {2} for {3}'.format(FORUM_ROLE_ADD, uname, FORUM_ROLE_ADMINISTRATOR, course_id),
                                  {}, page='idashboard')
 
     elif action == 'List course forum moderators':
@@ -337,35 +388,35 @@ def instructor_dashboard(request, course_id):
         datatable = {}
         msg += _list_course_forum_members(course_id, rolename, datatable)
         track.views.server_track(request, 'list-{0}'.format(rolename), {}, page='idashboard')
-    
+
     elif action == 'Remove forum moderator':
         uname = request.POST['forummoderator']
         msg += _update_forum_role_membership(uname, course, FORUM_ROLE_MODERATOR, FORUM_ROLE_REMOVE)
-        track.views.server_track(request, '{0} {1} as {2} for {3}'.format(FORUM_ROLE_REMOVE, uname, FORUM_ROLE_MODERATOR, course_id), 
+        track.views.server_track(request, '{0} {1} as {2} for {3}'.format(FORUM_ROLE_REMOVE, uname, FORUM_ROLE_MODERATOR, course_id),
                                  {}, page='idashboard')
-    
+
     elif action == 'Add forum moderator':
         uname = request.POST['forummoderator']
         msg += _update_forum_role_membership(uname, course, FORUM_ROLE_MODERATOR, FORUM_ROLE_ADD)
-        track.views.server_track(request, '{0} {1} as {2} for {3}'.format(FORUM_ROLE_ADD, uname, FORUM_ROLE_MODERATOR, course_id), 
+        track.views.server_track(request, '{0} {1} as {2} for {3}'.format(FORUM_ROLE_ADD, uname, FORUM_ROLE_MODERATOR, course_id),
                                  {}, page='idashboard')
-    
+
     elif action == 'List course forum community TAs':
         rolename = FORUM_ROLE_COMMUNITY_TA
         datatable = {}
         msg += _list_course_forum_members(course_id, rolename, datatable)
         track.views.server_track(request, 'list-{0}'.format(rolename), {}, page='idashboard')
-    
+
     elif action == 'Remove forum community TA':
         uname = request.POST['forummoderator']
         msg += _update_forum_role_membership(uname, course, FORUM_ROLE_COMMUNITY_TA, FORUM_ROLE_REMOVE)
-        track.views.server_track(request, '{0} {1} as {2} for {3}'.format(FORUM_ROLE_REMOVE, uname, FORUM_ROLE_COMMUNITY_TA, course_id), 
+        track.views.server_track(request, '{0} {1} as {2} for {3}'.format(FORUM_ROLE_REMOVE, uname, FORUM_ROLE_COMMUNITY_TA, course_id),
                                  {}, page='idashboard')
-    
+
     elif action == 'Add forum community TA':
         uname = request.POST['forummoderator']
         msg += _update_forum_role_membership(uname, course, FORUM_ROLE_COMMUNITY_TA, FORUM_ROLE_ADD)
-        track.views.server_track(request, '{0} {1} as {2} for {3}'.format(FORUM_ROLE_ADD, uname, FORUM_ROLE_COMMUNITY_TA, course_id), 
+        track.views.server_track(request, '{0} {1} as {2} for {3}'.format(FORUM_ROLE_ADD, uname, FORUM_ROLE_COMMUNITY_TA, course_id),
                                  {}, page='idashboard')
 
     #----------------------------------------
@@ -418,7 +469,7 @@ def instructor_dashboard(request, course_id):
         msg2, datatable = _do_remote_gradebook(request.user, course, 'get-sections')
         msg += msg2
 
-    elif action in ['List students in section in remote gradebook', 
+    elif action in ['List students in section in remote gradebook',
                     'Overload enrollment list using remote gradebook',
                     'Merge enrollment list with remote gradebook']:
 
@@ -431,7 +482,7 @@ def instructor_dashboard(request, course_id):
             overload = 'Overload' in action
             ret = _do_enroll_students(course, course_id, students, overload=overload)
             datatable = ret['datatable']
-        
+
 
     #----------------------------------------
     # psychometrics
@@ -448,7 +499,7 @@ def instructor_dashboard(request, course_id):
 
     #----------------------------------------
     # offline grades?
-    
+
     if use_offline:
         msg += "<br/><font color='orange'>Grades from %s</font>" % offline_grades_available(course_id)
 
@@ -482,17 +533,17 @@ def _do_remote_gradebook(user, course, action, args=None, files=None):
     if not rg:
         msg = "No remote gradebook defined in course metadata"
         return msg, {}
-    
+
     rgurl = settings.MITX_FEATURES.get('REMOTE_GRADEBOOK_URL','')
     if not rgurl:
         msg = "No remote gradebook url defined in settings.MITX_FEATURES"
         return msg, {}
-    
+
     rgname = rg.get('name','')
     if not rgname:
         msg = "No gradebook name defined in course remote_gradebook metadata"
         return msg, {}
-    
+
     if args is None:
         args = {}
     data = dict(submit=action, gradebook=rgname, user=user.email)
@@ -522,15 +573,15 @@ def _do_remote_gradebook(user, course, action, args=None, files=None):
     return msg, datatable
 
 def _list_course_forum_members(course_id, rolename, datatable):
-    ''' 
+    """
     Fills in datatable with forum membership information, for a given role,
     so that it will be displayed on instructor dashboard.
-    
+
       course_ID = the ID string for a course
       rolename = one of "Administrator", "Moderator", "Community TA"
-    
+
     Returns message status string to append to displayed message, if role is unknown.
-    '''
+    """
     # make sure datatable is set up properly for display first, before checking for errors
     datatable['header'] = ['Username', 'Full name', 'Roles']
     datatable['title'] = 'List of Forum {0}s in course {1}'.format(rolename, course_id)
@@ -549,13 +600,13 @@ def _list_course_forum_members(course_id, rolename, datatable):
 def _update_forum_role_membership(uname, course, rolename, add_or_remove):
     '''
     Supports adding a user to a course's forum role
-    
+
       uname = username string for user
-      course = course object 
+      course = course object
       rolename = one of "Administrator", "Moderator", "Community TA"
       add_or_remove = one of "add" or "remove"
-      
-    Returns message status string to append to displayed message,  Status is returned if user 
+
+    Returns message status string to append to displayed message,  Status is returned if user
     or role is unknown, or if entry already exists when adding, or if entry doesn't exist when removing.
     '''
     # check that username and rolename are valid:
@@ -575,21 +626,42 @@ def _update_forum_role_membership(uname, course, rolename, add_or_remove):
     if add_or_remove == FORUM_ROLE_REMOVE:
         if not alreadyexists:
             msg ='<font color="red">Error: user "{0}" does not have rolename "{1}", cannot remove</font>'.format(uname, rolename)
-        else: 
+        else:
             user.roles.remove(role)
             msg = '<font color="green">Removed "{0}" from "{1}" forum role = "{2}"</font>'.format(user, course.id, rolename)
     else:
         if alreadyexists:
             msg = '<font color="red">Error: user "{0}" already has rolename "{1}", cannot add</font>'.format(uname, rolename)
-        else: 
-            if (rolename == FORUM_ROLE_ADMINISTRATOR and not has_access(user, course, 'staff')):   
+        else:
+            if (rolename == FORUM_ROLE_ADMINISTRATOR and not has_access(user, course, 'staff')):
                 msg = '<font color="red">Error: user "{0}" should first be added as staff before adding as a forum administrator, cannot add</font>'.format(uname)
             else:
                 user.roles.add(role)
                 msg = '<font color="green">Added "{0}" to "{1}" forum role = "{2}"</font>'.format(user, course.id, rolename)
 
     return msg
-    
+
+def _group_members_table(group, title, course_id):
+    """
+    Return a data table of usernames and names of users in group_name.
+
+    Arguments:
+        group -- a django group.
+        title -- a descriptive title to show the user
+
+    Returns:
+        a dictionary with keys
+        'header': ['Username', 'Full name'],
+        'data': [[username, name] for all users]
+        'title': "{title} in course {course}"
+    """
+    uset = group.user_set.all()
+    datatable = {'header': ['Username', 'Full name']}
+    datatable['data'] = [[x.username, x.profile.name] for x in uset]
+    datatable['title'] = '{0} in course {1}'.format(title, course_id)
+    return datatable
+
+
 
 def get_student_grade_summary_data(request, course, course_id, get_grades=True, get_raw_scores=False, use_offline=False):
     '''
@@ -750,7 +822,7 @@ def _do_enroll_students(course, course_id, students, overload=False):
 
     def sf(stat): return [x for x in status if status[x]==stat]
 
-    data = dict(added=sf('added'), rejected=sf('rejected')+sf('exists'), 
+    data = dict(added=sf('added'), rejected=sf('rejected')+sf('exists'),
                 deleted=sf('deleted'), datatable=datatable)
 
     return data

@@ -329,7 +329,7 @@ def _course_staff_group_name(location):
     """
     return 'staff_%s' % Location(location).course
 
-def _course_beta_test_group_name(location):
+def course_beta_test_group_name(location):
     """
     Get the name of the beta tester group for a location.  Right now, that's
     beta_testers_COURSE.
@@ -388,7 +388,7 @@ def _adjust_start_date_for_beta_testers(user, descriptor):
 
     user_groups = [g.name for g in user.groups.all()]
 
-    beta_group = _course_beta_test_group_name(descriptor.location)
+    beta_group = course_beta_test_group_name(descriptor.location)
     if beta_group in user_groups:
         debug("Adjust start time: user in group %s", beta_group)
         # time_structs don't support subtraction, so convert to datetimes,

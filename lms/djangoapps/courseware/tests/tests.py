@@ -18,7 +18,7 @@ import xmodule.modulestore.django
 # Need access to internal func to put users in the right group
 from courseware import grades
 from courseware.access import (has_access, _course_staff_group_name,
-                               _course_beta_test_group_name)
+                               course_beta_test_group_name)
 from courseware.models import StudentModuleCache
 
 from student.models import Registration
@@ -645,7 +645,7 @@ class TestViewAuth(PageLoader):
         self.assertFalse(has_access(student_user, self.toy, 'load'))
 
         # now add the student to the beta test group
-        group_name = _course_beta_test_group_name(self.toy.location)
+        group_name = course_beta_test_group_name(self.toy.location)
         g = Group.objects.create(name=group_name)
         g.user_set.add(student_user)
 
