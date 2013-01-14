@@ -474,11 +474,11 @@ class XMLModuleStore(ModuleStoreBase):
                         if category == "static_tab":
                             for tab in course_descriptor.tabs or []:
                                 if tab.get('url_slug') == slug:
-                                    module.metadata['display_name'] = tab['name']            
+                                    module.metadata['display_name'] = tab['name']
                         module.metadata['data_dir'] = course_dir
-                        self.modules[course_descriptor.id][module.location] = module   
+                        self.modules[course_descriptor.id][module.location] = module
                     except Exception, e:
-                        logging.exception("Failed to load {0}. Skipping... Exception: {1}".format(filepath, str(e)))   
+                        logging.exception("Failed to load {0}. Skipping... Exception: {1}".format(filepath, str(e)))
                         system.error_tracker("ERROR: " + str(e))
 
     def get_instance(self, course_id, location, depth=0):
