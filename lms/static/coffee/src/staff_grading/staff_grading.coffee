@@ -227,6 +227,7 @@ class StaffGrading
       if score == undefined
         return
     # show button if we have scores for all categories
+    @state = state_graded
     @submit_button.show()
       
 
@@ -243,7 +244,7 @@ class StaffGrading
     # get the score for each one
     for i in [0..(num_categories-1)]
       score = $("input[name='score-selection-#{i}']:checked").val()
-      score_lst.append(score)
+      score_lst.push(score)
 
     return score_lst
 
@@ -431,7 +432,7 @@ class StaffGrading
   
 
 # for now, just create an instance and load it...
-mock_backend = true
+mock_backend = false
 ajax_url = $('.staff-grading').data('ajax_url')
 backend = new StaffGradingBackend(ajax_url, mock_backend)
 
