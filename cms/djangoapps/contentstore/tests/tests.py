@@ -351,10 +351,18 @@ class ContentStoreTest(TestCase):
         self.check_edit_unit('full')
 
     def test_about_overrides(self):
+        '''
+        This test case verifies that a course can use specialized override for about data, e.g. /about/Fall_2012/effort.html 
+        while there is a base definition in /about/effort.html
+        '''
         import_from_xml(modulestore(), 'common/test/data/', ['full'])
         ms = modulestore('direct')
         effort = ms.get_item(Location(['i4x','edX','full','about','effort', None]))
         self.assertEqual(effort.definition['data'],'6 hours')
+
+        # this one should be in a non-override folder
+        effort = ms.get_item(Location(['i4x','edX','full','about','end_date', None]))
+        self.assertEqual(effort.definition['data'],'TBD')
 
 
     def test_clone_course(self):
