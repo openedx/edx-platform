@@ -796,6 +796,7 @@ class RubricInput(InputTypeBase):
     submitted_msg = ("Feedback not yet available.  Reload to check again. "
                      "Once the problem is graded, this message will be "
                      "replaced with the grader's feedback.")
+    has_score = False
 
     @classmethod
     def get_attributes(cls):
@@ -811,14 +812,14 @@ class RubricInput(InputTypeBase):
         Add in the various bits and pieces that we need
         """
         return {'categories': self.categories,
-                'view_only': False}
+                'view_only': False,
+                'has_score': self.has_score}
 
     def setup(self):
         # set the categories
         self.categories = self.extract_categories(self.xml)
 
-    @staticmethod
-    def extract_categories(element):
+    def extract_categories(self, element):
         '''
         Contstruct a list of categories such that the structure looks like:
         [ { category: "Category 1 Name",
@@ -835,12 +836,11 @@ class RubricInput(InputTypeBase):
             if category.tag != 'category':
                 raise Exception("[capa.inputtypes.extract_categories] Expected a <category> tag: got {0} instead".format(category.tag))
             else:
-                categories.append(RubricInput.extract_category(category))
+                categories.append(self.extract_category(category))
         return categories
 
 
-    @staticmethod
-    def extract_category(category):
+    def extract_category(self, category):
         ''' 
         construct an individual category
         {category: "Category 1 Name",
@@ -851,6 +851,17 @@ class RubricInput(InputTypeBase):
         '''
         descriptionxml = category[0]
         optionsxml = category[1:]
+        scorexml = category[1]
+        score = None
+        if scorexml.tag == 'score':
+            score_text = scorexml.text
+            optionsxml = category[2:]
+            score = int(score_text)
+            self.has_score = True
+        # if we are missing the score tag and we are expecting one
+        elif self.has_score:
+            raise Exception("[inputtypes.extract_category] Category {0} is missing a score".format(descriptionxml.text))
+
 
         # parse description
         if descriptionxml.tag != 'description':
@@ -880,8 +891,10 @@ class RubricInput(InputTypeBase):
                     cur_points = cur_points + 1
                 else:
                     raise Exception("[extract_category]: missing points attribute. Cannot continue to auto-create points values after a points value is explicitly dfined.")
+                
+                selected = score == points
                 optiontext = option.text
-                options.append({'text': option.text, 'points': points})
+                options.append({'text': option.text, 'points': points, 'selected': selected})
 
         # sort and check for duplicates
         options = sorted(options, key=lambda option: option['points'])

@@ -1,7 +1,9 @@
 <form class="rubric-template" id="inputtype_${id}">
     <h3>Rubric</h3>
-    % if view_only:
-    <p>The highlighted selection matches how the grader feels you performed in each category.</p>
+    % if view_only and has_score:
+    <p>This is the rubric that was used to grade your submission.The highlighted selection matches how the grader feels you performed in each category.</p>
+    % elif view_only:
+    <p>Use the below rubric to rate this submission.</p>
     % else:
     <p>Select the criteria you feel best represents this submission in each category.</p>
     % endif
@@ -14,10 +16,15 @@
                 <% option = category['options'][j] %>
             <td>
                 % if view_only:
-                <div class="view-only">
-                    ${option['text']}
-                    <div class="grade">[${option['points']} points]</div>
-                </div>
+                    ## if this is the selected rubric block, show it
+                    % if option['selected']:
+                        <div class="view-only selected-grade">
+                    % else:
+                        <div class="view-only">
+                    % endif
+                        ${option['text']}
+                        <div class="grade">[${option['points']} points]</div>
+                        </div>
                 % else:
                     <input type="radio" class="score-selection" name="score-selection-${i}" id="score-${i}-${j}" value="${option['points']}"/>
                     <label for="score-${i}-${j}">${option['text']}</label>
