@@ -1,0 +1,39 @@
+<%inherit file="/main.html" />
+<%block name="bodyclass">${course.css_class}</%block>
+<%namespace name='static' file='/static_content.html'/>
+
+<%block name="headextra">
+  <%static:css group='course'/>
+</%block>
+
+<%block name="title"><title>${course.number} Peer Grading</title></%block>
+
+<%include file="/courseware/course_navigation.html" args="active_page='staff_grading'" />
+
+<%block name="js_extra">
+  <%static:js group='peer_grading'/>
+</%block>
+
+<section class="container">
+    <div class="peer-grading" data-ajax_url="${ajax_url}">
+        <div class="error-container">${error_text}</div>
+        <h1>Peer Grading</h1>
+        <h2>Instructions</h2>
+        <p>Here are a list of problems that need to be peer graded for this course.</p>
+        % if success:
+            % if len(problem_list) == 0:
+            <div class="message-container">
+                Nothing to grade!
+            </div>
+            %else:
+                <ul class="problem-list">
+                %for problem in problem_list:
+                    <li>
+                    <a href="${ajax_url}problem?location=${problem['location']}">${problem['problem_name']} (${problem['num_graded']} graded, ${problem['num_pending']} pending)</a>
+                    </li>
+                %endfor
+                </ul>
+            %endif
+        %endif
+    </div>
+</section>

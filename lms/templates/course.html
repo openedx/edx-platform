@@ -5,7 +5,7 @@
 %>
 <%page args="course" />
 <article id="${course.id}" class="course">
-  %if course.metadata.get('is_new'):
+  %if course.is_new:
     <span class="status">New</span>
   %endif
   <a href="${reverse('about_course', args=[course.id])}">

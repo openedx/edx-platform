@@ -4,6 +4,8 @@
         %if markdown != '' or data == '<problem>\n</problem>\n':
         <div class="editor-bar">
             <ul class="format-buttons">
+                <li><a href="#" class="header-button" data-tooltip="Header"><span
+                        class="problem-editor-icon header"></span></a></li>
                 <li><a href="#" class="multiple-choice-button" data-tooltip="Multiple Choice"><span
                         class="problem-editor-icon multiple-choice"></span></a></li>
                 <li><a href="#" class="checks-button" data-tooltip="Check Multiple"><span
@@ -14,13 +16,11 @@
                         class="problem-editor-icon number"></span></a></li>
                 <li><a href="#" class="dropdown-button" data-tooltip="Option Response"><span
                         class="problem-editor-icon dropdown"></span></a></li>
-                <li><a href="#" class="header-button" data-tooltip="Header"><span
-                        class="problem-editor-icon dropdown"></span></a></li>
-                <li><a href="#" class="explanation-button" data-tooltip="Explanation (aka Solution)"><span
-                        class="problem-editor-icon dropdown"></span></a></li>
+                <li><a href="#" class="explanation-button" data-tooltip="Explanation"><span
+                        class="problem-editor-icon explanation"></span></a></li>
             </ul>
             <ul class="editor-tabs">
-                <li><a href="#" class="xml-tab tab advanced-toggle" data-tab="xml">Advanced Editor</a></li>
+                <li><a href="#" class="xml-tab advanced-toggle" data-tab="xml">Advanced Editor</a></li>
                 <li><a href="#" class="cheatsheet-toggle" data-tooltip="Toggle Cheatsheet">?</a></li>
             </ul>
         </div>
@@ -35,7 +35,7 @@
         <div class="cheatsheet-wrapper">
             <div class="row">
                 <h6>Header</h6>
-                <div class="col sample">
+                <div class="col sample header">
                     <img src="/static/img/header-example.png" />
                 </div>
                 <div class="col">
@@ -46,7 +46,7 @@
             </div>
             <div class="row">
                 <h6>Multiple Choice</h6>
-                <div class="col sample">
+                <div class="col sample multiple-choice">
                     <img src="/static/img/choice-example.png" />
                 </div>
                 <div class="col">
@@ -57,7 +57,7 @@
             </div>
             <div class="row">
                 <h6>Check Multiple</h6>
-                <div class="col sample">
+                <div class="col sample check-multiple">
                     <img src="/static/img/multi-example.png" />
                 </div>
                 <div class="col">
@@ -68,7 +68,7 @@
             </div>
             <div class="row">
                 <h6>String Response</h6>
-                <div class="col sample">
+                <div class="col sample string-response">
                     <img src="/static/img/string-example.png" />
                 </div>
                 <div class="col">
@@ -77,7 +77,7 @@
             </div>
             <div class="row">
                 <h6>Numerical Response</h6>
-                <div class="col sample">
+                <div class="col sample numerical-response">
                     <img src="/static/img/number-example.png" />
                 </div>
                 <div class="col">
@@ -86,7 +86,7 @@
             </div>
             <div class="row">
                 <h6>Option Response</h6>
-                <div class="col sample">
+                <div class="col sample option-reponse">
                     <img src="/static/img/select-example.png" />
                 </div>
                 <div class="col">
@@ -95,14 +95,11 @@
             </div>
             <div class="row">
                 <h6>Explanation</h6>
-                <div class="col sample">
+                <div class="col sample explanation">
                     <img src="/static/img/explanation-example.png" />
                 </div>
                 <div class="col">
-<pre><code>[explanation]
-A short explanation of the answer.
-[explanation]
-</code></pre>
+                    <pre><code>[explanation] A short explanation of the answer. [explanation]</code></pre>
                 </div>
             </div>
         </div>

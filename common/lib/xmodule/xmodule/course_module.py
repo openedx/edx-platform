@@ -1,11 +1,16 @@
+import logging
 from cStringIO import StringIO
 from lxml import etree
-from path import path # NOTE (THK): Only used for detecting presence of syllabus
-from xmodule.graders import grader_from_conf
+from path import path  # NOTE (THK): Only used for detecting presence of syllabus
+import requests
+import time
+from datetime import datetime
+
 from xmodule.modulestore import Location
 from xmodule.seq_module import SequenceDescriptor, SequenceModule
 from xmodule.timeparse import parse_time, stringify_time
 from xmodule.util.decorators import lazyproperty
+from xmodule.graders import grader_from_conf
 from datetime import datetime
 import json
 import logging
@@ -16,10 +21,12 @@ import copy
 
 log = logging.getLogger(__name__)
 
+
 edx_xml_parser = etree.XMLParser(dtd_validation=False, load_dtd=False,
                                  remove_comments=True, remove_blank_text=True)
 
 _cached_toc = {}
+
 
 class CourseDescriptor(SequenceDescriptor):
     module_class = SequenceModule
@@ -334,6 +341,38 @@ class CourseDescriptor(SequenceDescriptor):
     def show_calculator(self):
         return self.metadata.get("show_calculator", None) == "Yes"
 
+    @property
+    def is_new(self):
+        # The course is "new" if either if the metadata flag is_new is
+        # true or if the course has not started yet
+        flag = self.metadata.get('is_new', None)
+        if flag is None:
+            return self.days_until_start > 1
+        elif isinstance(flag, basestring):
+            return flag.lower() in ['true', 'yes', 'y']
+        else:
+            return bool(flag)
+
+    @property
+    def days_until_start(self):
+        def convert_to_datetime(timestamp):
+            return datetime.fromtimestamp(time.mktime(timestamp))
+
+        start_date = convert_to_datetime(self.start)
+
+        #  Try to use course advertised date if we can parse it
+        advertised_start = self.metadata.get('advertised_start', None)
+        if advertised_start:
+            try:
+                start_date = datetime.strptime(advertised_start,
+                                               "%Y-%m-%dT%H:%M")
+            except ValueError:
+                pass  # Invalid date, keep using 'start''
+
+        now = convert_to_datetime(time.gmtime())
+        days_until_start = (start_date - now).days
+        return days_until_start
+
     @lazyproperty
     def grading_context(self):
         """
@@ -413,7 +452,6 @@ class CourseDescriptor(SequenceDescriptor):
             raise ValueError("{0} is not a course location".format(loc))
         return "/".join([loc.org, loc.course, loc.name])
 
-
     @property
     def id(self):
         """Return the course_id for this course"""
@@ -427,7 +465,7 @@ class CourseDescriptor(SequenceDescriptor):
         # form text...
         if parsed_advertised_start is None and \
            ('advertised_start' in self.metadata):
-           return self.metadata['advertised_start']
+            return self.metadata['advertised_start']
 
         displayed_start = parsed_advertised_start or self.start
 
@@ -510,6 +548,4 @@ class CourseDescriptor(SequenceDescriptor):
     @property
     def org(self):
         return self.location.org
-
-
 
