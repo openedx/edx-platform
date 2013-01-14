@@ -3,6 +3,8 @@
 set -e
 set -x
 
+git remote prune origin
+
 # Reset the submodule, in case it changed
 git submodule foreach 'git reset --hard HEAD'
 

@@ -15,6 +15,8 @@ function github_mark_failed_on_exit {
     trap '[ $? == "0" ] || github_status state:failure "failed"' EXIT
 }
 
+git remote prune origin
+
 github_mark_failed_on_exit
 github_status state:pending "is running"
 
