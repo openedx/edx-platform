@@ -262,16 +262,16 @@ def _get_next(course_id, grader_id, location):
     try:
         response = staff_grading_service().get_next(course_id, location, grader_id)
         response_json = json.loads(response)
-        rubric = response_json['rubric']
-        rubric_renderer = CombinedOpenEndedRubric(False)
-        success, rubric_html = rubric_renderer.render_rubric(rubric)
-        if not success:
-            error_message = "Could not render rubric: {0}".format(rubric)
-            log.exception(error_message)
-            return json.dumps({'success': False,
-                               'error': error_message})
-        response_json['rubric'] = rubric_html
-        log.debug(rubric_html)
+        if response_json.has_key('rubric'):
+            rubric = response_json['rubric']
+            rubric_renderer = CombinedOpenEndedRubric(False)
+            success, rubric_html = rubric_renderer.render_rubric(rubric)
+            if not success:
+                error_message = "Could not render rubric: {0}".format(rubric)
+                log.exception(error_message)
+                return json.dumps({'success': False,
+                                   'error': error_message})
+            response_json['rubric'] = rubric_html
         return json.dumps(response_json)
     except GradingServiceError:
         log.exception("Error from grading service.  server url: {0}"
