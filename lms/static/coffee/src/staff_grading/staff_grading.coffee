@@ -219,18 +219,23 @@ class StaffGrading
 
   setup_score_selection: =>
     # first, get rid of all the old inputs, if any.
-    @grade_selection_container.html('Choose score: ')
+    @grade_selection_container.html("""
+    <h3>Overall Score</h3>
+    <p>Choose an overall score for this submission.</p>
+    """)
     # Now create new labels and inputs for each possible score.
     for score in [0..@max_score]
       id = 'score-' + score
       label = """<label for="#{id}">#{score}</label>"""
       input = """
-              <input type="radio" name="grade-selection" id="#{id}" value="#{score}"/>
+              <input type="radio" class="grade-selection" name="grade-selection" id="#{id}" value="#{score}"/>
               """  # "  fix broken parsing in emacs
       @grade_selection_container.append(input + label)
+    $('.grade-selection').click => @graded_callback()
 
     @score_selection_container.html(@rubric)
     $('.score-selection').click => @graded_callback()
+
 
   graded_callback: () =>
     @grade = $("input[name='grade-selection']:checked").val()
