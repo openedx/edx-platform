@@ -445,6 +445,7 @@ class CapaModule(XModule):
 
         return False
 
+
     def update_score(self, get):
         """
         Delivers grading response (e.g. from asynchronous code checking) to
