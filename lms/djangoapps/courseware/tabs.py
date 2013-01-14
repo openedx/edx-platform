@@ -127,10 +127,10 @@ def _peer_grading(tab, user, course, active_page):
         log.info("Problem with getting notifications from peer grading service.")
 
     if pending_grading:
-        tab_name = "Peer grading (Pending)"
-        img_path = "/static/images/unanswered-icon.png"
+        tab_name = "Peer grading"
+        img_path = "/static/images/slider-handle.png"
     else:
-        tab_name = "Peer Grading"
+        tab_name = "Peer grading"
         img_path= ""
 
     tab = [CourseTab(tab_name, link, active_page == "peer_grading", True, img_path)]
@@ -171,8 +171,8 @@ VALID_TAB_TYPES = {
     'textbooks': TabImpl(null_validator, _textbooks),
     'progress': TabImpl(need_name, _progress),
     'static_tab': TabImpl(key_checker(['name', 'url_slug']), _static_tab),
-    'staff_grading': TabImpl(null_validator, _staff_grading),
     'peer_grading': TabImpl(null_validator, _peer_grading),
+    'staff_grading': TabImpl(null_validator, _staff_grading),
     }
 
 
