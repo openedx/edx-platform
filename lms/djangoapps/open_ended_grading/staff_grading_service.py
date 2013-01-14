@@ -271,6 +271,7 @@ def _get_next(course_id, grader_id, location):
             return json.dumps({'success': False,
                                'error': error_message})
         response_json['rubric'] = rubric_html
+        log.debug(rubric_html)
         return json.dumps(response_json)
     except GradingServiceError:
         log.exception("Error from grading service.  server url: {0}"
