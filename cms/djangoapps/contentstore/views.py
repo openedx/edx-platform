@@ -753,8 +753,7 @@ def upload_asset(request, org, course, coursename):
     # nomenclature since we're using a FileSystem paradigm here. We're just imposing
     # the Location string formatting expectations to keep things a bit more consistent
 
-    # unicode needed for cache equivalency
-    filename = unicode(request.FILES['file'].name)
+    filename = request.FILES['file'].name
     mime_type = request.FILES['file'].content_type
     filedata = request.FILES['file'].read()
 

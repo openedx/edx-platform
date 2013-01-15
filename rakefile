@@ -120,7 +120,7 @@ default_options = {
 }
 
 task :predjango do
-    sh("find . -type f -name *.pyc -delete")
+    sh("find . -type f -name '*.pyc' -delete")
     sh('pip install -q --upgrade --no-deps -r local-requirements.txt')
 end
 
