@@ -248,7 +248,7 @@ class PeerGradingProblem
   construct_data: () ->
     data =
       rubric_scores: @get_score_list()
-      score: @score
+      score: @grade
       location: @location
       submission_id: @essay_id_input.val()
       submission_key: @submission_key_input.val()
