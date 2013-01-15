@@ -120,8 +120,6 @@ def _peer_grading(tab, user, course, active_page):
         img_path= ""
         try:
             notifications = json.loads(peer_gs.get_notifications(course.id,unique_id_for_user(user)))
-            log.debug(notifications)
-
             if notifications['success']:
                 if notifications['student_needs_to_peer_grade']:
                     pending_grading=True
