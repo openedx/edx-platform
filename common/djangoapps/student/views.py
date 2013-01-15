@@ -610,7 +610,7 @@ def exam_registration_info(user, course):
     
 @login_required
 @ensure_csrf_cookie
-def begin_test_registration(request, course_id):
+def begin_exam_registration(request, course_id):
     """ Handles request to register the user for the current
     test center exam of the specified course.  Called by form
     in dashboard.html.
@@ -649,7 +649,7 @@ def begin_test_registration(request, course_id):
     return render_to_response('test_center_register.html', context)
 
 @ensure_csrf_cookie
-def create_test_registration(request, post_override=None):
+def create_exam_registration(request, post_override=None):
     '''
     JSON call to create a test center exam registration.
     Called by form in test_center_register.html
@@ -662,19 +662,19 @@ def create_test_registration(request, post_override=None):
     user = User.objects.get(username=username)
     course_id = post_vars['course_id']
     course = (course_from_id(course_id))  # assume it will be found....
-    log.info("User {0} enrolled in course {1} clicked on enter/update demographic info for test registration".format(user.username, course_id))
         
     try:
         testcenter_user = TestCenterUser.objects.get(user=user)
-        needs_updating = testcenter_user.needs_update(post_vars)    
+        needs_updating = testcenter_user.needs_update(post_vars) 
+        log.info("User {0} enrolled in course {1} {2}updating demographic info for exam registration".format(user.username, course_id, "" if needs_updating else "not "))
     except TestCenterUser.DoesNotExist:
         # do additional initialization here:
         testcenter_user = TestCenterUser.create(user)
         needs_updating = True
+        log.info("User {0} enrolled in course {1} creating demographic info for exam registration".format(user.username, course_id))
 
     # perform validation:
     if needs_updating:
-        log.info("User {0} enrolled in course {1} updating demographic info for test registration".format(user.username, course_id))
         # first perform validation on the user information 
         # using a Django Form.
         form = TestCenterUserForm(instance=testcenter_user, data=post_vars)
@@ -706,6 +706,7 @@ def create_test_registration(request, post_override=None):
         accommodation_request = post_vars.get('accommodation_request','')
         registration = TestCenterRegistration.create(testcenter_user, exam, accommodation_request)
         needs_saving = True
+        log.info("User {0} enrolled in course {1} creating new exam registration".format(user.username, course_id))
 
     if needs_saving:
         # do validation of registration.  (Mainly whether an accommodation request is too long.)        
