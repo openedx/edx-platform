@@ -610,7 +610,7 @@ def exam_registration_info(user, course):
     
 @login_required
 @ensure_csrf_cookie
-def begin_test_registration(request, course_id):
+def begin_exam_registration(request, course_id):
     """ Handles request to register the user for the current
     test center exam of the specified course.  Called by form
     in dashboard.html.
@@ -649,7 +649,7 @@ def begin_test_registration(request, course_id):
     return render_to_response('test_center_register.html', context)
 
 @ensure_csrf_cookie
-def create_test_registration(request, post_override=None):
+def create_exam_registration(request, post_override=None):
     '''
     JSON call to create a test center exam registration.
     Called by form in test_center_register.html
@@ -662,19 +662,19 @@ def create_test_registration(request, post_override=None):
     user = User.objects.get(username=username)
     course_id = post_vars['course_id']
     course = (course_from_id(course_id))  # assume it will be found....
-    log.info("User {0} enrolled in course {1} clicked on enter/update demographic info for test registration".format(user.username, course_id))
         
     try:
         testcenter_user = TestCenterUser.objects.get(user=user)
-        needs_updating = testcenter_user.needs_update(post_vars)    
+        needs_updating = testcenter_user.needs_update(post_vars) 
+        log.info("User {0} enrolled in course {1} {2}updating demographic info for exam registration".format(user.username, course_id, "" if needs_updating else "not "))
     except TestCenterUser.DoesNotExist:
         # do additional initialization here:
         testcenter_user = TestCenterUser.create(user)
         needs_updating = True
+        log.info("User {0} enrolled in course {1} creating demographic info for exam registration".format(user.username, course_id))
 
     # perform validation:
     if needs_updating:
-        log.info("User {0} enrolled in course {1} updating demographic info for test registration".format(user.username, course_id))
         # first perform validation on the user information 
         # using a Django Form.
         form = TestCenterUserForm(instance=testcenter_user, data=post_vars)
@@ -694,15 +694,19 @@ def create_test_registration(request, post_override=None):
     registrations = get_testcenter_registration(user, course_id, exam_code)
     if len(registrations) > 0:
         registration = registrations[0]
-        # TODO: check to see if registration changed.  Should check appointment dates too...
-        # And later should check changes in accommodation_code.
-        # But at the moment, we don't expect anything to cause this to change
-        # because of the registration form.
+        # NOTE: we do not bother to check here to see if the registration has changed,
+        # because at the moment there is no way for a user to change anything about their
+        # registration.  They only provide an optional accommodation request once, and 
+        # cannot make changes to it thereafter.
+        # It is possible that the exam_info content has been changed, such as the
+        # scheduled exam dates, but those kinds of changes should not be handled through
+        # this registration screen.   
         
     else:
         accommodation_request = post_vars.get('accommodation_request','')
         registration = TestCenterRegistration.create(testcenter_user, exam, accommodation_request)
         needs_saving = True
+        log.info("User {0} enrolled in course {1} creating new exam registration".format(user.username, course_id))
 
     if needs_saving:
         # do validation of registration.  (Mainly whether an accommodation request is too long.)        
@@ -720,27 +724,25 @@ def create_test_registration(request, post_override=None):
     # only do the following if there is accommodation text to send,
     # and a destination to which to send it.
     # TODO: still need to create the accommodation email templates
-    if 'accommodation_request' in post_vars and settings.MITX_FEATURES.get('ACCOMMODATION_EMAIL'):
-        d = {'accommodation_request': post_vars['accommodation_request'] }
-        
-        # composes accommodation email
-        subject = render_to_string('emails/accommodation_email_subject.txt', d)
-        # Email subject *must not* contain newlines
-        subject = ''.join(subject.splitlines())
-        message = render_to_string('emails/accommodation_email.txt', d)
+#    if 'accommodation_request' in post_vars and 'TESTCENTER_ACCOMMODATION_REQUEST_EMAIL' in settings:
+#        d = {'accommodation_request': post_vars['accommodation_request'] }
+#        
+#        # composes accommodation email
+#        subject = render_to_string('emails/accommodation_email_subject.txt', d)
+#        # Email subject *must not* contain newlines
+#        subject = ''.join(subject.splitlines())
+#        message = render_to_string('emails/accommodation_email.txt', d)
+#
+#        try:
+#            dest_addr = settings['TESTCENTER_ACCOMMODATION_REQUEST_EMAIL']
+#            from_addr = user.email
+#            send_mail(subject, message, from_addr, [dest_addr], fail_silently=False)
+#        except:
+#            log.exception(sys.exc_info())
+#            response_data = {'success': False}
+#            response_data['non_field_errors'] =  [ 'Could not send accommodation e-mail.', ]
+#            return HttpResponse(json.dumps(response_data), mimetype="application/json")
 
-        # skip if destination email address is not specified
-        try:
-            dest_addr = settings.MITX_FEATURES['ACCOMMODATION_EMAIL']
-            send_mail(subject, message, settings.DEFAULT_FROM_EMAIL, [dest_addr], fail_silently=False)
-        except:
-            log.exception(sys.exc_info())
-            response_data = {'success': False}
-            response_data['non_field_errors'] =  [ 'Could not send accommodation e-mail.', ]
-            return HttpResponse(json.dumps(response_data), mimetype="application/json")
-
-    # TODO: enable appropriate stat
-    # statsd.increment("common.student.account_created")
 
     js = {'success': True}
     return HttpResponse(json.dumps(js), mimetype="application/json")
