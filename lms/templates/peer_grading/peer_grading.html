@@ -29,7 +29,7 @@
                 <ul class="problem-list">
                 %for problem in problem_list:
                     <li>
-                    <a href="${ajax_url}problem?location=${problem['location']}">${problem['problem_name']} (${problem['num_graded']} graded, ${problem['num_pending']} pending)</a>
+                    <a href="${ajax_url}problem?location=${problem['location']}">${problem['problem_name']} (${problem['num_graded']} graded, ${problem['num_pending']} pending, required to grade ${problem['num_required']} more)</a>
                     </li>
                 %endfor
                 </ul>
