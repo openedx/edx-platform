@@ -63,7 +63,9 @@ define(
 
             Targets(state);
             Scroller(state);
-            Draggables(state);
+            Draggables.init(state);
+
+            logme('After Draggables.init(state); state = ', state);
 
             // Update the input element, checking first that it is not filled with
             // an answer from the server.

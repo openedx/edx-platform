@@ -120,15 +120,6 @@ define(['logme'], function (logme) {
             lowestZIndex = 10000;
 
             for (c1 = 0; c1 < draggablesInMe.length; c1 += 1) {
-                logme(
-                    'draggablesInMe[' + c1 + '].id = ' + draggablesInMe[c1].id,
-                    'draggablesInMe[' + c1 + '].zIndex = ' + draggablesInMe[c1].zIndex,
-                    'draggablesInMe[' + c1 + '].oldZIndex = ' + draggablesInMe[c1].oldZIndex
-                );
-            }
-            logme('------------------');
-
-            for (c1 = 0; c1 < draggablesInMe.length; c1 += 1) {
                 if (draggablesInMe[c1].zIndex < lowestZIndex) {
                     lowestZIndex = draggablesInMe[c1].zIndex;
                 }

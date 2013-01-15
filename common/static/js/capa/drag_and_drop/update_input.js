@@ -10,6 +10,8 @@ define(['logme'], function (logme) {
     function updateInput(state, checkFirst) {
         var inputEl, stateStr, targets, draggables, c1, c2, tempObj;
 
+        logme('updateInput; state = ', state);
+
         if (checkFirst === true) {
             if (checkIfHasAnswer() === true) {
                 return;
@@ -126,7 +128,7 @@ define(['logme'], function (logme) {
                                     return;
                                 }
 
-                                draggable.setInContainer(false);
+                                draggable.inContainer = false;
                                 draggable.containerEl.hide();
 
                                 draggable.iconEl.detach();
@@ -196,7 +198,7 @@ define(['logme'], function (logme) {
                                     );
                                 }
 
-                                draggable.setOnTarget(target);
+                                draggable.onTarget = target;
                                 target.draggable.push(draggableId);
 
                                 if (target.numTextEl !== null) {
@@ -244,7 +246,7 @@ define(['logme'], function (logme) {
                                     return;
                                 }
 
-                                draggable.setInContainer(false);
+                                draggable.inContainer = false;
                                 draggable.containerEl.hide();
 
                                 draggable.iconEl.detach();
