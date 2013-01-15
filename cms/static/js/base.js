@@ -59,7 +59,9 @@ $(document).ready(function() {
     $('.sortable-unit-list').sortable({
         axis: 'y',
         handle: '.drag-handle',
-        update: onUnitReordered
+        update: onUnitReordered,
+        connectWith: '.sortable-unit-list',
+        revert: true
     });
 
     // expand/collapse methods for optional date setters
@@ -242,7 +244,7 @@ function removePolicyMetadata(e) {
 
 
 // This method only changes the ordering of the child objects in a subsection
-function onUnitReordered() {
+function onUnitReordered(event, ui) {
     var subsection_id = $(this).data('subsection-id');
 
     var _els = $(this).children('li:.leaf');
@@ -256,6 +258,23 @@ function onUnitReordered() {
 		contentType: "application/json",
 		data:JSON.stringify({ 'id' : subsection_id, 'children' : children})
 	});
+    
+    // remove from old container
+    if (ui.sender && subsection_id !== ui.sender.data('subsection-id')) {
+    	
+    	var _els = ui.sender.children('li:.leaf');
+    	var children = _els.map(function(idx, el) { return $(el).data('id'); }).get();
+    	
+    	// call into server to commit the new order
+    	$.ajax({
+    		url: "/save_item",
+    		type: "POST",
+    		dataType: "json",
+    		contentType: "application/json",
+    		data:JSON.stringify({ 'id' : ui.sender.data('subsection-id'), 'children' : children})
+    	});
+    	
+    }
 }
 
 function onSubsectionReordered() {
