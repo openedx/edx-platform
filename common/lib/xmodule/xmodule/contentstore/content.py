@@ -29,12 +29,14 @@ class StaticContent(object):
 
     @staticmethod
     def generate_thumbnail_name(original_name):
-        return ('{0}'+XASSET_THUMBNAIL_TAIL_NAME).format(os.path.splitext(original_name)[0])
+        # unicode needed for cache equivalency
+        return unicode(('{0}'+XASSET_THUMBNAIL_TAIL_NAME).format(os.path.splitext(original_name)[0]))
 
     @staticmethod
     def compute_location(org, course, name, revision=None, is_thumbnail=False):
         name = name.replace('/', '_')
-        return Location([XASSET_LOCATION_TAG, org, course, 'asset' if not is_thumbnail else 'thumbnail', Location.clean(name), revision])
+        # unicode needed for cache equivalency
+        return Location([unicode(XASSET_LOCATION_TAG), org, course, u'asset' if not is_thumbnail else u'thumbnail', Location.clean(name), revision])
 
     def get_id(self):
         return StaticContent.get_id_from_location(self.location)
