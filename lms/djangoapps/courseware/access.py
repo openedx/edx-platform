@@ -13,6 +13,8 @@ from xmodule.modulestore import Location
 from xmodule.timeparse import parse_time
 from xmodule.x_module import XModule, XModuleDescriptor
 
+from student.models import CourseEnrollmentAllowed
+
 DEBUG_ACCESS = False
 
 log = logging.getLogger(__name__)
@@ -124,6 +126,11 @@ def _has_access_course_desc(user, course, action):
             debug("Allow: in enrollment period")
             return True
 
+        # if user is in CourseEnrollmentAllowed with right course_id then can also enroll
+        if user is not None and CourseEnrollmentAllowed:
+            if CourseEnrollmentAllowed.objects.filter(email=user.email, course_id=course.id):
+                return True
+
         # otherwise, need staff access
         return _has_staff_access_to_descriptor(user, course)
 
@@ -159,13 +166,19 @@ def _has_access_course_desc(user, course, action):
 
     return _dispatch(checkers, action, user, course)
 
+
 def _get_access_group_name_course_desc(course, action):
     '''
-    Return name of group which gives staff access to course.  Only understands action = 'staff'
+    Return name of group which gives staff access to course.  Only understands action = 'staff' and 'instructor'
     '''
-    if not action=='staff':
-        return []
-    return _course_staff_group_name(course.location)
+    if action=='staff':
+        return _course_staff_group_name(course.location)
+    elif action=='instructor':
+        return _course_instructor_group_name(course.location)
+
+    return []
+
+
 
 def _has_access_error_desc(user, descriptor, action):
     """

@@ -2,9 +2,13 @@
 
 from collections import defaultdict
 import csv
+import json
 import logging
 import os
+import requests
 import urllib
+
+from StringIO import StringIO
 
 from django.conf import settings
 from django.contrib.auth.models import User, Group
@@ -20,7 +24,7 @@ from courseware.courses import get_course_with_access
 from django_comment_client.models import Role, FORUM_ROLE_ADMINISTRATOR, FORUM_ROLE_MODERATOR, FORUM_ROLE_COMMUNITY_TA
 from django_comment_client.utils import has_forum_access
 from psychometrics import psychoanalyze
-from student.models import CourseEnrollment
+from student.models import CourseEnrollment, CourseEnrollmentAllowed
 from xmodule.course_module import CourseDescriptor
 from xmodule.modulestore import Location
 from xmodule.modulestore.django import modulestore
@@ -28,8 +32,7 @@ from xmodule.modulestore.exceptions import InvalidLocationError, ItemNotFoundErr
 from xmodule.modulestore.search import path_to_location
 import track.views
 
-from .grading import StaffGrading
-
+from .offline_gradecalc import student_grades, offline_grades_available
 
 log = logging.getLogger(__name__)
 
@@ -76,9 +79,12 @@ def instructor_dashboard(request, course_id):
         data.append(['metadata', escape(str(course.metadata))])
     datatable['data'] = data
 
-    def return_csv(fn, datatable):
-        response = HttpResponse(mimetype='text/csv')
-        response['Content-Disposition'] = 'attachment; filename={0}'.format(fn)
+    def return_csv(fn, datatable, fp=None):
+        if fp is None:
+            response = HttpResponse(mimetype='text/csv')
+            response['Content-Disposition'] = 'attachment; filename={0}'.format(fn)
+        else:
+            response = fp
         writer = csv.writer(response, dialect='excel', quotechar='"', quoting=csv.QUOTE_ALL)
         writer.writerow(datatable['header'])
         for datarow in datatable['data']:
@@ -87,16 +93,23 @@ def instructor_dashboard(request, course_id):
         return response
 
     def get_staff_group(course):
-        staffgrp = get_access_group_name(course, 'staff')
+        return get_group(course, 'staff')
+
+    def get_instructor_group(course):
+        return get_group(course, 'instructor')
+
+    def get_group(course, groupname):
+        grpname = get_access_group_name(course, groupname)
         try:
-            group = Group.objects.get(name=staffgrp)
+            group = Group.objects.get(name=grpname)
         except Group.DoesNotExist:
-            group = Group(name=staffgrp)     # create the group
+            group = Group(name=grpname)     # create the group
             group.save()
         return group
 
     # process actions from form POST
     action = request.POST.get('action', '')
+    use_offline = request.POST.get('use_offline_grades',False)
 
     if settings.MITX_FEATURES['ENABLE_MANUAL_GIT_RELOAD']:
         if 'GIT pull' in action:
@@ -126,38 +139,97 @@ def instructor_dashboard(request, course_id):
             except Exception as err:
                 msg += '<br/><p>Error: {0}</p>'.format(escape(err))
 
-    if action == 'Dump list of enrolled students':
+    if action == 'Dump list of enrolled students' or action=='List enrolled students':
         log.debug(action)
-        datatable = get_student_grade_summary_data(request, course, course_id, get_grades=False)
+        datatable = get_student_grade_summary_data(request, course, course_id, get_grades=False, use_offline=use_offline)
         datatable['title'] = 'List of students enrolled in {0}'.format(course_id)
         track.views.server_track(request, 'list-students', {}, page='idashboard')
 
     elif 'Dump Grades' in action:
         log.debug(action)
-        datatable = get_student_grade_summary_data(request, course, course_id, get_grades=True)
+        datatable = get_student_grade_summary_data(request, course, course_id, get_grades=True, use_offline=use_offline)
         datatable['title'] = 'Summary Grades of students enrolled in {0}'.format(course_id)
         track.views.server_track(request, 'dump-grades', {}, page='idashboard')
 
     elif 'Dump all RAW grades' in action:
         log.debug(action)
         datatable = get_student_grade_summary_data(request, course, course_id, get_grades=True,
-                                                   get_raw_scores=True)
+                                                   get_raw_scores=True, use_offline=use_offline)
         datatable['title'] = 'Raw Grades of students enrolled in {0}'.format(course_id)
         track.views.server_track(request, 'dump-grades-raw', {}, page='idashboard')
 
     elif 'Download CSV of all student grades' in action:
         track.views.server_track(request, 'dump-grades-csv', {}, page='idashboard')
         return return_csv('grades_{0}.csv'.format(course_id),
-                          get_student_grade_summary_data(request, course, course_id))
+                          get_student_grade_summary_data(request, course, course_id, use_offline=use_offline))
 
     elif 'Download CSV of all RAW grades' in action:
         track.views.server_track(request, 'dump-grades-csv-raw', {}, page='idashboard')
         return return_csv('grades_{0}_raw.csv'.format(course_id),
-                          get_student_grade_summary_data(request, course, course_id, get_raw_scores=True))
+                          get_student_grade_summary_data(request, course, course_id, get_raw_scores=True, use_offline=use_offline))
 
     elif 'Download CSV of answer distributions' in action:
         track.views.server_track(request, 'dump-answer-dist-csv', {}, page='idashboard')
         return return_csv('answer_dist_{0}.csv'.format(course_id), get_answers_distribution(request, course_id))
+
+    #----------------------------------------
+    # export grades to remote gradebook
+
+    elif action=='List assignments available in remote gradebook':
+        msg2, datatable = _do_remote_gradebook(request.user, course, 'get-assignments')
+        msg += msg2
+
+    elif action=='List assignments available for this course':
+        log.debug(action)
+        allgrades = get_student_grade_summary_data(request, course, course_id, get_grades=True, use_offline=use_offline)
+
+        assignments = [[x] for x in allgrades['assignments']]
+        datatable = {'header': ['Assignment Name']}
+        datatable['data'] = assignments
+        datatable['title'] = action
+
+        msg += 'assignments=<pre>%s</pre>' % assignments
+
+    elif action=='List enrolled students matching remote gradebook':
+        stud_data = get_student_grade_summary_data(request, course, course_id, get_grades=False, use_offline=use_offline)
+        msg2, rg_stud_data = _do_remote_gradebook(request.user, course, 'get-membership')
+        datatable = {'header': ['Student  email', 'Match?']}
+        rg_students = [ x['email'] for x in rg_stud_data['retdata'] ]
+        def domatch(x):
+            return '<font color="green">yes</font>' if x.email in rg_students else '<font color="red">No</font>'
+        datatable['data'] = [[x.email, domatch(x)] for x in stud_data['students']]
+        datatable['title'] = action
+
+    elif action in ['Display grades for assignment', 'Export grades for assignment to remote gradebook',
+                    'Export CSV file of grades for assignment']:
+
+        log.debug(action)
+        datatable = {}
+        aname = request.POST.get('assignment_name','')
+        if not aname:
+            msg += "<font color='red'>Please enter an assignment name</font>"
+        else:
+            allgrades = get_student_grade_summary_data(request, course, course_id, get_grades=True, use_offline=use_offline)
+            if aname not in allgrades['assignments']:
+                msg += "<font color='red'>Invalid assignment name '%s'</font>" % aname
+            else:
+                aidx = allgrades['assignments'].index(aname)
+                datatable = {'header': ['External email', aname]}
+                datatable['data'] = [[x.email, x.grades[aidx]] for x in allgrades['students']]
+                datatable['title'] = 'Grades for assignment "%s"' % aname
+
+                if 'Export CSV' in action:
+                    # generate and return CSV file
+                    return return_csv('grades %s.csv' % aname, datatable)
+
+                elif 'remote gradebook' in action:
+                    fp = StringIO()
+                    return_csv('', datatable, fp=fp)
+                    fp.seek(0)
+                    files = {'datafile': fp}
+                    msg2, dataset = _do_remote_gradebook(request.user, course, 'post-grades', files=files)
+                    msg += msg2
+
 
     #----------------------------------------
     # Admin
@@ -171,6 +243,16 @@ def instructor_dashboard(request, course_id):
         datatable['data'] = [[x.username, x.profile.name] for x in uset]
         datatable['title'] = 'List of Staff in course {0}'.format(course_id)
         track.views.server_track(request, 'list-staff', {}, page='idashboard')
+
+    elif 'List course instructors' in action and request.user.is_staff:
+        group = get_instructor_group(course)
+        msg += 'Instructor group = {0}'.format(group.name)
+        log.debug('instructor grp={0}'.format(group.name))
+        uset = group.user_set.all()
+        datatable = {'header': ['Username', 'Full name']}
+        datatable['data'] = [[x.username, x.profile.name] for x in uset]
+        datatable['title'] = 'List of Instructors in course {0}'.format(course_id)
+        track.views.server_track(request, 'list-instructors', {}, page='idashboard')
 
     elif action == 'Add course staff':
         uname = request.POST['staffuser']
@@ -186,6 +268,20 @@ def instructor_dashboard(request, course_id):
             user.groups.add(group)
             track.views.server_track(request, 'add-staff {0}'.format(user), {}, page='idashboard')
 
+    elif action == 'Add instructor' and request.user.is_staff:
+        uname = request.POST['instructor']
+        try:
+            user = User.objects.get(username=uname)
+        except User.DoesNotExist:
+            msg += '<font color="red">Error: unknown username "{0}"</font>'.format(uname)
+            user = None
+        if user is not None:
+            group = get_instructor_group(course)
+            msg += '<font color="green">Added {0} to instructor group = {1}</font>'.format(user, group.name)
+            log.debug('staffgrp={0}'.format(group.name))
+            user.groups.add(group)
+            track.views.server_track(request, 'add-instructor {0}'.format(user), {}, page='idashboard')
+
     elif action == 'Remove course staff':
         uname = request.POST['staffuser']
         try:
@@ -199,6 +295,20 @@ def instructor_dashboard(request, course_id):
             log.debug('staffgrp={0}'.format(group.name))
             user.groups.remove(group)
             track.views.server_track(request, 'remove-staff {0}'.format(user), {}, page='idashboard')
+
+    elif action == 'Remove instructor' and request.user.is_staff:
+        uname = request.POST['instructor']
+        try:
+            user = User.objects.get(username=uname)
+        except User.DoesNotExist:
+            msg += '<font color="red">Error: unknown username "{0}"</font>'.format(uname)
+            user = None
+        if user is not None:
+            group = get_instructor_group(course)
+            msg += '<font color="green">Removed {0} from instructor group = {1}</font>'.format(user, group.name)
+            log.debug('instructorgrp={0}'.format(group.name))
+            user.groups.remove(group)
+            track.views.server_track(request, 'remove-instructor {0}'.format(user), {}, page='idashboard')
 
     #----------------------------------------
     # forum administration
@@ -259,6 +369,71 @@ def instructor_dashboard(request, course_id):
                                  {}, page='idashboard')
 
     #----------------------------------------
+    # enrollment
+
+    elif action == 'List students who may enroll but may not have yet signed up':
+        ceaset = CourseEnrollmentAllowed.objects.filter(course_id=course_id)
+        datatable = {'header': ['StudentEmail']}
+        datatable['data'] = [[x.email] for x in ceaset]
+        datatable['title'] = action
+
+    elif action == 'Enroll student':
+
+        student = request.POST.get('enstudent','')
+        ret = _do_enroll_students(course, course_id, student)
+        datatable = ret['datatable']
+
+    elif action == 'Un-enroll student':
+
+        student = request.POST.get('enstudent','')
+        datatable = {}
+        isok = False
+        cea = CourseEnrollmentAllowed.objects.filter(course_id=course_id, email=student)
+        if cea:
+            cea.delete()
+            msg += "Un-enrolled student with email '%s'" % student
+            isok = True
+        try:
+            nce = CourseEnrollment.objects.get(user=User.objects.get(email=student), course_id=course_id)
+            nce.delete()
+            msg += "Un-enrolled student with email '%s'" % student
+        except Exception as err:
+            if not isok:
+                msg += "Error!  Failed to un-enroll student with email '%s'\n" % student
+                msg += str(err) + '\n'
+
+    elif action == 'Un-enroll ALL students':
+
+        ret = _do_enroll_students(course, course_id, '', overload=True)
+        datatable = ret['datatable']
+
+    elif action == 'Enroll multiple students':
+
+        students = request.POST.get('enroll_multiple','')
+        ret = _do_enroll_students(course, course_id, students)
+        datatable = ret['datatable']
+
+    elif action == 'List sections available in remote gradebook':
+
+        msg2, datatable = _do_remote_gradebook(request.user, course, 'get-sections')
+        msg += msg2
+
+    elif action in ['List students in section in remote gradebook', 
+                    'Overload enrollment list using remote gradebook',
+                    'Merge enrollment list with remote gradebook']:
+
+        section = request.POST.get('gradebook_section','')
+        msg2, datatable = _do_remote_gradebook(request.user, course, 'get-membership', dict(section=section) )
+        msg += msg2
+
+        if not 'List' in action:
+            students = ','.join([x['email'] for x in datatable['retdata']])
+            overload = 'Overload' in action
+            ret = _do_enroll_students(course, course_id, students, overload=overload)
+            datatable = ret['datatable']
+        
+
+    #----------------------------------------
     # psychometrics
 
     elif action == 'Generate Histogram and IRT Plot':
@@ -271,9 +446,15 @@ def instructor_dashboard(request, course_id):
         problems = psychoanalyze.problems_with_psychometric_data(course_id)
 
 
+    #----------------------------------------
+    # offline grades?
+    
+    if use_offline:
+        msg += "<br/><font color='orange'>Grades from %s</font>" % offline_grades_available(course_id)
 
     #----------------------------------------
     # context for rendering
+
     context = {'course': course,
                'staff_access': True,
                'admin_access': request.user.is_staff,
@@ -286,16 +467,66 @@ def instructor_dashboard(request, course_id):
                'plots': plots,			# psychometrics
                'course_errors': modulestore().get_item_errors(course.location),
                'djangopid' : os.getpid(),
+               'mitx_version' : getattr(settings,'MITX_VERSION_STRING',''),
+               'offline_grade_log' : offline_grades_available(course_id),
                }
 
     return render_to_response('courseware/instructor_dashboard.html', context)
+
+
+def _do_remote_gradebook(user, course, action, args=None, files=None):
+    '''
+    Perform remote gradebook action.  Returns msg, datatable.
+    '''
+    rg = course.metadata.get('remote_gradebook','')
+    if not rg:
+        msg = "No remote gradebook defined in course metadata"
+        return msg, {}
+    
+    rgurl = settings.MITX_FEATURES.get('REMOTE_GRADEBOOK_URL','')
+    if not rgurl:
+        msg = "No remote gradebook url defined in settings.MITX_FEATURES"
+        return msg, {}
+    
+    rgname = rg.get('name','')
+    if not rgname:
+        msg = "No gradebook name defined in course remote_gradebook metadata"
+        return msg, {}
+    
+    if args is None:
+        args = {}
+    data = dict(submit=action, gradebook=rgname, user=user.email)
+    data.update(args)
+
+    try:
+        resp = requests.post(rgurl, data=data, verify=False, files=files)
+        retdict = json.loads(resp.content)
+    except Exception as err:
+        msg = "Failed to communicate with gradebook server at %s<br/>" % rgurl
+        msg += "Error: %s" % err
+        msg += "<br/>resp=%s" % resp.content
+        msg += "<br/>data=%s" % data
+        return msg, {}
+
+    msg = '<pre>%s</pre>' % retdict['msg'].replace('\n','<br/>')
+    retdata = retdict['data']	# a list of dicts
+
+    if retdata:
+        datatable = {'header': retdata[0].keys()}
+        datatable['data'] = [x.values() for x in retdata]
+        datatable['title'] = 'Remote gradebook response for %s' % action
+        datatable['retdata'] = retdata
+    else:
+        datatable = {}
+
+    return msg, datatable
 
 def _list_course_forum_members(course_id, rolename, datatable):
     ''' 
     Fills in datatable with forum membership information, for a given role,
     so that it will be displayed on instructor dashboard.
     
-      course_ID = course's ID string
+      course_ID = the ID string for a course
       rolename = one of "Administrator", "Moderator", "Community TA"
     
     Returns message status string to append to displayed message, if role is unknown.
@@ -360,7 +591,7 @@ def _update_forum_role_membership(uname, course, rolename, add_or_remove):
     return msg
     
 
-def get_student_grade_summary_data(request, course, course_id, get_grades=True, get_raw_scores=False):
+def get_student_grade_summary_data(request, course, course_id, get_grades=True, get_raw_scores=False, use_offline=False):
     '''
     Return data arrays with student identity and grades for specified course.
 
@@ -381,16 +612,18 @@ def get_student_grade_summary_data(request, course, course_id, get_grades=True, 
     enrolled_students = User.objects.filter(courseenrollment__course_id=course_id).prefetch_related("groups").order_by('username')
 
     header = ['ID', 'Username', 'Full Name', 'edX email', 'External email']
+    assignments = []
     if get_grades and enrolled_students.count() > 0:
         # just to construct the header
-        gradeset = grades.grade(enrolled_students[0], request, course, keep_raw_scores=get_raw_scores)
+        gradeset = student_grades(enrolled_students[0], request, course, keep_raw_scores=get_raw_scores, use_offline=use_offline)
         # log.debug('student {0} gradeset {1}'.format(enrolled_students[0], gradeset))
         if get_raw_scores:
-            header += [score.section for score in gradeset['raw_scores']]
+            assignments += [score.section for score in gradeset['raw_scores']]
         else:
-            header += [x['label'] for x in gradeset['section_breakdown']]
+            assignments += [x['label'] for x in gradeset['section_breakdown']]
+    header += assignments
 
-    datatable = {'header': header}
+    datatable = {'header': header, 'assignments': assignments, 'students': enrolled_students}
     data = []
 
     for student in enrolled_students:
@@ -401,40 +634,21 @@ def get_student_grade_summary_data(request, course, course_id, get_grades=True, 
             datarow.append('')
 
         if get_grades:
-            gradeset = grades.grade(student, request, course, keep_raw_scores=get_raw_scores)
-            # log.debug('student={0}, gradeset={1}'.format(student,gradeset))
+            gradeset = student_grades(student, request, course, keep_raw_scores=get_raw_scores, use_offline=use_offline)
+            log.debug('student={0}, gradeset={1}'.format(student,gradeset))
             if get_raw_scores:
-                datarow += [score.earned for score in gradeset['raw_scores']]
+                # TODO (ichuang) encode Score as dict instead of as list, so score[0] -> score['earned']
+                sgrades = [(getattr(score,'earned','') or score[0]) for score in gradeset['raw_scores']]
             else:
-                datarow += [x['percent'] for x in gradeset['section_breakdown']]
+                sgrades = [x['percent'] for x in gradeset['section_breakdown']]
+            datarow += sgrades
+            student.grades = sgrades	# store in student object
 
         data.append(datarow)
     datatable['data'] = data
     return datatable
 
-
-
-@cache_control(no_cache=True, no_store=True, must_revalidate=True)
-def staff_grading(request, course_id):
-    """
-    Show the instructor grading interface.
-    """
-    course = get_course_with_access(request.user, course_id, 'staff')
-
-    grading = StaffGrading(course)
-
-    ajax_url = reverse('staff_grading', kwargs={'course_id': course_id})
-    if not ajax_url.endswith('/'):
-        ajax_url += '/'
-        
-    return render_to_response('instructor/staff_grading.html', {
-        'view_html': grading.get_html(),
-        'course': course,
-        'course_id': course_id,
-        'ajax_url': ajax_url,
-        # Checked above
-        'staff_access': True, })
-
+#-----------------------------------------------------------------------------
 
 @cache_control(no_cache=True, no_store=True, must_revalidate=True)
 def gradebook(request, course_id):
@@ -453,7 +667,7 @@ def gradebook(request, course_id):
     student_info = [{'username': student.username,
                      'id': student.id,
                      'email': student.email,
-                     'grade_summary': grades.grade(student, request, course),
+                     'grade_summary': student_grades(student, request, course),
                      'realname': student.profile.name,
                      }
                      for student in enrolled_students]
@@ -476,6 +690,72 @@ def grade_summary(request, course_id):
     return render_to_response('courseware/grade_summary.html', context)
 
 
+#-----------------------------------------------------------------------------
+# enrollment
+
+
+def _do_enroll_students(course, course_id, students, overload=False):
+    """Do the actual work of enrolling multiple students, presented as a string
+    of emails separated by commas or returns"""
+
+    ns = [x.split('\n') for x in students.split(',')]
+    new_students = [item for sublist in ns for item in sublist]
+    new_students = [str(s.strip()) for s in new_students]
+    new_students_lc = [x.lower() for x in new_students]
+
+    if '' in new_students:
+        new_students.remove('')
+
+    status = dict([x,'unprocessed'] for x in new_students)
+
+    if overload:	# delete all but staff
+        todelete = CourseEnrollment.objects.filter(course_id=course_id)
+        for ce in todelete:
+            if not has_access(ce.user, course, 'staff') and ce.user.email.lower() not in new_students_lc:
+                status[ce.user.email] = 'deleted'
+                ce.delete()
+            else:
+                status[ce.user.email] = 'is staff'
+        ceaset = CourseEnrollmentAllowed.objects.filter(course_id=course_id)
+        for cea in ceaset:
+            status[cea.email] = 'removed from pending enrollment list'
+        ceaset.delete()
+
+    for student in new_students:
+        try:
+            user=User.objects.get(email=student)
+        except User.DoesNotExist:
+            # user not signed up yet, put in pending enrollment allowed table
+            if CourseEnrollmentAllowed.objects.filter(email=student, course_id=course_id):
+                status[student] = 'user does not exist, enrollment already allowed, pending'
+                continue
+            cea = CourseEnrollmentAllowed(email=student, course_id=course_id)
+            cea.save()
+            status[student] = 'user does not exist, enrollment allowed, pending'
+            continue
+
+        if CourseEnrollment.objects.filter(user=user, course_id=course_id):
+            status[student] = 'already enrolled'
+            continue
+        try:
+            nce = CourseEnrollment(user=user, course_id=course_id)
+            nce.save()
+            status[student] = 'added'
+        except:
+            status[student] = 'rejected'
+
+    datatable = {'header': ['StudentEmail', 'action']}
+    datatable['data'] = [[x, status[x]] for x in status]
+    datatable['title'] = 'Enrollment of students'
+
+    def sf(stat): return [x for x in status if status[x]==stat]
+
+    data = dict(added=sf('added'), rejected=sf('rejected')+sf('exists'), 
+                deleted=sf('deleted'), datatable=datatable)
+
+    return data
+
+
 @ensure_csrf_cookie
 @cache_control(no_cache=True, no_store=True, must_revalidate=True)
 def enroll_students(request, course_id):
@@ -494,22 +774,10 @@ def enroll_students(request, course_id):
     course = get_course_with_access(request.user, course_id, 'staff')
     existing_students = [ce.user.email for ce in CourseEnrollment.objects.filter(course_id=course_id)]
 
-    if 'new_students' in request.POST:
-        new_students = request.POST['new_students'].split('\n')
-    else:
-        new_students = []
-    new_students = [s.strip() for s in new_students]
-
-    added_students = []
-    rejected_students = []
-
-    for student in new_students:
-        try:
-            nce = CourseEnrollment(user=User.objects.get(email=student), course_id=course_id)
-            nce.save()
-            added_students.append(student)
-        except:
-            rejected_students.append(student)
+    new_students = request.POST.get('new_students')
+    ret = _do_enroll_students(course, course_id, new_students)
+    added_students = ret['added']
+    rejected_students = ret['rejected']
 
     return render_to_response("enroll_students.html", {'course': course_id,
                                                        'existing_students': existing_students,
@@ -517,6 +785,9 @@ def enroll_students(request, course_id):
                                                        'rejected_students': rejected_students,
                                                        'debug': new_students})
 
+
+#-----------------------------------------------------------------------------
+# answer distribution
 
 def get_answers_distribution(request, course_id):
     """

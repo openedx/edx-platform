@@ -37,6 +37,8 @@ urlpatterns = ('',
     url(r'^event$', 'track.views.user_track'),
     url(r'^t/(?P<template>[^/]*)$', 'static_template_view.views.index'), # TODO: Is this used anymore? What is STATIC_GRAB?
 
+    url(r'^accounts/login$', 'student.views.accounts_login', name="accounts_login"),
+
     url(r'^login$', 'student.views.login_user', name="login"),
     url(r'^login/(?P<error>[^/]*)$', 'student.views.login_user'),
     url(r'^logout$', 'student.views.logout_user', name='logout'),
@@ -78,6 +80,8 @@ urlpatterns = ('',
     url(r'^contact$', 'static_template_view.views.render',
         {'template': 'contact.html'}, name="contact"),
     url(r'^press$', 'student.views.press', name="press"),
+    url(r'^media-kit$', 'static_template_view.views.render',
+        {'template': 'media-kit.html'}, name="media-kit"),
     url(r'^faq$', 'static_template_view.views.render',
         {'template': 'faq.html'}, name="faq_edx"),
     url(r'^help$', 'static_template_view.views.render',
@@ -112,10 +116,11 @@ urlpatterns = ('',
         {'template': 'press_releases/Wellesley_College_joins_edX.html'}, name="press/wellesley-college-joins-edx"),
     url(r'^press/georgetown-joins-edx$', 'static_template_view.views.render',
         {'template': 'press_releases/Georgetown_joins_edX.html'}, name="press/georgetown-joins-edx"),
-
+    url(r'^press/spring-courses$', 'static_template_view.views.render',
+        {'template': 'press_releases/Spring_2013_course_announcements.html'}, name="press/spring-courses"),
 
     # Should this always update to point to the latest press release?
-    (r'^pressrelease$', 'django.views.generic.simple.redirect_to', {'url': '/press/georgetown-joins-edx'}),
+    (r'^pressrelease$', 'django.views.generic.simple.redirect_to', {'url': '/press/spring-courses'}),
 
 
     (r'^favicon\.ico$', 'django.views.generic.simple.redirect_to', {'url': '/static/images/favicon.ico'}),
@@ -241,15 +246,32 @@ if settings.COURSEWARE_ENABLED:
         url(r'^courses/(?P<course_id>[^/]+/[^/]+/[^/]+)/enroll_students$',
             'instructor.views.enroll_students', name='enroll_students'),
         url(r'^courses/(?P<course_id>[^/]+/[^/]+/[^/]+)/staff_grading$',
-            'instructor.views.staff_grading', name='staff_grading'),
+            'open_ended_grading.views.staff_grading', name='staff_grading'),
         url(r'^courses/(?P<course_id>[^/]+/[^/]+/[^/]+)/staff_grading/get_next$',
-            'instructor.staff_grading_service.get_next', name='staff_grading_get_next'),
+            'open_ended_grading.staff_grading_service.get_next', name='staff_grading_get_next'),
         url(r'^courses/(?P<course_id>[^/]+/[^/]+/[^/]+)/staff_grading/save_grade$',
-            'instructor.staff_grading_service.save_grade', name='staff_grading_save_grade'),
+            'open_ended_grading.staff_grading_service.save_grade', name='staff_grading_save_grade'),
         url(r'^courses/(?P<course_id>[^/]+/[^/]+/[^/]+)/staff_grading/save_grade$',
-            'instructor.staff_grading_service.save_grade', name='staff_grading_save_grade'),
+            'open_ended_grading.staff_grading_service.save_grade', name='staff_grading_save_grade'),
         url(r'^courses/(?P<course_id>[^/]+/[^/]+/[^/]+)/staff_grading/get_problem_list$',
-            'instructor.staff_grading_service.get_problem_list', name='staff_grading_get_problem_list'),
+            'open_ended_grading.staff_grading_service.get_problem_list', name='staff_grading_get_problem_list'),
+
+
+        # Peer Grading
+        url(r'^courses/(?P<course_id>[^/]+/[^/]+/[^/]+)/peer_grading$',
+            'open_ended_grading.views.peer_grading', name='peer_grading'),
+        url(r'^courses/(?P<course_id>[^/]+/[^/]+/[^/]+)/peer_grading/problem$',
+            'open_ended_grading.views.peer_grading_problem', name='peer_grading_problem'),
+        url(r'^courses/(?P<course_id>[^/]+/[^/]+/[^/]+)/peer_grading/get_next_submission$',
+            'open_ended_grading.peer_grading_service.get_next_submission', name='peer_grading_get_next_submission'),
+        url(r'^courses/(?P<course_id>[^/]+/[^/]+/[^/]+)/peer_grading/show_calibration_essay$',
+            'open_ended_grading.peer_grading_service.show_calibration_essay', name='peer_grading_show_calibration_essay'),
+        url(r'^courses/(?P<course_id>[^/]+/[^/]+/[^/]+)/peer_grading/is_student_calibrated$',
+            'open_ended_grading.peer_grading_service.is_student_calibrated', name='peer_grading_is_student_calibrated'),
+        url(r'^courses/(?P<course_id>[^/]+/[^/]+/[^/]+)/peer_grading/save_grade$',
+            'open_ended_grading.peer_grading_service.save_grade', name='peer_grading_save_grade'),
+        url(r'^courses/(?P<course_id>[^/]+/[^/]+/[^/]+)/peer_grading/save_calibration_essay$',
+            'open_ended_grading.peer_grading_service.save_calibration_essay', name='peer_grading_save_calibration_essay'),
     )
 
     # discussion forums live within courseware, so courseware must be enabled first

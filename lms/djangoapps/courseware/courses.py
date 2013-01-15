@@ -217,11 +217,21 @@ def get_courses_by_university(user, domain=None):
     '''
     # TODO: Clean up how 'error' is done.
     # filter out any courses that errored.
-    visible_courses = branding.get_visible_courses(domain)
+    visible_courses = get_courses(user, domain)
 
     universities = defaultdict(list)
     for course in visible_courses:
-        if not has_access(user, course, 'see_exists'):
-            continue
         universities[course.org].append(course)
+
     return universities
+
+
+def get_courses(user, domain=None):
+    '''
+    Returns a list of courses available, sorted by course.number
+    '''
+    courses = branding.get_visible_courses(domain)
+    courses = [c for c in courses if has_access(user, c, 'see_exists')]
+
+    courses = sorted(courses, key=lambda course:course.number)
+    return courses

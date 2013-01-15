@@ -8,59 +8,25 @@ from django.db import models
 class Migration(SchemaMigration):
 
     def forwards(self, orm):
-        # Adding field 'TestCenterUser.processed_at'
-        db.add_column('student_testcenteruser', 'processed_at',
-                      self.gf('django.db.models.fields.DateTimeField')(null=True, db_index=True),
-                      keep_default=False)
+        # Adding model 'CourseEnrollmentAllowed'
+        db.create_table('student_courseenrollmentallowed', (
+            ('id', self.gf('django.db.models.fields.AutoField')(primary_key=True)),
+            ('email', self.gf('django.db.models.fields.CharField')(max_length=255, db_index=True)),
+            ('course_id', self.gf('django.db.models.fields.CharField')(max_length=255, db_index=True)),
+            ('created', self.gf('django.db.models.fields.DateTimeField')(auto_now_add=True, null=True, db_index=True, blank=True)),
+        ))
+        db.send_create_signal('student', ['CourseEnrollmentAllowed'])
 
-        # Adding field 'TestCenterUser.confirmed_at'
-        db.add_column('student_testcenteruser', 'confirmed_at',
-                      self.gf('django.db.models.fields.DateTimeField')(null=True, db_index=True),
-                      keep_default=False)
-
-        # Adding field 'TestCenterRegistration.processed_at'
-        db.add_column('student_testcenterregistration', 'processed_at',
-                      self.gf('django.db.models.fields.DateTimeField')(null=True, db_index=True),
-                      keep_default=False)
-
-        # Adding field 'TestCenterRegistration.authorization_id'
-        db.add_column('student_testcenterregistration', 'authorization_id',
-                      self.gf('django.db.models.fields.IntegerField')(null=True, db_index=True),
-                      keep_default=False)
-
-        # Adding field 'TestCenterRegistration.confirmed_at'
-        db.add_column('student_testcenterregistration', 'confirmed_at',
-                      self.gf('django.db.models.fields.DateTimeField')(null=True, db_index=True),
-                      keep_default=False)
-
-        # Adding index on 'TestCenterRegistration', fields ['accommodation_request']
-        db.create_index('student_testcenterregistration', ['accommodation_request'])
-
-        # Adding index on 'TestCenterRegistration', fields ['upload_status']
-        db.create_index('student_testcenterregistration', ['upload_status'])
+        # Adding unique constraint on 'CourseEnrollmentAllowed', fields ['email', 'course_id']
+        db.create_unique('student_courseenrollmentallowed', ['email', 'course_id'])
 
 
     def backwards(self, orm):
-        # Removing index on 'TestCenterRegistration', fields ['upload_status']
-        db.delete_index('student_testcenterregistration', ['upload_status'])
+        # Removing unique constraint on 'CourseEnrollmentAllowed', fields ['email', 'course_id']
+        db.delete_unique('student_courseenrollmentallowed', ['email', 'course_id'])
 
-        # Removing index on 'TestCenterRegistration', fields ['accommodation_request']
-        db.delete_index('student_testcenterregistration', ['accommodation_request'])
-
-        # Deleting field 'TestCenterUser.processed_at'
-        db.delete_column('student_testcenteruser', 'processed_at')
-
-        # Deleting field 'TestCenterUser.confirmed_at'
-        db.delete_column('student_testcenteruser', 'confirmed_at')
-
-        # Deleting field 'TestCenterRegistration.processed_at'
-        db.delete_column('student_testcenterregistration', 'processed_at')
-
-        # Deleting field 'TestCenterRegistration.authorization_id'
-        db.delete_column('student_testcenterregistration', 'authorization_id')
-
-        # Deleting field 'TestCenterRegistration.confirmed_at'
-        db.delete_column('student_testcenterregistration', 'confirmed_at')
+        # Deleting model 'CourseEnrollmentAllowed'
+        db.delete_table('student_courseenrollmentallowed')
 
 
     models = {
@@ -107,6 +73,13 @@ class Migration(SchemaMigration):
             'id': ('django.db.models.fields.AutoField', [], {'primary_key': 'True'}),
             'user': ('django.db.models.fields.related.ForeignKey', [], {'to': "orm['auth.User']"})
         },
+        'student.courseenrollmentallowed': {
+            'Meta': {'unique_together': "(('email', 'course_id'),)", 'object_name': 'CourseEnrollmentAllowed'},
+            'course_id': ('django.db.models.fields.CharField', [], {'max_length': '255', 'db_index': 'True'}),
+            'created': ('django.db.models.fields.DateTimeField', [], {'auto_now_add': 'True', 'null': 'True', 'db_index': 'True', 'blank': 'True'}),
+            'email': ('django.db.models.fields.CharField', [], {'max_length': '255', 'db_index': 'True'}),
+            'id': ('django.db.models.fields.AutoField', [], {'primary_key': 'True'})
+        },
         'student.pendingemailchange': {
             'Meta': {'object_name': 'PendingEmailChange'},
             'activation_key': ('django.db.models.fields.CharField', [], {'unique': 'True', 'max_length': '32', 'db_index': 'True'}),
@@ -127,27 +100,6 @@ class Migration(SchemaMigration):
             'id': ('django.db.models.fields.AutoField', [], {'primary_key': 'True'}),
             'user': ('django.db.models.fields.related.ForeignKey', [], {'to': "orm['auth.User']", 'unique': 'True'})
         },
-        'student.testcenterregistration': {
-            'Meta': {'object_name': 'TestCenterRegistration'},
-            'accommodation_code': ('django.db.models.fields.CharField', [], {'max_length': '64', 'blank': 'True'}),
-            'accommodation_request': ('django.db.models.fields.CharField', [], {'db_index': 'True', 'max_length': '1024', 'blank': 'True'}),
-            'authorization_id': ('django.db.models.fields.IntegerField', [], {'null': 'True', 'db_index': 'True'}),
-            'client_authorization_id': ('django.db.models.fields.CharField', [], {'unique': 'True', 'max_length': '20', 'db_index': 'True'}),
-            'confirmed_at': ('django.db.models.fields.DateTimeField', [], {'null': 'True', 'db_index': 'True'}),
-            'course_id': ('django.db.models.fields.CharField', [], {'max_length': '128', 'db_index': 'True'}),
-            'created_at': ('django.db.models.fields.DateTimeField', [], {'auto_now_add': 'True', 'db_index': 'True', 'blank': 'True'}),
-            'eligibility_appointment_date_first': ('django.db.models.fields.DateField', [], {'db_index': 'True'}),
-            'eligibility_appointment_date_last': ('django.db.models.fields.DateField', [], {'db_index': 'True'}),
-            'exam_series_code': ('django.db.models.fields.CharField', [], {'max_length': '15', 'db_index': 'True'}),
-            'id': ('django.db.models.fields.AutoField', [], {'primary_key': 'True'}),
-            'processed_at': ('django.db.models.fields.DateTimeField', [], {'null': 'True', 'db_index': 'True'}),
-            'testcenter_user': ('django.db.models.fields.related.ForeignKey', [], {'default': 'None', 'to': "orm['student.TestCenterUser']"}),
-            'updated_at': ('django.db.models.fields.DateTimeField', [], {'auto_now': 'True', 'db_index': 'True', 'blank': 'True'}),
-            'upload_error_message': ('django.db.models.fields.CharField', [], {'max_length': '512', 'blank': 'True'}),
-            'upload_status': ('django.db.models.fields.CharField', [], {'db_index': 'True', 'max_length': '20', 'blank': 'True'}),
-            'uploaded_at': ('django.db.models.fields.DateTimeField', [], {'null': 'True', 'db_index': 'True'}),
-            'user_updated_at': ('django.db.models.fields.DateTimeField', [], {'db_index': 'True'})
-        },
         'student.testcenteruser': {
             'Meta': {'object_name': 'TestCenterUser'},
             'address_1': ('django.db.models.fields.CharField', [], {'max_length': '40'}),
@@ -155,9 +107,8 @@ class Migration(SchemaMigration):
             'address_3': ('django.db.models.fields.CharField', [], {'max_length': '40', 'blank': 'True'}),
             'candidate_id': ('django.db.models.fields.IntegerField', [], {'null': 'True', 'db_index': 'True'}),
             'city': ('django.db.models.fields.CharField', [], {'max_length': '32', 'db_index': 'True'}),
-            'client_candidate_id': ('django.db.models.fields.CharField', [], {'unique': 'True', 'max_length': '50', 'db_index': 'True'}),
-            'company_name': ('django.db.models.fields.CharField', [], {'db_index': 'True', 'max_length': '50', 'blank': 'True'}),
-            'confirmed_at': ('django.db.models.fields.DateTimeField', [], {'null': 'True', 'db_index': 'True'}),
+            'client_candidate_id': ('django.db.models.fields.CharField', [], {'max_length': '50', 'db_index': 'True'}),
+            'company_name': ('django.db.models.fields.CharField', [], {'max_length': '50', 'blank': 'True'}),
             'country': ('django.db.models.fields.CharField', [], {'max_length': '3', 'db_index': 'True'}),
             'created_at': ('django.db.models.fields.DateTimeField', [], {'auto_now_add': 'True', 'db_index': 'True', 'blank': 'True'}),
             'extension': ('django.db.models.fields.CharField', [], {'db_index': 'True', 'max_length': '8', 'blank': 'True'}),
@@ -170,14 +121,10 @@ class Migration(SchemaMigration):
             'phone': ('django.db.models.fields.CharField', [], {'max_length': '35'}),
             'phone_country_code': ('django.db.models.fields.CharField', [], {'max_length': '3', 'db_index': 'True'}),
             'postal_code': ('django.db.models.fields.CharField', [], {'db_index': 'True', 'max_length': '16', 'blank': 'True'}),
-            'processed_at': ('django.db.models.fields.DateTimeField', [], {'null': 'True', 'db_index': 'True'}),
             'salutation': ('django.db.models.fields.CharField', [], {'max_length': '50', 'blank': 'True'}),
             'state': ('django.db.models.fields.CharField', [], {'db_index': 'True', 'max_length': '20', 'blank': 'True'}),
             'suffix': ('django.db.models.fields.CharField', [], {'max_length': '255', 'blank': 'True'}),
             'updated_at': ('django.db.models.fields.DateTimeField', [], {'auto_now': 'True', 'db_index': 'True', 'blank': 'True'}),
-            'upload_error_message': ('django.db.models.fields.CharField', [], {'max_length': '512', 'blank': 'True'}),
-            'upload_status': ('django.db.models.fields.CharField', [], {'db_index': 'True', 'max_length': '20', 'blank': 'True'}),
-            'uploaded_at': ('django.db.models.fields.DateTimeField', [], {'db_index': 'True', 'null': 'True', 'blank': 'True'}),
             'user': ('django.db.models.fields.related.ForeignKey', [], {'default': 'None', 'to': "orm['auth.User']", 'unique': 'True'}),
             'user_updated_at': ('django.db.models.fields.DateTimeField', [], {'db_index': 'True'})
         },

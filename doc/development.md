@@ -19,6 +19,11 @@ Use the MacPorts package `mongodb` or the Homebrew formula `mongodb`
 
 ## Initializing Mongodb
 
+First start up the mongo daemon. E.g. to start it up in the background
+using a config file:
+
+    mongod --config /usr/local/etc/mongod.conf &
+
 Check out the course data directories that you want to work with into the
 `GITHUB_REPO_ROOT` (by default, `../data`). Then run the following command:
 
@@ -37,8 +42,12 @@ This runs all the tests (long, uses collectstatic):
 
 If if you aren't changing static files, can run `rake test` once, then run
 
-    rake fasttest_{lms,cms}
+    rake fasttest_lms
 
+or
+
+    rake fasttest_cms
+    
 xmodule can be tested independently, with this:
 
     rake test_common/lib/xmodule

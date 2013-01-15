@@ -177,3 +177,40 @@ class StudentModuleCache(object):
 
     def append(self, student_module):
         self.cache.append(student_module)
+
+
+class OfflineComputedGrade(models.Model):
+    """
+    Table of grades computed offline for a given user and course.
+    """
+    user = models.ForeignKey(User, db_index=True)
+    course_id = models.CharField(max_length=255, db_index=True)
+
+    created = models.DateTimeField(auto_now_add=True, null=True, db_index=True)
+    updated = models.DateTimeField(auto_now=True, db_index=True)
+
+    gradeset = models.TextField(null=True, blank=True)		# grades, stored as JSON
+
+    class Meta:
+        unique_together = (('user', 'course_id'), )
+
+    def __unicode__(self):
+        return "[OfflineComputedGrade] %s: %s (%s) = %s" % (self.user, self.course_id, self.created, self.gradeset)
+
+
+class OfflineComputedGradeLog(models.Model):
+    """
+    Log of when offline grades are computed.
+    Use this to be able to show instructor when the last computed grades were done.
+    """
+    class Meta:
+        ordering = ["-created"]
+        get_latest_by = "created"
+
+    course_id = models.CharField(max_length=255, db_index=True)
+    created = models.DateTimeField(auto_now_add=True, null=True, db_index=True)
+    seconds = models.IntegerField(default=0)	# seconds elapsed for computation
+    nstudents = models.IntegerField(default=0)
+
+    def __unicode__(self):
+        return "[OCGLog] %s: %s" % (self.course_id, self.created)

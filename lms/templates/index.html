@@ -106,21 +106,13 @@
       </section>
 
       <section class="courses">
-        <section class='university-column'>
-          %for course in universities['MITx']:
-            <%include file="course.html" args="course=course" />
+          <ul class="courses-listing">
+          %for course in courses:
+            <li class="courses-listing-item">
+              <%include file="course.html" args="course=course" />
+            </li>
           %endfor
-        </section>
-        <section class='university-column'>
-          %for course in universities['HarvardX']:
-            <%include file="course.html" args="course=course" />
-          %endfor
-        </section>
-        <section class='university-column last'>
-          %for course in universities['BerkeleyX']:
-            <%include file="course.html" args="course=course" />
-          %endfor
-        </section>
+          </ul>
       </section>
     </section>
   </section>
@@ -129,6 +121,7 @@
     <section class="more-info">
       <header>
         <h2><span class="edx">edX</span> News &amp; Announcements</h2>
+        <a class="action action-mediakit" href="${reverse('media-kit')}"> <span class="org-name">edX</span> MEDIA KIT</a>
       </header>
       <section class="news">
         <section class="blog-posts">
