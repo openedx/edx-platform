@@ -66,6 +66,7 @@ class StaffGradingService(GradingService):
         self.get_next_url = self.url + '/get_next_submission/'
         self.save_grade_url = self.url + '/save_grade/'
         self.get_problem_list_url = self.url + '/get_problem_list/'
+        self.get_notifications_url = self.url + "/get_notifications/"
 
 
     def get_problem_list(self, course_id, grader_id):
@@ -131,6 +132,12 @@ class StaffGradingService(GradingService):
                 'skipped': skipped}
 
         return self.post(self.save_grade_url, data=data)
+
+    def get_notifications(self, course_id):
+        params = {'course_id': course_id}
+        response = self.get(self.get_notifications_url, params)
+        return response
+
 
 # don't initialize until staff_grading_service() is called--means that just
 # importing this file doesn't create objects that may not have the right config
