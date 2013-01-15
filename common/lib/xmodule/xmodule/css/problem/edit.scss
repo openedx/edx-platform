@@ -1,32 +1,6 @@
 .editor-bar {
-  position: relative;
-  @include linear-gradient(top, #d4dee8, #c9d5e2);
-  padding: 5px;
-  border: 1px solid #3c3c3c;
-  border-radius: 3px 3px 0 0;
-  border-bottom-color: #a5aaaf;
-  @include clearfix;
-
-  a {
-    display: block;
-    float: left;
-    padding: 3px 10px 7px;
-    margin-left: 7px;
-    border-radius: 2px;
-
-    &:hover {
-      background: rgba(255, 255, 255, .5);
-    }
-  }
 
   .editor-tabs {
-    position: absolute;
-    top: 10px;
-    right: 10px;
-
-    li {
-      float: left;
-    }
 
     .advanced-toggle {
       @include white-button;
