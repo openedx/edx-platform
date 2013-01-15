@@ -810,9 +810,8 @@ class DragAndDropInput(InputTypeBase):
 
                     tag_type: 'draggable' or 'target'.
 
-                    If tag_type is 'draggable' : all attributes (name or label or
-                    icon) are optional, but at least one attribute must be
-                    presented.
+                    If tag_type is 'draggable' : all attributes except id
+                    (name or label or icon or can_reuse) are optional
 
                     If tag_type is 'target' all attributes (name, x, y, w, h)
                     are required. (x, y) - coordinates of center of target,
@@ -820,11 +819,13 @@ class DragAndDropInput(InputTypeBase):
 
                 Returns:
                     Dictionary of vaues of attributes:
-                    dict{'name': smth, 'label': smth, 'icon': smth}.
+                    dict{'name': smth, 'label': smth, 'icon': smth,
+                    'can_reuse': smth}.
             """
             tag_attrs = dict()
             tag_attrs['draggable'] = {'id': Attribute._sentinel,
-                                      'label': "", 'icon': ""}
+                                      'label': "", 'icon': "",
+                                      'can_reuse': ""}
 
             tag_attrs['target'] = {'id': Attribute._sentinel,
                                     'x': Attribute._sentinel,
