@@ -7,6 +7,7 @@ import logging
 import os
 import requests
 import urllib
+import json
 
 from StringIO import StringIO
 
@@ -25,6 +26,7 @@ from django_comment_client.models import Role, FORUM_ROLE_ADMINISTRATOR, FORUM_R
 from django_comment_client.utils import has_forum_access
 from psychometrics import psychoanalyze
 from student.models import CourseEnrollment, CourseEnrollmentAllowed
+from courseware.models import StudentModule
 from xmodule.course_module import CourseDescriptor
 from xmodule.modulestore import Location
 from xmodule.modulestore.django import modulestore
@@ -171,6 +173,56 @@ def instructor_dashboard(request, course_id):
     elif 'Download CSV of answer distributions' in action:
         track.views.server_track(request, 'dump-answer-dist-csv', {}, page='idashboard')
         return return_csv('answer_dist_{0}.csv'.format(course_id), get_answers_distribution(request, course_id))
+
+    elif "Reset student's attempts" in action:
+        # get the form data
+        unique_student_identifier=request.POST.get('unique_student_identifier','')
+        problem_to_reset=request.POST.get('problem_to_reset','')
+        
+        if problem_to_reset[-4:]==".xml": 
+            problem_to_reset=problem_to_reset[:-4]
+
+        # try to uniquely id student by email address or username
+        try:
+            if "@" in unique_student_identifier:
+                student_to_reset=User.objects.get(email=unique_student_identifier)
+            else:
+                student_to_reset=User.objects.get(username=unique_student_identifier)
+            msg+="Found a single student to reset.  "
+        except:
+            msg+="<font color='red'>Couldn't find student to reset.  </font>"
+
+        # find the module in question
+        try:
+            module_to_reset=StudentModule.objects.get(student_id=student_to_reset.id, course_id=course_id, module_state_key__iendswith="/problem/"+problem_to_reset)
+            msg+="Found module to reset.  "
+        except Exception as e:
+            msg+="<font color='red'>Couldn't find module to reset.  </font>"
+
+        # modify the problem's state
+        try:
+            # load the state json
+            problem_state=json.loads(module_to_reset.state)
+            problem_state["attempts"]=0
+
+            # save
+            module_to_reset.state=json.dumps(problem_state)
+            module_to_reset.save()
+            msg+="<font color='green'>Module state successfully reset!</font>"
+        except:
+            msg+="<font color='red'>Couldn't reset module state.  </font>"
+
+
+    elif "Get link to student's progress page" in action:
+        unique_student_identifier=request.POST.get('unique_student_identifier','')
+        try:
+            if "@" in unique_student_identifier:
+                student_to_reset=User.objects.get(email=unique_student_identifier)
+            else:
+                student_to_reset=User.objects.get(username=unique_student_identifier)
+            msg+="<a href='./progress/{0}' target='_blank'> Progress page for username: {1} with email address: {2}</a>.".format(str(student_to_reset.id),student_to_reset.username,student_to_reset.email)
+        except:
+            msg+="<font color='red'>Couldn't find student with that username.  </font>"
 
     #----------------------------------------
     # export grades to remote gradebook
