@@ -11,6 +11,8 @@ from django.http import HttpResponse, Http404
 from courseware.access import has_access
 from util.json_request import expect_json
 from xmodule.course_module import CourseDescriptor
+from xmodule.combined_open_ended_rubric import CombinedOpenEndedRubric
+from lxml import etree
 
 log = logging.getLogger(__name__)
 
@@ -97,4 +99,30 @@ class GradingService(object):
             response.raise_for_status()
 
         return response
+
+    def _render_rubric(self, response, view_only=False):
+        """
+        Given an HTTP Response with the key 'rubric', render out the html
+        required to display the rubric
+        """
+        try:
+            response_json = json.loads(response)
+            if response_json.has_key('rubric'):
+                rubric = response_json['rubric']
+                rubric_renderer = CombinedOpenEndedRubric(False)
+                success, rubric_html = rubric_renderer.render_rubric(rubric)
+                if not success:
+                    error_message = "Could not render rubric: {0}".format(rubric)
+                    log.exception(error_message)
+                    return json.dumps({'success': False,
+                                       'error': error_message})
+                response_json['rubric'] = rubric_html
+            return json.dumps(response_json)
+        # if we can't parse the rubric into HTML, 
+        except etree.XMLSyntaxError:
+            log.exception("Cannot parse rubric string. Raw string: {0}"
+                          .format(rubric))
+            return json.dumps({'success': False,
+                               'error': 'Error displaying submission'})
+
 

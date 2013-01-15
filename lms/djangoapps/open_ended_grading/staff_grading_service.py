@@ -19,8 +19,6 @@ from xmodule.course_module import CourseDescriptor
 from student.models import unique_id_for_user
 from xmodule.x_module import ModuleSystem
 from mitxmako.shortcuts import render_to_string
-from xmodule.combined_open_ended_rubric import CombinedOpenEndedRubric
-from lxml import etree
 
 log = logging.getLogger(__name__)
 
@@ -110,9 +108,10 @@ class StaffGradingService(GradingService):
         Raises:
             GradingServiceError: something went wrong with the connection.
         """
-        return self.get(self.get_next_url,
+        response = self.get(self.get_next_url,
                                       params={'location': location,
                                               'grader_id': grader_id})
+        return self._render_rubric(response)
 
 
     def save_grade(self, course_id, grader_id, submission_id, score, feedback, skipped, rubric_scores):
@@ -260,30 +259,12 @@ def _get_next(course_id, grader_id, location):
     Implementation of get_next (also called from save_grade) -- returns a json string
     """
     try:
-        response = staff_grading_service().get_next(course_id, location, grader_id)
-        response_json = json.loads(response)
-        if response_json.has_key('rubric'):
-            rubric = response_json['rubric']
-            rubric_renderer = CombinedOpenEndedRubric(False)
-            success, rubric_html = rubric_renderer.render_rubric(rubric)
-            if not success:
-                error_message = "Could not render rubric: {0}".format(rubric)
-                log.exception(error_message)
-                return json.dumps({'success': False,
-                                   'error': error_message})
-            response_json['rubric'] = rubric_html
-        return json.dumps(response_json)
+        return staff_grading_service().get_next(course_id, location, grader_id)
     except GradingServiceError:
         log.exception("Error from grading service.  server url: {0}"
                       .format(staff_grading_service().url))
         return json.dumps({'success': False,
                            'error': 'Could not connect to grading service'})
-    # if we can't parse the rubric into HTML, 
-    except etree.XMLSyntaxError:
-        log.exception("Cannot parse rubric string. Raw string: {0}"
-                      .format(rubric))
-        return json.dumps({'success': False,
-                           'error': 'Error displaying submission'})
 
 
 @expect_json

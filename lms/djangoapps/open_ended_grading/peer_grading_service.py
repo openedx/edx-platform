@@ -20,7 +20,9 @@ from grading_service import GradingServiceError
 from courseware.access import has_access
 from util.json_request import expect_json
 from xmodule.course_module import CourseDescriptor
+from xmodule.combined_open_ended_rubric import CombinedOpenEndedRubric
 from student.models import unique_id_for_user
+from lxml import etree
 
 log = logging.getLogger(__name__)
 
@@ -83,15 +85,17 @@ class PeerGradingService(GradingService):
     def get_next_submission(self, problem_location, grader_id):
         response = self.get(self.get_next_submission_url,
                 {'location': problem_location, 'grader_id': grader_id})
-        return response
+        return self._render_rubric(response)
 
-    def save_grade(self, location, grader_id, submission_id, score, feedback, submission_key):
+    def save_grade(self, location, grader_id, submission_id, score, feedback, submission_key, rubric_scores):
         data = {'grader_id' : grader_id,
                 'submission_id' : submission_id,
                 'score' : score,
                 'feedback' : feedback,
                 'submission_key': submission_key,
-                'location': location}
+                'location': location,
+                'rubric_scores': rubric_scores,
+                'rubric_scores_complete': True}
         return self.post(self.save_grade_url, data)
 
     def is_student_calibrated(self, problem_location, grader_id):
@@ -100,15 +104,19 @@ class PeerGradingService(GradingService):
     
     def show_calibration_essay(self, problem_location, grader_id):
         params = {'problem_id' : problem_location, 'student_id': grader_id}
-        return self.get(self.show_calibration_essay_url, params)
+        response = self.get(self.show_calibration_essay_url, params)
+        return self._render_rubric(response)
 
-    def save_calibration_essay(self, problem_location, grader_id, calibration_essay_id, submission_key, score, feedback):
+    def save_calibration_essay(self, problem_location, grader_id, calibration_essay_id, submission_key, 
+            score, feedback, rubric_scores):
         data = {'location': problem_location, 
                 'student_id': grader_id, 
                 'calibration_essay_id': calibration_essay_id,
                 'submission_key': submission_key,
                 'score': score,
-                'feedback': feedback}
+                'feedback': feedback,
+                'rubric_scores[]': rubric_scores,
+                'rubric_scores_complete': True}
         return self.post(self.save_calibration_essay_url, data)
 
     def get_problem_list(self, course_id, grader_id):
@@ -210,7 +218,7 @@ def save_grade(request, course_id):
         error: if there was an error in the submission, this is the error message
     """
     _check_post(request)
-    required = set(['location', 'submission_id', 'submission_key', 'score', 'feedback'])
+    required = set(['location', 'submission_id', 'submission_key', 'score', 'feedback', 'rubric_scores[]'])
     success, message = _check_required(request, required)
     if not success:
         return _err_response(message)
@@ -221,9 +229,10 @@ def save_grade(request, course_id):
     score = p['score']
     feedback = p['feedback']
     submission_key = p['submission_key']
+    rubric_scores = p.getlist('rubric_scores[]')
     try:
         response = peer_grading_service().save_grade(location, grader_id, submission_id, 
-                score, feedback, submission_key)
+                score, feedback, submission_key, rubric_scores)
         return HttpResponse(response, mimetype="application/json")
     except GradingServiceError:
         log.exception("""Error saving grade.  server url: {0}, location: {1}, submission_id:{2}, 
@@ -308,19 +317,7 @@ def show_calibration_essay(request, course_id):
     location = p['location']
     try:
         response = peer_grading_service().show_calibration_essay(location, grader_id)
-        response_json = json.loads(response)
-        # if we can't handle the rubric
-        if response_json.has_key('rubric'):
-            rubric = response_json['rubric']
-            rubric_renderer = CombinedOpenEndedRubric(False)
-            success, rubric_html = rubric_renderer.render_rubric(rubric)
-            if not success:
-                error_message = "Could not render rubric: {0}".format(rubric)
-                log.exception(error_message)
-                return json.dumps({'success': False,
-                                   'error': error_message})
-            response_json['rubric'] = rubric_html
-        return json.dumps(response_json)
+        return HttpResponse(response, mimetype="application/json")
     except GradingServiceError:
         log.exception("Error from grading service.  server url: {0}, location: {0}"
                       .format(peer_grading_service().url, location))
@@ -353,7 +350,7 @@ def save_calibration_essay(request, course_id):
     """
     _check_post(request)
 
-    required = set(['location', 'submission_id', 'submission_key', 'score', 'feedback'])
+    required = set(['location', 'submission_id', 'submission_key', 'score', 'feedback', 'rubric_scores[]'])
     success, message = _check_required(request, required)
     if not success:
         return _err_response(message)
@@ -364,9 +361,11 @@ def save_calibration_essay(request, course_id):
     submission_key = p['submission_key']
     score = p['score']
     feedback = p['feedback']
+    rubric_scores = p.getlist('rubric_scores[]')
 
     try:
-        response = peer_grading_service().save_calibration_essay(location, grader_id, calibration_essay_id, submission_key, score, feedback)
+        response = peer_grading_service().save_calibration_essay(location, grader_id, calibration_essay_id, 
+                submission_key, score, feedback, rubric_scores)
         return HttpResponse(response, mimetype="application/json")
     except GradingServiceError:
         log.exception("Error saving calibration grade, location: {0}, submission_id: {1}, submission_key: {2}, grader_id: {3}".format(location, submission_id, submission_key, grader_id))

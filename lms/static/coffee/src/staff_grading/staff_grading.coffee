@@ -357,7 +357,6 @@ class StaffGrading
       @state == state_no_data)
     @prompt_wrapper.toggle(show_grading_elements)
     @submission_wrapper.toggle(show_grading_elements)
-    @rubric_wrapper.toggle(show_grading_elements)
     @grading_wrapper.toggle(show_grading_elements)
     @meta_info_wrapper.toggle(show_grading_elements)
     @action_button.hide()

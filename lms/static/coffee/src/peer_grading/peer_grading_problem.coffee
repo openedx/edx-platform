@@ -194,7 +194,7 @@ class PeerGradingProblem
 
     @score_selection_container = $('.score-selection-container')
     @rubric_selection_container = $('.rubric-selection-container')
-    @score = null
+    @grade = null
     @calibration = null
 
     @submit_button = $('.submit-button')
@@ -415,10 +415,10 @@ class PeerGradingProblem
     # display correct grade
     @calibration_feedback_panel.slideDown()
     calibration_wrapper = $('.calibration-feedback-wrapper')
-    calibration_wrapper.html("<p>The score you gave was: #{@score}. The actual score is: #{response.actual_score}</p>")
+    calibration_wrapper.html("<p>The score you gave was: #{@grade}. The actual score is: #{response.actual_score}</p>")
 
 
-    score = parseInt(@score)
+    score = parseInt(@grade)
     actual_score = parseInt(response.actual_score)
 
     if score == actual_score
