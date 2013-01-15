@@ -111,7 +111,7 @@
   % if registration:
     <!-- select one of four registration status banners to display -->
     % if registration.is_accepted:
-    <section class="status message message-flash registration-processed message-action">
+    <section class="status message message-flash registration-processed message-action is-shown">
       <h3 class="message-title">Your registration for the Pearson exam has been processed</h3>
       <p class="message-copy">Your registration number is <strong>${registration.client_authorization_id}</strong>.  (Write this down! You’ll need it to schedule your exam.)</p>
       <a href="${registration.registration_signup_url}" class="button exam-button">Schedule Pearson exam</a>
@@ -119,21 +119,21 @@
     % endif
 
     % if registration.demographics_is_rejected:      
-    <section class="status message message-flash demographics-rejected message-action">
+    <section class="status message message-flash demographics-rejected message-action is-shown">
       <h3 class="message-title">Your demographic information contained an error and was rejected</h3>
       <p class="message-copy">Please check the information you provided, and correct the errors noted below.
     </section>
     % endif
    
     % if registration.registration_is_rejected:      
-    <section class="status message message-flash registration-rejected message-action">
+    <section class="status message message-flash registration-rejected message-action is-shown">
       <h3 class="message-title">Your registration for the Pearson exam has been rejected</h3>
       <p class="message-copy">Please see your registration status details for more information.</p>
     </section>
     % endif
 
     % if registration.is_pending:
-   <section class="status message message-flash registration-pending">
+   <section class="status message message-flash registration-pending is-shown">
     <h3 class="message-title">Your registration for the Pearson exam is pending</h3>
     <p class="message-copy">Once your information is processed, it will be forwarded to Pearson and you will be able to schedule an exam.</p>
    </section>
@@ -150,10 +150,10 @@
   % else:    
     <form id="testcenter_register_form" method="post" data-remote="true" action="/create_exam_registration" class="disabled">
       <!-- registration closed, so tell them they can't do anything: -->
-      <section class="status message message-flash registration-closed">
+      <div class="status message registration-closed is-shown">
         <h3 class="message-title">Registration for this Pearson exam is closed</h3>
         <p class="message-copy">Your previous information is available below, however you may not edit any of the information.
-      </section>
+      </div>
   % endif
       
       % if registration:

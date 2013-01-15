@@ -294,10 +294,10 @@ $red: rgb(178, 6, 16);
 			}
 
 			.field {
-				opacity: 0.5;
+				opacity: 0.6;
 
-				.label {
-					cursor: default;
+				.label, label {
+					cursor: auto;
 				}
 			}
 
@@ -646,7 +646,6 @@ $red: rgb(178, 6, 16);
 
 		// registration status
 		&.message-flash {
-			display: block;
 			@include border-radius(3px);
 			position: relative;
 			margin: 0 0 ($baseline*2) 0;
@@ -698,7 +697,6 @@ $red: rgb(178, 6, 16);
 				}
 			}
 		}
-
 
 		// submission error
 		&.submission-error {
@@ -766,16 +764,31 @@ $red: rgb(178, 6, 16);
 				color: $blue;
 			}
 		}
+
+		// specific - registration closed
+		&.registration-closed {
+			@include border-bottom-radius(0);
+			margin-top: 0;
+			border-bottom: 1px solid $light-gray;
+			padding: $baseline;
+			background: tint($light-gray,50%);
+
+			.message-title {
+				font-weight: bold;
+			}
+
+			.message-copy {
+
+			}
+		}
 	}
 
+	.is-shown {
+		display: block;
+	}
 
 	// hidden
 	.is-hidden {
-		display: none;
-	}
-
-	// temp
-	.output-raw {
 		display: none;
 	}
 }
