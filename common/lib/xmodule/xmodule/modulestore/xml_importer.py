@@ -11,7 +11,8 @@ from xmodule.contentstore.content import StaticContent, XASSET_SRCREF_PREFIX
 
 log = logging.getLogger(__name__)
 
-def import_static_content(modules, course_loc, course_data_path, static_content_store, target_location_namespace, subpath = 'static'):
+def import_static_content(modules, course_loc, course_data_path, static_content_store, target_location_namespace, 
+    subpath = 'static', verbose=False):
     
     remap_dict = {}
 
@@ -23,6 +24,9 @@ def import_static_content(modules, course_loc, course_data_path, static_content_
 
             try:
                 content_path = os.path.join(dirname, filename)
+                if verbose:
+                    log.debug('importing static content {0}...'.format(content_path))
+
                 fullname_with_subpath = content_path.replace(static_dir, '')  # strip away leading path from the name
                 if fullname_with_subpath.startswith('/'):
                     fullname_with_subpath = fullname_with_subpath[1:]
@@ -90,7 +94,7 @@ def verify_content_links(module, base_dir, static_content_store, link, remap_dic
 
 def import_from_xml(store, data_dir, course_dirs=None, 
                     default_class='xmodule.raw_module.RawDescriptor',
-                    load_error_modules=True, static_content_store=None, target_location_namespace=None):
+                    load_error_modules=True, static_content_store=None, target_location_namespace=None, verbose=False):
     """
     Import the specified xml data_dir into the "store" modulestore,
     using org and course as the location org and course.
@@ -120,6 +124,9 @@ def import_from_xml(store, data_dir, course_dirs=None,
 
         course_data_path = None
         course_location = None
+
+        if verbose:
+            log.debug("Scanning {0} for course module...".format(course_id))
 
         # Quick scan to get course module as we need some info from there. Also we need to make sure that the
         # course module is committed first into the store
@@ -155,7 +162,6 @@ def import_from_xml(store, data_dir, course_dirs=None,
 
                 course_items.append(module)
 
-
                 
         # then import all the static content
         if static_content_store is not None:
@@ -163,7 +169,7 @@ def import_from_xml(store, data_dir, course_dirs=None,
             
             # first pass to find everything in /static/
             import_static_content(module_store.modules[course_id], course_location, course_data_path, static_content_store, 
-                _namespace_rename, subpath='static')
+                _namespace_rename, subpath='static', verbose=verbose)
 
         # finally loop through all the modules
         for module in module_store.modules[course_id].itervalues():
@@ -177,6 +183,8 @@ def import_from_xml(store, data_dir, course_dirs=None,
             if target_location_namespace is not None:
                 module = remap_namespace(module, target_location_namespace)
 
+            if verbose:
+                log.debug('importing module location {0}'.format(module.location))
 
             if 'data' in module.definition:
                 module_data = module.definition['data']

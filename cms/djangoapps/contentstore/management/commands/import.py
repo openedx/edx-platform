@@ -27,4 +27,5 @@ class Command(BaseCommand):
         print "Importing.  Data_dir={data}, course_dirs={courses}".format(
             data=data_dir,
             courses=course_dirs)
-        import_from_xml(modulestore('direct'), data_dir, course_dirs, load_error_modules=False,static_content_store=contentstore())
+        import_from_xml(modulestore('direct'), data_dir, course_dirs, load_error_modules=False,
+            static_content_store=contentstore(), verbose=True)
