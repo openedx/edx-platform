@@ -124,7 +124,7 @@ class SelfAssessmentModule(openendedchild.OpenEndedChild):
 
         rubric_renderer = CombinedOpenEndedRubric(True)
 
-        rubric_html  = rubric_renderer.render_rubric(self.rubric)
+        success, rubric_html  = rubric_renderer.render_rubric(self.rubric)
 
         # we'll render it
         context = {'rubric': rubric_html,

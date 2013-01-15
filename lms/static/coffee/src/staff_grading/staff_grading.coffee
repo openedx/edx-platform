@@ -174,7 +174,8 @@ class StaffGrading
     @grading_wrapper = $('.grading-wrapper')
 
     @feedback_area = $('.feedback-area')
-    @score_selection_container = $('.score-selection-container')        
+    @score_selection_container = $('.score-selection-container')
+    @grade_selection_container = $('.grade-selection-container')
 
     @submit_button = $('.submit-button')
     @action_button = $('.action-button')
@@ -202,6 +203,7 @@ class StaffGrading
     @num_graded = 0
     @num_pending = 0
     @score_lst = []
+    @grade = null
 
     @problems = null
 
@@ -216,10 +218,29 @@ class StaffGrading
 
 
   setup_score_selection: =>
+    # first, get rid of all the old inputs, if any.
+    @grade_selection_container.html("""
+    <h3>Overall Score</h3>
+    <p>Choose an overall score for this submission.</p>
+    """)
+    # Now create new labels and inputs for each possible score.
+    for score in [0..@max_score]
+      id = 'score-' + score
+      label = """<label for="#{id}">#{score}</label>"""
+      input = """
+              <input type="radio" class="grade-selection" name="grade-selection" id="#{id}" value="#{score}"/>
+              """  # "  fix broken parsing in emacs
+      @grade_selection_container.append(input + label)
+    $('.grade-selection').click => @graded_callback()
+
     @score_selection_container.html(@rubric)
     $('.score-selection').click => @graded_callback()
 
+
   graded_callback: () =>
+    @grade = $("input[name='grade-selection']:checked").val()
+    if @grade == undefined
+      return
     # check to see whether or not any categories have not been scored
     num_categories = $('table.rubric tr').length
     for i in [0..(num_categories-1)]
@@ -229,8 +250,6 @@ class StaffGrading
     # show button if we have scores for all categories
     @state = state_graded
     @submit_button.show()
-      
-
 
   set_button_text: (text) =>
     @action_button.attr('value', text)
@@ -272,6 +291,7 @@ class StaffGrading
 
   skip_and_get_next: () =>
     data =
+      score: @grade
       rubric_scores: @get_score_list()
       feedback: @feedback_area.val()
       submission_id: @submission_id
@@ -285,8 +305,8 @@ class StaffGrading
 
   submit_and_get_next: () ->
     data =
+      score: @grade
       rubric_scores: @get_score_list()
-      score: 0
       feedback: @feedback_area.val()
       submission_id: @submission_id
       location: @location
@@ -303,6 +323,8 @@ class StaffGrading
     @rubric = response.rubric
     @submission_id = response.submission_id
     @feedback_area.val('')
+    @grade = null
+    @max_score = response.max_score
     @ml_error_info=response.ml_error_info
     @prompt_name = response.problem_name
     @num_graded = response.num_graded
@@ -322,8 +344,9 @@ class StaffGrading
     @ml_error_info = null
     @submission_id = null
     @message = message
+    @grade = null
+    @max_score = 0
     @state = state_no_data
-
 
   render_view: () ->
     # clear the problem list and breadcrumbs
