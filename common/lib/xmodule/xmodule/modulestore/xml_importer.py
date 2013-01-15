@@ -159,7 +159,7 @@ def import_from_xml(store, data_dir, course_dirs=None,
                 
         # then import all the static content
         if static_content_store is not None:
-            _namespace_rename = target_location_namespace if target_location_namespace is not None else  module_store.modules[course_id].location
+            _namespace_rename = target_location_namespace if target_location_namespace is not None else course_location
             
             # first pass to find everything in /static/
             import_static_content(module_store.modules[course_id], course_location, course_data_path, static_content_store, 
