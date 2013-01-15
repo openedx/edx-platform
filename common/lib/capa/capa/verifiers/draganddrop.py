@@ -119,9 +119,24 @@ class DragAndDrop(object):
             if not self.excess_draggables[draggable]:
                 return False  # user answer has more draggables than correct answer
 
-        # Number of draggables in user_groups may be smaller that in
-        # correct_groups, that is incorrect.
+        # Number of draggables in user_groups may be differ that in
+        # correct_groups, that is incorrect, except special case with 'number'
         for groupname, draggable_ids in self.correct_groups.items():
+
+            # 'number' rule special case
+            # for reusable draggables we may get in self.user_groups
+            # {'1': [u'2', u'2', u'2'], '0': [u'1', u'1'], '2': [u'3']}
+            # if +number in rule - do not remove duplicates but clean rule
+            current_rule = self.correct_positions[groupname].keys()[0]
+            if 'number' in current_rule:
+                rule_values = self.correct_positions[groupname][current_rule]
+                #clean rule, do not do clean dublicate items
+                self.correct_positions[groupname].pop(current_rule, None)
+                parsed_rule = current_rule.replace('+', '').replace('number', '')
+                self.correct_positions[groupname][parsed_rule] = rule_values
+            else:  # remove dublicates
+                self.user_groups[groupname] = list(set(self.user_groups[groupname]))
+
             if sorted(draggable_ids) != sorted(self.user_groups[groupname]):
                 return False
 
@@ -129,8 +144,9 @@ class DragAndDrop(object):
         # every element are equal with correct positions
         for groupname in self.correct_groups:
             rules_executed = 0
-            for rule in ('exact', 'anyof'):   # every group has only one rule
-                if self.correct_positions[groupname].get(rule, []):
+            for rule in ('exact', 'anyof', 'unorderly_equal'):
+                # every group has only one rule
+                if self.correct_positions[groupname].get(rule, None):
                     rules_executed += 1
                     if not self.compare_positions(
                             self.correct_positions[groupname][rule],
@@ -174,6 +190,8 @@ class DragAndDrop(object):
                      - draggables can be placed in any order:
                     user ['1','2','3','4'] is 'anyof' equal to ['4', '2', '1', 3']
 
+            'unorderly_equal' is same as 'exact' but disregards on order
+
         Equality functions:
 
         Equality functon depends on type of element. They declared in
@@ -193,14 +211,24 @@ class DragAndDrop(object):
                     return False
 
         if flag == 'anyof':
-            count = 0
             for u_el in user:
                 for c_el in correct:
                     if PositionsCompare(u_el) == PositionsCompare(c_el):
-                        count += 1
                         break
-            if count != len(user):
+                else:
+                    return False
+
+        if flag == 'unorderly_equal':
+            if len(correct) != len(user):
                 return False
+            temp = correct[:]
+            for u_el in user:
+                for c_el in temp:
+                    if PositionsCompare(u_el) == PositionsCompare(c_el):
+                        temp.remove(c_el)
+                        break
+                else:
+                    return False
 
         return True
 
