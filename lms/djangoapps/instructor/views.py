@@ -232,6 +232,13 @@ def instructor_dashboard(request, course_id):
                 student_to_reset=User.objects.get(email=unique_student_identifier)
             else:
                 student_to_reset=User.objects.get(username=unique_student_identifier)
+            track.views.server_track(request, 
+                                    '{instructor} requested progress page for {student} in {course}'.format(
+                                        student=student_to_reset,
+                                        instructor=request.user,
+                                        course=course_id),
+                                    {}, 
+                                    page='idashboard')
             msg+="<a href='./progress/{0}' target='_blank'> Progress page for username: {1} with email address: {2}</a>.".format(str(student_to_reset.id),student_to_reset.username,student_to_reset.email)
         except:
             msg+="<font color='red'>Couldn't find student with that username.  </font>"
