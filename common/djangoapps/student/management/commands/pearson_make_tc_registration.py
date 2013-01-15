@@ -37,11 +37,13 @@ class Command(BaseCommand):
             '--eligibility_appointment_date_first',
             action='store',
             dest='eligibility_appointment_date_first',
-        ),        
+            help='use YYYY-MM-DD format if overriding existing course values, or YYYY-MM-DDTHH:MM if not using an existing course.'
+        ),
         make_option(
             '--eligibility_appointment_date_last',
             action='store',
             dest='eligibility_appointment_date_last',
+            help='use YYYY-MM-DD format if overriding existing course values, or YYYY-MM-DDTHH:MM if not using an existing course.'
         ),
         # internal values:
         make_option(
@@ -67,11 +69,11 @@ class Command(BaseCommand):
             '--ignore_registration_dates',
             action='store_true',
             dest='ignore_registration_dates',
-            help='find exam info for course based on exam_series_code, even if it is not active.'
+            help='find exam info for course based on exam_series_code, even if the exam is not active.'
         ),   
     )
     args = "<student_username course_id>"
-    help = "Create a TestCenterRegistration entry for a given Student"
+    help = "Create or modify a TestCenterRegistration entry for a given Student"
 
     @staticmethod
     def is_valid_option(option_name):
@@ -86,11 +88,15 @@ class Command(BaseCommand):
 
         our_options = dict((k, v) for k, v in options.items()
                            if Command.is_valid_option(k) and v is not None)
-        student = User.objects.get(username=username)
+        try:
+            student = User.objects.get(username=username)
+        except User.DoesNotExist:
+            raise CommandError("User \"{}\" does not exist".format(username))
+
         try:
             testcenter_user = TestCenterUser.objects.get(user=student)
         except TestCenterUser.DoesNotExist:
-            raise CommandError("User {%s} does not exist".format(student))
+            raise CommandError("User \"{}\" does not have an existing demographics record".format(username))
             
         # check to see if a course_id was specified, and use information from that:
         try:

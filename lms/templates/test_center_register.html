@@ -113,7 +113,7 @@
     % if registration.is_accepted:
     <section class="status message message-flash registration-processed message-action is-shown">
       <h3 class="message-title">Your registration for the Pearson exam has been processed</h3>
-      <p class="message-copy">Your registration number is <strong>${registration.client_authorization_id}</strong>.  (Write this down! You’ll need it to schedule your exam.)</p>
+      <p class="message-copy">Your registration number is <strong>${registration.client_candidate_id}</strong>.  (Write this down! You’ll need it to schedule your exam.)</p>
       <a href="${registration.registration_signup_url}" class="button exam-button">Schedule Pearson exam</a>
     </section>
     % endif

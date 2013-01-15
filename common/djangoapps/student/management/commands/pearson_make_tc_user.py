@@ -125,7 +125,7 @@ class Command(BaseCommand):
         ),   
     )
     args = "<student_username>"
-    help = "Create a TestCenterUser entry for a given Student"
+    help = "Create or modify a TestCenterUser entry for a given Student"
 
     @staticmethod
     def is_valid_option(option_name):

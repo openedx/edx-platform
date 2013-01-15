@@ -1,8 +1,7 @@
 import csv
 from collections import OrderedDict
 from datetime import datetime
-from os.path import isdir
-from fs.path import pathjoin
+from os.path import isdir, join
 from optparse import make_option
 
 from django.core.management.base import BaseCommand
@@ -61,7 +60,7 @@ class Command(BaseCommand):
         # used in the system.
         dest = args[0]
         if isdir(dest):
-            destfile = pathjoin(dest, uploaded_at.strftime("ead-%Y%m%d-%H%M%S.dat"))
+            destfile = join(dest, uploaded_at.strftime("ead-%Y%m%d-%H%M%S.dat"))
         else:
             destfile = dest
 
@@ -90,6 +89,5 @@ class Command(BaseCommand):
                     tcr.save()
 
 
-  
 
         

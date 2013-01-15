@@ -229,13 +229,13 @@ class TestCenterUser(models.Model):
         return False    
                        
     @staticmethod
-    def _generate_edx_id():
+    def _generate_edx_id(prefix):
         NUM_DIGITS = 12
-        return u"edX{:012}".format(randint(1, 10**NUM_DIGITS-1))
+        return u"{}{:012}".format(prefix, randint(1, 10**NUM_DIGITS-1))
     
     @staticmethod
     def _generate_candidate_id():
-        return TestCenterUser._generate_edx_id()
+        return TestCenterUser._generate_edx_id("edX")
         
     @staticmethod
     def create(user):
@@ -283,15 +283,12 @@ class TestCenterUserForm(ModelForm):
         except UnicodeEncodeError:
             return False
         return True
-    
-    def check_country_code(self, fieldname):
-        code = self.cleaned_data[fieldname]
+        
+    def clean_country(self):
+        code = self.cleaned_data['country']
         if code and len(code) != 3:
             raise forms.ValidationError(u'Must be three characters (ISO 3166-1):  e.g. USA, CAN, MNG')
         return code
-        
-    def clean_country(self):
-        return self.check_country_code('country')
                 
     def clean(self):
         cleaned_data = super(TestCenterUserForm, self).clean()
@@ -434,7 +431,7 @@ class TestCenterRegistration(models.Model):
     def create(testcenter_user, exam, accommodation_request):
         registration = TestCenterRegistration(testcenter_user = testcenter_user)
         registration.course_id = exam.course_id
-        registration.accommodation_request = accommodation_request
+        registration.accommodation_request = accommodation_request.strip()
         registration.exam_series_code = exam.exam_series_code
         registration.eligibility_appointment_date_first = strftime("%Y-%m-%d", exam.first_eligible_appointment_date)
         registration.eligibility_appointment_date_last = strftime("%Y-%m-%d", exam.last_eligible_appointment_date)
@@ -444,7 +441,7 @@ class TestCenterRegistration(models.Model):
 
     @staticmethod
     def _generate_authorization_id():
-        return TestCenterUser._generate_edx_id()
+        return TestCenterUser._generate_edx_id("edXexam")
         
     @staticmethod
     def _create_client_authorization_id():
@@ -526,13 +523,19 @@ class TestCenterRegistrationForm(ModelForm):
     class Meta:
         model = TestCenterRegistration
         fields = ( 'accommodation_request', 'accommodation_code' )
+
+    def clean_accommodation_request(self):
+        code = self.cleaned_data['accommodation_request']
+        if code and len(code) > 0:
+            return code.strip()
+        return code
         
     def update_and_save(self):
         registration = self.save(commit=False)
         # create additional values here:
         registration.user_updated_at = datetime.utcnow()
         registration.save()
-        log.info("Updated registration information for user's test center exam registration: username \"{}\" course \"{}\", examcode \"{}\"".format(registration.testcenter_user.username, registration.course_id, registration.exam_series_code)) 
+        log.info("Updated registration information for user's test center exam registration: username \"{}\" course \"{}\", examcode \"{}\"".format(registration.testcenter_user.user.username, registration.course_id, registration.exam_series_code)) 
 
     # TODO: add validation code for values added to accommodation_code field.
     
