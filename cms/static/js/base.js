@@ -55,6 +55,7 @@ $(document).ready(function() {
     $("#start_date, #start_time, #due_date, #due_time").bind('change', autosaveInput);
     $('.sync-date, .remove-date').bind('click', autosaveInput);
 
+    var cachedHesitation = new CMS.HesitateEvent( expandSection, $('.branch .collapsed'), 'mouseLeave');
     // making the unit list sortable
     $('.sortable-unit-list').sortable({
         axis: 'y',
@@ -240,6 +241,12 @@ function removePolicyMetadata(e) {
     saveSubsection()
 }
 
+function expandSection(event) {
+	$(event.currentTarget).removeClass('collapsed');
+	// TODO remove the hesitate trigger on this ele
+	// $(event.currentTarget).off('mouseEnter', expandSection);
+	$(event.currentTarget).find('.expand-collapse-icon').removeClass('expand').addClass('collapse');
+}
 
 // This method only changes the ordering of the child objects in a subsection
 function onUnitReordered() {
