@@ -41,73 +41,72 @@ class Test_PositionsCompare(unittest.TestCase):
 class Test_DragAndDrop_Grade(unittest.TestCase):
 
     def test_targets_true(self):
-        user_input = '{"use_targets": true, "draggables": [{"1": "t1"}, \
+        user_input = '{"draggables": [{"1": "t1"}, \
          {"name_with_icon": "t2"}]}'
         correct_answer = {'1':              't1', 'name_with_icon': 't2'}
         self.assertTrue(draganddrop.grade(user_input, correct_answer))
 
     def test_targets_false(self):
-        user_input = '{"use_targets": true, "draggables": [{"1": "t1"}, \
+        user_input = '{"draggables": [{"1": "t1"}, \
         {"name_with_icon": "t2"}]}'
         correct_answer = {'1':              't3', 'name_with_icon': 't2'}
         self.assertFalse(draganddrop.grade(user_input, correct_answer))
 
     def test_multiple_images_per_target_true(self):
-        user_input = '{"use_targets": true, \
+        user_input = '{\
         "draggables": [{"1": "t1"}, {"name_with_icon": "t1"}]}'
         correct_answer = {'1':              't1', 'name_with_icon': 't1'}
         self.assertTrue(draganddrop.grade(user_input, correct_answer))
 
     def test_multiple_images_per_target_false(self):
-        user_input = '{"use_targets": true, \
+        user_input = '{\
         "draggables": [{"1": "t1"}, {"name_with_icon": "t1"}]}'
         correct_answer = {'1':              't2', 'name_with_icon': 't1'}
         self.assertFalse(draganddrop.grade(user_input, correct_answer))
 
     def test_targets_and_positions(self):
-        user_input = '{"use_targets": true, "draggables": [{"1": [10,10]}, \
+        user_input = '{"draggables": [{"1": [10,10]}, \
          {"name_with_icon": [[10,10],4]}]}'
         correct_answer = {'1':  [10, 10], 'name_with_icon': [[10, 10], 4]}
         self.assertFalse(draganddrop.grade(user_input, correct_answer))
 
     def test_position_and_targets(self):
-        user_input = '{"use_targets": false, \
-        "draggables": [{"1": "t1"}, {"name_with_icon": "t2"}]}'
+        user_input = '{"draggables": [{"1": "t1"}, {"name_with_icon": "t2"}]}'
         correct_answer = {'1':    't1', 'name_with_icon': 't2'}
         self.assertTrue(draganddrop.grade(user_input, correct_answer))
 
     def test_positions_exact(self):
-        user_input = '{"use_targets": false, "draggables": \
+        user_input = '{"draggables": \
         [{"1": [10, 10]}, {"name_with_icon": [20, 20]}]}'
         correct_answer = {'1':   [10, 10], 'name_with_icon': [20, 20]}
         self.assertTrue(draganddrop.grade(user_input, correct_answer))
 
     def test_positions_false(self):
-        user_input = '{"use_targets": false, "draggables": \
+        user_input = '{"draggables": \
         [{"1": [10, 10]}, {"name_with_icon": [20, 20]}]}'
         correct_answer = {'1':   [25, 25], 'name_with_icon': [20, 20]}
         self.assertFalse(draganddrop.grade(user_input, correct_answer))
 
     def test_positions_true_in_radius(self):
-        user_input = '{"use_targets": false, "draggables": \
+        user_input = '{"draggables": \
         [{"1": [10, 10]}, {"name_with_icon": [20, 20]}]}'
         correct_answer = {'1':   [14, 14], 'name_with_icon': [20, 20]}
         self.assertTrue(draganddrop.grade(user_input, correct_answer))
 
     def test_positions_true_in_manual_radius(self):
-        user_input = '{"use_targets": false, "draggables": \
+        user_input = '{"draggables": \
         [{"1": [10, 10]}, {"name_with_icon": [20, 20]}]}'
         correct_answer = {'1':   [[40, 10], 30], 'name_with_icon': [20, 20]}
         self.assertTrue(draganddrop.grade(user_input, correct_answer))
 
     def test_positions_false_in_manual_radius(self):
-        user_input = '{"use_targets": false, "draggables": \
+        user_input = '{"draggables": \
         [{"1": [10, 10]}, {"name_with_icon": [20, 20]}]}'
         correct_answer = {'1': [[40, 10], 29], 'name_with_icon': [20, 20]}
         self.assertFalse(draganddrop.grade(user_input, correct_answer))
 
     def test_correct_answer_not_has_key_from_user_answer(self):
-        user_input = '{"use_targets": true, "draggables": [{"1": "t1"}, \
+        user_input = '{"draggables": [{"1": "t1"}, \
         {"name_with_icon": "t2"}]}'
         correct_answer = {'3':   't3', 'name_with_icon': 't2'}
         self.assertFalse(draganddrop.grade(user_input, correct_answer))
@@ -116,14 +115,14 @@ class Test_DragAndDrop_Grade(unittest.TestCase):
         """Draggables can be places anywhere on base image.
             Place grass in the middle of the image and ant in the
             right upper corner."""
-        user_input = '{"use_targets": false, "draggables": \
+        user_input = '{"draggables": \
         [{"ant":[610.5,57.449951171875]},{"grass":[322.5,199.449951171875]}]}'
         correct_answer = {'grass':     [[300, 200], 200], 'ant': [[500, 0], 200]}
         self.assertTrue(draganddrop.grade(user_input, correct_answer))
 
     def test_lcao_correct(self):
         """Describe carbon molecule in LCAO-MO"""
-        user_input = '{"use_targets":true,"draggables":[{"1":"s_left"}, \
+        user_input = '{"draggables":[{"1":"s_left"}, \
         {"5":"s_right"},{"4":"s_sigma"},{"6":"s_sigma_star"},{"7":"p_left_1"}, \
         {"8":"p_left_2"},{"10":"p_right_1"},{"9":"p_right_2"}, \
         {"2":"p_pi_1"},{"3":"p_pi_2"},{"11":"s_sigma_name"}, \
@@ -162,7 +161,7 @@ class Test_DragAndDrop_Grade(unittest.TestCase):
 
     def test_lcao_extra_element_incorrect(self):
         """Describe carbon molecule in LCAO-MO"""
-        user_input = '{"use_targets":true,"draggables":[{"1":"s_left"}, \
+        user_input = '{"draggables":[{"1":"s_left"}, \
         {"5":"s_right"},{"4":"s_sigma"},{"6":"s_sigma_star"},{"7":"p_left_1"}, \
         {"8":"p_left_2"},{"17":"p_left_3"},{"10":"p_right_1"},{"9":"p_right_2"}, \
         {"2":"p_pi_1"},{"3":"p_pi_2"},{"11":"s_sigma_name"}, \
@@ -177,7 +176,7 @@ class Test_DragAndDrop_Grade(unittest.TestCase):
             'rule': 'anyof'
         }, {
             'draggables': ['7', '8', '9', '10'],
-            'targets': ['p_left_1', 'p_left_2', 'p_right_1','p_right_2'],
+            'targets': ['p_left_1', 'p_left_2', 'p_right_1', 'p_right_2'],
             'rule': 'anyof'
         }, {
             'draggables': ['11', '12'],
@@ -205,7 +204,7 @@ class Test_DragAndDrop_Populate(unittest.TestCase):
     def test_1(self):
         dnd = draganddrop.DragAndDrop()
         correct_answer = {'1': [[40, 10], 29], 'name_with_icon': [20, 20]}
-        user_input = '{"use_targets": false, "draggables": \
+        user_input = '{"draggables": \
         [{"1": [10, 10]}, {"name_with_icon": [20, 20]}]}'
         dnd.populate(correct_answer, user_input)
 

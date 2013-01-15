@@ -1,11 +1,10 @@
 """ Grader of drag and drop input.
 
 Client side behavior: user can drag and drop images from list on base image.
-Parameter 'use_targets' in xml can control two use cases.
 
-if use_targets is true (defaut), then json returned from client is:
+
+ Then json returned from client is:
  {
-    "use_targets": true,
     "draggable": [
         { "image1": "t1"  },
         { "ant": "t2"  },
@@ -14,9 +13,8 @@ if use_targets is true (defaut), then json returned from client is:
 }
 values are target names.
 
-If use_targets is false:
+or:
  {
-    "use_targets": false,
     "draggable": [
         { "image1": "[10, 20]"  },
         { "ant": "[30, 40]"  },
@@ -112,11 +110,8 @@ class DragAndDrop(object):
     def grade(self):
         ''' Grader user answer.
 
-        If use_targets is True - checks if every draggable isplaced on proper
-         target.
-
-        If use_targets is False - checks if every draggable is placed on proper
-         coordinates within radius of forgiveness (default is 10).
+        Checks if every draggable isplaced on proper target or  on proper
+        coordinates within radius of forgiveness (default is 10).
 
         Returns: bool.
         '''
@@ -260,7 +255,6 @@ class DragAndDrop(object):
             correct_answer = tmp
 
         user_answer = json.loads(user_answer)
-        self.use_targets = user_answer.get('use_targets')
 
         # check if we have draggables that are not in correct answer:
         self.excess_draggables = {}
@@ -295,12 +289,12 @@ def grade(user_input, correct_answer):
         Args:
             user_input: json. Format::
 
-                {"use_targets": false, "draggables":
+                { "draggables":
                 [{"1": [10, 10]}, {"name_with_icon": [20, 20]}]}'
 
                 or
 
-                {"use_targets": true, "draggables": [{"1": "t1"}, \
+                {"draggables": [{"1": "t1"}, \
                 {"name_with_icon": "t2"}]}
 
             correct_answer: dict or list.
