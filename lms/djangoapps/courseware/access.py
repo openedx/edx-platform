@@ -393,6 +393,8 @@ def _adjust_start_date_for_beta_testers(user, descriptor):
         debug("Adjust start time: user in group %s", beta_group)
         # time_structs don't support subtraction, so convert to datetimes,
         # subtract, convert back.
+        # (fun fact: datetime(*a_time_struct[:6]) is the beautiful syntax for
+        # converting time_structs into datetimes)
         start_as_datetime = datetime(*descriptor.start[:6])
         delta = timedelta(descriptor.days_early_for_beta)
         effective = start_as_datetime - delta
