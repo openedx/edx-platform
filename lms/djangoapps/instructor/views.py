@@ -2,6 +2,7 @@
 
 from collections import defaultdict
 import csv
+import itertools
 import json
 import logging
 import os
@@ -798,14 +799,15 @@ def _split_by_comma_and_whitespace(s):
     Split a string both by on commas and whitespice.
     """
     # Note: split() with no args removes empty strings from output
-    return [x.split() for x in s.split(',')]
+    lists = [x.split() for x in s.split(',')]
+    # return all of them
+    return itertools.chain(*lists)
 
 def _do_enroll_students(course, course_id, students, overload=False):
     """Do the actual work of enrolling multiple students, presented as a string
     of emails separated by commas or returns"""
 
-    ns = _split_by_comma_and_whitespace(students)
-    new_students = [item for sublist in ns for item in sublist]
+    new_students = _split_by_comma_and_whitespace(students)
     new_students = [str(s.strip()) for s in new_students]
     new_students_lc = [x.lower() for x in new_students]
 
