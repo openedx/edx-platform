@@ -103,7 +103,6 @@ class GraphicalSliderToolModule(XModule):
         slider_div = '<div class="{element_class}_slider" \
                                    id="{element_id}_slider_{var}" \
                                    data-var="{var}" \
-                                   data-on_event="{on_event}" \
                                    style="{style}">\
                      </div>'
         slider_els = xml.xpath('//slider')
@@ -112,21 +111,18 @@ class GraphicalSliderToolModule(XModule):
                                 slider_div.format(element_class=self.html_class,
                                     element_id=self.html_id,
                                     var=slider_el.get('var', ""),
-                                    on_event=slider_el.get('on_event', 'slide'),
                                     style=slider_el.get('style', ""))))
 
         # substitute inputs aka textboxes
         input_div = '<input class="{element_class}_input" \
                                   id="{element_id}_input_{var}_{input_index}" \
-                                   data-var="{var}" style="{style}" \
-                                   data-el_readonly="{readonly}"/>'
+                                   data-var="{var}" style="{style}"/>'
         input_els = xml.xpath('//textbox')
         for input_index, input_el in enumerate(input_els):
             input_el.getparent().replace(input_el, html.fromstring(
                                 input_div.format(element_class=self.html_class,
                                         element_id=self.html_id,
                                         var=input_el.get('var', ""),
-                                        readonly=input_el.get('readonly', ''),
                                         style=input_el.get('style', ""),
                                         input_index=input_index)))
 
