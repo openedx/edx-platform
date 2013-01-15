@@ -56,3 +56,4 @@ dogstatsd-python==0.2.1
 sphinx==1.1.3
 Shapely==1.2.16
 ipython==0.13.1
+xmltodict==0.4.1

@@ -19,6 +19,7 @@ setup(
             "abtest = xmodule.abtest_module:ABTestDescriptor",
             "book = xmodule.backcompat_module:TranslateCustomTagDescriptor",
             "chapter = xmodule.seq_module:SequenceDescriptor",
+            "combinedopenended = xmodule.combined_open_ended_module:CombinedOpenEndedDescriptor",
             "course = xmodule.course_module:CourseDescriptor",
             "customtag = xmodule.template_module:CustomTagDescriptor",
             "discuss = xmodule.backcompat_module:TranslateCustomTagDescriptor",
@@ -28,7 +29,6 @@ setup(
             "problem = xmodule.capa_module:CapaDescriptor",
             "problemset = xmodule.seq_module:SequenceDescriptor",
             "section = xmodule.backcompat_module:SemanticSectionDescriptor",
-            "selfassessment = xmodule.self_assessment_module:SelfAssessmentDescriptor",
             "sequential = xmodule.seq_module:SequenceDescriptor",
             "slides = xmodule.backcompat_module:TranslateCustomTagDescriptor",
             "vertical = xmodule.vertical_module:VerticalDescriptor",
@@ -36,6 +36,7 @@ setup(
             "videodev = xmodule.backcompat_module:TranslateCustomTagDescriptor",
             "videosequence = xmodule.seq_module:SequenceDescriptor",
             "discussion = xmodule.discussion_module:DiscussionDescriptor",
+            "graphical_slider_tool = xmodule.gst_module:GraphicalSliderToolDescriptor",
         ]
     }
 )
