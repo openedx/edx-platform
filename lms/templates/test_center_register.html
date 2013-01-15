@@ -109,39 +109,35 @@
   %>
 
   % if registration:
-  
-   % if  registration.is_rejected:      
-  <section class="status message message-flash registration-rejected message-action">
-    <h3 class="message-title">Your registration for the Pearson exam has been rejected</h3>
-    <p class="message-copy">Please see your registration status details for more information.</p>
-   % endif
+    <!-- select one of four registration status banners to display -->
+    % if registration.is_accepted:
+    <section class="status message message-flash registration-processed message-action">
+      <h3 class="message-title">Your registration for the Pearson exam has been processed</h3>
+      <p class="message-copy">Your registration number is <strong>${registration.client_authorization_id}</strong>.  (Write this down! You’ll need it to schedule your exam.)</p>
+      <a href="${registration.registration_signup_url}" class="button exam-button">Schedule Pearson exam</a>
+    </section>
+    % endif
 
-   % if  registration.is_accepted:
-  <section class="status message message-flash registration-processed message-action">
-    <h3 class="message-title">Your registration for the Pearson exam has been processed</h3>
-    <p class="message-copy">Your registration number is <strong>${registration.client_authorization_id}</strong> (Write this down! You’ll need it to schedule your exam.)</p>
-    <a href="${registration.registration_signup_url}" class="button exam-button">Schedule Pearson exam</a>
-  </section>
-   % endif
+    % if registration.demographics_is_rejected:      
+    <section class="status message message-flash demographics-rejected message-action">
+      <h3 class="message-title">Your demographic information contained an error and was rejected</h3>
+      <p class="message-copy">Please check the information you provided, and correct the errors noted below.
+    </section>
+    % endif
+   
+    % if registration.registration_is_rejected:      
+    <section class="status message message-flash registration-rejected message-action">
+      <h3 class="message-title">Your registration for the Pearson exam has been rejected</h3>
+      <p class="message-copy">Please see your registration status details for more information.</p>
+    </section>
+    % endif
 
-   % if  registration.is_pending:
-  <section class="status message message-flash registration-pending">
+    % if registration.is_pending:
+   <section class="status message message-flash registration-pending">
     <h3 class="message-title">Your registration for the Pearson exam is pending</h3>
     <p class="message-copy">Once your information is processed, it will be forwarded to Pearson and you will be able to schedule an exam.</p>
-  </section>
-   % endif
-   
-   <!-- TODO: add logic for demographic error/rejected state (add this message to the page) -->
-   <section class="status message message-flash demographics-rejected message-action">
-     <h3 class="message-title">Your demographic information contained an error and was rejected</h3>
-     <p class="message-copy">Please check the information you provided, and correct the errors noted below.
    </section>
-   
-   <!-- TODO: add logic for registration closed state (add this message to the page) -->
-   <section class="status message message-flash registration-closed">
-     <h3 class="message-title">Registration for this Pearson exam is closed</h3>
-     <p class="message-copy">Your registration status and previous information is available below, however you may not edit any of the information.
-   </section>
+    % endif
 
   % endif
   
@@ -149,10 +145,16 @@
     <header>
       <h3 class="is-hidden">Registration Form</h3>
     </header>
-    <form id="testcenter_register_form" method="post" data-remote="true" action="/create_test_registration">
-    
-    <!-- TODO: add logic for registration closed state (add class of disabled to <form>) -->
-    <!-- <form id="testcenter_register_form" method="post" data-remote="true" action="/create_test_registration" class="disabled"> -->
+  % if exam_info.is_registering():  
+    <form id="testcenter_register_form" method="post" data-remote="true" action="/create_exam_registration">
+  % else:    
+    <form id="testcenter_register_form" method="post" data-remote="true" action="/create_exam_registration" class="disabled">
+      <!-- registration closed, so tell them they can't do anything: -->
+      <section class="status message message-flash registration-closed">
+        <h3 class="message-title">Registration for this Pearson exam is closed</h3>
+        <p class="message-copy">Your previous information is available below, however you may not edit any of the information.
+      </section>
+  % endif
       
       % if registration:
       <p class="instructions">
@@ -168,7 +170,7 @@
       <input id="id_email" type="hidden" name="email" value="${user.email}" />
       <input id="id_username" type="hidden" name="username" value="${user.username}" />
       <input id="id_course_id" type="hidden" name="course_id" value="${course.id}" />
-      <input id="id_course_id" type="hidden" name="exam_series_code" value="${exam_info.exam_series_code}" />
+      <input id="id_exam_series_code" type="hidden" name="exam_series_code" value="${exam_info.exam_series_code}" />
 
       <div class="form-fields-primary">
         <fieldset class="group group-form group-form-personalinformation">
@@ -283,10 +285,10 @@
 
         % if registration:
           % if registration.accommodation_request and len(registration.accommodation_request) > 0:
-        <p class="note"><span class="title">Note</span>: Your previously accomodation requests below need to be reviewed in detail <strong>and will add asignificant delay to your registration process</strong>.</p>
+        <p class="note"><span class="title">Note</span>: Your previous accommodation request below needs to be reviewed in detail <strong>and will add a significant delay to your registration process</strong>.</p>
           % endif
         % else: 
-        <p class="note"><span class="title">Note</span>: Accommodation requests are not part of your demographic information, <strong>and cannot be changed once submitted</strong>. Accomodation requests, which are reviewed on a case-by-case basis, <strong>will add significant delay to the registration process</strong>.</p>
+        <p class="note"><span class="title">Note</span>: Accommodation requests are not part of your demographic information, <strong>and cannot be changed once submitted</strong>. Accommodation requests, which are reviewed on a case-by-case basis, <strong>will add significant delay to the registration process</strong>.</p>
         % endif
                   
         <fieldset class="group group-form group-form-optional">
@@ -328,10 +330,10 @@
 
     % if registration:
       % if registration.accommodation_request and len(registration.accommodation_request) > 0:
-    <a class="actions form-fields-secondary-visibility is-hidden" href="#form-fields-secondary">Special (<abbr title="Americans with Disabilities Act">ADA</abbr>) Accommdations</a>
+    <a class="actions form-fields-secondary-visibility is-hidden" href="#form-fields-secondary">Special (<abbr title="Americans with Disabilities Act">ADA</abbr>) Accommodations</a>
       % endif
     % else: 
-    <a class="actions form-fields-secondary-visibility" href="#form-fields-secondary">Special (<abbr title="Americans with Disabilities Act">ADA</abbr>) Accommdations</a>
+    <a class="actions form-fields-secondary-visibility" href="#form-fields-secondary">Special (<abbr title="Americans with Disabilities Act">ADA</abbr>) Accommodations</a>
     % endif
   </section>
     
