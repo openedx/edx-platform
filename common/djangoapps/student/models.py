@@ -221,9 +221,9 @@ class TestCenterUser(models.Model):
     def email(self):
         return self.user.email
     
-    def needs_update(self, dict):
+    def needs_update(self, fields):
         for fieldname in TestCenterUser.user_provided_fields():
-            if fieldname in dict and self.__getattribute__(fieldname) != dict[fieldname]:
+            if fieldname in fields and getattr(self, fieldname) != fields[fieldname]:
                 return True
             
         return False    
@@ -237,14 +237,14 @@ class TestCenterUser(models.Model):
     def _generate_candidate_id():
         return TestCenterUser._generate_edx_id("edX")
         
-    @staticmethod
-    def create(user):
-        testcenter_user = TestCenterUser(user=user)
+    @classmethod
+    def create(cls, user):
+        testcenter_user = cls(user=user)
         # testcenter_user.candidate_id remains unset    
         # assign an ID of our own:
-        cand_id = TestCenterUser._generate_candidate_id()
+        cand_id = cls._generate_candidate_id()
         while TestCenterUser.objects.filter(client_candidate_id=cand_id).exists():
-            cand_id = TestCenterUser._generate_candidate_id()
+            cand_id = cls._generate_candidate_id()
         testcenter_user.client_candidate_id = cand_id  
         return testcenter_user
 
@@ -276,14 +276,6 @@ class TestCenterUserForm(ModelForm):
         
     # add validation:
     
-    @staticmethod
-    def can_encode_as_latin(fieldvalue):
-        try:
-            fieldvalue.encode('iso-8859-1')
-        except UnicodeEncodeError:
-            return False
-        return True
-        
     def clean_country(self):
         code = self.cleaned_data['country']
         if code and len(code) != 3:
@@ -291,6 +283,13 @@ class TestCenterUserForm(ModelForm):
         return code
                 
     def clean(self):
+        def _can_encode_as_latin(fieldvalue):
+            try:
+                fieldvalue.encode('iso-8859-1')
+            except UnicodeEncodeError:
+                return False
+            return True
+        
         cleaned_data = super(TestCenterUserForm, self).clean()
         
         # check for interactions between fields:
@@ -312,7 +311,7 @@ class TestCenterUserForm(ModelForm):
         # check encoding for all fields:
         cleaned_data_fields = [fieldname for fieldname in cleaned_data]
         for fieldname in cleaned_data_fields:
-            if not TestCenterUserForm.can_encode_as_latin(cleaned_data[fieldname]):
+            if not _can_encode_as_latin(cleaned_data[fieldname]):
                 self._errors[fieldname] = self.error_class([u'Must only use characters in Latin-1 (iso-8859-1) encoding'])                
                 del cleaned_data[fieldname]
 
@@ -427,15 +426,15 @@ class TestCenterRegistration(models.Model):
         # TODO: figure out if this should really go in the database (with a default value).
         return 1
     
-    @staticmethod
-    def create(testcenter_user, exam, accommodation_request):
-        registration = TestCenterRegistration(testcenter_user = testcenter_user)
+    @classmethod
+    def create(cls, testcenter_user, exam, accommodation_request):
+        registration = cls(testcenter_user = testcenter_user)
         registration.course_id = exam.course_id
         registration.accommodation_request = accommodation_request.strip()
         registration.exam_series_code = exam.exam_series_code
         registration.eligibility_appointment_date_first = strftime("%Y-%m-%d", exam.first_eligible_appointment_date)
         registration.eligibility_appointment_date_last = strftime("%Y-%m-%d", exam.last_eligible_appointment_date)
-        registration.client_authorization_id = TestCenterRegistration._create_client_authorization_id()
+        registration.client_authorization_id = cls._create_client_authorization_id()
         # accommodation_code remains blank for now, along with Pearson confirmation information
         return registration
 

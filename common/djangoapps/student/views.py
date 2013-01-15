@@ -471,8 +471,9 @@ def _do_create_account(post_vars):
     try:
         profile.year_of_birth = int(post_vars['year_of_birth'])
     except (ValueError, KeyError):
-        profile.year_of_birth = None  # If they give us garbage, just ignore it instead
-                                # of asking them to put an integer.
+        # If they give us garbage, just ignore it instead
+        # of asking them to put an integer.
+        profile.year_of_birth = None  
     try:
         profile.save()
     except Exception:
@@ -615,7 +616,7 @@ def exam_registration_info(user, course):
     
     exam_code = exam_info.exam_series_code
     registrations = get_testcenter_registration(user, course.id, exam_code)
-    if len(registrations) > 0:
+    if registrations:
         registration = registrations[0]
     else:
         registration = None
@@ -705,7 +706,7 @@ def create_exam_registration(request, post_override=None):
     exam = course.current_test_center_exam
     exam_code = exam.exam_series_code
     registrations = get_testcenter_registration(user, course_id, exam_code)
-    if len(registrations) > 0:
+    if registrations:
         registration = registrations[0]
         # NOTE: we do not bother to check here to see if the registration has changed,
         # because at the moment there is no way for a user to change anything about their
