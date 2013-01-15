@@ -11,6 +11,7 @@ actually generates the CourseTab.
 
 from collections import namedtuple
 import logging
+import json
 
 from django.conf import settings
 from django.core.urlresolvers import reverse
@@ -20,6 +21,10 @@ from fs.errors import ResourceNotFoundError
 from courseware.access import has_access
 from static_replace import replace_urls
 
+from open_ended_grading.peer_grading_service import PeerGradingService
+from open_ended_grading.staff_grading_service import StaffGradingService
+from student.models import unique_id_for_user
+
 log = logging.getLogger(__name__)
 
 class InvalidTabsException(Exception):
@@ -28,7 +33,10 @@ class InvalidTabsException(Exception):
     """
     pass
 
-CourseTab = namedtuple('CourseTab', 'name link is_active')
+CourseTabBase = namedtuple('CourseTab', 'name link is_active has_img img')
+
+def CourseTab(name, link, is_active, has_img=False, img=""):
+    return CourseTabBase(name, link, is_active, has_img, img)
 
 # encapsulate implementation for a tab:
 #  - a validation function: takes the config dict and raises
@@ -101,9 +109,48 @@ def _textbooks(tab, user, course, active_page):
 def _staff_grading(tab, user, course, active_page):
     if has_access(user, course, 'staff'):
         link = reverse('staff_grading', args=[course.id])
-        return [CourseTab('Staff grading', link, active_page == "staff_grading")]
+        staff_gs = StaffGradingService(settings.STAFF_GRADING_INTERFACE)
+        pending_grading=False
+        tab_name = "Staff grading"
+        img_path= ""
+        try:
+            notifications = json.loads(staff_gs.get_notifications(course.id))
+            if notifications['success']:
+                if notifications['staff_needs_to_grade']:
+                    pending_grading=True
+        except:
+            #Non catastrophic error, so no real action
+            log.info("Problem with getting notifications from staff grading service.")
+
+        if pending_grading:
+            img_path = "/static/images/slider-handle.png"
+
+        tab = [CourseTab(tab_name, link, active_page == "staff_grading", pending_grading, img_path)]
+        return tab
     return []
 
+def _peer_grading(tab, user, course, active_page):
+    if user.is_authenticated():
+        link = reverse('peer_grading', args=[course.id])
+        peer_gs = PeerGradingService(settings.PEER_GRADING_INTERFACE)
+        pending_grading=False
+        tab_name = "Peer grading"
+        img_path= ""
+        try:
+            notifications = json.loads(peer_gs.get_notifications(course.id,unique_id_for_user(user)))
+            if notifications['success']:
+                if notifications['student_needs_to_peer_grade']:
+                    pending_grading=True
+        except:
+            #Non catastrophic error, so no real action
+            log.info("Problem with getting notifications from peer grading service.")
+
+        if pending_grading:
+            img_path = "/static/images/slider-handle.png"
+
+        tab = [CourseTab(tab_name, link, active_page == "peer_grading", pending_grading, img_path)]
+        return tab
+    return []
 
 #### Validators
 
@@ -140,6 +187,7 @@ VALID_TAB_TYPES = {
     'textbooks': TabImpl(null_validator, _textbooks),
     'progress': TabImpl(need_name, _progress),
     'static_tab': TabImpl(key_checker(['name', 'url_slug']), _static_tab),
+    'peer_grading': TabImpl(null_validator, _peer_grading),
     'staff_grading': TabImpl(null_validator, _staff_grading),
     }
 
