@@ -1,0 +1,91 @@
+<vertical>
+    <graphical_slider_tool>
+      <render>
+
+          <h2>Graphic slider tool: full example.</h2>
+            <p>
+                A simple equation
+                    \(
+                        y_1 = 10 \times b \times \frac{sin(a \times x) \times sin(b \times x)}{cos(b \times x) + 10}
+                    \)
+                can be plotted.
+            </p>
+
+            <!-- make text and input or slider at the same line -->
+            <div>
+              <p style="float:left;"> Currently \(a\) is</p>
+              <!-- readonly input for a -->
+              <span id="a_readonly" style="width:50px; float:left; margin-left:10px;"/>
+            </div>
+            <!-- clear:left will make next text to begin from new line -->
+            <p style="clear:left">   This one
+                  \(
+                      y_2 = sin(a \times x)
+                  \)
+              will be overlayed on top.
+            </p>
+            <div>
+              <p style="float:left;">Currently \(b\) is </p>
+              <textbox var="b" style="width:50px; float:left; margin-left:10px;"/>
+            </div>
+            <div style="clear:left;">
+              <p style="float:left;">To change \(a\) use:</p>
+              <slider var="a" style="width:400px;float:left;margin-left:10px;"/>
+            </div>
+            <div style="clear:left;">
+              <p style="float:left;">To change \(b\) use:</p>
+              <slider var="b" style="width:400px;float:left;margin-left:10px;"/>
+            </div>
+            <plot style='clear:left;width:600px;padding-top:15px;padding-bottom:20px;'/>
+            <div style="clear:left;height:50px;">
+             <p style="float:left;">Second input for b:</p>
+             <!-- editable input for b -->
+              <textbox var="b" style="color:red;width:60px;float:left;margin-left:10px;"/>
+            </div >
+      </render>
+
+      <configuration>
+
+        <parameters>
+            <param var="a" min="90" max="120" step="10" initial="100" />
+            <param var="b" min="120" max="200" step="2.3" initial="120" />
+        </parameters>
+
+        <functions>
+
+          <function color="#0000FF" line="false" dot="true" label="\(y_1\)">
+            return 10.0 * b * Math.sin(a * x) * Math.sin(b * x) / (Math.cos(b * x) + 10);
+          </function>
+          <function color="red" line="true" dot="false" label="\(y_2\)">
+            <!-- works w/o return, if function is single line -->
+            Math.sin(a * x);
+          </function>
+          <function color="#FFFF00" line="false" dot="false" label="unknown">
+            function helperFunc(c1) {
+              return c1 * c1 - a;
+            }
+
+            return helperFunc(x + 10 * a * b) + Math.sin(a - x);
+          </function>
+          <function output="element" el_id="a_readonly">a</function>
+        </functions>
+
+        <plot>
+
+          <xrange>
+              <min>return 0;</min>
+              <!-- works w/o return -->
+              <max>30</max>
+          </xrange>
+
+          <num_points>120</num_points>
+
+          <xticks>0, 3, 30</xticks>
+          <yticks>-1.5, 1.5, 13.5</yticks>
+
+          <xunits>\(cm\)</xunits>
+          <yunits>\(m\)</yunits>
+        </plot>
+      </configuration>
+    </graphical_slider_tool>
+</vertical>
