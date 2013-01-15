@@ -45,43 +45,35 @@ The standard chunk of Lorem Ipsum used since the 1500s is reproduced below for t
 <table class="rubric"><tbody><tr><th>Purpose</th>
                 
             <td>
-                <!--TODO: figure out the state variables/selected info -->
                     <input type="radio" class="score-selection" name="score-selection-0" id="score-0-0" value="0"><label for="score-0-0">No product</label>
             </td>
                 
             <td>
-                <!--TODO: figure out the state variables/selected info -->
                     <input type="radio" class="score-selection" name="score-selection-0" id="score-0-1" value="1"><label for="score-0-1">Unclear purpose or main idea</label>
             </td>
                 
             <td>
-                <!--TODO: figure out the state variables/selected info -->
                     <input type="radio" class="score-selection" name="score-selection-0" id="score-0-2" value="2"><label for="score-0-2">Communicates an identifiable purpose and/or main idea for an audience</label>
             </td>
                 
             <td>
-                <!--TODO: figure out the state variables/selected info -->
                     <input type="radio" class="score-selection" name="score-selection-0" id="score-0-3" value="3"><label for="score-0-3">Achieves a clear and distinct purpose for a targeted audience and communicates main ideas with effectively used techniques to introduce and represent ideas and insights</label>
             </td>
         </tr><tr><th>Organization</th>
                 
             <td>
-                <!--TODO: figure out the state variables/selected info -->
                     <input type="radio" class="score-selection" name="score-selection-1" id="score-1-0" value="0"><label for="score-1-0">No product</label>
             </td>
                 
             <td>
-                <!--TODO: figure out the state variables/selected info -->
                     <input type="radio" class="score-selection" name="score-selection-1" id="score-1-1" value="1"><label for="score-1-1">Organization is unclear; introduction, body, and/or conclusion are underdeveloped, missing or confusing.</label>
             </td>
                 
             <td>
-                <!--TODO: figure out the state variables/selected info -->
                     <input type="radio" class="score-selection" name="score-selection-1" id="score-1-2" value="2"><label for="score-1-2">Organization is occasionally unclear; introduction, body or conclusion may be underdeveloped.</label>
             </td>
                 
             <td>
-                <!--TODO: figure out the state variables/selected info -->
                     <input type="radio" class="score-selection" name="score-selection-1" id="score-1-3" value="3"><label for="score-1-3">Organization is clear and easy to follow; introduction, body and conclusion are defined and aligned with purpose.</label>
             </td>
         </tr></tbody></table>'''
@@ -169,8 +161,6 @@ class StaffGrading
     @submission_container = $('.submission-container')
     @submission_wrapper = $('.submission-wrapper')
 
-    @rubric_container = $('.rubric-container')
-    @rubric_wrapper = $('.rubric-wrapper')
     @grading_wrapper = $('.grading-wrapper')
 
     @feedback_area = $('.feedback-area')

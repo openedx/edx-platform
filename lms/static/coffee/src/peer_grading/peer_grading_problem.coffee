@@ -56,13 +56,41 @@ The standard chunk of Lorem Ipsum used since the 1500s is reproduced below for t
 <p>This is a self-assessed open response question. Please use as much space as you need in the box below to answer the question.</p>
             '''
         rubric: '''
-<ul>
-<li>Metals tend to be good electronic conductors, meaning that they have a large number of electrons which are able to access empty (mobile) energy states within the material.</li>
-<li>Sodium has a half-filled s-band, so there are a number of empty states immediately above the highest occupied energy levels within the band.</li>
-<li>Magnesium has a full s-band, but the the s-band and p-band overlap in magnesium. Thus are still a large number of available energy states immediately above the s-band highest occupied energy level.</li>
-</ul>
-
-<p>Please score your response according to how many of the above components you identified:</p>
+<table class="rubric"><tbody><tr><th>Purpose</th>
+                
+            <td>
+                    <input type="radio" class="score-selection" name="score-selection-0" id="score-0-0" value="0"><label for="score-0-0">No product</label>
+            </td>
+                
+            <td>
+                    <input type="radio" class="score-selection" name="score-selection-0" id="score-0-1" value="1"><label for="score-0-1">Unclear purpose or main idea</label>
+            </td>
+                
+            <td>
+                    <input type="radio" class="score-selection" name="score-selection-0" id="score-0-2" value="2"><label for="score-0-2">Communicates an identifiable purpose and/or main idea for an audience</label>
+            </td>
+                
+            <td>
+                    <input type="radio" class="score-selection" name="score-selection-0" id="score-0-3" value="3"><label for="score-0-3">Achieves a clear and distinct purpose for a targeted audience and communicates main ideas with effectively used techniques to introduce and represent ideas and insights</label>
+            </td>
+        </tr><tr><th>Organization</th>
+                
+            <td>
+                    <input type="radio" class="score-selection" name="score-selection-1" id="score-1-0" value="0"><label for="score-1-0">No product</label>
+            </td>
+                
+            <td>
+                    <input type="radio" class="score-selection" name="score-selection-1" id="score-1-1" value="1"><label for="score-1-1">Organization is unclear; introduction, body, and/or conclusion are underdeveloped, missing or confusing.</label>
+            </td>
+                
+            <td>
+                    <input type="radio" class="score-selection" name="score-selection-1" id="score-1-2" value="2"><label for="score-1-2">Organization is occasionally unclear; introduction, body or conclusion may be underdeveloped.</label>
+            </td>
+                
+            <td>
+                    <input type="radio" class="score-selection" name="score-selection-1" id="score-1-3" value="3"><label for="score-1-3">Organization is clear and easy to follow; introduction, body and conclusion are defined and aligned with purpose.</label>
+            </td>
+        </tr></tbody></table>
             '''
         max_score: 4
     else if cmd == 'get_next_submission'
@@ -82,13 +110,41 @@ Curabitur tristique purus ac arcu consequat cursus. Cras diam felis, dignissim q
 <p>This is a self-assessed open response question. Please use as much space as you need in the box below to answer the question.</p>
             '''
         rubric: '''
-<ul>
-<li>Metals tend to be good electronic conductors, meaning that they have a large number of electrons which are able to access empty (mobile) energy states within the material.</li>
-<li>Sodium has a half-filled s-band, so there are a number of empty states immediately above the highest occupied energy levels within the band.</li>
-<li>Magnesium has a full s-band, but the the s-band and p-band overlap in magnesium. Thus are still a large number of available energy states immediately above the s-band highest occupied energy level.</li>
-</ul>
-
-<p>Please score your response according to how many of the above components you identified:</p>
+<table class="rubric"><tbody><tr><th>Purpose</th>
+                
+            <td>
+                    <input type="radio" class="score-selection" name="score-selection-0" id="score-0-0" value="0"><label for="score-0-0">No product</label>
+            </td>
+                
+            <td>
+                    <input type="radio" class="score-selection" name="score-selection-0" id="score-0-1" value="1"><label for="score-0-1">Unclear purpose or main idea</label>
+            </td>
+                
+            <td>
+                    <input type="radio" class="score-selection" name="score-selection-0" id="score-0-2" value="2"><label for="score-0-2">Communicates an identifiable purpose and/or main idea for an audience</label>
+            </td>
+                
+            <td>
+                    <input type="radio" class="score-selection" name="score-selection-0" id="score-0-3" value="3"><label for="score-0-3">Achieves a clear and distinct purpose for a targeted audience and communicates main ideas with effectively used techniques to introduce and represent ideas and insights</label>
+            </td>
+        </tr><tr><th>Organization</th>
+                
+            <td>
+                    <input type="radio" class="score-selection" name="score-selection-1" id="score-1-0" value="0"><label for="score-1-0">No product</label>
+            </td>
+                
+            <td>
+                    <input type="radio" class="score-selection" name="score-selection-1" id="score-1-1" value="1"><label for="score-1-1">Organization is unclear; introduction, body, and/or conclusion are underdeveloped, missing or confusing.</label>
+            </td>
+                
+            <td>
+                    <input type="radio" class="score-selection" name="score-selection-1" id="score-1-2" value="2"><label for="score-1-2">Organization is occasionally unclear; introduction, body or conclusion may be underdeveloped.</label>
+            </td>
+                
+            <td>
+                    <input type="radio" class="score-selection" name="score-selection-1" id="score-1-3" value="3"><label for="score-1-3">Organization is clear and easy to follow; introduction, body and conclusion are defined and aligned with purpose.</label>
+            </td>
+        </tr></tbody></table>
             '''
         max_score: 4
     else if cmd == 'save_calibration_essay'
@@ -137,6 +193,7 @@ class PeerGradingProblem
     @feedback_area = $('.feedback-area')
 
     @score_selection_container = $('.score-selection-container')
+    @rubric_selection_container = $('.rubric-selection-container')
     @score = null
     @calibration = null
 
@@ -175,8 +232,22 @@ class PeerGradingProblem
   fetch_submission_essay: () =>
     @backend.post('get_next_submission', {location: @location}, @render_submission)
 
+  # finds the scores for each rubric category
+  get_score_list: () =>
+    # find the number of categories:
+    num_categories = $('table.rubric tr').length
+
+    score_lst = []
+    # get the score for each one
+    for i in [0..(num_categories-1)]
+      score = $("input[name='score-selection-#{i}']:checked").val()
+      score_lst.push(score)
+
+    return score_lst
+
   construct_data: () ->
     data =
+      rubric_scores: @get_score_list()
       score: @score
       location: @location
       submission_id: @essay_id_input.val()
@@ -244,8 +315,16 @@ class PeerGradingProblem
 
   # called after a grade is selected on the interface
   graded_callback: (event) =>
-    @grading_message.hide()
-    @score = event.target.value
+    @grade = $("input[name='grade-selection']:checked").val()
+    if @grade == undefined
+      return
+    # check to see whether or not any categories have not been scored
+    num_categories = $('table.rubric tr').length
+    for i in [0..(num_categories-1)]
+      score = $("input[name='score-selection-#{i}']:checked").val()
+      if score == undefined
+        return
+    # show button if we have scores for all categories
     @show_submit_button()
 
   
@@ -322,7 +401,7 @@ class PeerGradingProblem
 
     @submission_container.append(@make_paragraphs(response.student_response))
     @prompt_container.html(response.prompt)
-    @rubric_container.html(response.rubric)
+    @rubric_selection_container.html(response.rubric)
     @submission_key_input.val(response.submission_key)
     @essay_id_input.val(response.submission_id)
     @setup_score_selection(response.max_score)
@@ -366,8 +445,12 @@ class PeerGradingProblem
     @submit_button.show()
 
   setup_score_selection: (max_score) =>
+    
     # first, get rid of all the old inputs, if any.
-    @score_selection_container.html('Choose score: ')
+    @score_selection_container.html("""
+    <h3>Overall Score</h3>
+    <p>Choose an overall score for this submission.</p>
+    """)
 
     # Now create new labels and inputs for each possible score.
     for score in [0..max_score]
@@ -375,12 +458,13 @@ class PeerGradingProblem
       label = """<label for="#{id}">#{score}</label>"""
       
       input = """
-              <input type="radio" name="score-selection" id="#{id}" value="#{score}"/>
+              <input type="radio" name="grade-selection" id="#{id}" value="#{score}"/>
               """       # "  fix broken parsing in emacs
       @score_selection_container.append(input + label)
 
     # And now hook up an event handler again
     $("input[name='score-selection']").change @graded_callback
+    $("input[name='grade-selection']").change @graded_callback
 
 
 

@@ -24,7 +24,8 @@ div.peer-grading{
         color: white;
     }
 
-    input[name='score-selection'] {
+    input[name='score-selection'],
+    input[name='grade-selection'] {
         display: none;
     }
 

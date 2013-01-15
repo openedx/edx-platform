@@ -190,7 +190,7 @@ def get_next_submission(request, course_id):
                         mimetype="application/json")
     except GradingServiceError:
         log.exception("Error getting next submission.  server url: {0}  location: {1}, grader_id: {2}"
-                      .format(staff_grading_service().url, location, grader_id))
+                      .format(peer_grading_service().url, location, grader_id))
         return json.dumps({'success': False,
                            'error': 'Could not connect to grading service'})
 
@@ -228,7 +228,7 @@ def save_grade(request, course_id):
     except GradingServiceError:
         log.exception("""Error saving grade.  server url: {0}, location: {1}, submission_id:{2}, 
                         submission_key: {3}, score: {4}"""
-                      .format(staff_grading_service().url,
+                      .format(peer_grading_service().url,
                           location, submission_id, submission_key, score)
                       )
         return json.dumps({'success': False,
@@ -267,7 +267,7 @@ def is_student_calibrated(request, course_id):
         return HttpResponse(response, mimetype="application/json")
     except GradingServiceError:
         log.exception("Error from grading service.  server url: {0}, grader_id: {0}, location: {1}"
-                      .format(staff_grading_service().url, grader_id, location))
+                      .format(peer_grading_service().url, grader_id, location))
         return json.dumps({'success': False,
                            'error': 'Could not connect to grading service'})
 
@@ -308,12 +308,30 @@ def show_calibration_essay(request, course_id):
     location = p['location']
     try:
         response = peer_grading_service().show_calibration_essay(location, grader_id)
-        return HttpResponse(response, mimetype="application/json")
+        response_json = json.loads(response)
+        # if we can't handle the rubric
+        if response_json.has_key('rubric'):
+            rubric = response_json['rubric']
+            rubric_renderer = CombinedOpenEndedRubric(False)
+            success, rubric_html = rubric_renderer.render_rubric(rubric)
+            if not success:
+                error_message = "Could not render rubric: {0}".format(rubric)
+                log.exception(error_message)
+                return json.dumps({'success': False,
+                                   'error': error_message})
+            response_json['rubric'] = rubric_html
+        return json.dumps(response_json)
     except GradingServiceError:
         log.exception("Error from grading service.  server url: {0}, location: {0}"
-                      .format(staff_grading_service().url, location))
+                      .format(peer_grading_service().url, location))
         return json.dumps({'success': False,
                            'error': 'Could not connect to grading service'})
+    # if we can't parse the rubric into HTML, 
+    except etree.XMLSyntaxError:
+        log.exception("Cannot parse rubric string. Raw string: {0}"
+                      .format(rubric))
+        return json.dumps({'success': False,
+                           'error': 'Error displaying submission'})
 
 
 def save_calibration_essay(request, course_id):
