@@ -3,8 +3,8 @@ $(document).ready(function() {
     var question_id;
 
     $('.response').click(function(){
-        $(this).toggleClass('opened');
-	answer = $(this).find(".answer");
-        answer.slideToggle('fast');
+      $(this).toggleClass('opened');
+      answer = $(this).find(".answer");
+      answer.slideToggle('fast');
     });
 });
