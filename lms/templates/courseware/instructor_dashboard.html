@@ -57,10 +57,13 @@ function goto( mode)
             <a href="#" onclick="goto('Psychometrics');" class="${modeflag.get('Psychometrics')}">Psychometrics</a> | 
           %endif
           <a href="#" onclick="goto('Admin');" class="${modeflag.get('Admin')}">Admin</a> |
-          <a href="#" onclick="goto('Forum Admin');" class="${modeflag.get('Forum Admin')}">Forum Admin</a> ]
+          <a href="#" onclick="goto('Forum Admin');" class="${modeflag.get('Forum Admin')}">Forum Admin</a> |
+          <a href="#" onclick="goto('Enrollment');" class="${modeflag.get('Enrollment')}">Enrollment</a>
+	 ]
     </h2>
 
-  <div style="text-align:right" id="djangopid">${djangopid}</div>
+  <div style="text-align:right"><span id="djangopid">${djangopid}</span>
+  | <span id="mitxver">${mitx_version}</span></div>
 
     <form name="idashform" method="POST">
     <input type="hidden" name="csrfmiddlewaretoken" value="${ csrf_token }">
@@ -68,6 +71,12 @@ function goto( mode)
 
 ##----------------------------------------------------------------------------- 
 %if modeflag.get('Grades'):
+
+    %if offline_grade_log:
+      <p><font color='orange'>Pre-computed grades ${offline_grade_log} available: Use?
+          <input type='checkbox' name='use_offline_grades' value='yes'></font> </p>
+    %endif
+
     <p>
     <a href="${reverse('gradebook', kwargs=dict(course_id=course.id))}">Gradebook</a>
     </p>
@@ -93,6 +102,42 @@ function goto( mode)
     <p>
     <input type="submit" name="action" value="Download CSV of answer distributions">
     </p>
+    <hr width="40%" style="align:left">
+
+  %if settings.MITX_FEATURES.get('REMOTE_GRADEBOOK_URL','') and instructor_access:
+  
+    <%
+        rg = course.metadata.get('remote_gradebook',{})
+    %>
+
+    <h3>Export grades to remote gradebook</h3>
+    <p>The assignments defined for this course should match the ones
+    stored in the gradebook, for this to work properly!</p>
+
+    <ul>
+    <li>Gradebook name: <font color="green">${rg.get('name','None defined!')}</font>
+    <br/>
+    <br/>
+    <input type="submit" name="action" value="List assignments available in remote gradebook">
+    <input type="submit" name="action" value="List enrolled students matching remote gradebook">
+    <br/>
+    <br/>
+    </li>
+    <li><input type="submit" name="action" value="List assignments available for this course">
+    <br/>
+    <br/>
+    </li>
+    <li>Assignment name: <input type="text" name="assignment_name" size=40 >
+    <br/>
+    <br/>
+    <input type="submit" name="action" value="Display grades for assignment">
+    <input type="submit" name="action" value="Export grades for assignment to remote gradebook">
+    <input type="submit" name="action" value="Export CSV file of grades for assignment">
+    </li>
+    </ul>
+
+  %endif
+
  %endif
 
 ##----------------------------------------------------------------------------- 
@@ -125,6 +170,16 @@ function goto( mode)
     <p>
     <input type="text" name="staffuser"> <input type="submit" name="action" value="Remove course staff">
     <input type="submit" name="action" value="Add course staff">
+    <hr width="40%" style="align:left">
+  %endif
+
+  %if admin_access:
+    <hr width="40%" style="align:left">
+    <p>
+    <input type="submit" name="action" value="List course instructors">
+    <p>
+    <input type="text" name="instructor"> <input type="submit" name="action" value="Remove instructor">
+    <input type="submit" name="action" value="Add instructor">
     <hr width="40%" style="align:left">
   %endif
 
@@ -163,10 +218,52 @@ function goto( mode)
   %endif
 %endif
 
+##----------------------------------------------------------------------------- 
+%if modeflag.get('Enrollment'):
+
+    <hr width="40%" style="align:left">
+    <p>
+    <input type="submit" name="action" value="List enrolled students">
+    <input type="submit" name="action" value="List students who may enroll but may not have yet signed up">
+    <p>
+    Student Email: <input type="text" name="enstudent"> <input type="submit" name="action" value="Un-enroll student">
+    <input type="submit" name="action" value="Enroll student">
+    <input type="submit" name="action" value="Un-enroll ALL students">
+    <hr width="40%" style="align:left">
+
+  %if settings.MITX_FEATURES.get('REMOTE_GRADEBOOK_URL','') and instructor_access:
+  
+    <%
+        rg = course.metadata.get('remote_gradebook',{})
+    %>
+
+    <p>Pull enrollment from remote gradebook</p>
+    <ul>
+    <li>Gradebook name: <font color="green">${rg.get('name','None defined!')}</font>
+    <li>Section: <input type="text" name="gradebook_section" size=40 value="${rg.get('section','')}"></li>
+    </ul>
+    <input type="submit" name="action" value="List sections available in remote gradebook">
+    <input type="submit" name="action" value="List students in section in remote gradebook">
+    <input type="submit" name="action" value="Overload enrollment list using remote gradebook">
+    <input type="submit" name="action" value="Merge enrollment list with remote gradebook">
+    <hr width="40%" style="align:left">
+  
+  %endif
+
+  <p>Add students: enter emails, separated by returns or commas;</p>
+  <textarea rows="6" cols="70" name="enroll_multiple"></textarea>
+  <input type="submit" name="action" value="Enroll multiple students">
+
+%endif
+
+##----------------------------------------------------------------------------- 
+
     </form>
 
 ##----------------------------------------------------------------------------- 
-%if modeflag.get('Psychometrics') is None:
+##----------------------------------------------------------------------------- 
+
+%if datatable and modeflag.get('Psychometrics') is None:
 
     <br/>
     <br/>
