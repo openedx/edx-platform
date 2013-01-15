@@ -190,24 +190,36 @@ def instructor_dashboard(request, course_id):
                 student_to_reset=User.objects.get(username=unique_student_identifier)
             msg+="Found a single student to reset.  "
         except:
-            msg+="<font color='red'>Couldn't find student to reset.  </font>"
+            student_to_reset=None
+            msg+="<font color='red'>Couldn't find student with that email or username.  </font>"
 
-        # find the module in question
-        try:
-            module_to_reset=StudentModule.objects.get(student_id=student_to_reset.id, course_id=course_id, module_state_key__iendswith="/problem/"+problem_to_reset)
-            msg+="Found module to reset.  "
-        except Exception as e:
-            msg+="<font color='red'>Couldn't find module to reset.  </font>"
+        if student_to_reset is not None:
+            # find the module in question
+            try:
+                module_to_reset=StudentModule.objects.get(student_id=student_to_reset.id, course_id=course_id, module_state_key__iendswith="/problem/"+problem_to_reset)
+                msg+="Found module to reset.  "
+            except Exception as e:
+                msg+="<font color='red'>Couldn't find module with that urlname.  </font>"
 
         # modify the problem's state
         try:
             # load the state json
             problem_state=json.loads(module_to_reset.state)
+            old_number_of_attempts=problem_state["attempts"]
             problem_state["attempts"]=0
 
             # save
             module_to_reset.state=json.dumps(problem_state)
             module_to_reset.save()
+            track.views.server_track(request, 
+                                    '{instructor} reset attempts from {old_attempts} to 0 for {student} on problem {problem} in {course}'.format(
+                                        old_attempts=old_number_of_attempts,
+                                        student=student_to_reset,
+                                        problem=module_to_reset.module_state_key,
+                                        instructor=request.user,
+                                        course=course_id),
+                                    {}, 
+                                    page='idashboard')
             msg+="<font color='green'>Module state successfully reset!</font>"
         except:
             msg+="<font color='red'>Couldn't reset module state.  </font>"
