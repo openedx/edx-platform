@@ -314,14 +314,14 @@ def instructor_dashboard(request, course_id):
         users = request.POST['betausers']
         log.debug("users: {0!r}".format(users))
         group = get_beta_group(course)
-        for username_or_email in users.split():
+        for username_or_email in _split_by_comma_and_whitespace(users):
             msg += "<p>{0}</p>".format(
                 add_user_to_group(request, username_or_email, group, 'beta testers', 'beta-tester'))
 
     elif action == 'Remove beta testers':
         users = request.POST['betausers']
         group = get_beta_group(course)
-        for username_or_email in users.split():
+        for username_or_email in _split_by_comma_and_whitespace(users):
             msg += "<p>{0}</p>".format(
                 remove_user_from_group(request, username_or_email, group, 'beta testers', 'beta-tester'))
 
@@ -793,11 +793,18 @@ def grade_summary(request, course_id):
 # enrollment
 
 
+def _split_by_comma_and_whitespace(s):
+    """
+    Split a string both by on commas and whitespice.
+    """
+    # Note: split() with no args removes empty strings from output
+    return [x.split() for x in s.split(',')]
+
 def _do_enroll_students(course, course_id, students, overload=False):
     """Do the actual work of enrolling multiple students, presented as a string
     of emails separated by commas or returns"""
 
-    ns = [x.split('\n') for x in students.split(',')]
+    ns = _split_by_comma_and_whitespace(students)
     new_students = [item for sublist in ns for item in sublist]
     new_students = [str(s.strip()) for s in new_students]
     new_students_lc = [x.lower() for x in new_students]

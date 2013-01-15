@@ -61,7 +61,7 @@ function goto( mode)
           %endif
           <a href="#" onclick="goto('Admin');" class="${modeflag.get('Admin')}">Admin</a> |
           <a href="#" onclick="goto('Forum Admin');" class="${modeflag.get('Forum Admin')}">Forum Admin</a> |
-          <a href="#" onclick="goto('Enrollment');" class="${modeflag.get('Enrollment')}">Enrollment</a>
+          <a href="#" onclick="goto('Enrollment');" class="${modeflag.get('Enrollment')}">Enrollment</a> |
           <a href="#" onclick="goto('Manage Groups');" class="${modeflag.get('Manage Groups')}">Manage Groups</a> ]
     </h2>
 
@@ -254,7 +254,7 @@ function goto( mode)
   
   %endif
 
-  <p>Add students: enter emails, separated by returns or commas;</p>
+  <p>Add students: enter emails, separated by new lines or commas;</p>
   <textarea rows="6" cols="70" name="enroll_multiple"></textarea>
   <input type="submit" name="action" value="Enroll multiple students">
 
@@ -268,7 +268,7 @@ function goto( mode)
     <p>
     <input type="submit" name="action" value="List beta testers">
     <p>
-    Enter usernames or emails for students who should be beta-testers, one per line.  They will get to
+    Enter usernames or emails for students who should be beta-testers, one per line, or separated by commas.  They will get to
     see course materials early, as configured via the <tt>days_early_for_beta</tt> option in the course policy.
     </p>
     <p>
