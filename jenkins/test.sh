@@ -28,6 +28,11 @@ export PYTHONIOENCODING=UTF-8
 
 GIT_BRANCH=${GIT_BRANCH/HEAD/master}
 
+# Temporary workaround for pip/numpy bug.
+wget -O /tmp/numpy.tar.gz http://pypi.python.org/packages/source/n/numpy/numpy-1.6.2.tar.gz#md5=95ed6c9dcc94af1fc1642ea2a33c1bba
+tar -zxvf /tmp/numpy.tar.gz -C /tmp/
+python /tmp/numpy-1.6.2/setup.py install
+
 pip install -q -r pre-requirements.txt
 pip install -q -r test-requirements.txt
 yes w | pip install -q -r requirements.txt
