@@ -34,8 +34,8 @@ import chem
 import chem.chemcalc
 import chem.chemtools
 import chem.miller
-import graders
-import graders.draganddrop
+import verifiers
+import verifiers.draganddrop
 
 import calc
 from correctmap import CorrectMap
@@ -72,7 +72,7 @@ global_context = {'random': random,
                   'chemcalc': chem.chemcalc,
                   'chemtools': chem.chemtools,
                   'miller': chem.miller,
-                  'draganddrop': graders.draganddrop}
+                  'draganddrop': verifiers.draganddrop}
 
 # These should be removed from HTML output, including all subelements
 html_problem_semantics = ["codeparam", "responseparam", "answer", "script", "hintgroup", "openendedparam","openendedrubric"]

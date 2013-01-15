@@ -68,7 +68,7 @@ class Test_DragAndDrop_Grade(unittest.TestCase):
         user_input = '{"use_targets": true, "draggables": [{"1": [10,10]}, \
          {"name_with_icon": [[10,10],4]}]}'
         correct_answer = {'1':  [10, 10], 'name_with_icon': [[10, 10], 4]}
-        self.assertTrue(draganddrop.grade(user_input, correct_answer))
+        self.assertFalse(draganddrop.grade(user_input, correct_answer))
 
     def test_position_and_targets(self):
         user_input = '{"use_targets": false, \
