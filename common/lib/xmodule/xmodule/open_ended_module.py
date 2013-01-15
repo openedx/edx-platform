@@ -448,8 +448,8 @@ class OpenEndedModule(openendedchild.OpenEndedChild):
                     'success': score_result['success'],
                     'grader_id': score_result['grader_id'][i],
                     'submission_id': score_result['submission_id'],
-                    'rubric_scores_complete' : score_result['rubric_scores_complete'],
-                    'rubric_xml' : score_result['rubric_xml'],
+                    'rubric_scores_complete' : score_result['rubric_scores_complete'][i],
+                    'rubric_xml' : score_result['rubric_xml'][i],
                 }
                 feedback_items.append(self._format_feedback(new_score_result))
             if join_feedback:
