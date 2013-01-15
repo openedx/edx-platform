@@ -18,7 +18,12 @@ def url_class(is_active):
     <ol class="course-tabs">
       % for tab in get_course_tabs(user, course, active_page):
           <li>
-             <a href="${tab.link | h}" class="${url_class(tab.is_active)}">${tab.name | h}</a>
+             <a href="${tab.link | h}" class="${url_class(tab.is_active)}">
+                 ${tab.name | h}
+                 % if tab.has_img == True:
+                    <img src="${tab.img}"/>
+                 %endif
+             </a>
           </li>
       % endfor
     <%block name="extratabs" />
