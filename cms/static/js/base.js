@@ -93,14 +93,17 @@ $(document).ready(function() {
     $('.subsection-list > ol').sortable({
         axis: 'y',
         handle: '.section-item .drag-handle',
-        update: onSubsectionReordered
+        update: onSubsectionReordered,
+        connectWith: '.subsection-list > ol',
+        revert: true
     });
 
     // Section reordering
     $('.courseware-overview').sortable({
         axis: 'y',
         handle: 'header .drag-handle',
-        update: onSectionReordered
+        update: onSectionReordered,
+        revert: true
     });
 
     $('.new-course-button').bind('click', addNewCourse);
@@ -277,7 +280,7 @@ function onUnitReordered(event, ui) {
     }
 }
 
-function onSubsectionReordered() {
+function onSubsectionReordered(event, ui) {
     var section_id = $(this).data('section-id');
 
     var _els = $(this).children('li:.branch');
@@ -291,6 +294,22 @@ function onSubsectionReordered() {
         contentType: "application/json",
         data:JSON.stringify({ 'id' : section_id, 'children' : children})
     });
+    
+    // remove from old container
+    if (ui.sender && section_id !== ui.sender.data('section-id')) {
+    	var _els = ui.sender.children('li:.branch');
+    	var children = _els.map(function(idx, el) { return $(el).data('id'); }).get();
+    	
+    	// call into server to commit the new order
+    	$.ajax({
+    		url: "/save_item",
+    		type: "POST",
+    		dataType: "json",
+    		contentType: "application/json",
+    		data:JSON.stringify({ 'id' : ui.sender.data('section-id'), 'children' : children})
+    	});
+    	
+    }
 }
 
 function onSectionReordered() {
