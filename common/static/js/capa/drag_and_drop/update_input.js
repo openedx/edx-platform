@@ -5,363 +5,209 @@
 (function (requirejs, require, define) {
 
 define(['logme'], function (logme) {
-    return updateInput;
+    return {
+        'check': check,
+        'update': update
+    };
 
-    function updateInput(state, checkFirst) {
-        var inputEl, stateStr, targets, draggables, c1, c2, tempObj;
+    function update(state) {
+        var draggables, tempObj;
 
-        logme('updateInput; state = ', state);
-
-        if (checkFirst === true) {
-            if (checkIfHasAnswer() === true) {
-                return;
-            }
-        }
+        logme('state.problemId = ' + state.problemId);
 
         draggables = [];
 
-        if (state.individualTargets === false) {
-            for (c1 = 0; c1 < state.draggables.length; c1++) {
-                if (state.draggables[c1].x !== -1) {
-                    tempObj = {};
-                    tempObj[state.draggables[c1].id] = [
-                        state.draggables[c1].x,
-                        state.draggables[c1].y
-                    ];
+        if (state.config.individualTargets === false) {
+            (function (c1) {
+                while (c1 < state.draggables.length) {
+                    if (state.draggables[c1].x !== -1) {
+                        tempObj = {};
+                        tempObj[state.draggables[c1].id] = [
+                            state.draggables[c1].x,
+                            state.draggables[c1].y
+                        ];
+                        draggables.push(tempObj);
+                        tempObj = null;
+                    }
 
-                    draggables.push(tempObj);
+                    c1 += 1;
                 }
-            }
-
-            stateStr = JSON.stringify({
-                'use_targets': false,
-                'draggables': draggables
-            });
+            }(0));
         } else {
-            for (c1 = 0; c1 < state.targets.length; c1++) {
-                for (c2 = 0; c2 < state.targets[c1].draggable.length; c2++) {
-                    tempObj = {};
-                    tempObj[state.targets[c1].draggable[c2]] =
-                        state.targets[c1].id;
+            (function (c1) {
+                while (c1 < state.targets.length) {
+                    (function (c2) {
+                        while (c2 < state.targets[c1].draggable.length) {
+                            tempObj = {};
+                            tempObj[state.targets[c1].draggable[c2]] = state.targets[c1].id;
+                            draggables.push(tempObj);
+                            tempObj = null;
 
-                    draggables.push(tempObj);
+                            c2 += 1;
+                        }
+                    }(0));
+
+                    c1 += 1;
                 }
-            }
-
-            stateStr = JSON.stringify({
-                'use_targets': true,
-                'draggables': draggables
-            });
+            }(0));
         }
 
-        inputEl = $('#input_' + state.problemId);
-        inputEl.val(stateStr);
+        $('#input_' + state.problemId).val(JSON.stringify({'draggables': draggables}));
+    }
 
-        return;
+    // Check if input has an answer from server. If yes, then position
+    // all draggables according to answer.
+    function check(state) {
+        var inputElVal;
 
-        // Check if input has an answer from server. If yes, then position
-        // all draggables according to answer.
-        function checkIfHasAnswer() {
-            var inputElVal;
-
-            inputElVal = $('#input_' + state.problemId).val();
-            if (inputElVal.length === 0) {
-                return false;
-            }
-
-            repositionDraggables(JSON.parse(inputElVal));
-
-            return true;
+        inputElVal = $('#input_' + state.problemId).val();
+        if (inputElVal.length === 0) {
+            return false;
         }
 
-        function repositionDraggables(answer) {
-            var draggableId, draggable, targetId, target, c1, offset;
+        repositionDraggables(state, JSON.parse(inputElVal));
 
-            offset = 0;
-            if (state.config.targetOutline === true) {
-                offset = 1;
+        return true;
+    }
+
+    function getUseTargets(answer) {
+        if ($.isArray(answer.draggables) === false) {
+            logme('ERROR: answer.draggables is not an array.');
+
+            return;
+        } else if (answer.draggables.length === 0) {
+            return;
+        }
+
+        if ($.isPlainObject(answer.draggables[0]) === false) {
+            logme('ERROR: answer.draggables array does not contain objects.');
+
+            return;
+        }
+
+        for (c1 in answer.draggables[0]) {
+            if (answer.draggables[0].hasOwnProperty(c1) === false) {
+                continue;
             }
 
-            if (
-                (
-                    (typeof answer.use_targets === 'boolean') &&
-                    (answer.use_targets === true)
-                ) ||
-                (
-                    (typeof answer.use_targets === 'string') &&
-                    (answer.use_targets === 'true')
-                )
-            ) {
-                for (c1 = 0; c1 < answer.draggables.length; c1++) {
-                    for (draggableId in answer.draggables[c1]) {
-                        if (
-                            (draggable = getDraggableById(draggableId)) ===
-                            null
-                        ) {
-                            logme(
-                                'ERROR: In answer there exists a ' +
-                                'draggable ID "' + draggableId + '". No ' +
-                                'draggable with this ID could be found.'
-                            );
+            if (typeof answer.draggables[0][c1] === 'string') {
+                // use_targets = true;
 
-                            continue;
-                        }
-
-                        targetId = answer.draggables[c1][draggableId];
-                        if ((target = getTargetById(targetId)) === null) {
-                            logme(
-                                'ERROR: In answer there exists a target ' +
-                                'ID "' + targetId + '". No target with this ' +
-                                'ID could be found.'
-                            );
-
-                            continue;
-                        }
-
-                        (function (draggableId, draggable, targetId, target) {
-                            moveDraggableToBaseImage();
-                            return;
-
-                            function moveDraggableToBaseImage() {
-                                if (draggable.hasLoaded === false) {
-                                    setTimeout(moveDraggableToBaseImage, 50);
-                                    return;
-                                }
-
-                                draggable.inContainer = false;
-                                draggable.containerEl.hide();
-
-                                draggable.iconEl.detach();
-                                draggable.iconEl.css(
-                                    'background-color', draggable.iconElBGColor
-                                );
-                                draggable.iconEl.css(
-                                    'padding-left', draggable.iconElPadding
-                                );
-                                draggable.iconEl.css(
-                                    'padding-right', draggable.iconElPadding
-                                );
-                                draggable.iconEl.css(
-                                    'border', draggable.iconElBorder
-                                );
-                                draggable.iconEl.css(
-                                    'width',
-                                    draggable.iconWidth
-                                );
-                                draggable.iconEl.css(
-                                    'height',
-                                    draggable.iconHeight
-                                );
-                                draggable.iconEl.css(
-                                    'left',
-                                    target.offset.left + 0.5 * target.w -
-                                        draggable.iconWidth * 0.5 + offset
-                                        - draggable.iconElLeftOffset
-                                );
-                                draggable.iconEl.css(
-                                    'top',
-                                    target.offset.top + 0.5 * target.h -
-                                        draggable.iconHeight * 0.5 + offset
-                                );
-                                draggable.iconEl.appendTo(
-                                    state.baseImageEl.parent()
-                                );
-
-                                if (draggable.labelEl !== null) {
-                                    draggable.labelEl.detach();
-                                    draggable.labelEl.css(
-                                        'background-color', state.config.labelBgColor
-                                    );
-                                    draggable.labelEl.css(
-                                        'padding-left', 8
-                                    );
-                                    draggable.labelEl.css(
-                                        'padding-right', 8
-                                    );
-                                    draggable.labelEl.css(
-                                        'border', '1px solid black'
-                                    );
-                                    draggable.labelEl.css(
-                                        'left',
-                                        target.offset.left + 0.5 * target.w -
-                                            draggable.labelWidth * 0.5 + offset
-                                            - 9 // Account for padding, border.
-                                    );
-                                    draggable.labelEl.css(
-                                        'top',
-                                        target.offset.top + 0.5 * target.h +
-                                            draggable.iconHeight * 0.5 + 5 +
-                                            offset
-                                    );
-                                    draggable.labelEl.appendTo(
-                                        state.baseImageEl.parent()
-                                    );
-                                }
-
-                                draggable.onTarget = target;
-                                target.draggable.push(draggableId);
-
-                                if (target.numTextEl !== null) {
-                                    target.updateNumTextEl();
-                                }
-
-                                state.numDraggablesInSlider -= 1;
-                                state.updateArrowOpacity();
-                            }
-                        }(draggableId, draggable, targetId, target));
-                    }
-                }
+                return true;
             } else if (
-                (
-                    (typeof answer.use_targets === 'boolean') &&
-                    (answer.use_targets === false)
-                ) ||
-                (
-                    (typeof answer.use_targets === 'string') &&
-                    (answer.use_targets === 'false')
-                )
+                ($.isArray(answer.draggables[0][c1]) === true) &&
+                (answer.draggables[0][c1].length === 2)
             ) {
-                for (c1 = 0; c1 < answer.draggables.length; c1++) {
-                    for (draggableId in answer.draggables[c1]) {
-                        if (
-                            (draggable = getDraggableById(draggableId)) ===
-                            null
-                           ) {
-                            logme(
-                                'ERROR: In answer there exists a ' +
-                                'draggable ID "' + draggableId + '". No ' +
-                                'draggable with this ID could be found.'
-                            );
+                // use_targets = false;
 
-                            continue;
-                        }
-
-                        (function (c1, draggableId, draggable) {
-                            moveDraggableToBaseImage();
-                            return;
-
-                            function moveDraggableToBaseImage() {
-                                if (draggable.hasLoaded === false) {
-                                    setTimeout(moveDraggableToBaseImage, 50);
-                                    return;
-                                }
-
-                                draggable.inContainer = false;
-                                draggable.containerEl.hide();
-
-                                draggable.iconEl.detach();
-                                draggable.iconEl.css(
-                                    'background-color', draggable.iconElBGColor
-                                );
-                                draggable.iconEl.css(
-                                    'padding-left', draggable.iconElPadding
-                                );
-                                draggable.iconEl.css(
-                                    'padding-right', draggable.iconElPadding
-                                );
-                                draggable.iconEl.css(
-                                    'border', draggable.iconElBorder
-                                );
-                                draggable.iconEl.css(
-                                    'width',
-                                    draggable.iconWidth
-                                );
-                                draggable.iconEl.css(
-                                    'height',
-                                    draggable.iconHeight
-                                );
-                                draggable.iconEl.css(
-                                    'left',
-                                    answer.draggables[c1][draggableId][0] -
-                                        draggable.iconWidth * 0.5 + offset
-                                        - draggable.iconElLeftOffset
-                                );
-                                draggable.iconEl.css(
-                                    'top',
-                                    answer.draggables[c1][draggableId][1] -
-                                        draggable.iconHeight * 0.5 + offset
-                                );
-                                draggable.iconEl.appendTo(
-                                    state.baseImageEl.parent()
-                                );
-
-                                if (draggable.labelEl !== null) {
-                                    draggable.labelEl.detach();
-                                    draggable.labelEl.css(
-                                        'background-color', state.config.labelBgColor
-                                    );
-                                    draggable.labelEl.css(
-                                        'padding-left', 8
-                                    );
-                                    draggable.labelEl.css(
-                                        'padding-right', 8
-                                    );
-                                    draggable.labelEl.css(
-                                        'border', '1px solid black'
-                                    );
-                                    draggable.labelEl.css(
-                                        'left',
-                                        answer.draggables[c1][draggableId][0] -
-                                            draggable.labelWidth * 0.5 + offset
-                                            - 9 // Account for padding, border.
-                                    );
-                                    draggable.labelEl.css(
-                                        'top',
-                                        answer.draggables[c1][draggableId][1] -
-                                            draggable.iconHeight * 0.5 +
-                                            draggable.iconHeight + 5 + offset
-                                    );
-                                    draggable.labelEl.appendTo(
-                                        state.baseImageEl.parent()
-                                    );
-                                }
-
-                                draggable.x =
-                                    answer.draggables[c1][draggableId][0];
-                                draggable.y =
-                                    answer.draggables[c1][draggableId][1];
-
-                                state.numDraggablesInSlider -= 1;
-                                state.updateArrowOpacity();
-                            }
-                        }(c1, draggableId, draggable));
-                    }
-                }
+                return false;
             } else {
-                logme(
-                    'ERROR: The type of answer.targets is not supported. ' +
-                    'answer.targets = ', answer.targets
-                );
+                logme('ERROR: answer.draggables[0] is inconsidtent.');
 
                 return;
             }
         }
 
+        logme('ERROR: answer.draggables[0] is an empty object.');
+
         return;
+    }
 
-        function getDraggableById(id) {
-            var c1;
+    function processAnswerTargets(state, answer) {
+        var draggableId, draggable, targetId, target;
 
-            for (c1 = 0; c1 < state.draggables.length; c1 += 1) {
-                if (state.draggables[c1].id === id) {
-                    return state.draggables[c1];
+        (function (c1) {
+            while (c1 < answer.draggables.length) {
+                for (draggableId in answer.draggables[c1]) {
+                    if (answer.draggables[c1].hasOwnProperty(draggableId) === false) {
+                        continue;
+                    }
+
+                    if ((draggable = getById(state, 'draggables', draggableId)) === null) {
+                        logme(
+                            'ERROR: In answer there exists a ' +
+                            'draggable ID "' + draggableId + '". No ' +
+                            'draggable with this ID could be found.'
+                        );
+
+                        continue;
+                    }
+
+                    targetId = answer.draggables[c1][draggableId];
+                    if ((target = getById(state, 'targets', targetId)) === null) {
+                        logme(
+                            'ERROR: In answer there exists a target ' +
+                            'ID "' + targetId + '". No target with this ' +
+                            'ID could be found.'
+                        );
+
+                        continue;
+                    }
+
+                    draggable.moveDraggableToTarget(target);
                 }
+
+                c1 += 1;
+            }
+        }(0));
+    }
+
+    function processAnswerPositions(state, answer) {
+        var draggableId, draggable;
+
+        (function (c1) {
+            while (c1 < answer.draggables.length) {
+                for (draggableId in answer.draggables[c1]) {
+                    if (answer.draggables[c1].hasOwnProperty(draggableId) === false) {
+                        continue;
+                    }
+
+                    if ((draggable = getById(state, 'draggables', draggableId)) === null) {
+                        logme(
+                            'ERROR: In answer there exists a ' +
+                            'draggable ID "' + draggableId + '". No ' +
+                            'draggable with this ID could be found.'
+                        );
+
+                        continue;
+                    }
+
+                    draggable.moveDraggableToXY({
+                        'x': answer.draggables[c1][draggableId][0],
+                        'y': answer.draggables[c1][draggableId][1]
+                    });
+                }
+
+                c1 += 1;
+            }
+        }(0));
+    }
+
+    function repositionDraggables(state, answer) {
+        if (state.config.individualTargets !== getUseTargets(answer)) {
+            logme('ERROR: JSON config is not consistent with server response.');
+
+            return;
+        }
+
+        if (state.config.individualTargets === true) {
+            processAnswerTargets(state, answer);
+        } else if (state.config.individualTargets === false) {
+            processAnswerPositions(state, answer);
+        }
+    }
+
+    function getById(state, type, id) {
+        return (function (c1) {
+            while (c1 < state[type].length) {
+                if (state[type][c1].id === id) {
+                    return state[type][c1];
+                }
+                c1 += 1;
             }
 
             return null;
-        }
-
-        function getTargetById(id) {
-            var c1;
-
-            for (c1 = 0; c1 < state.targets.length; c1 += 1) {
-                if (state.targets[c1].id === id) {
-                    return state.targets[c1];
-                }
-            }
-
-            return null;
-        }
+        }(0));
     }
 });
 

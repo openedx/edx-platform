@@ -10,8 +10,6 @@ define(['logme', 'update_input'], function (logme, updateInput) {
     };
 
     function init(state) {
-        logme('Draggables.init; state = ', state);
-
         state.draggables = [];
         state.numDraggablesInSlider = 0;
         state.currentMovingDraggable = null;
@@ -65,12 +63,136 @@ define(['logme', 'update_input'], function (logme, updateInput) {
         }
     }
 
+    function moveDraggableToXY(newPosition) {
+        var self, offset;
+
+        if (this.hasLoaded === false) {
+            self = this;
+
+            setTimeout(function () {
+                self.moveDraggableToXY(newPosition);
+            }, 50);
+
+            return;
+        }
+
+        offset = 0;
+        if (this.state.config.targetOutline === true) {
+            offset = 1;
+        }
+
+        this.inContainer = false;
+        this.containerEl.hide();
+
+        this.iconEl.detach();
+        this.iconEl.css('background-color', this.iconElBGColor);
+        this.iconEl.css('padding-left', this.iconElPadding);
+        this.iconEl.css('padding-right', this.iconElPadding);
+        this.iconEl.css('border', this.iconElBorder);
+        this.iconEl.css('width', this.iconWidth);
+        this.iconEl.css('height', this.iconHeight);
+        this.iconEl.css(
+            'left',
+            newPosition.x - this.iconWidth * 0.5 + offset - this.iconElLeftOffset
+        );
+        this.iconEl.css(
+            'top',
+            newPosition.y - this.iconHeight * 0.5 + offset
+        );
+        this.iconEl.appendTo(this.state.baseImageEl.parent());
+
+        if (this.labelEl !== null) {
+            this.labelEl.detach();
+            this.labelEl.css('background-color', this.state.config.labelBgColor);
+            this.labelEl.css('padding-left', 8);
+            this.labelEl.css('padding-right', 8);
+            this.labelEl.css('border', '1px solid black');
+            this.labelEl.css(
+                'left',
+                newPosition.x - this.labelWidth * 0.5 + offset - 9 // Account for padding, border.
+            );
+            this.labelEl.css(
+                'top',
+                newPosition.y - this.iconHeight * 0.5 + this.iconHeight + 5 + offset
+            );
+            this.labelEl.appendTo(this.state.baseImageEl.parent());
+        }
+
+        this.x = newPosition.x;
+        this.y = newPosition.y;
+
+        this.state.numDraggablesInSlider -= 1;
+        this.state.updateArrowOpacity();
+    }
+
+    function moveDraggableToTarget(target) {
+        var self, offset;
+
+        if (this.hasLoaded === false) {
+            self = this;
+
+            setTimeout(function () {
+                self.moveDraggableToTarget(target);
+            }, 50);
+
+            return;
+        }
+
+        offset = 0;
+        if (this.state.config.targetOutline === true) {
+            offset = 1;
+        }
+
+        this.inContainer = false;
+        this.containerEl.hide();
+
+        this.iconEl.detach();
+        this.iconEl.css('background-color', this.iconElBGColor);
+        this.iconEl.css('padding-left', this.iconElPadding);
+        this.iconEl.css('padding-right', this.iconElPadding);
+        this.iconEl.css('border', this.iconElBorder);
+        this.iconEl.css('width', this.iconWidth);
+        this.iconEl.css('height', this.iconHeight);
+        this.iconEl.css(
+            'left',
+            target.offset.left + 0.5 * target.w - this.iconWidth * 0.5 + offset - this.iconElLeftOffset
+        );
+        this.iconEl.css(
+            'top',
+            target.offset.top + 0.5 * target.h - this.iconHeight * 0.5 + offset
+        );
+        this.iconEl.appendTo(this.state.baseImageEl.parent());
+
+        if (this.labelEl !== null) {
+            this.labelEl.detach();
+            this.labelEl.css('background-color', this.state.config.labelBgColor);
+            this.labelEl.css('padding-left', 8);
+            this.labelEl.css('padding-right', 8);
+            this.labelEl.css('border', '1px solid black');
+            this.labelEl.css(
+                'left',
+                target.offset.left + 0.5 * target.w - this.labelWidth * 0.5 + offset - 9 // Account for padding, border.
+            );
+            this.labelEl.css(
+                'top',
+                target.offset.top + 0.5 * target.h + this.iconHeight * 0.5 + 5 + offset
+            );
+            this.labelEl.appendTo(this.state.baseImageEl.parent());
+        }
+
+        this.onTarget = target;
+        target.draggable.push(this.id);
+
+        if (target.numTextEl !== null) {
+            target.updateNumTextEl();
+        }
+
+        this.state.numDraggablesInSlider -= 1;
+        this.state.updateArrowOpacity();
+    }
+
     function processDraggable(state, obj, objIndex) {
         var draggableObj;
-
-        logme('processDraggable; state = ', state);
-
-        logme('Processing draggable #' + objIndex);
 
         draggableObj = {
             'zIndex': objIndex,
@@ -91,7 +213,10 @@ define(['logme', 'update_input'], function (logme, updateInput) {
             'checkIfOnTarget': checkIfOnTarget,
             'snapToTarget': snapToTarget,
             'correctZIndexes': correctZIndexes,
-            'moveBackToSlider': moveBackToSlider
+            'moveBackToSlider': moveBackToSlider,
+
+            'moveDraggableToTarget': moveDraggableToTarget,
+            'moveDraggableToXY': moveDraggableToXY
         };
 
         draggableObj.containerEl = $(
@@ -334,7 +459,7 @@ define(['logme', 'update_input'], function (logme, updateInput) {
                         this.iconHeight * 0.5
                 );
                 this.iconEl.appendTo(
-                    state.baseImageEl.parent()
+                    this.state.baseImageEl.parent()
                 );
 
                 if (this.labelEl !== null) {
@@ -447,7 +572,7 @@ define(['logme', 'update_input'], function (logme, updateInput) {
         this.mousePressed = false;
         positionIE = this.iconEl.position();
 
-        if (this.state.individualTargets === true) {
+        if (this.state.config.individualTargets === true) {
             if (this.checkIfOnTarget(positionIE) === true) {
                 this.correctZIndexes();
             } else {
@@ -486,7 +611,7 @@ define(['logme', 'update_input'], function (logme, updateInput) {
         }
 
         this.state.updateArrowOpacity();
-        updateInput(this.state);
+        updateInput.update(this.state);
     }
 
     function removeObjIdFromTarget() {
@@ -532,7 +657,7 @@ define(['logme', 'update_input'], function (logme, updateInput) {
             // (with an ID different from the one we are checking
             // against), then go to next target.
             if (
-                (this.state.config.one_per_target === true) &&
+                (this.state.config.onePerTarget === true) &&
                 (target.draggable.length === 1) &&
                 (target.draggable[0] !== this.id)
             ) {
@@ -652,7 +777,7 @@ define(['logme', 'update_input'], function (logme, updateInput) {
     function correctZIndexes() {
         var draggablesInMe, c1, c2, highestZIndex;
 
-        if (this.state.individualTargets === true) {
+        if (this.state.config.individualTargets === true) {
             if (this.onTarget.draggable.length > 0) {
                 draggablesInMe = [];
 

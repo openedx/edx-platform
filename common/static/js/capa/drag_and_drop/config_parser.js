@@ -8,154 +8,218 @@ define(['logme'], function (logme) {
     return configParser;
 
     function configParser(config, state) {
-        var returnStatus;
-
-        returnStatus = true;
-
         state.config = {
             'draggables': [],
+            'baseImage': '',
             'targets': [],
-            'base_image': ''
+            'onePerTarget': null,
+            'targetOutline': true,
+            'labelBgColor': '#d6d6d6',
+
+            'individualTargets': null,
+
+            'errors': 0 // Number of errors found while parsing config.
         };
 
-        if ($.isArray(config.draggables) === true) {
+        getDraggables(state, config);
+        getBaseImage(state, config);
+        getTargets(state, config);
+        getOnePerTarget(state, config);
+        getTargetOutline(state, config);
+        getLabelBgColor(state, config);
+
+        setIndividualTargets(state);
+
+        if (state.config.errors !== 0) {
+            return false;
+        }
+
+        return true;
+    }
+
+    function getDraggables(state, config) {
+        if (config.hasOwnProperty('draggables') === false) {
+            logme('ERROR: "config" does not have a property "draggables".');
+            state.config.errors += 1;
+        } else if ($.isArray(config.draggables) === true) {
             (function (i) {
                 while (i < config.draggables.length) {
-                    if (processDraggable(config.draggables[i]) !== true) {
-                        returnStatus = false;
+                    if (processDraggable(state, config.draggables[i]) !== true) {
+                        state.config.errors += 1;
                     }
                     i += 1;
                 }
             }(0));
         } else if ($.isPlainObject(config.draggables) === true) {
-            if (processDraggable(config.draggables) !== true) {
-                returnStatus = false;
+            if (processDraggable(state, config.draggables) !== true) {
+                state.config.errors += 1;
             }
         } else {
             logme('ERROR: The type of config.draggables is no supported.');
-            returnStatus = false;
+            state.config.errors += 1;
         }
+    }
 
-        if (typeof config.base_image === 'string') {
-            state.config.base_image = config.base_image;
+    function getBaseImage(state, config) {
+        if (config.hasOwnProperty('base_image') === false) {
+            logme('ERROR: "config" does not have a property "base_image".');
+            state.config.errors += 1;
+        } else if (typeof config.base_image === 'string') {
+            state.config.baseImage = config.base_image;
         } else {
             logme('ERROR: Property config.base_image is not of type "string".');
-            returnStatus = false;
+            state.config.errors += 1;
         }
+    }
 
-        if ($.isArray(config.targets) === true) {
+    function getTargets(state, config) {
+        if (config.hasOwnProperty('targets') === false) {
+            // It is possible that no "targets" were specified. This is not an error.
+            // In this case the default value of "[]" (empty array) will be used.
+            // Draggables can be positioned anywhere on the image, and the server will
+            // get an answer in the form of (x, y) coordinates for each draggable.
+        } else if ($.isArray(config.targets) === true) {
             (function (i) {
                 while (i < config.targets.length) {
-                    if (processTarget(config.targets[i]) !== true) {
-                        returnStatus = false;
+                    if (processTarget(state, config.targets[i]) !== true) {
+                        state.config.errors += 1;
                     }
                     i += 1;
                 }
             }(0));
         } else if ($.isPlainObject(config.targets) === true) {
-            if (processTarget(config.targets) !== true) {
-                returnStatus = false;
+            if (processTarget(state, config.targets) !== true) {
+                state.config.errors += 1;
             }
-        } else if (typeof config.targets !== 'undefined') {
+        } else {
             logme('ERROR: Property config.targets is not of a supported type.');
-            returnStatus = false;
+            state.config.errors += 1;
         }
+    }
 
-        if (typeof config.one_per_target === 'string') {
+    function getOnePerTarget(state, config) {
+        if (config.hasOwnProperty('one_per_target') === false) {
+            logme('ERROR: "config" does not have a property "one_per_target".');
+            state.config.errors += 1;
+        } else if (typeof config.one_per_target === 'string') {
             if (config.one_per_target.toLowerCase() === 'true') {
-                state.config.one_per_target = true;
+                state.config.onePerTarget = true;
             } else if (config.one_per_target.toLowerCase() === 'false') {
-                state.config.one_per_target = false;
+                state.config.onePerTarget = false;
             } else {
                 logme('ERROR: Property config.one_per_target can either be "true", or "false".');
-                returnStatus = false;
+                state.config.errors += 1;
             }
-        } else if (typeof config.one_per_target !== 'undefined') {
+        } else {
             logme('ERROR: Property config.one_per_target is not of a supported type.');
-            returnStatus = false;
+            state.config.errors += 1;
         }
+    }
 
-        if (typeof config.target_outline === 'string') {
+    function getTargetOutline(state, config) {
+        if (config.hasOwnProperty('target_outline') === false) {
+            // It is possible that no "target_outline" was specified. This is not an error.
+            // In this case the default value of 'true' (boolean) will be used.
+        } else if (typeof config.target_outline === 'string') {
             if (config.target_outline.toLowerCase() === 'true') {
                 state.config.targetOutline = true;
             } else if (config.target_outline.toLowerCase() === 'false') {
                 state.config.targetOutline = false;
             } else {
                 logme('ERROR: Property config.target_outline can either be "true", or "false".');
-                returnStatus = false;
+                state.config.errors += 1;
             }
-        } else if (typeof config.target_outline !== 'undefined') {
+        } else {
             logme('ERROR: Property config.target_outline is not of a supported type.');
-            returnStatus = false;
+            state.config.errors += 1;
         }
+    }
 
-        state.config.labelBgColor = '#d6d6d6';
-        if (typeof config.label_bg_color === 'string') {
+    function getLabelBgColor(state, config) {
+        if (config.hasOwnProperty('label_bg_color') === false) {
+            // It is possible that no "label_bg_color" was specified. This is not an error.
+            // In this case the default value of '#d6d6d6' (string) will be used.
+        } else if (typeof config.label_bg_color === 'string') {
             state.config.labelBgColor = config.label_bg_color;
-        } else if (typeof config.label_bg_color !== 'undefined') {
+        } else {
             logme('ERROR: Property config.label_bg_color is not of a supported type.');
             returnStatus = false;
         }
+    }
 
+    function setIndividualTargets(state) {
         if (state.config.targets.length === 0) {
-            state.individualTargets = false;
+            state.config.individualTargets = false;
         } else {
-            state.individualTargets = true;
+            state.config.individualTargets = true;
+        }
+    }
+
+    function processDraggable(state, obj) {
+        if (!attrIsString(obj, 'id')) {
+            return false;
+        }
+
+        if (!attrIsString(obj, 'icon')) {
+            return false;
+        }
+        if (!attrIsString(obj, 'label')) {
+            return false;
+        }
+
+        state.config.draggables.push(obj);
+
+        return true;
+    }
+
+    function processTarget(state, obj) {
+        if (!attrIsString(obj, 'id')) {
+            return false;
+        }
+
+        if (!attrIsInteger(obj, 'w')) {
+            return false;
+        }
+        if (!attrIsInteger(obj, 'h')) {
+            return false;
+        }
+
+        if (!attrIsInteger(obj, 'x')) {
+            return false;
+        }
+        if (!attrIsInteger(obj, 'y')) {
+            return false;
+        }
+
+        state.config.targets.push(obj);
+
+        return true;
+    }
+
+    function attrIsString(obj, attr) {
+        if (typeof obj[attr] !== 'string') {
+            logme('ERROR: Attribute "obj.' + attr + '" is not a string.');
+
+            return false;
         }
 
         return true;
+    }
 
-        function processDraggable(obj) {
-            if (!attrIsString(obj, 'id')) { return false; }
+    function attrIsInteger(obj, attr) {
+        var tempInt;
 
-            if (!attrIsString(obj, 'icon')) { return false; }
-            if (!attrIsString(obj, 'label')) { return false; }
+        tempInt = parseInt(obj[attr], 10);
 
-            state.config.draggables.push(obj);
+        if (isFinite(tempInt) === false) {
+            logme('ERROR: Attribute "obj.' + attr + '" is not an integer.');
 
-            true;
+            return false;
         }
 
-        function processTarget(obj) {
-            if (!attrIsString(obj, 'id')) { return false; }
+        obj[attr] = tempInt;
 
-            if (!attrIsInteger(obj, 'w')) { return false; }
-            if (!attrIsInteger(obj, 'h')) { return false; }
-
-            if (!attrIsInteger(obj, 'x')) { return false; }
-            if (!attrIsInteger(obj, 'y')) { return false; }
-
-            state.config.targets.push(obj);
-
-            true;
-
-        }
-
-        function attrIsString(obj, attr) {
-            if (typeof obj[attr] !== 'string') {
-                logme('ERROR: Attribute "obj.' + attr + '" is not a string.');
-
-                return false;
-            }
-
-            return true;
-        }
-
-        function attrIsInteger(obj, attr) {
-            var tempInt;
-
-            tempInt = parseInt(obj[attr], 10);
-
-            if (isFinite(tempInt) === false) {
-                logme('ERROR: Attribute "obj.' + attr + '" is not an integer.');
-
-                return false;
-            }
-
-            obj[attr] = tempInt;
-
-            return true;
-        }
+        return true;
     }
 });
 

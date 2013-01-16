@@ -45,7 +45,7 @@ define(['logme'], function (logme) {
                 event.preventDefault();
             });
 
-            if (state.config.one_per_target === false) {
+            if (state.config.onePerTarget === false) {
                 numTextEl = $(
                     '<div ' +
                         'style=" ' +
@@ -86,7 +86,7 @@ define(['logme'], function (logme) {
                 'updateNumTextEl': updateNumTextEl
             };
 
-            if (state.config.one_per_target === false) {
+            if (state.config.onePerTarget === false) {
                 numTextEl.appendTo(state.baseImageEl.parent());
                 numTextEl.mousedown(function (event) {
                     event.preventDefault();
