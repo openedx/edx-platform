@@ -1,0 +1,20 @@
+.html-editor {
+  @include clearfix();
+
+  .CodeMirror {
+    display: none;
+    position: absolute;
+    top: 46px;
+    width: 100%;
+    height: 378px;
+    background: #fff;
+    color: #3c3c3c;
+    @include box-sizing(border-box);
+  }
+
+  .editor-tabs {
+    top: 11px;
+    right: 30px;
+    z-index: 99;
+  }
+}

@@ -1,13 +1,12 @@
 <%include file="metadata-edit.html" />
-<section class="html-edit">
-    <div class="row">
-        <div class="editor-bar">
-            <ul class="editor-tabs">
-                <li><a href="#" class="visual-tab tab current" data-tab="visual">Visual</a></li>
-                <li><a href="#" class="html-tab tab" data-tab="advanced">Advanced</a></li>
-            </ul>
-        </div>
-        <textarea class="tiny-mce">${data}</textarea>
-        <div name="" class="edit-box">${data}</div>
-    </div>
+<section class="html-editor editor">
+  <ul class="editor-tabs">
+    <li><a href="#" class="visual-tab tab current" data-tab="visual">Visual</a></li>
+    <li><a href="#" class="html-tab tab" data-tab="advanced">HTML</a></li>
+  </ul>
+  
+  <div class="row">
+    <textarea class="tiny-mce">${data}</textarea>
+    <div name="" class="edit-box">${data}</div>
+  </div>
 </section>
