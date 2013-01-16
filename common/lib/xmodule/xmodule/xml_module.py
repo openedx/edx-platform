@@ -94,12 +94,18 @@ class XmlDescriptor(XModuleDescriptor):
         'start', 'due', 'graded', 'display_name', 'url_name', 'hide_from_toc',
         'ispublic', 	# if True, then course is listed for all users; see
         'xqa_key',	# for xqaa server access
+        # information about testcenter exams is a dict (of dicts), not a string, 
+        # so it cannot be easily exportable as a course element's attribute. 
+        'testcenter_info',
         # VS[compat] Remove once unused.
         'name', 'slug')
 
     metadata_to_strip = ('data_dir',
-           # VS[compat] -- remove the below attrs once everything is in the CMS
-           'course', 'org', 'url_name', 'filename')
+        # information about testcenter exams is a dict (of dicts), not a string, 
+        # so it cannot be easily exportable as a course element's attribute. 
+        'testcenter_info',
+        # VS[compat] -- remove the below attrs once everything is in the CMS
+        'course', 'org', 'url_name', 'filename')
 
     # A dictionary mapping xml attribute names AttrMaps that describe how
     # to import and export them
