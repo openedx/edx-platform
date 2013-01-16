@@ -12,26 +12,40 @@ dog_http_api.api_key = settings.DATADOG_API
 
 class Command(BaseCommand):
 
-    option_list = BaseCommand.option_list
-    args = '<mode>'
-    help = """
-    Mode should be import or export depending on if you're fetching from pearson or
-    sending to them.
-    """
+    option_list = BaseCommand.option_list + (
+        make_option('--mode',
+                    action='store_true',
+                    dest='mode',
+                    default='both',
+                    help='mode is import, export, or both'),
+    )
 
-    def handle(self, *args):
-        if len(args) < 1:
-            raise CommandError('Usage is pearson {0}'.format(self.args))
+    def handle(self, **options):
 
-        for mode in args:
-            if mode == 'export':
-                sftp(settings.PEARSON[LOCAL_EXPORT], settings.PEARSON[SFTP_EXPORT])
-                s3(settings.PEARSON[LOCAL_EXPORT], settings.PEARSON[BUCKET])
-            elif mode == 'import':
-                sftp(settings.PEARSON[SFTP_IMPORT], settings.PEARSON[LOCAL_IMPORT])
-                s3(settings.PEARSON[LOCAL_IMPORT], settings.PEARSON[BUCKET])
-            else:
-                print("ERROR:  Mode must be export or import.")
+        if not settings.PEARSON:
+            raise CommandError('No PEARSON entries in auth/env.json.')
+
+        def import_pearson():
+            sftp(settings.PEARSON[SFTP_IMPORT], settings.PEARSON[LOCAL_IMPORT])
+            s3(settings.PEARSON[LOCAL_IMPORT], settings.PEARSON[BUCKET])
+            call_command('pearson_import', 'dest_from_settings=True')
+
+        def export_pearson():
+            call_command('pearson_export_ccd', 'dest_from_settings=True')
+            call_command('pearson_export_ead', 'dest_from_settings=True')
+            sftp(settings.PEARSON[LOCAL_EXPORT], settings.PEARSON[SFTP_EXPORT])
+            s3(settings.PEARSON[LOCAL_EXPORT], settings.PEARSON[BUCKET])
+
+        if options['mode'] == 'both':
+            export_pearson()
+            import_pearson()
+        elif options['mode'] == 'export':
+            export_pearson()
+        elif options['mode'] == 'import':
+            import_pearson()
+        else:
+            print("ERROR:  Mode must be export or import.")
+
 
         def sftp(files_from, files_to):
             with dog_stats_api.timer('pearson.{0}'.format(mode), tags='sftp'):

@@ -37,7 +37,20 @@ class Command(BaseCommand):
         ("LastUpdate", "user_updated_at"), # in UTC, so same as what we store
     ])
 
-    def handle(self, **kwargs):
+    option_list = BaseCommand.option_list + (
+        make_option('--dest-from-settings',
+                    action='store_true',
+                    dest='dest-from-settings',
+                    default=False,
+                    help='Retrieve the destination to export to from django? True/False'),
+        make_option('--destination',
+                    action='store_true',
+                    dest='destination',
+                    default=None,
+                    help='Where to store the exported files')
+    )
+
+    def handle(self, **options):
         # update time should use UTC in order to be comparable to the user_updated_at 
         # field
         uploaded_at = datetime.utcnow()
@@ -48,13 +61,23 @@ class Command(BaseCommand):
         # Name will use timestamp -- this is UTC, so it will look funny,
         # but it should at least be consistent with the other timestamps 
         # used in the system.
-        if not os.path.isdir(settings.PEARSON[LOCAL_EXPORT]):
-            os.makedirs(settings.PEARSON[LOCAL_EXPORT])
-            destfile = os.path.join(settings.PEARSON[LOCAL_EXPORT],
-                    uploaded_at.strftime("cdd-%Y%m%d-%H%M%S.dat"))
+        if options['dest-from-settings'] is True:
+            if settings.PEARSON[LOCAL_EXPORT]:
+                dest = settings.PEARSON[LOCAL_EXPORT]
+            else:
+                raise CommandError('--dest-from-settings was enabled but the'
+                        'PEARSON[LOCAL_EXPORT] setting was not set.')
+        elif options['destination']:
+            dest = options['destination']
         else:
-            destfile = os.path.join(settings.PEARSON[LOCAL_EXPORT],
-                    uploaded_at.strftime("cdd-%Y%m%d-%H%M%S.dat"))
+            raise ComamndError('--destination or --dest-from-settings must be used')
+                
+
+        if not os.path.isdir(dest):
+            os.makedirs(dest)
+            destfile = os.path.join(dest, uploaded_at.strftime("cdd-%Y%m%d-%H%M%S.dat"))
+        else:
+            destfile = os.path.join(dest, uploaded_at.strftime("cdd-%Y%m%d-%H%M%S.dat"))
 
         
         # strings must be in latin-1 format.  CSV parser will
