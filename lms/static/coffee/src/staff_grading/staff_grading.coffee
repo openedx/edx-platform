@@ -340,7 +340,14 @@ class StaffGrading
 
   render_view: () ->
     # clear the problem list and breadcrumbs
-    @problem_list.html('')
+    @problem_list.html('''
+        <tr>
+            <th>Problem Name</th>
+            <th>Number Graded</th>
+            <th>Number Pending</th>
+            <th>Number Required</th>
+        </tr>
+    ''')    
     @breadcrumbs.html('')
     @problem_list_container.toggle(@list_view)
     if @backend.mock_backend
@@ -368,7 +375,7 @@ class StaffGrading
 
   problem_link:(problem) ->
     link = $('<a>').attr('href', "javascript:void(0)").append(
-      "#{problem.problem_name} (#{problem.num_graded} graded, #{problem.num_pending} pending, required to grade #{problem.num_required} more)")
+      "#{problem.problem_name}")
         .click =>
           @get_next_submission problem.location
 
@@ -381,7 +388,12 @@ class StaffGrading
 
   render_list: () ->
     for problem in @problems
-      @problem_list.append($('<li>').append(@problem_link(problem)))
+      problem_row = $('<tr>')
+      problem_row.append($('<td>').append(@problem_link(problem)))
+      problem_row.append($('<td>').append("#{problem.num_graded}"))
+      problem_row.append($('<td>').append("#{problem.num_pending}"))
+      problem_row.append($('<td>').append("#{problem.num_required}"))
+      @problem_list.append(problem_row)
 
   render_problem: () ->
     # make the view elements match the state.  Idempotent.

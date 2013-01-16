@@ -26,13 +26,32 @@
                 Nothing to grade!
             </div>
             %else:
-                <ul class="problem-list">
+            <div class="problem-list-container">
+                <table class="problem-list">
+                    <tr>
+                        <th>Problem Name</th>
+                        <th>Number Graded</th>
+                        <th>Number Pending</th>
+                        <th>Number Required</th>
+                    </tr>
                 %for problem in problem_list:
-                    <li>
-                    <a href="${ajax_url}problem?location=${problem['location']}">${problem['problem_name']} (${problem['num_graded']} graded, ${problem['num_pending']} pending, required to grade ${problem['num_required']} more)</a>
-                    </li>
+                <tr>
+                    <td>
+                        <a href="${ajax_url}/problem?location=$problem['location']">${problem['problem_name']}</a>
+                    </td>
+                    <td>
+                        ${problem['num_graded']}
+                    </td>
+                    <td>
+                        ${problem['num_pending']}
+                    </td>
+                    <td>
+                        ${problem['num_required']}
+                    </td>
+                </tr>
                 %endfor
-                </ul>
+                </table>
+            </div>
             %endif
         %endif
     </div>
