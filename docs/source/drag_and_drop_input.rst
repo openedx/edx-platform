@@ -212,6 +212,12 @@ for same number of draggables, anyof is equal to unordered_equal
 
 If we have can_reuse=true, than one must use only long form of correct answer.
 
+Logic flow
+----------
+
+.. image:: draganddrop_logic_flow.png
+
+
 Example
 =======
 
