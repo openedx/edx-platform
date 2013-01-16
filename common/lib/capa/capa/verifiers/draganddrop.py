@@ -206,6 +206,8 @@ class DragAndDrop(object):
         Returns: True if within rule lists are equal, otherwise False.
         """
         if flag == 'exact':
+            if len(correct) != len(user):
+                return False
             for el1, el2 in zip(correct, user):
                 if PositionsCompare(el1) != PositionsCompare(el2):
                     return False
