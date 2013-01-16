@@ -396,7 +396,7 @@ class StaffGrading
       problem_row.append($('<td>').append("#{problem.num_required}"))
       row_progress_bar = $('<div>').addClass('progress-bar')
       progress_value = parseInt(problem.num_graded)
-      progress_max = parseInt(problem.num_pending) + progress_value
+      progress_max = parseInt(problem.num_required) + progress_value
       row_progress_bar.progressbar({value: progress_value, max: progress_max})
       problem_row.append($('<td>').append(row_progress_bar))
       @problem_list.append(problem_row)
