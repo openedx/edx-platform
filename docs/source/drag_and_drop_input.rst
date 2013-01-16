@@ -42,6 +42,8 @@ attributes::
     id - Unique identifier of the draggable object.
     label - Human readable label that will be shown to the user.
     icon - Relative path to an image that will be shown to the user.
+    can_reuse - true or false, default is false. If true, same draggable can be
+    used multiple times.
 
 A draggable is what the user must drag out of the slider and place onto the
 base image. After a drag operation, if the center of the draggable ends up
@@ -80,6 +82,129 @@ the slider.
 
 If no targets are provided, then a draggable can be dragged and placed anywhere
 on the base image.
+
+correct answer format
+---------------------
+
+There are two correct answer formats: short and long
+If short from correct answer is mapping of 'draggable_id' to 'target_id'::
+
+    correct_answer = {'grass':     [[300, 200], 200], 'ant': [[500, 0], 200]}
+    correct_answer = {'name4': 't1', '7': 't2'}
+
+In long form correct answer is list of dicts. Every dict has 3 keys:
+draggables, targets and rule. For example::
+
+    correct_answer = [
+    {
+    'draggables':   ['7', '8'],
+    'targets':  ['t5_c', 't6_c'],
+    'rule': 'anyof'
+    },
+    {
+    'draggables': ['1', '2'],
+    'targets': ['t2_h', 't3_h', 't4_h', 't7_h', 't8_h', 't10_h'],
+    'rule': 'anyof'
+    }]
+
+Draggables is list of draggables id. Target is list of targets id, draggables
+must be dragged to with considering rule. Rule is string.
+
+Draggables in dicts inside correct_answer list must not intersect.
+Wrong (for draggable id 7)::
+
+    correct_answer = [
+    {
+    'draggables':   ['7', '8'],
+    'targets':  ['t5_c', 't6_c'],
+    'rule': 'anyof'
+    },
+    {
+    'draggables': ['7', '2'],
+    'targets': ['t2_h', 't3_h', 't4_h', 't7_h', 't8_h', 't10_h'],
+    'rule': 'anyof'
+    }]
+
+Rules are: exact, anyof, unorderly_equal, anyof+number, unorderly_equal+number
+
+- Exact rule means that targets for draggable id's in user_answer are the same
+that targets from correct answer. For example, for draggables 7 and 8 user must
+drag 7 to target1 and 8 to target2 if correct_answer is::
+
+    correct_answer = [
+    {
+    'draggables':   ['7', '8'],
+    'targets':  ['tartget1', 'target2'],
+    'rule': 'exact'
+    }]
+
+
+- Unorderly_equal rule allows draggables be dragged to targets unorderly. If one
+want to allow for student to drag 7 to target1 or target2 and 8 to target2 or
+target 1 and 7 and 8 must be in different targets, then correct answer must be::
+
+    correct_answer = [
+    {
+    'draggables':   ['7', '8'],
+    'targets':  ['tartget1', 'target2'],
+    'rule': 'unorderly_equal'
+    }]
+
+- Anyof rule allows draggables to be dragged to any of targets. If one want to
+allow for student to drag 7 and 8 to target1 or target2, which means that if 7
+is on target1 and 8 is on target1 or 7 on target2 and 8 on target2 or 7 on
+target1 and 8 on target2. Any of theese are correct which anyof rule::
+
+    correct_answer = [
+    {
+    'draggables':   ['7', '8'],
+    'targets':  ['tartget1', 'target2'],
+    'rule': 'anyof'
+    }]
+
+
+- If you have can_reuse true, then you, for example, have draggables a,b,c and 10
+targets. These will allow you to drag 4 'a' draggables to
+['target1',  'target4', 'target7', 'target10'] , you do not need to write 'a'
+four times. Also this will allow you to drag 'b' draggable to target2 or target5
+or target5 and target2 etc..::
+
+    correct_answer = [
+        {
+            'draggables': ['a'],
+            'targets': ['target1',  'target4', 'target7', 'target10'],
+            'rule': 'unorderly_equal'
+        },
+        {
+            'draggables': ['b'],
+            'targets': ['target2', 'target5', 'target8'],
+            'rule': 'anyof'
+        },
+        {
+            'draggables': ['c'],
+            'targets': ['target3', 'target6', 'target9'],
+            'rule': 'unorderly_equal'
+        }]
+
+And sometimes you want to allow drag only two 'b' draggables, in these case
+you sould use 'anyof+number' of 'unordered_equal+number' rule::
+
+    correct_answer = [
+        {
+            'draggables': ['a', 'a', 'a'],
+            'targets': ['target1',  'target4', 'target7'],
+            'rule': 'unorderly_equal+numbers'
+        },
+        {
+            'draggables': ['b', 'b'],
+            'targets': ['target2', 'target5', 'target8'],
+            'rule': 'anyof+numbers'
+        },
+        {
+            'draggables': ['c'],
+            'targets': ['target3', 'target6', 'target9'],
+            'rule': 'unorderly_equal'
+        }]
 
 
 Example
