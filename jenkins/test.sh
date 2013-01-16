@@ -45,7 +45,6 @@ TESTS_FAILED=0
 rake test_lms[false] || TESTS_FAILED=1
 rake test_common/lib/capa || TESTS_FAILED=1
 rake test_common/lib/xmodule || TESTS_FAILED=1
-rake phantomjs_jasmine_lms || true
 # Don't run the studio tests until feature/cale/cms-master is merged in
 # rake phantomjs_jasmine_cms || true
 rake coverage:xml coverage:html
