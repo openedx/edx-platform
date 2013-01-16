@@ -28,7 +28,7 @@ class Command(BaseCommand):
                     action='store_true',
                     dest='dest-from-settings',
                     default=False,
-                    help='Retrieve the destination to export to from django? True/False'),
+                    help='Retrieve the destination to export to from django.'),
         make_option('--destination',
                     action='store',
                     dest='destination',
