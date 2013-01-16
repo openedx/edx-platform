@@ -678,11 +678,18 @@ def create_exam_registration(request, post_override=None):
     username = post_vars['username']
     user = User.objects.get(username=username)
     course_id = post_vars['course_id']
-    course = (course_from_id(course_id))  # assume it will be found....
+    course = course_from_id(course_id)  # assume it will be found....
+
+    # make sure that any demographic data values received from the page have been stripped.
+    # Whitespace is not an acceptable response for any of these values
+    demographic_data = {}
+    for fieldname in TestCenterUser.user_provided_fields():
+        if fieldname in post_vars:
+            demographic_data[fieldname] = (post_vars[fieldname]).strip()
         
     try:
         testcenter_user = TestCenterUser.objects.get(user=user)
-        needs_updating = testcenter_user.needs_update(post_vars) 
+        needs_updating = testcenter_user.needs_update(demographic_data) 
         log.info("User {0} enrolled in course {1} {2}updating demographic info for exam registration".format(user.username, course_id, "" if needs_updating else "not "))
     except TestCenterUser.DoesNotExist:
         # do additional initialization here:
@@ -694,7 +701,7 @@ def create_exam_registration(request, post_override=None):
     if needs_updating:
         # first perform validation on the user information 
         # using a Django Form.
-        form = TestCenterUserForm(instance=testcenter_user, data=post_vars)
+        form = TestCenterUserForm(instance=testcenter_user, data=demographic_data)
         if form.is_valid():
             form.update_and_save()
         else:
