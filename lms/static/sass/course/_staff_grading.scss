@@ -29,11 +29,28 @@ div.peer-grading{
         display: none;
     }
 
-    ul
+    .problem-list
     {
-        li
+        text-align: center;
+        table-layout: auto;
+        width:100%;
+        th
         {
-            margin: 16px 0px;
+            padding: 10px;
+        }
+        td
+        {
+            padding:10px;
+        }
+        td.problem-name
+        {
+            text-align:left;
+        }
+        .ui-progressbar
+        {
+            height:1em;
+            margin:0px;
+            padding:0px;
         }
     }
 

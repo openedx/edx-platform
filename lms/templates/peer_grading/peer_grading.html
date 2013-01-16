@@ -30,14 +30,15 @@
                 <table class="problem-list">
                     <tr>
                         <th>Problem Name</th>
-                        <th>Number Graded</th>
-                        <th>Number Pending</th>
-                        <th>Number Required</th>
+                        <th>Graded</th>
+                        <th>Pending</th>
+                        <th>Required</th>
+                        <th>Progress</th>
                     </tr>
                 %for problem in problem_list:
-                <tr>
-                    <td>
-                        <a href="${ajax_url}/problem?location=$problem['location']">${problem['problem_name']}</a>
+                <tr data-graded="${problem['num_graded']}" data-required="${problem['num_required']}">
+                    <td class="problem-name">
+                        <a href="${ajax_url}problem?location=${problem['location']}">${problem['problem_name']}</a>
                     </td>
                     <td>
                         ${problem['num_graded']}
@@ -47,6 +48,10 @@
                     </td>
                     <td>
                         ${problem['num_required']}
+                    </td>
+                    <td>
+                        <div class="progress-bar">
+                        </div>
                     </td>
                 </tr>
                 %endfor

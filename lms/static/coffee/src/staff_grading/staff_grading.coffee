@@ -343,9 +343,10 @@ class StaffGrading
     @problem_list.html('''
         <tr>
             <th>Problem Name</th>
-            <th>Number Graded</th>
-            <th>Number Pending</th>
-            <th>Number Required</th>
+            <th>Graded</th>
+            <th>Pending</th>
+            <th>Required</th>
+            <th>Progress</th>
         </tr>
     ''')    
     @breadcrumbs.html('')
@@ -389,10 +390,15 @@ class StaffGrading
   render_list: () ->
     for problem in @problems
       problem_row = $('<tr>')
-      problem_row.append($('<td>').append(@problem_link(problem)))
+      problem_row.append($('<td class="problem-name">').append(@problem_link(problem)))
       problem_row.append($('<td>').append("#{problem.num_graded}"))
       problem_row.append($('<td>').append("#{problem.num_pending}"))
       problem_row.append($('<td>').append("#{problem.num_required}"))
+      row_progress_bar = $('<div>').addClass('progress-bar')
+      progress_value = parseInt(problem.num_graded)
+      progress_max = parseInt(problem.num_pending) + progress_value
+      row_progress_bar.progressbar({value: progress_value, max: progress_max})
+      problem_row.append($('<td>').append(row_progress_bar))
       @problem_list.append(problem_row)
 
   render_problem: () ->
