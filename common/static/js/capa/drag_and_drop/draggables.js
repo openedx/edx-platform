@@ -739,27 +739,21 @@ define(['logme', 'update_input'], function (logme, updateInput) {
 
         this.iconEl.css(
             'left',
-            target.offset.left + 0.5 * target.w -
-                this.iconWidth * 0.5 + offset
-                - this.iconElLeftOffset
+            target.offset.left + 0.5 * target.w - this.iconWidth * 0.5 + offset - this.iconElLeftOffset
         );
         this.iconEl.css(
             'top',
-            target.offset.top + 0.5 * target.h -
-                this.iconHeight * 0.5 + offset
+            target.offset.top + 0.5 * target.h - this.iconHeight * 0.5 + offset
         );
 
         if (this.labelEl !== null) {
             this.labelEl.css(
                 'left',
-                target.offset.left + 0.5 * target.w -
-                    this.labelWidth * 0.5 + offset
-                    - 9 // Acoount for padding, border.
+                target.offset.left + 0.5 * target.w - this.labelWidth * 0.5 + offset - 9 // Acoount for padding, border.
             );
             this.labelEl.css(
                 'top',
-                target.offset.top + 0.5 * target.h +
-                    this.iconHeight * 0.5 + 5 + offset
+                target.offset.top + 0.5 * target.h + this.iconHeight * 0.5 + 5 + offset
             );
         }
     }
