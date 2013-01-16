@@ -196,7 +196,11 @@ def instructor_dashboard(request, course_id):
         if student_to_reset is not None:
             # find the module in question
             try:
-                module_to_reset=StudentModule.objects.get(student_id=student_to_reset.id, course_id=course_id, module_state_key__iendswith="/problem/"+problem_to_reset)
+                (org, course_name, run)=course_id.split("/")
+                module_state_key="i4x://"+org+"/"+course_name+"/problem/"+problem_to_reset
+                module_to_reset=StudentModule.objects.get(student_id=student_to_reset.id, 
+                                                          course_id=course_id, 
+                                                          module_state_key=module_state_key)
                 msg+="Found module to reset.  "
             except Exception as e:
                 msg+="<font color='red'>Couldn't find module with that urlname.  </font>"
@@ -232,6 +236,7 @@ def instructor_dashboard(request, course_id):
                 student_to_reset=User.objects.get(email=unique_student_identifier)
             else:
                 student_to_reset=User.objects.get(username=unique_student_identifier)
+            progress_url=reverse('student_progress',kwargs={'course_id':course_id,'student_id': student_to_reset.id})
             track.views.server_track(request, 
                                     '{instructor} requested progress page for {student} in {course}'.format(
                                         student=student_to_reset,
@@ -239,7 +244,7 @@ def instructor_dashboard(request, course_id):
                                         course=course_id),
                                     {}, 
                                     page='idashboard')
-            msg+="<a href='./progress/{0}' target='_blank'> Progress page for username: {1} with email address: {2}</a>.".format(str(student_to_reset.id),student_to_reset.username,student_to_reset.email)
+            msg+="<a href='{0}' target='_blank'> Progress page for username: {1} with email address: {2}</a>.".format(progress_url,student_to_reset.username,student_to_reset.email)
         except:
             msg+="<font color='red'>Couldn't find student with that username.  </font>"
 
