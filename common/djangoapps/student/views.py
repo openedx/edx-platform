@@ -632,15 +632,18 @@ def begin_exam_registration(request, course_id):
     user = request.user
 
     try:
-        course = (course_from_id(course_id))
+        course = course_from_id(course_id)
     except ItemNotFoundError:
-        # TODO: do more than just log!!  The rest will fail, so we should fail right now.
-        log.error("User {0} enrolled in non-existent course {1}"
-                      .format(user.username, course_id))
+        log.error("User {0} enrolled in non-existent course {1}".format(user.username, course_id))
+        raise Http404
 
     # get the exam to be registered for:
     # (For now, we just assume there is one at most.)
+    # if there is no exam now (because someone bookmarked this stupid page),
+    # then return a 404:
     exam_info = course.current_test_center_exam
+    if exam_info is None:
+        raise Http404
 
     # determine if the user is registered for this course:
     registration = exam_registration_info(user, course)
