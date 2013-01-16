@@ -1,15 +1,16 @@
 import csv
+import os
 from collections import OrderedDict
 from datetime import datetime
-from os.path import isdir, join
 from optparse import make_option
 
 from django.core.management.base import BaseCommand
 
 from student.models import TestCenterRegistration
 
+
 class Command(BaseCommand):
-    
+
     CSV_TO_MODEL_FIELDS = OrderedDict([
         ('AuthorizationTransactionType', 'authorization_transaction_type'),
         ('AuthorizationID', 'authorization_id'),
@@ -20,7 +21,7 @@ class Command(BaseCommand):
         ('Accommodations', 'accommodation_code'),
         ('EligibilityApptDateFirst', 'eligibility_appointment_date_first'),
         ('EligibilityApptDateLast', 'eligibility_appointment_date_last'),
-        ("LastUpdate", "user_updated_at"), # in UTC, so same as what we store
+        ("LastUpdate", "user_updated_at"),  # in UTC, so same as what we store
     ])
 
     option_list = BaseCommand.option_list + (
@@ -37,11 +38,11 @@ class Command(BaseCommand):
         make_option('--dump_all',
                     action='store_true',
                     dest='dump_all',
-        ),
+                    ),
         make_option('--force_add',
                     action='store_true',
                     dest='force_add',
-        ),
+                    ),
     )
 
     def handle(self, **options):
@@ -56,12 +57,12 @@ class Command(BaseCommand):
         # but it should at least be consistent with the other timestamps
         # used in the system.
         if 'dest-from-settings' in options:
-            if LOCAL_EXPORT in settings.PEARSON:
-                dest = settings.PEARSON[LOCAL_EXPORT]
+            if 'LOCAL_EXPORT' in settings.PEARSON:
+                dest = settings.PEARSON['LOCAL_EXPORT']
             else:
                 raise CommandError('--dest-from-settings was enabled but the'
-                        'PEARSON[LOCAL_EXPORT] setting was not set.')
-        elif destinations in options:
+                                   'PEARSON[LOCAL_EXPORT] setting was not set.')
+        elif 'destinations' in options:
             dest = options['destination']
         else:
             raise CommandError('--destination or --dest-from-settings must be used')
@@ -71,7 +72,7 @@ class Command(BaseCommand):
 
         destfile = os.path.join(dest, uploaded_at.strftime("ead-%Y%m%d-%H%M%S.dat"))
 
-        dump_all = kwargs['dump_all']
+        dump_all = options['dump_all']
 
         with open(destfile, "wb") as outfile:
             writer = csv.DictWriter(outfile,
@@ -88,13 +89,9 @@ class Command(BaseCommand):
                     record["LastUpdate"] = record["LastUpdate"].strftime("%Y/%m/%d %H:%M:%S")
                     record["EligibilityApptDateFirst"] = record["EligibilityApptDateFirst"].strftime("%Y/%m/%d")
                     record["EligibilityApptDateLast"] = record["EligibilityApptDateLast"].strftime("%Y/%m/%d")
-                    if kwargs['force_add']:
+                    if options['force_add']:
                         record['AuthorizationTransactionType'] = 'Add'
 
                     writer.writerow(record)
                     tcr.uploaded_at = uploaded_at
                     tcr.save()
-
-
-
-        

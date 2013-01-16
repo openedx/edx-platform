@@ -1,15 +1,16 @@
 import csv
+import os
 from collections import OrderedDict
 from datetime import datetime
-from os.path import isdir
 from optparse import make_option
 
 from django.core.management.base import BaseCommand
 
 from student.models import TestCenterUser
 
+
 class Command(BaseCommand):
-    
+
     CSV_TO_MODEL_FIELDS = OrderedDict([
         # Skipping optional field CandidateID
         ("ClientCandidateID", "client_candidate_id"),
@@ -34,7 +35,7 @@ class Command(BaseCommand):
         ("FAXCountryCode", "fax_country_code"),
         ("CompanyName", "company_name"),
         # Skipping optional field CustomQuestion
-        ("LastUpdate", "user_updated_at"), # in UTC, so same as what we store
+        ("LastUpdate", "user_updated_at"),  # in UTC, so same as what we store
     ])
 
     option_list = BaseCommand.option_list + (
@@ -55,29 +56,28 @@ class Command(BaseCommand):
         # field
         uploaded_at = datetime.utcnow()
 
-        # if specified destination is an existing directory, then 
+        # if specified destination is an existing directory, then
         # create a filename for it automatically.  If it doesn't exist,
         # then we will create the directory.
         # Name will use timestamp -- this is UTC, so it will look funny,
-        # but it should at least be consistent with the other timestamps 
+        # but it should at least be consistent with the other timestamps
         # used in the system.
         if 'dest-from-settings' in options:
-            if LOCAL_EXPORT in settings.PEARSON:
-                dest = settings.PEARSON[LOCAL_EXPORT]
+            if 'LOCAL_EXPORT' in settings.PEARSON:
+                dest = settings.PEARSON['LOCAL_EXPORT']
             else:
                 raise CommandError('--dest-from-settings was enabled but the'
-                        'PEARSON[LOCAL_EXPORT] setting was not set.')
+                                   'PEARSON[LOCAL_EXPORT] setting was not set.')
         elif 'destination' in options:
             dest = options['destination']
         else:
             raise CommandError('--destination or --dest-from-settings must be used')
-                
 
         if not os.path.isdir(dest):
             os.makedirs(dest)
 
         destfile = os.path.join(dest, uploaded_at.strftime("cdd-%Y%m%d-%H%M%S.dat"))
-        
+
         # strings must be in latin-1 format.  CSV parser will
         # otherwise convert unicode objects to ascii.
         def ensure_encoding(value):
@@ -85,8 +85,8 @@ class Command(BaseCommand):
                 return value.encode('iso-8859-1')
             else:
                 return value
-            
-        dump_all = kwargs['dump_all']
+
+        dump_all = options['dump_all']
 
         with open(destfile, "wb") as outfile:
             writer = csv.DictWriter(outfile,
@@ -104,6 +104,3 @@ class Command(BaseCommand):
                     writer.writerow(record)
                     tcu.uploaded_at = uploaded_at
                     tcu.save()
-
-
-        
