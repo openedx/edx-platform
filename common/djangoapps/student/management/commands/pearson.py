@@ -25,11 +25,11 @@ class Command(BaseCommand):
 
         for mode in args:
             if mode == 'export':
-                sftp(settings.PEARSON[LOCAL_IMPORT], settings.PEARSON[SFTP_IMPORT])
-                s3(settings.PEARSON_LOCAL, settings.PEARSON[BUCKET])
-            elif mode == 'import':
-                sftp(settings.PEARSON[SFTP_EXPORT], settings.PEARSON[LOCAL_EXPORT])
+                sftp(settings.PEARSON[LOCAL_EXPORT], settings.PEARSON[SFTP_EXPORT])
                 s3(settings.PEARSON[LOCAL_EXPORT], settings.PEARSON[BUCKET])
+            elif mode == 'import':
+                sftp(settings.PEARSON[SFTP_IMPORT], settings.PEARSON[LOCAL_IMPORT])
+                s3(settings.PEARSON[LOCAL_IMPORT], settings.PEARSON[BUCKET])
             else:
                 print("ERROR:  Mode must be export or import.")
 
@@ -37,8 +37,8 @@ class Command(BaseCommand):
             with dog_stats_api.timer('pearson.{0}'.format(mode), tags='sftp'):
                 try:
                     t = paramiko.Transport((hostname, 22))
-                    t.connect(username=settings.PEARSON_SFTP_USERNAME,
-                              password=settings.PEARSON_SFTP_PASSWORD)
+                    t.connect(username=settings.PEARSON[SFTP_USERNAME],
+                              password=settings.PEARSON[SFTP_PASSWORD])
                     sftp = paramiko.SFTPClient.from_transport(t)
                     if os.path.isdir(files_from):
                         for file in os.listdir(files_from):
