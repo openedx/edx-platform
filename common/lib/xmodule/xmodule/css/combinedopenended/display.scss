@@ -40,6 +40,10 @@ section.combined-open-ended {
       width: 93%;
       position:relative;
   }
+  h4
+  {
+      margin-bottom:10px;
+  }
 }
 
 section.combined-open-ended-status {
@@ -49,15 +53,12 @@ section.combined-open-ended-status {
       color: #2C2C2C;
       font-family: monospace;
       font-size: 1em;
-      padding-top: 10px;
+      padding: 10px;
    }
 
    .statusitem-current {
-     background-color: #BEBEBE;
+     background-color: #ccc;
      color: #2C2C2C;
-     font-family: monospace;
-     font-size: 1em;
-     padding-top: 10px;
   }
 
     span {

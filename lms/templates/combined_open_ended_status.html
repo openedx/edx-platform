@@ -2,7 +2,7 @@
     %for i in xrange(0,len(status_list)):
         <%status=status_list[i]%>
         %if i==len(status_list)-1:
-            <div class="statusitem-current" data-status-number="${i}">
+            <div class="statusitem statusitem-current" data-status-number="${i}">
         %else:
             <div class="statusitem" data-status-number="${i}">
         %endif
