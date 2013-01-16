@@ -216,6 +216,7 @@ Logic flow
 ----------
 
 .. image:: draganddrop_logic_flow.png
+    :scale: 36 %
 
 
 Example
