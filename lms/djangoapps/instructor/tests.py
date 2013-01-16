@@ -179,7 +179,7 @@ class TestInstructorDashboardForumAdmin(ct.PageLoader):
             self.assertTrue(response.content.find('Removed "{0}" from "{1}" forum role = "{2}"'.format(username, course.id, rolename))>=0)
             self.assertFalse(has_forum_access(username, course.id, rolename))
 
-    def test_add_and_readd_forum_admin_users(self):
+    def test_add_and_read_forum_admin_users(self):
         course = self.toy
         self.initialize_roles(course.id)
         url = reverse('instructor_dashboard', kwargs={'course_id': course.id})
