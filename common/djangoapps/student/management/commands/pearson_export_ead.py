@@ -23,11 +23,6 @@ class Command(BaseCommand):
         ("LastUpdate", "user_updated_at"), # in UTC, so same as what we store
     ])
 
-    args = '<output_file_or_dir>'
-    help = """
-    Export user registration information from TestCenterRegistration model into a tab delimited
-    text file with a format that Pearson expects.
-    """
 
     option_list = BaseCommand.option_list + (
         make_option(
@@ -43,26 +38,25 @@ class Command(BaseCommand):
     )
     
     
-    def handle(self, *args, **kwargs):
-        if len(args) < 1:
-            print Command.help
-            return
+    def handle(self, **kwargs):
 
         # update time should use UTC in order to be comparable to the user_updated_at 
         # field
         uploaded_at = datetime.utcnow()
 
-        # if specified destination is an existing directory, then 
+        # if specified destination is an existing directory, then
         # create a filename for it automatically.  If it doesn't exist,
-        # or exists as a file, then we will just write to it.
+        # then we will create the directory.
         # Name will use timestamp -- this is UTC, so it will look funny,
-        # but it should at least be consistent with the other timestamps 
+        # but it should at least be consistent with the other timestamps
         # used in the system.
-        dest = args[0]
-        if isdir(dest):
-            destfile = join(dest, uploaded_at.strftime("ead-%Y%m%d-%H%M%S.dat"))
+        if not os.path.isdir(settings.PEARSON_LOCAL_EXPORT):
+            os.makedirs(settings.PEARSON_LOCAL_EXPORT)
+            destfile = os.path.join(settings.PEARSON_LOCAL_EXPORT,
+                    uploaded_at.strftime("ead-%Y%m%d-%H%M%S.dat"))
         else:
-            destfile = dest
+            destfile = os.path.join(settings.PEARSON_LOCAL_EXPORT,
+                    uploaded_at.strftime("ead-%Y%m%d-%H%M%S.dat"))
 
         dump_all = kwargs['dump_all']
 

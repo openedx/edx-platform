@@ -37,39 +37,25 @@ class Command(BaseCommand):
         ("LastUpdate", "user_updated_at"), # in UTC, so same as what we store
     ])
 
-    option_list = BaseCommand.option_list + (
-        make_option(
-            '--dump_all',
-            action='store_true',
-            dest='dump_all',
-        ),
-    )
-    
-    args = '<output_file_or_dir>'
-    help = """
-    Export user demographic information from TestCenterUser model into a tab delimited
-    text file with a format that Pearson expects.
-    """
-    def handle(self, *args, **kwargs):
-        if len(args) < 1:
-            print Command.help
-            return
-
+    def handle(self, **kwargs):
         # update time should use UTC in order to be comparable to the user_updated_at 
         # field
         uploaded_at = datetime.utcnow()
 
         # if specified destination is an existing directory, then 
         # create a filename for it automatically.  If it doesn't exist,
-        # or exists as a file, then we will just write to it.
+        # then we will create the directory.
         # Name will use timestamp -- this is UTC, so it will look funny,
         # but it should at least be consistent with the other timestamps 
         # used in the system.
-        dest = args[0]
-        if isdir(dest):
-            destfile = os.path.join(dest, uploaded_at.strftime("cdd-%Y%m%d-%H%M%S.dat"))
+        if not os.path.isdir(settings.PEARSON_LOCAL_EXPORT):
+            os.makedirs(settings.PEARSON_LOCAL_EXPORT)
+            destfile = os.path.join(settings.PEARSON_LOCAL_EXPORT,
+                    uploaded_at.strftime("cdd-%Y%m%d-%H%M%S.dat"))
         else:
-            destfile = dest
+            destfile = os.path.join(settings.PEARSON_LOCAL_EXPORT,
+                    uploaded_at.strftime("cdd-%Y%m%d-%H%M%S.dat"))
+
         
         # strings must be in latin-1 format.  CSV parser will
         # otherwise convert unicode objects to ascii.
