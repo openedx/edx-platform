@@ -125,7 +125,7 @@ Wrong (for draggable id 7)::
     'rule': 'anyof'
     }]
 
-Rules are: exact, anyof, unorderly_equal, anyof+number, unorderly_equal+number
+Rules are: exact, anyof, unordered_equal, anyof+number, unordered_equal+number
 
 - Exact rule means that targets for draggable id's in user_answer are the same
 that targets from correct answer. For example, for draggables 7 and 8 user must
@@ -139,7 +139,7 @@ drag 7 to target1 and 8 to target2 if correct_answer is::
     }]
 
 
-- Unorderly_equal rule allows draggables be dragged to targets unorderly. If one
+- unordered_equal rule allows draggables be dragged to targets unordered. If one
 want to allow for student to drag 7 to target1 or target2 and 8 to target2 or
 target 1 and 7 and 8 must be in different targets, then correct answer must be::
 
@@ -147,7 +147,7 @@ target 1 and 7 and 8 must be in different targets, then correct answer must be::
     {
     'draggables':   ['7', '8'],
     'targets':  ['tartget1', 'target2'],
-    'rule': 'unorderly_equal'
+    'rule': 'unordered_equal'
     }]
 
 - Anyof rule allows draggables to be dragged to any of targets. If one want to
@@ -173,7 +173,7 @@ or target5 and target2 etc..::
         {
             'draggables': ['a'],
             'targets': ['target1',  'target4', 'target7', 'target10'],
-            'rule': 'unorderly_equal'
+            'rule': 'unordered_equal'
         },
         {
             'draggables': ['b'],
@@ -183,7 +183,7 @@ or target5 and target2 etc..::
         {
             'draggables': ['c'],
             'targets': ['target3', 'target6', 'target9'],
-            'rule': 'unorderly_equal'
+            'rule': 'unordered_equal'
         }]
 
 And sometimes you want to allow drag only two 'b' draggables, in these case
@@ -193,7 +193,7 @@ you sould use 'anyof+number' of 'unordered_equal+number' rule::
         {
             'draggables': ['a', 'a', 'a'],
             'targets': ['target1',  'target4', 'target7'],
-            'rule': 'unorderly_equal+numbers'
+            'rule': 'unordered_equal+numbers'
         },
         {
             'draggables': ['b', 'b'],
@@ -203,9 +203,11 @@ you sould use 'anyof+number' of 'unordered_equal+number' rule::
         {
             'draggables': ['c'],
             'targets': ['target3', 'target6', 'target9'],
-            'rule': 'unorderly_equal'
+            'rule': 'unordered_equal'
         }]
 
+In case if we have no multiple draggables per targets (one_per_target="true"),
+for same number of draggables, anyof is equal to unordered_equal
 
 Example
 =======
