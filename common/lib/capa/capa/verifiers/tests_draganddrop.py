@@ -319,17 +319,17 @@ class Test_DragAndDrop_Grade(unittest.TestCase):
         {
             'draggables': ['a'],
             'targets': ['target1',  'target4', 'target7', 'target10'],
-            'rule': 'unorderly_equal'
+            'rule': 'unordered_equal'
         },
         {
             'draggables': ['b'],
             'targets': ['target2', 'target5', 'target8'],
-            'rule': 'unorderly_equal'
+            'rule': 'unordered_equal'
         },
         {
             'draggables': ['c'],
             'targets': ['target3', 'target6', 'target9'],
-            'rule': 'unorderly_equal'
+            'rule': 'unordered_equal'
         }]
         self.assertFalse(draganddrop.grade(user_input, correct_answer))
 
@@ -406,7 +406,7 @@ class Test_DragAndDrop_Grade(unittest.TestCase):
         self.assertFalse(draganddrop.grade(user_input, correct_answer))
 
     def test_label_10_targets_with_a_b_c_reused(self):
-        """Test reusable draggables (no mupltiple draggables per target)"""
+        """Test a b c in 10 labels reused"""
         user_input = '{"draggables":[{"a":"target1"}, \
         {"b":"target2"},{"c":"target3"},{"b":"target5"}, \
         {"c":"target6"}, {"b":"target8"},{"c":"target9"}, \
@@ -415,22 +415,22 @@ class Test_DragAndDrop_Grade(unittest.TestCase):
         {
             'draggables': ['a', 'a'],
             'targets': ['target1',   'target10'],
-            'rule': 'unorderly_equal+number'
+            'rule': 'unordered_equal+number'
         },
         {
             'draggables': ['b', 'b', 'b'],
             'targets': ['target2', 'target5', 'target8'],
-            'rule': 'unorderly_equal+number'
+            'rule': 'unordered_equal+number'
         },
         {
             'draggables': ['c', 'c', 'c'],
             'targets': ['target3', 'target6', 'target9'],
-            'rule': 'unorderly_equal+number'
+            'rule': 'unordered_equal+number'
         }]
         self.assertTrue(draganddrop.grade(user_input, correct_answer))
 
     def test_label_10_targets_with_a_b_c_reused_false(self):
-        """Test reusable draggables (no mupltiple draggables per target)"""
+        """Test a b c in 10 labels reused false"""
         user_input = '{"draggables":[{"a":"target1"}, \
         {"b":"target2"},{"c":"target3"},{"b":"target5"}, {"a":"target8"},\
         {"c":"target6"}, {"b":"target8"},{"c":"target9"}, \
@@ -439,19 +439,72 @@ class Test_DragAndDrop_Grade(unittest.TestCase):
         {
             'draggables': ['a', 'a'],
             'targets': ['target1',   'target10'],
-            'rule': 'unorderly_equal+number'
+            'rule': 'unordered_equal+number'
         },
         {
             'draggables': ['b', 'b', 'b'],
             'targets': ['target2', 'target5', 'target8'],
-            'rule': 'unorderly_equal+number'
+            'rule': 'unordered_equal+number'
         },
         {
             'draggables': ['c', 'c', 'c'],
             'targets': ['target3', 'target6', 'target9'],
-            'rule': 'unorderly_equal+number'
+            'rule': 'unordered_equal+number'
         }]
         self.assertFalse(draganddrop.grade(user_input, correct_answer))
+
+    def test_mixed_reuse_and_not_reuse(self):
+        """Test reusable draggables """
+        user_input = '{"draggables":[{"a":"target1"}, \
+        {"b":"target2"},{"c":"target3"}, {"a":"target4"},\
+         {"a":"target5"}]}'
+        correct_answer = [
+        {
+            'draggables': ['a', 'b'],
+            'targets': ['target1',   'target2', 'target4', 'target5'],
+            'rule': 'anyof'
+        },
+        {
+            'draggables': ['c'],
+            'targets': ['target3'],
+            'rule': 'exact'
+        }]
+        self.assertTrue(draganddrop.grade(user_input, correct_answer))
+
+    def test_mixed_reuse_and_not_reuse_number(self):
+        """Test reusable draggables with number """
+        user_input = '{"draggables":[{"a":"target1"}, \
+        {"b":"target2"},{"c":"target3"}, {"a":"target4"}]}'
+        correct_answer = [
+        {
+            'draggables': ['a', 'a', 'b'],
+            'targets': ['target1',   'target2', 'target4'],
+            'rule': 'anyof+number'
+        },
+        {
+            'draggables': ['c'],
+            'targets': ['target3'],
+            'rule': 'exact'
+        }]
+        self.assertTrue(draganddrop.grade(user_input, correct_answer))
+
+    def test_mixed_reuse_and_not_reuse_number_false(self):
+        """Test reusable draggables with numbers, but wrong"""
+        user_input = '{"draggables":[{"a":"target1"}, \
+        {"b":"target2"},{"c":"target3"}, {"a":"target4"}, {"a":"target10"}]}'
+        correct_answer = [
+        {
+            'draggables': ['a', 'a', 'b'],
+            'targets': ['target1',   'target2', 'target4', 'target10'],
+            'rule': 'anyof_number'
+        },
+        {
+            'draggables': ['c'],
+            'targets': ['target3'],
+            'rule': 'exact'
+        }]
+        self.assertFalse(draganddrop.grade(user_input, correct_answer))
+
 
 class Test_DragAndDrop_Populate(unittest.TestCase):
 
