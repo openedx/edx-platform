@@ -289,31 +289,43 @@ def instructor_dashboard(request, course_id):
         from_day = to_day - timedelta(days=7)
 
         # WARNING: do not use req.json because the preloaded json doesn't preserve the order of the original record 
+        #          use instead: json.loads(req.content, object_pairs_hook=OrderedDict)
 
         # number of students enrolled in this course
-        req = requests.get(settings.ANALYTICS_SERVER_URL + "get_analytics?aname=StudentsEnrolled&course_id=%s" % course_id)
-        students_enrolled_json = json.loads(req.content, object_pairs_hook=OrderedDict)
+        req = requests.get(settings.ANALYTICS_SERVER_URL + "get?aname=StudentsEnrolled&course_id=%s" % course_id)
+        if req.content != 'None':
+            students_enrolled_json = json.loads(req.content, object_pairs_hook=OrderedDict)
 
         # number of students active in the past 7 days (including current day), i.e. with at least one activity for the period
         #req = requests.get(settings.ANALYTICS_SERVER_URL + "get_analytics?aname=StudentsActive&course_id=%s&from=%s" % (course_id,from_day))
-        req = requests.get(settings.ANALYTICS_SERVER_URL + "get_analytics?aname=StudentsActive&course_id=%s" % (course_id,))    # default is active past 7 days
-        students_active_json = json.loads(req.content, object_pairs_hook=OrderedDict)
+        req = requests.get(settings.ANALYTICS_SERVER_URL + "get?aname=StudentsActive&course_id=%s" % (course_id,))    # default is active past 7 days
+        if req.content != 'None':
+            students_active_json = json.loads(req.content, object_pairs_hook=OrderedDict)
 
         # number of students per problem who have problem graded correct
-        req = requests.get(settings.ANALYTICS_SERVER_URL + "get_analytics?aname=StudentsPerProblemCorrect&course_id=%s&from=%s" % (course_id,from_day))
-        students_per_problem_correct_json = json.loads(req.content, object_pairs_hook=OrderedDict)
+        req = requests.get(settings.ANALYTICS_SERVER_URL + "get?aname=StudentsPerProblemCorrect&course_id=%s" % (course_id,))
+        if req.content != 'None':
+            students_per_problem_correct_json = json.loads(req.content, object_pairs_hook=OrderedDict)
+        
+        # number of students per problem who have problem graded correct <<< THIS IS FOR ACTIVE STUDENTS
+#        req = requests.get(settings.ANALYTICS_SERVER_URL + "get?aname=StudentsPerProblemCorrect&course_id=%s&from=%s" % (course_id,from_day))
+#        if req.content != 'None':
+#            students_per_problem_correct_json = json.loads(req.content, object_pairs_hook=OrderedDict)
 
         # grade distribution for the course +++ this is not the desired distribution +++
-        req = requests.get(settings.ANALYTICS_SERVER_URL + "get_analytics?aname=OverallGradeDistribution&course_id=%s" % (course_id,))
-        overall_grade_distribution = json.loads(req.content, object_pairs_hook=OrderedDict)
+        req = requests.get(settings.ANALYTICS_SERVER_URL + "get?aname=OverallGradeDistribution&course_id=%s" % (course_id,))
+        if req.content != 'None':
+            overall_grade_distribution = json.loads(req.content, object_pairs_hook=OrderedDict)
 
         # number of students distribution drop off per day
-        req = requests.get(settings.ANALYTICS_SERVER_URL + "get_analytics?aname=StudentsDropoffPerDay&course_id=%s&from=%s" % (course_id,from_day))
-        dropoff_per_day = json.loads(req.content, object_pairs_hook=OrderedDict)
+        req = requests.get(settings.ANALYTICS_SERVER_URL + "get?aname=StudentsDropoffPerDay&course_id=%s&from=%s" % (course_id,from_day))
+        if req.content != 'None':
+            dropoff_per_day = json.loads(req.content, object_pairs_hook=OrderedDict)
 
         # number of students per problem who attempted this problem at least once
-        req = requests.get(settings.ANALYTICS_SERVER_URL + "get_analytics?aname=StudentsAttemptedProblems&course_id=%s" % course_id)
-        attempted_problems = json.loads(req.content, object_pairs_hook=OrderedDict)
+        req = requests.get(settings.ANALYTICS_SERVER_URL + "get?aname=StudentsAttemptedProblems&course_id=%s" % course_id)
+        if req.content != 'None':
+            attempted_problems = json.loads(req.content, object_pairs_hook=OrderedDict)
 
 
         # number of students active in the past 7 days (including current day) --- online version! experimental

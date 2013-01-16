@@ -218,10 +218,29 @@ function goto( mode)
 %if modeflag.get('Analytics'):
 
    <p>
-     Number of students enrolled: ${students_enrolled_json['data']['value']}
+     Number of students enrolled:
+     % if students_enrolled_json is not None:
+     % if students_enrolled_json['status'] == 'success':
+     ${students_enrolled_json['data']['value']}
+     % else:
+     <i> ${students_enrolled_json['error']} </i>
+     % endif
+     % else:
+     <i> null data </i>
+     % endif
    </p>
+
    <p>
-     Number of active students for the past 7 days: ${students_active_json['data']['value']}
+     Number of active students for the past 7 days: 
+     % if students_active_json is not None:
+     % if students_active_json['status'] == 'success':
+     ${students_active_json['data']['value']}
+     % else:
+     <i> ${students_active_json['error']} </i>
+     % endif
+     % else:
+     <i> null data </i>
+     % endif
    </p>
 
    <p>
@@ -253,78 +272,103 @@ function goto( mode)
 </figure>
 </div>
 
-
    <p>
      <p>Number of active students per problems who have this problem graded as correct:</p>
 
+     % if students_per_problem_correct_json is not None:
+     % if students_per_problem_correct_json['status'] == 'success':
+     <div class="divScroll">
      <table class="stat_table">
-     <tr><th>Problem</td><th>Number of students</td></tr>
+     <tr><th>Problem</th><th>Number of students</th></tr>
      % for k,v in students_per_problem_correct_json['data'].items():
-     <tr>
-     <td>${k}</td> <td>${v}</td>
-     </tr>
-     % endfor
-     </table>
-   </p>
-
-   <p>
-     <p>Grade distribution:</p>
-
-     <div class="divScroll">
-     <table class="stat_table">
-     <tr><th>Grade</th><th>Number of students</th></tr>
-     % for k,v in overall_grade_distribution['data'].items():
-     <tr>
-     <td>${k}</td> <td>${v}</td>
-     </tr>
+     <tr> <td>${k}</td> <td>${v}</td> </tr>
      % endfor
      </table>
      </div>
-
+     % else:
+     <i> ${students_per_problem_correct_json['error']}</i>
+     % endif
+     % else:
+     <i> null data </i>
+     % endif
    </p>
 
-   <p>
-     <p>Number of students who dropped off per day before becoming inactive:</p>
+##   <p>
+##     <p>Students who attempted at least one exercise:</p>
+##
+##     % if attempted_problems is not None:
+##     % if attempted_problems['status'] == 'success':
+##     <div class="divScroll">
+##     <table class="stat_table">
+##     <tr><th>Module</th><th>Number of students</th></tr>
+##     % for k,v in attempted_problems['data'].items():
+##     <tr> <td>${k}</td> <td>${v}</td> </tr>
+##     % endfor
+##     </table>
+##     </div>
+##     % else:
+##     <i> ${attempted_problems['error']}</i>
+##     % endif
+##     % else:
+##     <i> null data </i>
+##     % endif
+##   </p>
+##
+##   <p>
+##     <p>Number of students who dropped off per day before becoming inactive:</p>
+##
+##     % if dropoff_per_day is not None:
+##     % if dropoff_per_day['status'] == 'success':
+##     <div class="divScroll">
+##     <table class="stat_table">
+##     <tr><th>Day</th><th>Number of students</th></tr>
+##     % for k,v in dropoff_per_day['data'].items():
+##     <tr> <td>${k}</td> <td>${v}</td> </tr>
+##     % endfor
+##     </table>
+##     </div>
+##     % else:
+##     <i> ${dropoff_per_day['error']}</i>
+##     % endif
+##     % else:
+##     <i> null data </i>
+##     % endif
+##   </p>
+##
+##   <p>
+##     <p>Grade distribution:</p>
+##
+##     % if overall_grade_distribution is not None:
+##     % if overall_grade_distribution['status'] == 'success':
+##     <div class="divScroll">
+##     <table class="stat_table">
+##     <tr><th>Grade</th><th>Number of students</th></tr>
+##     % for k,v in overall_grade_distribution['data'].items():
+##     <tr> <td>${k}</td> <td>${v}</td> </tr>
+##     % endfor
+##     </table>
+##     </div>
+##     % else:
+##     <i> ${dropoff_per_day['error']}</i>
+##     % endif
+##     % else:
+##     <i> null data </i>
+##     % endif
+##   </p>
 
-     <div class="divScroll">
-     <table class="stat_table">
-     <tr><th>Day</th><th>Number of students</th></tr>
-     % for k,v in dropoff_per_day['data'].items():
-     <tr>
-     <td>${k}</td> <td>${v}</td>
-     </tr>
-     % endfor
-     </table>
-     </div>
-   </p>
 
-   <p>
-     <p>Students who attempted at least one exercise:</p>
+##   <p>
+##     <h2>Daily activity (online version):</h2>
+##     <table class="stat_table">
+##     <tr><th>Day</td><th>Number of students</td></tr>
+##     % for k,v in daily_activity_json['data'].items():
+##     <tr>
+##     <td>${k}</td> <td>${v}</td>
+##     </tr>
+##     % endfor
+##     </table>
+##   </p>
 
-     <div class="divScroll">
-     <table class="stat_table">
-     <tr><th>Module</th><th>Number of students</th></tr>
-     % for k,v in attempted_problems['data'].items():
-     <tr>
-     <td>${k}</td> <td>${v}</td>
-     </tr>
-     % endfor
-     </table>
-     </div>
-
-   </p>
-
-   <p>
-     <h2>Daily activity (online version):</h2>
-     <table class="stat_table">
-     <tr><th>Day</td><th>Number of students</td></tr>
-     % for k,v in daily_activity_json['data'].items():
-     <tr>
-     <td>${k}</td> <td>${v}</td>
-     </tr>
-     % endfor
-     </table>
-   </p>
 
 %endif
 
