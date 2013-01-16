@@ -28,12 +28,12 @@ export PYTHONIOENCODING=UTF-8
 
 GIT_BRANCH=${GIT_BRANCH/HEAD/master}
 
-# Temporary workaround for pip/numpy bug. (Jenkin's is unable to pip install numpy successfully, scipy fails to install afterwards.
-# We tried pip 1.1, 1.2, all sorts of varieties but it's apparently a pip bug of some kind.
-wget -O /tmp/numpy.tar.gz http://pypi.python.org/packages/source/n/numpy/numpy-1.6.2.tar.gz#md5=95ed6c9dcc94af1fc1642ea2a33c1bba
-tar -zxvf /tmp/numpy.tar.gz -C /tmp/
-python /tmp/numpy-1.6.2/setup.py install
+if [ ! -d /mnt/virtualenvs/"$JOB_NAME" ]; then
+    mkdir -p /mnt/virtualenvs/"$JOB_NAME"
+    virtualenv /mnt/virtualenvs/"$JOB_NAME"
+fi
 
+source /mnt/virtualenvs/"$JOB_NAME"/bin/activate
 pip install -q -r pre-requirements.txt
 pip install -q -r test-requirements.txt
 yes w | pip install -q -r requirements.txt
