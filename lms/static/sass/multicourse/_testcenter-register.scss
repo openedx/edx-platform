@@ -232,8 +232,9 @@ $red: rgb(178, 6, 16);
 				}
 
 				input, textarea {
+					height: 100%;
 					width: 100%;
-					padding: $baseline ($baseline*.75);					
+					padding: ($baseline/2);					
 
 					&.long {
 						width: 100%;
