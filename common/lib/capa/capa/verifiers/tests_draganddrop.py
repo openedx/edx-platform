@@ -343,17 +343,17 @@ class Test_DragAndDrop_Grade(unittest.TestCase):
         {
             'draggables': ['a'],
             'targets': ['target1',  'target4', 'target7', 'target10'],
-            'rule': 'unorderly_equal'
+            'rule': 'unordered_equal'
         },
         {
             'draggables': ['b'],
             'targets': ['target2', 'target5', 'target8'],
-            'rule': 'unorderly_equal'
+            'rule': 'unordered_equal'
         },
         {
             'draggables': ['c'],
             'targets': ['target3', 'target6', 'target9'],
-            'rule': 'unorderly_equal'
+            'rule': 'unordered_equal'
         }]
         self.assertTrue(draganddrop.grade(user_input, correct_answer))
 

@@ -144,7 +144,7 @@ class DragAndDrop(object):
         # every element are equal with correct positions
         for groupname in self.correct_groups:
             rules_executed = 0
-            for rule in ('exact', 'anyof', 'unorderly_equal'):
+            for rule in ('exact', 'anyof', 'unordered_equal'):
                 # every group has only one rule
                 if self.correct_positions[groupname].get(rule, None):
                     rules_executed += 1
@@ -190,7 +190,7 @@ class DragAndDrop(object):
                      - draggables can be placed in any order:
                     user ['1','2','3','4'] is 'anyof' equal to ['4', '2', '1', 3']
 
-            'unorderly_equal' is same as 'exact' but disregards on order
+            'unordered_equal' is same as 'exact' but disregards on order
 
         Equality functions:
 
@@ -220,7 +220,7 @@ class DragAndDrop(object):
                 else:
                     return False
 
-        if flag == 'unorderly_equal':
+        if flag == 'unordered_equal':
             if len(correct) != len(user):
                 return False
             temp = correct[:]
