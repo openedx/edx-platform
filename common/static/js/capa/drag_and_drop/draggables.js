@@ -195,6 +195,13 @@ define(['logme', 'update_input'], function (logme, updateInput) {
         var draggableObj;
 
         draggableObj = {
+            'id': obj.id,
+
+            'isReusable': obj.can_reuse,
+
+            'x': -1,
+            'y': -1,
+
             'zIndex': objIndex,
             'oldZIndex': objIndex,
             'labelEl': null,
@@ -373,12 +380,15 @@ define(['logme', 'update_input'], function (logme, updateInput) {
                     'top',
                     50 - draggableObj.iconHeightSmall * 0.5
                 );
+
+                draggableObj.hasLoaded = true;
             } else {
                 // If no icon and no label, don't create a draggable.
                 return;
             }
         }
 
+        // Attach events to "iconEl".
         draggableObj.iconEl.mousedown(function (event) {
             draggableObj.mouseDown.call(draggableObj, event);
         });
@@ -389,6 +399,7 @@ define(['logme', 'update_input'], function (logme, updateInput) {
             draggableObj.mouseMove.call(draggableObj, event);
         });
 
+        // Attach events to "containerEl".
         draggableObj.containerEl.mousedown(function (event) {
             draggableObj.mouseDown.call(draggableObj, event);
         });
@@ -399,16 +410,7 @@ define(['logme', 'update_input'], function (logme, updateInput) {
             draggableObj.mouseMove.call(draggableObj, event);
         });
 
-        draggableObj.id = obj.id;
-        draggableObj.x = -1;
-        draggableObj.y = -1;
-
         state.numDraggablesInSlider += 1;
-
-        if (obj.icon.length === 0) {
-            draggableObj.hasLoaded = true;
-        }
-
         state.draggables.push(draggableObj);
     }
 

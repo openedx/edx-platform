@@ -163,7 +163,12 @@ define(['logme'], function (logme) {
         if (!attrIsString(obj, 'icon')) {
             return false;
         }
+
         if (!attrIsString(obj, 'label')) {
+            return false;
+        }
+
+        if (!attrIsBoolean(obj, 'can_reuse', false)) {
             return false;
         }
 
@@ -197,7 +202,11 @@ define(['logme'], function (logme) {
     }
 
     function attrIsString(obj, attr) {
-        if (typeof obj[attr] !== 'string') {
+        if (obj.hasOwnProperty(attr) === false) {
+            logme('ERROR: Attribute "obj.' + attr + '" is not present.');
+
+            return false;
+        } else if (typeof obj[attr] !== 'string') {
             logme('ERROR: Attribute "obj.' + attr + '" is not a string.');
 
             return false;
@@ -209,6 +218,12 @@ define(['logme'], function (logme) {
     function attrIsInteger(obj, attr) {
         var tempInt;
 
+        if (obj.hasOwnProperty(attr) === false) {
+            logme('ERROR: Attribute "obj.' + attr + '" is not present.');
+
+            return false;
+        }
+
         tempInt = parseInt(obj[attr], 10);
 
         if (isFinite(tempInt) === false) {
@@ -218,6 +233,34 @@ define(['logme'], function (logme) {
         }
 
         obj[attr] = tempInt;
+
+        return true;
+    }
+
+    function attrIsBoolean(obj, attr, defaultVal) {
+        if (obj.hasOwnProperty(attr) === false) {
+            if (defaultVal === undefined) {
+                logme('ERROR: Attribute "obj.' + attr + '" is not present.');
+
+                return false;
+            } else {
+                obj[attr] = defaultVal;
+
+                return true;
+            }
+        }
+
+        if (obj[attr] === '') {
+            obj[attr] = defaultVal;
+        } else if ((obj[attr] === 'false') || (obj[attr] === false)) {
+            obj[attr] = false;
+        } else if ((obj[attr] === 'true') || (obj[attr] === true)) {
+            obj[attr] = true;
+        } else {
+            logme('ERROR: Attribute "obj.' + attr + '" is not a boolean.');
+
+            return false;
+        }
 
         return true;
     }

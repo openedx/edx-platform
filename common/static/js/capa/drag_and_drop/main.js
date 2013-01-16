@@ -70,6 +70,10 @@ define(
             if (updateInput.check(state) === false) {
                 updateInput.update(state);
             }
+
+            setTimeout(function () {
+                logme('state.draggables', state.draggables);
+            }, 500);
         }());
     }
 });
