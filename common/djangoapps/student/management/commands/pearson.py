@@ -5,6 +5,7 @@ from django.core.management.base import BaseCommand, CommandError
 import re
 from dogapi import dog_http_api, dog_stats_api
 import paramiko
+import boto
 
 dog_http_api.api_key = settings.DATADOG_API
 
@@ -24,11 +25,11 @@ class Command(BaseCommand):
 
         for mode in args:
             if mode == 'export':
-                sftp(settings.PEARSON_LOCAL_IMPORT, settings.PEARSON_SFTP_IMPORT)
-                s3(settings.PEARSON_LOCAL, settings.PEARSON_BUCKET)
+                sftp(settings.PEARSON[LOCAL_IMPORT], settings.PEARSON[SFTP_IMPORT])
+                s3(settings.PEARSON_LOCAL, settings.PEARSON[BUCKET])
             elif mode == 'import':
-                sftp(settings.PEARSON_SFTP_EXPORT, settings.PEARSON_LOCAL_EXPORT)
-                s3(settings.PEARSON_LOCAL_EXPORT, settings.PEARSON_BUCKET)
+                sftp(settings.PEARSON[SFTP_EXPORT], settings.PEARSON[LOCAL_EXPORT])
+                s3(settings.PEARSON[LOCAL_EXPORT], settings.PEARSON[BUCKET])
             else:
                 print("ERROR:  Mode must be export or import.")
 
@@ -66,7 +67,8 @@ class Command(BaseCommand):
             """
             Upload file to S3
             """
-            s3 = boto.connect_s3()
+            s3 = boto.connect_s3(settings.AWS_ACCESS_KEY_ID,
+                    settings.AWS_SECRET_ACCESS_KEY)
             from boto.s3.key import Key
             b = s3.get_bucket(bucket)
             k = Key(b)

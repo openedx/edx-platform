@@ -50,12 +50,12 @@ class Command(BaseCommand):
         # Name will use timestamp -- this is UTC, so it will look funny,
         # but it should at least be consistent with the other timestamps
         # used in the system.
-        if not os.path.isdir(settings.PEARSON_LOCAL_EXPORT):
-            os.makedirs(settings.PEARSON_LOCAL_EXPORT)
-            destfile = os.path.join(settings.PEARSON_LOCAL_EXPORT,
+        if not os.path.isdir(settings.PEARSON[LOCAL_EXPORT]):
+            os.makedirs(settings.PEARSON[LOCAL_EXPORT])
+            destfile = os.path.join(settings.PEARSON[LOCAL_EXPORT],
                     uploaded_at.strftime("ead-%Y%m%d-%H%M%S.dat"))
         else:
-            destfile = os.path.join(settings.PEARSON_LOCAL_EXPORT,
+            destfile = os.path.join(settings.PEARSON[LOCAL_EXPORT],
                     uploaded_at.strftime("ead-%Y%m%d-%H%M%S.dat"))
 
         dump_all = kwargs['dump_all']
