@@ -110,7 +110,8 @@ draggables, targets and rule. For example::
 Draggables is list of draggables id. Target is list of targets id, draggables
 must be dragged to with considering rule. Rule is string.
 
-Draggables in dicts inside correct_answer list must not intersect.
+Draggables in dicts inside correct_answer list must not intersect!!!
+
 Wrong (for draggable id 7)::
 
     correct_answer = [
@@ -208,6 +209,8 @@ you sould use 'anyof+number' of 'unordered_equal+number' rule::
 
 In case if we have no multiple draggables per targets (one_per_target="true"),
 for same number of draggables, anyof is equal to unordered_equal
+
+If we have can_reuse=true, than one must use only long form of correct answer.
 
 Example
 =======
