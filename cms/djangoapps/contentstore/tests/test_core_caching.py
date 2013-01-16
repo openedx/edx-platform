@@ -22,14 +22,17 @@ class CachingTestCase(TestCase):
         set_cached_content(self.mockAsset)
         self.assertEqual(self.mockAsset.content, get_cached_content(self.unicodeLocation).content,
             'should be stored in cache with unicodeLocation')
-        self.assertEqual(self.mockAsset.content, get_cached_content(Location('c4x', u'mitX', u'800', 'thumbnail', 'monsters.jpg')).content,
+        self.assertEqual(self.mockAsset.content, get_cached_content(self.nonUnicodeLocation).content,
             'should be stored in cache with nonUnicodeLocation')
 
     def test_delete(self):
         set_cached_content(self.mockAsset)
         del_cached_content(self.nonUnicodeLocation)
-        self.assertEqual(None, get_cached_content(self.nonUnicodeLocation), 'should not be stored in cache with nonUnicodeLocation')
-        self.assertEqual(None, get_cached_content(self.unicodeLocation), 'should not be stored in cache with unicodeLocation')
+        self.assertEqual(None, get_cached_content(self.unicodeLocation),
+            'should not be stored in cache with unicodeLocation')
+        self.assertEqual(None, get_cached_content(self.nonUnicodeLocation),
+            'should not be stored in cache with nonUnicodeLocation')
+
 
 
 
