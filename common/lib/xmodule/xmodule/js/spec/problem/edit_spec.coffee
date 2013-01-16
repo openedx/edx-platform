@@ -316,15 +316,15 @@ describe 'MarkdownEditingDescriptor', ->
         </multiplechoiceresponse>
         
         <p>Choice checks</p>
-        <multiplechoiceresponse>
-          <choicegroup type="MultipleChoiceChecks">
+        <choiceresponse>
+          <checkboxgroup direction="vertical">
             <choice correct="false">option1 [x]</choice>
             <choice correct="true">correct</choice>
             <choice correct="true">redundant</choice>
             <choice correct="false">distractor</choice>
             <choice correct="false">no space</choice>
-          </choicegroup>
-        </multiplechoiceresponse>
+          </checkboxgroup>
+        </choiceresponse>
         
         <p>Option with multiple correct ones</p>
         
