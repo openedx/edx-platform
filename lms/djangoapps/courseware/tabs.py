@@ -22,6 +22,7 @@ from courseware.access import has_access
 from static_replace import replace_urls
 
 from open_ended_grading.peer_grading_service import PeerGradingService
+from open_ended_grading.staff_grading_service import StaffGradingService
 from student.models import unique_id_for_user
 
 log = logging.getLogger(__name__)
@@ -108,7 +109,24 @@ def _textbooks(tab, user, course, active_page):
 def _staff_grading(tab, user, course, active_page):
     if has_access(user, course, 'staff'):
         link = reverse('staff_grading', args=[course.id])
-        return [CourseTab('Staff grading', link, active_page == "staff_grading")]
+        staff_gs = StaffGradingService(settings.STAFF_GRADING_INTERFACE)
+        pending_grading=False
+        tab_name = "Staff grading"
+        img_path= ""
+        try:
+            notifications = json.loads(staff_gs.get_notifications(course.id))
+            if notifications['success']:
+                if notifications['staff_needs_to_grade']:
+                    pending_grading=True
+        except:
+            #Non catastrophic error, so no real action
+            log.info("Problem with getting notifications from staff grading service.")
+
+        if pending_grading:
+            img_path = "/static/images/slider-handle.png"
+
+        tab = [CourseTab(tab_name, link, active_page == "staff_grading", pending_grading, img_path)]
+        return tab
     return []
 
 def _peer_grading(tab, user, course, active_page):

@@ -368,7 +368,7 @@ class StaffGrading
 
   problem_link:(problem) ->
     link = $('<a>').attr('href', "javascript:void(0)").append(
-      "#{problem.problem_name} (#{problem.num_graded} graded, #{problem.num_pending} pending)")
+      "#{problem.problem_name} (#{problem.num_graded} graded, #{problem.num_pending} pending, required to grade #{problem.num_required} more)")
         .click =>
           @get_next_submission problem.location
 
