@@ -44,7 +44,7 @@ class Command(BaseCommand):
                     default=False,
                     help='Retrieve the destination to export to from django? True/False'),
         make_option('--destination',
-                    action='store_true',
+                    action='store',
                     dest='destination',
                     default=None,
                     help='Where to store the exported files')
@@ -61,24 +61,22 @@ class Command(BaseCommand):
         # Name will use timestamp -- this is UTC, so it will look funny,
         # but it should at least be consistent with the other timestamps 
         # used in the system.
-        if options['dest-from-settings'] is True:
-            if settings.PEARSON[LOCAL_EXPORT]:
+        if 'dest-from-settings' in options:
+            if LOCAL_EXPORT in settings.PEARSON:
                 dest = settings.PEARSON[LOCAL_EXPORT]
             else:
                 raise CommandError('--dest-from-settings was enabled but the'
                         'PEARSON[LOCAL_EXPORT] setting was not set.')
-        elif options['destination']:
+        elif 'destination' in options:
             dest = options['destination']
         else:
-            raise ComamndError('--destination or --dest-from-settings must be used')
+            raise CommandError('--destination or --dest-from-settings must be used')
                 
 
         if not os.path.isdir(dest):
             os.makedirs(dest)
-            destfile = os.path.join(dest, uploaded_at.strftime("cdd-%Y%m%d-%H%M%S.dat"))
-        else:
-            destfile = os.path.join(dest, uploaded_at.strftime("cdd-%Y%m%d-%H%M%S.dat"))
 
+        destfile = os.path.join(dest, uploaded_at.strftime("cdd-%Y%m%d-%H%M%S.dat"))
         
         # strings must be in latin-1 format.  CSV parser will
         # otherwise convert unicode objects to ascii.

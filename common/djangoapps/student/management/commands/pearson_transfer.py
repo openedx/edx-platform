@@ -14,7 +14,7 @@ class Command(BaseCommand):
 
     option_list = BaseCommand.option_list + (
         make_option('--mode',
-                    action='store_true',
+                    action='store',
                     dest='mode',
                     default='both',
                     help='mode is import, export, or both'),
@@ -55,11 +55,11 @@ class Command(BaseCommand):
                               password=settings.PEARSON[SFTP_PASSWORD])
                     sftp = paramiko.SFTPClient.from_transport(t)
                     if os.path.isdir(files_from):
-                        for file in os.listdir(files_from):
+                        for filename in os.listdir(files_from):
                             sftp.put(files_from+'/'+filename,
                                      files_to+'/'+filename)
                     else:
-                        for file in sftp.listdir(files_from):
+                        for filename in sftp.listdir(files_from):
                             sftp.get(files_from+'/'+filename,
                                      files_to+'/'+filename)
                 except:
