@@ -108,23 +108,11 @@ def instance_key(model, instance_or_pk):
         getattr(instance_or_pk, 'pk', instance_or_pk),
     )
 
-import logging
-
 def set_cached_content(content):
-    logging.warn("set cached---------------------------------------")
-    logging.warn(str(content.location))
     cache.set(str(content.location), content)
 
 def get_cached_content(location):
-    logging.warn("get cached------------------------")
-    logging.warn(str(location))
-    logging.warn(StaticContent.get_id_from_location(location))
     return cache.get(str(location))
 
 def del_cached_content(location):
-    if cache.get(str(location)) is None:
-        logging.err('nothing in cache for: ' + str(location))
-    logging.warn("deleted cache----------")
-    logging.warn(str(location))
-    logging.warn(StaticContent.get_id_from_location(location))
     cache.delete(str(location))
