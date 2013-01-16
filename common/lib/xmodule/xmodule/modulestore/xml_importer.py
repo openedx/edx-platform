@@ -35,10 +35,10 @@ def import_static_content(modules, course_loc, course_data_path, static_content_
                 content = StaticContent(content_loc, filename, mime_type, data, import_path = fullname_with_subpath)
 
                 # first let's save a thumbnail so we can get back a thumbnail location
-                thumbnail_content = static_content_store.generate_thumbnail(content)
+                (thumbnail_content, thumbnail_location) = static_content_store.generate_thumbnail(content)
 
                 if thumbnail_content is not None:
-                    content.thumbnail_location = thumbnail_content.location
+                    content.thumbnail_location = thumbnail_location
 
                 #then commit the content
                 static_content_store.save(content)
@@ -69,10 +69,10 @@ def verify_content_links(module, base_dir, static_content_store, link, remap_dic
                 content = StaticContent(content_loc, filename, mime_type, data, import_path = path) 
 
                 # first let's save a thumbnail so we can get back a thumbnail location
-                thumbnail_content = static_content_store.generate_thumbnail(content)
+                (thumbnail_content, thumbnail_location) = static_content_store.generate_thumbnail(content)
 
                 if thumbnail_content is not None:
-                    content.thumbnail_location = thumbnail_content.location
+                    content.thumbnail_location = thumbnail_location
 
                 #then commit the content
                 static_content_store.save(content)   

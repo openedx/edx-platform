@@ -760,14 +760,16 @@ def upload_asset(request, org, course, coursename):
     content_loc = StaticContent.compute_location(org, course, filename)
     content = StaticContent(content_loc, filename, mime_type, filedata)
 
-    # first let's save a thumbnail so we can get back a thumbnail location
-    thumbnail_content = contentstore().generate_thumbnail(content)
+    # first let's see if a thumbnail can be created
+    (thumbnail_content, thumbnail_location) = contentstore().generate_thumbnail(content)
 
+    # delete cached thumbnail even if one couldn't be created this time (else the old thumbnail will continue to show)
+    del_cached_content(thumbnail_location)
+    # now store thumbnail location only if we could create it
     if thumbnail_content is not None:
-        content.thumbnail_location = thumbnail_content.location
-        del_cached_content(thumbnail_content.location)
+        content.thumbnail_location = thumbnail_location
 
-    #then commit the content 
+    #then commit the content
     contentstore().save(content)
     del_cached_content(content.location)
 
@@ -777,7 +779,7 @@ def upload_asset(request, org, course, coursename):
     response_payload = {'displayname' : content.name, 
         'uploadDate' : get_date_display(readback.last_modified_at), 
         'url' : StaticContent.get_url_path_from_location(content.location),
-        'thumb_url' : StaticContent.get_url_path_from_location(thumbnail_content.location) if thumbnail_content is not None else None,
+        'thumb_url' : StaticContent.get_url_path_from_location(thumbnail_location) if thumbnail_content is not None else None,
         'msg' : 'Upload completed'
         }
 

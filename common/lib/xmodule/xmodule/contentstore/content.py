@@ -18,7 +18,7 @@ class StaticContent(object):
         self.content_type = content_type
         self.data = data
         self.last_modified_at = last_modified_at
-        self.thumbnail_location = Location(thumbnail_location)
+        self.thumbnail_location = Location(thumbnail_location) if thumbnail_location is not None else None
         # optional information about where this file was imported from. This is needed to support import/export 
         # cycles
         self.import_path = import_path
@@ -113,6 +113,12 @@ class ContentStore(object):
 
     def generate_thumbnail(self, content):
         thumbnail_content = None
+        # use a naming convention to associate originals with the thumbnail
+        thumbnail_name = StaticContent.generate_thumbnail_name(content.location.name)
+
+        thumbnail_file_location = StaticContent.compute_location(content.location.org, content.location.course,
+            thumbnail_name, is_thumbnail = True)
+
         # if we're uploading an image, then let's generate a thumbnail so that we can
         # serve it up when needed without having to rescale on the fly
         if content.content_type is not None and content.content_type.split('/')[0] == 'image':
@@ -131,13 +137,8 @@ class ContentStore(object):
                 thumbnail_file = StringIO.StringIO()
                 im.save(thumbnail_file, 'JPEG')
                 thumbnail_file.seek(0)
-            
-                # use a naming convention to associate originals with the thumbnail
-                thumbnail_name = StaticContent.generate_thumbnail_name(content.location.name)
 
-                # then just store this thumbnail as any other piece of content
-                thumbnail_file_location = StaticContent.compute_location(content.location.org, content.location.course, 
-                                                                                  thumbnail_name, is_thumbnail = True)
+                # store this thumbnail as any other piece of content
                 thumbnail_content = StaticContent(thumbnail_file_location, thumbnail_name, 
                                                   'image/jpeg', thumbnail_file)
 
@@ -147,7 +148,7 @@ class ContentStore(object):
                 # log and continue as thumbnails are generally considered as optional
                 logging.exception("Failed to generate thumbnail for {0}. Exception: {1}".format(content.location, str(e)))
 
-        return thumbnail_content
+        return thumbnail_content, thumbnail_file_location
 
 
 
