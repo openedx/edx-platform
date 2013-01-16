@@ -33,14 +33,25 @@ class Command(BaseCommand):
                     default=False,
                     help='Grade and generate certificates '
                     'for a specific course'),
+        make_option('-f', '--force-gen',
+                    metavar='STATUS',
+                    dest='force',
+                    default=False,
+                    help='Will force generate a search for STATUS '
+                    '(cannot be downloadable)'),
+
     )
 
     def handle(self, *args, **options):
 
         # Will only generate a certificate if the current
-        # status is in this state
+        # status is in the unavailable state, can be set
+        # to something else with the force flag
 
-        VALID_STATUSES = [CertificateStatuses.unavailable]
+        if options['force']:
+            valid_statuses = getattr(CertificateStatuses, options['force'])
+        else:
+            valid_statuses = [CertificateStatuses.unavailable]
 
         # Print update after this many students
 
@@ -83,7 +94,7 @@ class Command(BaseCommand):
                     start = datetime.datetime.now()
 
                 if certificate_status_for_student(
-                        student, course_id)['status'] in VALID_STATUSES:
+                        student, course_id)['status'] in valid_statuses:
                     if not options['noop']:
                         # Add the certificate request to the queue
                         ret = xq.add_cert(student, course_id)
