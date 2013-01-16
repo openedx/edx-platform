@@ -9,6 +9,8 @@ class @HTMLEditingDescriptor
       lineNumbers: true
       lineWrapping: true})
 
+    $(@advanced_editor.getWrapperElement()).addClass('is-inactive')
+
     @tiny_mce_textarea = $(".tiny-mce", @element).tinymce({
       script_url : '/static/js/vendor/tiny_mce/tiny_mce.js',
       theme : "advanced",
@@ -41,18 +43,20 @@ class @HTMLEditingDescriptor
       $(e.currentTarget).addClass('current')
       visualEditor = @getVisualEditor()
 
-      $('table.mceToolbar').toggleClass('is-inactive')
-      $(@advanced_editor.getWrapperElement()).toggleClass('is-inactive')
-
       if $(e.currentTarget).attr('data-tab') is 'visual'
         @showVisualEditor(visualEditor)
+        $('table.mceToolbar').removeClass('is-inactive')
+        $(@advanced_editor.getWrapperElement()).addClass('is-inactive')
+
       else
         # @tiny_mce_textarea.hide()
         @showAdvancedEditor(visualEditor)
+        $('table.mceToolbar').addClass('is-inactive')
+        $(@advanced_editor.getWrapperElement()).removeClass('is-inactive')
+
 
   # Show the Advanced (codemirror) Editor. Pulled out as a helper method for unit testing.
   showAdvancedEditor: (visualEditor) ->
-    # $(@advanced_editor.getWrapperElement()).show()
     if visualEditor.isDirty()
       @advanced_editor.setValue(visualEditor.getContent({no_events: 1}))
       @advanced_editor.setCursor(0)

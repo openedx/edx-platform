@@ -30,7 +30,7 @@ class XMLEditingDescriptor(EditingDescriptor):
     any validation of its definition
     """
 
-    css = {'scss': [resource_string(__name__, 'css/editor/display.scss'), resource_string(__name__, 'css/codemirror/codemirror.scss')]}
+    css = {'scss': [resource_string(__name__, 'css/codemirror/codemirror.scss')]}
 
     js = {'coffee': [resource_string(__name__, 'js/src/raw/edit/xml.coffee')]}
     js_module_name = "XMLEditingDescriptor"
@@ -42,7 +42,7 @@ class JSONEditingDescriptor(EditingDescriptor):
     any validation of its definition
     """
 
-    css = {'scss': [resource_string(__name__, 'css/editor/display.scss'), resource_string(__name__, 'css/codemirror/codemirror.scss')]}
+    css = {'scss': [resource_string(__name__, 'css/codemirror/codemirror.scss')]}
 
     js = {'coffee': [resource_string(__name__, 'js/src/raw/edit/json.coffee')]}
     js_module_name = "JSONEditingDescriptor"
