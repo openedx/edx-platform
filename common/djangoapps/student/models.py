@@ -272,7 +272,7 @@ class TestCenterUserForm(ModelForm):
         # create additional values here:
         new_user.user_updated_at = datetime.utcnow()
         new_user.save()
-        log.info("Updated demographic information for user's test center exam registration: username \"{}\" ".format(new_user.username)) 
+        log.info("Updated demographic information for user's test center exam registration: username \"{}\" ".format(new_user.user.username)) 
         
     # add validation:
     
