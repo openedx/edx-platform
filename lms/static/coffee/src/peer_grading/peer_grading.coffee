@@ -19,7 +19,7 @@ class PeerGrading
       problem = $(element)
       progress_bar = problem.find('.progress-bar')
       bar_value = parseInt(problem.data('graded'))
-      bar_max = parseInt(problem.data('required'))
+      bar_max = parseInt(problem.data('required')) + bar_value
       progress_bar.progressbar({value: bar_value, max: bar_max})
     )
     
