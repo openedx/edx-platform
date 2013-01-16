@@ -377,7 +377,7 @@ class CourseDescriptor(SequenceDescriptor):
         """
         return self.metadata.get('end_of_course_survey_url')
 
-    class TestCenterExam:
+    class TestCenterExam(object):
         def __init__(self, course_id, exam_name, exam_info):
             self.course_id = course_id
             self.exam_name = exam_name
