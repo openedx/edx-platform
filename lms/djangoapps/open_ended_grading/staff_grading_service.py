@@ -55,7 +55,7 @@ class MockStaffGradingService(object):
         ]})
 
 
-    def save_grade(self, course_id, grader_id, submission_id, score, feedback, skipped):
+    def save_grade(self, course_id, grader_id, submission_id, score, feedback, skipped, rubric_scores):
         return self.get_next(course_id, 'fake location', grader_id)
 
 

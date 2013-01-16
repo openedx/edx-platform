@@ -94,7 +94,8 @@ class TestStaffGradingService(ct.PageLoader):
         data = {'score': '12',
                 'feedback': 'great!',
                 'submission_id': '123',
-                'location': self.location}
+                'location': self.location,
+                'rubric_scores[]': ['1', '2']}
         r = self.check_for_post_code(200, url, data)
         d = json.loads(r.content)
         self.assertTrue(d['success'], str(d))
