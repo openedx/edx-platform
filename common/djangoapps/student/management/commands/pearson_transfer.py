@@ -28,23 +28,21 @@ class Command(BaseCommand):
         def import_pearson():
             sftp(settings.PEARSON[SFTP_IMPORT], settings.PEARSON[LOCAL_IMPORT])
             s3(settings.PEARSON[LOCAL_IMPORT], settings.PEARSON[BUCKET])
-            call_command('pearson_import', 'dest_from_settings=True')
+            call_command('pearson_import', 'dest_from_settings')
 
         def export_pearson():
-            call_command('pearson_export_ccd', 'dest_from_settings=True')
-            call_command('pearson_export_ead', 'dest_from_settings=True')
+            call_command('pearson_export_ccd', 'dest_from_settings')
+            call_command('pearson_export_ead', 'dest_from_settings')
             sftp(settings.PEARSON[LOCAL_EXPORT], settings.PEARSON[SFTP_EXPORT])
             s3(settings.PEARSON[LOCAL_EXPORT], settings.PEARSON[BUCKET])
 
-        if options['mode'] == 'both':
-            export_pearson()
-            import_pearson()
-        elif options['mode'] == 'export':
+        if options['mode'] == 'export':
             export_pearson()
         elif options['mode'] == 'import':
             import_pearson()
         else:
-            print("ERROR:  Mode must be export or import.")
+            export_pearson()
+            import_pearson()
 
 
         def sftp(files_from, files_to):
@@ -62,6 +60,7 @@ class Command(BaseCommand):
                         for filename in sftp.listdir(files_from):
                             sftp.get(files_from+'/'+filename,
                                      files_to+'/'+filename)
+                    t.close()
                 except:
                     dog_http_api.event('pearson {0}'.format(mode),
                                        'sftp uploading failed', alert_type='error')
