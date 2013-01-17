@@ -51,6 +51,8 @@
   }
 
   .components {
+
+
     > li {
       position: relative;
       z-index: 10;
@@ -118,6 +120,24 @@
           }
         }
 
+        .new-component-templates {
+          display: none;
+          padding: 20px;
+          @include clearfix;
+
+          .cancel-button {
+            @include white-button;
+          }
+
+          // specific menu types
+          &.new-component-problem {
+
+            .ss-icon, .editor-indicator {
+              display: inline-block;
+            }
+          }
+        }
+        
         .new-component-type,
         .new-component-template {
           @include clearfix;
@@ -177,7 +197,11 @@
               position: relative;
               top: 3px;
               font-size: 12px;
-              opacity: 0.1;
+              opacity: 0.3;
+            }
+
+            .ss-icon, .editor-indicator {
+              display: none;
             }
 
             &:hover {
@@ -213,16 +237,6 @@
             color: $green;
           }
           
-        }
-        
-        .new-component-templates {
-          display: none;
-          padding: 20px;
-          @include clearfix;
-
-          .cancel-button {
-            @include white-button;
-          }
         }
       }
     }
