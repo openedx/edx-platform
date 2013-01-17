@@ -109,10 +109,10 @@ def instance_key(model, instance_or_pk):
     )
 
 def set_cached_content(content):
-    cache.set(content.get_id(), content)
+    cache.set(str(content.location), content)
 
 def get_cached_content(location):
-    return cache.get(StaticContent.get_id_from_location(location))
+    return cache.get(str(location))
 
 def del_cached_content(location):
-    cache.delete(StaticContent.get_id_from_location(location))
+    cache.delete(str(location))

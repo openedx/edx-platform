@@ -213,8 +213,8 @@ class @MarkdownEditingDescriptor extends XModule.Descriptor
 
       // group check answers
       xml = xml.replace(/(^\s*\[.?\].*?$\n*)+/gm, function(match, p) {
-        var groupString = '<multiplechoiceresponse>\n';
-        groupString += '  <choicegroup type="MultipleChoiceChecks">\n';
+        var groupString = '<choiceresponse>\n';
+        groupString += '  <checkboxgroup direction="vertical">\n';
         var options = match.split('\n');
         for(var i = 0; i < options.length; i++) {
           if(options[i].length > 0) {
@@ -223,8 +223,8 @@ class @MarkdownEditingDescriptor extends XModule.Descriptor
             groupString += '    <choice correct="' + correct + '">' + value + '</choice>\n';
           }
         }
-        groupString += '  </choicegroup>\n';
-        groupString += '</multiplechoiceresponse>\n\n';
+        groupString += '  </checkboxgroup>\n';
+        groupString += '</choiceresponse>\n\n';
         return groupString;
       });
 
