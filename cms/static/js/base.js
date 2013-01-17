@@ -55,16 +55,6 @@ $(document).ready(function() {
     $("#start_date, #start_time, #due_date, #due_time").bind('change', autosaveInput);
     $('.sync-date, .remove-date').bind('click', autosaveInput);
 
-    var cachedHesitation = new CMS.HesitateEvent( expandSection, $('.branch .collapsed'), 'mouseLeave');
-    // making the unit list sortable
-    $('.sortable-unit-list').sortable({
-        axis: 'y',
-        handle: '.drag-handle',
-        update: onUnitReordered,
-        connectWith: '.sortable-unit-list',
-        revert: true
-    });
-
     // expand/collapse methods for optional date setters
     $('.set-date').bind('click', showDateSetter);
     $('.remove-date').bind('click', removeDateSetter);
@@ -90,6 +80,16 @@ $(document).ready(function() {
         $('.import .file-input').click();
     });
 
+    var cachedHesitation = new CMS.HesitateEvent( expandSection, $('.branch .collapsed'), 'mouseLeave');
+    // making the unit list sortable
+    $('.sortable-unit-list').sortable({
+    	axis: 'y',
+    	handle: '.drag-handle',
+    	update: onUnitReordered,
+    	connectWith: '.sortable-unit-list',
+    	revert: true
+    });
+    
     // Subsection reordering
     $('.subsection-list > ol').sortable({
         axis: 'y',
@@ -254,9 +254,8 @@ function expandSection(event) {
 }
 
 function checkDropValidity(event, ui) {
-	var posInDestination = ui.position.top - $(event.target).position().top;
+	var posInDestination = ui.item.position().top - $(event.target).position().top;
 	if (posInDestination <= -ui.item.height() || posInDestination >= $(event.target).height()) {
-		// May need to call on ui.sender
 		$(event.target).sortable("cancel");
 		return false;
 	}
@@ -297,34 +296,32 @@ function onUnitReordered(event, ui) {
 }
 
 function onSubsectionReordered(event, ui) {
+	// see onUnitReordered for  pattern and comments
     var section_id = $(event.target).data('section-id');
-
     var _els = $(event.target).children('li:.branch');
     var children = _els.map(function(idx, el) { return $(el).data('id'); }).get();
-
-    // call into server to commit the new order
-    $.ajax({
-        url: "/save_item",
-        type: "POST",
-        dataType: "json",
-        contentType: "application/json",
-        data:JSON.stringify({ 'id' : section_id, 'children' : children})
-    });
-    
-    // remove from old container
-    if (ui.sender && section_id !== ui.sender.data('section-id')) {
-    	var _els = ui.sender.children('li:.branch');
-    	var children = _els.map(function(idx, el) { return $(el).data('id'); }).get();
-    	
+    // if it believes the element belongs in this section, check that it was dropped w/in the bounds
+    if (_.contains(children, ui.item.data('id'))) {
+    	if (checkDropValidity(event, ui)) {
+    		// call into server to commit the new order
+    		$.ajax({
+    			url: "/save_item",
+    			type: "POST",
+    			dataType: "json",
+    			contentType: "application/json",
+    			data:JSON.stringify({ 'id' : section_id, 'children' : children})
+    		});
+    	}
+    }
+    else {
     	// call into server to commit the new order
     	$.ajax({
     		url: "/save_item",
     		type: "POST",
     		dataType: "json",
     		contentType: "application/json",
-    		data:JSON.stringify({ 'id' : ui.sender.data('section-id'), 'children' : children})
+    		data:JSON.stringify({ 'id' : section_id, 'children' : children})
     	});
-    	
     }
 }
 
