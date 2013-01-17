@@ -51,8 +51,7 @@ pygraphviz==1.1
 pil==1.1.7
 nltk==2.0.4
 dogstatsd-python==0.2.1
-# Taking out MySQL-python for now because it requires mysql to be installed, so breaks updates on content folks' envs.
-# MySQL-python
+MySQL-python==1.2.4c1
 sphinx==1.1.3
 Shapely==1.2.16
 ipython==0.13.1
