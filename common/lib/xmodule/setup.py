@@ -19,6 +19,8 @@ setup(
             "abtest = xmodule.abtest_module:ABTestDescriptor",
             "book = xmodule.backcompat_module:TranslateCustomTagDescriptor",
             "chapter = xmodule.seq_module:SequenceDescriptor",
+            "combinedopenended = xmodule.combined_open_ended_module:CombinedOpenEndedDescriptor",
+            "conditional = xmodule.conditional_module:ConditionalDescriptor",
             "course = xmodule.course_module:CourseDescriptor",
             "customtag = xmodule.template_module:CustomTagDescriptor",
             "discuss = xmodule.backcompat_module:TranslateCustomTagDescriptor",
