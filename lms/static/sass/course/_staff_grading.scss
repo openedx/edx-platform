@@ -124,7 +124,7 @@ div.peer-grading{
             margin: 0px;
             background: #eee;
             height: 10em;
-            width:48%;
+            width:47.6%;
             h3
             {
                 text-align:center;
@@ -182,8 +182,7 @@ div.peer-grading{
           height: 100%;
       }
       td {
-          padding: 20px 0px;
-          margin: 10px 0px;
+          padding: 20px 0px 25px 0px;
           height: 100%;
       }
       th {
@@ -201,7 +200,7 @@ div.peer-grading{
           min-height: 50px;
           min-width: 50px;
           background-color: #CCC;
-          font-size: .85em;
+          font-size: .9em;
       }
       .grade {
         position: absolute;

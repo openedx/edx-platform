@@ -152,6 +152,7 @@ div.result-container {
           font-family: monospace;
           font-size: 1em;
           padding-top: 10px;
+          padding-bottom:30px;
           header {
               font-size: 1.4em;
           }
@@ -237,7 +238,7 @@ div.result-container, section.open-ended-child {
                 height: 100%;
             }
             td {
-                padding: 20px 0px;
+                padding: 20px 0px 25px 0px;
                 margin: 10px 0px;
                 height: 100%;
             }
@@ -249,7 +250,7 @@ div.result-container, section.open-ended-child {
             .view-only {
                 margin:2px;
                 position: relative;
-                padding: 15px 15px 25px 15px;
+                padding: 10px 15px 25px 15px;
                 width: 145px;
                 height:100%;
                 display: inline-block;
