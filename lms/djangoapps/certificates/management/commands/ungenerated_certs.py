@@ -37,8 +37,10 @@ class Command(BaseCommand):
                     metavar='STATUS',
                     dest='force',
                     default=False,
-                    help='Will force generate a search for STATUS '
-                    '(cannot be downloadable)'),
+                    help='Will generate new certificates for only those users '
+                    'whose entry in the certificate table matches STATUS. '
+                    'STATUS can be generating, unavailable, deleted, error '
+                    'or notpassing.'),
 
     )
 
