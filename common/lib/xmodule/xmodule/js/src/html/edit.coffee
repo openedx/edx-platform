@@ -1,4 +1,6 @@
 class @HTMLEditingDescriptor
+  @isInactiveClass : "is-inactive"
+
   constructor: (element) ->
     @element = element;
     text = $(".edit-box", @element)[0];
@@ -9,7 +11,7 @@ class @HTMLEditingDescriptor
       lineNumbers: true
       lineWrapping: true})
 
-    $(@advanced_editor.getWrapperElement()).addClass('is-inactive')
+    $(@advanced_editor.getWrapperElement()).addClass(HTMLEditingDescriptor.isInactiveClass)
 
     @tiny_mce_textarea = $(".tiny-mce", @element).tinymce({
       script_url : '/static/js/vendor/tiny_mce/tiny_mce.js',
@@ -29,7 +31,7 @@ class @HTMLEditingDescriptor
       height: '400px',
       # Cannot get access to tinyMCE Editor instance (for focusing) until after it is rendered.
       # The tinyMCE callback passes in the editor as a paramter.
-      init_instance_callback: @initializeVisualEditor
+      init_instance_callback: @focusVisualEditor
     })
 
     @showingVisualEditor = true
@@ -41,19 +43,14 @@ class @HTMLEditingDescriptor
     if not $(e.currentTarget).hasClass('current')
       $('.editor-tabs .current').removeClass('current')
       $(e.currentTarget).addClass('current')
-      visualEditor = @getVisualEditor()
+      $('table.mceToolbar').toggleClass(HTMLEditingDescriptor.isInactiveClass)
+      $(@advanced_editor.getWrapperElement()).toggleClass(HTMLEditingDescriptor.isInactiveClass)
 
+      visualEditor = @getVisualEditor()
       if $(e.currentTarget).attr('data-tab') is 'visual'
         @showVisualEditor(visualEditor)
-        $('table.mceToolbar').removeClass('is-inactive')
-        $(@advanced_editor.getWrapperElement()).addClass('is-inactive')
-
       else
-        # @tiny_mce_textarea.hide()
         @showAdvancedEditor(visualEditor)
-        $('table.mceToolbar').addClass('is-inactive')
-        $(@advanced_editor.getWrapperElement()).removeClass('is-inactive')
-
 
   # Show the Advanced (codemirror) Editor. Pulled out as a helper method for unit testing.
   showAdvancedEditor: (visualEditor) ->
@@ -66,16 +63,15 @@ class @HTMLEditingDescriptor
 
   # Show the Visual (tinyMCE) Editor. Pulled out as a helper method for unit testing.
   showVisualEditor: (visualEditor) ->
-    # visualEditor.show()
     visualEditor.setContent(@advanced_editor.getValue())
     # In order for isDirty() to return true ONLY if edits have been made after setting the text,
     # both the startContent must be sync'ed up and the dirty flag set to false.
     visualEditor.startContent = visualEditor.getContent({format: "raw", no_events: 1});
     visualEditor.isNotDirty = true
-    visualEditor.focus()
+    @focusVisualEditor(visualEditor)
     @showingVisualEditor = true
 
-  initializeVisualEditor: (visualEditor) ->
+  focusVisualEditor: (visualEditor) ->
     visualEditor.focus()
 
   getVisualEditor: ->

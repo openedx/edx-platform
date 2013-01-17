@@ -78,7 +78,6 @@ describe 'HTMLEditingDescriptor', ->
         isNotDirty: false
         content: 'not set'
         startContent: 'not set',
-        show: () -> true
         focus: () -> true
         isDirty: () -> not @isNotDirty
         setContent: (x) -> @content = x

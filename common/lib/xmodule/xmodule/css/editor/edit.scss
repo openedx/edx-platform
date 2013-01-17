@@ -1,3 +1,4 @@
+// This is shared CSS between the xmodule problem editor and the xmodule HTML editor.
 .editor {
   position: relative;
 
@@ -13,8 +14,6 @@
     border-radius: 3px 3px 0 0;
     border-bottom-color: #a5aaaf;
     @include clearfix;
-    // TODO: I added this -- Brian to fix roperly
-    height: 34px;
 
     a {
       display: block;
