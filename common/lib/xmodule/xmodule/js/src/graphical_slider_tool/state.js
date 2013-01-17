@@ -24,7 +24,7 @@ define('State', ['logme'], function (logme) {
         dynamicElByElId = {};
 
         stateInst += 1;
-        logme('MESSAGE: Creating state instance # ' + stateInst + '.');
+        // logme('MESSAGE: Creating state instance # ' + stateInst + '.');
 
         // Initially, there are no parameters to track. So, we will instantiate
         // an empty object.
