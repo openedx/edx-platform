@@ -93,6 +93,7 @@ class OpenEndedChild():
 
         self.prompt = static_data['prompt']
         self.rubric = static_data['rubric']
+        self.display_name = static_data['display_name']
 
         # Used for progress / grading.  Currently get credit just for
         # completion (doesn't matter if you self-assessed correct/incorrect).

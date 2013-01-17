@@ -122,6 +122,7 @@ class OpenEndedModule(openendedchild.OpenEndedChild):
             'rubric': rubric_string,
             'initial_display': self.initial_display,
             'answer': self.answer,
+            'problem_id': self.display_name
         })
         updated_grader_payload = json.dumps(parsed_grader_payload)
 

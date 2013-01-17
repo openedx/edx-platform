@@ -153,7 +153,8 @@ class CombinedOpenEndedModule(XModule):
             'max_score': self._max_score,
             'max_attempts': self.max_attempts,
             'prompt': definition['prompt'],
-            'rubric': definition['rubric']
+            'rubric': definition['rubric'],
+            'display_name': self.display_name
         }
 
         self.task_xml = definition['task_xml']
