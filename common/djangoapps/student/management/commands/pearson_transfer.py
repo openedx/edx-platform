@@ -39,14 +39,18 @@ class Command(BaseCommand):
                                    '(env/auth.json) for {0}'.format(value))
 
         def import_pearson():
-            sftp(settings.PEARSON['SFTP_IMPORT'],
-                 settings.PEARSON['LOCAL_IMPORT'], options['mode'])
-            s3(settings.PEARSON['LOCAL_IMPORT'],
-               settings.PEARSON['BUCKET'], options['mode'])
-            for file in os.listdir(settings.PEARSON['LOCAL_IMPORT']):
-                call_command('pearson_import_conf_zip',
-                             settings.PEARSON['LOCAL_IMPORT'] + '/' + file)
-                os.remove(file)
+            try:
+                sftp(settings.PEARSON['SFTP_IMPORT'],
+                     settings.PEARSON['LOCAL_IMPORT'], options['mode'])
+                s3(settings.PEARSON['LOCAL_IMPORT'],
+                   settings.PEARSON['BUCKET'], options['mode'])
+            except Exception as e:
+                dog_http_api.event('Pearson Import failure', str(e))
+            else:
+                for file in os.listdir(settings.PEARSON['LOCAL_IMPORT']):
+                    call_command('pearson_import_conf_zip',
+                                 settings.PEARSON['LOCAL_IMPORT'] + '/' + file)
+                    os.remove(file)
 
         def export_pearson():
             call_command('pearson_export_cdd', 'dest_from_settings')
@@ -79,6 +83,7 @@ class Command(BaseCommand):
                         for filename in sftp.listdir(files_from):
                             sftp.get(files_from + '/' + filename,
                                      files_to + '/' + filename)
+                            sftp.remove(files_from + '/' + filename)
                     t.close()
                 except:
                     dog_http_api.event('pearson {0}'.format(mode),
