@@ -20,9 +20,9 @@ define('Sliders', ['logme'], function (logme) {
             } else if (sliderDiv.length > 1) {
                 logme('ERROR: Found more than one slider for the parameter "' + paramName + '".');
                 logme('sliderDiv.length = ', sliderDiv.length);
-            } else {
-                logme('MESSAGE: Did not find a slider for the parameter "' + paramName + '".');
-            }
+            } // else {
+            //     logme('MESSAGE: Did not find a slider for the parameter "' + paramName + '".');
+            // }
         }
 
         function createSlider(sliderDiv, paramName) {
