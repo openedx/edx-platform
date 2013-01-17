@@ -3,13 +3,12 @@ class @HTMLEditingDescriptor
 
   constructor: (element) ->
     @element = element;
-    text = $(".edit-box", @element)[0];
-    replace_func = (elt) -> text.parentNode.replaceChild(elt, text)
-    @advanced_editor = CodeMirror(replace_func, {
-      value: text.innerHTML
+
+    @advanced_editor = CodeMirror.fromTextArea($(".edit-box", @element)[0], {
       mode: "text/html"
       lineNumbers: true
-      lineWrapping: true})
+      lineWrapping: true
+    })
 
     $(@advanced_editor.getWrapperElement()).addClass(HTMLEditingDescriptor.isInactiveClass)
 

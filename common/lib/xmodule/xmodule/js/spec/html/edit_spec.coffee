@@ -13,12 +13,12 @@ describe 'HTMLEditingDescriptor', ->
       spyOn(@descriptor, 'getVisualEditor').andCallFake () ->
         visualEditorStub
       data = @descriptor.save().data
-      expect(data).toEqual("""&lt;problem&gt;
-                              &lt;p&gt;&lt;/p&gt;
-                              &lt;multiplechoiceresponse&gt;
-                              <pre>&lt;problem&gt;
-                                  &lt;p&gt;&lt;/p&gt;</pre>
-                              <div><foo>bar</foo></div>""")
+      expect(data).toEqual("""&lt;problem>
+                           &lt;p>&lt;/p>
+                           &lt;multiplechoiceresponse>
+                           <pre>&lt;problem>
+                               &lt;p>&lt;/p></pre>
+                           <div><foo>bar</foo></div>""")
   describe 'Saves HTML', ->
     beforeEach ->
       loadFixtures 'html-edit.html'
@@ -52,7 +52,7 @@ describe 'HTMLEditingDescriptor', ->
     beforeEach ->
       loadFixtures 'html-edit.html'
       @descriptor = new HTMLEditingDescriptor($('.html-edit'))
-    it 'Populates from Advanced Editor if Advanced Editor is dirty', ->
+    it 'Populates from Visual Editor if Advanced Visual is dirty', ->
       expect(@descriptor.showingVisualEditor).toEqual(true)
       visualEditorStub =
         isDirty: () -> true
@@ -60,7 +60,7 @@ describe 'HTMLEditingDescriptor', ->
       @descriptor.showAdvancedEditor(visualEditorStub)
       expect(@descriptor.showingVisualEditor).toEqual(false)
       expect(@descriptor.advanced_editor.getValue()).toEqual('from visual editor')
-    it 'Does not populate from Advanced Editor if Advanced Editor is not dirty', ->
+    it 'Does not populate from Visual Editor if Visual Editor is not dirty', ->
       expect(@descriptor.showingVisualEditor).toEqual(true)
       visualEditorStub =
         isDirty: () -> false
