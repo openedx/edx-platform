@@ -36,6 +36,9 @@ table.stat_table td {
 
 a.selectedmode { background-color: yellow; }
 
+textarea {
+  height: 200px;
+}
 </style>
 
 <script language="JavaScript" type="text/javascript">
@@ -58,8 +61,8 @@ function goto( mode)
           %endif
           <a href="#" onclick="goto('Admin');" class="${modeflag.get('Admin')}">Admin</a> |
           <a href="#" onclick="goto('Forum Admin');" class="${modeflag.get('Forum Admin')}">Forum Admin</a> |
-          <a href="#" onclick="goto('Enrollment');" class="${modeflag.get('Enrollment')}">Enrollment</a>
-	 ]
+          <a href="#" onclick="goto('Enrollment');" class="${modeflag.get('Enrollment')}">Enrollment</a> |
+          <a href="#" onclick="goto('Manage Groups');" class="${modeflag.get('Manage Groups')}">Manage Groups</a> ]
     </h2>
 
   <div style="text-align:right"><span id="djangopid">${djangopid}</span>
@@ -138,6 +141,11 @@ function goto( mode)
 
   %endif
 
+    <H2>Student-specific grade inspection and adjustment</h2>
+    <p>edX email address or their username: </p>
+    <p><input type="text" name="unique_student_identifier">  <input type="submit" name="action" value="Get link to student's progress page"></p>
+    <p>and, if you want to reset the number of attempts for a problem, the urlname of that problem</p>
+    <p> <input type="text" name="problem_to_reset"> <input type="submit" name="action" value="Reset student's attempts">  </p>
  %endif
 
 ##----------------------------------------------------------------------------- 
@@ -168,7 +176,8 @@ function goto( mode)
     <p>
     <input type="submit" name="action" value="List course staff members">
     <p>
-    <input type="text" name="staffuser"> <input type="submit" name="action" value="Remove course staff">
+    <input type="text" name="staffuser">
+    <input type="submit" name="action" value="Remove course staff">
     <input type="submit" name="action" value="Add course staff">
     <hr width="40%" style="align:left">
   %endif
@@ -250,7 +259,7 @@ function goto( mode)
   
   %endif
 
-  <p>Add students: enter emails, separated by returns or commas;</p>
+  <p>Add students: enter emails, separated by new lines or commas;</p>
   <textarea rows="6" cols="70" name="enroll_multiple"></textarea>
   <input type="submit" name="action" value="Enroll multiple students">
 
@@ -258,8 +267,29 @@ function goto( mode)
 
 ##----------------------------------------------------------------------------- 
 
+%if modeflag.get('Manage Groups'):
+  %if instructor_access:
+    <hr width="40%" style="align:left">
+    <p>
+    <input type="submit" name="action" value="List beta testers">
+    <p>
+    Enter usernames or emails for students who should be beta-testers, one per line, or separated by commas.  They will get to
+    see course materials early, as configured via the <tt>days_early_for_beta</tt> option in the course policy.
+    </p>
+    <p>
+    <textarea cols="50" row="30" name="betausers"></textarea>
+    <input type="submit" name="action" value="Remove beta testers">
+    <input type="submit" name="action" value="Add beta testers">
+    </p>
+    <hr width="40%" style="align:left">
+  %endif
+%endif
+
     </form>
 
+%if msg:
+    <p></p><p>${msg}</p>
+%endif
 ##----------------------------------------------------------------------------- 
 ##----------------------------------------------------------------------------- 
 
@@ -312,9 +342,6 @@ function goto( mode)
 ##-----------------------------------------------------------------------------  
 ## always show msg
 
-%if msg:
-    <p>${msg}</p>
-%endif
 
 ##----------------------------------------------------------------------------- 
 %if modeflag.get('Admin'):
