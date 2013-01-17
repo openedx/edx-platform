@@ -60,7 +60,9 @@ $(document).ready(function() {
     $('.sortable-unit-list').sortable({
         axis: 'y',
         handle: '.drag-handle',
-        update: onUnitReordered
+        update: onUnitReordered,
+        connectWith: '.sortable-unit-list',
+        revert: true
     });
 
     // expand/collapse methods for optional date setters
@@ -92,14 +94,17 @@ $(document).ready(function() {
     $('.subsection-list > ol').sortable({
         axis: 'y',
         handle: '.section-item .drag-handle',
-        update: onSubsectionReordered
+        update: onSubsectionReordered,
+        connectWith: '.subsection-list > ol',
+        revert: true
     });
 
     // Section reordering
     $('.courseware-overview').sortable({
         axis: 'y',
         handle: 'header .drag-handle',
-        update: onSectionReordered
+        update: onSectionReordered,
+        revert: true
     });
 
     $('.new-course-button').bind('click', addNewCourse);
@@ -249,7 +254,7 @@ function expandSection(event) {
 }
 
 // This method only changes the ordering of the child objects in a subsection
-function onUnitReordered() {
+function onUnitReordered(event, ui) {
     var subsection_id = $(this).data('subsection-id');
 
     var _els = $(this).children('li:.leaf');
@@ -263,9 +268,26 @@ function onUnitReordered() {
 		contentType: "application/json",
 		data:JSON.stringify({ 'id' : subsection_id, 'children' : children})
 	});
+    
+    // remove from old container
+    if (ui.sender && subsection_id !== ui.sender.data('subsection-id')) {
+    	
+    	var _els = ui.sender.children('li:.leaf');
+    	var children = _els.map(function(idx, el) { return $(el).data('id'); }).get();
+    	
+    	// call into server to commit the new order
+    	$.ajax({
+    		url: "/save_item",
+    		type: "POST",
+    		dataType: "json",
+    		contentType: "application/json",
+    		data:JSON.stringify({ 'id' : ui.sender.data('subsection-id'), 'children' : children})
+    	});
+    	
+    }
 }
 
-function onSubsectionReordered() {
+function onSubsectionReordered(event, ui) {
     var section_id = $(this).data('section-id');
 
     var _els = $(this).children('li:.branch');
@@ -279,6 +301,22 @@ function onSubsectionReordered() {
         contentType: "application/json",
         data:JSON.stringify({ 'id' : section_id, 'children' : children})
     });
+    
+    // remove from old container
+    if (ui.sender && section_id !== ui.sender.data('section-id')) {
+    	var _els = ui.sender.children('li:.branch');
+    	var children = _els.map(function(idx, el) { return $(el).data('id'); }).get();
+    	
+    	// call into server to commit the new order
+    	$.ajax({
+    		url: "/save_item",
+    		type: "POST",
+    		dataType: "json",
+    		contentType: "application/json",
+    		data:JSON.stringify({ 'id' : ui.sender.data('section-id'), 'children' : children})
+    	});
+    	
+    }
 }
 
 function onSectionReordered() {
