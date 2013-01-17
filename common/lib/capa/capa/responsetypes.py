@@ -8,21 +8,24 @@ Used by capa_problem.py
 '''
 
 # standard library imports
+import abc
 import cgi
+import hashlib
 import inspect
 import json
 import logging
 import numbers
 import numpy
+import os
 import random
 import re
 import requests
-import traceback
-import hashlib
-import abc
-import os
 import subprocess
+import traceback
 import xml.sax.saxutils as saxutils
+
+from collections import namedtuple
+from shapely.geometry import Point, MultiPoint
 
 # specific library imports
 from calc import evaluator, UndefinedVariable
@@ -626,7 +629,7 @@ class MultipleChoiceResponse(LoncapaResponse):
         # define correct choices (after calling secondary setup)
         xml = self.xml
         cxml = xml.xpath('//*[@id=$id]//choice[@correct="true"]', id=xml.get('id'))
-        self.correct_choices = [choice.get('name') for choice in cxml]
+        self.correct_choices = [contextualize_text(choice.get('name'), self.context) for choice in cxml]
 
     def mc_setup_response(self):
         '''
@@ -720,7 +723,7 @@ class OptionResponse(LoncapaResponse):
         return cmap
 
     def get_answers(self):
-        amap = dict([(af.get('id'), af.get('correct')) for af in self.answer_fields])
+        amap = dict([(af.get('id'), contextualize_text(af.get('correct'), self.context)) for af in self.answer_fields])
         # log.debug('%s: expected answers=%s' % (unicode(self),amap))
         return amap
 
@@ -1100,6 +1103,15 @@ class SymbolicResponse(CustomResponse):
 
 #-----------------------------------------------------------------------------
 
+"""
+valid:       Flag indicating valid score_msg format (Boolean)
+correct:     Correctness of submission (Boolean)
+score:       Points to be assigned (numeric, can be float)
+msg:         Message from grader to display to student (string)
+"""
+ScoreMessage = namedtuple('ScoreMessage',
+                          ['valid', 'correct', 'points', 'msg'])
+
 
 class CodeResponse(LoncapaResponse):
     """
@@ -1139,7 +1151,7 @@ class CodeResponse(LoncapaResponse):
         else:
             self._parse_coderesponse_xml(codeparam)
 
-    def _parse_coderesponse_xml(self,codeparam):
+    def _parse_coderesponse_xml(self, codeparam):
         '''
         Parse the new CodeResponse XML format. When successful, sets:
             self.initial_display
@@ -1151,17 +1163,9 @@ class CodeResponse(LoncapaResponse):
         grader_payload = grader_payload.text if grader_payload is not None else ''
         self.payload = {'grader_payload': grader_payload}
 
-        answer_display = codeparam.find('answer_display')
-        if answer_display is not None:
-            self.answer = answer_display.text
-        else:
-            self.answer = 'No answer provided.'
-
-        initial_display = codeparam.find('initial_display')
-        if initial_display is not None:
-            self.initial_display = initial_display.text
-        else:
-            self.initial_display = ''
+        self.initial_display = find_with_default(codeparam, 'initial_display', '')
+        self.answer = find_with_default(codeparam, 'answer_display',
+                                        'No answer provided.')
 
     def _parse_externalresponse_xml(self):
         '''
@@ -1308,8 +1312,6 @@ class CodeResponse(LoncapaResponse):
             # Sanity check on returned points
             if points < 0:
                 points = 0
-            elif points > self.maxpoints[self.answer_id]:
-                points = self.maxpoints[self.answer_id]
             # Queuestate is consumed
             oldcmap.set(self.answer_id, npoints=points, correctness=correctness,
                         msg=msg.replace('&nbsp;', '&#160;'), queuestate=None)
@@ -1717,15 +1719,38 @@ class ImageResponse(LoncapaResponse):
     which produces an [x,y] coordinate pair.  The click is correct if it falls
     within a region specified.  This region is a union of rectangles.
 
-    Lon-CAPA requires that each <imageresponse> has a <foilgroup> inside it.  That
-    doesn't make sense to me (Ike).  Instead, let's have it such that <imageresponse>
-    should contain one or more <imageinput> stanzas. Each <imageinput> should specify
-    a rectangle, given as an attribute, defining the correct answer.
+    Lon-CAPA requires that each <imageresponse> has a <foilgroup> inside it.
+    That doesn't make sense to me (Ike).  Instead, let's have it such that
+    <imageresponse> should contain one or more <imageinput> stanzas.
+    Each <imageinput> should specify a rectangle(s) or region(s), given as an
+    attribute, defining the correct answer.
+
+    <imageinput src="/static/images/Lecture2/S2_p04.png" width="811" height="610"
+    rectangle="(10,10)-(20,30);(12,12)-(40,60)"
+    regions="[[[10,10], [20,30], [40, 10]], [[100,100], [120,130], [110,150]]]"/>
+
+    Regions is list of lists [region1, region2, region3, ...] where regionN
+    is disordered list of points: [[1,1], [100,100], [50,50], [20, 70]].
+
+    If there is only one region in the list, simpler notation can be used:
+    regions="[[10,10], [30,30], [10, 30], [30, 10]]" (without explicitly
+        setting outer list)
+
+    Returns:
+        True, if click is inside any region or rectangle. Otherwise False.
     """
     snippets = [{'snippet': '''<imageresponse>
-      <imageinput src="image1.jpg" width="200" height="100" rectangle="(10,10)-(20,30)" />
-      <imageinput src="image2.jpg" width="210" height="130" rectangle="(12,12)-(40,60)" />
-      <imageinput src="image2.jpg" width="210" height="130" rectangle="(10,10)-(20,30);(12,12)-(40,60)" />
+      <imageinput src="image1.jpg" width="200" height="100"
+      rectangle="(10,10)-(20,30)" />
+      <imageinput src="image2.jpg" width="210" height="130"
+      rectangle="(12,12)-(40,60)" />
+      <imageinput src="image3.jpg" width="210" height="130"
+      rectangle="(10,10)-(20,30);(12,12)-(40,60)" />
+      <imageinput src="image4.jpg" width="811" height="610"
+      rectangle="(10,10)-(20,30);(12,12)-(40,60)"
+      regions="[[[10,10], [20,30], [40, 10]], [[100,100], [120,130], [110,150]]]"/>
+      <imageinput src="image5.jpg" width="200" height="200"
+      regions="[[[10,10], [20,30], [40, 10]], [[100,100], [120,130], [110,150]]]"/>
     </imageresponse>'''}]
 
     response_tag = 'imageresponse'
@@ -1733,19 +1758,17 @@ class ImageResponse(LoncapaResponse):
 
     def setup_response(self):
         self.ielements = self.inputfields
-        self.answer_ids = [ie.get('id')  for ie in self.ielements]
+        self.answer_ids = [ie.get('id') for ie in self.ielements]
 
     def get_score(self, student_answers):
         correct_map = CorrectMap()
         expectedset = self.get_answers()
-
-        for aid in self.answer_ids:	 # loop through IDs of <imageinput> fields in our stanza
-            given = student_answers[aid]	 # this should be a string of the form '[x,y]'
-
+        for aid in self.answer_ids:	 # loop through IDs of <imageinput>
+        #  fields in our stanza
+            given = student_answers[aid]  # this should be a string of the form '[x,y]'
             correct_map.set(aid, 'incorrect')
-            if not given: # No answer to parse. Mark as incorrect and move on
+            if not given:  # No answer to parse. Mark as incorrect and move on
                 continue
-
             # parse given answer
             m = re.match('\[([0-9]+),([0-9]+)]', given.strip().replace(' ', ''))
             if not m:
@@ -1753,29 +1776,44 @@ class ImageResponse(LoncapaResponse):
                                 'error grading %s (input=%s)' % (aid, given))
             (gx, gy) = [int(x) for x in m.groups()]
 
-            # Check whether given point lies in any of the solution rectangles
-            solution_rectangles = expectedset[aid].split(';')
-            for solution_rectangle in solution_rectangles:
-                # parse expected answer
-                # TODO: Compile regexp on file load
-                m = re.match('[\(\[]([0-9]+),([0-9]+)[\)\]]-[\(\[]([0-9]+),([0-9]+)[\)\]]',
-                             solution_rectangle.strip().replace(' ', ''))
-                if not m:
-                    msg = 'Error in problem specification! cannot parse rectangle in %s' % (
-                        etree.tostring(self.ielements[aid], pretty_print=True))
-                    raise Exception('[capamodule.capa.responsetypes.imageinput] ' + msg)
-                (llx, lly, urx, ury) = [int(x) for x in m.groups()]
+            rectangles, regions = expectedset
+            if rectangles[aid]:  # rectangles part - for backward compatibility
+                # Check whether given point lies in any of the solution rectangles
+                solution_rectangles = rectangles[aid].split(';')
+                for solution_rectangle in solution_rectangles:
+                    # parse expected answer
+                    # TODO: Compile regexp on file load
+                    m = re.match('[\(\[]([0-9]+),([0-9]+)[\)\]]-[\(\[]([0-9]+),([0-9]+)[\)\]]',
+                                 solution_rectangle.strip().replace(' ', ''))
+                    if not m:
+                        msg = 'Error in problem specification! cannot parse rectangle in %s' % (
+                            etree.tostring(self.ielements[aid], pretty_print=True))
+                        raise Exception('[capamodule.capa.responsetypes.imageinput] ' + msg)
+                    (llx, lly, urx, ury) = [int(x) for x in m.groups()]
 
-                # answer is correct if (x,y) is within the specified rectangle
-                if (llx <= gx <= urx) and (lly <= gy <= ury):
-                    correct_map.set(aid, 'correct')
-                    break
-
+                    # answer is correct if (x,y) is within the specified rectangle
+                    if (llx <= gx <= urx) and (lly <= gy <= ury):
+                        correct_map.set(aid, 'correct')
+                        break
+            if correct_map[aid]['correctness'] != 'correct' and regions[aid]:
+                parsed_region = json.loads(regions[aid])
+                if parsed_region:
+                    if type(parsed_region[0][0]) != list:
+                        # we have [[1,2],[3,4],[5,6]] - single region
+                        # instead of [[[1,2],[3,4],[5,6], [[1,2],[3,4],[5,6]]]
+                        # or [[[1,2],[3,4],[5,6]]] - multiple regions syntax
+                        parsed_region = [parsed_region]
+                    for region in parsed_region:
+                        polygon = MultiPoint(region).convex_hull
+                        if (polygon.type == 'Polygon' and
+                                polygon.contains(Point(gx, gy))):
+                            correct_map.set(aid, 'correct')
+                            break
         return correct_map
 
     def get_answers(self):
-        return dict([(ie.get('id'), ie.get('rectangle')) for ie in self.ielements])
-
+        return (dict([(ie.get('id'), ie.get('rectangle')) for ie in self.ielements]),
+                dict([(ie.get('id'), ie.get('regions')) for ie in self.ielements]))
 #-----------------------------------------------------------------------------
 # TEMPORARY: List of all response subclasses
 # FIXME: To be replaced by auto-registration

@@ -152,7 +152,7 @@ class ImportSystem(XMLParsingSystem, MakoDescriptorSystem):
                 make_name_unique(xml_data)
 
                 descriptor = XModuleDescriptor.load_from_xml(
-                    etree.tostring(xml_data), self, self.org,
+                    etree.tostring(xml_data, encoding='unicode'), self, self.org,
                     self.course, xmlstore.default_class)
             except Exception as err:
                 print err, self.load_error_modules
@@ -275,14 +275,16 @@ class XMLModuleStore(ModuleStoreBase):
             class_ = getattr(import_module(module_path), class_name)
             self.default_class = class_
 
-        self.parent_tracker = ParentTracker()
+        self.parent_trackers = defaultdict(ParentTracker)
 
         # If we are specifically asked for missing courses, that should
         # be an error.  If we are asked for "all" courses, find the ones
-        # that have a course.xml
+        # that have a course.xml. We sort the dirs in alpha order so we always
+        # read things in the same order (OS differences in load order have
+        # bitten us in the past.)
         if course_dirs is None:
-            course_dirs = [d for d in os.listdir(self.data_dir) if
-                           os.path.exists(self.data_dir / d / "course.xml")]
+            course_dirs = sorted([d for d in os.listdir(self.data_dir) if
+                                  os.path.exists(self.data_dir / d / "course.xml")])
 
         for course_dir in course_dirs:
             self.try_load_course(course_dir)
@@ -307,7 +309,7 @@ class XMLModuleStore(ModuleStoreBase):
         if course_descriptor is not None:
             self.courses[course_dir] = course_descriptor
             self._location_errors[course_descriptor.location] = errorlog
-            self.parent_tracker.make_known(course_descriptor.location)
+            self.parent_trackers[course_descriptor.id].make_known(course_descriptor.location)
         else:
             # Didn't load course.  Instead, save the errors elsewhere.
             self.errored_courses[course_dir] = errorlog
@@ -432,11 +434,11 @@ class XMLModuleStore(ModuleStoreBase):
                 course_dir,
                 policy,
                 tracker,
-                self.parent_tracker,
+                self.parent_trackers[course_id],
                 self.load_error_modules,
             )
 
-            course_descriptor = system.process_xml(etree.tostring(course_data))
+            course_descriptor = system.process_xml(etree.tostring(course_data, encoding='unicode'))
 
             # NOTE: The descriptors end up loading somewhat bottom up, which
             # breaks metadata inheritance via get_children().  Instead
@@ -541,9 +543,9 @@ class XMLModuleStore(ModuleStoreBase):
         """
         raise NotImplementedError("XMLModuleStores are read-only")
 
-    def get_parent_locations(self, location):
-        '''Find all locations that are the parents of this location.  Needed
-        for path_to_location().
+    def get_parent_locations(self, location, course_id):
+        '''Find all locations that are the parents of this location in this 
+        course.  Needed for path_to_location().
 
         If there is no data at location in this modulestore, raise
             ItemNotFoundError.
@@ -552,7 +554,7 @@ class XMLModuleStore(ModuleStoreBase):
         be empty if there are no parents.
         '''
         location = Location.ensure_fully_specified(location)
-        if not self.parent_tracker.is_known(location):
-            raise ItemNotFoundError(location)
+        if not self.parent_trackers[course_id].is_known(location):
+            raise ItemNotFoundError("{0} not in {1}".format(location, course_id))
 
-        return self.parent_tracker.parents(location)
+        return self.parent_trackers[course_id].parents(location)

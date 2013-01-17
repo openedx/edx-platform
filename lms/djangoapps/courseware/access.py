@@ -4,14 +4,16 @@ like DISABLE_START_DATES"""
 
 import logging
 import time
+from datetime import datetime, timedelta
 
 from django.conf import settings
 
 from xmodule.course_module import CourseDescriptor
 from xmodule.error_module import ErrorDescriptor
 from xmodule.modulestore import Location
-from xmodule.timeparse import parse_time
 from xmodule.x_module import XModule, XModuleDescriptor
+
+from student.models import CourseEnrollmentAllowed
 
 DEBUG_ACCESS = False
 
@@ -34,7 +36,8 @@ def has_access(user, obj, action):
 
     user: a Django user object. May be anonymous.
 
-    obj: The object to check access for.  For now, a module or descriptor.
+    obj: The object to check access for.  A module, descriptor, location, or
+                    certain special strings (e.g. 'global')
 
     action: A string specifying the action that the client is trying to perform.
 
@@ -70,7 +73,7 @@ def has_access(user, obj, action):
     raise TypeError("Unknown object type in has_access(): '{0}'"
                     .format(type(obj)))
 
-def get_access_group_name(obj,action):
+def get_access_group_name(obj, action):
     '''
     Returns group name for user group which has "action" access to the given object.
 
@@ -123,6 +126,11 @@ def _has_access_course_desc(user, course, action):
             debug("Allow: in enrollment period")
             return True
 
+        # if user is in CourseEnrollmentAllowed with right course_id then can also enroll
+        if user is not None and CourseEnrollmentAllowed:
+            if CourseEnrollmentAllowed.objects.filter(email=user.email, course_id=course.id):
+                return True
+
         # otherwise, need staff access
         return _has_staff_access_to_descriptor(user, course)
 
@@ -158,13 +166,19 @@ def _has_access_course_desc(user, course, action):
 
     return _dispatch(checkers, action, user, course)
 
+
 def _get_access_group_name_course_desc(course, action):
     '''
-    Return name of group which gives staff access to course.  Only understands action = 'staff'
+    Return name of group which gives staff access to course.  Only understands action = 'staff' and 'instructor'
     '''
-    if not action=='staff':
-        return []
-    return _course_staff_group_name(course.location)
+    if action=='staff':
+        return _course_staff_group_name(course.location)
+    elif action=='instructor':
+        return _course_instructor_group_name(course.location)
+
+    return []
+
+
 
 def _has_access_error_desc(user, descriptor, action):
     """
@@ -212,9 +226,10 @@ def _has_access_descriptor(user, descriptor, action):
         # Check start date
         if descriptor.start is not None:
             now = time.gmtime()
-            if now > descriptor.start:
+            effective_start = _adjust_start_date_for_beta_testers(user, descriptor)
+            if now > effective_start:
                 # after start date, everyone can see it
-                debug("Allow: now > start date")
+                debug("Allow: now > effective start date")
                 return True
             # otherwise, need staff access
             return _has_staff_access_to_descriptor(user, descriptor)
@@ -314,6 +329,15 @@ def _course_staff_group_name(location):
     """
     return 'staff_%s' % Location(location).course
 
+def course_beta_test_group_name(location):
+    """
+    Get the name of the beta tester group for a location.  Right now, that's
+    beta_testers_COURSE.
+
+    location: something that can passed to Location.
+    """
+    return 'beta_testers_{0}'.format(Location(location).course)
+
 
 def _course_instructor_group_name(location):
     """
@@ -333,6 +357,51 @@ def _has_global_staff_access(user):
         debug("Deny: not user.is_staff")
         return False
 
+
+def _adjust_start_date_for_beta_testers(user, descriptor):
+    """
+    If user is in a beta test group, adjust the start date by the appropriate number of
+    days.
+
+    Arguments:
+       user: A django user.  May be anonymous.
+       descriptor: the XModuleDescriptor the user is trying to get access to, with a
+       non-None start date.
+
+    Returns:
+        A time, in the same format as returned by time.gmtime().  Either the same as
+        start, or earlier for beta testers.
+
+    NOTE: number of days to adjust should be cached to avoid looking it up thousands of
+    times per query.
+
+    NOTE: For now, this function assumes that the descriptor's location is in the course
+    the user is looking at.  Once we have proper usages and definitions per the XBlock
+    design, this should use the course the usage is in.
+
+    NOTE: If testing manually, make sure MITX_FEATURES['DISABLE_START_DATES'] = False
+    in envs/dev.py!
+    """
+    if descriptor.days_early_for_beta is None:
+        # bail early if no beta testing is set up
+        return descriptor.start
+
+    user_groups = [g.name for g in user.groups.all()]
+
+    beta_group = course_beta_test_group_name(descriptor.location)
+    if beta_group in user_groups:
+        debug("Adjust start time: user in group %s", beta_group)
+        # time_structs don't support subtraction, so convert to datetimes,
+        # subtract, convert back.
+        # (fun fact: datetime(*a_time_struct[:6]) is the beautiful syntax for
+        # converting time_structs into datetimes)
+        start_as_datetime = datetime(*descriptor.start[:6])
+        delta = timedelta(descriptor.days_early_for_beta)
+        effective = start_as_datetime - delta
+        # ...and back to time_struct
+        return effective.timetuple()
+
+    return descriptor.start
 
 def _has_instructor_access_to_location(user, location):
     return _has_access_to_location(user, location, 'instructor')

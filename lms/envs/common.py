@@ -76,6 +76,8 @@ MITX_FEATURES = {
 
     'DISABLE_LOGIN_BUTTON': False,  # used in systems where login is automatic, eg MIT SSL
 
+    'STUB_VIDEO_FOR_TESTING': False, # do not display video when running automated acceptance tests
+
     # extrernal access methods
     'ACCESS_REQUIRE_STAFF_FOR_COURSE': False,
     'AUTH_USE_OPENID': False,
@@ -189,6 +191,9 @@ TRACK_MAX_EVENT = 10000
 DEBUG_TRACK_LOG = False
 
 MITX_ROOT_URL = ''
+
+LOGIN_REDIRECT_URL = MITX_ROOT_URL + '/accounts/login'
+LOGIN_URL = MITX_ROOT_URL + '/accounts/login'
 
 COURSE_NAME = "6.002_Spring_2012"
 COURSE_NUMBER = "6.002x"
@@ -325,6 +330,37 @@ WIKI_USE_BOOTSTRAP_SELECT_WIDGET = False
 WIKI_LINK_LIVE_LOOKUPS = False
 WIKI_LINK_DEFAULT_LEVEL = 2
 
+################################# Staff grading config  #####################
+
+#By setting up the default settings with an incorrect user name and password,
+# will get an error when attempting to connect
+STAFF_GRADING_INTERFACE = {
+    'url': 'http://sandbox-grader-001.m.edx.org/staff_grading',
+    'username': 'incorrect_user',
+    'password': 'incorrect_pass',
+    }
+
+# Used for testing, debugging
+MOCK_STAFF_GRADING = False
+
+################################# Pearson TestCenter config  ################
+
+PEARSONVUE_SIGNINPAGE_URL = "https://www1.pearsonvue.com/testtaker/signin/SignInPage/EDX"
+# TESTCENTER_ACCOMMODATION_REQUEST_EMAIL = "exam-help@edx.org"
+
+################################# Peer grading config  #####################
+
+#By setting up the default settings with an incorrect user name and password,
+# will get an error when attempting to connect
+PEER_GRADING_INTERFACE = {
+    'url': 'http://sandbox-grader-001.m.edx.org/peer_grading',
+    'username': 'incorrect_user',
+    'password': 'incorrect_pass',
+    }
+
+# Used for testing, debugging
+MOCK_PEER_GRADING = False
+
 ################################# Jasmine ###################################
 JASMINE_TEST_DIRECTORY = PROJECT_ROOT + '/static/coffee'
 
@@ -400,6 +436,9 @@ courseware_only_js += [
 ]
 
 main_vendor_js = [
+  'js/vendor/RequireJS.js',
+  'js/vendor/json2.js',
+  'js/vendor/RequireJS.js',
   'js/vendor/jquery.min.js',
   'js/vendor/jquery-ui.min.js',
   'js/vendor/jquery.cookie.js',
@@ -408,6 +447,10 @@ main_vendor_js = [
 ]
 
 discussion_js = sorted(glob2.glob(PROJECT_ROOT / 'static/coffee/src/discussion/**/*.coffee'))
+
+staff_grading_js = sorted(glob2.glob(PROJECT_ROOT / 'static/coffee/src/staff_grading/**/*.coffee'))
+peer_grading_js = sorted(glob2.glob(PROJECT_ROOT / 'static/coffee/src/peer_grading/**/*.coffee'))
+
 
 # Load javascript from all of the available xmodules, and
 # prep it for use in pipeline js
@@ -471,7 +514,8 @@ with open(module_styles_path, 'w') as module_styles:
 
 PIPELINE_JS = {
     'application': {
-        # Application will contain all paths not in courseware_only_js
+        # Application will contain all paths not in courseware_only_js or
+        # discussion_js or staff_grading_js
         'source_filenames': [
             pth.replace(COMMON_ROOT / 'static/', '')
             for pth
@@ -479,7 +523,10 @@ PIPELINE_JS = {
         ] + [
             pth.replace(PROJECT_ROOT / 'static/', '')
             for pth in sorted(glob2.glob(PROJECT_ROOT / 'static/coffee/src/**/*.coffee'))\
-            if pth not in courseware_only_js and pth not in discussion_js
+            if (pth not in courseware_only_js and
+                pth not in discussion_js and
+                pth not in peer_grading_js and
+                pth not in staff_grading_js)
         ] + [
             'js/form.ext.js',
             'js/my_courses_dropdown.js',
@@ -508,6 +555,14 @@ PIPELINE_JS = {
     'discussion' : {
         'source_filenames': [pth.replace(PROJECT_ROOT / 'static/', '')  for pth in discussion_js],
         'output_filename': 'js/discussion.js'
+    },
+    'staff_grading' : {
+        'source_filenames': [pth.replace(PROJECT_ROOT / 'static/', '')  for pth in staff_grading_js],
+        'output_filename': 'js/staff_grading.js'
+    },
+    'peer_grading' : {
+        'source_filenames': [pth.replace(PROJECT_ROOT / 'static/', '')  for pth in peer_grading_js],
+        'output_filename': 'js/peer_grading.js'
     }
 }
 
@@ -581,6 +636,7 @@ INSTALLED_APPS = (
     'util',
     'certificates',
     'instructor',
+    'open_ended_grading',
     'psychometrics',
     'licenses',
 

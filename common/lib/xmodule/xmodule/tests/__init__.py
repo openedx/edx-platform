@@ -4,7 +4,7 @@ unittests for xmodule
 Run like this:
 
     rake test_common/lib/xmodule
-    
+
 """
 
 import unittest
@@ -19,11 +19,12 @@ import xmodule
 from xmodule.x_module import ModuleSystem
 from mock import Mock
 
-i4xs = ModuleSystem(
+test_system = ModuleSystem(
     ajax_url='courses/course_id/modx/a_location',
     track_function=Mock(),
     get_module=Mock(),
-    render_template=Mock(),
+    # "render" to just the context...
+    render_template=lambda template, context: str(context),
     replace_urls=Mock(),
     user=Mock(),
     filestore=Mock(),

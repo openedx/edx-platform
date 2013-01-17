@@ -1,0 +1,163 @@
+div.staff-grading,
+div.peer-grading{
+    textarea.feedback-area {
+        height: 75px;
+        margin: 20px;
+    }
+
+    div {
+        margin: 10px;
+    }
+
+    label {
+        margin: 10px;
+        padding: 5px;
+        display: inline-block;
+        min-width: 50px;
+        background-color: #CCC;
+        text-size: 1.5em;
+    }
+    
+    /* Toggled State */
+    input[type=radio]:checked + label {
+        background: #666;
+        color: white;
+    }
+
+    input[name='score-selection'] {
+        display: none;
+    }
+
+    ul
+    {
+        li
+        {
+            margin: 16px 0px;
+        }
+    }
+
+    .prompt-information-container,
+    .rubric-wrapper,
+    .calibration-feedback-wrapper,
+    .grading-container
+    {
+        border: 1px solid gray;
+        padding: 15px;
+    }
+    .error-container
+    {
+        background-color: #FFCCCC;
+        padding: 15px;
+        margin-left: 0px;
+    }
+    .submission-wrapper
+    {
+        h3
+        {
+            margin-bottom: 15px;
+        }
+        p
+        {
+            margin-left:10px;
+        }
+        padding: 15px;
+    }
+    .meta-info-wrapper
+    {
+        background-color: #eee;
+        padding:15px;
+        h3
+        {
+            font-size:1em;
+        }
+        ul
+        {
+            list-style-type: none;
+            font-size: .85em;
+            li
+            {
+                margin: 5px 0px;
+            }
+        }
+    }
+    .message-container,
+    .grading-message
+    {
+        background-color: $yellow;
+        padding: 10px;
+        margin-left:0px;
+    }
+    
+    .breadcrumbs
+    {
+        margin-top:20px;
+        margin-left:0px;
+        margin-bottom:5px;
+        font-size: .8em;
+    }
+
+    .instructions-panel
+    {
+
+        margin-right:20px;
+        > div
+        {
+            padding: 10px;
+            margin: 0px;
+            background: #eee;
+            height: 10em;
+            h3
+            {
+                text-align:center;
+                text-transform:uppercase;
+                color: #777;
+            }
+            p
+            {
+                color: #777;
+            }
+        }
+        .calibration-panel
+        {
+            float:left;
+            width:48%;
+        }
+        .grading-panel
+        {
+            float:right;
+            width: 48%;
+        }
+        .current-state
+        {
+            background: #1D9DD9;
+            h3, p
+            {
+                color: white;
+            }
+        }
+        @include clearfix;
+    }
+
+
+    .collapsible
+    {
+        margin-left: 0px;
+        header
+        {
+            margin-top:20px;
+            margin-bottom:20px;
+            font-size: 1.2em;
+        }
+    }
+    
+    .interstitial-page
+    {
+        text-align: center;
+        input[type=button]
+        {
+            margin-top: 20px;
+        }
+    }
+    padding: 40px;
+}
+

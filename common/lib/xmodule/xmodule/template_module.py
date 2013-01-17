@@ -58,7 +58,7 @@ class CustomTagDescriptor(RawDescriptor):
         params = dict(xmltree.items())
         with system.resources_fs.open('custom_tags/{name}'
                                    .format(name=template_name)) as template:
-            return Template(template.read()).render(**params)
+            return Template(template.read().decode('utf-8')).render(**params)
 
 
     def __init__(self, system, definition, **kwargs):

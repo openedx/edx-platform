@@ -1,9 +1,9 @@
-from fs.errors import ResourceNotFoundError
 import logging
 from lxml import etree
-from path import path # NOTE (THK): Only used for detecting presence of syllabus
+from path import path  # NOTE (THK): Only used for detecting presence of syllabus
 import requests
 import time
+from datetime import datetime
 
 from xmodule.util.decorators import lazyproperty
 from xmodule.graders import load_grading_policy
@@ -12,6 +12,7 @@ from xmodule.seq_module import SequenceDescriptor, SequenceModule
 from xmodule.timeparse import parse_time, stringify_time
 
 log = logging.getLogger(__name__)
+
 
 class CourseDescriptor(SequenceDescriptor):
     module_class = SequenceModule
@@ -96,11 +97,27 @@ class CourseDescriptor(SequenceDescriptor):
         #   disable the syllabus content for courses that do not provide a syllabus
         self.syllabus_present = self.system.resources_fs.exists(path('syllabus'))
 
+        self.test_center_exams = []
+        test_center_info = self.metadata.get('testcenter_info')
+        if test_center_info is not None:
+            for exam_name in test_center_info:
+                try:
+                    exam_info = test_center_info[exam_name]
+                    self.test_center_exams.append(self.TestCenterExam(self.id, exam_name, exam_info))
+                except Exception as err:
+                    # If we can't parse the test center exam info, don't break
+                    # the rest of the courseware.
+                    msg = 'Error %s: Unable to load test-center exam info for exam "%s" of course "%s"' % (err, exam_name, self.id)
+                    log.error(msg)
+                    continue
+
+
     def set_grading_policy(self, policy_str):
         """Parse the policy specified in policy_str, and save it"""
         try:
             self._grading_policy = load_grading_policy(policy_str)
-        except:
+        except Exception, err:
+            log.exception('Failed to load grading policy:')
             self.system.error_tracker("Failed to load grading policy")
             # Setting this to an empty dictionary will lead to errors when
             # grading needs to happen, but should allow course staff to see
@@ -150,6 +167,10 @@ class CourseDescriptor(SequenceDescriptor):
         return self._grading_policy['GRADE_CUTOFFS']
 
     @property
+    def lowest_passing_grade(self):
+        return min(self._grading_policy['GRADE_CUTOFFS'].values())
+
+    @property
     def tabs(self):
         """
         Return the tabs config, as a python object, or None if not specified.
@@ -159,6 +180,38 @@ class CourseDescriptor(SequenceDescriptor):
     @property
     def show_calculator(self):
         return self.metadata.get("show_calculator", None) == "Yes"
+
+    @property
+    def is_new(self):
+        # The course is "new" if either if the metadata flag is_new is
+        # true or if the course has not started yet
+        flag = self.metadata.get('is_new', None)
+        if flag is None:
+            return self.days_until_start > 1
+        elif isinstance(flag, basestring):
+            return flag.lower() in ['true', 'yes', 'y']
+        else:
+            return bool(flag)
+
+    @property
+    def days_until_start(self):
+        def convert_to_datetime(timestamp):
+            return datetime.fromtimestamp(time.mktime(timestamp))
+
+        start_date = convert_to_datetime(self.start)
+
+        #  Try to use course advertised date if we can parse it
+        advertised_start = self.metadata.get('advertised_start', None)
+        if advertised_start:
+            try:
+                start_date = datetime.strptime(advertised_start,
+                                               "%Y-%m-%dT%H:%M")
+            except ValueError:
+                pass  # Invalid date, keep using 'start''
+
+        now = convert_to_datetime(time.gmtime())
+        days_until_start = (start_date - now).days
+        return days_until_start
 
     @lazyproperty
     def grading_context(self):
@@ -239,7 +292,6 @@ class CourseDescriptor(SequenceDescriptor):
             raise ValueError("{0} is not a course location".format(loc))
         return "/".join([loc.org, loc.course, loc.name])
 
-
     @property
     def id(self):
         """Return the course_id for this course"""
@@ -247,7 +299,20 @@ class CourseDescriptor(SequenceDescriptor):
 
     @property
     def start_date_text(self):
-        displayed_start = self._try_parse_time('advertised_start') or self.start
+        parsed_advertised_start = self._try_parse_time('advertised_start')
+
+        # If the advertised start isn't a real date string, we assume it's free
+        # form text...
+        if parsed_advertised_start is None and \
+           ('advertised_start' in self.metadata):
+            return self.metadata['advertised_start']
+
+        displayed_start = parsed_advertised_start or self.start
+
+        # If we have neither an advertised start or a real start, just return TBD
+        if not displayed_start:
+            return "TBD"
+
         return time.strftime("%b %d, %Y", displayed_start)
 
     @property
@@ -292,7 +357,7 @@ class CourseDescriptor(SequenceDescriptor):
                     return False
         except:
             log.exception("Error parsing discussion_blackouts for course {0}".format(self.id))
-        
+
         return True
 
     @property
@@ -312,6 +377,88 @@ class CourseDescriptor(SequenceDescriptor):
         """
         return self.metadata.get('end_of_course_survey_url')
 
+    class TestCenterExam(object):
+        def __init__(self, course_id, exam_name, exam_info):
+            self.course_id = course_id
+            self.exam_name = exam_name
+            self.exam_info = exam_info
+            self.exam_series_code = exam_info.get('Exam_Series_Code') or exam_name
+            self.display_name = exam_info.get('Exam_Display_Name') or self.exam_series_code
+            self.first_eligible_appointment_date = self._try_parse_time('First_Eligible_Appointment_Date')
+            if self.first_eligible_appointment_date is None:
+                raise ValueError("First appointment date must be specified")
+            # TODO: If defaulting the last appointment date, it should be the 
+            # *end* of the same day, not the same time.  It's going to be used as the
+            # end of the exam overall, so we don't want the exam to disappear too soon.  
+            # It's also used optionally as the registration end date, so time matters there too.
+            self.last_eligible_appointment_date = self._try_parse_time('Last_Eligible_Appointment_Date') # or self.first_eligible_appointment_date
+            if self.last_eligible_appointment_date is None:
+                raise ValueError("Last appointment date must be specified")
+            self.registration_start_date = self._try_parse_time('Registration_Start_Date') or time.gmtime(0)
+            self.registration_end_date = self._try_parse_time('Registration_End_Date') or self.last_eligible_appointment_date
+            # do validation within the exam info:
+            if self.registration_start_date > self.registration_end_date:
+                raise ValueError("Registration start date must be before registration end date")
+            if self.first_eligible_appointment_date > self.last_eligible_appointment_date:
+                raise ValueError("First appointment date must be before last appointment date")
+            if self.registration_end_date > self.last_eligible_appointment_date:
+                raise ValueError("Registration end date must be before last appointment date")
+            
+
+        def _try_parse_time(self, key):
+            """
+            Parse an optional metadata key containing a time: if present, complain
+            if it doesn't parse.
+            Return None if not present or invalid.
+            """
+            if key in self.exam_info:
+                try:
+                    return parse_time(self.exam_info[key])
+                except ValueError as e:
+                    msg = "Exam {0} in course {1} loaded with a bad exam_info key '{2}': '{3}'".format(self.exam_name, self.course_id, self.exam_info[key], e)
+                    log.warning(msg)
+                return None
+
+        def has_started(self):
+            return time.gmtime() > self.first_eligible_appointment_date
+
+        def has_ended(self):
+            return time.gmtime() > self.last_eligible_appointment_date
+
+        def has_started_registration(self):
+            return time.gmtime() > self.registration_start_date
+
+        def has_ended_registration(self):
+            return time.gmtime() > self.registration_end_date
+
+        def is_registering(self):
+            now = time.gmtime()
+            return now >= self.registration_start_date and now <= self.registration_end_date
+            
+        @property
+        def first_eligible_appointment_date_text(self):
+            return time.strftime("%b %d, %Y", self.first_eligible_appointment_date)
+
+        @property
+        def last_eligible_appointment_date_text(self):
+            return time.strftime("%b %d, %Y", self.last_eligible_appointment_date)
+
+        @property
+        def registration_end_date_text(self):
+            return time.strftime("%b %d, %Y", self.registration_end_date)
+
+    @property
+    def current_test_center_exam(self):
+        exams = [exam for exam in self.test_center_exams if exam.has_started_registration() and not exam.has_ended()]
+        if len(exams) > 1:
+            # TODO: output some kind of warning.  This should already be 
+            # caught if we decide to do validation at load time.
+            return exams[0]
+        elif len(exams) == 1:
+            return exams[0]
+        else:
+            return None
+
     @property
     def title(self):
         return self.display_name
@@ -323,4 +470,3 @@ class CourseDescriptor(SequenceDescriptor):
     @property
     def org(self):
         return self.location.org
-

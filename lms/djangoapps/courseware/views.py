@@ -17,7 +17,7 @@ from django.views.decorators.cache import cache_control
 
 from courseware import grades
 from courseware.access import has_access
-from courseware.courses import (get_course_with_access, get_courses_by_university)
+from courseware.courses import (get_courses, get_course_with_access, get_courses_by_university)
 import courseware.tabs as tabs
 from courseware.models import StudentModuleCache
 from module_render import toc_for_course, get_module, get_instance_module
@@ -61,16 +61,19 @@ def user_groups(user):
     return group_names
 
 
-
 @ensure_csrf_cookie
 @cache_if_anonymous
 def courses(request):
     '''
     Render "find courses" page.  The course selection work is done in courseware.courses.
     '''
-    universities = get_courses_by_university(request.user,
-                                             domain=request.META.get('HTTP_HOST'))
-    return render_to_response("courseware/courses.html", {'universities': universities})
+    courses = get_courses(request.user, domain=request.META.get('HTTP_HOST'))
+
+    # Sort courses by how far are they from they start day
+    key = lambda course: course.days_until_start
+    courses = sorted(courses, key=key, reverse=True)
+
+    return render_to_response("courseware/courses.html", {'courses': courses})
 
 
 def render_accordion(request, course, chapter, section):
@@ -293,7 +296,6 @@ def index(request, course_id, chapter=None, section=None,
 
     return result
 
-
 @ensure_csrf_cookie
 def jump_to(request, course_id, location):
     '''
@@ -318,12 +320,18 @@ def jump_to(request, course_id, location):
     except NoPathToItem:
         raise Http404("This location is not in any class: {0}".format(location))
 
+    # choose the appropriate view (and provide the necessary args) based on the
+    # args provided by the redirect.
     # Rely on index to do all error handling and access control.
-    return redirect('courseware_position',
-                    course_id=course_id,
-                    chapter=chapter,
-                    section=section,
-                    position=position)
+    if chapter is None:
+        return redirect('courseware', course_id=course_id)
+    elif section is None:
+        return redirect('courseware_chapter', course_id=course_id, chapter=chapter)
+    elif position is None:
+        return redirect('courseware_section', course_id=course_id, chapter=chapter, section=section)
+    else:
+        return redirect('courseware_position', course_id=course_id, chapter=chapter, section=section, position=position)
+
 @ensure_csrf_cookie
 def course_info(request, course_id):
     """
@@ -430,6 +438,11 @@ def university_profile(request, org_id):
     # Only grab courses for this org...
     courses = get_courses_by_university(request.user,
                                         domain=request.META.get('HTTP_HOST'))[org_id]
+
+    # Sort courses by how far are they from they start day
+    key = lambda course: course.days_until_start
+    courses = sorted(courses, key=key, reverse=True)
+
     context = dict(courses=courses, org_id=org_id)
     template_file = "university_profile/{0}.html".format(org_id).lower()
 

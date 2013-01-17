@@ -1,0 +1,5 @@
+<course>
+  <chapter url_name="Overview">
+    <graphical_slider_tool url_name="sample_gst"/>
+  </chapter>
+</course>

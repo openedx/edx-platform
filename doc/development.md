@@ -19,6 +19,11 @@ Use the MacPorts package `mongodb` or the Homebrew formula `mongodb`
 
 ## Initializing Mongodb
 
+First start up the mongo daemon. E.g. to start it up in the background
+using a config file:
+
+    mongod --config /usr/local/etc/mongod.conf &
+
 Check out the course data directories that you want to work with into the
 `GITHUB_REPO_ROOT` (by default, `../data`). Then run the following command:
 
@@ -37,8 +42,12 @@ This runs all the tests (long, uses collectstatic):
 
 If if you aren't changing static files, can run `rake test` once, then run
 
-    rake fasttest_{lms,cms}
+    rake fasttest_lms
 
+or
+
+    rake fasttest_cms
+    
 xmodule can be tested independently, with this:
 
     rake test_common/lib/xmodule
@@ -66,6 +75,15 @@ To run a single nose test:
 
 
 Very handy: if you uncomment the `--pdb` argument in `NOSE_ARGS` in `lms/envs/test.py`, it will drop you into pdb on error.  This lets you go up and down the stack and see what the values of the variables are.  Check out http://docs.python.org/library/pdb.html
+
+## Testing using queue servers
+
+When testing problems that use a queue server on AWS (e.g. sandbox-xqueue.edx.org), you'll need to run your server on your public IP, like so.
+
+`django-admin.py runserver --settings=lms.envs.dev --pythonpath=. 0.0.0.0:8000`
+
+When you connect to the LMS, you need to use the public ip.  Use `ifconfig` to figure out the numnber, and connect e.g. to `http://18.3.4.5:8000/`
+
 
 ## Content development
 

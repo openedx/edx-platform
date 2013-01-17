@@ -267,13 +267,12 @@
     }
 
     .my-course {
-      @include border-radius(3px);
-      @include box-shadow(0 1px 8px 0 rgba(0,0,0, 0.1), inset 0 -1px 0 0 rgba(255,255,255, 0.8), inset 0 1px 0 0 rgba(255,255,255, 0.8));
+      clear: both;
       @include clearfix;
-      height: 120px;
       margin-right: flex-gutter();
-      margin-bottom: 10px;
-      overflow: hidden;
+      margin-bottom: 50px;
+      padding-bottom: 50px;
+      border-bottom: 1px solid $light-gray;
       position: relative;
       width: flex-grid(12);
       z-index: 20;
@@ -283,13 +282,7 @@
         margin-bottom: none;
       }
 
-      .cover {
-        background: rgb(225,225,225);
-        background-size: cover;
-        background-position: center center;
-        border: 1px solid rgb(120,120,120);
-        @include border-left-radius(3px);
-        @include box-shadow(inset 0 0 0 1px rgba(255,255,255, 0.6), 1px 0 0 0 rgba(255,255,255, 0.8));
+      .cover {        
         @include box-sizing(border-box);
         float: left;
         height: 100%;
@@ -299,100 +292,51 @@
         position: relative;
         @include transition(all, 0.15s, linear);
         width: 200px;
+        height: 120px;
 
-        .shade {
-          @include background-image(linear-gradient(-90deg, rgba(255,255,255, 0.3) 0%,
-                                                            rgba(0,0,0, 0.3) 100%));
-          bottom: 0px;
-          content: "";
-          display: block;
-          left: 0px;
-          position: absolute;
-          z-index: 50;
-          top: 0px;
-          @include transition(all, 0.15s, linear);
-          right: 0px;
-        }
-
-        .arrow {
-          position: absolute;
-          z-index: 100;
+        img {
           width: 100%;
-          font-size: 70px;
-          line-height: 110px;
-          text-align: center;
-          text-decoration: none;
-          color: rgba(0, 0, 0, .7);
-          opacity: 0;
-          @include transition(all, 0.15s, linear);
-        }
-
-        &:hover {
-          .shade {
-            background: rgba(255,255,255, 0.3);
-            @include background-image(linear-gradient(-90deg, rgba(255,255,255, 0.3) 0%,
-                                                              rgba(0,0,0, 0.3) 100%));
-          }
         }
       }
 
       .info {
-        background: rgb(250,250,250);
-        @include background-image(linear-gradient(-90deg, rgb(253,253,253), rgb(240,240,240)));
-        @include box-sizing(border-box);
-        border: 1px solid rgb(190,190,190);
-        border-left: none;
-        @include border-right-radius(3px);
-        left: 201px;
-        height: 100%;
-        max-height: 100%;
-        padding: 0px 10px;
-        position: absolute;
-        right: 0px;
-        top: 0px;
-        z-index: 2;
+        @include clearfix;
+        padding: 0 10px 0 230px;
 
         > hgroup {
-          @include clearfix;
-          border-bottom: 1px solid rgb(210,210,210);
-          @include box-shadow(0 1px 0 0 rgba(255,255,255, 0.6));
-          padding: 12px 0px;
+          padding: 0;
           width: 100%;
 
           .university {
-            background: rgba(255,255,255, 1);
-            border: 1px solid rgb(180,180,180);
-            @include border-radius(3px);
-            @include box-shadow(inset 0 0 3px 0 rgba(0,0,0, 0.2), 0 1px 0 0 rgba(255,255,255, 0.6));
             color: $lighter-base-font-color;
-            display: block;
-            font-style: italic;
             font-family: $sans-serif;
             font-size: 16px;
-            font-weight: 800;
-            @include inline-block;
-            margin-right: 10px;
-            margin-bottom: 0;
-            padding: 5px 10px;
-            float: left;
+            font-weight: 400;
+            margin: 0 0 6px;
+            text-transform: none;
+            letter-spacing: 0;
           }
 
-          h3 {
+          .date-block {
+            position: absolute;
+            top: 0;
+            right: 0;
+            font-family: $sans-serif;
+            font-size: 13px;
+            font-style: italic;
+            color: $lighter-base-font-color;
+          }
+
+          h3 a {
             display: block;
-            margin-bottom: 0px;
-            overflow: hidden;
-            padding-top: 2px;
-            text-overflow: ellipsis;
-            white-space: nowrap;
+            margin-bottom: 10px;
+            font-family: $sans-serif;
+            font-size: 34px;
+            line-height: 42px;
+            font-weight: 300;
 
-            a {
-              color: $base-font-color;
-              font-weight: 700;
-              text-shadow: 0 1px rgba(255,255,255, 0.6);
-
-              &:hover {
-                text-decoration: underline;
-              }
+            &:hover {
+              text-decoration: none;
             }
           }
         }
@@ -430,91 +374,83 @@
         }
 
         .enter-course {
-          @include button(shiny, $blue);
+          @include button(simple, $blue);
           @include box-sizing(border-box);
           @include border-radius(3px);
           display: block;
           float: left;
-          font: normal 1rem/1.6rem $sans-serif;
-          letter-spacing: 1px;
-          padding: 6px 0px;
-          text-transform: uppercase;
+          font: normal 15px/1.6rem $sans-serif;
+          letter-spacing: 0;
+          padding: 6px 32px 7px;
           text-align: center;
           margin-top: 16px;
-          width: flex-grid(4);
-        }
-      }
 
-      > a:hover {
-        .cover {
-          .shade {
-            background: rgba(255,255,255, 0.1);
-            @include background-image(linear-gradient(-90deg, rgba(255,255,255, 0.3) 0%,
-            rgba(0,0,0, 0.3) 100%));
+          &.archived {
+            @include button(simple, #eee);
+            font: normal 15px/1.6rem $sans-serif;
+            padding: 6px 32px 7px;
+
+            &:hover {
+              text-decoration: none;
+            }
           }
 
-          .arrow {
-            opacity: 1;
-          }
-        }
-
-        .info {
-          background: darken(rgb(250,250,250), 5%);
-          @include background-image(linear-gradient(-90deg, darken(rgb(253,253,253), 3%), darken(rgb(240,240,240), 5%)));
-          border-color: darken(rgb(190,190,190), 10%);
-
-          .course-status {
-            background: darken($yellow, 3%);
-            border-color: darken(rgb(200,200,200), 3%);
-            @include box-shadow(0 1px 0 0 rgba(255,255,255, 0.6));
-          }
-
-          .course-status-completed {
-            background: #888;
-            color: #fff;
+          &:hover {
+            text-decoration: none;
           }
         }
       }
     }
 
     .message-status {
+      @include clearfix;
       @include border-radius(3px);
-      @include box-shadow(0 1px 4px 0 rgba(0,0,0, 0.1), inset 0 -1px 0 0 rgba(255,255,255, 0.8), inset 0 1px 0 0 rgba(255,255,255, 0.8));
       display: none;
-      position: relative;
-      top: -15px;
       z-index: 10;
-      margin: 0 0 20px 0;
+      margin: 20px 0 10px;
       padding: 15px 20px;
-      font-family: "Open Sans", Verdana, Geneva, sans-serif;
-      background: #fffcf0;
+      font-family: $sans-serif;
+      background: tint($yellow,70%);
       border: 1px solid #ccc;
 
       .message-copy {
+        font-family: $sans-serif;
+        font-size: 13px;
         margin: 0;
 
+        a {
+          font-family: $sans-serif;
+        }
+
         .grade-value {
-          font-size: 1.4rem;
+          font-size: 1.2rem;
           font-weight: bold;
+        }
+
+        strong {
+          font-weight: 700;
+        
+          a {
+            font-weight: 700;
+          }
         }
       }
 
       .actions {
          @include clearfix;
         list-style: none;
-        margin: 15px 0 0 0;
+        margin: 0;
         padding: 0;
 
         .action {
           float: left;
-          margin:0 15px 10px 0;
+          margin: 0 15px 0 0;
 
           .btn, .cta {
             display: inline-block;
           }
 
           .btn {
-            @include button(shiny, $blue);
             @include box-sizing(border-box);
             @include border-radius(3px);
             float: left;
@@ -524,7 +460,6 @@
             text-align: center;
 
             &.disabled {
-              @include button(shiny, #eee);
               cursor: default !important;
 
               &:hover {
@@ -539,13 +474,58 @@
           }
 
           .cta {
-            @include button(shiny, #666);
             float: left;
             font: normal 0.8rem/1.2rem $sans-serif;
             letter-spacing: 1px;
             padding: 6px 12px;
             text-align: center;
           }
+        }
+      }
+
+      .exam-registration-number {
+        font-family: $sans-serif;
+        font-size: 18px;
+
+        a {
+          font-family: $sans-serif;
+        }
+      }
+
+      &.exam-register {
+
+        .message-copy {
+          margin-top: 5px;
+          width: 55%;
+        }
+      }
+
+      &.exam-schedule {
+        .exam-button {
+          margin-top: 5px;
+        }
+      }
+
+      .exam-button {
+        @include button(simple, $pink);
+        margin-top: 0;
+        float: right;
+      }
+
+      .contact-button {
+        @include button(simple, $pink);
+      }
+
+      .button {
+        display: inline-block;
+        margin-top: 10px;
+        padding: 9px 18px 10px;
+        font-size: 13px;
+        font-weight: bold;
+        letter-spacing: 0;
+
+        &:hover {
+          text-decoration: none;
         }
       }
 
@@ -577,17 +557,16 @@
 
     a.unenroll {
       float: right;
+      display: block;
       font-style: italic;
       color: #a0a0a0;
       text-decoration: underline;
       font-size: .8em;
-      @include inline-block;
-      margin-bottom: 40px;
+      margin-top: 32px;
 
       &:hover {
         color: #333;
       }
     }
-
   }
 }

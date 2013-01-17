@@ -233,17 +233,17 @@ class XModule(HTMLSnippet):
             self._loaded_children = [c for c in children if c is not None]
 
         return self._loaded_children
-    
+
     def get_children_locations(self):
         '''
         Returns the locations of each of child modules.
-        
+
         Overriding this changes the behavior of get_children and
         anything that uses get_children, such as get_display_items.
-        
+
         This method will not instantiate the modules of the children
         unless absolutely necessary, so it is cheaper to call than get_children
-        
+
         These children will be the same children returned by the
         descriptor unless descriptor.has_dynamic_children() is true.
         '''
@@ -288,8 +288,20 @@ class XModule(HTMLSnippet):
         return '{}'
 
     def get_score(self):
-        ''' Score the student received on the problem.
-        '''
+        """
+        Score the student received on the problem, or None if there is no
+        score.
+
+        Returns:
+          dictionary
+             {'score': integer, from 0 to get_max_score(),
+              'total': get_max_score()}
+
+          NOTE (vshnayder): not sure if this was the intended return value, but
+          that's what it's doing now.  I suspect that we really want it to just
+          return a number.  Would need to change (at least) capa and
+          modx_dispatch to match if we did that.
+        """
         return None
 
     def max_score(self):
@@ -319,7 +331,7 @@ class XModule(HTMLSnippet):
             get is a dictionary-like object '''
         return ""
 
-    # cdodge: added to support dynamic substitutions of 
+    # cdodge: added to support dynamic substitutions of
     # links for courseware assets (e.g. images). <link> is passed through from lxml.html parser
     def rewrite_content_links(self, link):
         # see if we start with our format, e.g. 'xasset:<filename>'
@@ -402,13 +414,17 @@ class XModuleDescriptor(Plugin, HTMLSnippet, ResourceTemplates):
         'xqa_key',
         # TODO: This is used by the XMLModuleStore to provide for locations for
         # static files, and will need to be removed when that code is removed
-        'data_dir'
+        'data_dir',
+        # How many days early to show a course element to beta testers (float)
+        # intended to be set per-course, but can be overridden in for specific
+        # elements.  Can be a float.
+        'days_early_for_beta'
     )
 
     # cdodge: this is a list of metadata names which are 'system' metadata
     # and should not be edited by an end-user
     system_metadata_fields = [ 'data_dir' ]
-    
+
     # A list of descriptor attributes that must be equal for the descriptors to
     # be equal
     equality_attributes = ('definition', 'metadata', 'location',
@@ -485,11 +501,25 @@ class XModuleDescriptor(Plugin, HTMLSnippet, ResourceTemplates):
     @property
     def start(self):
         """
-        If self.metadata contains start, return it.  Else return None.
+        If self.metadata contains a valid start time, return it as a time struct.
+        Else return None.
         """
         if 'start' not in self.metadata:
             return None
         return self._try_parse_time('start')
+
+    @property
+    def days_early_for_beta(self):
+        """
+        If self.metadata contains start, return the number, as a float.  Else return None.
+        """
+        if 'days_early_for_beta' not in self.metadata:
+            return None
+        try:
+            return float(self.metadata['days_early_for_beta'])
+        except ValueError:
+            return None
+
 
     @property
     def own_metadata(self):
@@ -562,18 +592,18 @@ class XModuleDescriptor(Plugin, HTMLSnippet, ResourceTemplates):
             self,
             metadata=self.metadata
         )
-    
-    
+
+
     def has_dynamic_children(self):
         """
         Returns True if this descriptor has dynamic children for a given
         student when the module is created.
-        
+
         Returns False if the children of this descriptor are the same
-        children that the module will return for any student. 
+        children that the module will return for any student.
         """
         return False
-        
+
 
     # ================================= JSON PARSING ===========================
     @staticmethod
@@ -703,7 +733,8 @@ class XModuleDescriptor(Plugin, HTMLSnippet, ResourceTemplates):
         """
         Parse an optional metadata key containing a time: if present, complain
         if it doesn't parse.
-        Return None if not present or invalid.
+
+        Returns a time_struct, or None if metadata key is not present or is invalid.
         """
         if key in self.metadata:
             try:
@@ -797,7 +828,8 @@ class ModuleSystem(object):
                  debug=False,
                  xqueue=None,
                  node_path="",
-                 anonymous_student_id=''):
+                 anonymous_student_id='',
+                 course_id=None):
         '''
         Create a closure around the system environment.
 
@@ -832,6 +864,8 @@ class ModuleSystem(object):
                          ajax results.
 
         anonymous_student_id - Used for tracking modules with student id
+
+        course_id - the course_id containing this module
         '''
         self.ajax_url = ajax_url
         self.xqueue = xqueue
@@ -844,6 +878,7 @@ class ModuleSystem(object):
         self.replace_urls = replace_urls
         self.node_path = node_path
         self.anonymous_student_id = anonymous_student_id
+        self.course_id = course_id
         self.user_is_staff = user is not None and user.is_staff
 
     def get(self, attr):

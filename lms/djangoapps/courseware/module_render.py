@@ -1,4 +1,3 @@
-import hashlib
 import json
 import logging
 import pyparsing
@@ -20,6 +19,7 @@ from mitxmako.shortcuts import render_to_string
 from models import StudentModule, StudentModuleCache
 from psychometrics.psychoanalyze import make_psychometrics_data_update_handler
 from static_replace import replace_urls
+from student.models import unique_id_for_user
 from xmodule.errortracker import exc_info_to_str
 from xmodule.exceptions import NotFoundError
 from xmodule.modulestore import Location
@@ -152,12 +152,6 @@ def _get_module(user, request, location, student_module_cache, course_id, positi
     if not has_access(user, descriptor, 'load'):
         return None
 
-    # Anonymized student identifier
-    h = hashlib.md5()
-    h.update(settings.SECRET_KEY)
-    h.update(str(user.id))
-    anonymous_student_id = h.hexdigest()
-
     # Only check the cache if this module can possibly have state
     instance_module = None
     shared_module = None
@@ -230,7 +224,8 @@ def _get_module(user, request, location, student_module_cache, course_id, positi
                           # by the replace_static_urls code below
                           replace_urls=replace_urls,
                           node_path=settings.NODE_PATH,
-                          anonymous_student_id=anonymous_student_id,
+                          anonymous_student_id=unique_id_for_user(user),
+                          course_id=course_id,
                           )
     # pass position specified in URL to module through ModuleSystem
     system.set('position', position)

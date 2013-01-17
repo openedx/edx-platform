@@ -1,0 +1,30 @@
+
+    <graphical_slider_tool>
+      <render>
+<slider var='a' style="width:400px;float:left;"/><plot style="margin-top:15px;margin-bottom:15px;"/>
+      </render>
+      <configuration>
+        <parameters>
+            <param var="a" min="5" max="25" step="0.5" initial="12.5" />
+        </parameters>
+        <functions>
+          <function color="red">return Math.sqrt(a * a - x * x);</function>
+          <function color="red">return -Math.sqrt(a * a - x * x);</function>
+        </functions>
+        <plot>
+          <xrange>
+            <!-- dynamic range -->
+              <min>
+                  return -a;
+              </min>
+              <max>
+                  return a;
+              </max>
+          </xrange>
+          <num_points>1000</num_points>
+          <xticks>-30, 6, 30</xticks>
+          <yticks>-30, 6, 30</yticks>
+        </plot>
+      </configuration>
+    </graphical_slider_tool>
+

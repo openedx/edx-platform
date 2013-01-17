@@ -1,0 +1,112 @@
+
+<%inherit file="/main.html" />
+<%block name="bodyclass">${course.css_class}</%block>
+<%namespace name='static' file='/static_content.html'/>
+
+<%block name="headextra">
+  <%static:css group='course'/>
+</%block>
+
+<%block name="title"><title>${course.number} Peer Grading.</title></%block>
+
+<%include file="/courseware/course_navigation.html" args="active_page='peer_grading'" />
+
+<%block name="js_extra">
+  <%static:js group='peer_grading'/>
+</%block>
+
+
+<section class="container">
+    <div class="peer-grading" data-ajax_url="${ajax_url}" data-location="${problem_location}">
+        <div class="error-container"></div>
+
+        <section class="content-panel">
+        <h1>Peer Grading </h1>
+        <div class="instructions-panel">
+            <div class="calibration-panel">
+                <h3>Learning to Grade</h3>
+                <div class="calibration-text">
+                    <p>Before you can do any proper peer grading, you first need to understand how your own grading compares to that of the instrutor. Once your grades begin to match the instructor's, you will move on to grading your peers!</p>
+                </div>
+                <div class="grading-text">
+                    <p>You have successfully managed to calibrate your answers to that of the instructors and have moved onto the next step in the peer grading process.</p>
+                </div>
+            </div>
+            <div class="grading-panel">
+                <h3>Grading</h3>
+                <div class="calibration-text">
+                    <p>You cannot start grading until you have graded a sufficient number of training problems and have been able to demonstrate that your scores closely match that of the instructor.</p>
+                </div>
+                <div class="grading-text">
+                    <p>Now that you have finished your training, you are now allowed to grade your peers. Please keep in mind that students are allowed to respond to the grades and feedback they receive.</p>
+                </div>
+            </div>
+        </div>
+
+        <div class="prompt-wrapper">
+            <div class="prompt-information-container collapsible">
+                <header><a href="javascript:void(0)">Question</a></header>
+                <section>
+                <div class="prompt-container">
+                </div>
+            </section>
+            </div>
+            <div class="rubric-wrapper collapsible">
+                <header><a href="javascript:void(0)">Rubric</a></header>
+                <section>
+                <div class="rubric-container">
+                </div>
+            </section>
+            </div>
+
+    </div>
+
+
+    <section class="grading-wrapper">
+    <h2>Grading</h2>
+
+    <div class="grading-container">
+        <div class="submission-wrapper">
+            <h3></h3>
+            <div class="submission-container">
+            </div>
+            <input type="hidden" name="submission-key" value="" />
+            <input type="hidden" name="essay-id" value="" />
+        </div>
+        <div class="evaluation">
+          <p class="score-selection-container">
+          </p>
+          <textarea name="feedback" placeholder="Feedback for student (optional)"
+                    class="feedback-area" cols="70" ></textarea>
+        </div>
+          
+
+        <div class="submission">
+            <input type="button" value="Submit" class="submit-button" name="show"/>
+        </div>
+
+    </div>
+    <div class="grading-message">
+    </div>
+
+    </section>
+    </section>
+
+    <!-- Calibration feedback: Shown after a calibration is sent -->
+    <section class="calibration-feedback">
+    <h2>How did I do?</h2>
+    <div class="calibration-feedback-wrapper">
+    </div>
+        <input type="button" class="calibration-feedback-button" value="Continue" name="calibration-feedback-button" />
+    </section>
+
+    <!-- Interstitial Page: Shown between calibration and grading steps -->
+    <section class="interstitial-page">
+        <h1>Congratulations!</h1>
+        <p> You have now completed the calibration step. You are now ready to start grading.</p>
+        <input type="button" class="interstitial-page-button" value="Start Grading!" name="interstitial-page-button" />
+    </section>
+
+    <input type="button" value="Go Back" class="action-button" name="back" />
+    </div>
+</section>

@@ -257,6 +257,7 @@ Supported fields at the course level:
 * "tabs" -- have custom tabs in the courseware.  See below for details on config.
 * "discussion_blackouts" -- An array of time intervals during which you want to disable a student's ability to create or edit posts in the forum. Moderators, Community TAs, and Admins are unaffected. You might use this during exam periods, but please be aware that the forum is often a very good place to catch mistakes and clarify points to students. The better long term solution would be to have better flagging/moderation mechanisms, but this is the hammer we have today. Format by example: [["2012-10-29T04:00", "2012-11-03T04:00"], ["2012-12-30T04:00", "2013-01-02T04:00"]]
 * "show_calculator" (value "Yes" if desired)
+* "days_early_for_beta" -- number of days (floating point ok) early that students in the beta-testers group get to see course content.  Can also be specified for any other course element, and overrides values set at higher levels.
 * TODO: there are others
 
 ### Grading policy file contents
@@ -418,6 +419,10 @@ If you want to customize the courseware tabs displayed for your course, specify 
 * "external_link".  Parameters "name", "link".
 * "textbooks".  No parameters--generates tab names from book titles.
 * "progress".  Parameter "name".
+* "static_tab".  Parameters "name", 'url_slug'--will look for tab contents in
+                       'tabs/{course_url_name}/{tab url_slug}.html'
+* "staff_grading". No parameters.  If specified, displays the staff grading tab for instructors.
+
 
 # Tips for content developers
 
@@ -429,9 +434,7 @@ before the week 1 material to make it easy to find in the file.
 
 * Come up with a consistent pattern for url_names, so that it's easy to know where to look for any piece of content.  It will also help to come up with a standard way of splitting your content files.  As a point of departure, we suggest splitting chapters, sequences, html, and problems into separate files.
 
-* A heads up: our content management system will allow you to develop content through a web browser, but will be backed by this same xml at first.  Once that happens, every element will be in its own file to make access and updates faster.
-
-* Prefer the most "semantic" name for containers: e.g., use problemset rather than vertical for a problem set.  That way, if we decide to display problem sets differently, we don't have to change the xml.
+* Prefer the most "semantic" name for containers: e.g., use problemset rather than sequential for a problem set.  That way, if we decide to display problem sets differently, we don't have to change the xml.
 
 # Other file locations (info and about)
 

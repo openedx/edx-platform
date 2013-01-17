@@ -40,7 +40,7 @@ def get_logger_config(log_dir,
                         logging_env=logging_env, hostname=hostname)
 
     handlers = ['console', 'local'] if debug else ['console',
-                                'syslogger-remote', 'local', 'newrelic']
+                                'syslogger-remote', 'local']
 
     logger_config = {
         'version': 1,

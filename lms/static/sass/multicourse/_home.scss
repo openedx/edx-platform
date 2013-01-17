@@ -196,6 +196,24 @@
       display: block;
     }
 
+
+    hr {
+      @extend .faded-hr-divider-light;
+      border: none;
+      margin: 0px;
+      position: relative;
+      z-index: 2;
+
+      &::after {
+        @extend .faded-hr-divider;
+        bottom: 0px;
+        content: "";
+        display: block;
+        position: absolute;
+        top: -1px;
+      }
+    }
+
     .partners {
       margin: 0 auto;
       padding: 20px 0px;
@@ -206,6 +224,7 @@
         padding: 0px 30px;
         position: relative;
         vertical-align: middle;
+        overflow: hidden;
 
         &::before {
           @extend .faded-vertical-divider;
@@ -281,7 +300,7 @@
         }
 
         img {
-          max-width: 160px;
+          max-width: 190px;
           position: relative;
           @include transition(all, 0.25s, ease-in-out);
           vertical-align: middle;
@@ -317,6 +336,7 @@
       border-bottom: 1px solid rgb(200,200,200);
       @include clearfix;
       padding: 10px 20px 8px;
+      position: relative;
 
       h2 {
         float: left;
@@ -324,16 +344,27 @@
         text-shadow: 0 1px rgba(255,255,255, 0.6);
       }
 
-      a {
-        color: $lighter-base-font-color;
+      .action.action-mediakit {
         float: right;
-        font-style: italic;
-        font-family: $serif;
-        padding-top: 3px;
+        position: relative;
+        top: 1px;
+        font-family: $sans-serif;
+        font-size: 14px;
         text-shadow: 0 1px rgba(255,255,255, 0.6);
 
-        &:hover {
-          color: $base-font-color;
+        &:after {
+          position: relative;
+          top: -1px;
+          display: inline-block;
+          margin: 0 0 0 5px;
+          content: "➤";
+          font-size: 11px;
+        }
+
+        .org-name {
+          color: $blue;
+          font-family: $sans-serif;
+          text-transform: none;
         }
       }
     }
