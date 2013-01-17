@@ -5,7 +5,7 @@
 (function (requirejs, require, define) {
 
 requirejs.config({
-    'baseUrl': '/static/js/capa/drag_and_drop/',
+    'baseUrl': '/static/js/capa/drag_and_drop/'
 });
 
 // The current JS file will be loaded and run each time. It will require a

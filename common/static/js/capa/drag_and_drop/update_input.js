@@ -13,8 +13,6 @@ define(['logme'], function (logme) {
     function update(state) {
         var draggables, tempObj;
 
-        logme('state.problemId = ' + state.problemId);
-
         draggables = [];
 
         if (state.config.individualTargets === false) {
@@ -37,9 +35,9 @@ define(['logme'], function (logme) {
             (function (c1) {
                 while (c1 < state.targets.length) {
                     (function (c2) {
-                        while (c2 < state.targets[c1].draggable.length) {
+                        while (c2 < state.targets[c1].draggableList.length) {
                             tempObj = {};
-                            tempObj[state.targets[c1].draggable[c2]] = state.targets[c1].id;
+                            tempObj[state.targets[c1].draggableList[c2].id] = state.targets[c1].id;
                             draggables.push(tempObj);
                             tempObj = null;
 

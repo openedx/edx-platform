@@ -9,11 +9,24 @@ define([], function () {
 
     function State(problemId) {
         return {
-            'problemId': problemId,
+            'config': null,
 
+            'baseImageEl': null,
             'baseImageLoaded': false,
 
-            'numDraggablesInSlider': 0
+            'containerEl': null,
+
+            'sliderEl': null,
+
+            'problemId': problemId,
+
+            'draggables': [],
+            'numDraggablesInSlider': 0,
+            'currentMovingDraggable': null,
+
+            'targets': [],
+
+            'updateArrowOpacity': null
         };
     }
 });

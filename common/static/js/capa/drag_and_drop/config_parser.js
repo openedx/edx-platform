@@ -7,17 +7,15 @@
 define(['logme'], function (logme) {
     return configParser;
 
-    function configParser(config, state) {
+    function configParser(state, config) {
         state.config = {
             'draggables': [],
             'baseImage': '',
             'targets': [],
-            'onePerTarget': null,
+            'onePerTarget': null, // Specified by user. No default.
             'targetOutline': true,
             'labelBgColor': '#d6d6d6',
-
-            'individualTargets': null,
-
+            'individualTargets': null, // Depends on 'targets'.
             'errors': 0 // Number of errors found while parsing config.
         };
 
@@ -156,19 +154,13 @@ define(['logme'], function (logme) {
     }
 
     function processDraggable(state, obj) {
-        if (!attrIsString(obj, 'id')) {
-            return false;
-        }
+        if (
+            (attrIsString(obj, 'id') === false) ||
+            (attrIsString(obj, 'icon') === false) ||
+            (attrIsString(obj, 'label') === false) ||
 
-        if (!attrIsString(obj, 'icon')) {
-            return false;
-        }
-
-        if (!attrIsString(obj, 'label')) {
-            return false;
-        }
-
-        if (!attrIsBoolean(obj, 'can_reuse', false)) {
+            (attrIsBoolean(obj, 'can_reuse', false) === false)
+        ) {
             return false;
         }
 
@@ -178,21 +170,15 @@ define(['logme'], function (logme) {
     }
 
     function processTarget(state, obj) {
-        if (!attrIsString(obj, 'id')) {
-            return false;
-        }
+        if (
+            (attrIsString(obj, 'id') === false) ||
 
-        if (!attrIsInteger(obj, 'w')) {
-            return false;
-        }
-        if (!attrIsInteger(obj, 'h')) {
-            return false;
-        }
+            (attrIsInteger(obj, 'w') === false) ||
+            (attrIsInteger(obj, 'h') === false) ||
 
-        if (!attrIsInteger(obj, 'x')) {
-            return false;
-        }
-        if (!attrIsInteger(obj, 'y')) {
+            (attrIsInteger(obj, 'x') === false) ||
+            (attrIsInteger(obj, 'y') === false)
+        ) {
             return false;
         }
 

@@ -5,10 +5,8 @@
 (function (requirejs, require, define) {
 
 define(
-    ['logme', 'state', 'config_parser', 'container', 'base_image', 'scroller',
-     'draggables', 'targets', 'update_input'],
-    function (logme, State, configParser, Container, BaseImage, Scroller,
-              Draggables, Targets, updateInput) {
+    ['logme', 'state', 'config_parser', 'container', 'base_image', 'scroller', 'draggables', 'targets', 'update_input'],
+    function (logme, State, configParser, Container, BaseImage, Scroller, Draggables, Targets, updateInput) {
     return Main;
 
     function Main() {
@@ -45,7 +43,7 @@ define(
 
         state = State(problemId);
 
-        if (configParser(config, state) !== true) {
+        if (configParser(state, config) !== true) {
             logme('ERROR: Could not make sense of the JSON configuration options.');
 
             return;
@@ -70,11 +68,11 @@ define(
             if (updateInput.check(state) === false) {
                 updateInput.update(state);
             }
-
-            setTimeout(function () {
-                logme('state.draggables', state.draggables);
-            }, 500);
         }());
+
+        setTimeout(function () {
+            logme('After 1000 ms:', state);
+        }, 1000);
     }
 });
 

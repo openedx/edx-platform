@@ -10,13 +10,9 @@ define(['logme', 'update_input'], function (logme, updateInput) {
     };
 
     function init(state) {
-        state.draggables = [];
-        state.numDraggablesInSlider = 0;
-        state.currentMovingDraggable = null;
-
         (function (c1) {
             while (c1 < state.config.draggables.length) {
-                processDraggable(state, state.config.draggables[c1], c1 + 1);
+                processDraggable(state, state.config.draggables[c1]);
                 c1 += 1
             }
         }(0));
@@ -121,6 +117,9 @@ define(['logme', 'update_input'], function (logme, updateInput) {
         this.x = newPosition.x;
         this.y = newPosition.y;
 
+        this.zIndex = 1000;
+        this.correctZIndexes();
+
         this.state.numDraggablesInSlider -= 1;
         this.state.updateArrowOpacity();
     }
@@ -180,35 +179,49 @@ define(['logme', 'update_input'], function (logme, updateInput) {
             this.labelEl.appendTo(this.state.baseImageEl.parent());
         }
 
-        this.onTarget = target;
-        target.draggable.push(this.id);
+        target.addDraggable(this);
 
-        if (target.numTextEl !== null) {
-            target.updateNumTextEl();
-        }
+        this.zIndex = 1000;
+        this.correctZIndexes();
 
         this.state.numDraggablesInSlider -= 1;
         this.state.updateArrowOpacity();
     }
 
-    function processDraggable(state, obj, objIndex) {
+    function processDraggable(state, obj) {
         var draggableObj;
 
         draggableObj = {
             'id': obj.id,
 
             'isReusable': obj.can_reuse,
+            'isOriginal': true,
 
             'x': -1,
             'y': -1,
 
-            'zIndex': objIndex,
-            'oldZIndex': objIndex,
+            'zIndex': 1,
+
+            'containerEl': null,
+
+            'iconEl': null,
+            'iconElBGColor': null,
+            'iconElPadding': null,
+            'iconElBorder': null,
+            'iconElLeftOffset': null,
+            'iconWidth': null,
+            'iconHeight': null,
+            'iconWidthSmall': null,
+            'iconHeightSmall': null,
+
             'labelEl': null,
+            'labelWidth': null,
+
             'hasLoaded': false,
             'inContainer': true,
             'mousePressed': false,
             'onTarget': null,
+            'onTargetIndex': null,
 
             'state': state,
 
@@ -216,7 +229,6 @@ define(['logme', 'update_input'], function (logme, updateInput) {
             'mouseUp': mouseUp,
             'mouseMove': mouseMove,
             'checkLandingElement': checkLandingElement,
-            'removeObjIdFromTarget': removeObjIdFromTarget,
             'checkIfOnTarget': checkIfOnTarget,
             'snapToTarget': snapToTarget,
             'correctZIndexes': correctZIndexes,
@@ -234,7 +246,6 @@ define(['logme', 'update_input'], function (logme, updateInput) {
                     'display: inline; ' +
                     'float: left; ' +
                     'overflow: hidden; ' +
-                    'z-index: ' + objIndex + '; ' +
                     'border-left: 1px solid #CCC; ' +
                     'border-right: 1px solid #CCC; ' +
                     'text-align: center; ' +
@@ -252,49 +263,28 @@ define(['logme', 'update_input'], function (logme, updateInput) {
             draggableObj.iconElLeftOffset = 0;
 
             draggableObj.iconEl = $('<img />');
-            draggableObj.iconEl.attr(
-                'src',
-                obj.icon
-            );
+            draggableObj.iconEl.attr('src', obj.icon);
             draggableObj.iconEl.load(function () {
                 draggableObj.iconWidth = this.width;
                 draggableObj.iconHeight = this.height;
 
                 if (draggableObj.iconWidth >= draggableObj.iconHeight) {
                     draggableObj.iconWidthSmall = 60;
-                    draggableObj.iconHeightSmall =
-                        draggableObj.iconWidthSmall *
-                        (draggableObj.iconHeight / draggableObj.iconWidth);
+                    draggableObj.iconHeightSmall = draggableObj.iconWidthSmall * (draggableObj.iconHeight / draggableObj.iconWidth);
                 } else {
                     draggableObj.iconHeightSmall = 60;
-                    draggableObj.iconWidthSmall =
-                        draggableObj.iconHeightSmall *
-                        (draggableObj.iconWidth / draggableObj.iconHeight);
+                    draggableObj.iconWidthSmall = draggableObj.iconHeightSmall * (draggableObj.iconWidth / draggableObj.iconHeight);
                 }
 
                 draggableObj.iconEl.css('position', 'absolute');
-
-                draggableObj.iconEl.css(
-                    'width',
-                    draggableObj.iconWidthSmall
-                );
-                draggableObj.iconEl.css(
-                    'height',
-                    draggableObj.iconHeightSmall
-                );
-
-                draggableObj.iconEl.css(
-                    'left',
-                    50 - draggableObj.iconWidthSmall * 0.5
-                );
+                draggableObj.iconEl.css('width', draggableObj.iconWidthSmall);
+                draggableObj.iconEl.css('height', draggableObj.iconHeightSmall);
+                draggableObj.iconEl.css('left', 50 - draggableObj.iconWidthSmall * 0.5);
 
                 if (obj.label.length > 0) {
                     draggableObj.iconEl.css('top', 5);
                 } else {
-                    draggableObj.iconEl.css(
-                        'top',
-                        50 - draggableObj.iconHeightSmall * 0.5
-                    );
+                    draggableObj.iconEl.css('top', 50 - draggableObj.iconHeightSmall * 0.5);
                 }
 
                 draggableObj.iconEl.appendTo(draggableObj.containerEl);
@@ -306,27 +296,16 @@ define(['logme', 'update_input'], function (logme, updateInput) {
                                 'position: absolute; ' +
                                 'color: black; ' +
                                 'font-size: 0.95em; ' +
-                                'z-index: ' + objIndex + '; ' +
                             '" ' +
                         '>' +
                             obj.label +
                         '</div>'
                     );
 
-                    draggableObj.labelEl.appendTo(
-                        draggableObj.containerEl
-                    );
-
+                    draggableObj.labelEl.appendTo(draggableObj.containerEl);
                     draggableObj.labelWidth = draggableObj.labelEl.width();
-
-                    draggableObj.labelEl.css(
-                        'left',
-                        50 - draggableObj.labelWidth * 0.5
-                    );
-                    draggableObj.labelEl.css(
-                        'top',
-                        5 + draggableObj.iconHeightSmall + 5
-                    );
+                    draggableObj.labelEl.css('left', 50 - draggableObj.labelWidth * 0.5);
+                    draggableObj.labelEl.css('top', 5 + draggableObj.iconHeightSmall + 5);
 
                     draggableObj.labelEl.mousedown(function (event) {
                         draggableObj.mouseDown.call(draggableObj, event);
@@ -358,7 +337,6 @@ define(['logme', 'update_input'], function (logme, updateInput) {
                             'position: absolute; ' +
                             'color: black; ' +
                             'font-size: 0.95em; ' +
-                            'z-index: ' + objIndex + '; ' +
                         '" ' +
                     '>' +
                         obj.label +
@@ -372,14 +350,8 @@ define(['logme', 'update_input'], function (logme, updateInput) {
                 draggableObj.iconWidthSmall = draggableObj.iconWidth;
                 draggableObj.iconHeightSmall = draggableObj.iconHeight;
 
-                draggableObj.iconEl.css(
-                    'left',
-                    50 - draggableObj.iconWidthSmall * 0.5
-                );
-                draggableObj.iconEl.css(
-                    'top',
-                    50 - draggableObj.iconHeightSmall * 0.5
-                );
+                draggableObj.iconEl.css('left', 50 - draggableObj.iconWidthSmall * 0.5);
+                draggableObj.iconEl.css('top', 50 - draggableObj.iconHeightSmall * 0.5);
 
                 draggableObj.hasLoaded = true;
             } else {
@@ -420,6 +392,11 @@ define(['logme', 'update_input'], function (logme, updateInput) {
             // If we don't do this, each drag operation will
             // potentially cause the highlghting of the dragged element.
             event.preventDefault();
+
+            if ((this.isReusable === true) && (this.isOriginal === true)) {
+
+                return;
+            }
 
             // If this draggable is just being dragged out of the
             // container, we must perform some additional tasks.
@@ -500,7 +477,6 @@ define(['logme', 'update_input'], function (logme, updateInput) {
                 this.state.numDraggablesInSlider -= 1;
             }
 
-            this.oldZIndex = this.zIndex;
             this.zIndex = 1000;
             this.iconEl.css('z-index', '1000');
             if (this.labelEl !== null) {
@@ -532,32 +508,21 @@ define(['logme', 'update_input'], function (logme, updateInput) {
 
             this.iconEl.css(
                 'left',
-                event.pageX -
-                    this.state.baseImageEl.offset().left -
-                    this.iconWidth * 0.5
-                    - this.iconElLeftOffset
+                event.pageX - this.state.baseImageEl.offset().left - this.iconWidth * 0.5 - this.iconElLeftOffset
             );
             this.iconEl.css(
                 'top',
-                event.pageY -
-                    this.state.baseImageEl.offset().top -
-                    this.iconHeight * 0.5
+                event.pageY - this.state.baseImageEl.offset().top - this.iconHeight * 0.5
             );
 
             if (this.labelEl !== null) {
                 this.labelEl.css(
                     'left',
-                    event.pageX -
-                        this.state.baseImageEl.offset().left -
-                        this.labelWidth * 0.5
-                        - 9 // Acoount for padding, border.
+                    event.pageX - this.state.baseImageEl.offset().left - this.labelWidth * 0.5 - 9 // Acoount for padding, border.
                 );
                 this.labelEl.css(
                     'top',
-                    event.pageY -
-                        this.state.baseImageEl.offset().top +
-                        this.iconHeight * 0.5 +
-                        5
+                    event.pageY - this.state.baseImageEl.offset().top + this.iconHeight * 0.5 + 5
                 );
             }
         }
@@ -578,23 +543,20 @@ define(['logme', 'update_input'], function (logme, updateInput) {
             if (this.checkIfOnTarget(positionIE) === true) {
                 this.correctZIndexes();
             } else {
+                if (this.onTarget !== null) {
+                    this.onTarget.removeDraggable(this);
+                }
+
                 this.moveBackToSlider();
-                this.removeObjIdFromTarget();
 
                 this.state.numDraggablesInSlider += 1;
             }
         } else {
             if (
                 (positionIE.left < 0) ||
-                (
-                    positionIE.left + this.iconWidth >
-                    this.state.baseImageEl.width()
-                ) ||
+                (positionIE.left + this.iconWidth > this.state.baseImageEl.width()) ||
                 (positionIE.top < 0) ||
-                (
-                    positionIE.top + this.iconHeight >
-                    this.state.baseImageEl.height()
-                )
+                (positionIE.top + this.iconHeight > this.state.baseImageEl.height())
             ) {
                 this.moveBackToSlider();
 
@@ -605,35 +567,13 @@ define(['logme', 'update_input'], function (logme, updateInput) {
             } else {
                 this.correctZIndexes();
 
-                this.x =
-                    positionIE.left + this.iconWidth * 0.5;
-                this.y =
-                    positionIE.top + this.iconHeight * 0.5;
+                this.x = positionIE.left + this.iconWidth * 0.5;
+                this.y = positionIE.top + this.iconHeight * 0.5;
             }
         }
 
         this.state.updateArrowOpacity();
         updateInput.update(this.state);
-    }
-
-    function removeObjIdFromTarget() {
-        var c1;
-
-        if (this.onTarget !== null) {
-            for (c1 = 0; c1 < this.onTarget.draggable.length; c1 += 1) {
-                if (this.onTarget.draggable[c1] === this.id) {
-                    this.onTarget.draggable.splice(c1, 1);
-
-                    break;
-                }
-            }
-
-            if (this.onTarget.numTextEl !== null) {
-                this.onTarget.updateNumTextEl();
-            }
-
-            this.onTarget = null;
-        }
     }
 
     //
@@ -647,9 +587,7 @@ define(['logme', 'update_input'], function (logme, updateInput) {
     //     this.iconEl.position()
     //
     function checkIfOnTarget(positionIE) {
-        var c1, target, targetFound;
-
-        targetFound = false;
+        var c1, target;
 
         for (c1 = 0; c1 < this.state.targets.length; c1 += 1) {
             target = this.state.targets[c1];
@@ -660,75 +598,52 @@ define(['logme', 'update_input'], function (logme, updateInput) {
             // against), then go to next target.
             if (
                 (this.state.config.onePerTarget === true) &&
-                (target.draggable.length === 1) &&
-                (target.draggable[0] !== this.id)
+                (target.draggableList.length === 1) &&
+                (target.draggableList[0].id !== this.id)
             ) {
                 continue;
             }
 
             // Check if the draggable's center coordinate is within
             // the target's dimensions. If not, go to next target.
-            if (
-                positionIE.top + this.iconHeight * 0.5 <
-                target.offset.top
-            ) {
+            if (positionIE.top + this.iconHeight * 0.5 < target.offset.top) {
                 continue;
             }
-            if (
-                positionIE.top + this.iconHeight * 0.5 >
-                target.offset.top + target.h
-            ) {
+            if (positionIE.top + this.iconHeight * 0.5 > target.offset.top + target.h) {
                 continue;
             }
-            if (
-                positionIE.left + this.iconWidth * 0.5 <
-                target.offset.left
-            ) {
+            if (positionIE.left + this.iconWidth * 0.5 < target.offset.left) {
                 continue;
             }
-            if (
-                positionIE.left + this.iconWidth * 0.5 >
-                target.offset.left + target.w
-            ) {
+            if (positionIE.left + this.iconWidth * 0.5 > target.offset.left + target.w) {
                 continue;
             }
-
-            // If we got here, then our draggable is on top of a
-            // target.
-            targetFound = true;
 
             // If the draggable was moved from one target to
-            // another, then we need to remove it's ID from the
+            // another, then we need to remove it from the
             // previous target's draggables list, and add it to the
             // new target's draggables list.
-            if (
-                (this.onTarget !== null) &&
-                (this.onTarget.id !== target.id)
-            ) {
-                this.removeObjIdFromTarget();
-                this.onTarget = target;
-                target.draggable.push(this.id);
+            if ((this.onTarget !== null) && (this.onTarget.id !== target.id)) {
+                this.onTarget.removeDraggable(this);
+                target.addDraggable(this);
             }
             // If the draggable was moved from the slider to a
             // target, remember the target, and add ID to the
             // target's draggables list.
             else if (this.onTarget === null) {
-                this.onTarget = target;
-                target.draggable.push(this.id);
-            }
-
-            if (target.numTextEl !== null) {
-                target.updateNumTextEl();
+                target.addDraggable(this);
             }
 
             // Reposition the draggable so that it's center
             // coincides with the center of the target.
             this.snapToTarget(target);
 
-            break;
+            // Target was found.
+            return true;
         }
 
-        return targetFound;
+        // Target was not found.
+        return false;
     }
 
     function snapToTarget(target) {
@@ -771,101 +686,45 @@ define(['logme', 'update_input'], function (logme, updateInput) {
     // ordering of the visibility (z-index) of the other draggables
     // will not change.
     function correctZIndexes() {
-        var draggablesInMe, c1, c2, highestZIndex;
+        var c1, highestZIndex;
+
+        highestZIndex = -10000;
 
         if (this.state.config.individualTargets === true) {
-            if (this.onTarget.draggable.length > 0) {
-                draggablesInMe = [];
-
-                for (c1 = 0; c1 < this.onTarget.draggable.length; c1 += 1) {
-                    for (c2 = 0; c2 < this.state.draggables.length; c2 += 1) {
-                        if (
-                            this.onTarget.draggable[c1] ===
-                                this.state.draggables[c2].id
-                        ) {
-                            draggablesInMe.push(this.state.draggables[c2]);
-                        }
-                    }
-                }
-
-                highestZIndex = -10000;
-
-                for (c1 = 0; c1 < draggablesInMe.length; c1 += 1) {
+            if (this.onTarget.draggableList.length > 0) {
+                for (c1 = 0; c1 < this.onTarget.draggableList.length; c1 += 1) {
                     if (
-                        (draggablesInMe[c1].zIndex > highestZIndex) &&
-                            (draggablesInMe[c1].zIndex !== 1000)
+                        (this.onTarget.draggableList[c1].zIndex > highestZIndex) &&
+                        (this.onTarget.draggableList[c1].zIndex !== 1000)
                     ) {
-                        highestZIndex = draggablesInMe[c1].zIndex;
-                    }
-                }
-
-                if (highestZIndex === -10000) {
-                    highestZIndex = this.onTarget.draggable.length;
-                } else if (highestZIndex < this.oldZIndex) {
-                    highestZIndex = this.oldZIndex;
-                } else {
-                    for (c1 = 0; c1 < draggablesInMe.length; c1 += 1) {
-                        draggablesInMe[c1].zIndex -= 1;
-                        draggablesInMe[c1].oldZIndex -= 1;
-
-                        draggablesInMe[c1].iconEl.css(
-                            'z-index',
-                            draggablesInMe[c1].zIndex
-                        );
-                        if (draggablesInMe[c1].labelEl !== null) {
-                            draggablesInMe[c1].labelEl.css(
-                                'z-index',
-                                draggablesInMe[c1].zIndex
-                            );
-                        }
+                        highestZIndex = this.onTarget.draggableList[c1].zIndex;
                     }
                 }
             } else {
-                highestZIndex = this.onTarget.draggable.length;
-            }
-
-            this.zIndex = highestZIndex;
-            this.oldZIndex = highestZIndex;
-
-            this.iconEl.css(
-                'z-index',
-                this.zIndex
-            );
-            if (this.labelEl !== null) {
-                this.labelEl.css(
-                    'z-index',
-                    this.zIndex
-                );
+                highestZIndex = 0;
             }
         } else {
             for (c1 = 0; c1 < this.state.draggables.length; c1++) {
-                if (
-                    this.oldZIndex <
-                        this.state.draggables[c1].zIndex
-                ) {
-                    this.state.draggables[c1].zIndex -= 1;
-                    this.state.draggables[c1].oldZIndex = this.state.draggables[c1].zIndex;
-                    this.state.draggables[c1].iconEl.css(
-                        'z-index',
-                        this.state.draggables[c1].zIndex
-                    );
-
-                    if (this.state.draggables[c1].labelEl !== null) {
-                        this.state.draggables[c1].labelEl.css(
-                            'z-index',
-                            this.state.draggables[c1].zIndex
-                        );
+                if (this.inContainer === false) {
+                    if (
+                        (this.state.draggables[c1].zIndex > highestZIndex) &&
+                        (this.state.draggables[c1].zIndex !== 1000)
+                    ) {
+                        highestZIndex = this.state.draggables[c1].zIndex;
                     }
                 }
             }
+        }
 
-            this.zIndex = c1;
-            this.oldZIndex = c1;
-            this.iconEl.css('z-index', c1);
+        if (highestZIndex === -10000) {
+            highestZIndex = 0;
+        }
 
-            if (this.labelEl !== null) {
-                this.labelEl.css('z-index', c1);
-            }
+        this.zIndex = highestZIndex + 1;
+
+        this.iconEl.css('z-index', highestZIndex);
+        if (this.labelEl !== null) {
+            this.labelEl.css('z-index', highestZIndex);
         }
     }
 

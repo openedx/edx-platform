@@ -24,10 +24,7 @@ define(['logme'], function (logme) {
 
         state.baseImageEl = $('<img />');
 
-        state.baseImageEl.attr(
-            'src',
-            state.config.baseImage
-        );
+        state.baseImageEl.attr('src', state.config.baseImage);
         state.baseImageEl.load(function () {
             baseImageElContainer.css('width', this.width);
             baseImageElContainer.css('height', this.height);
@@ -42,9 +39,7 @@ define(['logme'], function (logme) {
             state.baseImageLoaded = true;
         });
         state.baseImageEl.error(function () {
-            logme(
-                'ERROR: Image "' + state.config.baseImage + '" was not found!'
-            );
+            logme('ERROR: Image "' + state.config.baseImage + '" was not found!');
             baseImageElContainer.html(
                 '<span style="color: red;">' +
                     'ERROR: Image "' + state.config.baseImage + '" was not found!' +

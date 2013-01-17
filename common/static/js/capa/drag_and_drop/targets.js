@@ -8,146 +8,166 @@ define(['logme'], function (logme) {
     return Targets;
 
     function Targets(state) {
-        var c1;
+        (function (c1) {
+            while (c1 < state.config.targets.length) {
+                processTarget(state, state.config.targets[c1]);
 
-        state.targets = [];
+                c1 += 1;
+            }
+        }(0));
+    } // function Targets(state) {
 
-        for (c1 = 0; c1 < state.config.targets.length; c1++) {
-            processTarget(state.config.targets[c1]);
+    function processTarget(state, obj) {
+        var targetEl, borderCss, numTextEl, targetObj;
+
+        borderCss = '';
+        if (state.config.targetOutline === true) {
+            borderCss = 'border: 1px dashed gray; ';
         }
 
-        return;
+        targetEl = $(
+            '<div ' +
+                'style=" ' +
+                    'display: block; ' +
+                    'position: absolute; ' +
+                    'width: ' + obj.w + 'px; ' +
+                    'height: ' + obj.h + 'px; ' +
+                    'top: ' + obj.y + 'px; ' +
+                    'left: ' + obj.x + 'px; ' +
+                    borderCss +
+                '" ' +
+                'data-target-id="' + obj.id + '" ' +
+            '></div>'
+        );
+        targetEl.appendTo(state.baseImageEl.parent());
+        targetEl.mousedown(function (event) {
+            event.preventDefault();
+        });
 
-        function processTarget(obj) {
-            var targetEl, borderCss, numTextEl, targetObj;
-
-            borderCss = '';
-            if (state.config.targetOutline === true) {
-                borderCss = 'border: 1px dashed gray; ';
-            }
-
-            targetEl = $(
+        if (state.config.onePerTarget === false) {
+            numTextEl = $(
                 '<div ' +
                     'style=" ' +
                         'display: block; ' +
                         'position: absolute; ' +
-                        'width: ' + obj.w + 'px; ' +
-                        'height: ' + obj.h + 'px; ' +
+                        'width: 24px; ' +
+                        'height: 24px; ' +
                         'top: ' + obj.y + 'px; ' +
-                        'left: ' + obj.x + 'px; ' +
-                        borderCss +
+                        'left: ' + (obj.x + obj.w - 24) + 'px; ' +
+                        'border: 1px solid black; ' +
+                        'text-align: center; ' +
+                        'z-index: 500; ' +
+                        'background-color: white; ' +
+                        'font-size: 0.95em; ' +
+                        'color: #009fe2; ' +
+                        'cursor: pointer; ' +
                     '" ' +
-                    'data-target-id="' + obj.id + '" ' +
-                '></div>'
+                '>0</div>'
             );
-            targetEl.appendTo(state.baseImageEl.parent());
-            targetEl.mousedown(function (event) {
+        } else {
+            numTextEl = null;
+        }
+
+        targetObj = {
+            'id': obj.id,
+
+            'w': obj.w,
+            'h': obj.h,
+
+            'el': targetEl,
+            'offset': targetEl.position(),
+
+            'draggableList': [],
+
+            'targetEl': targetEl,
+
+            'numTextEl': numTextEl,
+            'updateNumTextEl': updateNumTextEl,
+
+            'removeDraggable': removeDraggable,
+            'addDraggable': addDraggable
+        };
+
+        if (state.config.onePerTarget === false) {
+            numTextEl.appendTo(state.baseImageEl.parent());
+            numTextEl.mousedown(function (event) {
                 event.preventDefault();
             });
+            numTextEl.mouseup(function () {
+                cycleDraggableOrder.call(targetObj)
+            });
+        }
 
-            if (state.config.onePerTarget === false) {
-                numTextEl = $(
-                    '<div ' +
-                        'style=" ' +
-                            'display: block; ' +
-                            'position: absolute; ' +
-                            'width: 24px; ' +
-                            'height: 24px; ' +
-                            'top: ' + obj.y + 'px; ' +
-                            'left: ' + (obj.x + obj.w - 24) + 'px; ' +
-                            'border: 1px solid black; ' +
-                            'text-align: center; ' +
-                            'z-index: 500; ' +
-                            'background-color: white; ' +
-                            'font-size: 0.95em; ' +
-                            'color: #009fe2; ' +
-                            'cursor: pointer; ' +
-                        '" ' +
-                    '>0</div>'
-                );
+        state.targets.push(targetObj);
+    }
+
+    function removeDraggable(draggable) {
+        this.draggableList.splice(draggable.onTargetIndex, 1);
+
+        draggable.onTarget = null;
+        draggable.onTargetIndex = null;
+
+        this.updateNumTextEl();
+    }
+
+    function addDraggable(draggable) {
+        draggable.onTarget = this;
+        draggable.onTargetIndex = this.draggableList.push(draggable) - 1;
+
+        this.updateNumTextEl();
+    }
+
+    /*
+     * function cycleDraggableOrder
+     *
+     * Parameters:
+     *     none - This function does not expect any parameters.
+     *
+     * Returns:
+     *     undefined - The return value of this function is not used.
+     *
+     * Description:
+     *     Go through all draggables that are on the current target, and decrease their
+     *     z-index by 1, making sure that the bottom-most draggable ends up on the top.
+     */
+    function cycleDraggableOrder() {
+        var c1, lowestZIndex, highestZIndex;
+
+        if (this.draggableList.length === 0) {
+            return;
+        }
+
+        highestZIndex = -10000;
+        lowestZIndex = 10000;
+
+        for (c1 = 0; c1 < this.draggableList.length; c1 += 1) {
+            if (this.draggableList[c1].zIndex < lowestZIndex) {
+                lowestZIndex = this.draggableList[c1].zIndex;
+            }
+
+            if (this.draggableList[c1].zIndex > highestZIndex) {
+                highestZIndex = this.draggableList[c1].zIndex;
+            }
+        }
+
+        for (c1 = 0; c1 < this.draggableList.length; c1 += 1) {
+            if (this.draggableList[c1].zIndex === lowestZIndex) {
+                this.draggableList[c1].zIndex = highestZIndex;
             } else {
-                numTextEl = null;
+                this.draggableList[c1].zIndex -= 1;
             }
 
-            targetObj = {
-                'id': obj.id,
-
-                'w': obj.w,
-                'h': obj.h,
-
-                'el': targetEl,
-                'offset': targetEl.position(),
-
-                'draggable': [],
-
-                'targetEl': targetEl,
-
-                'numTextEl': numTextEl,
-                'updateNumTextEl': updateNumTextEl
-            };
-
-            if (state.config.onePerTarget === false) {
-                numTextEl.appendTo(state.baseImageEl.parent());
-                numTextEl.mousedown(function (event) {
-                    event.preventDefault();
-                });
-                numTextEl.mouseup(function () {
-                    cycleDraggableOrder.call(targetObj)
-                });
-            }
-
-            state.targets.push(targetObj);
-        }
-
-        function cycleDraggableOrder() {
-            var draggablesInMe, c1, c2, lowestZIndex, highestZIndex;
-
-            if (this.draggable.length === 0) {
-                return 0;
-            }
-
-            draggablesInMe = [];
-
-            for (c1 = 0; c1 < this.draggable.length; c1 += 1) {
-                for (c2 = 0; c2 < state.draggables.length; c2 += 1) {
-                    if (this.draggable[c1] === state.draggables[c2].id) {
-                        draggablesInMe.push(state.draggables[c2]);
-                    }
-                }
-            }
-
-            highestZIndex = -10000;
-            lowestZIndex = 10000;
-
-            for (c1 = 0; c1 < draggablesInMe.length; c1 += 1) {
-                if (draggablesInMe[c1].zIndex < lowestZIndex) {
-                    lowestZIndex = draggablesInMe[c1].zIndex;
-                }
-
-                if (draggablesInMe[c1].zIndex > highestZIndex) {
-                    highestZIndex = draggablesInMe[c1].zIndex;
-                }
-            }
-
-            for (c1 = 0; c1 < draggablesInMe.length; c1 += 1) {
-                if (draggablesInMe[c1].zIndex === lowestZIndex) {
-                    draggablesInMe[c1].zIndex = highestZIndex;
-                    draggablesInMe[c1].oldZIndex = highestZIndex;
-                } else {
-                    draggablesInMe[c1].zIndex -= 1;
-                    draggablesInMe[c1].oldZIndex -= 1;
-                }
-
-                draggablesInMe[c1].iconEl.css('z-index', draggablesInMe[c1].zIndex);
-                if (draggablesInMe[c1].labelEl !== null) {
-                    draggablesInMe[c1].labelEl.css('z-index', draggablesInMe[c1].zIndex);
-                }
+            this.draggableList[c1].iconEl.css('z-index', this.draggableList[c1].zIndex);
+            if (this.draggableList[c1].labelEl !== null) {
+                this.draggableList[c1].labelEl.css('z-index', this.draggableList[c1].zIndex);
             }
         }
-    } // function Targets(state) {
+    }
 
     function updateNumTextEl() {
-        this.numTextEl.html(this.draggable.length);
+        if (this.numTextEl !== null) {
+            this.numTextEl.html(this.draggableList.length);
+        }
     }
 });
 
