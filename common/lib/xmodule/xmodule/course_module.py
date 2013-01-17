@@ -128,6 +128,20 @@ class CourseDescriptor(SequenceDescriptor):
         self.syllabus_present = self.system.resources_fs.exists(path('syllabus'))
         self.set_grading_policy(self.definition['data'].get('grading_policy', None))
 
+        self.test_center_exams = []
+        test_center_info = self.metadata.get('testcenter_info')
+        if test_center_info is not None:
+            for exam_name in test_center_info:
+                try:
+                    exam_info = test_center_info[exam_name]
+                    self.test_center_exams.append(self.TestCenterExam(self.id, exam_name, exam_info))
+                except Exception as err:
+                    # If we can't parse the test center exam info, don't break
+                    # the rest of the courseware.
+                    msg = 'Error %s: Unable to load test-center exam info for exam "%s" of course "%s"' % (err, exam_name, self.id)
+                    log.error(msg)
+                    continue
+
     def defaut_grading_policy(self):
         """
         Return a dict which is a copy of the default grading policy
@@ -228,26 +242,6 @@ class CourseDescriptor(SequenceDescriptor):
         if policy_dir:
             paths = [policy_dir + '/grading_policy.json'] + paths
 
-<<<<<<< HEAD
-=======
-        self.test_center_exams = []
-        test_center_info = self.metadata.get('testcenter_info')
-        if test_center_info is not None:
-            for exam_name in test_center_info:
-                try:
-                    exam_info = test_center_info[exam_name]
-                    self.test_center_exams.append(self.TestCenterExam(self.id, exam_name, exam_info))
-                except Exception as err:
-                    # If we can't parse the test center exam info, don't break
-                    # the rest of the courseware.
-                    msg = 'Error %s: Unable to load test-center exam info for exam "%s" of course "%s"' % (err, exam_name, self.id)
-                    log.error(msg)
-                    continue
-
-
-    def set_grading_policy(self, policy_str):
-        """Parse the policy specified in policy_str, and save it"""
->>>>>>> master
         try:
             policy = json.loads(cls.read_grading_policy(paths, system))
         except ValueError:
