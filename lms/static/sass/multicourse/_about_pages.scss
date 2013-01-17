@@ -194,30 +194,9 @@
         margin-bottom: 40px;
 
         h3 {
-          background: url('/static/images/bullet-closed.png') no-repeat left 0.25em;
           font-family: $sans-serif;
           font-weight: 700;
-          margin-bottom: 10px;
-          padding-left: 20px;
-          cursor: pointer;
-        }
-
-        .answer {
-          display: none;
-          color: #3c3c3c;
-          padding-left: 16px;
-          font-family: $serif;
-          li {
-            line-height: 1.6em;
-          }
-        }
-
-        // opened states
-        &.opened {
-
-          h3 {
-            background: url('/static/images/bullet-open.png') no-repeat left 0.25em;
-          }
+          margin-bottom: 15px;
         }
       }
     }

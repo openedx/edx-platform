@@ -14,7 +14,9 @@ window.GraphicalSliderTool = function (el) {
         // with a unique DOM ID), we will iterate over all children, and for
         // each match, we will call GstMain module.
         $(el).children('.graphical_slider_tool').each(function (index, value) {
-            GstMain($(value).attr('id'));
+            JavascriptLoader.executeModuleScripts($(value), function(){
+                GstMain($(value).attr('id'));
+            });
         });
     });
 };
