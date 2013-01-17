@@ -63,7 +63,7 @@ class CombinedOpenEndedRubric(object):
 
         if has_score:
             if scorexml.tag != 'score':
-                raise Exception("[extract_category]mitxmako: expected score tag, got {0} instead".format(scorexml.tag))
+                raise Exception("[extract_category]: expected score tag, got {0} instead".format(scorexml.tag))
 
         for option in optionsxml:
             if option.tag != "option":
