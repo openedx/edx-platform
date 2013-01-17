@@ -524,6 +524,7 @@ class SelfAssessmentDescriptor(XmlDescriptor, EditingDescriptor):
 
     js = {'coffee': [resource_string(__name__, 'js/src/html/edit.coffee')]}
     js_module_name = "HTMLEditingDescriptor"
+    css = {'scss': [resource_string(__name__, 'css/editor/edit.scss'), resource_string(__name__, 'css/html/edit.scss')]}
 
     @classmethod
     def definition_from_xml(cls, xml_object, system):
