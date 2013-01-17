@@ -46,7 +46,7 @@ class Command(BaseCommand):
             call_command('pearson_import', 'dest_from_settings')
 
         def export_pearson():
-            call_command('pearson_export_ccd', 'dest_from_settings')
+            call_command('pearson_export_cdd', 'dest_from_settings')
             call_command('pearson_export_ead', 'dest_from_settings')
             sftp(settings.PEARSON['LOCAL_EXPORT'],
                  settings.PEARSON['SFTP_EXPORT'], options['mode'])
