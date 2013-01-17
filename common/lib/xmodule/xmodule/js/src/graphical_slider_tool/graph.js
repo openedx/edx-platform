@@ -401,7 +401,7 @@ define('Graph', ['logme'], function (logme) {
                     return false;
                 }
             } else {
-                logme('MESSAGE: "xticks" were not specified. Using defaults.');
+                // logme('MESSAGE: "xticks" were not specified. Using defaults.');
 
                 return false;
             }
@@ -416,7 +416,7 @@ define('Graph', ['logme'], function (logme) {
                     return false;
                 }
             } else {
-                logme('MESSAGE: "yticks" were not specified. Using defaults.');
+                // logme('MESSAGE: "yticks" were not specified. Using defaults.');
 
                 return false;
             }
