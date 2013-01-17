@@ -291,29 +291,29 @@ class PageLoader(ActivateLoginTestCase):
                 #print descriptor.__class__, descriptor.location
                 resp = self.client.get(reverse('jump_to',
                                        kwargs={'course_id': course_id,
-                                               'location': descriptor.location.url()}))
+                                               'location': descriptor.location.url()}), follow=True)
                 msg = str(resp.status_code)
 
-            if resp.status_code != 200:
-                msg = "ERROR " + msg  + ": " + descriptor.location.url()
-                all_ok = False
-                num_bad += 1
-            elif resp.redirect_chain[0][1] != 302:
-                msg = "ERROR on redirect from " + descriptor.location.url()
-                all_ok = False
-                num_bad += 1
+                if resp.status_code != 200:
+                    msg = "ERROR " + msg  + ": " + descriptor.location.url()
+                    all_ok = False
+                    num_bad += 1
+                elif resp.redirect_chain[0][1] != 302:
+                    msg = "ERROR on redirect from " + descriptor.location.url()
+                    all_ok = False
+                    num_bad += 1
 
-            # check content to make sure there were no rendering failures
-            content = resp.content
-            if content.find("this module is temporarily unavailable")>=0:
-                msg = "ERROR unavailable module "
-                all_ok = False
-                num_bad += 1
-            elif isinstance(descriptor, ErrorDescriptor):
-                msg = "ERROR error descriptor loaded: "
-                msg = msg + descriptor.definition['data']['error_msg']
-                all_ok = False
-                num_bad += 1
+                # check content to make sure there were no rendering failures
+                content = resp.content
+                if content.find("this module is temporarily unavailable")>=0:
+                    msg = "ERROR unavailable module "
+                    all_ok = False
+                    num_bad += 1
+                elif isinstance(descriptor, ErrorDescriptor):
+                    msg = "ERROR error descriptor loaded: "
+                    msg = msg + descriptor.definition['data']['error_msg']
+                    all_ok = False
+                    num_bad += 1
 
             print msg
             self.assertTrue(all_ok)  # fail fast
