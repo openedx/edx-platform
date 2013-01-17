@@ -10,6 +10,14 @@ dog_http_api.api_key = settings.DATADOG_API
 
 
 class Command(BaseCommand):
+    help = """
+    This command handles the importing and exporting of student records for
+    Pearson.  It uses some other Django commands to export and import the
+    files and then uploads over SFTP to pearson and stuffs the entry in an
+    S3 bucket for archive purposes.
+
+    Usage: django-admin.py pearson-transfer --mode [import|export|both]
+    """
 
     option_list = BaseCommand.option_list + (
         make_option('--mode',
