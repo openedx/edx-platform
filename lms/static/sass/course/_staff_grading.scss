@@ -124,6 +124,7 @@ div.peer-grading{
             margin: 0px;
             background: #eee;
             height: 10em;
+            width:48%;
             h3
             {
                 text-align:center;
@@ -138,12 +139,10 @@ div.peer-grading{
         .calibration-panel
         {
             float:left;
-            width:48%;
         }
         .grading-panel
         {
             float:right;
-            width: 48%;
         }
         .current-state
         {

@@ -10,9 +10,9 @@
     % if state == 'initial':
       <span class="unanswered" style="display:inline-block;" id="status_${id}">Unanswered</span>
     % elif state in ['done', 'post_assessment'] and correct == 'correct':
-      <span class="correct" id="status_${id}">Correct</span>
+    <span class="correct" id="status_${id}">Correct</span> <p>Correct</p>
     % elif state in ['done', 'post_assessment'] and correct == 'incorrect':
-      <span class="incorrect" id="status_${id}">Incorrect</span>
+    <span class="incorrect" id="status_${id}">Incorrect</span> <p>This submission has been assessed as incorrect. </p>
     % elif state == 'assessing':
       <span class="grading" id="status_${id}">Submitted for grading</span>
     % endif

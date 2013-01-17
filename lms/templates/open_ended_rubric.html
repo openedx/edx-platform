@@ -1,7 +1,7 @@
 <form class="rubric-template" id="inputtype_${id}">
     <h3>Rubric</h3>
     % if view_only and has_score:
-    <p>This is the rubric that was used to grade your submission.The highlighted selection matches how the grader feels you performed in each category.</p>
+    <p>This is the rubric that was used to grade your submission. The highlighted selection matches how the grader feels you performed in each category.</p>
     % elif view_only:
     <p>Use the below rubric to rate this submission.</p>
     % else:
@@ -16,7 +16,7 @@
                 <% option = category['options'][j] %>
             <td>
                 % if view_only:
-                    ## if this is the selected rubric block, show it
+                    ## if this is the selected rubric block, show it highlighted
                     % if option['selected']:
                         <div class="view-only selected-grade">
                     % else:

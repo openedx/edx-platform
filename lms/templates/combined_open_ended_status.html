@@ -14,9 +14,9 @@
             % if status['state'] == 'initial':
                 <span class="unanswered" id="status"></span>
             % elif status['state'] in ['done', 'post_assessment'] and status['correct'] == 'correct':
-                <span class="correct" id="status"></span>
+                <span class="correct" id="status"></span> 
             % elif status['state'] in ['done', 'post_assessment'] and status['correct'] == 'incorrect':
-                <span class="incorrect" id="status"></span>
+                <span class="incorrect" id="status"></span> 
             % elif status['state'] == 'assessing':
                 <span class="grading" id="status"></span>
             % endif

@@ -37,7 +37,7 @@ section.combined-open-ended {
   .result-container
   {
       float:left;
-      width: 93%;
+      width: 100%;
       position:relative;
   }
   h4
@@ -64,8 +64,8 @@ section.combined-open-ended-status {
    }
 
    .statusitem-current {
-     background-color: #cdc;
-     color: #2C2C2C;
+     background-color: #d4d4d4;
+     color: #222;
   }
 
     span {
@@ -101,6 +101,7 @@ section.combined-open-ended-status {
 div.result-container {
 
  .evaluation {
+
         p {
             margin-bottom: 1px;
         }
@@ -112,6 +113,7 @@ div.result-container {
     }
 
     .evaluation-response {
+        margin-bottom: 10px;
         header {
             text-align: right;
             a {
@@ -142,6 +144,7 @@ div.result-container {
     }
 
      .external-grader-message {
+         margin-bottom: 5px;
         section {
           padding-left: 20px;
           background-color: #FAFAFA;
@@ -247,7 +250,7 @@ div.result-container, section.open-ended-child {
                 margin:2px;
                 position: relative;
                 padding: 15px 15px 25px 15px;
-                width: 150px;
+                width: 145px;
                 height:100%;
                 display: inline-block;
                 min-height: 50px;
@@ -469,7 +472,6 @@ section.open-ended-child {
 
       p {
         line-height: 20px;
-        text-transform: capitalize;
         margin-bottom: 0;
         float: left;
       }
