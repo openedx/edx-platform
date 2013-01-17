@@ -69,10 +69,6 @@ define(
                 updateInput.update(state);
             }
         }());
-
-        setTimeout(function () {
-            logme('After 1000 ms:', state);
-        }, 1000);
     }
 });
 

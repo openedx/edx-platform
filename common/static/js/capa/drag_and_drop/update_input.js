@@ -198,9 +198,16 @@ define(['logme'], function (logme) {
     function getById(state, type, id) {
         return (function (c1) {
             while (c1 < state[type].length) {
-                if (state[type][c1].id === id) {
-                    return state[type][c1];
+                if (type === 'draggables') {
+                    if ((state[type][c1].id === id) && (state[type][c1].isOriginal === true)) {
+                        return state[type][c1];
+                    }
+                } else { // 'targets'
+                    if (state[type][c1].id === id) {
+                        return state[type][c1];
+                    }
                 }
+
                 c1 += 1;
             }
 
