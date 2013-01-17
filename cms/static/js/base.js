@@ -253,44 +253,53 @@ function expandSection(event) {
 	$(event.currentTarget).find('.expand-collapse-icon').removeClass('expand').addClass('collapse');
 }
 
+function checkDropValidity(event, ui) {
+	var posInDestination = ui.position.top - $(event.target).position().top;
+	if (posInDestination <= -ui.item.height() || posInDestination >= $(event.target).height()) {
+		// May need to call on ui.sender
+		$(event.target).sortable("cancel");
+		return false;
+	}
+	return true;
+}
+
 // This method only changes the ordering of the child objects in a subsection
 function onUnitReordered(event, ui) {
-    var subsection_id = $(this).data('subsection-id');
-
-    var _els = $(this).children('li:.leaf');
+	// This is called 2x when moving from one subsection to another: once for the sender and once
+	// for the receiver. The sender's call has ui.sender == null
+	var subsection_id = $(event.target).data('subsection-id');
+    var _els = $(event.target).children('li:.leaf');
     var children = _els.map(function(idx, el) { return $(el).data('id'); }).get();
-
-    // call into server to commit the new order
-    $.ajax({
-	    url: "/save_item",
-		type: "POST",
-		dataType: "json",
-		contentType: "application/json",
-		data:JSON.stringify({ 'id' : subsection_id, 'children' : children})
-	});
-    
-    // remove from old container
-    if (ui.sender && subsection_id !== ui.sender.data('subsection-id')) {
-    	
-    	var _els = ui.sender.children('li:.leaf');
-    	var children = _els.map(function(idx, el) { return $(el).data('id'); }).get();
-    	
-    	// call into server to commit the new order
+    // if it believes the element belongs in this section, check that it was dropped w/in the bounds
+    if (_.contains(children, ui.item.data('id'))) {
+    	if (checkDropValidity(event, ui)) {
+    		// call into server to commit the new order
+    		$.ajax({
+    			url: "/save_item",
+    			type: "POST",
+    			dataType: "json",
+    			contentType: "application/json",
+    			data:JSON.stringify({ 'id' : subsection_id, 'children' : children})
+    		});
+    	}
+    }
+    else {
+    	// recording the removal (as element is not in the collection)
     	$.ajax({
     		url: "/save_item",
     		type: "POST",
     		dataType: "json",
     		contentType: "application/json",
-    		data:JSON.stringify({ 'id' : ui.sender.data('subsection-id'), 'children' : children})
+    		data:JSON.stringify({ 'id' : subsection_id, 'children' : children})
     	});
-    	
     }
+    
 }
 
 function onSubsectionReordered(event, ui) {
-    var section_id = $(this).data('section-id');
+    var section_id = $(event.target).data('section-id');
 
-    var _els = $(this).children('li:.branch');
+    var _els = $(event.target).children('li:.branch');
     var children = _els.map(function(idx, el) { return $(el).data('id'); }).get();
 
     // call into server to commit the new order
@@ -320,9 +329,9 @@ function onSubsectionReordered(event, ui) {
 }
 
 function onSectionReordered() {
-    var course_id = $(this).data('course-id');
+    var course_id = $(event.target).data('course-id');
 
-    var _els = $(this).children('section:.branch');
+    var _els = $(event.target).children('section:.branch');
     var children = _els.map(function(idx, el) { return $(el).data('id'); }).get();
 
     // call into server to commit the new order
