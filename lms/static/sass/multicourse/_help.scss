@@ -1,36 +1,78 @@
 .static-container.help {
+
   section.questions {
-    float: left;
-    width: flex-grid(9);
-    margin-right: flex-gutter();
+    @include clearfix;
 
-    article {
-      margin-bottom: 40px;
+    nav.categories {
+      border: 1px solid rgb(220,220,220);
+      @include box-sizing(border-box);
+      float: left;
+      margin-left: flex-gutter();
+      padding: 20px;
+      width: flex-grid(3);
 
-      h2 {
-        border-bottom: 1px solid rgb(220,220,220);
-        margin-bottom: 40px;
-        padding-bottom: 20px;
+      a {
+        display: block;
+        letter-spacing: 1px;
+        margin: 0px -20px;
+        padding: 12px 0px 12px 20px;
+        text-align: left;
+
+        &:hover {
+          background: rgb(245,245,245);
+          text-decoration: none;
+        }
       }
     }
-  }
 
-  section.emails {
-    border: 1px solid rgb(220,220,220);
-    @include box-sizing(border-box);
-    float: left;
-    padding: 20px;
-    width: flex-grid(3);
+    .responses {
+      float: left;
+      width: flex-grid(9);
 
-    ul {
-      margin-left: 0;
-      padding-left: 0;
-      list-style: none;
+      .category {
+        padding-top: 40px;
 
-      li {
-        margin-bottom: 1em;
+        &:first-child {
+          padding-top: 0px;
+        }
+
+        > h2 {
+          border-bottom: 1px solid rgb(220,220,220);
+          margin-bottom: 40px;
+          padding-bottom: 20px;
+        }
+      }
+
+      .response {
+        margin-bottom: 40px;
+
+        h3 {
+          background: url('/static/images/bullet-closed.png') no-repeat left 0.25em;
+          font-family: $sans-serif;
+          font-weight: 700;
+          margin-bottom: 10px;
+          padding-left: 20px;
+          cursor: pointer;
+        }
+
+        .answer {
+          display: none;
+          color: #3c3c3c;
+          padding-left: 16px;
+          font-family: $serif;
+          li {
+            line-height: 1.6em;
+          }
+        }
+
+        // opened states
+        &.opened {
+
+          h3 {
+            background: url('/static/images/bullet-open.png') no-repeat left 0.25em;
+          }
+        }
       }
     }
   }
 }
-
