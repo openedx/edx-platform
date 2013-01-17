@@ -18,20 +18,12 @@ from django.core.urlresolvers import reverse
 
 from fs.errors import ResourceNotFoundError
 
-from lxml.html import rewrite_links
-
-from module_render import get_module
 from courseware.access import has_access
 from static_replace import replace_urls
-from xmodule.modulestore import Location
-from xmodule.modulestore.django import modulestore
-from xmodule.modulestore.xml import XMLModuleStore
-from xmodule.x_module import XModule
-
-
 
 from open_ended_grading.peer_grading_service import PeerGradingService
 from open_ended_grading.staff_grading_service import StaffGradingService
+from open_ended_grading.controller_query_service import ControllerQueryService
 from student.models import unique_id_for_user
 
 log = logging.getLogger(__name__)
@@ -160,6 +152,38 @@ def _peer_grading(tab, user, course, active_page):
         tab = [CourseTab(tab_name, link, active_page == "peer_grading", pending_grading, img_path)]
         return tab
     return []
+
+def _combined_open_ended_grading(tab, user, course, active_page):
+    if user.is_authenticated:
+        link = reverse('peer_grading', args=[course.id])
+        peer_grading_url = settings.PEER_GRADING_INTERFACE
+        split_url = peer_grading_url.split("/")
+        controller_url = "http://" + split_url[2] + "/grading_controller"
+        log.debug(controller_url)
+        peer_gs = ControllerQueryService(controller_url)
+        student_id = unique_id_for_user(user)
+        course_id = course.id
+        user_is_staff  = has_access(user, course, 'staff')
+        last_time_viewed = 1
+        pending_grading= False
+        tab_name = "Peer grading"
+        img_path= ""
+        try:
+            notifications = json.loads(peer_gs.get_notifications(course.id,))
+            if notifications['success']:
+                if notifications['student_needs_to_peer_grade']:
+                    pending_grading=True
+        except:
+            #Non catastrophic error, so no real action
+            log.info("Problem with getting notifications from peer grading service.")
+
+        if pending_grading:
+            img_path = "/static/images/slider-handle.png"
+
+        tab = [CourseTab(tab_name, link, active_page == "peer_grading", pending_grading, img_path)]
+        return tab
+    return []
+
 
 #### Validators
 
@@ -314,16 +338,27 @@ def get_static_tab_by_slug(course, tab_slug):
 
     return None
 
-def get_static_tab_contents(request, cache, course, tab):
 
-    loc = Location(course.location.tag, course.location.org, course.location.course, 'static_tab', tab['url_slug'])
-    tab_module = get_module(request.user, request, loc, cache, course.id)
+def get_static_tab_contents(course, tab):
+    """
+    Given a course and a static tab config dict, load the tab contents,
+    returning None if not found.
 
-    logging.debug('course_module = {0}'.format(tab_module))
-
-    html = ''
-
-    if tab_module is not None:
-        html = tab_module.get_html()
-
-    return html
+    Looks in tabs/{course_url_name}/{tab_slug}.html first, then tabs/{tab_slug}.html.
+    """
+    slug = tab['url_slug']
+    paths = ['tabs/{0}/{1}.html'.format(course.url_name, slug),
+             'tabs/{0}.html'.format(slug)]
+    fs = course.system.resources_fs
+    for p in paths:
+        if fs.exists(p):
+            try:
+                with fs.open(p) as tabfile:
+                    # TODO: redundant with module_render.py.  Want to be helper methods in static_replace or something.
+                    text = tabfile.read().decode('utf-8')
+                    contents = replace_urls(text, course.metadata['data_dir'])
+                    return replace_urls(contents, staticfiles_prefix='/courses/'+course.id, replace_prefix='/course/')
+            except (ResourceNotFoundError) as err:
+                log.exception("Couldn't load tab contents from '{0}': {1}".format(p, err))
+                return None
+    return None

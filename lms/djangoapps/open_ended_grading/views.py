@@ -114,5 +114,45 @@ def peer_grading_problem(request, course_id):
         'ajax_url': ajax_url,
         # Checked above
         'staff_access': False, })
+
+@cache_control(no_cache=True, no_store=True, must_revalidate=True)
+def student_problem_list(request, course_id, student_id):
+    '''
+    Show a student problem list
+    '''
+    course = get_course_with_access(request.user, course_id, 'load')
+
+    # call problem list service
+    success = False
+    error_text = ""
+    problem_list = []
+    try:
+        problem_list_json = peer_gs.get_problem_list(course_id, unique_id_for_user(request.user))
+        problem_list_dict = json.loads(problem_list_json)
+        success = problem_list_dict['success']
+        if 'error' in problem_list_dict:
+            error_text = problem_list_dict['error']
+
+        problem_list = problem_list_dict['problem_list']
+
+    except GradingServiceError:
+        error_text = "Error occured while contacting the grading service"
+        success = False
+    # catch error if if the json loads fails
+    except ValueError:
+        error_text = "Could not get problem list"
+        success = False
+
+    ajax_url = _reverse_with_slash('peer_grading', course_id)
+
+    return render_to_response('peer_grading/peer_grading.html', {
+        'course': course,
+        'course_id': course_id,
+        'ajax_url': ajax_url,
+        'success': success,
+        'problem_list': problem_list,
+        'error_text': error_text,
+        # Checked above
+        'staff_access': False, })
     
 
