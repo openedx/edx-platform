@@ -23,8 +23,8 @@ class Command(BaseCommand):
     and TestCenterRegistration tables with status.
     """
 
-    def datadog_error(string):
-        dog_http_api.event("Pearson Import", string, alert_type='error')
+    def datadog_error(string, tags):
+        dog_http_api.event("Pearson Import", string, alert_type='error', tags=tags)
 
     def handle(self, *args, **kwargs):
         if len(args) < 1:
@@ -44,7 +44,9 @@ class Command(BaseCommand):
                     elif fileinfo.filename.startswith("vcdc-"):
                         self.process_vcdc(zipentry)
                     else:
-                        raise CommandError("Unrecognized confirmation file type \"{}\" in confirmation zip file \"{}\"".format(fileinfo.filename, zipfile))
+                        error = "Unrecognized confirmation file type\"{}\" in confirmation zip file \"{}\"".format(fileinfo.filename, zipfile)
+                        Command.datadog_error(error, source_zip)
+                        raise CommandError(error)
 
     def process_eac(self, eacfile):
         print "processing eac"
@@ -53,31 +55,31 @@ class Command(BaseCommand):
             client_authorization_id = row['ClientAuthorizationID']
             if not client_authorization_id:
                 if row['Status'] == 'Error':
-                    Command.datadog_error("Error in EAD file processing ({}): {}".format(row['Date'], row['Message']))
+                    Command.datadog_error("Error in EAD file processing ({}): {}".format(row['Date'], row['Message']), eacfile)
                 else:
-                    Command.datadog_error("Encountered bad record: {}".format(row))
+                    Command.datadog_error("Encountered bad record: {}".format(row), eacfile)
             else:
                 try:
                     registration = TestCenterRegistration.objects.get(client_authorization_id=client_authorization_id)
-                    Command.datadog_error("Found authorization record for user {}".format(registration.testcenter_user.user.username))
+                    Command.datadog_error("Found authorization record for user {}".format(registration.testcenter_user.user.username), eacfile)
                     # now update the record:
                     registration.upload_status = row['Status']
                     registration.upload_error_message =  row['Message']
                     try:
                         registration.processed_at = strftime('%Y-%m-%d %H:%M:%S', strptime(row['Date'], '%Y/%m/%d %H:%M:%S'))
                     except ValueError as ve:
-                        Command.datadog_error("Bad Date value found for {}: message {}".format(client_authorization_id, ve))
+                        Command.datadog_error("Bad Date value found for {}: message {}".format(client_authorization_id, ve), eacfile)
                     # store the authorization Id if one is provided.  (For debugging)
                     if row['AuthorizationID']:
                         try:
                             registration.authorization_id = int(row['AuthorizationID'])
                         except ValueError as ve:
-                            Command.datadog_error("Bad AuthorizationID value found for {}: message {}".format(client_authorization_id, ve))
+                            Command.datadog_error("Bad AuthorizationID value found for {}: message {}".format(client_authorization_id, ve), eacfile)
 
                     registration.confirmed_at = datetime.utcnow()
                     registration.save()
                 except TestCenterRegistration.DoesNotExist:
-                    Command.datadog_error("Failed to find record for client_auth_id {}".format(client_authorization_id))
+                    Command.datadog_error("Failed to find record for client_auth_id {}".format(client_authorization_id), eacfile)
 
     def process_vcdc(self, vcdcfile):
         print "processing vcdc"
@@ -86,28 +88,28 @@ class Command(BaseCommand):
             client_candidate_id = row['ClientCandidateID']
             if not client_candidate_id:
                 if row['Status'] == 'Error':
-                    Command.datadog_error("Error in CDD file processing ({}): {}".format(row['Date'], row['Message']))
+                    Command.datadog_error("Error in CDD file processing ({}): {}".format(row['Date'], row['Message']), vcdcfile)
                 else:
-                    Command.datadog_error("Encountered bad record: {}".format(row))
+                    Command.datadog_error("Encountered bad record: {}".format(row), vcdcfile)
             else:
                 try:
                     tcuser = TestCenterUser.objects.get(client_candidate_id=client_candidate_id)
-                    Command.datadog_error("Found demographics record for user {}".format(tcuser.user.username))
+                    Command.datadog_error("Found demographics record for user {}".format(tcuser.user.username), vcdcfile)
                     # now update the record:
                     tcuser.upload_status = row['Status']
                     tcuser.upload_error_message = row['Message']
                     try:
                         tcuser.processed_at = strftime('%Y-%m-%d %H:%M:%S', strptime(row['Date'], '%Y/%m/%d %H:%M:%S'))
                     except ValueError as ve:
-                        Command.datadog_error("Bad Date value found for {}: message {}".format(client_candidate_id, ve))
+                        Command.datadog_error("Bad Date value found for {}: message {}".format(client_candidate_id, ve), vcdcfile)
                     # store the candidate Id if one is provided.  (For debugging)
                     if row['CandidateID']:
                         try:
                             tcuser.candidate_id = int(row['CandidateID'])
                         except ValueError as ve:
-                            Command.datadog_error("Bad CandidateID value found for {}: message {}".format(client_candidate_id, ve))
+                            Command.datadog_error("Bad CandidateID value found for {}: message {}".format(client_candidate_id, ve), vcdcfile)
                     tcuser.confirmed_at = datetime.utcnow()
                     tcuser.save()
                 except TestCenterUser.DoesNotExist:
-                    Command.datadog_error(" Failed to find record for client_candidate_id {}".format(client_candidate_id))
+                    Command.datadog_error(" Failed to find record for client_candidate_id {}".format(client_candidate_id), vcdcfile)
 
