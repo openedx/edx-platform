@@ -339,6 +339,11 @@ STAFF_GRADING_INTERFACE = {
 # Used for testing, debugging
 MOCK_STAFF_GRADING = False
 
+################################# Pearson TestCenter config  ################
+
+PEARSONVUE_SIGNINPAGE_URL = "https://www1.pearsonvue.com/testtaker/signin/SignInPage/EDX"
+# TESTCENTER_ACCOMMODATION_REQUEST_EMAIL = "exam-help@edx.org"
+
 ################################# Peer grading config  #####################
 
 #By setting up the default settings with an incorrect user name and password,
@@ -420,6 +425,7 @@ courseware_js = (
 main_vendor_js = [
   'js/vendor/RequireJS.js',
   'js/vendor/json2.js',
+  'js/vendor/RequireJS.js',
   'js/vendor/jquery.min.js',
   'js/vendor/jquery-ui.min.js',
   'js/vendor/jquery.cookie.js',

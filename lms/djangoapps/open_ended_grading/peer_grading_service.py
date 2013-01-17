@@ -79,9 +79,10 @@ class PeerGradingService(GradingService):
         self.show_calibration_essay_url = self.url + '/show_calibration_essay/'
         self.save_calibration_essay_url = self.url + '/save_calibration_essay/'
         self.get_problem_list_url = self.url + '/get_problem_list/'
+        self.get_notifications_url = self.url + '/get_notifications/'
 
     def get_next_submission(self, problem_location, grader_id):
-        response = self.get(self.get_next_submission_url, False, 
+        response = self.get(self.get_next_submission_url,
                 {'location': problem_location, 'grader_id': grader_id})
         return response
 
@@ -114,6 +115,11 @@ class PeerGradingService(GradingService):
     def get_problem_list(self, course_id, grader_id):
         params = {'course_id': course_id, 'student_id': grader_id}
         response = self.get(self.get_problem_list_url, params)
+        return response
+
+    def get_notifications(self, course_id, grader_id):
+        params = {'course_id': course_id, 'student_id': grader_id}
+        response = self.get(self.get_notifications_url, params)
         return response
 
 

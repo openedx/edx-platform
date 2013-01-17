@@ -35,6 +35,43 @@ weights of 30, 10, 10, and 10 to the 4 problems, respectively.
 Note that the default weight of a problem **is not 1.** The default weight of a
 problem is the module's max_grade.
 
+If weighting is set, each problem is worth the number of points assigned, regardless of the number of responses it contains.
+
+Consider a Homework section that contains two problems.
+
+    <problem display_name=”Problem 1”>
+      <numericalresponse> ... </numericalreponse>
+    </problem>
+
+and
+
+    <problem display_name=”Problem 2”>
+      <numericalresponse> ... </numericalreponse>
+      <numericalresponse> ... </numericalreponse>
+      <numericalresponse> ... </numericalreponse>
+    </problem>
+
+
+
+
+
+Without weighting, Problem 1 is worth 25% of the assignment, and Problem 2 is worth 75% of the assignment.
+
+Weighting for the problems can be set in the policy.json file.
+
+    "problem/problem1": {
+       "weight": 2
+       },
+    "problem/problem2": {
+       "weight": 2
+        },
+
+With the above weighting, Problems 1 and 2 are each worth 50% of the assignment.
+
+Please note: When problems have weight, the point value is automatically included in the display name *except* when “weight”: 1.When “weight”: 1, no visual change occurs in the display name, leaving the point value open to interpretation to the student.
+
+
+
 ## Section Weighting
 
 Once each section has a percentage score, we must total those sections into a

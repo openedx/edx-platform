@@ -1,0 +1,40 @@
+<vertical>
+    <graphical_slider_tool>
+        <render>
+            <h2>Graphic slider tool: Output to DOM element.</h2>
+
+            <p>a + b = <span id="answer_span_1"></span></p>
+
+            <div style="clear:both">
+                <p style="float:left;margin-right:10px;">a</p>
+                <slider var='a' style="width:400px;float:left;"/>
+                <textbox var='a' style="width:50px;float:left;margin-left:15px;"/>
+            </div>
+
+            <div style="clear:both">
+                <p style="float:left;margin-right:10px;">b</p>
+                <slider var='b' style="width:400px;float:left;"/>
+                <textbox var='b' style="width:50px;float:left;margin-left:15px;"/>
+            </div>
+            <br/><br/><br/>
+            <plot/>
+        </render>
+        <configuration>
+            <parameters>
+                <param var="a" min="-10.0" max="10.0" step="0.1" initial="0" />
+                <param var="b" min="-10.0" max="10.0" step="0.1" initial="0" />
+            </parameters>
+
+            <functions>
+                <function output="element" el_id="answer_span_1">
+                    function add(a, b, precision) {
+                        var x = Math.pow(10, precision || 2);
+                        return (Math.round(a * x) + Math.round(b * x)) / x;
+                    }
+
+                    return add(a, b, 5);
+                </function>
+            </functions>
+        </configuration>
+    </graphical_slider_tool>
+</vertical>

@@ -2,9 +2,15 @@
 
 from collections import defaultdict
 import csv
+import itertools
+import json
 import logging
 import os
+import requests
 import urllib
+import json
+
+from StringIO import StringIO
 
 from django.conf import settings
 from django.contrib.auth.models import User, Group
@@ -15,12 +21,17 @@ from mitxmako.shortcuts import render_to_response
 from django.core.urlresolvers import reverse
 
 from courseware import grades
-from courseware.access import has_access, get_access_group_name
-from courseware.courses import get_course_with_access 
-from django_comment_client.models import Role, FORUM_ROLE_ADMINISTRATOR, FORUM_ROLE_MODERATOR, FORUM_ROLE_COMMUNITY_TA
+from courseware.access import (has_access, get_access_group_name,
+                               course_beta_test_group_name)
+from courseware.courses import get_course_with_access
+from django_comment_client.models import (Role,
+                                          FORUM_ROLE_ADMINISTRATOR,
+                                          FORUM_ROLE_MODERATOR,
+                                          FORUM_ROLE_COMMUNITY_TA)
 from django_comment_client.utils import has_forum_access
 from psychometrics import psychoanalyze
-from student.models import CourseEnrollment
+from student.models import CourseEnrollment, CourseEnrollmentAllowed
+from courseware.models import StudentModule
 from xmodule.course_module import CourseDescriptor
 from xmodule.modulestore import Location
 from xmodule.modulestore.django import modulestore
@@ -28,7 +39,7 @@ from xmodule.modulestore.exceptions import InvalidLocationError, ItemNotFoundErr
 from xmodule.modulestore.search import path_to_location
 import track.views
 
-
+from .offline_gradecalc import student_grades, offline_grades_available
 
 log = logging.getLogger(__name__)
 
@@ -40,13 +51,12 @@ FORUM_ROLE_REMOVE = 'remove'
 
 @ensure_csrf_cookie
 @cache_control(no_cache=True, no_store=True, must_revalidate=True)
-
 def instructor_dashboard(request, course_id):
     """Display the instructor dashboard for a course."""
     course = get_course_with_access(request.user, course_id, 'staff')
 
     instructor_access = has_access(request.user, course, 'instructor')   # an instructor can manage staff lists
-    
+
     forum_admin_access = has_forum_access(request.user, course_id, FORUM_ROLE_ADMINISTRATOR)
 
     msg = ''
@@ -75,9 +85,12 @@ def instructor_dashboard(request, course_id):
         data.append(['metadata', escape(str(course.metadata))])
     datatable['data'] = data
 
-    def return_csv(fn, datatable):
-        response = HttpResponse(mimetype='text/csv')
-        response['Content-Disposition'] = 'attachment; filename={0}'.format(fn)
+    def return_csv(fn, datatable, fp=None):
+        if fp is None:
+            response = HttpResponse(mimetype='text/csv')
+            response['Content-Disposition'] = 'attachment; filename={0}'.format(fn)
+        else:
+            response = fp
         writer = csv.writer(response, dialect='excel', quotechar='"', quoting=csv.QUOTE_ALL)
         writer.writerow(datatable['header'])
         for datarow in datatable['data']:
@@ -86,16 +99,33 @@ def instructor_dashboard(request, course_id):
         return response
 
     def get_staff_group(course):
-        staffgrp = get_access_group_name(course, 'staff')
+        return get_group(course, 'staff')
+
+    def get_instructor_group(course):
+        return get_group(course, 'instructor')
+
+    def get_group(course, groupname):
+        grpname = get_access_group_name(course, groupname)
         try:
-            group = Group.objects.get(name=staffgrp)
+            group = Group.objects.get(name=grpname)
         except Group.DoesNotExist:
-            group = Group(name=staffgrp)     # create the group
+            group = Group(name=grpname)     # create the group
             group.save()
+
+    def get_beta_group(course):
+        """
+        Get the group for beta testers of course.
+        """
+        # Not using get_group because there is no access control action called
+        # 'beta', so adding it to get_access_group_name doesn't really make
+        # sense.
+        name = course_beta_test_group_name(course.location)
+        (group, created) = Group.objects.get_or_create(name=name)
         return group
 
     # process actions from form POST
     action = request.POST.get('action', '')
+    use_offline = request.POST.get('use_offline_grades',False)
 
     if settings.MITX_FEATURES['ENABLE_MANUAL_GIT_RELOAD']:
         if 'GIT pull' in action:
@@ -125,38 +155,171 @@ def instructor_dashboard(request, course_id):
             except Exception as err:
                 msg += '<br/><p>Error: {0}</p>'.format(escape(err))
 
-    if action == 'Dump list of enrolled students':
+    if action == 'Dump list of enrolled students' or action=='List enrolled students':
         log.debug(action)
-        datatable = get_student_grade_summary_data(request, course, course_id, get_grades=False)
+        datatable = get_student_grade_summary_data(request, course, course_id, get_grades=False, use_offline=use_offline)
         datatable['title'] = 'List of students enrolled in {0}'.format(course_id)
         track.views.server_track(request, 'list-students', {}, page='idashboard')
 
     elif 'Dump Grades' in action:
         log.debug(action)
-        datatable = get_student_grade_summary_data(request, course, course_id, get_grades=True)
+        datatable = get_student_grade_summary_data(request, course, course_id, get_grades=True, use_offline=use_offline)
         datatable['title'] = 'Summary Grades of students enrolled in {0}'.format(course_id)
         track.views.server_track(request, 'dump-grades', {}, page='idashboard')
 
     elif 'Dump all RAW grades' in action:
         log.debug(action)
         datatable = get_student_grade_summary_data(request, course, course_id, get_grades=True,
-                                                   get_raw_scores=True)
+                                                   get_raw_scores=True, use_offline=use_offline)
         datatable['title'] = 'Raw Grades of students enrolled in {0}'.format(course_id)
         track.views.server_track(request, 'dump-grades-raw', {}, page='idashboard')
 
     elif 'Download CSV of all student grades' in action:
         track.views.server_track(request, 'dump-grades-csv', {}, page='idashboard')
         return return_csv('grades_{0}.csv'.format(course_id),
-                          get_student_grade_summary_data(request, course, course_id))
+                          get_student_grade_summary_data(request, course, course_id, use_offline=use_offline))
 
     elif 'Download CSV of all RAW grades' in action:
         track.views.server_track(request, 'dump-grades-csv-raw', {}, page='idashboard')
         return return_csv('grades_{0}_raw.csv'.format(course_id),
-                          get_student_grade_summary_data(request, course, course_id, get_raw_scores=True))
+                          get_student_grade_summary_data(request, course, course_id, get_raw_scores=True, use_offline=use_offline))
 
     elif 'Download CSV of answer distributions' in action:
         track.views.server_track(request, 'dump-answer-dist-csv', {}, page='idashboard')
         return return_csv('answer_dist_{0}.csv'.format(course_id), get_answers_distribution(request, course_id))
+
+    elif "Reset student's attempts" in action:
+        # get the form data
+        unique_student_identifier=request.POST.get('unique_student_identifier','')
+        problem_to_reset=request.POST.get('problem_to_reset','')
+        
+        if problem_to_reset[-4:]==".xml": 
+            problem_to_reset=problem_to_reset[:-4]
+
+        # try to uniquely id student by email address or username
+        try:
+            if "@" in unique_student_identifier:
+                student_to_reset=User.objects.get(email=unique_student_identifier)
+            else:
+                student_to_reset=User.objects.get(username=unique_student_identifier)
+            msg+="Found a single student to reset.  "
+        except:
+            student_to_reset=None
+            msg+="<font color='red'>Couldn't find student with that email or username.  </font>"
+
+        if student_to_reset is not None:
+            # find the module in question
+            try:
+                (org, course_name, run)=course_id.split("/")
+                module_state_key="i4x://"+org+"/"+course_name+"/problem/"+problem_to_reset
+                module_to_reset=StudentModule.objects.get(student_id=student_to_reset.id, 
+                                                          course_id=course_id, 
+                                                          module_state_key=module_state_key)
+                msg+="Found module to reset.  "
+            except Exception as e:
+                msg+="<font color='red'>Couldn't find module with that urlname.  </font>"
+
+        # modify the problem's state
+        try:
+            # load the state json
+            problem_state=json.loads(module_to_reset.state)
+            old_number_of_attempts=problem_state["attempts"]
+            problem_state["attempts"]=0
+
+            # save
+            module_to_reset.state=json.dumps(problem_state)
+            module_to_reset.save()
+            track.views.server_track(request, 
+                                    '{instructor} reset attempts from {old_attempts} to 0 for {student} on problem {problem} in {course}'.format(
+                                        old_attempts=old_number_of_attempts,
+                                        student=student_to_reset,
+                                        problem=module_to_reset.module_state_key,
+                                        instructor=request.user,
+                                        course=course_id),
+                                    {}, 
+                                    page='idashboard')
+            msg+="<font color='green'>Module state successfully reset!</font>"
+        except:
+            msg+="<font color='red'>Couldn't reset module state.  </font>"
+
+
+    elif "Get link to student's progress page" in action:
+        unique_student_identifier=request.POST.get('unique_student_identifier','')
+        try:
+            if "@" in unique_student_identifier:
+                student_to_reset=User.objects.get(email=unique_student_identifier)
+            else:
+                student_to_reset=User.objects.get(username=unique_student_identifier)
+            progress_url=reverse('student_progress',kwargs={'course_id':course_id,'student_id': student_to_reset.id})
+            track.views.server_track(request, 
+                                    '{instructor} requested progress page for {student} in {course}'.format(
+                                        student=student_to_reset,
+                                        instructor=request.user,
+                                        course=course_id),
+                                    {}, 
+                                    page='idashboard')
+            msg+="<a href='{0}' target='_blank'> Progress page for username: {1} with email address: {2}</a>.".format(progress_url,student_to_reset.username,student_to_reset.email)
+        except:
+            msg+="<font color='red'>Couldn't find student with that username.  </font>"
+
+    #----------------------------------------
+    # export grades to remote gradebook
+
+    elif action=='List assignments available in remote gradebook':
+        msg2, datatable = _do_remote_gradebook(request.user, course, 'get-assignments')
+        msg += msg2
+
+    elif action=='List assignments available for this course':
+        log.debug(action)
+        allgrades = get_student_grade_summary_data(request, course, course_id, get_grades=True, use_offline=use_offline)
+
+        assignments = [[x] for x in allgrades['assignments']]
+        datatable = {'header': ['Assignment Name']}
+        datatable['data'] = assignments
+        datatable['title'] = action
+
+        msg += 'assignments=<pre>%s</pre>' % assignments
+
+    elif action=='List enrolled students matching remote gradebook':
+        stud_data = get_student_grade_summary_data(request, course, course_id, get_grades=False, use_offline=use_offline)
+        msg2, rg_stud_data = _do_remote_gradebook(request.user, course, 'get-membership')
+        datatable = {'header': ['Student  email', 'Match?']}
+        rg_students = [ x['email'] for x in rg_stud_data['retdata'] ]
+        def domatch(x):
+            return '<font color="green">yes</font>' if x.email in rg_students else '<font color="red">No</font>'
+        datatable['data'] = [[x.email, domatch(x)] for x in stud_data['students']]
+        datatable['title'] = action
+
+    elif action in ['Display grades for assignment', 'Export grades for assignment to remote gradebook',
+                    'Export CSV file of grades for assignment']:
+
+        log.debug(action)
+        datatable = {}
+        aname = request.POST.get('assignment_name','')
+        if not aname:
+            msg += "<font color='red'>Please enter an assignment name</font>"
+        else:
+            allgrades = get_student_grade_summary_data(request, course, course_id, get_grades=True, use_offline=use_offline)
+            if aname not in allgrades['assignments']:
+                msg += "<font color='red'>Invalid assignment name '%s'</font>" % aname
+            else:
+                aidx = allgrades['assignments'].index(aname)
+                datatable = {'header': ['External email', aname]}
+                datatable['data'] = [[x.email, x.grades[aidx]] for x in allgrades['students']]
+                datatable['title'] = 'Grades for assignment "%s"' % aname
+
+                if 'Export CSV' in action:
+                    # generate and return CSV file
+                    return return_csv('grades %s.csv' % aname, datatable)
+
+                elif 'remote gradebook' in action:
+                    fp = StringIO()
+                    return_csv('', datatable, fp=fp)
+                    fp.seek(0)
+                    files = {'datafile': fp}
+                    msg2, dataset = _do_remote_gradebook(request.user, course, 'post-grades', files=files)
+                    msg += msg2
+
 
     #----------------------------------------
     # Admin
@@ -164,61 +327,101 @@ def instructor_dashboard(request, course_id):
     elif 'List course staff' in action:
         group = get_staff_group(course)
         msg += 'Staff group = {0}'.format(group.name)
-        log.debug('staffgrp={0}'.format(group.name))
+        datatable = _group_members_table(group, "List of Staff", course_id)
+        track.views.server_track(request, 'list-staff', {}, page='idashboard')
+
+    elif 'List course instructors' in action and request.user.is_staff:
+        group = get_instructor_group(course)
+        msg += 'Instructor group = {0}'.format(group.name)
+        log.debug('instructor grp={0}'.format(group.name))
         uset = group.user_set.all()
         datatable = {'header': ['Username', 'Full name']}
         datatable['data'] = [[x.username, x.profile.name] for x in uset]
-        datatable['title'] = 'List of Staff in course {0}'.format(course_id)
-        track.views.server_track(request, 'list-staff', {}, page='idashboard')
+        datatable['title'] = 'List of Instructors in course {0}'.format(course_id)
+        track.views.server_track(request, 'list-instructors', {}, page='idashboard')
 
     elif action == 'Add course staff':
         uname = request.POST['staffuser']
+        group = get_staff_group(course)
+        msg += add_user_to_group(request, uname, group, 'staff', 'staff')
+
+    elif action == 'Add instructor' and request.user.is_staff:
+        uname = request.POST['instructor']
         try:
             user = User.objects.get(username=uname)
         except User.DoesNotExist:
             msg += '<font color="red">Error: unknown username "{0}"</font>'.format(uname)
             user = None
         if user is not None:
-            group = get_staff_group(course)
-            msg += '<font color="green">Added {0} to staff group = {1}</font>'.format(user, group.name)
+            group = get_instructor_group(course)
+            msg += '<font color="green">Added {0} to instructor group = {1}</font>'.format(user, group.name)
             log.debug('staffgrp={0}'.format(group.name))
             user.groups.add(group)
-            track.views.server_track(request, 'add-staff {0}'.format(user), {}, page='idashboard')
+            track.views.server_track(request, 'add-instructor {0}'.format(user), {}, page='idashboard')
 
     elif action == 'Remove course staff':
         uname = request.POST['staffuser']
+        group = get_staff_group(course)
+        msg += remove_user_from_group(request, uname, group, 'staff', 'staff')
+
+    elif action == 'Remove instructor' and request.user.is_staff:
+        uname = request.POST['instructor']
         try:
             user = User.objects.get(username=uname)
         except User.DoesNotExist:
             msg += '<font color="red">Error: unknown username "{0}"</font>'.format(uname)
             user = None
         if user is not None:
-            group = get_staff_group(course)
-            msg += '<font color="green">Removed {0} from staff group = {1}</font>'.format(user, group.name)
-            log.debug('staffgrp={0}'.format(group.name))
+            group = get_instructor_group(course)
+            msg += '<font color="green">Removed {0} from instructor group = {1}</font>'.format(user, group.name)
+            log.debug('instructorgrp={0}'.format(group.name))
             user.groups.remove(group)
-            track.views.server_track(request, 'remove-staff {0}'.format(user), {}, page='idashboard')
+            track.views.server_track(request, 'remove-instructor {0}'.format(user), {}, page='idashboard')
+
+    #----------------------------------------
+    # Group management
+
+    elif 'List beta testers' in action:
+        group = get_beta_group(course)
+        msg += 'Beta test group = {0}'.format(group.name)
+        datatable = _group_members_table(group, "List of beta_testers", course_id)
+        track.views.server_track(request, 'list-beta-testers', {}, page='idashboard')
+
+    elif action == 'Add beta testers':
+        users = request.POST['betausers']
+        log.debug("users: {0!r}".format(users))
+        group = get_beta_group(course)
+        for username_or_email in _split_by_comma_and_whitespace(users):
+            msg += "<p>{0}</p>".format(
+                add_user_to_group(request, username_or_email, group, 'beta testers', 'beta-tester'))
+
+    elif action == 'Remove beta testers':
+        users = request.POST['betausers']
+        group = get_beta_group(course)
+        for username_or_email in _split_by_comma_and_whitespace(users):
+            msg += "<p>{0}</p>".format(
+                remove_user_from_group(request, username_or_email, group, 'beta testers', 'beta-tester'))
 
     #----------------------------------------
     # forum administration
-  
+
     elif action == 'List course forum admins':
         rolename = FORUM_ROLE_ADMINISTRATOR
         datatable = {}
         msg += _list_course_forum_members(course_id, rolename, datatable)
         track.views.server_track(request, 'list-{0}'.format(rolename), {}, page='idashboard')
-        
-    
+
+
     elif action == 'Remove forum admin':
         uname = request.POST['forumadmin']
         msg += _update_forum_role_membership(uname, course, FORUM_ROLE_ADMINISTRATOR, FORUM_ROLE_REMOVE)
-        track.views.server_track(request, '{0} {1} as {2} for {3}'.format(FORUM_ROLE_REMOVE, uname, FORUM_ROLE_ADMINISTRATOR, course_id), 
+        track.views.server_track(request, '{0} {1} as {2} for {3}'.format(FORUM_ROLE_REMOVE, uname, FORUM_ROLE_ADMINISTRATOR, course_id),
                                  {}, page='idashboard')
 
     elif action == 'Add forum admin':
         uname = request.POST['forumadmin']
         msg += _update_forum_role_membership(uname, course, FORUM_ROLE_ADMINISTRATOR, FORUM_ROLE_ADD)
-        track.views.server_track(request, '{0} {1} as {2} for {3}'.format(FORUM_ROLE_ADD, uname, FORUM_ROLE_ADMINISTRATOR, course_id), 
+        track.views.server_track(request, '{0} {1} as {2} for {3}'.format(FORUM_ROLE_ADD, uname, FORUM_ROLE_ADMINISTRATOR, course_id),
                                  {}, page='idashboard')
 
     elif action == 'List course forum moderators':
@@ -226,36 +429,101 @@ def instructor_dashboard(request, course_id):
         datatable = {}
         msg += _list_course_forum_members(course_id, rolename, datatable)
         track.views.server_track(request, 'list-{0}'.format(rolename), {}, page='idashboard')
-    
+
     elif action == 'Remove forum moderator':
         uname = request.POST['forummoderator']
         msg += _update_forum_role_membership(uname, course, FORUM_ROLE_MODERATOR, FORUM_ROLE_REMOVE)
-        track.views.server_track(request, '{0} {1} as {2} for {3}'.format(FORUM_ROLE_REMOVE, uname, FORUM_ROLE_MODERATOR, course_id), 
+        track.views.server_track(request, '{0} {1} as {2} for {3}'.format(FORUM_ROLE_REMOVE, uname, FORUM_ROLE_MODERATOR, course_id),
                                  {}, page='idashboard')
-    
+
     elif action == 'Add forum moderator':
         uname = request.POST['forummoderator']
         msg += _update_forum_role_membership(uname, course, FORUM_ROLE_MODERATOR, FORUM_ROLE_ADD)
-        track.views.server_track(request, '{0} {1} as {2} for {3}'.format(FORUM_ROLE_ADD, uname, FORUM_ROLE_MODERATOR, course_id), 
+        track.views.server_track(request, '{0} {1} as {2} for {3}'.format(FORUM_ROLE_ADD, uname, FORUM_ROLE_MODERATOR, course_id),
                                  {}, page='idashboard')
-    
+
     elif action == 'List course forum community TAs':
         rolename = FORUM_ROLE_COMMUNITY_TA
         datatable = {}
         msg += _list_course_forum_members(course_id, rolename, datatable)
         track.views.server_track(request, 'list-{0}'.format(rolename), {}, page='idashboard')
-    
+
     elif action == 'Remove forum community TA':
         uname = request.POST['forummoderator']
         msg += _update_forum_role_membership(uname, course, FORUM_ROLE_COMMUNITY_TA, FORUM_ROLE_REMOVE)
-        track.views.server_track(request, '{0} {1} as {2} for {3}'.format(FORUM_ROLE_REMOVE, uname, FORUM_ROLE_COMMUNITY_TA, course_id), 
+        track.views.server_track(request, '{0} {1} as {2} for {3}'.format(FORUM_ROLE_REMOVE, uname, FORUM_ROLE_COMMUNITY_TA, course_id),
                                  {}, page='idashboard')
-    
+
     elif action == 'Add forum community TA':
         uname = request.POST['forummoderator']
         msg += _update_forum_role_membership(uname, course, FORUM_ROLE_COMMUNITY_TA, FORUM_ROLE_ADD)
-        track.views.server_track(request, '{0} {1} as {2} for {3}'.format(FORUM_ROLE_ADD, uname, FORUM_ROLE_COMMUNITY_TA, course_id), 
+        track.views.server_track(request, '{0} {1} as {2} for {3}'.format(FORUM_ROLE_ADD, uname, FORUM_ROLE_COMMUNITY_TA, course_id),
                                  {}, page='idashboard')
+
+    #----------------------------------------
+    # enrollment
+
+    elif action == 'List students who may enroll but may not have yet signed up':
+        ceaset = CourseEnrollmentAllowed.objects.filter(course_id=course_id)
+        datatable = {'header': ['StudentEmail']}
+        datatable['data'] = [[x.email] for x in ceaset]
+        datatable['title'] = action
+
+    elif action == 'Enroll student':
+
+        student = request.POST.get('enstudent','')
+        ret = _do_enroll_students(course, course_id, student)
+        datatable = ret['datatable']
+
+    elif action == 'Un-enroll student':
+
+        student = request.POST.get('enstudent','')
+        datatable = {}
+        isok = False
+        cea = CourseEnrollmentAllowed.objects.filter(course_id=course_id, email=student)
+        if cea:
+            cea.delete()
+            msg += "Un-enrolled student with email '%s'" % student
+            isok = True
+        try:
+            nce = CourseEnrollment.objects.get(user=User.objects.get(email=student), course_id=course_id)
+            nce.delete()
+            msg += "Un-enrolled student with email '%s'" % student
+        except Exception as err:
+            if not isok:
+                msg += "Error!  Failed to un-enroll student with email '%s'\n" % student
+                msg += str(err) + '\n'
+
+    elif action == 'Un-enroll ALL students':
+
+        ret = _do_enroll_students(course, course_id, '', overload=True)
+        datatable = ret['datatable']
+
+    elif action == 'Enroll multiple students':
+
+        students = request.POST.get('enroll_multiple','')
+        ret = _do_enroll_students(course, course_id, students)
+        datatable = ret['datatable']
+
+    elif action == 'List sections available in remote gradebook':
+
+        msg2, datatable = _do_remote_gradebook(request.user, course, 'get-sections')
+        msg += msg2
+
+    elif action in ['List students in section in remote gradebook',
+                    'Overload enrollment list using remote gradebook',
+                    'Merge enrollment list with remote gradebook']:
+
+        section = request.POST.get('gradebook_section','')
+        msg2, datatable = _do_remote_gradebook(request.user, course, 'get-membership', dict(section=section) )
+        msg += msg2
+
+        if not 'List' in action:
+            students = ','.join([x['email'] for x in datatable['retdata']])
+            overload = 'Overload' in action
+            ret = _do_enroll_students(course, course_id, students, overload=overload)
+            datatable = ret['datatable']
+
 
     #----------------------------------------
     # psychometrics
@@ -270,9 +538,15 @@ def instructor_dashboard(request, course_id):
         problems = psychoanalyze.problems_with_psychometric_data(course_id)
 
 
+    #----------------------------------------
+    # offline grades?
+
+    if use_offline:
+        msg += "<br/><font color='orange'>Grades from %s</font>" % offline_grades_available(course_id)
 
     #----------------------------------------
     # context for rendering
+
     context = {'course': course,
                'staff_access': True,
                'admin_access': request.user.is_staff,
@@ -285,20 +559,70 @@ def instructor_dashboard(request, course_id):
                'plots': plots,			# psychometrics
                'course_errors': modulestore().get_item_errors(course.location),
                'djangopid' : os.getpid(),
+               'mitx_version' : getattr(settings,'MITX_VERSION_STRING',''),
+               'offline_grade_log' : offline_grades_available(course_id),
                }
 
     return render_to_response('courseware/instructor_dashboard.html', context)
 
+
+def _do_remote_gradebook(user, course, action, args=None, files=None):
+    '''
+    Perform remote gradebook action.  Returns msg, datatable.
+    '''
+    rg = course.metadata.get('remote_gradebook','')
+    if not rg:
+        msg = "No remote gradebook defined in course metadata"
+        return msg, {}
+
+    rgurl = settings.MITX_FEATURES.get('REMOTE_GRADEBOOK_URL','')
+    if not rgurl:
+        msg = "No remote gradebook url defined in settings.MITX_FEATURES"
+        return msg, {}
+
+    rgname = rg.get('name','')
+    if not rgname:
+        msg = "No gradebook name defined in course remote_gradebook metadata"
+        return msg, {}
+
+    if args is None:
+        args = {}
+    data = dict(submit=action, gradebook=rgname, user=user.email)
+    data.update(args)
+
+    try:
+        resp = requests.post(rgurl, data=data, verify=False, files=files)
+        retdict = json.loads(resp.content)
+    except Exception as err:
+        msg = "Failed to communicate with gradebook server at %s<br/>" % rgurl
+        msg += "Error: %s" % err
+        msg += "<br/>resp=%s" % resp.content
+        msg += "<br/>data=%s" % data
+        return msg, {}
+
+    msg = '<pre>%s</pre>' % retdict['msg'].replace('\n','<br/>')
+    retdata = retdict['data']	# a list of dicts
+
+    if retdata:
+        datatable = {'header': retdata[0].keys()}
+        datatable['data'] = [x.values() for x in retdata]
+        datatable['title'] = 'Remote gradebook response for %s' % action
+        datatable['retdata'] = retdata
+    else:
+        datatable = {}
+
+    return msg, datatable
+
 def _list_course_forum_members(course_id, rolename, datatable):
-    ''' 
+    """
     Fills in datatable with forum membership information, for a given role,
     so that it will be displayed on instructor dashboard.
-    
-      course_ID = course's ID string
+
+      course_ID = the ID string for a course
       rolename = one of "Administrator", "Moderator", "Community TA"
-    
+
     Returns message status string to append to displayed message, if role is unknown.
-    '''
+    """
     # make sure datatable is set up properly for display first, before checking for errors
     datatable['header'] = ['Username', 'Full name', 'Roles']
     datatable['title'] = 'List of Forum {0}s in course {1}'.format(rolename, course_id)
@@ -317,13 +641,13 @@ def _list_course_forum_members(course_id, rolename, datatable):
 def _update_forum_role_membership(uname, course, rolename, add_or_remove):
     '''
     Supports adding a user to a course's forum role
-    
+
       uname = username string for user
-      course = course object 
+      course = course object
       rolename = one of "Administrator", "Moderator", "Community TA"
       add_or_remove = one of "add" or "remove"
-      
-    Returns message status string to append to displayed message,  Status is returned if user 
+
+    Returns message status string to append to displayed message,  Status is returned if user
     or role is unknown, or if entry already exists when adding, or if entry doesn't exist when removing.
     '''
     # check that username and rolename are valid:
@@ -343,23 +667,107 @@ def _update_forum_role_membership(uname, course, rolename, add_or_remove):
     if add_or_remove == FORUM_ROLE_REMOVE:
         if not alreadyexists:
             msg ='<font color="red">Error: user "{0}" does not have rolename "{1}", cannot remove</font>'.format(uname, rolename)
-        else: 
+        else:
             user.roles.remove(role)
             msg = '<font color="green">Removed "{0}" from "{1}" forum role = "{2}"</font>'.format(user, course.id, rolename)
     else:
         if alreadyexists:
             msg = '<font color="red">Error: user "{0}" already has rolename "{1}", cannot add</font>'.format(uname, rolename)
-        else: 
-            if (rolename == FORUM_ROLE_ADMINISTRATOR and not has_access(user, course, 'staff')):   
+        else:
+            if (rolename == FORUM_ROLE_ADMINISTRATOR and not has_access(user, course, 'staff')):
                 msg = '<font color="red">Error: user "{0}" should first be added as staff before adding as a forum administrator, cannot add</font>'.format(uname)
             else:
                 user.roles.add(role)
                 msg = '<font color="green">Added "{0}" to "{1}" forum role = "{2}"</font>'.format(user, course.id, rolename)
 
     return msg
-    
 
-def get_student_grade_summary_data(request, course, course_id, get_grades=True, get_raw_scores=False):
+def _group_members_table(group, title, course_id):
+    """
+    Return a data table of usernames and names of users in group_name.
+
+    Arguments:
+        group -- a django group.
+        title -- a descriptive title to show the user
+
+    Returns:
+        a dictionary with keys
+        'header': ['Username', 'Full name'],
+        'data': [[username, name] for all users]
+        'title': "{title} in course {course}"
+    """
+    uset = group.user_set.all()
+    datatable = {'header': ['Username', 'Full name']}
+    datatable['data'] = [[x.username, x.profile.name] for x in uset]
+    datatable['title'] = '{0} in course {1}'.format(title, course_id)
+    return datatable
+
+
+def _add_or_remove_user_group(request, username_or_email, group, group_title, event_name, do_add):
+    """
+    Implementation for both add and remove functions, to get rid of shared code.  do_add is bool that determines which
+    to do.
+    """
+    user = None
+    try:
+        if '@' in username_or_email:
+            user = User.objects.get(email=username_or_email)
+        else:
+            user = User.objects.get(username=username_or_email)
+    except User.DoesNotExist:
+        msg = '<font color="red">Error: unknown username or email "{0}"</font>'.format(username_or_email)
+        user = None
+
+    if user is not None:
+        action = "Added" if do_add else "Removed"
+        prep = "to" if do_add else "from"
+        msg = '<font color="green">{action} {0} {prep} {1} group = {2}</font>'.format(user, group_title, group.name,
+                                                                                  action=action, prep=prep)
+        if do_add:
+            user.groups.add(group)
+        else:
+            user.groups.remove(group)
+        event = "add" if do_add else "remove"
+        track.views.server_track(request, '{event}-{0} {1}'.format(event_name, user, event=event),
+                                 {}, page='idashboard')
+
+    return msg
+
+
+def add_user_to_group(request, username_or_email, group, group_title, event_name):
+    """
+    Look up the given user by username (if no '@') or email (otherwise), and add them to group.
+
+    Arguments:
+       request: django request--used for tracking log
+       username_or_email: who to add.  Decide if it's an email by presense of an '@'
+       group: django group object
+       group_title: what to call this group in messages to user--e.g. "beta-testers".
+       event_name: what to call this event when logging to tracking logs.
+
+    Returns:
+       html to insert in the message field
+    """
+    return _add_or_remove_user_group(request, username_or_email, group, group_title, event_name, True)
+
+def remove_user_from_group(request, username_or_email, group, group_title, event_name):
+    """
+    Look up the given user by username (if no '@') or email (otherwise), and remove them from group.
+
+    Arguments:
+       request: django request--used for tracking log
+       username_or_email: who to remove.  Decide if it's an email by presense of an '@'
+       group: django group object
+       group_title: what to call this group in messages to user--e.g. "beta-testers".
+       event_name: what to call this event when logging to tracking logs.
+
+    Returns:
+       html to insert in the message field
+    """
+    return _add_or_remove_user_group(request, username_or_email, group, group_title, event_name, False)
+
+
+def get_student_grade_summary_data(request, course, course_id, get_grades=True, get_raw_scores=False, use_offline=False):
     '''
     Return data arrays with student identity and grades for specified course.
 
@@ -380,16 +788,18 @@ def get_student_grade_summary_data(request, course, course_id, get_grades=True, 
     enrolled_students = User.objects.filter(courseenrollment__course_id=course_id).prefetch_related("groups").order_by('username')
 
     header = ['ID', 'Username', 'Full Name', 'edX email', 'External email']
+    assignments = []
     if get_grades and enrolled_students.count() > 0:
         # just to construct the header
-        gradeset = grades.grade(enrolled_students[0], request, course, keep_raw_scores=get_raw_scores)
+        gradeset = student_grades(enrolled_students[0], request, course, keep_raw_scores=get_raw_scores, use_offline=use_offline)
         # log.debug('student {0} gradeset {1}'.format(enrolled_students[0], gradeset))
         if get_raw_scores:
-            header += [score.section for score in gradeset['raw_scores']]
+            assignments += [score.section for score in gradeset['raw_scores']]
         else:
-            header += [x['label'] for x in gradeset['section_breakdown']]
+            assignments += [x['label'] for x in gradeset['section_breakdown']]
+    header += assignments
 
-    datatable = {'header': header}
+    datatable = {'header': header, 'assignments': assignments, 'students': enrolled_students}
     data = []
 
     for student in enrolled_students:
@@ -400,20 +810,21 @@ def get_student_grade_summary_data(request, course, course_id, get_grades=True, 
             datarow.append('')
 
         if get_grades:
-            gradeset = grades.grade(student, request, course, keep_raw_scores=get_raw_scores)
-            # log.debug('student={0}, gradeset={1}'.format(student,gradeset))
+            gradeset = student_grades(student, request, course, keep_raw_scores=get_raw_scores, use_offline=use_offline)
+            log.debug('student={0}, gradeset={1}'.format(student,gradeset))
             if get_raw_scores:
-                datarow += [score.earned for score in gradeset['raw_scores']]
+                # TODO (ichuang) encode Score as dict instead of as list, so score[0] -> score['earned']
+                sgrades = [(getattr(score,'earned','') or score[0]) for score in gradeset['raw_scores']]
             else:
-                datarow += [x['percent'] for x in gradeset['section_breakdown']]
+                sgrades = [x['percent'] for x in gradeset['section_breakdown']]
+            datarow += sgrades
+            student.grades = sgrades	# store in student object
 
         data.append(datarow)
     datatable['data'] = data
     return datatable
 
-
-
-
+#-----------------------------------------------------------------------------
 
 @cache_control(no_cache=True, no_store=True, must_revalidate=True)
 def gradebook(request, course_id):
@@ -432,7 +843,7 @@ def gradebook(request, course_id):
     student_info = [{'username': student.username,
                      'id': student.id,
                      'email': student.email,
-                     'grade_summary': grades.grade(student, request, course),
+                     'grade_summary': student_grades(student, request, course),
                      'realname': student.profile.name,
                      }
                      for student in enrolled_students]
@@ -455,6 +866,80 @@ def grade_summary(request, course_id):
     return render_to_response('courseware/grade_summary.html', context)
 
 
+#-----------------------------------------------------------------------------
+# enrollment
+
+
+def _split_by_comma_and_whitespace(s):
+    """
+    Split a string both by on commas and whitespice.
+    """
+    # Note: split() with no args removes empty strings from output
+    lists = [x.split() for x in s.split(',')]
+    # return all of them
+    return itertools.chain(*lists)
+
+def _do_enroll_students(course, course_id, students, overload=False):
+    """Do the actual work of enrolling multiple students, presented as a string
+    of emails separated by commas or returns"""
+
+    new_students = _split_by_comma_and_whitespace(students)
+    new_students = [str(s.strip()) for s in new_students]
+    new_students_lc = [x.lower() for x in new_students]
+
+    if '' in new_students:
+        new_students.remove('')
+
+    status = dict([x,'unprocessed'] for x in new_students)
+
+    if overload:	# delete all but staff
+        todelete = CourseEnrollment.objects.filter(course_id=course_id)
+        for ce in todelete:
+            if not has_access(ce.user, course, 'staff') and ce.user.email.lower() not in new_students_lc:
+                status[ce.user.email] = 'deleted'
+                ce.delete()
+            else:
+                status[ce.user.email] = 'is staff'
+        ceaset = CourseEnrollmentAllowed.objects.filter(course_id=course_id)
+        for cea in ceaset:
+            status[cea.email] = 'removed from pending enrollment list'
+        ceaset.delete()
+
+    for student in new_students:
+        try:
+            user=User.objects.get(email=student)
+        except User.DoesNotExist:
+            # user not signed up yet, put in pending enrollment allowed table
+            if CourseEnrollmentAllowed.objects.filter(email=student, course_id=course_id):
+                status[student] = 'user does not exist, enrollment already allowed, pending'
+                continue
+            cea = CourseEnrollmentAllowed(email=student, course_id=course_id)
+            cea.save()
+            status[student] = 'user does not exist, enrollment allowed, pending'
+            continue
+
+        if CourseEnrollment.objects.filter(user=user, course_id=course_id):
+            status[student] = 'already enrolled'
+            continue
+        try:
+            nce = CourseEnrollment(user=user, course_id=course_id)
+            nce.save()
+            status[student] = 'added'
+        except:
+            status[student] = 'rejected'
+
+    datatable = {'header': ['StudentEmail', 'action']}
+    datatable['data'] = [[x, status[x]] for x in status]
+    datatable['title'] = 'Enrollment of students'
+
+    def sf(stat): return [x for x in status if status[x]==stat]
+
+    data = dict(added=sf('added'), rejected=sf('rejected')+sf('exists'),
+                deleted=sf('deleted'), datatable=datatable)
+
+    return data
+
+
 @ensure_csrf_cookie
 @cache_control(no_cache=True, no_store=True, must_revalidate=True)
 def enroll_students(request, course_id):
@@ -473,22 +958,10 @@ def enroll_students(request, course_id):
     course = get_course_with_access(request.user, course_id, 'staff')
     existing_students = [ce.user.email for ce in CourseEnrollment.objects.filter(course_id=course_id)]
 
-    if 'new_students' in request.POST:
-        new_students = request.POST['new_students'].split('\n')
-    else:
-        new_students = []
-    new_students = [s.strip() for s in new_students]
-
-    added_students = []
-    rejected_students = []
-
-    for student in new_students:
-        try:
-            nce = CourseEnrollment(user=User.objects.get(email=student), course_id=course_id)
-            nce.save()
-            added_students.append(student)
-        except:
-            rejected_students.append(student)
+    new_students = request.POST.get('new_students')
+    ret = _do_enroll_students(course, course_id, new_students)
+    added_students = ret['added']
+    rejected_students = ret['rejected']
 
     return render_to_response("enroll_students.html", {'course': course_id,
                                                        'existing_students': existing_students,
@@ -496,6 +969,9 @@ def enroll_students(request, course_id):
                                                        'rejected_students': rejected_students,
                                                        'debug': new_students})
 
+
+#-----------------------------------------------------------------------------
+# answer distribution
 
 def get_answers_distribution(request, course_id):
     """

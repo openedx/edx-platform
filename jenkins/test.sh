@@ -28,6 +28,12 @@ export PYTHONIOENCODING=UTF-8
 
 GIT_BRANCH=${GIT_BRANCH/HEAD/master}
 
+if [ ! -d /mnt/virtualenvs/"$JOB_NAME" ]; then
+    mkdir -p /mnt/virtualenvs/"$JOB_NAME"
+    virtualenv /mnt/virtualenvs/"$JOB_NAME"
+fi
+
+source /mnt/virtualenvs/"$JOB_NAME"/bin/activate
 pip install -q -r pre-requirements.txt
 pip install -q -r test-requirements.txt
 yes w | pip install -q -r requirements.txt
@@ -41,6 +47,7 @@ rake test_common/lib/xmodule || TESTS_FAILED=1
 rake phantomjs_jasmine_lms || true
 rake phantomjs_jasmine_cms || TESTS_FAILED=1
 rake phantomjs_jasmine_common/lib/xmodule || TESTS_FAILED=1
+
 rake coverage:xml coverage:html
 
 [ $TESTS_FAILED == '0' ]

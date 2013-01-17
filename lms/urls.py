@@ -45,6 +45,9 @@ urlpatterns = ('',
     url(r'^create_account$', 'student.views.create_account'),
     url(r'^activate/(?P<key>[^/]*)$', 'student.views.activate_account', name="activate"),
 
+    url(r'^begin_exam_registration/(?P<course_id>[^/]+/[^/]+/[^/]+)$', 'student.views.begin_exam_registration', name="begin_exam_registration"),
+    url(r'^create_exam_registration$', 'student.views.create_exam_registration'),
+
     url(r'^password_reset/$', 'student.views.password_reset', name='password_reset'),
     ## Obsolete Django views for password resets
     ## TODO: Replace with Mako-ized views

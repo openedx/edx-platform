@@ -1,0 +1,28 @@
+<section id="combined-open-ended-status" class="combined-open-ended-status">
+    %for i in xrange(0,len(status_list)):
+        <%status=status_list[i]%>
+        %if i==len(status_list)-1:
+            <div class="statusitem-current" data-status-number="${i}">
+        %else:
+            <div class="statusitem" data-status-number="${i}">
+        %endif
+
+            Step ${status['task_number']} (${status['human_state']}) : ${status['score']} / ${status['max_score']}
+            % if status['state'] == 'initial':
+                <span class="unanswered" id="status"></span>
+            % elif status['state'] in ['done', 'post_assessment'] and status['correct'] == 'correct':
+                <span class="correct" id="status"></span>
+            % elif status['state'] in ['done', 'post_assessment'] and status['correct'] == 'incorrect':
+                <span class="incorrect" id="status"></span>
+            % elif status['state'] == 'assessing':
+                <span class="grading" id="status"></span>
+            % endif
+
+            %if status['type']=="openended" and status['state'] in ['done', 'post_assessment']:
+                <div class="show-results">
+                    <a href="#" class="show-results-button">Show results from step ${status['task_number']}</a>
+                </div>
+            %endif
+        </div>
+    %endfor
+</section>
