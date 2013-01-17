@@ -1,14 +1,18 @@
-<div class="assessment">
+<div class="assessment-container">
     <div class="rubric">
     ${rubric | n }
     </div>
 
     % if not read_only:
+    <div class="scoring-container">
+    <h3>Scoring</h3>
+    <p>Please select a score below:</p>
     <select name="assessment" class="assessment">
         %for i in xrange(0,max_score+1):
             <option value="${i}">${i}</option>
         %endfor
     </select>
+    </div>
     % endif
 
 </div>

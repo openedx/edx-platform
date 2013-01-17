@@ -54,10 +54,17 @@ section.combined-open-ended-status {
       font-family: monospace;
       font-size: 1em;
       padding: 10px;
+      .show-results {
+          margin-top: .3em;
+          text-align:right;
+      }
+      .show-results-button {
+          font: 1em monospace;
+      }
    }
 
    .statusitem-current {
-     background-color: #ccc;
+     background-color: #cdc;
      color: #2C2C2C;
   }
 
@@ -624,7 +631,15 @@ section.open-ended-child {
     font-size: 0.9em;
   }
 
-  .assessment {
-      margin: 40px 0px 20px 0px;
+  .assessment-container {
+      margin: 40px 0px 30px 0px;
+      .scoring-container
+      {
+          p
+          {
+              margin-bottom: 1em;
+          }
+
+      }
   }
 }

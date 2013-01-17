@@ -1,3 +1,6 @@
+%if len(status_list) > 1:
+<h4>Status</h4>
+<div class="status-elements">
 <section id="combined-open-ended-status" class="combined-open-ended-status">
     %for i in xrange(0,len(status_list)):
         <%status=status_list[i]%>
@@ -20,9 +23,12 @@
 
             %if status['type']=="openended" and status['state'] in ['done', 'post_assessment']:
                 <div class="show-results">
-                    <a href="#" class="show-results-button">Show results from step ${status['task_number']}</a>
+                    <a href="#results" class="show-results-button">Show results from Step ${status['task_number']}</a>
+
                 </div>
             %endif
         </div>
     %endfor
 </section>
+</div>
+%endif
