@@ -271,8 +271,9 @@ class TestCenterUserForm(ModelForm):
         new_user = self.save(commit=False)
         # create additional values here:
         new_user.user_updated_at = datetime.utcnow()
+        new_user.upload_status = ''
         new_user.save()
-        log.info("Updated demographic information for user's test center exam registration: username \"{}\" ".format(new_user.username)) 
+        log.info("Updated demographic information for user's test center exam registration: username \"{}\" ".format(new_user.user.username)) 
         
     # add validation:
     
@@ -533,6 +534,7 @@ class TestCenterRegistrationForm(ModelForm):
         registration = self.save(commit=False)
         # create additional values here:
         registration.user_updated_at = datetime.utcnow()
+        registration.upload_status = ''
         registration.save()
         log.info("Updated registration information for user's test center exam registration: username \"{}\" course \"{}\", examcode \"{}\"".format(registration.testcenter_user.user.username, registration.course_id, registration.exam_series_code)) 
 
