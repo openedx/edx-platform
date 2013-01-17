@@ -44,7 +44,8 @@ class Command(BaseCommand):
             s3(settings.PEARSON['LOCAL_IMPORT'],
                settings.PEARSON['BUCKET'], options['mode'])
             for file in os.listdir(settings.PEARSON['LOCAL_IMPORT']):
-                call_command('pearson_import_conf_zip', 'dest_from_settings')
+                call_command('pearson_import_conf_zip',
+                             settings.PEARSON['LOCAL_IMPORT'] + '/' + file)
                 os.remove(file)
 
         def export_pearson():
