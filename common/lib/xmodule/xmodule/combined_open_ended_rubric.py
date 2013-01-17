@@ -1,16 +1,15 @@
-from mitxmako.shortcuts import render_to_string
 import logging
 from lxml import etree
 
 log=logging.getLogger(__name__)
 
-class CombinedOpenEndedRubric:
+class CombinedOpenEndedRubric(object):
 
     @staticmethod
-    def render_rubric(rubric_xml):
+    def render_rubric(rubric_xml, system):
         try:
             rubric_categories = CombinedOpenEndedRubric.extract_rubric_categories(rubric_xml)
-            html = render_to_string('open_ended_rubric.html', {'rubric_categories'  : rubric_categories})
+            html = system.render_template('open_ended_rubric.html', {'rubric_categories'  : rubric_categories})
         except:
             log.exception("Could not parse the rubric.")
             html = rubric_xml
@@ -64,7 +63,7 @@ class CombinedOpenEndedRubric:
 
         if has_score:
             if scorexml.tag != 'score':
-                raise Exception("[extract_category]: expected score tag, got {0} instead".format(scorexml.tag))
+                raise Exception("[extract_category]mitxmako: expected score tag, got {0} instead".format(scorexml.tag))
 
         for option in optionsxml:
             if option.tag != "option":
