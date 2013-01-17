@@ -2,7 +2,7 @@
     <div class="browse-search">
         <div class="browse is-open">
             <a href="#" class="browse-topic-drop-icon"></a>
-            <a href="#" class="browse-topic-drop-btn"><span class="current-board">All</span> <span class="drop-arrow">▾</span></a>
+            <a href="#" class="browse-topic-drop-btn"><span class="current-board">Show All Discussions</span> <span class="drop-arrow">▾</span></a>
         </div>
         <%include file="_filter_dropdown.html" />
         <div class="search">
@@ -18,6 +18,13 @@
             <li><a href="#" data-sort="votes">votes</a></li>
             <li><a href="#" data-sort="comments">comments</a></li>
         </ul>
+        <span class="group-filter-label">Show:</span>
+        <select class="group-filter-select"> 
+            <option value="all">All Groups</option>
+            <option value="g1">Group 1</option>
+            <option value="g2">Group 2</option>
+        </select>
+
     </div>
     <div class="post-list-wrapper">
         <ul class="post-list">

@@ -181,7 +181,7 @@ body.discussion {
         .drop-arrow {
           float: right;
           color: #999;
-          line-height: 36px;
+          line-height: 37px;
         }
       }
 
@@ -1020,6 +1020,18 @@ body.discussion {
       }
 
     }
+    .group-filter-label {
+      width: 40px;
+      margin-left:10px;
+    }
+
+    .group-filter-select {
+      margin: 5px 0px 5px 5px;
+      width: 80px;
+      font-size:10px;
+      background: transparent;
+      border-color: #ccc;
+    }
   }
 
   .post-list-wrapper {
@@ -1327,6 +1339,8 @@ body.discussion {
       margin-left: 40px;
     }
 
+
+
     .post-tools {
       @include clearfix;
       margin-top: 15px;
@@ -1355,6 +1369,12 @@ body.discussion {
   .discussion-post header,
   .responses li header {
     margin-bottom: 20px;
+  }
+
+  .group-visibility-label {
+    font-size: 12px;
+    color:#ddd;
+    font-style: italic;
   }
 
   .responses {
