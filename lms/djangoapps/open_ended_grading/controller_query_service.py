@@ -19,6 +19,7 @@ class ControllerQueryService(GradingService):
         super(ControllerQuery, self).__init__(config)
         self.check_eta_url = self.url + '/get_submission_eta/'
         self.is_unique_url = self.url + '/is_name_unique/'
+        self.combined_notifications_url = self.url + '/combined_notifications/'
 
     def check_if_name_is_unique(self, location, problem_id, course_id):
         params = {
@@ -35,3 +36,12 @@ class ControllerQueryService(GradingService):
         }
         response = self.get(self.check_eta_url, params)
         return response
+
+    def check_combined_notifications(self, course_id, student_id):
+        params= {
+            'student_id' : student_id,
+            'course_id' : course_id,
+        }
+        response = self.get(self.combined_notifications_url,params)
+        return response
+
