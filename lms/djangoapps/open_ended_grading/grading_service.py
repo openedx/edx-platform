@@ -13,6 +13,8 @@ from util.json_request import expect_json
 from xmodule.course_module import CourseDescriptor
 from xmodule.combined_open_ended_rubric import CombinedOpenEndedRubric
 from lxml import etree
+from mitxmako.shortcuts import render_to_string
+from xmodule.x_module import ModuleSystem
 
 log = logging.getLogger(__name__)
 
@@ -29,6 +31,7 @@ class GradingService(object):
         self.url = config['url']
         self.login_url = self.url + '/login/'
         self.session = requests.session()
+        self.system = ModuleSystem(None, None, None, render_to_string, None)
 
     def _login(self):
         """
@@ -109,7 +112,7 @@ class GradingService(object):
             response_json = json.loads(response)
             if response_json.has_key('rubric'):
                 rubric = response_json['rubric']
-                rubric_renderer = CombinedOpenEndedRubric(False)
+                rubric_renderer = CombinedOpenEndedRubric(self.system, False)
                 success, rubric_html = rubric_renderer.render_rubric(rubric)
                 if not success:
                     error_message = "Could not render rubric: {0}".format(rubric)
