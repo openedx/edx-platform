@@ -21,12 +21,12 @@ class ConditionalModule(XModule):
 
     '''
 
-    js = {'coffee': [resource_string(__name__, 'js/src/capa/display.coffee'),
+    js = {'coffee': [resource_string(__name__, 'js/src/conditional/display.coffee'),
                      resource_string(__name__, 'js/src/collapsible.coffee'),
                      resource_string(__name__, 'js/src/javascript_loader.coffee'),
                     ]}
 
-    js_module_name = "Problem"
+    js_module_name = "Conditional"
     css = {'scss': [resource_string(__name__, 'css/capa/display.scss')]}
 
 
@@ -74,7 +74,7 @@ class ConditionalModule(XModule):
 
     def get_html(self):
         self.is_condition_satisfied()
-        return self.system.render_template('problem_ajax.html', {
+        return self.system.render_template('conditional_ajax.html', {
             'element_id': self.location.html_id(),
             'id': self.id,
             'ajax_url': self.system.ajax_url,
