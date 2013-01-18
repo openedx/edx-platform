@@ -27,7 +27,12 @@ git submodule foreach 'git reset --hard HEAD'
 export PYTHONIOENCODING=UTF-8
 
 GIT_BRANCH=${GIT_BRANCH/HEAD/master}
+if [ ! -d /mnt/virtualenvs/"$JOB_NAME" ]; then
+    mkdir -p /mnt/virtualenvs/"$JOB_NAME"
+    virtualenv /mnt/virtualenvs/"$JOB_NAME"
+fi
 
+source /mnt/virtualenvs/"$JOB_NAME"/bin/activate
 pip install -q -r pre-requirements.txt
 pip install -q -r test-requirements.txt
 yes w | pip install -q -r requirements.txt
