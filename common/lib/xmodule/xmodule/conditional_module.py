@@ -48,7 +48,7 @@ class ConditionalModule(XModule):
         for loc in self.descriptor.required_module_locations:
             module = self.system.get_module(loc)
             self.required_modules.append(module)
-        log.debug('required_modules=%s' % (self.required_modules))
+        #log.debug('required_modules=%s' % (self.required_modules))
 
     def is_condition_satisfied(self):
         self._get_required_modules()
@@ -57,15 +57,15 @@ class ConditionalModule(XModule):
             # all required modules must be completed, as determined by
             # the modules .is_completed() method
             for module in self.required_modules:
-                log.debug('in is_condition_satisfied; student_answers=%s' % module.lcp.student_answers)
-                log.debug('in is_condition_satisfied; instance_state=%s' % module.instance_state)
+                #log.debug('in is_condition_satisfied; student_answers=%s' % module.lcp.student_answers)
+                #log.debug('in is_condition_satisfied; instance_state=%s' % module.instance_state)
                 if not hasattr(module, 'is_completed'):
                     raise Exception('Error in conditional module: required module %s has no .is_completed() method' % module)
                 if not module.is_completed():
-                    log.debug('condition module: %s not completed' % module)
+                    log.debug('conditional module: %s not completed' % module)
                     return False
                 else:
-                    log.debug('condition module: %s IS completed' % module)
+                    log.debug('conditional module: %s IS completed' % module)
             return True
         else:
             raise Exception('Error in conditional module: unknown condition "%s"' % self.condition)
@@ -84,7 +84,7 @@ class ConditionalModule(XModule):
         '''
         This is called by courseware.module_render, to handle an AJAX call.
         '''
-        log.debug('conditional_module handle_ajax: dispatch=%s' % dispatch)
+        #log.debug('conditional_module handle_ajax: dispatch=%s' % dispatch)
 
         if not self.is_condition_satisfied():
             context = {'module': self}
@@ -99,7 +99,7 @@ class ConditionalModule(XModule):
         # for now, just deal with one child
         html = self.contents[0]
         
-        log.debug('rendered conditional module %s' % str(self.location))
+        #log.debug('rendered conditional module %s' % str(self.location))
 
         return json.dumps({'html': html})
         #return html
