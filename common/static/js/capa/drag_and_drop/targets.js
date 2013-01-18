@@ -79,6 +79,8 @@ define(['logme'], function (logme) {
 
             'draggableList': [],
 
+            'state': state,
+
             'targetEl': targetEl,
 
             'numTextEl': numTextEl,
@@ -102,7 +104,20 @@ define(['logme'], function (logme) {
     }
 
     function removeDraggable(draggable) {
+        var c1;
+
         this.draggableList.splice(draggable.onTargetIndex, 1);
+
+        // An item from the array was removed. We need to updated all indexes accordingly.
+        // Shift all indexes down by one if they are higher than the index of the removed item.
+        c1 = 0;
+        while (c1 < this.draggableList.length) {
+            if (this.draggableList[c1].onTargetIndex > draggable.onTargetIndex) {
+                this.draggableList[c1].onTargetIndex -= 1;
+            }
+
+            c1 += 1;
+        }
 
         draggable.onTarget = null;
         draggable.onTargetIndex = null;
@@ -133,7 +148,7 @@ define(['logme'], function (logme) {
     function cycleDraggableOrder() {
         var c1, lowestZIndex, highestZIndex;
 
-        if (this.draggableList.length === 0) {
+        if (this.draggableList.length < 2) {
             return;
         }
 

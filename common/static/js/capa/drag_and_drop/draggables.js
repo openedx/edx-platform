@@ -59,7 +59,7 @@ define(['logme', 'update_input'], function (logme, updateInput) {
         }
     }
 
-    function makeDraggableCopy() {
+    function makeDraggableCopy(callbackFunc) {
         var draggableObj, obj;
 
         draggableObj = {
@@ -158,7 +158,26 @@ define(['logme', 'update_input'], function (logme, updateInput) {
                         draggableObj.mouseMove.call(draggableObj, event);
                     });
                 }
+
+                // Attach events to "iconEl".
+                draggableObj.iconEl.mousedown(function (event) {
+                    draggableObj.mouseDown.call(draggableObj, event);
+                });
+                draggableObj.iconEl.mouseup(function (event) {
+                    draggableObj.mouseUp.call(draggableObj, event);
+                });
+                draggableObj.iconEl.mousemove(function (event) {
+                    draggableObj.mouseMove.call(draggableObj, event);
+                });
+
+                draggableObj.stateDraggablesIndex = draggableObj.state.draggables.push(draggableObj);
+
+                setTimeout(function () {
+                    callbackFunc(draggableObj);
+                }, 0);
             });
+
+            return;
         } else {
             if (obj.label.length > 0) {
                 draggableObj.iconEl = $(
@@ -189,26 +208,17 @@ define(['logme', 'update_input'], function (logme, updateInput) {
             draggableObj.mouseMove.call(draggableObj, event);
         });
 
-        // Attach events to "containerEl".
-        draggableObj.containerEl.mousedown(function (event) {
-            draggableObj.mouseDown.call(draggableObj, event);
-        });
-        draggableObj.containerEl.mouseup(function (event) {
-            draggableObj.mouseUp.call(draggableObj, event);
-        });
-        draggableObj.containerEl.mousemove(function (event) {
-            draggableObj.mouseMove.call(draggableObj, event);
-        });
-
         draggableObj.stateDraggablesIndex = draggableObj.state.draggables.push(draggableObj);
 
-        logme('Returning from draggableCopy.');
+        setTimeout(function () {
+            callbackFunc(draggableObj);
+        }, 0);
 
-        return draggableObj;
+        return;
     }
 
     function moveDraggableToXY(newPosition) {
-        var self, offset, draggableCopy;
+        var self, offset;
 
         if (this.hasLoaded === false) {
             self = this;
@@ -220,10 +230,10 @@ define(['logme', 'update_input'], function (logme, updateInput) {
             return;
         }
 
-        logme('moveDraggableToXY: isReusable = ' + this.isReusable);
         if ((this.isReusable === true) && (this.isOriginal === true)) {
-            draggableCopy = this.makeDraggableCopy();
-            draggableCopy.moveDraggableToXY(newPosition);
+            this.makeDraggableCopy(function (draggableCopy) {
+                draggableCopy.moveDraggableToXY(newPosition);
+            });
 
             return;
         }
@@ -287,7 +297,7 @@ define(['logme', 'update_input'], function (logme, updateInput) {
     }
 
     function moveDraggableToTarget(target) {
-        var self, offset, draggableCopy;
+        var self, offset;
 
         if (this.hasLoaded === false) {
             self = this;
@@ -299,10 +309,10 @@ define(['logme', 'update_input'], function (logme, updateInput) {
             return;
         }
 
-        logme('moveDraggableToTarget: isReusable = ' + this.isReusable);
         if ((this.isReusable === true) && (this.isOriginal === true)) {
-            draggableCopy = this.makeDraggableCopy();
-            draggableCopy.moveDraggableToTarget(target);
+            this.makeDraggableCopy(function (draggableCopy) {
+                draggableCopy.moveDraggableToTarget(target);
+            });
 
             return;
         }
@@ -569,20 +579,20 @@ define(['logme', 'update_input'], function (logme, updateInput) {
     }
 
     function mouseDown(event) {
-        var draggableCopy;
-
         if (this.mousePressed === false) {
             // So that the browser does not perform a default drag.
             // If we don't do this, each drag operation will
             // potentially cause the highlghting of the dragged element.
             event.preventDefault();
+            event.stopPropagation();
 
             // If this draggable is just being dragged out of the
             // container, we must perform some additional tasks.
             if (this.inContainer === true) {
                 if ((this.isReusable === true) && (this.isOriginal === true)) {
-                    draggableCopy = this.makeDraggableCopy();
-                    draggableCopy.mouseDown(event);
+                    this.makeDraggableCopy(function (draggableCopy) {
+                        draggableCopy.mouseDown(event);
+                    });
 
                     return;
                 }
@@ -651,7 +661,7 @@ define(['logme', 'update_input'], function (logme, updateInput) {
         }
     }
 
-    function mouseMove() {
+    function mouseMove(event) {
         if (this.mousePressed === true) {
             // Because we have also attached a 'mousemove' event to the
             // 'document' (that will do the same thing), let's tell the
@@ -881,9 +891,9 @@ define(['logme', 'update_input'], function (logme, updateInput) {
 
         this.zIndex = highestZIndex + 1;
 
-        this.iconEl.css('z-index', highestZIndex);
+        this.iconEl.css('z-index', this.zIndex);
         if (this.labelEl !== null) {
-            this.labelEl.css('z-index', highestZIndex);
+            this.labelEl.css('z-index', this.zIndex);
         }
     }
 
@@ -891,12 +901,27 @@ define(['logme', 'update_input'], function (logme, updateInput) {
     // move it back to the slider, placing it in the same position
     // that it was dragged out of.
     function moveBackToSlider() {
+        var c1;
+
         if (this.isOriginal === false) {
             this.iconEl.empty();
+            this.iconEl.remove();
             if (this.labelEl !== null) {
                 this.labelEl.empty();
+                this.labelEl.remove();
             }
             this.state.draggables.splice(this.stateDraggablesIndex, 1);
+
+            c1 = 0;
+            while (c1 < this.state.draggables) {
+                if (this.state.draggables[c1].stateDraggablesIndex > this.stateDraggablesIndex) {
+                    this.state.draggables[c1].stateDraggablesIndex -= 1;
+                }
+
+                c1 += 1;
+            }
+
+            return;
         }
 
         this.containerEl.show();
