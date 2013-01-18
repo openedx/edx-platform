@@ -58,6 +58,29 @@ def get_opt_course_with_access(user, course_id, action):
     return get_course_with_access(user, course_id, action)
 
 
+    
+  
+def is_course_cohorted(course_id):
+    """
+    given a course id, return a boolean for whether or not the course is cohorted
+        
+    """
+
+def get_cohort_id(user, course_id):
+    """
+    given a course id and a user, return the id of the cohort that user is assigned to
+    and if the course is not cohorted or the user is an instructor, return None
+    
+    """
+    
+def is_commentable_cohorted(course_id,commentable_id)
+    """
+    given a course and a commentable id, return whether or not this commentable is cohorted
+    
+    """
+    
+    
+    
 def course_image_url(course):
     """Try to look up the image url for the course.  If it's not found,
     log an error and return the dead link"""
