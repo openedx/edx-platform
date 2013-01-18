@@ -78,8 +78,12 @@ def is_commentable_cohorted(course_id,commentable_id)
     given a course and a commentable id, return whether or not this commentable is cohorted
     
     """
+
     
-    
+def get_cohort_ids(course_id):
+    """
+    given a course id, return an array of all cohort ids for that course (needed for UI
+    """
     
 def course_image_url(course):
     """Try to look up the image url for the course.  If it's not found,
