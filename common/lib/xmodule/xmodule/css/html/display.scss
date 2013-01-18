@@ -1,4 +1,77 @@
 // HTML component display: 
-.xmodule_HtmlModule {
+* {
+  line-height: 1.4em;
+}
 
+h1 {
+    color: $baseFontColor;
+    font: normal 2em/1.4em $sans-serif;
+    letter-spacing: 1px;
+  }
+
+h2 {
+  color: #646464;
+  font: normal 1.2em/1.2em $sans-serif;
+  letter-spacing: 1px;
+  margin-bottom: 15px;
+  text-transform: uppercase;
+  -webkit-font-smoothing: antialiased;
+}
+
+h3 {
+  font-size: 1.2em;
+  font-weight: 600;
+}
+
+p {
+  margin-bottom: 1.416em;
+  font-size: 1em;
+  line-height: 1.6em !important;
+  color: $baseFontColor;
+}
+
+em, i {
+  font-style: italic;
+}
+
+strong, b {
+  font-style: bold;
+}
+
+p + p, ul + p, ol + p {
+  margin-top: 20px;
+}
+
+ol, ul {
+  margin: 1em 0;
+  padding: 0 0 0 1em;
+  color: $baseFontColor;
+
+  li {
+    margin-bottom: 0.708em;
+  }
+}
+
+ol {
+  list-style: decimal outside none;
+}
+
+ul {
+  list-style: disc outside none;
+}
+
+a {
+  &:link, &:visited, &:hover, &:active {
+    color: #1d9dd9;
+  } 
+}
+
+img {
+  max-width: 100%;
+}
+
+code {
+  color: $baseFontColor;
+  font-family: monospace, serif;
+  background: none;
 }

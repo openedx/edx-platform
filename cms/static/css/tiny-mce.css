@@ -1,4 +1,5 @@
-body {
+.mceContentBody {
+  padding: 10px;
   background-color: #fff;
   font-family: 'Open Sans', Verdana, Arial, Helvetica, sans-serif;
   font-size: 16px;
