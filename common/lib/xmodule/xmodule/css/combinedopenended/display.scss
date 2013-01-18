@@ -233,6 +233,7 @@ div.result-container {
 
 div.result-container, section.open-ended-child {
     .rubric {
+            margin-bottom:25px;
             tr {
                 margin:10px 0px;
                 height: 100%;
@@ -609,13 +610,15 @@ section.open-ended-child {
     }
   }
 
-  div.open-ended-alert {
+  div.open-ended-alert,
+  .message-wrapper {
     padding: 8px 12px;
     border: 1px solid #EBE8BF;
     border-radius: 3px;
     background: #FFFCDD;
     font-size: 0.9em;
     margin-top: 10px;
+    margin-bottom:5px;
   }
 
   div.capa_reset {
