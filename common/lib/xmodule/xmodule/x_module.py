@@ -324,6 +324,11 @@ class XModuleDescriptor(HTMLSnippet, ResourceTemplates, XBlock):
 
         self._child_instances = None
 
+    def get_required_module_descriptors(self):
+        """Returns a list of XModuleDescritpor instances upon which this module depends, but are
+        not children of this module"""
+        return []
+
     def get_children(self):
         """Returns a list of XModuleDescriptor instances for the children of
         this module"""
