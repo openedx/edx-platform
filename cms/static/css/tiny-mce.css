@@ -1,50 +1,89 @@
-body {
-    background-color: #fff;
-    font-family: 'Open Sans', Verdana, Arial, Helvetica, sans-serif;
-    font-size: 16px;
-    line-height: 1.6;
-    color: #3c3c3c;
-    scrollbar-3dlight-color: #F0F0EE;
-    scrollbar-arrow-color: #676662;
-    scrollbar-base-color: #F0F0EE;
-    scrollbar-darkshadow-color: #DDDDDD;
-    scrollbar-face-color: #E0E0DD;
-    scrollbar-highlight-color: #F0F0EE;
-    scrollbar-shadow-color: #F0F0EE;
-    scrollbar-track-color: #F5F5F5;
+.mceContentBody {
+  padding: 10px;
+  background-color: #fff;
+  font-family: 'Open Sans', Verdana, Arial, Helvetica, sans-serif;
+  font-size: 16px;
+  line-height: 1.6;
+  color: #3c3c3c;
+  scrollbar-3dlight-color: #F0F0EE;
+  scrollbar-arrow-color: #676662;
+  scrollbar-base-color: #F0F0EE;
+  scrollbar-darkshadow-color: #DDDDDD;
+  scrollbar-face-color: #E0E0DD;
+  scrollbar-highlight-color: #F0F0EE;
+  scrollbar-shadow-color: #F0F0EE;
+  scrollbar-track-color: #F5F5F5;
 }
 
-a {
-    color: #1d9dd9;
-    text-decoration: none;
-}
-
-p {
-    font-size: 16px;
-    line-height: 1.6;
+h1 {
+  color: #3c3c3c;
+  font-weight: normal;
+  font-size: 2em;
+  line-height: 1.4em;
+  letter-spacing: 1px;
 }
 
 h2 {
-    color: #646464;
-    font-size: 19px;
-    font-weight: 300;
-    letter-spacing: 1px;
-    margin-bottom: 15px;
-    text-transform: uppercase;
+  color: #646464;
+  font-weight: normal;
+  font-size: 1.2em;
+  line-height: 1.2em;
+  letter-spacing: 1px;
+  margin-bottom: 15px;
+  text-transform: uppercase;
+  -webkit-font-smoothing: antialiased;
 }
 
 h3 {
-    font-size: 19px;
-    font-weight: 400;
+  font-size: 1.2em;
+  font-weight: 600;
+}
+
+p {
+  margin-bottom: 1.416em;
+  font-size: 1em;
+  line-height: 1.6em !important;
+  color: $baseFontColor;
+}
+
+em, i {
+  font-style: italic;
+}
+
+strong, b {
+  font-style: bold;
+}
+
+p + p, ul + p, ol + p {
+  margin-top: 20px;
+}
+
+ol, ul {
+  margin: 1em 0;
+  padding: 0 0 0 1em;
+}
+
+ol li, ul li {
+  margin-bottom: 0.708em;
+}
+
+ol {
+  list-style: decimal outside none;
+}
+
+ul {
+  list-style: disc outside none;
+}
+
+a, a:link, a:visited, a:hover, a:active {
+  color: #1d9dd9;
+} 
+
+img {
+  max-width: 100%;
 }
 
 code {
-    margin: 0 2px;
-    padding: 0px 5px;
-    border-radius: 3px;
-    border: 1px solid #eaeaea;
-    white-space: nowrap;
-    font-family: Monaco, monospace;
-    font-size: 14px;
-    background-color: #f8f8f8;
+  font-family: monospace, serif;
+  background: none;
 }
