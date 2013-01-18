@@ -50,6 +50,7 @@ define(['logme'], function (logme) {
             }(0));
         }
 
+        logme('input = "' + JSON.stringify({'draggables': draggables}) + '".');
         $('#input_' + state.problemId).val(JSON.stringify({'draggables': draggables}));
     }
 

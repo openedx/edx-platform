@@ -215,8 +215,11 @@ If we have can_reuse=true, than one must use only long form of correct answer.
 Logic flow
 ----------
 
+(Click on image to see full size version.)
+
 .. image:: draganddrop_logic_flow.png
-    :scale: 36 %
+    :width: 100%
+    :target: _images/draganddrop_logic_flow.png
 
 
 Example
