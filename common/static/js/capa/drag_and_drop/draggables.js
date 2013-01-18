@@ -60,81 +60,37 @@ define(['logme', 'update_input'], function (logme, updateInput) {
     }
 
     function makeDraggableCopy(callbackFunc) {
-        var draggableObj, obj;
+        var draggableObj, property;
 
-        draggableObj = {
-            'uniqueId': /* this.uniqueId */ this.state.getUniqueId(), // Is newly set.
+        // Make a full proper copy of the draggable object, with some modifications.
+        draggableObj = {};
+        for (property in this) {
+            if (this.hasOwnProperty(property) === true) {
+                draggableObj[property] = this[property];
+            }
+        }
+        // The modifications to the draggable copy.
+        draggableObj.isOriginal = false; // This new draggable is a copy.
+        draggableObj.uniqueId = draggableObj.state.getUniqueId(); // Is newly set.
+        draggableObj.stateDraggablesIndex = null; // Will be set.
+        draggableObj.containerEl = null; // Not needed, since a copy will never return to a container element.
+        draggableObj.iconEl = null; // Will be created.
+        draggableObj.labelEl = null; // Will be created.
 
-            'originalConfigObj': this.originalConfigObj,
-            'stateDraggablesIndex': /* this.stateDraggablesIndex */ null, // Will be set.
-
-            'id': this.id,
-
-            'isReusable': this.isReusable,
-            'isOriginal': false,
-
-            'x': this.x,
-            'y': this.y,
-
-            'zIndex': this.zIndex,
-
-            // Not needed, since a copy will never return to a container element.
-            'containerEl': null,
-
-            'iconEl': /* this.iconEl */ null, // Will be created.
-            'iconElBGColor': this.iconElBGColor,
-            'iconElPadding': this.iconElPadding,
-            'iconElBorder': this.iconElBorder,
-            'iconElLeftOffset': this.iconElLeftOffset,
-            'iconWidth': this.iconWidth,
-            'iconHeight': this.iconHeight,
-            'iconWidthSmall': this.iconWidthSmall,
-            'iconHeightSmall': this.iconHeightSmall,
-
-            'labelEl': /* this.labelEl */ null, // Will be created.
-            'labelWidth': this.labelWidth,
-
-            'hasLoaded': this.hasLoaded,
-            'inContainer': this.inContainer,
-            'mousePressed': this.mousePressed,
-            'onTarget': this.onTarget,
-            'onTargetIndex': this.onTargetIndex,
-
-            'state': this.state,
-
-            'mouseDown': this.mouseDown,
-            'mouseUp': this.mouseUp,
-            'mouseMove': this.mouseMove,
-            'checkLandingElement': this.checkLandingElement,
-            'checkIfOnTarget': this.checkIfOnTarget,
-            'snapToTarget': this.snapToTarget,
-            'correctZIndexes': this.correctZIndexes,
-            'moveBackToSlider': this.moveBackToSlider,
-
-            'moveDraggableToTarget': this.moveDraggableToTarget,
-            'moveDraggableToXY': this.moveDraggableToXY,
-
-            'makeDraggableCopy': this.makeDraggableCopy
-        };
-
-        obj = draggableObj.originalConfigObj;
-
-        if (obj.icon.length > 0) {
+        // Create DOM elements and attach events.
+        if (draggableObj.originalConfigObj.icon.length > 0) {
             draggableObj.iconEl = $('<img />');
-            draggableObj.iconEl.attr('src', obj.icon);
+            draggableObj.iconEl.attr('src', draggableObj.originalConfigObj.icon);
             draggableObj.iconEl.load(function () {
-                draggableObj.iconEl.css('position', 'absolute');
-                draggableObj.iconEl.css('width', draggableObj.iconWidthSmall);
-                draggableObj.iconEl.css('height', draggableObj.iconHeightSmall);
-                draggableObj.iconEl.css('left', 50 - draggableObj.iconWidthSmall * 0.5);
+                draggableObj.iconEl.css({
+                    'position': 'absolute',
+                    'width': draggableObj.iconWidthSmall,
+                    'height': draggableObj.iconHeightSmall,
+                    'left': 50 - draggableObj.iconWidthSmall * 0.5,
+                    'top': ((draggableObj.originalConfigObj.label.length > 0) ? 5 : 50 - draggableObj.iconHeightSmall * 0.5)
+                });
 
-                if (obj.label.length > 0) {
-                    draggableObj.iconEl.css('top', 5);
-                } else {
-                    draggableObj.iconEl.css('top', 50 - draggableObj.iconHeightSmall * 0.5);
-                }
-
-                if (obj.label.length > 0) {
+                if (draggableObj.originalConfigObj.label.length > 0) {
                     draggableObj.labelEl = $(
                         '<div ' +
                             'style=" ' +
@@ -143,34 +99,18 @@ define(['logme', 'update_input'], function (logme, updateInput) {
                                 'font-size: 0.95em; ' +
                             '" ' +
                         '>' +
-                            obj.label +
+                            draggableObj.originalConfigObj.label +
                         '</div>'
                     );
+                    draggableObj.labelEl.css({
+                        'left': 50 - draggableObj.labelWidth * 0.5,
+                        'top': 5 + draggableObj.iconHeightSmall + 5
+                    });
 
-                    draggableObj.labelEl.css('left', 50 - draggableObj.labelWidth * 0.5);
-                    draggableObj.labelEl.css('top', 5 + draggableObj.iconHeightSmall + 5);
-
-                    draggableObj.labelEl.mousedown(function (event) {
-                        draggableObj.mouseDown.call(draggableObj, event);
-                    });
-                    draggableObj.labelEl.mouseup(function (event) {
-                        draggableObj.mouseUp.call(draggableObj, event);
-                    });
-                    draggableObj.labelEl.mousemove(function (event) {
-                        draggableObj.mouseMove.call(draggableObj, event);
-                    });
+                    draggableObj.attachMouseEventsTo('labelEl');
                 }
 
-                // Attach events to "iconEl".
-                draggableObj.iconEl.mousedown(function (event) {
-                    draggableObj.mouseDown.call(draggableObj, event);
-                });
-                draggableObj.iconEl.mouseup(function (event) {
-                    draggableObj.mouseUp.call(draggableObj, event);
-                });
-                draggableObj.iconEl.mousemove(function (event) {
-                    draggableObj.mouseMove.call(draggableObj, event);
-                });
+                draggableObj.attachMouseEventsTo('iconEl');
 
                 draggableObj.stateDraggablesIndex = draggableObj.state.draggables.push(draggableObj);
 
@@ -181,7 +121,7 @@ define(['logme', 'update_input'], function (logme, updateInput) {
 
             return;
         } else {
-            if (obj.label.length > 0) {
+            if (draggableObj.originalConfigObj.label.length > 0) {
                 draggableObj.iconEl = $(
                     '<div ' +
                         'style=" ' +
@@ -190,43 +130,51 @@ define(['logme', 'update_input'], function (logme, updateInput) {
                             'font-size: 0.95em; ' +
                         '" ' +
                     '>' +
-                        obj.label +
+                        draggableObj.originalConfigObj.label +
                     '</div>'
                 );
+                draggableObj.iconEl.css({
+                    'left': 50 - draggableObj.iconWidthSmall * 0.5,
+                    'top': 50 - draggableObj.iconHeightSmall * 0.5
+                });
 
-                draggableObj.iconEl.css('left', 50 - draggableObj.iconWidthSmall * 0.5);
-                draggableObj.iconEl.css('top', 50 - draggableObj.iconHeightSmall * 0.5);
+                draggableObj.attachMouseEventsTo('iconEl');
+
+                draggableObj.stateDraggablesIndex = draggableObj.state.draggables.push(draggableObj);
+
+                setTimeout(function () {
+                    callbackFunc(draggableObj);
+                }, 0);
+
+                return;
             }
         }
-
-        // Attach events to "iconEl".
-        draggableObj.iconEl.mousedown(function (event) {
-            draggableObj.mouseDown.call(draggableObj, event);
-        });
-        draggableObj.iconEl.mouseup(function (event) {
-            draggableObj.mouseUp.call(draggableObj, event);
-        });
-        draggableObj.iconEl.mousemove(function (event) {
-            draggableObj.mouseMove.call(draggableObj, event);
-        });
-
-        draggableObj.stateDraggablesIndex = draggableObj.state.draggables.push(draggableObj);
-
-        setTimeout(function () {
-            callbackFunc(draggableObj);
-        }, 0);
-
-        return;
     }
 
-    function moveDraggableToXY(newPosition) {
+    function attachMouseEventsTo(element) {
+        var self;
+
+        self = this;
+
+        this[element].mousedown(function (event) {
+            self.mouseDown(event);
+        });
+        this[element].mouseup(function (event) {
+            self.mouseUp(event);
+        });
+        this[element].mousemove(function (event) {
+            self.mouseMove(event);
+        });
+    }
+
+    function moveDraggableTo(moveType, target) {
         var self, offset;
 
         if (this.hasLoaded === false) {
             self = this;
 
             setTimeout(function () {
-                self.moveDraggableToXY(newPosition);
+                self.moveDraggableTo(moveType, target);
             }, 50);
 
             return;
@@ -234,7 +182,7 @@ define(['logme', 'update_input'], function (logme, updateInput) {
 
         if ((this.isReusable === true) && (this.isOriginal === true)) {
             this.makeDraggableCopy(function (draggableCopy) {
-                draggableCopy.moveDraggableToXY(newPosition);
+                draggableCopy.moveDraggableTo(moveType, target);
             });
 
             return;
@@ -251,121 +199,57 @@ define(['logme', 'update_input'], function (logme, updateInput) {
             this.containerEl.hide();
             this.iconEl.detach();
         }
-        this.iconEl.css('background-color', this.iconElBGColor);
-        this.iconEl.css('padding-left', this.iconElPadding);
-        this.iconEl.css('padding-right', this.iconElPadding);
-        this.iconEl.css('border', this.iconElBorder);
-        this.iconEl.css('width', this.iconWidth);
-        this.iconEl.css('height', this.iconHeight);
-        this.iconEl.css(
-            'left',
-            newPosition.x - this.iconWidth * 0.5 + offset - this.iconElLeftOffset
-        );
-        this.iconEl.css(
-            'top',
-            newPosition.y - this.iconHeight * 0.5 + offset
-        );
-        this.iconEl.appendTo(this.state.baseImageEl.parent());
-
-        if (this.labelEl !== null) {
-            if (this.isOriginal === true) {
-                this.labelEl.detach();
-            }
-            this.labelEl.css('background-color', this.state.config.labelBgColor);
-            this.labelEl.css('padding-left', 8);
-            this.labelEl.css('padding-right', 8);
-            this.labelEl.css('border', '1px solid black');
-            this.labelEl.css(
-                'left',
-                newPosition.x - this.labelWidth * 0.5 + offset - 9 // Account for padding, border.
-            );
-            this.labelEl.css(
-                'top',
-                newPosition.y - this.iconHeight * 0.5 + this.iconHeight + 5 + offset
-            );
-            this.labelEl.appendTo(this.state.baseImageEl.parent());
-        }
-
-        this.x = newPosition.x;
-        this.y = newPosition.y;
-
-        this.zIndex = 1000;
-        this.correctZIndexes();
-
-        if (this.isOriginal === true) {
-            this.state.numDraggablesInSlider -= 1;
-            this.state.updateArrowOpacity();
-        }
-    }
-
-    function moveDraggableToTarget(target) {
-        var self, offset;
-
-        if (this.hasLoaded === false) {
-            self = this;
-
-            setTimeout(function () {
-                self.moveDraggableToTarget(target);
-            }, 50);
-
-            return;
-        }
-
-        if ((this.isReusable === true) && (this.isOriginal === true)) {
-            this.makeDraggableCopy(function (draggableCopy) {
-                draggableCopy.moveDraggableToTarget(target);
+        this.iconEl.css({
+            'background-color': this.iconElBGColor,
+            'padding-left': this.iconElPadding,
+            'padding-right': this.iconElPadding,
+            'border': this.iconElBorder,
+            'width': this.iconWidth,
+            'height': this.iconHeight
+        });
+        if (moveType === 'target') {
+            this.iconEl.css({
+                'left': target.offset.left + 0.5 * target.w - this.iconWidth * 0.5 + offset - this.iconElLeftOffset,
+                'top': target.offset.top + 0.5 * target.h - this.iconHeight * 0.5 + offset
             });
-
-            return;
+        } else {
+            this.iconEl.css({
+                'left': target.x - this.iconWidth * 0.5 + offset - this.iconElLeftOffset,
+                'top': target.y - this.iconHeight * 0.5 + offset
+            });
         }
-
-        offset = 0;
-        if (this.state.config.targetOutline === true) {
-            offset = 1;
-        }
-
-        this.inContainer = false;
-
-        if (this.isOriginal === true) {
-            this.containerEl.hide();
-            this.iconEl.detach();
-        }
-        this.iconEl.css('background-color', this.iconElBGColor);
-        this.iconEl.css('padding-left', this.iconElPadding);
-        this.iconEl.css('padding-right', this.iconElPadding);
-        this.iconEl.css('border', this.iconElBorder);
-        this.iconEl.css('width', this.iconWidth);
-        this.iconEl.css('height', this.iconHeight);
-        this.iconEl.css(
-            'left',
-            target.offset.left + 0.5 * target.w - this.iconWidth * 0.5 + offset - this.iconElLeftOffset
-        );
-        this.iconEl.css(
-            'top',
-            target.offset.top + 0.5 * target.h - this.iconHeight * 0.5 + offset
-        );
         this.iconEl.appendTo(this.state.baseImageEl.parent());
 
         if (this.labelEl !== null) {
             if (this.isOriginal === true) {
                 this.labelEl.detach();
             }
-            this.labelEl.css('background-color', this.state.config.labelBgColor);
-            this.labelEl.css('padding-left', 8);
-            this.labelEl.css('padding-right', 8);
-            this.labelEl.css('border', '1px solid black');
-            this.labelEl.css(
-                'left',
-                target.offset.left + 0.5 * target.w - this.labelWidth * 0.5 + offset - 9 // Account for padding, border.
-            );
-            this.labelEl.css(
-                'top',
-                target.offset.top + 0.5 * target.h + this.iconHeight * 0.5 + 5 + offset
-            );
+            this.labelEl.css({
+                'background-color': this.state.config.labelBgColor,
+                'padding-left': 8,
+                'padding-right': 8,
+                'border': '1px solid black'
+            });
+            if (moveType === 'target') {
+                this.labelEl.css({
+                    'left': target.offset.left + 0.5 * target.w - this.labelWidth * 0.5 + offset - 9, // Account for padding, border.
+                    'top': target.offset.top + 0.5 * target.h + this.iconHeight * 0.5 + 5 + offset
+                });
+            } else {
+                this.labelEl.css({
+                    'left': target.x - this.labelWidth * 0.5 + offset - 9, // Account for padding, border.
+                    'top': target.y - this.iconHeight * 0.5 + this.iconHeight + 5 + offset
+                });
+            }
             this.labelEl.appendTo(this.state.baseImageEl.parent());
         }
 
-        target.addDraggable(this);
+        if (moveType === 'target') {
+            target.addDraggable(this);
+        } else {
+            this.x = target.x;
+            this.y = target.y;
+        }
 
         this.zIndex = 1000;
         this.correctZIndexes();
@@ -374,7 +258,6 @@ define(['logme', 'update_input'], function (logme, updateInput) {
             this.state.numDraggablesInSlider -= 1;
             this.state.updateArrowOpacity();
         }
-
     }
 
     function processDraggable(state, obj) {
@@ -382,22 +265,15 @@ define(['logme', 'update_input'], function (logme, updateInput) {
 
         draggableObj = {
             'uniqueId': state.getUniqueId(),
-
             'originalConfigObj': obj,
             'stateDraggablesIndex': null,
-
             'id': obj.id,
-
             'isReusable': obj.can_reuse,
             'isOriginal': true,
-
             'x': -1,
             'y': -1,
-
             'zIndex': 1,
-
             'containerEl': null,
-
             'iconEl': null,
             'iconElBGColor': null,
             'iconElPadding': null,
@@ -407,16 +283,13 @@ define(['logme', 'update_input'], function (logme, updateInput) {
             'iconHeight': null,
             'iconWidthSmall': null,
             'iconHeightSmall': null,
-
             'labelEl': null,
             'labelWidth': null,
-
             'hasLoaded': false,
             'inContainer': true,
             'mousePressed': false,
             'onTarget': null,
             'onTargetIndex': null,
-
             'state': state,
 
             'mouseDown': mouseDown,
@@ -427,11 +300,9 @@ define(['logme', 'update_input'], function (logme, updateInput) {
             'snapToTarget': snapToTarget,
             'correctZIndexes': correctZIndexes,
             'moveBackToSlider': moveBackToSlider,
-
-            'moveDraggableToTarget': moveDraggableToTarget,
-            'moveDraggableToXY': moveDraggableToXY,
-
-            'makeDraggableCopy': makeDraggableCopy
+            'moveDraggableTo': moveDraggableTo,
+            'makeDraggableCopy': makeDraggableCopy,
+            'attachMouseEventsTo': attachMouseEventsTo
         };
 
         draggableObj.containerEl = $(
@@ -472,17 +343,13 @@ define(['logme', 'update_input'], function (logme, updateInput) {
                     draggableObj.iconWidthSmall = draggableObj.iconHeightSmall * (draggableObj.iconWidth / draggableObj.iconHeight);
                 }
 
-                draggableObj.iconEl.css('position', 'absolute');
-                draggableObj.iconEl.css('width', draggableObj.iconWidthSmall);
-                draggableObj.iconEl.css('height', draggableObj.iconHeightSmall);
-                draggableObj.iconEl.css('left', 50 - draggableObj.iconWidthSmall * 0.5);
-
-                if (obj.label.length > 0) {
-                    draggableObj.iconEl.css('top', 5);
-                } else {
-                    draggableObj.iconEl.css('top', 50 - draggableObj.iconHeightSmall * 0.5);
-                }
-
+                draggableObj.iconEl.css({
+                    'position': 'absolute',
+                    'width': draggableObj.iconWidthSmall,
+                    'height': draggableObj.iconHeightSmall,
+                    'left': 50 - draggableObj.iconWidthSmall * 0.5,
+                    'top': ((obj.label.length > 0) ? 5 : 50 - draggableObj.iconHeightSmall * 0.5)
+                });
                 draggableObj.iconEl.appendTo(draggableObj.containerEl);
 
                 if (obj.label.length > 0) {
@@ -500,18 +367,12 @@ define(['logme', 'update_input'], function (logme, updateInput) {
 
                     draggableObj.labelEl.appendTo(draggableObj.containerEl);
                     draggableObj.labelWidth = draggableObj.labelEl.width();
-                    draggableObj.labelEl.css('left', 50 - draggableObj.labelWidth * 0.5);
-                    draggableObj.labelEl.css('top', 5 + draggableObj.iconHeightSmall + 5);
+                    draggableObj.labelEl.css({
+                        'left': 50 - draggableObj.labelWidth * 0.5,
+                        'top': 5 + draggableObj.iconHeightSmall + 5
+                    });
 
-                    draggableObj.labelEl.mousedown(function (event) {
-                        draggableObj.mouseDown.call(draggableObj, event);
-                    });
-                    draggableObj.labelEl.mouseup(function (event) {
-                        draggableObj.mouseUp.call(draggableObj, event);
-                    });
-                    draggableObj.labelEl.mousemove(function (event) {
-                        draggableObj.mouseMove.call(draggableObj, event);
-                    });
+                    draggableObj.attachMouseEventsTo('labelEl');
                 }
 
                 draggableObj.hasLoaded = true;
@@ -546,8 +407,10 @@ define(['logme', 'update_input'], function (logme, updateInput) {
                 draggableObj.iconWidthSmall = draggableObj.iconWidth;
                 draggableObj.iconHeightSmall = draggableObj.iconHeight;
 
-                draggableObj.iconEl.css('left', 50 - draggableObj.iconWidthSmall * 0.5);
-                draggableObj.iconEl.css('top', 50 - draggableObj.iconHeightSmall * 0.5);
+                draggableObj.iconEl.css({
+                    'left': 50 - draggableObj.iconWidthSmall * 0.5,
+                    'top': 50 - draggableObj.iconHeightSmall * 0.5
+                });
 
                 draggableObj.hasLoaded = true;
             } else {
@@ -556,27 +419,8 @@ define(['logme', 'update_input'], function (logme, updateInput) {
             }
         }
 
-        // Attach events to "iconEl".
-        draggableObj.iconEl.mousedown(function (event) {
-            draggableObj.mouseDown.call(draggableObj, event);
-        });
-        draggableObj.iconEl.mouseup(function (event) {
-            draggableObj.mouseUp.call(draggableObj, event);
-        });
-        draggableObj.iconEl.mousemove(function (event) {
-            draggableObj.mouseMove.call(draggableObj, event);
-        });
-
-        // Attach events to "containerEl".
-        draggableObj.containerEl.mousedown(function (event) {
-            draggableObj.mouseDown.call(draggableObj, event);
-        });
-        draggableObj.containerEl.mouseup(function (event) {
-            draggableObj.mouseUp.call(draggableObj, event);
-        });
-        draggableObj.containerEl.mousemove(function (event) {
-            draggableObj.mouseMove.call(draggableObj, event);
-        });
+        draggableObj.attachMouseEventsTo('iconEl');
+        draggableObj.attachMouseEventsTo('containerEl');
 
         state.numDraggablesInSlider += 1;
         draggableObj.stateDraggablesIndex = state.draggables.push(draggableObj) - 1;
@@ -605,38 +449,30 @@ define(['logme', 'update_input'], function (logme, updateInput) {
                     this.containerEl.hide();
                     this.iconEl.detach();
                 }
-                this.iconEl.css('background-color', this.iconElBGColor);
-                this.iconEl.css('padding-left', this.iconElPadding);
-                this.iconEl.css('padding-right', this.iconElPadding);
-                this.iconEl.css('border', this.iconElBorder);
-                this.iconEl.css('width', this.iconWidth);
-                this.iconEl.css('height', this.iconHeight);
-                this.iconEl.css(
-                    'left',
-                    event.pageX - this.state.baseImageEl.offset().left - this.iconWidth * 0.5 - this.iconElLeftOffset
-                );
-                this.iconEl.css(
-                    'top',
-                    event.pageY - this.state.baseImageEl.offset().top - this.iconHeight * 0.5
-                );
+                this.iconEl.css({
+                    'background-color': this.iconElBGColor,
+                    'padding-left': this.iconElPadding,
+                    'padding-right': this.iconElPadding,
+                    'border': this.iconElBorder,
+                    'width': this.iconWidth,
+                    'height': this.iconHeight,
+                    'left': event.pageX - this.state.baseImageEl.offset().left - this.iconWidth * 0.5 - this.iconElLeftOffset,
+                    'top': event.pageY - this.state.baseImageEl.offset().top - this.iconHeight * 0.5
+                });
                 this.iconEl.appendTo(this.state.baseImageEl.parent());
 
                 if (this.labelEl !== null) {
                     if (this.isOriginal === true) {
                         this.labelEl.detach();
                     }
-                    this.labelEl.css('background-color', this.state.config.labelBgColor);
-                    this.labelEl.css('padding-left', 8);
-                    this.labelEl.css('padding-right', 8);
-                    this.labelEl.css('border', '1px solid black');
-                    this.labelEl.css(
-                        'left',
-                        event.pageX - this.state.baseImageEl.offset().left - this.labelWidth * 0.5 - 9 // Account for padding, border.
-                    );
-                    this.labelEl.css(
-                        'top',
-                        event.pageY - this.state.baseImageEl.offset().top + this.iconHeight * 0.5 + 5
-                    );
+                    this.labelEl.css({
+                        'background-color': this.state.config.labelBgColor,
+                        'padding-left': 8,
+                        'padding-right': 8,
+                        'border': '1px solid black',
+                        'left': event.pageX - this.state.baseImageEl.offset().left - this.labelWidth * 0.5 - 9, // Account for padding, border.
+                        'top': event.pageY - this.state.baseImageEl.offset().top + this.iconHeight * 0.5 + 5
+                    });
                     this.labelEl.appendTo(this.state.baseImageEl.parent());
                 }
 
@@ -675,24 +511,16 @@ define(['logme', 'update_input'], function (logme, updateInput) {
             // of a drag operation (user moves the mouse very quickly).
             event.stopPropagation();
 
-            this.iconEl.css(
-                'left',
-                event.pageX - this.state.baseImageEl.offset().left - this.iconWidth * 0.5 - this.iconElLeftOffset
-            );
-            this.iconEl.css(
-                'top',
-                event.pageY - this.state.baseImageEl.offset().top - this.iconHeight * 0.5
-            );
+            this.iconEl.css({
+                'left': event.pageX - this.state.baseImageEl.offset().left - this.iconWidth * 0.5 - this.iconElLeftOffset,
+                'top': event.pageY - this.state.baseImageEl.offset().top - this.iconHeight * 0.5
+            });
 
             if (this.labelEl !== null) {
-                this.labelEl.css(
-                    'left',
-                    event.pageX - this.state.baseImageEl.offset().left - this.labelWidth * 0.5 - 9 // Acoount for padding, border.
-                );
-                this.labelEl.css(
-                    'top',
-                    event.pageY - this.state.baseImageEl.offset().top + this.iconHeight * 0.5 + 5
-                );
+                this.labelEl.css({
+                    'left': event.pageX - this.state.baseImageEl.offset().left - this.labelWidth * 0.5 - 9, // Acoount for padding, border.
+                    'top': event.pageY - this.state.baseImageEl.offset().top + this.iconHeight * 0.5 + 5
+                });
             }
         }
     }
@@ -779,16 +607,12 @@ define(['logme', 'update_input'], function (logme, updateInput) {
 
             // Check if the draggable's center coordinate is within
             // the target's dimensions. If not, go to next target.
-            if (positionIE.top + this.iconHeight * 0.5 < target.offset.top) {
-                continue;
-            }
-            if (positionIE.top + this.iconHeight * 0.5 > target.offset.top + target.h) {
-                continue;
-            }
-            if (positionIE.left + this.iconWidth * 0.5 < target.offset.left) {
-                continue;
-            }
-            if (positionIE.left + this.iconWidth * 0.5 > target.offset.left + target.w) {
+            if (
+                (positionIE.top + this.iconHeight * 0.5 < target.offset.top) ||
+                (positionIE.top + this.iconHeight * 0.5 > target.offset.top + target.h) ||
+                (positionIE.left + this.iconWidth * 0.5 < target.offset.left) ||
+                (positionIE.left + this.iconWidth * 0.5 > target.offset.left + target.w)
+            ) {
                 continue;
             }
 
@@ -827,24 +651,16 @@ define(['logme', 'update_input'], function (logme, updateInput) {
             offset = 1;
         }
 
-        this.iconEl.css(
-            'left',
-            target.offset.left + 0.5 * target.w - this.iconWidth * 0.5 + offset - this.iconElLeftOffset
-        );
-        this.iconEl.css(
-            'top',
-            target.offset.top + 0.5 * target.h - this.iconHeight * 0.5 + offset
-        );
+        this.iconEl.css({
+            'left': target.offset.left + 0.5 * target.w - this.iconWidth * 0.5 + offset - this.iconElLeftOffset,
+            'top': target.offset.top + 0.5 * target.h - this.iconHeight * 0.5 + offset
+        });
 
         if (this.labelEl !== null) {
-            this.labelEl.css(
-                'left',
-                target.offset.left + 0.5 * target.w - this.labelWidth * 0.5 + offset - 9 // Acoount for padding, border.
-            );
-            this.labelEl.css(
-                'top',
-                target.offset.top + 0.5 * target.h + this.iconHeight * 0.5 + 5 + offset
-            );
+            this.labelEl.css({
+                'left': target.offset.left + 0.5 * target.w - this.labelWidth * 0.5 + offset - 9, // Acoount for padding, border.
+                'top': target.offset.top + 0.5 * target.h + this.iconHeight * 0.5 + 5 + offset
+            });
         }
     }
 
@@ -908,77 +724,50 @@ define(['logme', 'update_input'], function (logme, updateInput) {
         var c1;
 
         if (this.isOriginal === false) {
-            this.iconEl.empty();
             this.iconEl.remove();
             if (this.labelEl !== null) {
-                this.labelEl.empty();
                 this.labelEl.remove();
             }
             this.state.draggables.splice(this.stateDraggablesIndex, 1);
 
-            c1 = 0;
-            while (c1 < this.state.draggables) {
+            for (c1 = 0; c1 < this.state.draggables; c1 += 1) {
                 if (this.state.draggables[c1].stateDraggablesIndex > this.stateDraggablesIndex) {
                     this.state.draggables[c1].stateDraggablesIndex -= 1;
                 }
-
-                c1 += 1;
             }
 
             return;
         }
 
         this.containerEl.show();
-
         this.zIndex = 1;
 
         this.iconEl.detach();
-        this.iconEl.css('border', 'none');
-        this.iconEl.css('background-color', 'transparent');
-        this.iconEl.css('padding-left', 0);
-        this.iconEl.css('padding-right', 0);
-        this.iconEl.css('z-index', this.zIndex);
-        this.iconEl.css(
-            'width',
-            this.iconWidthSmall
-        );
-        this.iconEl.css(
-            'height',
-            this.iconHeightSmall
-        );
-        this.iconEl.css(
-            'left',
-            50 - this.iconWidthSmall * 0.5
-        );
-        if (this.labelEl !== null) {
-            this.iconEl.css('top', 5);
-        } else {
-            this.iconEl.css(
-                'top',
-                50 - this.iconHeightSmall * 0.5
-            );
-        }
-
+        this.iconEl.css({
+            'border': 'none',
+            'background-color': 'transparent',
+            'padding-left': 0,
+            'padding-right': 0,
+            'z-index': this.zIndex,
+            'width': this.iconWidthSmall,
+            'height': this.iconHeightSmall,
+            'left': 50 - this.iconWidthSmall * 0.5,
+            'top': ((this.labelEl !== null) ? 5 : 50 - this.iconHeightSmall * 0.5)
+        });
         this.iconEl.appendTo(this.containerEl);
 
         if (this.labelEl !== null) {
             this.labelEl.detach();
-            this.labelEl.css('border', 'none');
-            this.labelEl.css('background-color', 'transparent');
-            this.labelEl.css('padding-left', 0);
-            this.labelEl.css('padding-right', 0);
-            this.labelEl.css('z-index', this.zIndex);
-            this.labelEl.css(
-                'left',
-                50 - this.labelWidth * 0.5
-            );
-            this.labelEl.css(
-                'top',
-                5 + this.iconHeightSmall + 5
-            );
-            this.labelEl.appendTo(
-                this.containerEl
-            );
+            this.labelEl.css({
+                'border': 'none',
+                'background-color': 'transparent',
+                'padding-left': 0,
+                'padding-right': 0,
+                'z-index': this.zIndex,
+                'left': 50 - this.labelWidth * 0.5,
+                'top': 5 + this.iconHeightSmall + 5
+            });
+            this.labelEl.appendTo(this.containerEl);
         }
 
         this.inContainer = true;

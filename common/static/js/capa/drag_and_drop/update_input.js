@@ -142,7 +142,7 @@ define(['logme'], function (logme) {
                         continue;
                     }
 
-                    draggable.moveDraggableToTarget(target);
+                    draggable.moveDraggableTo('target', target);
                 }
 
                 c1 += 1;
@@ -170,7 +170,7 @@ define(['logme'], function (logme) {
                         continue;
                     }
 
-                    draggable.moveDraggableToXY({
+                    draggable.moveDraggableTo('XY', {
                         'x': answer.draggables[c1][draggableId][0],
                         'y': answer.draggables[c1][draggableId][1]
                     });
