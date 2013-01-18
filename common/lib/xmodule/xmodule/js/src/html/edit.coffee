@@ -14,7 +14,7 @@ class @HTMLEditingDescriptor
 
 #   This is a workaround for the fact that tinyMCE's baseURL property is not getting correctly set on AWS
 #   instances (like sandbox). It is not necessary to explicitly set baseURL when running locally.
-    tinyMCE.baseURL = window.location.protocol + "//" + window.location.host + '/static/js/vendor/tiny_mce'
+    tinyMCE.baseURL = '/static/js/vendor/tiny_mce'
     @tiny_mce_textarea = $(".tiny-mce", @element).tinymce({
       script_url : '/static/js/vendor/tiny_mce/tiny_mce.js',
       theme : "advanced",
