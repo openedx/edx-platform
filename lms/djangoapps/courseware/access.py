@@ -338,6 +338,10 @@ def course_beta_test_group_name(location):
     """
     return 'beta_testers_{0}'.format(Location(location).course)
 
+# nosetests thinks that anything with _test_ in the name is a test.
+# Correct this (https://nose.readthedocs.org/en/latest/finding_tests.html)
+course_beta_test_group_name.__test__ = False
+
 
 def _course_instructor_group_name(location):
     """
