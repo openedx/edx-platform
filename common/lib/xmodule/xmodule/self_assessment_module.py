@@ -122,7 +122,7 @@ class SelfAssessmentModule(openendedchild.OpenEndedChild):
         if self.state == self.INITIAL:
             return ''
 
-        rubric_html  = CombinedOpenEndedRubric.render_rubric(self.rubric)
+        rubric_html  = CombinedOpenEndedRubric.render_rubric(self.rubric, system)
 
         # we'll render it
         context = {'rubric': rubric_html,
@@ -147,7 +147,7 @@ class SelfAssessmentModule(openendedchild.OpenEndedChild):
 
         if self.state == self.DONE:
             # display the previous hint
-            latest = self.latest_post_assessment()
+            latest = self.latest_post_assessment(system)
             hint = latest if latest is not None else ''
         else:
             hint = ''

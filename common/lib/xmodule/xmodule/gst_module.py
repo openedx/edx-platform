@@ -24,11 +24,10 @@ class GraphicalSliderToolModule(XModule):
     '''
 
     js = {
+      'coffee': [resource_string(__name__, 'js/src/javascript_loader.coffee')],
       'js': [
         # 3rd party libraries used by graphic slider tool.
         # TODO - where to store them - outside xmodule?
-        resource_string(__name__, 'js/src/graphical_slider_tool/jstat-1.0.0.min.js'),
-
         resource_string(__name__, 'js/src/graphical_slider_tool/gst_main.js'),
         resource_string(__name__, 'js/src/graphical_slider_tool/state.js'),
         resource_string(__name__, 'js/src/graphical_slider_tool/logme.js'),
@@ -38,8 +37,8 @@ class GraphicalSliderToolModule(XModule):
         resource_string(__name__, 'js/src/graphical_slider_tool/graph.js'),
         resource_string(__name__, 'js/src/graphical_slider_tool/el_output.js'),
         resource_string(__name__, 'js/src/graphical_slider_tool/g_label_el_output.js'),
-
         resource_string(__name__, 'js/src/graphical_slider_tool/gst.js')
+
       ]
     }
     js_module_name = "GraphicalSliderTool"
