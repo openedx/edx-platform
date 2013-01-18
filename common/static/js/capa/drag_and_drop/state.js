@@ -26,8 +26,32 @@ define([], function () {
 
             'targets': [],
 
-            'updateArrowOpacity': null
+            'updateArrowOpacity': null,
+
+            'uniqueId': 0,
+            'salt': makeSalt(),
+
+            'getUniqueId': getUniqueId
         };
+    }
+
+    function getUniqueId() {
+        this.uniqueId += 1;
+
+        return this.salt + '_' + this.uniqueId.toFixed(0);
+    }
+
+    function makeSalt() {
+        var text, possible, i;
+
+        text = '';
+        possible = 'ABCDEFGHIJKLMNOPQRSTUVWXYZabcdefghijklmnopqrstuvwxyz0123456789';
+
+        for(i = 0; i < 5; i += 1) {
+            text += possible.charAt(Math.floor(Math.random() * possible.length));
+        }
+
+        return text;
     }
 });
 

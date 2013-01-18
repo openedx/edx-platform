@@ -63,6 +63,8 @@ define(['logme', 'update_input'], function (logme, updateInput) {
         var draggableObj, obj;
 
         draggableObj = {
+            'uniqueId': /* this.uniqueId */ this.state.getUniqueId(), // Is newly set.
+
             'originalConfigObj': this.originalConfigObj,
             'stateDraggablesIndex': /* this.stateDraggablesIndex */ null, // Will be set.
 
@@ -379,6 +381,8 @@ define(['logme', 'update_input'], function (logme, updateInput) {
         var draggableObj;
 
         draggableObj = {
+            'uniqueId': state.getUniqueId(),
+
             'originalConfigObj': obj,
             'stateDraggablesIndex': null,
 
@@ -768,7 +772,7 @@ define(['logme', 'update_input'], function (logme, updateInput) {
             if (
                 (this.state.config.onePerTarget === true) &&
                 (target.draggableList.length === 1) &&
-                (target.draggableList[0].id !== this.id)
+                (target.draggableList[0].uniqueId !== this.uniqueId)
             ) {
                 continue;
             }

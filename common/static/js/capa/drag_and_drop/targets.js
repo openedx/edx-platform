@@ -15,7 +15,7 @@ define(['logme'], function (logme) {
                 c1 += 1;
             }
         }(0));
-    } // function Targets(state) {
+    }
 
     function processTarget(state, obj) {
         var targetEl, borderCss, numTextEl, targetObj;
@@ -36,7 +36,6 @@ define(['logme'], function (logme) {
                     'left: ' + obj.x + 'px; ' +
                     borderCss +
                 '" ' +
-                'data-target-id="' + obj.id + '" ' +
             '></div>'
         );
         targetEl.appendTo(state.baseImageEl.parent());
