@@ -6,39 +6,18 @@ Created on Jan 17, 2013
 import logging
 
 from django.test import TestCase
-from student.models import User, TestCenterRegistration, TestCenterUser, unique_id_for_user
-from mock import Mock
-from datetime import datetime
+from student.models import User, TestCenterRegistration, TestCenterUser
+# This is stupid!  Because I import a function with the word "test" in the name,
+# the unittest framework tries to run *it* as a test?!  Crazy!
+from student.models import get_testcenter_registration as get_tc_registration
 from django.core import management
-
-COURSE_1 = 'edX/toy/2012_Fall'
-COURSE_2 = 'edx/full/6.002_Spring_2012'
 
 log = logging.getLogger(__name__)
 
-class PearsonTestCase(TestCase):
-    '''
-    Base class for tests running Pearson-related commands
-    '''
 
-    def test_create_good_testcenter_user(self):
-        username = "rusty"
-#        user = Mock(username=username)
-#        # id = unique_id_for_user(user)
-#        course = Mock(end_of_course_survey_url=survey_url)
-
-
-        newuser = User.objects.create_user(username, 'rusty@edx.org', 'fakepass')
-#        newuser.first_name='Rusty'
-#        newuser.last_name='Skids'
-#        newuser.is_staff=True
-#        newuser.is_active=True
-#        newuser.is_superuser=True
-#        newuser.last_login=datetime(2012, 1, 1)
-#        newuser.date_joined=datetime(2011, 1, 1)
-
-#        newuser.save(using='default')
-        options = {
+def create_tc_user(username):
+    user = User.objects.create_user(username, '{}@edx.org'.format(username), 'fakepass')
+    options = {
                    'first_name' : 'TestFirst',
                    'last_name' : 'TestLast',
                    'address_1' : 'Test Address',
@@ -49,5 +28,50 @@ class PearsonTestCase(TestCase):
                    'phone' : '252-1866',
                    'phone_country_code' : '1',
                     }
-        management.call_command('pearson_make_tc_user', username, options)
+    management.call_command('pearson_make_tc_user', username, **options)
+    return TestCenterUser.objects.get(user=user)
+    
+    
+def create_tc_registration(username, course_id, exam_code, accommodation_code):
+    
+    options = { 'exam_series_code' : exam_code,
+               'eligibility_appointment_date_first' : '2013-01-01T00:00',
+               'eligibility_appointment_date_last' : '2013-12-31T23:59',
+               'accommodation_code' : accommodation_code, 
+               }
+
+    management.call_command('pearson_make_tc_registration', username, course_id, **options)
+    user = User.objects.get(username=username)
+    registrations = get_tc_registration(user, course_id, exam_code)
+    return registrations[0]
+    
+class PearsonTestCase(TestCase):
+    '''
+    Base class for tests running Pearson-related commands
+    '''
+
+    def test_create_good_testcenter_user(self):
+        testcenter_user = create_tc_user("test1")
+        
+    def test_create_good_testcenter_registration(self):
+        username = 'test1'
+        course_id = 'org1/course1/term1'
+        exam_code = 'exam1'
+        accommodation_code = 'NONE'
+        testcenter_user = create_tc_user(username)
+        registration = create_tc_registration(username, course_id, exam_code, accommodation_code)
+        
+    def test_export(self):
+        username = 'test1'
+        course_id = 'org1/course1/term1'
+        exam_code = 'exam1'
+        accommodation_code = 'NONE'
+        testcenter_user = create_tc_user(username)
+        registration = create_tc_registration(username, course_id, exam_code, accommodation_code)
+        output_dir = "./tmpOutput"
+        options = { 'destination' : output_dir }
+        with self.settings(PEARSON={ 'LOCAL_EXPORT' : output_dir }):
+            management.call_command('pearson_export_cdd', **options)
+            management.call_command('pearson_export_ead', **options)
+        # TODO: check that files were output....
         

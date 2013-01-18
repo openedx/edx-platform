@@ -428,6 +428,10 @@ class TestCenterRegistration(models.Model):
         # TODO: figure out if this should really go in the database (with a default value).
         return 1
     
+    @property
+    def needs_uploading(self):
+        return self.uploaded_at is None or self.uploaded_at < self.user_updated_at
+    
     @classmethod
     def create(cls, testcenter_user, exam, accommodation_request):
         registration = cls(testcenter_user = testcenter_user)

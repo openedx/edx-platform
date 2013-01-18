@@ -4,6 +4,7 @@ from collections import OrderedDict
 from datetime import datetime
 from optparse import make_option
 
+from django.conf import settings
 from django.core.management.base import BaseCommand
 
 from student.models import TestCenterUser
@@ -86,7 +87,7 @@ class Command(BaseCommand):
             else:
                 return value
 
-        dump_all = options['dump_all']
+#        dump_all = options['dump_all']
 
         with open(destfile, "wb") as outfile:
             writer = csv.DictWriter(outfile,
@@ -96,7 +97,7 @@ class Command(BaseCommand):
                                     extrasaction='ignore')
             writer.writeheader()
             for tcu in TestCenterUser.objects.order_by('id'):
-                if dump_all or tcu.needs_uploading:
+                if tcu.needs_uploading: # or dump_all
                     record = dict((csv_field, ensure_encoding(getattr(tcu, model_field)))
                                   for csv_field, model_field
                                   in Command.CSV_TO_MODEL_FIELDS.items())
