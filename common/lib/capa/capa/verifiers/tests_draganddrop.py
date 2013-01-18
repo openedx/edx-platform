@@ -505,6 +505,17 @@ class Test_DragAndDrop_Grade(unittest.TestCase):
         }]
         self.assertFalse(draganddrop.grade(user_input, correct_answer))
 
+    def test_alternative_correct_answer(self):
+        user_input = '{"draggables":[{"name_with_icon":"t1"},\
+        {"name_with_icon":"t1"},{"name_with_icon":"t1"},{"name4":"t1"}, \
+        {"name4":"t1"}]}'
+        correct_answer = [
+        {'draggables': ['name4'], 'targets': ['t1', 't1'], 'rule': 'exact'},
+        {'draggables': ['name_with_icon'], 'targets': ['t1', 't1', 't1'],
+        'rule': 'exact'}
+        ]
+        self.assertTrue(draganddrop.grade(user_input, correct_answer))
+
 
 class Test_DragAndDrop_Populate(unittest.TestCase):
 
