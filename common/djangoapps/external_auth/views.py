@@ -402,7 +402,9 @@ def provider_login(request):
     store = DjangoOpenIDStore()
     server = Server(store, endpoint)
 
-    # handle OpenID request
+    # first check to see if the request is an OpenID request.
+    # If so, the client will have specified an 'openid.mode' as part
+    # of the request.
     querydict = dict(request.REQUEST.items())
     error = False
     if 'openid.mode' in request.GET or 'openid.mode' in request.POST:
@@ -422,6 +424,8 @@ def provider_login(request):
                                     openid_request.answer(False), {})
 
         # checkid_setup, so display login page
+        # (by falling through to the provider_login at the 
+        # bottom of this method).
         elif openid_request.mode == 'checkid_setup':
             if openid_request.idSelect():
                 # remember request and original path
@@ -440,8 +444,10 @@ def provider_login(request):
             return provider_respond(server, openid_request,
                                     server.handleRequest(openid_request), {})
 
-    # handle login
-    if request.method == 'POST' and 'openid_setup' in request.session:
+    # handle login redirection:  these are also sent to this view function,
+    # but are distinguished by lacking the openid mode.  We also know that
+    # they are posts, because they come from the popup 
+    elif request.method == 'POST' and 'openid_setup' in request.session:
         # get OpenID request from session
         openid_setup = request.session['openid_setup']
         openid_request = openid_setup['request']
@@ -453,6 +459,8 @@ def provider_login(request):
             return default_render_failure(request, "Invalid OpenID trust root")
 
         # check if user with given email exists
+        # Failure is redirected to this method (by using the original URL), 
+        # which will bring up the login dialog.
         email = request.POST.get('email', None)
         try:
             user = User.objects.get(email=email)
@@ -462,7 +470,8 @@ def provider_login(request):
             log.warning(msg)
             return HttpResponseRedirect(openid_request_url)
 
-        # attempt to authenticate user
+        # attempt to authenticate user (but not actually log them in...)
+        # Failure is again redirected to the login dialog.
         username = user.username
         password = request.POST.get('password', None)
         user = authenticate(username=username, password=password)
@@ -473,7 +482,8 @@ def provider_login(request):
             log.warning(msg)
             return HttpResponseRedirect(openid_request_url)
 
-        # authentication succeeded, so log user in
+        # authentication succeeded, so fetch user information
+        # that was requested
         if user is not None and user.is_active:
             # remove error from session since login succeeded
             if 'openid_error' in request.session:
@@ -498,13 +508,19 @@ def provider_login(request):
             # break the CS50 client. Temporarily we will be returning
             # username filling in for fullname in addition to username 
             # as sreg nickname.
+            
+            # Note too that this is hardcoded, and not really responding to 
+            # the extensions that were registered in the first place.
             results = {
                 'nickname': user.username,
                 'email': user.email,
                 'fullname': user.username
                 }
+            
+            # the request succeeded:
             return provider_respond(server, openid_request, response, results)
 
+        # the account is not active, so redirect back to the login page:
         request.session['openid_error'] = True
         msg = "Login failed - Account not active for user {0}".format(username)
         log.warning(msg)
@@ -523,7 +539,7 @@ def provider_login(request):
         'return_to': return_to
     })
 
-    # custom XRDS header necessary for discovery process
+    # add custom XRDS header necessary for discovery process
     response['X-XRDS-Location'] = get_xrds_url('xrds', request)
     return response
 
