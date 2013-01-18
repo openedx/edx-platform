@@ -46,6 +46,7 @@ rake test_common/lib/xmodule || TESTS_FAILED=1
 rake phantomjs_jasmine_lms || true
 rake phantomjs_jasmine_cms || TESTS_FAILED=1
 rake phantomjs_jasmine_common/lib/xmodule || TESTS_FAILED=1
+
 rake coverage:xml coverage:html
 
 [ $TESTS_FAILED == '0' ]

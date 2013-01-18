@@ -94,13 +94,16 @@ class XmlDescriptor(XModuleDescriptor):
         'start', 'due', 'graded', 'display_name', 'url_name', 'hide_from_toc',
         'ispublic', 	# if True, then course is listed for all users; see
         'xqa_key',	# for xqaa server access
+        # information about testcenter exams is a dict (of dicts), not a string, 
+        # so it cannot be easily exportable as a course element's attribute. 
+        'testcenter_info',
         # VS[compat] Remove once unused.
         'name', 'slug')
 
     metadata_to_strip = ('data_dir', 
             # cdodge: @TODO: We need to figure out a way to export out 'tabs' and 'grading_policy' which is on the course
             'tabs', 'grading_policy', 'is_draft', 'published_by', 'published_date', 
-            'discussion_blackouts',
+            'discussion_blackouts', 'testcenter_info',
            # VS[compat] -- remove the below attrs once everything is in the CMS
            'course', 'org', 'url_name', 'filename')
 

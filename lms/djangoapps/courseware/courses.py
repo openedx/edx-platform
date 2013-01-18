@@ -95,6 +95,7 @@ def course_image_url(course):
         path = StaticContent.get_url_path_from_location(loc)
         return path
 
+
 def find_file(fs, dirs, filename):
     """
     Looks for a filename in a list of dirs on a filesystem, in the specified order.
@@ -110,6 +111,7 @@ def find_file(fs, dirs, filename):
         if fs.exists(filepath):
             return filepath
     raise ResourceNotFoundError("Could not find {0}".format(filename))
+
 
 def get_course_about_section(course, section_key):
     """
@@ -256,4 +258,18 @@ def get_courses(user, domain=None):
     courses = [c for c in courses if has_access(user, c, 'see_exists')]
 
     courses = sorted(courses, key=lambda course:course.number)
+
+    return courses
+
+
+def sort_by_announcement(courses):
+    """
+    Sorts a list of courses by their announcement date. If the date is
+    not available, sort them by their start date.
+    """
+
+    # Sort courses by how far are they from they start day
+    key = lambda course: course.sorting_score
+    courses = sorted(courses, key=key)
+
     return courses

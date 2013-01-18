@@ -371,7 +371,6 @@ class CapaModule(XModule):
             'problem_save': self.save_problem,
             'problem_show': self.get_answer,
             'score_update': self.update_score,
-            'message_post' : self.message_post,
             }
 
         if dispatch not in handlers:
@@ -385,20 +384,6 @@ class CapaModule(XModule):
             'progress_status': Progress.to_js_status_str(after),
             })
         return json.dumps(d, cls=ComplexEncoder)
-
-    def message_post(self, get):
-        """
-        Posts a message from a form to an appropriate location
-        """
-        event_info = dict()
-        event_info['state'] = self.lcp.get_state()
-        event_info['problem_id'] = self.location.url()
-        event_info['student_id'] = self.system.anonymous_student_id
-        event_info['survey_responses']= get
-
-        success, message = self.lcp.message_post(event_info)
-
-        return {'success' : success, 'message' : message}
 
     def closed(self):
         ''' Is the student still allowed to submit answers? '''
@@ -435,6 +420,7 @@ class CapaModule(XModule):
             return True
 
         return False
+
 
     def update_score(self, get):
         """
