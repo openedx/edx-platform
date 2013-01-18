@@ -113,7 +113,7 @@ class CombinedOpenEndedRubric(object):
                     points = cur_points
                     cur_points = cur_points + 1
                 else:
-                    raise Exception("[extract_category]: missing points attribute. Cannot continue to auto-create points values after a points value is explicitly dfined.")
+                    raise Exception("[extract_category]: missing points attribute. Cannot continue to auto-create points values after a points value is explicitly defined.")
                 
                 selected = score == points
                 optiontext = option.text
