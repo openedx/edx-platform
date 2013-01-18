@@ -23,7 +23,7 @@ class CombinedOpenEndedRubric(object):
         success = False
         try:
             rubric_categories = self.extract_categories(rubric_xml)
-            html = system.render_template('open_ended_rubric.html', 
+            html = self.system.render_template('open_ended_rubric.html', 
                     {'categories'  : rubric_categories,
                      'has_score': self.has_score,
                      'view_only': self.view_only})
