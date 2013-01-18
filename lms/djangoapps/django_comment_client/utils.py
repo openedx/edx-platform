@@ -2,6 +2,7 @@ from collections import defaultdict
 import logging
 import time
 import urllib
+from datetime import datetime
 
 from django.contrib.auth.models import User
 from django.core.urlresolvers import reverse
@@ -63,22 +64,19 @@ def get_discussion_id_map(course):
         return a dict of the form {category: modules}
     """
     global _DISCUSSIONINFO
-    if not _DISCUSSIONINFO[course.id]:
-        initialize_discussion_info(course)
+    initialize_discussion_info(course)
     return _DISCUSSIONINFO[course.id]['id_map']
 
 def get_discussion_title(course, discussion_id):
     global _DISCUSSIONINFO
-    if not _DISCUSSIONINFO[course.id]:
-        initialize_discussion_info(course)
+    initialize_discussion_info(course)
     title = _DISCUSSIONINFO[course.id]['id_map'].get(discussion_id, {}).get('title', '(no title)')
     return title
 
 def get_discussion_category_map(course):
 
     global _DISCUSSIONINFO
-    if not _DISCUSSIONINFO[course.id]:
-        initialize_discussion_info(course)
+    initialize_discussion_info(course)
     return filter_unstarted_categories(_DISCUSSIONINFO[course.id]['category_map'])
 
 def filter_unstarted_categories(category_map):
@@ -131,8 +129,18 @@ def sort_map_entries(category_map):
 def initialize_discussion_info(course):
 
     global _DISCUSSIONINFO
+
+    # only cache in-memory discussion information for 10 minutes
+    # this is because we need a short-term hack fix for
+    # mongo-backed courseware whereby new discussion modules can be added
+    # without LMS service restart
+
     if _DISCUSSIONINFO[course.id]:
-        return
+        timestamp = _DISCUSSIONINFO[course.id].get('timestamp', datetime.now())
+        age = datetime.now() - timestamp
+        # expire every 5 minutes
+        if age.seconds < 300:
+            return
 
     course_id = course.id
 
@@ -209,6 +217,7 @@ def initialize_discussion_info(course):
 
     _DISCUSSIONINFO[course.id]['id_map'] = discussion_id_map
     _DISCUSSIONINFO[course.id]['category_map'] = category_map
+    _DISCUSSIONINFO[course.id]['timestamp'] = datetime.now()
 
 class JsonResponse(HttpResponse):
     def __init__(self, data=None):

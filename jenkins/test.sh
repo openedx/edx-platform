@@ -27,7 +27,6 @@ git submodule foreach 'git reset --hard HEAD'
 export PYTHONIOENCODING=UTF-8
 
 GIT_BRANCH=${GIT_BRANCH/HEAD/master}
-
 if [ ! -d /mnt/virtualenvs/"$JOB_NAME" ]; then
     mkdir -p /mnt/virtualenvs/"$JOB_NAME"
     virtualenv /mnt/virtualenvs/"$JOB_NAME"
