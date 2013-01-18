@@ -54,20 +54,24 @@ class DraftModuleStore(ModuleStoreBase):
             in the request. The depth is counted in the number of calls to
             get_children() to cache. None indicates to cache all descendents
         """
+
+        # cdodge: we're forcing depth=0 here as the Draft store is not handling caching well
         try:
-            return wrap_draft(super(DraftModuleStore, self).get_item(as_draft(location), depth))
+            return wrap_draft(super(DraftModuleStore, self).get_item(as_draft(location), depth=0))
         except ItemNotFoundError:
-            return wrap_draft(super(DraftModuleStore, self).get_item(location, depth))
+            return wrap_draft(super(DraftModuleStore, self).get_item(location, depth=0))
 
     def get_instance(self, course_id, location, depth=0):
         """
         Get an instance of this location, with policy for course_id applied.
         TODO (vshnayder): this may want to live outside the modulestore eventually
         """
+
+        # cdodge: we're forcing depth=0 here as the Draft store is not handling caching well 
         try:
-            return wrap_draft(super(DraftModuleStore, self).get_instance(course_id, as_draft(location), depth=depth))
+            return wrap_draft(super(DraftModuleStore, self).get_instance(course_id, as_draft(location), depth=0))
         except ItemNotFoundError:
-            return wrap_draft(super(DraftModuleStore, self).get_instance(course_id, location, depth=depth))
+            return wrap_draft(super(DraftModuleStore, self).get_instance(course_id, location, depth=0))
 
     def get_items(self, location, depth=0):
         """
@@ -83,8 +87,10 @@ class DraftModuleStore(ModuleStoreBase):
             get_children() to cache. None indicates to cache all descendents
         """
         draft_loc = as_draft(location)
-        draft_items = super(DraftModuleStore, self).get_items(draft_loc, depth)
-        items = super(DraftModuleStore, self).get_items(location, depth)
+
+        # cdodge: we're forcing depth=0 here as the Draft store is not handling caching well
+        draft_items = super(DraftModuleStore, self).get_items(draft_loc, depth=0)
+        items = super(DraftModuleStore, self).get_items(location, depth=0)
 
         draft_locs_found = set(item.location._replace(revision=None) for item in draft_items)
         non_draft_items = [
