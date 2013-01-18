@@ -5,10 +5,8 @@ import unittest
 from xmodule.self_assessment_module import SelfAssessmentModule
 from xmodule.modulestore import Location
 from lxml import etree
-import logging
 
 from . import test_system
-log = logging.getLogger("mitx.courseware")
 
 class SelfAssessmentTest(unittest.TestCase):
 
@@ -52,9 +50,6 @@ class SelfAssessmentTest(unittest.TestCase):
                                       static_data, state, metadata=self.metadata)
 
         self.assertEqual(module.get_score()['score'], 0)
-
-        html = module.get_html(test_system)
-        log.debug("rendered html: {0}".format(html))
 
 
         module.save_answer({'student_answer': "I am an answer"}, test_system)
