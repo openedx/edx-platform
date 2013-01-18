@@ -1,4 +1,5 @@
 import logging
+from math import exp, erf
 from lxml import etree
 from path import path  # NOTE (THK): Only used for detecting presence of syllabus
 import requests
@@ -183,35 +184,66 @@ class CourseDescriptor(SequenceDescriptor):
 
     @property
     def is_new(self):
-        # The course is "new" if either if the metadata flag is_new is
-        # true or if the course has not started yet
+        """
+        Returns if the course has been flagged as new in the metadata. If
+        there is no flag, return a heuristic value considering the
+        announcement and the start dates.
+        """
         flag = self.metadata.get('is_new', None)
         if flag is None:
-            return self.days_until_start > 1
+            # Use a heuristic if the course has not been flagged
+            announcement, start, now = self._sorting_dates()
+            if announcement and (now - announcement).days < 30:
+                # The course has been announced for less that month
+                return True
+            elif (now - start).days < 1:
+                # The course has not started yet
+                return True
+            else:
+                return False
         elif isinstance(flag, basestring):
             return flag.lower() in ['true', 'yes', 'y']
         else:
             return bool(flag)
 
     @property
-    def days_until_start(self):
-        def convert_to_datetime(timestamp):
+    def sorting_score(self):
+        """
+        Returns a number that can be used to sort the courses according
+        the how "new"" they are. The "newness"" score is computed using a
+        heuristic that takes into account the announcement and
+        (advertized) start dates of the course if available.
+
+        The lower the number the "newer" the course.
+        """
+        # Make courses that have an announcement date shave a lower
+        # score than courses than don't, older courses should have a
+        # higher score.
+        announcement, start, now = self._sorting_dates()
+        scale = 300.0  # about a year
+        if announcement:
+            days = (now - announcement).days
+            score = -exp(-days/scale)
+        else:
+            days = (now - start).days
+            score = exp(days/scale)
+        return score
+
+    def _sorting_dates(self):
+        # utility function to get datetime objects for dates used to
+        # compute the is_new flag and the sorting_score
+        def to_datetime(timestamp):
             return datetime.fromtimestamp(time.mktime(timestamp))
 
-        start_date = convert_to_datetime(self.start)
+        def get_date(field):
+            timetuple = self._try_parse_time(field)
+            return to_datetime(timetuple) if timetuple else None
 
-        #  Try to use course advertised date if we can parse it
-        advertised_start = self.metadata.get('advertised_start', None)
-        if advertised_start:
-            try:
-                start_date = datetime.strptime(advertised_start,
-                                               "%Y-%m-%dT%H:%M")
-            except ValueError:
-                pass  # Invalid date, keep using 'start''
+        announcement = get_date('announcement')
+        start = get_date('advertised_start') or to_datetime(self.start)
+        now = to_datetime(time.gmtime())
 
-        now = convert_to_datetime(time.gmtime())
-        days_until_start = (start_date - now).days
-        return days_until_start
+        return announcement, start, now
 
     @lazyproperty
     def grading_context(self):
@@ -387,9 +419,9 @@ class CourseDescriptor(SequenceDescriptor):
             self.first_eligible_appointment_date = self._try_parse_time('First_Eligible_Appointment_Date')
             if self.first_eligible_appointment_date is None:
                 raise ValueError("First appointment date must be specified")
-            # TODO: If defaulting the last appointment date, it should be the 
+            # TODO: If defaulting the last appointment date, it should be the
             # *end* of the same day, not the same time.  It's going to be used as the
-            # end of the exam overall, so we don't want the exam to disappear too soon.  
+            # end of the exam overall, so we don't want the exam to disappear too soon.
             # It's also used optionally as the registration end date, so time matters there too.
             self.last_eligible_appointment_date = self._try_parse_time('Last_Eligible_Appointment_Date') # or self.first_eligible_appointment_date
             if self.last_eligible_appointment_date is None:
@@ -403,7 +435,7 @@ class CourseDescriptor(SequenceDescriptor):
                 raise ValueError("First appointment date must be before last appointment date")
             if self.registration_end_date > self.last_eligible_appointment_date:
                 raise ValueError("Registration end date must be before last appointment date")
-            
+
 
         def _try_parse_time(self, key):
             """
@@ -434,7 +466,7 @@ class CourseDescriptor(SequenceDescriptor):
         def is_registering(self):
             now = time.gmtime()
             return now >= self.registration_start_date and now <= self.registration_end_date
-            
+
         @property
         def first_eligible_appointment_date_text(self):
             return time.strftime("%b %d, %Y", self.first_eligible_appointment_date)
@@ -451,7 +483,7 @@ class CourseDescriptor(SequenceDescriptor):
     def current_test_center_exam(self):
         exams = [exam for exam in self.test_center_exams if exam.has_started_registration() and not exam.has_ended()]
         if len(exams) > 1:
-            # TODO: output some kind of warning.  This should already be 
+            # TODO: output some kind of warning.  This should already be
             # caught if we decide to do validation at load time.
             return exams[0]
         elif len(exams) == 1:
