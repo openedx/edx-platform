@@ -63,6 +63,8 @@ define(
             Scroller(state);
             Draggables.init(state);
 
+            state.updateArrowOpacity();
+
             // Update the input element, checking first that it is not filled with
             // an answer from the server.
             if (updateInput.check(state) === false) {
