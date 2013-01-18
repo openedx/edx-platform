@@ -50,7 +50,6 @@ define(['logme'], function (logme) {
             }(0));
         }
 
-        logme('input = "' + JSON.stringify({'draggables': draggables}) + '".');
         $('#input_' + state.problemId).val(JSON.stringify({'draggables': draggables}));
     }
 
@@ -183,6 +182,10 @@ define(['logme'], function (logme) {
     }
 
     function repositionDraggables(state, answer) {
+        if (answer.draggables.length === 0) {
+            return;
+        }
+
         if (state.config.individualTargets !== getUseTargets(answer)) {
             logme('ERROR: JSON config is not consistent with server response.');
 
