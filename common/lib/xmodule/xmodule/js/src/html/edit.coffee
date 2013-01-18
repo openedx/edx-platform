@@ -11,7 +11,7 @@ class @HTMLEditingDescriptor
     })
 
     $(@advanced_editor.getWrapperElement()).addClass(HTMLEditingDescriptor.isInactiveClass)
-
+    tinyMCE.baseURL = window.location.protocol + "//" + window.location.host + '/static/js/vendor/tiny_mce'
     @tiny_mce_textarea = $(".tiny-mce", @element).tinymce({
       script_url : '/static/js/vendor/tiny_mce/tiny_mce.js',
       theme : "advanced",
