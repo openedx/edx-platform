@@ -35,7 +35,7 @@ MAX_ATTEMPTS = 1
 # Overriden by max_score specified in xml.
 MAX_SCORE = 1
 
-class OpenEndedChild():
+class OpenEndedChild(object):
     """
     States:
 
@@ -124,7 +124,7 @@ class OpenEndedChild():
             return None
         return self.history[-1].get('score')
 
-    def latest_post_assessment(self):
+    def latest_post_assessment(self, system):
         """None if not available"""
         if not self.history:
             return ""

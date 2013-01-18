@@ -426,6 +426,14 @@
           font-size: 1.2rem;
           font-weight: bold;
         }
+
+        strong {
+          font-weight: 700;
+        
+          a {
+            font-weight: 700;
+          }
+        }
       }
 
       .actions {

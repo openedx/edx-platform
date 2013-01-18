@@ -1,14 +1,14 @@
-from mitxmako.shortcuts import render_to_string
 import logging
 from lxml import etree
 
 log=logging.getLogger(__name__)
 
-class CombinedOpenEndedRubric:
+class CombinedOpenEndedRubric(object):
 
-    def __init__ (self, view_only = False):
+    def __init__ (self, system, view_only = False):
         self.has_score = False
         self.view_only = view_only
+        self.system = system
 
     '''
     render_rubric: takes in an xml string and outputs the corresponding
@@ -23,7 +23,7 @@ class CombinedOpenEndedRubric:
         success = False
         try:
             rubric_categories = self.extract_categories(rubric_xml)
-            html = render_to_string('open_ended_rubric.html', 
+            html = system.render_template('open_ended_rubric.html', 
                     {'categories'  : rubric_categories,
                      'has_score': self.has_score,
                      'view_only': self.view_only})
