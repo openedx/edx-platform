@@ -25,7 +25,8 @@ class HtmlModule(XModule):
                     ]
          }
     js_module_name = "HTMLModule"
-    
+    css = {'scss': [resource_string(__name__, 'css/html/display.scss')]}
+
     def get_html(self):
         return self.html
 
