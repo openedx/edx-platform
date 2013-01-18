@@ -8,7 +8,7 @@ class CombinedOpenEndedRubric(object):
     def __init__ (self, system, view_only = False):
         self.has_score = False
         self.view_only = view_only
-        self.system
+        self.system = system
 
     '''
     render_rubric: takes in an xml string and outputs the corresponding
