@@ -547,7 +547,7 @@ class TestCenterRegistrationForm(ModelForm):
     
     
     
-def get_testcenter_registration(user, course_id, exam_series_code):
+def get_tc_registration(user, course_id, exam_series_code):
     try:
         tcu = TestCenterUser.objects.get(user=user)
     except TestCenterUser.DoesNotExist:

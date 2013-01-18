@@ -4,7 +4,7 @@ from time import strftime
 from django.contrib.auth.models import User
 from django.core.management.base import BaseCommand, CommandError
 
-from student.models import TestCenterUser, TestCenterRegistration, TestCenterRegistrationForm, get_testcenter_registration
+from student.models import TestCenterUser, TestCenterRegistration, TestCenterRegistrationForm, get_tc_registration
 from student.views import course_from_id
 from xmodule.course_module import CourseDescriptor
 from xmodule.modulestore.exceptions import ItemNotFoundError
@@ -134,7 +134,7 @@ class Command(BaseCommand):
         
         # create and save the registration:
         needs_updating = False
-        registrations = get_testcenter_registration(student, course_id, exam_code)
+        registrations = get_tc_registration(student, course_id, exam_code)
         if len(registrations) > 0:
             registration = registrations[0]
             for fieldname in UPDATE_FIELDS:
@@ -181,7 +181,7 @@ class Command(BaseCommand):
         change_internal = False
         if 'exam_series_code' in our_options:
             exam_code = our_options['exam_series_code']
-        registration = get_testcenter_registration(student, course_id, exam_code)[0]
+        registration = get_tc_registration(student, course_id, exam_code)[0]
         for internal_field in [ 'upload_error_message', 'upload_status', 'authorization_id']:
             if internal_field in our_options:
                 registration.__setattr__(internal_field, our_options[internal_field])

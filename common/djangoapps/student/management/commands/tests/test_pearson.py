@@ -9,7 +9,7 @@ from django.test import TestCase
 from student.models import User, TestCenterRegistration, TestCenterUser
 # This is stupid!  Because I import a function with the word "test" in the name,
 # the unittest framework tries to run *it* as a test?!  Crazy!
-from student.models import get_testcenter_registration as get_tc_registration
+from student.models import get_tc_registration
 from django.core import management
 
 log = logging.getLogger(__name__)

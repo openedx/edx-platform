@@ -31,7 +31,7 @@ from student.models import (Registration, UserProfile, TestCenterUser, TestCente
                             TestCenterRegistration, TestCenterRegistrationForm,
                             PendingNameChange, PendingEmailChange,
                             CourseEnrollment, unique_id_for_user,
-                            get_testcenter_registration)
+                            get_tc_registration)
 
 from certificates.models import CertificateStatuses, certificate_status_for_student
 
@@ -612,7 +612,7 @@ def exam_registration_info(user, course):
         return None
 
     exam_code = exam_info.exam_series_code
-    registrations = get_testcenter_registration(user, course.id, exam_code)
+    registrations = get_tc_registration(user, course.id, exam_code)
     if registrations:
         registration = registrations[0]
     else:
@@ -712,7 +712,7 @@ def create_exam_registration(request, post_override=None):
     needs_saving = False
     exam = course.current_test_center_exam
     exam_code = exam.exam_series_code
-    registrations = get_testcenter_registration(user, course_id, exam_code)
+    registrations = get_tc_registration(user, course_id, exam_code)
     if registrations:
         registration = registrations[0]
         # NOTE: we do not bother to check here to see if the registration has changed,
