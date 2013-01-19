@@ -1,30 +1,5 @@
 """
-Models for Student Information
-
-Replication Notes
-
-TODO: Update this to be consistent with reality  (no portal servers, no more askbot)
-
-In our live deployment, we intend to run in a scenario where there is a pool of
-Portal servers that hold the canoncial user information and that user
-information is replicated to slave Course server pools. Each Course has a set of
-servers that serves only its content and has users that are relevant only to it.
-
-We replicate the following tables into the Course DBs where the user is
-enrolled. Only the Portal servers should ever write to these models.
-* UserProfile
-* CourseEnrollment
-
-We do a partial replication of:
-* User -- Askbot extends this and uses the extra fields, so we replicate only
-          the stuff that comes with basic django_auth and ignore the rest.)
-
-There are a couple different scenarios:
-
-1. There's an update of User or UserProfile -- replicate it to all Course DBs
-   that the user is enrolled in (found via CourseEnrollment).
-2. There's a change in CourseEnrollment. We need to push copies of UserProfile,
-   CourseEnrollment, and the base fields in User
+Models for User Information (students, staff, etc)
 
 Migration Notes
 
