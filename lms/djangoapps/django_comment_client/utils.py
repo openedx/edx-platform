@@ -207,6 +207,9 @@ def initialize_discussion_info(course):
                                                       "sort_key": entry["sort_key"],
                                                       "start_date": entry["start_date"]}
 
+    # TODO.  BUG! : course location is not unique across multiple course runs!
+    # (I think Kevin already noticed this)  Need to send course_id with requests, store it
+    # in the backend.
     default_topics = {'General': {'id' :course.location.html_id()}}
     discussion_topics = course.metadata.get('discussion_topics', default_topics)
     for topic, entry in discussion_topics.items():
