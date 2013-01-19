@@ -23,5 +23,32 @@ class CourseUserGroup(models.Model):
 
     # For now, only have group type 'cohort', but adding a type field to support
     # things like 'question_discussion', 'friends', 'off-line-class', etc
-    GROUP_TYPE_CHOICES = (('cohort', 'Cohort'),)
+    COHORT = 'cohort'
+    GROUP_TYPE_CHOICES = ((COHORT, 'Cohort'),)
     group_type = models.CharField(max_length=20, choices=GROUP_TYPE_CHOICES)
+
+
+def get_cohort(user, course_id):
+    """
+    Given a django User and a course_id, return the user's cohort.  In classes with
+    auto-cohorting, put the user in a cohort if they aren't in one already.
+
+    Arguments:
+        user: a Django User object.
+        course_id: string in the format 'org/course/run'
+
+    Returns:
+        A CourseUserGroup object if the User has a cohort, or None.
+    """
+    group_type = CourseUserGroup.COHORT
+    try:
+        group = CourseUserGroup.objects.get(course_id=course_id, group_type=group_type,
+                                        users__id=user.id)
+    except CourseUserGroup.DoesNotExist:
+        group = None
+    
+    if group:
+        return group
+
+    # TODO: add auto-cohorting logic here
+    return None
