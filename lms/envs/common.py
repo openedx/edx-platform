@@ -577,6 +577,7 @@ INSTALLED_APPS = (
     'open_ended_grading',
     'psychometrics',
     'licenses',
+    'course_groups',
 
     #For the wiki
     'wiki', # The new django-wiki from benjaoming
