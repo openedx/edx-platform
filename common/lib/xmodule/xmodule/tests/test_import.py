@@ -353,3 +353,28 @@ class ImportTestCase(unittest.TestCase):
         <slider var="a" style="width:400px;float:left;"/>\
 <plot style="margin-top:15px;margin-bottom:15px;"/>""".strip()
         self.assertEqual(gst_sample.definition['render'], render_string_from_sample_gst_xml)
+
+    def test_cohort_config(self):
+        """
+        Check that cohort config parsing works right.
+        """
+        modulestore = XMLModuleStore(DATA_DIR, course_dirs=['toy'])
+
+        toy_id = "edX/toy/2012_Fall"
+
+        course = modulestore.get_course(toy_id)
+
+        # No config -> False
+        self.assertFalse(course.is_cohorted)
+
+        # empty config -> False
+        course.metadata['cohort-config'] = {}
+        self.assertFalse(course.is_cohorted)
+
+        # false config -> False
+        course.metadata['cohort-config'] = {'cohorted': False}
+        self.assertFalse(course.is_cohorted)
+
+        # and finally...
+        course.metadata['cohort-config'] = {'cohorted': True}
+        self.assertTrue(course.is_cohorted)
