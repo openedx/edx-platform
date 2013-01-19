@@ -361,6 +361,17 @@ class CourseDescriptor(SequenceDescriptor):
         return self.metadata.get("show_calculator", None) == "Yes"
 
     @property
+    def is_cohorted(self):
+        """
+        Return whether the course is cohorted.
+        """
+        config = self.metadata.get("cohort-config")
+        if config is None:
+            return False
+
+        return bool(config.get("cohorted"))
+
+    @property
     def is_new(self):
         """
         Returns if the course has been flagged as new in the metadata. If
