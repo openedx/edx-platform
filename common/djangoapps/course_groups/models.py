@@ -40,15 +40,28 @@ def get_cohort(user, course_id):
     Returns:
         A CourseUserGroup object if the User has a cohort, or None.
     """
-    group_type = CourseUserGroup.COHORT
     try:
-        group = CourseUserGroup.objects.get(course_id=course_id, group_type=group_type,
-                                        users__id=user.id)
+        group = CourseUserGroup.objects.get(course_id=course_id,
+                                            group_type=CourseUserGroup.COHORT,
+                                            users__id=user.id)
     except CourseUserGroup.DoesNotExist:
         group = None
-    
+
     if group:
         return group
 
     # TODO: add auto-cohorting logic here
     return None
+
+def get_course_cohorts(course_id):
+    """
+    Get a list of all the cohorts in the given course.
+
+    Arguments:
+        course_id: string in the format 'org/course/run'
+
+    Returns:
+        A list of CourseUserGroup objects.  Empty if there are no cohorts.
+    """
+    return list(CourseUserGroup.objects.filter(course_id=course_id,
+                                               group_type=CourseUserGroup.COHORT))
