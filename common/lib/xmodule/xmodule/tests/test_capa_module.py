@@ -138,10 +138,11 @@ class CapaModuleTest(unittest.TestCase):
 
     def test_showanswer_closed(self):
 
-        # can see after attempts used up
+        # can see after attempts used up, even with due date in the future
         used_all_attempts = CapaFactory.create(showanswer='closed',
                                                max_attempts="1",
-                                               attempts="1")
+                                               attempts="1",
+                                               due=self.tomorrow_str)
         self.assertTrue(used_all_attempts.answer_available())
 
 
@@ -151,6 +152,7 @@ class CapaModuleTest(unittest.TestCase):
                                                attempts="0",
                                                due=self.yesterday_str)
         self.assertTrue(after_due_date.answer_available())
+
 
         # can't see because attempts left
         attempts_left_open = CapaFactory.create(showanswer='closed',
@@ -166,6 +168,47 @@ class CapaModuleTest(unittest.TestCase):
                                             due=self.yesterday_str,
                                             graceperiod=self.two_day_delta_str)
         self.assertFalse(still_in_grace.answer_available())
+
+
+
+    def test_showanswer_past_due(self):
+        """
+        With showanswer="past_due" should only show answer after the problem is closed
+        for everyone--e.g. after due date + grace period.
+        """
+
+        # can see after attempts used up, even with due date in the future
+        used_all_attempts = CapaFactory.create(showanswer='past_due',
+                                               max_attempts="1",
+                                               attempts="1",
+                                               due=self.tomorrow_str)
+        self.assertFalse(used_all_attempts.answer_available())
+
+
+        # can see after due date
+        past_due_date = CapaFactory.create(showanswer='past_due',
+                                               max_attempts="1",
+                                               attempts="0",
+                                               due=self.yesterday_str)
+        self.assertTrue(past_due_date.answer_available())
+
+
+        # can't see because attempts left
+        attempts_left_open = CapaFactory.create(showanswer='past_due',
+                                               max_attempts="1",
+                                               attempts="0",
+                                               due=self.tomorrow_str)
+        self.assertFalse(attempts_left_open.answer_available())
+
+        # Can't see because grace period hasn't expired, even though have no more
+        # attempts.
+        still_in_grace = CapaFactory.create(showanswer='past_due',
+                                            max_attempts="1",
+                                            attempts="1",
+                                            due=self.yesterday_str,
+                                            graceperiod=self.two_day_delta_str)
+        self.assertFalse(still_in_grace.answer_available())
+
 
 
 

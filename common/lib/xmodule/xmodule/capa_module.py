@@ -389,38 +389,43 @@ class CapaModule(XModule):
             })
         return json.dumps(d, cls=ComplexEncoder)
 
+    def is_past_due(self):
+        """
+        Is it now past this problem's due date, including grace period?
+        """
+        return (self.close_date is not None and
+                datetime.datetime.utcnow() > self.close_date)
+
     def closed(self):
         ''' Is the student still allowed to submit answers? '''
         if self.attempts == self.max_attempts:
             return True
-        if self.close_date is not None and datetime.datetime.utcnow() > self.close_date:
+        if self.is_past_due():
             return True
 
         return False
 
     def answer_available(self):
-        ''' Is the user allowed to see an answer?
+        '''
+        Is the user allowed to see an answer?
         '''
         if self.show_answer == '':
             return False
-
-        if self.show_answer == "never":
+        elif self.show_answer == "never":
             return False
-
-        # Admins can see the answer, unless the problem explicitly prevents it
-        if self.system.user_is_staff:
+        elif self.system.user_is_staff:
+            # This i after the 'never' check because admins can see the answer
+            # unless the problem explicitly prevents it
             return True
-
-        if self.show_answer == 'attempted':
+        elif self.show_answer == 'attempted':
             return self.attempts > 0
-
-        if self.show_answer == 'answered':
+        elif self.show_answer == 'answered':
             return self.lcp.done
-
-        if self.show_answer == 'closed':
+        elif self.show_answer == 'closed':
             return self.closed()
-
-        if self.show_answer == 'always':
+        elif self.show_answer == 'past_due':
+            return self.is_past_due()
+        elif self.show_answer == 'always':
             return True
 
         return False
