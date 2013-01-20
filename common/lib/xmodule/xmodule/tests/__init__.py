@@ -26,7 +26,7 @@ test_system = ModuleSystem(
     # "render" to just the context...
     render_template=lambda template, context: str(context),
     replace_urls=Mock(),
-    user=Mock(),
+    user=Mock(is_staff=False),
     filestore=Mock(),
     debug=True,
     xqueue={'interface':None, 'callback_url':'/', 'default_queuename': 'testqueue', 'waittime': 10},
