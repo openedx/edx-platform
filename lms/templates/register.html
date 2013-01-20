@@ -1,7 +1,202 @@
 <%inherit file="main.html" />
 
 <%namespace name='static' file='static_content.html'/>
-<%block name="title"><title>register</title></%block>
+<%! from django.core.urlresolvers import reverse %>
+<%! from django_countries.countries import COUNTRIES %>
+<%! from student.models import UserProfile %>
+<%! from datetime import date %>
+<%! import calendar %>
 
-Hello world
+<%block name="title"><title>Register for edX</title></%block>
 
+<%block name="js_extra">
+  <script type="text/javascript">
+    $(function() {
+
+      // adding js class for styling with accessibility in mind
+      $('body').addClass('js');
+
+      // new window/tab opening
+      $('a[rel="external"], a[class="new-vp"]')
+      .click( function() {
+      window.open( $(this).attr('href') );
+      return false;
+      });
+
+      // form field label styling on focus
+      $("form :input").focus(function() {
+        $("label[for='" + this.id + "']").addClass("is-focused");
+      }).blur(function() {
+        $("label").removeClass("is-focused");
+      });
+
+    });
+  </script>
+</%block>
+
+<section class="register container">
+  <section class="introduction">
+    <header>
+      <h1>Register for edX</h1>
+    </header>
+  </section>
+
+  <section role="main" class="content">
+    <header>
+      <h2 class="is-hidden">Registration Form</h2>
+    </header>
+
+    <form role="form" id="register-form" method="post" data-remote="true" action="/create_account">
+      
+      <!-- status messages -->
+      <div role="alert" class="status message submission-error">
+        <h3 class="message-title"></h3>
+        <p class="message-copy"></p>
+      </div>
+
+      <div role="alert" class="status message system-error">
+        <h3 class="message-title"></h3>
+        <p class="message-copy"></p>
+      </div>
+
+      <p class="instructions">
+        Please complete the following fields to register for an edX account. Required fields are noted by <strong class="indicator">bold text and an asterisk (*)</strong>. 
+      </p>
+
+      <fieldset class="group group-form group-form-requiredinformation">
+        <legend class="is-hidden">Required Information</legend>
+
+        % if has_extauth_info is UNDEFINED:
+
+        <ol class="list-input">
+          <li class="field required" id="field-email">
+            <label for="email">E-mail</label>
+            <input class="" id="email" type="email" name="email" value="" placeholder="eg. example@edx.org" />              
+          </li>
+          <li class="field required" id="field-password">
+            <label for="password">Password</label>
+            <input id="password" type="password" name="password" value="" placeholder="*****" />
+          </li>
+          <li class="field required" id="field-username">
+            <label for="username">Public Username</label>
+            <input id="username" type="text" name="username" value="" placeholder="e.g. JaneDoe314159" />
+            <span class="tip tip-input">Will be shown in any discussions or forums you participate in</span>
+          </li>
+          <li class="field required" id="field-name">
+            <label for="name">Full Name</label>
+            <input id="name" type="text" name="name" value="" placeholder="e.g. Jane Doe" />
+            <span class="tip tip-input">Needed for any certificates you earn</span>
+          </li>
+        </ol>
+
+        % else:
+
+        <div class="message">
+          <h3 class="message-title">Welcome ${extauth_email}</h3>
+          <p class="message-copy">Enter a public username:</p>
+        </div>
+
+        <ol class="list-input">
+          <li class="field required" id="field-username">
+            <label for="username">Public Username</label>
+            <input id="username" type="text" name="username" value="${extauth_username}" placeholder="e.g. JaneDoe314159" />
+            <span class="tip tip-input">Will be shown in any discussions or forums you participate in</span>
+          </li>
+        </ol>
+
+        % endif
+      </fieldset>
+
+      <fieldset class="group group-form group-form-secondary group-form-personalinformation">
+        <legend class="is-hidden">Optional Personal Information</legend>
+
+        <ol class="list-input">
+          <li class="field" id="field-education-level">
+            <label for="education-level">Highest Level of Education Completed</label>
+            <select id="education-level" name="level_of_education">
+              <option value="">--</option>
+              %for code, ed_level in UserProfile.LEVEL_OF_EDUCATION_CHOICES:
+              <option value="${code}">${ed_level}</option>
+              %endfor
+            </select>
+          </li>
+
+          <li class="field" id="field-gender">
+            <label for="gender">Highest Level of Education Completed</label>
+            <select id="gender" name="gender">
+              <option value="">--</option>
+              %for code, gender in UserProfile.GENDER_CHOICES:
+              <option value="${code}">${gender}</option>
+              %endfor
+            </select>
+          </li>
+
+          <li class="field" id="field-yob">
+            <label for="yob">Year of Birth</label>
+            <select id="yob" name="year_of_birth">
+              <option value="">--</option>
+              %for year in UserProfile.VALID_YEARS:
+              <option value="${year}">${year}</option>
+              %endfor
+            </select>
+          </li>
+        </ol>
+      </fieldset>
+
+      <fieldset class="group group-form group-form-personalinformation2">
+        <legend class="is-hidden">Optional Personal Information</legend>
+
+        <ol class="list-input">
+          <li class="field" id="field-address-mailing">
+            <label for="address-mailing">Mailing Address</label>
+            <textarea id="address-mailing" name="mailing_address" value=""></textarea>
+          </li>
+
+          <li class="field" id="field-goals">
+            <label for="goals">Do you have any goals in signing up for edX?</label>
+            <textarea id="goals" name="goals" value=""></textarea>
+          </li>
+        </ol>
+      </fieldset>
+
+      <fieldset class="group group-form group-form-accountacknowledgements">
+        <legend class="is-hidden">Account Acknowledgements</legend>
+
+        <ol class="list-input">
+          <li class="field required" id="field-tos">
+            <input id="tos-yes" type="checkbox" name="terms_of_service" value="true" />
+            <label for="tos-yes">I agree to the <a href="${reverse('tos')}" class="new-vp">Terms of Service</a></label>
+          </li>
+
+          <li class="field required" id="field-honorcode">
+            <input id="honorcode-yes" type="checkbox" name="honor_code" value="true" />
+            <label for="honorcode-yes">I agree to the <a href="${reverse('honor')}" class="new-vp">Honor Code</a></label>
+          </li>
+        </ol>
+      </fieldset>
+
+      <div class="form-actions">
+        <button name="submit" type="submit" id="submit" class="action action-primary action-update">Register &amp; Create My Account</button>
+        % if has_extauth_info is UNDEFINED:
+        <a href="${reverse('login')}" class="action action-secondary action-login">Already have an account? Login.</a>
+        % endif
+      </div>
+    </form>
+  </section>
+
+  <aside role="complementary">
+    <header>
+      <h3 class="is-hidden">Registration Help</h3>
+    </header>
+
+    <div class="cta cta-login">
+      <h3>Already Have an Account?</h3>
+      <p><a class="action action-login" href="${reverse('login')}">Log into your edX account</a> and continue with your classes</p>
+    </div>
+
+    <div class="cta cta-help">
+      <h3>Need Help?</h3>
+      <p>Looking for help in registering with edX? <a href="#">View our help section for contact information and answers to commonly asked questions</a></p>
+    </div>
+  </aside>
+</section>
