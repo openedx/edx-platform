@@ -1,8 +1,8 @@
+import datetime
 import json
 from mock import Mock
 from pprint import pprint
 import unittest
-
 
 from xmodule.capa_module import CapaModule
 from xmodule.modulestore import Location
@@ -56,7 +56,7 @@ class CapaFactory(object):
             problem_state: a dict to to be serialized into the instance_state of the
                 module.
 
-            attempts: also added to instance state.  Should be a number.
+            attempts: also added to instance state.  Will be converted to an int.
         """
         definition = {'data': CapaFactory.sample_problem_xml,}
         location = Location(["i4x", "edX", "capa_test", "problem",
@@ -81,7 +81,9 @@ class CapaFactory(object):
         if problem_state is not None:
             instance_state_dict = problem_state
         if attempts is not None:
-            instance_state_dict['attempts'] = attempts
+            # converting to int here because I keep putting "0" and "1" in the tests
+            # since everything else is a string.
+            instance_state_dict['attempts'] = int(attempts)
         if len(instance_state_dict) > 0:
             instance_state = json.dumps(instance_state_dict)
         else:
@@ -97,6 +99,17 @@ class CapaFactory(object):
 
 class CapaModuleTest(unittest.TestCase):
 
+
+    def setUp(self):
+        now = datetime.datetime.now()
+        day_delta = datetime.timedelta(days=1)
+        self.yesterday_str = str(now - day_delta)
+        self.today_str = str(now)
+        self.tomorrow_str = str(now + day_delta)
+
+        # in the capa grace period format, not in time delta format
+        self.two_day_delta_str = "2 days"
+
     def test_import(self):
         module = CapaFactory.create()
         self.assertEqual(module.get_score()['score'], 0)
@@ -106,11 +119,54 @@ class CapaModuleTest(unittest.TestCase):
         self.assertNotEqual(module.url_name, other_module.url_name,
                             "Factory should be creating unique names for each problem")
 
-    def test_showanswer(self):
+    def test_showanswer_default(self):
         """
         Make sure the show answer logic does the right thing.
         """
-        # default, no due date, showanswer 'closed'
+        # default, no due date, showanswer 'closed', so problem is open, and show_answer
+        # not visible.
         problem = CapaFactory.create()
-        pprint(problem.__dict__)
         self.assertFalse(problem.answer_available())
+
+
+    def test_showanswer_attempted(self):
+        problem = CapaFactory.create(showanswer='attempted')
+        self.assertFalse(problem.answer_available())
+        problem.attempts = 1
+        self.assertTrue(problem.answer_available())
+
+
+    def test_showanswer_closed(self):
+
+        # can see after attempts used up
+        used_all_attempts = CapaFactory.create(showanswer='closed',
+                                               max_attempts="1",
+                                               attempts="1")
+        self.assertTrue(used_all_attempts.answer_available())
+
+
+        # can see after due date
+        after_due_date = CapaFactory.create(showanswer='closed',
+                                               max_attempts="1",
+                                               attempts="0",
+                                               due=self.yesterday_str)
+        self.assertTrue(after_due_date.answer_available())
+
+        # can't see because attempts left
+        attempts_left_open = CapaFactory.create(showanswer='closed',
+                                               max_attempts="1",
+                                               attempts="0",
+                                               due=self.tomorrow_str)
+        self.assertFalse(attempts_left_open.answer_available())
+
+        # Can't see because grace period hasn't expired
+        still_in_grace = CapaFactory.create(showanswer='closed',
+                                            max_attempts="1",
+                                            attempts="0",
+                                            due=self.yesterday_str,
+                                            graceperiod=self.two_day_delta_str)
+        self.assertFalse(still_in_grace.answer_available())
+
+
+
+
