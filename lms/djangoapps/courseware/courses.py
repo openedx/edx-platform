@@ -73,7 +73,7 @@ def get_cohort_id(user, course_id):
     
     """
     
-def is_commentable_cohorted(course_id,commentable_id)
+def is_commentable_cohorted(course_id,commentable_id):
     """
     given a course and a commentable id, return whether or not this commentable is cohorted
     
