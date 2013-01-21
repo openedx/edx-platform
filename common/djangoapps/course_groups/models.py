@@ -1,5 +1,9 @@
+import logging
+
 from django.contrib.auth.models import User
 from django.db import models
+
+log = logging.getLogger(__name__)
 
 class CourseUserGroup(models.Model):
     """
@@ -26,7 +30,6 @@ class CourseUserGroup(models.Model):
     COHORT = 'cohort'
     GROUP_TYPE_CHOICES = ((COHORT, 'Cohort'),)
     group_type = models.CharField(max_length=20, choices=GROUP_TYPE_CHOICES)
-
 
 def get_cohort(user, course_id):
     """
@@ -65,3 +68,49 @@ def get_course_cohorts(course_id):
     """
     return list(CourseUserGroup.objects.filter(course_id=course_id,
                                                group_type=CourseUserGroup.COHORT))
+
+### Helpers for cohor management views
+
+def get_cohort_by_name(course_id, name):
+    """
+    Return the CourseUserGroup object for the given cohort.  Raises DoesNotExist
+    it isn't present.
+    """
+    return CourseUserGroup.objects.get(course_id=course_id,
+                                       group_type=CourseUserGroup.COHORT,
+                                       name=name)
+
+def add_cohort(course_id, name):
+    """
+    Add a cohort to a course.  Raises ValueError if a cohort of the same name already
+    exists.
+    """
+    log.debug("Adding cohort %s to %s", name, course_id)
+    if CourseUserGroup.objects.filter(course_id=course_id,
+                                      group_type=CourseUserGroup.COHORT,
+                                      name=name).exists():
+        raise ValueError("Can't create two cohorts with the same name")
+
+    return CourseUserGroup.objects.create(course_id=course_id,
+                                          group_type=CourseUserGroup.COHORT,
+                                          name=name)
+
+def get_course_cohort_names(course_id):
+    """
+    Return a list of the cohort names in a course.
+    """
+    return [c.name for c in get_course_cohorts(course_id)]
+
+
+def delete_empty_cohort(course_id, name):
+    """
+    Remove an empty cohort.  Raise ValueError if cohort is not empty.
+    """
+    cohort = get_cohort_by_name(course_id, name)
+    if cohort.users.exists():
+        raise ValueError(
+            "Can't delete non-empty cohort {0} in course {1}".format(
+                name, course_id))
+
+    cohort.delete()
+

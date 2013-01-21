@@ -562,6 +562,7 @@ def instructor_dashboard(request, course_id):
                'djangopid' : os.getpid(),
                'mitx_version' : getattr(settings,'MITX_VERSION_STRING',''),
                'offline_grade_log' : offline_grades_available(course_id),
+               'cohorts_ajax_url' : reverse('cohorts', kwargs={'course_id': course_id}),
                }
 
     return render_to_response('courseware/instructor_dashboard.html', context)
