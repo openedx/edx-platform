@@ -12,6 +12,8 @@ $sans-serif: 'Open Sans', $verdana;
 $monospace: Monaco, 'Bitstream Vera Sans Mono', 'Lucida Console', monospace;
 $serif: $georgia;
 
+$white: rgb(255,255,255);
+$black: rgb(0,0,0);
 $blue: rgb(29,157,217);
 $pink: rgb(182,37,104);
 $yellow: rgb(255, 252, 221);
@@ -22,6 +24,13 @@ $dark-gray: rgb(51, 51, 51);
 $border-color: rgb(200, 200, 200);
 $sidebar-color: rgb(246, 246, 246);
 $outer-border-color: rgb(170, 170, 170);
+
+// edx.org-related
+$m-gray-l: rgb(247, 247, 247);
+$m-gray: rgb(67,67,67);
+$m-blue: rgb(2,159,211);
+$m-base-font-size: em(16);
+
 
 $base-font-color: rgb(60,60,60);
 $lighter-base-font-color: rgb(100,100,100);
