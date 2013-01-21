@@ -48,12 +48,12 @@
     <form role="form" id="login-form" method="post" data-remote="true" action="/login">
       
       <!-- status messages -->
-      <div role="alert" class="status message">
+      <div role="alert" class="status message is-hidden">
         <h3 class="message-title">We're Sorry, edX accounts are unavailable currently</h3>
         <p class="message-copy">Lorem ipsum dolor sit amet, consectetuer adipiscing elit. Lorem ipsum dolor sit amet, consectetuer adipiscing elit.</p>
       </div>
 
-      <div role="alert" class="status message submission-error">
+      <div role="alert" class="status message submission-error is-hidden">
         <h3 class="message-title">The following errors occured while logging you in: </h3>
         <ul class="message-copy">
           <li>Your email or password is incorrect</li>
@@ -108,11 +108,11 @@
     </header>
 
     % if settings.MITX_FEATURES.get('AUTH_USE_OPENID'):
-    <div class="cta cta-login-options-openid">
+    <!-- <div class="cta cta-login-options-openid">
       <h3>Login via OpenID</h3>
       <p>You can now start learning with edX by logging in with your <a rel="external" href="http://openid.net/">OpenID account</a>.</p>
       <a class="action action-login-openid" href="#">Login via OpenID</a>
-    </div>
+    </div> -->
     % endif
 
     <div class="cta cta-forgotpw">

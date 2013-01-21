@@ -128,6 +128,8 @@
         margin: 0 0 ($baseline/4) 0;
         color: tint($black, 20%);
         font-size: em(16);
+        font-weight: 600;
+        text-transform: uppercase;
       }
 
       p, ul, ol, dl, blockquote {
@@ -368,13 +370,13 @@
   // forms - messages/status
   .status {
     @include box-sizing(border-box);
-    @include box-shadow(inset 0 -1px 2px 0 rgba(0,0,0,0.1));
+    @include box-shadow(inset 0 -1px 2px 0 tint($yellow, 85%));
+    border-top: 2px solid $yellow;
     border-bottom: 1px solid tint($m-gray,70%);
     background: tint($yellow,70%);
 
     .message-title {
       margin: 0 0 ($baseline/4) 0;
-      color: shade($yellow, 50%);
       font-size: em(14);
       font-weight: 600;
     }
@@ -392,7 +394,9 @@
   }
 
   .submission-error, .system-error {
-    background: tint($red,95%);
+    @include box-shadow(inset 0 -1px 2px 0 tint($red, 85%));
+    border-top: 2px solid tint($red,65%);
+    background: tint($red,98%);
 
     .message-title {
       color: shade($red, 10%);
