@@ -255,6 +255,9 @@ class DragAndDrop(object):
 
             It is draggable_name: dragable_position mapping.
 
+            Complex form converted from simple form uses 'exact' rule
+            for matching.
+
         Correct answer in list form is designed for complex cases::
 
         correct_answers = [
