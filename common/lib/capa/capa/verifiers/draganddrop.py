@@ -126,6 +126,7 @@ class DragAndDrop(object):
             current_rule = self.correct_positions[groupname].keys()[0]
             if 'number' in current_rule:
                 rule_values = self.correct_positions[groupname][current_rule]
+                # clean rule, do not do clean duplicate items
                 self.correct_positions[groupname].pop(current_rule, None)
                 parsed_rule = current_rule.replace('+', '').replace('number', '')
                 self.correct_positions[groupname][parsed_rule] = rule_values
