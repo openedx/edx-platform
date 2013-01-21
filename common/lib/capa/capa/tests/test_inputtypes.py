@@ -16,6 +16,7 @@ TODO:
 
 """
 
+import json
 from lxml import etree
 import unittest
 import xml.sax.saxutils as saxutils
@@ -533,6 +534,25 @@ class DragAndDropTest(unittest.TestCase):
         state = {'value': value,
                  'status': 'unsubmitted'}
 
+        user_input = {  # order matters, for string comparison
+                        "target_outline": "false",
+                        "base_image": "/static/images/about_1.png",
+                        "draggables": [
+{"can_reuse": "", "label": "Label 1", "id": "1", "icon": ""},
+{"can_reuse": "", "label": "cc", "id": "name_with_icon", "icon": "/static/images/cc.jpg", },
+{"can_reuse": "", "label": "arrow-left", "id": "with_icon", "icon": "/static/images/arrow-left.png", "can_reuse": ""},
+{"can_reuse": "", "label": "Label2", "id": "5", "icon": "", "can_reuse": ""},
+{"can_reuse": "", "label": "Mute", "id": "2", "icon": "/static/images/mute.png", "can_reuse": ""},
+{"can_reuse": "", "label": "spinner", "id": "name_label_icon3", "icon": "/static/images/spinner.gif", "can_reuse": ""},
+{"can_reuse": "", "label": "Star", "id": "name4", "icon": "/static/images/volume.png", "can_reuse": ""},
+{"can_reuse": "", "label": "Label3", "id": "7", "icon": "", "can_reuse": ""}],
+                        "one_per_target": "True",
+                        "targets": [
+                {"y": "90", "x": "210", "id": "t1", "w": "90", "h": "90"},
+                {"y": "160", "x": "370", "id": "t2", "w": "90", "h": "90"}
+                                    ]
+                    }
+
         the_input = lookup_tag('drag_and_drop_input')(test_system, element, state)
 
         context = the_input._get_render_context()
@@ -540,20 +560,12 @@ class DragAndDropTest(unittest.TestCase):
                     'value': value,
                     'status': 'unsubmitted',
                     'msg': '',
-                    'drag_and_drop_json': '{"use_targets": "True", \
-"target_outline": "false", "one_per_target": "True", \
-"draggables": [{"label": "Label 1", "id": "1", "icon": ""}, \
-{"label": "cc", "id": "name_with_icon", "icon": \
-"/static/images/cc.jpg"}, {"label": "arrow-left", "id": \
-"with_icon", "icon": "/static/images/arrow-left.png"}, \
-{"label": "Label2", "id": "5", "icon": ""}, {"label": \
-"Mute", "id": "2", "icon": "/static/images/mute.png"}, \
-{"label": "spinner", "id": "name_label_icon3", "icon": \
-"/static/images/spinner.gif"}, {"label": "Star", "id": \
-"name4", "icon": "/static/images/volume.png"}, {"label": \
-"Label3", "id": "7", "icon": ""}], "base_image": \
-"/static/images/about_1.png", "targets": \
-[{"y": "90", "x": "210", "id": "t1", "w": "90", "h": "90"}, \
-{"y": "160", "x": "370", "id": "t2", "w": "90", "h": "90"}]}',
+                    'drag_and_drop_json': json.dumps(user_input)
                     }
+
+        # as we are dumping 'draggables' dicts while dumping user_input, string
+        # comparison will fail, as order of keys is random.
+        self.assertEqual(json.loads(context['drag_and_drop_json']), user_input)
+        context.pop('drag_and_drop_json')
+        expected.pop('drag_and_drop_json')
         self.assertEqual(context, expected)
