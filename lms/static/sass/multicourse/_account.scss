@@ -1,0 +1,421 @@
+// Account-Centric (Login/Register)
+// =====
+
+// page-level
+.view-register, .view-login {
+
+  .content-wrapper {
+    background: $m-gray-l;
+  }
+}
+
+// js-enabled
+.js {
+
+  // utility
+  .is-shown {
+    display: block;
+  }
+
+  // hidden
+  .is-hidden {
+    display: none;
+  }
+}
+
+// shared
+.login, .register {
+  padding: ($baseline*1.5);
+  @include clearfix;
+
+  // reset - horrible, but necessary
+  p, ol, ul, h1, h2, h3, h4, h5, h6, label, input, textarea {
+    color: $m-gray;
+    font-family: $sans-serif;
+  }
+
+  h1, h2, h3, h4, h5, h6 {
+    letter-spacing: 0;
+  }
+
+  a {
+    @include transition(color 0.15s ease-in-out, border 0.15s ease-in-out);
+
+    &:link, &:visited, &:hover, &:active {
+      color: $m-blue;
+      text-decoration: none !important;
+      font-family: $sans-serif;
+    }
+
+    &:hover, &:active {
+      border-bottom: 1px dotted shade($m-blue, 20%);
+      color: shade($m-blue, 20%);
+    }
+  }
+
+  strong {
+    font-weight: 600;
+  }
+
+  p, ul, ol, dl, blockquote {
+    font-size: $m-base-font-size;
+  }
+
+  // basic layout
+  .introduction {
+    width: flex-grid(8);
+  }
+
+  .content, aside {
+    @include box-sizing(border-box);
+  }
+
+  .content {
+    margin-right: flex-gutter();
+    width: flex-grid(8);
+    float: left;
+  }
+
+  aside {
+    margin: 0;
+    width: flex-grid(4);
+    float: left;
+  }
+
+  // introduction
+  .introduction {
+
+    header {
+      @include clearfix();
+
+      h1 {
+        float: left;
+        width: flex-grid(5,8);
+        margin-right: flex-gutter(0);
+        font-family: $sans-serif;
+        font-size: em(36);
+        font-weight: 700;
+        text-align: left;
+      }
+
+      .wrapper-action {
+        display: block;
+        float: right;
+        width: flex-grid(3,8);
+        margin-top: $baseline;
+        font-size: em(14);
+        text-align: right;
+      }  
+    }
+  }
+
+  // content
+  .content {
+    background: $white;
+  }
+
+  // aside
+  aside {
+
+    .cta {
+      margin: 0 0 ($baseline*2) 0;
+
+      &:last-child {
+        margin-bottom: 0;
+      }
+
+      h3 {
+        margin: 0 0 ($baseline/4) 0;
+        color: tint($black, 20%);
+        font-size: em(16);
+      }
+
+      p, ul, ol, dl, blockquote {
+        color: tint($m-gray, 30%);
+        font-size: em(14);
+      }
+    }
+  }
+
+  // forms
+  form {
+    border: 1px solid tint($m-gray,70%);
+    @include border-radius(3px);
+    @include box-shadow(0 1px 2px 0 rgba(0,0,0, 0.3));
+
+    .instructions, fieldset, .form-actions, .status {
+      padding: ($baseline*1.5);
+    }
+
+    .instructions {
+      padding-bottom: 0;
+      color: tint($m-gray, 30%);
+      font-size: em(14);
+    }
+
+    fieldset {
+      margin: 0;
+      padding-top: $baseline;
+      padding-bottom: $baseline;
+      // border-bottom: 1px solid rgba(216, 223, 230, 0.50);
+
+    }
+
+    .list-input {
+      margin: 0;
+      padding: 0;
+      list-style: none;
+    }
+
+    // field groups
+    .field-group {
+      @include clearfix();
+      margin: 0 0 $baseline 0;
+
+      .field {
+        display: block;
+        float: left;
+        border-bottom: none;
+        margin: 0 ($baseline*1.5) 0 0;
+        padding-bottom: 0;
+
+        input, textarea {
+          width: 100%;
+        }
+      }
+
+      &:last-child {
+        margin-bottom: 0;
+      }
+    }
+
+    // individual fields
+    .field {
+      margin: 0 0 $baseline 0;
+
+      // elements
+      label, input, textarea {
+        display: block;
+        font-family: $sans-serif;
+        font-style: normal;
+      }
+
+      label {
+        @include transition(color 0.15s ease-in-out);
+        margin: 0 0 ($baseline/4) 0;
+        color: tint($black, 20%);
+      }
+
+      .tip {
+        @include transition(color 0.15s ease-in-out);
+        display: block;
+        margin-top: ($baseline/4);
+        color: tint($m-gray, 50%);
+        font-size: em(13);
+      }
+
+      input, textarea {
+        width: 100%;
+        padding: $baseline ($baseline*.75);         
+
+        &.long {
+          width: 100%;
+        }
+
+        &.short {
+          width: 25%;
+        }
+      }
+
+      textarea.long {
+        height: ($baseline*5);
+      }
+
+      &:last-child {
+        margin-bottom: 0;
+      }
+
+      // types - password
+
+      // types - select
+      &.select {
+
+        select {
+          width: 100%;
+        }
+      }
+
+      // types - checkboxes/radio buttons
+      &.checkbox {
+
+        input[type="checkbox"] {
+          display: inline-block;
+          width: auto;
+          margin-right: ($baseline/4);
+        }
+
+        label {
+          display: inline-block;
+        }
+      }
+
+      // states - all
+      &.disabled, &.submitted {
+        color: rgba(0,0,0,.25);
+
+        label {
+          cursor: text;
+
+          &:after {
+            margin-left: ($baseline/4);
+          }
+        }
+
+        textarea, input {
+          background: $white;
+          color: rgba(0,0,0,.25);
+        }
+      }
+
+      // states - focused
+      &.is-focused {
+
+        label {
+          color: $m-blue;          
+        }
+
+        .tip {
+          color: tint($m-blue, 30%);
+        }
+      }
+
+      // states - disabled
+      &.disabled {
+        label:after {
+          color: rgba(0,0,0,.35);
+          content: "(Disabled Currently)";
+        }
+      }
+
+      &.error {
+
+        label {
+          color: $red;
+        }
+
+        input, textarea {
+          border-color: tint($red,50%);
+        }
+      }
+
+      &.required {
+
+        label {
+          font-weight: 600;
+
+          a {
+            font-weight: 600 !important;
+          }
+        }
+
+        label:after {
+          margin-left: ($baseline/4);
+          content: "*";
+        }
+      }
+    }
+  }
+
+  // forms - actions
+  .form-actions {
+    @include clearfix();
+
+    button[type="submit"] {
+      @include button(simple, $blue);
+      @include box-sizing(border-box);
+      @include border-radius(2px);
+      padding: ($baseline*0.75) $baseline;
+      font-size: em(16);
+      font-weight: 600;
+      letter-spacing: 0;
+      text-align: center;
+
+      &:disabled {
+        opacity: 0.3;
+      }
+    }
+
+    .action-primary {
+      float: left;
+      width: flex-grid(5,8);
+      margin-right: flex-gutter(0);
+    }
+
+    .action-secondary {
+      display: block;
+      float: right;
+      width: flex-grid(3,8);
+      margin: $baseline $baseline 0 0;
+      font-size: em(14);
+      text-align: right;
+    }
+
+    &.error {
+
+    }
+  }
+
+  // forms - messages/status
+  .status {
+    @include box-sizing(border-box);
+    @include box-shadow(inset 0 -1px 2px 0 rgba(0,0,0,0.1));
+    border-bottom: 1px solid tint($m-gray,70%);
+    background: tint($yellow,70%);
+
+    .message-title {
+      margin: 0 0 ($baseline/4) 0;
+      color: shade($yellow, 50%);
+      font-size: em(14);
+      font-weight: 600;
+    }
+
+    .message-copy {
+      margin: 0;
+      padding: 0;
+      font-size: em(14);
+      list-style: none;
+
+      li {
+        margin: 0 0 ($baseline/4) 0;
+      }
+    }
+  }
+
+  .submission-error, .system-error {
+    background: tint($red,95%);
+
+    .message-title {
+      color: shade($red, 10%);
+    }
+  }
+}
+
+// =====
+
+// login
+.login {
+
+  .group-form-accountpreferences {
+    padding-top: 0;
+    padding-bottom: 0;
+  }
+}
+
+// register
+.register {
+
+  .group-form-accountacknowledgements {
+    padding-top: 0;
+    padding-bottom: 0;
+  }
+}
