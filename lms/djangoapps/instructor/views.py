@@ -193,8 +193,8 @@ def instructor_dashboard(request, course_id):
         # get the form data
         unique_student_identifier=request.POST.get('unique_student_identifier','')
         problem_to_reset=request.POST.get('problem_to_reset','')
-        
-        if problem_to_reset[-4:]==".xml": 
+
+        if problem_to_reset[-4:]==".xml":
             problem_to_reset=problem_to_reset[:-4]
 
         # try to uniquely id student by email address or username
@@ -213,8 +213,8 @@ def instructor_dashboard(request, course_id):
             try:
                 (org, course_name, run)=course_id.split("/")
                 module_state_key="i4x://"+org+"/"+course_name+"/problem/"+problem_to_reset
-                module_to_reset=StudentModule.objects.get(student_id=student_to_reset.id, 
-                                                          course_id=course_id, 
+                module_to_reset=StudentModule.objects.get(student_id=student_to_reset.id,
+                                                          course_id=course_id,
                                                           module_state_key=module_state_key)
                 msg+="Found module to reset.  "
             except Exception as e:
@@ -230,14 +230,14 @@ def instructor_dashboard(request, course_id):
             # save
             module_to_reset.state=json.dumps(problem_state)
             module_to_reset.save()
-            track.views.server_track(request, 
+            track.views.server_track(request,
                                     '{instructor} reset attempts from {old_attempts} to 0 for {student} on problem {problem} in {course}'.format(
                                         old_attempts=old_number_of_attempts,
                                         student=student_to_reset,
                                         problem=module_to_reset.module_state_key,
                                         instructor=request.user,
                                         course=course_id),
-                                    {}, 
+                                    {},
                                     page='idashboard')
             msg+="<font color='green'>Module state successfully reset!</font>"
         except:
@@ -252,12 +252,12 @@ def instructor_dashboard(request, course_id):
             else:
                 student_to_reset=User.objects.get(username=unique_student_identifier)
             progress_url=reverse('student_progress',kwargs={'course_id':course_id,'student_id': student_to_reset.id})
-            track.views.server_track(request, 
+            track.views.server_track(request,
                                     '{instructor} requested progress page for {student} in {course}'.format(
                                         student=student_to_reset,
                                         instructor=request.user,
                                         course=course_id),
-                                    {}, 
+                                    {},
                                     page='idashboard')
             msg+="<a href='{0}' target='_blank'> Progress page for username: {1} with email address: {2}</a>.".format(progress_url,student_to_reset.username,student_to_reset.email)
         except:
