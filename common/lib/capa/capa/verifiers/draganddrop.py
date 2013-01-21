@@ -217,6 +217,13 @@ class DragAndDrop(object):
                     if PositionsCompare(u_el) == PositionsCompare(c_el):
                         break
                 else:
+                    # General: the else is executed after the for,
+                    # only if the for terminates normally (not by a break)
+
+                    # In this case, 'for' is terminated normally if every element
+                    # from 'correct' list isn't equal to concrete element from
+                    # 'user' list. So as we found one element from 'user' list,
+                    # that not in 'correct' list - we return False
                     return False
 
         if flag == 'unordered_equal':
@@ -229,6 +236,8 @@ class DragAndDrop(object):
                         temp.remove(c_el)
                         break
                 else:
+                    # same as upper -  if we found element from 'user' list,
+                    # that not in 'correct' list - we return False.
                     return False
 
         return True
