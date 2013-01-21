@@ -1,13 +1,15 @@
-<problem display_name="Drag and drop demo" >
+<problem display_name="Drag and drop demos: drag and drop icons or labels
+    to proper positions." >
 
 <customresponse>
     <text>
-        <h3>Please set hydrogen atoms to LEFT carbon atom</h3>
-        <br />
+        <h4>[Anyof rule example]</h4><br/>
+        <h4>Please label hydrogen  atoms connected with left carbon atom.</h4>
+        <br/>
     </text>
 
-    <drag_and_drop_input img="images_list/ethglycol.jpg" target_outline="true"
-        one_per_target="true" no_labels="true">
+    <drag_and_drop_input img="/static/images/images_list/ethglycol.jpg" target_outline="true"
+        one_per_target="true" no_labels="true" label_bg_color="rgb(222, 139, 238)">
         <draggable id="1" label="Hydrogen" />
         <draggable id="2" label="Hydrogen" />
 
@@ -39,43 +41,44 @@ else:
 
 <customresponse>
     <text>
-        <h3>Describe carbon molecule in LCAO-MO</h3>
-        <br />
+        <h4>[Complex grading example]</h4><br/>
+        <h4>Describe carbon molecule in LCAO-MO.</h4>
+        <br/>
     </text>
 
-    <drag_and_drop_input img="images_list/lcao-mo/lcao-mo.jpg" target_outline="true" >
+    <drag_and_drop_input img="/static/images/images_list/lcao-mo/lcao-mo.jpg" target_outline="true" >
 
         <!-- filled bond -->
-        <draggable id="1" icon="images_list/lcao-mo/u_d.png" />
-        <draggable id="2" icon="images_list/lcao-mo/u_d.png" />
-        <draggable id="3" icon="images_list/lcao-mo/u_d.png" />
-        <draggable id="4" icon="images_list/lcao-mo/u_d.png" />
-        <draggable id="5" icon="images_list/lcao-mo/u_d.png" />
-        <draggable id="6" icon="images_list/lcao-mo/u_d.png" />
+        <draggable id="1" icon="/static/images/images_list/lcao-mo/u_d.png" />
+        <draggable id="2" icon="/static/images/images_list/lcao-mo/u_d.png" />
+        <draggable id="3" icon="/static/images/images_list/lcao-mo/u_d.png" />
+        <draggable id="4" icon="/static/images/images_list/lcao-mo/u_d.png" />
+        <draggable id="5" icon="/static/images/images_list/lcao-mo/u_d.png" />
+        <draggable id="6" icon="/static/images/images_list/lcao-mo/u_d.png" />
 
         <!-- up bond -->
-        <draggable id="7"  icon="images_list/lcao-mo/up.png"/>
-        <draggable id="8"  icon="images_list/lcao-mo/up.png"/>
-        <draggable id="9"  icon="images_list/lcao-mo/up.png"/>
-        <draggable id="10" icon="images_list/lcao-mo/up.png"/>
+        <draggable id="7"  icon="/static/images/images_list/lcao-mo/up.png"/>
+        <draggable id="8"  icon="/static/images/images_list/lcao-mo/up.png"/>
+        <draggable id="9"  icon="/static/images/images_list/lcao-mo/up.png"/>
+        <draggable id="10" icon="/static/images/images_list/lcao-mo/up.png"/>
 
         <!-- sigma -->
-        <draggable id="11" icon="images_list/lcao-mo/sigma.png"/>
-        <draggable id="12" icon="images_list/lcao-mo/sigma.png"/>
+        <draggable id="11" icon="/static/images/images_list/lcao-mo/sigma.png"/>
+        <draggable id="12" icon="/static/images/images_list/lcao-mo/sigma.png"/>
 
         <!-- sigma* -->
-        <draggable id="13" icon="images_list/lcao-mo/sigma_s.png"/>
-        <draggable id="14" icon="images_list/lcao-mo/sigma_s.png"/>
+        <draggable id="13" icon="/static/images/images_list/lcao-mo/sigma_s.png"/>
+        <draggable id="14" icon="/static/images/images_list/lcao-mo/sigma_s.png"/>
 
         <!-- pi -->
-        <draggable id="15" icon="images_list/lcao-mo/pi.png" />
+        <draggable id="15" icon="/static/images/images_list/lcao-mo/pi.png" />
 
         <!-- pi* -->
-        <draggable id="16" icon="images_list/lcao-mo/pi_s.png" />
+        <draggable id="16" icon="/static/images/images_list/lcao-mo/pi_s.png" />
 
         <!-- images that should not be dragged -->
-        <draggable id="17" icon="images_list/lcao-mo/d.png" />
-        <draggable id="18" icon="images_list/lcao-mo/d.png" />
+        <draggable id="17" icon="/static/images/images_list/lcao-mo/d.png" />
+        <draggable id="18" icon="/static/images/images_list/lcao-mo/d.png" />
 
         <!-- positions of electrons and electron pairs -->
         <target id="s_left"       x="130" y="360"    w="32" h="32"/>
@@ -112,27 +115,27 @@ correct_answer = [
   'targets': [
     's_left', 's_right', 's_sigma', 's_sigma_star', 'p_pi_1', 'p_pi_2'
   ],
-  'rule': 'anyof'
+  'rule': 'unordered_equal'
 }, {
   'draggables': ['7','8', '9', '10'],
   'targets': ['p_left_1', 'p_left_2', 'p_right_1','p_right_2'],
-  'rule': 'anyof'
+  'rule': 'unordered_equal'
 }, {
   'draggables': ['11', '12'],
   'targets': ['s_sigma_name', 'p_sigma_name'],
-  'rule': 'anyof'
+  'rule': 'unordered_equal'
 }, {
   'draggables': ['13', '14'],
   'targets': ['s_sigma_star_name', 'p_sigma_star_name'],
-  'rule': 'anyof'
+  'rule': 'unordered_equal'
 }, {
   'draggables': ['15'],
   'targets': ['p_pi_name'],
-  'rule': 'anyof'
+  'rule': 'unordered_equal'
 }, {
   'draggables': ['16'],
   'targets': ['p_pi_star_name'],
-  'rule': 'anyof'
+  'rule': 'unordered_equal'
 }]
 
 if draganddrop.grade(submission[0], correct_answer):
@@ -144,47 +147,48 @@ else:
 
 <customresponse>
     <text>
-        <h3>Describe oxygen molecule in LCAO-MO</h3>
-        <br />
+        <h4>[Another complex grading example]</h4><br/>
+        <h4>Describe oxygen molecule in LCAO-MO</h4>
+        <br/>
     </text>
 
-    <drag_and_drop_input img="images_list/lcao-mo/lcao-mo.jpg" target_outline="true" one_per_target="true">
+    <drag_and_drop_input img="/static/images/images_list/lcao-mo/lcao-mo.jpg" target_outline="true" one_per_target="true">
         <!-- filled bond -->
-        <draggable id="1" icon="images_list/lcao-mo/u_d.png" />
-        <draggable id="2" icon="images_list/lcao-mo/u_d.png" />
-        <draggable id="3" icon="images_list/lcao-mo/u_d.png" />
-        <draggable id="4" icon="images_list/lcao-mo/u_d.png" />
-        <draggable id="5" icon="images_list/lcao-mo/u_d.png" />
-        <draggable id="6" icon="images_list/lcao-mo/u_d.png" />
-        <draggable id="v_fb_1" icon="images_list/lcao-mo/u_d.png" />
-        <draggable id="v_fb_2" icon="images_list/lcao-mo/u_d.png" />
-        <draggable id="v_fb_3" icon="images_list/lcao-mo/u_d.png" />
+        <draggable id="1" icon="/static/images/images_list/lcao-mo/u_d.png" />
+        <draggable id="2" icon="/static/images/images_list/lcao-mo/u_d.png" />
+        <draggable id="3" icon="/static/images/images_list/lcao-mo/u_d.png" />
+        <draggable id="4" icon="/static/images/images_list/lcao-mo/u_d.png" />
+        <draggable id="5" icon="/static/images/images_list/lcao-mo/u_d.png" />
+        <draggable id="6" icon="/static/images/images_list/lcao-mo/u_d.png" />
+        <draggable id="v_fb_1" icon="/static/images/images_list/lcao-mo/u_d.png" />
+        <draggable id="v_fb_2" icon="/static/images/images_list/lcao-mo/u_d.png" />
+        <draggable id="v_fb_3" icon="/static/images/images_list/lcao-mo/u_d.png" />
 
         <!-- up bond -->
-        <draggable id="7"  icon="images_list/lcao-mo/up.png"/>
-        <draggable id="8"  icon="images_list/lcao-mo/up.png"/>
-        <draggable id="9"  icon="images_list/lcao-mo/up.png"/>
-        <draggable id="10" icon="images_list/lcao-mo/up.png"/>
-        <draggable id="v_ub_1" icon="images_list/lcao-mo/up.png"/>
-        <draggable id="v_ub_2" icon="images_list/lcao-mo/up.png"/>
+        <draggable id="7"  icon="/static/images/images_list/lcao-mo/up.png"/>
+        <draggable id="8"  icon="/static/images/images_list/lcao-mo/up.png"/>
+        <draggable id="9"  icon="/static/images/images_list/lcao-mo/up.png"/>
+        <draggable id="10" icon="/static/images/images_list/lcao-mo/up.png"/>
+        <draggable id="v_ub_1" icon="/static/images/images_list/lcao-mo/up.png"/>
+        <draggable id="v_ub_2" icon="/static/images/images_list/lcao-mo/up.png"/>
 
         <!-- sigma -->
-        <draggable id="11" icon="images_list/lcao-mo/sigma.png"/>
-        <draggable id="12" icon="images_list/lcao-mo/sigma.png"/>
+        <draggable id="11" icon="/static/images/images_list/lcao-mo/sigma.png"/>
+        <draggable id="12" icon="/static/images/images_list/lcao-mo/sigma.png"/>
 
         <!-- sigma* -->
-        <draggable id="13" icon="images_list/lcao-mo/sigma_s.png"/>
-        <draggable id="14" icon="images_list/lcao-mo/sigma_s.png"/>
+        <draggable id="13" icon="/static/images/images_list/lcao-mo/sigma_s.png"/>
+        <draggable id="14" icon="/static/images/images_list/lcao-mo/sigma_s.png"/>
 
         <!-- pi -->
-        <draggable id="15" icon="images_list/lcao-mo/pi.png" />
+        <draggable id="15" icon="/static/images/images_list/lcao-mo/pi.png" />
 
         <!-- pi* -->
-        <draggable id="16" icon="images_list/lcao-mo/pi_s.png" />
+        <draggable id="16" icon="/static/images/images_list/lcao-mo/pi_s.png" />
 
         <!-- images that should not be dragged -->
-        <draggable id="17" icon="images_list/lcao-mo/d.png" />
-        <draggable id="18" icon="images_list/lcao-mo/d.png" />
+        <draggable id="17" icon="/static/images/images_list/lcao-mo/d.png" />
+        <draggable id="18" icon="/static/images/images_list/lcao-mo/d.png" />
 
         <!-- positions of electrons and electron pairs -->
         <target id="s_left"       x="130" y="360"    w="32" h="32"/>
@@ -255,30 +259,21 @@ else:
 ]]></answer>
 </customresponse>
 
-<text>
-    <p>
-      Drag and drop pictures to proper positions.
-    </p>
-    <p>
-      Drag images to the cow)).
-    </p>
-</text>
-
 <customresponse>
     <text>
-        <h3>Individual targets with outlines. One draggable per target.</h3>
-        <p> Drag ant to first and star to 3rd. </p>
-        <br />
+        <h4>[Individual targets with outlines, One draggable per target]</h4><br/>
+        <h4>
+        Drag -Ant- to first position and -Star- to third position </h4><br/>
     </text>
 
-    <drag_and_drop_input img="cow.png" target_outline="true">
+    <drag_and_drop_input img="/static/images/cow.png" target_outline="true">
         <draggable id="1" label="Label 1"/>
-        <draggable id="name_with_icon" label="Ant" icon="images_list/ant.jpg"/>
-        <draggable id="with_icon" label="Cloud" icon="images_list/cloud.jpg" />
+        <draggable id="name_with_icon" label="Ant" icon="/static/images/images_list/ant.jpg"/>
+        <draggable id="with_icon" label="Cloud" icon="/static/images/images_list/cloud.jpg" />
         <draggable id="5" label="Label2" />
-        <draggable id="2" label="Drop" icon="images_list/drop.jpg" />
-        <draggable id="name_label_icon3" label="Grass" icon="images_list/grass.jpg" />
-        <draggable id="name4" label="Star" icon="images_list/star.png" />
+        <draggable id="2" label="Drop" icon="/static/images/images_list/drop.jpg" />
+        <draggable id="name_label_icon3" label="Grass" icon="/static/images/images_list/grass.jpg" />
+        <draggable id="name4" label="Star" icon="/static/images/images_list/star.png" />
         <draggable id="7" label="Label3" />
 
         <target id="t1" x="20" y="20" w="90" h="90"/>
@@ -298,22 +293,22 @@ else:
 
 <customresponse>
     <text>
-        <h3>
-            SMALL IMAGE. Individual targets WITHOUT outlines. Move Star to the
-            volcano opening, and Label3 on to the right ear of the cow.
-            One draggable per target.
-        </h3>
-        <br />
+        <h4>[SMALL IMAGE,  Individual targets WITHOUT outlines, One draggable
+            per target]</h4><br/>
+        <h4>
+            Move -Star- to the volcano opening, and -Label3- on to
+            the right ear of the cow.
+        </h4><br/>
     </text>
 
-    <drag_and_drop_input img="cow3.png" target_outline="false">
+    <drag_and_drop_input img="/static/images/cow3.png" target_outline="false">
         <draggable id="1" label="Label 1"/>
-        <draggable id="name_with_icon" label="Ant" icon="images_list/ant.jpg"/>
-        <draggable id="with_icon" label="Cloud" icon="images_list/cloud.jpg" />
+        <draggable id="name_with_icon" label="Ant" icon="/static/images/images_list/ant.jpg"/>
+        <draggable id="with_icon" label="Cloud" icon="/static/images/images_list/cloud.jpg" />
         <draggable id="5" label="Label2" />
-        <draggable id="2" label="Drop" icon="images_list/drop.jpg" />
-        <draggable id="name_label_icon3" label="Grass" icon="images_list/grass.jpg" />
-        <draggable id="name4" label="Star" icon="images_list/star.png" />
+        <draggable id="2" label="Drop" icon="/static/images/images_list/drop.jpg" />
+        <draggable id="name_label_icon3" label="Grass" icon="/static/images/images_list/grass.jpg" />
+        <draggable id="name4" label="Star" icon="/static/images/images_list/star.png" />
         <draggable id="7" label="Label3" />
 
         <target id="t1" x="111" y="58" w="90" h="90"/>
@@ -333,19 +328,19 @@ else:
 
 <customresponse>
     <text>
-        <h3>Many draggable per target. Move star and ant to most left target
-            and lable 3 and label 2 to most right target.</h3>
-        <br />
+        <h4>[Many draggables per target]</h4><br/>
+        <h4>Move -Star- and -Ant- to most left target
+            and -Label3- and -Label2- to most right target.</h4><br/>
     </text>
 
-    <drag_and_drop_input img="cow.png" target_outline="true" one_per_target="false">
+    <drag_and_drop_input img="/static/images/cow.png" target_outline="true" one_per_target="false">
         <draggable id="1" label="Label 1"/>
-        <draggable id="name_with_icon" label="Ant" icon="images_list/ant.jpg"/>
-        <draggable id="with_icon" label="Cloud" icon="images_list/cloud.jpg" />
+        <draggable id="name_with_icon" label="Ant" icon="/static/images/images_list/ant.jpg"/>
+        <draggable id="with_icon" label="Cloud" icon="/static/images/images_list/cloud.jpg" />
         <draggable id="5" label="Label2" />
-        <draggable id="2" label="Drop" icon="images_list/drop.jpg" />
-        <draggable id="name_label_icon3" label="Grass" icon="images_list/grass.jpg" />
-        <draggable id="name4" label="Star" icon="images_list/star.png" />
+        <draggable id="2" label="Drop" icon="/static/images/images_list/drop.jpg" />
+        <draggable id="name_label_icon3" label="Grass" icon="/static/images/images_list/grass.jpg" />
+        <draggable id="name4" label="Star" icon="/static/images/images_list/star.png" />
         <draggable id="7" label="Label3" />
 
         <target id="t1" x="20" y="20" w="90" h="90"/>
@@ -368,20 +363,20 @@ else:
 
 <customresponse>
     <text>
-        <h3>Draggables can be places anywhere on base image.
-            Place grass in the middle of the image and ant in the
-            right upper corner.</h3>
-        <br />
+        <h4>[Draggables can be placed anywhere on base image]</h4><br/>
+        <h4>
+            Place -Grass- in the middle of the image and -Ant- in the
+            right upper corner.</h4><br/>
     </text>
 
-    <drag_and_drop_input img="cow.png" >
+    <drag_and_drop_input img="/static/images/cow.png" >
         <draggable id="1" label="Label 1"/>
-        <draggable id="ant" label="Ant" icon="images_list/ant.jpg"/>
-        <draggable id="with_icon" label="Cloud" icon="images_list/cloud.jpg" />
+        <draggable id="ant" label="Ant" icon="/static/images/images_list/ant.jpg"/>
+        <draggable id="with_icon" label="Cloud" icon="/static/images/images_list/cloud.jpg" />
         <draggable id="5" label="Label2" />
-        <draggable id="2" label="Drop" icon="images_list/drop.jpg" />
-        <draggable id="grass" label="Grass" icon="images_list/grass.jpg" />
-        <draggable id="name4" label="Star" icon="images_list/star.png" />
+        <draggable id="2" label="Drop" icon="/static/images/images_list/drop.jpg" />
+        <draggable id="grass" label="Grass" icon="/static/images/images_list/grass.jpg" />
+        <draggable id="name4" label="Star" icon="/static/images/images_list/star.png" />
         <draggable id="7" label="Label3" />
 
     </drag_and_drop_input>
@@ -398,11 +393,11 @@ else:
 
 <customresponse>
     <text>
-        <h3>Please identify the Carbon and Oxygen atoms in the molecule.</h3>
-        <br />
+        <h4>[Another anyof example]</h4><br/>
+        <h4>Please identify the Carbon and Oxygen atoms in the molecule.</h4><br/>
     </text>
 
-    <drag_and_drop_input img="images_list/ethglycol.jpg" target_outline="true" one_per_target="true">
+    <drag_and_drop_input img="/static/images/images_list/ethglycol.jpg" target_outline="true" one_per_target="true">
         <draggable id="l1_c" label="Carbon" />
         <draggable id="l2" label="Methane"/>
         <draggable id="l3_o" label="Oxygen" />
@@ -449,13 +444,13 @@ else:
 
 <customresponse>
     <text>
-        <h3>If the element appears in this molecule,
-         drag the label onto it</h3>
-        <br />
+        <h4>[Again another anyof example]</h4><br/>
+        <h4>If the element appears in this molecule, drag the label onto it</h4>
+        <br/>
     </text>
 
-    <drag_and_drop_input img="images_list/ethglycol.jpg" target_outline="true"
-        one_per_target="true" no_labels="true">
+    <drag_and_drop_input img="/static/images/images_list/ethglycol.jpg" target_outline="true"
+        one_per_target="true" no_labels="true" label_bg_color="rgb(222, 139, 238)">
         <draggable id="1" label="Hydrogen" />
         <draggable id="2" label="Hydrogen" />
         <draggable id="3" label="Nytrogen" />
@@ -499,22 +494,18 @@ else:
 
 <customresponse>
     <text>
-        <h3>
-            SMALL IMAGE. Individual targets WITHOUT outlines. Move Star to the
-            volcano opening, and Label3 on to the right ear of the cow.
-            One draggable per target.
-        </h3>
-        <br />
+        <h4>[Wrong base image url example]
+        </h4><br/>
     </text>
 
-    <drag_and_drop_input img="cow3_bad.png" target_outline="false">
+    <drag_and_drop_input img="/static/images/cow3_bad.png" target_outline="false">
         <draggable id="1" label="Label 1"/>
-        <draggable id="name_with_icon" label="Ant" icon="images_list/ant.jpg"/>
-        <draggable id="with_icon" label="Cloud" icon="images_list/cloud.jpg" />
+        <draggable id="name_with_icon" label="Ant" icon="/static/images/images_list/ant.jpg"/>
+        <draggable id="with_icon" label="Cloud" icon="/static/images/images_list/cloud.jpg" />
         <draggable id="5" label="Label2" />
-        <draggable id="2" label="Drop" icon="images_list/drop.jpg" />
-        <draggable id="name_label_icon3" label="Grass" icon="images_list/grass.jpg" />
-        <draggable id="name4" label="Star" icon="images_list/star.png" />
+        <draggable id="2" label="Drop" icon="/static/images/images_list/drop.jpg" />
+        <draggable id="name_label_icon3" label="Grass" icon="/static/images/images_list/grass.jpg" />
+        <draggable id="name4" label="Star" icon="/static/images/images_list/star.png" />
         <draggable id="7" label="Label3" />
 
         <target id="t1" x="111" y="58" w="90" h="90"/>

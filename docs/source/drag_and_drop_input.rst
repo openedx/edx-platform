@@ -312,7 +312,12 @@ Logic flow
 Example
 =======
 
-Various configuration of DnD on one page
-----------------------------------------
+Examples of draggables that can't be reused
+-------------------------------------------
 
 .. literalinclude:: drag-n-drop-demo.xml
+
+Draggables can be reused
+------------------------
+
+.. literalinclude:: drag-n-drop-demo2.xml
