@@ -126,7 +126,8 @@ class DragAndDrop(object):
             # 'number' rule special case
             # for reusable draggables we may get in self.user_groups
             # {'1': [u'2', u'2', u'2'], '0': [u'1', u'1'], '2': [u'3']}
-            # if +number in rule - do not remove duplicates but clean rule
+            # if '+number' is in rule - do not remove duplicates and strip
+            # '+number' from rule
             current_rule = self.correct_positions[groupname].keys()[0]
             if 'number' in current_rule:
                 rule_values = self.correct_positions[groupname][current_rule]
@@ -246,7 +247,7 @@ class DragAndDrop(object):
         """ Populates DragAndDrop variables from user_answer and correct_answer.
         If correct_answer is dict, converts it to list.
         Correct answer in dict form is simpe structure for fast and simple
-        grading. Example of corrrect answer dict example::
+        grading. Example of correct answer dict example::
 
             correct_answer = {'name4': 't1',
                             'name_with_icon': 't1',
@@ -255,10 +256,10 @@ class DragAndDrop(object):
 
             It is draggable_name: dragable_position mapping.
 
-            Complex form converted from simple form uses 'exact' rule
+            Advanced form converted from simple form uses 'exact' rule
             for matching.
 
-        Correct answer in list form is designed for complex cases::
+        Correct answer in list form is designed for advanced cases::
 
         correct_answers = [
         {
@@ -273,10 +274,17 @@ class DragAndDrop(object):
         }
                         ]
 
-        Correct answer in list form is list of dicts, and every dict must have
+        Advanced answer in list form is list of dicts, and every dict must have
         3 keys: 'draggables', 'targets' and 'rule'. 'Draggables' value is
         list of draggables ids, 'targes' values are list of targets ids, 'rule'
-        value is 'exact' or 'anyof'.
+        value one of 'exact', 'anyof', 'unordered_equal', 'anyof+number',
+        'unordered_equal+number'
+
+        Advanced form uses "all dicts must match with their rule" logic.
+
+        Same draggable cannot appears more that in one dict.
+
+        Behavior is more widely explained in sphinx documentation.
 
         Args:
             user_answer: json
