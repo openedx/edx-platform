@@ -101,11 +101,6 @@ class PositionsCompare(list):
 class DragAndDrop(object):
     """ Grader class for drag and drop inputtype.
     """
-    def __init__(self):
-        self.correct_groups = dict()  # correct groups from xml
-        self.correct_positions = dict()  # correct positions for comparing
-        self.user_groups = dict()  # will be populated from user answer
-        self.user_positions = dict()  # will be populated from user answer
 
     def grade(self):
         ''' Grader user answer.
@@ -243,7 +238,7 @@ class DragAndDrop(object):
 
         return True
 
-    def populate(self, correct_answer, user_answer):
+    def __init__(self, correct_answer, user_answer):
         """ Populates DragAndDrop variables from user_answer and correct_answer.
         If correct_answer is dict, converts it to list.
         Correct answer in dict form is simpe structure for fast and simple
@@ -289,10 +284,13 @@ class DragAndDrop(object):
         Args:
             user_answer: json
             correct_answer: dict  or list
+        """
 
-        Returns: None
+        self.correct_groups = dict()  # correct groups from xml
+        self.correct_positions = dict()  # correct positions for comparing
+        self.user_groups = dict()  # will be populated from user answer
+        self.user_positions = dict()  # will be populated from user answer
 
-         """
         # convert from dict answer format to list format
         if isinstance(correct_answer, dict):
             tmp = []
@@ -330,8 +328,8 @@ class DragAndDrop(object):
 
 
 def grade(user_input, correct_answer):
-    """ Populates DragAndDrop instance from user_input and correct_answer and
-        calls DragAndDrop.drade for grading.
+    """ Creates DragAndDrop instance from user_input and correct_answer and
+        calls DragAndDrop.grade for grading.
 
         Supports two interfaces for correct_answer: dict and list.
 
@@ -373,6 +371,5 @@ def grade(user_input, correct_answer):
 
         Returns: bool
     """
-    dnd = DragAndDrop()
-    dnd.populate(correct_answer=correct_answer, user_answer=user_input)
-    return dnd.grade()
+    return DragAndDrop(correct_answer=correct_answer,
+                       user_answer=user_input).grade()

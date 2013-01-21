@@ -520,11 +520,10 @@ class Test_DragAndDrop_Grade(unittest.TestCase):
 class Test_DragAndDrop_Populate(unittest.TestCase):
 
     def test_1(self):
-        dnd = draganddrop.DragAndDrop()
         correct_answer = {'1': [[40, 10], 29], 'name_with_icon': [20, 20]}
         user_input = '{"draggables": \
         [{"1": [10, 10]}, {"name_with_icon": [20, 20]}]}'
-        dnd.populate(correct_answer, user_input)
+        dnd = draganddrop.DragAndDrop(correct_answer, user_input)
 
         correct_groups = {'1': ['name_with_icon'], '0': ['1']}
         correct_positions = {'1': {'exact': [[20, 20]]}, '0': {'exact': [[[40, 10], 29]]}}
@@ -540,49 +539,49 @@ class Test_DragAndDrop_Populate(unittest.TestCase):
 class Test_DraAndDrop_Compare_Positions(unittest.TestCase):
 
     def test_1(self):
-        dnd = draganddrop.DragAndDrop()
+        dnd = draganddrop.DragAndDrop({'1': 't1'}, '{"draggables": [{"1": "t1"}]}')
         self.assertTrue(dnd.compare_positions(correct=[[1, 1], [2, 3]],
                                               user=[[2, 3], [1, 1]],
                                               flag='anyof'))
 
     def test_2a(self):
-        dnd = draganddrop.DragAndDrop()
+        dnd = draganddrop.DragAndDrop({'1': 't1'}, '{"draggables": [{"1": "t1"}]}')
         self.assertTrue(dnd.compare_positions(correct=[[1, 1], [2, 3]],
                                                user=[[2, 3], [1, 1]],
                                                flag='exact'))
 
     def test_2b(self):
-        dnd = draganddrop.DragAndDrop()
+        dnd = draganddrop.DragAndDrop({'1': 't1'}, '{"draggables": [{"1": "t1"}]}')
         self.assertFalse(dnd.compare_positions(correct=[[1, 1], [2, 3]],
                                                user=[[2, 13], [1, 1]],
                                                flag='exact'))
 
     def test_3(self):
-        dnd = draganddrop.DragAndDrop()
+        dnd = draganddrop.DragAndDrop({'1': 't1'}, '{"draggables": [{"1": "t1"}]}')
         self.assertFalse(dnd.compare_positions(correct=["a", "b"],
                                                user=["a", "b", "c"],
                                                flag='anyof'))
 
     def test_4(self):
-        dnd = draganddrop.DragAndDrop()
+        dnd = draganddrop.DragAndDrop({'1': 't1'}, '{"draggables": [{"1": "t1"}]}')
         self.assertTrue(dnd.compare_positions(correct=["a", "b", "c"],
                                               user=["a", "b"],
                                               flag='anyof'))
 
     def test_5(self):
-        dnd = draganddrop.DragAndDrop()
+        dnd = draganddrop.DragAndDrop({'1': 't1'}, '{"draggables": [{"1": "t1"}]}')
         self.assertFalse(dnd.compare_positions(correct=["a", "b", "c"],
                                                user=["a", "c", "b"],
                                                flag='exact'))
 
     def test_6(self):
-        dnd = draganddrop.DragAndDrop()
+        dnd = draganddrop.DragAndDrop({'1': 't1'}, '{"draggables": [{"1": "t1"}]}')
         self.assertTrue(dnd.compare_positions(correct=["a", "b", "c"],
                                                user=["a", "c", "b"],
                                                flag='anyof'))
 
     def test_7(self):
-        dnd = draganddrop.DragAndDrop()
+        dnd = draganddrop.DragAndDrop({'1': 't1'}, '{"draggables": [{"1": "t1"}]}')
         self.assertFalse(dnd.compare_positions(correct=["a", "b", "b"],
                                                user=["a", "c", "b"],
                                                flag='anyof'))
