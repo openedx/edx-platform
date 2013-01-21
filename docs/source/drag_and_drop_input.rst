@@ -128,9 +128,10 @@ Wrong (for draggable id 7)::
 
 Rules are: exact, anyof, unordered_equal, anyof+number, unordered_equal+number
 
-- Exact rule means that targets for draggable id's in user_answer are the same
-that targets from correct answer. For example, for draggables 7 and 8 user must
-drag 7 to target1 and 8 to target2 if correct_answer is::
+
+.. such long lines are needed for sphinx to display lists correctly
+
+- Exact rule means that targets for draggable id's in user_answer are the same that targets from correct answer. For example, for draggables 7 and 8 user must drag 7 to target1 and 8 to target2 if correct_answer is::
 
     correct_answer = [
     {
@@ -140,9 +141,7 @@ drag 7 to target1 and 8 to target2 if correct_answer is::
     }]
 
 
-- unordered_equal rule allows draggables be dragged to targets unordered. If one
-want to allow for student to drag 7 to target1 or target2 and 8 to target2 or
-target 1 and 7 and 8 must be in different targets, then correct answer must be::
+- unordered_equal rule allows draggables be dragged to targets unordered. If one want to allow for student to drag 7 to target1 or target2 and 8 to target2 or target 1 and 7 and 8 must be in different targets, then correct answer must be::
 
     correct_answer = [
     {
@@ -151,10 +150,8 @@ target 1 and 7 and 8 must be in different targets, then correct answer must be::
     'rule': 'unordered_equal'
     }]
 
-- Anyof rule allows draggables to be dragged to any of targets. If one want to
-allow for student to drag 7 and 8 to target1 or target2, which means that if 7
-is on target1 and 8 is on target1 or 7 on target2 and 8 on target2 or 7 on
-target1 and 8 on target2. Any of theese are correct which anyof rule::
+
+- Anyof rule allows draggables to be dragged to any of targets. If one want to allow for student to drag 7 and 8 to target1 or target2, which means that if 7 is on target1 and 8 is on target1 or 7 on target2 and 8 on target2 or 7 on target1 and 8 on target2. Any of theese are correct which anyof rule::
 
     correct_answer = [
     {
@@ -164,11 +161,7 @@ target1 and 8 on target2. Any of theese are correct which anyof rule::
     }]
 
 
-- If you have can_reuse true, then you, for example, have draggables a,b,c and 10
-targets. These will allow you to drag 4 'a' draggables to
-['target1',  'target4', 'target7', 'target10'] , you do not need to write 'a'
-four times. Also this will allow you to drag 'b' draggable to target2 or target5
-or target5 and target2 etc..::
+- If you have can_reuse true, then you, for example, have draggables a,b,c and 10 targets. These will allow you to drag 4 'a' draggables to ['target1',  'target4', 'target7', 'target10'] , you do not need to write 'a' four times. Also this will allow you to drag 'b' draggable to target2 or target5 for target5 and target2 etc..::
 
     correct_answer = [
         {
@@ -187,8 +180,7 @@ or target5 and target2 etc..::
             'rule': 'unordered_equal'
         }]
 
-And sometimes you want to allow drag only two 'b' draggables, in these case
-you sould use 'anyof+number' of 'unordered_equal+number' rule::
+- And sometimes you want to allow drag only two 'b' draggables, in these case you sould use 'anyof+number' of 'unordered_equal+number' rule::
 
     correct_answer = [
         {
@@ -216,40 +208,52 @@ If we have can_reuse=true, than one must use only long form of correct answer.
 Grading logic
 -------------
 
-1. User answer and correct answer populated to the same form::
+1. User answer (that comes from browser) and correct answer (from xml) are parsed to the same format::
 
     group_id: group_draggables, group_targets, group_rule
+
 
 Group_id is ordinal number, for every dict in correct answer incremental
 group_id is assigned: 0, 1, 2, ...
 
 Draggables from user answer are added to same group_id where identical draggables
-from correct answer are::
+from correct answer are, for example::
 
     If correct_draggables[group_0] = [t1, t2] then
-       user_draggables[group_0] are all draggables t1 and t2 from user answer:
-        [t1] or [t1, t2] or [t1, t2, t2] etc..
+    user_draggables[group_0] are all draggables t1 and t2 from user answer:
+    [t1] or [t1, t2] or [t1, t2, t2] etc..
 
-2. For every group user_draggables, if 'number' not in rule, set() is applicated,
-if 'number' not in rule, set is not applicated::
+2. For every group from user answer, for that group draggables, if 'number' is in  group rule, set() is applied,
+if 'number' is not in rule, set is not applied::
 
-    from [t1, t2, t3, t3] -> [t1, t2, ,t3]
+    set() : [t1, t2, t3, t3] -> [t1, t2, ,t3]
 
-Set() and 'number' are needed only for case of reusable draggables,
+For every group, at this step, draggables lists are equal.
+
+
+3. For every group, lists of targets are compared using rule for that group.
+
+
+Set and '+number' cases
+.......................
+
+Set() and '+number' are needed only for case of reusable draggables,
 for other cases there are no equal draggables in list, so set() does nothing.
 
-Usege of set() operation allows easily create rule for case of
-``any number of same draggable can be dragged to some targets``::
+.. such long lines needed for sphinx to display nicely
 
-    {
-            'draggables': ['draggable_1'],
-            'targets': ['target3', 'target6', 'target9'],
-            'rule': 'anyof'
-    }
+* Usage of set() operation allows easily create rule for case of "any number of same draggable can be dragged to some targets"::
 
-'number' rule is used for the case of reusable draggables, when one want to
-fix number of draggable to drag. In this example only two instances of
-draggables_1 are allowed to be dragged::
+        {
+                'draggables': ['draggable_1'],
+                'targets': ['target3', 'target6', 'target9'],
+                'rule': 'anyof'
+        }
+
+
+
+
+* 'number' rule is used for the case of reusable draggables, when one want to fix number of draggable to drag. In this example only two instances of draggables_1 are allowed to be dragged::
 
     {
             'draggables': ['draggable_1', 'draggable_1'],
@@ -257,23 +261,20 @@ draggables_1 are allowed to be dragged::
             'rule': 'anyof+number'
     }
 
-Note, that in using rule 'exact', one does not need 'number', because you can't
-recognize from user interface which reusable draggable on which target.
-Absurd example::
 
-        {
+* Note, that in using rule 'exact', one does not need 'number', because you can't recognize from user interface which reusable draggable is on which target. Absurd example::
+
+    {
             'draggables': ['draggable_1', 'draggable_1', 'draggable_2'],
             'targets': ['target3', 'target6', 'target9'],
             'rule': 'exact'
     }
 
 
-Correct handling of upper example is create different rule for draggable_1 and
-draggable_2
+    Correct handling of this example is to create different rules for draggable_1 and
+    draggable_2
 
-For 'unordered_equal' (or 'exact') we not need 'number' if you have only same
-draggable in group, as targets length will provide contraing for the number of
-draggables::
+* For 'unordered_equal' (or 'exact' too) we don't need 'number' if you have only same draggable in group, as targets length will provide constraint for the number of draggables::
 
     {
             'draggables': ['draggable_1'],
@@ -281,10 +282,10 @@ draggables::
             'rule': 'unordered_equal'
     }
 
-This means that only three draggaggables 'draggable_1' can be dragged.
 
-But if you have more that one different reusable draggable in lis, you may use
-'number' rule::
+    This means that only three draggaggables 'draggable_1' can be dragged.
+
+* But if you have more that one different reusable draggable in list, you may use 'number' rule::
 
     {
             'draggables': ['draggable_1', 'draggable_1', 'draggable_2'],
@@ -292,11 +293,10 @@ But if you have more that one different reusable draggable in lis, you may use
             'rule': 'unordered_equal+number'
     }
 
-If not use number, draggables list will be setted to  ['draggable_1', 'draggable_2']
 
-For every group, at this step, draggables lists are equal
+    If not use number, draggables list will be setted to  ['draggable_1', 'draggable_2']
 
-3. For every group, lists of targets are compared using rule for that group.
+
 
 
 Logic flow
