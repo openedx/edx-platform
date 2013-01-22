@@ -153,7 +153,6 @@ def student_problem_list(request, course_id):
 
         for i in xrange(0,len(problem_list)):
             problem_url_parts = search.path_to_location(modulestore(), course.id, problem_list[i]['location'])
-            log.debug(problem_url_parts)
             problem_url = base_course_url + "/"
             for z in xrange(0,len(problem_url_parts)):
                 part = problem_url_parts[z]
@@ -218,8 +217,6 @@ def combined_notifications(request, course_id):
         'success' : True,
         'ajax_url' : ajax_url,
     }
-
-    log.debug(combined_dict)
 
     return render_to_response('open_ended_problems/combined_notifications.html',
         combined_dict
