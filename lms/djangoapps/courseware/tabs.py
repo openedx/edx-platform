@@ -25,6 +25,8 @@ from open_ended_grading.peer_grading_service import PeerGradingService
 from open_ended_grading.staff_grading_service import StaffGradingService
 from open_ended_grading.controller_query_service import ControllerQueryService
 from student.models import unique_id_for_user
+from models import StudentModule
+import datetime
 
 log = logging.getLogger(__name__)
 
@@ -160,27 +162,31 @@ def _combined_open_ended_grading(tab, user, course, active_page):
         split_url = peer_grading_url.split("/")
         controller_url = "http://" + split_url[2] + "/grading_controller"
         log.debug(controller_url)
-        peer_gs = ControllerQueryService(controller_url)
+        controller_qs = ControllerQueryService(controller_url)
         student_id = unique_id_for_user(user)
         course_id = course.id
         user_is_staff  = has_access(user, course, 'staff')
-        last_time_viewed = 1
+
+        min_time_to_query = user.last_login
+        last_module_seen = StudentModule.objects.all(student=user, course_id = course_id, modified>min_time_to_query).values('modified').order_by('-modified')[0]
+
+        last_time_viewed = last_module_seen['modified']
         pending_grading= False
-        tab_name = "Peer grading"
+        tab_name = "Open Ended Questions"
         img_path= ""
         try:
-            notifications = json.loads(peer_gs.get_notifications(course.id,))
+            notifications = json.loads(controller_qs.get_notifications(course.id,student_id, user_is_staff, last_time_viewed))
             if notifications['success']:
                 if notifications['student_needs_to_peer_grade']:
                     pending_grading=True
         except:
             #Non catastrophic error, so no real action
-            log.info("Problem with getting notifications from peer grading service.")
+            log.info("Problem with getting notifications from controller query service.")
 
         if pending_grading:
             img_path = "/static/images/slider-handle.png"
 
-        tab = [CourseTab(tab_name, link, active_page == "peer_grading", pending_grading, img_path)]
+        tab = [CourseTab(tab_name, link, active_page == "controller_query", pending_grading, img_path)]
         return tab
     return []
 
