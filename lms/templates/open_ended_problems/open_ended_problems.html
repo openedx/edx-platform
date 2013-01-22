@@ -26,7 +26,7 @@
         <ul class="problem-list">
             %for problem in problem_list:
             <li>
-                <a href="${ajax_url}problem?location=${problem['location']}">${problem['problem_name']} (${problem['state']} , ${problem['grader_type']} )</a>
+                <a href="${problem['actual_url']}">${problem['problem_name']} (${problem['state']} , ${problem['grader_type']} )</a>
             </li>
             %endfor
         </ul>

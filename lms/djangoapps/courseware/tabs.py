@@ -181,6 +181,7 @@ VALID_TAB_TYPES = {
     'static_tab': TabImpl(key_checker(['name', 'url_slug']), _static_tab),
     'peer_grading': TabImpl(null_validator, _peer_grading),
     'staff_grading': TabImpl(null_validator, _staff_grading),
+    'open_ended': TabImpl(null_validator, _combined_open_ended_grading),
     }
 
 

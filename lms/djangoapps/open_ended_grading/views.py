@@ -22,6 +22,9 @@ from student.models import unique_id_for_user
 import open_ended_util
 import open_ended_notifications
 
+from xmodule.modulestore.django import modulestore
+from xmodule.modulestore import search
+
 log = logging.getLogger(__name__)
 
 template_imports = {'urllib': urllib}
@@ -137,6 +140,8 @@ def student_problem_list(request, course_id):
     success = False
     error_text = ""
     problem_list = []
+    base_course_url  = reverse('courses')
+
     try:
         problem_list_json = controller_qs.get_grading_status_list(course_id, unique_id_for_user(request.user))
         problem_list_dict = json.loads(problem_list_json)
@@ -145,6 +150,19 @@ def student_problem_list(request, course_id):
             error_text = problem_list_dict['error']
 
         problem_list = problem_list_dict['problem_list']
+
+        for i in xrange(0,len(problem_list)):
+            problem_url_parts = search.path_to_location(modulestore(), course.id, problem_list[i]['location'])
+            log.debug(problem_url_parts)
+            problem_url = base_course_url + "/"
+            for z in xrange(0,len(problem_url_parts)):
+                part = problem_url_parts[z]
+                if part is not None:
+                    if z==1:
+                        problem_url += "courseware/"
+                    problem_url += part + "/"
+
+            problem_list[i].update({'actual_url' : problem_url})
 
     except GradingServiceError:
         error_text = "Error occured while contacting the grading service"
@@ -171,7 +189,6 @@ def combined_notifications(request, course_id):
     course = get_course_with_access(request.user, course_id, 'load')
     user = request.user
     notifications = open_ended_notifications.combined_notifications(course, user)
-    log.debug(notifications)
     response = notifications['response']
     notification_tuples=open_ended_notifications.NOTIFICATION_TYPES
 
