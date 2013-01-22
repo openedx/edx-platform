@@ -1,5 +1,5 @@
 header.global {
-  border-bottom: 1px solid rgb(190,190,190);
+  border-bottom: 1px solid tint($m-gray,50%);
   @include box-shadow(0 1px 5px 0 rgba(0,0,0, 0.1));
   background: $white;
   height: 76px;
