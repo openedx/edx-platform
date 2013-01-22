@@ -1,4 +1,4 @@
-class CourseRelativeMember:
+class CourseRelativeMember(object):
     def __init__(self, location, idx):
         self.course_location = location     # a Location obj
         self.idx = idx                   # which milestone this represents. Hopefully persisted # so we don't have race conditions

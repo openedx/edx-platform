@@ -12,7 +12,7 @@ import re
 import logging
 
 
-class CourseDetails:
+class CourseDetails(object):
     def __init__(self, location):
         self.course_location = location    # a Location obj
         self.start_date = None  # 'start'
@@ -79,8 +79,7 @@ class CourseDetails:
         descriptor = get_modulestore(course_location).get_item(course_location)
         
         dirty = False
-        
-        ## ??? Will this comparison work?
+
         if 'start_date' in jsondict:
             converted = jsdate_to_time(jsondict['start_date'])
         else:

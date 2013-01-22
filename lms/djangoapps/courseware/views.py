@@ -17,7 +17,8 @@ from django.views.decorators.cache import cache_control
 
 from courseware import grades
 from courseware.access import has_access
-from courseware.courses import (get_courses, get_course_with_access, get_courses_by_university)
+from courseware.courses import (get_courses, get_course_with_access,
+                                get_courses_by_university, sort_by_announcement)
 import courseware.tabs as tabs
 from courseware.models import StudentModuleCache
 from module_render import toc_for_course, get_module, get_instance_module, get_module_for_descriptor
@@ -67,11 +68,8 @@ def courses(request):
     '''
     Render "find courses" page.  The course selection work is done in courseware.courses.
     '''
-    courses = get_courses(request.user, domain=request.META.get('HTTP_HOST'))
-
-    # Sort courses by how far are they from they start day
-    key = lambda course: course.days_until_start
-    courses = sorted(courses, key=key, reverse=True)
+    courses = get_courses(request.user, request.META.get('HTTP_HOST'))
+    courses = sort_by_announcement(courses)
 
     return render_to_response("courseware/courses.html", {'courses': courses})
 
@@ -437,10 +435,7 @@ def university_profile(request, org_id):
     # Only grab courses for this org...
     courses = get_courses_by_university(request.user,
                                         domain=request.META.get('HTTP_HOST'))[org_id]
-
-    # Sort courses by how far are they from they start day
-    key = lambda course: course.days_until_start
-    courses = sorted(courses, key=key, reverse=True)
+    courses = sort_by_announcement(courses)
 
     context = dict(courses=courses, org_id=org_id)
     template_file = "university_profile/{0}.html".format(org_id).lower()

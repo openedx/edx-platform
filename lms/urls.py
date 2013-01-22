@@ -45,6 +45,9 @@ urlpatterns = ('',
     url(r'^create_account$', 'student.views.create_account'),
     url(r'^activate/(?P<key>[^/]*)$', 'student.views.activate_account', name="activate"),
 
+    url(r'^begin_exam_registration/(?P<course_id>[^/]+/[^/]+/[^/]+)$', 'student.views.begin_exam_registration', name="begin_exam_registration"),
+    url(r'^create_exam_registration$', 'student.views.create_exam_registration'),
+
     url(r'^password_reset/$', 'student.views.password_reset', name='password_reset'),
     ## Obsolete Django views for password resets
     ## TODO: Replace with Mako-ized views
@@ -115,9 +118,11 @@ urlpatterns = ('',
         {'template': 'press_releases/Georgetown_joins_edX.html'}, name="press/georgetown-joins-edx"),
     url(r'^press/spring-courses$', 'static_template_view.views.render',
         {'template': 'press_releases/Spring_2013_course_announcements.html'}, name="press/spring-courses"),
+    url(r'^press/lewin-course-announcement$', 'static_template_view.views.render',
+        {'template': 'press_releases/Lewin_course_announcement.html'}, name="press/lewin-course-announcement"),
 
     # Should this always update to point to the latest press release?
-    (r'^pressrelease$', 'django.views.generic.simple.redirect_to', {'url': '/press/spring-courses'}),
+    (r'^pressrelease$', 'django.views.generic.simple.redirect_to', {'url': '/press/lewin-course-announcement'}),
 
 
     (r'^favicon\.ico$', 'django.views.generic.simple.redirect_to', {'url': '/static/images/favicon.ico'}),

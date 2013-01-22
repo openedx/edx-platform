@@ -257,6 +257,7 @@ Supported fields at the course level:
 * "tabs" -- have custom tabs in the courseware.  See below for details on config.
 * "discussion_blackouts" -- An array of time intervals during which you want to disable a student's ability to create or edit posts in the forum. Moderators, Community TAs, and Admins are unaffected. You might use this during exam periods, but please be aware that the forum is often a very good place to catch mistakes and clarify points to students. The better long term solution would be to have better flagging/moderation mechanisms, but this is the hammer we have today. Format by example: [["2012-10-29T04:00", "2012-11-03T04:00"], ["2012-12-30T04:00", "2013-01-02T04:00"]]
 * "show_calculator" (value "Yes" if desired)
+* "days_early_for_beta" -- number of days (floating point ok) early that students in the beta-testers group get to see course content.  Can also be specified for any other course element, and overrides values set at higher levels.
 * TODO: there are others
 
 ### Grading policy file contents
