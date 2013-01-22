@@ -432,10 +432,11 @@ courseware_only_js += [
     in glob2.glob(PROJECT_ROOT / 'static/coffee/src/modules/**/*.coffee')
 ]
 
+# 'js/vendor/RequireJS.js' - Require JS wrapper.
+# See https://edx-wiki.atlassian.net/wiki/display/LMS/Integration+of+Require+JS+into+the+system
 main_vendor_js = [
   'js/vendor/RequireJS.js',
   'js/vendor/json2.js',
-  'js/vendor/RequireJS.js',
   'js/vendor/jquery.min.js',
   'js/vendor/jquery-ui.min.js',
   'js/vendor/jquery.cookie.js',
