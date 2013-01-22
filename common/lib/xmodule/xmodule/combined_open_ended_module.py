@@ -35,6 +35,9 @@ MAX_ATTEMPTS = 10000
 # Overriden by max_score specified in xml.
 MAX_SCORE = 1
 
+#The highest score allowed for the overall xmodule and for each rubric point
+MAX_SCORE_ALLOWED = 3
+
 class CombinedOpenEndedModule(XModule):
     """
     This is a module that encapsulates all open ended grading (self assessment, peer assessment, etc).
@@ -140,12 +143,25 @@ class CombinedOpenEndedModule(XModule):
         # completion (doesn't matter if you self-assessed correct/incorrect).
         self._max_score = int(self.metadata.get('max_score', MAX_SCORE))
 
+        if self._max_score>MAX_SCORE_ALLOWED:
+            error_message="Max score {0} is higher than max score allowed {1}".format(self._max_score, MAX_SCORE_ALLOWED)
+            log.exception(error_message)
+            raise Exception
+
         rubric_renderer = CombinedOpenEndedRubric(system, True)
         success, rubric_feedback = rubric_renderer.render_rubric(stringify_children(definition['rubric']))
         if not success:
             error_message="Could not parse rubric : {0}".format(definition['rubric'])
             log.exception(error_message)
             raise Exception
+
+        rubric_categories = rubric_renderer.extract_categories(stringify_children(definition['rubric']))
+        for category in rubric_categories:
+            if len(category['options'])>MAX_SCORE_ALLOWED:
+                error_message="Number of score points in rubric higher than the max allowed, which is {0} : {1}".format(MAX_SCORE_ALLOWED, definition['rubric'])
+                log.exception(error_message)
+                raise Exception
+
         #Static data is passed to the child modules to render
         self.static_data = {
             'max_score': self._max_score,
