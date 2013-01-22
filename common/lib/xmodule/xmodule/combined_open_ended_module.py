@@ -157,8 +157,8 @@ class CombinedOpenEndedModule(XModule):
 
         rubric_categories = rubric_renderer.extract_categories(stringify_children(definition['rubric']))
         for category in rubric_categories:
-            if len(category['options'])>MAX_SCORE_ALLOWED:
-                error_message="Number of score points in rubric higher than the max allowed, which is {0} : {1}".format(MAX_SCORE_ALLOWED, definition['rubric'])
+            if len(category['options'])>(MAX_SCORE_ALLOWED+1):
+                error_message="Number of score points in rubric {0} higher than the max allowed, which is {1}".format(len(category['options']) , MAX_SCORE_ALLOWED)
                 log.exception(error_message)
                 raise Exception
 
