@@ -81,9 +81,10 @@ a:link, a:visited {
 }
 
 .content-wrapper {
-  background: rgb(255,255,255);
-  margin: 0 auto 0;
   width: flex-grid(12);
+  margin: 0 auto;
+  padding-bottom: ($baseline*2);
+  background: rgb(255,255,255);  
 }
 
 .container {
