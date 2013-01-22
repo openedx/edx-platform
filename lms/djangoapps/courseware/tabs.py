@@ -177,7 +177,7 @@ def _combined_open_ended_grading(tab, user, course, active_page):
         try:
             notifications = json.loads(controller_qs.get_notifications(course.id,student_id, user_is_staff, last_time_viewed))
             if notifications['success']:
-                if notifications['student_needs_to_peer_grade']:
+                if notifications['overall_need_to_check']:
                     pending_grading=True
         except:
             #Non catastrophic error, so no real action
