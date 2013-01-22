@@ -55,13 +55,6 @@ $(document).ready(function() {
     $("#start_date, #start_time, #due_date, #due_time").bind('change', autosaveInput);
     $('.sync-date, .remove-date').bind('click', autosaveInput);
 
-    // making the unit list sortable
-    $('.sortable-unit-list').sortable({
-        axis: 'y',
-        handle: '.drag-handle',
-        update: onUnitReordered
-    });
-
     // expand/collapse methods for optional date setters
     $('.set-date').bind('click', showDateSetter);
     $('.remove-date').bind('click', removeDateSetter);
@@ -87,18 +80,44 @@ $(document).ready(function() {
         $('.import .file-input').click();
     });
 
+    var cachedHesitation = new CMS.HesitateEvent( expandSection, 'dropout', true);
+    // making the unit list draggable. Note: sortable didn't work b/c it considered
+    // drop points which the user hovered over as destinations if the user subsequently
+    // dropped at an illegal spot.
+    
+    $('.sortable-unit-list').droppable({
+    	accept : '.unit',
+    	greedy: true,
+    	drop: onUnitReordered
+    });
+    $('.subsection-list > ol').droppable({
+    	// why don't we have a more useful class for subsections than id-holder?
+    	accept : '.unit .id-holder',
+    	drop: onSubsectionReordered,
+    	greedy: true
+    });
+    // Are there any other collapsed than possible droppables?
+    $('.collapsed').droppable({
+    	over : cachedHesitation.trigger
+    });
+    
+    $('.unit').draggable({
+    	axis: 'y',
+    	handle: '.drag-handle'
+    });
+    
     // Subsection reordering
-    $('.subsection-list > ol').sortable({
+    $('.id-holder').draggable({
         axis: 'y',
-        handle: '.section-item .drag-handle',
-        update: onSubsectionReordered
+        handle: '.section-item .drag-handle'
     });
 
     // Section reordering
     $('.courseware-overview').sortable({
         axis: 'y',
         handle: 'header .drag-handle',
-        update: onSectionReordered
+        update: onSectionReordered,
+        revert: true
     });
 
     $('.new-course-button').bind('click', addNewCourse);
@@ -240,44 +259,92 @@ function removePolicyMetadata(e) {
     saveSubsection()
 }
 
-
-// This method only changes the ordering of the child objects in a subsection
-function onUnitReordered() {
-    var subsection_id = $(this).data('subsection-id');
-
-    var _els = $(this).children('li:.leaf');
-    var children = _els.map(function(idx, el) { return $(el).data('id'); }).get();
-
-    // call into server to commit the new order
-    $.ajax({
-	    url: "/save_item",
-		type: "POST",
-		dataType: "json",
-		contentType: "application/json",
-		data:JSON.stringify({ 'id' : subsection_id, 'children' : children})
-	});
+function expandSection(event) {
+	$(event.delegateTarget).removeClass('collapsed'); 
+	$(event.delegateTarget).find('.expand-collapse-icon').removeClass('expand').addClass('collapse');
 }
 
-function onSubsectionReordered() {
-    var section_id = $(this).data('section-id');
+function checkDropValidity(event, ui) {
+	var posInDestination = ui.item.position().top - $(event.target).position().top;
+	if (posInDestination <= -ui.item.height() || posInDestination >= $(event.target).height()) {
+		$(event.target).sortable("cancel");
+		return false;
+	}
+	return true;
+}
 
-    var _els = $(this).children('li:.branch');
+// This method only changes the ordering of the child objects in a subsection
+function onUnitReordered(event, ui) {
+	// a unit's been dropped on this subsection,
+	//       figure out where 
+	
+	// This is called 2x when moving from one subsection to another: once for the sender and once
+	// for the receiver. The sender's call has ui.sender == null
+	var subsection_id = $(event.target).data('subsection-id');
+    var _els = $(event.target).children('li:.leaf');
     var children = _els.map(function(idx, el) { return $(el).data('id'); }).get();
+    // if it believes the element belongs in this section, check that it was dropped w/in the bounds
+    if (_.contains(children, ui.item.data('id'))) {
+    	if (checkDropValidity(event, ui)) {
+    		// call into server to commit the new order
+    		$.ajax({
+    			url: "/save_item",
+    			type: "POST",
+    			dataType: "json",
+    			contentType: "application/json",
+    			data:JSON.stringify({ 'id' : subsection_id, 'children' : children})
+    		});
+    	}
+    }
+    else {
+    	// recording the removal (as element is not in the collection)
+    	$.ajax({
+    		url: "/save_item",
+    		type: "POST",
+    		dataType: "json",
+    		contentType: "application/json",
+    		data:JSON.stringify({ 'id' : subsection_id, 'children' : children})
+    	});
+    }
+    
+}
 
-    // call into server to commit the new order
-    $.ajax({
-        url: "/save_item",
-        type: "POST",
-        dataType: "json",
-        contentType: "application/json",
-        data:JSON.stringify({ 'id' : section_id, 'children' : children})
-    });
+function onSubsectionReordered(event, ui) {
+	// dropped object may be either unit or subsection!
+	
+	// see onUnitReordered for  pattern and comments
+    var section_id = $(event.target).data('section-id');
+    var _els = $(event.target).children('li:.branch');
+    var children = _els.map(function(idx, el) { return $(el).data('id'); }).get();
+    // if it believes the element belongs in this section, check that it was dropped w/in the bounds
+    if (_.contains(children, ui.item.data('id'))) {
+    	if (checkDropValidity(event, ui)) {
+    		// call into server to commit the new order
+    		$.ajax({
+    			url: "/save_item",
+    			type: "POST",
+    			dataType: "json",
+    			contentType: "application/json",
+    			data:JSON.stringify({ 'id' : section_id, 'children' : children})
+    		});
+    	}
+    }
+    else {
+    	// call into server to commit the new order
+    	$.ajax({
+    		url: "/save_item",
+    		type: "POST",
+    		dataType: "json",
+    		contentType: "application/json",
+    		data:JSON.stringify({ 'id' : section_id, 'children' : children})
+    	});
+    }
 }
 
 function onSectionReordered() {
-    var course_id = $(this).data('course-id');
+    var course_id = $(event.target).data('course-id');
 
-    var _els = $(this).children('section:.branch');
+    var _els = $(event.target).children('section:.branch');
     var children = _els.map(function(idx, el) { return $(el).data('id'); }).get();
 
     // call into server to commit the new order

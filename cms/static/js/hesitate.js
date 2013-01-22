@@ -12,12 +12,12 @@
  *   NOTE: if something outside of this wants to cancel the event, invoke cachedhesitation.untrigger(null | anything);
  */
 
-CMS.HesitateEvent = function(executeOnTimeOut, cancelSelector, onlyOnce = false) {
+CMS.HesitateEvent = function(executeOnTimeOut, cancelSelector, onlyOnce) {
 	this.executeOnTimeOut = executeOnTimeOut;
 	this.cancelSelector = cancelSelector;
 	this.timeoutEventId = null;
 	this.originalEvent = null;
-	this.onlyOnce = onlyOnce;
+	this.onlyOnce = (onlyOnce === true);
 }
 
 CMS.HesitateEvent.DURATION = 400;
