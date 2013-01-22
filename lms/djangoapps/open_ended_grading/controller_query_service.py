@@ -55,3 +55,4 @@ class ControllerQueryService(GradingService):
         }
 
         response = self.get(self.grading_status_list_url, params)
+        return response
