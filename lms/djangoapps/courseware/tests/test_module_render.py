@@ -70,8 +70,6 @@ class ModuleRenderTestCase(TestCase):
         mock_module.shared_state_key = 'key'
         self.assertIsInstance(render.get_shared_instance_module('dummy', mock_user,
                           mock_module, 'dummy'), StudentModule)
-        
-        
 
     def test_xqueue_callback(self):
         mock_request = MagicMock()
@@ -162,3 +160,5 @@ class ModuleRenderTestCase(TestCase):
 
 class MagicMockFactory(factory.Factory):
     FACTORY_FOR = MagicMock
+    v = factory.LazyAttribute(i for i in [True, False, False])
+    
