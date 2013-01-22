@@ -19,6 +19,8 @@ import json
 from .staff_grading import StaffGrading
 from student.models import unique_id_for_user
 
+import open_ended_util
+
 
 log = logging.getLogger(__name__)
 
@@ -28,7 +30,8 @@ if settings.MOCK_PEER_GRADING:
 else:
     peer_gs = PeerGradingService(settings.PEER_GRADING_INTERFACE)
 
-controller_qs = ControllerQueryService(settings.PEER_GRADING_INTERFACE)
+controller_url = open_ended_util.get_controller_url()
+controller_qs = ControllerQueryService(controller_url)
 
 """
 Reverses the URL from the name and the course id, and then adds a trailing slash if

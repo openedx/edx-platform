@@ -24,6 +24,7 @@ from static_replace import replace_urls
 from open_ended_grading.peer_grading_service import PeerGradingService
 from open_ended_grading.staff_grading_service import StaffGradingService
 from open_ended_grading.controller_query_service import ControllerQueryService
+from open_ended_grading import open_ended_util
 from student.models import unique_id_for_user
 from models import StudentModule
 import datetime
@@ -158,10 +159,8 @@ def _peer_grading(tab, user, course, active_page):
 def _combined_open_ended_grading(tab, user, course, active_page):
     if user.is_authenticated:
         link = reverse('open_ended_problems', args=[course.id])
-        peer_grading_url = settings.PEER_GRADING_INTERFACE
-        split_url = peer_grading_url.split("/")
-        controller_url = "http://" + split_url[2] + "/grading_controller"
-        log.debug(controller_url)
+
+        controller_url = open_ended_util.get_controller_url()
         controller_qs = ControllerQueryService(controller_url)
         student_id = unique_id_for_user(user)
         course_id = course.id
