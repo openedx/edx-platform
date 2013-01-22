@@ -107,6 +107,7 @@ def _textbooks(tab, user, course, active_page):
 def _staff_grading(tab, user, course, active_page):
     if has_access(user, course, 'staff'):
         link = reverse('staff_grading', args=[course.id])
+
         tab_name = "Staff grading"
 
         notifications  = open_ended_notifications.staff_grading_notifications(course)
@@ -118,6 +119,7 @@ def _staff_grading(tab, user, course, active_page):
     return []
 
 def _peer_grading(tab, user, course, active_page):
+
     if user.is_authenticated():
         link = reverse('peer_grading', args=[course.id])
         tab_name = "Peer grading"
