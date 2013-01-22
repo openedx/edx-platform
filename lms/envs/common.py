@@ -423,7 +423,6 @@ courseware_js = (
 )
 
 main_vendor_js = [
-  'js/vendor/RequireJS.js',
   'js/vendor/json2.js',
   'js/vendor/RequireJS.js',
   'js/vendor/jquery.min.js',
