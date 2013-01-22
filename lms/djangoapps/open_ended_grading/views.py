@@ -17,6 +17,7 @@ from controller_query_service import ControllerQueryService
 from grading_service import GradingServiceError
 import json
 from .staff_grading import StaffGrading
+from student.models import unique_id_for_user
 
 
 log = logging.getLogger(__name__)
@@ -119,11 +120,12 @@ def peer_grading_problem(request, course_id):
         'staff_access': False, })
 
 @cache_control(no_cache=True, no_store=True, must_revalidate=True)
-def student_problem_list(request, course_id, student_id):
+def student_problem_list(request, course_id):
     '''
     Show a student problem list
     '''
     course = get_course_with_access(request.user, course_id, 'load')
+    student_id = unique_id_for_user(request.user)
 
     # call problem list service
     success = False
