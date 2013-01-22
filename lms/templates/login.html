@@ -75,7 +75,9 @@
           <li class="field required password" id="field-password">
             <label for="password">Password</label>
             <input id="password" type="password" name="password" value="" placeholder="*****" />
-            <span class="tip tip-input"><a href="#" rel="modal" class="action action-forgotpw">Forgot password?</a></span>
+            <span class="tip tip-input">
+              <a href="#forgot-password-modal" rel="leanModal" class="pwd-reset action action-forgotpw">Forgot password?</a>
+            </span>
           </li>
         </ol>
       </fieldset>
@@ -114,11 +116,6 @@
       <a class="action action-login-openid" href="#">Login via OpenID</a>
     </div> -->
     % endif
-
-    <div class="cta cta-forgotpw">
-      <h3>Forgot Your edX Password</h3>
-      <p><a href="#" class="action action-forgotpw">Request help with resetting your password</a></p>
-    </div>
 
     <div class="cta cta-help">
       <h3>Need Help?</h3>
