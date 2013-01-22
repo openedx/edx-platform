@@ -24,14 +24,15 @@ from courseware import grades
 from courseware.access import (has_access, get_access_group_name,
                                course_beta_test_group_name)
 from courseware.courses import get_course_with_access
+from courseware.models import StudentModule
 from django_comment_client.models import (Role,
                                           FORUM_ROLE_ADMINISTRATOR,
                                           FORUM_ROLE_MODERATOR,
                                           FORUM_ROLE_COMMUNITY_TA)
 from django_comment_client.utils import has_forum_access
 from psychometrics import psychoanalyze
+from string_util import split_by_comma_and_whitespace
 from student.models import CourseEnrollment, CourseEnrollmentAllowed
-from courseware.models import StudentModule
 from xmodule.course_module import CourseDescriptor
 from xmodule.modulestore import Location
 from xmodule.modulestore.django import modulestore
@@ -392,14 +393,14 @@ def instructor_dashboard(request, course_id):
         users = request.POST['betausers']
         log.debug("users: {0!r}".format(users))
         group = get_beta_group(course)
-        for username_or_email in _split_by_comma_and_whitespace(users):
+        for username_or_email in split_by_comma_and_whitespace(users):
             msg += "<p>{0}</p>".format(
                 add_user_to_group(request, username_or_email, group, 'beta testers', 'beta-tester'))
 
     elif action == 'Remove beta testers':
         users = request.POST['betausers']
         group = get_beta_group(course)
-        for username_or_email in _split_by_comma_and_whitespace(users):
+        for username_or_email in split_by_comma_and_whitespace(users):
             msg += "<p>{0}</p>".format(
                 remove_user_from_group(request, username_or_email, group, 'beta testers', 'beta-tester'))
 
@@ -871,21 +872,11 @@ def grade_summary(request, course_id):
 #-----------------------------------------------------------------------------
 # enrollment
 
-
-def _split_by_comma_and_whitespace(s):
-    """
-    Split a string both by on commas and whitespice.
-    """
-    # Note: split() with no args removes empty strings from output
-    lists = [x.split() for x in s.split(',')]
-    # return all of them
-    return itertools.chain(*lists)
-
 def _do_enroll_students(course, course_id, students, overload=False):
     """Do the actual work of enrolling multiple students, presented as a string
     of emails separated by commas or returns"""
 
-    new_students = _split_by_comma_and_whitespace(students)
+    new_students = split_by_comma_and_whitespace(students)
     new_students = [str(s.strip()) for s in new_students]
     new_students_lc = [x.lower() for x in new_students]
 

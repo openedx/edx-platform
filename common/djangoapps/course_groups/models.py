@@ -80,6 +80,15 @@ def get_cohort_by_name(course_id, name):
                                        group_type=CourseUserGroup.COHORT,
                                        name=name)
 
+def get_cohort_by_id(course_id, cohort_id):
+    """
+    Return the CourseUserGroup object for the given cohort.  Raises DoesNotExist
+    it isn't present.  Uses the course_id for extra validation...
+    """
+    return CourseUserGroup.objects.get(course_id=course_id,
+                                       group_type=CourseUserGroup.COHORT,
+                                       id=cohort_id)
+
 def add_cohort(course_id, name):
     """
     Add a cohort to a course.  Raises ValueError if a cohort of the same name already
@@ -94,6 +103,34 @@ def add_cohort(course_id, name):
     return CourseUserGroup.objects.create(course_id=course_id,
                                           group_type=CourseUserGroup.COHORT,
                                           name=name)
+
+def add_user_to_cohort(cohort, username_or_email):
+    """
+    Look up the given user, and if successful, add them to the specified cohort.
+
+    Arguments:
+        cohort: CourseUserGroup
+        username_or_email: string.  Treated as email if has '@'
+
+    Returns:
+        User object.
+
+    Raises:
+        User.DoesNotExist if can't find user.
+
+        ValueError if user already present.
+    """
+    if '@' in username_or_email:
+        user = User.objects.get(email=username_or_email)
+    else:
+        user = User.objects.get(username=username_or_email)
+
+    if cohort.users.filter(id=user.id).exists():
+        raise ValueError("User {0} already present".format(user.username))
+
+    cohort.users.add(user)
+    return user
+
 
 def get_course_cohort_names(course_id):
     """
