@@ -22,15 +22,24 @@ class @HTMLEditingDescriptor
       schema: "html5",
       # TODO: we should share this CSS with studio (and LMS)
       content_css : "/static/css/tiny-mce.css",
+      # Disable h4, h5, and h6 styles as we don't have CSS for them.
+      formats : {
+        h4: {},
+        h5: {},
+        h6: {}
+      },
+      # Disable visual aid on borderless table.
+      visual:false,
       # We may want to add "styleselect" when we collect all styles used throughout the LMS
-      theme_advanced_buttons1 : "formatselect,bold,italic,underline,bullist,numlist,outdent,indent,blockquote,link,unlink",
+      theme_advanced_buttons1 : "formatselect,bold,italic,underline,|,bullist,numlist,outdent,indent,|,blockquote,wrapAsCode,|,link,unlink",
       theme_advanced_toolbar_location : "top",
       theme_advanced_toolbar_align : "left",
       theme_advanced_statusbar_location : "none",
       theme_advanced_resizing : true,
-      theme_advanced_blockformats : "p,code,h2,h3,blockquote",
+      theme_advanced_blockformats : "p,h1,h2,h3,pre",
       width: '100%',
       height: '400px',
+      setup : HTMLEditingDescriptor.setupTinyMCE,
       # Cannot get access to tinyMCE Editor instance (for focusing) until after it is rendered.
       # The tinyMCE callback passes in the editor as a paramter.
       init_instance_callback: @focusVisualEditor
@@ -38,6 +47,18 @@ class @HTMLEditingDescriptor
 
     @showingVisualEditor = true
     @element.on('click', '.editor-tabs .tab', @onSwitchEditor)
+
+  @setupTinyMCE: (ed) ->
+    ed.addButton('wrapAsCode', {
+      title : 'Code Block',
+      image : '/static/images/code.gif',
+      onclick : () ->
+        ed.formatter.toggle('code')
+    })
+
+    ed.onNodeChange.add((editor, command, e) ->
+      command.setActive('wrapAsCode', e.nodeName == 'CODE')
+    )
 
   onSwitchEditor: (e)=>
     e.preventDefault();
