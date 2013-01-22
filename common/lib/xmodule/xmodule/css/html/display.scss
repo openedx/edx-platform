@@ -87,6 +87,15 @@ img {
   max-width: 100%;
 }
 
+pre {
+  margin: 1em 0;
+  color: $baseFontColor;
+  font-family: monospace, serif;
+  font-size: 1em;
+  white-space: pre-wrap;
+  word-wrap: break-word;
+}
+
 code {
   color: $baseFontColor;
   font-family: monospace, serif;

@@ -103,6 +103,15 @@ img {
   max-width: 100%;
 }
 
+pre {
+  margin: 1em 0;
+  color: #3c3c3c;
+  font-family: monospace, serif;
+  font-size: 1em;
+  white-space: pre-wrap;
+  word-wrap: break-word;
+}
+
 code {
   font-family: monospace, serif;
   background: none;
