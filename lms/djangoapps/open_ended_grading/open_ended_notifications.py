@@ -7,6 +7,12 @@ from student.models import unique_id_for_user
 import open_ended_util
 from courseware.models import StudentModule
 
+NOTIFICATION_TYPES = (
+    ('student_needs_to_peer_grade', 'peer_grading', 'Peer Grading'),
+    ('staff_needs_to_grade', 'staff_grading', 'Staff Grading'),
+    ('overall_need_to_check', 'open_ended_problems', 'Problems you have submitted')
+    )
+
 def staff_grading_notifications(course_id):
     staff_gs = StaffGradingService(settings.STAFF_GRADING_INTERFACE)
     pending_grading=False

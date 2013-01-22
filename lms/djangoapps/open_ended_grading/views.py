@@ -168,6 +168,31 @@ def combined_notifications(request, course_id):
     user = request.user
     notifications = open_ended_notifications.combined_notifications(course_id, user)
     response = notifications['response']
+    notificaton_tuples=open_ended_notifications.NOTIFICATION_TYPES
 
+    notification_list = []
+    for response_num in xrange(0,len(notification_tuples)):
+        tag=notification_tuples[response_num][0]
+        if tag in response:
+            url_name = notification_tuples[response_num][1]
+            human_name = notification_tuples[response_num][2]
+            url = _reverse_with_slash(url_name, course_id)
+            has_img = response[tag]
+            img_path = "/static/images/slider-handle.png"
+
+            notification_item = {
+                'url' : url,
+                'name' : human_name,
+                'has_img' : has_img,
+                'img' : img_path,
+            }
+            notification_list.append(notification_item)
+
+    combined_dict = {
+        'error_text' : "",
+        'notification_list' : notification_list,
+    }
+
+    return combined_dict
     
 
