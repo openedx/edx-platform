@@ -142,7 +142,7 @@ def _has_access_course_desc(user, course, action):
             return True
 
         # if user is in CourseEnrollmentAllowed with right course_id then can also enroll
-        if user is not None and CourseEnrollmentAllowed:
+        if user is not None and user.is_authenticated() and CourseEnrollmentAllowed:
             if CourseEnrollmentAllowed.objects.filter(email=user.email, course_id=course.id):
                 return True
 
