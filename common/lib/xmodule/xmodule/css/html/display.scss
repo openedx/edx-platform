@@ -7,6 +7,7 @@ h1 {
     color: $baseFontColor;
     font: normal 2em/1.4em $sans-serif;
     letter-spacing: 1px;
+    margin: 0 0 1.416em 0;
   }
 
 h2 {
@@ -18,9 +19,25 @@ h2 {
   -webkit-font-smoothing: antialiased;
 }
 
+h3, h4, h5, h6 {
+  margin: 0 0 10px 0;
+  font-weight: 600;
+}
+
 h3 {
   font-size: 1.2em;
-  font-weight: 600;
+}
+
+h4 {
+  font-size: 1em;
+}
+
+h5 {
+  font-size: .83em;
+}
+
+h6 {
+  font-size: 0.75em;
 }
 
 p {
@@ -74,4 +91,23 @@ code {
   color: $baseFontColor;
   font-family: monospace, serif;
   background: none;
+}
+
+table {
+  width: 100%; 
+  border-collapse: collapse;
+  font-size: 16px;
+}
+
+th { 
+  background: #eee; 
+  font-weight: bold; 
+}
+
+table td, th { 
+  margin: 20px 0;
+  padding: 10px; 
+  border: 1px solid #ccc !important; 
+  text-align: left;
+  font-size: 14px;
 }
