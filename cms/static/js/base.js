@@ -80,10 +80,23 @@ $(document).ready(function() {
         $('.import .file-input').click();
     });
 
-    var cachedHesitation = new CMS.HesitateEvent( expandSection, 'dropout', true);
     // making the unit list draggable. Note: sortable didn't work b/c it considered
-    // drop points which the user hovered over as destinations if the user subsequently
-    // dropped at an illegal spot.
+    // drop points which the user hovered over as destinations and proactively changed
+    // the dom; so, if the user subsequently dropped at an illegal spot, the reversion
+    // point was the last dom change.
+    $('.unit').draggable({
+    	axis: 'y',
+    	handle: '.drag-handle',
+    	stack: '.unit',  
+    	revert: "invalid"
+    });
+    
+    // Subsection reordering
+    $('.id-holder').draggable({
+    	axis: 'y',
+    	handle: '.section-item .drag-handle',
+    	revert: "invalid"
+    });
     
     $('.sortable-unit-list').droppable({
     	accept : '.unit',
@@ -92,26 +105,11 @@ $(document).ready(function() {
     });
     $('.subsection-list > ol').droppable({
     	// why don't we have a more useful class for subsections than id-holder?
-    	accept : '.unit .id-holder',
+    	accept : '.id-holder', // '.unit, .id-holder',
     	drop: onSubsectionReordered,
     	greedy: true
     });
-    // Are there any other collapsed than possible droppables?
-    $('.collapsed').droppable({
-    	over : cachedHesitation.trigger
-    });
     
-    $('.unit').draggable({
-    	axis: 'y',
-    	handle: '.drag-handle'
-    });
-    
-    // Subsection reordering
-    $('.id-holder').draggable({
-        axis: 'y',
-        handle: '.section-item .drag-handle'
-    });
-
     // Section reordering
     $('.courseware-overview').sortable({
         axis: 'y',
@@ -273,39 +271,56 @@ function checkDropValidity(event, ui) {
 	return true;
 }
 
-// This method only changes the ordering of the child objects in a subsection
 function onUnitReordered(event, ui) {
 	// a unit's been dropped on this subsection,
-	//       figure out where 
-	
-	// This is called 2x when moving from one subsection to another: once for the sender and once
-	// for the receiver. The sender's call has ui.sender == null
+	//       figure out where it came from and where it slots in. 
 	var subsection_id = $(event.target).data('subsection-id');
     var _els = $(event.target).children('li:.leaf');
     var children = _els.map(function(idx, el) { return $(el).data('id'); }).get();
-    // if it believes the element belongs in this section, check that it was dropped w/in the bounds
-    if (_.contains(children, ui.item.data('id'))) {
-    	if (checkDropValidity(event, ui)) {
-    		// call into server to commit the new order
-    		$.ajax({
-    			url: "/save_item",
-    			type: "POST",
-    			dataType: "json",
-    			contentType: "application/json",
-    			data:JSON.stringify({ 'id' : subsection_id, 'children' : children})
-    		});
-    	}
+    // if new to this parent, figure out which parent to remove it from and do so
+    if (!_.contains(children, ui.draggable.data('id'))) {
+    	var old_parent = ui.draggable.parent();
+    	var old_children = old_parent.children('li:.leaf').map(function(idx, el) { return $(el).data('id'); }).get();
+    	old_children = _.without(old_children, ui.draggable.data('id'));
+		// call into server to commit the new order
+		$.ajax({
+			url: "/save_item",
+			type: "POST",
+			dataType: "json",
+			contentType: "application/json",
+			data:JSON.stringify({ 'id' : old_parent.data('subsection-id'), 'children' : old_children})
+		});
+		//
     }
     else {
-    	// recording the removal (as element is not in the collection)
-    	$.ajax({
-    		url: "/save_item",
-    		type: "POST",
-    		dataType: "json",
-    		contentType: "application/json",
-    		data:JSON.stringify({ 'id' : subsection_id, 'children' : children})
-    	});
+    	// staying in same parent
+    	// remove so that the replacement in the right place doesn't double it
+    	children = _.without(children, ui.draggable.data('id'));
     }
+    // add to this parent (figure out where)
+    for (var i = 0; i < _els.length; i++) {
+    	if (ui.offset.top < $(_els[i]).offset().top) {
+    		// insert at i in children and _els
+    		ui.draggable.insertBefore($(_els[i]));
+    		// TODO figure out correct way to have it format (and again below)
+    		ui.draggable.attr("style", "position:relative;");
+    		children.splice(i, 0, ui.draggable.data('id'));
+    		break;
+    	}
+    }
+    // see if it goes at end (the above loop didn't insert it)
+    if (!_.contains(children, ui.draggable.data('id'))) {
+    	$(event.target).append(ui.draggable);
+    	ui.draggable.attr("style", "position:relative;"); // STYLE hack too
+    	children.push(ui.draggable.data('id'));
+    }
+	$.ajax({
+		url: "/save_item",
+		type: "POST",
+		dataType: "json",
+		contentType: "application/json",
+		data:JSON.stringify({ 'id' : subsection_id, 'children' : children})
+	});
     
 }
 
