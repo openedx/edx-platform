@@ -324,7 +324,6 @@ class XModuleDescriptor(HTMLSnippet, ResourceTemplates, XBlock):
         self._model_data = model_data
 
         self._child_instances = None
-        self._child_instances = None
 
     def get_children(self):
         """Returns a list of XModuleDescriptor instances for the children of
