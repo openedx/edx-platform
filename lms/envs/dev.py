@@ -106,6 +106,10 @@ VIRTUAL_UNIVERSITIES = []
 
 COMMENTS_SERVICE_KEY = "PUT_YOUR_API_KEY_HERE"
 
+################################# mitx revision string  #####################
+
+MITX_VERSION_STRING = os.popen('cd %s; git describe' % REPO_ROOT).read().strip()
+
 ################################# Staff grading config  #####################
 
 STAFF_GRADING_INTERFACE = {

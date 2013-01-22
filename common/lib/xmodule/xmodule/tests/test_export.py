@@ -39,9 +39,12 @@ def strip_filenames(descriptor):
 
 
 class RoundTripTestCase(unittest.TestCase):
-    '''Check that our test courses roundtrip properly'''
+    ''' Check that our test courses roundtrip properly.
+        Same course imported , than exported, then imported again.
+        And we compare original import with second import (after export).
+        Thus we make sure that export and import work properly.
+    '''
     def check_export_roundtrip(self, data_dir, course_dir):
-
         root_dir = path(mkdtemp())
         print "Copying test course to temp dir {0}".format(root_dir)
 
@@ -117,3 +120,11 @@ class RoundTripTestCase(unittest.TestCase):
     def test_selfassessment_roundtrip(self):
         #Test selfassessment xmodule to see if it exports correctly
         self.check_export_roundtrip(DATA_DIR,"self_assessment")
+
+    def test_graphicslidertool_roundtrip(self):
+        #Test graphicslidertool xmodule to see if it exports correctly
+        self.check_export_roundtrip(DATA_DIR,"graphic_slider_tool")
+
+    def test_exam_registration_roundtrip(self):
+        # Test exam_registration xmodule to see if it exports correctly
+        self.check_export_roundtrip(DATA_DIR,"test_exam_registration")

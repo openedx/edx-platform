@@ -25,7 +25,6 @@ class @Problem
     @$('section.action input.reset').click @reset
     @$('section.action input.show').click @show
     @$('section.action input.save').click @save
-    @$('section.evaluation input.submit-message').click @message_post
 
     # Collapsibles
     Collapsible.setCollapsibles(@el)
@@ -197,35 +196,6 @@ class @Problem
             @el.removeClass 'showed'
         else
           @gentle_alert response.success
-
-  message_post: =>
-    Logger.log 'message_post', @answers
-
-    fd = new FormData()
-    feedback = @$('section.evaluation textarea.feedback-on-feedback')[0].value
-    submission_id = $('div.external-grader-message div.submission_id')[0].innerHTML
-    grader_id = $('div.external-grader-message div.grader_id')[0].innerHTML
-    score = $(".evaluation-scoring input:radio[name='evaluation-score']:checked").val()
-    fd.append('feedback', feedback)
-    fd.append('submission_id', submission_id)
-    fd.append('grader_id', grader_id)
-    if(!score)
-      @gentle_alert "You need to pick a rating before you can submit."
-      return
-    else
-      fd.append('score', score)
-
-
-    settings =
-      type: "POST"
-      data: fd
-      processData: false
-      contentType: false
-      success: (response) =>
-        @gentle_alert response.message
-        @$('section.evaluation').slideToggle()
-
-    $.ajaxWithPrefix("#{@url}/message_post", settings)
 
   reset: =>
     Logger.log 'problem_reset', @answers
