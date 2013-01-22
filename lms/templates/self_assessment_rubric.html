@@ -7,11 +7,14 @@
     <div class="scoring-container">
     <h3>Scoring</h3>
     <p>Please select a score below:</p>
-    <select name="assessment" class="assessment">
-        %for i in xrange(0,max_score+1):
-            <option value="${i}">${i}</option>
-        %endfor
-    </select>
+
+    <div class="grade-selection">
+    %for i in xrange(0,max_score+1):
+    <% id = "score-{0}".format(i) %>
+        <input type="radio" class="grade-selection" name="grade-selection" value="${i}" id="${id}">
+        <label for="${id}">${i}</label>
+    %endfor
+    </div>
     </div>
     % endif
 

@@ -153,7 +153,7 @@ class @CombinedOpenEnded
 
 
   find_assessment_elements: ->
-    @assessment = @$('select.assessment')
+    @assessment = @$('input[name="grade-selection"]')
 
   find_hint_elements: ->
     @hint_area = @$('textarea.post_assessment')
@@ -177,7 +177,8 @@ class @CombinedOpenEnded
   save_assessment: (event) =>
     event.preventDefault()
     if @child_state == 'assessing'
-      data = {'assessment' : @assessment.find(':selected').text()}
+      checked_assessment = @$('input[name="grade-selection"]:checked')
+      data = {'assessment' : checked_assessment.val()}
       $.postWithPrefix "#{@ajax_url}/save_assessment", data, (response) =>
         if response.success
           @child_state = response.state

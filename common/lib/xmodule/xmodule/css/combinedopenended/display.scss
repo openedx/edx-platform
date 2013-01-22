@@ -270,12 +270,6 @@ div.result-container, section.open-ended-child {
               background: #666;
               color: white;
             }
-            input[type=radio]:checked + label {
-              background: #666;
-              color: white; }
-            input[class='score-selection'] {
-              display: none;
-            }
         }
 }
 
@@ -644,6 +638,22 @@ section.open-ended-child {
           p
           {
               margin-bottom: 1em;
+          }
+          label {
+              margin: 10px;
+              padding: 5px;
+              display: inline-block;
+              min-width: 50px;
+              background-color: #CCC;
+              text-size: 1.5em;
+          }
+
+          input[type=radio]:checked + label {
+              background: #666;
+              color: white; 
+          }
+          input[class='grade-selection'] {
+              display: none;
           }
 
       }
