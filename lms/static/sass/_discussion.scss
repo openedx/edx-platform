@@ -169,6 +169,12 @@ body.discussion {
         }
       }
 
+      .form-group-label {
+        display: block;
+        padding-top: 5px;
+        color:#fff;
+      }
+
       .topic_dropdown_button {
         position: relative;
         z-index: 1000;
@@ -1373,7 +1379,7 @@ body.discussion {
 
   .group-visibility-label {
     font-size: 12px;
-    color:#ddd;
+    color:#fff;
     font-style: italic;
   }
 
