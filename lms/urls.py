@@ -285,7 +285,7 @@ if settings.COURSEWARE_ENABLED:
         # Open Ended problem list
         url(r'^courses/(?P<course_id>[^/]+/[^/]+/[^/]+)/open_ended_problems$',
             'open_ended_grading.views.student_problem_list', name='open_ended_problems'),
-
+		
 		# Cohorts management
         url(r'^courses/(?P<course_id>[^/]+/[^/]+/[^/]+)/cohorts$',
             'course_groups.views.list_cohorts', name="cohorts"),
@@ -305,6 +305,9 @@ if settings.COURSEWARE_ENABLED:
             'course_groups.views.debug_cohort_mgmt',
             name="debug_cohort_mgmt"),
 
+        # Open Ended Notifications
+        url(r'^courses/(?P<course_id>[^/]+/[^/]+/[^/]+)/open_ended_notifications$',
+            'open_ended_grading.views.combined_notifications', name='open_ended_notifications'),
     )
 
     # discussion forums live within courseware, so courseware must be enabled first

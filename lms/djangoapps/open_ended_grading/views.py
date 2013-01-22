@@ -165,10 +165,12 @@ def student_problem_list(request, course_id):
 
 @cache_control(no_cache=True, no_store=True, must_revalidate=True)
 def combined_notifications(request, course_id):
+    course = get_course_with_access(request.user, course_id, 'load')
     user = request.user
-    notifications = open_ended_notifications.combined_notifications(course_id, user)
+    notifications = open_ended_notifications.combined_notifications(course, user)
     response = notifications['response']
-    notificaton_tuples=open_ended_notifications.NOTIFICATION_TYPES
+    notification_tuples=open_ended_notifications.NOTIFICATION_TYPES
+
 
     notification_list = []
     for response_num in xrange(0,len(notification_tuples)):
@@ -191,8 +193,11 @@ def combined_notifications(request, course_id):
     combined_dict = {
         'error_text' : "",
         'notification_list' : notification_list,
+        'course' : course,
     }
 
-    return combined_dict
+    return render_to_response('open_ended_problems/combined_notifications.html',
+        combined_dict
+    )
     
 
