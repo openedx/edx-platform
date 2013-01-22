@@ -1,8 +1,8 @@
 header.global {
   border-bottom: 1px solid rgb(190,190,190);
   @include box-shadow(0 1px 5px 0 rgba(0,0,0, 0.1));
-  @include background-image(linear-gradient(-90deg, rgba(255,255,255, 1), rgba(230,230,230, 0.9)));
-  height: 68px;
+  background: $white;
+  height: 76px;
   position: relative;
   width: 100%;
   z-index: 10;
@@ -12,7 +12,7 @@ header.global {
     height: 40px;
     margin: 0 auto;
     max-width: 1200px;
-    padding: 14px 10px 0px;
+    padding: 18px 10px 0px;
     max-width: grid-width(12);
     min-width: 760px;
   }
@@ -249,6 +249,70 @@ header.global {
           }
         }
       }
+    }
+  }
+
+  .nav-global {
+    margin-top: ($baseline/4);
+    list-style: none;
+
+    li {
+      display: inline-block;
+      margin: 0 ($baseline/4) 0 0;
+      font-size: em(16);
+      font-weight: 600;
+      text-transform: uppercase;
+      letter-spacing: 0.5px;
+
+      &:last-child {
+        margin-right: 0;
+      }
+
+      a {
+        display:block;
+        padding: ($baseline/4);
+        color: tint($black, 20%);
+
+        &:hover, &:active {
+          text-decoration: none;
+          color: $m-blue;
+        }
+      }
+    }
+
+    // logged in
+    &.authenticated {
+
+    }
+  }
+
+  .nav-courseware {
+    float: right;
+    margin-top: ($baseline/2);
+    list-style: none;
+
+    li {
+      display: inline-block;
+
+      a {
+        @include button(simple, $blue);
+        @include box-sizing(border-box);
+        @include border-radius(3px);
+        padding: ($baseline/4) ($baseline/2);
+        font-size: em(14);
+        font-weight: 600;
+        letter-spacing: 0;
+        text-align: center;
+
+        &:hover {
+          text-decoration: none;
+        }
+      }
+    }
+
+    // logged in
+    &.authenticated {
+
     }
   }
 }

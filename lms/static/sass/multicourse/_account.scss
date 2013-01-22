@@ -77,7 +77,7 @@
   }
 
   aside {
-    margin: 0;
+    margin: ($baseline*1.5) 0 0 0;
     width: flex-grid(4);
     float: left;
   }
