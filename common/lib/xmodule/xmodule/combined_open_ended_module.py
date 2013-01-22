@@ -141,11 +141,11 @@ class CombinedOpenEndedModule(XModule):
         self._max_score = int(self.metadata.get('max_score', MAX_SCORE))
 
         rubric_renderer = CombinedOpenEndedRubric(system, True)
-        try:
-            rubric_feedback = rubric_renderer.render_rubric(stringify_children(definition['rubric']))
-        except RubricParsingError:
-            log.error("Failed to parse rubric in location: {1}".format(location))
-            raise 
+        success, rubric_feedback = rubric_renderer.render_rubric(stringify_children(definition['rubric']))
+        if not success:
+            error_message="Could not parse rubric : {0}".format(definition['rubric'])
+            log.exception(error_message)
+            raise Exception
         #Static data is passed to the child modules to render
         self.static_data = {
             'max_score': self._max_score,
