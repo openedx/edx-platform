@@ -49,8 +49,8 @@
     }
 
     &:hover, &:active {
-      border-bottom: 1px dotted shade($m-blue, 20%);
-      color: shade($m-blue, 20%);
+      border-bottom: 1px dotted $m-blue-s;
+      color: $m-blue-s;
     }
   }
 
@@ -285,11 +285,11 @@
       &.is-focused {
 
         label {
-          color: $m-blue;          
+          color: $m-blue-s;          
         }
 
         .tip {
-          color: tint($m-blue, 30%);
+          color: $m-blue-s;
         }
       }
 
@@ -335,7 +335,7 @@
     @include clearfix();
 
     button[type="submit"] {
-      @include button(simple, $blue);
+      @include button(simple, $m-blue-s);
       @include box-sizing(border-box);
       @include border-radius(3px);
       padding: ($baseline*0.75) $baseline;

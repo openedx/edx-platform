@@ -275,7 +275,7 @@ header.global {
 
         &:hover, &:active {
           text-decoration: none;
-          color: $m-blue;
+          color: $m-blue-s;
         }
       }
     }
@@ -295,7 +295,7 @@ header.global {
       display: inline-block;
 
       a {
-        @include button(simple, $blue);
+        @include button(simple, $m-blue);
         @include box-sizing(border-box);
         @include border-radius(3px);
         padding: ($baseline/4) ($baseline/2);

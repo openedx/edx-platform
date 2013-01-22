@@ -25,8 +25,8 @@
       }
 
       &:hover, &:active {
-        border-bottom: 1px dotted shade($m-blue, 20%);
-        color: shade($m-blue, 20%);
+        border-bottom: 1px dotted $m-blue-s;
+        color: $m-blue-s;
       }
     }
 
@@ -48,7 +48,7 @@
             color: tint($black, 20%);
 
             &:hover, &:active {
-              color: shade($m-blue, 20%);
+              color: $m-blue-s;
             }
           }
 
