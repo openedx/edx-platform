@@ -157,7 +157,7 @@ def _peer_grading(tab, user, course, active_page):
 
 def _combined_open_ended_grading(tab, user, course, active_page):
     if user.is_authenticated:
-        link = reverse('peer_grading', args=[course.id])
+        link = reverse('open_ended_problems', args=[course.id])
         peer_grading_url = settings.PEER_GRADING_INTERFACE
         split_url = peer_grading_url.split("/")
         controller_url = "http://" + split_url[2] + "/grading_controller"

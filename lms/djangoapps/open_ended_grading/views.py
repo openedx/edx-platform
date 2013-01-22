@@ -13,6 +13,7 @@ from courseware.courses import get_course_with_access
 
 from peer_grading_service import PeerGradingService
 from peer_grading_service import MockPeerGradingService
+from controller_query_service import ControllerQueryService
 from grading_service import GradingServiceError
 import json
 from .staff_grading import StaffGrading
@@ -25,6 +26,8 @@ if settings.MOCK_PEER_GRADING:
     peer_gs = MockPeerGradingService() 
 else:
     peer_gs = PeerGradingService(settings.PEER_GRADING_INTERFACE)
+
+controller_qs = ControllerQueryService(settings.PEER_GRADING_INTERFACE)
 
 """
 Reverses the URL from the name and the course id, and then adds a trailing slash if
@@ -127,7 +130,7 @@ def student_problem_list(request, course_id, student_id):
     error_text = ""
     problem_list = []
     try:
-        problem_list_json = peer_gs.get_problem_list(course_id, unique_id_for_user(request.user))
+        problem_list_json = controller_qs.get_grading_status_list(course_id, unique_id_for_user(request.user))
         problem_list_dict = json.loads(problem_list_json)
         success = problem_list_dict['success']
         if 'error' in problem_list_dict:
@@ -143,9 +146,9 @@ def student_problem_list(request, course_id, student_id):
         error_text = "Could not get problem list"
         success = False
 
-    ajax_url = _reverse_with_slash('peer_grading', course_id)
+    ajax_url = _reverse_with_slash('open_ended_problems', course_id)
 
-    return render_to_response('peer_grading/peer_grading.html', {
+    return render_to_response('open_ended_problems/open_ended_problems.html', {
         'course': course,
         'course_id': course_id,
         'ajax_url': ajax_url,
