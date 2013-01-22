@@ -5,7 +5,7 @@ from datetime import datetime
 from optparse import make_option
 
 from django.conf import settings
-from django.core.management.base import BaseCommand
+from django.core.management.base import BaseCommand, CommandError
 
 from student.models import TestCenterRegistration
 
@@ -39,10 +39,12 @@ class Command(BaseCommand):
         make_option('--dump_all',
                     action='store_true',
                     dest='dump_all',
+                    default=False,
                     ),
         make_option('--force_add',
                     action='store_true',
                     dest='force_add',
+                    default=False,
                     ),
     )
 
@@ -57,13 +59,13 @@ class Command(BaseCommand):
         # Name will use timestamp -- this is UTC, so it will look funny,
         # but it should at least be consistent with the other timestamps
         # used in the system.
-        if 'dest-from-settings' in options:
+        if 'dest-from-settings' in options and options['dest-from-settings']:
             if 'LOCAL_EXPORT' in settings.PEARSON:
                 dest = settings.PEARSON['LOCAL_EXPORT']
             else:
                 raise CommandError('--dest-from-settings was enabled but the'
                                    'PEARSON[LOCAL_EXPORT] setting was not set.')
-        elif 'destinations' in options:
+        elif 'destination' in options and options['destination']:
             dest = options['destination']
         else:
             raise CommandError('--destination or --dest-from-settings must be used')

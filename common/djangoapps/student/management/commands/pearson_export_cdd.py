@@ -5,7 +5,7 @@ from datetime import datetime
 from optparse import make_option
 
 from django.conf import settings
-from django.core.management.base import BaseCommand
+from django.core.management.base import BaseCommand, CommandError
 
 from student.models import TestCenterUser
 
@@ -39,6 +39,9 @@ class Command(BaseCommand):
         ("LastUpdate", "user_updated_at"),  # in UTC, so same as what we store
     ])
 
+    # define defaults, even thought 'store_true' shouldn't need them.  
+    # (call_command will set None as default value for all options that don't have one,
+    # so one cannot rely on presence/absence of flags in that world.)
     option_list = BaseCommand.option_list + (
         make_option('--dest-from-settings',
                     action='store_true',
@@ -63,13 +66,13 @@ class Command(BaseCommand):
         # Name will use timestamp -- this is UTC, so it will look funny,
         # but it should at least be consistent with the other timestamps
         # used in the system.
-        if 'dest-from-settings' in options:
+        if 'dest-from-settings' in options and options['dest-from-settings']:
             if 'LOCAL_EXPORT' in settings.PEARSON:
                 dest = settings.PEARSON['LOCAL_EXPORT']
             else:
                 raise CommandError('--dest-from-settings was enabled but the'
                                    'PEARSON[LOCAL_EXPORT] setting was not set.')
-        elif 'destination' in options:
+        elif 'destination' in options and options['destination']:
             dest = options['destination']
         else:
             raise CommandError('--destination or --dest-from-settings must be used')

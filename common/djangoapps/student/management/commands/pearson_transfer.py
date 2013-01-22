@@ -1,10 +1,12 @@
+import os
 from optparse import make_option
 
+from django.conf import settings
 from django.core.management.base import BaseCommand, CommandError
+from django.core.management import call_command
 from dogapi import dog_http_api, dog_stats_api
 import paramiko
 import boto
-import os
 
 dog_http_api.api_key = settings.DATADOG_API
 
@@ -13,7 +15,7 @@ class Command(BaseCommand):
     help = """
     This command handles the importing and exporting of student records for
     Pearson.  It uses some other Django commands to export and import the
-    files and then uploads over SFTP to pearson and stuffs the entry in an
+    files and then uploads over SFTP to Pearson and stuffs the entry in an
     S3 bucket for archive purposes.
 
     Usage: django-admin.py pearson-transfer --mode [import|export|both]
@@ -29,11 +31,12 @@ class Command(BaseCommand):
 
     def handle(self, **options):
 
+        # TODO: this doesn't work. Need to check if it's a property.
         if not settings.PEARSON:
             raise CommandError('No PEARSON entries in auth/env.json.')
 
-        for value in ['LOCAL_IMPORT', 'SFTP_IMPORT', 'BUCKET', 'LOCAL_EXPORT',
-                      'SFTP_EXPORT']:
+        for value in ['LOCAL_IMPORT', 'SFTP_IMPORT', 'LOCAL_EXPORT',
+                      'SFTP_EXPORT', 'SFTP_HOSTNAME', 'SFTP_USERNAME', 'SFTP_PASSWORD']:
             if value not in settings.PEARSON:
                 raise CommandError('No entry in the PEARSON settings'
                                    '(env/auth.json) for {0}'.format(value))
