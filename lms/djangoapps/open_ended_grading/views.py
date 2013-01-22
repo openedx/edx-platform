@@ -163,8 +163,11 @@ def student_problem_list(request, course_id):
         # Checked above
         'staff_access': False, })
 
+@cache_control(no_cache=True, no_store=True, must_revalidate=True)
 def combined_notifications(request, course_id):
     user = request.user
+    notifications = open_ended_notifications.combined_notifications(course_id, user)
+    response = notifications['response']
 
     
 

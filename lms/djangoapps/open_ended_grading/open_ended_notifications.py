@@ -7,12 +7,12 @@ from student.models import unique_id_for_user
 import open_ended_util
 from courseware.models import StudentModule
 
-def staff_grading_notifications(course):
+def staff_grading_notifications(course_id):
     staff_gs = StaffGradingService(settings.STAFF_GRADING_INTERFACE)
     pending_grading=False
     img_path= ""
     try:
-        notifications = json.loads(staff_gs.get_notifications(course.id))
+        notifications = json.loads(staff_gs.get_notifications(course_id))
         if notifications['success']:
             if notifications['staff_needs_to_grade']:
                 pending_grading=True
@@ -25,12 +25,12 @@ def staff_grading_notifications(course):
 
     return {'pending_grading' : pending_grading, 'img_path' : img_path, 'response' : notifications}
 
-def peer_grading_notifications(course, user):
+def peer_grading_notifications(course_id, user):
     peer_gs = PeerGradingService(settings.PEER_GRADING_INTERFACE)
     pending_grading=False
     img_path= ""
     try:
-        notifications = json.loads(peer_gs.get_notifications(course.id,unique_id_for_user(user)))
+        notifications = json.loads(peer_gs.get_notifications(course_id,unique_id_for_user(user)))
         if notifications['success']:
             if notifications['student_needs_to_peer_grade']:
                 pending_grading=True
@@ -43,11 +43,10 @@ def peer_grading_notifications(course, user):
 
     return {'pending_grading' : pending_grading, 'img_path' : img_path, 'response' : notifications}
 
-def combined_notifications(course, user):
+def combined_notifications(course_id, user):
     controller_url = open_ended_util.get_controller_url()
     controller_qs = ControllerQueryService(controller_url)
     student_id = unique_id_for_user(user)
-    course_id = course.id
     user_is_staff  = has_access(user, course, 'staff')
 
     min_time_to_query = user.last_login

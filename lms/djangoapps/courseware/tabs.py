@@ -108,8 +108,8 @@ def _staff_grading(tab, user, course, active_page):
     if has_access(user, course, 'staff'):
         link = reverse('staff_grading', args=[course.id])
         tab_name = "Staff grading"
-        
-        notifications  = open_ended_notifications.staff_grading_notifications(course)
+
+        notifications  = open_ended_notifications.staff_grading_notifications(course_id)
         pending_grading = notifications['pending_grading']
         img_path = notifications['img_path']
 
@@ -122,7 +122,7 @@ def _peer_grading(tab, user, course, active_page):
         link = reverse('peer_grading', args=[course.id])
         tab_name = "Peer grading"
 
-        notifications = open_ended_notifications.peer_grading_notifications(course, user)
+        notifications = open_ended_notifications.peer_grading_notifications(course_id, user)
         pending_grading = notifications['pending_grading']
         img_path = notifications['img_path']
 
@@ -135,7 +135,7 @@ def _combined_open_ended_grading(tab, user, course, active_page):
         link = reverse('open_ended_problems', args=[course.id])
         tab_name = "Open Ended Questions"
 
-        notifications  = open_ended_notifications.combined_notifications(course, user)
+        notifications  = open_ended_notifications.combined_notifications(course_id, user)
         pending_grading = notifications['pending_grading']
         img_path = notifications['img_path']
 
