@@ -299,10 +299,11 @@ header.global {
         @include box-sizing(border-box);
         @include border-radius(3px);
         padding: ($baseline/4) ($baseline/2);
-        font-size: em(14);
-        font-weight: 600;
-        letter-spacing: 0;
+        font-size: em(15);
+        font-weight: 500;
+        letter-spacing: 1px;
         text-align: center;
+        text-transform: uppercase;
 
         &:hover {
           text-decoration: none;

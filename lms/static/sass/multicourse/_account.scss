@@ -335,10 +335,10 @@
     button[type="submit"] {
       @include button(simple, $blue);
       @include box-sizing(border-box);
-      @include border-radius(2px);
+      @include border-radius(3px);
       padding: ($baseline*0.75) $baseline;
       font-size: em(16);
-      font-weight: 600;
+      font-weight: 700;
       letter-spacing: 0;
       text-align: center;
 
