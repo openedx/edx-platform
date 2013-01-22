@@ -4,7 +4,7 @@ import re
 from util import converters
 
 
-class CourseGradingModel:
+class CourseGradingModel(object):
     """
     Basically a DAO and Model combo for CRUD operations pertaining to grading policy. 
     """
