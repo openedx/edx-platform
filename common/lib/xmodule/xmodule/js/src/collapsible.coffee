@@ -9,20 +9,34 @@ class @Collapsible
     ###
     el: container
     ###
+    # standard longform + shortfom pattern
     el.find('.longform').hide()
     el.find('.shortform').append('<a href="#" class="full">See full output</a>')
+
+    # custom longform + shortform text pattern
+    short_custom = el.find('.shortform-custom') 
+    # set up each one individually
+    short_custom.each (index, elt) =>
+      open_text = $(elt).data('open-text')
+      close_text = $(elt).data('close-text')
+      $(elt).append("<a href='#' class='full-custom'>"+ open_text + "</a>")
+      $(elt).find('.full-custom').click (event) => @toggleFull(event, open_text, close_text)
+
+    # collapsible pattern
     el.find('.collapsible header + section').hide()
-    el.find('.full').click @toggleFull
+
+    # set up triggers
+    el.find('.full').click (event) => @toggleFull(event, "See full output", "Hide output")
     el.find('.collapsible header a').click @toggleHint
 
-  @toggleFull: (event) =>
+  @toggleFull: (event, open_text, close_text) =>
     event.preventDefault()
     $(event.target).parent().siblings().slideToggle()
     $(event.target).parent().parent().toggleClass('open')
-    if $(event.target).text() == 'See full output'
-      new_text = 'Hide output'
+    if $(event.target).text() == open_text
+      new_text = close_text
     else
-      new_text = 'See full output'
+      new_text = open_text
     $(event.target).text(new_text)
 
   @toggleHint: (event) =>
