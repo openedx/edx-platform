@@ -1,0 +1,11 @@
+---
+metadata:
+    display_name: Empty
+    rerandomize: never
+    showanswer: always
+    markdown: ""
+data: |
+  <problem>
+  </problem>
+
+children: []

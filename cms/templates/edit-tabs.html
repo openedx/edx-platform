@@ -1,0 +1,46 @@
+<%inherit file="base.html" />
+<%! from django.core.urlresolvers import reverse %>
+<%block name="title">Tabs</%block>
+<%block name="bodyclass">static-pages</%block>
+
+<%block name="jsextra">
+  <script type='text/javascript'>
+    new CMS.Views.TabsEdit({
+      el: $('.main-wrapper'),
+      model: new CMS.Models.Module({
+        id: '${context_course.location}'
+      })
+    });
+  </script>
+</%block>
+
+<%block name="content">
+<div class="main-wrapper">
+  <div class="inner-wrapper">
+    <article class="unit-body">
+      <div class="details">
+        <h2>Here you can add and manage additional pages for your course</h2> 
+        <p>These pages will be added to the primary navigation menu alongside Courseware, Course Info, Discussion, etc.</p>
+      </div>
+
+      <div class="page-actions">
+        <a href="#" class="new-button new-tab">
+          <span class="plus-icon white"></span>New Page
+        </a>
+      </div>
+      
+      <div class="tab-list">
+        <ol class='components'>
+          % for id in components:
+          <li class="component" data-id="${id}"/>
+          % endfor
+                   
+          <li class="new-component-item">
+            
+          </li>
+        </ol>      
+      </div>
+    </article>
+  </div>
+</div>
+</%block>

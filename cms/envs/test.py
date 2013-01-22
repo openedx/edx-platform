@@ -19,6 +19,9 @@ TEST_RUNNER = 'django_nose.NoseTestSuiteRunner'
 
 TEST_ROOT = path('test_root')
 
+# Makes the tests run much faster...
+SOUTH_TESTS_MIGRATE = False # To disable migrations and use syncdb instead
+
 # Want static files in the same dir for running on jenkins.
 STATIC_ROOT = TEST_ROOT / "staticfiles"
 
@@ -36,17 +39,31 @@ STATICFILES_DIRS += [
     if os.path.isdir(COMMON_TEST_DATA_ROOT / course_dir)
 ]
 
+modulestore_options = {
+    'default_class': 'xmodule.raw_module.RawDescriptor',
+    'host': 'localhost',
+    'db': 'test_xmodule',
+    'collection': 'modulestore',
+    'fs_root': GITHUB_REPO_ROOT,
+    'render_template': 'mitxmako.shortcuts.render_to_string',
+}
+
 MODULESTORE = {
     'default': {
         'ENGINE': 'xmodule.modulestore.mongo.MongoModuleStore',
-        'OPTIONS': {
-            'default_class': 'xmodule.raw_module.RawDescriptor',
-            'host': 'localhost',
-            'db': 'test_xmodule',
-            'collection': 'modulestore',
-            'fs_root': GITHUB_REPO_ROOT,
-            'render_template': 'mitxmako.shortcuts.render_to_string',
-        }
+        'OPTIONS': modulestore_options
+    },
+    'direct': {
+        'ENGINE': 'xmodule.modulestore.mongo.MongoModuleStore',
+        'OPTIONS': modulestore_options
+    }
+}
+
+CONTENTSTORE = {
+    'ENGINE': 'xmodule.contentstore.mongo.MongoContentStore',
+    'OPTIONS': {
+        'host': 'localhost',
+        'db' : 'xcontent',
     }
 }
 
@@ -67,6 +84,8 @@ DATABASES = {
         'NAME': ENV_ROOT / "db" / "course2.db",
     }
 }
+
+LMS_BASE = "localhost:8000"
 
 CACHES = {
     # This is the cache used for most things. Askbot will not work without a 
@@ -90,3 +109,10 @@ CACHES = {
         'KEY_FUNCTION': 'util.memcache.safe_key',
     }
 }
+
+################### Make tests faster
+#http://slacy.com/blog/2012/04/make-your-tests-faster-in-django-1-4/
+PASSWORD_HASHERS = (
+    'django.contrib.auth.hashers.SHA1PasswordHasher',
+    'django.contrib.auth.hashers.MD5PasswordHasher',
+)

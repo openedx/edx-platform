@@ -2,8 +2,33 @@
 @import 'vendor/normalize';
 @import 'keyframes';
 
-@import 'base', 'layout', 'content-types';
-@import 'calendar';
-@import 'section', 'unit', 'index';
+@import 'reset';
+@import 'mixins';
+
+@import "fonts";
+@import "variables";
+@import "cms_mixins";
+@import "base";
+@import "header";
+@import "dashboard";
+@import "courseware";
+@import "subsection";
+@import "unit";
+@import "assets";
+@import "static-pages";
+@import "users";
+@import "import";
+@import "export";
+@import "settings";
+@import "course-info";
+@import "landing";
+@import "graphics";
+@import "modal";
+@import "alerts";
+@import "login";
+@import 'jquery-ui-calendar';
+
+@import 'content-types';
 
 @import 'module/module-styles.scss';
+@import 'descriptor/module-styles.scss';

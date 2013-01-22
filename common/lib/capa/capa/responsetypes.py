@@ -101,7 +101,6 @@ class LoncapaResponse(object):
 
       - hint_tag             : xhtml tag identifying hint associated with this response inside
                                hintgroup
-
     """
     __metaclass__ = abc.ABCMeta  # abc = Abstract Base Class
 
@@ -185,6 +184,11 @@ class LoncapaResponse(object):
         '''
         # render ourself as a <span> + our content
         tree = etree.Element('span')
+
+        # problem author can make this span display:inline
+        if self.xml.get('inline',''):
+            tree.set('class','inline')
+            
         for item in self.xml:
             # call provided procedure to do the rendering
             item_xhtml = renderer(item)
@@ -1143,7 +1147,13 @@ class CodeResponse(LoncapaResponse):
         xml = self.xml
         # TODO: XML can override external resource (grader/queue) URL
         self.url = xml.get('url', None)
-        self.queue_name = xml.get('queuename', self.system.xqueue['default_queuename'])
+
+        # We do not support xqueue within Studio.
+        if self.system.xqueue is not None:
+            default_queuename = self.system.xqueue['default_queuename']
+        else:
+            default_queuename = None
+        self.queue_name = xml.get('queuename', default_queuename)
 
         # VS[compat]:
         #   Check if XML uses the ExternalResponse format or the generic CodeResponse format
@@ -1231,6 +1241,13 @@ class CodeResponse(LoncapaResponse):
                       ' student_answers=%s' %
                 (err, self.answer_id, convert_files_to_filenames(student_answers)))
             raise Exception(err)
+
+        # We do not support xqueue within Studio.
+        if self.system.xqueue is None:
+            cmap = CorrectMap()
+            cmap.set(self.answer_id, queuestate=None,
+                msg='Error checking problem: no external queueing server is configured.')
+            return cmap
 
         # Prepare xqueue request
         #------------------------------------------------------------
@@ -1817,6 +1834,7 @@ class ImageResponse(LoncapaResponse):
         return (dict([(ie.get('id'), ie.get('rectangle')) for ie in self.ielements]),
                 dict([(ie.get('id'), ie.get('regions')) for ie in self.ielements]))
 #-----------------------------------------------------------------------------
+
 # TEMPORARY: List of all response subclasses
 # FIXME: To be replaced by auto-registration
 

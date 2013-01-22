@@ -1,0 +1,800 @@
+.settings {
+  .settings-overview {
+    @extend .window;
+    @include clearfix;
+    display: table;
+    width: 100%;
+
+    // layout
+    .sidebar {
+      display: table-cell;
+      float: none;
+      width: 20%;
+      padding: 30px 0 30px 20px;
+      @include border-radius(3px 0 0 3px);
+      background: $lightGrey;      
+    }
+
+    .main-column {
+      display: table-cell;
+      float: none;
+      width: 80%;
+      padding: 30px 40px 30px 60px;
+    }
+
+    .settings-page-menu {
+      a {
+        display: block;
+        padding-left: 20px;
+        line-height: 52px;
+
+        &.is-shown {
+          background: #fff;
+          @include border-radius(5px 0 0 5px);
+        }
+      }
+    }
+
+    .settings-page-section {
+      > .alert {
+        display: none;
+
+        &.is-shown {
+          display: block;
+        }
+      }
+
+      > section {
+        display: none;
+        margin-bottom: 40px;
+
+        &.is-shown {
+          display: block;
+        }
+
+        &:last-child {
+          border-bottom: none;
+        }
+
+        > .title {
+          margin-bottom: 30px;
+          font-size: 28px;
+          font-weight: 300;
+          color: $blue;
+        }
+
+        > section {
+          margin-bottom: 100px;
+          @include clearfix;
+
+          header {
+            @include clearfix;
+            border-bottom: 1px solid $mediumGrey;
+            margin-bottom: 20px;
+            padding-bottom: 10px;
+
+            h3 {
+              color: $darkGrey;
+              float: left;
+
+              margin: 0 40px 0 0;
+              text-transform: uppercase;
+            }
+
+            .detail {
+              float: right;
+              margin-top: 3px;
+              color: $mediumGrey;
+              font-size: 13px;
+            }
+          }
+
+          &:last-child {
+            padding-bottom: 0;
+            border-bottom: none;
+          }
+        }
+      }
+    }
+
+    // form basics
+    label, .label {
+      padding: 0;
+      border: none;
+      background: none;
+      font-size: 15px;
+      font-weight: 400;
+
+      &.check-label {
+        display: inline;
+        margin-left: 10px;
+      }
+
+      &.ranges {
+        margin-bottom: 20px;
+      }
+    }
+
+    input, textarea {
+      @include transition(all 1s ease-in-out);
+      @include box-sizing(border-box);
+      font-size: 15px;
+
+      &.long {
+        width: 100%;
+        min-width: 400px;
+      }
+
+      &.tall {
+        height: 200px;
+      }
+
+      &.short {
+        min-width: 100px;
+        width: 25%;
+      }
+
+      &.date {
+        display: block !important;
+      }
+
+      &.time {
+        width: 85px !important;
+        min-width: 85px !important;
+      }
+
+      &:disabled {
+        border: none;
+        @include box-shadow(none);
+        padding: 0;
+        color: $darkGrey !important;
+        font-weight: bold;
+        background: #fff;
+      }
+    }
+
+    textarea.tinymce {
+      border: 1px solid $darkGrey;
+      height: 300px;
+    }
+
+    input[type="checkbox"], input[type="radio"] {
+
+    }
+
+    input:disabled + .copy > label, input:disabled + .label {
+      color: $mediumGrey;
+    }
+
+
+    .input-default input, .input-default textarea {
+      color: $mediumGrey;
+      background: $lightGrey;
+    }
+
+    ::-webkit-input-placeholder {
+      color: $mediumGrey;
+      font-size: 13px;
+    }
+    :-moz-placeholder {  
+      color: $mediumGrey;  
+      font-size: 13px;
+    }
+
+    .tip {
+      color: $mediumGrey;
+      font-size: 13px;
+    }
+
+
+    // form layouts
+    .row {
+      margin-bottom: 30px;
+      padding-bottom: 30px;
+      border-bottom: 1px solid $lightGrey;
+
+      &:last-child {
+        margin-bottom: 0;
+        padding-bottom: 0;
+        border-bottom: none;
+      }
+
+      // structural labels, not semantic labels per se
+      > label, .label {
+        display: inline-block;
+        vertical-align: top;
+      }
+
+      // tips
+      .tip-inline {
+        display: inline-block;
+        margin-left: 10px;
+      }
+
+      .tip-stacked {
+        display: block;
+        margin-top: 10px;
+      }
+
+      // structural field, not semantic fields per se
+      .field {
+        display: inline-block;
+        width: 100%;
+
+        > input, > textarea, .input {
+          display: inline-block;
+
+          &:last-child {
+            margin-bottom: 0;
+          }
+
+          .group {
+            input, textarea {
+              margin-bottom: 5px;
+            }
+
+            .label, label {
+              font-size: 13px;
+            }
+          }
+
+          // multi-field
+          &.multi {
+            display: block;
+            background: tint($lightGrey, 50%);
+            padding: 20px;
+            @include border-radius(4px);
+            @include box-sizing(border-box);
+
+            .group {
+              margin-bottom: 10px;
+              max-width: 175px;
+
+              &:last-child {
+                margin-bottom: 0;
+              }
+
+              input, .input, textarea {
+
+              }
+
+              .tip-stacked {
+                margin-top: 0;
+              }
+            }
+          }
+
+          // multi stacked
+          &.multi-stacked {
+            
+            .group {
+              input, .input, textarea {
+                min-width: 370px;
+                width: 370px;
+              }
+            }
+          }
+
+          // multi-field inline
+          &.multi-inline {
+            @include clearfix;
+
+            .group {
+              float: left;
+              margin-right: 20px;
+
+              &:nth-child(2) {
+                margin-right: 0;
+              }
+
+              .input, input, textarea {
+                width: 100%;
+              }
+            }
+          }
+        }
+
+        // input-list
+        .input-list {
+
+          .input {
+            margin-bottom: 15px;
+            padding-bottom: 15px;
+            border-bottom: 1px dotted $lightGrey;
+            @include clearfix();
+
+            &:last-child {
+              border: 0;
+            }
+
+            .row {
+            }
+          }
+        }
+
+        //radio buttons and checkboxes
+        .input-radio {
+          @include clearfix();
+
+          input {
+            display: block;
+            float: left;
+            margin-right: 10px;
+          }
+
+          .copy {
+            position: relative;
+            top: -5px;
+            float: left;
+            width: 350px;
+          }
+
+          label {
+            display: block;
+            margin-bottom: 0;
+          }
+
+          .tip {
+            display: block;
+            margin-top: 0;
+          }
+
+          .message-error {
+
+          }
+        }
+
+        .input-checkbox {
+          
+        }
+
+        // enumerated inputs
+        &.enum {
+        }
+      }
+      
+      // layout - aligned label/field pairs 
+      &.row-col2 {
+
+        > label, .label {
+          width: 200px;
+        }
+
+        .field {
+          width: 400px ! important;
+        }
+
+        &.multi-inline {
+          @include clearfix();
+
+          .group {
+            width: 170px;
+          }  
+        }
+      }
+
+      .field-additional {
+        margin-left: 204px;       
+      }
+    }
+
+    // editing controls - adding
+    .new-item, .replace-item {
+      clear: both;
+      display: block;
+      margin-top: 10px;
+      padding-bottom: 10px;
+      @include grey-button;
+      @include box-sizing(border-box);
+    }
+
+
+    // editing controls - removing
+    .delete-button {
+      float: right;
+    }
+
+    // editing controls - preview
+    .input-existing {
+      display: block !important;
+
+      .current {
+        width: 100%;
+        margin: 10px 0;
+        padding: 10px;
+        @include box-sizing(border-box);
+        @include border-radius(5px);
+        font-size: 14px;
+        background: tint($lightGrey, 50%);
+        @include clearfix();
+      
+        .doc-filename {
+          display: inline-block;
+          width: 220px;
+          overflow: hidden;
+          text-overflow: ellipsis;
+        }
+
+        .remove-doc-data {
+          display: inline-block;
+          margin-top: 0;
+          width: 150px;
+        }
+      }
+    }
+
+    // specific sections
+    .settings-details {
+
+    }
+
+    .settings-faculty {
+
+      .settings-faculty-members {
+
+        > header {
+          display: none;
+        }
+
+        .field .multi {
+          display: block;
+          margin-bottom: 40px;
+          padding: 20px;
+          background: tint($lightGrey, 50%);
+          @include border-radius(4px);
+          @include box-sizing(border-box);
+        }
+
+        .course-faculty-list-item {
+
+          .row {
+
+            &:nth-child(4) {
+              padding-bottom: 0;
+              border-bottom: none;
+            }
+          }
+
+          .remove-faculty-photo {
+            display: inline-block;
+          }
+        }
+
+        #course-faculty-bio-input {
+          margin-bottom: 0;
+        }
+
+        .new-course-faculty-item {
+        }
+
+        .current-faculty-photo {
+          padding: 0;
+
+          img {
+            display: block;
+            @include box-shadow(0 1px 3px rgba(0,0,0,0.1));
+            padding: 10px;
+            border: 2px solid $mediumGrey;
+            background: #fff;
+          }
+        }
+      }
+    }
+
+    .settings-grading {
+
+      .setting-grading-assignment-types {
+
+        .row .field.enum {
+          width: 684px;
+        }
+      }
+
+      .course-grading-assignment-list-item {
+
+      }
+
+      .input-list {
+        .row {
+
+          .input {
+            &:last-child {
+              margin-bottom: 0;
+              padding-bottom: 0;
+            }
+          }
+        }
+      }
+    }
+
+    .settings-handouts {
+
+    }
+
+    .settings-problems {
+
+      > section {
+
+        &.is-shown {
+          display: block;
+        }
+      }
+    }
+
+    .settings-discussions {
+
+      .course-discussions-categories-list-item {
+
+        label {
+          display: none;
+        }
+
+        .group {
+          display: inline-block;
+        }
+
+        .remove-item {
+          display: inline-block !important;
+          margin-left: 10px;
+        }
+      }
+
+
+    }
+
+    // states
+    label.is-focused {
+      color: $blue;
+      @include transition(color 1s ease-in-out);
+    }
+
+    // extras/abbreviations
+    // .settings-extras {
+
+    //   > header {
+    //     cursor: pointer;
+
+    //     &.active {
+
+    //     }
+    //   }
+      
+    //    > div {
+    //     display: none;
+    //     @include transition(display 0.25s ease-in-out);
+
+    //     &.is-shown {
+    //       display: block;
+    //     }
+    //    }
+    // }
+
+    input.error, textarea.error {
+      border-color: $red;
+    }
+
+    .message-error {
+      display: block;
+      margin-top: 5px;
+      color: $red;
+      font-size: 13px;
+    }
+
+    // misc
+    .divide {
+      display: none;
+    }
+
+    i.ss-icon {
+      position: relative;
+      top: 1px;
+      margin-right: 5px;
+    }
+
+    .well {
+      padding: 20px;
+      background: $lightGrey;
+      border: 1px solid $mediumGrey;
+      @include border-radius(4px);
+      @include box-shadow(0 1px 1px rgba(0,0,0,0.05) inset)
+    }
+  }
+
+
+
+  h3 {
+    margin-bottom: 30px;
+    font-size: 15px;
+    font-weight: 700;
+    color: $blue;
+  }
+
+  .grade-controls {
+    @include clearfix;
+    width: 642px;
+  }
+
+  .new-grade-button {
+    position: relative;
+    float: left;
+    display: block;
+    width: 29px;
+    height: 29px;
+    margin: 10px 20px 0 0;
+    border-radius: 20px;
+    border: 1px solid $darkGrey;
+    @include linear-gradient(top, rgba(255, 255, 255, 0.8), rgba(255, 255, 255, 0));
+    background-color: #d1dae3;
+    @include box-shadow(0 1px 0 rgba(255, 255, 255, .3) inset);
+    color: #6d788b;
+
+    .plus-icon {
+      position: absolute;
+      top: 50%;
+      left: 50%;
+      margin-left: -6px;
+      margin-top: -6px;
+    }
+  }
+
+  .grade-slider {
+    float: left;
+    width: 580px;
+    margin-bottom: 10px;
+
+    .grade-bar {
+      position: relative;
+      width: 100%;
+      height: 50px;
+      background: $lightGrey;
+
+      .increments {
+        position: relative;
+
+        li {
+          position: absolute;
+          top: 52px;
+          width: 30px;
+          margin-left: -15px;
+          font-size: 9px;
+          text-align: center;
+
+          &.increment-0 {
+            left: 0;
+          }
+
+          &.increment-10 {
+            left: 10%;
+          }
+
+          &.increment-20 {
+            left: 20%;
+          }
+
+          &.increment-30 {
+            left: 30%;
+          }
+
+          &.increment-40 {
+            left: 40%;
+          }
+
+          &.increment-50 {
+            left: 50%;
+          }
+
+          &.increment-60 {
+            left: 60%;
+          }
+
+          &.increment-70 {
+            left: 70%;
+          }
+
+          &.increment-80 {
+            left: 80%;
+          }
+
+          &.increment-90 {
+            left: 90%;
+          }
+
+          &.increment-100 {
+            left: 100%;
+          }
+        }
+      }
+      
+      .grade-specific-bar {
+        height: 50px !important;
+      }
+
+      .grades {
+        position: relative;
+
+        li {
+          position: absolute;
+          top: 0;
+          height: 50px;     
+          text-align: right;
+          @include border-radius(2px);
+
+          &:hover,
+          &.is-dragging {
+            .remove-button {
+              display: block;
+            }
+          }
+
+          &.is-dragging {
+
+
+          }
+
+          .remove-button {
+            display: none;
+            position: absolute;
+            top: -17px;
+            right: 1px;
+            height: 17px;
+            font-size: 10px;
+          }
+
+          &:nth-child(1) {
+            background: #4fe696;
+          }
+
+          &:nth-child(2) {
+            background: #ffdf7e;
+          }
+
+          &:nth-child(3) {
+            background: #ffb657;
+          }
+
+          &:nth-child(4) {
+            background: #ef54a1;
+          }
+
+          &:nth-child(5),
+          &.bar-fail {
+            background: #fb336c;
+          }
+
+          .letter-grade {
+            display: block;
+            margin: 10px 15px 0 0;
+            font-size: 16px;
+            font-weight: 700;
+            line-height: 14px;
+          }
+
+          .range {
+            display: block;
+            margin-right: 15px;
+            font-size: 10px;
+            line-height: 12px;
+          }
+
+          .drag-bar {
+            position: absolute;
+            top: 0;
+            right: -1px;
+            height: 50px;
+            width: 2px;
+            background-color: #fff;
+            @include box-shadow(-1px 0 3px rgba(0,0,0,0.1));
+
+            cursor: ew-resize;
+            @include transition(none);
+
+            &:hover {
+              width: 6px;
+              right: -2px;
+            }
+          }
+        }
+      }
+    }
+  }
+}
