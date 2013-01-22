@@ -125,7 +125,14 @@ SECRET_KEY = '85920908f28904ed733fe576320db18cabd7b6cd'
 ################################## OPENID ######################################
 MITX_FEATURES['AUTH_USE_OPENID'] = True
 MITX_FEATURES['AUTH_USE_OPENID_PROVIDER'] = True
+
+OPENID_CREATE_USERS = False
+OPENID_UPDATE_DETAILS_FROM_SREG = True
+OPENID_USE_AS_ADMIN_LOGIN = False
 OPENID_PROVIDER_TRUSTED_ROOTS = ['*']
+
+INSTALLED_APPS += ('external_auth',)
+INSTALLED_APPS += ('django_openid_auth',)
 
 ############################ STATIC FILES #############################
 DEFAULT_FILE_STORAGE = 'django.core.files.storage.FileSystemStorage'
