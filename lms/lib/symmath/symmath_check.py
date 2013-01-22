@@ -157,13 +157,33 @@ def symmath_check(expect, ans, dynamath=None, options=None, debug=None, xml=None
     '''
     Check a symbolic mathematical expression using sympy.
     The input may be presentation MathML.  Uses formula.
+
+    This is the default Symbolic Response checking function
+
+    Desc of args:
+    expect is a sympy string representing the correct answer. It is interpreted
+     using my_sympify (from formula.py), which reads strings as sympy input
+     (e.g. 'integrate(x^2, (x,1,2))' would be valid, and evaluate to give 1.5)
+
+    ans is student-typed answer. It is expected to be ascii math, but the code
+     below would support a sympy string.
+
+    dynamath is the PMathML string converted by MathJax. It is used if
+     evaluation with ans is not sufficient.
+
+    options is a string with these possible substrings, set as an xml property
+     of the problem:
+     -matrix - make a sympy matrix, rather than a list of lists, if possible
+     -qubit - passed to my_sympify
+     -imaginary - used in formla, presumably to signal to use i as sqrt(-1)?
+     -numerical - force numerical comparison.
     '''
 
     msg = ''
     # msg += '<p/>abname=%s' % abname
     # msg += '<p/>adict=%s' % (repr(adict).replace('<','&lt;'))
 
-    threshold = 1.0e-3
+    threshold = 1.0e-3 # for numerical comparison (also with matrices)
     DEBUG = debug
 
     if xml is not None:
@@ -184,13 +204,17 @@ def symmath_check(expect, ans, dynamath=None, options=None, debug=None, xml=None
         msg += '<p>Error %s in parsing OUR expected answer "%s"</p>' % (err, expect)
         return {'ok': False, 'msg': make_error_message(msg)}
 
+
+    ###### Sympy input #######
     # if expected answer is a number, try parsing provided answer as a number also
     try:
         fans = my_sympify(str(ans), matrix=do_matrix, do_qubit=do_qubit)
     except Exception, err:
         fans = None
 
-    if hasattr(fexpect, 'is_number') and fexpect.is_number and fans and hasattr(fans, 'is_number') and fans.is_number:
+    # do a numerical comparison if both expected and answer are numbers
+    if (hasattr(fexpect, 'is_number') and fexpect.is_number and fans
+        and hasattr(fans, 'is_number') and fans.is_number):
         if abs(abs(fans - fexpect) / fexpect) < threshold:
             return {'ok': True, 'msg': msg}
         else:
@@ -208,6 +232,8 @@ def symmath_check(expect, ans, dynamath=None, options=None, debug=None, xml=None
         msg += '<p>You entered: %s</p>' % to_latex(fans)
         return {'ok': True, 'msg': msg}
 
+
+    ###### PMathML input ######
     # convert mathml answer to formula
     try:
         if dynamath:
@@ -216,6 +242,7 @@ def symmath_check(expect, ans, dynamath=None, options=None, debug=None, xml=None
         mmlans = None
     if not mmlans:
         return {'ok': False, 'msg': '[symmath_check] failed to get MathML for input; dynamath=%s' % dynamath}
+
     f = formula(mmlans, options=options)
 
     # get sympy representation of the formula
@@ -238,7 +265,7 @@ def symmath_check(expect, ans, dynamath=None, options=None, debug=None, xml=None
             msg += '<hr>'
         return {'ok': False, 'msg': make_error_message(msg)}
 
-    # compare with expected
+    # do numerical comparison with expected
     if hasattr(fexpect, 'is_number') and fexpect.is_number:
         if hasattr(fsym, 'is_number') and fsym.is_number:
             if abs(abs(fsym - fexpect) / fexpect) < threshold:
@@ -250,6 +277,10 @@ def symmath_check(expect, ans, dynamath=None, options=None, debug=None, xml=None
         # msg += "<p>cmathml = <pre>%s</pre></p>" % str(f.cmathml).replace('<','&lt;')
         return {'ok': False, 'msg': make_error_message(msg)}
 
+    # Here is a good spot for adding calls to X.simplify() or X.expand(),
+    #  allowing equivalence over binomial expansion or trig identities
+
+    # exactly the same?
     if fexpect == fsym:
         return {'ok': True, 'msg': msg}
 
