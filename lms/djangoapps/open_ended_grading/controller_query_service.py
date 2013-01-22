@@ -45,6 +45,7 @@ class ControllerQueryService(GradingService):
             'user_is_staff' : user_is_staff,
             'last_time_viewed' : last_time_viewed,
         }
+        log.debug(self.combined_notifications_url)
         response = self.get(self.combined_notifications_url,params)
         return response
 

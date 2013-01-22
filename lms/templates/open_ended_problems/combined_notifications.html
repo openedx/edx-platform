@@ -27,7 +27,7 @@
                 %for notification in notification_list:
                 <li>
                     <a href="${notification['url']}">
-                        {notification['name']}
+                        ${notification['name']}
                         % if notification['has_img'] == True:
                         <img src="${notification['img']}"/>
                         %endif

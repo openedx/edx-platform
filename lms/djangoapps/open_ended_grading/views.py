@@ -39,11 +39,14 @@ it does not exist yet
 
 """
 def _reverse_with_slash(url_name, course_id):
-    ajax_url = reverse(url_name, kwargs={'course_id': course_id})
+    ajax_url = _reverse_without_slash(url_name, course_id)
     if not ajax_url.endswith('/'):
         ajax_url += '/'
     return ajax_url
 
+def _reverse_without_slash(url_name, course_id):
+    ajax_url = reverse(url_name, kwargs={'course_id': course_id})
+    return ajax_url
 
 @cache_control(no_cache=True, no_store=True, must_revalidate=True)
 def staff_grading(request, course_id):
@@ -178,7 +181,7 @@ def combined_notifications(request, course_id):
         if tag in response:
             url_name = notification_tuples[response_num][1]
             human_name = notification_tuples[response_num][2]
-            url = _reverse_with_slash(url_name, course_id)
+            url = _reverse_without_slash(url_name, course_id)
             has_img = response[tag]
             img_path = "/static/images/slider-handle.png"
 
