@@ -12,7 +12,7 @@ import sys
 from django.test import TestCase
 from django.core import management
 
-from student.models import User, TestCenterRegistration, TestCenterUser, get_tc_registration
+from student.models import User, TestCenterRegistration, TestCenterUser, get_testcenter_registration
 
 log = logging.getLogger(__name__)
 
@@ -44,7 +44,7 @@ def create_tc_registration(username, course_id, exam_code, accommodation_code):
 
     management.call_command('pearson_make_tc_registration', username, course_id, **options)
     user = User.objects.get(username=username)
-    registrations = get_tc_registration(user, course_id, exam_code)
+    registrations = get_testcenter_registration(user, course_id, exam_code)
     return registrations[0]
     
 class PearsonTestCase(TestCase):

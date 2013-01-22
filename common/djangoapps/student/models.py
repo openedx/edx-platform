@@ -547,13 +547,17 @@ class TestCenterRegistrationForm(ModelForm):
     
     
     
-def get_tc_registration(user, course_id, exam_series_code):
+def get_testcenter_registration(user, course_id, exam_series_code):
     try:
         tcu = TestCenterUser.objects.get(user=user)
     except TestCenterUser.DoesNotExist:
         return []
     return TestCenterRegistration.objects.filter(testcenter_user=tcu, course_id=course_id, exam_series_code=exam_series_code)
-        
+
+# nosetests thinks that anything with _test_ in the name is a test.
+# Correct this (https://nose.readthedocs.org/en/latest/finding_tests.html)
+get_testcenter_registration.__test__ = False
+   
 def unique_id_for_user(user):
     """
     Return a unique id for a user, suitable for inserting into
