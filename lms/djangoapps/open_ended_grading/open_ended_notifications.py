@@ -73,14 +73,16 @@ def combined_notifications(course, user):
 
     img_path= ""
     try:
-        notifications = json.loads(controller_qs.get_notifications(course.id,student_id, user_is_staff, last_time_viewed))
+        controller_response = controller_qs.check_combined_notifications(course.id,student_id, user_is_staff, last_time_viewed)
+        log.debug(controller_response)
+        notifications = json.loads(controller_response)
         if notifications['success']:
             if notifications['overall_need_to_check']:
                 pending_grading=True
     except:
         #Non catastrophic error, so no real action
         notifications = {}
-        log.info("Problem with getting notifications from controller query service.")
+        log.exception("Problem with getting notifications from controller query service.")
 
     if pending_grading:
         img_path = "/static/images/slider-handle.png"

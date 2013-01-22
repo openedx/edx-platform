@@ -168,9 +168,9 @@ def combined_notifications(request, course_id):
     course = get_course_with_access(request.user, course_id, 'load')
     user = request.user
     notifications = open_ended_notifications.combined_notifications(course, user)
+    log.debug(notifications)
     response = notifications['response']
     notification_tuples=open_ended_notifications.NOTIFICATION_TYPES
-
 
     notification_list = []
     for response_num in xrange(0,len(notification_tuples)):
@@ -190,11 +190,16 @@ def combined_notifications(request, course_id):
             }
             notification_list.append(notification_item)
 
+    ajax_url = _reverse_with_slash('open_ended_notifications', course_id)
     combined_dict = {
         'error_text' : "",
         'notification_list' : notification_list,
         'course' : course,
+        'success' : True,
+        'ajax_url' : ajax_url,
     }
+
+    log.debug(combined_dict)
 
     return render_to_response('open_ended_problems/combined_notifications.html',
         combined_dict

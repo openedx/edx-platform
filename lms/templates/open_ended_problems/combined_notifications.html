@@ -18,24 +18,24 @@
         <h2>Instructions</h2>
         <p>Here are items that could potentially need your attention.</p>
         % if success:
-        % if len(notification_list) == 0:
-        <div class="message-container">
-            No items require attention at the moment.
-        </div>
-        %else:
-        <ul class="notification-list">
-            %for notification in notification_list:
-            <li>
-                <a href="${notification['url']}">
-                    {notification['name']}
-                    % if notification['has_img'] == True:
-                    <img src="${notification['img']}"/>
-                    %endif
-                </a>
-            </li>
-            %endfor
-        </ul>
-        %endif
+            % if len(notification_list) == 0:
+            <div class="message-container">
+                No items require attention at the moment.
+            </div>
+            %else:
+            <ul class="notification-list">
+                %for notification in notification_list:
+                <li>
+                    <a href="${notification['url']}">
+                        {notification['name']}
+                        % if notification['has_img'] == True:
+                        <img src="${notification['img']}"/>
+                        %endif
+                    </a>
+                </li>
+                %endfor
+            </ul>
+            %endif
         %endif
     </div>
 </section>
