@@ -6,6 +6,7 @@ from django.contrib.auth.models import User
 
 from student.models import CourseEnrollment
 import courseware.courses as courses
+from xmodule.modulestore.xml import XMLModuleStore
 
 class CoursesTestCase(TestCase):
     def setUp(self):
@@ -16,6 +17,7 @@ class CoursesTestCase(TestCase):
         self.enrollment = CourseEnrollment.objects.get_or_create(user = self.user,
                                                   course_id = self.course_id,
                                                   created = self.date)[0]
+        self.xml_modulestore = XMLModuleStore()
     
     def test_get_course_by_id(self):
         courses.get_course_by_id(self.course_id)
