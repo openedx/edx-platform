@@ -64,9 +64,9 @@ class @HTMLEditingDescriptor
     e.preventDefault();
 
     if not $(e.currentTarget).hasClass('current')
-      $('.editor-tabs .current').removeClass('current')
+      $('.editor-tabs .current', @element).removeClass('current')
       $(e.currentTarget).addClass('current')
-      $('table.mceToolbar').toggleClass(HTMLEditingDescriptor.isInactiveClass)
+      $('table.mceToolbar', @element).toggleClass(HTMLEditingDescriptor.isInactiveClass)
       $(@advanced_editor.getWrapperElement()).toggleClass(HTMLEditingDescriptor.isInactiveClass)
 
       visualEditor = @getVisualEditor()
