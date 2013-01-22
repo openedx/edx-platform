@@ -16,7 +16,7 @@ class ControllerQueryService(GradingService):
     Interface to staff grading backend.
     """
     def __init__(self, config):
-        super(ControllerQuery, self).__init__(config)
+        super(ControllerQueryService, self).__init__(config)
         self.check_eta_url = self.url + '/get_submission_eta/'
         self.is_unique_url = self.url + '/is_name_unique/'
         self.combined_notifications_url = self.url + '/combined_notifications/'

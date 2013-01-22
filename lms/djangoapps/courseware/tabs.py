@@ -168,7 +168,7 @@ def _combined_open_ended_grading(tab, user, course, active_page):
         user_is_staff  = has_access(user, course, 'staff')
 
         min_time_to_query = user.last_login
-        last_module_seen = StudentModule.objects.all(student=user, course_id = course_id, modified>min_time_to_query).values('modified').order_by('-modified')[0]
+        last_module_seen = StudentModule.objects.all(student=user, course_id = course_id, modified__gt=min_time_to_query).values('modified').order_by('-modified')[0]
 
         last_time_viewed = last_module_seen['modified']
         pending_grading= False
