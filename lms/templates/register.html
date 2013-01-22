@@ -105,7 +105,7 @@
           <li class="field required text" id="field-name">
             <label for="name">Full Name</label>
             <input id="name" type="text" name="name" value="" placeholder="e.g. Jane Doe" />
-            <span class="tip tip-input">Needed for any certificates you earn</span>
+            <span class="tip tip-input">Needed for any certificates you may earn</span>
           </li>
         </ol>
 
@@ -186,14 +186,9 @@
 
         <ol class="list-input">
           <li class="field-group">
-            <div class="field required checkbox" id="field-tos">
-              <input id="tos-yes" type="checkbox" name="terms_of_service" value="true" />
-              <label for="tos-yes">I agree to the <a href="${reverse('tos')}" class="new-vp">Terms of Service</a></label>
-            </div>
-
-            <div class="field required checkbox" id="field-honorcode">
-              <input id="honorcode-yes" type="checkbox" name="honor_code" value="true" />
-              <label for="honorcode-yes">I agree to the <a href="${reverse('honor')}" class="new-vp">Honor Code</a></label>
+            <div class="field required checkbox" id="field-toshonorcode">
+              <input id="toshonorcode-yes" type="checkbox" name="terms_of_service_honor_code" value="true" />
+              <label for="toshonorcode-yes">I agree to the <a href="${reverse('tos')}" class="new-vp">Terms of Service</a> and <a href="${reverse('honor')}" class="new-vp">Honor Code</a></label>
             </div>
           </li>
         </ol>
@@ -202,9 +197,9 @@
       <div class="form-actions">
         <button name="submit" type="submit" id="submit" class="action action-primary action-update">Register &amp; Create My Account</button>
         % if has_extauth_info is UNDEFINED:
-        <!-- <span class="wrapper wrapper-action action-secondary">
+        <span class="wrapper wrapper-action action-secondary">
           <a href="${reverse('login')}" class="action action-login">Already have an account? Login</a>
-        </span> -->
+        </span>
         % endif
       </div>
     </form>

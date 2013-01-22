@@ -409,7 +409,11 @@
 // =====
 
 // login
-.login {
+.view-login {
+
+  .nav-courseware .cta-login {
+    display: none;
+  }
 
   .group-form-accountpreferences {
     padding-top: 0;
@@ -418,7 +422,7 @@
 }
 
 // register
-.register {
+.view-register {
 
   .group-form-accountacknowledgements {
     padding-top: 0;
@@ -427,7 +431,7 @@
 }
 
 // password reset
-.passwordreset {
+.view-passwordreset {
 
 }
 
