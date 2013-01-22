@@ -73,7 +73,7 @@ class DraftModuleStore(ModuleStoreBase):
         except ItemNotFoundError:
             return wrap_draft(super(DraftModuleStore, self).get_instance(course_id, location, depth=0))
 
-    def get_items(self, location, depth=0):
+    def get_items(self, location, course_id=None, depth=0):
         """
         Returns a list of XModuleDescriptor instances for the items
         that match location. Any element of location that is None is treated
@@ -89,8 +89,8 @@ class DraftModuleStore(ModuleStoreBase):
         draft_loc = as_draft(location)
 
         # cdodge: we're forcing depth=0 here as the Draft store is not handling caching well
-        draft_items = super(DraftModuleStore, self).get_items(draft_loc, depth=0)
-        items = super(DraftModuleStore, self).get_items(location, depth=0)
+        draft_items = super(DraftModuleStore, self).get_items(draft_loc, course_id=course_id, depth=0)
+        items = super(DraftModuleStore, self).get_items(location, course_id=course_id, depth=0)
 
         draft_locs_found = set(item.location._replace(revision=None) for item in draft_items)
         non_draft_items = [
