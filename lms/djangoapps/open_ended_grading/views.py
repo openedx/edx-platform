@@ -21,7 +21,6 @@ from student.models import unique_id_for_user
 
 import open_ended_util
 
-
 log = logging.getLogger(__name__)
 
 template_imports = {'urllib': urllib}
@@ -162,5 +161,8 @@ def student_problem_list(request, course_id):
         'error_text': error_text,
         # Checked above
         'staff_access': False, })
+
+def combined_notifications(request, course_id):
+    pass
     
 

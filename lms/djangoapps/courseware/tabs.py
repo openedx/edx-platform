@@ -21,13 +21,7 @@ from fs.errors import ResourceNotFoundError
 from courseware.access import has_access
 from static_replace import replace_urls
 
-from open_ended_grading.peer_grading_service import PeerGradingService
-from open_ended_grading.staff_grading_service import StaffGradingService
-from open_ended_grading.controller_query_service import ControllerQueryService
-from open_ended_grading import open_ended_util
-from student.models import unique_id_for_user
-from models import StudentModule
-import datetime
+from open_ended_grading import open_ended_notifications
 
 log = logging.getLogger(__name__)
 
@@ -113,21 +107,8 @@ def _textbooks(tab, user, course, active_page):
 def _staff_grading(tab, user, course, active_page):
     if has_access(user, course, 'staff'):
         link = reverse('staff_grading', args=[course.id])
-        staff_gs = StaffGradingService(settings.STAFF_GRADING_INTERFACE)
-        pending_grading=False
         tab_name = "Staff grading"
-        img_path= ""
-        try:
-            notifications = json.loads(staff_gs.get_notifications(course.id))
-            if notifications['success']:
-                if notifications['staff_needs_to_grade']:
-                    pending_grading=True
-        except:
-            #Non catastrophic error, so no real action
-            log.info("Problem with getting notifications from staff grading service.")
-
-        if pending_grading:
-            img_path = "/static/images/slider-handle.png"
+        pending_grading, img_path  = open_ended_notifications.staff_grading_notifications(course)
 
         tab = [CourseTab(tab_name, link, active_page == "staff_grading", pending_grading, img_path)]
         return tab
@@ -136,21 +117,8 @@ def _staff_grading(tab, user, course, active_page):
 def _peer_grading(tab, user, course, active_page):
     if user.is_authenticated():
         link = reverse('peer_grading', args=[course.id])
-        peer_gs = PeerGradingService(settings.PEER_GRADING_INTERFACE)
-        pending_grading=False
         tab_name = "Peer grading"
-        img_path= ""
-        try:
-            notifications = json.loads(peer_gs.get_notifications(course.id,unique_id_for_user(user)))
-            if notifications['success']:
-                if notifications['student_needs_to_peer_grade']:
-                    pending_grading=True
-        except:
-            #Non catastrophic error, so no real action
-            log.info("Problem with getting notifications from peer grading service.")
-
-        if pending_grading:
-            img_path = "/static/images/slider-handle.png"
+        pending_grading, img_path = open_ended_notifications.peer_grading_notifications(course, user)
 
         tab = [CourseTab(tab_name, link, active_page == "peer_grading", pending_grading, img_path)]
         return tab
@@ -159,31 +127,9 @@ def _peer_grading(tab, user, course, active_page):
 def _combined_open_ended_grading(tab, user, course, active_page):
     if user.is_authenticated:
         link = reverse('open_ended_problems', args=[course.id])
-
-        controller_url = open_ended_util.get_controller_url()
-        controller_qs = ControllerQueryService(controller_url)
-        student_id = unique_id_for_user(user)
-        course_id = course.id
-        user_is_staff  = has_access(user, course, 'staff')
-
-        min_time_to_query = user.last_login
-        last_module_seen = StudentModule.objects.all(student=user, course_id = course_id, modified__gt=min_time_to_query).values('modified').order_by('-modified')[0]
-
-        last_time_viewed = last_module_seen['modified']
-        pending_grading= False
         tab_name = "Open Ended Questions"
-        img_path= ""
-        try:
-            notifications = json.loads(controller_qs.get_notifications(course.id,student_id, user_is_staff, last_time_viewed))
-            if notifications['success']:
-                if notifications['overall_need_to_check']:
-                    pending_grading=True
-        except:
-            #Non catastrophic error, so no real action
-            log.info("Problem with getting notifications from controller query service.")
-
-        if pending_grading:
-            img_path = "/static/images/slider-handle.png"
+        
+        pending_grading, img_path  = open_ended_notifications.combined_notifications(course, user)
 
         tab = [CourseTab(tab_name, link, active_page == "controller_query", pending_grading, img_path)]
         return tab
