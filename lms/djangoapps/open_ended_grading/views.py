@@ -20,6 +20,7 @@ from .staff_grading import StaffGrading
 from student.models import unique_id_for_user
 
 import open_ended_util
+import open_ended_notifications
 
 log = logging.getLogger(__name__)
 
@@ -163,6 +164,7 @@ def student_problem_list(request, course_id):
         'staff_access': False, })
 
 def combined_notifications(request, course_id):
-    pass
+    user = request.user
+
     
 

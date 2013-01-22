@@ -23,7 +23,7 @@ def staff_grading_notifications(course):
     if pending_grading:
         img_path = "/static/images/slider-handle.png"
 
-    return pending_grading, img_path
+    return {'pending_grading' : pending_grading, 'img_path' : img_path, 'response' : notifications}
 
 def peer_grading_notifications(course, user):
     peer_gs = PeerGradingService(settings.PEER_GRADING_INTERFACE)
@@ -41,7 +41,7 @@ def peer_grading_notifications(course, user):
     if pending_grading:
         img_path = "/static/images/slider-handle.png"
 
-    return pending_grading, img_path
+    return {'pending_grading' : pending_grading, 'img_path' : img_path, 'response' : notifications}
 
 def combined_notifications(course, user):
     controller_url = open_ended_util.get_controller_url()
@@ -69,4 +69,4 @@ def combined_notifications(course, user):
     if pending_grading:
         img_path = "/static/images/slider-handle.png"
 
-    return pending_grading, img_path
+    return {'pending_grading' : pending_grading, 'img_path' : img_path, 'response' : notifications}
