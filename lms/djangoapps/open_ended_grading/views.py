@@ -219,8 +219,6 @@ def combined_notifications(request, course_id):
         'ajax_url' : ajax_url,
     }
 
-    log.debug(combined_dict)
-
     return render_to_response('open_ended_problems/combined_notifications.html',
         combined_dict
     )
