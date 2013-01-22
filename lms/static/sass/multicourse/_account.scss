@@ -24,7 +24,7 @@
 }
 
 // shared
-.login, .register, .passwordreset {
+.login, .register, .passwordreset, #forgot-password-modal #password-reset {
   padding: ($baseline*1.5);
   @include clearfix;
 
@@ -183,6 +183,7 @@
 
         input, textarea {
           width: 100%;
+          font-weight: 600;
         }
       }
 
@@ -427,4 +428,84 @@
 // password reset
 .passwordreset {
 
+}
+
+// modal password reset form
+#forgot-password-modal {
+  @include border-radius(2px);
+
+
+  .inner-wrapper {
+    @include border-radius(2px);
+    background: $m-gray-l;
+    padding-bottom: 0 !important;
+  }
+
+  #password-reset {
+
+    header {
+      border-bottom: 1px solid tint($m-gray,70%);
+      background-image: none;
+      padding: 0;
+
+      &:before {
+        background-image: none;
+      }
+
+      h2 {
+        font-size: em(24);
+        font-weight: 700;
+        text-transform: none;
+      }
+    }
+
+    .instructions {
+
+      p {
+        color: $m-gray;
+        font-size: em(14);
+      }
+    }
+
+    fieldset {
+      padding: 0 !important;
+      margin: ($baseline*1.25) 0 !important;
+    }
+
+    form {
+      @include border-radius(0);
+      @include box-shadow(none);
+      margin: $baseline 0;
+      border: none;
+      padding: 0;
+
+      .field {
+
+        &.text, &.email, &.textarea {
+
+          input {
+            background: #fafafa;
+            margin-bottom: 0;
+          }
+        }
+      }
+
+      .form-actions {
+        padding: 0 !important;
+
+        .action-primary {
+          float: none;
+          display: block !important;
+          width: 100%;
+        }
+      }
+    } 
+  }
+
+  .modal-form-error {
+    @include border-radius(2px);
+    border: 1px solid tint($red,65%);
+    background: tint($red,98%);
+    color: $red;
+  }
 }
