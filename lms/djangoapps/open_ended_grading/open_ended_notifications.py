@@ -14,7 +14,7 @@ log=logging.getLogger(__name__)
 NOTIFICATION_TYPES = (
     ('student_needs_to_peer_grade', 'peer_grading', 'Peer Grading'),
     ('staff_needs_to_grade', 'staff_grading', 'Staff Grading'),
-    ('overall_need_to_check', 'open_ended_problems', 'Problems you have submitted')
+    ('new_student_grading_to_view', 'open_ended_problems', 'Problems you have submitted')
     )
 
 def staff_grading_notifications(course):
