@@ -2,7 +2,7 @@
 // =====
 
 // page-level
-.view-register, .view-login {
+.view-register, .view-login, .view-passwordreset {
 
   .content-wrapper {
     background: $m-gray-l;
@@ -24,7 +24,7 @@
 }
 
 // shared
-.login, .register {
+.login, .register, .passwordreset {
   padding: ($baseline*1.5);
   @include clearfix;
 
@@ -422,4 +422,9 @@
     padding-top: 0;
     padding-bottom: 0;
   }
+}
+
+// password reset
+.passwordreset {
+
 }
