@@ -344,7 +344,7 @@ class StaffGrading
         <tr>
             <th>Problem Name</th>
             <th>Graded</th>
-            <th>Pending</th>
+            <th>Available to Grade</th>
             <th>Required</th>
             <th>Progress</th>
         </tr>
