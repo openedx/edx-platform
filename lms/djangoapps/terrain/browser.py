@@ -11,7 +11,7 @@ from django.core.management import call_command
 @before.harvest
 def initial_setup(server):
     # Launch firefox
-    world.browser = Browser('firefox')
+    world.browser = Browser('chrome')
 
 @before.each_scenario
 def reset_data(scenario):
@@ -24,3 +24,4 @@ def reset_data(scenario):
 def teardown_browser(total):
     # Quit firefox
     world.browser.quit()
+    pass

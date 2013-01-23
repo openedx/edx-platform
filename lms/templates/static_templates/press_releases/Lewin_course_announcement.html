@@ -1,0 +1,77 @@
+<%! from django.core.urlresolvers import reverse %>
+<%inherit file="../../main.html" />
+
+<%namespace name='static' file='../../static_content.html'/>
+
+<%block name="title"><title>New Course from legendary MIT physics professor Walter Lewin</title></%block>
+<div id="fb-root"></div>
+<script>(function(d, s, id) {
+  var js, fjs = d.getElementsByTagName(s)[0];
+  if (d.getElementById(id)) return;
+  js = d.createElement(s); js.id = id;
+  js.src = "//connect.facebook.net/en_US/all.js#xfbml=1";
+  fjs.parentNode.insertBefore(js, fjs);
+}(document, 'script', 'facebook-jssdk'));</script>
+
+<section class="pressrelease">
+  <section class="container">
+    <h1>Afraid of physics? Do you hate it?<br/>Walter Lewin will make you love physics whether you like it or not</h1>
+    <hr class="horizontal-divider">
+      <article>
+        <h2>MIT physics professor and online web star brings his renowned Electricity and Magnetism course to edX</h2>
+
+        <figure>
+          <a href="${static.url('images/press/releases/dr-lewin-276_2400x1600.jpg')}"><img src="${static.url('images/press/releases/dr-lewin-276_240x180.jpg')}" /></a>
+          <figcaption>
+            <p>Walter Lewin, legendary MIT physics professor, demonstrates, in his inimitable fashion, one of the many laws of physics covered in his new course on edX.</p>
+            <p>Credit: Dominick Reuter</p>
+            <a href="${static.url('images/press/releases/dr-lewin-276_2400x1600.jpg')}">High Resolution Image</a></p>
+          </figcaption>
+        </figure>
+
+        <p><strong>CAMBRIDGE, MA  &ndash; January 22, 2013 &ndash;</strong> <a href="http://www.edx.org">EdX</a>, the not-for-profit online learning initiative founded by Harvard University and the Massachusetts Institute of Technology (MIT), announced today a new course from the legendary Professor Walter Lewin who, for 47 years, has provided generations of MIT students – and millions watching online – with his inspiring and unconventional lectures. Now, with this edX version of Professor Lewin’s famous course Electricity and Magnetism (Physics), people around the world can experience it just like his students on the MIT campus. MITx <a href="https://www.edx.org/courses/MITx/8.02x/2013_Spring/about">8.02x Electricity and Magnetism</a> is now open for enrollment and classes will begin on February 18, 2013.</p>
+
+        <p>“I have taught this course to tens of thousands and many tell me it changed their lives,” said Walter Lewin, Professor of Physics at MIT. “Teaching is my passion:  I want to open peoples’ eyes and minds to the beauty of physics so they will begin to see the world in a new way.”</p>
+
+        <p>In <a href="https://www.edx.org/courses/MITx/8.02x/2013_Spring/about">8.02x Electricity and Magnetism</a>, Professor Lewin will teach students to “see” the world instead of just “looking at” it. He will make them “see” natural phenomena such as rainbows in a way they never imagined before. Through his dynamic teaching, enthusiasm and great sense of humor, Professor Lewin has an innate ability to make difficult concepts easy.  The New York Times has crowned him a “Web Star” and noted how his lectures, with their engaging physics demonstrations, have won him devotees around the world.  While this course is MIT level, edX and Professor Lewin encourage even senior high school students from around the world to watch his lectures and take the course.</p>
+
+        <p>“Walter Lewin is an international treasure,” said Anant Agarwal, President of edX. “His physics lectures on the MIT campus were already legendary before he put them online and they became an international sensation. We know edX learners will be awestruck by his provocative and enlightening course.”</p>
+
+        <p>In addition to the basic concepts of Electromagnetism, a vast variety of interesting topics are covered, including Lightning, Pacemakers, Electric Shock Treatment, Electrocardiograms, Metal Detectors, Musical Instruments, Magnetic Levitation, Bullet Trains, Electric Motors, Radios, TV, Car Coils, Superconductivity, Aurora Borealis, Rainbows, Radio Telescopes, Interferometers, Particle Accelerators such as the Large Hadron Collider, Mass Spectrometers, Red Sunsets, Blue Skies, Haloes around Sun and Moon, Color Perception, Doppler Effect and Big-Bang Cosmology.</p>
+
+        <p>Professor Lewin received his PhD in Nuclear Physics at the Technical University in Delft, the Netherlands in 1965. He joined the Physics faculty at MIT in 1966 and became a pioneer in the new field of X-ray Astronomy. His 105 online lectures are world-renowned and are viewed by nearly 2 million people annually. Professor Lewin has received five teaching awards and is the only MIT professor featured in "The Best 300 Professors" by The Princeton Review. He has co-authored with Warren Goldstein the book "For the Love of Physics" (Free Press, Simon & Schuster), which has been translated into 9 languages.</p>
+
+        <p>Previously announced new 2013 courses include: <a href="http://www.edx.org/courses/HarvardX/ER22x/2013_Spring/about">Justice from Michael Sandel</a>; <a href="http://www.edx.org/courses/BerkeleyX/Stat2.1x/2013_Spring/about">Introduction to Statistics from Ani Adhikari</a>; <a href="http://www.edx.org/courses/MITx/14.73x/2013_Spring/about">The Challenges of Global Poverty from Esther Duflo</a>; <a href="http://www.edx.org/courses/HarvardX/CB22x/2013_Spring/about">The Ancient Greek Hero from Gregory Nagy</a>; <a href="https://www.edx.org/courses/BerkeleyX/CS191x/2013_Spring/about">Quantum Mechanics and Quantum Computation from Umesh Vazirani</a>; <a href="https://www.edx.org/courses/HarvardX/PH278x/2013_Spring/about">Human Health and Global Environmental Change, from Aaron Bernstein and Jack Spengler</a>.</p>
+
+        <p>In addition to these new courses, edX is bringing back several courses from the popular fall 2012 semester: <a href="http://www.edx.org/courses/MITx/6.00x/2013_Spring/about">Introduction to Computer Science and Programming</a>; <a href="http://www.edx.org/courses/MITx/3.091x/2013_Spring/about">Introduction to Solid State Chemistry</a>; <a href="http://www.edx.org/courses/BerkeleyX/CS188.1x/2013_Spring/about">Introduction to Artificial Intelligence</a>; <a href="https://www.edx.org/courses/BerkeleyX/CS169.1x/2013_Spring/about">Software as a Service I</a>; <a href="https://www.edx.org/courses/BerkeleyX/CS169.2x/2013_Spring/about">Software as a Service II</a>; <a href="http://www.edx.org/courses/BerkeleyX/CS184.1x/2013_Spring/about">Foundations of Computer Graphics</a>.</p>
+
+        <h2>About edX</h2>
+
+        <p><a href="https://www.edx.org/">EdX</a> is a not-for-profit enterprise of its founding partners <a href="http://www.harvard.edu">Harvard University</a> and the <a href="http://www.mit.edu">Massachusetts Institute of Technology</a> focused on transforming online and on-campus learning through groundbreaking methodologies, game-like experiences and cutting-edge research. EdX provides inspirational and transformative knowledge to students of all ages, social status, and income who form worldwide communities of learners. EdX uses its open source technology to transcend physical and social borders. We’re focused on people, not profit. EdX is based in Cambridge, Massachusetts in the USA.</p>
+
+      <section class="contact">
+        <p><strong>Contact:</strong></p>
+        <p>Brad Baker, Weber Shandwick for edX</p>
+        <p>BBaker@webershandwick.com</p>
+        <p>(617) 520-7043</p>
+      </section>
+
+      <section class="footer">
+        <hr class="horizontal-divider">
+        <div class="logo"></div><h3 class="date">12 - 22 - 2013</h3>
+        <div class="social-sharing">
+        <hr class="horizontal-divider">
+          <p>Share with friends and family:</p>
+          <a href="http://twitter.com/intent/tweet?text=:MIT+physics+professor+and+online+web+star+brings+his+renowned+Electricity+and+Magnetism+course+to+edX+http://www.edx.org/press/lewin-course-announcement" class="share">
+            <img src="${static.url('images/social/twitter-sharing.png')}">
+          </a>
+        </a>
+        <a href="mailto:?subject=MIT%20physics%20professor%20and%20online%20web%20star%20brings%20his%20renowned%20Electricity%20and%20Magnetism%20course%20to%20edX&body=Afraid%20of%20physics?%20Do%20you%20hate%20it?%20Walter%20Lewin%20will%20make%20you%20love%20physics%20whether%20you%20like%20it%20or%20not…http://edx.org/press/lewin-course-announcement" class="share">
+          <img src="${static.url('images/social/email-sharing.png')}">
+        </a>
+        <div class="fb-like" data-href="http://edx.org/press/lewin-course-announcement" data-send="true" data-width="450" data-show-faces="true"></div>
+      </div>
+      </section>
+    </article>
+  </section>
+</section>

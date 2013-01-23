@@ -36,7 +36,11 @@ setup(
             "videodev = xmodule.backcompat_module:TranslateCustomTagDescriptor",
             "videosequence = xmodule.seq_module:SequenceDescriptor",
             "discussion = xmodule.discussion_module:DiscussionDescriptor",
-            "graphical_slider_tool = xmodule.gst_module:GraphicalSliderToolDescriptor",
+            "course_info = xmodule.html_module:CourseInfoDescriptor",
+            "static_tab = xmodule.html_module:StaticTabDescriptor",
+            "custom_tag_template = xmodule.raw_module:RawDescriptor",
+            "about = xmodule.html_module:AboutDescriptor",
+            "graphical_slider_tool = xmodule.gst_module:GraphicalSliderToolDescriptor"
         ]
     }
 )
