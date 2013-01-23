@@ -11,7 +11,8 @@ from django.contrib.auth.models import User
 from student.models import CourseEnrollment
 import courseware.views as views
 from xmodule.modulestore.django import modulestore
-
+from xmodule.modulestore.exceptions import InvalidLocationError,\
+     ItemNotFoundError, NoPathToItem 
 
 class Stub():
     pass
@@ -25,6 +26,7 @@ class ViewsTestCase(TestCase):
         self.enrollment = CourseEnrollment.objects.get_or_create(user = self.user,
                                                   course_id = self.course_id,
                                                   created = self.date)[0]
+        self.location = ['tag', 'org', 'course', 'category', 'name']
 
     def test_user_groups(self):
         # depreciated function?
@@ -75,5 +77,8 @@ class ViewsTestCase(TestCase):
         self.assertTrue(views.registered_for_course(mock_course, self.user))
 
     def test_jump_to(self):
-        self.assertRaises(Http404, views.jump_to, 'foo', 'bar', ())
+        mock_request = MagicMock()
+        self.assertRaises(Http404, views.jump_to, mock_request, 'bar', ())
         
+        self.assertRaises(ItemNotFoundError, views.jump_to, mock_request, 'dummy',
+                          self.location)
