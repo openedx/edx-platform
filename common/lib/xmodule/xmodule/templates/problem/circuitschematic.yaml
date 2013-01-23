@@ -3,6 +3,8 @@ metadata:
     display_name: Circuit Schematic
     rerandomize: never
     showanswer: always
+    weight: ""
+    attempts: ""
 data: |
   <problem >
     Please make a voltage divider that splits the provided voltage evenly.
