@@ -4,6 +4,7 @@ import logging
 import os
 import re
 import sys
+import glob
 
 from collections import defaultdict
 from cStringIO import StringIO
@@ -12,10 +13,13 @@ from importlib import import_module
 from lxml import etree
 from path import path
 
+from xmodule.error_module import ErrorDescriptor
 from xmodule.errortracker import make_error_tracker, exc_info_to_str
 from xmodule.course_module import CourseDescriptor
 from xmodule.mako_module import MakoDescriptorSystem
 from xmodule.x_module import XModuleDescriptor, XMLParsingSystem
+
+from xmodule.html_module import HtmlDescriptor
 
 from . import ModuleStoreBase, Location
 from .exceptions import ItemNotFoundError
@@ -50,6 +54,8 @@ class ImportSystem(XMLParsingSystem, MakoDescriptorSystem):
         self.unnamed = defaultdict(int)     # category -> num of new url_names for that category
         self.used_names = defaultdict(set)  # category -> set of used url_names
         self.org, self.course, self.url_name = course_id.split('/')
+        # cdodge: adding the course_id as passed in for later reference rather than having to recomine the org/course/url_name
+        self.course_id = course_id
         self.load_error_modules = load_error_modules
 
         def process_xml(xml):
@@ -162,8 +168,6 @@ class ImportSystem(XMLParsingSystem, MakoDescriptorSystem):
                 # Didn't load properly.  Fall back on loading as an error
                 # descriptor.  This should never error due to formatting.
 
-                # Put import here to avoid circular import errors
-                from xmodule.error_module import ErrorDescriptor
 
                 msg = "Error loading from xml. " + str(err)[:200]
                 log.warning(msg)
@@ -302,11 +306,11 @@ class XMLModuleStore(ModuleStoreBase):
         try:
             course_descriptor = self.load_course(course_dir, errorlog.tracker)
         except Exception as e:
-            msg = "Failed to load course '{0}': {1}".format(course_dir, str(e))
+            msg = "ERROR: Failed to load course '{0}': {1}".format(course_dir, str(e))
             log.exception(msg)
             errorlog.tracker(msg)
 
-        if course_descriptor is not None:
+        if course_descriptor is not None and not isinstance(course_descriptor, ErrorDescriptor):
             self.courses[course_dir] = course_descriptor
             self._location_errors[course_descriptor.location] = errorlog
             self.parent_trackers[course_descriptor.id].make_known(course_descriptor.location)
@@ -333,36 +337,14 @@ class XMLModuleStore(ModuleStoreBase):
         if not os.path.exists(policy_path):
             return {}
         try:
-            log.debug("Loading policy from {0}".format(policy_path))
             with open(policy_path) as f:
                 return json.load(f)
         except (IOError, ValueError) as err:
-            msg = "Error loading course policy from {0}".format(policy_path)
+            msg = "ERROR: loading course policy from {0}".format(policy_path)
             tracker(msg)
             log.warning(msg + " " + str(err))
         return {}
 
-
-    def read_grading_policy(self, paths, tracker):
-        """Load a grading policy from the specified paths, in order, if it exists."""
-        # Default to a blank policy
-        policy_str = ""
-
-        for policy_path in paths:
-            if not os.path.exists(policy_path):
-                continue
-            log.debug("Loading grading policy from {0}".format(policy_path))
-            try:
-                with open(policy_path) as grading_policy_file:
-                    policy_str = grading_policy_file.read()
-                    # if we successfully read the file, stop looking at backups
-                    break
-            except (IOError):
-                msg = "Unable to load course settings file from '{0}'".format(policy_path)
-                tracker(msg)
-                log.warning(msg)
-
-        return policy_str
 
 
     def load_course(self, course_dir, tracker):
@@ -409,6 +391,7 @@ class XMLModuleStore(ModuleStoreBase):
             if url_name:
                 policy_dir = self.data_dir / course_dir / 'policies' / url_name
                 policy_path = policy_dir / 'policy.json'
+
                 policy = self.load_policy(policy_path, tracker)
 
                 # VS[compat]: remove once courses use the policy dirs.
@@ -426,7 +409,6 @@ class XMLModuleStore(ModuleStoreBase):
                     raise ValueError("Can't load a course without a 'url_name' "
                                      "(or 'name') set.  Set url_name.")
 
-
             course_id = CourseDescriptor.make_id(org, course, url_name)
             system = ImportSystem(
                 self,
@@ -440,23 +422,64 @@ class XMLModuleStore(ModuleStoreBase):
 
             course_descriptor = system.process_xml(etree.tostring(course_data, encoding='unicode'))
 
+            # If we fail to load the course, then skip the rest of the loading steps
+            if isinstance(course_descriptor, ErrorDescriptor):
+                return course_descriptor
+
             # NOTE: The descriptors end up loading somewhat bottom up, which
             # breaks metadata inheritance via get_children().  Instead
             # (actually, in addition to, for now), we do a final inheritance pass
             # after we have the course descriptor.
             XModuleDescriptor.compute_inherited_metadata(course_descriptor)
 
-            # Try to load grading policy
-            paths = [self.data_dir / course_dir / 'grading_policy.json']
-            if policy_dir:
-                paths = [policy_dir / 'grading_policy.json'] + paths
+            # now import all pieces of course_info which is expected to be stored
+            # in <content_dir>/info or <content_dir>/info/<url_name>
+            self.load_extra_content(system, course_descriptor, 'course_info', self.data_dir / course_dir / 'info', course_dir, url_name)
 
-            policy_str = self.read_grading_policy(paths, tracker)
-            course_descriptor.set_grading_policy(policy_str)
+            # now import all static tabs which are expected to be stored in
+            # in <content_dir>/tabs or <content_dir>/tabs/<url_name>           
+            self.load_extra_content(system, course_descriptor, 'static_tab', self.data_dir / course_dir / 'tabs', course_dir, url_name)
+
+            self.load_extra_content(system, course_descriptor, 'custom_tag_template', self.data_dir / course_dir / 'custom_tags', course_dir, url_name)
+
+            self.load_extra_content(system, course_descriptor, 'about', self.data_dir / course_dir / 'about', course_dir, url_name)
 
             log.debug('========> Done with course import from {0}'.format(course_dir))
             return course_descriptor
 
+
+    def load_extra_content(self, system, course_descriptor, category, base_dir, course_dir, url_name):
+
+        self._load_extra_content(system, course_descriptor, category, base_dir, course_dir)
+
+         # then look in a override folder based on the course run
+        if os.path.isdir(base_dir / url_name):
+            self._load_extra_content(system, course_descriptor, category, base_dir / url_name, course_dir)       
+
+
+    def _load_extra_content(self, system, course_descriptor, category, path, course_dir):
+
+        for filepath in glob.glob(path/ '*'):
+            if not os.path.isdir(filepath):
+                with open(filepath) as f:
+                    try:
+                        html = f.read().decode('utf-8')
+                        # tabs are referenced in policy.json through a 'slug' which is just the filename without the .html suffix
+                        slug = os.path.splitext(os.path.basename(filepath))[0]
+                        loc = Location('i4x', course_descriptor.location.org, course_descriptor.location.course, category, slug)
+                        module = HtmlDescriptor(system, definition={'data' : html}, **{'location' : loc})
+                        # VS[compat]:
+                        # Hack because we need to pull in the 'display_name' for static tabs (because we need to edit them)
+                        # from the course policy
+                        if category == "static_tab":
+                            for tab in course_descriptor.tabs or []:
+                                if tab.get('url_slug') == slug:
+                                    module.metadata['display_name'] = tab['name']
+                        module.metadata['data_dir'] = course_dir
+                        self.modules[course_descriptor.id][module.location] = module
+                    except Exception, e:
+                        logging.exception("Failed to load {0}. Skipping... Exception: {1}".format(filepath, str(e)))
+                        system.error_tracker("ERROR: " + str(e))
 
     def get_instance(self, course_id, location, depth=0):
         """
@@ -479,11 +502,16 @@ class XMLModuleStore(ModuleStoreBase):
         except KeyError:
             raise ItemNotFoundError(location)
 
+    def has_item(self, location):
+        """
+        Returns True if location exists in this ModuleStore.
+        """
+        location = Location(location)
+        return any(location in course_modules for course_modules in self.modules.values())
+
     def get_item(self, location, depth=0):
         """
         Returns an XModuleDescriptor instance for the item at location.
-        If location.revision is None, returns the most item with the most
-        recent revision
 
         If any segment of the location is None except revision, raises
             xmodule.modulestore.exceptions.InsufficientSpecificationError
@@ -495,6 +523,24 @@ class XMLModuleStore(ModuleStoreBase):
         """
         raise NotImplementedError("XMLModuleStores can't guarantee that definitions"
                                   " are unique. Use get_instance.")
+
+    def get_items(self, location, course_id=None, depth=0):
+        items = []
+
+        def _add_get_items(self, location, modules):
+            for mod_loc, module in modules.iteritems():
+                # Locations match if each value in `location` is None or if the value from `location`
+                # matches the value from `mod_loc`
+                if all(goal is None or goal == value for goal, value in zip(location, mod_loc)):
+                    items.append(module)
+
+        if course_id is None:
+            for _, modules in self.modules.iteritems():
+                _add_get_items(self, location, modules)
+        else:
+            _add_get_items(self, location, self.modules[course_id])
+
+        return items
 
 
     def get_courses(self, depth=0):
@@ -546,9 +592,6 @@ class XMLModuleStore(ModuleStoreBase):
     def get_parent_locations(self, location, course_id):
         '''Find all locations that are the parents of this location in this 
         course.  Needed for path_to_location().
-
-        If there is no data at location in this modulestore, raise
-            ItemNotFoundError.
 
         returns an iterable of things that can be passed to Location.  This may
         be empty if there are no parents.

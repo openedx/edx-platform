@@ -10,9 +10,11 @@ from collections import namedtuple
 from pkg_resources import resource_listdir, resource_string, resource_isdir
 
 from xmodule.modulestore import Location
-from xmodule.timeparse import parse_time
+from xmodule.timeparse import parse_time, stringify_time
 
 from xmodule.contentstore.content import StaticContent, XASSET_SRCREF_PREFIX
+from xmodule.modulestore.exceptions import ItemNotFoundError
+import time
 
 log = logging.getLogger('mitx.' + __name__)
 
@@ -106,7 +108,20 @@ class HTMLSnippet(object):
 
         All of these will be loaded onto the page in the CMS
         """
-        return cls.js
+        # cdodge: We've moved the xmodule.coffee script from an outside directory into the xmodule area of common
+        # this means we need to make sure that all xmodules include this dependency which had been previously implicitly 
+        # fulfilled in a different area of code
+        js = cls.js
+        
+        if js is None:
+            js = {}
+
+        if 'coffee' not in js:
+            js['coffee'] = []
+        
+        js['coffee'].append(resource_string(__name__, 'js/src/xmodule.coffee'))
+
+        return js
 
     @classmethod
     def get_css(cls):
@@ -226,17 +241,17 @@ class XModule(HTMLSnippet):
         Return module instances for all the children of this module.
         '''
         if self._loaded_children is None:
-            child_locations = self.get_children_locations()
-            children = [self.system.get_module(loc) for loc in child_locations]
+            child_descriptors = self.get_child_descriptors()
+            children = [self.system.get_module(descriptor) for descriptor in child_descriptors]
             # get_module returns None if the current user doesn't have access
             # to the location.
             self._loaded_children = [c for c in children if c is not None]
 
         return self._loaded_children
 
-    def get_children_locations(self):
+    def get_child_descriptors(self):
         '''
-        Returns the locations of each of child modules.
+        Returns the descriptors of the child modules
 
         Overriding this changes the behavior of get_children and
         anything that uses get_children, such as get_display_items.
@@ -247,7 +262,16 @@ class XModule(HTMLSnippet):
         These children will be the same children returned by the
         descriptor unless descriptor.has_dynamic_children() is true.
         '''
-        return self.definition.get('children', [])
+        return self.descriptor.get_children()
+
+    def get_child_by(self, selector):
+        """
+        Return a child XModuleDescriptor with the specified url_name, if it exists, and None otherwise.
+        """
+        for child in self.get_children():
+            if selector(child):
+                return child
+        return None
 
     def get_display_items(self):
         '''
@@ -345,7 +369,6 @@ class XModule(HTMLSnippet):
         return link
 
 
-
 def policy_key(location):
     """
     Get the key for a location in a policy file.  (Since the policy file is
@@ -379,6 +402,9 @@ class ResourceTemplates(object):
             return []
 
         for template_file in resource_listdir(__name__, dirname):
+            if not template_file.endswith('.yaml'):
+                log.warning("Skipping unknown template file %s" % template_file)
+                continue
             template_content = resource_string(__name__, os.path.join(dirname, template_file))
             template = yaml.load(template_content)
             templates.append(Template(**template))
@@ -423,7 +449,7 @@ class XModuleDescriptor(Plugin, HTMLSnippet, ResourceTemplates):
 
     # cdodge: this is a list of metadata names which are 'system' metadata
     # and should not be edited by an end-user
-    system_metadata_fields = [ 'data_dir' ]
+    system_metadata_fields = ['data_dir', 'published_date', 'published_by', 'is_draft']
 
     # A list of descriptor attributes that must be equal for the descriptors to
     # be equal
@@ -508,6 +534,11 @@ class XModuleDescriptor(Plugin, HTMLSnippet, ResourceTemplates):
             return None
         return self._try_parse_time('start')
 
+    @start.setter
+    def start(self, value):
+        if isinstance(value, time.struct_time):
+            self.metadata['start'] = stringify_time(value)
+        
     @property
     def days_early_for_beta(self):
         """
@@ -560,7 +591,11 @@ class XModuleDescriptor(Plugin, HTMLSnippet, ResourceTemplates):
         if self._child_instances is None:
             self._child_instances = []
             for child_loc in self.definition.get('children', []):
-                child = self.system.load_item(child_loc)
+                try:
+                    child = self.system.load_item(child_loc)
+                except ItemNotFoundError:
+                    log.exception('Unable to load item {loc}, skipping'.format(loc=child_loc))
+                    continue
                 # TODO (vshnayder): this should go away once we have
                 # proper inheritance support in mongo.  The xml
                 # datastore does all inheritance on course load.
@@ -569,13 +604,13 @@ class XModuleDescriptor(Plugin, HTMLSnippet, ResourceTemplates):
 
         return self._child_instances
 
-    def get_child_by_url_name(self, url_name):
+    def get_child_by(self, selector):
         """
         Return a child XModuleDescriptor with the specified url_name, if it exists, and None otherwise.
         """
-        for c in self.get_children():
-            if c.url_name == url_name:
-                return c
+        for child in self.get_children():
+            if selector(child):
+                return child
         return None
 
     def xmodule_constructor(self, system):
@@ -840,7 +875,7 @@ class ModuleSystem(object):
                          TODO: Not used, and has inconsistent args in different
                          files.  Update or remove.
 
-        get_module - function that takes (location) and returns a corresponding
+        get_module - function that takes a descriptor and returns a corresponding
                          module instance object.  If the current user does not have
                          access to that location, returns None.
 

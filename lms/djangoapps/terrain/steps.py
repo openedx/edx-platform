@@ -44,6 +44,10 @@ def and_i_press_the_button(step, value):
     button_css = 'input[value="%s"]' % value
     world.browser.find_by_css(button_css).first.click()
 
+@step(u'I click the link with the text "([^"]*)"$')
+def click_the_link_with_the_text_group1(step, linktext):
+    world.browser.find_link_by_text(linktext).first.click()
+
 @step('I should see that the path is "([^"]*)"$')
 def i_should_see_that_the_path_is(step, path):
     assert world.browser.url == django_url(path)

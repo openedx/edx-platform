@@ -14,6 +14,8 @@ from django.core.urlresolvers import reverse
 from override_settings import override_settings
 
 import xmodule.modulestore.django
+from xmodule.modulestore.mongo import MongoModuleStore
+
 
 # Need access to internal func to put users in the right group
 from courseware import grades
@@ -43,6 +45,25 @@ def registration(email):
     '''look up registration object by email'''
     return Registration.objects.get(user__email=email)
 
+# A bit of a hack--want mongo modulestore for these tests, until
+# jump_to works with the xmlmodulestore or we have an even better solution
+# NOTE: this means this test requires mongo to be running.
+
+def mongo_store_config(data_dir):
+    return {
+    'default': {
+        'ENGINE': 'xmodule.modulestore.mongo.MongoModuleStore',
+        'OPTIONS': {
+            'default_class': 'xmodule.raw_module.RawDescriptor',
+            'host': 'localhost',
+            'db': 'test_xmodule',
+            'collection': 'modulestore',
+            'fs_root': data_dir,
+            'render_template': 'mitxmako.shortcuts.render_to_string',
+        }
+    }
+}
+
 def xml_store_config(data_dir):
     return {
     'default': {
@@ -56,6 +77,7 @@ def xml_store_config(data_dir):
 
 TEST_DATA_DIR = settings.COMMON_TEST_DATA_ROOT
 TEST_DATA_XML_MODULESTORE = xml_store_config(TEST_DATA_DIR)
+TEST_DATA_MONGO_MODULESTORE = mongo_store_config(TEST_DATA_DIR)
 
 class ActivateLoginTestCase(TestCase):
     '''Check that we can activate and log in'''
@@ -217,17 +239,9 @@ class PageLoader(ActivateLoginTestCase):
 
 
 
-    def check_pages_load(self, course_name, data_dir, modstore):
+    def check_pages_load(self, module_store):
         """Make all locations in course load"""
-        print "Checking course {0} in {1}".format(course_name, data_dir)
-        default_class='xmodule.hidden_module.HiddenDescriptor'
-        load_error_modules=True
-        module_store = XMLModuleStore(
-                                      data_dir,
-                                      default_class=default_class,
-                                      course_dirs=[course_name],
-                                      load_error_modules=load_error_modules,
-                                      )
+
 
        # enroll in the course before trying to access pages
         courses = module_store.get_courses()
@@ -239,35 +253,68 @@ class PageLoader(ActivateLoginTestCase):
         n = 0
         num_bad = 0
         all_ok = True
-        for descriptor in module_store.modules[course_id].itervalues():
+
+        for descriptor in module_store.get_items(
+                Location(None, None, None, None, None)):
+
             n += 1
             print "Checking ", descriptor.location.url()
-            #print descriptor.__class__, descriptor.location
-            resp = self.client.get(reverse('jump_to',
-                                   kwargs={'course_id': course_id,
-                                           'location': descriptor.location.url()}), follow=True)
-            # check status codes first
-            msg = str(resp.status_code)
-            if resp.status_code != 200:
-                msg = "ERROR " + msg  + ": " + descriptor.location.url()
-                all_ok = False
-                num_bad += 1
-            elif resp.redirect_chain[0][1] != 302:
-                msg = "ERROR on redirect from " + descriptor.location.url()
-                all_ok = False
-                num_bad += 1
 
-            # check content to make sure there were no rendering failures
-            content = resp.content
-            if content.find("this module is temporarily unavailable")>=0:
-                msg = "ERROR unavailable module "
-                all_ok = False
-                num_bad += 1
-            elif isinstance(descriptor, ErrorDescriptor):
-                msg = "ERROR error descriptor loaded: "
-                msg = msg + descriptor.definition['data']['error_msg']
-                all_ok = False
-                num_bad += 1
+            # We have ancillary course information now as modules and we can't simply use 'jump_to' to view them
+            if descriptor.location.category == 'about':
+                resp = self.client.get(reverse('about_course', kwargs={'course_id': course_id}))
+                msg = str(resp.status_code)
+
+                if resp.status_code != 200:
+                    msg = "ERROR " + msg
+                    all_ok = False
+                    num_bad += 1
+            elif descriptor.location.category == 'static_tab':
+                resp = self.client.get(reverse('static_tab', kwargs={'course_id': course_id, 'tab_slug' : descriptor.location.name}))
+                msg = str(resp.status_code)
+
+                if resp.status_code != 200:
+                    msg = "ERROR " + msg
+                    all_ok = False
+                    num_bad += 1    
+            elif descriptor.location.category == 'course_info':
+                resp = self.client.get(reverse('info', kwargs={'course_id': course_id}))
+                msg = str(resp.status_code)
+
+                if resp.status_code != 200:
+                    msg = "ERROR " + msg
+                    all_ok = False
+                    num_bad += 1  
+            elif descriptor.location.category == 'custom_tag_template':
+                pass
+            else:
+                #print descriptor.__class__, descriptor.location
+                resp = self.client.get(reverse('jump_to',
+                                       kwargs={'course_id': course_id,
+                                               'location': descriptor.location.url()}), follow=True)
+                msg = str(resp.status_code)
+
+                if resp.status_code != 200:
+                    msg = "ERROR " + msg  + ": " + descriptor.location.url()
+                    all_ok = False
+                    num_bad += 1
+                elif resp.redirect_chain[0][1] != 302:
+                    msg = "ERROR on redirect from " + descriptor.location.url()
+                    all_ok = False
+                    num_bad += 1
+
+                # check content to make sure there were no rendering failures
+                content = resp.content
+                if content.find("this module is temporarily unavailable")>=0:
+                    msg = "ERROR unavailable module "
+                    all_ok = False
+                    num_bad += 1
+                elif isinstance(descriptor, ErrorDescriptor):
+                    msg = "ERROR error descriptor loaded: "
+                    msg = msg + descriptor.definition['data']['error_msg']
+                    all_ok = False
+                    num_bad += 1
+
             print msg
             self.assertTrue(all_ok)  # fail fast
 
@@ -278,21 +325,51 @@ class PageLoader(ActivateLoginTestCase):
 
 
 @override_settings(MODULESTORE=TEST_DATA_XML_MODULESTORE)
-class TestCoursesLoadTestCase(PageLoader):
+class TestCoursesLoadTestCase_XmlModulestore(PageLoader):
     '''Check that all pages in test courses load properly'''
 
     def setUp(self):
         ActivateLoginTestCase.setUp(self)
         xmodule.modulestore.django._MODULESTORES = {}
-#        xmodule.modulestore.django.modulestore().collection.drop()
-#        store = xmodule.modulestore.django.modulestore()
-        # is there a way to empty the store?
-
+        
     def test_toy_course_loads(self):
-        self.check_pages_load('toy', TEST_DATA_DIR, modulestore())
+        module_store = XMLModuleStore(
+                                      TEST_DATA_DIR,
+                                      default_class='xmodule.hidden_module.HiddenDescriptor',
+                                      course_dirs=['toy'],
+                                      load_error_modules=True,
+                                      )
+
+        self.check_pages_load(module_store)
 
     def test_full_course_loads(self):
-        self.check_pages_load('full', TEST_DATA_DIR, modulestore())
+        module_store = XMLModuleStore(
+                                      TEST_DATA_DIR,
+                                      default_class='xmodule.hidden_module.HiddenDescriptor',
+                                      course_dirs=['full'],
+                                      load_error_modules=True,
+                                      )
+        self.check_pages_load(module_store)
+
+
+@override_settings(MODULESTORE=TEST_DATA_MONGO_MODULESTORE)
+class TestCoursesLoadTestCase_MongoModulestore(PageLoader):
+    '''Check that all pages in test courses load properly'''
+
+    def setUp(self):
+        ActivateLoginTestCase.setUp(self)
+        xmodule.modulestore.django._MODULESTORES = {}
+        modulestore().collection.drop()
+        
+    def test_toy_course_loads(self):
+        module_store = modulestore()
+        import_from_xml(module_store, TEST_DATA_DIR, ['toy'])
+        self.check_pages_load(module_store)
+
+    def test_full_course_loads(self):
+        module_store = modulestore()
+        import_from_xml(module_store, TEST_DATA_DIR, ['full'])
+        self.check_pages_load(module_store)
 
 
 @override_settings(MODULESTORE=TEST_DATA_XML_MODULESTORE)

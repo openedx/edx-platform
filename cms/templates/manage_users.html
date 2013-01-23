@@ -1,38 +1,115 @@
 <%inherit file="base.html" />
-<%block name="title">Course Editor Manager</%block>
-<%include file="widgets/header.html"/>
+<%block name="title">Course Staff Manager</%block>
+<%block name="bodyclass">users</%block>
 
 <%block name="content">
-<section class="main-container">
+<div class="main-wrapper">
+  <div class="inner-wrapper">
+    <div class="page-actions">
+      %if allow_actions:
+      <a href="#" class="new-button new-user-button">
+        <span class="plus-icon white"></span>New User
+      </a>
+      %endif
+    </div>
 
-  <h2>Course Editors</h2>
-  <ul>
-    % for user in editors:
-    <li>${user.email} (${user.username})</li>
-    % endfor
-  </ul>
+    <div class="details">
+      <p>The following list of users have been designated as course staff. This means that these users will have permissions to modify course content. You may add additional course staff below, if you are the course instructor. Please note that they must have already registered and verified their account.</p>
+    </div>
 
-  <form action="add_user" id="addEditorsForm">
-    <label>email:&nbsp;</label><input type="text" name="email" placeholder="email@example.com..." />
-    <input type="submit" value="add editor" />
-  </form>
-  <div id="result"></div>
+    <article class="user-overview">           
+      %if allow_actions:
+      <form class="new-user-form">
+        <div id="result"></div>
+        <div class="form-elements">
+          <label>email: </label><input type="text" id="email" class="email-input" autocomplete="off" placeholder="email@example.com">
+          <input type="submit" value="Add User" id="add_user" class="add-button" />
+          <input type="button" value="Cancel" class="cancel-button" />
+        </div>
+      </form>
+      %endif
+      <div>
+        <ol class="user-list">
+          % for user in staff:
+          <li>
+            <span class="user-name">${user.username}</span>
+            <span class="user-email">${user.email}</span>
+            %if allow_actions :
+            <div class="item-actions">
+              %if request_user_id != user.id:
+              <a href="#" class="delete-button remove-user" data-id="${user.email}"><span class="delete-icon"></span></a>
+              %endif
+            </div>
+            %endif
+          </li>
+          % endfor
+        </ol>
+      </div>
+    </article>
+  </div>
+</div>
+</%block>
 
-<script>
-  $("#addEditorsForm").submit(function(event) {
-  event.preventDefault();
-  var $form = $(this),
-  email = $form.find('input[name="email"]').val(),
-  url = $form.attr('action');
-  $.post(url, {email:email},
-  function(data) {
-  if(data['Status'] != 'OK')
-  $("#result").empty().append(data['ErrMsg']);
-  else
-  location.reload();
-  });
+<%block name="jsextra">
+<script type="text/javascript">
+  var $newUserForm;
+
+  function showNewUserForm(e) {
+    e.preventDefault();
+    $newUserForm.slideDown(150);
+    $newUserForm.find('.email-input').focus();
+  }
+
+  function hideNewUserForm(e) {
+    e.preventDefault();
+    $newUserForm.slideUp(150);
+    $('#result').hide();
+    $('#email').val('');
+  }
+
+  function checkForCancel(e) {
+    if(e.which == 27) {
+      e.data.$cancelButton.click();
+    }
+  }
+
+  function addUser(e) {
+    e.preventDefault();
+
+    $.ajax({
+      url: '${add_user_postback_url}',
+      type: 'POST',
+      dataType: 'json',
+      contentType: 'application/json',
+      data:JSON.stringify({ 'email': $('#email').val()}),
+    }).done(function(data) {
+      if (data.ErrMsg != undefined)
+        $('#result').show().empty().append(data.ErrMsg);
+      else
+        location.reload();
+    });
+  }
+
+  $(document).ready(function() {
+    $newUserForm = $('.new-user-form');
+    var $cancelButton = $newUserForm.find('.cancel-button');    
+    $newUserForm.bind('submit', addUser);
+    $cancelButton.bind('click', hideNewUserForm);
+
+    $('.new-user-button').bind('click', showNewUserForm);
+    $body.bind('keyup', { $cancelButton: $cancelButton }, checkForCancel);
+
+    $('.remove-user').click(function() {
+      $.ajax({
+        url: '${remove_user_postback_url}',
+        type: 'POST',
+        dataType: 'json',
+        contentType: 'application/json',
+        data:JSON.stringify({ 'email': $(this).data('id')}),          
+        }).done(function() {
+          location.reload();
+        })
+    });
   });
 </script>
-
-</section>
 </%block>

@@ -1,31 +1,49 @@
 ---
 metadata:
     display_name: Custom Grader
+    rerandomize: never
+    showanswer: always
 data: |
- <problem>
- <text>
-   <h2>Example: Custom Response Problem</h2>
-   
-   <p>
-     A custom response problem accepts one or more lines of text input from the
-     student, and evaluates the inputs for correctness based on evaluation using a 
-     python script embedded within the problem.
-   </p>
-   
-   <script type="loncapa/python">def test_add(expect,ans):
-        (a1,a2) = map(float,ans)
-        return (a1+a2)==10
-     
-   </script>
-   
-   <text>
-     Enter two integers which sum to 10: <br/>
-     <customresponse cfn="test_add">
-              <textline size="40" correct_answer="3"/><br/>
-              <textline size="40" correct_answer="7"/>
-     </customresponse>
-   </text>
-   
- </text>
- </problem>
+  <problem>
+  <p>
+  A custom response problem accepts one or more lines of text input from the
+  student, and evaluates the inputs for correctness based on evaluation using a 
+  python script embedded within the problem.
+  </p>
+
+  <script type="loncapa/python">
+
+  def test_add_to_ten(expect,ans):
+    a1=float(ans[0])
+    a2=float(ans[1])
+    return (a1+a2)==10
+
+  def test_add(expect,ans):
+    a1=float(ans[0])
+    a2=float(ans[1])
+    return (a1+a2)== float(expect)
+
+  </script>
+
+  <p>Enter two integers which sum to 10: </p>
+  <customresponse cfn="test_add_to_ten">
+          <textline size="40" correct_answer="3"/><br/>
+          <textline size="40" correct_answer="7"/>
+  </customresponse>
+
+  <p>Enter two integers which sum to 20: </p>
+  <customresponse cfn="test_add" expect="20">
+          <textline size="40" correct_answer="11"/><br/>
+          <textline size="40" correct_answer="9"/>
+  </customresponse>
+
+      <solution>
+          <div class="detailed-solution">
+              <p>Explanation</p>
+              <p>Any set of values on the line \(y = 10 - x\) and \(y = 20 - x\) satisfy these constraints.</p>
+              <img src="/static/images/simple_graph.png"/>
+          </div>
+      </solution>
+  </problem>
+
 children: []
