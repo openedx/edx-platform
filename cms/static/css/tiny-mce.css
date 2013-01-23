@@ -117,6 +117,7 @@ code {
     font-family: monospace, serif;
     background: none;
     color: #3c3c3c;
+    padding: 0;
 }
 
 table {
