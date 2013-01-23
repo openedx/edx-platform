@@ -8,8 +8,12 @@ import open_ended_util
 from courseware.models import StudentModule
 import logging
 from courseware.access import has_access
+from util.cache import cache
 
 log=logging.getLogger(__name__)
+
+NOTIFICATION_CACHE_TIME = 300
+KEY_PREFIX = "open_ended_"
 
 NOTIFICATION_TYPES = (
     ('student_needs_to_peer_grade', 'peer_grading', 'Peer Grading'),
@@ -17,11 +21,18 @@ NOTIFICATION_TYPES = (
     ('new_student_grading_to_view', 'open_ended_problems', 'Problems you have submitted')
     )
 
-def staff_grading_notifications(course):
+def staff_grading_notifications(course, user):
     staff_gs = StaffGradingService(settings.STAFF_GRADING_INTERFACE)
     pending_grading=False
     img_path= ""
     course_id = course.id
+    student_id = unique_id_for_user(user)
+    notification_type = "staff"
+
+    success, notification_dict = get_value_from_cache(student_id, course_id, notification_type)
+    if success:
+        return notification_dict
+
     try:
         notifications = json.loads(staff_gs.get_notifications(course_id))
         if notifications['success']:
@@ -35,16 +46,26 @@ def staff_grading_notifications(course):
     if pending_grading:
         img_path = "/static/images/slider-handle.png"
 
-    return {'pending_grading' : pending_grading, 'img_path' : img_path, 'response' : notifications}
+    notification_dict = {'pending_grading' : pending_grading, 'img_path' : img_path, 'response' : notifications}
+
+    set_value_in_cache(student_id, course_id, notification_type, notification_dict)
+
+    return notification_dict
 
 def peer_grading_notifications(course, user):
     peer_gs = PeerGradingService(settings.PEER_GRADING_INTERFACE)
     pending_grading=False
     img_path= ""
     course_id = course.id
+    student_id = unique_id_for_user(user)
+    notification_type = "peer"
+
+    success, notification_dict = get_value_from_cache(student_id, course_id, notification_type)
+    if success:
+        return notification_dict
 
     try:
-        notifications = json.loads(peer_gs.get_notifications(course_id,unique_id_for_user(user)))
+        notifications = json.loads(peer_gs.get_notifications(course_id,student_id))
         if notifications['success']:
             if notifications['student_needs_to_peer_grade']:
                 pending_grading=True
@@ -56,7 +77,11 @@ def peer_grading_notifications(course, user):
     if pending_grading:
         img_path = "/static/images/slider-handle.png"
 
-    return {'pending_grading' : pending_grading, 'img_path' : img_path, 'response' : notifications}
+    notification_dict = {'pending_grading' : pending_grading, 'img_path' : img_path, 'response' : notifications}
+
+    set_value_in_cache(student_id, course_id, notification_type, notification_dict)
+
+    return notification_dict
 
 def combined_notifications(course, user):
     controller_url = open_ended_util.get_controller_url()
@@ -64,6 +89,11 @@ def combined_notifications(course, user):
     student_id = unique_id_for_user(user)
     user_is_staff = has_access(user, course, 'staff')
     course_id = course.id
+    notification_type = "combined"
+
+    success, notification_dict = get_value_from_cache(student_id, course_id, notification_type)
+    if success:
+        return notification_dict
 
     min_time_to_query = user.last_login
     last_module_seen = StudentModule.objects.filter(student=user, course_id = course_id, modified__gt=min_time_to_query).values('modified').order_by('-modified')
@@ -92,4 +122,36 @@ def combined_notifications(course, user):
     if pending_grading:
         img_path = "/static/images/slider-handle.png"
 
-    return {'pending_grading' : pending_grading, 'img_path' : img_path, 'response' : notifications}
+    notification_dict = {'pending_grading' : pending_grading, 'img_path' : img_path, 'response' : notifications}
+
+    set_value_in_cache(student_id, course_id, notification_type, notification_dict)
+
+    return notification_dict
+
+def get_value_from_cache(student_id, course_id, notification_type):
+    key_name = create_key_name(student_id, course_id, notification_type)
+    success, value = _get_value_from_cache(key_name)
+    return success, value
+
+def set_value_in_cache(student_id, course_id, notification_type, value):
+    key_name = create_key_name(student_id, course_id, notification_type)
+    _set_value_in_cache(key_name, value)
+
+def create_key_name(student_id, course_id, notification_type):
+    key_name = "{prefix}{type}_{course}_{student}".format(prefix=KEY_PREFIX, type=notification_type, course=course_id, student=student_id)
+    return key_name
+
+def _get_value_from_cache(key_name):
+    value = cache.get(key_name)
+    success = False
+    if value is None:
+        return success , value
+    try:
+        value = json.loads(value)
+        success = True
+    except:
+        pass
+    return success , value
+
+def _set_value_in_cache(key_name, value):
+    cache.set(key_name, json.dumps(value), NOTIFICATION_CACHE_TIME)
