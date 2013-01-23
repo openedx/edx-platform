@@ -226,3 +226,19 @@
     </div>
   </aside>
 </section>
+
+<script type="text/javascript">
+  (function() {
+   $(document).delegate('#register-form', 'ajax:success', function(data, json, xhr) {
+     if(json.success) {
+       location.href="${reverse('dashboard')}";
+     } else {
+       $(".field-error").removeClass('field-error');
+       $('#register_error').html(json.value).stop().css("display", "block");
+       $("[data-field='"+json.field+"']").addClass('field-error')
+     }
+    });
+  })(this)
+</script>
+
+
