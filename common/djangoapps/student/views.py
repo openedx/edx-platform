@@ -204,14 +204,14 @@ def _cert_info(user, course, cert_status):
     return d
 
 
-def login(request):
+def login_user(request):
     """
     This view will display the non-modal login form
     """
     context = {}
     return render_to_response('login.html', context)
 
-def register(request):
+def register_user(request):
     """
     This view will display the non-modal registration form
     """
