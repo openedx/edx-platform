@@ -362,7 +362,7 @@ class XModuleDescriptor(HTMLSnippet, ResourceTemplates, XBlock):
             system,
             self.location,
             self,
-            system.xblock_model_data(self._model_data),
+            system.xblock_model_data(self),
         )
     
     def has_dynamic_children(self):

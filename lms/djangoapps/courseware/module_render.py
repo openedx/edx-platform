@@ -203,9 +203,9 @@ def _get_module(user, request, location, student_module_cache, course_id, positi
         return get_module(user, request, location,
                                        student_module_cache, course_id, position)
 
-    def xblock_model_data(descriptor_model_data):
+    def xblock_model_data(descriptor):
         return DbModel(
-            LmsKeyValueStore(course_id, user, descriptor_model_data, student_module_cache),
+            LmsKeyValueStore(course_id, user, descriptor._model_data, student_module_cache),
             descriptor.module_class,
             user.id,
             LmsUsage(location, location)

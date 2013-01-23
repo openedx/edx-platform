@@ -454,9 +454,9 @@ def preview_module_system(request, preview_id, descriptor):
     descriptor: An XModuleDescriptor
     """
 
-    def preview_model_data(model_data):
+    def preview_model_data(descriptor):
         return DbModel(
-            SessionKeyValueStore(request, model_data),
+            SessionKeyValueStore(request, descriptor._model_data),
             descriptor.module_class,
             preview_id,
             MongoUsage(preview_id, descriptor.location.url()),
