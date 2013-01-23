@@ -3,6 +3,8 @@ metadata:
     display_name: String Response
     rerandomize: never
     showanswer: always
+    weight: ""
+    attempts: ""
     # Note, the extra newlines are needed to make the yaml parser add blank lines instead of folding
     markdown: 
         "A string response problem accepts a line of text input from the 
