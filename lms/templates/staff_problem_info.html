@@ -61,18 +61,16 @@ category = ${category | h}
 
 <script type="text/javascript">
 // assumes courseware.html's loaded this method.
- % if staff_access:
-    setup_debug('${element_id}', 
-    	%if edit_link:
-    		'${edit_link}',
-    	%else:
-       		null,
-    	%endif
-    	{
-           'location': '${location}',
-           'xqa_key': '${xqa_key}',
-          'category': '${category}',
-          'user': '${user}'
-       });
- % endif
+  setup_debug('${element_id}',
+    %if edit_link:
+      '${edit_link}',
+    %else:
+      null,
+    %endif
+    {
+        'location': '${location}',
+        'xqa_key': '${xqa_key}',
+        'category': '${category}',
+        'user': '${user}'
+    });
 </script>
