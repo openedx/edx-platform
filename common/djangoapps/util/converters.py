@@ -15,10 +15,13 @@ def jsdate_to_time(field):
     """
     if field is None:
         return field
-    elif isinstance(field, unicode) or isinstance(field, str):  # iso format but ignores time zone assuming it's Z
+    elif isinstance(field, (unicode, str)):
+        # ISO format but ignores time zone assuming it's Z.
         d=datetime.datetime(*map(int, re.split('[^\d]', field)[:6])) # stop after seconds. Debatable  
         return d.utctimetuple()
-    elif isinstance(field, int) or isinstance(field, float):
+    elif isinstance(field, (int, long, float)):
         return time.gmtime(field / 1000)
     elif isinstance(field, time.struct_time):
         return field
+    else:
+        raise ValueError("Couldn't convert %r to time" % field)
