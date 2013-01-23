@@ -613,9 +613,7 @@ class CombinedOpenEndedModule(XModule):
         If this module has no notion of progress, return None.
         '''
         progress_object = None
-        if (self.state == self.DONE or self.allow_reset) and self.is_scored:
-            score_dict = self.get_score()
-            progress_object = Progress(score_dict['score'], score_dict['total'])
+        progress_object = Progress(self.current_task_number, len(self.task_xml))
 
         return progress_object
 
