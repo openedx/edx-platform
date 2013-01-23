@@ -100,12 +100,14 @@ class XmlDescriptor(XModuleDescriptor):
         # VS[compat] Remove once unused.
         'name', 'slug')
 
-    metadata_to_strip = ('data_dir',
-        # information about testcenter exams is a dict (of dicts), not a string, 
-        # so it cannot be easily exportable as a course element's attribute. 
-        'testcenter_info',
-        # VS[compat] -- remove the below attrs once everything is in the CMS
-        'course', 'org', 'url_name', 'filename')
+    metadata_to_strip = ('data_dir', 
+            # cdodge: @TODO: We need to figure out a way to export out 'tabs' and 'grading_policy' which is on the course
+            'tabs', 'grading_policy', 'is_draft', 'published_by', 'published_date', 
+            'discussion_blackouts', 'testcenter_info',
+           # VS[compat] -- remove the below attrs once everything is in the CMS
+           'course', 'org', 'url_name', 'filename')
+
+    metadata_to_export_to_policy = ('discussion_topics')
 
     # A dictionary mapping xml attribute names AttrMaps that describe how
     # to import and export them
@@ -113,10 +115,17 @@ class XmlDescriptor(XModuleDescriptor):
     to_bool = lambda val: val == 'true' or val == True
     from_bool = lambda val: str(val).lower()
     bool_map = AttrMap(to_bool, from_bool)
+
+    to_int = lambda val: int(val)
+    from_int = lambda val: str(val) 
+    int_map = AttrMap(to_int, from_int)
     xml_attribute_map = {
         # type conversion: want True/False in python, "true"/"false" in xml
         'graded': bool_map,
         'hide_progress_tab': bool_map,
+        'allow_anonymous': bool_map,
+        'allow_anonymous_to_peers': bool_map,
+        'weight':int_map
     }
 
 
@@ -364,14 +373,16 @@ class XmlDescriptor(XModuleDescriptor):
         # Add the non-inherited metadata
         for attr in sorted(self.own_metadata):
             # don't want e.g. data_dir
-            if attr not in self.metadata_to_strip:
-                xml_object.set(attr, val_for_xml(attr))
+            if attr not in self.metadata_to_strip and attr not in self.metadata_to_export_to_policy:
+                val = val_for_xml(attr)
+                #logging.debug('location.category = {0}, attr = {1}'.format(self.location.category, attr))
+                xml_object.set(attr, val)
 
         if self.export_to_file():
             # Write the definition to a file
             url_path = name_to_pathname(self.url_name)
             filepath = self.__class__._format_filepath(self.category, url_path)
-            resource_fs.makedir(os.path.dirname(filepath), allow_recreate=True)
+            resource_fs.makedir(os.path.dirname(filepath), recursive=True, allow_recreate=True)
             with resource_fs.open(filepath, 'w') as file:
                 file.write(etree.tostring(xml_object, pretty_print=True, encoding='utf-8'))
 

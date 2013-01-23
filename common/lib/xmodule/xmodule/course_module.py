@@ -1,4 +1,5 @@
 import logging
+from cStringIO import StringIO
 from math import exp, erf
 from lxml import etree
 from path import path  # NOTE (THK): Only used for detecting presence of syllabus
@@ -6,17 +7,32 @@ import requests
 import time
 from datetime import datetime
 
-from xmodule.util.decorators import lazyproperty
-from xmodule.graders import load_grading_policy
 from xmodule.modulestore import Location
 from xmodule.seq_module import SequenceDescriptor, SequenceModule
 from xmodule.timeparse import parse_time, stringify_time
+from xmodule.util.decorators import lazyproperty
+from xmodule.graders import grader_from_conf
+from datetime import datetime
+import json
+import logging
+import requests
+import time
+import copy
+
 
 log = logging.getLogger(__name__)
 
 
+edx_xml_parser = etree.XMLParser(dtd_validation=False, load_dtd=False,
+                                 remove_comments=True, remove_blank_text=True)
+
+_cached_toc = {}
+
+
 class CourseDescriptor(SequenceDescriptor):
     module_class = SequenceModule
+
+    template_dir_name = 'course'
 
     class Textbook:
         def __init__(self, title, book_url):
@@ -45,6 +61,24 @@ class CourseDescriptor(SequenceDescriptor):
             """
             toc_url = self.book_url + 'toc.xml'
 
+            # cdodge: I've added this caching of TOC because in Mongo-backed instances (but not Filesystem stores)
+            # course modules have a very short lifespan and are constantly being created and torn down.
+            # Since this module in the __init__() method does a synchronous call to AWS to get the TOC
+            # this is causing a big performance problem. So let's be a bit smarter about this and cache
+            # each fetch and store in-mem for 10 minutes.
+            # NOTE: I have to get this onto sandbox ASAP as we're having runtime failures. I'd like to swing back and
+            # rewrite to use the traditional Django in-memory cache.
+            try:
+                # see if we already fetched this
+                if toc_url in _cached_toc:
+                    (table_of_contents, timestamp) = _cached_toc[toc_url]
+                    age = datetime.now() - timestamp
+                    # expire every 10 minutes
+                    if age.seconds < 600:
+                        return table_of_contents
+            except Exception as err:
+                pass
+
             # Get the table of contents from S3
             log.info("Retrieving textbook table of contents from %s" % toc_url)
             try:
@@ -57,6 +91,7 @@ class CourseDescriptor(SequenceDescriptor):
             # TOC is XML. Parse it
             try:
                 table_of_contents = etree.fromstring(r.text)
+                _cached_toc[toc_url] = (table_of_contents, datetime.now())
             except Exception as err:
                 msg = 'Error %s: Unable to parse XML for textbook table of contents at %s' % (err, toc_url)
                 log.error(msg)
@@ -66,7 +101,6 @@ class CourseDescriptor(SequenceDescriptor):
 
     def __init__(self, system, definition=None, **kwargs):
         super(CourseDescriptor, self).__init__(system, definition, **kwargs)
-
         self.textbooks = []
         for title, book_url in self.definition['data']['textbooks']:
             try:
@@ -87,16 +121,13 @@ class CourseDescriptor(SequenceDescriptor):
             log.critical(msg)
             system.error_tracker(msg)
 
-        self.enrollment_start = self._try_parse_time("enrollment_start")
-        self.enrollment_end = self._try_parse_time("enrollment_end")
-        self.end = self._try_parse_time("end")
-
         # NOTE: relies on the modulestore to call set_grading_policy() right after
         # init.  (Modulestore is in charge of figuring out where to load the policy from)
 
         # NOTE (THK): This is a last-minute addition for Fall 2012 launch to dynamically
         #   disable the syllabus content for courses that do not provide a syllabus
         self.syllabus_present = self.system.resources_fs.exists(path('syllabus'))
+        self.set_grading_policy(self.definition['data'].get('grading_policy', None))
 
         self.test_center_exams = []
         test_center_info = self.metadata.get('testcenter_info')
@@ -112,18 +143,121 @@ class CourseDescriptor(SequenceDescriptor):
                     log.error(msg)
                     continue
 
+    def defaut_grading_policy(self):
+        """
+        Return a dict which is a copy of the default grading policy
+        """
+        default = {"GRADER" : [
+                {
+                    "type" : "Homework",
+                    "min_count" : 12,
+                    "drop_count" : 2,
+                    "short_label" : "HW",
+                    "weight" : 0.15
+                },
+                {
+                    "type" : "Lab",
+                    "min_count" : 12,
+                    "drop_count" : 2,
+                    "weight" : 0.15
+                },
+                {
+                    "type" : "Midterm Exam",
+                    "short_label" : "Midterm",
+                    "min_count" : 1,
+                    "drop_count" : 0,
+                    "weight" : 0.3
+                },
+                {
+                    "type" : "Final Exam",
+                    "short_label" : "Final",
+                    "min_count" : 1,
+                    "drop_count" : 0,
+                    "weight" : 0.4
+                }
+            ],
+            "GRADE_CUTOFFS" : {
+                "Pass" : 0.5
+            }}
+        return copy.deepcopy(default)
 
-    def set_grading_policy(self, policy_str):
-        """Parse the policy specified in policy_str, and save it"""
+    def set_grading_policy(self, course_policy):
+        """
+        The JSON object can have the keys GRADER and GRADE_CUTOFFS. If either is
+        missing, it reverts to the default.
+        """
+        if course_policy is None:
+            course_policy = {}
+
+        # Load the global settings as a dictionary
+        grading_policy = self.defaut_grading_policy()
+
+        # Override any global settings with the course settings
+        grading_policy.update(course_policy)
+
+        # Here is where we should parse any configurations, so that we can fail early
+        grading_policy['RAW_GRADER'] = grading_policy['GRADER']  # used for cms access
+        grading_policy['GRADER'] = grader_from_conf(grading_policy['GRADER'])
+        self._grading_policy = grading_policy
+
+
+
+    @classmethod
+    def read_grading_policy(cls, paths, system):
+        """Load a grading policy from the specified paths, in order, if it exists."""
+        # Default to a blank policy dict
+        policy_str = '{}'
+
+        for policy_path in paths:
+            if not system.resources_fs.exists(policy_path):
+                continue
+            log.debug("Loading grading policy from {0}".format(policy_path))
+            try:
+                with system.resources_fs.open(policy_path) as grading_policy_file:
+                    policy_str = grading_policy_file.read()
+                    # if we successfully read the file, stop looking at backups
+                    break
+            except (IOError):
+                msg = "Unable to load course settings file from '{0}'".format(policy_path)
+                log.warning(msg)
+
+        return policy_str
+
+    
+    @classmethod
+    def from_xml(cls, xml_data, system, org=None, course=None):
+        instance = super(CourseDescriptor, cls).from_xml(xml_data, system, org, course)
+
+        # bleh, have to parse the XML here to just pull out the url_name attribute
+        # I don't think it's stored anywhere in the instance.
+        course_file = StringIO(xml_data.encode('ascii','ignore'))
+        xml_obj = etree.parse(course_file,parser=edx_xml_parser).getroot()
+
+        policy_dir = None
+        url_name = xml_obj.get('url_name', xml_obj.get('slug'))
+        if url_name:
+            policy_dir = 'policies/' + url_name
+
+        # Try to load grading policy
+        paths = ['grading_policy.json']
+        if policy_dir:
+            paths = [policy_dir + '/grading_policy.json'] + paths
+
         try:
-            self._grading_policy = load_grading_policy(policy_str)
-        except Exception, err:
-            log.exception('Failed to load grading policy:')
-            self.system.error_tracker("Failed to load grading policy")
-            # Setting this to an empty dictionary will lead to errors when
-            # grading needs to happen, but should allow course staff to see
-            # the error log.
-            self._grading_policy = {}
+            policy = json.loads(cls.read_grading_policy(paths, system))
+        except ValueError:
+            system.error_tracker("Unable to decode grading policy as json")
+            policy = None
+        
+        # cdodge: import the grading policy information that is on disk and put into the
+        # descriptor 'definition' bucket as a dictionary so that it is persisted in the DB
+        instance.definition['data']['grading_policy'] = policy
+
+        # now set the current instance. set_grading_policy() will apply some inheritance rules
+        instance.set_grading_policy(policy)
+
+        return instance
+
 
     @classmethod
     def definition_from_xml(cls, xml_object, system):
@@ -160,12 +294,52 @@ class CourseDescriptor(SequenceDescriptor):
         return time.gmtime() > self.start
 
     @property
+    def end(self):
+        return self._try_parse_time("end")
+    @end.setter
+    def end(self, value):
+        if isinstance(value, time.struct_time):
+            self.metadata['end'] = stringify_time(value)
+    @property
+    def enrollment_start(self):
+        return self._try_parse_time("enrollment_start")
+        
+    @enrollment_start.setter
+    def enrollment_start(self, value):
+        if isinstance(value, time.struct_time):
+            self.metadata['enrollment_start'] = stringify_time(value)
+    @property
+    def enrollment_end(self):        
+        return self._try_parse_time("enrollment_end")
+        
+    @enrollment_end.setter
+    def enrollment_end(self, value):
+        if isinstance(value, time.struct_time):
+            self.metadata['enrollment_end'] = stringify_time(value)
+        
+    @property
     def grader(self):
         return self._grading_policy['GRADER']
+    
+    @property
+    def raw_grader(self):
+        return self._grading_policy['RAW_GRADER']
+    
+    @raw_grader.setter
+    def raw_grader(self, value):
+        # NOTE WELL: this change will not update the processed graders. If we need that, this needs to call grader_from_conf
+        self._grading_policy['RAW_GRADER'] = value
+        self.definition['data'].setdefault('grading_policy',{})['GRADER'] = value
 
     @property
     def grade_cutoffs(self):
         return self._grading_policy['GRADE_CUTOFFS']
+    
+    @grade_cutoffs.setter
+    def grade_cutoffs(self, value):
+        self._grading_policy['GRADE_CUTOFFS'] = value
+        self.definition['data'].setdefault('grading_policy',{})['GRADE_CUTOFFS'] = value
+    
 
     @property
     def lowest_passing_grade(self):
@@ -177,6 +351,10 @@ class CourseDescriptor(SequenceDescriptor):
         Return the tabs config, as a python object, or None if not specified.
         """
         return self.metadata.get('tabs')
+
+    @tabs.setter
+    def tabs(self, value):
+        self.metadata['tabs'] = value
 
     @property
     def show_calculator(self):
@@ -502,3 +680,4 @@ class CourseDescriptor(SequenceDescriptor):
     @property
     def org(self):
         return self.location.org
+

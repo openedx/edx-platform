@@ -36,8 +36,7 @@ def yield_dynamic_descriptor_descendents(descriptor, module_creator):
     def get_dynamic_descriptor_children(descriptor):
         if descriptor.has_dynamic_children():
             module = module_creator(descriptor)
-            child_locations = module.get_children_locations()
-            return [descriptor.system.load_item(child_location) for child_location in child_locations ]
+            return module.get_child_descriptors()
         else:
             return descriptor.get_children()
     
@@ -291,7 +290,7 @@ def progress_summary(student, request, course, student_module_cache):
             graded = section_module.metadata.get('graded', False)
             scores = []
             
-            module_creator = lambda descriptor : section_module.system.get_module(descriptor.location)
+            module_creator = section_module.system.get_module
             
             for module_descriptor in yield_dynamic_descriptor_descendents(section_module.descriptor, module_creator):
                 

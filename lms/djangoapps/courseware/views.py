@@ -21,7 +21,7 @@ from courseware.courses import (get_courses, get_course_with_access,
                                 get_courses_by_university, sort_by_announcement)
 import courseware.tabs as tabs
 from courseware.models import StudentModuleCache
-from module_render import toc_for_course, get_module, get_instance_module
+from module_render import toc_for_course, get_module, get_instance_module, get_module_for_descriptor
 
 from django_comment_client.utils import get_discussion_title
 
@@ -178,7 +178,7 @@ def index(request, course_id, chapter=None, section=None,
 
      - HTTPresponse
     """
-    course = get_course_with_access(request.user, course_id, 'load')
+    course = get_course_with_access(request.user, course_id, 'load', depth=2)
     staff_access = has_access(request.user, course, 'staff')
     registered = registered_for_course(course, request.user)
     if not registered:
@@ -193,7 +193,8 @@ def index(request, course_id, chapter=None, section=None,
         # Has this student been in this course before?
         first_time = student_module_cache.lookup(course_id, 'course', course.location.url()) is None
 
-        course_module = get_module(request.user, request, course.location, student_module_cache, course.id)
+        # Load the module for the course
+        course_module = get_module_for_descriptor(request.user, request, course, student_module_cache, course.id)
         if course_module is None:
             log.warning('If you see this, something went wrong: if we got this'
                         ' far, should have gotten a course module for this user')
@@ -213,30 +214,28 @@ def index(request, course_id, chapter=None, section=None,
             'xqa_server': settings.MITX_FEATURES.get('USE_XQA_SERVER','http://xqa:server@content-qa.mitx.mit.edu/xqa')
             }
 
-        chapter_descriptor = course.get_child_by_url_name(chapter)
+        chapter_descriptor = course.get_child_by(lambda m: m.url_name == chapter)
         if chapter_descriptor is not None:
             instance_module = get_instance_module(course_id, request.user, course_module, student_module_cache)
             save_child_position(course_module, chapter, instance_module)
         else:
             raise Http404
 
-        chapter_module = get_module(request.user, request, chapter_descriptor.location,
-                                    student_module_cache, course_id)
+        chapter_module = course_module.get_child_by(lambda m: m.url_name == chapter)
         if chapter_module is None:
             # User may be trying to access a chapter that isn't live yet
             raise Http404
 
         if section is not None:
-            section_descriptor = chapter_descriptor.get_child_by_url_name(section)
+            section_descriptor = chapter_descriptor.get_child_by(lambda m: m.url_name == section)
             if section_descriptor is None:
                 # Specifically asked-for section doesn't exist
                 raise Http404
 
-            section_student_module_cache = StudentModuleCache.cache_for_descriptor_descendents(
-                course_id, request.user, section_descriptor)
-            section_module = get_module(request.user, request,
-                                section_descriptor.location,
-                                section_student_module_cache, course_id, position)
+            # Load all descendents of the section, because we're going to display it's
+            # html, which in general will need all of its children
+            section_module = get_module(request.user, request, section_descriptor.location,
+                                        student_module_cache, course.id, depth=None)
             if section_module is None:
                 # User may be trying to be clever and access something
                 # they don't have access to.
@@ -340,8 +339,8 @@ def course_info(request, course_id):
     course = get_course_with_access(request.user, course_id, 'load')
     staff_access = has_access(request.user, course, 'staff')
 
-    return render_to_response('courseware/info.html', {'course': course,
-                                            'staff_access': staff_access,})
+    return render_to_response('courseware/info.html', {'request' : request, 'course_id' : course_id, 'cache' : None, 
+            'course': course, 'staff_access': staff_access})
 
 @ensure_csrf_cookie
 def static_tab(request, course_id, tab_slug):
@@ -356,7 +355,7 @@ def static_tab(request, course_id, tab_slug):
     if tab is None:
         raise Http404
 
-    contents = tabs.get_static_tab_contents(course, tab)
+    contents = tabs.get_static_tab_contents(request, None, course, tab)
     if contents is None:
         raise Http404
 
@@ -429,7 +428,7 @@ def university_profile(request, org_id):
     Return the profile for the particular org_id.  404 if it's not valid.
     """
     all_courses = modulestore().get_courses()
-    valid_org_ids = set(c.org for c in all_courses)
+    valid_org_ids = set(c.org for c in all_courses).union(settings.VIRTUAL_UNIVERSITIES)
     if org_id not in valid_org_ids:
         raise Http404("University Profile not found for {0}".format(org_id))
 

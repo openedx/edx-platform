@@ -1,0 +1,109 @@
+body.no-header {
+	.primary-header {
+		display: none;
+	}
+}
+
+@mixin active {
+	@include linear-gradient(top, rgba(255, 255, 255, .4), rgba(255, 255, 255, 0));
+	background-color: rgba(255, 255, 255, .3);
+	@include box-shadow(0 -1px 0 rgba(0, 0, 0, .2) inset, 0 1px 0 #fff inset);
+	text-shadow: 0 1px 0 rgba(255, 255, 255, 0.5);
+}
+
+.primary-header {
+	width: 100%;
+	margin-bottom: 30px;
+
+	&.active-tab-courseware #courseware-tab {
+		@include active;
+	}
+
+	&.active-tab-assets #assets-tab {
+		@include active;
+	}
+	
+	&.active-tab-pages #pages-tab {
+		@include active;
+	}
+
+	&.active-tab-users #users-tab {
+		@include active;
+	}
+
+	&.active-tab-settings #settings-tab {
+		@include active;
+	}
+
+	&.active-tab-import #import-tab {
+		@include active;
+	}
+
+	&.active-tab-export #export-tab {
+		@include active;
+	}
+
+	.drop-icon {
+		margin-left: 5px;
+		font-size: 11px;
+	}
+
+	.settings-icon {
+		font-size: 18px;
+		line-height: 18px;
+	}
+
+	.class-nav-bar {
+		clear: both;
+		@include linear-gradient(top, rgba(255, 255, 255, .4), rgba(255, 255, 255, 0));
+		background-color: $lightBluishGrey;
+		@include box-shadow(0 1px 0 rgba(255, 255, 255, 0.2) inset, 0 -1px 0 rgba(0, 0, 0, 0.2) inset);
+	}
+
+	.class-nav {
+		@include clearfix;		
+
+		a {
+			float: left;
+			display: inline-block;
+			padding: 15px 25px 17px;
+			font-size: 15px;
+			color: #3c3c3c;
+			text-shadow: 0 1px 0 rgba(255, 255, 255, 0.3);
+
+			&:hover {
+				@include linear-gradient(top, rgba(255, 255, 255, .2), rgba(255, 255, 255, 0));
+			}
+		}
+
+		li {
+			float: left;
+		}
+	}
+
+	.class {
+		@include clearfix;
+		height: 100%;
+		font-size: 12px;
+		color: rgb(163, 171, 184);
+		@include linear-gradient(top, rgba(255, 255, 255, 0), rgba(255, 255, 255, .1));
+		background-color: rgb(47, 53, 63);
+
+		a {
+			display: inline-block;
+			height: 20px;
+			padding: 5px 10px 6px;
+			color: rgb(163, 171, 184);			
+		}
+
+		.home {
+			position: relative;
+			top: 1px;
+		}
+
+		.log-out {
+			position: relative;
+			top: 3px;
+		}
+	}
+}

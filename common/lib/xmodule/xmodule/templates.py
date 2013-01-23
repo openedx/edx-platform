@@ -65,8 +65,15 @@ def update_templates():
             template_location = Location('i4x', 'edx', 'templates', category, Location.clean_for_url_name(template.metadata['display_name']))
 
             try:
-                json_data = template._asdict()
+                json_data = {
+                    'definition': {
+                        'data': template.data,
+                        'children': template.children
+                    },
+                    'metadata': template.metadata
+                }
                 json_data['location'] = template_location.dict()
+
                 XModuleDescriptor.load_from_json(json_data, TemplateTestSystem())
             except:
                 log.warning('Unable to instantiate {cat} from template {template}, skipping'.format(
@@ -75,6 +82,6 @@ def update_templates():
                 ), exc_info=True)
                 continue
 
-            modulestore().update_item(template_location, template.data)
-            modulestore().update_children(template_location, template.children)
-            modulestore().update_metadata(template_location, template.metadata)
+            modulestore('direct').update_item(template_location, template.data)
+            modulestore('direct').update_children(template_location, template.children)
+            modulestore('direct').update_metadata(template_location, template.metadata)
