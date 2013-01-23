@@ -192,7 +192,7 @@ class XQueueCertInterface(object):
         Will change the certificate status to 'deleting'.
 
         Certificate must be in the 'unavailable', 'error',
-        or 'deleted' state.
+        'deleted' or 'generating' state.
 
         If a student has a passing grade a request will made
         for a new cert
@@ -204,7 +204,8 @@ class XQueueCertInterface(object):
 
         """
 
-        VALID_STATUSES = [status.unavailable, status.deleted, status.error,
+        VALID_STATUSES = [ status.generating,
+                status.unavailable, status.deleted, status.error,
                 status.notpassing]
 
         cert_status = certificate_status_for_student(
