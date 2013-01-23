@@ -141,7 +141,7 @@ def _combined_open_ended_grading(tab, user, course, active_page):
         pending_grading = notifications['pending_grading']
         img_path = notifications['img_path']
 
-        tab = [CourseTab(tab_name, link, active_page == "controller_query", pending_grading, img_path)]
+        tab = [CourseTab(tab_name, link, active_page == "open_ended", pending_grading, img_path)]
         return tab
     return []
 
