@@ -274,15 +274,6 @@ function expandSection(event) {
 	$(event.delegateTarget).find('.expand-collapse-icon').removeClass('expand').addClass('collapse');
 }
 
-function checkDropValidity(event, ui) {
-	var posInDestination = ui.item.position().top - $(event.target).position().top;
-	if (posInDestination <= -ui.item.height() || posInDestination >= $(event.target).height()) {
-		$(event.target).sortable("cancel");
-		return false;
-	}
-	return true;
-}
-
 function onUnitReordered(event, ui) {
 	// a unit's been dropped on this subsection,
 	//       figure out where it came from and where it slots in. 
