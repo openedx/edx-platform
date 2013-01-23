@@ -38,6 +38,8 @@ MAX_SCORE = 1
 #The highest score allowed for the overall xmodule and for each rubric point
 MAX_SCORE_ALLOWED = 3
 
+IS_SCORED=False
+
 class CombinedOpenEndedModule(XModule):
     """
     This is a module that encapsulates all open ended grading (self assessment, peer assessment, etc).
@@ -138,6 +140,9 @@ class CombinedOpenEndedModule(XModule):
         #Allow reset is true if student has failed the criteria to move to the next child task
         self.allow_reset = instance_state.get('ready_to_reset', False)
         self.max_attempts = int(self.metadata.get('attempts', MAX_ATTEMPTS))
+        self.is_scored = (self.metadata.get('is_graded', IS_SCORED)=="True")
+
+        log.debug(self.metadata.get('is_graded', IS_SCORED))
 
         # Used for progress / grading.  Currently get credit just for
         # completion (doesn't matter if you self-assessed correct/incorrect).
@@ -281,7 +286,6 @@ class CombinedOpenEndedModule(XModule):
                 self.current_task_parsed_xml, self.current_task_descriptor, self.static_data,
                 instance_state=current_task_state)
 
-        log.debug(current_task_state)
         return True
 
     def check_allow_reset(self):
@@ -562,6 +566,38 @@ class CombinedOpenEndedModule(XModule):
         status_html = self.system.render_template("combined_open_ended_status.html", context)
 
         return status_html
+
+    def get_score(self):
+        """
+        Score the student received on the problem, or None if there is no
+        score.
+
+        Returns:
+          dictionary
+             {'score': integer, from 0 to get_max_score(),
+              'total': get_max_score()}
+        """
+        max_score = None
+        if (self.state == self.DONE or self.allow_reset) and self.is_scored:
+            last_response = self.get_last_response(self.current_task_number -1)
+            max_score = last_response['max_score']
+            score = last_response['score']
+        return {
+            'score' : score,
+            'total' : max_score,
+                }
+
+    def max_score(self):
+        ''' Maximum score. Two notes:
+
+            * This is generic; in abstract, a problem could be 3/5 points on one
+              randomization, and 5/7 on another
+        '''
+        max_score = None
+        if (self.state == self.DONE or self.allow_reset) and self.is_scored:
+            last_response = self.get_last_response(self.current_task_number -1)
+            max_score = last_response['max_score']
+        return max_score
 
 
 class CombinedOpenEndedDescriptor(XmlDescriptor, EditingDescriptor):
