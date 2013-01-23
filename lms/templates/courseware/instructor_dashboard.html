@@ -348,7 +348,7 @@ function goto( mode)
      Number of students enrolled:
      % if students_enrolled_json is not None:
      % if students_enrolled_json['status'] == 'success':
-     ${students_enrolled_json['data']['value']}
+     ${students_enrolled_json['data']['value']} as of ${students_enrolled_json['time']}
      % else:
      <i> ${students_enrolled_json['error']} </i>
      % endif
@@ -361,7 +361,7 @@ function goto( mode)
      Number of active students for the past 7 days: 
      % if students_active_json is not None:
      % if students_active_json['status'] == 'success':
-     ${students_active_json['data']['value']}
+     ${students_active_json['data']['value']} as of ${students_active_json['time']}
      % else:
      <i> ${students_active_json['error']} </i>
      % endif
@@ -400,7 +400,7 @@ function goto( mode)
 </div>
 
    <p>
-     <p>Number of active students per problems who have this problem graded as correct:</p>
+     <p>Number of students per problem who have this problem graded as correct, as of ${students_per_problem_correct_json['time']}</p>
 
      % if students_per_problem_correct_json is not None:
      % if students_per_problem_correct_json['status'] == 'success':
@@ -420,28 +420,30 @@ function goto( mode)
      % endif
    </p>
 
-##   <p>
-##     <p>Students who attempted at least one exercise:</p>
-##
-##     % if attempted_problems is not None:
-##     % if attempted_problems['status'] == 'success':
-##     <div class="divScroll">
-##     <table class="stat_table">
-##     <tr><th>Module</th><th>Number of students</th></tr>
-##     % for k,v in attempted_problems['data'].items():
-##     <tr> <td>${k}</td> <td>${v}</td> </tr>
-##     % endfor
-##     </table>
-##     </div>
-##     % else:
-##     <i> ${attempted_problems['error']}</i>
-##     % endif
-##     % else:
-##     <i> null data </i>
-##     % endif
-##   </p>
-##
-##   <p>
+   <p>
+     Students per module who attempted at least one problem
+
+     % if attempted_problems is not None:
+     , as of ${attempted_problems['time']}
+     % if attempted_problems['status'] == 'success':
+     <div class="divScroll">
+     <table class="stat_table">
+     <tr><th>Module</th><th>Number of students</th></tr>
+     % for k,v in attempted_problems['data'].items():
+     <tr> <td>${k}</td> <td>${v}</td> </tr>
+     % endfor
+     </table>
+     </div>
+     % else:
+     <i> ${attempted_problems['error']}</i>
+     % endif
+     % else:
+     <i>: null data </i>
+     % endif
+
+     </p>
+   <p>
+
 ##     <p>Number of students who dropped off per day before becoming inactive:</p>
 ##
 ##     % if dropoff_per_day is not None:
