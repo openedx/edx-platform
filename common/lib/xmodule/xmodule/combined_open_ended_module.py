@@ -578,14 +578,19 @@ class CombinedOpenEndedModule(XModule):
               'total': get_max_score()}
         """
         max_score = None
+        score = None
         if (self.state == self.DONE or self.allow_reset) and self.is_scored:
-            last_response = self.get_last_response(self.current_task_number -1)
+            last_response = self.get_last_response(self.current_task_number)
             max_score = last_response['max_score']
             score = last_response['score']
-        return {
+            log.debug(last_response)
+
+        score_dict = {
             'score' : score,
             'total' : max_score,
-                }
+            }
+
+        return score_dict
 
     def max_score(self):
         ''' Maximum score. Two notes:
@@ -595,9 +600,24 @@ class CombinedOpenEndedModule(XModule):
         '''
         max_score = None
         if (self.state == self.DONE or self.allow_reset) and self.is_scored:
-            last_response = self.get_last_response(self.current_task_number -1)
+            last_response = self.get_last_response(self.current_task_number)
             max_score = last_response['max_score']
         return max_score
+
+    def get_progress(self):
+        ''' Return a progress.Progress object that represents how far the
+        student has gone in this module.  Must be implemented to get correct
+        progress tracking behavior in nesting modules like sequence and
+        vertical.
+
+        If this module has no notion of progress, return None.
+        '''
+        progress_object = None
+        if (self.state == self.DONE or self.allow_reset) and self.is_scored:
+            score_dict = self.get_score()
+            progress_object = Progress(score_dict['score'], score_dict['total'])
+
+        return progress_object
 
 
 class CombinedOpenEndedDescriptor(XmlDescriptor, EditingDescriptor):
