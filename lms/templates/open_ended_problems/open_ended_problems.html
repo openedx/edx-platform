@@ -23,13 +23,26 @@
             You have not attempted any open ended problems yet.
         </div>
         %else:
-        <ul class="problem-list">
+        <table class="problem-list">
+            <tr>
+                <th>Problem Name</th>
+                <th>Status</th>
+                <th>Grader Type</th>
+            </tr>
             %for problem in problem_list:
-            <li>
-                <a href="${problem['actual_url']}">${problem['problem_name']} (${problem['state']} , ${problem['grader_type']} )</a>
-            </li>
+            <tr>
+                <td>
+                    <a href="${problem['actual_url']}">${problem['problem_name']}</a> 
+                </td>
+                <td>
+                    ${problem['state']} 
+                </td>
+                <td> 
+                    ${problem['grader_type']}
+                </td>
+            </tr>
             %endfor
-        </ul>
+        </table>
         %endif
         %endif
     </div>

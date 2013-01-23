@@ -1,0 +1,17 @@
+.open-ended-problems,
+.combined-notifications
+{
+    padding: 40px;
+    .problem-list
+    {
+        table-layout: auto;
+        margin-top: 10px;
+        width:70%;
+        text-align: center;
+        td, th
+        {
+            padding: 7px;
+        }
+    }
+
+}
