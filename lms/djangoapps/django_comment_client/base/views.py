@@ -21,6 +21,7 @@ from django.contrib.auth.models import User
 
 from mitxmako.shortcuts import render_to_response, render_to_string
 from courseware.courses import get_course_with_access
+from courseware.courses import get_cohort_id
 
 from django_comment_client.utils import JsonResponse, JsonError, extract, get_courseware_context
 
@@ -83,6 +84,24 @@ def create_thread(request, course_id, commentable_id):
         'course_id'          : course_id,
         'user_id'            : request.user.id,
     })
+    
+    #now cohort id
+    #if the group id came in from the form, set it there, otherwise, 
+    #see if the user and the commentable are cohorted
+    print post
+    
+    group_id = None
+    
+    if 'group_id' in post:
+      group_id = post['group_id']
+    
+    
+    if group_id is None:
+      group_id = get_cohort_id(request.user, course_id)
+
+    if group_id is not None:
+      thread.update_attributes(**{'group_id' :group_id})
+
     thread.save()
     if post.get('auto_subscribe', 'false').lower() == 'true':
         user = cc.User.from_django_user(request.user)

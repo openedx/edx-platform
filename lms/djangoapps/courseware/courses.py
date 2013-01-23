@@ -72,6 +72,7 @@ def get_cohort_id(user, course_id):
     and if the course is not cohorted or the user is an instructor, return None
     
     """
+    return 101
     
 def is_commentable_cohorted(course_id,commentable_id):
     """

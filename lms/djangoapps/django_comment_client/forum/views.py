@@ -11,6 +11,7 @@ from django.contrib.auth.models import User
 
 from mitxmako.shortcuts import render_to_response, render_to_string
 from courseware.courses import get_course_with_access
+from courseware.courses import get_cohort_id
 from courseware.access import has_access
 
 from urllib import urlencode
@@ -58,6 +59,12 @@ def get_threads(request, course_id, discussion_id=None, per_page=THREADS_PER_PAG
         user.default_sort_key = request.GET.get('sort_key')
         user.save()
 
+        
+    #if the course-user is cohorted, then add the group id
+    group_id = get_cohort_id(user,course_id);
+    if group_id:
+      default_query_params["group_id"] = group_id; 
+        
     query_params = merge_dict(default_query_params,
                               strip_none(extract(request.GET, ['page', 'sort_key', 'sort_order', 'text', 'tags', 'commentable_ids'])))
 
