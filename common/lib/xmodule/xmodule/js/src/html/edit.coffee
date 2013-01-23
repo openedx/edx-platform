@@ -54,6 +54,9 @@ class @HTMLEditingDescriptor
       image : '/static/images/ico-tinymce-code.png',
       onclick : () ->
         ed.formatter.toggle('code')
+        # Without this, the dirty flag does not get set unless the user also types in text.
+        # Visual Editor must be marked as dirty or else we won't populate the Advanced Editor from it.
+        ed.isNotDirty = false
     })
 
     ed.onNodeChange.add((editor, command, e) ->
