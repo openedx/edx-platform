@@ -106,6 +106,17 @@
         margin-top: $baseline;
         font-size: em(14);
         text-align: right;
+
+        .action {
+          @include button(simple, $m-gray-l);
+          @include box-sizing(border-box);
+          @include border-radius(3px);
+          padding: ($baseline/4) ($baseline/2);
+          font-size: em(16);
+          font-weight: 700;
+          letter-spacing: 0;
+          text-align: center;
+        }
       }  
     }
   }
@@ -351,7 +362,7 @@
 
     .action-primary {
       float: left;
-      width: flex-grid(5,8);
+      width: flex-grid(8,8);
       margin-right: flex-gutter(0);
     }
 
@@ -410,10 +421,6 @@
 
 // login
 .view-login {
-
-  .nav-courseware .cta-login {
-    display: none;
-  }
 
   .group-form-accountpreferences {
     padding-top: 0;

@@ -278,6 +278,14 @@ header.global {
           color: $m-blue-s;
         }
       }
+
+      &.active {
+
+        a {
+          text-decoration: none;
+          color: $m-blue-s;
+        }
+      }
     }
 
     // logged in
@@ -315,5 +323,20 @@ header.global {
     &.authenticated {
 
     }
+  }
+
+
+// =====
+
+// page-based nav states
+  .view-howitworks .nav-global-01, 
+  .view-courses .nav-global-02, 
+  .view-schools .nav-global-03, 
+  .view-register .nav-global-04 {
+
+    a {
+      text-decoration: none;
+      color: $m-blue-s !important;
+    } 
   }
 }

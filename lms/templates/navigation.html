@@ -46,11 +46,8 @@ site_status_msg = get_site_status_msg(course_id)
 
     % if user.is_authenticated():
     <ol class="left nav-global authenticated">
-      <li class="nav-global-02">
-        <a href="${reverse('courses')}">Courses</a>
-      </li>
-      <li class="nav-global-03">
-        <a href="#">Schools</a>
+      <li class="nav-global-01">
+        <a href="${reverse('courses')}">Find Courses</a>
       </li>
     </ol>
 
@@ -91,7 +88,7 @@ site_status_msg = get_site_status_msg(course_id)
     <ol class="right nav-courseware">
     <li class="nav-courseware-01">
       % if not settings.MITX_FEATURES['DISABLE_LOGIN_BUTTON']:
-      <a class="cta cta-login" href="#">Courseware</a>
+      <a class="cta cta-login" href="#">Login</a>
       % endif
     </li>
     </ol>

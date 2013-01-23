@@ -70,11 +70,11 @@
         <ol class="list-input">
           <li class="field required text" id="field-email">
             <label for="email">E-mail</label>
-            <input class="" id="email" type="email" name="email" value="" placeholder="eg. example@edx.org" />              
+            <input class="" id="email" type="email" name="email" value="" placeholder="example: username@domain.com" />              
           </li>
           <li class="field required password" id="field-password">
             <label for="password">Password</label>
-            <input id="password" type="password" name="password" value="" placeholder="*****" />
+            <input id="password" type="password" name="password" value="" />
             <span class="tip tip-input">
               <a href="#forgot-password-modal" rel="leanModal" class="pwd-reset action action-forgotpw">Forgot password?</a>
             </span>
@@ -94,12 +94,7 @@
       </fieldset>
 
       <div class="form-actions">
-        <button name="submit" type="submit" id="submit" class="action action-primary action-update">Access My Courses</button>
-        % if has_extauth_info is UNDEFINED:
-        <span class="wrapper wrapper-action action-secondary">
-          <a href="#" class="action action-register">Not enrolled? Register</a>
-        </span>
-        % endif
+        <button name="submit" type="submit" id="submit" class="action action-primary action-update">Log into My edX Account &amp; Access My Courses</button>
       </div>
     </form>
   </section>
@@ -119,7 +114,7 @@
 
     <div class="cta cta-help">
       <h3>Need Help?</h3>
-      <p>Looking for help in logging in or with your edX account? <a href="#">View our help section for contact information and answers to commonly asked questions</a></p>
+      <p>Looking for help in logging in or with your edX account? <a href="#">View our help section for answers to commonly asked questions</a></p>
     </div>
   </aside>
 </section>

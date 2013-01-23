@@ -91,21 +91,21 @@
         <ol class="list-input">
           <li class="field required text" id="field-email">
             <label for="email">E-mail</label>
-            <input class="" id="email" type="email" name="email" value="" placeholder="eg. example@edx.org" />              
+            <input class="" id="email" type="email" name="email" value="" placeholder="example: username@domain.com" />              
           </li>
           <li class="field required password" id="field-password">
             <label for="password">Password</label>
-            <input id="password" type="password" name="password" value="" placeholder="*****" />
+            <input id="password" type="password" name="password" value="" />
           </li>
           <li class="field required text" id="field-username">
             <label for="username">Public Username</label>
-            <input id="username" type="text" name="username" value="" placeholder="e.g. JaneDoe314159" />
+            <input id="username" type="text" name="username" value="" placeholder="example: JaneDoe" />
             <span class="tip tip-input">Will be shown in any discussions or forums you participate in</span>
           </li>
           <li class="field required text" id="field-name">
             <label for="name">Full Name</label>
-            <input id="name" type="text" name="name" value="" placeholder="e.g. Jane Doe" />
-            <span class="tip tip-input">Needed for any certificates you may earn</span>
+            <input id="name" type="text" name="name" value="" placeholder="example: Jane Doe" />
+            <span class="tip tip-input">Needed for any certificates you may earn <strong>(cannot be changed later)</strong></span>
           </li>
         </ol>
 
@@ -119,7 +119,7 @@
         <ol class="list-input">
           <li class="field required text" id="field-username">
             <label for="username">Public Username</label>
-            <input id="username" type="text" name="username" value="${extauth_username}" placeholder="e.g. JaneDoe314159" />
+            <input id="username" type="text" name="username" value="${extauth_username}" placeholder="example: JaneDoe" />
             <span class="tip tip-input">Will be shown in any discussions or forums you participate in</span>
           </li>
         </ol>
@@ -175,7 +175,7 @@
           </li>
 
           <li class="field text" id="field-goals">
-            <label for="goals">Do you have any goals in signing up for edX?</label>
+            <label for="goals">Please share with us any goals you may have in signing up for edX?</label>
             <textarea id="goals" name="goals" value=""></textarea>
           </li>
         </ol>
@@ -186,9 +186,14 @@
 
         <ol class="list-input">
           <li class="field-group">
-            <div class="field required checkbox" id="field-toshonorcode">
-              <input id="toshonorcode-yes" type="checkbox" name="terms_of_service_honor_code" value="true" />
-              <label for="toshonorcode-yes">I agree to the <a href="${reverse('tos')}" class="new-vp">Terms of Service</a> and <a href="${reverse('honor')}" class="new-vp">Honor Code</a></label>
+            <div class="field required checkbox" id="field-tos">
+              <input id="tos-yes" type="checkbox" name="terms_of_service" value="true" />
+              <label for="tos-yes">I agree to the <a href="${reverse('tos')}" class="new-vp">Terms of Service</a></label>
+            </div>
+
+            <div class="field required checkbox" id="field-honorcode">
+              <input id="honorcode-yes" type="checkbox" name="honor_code" value="true" />
+              <label for="honorcode-yes">I agree to the <a href="${reverse('honor')}" class="new-vp">Honor Code</a></label>
             </div>
           </li>
         </ol>
@@ -196,11 +201,6 @@
 
       <div class="form-actions">
         <button name="submit" type="submit" id="submit" class="action action-primary action-update">Register &amp; Create My Account</button>
-        % if has_extauth_info is UNDEFINED:
-        <span class="wrapper wrapper-action action-secondary">
-          <a href="${reverse('login')}" class="action action-login">Already have an account? Login</a>
-        </span>
-        % endif
       </div>
     </form>
   </section>
@@ -210,9 +210,19 @@
       <h3 class="is-hidden">Registration Help</h3>
     </header>
 
+    <div class="cta cta-welcome">
+      <h3>Welcome to edX</h3>
+      <p>Lorem ipsum dolor sit amet, consectetuer adipiscing elit. Aenean commodo ligula eget dolor. Aenean massa. Cum sociis natoque penatibus et magnis dis parturient montes, nascetur ridiculus mus. Donec quam felis, ultricies nec, pellentesque eu, pretium quis. [Matt to provide copy]</p>
+    </div>
+
+    <div class="cta cta-welcome">
+      <h3>What an edX Account Means</h3>
+      <p>Lorem ipsum dolor sit amet, consectetuer adipiscing elit. Aenean commodo ligula eget dolor. Aenean massa. Cum sociis natoque penatibus et magnis dis parturient montes, nascetur ridiculus mus. Donec quam felis, ultricies nec, pellentesque eu, pretium quis. [Matt to provide copy]</p>
+    </div>
+
     <div class="cta cta-help">
       <h3>Need Help?</h3>
-      <p>Looking for help in registering with edX? View our <a href="#">help section for contact information and answers to commonly asked questions</a></p>
+      <p>Looking for help in registering with edX? View our <a href="#">help section for answers to commonly asked questions</a></p>
     </div>
   </aside>
 </section>
