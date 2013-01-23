@@ -95,8 +95,18 @@ $(document).ready(function() {
     $('.id-holder').draggable({
     	axis: 'y',
     	handle: '.section-item .drag-handle',
+    	stack: '.id-holder',
     	revert: "invalid"
     });
+    
+    // Section reordering
+    $('.courseware-section').draggable({
+    	axis: 'y',
+    	handle: 'header .drag-handle',
+    	stack: '.courseware-section',
+    	revert: "invalid"
+    });
+    
     
     $('.sortable-unit-list').droppable({
     	accept : '.unit',
@@ -111,11 +121,10 @@ $(document).ready(function() {
     });
     
     // Section reordering
-    $('.courseware-overview').sortable({
-        axis: 'y',
-        handle: 'header .drag-handle',
-        update: onSectionReordered,
-        revert: true
+    $('.courseware-overview').droppable({
+    	accept : '.courseware-section',
+    	drop: onSectionReordered,
+    	greedy: true
     });
 
     $('.new-course-button').bind('click', addNewCourse);
@@ -274,13 +283,29 @@ function checkDropValidity(event, ui) {
 function onUnitReordered(event, ui) {
 	// a unit's been dropped on this subsection,
 	//       figure out where it came from and where it slots in. 
-	var subsection_id = $(event.target).data('subsection-id');
-    var _els = $(event.target).children('li:.leaf');
+	_handleReorder(event, ui, 'subsection-id', 'li:.leaf');
+}
+
+function onSubsectionReordered(event, ui) {
+	// a subsection has been dropped on this section,
+	//       figure out where it came from and where it slots in. 
+	_handleReorder(event, ui, 'section-id', 'li:.branch');
+}
+
+function onSectionReordered(event, ui) {
+	// a section moved w/in the overall (cannot change course via this, so no parentage change possible, just order)
+	_handleReorder(event, ui, 'course-id', '.courseware-section');
+}
+
+function _handleReorder(event, ui, parentIdField, childrenSelector) {
+	//       figure out where it came from and where it slots in. 
+	var subsection_id = $(event.target).data(parentIdField);
+    var _els = $(event.target).children(childrenSelector);
     var children = _els.map(function(idx, el) { return $(el).data('id'); }).get();
     // if new to this parent, figure out which parent to remove it from and do so
     if (!_.contains(children, ui.draggable.data('id'))) {
     	var old_parent = ui.draggable.parent();
-    	var old_children = old_parent.children('li:.leaf').map(function(idx, el) { return $(el).data('id'); }).get();
+    	var old_children = old_parent.children(childrenSelector).map(function(idx, el) { return $(el).data('id'); }).get();
     	old_children = _.without(old_children, ui.draggable.data('id'));
 		// call into server to commit the new order
 		$.ajax({
@@ -288,7 +313,7 @@ function onUnitReordered(event, ui) {
 			type: "POST",
 			dataType: "json",
 			contentType: "application/json",
-			data:JSON.stringify({ 'id' : old_parent.data('subsection-id'), 'children' : old_children})
+			data:JSON.stringify({ 'id' : old_parent.data(parentIdField), 'children' : old_children})
 		});
 		//
     }
@@ -299,10 +324,10 @@ function onUnitReordered(event, ui) {
     }
     // add to this parent (figure out where)
     for (var i = 0; i < _els.length; i++) {
-    	if (ui.offset.top < $(_els[i]).offset().top) {
+    	if (!ui.draggable.is(_els[i]) && ui.offset.top < $(_els[i]).offset().top) {
     		// insert at i in children and _els
     		ui.draggable.insertBefore($(_els[i]));
-    		// TODO figure out correct way to have it format (and again below)
+    		// TODO figure out correct way to have it format (and similar line below)
     		ui.draggable.attr("style", "position:relative;");
     		children.splice(i, 0, ui.draggable.data('id'));
     		break;
@@ -322,54 +347,6 @@ function onUnitReordered(event, ui) {
 		data:JSON.stringify({ 'id' : subsection_id, 'children' : children})
 	});
     
-}
-
-function onSubsectionReordered(event, ui) {
-	// dropped object may be either unit or subsection!
-	
-	// see onUnitReordered for  pattern and comments
-    var section_id = $(event.target).data('section-id');
-    var _els = $(event.target).children('li:.branch');
-    var children = _els.map(function(idx, el) { return $(el).data('id'); }).get();
-    // if it believes the element belongs in this section, check that it was dropped w/in the bounds
-    if (_.contains(children, ui.item.data('id'))) {
-    	if (checkDropValidity(event, ui)) {
-    		// call into server to commit the new order
-    		$.ajax({
-    			url: "/save_item",
-    			type: "POST",
-    			dataType: "json",
-    			contentType: "application/json",
-    			data:JSON.stringify({ 'id' : section_id, 'children' : children})
-    		});
-    	}
-    }
-    else {
-    	// call into server to commit the new order
-    	$.ajax({
-    		url: "/save_item",
-    		type: "POST",
-    		dataType: "json",
-    		contentType: "application/json",
-    		data:JSON.stringify({ 'id' : section_id, 'children' : children})
-    	});
-    }
-}
-
-function onSectionReordered() {
-    var course_id = $(event.target).data('course-id');
-
-    var _els = $(event.target).children('section:.branch');
-    var children = _els.map(function(idx, el) { return $(el).data('id'); }).get();
-
-    // call into server to commit the new order
-    $.ajax({
-        url: "/save_item",
-        type: "POST",
-        dataType: "json",
-        contentType: "application/json",
-        data:JSON.stringify({ 'id' : course_id, 'children' : children})
-    });
 }
 
 function getEdxTimeFromDateTimeVals(date_val, time_val, format) {
