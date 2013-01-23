@@ -21,7 +21,7 @@ from django.contrib.auth.models import User
 
 from mitxmako.shortcuts import render_to_response, render_to_string
 from courseware.courses import get_course_with_access
-from courseware.courses import get_cohort_id,is_commentable_cohorted
+from course_groups.cohorts import get_cohort_id, is_commentable_cohorted
 
 from django_comment_client.utils import JsonResponse, JsonError, extract, get_courseware_context
 

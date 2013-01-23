@@ -1,4 +1,3 @@
-import json
 from django_future.csrf import ensure_csrf_cookie
 from django.contrib.auth.decorators import login_required
 from django.contrib.auth.models import User
@@ -7,6 +6,7 @@ from django.core.paginator import Paginator, EmptyPage, PageNotAnInteger
 from django.core.urlresolvers import reverse
 from django.http import HttpResponse, HttpResponseForbidden, Http404
 from django.shortcuts import redirect
+import json
 import logging
 
 from courseware.courses import get_course_with_access
@@ -14,7 +14,7 @@ from mitxmako.shortcuts import render_to_response, render_to_string
 from string_util import split_by_comma_and_whitespace
 
 from .models import CourseUserGroup
-from . import models
+from . import cohorts
 
 import track.views
 
@@ -38,11 +38,11 @@ def list_cohorts(request, course_id):
     """
     get_course_with_access(request.user, course_id, 'staff')
 
-    cohorts = [{'name': c.name, 'id': c.id}
-               for c in models.get_course_cohorts(course_id)]
+    all_cohorts = [{'name': c.name, 'id': c.id}
+               for c in cohorts.get_course_cohorts(course_id)]
 
     return JsonHttpReponse({'success': True,
-                            'cohorts': cohorts})
+                            'cohorts': all_cohorts})
 
 
 @ensure_csrf_cookie
@@ -70,7 +70,7 @@ def add_cohort(request, course_id):
                                 'msg': "No name specified"})
 
     try:
-        cohort = models.add_cohort(course_id, name)
+        cohort = cohorts.add_cohort(course_id, name)
     except ValueError as err:
         return JsonHttpReponse({'success': False,
                                 'msg': str(err)})
@@ -98,7 +98,7 @@ def users_in_cohort(request, course_id, cohort_id):
     """
     get_course_with_access(request.user, course_id, 'staff')
 
-    cohort = models.get_cohort_by_id(course_id, int(cohort_id))
+    cohort = cohorts.get_cohort_by_id(course_id, int(cohort_id))
 
     paginator = Paginator(cohort.users.all(), 100)
     page = request.GET.get('page')
@@ -141,7 +141,7 @@ def add_users_to_cohort(request, course_id, cohort_id):
     if request.method != "POST":
         raise Http404("Must POST to add users to cohorts")
 
-    cohort = models.get_cohort_by_id(course_id, cohort_id)
+    cohort = cohorts.get_cohort_by_id(course_id, cohort_id)
 
     users = request.POST.get('users', '')
     added = []
@@ -149,7 +149,7 @@ def add_users_to_cohort(request, course_id, cohort_id):
     unknown = []
     for username_or_email in split_by_comma_and_whitespace(users):
         try:
-            user = models.add_user_to_cohort(cohort, username_or_email)
+            user = cohorts.add_user_to_cohort(cohort, username_or_email)
             added.append({'username': user.username,
                           'name': "{0} {1}".format(user.first_name, user.last_name),
                           'email': user.email,

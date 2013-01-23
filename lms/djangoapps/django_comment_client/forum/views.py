@@ -11,7 +11,7 @@ from django.contrib.auth.models import User
 
 from mitxmako.shortcuts import render_to_response, render_to_string
 from courseware.courses import get_course_with_access
-from courseware.courses import get_cohort_id
+from course_groups.cohorts import get_cohort_id
 from courseware.access import has_access
 
 from urllib import urlencode
