@@ -111,11 +111,13 @@ $(document).ready(function() {
     $('.sortable-unit-list').droppable({
     	accept : '.unit',
     	greedy: true,
+    	tolerance: "pointer",
     	drop: onUnitReordered
     });
     $('.subsection-list > ol').droppable({
     	// why don't we have a more useful class for subsections than id-holder?
     	accept : '.id-holder', // '.unit, .id-holder',
+    	tolerance: "pointer",
     	drop: onSubsectionReordered,
     	greedy: true
     });
@@ -123,6 +125,7 @@ $(document).ready(function() {
     // Section reordering
     $('.courseware-overview').droppable({
     	accept : '.courseware-section',
+    	tolerance: "pointer",
     	drop: onSectionReordered,
     	greedy: true
     });
