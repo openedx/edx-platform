@@ -276,15 +276,16 @@ def _get_module(user, request, location, student_module_cache, course_id, positi
         log.exception("Error creating module from descriptor {0}".format(descriptor))
 
         # make an ErrorDescriptor -- assuming that the descriptor's system is ok
-        import_system = descriptor.system
         if has_access(user, location, 'staff', course_id):
-            err_descriptor = ErrorDescriptor.from_xml(str(descriptor), import_system,
-                                                      org=descriptor.location.org, course=descriptor.location.course,
-                                                      error_msg=exc_info_to_str(sys.exc_info()))
+            err_descriptor_class = ErrorDescriptor
         else:
-            err_descriptor = NonStaffErrorDescriptor.from_xml(str(descriptor), import_system,
-                                                              org=descriptor.location.org, course=descriptor.location.course,
-                                                              error_msg=exc_info_to_str(sys.exc_info()))
+            err_descriptor_class = NonStaffErrorDescriptor
+
+        err_descriptor = err_descriptor_class.from_xml(
+            str(descriptor), descriptor.system,
+            org=descriptor.location.org, course=descriptor.location.course,
+            error_msg=exc_info_to_str(sys.exc_info())
+        )
 
         # Make an error module
         return err_descriptor.xmodule(system)
