@@ -1,26 +1,28 @@
 <section id="editamoleculeinput_${id}" class="editamoleculeinput">
-    <div class="script_placeholder" data-src="/static/js/capa/jsmolcalc/jsmolcalc.nocache.js"/>
-    <div class="script_placeholder" data-src="${applet_loader}"/>
+  <div class="script_placeholder" data-src="/static/js/capa/jsmolcalc/jsmolcalc.nocache.js"/>
+  <div class="script_placeholder" data-src="/static/js/capa/jsme/jsme_export.nocache.js"/>
+  <div class="script_placeholder" data-src="${applet_loader}"/>
 
-    % if status == 'unsubmitted':
-    <div class="unanswered" id="status_${id}">
-    % elif status == 'correct':
-    <div class="correct" id="status_${id}">
-    % elif status == 'incorrect':
-    <div class="incorrect" id="status_${id}">
-    % elif status == 'incomplete':
-    <div class="incorrect" id="status_${id}">
-    % endif
+  % if status == 'unsubmitted':
+  <div class="unanswered" id="status_${id}">
+  % elif status == 'correct':
+  <div class="correct" id="status_${id}">
+  % elif status == 'incorrect':
+  <div class="incorrect" id="status_${id}">
+  % elif status == 'incomplete':
+  <div class="incorrect" id="status_${id}">
+  % endif
 
-    <object type="application/x-java-applet" id="applet_${id}" class="applet" height="400" width="500">
-      <param name="archive" value="/static/applets/capa/editamolecule/JME.jar" />
-      <param name="code" value="JME.class" />
-      <param name="molfile" value="${file}" />
-      Applet failed to run.  No Java plug-in was found.
-    </object>
+    <div id="applet_${id}" class="applet" data-molfile-src="${file}" style="display:block;width:500px;height:400px">
+    </div>
 
+    <br/>
 
     <input type="hidden" name="input_${id}" id="input_${id}" value="${value|h}"/>
+
+    <button id="reset_${id}" class="reset">Reset</button>
+
+    <p id="answer_${id}" class="answer"></p>
 
     <p class="status">
       % if status == 'unsubmitted':
@@ -33,11 +35,6 @@
       incomplete
       % endif
     </p>
-
-    <br/>
-    <button id="reset_${id}" class="reset">Reset</button>
-
-    <p id="answer_${id}" class="answer"></p>
   % if status in ['unsubmitted', 'correct', 'incorrect', 'incomplete']:
   </div>
   % endif

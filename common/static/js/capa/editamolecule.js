@@ -1,88 +1,88 @@
 (function () {
     var timeout = 100;
 
-    waitForJSMolCalc();
+    // Simple "lock" to prevent applets from being initialized more than once
+    if (typeof(_editamolecule_lock) == 'undefined' || _editamolecule_lock == false) {
+        _editamolecule_lock = true;
+        waitForGWT();
+    } else {
+        return;
+    }
 
-    // FIXME: [rocha] jsmolcalc and jsmol.API should be initialized
-    // automatically by the GWT script loader. However, it is not
-    // working correcly when including them inside the
-    // courseware.
-    function waitForJSMolCalc() {
+    // FIXME: [rocha] jsme and jsmolcalc are not initialized automatically by
+    // the GWT script loader. To fix this, wait for the scripts to load, initialize
+    // them manually and wait until they are ready
+    function waitForGWT() {
         if (typeof(jsmolcalc) != "undefined" && jsmolcalc)
         {
-            // FIXME: [rocha] this should be called automatically by
-            // GWT at the end of the loader. However it is not.
             jsmolcalc.onInjectionDone('jsmolcalc');
         }
 
-        if (typeof(jsmol) != "undefined") {
+        if (typeof(jsme_export) != "undefined" && jsme_export)
+        {
+            // dummy function called by jsme_export
+            window.jsmeOnLoad  = function() {};
+            jsme_export.onInjectionDone('jsme_export');
+        }
+
+        // jsmol is defined my jsmolcalc and JavaScriptApplet is defined by jsme
+        if (typeof(jsmol) != 'undefined' && typeof(JavaScriptApplet) != 'undefined') {
             // ready, initialize applets
             initializeApplets();
+            _editamolecule_lock = false;  // release lock, for reloading
         } else {
-            setTimeout(function() { waitForJSMolCalc(); }, timeout);
+            setTimeout(waitForGWT, timeout);
         }
     }
 
     function initializeApplets() {
-        var applets = $('.editamoleculeinput object');
+        var applets = $('.editamoleculeinput div.applet');
         applets.each(function(i, element) {
-            var applet = $(element);
-            if (!applet.hasClass('initialized')) {
-                applet.addClass("initialized");
-                waitForApplet(applet, configureApplet);
+            if (!$(element).hasClass('loaded')) {
+                var applet = new JavaScriptApplet.JSME(
+                    element.id,
+                    $(element).width(),
+                    $(element).height(),
+                    {
+    	                "options" : "query, hydrogens"
+    	            });
+                $(element).addClass('loaded');
+                configureApplet(element, applet);
             }
         });
     }
 
-    function waitForApplet(applet, callback) {
-        if (applet[0].isActive && applet[0].isActive()) {
-            callback(applet);
-        } else {
-            setTimeout(function() {
-                waitForApplet(applet, callback); }, timeout);
-        }
-    }
-
-    function configureApplet(applet) {
+    function configureApplet(element, applet) {
         // Traverse up the DOM tree and get the other relevant elements
-        var parent = applet.parent();
+        var parent = $(element).parent();
         var input_field = parent.find('input[type=hidden]');
         var reset_button = parent.find('button.reset');
 
-        console.log(input_field.toArray());
-        console.log(input_field.toArray().length);
+        // Applet options
+        applet.setAntialias(true);
 
         // Load initial data
         var value = input_field.val();
-
-        value = false;
         if (value) {
-            console.log('loading old');
             var data = JSON.parse(value)["mol"];
-            console.log(data);
             loadAppletData(applet, data, input_field);
         } else {
-            console.log('loading preset');
-            requestAppletData(applet, input_field);
+            requestAppletData(element, applet, input_field);
         }
 
         reset_button.on('click', function() {
-            console.log('reseting');
-            requestAppletData(applet, input_field);
+            requestAppletData(element, applet, input_field);
         });
 
-        // FIXME: [rocha] This is a hack to capture the click on the check
-        // button and update the hidden field with the applet values
-        var problem = applet.parents('.problem');
-        var check_button = problem.find('input.check');
-        check_button.on('click', function() {
-            console.log('check');
+        // Update the input element everytime the is an interaction
+        // with the applet (click, drag, etc)
+        $(element).on('mouseup', function() {
             updateInput(applet, input_field);
         });
     }
 
-    function requestAppletData(applet, input_field) {
-        var molFile = applet.find('param[name=molfile]').attr('value');
+    function requestAppletData(element, applet, input_field) {
+        var molFile = $(element).data('molfile-src');
 
         jQuery.ajax({
             url: molFile,
@@ -98,14 +98,14 @@
     }
 
     function loadAppletData(applet, data, input_field) {
-        applet[0].readMolFile(data);
+        applet.readMolFile(data);
         updateInput(applet, input_field);
     }
 
     function updateInput(applet, input_field) {
-        var mol = applet[0].molFile();
-        var smiles = applet[0].smiles();
-        var jme = applet[0].jmeFile();
+        var mol = applet.molFile();
+        var smiles = applet.smiles();
+        var jme = applet.jmeFile();
 
         var info = jsmol.API.getInfo(mol, smiles, jme).toString();
         var err = jsmol.API.getErrors(mol, smiles, jme).toString();
