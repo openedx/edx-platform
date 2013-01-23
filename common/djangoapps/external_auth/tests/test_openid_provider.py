@@ -125,6 +125,60 @@ class OpenIdProviderTest(TestCase):
             self.assertEqual(resp.status_code, code,
                              "got code {0} for url '{1}'. Expected code {2}"
                              .format(resp.status_code, url, code))
+            self.assertContains(resp, '<input name="openid.mode" type="hidden" value="checkid_setup" />', html=True)
+            self.assertContains(resp, '<input name="openid.ns" type="hidden" value="http://specs.openid.net/auth/2.0" />', html=True)
+            self.assertContains(resp, '<input name="openid.identity" type="hidden" value="http://specs.openid.net/auth/2.0/identifier_select" />', html=True)
+            self.assertContains(resp, '<input name="openid.claimed_id" type="hidden" value="http://specs.openid.net/auth/2.0/identifier_select" />', html=True)
+            self.assertContains(resp, '<input name="openid.ns.ax" type="hidden" value="http://openid.net/srv/ax/1.0" />', html=True)
+            self.assertContains(resp, '<input name="openid.ax.mode" type="hidden" value="fetch_request" />', html=True)
+            self.assertContains(resp, '<input name="openid.ax.required" type="hidden" value="email,fullname,old_email,firstname,old_nickname,lastname,old_fullname,nickname" />', html=True)
+            self.assertContains(resp, '<input name="openid.ax.type.fullname" type="hidden" value="http://axschema.org/namePerson" />', html=True)
+            self.assertContains(resp, '<input name="openid.ax.type.lastname" type="hidden" value="http://axschema.org/namePerson/last" />', html=True)
+            self.assertContains(resp, '<input name="openid.ax.type.firstname" type="hidden" value="http://axschema.org/namePerson/first" />', html=True)
+            self.assertContains(resp, '<input name="openid.ax.type.nickname" type="hidden" value="http://axschema.org/namePerson/friendly" />', html=True)
+            self.assertContains(resp, '<input name="openid.ax.type.email" type="hidden" value="http://axschema.org/contact/email" />', html=True)
+            self.assertContains(resp, '<input name="openid.ax.type.old_email" type="hidden" value="http://schema.openid.net/contact/email" />', html=True)
+            self.assertContains(resp, '<input name="openid.ax.type.old_nickname" type="hidden" value="http://schema.openid.net/namePerson/friendly" />', html=True)
+            self.assertContains(resp, '<input name="openid.ax.type.old_fullname" type="hidden" value="http://schema.openid.net/namePerson" />', html=True)
+            self.assertContains(resp, '<input type="submit" value="Continue" />', html=True)
+            # this should work on the server:
+            self.assertContains(resp, '<input name="openid.realm" type="hidden" value="http://testserver/" />', html=True)
+            
+            # not included here are elements that will vary from run to run:
+            # <input name="openid.return_to" type="hidden" value="http://testserver/openid/complete/?janrain_nonce=2013-01-23T06%3A20%3A17ZaN7j6H" />
+            # <input name="openid.assoc_handle" type="hidden" value="{HMAC-SHA1}{50ff8120}{rh87+Q==}" />
+            
+            
+    def testOpenIdSetup(self):
+        if not settings.MITX_FEATURES.get('AUTH_USE_OPENID_PROVIDER'):
+            return
+        url = reverse('openid-provider-login')
+        post_args = {
+                     "openid.mode" : "checkid_setup",
+                     "openid.return_to" : "http://testserver/openid/complete/?janrain_nonce=2013-01-23T06%3A20%3A17ZaN7j6H",
+                     "openid.assoc_handle" : "{HMAC-SHA1}{50ff8120}{rh87+Q==}",
+                     "openid.claimed_id" : "http://specs.openid.net/auth/2.0/identifier_select",
+                     "openid.ns" : "http://specs.openid.net/auth/2.0",
+                     "openid.realm" : "http://testserver/",
+                     "openid.identity" : "http://specs.openid.net/auth/2.0/identifier_select",
+                     "openid.ns.ax" : "http://openid.net/srv/ax/1.0",
+                     "openid.ax.mode" : "fetch_request",
+                     "openid.ax.required" : "email,fullname,old_email,firstname,old_nickname,lastname,old_fullname,nickname",
+                     "openid.ax.type.fullname" : "http://axschema.org/namePerson",
+                     "openid.ax.type.lastname" : "http://axschema.org/namePerson/last",
+                     "openid.ax.type.firstname" : "http://axschema.org/namePerson/first",
+                     "openid.ax.type.nickname" : "http://axschema.org/namePerson/friendly",
+                     "openid.ax.type.email" : "http://axschema.org/contact/email",
+                     "openid.ax.type.old_email" : "http://schema.openid.net/contact/email",
+                     "openid.ax.type.old_nickname" : "http://schema.openid.net/namePerson/friendly",
+                     "openid.ax.type.old_fullname" : "http://schema.openid.net/namePerson",
+                     }
+        resp = self.client.post(url, post_args)
+        code = 200
+        self.assertEqual(resp.status_code, code,
+                         "got code {0} for url '{1}'. Expected code {2}"
+                         .format(resp.status_code, url, code))
+        
             
 # In order for this absolute URL to work (i.e. to get xrds, then authentication)
 # in the test environment, we either need a live server that works with the default
