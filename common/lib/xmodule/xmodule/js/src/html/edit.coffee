@@ -36,7 +36,7 @@ class @HTMLEditingDescriptor
       theme_advanced_toolbar_align : "left",
       theme_advanced_statusbar_location : "none",
       theme_advanced_resizing : true,
-      theme_advanced_blockformats : "p,h1,h2,h3,pre",
+      theme_advanced_blockformats : "p,pre,h1,h2,h3",
       width: '100%',
       height: '400px',
       setup : HTMLEditingDescriptor.setupTinyMCE,
