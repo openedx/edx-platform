@@ -22,11 +22,13 @@ class @HTMLEditingDescriptor
       schema: "html5",
       # TODO: we should share this CSS with studio (and LMS)
       content_css : "/static/css/tiny-mce.css",
-      # Disable h4, h5, and h6 styles as we don't have CSS for them.
       formats : {
+        # Disable h4, h5, and h6 styles as we don't have CSS for them.
         h4: {},
         h5: {},
-        h6: {}
+        h6: {},
+        # tinyMCE does block level for code by default
+        code: {inline: 'code'}
       },
       # Disable visual aid on borderless table.
       visual:false,
@@ -50,7 +52,7 @@ class @HTMLEditingDescriptor
 
   @setupTinyMCE: (ed) ->
     ed.addButton('wrapAsCode', {
-      title : 'Code Block',
+      title : 'Code',
       image : '/static/images/ico-tinymce-code.png',
       onclick : () ->
         ed.formatter.toggle('code')
