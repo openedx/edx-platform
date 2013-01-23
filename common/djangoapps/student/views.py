@@ -691,7 +691,7 @@ def create_exam_registration(request, post_override=None):
     username = post_vars['username']
     user = User.objects.get(username=username)
     course_id = post_vars['course_id']
-    course = (course_from_id(course_id))  # assume it will be found....
+    course = course_from_id(course_id)  # assume it will be found....
 
     # make sure that any demographic data values received from the page have been stripped.
     # Whitespace is not an acceptable response for any of these values
