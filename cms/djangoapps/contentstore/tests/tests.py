@@ -364,6 +364,16 @@ class ContentStoreTest(TestCase):
         effort = ms.get_item(Location(['i4x','edX','full','about','end_date', None]))
         self.assertEqual(effort.definition['data'],'TBD')
 
+    def test_remove_hide_progress_tab(self):
+        import_from_xml(modulestore(), 'common/test/data/', ['full'])
+
+        ms = modulestore('direct')
+        cs = contentstore()
+
+        source_location = CourseDescriptor.id_to_location('edX/full/6.002_Spring_2012')
+        course = ms.get_item(source_location)
+        self.assertNotIn('hide_progress_tab', course.metadata)
+
 
     def test_clone_course(self):
         import_from_xml(modulestore(), 'common/test/data/', ['full'])

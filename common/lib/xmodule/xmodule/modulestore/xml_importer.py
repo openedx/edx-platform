@@ -137,9 +137,6 @@ def import_from_xml(store, data_dir, course_dirs=None,
 
                 module = remap_namespace(module, target_location_namespace)
 
-                # HACK: for now we don't support progress tabs. There's a special metadata configuration setting for this.
-                module.metadata['hide_progress_tab'] = True
-
                 # cdodge: more hacks (what else). Seems like we have a problem when importing a course (like 6.002) which 
                 # does not have any tabs defined in the policy file. The import goes fine and then displays fine in LMS, 
                 # but if someone tries to add a new tab in the CMS, then the LMS barfs because it expects that - 
