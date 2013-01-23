@@ -7,7 +7,6 @@
         table-layout: auto;
         margin-top: 10px;
         width:70%;
-        text-align: center;
         td, th
         {
             padding: 7px;
@@ -18,10 +17,6 @@
         margin: 30px 0px;
     }
 
-    .alert
-    {
-        background-color: red;
-    }
     .notification
     {
         margin: 10px;
@@ -31,23 +26,38 @@
         .notification-link
         {
             display:block;
-            height: 8em;
+            height: 9em;
             padding: 10px;
             border: 1px solid black;
             text-align: center;
+            p
+            {
+                font-size: .9em;
+                text-align: center;
+            }
         }
-        .notification-title
+        .notification-title 
         {
             text-transform: uppercase;
+            background: #1d9dd9;
+            color: white;
+            padding: 5px 0px;
+            font-size: 1.1em;
         }
         .notification-link:hover
         {
             background-color: #eee;
-            color: black;
         }
         .notification-description
         {
             padding-top:5%;
+        }
+        .alert-message 
+        {
+            img
+            {
+                vertical-align: baseline;
+            }
         }
         @include clearfix;
     }

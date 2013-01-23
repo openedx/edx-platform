@@ -195,8 +195,13 @@ def combined_notifications(request, course_id):
     notification_list = []
     description_dict = {
             'Peer Grading': "View all problems that require peer assessment in this particular course.",
-            'Staff Grading': "View ungraded submissions submitted by your students for the open ended problems in the course.",
+            'Staff Grading': "View ungraded submissions submitted by students for the open ended problems in the course.",
             'Problems you have submitted': "View open ended problems that you have previously submitted for grading." 
+    }
+    alert_dict = {
+            'Peer Grading': "New submissions to grade",
+            'Staff Grading': "New submissions to grade",
+            'Problems you have submitted': "New grades have been returned" 
     }
     for response_num in xrange(0,len(notification_tuples)):
         tag=notification_tuples[response_num][0]
@@ -210,7 +215,8 @@ def combined_notifications(request, course_id):
                 'url' : url,
                 'name' : human_name,
                 'alert' : has_img,
-                'description': description_dict[human_name]
+                'description': description_dict[human_name],
+                'alert_message': alert_dict[human_name]
             }
             notification_list.append(notification_item)
 
