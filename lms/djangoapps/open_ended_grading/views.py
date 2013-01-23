@@ -193,6 +193,11 @@ def combined_notifications(request, course_id):
     notification_tuples=open_ended_notifications.NOTIFICATION_TYPES
 
     notification_list = []
+    description_dict = {
+            'Peer Grading': "View all problems that require peer assessment in this particular course.",
+            'Staff Grading': "View ungraded submissions submitted by your students for the open ended problems in the course.",
+            'Problems you have submitted': "View open ended problems that you have previously submitted for grading." 
+    }
     for response_num in xrange(0,len(notification_tuples)):
         tag=notification_tuples[response_num][0]
         if tag in response:
@@ -200,13 +205,12 @@ def combined_notifications(request, course_id):
             human_name = notification_tuples[response_num][2]
             url = _reverse_without_slash(url_name, course_id)
             has_img = response[tag]
-            img_path = "/static/images/slider-handle.png"
 
             notification_item = {
                 'url' : url,
                 'name' : human_name,
-                'has_img' : has_img,
-                'img' : img_path,
+                'alert' : has_img,
+                'description': description_dict[human_name]
             }
             notification_list.append(notification_item)
 

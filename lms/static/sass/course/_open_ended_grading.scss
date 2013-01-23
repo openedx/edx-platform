@@ -13,5 +13,43 @@
             padding: 7px;
         }
     }
+    .notification-container
+    {
+        margin: 30px 0px;
+    }
+
+    .alert
+    {
+        background-color: red;
+    }
+    .notification
+    {
+        margin: 10px;
+        width: 30%;
+        @include inline-block;
+        vertical-align: top;
+        .notification-link
+        {
+            display:block;
+            height: 8em;
+            padding: 10px;
+            border: 1px solid black;
+            text-align: center;
+        }
+        .notification-title
+        {
+            text-transform: uppercase;
+        }
+        .notification-link:hover
+        {
+            background-color: #eee;
+            color: black;
+        }
+        .notification-description
+        {
+            padding-top:5%;
+        }
+        @include clearfix;
+    }
 
 }

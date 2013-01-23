@@ -23,18 +23,22 @@
                 No items require attention at the moment.
             </div>
             %else:
-            <ul class="notification-list">
+            <div class="notification-container">
                 %for notification in notification_list:
-                <li>
-                    <a href="${notification['url']}">
-                        ${notification['name']}
-                        % if notification['has_img'] == True:
-                        <img src="${notification['img']}"/>
-                        %endif
+                 % if notification['alert']:
+                    <div class="notification alert">
+                % else:
+                    <div class="notification">
+                % endif
+                    <a href="${notification['url']}" class="notification-link">
+                        <div class="notification-title">${notification['name']}</div>
+                    <div class="notification-description">
+                        <p>${notification['description']}</p>
+                    </div>
                     </a>
-                </li>
+                </div>
                 %endfor
-            </ul>
+            </div>
             %endif
         %endif
     </div>
