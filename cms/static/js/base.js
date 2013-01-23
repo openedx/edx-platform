@@ -55,13 +55,6 @@ $(document).ready(function() {
     $("#start_date, #start_time, #due_date, #due_time").bind('change', autosaveInput);
     $('.sync-date, .remove-date').bind('click', autosaveInput);
 
-    // making the unit list sortable
-    $('.sortable-unit-list').sortable({
-        axis: 'y',
-        handle: '.drag-handle',
-        update: onUnitReordered
-    });
-
     // expand/collapse methods for optional date setters
     $('.set-date').bind('click', showDateSetter);
     $('.remove-date').bind('click', removeDateSetter);
@@ -87,18 +80,54 @@ $(document).ready(function() {
         $('.import .file-input').click();
     });
 
-    // Subsection reordering
-    $('.subsection-list > ol').sortable({
-        axis: 'y',
-        handle: '.section-item .drag-handle',
-        update: onSubsectionReordered
+    // making the unit list draggable. Note: sortable didn't work b/c it considered
+    // drop points which the user hovered over as destinations and proactively changed
+    // the dom; so, if the user subsequently dropped at an illegal spot, the reversion
+    // point was the last dom change.
+    $('.unit').draggable({
+    	axis: 'y',
+    	handle: '.drag-handle',
+    	stack: '.unit',  
+    	revert: "invalid"
     });
-
+    
+    // Subsection reordering
+    $('.id-holder').draggable({
+    	axis: 'y',
+    	handle: '.section-item .drag-handle',
+    	stack: '.id-holder',
+    	revert: "invalid"
+    });
+    
     // Section reordering
-    $('.courseware-overview').sortable({
-        axis: 'y',
-        handle: 'header .drag-handle',
-        update: onSectionReordered
+    $('.courseware-section').draggable({
+    	axis: 'y',
+    	handle: 'header .drag-handle',
+    	stack: '.courseware-section',
+    	revert: "invalid"
+    });
+    
+    
+    $('.sortable-unit-list').droppable({
+    	accept : '.unit',
+    	greedy: true,
+    	tolerance: "pointer",
+    	drop: onUnitReordered
+    });
+    $('.subsection-list > ol').droppable({
+    	// why don't we have a more useful class for subsections than id-holder?
+    	accept : '.id-holder', // '.unit, .id-holder',
+    	tolerance: "pointer",
+    	drop: onSubsectionReordered,
+    	greedy: true
+    });
+    
+    // Section reordering
+    $('.courseware-overview').droppable({
+    	accept : '.courseware-section',
+    	tolerance: "pointer",
+    	drop: onSectionReordered,
+    	greedy: true
     });
 
     $('.new-course-button').bind('click', addNewCourse);
@@ -240,54 +269,87 @@ function removePolicyMetadata(e) {
     saveSubsection()
 }
 
+function expandSection(event) {
+	$(event.delegateTarget).removeClass('collapsed'); 
+	$(event.delegateTarget).find('.expand-collapse-icon').removeClass('expand').addClass('collapse');
+}
 
-// This method only changes the ordering of the child objects in a subsection
-function onUnitReordered() {
-    var subsection_id = $(this).data('subsection-id');
+function checkDropValidity(event, ui) {
+	var posInDestination = ui.item.position().top - $(event.target).position().top;
+	if (posInDestination <= -ui.item.height() || posInDestination >= $(event.target).height()) {
+		$(event.target).sortable("cancel");
+		return false;
+	}
+	return true;
+}
 
-    var _els = $(this).children('li:.leaf');
+function onUnitReordered(event, ui) {
+	// a unit's been dropped on this subsection,
+	//       figure out where it came from and where it slots in. 
+	_handleReorder(event, ui, 'subsection-id', 'li:.leaf');
+}
+
+function onSubsectionReordered(event, ui) {
+	// a subsection has been dropped on this section,
+	//       figure out where it came from and where it slots in. 
+	_handleReorder(event, ui, 'section-id', 'li:.branch');
+}
+
+function onSectionReordered(event, ui) {
+	// a section moved w/in the overall (cannot change course via this, so no parentage change possible, just order)
+	_handleReorder(event, ui, 'course-id', '.courseware-section');
+}
+
+function _handleReorder(event, ui, parentIdField, childrenSelector) {
+	//       figure out where it came from and where it slots in. 
+	var subsection_id = $(event.target).data(parentIdField);
+    var _els = $(event.target).children(childrenSelector);
     var children = _els.map(function(idx, el) { return $(el).data('id'); }).get();
-
-    // call into server to commit the new order
-    $.ajax({
-	    url: "/save_item",
+    // if new to this parent, figure out which parent to remove it from and do so
+    if (!_.contains(children, ui.draggable.data('id'))) {
+    	var old_parent = ui.draggable.parent();
+    	var old_children = old_parent.children(childrenSelector).map(function(idx, el) { return $(el).data('id'); }).get();
+    	old_children = _.without(old_children, ui.draggable.data('id'));
+		// call into server to commit the new order
+		$.ajax({
+			url: "/save_item",
+			type: "POST",
+			dataType: "json",
+			contentType: "application/json",
+			data:JSON.stringify({ 'id' : old_parent.data(parentIdField), 'children' : old_children})
+		});
+		//
+    }
+    else {
+    	// staying in same parent
+    	// remove so that the replacement in the right place doesn't double it
+    	children = _.without(children, ui.draggable.data('id'));
+    }
+    // add to this parent (figure out where)
+    for (var i = 0; i < _els.length; i++) {
+    	if (!ui.draggable.is(_els[i]) && ui.offset.top < $(_els[i]).offset().top) {
+    		// insert at i in children and _els
+    		ui.draggable.insertBefore($(_els[i]));
+    		// TODO figure out correct way to have it format (and similar line below)
+    		ui.draggable.attr("style", "position:relative;");
+    		children.splice(i, 0, ui.draggable.data('id'));
+    		break;
+    	}
+    }
+    // see if it goes at end (the above loop didn't insert it)
+    if (!_.contains(children, ui.draggable.data('id'))) {
+    	$(event.target).append(ui.draggable);
+    	ui.draggable.attr("style", "position:relative;"); // STYLE hack too
+    	children.push(ui.draggable.data('id'));
+    }
+	$.ajax({
+		url: "/save_item",
 		type: "POST",
 		dataType: "json",
 		contentType: "application/json",
 		data:JSON.stringify({ 'id' : subsection_id, 'children' : children})
 	});
-}
-
-function onSubsectionReordered() {
-    var section_id = $(this).data('section-id');
-
-    var _els = $(this).children('li:.branch');
-    var children = _els.map(function(idx, el) { return $(el).data('id'); }).get();
-
-    // call into server to commit the new order
-    $.ajax({
-        url: "/save_item",
-        type: "POST",
-        dataType: "json",
-        contentType: "application/json",
-        data:JSON.stringify({ 'id' : section_id, 'children' : children})
-    });
-}
-
-function onSectionReordered() {
-    var course_id = $(this).data('course-id');
-
-    var _els = $(this).children('section:.branch');
-    var children = _els.map(function(idx, el) { return $(el).data('id'); }).get();
-
-    // call into server to commit the new order
-    $.ajax({
-        url: "/save_item",
-        type: "POST",
-        dataType: "json",
-        contentType: "application/json",
-        data:JSON.stringify({ 'id' : course_id, 'children' : children})
-    });
+    
 }
 
 function getEdxTimeFromDateTimeVals(date_val, time_val, format) {
