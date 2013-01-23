@@ -10,6 +10,7 @@ from optparse import make_option
 from dogapi import dog_http_api, dog_stats_api
 
 from django.core.management.base import BaseCommand, CommandError
+from django.conf import settings
 
 from student.models import TestCenterUser, TestCenterRegistration
 
@@ -23,6 +24,7 @@ class Command(BaseCommand):
     and TestCenterRegistration tables with status.
     """
 
+    @staticmethod
     def datadog_error(string, tags):
         dog_http_api.event("Pearson Import", string, alert_type='error', tags=tags)
 

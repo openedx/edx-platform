@@ -1,5 +1,6 @@
 import os
 from optparse import make_option
+from stat import S_ISDIR
 
 from django.conf import settings
 from django.core.management.base import BaseCommand, CommandError
@@ -26,85 +27,99 @@ class Command(BaseCommand):
                     action='store',
                     dest='mode',
                     default='both',
+                    choices=('import', 'export', 'both'),
                     help='mode is import, export, or both'),
     )
 
     def handle(self, **options):
 
-        # TODO: this doesn't work. Need to check if it's a property.
-        if not settings.PEARSON:
+        if not hasattr(settings, 'PEARSON'):
             raise CommandError('No PEARSON entries in auth/env.json.')
 
-        for value in ['LOCAL_IMPORT', 'SFTP_IMPORT', 'LOCAL_EXPORT',
-                      'SFTP_EXPORT', 'SFTP_HOSTNAME', 'SFTP_USERNAME', 'SFTP_PASSWORD']:
+        # check settings needed for either import or export:
+        for value in ['SFTP_HOSTNAME', 'SFTP_USERNAME', 'SFTP_PASSWORD', 'S3_BUCKET']:
             if value not in settings.PEARSON:
                 raise CommandError('No entry in the PEARSON settings'
                                    '(env/auth.json) for {0}'.format(value))
 
-        def import_pearson():
-            try:
-                sftp(settings.PEARSON['SFTP_IMPORT'],
-                     settings.PEARSON['LOCAL_IMPORT'], options['mode'])
-                s3(settings.PEARSON['LOCAL_IMPORT'],
-                   settings.PEARSON['BUCKET'], options['mode'])
-            except Exception as e:
-                dog_http_api.event('Pearson Import failure', str(e))
-            else:
-                for file in os.listdir(settings.PEARSON['LOCAL_IMPORT']):
-                    call_command('pearson_import_conf_zip',
-                                 settings.PEARSON['LOCAL_IMPORT'] + '/' + file)
-                    os.remove(file)
+        for value in ['AWS_ACCESS_KEY_ID', 'AWS_SECRET_ACCESS_KEY']:
+            if not hasattr(settings, value):
+                raise CommandError('No entry in the AWS settings'
+                                   '(env/auth.json) for {0}'.format(value))
+                
+        # check additional required settings for import and export:
+        if options['mode'] in ('export', 'both'):
+            for value in ['LOCAL_EXPORT','SFTP_EXPORT']: 
+                if value not in settings.PEARSON:
+                    raise CommandError('No entry in the PEARSON settings'
+                                       '(env/auth.json) for {0}'.format(value))
+            # make sure that the import directory exists or can be created:
+            source_dir = settings.PEARSON['LOCAL_EXPORT']
+            if not os.path.isdir(source_dir):
+                os.makedirs(source_dir)
+                    
+        if options['mode'] in ('import', 'both'):
+            for value in ['LOCAL_IMPORT','SFTP_IMPORT']: 
+                if value not in settings.PEARSON:
+                    raise CommandError('No entry in the PEARSON settings'
+                                       '(env/auth.json) for {0}'.format(value))
+            # make sure that the import directory exists or can be created:
+            dest_dir = settings.PEARSON['LOCAL_IMPORT']
+            if not os.path.isdir(dest_dir):
+                os.makedirs(dest_dir)
 
-        def export_pearson():
-            call_command('pearson_export_cdd', 'dest_from_settings')
-            call_command('pearson_export_ead', 'dest_from_settings')
-            sftp(settings.PEARSON['LOCAL_EXPORT'],
-                 settings.PEARSON['SFTP_EXPORT'], options['mode'])
-            s3(settings.PEARSON['LOCAL_EXPORT'],
-               settings.PEARSON['BUCKET'], options['mode'])
 
-        if options['mode'] == 'export':
-            export_pearson()
-        elif options['mode'] == 'import':
-            import_pearson()
-        else:
-            export_pearson()
-            import_pearson()
-
-        def sftp(files_from, files_to, mode):
+        def sftp(files_from, files_to, mode, deleteAfterCopy=False):
             with dog_stats_api.timer('pearson.{0}'.format(mode), tags='sftp'):
                 try:
                     t = paramiko.Transport((settings.PEARSON['SFTP_HOSTNAME'], 22))
                     t.connect(username=settings.PEARSON['SFTP_USERNAME'],
                               password=settings.PEARSON['SFTP_PASSWORD'])
                     sftp = paramiko.SFTPClient.from_transport(t)
-                    if os.path.isdir(files_from):
+                    
+                    if mode == 'export':
+                        try:
+                            sftp.chdir(files_to)
+                        except IOError:
+                            raise CommandError('SFTP destination path does not exist: {}'.format(files_to))
                         for filename in os.listdir(files_from):
-                            sftp.put(files_from + '/' + filename,
-                                     files_to + '/' + filename)
+                            sftp.put(files_from + '/' + filename, filename)
+                            if deleteAfterCopy:
+                                os.remove(os.path.join(files_from, filename))
                     else:
-                        for filename in sftp.listdir(files_from):
-                            sftp.get(files_from + '/' + filename,
-                                     files_to + '/' + filename)
-                            sftp.remove(files_from + '/' + filename)
-                    t.close()
+                        try:
+                            sftp.chdir(files_from)
+                        except IOError:
+                            raise CommandError('SFTP source path does not exist: {}'.format(files_from))
+                        for filename in sftp.listdir('.'):
+                            # skip subdirectories 
+                            if not S_ISDIR(sftp.stat(filename).st_mode):
+                                sftp.get(filename, files_to + '/' + filename)
+                                # delete files from sftp server once they are successfully pulled off:
+                                if deleteAfterCopy:
+                                    sftp.remove(filename)
                 except:
                     dog_http_api.event('pearson {0}'.format(mode),
                                        'sftp uploading failed',
                                        alert_type='error')
                     raise
+                finally:
+                    sftp.close()
+                    t.close()
 
-        def s3(files_from, bucket, mode):
+        def s3(files_from, bucket, mode, deleteAfterCopy=False):
             with dog_stats_api.timer('pearson.{0}'.format(mode), tags='s3'):
                 try:
                     for filename in os.listdir(files_from):
-                        upload_file_to_s3(bucket, files_from + '/' + filename)
+                        upload_file_to_s3(bucket, files_from, filename)
+                        if deleteAfterCopy:
+                            os.remove(files_from + '/' + filename)
                 except:
                     dog_http_api.event('pearson {0}'.format(mode),
                                        's3 archiving failed')
                     raise
 
-        def upload_file_to_s3(bucket, filename):
+        def upload_file_to_s3(bucket, source_dir, filename):
             """
             Upload file to S3
             """
@@ -114,4 +129,32 @@ class Command(BaseCommand):
             b = s3.get_bucket(bucket)
             k = Key(b)
             k.key = "{filename}".format(filename=filename)
-            k.set_contents_from_filename(filename)
+            k.set_contents_from_filename(os.path.join(source_dir, filename))
+
+        def export_pearson():
+            options = { 'dest-from-settings' : True }
+            call_command('pearson_export_cdd', **options)
+            call_command('pearson_export_ead', **options)
+            mode = 'export'
+            sftp(settings.PEARSON['LOCAL_EXPORT'], settings.PEARSON['SFTP_EXPORT'], mode, deleteAfterCopy = False)
+            s3(settings.PEARSON['LOCAL_EXPORT'], settings.PEARSON['S3_BUCKET'], mode, deleteAfterCopy=True)
+
+        def import_pearson():
+            mode = 'import'
+            try:
+                sftp(settings.PEARSON['SFTP_IMPORT'], settings.PEARSON['LOCAL_IMPORT'], mode, deleteAfterCopy = True)
+                s3(settings.PEARSON['LOCAL_IMPORT'], settings.PEARSON['S3_BUCKET'], mode, deleteAfterCopy=False)
+            except Exception as e:
+                dog_http_api.event('Pearson Import failure', str(e))
+                raise e
+            else:
+                for filename in os.listdir(settings.PEARSON['LOCAL_IMPORT']):
+                    filepath = os.path.join(settings.PEARSON['LOCAL_IMPORT'], filename)
+                    call_command('pearson_import_conf_zip', filepath)
+                    os.remove(filepath)
+
+        # actually do the work!
+        if options['mode'] in ('export', 'both'):
+            export_pearson()
+        if options['mode'] in ('import', 'both'):
+            import_pearson()
