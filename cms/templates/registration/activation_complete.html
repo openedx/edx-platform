@@ -3,28 +3,24 @@
 
 <%namespace name='static' file='../static_content.html'/>
 
+<%block name="content">
 <section class="container activation">
 
   <section class="message">
-    %if not already_active:
-      <h1 class="valid">Activation Complete!</h1>
-    %else:
-      <h1>Account already active!</h1>
-    %endif
-    <hr class="horizontal-divider">
-    
-    <p>
+
+    <p style='padding-top:100px; text-align:center;'>
       %if not already_active:
-        Thanks for activating your account. 
+        Thanks for activating your account.
       %else:
         This account has already been activated.
       %endif
-      
+
       %if user_logged_in:
-        Visit your <a href="${reverse('dashboard')}">dashboard</a> to see your courses.
+        Visit your <a href="/">dashboard</a> to see your courses.
       %else:
         You can now <a href="#login-modal" rel="leanModal">login</a>.
       %endif
     </p>
   </section>
 </section>
+</%block>

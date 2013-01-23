@@ -1,21 +1,38 @@
 import logging
+from cStringIO import StringIO
+from math import exp, erf
 from lxml import etree
 from path import path  # NOTE (THK): Only used for detecting presence of syllabus
 import requests
 import time
 from datetime import datetime
 
-from xmodule.util.decorators import lazyproperty
-from xmodule.graders import load_grading_policy
 from xmodule.modulestore import Location
 from xmodule.seq_module import SequenceDescriptor, SequenceModule
 from xmodule.timeparse import parse_time, stringify_time
+from xmodule.util.decorators import lazyproperty
+from xmodule.graders import grader_from_conf
+from datetime import datetime
+import json
+import logging
+import requests
+import time
+import copy
+
 
 log = logging.getLogger(__name__)
 
 
+edx_xml_parser = etree.XMLParser(dtd_validation=False, load_dtd=False,
+                                 remove_comments=True, remove_blank_text=True)
+
+_cached_toc = {}
+
+
 class CourseDescriptor(SequenceDescriptor):
     module_class = SequenceModule
+
+    template_dir_name = 'course'
 
     class Textbook:
         def __init__(self, title, book_url):
@@ -44,6 +61,24 @@ class CourseDescriptor(SequenceDescriptor):
             """
             toc_url = self.book_url + 'toc.xml'
 
+            # cdodge: I've added this caching of TOC because in Mongo-backed instances (but not Filesystem stores)
+            # course modules have a very short lifespan and are constantly being created and torn down.
+            # Since this module in the __init__() method does a synchronous call to AWS to get the TOC
+            # this is causing a big performance problem. So let's be a bit smarter about this and cache
+            # each fetch and store in-mem for 10 minutes.
+            # NOTE: I have to get this onto sandbox ASAP as we're having runtime failures. I'd like to swing back and
+            # rewrite to use the traditional Django in-memory cache.
+            try:
+                # see if we already fetched this
+                if toc_url in _cached_toc:
+                    (table_of_contents, timestamp) = _cached_toc[toc_url]
+                    age = datetime.now() - timestamp
+                    # expire every 10 minutes
+                    if age.seconds < 600:
+                        return table_of_contents
+            except Exception as err:
+                pass
+
             # Get the table of contents from S3
             log.info("Retrieving textbook table of contents from %s" % toc_url)
             try:
@@ -56,6 +91,7 @@ class CourseDescriptor(SequenceDescriptor):
             # TOC is XML. Parse it
             try:
                 table_of_contents = etree.fromstring(r.text)
+                _cached_toc[toc_url] = (table_of_contents, datetime.now())
             except Exception as err:
                 msg = 'Error %s: Unable to parse XML for textbook table of contents at %s' % (err, toc_url)
                 log.error(msg)
@@ -65,7 +101,6 @@ class CourseDescriptor(SequenceDescriptor):
 
     def __init__(self, system, definition=None, **kwargs):
         super(CourseDescriptor, self).__init__(system, definition, **kwargs)
-
         self.textbooks = []
         for title, book_url in self.definition['data']['textbooks']:
             try:
@@ -86,16 +121,13 @@ class CourseDescriptor(SequenceDescriptor):
             log.critical(msg)
             system.error_tracker(msg)
 
-        self.enrollment_start = self._try_parse_time("enrollment_start")
-        self.enrollment_end = self._try_parse_time("enrollment_end")
-        self.end = self._try_parse_time("end")
-
         # NOTE: relies on the modulestore to call set_grading_policy() right after
         # init.  (Modulestore is in charge of figuring out where to load the policy from)
 
         # NOTE (THK): This is a last-minute addition for Fall 2012 launch to dynamically
         #   disable the syllabus content for courses that do not provide a syllabus
         self.syllabus_present = self.system.resources_fs.exists(path('syllabus'))
+        self.set_grading_policy(self.definition['data'].get('grading_policy', None))
 
         self.test_center_exams = []
         test_center_info = self.metadata.get('testcenter_info')
@@ -111,18 +143,121 @@ class CourseDescriptor(SequenceDescriptor):
                     log.error(msg)
                     continue
 
+    def defaut_grading_policy(self):
+        """
+        Return a dict which is a copy of the default grading policy
+        """
+        default = {"GRADER" : [
+                {
+                    "type" : "Homework",
+                    "min_count" : 12,
+                    "drop_count" : 2,
+                    "short_label" : "HW",
+                    "weight" : 0.15
+                },
+                {
+                    "type" : "Lab",
+                    "min_count" : 12,
+                    "drop_count" : 2,
+                    "weight" : 0.15
+                },
+                {
+                    "type" : "Midterm Exam",
+                    "short_label" : "Midterm",
+                    "min_count" : 1,
+                    "drop_count" : 0,
+                    "weight" : 0.3
+                },
+                {
+                    "type" : "Final Exam",
+                    "short_label" : "Final",
+                    "min_count" : 1,
+                    "drop_count" : 0,
+                    "weight" : 0.4
+                }
+            ],
+            "GRADE_CUTOFFS" : {
+                "Pass" : 0.5
+            }}
+        return copy.deepcopy(default)
 
-    def set_grading_policy(self, policy_str):
-        """Parse the policy specified in policy_str, and save it"""
+    def set_grading_policy(self, course_policy):
+        """
+        The JSON object can have the keys GRADER and GRADE_CUTOFFS. If either is
+        missing, it reverts to the default.
+        """
+        if course_policy is None:
+            course_policy = {}
+
+        # Load the global settings as a dictionary
+        grading_policy = self.defaut_grading_policy()
+
+        # Override any global settings with the course settings
+        grading_policy.update(course_policy)
+
+        # Here is where we should parse any configurations, so that we can fail early
+        grading_policy['RAW_GRADER'] = grading_policy['GRADER']  # used for cms access
+        grading_policy['GRADER'] = grader_from_conf(grading_policy['GRADER'])
+        self._grading_policy = grading_policy
+
+
+
+    @classmethod
+    def read_grading_policy(cls, paths, system):
+        """Load a grading policy from the specified paths, in order, if it exists."""
+        # Default to a blank policy dict
+        policy_str = '{}'
+
+        for policy_path in paths:
+            if not system.resources_fs.exists(policy_path):
+                continue
+            log.debug("Loading grading policy from {0}".format(policy_path))
+            try:
+                with system.resources_fs.open(policy_path) as grading_policy_file:
+                    policy_str = grading_policy_file.read()
+                    # if we successfully read the file, stop looking at backups
+                    break
+            except (IOError):
+                msg = "Unable to load course settings file from '{0}'".format(policy_path)
+                log.warning(msg)
+
+        return policy_str
+
+    
+    @classmethod
+    def from_xml(cls, xml_data, system, org=None, course=None):
+        instance = super(CourseDescriptor, cls).from_xml(xml_data, system, org, course)
+
+        # bleh, have to parse the XML here to just pull out the url_name attribute
+        # I don't think it's stored anywhere in the instance.
+        course_file = StringIO(xml_data.encode('ascii','ignore'))
+        xml_obj = etree.parse(course_file,parser=edx_xml_parser).getroot()
+
+        policy_dir = None
+        url_name = xml_obj.get('url_name', xml_obj.get('slug'))
+        if url_name:
+            policy_dir = 'policies/' + url_name
+
+        # Try to load grading policy
+        paths = ['grading_policy.json']
+        if policy_dir:
+            paths = [policy_dir + '/grading_policy.json'] + paths
+
         try:
-            self._grading_policy = load_grading_policy(policy_str)
-        except Exception, err:
-            log.exception('Failed to load grading policy:')
-            self.system.error_tracker("Failed to load grading policy")
-            # Setting this to an empty dictionary will lead to errors when
-            # grading needs to happen, but should allow course staff to see
-            # the error log.
-            self._grading_policy = {}
+            policy = json.loads(cls.read_grading_policy(paths, system))
+        except ValueError:
+            system.error_tracker("Unable to decode grading policy as json")
+            policy = None
+        
+        # cdodge: import the grading policy information that is on disk and put into the
+        # descriptor 'definition' bucket as a dictionary so that it is persisted in the DB
+        instance.definition['data']['grading_policy'] = policy
+
+        # now set the current instance. set_grading_policy() will apply some inheritance rules
+        instance.set_grading_policy(policy)
+
+        return instance
+
 
     @classmethod
     def definition_from_xml(cls, xml_object, system):
@@ -159,12 +294,52 @@ class CourseDescriptor(SequenceDescriptor):
         return time.gmtime() > self.start
 
     @property
+    def end(self):
+        return self._try_parse_time("end")
+    @end.setter
+    def end(self, value):
+        if isinstance(value, time.struct_time):
+            self.metadata['end'] = stringify_time(value)
+    @property
+    def enrollment_start(self):
+        return self._try_parse_time("enrollment_start")
+        
+    @enrollment_start.setter
+    def enrollment_start(self, value):
+        if isinstance(value, time.struct_time):
+            self.metadata['enrollment_start'] = stringify_time(value)
+    @property
+    def enrollment_end(self):        
+        return self._try_parse_time("enrollment_end")
+        
+    @enrollment_end.setter
+    def enrollment_end(self, value):
+        if isinstance(value, time.struct_time):
+            self.metadata['enrollment_end'] = stringify_time(value)
+        
+    @property
     def grader(self):
         return self._grading_policy['GRADER']
+    
+    @property
+    def raw_grader(self):
+        return self._grading_policy['RAW_GRADER']
+    
+    @raw_grader.setter
+    def raw_grader(self, value):
+        # NOTE WELL: this change will not update the processed graders. If we need that, this needs to call grader_from_conf
+        self._grading_policy['RAW_GRADER'] = value
+        self.definition['data'].setdefault('grading_policy',{})['GRADER'] = value
 
     @property
     def grade_cutoffs(self):
         return self._grading_policy['GRADE_CUTOFFS']
+    
+    @grade_cutoffs.setter
+    def grade_cutoffs(self, value):
+        self._grading_policy['GRADE_CUTOFFS'] = value
+        self.definition['data'].setdefault('grading_policy',{})['GRADE_CUTOFFS'] = value
+    
 
     @property
     def lowest_passing_grade(self):
@@ -177,41 +352,76 @@ class CourseDescriptor(SequenceDescriptor):
         """
         return self.metadata.get('tabs')
 
+    @tabs.setter
+    def tabs(self, value):
+        self.metadata['tabs'] = value
+
     @property
     def show_calculator(self):
         return self.metadata.get("show_calculator", None) == "Yes"
 
     @property
     def is_new(self):
-        # The course is "new" if either if the metadata flag is_new is
-        # true or if the course has not started yet
+        """
+        Returns if the course has been flagged as new in the metadata. If
+        there is no flag, return a heuristic value considering the
+        announcement and the start dates.
+        """
         flag = self.metadata.get('is_new', None)
         if flag is None:
-            return self.days_until_start > 1
+            # Use a heuristic if the course has not been flagged
+            announcement, start, now = self._sorting_dates()
+            if announcement and (now - announcement).days < 30:
+                # The course has been announced for less that month
+                return True
+            elif (now - start).days < 1:
+                # The course has not started yet
+                return True
+            else:
+                return False
         elif isinstance(flag, basestring):
             return flag.lower() in ['true', 'yes', 'y']
         else:
             return bool(flag)
 
     @property
-    def days_until_start(self):
-        def convert_to_datetime(timestamp):
+    def sorting_score(self):
+        """
+        Returns a number that can be used to sort the courses according
+        the how "new"" they are. The "newness"" score is computed using a
+        heuristic that takes into account the announcement and
+        (advertized) start dates of the course if available.
+
+        The lower the number the "newer" the course.
+        """
+        # Make courses that have an announcement date shave a lower
+        # score than courses than don't, older courses should have a
+        # higher score.
+        announcement, start, now = self._sorting_dates()
+        scale = 300.0  # about a year
+        if announcement:
+            days = (now - announcement).days
+            score = -exp(-days/scale)
+        else:
+            days = (now - start).days
+            score = exp(days/scale)
+        return score
+
+    def _sorting_dates(self):
+        # utility function to get datetime objects for dates used to
+        # compute the is_new flag and the sorting_score
+        def to_datetime(timestamp):
             return datetime.fromtimestamp(time.mktime(timestamp))
 
-        start_date = convert_to_datetime(self.start)
+        def get_date(field):
+            timetuple = self._try_parse_time(field)
+            return to_datetime(timetuple) if timetuple else None
 
-        #  Try to use course advertised date if we can parse it
-        advertised_start = self.metadata.get('advertised_start', None)
-        if advertised_start:
-            try:
-                start_date = datetime.strptime(advertised_start,
-                                               "%Y-%m-%dT%H:%M")
-            except ValueError:
-                pass  # Invalid date, keep using 'start''
+        announcement = get_date('announcement')
+        start = get_date('advertised_start') or to_datetime(self.start)
+        now = to_datetime(time.gmtime())
 
-        now = convert_to_datetime(time.gmtime())
-        days_until_start = (start_date - now).days
-        return days_until_start
+        return announcement, start, now
 
     @lazyproperty
     def grading_context(self):
@@ -387,9 +597,9 @@ class CourseDescriptor(SequenceDescriptor):
             self.first_eligible_appointment_date = self._try_parse_time('First_Eligible_Appointment_Date')
             if self.first_eligible_appointment_date is None:
                 raise ValueError("First appointment date must be specified")
-            # TODO: If defaulting the last appointment date, it should be the 
+            # TODO: If defaulting the last appointment date, it should be the
             # *end* of the same day, not the same time.  It's going to be used as the
-            # end of the exam overall, so we don't want the exam to disappear too soon.  
+            # end of the exam overall, so we don't want the exam to disappear too soon.
             # It's also used optionally as the registration end date, so time matters there too.
             self.last_eligible_appointment_date = self._try_parse_time('Last_Eligible_Appointment_Date') # or self.first_eligible_appointment_date
             if self.last_eligible_appointment_date is None:
@@ -403,7 +613,7 @@ class CourseDescriptor(SequenceDescriptor):
                 raise ValueError("First appointment date must be before last appointment date")
             if self.registration_end_date > self.last_eligible_appointment_date:
                 raise ValueError("Registration end date must be before last appointment date")
-            
+
 
         def _try_parse_time(self, key):
             """
@@ -434,7 +644,7 @@ class CourseDescriptor(SequenceDescriptor):
         def is_registering(self):
             now = time.gmtime()
             return now >= self.registration_start_date and now <= self.registration_end_date
-            
+
         @property
         def first_eligible_appointment_date_text(self):
             return time.strftime("%b %d, %Y", self.first_eligible_appointment_date)
@@ -451,7 +661,7 @@ class CourseDescriptor(SequenceDescriptor):
     def current_test_center_exam(self):
         exams = [exam for exam in self.test_center_exams if exam.has_started_registration() and not exam.has_ended()]
         if len(exams) > 1:
-            # TODO: output some kind of warning.  This should already be 
+            # TODO: output some kind of warning.  This should already be
             # caught if we decide to do validation at load time.
             return exams[0]
         elif len(exams) == 1:
@@ -470,3 +680,4 @@ class CourseDescriptor(SequenceDescriptor):
     @property
     def org(self):
         return self.location.org
+

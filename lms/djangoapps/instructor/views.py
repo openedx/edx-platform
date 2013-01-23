@@ -115,6 +115,7 @@ def instructor_dashboard(request, course_id):
         except Group.DoesNotExist:
             group = Group(name=grpname)     # create the group
             group.save()
+        return group
 
     def get_beta_group(course):
         """

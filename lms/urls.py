@@ -118,9 +118,11 @@ urlpatterns = ('',
         {'template': 'press_releases/Georgetown_joins_edX.html'}, name="press/georgetown-joins-edx"),
     url(r'^press/spring-courses$', 'static_template_view.views.render',
         {'template': 'press_releases/Spring_2013_course_announcements.html'}, name="press/spring-courses"),
+    url(r'^press/lewin-course-announcement$', 'static_template_view.views.render',
+        {'template': 'press_releases/Lewin_course_announcement.html'}, name="press/lewin-course-announcement"),
 
     # Should this always update to point to the latest press release?
-    (r'^pressrelease$', 'django.views.generic.simple.redirect_to', {'url': '/press/spring-courses'}),
+    (r'^pressrelease$', 'django.views.generic.simple.redirect_to', {'url': '/press/lewin-course-announcement'}),
 
 
     (r'^favicon\.ico$', 'django.views.generic.simple.redirect_to', {'url': '/static/images/favicon.ico'}),
@@ -293,11 +295,12 @@ if settings.QUICKEDIT:
     urlpatterns += (url(r'^quickedit/(?P<id>[^/]*)$', 'dogfood.views.quickedit'),)
     urlpatterns += (url(r'^dogfood/(?P<id>[^/]*)$', 'dogfood.views.df_capa_problem'),)
 
+if settings.ENABLE_JASMINE:
+    urlpatterns += (url(r'^_jasmine/', include('django_jasmine.urls')),)
+
 if settings.DEBUG:
     ## Jasmine and admin
-    urlpatterns=urlpatterns + (url(r'^_jasmine/', include('django_jasmine.urls')),
-                    url(r'^admin/', include(admin.site.urls)),
-                    )
+    urlpatterns += (url(r'^admin/', include(admin.site.urls)),)
 
 if settings.MITX_FEATURES.get('AUTH_USE_OPENID'):
     urlpatterns += (

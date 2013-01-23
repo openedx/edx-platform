@@ -86,6 +86,7 @@ class SequenceModule(XModule):
                 'progress_status': Progress.to_js_status_str(progress),
                 'progress_detail': Progress.to_js_detail_str(progress),
                 'type': child.get_icon_class(),
+                'id': child.id,
             }
             if childinfo['title']=='':
                 childinfo['title'] = child.metadata.get('display_name','')
@@ -117,7 +118,8 @@ class SequenceDescriptor(MakoModuleDescriptor, XmlDescriptor):
 
     stores_state = True # For remembering where in the sequence the student is
 
-    template_dir_name = 'sequence'
+    js = {'coffee': [resource_string(__name__, 'js/src/sequence/edit.coffee')]}
+    js_module_name = "SequenceDescriptor"
 
     @classmethod
     def definition_from_xml(cls, xml_object, system):
@@ -125,8 +127,10 @@ class SequenceDescriptor(MakoModuleDescriptor, XmlDescriptor):
         for child in xml_object:
             try:
                 children.append(system.process_xml(etree.tostring(child, encoding='unicode')).location.url())
-            except:
+            except Exception as e:
                 log.exception("Unable to load child when parsing Sequence. Continuing...")
+                if system.error_tracker is not None:
+                    system.error_tracker("ERROR: " + str(e))
                 continue
         return {'children': children}
 
