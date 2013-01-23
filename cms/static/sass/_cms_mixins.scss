@@ -1,0 +1,288 @@
+@mixin clearfix {
+	&:after {
+		content: '';
+		display: block;
+		height: 0;
+		visibility: hidden;
+		clear: both;
+	}
+}
+
+@mixin button {
+	display: inline-block;
+	padding: 4px 20px 6px;
+	font-size: 14px;
+	font-weight: 700;
+	@include box-shadow(0 1px 0 rgba(255, 255, 255, .3) inset, 0 0 0 rgba(0, 0, 0, 0));
+	@include transition(background-color .15s, box-shadow .15s);
+
+	&.disabled {
+		border: 1px solid $lightGrey !important;
+		border-radius: 3px !important;
+		background: $lightGrey !important;
+		color: $darkGrey !important;
+		pointer-events: none;
+		cursor: none;
+		&:hover {
+			box-shadow: 0 0 0 0 !important;
+		}
+	}
+
+	&:hover {
+		@include box-shadow(0 1px 0 rgba(255, 255, 255, .3) inset, 0 1px 1px rgba(0, 0, 0, .15));
+	}
+}
+
+@mixin blue-button {
+	@include button;
+	border: 1px solid #437fbf;
+	border-radius: 3px;
+	@include linear-gradient(top, rgba(255, 255, 255, .3), rgba(255, 255, 255, 0));
+	background-color: $blue;
+	color: #fff;
+
+	&:hover {
+		background-color: #62aaf5;
+		color: #fff;
+	}
+}
+
+@mixin green-button {
+  @include button;
+  border: 1px solid #0d7011;
+  border-radius: 3px;
+  @include linear-gradient(top, rgba(255, 255, 255, .3), rgba(255, 255, 255, 0));
+  background-color: $green;
+  color: #fff;
+
+  &:hover {
+  background-color: #129416;
+  color: #fff;
+  }
+}
+
+@mixin white-button {
+  @include button;
+  border: 1px solid $mediumGrey;
+  border-radius: 3px;
+  @include linear-gradient(top, rgba(255, 255, 255, 0.6), rgba(255, 255, 255, 0));
+  background-color: #dfe5eb;
+  @include box-shadow(0 1px 0 rgba(255, 255, 255, .3) inset);
+  color: rgb(92, 103, 122);
+  text-shadow: 0 1px 0 rgba(255, 255, 255, .5);
+
+  &:hover {
+    background-color: rgb(222, 236, 247);
+    color: rgb(92, 103, 122);
+  }
+}
+
+@mixin orange-button {
+	@include button;
+	border: 1px solid #bda046;
+	border-radius: 3px;
+	@include linear-gradient(top, rgba(255, 255, 255, 0.4), rgba(255, 255, 255, 0) 60%);
+	background-color: #edbd3c;
+	@include box-shadow(0 1px 0 rgba(255, 255, 255, .3) inset);
+	color: #3c3c3c;
+
+	&:hover {
+		background-color: #ffcd46;
+		color: #3c3c3c;
+	}
+}
+
+@mixin grey-button {
+	@include button;
+	border: 1px solid $darkGrey;
+	border-radius: 3px;
+	@include linear-gradient(top, rgba(255, 255, 255, .3), rgba(255, 255, 255, 0));
+	background-color: #d1dae3;
+	@include box-shadow(0 1px 0 rgba(255, 255, 255, .3) inset);
+	color: #6d788b;
+
+	&:hover {
+		background-color: #d9e3ee;
+		color: #6d788b;
+	}
+}
+
+@mixin green-button {
+	@include button;
+	border: 1px solid $darkGreen;
+	border-radius: 3px;
+	@include linear-gradient(top, rgba(255, 255, 255, .3), rgba(255, 255, 255, 0));
+	background-color: $green;
+	@include box-shadow(0 1px 0 rgba(255, 255, 255, .3) inset);
+	color: #fff;
+
+	&:hover {
+		background-color: $brightGreen;
+		color: #fff;
+	}
+
+	&.disabled {
+		border: 1px solid $disabledGreen !important;
+		background: $disabledGreen !important;
+		color: #fff !important;
+		@include box-shadow(none);
+	}
+}
+
+@mixin dark-grey-button {
+	@include button;
+	border: 1px solid #1c1e20;
+	border-radius: 3px;
+	background: -webkit-linear-gradient(top, rgba(255, 255, 255, .2), rgba(255, 255, 255, 0)) $extraDarkGrey;
+	box-shadow: 0 1px 0 rgba(255, 255, 255, .2) inset;
+	color: #fff;
+
+	&:hover {
+		background-color: #595f64;
+		color: #fff;
+	}
+}
+
+@mixin edit-box {
+	padding: 15px 20px;
+	border-radius: 3px;
+	background-color: $lightBluishGrey2;
+	color: #3c3c3c;
+	@include box-shadow(0 1px 0 rgba(255, 255, 255, .2) inset);
+
+	label {
+		color: $baseFontColor;
+	}
+
+	input,
+	textarea {
+		border: 1px solid $darkGrey;
+	}
+
+	textarea {
+		min-height: 80px;		
+	}
+
+	h5 {
+		margin-bottom: 8px;
+		color: #fff;
+		font-weight: 700;
+	}
+
+	.row {
+		margin-bottom: 10px;
+		padding: 0;
+		border: none;
+	}
+
+	.save-button {
+		@include blue-button;
+		margin-top: 0;
+	}
+
+	.cancel-button {
+		@include white-button;
+		margin-top: 0;
+	}
+}
+
+@mixin tree-view {
+	border: 1px solid $mediumGrey;
+	background: $lightGrey;
+
+	.branch {
+		margin-bottom: 10px;
+
+		&.collapsed {
+			margin-bottom: 0;
+		}
+	}
+
+	.branch > .section-item {
+		border-top: 1px solid #c5cad4;
+	}
+
+	.section-item {
+		position: relative;
+		display: block;
+		padding: 6px 8px 8px 16px;			
+		background: #edf1f5;
+		font-size: 13px;
+
+		&:hover {
+			background: #fffcf1;
+
+			.item-actions {
+				display: block;
+			}
+		}
+
+		&.editing {
+			background: #fffcf1;
+		}
+
+		.draft-item:after,
+		.public-item:after,
+		.private-item:after {
+			margin-left: 3px;
+			font-size: 9px;
+			font-weight: 600;
+			text-transform: uppercase;
+		}
+
+		.draft-item:after {
+			content: "- draft";
+		}
+
+		.private-item:after {
+			content: "- private";
+		}
+
+		.private-item {
+			color: #a4aab7;
+		}
+
+		.draft-item {
+			color: #9f7d10;
+		}
+	}
+
+	a {
+		color: $baseFontColor;
+
+		&.new-unit-item {
+			color: #6d788b;
+		}
+	}
+
+	ol {
+		.section-item {
+			padding-left: 56px;
+		}
+
+		.new-unit-item {
+			margin-left: 56px;
+		}
+	}
+
+	ol ol {
+		.section-item {
+			padding-left: 96px;
+		}
+
+		.new-unit-item {
+			margin-left: 96px;
+		}
+	}
+}
+
+@mixin sr-text {
+  border: 0; 
+  clip: rect(0 0 0 0); 
+  height: 1px; 
+  margin: -1px; 
+  overflow: hidden; 
+  padding: 0; 
+  position: absolute; 
+  width: 1px;
+}

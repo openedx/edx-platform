@@ -8,7 +8,7 @@ sessions. Assumes structure:
         /log  # Where we're going to write log files
 """
 from .common import *
-from .logsettings import get_logger_config
+from logsettings import get_logger_config
 
 DEBUG = True
 TEMPLATE_DEBUG = True
@@ -99,6 +99,10 @@ SUBDOMAIN_BRANDING = {
     'berkeley': 'BerkeleyX',
     'harvard': 'HarvardX',
 }
+
+# List of `university` landing pages to display, even though they may not
+# have an actual course with that org set
+VIRTUAL_UNIVERSITIES = []
 
 COMMENTS_SERVICE_KEY = "PUT_YOUR_API_KEY_HERE"
 

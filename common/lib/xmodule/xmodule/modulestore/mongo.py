@@ -1,5 +1,6 @@
 import pymongo
 import sys
+import logging
 
 from bson.son import SON
 from fs.osfs import OSFS
@@ -13,6 +14,7 @@ from xmodule.mako_module import MakoDescriptorSystem
 from xmodule.error_module import ErrorDescriptor
 
 from . import ModuleStoreBase, Location
+from .draft import DraftModuleStore
 from .exceptions import (ItemNotFoundError,
                          DuplicateItemError)
 
@@ -49,6 +51,9 @@ class CachingDescriptorSystem(MakoDescriptorSystem):
         self.modulestore = modulestore
         self.module_data = module_data
         self.default_class = default_class
+        # cdodge: other Systems have a course_id attribute defined. To keep things consistent, let's
+        # define an attribute here as well, even though it's None
+        self.course_id = None
 
     def load_item(self, location):
         location = Location(location)
@@ -69,19 +74,32 @@ class CachingDescriptorSystem(MakoDescriptorSystem):
                 )
 
 
-def location_to_query(location):
+def location_to_query(location, wildcard=True):
     """
     Takes a Location and returns a SON object that will query for that location.
     Fields in location that are None are ignored in the query
+
+    If `wildcard` is True, then a None in a location is treated as a wildcard
+    query. Otherwise, it is searched for literally
     """
-    query = SON()
-    # Location dict is ordered by specificity, and SON
-    # will preserve that order for queries
-    for key, val in Location(location).dict().iteritems():
-        if val is not None:
-            query['_id.{key}'.format(key=key)] = val
+    query = namedtuple_to_son(Location(location), prefix='_id.')
+
+    if wildcard:
+        for key, value in query.items():
+            if value is None:
+                del query[key]
 
     return query
+
+
+def namedtuple_to_son(namedtuple, prefix=''):
+    """
+    Converts a namedtuple into a SON object with the same key order
+    """
+    son = SON()
+    for idx, field_name in enumerate(namedtuple._fields):
+        son[prefix + field_name] = namedtuple[idx]
+    return son
 
 
 class MongoModuleStore(ModuleStoreBase):
@@ -92,14 +110,20 @@ class MongoModuleStore(ModuleStoreBase):
     # TODO (cpennington): Enable non-filesystem filestores
     def __init__(self, host, db, collection, fs_root, render_template,
                  port=27017, default_class=None,
-                 error_tracker=null_error_tracker):
+                 error_tracker=null_error_tracker,
+                 user=None, password=None, **kwargs):
 
         ModuleStoreBase.__init__(self)
 
         self.collection = pymongo.connection.Connection(
             host=host,
-            port=port
+            port=port,
+            **kwargs
         )[db][collection]
+
+        if user is not None and password is not None:
+            self.collection.database.authenticate(user, password)
+
 
         # Force mongo to report errors, at the expense of performance
         self.collection.safe = True
@@ -134,6 +158,7 @@ class MongoModuleStore(ModuleStoreBase):
         If depth is None, will load all the children.
         This will make a number of queries that is linear in the depth.
         """
+
         data = {}
         to_process = list(items)
         while to_process and depth is None or depth >= 0:
@@ -147,8 +172,10 @@ class MongoModuleStore(ModuleStoreBase):
             # http://www.mongodb.org/display/DOCS/Advanced+Queries#AdvancedQueries-%24or
             # for or-query syntax
             if children:
-                to_process = list(self.collection.find(
-                    {'_id': {'$in': [Location(child).dict() for child in children]}}))
+                query = {
+                    '_id': {'$in': [namedtuple_to_son(Location(child)) for child in children]}
+                }
+                to_process = self.collection.find(query)
             else:
                 to_process = []
             # If depth is None, then we just recurse until we hit all the descendents
@@ -202,18 +229,27 @@ class MongoModuleStore(ModuleStoreBase):
         ItemNotFoundError.
         '''
         item = self.collection.find_one(
-            location_to_query(location),
+            location_to_query(location, wildcard=False),
             sort=[('revision', pymongo.ASCENDING)],
         )
         if item is None:
             raise ItemNotFoundError(location)
         return item
 
+    def has_item(self, location):
+        """
+        Returns True if location exists in this ModuleStore.
+        """
+        location = Location.ensure_fully_specified(location)
+        try:
+            self._find_one(location)
+            return True
+        except ItemNotFoundError:
+            return False
+
     def get_item(self, location, depth=0):
         """
         Returns an XModuleDescriptor instance for the item at location.
-        If location.revision is None, returns the item with the most
-        recent revision.
 
         If any segment of the location is None except revision, raises
             xmodule.modulestore.exceptions.InsufficientSpecificationError
@@ -231,14 +267,19 @@ class MongoModuleStore(ModuleStoreBase):
         item = self._find_one(location)
         return self._load_items([item], depth)[0]
 
-    def get_instance(self, course_id, location):
+    def get_instance(self, course_id, location, depth=0):
         """
         TODO (vshnayder): implement policy tracking in mongo.
         For now, just delegate to get_item and ignore policy.
-        """
-        return self.get_item(location)
 
-    def get_items(self, location, depth=0):
+        depth (int): An argument that some module stores may use to prefetch
+            descendents of the queried modules for more efficient results later
+            in the request. The depth is counted in the number of
+            calls to get_children() to cache. None indicates to cache all descendents.
+        """
+        return self.get_item(location, depth=depth)
+
+    def get_items(self, location, course_id=None, depth=0):
         items = self.collection.find(
             location_to_query(location),
             sort=[('revision', pymongo.ASCENDING)],
@@ -255,9 +296,48 @@ class MongoModuleStore(ModuleStoreBase):
             source_item = self.collection.find_one(location_to_query(source))
             source_item['_id'] = Location(location).dict()
             self.collection.insert(source_item)
-            return self._load_items([source_item])[0]
+            item = self._load_items([source_item])[0]
+
+            # VS[compat] cdodge: This is a hack because static_tabs also have references from the course module, so
+            # if we add one then we need to also add it to the policy information (i.e. metadata)
+            # we should remove this once we can break this reference from the course to static tabs
+            if location.category == 'static_tab':
+                course = self.get_course_for_item(item.location)
+                existing_tabs = course.tabs or []
+                existing_tabs.append({'type':'static_tab', 'name' : item.metadata.get('display_name'), 'url_slug' : item.location.name})
+                course.tabs = existing_tabs
+                self.update_metadata(course.location, course.metadata)
+
+            return item
         except pymongo.errors.DuplicateKeyError:
             raise DuplicateItemError(location)
+
+
+    def get_course_for_item(self, location):
+        '''
+        VS[compat]
+        cdodge: for a given Xmodule, return the course that it belongs to
+        NOTE: This makes a lot of assumptions about the format of the course location
+        Also we have to assert that this module maps to only one course item - it'll throw an
+        assert if not
+        This is only used to support static_tabs as we need to be course module aware
+        '''
+
+        # @hack! We need to find the course location however, we don't
+        # know the 'name' parameter in this context, so we have
+        # to assume there's only one item in this query even though we are not specifying a name
+        course_search_location = ['i4x', location.org, location.course, 'course', None]
+        courses = self.get_items(course_search_location)
+
+        # make sure we found exactly one match on this above course search
+        found_cnt = len(courses)
+        if found_cnt == 0:
+            raise BaseException('Could not find course at {0}'.format(course_search_location))
+
+        if found_cnt > 1:
+            raise BaseException('Found more than one course at {0}. There should only be one!!! Dump = {1}'.format(course_search_location, courses))
+
+        return courses[0]
 
     def _update_single_item(self, location, update):
         """
@@ -306,23 +386,47 @@ class MongoModuleStore(ModuleStoreBase):
         location: Something that can be passed to Location
         metadata: A nested dictionary of module metadata
         """
+        # VS[compat] cdodge: This is a hack because static_tabs also have references from the course module, so
+        # if we add one then we need to also add it to the policy information (i.e. metadata)
+        # we should remove this once we can break this reference from the course to static tabs
+        loc = Location(location)
+        if loc.category == 'static_tab':
+            course = self.get_course_for_item(loc)
+            existing_tabs = course.tabs or []
+            for tab in existing_tabs:
+                if tab.get('url_slug') == loc.name:
+                    tab['name'] = metadata.get('display_name')
+                    break
+            course.tabs = existing_tabs
+            self.update_metadata(course.location, course.metadata)
 
         self._update_single_item(location, {'metadata': metadata})
+
+
+    def delete_item(self, location):
+        """
+        Delete an item from this modulestore
+
+        location: Something that can be passed to Location
+        """
+        # VS[compat] cdodge: This is a hack because static_tabs also have references from the course module, so
+        # if we add one then we need to also add it to the policy information (i.e. metadata)
+        # we should remove this once we can break this reference from the course to static tabs
+        if location.category == 'static_tab':
+            item = self.get_item(location)
+            course = self.get_course_for_item(item.location)
+            existing_tabs = course.tabs or []
+            course.tabs = [tab for tab in existing_tabs if tab.get('url_slug') != location.name]
+            self.update_metadata(course.location, course.metadata)
+
+        self.collection.remove({'_id': Location(location).dict()})
+
 
     def get_parent_locations(self, location, course_id):
         '''Find all locations that are the parents of this location in this 
         course.  Needed for path_to_location().
-
-        If there is no data at location in this modulestore, raise
-            ItemNotFoundError.
-
-        returns an iterable of things that can be passed to Location.  This may
-        be empty if there are no parents.
         '''
         location = Location.ensure_fully_specified(location)
-        # Check that it's actually in this modulestore.
-        self._find_one(location)
-        # now get the parents
         items = self.collection.find({'definition.children': location.url()},
                                     {'_id': True})
         return [i['_id'] for i in items]
@@ -333,3 +437,8 @@ class MongoModuleStore(ModuleStoreBase):
         are loaded on demand, rather than up front
         """
         return {}
+
+
+# DraftModuleStore is first, because it needs to intercept calls to MongoModuleStore
+class DraftMongoModuleStore(DraftModuleStore, MongoModuleStore):
+    pass

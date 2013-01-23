@@ -7,6 +7,7 @@ import time
 from datetime import datetime, timedelta
 
 from django.conf import settings
+from django.contrib.auth.models import Group
 
 from xmodule.course_module import CourseDescriptor
 from xmodule.error_module import ErrorDescriptor
@@ -19,12 +20,21 @@ DEBUG_ACCESS = False
 
 log = logging.getLogger(__name__)
 
+
+class CourseContextRequired(Exception):
+    """
+    Raised when a course_context is required to determine permissions
+    """
+    pass
+
+
 def debug(*args, **kwargs):
     # to avoid overly verbose output, this is off by default
     if DEBUG_ACCESS:
         log.debug(*args, **kwargs)
 
-def has_access(user, obj, action):
+
+def has_access(user, obj, action, course_context=None):
     """
     Check whether a user has the access to do action on obj.  Handles any magic
     switching based on various settings.
@@ -44,6 +54,10 @@ def has_access(user, obj, action):
     actions depend on the obj type, but include e.g. 'enroll' for courses.  See the
     type-specific functions below for the known actions for that type.
 
+    course_context: A course_id specifying which course run this access is for.
+        Required when accessing anything other than a CourseDescriptor, 'global',
+        or a location with category 'course'
+
     Returns a bool.  It is up to the caller to actually deny access in a way
     that makes sense in context.
     """
@@ -53,25 +67,26 @@ def has_access(user, obj, action):
         return _has_access_course_desc(user, obj, action)
 
     if isinstance(obj, ErrorDescriptor):
-        return _has_access_error_desc(user, obj, action)
+        return _has_access_error_desc(user, obj, action, course_context)
 
     # NOTE: any descriptor access checkers need to go above this
     if isinstance(obj, XModuleDescriptor):
-        return _has_access_descriptor(user, obj, action)
+        return _has_access_descriptor(user, obj, action, course_context)
 
     if isinstance(obj, XModule):
-        return _has_access_xmodule(user, obj, action)
+        return _has_access_xmodule(user, obj, action, course_context)
 
     if isinstance(obj, Location):
-        return _has_access_location(user, obj, action)
+        return _has_access_location(user, obj, action, course_context)
 
     if isinstance(obj, basestring):
-        return _has_access_string(user, obj, action)
+        return _has_access_string(user, obj, action, course_context)
 
     # Passing an unknown object here is a coding error, so rather than
     # returning a default, complain.
     raise TypeError("Unknown object type in has_access(): '{0}'"
                     .format(type(obj)))
+
 
 def get_access_group_name(obj, action):
     '''
@@ -88,8 +103,8 @@ def get_access_group_name(obj, action):
     raise TypeError("Unknown object type in get_access_group_name(): '{0}'"
                     .format(type(obj)))
 
-# ================ Implementation helpers ================================
 
+# ================ Implementation helpers ================================
 def _has_access_course_desc(user, course, action):
     """
     Check if user has access to a course descriptor.
@@ -127,7 +142,7 @@ def _has_access_course_desc(user, course, action):
             return True
 
         # if user is in CourseEnrollmentAllowed with right course_id then can also enroll
-        if user is not None and CourseEnrollmentAllowed:
+        if user is not None and user.is_authenticated() and CourseEnrollmentAllowed:
             if CourseEnrollmentAllowed.objects.filter(email=user.email, course_id=course.id):
                 return True
 
@@ -180,7 +195,8 @@ def _get_access_group_name_course_desc(course, action):
 
 
 
-def _has_access_error_desc(user, descriptor, action):
+
+def _has_access_error_desc(user, descriptor, action, course_context):
     """
     Only staff should see error descriptors.
 
@@ -189,7 +205,7 @@ def _has_access_error_desc(user, descriptor, action):
     'staff' -- staff access to descriptor.
     """
     def check_for_staff():
-        return _has_staff_access_to_descriptor(user, descriptor)
+        return _has_staff_access_to_descriptor(user, descriptor, course_context)
 
     checkers = {
         'load': check_for_staff,
@@ -199,7 +215,7 @@ def _has_access_error_desc(user, descriptor, action):
     return _dispatch(checkers, action, user, descriptor)
 
 
-def _has_access_descriptor(user, descriptor, action):
+def _has_access_descriptor(user, descriptor, action, course_context=None):
     """
     Check if user has access to this descriptor.
 
@@ -232,7 +248,7 @@ def _has_access_descriptor(user, descriptor, action):
                 debug("Allow: now > effective start date")
                 return True
             # otherwise, need staff access
-            return _has_staff_access_to_descriptor(user, descriptor)
+            return _has_staff_access_to_descriptor(user, descriptor, course_context)
 
         # No start date, so can always load.
         debug("Allow: no start date")
@@ -240,13 +256,13 @@ def _has_access_descriptor(user, descriptor, action):
 
     checkers = {
         'load': can_load,
-        'staff': lambda: _has_staff_access_to_descriptor(user, descriptor)
+        'staff': lambda: _has_staff_access_to_descriptor(user, descriptor, course_context)
         }
 
     return _dispatch(checkers, action, user, descriptor)
 
 
-def _has_access_xmodule(user, xmodule, action):
+def _has_access_xmodule(user, xmodule, action, course_context):
     """
     Check if user has access to this xmodule.
 
@@ -254,10 +270,10 @@ def _has_access_xmodule(user, xmodule, action):
       - same as the valid actions for xmodule.descriptor
     """
     # Delegate to the descriptor
-    return has_access(user, xmodule.descriptor, action)
+    return has_access(user, xmodule.descriptor, action, course_context)
 
 
-def _has_access_location(user, location, action):
+def _has_access_location(user, location, action, course_context):
     """
     Check if user has access to this location.
 
@@ -271,13 +287,13 @@ def _has_access_location(user, location, action):
     And in general, prefer checking access on loaded items, rather than locations.
     """
     checkers = {
-        'staff': lambda: _has_staff_access_to_location(user, location)
+        'staff': lambda: _has_staff_access_to_location(user, location, course_context)
         }
 
     return _dispatch(checkers, action, user, location)
 
 
-def _has_access_string(user, perm, action):
+def _has_access_string(user, perm, action, course_context):
     """
     Check if user has certain special access, specified as string.  Valid strings:
 
@@ -321,13 +337,35 @@ def _dispatch(table, action, user, obj):
     raise ValueError("Unknown action for object type '{0}': '{1}'".format(
         type(obj), action))
 
-def _course_staff_group_name(location):
-    """
-    Get the name of the staff group for a location.  Right now, that's staff_COURSE.
 
-    location: something that can passed to Location.
+def _does_course_group_name_exist(name):
+    return len(Group.objects.filter(name=name)) > 0
+
+
+def _course_staff_group_name(location, course_context=None):
     """
-    return 'staff_%s' % Location(location).course
+    Get the name of the staff group for a location in the context of a course run.
+
+    location: something that can passed to Location
+    course_context: A course_id that specifies the course run in which the location occurs.
+        Required if location doesn't have category 'course'
+
+    cdodge: We're changing the name convention of the group to better epxress different runs of courses by
+    using course_id rather than just the course number. So first check to see if the group name exists
+    """
+    loc = Location(location)
+    legacy_name = 'staff_%s' % loc.course
+    if _does_course_group_name_exist(legacy_name):
+        return legacy_name
+
+    if loc.category == 'course':
+        course_id = loc.course_id
+    else:
+        if course_context is None:
+            raise CourseContextRequired()
+        course_id = course_context
+
+    return 'staff_%s' % course_id
 
 def course_beta_test_group_name(location):
     """
@@ -343,14 +381,31 @@ def course_beta_test_group_name(location):
 course_beta_test_group_name.__test__ = False
 
 
-def _course_instructor_group_name(location):
+def _course_instructor_group_name(location, course_context=None):
     """
-    Get the name of the instructor group for a location.  Right now, that's instructor_COURSE.
+    Get the name of the instructor group for a location, in the context of a course run.
     A course instructor has all staff privileges, but also can manage list of course staff (add, remove, list).
 
     location: something that can passed to Location.
+    course_context: A course_id that specifies the course run in which the location occurs.
+        Required if location doesn't have category 'course'
+
+    cdodge: We're changing the name convention of the group to better epxress different runs of courses by
+    using course_id rather than just the course number. So first check to see if the group name exists
     """
-    return 'instructor_%s' % Location(location).course
+    loc = Location(location)
+    legacy_name = 'instructor_%s' % loc.course
+    if _does_course_group_name_exist(legacy_name):
+        return legacy_name
+
+    if loc.category == 'course':
+        course_id = loc.course_id
+    else:
+        if course_context is None:
+            raise CourseContextRequired()
+        course_id = course_context
+
+    return 'instructor_%s' % course_id
 
 
 def _has_global_staff_access(user):
@@ -407,15 +462,15 @@ def _adjust_start_date_for_beta_testers(user, descriptor):
 
     return descriptor.start
 
-def _has_instructor_access_to_location(user, location):
-    return _has_access_to_location(user, location, 'instructor')
+def _has_instructor_access_to_location(user, location, course_context=None):
+    return _has_access_to_location(user, location, 'instructor', course_context)
 
 
-def _has_staff_access_to_location(user, location):
-    return _has_access_to_location(user, location, 'staff')
+def _has_staff_access_to_location(user, location, course_context=None):
+    return _has_access_to_location(user, location, 'staff', course_context)
 
 
-def _has_access_to_location(user, location, access_level):
+def _has_access_to_location(user, location, access_level, course_context):
     '''
     Returns True if the given user has access_level (= staff or
     instructor) access to a location.  For now this is equivalent to
@@ -441,14 +496,14 @@ def _has_access_to_location(user, location, access_level):
     user_groups = [g.name for g in user.groups.all()]
 
     if access_level == 'staff':
-        staff_group = _course_staff_group_name(location)
+        staff_group = _course_staff_group_name(location, course_context)
         if staff_group in user_groups:
             debug("Allow: user in group %s", staff_group)
             return True
         debug("Deny: user not in group %s", staff_group)
 
     if access_level == 'instructor' or access_level == 'staff': 	# instructors get staff privileges
-        instructor_group = _course_instructor_group_name(location)
+        instructor_group = _course_instructor_group_name(location, course_context)
         if instructor_group in user_groups:
             debug("Allow: user in group %s", instructor_group)
             return True
@@ -463,22 +518,22 @@ def _has_access_to_location(user, location, access_level):
 def _has_staff_access_to_course_id(user, course_id):
     """Helper method that takes a course_id instead of a course name"""
     loc = CourseDescriptor.id_to_location(course_id)
-    return _has_staff_access_to_location(user, loc)
+    return _has_staff_access_to_location(user, loc, course_id)
 
 
-def _has_instructor_access_to_descriptor(user, descriptor):
+def _has_instructor_access_to_descriptor(user, descriptor, course_context=None):
     """Helper method that checks whether the user has staff access to
     the course of the location.
 
     descriptor: something that has a location attribute
     """
-    return _has_instructor_access_to_location(user, descriptor.location)
+    return _has_instructor_access_to_location(user, descriptor.location, course_context)
 
-def _has_staff_access_to_descriptor(user, descriptor):
+
+def _has_staff_access_to_descriptor(user, descriptor, course_context=None):
     """Helper method that checks whether the user has staff access to
     the course of the location.
 
     descriptor: something that has a location attribute
     """
-    return _has_staff_access_to_location(user, descriptor.location)
-
+    return _has_staff_access_to_location(user, descriptor.location, course_context)
