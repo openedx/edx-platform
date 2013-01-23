@@ -272,7 +272,7 @@ class CombinedOpenEndedModule(XModule):
                 'max_score' : self._max_score,
                 'attempts' : 0,
                 'created' : True,
-                'history' : [{'answer' : str(last_response)}],
+                'history' : [{'answer' : last_response}],
             })
             self.current_task = child_task_module(self.system, self.location,
                 self.current_task_parsed_xml, self.current_task_descriptor, self.static_data,
