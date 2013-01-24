@@ -40,7 +40,18 @@ def is_commentable_cohorted(course_id, commentable_id):
         Http404 if the course doesn't exist.
     """
     course = courses.get_course_by_id(course_id)
-    ans = commentable_id in course.cohorted_discussions()
+
+    if not course.is_cohorted:
+        # this is the easy case :)
+        ans = False
+    elif commentable_id in course.top_level_discussion_topic_ids:
+        # top level discussions have to be manually configured as cohorted
+        # (default is not)
+        ans = commentable_id in course.cohorted_discussions()
+    else:
+        # inline discussions are cohorted by default
+        ans = True
+
     log.debug("is_commentable_cohorted({0}, {1}) = {2}".format(course_id,
                                                                commentable_id,
                                                                ans))
@@ -49,7 +60,11 @@ def is_commentable_cohorted(course_id, commentable_id):
 
 def get_cohort(user, course_id):
     c = _get_cohort(user, course_id)
-    log.debug("get_cohort({0}, {1}) = {2}".format(user, course_id, c.id))
+    log.debug("get_cohort({0}, {1}) = {2}".format(
+        user, course_id,
+        c.id if c is not None else None))
+    return c
+
 
 def _get_cohort(user, course_id):
     """

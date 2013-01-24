@@ -371,10 +371,21 @@ class CourseDescriptor(SequenceDescriptor):
 
         return bool(config.get("cohorted"))
 
+    @property
+    def top_level_discussion_topic_ids(self):
+        """
+        Return list of topic ids defined in course policy.
+        """
+        topics = self.metadata.get("discussion_topics", {})
+        return [d["id"] for d in topics.values()] 
+
+
+    @property
     def cohorted_discussions(self):
         """
-        Return the set of discussions that is cohorted.  It may be the empty
-        set.
+        Return the set of discussions that is explicitly cohorted.  It may be
+        the empty set.  Note that all inline discussions are automatically
+        cohorted based on the course's is_cohorted setting.
         """
         config = self.metadata.get("cohort_config")
         if config is None:
