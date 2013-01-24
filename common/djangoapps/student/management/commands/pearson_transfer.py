@@ -111,7 +111,10 @@ class Command(BaseCommand):
             with dog_stats_api.timer('pearson.{0}'.format(mode), tags='s3'):
                 try:
                     for filename in os.listdir(files_from):
-                        upload_file_to_s3(bucket, files_from, filename)
+                        source_file = os.path.join(files_from, filename)
+                        # use mode as name of directory into which to write files 
+                        dest_file = os.path.join(mode, filename)
+                        upload_file_to_s3(bucket, source_file, dest_file)
                         if deleteAfterCopy:
                             os.remove(files_from + '/' + filename)
                 except:
@@ -119,7 +122,7 @@ class Command(BaseCommand):
                                        's3 archiving failed')
                     raise
 
-        def upload_file_to_s3(bucket, source_dir, filename):
+        def upload_file_to_s3(bucket, source_file, dest_file):
             """
             Upload file to S3
             """
@@ -128,8 +131,8 @@ class Command(BaseCommand):
             from boto.s3.key import Key
             b = s3.get_bucket(bucket)
             k = Key(b)
-            k.key = "{filename}".format(filename=filename)
-            k.set_contents_from_filename(os.path.join(source_dir, filename))
+            k.key = "{filename}".format(filename=dest_file)
+            k.set_contents_from_filename(source_file)
 
         def export_pearson():
             options = { 'dest-from-settings' : True }
