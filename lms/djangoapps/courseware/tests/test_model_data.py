@@ -114,6 +114,7 @@ class TestDescriptorFallback(TestCase):
 class TestInvalidScopes(TestCase):
     def setUp(self):
         self.desc_md = {}
+        self.user = UserFactory.create()
         self.mdc = ModelDataCache([mock_descriptor([mock_field(Scope.student_state, 'a_field')])], course_id, self.user)
         self.kvs = LmsKeyValueStore(self.desc_md, self.mdc)
 
@@ -205,7 +206,7 @@ class TestSettingsStorage(TestCase):
         settings = SettingsFactory.create()
         self.user = UserFactory.create()
         self.desc_md = {}
-        self.mdc = ModelDataCache([mock_descriptor()], course_id, self.user)
+        self.mdc = ModelDataCache([mock_descriptor([mock_field(Scope.settings, 'settings_field')])], course_id, self.user)
         self.kvs = LmsKeyValueStore(self.desc_md, self.mdc)
 
     def test_get_existing_field(self):
@@ -246,7 +247,7 @@ class TestContentStorage(TestCase):
         content = ContentFactory.create()
         self.user = UserFactory.create()
         self.desc_md = {}
-        self.mdc = ModelDataCache([mock_descriptor()], course_id, self.user)
+        self.mdc = ModelDataCache([mock_descriptor([mock_field(Scope.content, 'content_field')])], course_id, self.user)
         self.kvs = LmsKeyValueStore(self.desc_md, self.mdc)
 
     def test_get_existing_field(self):
