@@ -1,26 +1,22 @@
-from unittest import TestCase
 import logging
 from mock import MagicMock, patch
 import json
 import factory
+import unittest 
 
 from django.http import Http404, HttpResponse, HttpRequest
 from django.conf import settings
 from django.contrib.auth.models import User
 from django.test.client import Client
 from django.conf import settings
+from django.test import TestCase
+from django.test.client import RequestFactory
 
 from courseware.models import StudentModule
 from xmodule.modulestore.exceptions import ItemNotFoundError
 from xmodule.modulestore import Location
 import courseware.module_render as render
-
-import unittest 
-
-from django.test import TestCase
-from django.test.client import RequestFactory
 from override_settings import override_settings
-
 from xmodule.modulestore.django import modulestore, _MODULESTORES
 
 
@@ -202,7 +198,8 @@ class TestTOC(TestCase):
         # Toy courses should be loaded
         self.course_name = 'edX/toy/2012_Fall'
         self.toy_course = modulestore().get_course(self.course_name)
-        
+        print type(self.toy_course)
+        assert False
         self.portal_user = UserFactory()
 
     def test_toc_toy_from_chapter(self):
