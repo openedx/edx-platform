@@ -1,7 +1,7 @@
 from optparse import make_option
 
 from django.contrib.auth.models import User
-from django.core.management.base import BaseCommand
+from django.core.management.base import BaseCommand, CommandError
 
 from student.models import TestCenterUser, TestCenterUserForm
 
@@ -161,15 +161,16 @@ class Command(BaseCommand):
             if form.is_valid():
                 form.update_and_save()
             else:
+                errorlist = []
                 if (len(form.errors) > 0):
-                    print "Field Form errors encountered:"
-                for fielderror in form.errors:
-                    print "Field Form Error:  %s" % fielderror
-                    if (len(form.non_field_errors()) > 0):
-                        print "Non-field Form errors encountered:"
-                        for nonfielderror in form.non_field_errors:
-                            print "Non-field Form Error:  %s" % nonfielderror
-                    
+                    errorlist.append("Field Form errors encountered:")
+                    for fielderror in form.errors:
+                        errorlist.append("Field Form Error:  {}".format(fielderror))
+                if (len(form.non_field_errors()) > 0):
+                    errorlist.append("Non-field Form errors encountered:")
+                    for nonfielderror in form.non_field_errors:
+                        errorlist.append("Non-field Form Error:  {}".format(nonfielderror))
+                raise CommandError("\n".join(errorlist))    
         else:
             print "No changes necessary to make to existing user's demographics."
             

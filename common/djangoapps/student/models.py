@@ -428,6 +428,10 @@ class TestCenterRegistration(models.Model):
         # TODO: figure out if this should really go in the database (with a default value).
         return 1
     
+    @property
+    def needs_uploading(self):
+        return self.uploaded_at is None or self.uploaded_at < self.user_updated_at
+    
     @classmethod
     def create(cls, testcenter_user, exam, accommodation_request):
         registration = cls(testcenter_user = testcenter_user)
@@ -549,7 +553,11 @@ def get_testcenter_registration(user, course_id, exam_series_code):
     except TestCenterUser.DoesNotExist:
         return []
     return TestCenterRegistration.objects.filter(testcenter_user=tcu, course_id=course_id, exam_series_code=exam_series_code)
-        
+
+# nosetests thinks that anything with _test_ in the name is a test.
+# Correct this (https://nose.readthedocs.org/en/latest/finding_tests.html)
+get_testcenter_registration.__test__ = False
+   
 def unique_id_for_user(user):
     """
     Return a unique id for a user, suitable for inserting into
