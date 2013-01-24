@@ -59,4 +59,3 @@ Shapely==1.2.16
 ipython==0.13.1
 xmltodict==0.4.1
 paramiko==1.9.0
-git+ssh://git@github.com/MITx/dogapi.git@003a4fc9#egg=dogapi
