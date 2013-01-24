@@ -49,7 +49,7 @@ def is_commentable_cohorted(course_id, commentable_id):
 
 def get_cohort(user, course_id):
     c = _get_cohort(user, course_id)
-    log.debug("get_cohort({0}, {1}) = {2}", user, course_id, c.id)
+    log.debug("get_cohort({0}, {1}) = {2}".format(user, course_id, c.id))
 
 def _get_cohort(user, course_id):
     """
