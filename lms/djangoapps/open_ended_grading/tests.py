@@ -18,6 +18,8 @@ from nose import SkipTest
 from mock import patch, Mock
 import json
 
+import logging
+log = logging.getLogger(__name__)
 from override_settings import override_settings
 
 
@@ -182,7 +184,7 @@ class TestPeerGradingService(ct.PageLoader):
         self.assertFalse(d['success'])
         self.assertTrue(d['error'].find('Missing required keys:') > -1)
 
-    def test_is_calibrated(self):
+    def test_is_calibrated_success(self):
         self.login(self.student, self.password)
         url = reverse('peer_grading_is_student_calibrated', kwargs={'course_id': self.course_id})
         data = {'location': self.location}
@@ -190,4 +192,62 @@ class TestPeerGradingService(ct.PageLoader):
         d = json.loads(r.content)
         self.assertTrue(d['success'])
         self.assertTrue('calibrated' in d)
+
+    def test_is_calibrated_failure(self):
+        self.login(self.student, self.password)
+        url = reverse('peer_grading_is_student_calibrated', kwargs={'course_id': self.course_id})
+        data = {}
+        r = self.check_for_post_code(200, url, data)
+        d = json.loads(r.content)
+        self.assertFalse(d['success'])
+        self.assertFalse('calibrated' in d)
+
+    def test_show_calibration_essay_success(self):
+        self.login(self.student, self.password)
+
+        url = reverse('peer_grading_show_calibration_essay', kwargs={'course_id': self.course_id})
+        data = {'location': self.location}
+
+        r = self.check_for_post_code(200, url, data)
+        d = json.loads(r.content)
+        self.assertTrue(d['success'])
+        self.assertIsNotNone(d['submission_id'])
+        self.assertIsNotNone(d['prompt'])
+        self.assertIsNotNone(d['submission_key'])
+        self.assertIsNotNone(d['max_score'])
+
+    def test_show_calibration_essay_missing_key(self):
+        self.login(self.student, self.password)
+
+        url = reverse('peer_grading_show_calibration_essay', kwargs={'course_id': self.course_id})
+        data = {}
+
+        r = self.check_for_post_code(200, url, data)
+        d = json.loads(r.content)
+
+        self.assertFalse(d['success'])
+        self.assertEqual(d['error'], "Missing required keys: location")
+
+    def test_save_calibration_essay_success(self):
+        self.login(self.student, self.password)
+        url = reverse('peer_grading_save_calibration_essay', kwargs={'course_id': self.course_id})
+        data = {'location': self.location, 
+                'submission_id': '1', 
+                'submission_key': 'fake key', 
+                'score': '2',
+                'feedback': 'This is feedback'}
+        r = self.check_for_post_code(200, url, data)
+        d = json.loads(r.content)
+        self.assertTrue(d['success'])
+        self.assertTrue('actual_score' in d)
+
+    def test_save_calibration_essay_missing_keys(self):
+        self.login(self.student, self.password)
+        url = reverse('peer_grading_save_calibration_essay', kwargs={'course_id': self.course_id})
+        data = {}
+        r = self.check_for_post_code(200, url, data)
+        d = json.loads(r.content)
+        self.assertFalse(d['success'])
+        self.assertTrue(d['error'].find('Missing required keys:') > -1)
+        self.assertFalse('actual_score' in d)
 

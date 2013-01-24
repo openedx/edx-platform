@@ -29,6 +29,15 @@ This is a mock peer grading service that can be used for unit tests
 without making actual service calls to the grading controller
 """
 class MockPeerGradingService(object):
+    # TODO: get this rubric parsed and working
+    rubric = """<rubric>
+                    <category>
+                    <description>Description</description>
+                    <option>First option</option>
+                    <option>Second option</option>
+                    </category>
+                    </rubric>"""
+
     def get_next_submission(self, problem_location, grader_id):
         return json.dumps({'success': True,
                 'submission_id':1,
@@ -56,15 +65,15 @@ class MockPeerGradingService(object):
 
     def save_calibration_essay(self, problem_location, grader_id, 
             calibration_essay_id, submission_key, score, feedback):
-        return {'success': True, 'actual_score': 2}
+        return json.dumps({'success': True, 'actual_score': 2})
 
     def get_problem_list(self, course_id, grader_id):
         return json.dumps({'success': True,
         'problem_list': [
           json.dumps({'location': 'i4x://MITx/3.091x/problem/open_ended_demo1',
-            'problem_name': "Problem 1", 'num_graded': 3, 'num_pending': 5}),
+              'problem_name': "Problem 1", 'num_graded': 3, 'num_pending': 5, 'num_required': 7}),
           json.dumps({'location': 'i4x://MITx/3.091x/problem/open_ended_demo2',
-            'problem_name': "Problem 2", 'num_graded': 1, 'num_pending': 5})
+              'problem_name': "Problem 2", 'num_graded': 1, 'num_pending': 5, 'num_required': 8})
         ]})
 
 class PeerGradingService(GradingService):
