@@ -7,7 +7,7 @@ from optparse import make_option
 from django.conf import settings
 from django.core.management.base import BaseCommand, CommandError
 
-from student.models import TestCenterRegistration
+from student.models import TestCenterRegistration, ACCOMMODATION_REJECTED_CODE
 
 
 class Command(BaseCommand):
@@ -92,6 +92,8 @@ class Command(BaseCommand):
                     record["LastUpdate"] = record["LastUpdate"].strftime("%Y/%m/%d %H:%M:%S")
                     record["EligibilityApptDateFirst"] = record["EligibilityApptDateFirst"].strftime("%Y/%m/%d")
                     record["EligibilityApptDateLast"] = record["EligibilityApptDateLast"].strftime("%Y/%m/%d")
+                    if record["Accommodations"] == ACCOMMODATION_REJECTED_CODE:
+                        record["Accommodations"] = ""
                     if options['force_add']:
                         record['AuthorizationTransactionType'] = 'Add'
 
