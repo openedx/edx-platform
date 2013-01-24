@@ -365,7 +365,7 @@ class CourseDescriptor(SequenceDescriptor):
         """
         Return whether the course is cohorted.
         """
-        config = self.metadata.get("cohort-config")
+        config = self.metadata.get("cohort_config")
         if config is None:
             return False
 
@@ -376,11 +376,11 @@ class CourseDescriptor(SequenceDescriptor):
         Return the set of discussions that is cohorted.  It may be the empty
         set.
         """
-        config = self.metadata.get("cohort-config")
+        config = self.metadata.get("cohort_config")
         if config is None:
             return set()
 
-        return set(config.get("cohorted-discussions", []))
+        return set(config.get("cohorted_discussions", []))
 
 
 
