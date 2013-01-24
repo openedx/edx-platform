@@ -838,33 +838,33 @@ define('Graph', ['logme'], function (logme) {
                 return;
             }
 
-            if (typeof config.functions.function === 'string') {
+            if (typeof config.functions["function"] === 'string') {
 
                 // If just one function string is present.
-                addFunction(config.functions.function);
+                addFunction(config.functions["function"]);
 
-            } else if ($.isPlainObject(config.functions.function) === true) {
+            } else if ($.isPlainObject(config.functions["function"]) === true) {
 
                 // If a function is present, but it also has properties
                 // defined.
-                callAddFunction(config.functions.function);
+                callAddFunction(config.functions["function"]);
 
-            } else if ($.isArray(config.functions.function)) {
+            } else if ($.isArray(config.functions["function"])) {
 
                 // If more than one function is defined.
-                for (c1 = 0; c1 < config.functions.function.length; c1 += 1) {
+                for (c1 = 0; c1 < config.functions["function"].length; c1 += 1) {
 
                     // For each definition, we must check if it is a simple
                     // string definition, or a complex one with properties.
-                    if (typeof config.functions.function[c1] === 'string') {
+                    if (typeof config.functions["function"][c1] === 'string') {
 
                         // Simple string.
-                        addFunction(config.functions.function[c1]);
+                        addFunction(config.functions["function"][c1]);
 
-                    } else if ($.isPlainObject(config.functions.function[c1])) {
+                    } else if ($.isPlainObject(config.functions["function"][c1])) {
 
                         // Properties are present.
-                        callAddFunction(config.functions.function[c1]);
+                        callAddFunction(config.functions["function"][c1]);
 
                     }
                 }
