@@ -4,6 +4,9 @@ from django.test import TestCase
 from django.test.client import RequestFactory
 from django.conf import settings
 from django.core.urlresolvers import reverse
+
+from mock import Mock
+
 from override_settings import override_settings
 
 import xmodule.modulestore.django
@@ -26,6 +29,7 @@ from xmodule.modulestore import Location
 from xmodule.modulestore.xml_importer import import_from_xml
 from xmodule.modulestore.xml import XMLModuleStore
 
+import comment_client
 
 from courseware.tests.tests import PageLoader, TEST_DATA_XML_MODULESTORE
 
@@ -49,13 +53,25 @@ class TestCohorting(PageLoader):
         self.activate_user(self.student2)
 
     def test_create_thread(self):
-        resp = self.client.post(reverse('create_thread'),
+        my_save = Mock()
+        comment_client.perform_request = my_save
+
+        resp = self.client.post(
+            reverse('django_comment_client.base.views.create_thread',
+                    kwargs={'course_id': 'edX/toy/2012_Fall',
+                            'commentable_id': 'General'}),
                                         {'some': "some",
                                          'data': 'data'})
-        self.assertEqual(resp.status_code, 200)
-        
+        self.assertTrue(my_save.called)
 
+        #self.assertEqual(resp.status_code, 200)
+        #self.assertEqual(my_save.something, "expected", "complaint if not true")
 
+        self.toy.metadata["cohort_config"] = {"cohorted": True}
+
+        # call the view again ...
+
+        # assert that different things happened
 
 
 
