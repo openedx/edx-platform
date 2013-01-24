@@ -1,7 +1,9 @@
+<<<<<<< HEAD
 import logging
 from mock import MagicMock, patch
 import datetime
 import factory
+import unittest
 
 from django.test import TestCase
 from django.http import Http404, HttpResponse
@@ -11,12 +13,14 @@ from django.contrib.auth.models import User
 from django.test.client import RequestFactory
 
 from student.models import CourseEnrollment
-from xmodule.modulestore.django import modulestore
+from xmodule.modulestore.django import modulestore, _MODULESTORES
 from xmodule.modulestore.exceptions import InvalidLocationError,\
      ItemNotFoundError, NoPathToItem
 import courseware.views as views
 from xmodule.modulestore import Location
-#import mitx.common.djangoapps.mitxmako as mako
+
+
+#from override_settings import override_settings
 
 class Stub():
     pass
@@ -36,6 +40,7 @@ class UserFactory(factory.Factory):
     is_active = True
 
 # This part is required for modulestore() to work properly
+
 def xml_store_config(data_dir):
     return {
     'default': {
@@ -50,7 +55,12 @@ def xml_store_config(data_dir):
 TEST_DATA_DIR = settings.COMMON_TEST_DATA_ROOT
 TEST_DATA_XML_MODULESTORE = xml_store_config(TEST_DATA_DIR)
 
+
 class ModulestoreTest(TestCase):
+
+@override_settings(MODULESTORE=TEST_DATA_XML_MODULESTORE)
+class TestJumpTo(TestCase):
+    """Check the jumpto link for a course"""
     def setUp(self):
         self._MODULESTORES = {}
 
@@ -60,6 +70,20 @@ class ModulestoreTest(TestCase):
 
     def test(self):
         self.assertEquals(1,2)
+
+    def test_jumpto_invalid_location(self):
+        location = Location('i4x', 'edX', 'toy', 'NoSuchPlace', None)
+        jumpto_url = '%s/%s/jump_to/%s' % ('/courses', self.course_name, location)
+        expected = 'courses/edX/toy/2012_Fall/courseware/Overview/'
+        response = self.client.get(jumpto_url)
+        self.assertEqual(response.status_code, 404)
+
+    def test_jumpto_from_chapter(self):
+        location = Location('i4x', 'edX', 'toy', 'chapter', 'Overview')
+        jumpto_url = '%s/%s/jump_to/%s' % ('/courses', self.course_name, location)
+        expected = 'courses/edX/toy/2012_Fall/courseware/Overview/'
+        response = self.client.get(jumpto_url)
+        self.assertRedirects(response, expected, status_code=302, target_status_code=302)
 
 class ViewsTestCase(TestCase):
     def setUp(self):
