@@ -149,7 +149,7 @@ class ModelDataCache(object):
                 field_name__in=set(field.name for field in fields),
             )
         elif scope == Scope.student_info:
-            self._query(
+            return self._query(
                 XModuleStudentInfoField,
                 student=self.user,
                 field_name__in=set(field.name for field in fields),
