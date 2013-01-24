@@ -260,7 +260,7 @@ Supported fields at the course level:
 * "days_early_for_beta" -- number of days (floating point ok) early that students in the beta-testers group get to see course content.  Can also be specified for any other course element, and overrides values set at higher levels.
 * "cohort_config" : dictionary with keys 
     - "cohorted" : boolean.  Set to true if this course uses student cohorts.  If so, all inline discussions are automatically cohorted, and top-level discussion topics are configurable with an optional 'cohorted': bool parameter (with default value false).  
-    - "cohorted_discussion": list of discussions that should be cohorted.  
+    - "cohorted_discussions": list of discussions that should be cohorted.  
     - ... more to come.  ('auto_cohort', how to auto cohort, etc)
 
 * TODO: there are others

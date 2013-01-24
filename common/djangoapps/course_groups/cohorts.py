@@ -40,10 +40,18 @@ def is_commentable_cohorted(course_id, commentable_id):
         Http404 if the course doesn't exist.
     """
     course = courses.get_course_by_id(course_id)
-    return commentable_id in course.cohorted_discussions()
+    ans = commentable_id in course.cohorted_discussions()
+    log.debug("is_commentable_cohorted({0}, {1}) = {2}".format(course_id,
+                                                               commentable_id,
+                                                               ans))
+    return ans
 
 
 def get_cohort(user, course_id):
+    c = _get_cohort(user, course_id)
+    log.debug("get_cohort({0}, {1}) = {2}", user, course_id, c.id)
+
+def _get_cohort(user, course_id):
     """
     Given a django User and a course_id, return the user's cohort.  In classes with
     auto-cohorting, put the user in a cohort if they aren't in one already.
@@ -54,7 +62,20 @@ def get_cohort(user, course_id):
 
     Returns:
         A CourseUserGroup object if the User has a cohort, or None.
+
+    Raises:
+       ValueError if the course_id doesn't exist.
     """
+    # First check whether the course is cohorted (users shouldn't be in a cohort
+    # in non-cohorted courses, but settings can change after )
+    try:
+        course = courses.get_course_by_id(course_id)
+    except Http404:
+        raise ValueError("Invalid course_id")
+
+    if not course.is_cohorted:
+        return None
+
     try:
         group = CourseUserGroup.objects.get(course_id=course_id,
                                             group_type=CourseUserGroup.COHORT,
