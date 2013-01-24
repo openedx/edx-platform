@@ -5,6 +5,7 @@ import json
 import logging
 from lxml import etree
 from lxml.html import rewrite_links
+from lxml.html.clean import Cleaner
 from path import path
 import os
 import sys
@@ -130,12 +131,18 @@ class OpenEndedChild(object):
             return ""
         return self.history[-1].get('post_assessment', "")
 
+    def sanitize_html(self, answer):
+        cleaner = Cleaner(style=True, links=True, add_nofollow=True, page_structure=True, safe_attrs_only=True)
+        clean_html = cleaner.clean_html(answer)
+        return clean_html
+
     def new_history_entry(self, answer):
         """
         Adds a new entry to the history dictionary
         @param answer: The student supplied answer
         @return: None
         """
+        answer = self.sanitize_html(answer)
         self.history.append({'answer': answer})
 
     def record_latest_score(self, score):

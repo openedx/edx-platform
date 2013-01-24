@@ -554,6 +554,7 @@ class OpenEndedModule(openendedchild.OpenEndedChild):
 
         # add new history element with answer and empty score and hint.
         self.new_history_entry(get['student_answer'])
+        get['student_answer'] = self.sanitize_html(get['student_answer'])
         self.send_to_grader(get['student_answer'], system)
         self.change_state(self.ASSESSING)
 
