@@ -117,6 +117,12 @@ def add_cohort(course_id, name):
                                           group_type=CourseUserGroup.COHORT,
                                           name=name)
 
+class CohortConflict(Exception):
+    """
+    Raised when user to be added is already in another cohort in same course.
+    """
+    pass
+
 def add_user_to_cohort(cohort, username_or_email):
     """
     Look up the given user, and if successful, add them to the specified cohort.
@@ -131,15 +137,29 @@ def add_user_to_cohort(cohort, username_or_email):
     Raises:
         User.DoesNotExist if can't find user.
 
-        ValueError if user already present.
+        ValueError if user already present in this cohort.
+
+        CohortConflict if user already in another cohort.
     """
     if '@' in username_or_email:
         user = User.objects.get(email=username_or_email)
     else:
         user = User.objects.get(username=username_or_email)
 
-    if cohort.users.filter(id=user.id).exists():
-        raise ValueError("User {0} already present".format(user.username))
+    # If user in any cohorts in this course already, complain
+    course_cohorts = CourseUserGroup.objects.filter(
+        course_id=cohort.course_id,
+        users__id=user.id,
+        group_type=CourseUserGroup.COHORT)
+    if course_cohorts.exists():
+        if course_cohorts[0] == cohort:
+            raise ValueError("User {0} already present in cohort {1}".format(
+                user.username,
+                cohort.name))
+        else:
+            raise CohortConflict("User {0} is in another cohort {1} in course"
+                                 .format(user.username,
+                                         course_cohorts[0].name))
 
     cohort.users.add(user)
     return user

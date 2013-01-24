@@ -166,8 +166,10 @@ var CohortManager = (function ($) {
             function adder(note, color) {
                 return function(item) {
                     var li = $('<li></li>')
-                    if (typeof item === "object") {
+                    if (typeof item === "object" && item.username) {
                         li.text(note + ' ' + item.name + ', ' + item.username + ', ' + item.email);
+                    } else if (typeof item === "object" && item.msg) {
+                        li.text(note + ' ' + item.username_or_email + ', ' + item.msg);
                     } else {
                         // string
                         li.text(note + ' ' + item);
@@ -176,10 +178,13 @@ var CohortManager = (function ($) {
                     op_results.append(li);
                 }
             }
+            op_results.empty();
             if (response && response.success) {
                 response.added.forEach(adder("Added", "green"));
                 response.present.forEach(adder("Already present:", "black"));
+                response.conflict.forEach(adder("In another cohort:", "purple"));
                 response.unknown.forEach(adder("Unknown user:", "red"));
+                users_area.val('')
             } else {
                 log_error(response.msg || "There was an error adding users");
             }                

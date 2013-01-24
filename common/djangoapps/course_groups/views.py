@@ -133,6 +133,8 @@ def add_users_to_cohort(request, course_id, cohort_id):
      'added': [{'username': username,
                 'name': name,
                 'email': email}, ...],
+     'conflict': [{'username_or_email': ...,
+                    'msg': ...}],  # in another cohort
      'present': [str1, str2, ...],    # already there
      'unknown': [str1, str2, ...]}
     """
@@ -146,6 +148,7 @@ def add_users_to_cohort(request, course_id, cohort_id):
     users = request.POST.get('users', '')
     added = []
     present = []
+    conflict = []
     unknown = []
     for username_or_email in split_by_comma_and_whitespace(users):
         try:
@@ -158,10 +161,15 @@ def add_users_to_cohort(request, course_id, cohort_id):
             present.append(username_or_email)
         except User.DoesNotExist:
             unknown.append(username_or_email)
+        except cohorts.CohortConflict as err:
+            conflict.append({'username_or_email': username_or_email,
+                              'msg': str(err)})
+
 
     return JsonHttpReponse({'success': True,
                             'added': added,
                             'present': present,
+                            'conflict': conflict,
                             'unknown': unknown})
 
 @ensure_csrf_cookie
