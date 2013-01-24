@@ -9,6 +9,7 @@ from courseware.models import StudentModule
 import logging
 from courseware.access import has_access
 from util.cache import cache
+import datetime
 
 log=logging.getLogger(__name__)
 
@@ -100,7 +101,7 @@ def combined_notifications(course, user):
     last_module_seen_count = last_module_seen.count()
 
     if last_module_seen_count>0:
-        last_time_viewed = last_module_seen[0]['modified']
+        last_time_viewed = last_module_seen[0]['modified'] - datetime.timedelta(seconds=(NOTIFICATION_CACHE_TIME + 60))
     else:
         last_time_viewed = user.last_login
 
