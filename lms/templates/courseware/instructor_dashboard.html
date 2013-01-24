@@ -285,7 +285,9 @@ function goto( mode)
     </p>
     <hr width="40%" style="align:left">
 
+    %if course.is_cohorted:
     <%include file="/course_groups/cohort_management.html" />
+    %endif
 
   %endif
 %endif
