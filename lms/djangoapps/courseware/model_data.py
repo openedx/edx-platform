@@ -267,6 +267,15 @@ class LmsKeyValueStore(KeyValueStore):
 
     If the key isn't found in the expected table during a read or a delete, then a KeyError will be raised
     """
+
+    _allowed_scopes = (
+        Scope.content,
+        Scope.settings,
+        Scope.student_state,
+        Scope.student_preferences,
+        Scope.student_info,
+        Scope.children,
+    )
     def __init__(self, descriptor_model_data, model_data_cache):
         self._descriptor_model_data = descriptor_model_data
         self._model_data_cache = model_data_cache
@@ -277,6 +286,9 @@ class LmsKeyValueStore(KeyValueStore):
 
         if key.scope == Scope.parent:
             return None
+
+        if key.scope not in self._allowed_scopes:
+            raise InvalidScopeError(key.scope)
 
         field_object = self._model_data_cache.find(key)
         if field_object is None:
@@ -293,6 +305,9 @@ class LmsKeyValueStore(KeyValueStore):
 
         field_object = self._model_data_cache.find_or_create(key)
 
+        if key.scope not in self._allowed_scopes:
+            raise InvalidScopeError(key.scope)
+
         if key.scope == Scope.student_state:
             state = json.loads(field_object.state)
             state[key.field_name] = value
@@ -305,6 +320,9 @@ class LmsKeyValueStore(KeyValueStore):
     def delete(self, key):
         if key.field_name in self._descriptor_model_data:
             raise InvalidWriteError("Not allowed to deleted descriptor model data", key.field_name)
+
+        if key.scope not in self._allowed_scopes:
+            raise InvalidScopeError(key.scope)
 
         field_object = self._model_data_cache.find(key)
         if field_object is None:

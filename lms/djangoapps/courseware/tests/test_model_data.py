@@ -131,8 +131,8 @@ class TestStudentModuleStorage(TestCase):
 
     def setUp(self):
         self.desc_md = {}
-        self.mdc = Mock()
-        self.mdc.find.return_value.state = json.dumps({'a_field': 'a_value'})
+        self.user = UserFactory.create()
+        self.mdc = ModelDataCache([mock_descriptor([mock_field(Scope.student_state, 'a_field')])], course_id, self.user)
         self.kvs = LmsKeyValueStore(self.desc_md, self.mdc)
 
     def test_get_existing_field(self):
