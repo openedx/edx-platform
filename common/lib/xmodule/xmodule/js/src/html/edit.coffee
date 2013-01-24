@@ -20,6 +20,8 @@ class @HTMLEditingDescriptor
       theme : "advanced",
       skin: 'studio',
       schema: "html5",
+      # Necessary to preserve relative URLs to our images.
+      convert_urls : false,
       # TODO: we should share this CSS with studio (and LMS)
       content_css : "/static/css/tiny-mce.css",
       formats : {
