@@ -4,6 +4,7 @@ import datetime
 import factory
 import unittest
 import os
+from nose.plugins.skip import SkipTest
 
 from django.test import TestCase
 from django.http import Http404, HttpResponse
@@ -19,6 +20,12 @@ from xmodule.modulestore.exceptions import InvalidLocationError,\
 import courseware.views as views
 from xmodule.modulestore import Location
 
+def skipped(func):
+    from nose.plugins.skip import SkipTest
+    def _():
+        raise SkipTest("Test %s is skipped" % func.__name__)
+    _.__name__ = func.__name__
+    return _
 
 #from override_settings import override_settings
 
@@ -39,8 +46,14 @@ class UserFactory(factory.Factory):
     is_staff = True
     is_active = True
 
-# This part is required for modulestore() to work properly
+def skipped(func):
+    from nose.plugins.skip import SkipTest
+    def _():
+        raise SkipTest("Test %s is skipped" % func.__name__)
+    _.__name__ = func.__name__
+    return _
 
+# This part is required for modulestore() to work properly
 def xml_store_config(data_dir):
     return {
     'default': {
@@ -96,10 +109,6 @@ class ViewsTestCase(TestCase):
         # This is a CourseDescriptor object
         self.toy_course = modulestore().get_course('edX/toy/2012_Fall')
         self.request_factory = RequestFactory()
-        # Many functions call upon render_to_response
-        # Problem is that we don't know what templates there are?
-        #views.render_to_response = render_to_response
-        #m = mako.MakoMiddleware()
 
     def test_user_groups(self):
         # depreciated function
@@ -161,49 +170,50 @@ class ViewsTestCase(TestCase):
 ##        print dir(self.toy_course)
 ##        print self.toy_course.location
 ##        print self.toy_course.__dict__
-        valid = ['i4x', 'edX', 'toy', 'chapter', 'overview']
-        L = Location('i4x', 'edX', 'toy', 'chapter', 'Overview', None)
-        
-        views.jump_to(request, 'dummy', L)
+##        valid = ['i4x', 'edX', 'toy', 'chapter', 'overview']
+##        L = Location('i4x', 'edX', 'toy', 'chapter', 'Overview', None)
+##        
+##        views.jump_to(request, 'dummy', L)
         
     def test_static_tab(self):
-        mock_request = MagicMock()
-        mock_request.user = self.user
-        # What is tab_slug? A string?
-        #views.static_tab(mock_request, self.course_id, 'dummy')
-
+        request = self.request_factory.get('foo')
+        request.user = self.user
+        self.assertRaises(Http404, views.static_tab, request, 'edX/toy/2012_Fall',
+                          'dummy')
+        # What are valid tab_slugs?
+##        request_2 = self.request_factory.get('foo')
+##        request_2.user = UserFactory()
+        
     def test_static_university_profile(self):
         # TODO
         # Can't test unless have a valid template file
-##        request = self.client.get('university_profile/edX')
-##        views.static_university_profile(request, 'edX')
-        pass
+        raise SkipTest
+        request = self.client.get('university_profile/edX')
+        self.assertIsInstance(views.static_university_profile(request, 'edX'), HttpResponse)
         
-
     def test_university_profile(self):
-        
+        raise SkipTest
         chapter = 'Overview'
         chapter_url = '%s/%s/%s' % ('/courses', self.course_id, chapter)
         request = self.request_factory.get(chapter_url)
         request.user = UserFactory()
         self.assertRaisesRegexp(Http404, 'University Profile*',
                                 views.university_profile, request, 'Harvard')
-        # Supposed to return a HttpResponse object
-        # Templates don't exist because not in database
         # TODO
-        # assertTemplateUsed is called on an HttpResponse, but 
         #request_2 = self.client.get('/university_profile/edx')
-        #self.assertIsInstance(views.university_profile(request, 'edX'), HttpResponse)
+        self.assertIsInstance(views.university_profile(request, 'edX'), HttpResponse)
         # Can't continue testing unless have valid template file
 
+    
     def test_syllabus(self):
+        raise SkipTest
         chapter = 'Overview'
         chapter_url = '%s/%s/%s' % ('/courses', self.course_id, chapter)
         request = self.request_factory.get(chapter_url)
         request.user = UserFactory()
-        # course not found
+        # Can't find valid template
         # TODO
-        views.syllabus(request, self.course_id)
+        views.syllabus(request, 'edX/toy/2012_Fall')
 
     def test_render_notifications(self):
         request = self.request_factory.get('foo')
@@ -212,13 +222,12 @@ class ViewsTestCase(TestCase):
         # Needs valid template
 
     def test_news(self):
-        #print settings.TEMPLATE_DIRS
-        #assert False
-        # I want news to get all the way to render_to_response
+        raise SkipTest
         # Bug? get_notifications is actually in lms/lib/comment_client/legacy.py
         request = self.client.get('/news')
         self.user.id = 'foo'
         request.user = self.user
         course_id = 'edX/toy/2012_Fall'
-        views.news(request, course_id)
+        self.assertIsInstance(views.news(request, course_id), HttpResponse)
+        
         # TODO
