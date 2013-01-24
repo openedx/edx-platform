@@ -67,7 +67,8 @@ var CohortManager = (function ($) {
         var detail_page_num = $$(".page_num");
         var users_area = $$(".users_area");
         var add_members_button = $$(".add_members");
-        var op_results = $$("op_results");
+        var op_results = $$(".op_results");
+        var cohort_id = null;
         var cohort_title = null;
         var detail_url = null;
         var page = null;
@@ -79,6 +80,7 @@ var CohortManager = (function ($) {
             var el = $(this);
             cohort_title = el.text();
             detail_url = el.data('href');
+            cohort_id = el.data('id');
             state = state_detail;
             render();
         }
@@ -118,12 +120,31 @@ var CohortManager = (function ($) {
 
         // *********** Detail view methods
 
+        function remove_user_from_cohort(username, cohort_id, row) {
+            var delete_url = detail_url + '/delete';
+            var data = {'username': username}
+            $.post(delete_url, data).done(function() {row.remove()})
+                .fail(function(jqXHR, status, error) {
+                    log_error('Error removing user ' + username + 
+                              ' from cohort. ' + status + ' ' + error);
+                });
+        }
+
         function add_to_users_list(item) {
             var tr = $('<tr><td class="name"></td><td class="username"></td>' + 
-                       '<td class="email"></td></tr>');
+                       '<td class="email"></td>' + 
+                       '<td class="remove"></td></tr>');
+            var current_cohort_id = cohort_id;
+
             $(".name", tr).text(item.name);
             $(".username", tr).text(item.username);
             $(".email", tr).text(item.email);
+
+            $(".remove", tr).html('<a href="#">remove</a>')
+                .click(function() { 
+                    remove_user_from_cohort(item.username, current_cohort_id, tr);
+                });
+            
             detail_users.append(tr);
         };
 
@@ -145,7 +166,12 @@ var CohortManager = (function ($) {
             function adder(note, color) {
                 return function(item) {
                     var li = $('<li></li>')
-                    li.text(note + ' ' + item.name + ', ' + item.username + ', ' + item.email);
+                    if (typeof item === "object") {
+                        li.text(note + ' ' + item.name + ', ' + item.username + ', ' + item.email);
+                    } else {
+                        // string
+                        li.text(note + ' ' + item);
+                    }
                     li.css('color', color);
                     op_results.append(li);
                 }
@@ -153,7 +179,7 @@ var CohortManager = (function ($) {
             if (response && response.success) {
                 response.added.forEach(adder("Added", "green"));
                 response.present.forEach(adder("Already present:", "black"));
-                response.unknown.forEach(adder("Already present:", "red"));
+                response.unknown.forEach(adder("Unknown user:", "red"));
             } else {
                 log_error(response.msg || "There was an error adding users");
             }                

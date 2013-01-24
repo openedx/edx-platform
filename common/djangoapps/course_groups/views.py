@@ -164,6 +164,37 @@ def add_users_to_cohort(request, course_id, cohort_id):
                             'present': present,
                             'unknown': unknown})
 
+@ensure_csrf_cookie
+def remove_user_from_cohort(request, course_id, cohort_id):
+    """
+    Expects 'username': username in POST data.
+
+    Return json dict of:
+
+    {'success': True} or
+    {'success': False,
+     'msg': error_msg}
+    """
+    get_course_with_access(request.user, course_id, 'staff')
+
+    if request.method != "POST":
+        raise Http404("Must POST to add users to cohorts")
+
+    username = request.POST.get('username')
+    if username is None:
+        return JsonHttpReponse({'success': False,
+                                'msg': 'No username specified'})
+
+    cohort = cohorts.get_cohort_by_id(course_id, cohort_id)
+    try:
+        user = User.objects.get(username=username)
+        cohort.users.remove(user)
+        return JsonHttpReponse({'success': True})
+    except User.DoesNotExist:
+        log.debug('no user')
+        return JsonHttpReponse({'success': False,
+                                'msg': "No user '{0}'".format(username)})
+
 
 def debug_cohort_mgmt(request, course_id):
     """
