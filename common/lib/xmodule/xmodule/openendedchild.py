@@ -112,7 +112,7 @@ class OpenEndedChild(object):
         pass
 
     def latest_answer(self):
-        """None if not available"""
+        """Empty string if not available"""
         if not self.history:
             return ""
         return self.history[-1].get('answer', "")
@@ -124,7 +124,7 @@ class OpenEndedChild(object):
         return self.history[-1].get('score')
 
     def latest_post_assessment(self, system):
-        """None if not available"""
+        """Empty string if not available"""
         if not self.history:
             return ""
         return self.history[-1].get('post_assessment', "")
