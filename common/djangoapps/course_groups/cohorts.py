@@ -4,6 +4,7 @@ forums, and to the cohort admin views.
 """
 
 from django.contrib.auth.models import User
+from django.http import Http404
 import logging
 
 from courseware import courses

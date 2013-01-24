@@ -1,7 +1,9 @@
 import django.test
 from django.contrib.auth.models import User
 
-from course_groups.models import CourseUserGroup, get_cohort, get_course_cohorts
+from course_groups.models import CourseUserGroup
+from course_groups.cohorts import get_cohort, get_course_cohorts
+
 
 class TestCohorts(django.test.TestCase):
 
