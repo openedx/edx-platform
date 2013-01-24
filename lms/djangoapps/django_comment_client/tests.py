@@ -1,17 +1,63 @@
-from django.contrib.auth.models import User
+from django.contrib.auth.models import User, Group
+from django.core.urlresolvers import reverse
 from django.test import TestCase
+from django.test.client import RequestFactory
+from django.conf import settings
+from django.core.urlresolvers import reverse
+from override_settings import override_settings
+
+import xmodule.modulestore.django
+
 from student.models import CourseEnrollment, \
                            replicate_enrollment_save, \
                            replicate_enrollment_delete, \
                            update_user_information, \
                            replicate_user_save
-                           
+
 from django.db.models.signals import m2m_changed, pre_delete, pre_save, post_delete, post_save
 from django.dispatch.dispatcher import _make_id
 import string
 import random
 from .permissions import has_permission
 from .models import Role, Permission
+
+from xmodule.modulestore.django import modulestore
+from xmodule.modulestore import Location
+from xmodule.modulestore.xml_importer import import_from_xml
+from xmodule.modulestore.xml import XMLModuleStore
+
+
+from courseware.tests.tests import PageLoader, TEST_DATA_XML_MODULESTORE
+
+@override_settings(MODULESTORE=TEST_DATA_XML_MODULESTORE)
+class TestCohorting(PageLoader):
+    """Check that cohorting works properly"""
+
+    def setUp(self):
+        xmodule.modulestore.django._MODULESTORES = {}
+
+        # Assume courses are there
+        self.toy = modulestore().get_course("edX/toy/2012_Fall")
+
+        # Create two accounts
+        self.student = 'view@test.com'
+        self.student2 = 'view2@test.com'
+        self.password = 'foo'
+        self.create_account('u1', self.student, self.password)
+        self.create_account('u2', self.student2, self.password)
+        self.activate_user(self.student)
+        self.activate_user(self.student2)
+
+    def test_create_thread(self):
+        resp = self.client.post(reverse('create_thread'),
+                                        {'some': "some",
+                                         'data': 'data'})
+        self.assertEqual(resp.status_code, 200)
+        
+
+
+
+
 
 class PermissionsTestCase(TestCase):
     def random_str(self, length=15, chars=string.ascii_uppercase + string.digits):
