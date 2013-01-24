@@ -148,6 +148,17 @@
         color: tint($m-gray, 30%);
         font-size: em(14);
       }
+
+      ol, ul {
+        margin: 0;
+        padding: 0;
+        list-style: none;
+
+        li {
+          margin: 0 0 ($baseline/2);
+          line-height: 1.6em;
+        }
+      }
     }
   }
 
