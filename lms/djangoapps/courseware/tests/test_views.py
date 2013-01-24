@@ -1,9 +1,9 @@
-<<<<<<< HEAD
 import logging
 from mock import MagicMock, patch
 import datetime
 import factory
 import unittest
+import os
 
 from django.test import TestCase
 from django.http import Http404, HttpResponse
@@ -25,13 +25,13 @@ from xmodule.modulestore import Location
 class Stub():
     pass
 
-def render_to_response(template_name, dictionary, context_instance=None,
-                       namespace='main', **kwargs):
-    # The original returns HttpResponse
-    print dir()
-    print template_name
-    print dictionary
-    return HttpResponse('foo')
+##def render_to_response(template_name, dictionary, context_instance=None,
+##                       namespace='main', **kwargs):
+##    # The original returns HttpResponse
+##    print dir()
+##    print template_name
+##    print dictionary
+##    return HttpResponse('foo')
 
 class UserFactory(factory.Factory):
     first_name = 'Test'
@@ -56,7 +56,7 @@ TEST_DATA_DIR = settings.COMMON_TEST_DATA_ROOT
 TEST_DATA_XML_MODULESTORE = xml_store_config(TEST_DATA_DIR)
 
 
-class ModulestoreTest(TestCase):
+#class ModulestoreTest(TestCase):
 
 @override_settings(MODULESTORE=TEST_DATA_XML_MODULESTORE)
 class TestJumpTo(TestCase):
@@ -67,9 +67,6 @@ class TestJumpTo(TestCase):
         # Toy courses should be loaded
         self.course_name = 'edX/toy/2012_Fall'
         self.toy_course = modulestore().get_course('edX/toy/2012_Fall')
-
-    def test(self):
-        self.assertEquals(1,2)
 
     def test_jumpto_invalid_location(self):
         location = Location('i4x', 'edX', 'toy', 'NoSuchPlace', None)
@@ -101,11 +98,11 @@ class ViewsTestCase(TestCase):
         self.request_factory = RequestFactory()
         # Many functions call upon render_to_response
         # Problem is that we don't know what templates there are?
-        views.render_to_response = render_to_response
+        #views.render_to_response = render_to_response
         #m = mako.MakoMiddleware()
 
     def test_user_groups(self):
-        # depreciated function?
+        # depreciated function
         mock_user = MagicMock()
         mock_user.is_authenticated.return_value = False
         self.assertEquals(views.user_groups(mock_user),[])
@@ -160,10 +157,10 @@ class ViewsTestCase(TestCase):
                                 request, 'bar', ())
         self.assertRaisesRegexp(Http404, 'No data*', views.jump_to, request,
                                 'dummy', self.location)
-        print type(self.toy_course)
-        print dir(self.toy_course)
-        print self.toy_course.location
-        print self.toy_course.__dict__
+##        print type(self.toy_course)
+##        print dir(self.toy_course)
+##        print self.toy_course.location
+##        print self.toy_course.__dict__
         valid = ['i4x', 'edX', 'toy', 'chapter', 'overview']
         L = Location('i4x', 'edX', 'toy', 'chapter', 'Overview', None)
         
@@ -172,18 +169,32 @@ class ViewsTestCase(TestCase):
     def test_static_tab(self):
         mock_request = MagicMock()
         mock_request.user = self.user
-        # What is tab_slug?
+        # What is tab_slug? A string?
         #views.static_tab(mock_request, self.course_id, 'dummy')
 
+    def test_static_university_profile(self):
+        # TODO
+        # Can't test unless have a valid template file
+##        request = self.client.get('university_profile/edX')
+##        views.static_university_profile(request, 'edX')
+        pass
+        
+
     def test_university_profile(self):
+        
         chapter = 'Overview'
         chapter_url = '%s/%s/%s' % ('/courses', self.course_id, chapter)
         request = self.request_factory.get(chapter_url)
         request.user = UserFactory()
         self.assertRaisesRegexp(Http404, 'University Profile*',
                                 views.university_profile, request, 'Harvard')
-        # Mocked out function render_to_response
-        self.assertIsInstance(views.university_profile(request, 'edX'), HttpResponse)
+        # Supposed to return a HttpResponse object
+        # Templates don't exist because not in database
+        # TODO
+        # assertTemplateUsed is called on an HttpResponse, but 
+        #request_2 = self.client.get('/university_profile/edx')
+        #self.assertIsInstance(views.university_profile(request, 'edX'), HttpResponse)
+        # Can't continue testing unless have valid template file
 
     def test_syllabus(self):
         chapter = 'Overview'
@@ -191,8 +202,23 @@ class ViewsTestCase(TestCase):
         request = self.request_factory.get(chapter_url)
         request.user = UserFactory()
         # course not found
+        # TODO
         views.syllabus(request, self.course_id)
 
     def test_render_notifications(self):
         request = self.request_factory.get('foo')
-        views.render_notifications(request, self.course_id, 'dummy')
+        #views.render_notifications(request, self.course_id, 'dummy')
+        # TODO
+        # Needs valid template
+
+    def test_news(self):
+        #print settings.TEMPLATE_DIRS
+        #assert False
+        # I want news to get all the way to render_to_response
+        # Bug? get_notifications is actually in lms/lib/comment_client/legacy.py
+        request = self.client.get('/news')
+        self.user.id = 'foo'
+        request.user = self.user
+        course_id = 'edX/toy/2012_Fall'
+        views.news(request, course_id)
+        # TODO

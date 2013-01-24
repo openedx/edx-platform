@@ -62,9 +62,6 @@ class ModuleRenderTestCase(TestCase):
                                                      mock_module,'dummy'))
 
     def test_get_shared_instance_module(self):
-##        class MockUserFactory(factory.Factory):
-##            FACTORY_FOR = MagicMock
-##            is_authenticated.return_value = 
         mock_user = MagicMock(User)
         mock_user.is_authenticated.return_value = False
         self.assertIsNone(render.get_shared_instance_module('dummy', mock_user, 'dummy',
@@ -198,8 +195,6 @@ class TestTOC(TestCase):
         # Toy courses should be loaded
         self.course_name = 'edX/toy/2012_Fall'
         self.toy_course = modulestore().get_course(self.course_name)
-        print type(self.toy_course)
-        assert False
         self.portal_user = UserFactory()
 
     def test_toc_toy_from_chapter(self):
