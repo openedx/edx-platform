@@ -34,7 +34,6 @@ def get_threads(request, course_id, discussion_id=None, per_page=THREADS_PER_PAG
     This may raise cc.utils.CommentClientError or
     cc.utils.CommentClientUnknownError if something goes wrong.
     """
-
     default_query_params = {
         'page': 1,
         'per_page': per_page,
@@ -64,6 +63,8 @@ def get_threads(request, course_id, discussion_id=None, per_page=THREADS_PER_PAG
     group_id = get_cohort_id(user,course_id);
     if group_id:
       default_query_params["group_id"] = group_id; 
+      print("\n\n\n\n\n****************GROUP ID IS ")
+      print group_id
         
     query_params = merge_dict(default_query_params,
                               strip_none(extract(request.GET, ['page', 'sort_key', 'sort_order', 'text', 'tags', 'commentable_ids'])))

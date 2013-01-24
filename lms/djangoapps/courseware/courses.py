@@ -84,21 +84,13 @@ def get_opt_course_with_access(user, course_id, action):
     return get_course_with_access(user, course_id, action)
 
 
-    
-  
-def is_course_cohorted(course_id):
-    """
-    given a course id, return a boolean for whether or not the course is cohorted
-        
-    """
-
 def get_cohort_id(user, course_id):
     """
     given a course id and a user, return the id of the cohort that user is assigned to
     and if the course is not cohorted or the user is an instructor, return None
     
     """
-    return 101
+    return 127
     
 def is_commentable_cohorted(course_id,commentable_id):
     """

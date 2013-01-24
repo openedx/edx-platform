@@ -21,11 +21,11 @@ from django.contrib.auth.models import User
 
 from mitxmako.shortcuts import render_to_response, render_to_string
 from courseware.courses import get_course_with_access
-from courseware.courses import get_cohort_id
+from courseware.courses import get_cohort_id,is_commentable_cohorted
 
 from django_comment_client.utils import JsonResponse, JsonError, extract, get_courseware_context
 
-from django_comment_client.permissions import check_permissions_by_view
+from django_comment_client.permissions import check_permissions_by_view, cached_has_permission
 from django_comment_client.models import Role
 
 def permitted(fn):
@@ -59,10 +59,17 @@ def ajax_content_response(request, course_id, content, template_name):
         'annotated_content_info': annotated_content_info,
     })
 
+    
+    
+def is_moderator(user, course_id):
+  cached_has_permission(user, "see_all_cohorts", course_id)    
+    
 @require_POST
 @login_required
 @permitted
 def create_thread(request, course_id, commentable_id):
+    print "\n\n\n\n\n*******************"
+    print commentable_id
     course = get_course_with_access(request.user, course_id, 'load')
     post = request.POST
 
@@ -85,23 +92,28 @@ def create_thread(request, course_id, commentable_id):
         'user_id'            : request.user.id,
     })
     
-    #now cohort id
+    
+    #now cohort the thread if the commentable is cohorted
     #if the group id came in from the form, set it there, otherwise, 
     #see if the user and the commentable are cohorted
-    print post
+    if is_commentable_cohorted(course_id,commentable_id):
+      if 'group_id' in post: #if a group id was submitted in the form
+        posted_group_id = post['group_id']
+      else:
+        post_group_id = None
     
-    group_id = None
-    
-    if 'group_id' in post:
-      group_id = post['group_id']
-    
-    
-    if group_id is None:
-      group_id = get_cohort_id(request.user, course_id)
+      user_group_id = get_cohort_id(request.user, course_id)
 
-    if group_id is not None:
+      if is_moderator(request.user,course_id):
+        if post_group_id is None:
+          group_id = user_group_id
+        else:
+          group_id = post_group_id
+      else:
+          group_id = user_group_id
+      
       thread.update_attributes(**{'group_id' :group_id})
-
+    
     thread.save()
     if post.get('auto_subscribe', 'false').lower() == 'true':
         user = cc.User.from_django_user(request.user)
