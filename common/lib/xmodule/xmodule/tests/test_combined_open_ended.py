@@ -1,8 +1,9 @@
 import json
-from mock import Mock
+from mock import Mock, MagicMock
 import unittest
 
 from xmodule.openendedchild import OpenEndedChild
+from xmodule.open_ended_module import OpenEndedModule
 from xmodule.modulestore import Location
 from lxml import etree
 
@@ -119,6 +120,60 @@ class OpenEndedChildTest(unittest.TestCase):
         self.openendedchild.record_latest_score(0)
         self.assertEqual(self.openendedchild.is_last_response_correct(),
                 'incorrect')
+
+class OpenEndedModuleTest(unittest.TestCase):
+    location = Location(["i4x", "edX", "sa_test", "selfassessment",
+                         "SampleQuestion"])
+
+    metadata = json.dumps({'attempts': '10'})
+    prompt = etree.XML("<prompt>This is a question prompt</prompt>")
+    rubric = etree.XML('''<rubric><rubric>
+        <category>
+        <description>Response Quality</description>
+        <option>The response is not a satisfactory answer to the question.  It either fails to address the question or does so in a limited way, with no evidence of higher-order thinking.</option>
+        </category>
+         </rubric></rubric>''')
+    max_score = 4
+
+    static_data = {
+            'max_attempts': 20,
+            'prompt': prompt,
+            'rubric': rubric,
+            'max_score': max_score, 
+            }
+
+    oeparam = etree.XML('''
+      <openendedparam>
+            <initial_display>Enter essay here.</initial_display>
+            <answer_display>This is the answer.</answer_display>
+            <grader_payload>{"grader_settings" : "ml_grading.conf", "problem_id" : "6.002x/Welcome/OETest"}</grader_payload>
+        </openendedparam>
+    ''')
+    definition = {'oeparam': oeparam}
+    descriptor = Mock()
+
+    def setUp(self):
+        test_system.location = self.location
+        self.mock_xqueue = MagicMock()
+        self.mock_xqueue.send_to_queue.return_value=(None, "Message")
+        test_system.xqueue = {'interface':self.mock_xqueue, 'callback_url':'/', 'default_queuename': 'testqueue', 'waittime': 1}
+        self.openendedmodule = OpenEndedModule(test_system, self.location, 
+                self.definition, self.descriptor, self.static_data, self.metadata) 
+
+    def test_message_post(self):
+        get = {'feedback': 'feedback text',
+                'submission_id': '1',
+                'grader_id': '1',
+                'score': 3}
+
+        result = self.openendedmodule.message_post(get, test_system)
+        self.assertTrue(result['success'])
+        state = json.loads(self.openendedmodule.get_instance_state())
+        self.assertIsNotNone(state['state'], OpenEndedModule.DONE)
+
+    def test_send_to_grader(self):
+        result = self.openendedmodule.send_to_grader("This is a student submission", test_system)
+        self.assertTrue(result)
 
 
 
