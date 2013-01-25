@@ -32,45 +32,45 @@ import comment_client
 
 from courseware.tests.tests import PageLoader, TEST_DATA_XML_MODULESTORE
 
-@override_settings(MODULESTORE=TEST_DATA_XML_MODULESTORE)
-class TestCohorting(PageLoader):
-    """Check that cohorting works properly"""
-
-    def setUp(self):
-        xmodule.modulestore.django._MODULESTORES = {}
-
-        # Assume courses are there
-        self.toy = modulestore().get_course("edX/toy/2012_Fall")
-
-        # Create two accounts
-        self.student = 'view@test.com'
-        self.student2 = 'view2@test.com'
-        self.password = 'foo'
-        self.create_account('u1', self.student, self.password)
-        self.create_account('u2', self.student2, self.password)
-        self.activate_user(self.student)
-        self.activate_user(self.student2)
-
-    def test_create_thread(self):
-        my_save = Mock()
-        comment_client.perform_request = my_save
-
-        resp = self.client.post(
-            reverse('django_comment_client.base.views.create_thread',
-                    kwargs={'course_id': 'edX/toy/2012_Fall',
-                            'commentable_id': 'General'}),
-                                        {'some': "some",
-                                         'data': 'data'})
-        self.assertTrue(my_save.called)
-
-        #self.assertEqual(resp.status_code, 200)
-        #self.assertEqual(my_save.something, "expected", "complaint if not true")
-
-        self.toy.metadata["cohort_config"] = {"cohorted": True}
-
-        # call the view again ...
-
-        # assert that different things happened
+#@override_settings(MODULESTORE=TEST_DATA_XML_MODULESTORE)
+#class TestCohorting(PageLoader):
+#    """Check that cohorting works properly"""
+#
+#    def setUp(self):
+#        xmodule.modulestore.django._MODULESTORES = {}
+#
+#        # Assume courses are there
+#        self.toy = modulestore().get_course("edX/toy/2012_Fall")
+#
+#        # Create two accounts
+#        self.student = 'view@test.com'
+#        self.student2 = 'view2@test.com'
+#        self.password = 'foo'
+#        self.create_account('u1', self.student, self.password)
+#        self.create_account('u2', self.student2, self.password)
+#        self.activate_user(self.student)
+#        self.activate_user(self.student2)
+#
+#    def test_create_thread(self):
+#        my_save = Mock()
+#        comment_client.perform_request = my_save
+#
+#        resp = self.client.post(
+#            reverse('django_comment_client.base.views.create_thread',
+#                    kwargs={'course_id': 'edX/toy/2012_Fall',
+#                            'commentable_id': 'General'}),
+#                                        {'some': "some",
+#                                         'data': 'data'})
+#        self.assertTrue(my_save.called)
+#
+#        #self.assertEqual(resp.status_code, 200)
+#        #self.assertEqual(my_save.something, "expected", "complaint if not true")
+#
+#        self.toy.metadata["cohort_config"] = {"cohorted": True}
+#
+#        # call the view again ...
+#
+#       # assert that different things happened
 
 
 
