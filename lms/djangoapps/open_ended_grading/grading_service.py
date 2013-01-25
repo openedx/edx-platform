@@ -11,7 +11,7 @@ from django.http import HttpResponse, Http404
 from courseware.access import has_access
 from util.json_request import expect_json
 from xmodule.course_module import CourseDescriptor
-from xmodule.combined_open_ended_rubric import CombinedOpenEndedRubric
+from xmodule.combined_open_ended_rubric import CombinedOpenEndedRubric, RubricParsingError
 from lxml import etree
 from mitxmako.shortcuts import render_to_string
 from xmodule.x_module import ModuleSystem
@@ -113,19 +113,20 @@ class GradingService(object):
             if response_json.has_key('rubric'):
                 rubric = response_json['rubric']
                 rubric_renderer = CombinedOpenEndedRubric(self.system, False)
-                success, rubric_html = rubric_renderer.render_rubric(rubric)
-                if not success:
-                    error_message = "Could not render rubric: {0}".format(rubric)
-                    log.exception(error_message)
-                    return json.dumps({'success': False,
-                                       'error': error_message})
+                rubric_html = rubric_renderer.render_rubric(rubric)
                 response_json['rubric'] = rubric_html
             return json.dumps(response_json)
         # if we can't parse the rubric into HTML, 
-        except etree.XMLSyntaxError:
+        except etree.XMLSyntaxError, RubricParsingError:
             log.exception("Cannot parse rubric string. Raw string: {0}"
                           .format(rubric))
             return json.dumps({'success': False,
                                'error': 'Error displaying submission'})
+        except ValueError:
+            log.exception("Error parsing response: {0}".format(response))
+            return json.dumps({'success': False,
+                                'error': "Error displaying submission"}) 
+
+
 
 
