@@ -42,7 +42,8 @@ class SelfAssessmentTest(unittest.TestCase):
                 'max_attempts': 10,
                 'rubric': etree.XML(self.rubric),
                 'prompt': self.prompt,
-                'max_score': 1
+                'max_score': 1,
+                'display_name': "Name"
                 }
 
         self.module = SelfAssessmentModule(test_system, self.location,
@@ -57,14 +58,12 @@ class SelfAssessmentTest(unittest.TestCase):
 
         self.assertEqual(self.module.get_score()['score'], 0)
 
-
         self.module.save_answer({'student_answer': "I am an answer"}, test_system)
         self.assertEqual(self.module.state, self.module.ASSESSING)
 
         self.module.save_assessment({'assessment': '0'}, test_system)
-        self.assertEqual(self.module.state, self.module.POST_ASSESSMENT)
-        self.module.save_hint({'hint': 'this is a hint'}, test_system)
         self.assertEqual(self.module.state, self.module.DONE)
+
 
         d = self.module.reset({})
         self.assertTrue(d['success'])

@@ -109,7 +109,8 @@ class @CombinedOpenEnded
     @reset_button.hide()
     @next_problem_button.hide()
     @hint_area.attr('disabled', false)
-
+    if @child_state == 'done'
+      @rubric_wrapper.hide()
     if @child_type=="openended"
       @skip_button.hide()
     if @allow_reset=="True"
@@ -139,6 +140,7 @@ class @CombinedOpenEnded
       else
         @submit_button.click @message_post
     else if @child_state == 'done'
+      @rubric_wrapper.hide()
       @answer_area.attr("disabled", true)
       @hint_area.attr('disabled', true)
       @submit_button.hide()
@@ -151,7 +153,7 @@ class @CombinedOpenEnded
 
 
   find_assessment_elements: ->
-    @assessment = @$('select.assessment')
+    @assessment = @$('input[name="grade-selection"]')
 
   find_hint_elements: ->
     @hint_area = @$('textarea.post_assessment')
@@ -163,6 +165,7 @@ class @CombinedOpenEnded
       $.postWithPrefix "#{@ajax_url}/save_answer", data, (response) =>
         if response.success
           @rubric_wrapper.html(response.rubric_html)
+          @rubric_wrapper.show()
           @child_state = 'assessing'
           @find_assessment_elements()
           @rebind()
@@ -174,7 +177,8 @@ class @CombinedOpenEnded
   save_assessment: (event) =>
     event.preventDefault()
     if @child_state == 'assessing'
-      data = {'assessment' : @assessment.find(':selected').text()}
+      checked_assessment = @$('input[name="grade-selection"]:checked')
+      data = {'assessment' : checked_assessment.val()}
       $.postWithPrefix "#{@ajax_url}/save_assessment", data, (response) =>
         if response.success
           @child_state = response.state
@@ -183,6 +187,7 @@ class @CombinedOpenEnded
             @hint_wrapper.html(response.hint_html)
             @find_hint_elements()
           else if @child_state == 'done'
+            @rubric_wrapper.hide()
             @message_wrapper.html(response.message_html)
 
           @rebind()

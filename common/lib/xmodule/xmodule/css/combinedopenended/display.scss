@@ -37,8 +37,12 @@ section.combined-open-ended {
   .result-container
   {
       float:left;
-      width: 93%;
+      width: 100%;
       position:relative;
+  }
+  h4
+  {
+      margin-bottom:10px;
   }
 }
 
@@ -49,15 +53,19 @@ section.combined-open-ended-status {
       color: #2C2C2C;
       font-family: monospace;
       font-size: 1em;
-      padding-top: 10px;
+      padding: 10px;
+      .show-results {
+          margin-top: .3em;
+          text-align:right;
+      }
+      .show-results-button {
+          font: 1em monospace;
+      }
    }
 
    .statusitem-current {
-     background-color: #BEBEBE;
-     color: #2C2C2C;
-     font-family: monospace;
-     font-size: 1em;
-     padding-top: 10px;
+     background-color: #d4d4d4;
+     color: #222;
   }
 
     span {
@@ -93,6 +101,7 @@ section.combined-open-ended-status {
 div.result-container {
 
  .evaluation {
+
         p {
             margin-bottom: 1px;
         }
@@ -104,6 +113,7 @@ div.result-container {
     }
 
     .evaluation-response {
+        margin-bottom: 10px;
         header {
             text-align: right;
             a {
@@ -134,6 +144,7 @@ div.result-container {
     }
 
      .external-grader-message {
+         margin-bottom: 5px;
         section {
           padding-left: 20px;
           background-color: #FAFAFA;
@@ -141,6 +152,7 @@ div.result-container {
           font-family: monospace;
           font-size: 1em;
           padding-top: 10px;
+          padding-bottom:30px;
           header {
               font-size: 1.4em;
           }
@@ -221,12 +233,13 @@ div.result-container {
 
 div.result-container, section.open-ended-child {
     .rubric {
+            margin-bottom:25px;
             tr {
                 margin:10px 0px;
                 height: 100%;
             }
             td {
-                padding: 20px 0px;
+                padding: 20px 0px 25px 0px;
                 margin: 10px 0px;
                 height: 100%;
             }
@@ -236,16 +249,16 @@ div.result-container, section.open-ended-child {
             }
             label,
             .view-only {
-                margin:10px;
+                margin:2px;
                 position: relative;
-                padding: 15px;
-                width: 200px;
+                padding: 10px 15px 25px 15px;
+                width: 145px;
                 height:100%;
                 display: inline-block;
                 min-height: 50px;
                 min-width: 50px;
                 background-color: #CCC;
-                font-size: 1em;
+                font-size: .85em;
             }
             .grade {
               position: absolute;
@@ -256,12 +269,6 @@ div.result-container, section.open-ended-child {
             .selected-grade {
               background: #666;
               color: white;
-            }
-            input[type=radio]:checked + label {
-              background: #666;
-              color: white; }
-            input[class='score-selection'] {
-              display: none;
             }
         }
 }
@@ -461,7 +468,6 @@ section.open-ended-child {
 
       p {
         line-height: 20px;
-        text-transform: capitalize;
         margin-bottom: 0;
         float: left;
       }
@@ -598,13 +604,15 @@ section.open-ended-child {
     }
   }
 
-  div.open-ended-alert {
+  div.open-ended-alert,
+  .save_message {
     padding: 8px 12px;
     border: 1px solid #EBE8BF;
     border-radius: 3px;
     background: #FFFCDD;
     font-size: 0.9em;
     margin-top: 10px;
+    margin-bottom:5px;
   }
 
   div.capa_reset {
@@ -623,4 +631,31 @@ section.open-ended-child {
     font-size: 0.9em;
   }
 
+  .assessment-container {
+      margin: 40px 0px 30px 0px;
+      .scoring-container
+      {
+          p
+          {
+              margin-bottom: 1em;
+          }
+          label {
+              margin: 10px;
+              padding: 5px;
+              display: inline-block;
+              min-width: 50px;
+              background-color: #CCC;
+              text-size: 1.5em;
+          }
+
+          input[type=radio]:checked + label {
+              background: #666;
+              color: white; 
+          }
+          input[class='grade-selection'] {
+              display: none;
+          }
+
+      }
+  }
 }

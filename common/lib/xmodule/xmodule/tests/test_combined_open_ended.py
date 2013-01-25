@@ -30,6 +30,7 @@ class OpenEndedChildTest(unittest.TestCase):
             'prompt': prompt,
             'rubric': rubric,
             'max_score': max_score, 
+            'display_name': 'Name'
             }
     definition = Mock()
     descriptor = Mock()
@@ -142,6 +143,7 @@ class OpenEndedModuleTest(unittest.TestCase):
             'prompt': prompt,
             'rubric': rubric,
             'max_score': max_score, 
+            'display_name': 'Name'
             }
 
     oeparam = etree.XML('''
