@@ -11,6 +11,7 @@ import os
 import sys
 import hashlib
 import capa.xqueue_interface as xqueue_interface
+import re
 
 from pkg_resources import resource_string
 
@@ -133,8 +134,12 @@ class OpenEndedChild(object):
 
     @staticmethod
     def sanitize_html(answer):
-        cleaner = Cleaner(style=True, links=True, add_nofollow=True, page_structure=True, safe_attrs_only=True)
-        clean_html = cleaner.clean_html(answer)
+        try:
+            cleaner = Cleaner(style=True, links=True, add_nofollow=True, page_structure=True, safe_attrs_only=True)
+            clean_html = cleaner.clean_html(answer)
+            clean_html = re.sub(r'</p>$', '', re.sub(r'^<p>', '', clean_html))
+        except:
+            clean_html = answer
         return clean_html
 
     def new_history_entry(self, answer):
