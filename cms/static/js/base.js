@@ -292,16 +292,15 @@ function onSectionReordered(event, ui) {
 }
 
 function _handleReorder(event, ui, parentIdField, childrenSelector) {
-	//       figure out where it came from and where it slots in. 
+	// figure out where it came from and where it slots in. 
 	var subsection_id = $(event.target).data(parentIdField);
-    var _els = $(event.target).children(childrenSelector);
-    var children = _els.map(function(idx, el) { return $(el).data('id'); }).get();
-    // if new to this parent, figure out which parent to remove it from and do so
-    if (!_.contains(children, ui.draggable.data('id'))) {
-    	var old_parent = ui.draggable.parent();
-    	var old_children = old_parent.children(childrenSelector).map(function(idx, el) { return $(el).data('id'); }).get();
-    	old_children = _.without(old_children, ui.draggable.data('id'));
-		// call into server to commit the new order
+	var _els = $(event.target).children(childrenSelector);
+	var children = _els.map(function(idx, el) { return $(el).data('id'); }).get();
+	// if new to this parent, figure out which parent to remove it from and do so
+	if (!_.contains(children, ui.draggable.data('id'))) {
+		var old_parent = ui.draggable.parent();
+		var old_children = old_parent.children(childrenSelector).map(function(idx, el) { return $(el).data('id'); }).get();
+		old_children = _.without(old_children, ui.draggable.data('id'));
 		$.ajax({
 			url: "/save_item",
 			type: "POST",
@@ -309,30 +308,29 @@ function _handleReorder(event, ui, parentIdField, childrenSelector) {
 			contentType: "application/json",
 			data:JSON.stringify({ 'id' : old_parent.data(parentIdField), 'children' : old_children})
 		});
-		//
-    }
-    else {
-    	// staying in same parent
-    	// remove so that the replacement in the right place doesn't double it
-    	children = _.without(children, ui.draggable.data('id'));
-    }
-    // add to this parent (figure out where)
-    for (var i = 0; i < _els.length; i++) {
-    	if (!ui.draggable.is(_els[i]) && ui.offset.top < $(_els[i]).offset().top) {
-    		// insert at i in children and _els
-    		ui.draggable.insertBefore($(_els[i]));
-    		// TODO figure out correct way to have it format (and similar line below)
-    		ui.draggable.attr("style", "position:relative;");
-    		children.splice(i, 0, ui.draggable.data('id'));
-    		break;
-    	}
-    }
-    // see if it goes at end (the above loop didn't insert it)
-    if (!_.contains(children, ui.draggable.data('id'))) {
-    	$(event.target).append(ui.draggable);
-    	ui.draggable.attr("style", "position:relative;"); // STYLE hack too
-    	children.push(ui.draggable.data('id'));
-    }
+	}
+	else {
+		// staying in same parent
+		// remove so that the replacement in the right place doesn't double it
+		children = _.without(children, ui.draggable.data('id'));
+	}
+	// add to this parent (figure out where)
+	for (var i = 0; i < _els.length; i++) {
+		if (!ui.draggable.is(_els[i]) && ui.offset.top < $(_els[i]).offset().top) {
+			// insert at i in children and _els
+			ui.draggable.insertBefore($(_els[i]));
+			// TODO figure out correct way to have it remove the style: top:n; setting (and similar line below)
+			ui.draggable.attr("style", "position:relative;");
+			children.splice(i, 0, ui.draggable.data('id'));
+			break;
+		}
+	}
+	// see if it goes at end (the above loop didn't insert it)
+	if (!_.contains(children, ui.draggable.data('id'))) {
+		$(event.target).append(ui.draggable);
+		ui.draggable.attr("style", "position:relative;"); // STYLE hack too
+		children.push(ui.draggable.data('id'));
+	}
 	$.ajax({
 		url: "/save_item",
 		type: "POST",
@@ -340,7 +338,7 @@ function _handleReorder(event, ui, parentIdField, childrenSelector) {
 		contentType: "application/json",
 		data:JSON.stringify({ 'id' : subsection_id, 'children' : children})
 	});
-    
+
 }
 
 function getEdxTimeFromDateTimeVals(date_val, time_val, format) {
