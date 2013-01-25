@@ -112,12 +112,14 @@ $(document).ready(function() {
     	accept : '.unit',
     	greedy: true,
     	tolerance: "pointer",
+    	hoverClass: "dropover",
     	drop: onUnitReordered
     });
     $('.subsection-list > ol').droppable({
     	// why don't we have a more useful class for subsections than id-holder?
     	accept : '.id-holder', // '.unit, .id-holder',
     	tolerance: "pointer",
+    	hoverClass: "dropover",
     	drop: onSubsectionReordered,
     	greedy: true
     });
