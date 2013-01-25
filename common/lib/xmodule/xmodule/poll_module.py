@@ -117,9 +117,9 @@ class PollModule(XModule):
         poll_units = html.fromstring(html_string).xpath('//unit')
         for i, pu in enumerate(poll_units):
             if i == 0:
-                css_class = 'hidden'
-            else:
                 css_class = ''
+            else:
+                css_class = 'hidden'
             pu_question = stringify_children(pu.xpath('//question')[0])
             pu_html = self.get_poll_unit_html(i, pu_question, css_class)
             pu_controls = (pu.get('plot', "no"), pu.get('next_yes', "end"),
