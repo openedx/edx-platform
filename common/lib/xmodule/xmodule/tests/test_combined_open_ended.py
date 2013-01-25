@@ -10,6 +10,13 @@ import capa.xqueue_interface as xqueue_interface
 from datetime import datetime
 
 from . import test_system
+"""
+Tests for the various pieces of the CombinedOpenEndedGrading system
+
+OpenEndedChild
+OpenEndedModule
+
+"""
 
 class OpenEndedChildTest(unittest.TestCase):
     location = Location(["i4x", "edX", "sa_test", "selfassessment",
@@ -130,12 +137,12 @@ class OpenEndedModuleTest(unittest.TestCase):
 
     metadata = json.dumps({'attempts': '10'})
     prompt = etree.XML("<prompt>This is a question prompt</prompt>")
-    rubric = etree.XML('''<rubric><rubric>
+    rubric = etree.XML('''<rubric>
         <category>
         <description>Response Quality</description>
         <option>The response is not a satisfactory answer to the question.  It either fails to address the question or does so in a limited way, with no evidence of higher-order thinking.</option>
         </category>
-         </rubric></rubric>''')
+         </rubric>''')
     max_score = 4
 
     static_data = {
@@ -225,22 +232,28 @@ class OpenEndedModuleTest(unittest.TestCase):
                 'correct': True,
                 'score': 4,
                 'msg' : 'Grader Message',
-                'feedback': feedback,
+                'feedback': json.dumps(feedback),
                 'grader_type': 'IN',
                 'grader_id': '1',
                 'submission_id': '1',
-                'success': True
+                'success': True,
+                'rubric_scores': [0],
+                'rubric_scores_complete': True,
+                'rubric_xml': etree.tostring(self.rubric)
                 }
         get = {'queuekey': "abcd",
                 'xqueue_body': json.dumps(score_msg)}
         self.openendedmodule.update_score(get, test_system)
 
-
+    def test_latest_post_assessment(self):
+        self.update_score_single()
+        assessment = self.openendedmodule.latest_post_assessment(test_system)
+        self.assertFalse(assessment == '')
+        # check for errors
+        self.assertFalse('errors' in assessment)
 
     def test_update_score(self):
         self.update_score_single()
         score = self.openendedmodule.latest_score()
         self.assertEqual(score, 4)
 
-    def test_latest_post_assessment(self):
-        self.update_score_single()

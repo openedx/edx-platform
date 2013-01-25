@@ -52,7 +52,7 @@ class SelfAssessmentTest(unittest.TestCase):
 
     def test_get_html(self):
         html = self.module.get_html(test_system)
-        self.assertTrue(html.find("This is sample prompt text") != -1)
+        self.assertTrue("This is sample prompt text" in html)
 
     def test_self_assessment_flow(self):
 

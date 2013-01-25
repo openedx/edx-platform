@@ -410,6 +410,9 @@ class OpenEndedModule(openendedchild.OpenEndedChild):
              'grader_id': id of the grader
              'submission_id' : id of the submission
              'success': whether or not this submission was successful
+             'rubric_scores': a list of rubric scores
+             'rubric_scores_complete': boolean if rubric scores are complete
+             'rubric_xml': the xml of the rubric in string format
              }
 
         Returns (valid_score_msg, correct, score, msg):
