@@ -71,6 +71,12 @@ class Command(BaseCommand):
             dest='ignore_registration_dates',
             help='find exam info for course based on exam_series_code, even if the exam is not active.'
         ),   
+        make_option(
+            '--create_dummy_exam',
+            action='store_true',
+            dest='create_dummy_exam',
+            help='create dummy exam info for course, even if course exists'
+        ),   
     )
     args = "<student_username course_id>"
     help = "Create or modify a TestCenterRegistration entry for a given Student"
@@ -98,15 +104,20 @@ class Command(BaseCommand):
         except TestCenterUser.DoesNotExist:
             raise CommandError("User \"{}\" does not have an existing demographics record".format(username))
             
-        # check to see if a course_id was specified, and use information from that:
-        try:
-            course = course_from_id(course_id)
-            if 'ignore_registration_dates' in our_options:
-                examlist = [exam for exam in course.test_center_exams if exam.exam_series_code == our_options.get('exam_series_code')]
-                exam = examlist[0] if len(examlist) > 0 else None
-            else:
-                exam = course.current_test_center_exam
-        except ItemNotFoundError: 
+        # get an "exam" object.  Check to see if a course_id was specified, and use information from that:
+        exam = None
+        create_dummy_exam = 'create_dummy_exam' in our_options and our_options['create_dummy_exam']
+        if not create_dummy_exam:
+            try:
+                course = course_from_id(course_id)
+                if 'ignore_registration_dates' in our_options:
+                    examlist = [exam for exam in course.test_center_exams if exam.exam_series_code == our_options.get('exam_series_code')]
+                    exam = examlist[0] if len(examlist) > 0 else None
+                else:
+                    exam = course.current_test_center_exam
+            except ItemNotFoundError: 
+                pass
+        else:
             # otherwise use explicit values (so we don't have to define a course):    
             exam_name = "Dummy Placeholder Name"
             exam_info = { 'Exam_Series_Code': our_options['exam_series_code'],
@@ -120,7 +131,7 @@ class Command(BaseCommand):
             our_options['eligibility_appointment_date_last'] = strftime("%Y-%m-%d", exam.last_eligible_appointment_date)
 
         if exam is None:
-            raise CommandError("Exam for course_id {%s} does not exist".format(course_id))
+            raise CommandError("Exam for course_id {} does not exist".format(course_id))
 
         exam_code = exam.exam_series_code
             
