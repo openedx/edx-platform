@@ -89,18 +89,8 @@ class TextbookList(ModelType):
         return json_data
 
 
-class CourseModule(SequenceModule):
-    first_time_user = Boolean(help="Whether this is the first time the user has visited this course", scope=Scope.student_state, default=True)
-
-    def __init__(self, *args, **kwargs):
-        super(CourseModule, self).__init__(*args, **kwargs)
-
-        if self.first_time_user:
-            self.first_time_user = False
-
-
 class CourseDescriptor(SequenceDescriptor):
-    module_class = CourseModule
+    module_class = SequenceModule
 
     textbooks = TextbookList(help="List of pairs of (title, url) for textbooks used in this course", default=[], scope=Scope.content)
     wiki_slug = String(help="Slug that points to the wiki for this course", scope=Scope.content)
@@ -123,7 +113,7 @@ class CourseDescriptor(SequenceDescriptor):
     has_children = True
 
     info_sidebar_name = String(scope=Scope.settings, default='Course Handouts')
-    
+
     # An extra property is used rather than the wiki_slug/number because
     # there are courses that change the number for different runs. This allows
     # courses to share the same css_class across runs even if they have

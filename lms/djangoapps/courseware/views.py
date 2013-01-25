@@ -103,16 +103,18 @@ def render_accordion(request, course, chapter, section, model_data_cache):
 def get_current_child(xmodule):
     """
     Get the xmodule.position's display item of an xmodule that has a position and
-    children.  Returns None if the xmodule doesn't have a position, or if there
-    are no children.  Otherwise, if position is out of bounds, returns the first child.
+    children.  If xmodule has no position or is out of bounds, return the first child.
+    Returns None only if there are no children at all.
     """
-    if not hasattr(xmodule, 'position'):
-        return None
+    if xmodule.position is None:
+        pos = 0
+    else:
+        # position is 1-indexed.
+        pos = xmodule.position - 1
 
     children = xmodule.get_display_items()
-    # position is 1-indexed.
-    if 0 <= xmodule.position - 1 < len(children):
-        child = children[xmodule.position - 1]
+    if 0 <= pos < len(children):
+        child = children[pos]
     elif len(children) > 0:
         # Something is wrong.  Default to first child
         child = children[0]
@@ -121,36 +123,43 @@ def get_current_child(xmodule):
     return child
 
 
-def redirect_to_course_position(course_module, first_time):
+def redirect_to_course_position(course_module):
     """
-    Load the course state for the user, and return a redirect to the
-    appropriate place in the course: either the first element if there
-    is no state, or their previous place if there is.
+    Return a redirect to the user's current place in the course.
 
-    If this is the user's first time, send them to the first section instead.
+    If this is the user's first time, redirects to COURSE/CHAPTER/SECTION.
+    If this isn't the users's first time, redirects to COURSE/CHAPTER,
+    and the view will find the current section and display a message
+    about reusing the stored position.
+
+    If there is no current position in the course or chapter, then selects
+    the first child.
+
     """
-    course_id = course_module.descriptor.id
+    urlargs = {'course_id': course_module.descriptor.id}
     chapter = get_current_child(course_module)
     if chapter is None:
         # oops.  Something bad has happened.
         raise Http404("No chapter found when loading current position in course")
-    if not first_time:
-        return redirect(reverse('courseware_chapter', kwargs={'course_id': course_id,
-                                                              'chapter': chapter.url_name}))
+
+    urlargs['chapter'] = chapter.url_name
+    if course_module.position is not None:
+        return redirect(reverse('courseware_chapter', kwargs=urlargs))
+
     # Relying on default of returning first child
     section = get_current_child(chapter)
-    return redirect(reverse('courseware_section', kwargs={'course_id': course_id,
-                                                          'chapter': chapter.url_name,
-                                                          'section': section.url_name}))
+    if section is None:
+        raise Http404("No section found when loading current position in course")
+
+    urlargs['section'] = section.url_name
+    return redirect(reverse('courseware_section', kwargs=urlargs))
 
 def save_child_position(seq_module, child_name):
     """
     child_name: url_name of the child
     """
-    for i, c in enumerate(seq_module.get_display_items()):
+    for position, c in enumerate(seq_module.get_display_items(), start=1):
         if c.url_name == child_name:
-            # Position is 1-indexed
-            position = i + 1
             # Only save if position changed
             if position != seq_module.position:
                 seq_module.position = position
@@ -201,7 +210,7 @@ def index(request, course_id, chapter=None, section=None,
             return redirect(reverse('about_course', args=[course.id]))
 
         if chapter is None:
-            return redirect_to_course_position(course_module, course_module.first_time_user)
+            return redirect_to_course_position(course_module)
 
         context = {
             'csrf': csrf(request)['csrf_token'],
@@ -244,7 +253,6 @@ def index(request, course_id, chapter=None, section=None,
 
             # Save where we are in the chapter
             save_child_position(chapter_module, section)
-
 
             context['content'] = section_module.get_html()
         else:

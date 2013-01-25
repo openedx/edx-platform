@@ -46,13 +46,6 @@ class SequenceModule(XModule):
         if self.system.get('position'):
             self.position = int(self.system.get('position'))
 
-        # Default to the first child
-        # Don't set 1 as the default in the property definition, because
-        # there is code that looks for the existance of the position value
-        # to determine if the student has visited the sequence before or not
-        if self.position is None:
-            self.position = 1
-
         self.rendered = False
 
     def get_instance_state(self):
