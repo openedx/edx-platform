@@ -26,7 +26,7 @@ class Command(BaseCommand):
 
     @staticmethod
     def datadog_error(string, tags):
-        dog_http_api.event("Pearson Import", string, alert_type='error', tags=tags)
+        dog_http_api.event("Pearson Import", string, alert_type='error', tags=[tags])
 
     def handle(self, *args, **kwargs):
         if len(args) < 1:
