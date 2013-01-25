@@ -644,3 +644,11 @@ input.courseware-unit-search-input {
 	font-size: 13px;
 	color: $darkGrey;
 }
+
+.ui-droppable {
+    min-height: 22px;
+    &.dropover {
+        padding-top: 11px;
+        padding-bottom: 11px;
+    }
+}
