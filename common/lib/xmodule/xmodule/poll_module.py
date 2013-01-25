@@ -90,7 +90,7 @@ class PollModule(XModule):
                   'element_id': self.html_id,
                   'element_class': self.html_class,
                   'ajax_url': self.system.ajax_url,
-                  'poll_units': self.parse_sequence(self.sequence),
+                  'poll_chain': self.parse_sequence(self.sequence),
                   'configuration_json': json.dumps({}),
                   'poll_units': self.poll_units_list
                   }
@@ -101,31 +101,14 @@ class PollModule(XModule):
     def get_poll_unit_html(self, i, question, css_class):
         """ """
         return """
-<div id="poll_unit_{poll_number}" class="{css_class} polls">
-                    {question}
-  <div class="vote_and_submit">
-    <div id="vote_block-{poll_number}" class="vote">
-      <a class="upvote">Yes</a>
-      <a class="downvote">No</a>
-    </div>
-  </div>
-  <div class="graph_answer"></div>
-</div>""".format(poll_number=i, question=question, css_class=css_class)
+""".format(poll_number=i, question=question, css_class=css_class)
 
     def parse_sequence(self, html_string):
         """    substitute sequence     """
-        poll_units = html.fromstring(html_string).xpath('//unit')
-        for i, pu in enumerate(poll_units):
-            if i == 0:
-                css_class = ''
-            else:
-                css_class = 'hidden'
-            pu_question = stringify_children(pu.xpath('//question')[0])
-            pu_html = self.get_poll_unit_html(i, pu_question, css_class)
-            pu_controls = (pu.get('plot', "no"), pu.get('next_yes', "end"),
-                                                 pu.get('next_no', "end"))
-            self.poll_units_list.append((pu_html, pu_controls))
-        # import ipdb; ipdb.set_trace()
+        return [(stringify_children(pu.xpath('//question')[0]),
+    (pu.get('plot', "no"), pu.get('next_yes', "end"),
+     pu.get('next_no', "end"), pu.get('id')))
+        for pu in html.fromstring(html_string).xpath('//unit')]
 
 
 class PollDescriptor(MakoModuleDescriptor, XmlDescriptor):

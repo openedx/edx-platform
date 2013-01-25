@@ -13,7 +13,16 @@
     <!-- Main HTML. -->
     ${element_html}
 
-% for poll_unit, poll_unit_controls in poll_units:
-    ${poll_unit}
+% for question, controls in poll_chain:
+    <div id="poll_unit_${loop.index}"
+    class="${'' if loop.index == 0 else 'hidden'} polls">
+            ${question}
+  <div class="vote_and_submit">
+    <div id="vote_block-${loop.index}" class="vote">
+      <a class="upvote">Yes</a>    <a class="downvote">No</a>
+    </div>
+  </div>
+  <div class="graph_answer"></div>
+</div>
 %    endfor
 </section>
