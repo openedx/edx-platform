@@ -257,7 +257,7 @@ class OpenEndedModule(openendedchild.OpenEndedChild):
         """
         new_score_msg = self._parse_score_msg(score_msg, system)
         if not new_score_msg['valid']:
-            score_msg['feedback'] = 'Invalid grader reply. Please contact the course staff.'
+            new_score_msg['feedback'] = 'Invalid grader reply. Please contact the course staff.'
 
         self.record_latest_score(new_score_msg['score'])
         self.record_latest_post_assessment(score_msg)
@@ -404,6 +404,10 @@ class OpenEndedModule(openendedchild.OpenEndedChild):
              'score': Numeric value (floating point is okay) to assign to answer
              'msg': grader_msg
              'feedback' : feedback from grader
+             'grader_type': what type of grader resulted in this score
+             'grader_id': id of the grader
+             'submission_id' : id of the submission
+             'success': whether or not this submission was successful
              }
 
         Returns (valid_score_msg, correct, score, msg):

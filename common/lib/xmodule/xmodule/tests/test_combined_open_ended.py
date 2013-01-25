@@ -1,11 +1,13 @@
 import json
-from mock import Mock, MagicMock
+from mock import Mock, MagicMock, ANY
 import unittest
 
 from xmodule.openendedchild import OpenEndedChild
 from xmodule.open_ended_module import OpenEndedModule
 from xmodule.modulestore import Location
 from lxml import etree
+import capa.xqueue_interface as xqueue_interface
+from datetime import datetime
 
 from . import test_system
 
@@ -165,15 +167,78 @@ class OpenEndedModuleTest(unittest.TestCase):
                 'submission_id': '1',
                 'grader_id': '1',
                 'score': 3}
+        qtime = datetime.strftime(datetime.now(), xqueue_interface.dateformat)
+        student_info = {'anonymous_student_id': test_system.anonymous_student_id,
+                'submission_time': qtime}
+        contents = {
+                'feedback': get['feedback'],
+                'submission_id': int(get['submission_id']),
+                'grader_id': int(get['grader_id']),
+                'score': get['score'],
+                'student_info': json.dumps(student_info)
+                }
 
         result = self.openendedmodule.message_post(get, test_system)
         self.assertTrue(result['success'])
+        # make sure it's actually sending something to the queue
+        self.mock_xqueue.send_to_queue.assert_called_with(body = json.dumps(contents), header=ANY)
+        
         state = json.loads(self.openendedmodule.get_instance_state())
         self.assertIsNotNone(state['state'], OpenEndedModule.DONE)
 
     def test_send_to_grader(self):
-        result = self.openendedmodule.send_to_grader("This is a student submission", test_system)
+        submission = "This is a student submission"
+        qtime = datetime.strftime(datetime.now(), xqueue_interface.dateformat)
+        student_info = {'anonymous_student_id': test_system.anonymous_student_id,
+                'submission_time': qtime}
+        contents = self.openendedmodule.payload.copy()
+        contents.update({ 
+            'student_info': json.dumps(student_info),
+            'student_response': submission, 
+            'max_score': self.max_score
+            })
+        result = self.openendedmodule.send_to_grader(submission, test_system)
         self.assertTrue(result)
+        self.mock_xqueue.send_to_queue.assert_called_with(body = json.dumps(contents), header=ANY)
+
+    def update_score_single(self):
+        self.openendedmodule.new_history_entry("New Entry")
+        score_msg = { 
+                'correct': True,
+                'score': 4,
+                'msg' : 'Grader Message',
+                'feedback': "Grader Feedback"
+                }
+        get = {'queuekey': "abcd",
+                'xqueue_body': score_msg}
+        self.openendedmodule.update_score(get, test_system)
+
+    def update_score_single(self):
+        self.openendedmodule.new_history_entry("New Entry")
+        feedback = {
+                "success": True,
+                "feedback": "Grader Feedback"
+                }
+        score_msg = { 
+                'correct': True,
+                'score': 4,
+                'msg' : 'Grader Message',
+                'feedback': feedback,
+                'grader_type': 'IN',
+                'grader_id': '1',
+                'submission_id': '1',
+                'success': True
+                }
+        get = {'queuekey': "abcd",
+                'xqueue_body': json.dumps(score_msg)}
+        self.openendedmodule.update_score(get, test_system)
 
 
 
+    def test_update_score(self):
+        self.update_score_single()
+        score = self.openendedmodule.latest_score()
+        self.assertEqual(score, 4)
+
+    def test_latest_post_assessment(self):
+        self.update_score_single()
