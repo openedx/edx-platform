@@ -34,7 +34,7 @@ from xmodule.x_module import XModule
 from xmodule.stringify import stringify_children
 from xmodule.mako_module import MakoModuleDescriptor
 from xmodule.xml_module import XmlDescriptor
-from xblock.core import Integer, Scope  # , Boolean
+from xblock.core import Integer, Scope, String  # , Boolean
 
 log = logging.getLogger(__name__)
 
@@ -53,6 +53,9 @@ class PollModule(XModule):
     upvotes = Integer(help="Number of upvotes this poll has recieved", scope=Scope.content, default=0)
     downvotes = Integer(help="Number of downvotes this poll has recieved", scope=Scope.content, default=0)
     # voted = Boolean(help="Whether this student has voted on the poll", scope=Scope.student_state, default=False)
+
+    html_render = String(scope=Scope.content)
+    sequence = String(scope=Scope.content)
 
     def handle_ajax(self, dispatch, get):
         '''
@@ -81,13 +84,14 @@ class PollModule(XModule):
         self.html_id = self.location.html_id()
         self.html_class = self.location.category
         self.poll_units_list = []
-
+        # import ipdb; ipdb.set_trace()
         params = {
-                  'element_html': self.definition['render'],
+                  'element_html': self.html_render,
                   'element_id': self.html_id,
                   'element_class': self.html_class,
                   'ajax_url': self.system.ajax_url,
-                  'poll_units': self.parse_sequence(self.definition['sequence']),
+                  'poll_units': self.parse_sequence(self.sequence),
+                  'configuration_json': json.dumps({})
                   }
         self.content = self.system.render_template(
                         'poll.html', params)
@@ -96,26 +100,14 @@ class PollModule(XModule):
     def get_poll_unit_html(self, i, question):
         """ """
         return """
-<div id="poll_unit_{poll_number}" class="polls"> {question}
+<div id="poll_unit_{poll_number}" class="polls">
+                    {question}
   <div class="vote_and_submit">
-    <div id="vote_block-1" class="vote">
-      <ul>
-        <li>
-          <input type="radio" id="vote_{poll_number}" name="vote_{poll_number}" value="Yes" />
-            <label for="vote_{poll_number}">Yes</label>
-          </li>
-          <li>
-            <input type="radio" id="vote_{poll_number}" name="vote_{poll_number}" value="No" />
-            <label for="vote_{poll_number}">No</label>
-          </li>
-        </ul>
-      </div>
-
-    <div class="vote_submit_button">
-        <input type="button" value="Cast Your vote" class=".submit-button"/>
+    <div id="vote_block-{poll_number}" class="vote">
+      <a class="upvote">Yes</a>
+      <a class="downvote">No</a>
     </div>
   </div>
-
   <div class="graph_answer"></div>
 </div>""".format(poll_number=i, question=question)
 
@@ -153,6 +145,7 @@ class PollDescriptor(MakoModuleDescriptor, XmlDescriptor):
         Returns:
             dict
         """
+        # import ipdb; ipdb.set_trace()
         # check for presense of required tags in xml
         expected_children_level_0 = ['render', 'sequence']
         for child in expected_children_level_0:
@@ -164,9 +157,9 @@ class PollDescriptor(MakoModuleDescriptor, XmlDescriptor):
             """Assumes that xml_object has child k"""
             return stringify_children(xml_object.xpath(k)[0])
         return {
-                    'render': parse('render'),
+                    'html_render': parse('render'),
                     'sequence': parse('sequence')
-                }
+                }, []
 
     def definition_to_xml(self, resource_fs):
         '''Return an xml element representing this definition.'''
