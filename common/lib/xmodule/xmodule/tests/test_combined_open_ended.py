@@ -263,7 +263,6 @@ class CombinedOpenEndedModuleTest(unittest.TestCase):
     location = Location(["i4x", "edX", "open_ended", "combinedopenended",
                          "SampleQuestion"])
 
-    metadata = json.dumps({'attempts': '10'})
     prompt = "<prompt>This is a question prompt</prompt>"
     rubric = '''<rubric><rubric>
         <category>
@@ -272,6 +271,8 @@ class CombinedOpenEndedModuleTest(unittest.TestCase):
         </category>
          </rubric></rubric>'''
     max_score = 4
+
+    metadata = {'attempts': '10', 'max_score': max_score}
 
     static_data = json.dumps({
             'max_attempts': 20,
@@ -303,9 +304,23 @@ class CombinedOpenEndedModuleTest(unittest.TestCase):
     descriptor = Mock()
 
     def setUp(self):
-        self.combinedoe = CombinedOpenEndedModule(test_system, self.location, self.definition, self.descriptor, self.static_data, self.metadata)
+        self.combinedoe = CombinedOpenEndedModule(test_system, self.location, self.definition, self.descriptor, self.static_data, metadata=self.metadata)
 
     def test_get_tag_name(self):
         name = self.combinedoe.get_tag_name("<t>Tag</t>")
         self.assertEqual(name, "t")
+
+    def test_get_last_response(self):
+        response_dict = self.combinedoe.get_last_response(0)
+        self.assertEqual(response_dict['type'], "selfassessment")
+        self.assertEqual(response_dict['max_score'], self.max_score)
+        self.assertEqual(response_dict['state'], CombinedOpenEndedModule.INITIAL)
+
+    def test_update_task_states(self):
+        changed = self.combinedoe.update_task_states()
+        self.assertFalse(changed)
+
+        # do something to change the state
+
+        # check again
 
