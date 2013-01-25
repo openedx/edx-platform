@@ -1,0 +1,101 @@
+h2 {
+  margin-top: 0;
+  margin-bottom: 15px;
+
+  &.problem-header {
+    section.staff {
+      margin-top: 30px;
+      font-size: 80%;
+    }
+  }
+
+  @media print {
+    display: block;
+    width: auto;
+    border-right: 0;
+  }
+}
+
+section.poll {
+  @media print {
+    display: block;
+    width: auto;
+    padding: 0;
+
+    canvas, img {
+      page-break-inside: avoid;
+    }
+  }
+
+
+  .inline {
+      display: inline;
+  }
+
+
+  ul {
+    margin: 3em;
+    margin: 3rem;
+    background: white;
+    color: black;
+    height: 1em;
+    height: 1rem;
+  }
+
+  li {
+    margin-left: 1em;
+    margin-left: 1rem;
+    margin-right: 1em;
+    margin-right: 1rem;
+    float: left;
+    list-style: none;
+    padding-left: 0em;
+    padding-left: 0rem;
+  }
+
+  .hidden {
+    display: none;
+    visibility: hidden;
+  }
+
+  .vote_submit_button {
+    display: inline;
+    float: left;
+    clear: none;
+    margin: 2.5rem;
+    margin: 2.5rem;
+  }
+
+  .submit_botton {
+
+
+  }
+
+  .graph_answer {
+    display: none; clear: both;
+  }
+
+  h3 {
+  margin-top: 0;
+  margin-bottom: 15px;
+  color: #fe57a1;
+  }
+
+  p {
+    text-align: center;
+    font-weight: bold;
+  }
+
+  .vote_and_submit {
+    width: 500px;
+    height: 100px;
+    margin-left: auto;
+    margin-right: auto;
+  }
+
+  .vote {
+    display: inline;
+    float: left;
+    clear: none;
+  }
+}
