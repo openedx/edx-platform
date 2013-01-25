@@ -91,16 +91,17 @@ class PollModule(XModule):
                   'element_class': self.html_class,
                   'ajax_url': self.system.ajax_url,
                   'poll_units': self.parse_sequence(self.sequence),
-                  'configuration_json': json.dumps({})
+                  'configuration_json': json.dumps({}),
+                  'poll_units': self.poll_units_list
                   }
         self.content = self.system.render_template(
                         'poll.html', params)
         return self.content
 
-    def get_poll_unit_html(self, i, question):
+    def get_poll_unit_html(self, i, question, css_class):
         """ """
         return """
-<div id="poll_unit_{poll_number}" class="polls">
+<div id="poll_unit_{poll_number}" class="{css_class} polls">
                     {question}
   <div class="vote_and_submit">
     <div id="vote_block-{poll_number}" class="vote">
@@ -109,23 +110,21 @@ class PollModule(XModule):
     </div>
   </div>
   <div class="graph_answer"></div>
-</div>""".format(poll_number=i, question=question)
+</div>""".format(poll_number=i, question=question, css_class=css_class)
 
     def parse_sequence(self, html_string):
         """    substitute sequence     """
-        xml = html.fromstring(html_string)
-        poll_units = xml.xpath('//unit')
-        for i, poll_unit in enumerate(poll_units):
-            # import ipdb; ipdb.set_trace()
-            poll_unit_question = stringify_children(poll_unit.xpath('//question')[0])
-            poll_unit_html = html.fromstring(self.get_poll_unit_html(i,
-                                             poll_unit_question))
-
-            poll_unit_controls = (poll_unit.get('plot', "no"),
-                             poll_unit.get('next_yes', "end"),
-                             poll_unit.get('next_no', "end"))
-            self.poll_units_list.append((poll_unit_html,
-                                   poll_unit_controls))
+        poll_units = html.fromstring(html_string).xpath('//unit')
+        for i, pu in enumerate(poll_units):
+            if i == 0:
+                css_class = 'hidden'
+            else:
+                css_class = ''
+            pu_question = stringify_children(pu.xpath('//question')[0])
+            pu_html = self.get_poll_unit_html(i, pu_question, css_class)
+            pu_controls = (pu.get('plot', "no"), pu.get('next_yes', "end"),
+                                                 pu.get('next_no', "end"))
+            self.poll_units_list.append((pu_html, pu_controls))
         # import ipdb; ipdb.set_trace()
 
 
