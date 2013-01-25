@@ -31,7 +31,6 @@ from django_comment_client.models import (Role,
                                           FORUM_ROLE_COMMUNITY_TA)
 from django_comment_client.utils import has_forum_access
 from psychometrics import psychoanalyze
-from string_util import split_by_comma_and_whitespace
 from student.models import CourseEnrollment, CourseEnrollmentAllowed
 from xmodule.course_module import CourseDescriptor
 from xmodule.modulestore import Location
@@ -49,6 +48,9 @@ template_imports = {'urllib': urllib}
 # internal commands for managing forum roles:
 FORUM_ROLE_ADD = 'add'
 FORUM_ROLE_REMOVE = 'remove'
+
+def split_by_comma_and_whitespace(s):
+    return re.split(r'[\s,]', s)
 
 @ensure_csrf_cookie
 @cache_control(no_cache=True, no_store=True, must_revalidate=True)

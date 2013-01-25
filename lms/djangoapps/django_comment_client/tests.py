@@ -10,11 +10,7 @@ from override_settings import override_settings
 
 import xmodule.modulestore.django
 
-from student.models import CourseEnrollment, \
-                           replicate_enrollment_save, \
-                           replicate_enrollment_delete, \
-                           update_user_information, \
-                           replicate_user_save
+from student.models import CourseEnrollment
 
 from django.db.models.signals import m2m_changed, pre_delete, pre_save, post_delete, post_save
 from django.dispatch.dispatcher import _make_id
