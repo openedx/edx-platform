@@ -55,6 +55,16 @@ class @CombinedOpenEnded
   $: (selector) ->
     $(selector, @el)
 
+  show_results_current: () =>
+    data = {'task_number' : @task_number-1}
+    $.postWithPrefix "#{@ajax_url}/get_results", data, (response) =>
+      if response.success
+        @results_container.after(response.html).remove()
+        @results_container = $('div.result-container')
+        @submit_evaluation_button = $('.submit-evaluation-button')
+        @submit_evaluation_button.click @message_post
+        Collapsible.setCollapsibles(@results_container)
+
   show_results: (event) =>
     status_item = $(event.target).parent().parent()
     status_number = status_item.data('status-number')
@@ -114,6 +124,7 @@ class @CombinedOpenEnded
     if @child_type=="openended"
       @skip_button.hide()
     if @allow_reset=="True"
+      @show_results_current
       @reset_button.show()
       @submit_button.hide()
       @answer_area.attr("disabled", true)
@@ -149,6 +160,7 @@ class @CombinedOpenEnded
       if @task_number<@task_count
         @next_problem()
       else
+        @show_results_current()
         @reset_button.show()
 
 
@@ -260,6 +272,7 @@ class @CombinedOpenEnded
             @gentle_alert "Moved to next step."
           else
             @gentle_alert "Your score did not meet the criteria to move to the next step."
+            @show_results_current()
         else
           @errors_area.html(response.error)
     else
