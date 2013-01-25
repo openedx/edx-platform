@@ -133,7 +133,7 @@ def _peer_grading(tab, user, course, active_page):
     return []
 
 def _combined_open_ended_grading(tab, user, course, active_page):
-    if user.is_authenticated:
+    if user.is_authenticated():
         link = reverse('open_ended_notifications', args=[course.id])
         tab_name = "Open Ended Panel"
 

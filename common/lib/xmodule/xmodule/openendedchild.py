@@ -131,7 +131,8 @@ class OpenEndedChild(object):
             return ""
         return self.history[-1].get('post_assessment', "")
 
-    def sanitize_html(self, answer):
+    @staticmethod
+    def sanitize_html(answer):
         cleaner = Cleaner(style=True, links=True, add_nofollow=True, page_structure=True, safe_attrs_only=True)
         clean_html = cleaner.clean_html(answer)
         return clean_html
@@ -142,7 +143,7 @@ class OpenEndedChild(object):
         @param answer: The student supplied answer
         @return: None
         """
-        answer = self.sanitize_html(answer)
+        answer = OpenEndedChild.sanitize_html(answer)
         self.history.append({'answer': answer})
 
     def record_latest_score(self, score):
