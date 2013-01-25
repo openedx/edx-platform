@@ -45,7 +45,7 @@ class DummySystem(ImportSystem):
             raise Exception("Shouldn't be called")
 
 
-class ImportTestCase(unittest.TestCase):
+class BaseCourseTestCase(unittest.TestCase):
     '''Make sure module imports work properly, including for malformed inputs'''
     @staticmethod
     def get_system(load_error_modules=True):
@@ -61,6 +61,7 @@ class ImportTestCase(unittest.TestCase):
         self.assertEquals(len(courses), 1)
         return courses[0]
 
+class ImportTestCase(BaseCourseTestCase):
 
     def test_fallback(self):
         '''Check that malformed xml loads as an ErrorDescriptor.'''
@@ -379,4 +380,4 @@ class ImportTestCase(unittest.TestCase):
         course.metadata['cohort_config'] = {'cohorted': True}
         self.assertTrue(course.is_cohorted)
 
-        
+

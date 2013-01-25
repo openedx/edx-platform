@@ -34,7 +34,7 @@ MITX_FEATURES = {
     'GITHUB_PUSH': False,
     'ENABLE_DISCUSSION_SERVICE': False,
     'AUTH_USE_MIT_CERTIFICATES' : False,
-    'STUB_VIDEO_FOR_TESTING': False, # do not display video when running automated acceptance tests    
+    'STUB_VIDEO_FOR_TESTING': False, # do not display video when running automated acceptance tests
 }
 ENABLE_JASMINE = False
 
@@ -281,7 +281,7 @@ INSTALLED_APPS = (
     'contentstore',
     'auth',
     'student',  # misleading name due to sharing with lms
-
+    'course_groups',  # not used in cms (yet), but tests run
     # For asset pipelining
     'pipeline',
     'staticfiles',
