@@ -4,6 +4,8 @@ import unittest
 
 from xmodule.openendedchild import OpenEndedChild
 from xmodule.open_ended_module import OpenEndedModule
+from xmodule.combined_open_ended_module import CombinedOpenEndedModule
+
 from xmodule.modulestore import Location
 from lxml import etree
 import capa.xqueue_interface as xqueue_interface
@@ -189,7 +191,7 @@ class OpenEndedModuleTest(unittest.TestCase):
 
         result = self.openendedmodule.message_post(get, test_system)
         self.assertTrue(result['success'])
-        # make sure it's actually sending something to the queue
+        # make sure it's actually sending something we want to the queue
         self.mock_xqueue.send_to_queue.assert_called_with(body = json.dumps(contents), header=ANY)
         
         state = json.loads(self.openendedmodule.get_instance_state())
@@ -256,4 +258,54 @@ class OpenEndedModuleTest(unittest.TestCase):
         self.update_score_single()
         score = self.openendedmodule.latest_score()
         self.assertEqual(score, 4)
+
+class CombinedOpenEndedModuleTest(unittest.TestCase):
+    location = Location(["i4x", "edX", "open_ended", "combinedopenended",
+                         "SampleQuestion"])
+
+    metadata = json.dumps({'attempts': '10'})
+    prompt = "<prompt>This is a question prompt</prompt>"
+    rubric = '''<rubric><rubric>
+        <category>
+        <description>Response Quality</description>
+        <option>The response is not a satisfactory answer to the question.  It either fails to address the question or does so in a limited way, with no evidence of higher-order thinking.</option>
+        </category>
+         </rubric></rubric>'''
+    max_score = 4
+
+    static_data = json.dumps({
+            'max_attempts': 20,
+            'prompt': prompt,
+            'rubric': rubric,
+            'max_score': max_score, 
+            'display_name': 'Name'
+            })
+
+    oeparam = etree.XML('''
+      <openendedparam>
+            <initial_display>Enter essay here.</initial_display>
+            <answer_display>This is the answer.</answer_display>
+            <grader_payload>{"grader_settings" : "ml_grading.conf", "problem_id" : "6.002x/Welcome/OETest"}</grader_payload>
+        </openendedparam>
+    ''')
+
+    task_xml = '''
+                <selfassessment>
+                    <hintprompt>
+                        What hint about this problem would you give to someone?
+                    </hintprompt>
+                    <submitmessage>
+                        Save Succcesful.  Thanks for participating!
+                    </submitmessage>
+                </selfassessment>
+            '''
+    definition = {'prompt': etree.XML(prompt), 'rubric': etree.XML(rubric), 'task_xml': [task_xml]}
+    descriptor = Mock()
+
+    def setUp(self):
+        self.combinedoe = CombinedOpenEndedModule(test_system, self.location, self.definition, self.descriptor, self.static_data, self.metadata)
+
+    def test_get_tag_name(self):
+        name = self.combinedoe.get_tag_name("<t>Tag</t>")
+        self.assertEqual(name, "t")
 
