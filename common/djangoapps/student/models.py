@@ -613,7 +613,20 @@ class CourseEnrollmentAllowed(models.Model):
 
 #cache_relation(User.profile)
 
-#### Helper methods for use from python manage.py shell.
+#### Helper methods for use from python manage.py shell and other classes.
+
+def get_user_by_username_or_email(username_or_email):
+    """
+    Return a User object, looking up by email if username_or_email contains a
+    '@', otherwise by username.
+
+    Raises:
+        User.DoesNotExist is lookup fails.
+    """
+    if '@' in username_or_email:
+        return User.objects.get(email=username_or_email)
+    else:
+        return User.objects.get(username=username_or_email)
 
 
 def get_user(email):

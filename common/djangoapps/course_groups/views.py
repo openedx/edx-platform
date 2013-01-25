@@ -1,5 +1,6 @@
 from django_future.csrf import ensure_csrf_cookie
 from django.contrib.auth.decorators import login_required
+from django.views.decorators.http import require_POST
 from django.contrib.auth.models import User
 from django.core.context_processors import csrf
 from django.core.paginator import Paginator, EmptyPage, PageNotAnInteger
@@ -8,10 +9,10 @@ from django.http import HttpResponse, HttpResponseForbidden, Http404
 from django.shortcuts import redirect
 import json
 import logging
+import re
 
 from courseware.courses import get_course_with_access
 from mitxmako.shortcuts import render_to_response, render_to_string
-from string_util import split_by_comma_and_whitespace
 
 from .models import CourseUserGroup
 from . import cohorts
@@ -21,12 +22,19 @@ import track.views
 
 log = logging.getLogger(__name__)
 
-def JsonHttpReponse(data):
+def json_http_response(data):
     """
-    Return an HttpResponse with the data json-serialized and the right content type
-    header.  Named to look like a class.
+    Return an HttpResponse with the data json-serialized and the right content
+    type header.
     """
     return HttpResponse(json.dumps(data), content_type="application/json")
+
+def split_by_comma_and_whitespace(s):
+    """
+    Split a string both by commas and whitespice.  Returns a list.
+    """
+    return re.split(r'[\s|,|]+', s)
+
 
 @ensure_csrf_cookie
 def list_cohorts(request, course_id):
@@ -41,11 +49,12 @@ def list_cohorts(request, course_id):
     all_cohorts = [{'name': c.name, 'id': c.id}
                for c in cohorts.get_course_cohorts(course_id)]
 
-    return JsonHttpReponse({'success': True,
+    return json_http_response({'success': True,
                             'cohorts': all_cohorts})
 
 
 @ensure_csrf_cookie
+@require_POST
 def add_cohort(request, course_id):
     """
     Return json of dict:
@@ -60,22 +69,18 @@ def add_cohort(request, course_id):
     """
     get_course_with_access(request.user, course_id, 'staff')
 
-
-    if request.method != "POST":
-        raise Http404("Must POST to add cohorts")
-
     name = request.POST.get("name")
     if not name:
-        return JsonHttpReponse({'success': False,
+        return json_http_response({'success': False,
                                 'msg': "No name specified"})
 
     try:
         cohort = cohorts.add_cohort(course_id, name)
     except ValueError as err:
-        return JsonHttpReponse({'success': False,
+        return json_http_response({'success': False,
                                 'msg': str(err)})
 
-    return JsonHttpReponse({'success': 'True',
+    return json_http_response({'success': 'True',
                             'cohort': {
                                 'id': cohort.id,
                                 'name': cohort.name
@@ -98,6 +103,8 @@ def users_in_cohort(request, course_id, cohort_id):
     """
     get_course_with_access(request.user, course_id, 'staff')
 
+    # this will error if called with a non-int cohort_id.  That's ok--it
+    # shoudn't happen for valid clients.
     cohort = cohorts.get_cohort_by_id(course_id, int(cohort_id))
 
     paginator = Paginator(cohort.users.all(), 100)
@@ -118,13 +125,14 @@ def users_in_cohort(request, course_id, cohort_id):
                   'name': '{0} {1}'.format(u.first_name, u.last_name)}
                   for u in users]
 
-    return JsonHttpReponse({'success': True,
+    return json_http_response({'success': True,
                             'page': page,
                             'num_pages': paginator.num_pages,
                             'users': user_info})
 
 
 @ensure_csrf_cookie
+@require_POST
 def add_users_to_cohort(request, course_id, cohort_id):
     """
     Return json dict of:
@@ -139,9 +147,6 @@ def add_users_to_cohort(request, course_id, cohort_id):
      'unknown': [str1, str2, ...]}
     """
     get_course_with_access(request.user, course_id, 'staff')
-
-    if request.method != "POST":
-        raise Http404("Must POST to add users to cohorts")
 
     cohort = cohorts.get_cohort_by_id(course_id, cohort_id)
 
@@ -166,13 +171,14 @@ def add_users_to_cohort(request, course_id, cohort_id):
                               'msg': str(err)})
 
 
-    return JsonHttpReponse({'success': True,
+    return json_http_response({'success': True,
                             'added': added,
                             'present': present,
                             'conflict': conflict,
                             'unknown': unknown})
 
 @ensure_csrf_cookie
+@require_POST
 def remove_user_from_cohort(request, course_id, cohort_id):
     """
     Expects 'username': username in POST data.
@@ -185,22 +191,19 @@ def remove_user_from_cohort(request, course_id, cohort_id):
     """
     get_course_with_access(request.user, course_id, 'staff')
 
-    if request.method != "POST":
-        raise Http404("Must POST to add users to cohorts")
-
     username = request.POST.get('username')
     if username is None:
-        return JsonHttpReponse({'success': False,
+        return json_http_response({'success': False,
                                 'msg': 'No username specified'})
 
     cohort = cohorts.get_cohort_by_id(course_id, cohort_id)
     try:
         user = User.objects.get(username=username)
         cohort.users.remove(user)
-        return JsonHttpReponse({'success': True})
+        return json_http_response({'success': True})
     except User.DoesNotExist:
         log.debug('no user')
-        return JsonHttpReponse({'success': False,
+        return json_http_response({'success': False,
                                 'msg': "No user '{0}'".format(username)})
 
 

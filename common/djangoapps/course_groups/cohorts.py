@@ -8,6 +8,7 @@ from django.http import Http404
 import logging
 
 from courseware import courses
+from student.models import get_user_by_username_or_email
 from .models import CourseUserGroup
 
 log = logging.getLogger(__name__)
@@ -178,10 +179,7 @@ def add_user_to_cohort(cohort, username_or_email):
 
         CohortConflict if user already in another cohort.
     """
-    if '@' in username_or_email:
-        user = User.objects.get(email=username_or_email)
-    else:
-        user = User.objects.get(username=username_or_email)
+    user = get_user_by_username_or_email(username_or_email)
 
     # If user in any cohorts in this course already, complain
     course_cohorts = CourseUserGroup.objects.filter(
