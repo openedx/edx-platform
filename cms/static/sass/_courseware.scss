@@ -25,18 +25,18 @@ input.courseware-unit-search-input {
 	    width: 145px;
 
 	    .status-label {
-	            position: absolute;
-	            top: 2px;
-	            right: -5px;
-	            display: none;
-	            width: 110px;
-	            padding: 5px 40px 5px 10px;
-	            @include border-radius(3px);
-	            color: $lightGrey;
-	            text-align: right;
-	            font-size: 12px;
-	            font-weight: bold;
-	            line-height: 16px;
+	      position: absolute;
+	      top: 2px;
+	      right: -5px;
+	      display: none;
+	      width: 110px;
+	      padding: 5px 40px 5px 10px;
+	      @include border-radius(3px);
+	      color: $lightGrey;
+	      text-align: right;
+	      font-size: 12px;
+	      font-weight: bold;
+	      line-height: 16px;
 	    }
 
 	    .menu-toggle {
@@ -644,3 +644,20 @@ input.courseware-unit-search-input {
 	font-size: 13px;
 	color: $darkGrey;
 }
+
+// sort/drag and drop
+.ui-droppable {
+  min-height: 20px;
+
+  &.dropover {
+    padding-top: 10px;
+    padding-bottom: 10px;
+  }
+}
+
+ol.ui-droppable .branch:first-child .section-item {
+	border-top: none;
+}
+
+
+
