@@ -4,6 +4,8 @@ metadata:
     rerandomize: never
     showanswer: always
     markdown: ""
+    weight: ""
+    attempts: ""
 data: |
   <problem>
   </problem>
