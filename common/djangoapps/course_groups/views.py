@@ -33,7 +33,7 @@ def split_by_comma_and_whitespace(s):
     """
     Split a string both by commas and whitespice.  Returns a list.
     """
-    return re.split(r'[\s|,|]+', s)
+    return re.split(r'[\s,]+', s)
 
 
 @ensure_csrf_cookie
