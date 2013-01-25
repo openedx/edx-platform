@@ -45,6 +45,7 @@ class @VideoPlayer extends Subview
       modestbranding: 1
     if @video.start
       @playerVars.start = @video.start
+      @playerVars.wmode = 'window'
     if @video.end
       # work in AS3, not HMLT5. but iframe use AS3
       @playerVars.end = @video.end
