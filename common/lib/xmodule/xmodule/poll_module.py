@@ -54,8 +54,7 @@ class PollModule(XModule):
     downvotes = Integer(help="Number of downvotes this poll has recieved", scope=Scope.content, default=0)
     # voted = Boolean(help="Whether this student has voted on the poll", scope=Scope.student_state, default=False)
 
-    html_render = String(scope=Scope.content)
-    sequence = String(scope=Scope.content)
+    xml_object = String(scope=Scope.content)
 
     def handle_ajax(self, dispatch, get):
         '''
@@ -80,35 +79,24 @@ class PollModule(XModule):
 
     def get_html(self):
         """ Renders parameters to template. """
-
-        self.html_id = self.location.html_id()
-        self.html_class = self.location.category
-        self.poll_units_list = []
-        # import ipdb; ipdb.set_trace()
         params = {
-                  'element_html': self.html_render,
-                  'element_id': self.html_id,
-                  'element_class': self.html_class,
+                  'element_id': self.location.html_id(),
+                  'element_class': self.location.category,
                   'ajax_url': self.system.ajax_url,
-                  'poll_chain': self.parse_sequence(self.sequence),
-                  'configuration_json': json.dumps({}),
-                  'poll_units': self.poll_units_list
+                  'configuration_json': self.dump_poll(),
                   }
-        self.content = self.system.render_template(
-                        'poll.html', params)
+        self.content = self.system.render_template('poll.html', params)
         return self.content
 
-    def get_poll_unit_html(self, i, question, css_class):
-        """ """
-        return """
-""".format(poll_number=i, question=question, css_class=css_class)
-
-    def parse_sequence(self, html_string):
-        """    substitute sequence     """
-        return [(stringify_children(pu.xpath('//question')[0]),
-    (pu.get('plot', "no"), pu.get('next_yes', "end"),
-     pu.get('next_no', "end"), pu.get('id')))
-        for pu in html.fromstring(html_string).xpath('//unit')]
+    def dump_poll(self):
+        """     """
+        return json.dumps({'poll_chain':
+                          [{'question': stringify_children(q),
+                            'id':          q.get('id'),
+                            'upvote_id':   q.get('upvote', ""),
+                            'downvote_id': q.get('downvote', ""),
+                            'show_stats':  q.get('show_stats', "yes")}
+                            for q in self.xml_object.xpath('question')]})
 
 
 class PollDescriptor(MakoModuleDescriptor, XmlDescriptor):
@@ -127,21 +115,12 @@ class PollDescriptor(MakoModuleDescriptor, XmlDescriptor):
         Returns:
             dict
         """
-        # import ipdb; ipdb.set_trace()
         # check for presense of required tags in xml
-        expected_children_level_0 = ['render', 'sequence']
-        for child in expected_children_level_0:
-            if len(xml_object.xpath(child)) != 1:
-                raise ValueError("Poll definition must include \
-                    exactly one '{0}' tag".format(child))
+        if len(xml_object.xpath('question')) == 0:
+            raise ValueError("Poll definition must include \
+                at least one 'question' tag")
 
-        def parse(k):
-            """Assumes that xml_object has child k"""
-            return stringify_children(xml_object.xpath(k)[0])
-        return {
-                    'html_render': parse('render'),
-                    'sequence': parse('sequence')
-                }, []
+        return {'xml_object': xml_object}, []
 
     def definition_to_xml(self, resource_fs):
         '''Return an xml element representing this definition.'''
