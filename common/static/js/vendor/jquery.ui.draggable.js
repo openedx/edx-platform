@@ -207,6 +207,7 @@ $.widget("ui.draggable", $.ui.mouse, {
 			// scroll. This causes position to change faster than the mouse which races the helper
 			// ahead. This "fixes" that bug here whereas the real fix should be in either the 
 			// computation of pageY or scrollTop() or caching of scrollTop at same state as pageY
+			// btw: known bug in jqueryui http://bugs.jqueryui.com/ticket/5718
 			if (this.scrollParent.is(document) && this.cssPosition === 'relative') {
 				this.helper[0].style.top = (event.pageY - this.originalPageY) +"px";
 			}
