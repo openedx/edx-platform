@@ -35,8 +35,12 @@ def get_cohort_id(user, course_id):
 
 def is_commentable_cohorted(course_id, commentable_id):
     """
-    Given a course and a commentable id, return whether or not this commentable
-    is cohorted.
+    Args:
+        course_id: string
+        commentable_id: string
+
+    Returns:
+        Bool: is this commentable cohorted?
 
     Raises:
         Http404 if the course doesn't exist.
@@ -49,7 +53,7 @@ def is_commentable_cohorted(course_id, commentable_id):
     elif commentable_id in course.top_level_discussion_topic_ids:
         # top level discussions have to be manually configured as cohorted
         # (default is not)
-        ans = commentable_id in course.cohorted_discussions()
+        ans = commentable_id in course.cohorted_discussions
     else:
         # inline discussions are cohorted by default
         ans = True
@@ -61,20 +65,9 @@ def is_commentable_cohorted(course_id, commentable_id):
 
 
 def get_cohort(user, course_id):
-    c = _get_cohort(user, course_id)
-    log.debug("get_cohort({0}, {1}) = {2}".format(
-        user, course_id,
-        c.id if c is not None else None))
-    return c
-
-
-def _get_cohort(user, course_id):
     """
     Given a django User and a course_id, return the user's cohort in that
     cohort.
-
-    TODO: In classes with auto-cohorting, put the user in a cohort if they
-    aren't in one already.
 
     Arguments:
         user: a Django User object.
@@ -88,7 +81,7 @@ def _get_cohort(user, course_id):
        ValueError if the course_id doesn't exist.
     """
     # First check whether the course is cohorted (users shouldn't be in a cohort
-    # in non-cohorted courses, but settings can change after )
+    # in non-cohorted courses, but settings can change after course starts)
     try:
         course = courses.get_course_by_id(course_id)
     except Http404:
@@ -98,17 +91,12 @@ def _get_cohort(user, course_id):
         return None
 
     try:
-        group = CourseUserGroup.objects.get(course_id=course_id,
+        return CourseUserGroup.objects.get(course_id=course_id,
                                             group_type=CourseUserGroup.COHORT,
                                             users__id=user.id)
     except CourseUserGroup.DoesNotExist:
-        group = None
-
-    if group:
-        return group
-
-    # TODO: add auto-cohorting logic here once we know what that will be.
-    return None
+        # TODO: add auto-cohorting logic here once we know what that will be.
+        return None
 
 
 def get_course_cohorts(course_id):
@@ -119,7 +107,8 @@ def get_course_cohorts(course_id):
         course_id: string in the format 'org/course/run'
 
     Returns:
-        A list of CourseUserGroup objects.  Empty if there are no cohorts.
+        A list of CourseUserGroup objects.  Empty if there are no cohorts. Does
+        not check whether the course is cohorted.
     """
     return list(CourseUserGroup.objects.filter(course_id=course_id,
                                                group_type=CourseUserGroup.COHORT))
