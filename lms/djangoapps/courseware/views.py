@@ -236,7 +236,7 @@ def index(request, course_id, chapter=None, section=None,
             # Load all descendents of the section, because we're going to display it's
             # html, which in general will need all of its children
             section_module = get_module(request.user, request, section_descriptor.location,
-                                        student_module_cache, course.id, depth=None)
+                                        student_module_cache, course.id, position=position, depth=None)
             if section_module is None:
                 # User may be trying to be clever and access something
                 # they don't have access to.

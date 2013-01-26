@@ -690,7 +690,7 @@ class CourseDescriptor(SequenceDescriptor):
 
         @property
         def registration_end_date_text(self):
-            return time.strftime("%b %d, %Y", self.registration_end_date)
+            return time.strftime("%b %d, %Y at %H:%M UTC", self.registration_end_date)
 
     @property
     def current_test_center_exam(self):

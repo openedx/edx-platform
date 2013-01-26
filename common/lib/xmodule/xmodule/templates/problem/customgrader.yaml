@@ -3,6 +3,8 @@ metadata:
     display_name: Custom Grader
     rerandomize: never
     showanswer: always
+    weight: ""
+    attempts: ""
 data: |
   <problem>
   <p>

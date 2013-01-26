@@ -3,6 +3,8 @@ metadata:
     display_name: Numerical Response
     rerandomize: never
     showanswer: always
+    weight: ""
+    attempts: ""
     markdown: 
        "A numerical response problem accepts a line of text input from the
        student, and evaluates the input for correctness based on its
