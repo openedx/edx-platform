@@ -45,12 +45,23 @@ class DummySystem(ImportSystem):
             raise Exception("Shouldn't be called")
 
 
-class ImportTestCase(unittest.TestCase):
+class BaseCourseTestCase(unittest.TestCase):
     '''Make sure module imports work properly, including for malformed inputs'''
     @staticmethod
     def get_system(load_error_modules=True):
         '''Get a dummy system'''
         return DummySystem(load_error_modules)
+
+    def get_course(self, name):
+        """Get a test course by directory name.  If there's more than one, error."""
+        print "Importing {0}".format(name)
+
+        modulestore = XMLModuleStore(DATA_DIR, course_dirs=[name])
+        courses = modulestore.get_courses()
+        self.assertEquals(len(courses), 1)
+        return courses[0]
+
+class ImportTestCase(BaseCourseTestCase):
 
     def test_fallback(self):
         '''Check that malformed xml loads as an ErrorDescriptor.'''
@@ -207,11 +218,7 @@ class ImportTestCase(unittest.TestCase):
         """Make sure that metadata is inherited properly"""
 
         print "Starting import"
-        initial_import = XMLModuleStore(DATA_DIR, course_dirs=['toy'])
-
-        courses = initial_import.get_courses()
-        self.assertEquals(len(courses), 1)
-        course = courses[0]
+        course = self.get_course('toy')
 
         def check_for_key(key, node):
             "recursive check for presence of key"
@@ -227,16 +234,8 @@ class ImportTestCase(unittest.TestCase):
         """Make sure that when two courses share content with the same
         org and course names, policy applies to the right one."""
 
-        def get_course(name):
-            print "Importing {0}".format(name)
-
-            modulestore = XMLModuleStore(DATA_DIR, course_dirs=[name])
-            courses = modulestore.get_courses()
-            self.assertEquals(len(courses), 1)
-            return courses[0]
-
-        toy = get_course('toy')
-        two_toys = get_course('two_toys')
+        toy = self.get_course('toy')
+        two_toys = self.get_course('two_toys')
 
         self.assertEqual(toy.url_name, "2012_Fall")
         self.assertEqual(two_toys.url_name, "TT_2012_Fall")
@@ -279,8 +278,8 @@ class ImportTestCase(unittest.TestCase):
         """Ensure that colons in url_names convert to file paths properly"""
 
         print "Starting import"
+        # Not using get_courses because we need the modulestore object too afterward
         modulestore = XMLModuleStore(DATA_DIR, course_dirs=['toy'])
-
         courses = modulestore.get_courses()
         self.assertEquals(len(courses), 1)
         course = courses[0]
@@ -317,7 +316,7 @@ class ImportTestCase(unittest.TestCase):
 
         toy_id = "edX/toy/2012_Fall"
 
-        course = modulestore.get_courses()[0]
+        course = modulestore.get_course(toy_id)
         chapters = course.get_children()
         ch1 = chapters[0]
         sections = ch1.get_children()
@@ -355,3 +354,30 @@ class ImportTestCase(unittest.TestCase):
         <slider var="a" style="width:400px;float:left;"/>\
 <plot style="margin-top:15px;margin-bottom:15px;"/>""".strip()
         self.assertEqual(gst_sample.definition['render'], render_string_from_sample_gst_xml)
+
+    def test_cohort_config(self):
+        """
+        Check that cohort config parsing works right.
+        """
+        modulestore = XMLModuleStore(DATA_DIR, course_dirs=['toy'])
+
+        toy_id = "edX/toy/2012_Fall"
+
+        course = modulestore.get_course(toy_id)
+
+        # No config -> False
+        self.assertFalse(course.is_cohorted)
+
+        # empty config -> False
+        course.metadata['cohort_config'] = {}
+        self.assertFalse(course.is_cohorted)
+
+        # false config -> False
+        course.metadata['cohort_config'] = {'cohorted': False}
+        self.assertFalse(course.is_cohorted)
+
+        # and finally...
+        course.metadata['cohort_config'] = {'cohorted': True}
+        self.assertTrue(course.is_cohorted)
+
+

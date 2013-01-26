@@ -83,7 +83,7 @@ def get_opt_course_with_access(user, course_id, action):
         return None
     return get_course_with_access(user, course_id, action)
 
-
+    
 def course_image_url(course):
     """Try to look up the image url for the course.  If it's not found,
     log an error and return the dead link"""

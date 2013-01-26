@@ -39,6 +39,7 @@ log = logging.getLogger("mitx.courseware")
 template_imports = {'urllib': urllib}
 
 
+
 def user_groups(user):
     """
     TODO (vshnayder): This is not used. When we have a new plan for groups, adjust appropriately.
