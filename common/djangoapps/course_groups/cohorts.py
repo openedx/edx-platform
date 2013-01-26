@@ -70,15 +70,19 @@ def get_cohort(user, course_id):
 
 def _get_cohort(user, course_id):
     """
-    Given a django User and a course_id, return the user's cohort.  In classes with
-    auto-cohorting, put the user in a cohort if they aren't in one already.
+    Given a django User and a course_id, return the user's cohort in that
+    cohort.
+
+    TODO: In classes with auto-cohorting, put the user in a cohort if they
+    aren't in one already.
 
     Arguments:
         user: a Django User object.
         course_id: string in the format 'org/course/run'
 
     Returns:
-        A CourseUserGroup object if the User has a cohort, or None.
+        A CourseUserGroup object if the course is cohorted and the User has a
+        cohort, else None.
 
     Raises:
        ValueError if the course_id doesn't exist.
