@@ -26,6 +26,7 @@ answer from other users.
 
 import json
 import logging
+import cgi
 
 from lxml import html, etree
 from pkg_resources import resource_string
@@ -34,7 +35,7 @@ from xmodule.x_module import XModule
 from xmodule.stringify import stringify_children
 from xmodule.mako_module import MakoModuleDescriptor
 from xmodule.xml_module import XmlDescriptor
-from xblock.core import Integer, Scope, String  # , Boolean
+from xblock.core import Integer, Scope, String, List  # , Boolean
 
 log = logging.getLogger(__name__)
 
@@ -50,23 +51,19 @@ class PollModule(XModule):
     css = {'scss': [resource_string(__name__, 'css/poll/display.scss')]}
     js_module_name = "Poll"
 
+    # poll_id =
     upvotes = Integer(help="Number of upvotes this poll has recieved", scope=Scope.content, default=0)
     downvotes = Integer(help="Number of downvotes this poll has recieved", scope=Scope.content, default=0)
     # voted = Boolean(help="Whether this student has voted on the poll", scope=Scope.student_state, default=False)
+    # poll_id_list = List(help="Number of upvotes this poll has recieved", scope=Scope.content, default=[])
+    # poll_up_list = List(help="Number of upvotes this poll has recieved", scope=Scope.content, default=[])
+    # poll_down_list = List(help="Number of upvotes this poll has recieved", scope=Scope.content, default=[])
 
     xml_object = String(scope=Scope.content)
 
     def handle_ajax(self, dispatch, get):
-        '''
-        Handle ajax calls to this video.
-        TODO (vshnayder): This is not being called right now, so the position
-        is not being saved.
-        '''
-        # if self.voted:
-            # return json.dumps({'error': 'Already Voted!'})
-        if None:
-            pass
-        elif dispatch == 'upvote':
+        ''' '''
+        if dispatch == 'upvote':
             self.upvotes += 1
             # self.voted = True
             return json.dumps({'upvotes': self.upvotes, 'downvotes': self.downvote})
@@ -91,7 +88,7 @@ class PollModule(XModule):
     def dump_poll(self):
         """     """
         return json.dumps({'poll_chain':
-                          [{'question': stringify_children(q),
+                          [{'question': cgi.escape(stringify_children(q)),
                             'id':          q.get('id'),
                             'upvote_id':   q.get('upvote', ""),
                             'downvote_id': q.get('downvote', ""),
