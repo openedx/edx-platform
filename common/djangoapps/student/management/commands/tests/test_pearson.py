@@ -40,6 +40,7 @@ def create_tc_registration(username, course_id = 'org1/course1/term1', exam_code
                'eligibility_appointment_date_first' : '2013-01-01T00:00',
                'eligibility_appointment_date_last' : '2013-12-31T23:59',
                'accommodation_code' : accommodation_code, 
+               'create_dummy_exam' : True,
                }
 
     call_command('pearson_make_tc_registration', username, course_id, **options)
@@ -179,11 +180,11 @@ class PearsonCommandTestCase(PearsonTestCase):
         self.assertErrorContains(error_string, 'Field Form Error:  address_1')
         
     def test_create_good_testcenter_user(self):
-        testcenter_user = create_tc_user("test1")
+        testcenter_user = create_tc_user("test_good_user")
         self.assertIsNotNone(testcenter_user)
         
     def test_create_good_testcenter_registration(self):
-        username = 'test1'
+        username = 'test_good_registration'
         create_tc_user(username)
         registration = create_tc_registration(username)
         self.assertIsNotNone(registration)
