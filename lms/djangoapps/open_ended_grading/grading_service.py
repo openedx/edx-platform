@@ -106,26 +106,29 @@ class GradingService(object):
     def _render_rubric(self, response, view_only=False):
         """
         Given an HTTP Response with the key 'rubric', render out the html
-        required to display the rubric
+        required to display the rubric and put it back into the response
+
+        returns the updated response as a dictionary that can be serialized later
+
         """
         try:
             response_json = json.loads(response)
-            if response_json.has_key('rubric'):
+            if 'rubric' in response_json:
                 rubric = response_json['rubric']
                 rubric_renderer = CombinedOpenEndedRubric(self.system, False)
                 rubric_html = rubric_renderer.render_rubric(rubric)
                 response_json['rubric'] = rubric_html
-            return json.dumps(response_json)
+            return response_json
         # if we can't parse the rubric into HTML, 
         except etree.XMLSyntaxError, RubricParsingError:
             log.exception("Cannot parse rubric string. Raw string: {0}"
                           .format(rubric))
-            return json.dumps({'success': False,
-                               'error': 'Error displaying submission'})
+            return {'success': False,
+                               'error': 'Error displaying submission'}
         except ValueError:
             log.exception("Error parsing response: {0}".format(response))
-            return json.dumps({'success': False,
-                                'error': "Error displaying submission"}) 
+            return {'success': False,
+                                'error': "Error displaying submission"} 
 
 
 

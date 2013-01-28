@@ -86,7 +86,7 @@ class PeerGradingService(GradingService):
     def get_next_submission(self, problem_location, grader_id):
         response = self.get(self.get_next_submission_url,
                 {'location': problem_location, 'grader_id': grader_id})
-        return self._render_rubric(response)
+        return json.dumps(self._render_rubric(response))
 
     def save_grade(self, location, grader_id, submission_id, score, feedback, submission_key, rubric_scores):
         data = {'grader_id' : grader_id,
@@ -106,7 +106,7 @@ class PeerGradingService(GradingService):
     def show_calibration_essay(self, problem_location, grader_id):
         params = {'problem_id' : problem_location, 'student_id': grader_id}
         response = self.get(self.show_calibration_essay_url, params)
-        return self._render_rubric(response)
+        return json.dumps(self._render_rubric(response))
 
     def save_calibration_essay(self, problem_location, grader_id, calibration_essay_id, submission_key, 
             score, feedback, rubric_scores):
