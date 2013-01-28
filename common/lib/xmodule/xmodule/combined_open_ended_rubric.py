@@ -3,6 +3,9 @@ from lxml import etree
 
 log=logging.getLogger(__name__)
 
+class RubricParsingError(Exception):
+    pass
+
 class CombinedOpenEndedRubric(object):
 
     def __init__ (self, system, view_only = False):
@@ -10,35 +13,25 @@ class CombinedOpenEndedRubric(object):
         self.view_only = view_only
         self.system = system
 
-    '''
-    render_rubric: takes in an xml string and outputs the corresponding
-        html for that xml, given the type of rubric we're generating
-    Input:
-        rubric_xml: an string that has not been parsed into xml that
-            represents this particular rubric
-    Output:
-        html: the html that corresponds to the xml given
-    '''
     def render_rubric(self, rubric_xml):
-        success = False
+        '''
+        render_rubric: takes in an xml string and outputs the corresponding
+            html for that xml, given the type of rubric we're generating
+        Input:
+            rubric_xml: an string that has not been parsed into xml that
+                represents this particular rubric
+        Output:
+            html: the html that corresponds to the xml given
+        '''
         try:
             rubric_categories = self.extract_categories(rubric_xml)
             html = self.system.render_template('open_ended_rubric.html', 
                     {'categories'  : rubric_categories,
                      'has_score': self.has_score,
                      'view_only': self.view_only})
-            success = True
         except:
-            log.exception("Could not parse the rubric.")
-            try:
-                html = etree.tostring(rubric_xml, pretty_print=True)
-            except:
-                log.exception("Rubric XML is a string, not an XML object : {0}".format(rubric_xml))
-                if isinstance(rubric_xml, basestring):
-                    html = rubric_xml
-                else:
-                    html = "Invalid rubric.  Please contact course staff."
-        return success, html
+            raise RubricParsingError("[render_rubric] Could not parse the rubric with xml: {0}".format(rubric_xml))
+        return html
 
     def extract_categories(self, element):
         '''
@@ -57,7 +50,7 @@ class CombinedOpenEndedRubric(object):
         categories = []
         for category in element:
             if category.tag != 'category':
-                raise Exception("[extract_categories] Expected a <category> tag: got {0} instead".format(category.tag))
+                raise RubricParsingError("[extract_categories] Expected a <category> tag: got {0} instead".format(category.tag))
             else:
                 categories.append(self.extract_category(category))
         return categories
@@ -83,12 +76,12 @@ class CombinedOpenEndedRubric(object):
             self.has_score = True
         # if we are missing the score tag and we are expecting one
         elif self.has_score:
-            raise Exception("[extract_category] Category {0} is missing a score".format(descriptionxml.text))
+            raise RubricParsingError("[extract_category] Category {0} is missing a score".format(descriptionxml.text))
 
 
         # parse description
         if descriptionxml.tag != 'description':
-            raise Exception("[extract_category]: expected description tag, got {0} instead".format(descriptionxml.tag))
+            raise RubricParsingError("[extract_category]: expected description tag, got {0} instead".format(descriptionxml.tag))
 
         description = descriptionxml.text
 
@@ -98,7 +91,7 @@ class CombinedOpenEndedRubric(object):
         # parse options
         for option in optionsxml:
             if option.tag != 'option': 
-                raise Exception("[extract_category]: expected option tag, got {0} instead".format(option.tag))
+                raise RubricParsingError("[extract_category]: expected option tag, got {0} instead".format(option.tag))
             else:
                 pointstr = option.get("points")
                 if pointstr:
@@ -107,7 +100,7 @@ class CombinedOpenEndedRubric(object):
                     try:
                         points = int(pointstr)
                     except ValueError:
-                        raise Exception("[extract_category]: expected points to have int, got {0} instead".format(pointstr))
+                        raise RubricParsingError("[extract_category]: expected points to have int, got {0} instead".format(pointstr))
                 elif autonumbering:
                     # use the generated one if we're in the right mode
                     points = cur_points
@@ -132,12 +125,12 @@ class CombinedOpenEndedRubric(object):
         Validates a set of options. This can and should be extended to filter out other bad edge cases
         '''
         if len(options) == 0:
-            raise Exception("[extract_category]: no options associated with this category")
+            raise RubricParsingError("[extract_category]: no options associated with this category")
         if len(options) == 1:
             return
         prev = options[0]['points']
         for option in options[1:]:
             if prev == option['points']:
-                raise Exception("[extract_category]: found duplicate point values between two different options")
+                raise RubricParsingError("[extract_category]: found duplicate point values between two different options")
             else:
                 prev = option['points']

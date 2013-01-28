@@ -112,7 +112,7 @@ class StaffGradingService(GradingService):
         response = self.get(self.get_next_url,
                                       params={'location': location,
                                               'grader_id': grader_id})
-        return self._render_rubric(response)
+        return json.dumps(self._render_rubric(response))
 
 
     def save_grade(self, course_id, grader_id, submission_id, score, feedback, skipped, rubric_scores):
@@ -148,7 +148,6 @@ class StaffGradingService(GradingService):
 # importing this file doesn't create objects that may not have the right config
 _service = None
 
-module_system = ModuleSystem("", None, None, render_to_string, None)
 
 def staff_grading_service():
     """
