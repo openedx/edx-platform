@@ -1,5 +1,4 @@
 source :rubygems
-ruby "1.8.7"
 gem 'rake', '~> 10.0.3'
 gem 'sass', '3.1.15'
 gem 'bourbon', '~> 1.3.6'
