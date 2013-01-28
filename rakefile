@@ -271,7 +271,7 @@ Dir["common/lib/*"].select{|lib| File.directory?(lib)}.each do |lib|
     TEST_TASK_DIRS << lib
 
     desc "Run tests for common lib #{lib} (without coverage)"
-    task "fasttest_#{lib}" do 
+    task "fasttest_#{lib}" do
         sh("nosetests #{lib}")
     end
 
