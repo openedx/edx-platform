@@ -328,12 +328,10 @@ class CombinedOpenEndedModuleTest(unittest.TestCase):
         changed = self.combinedoe.update_task_states()
         self.assertFalse(changed)
 
-        #prev_context = self.combinedoe.get_context()
-        #new_state = {'state': CombinedOpenEndedModule.INITIAL, 'history': []}
-        ## force a task change
-        #task_state = self.combinedoe.overwrite_state(json.dumps(new_state))
+        current_task = self.combinedoe.current_task
+        current_task.change_state(CombinedOpenEndedModule.DONE)
+        changed = self.combinedoe.update_task_states()
 
-        ## check again
-        #new_context = self.combinedoe.get_context()
-        #self.assertNotEqual(prev_context['state'], new_context['state'])
+        self.assertTrue(changed)
+
 
