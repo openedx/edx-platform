@@ -290,7 +290,7 @@ class CombinedOpenEndedModuleTest(unittest.TestCase):
         </openendedparam>
     ''')
 
-    task_xml = '''
+    task_xml1 = '''
                 <selfassessment>
                     <hintprompt>
                         What hint about this problem would you give to someone?
@@ -300,7 +300,15 @@ class CombinedOpenEndedModuleTest(unittest.TestCase):
                     </submitmessage>
                 </selfassessment>
             '''
-    definition = {'prompt': etree.XML(prompt), 'rubric': etree.XML(rubric), 'task_xml': [task_xml]}
+    task_xml2 = '''
+    <openended min_score_to_attempt="1" max_score_to_attempt="1">
+		        <openendedparam>
+		      		<initial_display>Enter essay here.</initial_display>
+		      		<answer_display>This is the answer.</answer_display>
+		      		<grader_payload>{"grader_settings" : "ml_grading.conf", "problem_id" : "6.002x/Welcome/OETest"}</grader_payload>
+		    	</openendedparam>
+		</openended>'''
+    definition = {'prompt': etree.XML(prompt), 'rubric': etree.XML(rubric), 'task_xml': [task_xml1, task_xml2]}
     descriptor = Mock()
 
     def setUp(self):
@@ -320,7 +328,12 @@ class CombinedOpenEndedModuleTest(unittest.TestCase):
         changed = self.combinedoe.update_task_states()
         self.assertFalse(changed)
 
-        # do something to change the state
+        #prev_context = self.combinedoe.get_context()
+        #new_state = {'state': CombinedOpenEndedModule.INITIAL, 'history': []}
+        ## force a task change
+        #task_state = self.combinedoe.overwrite_state(json.dumps(new_state))
 
-        # check again
+        ## check again
+        #new_context = self.combinedoe.get_context()
+        #self.assertNotEqual(prev_context['state'], new_context['state'])
 
