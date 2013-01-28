@@ -32,14 +32,6 @@ def skipped(func):
 class Stub():
     pass
 
-##def render_to_response(template_name, dictionary, context_instance=None,
-##                       namespace='main', **kwargs):
-##    # The original returns HttpResponse
-##    print dir()
-##    print template_name
-##    print dictionary
-##    return HttpResponse('foo')
-
 class UserFactory(factory.Factory):
     first_name = 'Test'
     last_name = 'Robot'
@@ -100,7 +92,7 @@ class ViewsTestCase(TestCase):
         self.user = User.objects.create(username='dummy', password='123456',
                                         email='test@mit.edu')
         self.date = datetime.datetime(2013,1,22)
-        self.course_id = 'edx/toy/2012_Fall'
+        self.course_id = 'edX/toy/2012_Fall'
         self.enrollment = CourseEnrollment.objects.get_or_create(user = self.user,
                                                   course_id = self.course_id,
                                                   created = self.date)[0]
@@ -109,6 +101,9 @@ class ViewsTestCase(TestCase):
         # This is a CourseDescriptor object
         self.toy_course = modulestore().get_course('edX/toy/2012_Fall')
         self.request_factory = RequestFactory()
+        chapter = 'Overview'
+        self.chapter_url = '%s/%s/%s' % ('/courses', self.course_id, chapter)
+
 
     def test_user_groups(self):
         # depreciated function
@@ -145,9 +140,19 @@ class ViewsTestCase(TestCase):
                           mock_module, True)
 
     def test_index(self):
-        pass
-        #print modulestore()
-        #assert False
+        assert SkipTest
+        request = self.request_factory.get(self.chapter_url)
+        request.user = UserFactory()
+        response = views.index(request, self.course_id)
+        self.assertIsInstance(response, HttpResponse)
+        self.assertEqual(response.status_code, 302)
+        # views.index does not throw 404 if chapter, section, or position are
+        # not valid, which doesn't match index's comments
+        views.index(request, self.course_id, chapter='foo', section='bar',
+                    position='baz')
+        request_2 = self.request_factory.get(self.chapter_url)
+        request_2.user = self.user
+        response = views.index(request_2, self.course_id)
 
     def test_registered_for_course(self):
         self.assertFalse(views.registered_for_course('Basketweaving', None))
@@ -159,9 +164,7 @@ class ViewsTestCase(TestCase):
         self.assertTrue(views.registered_for_course(mock_course, self.user))
 
     def test_jump_to(self):
-        chapter = 'Overview'
-        chapter_url = '%s/%s/%s' % ('/courses', self.course_id, chapter)
-        request = self.request_factory.get(chapter_url)
+        request = self.request_factory.get(self.chapter_url)
         self.assertRaisesRegexp(Http404, 'Invalid location', views.jump_to,
                                 request, 'bar', ())
         self.assertRaisesRegexp(Http404, 'No data*', views.jump_to, request,
@@ -186,16 +189,14 @@ class ViewsTestCase(TestCase):
         
     def test_static_university_profile(self):
         # TODO
-        # Can't test unless have a valid template file
+        # Can't test unless havehttp://toastdriven.com/blog/2011/apr/10/guide-to-testing-in-django/ a valid template file
         raise SkipTest
         request = self.client.get('university_profile/edX')
         self.assertIsInstance(views.static_university_profile(request, 'edX'), HttpResponse)
         
     def test_university_profile(self):
         raise SkipTest
-        chapter = 'Overview'
-        chapter_url = '%s/%s/%s' % ('/courses', self.course_id, chapter)
-        request = self.request_factory.get(chapter_url)
+        request = self.request_factory.get(self.chapter_url)
         request.user = UserFactory()
         self.assertRaisesRegexp(Http404, 'University Profile*',
                                 views.university_profile, request, 'Harvard')
@@ -207,15 +208,14 @@ class ViewsTestCase(TestCase):
     
     def test_syllabus(self):
         raise SkipTest
-        chapter = 'Overview'
-        chapter_url = '%s/%s/%s' % ('/courses', self.course_id, chapter)
-        request = self.request_factory.get(chapter_url)
+        request = self.request_factory.get(self.chapter_url)
         request.user = UserFactory()
         # Can't find valid template
         # TODO
         views.syllabus(request, 'edX/toy/2012_Fall')
 
     def test_render_notifications(self):
+        raise SkipTest
         request = self.request_factory.get('foo')
         #views.render_notifications(request, self.course_id, 'dummy')
         # TODO
