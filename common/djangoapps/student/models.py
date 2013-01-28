@@ -387,6 +387,12 @@ class TestCenterRegistration(models.Model):
             return 'Update'
         elif self.uploaded_at is None:
             return 'Add'
+        elif self.registration_is_rejected:
+            # Assume that if the registration was rejected before, 
+            # it is more likely this is the (first) correction 
+            # than a second correction in flight before the first was
+            # processed. 
+            return 'Add'
         else:
             # TODO: decide what to send when we have uploaded an initial version,
             # but have not received confirmation back from that upload.  If the
@@ -400,7 +406,8 @@ class TestCenterRegistration(models.Model):
 
     @property
     def exam_authorization_count(self):
-        # TODO: figure out if this should really go in the database (with a default value).
+        # Someday this could go in the database (with a default value).  But at present,
+        # we do not expect anyone to be authorized to take an exam more than once.
         return 1
     
     @property
@@ -498,6 +505,33 @@ class TestCenterRegistration(models.Model):
     @property
     def registration_signup_url(self):
         return settings.PEARSONVUE_SIGNINPAGE_URL
+
+    def demographics_status(self):
+        if self.demographics_is_accepted:
+            return "Accepted"
+        elif self.demographics_is_rejected:
+            return "Rejected"
+        else: 
+            return "Pending"
+
+    def accommodation_status(self):
+        if self.accommodation_is_skipped:
+            return "Skipped"
+        elif self.accommodation_is_accepted:
+            return "Accepted"
+        elif self.accommodation_is_rejected:
+            return "Rejected"
+        else: 
+            return "Pending"
+
+    def registration_status(self):
+        if self.registration_is_accepted:
+            return "Accepted"
+        elif self.registration_is_rejected:
+            return "Rejected"
+        else:
+            return "Pending"
+        
 
 class TestCenterRegistrationForm(ModelForm):
     class Meta:
