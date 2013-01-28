@@ -133,6 +133,7 @@
         obj.upvoteId = jsonConfig.poll_chain[c1].upvote_id;
         obj.downvoteId = jsonConfig.poll_chain[c1].downvote_id;
         obj.showStats = jsonConfig.poll_chain[c1].show_stats === 'yes';
+        obj.ajax_url = element.data('ajax-url');
 
         strQuestion = $('<div />').html(jsonConfig.poll_chain[c1].question).text();
 
@@ -164,9 +165,9 @@
             var val, type;
 
             val = $(value).val();
-            if (val === '1') {
+            if (val == '1') {
                 type = 'upvote';
-            } else if (val === '2') {
+            } else if (val == '2') {
                 type = 'downvote';
             } else {
                 logme('ERROR: Not a valid input value.');
