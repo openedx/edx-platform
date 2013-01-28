@@ -23,7 +23,7 @@ class Command(BaseCommand):
             student_role.add_permission(per)
 
         for per in ["edit_content", "delete_thread", "openclose_thread",
-                        "endorse_comment", "delete_comment"]:
+                        "endorse_comment", "delete_comment", "see_all_cohorts"]:
             moderator_role.add_permission(per)
 
         for per in ["manage_moderator"]:

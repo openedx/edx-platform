@@ -6,6 +6,7 @@ import itertools
 import json
 import logging
 import os
+import re
 import requests
 import urllib
 import json
@@ -24,6 +25,7 @@ from courseware import grades
 from courseware.access import (has_access, get_access_group_name,
                                course_beta_test_group_name)
 from courseware.courses import get_course_with_access
+from courseware.models import StudentModule
 from django_comment_client.models import (Role,
                                           FORUM_ROLE_ADMINISTRATOR,
                                           FORUM_ROLE_MODERATOR,
@@ -31,7 +33,6 @@ from django_comment_client.models import (Role,
 from django_comment_client.utils import has_forum_access
 from psychometrics import psychoanalyze
 from student.models import CourseEnrollment, CourseEnrollmentAllowed
-from courseware.models import StudentModule
 from xmodule.course_module import CourseDescriptor
 from xmodule.modulestore import Location
 from xmodule.modulestore.django import modulestore
@@ -48,6 +49,9 @@ template_imports = {'urllib': urllib}
 # internal commands for managing forum roles:
 FORUM_ROLE_ADD = 'add'
 FORUM_ROLE_REMOVE = 'remove'
+
+def split_by_comma_and_whitespace(s):
+    return re.split(r'[\s,]', s)
 
 @ensure_csrf_cookie
 @cache_control(no_cache=True, no_store=True, must_revalidate=True)
@@ -193,8 +197,8 @@ def instructor_dashboard(request, course_id):
         # get the form data
         unique_student_identifier=request.POST.get('unique_student_identifier','')
         problem_to_reset=request.POST.get('problem_to_reset','')
-        
-        if problem_to_reset[-4:]==".xml": 
+
+        if problem_to_reset[-4:]==".xml":
             problem_to_reset=problem_to_reset[:-4]
 
         # try to uniquely id student by email address or username
@@ -213,8 +217,8 @@ def instructor_dashboard(request, course_id):
             try:
                 (org, course_name, run)=course_id.split("/")
                 module_state_key="i4x://"+org+"/"+course_name+"/problem/"+problem_to_reset
-                module_to_reset=StudentModule.objects.get(student_id=student_to_reset.id, 
-                                                          course_id=course_id, 
+                module_to_reset=StudentModule.objects.get(student_id=student_to_reset.id,
+                                                          course_id=course_id,
                                                           module_state_key=module_state_key)
                 msg+="Found module to reset.  "
             except Exception as e:
@@ -230,14 +234,14 @@ def instructor_dashboard(request, course_id):
             # save
             module_to_reset.state=json.dumps(problem_state)
             module_to_reset.save()
-            track.views.server_track(request, 
+            track.views.server_track(request,
                                     '{instructor} reset attempts from {old_attempts} to 0 for {student} on problem {problem} in {course}'.format(
                                         old_attempts=old_number_of_attempts,
                                         student=student_to_reset,
                                         problem=module_to_reset.module_state_key,
                                         instructor=request.user,
                                         course=course_id),
-                                    {}, 
+                                    {},
                                     page='idashboard')
             msg+="<font color='green'>Module state successfully reset!</font>"
         except:
@@ -252,12 +256,12 @@ def instructor_dashboard(request, course_id):
             else:
                 student_to_reset=User.objects.get(username=unique_student_identifier)
             progress_url=reverse('student_progress',kwargs={'course_id':course_id,'student_id': student_to_reset.id})
-            track.views.server_track(request, 
+            track.views.server_track(request,
                                     '{instructor} requested progress page for {student} in {course}'.format(
                                         student=student_to_reset,
                                         instructor=request.user,
                                         course=course_id),
-                                    {}, 
+                                    {},
                                     page='idashboard')
             msg+="<a href='{0}' target='_blank'> Progress page for username: {1} with email address: {2}</a>.".format(progress_url,student_to_reset.username,student_to_reset.email)
         except:
@@ -392,14 +396,14 @@ def instructor_dashboard(request, course_id):
         users = request.POST['betausers']
         log.debug("users: {0!r}".format(users))
         group = get_beta_group(course)
-        for username_or_email in _split_by_comma_and_whitespace(users):
+        for username_or_email in split_by_comma_and_whitespace(users):
             msg += "<p>{0}</p>".format(
                 add_user_to_group(request, username_or_email, group, 'beta testers', 'beta-tester'))
 
     elif action == 'Remove beta testers':
         users = request.POST['betausers']
         group = get_beta_group(course)
-        for username_or_email in _split_by_comma_and_whitespace(users):
+        for username_or_email in split_by_comma_and_whitespace(users):
             msg += "<p>{0}</p>".format(
                 remove_user_from_group(request, username_or_email, group, 'beta testers', 'beta-tester'))
 
@@ -562,6 +566,7 @@ def instructor_dashboard(request, course_id):
                'djangopid' : os.getpid(),
                'mitx_version' : getattr(settings,'MITX_VERSION_STRING',''),
                'offline_grade_log' : offline_grades_available(course_id),
+               'cohorts_ajax_url' : reverse('cohorts', kwargs={'course_id': course_id}),
                }
 
     return render_to_response('courseware/instructor_dashboard.html', context)
@@ -870,21 +875,11 @@ def grade_summary(request, course_id):
 #-----------------------------------------------------------------------------
 # enrollment
 
-
-def _split_by_comma_and_whitespace(s):
-    """
-    Split a string both by on commas and whitespice.
-    """
-    # Note: split() with no args removes empty strings from output
-    lists = [x.split() for x in s.split(',')]
-    # return all of them
-    return itertools.chain(*lists)
-
 def _do_enroll_students(course, course_id, students, overload=False):
     """Do the actual work of enrolling multiple students, presented as a string
     of emails separated by commas or returns"""
 
-    new_students = _split_by_comma_and_whitespace(students)
+    new_students = split_by_comma_and_whitespace(students)
     new_students = [str(s.strip()) for s in new_students]
     new_students_lc = [x.lower() for x in new_students]
 

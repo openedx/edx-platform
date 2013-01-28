@@ -6,6 +6,8 @@
   <%static:css group='course'/>
   <script type="text/javascript" src="${static.url('js/vendor/flot/jquery.flot.js')}"></script>
   <script type="text/javascript" src="${static.url('js/vendor/flot/jquery.flot.axislabels.js')}"></script>
+  <script type="text/javascript" src="${static.url('js/course_groups/cohorts.js')}"></script>
+
 </%block>
 
 <%include file="/courseware/course_navigation.html" args="active_page='instructor'" />
@@ -282,15 +284,20 @@ function goto( mode)
     <input type="submit" name="action" value="Add beta testers">
     </p>
     <hr width="40%" style="align:left">
+
+    %if course.is_cohorted:
+    <%include file="/course_groups/cohort_management.html" />
+    %endif
+
   %endif
 %endif
 
     </form>
+##----------------------------------------------------------------------------- 
 
 %if msg:
     <p></p><p>${msg}</p>
 %endif
-##----------------------------------------------------------------------------- 
 ##----------------------------------------------------------------------------- 
 
 %if datatable and modeflag.get('Psychometrics') is None:

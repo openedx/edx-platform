@@ -223,7 +223,7 @@ class CourseDescriptor(SequenceDescriptor):
 
         return policy_str
 
-    
+
     @classmethod
     def from_xml(cls, xml_data, system, org=None, course=None):
         instance = super(CourseDescriptor, cls).from_xml(xml_data, system, org, course)
@@ -248,7 +248,7 @@ class CourseDescriptor(SequenceDescriptor):
         except ValueError:
             system.error_tracker("Unable to decode grading policy as json")
             policy = None
-        
+
         # cdodge: import the grading policy information that is on disk and put into the
         # descriptor 'definition' bucket as a dictionary so that it is persisted in the DB
         instance.definition['data']['grading_policy'] = policy
@@ -303,28 +303,28 @@ class CourseDescriptor(SequenceDescriptor):
     @property
     def enrollment_start(self):
         return self._try_parse_time("enrollment_start")
-        
+
     @enrollment_start.setter
     def enrollment_start(self, value):
         if isinstance(value, time.struct_time):
             self.metadata['enrollment_start'] = stringify_time(value)
     @property
-    def enrollment_end(self):        
+    def enrollment_end(self):
         return self._try_parse_time("enrollment_end")
-        
+
     @enrollment_end.setter
     def enrollment_end(self, value):
         if isinstance(value, time.struct_time):
             self.metadata['enrollment_end'] = stringify_time(value)
-        
+
     @property
     def grader(self):
         return self._grading_policy['GRADER']
-    
+
     @property
     def raw_grader(self):
         return self._grading_policy['RAW_GRADER']
-    
+
     @raw_grader.setter
     def raw_grader(self, value):
         # NOTE WELL: this change will not update the processed graders. If we need that, this needs to call grader_from_conf
@@ -334,12 +334,12 @@ class CourseDescriptor(SequenceDescriptor):
     @property
     def grade_cutoffs(self):
         return self._grading_policy['GRADE_CUTOFFS']
-    
+
     @grade_cutoffs.setter
     def grade_cutoffs(self, value):
         self._grading_policy['GRADE_CUTOFFS'] = value
         self.definition['data'].setdefault('grading_policy',{})['GRADE_CUTOFFS'] = value
-    
+
 
     @property
     def lowest_passing_grade(self):
@@ -359,6 +359,41 @@ class CourseDescriptor(SequenceDescriptor):
     @property
     def show_calculator(self):
         return self.metadata.get("show_calculator", None) == "Yes"
+
+    @property
+    def is_cohorted(self):
+        """
+        Return whether the course is cohorted.
+        """
+        config = self.metadata.get("cohort_config")
+        if config is None:
+            return False
+
+        return bool(config.get("cohorted"))
+
+    @property
+    def top_level_discussion_topic_ids(self):
+        """
+        Return list of topic ids defined in course policy.
+        """
+        topics = self.metadata.get("discussion_topics", {})
+        return [d["id"] for d in topics.values()] 
+
+
+    @property
+    def cohorted_discussions(self):
+        """
+        Return the set of discussions that is explicitly cohorted.  It may be
+        the empty set.  Note that all inline discussions are automatically
+        cohorted based on the course's is_cohorted setting.
+        """
+        config = self.metadata.get("cohort_config")
+        if config is None:
+            return set()
+
+        return set(config.get("cohorted_discussions", []))
+
+
 
     @property
     def is_new(self):
