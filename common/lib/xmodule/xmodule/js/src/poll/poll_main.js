@@ -88,6 +88,8 @@
 'initialize': function (element) {
     var _this, prevPollObj;
 
+    console.log('four');
+
     if (element.attr('poll_main_processed') === 'true') {
         // This element was already processed once.
         return;
