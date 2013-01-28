@@ -903,6 +903,36 @@ def static_pages(request, org, course, coursename):
 def edit_static(request, org, course, coursename):
     return render_to_response('edit-static-page.html', {})
 
+
+@login_required
+@expect_json
+def reorder_tabs(request):
+    tabs = request.POST['tabs']
+    logging.debug('tabs = {0}  {1}'.format(tabs.__class__, tabs))
+
+    if len(tabs) > 0:
+        course = get_course_for_item(tabs[0])
+
+        if not has_access(request.user, course.location):
+            raise PermissionDenied()
+
+        # first filter out all non-static tabs from the tabs list
+        course_tabs = [t for t in course.tabs if t['type'] != 'static_tab']
+
+        # OK, re-assemble the static tabs in the new order
+        for tab in tabs:
+            item = modulestore('direct').get_item(Location(tab))
+
+            course_tabs.append({ 'type':'static_tab', 
+                'name' : item.metadata.get('display_name'), 
+                'url_slug' : item.location.name}
+                )
+        
+        course.tabs = course_tabs
+        modulestore('direct').update_metadata(course.location, course.metadata)
+
+    return HttpResponse()
+
 @login_required
 @ensure_csrf_cookie
 def edit_tabs(request, org, course, coursename):
@@ -914,11 +944,18 @@ def edit_tabs(request, org, course, coursename):
     if not has_access(request.user, location):
         raise PermissionDenied()
 
-    static_tabs = modulestore('direct').get_items(static_tabs_loc)
-
     # see tabs have been uninitialized (e.g. supporing courses created before tab support in studio)
     if course_item.tabs is None or len(course_item.tabs) == 0:
         initialize_course_tabs(course_item)
+
+    # first get all static tabs from the tabs list
+    # we do this because this is also the order in which items are displayed in the LMS
+    static_tabs_refs = [t for t in course_item.tabs if t['type'] == 'static_tab']
+
+    static_tabs = []
+    for static_tab_ref in static_tabs_refs:
+        static_tab_loc = Location(location)._replace(category='static_tab', name=static_tab_ref['url_slug'])
+        static_tabs.append(modulestore('direct').get_item(static_tab_loc))
 
     components = [
         static_tab.location.url()
