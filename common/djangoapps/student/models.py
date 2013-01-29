@@ -90,6 +90,7 @@ class UserProfile(models.Model):
                          )
     mailing_address = models.TextField(blank=True, null=True)
     goals = models.TextField(blank=True, null=True)
+    allow_certificate = models.BooleanField(default=1)
 
     def get_meta(self):
         js_str = self.meta
@@ -409,11 +410,11 @@ class TestCenterRegistration(models.Model):
         # Someday this could go in the database (with a default value).  But at present,
         # we do not expect anyone to be authorized to take an exam more than once.
         return 1
-    
+
     @property
     def needs_uploading(self):
         return self.uploaded_at is None or self.uploaded_at < self.user_updated_at
-    
+
     @classmethod
     def create(cls, testcenter_user, exam, accommodation_request):
         registration = cls(testcenter_user = testcenter_user)
@@ -574,7 +575,7 @@ def get_testcenter_registration(user, course_id, exam_series_code):
 # nosetests thinks that anything with _test_ in the name is a test.
 # Correct this (https://nose.readthedocs.org/en/latest/finding_tests.html)
 get_testcenter_registration.__test__ = False
-   
+
 def unique_id_for_user(user):
     """
     Return a unique id for a user, suitable for inserting into
