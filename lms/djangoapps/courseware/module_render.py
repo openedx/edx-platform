@@ -3,6 +3,8 @@ import logging
 import pyparsing
 import sys
 
+from functools import partial
+
 from django.conf import settings
 from django.contrib.auth.models import User
 from django.core.urlresolvers import reverse
