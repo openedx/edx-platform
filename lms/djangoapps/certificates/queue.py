@@ -167,8 +167,7 @@ class XQueueCertInterface(object):
                 # check to see whether the student is on the
                 # the embargoed country restricted list
                 if self.restricted.filter(user=student).exists():
-                    cert_status = status.restricted
-                    cert.status = cert_status
+                    cert.status = status.restricted
                     cert.save()
                     return cert.status
 
