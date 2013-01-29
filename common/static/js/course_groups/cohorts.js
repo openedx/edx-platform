@@ -83,10 +83,11 @@ var CohortManager = (function ($) {
             cohort_id = el.data('id');
             state = state_detail;
             render();
+            return false;
         }
 
         function add_to_cohorts_list(item) {
-            var li = $('<li><a></a></li>');
+            var li = $('<li><a href="#"></a></li>');
             $("a", li).text(item.name)
                 .data('href', url + '/' + item.id)
                 .addClass('link')
