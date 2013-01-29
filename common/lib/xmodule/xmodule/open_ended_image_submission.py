@@ -1,5 +1,10 @@
 from PIL import Image
 import urlparse
+import requests
+from boto.s3.connection import S3Connection
+from boto.s3.key import Key
+from django.conf import settings
+import pickle
 
 TRUSTED_IMAGE_DOMAINS = [
     'wikipedia.com',
@@ -91,11 +96,12 @@ def upload_to_s3(string_to_upload, keyname):
     '''
     try:
         conn = S3Connection(settings.AWS_ACCESS_KEY_ID, settings.AWS_SECRET_ACCESS_KEY)
-        bucketname = str(AWS_STORAGE_BUCKET_NAME)
+        bucketname = str(settings.AWS_STORAGE_BUCKET_NAME)
         bucket = conn.create_bucket(bucketname.lower())
 
         k = Key(bucket)
         k.key = keyname
+        k.set_metadata("Content-Type", 'images/png')
         k.set_contents_from_string(string_to_upload)
         public_url = k.generate_url(60*60*24*365) # URL timeout in seconds.
 
@@ -103,6 +109,13 @@ def upload_to_s3(string_to_upload, keyname):
     except:
         return False, "Could not connect to S3."
 
+def get_from_s3(s3_public_url):
+    r = requests.get(s3_public_url, timeout=2)
+    data=r.text
+    return data
+
+def convert_image_to_string(image):
+    return image.tostring()
 
 
 

@@ -39,6 +39,7 @@ MAX_SCORE = 1
 MAX_SCORE_ALLOWED = 3
 
 IS_SCORED=False
+UPLOAD_IMAGE = False
 
 class CombinedOpenEndedModule(XModule):
     """
@@ -141,6 +142,7 @@ class CombinedOpenEndedModule(XModule):
         self.allow_reset = instance_state.get('ready_to_reset', False)
         self.max_attempts = int(self.metadata.get('attempts', MAX_ATTEMPTS))
         self.is_scored = (self.metadata.get('is_graded', IS_SCORED)=="True")
+        self.upload_image = (self.metadata.get('upload_image', UPLOAD_IMAGE)=="True")
 
         log.debug(self.metadata.get('is_graded', IS_SCORED))
 
@@ -173,7 +175,8 @@ class CombinedOpenEndedModule(XModule):
             'max_attempts': self.max_attempts,
             'prompt': definition['prompt'],
             'rubric': definition['rubric'],
-            'display_name': self.display_name
+            'display_name': self.display_name,
+			'accept_file_upload' : self.upload_image,
         }
 
         self.task_xml = definition['task_xml']

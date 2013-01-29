@@ -44,6 +44,7 @@ class @CombinedOpenEnded
       @skip_button = @$('.skip-button')
       @skip_button.click @skip_post_assessment
 
+    @file_upload_area = @$('.file-upload')
     @open_ended_child= @$('.open-ended-child')
 
     @find_assessment_elements()
@@ -298,3 +299,6 @@ class @CombinedOpenEnded
         location.reload()
       else
         window.queuePollerID = window.setTimeout(@poll, 10000)
+
+  setup_file_upload: =>
+    @file_upload_area.html('<input type="file" class="file">')

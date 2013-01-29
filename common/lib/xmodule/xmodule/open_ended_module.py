@@ -602,6 +602,7 @@ class OpenEndedModule(openendedchild.OpenEndedChild):
             'msg': post_assessment,
             'child_type': 'openended',
             'correct': correct,
+            'accept_file_upload' : self.accept_file_upload,
         }
         html = system.render_template('open_ended.html', context)
         return html

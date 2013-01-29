@@ -80,6 +80,7 @@ class SelfAssessmentModule(openendedchild.OpenEndedChild):
             'state': self.state,
             'allow_reset': self._allow_reset(),
             'child_type': 'selfassessment',
+            'accept_file_upload' : self.accept_file_upload,
         }
 
         html = system.render_template('self_assessment_prompt.html', context)
