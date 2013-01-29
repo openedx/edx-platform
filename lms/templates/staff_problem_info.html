@@ -1,7 +1,7 @@
 ${module_content}
 %if edit_link:
 <div>
-	<a href="${edit_link}">Edit</a> / 
+	<a href="${edit_link}">Edit</a> /
 	<a href="#${element_id}_xqa-modal" onclick="javascript:getlog('${element_id}', {
         'location': '${location}',
         'xqa_key': '${xqa_key}',
@@ -61,16 +61,16 @@ category = ${category | h}
 
 <script type="text/javascript">
 // assumes courseware.html's loaded this method.
-setup_debug('${element_id}', 
-	%if edit_link:
-		'${edit_link}',
-	%else:
-		null,
-	%endif
-	{
+  setup_debug('${element_id}',
+    %if edit_link:
+      '${edit_link}',
+    %else:
+      null,
+    %endif
+    {
         'location': '${location}',
         'xqa_key': '${xqa_key}',
         'category': '${category}',
         'user': '${user}'
-     });
+    });
 </script>

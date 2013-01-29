@@ -424,6 +424,429 @@
 	"publish_date": "October 1, 2012"
     },
     {
+        "title": "The Year of the MOOC",
+        "url": "http://www.nytimes.com/2012/11/04/education/edlife/massive-open-online-courses-are-multiplying-at-a-rapid-pace.html",
+	"author": "Laura Pappano",
+        "image": "nyt_logo_178x138.jpeg",
+        "deck": null,
+        "publication": "The New York Times",
+	"publish_date": "November 2, 2012"
+    },
+    {
+        "title": "The Most Important Education Technology in 200 Years",
+        "url": "http://www.technologyreview.com/news/506351/the-most-important-education-technology-in-200-years/",
+	"author": "Antonio Regalado",
+        "image": "techreview_logo_178x138.jpg",
+        "deck": null,
+        "publication": "Technology Review",
+	"publish_date": "November 2, 2012"
+    },
+    {
+        "title": "Classroom in the Cloud",
+        "url": "http://harvardmagazine.com/2012/11/classroom-in-the-cloud",
+	"author": null,
+        "image": "harvardmagazine_logo_178x138.jpeg",
+        "deck": null,
+        "publication": "Harvard Magazine",
+	"publish_date": "November-December 2012"
+    },
+    {
+        "title": "How do you stop online students cheating?",
+        "url": "http://www.bbc.co.uk/news/business-19661899",
+	"author": "Sean Coughlan",
+        "image": "bbc_logo_178x138.jpeg",
+        "deck": null,
+        "publication": "BBC",
+	"publish_date": "October 31, 2012"
+    },    
+    {
+        "title": "VMware to provide software for HarvardX CS50x",
+        "url": "http://tech.mit.edu/V132/N48/edxvmware.html",
+	"author": "Stan Gill",
+        "image": "thetech_logo_178x138.jpg",
+        "deck": null,
+        "publication": "The Tech",
+	"publish_date": "October 26, 2012"
+    },
+    {
+        "title": "EdX platform integrates into classes",
+        "url": "http://tech.mit.edu/V132/N48/801edx.html",
+	"author": "Leon Lin",
+        "image": "thetech_logo_178x138.jpg",
+        "deck": null,
+        "publication": "The Tech",
+	"publish_date": "October 26, 2012"
+    },
+    {
+        "title": "VMware Offers Free Software to edX Learners",
+        "url": "http://campustechnology.com/articles/2012/10/25/vmware-offers-free-virtualization-software-for-edx-computer-science-students.aspx",
+	"author": "Joshua Bolkan",
+        "image": "campustech_logo_178x138.jpg",
+        "deck": "VMware Offers Free Virtualization Software for EdX Computer Science Students",
+        "publication": "Campus Technology",
+	"publish_date": "October 25, 2012"
+    },
+    {
+        "title": "Lone Star moots charges to make Moocs add up",
+        "url": "http://www.timeshighereducation.co.uk/story.asp?sectioncode=26&storycode=421577&c=1",
+	"author": "David Matthews",
+        "image": "timeshighered_logo_178x138.jpg",
+        "deck": null,
+        "publication": "Times Higher Education",
+	"publish_date": "October 25, 2012"
+    },
+    {
+        "title": "Free, high-quality and with mass appeal",
+        "url": "http://www.ft.com/intl/cms/s/2/73030f44-d4dd-11e1-9444-00144feabdc0.html#axzz2A9qvk48A",
+	"author": "Rebecca Knight",
+        "image": "ft_logo_178x138.jpg",
+        "deck": null,
+        "publication": "Financial Times",
+	"publish_date": "October 22, 2012"
+    },
+    {
+        "title": "Getting the most out of an online education",
+        "url": "http://www.reuters.com/article/2012/10/19/us-education-courses-online-idUSBRE89I17120121019",
+	"author": "Kathleen Kingsbury",
+        "image": "reuters_logo_178x138.jpg",
+        "deck": null,
+        "publication": "Reuters",
+	"publish_date": "October 19, 2012"
+    },
+    {
+        "title": "EdX announces partnership with Cengage",
+        "url": "http://tech.mit.edu/V132/N46/cengage.html",
+	"author": "Leon Lin",
+        "image": "thetech_logo_178x138.jpg",
+        "deck": null,
+        "publication": "The Tech",
+	"publish_date": "October 19, 2012"
+    },
+    {
+        "title": "U Texas System Joins EdX",
+        "url": "http://campustechnology.com/articles/2012/10/18/u-texas-system-joins-edx.aspx",
+	"author": "Joshua Bolkan",
+        "image": "campustech_logo_178x138.jpg",
+        "deck": null,
+        "publication": "Campus Technology",
+	"publish_date": "October 18, 2012"
+    },
+    {
+        "title": "San Jose State University Runs Blended Learning Course Using edX ",
+        "url": "http://chronicle.com/blogs/wiredcampus/san-jose-state-u-says-replacing-live-lectures-with-videos-increased-test-scores/40470",
+	"author": "Alisha Azevedo",
+        "image": "chroniclehighered_logo_178x138.jpeg",
+        "deck": "San Jose State U. Says Replacing Live Lectures With Videos Increased Test Scores",
+        "publication": "Chronicle of Higher Education",
+	"publish_date": "October 17, 2012"
+    },
+    {
+        "title": "Online university to charge tuition fees",
+        "url": "http://www.bbc.co.uk/news/education-19964787",
+	"author": "Sean Coughlan",
+        "image": "bbc_logo_178x138.jpeg",
+        "deck": null,
+        "publication": "BBC",
+	"publish_date": "October 17, 2012"
+    },
+    {
+        "title": "HarvardX marks the spot",
+        "url": "http://news.harvard.edu/gazette/story/2012/10/harvardx-marks-the-spot/",
+	"author": "Tania delLuzuriaga",
+        "image": "harvardgazette_logo_178x138.jpeg",
+        "deck": null,
+        "publication": "Harvard Gazette",
+	"publish_date": "October 17, 2012"
+    },
+    {
+        "title": "Harvard EdX Enrolls Near 100000 Students for Free Online Classes",
+        "url": "http://www.collegeclasses.com/harvard-edx-enrolls-near-100000-students-for-free-online-classes/",
+	"author": "Keith Koong",
+        "image": "college_classes_logo_178x138.jpg",
+        "deck": null,
+        "publication": "CollegeClasses.com",
+	"publish_date": "October 17, 2012"
+    },
+    {
+        "title": "Cengage Learning to Provide Book Content and Pedagogy through edX's Not-for-Profit Interactive Study Via the Web",
+        "url": "http://www.outsellinc.com/our_industry/headlines/1087978",
+	"author": null,
+        "image": "outsell_logo_178x138.jpg",
+        "deck": null,
+        "publication": "Outsell.com",
+	"publish_date": "October 17, 2012"
+    },
+    {
+        "title": "University of Texas System Embraces MOOCs",
+        "url": "http://www.usnewsuniversitydirectory.com/articles/university-of-texas-system-embraces-moocs_12713.aspx#.UIBLVq7bNzo",
+	"author": "Chris Hassan",
+        "image": "usnews_logo_178x138.jpeg",
+        "deck": null,
+        "publication": "US News",
+	"publish_date": "October 17, 2012"
+    },
+    {
+        "title": "Texas MOOCs for Credit?",
+        "url": "http://www.insidehighered.com/news/2012/10/16/u-texas-aims-use-moocs-reduce-costs-increase-completion",
+	"author": "Steve Kolowich",
+        "image": "insidehighered_logo_178x138.jpg",
+        "deck": null,
+        "publication": "Insider Higher Ed",
+	"publish_date": "October 16, 2012"
+    },
+    {
+        "title": "University of Texas Joins Harvard-Founded edX",
+        "url": "http://www.thecrimson.com/article/2012/10/16/University-of-Texas-edX/",
+	"author": "Kevin J. Wu",
+        "image": "harvardcrimson_logo_178x138.jpeg",
+        "deck": null,
+        "publication": "The Crimson",
+	"publish_date": "October 16, 2012"
+    },
+    {
+        "title": "Entire UT System to join edX",
+        "url": "http://tech.mit.edu/V132/N45/edx.html",
+	"author": "Ethan A. Solomon",
+        "image": "thetech_logo_178x138.jpg",
+        "deck": null,
+        "publication": "The Tech",
+	"publish_date": "October 16, 2012"
+    },
+    {
+        "title": "First University System Joins edX Platform",
+        "url": "http://www.govtech.com/education/First-University-System-Joins-edX-platform.html",
+	"author": "Tanya Roscoria",
+        "image": "govtech_logo_178x138.jpg",
+        "deck": null,
+        "publication": "GovTech.com",
+	"publish_date": "October 16, 2012"
+    },
+    {
+        "title": "University of Texas Joining Harvard, MIT Online Venture",
+        "url": "http://www.bloomberg.com/news/2012-10-15/university-of-texas-joining-harvard-mit-online-venture.html",
+	"author": "David Mildenberg",
+        "image": "bloomberg_logo_178x138.jpeg",
+        "deck": null,
+        "publication": "Bloomberg",
+	"publish_date": "October 15, 2012"
+    },
+    {
+        "title": "University of Texas Joining Harvard, MIT Online Venture",
+        "url": "http://www.businessweek.com/news/2012-10-15/university-of-texas-joining-harvard-mit-online-venture",
+	"author": "David Mildenberg",
+        "image": "busweek_logo_178x138.jpg",
+        "deck": null,
+        "publication": "Business Week",
+	"publish_date": "October 15, 2012"
+    },
+    {
+        "title": "Univ. of Texas joins online course program edX",
+        "url": "http://news.yahoo.com/univ-texas-joins-online-course-program-edx-172202035--finance.html",
+	"author": "Chris Tomlinson",
+        "image": "ap_logo_178x138.jpg",
+        "deck": null,
+        "publication": "Associated Press",
+	"publish_date": "October 15, 2012"
+    },
+    {
+        "title": "U. of Texas Plans to Join edX",
+        "url": "http://www.insidehighered.com/quicktakes/2012/10/15/u-texas-plans-join-edx",
+	"author": null,
+        "image": "insidehighered_logo_178x138.jpg",
+        "deck": null,
+        "publication": "Inside Higher Ed",
+	"publish_date": "October 15, 2012"
+    },
+    {
+        "title": "U. of Texas System Is Latest to Sign Up With edX for Online Courses",
+        "url": "http://chronicle.com/blogs/wiredcampus/u-of-texas-system-is-latest-to-sign-up-with-edx-for-online-courses/40440",
+	"author": "Alisha Azevedo",
+        "image": "chroniclehighered_logo_178x138.jpeg",
+        "deck": null,
+        "publication": "Chronicle of Higher Education",
+	"publish_date": "October 15, 2012"
+    },
+    {
+        "title": "First University System Joins edX",
+        "url": "http://www.centerdigitaled.com/news/First-University-System-Joins-edX.html",
+	"author": "Tanya Roscoria",
+        "image": "center_digeducation_logo_178x138.jpg",
+        "deck": null,
+        "publication": "Center for Digital Education",
+	"publish_date": "October 15, 2012"
+    },
+    {
+        "title": "University of Texas Joins Harvard, MIT in edX Online Learning Venture",
+        "url": "http://harvardmagazine.com/2012/10/university-of-texas-joins-harvard-mit-edx",
+	"author": null,
+        "image": "harvardmagazine_logo_178x138.jpeg",
+        "deck": null,
+        "publication": "Harvard Magazine",
+	"publish_date": "October 15, 2012"
+    },
+    {
+        "title": "University of Texas joins edX",
+        "url": "http://www.masshightech.com/stories/2012/10/15/daily13-University-of-Texas-joins-edX.html",
+	"author": "Don Seiffert",
+        "image": "masshightech_logo_178x138.jpg",
+        "deck": null,
+        "publication": "MassHighTech",
+	"publish_date": "October 15, 2012"
+    },
+    {
+        "title": "UT System to Forge Partnership with EdX",
+        "url": "http://www.texastribune.org/texas-education/higher-education/ut-system-announce-partnership-edx/",
+	"author": "Reeve Hamilton",
+        "image": "texastribune_logo_178x138.jpg",
+        "deck": null,
+        "publication": "Texas Tribune",
+	"publish_date": "October 15, 2012"
+    },
+    {
+        "title": "UT System puts $5 million into online learning initiative",
+        "url": "http://www.statesman.com/news/news/local/ut-system-puts-5-million-into-online-learning-init/nSdd5/",
+	"author": "Ralph K.M. Haurwitz",
+        "image": "austin_statesman_logo_178x138.jpg",
+        "deck": null,
+        "publication": "The Austin Statesman",
+	"publish_date": "October 15, 2012"
+    },
+    {
+        "title": "Harvard’s Online Classes Sound Pretty Popular",
+        "url": "http://blogs.bostonmagazine.com/boston_daily/2012/10/15/harvards-online-classes-sound-pretty-popular/",
+	"author": "Eric Randall",
+        "image": "bostonmag_logo_178x138.jpg",
+        "deck": null,
+        "publication": "Boston Magazine",
+	"publish_date": "October 15, 2012"
+    },
+    {
+        "title": "Harvard Debuts Free Online Courses",
+        "url": "http://www.ibtimes.com/harvard-debuts-free-online-courses-846629",
+	"author": "Eli Epstein",
+        "image": "ibtimes_logo_178x138.jpg",
+        "deck": null,
+        "publication": "International Business Times",
+	"publish_date": "October 15, 2012"
+    },
+    {
+        "title": "UT System Joins Online Learning Effort",
+        "url": "http://www.texastechpulse.com/ut_system_joins_online_learning_effort/s-0045632.html",
+	"author": null,
+        "image": "texaspulse_logo_178x138.jpg",
+        "deck": null,
+        "publication": "Texas Tech Pulse",
+	"publish_date": "October 15, 2012"
+    },
+    {
+        "title": "University of Texas Joins edX",
+        "url": "http://www.onlinecolleges.net/2012/10/15/university-of-texas-joins-edx/",
+	"author": "Alex Wukman",
+        "image": "online_colleges_logo_178x138.jpg",
+        "deck": null,
+        "publication": "Online Colleges.net",
+	"publish_date": "October 15, 2012"
+    },
+    {
+        "title": "100,000 sign up for first Harvard online courses",
+        "url": "http://www.masslive.com/news/index.ssf/2012/10/100000_sign_up_for_first_harva.html",
+	"author": null,
+        "image": "ap_logo_178x138.jpg",
+        "deck": null,
+        "publication": "Associated Press",
+	"publish_date": "October 15, 2012"
+    },
+    {
+        "title": "In the new Listener, on sale from 14.10.12",
+        "url": "http://www.listener.co.nz/commentary/the-internaut/in-the-new-listener-on-sale-from-14-10-12/",
+	"author": null,
+        "image": "nz_listener_logo_178x138.jpg",
+        "deck": null,
+        "publication": "The Listener",
+	"publish_date": "October 14, 2012"
+    },
+    {
+        "title": "HarvardX Classes to Begin Tomorrow",
+        "url": "http://www.thecrimson.com/article/2012/10/14/harvardx-classes-start-tomorrow/",
+	"author": "Hana N. Rouse",
+        "image": "harvardcrimson_logo_178x138.jpeg",
+        "deck": null,
+        "publication": "The Crimson",
+	"publish_date": "October 14, 2012"
+    },
+    {
+        "title": "Online Harvard University courses draw well",
+        "url": "http://bostonglobe.com/metro/2012/10/14/harvard-launching-free-online-courses-sign-for-first-two-classes/zBDuHY0zqD4OESrXWfEgML/story.html",
+	"author": "Brock Parker",
+        "image": "bostonglobe_logo_178x138.jpeg",
+        "deck": null,
+        "publication": "Boston Globe",
+	"publish_date": "October 14, 2012"
+    },
+    {
+        "title": "Harvard ready to launch its first free online courses Monday",
+        "url": "http://www.boston.com/yourtown/news/cambridge/2012/10/harvard_ready_to_launch_its_fi.html",
+	"author": "Brock Parker",
+        "image": "bostonglobe_logo_178x138.jpeg",
+        "deck": null,
+        "publication": "Boston Globe",
+	"publish_date": "October 12, 2012"
+    },
+    {
+        "title": "edX: Harvard's New Domain",
+        "url": "http://www.thecrimson.com/article/2012/10/4/edx-scrutiny-online-learning/ ",
+	"author": "Delphine Rodrik and Kevin Su",
+        "image": "harvardcrimson_logo_178x138.jpeg",
+        "deck": null,
+        "publication": "The Crimson",
+	"publish_date": "October 4, 2012"
+    },
+    {
+        "title": "New Experiments in the edX Higher Ed Petri Dish",
+        "url": "http://www.nonprofitquarterly.org/policysocial-context/21116-new-experiments-in-the-edx-higher-ed-petri-dish.html",
+	"author": "Michelle Shumate",
+        "image": "npq_logo_178x138.jpg",
+        "deck": null,
+        "publication": "Non-Profit Quarterly",
+	"publish_date": "October 4, 2012"
+    },
+    {
+        "title": "What Campuses Can Learn From Online Teaching",
+        "url": "http://online.wsj.com/article/SB10000872396390444620104578012262106378182.html?mod=googlenews_wsj",
+	"author": "Rafael Reif",
+        "image": "wsj_logo_178x138.jpg",
+        "deck": null,
+        "publication": "Wall Street Journal",
+	"publish_date": "October 2, 2012"
+    },
+    {
+        "title": "MongoDB courses to be offered via edX",
+        "url": "http://tech.mit.edu/V132/N42/edxmongodb.html",
+	"author": "Jake H. Gunter",
+        "image": "thetech_logo_178x138.jpg",
+        "deck": null,
+        "publication": "The Tech",
+	"publish_date": "October 2, 2012"
+    },
+    {
+        "title": "5 Ways That edX Could Change Education",
+        "url": "http://chronicle.com/article/5-Ways-That-edX-Could-Change/134672/",
+	"author": "Marc Parry",
+        "image": "chroniclehighered_logo_178x138.jpeg",
+        "deck": null,
+        "publication": "Chronicle of Higher Education",
+	"publish_date": "October 1, 2012"
+    },
+    {
+        "title": "MIT profs wait to teach you, for free",
+        "url": "http://www.dnaindia.com/mumbai/report_mit-profs-wait-to-teach-you-for-free_1747273",
+	"author": "Kanchan Srivastava",
+        "image": "dailynews_india_logo_178x138.jpg",
+        "deck": null,
+        "publication": "Daily News and Analysis India",
+	"publish_date": "October 1, 2012"
+    },
+    {
         "title": "EdX offers free higher education online",
         "url": "http://www.youtube.com/watch?v=yr5Ep7RN4Bs",
         "author": "via YouTube",

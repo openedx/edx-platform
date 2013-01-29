@@ -12,7 +12,7 @@ from django.core.cache import cache
 from django.db import DEFAULT_DB_ALIAS
 
 from . import app_settings
-
+from xmodule.contentstore.content import StaticContent
 
 def get_instance(model, instance_or_pk, timeout=None, using=None):
     """
@@ -108,14 +108,11 @@ def instance_key(model, instance_or_pk):
         getattr(instance_or_pk, 'pk', instance_or_pk),
     )
 
-def content_key(filename):
-    return 'content:%s' % (filename)
-
 def set_cached_content(content):
-    cache.set(content_key(content.filename), content)
+    cache.set(str(content.location), content)
 
-def get_cached_content(filename):
-    return cache.get(content_key(filename))
+def get_cached_content(location):
+    return cache.get(str(location))
 
-def del_cached_content(filename):
-    cache.delete(content_key(filename))
+def del_cached_content(location):
+    cache.delete(str(location))

@@ -2,7 +2,7 @@
 This config file runs the simplest dev environment"""
 
 from .common import *
-from .logsettings import get_logger_config
+from logsettings import get_logger_config
 
 import logging
 import sys
@@ -12,19 +12,26 @@ TEMPLATE_DEBUG = DEBUG
 LOGGING = get_logger_config(ENV_ROOT / "log",
                             logging_env="dev",
                             tracking_filename="tracking.log",
+                            dev_env = True,
                             debug=True)
+
+modulestore_options = {
+    'default_class': 'xmodule.raw_module.RawDescriptor',
+    'host': 'localhost',
+    'db': 'xmodule',
+    'collection': 'modulestore',
+    'fs_root': GITHUB_REPO_ROOT,
+    'render_template': 'mitxmako.shortcuts.render_to_string',
+}
 
 MODULESTORE = {
     'default': {
+        'ENGINE': 'xmodule.modulestore.mongo.DraftMongoModuleStore',
+        'OPTIONS': modulestore_options
+    },
+    'direct': {
         'ENGINE': 'xmodule.modulestore.mongo.MongoModuleStore',
-        'OPTIONS': {
-            'default_class': 'xmodule.raw_module.RawDescriptor',
-            'host': 'localhost',
-            'db': 'xmodule',
-            'collection': 'modulestore',
-            'fs_root': GITHUB_REPO_ROOT,
-            'render_template': 'mitxmako.shortcuts.render_to_string',
-        }
+        'OPTIONS': modulestore_options
     }
 }
 
@@ -42,11 +49,11 @@ CONTENTSTORE = {
 DATABASES = {
     'default': {
         'ENGINE': 'django.db.backends.sqlite3',
-        'NAME': ENV_ROOT / "db" / "cms.db",
+        'NAME': ENV_ROOT / "db" / "mitx.db",
     }
 }
 
-LMS_BASE = "http://localhost:8000"
+LMS_BASE = "localhost:8000"
 
 REPOS = {
     'edx4edx': {
@@ -97,3 +104,6 @@ CACHES = {
 
 # Make the keyedcache startup warnings go away
 CACHE_TIMEOUT = 0
+
+# Dummy secret key for dev
+SECRET_KEY = '85920908f28904ed733fe576320db18cabd7b6cd'

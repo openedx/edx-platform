@@ -153,7 +153,7 @@ class Location(_LocationBase):
             def check(val, regexp):
                 if val is not None and regexp.search(val) is not None:
                     log.debug('invalid characters val="%s", list_="%s"' % (val, list_))
-                    raise InvalidLocationError(location)
+                    raise InvalidLocationError("Invalid characters in '%s'." % (val))
 
             list_ = list(list_)
             for val in list_[:4] + [list_[5]]:
@@ -240,11 +240,15 @@ class ModuleStore(object):
     An abstract interface for a database backend that stores XModuleDescriptor
     instances
     """
+    def has_item(self, location):
+        """
+        Returns True if location exists in this ModuleStore.
+        """
+        raise NotImplementedError
+
     def get_item(self, location, depth=0):
         """
         Returns an XModuleDescriptor instance for the item at location.
-        If location.revision is None, returns the item with the most
-        recent revision
 
         If any segment of the location is None except revision, raises
             xmodule.modulestore.exceptions.InsufficientSpecificationError
@@ -261,7 +265,7 @@ class ModuleStore(object):
         """
         raise NotImplementedError
 
-    def get_instance(self, course_id, location):
+    def get_instance(self, course_id, location, depth=0):
         """
         Get an instance of this location, with policy for course_id applied.
         TODO (vshnayder): this may want to live outside the modulestore eventually
@@ -280,7 +284,7 @@ class ModuleStore(object):
         """
         raise NotImplementedError
 
-    def get_items(self, location, depth=0):
+    def get_items(self, location, course_id=None, depth=0):
         """
         Returns a list of XModuleDescriptor instances for the items
         that match location. Any element of location that is None is treated
@@ -332,10 +336,25 @@ class ModuleStore(object):
         """
         raise NotImplementedError
 
+    def delete_item(self, location):
+        """
+        Delete an item from this modulestore
+
+        location: Something that can be passed to Location
+        """
+        raise NotImplementedError
+
     def get_courses(self):
         '''
         Returns a list containing the top level XModuleDescriptors of the courses
         in this modulestore.
+        '''
+        course_filter = Location("i4x", category="course")
+        return self.get_items(course_filter)
+
+    def get_course(self, course_id):
+        '''
+        Look for a specific course id.  Returns the course descriptor, or None if not found.
         '''
         raise NotImplementedError
 
@@ -368,6 +387,7 @@ class ModuleStore(object):
         ]
 
         return courses
+
 
 
 class ModuleStoreBase(ModuleStore):

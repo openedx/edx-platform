@@ -4,7 +4,6 @@ import logging
 import os
 import sys
 from lxml import etree
-from lxml.html import rewrite_links
 from path import path
 
 from pkg_resources import resource_string
@@ -26,10 +25,10 @@ class HtmlModule(XModule):
                     ]
          }
     js_module_name = "HTMLModule"
-    
+    css = {'scss': [resource_string(__name__, 'css/html/display.scss')]}
+
     def get_html(self):
-        # cdodge: perform link substitutions for any references to course static content (e.g. images)
-        return rewrite_links(self.html, self.rewrite_content_links)
+        return self.html
 
     def __init__(self, system, location, definition, descriptor,
                  instance_state=None, shared_state=None, **kwargs):
@@ -50,6 +49,7 @@ class HtmlDescriptor(XmlDescriptor, EditingDescriptor):
 
     js = {'coffee': [resource_string(__name__, 'js/src/html/edit.coffee')]}
     js_module_name = "HTMLEditingDescriptor"
+    css = {'scss': [resource_string(__name__, 'css/editor/edit.scss'), resource_string(__name__, 'css/html/edit.scss')]}
 
     # VS[compat] TODO (cpennington): Delete this method once all fall 2012 course
     # are being edited in the cms
@@ -161,7 +161,7 @@ class HtmlDescriptor(XmlDescriptor, EditingDescriptor):
         filepath = u'{category}/{pathname}.html'.format(category=self.category,
                                                     pathname=pathname)
 
-        resource_fs.makedir(os.path.dirname(filepath), allow_recreate=True)
+        resource_fs.makedir(os.path.dirname(filepath), recursive=True, allow_recreate=True)
         with resource_fs.open(filepath, 'w') as file:
             file.write(self.definition['data'].encode('utf-8'))
 
@@ -171,3 +171,25 @@ class HtmlDescriptor(XmlDescriptor, EditingDescriptor):
         elt = etree.Element('html')
         elt.set("filename", relname)
         return elt
+
+
+class AboutDescriptor(HtmlDescriptor):
+    """
+    These pieces of course content are treated as HtmlModules but we need to overload where the templates are located
+    in order to be able to create new ones
+    """
+    template_dir_name = "about"
+
+class StaticTabDescriptor(HtmlDescriptor):
+    """
+    These pieces of course content are treated as HtmlModules but we need to overload where the templates are located
+    in order to be able to create new ones
+    """
+    template_dir_name = "statictab"
+
+class CourseInfoDescriptor(HtmlDescriptor):
+    """
+    These pieces of course content are treated as HtmlModules but we need to overload where the templates are located
+    in order to be able to create new ones
+    """
+    template_dir_name = "courseinfo"

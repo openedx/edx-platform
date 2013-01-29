@@ -13,6 +13,7 @@ class @Navigation
         active: active
         header: 'h3'
         autoHeight: false
+        heightStyle: 'content'
       $('#accordion .ui-state-active').closest('.chapter').addClass('is-open')
       $('#open_close_accordion a').click @toggle
       $('#accordion').show()

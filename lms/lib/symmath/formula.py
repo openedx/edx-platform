@@ -154,8 +154,9 @@ def my_sympify(expr, normphase=False, matrix=False, abcsym=False, do_qubit=False
 
 class formula(object):
     '''
-    Representation of a mathematical formula object.  Accepts mathml math expression for constructing,
-    and can produce sympy translation.  The formula may or may not include an assignment (=).
+    Representation of a mathematical formula object.  Accepts mathml math expression
+    for constructing, and can produce sympy translation.  The formula may or may not
+    include an assignment (=).
     '''
     def __init__(self, expr, asciimath='', options=None):
         self.expr = expr.strip()
@@ -194,8 +195,12 @@ class formula(object):
 
     def preprocess_pmathml(self, xml):
         '''
-        Pre-process presentation MathML from ASCIIMathML to make it more acceptable for SnuggleTeX, and also
-        to accomodate some sympy conventions (eg hat(i) for \hat{i}).
+        Pre-process presentation MathML from ASCIIMathML to make it more
+        acceptable for SnuggleTeX, and also to accomodate some sympy
+        conventions (eg hat(i) for \hat{i}).
+
+        This method would be a good spot to look for an integral and convert
+        it, if possible...
         '''
 
         if type(xml) == str or type(xml) == unicode:
@@ -266,6 +271,9 @@ class formula(object):
         '''
         Return sympy expression for the math formula.
         The math formula is converted to Content MathML then that is parsed.
+
+        This is a recursive function, called on every CMML node. Support for
+        more functions can be added by modifying opdict, abould halfway down
         '''
 
         if self.the_sympy: return self.the_sympy

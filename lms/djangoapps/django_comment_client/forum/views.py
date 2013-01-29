@@ -11,12 +11,14 @@ from django.contrib.auth.models import User
 
 from mitxmako.shortcuts import render_to_response, render_to_string
 from courseware.courses import get_course_with_access
+from course_groups.cohorts import get_cohort_id
 from courseware.access import has_access
 
 from urllib import urlencode
 from operator import methodcaller
 from django_comment_client.permissions import check_permissions_by_view
-from django_comment_client.utils import merge_dict, extract, strip_none, strip_blank, get_courseware_context
+from django_comment_client.utils import (merge_dict, extract, strip_none,
+                                         strip_blank, get_courseware_context)
 
 import django_comment_client.utils as utils
 import comment_client as cc
@@ -33,7 +35,6 @@ def get_threads(request, course_id, discussion_id=None, per_page=THREADS_PER_PAG
     This may raise cc.utils.CommentClientError or
     cc.utils.CommentClientUnknownError if something goes wrong.
     """
-
     default_query_params = {
         'page': 1,
         'per_page': per_page,
@@ -58,8 +59,17 @@ def get_threads(request, course_id, discussion_id=None, per_page=THREADS_PER_PAG
         user.default_sort_key = request.GET.get('sort_key')
         user.save()
 
+
+    #if the course-user is cohorted, then add the group id
+    group_id = get_cohort_id(user, course_id)
+    if group_id:
+        default_query_params["group_id"] = group_id
+
     query_params = merge_dict(default_query_params,
-                              strip_none(extract(request.GET, ['page', 'sort_key', 'sort_order', 'text', 'tags', 'commentable_ids'])))
+                              strip_none(extract(request.GET,
+                                                 ['page', 'sort_key',
+                                                  'sort_order', 'text',
+                                                  'tags', 'commentable_ids'])))
 
     threads, page, num_pages = cc.Thread.search(query_params)
 
@@ -218,7 +228,7 @@ def single_thread(request, course_id, discussion_id, thread_id):
         #    course_id,
         #)
 
-        
+
         annotated_content_info = utils.get_metadata_for_threads(course_id, threads, request.user, user_info)
 
         context = {
