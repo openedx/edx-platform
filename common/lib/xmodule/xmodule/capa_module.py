@@ -668,18 +668,18 @@ class CapaDescriptor(RawDescriptor):
     # TODO (vshnayder): do problems have any other metadata?  Do they
     # actually use type and points?
     metadata_attributes = RawDescriptor.metadata_attributes + ('type', 'points')
-    
+
     def get_context(self):
         _context = RawDescriptor.get_context(self)
         _context.update({'markdown': self.metadata.get('markdown', '')})
         return _context
-    
+
     @property
     def editable_metadata_fields(self):
         """Remove metadata from the editable fields since it has its own editor"""
         subset = super(CapaDescriptor,self).editable_metadata_fields
         if 'markdown' in subset:
-            subset.remove('markdown') 
+            subset.remove('markdown')
         return subset
 
 
