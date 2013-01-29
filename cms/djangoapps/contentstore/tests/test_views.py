@@ -13,8 +13,11 @@ from django.test.client import Client
 from django.conf import settings
 from django.test import TestCase
 from django.test.client import RequestFactory
+from override_settings import override_settings
 
-import cms.djangoapps.contentstore.views as views
+from xmodule.modulestore.django import modulestore, _MODULESTORES
+import contentstore.views as views
+
 
 def xml_store_config(data_dir):
     return {
@@ -32,7 +35,6 @@ class UserFactory(factory.Factory):
     last_name = 'Robot'
     is_staff = True
     is_active = True
-    is_authenticated = True
 
 TEST_DATA_DIR = settings.COMMON_TEST_DATA_ROOT
 TEST_DATA_XML_MODULESTORE = xml_store_config(TEST_DATA_DIR)
@@ -47,4 +49,6 @@ class ViewsTestCase(TestCase):
 
     def test_has_access(self):
         user = UserFactory()
-        views.has_access(user, self.location)
+        user.is_authenticated = True
+        set_trace()
+        self.assertTrue(views.has_access(user, self.location))
