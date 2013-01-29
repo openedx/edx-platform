@@ -552,7 +552,15 @@ class TestCenterRegistrationForm(ModelForm):
         registration.save()
         log.info("Updated registration information for user's test center exam registration: username \"{}\" course \"{}\", examcode \"{}\"".format(registration.testcenter_user.user.username, registration.course_id, registration.exam_series_code))
 
-    # TODO: add validation code for values added to accommodation_code field.
+    def clean_accommodation_code(self):
+        code = self.cleaned_data['accommodation_code']
+        if code:
+            code = code.upper()
+            codes = code.split('*')
+            for codeval in codes:
+                if codeval not in ACCOMMODATION_CODE_DICT:
+                    raise forms.ValidationError(u'Invalid accommodation code specified: "{}"'.format(codeval))
+        return code
 
 
 
