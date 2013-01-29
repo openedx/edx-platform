@@ -16,7 +16,7 @@ from courseware.access import has_access
 
 from urllib import urlencode
 from operator import methodcaller
-from django_comment_client.permissions import check_permissions_by_view
+from django_comment_client.permissions import check_permissions_by_view, cached_has_permission
 from django_comment_client.utils import (merge_dict, extract, strip_none,
                                          strip_blank, get_courseware_context)
 
@@ -165,6 +165,7 @@ def forum_form_discussion(request, course_id):
             'course_id': course.id,
             'category_map': category_map,
             'roles': saxutils.escape(json.dumps(utils.get_role_ids(course_id)), escapedict),
+            'is_moderator': cached_has_permission(request.user, "see_all_cohorts", course_id),
         }
         # print "start rendering.."
         return render_to_response('discussion/index.html', context)
