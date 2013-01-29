@@ -50,8 +50,14 @@ class ViewsTestCase(TestCase):
         self._MODULESTORES = {}
         self.course_id = 'edX/toy/2012_Fall'
         self.course_id_2 = 'edx/full/6.002_Spring_2012'
-        self.toy_course = modulestore().get_course(self.course_id)
+        #self.toy_course = modulestore().get_course(self.course_id)
+        # Problem: Classes persist, need to delete stuff from modulestore
+        self.course = CourseFactory.create()
+        print dir(self.course)
 
+    def tearDown(self):
+        pass
+        
     def test_has_access(self):
         user = MagicMock(is_staff = True, is_active = True, is_authenticated = True)
         m = MagicMock()
@@ -72,16 +78,15 @@ class ViewsTestCase(TestCase):
         self.user_2 = MagicMock(is_staff = True, is_active = True)
         self.user_2.is_authenticated.return_value = True
         request_2 = MagicMock(user = self.user_2)
-        # Bug? Raises error because calls modulestore().get_item(location)
-        #NotImplementedError: XMLModuleStores can't guarantee that definitions
-        #are unique. Use get_instance.
+        # Need to use XModuleStoreFactory?
         print views.course_index(request_2, 'edX',
                           'full', '6.002_Spring_2012')
 
     def test_edit_subsection(self):
+        # Redirects if request.user doesn't have access to location
         self.user = MagicMock(is_staff = False, is_active = False)
         self.user.is_authenticated.return_value = False
         self.request = MagicMock(user = self.user)
-        self.assertIsInstance(views.edit_subscription(self.request, self.location_2),
+        self.assertIsInstance(views.edit_subsection(self.request, self.location_2),
                               HttpResponseRedirect)
         
