@@ -35,6 +35,19 @@ State diagram:
             v                v             v
       [downloadable]   [downloadable]  [deleted]
 
+
+Eligibility:
+
+    Students are eligible for a certificate if they pass the course
+    with the following exceptions:
+
+       If the student has allow_certificate set to False in the student profile
+       he will never be issued a certificate.
+
+       If the user and course is present in the certificate whitelist table
+       then the student will be issued a certificate regardless of his grade,
+       unless he has allow_certificate set to False.
+
 """
 
 
