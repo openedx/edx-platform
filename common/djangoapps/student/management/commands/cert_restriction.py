@@ -19,7 +19,15 @@ class Command(BaseCommand):
     Export a list of students who have "allow_certificate" in
     userprofile set to True
 
-        $ ... cert_restriction --export path/to/export.csv
+        $ ... cert_restriction --output path/to/export.csv
+
+    Enable a single user so she is not on the restricted list
+
+        $ ... cert_restriction -e user
+
+    Disable a single user so she is on the restricted list
+
+        $ ... cert_restriction -d user
 
     """
 
