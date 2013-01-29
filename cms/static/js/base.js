@@ -99,6 +99,9 @@ $(document).ready(function() {
     	axis: 'y',
     	handle: '.section-item .drag-handle',
     	stack: '.id-holder',
+    	start: initiateHesitate,
+    	drag: checkHoverState,
+    	stop: removeHesitate,
     	revert: "invalid"
     });
     
@@ -292,6 +295,9 @@ function checkHoverState(event, ui) {
 		x1 = (draggable.positionAbs || draggable.position.absolute).left + (draggable.helperProportions.width / 2), 
 		y1 = (draggable.positionAbs || draggable.position.absolute).top + (draggable.helperProportions.height / 2);
 	$('.collapsed').each(function() {
+		// don't expand the thing being carried
+		if ($(draggable).is(this)) return;
+		
 		$.extend(this, {offset : $(this).offset()});
 
 		var droppable = this,
