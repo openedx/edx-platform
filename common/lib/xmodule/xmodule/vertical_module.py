@@ -1,6 +1,7 @@
 from xmodule.x_module import XModule
 from xmodule.seq_module import SequenceDescriptor
 from xmodule.progress import Progress
+from pkg_resources import resource_string
 
 # HACK: This shouldn't be hard-coded to two types
 # OBSOLETE: This obsoletes 'type'
@@ -16,7 +17,10 @@ class VerticalModule(XModule):
 
     def get_html(self):
         if self.contents is None:
-            self.contents = [child.get_html() for child in self.get_display_items()]
+            self.contents = [{
+                'id': child.id,
+                'content': child.get_html()
+            } for child in self.get_display_items()]
 
         return self.system.render_template('vert_module.html', {
             'items': self.contents
@@ -40,3 +44,7 @@ class VerticalModule(XModule):
 
 class VerticalDescriptor(SequenceDescriptor):
     module_class = VerticalModule
+
+    js = {'coffee': [resource_string(__name__, 'js/src/vertical/edit.coffee')]}
+    js_module_name = "VerticalDescriptor"
+        

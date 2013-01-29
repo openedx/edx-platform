@@ -1,0 +1,13 @@
+---
+metadata:
+    display_name: Empty
+    rerandomize: never
+    showanswer: always
+    markdown: ""
+    weight: ""
+    attempts: ""
+data: |
+  <problem>
+  </problem>
+
+children: []

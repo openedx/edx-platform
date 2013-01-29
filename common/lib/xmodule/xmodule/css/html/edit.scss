@@ -1,0 +1,30 @@
+// HTML component editor: 
+.html-editor {
+  @include clearfix();
+
+  .CodeMirror {
+    @include box-sizing(border-box);
+    position: absolute;
+    top: 46px;
+    width: 100%;
+    height: 379px;
+    border: 1px solid #3c3c3c;
+    border-top: 1px solid #8891a1;
+    background: #fff;
+    color: #3c3c3c;
+  }
+
+  .CodeMirror-scroll {
+    height: 100%;
+  }
+
+  .editor-tabs {
+    top: 11px !important;
+    right: 10px;
+    z-index: 99;
+  }
+
+  .is-inactive {
+    display: none;
+  }
+}

@@ -1,0 +1,34 @@
+<%namespace name='static' file='static_content.html'/>
+<!DOCTYPE html>
+<html>
+<head>
+  <%block name="title"><title>edX</title></%block>
+
+  <link rel="icon" type="image/x-icon" href="${static.url('images/favicon.ico')}" />
+
+  <%static:css group='application'/>
+
+  <%static:js group='main_vendor'/>
+  <%block name="headextra"/>
+
+
+  <!--[if lt IE 9]>
+  <script src="${static.url('js/html5shiv.js')}"></script>
+  <![endif]-->
+
+  <!--[if lte IE 9]>
+  <%static:css group='ie-fixes'/>
+  <![endif]-->
+  <meta name="path_prefix" content="${MITX_ROOT_URL}">
+</head>
+
+<body class="<%block name='bodyclass'/>">
+  ${self.body()}
+  <%block name="bodyextra"/>
+
+  <%static:js group='application'/>
+  <%static:js group='module-js'/>
+
+  <%block name="js_extra"/>
+</body>
+</html>

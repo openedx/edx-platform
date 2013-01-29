@@ -1,23 +1,27 @@
-# Running the CMS
+# Development Tasks
 
-One can start the CMS by running `rake cms`. This will run the server on localhost
-port 8001.
+## Prerequisites
 
-However, the server also needs data to work from.
+### Ruby
 
-## Installing Mongodb
+To install all of the libraries needed for our rake commands, run `bundle install`.
+This will read the `Gemfile` and install all of the gems specified there.
 
-Please see http://www.mongodb.org/downloads for more detailed instructions.
+### Python
 
-### Ubuntu
+In order, run the following:
 
-    sudo apt-get install mongodb
+    pip install -r pre-requirements.txt
+    pip install -r requirements.txt
+    pip install -r test-requirements.txt
 
-### OSX
+### Binaries
 
-Use the MacPorts package `mongodb` or the Homebrew formula `mongodb`
+Install the following:
 
-## Initializing Mongodb
+* Mongodb (http://www.mongodb.org/)
+
+### Databases
 
 First start up the mongo daemon. E.g. to start it up in the background
 using a config file:
@@ -27,14 +31,31 @@ using a config file:
 Check out the course data directories that you want to work with into the
 `GITHUB_REPO_ROOT` (by default, `../data`). Then run the following command:
 
+    rake resetdb
 
-    rake django-admin[import,cms,dev,../data]
+## Starting development servers
 
-Replace `../data` with your `GITHUB_REPO_ROOT` if it's not the default value.
+Both the LMS and Studio can be started using the following shortcut tasks
 
-This will import all courses in your data directory into mongodb
+    rake lms  # Start the LMS
+    rake cms  # Start studio
+    rake lms[cms.dev]  # Start LMS to run alongside Studio
+    rake lms[cms.dev_preview]  # Start LMS to run alongside Studio in preview mode
 
-## Unit tests
+Under the hood, this executes `django-admin.py runserver --pythonpath=$WORKING_DIRECTORY --settings=lms.envs.dev`,
+which starts a local development server.
+
+Both of these commands take arguments to start the servers in different environments
+or with additional options:
+
+    # Start the LMS using the test configuration, on port 5000
+    rake lms[test,5000]  # Executes django-admin.py runserver --pythonpath=$WORKING_DIRECTORY --setings=lms.envs.test 5000
+
+*N.B.* You may have to escape the `[` characters, depending on your shell: `rake "lms[test,5000]"`
+
+## Running tests
+
+### Python Tests
 
 This runs all the tests (long, uses collectstatic):
 
@@ -51,10 +72,6 @@ or
 xmodule can be tested independently, with this:
 
     rake test_common/lib/xmodule
-
-To see all available rake commands, do this:
-
-    rake -T
 
 To run a single django test class:
 
@@ -75,6 +92,29 @@ To run a single nose test:
 
 
 Very handy: if you uncomment the `--pdb` argument in `NOSE_ARGS` in `lms/envs/test.py`, it will drop you into pdb on error.  This lets you go up and down the stack and see what the values of the variables are.  Check out http://docs.python.org/library/pdb.html
+
+
+### Javascript Tests
+
+These commands start a development server with jasmine testing enabled, and launch your default browser
+pointing to those tests
+
+    rake browse_jasmine_{lms,cms}
+
+To run the tests headless, you must install phantomjs (http://phantomjs.org/download.html).
+
+    rake phantomjs_jasmine_{lms,cms}
+
+If the `phantomjs` binary is not on the path, set the `PHANTOMJS_PATH` environment variable to point to it
+    
+    PHANTOMJS_PATH=/path/to/phantomjs rake phantomjs_jasmine_{lms,cms}
+
+
+## Getting More Information
+
+Run the following to see a list of all rake tasks available and their arguments
+
+    rake -T
 
 ## Testing using queue servers
 

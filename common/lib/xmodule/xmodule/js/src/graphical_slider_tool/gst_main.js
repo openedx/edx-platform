@@ -19,7 +19,7 @@ define(
         if ($('#' + gstId).attr('data-processed') !== 'processed') {
             $('#' + gstId).attr('data-processed', 'processed');
         } else {
-            logme('MESSAGE: Already processed GST with ID ' + gstId + '. Skipping.');
+            // logme('MESSAGE: Already processed GST with ID ' + gstId + '. Skipping.');
 
             return;
         }

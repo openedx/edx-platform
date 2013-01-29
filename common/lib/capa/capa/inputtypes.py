@@ -13,6 +13,9 @@ Module containing the problem elements which render into input objects
 - imageinput  (for clickable image)
 - optioninput (for option list)
 - filesubmission (upload a file)
+- crystallography
+- vsepr_input
+- drag_and_drop
 
 These are matched by *.html files templates/*.html which are mako templates with the
 actual html.
@@ -41,6 +44,7 @@ from lxml import etree
 import re
 import shlex  # for splitting quoted strings
 import sys
+import os
 
 from registry import TagRegistry
 
@@ -692,7 +696,7 @@ class VseprInput(InputTypeBase):
     @classmethod
     def get_attributes(cls):
         """
-        Note: height, width are required.
+        Note: height, width, molecules and geometries are required.
         """
         return [Attribute('height'),
                 Attribute('width'),
@@ -735,3 +739,93 @@ class ChemicalEquationInput(InputTypeBase):
 registry.register(ChemicalEquationInput)
 
 #-----------------------------------------------------------------------------
+
+class DragAndDropInput(InputTypeBase):
+    """
+    Input for drag and drop problems. Allows student to drag and drop images and
+    labels to base image.
+    """
+
+    template = 'drag_and_drop_input.html'
+    tags = ['drag_and_drop_input']
+
+    def setup(self):
+
+        def parse(tag, tag_type):
+            """Parses <tag ... /> xml element to dictionary. Stores
+                'draggable' and 'target' tags with attributes to dictionary and
+                returns last.
+
+                Args:
+                    tag: xml etree element <tag...> with attributes
+
+                    tag_type: 'draggable' or 'target'.
+
+                    If tag_type is 'draggable' : all attributes except id
+                    (name or label or icon or can_reuse) are optional
+
+                    If tag_type is 'target' all attributes (name, x, y, w, h)
+                    are required. (x, y) - coordinates of center of target,
+                    w, h - weight and height of target.
+
+                Returns:
+                    Dictionary of vaues of attributes:
+                    dict{'name': smth, 'label': smth, 'icon': smth,
+                    'can_reuse': smth}.
+            """
+            tag_attrs = dict()
+            tag_attrs['draggable'] = {'id': Attribute._sentinel,
+                                      'label': "", 'icon': "",
+                                      'can_reuse': ""}
+
+            tag_attrs['target'] = {'id': Attribute._sentinel,
+                                    'x': Attribute._sentinel,
+                                    'y': Attribute._sentinel,
+                                    'w': Attribute._sentinel,
+                                    'h': Attribute._sentinel}
+
+            dic = dict()
+
+            for attr_name in tag_attrs[tag_type].keys():
+                dic[attr_name] = Attribute(attr_name,
+                    default=tag_attrs[tag_type][attr_name]).parse_from_xml(tag)
+
+            if tag_type == 'draggable' and not self.no_labels:
+                dic['label'] = dic['label'] or dic['id']
+
+            return dic
+
+        # add labels to images?:
+        self.no_labels = Attribute('no_labels',
+                                        default="False").parse_from_xml(self.xml)
+
+        to_js = dict()
+
+        # image drag and drop onto
+        to_js['base_image'] = Attribute('img').parse_from_xml(self.xml)
+
+        # outline places on image where to drag adn drop
+        to_js['target_outline'] = Attribute('target_outline',
+                                        default="False").parse_from_xml(self.xml)
+        # one draggable per target?
+        to_js['one_per_target'] = Attribute('one_per_target',
+                                        default="True").parse_from_xml(self.xml)
+        # list of draggables
+        to_js['draggables'] = [parse(draggable, 'draggable') for draggable in
+                                                self.xml.iterchildren('draggable')]
+        # list of targets
+        to_js['targets'] = [parse(target, 'target') for target in
+                                                self.xml.iterchildren('target')]
+
+        # custom background color for labels:
+        label_bg_color = Attribute('label_bg_color',
+                                   default=None).parse_from_xml(self.xml)
+        if label_bg_color:
+            to_js['label_bg_color'] = label_bg_color
+
+        self.loaded_attributes['drag_and_drop_json'] = json.dumps(to_js)
+        self.to_render.add('drag_and_drop_json')
+
+registry.register(DragAndDropInput)
+
+#--------------------------------------------------------------------------------------------------------------------

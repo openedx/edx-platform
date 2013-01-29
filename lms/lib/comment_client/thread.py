@@ -10,12 +10,12 @@ class Thread(models.Model):
         'closed', 'tags', 'votes', 'commentable_id', 'username', 'user_id',
         'created_at', 'updated_at', 'comments_count', 'unread_comments_count',
         'at_position_list', 'children', 'type', 'highlighted_title',
-        'highlighted_body', 'endorsed', 'read'
+        'highlighted_body', 'endorsed', 'read', 'group_id'
     ]
 
     updatable_fields = [
         'title', 'body', 'anonymous', 'anonymous_to_peers', 'course_id',
-        'closed', 'tags', 'user_id', 'commentable_id',
+        'closed', 'tags', 'user_id', 'commentable_id', 'group_id'
     ]
 
     initializable_fields = updatable_fields

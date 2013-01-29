@@ -31,7 +31,7 @@ class @VideoPlayer extends Subview
         el: @el
         youtubeId: @video.youtubeId('1.0')
         currentSpeed: @currentSpeed()
-        captionDataDir: @video.caption_data_dir
+        captionAssetPath: @video.caption_asset_path
     unless onTouchBasedDevice()
       @volumeControl = new VideoVolumeControl el: @$('.secondary-controls')
     @speedControl = new VideoSpeedControl el: @$('.secondary-controls'), speeds: @video.speeds, currentSpeed: @currentSpeed()
@@ -45,6 +45,7 @@ class @VideoPlayer extends Subview
       modestbranding: 1
     if @video.start
       @playerVars.start = @video.start
+      @playerVars.wmode = 'window'
     if @video.end
       # work in AS3, not HMLT5. but iframe use AS3
       @playerVars.end = @video.end

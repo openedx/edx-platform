@@ -2,6 +2,7 @@ from collections import defaultdict
 import logging
 import time
 import urllib
+from datetime import datetime
 
 from django.contrib.auth.models import User
 from django.core.urlresolvers import reverse
@@ -63,22 +64,19 @@ def get_discussion_id_map(course):
         return a dict of the form {category: modules}
     """
     global _DISCUSSIONINFO
-    if not _DISCUSSIONINFO[course.id]:
-        initialize_discussion_info(course)
+    initialize_discussion_info(course)
     return _DISCUSSIONINFO[course.id]['id_map']
 
 def get_discussion_title(course, discussion_id):
     global _DISCUSSIONINFO
-    if not _DISCUSSIONINFO[course.id]:
-        initialize_discussion_info(course)
+    initialize_discussion_info(course)
     title = _DISCUSSIONINFO[course.id]['id_map'].get(discussion_id, {}).get('title', '(no title)')
     return title
 
 def get_discussion_category_map(course):
 
     global _DISCUSSIONINFO
-    if not _DISCUSSIONINFO[course.id]:
-        initialize_discussion_info(course)
+    initialize_discussion_info(course)
     return filter_unstarted_categories(_DISCUSSIONINFO[course.id]['category_map'])
 
 def filter_unstarted_categories(category_map):
@@ -127,39 +125,50 @@ def sort_map_entries(category_map):
         sort_map_entries(category_map["subcategories"][title])
     category_map["children"] = [x[0] for x in sorted(things, key=lambda x: x[1]["sort_key"])]
 
+
 def initialize_discussion_info(course):
 
     global _DISCUSSIONINFO
+
+    # only cache in-memory discussion information for 10 minutes
+    # this is because we need a short-term hack fix for
+    # mongo-backed courseware whereby new discussion modules can be added
+    # without LMS service restart
+
     if _DISCUSSIONINFO[course.id]:
-        return
+        timestamp = _DISCUSSIONINFO[course.id].get('timestamp', datetime.now())
+        age = datetime.now() - timestamp
+        # expire every 5 minutes
+        if age.seconds < 300:
+            return
 
     course_id = course.id
-    all_modules = get_full_modules()[course_id]
 
     discussion_id_map = {}
-
     unexpanded_category_map = defaultdict(list)
 
-    for location, module in all_modules.items():
-        if location.category == 'discussion':
-            skip_module = False
-            for key in ('id', 'discussion_category', 'for'):
-                if key not in module.metadata:
-                    log.warning("Required key '%s' not in discussion %s, leaving out of category map" % (key, module.location))
-                    skip_module = True
+    # get all discussion models within this course_id
+    all_modules = modulestore().get_items(['i4x', course.location.org, course.location.course, 'discussion', None], course_id=course_id)
 
-            if skip_module:
-                continue
+    for module in all_modules:
+        skip_module = False
+        for key in ('id', 'discussion_category', 'for'):
+            if key not in module.metadata:
+                log.warning("Required key '%s' not in discussion %s, leaving out of category map" % (key, module.location))
+                skip_module = True
 
-            id = module.metadata['id']
-            category = module.metadata['discussion_category']
-            title = module.metadata['for']
-            sort_key = module.metadata.get('sort_key', title)
-            category = " / ".join([x.strip() for x in category.split("/")])
-            last_category = category.split("/")[-1]
-            discussion_id_map[id] = {"location": location, "title": last_category + " / " + title}
-            unexpanded_category_map[category].append({"title": title, "id": id,
-                "sort_key": sort_key, "start_date": module.start})
+        if skip_module:
+            continue
+
+        id = module.metadata['id']
+        category = module.metadata['discussion_category']
+        title = module.metadata['for']
+        sort_key = module.metadata.get('sort_key', title)
+        category = " / ".join([x.strip() for x in category.split("/")])
+        last_category = category.split("/")[-1]
+        discussion_id_map[id] = {"location": module.location, "title": last_category + " / " + title}
+        unexpanded_category_map[category].append({"title": title, "id": id,
+            "sort_key": sort_key, "start_date": module.start})
 
     category_map = {"entries": defaultdict(dict), "subcategories": defaultdict(dict)}
     for category_path, entries in unexpanded_category_map.items():
@@ -198,6 +207,9 @@ def initialize_discussion_info(course):
                                                       "sort_key": entry["sort_key"],
                                                       "start_date": entry["start_date"]}
 
+    # TODO.  BUG! : course location is not unique across multiple course runs!
+    # (I think Kevin already noticed this)  Need to send course_id with requests, store it
+    # in the backend.
     default_topics = {'General': {'id' :course.location.html_id()}}
     discussion_topics = course.metadata.get('discussion_topics', default_topics)
     for topic, entry in discussion_topics.items():
@@ -208,6 +220,7 @@ def initialize_discussion_info(course):
 
     _DISCUSSIONINFO[course.id]['id_map'] = discussion_id_map
     _DISCUSSIONINFO[course.id]['category_map'] = category_map
+    _DISCUSSIONINFO[course.id]['timestamp'] = datetime.now()
 
 class JsonResponse(HttpResponse):
     def __init__(self, data=None):

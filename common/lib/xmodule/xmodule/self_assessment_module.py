@@ -122,7 +122,7 @@ class SelfAssessmentModule(openendedchild.OpenEndedChild):
         if self.state == self.INITIAL:
             return ''
 
-        rubric_html  = CombinedOpenEndedRubric.render_rubric(self.rubric)
+        rubric_html  = CombinedOpenEndedRubric.render_rubric(self.rubric, system)
 
         # we'll render it
         context = {'rubric': rubric_html,
@@ -147,7 +147,7 @@ class SelfAssessmentModule(openendedchild.OpenEndedChild):
 
         if self.state == self.DONE:
             # display the previous hint
-            latest = self.latest_post_assessment()
+            latest = self.latest_post_assessment(system)
             hint = latest if latest is not None else ''
         else:
             hint = ''
@@ -283,6 +283,7 @@ class SelfAssessmentDescriptor(XmlDescriptor, EditingDescriptor):
 
     js = {'coffee': [resource_string(__name__, 'js/src/html/edit.coffee')]}
     js_module_name = "HTMLEditingDescriptor"
+    css = {'scss': [resource_string(__name__, 'css/editor/edit.scss'), resource_string(__name__, 'css/html/edit.scss')]}
 
     @classmethod
     def definition_from_xml(cls, xml_object, system):

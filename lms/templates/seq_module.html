@@ -8,7 +8,9 @@
         ## implementation note: will need to figure out how to handle combining detail
         ## statuses of multiple modules in js.
         <li>
-          <a class="seq_${item['type']} inactive progress-${item['progress_status']}" data-element="${idx+1}">
+        <a class="seq_${item['type']} inactive progress-${item['progress_status']}"
+           data-id="${item['id']}"
+           data-element="${idx+1}">
             <p>${item['title']}</p>
           </a>
         </li>

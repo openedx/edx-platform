@@ -1,0 +1,23 @@
+<%inherit file="base.html" />
+<%! from django.core.urlresolvers import reverse %>
+<%block name="bodyclass">error</%block>
+<%block name="title">
+  % if error == '404':
+    404 - Page Not Found
+  % elif error == '500':
+    500 - Internal Server Error
+  % endif
+</%block>
+
+<%block name="content">
+  <article class="error-prompt">
+    % if error == '404':
+      <h1>Hmm…</h1>
+      <p class="description">we can't find that page.</p>
+    % elif error == '500':      
+      <h1>Oops…</h1>
+      <p class="description">there was a problem with the server.</p>
+    % endif    
+    <a href="/" class="back-button">Back to dashboard</a>
+  </article>
+</%block>

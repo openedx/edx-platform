@@ -33,7 +33,7 @@ from correctmap import CorrectMap
 from datetime import datetime
 from util import *
 from lxml import etree
-from lxml.html.soupparser import fromstring as fromstring_bs	 # uses Beautiful Soup!!! FIXME?
+from lxml.html.soupparser import fromstring as fromstring_bs     # uses Beautiful Soup!!! FIXME?
 import xqueue_interface
 
 log = logging.getLogger('mitx.' + __name__)
@@ -101,7 +101,6 @@ class LoncapaResponse(object):
 
       - hint_tag             : xhtml tag identifying hint associated with this response inside
                                hintgroup
-
     """
     __metaclass__ = abc.ABCMeta  # abc = Abstract Base Class
 
@@ -185,6 +184,11 @@ class LoncapaResponse(object):
         '''
         # render ourself as a <span> + our content
         tree = etree.Element('span')
+
+        # problem author can make this span display:inline
+        if self.xml.get('inline',''):
+            tree.set('class','inline')
+            
         for item in self.xml:
             # call provided procedure to do the rendering
             item_xhtml = renderer(item)
@@ -869,7 +873,9 @@ def sympy_check2():
 
     response_tag = 'customresponse'
 
-    allowed_inputfields = ['textline', 'textbox', 'crystallography', 'chemicalequationinput', 'vsepr_input']
+    allowed_inputfields = ['textline', 'textbox', 'crystallography',
+                            'chemicalequationinput', 'vsepr_input',
+                            'drag_and_drop_input']
 
     def setup_response(self):
         xml = self.xml
@@ -1044,7 +1050,7 @@ def sympy_check2():
                                          pretty_print=True)
                     #msg = etree.tostring(fromstring_bs(msg),pretty_print=True)
                     msg = msg.replace('&#13;', '')
-                    #msg = re.sub('<html>(.*)</html>','\\1',msg,flags=re.M|re.DOTALL)	# python 2.7
+                    #msg = re.sub('<html>(.*)</html>','\\1',msg,flags=re.M|re.DOTALL)   # python 2.7
                     msg = re.sub('(?ms)<html>(.*)</html>', '\\1', msg)
 
                 messages[0] = msg
@@ -1141,7 +1147,13 @@ class CodeResponse(LoncapaResponse):
         xml = self.xml
         # TODO: XML can override external resource (grader/queue) URL
         self.url = xml.get('url', None)
-        self.queue_name = xml.get('queuename', self.system.xqueue['default_queuename'])
+
+        # We do not support xqueue within Studio.
+        if self.system.xqueue is not None:
+            default_queuename = self.system.xqueue['default_queuename']
+        else:
+            default_queuename = None
+        self.queue_name = xml.get('queuename', default_queuename)
 
         # VS[compat]:
         #   Check if XML uses the ExternalResponse format or the generic CodeResponse format
@@ -1229,6 +1241,13 @@ class CodeResponse(LoncapaResponse):
                       ' student_answers=%s' %
                 (err, self.answer_id, convert_files_to_filenames(student_answers)))
             raise Exception(err)
+
+        # We do not support xqueue within Studio.
+        if self.system.xqueue is None:
+            cmap = CorrectMap()
+            cmap.set(self.answer_id, queuestate=None,
+                msg='Error checking problem: no external queueing server is configured.')
+            return cmap
 
         # Prepare xqueue request
         #------------------------------------------------------------
@@ -1763,7 +1782,7 @@ class ImageResponse(LoncapaResponse):
     def get_score(self, student_answers):
         correct_map = CorrectMap()
         expectedset = self.get_answers()
-        for aid in self.answer_ids:	 # loop through IDs of <imageinput>
+        for aid in self.answer_ids:  # loop through IDs of <imageinput>
         #  fields in our stanza
             given = student_answers[aid]  # this should be a string of the form '[x,y]'
             correct_map.set(aid, 'incorrect')
@@ -1815,6 +1834,7 @@ class ImageResponse(LoncapaResponse):
         return (dict([(ie.get('id'), ie.get('rectangle')) for ie in self.ielements]),
                 dict([(ie.get('id'), ie.get('regions')) for ie in self.ielements]))
 #-----------------------------------------------------------------------------
+
 # TEMPORARY: List of all response subclasses
 # FIXME: To be replaced by auto-registration
 
