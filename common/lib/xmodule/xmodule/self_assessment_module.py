@@ -75,7 +75,7 @@ class SelfAssessmentModule(openendedchild.OpenEndedChild):
             'previous_answer': previous_answer,
             'ajax_url': system.ajax_url,
             'initial_rubric': self.get_rubric_html(system),
-            'initial_hint': self.get_hint_html(system),
+            'initial_hint': "",
             'initial_message': self.get_message_html(),
             'state': self.state,
             'allow_reset': self._allow_reset(),
@@ -122,7 +122,8 @@ class SelfAssessmentModule(openendedchild.OpenEndedChild):
         if self.state == self.INITIAL:
             return ''
 
-        rubric_html  = CombinedOpenEndedRubric.render_rubric(self.rubric, system)
+        rubric_renderer = CombinedOpenEndedRubric(system, True)
+        rubric_html  = rubric_renderer.render_rubric(self.rubric)
 
         # we'll render it
         context = {'rubric': rubric_html,
@@ -235,13 +236,9 @@ class SelfAssessmentModule(openendedchild.OpenEndedChild):
 
         d = {'success': True, }
 
-        if score == self.max_score():
-            self.change_state(self.DONE)
-            d['message_html'] = self.get_message_html()
-            d['allow_reset'] = self._allow_reset()
-        else:
-            self.change_state(self.POST_ASSESSMENT)
-            d['hint_html'] = self.get_hint_html(system)
+        self.change_state(self.DONE)
+        d['message_html'] = self.get_message_html()
+        d['allow_reset'] = self._allow_reset()
 
         d['state'] = self.state
         return d
