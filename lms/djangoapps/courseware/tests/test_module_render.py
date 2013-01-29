@@ -107,8 +107,7 @@ class ModuleRenderTestCase(PageLoader):
         mock_user_2 = MagicMock(User)
         mock_user_2.is_authenticated.return_value = True
         
-        mock_module = MagicMock()
-        mock_module.shared_state_key = 'key'
+        mock_module = MagicMock(shared_state_key = 'key')
         mock_module.location = Location('i4x', 'edX', 'toy', 'chapter', 'Overview')
         mock_module.get_shared_state.return_value = '{}'
         mock_cache = MagicMock()
@@ -197,11 +196,9 @@ class ModuleRenderTestCase(PageLoader):
         # keep going
         
     def test_preview_chemcalc(self):
-        mock_request = MagicMock()
-        mock_request.method = 'notGET'
+        mock_request = MagicMock(method = 'notGET')
         self.assertRaises(Http404, render.preview_chemcalc, mock_request)
-        mock_request_2 = MagicMock()
-        mock_request_2.method = 'GET'
+        mock_request_2 = MagicMock(method = 'GET')
         mock_request_2.GET.get.return_value = None
         self.assertEquals(render.preview_chemcalc(mock_request_2).content,
                           json.dumps({'preview':'',
