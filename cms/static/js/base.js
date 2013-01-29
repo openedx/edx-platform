@@ -87,7 +87,10 @@ $(document).ready(function() {
     $('.unit').draggable({
     	axis: 'y',
     	handle: '.drag-handle',
-    	stack: '.unit',  
+    	zIndex: 999,  
+    	start: initiateHesitate,
+    	drag: checkHoverState,
+    	stop: removeHesitate,
     	revert: "invalid"
     });
     
@@ -95,7 +98,10 @@ $(document).ready(function() {
     $('.id-holder').draggable({
     	axis: 'y',
     	handle: '.section-item .drag-handle',
-    	stack: '.id-holder',
+    	zIndex: 999,  
+    	start: initiateHesitate,
+    	drag: checkHoverState,
+    	stop: removeHesitate,
     	revert: "invalid"
     });
     
@@ -179,10 +185,12 @@ function toggleSections(e) {
 
   if($button.hasClass('is-activated')) {
       $section.addClass('collapsed');
-      $section.find('.expand-collapse-icon').removeClass('collapsed').addClass('expand');
+      // first child in order to avoid the icons on the subsection lists which are not in the first child 
+      $section.find('header .expand-collapse-icon').removeClass('collapse').addClass('expand');
   } else {
       $section.removeClass('collapsed');
-      $section.find('.expand-collapse-icon').removeClass('expand').addClass('collapse');
+      // first child in order to avoid the icons on the subsection lists which are not in the first child 
+      $section.find('header .expand-collapse-icon').removeClass('expand').addClass('collapse');
   }
 }
 
@@ -271,9 +279,67 @@ function removePolicyMetadata(e) {
     saveSubsection()
 }
 
+CMS.HesitateEvent.toggleXpandHesitation = null;
+function initiateHesitate(event, ui) {
+	CMS.HesitateEvent.toggleXpandHesitation = new CMS.HesitateEvent(expandSection, 'dragLeave', true);
+	$('.collapsed').on('dragEnter', CMS.HesitateEvent.toggleXpandHesitation, CMS.HesitateEvent.toggleXpandHesitation.trigger);
+	$('.collapsed').each(function() {
+		this.proportions = {width : this.offsetWidth, height : this.offsetHeight };
+		// reset b/c these were holding values from aborts
+		this.isover = false;
+	});
+}
+function checkHoverState(event, ui) {
+	// copied from jquery.ui.droppable.js $.ui.ddmanager.drag & other ui.intersect
+	var draggable = $(this).data("ui-draggable"),
+		x1 = (draggable.positionAbs || draggable.position.absolute).left + (draggable.helperProportions.width / 2), 
+		y1 = (draggable.positionAbs || draggable.position.absolute).top + (draggable.helperProportions.height / 2);
+	$('.collapsed').each(function() {
+		// don't expand the thing being carried
+		if (ui.helper.is(this)) {
+			return;
+		}
+		
+		$.extend(this, {offset : $(this).offset()});
+
+		var droppable = this,
+			l = droppable.offset.left, 
+			r = l + droppable.proportions.width,
+			t = droppable.offset.top, 
+			b = t + droppable.proportions.height;
+		
+		if (l === r) {
+			// probably wrong values b/c invisible at the time of caching
+			droppable.proportions = { width : droppable.offsetWidth, height : droppable.offsetHeight };
+			r = l + droppable.proportions.width;
+			b = t + droppable.proportions.height;
+		}
+		// equivalent to the intersects test
+		var intersects = (l < x1  && // Right Half
+					x1  < r && // Left Half
+					t < y1 && // Bottom Half
+					y1  < b ), // Top Half
+
+			c = !intersects && this.isover ? "isout" : (intersects && !this.isover ? "isover" : null);
+			
+		if(!c) {
+			return;
+		}
+
+		this[c] = true;
+		this[c === "isout" ? "isover" : "isout"] = false;
+		$(this).trigger(c === "isover" ? "dragEnter" : "dragLeave");
+	});
+}
+function removeHesitate(event, ui) {
+	$('.collapsed').off('dragEnter', CMS.HesitateEvent.toggleXpandHesitation.trigger);
+	CMS.HesitateEvent.toggleXpandHesitation = null;
+}
+
 function expandSection(event) {
-	$(event.delegateTarget).removeClass('collapsed'); 
-	$(event.delegateTarget).find('.expand-collapse-icon').removeClass('expand').addClass('collapse');
+	$(event.delegateTarget).removeClass('collapsed', 400); 
+	// don't descend to icon's on children (which aren't under first child) only to this element's icon
+	$(event.delegateTarget).children().first().find('.expand-collapse-icon').removeClass('expand', 400).addClass('collapse');
 }
 
 function onUnitReordered(event, ui) {
