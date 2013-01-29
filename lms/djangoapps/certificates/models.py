@@ -92,7 +92,7 @@ def certificate_status_for_student(student, course_id):
     deleted      - The certificate has been deleted.
     downloadable - The certificate is available for download.
     notpassing   - The student was graded but is not passing
-    restricted   - The student is on the restricted embargo list and 
+    restricted   - The student is on the restricted embargo list and
                    should not be issued a certificate. This will
                    be set if allow_certificate is set to False in
                    the userprofile table
