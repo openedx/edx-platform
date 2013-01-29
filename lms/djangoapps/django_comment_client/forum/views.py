@@ -11,7 +11,7 @@ from django.contrib.auth.models import User
 
 from mitxmako.shortcuts import render_to_response, render_to_string
 from courseware.courses import get_course_with_access
-from course_groups.cohorts import get_cohort_id
+from course_groups.cohorts import get_cohort_id, get_course_cohorts
 from courseware.access import has_access
 
 from urllib import urlencode
@@ -166,6 +166,7 @@ def forum_form_discussion(request, course_id):
             'category_map': category_map,
             'roles': saxutils.escape(json.dumps(utils.get_role_ids(course_id)), escapedict),
             'is_moderator': cached_has_permission(request.user, "see_all_cohorts", course_id),
+            'cohorts': get_course_cohorts
         }
         # print "start rendering.."
         return render_to_response('discussion/index.html', context)

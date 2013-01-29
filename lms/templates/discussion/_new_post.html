@@ -45,13 +45,15 @@
                     %elif course.metadata.get("allow_anonymous_to_peers", False):
                         <input type="checkbox" name="anonymous_to_peers" class="discussion-anonymous-to-peers" id="new-post-anonymous-to-peers"><label for="new-post-anonymous-to-peers">post anonymously to classmates</label>
                     %endif
-                    % if true:
+                    % if is_moderator:
                     <div class="form-group-label">
                         Make visible to:
                         <select class="group-filter-select"> 
-                            <option value="all">All Groups</option>
+                            <option >All Groups</option>
+                            %for c in cohorts:
                             <option value="g1">Group 1</option>
-                            <option value="g2">Group 2</option>
+                            %endfor
+
                         </select>
                     </div>
                     %endif
