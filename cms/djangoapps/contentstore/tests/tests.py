@@ -350,6 +350,34 @@ class ContentStoreTest(TestCase):
     def test_edit_unit_full(self):
         self.check_edit_unit('full')
 
+    def test_static_tab_reordering(self):
+        import_from_xml(modulestore(), 'common/test/data/', ['full'])
+        
+        # reverse the ordering
+        tabs = { 'tabs' :  ['i4x://edX/full/static_tab/resources', 'i4x://edX/full/static_tab/syllabus'] }       
+        resp = self.client.post(reverse('reorder_tabs'), json.dumps(tabs), "application/json")
+
+        ms = modulestore('direct')
+        course = ms.get_item(Location(['i4x','edX','full','course','6.002_Spring_2012', None]))
+        # compare to make sure that the tabs information is in the expected order after the server call
+
+        resource_idx = 0
+        syllabus_idx = 0
+        idx = 0
+        for tab in course.tabs:
+            if tab['type'] == 'static_tab':
+                if tab['url_slug'] == 'resources':
+                    resource_idx = idx
+                elif tab['url_slug'] == 'syllabus':
+                    syllabus_idx = idx
+            idx+=1
+
+        self.assertLess(resource_idx, syllabus_idx)
+
+
+
+
+
     def test_about_overrides(self):
         '''
         This test case verifies that a course can use specialized override for about data, e.g. /about/Fall_2012/effort.html 

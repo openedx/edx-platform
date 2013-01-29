@@ -908,7 +908,6 @@ def edit_static(request, org, course, coursename):
 @expect_json
 def reorder_tabs(request):
     tabs = request.POST['tabs']
-    logging.debug('tabs = {0}  {1}'.format(tabs.__class__, tabs))
 
     if len(tabs) > 0:
         course = get_course_for_item(tabs[0])
