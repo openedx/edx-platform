@@ -248,8 +248,8 @@ def _get_module(user, request, descriptor, student_module_cache, course_id,
                           # by the replace_static_urls code below
                           replace_urls=partial(
                               replace_urls,
-                              staticfiles_prefix='/static/' + module.metadata.get('data_dir', ''),
-                              course_namespace=module.location._replace(category=None, name=None),
+                              staticfiles_prefix='/static/' + descriptor.metadata.get('data_dir', ''),
+                              course_namespace=descriptor.location._replace(category=None, name=None),
                           ),
                           node_path=settings.NODE_PATH,
                           anonymous_student_id=unique_id_for_user(user),
