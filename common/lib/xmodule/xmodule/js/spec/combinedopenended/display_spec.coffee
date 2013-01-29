@@ -12,4 +12,5 @@ xdescribe 'CombinedOpenEnded', ->
       it 'set the element', ->
         except(@combined.element).not.toEqual @element
 
-      #it 'initialize the ajax url, state, and task count'
+      #it 'initialize the ajax url, state, and task count', ->
+
