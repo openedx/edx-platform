@@ -617,7 +617,6 @@ class CombinedOpenEndedModule(XModule):
 
         return progress_object
 
-
 class CombinedOpenEndedDescriptor(XmlDescriptor, EditingDescriptor):
     """
     Module for adding combined open ended questions
