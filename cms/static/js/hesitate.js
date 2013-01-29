@@ -18,7 +18,7 @@ CMS.HesitateEvent = function(executeOnTimeOut, cancelSelector, onlyOnce) {
 	this.timeoutEventId = null;
 	this.originalEvent = null;
 	this.onlyOnce = (onlyOnce === true);
-}
+};
 
 CMS.HesitateEvent.DURATION = 800;
 
@@ -28,17 +28,16 @@ CMS.HesitateEvent.prototype.trigger = function(event) {
 				function() { event.data.fireEvent(event); }, 
 				CMS.HesitateEvent.DURATION);
 		event.data.originalEvent = event;
-		// is it wrong to bind to the below v $(event.currentTarget)?
 		$(event.data.originalEvent.delegateTarget).on(event.data.cancelSelector, event.data, event.data.untrigger);
 	}
-}
+};
 
 CMS.HesitateEvent.prototype.fireEvent = function(event) {
 	event.data.timeoutEventId = null;
 	$(event.data.originalEvent.delegateTarget).off(event.data.cancelSelector, event.data.untrigger);
 	if (event.data.onlyOnce) $(event.data.originalEvent.delegateTarget).off(event.data.originalEvent.type, event.data.trigger);
 	event.data.executeOnTimeOut(event.data.originalEvent);
-}
+};
 
 CMS.HesitateEvent.prototype.untrigger = function(event) {
 	if (event.data.timeoutEventId) {
@@ -46,4 +45,4 @@ CMS.HesitateEvent.prototype.untrigger = function(event) {
 		$(event.data.originalEvent.delegateTarget).off(event.data.cancelSelector, event.data.untrigger);
 	}
 	event.data.timeoutEventId = null;
-}
+};

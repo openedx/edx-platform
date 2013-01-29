@@ -87,7 +87,7 @@ $(document).ready(function() {
     $('.unit').draggable({
     	axis: 'y',
     	handle: '.drag-handle',
-    	stack: '.unit, .id-holder',  
+    	zIndex: 999,  
     	start: initiateHesitate,
     	drag: checkHoverState,
     	stop: removeHesitate,
@@ -98,7 +98,7 @@ $(document).ready(function() {
     $('.id-holder').draggable({
     	axis: 'y',
     	handle: '.section-item .drag-handle',
-    	stack: '.id-holder',
+    	zIndex: 999,  
     	start: initiateHesitate,
     	drag: checkHoverState,
     	stop: removeHesitate,
@@ -339,7 +339,7 @@ function removeHesitate(event, ui) {
 function expandSection(event) {
 	$(event.delegateTarget).removeClass('collapsed', 400); 
 	// don't descend to icon's on children (which aren't under first child) only to this element's icon
-	$(event.delegateTarget).children().first().find('.expand-collapse-icon').removeClass('expand', 400).addClass('collapse', 400);
+	$(event.delegateTarget).children().first().find('.expand-collapse-icon').removeClass('expand', 400).addClass('collapse');
 }
 
 function onUnitReordered(event, ui) {
