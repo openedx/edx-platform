@@ -164,31 +164,29 @@ class XQueueCertInterface(object):
 
             if is_whitelisted or grade['grade'] is not None:
 
-                # check to see whether the student is on the
-                # the embargoed country restricted list
-                if self.restricted.filter(user=student).exists():
-                    cert.status = status.restricted
-                    cert.save()
-                    return cert.status
-
-                cert_status = status.generating
                 key = make_hashkey(random.random())
 
-                cert.status = cert_status
                 cert.grade = grade['percent']
                 cert.user = student
                 cert.course_id = course_id
                 cert.key = key
                 cert.name = profile.name
 
-                contents = {
-                    'action': 'create',
-                    'username': student.username,
-                    'course_id': course_id,
-                    'name': profile.name,
-                }
-
-                self._send_to_xqueue(contents, key)
+                # check to see whether the student is on the
+                # the embargoed country restricted list
+                # otherwise, put a new certificate request
+                # on the queue
+                if self.restricted.filter(user=student).exists():
+                    cert.status = status.restricted
+                else:
+                    contents = {
+                        'action': 'create',
+                        'username': student.username,
+                        'course_id': course_id,
+                        'name': profile.name,
+                    }
+                    cert.status = status.generating
+                    self._send_to_xqueue(contents, key)
                 cert.save()
             else:
                 cert_status = status.notpassing
