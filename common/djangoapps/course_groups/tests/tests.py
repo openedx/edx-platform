@@ -10,6 +10,25 @@ from course_groups.cohorts import (get_cohort, get_course_cohorts,
 
 from xmodule.modulestore.django import modulestore, _MODULESTORES
 
+# NOTE: running this with the lms.envs.test config works without
+# manually overriding the modulestore.  However, running with
+# cms.envs.test doesn't.  
+
+def xml_store_config(data_dir):
+    return {
+    'default': {
+        'ENGINE': 'xmodule.modulestore.xml.XMLModuleStore',
+        'OPTIONS': {
+            'data_dir': data_dir,
+            'default_class': 'xmodule.hidden_module.HiddenDescriptor',
+        }
+    }
+}
+
+TEST_DATA_DIR = settings.COMMON_TEST_DATA_ROOT
+TEST_DATA_XML_MODULESTORE = xml_store_config(TEST_DATA_DIR)
+
+@override_settings(MODULESTORE=TEST_DATA_XML_MODULESTORE)
 class TestCohorts(django.test.TestCase):
 
 
@@ -77,7 +96,7 @@ class TestCohorts(django.test.TestCase):
         course = modulestore().get_course("edX/toy/2012_Fall")
         self.assertEqual(course.id, "edX/toy/2012_Fall")
         self.assertFalse(course.is_cohorted)
-        
+
         user = User.objects.create(username="test", email="a@b.com")
         other_user = User.objects.create(username="test2", email="a2@b.com")
 
