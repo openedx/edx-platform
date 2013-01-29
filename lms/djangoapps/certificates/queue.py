@@ -159,10 +159,10 @@ class XQueueCertInterface(object):
                    user=student, course_id=course_id)
 
             grade = grades.grade(student, self.request, course)
-            whitelist = self.whitelist.filter(
+            is_whitelisted = self.whitelist.filter(
                 user=student, course_id=course_id, whitelist=True).exists()
 
-            if whitelist or grade['grade'] is not None:
+            if is_whitelisted or grade['grade'] is not None:
 
                 # check to see whether the student is on the
                 # the embargoed country restricted list
