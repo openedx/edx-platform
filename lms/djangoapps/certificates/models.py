@@ -50,6 +50,13 @@ class CertificateStatuses(object):
     error = 'error'
 
 class CertificateWhitelist(models.Model):
+    """
+    Tracks students who are whitelisted, all users
+    in this table will always qualify for a certificate
+    regardless of their grade unless they are on the
+    embargoed country restriction list
+    (allow_certificate set to False in userprofile).
+    """
     user = models.ForeignKey(User)
     course_id = models.CharField(max_length=255, blank=True, default='')
     whitelist = models.BooleanField(default=0)
