@@ -247,7 +247,7 @@ def remap_namespace(module, target_location_namespace):
 
     return module
 
-def validate_category_hierarcy(module_store, course_id, parent_category, expected_child_category):
+def validate_category_hierarchy(module_store, course_id, parent_category, expected_child_category):
     err_cnt = 0
 
     parents = []
@@ -324,11 +324,18 @@ def perform_xlint(data_dir, course_dirs,
 
     for course_id in module_store.modules.keys():
         # constrain that courses only have 'chapter' children
-        err_cnt += validate_category_hierarcy(module_store, course_id, "course", "chapter")
+        err_cnt += validate_category_hierarchy(module_store, course_id, "course", "chapter")
         # constrain that chapters only have 'sequentials'
-        err_cnt += validate_category_hierarcy(module_store, course_id, "chapter", "sequential")
+        err_cnt += validate_category_hierarchy(module_store, course_id, "chapter", "sequential")
         # constrain that sequentials only have 'verticals'
-        err_cnt += validate_category_hierarcy(module_store, course_id, "sequential", "vertical")
+        err_cnt += validate_category_hierarchy(module_store, course_id, "sequential", "vertical")
+
+        # check for a presence of a course marketing video
+        location_elements = course_id.split('/')
+        if Location(['i4x', location_elements[0], location_elements[1], 'about', 'video', None]) not in module_store.modules[course_id]:
+            print "WARN: Missing course marketing video. It is recommended that every course have a marketing video."
+            warn_cnt += 1
+
 
     print "\n\n------------------------------------------\nVALIDATION SUMMARY: {0} Errors   {1} Warnings\n".format(err_cnt, warn_cnt)
 
