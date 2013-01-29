@@ -134,7 +134,7 @@ class XQueueCertInterface(object):
         If a student has allow_certificate set to False in the
         userprofile table the status will change to 'restricted'
 
-       
+
         If a student does not have a passing grade the status
         will change to status.notpassing
 
@@ -148,7 +148,7 @@ class XQueueCertInterface(object):
 
         cert_status = certificate_status_for_student(
                               student, course_id)['status']
-         
+
         if cert_status in VALID_STATUSES:
             # grade the student
             course = courses.get_course_by_id(course_id)
