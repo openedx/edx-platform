@@ -9,14 +9,12 @@ class Command(BaseCommand):
 
     help = """
     Sets or gets certificate restrictions for users
-    from embargoed countries.
-
-    Import a list of students to restrict certificate download
-    by setting "allow_certificate" to True in userprofile:
-
-        $ ... cert_restriction --import path/to/userlist.csv
+    from embargoed countries. (allow_certificate in
+    userprofile)
 
     CSV should be comma delimited with double quoted entries.
+
+        $ ... cert_restriction --import path/to/userlist.csv
 
     Export a list of students who have "allow_certificate" in
     userprofile set to True
@@ -50,7 +48,6 @@ class Command(BaseCommand):
     )
 
     def handle(self, *args, **options):
-
         if options['output']:
 
             if os.path.exists(options['output']):
@@ -63,33 +60,34 @@ class Command(BaseCommand):
                 csvwriter = csv.writer(csvfile, delimiter=',', quotechar='"',
                                        quoting=csv.QUOTE_MINIMAL)
                 for user in disabled_users:
-                    csvwriter.writerow([user.username])
+                    csvwriter.writerow([user.user.username])
 
-        elif options['input']:
+        elif options['import']:
 
-            if not os.path.exists(options['input']):
+            if not os.path.exists(options['import']):
                 raise CommandError("File {0} does not exist".format(
-                    options['input']))
+                    options['import']))
 
-            print "Importing students from {0}".format(options['input'])
+            print "Importing students from {0}".format(options['import'])
 
             students = None
-            with open(options['input']) as csvfile:
+            with open(options['import']) as csvfile:
                 student_list = csv.reader(csvfile, delimiter=',',
                                           quotechar='"')
                 students = [student[0] for student in student_list]
             if not students:
                 raise CommandError(
                     "Unable to read student data from {0}".format(
-                        options['input']))
-            UserProfile.objects.filter(username__in=students).update(
+                        options['import']))
+            UserProfile.objects.filter(user__username__in=students).update(
                 allow_certificate=False)
 
         elif options['enable']:
 
             print "Enabling {0} for certificate download".format(
                 options['enable'])
-            cert_allow = UserProfile.objects.get(user=options['enable'])
+            cert_allow = UserProfile.objects.get(
+                user__username=options['enable'])
             cert_allow.allow_certificate = True
             cert_allow.save()
 
@@ -97,6 +95,7 @@ class Command(BaseCommand):
 
             print "Disabling {0} for certificate download".format(
                 options['disable'])
-            cert_allow = UserProfile.objects.get(user=options['disable'])
+            cert_allow = UserProfile.objects.get(
+                user__username=options['disable'])
             cert_allow.allow_certificate = False
             cert_allow.save()
