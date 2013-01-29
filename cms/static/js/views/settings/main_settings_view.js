@@ -55,7 +55,10 @@ CMS.Views.ValidatingView = Backbone.View.extend({
 		var newVal = $(event.currentTarget).val();
 		if (currentVal != newVal) {
 			this.clearValidationErrors();
-			this.model.save(field, newVal);
+			this.model.save(field, newVal, { error : function(model, error) {
+				// this handler is for the client:server communication not the vlidation errors which handleValidationError catches
+				if (error.responseText) window.alert("Error: " + error.responseText);
+			}});
 			return true;
 		}
 		else return false;
