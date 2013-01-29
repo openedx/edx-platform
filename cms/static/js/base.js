@@ -87,7 +87,7 @@ $(document).ready(function() {
     $('.unit').draggable({
     	axis: 'y',
     	handle: '.drag-handle',
-    	stack: '.unit',  
+    	stack: '.unit, .id-holder',  
     	start: initiateHesitate,
     	drag: checkHoverState,
     	stop: removeHesitate,
@@ -296,7 +296,9 @@ function checkHoverState(event, ui) {
 		y1 = (draggable.positionAbs || draggable.position.absolute).top + (draggable.helperProportions.height / 2);
 	$('.collapsed').each(function() {
 		// don't expand the thing being carried
-		if ($(draggable).is(this)) return;
+		if (ui.helper.is(this)) {
+			return;
+		}
 		
 		$.extend(this, {offset : $(this).offset()});
 
