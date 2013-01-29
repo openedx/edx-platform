@@ -117,12 +117,19 @@ urlpatterns = ('',
     url(r'^press/georgetown-joins-edx$', 'static_template_view.views.render',
         {'template': 'press_releases/Georgetown_joins_edX.html'}, name="press/georgetown-joins-edx"),
     url(r'^press/spring-courses$', 'static_template_view.views.render',
-        {'template': 'press_releases/Spring_2013_course_announcements.html'}, name="press/spring-courses"),
+        {'template': 'press_releases/Spring_2013_course_announcements.html'},
+        name="press/spring-courses"),
     url(r'^press/lewin-course-announcement$', 'static_template_view.views.render',
-        {'template': 'press_releases/Lewin_course_announcement.html'}, name="press/lewin-course-announcement"),
+        {'template': 'press_releases/Lewin_course_announcement.html'},
+        name="press/lewin-course-announcement"),
+    url(r'^press/bostonx-announcement$', 'static_template_view.views.render',
+        {'template': 'press_releases/bostonx_announcement.html'},
+        name="press/bostonx-announcement"),
+
 
     # Should this always update to point to the latest press release?
-    (r'^pressrelease$', 'django.views.generic.simple.redirect_to', {'url': '/press/lewin-course-announcement'}),
+    (r'^pressrelease$', 'django.views.generic.simple.redirect_to',
+     {'url': '/press/bostonx-announcement'}),
 
 
     (r'^favicon\.ico$', 'django.views.generic.simple.redirect_to', {'url': '/static/images/favicon.ico'}),
