@@ -18,33 +18,31 @@ CMS.HesitateEvent = function(executeOnTimeOut, cancelSelector, onlyOnce) {
 	this.timeoutEventId = null;
 	this.originalEvent = null;
 	this.onlyOnce = (onlyOnce === true);
-}
+};
 
-CMS.HesitateEvent.DURATION = 400;
+CMS.HesitateEvent.DURATION = 800;
 
 CMS.HesitateEvent.prototype.trigger = function(event) {
-console.log('trigger');
-	if (this.timeoutEventId === null) {
-		this.timeoutEventId = window.setTimeout(this.fireEvent, CMS.HesitateEvent.DURATION);
-		this.originalEvent = event;
-		// is it wrong to bind to the below v $(event.currentTarget)?
-		$(this.originalEvent.delegateTarget).on(this.cancelSelector, this.untrigger);
+	if (event.data.timeoutEventId == null) {
+		event.data.timeoutEventId = window.setTimeout(
+				function() { event.data.fireEvent(event); }, 
+				CMS.HesitateEvent.DURATION);
+		event.data.originalEvent = event;
+		$(event.data.originalEvent.delegateTarget).on(event.data.cancelSelector, event.data, event.data.untrigger);
 	}
-}
+};
 
 CMS.HesitateEvent.prototype.fireEvent = function(event) {
-console.log('fire');
-	this.timeoutEventId = null;
-	$(this.originalEvent.delegateTarget).off(this.cancelSelector, this.untrigger);
-	if (this.onlyOnce) $(this.originalEvent.delegateTarget).off(this.originalEvent.type, this.trigger);
-	this.executeOnTimeOut(this.originalEvent);
-}
+	event.data.timeoutEventId = null;
+	$(event.data.originalEvent.delegateTarget).off(event.data.cancelSelector, event.data.untrigger);
+	if (event.data.onlyOnce) $(event.data.originalEvent.delegateTarget).off(event.data.originalEvent.type, event.data.trigger);
+	event.data.executeOnTimeOut(event.data.originalEvent);
+};
 
 CMS.HesitateEvent.prototype.untrigger = function(event) {
-console.log('untrigger');
-	if (this.timeoutEventId) {
-		window.clearTimeout(this.timeoutEventId);
-		$(this.originalEvent.delegateTarget).off(this.cancelSelector, this.untrigger);
+	if (event.data.timeoutEventId) {
+		window.clearTimeout(event.data.timeoutEventId);
+		$(event.data.originalEvent.delegateTarget).off(event.data.cancelSelector, event.data.untrigger);
 	}
-	this.timeoutEventId = null;
-}
+	event.data.timeoutEventId = null;
+};

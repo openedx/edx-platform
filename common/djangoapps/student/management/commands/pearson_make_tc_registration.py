@@ -179,7 +179,8 @@ class Command(BaseCommand):
                 if (len(form.errors) > 0):
                     print "Field Form errors encountered:"
                 for fielderror in form.errors:
-                    print "Field Form Error:  %s" % fielderror
+                    for msg in form.errors[fielderror]:
+                        print "Field Form Error:  {} -- {}".format(fielderror, msg)
                     if (len(form.non_field_errors()) > 0):
                         print "Non-field Form errors encountered:"
                         for nonfielderror in form.non_field_errors:

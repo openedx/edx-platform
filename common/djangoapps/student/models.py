@@ -90,6 +90,7 @@ class UserProfile(models.Model):
                          )
     mailing_address = models.TextField(blank=True, null=True)
     goals = models.TextField(blank=True, null=True)
+    allow_certificate = models.BooleanField(default=1)
 
     def get_meta(self):
         js_str = self.meta
@@ -255,9 +256,9 @@ class TestCenterUserForm(ModelForm):
 
     def clean_country(self):
         code = self.cleaned_data['country']
-        if code and len(code) != 3:
+        if code and (len(code) != 3 or not code.isalpha()):
             raise forms.ValidationError(u'Must be three characters (ISO 3166-1):  e.g. USA, CAN, MNG')
-        return code
+        return code.upper()
 
     def clean(self):
         def _can_encode_as_latin(fieldvalue):
@@ -387,6 +388,12 @@ class TestCenterRegistration(models.Model):
             return 'Update'
         elif self.uploaded_at is None:
             return 'Add'
+        elif self.registration_is_rejected:
+            # Assume that if the registration was rejected before, 
+            # it is more likely this is the (first) correction 
+            # than a second correction in flight before the first was
+            # processed. 
+            return 'Add'
         else:
             # TODO: decide what to send when we have uploaded an initial version,
             # but have not received confirmation back from that upload.  If the
@@ -400,13 +407,14 @@ class TestCenterRegistration(models.Model):
 
     @property
     def exam_authorization_count(self):
-        # TODO: figure out if this should really go in the database (with a default value).
+        # Someday this could go in the database (with a default value).  But at present,
+        # we do not expect anyone to be authorized to take an exam more than once.
         return 1
-    
+
     @property
     def needs_uploading(self):
         return self.uploaded_at is None or self.uploaded_at < self.user_updated_at
-    
+
     @classmethod
     def create(cls, testcenter_user, exam, accommodation_request):
         registration = cls(testcenter_user = testcenter_user)
@@ -499,6 +507,33 @@ class TestCenterRegistration(models.Model):
     def registration_signup_url(self):
         return settings.PEARSONVUE_SIGNINPAGE_URL
 
+    def demographics_status(self):
+        if self.demographics_is_accepted:
+            return "Accepted"
+        elif self.demographics_is_rejected:
+            return "Rejected"
+        else: 
+            return "Pending"
+
+    def accommodation_status(self):
+        if self.accommodation_is_skipped:
+            return "Skipped"
+        elif self.accommodation_is_accepted:
+            return "Accepted"
+        elif self.accommodation_is_rejected:
+            return "Rejected"
+        else: 
+            return "Pending"
+
+    def registration_status(self):
+        if self.registration_is_accepted:
+            return "Accepted"
+        elif self.registration_is_rejected:
+            return "Rejected"
+        else:
+            return "Pending"
+        
+
 class TestCenterRegistrationForm(ModelForm):
     class Meta:
         model = TestCenterRegistration
@@ -518,7 +553,15 @@ class TestCenterRegistrationForm(ModelForm):
         registration.save()
         log.info("Updated registration information for user's test center exam registration: username \"{}\" course \"{}\", examcode \"{}\"".format(registration.testcenter_user.user.username, registration.course_id, registration.exam_series_code))
 
-    # TODO: add validation code for values added to accommodation_code field.
+    def clean_accommodation_code(self):
+        code = self.cleaned_data['accommodation_code']
+        if code:
+            code = code.upper()
+            codes = code.split('*')
+            for codeval in codes:
+                if codeval not in ACCOMMODATION_CODE_DICT:
+                    raise forms.ValidationError(u'Invalid accommodation code specified: "{}"'.format(codeval))
+        return code
 
 
 
@@ -532,7 +575,7 @@ def get_testcenter_registration(user, course_id, exam_series_code):
 # nosetests thinks that anything with _test_ in the name is a test.
 # Correct this (https://nose.readthedocs.org/en/latest/finding_tests.html)
 get_testcenter_registration.__test__ = False
-   
+
 def unique_id_for_user(user):
     """
     Return a unique id for a user, suitable for inserting into
