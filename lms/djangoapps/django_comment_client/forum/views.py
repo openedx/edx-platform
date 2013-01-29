@@ -61,7 +61,7 @@ def get_threads(request, course_id, discussion_id=None, per_page=THREADS_PER_PAG
 
 
     #if the course-user is cohorted, then add the group id
-    group_id = get_cohort_id(user,course_id)
+    group_id = get_cohort_id(user, course_id)
     if group_id:
         default_query_params["group_id"] = group_id
 
