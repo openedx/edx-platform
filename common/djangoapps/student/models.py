@@ -255,9 +255,9 @@ class TestCenterUserForm(ModelForm):
 
     def clean_country(self):
         code = self.cleaned_data['country']
-        if code and len(code) != 3:
+        if code and (len(code) != 3 or not code.isalpha()):
             raise forms.ValidationError(u'Must be three characters (ISO 3166-1):  e.g. USA, CAN, MNG')
-        return code
+        return code.upper()
 
     def clean(self):
         def _can_encode_as_latin(fieldvalue):
