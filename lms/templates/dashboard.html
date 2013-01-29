@@ -273,12 +273,16 @@
                 % if cert_status['status'] == 'processing':
                       <p class="message-copy">Final course details are being wrapped up at
                       this time. Your final standing will be available shortly.</p>
-                % elif cert_status['status'] in ('generating', 'ready', 'notpassing'):
+                % elif cert_status['status'] in ('generating', 'ready', 'notpassing', 'restricted'):
                       <p class="message-copy">Your final grade:
                       <span class="grade-value">${"{0:.0f}%".format(float(cert_status['grade'])*100)}</span>.
                       % if cert_status['status'] == 'notpassing':
                          Grade required for a certificate: <span class="grade-value">
                            ${"{0:.0f}%".format(float(course.lowest_passing_grade)*100)}</span>.
+                      % elif cert_status['status'] == 'restricted':
+                          <p class="message-copy">
+                          Your certificate is being held pending confirmation that the issuance of your certificate is in compliance with strict U.S. embargoes on Iran, Cuba, Syria and Sudan. If you think our system has mistakenly identified you as being connected with one of those countries, please let us know by contacting <a class="contact-link" href="mailto:info@edx.org">info@edx.org</a>.
+                          </p>
                       % endif
                       </p>
                 % endif

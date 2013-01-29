@@ -121,6 +121,7 @@ class OpenEndedModule(openendedchild.OpenEndedChild):
             'rubric': rubric_string,
             'initial_display': self.initial_display,
             'answer': self.answer,
+            'problem_id': self.display_name
         })
         updated_grader_payload = json.dumps(parsed_grader_payload)
 
@@ -381,7 +382,8 @@ class OpenEndedModule(openendedchild.OpenEndedChild):
         rubric_feedback=""
         feedback = self._convert_longform_feedback_to_html(response_items)
         if response_items['rubric_scores_complete']==True:
-            rubric_feedback = CombinedOpenEndedRubric.render_rubric(response_items['rubric_xml'], system)
+            rubric_renderer = CombinedOpenEndedRubric(system, True)
+            rubric_feedback = rubric_renderer.render_rubric(response_items['rubric_xml'])
 
         if not response_items['success']:
             return system.render_template("open_ended_error.html",
@@ -446,8 +448,8 @@ class OpenEndedModule(openendedchild.OpenEndedChild):
                     'success': score_result['success'],
                     'grader_id': score_result['grader_id'][i],
                     'submission_id': score_result['submission_id'],
-                    'rubric_scores_complete' : score_result['rubric_scores_complete'],
-                    'rubric_xml' : score_result['rubric_xml'],
+                    'rubric_scores_complete' : score_result['rubric_scores_complete'][i],
+                    'rubric_xml' : score_result['rubric_xml'][i],
                 }
                 feedback_items.append(self._format_feedback(new_score_result, system))
             if join_feedback:

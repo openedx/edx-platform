@@ -209,6 +209,14 @@ $.widget("ui.draggable", $.ui.mouse, {
 			// computation of pageY or scrollTop() or caching of scrollTop at same state as pageY
 			// btw: known bug in jqueryui http://bugs.jqueryui.com/ticket/5718
 			if (this.scrollParent.is(document) && this.cssPosition === 'relative') {
+				// need to catch the original parent having been shoved down during drag (perhaps by 
+				// events)
+				// update cached originals if it shifted
+				if (this.offset && this.offset.parent && this.offset.parent.top !== this._getParentOffset().top) {
+					var deltaY = this.offset.parent.top - this._getParentOffset().top;
+					this.offset.parent.top = this._getParentOffset().top;
+					this.originalPageY -= deltaY;
+				}
 				this.helper[0].style.top = (event.pageY - this.originalPageY) +"px";
 			}
 			else this.helper[0].style.top = this.position.top+"px";

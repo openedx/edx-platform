@@ -135,7 +135,7 @@ def cert_info(user, course):
     Get the certificate info needed to render the dashboard section for the given
     student and course.  Returns a dictionary with keys:
 
-    'status': one of 'generating', 'ready', 'notpassing', 'processing'
+    'status': one of 'generating', 'ready', 'notpassing', 'processing', 'restricted'
     'show_download_url': bool
     'download_url': url, only present if show_download_url is True
     'show_disabled_download_button': bool -- true if state is 'generating'
@@ -168,6 +168,7 @@ def _cert_info(user, course, cert_status):
         CertificateStatuses.regenerating: 'generating',
         CertificateStatuses.downloadable: 'ready',
         CertificateStatuses.notpassing: 'notpassing',
+        CertificateStatuses.restricted: 'restricted',
         }
 
     status = template_state.get(cert_status['status'], default_status)
@@ -176,7 +177,7 @@ def _cert_info(user, course, cert_status):
          'show_download_url': status == 'ready',
          'show_disabled_download_button': status == 'generating',}
 
-    if (status in ('generating', 'ready', 'notpassing') and
+    if (status in ('generating', 'ready', 'notpassing', 'restricted') and
         course.end_of_course_survey_url is not None):
         d.update({
          'show_survey_button': True,
@@ -192,7 +193,7 @@ def _cert_info(user, course, cert_status):
         else:
             d['download_url'] = cert_status['download_url']
 
-    if status in ('generating', 'ready', 'notpassing'):
+    if status in ('generating', 'ready', 'notpassing', 'restricted'):
         if 'grade' not in cert_status:
             # Note: as of 11/20/2012, we know there are students in this state-- cs169.1x,
             # who need to be regraded (we weren't tracking 'notpassing' at first).

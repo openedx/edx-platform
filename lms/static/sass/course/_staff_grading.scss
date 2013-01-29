@@ -24,15 +24,33 @@ div.peer-grading{
         color: white;
     }
 
-    input[name='score-selection'] {
+    input[name='score-selection'],
+    input[name='grade-selection'] {
         display: none;
     }
 
-    ul
+    .problem-list
     {
-        li
+        text-align: center;
+        table-layout: auto;
+        width:100%;
+        th
         {
-            margin: 16px 0px;
+            padding: 10px;
+        }
+        td
+        {
+            padding:10px;
+        }
+        td.problem-name
+        {
+            text-align:left;
+        }
+        .ui-progressbar
+        {
+            height:1em;
+            margin:0px;
+            padding:0px;
         }
     }
 
@@ -106,6 +124,7 @@ div.peer-grading{
             margin: 0px;
             background: #eee;
             height: 10em;
+            width:47.6%;
             h3
             {
                 text-align:center;
@@ -120,12 +139,10 @@ div.peer-grading{
         .calibration-panel
         {
             float:left;
-            width:48%;
         }
         .grading-panel
         {
             float:right;
-            width: 48%;
         }
         .current-state
         {
@@ -159,5 +176,49 @@ div.peer-grading{
         }
     }
     padding: 40px;
+  .rubric {
+      tr {
+          margin:10px 0px;
+          height: 100%;
+      }
+      td {
+          padding: 20px 0px 25px 0px;
+          height: 100%;
+      }
+      th {
+          padding: 5px;
+          margin: 5px;
+      }
+      label,
+      .view-only {
+          margin:2px;
+          position: relative;
+          padding: 15px 15px 25px 15px;
+          width: 150px;
+          height:100%;
+          display: inline-block;
+          min-height: 50px;
+          min-width: 50px;
+          background-color: #CCC;
+          font-size: .9em;
+      }
+      .grade {
+        position: absolute;
+        bottom:0px;
+        right:0px;
+        margin:10px;
+      }
+      .selected-grade {
+        background: #666;
+        color: white; 
+      }
+      input[type=radio]:checked + label {
+        background: #666;
+        color: white; }
+      input[class='score-selection'] {
+        display: none; 
+      }
+  }
+    
 }
 

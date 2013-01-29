@@ -21,6 +21,8 @@ from .xml_module import XmlDescriptor
 from xmodule.modulestore import Location
 import self_assessment_module
 import open_ended_module
+from combined_open_ended_rubric import CombinedOpenEndedRubric, RubricParsingError
+from .stringify import stringify_children
 
 log = logging.getLogger("mitx.courseware")
 
@@ -138,12 +140,19 @@ class CombinedOpenEndedModule(XModule):
         # completion (doesn't matter if you self-assessed correct/incorrect).
         self._max_score = int(self.metadata.get('max_score', MAX_SCORE))
 
+        rubric_renderer = CombinedOpenEndedRubric(system, True)
+        try:
+            rubric_feedback = rubric_renderer.render_rubric(stringify_children(definition['rubric']))
+        except RubricParsingError:
+            log.error("Failed to parse rubric in location: {1}".format(location))
+            raise 
         #Static data is passed to the child modules to render
         self.static_data = {
             'max_score': self._max_score,
             'max_attempts': self.max_attempts,
             'prompt': definition['prompt'],
-            'rubric': definition['rubric']
+            'rubric': definition['rubric'],
+            'display_name': self.display_name
         }
 
         self.task_xml = definition['task_xml']
@@ -295,6 +304,7 @@ class CombinedOpenEndedModule(XModule):
             'task_count': len(self.task_xml),
             'task_number': self.current_task_number + 1,
             'status': self.get_status(),
+            'display_name': self.display_name 
         }
 
         return context
