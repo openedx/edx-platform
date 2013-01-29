@@ -291,7 +291,6 @@ function checkHoverState(event, ui) {
 	var draggable = $(this).data("ui-draggable"),
 		x1 = (draggable.positionAbs || draggable.position.absolute).left + (draggable.helperProportions.width / 2), 
 		y1 = (draggable.positionAbs || draggable.position.absolute).top + (draggable.helperProportions.height / 2);
-var debugEle = $('article:first-of-type > section > div > ol:first-of-type > li:nth-of-type(2)').first();
 	$('.collapsed').each(function() {
 		$.extend(this, {offset : $(this).offset()});
 
