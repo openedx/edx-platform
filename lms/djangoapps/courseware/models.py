@@ -112,8 +112,8 @@ class XModuleContentField(models.Model):
             'value': self.value,
         },)
 
-                for child in descriptor.get_children():
-                    descriptors.extend(get_child_descriptors(child, new_depth, descriptor_filter))
+    def __unicode__(self):
+        return unicode(repr(self))
 
 
 class XModuleSettingsField(models.Model):
