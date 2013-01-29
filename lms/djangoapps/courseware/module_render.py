@@ -280,7 +280,7 @@ def _get_module(user, request, descriptor, student_module_cache, course_id,
 
     module.get_html = replace_static_urls(
         _get_html,
-        module.metadata['data_dir'] if 'data_dir' in module.metadata else '', 
+        '/static/' + module.metadata['data_dir'] if 'data_dir' in module.metadata else '',
         course_namespace = module.location._replace(category=None, name=None))
 
     # Allow URLs of the form '/course/' refer to the root of multicourse directory
