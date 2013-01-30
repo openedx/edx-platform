@@ -79,15 +79,16 @@ class ImageProperties(object):
         Gets the ratio of skin tone colors in an image
         @return: True if the ratio is low enough to be acceptable, false otherwise
         """
-        im = self.image
-        skin = sum([count for count, rgb in im.getcolors(im.size[0] * im.size[1]) if
-                    rgb[0] > 60 and rgb[1] < (rgb[0] * 0.85) and rgb[2] < (rgb[0] * 0.7) and rgb[1] > (rgb[0] * 0.4) and
-                    rgb[2] > (rgb[0] * 0.2)])
-        bad_color_val = float(skin) / float(im.size[0] * im.size[1])
-        if bad_color_val > .4:
-            is_okay = False
-        else:
-            is_okay = True
+        colors = self.image.getcolors(MAX_COLORS_TO_COUNT)
+        is_okay = True
+        if colors is not None:
+            skin = sum([count for count, rgb in colors if
+                        rgb[0] > 60 and rgb[1] < (rgb[0] * 0.85) and rgb[2] < (rgb[0] * 0.7) and rgb[1] > (rgb[0] * 0.4) and
+                        rgb[2] > (rgb[0] * 0.2)])
+            bad_color_val = float(skin) / len(colors)
+            if bad_color_val > .4:
+                is_okay = False
+
         return is_okay
 
     def run_tests(self):
@@ -95,8 +96,12 @@ class ImageProperties(object):
         Does all available checks on an image to ensure that it is okay (size, skin ratio, colors)
         @return: Boolean indicating whether or not image passes all checks
         """
-        #image_is_okay = self.count_colors() and self.get_skin_ratio() and not self.image_too_large
-        image_is_okay = self.count_colors() and not self.image_too_large
+        image_is_okay = False
+        try:
+            image_is_okay = self.count_colors() and self.get_skin_ratio() and not self.image_too_large
+        except:
+            pass
+        
         return image_is_okay
 
 
