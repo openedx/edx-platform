@@ -210,7 +210,7 @@ class SelfAssessmentModule(openendedchild.OpenEndedChild):
             self.new_history_entry(get['student_answer'])
             self.change_state(self.ASSESSING)
         else:
-            error_message = "There was a problem saving the image in your submission.  Please try a different image."
+            error_message = "There was a problem saving the image in your submission.  Please try a different image, or try pasting a link to an image into the answer box."
 
         return {
             'success': success,

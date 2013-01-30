@@ -318,7 +318,7 @@ class OpenEndedChild(object):
         and the html corresponding to the uploaded image
         """
         has_file_to_upload = False
-        success = False
+        uploaded_to_s3 = False
         image_tag = ""
         if 'can_upload_files' in get_data:
             if get_data['can_upload_files'] == 'true':
@@ -327,8 +327,8 @@ class OpenEndedChild(object):
                 uploaded_to_s3, s3_public_url = self.upload_image_to_s3(file)
                 if uploaded_to_s3:
                     image_tag = self.generate_image_tag_from_url(s3_public_url, file.name)
-                    success = True
-        return success, has_file_to_upload, uploaded_to_s3, image_tag
+
+        return has_file_to_upload, uploaded_to_s3, image_tag
 
     def generate_image_tag_from_url(self, s3_public_url, image_name):
         """
@@ -353,7 +353,7 @@ class OpenEndedChild(object):
             #If the question does not accept file uploads, do not do anything
             return True, get_data
 
-        success, has_file_to_upload, uploaded_to_s3, image_tag = self.check_for_image_and_upload(get_data)
+        has_file_to_upload, uploaded_to_s3, image_tag = self.check_for_image_and_upload(get_data)
         if uploaded_to_s3 and has_file_to_upload:
             get_data['student_answer'] += image_tag
             overall_success = True
