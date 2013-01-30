@@ -68,10 +68,18 @@ CMS.Models.Settings.CourseDetails = Backbone.Model.extend({
 	save_videosource: function(newsource) {
 		// newsource either is <video youtube="speed:key, *"/> or just the "speed:key, *" string
 		// returns the videosource for the preview which iss the key whose speed is closest to 1
-		if (_.isEmpty(newsource) && !_.isEmpty(this.get('intro_video'))) this.save({'intro_video': null}); 
+		if (_.isEmpty(newsource) && !_.isEmpty(this.get('intro_video'))) this.save({'intro_video': null},
+				{ error : function(model, error) {
+					// this handler is for the client:server communication not the vlidation errors which handleValidationError catches
+					window.alert("Error during save: " + error.responseText);
+				}}); 
 		// TODO remove all whitespace w/in string
 		else {
-			if (this.get('intro_video') !== newsource) this.save('intro_video', newsource);
+			if (this.get('intro_video') !== newsource) this.save('intro_video', newsource,
+					{ error : function(model, error) {
+						// this handler is for the client:server communication not the vlidation errors which handleValidationError catches
+						window.alert("Error during save: " + error.responseText);
+					}});
 		}
 		
 		return this.videosourceSample();
