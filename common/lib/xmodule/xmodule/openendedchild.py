@@ -324,10 +324,11 @@ class OpenEndedChild(object):
             if get_data['can_upload_files'] == 'true':
                 has_file_to_upload = True
                 file = get_data['student_file'][0]
-                success, s3_public_url = self.upload_image_to_s3(file)
-                if success:
+                uploaded_to_s3, s3_public_url = self.upload_image_to_s3(file)
+                if uploaded_to_s3:
                     image_tag = self.generate_image_tag_from_url(s3_public_url, file.name)
-        return success, has_file_to_upload, image_tag
+                    success = True
+        return success, has_file_to_upload, uploaded_to_s3, image_tag
 
     def generate_image_tag_from_url(self, s3_public_url, image_name):
         """
@@ -349,13 +350,23 @@ class OpenEndedChild(object):
         """
         overall_success = False
         if not self.accept_file_upload:
+            #If the question does not accept file uploads, do not do anything
             return True, get_data
 
-        success, has_file_to_upload, image_tag = self.check_for_image_and_upload(get_data)
-        if success and has_file_to_upload:
+        success, has_file_to_upload, uploaded_to_s3, image_tag = self.check_for_image_and_upload(get_data)
+        if uploaded_to_s3 and has_file_to_upload:
             get_data['student_answer'] += image_tag
-            overall_success = (success and has_file_to_upload)
+            overall_success = True
+        elif has_file_to_upload and not uploaded_to_s3:
+            #In this case, an image was submitted by the student, but the image could not be uploaded to S3.  Likely
+            #a config issue (development vs deployment).  For now, just treat this as a "success"
+            log.warning("Student AJAX post to combined open ended xmodule indicated that it contained an image, "
+                        "but the image was not able to be uploaded to S3.  This could indicate a config"
+                        "issue with this deployment, but it could also indicate a problem with S3 or with the"
+                        "student image itself.")
+            overall_success = True
         else:
+            #If there is no file to upload, probably the student has embedded the link in the answer text
             success, get_data['student_answer'] = self.check_for_url_in_text(get_data['student_answer'])
             overall_success = success
 
