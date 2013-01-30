@@ -2,11 +2,24 @@
   <h2> ${display_name} </h2>
 % endif
 
+<!-- data-streams="0.75:WL7anegEjsU,1.0:NUmLa2vBBLo,1.25:TygItMr4wY4,1.5:kctQ6liQdAE"-->
 
 %if settings.MITX_FEATURES['STUB_VIDEO_FOR_TESTING']:
   <div id="stub_out_video_for_testing"></div>
 %else:
-  <div id="video_${id}" class="video" data-streams="${streams}" data-caption-data-dir="${data_dir}" data-show-captions="${show_captions}" data-start="${start}" data-end="${end}" data-caption-asset-path="${caption_asset_path}">
+  <div
+      id="video_${id}"
+      class="video"
+      data-streams=""
+      data-mp4-source="http://clips.vorwaerts-gmbh.de/VfE_html5.mp4"
+      data-webm-source="http://clips.vorwaerts-gmbh.de/VfE_html5.webm"
+      data-ogg-source="http://clips.vorwaerts-gmbh.de/VfE_html5.ogv"
+      data-caption-data-dir="${data_dir}"
+      data-show-captions="${show_captions}"
+      data-start="${start}"
+      data-end="${end}"
+      data-caption-asset-path="${caption_asset_path}"
+  >
     <div class="tc-wrapper">
       <article class="video-wrapper">
         <section class="video-player">

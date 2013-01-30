@@ -19,11 +19,13 @@ import time
 log = logging.getLogger(__name__)
 
 
-class VideoModule(XModule):
+class VideoAlphaModule(XModule):
     video_time = 0
     icon_class = 'video'
 
-    js = {'coffee':
+    js = {
+        'js': [resource_string(__name__, 'js/src/videoalpha/display/html5_video.js')],
+        'coffee':
         [resource_string(__name__, 'js/src/time.coffee'),
          resource_string(__name__, 'js/src/videoalpha/display.coffee')] +
         [resource_string(__name__, 'js/src/videoalpha/display/' + filename)
@@ -31,7 +33,7 @@ class VideoModule(XModule):
          in sorted(resource_listdir(__name__, 'js/src/videoalpha/display'))
          if filename.endswith('.coffee')]}
     css = {'scss': [resource_string(__name__, 'css/videoalpha/display.scss')]}
-    js_module_name = "Video"
+    js_module_name = "VideoAlpha"
 
     def __init__(self, system, location, definition, descriptor,
                  instance_state=None, shared_state=None, **kwargs):
@@ -145,6 +147,6 @@ class VideoModule(XModule):
 
 
 class VideoAlphaDescriptor(RawDescriptor):
-    module_class = VideoModule
+    module_class = VideoAlphaModule
     stores_state = True
     template_dir_name = "videoalpha"

@@ -1,4 +1,4 @@
-class @Video
+class @VideoAlpha
   constructor: (element) ->
     @el = $(element).find('.video')
     @id = @el.attr('id').replace(/video_/, '')
@@ -9,40 +9,77 @@ class @Video
     @show_captions = @el.data('show-captions') == "true"
     window.player = null
     @el = $("#video_#{@id}")
-    @parseVideos @el.data('streams')
-    @fetchMetadata()
-    @parseSpeed()
+
+    if @parseVideos(@el.data("streams")) is true
+      @videoType = "youtube"
+      @fetchMetadata()
+      @parseSpeed()
+    else
+      @videoType = "html5"
+      @parseVideoSources @el.data("mp4-source"), @el.data("webm-source"), @el.data("ogg-source")
+      @speeds = ["0.75", "1.0", "1.25", "1.5"]
+      @setSpeed($.cookie('video_speed'))
+
     $("#video_#{@id}").data('video', this).addClass('video-load-complete')
 
     @hide_captions = $.cookie('hide_captions') == 'true'
 
-    if YT.Player
+    if ((@videoType is "youtube") and (YT.Player)) or ((@videoType is "html5") and (HTML5Video.Player))
+      console.log 'one'
       @embed()
     else
-      window.onYouTubePlayerAPIReady = =>
-        @el.each ->
-          $(this).data('video').embed()
+      console.log 'two'
+      if @videoType is "youtube"
+        console.log 'three'
+        window.onYouTubePlayerAPIReady = ->
+          _this.embed()
+      else if @videoType is "html5"
+        console.log 'four'
+        console.log @videoType
+        console.log HTML5Video.Player
+        window.onHTML5PlayerAPIReady = ->
+          _this.embed()
 
   youtubeId: (speed)->
     @videos[speed || @speed]
 
-  parseVideos: (videos) ->
+  VideoAlpha::parseVideos = (videos) ->
+    return false  if (typeof videos isnt "string") or (videos.length is 0)
+
+    console.log 'We got this far'
+    console.log videos
+
     @videos = {}
-    $.each videos.split(/,/), (index, video) =>
+    _this = this
+    $.each videos.split(/,/), (index, video) ->
+      speed = undefined
       video = video.split(/:/)
-      speed = parseFloat(video[0]).toFixed(2).replace /\.00$/, '.0'
-      @videos[speed] = video[1]
+      speed = parseFloat(video[0]).toFixed(2).replace(/\.00$/, ".0")
+      _this.videos[speed] = video[1]
+    true
+
+  VideoAlpha::parseVideoSources = (mp4Source, webmSource, oggSource) ->
+    @html5Sources =
+      mp4: null
+      webm: null
+      ogg: null
+
+    @html5Sources.mp4 = mp4Source  if (typeof mp4Source is "string") and (mp4Source.length > 0)
+    @html5Sources.webm = webmSource  if (typeof webmSource is "string") and (webmSource.length > 0)
+    @html5Sources.ogg = oggSource  if (typeof oggSource is "string") and (oggSource.length > 0)
 
   parseSpeed: ->
-    @setSpeed($.cookie('video_speed'))
     @speeds = ($.map @videos, (url, speed) -> speed).sort()
+    @setSpeed($.cookie('video_speed'))
 
-  setSpeed: (newSpeed) ->
-    if @videos[newSpeed] != undefined
+  VideoAlpha::setSpeed = (newSpeed) ->
+    if @speeds.indexOf(newSpeed) isnt -1
       @speed = newSpeed
-      $.cookie('video_speed', "#{newSpeed}", expires: 3650, path: '/')
+      $.cookie "video_speed", "" + newSpeed,
+        expires: 3650
+        path: "/"
     else
-      @speed = '1.0'
+      @speed = "1.0"
 
   embed: ->
     @player = new VideoPlayer video: this
@@ -55,9 +92,14 @@ class @Video
   getDuration: ->
     @metadata[@youtubeId()].duration
 
-  log: (eventName) ->
-    Logger.log eventName,
+  VideoAlpha::log = (eventName) ->
+    logInfo =
       id: @id
       code: @youtubeId()
       currentTime: @player.currentTime
       speed: @speed
+
+    if @videoType is "youtube"
+      logInfo.code = @youtubeId()
+    else logInfo.code = "html5"  if @videoType is "html5"
+    Logger.log eventName, logInfo
