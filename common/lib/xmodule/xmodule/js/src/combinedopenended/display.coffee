@@ -340,7 +340,7 @@ class @CombinedOpenEnded
           @file_upload_area.html('<input type="file" class="file-upload-box">')
           @file_upload_area.show()
     else
-      @gentle_alert 'File uploads are not supported in this browser. Try the newest version of google chrome'
+      @gentle_alert 'File uploads are required for this question, but are not supported in this browser. Try the newest version of google chrome.'
 
   hide_file_upload: =>
     if @accept_file_upload == "True"
