@@ -139,7 +139,7 @@ class OpenEndedChild(object):
     @staticmethod
     def sanitize_html(answer):
         try:
-            cleaner = Cleaner(style=True, links=True, add_nofollow=True, page_structure=True, safe_attrs_only=True)
+            cleaner = Cleaner(style=True, links=True, add_nofollow=False, page_structure=True, safe_attrs_only=False, allow_tags = ["img", "a"])
             clean_html = cleaner.clean_html(answer)
             clean_html = re.sub(r'</p>$', '', re.sub(r'^<p>', '', clean_html))
         except:
@@ -284,19 +284,21 @@ class OpenEndedChild(object):
         """
         success = False
         s3_public_url = ""
-
+        image_data.seek(0)
         try:
             image = Image.open(image_data)
             image_ok = open_ended_image_submission.run_image_tests(image)
+            log.debug("Image ok: {0}".format(image_ok))
             success = True
         except:
             log.exception("Could not create image and check it.")
 
-        if success:
+        if success and image_ok:
             image_key = image_data.name + datetime.now().strftime("%Y%m%d%H%M%S")
 
             try:
-                success, public_url = open_ended_image_submission.upload_to_s3(image_data, image_key)
+                image_data.seek(0)
+                success, s3_public_url = open_ended_image_submission.upload_to_s3(image_data, image_key)
             except:
                 success = False
                 log.exception("Could not upload image to S3.")
@@ -309,7 +311,7 @@ class OpenEndedChild(object):
         error=False
         image_tag=""
         if 'can_upload_files' in get_data:
-            file = get_data['student_file']
+            file = get_data['student_file'][0]
             success, s3_public_url = self.upload_image_to_s3(file)
             if success:
                 image_tag = self.generate_image_tag_from_url(s3_public_url, file.name)
@@ -318,7 +320,7 @@ class OpenEndedChild(object):
 
     def generate_image_tag_from_url(self, s3_public_url, image_name):
         image_template = """
-                        <img src="{0}">{1}</img>
+                        <a href="{0}">{1}</a>
                          """.format(s3_public_url, image_name)
         return image_template
 

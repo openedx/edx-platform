@@ -5,6 +5,9 @@ from boto.s3.connection import S3Connection
 from boto.s3.key import Key
 from django.conf import settings
 import pickle
+import logging
+
+log=logging.getLogger(__name__)
 
 TRUSTED_IMAGE_DOMAINS = [
     'wikipedia.com',
@@ -18,10 +21,10 @@ ALLOWABLE_IMAGE_SUFFIXES = [
     'gif'
 ]
 
-MAX_ALLOWED_IMAGE_DIM = 400
+MAX_ALLOWED_IMAGE_DIM = 1500
 MAX_IMAGE_DIM = 150
 MAX_COLORS_TO_COUNT = 16
-MAX_COLORS = 5
+MAX_COLORS = 20
 
 class ImageProperties(object):
     def __init__(self, image):
@@ -41,7 +44,9 @@ class ImageProperties(object):
         else:
             colors = len(colors)
 
-        return colors <= MAX_COLORS
+        too_many_colors = (colors <= MAX_COLORS)
+        log.debug("Too many colors: {0}".format(too_many_colors))
+        return too_many_colors
 
     def get_skin_ratio(self):
         im = self.image
@@ -51,10 +56,13 @@ class ImageProperties(object):
             is_okay = False
         else:
             is_okay = True
+        log.debug("Skin ratio okay: {0}".format(is_okay))
         return is_okay
 
     def run_tests(self):
         image_is_okay = self.count_colors() and self.get_skin_ratio() and not self.image_too_large
+        log.debug("Image too large: {0}".format(self.image_too_large))
+        log.debug("Image Okay: {0}".format(image_is_okay))
         return image_is_okay
 
 class URLProperties(object):
@@ -98,6 +106,10 @@ def upload_to_s3(file_to_upload, keyname):
     Returns:
         public_url: URL to access uploaded file
     '''
+    #im = Image.open(file_to_upload)
+    #out_im = cStringIO.StringIO()
+    #im.save(out_im, 'PNG')
+
     try:
         conn = S3Connection(settings.AWS_ACCESS_KEY_ID, settings.AWS_SECRET_ACCESS_KEY)
         bucketname = str(settings.AWS_STORAGE_BUCKET_NAME)
@@ -107,6 +119,10 @@ def upload_to_s3(file_to_upload, keyname):
         k.key = keyname
         k.set_metadata('filename', file_to_upload.name)
         k.set_contents_from_file(file_to_upload)
+        #k.set_contents_from_string(out_im.getvalue())
+        #k.set_metadata("Content-Type", 'images/png')
+
+        k.set_acl("public-read")
         public_url = k.generate_url(60*60*24*365) # URL timeout in seconds.
 
         return True, public_url
