@@ -27,6 +27,8 @@ import open_ended_image_submission
 
 from datetime import datetime
 
+from PIL import Image
+
 log = logging.getLogger("mitx.courseware")
 
 # Set the default number of max attempts.  Should be 1 for production
@@ -281,7 +283,26 @@ class OpenEndedChild(object):
         @return:
         """
         success = False
-        image_ok = run_image_checks(image)
+        image = Image.open(image_data)
+
+        try:
+            image_ok = open_ended_image_submission.run_image_tests(image)
+            success = True
+        except:
+            pass
+
+        if success:
+            image_key = image_data.name + datetime.now().strftime("%Y%m%d%H%M%S")
+
+            try:
+                success, public_url = open_ended_image_submission.upload_to_s3(image_data, image_key)
+                success = True
+            except:
+                pass
+
+        
+
+
 
 
 

@@ -87,7 +87,7 @@ def run_image_tests(image):
     image_properties = ImageProperties(image)
     return image_properties.run_tests()
 
-def upload_to_s3(string_to_upload, keyname):
+def upload_to_s3(file_to_upload, keyname):
     '''
     Upload file to S3 using provided keyname.
 
@@ -101,8 +101,8 @@ def upload_to_s3(string_to_upload, keyname):
 
         k = Key(bucket)
         k.key = keyname
-        k.set_metadata("Content-Type", 'images/png')
-        k.set_contents_from_string(string_to_upload)
+        k.set_metadata('filename', file_to_upload.name)
+        k.set_contents_from_file(file_to_upload)
         public_url = k.generate_url(60*60*24*365) # URL timeout in seconds.
 
         return True, public_url
