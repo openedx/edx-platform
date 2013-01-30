@@ -31,7 +31,7 @@ class CMS.Views.TabsEdit extends Backbone.View
     )
     $.ajax({
       type:'POST',
-      url: '/reorder_tabs', 
+      url: '/reorder_static_tabs', 
       data: JSON.stringify({
         tabs : tabs
       }),

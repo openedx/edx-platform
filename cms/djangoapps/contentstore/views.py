@@ -906,19 +906,19 @@ def edit_static(request, org, course, coursename):
 
 @login_required
 @expect_json
-def reorder_tabs(request):
+def reorder_static_tabs(request):
     tabs = request.POST['tabs']
     course = get_course_for_item(tabs[0])
 
     if not has_access(request.user, course.location):
         raise PermissionDenied()
 
-    # get list of course_tabs
-    course_tabs = [t for t in course.tabs if t['type'] == 'static_tab']
-
+    # get list of existing static tabs in course
     # make sure they are the same lengths (i.e. the number of passed in tabs equals the number
     # that we know about) otherwise we can drop some!
-    if len(course_tabs) != len(tabs):
+        
+    existing_static_tabs = [t for t in course.tabs if t['type'] == 'static_tab']
+    if len(existing_static_tabs) != len(tabs):
         return HttpResponseBadRequest()
 
     # load all reference tabs, return BadRequest if we can't find any of them

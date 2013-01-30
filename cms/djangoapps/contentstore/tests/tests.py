@@ -362,11 +362,11 @@ class ContentStoreTest(TestCase):
             if tab['type'] == 'static_tab':
                 reverse_tabs.insert(0, 'i4x://edX/full/static_tab/{0}'.format(tab['url_slug']))
  
-        resp = self.client.post(reverse('reorder_tabs'), json.dumps({'tabs':reverse_tabs}), "application/json")
+        resp = self.client.post(reverse('reorder_static_tabs'), json.dumps({'tabs':reverse_tabs}), "application/json")
 
         course = ms.get_item(Location(['i4x','edX','full','course','6.002_Spring_2012', None]))
+        
         # compare to make sure that the tabs information is in the expected order after the server call
-
         course_tabs = []
         for tab in course.tabs:
             if tab['type'] == 'static_tab':
