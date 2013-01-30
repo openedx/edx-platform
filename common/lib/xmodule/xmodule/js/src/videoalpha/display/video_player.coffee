@@ -1,7 +1,8 @@
 class @VideoPlayer extends Subview
   initialize: ->
-    # Define a missing constant of Youtube API
-    YT.PlayerState.UNSTARTED = -1
+    if @video.videoType is 'youtube'
+      # Define a missing constant of Youtube API
+      YT.PlayerState.UNSTARTED = -1
 
     @currentTime = 0
     @el = $("#video_#{@video.id}")
@@ -25,6 +26,7 @@ class @VideoPlayer extends Subview
       @toggleFullScreen(event)
 
   render: ->
+    console.log '1.1'
     @control = new VideoControl el: @$('.video-controls')
     @qualityControl = new VideoQualityControl el: @$('.secondary-controls')
     @caption = new VideoCaption
@@ -34,6 +36,7 @@ class @VideoPlayer extends Subview
         captionAssetPath: @video.caption_asset_path
     unless onTouchBasedDevice()
       @volumeControl = new VideoVolumeControl el: @$('.secondary-controls')
+    console.log '1.2'
     @speedControl = new VideoSpeedControl el: @$('.secondary-controls'), speeds: @video.speeds, currentSpeed: @currentSpeed()
     @progressSlider = new VideoProgressSlider el: @$('.slider')
     @playerVars =
@@ -43,20 +46,31 @@ class @VideoPlayer extends Subview
       showinfo: 0
       enablejsapi: 1
       modestbranding: 1
+    console.log '1.3'
     if @video.start
       @playerVars.start = @video.start
       @playerVars.wmode = 'window'
     if @video.end
       # work in AS3, not HMLT5. but iframe use AS3
       @playerVars.end = @video.end
+    console.log '1.4'
 
-    @player = new YT.Player @video.id,
-      playerVars: @playerVars
-      videoId: @video.youtubeId()
-      events:
-        onReady: @onReady
-        onStateChange: @onStateChange
-        onPlaybackQualityChange: @onPlaybackQualityChange
+    if @video.videoType is 'html5'
+      @player = new HTML5Video.Player @video.id,
+        playerVars: @playerVars,
+        videoSources: @video.html5Sources,
+        events:
+          onReady: @onReady
+          onStateChange: @onStateChange
+          onPlaybackQualityChange: @onPlaybackQualityChange
+    else if @video.videoType is 'youtube'
+      @player = new YT.Player @video.id,
+        playerVars: @playerVars
+        videoId: @video.youtubeId()
+        events:
+          onReady: @onReady
+          onStateChange: @onStateChange
+          onPlaybackQualityChange: @onPlaybackQualityChange
     @caption.hideCaptions(@['video'].hide_captions)
 
   addToolTip: ->
