@@ -86,12 +86,19 @@ class ImageProperties(object):
         @param rgb: RGB tuple
         @return: Boolean true false
         """
-        r,g,b = rgb
-        check_r = (r > 60)
-        check_b =  (r * 0.4) < b < (r * 0.85)
-        check_g = (r * 0.2) < g < (r * 0.7)
+        colors_okay = False
+        try:
+            r = rgb[0]
+            g = rgb[1]
+            b = rgb[2]
+            check_r = (r > 60)
+            check_g =  (r * 0.4) < g < (r * 0.85)
+            check_b = (r * 0.2) < b < (r * 0.7)
+            colors_okay = check_r and check_b and check_g
+        except:
+            pass
 
-        return check_r and check_b and check_g
+        return colors_okay
 
     def get_skin_ratio(self):
         """
@@ -118,7 +125,7 @@ class ImageProperties(object):
         try:
             image_is_okay = self.count_colors() and self.get_skin_ratio() and not self.image_too_large
         except:
-            pass
+            log.exception("Could not run image tests.")
 
         return image_is_okay
 

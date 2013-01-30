@@ -286,6 +286,7 @@ class OpenEndedChild(object):
         """
         success = False
         s3_public_url = ""
+        image_ok = False
         try:
             image_data.seek(0)
             image_ok = open_ended_image_submission.run_image_tests(image_data)
@@ -348,7 +349,7 @@ class OpenEndedChild(object):
             return True, get_data
 
         has_file_to_upload, uploaded_to_s3, image_ok, image_tag = self.check_for_image_and_upload(get_data)
-        if uploaded_to_s3 and has_file_to_upload:
+        if uploaded_to_s3 and has_file_to_upload and image_ok:
             get_data['student_answer'] += image_tag
             overall_success = True
         elif has_file_to_upload and not uploaded_to_s3 and image_ok:

@@ -39,7 +39,7 @@ MAX_SCORE = 1
 MAX_SCORE_ALLOWED = 3
 
 IS_SCORED = False
-ACCEPT_FILE_UPLOAD = True
+ACCEPT_FILE_UPLOAD = False
 
 #Contains all reasonable bool and case combinations of True
 TRUE_DICT = ["True", True, "TRUE", "true"]
