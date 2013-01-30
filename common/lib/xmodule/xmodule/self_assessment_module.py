@@ -107,6 +107,7 @@ class SelfAssessmentModule(openendedchild.OpenEndedChild):
         if dispatch not in handlers:
             return 'Error'
 
+        log.debug(get)
         before = self.get_progress()
         d = handlers[dispatch](get, system)
         after = self.get_progress()

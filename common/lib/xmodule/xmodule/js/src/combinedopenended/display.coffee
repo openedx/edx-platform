@@ -179,7 +179,11 @@ class @CombinedOpenEnded
   save_answer: (event) =>
     event.preventDefault()
     if @child_state == 'initial'
-      data = {'student_answer' : @answer_area.val()}
+      file_data = ""
+      if @can_upload_files == true
+        files = $('.file-upload-box')[0].files[0]
+        file_data = files
+      data = {'student_answer' : @answer_area.val(), 'file_data' : file_data}
       $.postWithPrefix "#{@ajax_url}/save_answer", data, (response) =>
         if response.success
           @rubric_wrapper.html(response.rubric_html)
@@ -307,7 +311,6 @@ class @CombinedOpenEnded
 
   setup_file_upload: =>
     if window.File and window.FileReader and window.FileList and window.Blob
-        alert('File API supported.')
         if @accept_file_upload == "True"
           @can_upload_files = true
           @file_upload_area.html('<input type="file" class="file-upload-box">')

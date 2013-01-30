@@ -39,7 +39,7 @@ MAX_SCORE = 1
 MAX_SCORE_ALLOWED = 3
 
 IS_SCORED=False
-ACCEPT_FILE_UPLOAD = False
+ACCEPT_FILE_UPLOAD = True
 
 class CombinedOpenEndedModule(XModule):
     """
@@ -141,8 +141,8 @@ class CombinedOpenEndedModule(XModule):
         #Allow reset is true if student has failed the criteria to move to the next child task
         self.allow_reset = instance_state.get('ready_to_reset', False)
         self.max_attempts = int(self.metadata.get('attempts', MAX_ATTEMPTS))
-        self.is_scored = (self.metadata.get('is_graded', IS_SCORED)=="True")
-        self.accept_file_upload = (self.metadata.get('accept_file_upload', ACCEPT_FILE_UPLOAD)=="True")
+        self.is_scored = (self.metadata.get('is_graded', IS_SCORED) in [True, "True"])
+        self.accept_file_upload = (self.metadata.get('accept_file_upload', ACCEPT_FILE_UPLOAD) in [True, "True"])
 
         log.debug(self.metadata.get('is_graded', IS_SCORED))
 
