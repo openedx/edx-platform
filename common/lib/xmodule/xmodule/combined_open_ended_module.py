@@ -49,6 +49,11 @@ ACCEPT_FILE_UPLOAD = False
 #Contains all reasonable bool and case combinations of True
 TRUE_DICT = ["True", True, "TRUE", "true"]
 
+HUMAN_TASK_TYPE = {
+    'selfassessment' : "Self Assessment",
+    'openended' : "External Grader",
+}
+
 class IncorrectMaxScoreError(Exception):
     def __init__(self, msg):
         self.msg = msg
@@ -429,6 +434,15 @@ class CombinedOpenEndedModule(XModule):
         last_correctness = task.is_last_response_correct()
         max_score = task.max_score()
         state = task.state
+        if task_type in HUMAN_TASK_TYPE:
+            human_task_name = HUMAN_TASK_TYPE[task_type]
+        else:
+            human_task_name = task_type
+
+        if state in task.HUMAN_NAMES:
+            human_state = task.HUMAN_NAMES[state]
+        else:
+            human_state = state
         last_response_dict = {
             'response': last_response,
             'score': last_score,
@@ -436,7 +450,8 @@ class CombinedOpenEndedModule(XModule):
             'type': task_type,
             'max_score': max_score,
             'state': state,
-            'human_state': task.HUMAN_NAMES[state],
+            'human_state': human_state,
+            'human_task': human_task_name,
             'correct': last_correctness,
             'min_score_to_attempt': min_score_to_attempt,
             'max_score_to_attempt': max_score_to_attempt,
