@@ -5,7 +5,7 @@ import json
 import logging
 from lxml import etree
 from lxml.html import rewrite_links
-from lxml.html.clean import Cleaner
+from lxml.html.clean import Cleaner, autolink_html
 from path import path
 import os
 import sys
@@ -139,8 +139,9 @@ class OpenEndedChild(object):
     @staticmethod
     def sanitize_html(answer):
         try:
-            cleaner = Cleaner(style=True, links=True, add_nofollow=False, page_structure=True, safe_attrs_only=False, allow_tags = ["img", "a"])
+            cleaner = Cleaner(style=True, links=True, add_nofollow=False, page_structure=True, safe_attrs_only=False, allow_tags = ["img", "a"], host_whitelist = open_ended_image_submission.TRUSTED_IMAGE_DOMAINS)
             clean_html = cleaner.clean_html(answer)
+            autolink_html = autolink_html(clean_html)
             clean_html = re.sub(r'</p>$', '', re.sub(r'^<p>', '', clean_html))
         except:
             clean_html = answer
@@ -311,12 +312,13 @@ class OpenEndedChild(object):
         error=False
         image_tag=""
         if 'can_upload_files' in get_data:
-            file = get_data['student_file'][0]
-            success, s3_public_url = self.upload_image_to_s3(file)
-            if success:
-                image_tag = self.generate_image_tag_from_url(s3_public_url, file.name)
-            error = not success
-        return success, error, image_tag
+            if get_data['can_upload_files'] =='true':
+                file = get_data['student_file'][0]
+                success, s3_public_url = self.upload_image_to_s3(file)
+                if success:
+                    image_tag = self.generate_image_tag_from_url(s3_public_url, file.name)
+                error = not success
+            return success, error, image_tag
 
     def generate_image_tag_from_url(self, s3_public_url, image_name):
         image_template = """

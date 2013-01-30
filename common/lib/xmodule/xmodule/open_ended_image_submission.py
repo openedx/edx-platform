@@ -12,7 +12,8 @@ log=logging.getLogger(__name__)
 TRUSTED_IMAGE_DOMAINS = [
     'wikipedia.com',
     'wikipedia.net',
-    'wikipedia.org'
+    'wikipedia.org',
+    'edxuploads.s3.amazonaws.com'
 ]
 
 ALLOWABLE_IMAGE_SUFFIXES = [

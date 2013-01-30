@@ -183,16 +183,16 @@ class @CombinedOpenEnded
       files = ""
       if @can_upload_files == true
         files = $('.file-upload-box')[0].files[0]
-        if files.size > max_filesize
-          @can_upload_files = false
-          files = ""
+        if files != undefined
+          if files.size > max_filesize
+            @can_upload_files = false
+            files = ""
 
       fd = new FormData()
       fd.append('student_answer', @answer_area.val())
       fd.append('student_file', files)
-      fd.append('can_upload_files', files)
+      fd.append('can_upload_files', @can_upload_files)
 
-      #data = {'student_answer' : @answer_area.val(), 'file_value' : file_value, 'file_id' : file_id}
       settings =
         type: "POST"
         data: fd
