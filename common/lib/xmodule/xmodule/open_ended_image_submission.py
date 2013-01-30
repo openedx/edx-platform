@@ -18,6 +18,7 @@ ALLOWABLE_IMAGE_SUFFIXES = [
     'gif'
 ]
 
+MAX_ALLOWED_IMAGE_DIM = 400
 MAX_IMAGE_DIM = 150
 MAX_COLORS_TO_COUNT = 16
 MAX_COLORS = 5
@@ -26,6 +27,9 @@ class ImageProperties(object):
     def __init__(self, image):
         self.image = image
         image_size = self.image.size
+        self.image_too_large = False
+        if image_size[0]> MAX_ALLOWED_IMAGE_DIM or image_size[1] > MAX_ALLOWED_IMAGE_DIM:
+            self.image_too_large = True
         if image_size[0]> MAX_IMAGE_DIM or image_size[1] > MAX_IMAGE_DIM:
             self.image = self.image.resize((MAX_IMAGE_DIM, MAX_IMAGE_DIM))
             self.image_size = self.image.size
@@ -50,7 +54,7 @@ class ImageProperties(object):
         return is_okay
 
     def run_tests(self):
-        image_is_okay = self.count_colors() and self.get_skin_ratio()
+        image_is_okay = self.count_colors() and self.get_skin_ratio() and not self.image_too_large
         return image_is_okay
 
 class URLProperties(object):

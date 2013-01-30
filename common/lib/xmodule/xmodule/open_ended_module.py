@@ -553,6 +553,7 @@ class OpenEndedModule(openendedchild.OpenEndedChild):
             return self.out_of_sync_error(get)
 
         # add new history element with answer and empty score and hint.
+        get = self.append_image_to_student_answer(get)
         self.new_history_entry(get['student_answer'])
         get['student_answer'] = OpenEndedModule.sanitize_html(get['student_answer'])
         self.send_to_grader(get['student_answer'], system)

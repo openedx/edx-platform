@@ -203,6 +203,7 @@ class SelfAssessmentModule(openendedchild.OpenEndedChild):
             return self.out_of_sync_error(get)
 
         # add new history element with answer and empty score and hint.
+        get = self.append_image_to_student_answer(get)
         self.new_history_entry(get['student_answer'])
         self.change_state(self.ASSESSING)
 

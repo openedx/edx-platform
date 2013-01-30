@@ -283,25 +283,51 @@ class OpenEndedChild(object):
         @return:
         """
         success = False
-        image = Image.open(image_data)
+        s3_public_url = ""
 
         try:
+            image = Image.open(image_data)
             image_ok = open_ended_image_submission.run_image_tests(image)
             success = True
         except:
-            pass
+            log.exception("Could not create image and check it.")
 
         if success:
             image_key = image_data.name + datetime.now().strftime("%Y%m%d%H%M%S")
 
             try:
                 success, public_url = open_ended_image_submission.upload_to_s3(image_data, image_key)
-                success = True
             except:
-                pass
+                success = False
+                log.exception("Could not upload image to S3.")
 
-        
+        log.debug(s3_public_url)
+        return success, s3_public_url
 
+    def check_for_image_and_upload(self, get_data):
+        success = False
+        error=False
+        image_tag=""
+        if 'can_upload_files' in get_data:
+            file = get_data['student_file']
+            success, s3_public_url = self.upload_image_to_s3(file)
+            if success:
+                image_tag = self.generate_image_tag_from_url(s3_public_url, file.name)
+            error = not success
+        return success, error, image_tag
+
+    def generate_image_tag_from_url(self, s3_public_url, image_name):
+        image_template = """
+                        <img src="{0}">{1}</img>
+                         """.format(s3_public_url, image_name)
+        return image_template
+
+    def append_image_to_student_answer(self, get_data):
+        success, error, image_tag = self.check_for_image_and_upload(get_data)
+        if success and not error:
+            get_data['student_answer'] += image_tag
+
+        return get_data
 
 
 
