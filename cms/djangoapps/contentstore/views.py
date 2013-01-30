@@ -1426,7 +1426,7 @@ def export_course(request, org, course, name):
         'successful_import_redirect_url' : ''
     })
 
-def event(requet):
+def event(request):
     '''
     A noop to swallow the analytics call so that cms methods don't spook and poor developers looking at
     console logs don't get distracted :-)
