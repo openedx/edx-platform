@@ -1,34 +1,44 @@
 (function () {
     var timeout = 1000;
 
-    function initializeApplet(applet) {
-        console.log("Initializing " + applet);
-        waitForApplet(applet);
-    }
+    waitForProtex();
 
-    function waitForApplet(applet) {
-        if (applet.isActive && applet.isActive()) {
-            console.log("Applet is ready.");
-
-            // FIXME: [rocha] This is a hack to capture the click on the check
-            // button and update the hidden field with the applet values
-            var input_field = $('.designprotein2dinput input');
-
-            var problem = $(applet).parents('.problem');
-            var check_button = problem.find('input.check');
-            check_button.on('click', function() {
-                var answerStr = applet.checkAnswer();
-                console.log(answerStr);
-                input_field.val(answerStr);
-            });
-
-        } else {
-            console.log("Waiting for applet...");
-            setTimeout(function() { waitForApplet(applet); }, timeout);
+    function waitForProtex() {
+        if (typeof(protex) !== "undefined" && protex) {
+            protex.onInjectionDone("protex");
+        }
+        if (typeof(protex) !== "undefined") {
+            initializeProtex();    
+        }
+        else {
+            setTimeout(function() { waitForProtex(); }, timeout);
         }
     }
-
-    var applets = $('.designprotein2dinput object');
-    applets.each(function(i, el) { initializeApplet(el); });
-
+    
+    function initializeProtex() {
+        //Check to see if the two exported GWT functions protexSetTargetShape 
+        // and protexCheckAnswer have been appended to global scope -- this 
+        //happens at the end of onModuleLoad() in GWT
+        if (typeof(protexSetTargetShape) === "function" &&
+            typeof(protexCheckAnswer) === "function") {
+            
+            //Load target shape
+            var target_shape = $('#target_shape').val();
+            protexSetTargetShape(target_shape);
+            
+            //Get answer from protex and store it into the hidden input field
+            //when Check button is clicked
+            var problem = $('#protex_container').parents('.problem');
+            var check_button = problem.find('input.check');
+        	var input_field = problem.find('input[type=hidden]');
+            check_button.on('click', function() {
+                var protex_answer = protexCheckAnswer();
+                var value = {protex_answer: protex_answer};
+                input_field.val(JSON.stringify(value));
+            });
+        }
+        else {
+            setTimeout(function() {initializeProtex(); }, timeout);
+        }
+    }
 }).call(this);

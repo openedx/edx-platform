@@ -1,4 +1,5 @@
 <section id="designprotein2dinput_${id}" class="designprotein2dinput">
+    <div class="script_placeholder" data-src="/static/js/capa/protex/protex.nocache.js"/>
     <div class="script_placeholder" data-src="${applet_loader}"/>
 
     % if status == 'unsubmitted':
@@ -8,16 +9,11 @@
     % elif status == 'incorrect':
     <div class="incorrect" id="status_${id}">
     % elif status == 'incomplete':
-    <div class="incorrect" id="status_${id}">
+    <div class="incomplete" id="status_${id}">
     % endif
-
-    <object type="application/x-java-applet" id="applet_${id}" class="applet" width="${width}" height="${height}">
-      <param name="archive" value="/static/applets/capa/Protex.jar" />
-      <param name="code" value="protex.ProtexApplet.class" />
-      <param name="TARGET_SHAPE" value="${target_shape}" />
-      Applet failed to run.  No Java plug-in was found.
-    </object>
-
+    
+    <div id="protex_container"></div>
+    <input type="hidden" name="target_shape" id="target_shape" value ="${target_shape}"></input>
     <input type="hidden" name="input_${id}" id="input_${id}" value="${value|h}"/>
 
     <p class="status">
