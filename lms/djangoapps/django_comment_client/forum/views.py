@@ -117,6 +117,8 @@ def forum_form_discussion(request, course_id):
     Renders the main Discussion page, potentially filtered by a search query
     """
     course = get_course_with_access(request.user, course_id, 'load')
+    print "\n\n\n\n\n****************************"
+    print course
     category_map = utils.get_discussion_category_map(course)
 
     try:
@@ -165,10 +167,13 @@ def forum_form_discussion(request, course_id):
             'course_id': course.id,
             'category_map': category_map,
             'roles': saxutils.escape(json.dumps(utils.get_role_ids(course_id)), escapedict),
-            'is_moderator': cached_has_permission(request.user, "see_all_cohorts", course_id),
-            'cohorts': get_course_cohorts
+            #'is_moderator': cached_has_permission(request.user, "see_all_cohorts", course_id),
+            'is_moderator': True,
+            'cohorts': get_course_cohorts(course_id)
         }
         # print "start rendering.."
+        print "\n\n\n\n\n\n*************************************"
+        print context
         return render_to_response('discussion/index.html', context)
 
 @login_required
