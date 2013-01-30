@@ -1,5 +1,6 @@
 from optparse import make_option
 from json import dump
+from datetime import datetime
 
 from django.core.management.base import BaseCommand, CommandError
 
@@ -32,10 +33,9 @@ class Command(BaseCommand):
 
     def handle(self, *args, **options):
         if len(args) < 1:
-            raise CommandError("Missing single argument: output JSON file")
-
-        # get output location:            
-        outputfile = args[0]
+            outputfile = datetime.utcnow().strftime("pearson-dump-%Y%m%d-%H%M%S.json")
+        else:
+            outputfile = args[0]
         
         # construct the query object to dump:
         registrations = TestCenterRegistration.objects.all()
@@ -65,6 +65,8 @@ class Command(BaseCommand):
                       }
             if len(registration.upload_error_message) > 0:
                 record['registration_error'] = registration.upload_error_message
+            if len(registration.testcenter_user.upload_error_message) > 0:
+                record['demographics_error'] = registration.testcenter_user.upload_error_message
             if registration.needs_uploading:
                 record['needs_uploading'] = True
 
@@ -72,5 +74,5 @@ class Command(BaseCommand):
             
         # dump output:
         with open(outputfile, 'w') as outfile:
-            dump(output, outfile)
+            dump(output, outfile, indent=2)
 
