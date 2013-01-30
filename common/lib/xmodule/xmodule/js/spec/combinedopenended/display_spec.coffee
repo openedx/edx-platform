@@ -40,9 +40,8 @@ describe 'CombinedOpenEnded', ->
       expect(window.queuePollerID).toBe(5)
 
     it 'polling stops properly', =>
-      $.postWithPrefix = jasmine.createSpy("$.postWithPrefix")
       fakeResponseDone = state: "done" 
-      $.postWithPrefix.andCallFake (url, callback) -> callback(fakeResponseDone)
+      spyOn($, 'postWithPrefix').andCallFake (url, callback) -> callback(fakeResponseDone)
       @combined.poll()
       expect(window.queuePollerID).toBeUndefined()
       expect(window.setTimeout).not.toHaveBeenCalled()
@@ -80,3 +79,34 @@ describe 'CombinedOpenEnded', ->
       @combined.rebind()
       expect(@combined.answer_area.attr("disabled")).toBe("disabled")
       expect(@combined.next_problem).toHaveBeenCalled()
+
+  describe 'next_problem', ->
+    beforeEach ->
+      @combined = new CombinedOpenEnded @element
+      @combined.child_state = 'done'
+
+    it 'handling a successful call', ->
+      fakeResponse = 
+        success: true
+        html: "dummy html"
+        allow_reset: false
+      spyOn($, 'postWithPrefix').andCallFake (url, val, callback) -> callback(fakeResponse)
+      spyOn(@combined, 'reinitialize')
+      spyOn(@combined, 'rebind')
+      @combined.next_problem()
+      expect($.postWithPrefix).toHaveBeenCalled()
+      expect(@combined.reinitialize).toHaveBeenCalledWith(@combined.element)
+      expect(@combined.rebind).toHaveBeenCalled()
+      expect(@combined.answer_area.val()).toBe('')
+      expect(@combined.child_state).toBe('initial')
+
+    it 'handling an unsuccessful call', ->
+      fakeResponse =
+        success: false
+        error: 'This is an error'
+      spyOn($, 'postWithPrefix').andCallFake (url, val, callback) -> callback(fakeResponse)
+      @combined.next_problem()
+      expect(@combined.errors_area.html()).toBe(fakeResponse.error)
+
+
+
