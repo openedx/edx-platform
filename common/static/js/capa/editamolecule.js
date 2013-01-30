@@ -58,6 +58,12 @@
         var input_field = parent.find('input[type=hidden]');
         var reset_button = parent.find('button.reset');
 
+        // Add div for error messages
+        
+        $('<br/> <br/> <div class="errormsgs" style="padding: 5px 5px 5px 5px;\
+                visibility:hidden; background-color:#FA6666; height:60px;\
+                width:400px;"> </div>').appendTo(parent);
+
         // Applet options
         applet.setAntialias(true);
 
@@ -72,12 +78,16 @@
 
         reset_button.on('click', function() {
             requestAppletData(element, applet, input_field);
+
+            // Make sure remaining error messages are cleared
+            var errordiv = $(element).parent().find('.errormsgs')[0];
+            errordiv.style.visibility = 'hidden';
         });
 
         // Update the input element everytime the is an interaction
         // with the applet (click, drag, etc)
         $(element).on('mouseup', function() {
-            updateInput(applet, input_field);
+            updateInput(applet, input_field, element);
         });
     }
 
@@ -102,31 +112,46 @@
         updateInput(applet, input_field);
     }
 
-    function updateInput(applet, input_field) {
+    function updateInput(applet, input_field, element) {
         var mol = applet.molFile();
         var smiles = applet.smiles();
         var jme = applet.jmeFile();
 
-        var info = jsmol.API.getInfo(mol, smiles, jme).toString();
-        var err = jsmol.API.getErrors(mol, smiles, jme).toString();
+        var info = formatInfo(jsmol.API.getInfo(mol, smiles, jme).toString(),
+                input_field, element); 
         var value = { mol: mol, info: info };
 
         console.log("Molecule info:");
         console.log(info);
-        console.log(err);
 
         input_field.val(JSON.stringify(value));
 
         return value;
     }
 
-    function formatInfo(info) {
+    function formatInfo(info, input_field, element) {
         var results = [];
+        var errordiv = $(element).parent().find('.errormsgs')[0];
+        console.log(errordiv);
 
-        var fragment = $('<div>').append(info);
-        fragment.find('font').each(function () {
-            results.push($(this).html());
-        });
+        if (info.search("It is not possible") == -1) {
+            errordiv.innerHTML = '';
+            errordiv.style.visibility = 'hidden';
+            var fragment = $('<div>').append(info);
+            fragment.find('font').each(function () {
+                results.push($(this).html());
+            });
+        }
+        else {
+            console.log("err");
+
+            // remove Brian's html tags
+            var tags = /<((\/)?\w{1,7})>/g;
+            var errmsg = info.replace(tags, ' ');
+            console.log(errmsg);
+            errordiv.innerHTML = errmsg;
+            errordiv.style.visibility = 'visible';
+        }
 
         return results;
     }
