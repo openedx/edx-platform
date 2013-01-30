@@ -329,14 +329,33 @@ class OpenEndedChild(object):
         return image_template
 
     def append_image_to_student_answer(self, get_data):
+        overall_success = False
         if not self.accept_file_upload:
             return True, get_data
 
         success, has_file_to_upload, image_tag = self.check_for_image_and_upload(get_data)
         if success and has_file_to_upload:
             get_data['student_answer'] += image_tag
+            overall_success = (success and has_file_to_upload)
+        else:
+            success, get_data['student_answer'] = self.check_for_url_in_text(get_data['student_answer'])
+            overall_success = success
 
-        return (success and has_file_to_upload), get_data
+        return success, get_data
+
+    def check_for_url_in_text(self, string):
+        success = False
+        links = re.findall(r'(https?://\S+)', string)
+        if len(links)>0:
+            for link in links:
+                success = open_ended_image_submission.run_url_tests(link)
+                if not success:
+                    string = re.sub(link, '', string)
+                else:
+                    success = True
+
+        return success, string
+
 
 
 

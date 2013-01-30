@@ -11,15 +11,15 @@ from boto.s3.key import Key
 from django.conf import settings
 import pickle
 import logging
+import re
 
 log = logging.getLogger(__name__)
 
 #Domains where any image linked to can be trusted to have acceptable content.
 TRUSTED_IMAGE_DOMAINS = [
-    'wikipedia.com',
-    'wikipedia.net',
-    'wikipedia.org',
-    'edxuploads.s3.amazonaws.com'
+    'wikipedia',
+    'edxuploads.s3.amazonaws.com',
+    'wikimedia',
 ]
 
 #Suffixes that are allowed in image urls
@@ -156,9 +156,19 @@ class URLProperties(object):
         Runs all available url tests
         @return: True if URL passes tests, false if not.
         """
-        url_is_okay = self.check_suffix() and self.check_if_parses()
+        url_is_okay = self.check_suffix() and self.check_if_parses() and self.check_domain()
         return url_is_okay
 
+    def check_domain(self):
+        """
+        Checks to see if url is from a trusted domain
+        """
+        success = False
+        for domain in TRUSTED_IMAGE_DOMAINS:
+            if domain in self.url_string:
+                success = True
+                return success
+        return success
 
 def run_url_tests(url_string):
     """
