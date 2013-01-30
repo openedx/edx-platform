@@ -44,6 +44,10 @@ ACCEPT_FILE_UPLOAD = True
 #Contains all reasonable bool and case combinations of True
 TRUE_DICT = ["True", True, "TRUE", "true"]
 
+class IncorrectMaxScoreError(Exception):
+    def __init__(self, msg):
+        self.msg = msg
+
 class CombinedOpenEndedModule(XModule):
     """
     This is a module that encapsulates all open ended grading (self assessment, peer assessment, etc).
@@ -154,23 +158,23 @@ class CombinedOpenEndedModule(XModule):
         if self._max_score > MAX_SCORE_ALLOWED:
             error_message = "Max score {0} is higher than max score allowed {1}".format(self._max_score,
                 MAX_SCORE_ALLOWED)
-            log.exception(error_message)
-            raise Exception
+            log.error(error_message)
+            raise IncorrectMaxScoreError(error_message)
 
         rubric_renderer = CombinedOpenEndedRubric(system, True)
         success, rubric_feedback = rubric_renderer.render_rubric(stringify_children(definition['rubric']))
         if not success:
             error_message = "Could not parse rubric : {0}".format(definition['rubric'])
-            log.exception(error_message)
-            raise Exception
+            log.error(error_message)
+            raise RubricParsingError(error_message)
 
         rubric_categories = rubric_renderer.extract_categories(stringify_children(definition['rubric']))
         for category in rubric_categories:
             if len(category['options']) > (MAX_SCORE_ALLOWED + 1):
                 error_message = "Number of score points in rubric {0} higher than the max allowed, which is {1}".format(
                     len(category['options']), MAX_SCORE_ALLOWED)
-                log.exception(error_message)
-                raise Exception
+                log.error(error_message)
+                raise RubricParsingError(error_message)
 
         #Static data is passed to the child modules to render
         self.static_data = {

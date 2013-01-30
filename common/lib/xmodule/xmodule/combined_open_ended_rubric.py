@@ -4,7 +4,8 @@ from lxml import etree
 log=logging.getLogger(__name__)
 
 class RubricParsingError(Exception):
-    pass
+    def __init__(self, msg):
+        self.msg = msg
 
 class CombinedOpenEndedRubric(object):
 
