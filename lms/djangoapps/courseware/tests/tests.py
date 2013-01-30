@@ -445,6 +445,8 @@ class TestDraftModuleStore(TestCase):
         store = modulestore()
         # fix was to allow get_items() to take the course_id parameter
         store.get_items(Location(None, None, 'vertical', None, None), course_id='abc', depth=0)
+        # test success is just getting through the above statement. The bug was that 'course_id' argument was
+        # not allowed to be passed in (i.e. was throwing exception)
 
 
 @override_settings(MODULESTORE=TEST_DATA_XML_MODULESTORE)
