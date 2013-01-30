@@ -2,6 +2,7 @@ import logging
 import urllib
 
 from functools import partial
+from time import time
 
 from django.conf import settings
 from django.core.context_processors import csrf
@@ -284,6 +285,140 @@ def index(request, course_id, chapter=None, section=None,
                               chapter=chapter,
                               section=section,
                               position=position
+                              ))
+            try:
+                result = render_to_response('courseware/courseware-error.html',
+                                            {'staff_access': staff_access,
+                                            'course' : course})
+            except:
+                # Let the exception propagate, relying on global config to at
+                # at least return a nice error message
+                log.exception("Error while rendering courseware-error page")
+                raise
+
+    return result
+
+@login_required
+@ensure_csrf_cookie
+@cache_control(no_cache=True, no_store=True, must_revalidate=True)
+def testcenter_exam(request, course_id, chapter, section):
+    """
+    Displays only associated content.  If course, chapter,
+    and section are all specified, renders the page, or returns an error if they
+    are invalid.
+
+    Returns an error if these are not all specified and correct.
+    
+    Arguments:
+
+     - request    : HTTP request
+     - course_id  : course id (str: ORG/course/URL_NAME)
+     - chapter    : chapter url_name (str)
+     - section    : section url_name (str)
+
+    Returns:
+
+     - HTTPresponse
+    """
+    course = get_course_with_access(request.user, course_id, 'load', depth=2)
+    staff_access = has_access(request.user, course, 'staff')
+    registered = registered_for_course(course, request.user)
+    if not registered:
+        log.debug('User %s tried to view course %s but is not enrolled' % (request.user,course.location.url()))
+        raise # error
+    try:
+        student_module_cache = StudentModuleCache.cache_for_descriptor_descendents(
+            course.id, request.user, course, depth=2)
+
+        # Has this student been in this course before?
+        # first_time = student_module_cache.lookup(course_id, 'course', course.location.url()) is None
+
+        # Load the module for the course
+        course_module = get_module_for_descriptor(request.user, request, course, student_module_cache, course.id)
+        if course_module is None:
+            log.warning('If you see this, something went wrong: if we got this'
+                        ' far, should have gotten a course module for this user')
+            # return redirect(reverse('about_course', args=[course.id]))
+            raise # error
+        
+        if chapter is None:
+            # return redirect_to_course_position(course_module, first_time)
+            raise # error
+
+        # BW: add this test earlier, and remove later clause
+        if section is None:
+            # return redirect_to_course_position(course_module, first_time)
+            raise # error
+        
+        context = {
+            'csrf': csrf(request)['csrf_token'],
+            # 'accordion': render_accordion(request, course, chapter, section),
+            'COURSE_TITLE': course.title,
+            'course': course,
+            'init': '',
+            'content': '',
+            'staff_access': staff_access,
+            'xqa_server': settings.MITX_FEATURES.get('USE_XQA_SERVER','http://xqa:server@content-qa.mitx.mit.edu/xqa')
+            }
+
+        chapter_descriptor = course.get_child_by(lambda m: m.url_name == chapter)
+        if chapter_descriptor is not None:
+            instance_module = get_instance_module(course_id, request.user, course_module, student_module_cache)
+            save_child_position(course_module, chapter, instance_module)
+        else:
+            raise Http404
+
+        chapter_module = course_module.get_child_by(lambda m: m.url_name == chapter)
+        if chapter_module is None:
+            # User may be trying to access a chapter that isn't live yet
+            raise Http404
+
+        section_descriptor = chapter_descriptor.get_child_by(lambda m: m.url_name == section)
+        if section_descriptor is None:
+            # Specifically asked-for section doesn't exist
+            raise Http404
+
+        # Load all descendents of the section, because we're going to display its
+        # html, which in general will need all of its children
+        section_module = get_module(request.user, request, section_descriptor.location,
+                                    student_module_cache, course.id, position=None, depth=None)
+        if section_module is None:
+            # User may be trying to be clever and access something
+            # they don't have access to.
+            raise Http404
+
+        # Save where we are in the chapter
+#        instance_module = get_instance_module(course_id, request.user, chapter_module, student_module_cache)
+#        save_child_position(chapter_module, section, instance_module)
+
+
+        context['content'] = section_module.get_html()
+        
+        # figure out when the exam should end.  Going forward, this is determined by getting a "normal"
+        # duration from the test, then doing some math to modify the duration based on accommodations,
+        # and then use that value as the end.  Once we have calculated this, it should be sticky -- we
+        # use the same value for future requests, unless it's a tester.
+
+        # Let's try 600s for now...
+        context['end_date'] =  (time() + 600) * 1000
+
+        result = render_to_response('courseware/testcenter_exam.html', context)
+    except Exception as e:
+        if isinstance(e, Http404):
+            # let it propagate
+            raise
+
+        # In production, don't want to let a 500 out for any reason
+        if settings.DEBUG:
+            raise
+        else:
+            log.exception("Error in exam view: user={user}, course={course},"
+                          " chapter={chapter} section={section}"
+                          "position={position}".format(
+                              user=request.user,
+                              course=course,
+                              chapter=chapter,
+                              section=section
                               ))
             try:
                 result = render_to_response('courseware/courseware-error.html',

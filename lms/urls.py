@@ -217,6 +217,10 @@ if settings.COURSEWARE_ENABLED:
         url(r'^courses/(?P<course_id>[^/]+/[^/]+/[^/]+)/about$',
             'courseware.views.course_about', name="about_course"),
 
+        # testcenter exam:
+        url(r'^courses/(?P<course_id>[^/]+/[^/]+/[^/]+)/testcenter_exam/(?P<chapter>[^/]*)/(?P<section>[^/]*)/$',
+            'courseware.views.testcenter_exam', name="testcenter_exam"),
+
         #Inside the course
         url(r'^courses/(?P<course_id>[^/]+/[^/]+/[^/]+)/$',
             'courseware.views.course_info', name="course_root"),
