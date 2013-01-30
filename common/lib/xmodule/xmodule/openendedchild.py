@@ -96,7 +96,7 @@ class OpenEndedChild(object):
         self.prompt = static_data['prompt']
         self.rubric = static_data['rubric']
         self.display_name = static_data['display_name']
-		self.accept_file_upload = static_data['accept_file_upload']
+        self.accept_file_upload = static_data['accept_file_upload']
 
         # Used for progress / grading.  Currently get credit just for
         # completion (doesn't matter if you self-assessed correct/incorrect).
@@ -279,7 +279,7 @@ class OpenEndedChild(object):
 
         @return:
         """
-		pass
+        pass
 
 
 

@@ -176,7 +176,7 @@ class CombinedOpenEndedModule(XModule):
             'prompt': definition['prompt'],
             'rubric': definition['rubric'],
             'display_name': self.display_name,
-			'accept_file_upload' : self.upload_image,
+            'accept_file_upload' : self.upload_image,
         }
 
         self.task_xml = definition['task_xml']
