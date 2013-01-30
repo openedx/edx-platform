@@ -282,8 +282,9 @@ class OpenEndedChild(object):
 
     def upload_image_to_s3(self, image_data):
         """
-
-        @return:
+        Uploads an image to S3
+        Image_data: InMemoryUploadedFileObject that responds to read() and seek()
+        @return:Success and a URL corresponding to the uploaded object
         """
         success = False
         s3_public_url = ""
@@ -310,6 +311,12 @@ class OpenEndedChild(object):
         return success, s3_public_url
 
     def check_for_image_and_upload(self, get_data):
+        """
+        Checks to see if an image was passed back in the AJAX query.  If so, it will upload it to S3
+        @param get_data: AJAX get data
+        @return: Success, whether or not a file was in the get dictionary,
+        and the html corresponding to the uploaded image
+        """
         has_file_to_upload = False
         success = False
         image_tag = ""
@@ -323,12 +330,23 @@ class OpenEndedChild(object):
         return success, has_file_to_upload, image_tag
 
     def generate_image_tag_from_url(self, s3_public_url, image_name):
+        """
+        Makes an image tag from a given URL
+        @param s3_public_url: URL of the image
+        @param image_name: Name of the image
+        @return: Boolean success, updated AJAX get data
+        """
         image_template = """
                         <a href="{0}" target="_blank">{1}</a>
                          """.format(s3_public_url, image_name)
         return image_template
 
     def append_image_to_student_answer(self, get_data):
+        """
+        Adds an image to a student answer after uploading it to S3
+        @param get_data: AJAx get data
+        @return: Boolean success, updated AJAX get data
+        """
         overall_success = False
         if not self.accept_file_upload:
             return True, get_data
@@ -344,6 +362,11 @@ class OpenEndedChild(object):
         return overall_success, get_data
 
     def check_for_url_in_text(self, string):
+        """
+        Checks for urls in a string
+        @param string: Arbitrary string
+        @return: Boolean success, the edited string
+        """
         success = False
         links = re.findall(r'(https?://\S+)', string)
         if len(links)>0:
@@ -356,7 +379,6 @@ class OpenEndedChild(object):
                     success = True
 
         return success, string
-
 
 
 
