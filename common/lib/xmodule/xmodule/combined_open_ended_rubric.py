@@ -23,15 +23,17 @@ class CombinedOpenEndedRubric(object):
         Output:
             html: the html that corresponds to the xml given
         '''
+        success = False
         try:
             rubric_categories = self.extract_categories(rubric_xml)
             html = self.system.render_template('open_ended_rubric.html', 
                     {'categories'  : rubric_categories,
                      'has_score': self.has_score,
                      'view_only': self.view_only})
+            success = True
         except:
             raise RubricParsingError("[render_rubric] Could not parse the rubric with xml: {0}".format(rubric_xml))
-        return html
+        return success, html
 
     def extract_categories(self, element):
         '''
