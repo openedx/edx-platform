@@ -74,6 +74,19 @@ class ImageProperties(object):
         too_many_colors = (color_count <= MAX_COLORS)
         return too_many_colors
 
+    def check_if_rgb_is_skin(self, rgb):
+        """
+        Checks if a given input rgb tuple/list is a skin tone
+        @param rgb: RGB tuple
+        @return: Boolean true false
+        """
+        r,g,b = rgb
+        check_r = (r > 60)
+        check_b =  (r * 0.4) < b < (r * 0.85)
+        check_g = (r * 0.2) < g < (r * 0.7)
+
+        return check_r and check_b and check_g
+
     def get_skin_ratio(self):
         """
         Gets the ratio of skin tone colors in an image
@@ -82,10 +95,9 @@ class ImageProperties(object):
         colors = self.image.getcolors(MAX_COLORS_TO_COUNT)
         is_okay = True
         if colors is not None:
-            skin = sum([count for count, rgb in colors if
-                        rgb[0] > 60 and rgb[1] < (rgb[0] * 0.85) and rgb[2] < (rgb[0] * 0.7) and rgb[1] > (rgb[0] * 0.4) and
-                        rgb[2] > (rgb[0] * 0.2)])
-            bad_color_val = float(skin) / len(colors)
+            skin = sum([count for count, rgb in colors if self.check_if_rgb_is_skin(rgb)])
+            total_colored_pixels = sum([count for count, rgb in colors])
+            bad_color_val = float(skin) / total_colored_pixels
             if bad_color_val > .4:
                 is_okay = False
 
@@ -101,7 +113,7 @@ class ImageProperties(object):
             image_is_okay = self.count_colors() and self.get_skin_ratio() and not self.image_too_large
         except:
             pass
-        
+
         return image_is_okay
 
 
