@@ -162,7 +162,8 @@ class CombinedOpenEndedModule(XModule):
             raise IncorrectMaxScoreError(error_message)
 
         rubric_renderer = CombinedOpenEndedRubric(system, True)
-        success, rubric_feedback = rubric_renderer.render_rubric(stringify_children(definition['rubric']))
+        rubric_string = stringify_children(definition['rubric'])
+        success, rubric_feedback = rubric_renderer.render_rubric(rubric_string)
         if not success:
             error_message = "Could not parse rubric : {0}".format(definition['rubric'])
             log.error(error_message)
@@ -578,6 +579,15 @@ class CombinedOpenEndedModule(XModule):
 
         return status_html
 
+    def check_if_done_and_scored(self):
+        """
+        Checks if the object is currently in a finished state (either student didn't meet criteria to move
+        to next step, in which case they are in the allow_reset state, or they are done with the question
+        entirely, in which case they will be in the self.DONE state), and if it is scored or not.
+        @return: Boolean corresponding to the above.
+        """
+        return (self.state == self.DONE or self.allow_reset) and self.is_scored
+
     def get_score(self):
         """
         Score the student received on the problem, or None if there is no
@@ -590,7 +600,7 @@ class CombinedOpenEndedModule(XModule):
         """
         max_score = None
         score = None
-        if (self.state == self.DONE or self.allow_reset) and self.is_scored:
+        if self.check_if_done_and_scored():
             last_response = self.get_last_response(self.current_task_number)
             max_score = last_response['max_score']
             score = last_response['score']
@@ -609,7 +619,7 @@ class CombinedOpenEndedModule(XModule):
               randomization, and 5/7 on another
         '''
         max_score = None
-        if (self.state == self.DONE or self.allow_reset) and self.is_scored:
+        if self.check_if_done_and_scored():
             last_response = self.get_last_response(self.current_task_number)
             max_score = last_response['max_score']
         return max_score
@@ -622,7 +632,6 @@ class CombinedOpenEndedModule(XModule):
 
         If this module has no notion of progress, return None.
         '''
-        progress_object = None
         progress_object = Progress(self.current_task_number, len(self.task_xml))
 
         return progress_object
