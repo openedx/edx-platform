@@ -139,9 +139,9 @@ class OpenEndedChild(object):
     @staticmethod
     def sanitize_html(answer):
         try:
-            cleaner = Cleaner(style=True, links=True, add_nofollow=False, page_structure=True, safe_attrs_only=False, allow_tags = ["img", "a"], host_whitelist = open_ended_image_submission.TRUSTED_IMAGE_DOMAINS)
+            answer = autolink_html(answer)
+            cleaner = Cleaner(style=True, links=True, add_nofollow=False, page_structure=True, safe_attrs_only=True, host_whitelist = open_ended_image_submission.TRUSTED_IMAGE_DOMAINS, whitelist_tags = set(['embed', 'iframe', 'a', 'img']))
             clean_html = cleaner.clean_html(answer)
-            autolink_html = autolink_html(clean_html)
             clean_html = re.sub(r'</p>$', '', re.sub(r'^<p>', '', clean_html))
         except:
             clean_html = answer
