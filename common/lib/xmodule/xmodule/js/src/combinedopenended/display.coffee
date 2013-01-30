@@ -12,6 +12,7 @@ class @CombinedOpenEnded
     @state = @el.data('state')
     @task_count = @el.data('task-count')
     @task_number = @el.data('task-number')
+    @accept_file_upload = @el.data('accept-file-upload')
 
     @allow_reset = @el.data('allow_reset')
     @reset_button = @$('.reset-button')
@@ -45,6 +46,7 @@ class @CombinedOpenEnded
       @skip_button.click @skip_post_assessment
 
     @file_upload_area = @$('.file-upload')
+    @can_upload_files = false
     @open_ended_child= @$('.open-ended-child')
 
     @find_assessment_elements()
@@ -119,6 +121,7 @@ class @CombinedOpenEnded
     @submit_button.show()
     @reset_button.hide()
     @next_problem_button.hide()
+    @hide_file_upload()
     @hint_area.attr('disabled', false)
     if @child_state == 'done'
       @rubric_wrapper.hide()
@@ -134,8 +137,10 @@ class @CombinedOpenEnded
       @answer_area.attr("disabled", false)
       @submit_button.prop('value', 'Submit')
       @submit_button.click @save_answer
+      @setup_file_upload()
     else if @child_state == 'assessing'
       @answer_area.attr("disabled", true)
+      @hide_file_upload()
       @submit_button.prop('value', 'Submit assessment')
       @submit_button.click @save_assessment
       if @child_type == "openended"
@@ -301,4 +306,15 @@ class @CombinedOpenEnded
         window.queuePollerID = window.setTimeout(@poll, 10000)
 
   setup_file_upload: =>
-    @file_upload_area.html('<input type="file" class="file">')
+    if window.File and window.FileReader and window.FileList and window.Blob
+        alert('File API supported.')
+        if @accept_file_upload == "True"
+          @can_upload_files = true
+          @file_upload_area.html('<input type="file" class="file-upload-box">')
+          @file_upload_area.show()
+    else
+      @gentle_alert 'File uploads are not supported in this browser. Try the newest version of google chrome'
+
+  hide_file_upload: =>
+    if @accept_file_upload == "True"
+      @file_upload_area.hide()
