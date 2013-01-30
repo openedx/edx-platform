@@ -132,6 +132,7 @@ class @CombinedOpenEnded
       @reset_button.show()
       @submit_button.hide()
       @answer_area.attr("disabled", true)
+      @replace_text_inputs()
       @hint_area.attr('disabled', true)
     else if @child_state == 'initial'
       @answer_area.attr("disabled", false)
@@ -140,6 +141,7 @@ class @CombinedOpenEnded
       @setup_file_upload()
     else if @child_state == 'assessing'
       @answer_area.attr("disabled", true)
+      @replace_text_inputs()
       @hide_file_upload()
       @submit_button.prop('value', 'Submit assessment')
       @submit_button.click @save_assessment
@@ -151,6 +153,7 @@ class @CombinedOpenEnded
         @skip_button.show()
         @skip_post_assessment()
       @answer_area.attr("disabled", true)
+      @replace_text_inputs()
       @submit_button.prop('value', 'Submit post-assessment')
       if @child_type=="selfassessment"
          @submit_button.click @save_hint
@@ -159,6 +162,7 @@ class @CombinedOpenEnded
     else if @child_state == 'done'
       @rubric_wrapper.hide()
       @answer_area.attr("disabled", true)
+      @replace_text_inputs()
       @hint_area.attr('disabled', true)
       @submit_button.hide()
       if @child_type=="openended"
@@ -340,3 +344,12 @@ class @CombinedOpenEnded
   hide_file_upload: =>
     if @accept_file_upload == "True"
       @file_upload_area.hide()
+
+  replace_text_inputs: =>
+    answer_class = @answer_area.attr('class')
+    answer_id = @answer_area.attr('id')
+    answer_val = @answer_area.val()
+    new_text = ''
+    new_text = "<span class='#{answer_class}' id='#{answer_id}'>#{answer_val}</span>"
+    @gentle_alert new_text
+    @answer_area.replaceWith(new_text)
