@@ -202,15 +202,21 @@ class SelfAssessmentModule(openendedchild.OpenEndedChild):
         if self.state != self.INITIAL:
             return self.out_of_sync_error(get)
 
+        error_message = ""
         # add new history element with answer and empty score and hint.
-        get = self.append_image_to_student_answer(get)
-        get['student_answer'] = SelfAssessmentModule.sanitize_html(get['student_answer'])
-        self.new_history_entry(get['student_answer'])
-        self.change_state(self.ASSESSING)
+        success, get = self.append_image_to_student_answer(get)
+        if success:
+            get['student_answer'] = SelfAssessmentModule.sanitize_html(get['student_answer'])
+            self.new_history_entry(get['student_answer'])
+            self.change_state(self.ASSESSING)
+        else:
+            error_message = "There was a problem saving the image in your submission.  Please try a different image."
 
         return {
-            'success': True,
-            'rubric_html': self.get_rubric_html(system)
+            'success': success,
+            'rubric_html': self.get_rubric_html(system),
+            'error' : error_message,
+            'student_response' : get['student_answer'],
         }
 
     def save_assessment(self, get, system):

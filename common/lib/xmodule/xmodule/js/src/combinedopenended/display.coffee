@@ -80,7 +80,7 @@ class @CombinedOpenEnded
         @submit_evaluation_button.click @message_post
         Collapsible.setCollapsibles(@results_container)
       else
-        @errors_area.html(response.error)
+        @gentle_alert response.error
 
   message_post: (event)=>
     Logger.log 'message_post', @answers
@@ -208,11 +208,12 @@ class @CombinedOpenEnded
           if response.success
             @rubric_wrapper.html(response.rubric_html)
             @rubric_wrapper.show()
+            @answer_area.html(response.student_response)
             @child_state = 'assessing'
             @find_assessment_elements()
             @rebind()
           else
-            @errors_area.html(response.error)
+            @gentle_alert response.error
 
       $.ajaxWithPrefix("#{@ajax_url}/save_answer",settings)
 
@@ -351,5 +352,4 @@ class @CombinedOpenEnded
     answer_val = @answer_area.val()
     new_text = ''
     new_text = "<span class='#{answer_class}' id='#{answer_id}'>#{answer_val}</span>"
-    @gentle_alert new_text
     @answer_area.replaceWith(new_text)

@@ -308,30 +308,33 @@ class OpenEndedChild(object):
         return success, s3_public_url
 
     def check_for_image_and_upload(self, get_data):
-        success = False
-        error=False
+        has_file_to_upload = False
+        success=False
         image_tag=""
         if 'can_upload_files' in get_data:
             if get_data['can_upload_files'] =='true':
+                has_file_to_upload = True
                 file = get_data['student_file'][0]
                 success, s3_public_url = self.upload_image_to_s3(file)
                 if success:
                     image_tag = self.generate_image_tag_from_url(s3_public_url, file.name)
-                error = not success
-            return success, error, image_tag
+        return success, has_file_to_upload, image_tag
 
     def generate_image_tag_from_url(self, s3_public_url, image_name):
         image_template = """
-                        <a href="{0}">{1}</a>
+                        <a href="{0}" target="_blank">{1}</a>
                          """.format(s3_public_url, image_name)
         return image_template
 
     def append_image_to_student_answer(self, get_data):
-        success, error, image_tag = self.check_for_image_and_upload(get_data)
-        if success and not error:
+        if not self.accept_file_upload:
+            return True, get_data
+
+        success, has_file_to_upload, image_tag = self.check_for_image_and_upload(get_data)
+        if success and has_file_to_upload:
             get_data['student_answer'] += image_tag
 
-        return get_data
+        return (success and has_file_to_upload), get_data
 
 
 

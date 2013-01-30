@@ -442,6 +442,14 @@ section.open-ended-child {
       margin: 10px;
     }
 
+    span.short-form-response {
+          padding: 9px;
+          background: #F6F6F6;
+          border: 1px solid #ddd;
+          border-top: 0;
+          margin-bottom: 20px;
+          @include clearfix;
+     }
 
     .grader-status {
       padding: 9px;
