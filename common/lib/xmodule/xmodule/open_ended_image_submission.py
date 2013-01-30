@@ -1,3 +1,8 @@
+"""
+This contains functions and classes used to evaluate if images are acceptable (do not show improper content, etc), and
+to send them to S3.
+"""
+
 from PIL import Image
 import urlparse
 import requests
@@ -9,6 +14,7 @@ import logging
 
 log = logging.getLogger(__name__)
 
+#Domains where any image linked to can be trusted to have acceptable content.
 TRUSTED_IMAGE_DOMAINS = [
     'wikipedia.com',
     'wikipedia.net',
@@ -16,15 +22,23 @@ TRUSTED_IMAGE_DOMAINS = [
     'edxuploads.s3.amazonaws.com'
 ]
 
+#Suffixes that are allowed in image urls
 ALLOWABLE_IMAGE_SUFFIXES = [
     'jpg',
     'png',
     'gif'
 ]
 
+#Maximum allowed dimensions (x and y) for an uploaded image
 MAX_ALLOWED_IMAGE_DIM = 1500
+
+#Dimensions to which image is resized before it is evaluated for color count, etc
 MAX_IMAGE_DIM = 150
+
+#Maximum number of colors that should be counted in ImageProperties
 MAX_COLORS_TO_COUNT = 16
+
+#Maximum number of colors allowed in an uploaded image
 MAX_COLORS = 20
 
 class ImageProperties(object):
