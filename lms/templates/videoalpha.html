@@ -1,0 +1,31 @@
+% if display_name is not UNDEFINED and display_name is not None:
+  <h2> ${display_name} </h2>
+% endif
+
+
+%if settings.MITX_FEATURES['STUB_VIDEO_FOR_TESTING']:
+  <div id="stub_out_video_for_testing"></div>
+%else:
+  <div id="video_${id}" class="video" data-streams="${streams}" data-caption-data-dir="${data_dir}" data-show-captions="${show_captions}" data-start="${start}" data-end="${end}" data-caption-asset-path="${caption_asset_path}">
+    <div class="tc-wrapper">
+      <article class="video-wrapper">
+        <section class="video-player">
+          <div id="${id}"></div>
+        </section>
+        <section class="video-controls"></section>
+      </article>
+    </div>
+  </div>
+%endif
+
+% if source:
+<div class="video-sources">
+  <p>Download video <a href="${source}">here</a>.</p>
+</div>
+% endif
+
+% if track:
+<div class="video-tracks">
+  <p>Download subtitles <a href="${track}">here</a>.</p>
+</div>
+% endif
