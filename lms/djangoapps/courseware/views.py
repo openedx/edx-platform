@@ -233,7 +233,7 @@ def index(request, course_id, chapter=None, section=None,
                 # Specifically asked-for section doesn't exist
                 raise Http404
 
-            # Load all descendants of the section, because we're going to display it's
+            # Load all descendants of the section, because we're going to display its
             # html, which in general will need all of its children
             section_module_cache = StudentModuleCache.cache_for_descriptor_descendents(
                 course.id, request.user, section_descriptor, depth=None)
