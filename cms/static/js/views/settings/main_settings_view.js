@@ -55,10 +55,7 @@ CMS.Views.ValidatingView = Backbone.View.extend({
 		var newVal = $(event.currentTarget).val();
 		if (currentVal != newVal) {
 			this.clearValidationErrors();
-			this.model.save(field, newVal, { error : function(model, error) {
-				// this handler is for the client:server communication not the vlidation errors which handleValidationError catches
-				window.alert("Error during save: " + error.responseText);
-			}});
+			this.model.save(field, newVal, { error : CMS.ServerError});
 			return true;
 		}
 		else return false;
@@ -231,10 +228,7 @@ CMS.Views.Settings.Details = CMS.Views.ValidatingView.extend({
                 }
                 var newVal = new Date(date.getTime() + time * 1000);
                 if (cacheModel.get(fieldName) != newVal) cacheModel.save(fieldName, newVal,
-                		{ error : function(model, error) {
-            				// this handler is for the client:server communication not the vlidation errors which handleValidationError catches
-            				window.alert("Error during save: " + error.responseText);
-            			}});
+                		{ error : CMS.ServerError});
             }
 		};
 		
@@ -284,10 +278,7 @@ CMS.Views.Settings.Details = CMS.Views.ValidatingView.extend({
 	
 	removeSyllabus: function() {
 		if (this.model.has('syllabus'))	this.model.save({'syllabus': null}, 
-				{ error : function(model, error) {
-					// this handler is for the client:server communication not the vlidation errors which handleValidationError catches
-					window.alert("Error during save: " + error.responseText);
-				}});
+				{ error : CMS.ServerError});
 	},
 	
 	assetSyllabus : function() {
@@ -321,10 +312,7 @@ CMS.Views.Settings.Details = CMS.Views.ValidatingView.extend({
 					cachethis.clearValidationErrors();
 					var newVal = mirror.getValue();
 					if (cachethis.model.get(field) != newVal) cachethis.model.save(field, newVal,
-							{ error : function(model, error) {
-								// this handler is for the client:server communication not the vlidation errors which handleValidationError catches
-								window.alert("Error during save: " + error.responseText);
-							}});
+							{ error : CMS.ServerError});
 				}
 			});
 		}
@@ -420,10 +408,7 @@ CMS.Views.Settings.Grading = CMS.Views.ValidatingView.extend({
 		event.data.clearValidationErrors();
 		var newVal = event.data.model.dateToGracePeriod($(event.currentTarget).timepicker('getTime'));
 		if (event.data.model.get('grace_period') != newVal) event.data.model.save('grace_period', newVal,
-				{ error : function(model, error) {
-					// this handler is for the client:server communication not the vlidation errors which handleValidationError catches
-					window.alert("Error during save: " + error.responseText);
-				}});
+				{ error : CMS.ServerError});
 	},
 	updateModel : function(event) {
 		if (!this.selectorToField[event.currentTarget.id]) return;
@@ -560,10 +545,7 @@ CMS.Views.Settings.Grading = CMS.Views.ValidatingView.extend({
 					return object;
 				}, 
 				{}),
-				{ error : function(model, error) {
-					// this handler is for the client:server communication not the vlidation errors which handleValidationError catches
-					window.alert("Error during save: " + error.responseText);
-				}});
+				{ error : CMS.ServerError});
 	},
 	
 	addNewGrade: function(e) {
@@ -695,10 +677,7 @@ CMS.Views.Settings.GraderView = CMS.Views.ValidatingView.extend({
 	},
 	deleteModel : function(e) {
 		this.model.destroy(
-				{ error : function(model, error) {
-					// this handler is for the client:server communication not the vlidation errors which handleValidationError catches
-					window.alert("Error during save: " + error.responseText);
-				}});
+				{ error : CMS.ServerError});
 		e.preventDefault();
 	}
 	
