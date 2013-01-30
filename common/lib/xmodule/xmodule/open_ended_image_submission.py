@@ -67,12 +67,11 @@ class ImageProperties(object):
         """
         colors = self.image.getcolors(MAX_COLORS_TO_COUNT)
         if colors is None:
-            colors = MAX_COLORS_TO_COUNT
+            color_count = MAX_COLORS_TO_COUNT
         else:
-            colors = len(colors)
+            color_count = len(colors)
 
-        too_many_colors = (colors <= MAX_COLORS)
-        log.debug("Too many colors: {0}".format(too_many_colors))
+        too_many_colors = (color_count <= MAX_COLORS)
         return too_many_colors
 
     def get_skin_ratio(self):
@@ -89,7 +88,6 @@ class ImageProperties(object):
             is_okay = False
         else:
             is_okay = True
-        log.debug("Skin ratio okay: {0}".format(is_okay))
         return is_okay
 
     def run_tests(self):
@@ -99,8 +97,6 @@ class ImageProperties(object):
         """
         #image_is_okay = self.count_colors() and self.get_skin_ratio() and not self.image_too_large
         image_is_okay = self.count_colors() and not self.image_too_large
-        log.debug("Image too large: {0}".format(self.image_too_large))
-        log.debug("Image Okay: {0}".format(image_is_okay))
         return image_is_okay
 
 
