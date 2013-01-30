@@ -3,6 +3,7 @@ describe 'CombinedOpenEnded', ->
     spyOn Logger, 'log'
     # load up some fixtures
     loadFixtures 'combined-open-ended.html'
+    jasmine.Clock.useMock()
     @element = $('.course-content')
 
 
@@ -27,3 +28,25 @@ describe 'CombinedOpenEnded', ->
       expect(@combined.answer_area.attr("disabled")).toBe("disabled")
       expect(@combined.submit_button.val()).toBe("Submit assessment")
 
+  describe 'poll', ->
+    beforeEach =>
+      # setup the spies
+      @combined = new CombinedOpenEnded @element
+      spyOn(@combined, 'reload').andCallFake -> return 0
+      window.setTimeout = jasmine.createSpy().andCallFake (callback, timeout) -> return 5
+
+    it 'we are setting the timeout', =>
+      fakeResponseContinue = state: 'not done'
+      spyOn($, 'postWithPrefix').andCallFake (url, callback) -> callback(fakeResponseContinue)
+      @combined.poll()
+      expect(window.setTimeout).toHaveBeenCalledWith(@combined.poll, 10000)
+      expect(window.queuePollerID).toBe(5)
+
+    it 'we are stopping polling properly', =>
+      $.postWithPrefix = jasmine.createSpy("$.postWithPrefix")
+      fakeResponseDone = state: "done" 
+      $.postWithPrefix.andCallFake (url, callback) -> callback(fakeResponseDone)
+      @combined.poll()
+      expect(window.queuePollerID).toBeUndefined()
+      expect(window.setTimeout).not.toHaveBeenCalled()
+      expect(@combined.reload).toHaveBeenCalled()

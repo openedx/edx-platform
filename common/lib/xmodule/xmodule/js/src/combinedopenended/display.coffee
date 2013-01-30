@@ -281,6 +281,10 @@ class @CombinedOpenEnded
     $.postWithPrefix "#{@ajax_url}/check_for_score", (response) =>
       if response.state == "done" or response.state=="post_assessment"
         delete window.queuePollerID
-        location.reload()
+        @reload()
       else
         window.queuePollerID = window.setTimeout(@poll, 10000)
+
+    # wrap this so that it can be mocked
+  reload: ->
+    location.reload()
