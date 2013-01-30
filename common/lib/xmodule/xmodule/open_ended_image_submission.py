@@ -3,7 +3,12 @@ This contains functions and classes used to evaluate if images are acceptable (d
 to send them to S3.
 """
 
-from PIL import Image
+try:
+    from PIL import Image
+    ENABLE_PIL = True
+except:
+    ENABLE_PIL = False
+
 from urlparse import urlparse
 import requests
 from boto.s3.connection import S3Connection
@@ -46,13 +51,13 @@ class ImageProperties(object):
     """
     Class to check properties of an image and to validate if they are allowed.
     """
-    def __init__(self, image):
+    def __init__(self, image_data):
         """
         Initializes class variables
         @param image: Image object (from PIL)
         @return: None
         """
-        self.image = image
+        self.image = Image.open(image_data)
         image_size = self.image.size
         self.image_too_large = False
         if image_size[0] > MAX_ALLOWED_IMAGE_DIM or image_size[1] > MAX_ALLOWED_IMAGE_DIM:
@@ -158,10 +163,6 @@ class URLProperties(object):
         @return: True if URL passes tests, false if not.
         """
         url_is_okay = self.check_suffix() and self.check_if_parses() and self.check_domain()
-        log.debug(self.url_string)
-        log.debug("Suffix : {0}".format(self.check_suffix()))
-        log.debug("Parses:{0}".format(self.check_if_parses()))
-        log.debug("Check Domain:{0}".format(self.check_domain()))
         return url_is_okay
 
     def check_domain(self):
@@ -191,8 +192,14 @@ def run_image_tests(image):
     @param image: PIL Image object
     @return: Boolean indicating whether or not all tests have been passed
     """
-    image_properties = ImageProperties(image)
-    return image_properties.run_tests()
+    success = False
+    try:
+        image_properties = ImageProperties(image)
+        success = image_properties.run_tests()
+    except:
+        log.exception("Cannot run image tests in combined open ended xmodule.  May be an issue with a particular image,"
+                    "or an issue with the deployment configuration of PIL/Pillow")
+    return success
 
 
 def upload_to_s3(file_to_upload, keyname):

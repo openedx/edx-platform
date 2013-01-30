@@ -27,8 +27,6 @@ import open_ended_image_submission
 
 from datetime import datetime
 
-from PIL import Image
-
 log = logging.getLogger("mitx.courseware")
 
 # Set the default number of max attempts.  Should be 1 for production
@@ -290,25 +288,20 @@ class OpenEndedChild(object):
         s3_public_url = ""
         try:
             image_data.seek(0)
-            image = Image.open(image_data)
-            image_ok = open_ended_image_submission.run_image_tests(image)
-            log.debug("Image ok: {0}".format(image_ok))
-            success = True
+            image_ok = open_ended_image_submission.run_image_tests(image_data)
         except:
             log.exception("Could not create image and check it.")
 
-        if success and image_ok:
+        if image_ok:
             image_key = image_data.name + datetime.now().strftime("%Y%m%d%H%M%S")
 
             try:
                 image_data.seek(0)
                 success, s3_public_url = open_ended_image_submission.upload_to_s3(image_data, image_key)
             except:
-                success = False
                 log.exception("Could not upload image to S3.")
 
-        log.debug(s3_public_url)
-        return success, s3_public_url
+        return success, image_ok, s3_public_url
 
     def check_for_image_and_upload(self, get_data):
         """
@@ -320,15 +313,16 @@ class OpenEndedChild(object):
         has_file_to_upload = False
         uploaded_to_s3 = False
         image_tag = ""
+        image_ok = False
         if 'can_upload_files' in get_data:
             if get_data['can_upload_files'] == 'true':
                 has_file_to_upload = True
                 file = get_data['student_file'][0]
-                uploaded_to_s3, s3_public_url = self.upload_image_to_s3(file)
+                uploaded_to_s3, image_ok, s3_public_url = self.upload_image_to_s3(file)
                 if uploaded_to_s3:
                     image_tag = self.generate_image_tag_from_url(s3_public_url, file.name)
 
-        return has_file_to_upload, uploaded_to_s3, image_tag
+        return has_file_to_upload, uploaded_to_s3, image_ok, image_tag
 
     def generate_image_tag_from_url(self, s3_public_url, image_name):
         """
@@ -353,11 +347,11 @@ class OpenEndedChild(object):
             #If the question does not accept file uploads, do not do anything
             return True, get_data
 
-        has_file_to_upload, uploaded_to_s3, image_tag = self.check_for_image_and_upload(get_data)
+        has_file_to_upload, uploaded_to_s3, image_ok, image_tag = self.check_for_image_and_upload(get_data)
         if uploaded_to_s3 and has_file_to_upload:
             get_data['student_answer'] += image_tag
             overall_success = True
-        elif has_file_to_upload and not uploaded_to_s3:
+        elif has_file_to_upload and not uploaded_to_s3 and image_ok:
             #In this case, an image was submitted by the student, but the image could not be uploaded to S3.  Likely
             #a config issue (development vs deployment).  For now, just treat this as a "success"
             log.warning("Student AJAX post to combined open ended xmodule indicated that it contained an image, "
@@ -365,7 +359,7 @@ class OpenEndedChild(object):
                         "issue with this deployment, but it could also indicate a problem with S3 or with the"
                         "student image itself.")
             overall_success = True
-        else:
+        elif not has_file_to_upload:
             #If there is no file to upload, probably the student has embedded the link in the answer text
             success, get_data['student_answer'] = self.check_for_url_in_text(get_data['student_answer'])
             overall_success = success
