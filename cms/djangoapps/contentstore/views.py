@@ -908,29 +908,46 @@ def edit_static(request, org, course, coursename):
 @expect_json
 def reorder_tabs(request):
     tabs = request.POST['tabs']
+    course = get_course_for_item(tabs[0])
 
-    if len(tabs) > 0:
-        course = get_course_for_item(tabs[0])
+    if not has_access(request.user, course.location):
+        raise PermissionDenied()
 
-        if not has_access(request.user, course.location):
-            raise PermissionDenied()
+    # get list of course_tabs
+    course_tabs = [t for t in course.tabs if t['type'] == 'static_tab']
 
-        # first filter out all non-static tabs from the tabs list
-        course_tabs = [t for t in course.tabs if t['type'] != 'static_tab']
+    # make sure they are the same lengths (i.e. the number of passed in tabs equals the number
+    # that we know about) otherwise we can drop some!
+    if len(course_tabs) != len(tabs):
+        return HttpResponseBadRequest()
 
-        # OK, re-assemble the static tabs in the new order
-        for tab in tabs:
-            item = modulestore('direct').get_item(Location(tab))
+    # load all reference tabs, return BadRequest if we can't find any of them
+    tab_items =[]
+    for tab in tabs:
+        item = modulestore('direct').get_item(Location(tab))
+        if item is None:
+            return HttpResponseBadRequest()
 
-            course_tabs.append({ 'type':'static_tab', 
-                'name' : item.metadata.get('display_name'), 
-                'url_slug' : item.location.name}
-                )
-        
-        course.tabs = course_tabs
-        modulestore('direct').update_metadata(course.location, course.metadata)
+        tab_items.append(item)
 
+    # now just go through the existing course_tabs and re-order the static tabs
+    reordered_tabs = []
+    static_tab_idx = 0
+    for tab in course.tabs:
+        if tab['type'] == 'static_tab':
+            reordered_tabs.append({'type': 'static_tab', 
+                'name' : tab_items[static_tab_idx].metadata.get('display_name'), 
+                'url_slug' : tab_items[static_tab_idx].location.name})
+            static_tab_idx += 1
+        else:
+            reordered_tabs.append(tab)
+
+
+    # OK, re-assemble the static tabs in the new order        
+    course.tabs = reordered_tabs
+    modulestore('direct').update_metadata(course.location, course.metadata)
     return HttpResponse()
+
 
 @login_required
 @ensure_csrf_cookie
