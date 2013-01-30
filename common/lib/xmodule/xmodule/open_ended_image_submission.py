@@ -70,9 +70,9 @@ class URLProperties(object):
     def check_suffix(self):
         good_suffix = False
         for suffix in ALLOWABLE_IMAGE_SUFFIXES:
-            if self.url_string.endswith(suffix)
-            good_suffix = True
-            break
+            if self.url_string.endswith(suffix):
+                good_suffix = True
+                break
         return good_suffix
 
     def run_tests(self):

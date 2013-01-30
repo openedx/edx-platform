@@ -178,21 +178,38 @@ class @CombinedOpenEnded
 
   save_answer: (event) =>
     event.preventDefault()
+    max_filesize = 2*1000*1000 #2MB
     if @child_state == 'initial'
-      file_data = ""
+      files = ""
       if @can_upload_files == true
         files = $('.file-upload-box')[0].files[0]
-        file_data = files
-      data = {'student_answer' : @answer_area.val(), 'file_data' : file_data}
-      $.postWithPrefix "#{@ajax_url}/save_answer", data, (response) =>
-        if response.success
-          @rubric_wrapper.html(response.rubric_html)
-          @rubric_wrapper.show()
-          @child_state = 'assessing'
-          @find_assessment_elements()
-          @rebind()
-        else
-          @errors_area.html(response.error)
+        if files.size > max_filesize
+          @can_upload_files = false
+          files = ""
+
+      fd = new FormData()
+      fd.append('student_answer', @answer_area.val())
+      fd.append('student_file', files)
+      fd.append('can_upload_files', files)
+
+      #data = {'student_answer' : @answer_area.val(), 'file_value' : file_value, 'file_id' : file_id}
+      settings =
+        type: "POST"
+        data: fd
+        processData: false
+        contentType: false
+        success: (response) =>
+          if response.success
+            @rubric_wrapper.html(response.rubric_html)
+            @rubric_wrapper.show()
+            @child_state = 'assessing'
+            @find_assessment_elements()
+            @rebind()
+          else
+            @errors_area.html(response.error)
+
+      $.ajaxWithPrefix("#{@ajax_url}/save_answer",settings)
+
     else
       @errors_area.html('Problem state got out of sync.  Try reloading the page.')
 

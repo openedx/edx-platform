@@ -23,6 +23,7 @@ from .stringify import stringify_children
 from .xml_module import XmlDescriptor
 from xmodule.modulestore import Location
 from capa.util import *
+import open_ended_image_submission
 
 from datetime import datetime
 
@@ -274,12 +275,13 @@ class OpenEndedChild(object):
         correctness = 'correct' if self.is_submission_correct(score) else 'incorrect'
         return correctness
 
-    def should_request_image(self):
+    def upload_image_to_s3(self, image_data):
         """
 
         @return:
         """
-        pass
+        success = False
+        image_ok = run_image_checks(image)
 
 
 
