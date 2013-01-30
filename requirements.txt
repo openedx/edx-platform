@@ -58,4 +58,4 @@ Shapely==1.2.16
 ipython==0.13.1
 xmltodict==0.4.1
 paramiko==1.9.0
-pillow
+Pillow==1.7.8
