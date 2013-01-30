@@ -38,8 +38,11 @@ MAX_SCORE = 1
 #The highest score allowed for the overall xmodule and for each rubric point
 MAX_SCORE_ALLOWED = 3
 
-IS_SCORED=False
+IS_SCORED = False
 ACCEPT_FILE_UPLOAD = True
+
+#Contains all reasonable bool and case combinations of True
+TRUE_DICT = ["True", True, "TRUE", "true"]
 
 class CombinedOpenEndedModule(XModule):
     """
@@ -141,31 +144,31 @@ class CombinedOpenEndedModule(XModule):
         #Allow reset is true if student has failed the criteria to move to the next child task
         self.allow_reset = instance_state.get('ready_to_reset', False)
         self.max_attempts = int(self.metadata.get('attempts', MAX_ATTEMPTS))
-        self.is_scored = (self.metadata.get('is_graded', IS_SCORED) in [True, "True"])
-        self.accept_file_upload = (self.metadata.get('accept_file_upload', ACCEPT_FILE_UPLOAD) in [True, "True"])
-
-        log.debug(self.metadata.get('is_graded', IS_SCORED))
+        self.is_scored = self.metadata.get('is_graded', IS_SCORED) in TRUE_DICT
+        self.accept_file_upload = self.metadata.get('accept_file_upload', ACCEPT_FILE_UPLOAD) in TRUE_DICT
 
         # Used for progress / grading.  Currently get credit just for
         # completion (doesn't matter if you self-assessed correct/incorrect).
         self._max_score = int(self.metadata.get('max_score', MAX_SCORE))
 
-        if self._max_score>MAX_SCORE_ALLOWED:
-            error_message="Max score {0} is higher than max score allowed {1}".format(self._max_score, MAX_SCORE_ALLOWED)
+        if self._max_score > MAX_SCORE_ALLOWED:
+            error_message = "Max score {0} is higher than max score allowed {1}".format(self._max_score,
+                MAX_SCORE_ALLOWED)
             log.exception(error_message)
             raise Exception
 
         rubric_renderer = CombinedOpenEndedRubric(system, True)
         success, rubric_feedback = rubric_renderer.render_rubric(stringify_children(definition['rubric']))
         if not success:
-            error_message="Could not parse rubric : {0}".format(definition['rubric'])
+            error_message = "Could not parse rubric : {0}".format(definition['rubric'])
             log.exception(error_message)
             raise Exception
 
         rubric_categories = rubric_renderer.extract_categories(stringify_children(definition['rubric']))
         for category in rubric_categories:
-            if len(category['options'])>(MAX_SCORE_ALLOWED+1):
-                error_message="Number of score points in rubric {0} higher than the max allowed, which is {1}".format(len(category['options']) , MAX_SCORE_ALLOWED)
+            if len(category['options']) > (MAX_SCORE_ALLOWED + 1):
+                error_message = "Number of score points in rubric {0} higher than the max allowed, which is {1}".format(
+                    len(category['options']), MAX_SCORE_ALLOWED)
                 log.exception(error_message)
                 raise Exception
 
@@ -176,7 +179,7 @@ class CombinedOpenEndedModule(XModule):
             'prompt': definition['prompt'],
             'rubric': definition['rubric'],
             'display_name': self.display_name,
-            'accept_file_upload' : self.accept_file_upload,
+            'accept_file_upload': self.accept_file_upload,
         }
 
         self.task_xml = definition['task_xml']
@@ -269,13 +272,13 @@ class CombinedOpenEndedModule(XModule):
         elif current_task_state is None and self.current_task_number > 0:
             last_response_data = self.get_last_response(self.current_task_number - 1)
             last_response = last_response_data['response']
-            current_task_state=json.dumps({
-                'state' : self.ASSESSING,
-                'version' : self.STATE_VERSION,
-                'max_score' : self._max_score,
-                'attempts' : 0,
-                'created' : True,
-                'history' : [{'answer' : last_response}],
+            current_task_state = json.dumps({
+                'state': self.ASSESSING,
+                'version': self.STATE_VERSION,
+                'max_score': self._max_score,
+                'attempts': 0,
+                'created': True,
+                'history': [{'answer': last_response}],
             })
             self.current_task = child_task_module(self.system, self.location,
                 self.current_task_parsed_xml, self.current_task_descriptor, self.static_data,
@@ -327,8 +330,8 @@ class CombinedOpenEndedModule(XModule):
             'task_count': len(self.task_xml),
             'task_number': self.current_task_number + 1,
             'status': self.get_status(),
-            'display_name': self.display_name ,
-            'accept_file_upload' : self.accept_file_upload,
+            'display_name': self.display_name,
+            'accept_file_upload': self.accept_file_upload,
         }
 
         return context
@@ -587,12 +590,11 @@ class CombinedOpenEndedModule(XModule):
             last_response = self.get_last_response(self.current_task_number)
             max_score = last_response['max_score']
             score = last_response['score']
-            log.debug(last_response)
 
         score_dict = {
-            'score' : score,
-            'total' : max_score,
-            }
+            'score': score,
+            'total': max_score,
+        }
 
         return score_dict
 
@@ -620,6 +622,7 @@ class CombinedOpenEndedModule(XModule):
         progress_object = Progress(self.current_task_number, len(self.task_xml))
 
         return progress_object
+
 
 class CombinedOpenEndedDescriptor(XmlDescriptor, EditingDescriptor):
     """

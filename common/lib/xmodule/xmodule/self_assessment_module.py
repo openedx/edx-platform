@@ -80,7 +80,7 @@ class SelfAssessmentModule(openendedchild.OpenEndedChild):
             'state': self.state,
             'allow_reset': self._allow_reset(),
             'child_type': 'selfassessment',
-            'accept_file_upload' : self.accept_file_upload,
+            'accept_file_upload': self.accept_file_upload,
         }
 
         html = system.render_template('self_assessment_prompt.html', context)
@@ -125,7 +125,7 @@ class SelfAssessmentModule(openendedchild.OpenEndedChild):
             return ''
 
         rubric_renderer = CombinedOpenEndedRubric(system, True)
-        success, rubric_html  = rubric_renderer.render_rubric(self.rubric)
+        success, rubric_html = rubric_renderer.render_rubric(self.rubric)
 
         # we'll render it
         context = {'rubric': rubric_html,
@@ -215,8 +215,8 @@ class SelfAssessmentModule(openendedchild.OpenEndedChild):
         return {
             'success': success,
             'rubric_html': self.get_rubric_html(system),
-            'error' : error_message,
-            'student_response' : get['student_answer'],
+            'error': error_message,
+            'student_response': get['student_answer'],
         }
 
     def save_assessment(self, get, system):

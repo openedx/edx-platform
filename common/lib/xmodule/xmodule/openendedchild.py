@@ -140,7 +140,9 @@ class OpenEndedChild(object):
     def sanitize_html(answer):
         try:
             answer = autolink_html(answer)
-            cleaner = Cleaner(style=True, links=True, add_nofollow=False, page_structure=True, safe_attrs_only=True, host_whitelist = open_ended_image_submission.TRUSTED_IMAGE_DOMAINS, whitelist_tags = set(['embed', 'iframe', 'a', 'img']))
+            cleaner = Cleaner(style=True, links=True, add_nofollow=False, page_structure=True, safe_attrs_only=True,
+                host_whitelist=open_ended_image_submission.TRUSTED_IMAGE_DOMAINS,
+                whitelist_tags=set(['embed', 'iframe', 'a', 'img']))
             clean_html = cleaner.clean_html(answer)
             clean_html = re.sub(r'</p>$', '', re.sub(r'^<p>', '', clean_html))
         except:
@@ -309,10 +311,10 @@ class OpenEndedChild(object):
 
     def check_for_image_and_upload(self, get_data):
         has_file_to_upload = False
-        success=False
-        image_tag=""
+        success = False
+        image_tag = ""
         if 'can_upload_files' in get_data:
-            if get_data['can_upload_files'] =='true':
+            if get_data['can_upload_files'] == 'true':
                 has_file_to_upload = True
                 file = get_data['student_file'][0]
                 success, s3_public_url = self.upload_image_to_s3(file)

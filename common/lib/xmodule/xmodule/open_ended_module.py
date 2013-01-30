@@ -378,9 +378,9 @@ class OpenEndedModule(openendedchild.OpenEndedChild):
             Return error message or feedback template
         """
 
-        rubric_feedback=""
+        rubric_feedback = ""
         feedback = self._convert_longform_feedback_to_html(response_items)
-        if response_items['rubric_scores_complete']==True:
+        if response_items['rubric_scores_complete'] == True:
             rubric_renderer = CombinedOpenEndedRubric(system, True)
             success, rubric_feedback = rubric_renderer.render_rubric(response_items['rubric_xml'])
 
@@ -392,7 +392,7 @@ class OpenEndedModule(openendedchild.OpenEndedChild):
             'grader_type': response_items['grader_type'],
             'score': "{0} / {1}".format(response_items['score'], self.max_score()),
             'feedback': feedback,
-            'rubric_feedback' : rubric_feedback
+            'rubric_feedback': rubric_feedback
         })
 
         return feedback_template
@@ -436,7 +436,7 @@ class OpenEndedModule(openendedchild.OpenEndedChild):
                 log.error(error_message)
                 fail['feedback'] = error_message
                 return fail
-        #This is to support peer grading
+            #This is to support peer grading
         if isinstance(score_result['score'], list):
             feedback_items = []
             for i in xrange(0, len(score_result['score'])):
@@ -447,8 +447,8 @@ class OpenEndedModule(openendedchild.OpenEndedChild):
                     'success': score_result['success'],
                     'grader_id': score_result['grader_id'][i],
                     'submission_id': score_result['submission_id'],
-                    'rubric_scores_complete' : score_result['rubric_scores_complete'][i],
-                    'rubric_xml' : score_result['rubric_xml'][i],
+                    'rubric_scores_complete': score_result['rubric_scores_complete'][i],
+                    'rubric_xml': score_result['rubric_xml'][i],
                 }
                 feedback_items.append(self._format_feedback(new_score_result, system))
             if join_feedback:
@@ -475,7 +475,8 @@ class OpenEndedModule(openendedchild.OpenEndedChild):
         if not self.history:
             return ""
 
-        feedback_dict = self._parse_score_msg(self.history[-1].get('post_assessment', ""), system, join_feedback=join_feedback)
+        feedback_dict = self._parse_score_msg(self.history[-1].get('post_assessment', ""), system,
+            join_feedback=join_feedback)
         if not short_feedback:
             return feedback_dict['feedback'] if feedback_dict['valid'] else ''
         if feedback_dict['valid']:
@@ -565,8 +566,8 @@ class OpenEndedModule(openendedchild.OpenEndedChild):
 
         return {
             'success': True,
-            'error' : error_message,
-            'student_response' : get['student_answer']
+            'error': error_message,
+            'student_response': get['student_answer']
         }
 
     def update_score(self, get, system):
@@ -611,7 +612,7 @@ class OpenEndedModule(openendedchild.OpenEndedChild):
             'msg': post_assessment,
             'child_type': 'openended',
             'correct': correct,
-            'accept_file_upload' : self.accept_file_upload,
+            'accept_file_upload': self.accept_file_upload,
         }
         html = system.render_template('open_ended.html', context)
         return html
