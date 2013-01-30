@@ -5,6 +5,7 @@ import factory
 import unittest
 from nose.tools import set_trace
 from nose.plugins.skip import SkipTest
+from collections import defaultdict
 
 from django.http import Http404, HttpResponse, HttpRequest, HttpResponseRedirect, HttpResponseBadRequest
 from django.conf import settings
@@ -20,7 +21,11 @@ from xmodule.modulestore.django import modulestore, _MODULESTORES
 import contentstore.views as views
 from contentstore.tests.factories import CourseFactory, ItemFactory
 from xmodule.modulestore import Location
+from xmodule.x_module import ModuleSystem
+from xmodule.error_module import ErrorModule
 
+class Stub():
+    pass
 
 def xml_store_config(data_dir):
     return {
@@ -61,6 +66,7 @@ class ViewsTestCase(TestCase):
     def tearDown(self):
         _MODULESTORES = {}
         modulestore().collection.drop()
+        assert False
         
     def test_has_access(self):
         user = MagicMock(is_staff = True, is_active = True, is_authenticated = True)
@@ -134,3 +140,78 @@ class ViewsTestCase(TestCase):
                                                     'course', 'Robot_Super_Course')
         self.assertIsInstance(post_response,HttpResponse)
         self.assertEquals(post_response.content, 'null')
+
+    def test_load_preview_state(self):
+        # Tests that function creates empty defaultdict when request.session
+        # is empty
+        # location cannot be a list or other mutable type
+        self.request = RequestFactory().get('foo')
+        self.request.session = {}
+        instance_state, shared_state = views.load_preview_state(self.request,
+                                                        'foo', 'bar')
+        self.assertIsNone(instance_state)
+        self.assertIsNone(shared_state)
+
+    def test_save_preview_state(self):
+        self.request = RequestFactory().get('foo')
+        self.request.session = {}
+        loc = Location(self.location_3)
+        result = {'preview_states':
+                                      {('id', loc):{'instance':None,
+                                                        'shared':None,
+                                                        }
+                                        }
+                }
+        views.save_preview_state(self.request, 'id', loc, None, None)
+        self.assertEquals(self.request.session, result)
+
+    def test_get_preview_module(self):
+        raise SkipTest
+        self.request = RequestFactory().get('foo')
+        self.request.user = UserFactory()
+        mock_descriptor = MagicMock()
+        mock_descriptor.get_sample_state.return_value = [('foo','bar')]
+        instance, shared = views.get_preview_module(self.request, 'id', mock_descriptor)
+        self.assertEquals(instance, 'foo')
+
+    def test_preview_module_system(self):
+        # Returns a ModuleSystem
+        self.request = RequestFactory().get('foo')
+        self.request.user = UserFactory()
+        self.assertIsInstance(views.preview_module_system(self.request,
+                                                          'id', self.course),
+                              ModuleSystem)
+
+    def test_load_preview_module(self):
+         
+        self.request = RequestFactory().get('foo')
+        self.request.user = UserFactory()
+        self.request.session = {}
+        self.assertIsInstance(views.load_preview_module(self.request, 'id',
+                                        self.course, 'instance', 'shared'),
+                              ErrorModule)
+        system = views.preview_module_system(self.request, 'id', self.course)
+        # is a functools.partial object?
+        # Not sure how to get a valid line 507
+        print self.course.xmodule_constructor(system)
+        print self.course.xmodule_constructor(system).func
+        print self.course.xmodule_constructor(system).keywords
+
+    def test__xmodule_recurse(self):
+        raise SkipTest
+##        mock_item = MagicMock()
+##        mock_item.get_children.return_value = []
+        s = Stub()
+        s.children.append(Stub())
+        views._xmodule_recurse(s, lambda x: return)
+        #views._xmodule_recurse(s, lambda x: x.n += 1)
+        self.assertEquals(s.n, 1)
+        self.assertEquals(s.children[0].n, 1)
+        
+class Stub():
+    def __init__(self):
+        self.n = 0
+        self.children = []
+    def get_children(self):
+        return self.children
+    
