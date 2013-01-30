@@ -7,7 +7,6 @@ class @CombinedOpenEnded
     @wrapper=$(element).find('section.xmodule_CombinedOpenEndedModule')
     @el = $(element).find('section.combined-open-ended')
     @combined_open_ended=$(element).find('section.combined-open-ended')
-    @id = @el.data('id')
     @ajax_url = @el.data('ajax-url')
     @state = @el.data('state')
     @task_count = @el.data('task-count')
