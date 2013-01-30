@@ -31,7 +31,7 @@ ALLOWABLE_IMAGE_SUFFIXES = [
 ]
 
 #Maximum allowed dimensions (x and y) for an uploaded image
-MAX_ALLOWED_IMAGE_DIM = 1500
+MAX_ALLOWED_IMAGE_DIM = 1000
 
 #Dimensions to which image is resized before it is evaluated for color count, etc
 MAX_IMAGE_DIM = 150
@@ -40,7 +40,7 @@ MAX_IMAGE_DIM = 150
 MAX_COLORS_TO_COUNT = 16
 
 #Maximum number of colors allowed in an uploaded image
-MAX_COLORS = 20
+MAX_COLORS = 400
 
 class ImageProperties(object):
     """
