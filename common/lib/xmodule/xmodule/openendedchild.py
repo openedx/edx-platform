@@ -285,8 +285,8 @@ class OpenEndedChild(object):
         """
         success = False
         s3_public_url = ""
-        image_data.seek(0)
         try:
+            image_data.seek(0)
             image = Image.open(image_data)
             image_ok = open_ended_image_submission.run_image_tests(image)
             log.debug("Image ok: {0}".format(image_ok))

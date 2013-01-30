@@ -204,6 +204,7 @@ class SelfAssessmentModule(openendedchild.OpenEndedChild):
 
         # add new history element with answer and empty score and hint.
         get = self.append_image_to_student_answer(get)
+        get['student_answer'] = SelfAssessmentModule.sanitize_html(get['student_answer'])
         self.new_history_entry(get['student_answer'])
         self.change_state(self.ASSESSING)
 

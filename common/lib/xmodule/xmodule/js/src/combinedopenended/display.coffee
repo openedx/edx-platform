@@ -187,6 +187,8 @@ class @CombinedOpenEnded
           if files.size > max_filesize
             @can_upload_files = false
             files = ""
+        else
+          @can_upload_files = false
 
       fd = new FormData()
       fd.append('student_answer', @answer_area.val())
