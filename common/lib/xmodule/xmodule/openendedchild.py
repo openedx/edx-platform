@@ -341,7 +341,7 @@ class OpenEndedChild(object):
             success, get_data['student_answer'] = self.check_for_url_in_text(get_data['student_answer'])
             overall_success = success
 
-        return success, get_data
+        return overall_success, get_data
 
     def check_for_url_in_text(self, string):
         success = False
@@ -352,6 +352,7 @@ class OpenEndedChild(object):
                 if not success:
                     string = re.sub(link, '', string)
                 else:
+                    string = re.sub(link, self.generate_image_tag_from_url(link,link), string)
                     success = True
 
         return success, string

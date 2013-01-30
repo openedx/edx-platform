@@ -4,7 +4,7 @@ to send them to S3.
 """
 
 from PIL import Image
-import urlparse
+from urlparse import urlparse
 import requests
 from boto.s3.connection import S3Connection
 from boto.s3.key import Key
@@ -26,7 +26,8 @@ TRUSTED_IMAGE_DOMAINS = [
 ALLOWABLE_IMAGE_SUFFIXES = [
     'jpg',
     'png',
-    'gif'
+    'gif',
+    'jpeg'
 ]
 
 #Maximum allowed dimensions (x and y) for an uploaded image
@@ -132,7 +133,7 @@ class URLProperties(object):
         """
         success = False
         try:
-            self.parsed_url = urlparse.urlparse(url_string)
+            self.parsed_url = urlparse(self.url_string)
             success = True
         except:
             pass
@@ -157,6 +158,10 @@ class URLProperties(object):
         @return: True if URL passes tests, false if not.
         """
         url_is_okay = self.check_suffix() and self.check_if_parses() and self.check_domain()
+        log.debug(self.url_string)
+        log.debug("Suffix : {0}".format(self.check_suffix()))
+        log.debug("Parses:{0}".format(self.check_if_parses()))
+        log.debug("Check Domain:{0}".format(self.check_domain()))
         return url_is_okay
 
     def check_domain(self):
