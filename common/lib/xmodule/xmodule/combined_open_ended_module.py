@@ -38,7 +38,12 @@ MAX_SCORE = 1
 #The highest score allowed for the overall xmodule and for each rubric point
 MAX_SCORE_ALLOWED = 3
 
+#If true, default behavior is to score module as a practice problem.  Otherwise, no grade at all is shown in progress
+#Metadata overrides this.
 IS_SCORED = False
+
+#If true, then default behavior is to require a file upload or pasted link from a student for this problem.
+#Metadata overrides this.
 ACCEPT_FILE_UPLOAD = False
 
 #Contains all reasonable bool and case combinations of True
