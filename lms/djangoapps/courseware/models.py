@@ -87,20 +87,8 @@ class XModuleContentField(models.Model):
     # The definition id for the module
     definition_id = models.CharField(max_length=255, db_index=True)
 
-    @classmethod
-    def cache_for_descriptor_descendents(cls, course_id, user, descriptor, depth=None,
-                                         descriptor_filter=lambda descriptor: True,
-                                         select_for_update=False):
-        """
-        course_id: the course in the context of which we want StudentModules.
-        user: the django user for whom to load modules.
-        descriptor: An XModuleDescriptor
-        depth is the number of levels of descendent modules to load StudentModules for, in addition to
-            the supplied descriptor. If depth is None, load all descendent StudentModules
-        descriptor_filter is a function that accepts a descriptor and return wether the StudentModule
-            should be cached
-        select_for_update: Flag indicating whether the rows should be locked until end of transaction
-        """
+    # The value of the field. Defaults to None dumped as json
+    value = models.TextField(default='null')
 
     created = models.DateTimeField(auto_now_add=True, db_index=True)
     modified = models.DateTimeField(auto_now=True, db_index=True)
@@ -209,4 +197,3 @@ class XModuleStudentInfoField(models.Model):
 
     def __unicode__(self):
         return unicode(repr(self))
-
