@@ -8,6 +8,8 @@ from django.core.urlresolvers import reverse
 from path import path
 from tempfile import mkdtemp
 import json
+from fs.osfs import OSFS
+
 
 from student.models import Registration
 from django.contrib.auth.models import User
@@ -350,6 +352,33 @@ class ContentStoreTest(TestCase):
     def test_edit_unit_full(self):
         self.check_edit_unit('full')
 
+    def test_static_tab_reordering(self):
+        import_from_xml(modulestore(), 'common/test/data/', ['full'])
+        
+        ms = modulestore('direct')
+        course = ms.get_item(Location(['i4x','edX','full','course','6.002_Spring_2012', None]))
+
+        # reverse the ordering
+        reverse_tabs = []
+        for tab in course.tabs:
+            if tab['type'] == 'static_tab':
+                reverse_tabs.insert(0, 'i4x://edX/full/static_tab/{0}'.format(tab['url_slug']))
+ 
+        resp = self.client.post(reverse('reorder_static_tabs'), json.dumps({'tabs':reverse_tabs}), "application/json")
+
+        course = ms.get_item(Location(['i4x','edX','full','course','6.002_Spring_2012', None]))
+        
+        # compare to make sure that the tabs information is in the expected order after the server call
+        course_tabs = []
+        for tab in course.tabs:
+            if tab['type'] == 'static_tab':
+                course_tabs.append('i4x://edX/full/static_tab/{0}'.format(tab['url_slug']))
+
+        self.assertEqual(reverse_tabs, course_tabs)
+
+
+
+
     def test_about_overrides(self):
         '''
         This test case verifies that a course can use specialized override for about data, e.g. /about/Fall_2012/effort.html 
@@ -429,6 +458,28 @@ class ContentStoreTest(TestCase):
 
         # export out to a tempdir
         export_to_xml(ms, cs, location, root_dir, 'test_export')
+
+        # check for static tabs
+        fs = OSFS(root_dir / 'test_export')
+        self.assertTrue(fs.exists('tabs'))
+
+        static_tabs_query_loc = Location('i4x', location.org, location.course, 'static_tab', None)
+        static_tabs = ms.get_items(static_tabs_query_loc)
+
+        for static_tab in static_tabs:
+            fs = OSFS(root_dir / 'test_export/tabs')
+            self.assertTrue(fs.exists(static_tab.location.name + '.html'))
+
+        # check for custom_tags
+        fs = OSFS(root_dir / 'test_export')
+        self.assertTrue(fs.exists('custom_tags'))
+
+        custom_tags_query_loc = Location('i4x', location.org, location.course, 'custom_tag_template', None)
+        custom_tags = ms.get_items(custom_tags_query_loc)
+
+        for custom_tag in custom_tags:
+            fs = OSFS(root_dir / 'test_export/custom_tags')
+            self.assertTrue(fs.exists(custom_tag.location.name))       
 
         # remove old course
         delete_course(ms, cs, location)
