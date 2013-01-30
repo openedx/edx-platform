@@ -83,7 +83,8 @@ class ImageProperties(object):
         Does all available checks on an image to ensure that it is okay (size, skin ratio, colors)
         @return: Boolean indicating whether or not image passes all checks
         """
-        image_is_okay = self.count_colors() and self.get_skin_ratio() and not self.image_too_large
+        #image_is_okay = self.count_colors() and self.get_skin_ratio() and not self.image_too_large
+        image_is_okay = self.count_colors() and not self.image_too_large
         log.debug("Image too large: {0}".format(self.image_too_large))
         log.debug("Image Okay: {0}".format(image_is_okay))
         return image_is_okay
