@@ -3,6 +3,8 @@ import logging
 import pyparsing
 import sys
 
+from functools import partial
+
 from django.conf import settings
 from django.contrib.auth.models import User
 from django.core.urlresolvers import reverse
@@ -244,7 +246,11 @@ def _get_module(user, request, descriptor, student_module_cache, course_id,
                           # TODO (cpennington): This should be removed when all html from
                           # a module is coming through get_html and is therefore covered
                           # by the replace_static_urls code below
-                          replace_urls=replace_urls,
+                          replace_urls=partial(
+                              replace_urls,
+                              staticfiles_prefix='/static/' + descriptor.metadata.get('data_dir', ''),
+                              course_namespace=descriptor.location._replace(category=None, name=None),
+                          ),
                           node_path=settings.NODE_PATH,
                           anonymous_student_id=unique_id_for_user(user),
                           course_id=course_id,
@@ -280,7 +286,7 @@ def _get_module(user, request, descriptor, student_module_cache, course_id,
 
     module.get_html = replace_static_urls(
         _get_html,
-        module.metadata['data_dir'] if 'data_dir' in module.metadata else '', 
+        '/static/' + module.metadata.get('data_dir', ''),
         course_namespace = module.location._replace(category=None, name=None))
 
     # Allow URLs of the form '/course/' refer to the root of multicourse directory
