@@ -25,6 +25,7 @@ class @VideoAlpha
       @setSpeed($.cookie('video_speed'))
     $("#video_#{@id}").data('video', this).addClass('video-load-complete')
     @hide_captions = $.cookie('hide_captions') == 'true'
+    _this = this
     if ((@videoType is "youtube") and (YT.Player)) or ((@videoType is "html5") and (HTML5Video.Player))
       @embed()
     else

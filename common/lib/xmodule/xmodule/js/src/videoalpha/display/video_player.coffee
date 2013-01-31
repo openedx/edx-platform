@@ -139,11 +139,13 @@ class @VideoPlayerAlpha extends SubviewAlpha
     newSpeed = parseFloat(newSpeed).toFixed(2).replace /\.00$/, '.0'
     @video.setSpeed(newSpeed)
     @caption.currentSpeed = newSpeed
-
-    if @isPlaying()
-      @player.loadVideoById(@video.youtubeId(), @currentTime)
-    else
-      @player.cueVideoById(@video.youtubeId(), @currentTime)
+    if @video.videoType is 'html5'
+      @player.setSpeed(newSpeed)
+    else if @video.videoType is 'youtube'
+      if @isPlaying()
+        @player.loadVideoById(@video.youtubeId(), @currentTime)
+      else
+        @player.cueVideoById(@video.youtubeId(), @currentTime)
     @updatePlayTime @currentTime
 
   onVolumeChange: (event, volume) =>
