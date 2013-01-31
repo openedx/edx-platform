@@ -55,7 +55,10 @@ class Command(BaseCommand):
 
         log.info('Syncronizing email list for {0}'.format(course_id))
 
-        mailchimp = connect_mailchimp(key, list_id, course_id)
+        mailchimp = connect_mailchimp(key)
+
+        if not verify_list(mailchimp, list_id, course_id):
+            raise CommandError('course_id does not match list name')
 
         subscribed = get_subscribed(mailchimp, list_id)
         unsubscribed = get_unsubscribed(mailchimp, list_id)
@@ -66,8 +69,6 @@ class Command(BaseCommand):
 
         exclude = subscribed.union(non_subscribed)
         to_subscribe = get_student_data(enrolled, exclude=exclude)
-
-        log.info(len(to_subscribe))
 
         tag_names = set(chain.from_iterable(d.keys() for d in to_subscribe))
         update_merge_tags(mailchimp, list_id, tag_names)
@@ -83,15 +84,20 @@ class Command(BaseCommand):
         make_segments(mailchimp, list_id, nsegments, subscribed)
 
 
-def connect_mailchimp(key, list_id, course_id):
+def connect_mailchimp(key):
     mailchimp = MailSnake(key)
     result = mailchimp.ping()
     log.debug(result)
 
+    return mailchimp
+
+
+def verify_list(mailchimp, list_id, course_id):
     lists = mailchimp.lists(filters={'list_id': list_id})['data']
 
     if len(lists) != 1:
-        raise CommandError('incorrect list id')
+        log.error('incorrect list id')
+        return False
 
     list_name = lists[0]['name']
 
@@ -103,9 +109,10 @@ def connect_mailchimp(key, list_id, course_id):
     if count < 3:
         log.info(course_id)
         log.info(list_name)
-        raise CommandError('course_id does not match list name')
+        log.error('course_id does not match list name')
+        return False
 
-    return mailchimp
+    return True
 
 
 def get_student_data(students, exclude=None):
