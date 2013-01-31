@@ -76,13 +76,13 @@
         padding: 20px;
         border: none;
         border-radius: 3px;
-        background: $lightGrey;
+        background: #fff;
 
         .new-component-button {
           display: block;
           padding: 20px;
           text-align: center;
-          color: #6d788b;
+          color: #edf1f5;
         }
 
         h5 {
@@ -98,18 +98,20 @@
         }
 
         .new-component-type {
+
           a,
           li {
             display: inline-block;
           }
 
           a {
-            width: 100px;
+            width: 175px;
             height: 100px;
+            color: #edf1f5;
             margin-right: 10px;
             margin-bottom: 10px;
             border-radius: 8px;
-            font-size: 13px;
+            font-size: 15px;
             line-height: 14px;
             text-align: center;
             @include box-shadow(0 1px 1px rgba(0, 0, 0, .2), 0 1px 0 rgba(255, 255, 255, .4) inset);
@@ -121,6 +123,7 @@
               width: 100%;
               padding: 10px;
               @include box-sizing(border-box);
+              color: $mediumGrey;
             }
           }
         }
@@ -150,12 +153,12 @@
           a {
             position: relative;            
             border: 1px solid $mediumGrey;
-            background: tint($lightBluishGrey2,20%);
-            color: #fff;            
+            background: #edf1f5;
+            color: $mediumGrey;            
             @include transition(background-color .15s);
 
             &:hover {
-              background: $brightGreen;
+              background: #fffcf1;
             }
           }
         }
@@ -218,7 +221,7 @@
             display: block;
             padding: 7px 20px;
             border-bottom: none;
-            font-weight: 300;
+            font-weight: 500;
 
             .name {
               float: left;
@@ -270,10 +273,10 @@
               border-bottom: 1px solid $mediumGrey;
               border-radius: 3px;
               font-weight: 500;
-              background: tint($lightBluishGrey2,20%);
+              background: #edf1f5;
 
               &:hover {
-              background: $brightGreen;
+              background: #fffcf1;
             }
             }
           }
@@ -283,7 +286,7 @@
           text-align: center;
 
           h5 {
-            color: $green;
+            color: $mediumGrey;
           }
           
         }
@@ -557,6 +560,7 @@
 
 .edit-state-draft {
   .visibility,
+
   .edit-draft-message,
   .view-button {
     display: none;
