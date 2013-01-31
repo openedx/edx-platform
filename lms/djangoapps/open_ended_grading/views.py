@@ -226,7 +226,7 @@ def flagged_problem_list(request, course_id):
         error_text = "Could not get problem list"
         success = False
 
-    ajax_url = _reverse_with_slash('open_ended_problems', course_id)
+    ajax_url = _reverse_with_slash('open_ended_flagged_problems', course_id)
 
     return render_to_response('open_ended_problems/open_ended_flagged_problems.html', {
         'course': course,
@@ -308,7 +308,6 @@ def take_action_on_flags(request, course_id):
     student_id = p['student_id']
 
     try:
-        controller_qs = ControllerQueryService()
         response = controller_qs.take_action_on_flags(course_id, student_id, submission_id, action_type)
         return HttpResponse(response, mimetype="application/json")
     except GradingServiceError:

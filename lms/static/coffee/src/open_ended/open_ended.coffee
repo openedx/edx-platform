@@ -24,12 +24,21 @@ class OpenEnded
 
   ban: (event) =>
     event.preventDefault()
-    @gentle_alert "Ban"
+    parent_tr = $(event.target).parent().parent()
+    tr_children = parent_tr.children()
+    action_type = "ban"
+    submission_id = tr_children[4].innerText
+    student_id = tr_children[5].innerText
+    @gentle_alert student_id
+    @post('take_action_on_flags', {'submission_id' : submission_id, 'student_id' : student_id, 'action_type' : action_type}, @handle_after_action)
 
   post: (cmd, data, callback) ->
       # if this post request fails, the error callback will catch it
       $.post(@ajax_url + cmd, data, callback)
         .error => callback({success: false, error: "Error occured while performing this operation"})
+
+  handle_after_action: (data) ->
+    @gentle_alert data
 
   gentle_alert: (msg) =>
     if $('.message-container').length

@@ -289,7 +289,7 @@ if settings.COURSEWARE_ENABLED:
         # Open Ended flagged problem list
         url(r'^courses/(?P<course_id>[^/]+/[^/]+/[^/]+)/open_ended_flagged_problems$',
             'open_ended_grading.views.flagged_problem_list', name='open_ended_flagged_problems'),
-        url(r'^courses/(?P<course_id>[^/]+/[^/]+/[^/]+)/open_ended_flagged_problems/take_action_on_flag$',
+        url(r'^courses/(?P<course_id>[^/]+/[^/]+/[^/]+)/open_ended_flagged_problems/take_action_on_flags$',
             'open_ended_grading.views.take_action_on_flags', name='open_ended_flagged_problems_take_action'),
 		
 		# Cohorts management
