@@ -19,7 +19,7 @@ this.HTML5Video = (function () {
          *
          *         'height': 390,
          *
-         *         'videoSources': null, // An object of with properties being video sources. The property name is the
+         *         'videoSources': {},   // An object of with properties being video sources. The property name is the
          *                               // video format of the source. Supported video formats are: 'mp4', 'webm', and
          *                               // 'ogg'. By default videoSources property is null. This means that the
          *                               // player will initialize, and not play anything. If you do not provide a
@@ -53,12 +53,14 @@ this.HTML5Video = (function () {
          *     }
          */
         function Player(el, config) {
+            var sourceStr, _this;
+
             if (typeof el === 'string') {
                 this.el = $(el);
-            } else if ($.isPlainObject(el) === true) {
+            } else if (el instanceof jQuery) {
                 this.el = el;
             } else {
-                // Error. el parameter is required.
+                // Error. Parameter el does not have a recognized type.
 
                 // TODO: Make sure that nothing breaks if one of the methods available via this object's prototype
                 // is called after we return.
@@ -69,22 +71,99 @@ this.HTML5Video = (function () {
             if ($.isPlainObject(config) === true) {
                 this.config = config;
             } else {
-                this.config = {
-                    'width': 640,
-                    'height': 390,
-                    'videoSource': '',
-                    'playerVars': {
-                        'controls': 1,
-                        'start': null,
-                        'end': null
-                    },
-                    'events': {
-                        'onReady': null,
-                        'onStateChange': null,
-                        'onPlaybackQualityChange': null
-                    }
-                };
+                // Error. Parameter config does not have a recognized type.
+
+                // TODO: Make sure that nothing breaks if one of the methods available via this object's prototype
+                // is called after we return.
+
+                return;
             }
+
+            sourceStr = {
+                'mp4': ' ',
+                'webm': ' ',
+                'ogg': ' '
+            };
+
+            _this = this;
+            $.each(sourceStr, function (videoType, videoSource) {
+                if (
+                    (_this.config.videoSources.hasOwnProperty(videoType) === true) &&
+                    (typeof _this.config.videoSources[videoType] === 'string') &&
+                    (_this.config.videoSources[videoType].length > 0)
+                ) {
+                    sourceStr[videoType] =
+                        '<source ' +
+                            'src="' + _this.config.videoSources[videoType] + '" ' +
+                            'type="video/' + videoType + '" ' +
+                        '/> ';
+                }
+            });
+
+            this.playerState = HTML5Video.PlayerState.UNSTARTED;
+
+            this.videoEl = $(
+                '<video style="width: 100%;">' +
+                    sourceStr.mp4 +
+                    sourceStr.webm +
+                    sourceStr.ogg +
+                '</video>'
+            );
+
+            this.video = this.videoEl[0];
+
+            this.video.addEventListener('canplay', function () {
+                console.log('We got a "canplay" event.');
+
+                _this.playerState = HTML5Video.PlayerState.PAUSED;
+
+                if ($.isFunction(_this.config.events.onReady) === true) {
+                    console.log('Callback function "onReady" is defined.');
+
+                    _this.config.events.onReady({});
+                }
+            }, false);
+            this.video.addEventListener('play', function () {
+                console.log('We got a "play" event.');
+
+                _this.playerState = HTML5Video.PlayerState.PLAYING;
+
+                if ($.isFunction(_this.config.events.onStateChange) === true) {
+                    console.log('Callback function "onStateChange" is defined.');
+
+                    _this.config.events.onStateChange({
+                        'data': _this.playerState
+                    });
+                }
+            }, false);
+            this.video.addEventListener('pause', function () {
+                console.log('We got a "pause" event.');
+
+                _this.playerState = HTML5Video.PlayerState.PAUSED;
+
+                if ($.isFunction(_this.config.events.onStateChange) === true) {
+                    console.log('Callback function "onStateChange" is defined.');
+
+                    _this.config.events.onStateChange({
+                        'data': _this.playerState
+                    });
+                }
+            }, false);
+            this.video.addEventListener('ended', function () {
+                console.log('We got a "ended" event.');
+
+                _this.playerState = HTML5Video.PlayerState.ENDED;
+
+                if ($.isFunction(_this.config.events.onStateChange) === true) {
+                    console.log('Callback function "onStateChange" is defined.');
+
+                    _this.config.events.onStateChange({
+                        'data': _this.playerState
+                    });
+                }
+            }, false);
+
+            this.videoEl.appendTo(this.el.find('.video-player div'));
         }
 
         /*
@@ -122,7 +201,9 @@ this.HTML5Video = (function () {
         };
 
         Player.prototype.pauseVideo = function () {
+            console.log('Player.prototype.pauseVideo');
 
+            this.video.pause();
         };
 
         Player.prototype.seekTo = function () {
@@ -160,18 +241,12 @@ this.HTML5Video = (function () {
         };
 
         Player.prototype.playVideo = function () {
+            console.log('Player.prototype.playVideo');
 
+            this.video.play();
         };
 
         Player.prototype.getPlayerState = function () {
-
-        };
-
-        Player.prototype.pauseVideo = function () {
-
-        };
-
-        Player.prototype.setVolume = function () {
 
         };
 

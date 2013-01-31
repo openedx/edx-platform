@@ -1,8 +1,11 @@
 class @VideoPlayerAlpha extends SubviewAlpha
   initialize: ->
     if @video.videoType is 'youtube'
+      @PlayerState = YT.PlayerState
       # Define a missing constant of Youtube API
-      YT.PlayerState.UNSTARTED = -1
+      @PlayerState.UNSTARTED = -1
+    else if @video.videoType is 'html5'
+      @PlayerState = HTML5Video.PlayerState
 
     @currentTime = 0
     @el = $("#video_#{@video.id}")
@@ -51,7 +54,7 @@ class @VideoPlayerAlpha extends SubviewAlpha
       # work in AS3, not HMLT5. but iframe use AS3
       @playerVars.end = @video.end
     if @video.videoType is 'html5'
-      @player = new HTML5Video.Player @video.id,
+      @player = new HTML5Video.Player @video.el,
         playerVars: @playerVars,
         videoSources: @video.html5Sources,
         events:
@@ -80,13 +83,13 @@ class @VideoPlayerAlpha extends SubviewAlpha
 
   onStateChange: (event) =>
     switch event.data
-      when YT.PlayerState.UNSTARTED
+      when @PlayerState.UNSTARTED
         @onUnstarted()
-      when YT.PlayerState.PLAYING
+      when @PlayerState.PLAYING
         @onPlay()
-      when YT.PlayerState.PAUSED
+      when @PlayerState.PAUSED
         @onPause()
-      when YT.PlayerState.ENDED
+      when @PlayerState.ENDED
         @onEnded()
 
   onPlaybackQualityChange: (event, value) =>
@@ -168,12 +171,16 @@ class @VideoPlayerAlpha extends SubviewAlpha
 
   # Delegates
   play: =>
+    console.log 'Play clicked'
+    console.log @player.playVideo
     @player.playVideo() if @player.playVideo
 
   isPlaying: ->
-    @player.getPlayerState() == YT.PlayerState.PLAYING
+    @player.getPlayerState() == @PlayerState.PLAYING
 
   pause: =>
+    console.log 'Pause clicked'
+    console.log @player.pauseVideo
     @player.pauseVideo() if @player.pauseVideo
 
   duration: ->
