@@ -51,10 +51,11 @@ from contentstore import utils
           <nav class="settings-page-menu">
             <ul>
               <li><a href="#" class="is-shown" data-section="details">Course Details</a></li>
-              <!-- <li><a href="#" data-section="faculty">Faculty</a></li>  -->
+              <!-- <li><a href="#" data-section="faculty">Faculty</a></li> -->
               <li><a href="#" data-section="grading">Grading</a></li>
               <!-- <li><a href="#" data-section="problems">Problems</a></li> -->
               <!-- <li><a href="#" data-section="discussions">Discussions</a></li> -->
+              <li><a href="#" data-section="advanced">Advanced</a></li>
             </ul>
           </nav>
         </div>
@@ -722,6 +723,89 @@ from contentstore import utils
               </div>
             </section><!-- .settings-discussions-general -->
           </section><!-- .settings-discussions -->
+
+          <section class="settings-advanced">
+            <h2 class="title">Advanced Settings</h2>
+
+            <section class="settings-advanced-policies">
+              <header>
+                <h3>Additional Policy Definition</h3>
+                <span class="detail">Manually Edit Course Policy Values</span>
+              </header>
+
+              <p class="instructions"><strong>Warning</strong>: Add only manual policy data that you are familiar with.</p>
+
+              <div class="row">
+                <div class="field enum">
+                  <ul class="input-list course-advanced-policy-list">
+                    <li class="input multi course-advanced-policy-list-item">
+
+                      <div class="row">
+                        <div class="key">
+                          <label for="course-advanced-policy-1-key" class="">Policy Key:</label>
+                          <div class="field">
+                            <input type="text" class="short" id="course-advanced-policy-1-key" value="" />
+                          </div>      
+                        </div>
+
+                        <div class="value">
+                          <label for="course-advanced-policy-1-value" class="">Policy Value:</label>
+                          <div class="field">
+                            <textarea class="ace text" id="course-advanced-policy-1-value" value=""></textarea>
+                          </div>      
+                        </div>
+                      </div>
+                      <a href="#" class="delete-button standard remove-item advanced-policy-data"><span class="delete-icon"></span>Delete</a>
+                    </li>
+
+                    <li class="input multi course-advanced-policy-list-item">
+
+                      <div class="row">
+                        <div class="key">
+                          <label for="course-advanced-policy-1-key" class="">Policy Key:</label>
+                          <div class="field">
+                            <input type="text" class="short" id="course-advanced-policy-1-key" value="" />
+                          </div>      
+                        </div>
+
+                        <div class="value">
+                          <label for="course-advanced-policy-1-value" class="">Policy Value:</label>
+                          <div class="field">
+                            <textarea class="ace text" id="course-advanced-policy-1-value" value=""></textarea>
+                          </div>      
+                        </div>
+                      </div>
+                      <a href="#" class="delete-button standard remove-item advanced-policy-data"><span class="delete-icon"></span>Delete</a>
+                    </li>
+
+                    <li class="input multi course-advanced-policy-list-item">
+
+                      <div class="row">
+                        <div class="key">
+                          <label for="course-advanced-policy-1-key" class="">Policy Key:</label>
+                          <div class="field">
+                            <input type="text" class="short" id="course-advanced-policy-1-key" value="" />
+                          </div>      
+                        </div>
+
+                        <div class="value">
+                          <label for="course-advanced-policy-1-value" class="">Policy Value:</label>
+                          <div class="field">
+                            <textarea class="ace text" id="course-advanced-policy-1-value" value=""></textarea>
+                          </div>      
+                        </div>
+                      </div>
+                      <a href="#" class="delete-button standard remove-item advanced-policy-data"><span class="delete-icon"></span>Delete</a>
+                    </li>
+                  </ul>                  
+
+                  <a href="#" class="new-button new-advanced-policy-item add-policy-data">
+                    <span class="plus-icon white"></span>New Manual Policy
+                  </a>
+                </div>
+              </div>
+            </section><!-- .settings-advanced-policies -->
+          </section><!-- .settings-advanced -->
         </div>
       </article>
     </div>
