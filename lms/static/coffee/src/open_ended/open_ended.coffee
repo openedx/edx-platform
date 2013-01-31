@@ -42,7 +42,7 @@ class OpenEnded
         .error => callback({success: false, error: "Error occured while performing this operation"})
 
   handle_after_action: (data) ->
-    @gentle_alert data
+    @gentle_alert data.data
 
   gentle_alert: (msg) =>
     if $('.message-container').length
