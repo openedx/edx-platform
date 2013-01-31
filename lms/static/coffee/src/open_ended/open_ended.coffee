@@ -20,7 +20,12 @@ class OpenEnded
 
   unflag: (event) =>
     event.preventDefault()
-    @gentle_alert "Unflag"
+    parent_tr = $(event.target).parent().parent()
+    tr_children = parent_tr.children()
+    action_type = "unflag"
+    submission_id = tr_children[4].innerText
+    student_id = tr_children[5].innerText
+    @post('take_action_on_flags', {'submission_id' : submission_id, 'student_id' : student_id, 'action_type' : action_type}, @handle_after_action)
 
   ban: (event) =>
     event.preventDefault()
