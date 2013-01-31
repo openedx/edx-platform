@@ -11,9 +11,9 @@
       id="video_${id}"
       class="video"
       data-streams=""
-      data-mp4-source="http://clips.vorwaerts-gmbh.de/VfE_html5.mp4"
-      data-webm-source="http://clips.vorwaerts-gmbh.de/VfE_html5.webm"
-      data-ogg-source="http://clips.vorwaerts-gmbh.de/VfE_html5.ogv"
+      ${'data-mp4-source="{}"'.format(mp4_source) if mp4_source else ''}
+      ${'data-wemb-source="{}"'.format(wemb_source) if wemb_source else ''}
+      ${'data-ogg-source="{}"'.format(ogv_source) if ogv_source else ''}
       data-caption-data-dir="${data_dir}"
       data-show-captions="${show_captions}"
       data-start="${start}"

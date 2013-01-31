@@ -4,14 +4,13 @@ import logging
 from lxml import etree
 from pkg_resources import resource_string, resource_listdir
 
+from django.http import Http404
+
 from xmodule.x_module import XModule
 from xmodule.raw_module import RawDescriptor
 from xmodule.modulestore.mongo import MongoModuleStore
 from xmodule.modulestore.django import modulestore
 from xmodule.contentstore.content import StaticContent
-
-import datetime
-import time
 
 import datetime
 import time
@@ -44,6 +43,9 @@ class VideoAlphaModule(XModule):
         self.position = 0
         self.show_captions = xmltree.get('show_captions', 'true')
         self.source = self._get_source(xmltree)
+        self.mp4_source = self._get_source(xmltree, ['mp4'])
+        self.wemb_source = self._get_source(xmltree, ['wemb'])
+        self.ogv_source = self._get_source(xmltree, ['ogv'])
         self.track = self._get_track(xmltree)
         self.start_time, self.end_time = self._get_timeframe(xmltree)
 
@@ -52,15 +54,16 @@ class VideoAlphaModule(XModule):
             if 'position' in state:
                 self.position = int(float(state['position']))
 
-    def _get_source(self, xmltree):
+    def _get_source(self, xmltree, extension=['mp4', 'ogv', 'avi', 'webm']):
         # find the first valid source
-        return self._get_first_external(xmltree, 'source')
+        condition = lambda src: any([src.endswith(ext) for ext in extension])
+        return self._get_first_external(xmltree, 'source', condition)
 
     def _get_track(self, xmltree):
         # find the first valid track
         return self._get_first_external(xmltree, 'track')
 
-    def _get_first_external(self, xmltree, tag):
+    def _get_first_external(self, xmltree, tag, condition=bool):
         """
         Will return the first valid element
         of the given tag.
@@ -69,7 +72,7 @@ class VideoAlphaModule(XModule):
         result = None
         for element in xmltree.findall(tag):
             src = element.get('src')
-            if src:
+            if condition(src):
                 result = src
                 break
         return result
@@ -134,6 +137,9 @@ class VideoAlphaModule(XModule):
             'streams': self.videoalpha_list(),
             'id': self.location.html_id(),
             'position': self.position,
+            'mp4_source': self.mp4_source,
+            'wemb_source': self.wemb_source,
+            'ogv_source': self.ogv_source,
             'source': self.source,
             'track': self.track,
             'display_name': self.display_name,
