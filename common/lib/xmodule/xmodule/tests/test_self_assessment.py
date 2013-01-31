@@ -43,7 +43,8 @@ class SelfAssessmentTest(unittest.TestCase):
                 'rubric': etree.XML(rubric),
                 'prompt': prompt,
                 'max_score': 1,
-                'display_name': "Name"
+                'display_name': "Name",
+                'accept_file_uploads' : False,
                 }
 
         module = SelfAssessmentModule(test_system, self.location,
