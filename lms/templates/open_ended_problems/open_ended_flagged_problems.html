@@ -25,9 +25,9 @@
         <table class="problem-list">
             <tr>
                 <th>Name</th>
-                <th>Student ID</th>
-                <th>ID</th>
                 <th>Response</th>
+                <th>Unflag</th>
+                <th>Ban</th>
             </tr>
             %for problem in problem_list:
             <tr>
@@ -35,13 +35,19 @@
                     ${problem['problem_name']}
                 </td>
                 <td>
-                    ${problem['student_id']}
+                    ${problem['student_response']}
                 </td>
                 <td>
+
+                </td>
+                <td>
+
+                </td>
+                <td style="display:none;">
                     ${problem['submission_id']}
                 </td>
-                <td>
-                    ${problem['student_response']}
+                <td style="display:none;">
+                    ${problem['student_id']}
                 </td>
             </tr>
             %endfor

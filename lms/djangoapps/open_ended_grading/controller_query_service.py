@@ -68,12 +68,14 @@ class ControllerQueryService(GradingService):
         response = self.get(self.flagged_problem_list_url, params)
         return response
 
-    def take_action_on_flags(self, course_id, student_id, submission_id):
+    def take_action_on_flags(self, course_id, student_id, submission_id, action_type):
         params = {
             'course_id' : course_id,
             'student_id' : student_id,
             'submission_id' : submission_id,
+            'action_type' : action_type
             }
 
         response = self.post(self.take_action_on_flags_url, params)
         return response
+

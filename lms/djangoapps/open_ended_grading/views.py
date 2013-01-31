@@ -287,5 +287,32 @@ def combined_notifications(request, course_id):
     return render_to_response('open_ended_problems/combined_notifications.html',
         combined_dict
     )
+
+def take_action_on_flags(request, course_id):
+    """
+
+    """
+    if request.method != 'POST':
+        raise Http404
+
+
+    required = ['submission_id', 'action_type', 'student_id']
+    for key in required:
+        if key not in request.POST:
+            return HttpResponse(json.dumps({'success': False, 'error': 'Missing key {0}'.format(key)}),
+                mimetype="application/json")
+
+    p = request.POST
+    submission_id = p['submission_id']
+    action_type = p['action_type']
+    student_id = p['student_id']
+
+    try:
+        controller_qs = ControllerQueryService()
+        response = controller_qs.save_calibration_essay(course_id, student_id, course_id, action_type)
+        return HttpResponse(response, mimetype="application/json")
+    except GradingServiceError:
+        log.exception("Error saving calibration grade, location: {0}, submission_id: {1}, submission_key: {2}, grader_id: {3}".format(location, submission_id, submission_key, grader_id))
+        return _err_response('Could not connect to grading service')
     
 
