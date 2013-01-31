@@ -86,9 +86,10 @@
         }
 
         h5 {
-          margin-bottom: 8px;
+          margin-bottom: 12px;
           color: #fff;
-          font-weight: 700;
+          font-weight: 600;
+          font-size: 18px;
         }
 
         .rendered-component {
@@ -105,11 +106,11 @@
           }
 
           a {
-            width: 175px;
+            width: 160px;
             height: 100px;
             color: #edf1f5;
-            margin-right: 10px;
-            margin-bottom: 10px;
+            margin-right: 15px;
+            margin-bottom: 15px;
             border-radius: 8px;
             font-size: 15px;
             line-height: 14px;
@@ -173,22 +174,23 @@
           background:none;
 
           .problem-type-label {
-            font-size: 14px;
-            font-style: italic;
-            color:#B0B6C2;
+            font-size: 16px;
+            margin-right: 10px;
+            color: $mediumGrey;
           }
 
           li {
+            float:right;
+            text-align: right;
             display:inline-block;
             margin: 5px;
-            width: 150px;
+            width: 100px;
             text-align:center;
             border: 1px $mediumGrey;
-            @include border-radius(5px 0 0 5px);
+            @include border-radius(5px 5px 5px 5px);
 
             &.current {
-              background: #fff;
-
+              background: #edf1f5;
             }
           }
           a{
