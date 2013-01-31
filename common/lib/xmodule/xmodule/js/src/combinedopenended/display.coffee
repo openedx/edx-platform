@@ -351,5 +351,5 @@ class @CombinedOpenEnded
     answer_id = @answer_area.attr('id')
     answer_val = @answer_area.val()
     new_text = ''
-    new_text = "<span class='#{answer_class}' id='#{answer_id}'>#{answer_val}</span>"
+    new_text = "<div class='#{answer_class}' id='#{answer_id}'>#{answer_val}</div>"
     @answer_area.replaceWith(new_text)

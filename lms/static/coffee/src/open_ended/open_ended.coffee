@@ -44,13 +44,14 @@ class OpenEnded
         .error => callback({success: false, error: "Error occured while performing this operation"})
 
   after_action_wrapper: (target, action_type) ->
+    tr_parent = target.parent().parent()
+    tr_children = tr_parent.children()
+    action_taken = tr_children[4].firstElementChild
+    action_taken.innerText = "#{action_type} done for student."
     return @handle_after_action
 
   handle_after_action: (data) ->
-    tr_parent = target.parent().parent()
-    tr_children = tr_parent.children()
-    action_taken = tr_children[4].children()[0]
-    action_taken.replaceWith('<div class="action-taken">#{action_type} done for student.</div>')
+    blah = "blah"
 
   gentle_alert: (msg) =>
     if $('.message-container').length
