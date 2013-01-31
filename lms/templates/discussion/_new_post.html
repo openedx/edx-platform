@@ -9,7 +9,7 @@
 </%def>
 
 <%def name="render_entry(entries, entry)">
-    <li><a href="#" class="topic" data-discussion_id="${entries[entry]['id']}">${entry}</a></li>
+    <li><a href="#" class="topic" data-discussion_id="${entries[entry]['id']}" cohorted = "${entries[entry]['id'] in cohorted_commentables}">${entry}</a></li>
 </%def>
 
 <%def name="render_category(categories, category)">
@@ -20,6 +20,9 @@
         </ul>
     </li>
 </%def>
+
+
+
 
 <article class="new-post-article">
     <div class="inner-wrapper">        
@@ -45,14 +48,18 @@
                     %elif course.metadata.get("allow_anonymous_to_peers", False):
                         <input type="checkbox" name="anonymous_to_peers" class="discussion-anonymous-to-peers" id="new-post-anonymous-to-peers"><label for="new-post-anonymous-to-peers">post anonymously to classmates</label>
                     %endif
-                    %if is_moderator:
-                    <div class="form-group-label">
+                    %if is_course_cohorted:
+                    <div class="form-group-label choose-cohort">
                         Make visible to:
-                        <select class="group-filter-select"> 
+                        <select class="group-filter-select new-post-group" name = "group_id"> 
                             <option >All Groups</option>
-                            %for c in cohorts:
-                            <option value="g1">Group 1</option>
-                            %endfor
+                            %if is_moderator:
+                              %for c in cohorts:
+                              <option value="${c.id}">${c.name}</option>
+                              %endfor
+                            %else:
+                              <option value="${cohort}">My Cohort</option>
+                            %endif
 
                         </select>
                     </div>

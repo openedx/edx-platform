@@ -30,6 +30,9 @@ def get_cohort_id(user, course_id):
     Given a course id and a user, return the id of the cohort that user is
     assigned to in that course.  If they don't have a cohort, return None.
     """
+    print "\n\n\n\n\n*********************************"
+    print user
+    print course_id
     cohort = get_cohort(user, course_id)
     return None if cohort is None else cohort.id
 
@@ -64,7 +67,23 @@ def is_commentable_cohorted(course_id, commentable_id):
                                                                ans))
     return ans
 
+    
+def get_cohorted_commentables(course_id):
+    """
+    Given a course_id return a list of strings representing cohorted commentables
+    """
 
+    course = courses.get_course_by_id(course_id)
+    
+    if not course.is_cohorted:
+        # this is the easy case :)
+        ans = []
+    else: 
+        ans = course.top_level_discussion_topic_ids
+
+    return ans
+    
+    
 def get_cohort(user, course_id):
     """
     Given a django User and a course_id, return the user's cohort in that

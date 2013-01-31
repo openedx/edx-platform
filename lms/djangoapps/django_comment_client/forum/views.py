@@ -11,7 +11,7 @@ from django.contrib.auth.models import User
 
 from mitxmako.shortcuts import render_to_response, render_to_string
 from courseware.courses import get_course_with_access
-from course_groups.cohorts import get_cohort_id, get_course_cohorts
+from course_groups.cohorts import get_cohort_id, get_course_cohorts, get_cohorted_commentables, is_course_cohorted
 from courseware.access import has_access
 
 from urllib import urlencode
@@ -128,7 +128,8 @@ def forum_form_discussion(request, course_id):
         log.error("Error loading forum discussion threads: %s" % str(err))
         raise Http404
 
-    user_info = cc.User.from_django_user(request.user).to_dict()
+    user = cc.User.from_django_user(request.user)
+    user_info = user.to_dict()
 
     annotated_content_info = utils.get_metadata_for_threads(course_id, threads, request.user, user_info)
 
@@ -167,13 +168,13 @@ def forum_form_discussion(request, course_id):
             'course_id': course.id,
             'category_map': category_map,
             'roles': saxutils.escape(json.dumps(utils.get_role_ids(course_id)), escapedict),
-            #'is_moderator': cached_has_permission(request.user, "see_all_cohorts", course_id),
-            'is_moderator': True,
-            'cohorts': get_course_cohorts(course_id)
+            'is_moderator': cached_has_permission(request.user, "see_all_cohorts", course_id),
+            'cohorts': get_course_cohorts(course_id),
+            'cohort': get_cohort_id(user, course_id),
+            'cohorted_commentables': get_cohorted_commentables(course_id),
+            'is_course_cohorted': is_course_cohorted(course_id)
         }
         # print "start rendering.."
-        print "\n\n\n\n\n\n*************************************"
-        print context
         return render_to_response('discussion/index.html', context)
 
 @login_required
