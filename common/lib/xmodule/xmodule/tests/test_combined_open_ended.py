@@ -39,7 +39,8 @@ class OpenEndedChildTest(unittest.TestCase):
             'prompt': prompt,
             'rubric': rubric,
             'max_score': max_score, 
-            'display_name': 'Name'
+            'display_name': 'Name',
+            'accept_file_upload' : False,
             }
     definition = Mock()
     descriptor = Mock()
