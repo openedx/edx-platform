@@ -17,18 +17,17 @@
         <h2>Instructions</h2>
         <p>Here are a list of open ended problems for this course that have been flagged by students as potentially inappropriate.</p>
         % if success:
-        % if len(flagged_list) == 0:
+        % if len(problem_list) == 0:
         <div class="message-container">
             No flagged problems exist.
         </div>
         %else:
         <table class="problem-list">
             <tr>
-                <th>Problem Name</th>
+                <th>Name</th>
                 <th>Student ID</th>
-                <th>Student Response</th>
-                <th>Submission ID</th>
-                <th>Location</th>
+                <th>ID</th>
+                <th>Response</th>
             </tr>
             %for problem in problem_list:
             <tr>
@@ -39,13 +38,10 @@
                     ${problem['student_id']}
                 </td>
                 <td>
-                    ${problem['student_response']}
-                </td>
-                <td>
                     ${problem['submission_id']}
                 </td>
                 <td>
-                    ${problem['location']}
+                    ${problem['student_response']}
                 </td>
             </tr>
             %endfor
