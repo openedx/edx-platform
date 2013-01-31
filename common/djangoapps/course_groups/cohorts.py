@@ -79,7 +79,7 @@ def get_cohorted_commentables(course_id):
         # this is the easy case :)
         ans = []
     else: 
-        ans = course.top_level_discussion_topic_ids
+        ans = course.cohorted_discussions
 
     return ans
     
