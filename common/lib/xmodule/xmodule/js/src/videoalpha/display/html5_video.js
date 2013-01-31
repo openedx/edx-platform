@@ -112,6 +112,28 @@ this.HTML5Video = (function () {
 
             this.video = this.videoEl[0];
 
+            this.videoEl.on('click', function (event) {
+                if (_this.playerState === HTML5Video.PlayerState.PAUSED) {
+                    _this.video.play();
+                    _this.playerState = HTML5Video.PlayerState.PLAYING;
+
+                    if ($.isFunction(_this.config.events.onStateChange) === true) {
+                        _this.config.events.onStateChange({
+                            'data': _this.playerState
+                        });
+                    }
+                } else if (_this.playerState === HTML5Video.PlayerState.PLAYING) {
+                    _this.video.pause();
+                    _this.playerState = HTML5Video.PlayerState.PAUSED;
+
+                    if ($.isFunction(_this.config.events.onStateChange) === true) {
+                        _this.config.events.onStateChange({
+                            'data': _this.playerState
+                        });
+                    }
+                }
+            });
+
             this.video.addEventListener('canplay', function () {
                 _this.playerState = HTML5Video.PlayerState.PAUSED;
 
@@ -185,12 +207,13 @@ this.HTML5Video = (function () {
         };
 
         Player.prototype.pauseVideo = function () {
-
             this.video.pause();
         };
 
-        Player.prototype.seekTo = function () {
-
+        Player.prototype.seekTo = function (value) {
+            if ((typeof value === 'number') && (value <= this.video.duration) && (value >= 0)) {
+                this.video.currentTime = value;
+            }
         };
 
         // YouTube API has player.loadVideoById, but since we are working with a video source, we will rename this
@@ -215,8 +238,10 @@ this.HTML5Video = (function () {
             this.cueVideoBySource(id);
         };
 
-        Player.prototype.setVolume = function () {
-
+        Player.prototype.setVolume = function (value) {
+            if ((typeof value === 'number') && (value <= 100) && (value >= 0)) {
+                this.video.volume = value * 0.01;
+            }
         };
 
         Player.prototype.getCurrentTime = function () {
@@ -232,12 +257,22 @@ this.HTML5Video = (function () {
         };
 
         Player.prototype.getVolume = function () {
-
+            return this.video.volume;
         };
 
         Player.prototype.getDuration = function () {
             return this.video.duration;
         };
+
+        Player.prototype.setSpeed = function (value) {
+            var newSpeed;
+
+            newSpeed = parseFloat(value);
+
+            if (isFinite(newSpeed) === true) {
+                this.video.playbackRate = value;
+            }
+        }
 
         return Player;
     }());
