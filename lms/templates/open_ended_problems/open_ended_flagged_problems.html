@@ -10,6 +10,10 @@
 
 <%include file="/courseware/course_navigation.html" args="active_page='open_ended_flagged_problems'" />
 
+<%block name="js_extra">
+    <%static:js group='open_ended'/>
+</%block>
+
 <section class="container">
     <div class="open-ended-problems" data-ajax_url="${ajax_url}">
         <div class="error-container">${error_text}</div>
@@ -38,10 +42,10 @@
                     ${problem['student_response']}
                 </td>
                 <td>
-                    <a href="#unflag" class="unflag-button action-button">Unflag</a>
+                    <a href="#unflag" class="unflag-button action-button" data-action-type="unflag">Unflag</a>
                 </td>
                 <td>
-                    <a href="#ban" class="ban-button action-button">Ban</a>
+                    <a href="#ban" class="ban-button action-button" data-action-type="ban">Ban</a>
                 </td>
                 <td style="display:none;">
                     ${problem['submission_id']}
