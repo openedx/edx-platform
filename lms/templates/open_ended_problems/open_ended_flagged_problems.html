@@ -28,6 +28,7 @@
                 <th>Student ID</th>
                 <th>Student Response</th>
                 <th>Submission ID</th>
+                <th>Location</th>
             </tr>
             %for problem in problem_list:
             <tr>
@@ -42,6 +43,9 @@
                 </td>
                 <td>
                     ${problem['submission_id']}
+                </td>
+                <td>
+                    ${problem['location']}
                 </td>
             </tr>
             %endfor
