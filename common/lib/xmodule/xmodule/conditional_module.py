@@ -1,10 +1,10 @@
 import json
-import logging
-
+import logging 
 from xmodule.x_module import XModule
 from xmodule.modulestore import Location
 from xmodule.seq_module import SequenceDescriptor
-
+from xblock.core import List, String, Scope, Integer
+from lxml import etree
 from pkg_resources import resource_string
 
 log = logging.getLogger('mitx.' + __name__)
@@ -14,49 +14,47 @@ class ConditionalModule(XModule):
     Blocks child module from showing unless certain conditions are met.
 
     Example:
-        
+
         <conditional condition="require_completed" required="tag/url_name1&tag/url_name2">
             <video url_name="secret_video" />
         </conditional>
 
     '''
 
-    js = {'coffee': [resource_string(__name__, 'js/src/conditional/display.coffee'),
+    js = {'coffee': [resource_string(__name__, 'js/src/javascript_loader.coffee'),
+                     resource_string(__name__, 'js/src/conditional/display.coffee'),
                      resource_string(__name__, 'js/src/collapsible.coffee'),
-                     resource_string(__name__, 'js/src/javascript_loader.coffee'),
+                     
                     ]}
 
     js_module_name = "Conditional"
     css = {'scss': [resource_string(__name__, 'css/capa/display.scss')]}
 
-
-    def __init__(self, system, location, definition, descriptor, instance_state=None, shared_state=None, **kwargs):
-        """
-        In addition to the normal XModule init, provide:
-        
-            self.condition            = string describing condition required
-
-        """
-        XModule.__init__(self, system, location, definition, descriptor, instance_state, shared_state, **kwargs)
-        self.contents = None
-        #self.required_modules_list = [tuple(x.split('/',1)) for x in self.metadata.get('required','').split('&')]
-        self.condition = self.metadata.get('condition','')
-        #log.debug('conditional module required=%s' % self.required_modules_list)
+    # xml_object = String(scope=Scope.content)
+    contents = String(scope=Scope.content)
 
     def _get_required_modules(self):
         self.required_modules = []
         for loc in self.descriptor.required_module_locations:
+            # import ipdb; ipdb.set_trace()
             module = self.system.get_module(loc)
+            # import ipdb; ipdb.set_trace()
             self.required_modules.append(module)
         #log.debug('required_modules=%s' % (self.required_modules))
 
+    def _get_condition(self):
+        return self.descriptor.xml_attributes.get('condition', '')
+
     def is_condition_satisfied(self):
         self._get_required_modules()
+        self.condition = self._get_condition()
 
-        if self.condition=='require_completed':
+        if self.condition == 'require_completed':
             # all required modules must be completed, as determined by
             # the modules .is_completed() method
             for module in self.required_modules:
+                # import ipdb; ipdb.set_trace()
+
                 #log.debug('in is_condition_satisfied; student_answers=%s' % module.lcp.student_answers)
                 #log.debug('in is_condition_satisfied; instance_state=%s' % module.instance_state)
                 if not hasattr(module, 'is_completed'):
@@ -85,8 +83,9 @@ class ConditionalModule(XModule):
         This is called by courseware.module_render, to handle an AJAX call.
         '''
         #log.debug('conditional_module handle_ajax: dispatch=%s' % dispatch)
-
+        # import ipdb; ipdb.set_trace()   
         if not self.is_condition_satisfied():
+            # import ipdb; ipdb.set_trace()
             context = {'module': self}
             html = self.system.render_template('conditional_module.html', context)
             # html = render_to_string('conditional_module.html', context)
@@ -94,11 +93,13 @@ class ConditionalModule(XModule):
             #return self.system.render_template('conditional_module.html', context)
 
         if self.contents is None:
-            self.contents = [child.get_html() for child in self.get_display_items()]
-
+            # self.contents = [child.get_html() for child in self.get_display_items()]
+            self.contents = [self.system.get_module(child_descriptor.location).get_html() 
+                    for child_descriptor in self.descriptor.get_children()]
+        # import ipdb; ipdb.set_trace()
         # for now, just deal with one child
         html = self.contents[0]
-        
+
         #log.debug('rendered conditional module %s' % str(self.location))
 
         return json.dumps({'html': html})
@@ -114,8 +115,8 @@ class ConditionalDescriptor(SequenceDescriptor):
 
     def __init__(self, *args, **kwargs):
         super(ConditionalDescriptor, self).__init__(*args, **kwargs)
-
-        required_module_list = [tuple(x.split('/',1)) for x in self.metadata.get('required','').split('&')]
+        # import ipdb; ipdb.set_trace()
+        required_module_list = [tuple(x.split('/',1)) for x in self.xml_attributes.get('required','').split('&')]
         self.required_module_locations = []
         for (tag, name) in required_module_list:
             loc = self.location.dict()
@@ -123,9 +124,8 @@ class ConditionalDescriptor(SequenceDescriptor):
             loc['name'] = name
             self.required_module_locations.append(Location(loc))
         log.debug('ConditionalDescriptor required_module_locations=%s' % self.required_module_locations)
-        
+
     def get_required_module_descriptors(self):
         """Returns a list of XModuleDescritpor instances upon which this module depends, but are
         not children of this module"""
         return [self.system.load_item(loc) for loc in self.required_module_locations]
-    
