@@ -9,7 +9,7 @@ class PeerGrading
 
     @message_container = $('.message-container')
     @message_container.toggle(not @message_container.is(':empty'))
-  
+
     @problem_list = $('.problem-list')
     @construct_progress_bar()
 

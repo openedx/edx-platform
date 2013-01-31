@@ -38,14 +38,15 @@ import sys
 from pkg_resources import resource_string
 from .capa_module import only_one, ComplexEncoder
 
-from peer_grading_service import peer_grading_service
+from peer_grading_service import peer_grading_service, GradingServiceError
 
 log = logging.getLogger(__name__)
 
 class PeerGradingModule(XModule):
     _VERSION = 1
 
-    js = {'coffee': [resource_string(__name__, 'js/src/combinedopenended/display.coffee'),
+    js = {'coffee': [resource_string(__name__, 'js/src/peergrading/peer_grading.coffee'),
+                     resource_string(__name__, 'js/src/peergrading/peer_grading_problem.coffee'),
                      resource_string(__name__, 'js/src/collapsible.coffee'),
                      resource_string(__name__, 'js/src/javascript_loader.coffee'),
                      ]}
@@ -66,6 +67,7 @@ class PeerGradingModule(XModule):
 
         #We need to set the location here so the child modules can use it
         system.set('location', location)
+        self.system = system
         self.peer_gs = peer_grading_service()
         log.debug(self.system)
 
@@ -104,19 +106,21 @@ class PeerGradingModule(XModule):
             'is_student_calibrated': self.is_student_calibrated,
             'save_grade': self.save_grade,
             'save_calibration_essay' : self.save_calibration_essay,
+            'show_problem' : self.peer_grading_problem,
             }
 
         if dispatch not in handlers:
             return 'Error'
 
-        before = self.get_progress()
         d = handlers[dispatch](get)
-        after = self.get_progress()
-        d.update({
-            'progress_changed': after != before,
-            'progress_status': Progress.to_js_status_str(after),
-            })
+
         return json.dumps(d, cls=ComplexEncoder)
+
+    def get_progress(self):
+        pass
+
+    def get_score(self):
+        pass
 
     def get_next_submission(self, get):
         """
@@ -146,12 +150,12 @@ class PeerGradingModule(XModule):
         location = p['location']
 
         try:
-            response = peer_grading_service().get_next_submission(location, grader_id)
+            response = self.peer_gs.get_next_submission(location, grader_id)
             return HttpResponse(response,
                 mimetype="application/json")
         except GradingServiceError:
             log.exception("Error getting next submission.  server url: {0}  location: {1}, grader_id: {2}"
-            .format(peer_grading_service().url, location, grader_id))
+            .format(self.peer_gs.url, location, grader_id))
             return json.dumps({'success': False,
                                'error': 'Could not connect to grading service'})
 
@@ -185,19 +189,17 @@ class PeerGradingModule(XModule):
         rubric_scores = p.getlist('rubric_scores[]')
         submission_flagged = p['submission_flagged']
         try:
-            response = peer_grading_service().save_grade(location, grader_id, submission_id,
+            response = self.peer_gs.save_grade(location, grader_id, submission_id,
                 score, feedback, submission_key, rubric_scores, submission_flagged)
             return HttpResponse(response, mimetype="application/json")
         except GradingServiceError:
             log.exception("""Error saving grade.  server url: {0}, location: {1}, submission_id:{2},
                             submission_key: {3}, score: {4}"""
-            .format(peer_grading_service().url,
+            .format(self.peer_gs.url,
                 location, submission_id, submission_key, score)
             )
             return json.dumps({'success': False,
                                'error': 'Could not connect to grading service'})
-
-
 
     def is_student_calibrated(self, get):
         """
@@ -226,15 +228,13 @@ class PeerGradingModule(XModule):
         location = p['location']
 
         try:
-            response = peer_grading_service().is_student_calibrated(location, grader_id)
+            response = self.peer_gs.is_student_calibrated(location, grader_id)
             return HttpResponse(response, mimetype="application/json")
         except GradingServiceError:
             log.exception("Error from grading service.  server url: {0}, grader_id: {0}, location: {1}"
-            .format(peer_grading_service().url, grader_id, location))
+            .format(self.peer_gs.url, grader_id, location))
             return json.dumps({'success': False,
                                'error': 'Could not connect to grading service'})
-
-
 
     def show_calibration_essay(self, get):
         """
@@ -270,11 +270,11 @@ class PeerGradingModule(XModule):
         p = request.POST
         location = p['location']
         try:
-            response = peer_grading_service().show_calibration_essay(location, grader_id)
+            response = self.peer_gs.show_calibration_essay(location, grader_id)
             return HttpResponse(response, mimetype="application/json")
         except GradingServiceError:
             log.exception("Error from grading service.  server url: {0}, location: {0}"
-            .format(peer_grading_service().url, location))
+            .format(self.peer_gs.url, location))
             return json.dumps({'success': False,
                                'error': 'Could not connect to grading service'})
         # if we can't parse the rubric into HTML,
@@ -318,13 +318,14 @@ class PeerGradingModule(XModule):
         rubric_scores = p.getlist('rubric_scores[]')
 
         try:
-            response = peer_grading_service().save_calibration_essay(location, grader_id, calibration_essay_id,
+            response = self.peer_gs.save_calibration_essay(location, grader_id, calibration_essay_id,
                 submission_key, score, feedback, rubric_scores)
             return HttpResponse(response, mimetype="application/json")
         except GradingServiceError:
             log.exception("Error saving calibration grade, location: {0}, submission_id: {1}, submission_key: {2}, grader_id: {3}".format(location, submission_id, submission_key, grader_id))
             return _err_response('Could not connect to grading service')
-    def peer_grading(self, request, course_id):
+
+    def peer_grading(self, get = None):
         '''
         Show a peer grading interface
         '''
@@ -334,7 +335,7 @@ class PeerGradingModule(XModule):
         error_text = ""
         problem_list = []
         try:
-            problem_list_json = self.peer_gs.get_problem_list(course_id, unique_id_for_user(request.user))
+            problem_list_json = self.peer_gs.get_problem_list(course_id, self.system.anonymous_student_id)
             problem_list_dict = json.loads(problem_list_json)
             success = problem_list_dict['success']
             if 'error' in problem_list_dict:
@@ -350,7 +351,7 @@ class PeerGradingModule(XModule):
             error_text = "Could not get problem list"
             success = False
 
-        ajax_url = _reverse_with_slash('peer_grading', course_id)
+        ajax_url = self.system.ajax_url
 
         return self.system.render_template('peer_grading/peer_grading.html', {
             'course': course,
@@ -363,16 +364,20 @@ class PeerGradingModule(XModule):
             'staff_access': False, })
 
 
-    def peer_grading_problem(request, course_id):
+    def peer_grading_problem(self, get = None):
         '''
         Show individual problem interface
         '''
-        course = get_course_with_access(request.user, course_id, 'load')
-        problem_location = request.GET.get("location")
+        if get == None:
+            problem_location = self.system.location
+        elif get.get('location') is not None:
+            problem_location = get.get('location')
+        else:
+            problem_location = self.system.location
 
-        ajax_url = _reverse_with_slash('peer_grading', course_id)
+        ajax_url = self.system.ajax_url
 
-        return render_to_response('peer_grading/peer_grading_problem.html', {
+        return self.system.render_template('peer_grading/peer_grading_problem.html', {
             'view_html': '',
             'course': course,
             'problem_location': problem_location,

@@ -25,9 +25,10 @@ from xmodule.course_module import CourseDescriptor
 from combined_open_ended_rubric import CombinedOpenEndedRubric, RubricParsingError
 from lxml import etree
 
-
-
 from django.conf import settings
+
+class GradingServiceError(Exception):
+    pass
 
 class PeerGradingService():
     """

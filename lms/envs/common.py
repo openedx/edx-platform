@@ -437,7 +437,6 @@ main_vendor_js = [
 
 discussion_js = sorted(rooted_glob(PROJECT_ROOT / 'static', 'coffee/src/discussion/**/*.coffee'))
 staff_grading_js = sorted(rooted_glob(PROJECT_ROOT / 'static', 'coffee/src/staff_grading/**/*.coffee'))
-peer_grading_js = sorted(rooted_glob(PROJECT_ROOT / 'static','coffee/src/peer_grading/**/*.coffee'))
 open_ended_js = sorted(rooted_glob(PROJECT_ROOT / 'static','coffee/src/open_ended/**/*.coffee'))
 
 PIPELINE_CSS = {
@@ -469,7 +468,7 @@ PIPELINE_JS = {
         'source_filenames': sorted(
             set(rooted_glob(COMMON_ROOT / 'static', 'coffee/src/**/*.coffee') +
                 rooted_glob(PROJECT_ROOT / 'static', 'coffee/src/**/*.coffee')) -
-            set(courseware_js + discussion_js + staff_grading_js + peer_grading_js + open_ended_js)
+            set(courseware_js + discussion_js + staff_grading_js + open_ended_js)
         ) + [
             'js/form.ext.js',
             'js/my_courses_dropdown.js',
@@ -498,10 +497,6 @@ PIPELINE_JS = {
     'staff_grading' : {
         'source_filenames': staff_grading_js,
         'output_filename': 'js/staff_grading.js'
-    },
-    'peer_grading' : {
-        'source_filenames': peer_grading_js,
-        'output_filename': 'js/peer_grading.js'
     },
     'open_ended' : {
         'source_filenames': open_ended_js,
