@@ -94,7 +94,10 @@ class PeerGradingModule(XModule):
          Needs to be implemented by inheritors.  Renders the HTML that students see.
         @return:
         """
-        pass
+        if not self.use_for_single_location:
+            return self.peer_grading()
+        else:
+            return self.peer_grading_problem({'location' : self.system.location})
 
     def handle_ajax(self, dispatch, get):
         """
@@ -357,7 +360,6 @@ class PeerGradingModule(XModule):
         ajax_url = self.system.ajax_url
 
         return self.system.render_template('peer_grading/peer_grading.html', {
-            'course': course,
             'course_id': self.system.course_id,
             'ajax_url': ajax_url,
             'success': success,
@@ -382,7 +384,6 @@ class PeerGradingModule(XModule):
 
         return self.system.render_template('peer_grading/peer_grading_problem.html', {
             'view_html': '',
-            'course': course,
             'problem_location': problem_location,
             'course_id': self.system.course_id,
             'ajax_url': ajax_url,
