@@ -3,6 +3,12 @@
   margin: 40px;
 }
 
+//Problem selector requirements - TO DO: Marco -determine placement, integration for this
+.js .tabs .tab {
+  display: none;
+}
+//end problem selector reqs
+
 .main-column {
   clear: both;
   float: left;
@@ -143,8 +149,8 @@
 
           a {
             position: relative;            
-            border: 1px solid $darkGreen;
-            background: tint($green,20%);
+            border: 1px solid $lightBluishGrey2;
+            background: tint($mediumGrey,20%);
             color: #fff;            
             @include transition(background-color .15s);
 
@@ -154,13 +160,26 @@
           }
         }
 
+        .problem-type-tabs {
+          list-style-type: none;
+          width: 100%;
+
+          li {
+          }
+          a{
+            display: block;
+            width: 70px;
+            height:25px;
+          }
+        }
+
         .new-component-template {
           margin-bottom: 20px;
 
           li:last-child {
             a {
               border-radius: 0 0 3px 3px;
-              border-bottom: 1px solid $darkGreen;
+              border-bottom: 1px solid $mediumGrey;
             }
           }
 
@@ -180,13 +199,16 @@
             .name {
               float: left;
 
-              .ss-icon {
+              .problem-selector-icon {
                 @include transition(opacity .15s);
-                position: relative;
+                display: inline-block;
                 top: 1px;
-                font-size: 13px;
                 margin-right: 5px;
                 opacity: 0.5;
+                width: 17;
+                height: 21px;
+                vertical-align: middle;
+                background: url(../img/problem-selector-icons.png) no-repeat;
               }
             }
 
