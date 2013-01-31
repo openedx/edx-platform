@@ -26,15 +26,15 @@
                 % if view_only:
                     ## if this is the selected rubric block, show it highlighted
                     % if option['selected']:
-                        <div class="view-only selected-grade">
+                        <div class="rubric-label selected-grade">
                     % else:
-                        <div class="view-only">
+                        <div class="rubric-label">
                     % endif
                         ${option['text']}
                         </div>
                 % else:
                     <input type="radio" class="score-selection" name="score-selection-${i}" id="score-${i}-${j}" value="${option['points']}"/>
-                    <label for="score-${i}-${j}">${option['text']}</label>
+                    <label class="rubric-label" for="score-${i}-${j}">${option['text']}</label>
                 % endif
             </td>
             % endfor
