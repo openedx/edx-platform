@@ -1,0 +1,63 @@
+.annotatable-header {
+  border: 1px solid $border-color;
+  border-radius: 3px;
+  margin-bottom: 1em;
+  padding: 2px 4px;
+  position: relative;
+
+  .annotatable-title {
+    font-size: em(18);
+    text-transform: uppercase;
+  }
+  .annotatable-description {
+    font-size: $body-font-size;
+  }
+}
+
+
+span.annotatable {
+  color: $blue;
+  .annotatable-icon {
+    margin: auto 2px auto 4px;
+  }
+}
+
+.annotatable-icon {
+  display: inline-block;
+  vertical-align: middle;
+  width: 16px;
+  height: 17px;
+  background: url(../images/link-icon.png) no-repeat;  
+}
+
+.help-icon {
+  display: block;
+  position: absolute;
+  right: 0;
+  top: 33%;
+  width: 16px;
+  height: 17px;
+  margin: 0 7px 0 0;
+  background: url(../images/info-icon.png) no-repeat;
+}
+
+.annotatable-discussion {
+  display: block;
+  border: 1px solid $border-color;
+  border-radius: 3px;
+  margin: 1em 0;
+  position: relative;
+  padding: 4px;
+
+  .annotatable-discussion-label {
+    font-weight: bold;
+  }
+  .annotatable-icon {
+    margin: auto 4px auto 0px;
+  }
+  .annotatable-show-discussion {
+    position: absolute;
+    right: 8px;
+    margin-top: 4px;
+  }
+}
