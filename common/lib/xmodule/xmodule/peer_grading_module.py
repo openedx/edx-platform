@@ -9,34 +9,30 @@ in settings.PEER_GRADING_INTERFACE
 import json
 import logging
 import requests
-from requests.exceptions import RequestException, ConnectionError, HTTPError
 import sys
 
 from django.conf import settings
 from django.http import HttpResponse, Http404
-from grading_service import GradingService
-from grading_service import GradingServiceError
 
-from courseware.access import has_access
-from util.json_request import expect_json
-from xmodule.course_module import CourseDescriptor
-from xmodule.combined_open_ended_rubric import CombinedOpenEndedRubric
-from student.models import unique_id_for_user
+from combined_open_ended_rubric import CombinedOpenEndedRubric
 from lxml import etree
 
 import copy
-from fs.errors import ResourceNotFoundError
 import itertools
 import json
 import logging
-from lxml import etree
 from lxml.html import rewrite_links
-from path import path
 import os
-import sys
 
 from pkg_resources import resource_string
 from .capa_module import only_one, ComplexEncoder
+from .editing_module import EditingDescriptor
+from .html_checker import check_html
+from progress import Progress
+from .stringify import stringify_children
+from .x_module import XModule
+from .xml_module import XmlDescriptor
+from xmodule.modulestore import Location
 
 from peer_grading_service import peer_grading_service, GradingServiceError
 
@@ -391,7 +387,7 @@ class PeerGradingDescriptor(XmlDescriptor, EditingDescriptor):
     Module for adding combined open ended questions
     """
     mako_template = "widgets/html-edit.html"
-    module_class = CombinedOpenEndedModule
+    module_class = PeerGradingModule
     filename_extension = "xml"
 
     stores_state = True
@@ -413,6 +409,7 @@ class PeerGradingDescriptor(XmlDescriptor, EditingDescriptor):
         'task_xml': dictionary of xml strings,
         }
         """
+        log.debug("In definition")
         expected_children = []
         for child in expected_children:
             if len(xml_object.xpath(child)) == 0:
