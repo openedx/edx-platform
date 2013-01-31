@@ -1,7 +1,6 @@
 class @Conditional
 
   constructor: (element) ->
-    alert "abc"
     @el = $(element).find('.conditional-wrapper')
     @id = @el.data('problem-id')
     @element_id = @el.attr('id')
@@ -19,7 +18,7 @@ class @Conditional
   render: (content) ->
     if content
       @el.html(content)
-      XModule.loadModules('display', @el)
+      XModule.loadModules(@el)
     else
       $.postWithPrefix "#{@url}/conditional_get", (response) =>
         @el.html(response.html)
