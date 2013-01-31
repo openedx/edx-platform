@@ -38,6 +38,9 @@ from peer_grading_service import peer_grading_service, GradingServiceError
 
 log = logging.getLogger(__name__)
 
+USE_FOR_SINGLE_LOCATION = False
+TRUE_DICT = [True, "True", "true", "TRUE"]
+
 class PeerGradingModule(XModule):
     _VERSION = 1
 
@@ -66,6 +69,10 @@ class PeerGradingModule(XModule):
         self.system = system
         self.peer_gs = peer_grading_service()
         log.debug(self.system)
+
+        self.use_for_single_location = self.metadata.get('use_for_single_location', USE_FOR_SINGLE_LOCATION)
+        if isinstance(self.use_for_single_location, basestring):
+            self.use_for_single_location = (self.use_for_single_location in TRUE_DICT)
 
     def _err_response(self, msg):
         """
@@ -331,7 +338,7 @@ class PeerGradingModule(XModule):
         error_text = ""
         problem_list = []
         try:
-            problem_list_json = self.peer_gs.get_problem_list(course_id, self.system.anonymous_student_id)
+            problem_list_json = self.peer_gs.get_problem_list(self.system.course_id, self.system.anonymous_student_id)
             problem_list_dict = json.loads(problem_list_json)
             success = problem_list_dict['success']
             if 'error' in problem_list_dict:
@@ -351,7 +358,7 @@ class PeerGradingModule(XModule):
 
         return self.system.render_template('peer_grading/peer_grading.html', {
             'course': course,
-            'course_id': course_id,
+            'course_id': self.system.course_id,
             'ajax_url': ajax_url,
             'success': success,
             'problem_list': problem_list,
@@ -377,7 +384,7 @@ class PeerGradingModule(XModule):
             'view_html': '',
             'course': course,
             'problem_location': problem_location,
-            'course_id': course_id,
+            'course_id': self.system.course_id,
             'ajax_url': ajax_url,
             # Checked above
             'staff_access': False, })
