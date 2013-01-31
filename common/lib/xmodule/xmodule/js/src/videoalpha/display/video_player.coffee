@@ -171,22 +171,19 @@ class @VideoPlayerAlpha extends SubviewAlpha
 
   # Delegates
   play: =>
-    console.log 'Play clicked'
-    console.log @player.playVideo
     @player.playVideo() if @player.playVideo
 
   isPlaying: ->
     @player.getPlayerState() == @PlayerState.PLAYING
 
   pause: =>
-    console.log 'Pause clicked'
-    console.log @player.pauseVideo
     @player.pauseVideo() if @player.pauseVideo
 
   duration: ->
     if @video.videoType is "youtube"
       return @video.getDuration()
-    else return @player.getDuration()  if @video.videoType is "html5"
+    else if @video.videoType is "html5"
+      return @player.getDuration()
     0
 
   currentSpeed: ->
