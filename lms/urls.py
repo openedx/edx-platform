@@ -285,6 +285,10 @@ if settings.COURSEWARE_ENABLED:
         # Open Ended problem list
         url(r'^courses/(?P<course_id>[^/]+/[^/]+/[^/]+)/open_ended_problems$',
             'open_ended_grading.views.student_problem_list', name='open_ended_problems'),
+
+        # Open Ended flagged problem list
+        url(r'^courses/(?P<course_id>[^/]+/[^/]+/[^/]+)/open_ended_flagged_problems$',
+            'open_ended_grading.views.flagged_problem_list', name='open_ended_flagged_problems'),
 		
 		# Cohorts management
         url(r'^courses/(?P<course_id>[^/]+/[^/]+/[^/]+)/cohorts$',
