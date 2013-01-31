@@ -158,8 +158,9 @@ def student_problem_list(request, course_id):
         success = problem_list_dict['success']
         if 'error' in problem_list_dict:
             error_text = problem_list_dict['error']
-
-        problem_list = problem_list_dict['problem_list']
+            problem_list = []
+        else:
+            problem_list = problem_list_dict['problem_list']
 
         for i in xrange(0,len(problem_list)):
             problem_url_parts = search.path_to_location(modulestore(), course.id, problem_list[i]['location'])
@@ -213,8 +214,9 @@ def flagged_problem_list(request, course_id):
         success = problem_list_dict['success']
         if 'error' in problem_list_dict:
             error_text = problem_list_dict['error']
-
-        problem_list = problem_list_dict['flagged_submissions']
+            problem_list=[]
+        else:
+            problem_list = problem_list_dict['flagged_submissions']
 
     except GradingServiceError:
         error_text = "Error occured while contacting the grading service"
