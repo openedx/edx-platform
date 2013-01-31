@@ -27,6 +27,7 @@ answer from other users.
 import json
 import logging
 import cgi
+from copy import deepcopy
 
 from lxml import html, etree
 from pkg_resources import resource_string
@@ -35,7 +36,7 @@ from xmodule.x_module import XModule
 from xmodule.stringify import stringify_children
 from xmodule.mako_module import MakoModuleDescriptor
 from xmodule.xml_module import XmlDescriptor
-from xblock.core import Integer, Scope, String, List, Object  # , Boolean
+from xblock.core import Integer, Scope, String, List, Object, Boolean
 
 log = logging.getLogger(__name__)
 
@@ -53,42 +54,22 @@ class PollModule(XModule):
     css = {'scss': [resource_string(__name__, 'css/poll/display.scss')]}
     js_module_name = "Poll"
 
-    # poll_id =
-    # upvotes = Integer(help="Number of upvotes this poll has recieved", scope=Scope.content, default=0)
-    # downvotes = Integer(help="Number of downvotes this poll has recieved", scope=Scope.content, default=0)
-    # voted = Boolean(help="Whether this student has voted on the poll", scope=Scope.student_state, default=False)
-    # poll_id_list = Obj(help="Number of upvotes this poll has recieved", scope=Scope.content, default=[])
-    # poll_up_list = List(help="Number of upvotes this poll has recieved", scope=Scope.content, default=[])
-    # poll_down_list = List(help="Number of upvotes this poll has recieved", scope=Scope.content, default=[])
-    polls_obj = Object(help="Number of upvotes this poll has recieved", scope=Scope.content, default=[])
-    # import ipdb; ipdb.set_trace()
-    # polls.append({})
-    # polls[0]['0'] = {'upvotes': 0, 'downvotes': 0}
-    polls_obj.polls = {'upvotes': 0, 'downvotes': 0}
+    voted = Boolean(help="Whether this student has voted on the poll", scope=Scope.student_state, default=False)
+    poll_answer = String(help="Whether this student has voted on the poll", scope=Scope.content, default='')
+    poll_answers = Object(help="Whether this student has voted on the poll", scope=Scope.content, default=dict())
 
     xml_object = String(scope=Scope.content)
 
     def handle_ajax(self, dispatch, get):
         ''' '''
-        import ipdb; ipdb.set_trace()
-        if dispatch == 'upvote':
-            # get index for current id from poll_id_li
-            # update value of  index element
-            # index=0
-            # self.poll_up_list.append(1)
-            # self.upvotes += 1
-            # self.voted = True
-            # return json.dumps({'upvotes': self.upvotes, 'downvotes': self.downvote})
-            PollModule.polls_obj.polls['upvotes'] += 1
-            return json.dumps(PollModule.polls_obj.polls)
-        elif dispatch == 'downvote':
-            # self.downvotes += 1
-            # self.voted = True
-            # return json.dumps({'upvotes': self.upvotes, 'downvotes': self.downvote})
-            # self.poll_down_list.append(2)
-            PollModule.polls_obj.polls['downvotes'] += 1
-            return json.dumps(PollModule.polls_obj.polls)
-
+        if dispatch in self.answers:
+            self.poll_answers[dispatch] += 1
+            self.voted = True
+            self.poll_answer = dispatch
+            return json.dumps({'poll_answers': self.poll_answers,
+                               'callback': {'object': 'Conditional',
+                                            'method': 'update'}
+                               })
         return json.dumps({'error': 'Unknown Command!'})
 
     def get_html(self):
@@ -104,13 +85,14 @@ class PollModule(XModule):
 
     def dump_poll(self):
         """     """
-        return json.dumps({'poll_chain':
-                          [{'question': cgi.escape(stringify_children(q)),
-                            'id':          q.get('id'),
-                            'upvote_id':   q.get('upvote', ""),
-                            'downvote_id': q.get('downvote', ""),
-                            'show_stats':  q.get('show_stats', "yes")}
-                            for q in self.xml_object.xpath('question')]})
+        xml_object_copy = deepcopy(self.xml_object)
+        for element_answer in xml_object_copy.findall('answer'):
+            if element_answer.get('name', ''):
+                self.poll_answers[element_answer.get('name')] = \
+                         cgi.escape(stringify_children(element_answer))
+            xml_object_copy.remove(element_answer)
+        return json.dumps({'answers': self.poll_answers,
+              'question': cgi.escape(stringify_children(xml_object_copy))})
 
 
 class PollDescriptor(MakoModuleDescriptor, XmlDescriptor):
@@ -130,15 +112,16 @@ class PollDescriptor(MakoModuleDescriptor, XmlDescriptor):
             dict
         """
         # check for presense of required tags in xml
-        if len(xml_object.xpath('question')) == 0:
-            raise ValueError("Poll definition must include \
-                at least one 'question' tag")
+        if len(xml_object.xpath('answer')) == 0:
+            raise ValueError("Poll_question definition must include \
+                at least one 'answer' tag")
 
         return {'xml_object': xml_object}, []
 
     def definition_to_xml(self, resource_fs):
         '''Return an xml element representing this definition.'''
-        xml_object = etree.Element('graphical_slider_tool')
+        #  TODO test and fix
+        xml_object = etree.Element('poll_question')
 
         def add_child(k):
             child_str = '<{tag}>{body}</{tag}>'.format(tag=k, body=self.definition[k])
@@ -148,4 +131,4 @@ class PollDescriptor(MakoModuleDescriptor, XmlDescriptor):
         for child in ['render', 'sequence']:
             add_child(child)
 
-        return
+        return xml_object
