@@ -1,15 +1,3 @@
-from .capa_module import only_one, ComplexEncoder
-from .editing_module import EditingDescriptor
-from .html_checker import check_html
-from progress import Progress
-from .stringify import stringify_children
-from .x_module import XModule
-from .xml_module import XmlDescriptor
-from xmodule.modulestore import Location
-import self_assessment_module
-import open_ended_module
-from combined_open_ended_rubric import CombinedOpenEndedRubric, RubricParsingError
-from .stringify import stringify_children
 import json
 import logging
 import requests
@@ -19,13 +7,10 @@ import sys
 from django.conf import settings
 from django.http import HttpResponse, Http404
 
-from courseware.access import has_access
-from util.json_request import expect_json
-from xmodule.course_module import CourseDescriptor
 from combined_open_ended_rubric import CombinedOpenEndedRubric, RubricParsingError
 from lxml import etree
 
-from django.conf import settings
+log=logging.getLogger(__name__)
 
 class GradingServiceError(Exception):
     pass
