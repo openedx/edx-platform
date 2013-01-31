@@ -44,7 +44,7 @@ class SelfAssessmentTest(unittest.TestCase):
                 'prompt': prompt,
                 'max_score': 1,
                 'display_name': "Name",
-                'accept_file_uploads' : False,
+                'accept_file_upload' : False,
                 }
 
         module = SelfAssessmentModule(test_system, self.location,
