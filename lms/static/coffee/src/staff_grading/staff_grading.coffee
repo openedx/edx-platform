@@ -9,9 +9,13 @@ state_graded = "graded"
 state_no_data = "no_data"
 state_error = "error"
 
-class StaffGradingBackend
+class @StaffGradingBackend
   constructor: (ajax_url, mock_backend) ->
     @ajax_url = ajax_url
+    # prevent this from trying to make requests when we don't have
+    # a proper url
+    if !ajax_url
+      mock_backend = true
     @mock_backend = mock_backend
     if @mock_backend
       @mock_cnt = 0
@@ -142,7 +146,7 @@ The standard chunk of Lorem Ipsum used since the 1500s is reproduced below for t
         .error => callback({success: false, error: "Error occured while performing this operation"})
 
 
-class StaffGrading
+class @StaffGrading
   constructor: (backend) ->
     @backend = backend
 
