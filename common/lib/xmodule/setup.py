@@ -26,7 +26,7 @@ setup(
             "html = xmodule.html_module:HtmlDescriptor",
             "image = xmodule.backcompat_module:TranslateCustomTagDescriptor",
             "error = xmodule.error_module:ErrorDescriptor",
-            "poll = xmodule.poll_module:PollDescriptor",
+            "poll_question = xmodule.poll_module:PollDescriptor",
             "problem = xmodule.capa_module:CapaDescriptor",
             "problemset = xmodule.seq_module:SequenceDescriptor",
             "section = xmodule.backcompat_module:SemanticSectionDescriptor",
