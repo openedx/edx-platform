@@ -301,7 +301,7 @@ def index(request, course_id, chapter=None, section=None,
 @login_required
 @ensure_csrf_cookie
 @cache_control(no_cache=True, no_store=True, must_revalidate=True)
-def testcenter_exam(request, course_id, chapter, section):
+def timed_exam(request, course_id, chapter, section):
     """
     Displays only associated content.  If course, chapter,
     and section are all specified, renders the page, or returns an error if they
@@ -387,20 +387,27 @@ def testcenter_exam(request, course_id, chapter, section):
             # they don't have access to.
             raise Http404
 
-        # Save where we are in the chapter
+        # Save where we are in the chapter NOT!
 #        instance_module = get_instance_module(course_id, request.user, chapter_module, student_module_cache)
 #        save_child_position(chapter_module, section, instance_module)
 
 
         context['content'] = section_module.get_html()
         
-        # figure out when the exam should end.  Going forward, this is determined by getting a "normal"
+        # figure out when the timed exam should end.  Going forward, this is determined by getting a "normal"
         # duration from the test, then doing some math to modify the duration based on accommodations,
         # and then use that value as the end.  Once we have calculated this, it should be sticky -- we
         # use the same value for future requests, unless it's a tester.
+        
+        # get value for duration from the section's metadata:
+        if 'duration' not in section_descriptor.metadata:
+            raise Http404
+        
+        # for now, assume that the duration is set as an integer value, indicating the number of seconds:
+        duration = int(section_descriptor.metadata.get('duration'))
 
-        # Let's try 600s for now...
-        context['end_date'] =  (time() + 600) * 1000
+        # This value should be UTC time as number of milliseconds since epoch.
+        context['end_date'] =  (time() + duration) * 1000
 
         result = render_to_response('courseware/testcenter_exam.html', context)
     except Exception as e:

@@ -67,7 +67,8 @@
          return ( num < 10 ? "0" : "" ) + num;
        }
        
-       // set the end time when the template is rendered
+       // set the end time when the template is rendered.
+       // This value should be UTC time as number of milliseconds since epoch.
        var endTime = new Date(${end_date});
        var currentTime = new Date();
        var remaining_secs = Math.floor((endTime - currentTime)/1000);
