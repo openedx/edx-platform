@@ -113,50 +113,34 @@ this.HTML5Video = (function () {
             this.video = this.videoEl[0];
 
             this.video.addEventListener('canplay', function () {
-                console.log('We got a "canplay" event.');
-
                 _this.playerState = HTML5Video.PlayerState.PAUSED;
 
                 if ($.isFunction(_this.config.events.onReady) === true) {
-                    console.log('Callback function "onReady" is defined.');
-
                     _this.config.events.onReady({});
                 }
             }, false);
             this.video.addEventListener('play', function () {
-                console.log('We got a "play" event.');
-
                 _this.playerState = HTML5Video.PlayerState.PLAYING;
 
                 if ($.isFunction(_this.config.events.onStateChange) === true) {
-                    console.log('Callback function "onStateChange" is defined.');
-
                     _this.config.events.onStateChange({
                         'data': _this.playerState
                     });
                 }
             }, false);
             this.video.addEventListener('pause', function () {
-                console.log('We got a "pause" event.');
-
                 _this.playerState = HTML5Video.PlayerState.PAUSED;
 
                 if ($.isFunction(_this.config.events.onStateChange) === true) {
-                    console.log('Callback function "onStateChange" is defined.');
-
                     _this.config.events.onStateChange({
                         'data': _this.playerState
                     });
                 }
             }, false);
             this.video.addEventListener('ended', function () {
-                console.log('We got a "ended" event.');
-
                 _this.playerState = HTML5Video.PlayerState.ENDED;
 
                 if ($.isFunction(_this.config.events.onStateChange) === true) {
-                    console.log('Callback function "onStateChange" is defined.');
-
                     _this.config.events.onStateChange({
                         'data': _this.playerState
                     });
@@ -201,7 +185,6 @@ this.HTML5Video = (function () {
         };
 
         Player.prototype.pauseVideo = function () {
-            console.log('Player.prototype.pauseVideo');
 
             this.video.pause();
         };
@@ -237,12 +220,10 @@ this.HTML5Video = (function () {
         };
 
         Player.prototype.getCurrentTime = function () {
-
+            return this.video.currentTime;
         };
 
         Player.prototype.playVideo = function () {
-            console.log('Player.prototype.playVideo');
-
             this.video.play();
         };
 
@@ -255,9 +236,7 @@ this.HTML5Video = (function () {
         };
 
         Player.prototype.getDuration = function () {
-            // TODO: Return valid video duration.
-
-            return 0;
+            return this.video.duration;
         };
 
         return Player;
