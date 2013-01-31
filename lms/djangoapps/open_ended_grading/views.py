@@ -56,12 +56,14 @@ def _reverse_without_slash(url_name, course_id):
 DESCRIPTION_DICT = {
             'Peer Grading': "View all problems that require peer assessment in this particular course.",
             'Staff Grading': "View ungraded submissions submitted by students for the open ended problems in the course.",
-            'Problems you have submitted': "View open ended problems that you have previously submitted for grading." 
+            'Problems you have submitted': "View open ended problems that you have previously submitted for grading.",
+            'Flagged Submissions' : "View submissions that have been flagged by students as inappropriate."
     }
 ALERT_DICT = {
             'Peer Grading': "New submissions to grade",
             'Staff Grading': "New submissions to grade",
-            'Problems you have submitted': "New grades have been returned" 
+            'Problems you have submitted': "New grades have been returned",
+            'Flagged Submissions' : "Submissions have been flagged for review"
     }
 @cache_control(no_cache=True, no_store=True, must_revalidate=True)
 def staff_grading(request, course_id):
