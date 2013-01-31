@@ -21,6 +21,8 @@ class ControllerQueryService(GradingService):
         self.is_unique_url = self.url + '/is_name_unique/'
         self.combined_notifications_url = self.url + '/combined_notifications/'
         self.grading_status_list_url = self.url + '/get_grading_status_list/'
+        self.flagged_problem_list_url = self.url + '/get_flagged_problem_list/'
+        self.take_action_on_flags_url = self.url + '/take_action_on_flags/'
 
     def check_if_name_is_unique(self, location, problem_id, course_id):
         params = {
@@ -56,4 +58,22 @@ class ControllerQueryService(GradingService):
         }
 
         response = self.get(self.grading_status_list_url, params)
+        return response
+
+    def get_flagged_problem_list(self, course_id):
+        params = {
+            'course_id' : course_id,
+            }
+
+        response = self.get(self.flagged_problem_list_url, params)
+        return response
+
+    def take_action_on_flags(self, course_id, student_id, submission_id):
+        params = {
+            'course_id' : course_id,
+            'student_id' : student_id,
+            'submission_id' : submission_id,
+            }
+
+        response = self.post(self.take_action_on_flags_url, params)
         return response
