@@ -94,26 +94,16 @@ def create_thread(request, course_id, commentable_id):
 
     # Cohort the thread if the commentable is cohorted.
     if is_commentable_cohorted(course_id, commentable_id):
-        print "********************** IS COHORTED"
         user_group_id = get_cohort_id(user, course_id)
-        print "********************** USER GOUP ID IS"
-        print user_group_id
         # TODO (vshnayder): once we have more than just cohorts, we'll want to
         # change this to a single get_group_for_user_and_commentable function
         # that can do different things depending on the commentable_id
         if cached_has_permission(request.user, "see_all_cohorts", course_id) or True:
             # admins can optionally choose what group to post as
-
-            print "********************** CACHED HAS PERMISSIONS TRUE"
             group_id = post.get('group_id', user_group_id)
         else:
             # regular users always post with their own id.
-            print "********************** CACHED HAS PERMISSIONS FALSE"
             group_id = user_group_id
-        print "\n\n\n\n\n********************************* group is "
-        print group_id
-        print "\n\n\n\n\n********************************* and post is"
-        print post
         thread.update_attributes(group_id=group_id)
 
     thread.save()
