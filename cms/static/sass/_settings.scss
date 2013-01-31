@@ -582,6 +582,18 @@
             input {
               width: 100%;
             }
+
+            .tip {
+              @include transition (opacity 0.5s ease-in-out 0s);
+              opacity: 0;
+            }
+
+            input:focus {
+
+              & + .tip {
+                opacity: 1.0;
+              }
+            }
           }
         }
 
@@ -599,6 +611,7 @@
         }
 
         .message-error {
+          float: left;
           margin: 0 0 10px 0;
         }
       }

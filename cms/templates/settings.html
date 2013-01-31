@@ -746,6 +746,7 @@ from contentstore import utils
                           <label for="course-advanced-policy-1-key">Policy Key:</label>
                           <div class="field">
                             <input type="text" class="short" id="course-advanced-policy-1-key" value="" />
+                            <span class="tip tip-stacked">Keys are case sensitive and cannot contain spaces or start with a number</span>
                           </div>      
                         </div>
                         <div class="value">
@@ -760,12 +761,12 @@ from contentstore import utils
 
                     <!-- error existing key pair example -->
                     <li class="input multi course-advanced-policy-list-item">
-                      <span class="message-error">This policy key, $KEYNAME, already exists.</span>
                       <div class="row">
                         <div class="key">
                           <label for="course-advanced-policy-2-key">Policy Key:</label>
                           <div class="field">
                             <input type="text" class="short" id="course-advanced-policy-2-key" value="" />
+                            <span class="tip tip-stacked">Keys are case sensitive and cannot contain spaces or start with a number</span>
                           </div>      
                         </div>
                         <div class="value">
@@ -775,17 +776,19 @@ from contentstore import utils
                           </div>      
                         </div>
                       </div>
+                      <span class="message-error">This policy key, $KEYNAME, already exists.</span>
+
                       <a href="#" class="delete-button standard remove-item advanced-policy-data"><span class="delete-icon"></span>Delete</a>
                     </li>
 
                     <!-- error on key left empty example -->
                     <li class="input multi course-advanced-policy-list-item">
-                      <span class="message-error">You cannot leave the key value for this pair blank.</span>
                       <div class="row">
                         <div class="key error">
                           <label for="course-advanced-policy-3-key">Policy Key:</label>
                           <div class="field">
                             <input type="text" class="short" id="course-advanced-policy-3-key" value="" />
+                            <span class="tip tip-stacked">Keys are case sensitive and cannot contain spaces or start with a number</span>
                           </div>      
                         </div>
                         <div class="value error">
@@ -795,18 +798,20 @@ from contentstore import utils
                           </div>      
                         </div>
                       </div>
+                      <span class="message-error">You cannot leave the key value for this pair blank.</span>
+
                       <a href="#" class="delete-button standard remove-item advanced-policy-data"><span class="delete-icon"></span>Delete</a>
                     </li>
 
                     <!-- error with value formatting example -->
                     <li class="input multi course-advanced-policy-list-item">
-                      <span class="message-error">The JSON value for $KEYNAME is invalid.</span>
                       <div class="row">
                         <div class="key error">
                           <label for="course-advanced-policy-4-key">Policy Key:</label>
                           <div class="field">
                             <input type="text" class="short" id="course-advanced-policy-4-key" value="" />
-                          </div>      
+                            <span class="tip tip-stacked">Keys are case sensitive and cannot contain spaces or start with a number</span>
+                          </div>  
                         </div>
                         <div class="value error">
                           <label for="course-advanced-policy-4-value">Policy Value:</label>
@@ -815,25 +820,8 @@ from contentstore import utils
                           </div>      
                         </div>
                       </div>
-                      <a href="#" class="delete-button standard remove-item advanced-policy-data"><span class="delete-icon"></span>Delete</a>
-                    </li>
+                      <span class="message-error">The JSON value for $KEYNAME is invalid.</span>
 
-                    <!-- existing pair (upon page load) - we'll need to toggle/remove the .existing class for the normal text color to appear (on blur/save?) -->
-                    <li class="input multi course-advanced-policy-list-item">
-                      <div class="row">
-                        <div class="key existing">
-                          <label for="course-advanced-policy-5-key">Policy Key:</label>
-                          <div class="field">
-                            <input type="text" class="short" id="course-advanced-policy-5-key" value="christina" />
-                          </div>      
-                        </div>
-                        <div class="value existing">
-                          <label for="course-advanced-policy-5-value">Policy Value:</label>
-                          <div class="field">
-                            <textarea class="ace text" id="course-advanced-policy-5-value">is awesome!</textarea>
-                          </div>      
-                        </div>
-                      </div>
                       <a href="#" class="delete-button standard remove-item advanced-policy-data"><span class="delete-icon"></span>Delete</a>
                     </li>
                   </ul>                  
