@@ -729,69 +729,108 @@ from contentstore import utils
 
             <section class="settings-advanced-policies">
               <header>
-                <h3>Additional Policy Definition</h3>
-                <span class="detail">Manually Edit Course Policy Values</span>
+                <h3>Manual Policy Definition</h3>
+                <span class="detail">Manually Edit Course Policy Values (JSON Key and Pair values)</span>
               </header>
 
               <p class="instructions"><strong>Warning</strong>: Add only manual policy data that you are familiar with.</p>
 
               <div class="row">
                 <div class="field enum">
+
+                  <!-- basic empty & initial empty field (if user had no values yet) -->
                   <ul class="input-list course-advanced-policy-list">
                     <li class="input multi course-advanced-policy-list-item">
-
                       <div class="row">
                         <div class="key">
-                          <label for="course-advanced-policy-1-key" class="">Policy Key:</label>
+                          <label for="course-advanced-policy-1-key">Policy Key:</label>
                           <div class="field">
                             <input type="text" class="short" id="course-advanced-policy-1-key" value="" />
                           </div>      
                         </div>
-
                         <div class="value">
-                          <label for="course-advanced-policy-1-value" class="">Policy Value:</label>
+                          <label for="course-advanced-policy-1-value">Policy Value:</label>
                           <div class="field">
-                            <textarea class="ace text" id="course-advanced-policy-1-value" value=""></textarea>
+                            <textarea class="ace text" id="course-advanced-policy-1-value"></textarea>
                           </div>      
                         </div>
                       </div>
                       <a href="#" class="delete-button standard remove-item advanced-policy-data"><span class="delete-icon"></span>Delete</a>
                     </li>
 
+                    <!-- error existing key pair example -->
                     <li class="input multi course-advanced-policy-list-item">
-
+                      <span class="message-error">This policy key, $KEYNAME, already exists.</span>
                       <div class="row">
                         <div class="key">
-                          <label for="course-advanced-policy-1-key" class="">Policy Key:</label>
+                          <label for="course-advanced-policy-2-key">Policy Key:</label>
                           <div class="field">
-                            <input type="text" class="short" id="course-advanced-policy-1-key" value="" />
+                            <input type="text" class="short" id="course-advanced-policy-2-key" value="" />
                           </div>      
                         </div>
-
                         <div class="value">
-                          <label for="course-advanced-policy-1-value" class="">Policy Value:</label>
+                          <label for="course-advanced-policy-2-value">Policy Value:</label>
                           <div class="field">
-                            <textarea class="ace text" id="course-advanced-policy-1-value" value=""></textarea>
+                            <textarea class="ace text" id="course-advanced-policy-2-value"></textarea>
                           </div>      
                         </div>
                       </div>
                       <a href="#" class="delete-button standard remove-item advanced-policy-data"><span class="delete-icon"></span>Delete</a>
                     </li>
 
+                    <!-- error on key left empty example -->
                     <li class="input multi course-advanced-policy-list-item">
-
+                      <span class="message-error">You cannot leave the key value for this pair blank.</span>
                       <div class="row">
-                        <div class="key">
-                          <label for="course-advanced-policy-1-key" class="">Policy Key:</label>
+                        <div class="key error">
+                          <label for="course-advanced-policy-3-key">Policy Key:</label>
                           <div class="field">
-                            <input type="text" class="short" id="course-advanced-policy-1-key" value="" />
+                            <input type="text" class="short" id="course-advanced-policy-3-key" value="" />
                           </div>      
                         </div>
-
-                        <div class="value">
-                          <label for="course-advanced-policy-1-value" class="">Policy Value:</label>
+                        <div class="value error">
+                          <label for="course-advanced-policy-3-value">Policy Value:</label>
                           <div class="field">
-                            <textarea class="ace text" id="course-advanced-policy-1-value" value=""></textarea>
+                            <textarea class="ace text" id="course-advanced-policy-3-value"></textarea>
+                          </div>      
+                        </div>
+                      </div>
+                      <a href="#" class="delete-button standard remove-item advanced-policy-data"><span class="delete-icon"></span>Delete</a>
+                    </li>
+
+                    <!-- error with value formatting example -->
+                    <li class="input multi course-advanced-policy-list-item">
+                      <span class="message-error">The JSON value for $KEYNAME is invalid.</span>
+                      <div class="row">
+                        <div class="key error">
+                          <label for="course-advanced-policy-4-key">Policy Key:</label>
+                          <div class="field">
+                            <input type="text" class="short" id="course-advanced-policy-4-key" value="" />
+                          </div>      
+                        </div>
+                        <div class="value error">
+                          <label for="course-advanced-policy-4-value">Policy Value:</label>
+                          <div class="field">
+                            <textarea class="ace text" id="course-advanced-policy-4-value" value=""></textarea>
+                          </div>      
+                        </div>
+                      </div>
+                      <a href="#" class="delete-button standard remove-item advanced-policy-data"><span class="delete-icon"></span>Delete</a>
+                    </li>
+
+                    <!-- existing pair (upon page load) - we'll need to toggle/remove the .existing class for the normal text color to appear (on blur/save?) -->
+                    <li class="input multi course-advanced-policy-list-item">
+                      <div class="row">
+                        <div class="key existing">
+                          <label for="course-advanced-policy-5-key">Policy Key:</label>
+                          <div class="field">
+                            <input type="text" class="short" id="course-advanced-policy-5-key" value="christina" />
+                          </div>      
+                        </div>
+                        <div class="value existing">
+                          <label for="course-advanced-policy-5-value">Policy Value:</label>
+                          <div class="field">
+                            <textarea class="ace text" id="course-advanced-policy-5-value">is awesome!</textarea>
                           </div>      
                         </div>
                       </div>
@@ -799,9 +838,23 @@ from contentstore import utils
                     </li>
                   </ul>                  
 
-                  <a href="#" class="new-button new-advanced-policy-item add-policy-data">
-                    <span class="plus-icon white"></span>New Manual Policy
-                  </a>
+                  <!-- advanced policy actions -->
+                  <div class="actions actions-advanced-policies">
+                    <a href="#" class="save-button">Save</a>
+                    <a href="#" class="cancel-button">Cancel</a>
+                    <a href="#" class="new-button new-advanced-policy-item add-policy-data">
+                      <span class="plus-icon white"></span>New Manual Policy
+                    </a>
+                  </div>
+
+                  <!-- advanced policy actions (with disabled save state) -->
+                  <div class="actions actions-advanced-policies">
+                    <a href="#" class="save-button disabled">Save</a>
+                    <a href="#" class="cancel-button">Cancel</a>
+                    <a href="#" class="new-button new-advanced-policy-item add-policy-data">
+                      <span class="plus-icon white"></span>New Manual Policy
+                    </a>
+                  </div>
                 </div>
               </div>
             </section><!-- .settings-advanced-policies -->

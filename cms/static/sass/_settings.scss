@@ -562,6 +562,14 @@
           margin: 0;
           border: none;
           padding: 0;
+
+          // existing fields
+          &.existing {
+
+            input, textarea {
+              color: $mediumGrey;
+            }
+          }
         }
 
         .key {
@@ -588,6 +596,35 @@
               height: 100px;
             }
           }
+        }
+
+        .message-error {
+          margin: 0 0 10px 0;
+        }
+      }
+
+      .actions {
+        @include clearfix();
+        margin-top: 15px;
+        border-top: 1px solid $lightGrey;
+        padding-top: 15px;
+
+        .save-button {
+          float: left;
+          @include blue-button;
+          margin-right: 10px;
+          padding-top: 8px;
+          padding-bottom: 8px;
+        }
+
+        .cancel-button {
+          float: left;
+          @include white-button;
+          margin-top: 4px;
+        }
+
+        .new-button {
+          float: right;
         }
       }
     }
@@ -619,8 +656,12 @@
     //    }
     // }
 
-    input.error, textarea.error {
+    input.error, textarea.error, .error input, .error textarea {
       border-color: $red;
+    }
+
+    .error label {
+      color: $red;
     }
 
     .message-error {
