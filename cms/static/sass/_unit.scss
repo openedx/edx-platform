@@ -4,9 +4,9 @@
 }
 
 //Problem selector requirements - TO DO: Marco -determine placement, integration for this
-.js .tabs .tab {
-  display: none;
-}
+//.js .tabs .tab {
+// display: none;
+//}
 //end problem selector reqs
 
 .main-column {
@@ -162,14 +162,29 @@
 
         .problem-type-tabs {
           list-style-type: none;
+          display: inline-block;
           width: 100%;
+          margin: 5px;
+
+          .problem-type-label {
+            font-size: 16px;
+          }
 
           li {
+            display:inline-block;
+            margin: 5px;
+            text-align:center;
           }
           a{
-            display: block;
-            width: 70px;
-            height:25px;
+            width: 100px;
+            height: 60px;
+            margin-right: 10px;
+            margin-bottom: 10px;
+            border-radius: 8px;
+            font-size: 13px;
+            line-height: 14px;
+            text-align: center;
+            @include box-shadow(0 1px 1px rgba(0, 0, 0, .2), 0 1px 0 rgba(255, 255, 255, .4) inset);
           }
         }
 
@@ -243,10 +258,14 @@
             margin-bottom: 10px;
 
             a {
-              border-bottom: 1px solid $darkGreen;
+              border-bottom: 1px solid $lightBluishGrey2;
               border-radius: 3px;
               font-weight: 500;
-              background: $green;
+              background: tint($mediumGrey,20%);
+
+              &:hover {
+              background: $brightGreen;
+            }
             }
           }
         }
