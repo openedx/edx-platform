@@ -23,6 +23,9 @@ def export_to_xml(modulestore, contentstore, course_location, root_dir, course_d
   # export the custom tags
   export_extra_content(export_fs, modulestore, course_location, 'custom_tag_template', 'custom_tags')
 
+  # export the course updates
+  export_extra_content(export_fs, modulestore, course_location, 'course_info', 'info', '.html')
+
 
 def export_extra_content(export_fs, modulestore, course_location, category_type, dirname, file_suffix = ''):
   query_loc = Location('i4x', course_location.org, course_location.course, category_type, None)
