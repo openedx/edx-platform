@@ -54,9 +54,10 @@ class VideoAlphaModule(XModule):
             if 'position' in state:
                 self.position = int(float(state['position']))
 
-    def _get_source(self, xmltree, extension=['mp4', 'ogv', 'avi', 'webm']):
-        # find the first valid source
-        condition = lambda src: any([src.endswith(ext) for ext in extension])
+    def _get_source(self, xmltree, extensions=['mp4', 'ogv', 'avi', 'webm']):
+        """Find the first valid source, which ends with one of
+        `extensions`."""
+        condition = lambda src: any([src.endswith(ext) for ext in extensions])
         return self._get_first_external(xmltree, 'source', condition)
 
     def _get_track(self, xmltree):
@@ -64,10 +65,8 @@ class VideoAlphaModule(XModule):
         return self._get_first_external(xmltree, 'track')
 
     def _get_first_external(self, xmltree, tag, condition=bool):
-        """
-        Will return the first valid element
-        of the given tag.
-        'valid' means has a non-empty 'src' attribute
+        """Will return the first 'valid' element of the given tag.
+        'valid' means that `condition('src' attribute) == True`
         """
         result = None
         for element in xmltree.findall(tag):
