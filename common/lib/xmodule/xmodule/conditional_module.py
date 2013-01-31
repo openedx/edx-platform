@@ -36,9 +36,7 @@ class ConditionalModule(XModule):
     def _get_required_modules(self):
         self.required_modules = []
         for loc in self.descriptor.required_module_locations:
-            # import ipdb; ipdb.set_trace()
             module = self.system.get_module(loc)
-            # import ipdb; ipdb.set_trace()
             self.required_modules.append(module)
         #log.debug('required_modules=%s' % (self.required_modules))
 
@@ -65,6 +63,20 @@ class ConditionalModule(XModule):
                 else:
                     log.debug('conditional module: %s IS completed' % module)
             return True
+        # elif self.condition == 'answer':
+        #     # parse descriptor
+        #     # find if tags
+        #     # get tag is: answer_to and child
+        #     # for every required module check if answer is equal to is, 
+        #     # and if so - append child to rendered modules
+
+
+        #     for module in self.required_modules:
+        #         if not hasattr(module, 'poll_answer'):
+        #             raise Exception('Error in conditional module: required module %s has no answer field' % module)
+        #         if not module.answer = self.descriptor.xml_object.
+
+
         else:
             raise Exception('Error in conditional module: unknown condition "%s"' % self.condition)
 
@@ -85,18 +97,14 @@ class ConditionalModule(XModule):
         #log.debug('conditional_module handle_ajax: dispatch=%s' % dispatch)
         # import ipdb; ipdb.set_trace()   
         if not self.is_condition_satisfied():
-            # import ipdb; ipdb.set_trace()
             context = {'module': self}
             html = self.system.render_template('conditional_module.html', context)
-            # html = render_to_string('conditional_module.html', context)
             return json.dumps({'html': html})
-            #return self.system.render_template('conditional_module.html', context)
 
         if self.contents is None:
             # self.contents = [child.get_html() for child in self.get_display_items()]
             self.contents = [self.system.get_module(child_descriptor.location).get_html() 
                     for child_descriptor in self.descriptor.get_children()]
-        # import ipdb; ipdb.set_trace()
         # for now, just deal with one child
         html = self.contents[0]
 
@@ -106,6 +114,7 @@ class ConditionalModule(XModule):
         #return html
 
 class ConditionalDescriptor(SequenceDescriptor):
+    ''' TODO check exports'''
     module_class = ConditionalModule
 
     filename_extension = "xml"
@@ -116,7 +125,7 @@ class ConditionalDescriptor(SequenceDescriptor):
     def __init__(self, *args, **kwargs):
         super(ConditionalDescriptor, self).__init__(*args, **kwargs)
         # import ipdb; ipdb.set_trace()
-        required_module_list = [tuple(x.split('/',1)) for x in self.xml_attributes.get('required','').split('&')]
+        required_module_list = [tuple(x.strip().split('/',1)) for x in self.xml_attributes.get('required','').split(';')]
         self.required_module_locations = []
         for (tag, name) in required_module_list:
             loc = self.location.dict()
