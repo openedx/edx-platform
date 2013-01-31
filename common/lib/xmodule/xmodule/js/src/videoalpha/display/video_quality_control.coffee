@@ -1,4 +1,4 @@
-class @VideoQualityControl extends Subview
+class @VideoQualityControlAlpha extends SubviewAlpha
   initialize: ->
     @quality = null;
 

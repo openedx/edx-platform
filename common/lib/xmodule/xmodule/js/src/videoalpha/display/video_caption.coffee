@@ -1,4 +1,4 @@
-class @VideoCaption extends Subview
+class @VideoCaptionAlpha extends SubviewAlpha
   initialize: ->
     @loaded = false
 

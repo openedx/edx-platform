@@ -1,4 +1,4 @@
-class @VideoControl extends Subview
+class @VideoControlAlpha extends SubviewAlpha
   bind: ->
     @$('.video_control').click @togglePlayback
 

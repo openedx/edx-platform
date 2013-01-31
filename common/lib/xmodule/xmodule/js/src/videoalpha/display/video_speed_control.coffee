@@ -1,4 +1,4 @@
-class @VideoSpeedControl extends Subview
+class @VideoSpeedControlAlpha extends SubviewAlpha
   bind: ->
     @$('.video_speeds a').click @changeVideoSpeed
     if onTouchBasedDevice()

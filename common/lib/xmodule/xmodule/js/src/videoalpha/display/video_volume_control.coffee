@@ -1,4 +1,4 @@
-class @VideoVolumeControl extends Subview
+class @VideoVolumeControlAlpha extends SubviewAlpha
   initialize: ->
     @currentVolume = 100
 
