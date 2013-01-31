@@ -1,0 +1,52 @@
+.rubric {
+  padding: 40px 0px;
+  tr {
+      margin:10px 0px;
+      height: 100%;
+  }
+  td {
+      padding: 20px 0px 25px 0px;
+      height: 100%;
+      border: 1px black solid;
+  }
+  th {
+      padding: 5px;
+      margin: 5px;
+      text-align: center;
+  }
+  .points-header th {
+      padding: 0px;
+  }
+  label,
+  .view-only {
+      margin:2px;
+      position: relative;
+      padding: 15px 15px 25px 15px;
+      width: 130px;
+      height:100%;
+      min-height: 50px;
+      min-width: 50px;
+      font-size: .9em;
+      background-color: white;
+      display: block;
+  }
+  .grade {
+    position: absolute;
+    bottom:0px;
+    right:0px;
+    margin:10px;
+  }
+  .selected-grade {
+    background: #666;
+    color: white; 
+  }
+  input[type=radio]:checked + label {
+    background: #666;
+    color: white; }
+  input[class='score-selection'] {
+      position: relative;
+      margin-left: 10px;
+      font-size: 16px;
+  }
+}
+
