@@ -117,8 +117,6 @@ def forum_form_discussion(request, course_id):
     Renders the main Discussion page, potentially filtered by a search query
     """
     course = get_course_with_access(request.user, course_id, 'load')
-    print "\n\n\n\n\n****************************"
-    print course
     category_map = utils.get_discussion_category_map(course)
 
     try:
