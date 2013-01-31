@@ -19,7 +19,6 @@ setup(
             "abtest = xmodule.abtest_module:ABTestDescriptor",
             "book = xmodule.backcompat_module:TranslateCustomTagDescriptor",
             "chapter = xmodule.seq_module:SequenceDescriptor",
-            "combinedopenended = xmodule.combined_open_ended_module:CombinedOpenEndedDescriptor",
             "conditional = xmodule.conditional_module:ConditionalDescriptor",
             "course = xmodule.course_module:CourseDescriptor",
             "customtag = xmodule.template_module:CustomTagDescriptor",
@@ -27,6 +26,7 @@ setup(
             "html = xmodule.html_module:HtmlDescriptor",
             "image = xmodule.backcompat_module:TranslateCustomTagDescriptor",
             "error = xmodule.error_module:ErrorDescriptor",
+            "poll = xmodule.poll_module:PollDescriptor",
             "problem = xmodule.capa_module:CapaDescriptor",
             "problemset = xmodule.seq_module:SequenceDescriptor",
             "section = xmodule.backcompat_module:SemanticSectionDescriptor",
@@ -41,8 +41,7 @@ setup(
             "course_info = xmodule.html_module:CourseInfoDescriptor",
             "static_tab = xmodule.html_module:StaticTabDescriptor",
             "custom_tag_template = xmodule.raw_module:RawDescriptor",
-            "about = xmodule.html_module:AboutDescriptor",
-            "poll = xmodule.poll_module:PollDescriptor",
+            "about = xmodule.html_module:AboutDescriptor"
         ],
     }
 )
