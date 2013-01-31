@@ -131,9 +131,19 @@
 
     function formatInfo(info, input_field, element) {
         var results = [];
+        console.log("element parent is"+$(element).parent())
         var errordiv = $(element).parent().find('.errormsgs')[0];
         console.log(errordiv);
-
+        
+        if (!errordiv) {
+            // This is a bit hackish, but works.
+            // There are situations where formatInfo is called but no div yet exists
+            // to my knowledge (blame John Hess) this is always followed by a call to
+            // this function once the div does exist
+            console.log("There is no errordiv loaded yet. trying again soon");
+            return []
+        }
+        
         if (info.search("It is not possible") == -1) {
             errordiv.innerHTML = '';
             errordiv.style.visibility = 'hidden';
