@@ -25,10 +25,13 @@ class CombinedOpenEndedRubric(object):
         '''
         try:
             rubric_categories = self.extract_categories(rubric_xml)
+            max_scores = map((lambda cat: cat['options'][-1]['points']), rubric_categories)
+            max_score = max(max_scores)
             html = self.system.render_template('open_ended_rubric.html', 
                     {'categories'  : rubric_categories,
                      'has_score': self.has_score,
-                     'view_only': self.view_only})
+                     'view_only': self.view_only,
+                     'max_score': max_score})
         except:
             raise RubricParsingError("[render_rubric] Could not parse the rubric with xml: {0}".format(rubric_xml))
         return html
