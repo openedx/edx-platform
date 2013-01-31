@@ -26,8 +26,8 @@
             <tr>
                 <th>Name</th>
                 <th>Response</th>
-                <th>Unflag</th>
-                <th>Ban</th>
+                <th></th>
+                <th></th>
             </tr>
             %for problem in problem_list:
             <tr>
@@ -38,10 +38,10 @@
                     ${problem['student_response']}
                 </td>
                 <td>
-
+                    <a href="#unflag" class="unflag-button action-button">Unflag</a>
                 </td>
                 <td>
-
+                    <a href="#ban" class="ban-button action-button">Ban</a>
                 </td>
                 <td style="display:none;">
                     ${problem['submission_id']}

@@ -309,7 +309,7 @@ def take_action_on_flags(request, course_id):
 
     try:
         controller_qs = ControllerQueryService()
-        response = controller_qs.save_calibration_essay(course_id, student_id, course_id, action_type)
+        response = controller_qs.take_action_on_flags(course_id, student_id, course_id, action_type)
         return HttpResponse(response, mimetype="application/json")
     except GradingServiceError:
         log.exception("Error saving calibration grade, location: {0}, submission_id: {1}, submission_key: {2}, grader_id: {3}".format(location, submission_id, submission_key, grader_id))
