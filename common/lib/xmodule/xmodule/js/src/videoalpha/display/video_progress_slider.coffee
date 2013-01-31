@@ -1,4 +1,4 @@
-class @VideoProgressSlider extends Subview
+class @VideoProgressSliderAlpha extends SubviewAlpha
   initialize: ->
     @buildSlider() unless onTouchBasedDevice()
 

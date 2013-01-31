@@ -1,4 +1,4 @@
-class @VideoPlayer extends Subview
+class @VideoPlayerAlpha extends SubviewAlpha
   initialize: ->
     if @video.videoType is 'youtube'
       # Define a missing constant of Youtube API
@@ -26,19 +26,17 @@ class @VideoPlayer extends Subview
       @toggleFullScreen(event)
 
   render: ->
-    console.log '1.1'
-    @control = new VideoControl el: @$('.video-controls')
-    @qualityControl = new VideoQualityControl el: @$('.secondary-controls')
-    @caption = new VideoCaption
+    @control = new VideoControlAlpha el: @$('.video-controls')
+    @qualityControl = new VideoQualityControlAlpha el: @$('.secondary-controls')
+    @caption = new VideoCaptionAlpha
         el: @el
         youtubeId: @video.youtubeId('1.0')
         currentSpeed: @currentSpeed()
         captionAssetPath: @video.caption_asset_path
     unless onTouchBasedDevice()
-      @volumeControl = new VideoVolumeControl el: @$('.secondary-controls')
-    console.log '1.2'
-    @speedControl = new VideoSpeedControl el: @$('.secondary-controls'), speeds: @video.speeds, currentSpeed: @currentSpeed()
-    @progressSlider = new VideoProgressSlider el: @$('.slider')
+      @volumeControl = new VideoVolumeControlAlpha el: @$('.secondary-controls')
+    @speedControl = new VideoSpeedControlAlpha el: @$('.secondary-controls'), speeds: @video.speeds, currentSpeed: @currentSpeed()
+    @progressSlider = new VideoProgressSliderAlpha el: @$('.slider')
     @playerVars =
       controls: 0
       wmode: 'transparent'
@@ -46,15 +44,12 @@ class @VideoPlayer extends Subview
       showinfo: 0
       enablejsapi: 1
       modestbranding: 1
-    console.log '1.3'
     if @video.start
       @playerVars.start = @video.start
       @playerVars.wmode = 'window'
     if @video.end
       # work in AS3, not HMLT5. but iframe use AS3
       @playerVars.end = @video.end
-    console.log '1.4'
-
     if @video.videoType is 'html5'
       @player = new HTML5Video.Player @video.id,
         playerVars: @playerVars,
@@ -182,7 +177,10 @@ class @VideoPlayer extends Subview
     @player.pauseVideo() if @player.pauseVideo
 
   duration: ->
-    @video.getDuration()
+    if @video.videoType is "youtube"
+      return @video.getDuration()
+    else return @player.getDuration()  if @video.videoType is "html5"
+    0
 
   currentSpeed: ->
     @video.speed

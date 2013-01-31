@@ -1,5 +1,3 @@
-console.log('We are in "html5_video.js" script.');
-
 this.HTML5Video = (function () {
     var HTML5Video = {};
 
@@ -55,8 +53,6 @@ this.HTML5Video = (function () {
          *     }
          */
         function Player(el, config) {
-            console.log('We are inside HTML5Video.Player constructor.');
-
             if (typeof el === 'string') {
                 this.el = $(el);
             } else if ($.isPlainObject(el) === true) {
@@ -69,8 +65,6 @@ this.HTML5Video = (function () {
 
                 return;
             }
-
-            console.log('We got a proper DOM element.');
 
             if ($.isPlainObject(config) === true) {
                 this.config = config;
@@ -91,9 +85,6 @@ this.HTML5Video = (function () {
                     }
                 };
             }
-
-            console.log('The config is:');
-            console.log(this.config);
         }
 
         /*
@@ -122,11 +113,11 @@ this.HTML5Video = (function () {
         };
 
         /*
-         * The original YouTube API function player.setPlayBackQuality changed (if it was possible) the quality of the
+         * The original YouTube API function player.setPlaybackQuality changed (if it was possible) the quality of the
          * played video. In our case, this function will not do anything because we can't change the quality of HTML5
          * video since we only get one source of video with one quality.
          */
-        Player.prototype.setPlayBackQuality = function (value) {
+        Player.prototype.setPlaybackQuality = function (value) {
 
         };
 
@@ -134,20 +125,30 @@ this.HTML5Video = (function () {
 
         };
 
-        Player.prototype.sekkTo = function () {
+        Player.prototype.seekTo = function () {
 
         };
 
         // YouTube API has player.loadVideoById, but since we are working with a video source, we will rename this
-        // function accordingly.
-        Player.prototype.loadVideoBySource = function () {
+        // function accordingly. However, not to cause conflicts, there will also be a loadVideoById function which
+        // will call this function.
+        Player.prototype.loadVideoBySource = function (source) {
 
         };
 
-        // YouTube API has player.cueVideoById, but since we are working with a video source, we will rename this
-        // function accordingly.
-        Player.prototype.cueVideoBySource = function () {
+        Player.prototype.loadVideoById = function (id) {
+            this.loadVideoBySource(id);
+        }
 
+        // YouTube API has player.cueVideoById, but since we are working with a video source, we will rename this
+        // function accordingly. However, not to cause conflicts, there will also be a cueVideoById function which
+        // will call this function.
+        Player.prototype.cueVideoBySource = function (source) {
+
+        };
+
+        Player.prototype.cueVideoById = function (id) {
+            this.cueVideoBySource(id);
         };
 
         Player.prototype.setVolume = function () {
@@ -178,6 +179,12 @@ this.HTML5Video = (function () {
 
         };
 
+        Player.prototype.getDuration = function () {
+            // TODO: Return valid video duration.
+
+            return 0;
+        };
+
         return Player;
     }());
 
@@ -192,5 +199,3 @@ this.HTML5Video = (function () {
 
     return HTML5Video;
 }());
-
-console.log(HTML5Video);

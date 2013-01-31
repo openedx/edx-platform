@@ -1,4 +1,4 @@
-class @Subview
+class @SubviewAlpha
   constructor: (options) ->
     $.each options, (key, value) =>
       @[key] = value

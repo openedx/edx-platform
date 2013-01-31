@@ -9,7 +9,6 @@ class @VideoAlpha
     @show_captions = @el.data('show-captions') == "true"
     window.player = null
     @el = $("#video_#{@id}")
-
     if @parseVideos(@el.data("streams")) is true
       @videoType = "youtube"
       @fetchMetadata()
@@ -18,25 +17,21 @@ class @VideoAlpha
       @videoType = "html5"
       @parseVideoSources @el.data("mp4-source"), @el.data("webm-source"), @el.data("ogg-source")
       @speeds = ["0.75", "1.0", "1.25", "1.5"]
+      @videos =
+        "0.75": ""
+        "1.0": ""
+        "1.25": ""
+        "1.5": ""
       @setSpeed($.cookie('video_speed'))
-
     $("#video_#{@id}").data('video', this).addClass('video-load-complete')
-
     @hide_captions = $.cookie('hide_captions') == 'true'
-
     if ((@videoType is "youtube") and (YT.Player)) or ((@videoType is "html5") and (HTML5Video.Player))
-      console.log 'one'
       @embed()
     else
-      console.log 'two'
       if @videoType is "youtube"
-        console.log 'three'
         window.onYouTubePlayerAPIReady = ->
           _this.embed()
       else if @videoType is "html5"
-        console.log 'four'
-        console.log @videoType
-        console.log HTML5Video.Player
         window.onHTML5PlayerAPIReady = ->
           _this.embed()
 
@@ -45,10 +40,6 @@ class @VideoAlpha
 
   VideoAlpha::parseVideos = (videos) ->
     return false  if (typeof videos isnt "string") or (videos.length is 0)
-
-    console.log 'We got this far'
-    console.log videos
-
     @videos = {}
     _this = this
     $.each videos.split(/,/), (index, video) ->
@@ -63,7 +54,6 @@ class @VideoAlpha
       mp4: null
       webm: null
       ogg: null
-
     @html5Sources.mp4 = mp4Source  if (typeof mp4Source is "string") and (mp4Source.length > 0)
     @html5Sources.webm = webmSource  if (typeof webmSource is "string") and (webmSource.length > 0)
     @html5Sources.ogg = oggSource  if (typeof oggSource is "string") and (oggSource.length > 0)
@@ -82,7 +72,7 @@ class @VideoAlpha
       @speed = "1.0"
 
   embed: ->
-    @player = new VideoPlayer video: this
+    @player = new VideoPlayerAlpha video: this
 
   fetchMetadata: (url) ->
     @metadata = {}
@@ -98,7 +88,6 @@ class @VideoAlpha
       code: @youtubeId()
       currentTime: @player.currentTime
       speed: @speed
-
     if @videoType is "youtube"
       logInfo.code = @youtubeId()
     else logInfo.code = "html5"  if @videoType is "html5"
