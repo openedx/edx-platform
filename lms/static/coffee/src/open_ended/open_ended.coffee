@@ -29,7 +29,6 @@ class OpenEnded
     action_type = "ban"
     submission_id = tr_children[4].innerText
     student_id = tr_children[5].innerText
-    @gentle_alert student_id
     @post('take_action_on_flags', {'submission_id' : submission_id, 'student_id' : student_id, 'action_type' : action_type}, @handle_after_action)
 
   post: (cmd, data, callback) ->

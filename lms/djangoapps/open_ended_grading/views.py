@@ -25,6 +25,8 @@ import open_ended_notifications
 from xmodule.modulestore.django import modulestore
 from xmodule.modulestore import search
 
+from django.http import HttpResponse, Http404
+
 log = logging.getLogger(__name__)
 
 template_imports = {'urllib': urllib}
@@ -306,7 +308,9 @@ def take_action_on_flags(request, course_id):
     submission_id = p['submission_id']
     action_type = p['action_type']
     student_id = p['student_id']
-
+    student_id = student_id.strip(' \t\n\r')
+    submission_id = submission_id.strip(' \t\n\r')
+    action_type = action_type.lower().strip(' \t\n\r')
     try:
         response = controller_qs.take_action_on_flags(course_id, student_id, submission_id, action_type)
         return HttpResponse(response, mimetype="application/json")
