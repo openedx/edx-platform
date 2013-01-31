@@ -44,7 +44,7 @@ class VideoAlphaModule(XModule):
         self.show_captions = xmltree.get('show_captions', 'true')
         self.source = self._get_source(xmltree)
         self.mp4_source = self._get_source(xmltree, ['mp4'])
-        self.wemb_source = self._get_source(xmltree, ['wemb'])
+        self.webm_source = self._get_source(xmltree, ['webm'])
         self.ogv_source = self._get_source(xmltree, ['ogv'])
         self.track = self._get_track(xmltree)
         self.start_time, self.end_time = self._get_timeframe(xmltree)
@@ -137,7 +137,7 @@ class VideoAlphaModule(XModule):
             'id': self.location.html_id(),
             'position': self.position,
             'mp4_source': self.mp4_source,
-            'wemb_source': self.wemb_source,
+            'webm_source': self.webm_source,
             'ogv_source': self.ogv_source,
             'source': self.source,
             'track': self.track,
