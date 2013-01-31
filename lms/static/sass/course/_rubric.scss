@@ -1,5 +1,5 @@
 .rubric {
-  padding: 40px 0px;
+  margin: 40px 0px;
   tr {
       margin:10px 0px;
       height: 100%;
@@ -8,6 +8,7 @@
       padding: 20px 0px 25px 0px;
       height: 100%;
       border: 1px black solid;
+      text-align: center;
   }
   th {
       padding: 5px;
@@ -17,13 +18,11 @@
   .points-header th {
       padding: 0px;
   }
-  label,
-  .view-only {
-      margin:2px;
+  .rubric-label
+  {
       position: relative;
-      padding: 15px 15px 25px 15px;
+      padding: 15px 15px 25px;
       width: 130px;
-      height:100%;
       min-height: 50px;
       min-width: 50px;
       font-size: .9em;
@@ -40,9 +39,9 @@
     background: #666;
     color: white; 
   }
-  input[type=radio]:checked + label {
-    background: #666;
-    color: white; }
+   input[type=radio]:checked + .rubric-label {
+    background: white;
+    color: $base-font-color; }
   input[class='score-selection'] {
       position: relative;
       margin-left: 10px;
