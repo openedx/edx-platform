@@ -11,10 +11,12 @@ class @VideoPlayerAlpha extends SubviewAlpha
     @el = $("#video_#{@video.id}")
 
   bind: ->
+    console.log "show_captions = #{@video.show_captions}"
     $(@control).bind('play', @play)
       .bind('pause', @pause)
     $(@qualityControl).bind('changeQuality', @handlePlaybackQualityChange)
-    $(@caption).bind('seek', @onSeek)
+    if @video.show_captions is true
+      $(@caption).bind('seek', @onSeek)
     $(@speedControl).bind('speedChange', @onSpeedChange)
     $(@progressSlider).bind('seek', @onSeek)
     if @volumeControl
@@ -31,7 +33,8 @@ class @VideoPlayerAlpha extends SubviewAlpha
   render: ->
     @control = new VideoControlAlpha el: @$('.video-controls')
     @qualityControl = new VideoQualityControlAlpha el: @$('.secondary-controls')
-    @caption = new VideoCaptionAlpha
+    if @video.show_captions is true
+      @caption = new VideoCaptionAlpha
         el: @el
         youtubeId: @video.youtubeId('1.0')
         currentSpeed: @currentSpeed()
@@ -69,7 +72,8 @@ class @VideoPlayerAlpha extends SubviewAlpha
           onReady: @onReady
           onStateChange: @onStateChange
           onPlaybackQualityChange: @onPlaybackQualityChange
-    @caption.hideCaptions(@['video'].hide_captions)
+    if @video.show_captions is true
+      @caption.hideCaptions(@['video'].hide_captions)
 
   addToolTip: ->
     @$('.add-fullscreen, .hide-subtitles').qtip
@@ -101,7 +105,8 @@ class @VideoPlayerAlpha extends SubviewAlpha
 
   onUnstarted: =>
     @control.pause()
-    @caption.pause()
+    if @video.show_captions is true
+      @caption.pause()
 
   onPlay: =>
     @video.log 'play_video'
@@ -109,7 +114,8 @@ class @VideoPlayerAlpha extends SubviewAlpha
     window.player = @player
     unless @player.interval
       @player.interval = setInterval(@update, 200)
-    @caption.play()
+    if @video.show_captions is true
+      @caption.play()
     @control.play()
     @progressSlider.play()
 
@@ -118,12 +124,14 @@ class @VideoPlayerAlpha extends SubviewAlpha
     window.player = null if window.player == @player
     clearInterval(@player.interval)
     @player.interval = null
-    @caption.pause()
+    if @video.show_captions is true
+      @caption.pause()
     @control.pause()
 
   onEnded: =>
     @control.pause()
-    @caption.pause()
+    if @video.show_captions is true
+      @caption.pause()
 
   onSeek: (event, time) =>
     @player.seekTo(time, true)
@@ -135,10 +143,13 @@ class @VideoPlayerAlpha extends SubviewAlpha
     @updatePlayTime time
 
   onSpeedChange: (event, newSpeed) =>
-    @currentTime = Time.convert(@currentTime, parseFloat(@currentSpeed()), newSpeed)
+    if @video.videoType is 'youtube'
+      @currentTime = Time.convert(@currentTime, parseFloat(@currentSpeed()), newSpeed)
     newSpeed = parseFloat(newSpeed).toFixed(2).replace /\.00$/, '.0'
     @video.setSpeed(newSpeed)
-    @caption.currentSpeed = newSpeed
+    if @video.videoType is 'youtube'
+      if @video.show_captions is true
+        @caption.currentSpeed = newSpeed
     if @video.videoType is 'html5'
       @player.setSpeed(newSpeed)
     else if @video.videoType is 'youtube'
@@ -146,7 +157,8 @@ class @VideoPlayerAlpha extends SubviewAlpha
         @player.loadVideoById(@video.youtubeId(), @currentTime)
       else
         @player.cueVideoById(@video.youtubeId(), @currentTime)
-    @updatePlayTime @currentTime
+    if @video.videoType is 'youtube'
+      @updatePlayTime @currentTime
 
   onVolumeChange: (event, volume) =>
     @player.setVolume volume
@@ -158,7 +170,8 @@ class @VideoPlayerAlpha extends SubviewAlpha
   updatePlayTime: (time) ->
     progress = Time.format(time) + ' / ' + Time.format(@duration())
     @$(".vidtime").html(progress)
-    @caption.updatePlayTime(time)
+    if @video.show_captions is true
+      @caption.updatePlayTime(time)
     @progressSlider.updatePlayTime(time, @duration())
 
   toggleFullScreen: (event) =>
@@ -169,7 +182,8 @@ class @VideoPlayerAlpha extends SubviewAlpha
     else
       @el.addClass('fullscreen')
       @$('.add-fullscreen').attr('title', 'Exit fill browser')
-    @caption.resize()
+    if @video.show_captions is true
+      @caption.resize()
 
   # Delegates
   play: =>
