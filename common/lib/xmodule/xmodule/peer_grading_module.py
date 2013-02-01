@@ -68,7 +68,6 @@ class PeerGradingModule(XModule):
         system.set('location', location)
         self.system = system
         self.peer_gs = peer_grading_service()
-        log.debug(self.system)
 
         self.use_for_single_location = self.metadata.get('use_for_single_location', USE_FOR_SINGLE_LOCATION)
         if isinstance(self.use_for_single_location, basestring):
@@ -108,7 +107,7 @@ class PeerGradingModule(XModule):
         Needs to be implemented by child modules.  Handles AJAX events.
         @return:
         """
-
+        log.debug(get)
         handlers = {
             'get_next_submission': self.get_next_submission,
             'show_calibration_essay': self.show_calibration_essay,
@@ -123,6 +122,8 @@ class PeerGradingModule(XModule):
 
         d = handlers[dispatch](get)
 
+        log.debug(d)
+        
         return json.dumps(d, cls=ComplexEncoder)
 
     def get_progress(self):
@@ -149,14 +150,12 @@ class PeerGradingModule(XModule):
 
         'error': if success is False, will have an error message with more info.
         """
-        _check_post(request)
         required = set(['location'])
-        success, message = _check_required(request, required)
+        success, message = self._check_required(get, required)
         if not success:
             return _err_response(message)
-        grader_id = unique_id_for_user(request.user)
-        p = request.POST
-        location = p['location']
+        grader_id = self.system.anonymous_student_id
+        location = get['location']
 
         try:
             response = self.peer_gs.get_next_submission(location, grader_id)
@@ -183,20 +182,20 @@ class PeerGradingModule(XModule):
             success: bool indicating whether the save was a success
             error: if there was an error in the submission, this is the error message
         """
-        _check_post(request)
+
         required = set(['location', 'submission_id', 'submission_key', 'score', 'feedback', 'rubric_scores[]', 'submission_flagged'])
-        success, message = _check_required(request, required)
+        success, message = self._check_required(get, required)
         if not success:
             return _err_response(message)
-        grader_id = unique_id_for_user(request.user)
-        p = request.POST
-        location = p['location']
-        submission_id = p['submission_id']
-        score = p['score']
-        feedback = p['feedback']
-        submission_key = p['submission_key']
-        rubric_scores = p.getlist('rubric_scores[]')
-        submission_flagged = p['submission_flagged']
+        grader_id = self.system.anonymous_student_id
+
+        location = get['location']
+        submission_id = get['submission_id']
+        score = get['score']
+        feedback = get['feedback']
+        submission_key = get['submission_key']
+        rubric_scores = get['rubric_scores']
+        submission_flagged = get['submission_flagged']
         try:
             response = self.peer_gs.save_grade(location, grader_id, submission_id,
                 score, feedback, submission_key, rubric_scores, submission_flagged)
@@ -227,14 +226,14 @@ class PeerGradingModule(XModule):
             total_calibrated_on_so_far - the number of calibration essays for this problem
                 that this grader has graded
         """
-        _check_post(request)
+
         required = set(['location'])
-        success, message = _check_required(request, required)
+        success, message = self._check_required(get, required)
         if not success:
             return _err_response(message)
-        grader_id = unique_id_for_user(request.user)
-        p = request.POST
-        location = p['location']
+        grader_id = self.system.anonymous_student_id
+
+        location = get['location']
 
         try:
             response = self.peer_gs.is_student_calibrated(location, grader_id)
@@ -268,16 +267,15 @@ class PeerGradingModule(XModule):
             'error': if success is False, will have an error message with more info.
 
         """
-        _check_post(request)
 
         required = set(['location'])
-        success, message = _check_required(request, required)
+        success, message = self._check_required(get, required)
         if not success:
             return _err_response(message)
 
-        grader_id = unique_id_for_user(request.user)
-        p = request.POST
-        location = p['location']
+        grader_id = self.system.anonymous_student_id
+
+        location = get['location']
         try:
             response = self.peer_gs.show_calibration_essay(location, grader_id)
             return HttpResponse(response, mimetype="application/json")
@@ -311,20 +309,19 @@ class PeerGradingModule(XModule):
             actual_score: the score that the instructor gave to this calibration essay
 
         """
-        _check_post(request)
 
         required = set(['location', 'submission_id', 'submission_key', 'score', 'feedback', 'rubric_scores[]'])
-        success, message = _check_required(request, required)
+        success, message = self._check_required(get, required)
         if not success:
             return _err_response(message)
-        grader_id = unique_id_for_user(request.user)
-        p = request.POST
-        location = p['location']
-        calibration_essay_id = p['submission_id']
-        submission_key = p['submission_key']
-        score = p['score']
-        feedback = p['feedback']
-        rubric_scores = p.getlist('rubric_scores[]')
+        grader_id = self.system.anonymous_student_id
+
+        location = get['location']
+        calibration_essay_id = get['submission_id']
+        submission_key = get['submission_key']
+        score = get['score']
+        feedback = get['feedback']
+        rubric_scores = get['rubric_scores']
 
         try:
             response = self.peer_gs.save_calibration_essay(location, grader_id, calibration_essay_id,

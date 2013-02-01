@@ -48,6 +48,7 @@ class PeerGradingService():
                 'rubric_scores': rubric_scores,
                 'rubric_scores_complete': True,
                 'submission_flagged' : submission_flagged}
+        log.debug(data)
         return self.post(self.save_grade_url, data)
 
     def is_student_calibrated(self, problem_location, grader_id):
@@ -69,6 +70,7 @@ class PeerGradingService():
                 'feedback': feedback,
                 'rubric_scores[]': rubric_scores,
                 'rubric_scores_complete': True}
+        log.debug(data)
         return self.post(self.save_calibration_essay_url, data)
 
     def get_problem_list(self, course_id, grader_id):

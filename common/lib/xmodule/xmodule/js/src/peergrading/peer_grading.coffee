@@ -2,11 +2,11 @@
 # and message container when they are empty
 # Can (and should be) expanded upon when our problem list 
 # becomes more sophisticated
-class PeerGrading
-  constructor: () ->
+class @PeerGrading
+  constructor: (element) ->
     @peer_grading_container = $('.peer-grading')
     @peer_grading_outer_container = $('.peer-grading-container')
-    @ajax_url = peer_grading_container.data('ajax-url')
+    @ajax_url = @peer_grading_container.data('ajax-url')
     @error_container = $('.error-container')
     @error_container.toggle(not @error_container.is(':empty'))
 
@@ -14,7 +14,7 @@ class PeerGrading
     @message_container.toggle(not @message_container.is(':empty'))
 
     @problem_button = $('.problem-button')
-    @problem_button.click show_results
+    @problem_button.click @show_results
 
     @problem_list = $('.problem-list')
     @construct_progress_bar()
@@ -35,7 +35,7 @@ class PeerGrading
     $.postWithPrefix "#{@ajax_url}problem", data, (response) =>
       if response.success
         @peer_grading_outer_container.after(response.html).remove()
+        backend = new PeerGradingProblemBackend(@ajax_url, false)
+        new PeerGradingProblem(backend)
       else
         @gentle_alert response.error
-
-$(document).ready(() -> new PeerGrading())
