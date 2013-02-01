@@ -21,6 +21,16 @@ from fs.errors import ResourceNotFoundError
 from courseware.access import has_access
 from static_replace import replace_urls
 
+from lxml.html import rewrite_links
+from module_render import get_module
+from courseware.access import has_access
+from static_replace import replace_urls
+from xmodule.modulestore import Location
+from xmodule.modulestore.django import modulestore
+from xmodule.modulestore.xml import XMLModuleStore
+from xmodule.x_module import XModule
+from student.models import unique_id_for_user
+
 from open_ended_grading import open_ended_notifications
 
 log = logging.getLogger(__name__)

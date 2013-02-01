@@ -229,6 +229,7 @@ class CapaModule(XModule):
             'element_id': self.location.html_id(),
             'id': self.id,
             'ajax_url': self.system.ajax_url,
+            'progress': Progress.to_js_status_str(self.get_progress())
         })
 
     def get_problem_html(self, encapsulate=True):

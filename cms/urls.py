@@ -17,6 +17,7 @@ urlpatterns = ('',
     url(r'^publish_draft$', 'contentstore.views.publish_draft', name='publish_draft'),
     url(r'^unpublish_unit$', 'contentstore.views.unpublish_unit', name='unpublish_unit'),
     url(r'^create_new_course', 'contentstore.views.create_new_course', name='create_new_course'),
+    url(r'^reorder_static_tabs', 'contentstore.views.reorder_static_tabs', name='reorder_static_tabs'),
 
     url(r'^(?P<org>[^/]+)/(?P<course>[^/]+)/course/(?P<name>[^/]+)$',
         'contentstore.views.course_index', name='course_index'),
@@ -67,6 +68,8 @@ urlpatterns = ('',
 
     # temporary landing page for edge
     url(r'^edge$', 'contentstore.views.edge', name='edge'),
+    # noop to squelch ajax errors
+    url(r'^event$', 'contentstore.views.event', name='event'),
 
     url(r'^heartbeat$', include('heartbeat.urls')),
 )
