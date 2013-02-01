@@ -19,7 +19,7 @@ class PeerGradingService():
     """
     Interface with the grading controller for peer grading
     """
-    def __init__(self, config):
+    def __init__(self, config, system):
         self.username = config['username']
         self.password = config['password']
         self.url = config['url']
@@ -32,6 +32,7 @@ class PeerGradingService():
         self.save_calibration_essay_url = self.url + '/save_calibration_essay/'
         self.get_problem_list_url = self.url + '/get_problem_list/'
         self.get_notifications_url = self.url + '/get_notifications/'
+        self.system = system
 
     def get_next_submission(self, problem_location, grader_id):
         response = self.get(self.get_next_submission_url,
@@ -48,7 +49,6 @@ class PeerGradingService():
                 'rubric_scores': rubric_scores,
                 'rubric_scores_complete': True,
                 'submission_flagged' : submission_flagged}
-        log.debug(data)
         return self.post(self.save_grade_url, data)
 
     def is_student_calibrated(self, problem_location, grader_id):
@@ -70,7 +70,6 @@ class PeerGradingService():
                 'feedback': feedback,
                 'rubric_scores[]': rubric_scores,
                 'rubric_scores_complete': True}
-        log.debug(data)
         return self.post(self.save_calibration_essay_url, data)
 
     def get_problem_list(self, course_id, grader_id):
@@ -123,7 +122,6 @@ class PeerGradingService():
         """
         Make a get request to the grading controller
         """
-        log.debug(params)
         op = lambda: self.session.get(url,
             allow_redirects=allow_redirects,
             params=params)
@@ -240,7 +238,7 @@ class MockPeerGradingService(object):
                            ]})
 
 _service = None
-def peer_grading_service():
+def peer_grading_service(system):
     """
     Return a peer grading service instance--if settings.MOCK_PEER_GRADING is True,
     returns a mock one, otherwise a real one.
@@ -255,6 +253,6 @@ def peer_grading_service():
     if settings.MOCK_PEER_GRADING:
         _service = MockPeerGradingService()
     else:
-        _service = PeerGradingService(settings.PEER_GRADING_INTERFACE)
+        _service = PeerGradingService(settings.PEER_GRADING_INTERFACE, system)
 
     return _service

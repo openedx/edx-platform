@@ -66,7 +66,7 @@ class PeerGradingModule(XModule):
         #We need to set the location here so the child modules can use it
         system.set('location', location)
         self.system = system
-        self.peer_gs = peer_grading_service()
+        self.peer_gs = peer_grading_service(self.system)
 
         self.use_for_single_location = self.metadata.get('use_for_single_location', USE_FOR_SINGLE_LOCATION)
         if isinstance(self.use_for_single_location, basestring):
@@ -106,6 +106,7 @@ class PeerGradingModule(XModule):
         @return:
         """
 
+        log.debug(get)
         handlers = {
             'get_next_submission': self.get_next_submission,
             'show_calibration_essay': self.show_calibration_essay,
@@ -119,8 +120,6 @@ class PeerGradingModule(XModule):
             return 'Error'
 
         d = handlers[dispatch](get)
-
-        log.debug(d)
 
         return json.dumps(d, cls=ComplexEncoder)
 
@@ -191,8 +190,10 @@ class PeerGradingModule(XModule):
         score = get['score']
         feedback = get['feedback']
         submission_key = get['submission_key']
-        rubric_scores = get['rubric_scores']
+        rubric_scores = get['rubric_scores[]']
         submission_flagged = get['submission_flagged']
+        log.debug(get)
+        log.debug(rubric_scores)
         try:
             response = self.peer_gs.save_grade(location, grader_id, submission_id,
                 score, feedback, submission_key, rubric_scores, submission_flagged)
@@ -322,7 +323,7 @@ class PeerGradingModule(XModule):
         submission_key = get['submission_key']
         score = get['score']
         feedback = get['feedback']
-        rubric_scores = get['rubric_scores']
+        rubric_scores = get['rubric_scores[]']
 
         try:
             response = self.peer_gs.save_calibration_essay(location, grader_id, calibration_essay_id,
@@ -343,7 +344,7 @@ class PeerGradingModule(XModule):
         problem_list = []
         try:
             problem_list_json = self.peer_gs.get_problem_list(self.system.course_id, self.system.anonymous_student_id)
-            problem_list_dict = json.loads(problem_list_json)
+            problem_list_dict = problem_list_json
             success = problem_list_dict['success']
             if 'error' in problem_list_dict:
                 error_text = problem_list_dict['error']
