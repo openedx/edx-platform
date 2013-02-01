@@ -89,8 +89,24 @@ class @VideoPlayerAlpha extends SubviewAlpha
       $('.video-load-complete:first').data('video').player.play()
 
   onStateChange: (event) =>
+    _this = this
     switch event.data
       when @PlayerState.UNSTARTED
+        if @video.videoType is "youtube"
+          availableSpeeds = @player.getAvailablePlaybackRates()
+          console.log @video.videos
+          if availableSpeeds.length > 1
+            baseSpeedSubs = @video.videos["1.0"]
+            $.each @video.videos, (index, value) ->
+              delete _this.video.videos[index]
+
+            $.each availableSpeeds, (index, value) ->
+              _this.video.videos[value.toFixed(2).replace(/\.00$/, ".0")] = baseSpeedSubs
+
+            @speedControl.reRender()
+
+          console.log "UNSTARTED. available speeds = "
+          console.log availableSpeeds
         @onUnstarted()
       when @PlayerState.PLAYING
         @onPlay()
