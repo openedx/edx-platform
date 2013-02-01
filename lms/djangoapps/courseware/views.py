@@ -352,7 +352,6 @@ def timed_exam(request, course_id, chapter, section):
         
         context = {
             'csrf': csrf(request)['csrf_token'],
-            # 'accordion': render_accordion(request, course, chapter, section),
             'COURSE_TITLE': course.title,
             'course': course,
             'init': '',
@@ -360,6 +359,11 @@ def timed_exam(request, course_id, chapter, section):
             'staff_access': staff_access,
             'xqa_server': settings.MITX_FEATURES.get('USE_XQA_SERVER','http://xqa:server@content-qa.mitx.mit.edu/xqa')
             }
+
+        # in general, we may want to disable accordion display on timed exams.  
+        provide_accordion = True
+        if provide_accordion:
+            context['accordion'] = render_accordion(request, course, chapter, section)
 
         chapter_descriptor = course.get_child_by(lambda m: m.url_name == chapter)
         if chapter_descriptor is not None:
@@ -387,9 +391,9 @@ def timed_exam(request, course_id, chapter, section):
             # they don't have access to.
             raise Http404
 
-        # Save where we are in the chapter NOT!
-#        instance_module = get_instance_module(course_id, request.user, chapter_module, student_module_cache)
-#        save_child_position(chapter_module, section, instance_module)
+        # Save where we are in the chapter:
+        instance_module = get_instance_module(course_id, request.user, chapter_module, student_module_cache)
+        save_child_position(chapter_module, section, instance_module)
 
 
         context['content'] = section_module.get_html()

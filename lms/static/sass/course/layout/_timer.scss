@@ -1,0 +1,11 @@
+div.timer-main {
+  position: fixed;
+  z-index: 99;
+  width: 100%;
+
+  div#timer_wrapper {
+    position: relative;
+    float: right;
+    margin-right: 10px;
+  }
+}

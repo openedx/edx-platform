@@ -220,6 +220,12 @@ if settings.COURSEWARE_ENABLED:
         # timed exam:
         url(r'^courses/(?P<course_id>[^/]+/[^/]+/[^/]+)/timed_exam/(?P<chapter>[^/]*)/(?P<section>[^/]*)/$',
             'courseware.views.timed_exam', name="timed_exam"),
+        # (handle hard-coded 6.002x exam explicitly as a timed exam, but without changing the URL.
+        # not only because Pearson doesn't want us to change its location, but because we also include it
+        # in the navigation accordion we display with this exam (so students can see what work they have already
+        # done).  Those are generated automatically using reverse(courseware_section).
+        url(r'^courses/(?P<course_id>MITx/6.002x/2012_Fall)/courseware/(?P<chapter>Final_Exam)/(?P<section>Final_Exam_Fall_2012)/$',
+            'courseware.views.timed_exam'),
 
         #Inside the course
         url(r'^courses/(?P<course_id>[^/]+/[^/]+/[^/]+)/$',

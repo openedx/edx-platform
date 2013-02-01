@@ -78,6 +78,7 @@
        // TBD...
        if (remaining_secs <= 0) {
            return "00:00:00";
+           // do we just set window.location = <url> value?
        }
        
        // count down in terms of hours, minutes, and seconds:
@@ -104,18 +105,40 @@
 
 </%block>
 
-<!-- %include file="/courseware/course_navigation.html" args="active_page='courseware'" /  -->
+<div class="timer-main">
+  <div id="timer_wrapper">
+    <div class="timer_label">Time Remaining:</div> <div id="exam_timer" class="timer_value">&nbsp;</div>
+  </div>
+</div>
 
-<span id="exam_timer">&nbsp;</span>
+% if accordion:
+ <%include file="/courseware/course_navigation.html" args="active_page='courseware'" />
+% endif
+
 
 <section class="container">
+
   <div class="course-wrapper">
+
+% if accordion:
+    <section aria-label="Course Navigation" class="course-index">
+      <header id="open_close_accordion">
+        <a href="#">close</a>
+      </header>
+
+      <div id="accordion" style="display: none">
+        <nav>
+          ${accordion}
+        </nav>
+      </div>
+    </section>
+% endif
+
     <section class="course-content">
       ${content}
     </section>
   </div>
 </section>
-
 
 % if course.show_calculator:
     <div class="calc-main">
