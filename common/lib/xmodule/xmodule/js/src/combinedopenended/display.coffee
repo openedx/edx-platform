@@ -1,3 +1,32 @@
+class @Rubric
+  constructor: () ->
+
+  # finds the scores for each rubric category
+  @get_score_list: () =>
+    # find the number of categories:
+    num_categories = $('table.rubric tr').length
+
+    score_lst = []
+    # get the score for each one
+    for i in [0..(num_categories-2)]
+      score = $("input[name='score-selection-#{i}']:checked").val()
+      score_lst.push(score)
+
+    return score_lst
+
+  @get_total_score: () ->
+    score_lst = @get_score_list()
+
+  @check_complete: () ->
+     # check to see whether or not any categories have not been scored
+    num_categories = $('table.rubric tr').length
+    # -2 because we want to skip the header
+    for i in [0..(num_categories-2)]
+      score = $("input[name='score-selection-#{i}']:checked").val()
+      if score == undefined
+        return false
+    return true
+
 class @CombinedOpenEnded
   constructor: (element) ->
     @element=element
