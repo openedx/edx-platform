@@ -8,13 +8,11 @@
   <div
       id="video_${id}"
       class="video"
-      data-streams=""
+      data-streams="${streams}"
+      ${'data-sub="{}"'.format(sub) if sub else ''}
       ${'data-mp4-source="{}"'.format(mp4_source) if mp4_source else ''}
       ${'data-webm-source="{}"'.format(webm_source) if webm_source else ''}
       ${'data-ogg-source="{}"'.format(ogv_source) if ogv_source else ''}
-      ${'data-mp4-sub="{}"'.format(mp4_sub) if mp4_sub else ''}
-      ${'data-webm-sub="{}"'.format(webm_sub) if webm_sub else ''}
-      ${'data-ogg-sub="{}"'.format(ogv_sub) if ogv_sub else ''}
       data-caption-data-dir="${data_dir}"
       data-show-captions="${show_captions}"
       data-start="${start}"

@@ -40,15 +40,13 @@ class VideoAlphaModule(XModule):
                          instance_state, shared_state, **kwargs)
         xmltree = etree.fromstring(self.definition['data'])
         self.youtube = xmltree.get('youtube')
+        self.sub = xmltree.get('sub')
         self.position = 0
         self.show_captions = xmltree.get('show_captions', 'true')
-        self.source, _ = self._get_source(xmltree)
-        self.mp4_source, self.mp4_element = self._get_source(xmltree, ['mp4'])
-        self.webm_source, self.webm_element = self._get_source(xmltree, ['webm'])
-        self.ogv_source, self.ogv_element = self._get_source(xmltree, ['ogv'])
-        self.mp4_sub = self.mp4_element.get('sub') if self.mp4_element else None
-        self.webm_sub = self.webm_element.get('sub') if self.webm_element else None
-        self.ogv_sub = self.ogv_element.get('sub') if self.ogv_element else None
+        self.source = self._get_source(xmltree)
+        self.mp4_source = self._get_source(xmltree, ['mp4'])
+        self.webm_source = self._get_source(xmltree, ['webm'])
+        self.ogv_source = self._get_source(xmltree, ['ogv'])
         self.track = self._get_track(xmltree)
         self.start_time, self.end_time = self._get_timeframe(xmltree)
 
@@ -61,23 +59,22 @@ class VideoAlphaModule(XModule):
         """Find the first valid source, which ends with one of
         `extensions`."""
         condition = lambda src: any([src.endswith(ext) for ext in extensions])
-        return self._get_first_external(xmltree, 'source', condition, True)
+        return self._get_first_external(xmltree, 'source', condition)
 
     def _get_track(self, xmltree):
         # find the first valid track
         return self._get_first_external(xmltree, 'track')
 
-    def _get_first_external(self, xmltree, tag, condition=bool,
-        return_element=False):
+    def _get_first_external(self, xmltree, tag, condition=bool):
         """Will return the first 'valid' element of the given tag.
         'valid' means that `condition('src' attribute) == True`
         """
-        result = (None, None) if return_element else None
+        result = None
 
         for element in xmltree.findall(tag):
             src = element.get('src')
             if condition(src):
-                result = (src, element) if return_element else src
+                result = src
                 break
         return result
 
@@ -144,9 +141,7 @@ class VideoAlphaModule(XModule):
             'mp4_source': self.mp4_source,
             'webm_source': self.webm_source,
             'ogv_source': self.ogv_source,
-            'mp4_sub': self.mp4_sub,
-            'webm_sub': self.webm_sub,
-            'ogv_sub': self.ogv_sub,
+            'sub': self.sub,
             'source': self.source,
             'track': self.track,
             'display_name': self.display_name,
