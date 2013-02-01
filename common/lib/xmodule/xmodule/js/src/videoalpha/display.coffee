@@ -15,16 +15,25 @@ class @VideoAlpha
       @parseSpeed()
     else
       @videoType = "html5"
-      @parseVideoSources @el.data("mp4-source"), @el.data("webm-source"), @el.data("ogg-source")
-      @speeds = ["0.75", "1.0", "1.25", "1.5"]
+      @parseVideoSources @el.data('mp4-source'), @el.data('webm-source'), @el.data('ogg-source')
+      @speeds = ['0.75', '1.0', '1.25', '1.5']
+      sub = @el.data('sub')
+      if (typeof sub isnt "string") or (sub.length is 0)
+        sub = ""
+        @show_captions = false
       @videos =
-        "0.75": ""
-        "1.0": ""
-        "1.25": ""
-        "1.5": ""
+        "0.75": sub
+        "1.0": sub
+        "1.25": sub
+        "1.5": sub
       @setSpeed($.cookie('video_speed'))
     $("#video_#{@id}").data('video', this).addClass('video-load-complete')
-    @hide_captions = $.cookie('hide_captions') == 'true'
+    if @show_captions is true
+      @hide_captions = $.cookie('hide_captions') == 'true'
+    else
+      @hide_captions = true
+      $.cookie('hide_captions', @hide_captions, expires: 3650, path: '/')
+      @el.addClass 'closed'
     _this = this
     if ((@videoType is "youtube") and (YT.Player)) or ((@videoType is "html5") and (HTML5Video.Player))
       @embed()
