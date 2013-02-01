@@ -59,9 +59,9 @@ class AnnotatableModule(XModule):
         if container is None:
             return parent
         return container
-    
-    def _attach_discussion(self, span, index, xmltree):
-        """ Attaches a discussion thread to the annotation span. """
+
+    def _get_discussion_html(self, discussion_id, discussion_title):
+        """ Returns html to display the discussion thread """
 
         tpl = u'<div class="annotatable-discussion" data-discussion-id="{0}">'
         tpl += '<div class="annotatable-icon"> </div>'
@@ -69,17 +69,22 @@ class AnnotatableModule(XModule):
         tpl += '<span class="annotatable-discussion-thread">{1}</span>'
         tpl += '<a class="annotatable-show-discussion" href="javascript:void(0);">Show Discussion</a>'
         tpl += '</div>'
+  
+        return tpl.format(discussion_id, discussion_title)
+    
+    def _attach_discussion(self, span, index, xmltree):
+        """ Attaches a discussion thread to the annotation span. """
 
         span_id = 'span-{0}'.format(index) # How should we anchor spans? 
         span.set('data-span-id', span_id)
 
         discussion_id = 'discussion-{0}'.format(index) # How do we get a real discussion ID?
         discussion_title = 'Thread Title {0}'.format(index) # How do we get the discussion Title?
-        discussion_html = tpl.format(discussion_id, discussion_title)
-        discussion = etree.fromstring(discussion_html)
+        discussion_html = self._get_discussion_html(discussion_id, discussion_title)
+        discussion_xmltree = etree.fromstring(discussion_html)
 
         span_container = self._get_span_container(span)
-        span_container.append(discussion)
+        span_container.append(discussion_xmltree)
 
         self.discussion_for[span_id] = discussion_id
     
