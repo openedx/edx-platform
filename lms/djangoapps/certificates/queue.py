@@ -1,6 +1,7 @@
 from certificates.models import GeneratedCertificate
 from certificates.models import certificate_status_for_student
 from certificates.models import CertificateStatuses as status
+from certificates.models import CertificateWhitelist
 
 from courseware import grades, courses
 from django.test.client import RequestFactory
@@ -71,6 +72,8 @@ class XQueueCertInterface(object):
                 settings.XQUEUE_INTERFACE['django_auth'],
                 requests_auth,
                 )
+        self.whitelist = CertificateWhitelist.objects.all()
+        self.restricted = UserProfile.objects.filter(allow_certificate=False)
 
     def regen_cert(self, student, course_id):
         """
@@ -93,49 +96,7 @@ class XQueueCertInterface(object):
 
         """
 
-        VALID_STATUSES = [status.error, status.downloadable]
-
-        cert_status = certificate_status_for_student(
-                              student, course_id)['status']
-
-        if cert_status in VALID_STATUSES:
-            # grade the student
-            course = courses.get_course_by_id(course_id)
-            grade = grades.grade(student, self.request, course)
-
-            profile = UserProfile.objects.get(user=student)
-            try:
-                cert = GeneratedCertificate.objects.get(
-                    user=student, course_id=course_id)
-            except GeneratedCertificate.DoesNotExist:
-                logger.critical("Attempting to regenerate a certificate"
-                               "for a user that doesn't have one")
-                raise
-
-            if grade['grade'] is not None:
-
-                cert.status = status.regenerating
-                cert.name = profile.name
-
-                contents = {
-                     'action': 'regen',
-                     'delete_verify_uuid': cert.verify_uuid,
-                     'delete_download_uuid': cert.download_uuid,
-                     'username': cert.user.username,
-                     'course_id': cert.course_id,
-                     'name': profile.name,
-                    }
-
-                key = cert.key
-                self._send_to_xqueue(contents, key)
-                cert.save()
-
-            else:
-                cert.status = status.notpassing
-                cert.name = profile.name
-                cert.save()
-
-        return cert_status
+        raise NotImplementedError
 
     def del_cert(self, student, course_id):
 
@@ -152,34 +113,7 @@ class XQueueCertInterface(object):
 
         """
 
-        VALID_STATUSES = [status.error, status.downloadable]
-
-        cert_status = certificate_status_for_student(
-                              student, course_id)['status']
-
-        if cert_status in VALID_STATUSES:
-
-            try:
-                cert = GeneratedCertificate.objects.get(
-                    user=student, course_id=course_id)
-            except GeneratedCertificate.DoesNotExist:
-                logger.warning("Attempting to delete a certificate"
-                               "for a user that doesn't have one")
-                raise
-
-            cert.status = status.deleting
-
-            contents = {
-                 'action': 'delete',
-                 'delete_verify_uuid': cert.verify_uuid,
-                 'delete_download_uuid': cert.download_uuid,
-                 'username': cert.user.username,
-            }
-
-            key = cert.key
-            self._send_to_xqueue(contents, key)
-            cert.save()
-        return cert_status
+        raise NotImplementedError
 
     def add_cert(self, student, course_id):
         """
@@ -189,13 +123,17 @@ class XQueueCertInterface(object):
           course_id - courseenrollment.course_id (string)
 
         Request a new certificate for a student.
-        Will change the certificate status to 'deleting'.
+        Will change the certificate status to 'generating'.
 
         Certificate must be in the 'unavailable', 'error',
-        or 'deleted' state.
+        'deleted' or 'generating' state.
 
-        If a student has a passing grade a request will made
-        for a new cert
+        If a student has a passing grade or is in the whitelist
+        table for the course a request will made for a new cert.
+
+        If a student has allow_certificate set to False in the
+        userprofile table the status will change to 'restricted'
+
 
         If a student does not have a passing grade the status
         will change to status.notpassing
@@ -204,7 +142,8 @@ class XQueueCertInterface(object):
 
         """
 
-        VALID_STATUSES = [status.unavailable, status.deleted, status.error,
+        VALID_STATUSES = [ status.generating,
+                status.unavailable, status.deleted, status.error,
                 status.notpassing]
 
         cert_status = certificate_status_for_student(
@@ -213,30 +152,41 @@ class XQueueCertInterface(object):
         if cert_status in VALID_STATUSES:
             # grade the student
             course = courses.get_course_by_id(course_id)
-            grade = grades.grade(student, self.request, course)
             profile = UserProfile.objects.get(user=student)
+
+
             cert, created = GeneratedCertificate.objects.get_or_create(
                    user=student, course_id=course_id)
 
-            if grade['grade'] is not None:
-                cert_status = status.generating
+            grade = grades.grade(student, self.request, course)
+            is_whitelisted = self.whitelist.filter(
+                user=student, course_id=course_id, whitelist=True).exists()
+
+            if is_whitelisted or grade['grade'] is not None:
+
                 key = make_hashkey(random.random())
 
-                cert.status = cert_status
                 cert.grade = grade['percent']
                 cert.user = student
                 cert.course_id = course_id
                 cert.key = key
                 cert.name = profile.name
 
-                contents = {
-                    'action': 'create',
-                    'username': student.username,
-                    'course_id': course_id,
-                    'name': profile.name,
-                }
-
-                self._send_to_xqueue(contents, key)
+                # check to see whether the student is on the
+                # the embargoed country restricted list
+                # otherwise, put a new certificate request
+                # on the queue
+                if self.restricted.filter(user=student).exists():
+                    cert.status = status.restricted
+                else:
+                    contents = {
+                        'action': 'create',
+                        'username': student.username,
+                        'course_id': course_id,
+                        'name': profile.name,
+                    }
+                    cert.status = status.generating
+                    self._send_to_xqueue(contents, key)
                 cert.save()
             else:
                 cert_status = status.notpassing

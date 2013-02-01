@@ -1,12 +1,19 @@
 from util.json_request import expect_json
 import json
-import os
 import logging
+import os
 import sys
-import mimetypes
-import StringIO
-import exceptions
+import time
+import tarfile
+import shutil
+from datetime import datetime
 from collections import defaultdict
+from uuid import uuid4
+from path import path
+from xmodule.modulestore.xml_exporter import export_to_xml
+from tempfile import mkdtemp
+from django.core.servers.basehttp import FileWrapper
+from django.core.files.temp import NamedTemporaryFile
 
 # to install PIL on MacOSX: 'easy_install http://dist.repoze.org/PIL-1.1.6.tar.gz'
 from PIL import Image
@@ -18,33 +25,50 @@ from django.core.context_processors import csrf
 from django_future.csrf import ensure_csrf_cookie
 from django.core.urlresolvers import reverse
 from django.conf import settings
-from django import forms
 
 from xmodule.modulestore import Location
+from xmodule.modulestore.exceptions import ItemNotFoundError, InvalidLocationError
 from xmodule.x_module import ModuleSystem
 from xmodule.error_module import ErrorDescriptor
 from xmodule.errortracker import exc_info_to_str
-from github_sync import export_to_github
 from static_replace import replace_urls
+from external_auth.views import ssl_login_shortcut
 
 from mitxmako.shortcuts import render_to_response, render_to_string
 from xmodule.modulestore.django import modulestore
 from xmodule_modifiers import replace_static_urls, wrap_xmodule
 from xmodule.exceptions import NotFoundError
 from functools import partial
-from itertools import groupby
-from operator import attrgetter
 
 from xmodule.contentstore.django import contentstore
 from xmodule.contentstore.content import StaticContent
 
-from cache_toolbox.core import set_cached_content, get_cached_content, del_cached_content
 from auth.authz import is_user_in_course_group_role, get_users_in_course_group_by_role
 from auth.authz import get_user_by_email, add_user_to_course_group, remove_user_from_course_group
-from auth.authz import ADMIN_ROLE_NAME, EDITOR_ROLE_NAME
-from .utils import get_course_location_for_item
+from auth.authz import INSTRUCTOR_ROLE_NAME, STAFF_ROLE_NAME, create_all_course_groups
+from .utils import get_course_location_for_item, get_lms_link_for_item, compute_unit_state, get_date_display, UnitState, get_course_for_item
+
+from xmodule.modulestore.xml_importer import import_from_xml
+from contentstore.course_info_model import get_course_updates,\
+    update_course_updates, delete_course_update
+from cache_toolbox.core import del_cached_content
+from xmodule.timeparse import stringify_time
+from contentstore.module_info_model import get_module_info, set_module_info
+from cms.djangoapps.models.settings.course_details import CourseDetails,\
+    CourseSettingsEncoder
+from cms.djangoapps.models.settings.course_grading import CourseGradingModel
+from cms.djangoapps.contentstore.utils import get_modulestore
+from lxml import etree
+
+# to install PIL on MacOSX: 'easy_install http://dist.repoze.org/PIL-1.1.6.tar.gz'
 
 log = logging.getLogger(__name__)
+
+
+COMPONENT_TYPES = ['customtag', 'discussion', 'html', 'problem', 'video']
+
+# cdodge: these are categories which should not be parented, they are detached from the hierarchy
+DETACHED_CATEGORIES = ['about', 'static_tab', 'course_info']
 
 
 # ==== Public views ==================================================
@@ -57,14 +81,17 @@ def signup(request):
     csrf_token = csrf(request)['csrf_token']
     return render_to_response('signup.html', {'csrf': csrf_token})
 
-
+@ssl_login_shortcut
 @ensure_csrf_cookie
 def login_page(request):
     """
     Display the login form.
     """
     csrf_token = csrf(request)['csrf_token']
-    return render_to_response('login.html', {'csrf': csrf_token})
+    return render_to_response('login.html', {
+        'csrf': csrf_token,
+        'forgot_password_link': "//{base}/#forgot-password-modal".format(base=settings.LMS_BASE),
+    })
 
 
 # ==== Views for any logged-in user ==================================
@@ -77,25 +104,45 @@ def index(request):
     """
     courses = modulestore().get_items(['i4x', None, None, 'course', None])
 
-    # filter out courses that we don't have access to
-    courses = filter(lambda course: has_access(request.user, course.location), courses)
+    # filter out courses that we don't have access too
+    def course_filter(course):
+        return (has_access(request.user, course.location)
+                and course.location.course != 'templates'
+                and course.location.org != ''
+                and course.location.course != ''
+                and course.location.name != '')
+    courses = filter(course_filter, courses)
 
     return render_to_response('index.html', {
+        'new_course_template' : Location('i4x', 'edx', 'templates', 'course', 'Empty'),
         'courses': [(course.metadata.get('display_name'),
                     reverse('course_index', args=[
                         course.location.org,
                         course.location.course,
                         course.location.name]))
-                    for course in courses]
+                    for course in courses],
+        'user': request.user
     })
 
 
 # ==== Views with per-item permissions================================
 
-def has_access(user, location, role=EDITOR_ROLE_NAME):
-    '''Return True if user allowed to access this piece of data'''
-    '''Note that the CMS permissions model is with respect to courses'''
-    return is_user_in_course_group_role(user, get_course_location_for_item(location), role)
+def has_access(user, location, role=STAFF_ROLE_NAME):
+    '''
+    Return True if user allowed to access this piece of data
+    Note that the CMS permissions model is with respect to courses
+    There is a super-admin permissions if user.is_staff is set
+    Also, since we're unifying the user database between LMS and CAS, 
+    I'm presuming that the course instructor (formally known as admin)
+    will not be in both INSTRUCTOR and STAFF groups, so we have to cascade our queries here as INSTRUCTOR
+    has all the rights that STAFF do
+    '''
+    course_location = get_course_location_for_item(location)
+    _has_access = is_user_in_course_group_role(user, course_location, role)
+    # if we're not in STAFF, perhaps we're in INSTRUCTOR groups
+    if not _has_access and role == STAFF_ROLE_NAME:
+        _has_access = is_user_in_course_group_role(user, course_location, INSTRUCTOR_ROLE_NAME)
+    return _has_access
 
 
 @login_required
@@ -112,31 +159,88 @@ def course_index(request, org, course, name):
     if not has_access(request.user, location):
         raise PermissionDenied()
 
-    # TODO (cpennington): These need to be read in from the active user
-    _course = modulestore().get_item(location)
-    weeks = _course.get_children()
-
-    #upload_asset_callback_url = "/{org}/{course}/course/{name}/upload_asset".format(
-    #    org = org, 
-    #    course = course,
-    #    name = name
-    #    )
-
     upload_asset_callback_url = reverse('upload_asset', kwargs = {
             'org' : org,
             'course' : course,
             'coursename' : name
             })
-    logging.debug(upload_asset_callback_url)
 
-    return render_to_response('course_index.html', {
-            'weeks': weeks, 
-            'upload_asset_callback_url': upload_asset_callback_url
-            })
+    course = modulestore().get_item(location)
+    sections = course.get_children()
+
+    return render_to_response('overview.html', {
+        'active_tab': 'courseware',
+        'context_course': course,
+        'sections': sections,
+        'course_graders': json.dumps(CourseGradingModel.fetch(course.location).graders),
+        'parent_location': course.location,
+        'new_section_template': Location('i4x', 'edx', 'templates', 'chapter', 'Empty'),
+        'new_subsection_template': Location('i4x', 'edx', 'templates', 'sequential', 'Empty'),  # for now they are the same, but the could be different at some point...
+        'upload_asset_callback_url': upload_asset_callback_url,
+        'create_new_unit_template': Location('i4x', 'edx', 'templates', 'vertical', 'Empty')
+    })
 
 
 @login_required
-def edit_item(request):
+def edit_subsection(request, location):
+    # check that we have permissions to edit this item
+    if not has_access(request.user, location):
+        raise PermissionDenied()
+
+    item = modulestore().get_item(location)
+
+    # TODO: we need a smarter way to figure out what course an item is in
+    for course in modulestore().get_courses():
+        if (course.location.org == item.location.org and
+            course.location.course == item.location.course):
+            break
+
+    lms_link = get_lms_link_for_item(location)
+    preview_link = get_lms_link_for_item(location, preview=True)
+
+    # make sure that location references a 'sequential', otherwise return BadRequest
+    if item.location.category != 'sequential':
+        return HttpResponseBadRequest()
+
+    parent_locs = modulestore().get_parent_locations(location, None)
+
+    # we're for now assuming a single parent
+    if len(parent_locs) != 1:
+        logging.error('Multiple (or none) parents have been found for {0}'.format(location))
+
+    # this should blow up if we don't find any parents, which would be erroneous
+    parent = modulestore().get_item(parent_locs[0])
+
+    # remove all metadata from the generic dictionary that is presented in a more normalized UI
+
+    policy_metadata = dict((key,value) for key, value in item.metadata.iteritems() 
+        if key not in ['display_name', 'start', 'due', 'format'] and key not in item.system_metadata_fields)
+
+    can_view_live = False
+    subsection_units = item.get_children()
+    for unit in subsection_units:
+        state = compute_unit_state(unit)
+        if state == UnitState.public or state == UnitState.draft:
+            can_view_live = True
+            break
+
+    return render_to_response('edit_subsection.html',
+                              {'subsection': item,
+                               'context_course': course,
+                               'create_new_unit_template': Location('i4x', 'edx', 'templates', 'vertical', 'Empty'),
+                               'lms_link': lms_link,
+                               'preview_link': preview_link,
+                                'course_graders': json.dumps(CourseGradingModel.fetch(course.location).graders),
+                                'parent_location': course.location,
+                               'parent_item': parent,
+                               'policy_metadata' : policy_metadata,
+                               'subsection_units' : subsection_units,
+                               'can_view_live' : can_view_live
+                               })
+
+
+@login_required
+def edit_unit(request, location):
     """
     Display an editing page for the specified module.
 
@@ -144,65 +248,125 @@ def edit_item(request):
 
     id: A Location URL
     """
-    
-    item_location = request.GET['id']
-
     # check that we have permissions to edit this item
-    if not has_access(request.user, item_location):
+    if not has_access(request.user, location):
         raise PermissionDenied()
 
-    item = modulestore().get_item(item_location)
-    item.get_html = wrap_xmodule(item.get_html, item, "xmodule_edit.html")
+    item = modulestore().get_item(location)
 
-    if settings.LMS_BASE is not None:
-        lms_link = "{lms_base}/courses/{course_id}/jump_to/{location}".format(
-            lms_base=settings.LMS_BASE,
-            # TODO: These will need to be changed to point to the particular instance of this problem in the particular course
-            course_id= modulestore().get_containing_courses(item.location)[0].id,
-            location=item.location,
-        )
-    else:
-        lms_link = None
+    # TODO: we need a smarter way to figure out what course an item is in
+    for course in modulestore().get_courses():
+        if (course.location.org == item.location.org and
+            course.location.course == item.location.course):
+            break
 
-    
+    lms_link = get_lms_link_for_item(item.location)
+    preview_lms_link = get_lms_link_for_item(item.location, preview=True)
+
+    component_templates = defaultdict(list)
+
+    templates = modulestore().get_items(Location('i4x', 'edx', 'templates'))
+    for template in templates:
+        if template.location.category in COMPONENT_TYPES:
+            component_templates[template.location.category].append((
+                template.display_name,
+                template.location.url(),
+                'markdown' in template.metadata,
+                template.location.name == 'Empty'
+            ))
+
+    components = [
+        component.location.url()
+        for component
+        in item.get_children()
+    ]
+
+    # TODO (cpennington): If we share units between courses,
+    # this will need to change to check permissions correctly so as
+    # to pick the correct parent subsection
+
+    containing_subsection_locs = modulestore().get_parent_locations(location, None)
+    containing_subsection = modulestore().get_item(containing_subsection_locs[0])
+
+    containing_section_locs = modulestore().get_parent_locations(containing_subsection.location, None)
+    containing_section = modulestore().get_item(containing_section_locs[0])
+
+    # cdodge hack. We're having trouble previewing drafts via jump_to redirect
+    # so let's generate the link url here 
+
+    # need to figure out where this item is in the list of children as the preview will need this
+    index =1
+    for child in containing_subsection.get_children():
+        if child.location == item.location:
+            break
+        index = index + 1
+
+    preview_lms_link = '//{preview}{lms_base}/courses/{org}/{course}/{course_name}/courseware/{section}/{subsection}/{index}'.format(
+            preview='preview.',
+            lms_base=settings.LMS_BASE,            
+            org=course.location.org,
+            course=course.location.course, 
+            course_name=course.location.name, 
+            section=containing_section.location.name, 
+            subsection=containing_subsection.location.name, 
+            index=index)
+
+    unit_state = compute_unit_state(item)
+
+    try:
+        published_date = time.strftime('%B %d, %Y', item.metadata.get('published_date'))
+    except TypeError:
+        published_date = None
+
     return render_to_response('unit.html', {
-        'contents': item.get_html(),
-        'js_module': item.js_module_name,
-        'category': item.category,
-        'url_name': item.url_name,
-        'previews': get_module_previews(request, item),
-        'metadata': item.metadata,
-        # TODO: It would be nice to able to use reverse here in some form, but we don't have the lms urls imported
-        'lms_link': lms_link,
+        'context_course': course,
+        'active_tab': 'courseware',
+        'unit': item,
+        'unit_location': location,
+        'components': components,
+        'component_templates': component_templates,
+        'draft_preview_link': preview_lms_link,
+        'published_preview_link': lms_link,
+        'subsection': containing_subsection,
+        'release_date': get_date_display(datetime.fromtimestamp(time.mktime(containing_subsection.start))) if containing_subsection.start is not None else None,
+        'section': containing_section,
+        'create_new_unit_template': Location('i4x', 'edx', 'templates', 'vertical', 'Empty'),
+        'unit_state': unit_state,
+        'published_date': published_date,
     })
 
 
 @login_required
-def new_item(request):
-    """
-    Display a page where the user can create a new item from a template
+def preview_component(request, location):
+    # TODO (vshnayder): change name from id to location in coffee+html as well.
+    if not has_access(request.user, location):
+        raise HttpResponseForbidden()
 
-    Expects a GET request with the parameter 'parent_location', which is the element to add
-    the newly created item to as a child.
+    component = modulestore().get_item(location)
 
-    parent_location: A Location URL
-    """
-
-    parent_location = request.GET['parent_location']
-    if not has_access(request.user, parent_location):
-        raise Http404
-
-    parent = modulestore().get_item(parent_location)
-    templates = modulestore().get_items(Location('i4x', 'edx', 'templates'))
-
-    templates.sort(key=attrgetter('location.category', 'display_name'))
-
-    return render_to_response('new_item.html', {
-        'parent_name': parent.display_name,
-        'parent_location': parent.location.url(),
-        'templates': groupby(templates, attrgetter('location.category')),
+    return render_to_response('component.html', {
+        'preview': get_module_previews(request, component)[0],
+        'editor': wrap_xmodule(component.get_html, component, 'xmodule_edit.html')(),
     })
 
+@expect_json
+@login_required
+@ensure_csrf_cookie
+def assignment_type_update(request, org, course, category, name):
+    '''
+    CRUD operations on assignment types for sections and subsections and anything else gradable.
+    '''
+    location = Location(['i4x', org, course, category, name])
+    if not has_access(request.user, location):
+        raise HttpResponseForbidden()
+    
+    if request.method == 'GET':
+        return HttpResponse(json.dumps(CourseGradingModel.get_section_grader_type(location)), 
+                            mimetype="application/json")
+    elif request.method == 'POST': # post or put, doesn't matter.
+        return HttpResponse(json.dumps(CourseGradingModel.update_section_grader_type(location, request.POST)),  
+                            mimetype="application/json")
+    
 
 def user_author_string(user):
     '''Get an author string for commits by this user.  Format:
@@ -277,8 +441,12 @@ def save_preview_state(request, preview_id, location, instance_state, shared_sta
     if 'preview_states' not in request.session:
         request.session['preview_states'] = defaultdict(dict)
 
-    request.session['preview_states'][preview_id, location]['instance'] = instance_state
-    request.session['preview_states'][preview_id, location]['shared'] = shared_state
+    # request.session doesn't notice indirect changes; so, must set its dict w/ every change to get
+    # it to persist: http://www.djangobook.com/en/2.0/chapter14.html
+    preview_states = request.session['preview_states']
+    preview_states[preview_id, location]['instance'] = instance_state
+    preview_states[preview_id, location]['shared'] = shared_state
+    request.session['preview_states'] = preview_states  # make session mgmt notice the update
 
 
 def render_from_lms(template_name, dictionary, context=None, namespace='main'):
@@ -297,6 +465,7 @@ def preview_module_system(request, preview_id, descriptor):
     preview_id (str): An identifier specifying which preview this module is used for
     descriptor: An XModuleDescriptor
     """
+
     return ModuleSystem(
         ajax_url=reverse('preview_dispatch', args=[preview_id, descriptor.location.url(), '']).rstrip('/'),
         # TODO (cpennington): Do we want to track how instructors are using the preview problems?
@@ -310,7 +479,7 @@ def preview_module_system(request, preview_id, descriptor):
     )
 
 
-def get_preview_module(request, preview_id, location):
+def get_preview_module(request, preview_id, descriptor):
     """
     Returns a preview XModule at the specified location. The preview_data is chosen arbitrarily
     from the set of preview data for the descriptor specified by Location
@@ -319,7 +488,6 @@ def get_preview_module(request, preview_id, location):
     preview_id (str): An identifier specifying which preview this module is used for
     location: A Location
     """
-    descriptor = modulestore().get_item(location)
     instance_state, shared_state = descriptor.get_sample_state()[0]
     return load_preview_module(request, preview_id, descriptor, instance_state, shared_state)
 
@@ -343,9 +511,24 @@ def load_preview_module(request, preview_id, descriptor, instance_state, shared_
             error_msg=exc_info_to_str(sys.exc_info())
         ).xmodule_constructor(system)(None, None)
 
+    # cdodge: Special case 
+    if module.location.category == 'static_tab':
+        module.get_html = wrap_xmodule(
+            module.get_html,
+            module,
+            "xmodule_tab_display.html",
+        )
+    else:        
+        module.get_html = wrap_xmodule(
+            module.get_html,
+            module,
+            "xmodule_display.html",
+        )
+        
     module.get_html = replace_static_urls(
-        wrap_xmodule(module.get_html, module, "xmodule_display.html"),
-        module.metadata.get('data_dir', module.location.course)
+        module.get_html,
+        module.metadata.get('data_dir', module.location.course),
+        course_namespace = Location([module.location.tag, module.location.org, module.location.course, None, None])
     )
     save_preview_state(request, preview_id, descriptor.location.url(),
         module.get_instance_state(), module.get_shared_state())
@@ -367,6 +550,51 @@ def get_module_previews(request, descriptor):
     return preview_html
 
 
+def _xmodule_recurse(item, action):
+    for child in item.get_children():
+        _xmodule_recurse(child, action)
+
+    action(item)
+    
+
+@login_required
+@expect_json
+def delete_item(request):
+    item_location = request.POST['id']
+    item_loc = Location(item_location)
+
+    # check permissions for this user within this course
+    if not has_access(request.user, item_location):
+        raise PermissionDenied()
+
+    # optional parameter to delete all children (default False)
+    delete_children = request.POST.get('delete_children', False)
+    delete_all_versions = request.POST.get('delete_all_versions', False)
+
+    item = modulestore().get_item(item_location)
+
+    store = get_modulestore(item_loc)
+
+
+    # @TODO: this probably leaves draft items dangling. My preferance would be for the semantic to be
+    # if item.location.revision=None, then delete both draft and published version
+    # if caller wants to only delete the draft than the caller should put item.location.revision='draft'
+
+    if delete_children:
+        _xmodule_recurse(item, lambda i: store.delete_item(i.location))
+    else:
+        store.delete_item(item.location)
+
+    # cdodge: this is a bit of a hack until I can talk with Cale about the
+    # semantics of delete_item whereby the store is draft aware. Right now calling
+    # delete_item on a vertical tries to delete the draft version leaving the
+    # requested delete to never occur
+    if item.location.revision is None and item.location.category=='vertical' and delete_all_versions:
+        modulestore('direct').delete_item(item.location)       
+
+    return HttpResponse()
+
+
 @login_required
 @expect_json
 def save_item(request):
@@ -376,75 +604,133 @@ def save_item(request):
     if not has_access(request.user, item_location):
         raise PermissionDenied()
 
-    if request.POST['data']:
+    store = get_modulestore(Location(item_location));
+
+    if request.POST.get('data') is not None:
         data = request.POST['data']
-        modulestore().update_item(item_location, data)
-        
-    if request.POST['children']:
+        store.update_item(item_location, data)
+       
+    # cdodge: note calling request.POST.get('children') will return None if children is an empty array
+    # so it lead to a bug whereby the last component to be deleted in the UI was not actually
+    # deleting the children object from the children collection
+    if 'children' in request.POST and request.POST['children'] is not None:
         children = request.POST['children']
-        modulestore().update_children(item_location, children)
+        store.update_children(item_location, children)
 
     # cdodge: also commit any metadata which might have been passed along in the
     # POST from the client, if it is there
-    # note, that the postback is not the complete metadata, as there's system metadata which is
+    # NOTE, that the postback is not the complete metadata, as there's system metadata which is
     # not presented to the end-user for editing. So let's fetch the original and
     # 'apply' the submitted metadata, so we don't end up deleting system metadata
-    if request.POST['metadata']:
+    if request.POST.get('metadata') is not None:
         posted_metadata = request.POST['metadata']
         # fetch original
         existing_item = modulestore().get_item(item_location)
+
         # update existing metadata with submitted metadata (which can be partial)
+        # IMPORTANT NOTE: if the client passed pack 'null' (None) for a piece of metadata that means 'remove it'
+        for metadata_key in posted_metadata.keys():
+
+            # let's strip out any metadata fields from the postback which have been identified as system metadata
+            # and therefore should not be user-editable, so we should accept them back from the client
+            if metadata_key in existing_item.system_metadata_fields:
+                del posted_metadata[metadata_key]
+            elif posted_metadata[metadata_key] is None:
+                # remove both from passed in collection as well as the collection read in from the modulestore
+                if metadata_key in existing_item.metadata:
+                    del existing_item.metadata[metadata_key]
+                del posted_metadata[metadata_key]
+
+        # overlay the new metadata over the modulestore sourced collection to support partial updates
         existing_item.metadata.update(posted_metadata)
-        modulestore().update_metadata(item_location, existing_item.metadata)
 
-    # Export the course back to github
-    # This uses wildcarding to find the course, which requires handling
-    # multiple courses returned, but there should only ever be one
-    course_location = Location(item_location)._replace(
-        category='course', name=None)
-    courses = modulestore().get_items(course_location, depth=None)
-    for course in courses:
-        author_string = user_author_string(request.user)
-        export_to_github(course, "CMS Edit", author_string)
+        # commit to datastore
+        store.update_metadata(item_location, existing_item.metadata)
 
-    descriptor = modulestore().get_item(item_location)
-    preview_html = get_module_previews(request, descriptor)
+    return HttpResponse()
 
-    return HttpResponse(json.dumps(preview_html))
 
+@login_required
+@expect_json
+def create_draft(request):
+    location = request.POST['id']
+
+    # check permissions for this user within this course
+    if not has_access(request.user, location):
+        raise PermissionDenied()
+
+    # This clones the existing item location to a draft location (the draft is implicit,
+    # because modulestore is a Draft modulestore)
+    modulestore().clone_item(location, location)
+
+    return HttpResponse()
+
+@login_required
+@expect_json
+def publish_draft(request):
+    location = request.POST['id']
+
+    # check permissions for this user within this course
+    if not has_access(request.user, location):
+        raise PermissionDenied()
+
+    item = modulestore().get_item(location)
+    _xmodule_recurse(item, lambda i: modulestore().publish(i.location, request.user.id))
+
+    return HttpResponse()
+
+
+@login_required
+@expect_json
+def unpublish_unit(request):
+    location = request.POST['id']
+
+    # check permissions for this user within this course
+    if not has_access(request.user, location):
+        raise PermissionDenied()
+
+    item = modulestore().get_item(location)
+    _xmodule_recurse(item, lambda i: modulestore().unpublish(i.location))
+
+    return HttpResponse()
 
 @login_required
 @expect_json
 def clone_item(request):
     parent_location = Location(request.POST['parent_location'])
     template = Location(request.POST['template'])
-    display_name = request.POST['name']
+    
+    display_name = request.POST.get('display_name')
 
     if not has_access(request.user, parent_location):
         raise PermissionDenied()
 
-    parent = modulestore().get_item(parent_location)
-    dest_location = parent_location._replace(category=template.category, name=Location.clean_for_url_name(display_name))
+    parent = get_modulestore(template).get_item(parent_location)
+    dest_location = parent_location._replace(category=template.category, name=uuid4().hex)
 
-    new_item = modulestore().clone_item(template, dest_location)
-    new_item.metadata['display_name'] = display_name
+    new_item = get_modulestore(template).clone_item(template, dest_location)
 
     # TODO: This needs to be deleted when we have proper storage for static content
     new_item.metadata['data_dir'] = parent.metadata['data_dir']
 
-    modulestore().update_metadata(new_item.location.url(), new_item.own_metadata)
-    modulestore().update_children(parent_location, parent.definition.get('children', []) + [new_item.location.url()])
+    # replace the display name with an optional parameter passed in from the caller
+    if display_name is not None:
+        new_item.metadata['display_name'] = display_name
 
-    return HttpResponse()
+    get_modulestore(template).update_metadata(new_item.location.url(), new_item.own_metadata)
 
-'''
-cdodge: this method allows for POST uploading of files into the course asset library, which will
-be supported by GridFS in MongoDB.
-'''
+    if new_item.location.category not in DETACHED_CATEGORIES:
+        get_modulestore(parent.location).update_children(parent_location, parent.definition.get('children', []) + [new_item.location.url()])
+
+    return HttpResponse(json.dumps({'id': dest_location.url()}))
+
 #@login_required
 #@ensure_csrf_cookie
 def upload_asset(request, org, course, coursename):
-
+    '''
+    cdodge: this method allows for POST uploading of files into the course asset library, which will
+    be supported by GridFS in MongoDB.
+    '''
     if request.method != 'POST':
         # (cdodge) @todo: Is there a way to do a - say - 'raise Http400'?
         return HttpResponseBadRequest()
@@ -454,7 +740,7 @@ def upload_asset(request, org, course, coursename):
     if not has_access(request.user, location):
         return HttpResponseForbidden()
     
-    # Does the course actually exist?!?
+    # Does the course actually exist?!? Get anything from it to prove its existance
     
     try:
         item = modulestore().get_item(location)
@@ -467,80 +753,61 @@ def upload_asset(request, org, course, coursename):
     # nomenclature since we're using a FileSystem paradigm here. We're just imposing
     # the Location string formatting expectations to keep things a bit more consistent
 
-    name = request.FILES['file'].name
+    filename = request.FILES['file'].name
     mime_type = request.FILES['file'].content_type
     filedata = request.FILES['file'].read()
 
-    file_location = StaticContent.compute_location_filename(org, course, name)
+    content_loc = StaticContent.compute_location(org, course, filename)
+    content = StaticContent(content_loc, filename, mime_type, filedata)
 
-    content = StaticContent(file_location, name, mime_type, filedata)
+    # first let's see if a thumbnail can be created
+    (thumbnail_content, thumbnail_location) = contentstore().generate_thumbnail(content)
 
-    # first commit to the DB
+    # delete cached thumbnail even if one couldn't be created this time (else the old thumbnail will continue to show)
+    del_cached_content(thumbnail_location)
+    # now store thumbnail location only if we could create it
+    if thumbnail_content is not None:
+        content.thumbnail_location = thumbnail_location
+
+    #then commit the content
     contentstore().save(content)
+    del_cached_content(content.location)
 
-    # then remove the cache so we're not serving up stale content
-    # NOTE: we're not re-populating the cache here as the DB owns the last-modified timestamp
-    # which is used when serving up static content. This integrity is needed for
-    # browser-side caching support. We *could* re-fetch the saved content so that we have the
-    # timestamp populated, but we might as well wait for the first real request to come in
-    # to re-populate the cache.
-    del_cached_content(file_location)
+    # readback the saved content - we need the database timestamp
+    readback = contentstore().find(content.location)
+    
+    response_payload = {'displayname' : content.name, 
+        'uploadDate' : get_date_display(readback.last_modified_at), 
+        'url' : StaticContent.get_url_path_from_location(content.location),
+        'thumb_url' : StaticContent.get_url_path_from_location(thumbnail_location) if thumbnail_content is not None else None,
+        'msg' : 'Upload completed'
+        }
 
-    # if we're uploading an image, then let's generate a thumbnail so that we can
-    # serve it up when needed without having to rescale on the fly
-    if mime_type.split('/')[0] == 'image':
-        try:
-            # not sure if this is necessary, but let's rewind the stream just in case
-            request.FILES['file'].seek(0)
-
-            # use PIL to do the thumbnail generation (http://www.pythonware.com/products/pil/)
-            # My understanding is that PIL will maintain aspect ratios while restricting
-            # the max-height/width to be whatever you pass in as 'size'
-            # @todo: move the thumbnail size to a configuration setting?!?
-            im = Image.open(request.FILES['file'])
-
-            # I've seen some exceptions from the PIL library when trying to save palletted 
-            # PNG files to JPEG. Per the google-universe, they suggest converting to RGB first.
-            im = im.convert('RGB')
-            size = 128, 128
-            im.thumbnail(size, Image.ANTIALIAS)
-            thumbnail_file = StringIO.StringIO()
-            im.save(thumbnail_file, 'JPEG')
-            thumbnail_file.seek(0)
-        
-            # use a naming convention to associate originals with the thumbnail
-            #   <name_without_extention>.thumbnail.jpg
-            thumbnail_name = os.path.splitext(name)[0] + '.thumbnail.jpg'
-            # then just store this thumbnail as any other piece of content
-            thumbnail_file_location = StaticContent.compute_location_filename(org, course, 
-                                                                              thumbnail_name)
-            thumbnail_content = StaticContent(thumbnail_file_location, thumbnail_name, 
-                                              'image/jpeg', thumbnail_file)
-            contentstore().save(thumbnail_content)
-
-            # remove any cached content at this location, as thumbnails are treated just like any
-            # other bit of static content
-            del_cached_content(thumbnail_file_location)
-        except:
-            # catch, log, and continue as thumbnails are not a hard requirement
-            logging.error('Failed to generate thumbnail for {0}. Continuing...'.format(name))
-
-    return HttpResponse('Upload completed')
+    response = HttpResponse(json.dumps(response_payload))
+    response['asset_url'] = StaticContent.get_url_path_from_location(content.location)
+    return response
 
 '''
 This view will return all CMS users who are editors for the specified course
 '''
 @login_required
 @ensure_csrf_cookie
-def manage_users(request, org, course, name):
-    location = ['i4x', org, course, 'course', name]
+def manage_users(request, location):
     
     # check that logged in user has permissions to this item
-    if not has_access(request.user, location, role=ADMIN_ROLE_NAME):
+    if not has_access(request.user, location, role=INSTRUCTOR_ROLE_NAME) and not has_access(request.user, location, role=STAFF_ROLE_NAME):
         raise PermissionDenied()
 
+    course_module = modulestore().get_item(location)
+
     return render_to_response('manage_users.html', {
-        'editors': get_users_in_course_group_by_role(location, EDITOR_ROLE_NAME)
+        'active_tab': 'users',
+        'context_course': course_module,
+        'staff': get_users_in_course_group_by_role(location, STAFF_ROLE_NAME),
+        'add_user_postback_url' : reverse('add_user', args=[location]).rstrip('/'),
+        'remove_user_postback_url' : reverse('remove_user', args=[location]).rstrip('/'),
+        'allow_actions' : has_access(request.user, location, role=INSTRUCTOR_ROLE_NAME),
+        'request_user_id' : request.user.id
     })
     
 
@@ -556,18 +823,17 @@ def create_json_response(errmsg = None):
 This POST-back view will add a user - specified by email - to the list of editors for
 the specified course
 '''
+@expect_json
 @login_required
 @ensure_csrf_cookie
-def add_user(request, org, course, name):
+def add_user(request, location):
     email = request.POST["email"]
 
     if email=='':
         return create_json_response('Please specify an email address.')
-
-    location = ['i4x', org, course, 'course', name]
     
     # check that logged in user has admin permissions to this course
-    if not has_access(request.user, location, role=ADMIN_ROLE_NAME):
+    if not has_access(request.user, location, role=INSTRUCTOR_ROLE_NAME):
         raise PermissionDenied()
     
     user = get_user_by_email(email)
@@ -581,7 +847,7 @@ def add_user(request, org, course, name):
         return create_json_response('User {0} has registered but has not yet activated his/her account.'.format(email))
 
     # ok, we're cool to add to the course group
-    add_user_to_course_group(request.user, user, location, EDITOR_ROLE_NAME)
+    add_user_to_course_group(request.user, user, location, STAFF_ROLE_NAME)
 
     return create_json_response()
 
@@ -589,22 +855,580 @@ def add_user(request, org, course, name):
 This POST-back view will remove a user - specified by email - from the list of editors for
 the specified course
 '''
+@expect_json
 @login_required
 @ensure_csrf_cookie
-def remove_user(request, org, course, name):
+def remove_user(request, location):
     email = request.POST["email"]
-
-    location = ['i4x', org, course, 'course', name]
     
     # check that logged in user has admin permissions on this course
-    if not has_access(request.user, location, role=ADMIN_ROLE_NAME):
+    if not has_access(request.user, location, role=INSTRUCTOR_ROLE_NAME):
         raise PermissionDenied()
 
     user = get_user_by_email(email)
     if user is None:
         return create_json_response('Could not find user by email address \'{0}\'.'.format(email))
 
-    remove_user_from_course_group(request.user, user, location, EDITOR_ROLE_NAME)
+    # make sure we're not removing ourselves
+    if user.id == request.user.id:
+        raise PermissionDenied()
+
+    remove_user_from_course_group(request.user, user, location, STAFF_ROLE_NAME)
 
     return create_json_response()
 
+
+# points to the temporary course landing page with log in and sign up
+def landing(request, org, course, coursename):
+    return render_to_response('temp-course-landing.html', {})
+
+@login_required
+@ensure_csrf_cookie
+def static_pages(request, org, course, coursename):
+
+    location = ['i4x', org, course, 'course', coursename]
+    
+    # check that logged in user has permissions to this item
+    if not has_access(request.user, location):
+        raise PermissionDenied()
+
+    course = modulestore().get_item(location)
+
+    return render_to_response('static-pages.html', {
+        'active_tab': 'pages',
+        'context_course': course,
+    })
+
+
+def edit_static(request, org, course, coursename):
+    return render_to_response('edit-static-page.html', {})
+
+
+@login_required
+@expect_json
+def reorder_static_tabs(request):
+    tabs = request.POST['tabs']
+    course = get_course_for_item(tabs[0])
+
+    if not has_access(request.user, course.location):
+        raise PermissionDenied()
+
+    # get list of existing static tabs in course
+    # make sure they are the same lengths (i.e. the number of passed in tabs equals the number
+    # that we know about) otherwise we can drop some!
+        
+    existing_static_tabs = [t for t in course.tabs if t['type'] == 'static_tab']
+    if len(existing_static_tabs) != len(tabs):
+        return HttpResponseBadRequest()
+
+    # load all reference tabs, return BadRequest if we can't find any of them
+    tab_items =[]
+    for tab in tabs:
+        item = modulestore('direct').get_item(Location(tab))
+        if item is None:
+            return HttpResponseBadRequest()
+
+        tab_items.append(item)
+
+    # now just go through the existing course_tabs and re-order the static tabs
+    reordered_tabs = []
+    static_tab_idx = 0
+    for tab in course.tabs:
+        if tab['type'] == 'static_tab':
+            reordered_tabs.append({'type': 'static_tab', 
+                'name' : tab_items[static_tab_idx].metadata.get('display_name'), 
+                'url_slug' : tab_items[static_tab_idx].location.name})
+            static_tab_idx += 1
+        else:
+            reordered_tabs.append(tab)
+
+
+    # OK, re-assemble the static tabs in the new order        
+    course.tabs = reordered_tabs
+    modulestore('direct').update_metadata(course.location, course.metadata)
+    return HttpResponse()
+
+
+@login_required
+@ensure_csrf_cookie
+def edit_tabs(request, org, course, coursename):
+    location = ['i4x', org, course, 'course', coursename]    
+    course_item = modulestore().get_item(location)
+    static_tabs_loc = Location('i4x', org, course, 'static_tab', None)
+
+    # check that logged in user has permissions to this item
+    if not has_access(request.user, location):
+        raise PermissionDenied()
+
+    # see tabs have been uninitialized (e.g. supporing courses created before tab support in studio)
+    if course_item.tabs is None or len(course_item.tabs) == 0:
+        initialize_course_tabs(course_item)
+
+    # first get all static tabs from the tabs list
+    # we do this because this is also the order in which items are displayed in the LMS
+    static_tabs_refs = [t for t in course_item.tabs if t['type'] == 'static_tab']
+
+    static_tabs = []
+    for static_tab_ref in static_tabs_refs:
+        static_tab_loc = Location(location)._replace(category='static_tab', name=static_tab_ref['url_slug'])
+        static_tabs.append(modulestore('direct').get_item(static_tab_loc))
+
+    components = [
+        static_tab.location.url()
+        for static_tab
+        in static_tabs
+    ]
+
+    return render_to_response('edit-tabs.html', {
+        'active_tab': 'pages',
+        'context_course':course_item, 
+        'components': components
+        })
+
+def not_found(request):
+    return render_to_response('error.html', {'error': '404'})
+
+
+def server_error(request):
+    return render_to_response('error.html', {'error': '500'})
+
+
+@login_required
+@ensure_csrf_cookie
+def course_info(request, org, course, name, provided_id=None):
+    """
+    Send models and views as well as html for editing the course info to the client.
+
+    org, course, name: Attributes of the Location for the item to edit
+    """
+    location = ['i4x', org, course, 'course', name]
+    
+    # check that logged in user has permissions to this item
+    if not has_access(request.user, location):
+        raise PermissionDenied()
+    
+    course_module = modulestore().get_item(location)
+    
+    # get current updates
+    location = ['i4x', org, course, 'course_info', "updates"]
+
+    return render_to_response('course_info.html', {
+        'active_tab': 'courseinfo-tab',
+        'context_course': course_module,
+        'url_base' : "/" + org + "/" + course + "/",
+        'course_updates' : json.dumps(get_course_updates(location)),
+        'handouts_location': Location(['i4x', org, course, 'course_info', 'handouts']).url()
+    })
+        
+@expect_json
+@login_required
+@ensure_csrf_cookie
+def course_info_updates(request, org, course, provided_id=None):
+    """
+    restful CRUD operations on course_info updates.
+
+    org, course: Attributes of the Location for the item to edit
+    provided_id should be none if it's new (create) and a composite of the update db id + index otherwise.
+    """
+    # ??? No way to check for access permission afaik
+    # get current updates
+    location = ['i4x', org, course, 'course_info', "updates"]
+    
+    # Hmmm, provided_id is coming as empty string on create whereas I believe it used to be None :-(
+    # Possibly due to my removing the seemingly redundant pattern in urls.py
+    if provided_id == '':
+        provided_id = None
+
+    # check that logged in user has permissions to this item
+    if not has_access(request.user, location):
+        raise PermissionDenied()
+
+    # NB: we're setting Backbone.emulateHTTP to true on the client so everything comes as a post!!!
+    if request.method == 'POST' and 'HTTP_X_HTTP_METHOD_OVERRIDE' in request.META:
+        real_method = request.META['HTTP_X_HTTP_METHOD_OVERRIDE']
+    else:
+        real_method = request.method
+        
+    if request.method == 'GET':
+        return HttpResponse(json.dumps(get_course_updates(location)), mimetype="application/json")
+    elif real_method == 'DELETE':  # coming as POST need to pull from Request Header X-HTTP-Method-Override    DELETE
+        return HttpResponse(json.dumps(delete_course_update(location, request.POST, provided_id)), mimetype="application/json")
+    elif request.method == 'POST':
+        try:
+            return HttpResponse(json.dumps(update_course_updates(location, request.POST, provided_id)), mimetype="application/json")
+        except:
+            return HttpResponseBadRequest("Failed to save: malformed html", content_type="text/plain")
+
+
+@expect_json
+@login_required
+@ensure_csrf_cookie
+def module_info(request, module_location):
+    location = Location(module_location)
+    
+    # check that logged in user has permissions to this item
+    if not has_access(request.user, location):
+        raise PermissionDenied()
+
+    # NB: we're setting Backbone.emulateHTTP to true on the client so everything comes as a post!!!
+    if request.method == 'POST' and 'HTTP_X_HTTP_METHOD_OVERRIDE' in request.META:
+        real_method = request.META['HTTP_X_HTTP_METHOD_OVERRIDE']
+    else:
+        real_method = request.method
+
+    rewrite_static_links = request.GET.get('rewrite_url_links','True') in ['True', 'true']
+    logging.debug('rewrite_static_links = {0} {1}'.format(request.GET.get('rewrite_url_links','False'), rewrite_static_links))
+    
+    # check that logged in user has permissions to this item
+    if not has_access(request.user, location):
+        raise PermissionDenied()    
+
+    if real_method == 'GET':
+        return HttpResponse(json.dumps(get_module_info(get_modulestore(location), location, rewrite_static_links=rewrite_static_links)), mimetype="application/json")
+    elif real_method == 'POST' or real_method == 'PUT':
+        return HttpResponse(json.dumps(set_module_info(get_modulestore(location), location, request.POST)), mimetype="application/json")
+    else:
+        return HttpResponseBadRequest()
+
+@login_required
+@ensure_csrf_cookie
+def get_course_settings(request, org, course, name):
+    """
+    Send models and views as well as html for editing the course settings to the client.
+
+    org, course, name: Attributes of the Location for the item to edit
+    """
+    location = ['i4x', org, course, 'course', name]
+    
+    # check that logged in user has permissions to this item
+    if not has_access(request.user, location):
+        raise PermissionDenied()
+    
+    course_module = modulestore().get_item(location)
+    course_details = CourseDetails.fetch(location)
+    
+    return render_to_response('settings.html', {
+        'active_tab': 'settings', 
+        'context_course': course_module,
+        'course_details' : json.dumps(course_details, cls=CourseSettingsEncoder)
+    })
+        
+@expect_json
+@login_required
+@ensure_csrf_cookie
+def course_settings_updates(request, org, course, name, section):
+    """
+    restful CRUD operations on course settings. This differs from get_course_settings by communicating purely
+    through json (not rendering any html) and handles section level operations rather than whole page.
+
+    org, course: Attributes of the Location for the item to edit
+    section: one of details, faculty, grading, problems, discussions
+    """
+    location = ['i4x', org, course, 'course', name]
+
+    # check that logged in user has permissions to this item
+    if not has_access(request.user, location):
+        raise PermissionDenied()
+
+    if section == 'details':
+        manager = CourseDetails
+    elif section == 'grading':
+        manager = CourseGradingModel
+    else: return
+    
+    if request.method == 'GET':
+        # Cannot just do a get w/o knowing the course name :-(
+        return HttpResponse(json.dumps(manager.fetch(Location(['i4x', org, course, 'course',name])), cls=CourseSettingsEncoder), 
+                            mimetype="application/json")
+    elif request.method == 'POST': # post or put, doesn't matter.
+        return HttpResponse(json.dumps(manager.update_from_json(request.POST), cls=CourseSettingsEncoder), 
+                            mimetype="application/json")
+
+@expect_json
+@login_required
+@ensure_csrf_cookie
+def course_grader_updates(request, org, course, name, grader_index=None):
+    """
+    restful CRUD operations on course_info updates. This differs from get_course_settings by communicating purely
+    through json (not rendering any html) and handles section level operations rather than whole page.
+
+    org, course: Attributes of the Location for the item to edit
+    """
+    
+    location = ['i4x', org, course, 'course', name]
+
+    # check that logged in user has permissions to this item
+    if not has_access(request.user, location):
+        raise PermissionDenied()
+
+    if request.method == 'POST' and 'HTTP_X_HTTP_METHOD_OVERRIDE' in request.META:
+        real_method = request.META['HTTP_X_HTTP_METHOD_OVERRIDE']
+    else:
+        real_method = request.method
+        
+    if real_method == 'GET':
+        # Cannot just do a get w/o knowing the course name :-(
+        return HttpResponse(json.dumps(CourseGradingModel.fetch_grader(Location(['i4x', org, course, 'course',name]), grader_index)), 
+                            mimetype="application/json")
+    elif real_method == "DELETE":
+        # ??? Shoudl this return anything? Perhaps success fail? 
+        CourseGradingModel.delete_grader(Location(['i4x', org, course, 'course',name]), grader_index)
+        return HttpResponse()
+    elif request.method == 'POST': # post or put, doesn't matter.
+        return HttpResponse(json.dumps(CourseGradingModel.update_grader_from_json(Location(['i4x', org, course, 'course',name]), request.POST)),
+                            mimetype="application/json")
+
+
+@login_required
+@ensure_csrf_cookie
+def asset_index(request, org, course, name):
+    """
+    Display an editable asset library
+
+    org, course, name: Attributes of the Location for the item to edit
+    """
+    location = ['i4x', org, course, 'course', name]
+    
+    # check that logged in user has permissions to this item
+    if not has_access(request.user, location):
+        raise PermissionDenied()
+
+
+    upload_asset_callback_url = reverse('upload_asset', kwargs = {
+            'org' : org,
+            'course' : course,
+            'coursename' : name
+            })
+
+    course_module = modulestore().get_item(location)
+    
+    course_reference = StaticContent.compute_location(org, course, name)
+    assets = contentstore().get_all_content_for_course(course_reference)
+
+    # sort in reverse upload date order
+    assets = sorted(assets, key=lambda asset: asset['uploadDate'], reverse=True)
+
+    thumbnails = contentstore().get_all_content_thumbnails_for_course(course_reference)
+    asset_display = []
+    for asset in assets:
+        id = asset['_id']
+        display_info = {}
+        display_info['displayname'] = asset['displayname']
+        display_info['uploadDate'] = get_date_display(asset['uploadDate'])
+        
+        asset_location = StaticContent.compute_location(id['org'], id['course'], id['name'])
+        display_info['url'] = StaticContent.get_url_path_from_location(asset_location)
+        
+        # note, due to the schema change we may not have a 'thumbnail_location' in the result set
+        _thumbnail_location = asset.get('thumbnail_location', None)
+        thumbnail_location = Location(_thumbnail_location) if _thumbnail_location is not None else None
+        display_info['thumb_url'] = StaticContent.get_url_path_from_location(thumbnail_location) if thumbnail_location is not None else None
+        
+        asset_display.append(display_info)
+
+    return render_to_response('asset_index.html', {
+        'active_tab': 'assets',
+        'context_course': course_module,
+        'assets': asset_display,
+        'upload_asset_callback_url': upload_asset_callback_url
+    })
+
+
+# points to the temporary edge page
+def edge(request):
+    return render_to_response('university_profiles/edge.html', {})
+
+@login_required
+@expect_json
+def create_new_course(request):
+    template = Location(request.POST['template'])
+    org = request.POST.get('org')   
+    number = request.POST.get('number')  
+    display_name = request.POST.get('display_name')   
+
+    try:
+        dest_location = Location('i4x', org, number, 'course', Location.clean(display_name))
+    except InvalidLocationError as e:
+        return HttpResponse(json.dumps({'ErrMsg': "Unable to create course '" + display_name + "'.\n\n" + e.message}))
+
+    # see if the course already exists
+    existing_course = None
+    try:
+        existing_course = modulestore('direct').get_item(dest_location)
+    except ItemNotFoundError:
+        pass
+
+    if existing_course is not None:
+        return HttpResponse(json.dumps({'ErrMsg': 'There is already a course defined with this name.'}))
+
+    course_search_location = ['i4x', dest_location.org, dest_location.course, 'course', None]
+    courses = modulestore().get_items(course_search_location)
+
+    if len(courses) > 0:
+        return HttpResponse(json.dumps({'ErrMsg': 'There is already a course defined with the same organization and course number.'}))
+
+    new_course = modulestore('direct').clone_item(template, dest_location)
+
+    if display_name is not None:
+        new_course.metadata['display_name'] = display_name
+
+    # we need a 'data_dir' for legacy reasons
+    new_course.metadata['data_dir'] = uuid4().hex
+
+    # set a default start date to now
+    new_course.metadata['start'] = stringify_time(time.gmtime())
+
+    initialize_course_tabs(new_course)
+
+    create_all_course_groups(request.user, new_course.location)
+
+    return HttpResponse(json.dumps({'id': new_course.location.url()}))
+
+def initialize_course_tabs(course):
+    # set up the default tabs
+    # I've added this because when we add static tabs, the LMS either expects a None for the tabs list or
+    # at least a list populated with the minimal times
+    # @TODO: I don't like the fact that the presentation tier is away of these data related constraints, let's find a better
+    # place for this. Also rather than using a simple list of dictionaries a nice class model would be helpful here
+    course.tabs = [{"type": "courseware"}, 
+        {"type": "course_info", "name": "Course Info"}, 
+        {"type": "discussion", "name": "Discussion"},
+        {"type": "wiki", "name": "Wiki"},
+        {"type": "progress", "name": "Progress"}]
+
+    modulestore('direct').update_metadata(course.location.url(), course.own_metadata)   
+
+@ensure_csrf_cookie
+@login_required
+def import_course(request, org, course, name):
+
+    location = ['i4x', org, course, 'course', name]
+
+    # check that logged in user has permissions to this item
+    if not has_access(request.user, location):
+        raise PermissionDenied()
+
+    if request.method == 'POST':
+        filename = request.FILES['course-data'].name
+
+        if not filename.endswith('.tar.gz'):
+            return HttpResponse(json.dumps({'ErrMsg': 'We only support uploading a .tar.gz file.'}))
+
+        data_root = path(settings.GITHUB_REPO_ROOT)
+
+        course_subdir = "{0}-{1}-{2}".format(org, course, name)
+        course_dir = data_root / course_subdir
+        if not course_dir.isdir():
+            os.mkdir(course_dir)
+
+        temp_filepath = course_dir / filename
+
+        logging.debug('importing course to {0}'.format(temp_filepath))
+
+        # stream out the uploaded files in chunks to disk
+        temp_file = open(temp_filepath, 'wb+')
+        for chunk in request.FILES['course-data'].chunks():
+            temp_file.write(chunk)
+        temp_file.close()
+
+        tf = tarfile.open(temp_filepath)
+        tf.extractall(course_dir + '/')
+
+        # find the 'course.xml' file
+
+        for r,d,f in os.walk(course_dir):
+            for files in f:
+                if files == 'course.xml':
+                    break
+            if files == 'course.xml':
+                break
+
+        if files != 'course.xml':
+            return HttpResponse(json.dumps({'ErrMsg': 'Could not find the course.xml file in the package.'}))
+
+        logging.debug('found course.xml at {0}'.format(r))
+
+        if r != course_dir:
+            for fname in os.listdir(r):
+                shutil.move(r/fname, course_dir)
+
+        module_store, course_items = import_from_xml(modulestore('direct'), settings.GITHUB_REPO_ROOT,
+            [course_subdir], load_error_modules=False, static_content_store=contentstore(), target_location_namespace = Location(location))
+
+        # we can blow this away when we're done importing.
+        shutil.rmtree(course_dir)
+
+        logging.debug('new course at {0}'.format(course_items[0].location))
+
+        create_all_course_groups(request.user, course_items[0].location)
+
+        return HttpResponse(json.dumps({'Status': 'OK'}))
+    else:
+        course_module = modulestore().get_item(location)
+
+        return render_to_response('import.html', {
+            'context_course': course_module,
+            'active_tab': 'import',
+            'successful_import_redirect_url' : reverse('course_index', args=[
+                        course_module.location.org,
+                        course_module.location.course,
+                        course_module.location.name])
+        })
+
+@ensure_csrf_cookie
+@login_required
+def generate_export_course(request, org, course, name):
+    location = ['i4x', org, course, 'course', name]
+    # check that logged in user has permissions to this item
+    if not has_access(request.user, location):
+        raise PermissionDenied()
+
+    loc = Location(location)
+    export_file = NamedTemporaryFile(prefix=name+'.', suffix=".tar.gz")
+
+    root_dir = path(mkdtemp())
+
+    # export out to a tempdir
+    
+    logging.debug('root = {0}'.format(root_dir))
+
+    export_to_xml(modulestore('direct'), contentstore(), loc, root_dir, name)
+    #filename = root_dir / name + '.tar.gz'
+
+    logging.debug('tar file being generated at {0}'.format(export_file.name))
+    tf = tarfile.open(name=export_file.name, mode='w:gz')
+    tf.add(root_dir/name, arcname=name)
+    tf.close()
+
+    # remove temp dir
+    shutil.rmtree(root_dir/name) 
+
+    wrapper = FileWrapper(export_file)
+    response = HttpResponse(wrapper, content_type='application/x-tgz')
+    response['Content-Disposition'] = 'attachment; filename=%s' % os.path.basename(export_file.name)
+    response['Content-Length'] = os.path.getsize(export_file.name)
+    return response
+
+
+@ensure_csrf_cookie
+@login_required
+def export_course(request, org, course, name):
+
+    location = ['i4x', org, course, 'course', name]
+    course_module = modulestore().get_item(location)
+    # check that logged in user has permissions to this item
+    if not has_access(request.user, location):
+        raise PermissionDenied()
+
+    return render_to_response('export.html', {
+        'context_course': course_module,
+        'active_tab': 'export',
+        'successful_import_redirect_url' : ''
+    })
+
+def event(request):
+    '''
+    A noop to swallow the analytics call so that cms methods don't spook and poor developers looking at
+    console logs don't get distracted :-)
+    '''
+    return HttpResponse(True)

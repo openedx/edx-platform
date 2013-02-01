@@ -30,7 +30,6 @@ from xmodule.modulestore import Location
 from capa.util import *
 import openendedchild
 
-from mitxmako.shortcuts import render_to_string
 from numpy import median
 
 from datetime import datetime
@@ -122,6 +121,7 @@ class OpenEndedModule(openendedchild.OpenEndedChild):
             'rubric': rubric_string,
             'initial_display': self.initial_display,
             'answer': self.answer,
+            'problem_id': self.display_name
         })
         updated_grader_payload = json.dumps(parsed_grader_payload)
 
@@ -256,9 +256,9 @@ class OpenEndedModule(openendedchild.OpenEndedChild):
         @param system: Modulesystem
         @return: Boolean True (not useful currently)
         """
-        new_score_msg = self._parse_score_msg(score_msg)
+        new_score_msg = self._parse_score_msg(score_msg, system)
         if not new_score_msg['valid']:
-            score_msg['feedback'] = 'Invalid grader reply. Please contact the course staff.'
+            new_score_msg['feedback'] = 'Invalid grader reply. Please contact the course staff.'
 
         self.record_latest_score(new_score_msg['score'])
         self.record_latest_post_assessment(score_msg)
@@ -370,7 +370,7 @@ class OpenEndedModule(openendedchild.OpenEndedChild):
 
         return u"\n".join([feedback_list_part1, feedback_list_part2])
 
-    def _format_feedback(self, response_items):
+    def _format_feedback(self, response_items, system):
         """
         Input:
             Dictionary called feedback.  Must contain keys seen below.
@@ -382,13 +382,14 @@ class OpenEndedModule(openendedchild.OpenEndedChild):
         rubric_feedback=""
         feedback = self._convert_longform_feedback_to_html(response_items)
         if response_items['rubric_scores_complete']==True:
-            rubric_feedback = CombinedOpenEndedRubric.render_rubric(response_items['rubric_xml'])
+            rubric_renderer = CombinedOpenEndedRubric(system, True)
+            rubric_feedback = rubric_renderer.render_rubric(response_items['rubric_xml'])
 
         if not response_items['success']:
             return system.render_template("open_ended_error.html",
                 {'errors': feedback})
 
-        feedback_template = render_to_string("open_ended_feedback.html", {
+        feedback_template = system.render_template("open_ended_feedback.html", {
             'grader_type': response_items['grader_type'],
             'score': "{0} / {1}".format(response_items['score'], self.max_score()),
             'feedback': feedback,
@@ -398,13 +399,20 @@ class OpenEndedModule(openendedchild.OpenEndedChild):
         return feedback_template
 
 
-    def _parse_score_msg(self, score_msg, join_feedback=True):
+    def _parse_score_msg(self, score_msg, system, join_feedback=True):
         """
          Grader reply is a JSON-dump of the following dict
            { 'correct': True/False,
              'score': Numeric value (floating point is okay) to assign to answer
              'msg': grader_msg
              'feedback' : feedback from grader
+             'grader_type': what type of grader resulted in this score
+             'grader_id': id of the grader
+             'submission_id' : id of the submission
+             'success': whether or not this submission was successful
+             'rubric_scores': a list of rubric scores
+             'rubric_scores_complete': boolean if rubric scores are complete
+             'rubric_xml': the xml of the rubric in string format
              }
 
         Returns (valid_score_msg, correct, score, msg):
@@ -447,10 +455,10 @@ class OpenEndedModule(openendedchild.OpenEndedChild):
                     'success': score_result['success'],
                     'grader_id': score_result['grader_id'][i],
                     'submission_id': score_result['submission_id'],
-                    'rubric_scores_complete' : score_result['rubric_scores_complete'],
-                    'rubric_xml' : score_result['rubric_xml'],
+                    'rubric_scores_complete' : score_result['rubric_scores_complete'][i],
+                    'rubric_xml' : score_result['rubric_xml'][i],
                 }
-                feedback_items.append(self._format_feedback(new_score_result))
+                feedback_items.append(self._format_feedback(new_score_result, system))
             if join_feedback:
                 feedback = "".join(feedback_items)
             else:
@@ -458,7 +466,7 @@ class OpenEndedModule(openendedchild.OpenEndedChild):
             score = int(median(score_result['score']))
         else:
             #This is for instructor and ML grading
-            feedback = self._format_feedback(score_result)
+            feedback = self._format_feedback(score_result, system)
             score = score_result['score']
 
         self.submission_id = score_result['submission_id']
@@ -466,7 +474,7 @@ class OpenEndedModule(openendedchild.OpenEndedChild):
 
         return {'valid': True, 'score': score, 'feedback': feedback}
 
-    def latest_post_assessment(self, short_feedback=False, join_feedback=True):
+    def latest_post_assessment(self, system, short_feedback=False, join_feedback=True):
         """
         Gets the latest feedback, parses, and returns
         @param short_feedback: If the long feedback is wanted or not
@@ -475,7 +483,7 @@ class OpenEndedModule(openendedchild.OpenEndedChild):
         if not self.history:
             return ""
 
-        feedback_dict = self._parse_score_msg(self.history[-1].get('post_assessment', ""), join_feedback=join_feedback)
+        feedback_dict = self._parse_score_msg(self.history[-1].get('post_assessment', ""), system, join_feedback=join_feedback)
         if not short_feedback:
             return feedback_dict['feedback'] if feedback_dict['valid'] else ''
         if feedback_dict['valid']:
@@ -483,14 +491,14 @@ class OpenEndedModule(openendedchild.OpenEndedChild):
                 json.loads(self.history[-1].get('post_assessment', "")))
         return short_feedback if feedback_dict['valid'] else ''
 
-    def format_feedback_with_evaluation(self, feedback):
+    def format_feedback_with_evaluation(self, system, feedback):
         """
         Renders a given html feedback into an evaluation template
         @param feedback: HTML feedback
         @return: Rendered html
         """
         context = {'msg': feedback, 'id': "1", 'rows': 50, 'cols': 50}
-        html = render_to_string('open_ended_evaluation.html', context)
+        html = system.render_template('open_ended_evaluation.html', context)
         return html
 
     def handle_ajax(self, dispatch, get, system):
@@ -582,7 +590,7 @@ class OpenEndedModule(openendedchild.OpenEndedChild):
         if self.state != self.INITIAL:
             latest = self.latest_answer()
             previous_answer = latest if latest is not None else self.initial_display
-            post_assessment = self.latest_post_assessment()
+            post_assessment = self.latest_post_assessment(system)
             score = self.latest_score()
             correct = 'correct' if self.is_submission_correct(score) else 'incorrect'
         else:

@@ -17,6 +17,8 @@ from courseware.access import has_access
 from util.json_request import expect_json
 from xmodule.course_module import CourseDescriptor
 from student.models import unique_id_for_user
+from xmodule.x_module import ModuleSystem
+from mitxmako.shortcuts import render_to_string
 
 log = logging.getLogger(__name__)
 
@@ -46,14 +48,14 @@ class MockStaffGradingService(object):
         self.cnt += 1
         return json.dumps({'success': True,
         'problem_list': [
-          json.dumps({'location': 'i4x://MITx/3.091x/problem/open_ended_demo1', \
+          json.dumps({'location': 'i4x://MITx/3.091x/problem/open_ended_demo1', 
             'problem_name': "Problem 1", 'num_graded': 3, 'num_pending': 5, 'min_for_ml': 10}),
-          json.dumps({'location': 'i4x://MITx/3.091x/problem/open_ended_demo2', \
+          json.dumps({'location': 'i4x://MITx/3.091x/problem/open_ended_demo2',
             'problem_name': "Problem 2", 'num_graded': 1, 'num_pending': 5, 'min_for_ml': 10})
         ]})
 
 
-    def save_grade(self, course_id, grader_id, submission_id, score, feedback, skipped):
+    def save_grade(self, course_id, grader_id, submission_id, score, feedback, skipped, rubric_scores):
         return self.get_next(course_id, 'fake location', grader_id)
 
 
@@ -66,6 +68,7 @@ class StaffGradingService(GradingService):
         self.get_next_url = self.url + '/get_next_submission/'
         self.save_grade_url = self.url + '/save_grade/'
         self.get_problem_list_url = self.url + '/get_problem_list/'
+        self.get_notifications_url = self.url + "/get_notifications/"
 
 
     def get_problem_list(self, course_id, grader_id):
@@ -106,12 +109,13 @@ class StaffGradingService(GradingService):
         Raises:
             GradingServiceError: something went wrong with the connection.
         """
-        return self.get(self.get_next_url,
+        response = self.get(self.get_next_url,
                                       params={'location': location,
                                               'grader_id': grader_id})
+        return json.dumps(self._render_rubric(response))
 
 
-    def save_grade(self, course_id, grader_id, submission_id, score, feedback, skipped):
+    def save_grade(self, course_id, grader_id, submission_id, score, feedback, skipped, rubric_scores):
         """
         Save a score and feedback for a submission.
 
@@ -128,13 +132,22 @@ class StaffGradingService(GradingService):
                 'score': score,
                 'feedback': feedback,
                 'grader_id': grader_id,
-                'skipped': skipped}
+                'skipped': skipped,
+                'rubric_scores': rubric_scores,
+                'rubric_scores_complete': True}
 
         return self.post(self.save_grade_url, data=data)
+
+    def get_notifications(self, course_id):
+        params = {'course_id': course_id}
+        response = self.get(self.get_notifications_url, params)
+        return response
+
 
 # don't initialize until staff_grading_service() is called--means that just
 # importing this file doesn't create objects that may not have the right config
 _service = None
+
 
 def staff_grading_service():
     """
@@ -279,7 +292,7 @@ def save_grade(request, course_id):
     if request.method != 'POST':
         raise Http404
 
-    required = set(['score', 'feedback', 'submission_id', 'location'])
+    required = set(['score', 'feedback', 'submission_id', 'location', 'rubric_scores[]'])
     actual = set(request.POST.keys())
     missing = required - actual
     if len(missing) > 0:
@@ -292,13 +305,15 @@ def save_grade(request, course_id):
 
     location = p['location']
     skipped =  'skipped' in p
+
     try:
         result_json = staff_grading_service().save_grade(course_id,
                                           grader_id,
                                           p['submission_id'],
                                           p['score'],
                                           p['feedback'],
-                                          skipped)
+                                          skipped,
+                                          p.getlist('rubric_scores[]'))
     except GradingServiceError:
         log.exception("Error saving grade")
         return _err_response('Could not connect to grading service')

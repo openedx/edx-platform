@@ -21,11 +21,14 @@ from django.contrib.auth.models import User
 
 from mitxmako.shortcuts import render_to_response, render_to_string
 from courseware.courses import get_course_with_access
+from course_groups.cohorts import get_cohort_id, is_commentable_cohorted
 
 from django_comment_client.utils import JsonResponse, JsonError, extract, get_courseware_context
 
-from django_comment_client.permissions import check_permissions_by_view
+from django_comment_client.permissions import check_permissions_by_view, cached_has_permission
 from django_comment_client.models import Role
+
+log = logging.getLogger(__name__)
 
 def permitted(fn):
     @functools.wraps(fn)
@@ -58,10 +61,12 @@ def ajax_content_response(request, course_id, content, template_name):
         'annotated_content_info': annotated_content_info,
     })
 
+
 @require_POST
 @login_required
 @permitted
 def create_thread(request, course_id, commentable_id):
+    log.debug("Creating new thread in %r, id %r", course_id, commentable_id)
     course = get_course_with_access(request.user, course_id, 'load')
     post = request.POST
 
@@ -83,6 +88,23 @@ def create_thread(request, course_id, commentable_id):
         'course_id'          : course_id,
         'user_id'            : request.user.id,
     })
+
+
+    # Cohort the thread if the commentable is cohorted.
+    if is_commentable_cohorted(course_id, commentable_id):
+        user_group_id = get_cohort_id(request.user, course_id)
+        # TODO (vshnayder): once we have more than just cohorts, we'll want to
+        # change this to a single get_group_for_user_and_commentable function
+        # that can do different things depending on the commentable_id
+        if cached_has_permission(request.user, "see_all_cohorts", course_id):
+            # admins can optionally choose what group to post as
+            group_id = post.get('group_id', user_group_id)
+        else:
+            # regular users always post with their own id.
+            group_id = user_group_id
+
+        thread.update_attributes(group_id=group_id)
+
     thread.save()
     if post.get('auto_subscribe', 'false').lower() == 'true':
         user = cc.User.from_django_user(request.user)

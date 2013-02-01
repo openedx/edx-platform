@@ -16,7 +16,6 @@ class Command(BaseCommand):
     This command does not do anything other than report the current
     certificate status.
 
-    unavailable  - A student is not eligible for a certificate.
     generating   - A request has been made to generate a certificate,
                    but it has not been generated yet.
     regenerating - A request has been made to regenerate a certificate,
@@ -64,11 +63,7 @@ class Command(BaseCommand):
             enrolled_students = User.objects.filter(
                     courseenrollment__course_id=course_id).prefetch_related(
                             "groups").order_by('username')
-            unavailable_count = enrolled_students.count() - \
-                    GeneratedCertificate.objects.filter(
-                            course_id__exact=course_id).count()
             cert_data[course_id] = {'enrolled': enrolled_students.count()}
-            cert_data[course_id].update({'unavailable': unavailable_count})
 
             tallies = GeneratedCertificate.objects.filter(
                         course_id__exact=course_id).values('status').annotate(

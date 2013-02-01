@@ -1,0 +1,42 @@
+{
+    "course/2012_Fall": {
+        "graceperiod": "2 days 5 hours 59 minutes 59 seconds",
+        "start": "2011-07-17T12:00",
+        "display_name": "Toy Course",
+	"testcenter_info": {
+            "Midterm_Exam": {
+                "Exam_Series_Code": "Midterm_Exam",
+                "First_Eligible_Appointment_Date": "2012-11-09T00:00",
+                "Last_Eligible_Appointment_Date": "2012-11-09T23:59"
+            },
+            "Final_Exam": {
+                 "Exam_Series_Code": "mit6002xfall12a",
+                 "Exam_Display_Name": "Final Exam",
+                 "First_Eligible_Appointment_Date": "2013-01-25T00:00",
+                 "Last_Eligible_Appointment_Date": "2013-01-25T23:59",
+                 "Registration_Start_Date": "2013-01-01T00:00",
+                 "Registration_End_Date": "2013-01-21T23:59"
+            }
+	}
+    },
+    "chapter/Overview": {
+        "display_name": "Overview"
+    },
+    "chapter/Ch2": {
+       "display_name": "Chapter 2",
+       "start": "2015-07-17T12:00"
+    },
+    "videosequence/Toy_Videos": {
+        "display_name": "Toy Videos",
+        "format": "Lecture Sequence"
+    },
+    "html/toylab": {
+        "display_name": "Toy lab"
+    },
+    "video/Video_Resources": {
+        "display_name": "Video Resources"
+    },
+    "video/Welcome": {
+        "display_name": "Welcome"
+    }
+}

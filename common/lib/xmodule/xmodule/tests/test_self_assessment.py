@@ -4,13 +4,22 @@ import unittest
 
 from xmodule.self_assessment_module import SelfAssessmentModule
 from xmodule.modulestore import Location
+from lxml import etree
 
 from . import test_system
 
 class SelfAssessmentTest(unittest.TestCase):
 
-    definition = {'rubric': 'A rubric',
-                  'prompt': 'Who?',
+    rubric = '''<rubric><rubric>
+        <category>
+        <description>Response Quality</description>
+        <option>The response is not a satisfactory answer to the question.  It either fails to address the question or does so in a limited way, with no evidence of higher-order thinking.</option>
+        </category>
+         </rubric></rubric>'''
+
+    prompt = etree.XML("<prompt>This is sample prompt text.</prompt>")
+    definition = {'rubric': rubric,
+                  'prompt': prompt,
                   'submitmessage': 'Shall we submit now?',
                   'hintprompt': 'Consider this...',
                   }
@@ -22,33 +31,46 @@ class SelfAssessmentTest(unittest.TestCase):
 
     descriptor = Mock()
 
-    def test_import(self):
+    def setUp(self):
         state = json.dumps({'student_answers': ["Answer 1", "answer 2", "answer 3"],
                             'scores': [0, 1],
                             'hints': ['o hai'],
-                            'state': SelfAssessmentModule.ASSESSING,
+                            'state': SelfAssessmentModule.INITIAL,
                             'attempts': 2})
 
-        module = SelfAssessmentModule(test_system, self.location,
+        static_data = {
+                'max_attempts': 10,
+                'rubric': etree.XML(self.rubric),
+                'prompt': self.prompt,
+                'max_score': 1,
+                'display_name': "Name"
+                }
+
+        self.module = SelfAssessmentModule(test_system, self.location,
                                       self.definition, self.descriptor,
-                                      state, {}, metadata=self.metadata)
+                                      static_data, state, metadata=self.metadata)
 
-        self.assertEqual(module.get_score()['score'], 0)
+    def test_get_html(self):
+        html = self.module.get_html(test_system)
+        self.assertTrue("This is sample prompt text" in html)
 
-        self.assertTrue('answer 3' in module.get_html())
-        self.assertFalse('answer 2' in module.get_html())
+    def test_self_assessment_flow(self):
 
-        module.save_assessment({'assessment': '0'})
-        self.assertEqual(module.state, module.REQUEST_HINT)
+        self.assertEqual(self.module.get_score()['score'], 0)
 
-        module.save_hint({'hint': 'hint for ans 3'})
-        self.assertEqual(module.state, module.DONE)
+        self.module.save_answer({'student_answer': "I am an answer"}, test_system)
+        self.assertEqual(self.module.state, self.module.ASSESSING)
 
-        d = module.reset({})
+        self.module.save_assessment({'assessment': '0'}, test_system)
+        self.assertEqual(self.module.state, self.module.DONE)
+
+
+        d = self.module.reset({})
         self.assertTrue(d['success'])
-        self.assertEqual(module.state, module.INITIAL)
+        self.assertEqual(self.module.state, self.module.INITIAL)
 
         # if we now assess as right, skip the REQUEST_HINT state
-        module.save_answer({'student_answer': 'answer 4'})
-        module.save_assessment({'assessment': '1'})
-        self.assertEqual(module.state, module.DONE)
+        self.module.save_answer({'student_answer': 'answer 4'}, test_system)
+        self.module.save_assessment({'assessment': '1'}, test_system)
+        self.assertEqual(self.module.state, self.module.DONE)
+

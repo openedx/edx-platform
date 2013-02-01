@@ -81,6 +81,9 @@ def path_to_location(modulestore, course_id, location):
         # If we're here, there is no path
         return None
 
+    if not modulestore.has_item(location):
+        raise ItemNotFoundError
+
     path = find_path_to_course()
     if path is None:
         raise NoPathToItem(location)

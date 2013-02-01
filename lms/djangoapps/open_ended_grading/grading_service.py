@@ -11,6 +11,10 @@ from django.http import HttpResponse, Http404
 from courseware.access import has_access
 from util.json_request import expect_json
 from xmodule.course_module import CourseDescriptor
+from xmodule.combined_open_ended_rubric import CombinedOpenEndedRubric, RubricParsingError
+from lxml import etree
+from mitxmako.shortcuts import render_to_string
+from xmodule.x_module import ModuleSystem
 
 log = logging.getLogger(__name__)
 
@@ -27,6 +31,7 @@ class GradingService(object):
         self.url = config['url']
         self.login_url = self.url + '/login/'
         self.session = requests.session()
+        self.system = ModuleSystem(None, None, None, render_to_string, None)
 
     def _login(self):
         """
@@ -97,4 +102,34 @@ class GradingService(object):
             response.raise_for_status()
 
         return response
+
+    def _render_rubric(self, response, view_only=False):
+        """
+        Given an HTTP Response with the key 'rubric', render out the html
+        required to display the rubric and put it back into the response
+
+        returns the updated response as a dictionary that can be serialized later
+
+        """
+        try:
+            response_json = json.loads(response)
+            if 'rubric' in response_json:
+                rubric = response_json['rubric']
+                rubric_renderer = CombinedOpenEndedRubric(self.system, False)
+                rubric_html = rubric_renderer.render_rubric(rubric)
+                response_json['rubric'] = rubric_html
+            return response_json
+        # if we can't parse the rubric into HTML, 
+        except etree.XMLSyntaxError, RubricParsingError:
+            log.exception("Cannot parse rubric string. Raw string: {0}"
+                          .format(rubric))
+            return {'success': False,
+                               'error': 'Error displaying submission'}
+        except ValueError:
+            log.exception("Error parsing response: {0}".format(response))
+            return {'success': False,
+                                'error': "Error displaying submission"} 
+
+
+
 

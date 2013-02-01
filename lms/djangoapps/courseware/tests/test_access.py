@@ -1,7 +1,7 @@
 import unittest
 import logging 
 import time
-from mock import MagicMock, patch
+from mock import Mock, MagicMock, patch
 
 from django.conf import settings
 from django.test import TestCase
@@ -12,115 +12,106 @@ from xmodule.modulestore import Location
 from xmodule.timeparse import parse_time 
 from xmodule.x_module import XModule, XModuleDescriptor
 import courseware.access as access
+from factories import CourseEnrollmentAllowedFactory
 
-class Stub:
-    def __init__(self):
-        pass
 
 class AccessTestCase(TestCase):
-    def setUp(self):
-        pass
-    
     def test__has_global_staff_access(self):
-        # Only 2 branches?
-        mock_user = MagicMock()
-        mock_user.is_staff = True
-        self.assertTrue(access._has_global_staff_access(mock_user))
-        mock_user_2 = MagicMock()
-        mock_user.is_staff = False
-        self.assertFalse(access._has_global_staff_access(mock_user))
+        u = Mock(is_staff=False)
+        self.assertFalse(access._has_global_staff_access(u))
+
+        u = Mock(is_staff=True)
+        self.assertTrue(access._has_global_staff_access(u))
 
     def test__has_access_to_location(self):
-        mock_user = MagicMock()
-        mock_user.is_authenticated.return_value = False
-        self.assertFalse(access._has_access_to_location(mock_user, "dummy",
-                                                        "dummy"))
-        mock_user_2 = MagicMock()
-        mock_user_2.groups.all.return_value = ['instructor_toy']
-        location = MagicMock(spec=Location)
-        location.course = 'toy'
-        self.assertTrue(access._has_access_to_location(mock_user_2, location,
-                                                       "instructor"))
-        mock_user_3 = MagicMock()
-        mock_user_3.is_staff = False
-        self.assertFalse(access._has_access_to_location(mock_user_3, 'dummy',
-                                                        'dummy'))
+        location = Location('i4x://edX/toy/course/2012_Fall')
 
-    def test__dispatch(self):
-        self.assertRaises(ValueError, access._dispatch,{}, 'action', 'dummy',
-                          'dummy')
+        self.assertFalse(access._has_access_to_location(None, location,
+                                                        'staff', None))
+        u = Mock()
+        u.is_authenticated.return_value = False
+        self.assertFalse(access._has_access_to_location(u, location,
+                                                        'staff', None))
+        u = Mock(is_staff=True)
+        self.assertTrue(access._has_access_to_location(u, location,
+                                                       'instructor', None))
+        # A user has staff access if they are in the staff group
+        u = Mock(is_staff=False)
+        g = Mock()
+        g.name = 'staff_edX/toy/2012_Fall'
+        u.groups.all.return_value = [g]
+        self.assertTrue(access._has_access_to_location(u, location,
+                                                        'staff', None))
+        # A user has staff access if they are in the instructor group
+        g.name = 'instructor_edX/toy/2012_Fall'
+        self.assertTrue(access._has_access_to_location(u, location,
+                                                        'staff', None))
+
+        # A user has instructor access if they are in the instructor group
+        g.name = 'instructor_edX/toy/2012_Fall'
+        self.assertTrue(access._has_access_to_location(u, location,
+                                                        'instructor', None))
+
+        # A user does not have staff access if they are 
+        # not in either the staff or the the instructor group
+        g.name = 'student_only'
+        self.assertFalse(access._has_access_to_location(u, location,
+                                                        'staff', None))
+
+        # A user does not have instructor access if they are 
+        # not in the instructor group
+        g.name = 'student_only'
+        self.assertFalse(access._has_access_to_location(u, location,
+                                                        'instructor', None))
 
     def test__has_access_string(self):
-        mock_user = MagicMock()
-        mock_user.is_staff = True
-        self.assertTrue(access._has_access_string(mock_user, 'global', 'staff'))
-        self.assertFalse(access._has_access_string(mock_user, 'dummy', 'staff'))
-        
+        u = Mock(is_staff=True)
+        self.assertFalse(access._has_access_string(u, 'not_global', 'staff', None))
+
+        u._has_global_staff_access.return_value = True
+        self.assertTrue(access._has_access_string(u, 'global', 'staff', None))
+
+        self.assertRaises(ValueError, access._has_access_string, u, 'global', 'not_staff', None)
+
     def test__has_access_descriptor(self):
-        mock_descriptor = MagicMock()
-        mock_descriptor.start = 0
-        # test has dependency on time.gmtime() > 0
-        self.assertTrue(access._has_access_descriptor("dummy", mock_descriptor,
-                                                      'load'))
-        mock_descriptor_2 = MagicMock()
-        mock_descriptor_2.start = None
-        self.assertTrue(access._has_access_descriptor("dummy", mock_descriptor_2,
-                                                      'load'))
-        
-    def test__has_access_error_desc(self):
-        mock_user = None
-        mock_descriptor = MagicMock()
-        mock_descriptor.location = None
-        # Just want to make sure function goes through path. 
-        self.assertFalse(access._has_access_error_desc(mock_user, mock_descriptor,
-                                                       'load'))
+        # TODO: override DISABLE_START_DATES and test the start date branch of the method
+        u = Mock()
+        d = Mock()
+        d.start = time.gmtime(time.time() - 86400) # make sure the start time is in the past
 
-    def test__get_access_group_name_course_desc(self):
-        self.assertEquals(access._get_access_group_name_course_desc('dummy',
-                                                                    'notstaff'),
-                          [])
-        # Problem: Can't use a Mock for location because needs to be a valid
-        # input to Location
-        # Getting "IndentationError: expected an indented block"
-##        tag, org, course, category, name = [MagicMock()]*5
-##        #mock_course.location = ['tag', 'org', 'course', 'category', 'name']
-##        L = Location([tag, org, course, category, name])
-##        print L.course_id()
-##        assert False
-        #mock_course.location.course = 'toy'
-        #access._get_access_group_name_course_desc(mock_course, 'staff')
+        # Always returns true because DISABLE_START_DATES is set in test.py
+        self.assertTrue(access._has_access_descriptor(u, d, 'load'))
+        self.assertRaises(ValueError, access._has_access_descriptor, u, d, 'not_load_or_staff')
 
-    def test__has_access_course_desc(self):
-        # This is more of a test for see_exists
-        mock_course = MagicMock()
-        mock_course.metadata.get = 'is_public'
-        self.assertTrue(access._has_access_course_desc('dummy', mock_course,
-                                                       'see_exists'))
-        mock_course_2 = MagicMock()
-        mock_course_2.metadata.get = 'private'
-        # Is there a way to see all the functions that have been called on a mock?
-        # Basically, I want to see if _has_staff_access_to_descriptor is called on
-        # the mock user and course
-        # This actually doesn't seem possible, according to the API
-        # None user can see course even if not 'is_public'?
-        self.assertTrue(access._has_access_course_desc(None, mock_course_2,
-                                                        'see_exists'))
-    def test_get_access_group_name(self):
-        # Need to create an instance of CourseDescriptor
-        # Is it necessary to test? basically "testing" python
-        self.assertRaises(TypeError, access.get_access_group_name,
-                           'notCourseDescriptor', 'dummy_action')
-        
-    def test_has_access(self):
-        magic = MagicMock()
-        error = ErrorDescriptor(magic)
-        mock_user = MagicMock()
-        self.assertFalse(access.has_access(None, error, 'load'))
-        self.assertFalse(access.has_access(mock_user, 'dummy', 'staff'))
-        self.assertRaises(TypeError, access.has_access,'dummyuser', {}, 'dummy')
+    def test__has_access_course_desc_can_enroll(self):
+        u = Mock()
+        yesterday = time.gmtime(time.time() - 86400)
+        tomorrow = time.gmtime(time.time() + 86400)
+        c = Mock(enrollment_start=yesterday, enrollment_end=tomorrow)
+        c.metadata.get = 'is_public'
 
-# How do decorators work? I think that is the correct 
-##    def test_patches(self):
-##        user = Stub()
-##        @patch.object(Stub, "is_staff", True)
-##        self.assertTrue(access._has_global_staff_access(mock_user))
+        # User can enroll if it is between the start and end dates
+        self.assertTrue(access._has_access_course_desc(u, c, 'enroll'))
+
+        # User can enroll if authenticated and specifically allowed for that course
+        # even outside the open enrollment period
+        u = Mock(email='test@edx.org', is_staff=False)
+        u.is_authenticated.return_value = True
+
+        c = Mock(enrollment_start=tomorrow, enrollment_end=tomorrow, id='edX/test/2012_Fall')
+        c.metadata.get = 'is_public'
+
+        allowed = CourseEnrollmentAllowedFactory(email=u.email, course_id=c.id)
+
+        self.assertTrue(access._has_access_course_desc(u, c, 'enroll'))
+
+        # Staff can always enroll even outside the open enrollment period
+        u = Mock(email='test@edx.org', is_staff=True)
+        u.is_authenticated.return_value = True
+
+        c = Mock(enrollment_start=tomorrow, enrollment_end=tomorrow, id='edX/test/Whenever')
+        c.metadata.get = 'is_public'
+        self.assertTrue(access._has_access_course_desc(u, c, 'enroll'))
+
+        # TODO: 
+        # Non-staff cannot enroll outside the open enrollment period if not specifically allowed

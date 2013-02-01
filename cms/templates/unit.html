@@ -1,61 +1,152 @@
-<section id="unit-wrapper">
-  <header>
-    <section>
-      <h1 class="editable">${url_name}</h1>
-      <p class="${category}"><a href="#">${category}</a></p>
-    </section>
+<%inherit file="base.html" />
+<%! from django.core.urlresolvers import reverse %>
+<%namespace name="units" file="widgets/units.html" />
+<%block name="bodyclass">unit</%block>
+<%block name="title">CMS Unit</%block>
+<%block name="jsextra">
+  <script type='text/javascript'>
+  $(document).ready(function() {
+    new CMS.Views.UnitEdit({
+      el: $('.main-wrapper'),
+      model: new CMS.Models.Module({
+        id: '${unit_location}',
+        state: '${unit_state}'
+      })
+    });
+  
+    $('.new-component-template').each(function(){
+        $emptyEditor = $(this).find('.empty');
+        $(this).prepend($emptyEditor);
+      });
+    });
+  </script>
 
-    <div class="actions">
-      <a href="#" class="cancel">Cancel</a>
-      <a href="" class="save-update">Save &amp; Update</a>
-    </div>
-  </header>
+</%block>
+<%block name="content">
+  <div class="main-wrapper edit-state-${unit_state}" data-id="${unit_location}">
+    <div class="inner-wrapper">
+      <div class="alert editing-draft-alert">
+        <p class="alert-message"><strong>You are editing a draft.</strong>
+        % if published_date:
+        This unit was originally published on ${published_date}.
+        % endif
+        </p>
+        <a href="${published_preview_link}" target="_blank" class="alert-action secondary">Preview the published version</a>
+      </div>
+      <div class="main-column">
+        <article class="unit-body window">
+          <p class="unit-name-input"><label>Display Name:</label><input type="text" value="${unit.display_name}" class="unit-display-name-input" /></p>
+          <ol class="components">
+            % for id in components:
+            <li class="component" data-id="${id}"/>
+            % endfor
+            <li class="new-component-item adding">              
+              <div class="new-component">
+                <h5>Add New Component</h5>
+                <ul class="new-component-type">
+                  % for type in sorted(component_templates.keys()):
+                  <li>
+                    <a href="#" data-type="${type}">
+                      <span class="large-template-icon large-${type}-icon"></span>
+                      <span class="name">${type}</span>
+                    </a>
+                  </li>
+                  % endfor
+                </ul>
+              </div>
+                % for type, templates in sorted(component_templates.items()):
+                <div class="new-component-templates new-component-${type}">
+                    <h3 class="title">Select <span class="type">${type}</span> component type:</h3>
 
-  <section>
-    <section class="meta wip">
-      <section class="status-settings">
-        <ul>
-          <li><a href="#" class="current">Scrap</a></li>
-          <li><a href="#">Draft</a></li>
-          <li><a href="#">Proofed</a></li>
-          <li><a href="#">Published</a></li>
-        </ul>
-        <a href="#" class="settings">Settings</a>
-      </section>
-      <section class="author">
-        <dl>
-          <dt>Last modified:</dt>
-          <dd>mm/dd/yy</dd>
-          <dt>By</dt>
-          <dd>Anant Agarwal</dd>
-        </dl>
-      </section>
-      <section class="tags">
-        <div>
-          <h2>Tags:</h2>
-          <p class="editable">Click to edit</p>
+                    <ul class="new-component-template">
+                        % for name, location, has_markdown, is_empty in templates:
+
+                          % if is_empty:
+                            <li class="editor-md empty">
+                              <a href="#" data-location="${location}">
+                                <span class="name"><i class="ss-icon ss-symbolicons-block">&#xE714;</i> ${name}</span>
+                                <span class="editor-indicator">Simple <span class="sr">Editor</span></span>
+                              </a>
+                            </li>
+
+                          % elif has_markdown:
+                            <li class="editor-md">
+                              <a href="#" data-location="${location}">
+                                <span class="name"><i class="ss-icon ss-symbolicons-block">&#xE714;</i> ${name}</span>
+                                <span class="editor-indicator">Simple <span class="sr">Editor</span></span>
+                              </a>
+                            </li>
+
+                          % else:
+                            <li class="editor-manual">
+                              <a href="#" data-location="${location}">
+                                <span class="name"><i class="ss-icon ss-symbolicons-block">&#x1F527;</i> ${name}</span>
+                                <span class="editor-indicator">Advanced <span class="sr">Editor</span></span>
+                              </a>
+                            </li>
+                          % endif
+
+                        %endfor
+                    </ul>
+                    <a href="#" class="cancel-button">Cancel</a>
+                </div>
+                % endfor
+            </li>
+          </ol>
+        </article>
+      </div>
+
+      <div class="sidebar">
+        <div class="unit-settings window">
+          <h4 class="header">Unit Settings</h4>
+          <div class="window-contents">
+            <div class="row visibility">
+              <label class="inline-label">Visibility:</label>
+              <select class='visibility-select'>
+                <option value="public">Public</option>
+                <option value="private">Private</option>
+              </select>
+            </div>
+            <div class="row published-alert">
+              <p class="edit-draft-message">This unit has been published. To make changes, you must <a href="#" class="create-draft">edit a draft</a>.</p>
+              <p class="publish-draft-message">This is a draft of the published unit. To update the live version, you must <a href="#" class="publish-draft">replace it with this draft</a>.</p>
+            </div>            
+            <div class="row status">
+              <p>This unit is scheduled to be released to <strong>students</strong> 
+              % if release_date is not None:
+                  on <strong>${release_date}</strong>
+              % endif 
+              with the subsection <a href="${reverse('edit_subsection', kwargs={'location': subsection.location})}">"${subsection.display_name}"</a></p>
+            </div>
+            <div class="row unit-actions">
+              <a href="#" class="delete-draft delete-button">Delete Draft</a>
+              <a href="${draft_preview_link}" target="_blank" class="preview-button">Preview</a>
+              <a href="${published_preview_link}" target="_blank" class="view-button">View Live</a>
+            </div>
+          </div>
         </div>
-        <div>
-          <h2>Goal</h2>
-          <p class="editable">Click to edit</p>
+        <div class="window unit-location">
+          <h4 class="header">Unit Location</h4>
+          <div class="window-contents">
+            <div><input type="text" class="url" value="/courseware/${section.url_name}/${subsection.url_name}" disabled /></div>
+            <ol>
+              <li>
+                <a href="#" class="section-item">${section.display_name}</a>
+                <ol>
+                  <li>
+                    <a href="${reverse('edit_subsection', args=[subsection.location])}" class="section-item">
+                      <span class="folder-icon"></span>
+                      <span class="subsection-name"><span class="subsection-name-value">${subsection.display_name}</span></span>
+                    </a>
+                    ${units.enum_units(subsection, actions=False, selected=unit.location)}
+                  </li>
+                </ol>
+              </li>
+            </ol>            
+          </div>
         </div>
-      </section>
-    </section>
-    ${contents}
-    % if lms_link is not None:
-    <a class="lms-link" href="${lms_link}">View in LMS</a>
-    % endif
-    <section class="previews">
-      % for preview in previews:
-        <section class="preview">
-          ${preview}
-        </section>
-      % endfor
-    </section>
-    <div class="actions">
-      <a href="" class="save-update">Save &amp; Update</a>
-      <a href="#" class="cancel">Cancel</a>
+      </div>
     </div>
-    <%include file="widgets/notes.html"/>
-  </section>
-</section>
+  </div>
+
+</%block>
