@@ -17,6 +17,7 @@ from django.test.client import Client, RequestFactory
 from django.test import TestCase
 from django.core.exceptions import PermissionDenied
 from override_settings import override_settings
+from django.core.exceptions import PermissionDenied
 
 from xmodule.modulestore.django import modulestore, _MODULESTORES
 from xmodule.modulestore import Location
@@ -28,6 +29,12 @@ from contentstore.utils import get_course_for_item
 from contentstore.tests.factories import UserFactory
 from contentstore.tests.factories import CourseFactory, ItemFactory
 import contentstore.views as views
+from contentstore.tests.factories import CourseFactory, ItemFactory
+from xmodule.modulestore import Location
+from xmodule.x_module import ModuleSystem
+from xmodule.error_module import ErrorModule
+from contentstore.utils import get_course_for_item
+from xmodule.templates import update_templates
 
 class Stub():
     pass
@@ -67,7 +74,6 @@ class ViewsTestCase(TestCase):
     def tearDown(self):
         _MODULESTORES = {}
         modulestore().collection.drop()
-        assert False
         
     def test_has_access(self):
         self.assertTrue(views.has_access(self.permit_user, self.location_2))
@@ -82,6 +88,27 @@ class ViewsTestCase(TestCase):
                           'full', '6.002_Spring_2012')
         request_2 = RequestFactory().get('foo')
         request.user = self.permit_user
+        
+    def test_has_access(self):
+        user = MagicMock(is_staff = True, is_active = True, is_authenticated = True)
+        m = MagicMock()
+        m.count.return_value = 1
+        user.groups.filter.return_value = m
+        self.assertTrue(views.has_access(user, self.location_2))
+        user.is_authenticated = False
+        self.assertFalse(views.has_access(user, self.location_2))
+
+    def test_course_index(self):
+        # UserFactory doesn't work?
+        self.user = MagicMock(is_staff = False, is_active = False)
+        self.user.is_authenticated.return_value = False
+        request = MagicMock(user = self.user)
+        # Redirects if request.user doesn't have access to location
+        self.assertIsInstance(views.course_index(request, 'edX',
+                          'full', '6.002_Spring_2012'), HttpResponseRedirect)
+        self.user_2 = MagicMock(is_staff = True, is_active = True)
+        self.user_2.is_authenticated.return_value = True
+        request_2 = MagicMock(user = self.user_2)
         # Doesn't work unless we figure out render_to_response
 ##        views.course_index(request_2, 'MITx',
 ##                          '999', 'Robot_Super_Course')
@@ -95,6 +122,15 @@ class ViewsTestCase(TestCase):
         # If location isn't for a "sequential", return Bad Request
         self.request_2 = RequestFactory().get('foo')
         self.request_2.user = self.permit_user
+        self.user = MagicMock(is_staff = False, is_active = False)
+        self.user.is_authenticated.return_value = False
+        self.request = MagicMock(user = self.user)
+        self.assertIsInstance(views.edit_subsection(self.request, self.location_2),
+                              HttpResponseRedirect)
+        # If location isn't for a "sequential", return Bad Request
+        self.user_2 = MagicMock(is_staff = True, is_active = True)
+        self.user_2.is_authenticated.return_value = True
+        self.request_2 = MagicMock(user = self.user_2)
         self.assertIsInstance(views.edit_subsection(self.request_2,
                                         self.location_3), HttpResponseBadRequest)
         # Need render_to_response
@@ -125,6 +161,26 @@ class ViewsTestCase(TestCase):
 ##        views.assignment_type_update(self.request, 'MITx', '999', 'course', 'Robot_Super_Course')
         # if user has access, then should return HttpResponse
         self.request.user = self.permit_user
+        # if user doesn't have access, should redirect
+        self.user = MagicMock(is_staff = False, is_active = False)
+        self.user.is_authenticated.return_value = False
+        self.request = MagicMock(user = self.user)
+        self.assertIsInstance(views.edit_unit(self.request, self.location_2),
+                              HttpResponseRedirect)
+
+    def test_assignment_type_update(self):
+        # If user doesn't have access, should redirect
+        self.user = MagicMock(is_staff = False, is_active = False)
+        self.user.is_authenticated.return_value = False
+        self.request = RequestFactory().get('foo')
+        self.request.user = self.user
+        self.assertIsInstance(views.assignment_type_update(self.request,
+                                    'MITx', '999', 'course', 'Robot_Super_Course'),
+                              HttpResponseRedirect)
+        # if user has access, then should return HttpResponse
+        self.user_2 = MagicMock(is_staff = True, is_active = True)
+        self.user_2.is_authenticated.return_value = True
+        self.request.user = self.user_2
         get_response = views.assignment_type_update(self.request,'MITx', '999',
                                                     'course', 'Robot_Super_Course')
         self.assertIsInstance(get_response,HttpResponse)
@@ -184,6 +240,9 @@ class ViewsTestCase(TestCase):
         # if error in getting module, return ErrorModule
         self.request = RequestFactory().get('foo')
         self.request.user = self.no_permit_user
+        self.assertIsInstance(views.preview_module_system(self.request,
+                                                          'id', self.course),
+                              ModuleSystem)
         self.request.session = {}
         self.assertIsInstance(views.load_preview_module(self.request, 'id',
                                         self.course, 'instance', 'shared'),
@@ -258,7 +317,6 @@ class ViewsTestCase(TestCase):
         #store = views.get_modulestore(child_item.location.url())
         #store.delete_item(child_item.location)
         self.assertEquals(modulestore().get_items(child_item.location.url()), [])
-
         # Check delete_item on 'vertical'
         self.item_3 = ItemFactory.create(template = 'i4x://edx/templates/vertical/Empty')
         self.request_4 = RequestFactory().post(self.item_3.location.url())
