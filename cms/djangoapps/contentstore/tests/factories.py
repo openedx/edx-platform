@@ -1,10 +1,17 @@
 from factory import Factory
-from xmodule.modulestore import Location
-from xmodule.modulestore.django import modulestore
+from datetime import datetime
+import uuid
 from time import gmtime
 from uuid import uuid4
-from xmodule.timeparse import stringify_time
 
+from django.contrib.auth.models import Group
+
+from xmodule.modulestore import Location
+from xmodule.modulestore.django import modulestore
+from xmodule.timeparse import stringify_time
+from student.models import (User, UserProfile, Registration,
+                            CourseEnrollmentAllowed)
+from django.contrib.auth.models import Group
 
 def XMODULE_COURSE_CREATION(class_to_create, **kwargs): 
     return XModuleCourseFactory._create(class_to_create, **kwargs)
@@ -115,3 +122,41 @@ class ItemFactory(XModuleItemFactory):
     parent_location = 'i4x://MITx/999/course/Robot_Super_Course'
     template = 'i4x://edx/templates/chapter/Empty'
     display_name = 'Section One'
+
+class UserProfileFactory(Factory):
+    FACTORY_FOR = UserProfile
+
+    user = None
+    name = 'Robot Studio'
+    courseware = 'course.xml'
+
+class RegistrationFactory(Factory):
+    FACTORY_FOR = Registration
+
+    user = None
+    activation_key = uuid.uuid4().hex
+
+class UserFactory(Factory):
+    FACTORY_FOR = User
+
+    username = 'robot'
+    email = 'robot@edx.org'
+    password = 'test'
+    first_name = 'Robot'
+    last_name = 'Tester'
+    is_staff = False
+    is_active = True
+    is_superuser = False
+    last_login = datetime.now()
+    date_joined = datetime.now()
+
+class GroupFactory(Factory):
+    FACTORY_FOR = Group
+
+    name = 'test_group'
+
+class CourseEnrollmentAllowedFactory(Factory):
+    FACTORY_FOR = CourseEnrollmentAllowed
+
+    email = 'test@edx.org'
+    course_id = 'edX/test/2012_Fall'
