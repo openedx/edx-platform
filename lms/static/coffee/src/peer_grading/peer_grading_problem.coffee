@@ -426,7 +426,6 @@ class PeerGradingProblem
     @submit_button.show()
 
   setup_score_selection: (max_score) =>
-    
     # And now hook up an event handler again
     $("input[name='score-selection']").change @graded_callback
 
