@@ -63,26 +63,24 @@ class ConditionalModule(XModule):
                 else:
                     log.debug('conditional module: %s IS completed' % module)
             return True
-        # elif self.condition == 'answer':
-        #     # parse descriptor
-        #     # find if tags
-        #     # get tag is: answer_to and child
-        #     # for every required module check if answer is equal to is, 
-        #     # and if so - append child to rendered modules
-
-
-        #     for module in self.required_modules:
-        #         if not hasattr(module, 'poll_answer'):
-        #             raise Exception('Error in conditional module: required module %s has no answer field' % module)
-        #         if not module.answer = self.descriptor.xml_object.
-
-
+        elif self.condition == 'answer':
+            for module in self.required_modules:
+                if not hasattr(module, 'poll_answer'):
+                    raise Exception('Error in conditional module: required module %s has no answer field' % module)
+                answer =  self.descriptor.xml_attributes.get('answer') 
+                if answer == 'unanswered' and not module.poll_answer:
+                    return False
+                if module.poll_answer == answer:
+                    return True
+                else:
+                    return False
         else:
             raise Exception('Error in conditional module: unknown condition "%s"' % self.condition)
 
         return True
 
     def get_html(self):
+        # import ipdb; ipdb.set_trace()
         self.is_condition_satisfied()
         return self.system.render_template('conditional_ajax.html', {
             'element_id': self.location.html_id(),
@@ -95,7 +93,6 @@ class ConditionalModule(XModule):
         This is called by courseware.module_render, to handle an AJAX call.
         '''
         #log.debug('conditional_module handle_ajax: dispatch=%s' % dispatch)
-        # import ipdb; ipdb.set_trace()   
         if not self.is_condition_satisfied():
             context = {'module': self}
             html = self.system.render_template('conditional_module.html', context)
@@ -109,7 +106,6 @@ class ConditionalModule(XModule):
         html = self.contents[0]
 
         #log.debug('rendered conditional module %s' % str(self.location))
-
         return json.dumps({'html': html})
         #return html
 
