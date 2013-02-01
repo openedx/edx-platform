@@ -10,7 +10,7 @@ sessions. Assumes structure:
 from .common import *
 import os
 from path import path
-
+from time import time
 
 # Nose Test Runner
 INSTALLED_APPS += ('django_nose',)
@@ -39,11 +39,14 @@ STATICFILES_DIRS += [
     if os.path.isdir(COMMON_TEST_DATA_ROOT / course_dir)
 ]
 
+# Use the current seconds since epoch to differentiate
+# the mongo collections on jenkins.
+sec_since_epoch = '%s' % int(time()*100)
 modulestore_options = {
     'default_class': 'xmodule.raw_module.RawDescriptor',
     'host': 'localhost',
     'db': 'test_xmodule',
-    'collection': 'modulestore',
+    'collection': 'modulestore_%s' % sec_since_epoch,
     'fs_root': GITHUB_REPO_ROOT,
     'render_template': 'mitxmako.shortcuts.render_to_string',
 }
