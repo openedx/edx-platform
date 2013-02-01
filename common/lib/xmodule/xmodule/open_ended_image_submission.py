@@ -216,6 +216,10 @@ def upload_to_s3(file_to_upload, keyname):
     Returns:
         public_url: URL to access uploaded file
     '''
+
+    #This commented out code is kept here in case we change the uploading method and require images to be
+    #converted before they are sent to S3.
+    #TODO: determine if commented code is needed and remove
     #im = Image.open(file_to_upload)
     #out_im = cStringIO.StringIO()
     #im.save(out_im, 'PNG')
@@ -229,6 +233,9 @@ def upload_to_s3(file_to_upload, keyname):
         k.key = keyname
         k.set_metadata('filename', file_to_upload.name)
         k.set_contents_from_file(file_to_upload)
+
+        #This commented out code is kept here in case we change the uploading method and require images to be
+        #converted before they are sent to S3.
         #k.set_contents_from_string(out_im.getvalue())
         #k.set_metadata("Content-Type", 'images/png')
 
