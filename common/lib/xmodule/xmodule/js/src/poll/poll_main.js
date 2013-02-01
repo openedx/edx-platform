@@ -180,58 +180,8 @@
             });
         });
 
-        if (c1 === 0) {
-            obj.el.appendTo(element);
-        }
+        obj.el.appendTo(element);
     }
-
-    /*
-
-    // Helper object which will help create a chain of poll objects.
-    // Initially there is no previous poll object, so we initialize this reference to null.
-    prevPollObj = null;
-
-    element.children('.polls').each(function (index, value) {
-        var pollObj;
-
-        // Poll object with poll configuration and properties.
-        pollObj = {
-            'element': $(value), // Current poll DOM element (jQuery object).
-            'id': $(value).prop('id'), // ID of DOM element with current poll.
-            'pollId': element.prop('id'), // ID of DOM element which contains all polls.
-            'ajax_url': element.data('ajax-url'),
-            'upvote': $(value).find('.upvote'),
-            'downvote': $(value).find('.downvote'),
-            'vote_blocks': $(value).find('.vote_blocks'),
-            'graph_answer': $(value).find('.graph_answer')
-        };
-
-        pollObj.graph_answer.css({
-                'width': 400,
-                'height': 400,
-                'margin-left': 'auto',
-                'margin-right': 'auto',
-                'margin-bottom': 15
-            });
-
-        // Set up a reference to current poll object in previous poll object.
-        // Reference to next poll object is initialized to null.
-        if (prevPollObj !== null) {
-            prevPollObj.nextPollObj = pollObj;
-        }
-        prevPollObj = pollObj;
-        pollObj.nextPollObj = null;
-
-        // Attach a handler to the submit button, which will pass the current poll object.
-        pollObj.upvote.click(function (event) {
-            _this.submitAnswer(event, pollObj, 'upvote');
-        });
-        pollObj.downvote.click(function (event) {
-            _this.submitAnswer(event, pollObj,'downvote');
-        });
-    });
-
-    */
 }
 
 }; }); }(RequireJS.requirejs, RequireJS.require, RequireJS.define));
