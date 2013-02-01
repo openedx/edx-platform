@@ -53,12 +53,15 @@ class PollModule(XModule):
          }
     css = {'scss': [resource_string(__name__, 'css/poll/display.scss')]}
     js_module_name = "Poll"
+    
+    display_name = String(help="Display name for this module", scope=Scope.settings)
 
     voted = Boolean(help="Whether this student has voted on the poll", scope=Scope.student_state, default=False)
     poll_answer = String(help="Whether this student has voted on the poll", scope=Scope.content, default='')
     poll_answers = Object(help="Whether this student has voted on the poll", scope=Scope.content, default=dict())
 
     xml_object = String(scope=Scope.content)
+
 
     def handle_ajax(self, dispatch, get):
         ''' '''
