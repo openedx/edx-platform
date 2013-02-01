@@ -82,27 +82,12 @@ def get_logger_config(log_dir,
             }
         },
         'loggers': {
-            'django': {
-                'handlers': handlers,
-                'propagate': True,
-                'level': 'INFO'
-            },
             'tracking': {
                 'handlers': ['tracking'],
                 'level': 'DEBUG',
                 'propagate': False,
             },
             '': {
-                'handlers': handlers,
-                'level': 'DEBUG',
-                'propagate': False
-            },
-            'mitx': {
-                'handlers': handlers,
-                'level': 'DEBUG',
-                'propagate': False
-            },
-            'keyedcache': {
                 'handlers': handlers,
                 'level': 'DEBUG',
                 'propagate': False
