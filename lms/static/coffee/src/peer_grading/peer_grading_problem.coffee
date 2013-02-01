@@ -232,23 +232,11 @@ class PeerGradingProblem
   fetch_submission_essay: () =>
     @backend.post('get_next_submission', {location: @location}, @render_submission)
 
-  # finds the scores for each rubric category
-  get_score_list: () =>
-    # find the number of categories:
-    num_categories = $('table.rubric tr').length
-
-    score_lst = []
-    # get the score for each one
-    for i in [0..(num_categories-2)]
-      score = $("input[name='score-selection-#{i}']:checked").val()
-      score_lst.push(score)
-
-    return score_lst
 
   construct_data: () ->
     data =
-      rubric_scores: @get_score_list()
-      score: @grade
+      rubric_scores: Rubric.get_score_list()
+      score: Rubric.get_total_score()
       location: @location
       submission_id: @essay_id_input.val()
       submission_key: @submission_key_input.val()
@@ -316,7 +304,7 @@ class PeerGradingProblem
   # called after a grade is selected on the interface
   graded_callback: (event) =>
     # check to see whether or not any categories have not been scored
-    if Rubric.check_complete():
+    if Rubric.check_complete()
       # show button if we have scores for all categories
       @show_submit_button()
 
@@ -439,25 +427,8 @@ class PeerGradingProblem
 
   setup_score_selection: (max_score) =>
     
-    # first, get rid of all the old inputs, if any.
-    @score_selection_container.html("""
-    <h3>Overall Score</h3>
-    <p>Choose an overall score for this submission.</p>
-    """)
-
-    # Now create new labels and inputs for each possible score.
-    for score in [0..max_score]
-      id = 'score-' + score
-      label = """<label for="#{id}">#{score}</label>"""
-      
-      input = """
-              <input type="radio" name="grade-selection" id="#{id}" value="#{score}"/>
-              """       # "  fix broken parsing in emacs
-      @score_selection_container.append(input + label)
-
     # And now hook up an event handler again
     $("input[name='score-selection']").change @graded_callback
-    $("input[name='grade-selection']").change @graded_callback
 
 
 
