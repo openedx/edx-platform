@@ -183,17 +183,8 @@ this.HTML5Video = (function () {
                 }
             }, false);
             this.video.addEventListener('timeupdate', function (data) {
-                console.log('[timeupdate]');
-                console.log(_this.video.currentTime);
-                if (_this.video.end > _this.video.currentTime) {
-                    console.log('_this.video.end >= _this.video.currentTime -> pausing video');
-                    _this.playerState = HTML5Video.PlayerState.PAUSED;
-
-                    if ($.isFunction(_this.config.events.onStateChange) === true) {
-                        _this.config.events.onStateChange({
-                            'data': _this.playerState
-                        });
-                    }
+                if (_this.end < _this.video.currentTime) {
+                    _this.video.pause();
                 }
             }, false);
 
@@ -206,6 +197,9 @@ this.HTML5Video = (function () {
 
         Player.prototype.seekTo = function (value) {
             if ((typeof value === 'number') && (value <= this.video.duration) && (value >= 0)) {
+                this.start = 0;
+                this.end = this.video.duration;
+
                 this.video.currentTime = value;
             }
         };
