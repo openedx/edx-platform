@@ -12,7 +12,6 @@ import requests
 import sys
 
 from django.conf import settings
-from django.http import HttpResponse, Http404
 
 from combined_open_ended_rubric import CombinedOpenEndedRubric
 from lxml import etree
@@ -81,8 +80,7 @@ class PeerGradingModule(XModule):
         """
         Return a HttpResponse with a json dump with success=False, and the given error message.
         """
-        return HttpResponse(json.dumps({'success': False, 'error': msg}),
-            mimetype="application/json")
+        return {'success': False, 'error': msg}
 
     def _check_required(self, get, required):
         actual = set(get.keys())
@@ -107,7 +105,7 @@ class PeerGradingModule(XModule):
         Needs to be implemented by child modules.  Handles AJAX events.
         @return:
         """
-        log.debug(get)
+
         handlers = {
             'get_next_submission': self.get_next_submission,
             'show_calibration_essay': self.show_calibration_essay,
@@ -123,7 +121,7 @@ class PeerGradingModule(XModule):
         d = handlers[dispatch](get)
 
         log.debug(d)
-        
+
         return json.dumps(d, cls=ComplexEncoder)
 
     def get_progress(self):
@@ -159,13 +157,12 @@ class PeerGradingModule(XModule):
 
         try:
             response = self.peer_gs.get_next_submission(location, grader_id)
-            return HttpResponse(response,
-                mimetype="application/json")
+            return response
         except GradingServiceError:
             log.exception("Error getting next submission.  server url: {0}  location: {1}, grader_id: {2}"
             .format(self.peer_gs.url, location, grader_id))
-            return json.dumps({'success': False,
-                               'error': 'Could not connect to grading service'})
+            return {'success': False,
+                               'error': 'Could not connect to grading service'}
 
     def save_grade(self, get):
         """
@@ -199,15 +196,17 @@ class PeerGradingModule(XModule):
         try:
             response = self.peer_gs.save_grade(location, grader_id, submission_id,
                 score, feedback, submission_key, rubric_scores, submission_flagged)
-            return HttpResponse(response, mimetype="application/json")
+            return response
         except GradingServiceError:
             log.exception("""Error saving grade.  server url: {0}, location: {1}, submission_id:{2},
                             submission_key: {3}, score: {4}"""
             .format(self.peer_gs.url,
                 location, submission_id, submission_key, score)
             )
-            return json.dumps({'success': False,
-                               'error': 'Could not connect to grading service'})
+            return {
+                'success': False,
+                'error': 'Could not connect to grading service'
+            }
 
     def is_student_calibrated(self, get):
         """
@@ -237,12 +236,14 @@ class PeerGradingModule(XModule):
 
         try:
             response = self.peer_gs.is_student_calibrated(location, grader_id)
-            return HttpResponse(response, mimetype="application/json")
+            return response
         except GradingServiceError:
             log.exception("Error from grading service.  server url: {0}, grader_id: {0}, location: {1}"
             .format(self.peer_gs.url, grader_id, location))
-            return json.dumps({'success': False,
-                               'error': 'Could not connect to grading service'})
+            return {
+                'success': False,
+                'error': 'Could not connect to grading service'
+            }
 
     def show_calibration_essay(self, get):
         """
@@ -278,18 +279,18 @@ class PeerGradingModule(XModule):
         location = get['location']
         try:
             response = self.peer_gs.show_calibration_essay(location, grader_id)
-            return HttpResponse(response, mimetype="application/json")
+            return response
         except GradingServiceError:
             log.exception("Error from grading service.  server url: {0}, location: {0}"
             .format(self.peer_gs.url, location))
-            return json.dumps({'success': False,
-                               'error': 'Could not connect to grading service'})
+            return {'success': False,
+                               'error': 'Could not connect to grading service'}
         # if we can't parse the rubric into HTML,
         except etree.XMLSyntaxError:
             log.exception("Cannot parse rubric string. Raw string: {0}"
             .format(rubric))
-            return json.dumps({'success': False,
-                               'error': 'Error displaying submission'})
+            return {'success': False,
+                               'error': 'Error displaying submission'}
 
 
     def save_calibration_essay(self, get):
@@ -326,7 +327,7 @@ class PeerGradingModule(XModule):
         try:
             response = self.peer_gs.save_calibration_essay(location, grader_id, calibration_essay_id,
                 submission_key, score, feedback, rubric_scores)
-            return HttpResponse(response, mimetype="application/json")
+            return response
         except GradingServiceError:
             log.exception("Error saving calibration grade, location: {0}, submission_id: {1}, submission_key: {2}, grader_id: {3}".format(location, submission_id, submission_key, grader_id))
             return _err_response('Could not connect to grading service')

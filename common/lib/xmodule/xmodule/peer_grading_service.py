@@ -36,7 +36,7 @@ class PeerGradingService():
     def get_next_submission(self, problem_location, grader_id):
         response = self.get(self.get_next_submission_url,
             {'location': problem_location, 'grader_id': grader_id})
-        return json.dumps(self._render_rubric(response))
+        return self._render_rubric(response)
 
     def save_grade(self, location, grader_id, submission_id, score, feedback, submission_key, rubric_scores, submission_flagged):
         data = {'grader_id' : grader_id,
@@ -58,7 +58,7 @@ class PeerGradingService():
     def show_calibration_essay(self, problem_location, grader_id):
         params = {'problem_id' : problem_location, 'student_id': grader_id}
         response = self.get(self.show_calibration_essay_url, params)
-        return json.dumps(self._render_rubric(response))
+        return self._render_rubric(response)
 
     def save_calibration_essay(self, problem_location, grader_id, calibration_essay_id, submission_key,
                                score, feedback, rubric_scores):
@@ -111,7 +111,13 @@ class PeerGradingService():
             # reraise as promised GradingServiceError, but preserve stacktrace.
             raise GradingServiceError, str(err), sys.exc_info()[2]
 
-        return r.text
+        text = r.text
+        try:
+            text= json.loads(text)
+        except:
+            pass
+
+        return text
 
     def get(self, url, params, allow_redirects=False):
         """
@@ -127,7 +133,13 @@ class PeerGradingService():
             # reraise as promised GradingServiceError, but preserve stacktrace.
             raise GradingServiceError, str(err), sys.exc_info()[2]
 
-        return r.text
+        text = r.text
+        try:
+            text= json.loads(text)
+        except:
+            pass
+
+        return text
 
 
     def _try_with_login(self, operation):
@@ -163,6 +175,10 @@ class PeerGradingService():
         """
         try:
             response_json = json.loads(response)
+        except:
+            response_json = response
+
+        try:
             if 'rubric' in response_json:
                 rubric = response_json['rubric']
                 rubric_renderer = CombinedOpenEndedRubric(self.system, False)
