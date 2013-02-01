@@ -216,15 +216,13 @@
           li:last-child {
             a {
               border-radius: 0 0 3px 3px;
-              border-top: 1px dashed $lightGrey;
+              border:none;
             }
           }
 
           li:nth-child(2) {
             a {
               border-radius: 3px 3px 0 0;
-              border-top: 1px dashed $lightGrey;
-              border-bottom: 1px dashed $lightGrey;
             }
           }
 
