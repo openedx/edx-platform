@@ -117,6 +117,9 @@ def get_logger_config(log_dir,
             },
         })
     else:
+        # for production environments we will only
+        # log INFO and up
+        logger_config['loggers']['']['level'] = 'INFO'
         logger_config['handlers'].update({
             'local': {
                 'level': local_loglevel,
