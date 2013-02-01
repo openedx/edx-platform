@@ -1,5 +1,8 @@
 class @VideoPlayerAlpha extends SubviewAlpha
   initialize: ->
+    if (window.OldVideoPlayerAlpha) and (window.OldVideoPlayerAlpha.onPause)
+      window.OldVideoPlayerAlpha.onPause()
+    window.OldVideoPlayerAlpha = this
     if @video.videoType is 'youtube'
       @PlayerState = YT.PlayerState
       # Define a missing constant of Youtube API
@@ -11,10 +14,10 @@ class @VideoPlayerAlpha extends SubviewAlpha
     @el = $("#video_#{@video.id}")
 
   bind: ->
-    console.log "show_captions = #{@video.show_captions}"
     $(@control).bind('play', @play)
       .bind('pause', @pause)
-    $(@qualityControl).bind('changeQuality', @handlePlaybackQualityChange)
+    if @video.videoType is 'youtube'
+      $(@qualityControl).bind('changeQuality', @handlePlaybackQualityChange)
     if @video.show_captions is true
       $(@caption).bind('seek', @onSeek)
     $(@speedControl).bind('speedChange', @onSpeedChange)
@@ -32,7 +35,8 @@ class @VideoPlayerAlpha extends SubviewAlpha
 
   render: ->
     @control = new VideoControlAlpha el: @$('.video-controls')
-    @qualityControl = new VideoQualityControlAlpha el: @$('.secondary-controls')
+    if @video.videoType is 'youtube'
+      @qualityControl = new VideoQualityControlAlpha el: @$('.secondary-controls')
     if @video.show_captions is true
       @caption = new VideoCaptionAlpha
         el: @el
@@ -63,7 +67,6 @@ class @VideoPlayerAlpha extends SubviewAlpha
         events:
           onReady: @onReady
           onStateChange: @onStateChange
-          onPlaybackQualityChange: @onPlaybackQualityChange
     else if @video.videoType is 'youtube'
       @player = new YT.Player @video.id,
         playerVars: @playerVars
@@ -110,8 +113,6 @@ class @VideoPlayerAlpha extends SubviewAlpha
 
   onPlay: =>
     @video.log 'play_video'
-    window.player.pauseVideo() if window.player && window.player != @player
-    window.player = @player
     unless @player.interval
       @player.interval = setInterval(@update, 200)
     if @video.show_captions is true
@@ -121,7 +122,6 @@ class @VideoPlayerAlpha extends SubviewAlpha
 
   onPause: =>
     @video.log 'pause_video'
-    window.player = null if window.player == @player
     clearInterval(@player.interval)
     @player.interval = null
     if @video.show_captions is true
