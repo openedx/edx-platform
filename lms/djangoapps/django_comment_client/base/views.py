@@ -98,7 +98,7 @@ def create_thread(request, course_id, commentable_id):
         # TODO (vshnayder): once we have more than just cohorts, we'll want to
         # change this to a single get_group_for_user_and_commentable function
         # that can do different things depending on the commentable_id
-        if cached_has_permission(request.user, "see_all_cohorts", course_id) or True:
+        if cached_has_permission(request.user, "see_all_cohorts", course_id):
             # admins can optionally choose what group to post as
             group_id = post.get('group_id', user_group_id)
         else:

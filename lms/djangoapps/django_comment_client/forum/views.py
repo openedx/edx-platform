@@ -152,6 +152,10 @@ def forum_form_discussion(request, course_id):
         #trending_tags = cc.search_trending_tags(
         #    course_id,
         #)
+        cohorts = get_course_cohorts(course_id)
+        cohort_dictionary = dict()
+        for c in cohorts:
+          cohort_dictionary[c.id] = c.name
 
         context = {
             'csrf': csrf(request)['csrf_token'],
@@ -167,12 +171,15 @@ def forum_form_discussion(request, course_id):
             'category_map': category_map,
             'roles': saxutils.escape(json.dumps(utils.get_role_ids(course_id)), escapedict),
             'is_moderator': cached_has_permission(request.user, "see_all_cohorts", course_id),
-            'cohorts': get_course_cohorts(course_id),
-            'cohort': get_cohort_id(user, course_id),
+            'cohorts': cohorts,
+            'cohort_map': cohort_dictionary,
+            'user_cohort': get_cohort_id(user, course_id),
             'cohorted_commentables': get_cohorted_commentables(course_id),
             'is_course_cohorted': is_course_cohorted(course_id)
         }
         # print "start rendering.."
+        print "\n\n\n\n*******************************"
+        print context
         return render_to_response('discussion/index.html', context)
 
 @login_required

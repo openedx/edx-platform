@@ -1377,11 +1377,7 @@ body.discussion {
     margin-bottom: 20px;
   }
 
-  .group-visibility-label {
-    font-size: 12px;
-    color:#fff;
-    font-style: italic;
-  }
+  
 
   .responses {
     list-style: none;
@@ -2438,3 +2434,11 @@ body.discussion {
 .discussion-user-threads {
   @extend .discussion-module
 }
+
+
+.group-visibility-label {
+    font-size: 12px;
+    color:#000;
+    font-style: italic;
+    background-color:#fff;
+  }

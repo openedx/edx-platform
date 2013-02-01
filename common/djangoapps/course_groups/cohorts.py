@@ -21,8 +21,7 @@ def is_course_cohorted(course_id):
     Raises:
        Http404 if the course doesn't exist.
     """
-    #return courses.get_course_by_id(course_id).is_cohorted
-    return True
+    return courses.get_course_by_id(course_id).is_cohorted
 
 
 def get_cohort_id(user, course_id):
@@ -30,9 +29,6 @@ def get_cohort_id(user, course_id):
     Given a course id and a user, return the id of the cohort that user is
     assigned to in that course.  If they don't have a cohort, return None.
     """
-    print "\n\n\n\n\n*********************************"
-    print user
-    print course_id
     cohort = get_cohort(user, course_id)
     return None if cohort is None else cohort.id
 

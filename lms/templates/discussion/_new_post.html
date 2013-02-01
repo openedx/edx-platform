@@ -55,10 +55,10 @@
                             <option >All Groups</option>
                             %if is_moderator:
                               %for c in cohorts:
-                              <option value="${c.id}">${c.name}</option>
+                                <option value="${c.id}">${c.name}</option>
                               %endfor
                             %else:
-                              <option value="${cohort}">My Cohort</option>
+                              <option value="${user_cohort}">My Cohort</option>
                             %endif
 
                         </select>
