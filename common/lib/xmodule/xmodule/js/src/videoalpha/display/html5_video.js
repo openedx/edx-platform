@@ -71,6 +71,20 @@ this.HTML5Video = (function () {
                 return;
             }
 
+            this.start = 0;
+            this.end = null;
+            if (config.hasOwnProperty('playerVars') === true) {
+                this.start = parseFloat(config.playerVars.start);
+                if ((isFinite(this.start) !== true) || (this.start < 0)) {
+                    this.start = 0;
+                }
+
+                this.end = parseFloat(config.playerVars.end);
+                if ((isFinite(this.end) !== true) || (this.end < this.start)) {
+                    this.end = null;
+                }
+            }
+
             sourceStr = {
                 'mp4': ' ',
                 'webm': ' ',
@@ -129,6 +143,14 @@ this.HTML5Video = (function () {
             this.video.addEventListener('canplay', function () {
                 _this.playerState = HTML5Video.PlayerState.PAUSED;
 
+                if (_this.start > _this.video.duration) {
+                    _this.start = 0;
+                }
+                if ((_this.end === null) || (_this.end > _this.video.duration)) {
+                    _this.end = _this.video.duration;
+                }
+                _this.video.currentTime = _this.start;
+
                 if ($.isFunction(_this.config.events.onReady) === true) {
                     _this.config.events.onReady({});
                 }
@@ -158,6 +180,20 @@ this.HTML5Video = (function () {
                     _this.config.events.onStateChange({
                         'data': _this.playerState
                     });
+                }
+            }, false);
+            this.video.addEventListener('timeupdate', function (data) {
+                console.log('[timeupdate]');
+                console.log(_this.video.currentTime);
+                if (_this.video.end > _this.video.currentTime) {
+                    console.log('_this.video.end >= _this.video.currentTime -> pausing video');
+                    _this.playerState = HTML5Video.PlayerState.PAUSED;
+
+                    if ($.isFunction(_this.config.events.onStateChange) === true) {
+                        _this.config.events.onStateChange({
+                            'data': _this.playerState
+                        });
+                    }
                 }
             }, false);
 
