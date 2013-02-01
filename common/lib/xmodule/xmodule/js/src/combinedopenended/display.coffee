@@ -329,7 +329,7 @@ class @CombinedOpenEnded
     $.postWithPrefix "#{@ajax_url}/check_for_score", (response) =>
       if response.state == "done" or response.state=="post_assessment"
         delete window.queuePollerID
-        location.reload()
+        @reload
       else
         window.queuePollerID = window.setTimeout(@poll, 10000)
 
@@ -353,3 +353,7 @@ class @CombinedOpenEnded
     new_text = ''
     new_text = "<span class='#{answer_class}' id='#{answer_id}'>#{answer_val}</span>"
     @answer_area.replaceWith(new_text)
+
+  # wrap this so that it can be mocked
+  reload: ->
+    location.reload()

@@ -29,6 +29,7 @@ describe 'CombinedOpenEnded', ->
     beforeEach =>
       # setup the spies
       @combined = new CombinedOpenEnded @element
+      spyOn(@combined, 'reload').andCallFake -> return 0
       window.setTimeout = jasmine.createSpy().andCallFake (callback, timeout) -> return 5
 
     it 'polls at the correct intervals', =>
@@ -44,6 +45,7 @@ describe 'CombinedOpenEnded', ->
       @combined.poll()
       expect(window.queuePollerID).toBeUndefined()
       expect(window.setTimeout).not.toHaveBeenCalled()
+      expect(@combined.reload).toHaveBeenCalled()
 
   describe 'rebind', ->
     beforeEach ->
