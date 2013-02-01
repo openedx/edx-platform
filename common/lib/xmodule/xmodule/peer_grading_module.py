@@ -74,6 +74,10 @@ class PeerGradingModule(XModule):
         if isinstance(self.use_for_single_location, basestring):
             self.use_for_single_location = (self.use_for_single_location in TRUE_DICT)
 
+        self.ajax_url = self.system.ajax_url
+        if not self.ajax_url.endswith("/"):
+            self.ajax_url = self.ajax_url + "/"
+
     def _err_response(self, msg):
         """
         Return a HttpResponse with a json dump with success=False, and the given error message.
@@ -108,11 +112,10 @@ class PeerGradingModule(XModule):
         handlers = {
             'get_next_submission': self.get_next_submission,
             'show_calibration_essay': self.show_calibration_essay,
-            'save_post_assessment': self.message_post,
             'is_student_calibrated': self.is_student_calibrated,
             'save_grade': self.save_grade,
             'save_calibration_essay' : self.save_calibration_essay,
-            'show_problem' : self.peer_grading_problem,
+            'problem' : self.peer_grading_problem,
             }
 
         if dispatch not in handlers:
@@ -357,9 +360,8 @@ class PeerGradingModule(XModule):
             error_text = "Could not get problem list"
             success = False
 
-        ajax_url = self.system.ajax_url
-
-        return self.system.render_template('peer_grading/peer_grading.html', {
+        ajax_url = self.ajax_url
+        html = self.system.render_template('peer_grading/peer_grading.html', {
             'course_id': self.system.course_id,
             'ajax_url': ajax_url,
             'success': success,
@@ -368,6 +370,7 @@ class PeerGradingModule(XModule):
             # Checked above
             'staff_access': False, })
 
+        return html
 
     def peer_grading_problem(self, get = None):
         '''
@@ -380,15 +383,16 @@ class PeerGradingModule(XModule):
         else:
             problem_location = self.system.location
 
-        ajax_url = self.system.ajax_url
-
-        return self.system.render_template('peer_grading/peer_grading_problem.html', {
+        ajax_url = self.ajax_url
+        html = self.system.render_template('peer_grading/peer_grading_problem.html', {
             'view_html': '',
             'problem_location': problem_location,
             'course_id': self.system.course_id,
             'ajax_url': ajax_url,
             # Checked above
             'staff_access': False, })
+
+        return {'html' : html, 'success' : True}
 
 class PeerGradingDescriptor(XmlDescriptor, EditingDescriptor):
     """
