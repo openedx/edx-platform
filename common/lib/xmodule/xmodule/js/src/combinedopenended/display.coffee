@@ -208,9 +208,9 @@ class @CombinedOpenEnded
 
   save_assessment: (event) =>
     event.preventDefault()
-    if @child_state == 'assessing'
-      checked_assessment = @$('input[name="grade-selection"]:checked')
-      data = {'assessment' : checked_assessment.val()}
+    if @child_state == 'assessing' && Rubric.check_complete()
+      checked_assessment = Rubric.get_total_score()
+      data = {'assessment' : checked_assessment}
       $.postWithPrefix "#{@ajax_url}/save_assessment", data, (response) =>
         if response.success
           @child_state = response.state
