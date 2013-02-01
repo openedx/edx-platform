@@ -106,7 +106,8 @@
           }
 
           a {
-            width: 160px;
+            border: 1px solid $mediumGrey;
+            width: 140px;
             height: 100px;
             color: #edf1f5;
             margin-right: 15px;
@@ -124,7 +125,7 @@
               width: 100%;
               padding: 10px;
               @include box-sizing(border-box);
-              color: $mediumGrey;
+              color: #4F8BC4;
             }
           }
         }
@@ -134,7 +135,13 @@
           padding: 20px;
           @include clearfix;
 
+          .tab-group {
+            border-radius: 4px;
+            border: 1px solid $mediumGrey;
+          }
+
           .cancel-button {
+            margin-top: 20px;
             @include white-button;
           }
 
@@ -153,9 +160,10 @@
 
           a {
             position: relative;            
-            border: 1px solid $mediumGrey;
-            background: #edf1f5;
-            color: $mediumGrey;            
+            background: #fff;
+            color: #4F8BC4; 
+            line-height: 2;
+            font-size: 18px;           
             @include transition(background-color .15s);
 
             &:hover {
@@ -166,27 +174,24 @@
 
         .problem-type-tabs {
           list-style-type: none;
-          display: inline-block;
-          width: 100%;
+
+          display: block;
+          line-height: 2;
           border-bottom: 1px solid $mediumGrey;
-          margin-bottom: 20px;
-          padding-bottom: 10px;
           background:none;
+          padding: 6px 14px;
 
           .problem-type-label {
             font-size: 16px;
-            margin-right: 10px;
+            text-align: center;
             color: $mediumGrey;
           }
 
           li {
-            float:right;
-            text-align: right;
+            float: right;
             display:inline-block;
-            margin: 5px;
             width: 100px;
             text-align:center;
-            border: 1px $mediumGrey;
             @include border-radius(5px 5px 5px 5px);
 
             &.current {
@@ -203,18 +208,23 @@
         }
 
         .new-component-template {
-          margin-bottom: 20px;
+
+          li {
+              border-bottom: 1px dashed $lightGrey;
+          }
 
           li:last-child {
             a {
               border-radius: 0 0 3px 3px;
-              border-bottom: 1px solid $mediumGrey;
+              border-top: 1px dashed $lightGrey;
             }
           }
 
           li:nth-child(2) {
             a {
               border-radius: 3px 3px 0 0;
+              border-top: 1px dashed $lightGrey;
+              border-bottom: 1px dashed $lightGrey;
             }
           }
 
@@ -227,8 +237,9 @@
 
             .name {
               float: left;
+              @include transition(opacity .15s);
 
-              .problem-selector-icon {
+              .ss-icon {
                 @include transition(opacity .15s);
                 display: inline-block;
                 top: 1px;
@@ -255,6 +266,7 @@
             }
 
             &:hover {
+              color: #CB9C40;
 
               .ss-icon {
                 opacity: 1.0;
@@ -268,17 +280,18 @@
 
           // specific editor types 
           .empty {
-            @include box-shadow(0 1px 3px rgba(0,0,0,0.2));
-            margin-bottom: 10px;
+            margin-bottom: 0px 0px 0px 25px;
 
             a {
-              border-bottom: 1px solid $mediumGrey;
-              border-radius: 3px;
+              font-size: 18px;
+              line-height: 2;
               font-weight: 500;
-              background: #edf1f5;
+              background: #fff;
+              color: #4F8BC4;
 
               &:hover {
               background: #fffcf1;
+              color: #CB9C40;
             }
             }
           }
@@ -288,7 +301,7 @@
           text-align: center;
 
           h5 {
-            color: $mediumGrey;
+            color: #6696d7;
           }
           
         }
