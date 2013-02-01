@@ -5,6 +5,5 @@
     course_id = module.location.org +'/' + module.location.course +'/' + module.system.ajax_url.split('/')[4]
 %>
 
-<p><a
-href="${reverse('jump_to',kwargs=dict(course_id=course_id, location=reqm.location.url()))}">${reqm.display_name}</a>
+<p><a href="${reverse('jump_to',kwargs=dict(course_id=course_id, location=reqm.location.url()))}">${reqm.display_name}</a>
 must be completed before this will become visible.</p>

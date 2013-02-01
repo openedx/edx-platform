@@ -80,7 +80,6 @@ class ConditionalModule(XModule):
         return True
 
     def get_html(self):
-        # import ipdb; ipdb.set_trace()
         self.is_condition_satisfied()
         return self.system.render_template('conditional_ajax.html', {
             'element_id': self.location.html_id(),
@@ -96,18 +95,16 @@ class ConditionalModule(XModule):
         if not self.is_condition_satisfied():
             context = {'module': self}
             html = self.system.render_template('conditional_module.html', context)
-            return json.dumps({'html': html})
+            return json.dumps({'html': [html]})
 
         if self.contents is None:
             # self.contents = [child.get_html() for child in self.get_display_items()]
             self.contents = [self.system.get_module(child_descriptor.location).get_html() 
                     for child_descriptor in self.descriptor.get_children()]
-        # for now, just deal with one child
-        html = self.contents[0]
 
+        html = self.contents
         #log.debug('rendered conditional module %s' % str(self.location))
         return json.dumps({'html': html})
-        #return html
 
 class ConditionalDescriptor(SequenceDescriptor):
     ''' TODO check exports'''

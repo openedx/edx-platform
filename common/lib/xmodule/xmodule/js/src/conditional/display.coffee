@@ -17,10 +17,10 @@ class @Conditional
 
   render: (content) ->
     if content
-      @el.html(content)
+      @el.append(i) for i in content
       XModule.loadModules(@el)
     else
       $.postWithPrefix "#{@url}/conditional_get", (response) =>
-        @el.html(response.html)
+        @el.append(i) for i in response.html
         XModule.loadModules(@el)
 
