@@ -1,7 +1,8 @@
 <%
     from django.core.urlresolvers import reverse
     reqm = module.required_modules[0]
-    course_id = module.location.course_id
+    # course_id = module.location.course_id
+    course_id = module.location.org +'/' + module.location.course +'/' + module.system.ajax_url.split('/')[4]
 %>
 
 <p><a
