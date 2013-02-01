@@ -26,6 +26,7 @@ class AnnotatableModule(XModule):
          }
     js_module_name = "Annotatable"
     css = {'scss': [resource_string(__name__, 'css/annotatable/display.scss')]}
+    icon_class = 'annotatable'
 
     def _is_span(self, element):
         """ Returns true if the element is a valid annotation span, false otherwise. """
