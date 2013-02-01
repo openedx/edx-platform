@@ -10,6 +10,21 @@ import json
 
 from .common import *
 from logsettings import get_logger_config
+import os
+
+# specified as an environment variable.  Typically this is set
+# in the service's upstart script and corresponds exactly to the service name.
+# Service variants apply config differences via env and auth JSON files,
+# the names of which correspond to the variant.
+SERVICE_VARIANT = os.environ.get('SERVICE_VARIANT', None)
+
+# when not variant is specified we attempt to load an unvaried
+# config set.
+CONFIG_PREFIX = ""
+
+if SERVICE_VARIANT:
+    CONFIG_PREFIX = SERVICE_VARIANT + "."
+
 
 ############################### ALWAYS THE SAME ################################
 DEBUG = False
@@ -32,7 +47,7 @@ SECURE_PROXY_SSL_HEADER = ('HTTP_X_FORWARDED_PROTO', 'https')
 ########################### NON-SECURE ENV CONFIG ##############################
 # Things like server locations, ports, etc.
 
-with open(ENV_ROOT / "env.json") as env_file:
+with open(ENV_ROOT / CONFIG_PREFIX + "env.json") as env_file:
     ENV_TOKENS = json.load(env_file)
 
 SITE_NAME = ENV_TOKENS['SITE_NAME']
@@ -66,7 +81,7 @@ CERT_QUEUE = ENV_TOKENS.get("CERT_QUEUE", 'test-pull')
 
 ############################## SECURE AUTH ITEMS ###############################
 # Secret things: passwords, access keys, etc.
-with open(ENV_ROOT / "auth.json") as auth_file:
+with open(ENV_ROOT / CONFIG_PREFIX + "auth.json") as auth_file:
     AUTH_TOKENS = json.load(auth_file)
 
 SECRET_KEY = AUTH_TOKENS['SECRET_KEY']
