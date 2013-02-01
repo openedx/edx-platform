@@ -51,8 +51,6 @@ class ConditionalModule(XModule):
             # all required modules must be completed, as determined by
             # the modules .is_completed() method
             for module in self.required_modules:
-                # import ipdb; ipdb.set_trace()
-
                 #log.debug('in is_condition_satisfied; student_answers=%s' % module.lcp.student_answers)
                 #log.debug('in is_condition_satisfied; instance_state=%s' % module.instance_state)
                 if not hasattr(module, 'is_completed'):
@@ -66,18 +64,17 @@ class ConditionalModule(XModule):
         elif self.condition == 'answer':
             for module in self.required_modules:
                 if not hasattr(module, 'poll_answer'):
-                    raise Exception('Error in conditional module: required module %s has no answer field' % module)
+                    raise Exception('Error in conditional module: required module %s has no poll_answer field' % module)
                 answer =  self.descriptor.xml_attributes.get('answer') 
-                if answer == 'unanswered' and not module.poll_answer:
+                if answer == 'unanswered' and module.poll_answer:
                     return False
-                if module.poll_answer == answer:
-                    return True
-                else:
+                if module.poll_answer != answer:
                     return False
+            return True
         else:
             raise Exception('Error in conditional module: unknown condition "%s"' % self.condition)
 
-        return True
+        return False
 
     def get_html(self):
         self.is_condition_satisfied()
