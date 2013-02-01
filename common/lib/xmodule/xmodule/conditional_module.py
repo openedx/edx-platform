@@ -77,7 +77,7 @@ class ConditionalModule(XModule):
         return False
 
     def get_html(self):
-        self.is_condition_satisfied()
+        # self.is_condition_satisfied()
         return self.system.render_template('conditional_ajax.html', {
             'element_id': self.location.html_id(),
             'id': self.id,
