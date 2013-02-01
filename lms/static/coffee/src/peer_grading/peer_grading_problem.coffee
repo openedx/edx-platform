@@ -239,7 +239,7 @@ class PeerGradingProblem
 
     score_lst = []
     # get the score for each one
-    for i in [0..(num_categories-1)]
+    for i in [0..(num_categories-2)]
       score = $("input[name='score-selection-#{i}']:checked").val()
       score_lst.push(score)
 
@@ -315,17 +315,10 @@ class PeerGradingProblem
 
   # called after a grade is selected on the interface
   graded_callback: (event) =>
-    @grade = $("input[name='grade-selection']:checked").val()
-    if @grade == undefined
-      return
     # check to see whether or not any categories have not been scored
-    num_categories = $('table.rubric tr').length
-    for i in [0..(num_categories-1)]
-      score = $("input[name='score-selection-#{i}']:checked").val()
-      if score == undefined
-        return
-    # show button if we have scores for all categories
-    @show_submit_button()
+    if Rubric.check_complete():
+      # show button if we have scores for all categories
+      @show_submit_button()
 
   
       

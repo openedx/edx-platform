@@ -232,34 +232,13 @@ class @StaffGrading
 
 
   graded_callback: () =>
-    @grade = $("input[name='grade-selection']:checked").val()
-    if @grade == undefined
-      return
-    # check to see whether or not any categories have not been scored
-    num_categories = $('table.rubric tr').length
-    for i in [0..(num_categories-1)]
-      score = $("input[name='score-selection-#{i}']:checked").val()
-      if score == undefined
-        return
-    # show button if we have scores for all categories
-    @state = state_graded
-    @submit_button.show()
+   # show button if we have scores for all categories
+    if Rubric.check_complete()
+      @state = state_graded
+      @submit_button.show()
 
   set_button_text: (text) =>
     @action_button.attr('value', text)
-
-  # finds the scores for each rubric category
-  get_score_list: () =>
-    # find the number of categories:
-    num_categories = $('table.rubric tr').length
-
-    score_lst = []
-    # get the score for each one
-    for i in [0..(num_categories-1)]
-      score = $("input[name='score-selection-#{i}']:checked").val()
-      score_lst.push(score)
-
-    return score_lst
 
   ajax_callback: (response) =>
     # always clear out errors and messages on transition.
@@ -285,8 +264,8 @@ class @StaffGrading
 
   skip_and_get_next: () =>
     data =
-      score: @grade
-      rubric_scores: @get_score_list()
+      score: Rubric.get_total_score()
+      rubric_scores: Rubric.get_score_list()
       feedback: @feedback_area.val()
       submission_id: @submission_id
       location: @location
@@ -299,8 +278,8 @@ class @StaffGrading
 
   submit_and_get_next: () ->
     data =
-      score: @grade
-      rubric_scores: @get_score_list()
+      score: Rubric.get_total_score()
+      rubric_scores: Rubric.get_score_list()
       feedback: @feedback_area.val()
       submission_id: @submission_id
       location: @location
