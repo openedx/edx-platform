@@ -6,8 +6,7 @@ class @VideoAlpha
     @end = @el.data('end')
     @caption_data_dir = @el.data('caption-data-dir')
     @caption_asset_path = @el.data('caption-asset-path')
-    @show_captions = @el.data('show-captions') == "true"
-    window.player = null
+    @show_captions = @el.data('show-captions').toString() == "true"
     @el = $("#video_#{@id}")
     if @parseVideos(@el.data("streams")) is true
       @videoType = "youtube"

@@ -15,9 +15,6 @@ this.HTML5Video = (function () {
          * follows:
          *
          *     config = {
-         *         'width': 640,
-         *
-         *         'height': 390,
          *
          *         'videoSources': {},   // An object of with properties being video sources. The property name is the
          *                               // video format of the source. Supported video formats are: 'mp4', 'webm', and
@@ -26,11 +23,7 @@ this.HTML5Video = (function () {
          *                               // 'videoSource' option, you can later call loadVideoBySource() method to load
          *                               // a video and start playing it.
          *
-         *          'playerVars': {     // Object's properties identify player parameters.
-         *
-         *              'controls': 1,  // Possible values: 0, or 1. Value of 1 will enable the default browser video
-         *                              // controls.
-         *
+         *          'playerVars': {     // Object's properties identify player parameters.         *
          *              'start': null,  // Possible values: positive integer. Position from which to start playing the
          *                              // video. Measured in seconds. If value is null, or 'start' property is not
          *                              // specified, the video will start playing from the beginning.
@@ -47,8 +40,7 @@ this.HTML5Video = (function () {
          *                              // called for that event.
          *
          *              'onReady': null,
-         *              'onStateChange': null,
-         *              'onPlaybackQualityChange': null
+         *              'onStateChange': null
          *          }
          *     }
          */
@@ -172,40 +164,6 @@ this.HTML5Video = (function () {
             this.videoEl.appendTo(this.el.find('.video-player div'));
         }
 
-        /*
-         * This function returns the quality of the video. Possible return values are (type String)
-         *
-         *     highres
-         *     hd1080
-         *     hd720
-         *     large
-         *     medium
-         *     small
-         *
-         * It returns undefined if there is no current video.
-         *
-         * If there is a current video, but it is impossible to determine it's quality, the function will return
-         * 'medium'.
-         */
-        Player.prototype.getPlayBackQuality = function () {
-            if (this.config.videoSource === '') {
-                return undefined;
-            }
-
-            // TODO: Figure out if we can get the quality of a video from a source (when it is loaded by the browser).
-
-            return 'medium';
-        };
-
-        /*
-         * The original YouTube API function player.setPlaybackQuality changed (if it was possible) the quality of the
-         * played video. In our case, this function will not do anything because we can't change the quality of HTML5
-         * video since we only get one source of video with one quality.
-         */
-        Player.prototype.setPlaybackQuality = function (value) {
-
-        };
-
         Player.prototype.pauseVideo = function () {
             this.video.pause();
         };
@@ -214,28 +172,6 @@ this.HTML5Video = (function () {
             if ((typeof value === 'number') && (value <= this.video.duration) && (value >= 0)) {
                 this.video.currentTime = value;
             }
-        };
-
-        // YouTube API has player.loadVideoById, but since we are working with a video source, we will rename this
-        // function accordingly. However, not to cause conflicts, there will also be a loadVideoById function which
-        // will call this function.
-        Player.prototype.loadVideoBySource = function (source) {
-
-        };
-
-        Player.prototype.loadVideoById = function (id) {
-            this.loadVideoBySource(id);
-        }
-
-        // YouTube API has player.cueVideoById, but since we are working with a video source, we will rename this
-        // function accordingly. However, not to cause conflicts, there will also be a cueVideoById function which
-        // will call this function.
-        Player.prototype.cueVideoBySource = function (source) {
-
-        };
-
-        Player.prototype.cueVideoById = function (id) {
-            this.cueVideoBySource(id);
         };
 
         Player.prototype.setVolume = function (value) {
@@ -253,7 +189,7 @@ this.HTML5Video = (function () {
         };
 
         Player.prototype.getPlayerState = function () {
-
+            return this.playerState;
         };
 
         Player.prototype.getVolume = function () {
@@ -272,7 +208,11 @@ this.HTML5Video = (function () {
             if (isFinite(newSpeed) === true) {
                 this.video.playbackRate = value;
             }
-        }
+        };
+
+        Player.prototype.getAvailablePlaybackRates = function () {
+            return [0.75, 1.0, 1.25, 1.5];
+        };
 
         return Player;
     }());
