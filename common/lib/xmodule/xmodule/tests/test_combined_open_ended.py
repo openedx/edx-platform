@@ -39,7 +39,8 @@ class OpenEndedChildTest(unittest.TestCase):
             'prompt': prompt,
             'rubric': rubric,
             'max_score': max_score, 
-            'display_name': 'Name'
+            'display_name': 'Name',
+            'accept_file_upload' : False,
             }
     definition = Mock()
     descriptor = Mock()
@@ -152,7 +153,8 @@ class OpenEndedModuleTest(unittest.TestCase):
             'prompt': prompt,
             'rubric': rubric,
             'max_score': max_score, 
-            'display_name': 'Name'
+            'display_name': 'Name',
+            'accept_file_upload': False,
             }
 
     oeparam = etree.XML('''
@@ -270,7 +272,7 @@ class CombinedOpenEndedModuleTest(unittest.TestCase):
         <option>The response is not a satisfactory answer to the question.  It either fails to address the question or does so in a limited way, with no evidence of higher-order thinking.</option>
         </category>
          </rubric></rubric>'''
-    max_score = 4
+    max_score = 3
 
     metadata = {'attempts': '10', 'max_score': max_score}
 

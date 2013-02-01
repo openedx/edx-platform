@@ -3,6 +3,7 @@
    <div class="prompt">
     ${prompt|n}
    </div>
+  <h4>Answer</h4>
   <textarea rows="${rows}" cols="${cols}" name="answer" class="answer short-form-response" id="input_${id}">${previous_answer|h}</textarea>
 
   <div class="message-wrapper"></div>
@@ -21,6 +22,8 @@
       <div style="display:none;" name="${hidden}" inputid="input_${id}" />
     % endif
   </div>
+
+  <div class="file-upload"></div>
 
   <input type="button" value="Submit" class="submit-button" name="show"/>
   <input name="skip" class="skip-button" type="button" value="Skip Post-Assessment"/>
