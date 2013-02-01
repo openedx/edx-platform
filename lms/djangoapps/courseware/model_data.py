@@ -25,7 +25,7 @@ def chunks(items, chunk_size):
 class ModelDataCache(object):
     """
     A cache of django model objects needed to supply the data
-    for a module and its decendents
+    for a module and its decendants
     """
     def __init__(self, descriptors, course_id, user, select_for_update=False):
         '''
@@ -35,10 +35,10 @@ class ModelDataCache(object):
         state will have a StudentModule.
 
         Arguments
-        descriptors: An array of XModuleDescriptors.
+        descriptors: A list of XModuleDescriptors.
         course_id: The id of the current course
         user: The user for which to cache data
-        select_for_update: Flag indicating whether the rows should be locked until end of transaction
+        select_for_update: True if rows should be locked until end of transaction
         '''
         self.cache = {}
         self.descriptors = descriptors

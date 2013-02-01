@@ -131,7 +131,8 @@ class TestStudentModuleStorage(TestCase):
 
     def setUp(self):
         self.desc_md = {}
-        self.user = UserFactory.create()
+        student_module = StudentModuleFactory(state=json.dumps({'a_field': 'a_value'}))
+        self.user = student_module.student
         self.mdc = ModelDataCache([mock_descriptor([mock_field(Scope.student_state, 'a_field')])], course_id, self.user)
         self.kvs = LmsKeyValueStore(self.desc_md, self.mdc)
 
@@ -159,7 +160,7 @@ class TestStudentModuleStorage(TestCase):
         "Test that deleting an existing field removes it from the StudentModule"
         self.kvs.delete(student_state_key('a_field'))
         self.assertEquals(1, StudentModule.objects.all().count())
-        self.assertEquals({}, self.mdc.find.return_value.state)
+        self.assertRaises(KeyError, self.kvs.get, student_state_key('not_a_field'))
 
     def test_delete_missing_field(self):
         "Test that deleting a missing field from an existing StudentModule raises a KeyError"
