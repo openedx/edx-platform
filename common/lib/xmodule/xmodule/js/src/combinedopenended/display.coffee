@@ -16,6 +16,10 @@ class @Rubric
 
   @get_total_score: () ->
     score_lst = @get_score_list()
+    tot = 0
+    for score in score_lst
+      tot += parseInt(score)
+    return tot
 
   @check_complete: () ->
      # check to see whether or not any categories have not been scored
