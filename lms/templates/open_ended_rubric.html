@@ -22,14 +22,14 @@
             <th>${category['description']}</th>
             % for j in range(len(category['options'])):
                 <% option = category['options'][j] %>
+            %if option['selected']:
+            <td class="selected-grade">
+            %else:
             <td>
+            % endif
                 % if view_only:
                     ## if this is the selected rubric block, show it highlighted
-                    % if option['selected']:
-                        <div class="rubric-label selected-grade">
-                    % else:
                         <div class="rubric-label">
-                    % endif
                         ${option['text']}
                         </div>
                 % else:
