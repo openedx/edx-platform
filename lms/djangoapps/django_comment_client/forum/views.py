@@ -178,8 +178,6 @@ def forum_form_discussion(request, course_id):
             'is_course_cohorted': is_course_cohorted(course_id)
         }
         # print "start rendering.."
-        print "\n\n\n\n*******************************"
-        print context
         return render_to_response('discussion/index.html', context)
 
 @login_required

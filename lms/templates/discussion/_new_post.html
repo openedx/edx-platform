@@ -52,7 +52,7 @@
                     <div class="form-group-label choose-cohort">
                         Make visible to:
                         <select class="group-filter-select new-post-group" name = "group_id"> 
-                            <option >All Groups</option>
+                            <option value="">All Groups</option>
                             %if is_moderator:
                               %for c in cohorts:
                                 <option value="${c.id}">${c.name}</option>

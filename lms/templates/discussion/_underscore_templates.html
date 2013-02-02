@@ -26,7 +26,7 @@
   <div class="discussion-post">
       <div><a href="javascript:void(0)" class="dogear action-follow" data-tooltip="follow"></a></div>
       <header>
-          %if thread['group_id']
+          %if group_id:
             <div class="group-visibility-label">This post visible only to Group ${cohort_dictionary[thread['group_id']]}.</div>
           %endif
           <a href="#" class="vote-btn discussion-vote discussion-vote-up" data-role="discussion-vote" data-tooltip="vote"><span class="plus-icon">+</span> <span class='votes-count-number'>${'<%- votes["up_count"] %>'}</span></a>
