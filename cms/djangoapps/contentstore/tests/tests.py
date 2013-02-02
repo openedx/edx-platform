@@ -9,23 +9,26 @@ from path import path
 from tempfile import mkdtemp
 import json
 from fs.osfs import OSFS
-
+import copy
 
 from student.models import Registration
 from django.contrib.auth.models import User
-import xmodule.modulestore.django
-from xmodule.modulestore.xml_importer import import_from_xml
-import copy
-from factories import *
+from cms.djangoapps.contentstore.utils import get_modulestore
 
+from xmodule.modulestore import Location
 from xmodule.modulestore.store_utilities import clone_course
 from xmodule.modulestore.store_utilities import delete_course
-from xmodule.modulestore.django import modulestore
+from xmodule.modulestore.django import modulestore, _MODULESTORES
 from xmodule.contentstore.django import contentstore
-from xmodule.course_module import CourseDescriptor
+from xmodule.templates import update_templates
 from xmodule.modulestore.xml_exporter import export_to_xml
-from cms.djangoapps.contentstore.utils import get_modulestore
+from xmodule.modulestore.xml_importer import import_from_xml
+
 from xmodule.capa_module import CapaDescriptor
+from xmodule.course_module import CourseDescriptor
+from xmodule.seq_module import SequenceDescriptor
+
+from xmodule.modulestore.tests.factories import CourseFactory, ItemFactory
 
 def parse_json(response):
     """Parse response, which is assumed to be json"""
@@ -217,9 +220,9 @@ class ContentStoreTest(TestCase):
         # (though it shouldn't), do this manually
         # from the bash shell to drop it:
         # $ mongo test_xmodule --eval "db.dropDatabase()"
-        xmodule.modulestore.django._MODULESTORES = {}
-        xmodule.modulestore.django.modulestore().collection.drop()
-        xmodule.templates.update_templates()
+        _MODULESTORES = {}
+        modulestore().collection.drop()
+        update_templates()
 
         self.client = Client()
         self.client.login(username=uname, password=password)
@@ -237,8 +240,8 @@ class ContentStoreTest(TestCase):
         # cms/djangoapps/contentstore/__init__.py
         # update_templates() will try to update the templates
         # via upsert and it sometimes seems to be messing things up.
-        xmodule.modulestore.django._MODULESTORES = {}
-        xmodule.modulestore.django.modulestore().collection.drop()
+        _MODULESTORES = {}
+        modulestore().collection.drop()
 
     def test_create_course(self):
         """Test new course creation - happy path"""
@@ -288,12 +291,12 @@ class ContentStoreTest(TestCase):
 
     def test_course_factory(self):
         course = CourseFactory.create()
-        self.assertIsInstance(course, xmodule.course_module.CourseDescriptor)
+        self.assertIsInstance(course, CourseDescriptor)
 
     def test_item_factory(self):
         course = CourseFactory.create()
         item = ItemFactory.create(parent_location=course.location)
-        self.assertIsInstance(item, xmodule.seq_module.SequenceDescriptor)
+        self.assertIsInstance(item, SequenceDescriptor)
 
     def test_course_index_view_with_course(self):
         """Test viewing the index page with an existing course"""
