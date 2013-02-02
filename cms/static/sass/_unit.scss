@@ -74,7 +74,9 @@
 
       &.new-component-item {
         border-radius: 3px;
+        border: 1px solid $mediumGrey;
         background: #fff;
+        @include box-shadow(0 1px 1px rgba(0, 0, 0, .2), 0 1px 0 rgba(255, 255, 255, .4) inset);
 
         .new-component-button {
           display: block;
@@ -105,7 +107,7 @@
 
           a {
             border: 1px solid $mediumGrey;
-            width: 140px;
+            width: 100px;
             height: 100px;
             color: #edf1f5;
             margin-right: 15px;
@@ -123,7 +125,7 @@
               width: 100%;
               padding: 10px;
               @include box-sizing(border-box);
-              color: #4F8BC4;
+              color: #fff;
             }
           }
         }
@@ -143,11 +145,19 @@
             @include white-button;
           }
 
+          .problem-type-tabs {
+            display: none;
+          }
+
           // specific menu types
           &.new-component-problem {
 
             .ss-icon, .editor-indicator {
               display: inline-block;
+            }
+
+            .problem-type-tabs {
+              display: block;
             }
           }
         }
@@ -158,21 +168,19 @@
 
           a {
             position: relative;            
-            background: #fff;
-            color: #4F8BC4; 
-            line-height: 2;
-            font-size: 18px;           
+            border: 1px solid $darkGreen;
+            background: tint($green,20%);
+            color: #fff;            
             @include transition(background-color .15s);
 
             &:hover {
-              background: #fffcf1;
+              background: $brightGreen;
             }
           }
         }
 
         .problem-type-tabs {
           list-style-type: none;
-
           display: block;
           line-height: 2;
           border-bottom: 1px solid $mediumGrey;
@@ -207,20 +215,34 @@
 
         .new-component-template {
 
+          a {
+            background: #fff;
+            border: 0px;
+            color: #4F8BC4;
+
+            &:hover {
+              border-radius: 0px;
+              background: tint($green,30%);
+              color: #edf1f5;            
+              @include transition(background-color .15s);
+            }
+          }
+
           li {
+              border:none;
               border-bottom: 1px dashed $lightGrey;
+              color: #fff;      
           }
 
           li:last-child {
             a {
-              border-radius: 0 0 3px 3px;
-              border:none;
+              border-radius: 0px;
             }
           }
 
           li:nth-child(2) {
             a {
-              border-radius: 3px 3px 0 0;
+              border-radius: 0px;
             }
           }
 
@@ -297,7 +319,7 @@
           text-align: center;
 
           h5 {
-            color: #6696d7;
+            color: $darkGreen;
           }
           
         }
