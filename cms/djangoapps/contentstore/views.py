@@ -31,7 +31,7 @@ from xmodule.modulestore.exceptions import ItemNotFoundError, InvalidLocationErr
 from xmodule.x_module import ModuleSystem
 from xmodule.error_module import ErrorDescriptor
 from xmodule.errortracker import exc_info_to_str
-from static_replace import replace_urls
+from static_replace import replace_static_urls
 from external_auth.views import ssl_login_shortcut
 
 from mitxmako.shortcuts import render_to_response, render_to_string
@@ -473,7 +473,7 @@ def preview_module_system(request, preview_id, descriptor):
         get_module=partial(get_preview_module, request, preview_id),
         render_template=render_from_lms,
         debug=True,
-        replace_urls=replace_urls,
+        replace_urls=partial(replace_static_urls, data_directory=None, course_namespace=descriptor.location),
         user=request.user,
     )
 
@@ -915,7 +915,7 @@ def reorder_static_tabs(request):
     # get list of existing static tabs in course
     # make sure they are the same lengths (i.e. the number of passed in tabs equals the number
     # that we know about) otherwise we can drop some!
-        
+
     existing_static_tabs = [t for t in course.tabs if t['type'] == 'static_tab']
     if len(existing_static_tabs) != len(tabs):
         return HttpResponseBadRequest()
@@ -934,15 +934,15 @@ def reorder_static_tabs(request):
     static_tab_idx = 0
     for tab in course.tabs:
         if tab['type'] == 'static_tab':
-            reordered_tabs.append({'type': 'static_tab', 
-                'name' : tab_items[static_tab_idx].metadata.get('display_name'), 
+            reordered_tabs.append({'type': 'static_tab',
+                'name' : tab_items[static_tab_idx].metadata.get('display_name'),
                 'url_slug' : tab_items[static_tab_idx].location.name})
             static_tab_idx += 1
         else:
             reordered_tabs.append(tab)
 
 
-    # OK, re-assemble the static tabs in the new order        
+    # OK, re-assemble the static tabs in the new order
     course.tabs = reordered_tabs
     modulestore('direct').update_metadata(course.location, course.metadata)
     return HttpResponse()

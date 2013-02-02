@@ -19,7 +19,7 @@ from xmodule.contentstore.content import StaticContent
 from xmodule.modulestore.xml import XMLModuleStore
 from xmodule.modulestore.exceptions import ItemNotFoundError
 from xmodule.x_module import XModule
-from static_replace import replace_urls, try_staticfiles_lookup
+from static_replace import replace_static_urls
 from courseware.access import has_access
 import branding
 from courseware.models import StudentModuleCache
@@ -223,8 +223,11 @@ def get_course_syllabus_section(course, section_key):
             dirs = [path("syllabus") / course.url_name, path("syllabus")]
             filepath = find_file(fs, dirs, section_key + ".html")
             with fs.open(filepath) as htmlFile:
-                return replace_urls(htmlFile.read().decode('utf-8'),
-                                    course.metadata['data_dir'], course_namespace=course.location)
+                return replace_static_urls(
+                    htmlFile.read().decode('utf-8'),
+                    course.metadata['data_dir'],
+                    course_namespace=course.location
+                )
         except ResourceNotFoundError:
             log.exception("Missing syllabus section {key} in course {url}".format(
                 key=section_key, url=course.location.url()))
