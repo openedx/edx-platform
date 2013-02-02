@@ -6,7 +6,7 @@
 
 body {
     min-width: 980px;
-    background: rgb(240, 241, 245);
+    background: $m-gray-l;
     font-size: 16px;
     line-height: 1.6;
     color: $baseFontColor;
@@ -40,6 +40,12 @@ h1 {
 
 .page-actions {
     margin-bottom: 30px;
+}
+
+.wrapper {
+  @include clearfix();
+  @include box-sizing(border-box);
+  width: 100%;
 }
 
 .main-wrapper {
@@ -417,4 +423,9 @@ body.show-wip {
     font-size: 20px;
     color: rgba(0, 0, 0, 0.85);
   }
+}
+
+// basic utility
+.sr {
+  @include text-sr();
 }

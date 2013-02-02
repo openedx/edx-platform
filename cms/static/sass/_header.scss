@@ -1,109 +1,348 @@
-body.no-header {
-	.primary-header {
-		display: none;
-	}
+// header
+.wrapper-header {
+  margin: 0 0 ($baseline*1.5) 0;
+  padding: $baseline;
+  border-bottom: 1px solid tint($m-gray, 50%);
+  @include box-shadow(0 1px 5px 0 rgba(0,0,0, 0.1));
+  background: $white;
+  height: 76px;
+  position: relative;
+  width: 100%;
+  z-index: 10;
+
+  a {
+    color: $baseFontColor;
+    display: block;
+
+    &:hover, &:active {
+      color: $blue;
+    }
+  }
 }
 
-@mixin active {
-	@include linear-gradient(top, rgba(255, 255, 255, .4), rgba(255, 255, 255, 0));
-	background-color: rgba(255, 255, 255, .3);
-	@include box-shadow(0 -1px 0 rgba(0, 0, 0, .2) inset, 0 1px 0 #fff inset);
-	text-shadow: 0 1px 0 rgba(255, 255, 255, 0.5);
+.header {
+  @include clearfix();
+  max-width: 1280px;
+  margin: 0 auto;
+  color: $lightGrey;
 }
 
-.primary-header {
-	width: 100%;
-	margin-bottom: 30px;
+.branding, .info-course, .nav-course, .nav-account {
+  display: inline-block;
+  vertical-align: top;
+}
 
-	&.active-tab-courseware #courseware-tab {
-		@include active;
-	}
+.branding, .info-course, .nav-course {
+  margin: 0 ($baseline*0.75) 0 0;
+}
 
-	&.active-tab-assets #assets-tab {
-		@include active;
-	}
-	
-	&.active-tab-pages #pages-tab {
-		@include active;
-	}
+.branding {
+  position: relative;
+  padding-right: 15px;
 
-	&.active-tab-users #users-tab {
-		@include active;
-	}
+  a {
+    @include text-hide();
+    display: block;
+    width: 164px;
+    height: 32px;
+    background: transparent url('../img/logo-edx-studio.png') 0 0 no-repeat;
+  }
 
-	&.active-tab-settings #settings-tab {
-		@include active;
-	}
+  &:before {
+    @extend .faded-vertical-divider;
+    content: "";
+    display: block;
+    height: 50px;
+    position: absolute;
+    right: 1px;
+    top: -8px;
+    width: 1px;
+  }
 
-	&.active-tab-import #import-tab {
-		@include active;
-	}
+  &:after {
+    @extend .faded-vertical-divider-light;
+    content: "";
+    display: block;
+    height: 50px;
+    position: absolute;
+    right: 0px;
+    top: -12px;
+    width: 1px;
+  }
+}
 
-	&.active-tab-export #export-tab {
-		@include active;
-	}
+.info-course {
+  position: relative;
+  max-width: 500px;
+  min-width: 200px;
+  width: 23%;
+  padding-right: 15px;
+  font-size: 14px;
 
-	.drop-icon {
-		margin-left: 5px;
-		font-size: 11px;
-	}
+  &:before {
+    @extend .faded-vertical-divider;
+    content: "";
+    display: block;
+    height: 50px;
+    position: absolute;
+    right: 1px;
+    top: -8px;
+    width: 1px;
+  }
 
-	.settings-icon {
-		font-size: 18px;
-		line-height: 18px;
-	}
+  &:after {
+    @extend .faded-vertical-divider-light;
+    content: "";
+    display: block;
+    height: 50px;
+    position: absolute;
+    right: 0px;
+    top: -12px;
+    width: 1px;
+  }
 
-	.class-nav-bar {
-		clear: both;
-		@include linear-gradient(top, rgba(255, 255, 255, .4), rgba(255, 255, 255, 0));
-		background-color: $lightBluishGrey;
-		@include box-shadow(0 1px 0 rgba(255, 255, 255, 0.2) inset, 0 -1px 0 rgba(0, 0, 0, 0.2) inset);
-	}
+  .course-number, .course-title {
+    display: block;
+  }
 
-	.class-nav {
-		@include clearfix;		
+  .course-number {
+    font-size: 12px;
+  }
 
-		a {
-			float: left;
-			display: inline-block;
-			padding: 15px 25px 17px;
-			font-size: 15px;
-			color: #3c3c3c;
-			text-shadow: 0 1px 0 rgba(255, 255, 255, 0.3);
+  .course-title {
+    width: 100%;
+    overflow: hidden;
+    white-space: nowrap;
+    text-overflow: ellipsis;
+    font-size: 16px;
+    font-weight: 600;
 
-			&:hover {
-				@include linear-gradient(top, rgba(255, 255, 255, .2), rgba(255, 255, 255, 0));
-			}
-		}
+  }
+}
 
-		li {
-			float: left;
-		}
-	}
+.nav-course {
+  width: 275px;
+  margin-top: -($baseline/4);
+  font-size: 14px;
 
-	.class {
-		@include clearfix;
-		height: 100%;
-		font-size: 12px;
-		color: rgb(163, 171, 184);
-		@include linear-gradient(top, rgba(255, 255, 255, 0), rgba(255, 255, 255, .1));
-		background-color: rgb(47, 53, 63);
+  ol {
+    @include clearfix();
+  }
 
-		a {
-			display: inline-block;
-			height: 20px;
-			padding: 5px 10px 6px;
-			color: rgb(163, 171, 184);			
-		}
+  .nav-item {
+    display: inline-block;
+    vertical-align: bottom;
+    margin: 0 ($baseline/2) 0 0;
 
-		.home {
-			position: relative;
-			top: 1px;
-		}
+    &:last-child {
+      margin-right: 0;
+    }
 
-		.log-out {
-			position: relative;
-			top: 3px;
-		}
-	}
+    .title {
+      display: block;
+      padding: 5px;
+      text-transform: uppercase;
+
+      &:hover, &:active {
+        color: $blue;
+      }
+
+      .label-prefix {
+        display: block;
+        font-size: 11px;
+      }
+
+      .ss-icon {
+       
+      }
+
+      &.is-selected {
+        color: $blue;
+      }
+    }
+
+    // current state
+    &.is-current {
+
+      .title {
+        color: $blue;
+      }
+    }
+
+    // specific nav items
+    &.nav-course-courseware {
+    }
+
+    &.nav-course-settings {
+    }
+
+    &.nav-course-tools {
+    }
+  }
+}
+
+.nav-account {
+  float: right;
+  max-width: 300px;
+  min-width: 175px;
+  width: 20%;
+  margin-top: 10px;
+  font-size: 14px;
+  text-align: right;
+
+  .nav-account-username {
+    .ss-icon {
+      display: inline-block;
+      vertical-align: middle;
+      margin-right: 3px;
+      font-size: 12px;
+    }
+
+    .account-username {
+      display: inline-block;
+      width: 80%;
+      overflow: hidden;
+      white-space: nowrap;
+      text-overflow: ellipsis;
+    }
+  }
+}
+
+// dropdown UI
+.nav-dropdown {
+
+  .nav-item {
+    position: relative;
+  }
+
+  .nav-sub {
+    @include border-radius(2px);
+    position: absolute;
+    top: 30px;
+    width: 125px;
+    border: 1px solid tint($m-gray, 50%);
+    padding: ($baseline/4) ($baseline/2);
+    @include box-shadow(0 1px 5px 0 rgba(0,0,0, 0.1));
+    background: $white;
+
+    li {
+      margin: 0 0 ($baseline/4) 0;
+      border-bottom: 1px solid tint($m-gray, 75%);
+      padding: 0 0($baseline/4) 0;
+      font-size: 13px;
+
+      &:last-child {
+        margin-bottom: 0;
+        border-bottom: none;
+        padding-bottom: 0;
+      }
+
+      a {
+        display: block;
+      }
+    }
+
+    // arrows
+    &:after, &:before {
+
+    }
+
+    &:after {
+
+    }
+
+    &:before {
+
+    }
+  }
+
+  // vendor
+  .arrow_box {
+    position: relative;
+    background: #fff;
+    border: 1px solid #a1a1a1;
+  }
+  .arrow_box:after, .arrow_box:before {
+    bottom: 100%;
+    border: solid transparent;
+    content: " ";
+    height: 0;
+    width: 0;
+    position: absolute;
+    pointer-events: none;
+  }
+
+  .arrow_box:after {
+    border-color: rgba(255, 255, 255, 0);
+    border-bottom-color: #fff;
+    border-width: 10px;
+    left: 50%;
+    margin-left: -10px;
+  }
+  .arrow_box:before {
+    border-color: rgba(161, 161, 161, 0);
+    border-bottom-color: #a1a1a1;
+    border-width: 11px;
+    left: 50%;
+    margin-left: -11px;
+  }
+
+  // specific navs
+  &.nav-account {
+
+    .nav-sub {
+      right: 0;
+      text-align: left;
+    }
+  }
+
+  &.nav-course {
+
+    .nav-sub {
+      left: -5px;
+    }
+
+    .nav-course-courseware {
+
+      .nav-sub {
+        top: 50px;
+      }
+    }
+
+    .nav-course-settings {
+
+      .nav-sub {
+        top: 50px;
+      }
+    }
+
+    .nav-course-tools {
+
+      .nav-sub {
+      
+      }
+    }
+  }
+}
+
+// js enabled 
+.js {
+
+  .nav-dropdown {
+
+    .nav-item .title {
+      cursor: pointer;
+    }
+  }
+
+  .nav-sub {
+    @include transition (opacity 1.0s ease-in-out 0s);
+    opacity: 0;
+    pointer-events: none;
+
+    &.is-shown {
+      opacity: 1.0;
+      pointer-events: auto;
+    }
+  }
 }
