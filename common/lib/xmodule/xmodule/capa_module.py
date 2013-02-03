@@ -403,6 +403,10 @@ class CapaModule(XModule):
         # return self.answer_available()
         return self.lcp.done
 
+    def is_attempted(self):
+        # used by conditional module
+        return self.attempts > 0
+
     def answer_available(self):
         ''' Is the user allowed to see an answer?
         '''

@@ -19,6 +19,10 @@ class ConditionalModule(XModule):
             <video url_name="secret_video" />
         </conditional>
 
+        <conditional condition="require_attempted" required="tag/url_name1&tag/url_name2">
+            <video url_name="secret_video" />
+        </conditional>
+
     '''
 
     js = {'coffee': [resource_string(__name__, 'js/src/conditional/display.coffee'),
@@ -62,6 +66,18 @@ class ConditionalModule(XModule):
                 if not hasattr(module, 'is_completed'):
                     raise Exception('Error in conditional module: required module %s has no .is_completed() method' % module)
                 if not module.is_completed():
+                    log.debug('conditional module: %s not completed' % module)
+                    return False
+                else:
+                    log.debug('conditional module: %s IS completed' % module)
+            return True
+        elif self.condition=='require_attempted':
+            # all required modules must be attempted, as determined by
+            # the modules .is_attempted() method
+            for module in self.required_modules:
+                if not hasattr(module, 'is_attempted'):
+                    raise Exception('Error in conditional module: required module %s has no .is_attempted() method' % module)
+                if not module.is_attempted():
                     log.debug('conditional module: %s not completed' % module)
                     return False
                 else:
