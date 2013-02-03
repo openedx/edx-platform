@@ -109,7 +109,7 @@
             border: 1px solid $mediumGrey;
             width: 100px;
             height: 100px;
-            color: #edf1f5;
+            color: #fff;
             margin-right: 15px;
             margin-bottom: 15px;
             border-radius: 8px;
@@ -132,16 +132,17 @@
 
         .new-component-templates {
           display: none;
-          padding: 20px;
           @include clearfix;
 
           .tab-group {
-            border-radius: 4px;
-            border: 1px solid $mediumGrey;
+            border-bottom-right-radius: 3px;
+            border-bottom-left-radius: 3px;
+            color: #3c3c3c;
+            text-shadow: 0 1px 0 rgba(255, 255, 255, 0.3);
           }
 
           .cancel-button {
-            margin-top: 20px;
+            margin: 20px 0px 10px 10px;
             @include white-button;
           }
 
@@ -157,7 +158,7 @@
             }
 
             .problem-type-tabs {
-              display: block;
+              display: inline-block;
             }
           }
         }
@@ -181,35 +182,46 @@
 
         .problem-type-tabs {
           list-style-type: none;
-          display: block;
-          line-height: 2;
-          border-bottom: 1px solid $mediumGrey;
-          background:none;
-          padding: 6px 14px;
+          width: 100%;
+          background-color: $lightBluishGrey;
+          border-top-left-radius: 3px;
+          border-top-right-radius: 3px;
 
-          .problem-type-label {
-            font-size: 16px;
-            text-align: center;
-            color: $mediumGrey;
+          li:first-child {
+            border-top-left-radius: 3px;
           }
 
+          li:last-child {
+            border-top-right-radius: 3px;
+          }
           li {
-            float: right;
+            float:left;
             display:inline-block;
-            width: 100px;
             text-align:center;
-            @include border-radius(5px 5px 5px 5px);
+            width: 50%;
+            @include linear-gradient(top, rgba(255, 255, 255, .4), rgba(255, 255, 255, 0));
+            background-color: $lightBluishGrey;
+            @include box-shadow(0 1px 0 rgba(255, 255, 255, 0.2) inset, 0 -1px 0 rgba(0, 0, 0, 0.2) inset);
+            
+            &:hover {
+              opacity: .7;
+              @include linear-gradient(top, rgba(255, 255, 255, .2), rgba(255, 255, 255, 0));
+            }
 
             &.current {
-              background: #edf1f5;
+              border: 0px;
+              @include active;
             }
           }
+
           a{
-            padding: 4px 10px;
-            border-radius: 3px;
-            font-size: 16px;
+            display: block;
+            padding: 10px 25px;
+            font-size: 14px;
             line-height: 16px;
             text-align: center;
+            color: #3c3c3c;
+            text-shadow: 0 1px 0 rgba(255, 255, 255, 0.3);
           }
         }
 
@@ -218,12 +230,11 @@
           a {
             background: #fff;
             border: 0px;
-            color: #4F8BC4;
+            color: #3c3c3c;
 
             &:hover {
-              border-radius: 0px;
-              background: tint($green,30%);
-              color: #edf1f5;            
+              background: tint($green,30%); 
+              color: #fff;        
               @include transition(background-color .15s);
             }
           }
@@ -234,9 +245,9 @@
               color: #fff;      
           }
 
-          li:last-child {
+          li:first-child {
             a {
-              border-radius: 0px;
+              border-top: 0px;
             }
           }
 
@@ -284,7 +295,7 @@
             }
 
             &:hover {
-              color: #CB9C40;
+              color: #fff;
 
               .ss-icon {
                 opacity: 1.0;
@@ -298,18 +309,17 @@
 
           // specific editor types 
           .empty {
-            margin-bottom: 0px 0px 0px 25px;
 
             a {
-              font-size: 18px;
-              line-height: 2;
-              font-weight: 500;
+              line-height: 1.4;
+              font-weight: 400;
               background: #fff;
-              color: #4F8BC4;
+              color: #3c3c3c;
+
 
               &:hover {
-              background: #fffcf1;
-              color: #CB9C40;
+              background: tint($green,30%); 
+              color: #fff;
             }
             }
           }
