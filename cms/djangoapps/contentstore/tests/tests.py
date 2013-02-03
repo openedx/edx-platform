@@ -29,6 +29,7 @@ from xmodule.course_module import CourseDescriptor
 from xmodule.seq_module import SequenceDescriptor
 
 from xmodule.modulestore.tests.factories import CourseFactory, ItemFactory
+from .utils import CmsTestCase
 
 def parse_json(response):
     """Parse response, which is assumed to be json"""
@@ -196,7 +197,7 @@ TEST_DATA_MODULESTORE['default']['OPTIONS']['fs_root'] = path('common/test/data'
 TEST_DATA_MODULESTORE['direct']['OPTIONS']['fs_root'] = path('common/test/data')
 
 @override_settings(MODULESTORE=TEST_DATA_MODULESTORE)
-class ContentStoreTest(TestCase):
+class ContentStoreTest(CmsTestCase):
 
     def setUp(self):
         uname = 'testuser'
@@ -213,17 +214,6 @@ class ContentStoreTest(TestCase):
         self.user.is_staff = True
         self.user.save()
 
-        # Flush and initialize the module store
-        # It needs the templates because it creates new records
-        # by cloning from the template.
-        # Note that if your test module gets in some weird state
-        # (though it shouldn't), do this manually
-        # from the bash shell to drop it:
-        # $ mongo test_xmodule --eval "db.dropDatabase()"
-        _MODULESTORES = {}
-        modulestore().collection.drop()
-        update_templates()
-
         self.client = Client()
         self.client.login(username=uname, password=password)
 
@@ -233,15 +223,6 @@ class ContentStoreTest(TestCase):
             'number': '999',
             'display_name': 'Robot Super Course',
             }
-
-    def tearDown(self):
-        # Make sure you flush out the test modulestore after the end
-        # of the last test because otherwise on the next run
-        # cms/djangoapps/contentstore/__init__.py
-        # update_templates() will try to update the templates
-        # via upsert and it sometimes seems to be messing things up.
-        _MODULESTORES = {}
-        modulestore().collection.drop()
 
     def test_create_course(self):
         """Test new course creation - happy path"""
