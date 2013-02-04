@@ -16,6 +16,7 @@ from contentstore import utils
   
   <script type="text/javascript" src="${static.url('js/template_loader.js')}"></script>
   <script type="text/javascript" src="${static.url('js/models/course_relative.js')}"></script>
+  <script type="text/javascript" src="${static.url('js/models/settings/advanced.js')}"></script>
   <script type="text/javascript" src="${static.url('js/models/settings/course_details.js')}"></script>
   <script type="text/javascript" src="${static.url('js/models/settings/course_settings.js')}"></script>
   <script type="text/javascript" src="${static.url('js/models/settings/course_grading_policy.js')}"></script>
@@ -24,11 +25,13 @@ from contentstore import utils
   
   <script type="text/javascript">
     $(document).ready(function(){
-    
+
         var settingsModel = new CMS.Models.Settings.CourseSettings({
             courseLocation: new CMS.Models.Location('${context_course.location}',{parse:true}),
             details: new CMS.Models.Settings.CourseDetails(${course_details|n},{parse:true})
         });
+
+        var advancedSettingsModel = new CMS.Models.Settings.Advanced({});
         
         var editor = new CMS.Views.Settings.Main({
             el: $('.main-wrapper'),
@@ -752,7 +755,7 @@ from contentstore import utils
                         <div class="value">
                           <label for="course-advanced-policy-1-value">Policy Value:</label>
                           <div class="field">
-                            <textarea class="ace text" id="course-advanced-policy-1-value"></textarea>
+                            <div class="ace text" id="course-advanced-policy-1-value">some existing text</div>
                           </div>      
                         </div>
                       </div>

@@ -261,7 +261,6 @@ def edit_unit(request, location):
             break
 
     lms_link = get_lms_link_for_item(item.location)
-    preview_lms_link = get_lms_link_for_item(item.location, preview=True)
 
     component_templates = defaultdict(list)
 
@@ -1432,7 +1431,6 @@ def import_course(request, org, course, name):
 @login_required
 def generate_export_course(request, org, course, name):
     location = ['i4x', org, course, 'course', name]
-    course_module = modulestore().get_item(location)
     # check that logged in user has permissions to this item
     if not has_access(request.user, location):
         raise PermissionDenied()
@@ -1479,3 +1477,10 @@ def export_course(request, org, course, name):
         'active_tab': 'export',
         'successful_import_redirect_url' : ''
     })
+
+def event(request):
+    '''
+    A noop to swallow the analytics call so that cms methods don't spook and poor developers looking at
+    console logs don't get distracted :-)
+    '''
+    return HttpResponse(True)

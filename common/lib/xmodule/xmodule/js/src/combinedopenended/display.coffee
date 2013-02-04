@@ -12,6 +12,7 @@ class @CombinedOpenEnded
     @state = @el.data('state')
     @task_count = @el.data('task-count')
     @task_number = @el.data('task-number')
+    @accept_file_upload = @el.data('accept-file-upload')
 
     @allow_reset = @el.data('allow_reset')
     @reset_button = @$('.reset-button')
@@ -44,6 +45,8 @@ class @CombinedOpenEnded
       @skip_button = @$('.skip-button')
       @skip_button.click @skip_post_assessment
 
+    @file_upload_area = @$('.file-upload')
+    @can_upload_files = false
     @open_ended_child= @$('.open-ended-child')
 
     @find_assessment_elements()
@@ -54,6 +57,16 @@ class @CombinedOpenEnded
   # locally scoped jquery.
   $: (selector) ->
     $(selector, @el)
+
+  show_results_current: () =>
+    data = {'task_number' : @task_number-1}
+    $.postWithPrefix "#{@ajax_url}/get_results", data, (response) =>
+      if response.success
+        @results_container.after(response.html).remove()
+        @results_container = $('div.result-container')
+        @submit_evaluation_button = $('.submit-evaluation-button')
+        @submit_evaluation_button.click @message_post
+        Collapsible.setCollapsibles(@results_container)
 
   show_results: (event) =>
     status_item = $(event.target).parent().parent()
@@ -67,7 +80,7 @@ class @CombinedOpenEnded
         @submit_evaluation_button.click @message_post
         Collapsible.setCollapsibles(@results_container)
       else
-        @errors_area.html(response.error)
+        @gentle_alert response.error
 
   message_post: (event)=>
     Logger.log 'message_post', @answers
@@ -108,22 +121,28 @@ class @CombinedOpenEnded
     @submit_button.show()
     @reset_button.hide()
     @next_problem_button.hide()
+    @hide_file_upload()
     @hint_area.attr('disabled', false)
     if @child_state == 'done'
       @rubric_wrapper.hide()
     if @child_type=="openended"
       @skip_button.hide()
     if @allow_reset=="True"
+      @show_results_current
       @reset_button.show()
       @submit_button.hide()
       @answer_area.attr("disabled", true)
+      @replace_text_inputs()
       @hint_area.attr('disabled', true)
     else if @child_state == 'initial'
       @answer_area.attr("disabled", false)
       @submit_button.prop('value', 'Submit')
       @submit_button.click @save_answer
+      @setup_file_upload()
     else if @child_state == 'assessing'
       @answer_area.attr("disabled", true)
+      @replace_text_inputs()
+      @hide_file_upload()
       @submit_button.prop('value', 'Submit assessment')
       @submit_button.click @save_assessment
       if @child_type == "openended"
@@ -134,6 +153,7 @@ class @CombinedOpenEnded
         @skip_button.show()
         @skip_post_assessment()
       @answer_area.attr("disabled", true)
+      @replace_text_inputs()
       @submit_button.prop('value', 'Submit post-assessment')
       if @child_type=="selfassessment"
          @submit_button.click @save_hint
@@ -142,6 +162,7 @@ class @CombinedOpenEnded
     else if @child_state == 'done'
       @rubric_wrapper.hide()
       @answer_area.attr("disabled", true)
+      @replace_text_inputs()
       @hint_area.attr('disabled', true)
       @submit_button.hide()
       if @child_type=="openended"
@@ -149,6 +170,7 @@ class @CombinedOpenEnded
       if @task_number<@task_count
         @next_problem()
       else
+        @show_results_current()
         @reset_button.show()
 
 
@@ -160,17 +182,41 @@ class @CombinedOpenEnded
 
   save_answer: (event) =>
     event.preventDefault()
+    max_filesize = 2*1000*1000 #2MB
     if @child_state == 'initial'
-      data = {'student_answer' : @answer_area.val()}
-      $.postWithPrefix "#{@ajax_url}/save_answer", data, (response) =>
-        if response.success
-          @rubric_wrapper.html(response.rubric_html)
-          @rubric_wrapper.show()
-          @child_state = 'assessing'
-          @find_assessment_elements()
-          @rebind()
+      files = ""
+      if @can_upload_files == true
+        files = $('.file-upload-box')[0].files[0]
+        if files != undefined
+          if files.size > max_filesize
+            @can_upload_files = false
+            files = ""
         else
-          @errors_area.html(response.error)
+          @can_upload_files = false
+
+      fd = new FormData()
+      fd.append('student_answer', @answer_area.val())
+      fd.append('student_file', files)
+      fd.append('can_upload_files', @can_upload_files)
+
+      settings =
+        type: "POST"
+        data: fd
+        processData: false
+        contentType: false
+        success: (response) =>
+          if response.success
+            @rubric_wrapper.html(response.rubric_html)
+            @rubric_wrapper.show()
+            @answer_area.html(response.student_response)
+            @child_state = 'assessing'
+            @find_assessment_elements()
+            @rebind()
+          else
+            @gentle_alert response.error
+
+      $.ajaxWithPrefix("#{@ajax_url}/save_answer",settings)
+
     else
       @errors_area.html('Problem state got out of sync.  Try reloading the page.')
 
@@ -260,6 +306,7 @@ class @CombinedOpenEnded
             @gentle_alert "Moved to next step."
           else
             @gentle_alert "Your score did not meet the criteria to move to the next step."
+            @show_results_current()
         else
           @errors_area.html(response.error)
     else
@@ -282,6 +329,31 @@ class @CombinedOpenEnded
     $.postWithPrefix "#{@ajax_url}/check_for_score", (response) =>
       if response.state == "done" or response.state=="post_assessment"
         delete window.queuePollerID
-        location.reload()
+        @reload
       else
         window.queuePollerID = window.setTimeout(@poll, 10000)
+
+  setup_file_upload: =>
+    if window.File and window.FileReader and window.FileList and window.Blob
+        if @accept_file_upload == "True"
+          @can_upload_files = true
+          @file_upload_area.html('<input type="file" class="file-upload-box">')
+          @file_upload_area.show()
+    else
+      @gentle_alert 'File uploads are required for this question, but are not supported in this browser. Try the newest version of google chrome.  Alternatively, if you have uploaded the image to the web, you can paste a link to it into the answer box.'
+
+  hide_file_upload: =>
+    if @accept_file_upload == "True"
+      @file_upload_area.hide()
+
+  replace_text_inputs: =>
+    answer_class = @answer_area.attr('class')
+    answer_id = @answer_area.attr('id')
+    answer_val = @answer_area.val()
+    new_text = ''
+    new_text = "<span class='#{answer_class}' id='#{answer_id}'>#{answer_val}</span>"
+    @answer_area.replaceWith(new_text)
+
+  # wrap this so that it can be mocked
+  reload: ->
+    location.reload()

@@ -80,6 +80,7 @@ class SelfAssessmentModule(openendedchild.OpenEndedChild):
             'state': self.state,
             'allow_reset': self._allow_reset(),
             'child_type': 'selfassessment',
+            'accept_file_upload': self.accept_file_upload,
         }
 
         html = system.render_template('self_assessment_prompt.html', context)
@@ -106,6 +107,7 @@ class SelfAssessmentModule(openendedchild.OpenEndedChild):
         if dispatch not in handlers:
             return 'Error'
 
+        log.debug(get)
         before = self.get_progress()
         d = handlers[dispatch](get, system)
         after = self.get_progress()
@@ -123,7 +125,7 @@ class SelfAssessmentModule(openendedchild.OpenEndedChild):
             return ''
 
         rubric_renderer = CombinedOpenEndedRubric(system, True)
-        rubric_html  = rubric_renderer.render_rubric(self.rubric)
+        success, rubric_html = rubric_renderer.render_rubric(self.rubric)
 
         # we'll render it
         context = {'rubric': rubric_html,
@@ -200,13 +202,21 @@ class SelfAssessmentModule(openendedchild.OpenEndedChild):
         if self.state != self.INITIAL:
             return self.out_of_sync_error(get)
 
+        error_message = ""
         # add new history element with answer and empty score and hint.
-        self.new_history_entry(get['student_answer'])
-        self.change_state(self.ASSESSING)
+        success, get = self.append_image_to_student_answer(get)
+        if success:
+            get['student_answer'] = SelfAssessmentModule.sanitize_html(get['student_answer'])
+            self.new_history_entry(get['student_answer'])
+            self.change_state(self.ASSESSING)
+        else:
+            error_message = "There was a problem saving the image in your submission.  Please try a different image, or try pasting a link to an image into the answer box."
 
         return {
-            'success': True,
-            'rubric_html': self.get_rubric_html(system)
+            'success': success,
+            'rubric_html': self.get_rubric_html(system),
+            'error': error_message,
+            'student_response': get['student_answer'],
         }
 
     def save_assessment(self, get, system):

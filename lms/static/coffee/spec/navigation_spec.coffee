@@ -16,6 +16,7 @@ describe 'Navigation', ->
             active: 1
             header: 'h3'
             autoHeight: false
+            heightStyle: 'content'
 
       describe 'when there is no active section', ->
         beforeEach ->
@@ -23,11 +24,12 @@ describe 'Navigation', ->
           $('#accordion').append('<ul><li></li></ul><ul><li></li></ul>')
           new Navigation
 
-        it 'activate the accordian with section 1 as active', ->
+        it 'activate the accordian with no section as active', ->
           expect($('#accordion').accordion).toHaveBeenCalledWith
-            active: 1
+            active: 0
             header: 'h3'
             autoHeight: false
+            heightStyle: 'content'
 
       it 'binds the accordionchange event', ->
         Navigation.bind()
