@@ -405,8 +405,8 @@ section.open-ended-child {
           padding: 9px;
           background: #F6F6F6;
           border: 1px solid #ddd;
-          border-top: 0;
           margin-bottom: 20px;
+          min-height: 5em;
           @include clearfix;
      }
 
@@ -544,11 +544,6 @@ section.open-ended-child {
     }
 
     .submission_feedback {
-      // background: #F3F3F3;
-      // border: 1px solid #ddd;
-      // @include border-radius(3px);
-      // padding: 8px 12px;
-      // margin-top: 10px;
       @include inline-block;
       font-style: italic;
       margin: 8px 0 0 10px;
