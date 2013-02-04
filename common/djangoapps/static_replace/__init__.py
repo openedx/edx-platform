@@ -48,7 +48,6 @@ def replace_course_urls(text, course_id):
 
 
     def replace_course_url(match):
-        log.warning("Course match: %s", match.groupdict())
         quote = match.group('quote')
         rest = match.group('rest')
         return "".join([quote, '/courses/' + course_id + '/', rest, quote])
@@ -69,31 +68,26 @@ def replace_static_urls(text, data_directory, course_namespace=None):
     """
 
     def replace_static_url(match):
-        log.warning(match.groupdict())
+        original = match.group(0)
         quote = match.group('quote')
         rest = match.group('rest')
 
         # course_namespace is not None, then use studio style urls
         if course_namespace is not None and not isinstance(modulestore(), XMLModuleStore):
             url = StaticContent.convert_legacy_static_url(rest, course_namespace)
-            log.warning("From modulestore: %s", url)
         # If we're in debug mode, and the file as requested exists, then don't change the links
         elif (settings.DEBUG and finders.find(rest, True)):
-            url = match.group('prefix') + rest
-            log.warning("From finder: %s", url)
+            return original
         # Otherwise, look the file up in staticfiles_storage
         else:
             path = data_directory + '/' + rest
             try:
                 url = staticfiles_storage.url(path)
-                log.warning("From staticfiles_storage: %s", url)
             # And if that fails, return the path unmodified
             except Exception as err:
                 log.warning("staticfiles_storage couldn't find path {0}: {1}".format(
                     path, str(err)))
-                url = path
-                log.warning("Fallback: %s", url)
-        log.warning("".join([quote, url, quote]))
+                return original
         return "".join([quote, url, quote])
 
     return re.sub(
