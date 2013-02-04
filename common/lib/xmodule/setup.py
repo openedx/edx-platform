@@ -29,6 +29,7 @@ setup(
             "error = xmodule.error_module:ErrorDescriptor",
             "problem = xmodule.capa_module:CapaDescriptor",
             "problemset = xmodule.seq_module:SequenceDescriptor",
+            "randomize = xmodule.randomize_module:RandomizeDescriptor", 
             "section = xmodule.backcompat_module:SemanticSectionDescriptor",
             "sequential = xmodule.seq_module:SequenceDescriptor",
             "slides = xmodule.backcompat_module:TranslateCustomTagDescriptor",

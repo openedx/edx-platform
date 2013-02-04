@@ -2,6 +2,7 @@ import cgi
 import datetime
 import dateutil
 import dateutil.parser
+import hashlib
 import json
 import logging
 import traceback
@@ -25,6 +26,22 @@ log = logging.getLogger("mitx.courseware")
 #-----------------------------------------------------------------------------
 TIMEDELTA_REGEX = re.compile(r'^((?P<days>\d+?) day(?:s?))?(\s)?((?P<hours>\d+?) hour(?:s?))?(\s)?((?P<minutes>\d+?) minute(?:s)?)?(\s)?((?P<seconds>\d+?) second(?:s)?)?$')
 
+# Generated this many different variants of problems with rerandomize=per_student
+NUM_RANDOMIZATION_BINS = 20
+
+def randomization_bin(seed, problem_id):
+    """
+    Pick a randomization bin for the problem given the user's seed and a problem id.
+
+    We do this because we only want e.g. 20 randomizations of a problem to make analytics
+    interesting.  To avoid having sets of students that always get the same problems,
+    we'll combine the system's per-student seed with the problem id in picking the bin.
+    """
+    h = hashlib.sha1()
+    h.update(str(seed))
+    h.update(str(problem_id))
+    # get the first few digits of the hash, convert to an int, then mod.
+    return int(h.hexdigest()[:7], 16) % NUM_RANDOMIZATION_BINS
 
 def only_one(lst, default="", process=lambda x: x):
     """
@@ -138,13 +155,9 @@ class CapaModule(XModule):
 
         if self.rerandomize == 'never':
             self.seed = 1
-        elif self.rerandomize == "per_student" and hasattr(self.system, 'id'):
-            # TODO: This line is badly broken:
-            # (1) We're passing student ID to xmodule.
-            # (2) There aren't bins of students.  -- we only want 10 or 20 randomizations, and want to assign students
-            # to these bins, and may not want cohorts.  So e.g. hash(your-id, problem_id) % num_bins.
-            #     - analytics really needs small number of bins.
-            self.seed = system.id
+        elif self.rerandomize == "per_student" and hasattr(self.system, 'seed'):
+            # see comment on randomization_bin
+            self.seed = randomization_bin(system.seed, self.location.url)
         else:
             self.seed = None
 
