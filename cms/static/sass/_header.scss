@@ -40,7 +40,7 @@
 
 .branding {
   position: relative;
-  padding-right: 15px;
+  padding-right: ($baseline*0.75);
 
   a {
     @include text-hide();
@@ -54,7 +54,8 @@
 .info-course {
   position: relative;
   max-width: 200px;
-  padding-right: 15px;
+  margin-top: -3px;
+  padding-right: $baseline;
   @include font-size(14);
 
   &:before {
@@ -94,7 +95,6 @@
     text-overflow: ellipsis;
     @include font-size(16);
     font-weight: 600;
-
   }
 }
 
@@ -119,6 +119,7 @@
       padding: 5px;
       text-transform: uppercase;
       font-weight: 600;
+      color: $gray-d3;
 
       &:hover, &:active {
         color: $blue;
