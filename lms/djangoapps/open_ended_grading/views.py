@@ -97,8 +97,10 @@ def peer_grading(request, course_id):
     '''
 
     course = get_course_with_access(request.user, course_id, 'load')
-    log.debug(course_id)
-    pg_location = "i4x://" + "MITx/oe101x/" + "peergrading/init"
+    course_id_parts = course.id.split("/")
+    course_id_norun = "/".join(course_id_parts[0:2])
+    pg_location = "i4x://" + course_id_norun + "/peergrading/init"
+    log.debug("PG LOCATION :{0}".format(pg_location))
 
     base_course_url  = reverse('courses')
     problem_url_parts = search.path_to_location(modulestore(), course.id, pg_location)
