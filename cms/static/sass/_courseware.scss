@@ -656,17 +656,6 @@ input.courseware-unit-search-input {
     }
 }
 
-// sort/drag and drop - make room
-.ui-dragging-pushdown {
-    @include transition (margin-top 0.5s ease-in-out 0s);
-    margin-top: 15px;
-}
-
-.ui-dragging-pushup {
-    @include transition (margin-bottom 0.5s ease-in-out 0s);
-    margin-bottom: 15px;
-}
-
 .ui-draggable-dragging {
     @include box-shadow(0 1px 2px rgba(0, 0, 0, .3));
     border: 1px solid $darkGrey;
@@ -676,6 +665,11 @@ input.courseware-unit-search-input {
         .section-item {
             background: $yellow !important;
         }
+    }
+
+    // hiding unit button - temporary fix until this semantically corrected
+    .new-unit-item {
+      display: none;
     }
 }
 
