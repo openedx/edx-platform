@@ -353,3 +353,7 @@ class @CombinedOpenEnded
     new_text = ''
     new_text = "<div class='#{answer_class}' id='#{answer_id}'>#{answer_val}</div>"
     @answer_area.replaceWith(new_text)
+
+  # wrap this so that it can be mocked
+  reload: ->
+    location.reload()

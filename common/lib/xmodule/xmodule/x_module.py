@@ -406,7 +406,7 @@ class ResourceTemplates(object):
                 log.warning("Skipping unknown template file %s" % template_file)
                 continue
             template_content = resource_string(__name__, os.path.join(dirname, template_file))
-            template = yaml.load(template_content)
+            template = yaml.safe_load(template_content)
             templates.append(Template(**template))
 
         return templates
@@ -584,6 +584,11 @@ class XModuleDescriptor(Plugin, HTMLSnippet, ResourceTemplates):
             if attr not in self.metadata and attr in metadata:
                 self._inherited_metadata.add(attr)
                 self.metadata[attr] = metadata[attr]
+
+    def get_required_module_descriptors(self):
+        """Returns a list of XModuleDescritpor instances upon which this module depends, but are
+        not children of this module"""
+        return []
 
     def get_children(self):
         """Returns a list of XModuleDescriptor instances for the children of

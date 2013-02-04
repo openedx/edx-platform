@@ -34,7 +34,7 @@
                 <th></th>
             </tr>
             %for problem in problem_list:
-            <tr>
+            <tr data-submission-id="${problem['submission_id']}" data-student-id="${problem['student_id']}">
                 <td>
                     ${problem['problem_name']}
                 </td>
@@ -49,12 +49,6 @@
                 </td>
                 <td>
                     <div class="action-taken"></div>
-                </td>
-                <td style="display:none;">
-                    ${problem['submission_id']}
-                </td>
-                <td style="display:none;">
-                    ${problem['student_id']}
                 </td>
             </tr>
             %endfor
