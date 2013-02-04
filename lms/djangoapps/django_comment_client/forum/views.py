@@ -11,7 +11,7 @@ from django.contrib.auth.models import User
 
 from mitxmako.shortcuts import render_to_response, render_to_string
 from courseware.courses import get_course_with_access
-from course_groups.cohorts import get_cohort_id, get_course_cohorts, get_cohorted_commentables, is_course_cohorted
+from course_groups.cohorts import get_cohort_id, get_course_cohorts, get_cohorted_commentables, is_course_cohorted, get_cohort_by_id
 from courseware.access import has_access
 
 from urllib import urlencode
@@ -72,6 +72,12 @@ def get_threads(request, course_id, discussion_id=None, per_page=THREADS_PER_PAG
                                                   'tags', 'commentable_ids'])))
 
     threads, page, num_pages = cc.Thread.search(query_params)
+    
+    #now add the group name if the thread has a group id
+    for thread in threads:
+        if thread.get('group_id') and not thread.get('group_name'):
+            thread['group_name'] = get_cohort_by_id(course_id, thread.get('group_id')).name 
+      
 
     query_params['page'] = page
     query_params['num_pages'] = num_pages
@@ -133,6 +139,8 @@ def forum_form_discussion(request, course_id):
 
     for thread in threads:
         courseware_context = get_courseware_context(thread, course)
+        if thread.get('group_id') and not thread.get('group_name'):
+                thread['group_name'] = get_cohort_by_id(course_id, thread.get('group_id')).name      
         if courseware_context:
             thread.update(courseware_context)
     if request.is_ajax():
@@ -152,10 +160,8 @@ def forum_form_discussion(request, course_id):
         #trending_tags = cc.search_trending_tags(
         #    course_id,
         #)
+        
         cohorts = get_course_cohorts(course_id)
-        cohort_dictionary = dict()
-        for c in cohorts:
-          cohort_dictionary[c.id] = c.name
 
         context = {
             'csrf': csrf(request)['csrf_token'],
@@ -172,14 +178,11 @@ def forum_form_discussion(request, course_id):
             'roles': saxutils.escape(json.dumps(utils.get_role_ids(course_id)), escapedict),
             'is_moderator': cached_has_permission(request.user, "see_all_cohorts", course_id),
             'cohorts': cohorts,
-            'cohort_map': cohort_dictionary,
             'user_cohort': get_cohort_id(user, course_id),
             'cohorted_commentables': get_cohorted_commentables(course_id),
             'is_course_cohorted': is_course_cohorted(course_id)
         }
         # print "start rendering.."
-        print "\n\n\n\n*******************************"
-        print context
         return render_to_response('discussion/index.html', context)
 
 @login_required
@@ -228,6 +231,8 @@ def single_thread(request, course_id, discussion_id, thread_id):
             courseware_context = get_courseware_context(thread, course)
             if courseware_context:
                 thread.update(courseware_context)
+            if thread.get('group_id') and not thread.get('group_name'):
+                thread['group_name'] = get_cohort_by_id(course_id, thread.get('group_id')).name     
 
         threads = [utils.safe_content(thread) for thread in threads]
 
@@ -240,7 +245,6 @@ def single_thread(request, course_id, discussion_id, thread_id):
         #trending_tags = cc.search_trending_tags(
         #    course_id,
         #)
-
 
         annotated_content_info = utils.get_metadata_for_threads(course_id, threads, request.user, user_info)
 
