@@ -94,19 +94,16 @@ class @VideoPlayerAlpha extends SubviewAlpha
       when @PlayerState.UNSTARTED
         if @video.videoType is "youtube"
           availableSpeeds = @player.getAvailablePlaybackRates()
-          console.log @video.videos
           if availableSpeeds.length > 1
             baseSpeedSubs = @video.videos["1.0"]
             $.each @video.videos, (index, value) ->
               delete _this.video.videos[index]
-
+            @video.speeds = []
             $.each availableSpeeds, (index, value) ->
               _this.video.videos[value.toFixed(2).replace(/\.00$/, ".0")] = baseSpeedSubs
-
-            @speedControl.reRender()
-
-          console.log "UNSTARTED. available speeds = "
-          console.log availableSpeeds
+              _this.video.speeds.push value.toFixed(2).replace(/\.00$/, ".0")
+            @speedControl.reRender @video.speeds
+            @video.videoType = 'html5'
         @onUnstarted()
       when @PlayerState.PLAYING
         @onPlay()
@@ -162,12 +159,12 @@ class @VideoPlayerAlpha extends SubviewAlpha
     if @video.videoType is 'youtube'
       @currentTime = Time.convert(@currentTime, parseFloat(@currentSpeed()), newSpeed)
     newSpeed = parseFloat(newSpeed).toFixed(2).replace /\.00$/, '.0'
-    @video.setSpeed(newSpeed)
+    @video.setSpeed newSpeed
     if @video.videoType is 'youtube'
       if @video.show_captions is true
         @caption.currentSpeed = newSpeed
     if @video.videoType is 'html5'
-      @player.setSpeed(newSpeed)
+      @player.setPlaybackRate newSpeed
     else if @video.videoType is 'youtube'
       if @isPlaying()
         @player.loadVideoById(@video.youtubeId(), @currentTime)

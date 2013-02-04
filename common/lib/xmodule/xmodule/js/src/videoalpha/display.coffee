@@ -25,7 +25,7 @@ class @VideoAlpha
         "1.0": sub
         "1.25": sub
         "1.5": sub
-      @setSpeed($.cookie('video_speed'))
+      @setSpeed $.cookie('video_speed')
     $("#video_#{@id}").data('video', this).addClass('video-load-complete')
     if @show_captions is true
       @hide_captions = $.cookie('hide_captions') == 'true'
@@ -47,7 +47,7 @@ class @VideoAlpha
   youtubeId: (speed)->
     @videos[speed || @speed]
 
-  VideoAlpha::parseVideos = (videos) ->
+  parseVideos: (videos)->
     return false  if (typeof videos isnt "string") or (videos.length is 0)
     @videos = {}
     _this = this
@@ -58,7 +58,7 @@ class @VideoAlpha
       _this.videos[speed] = video[1]
     true
 
-  VideoAlpha::parseVideoSources = (mp4Source, webmSource, oggSource) ->
+  parseVideoSources: (mp4Source, webmSource, oggSource)->
     @html5Sources =
       mp4: null
       webm: null
@@ -69,9 +69,9 @@ class @VideoAlpha
 
   parseSpeed: ->
     @speeds = ($.map @videos, (url, speed) -> speed).sort()
-    @setSpeed($.cookie('video_speed'))
+    @setSpeed $.cookie('video_speed')
 
-  VideoAlpha::setSpeed = (newSpeed) ->
+  setSpeed: (newSpeed)->
     if @speeds.indexOf(newSpeed) isnt -1
       @speed = newSpeed
       $.cookie "video_speed", "" + newSpeed,
@@ -91,7 +91,7 @@ class @VideoAlpha
   getDuration: ->
     @metadata[@youtubeId()].duration
 
-  VideoAlpha::log = (eventName) ->
+  log: (eventName)->
     logInfo =
       id: @id
       code: @youtubeId()
