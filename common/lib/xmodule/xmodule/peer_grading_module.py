@@ -259,8 +259,7 @@ class PeerGradingModule(XModule):
         submission_key = get.get('submission_key')
         rubric_scores = get.getlist('rubric_scores[]')
         submission_flagged = get.get('submission_flagged')
-        log.debug("GET: {0}".format(get))
-        log.debug(rubric_scores)
+
         try:
             response = self.peer_gs.save_grade(location, grader_id, submission_id,
                 score, feedback, submission_key, rubric_scores, submission_flagged)
