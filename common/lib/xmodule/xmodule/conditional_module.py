@@ -43,7 +43,6 @@ class ConditionalModule(XModule):
         """
         XModule.__init__(self, system, location, definition, descriptor, instance_state, shared_state, **kwargs)
         self.contents = None
-        #self.required_modules_list = [tuple(x.split('/',1)) for x in self.metadata.get('required','').split('&')]
         self.condition = self.metadata.get('condition','')
         #log.debug('conditional module required=%s' % self.required_modules_list)
 
@@ -105,9 +104,7 @@ class ConditionalModule(XModule):
         if not self.is_condition_satisfied():
             context = {'module': self}
             html = self.system.render_template('conditional_module.html', context)
-            # html = render_to_string('conditional_module.html', context)
             return json.dumps({'html': html})
-            #return self.system.render_template('conditional_module.html', context)
 
         if self.contents is None:
             self.contents = [child.get_html() for child in self.get_display_items()]
@@ -115,10 +112,7 @@ class ConditionalModule(XModule):
         # for now, just deal with one child
         html = self.contents[0]
         
-        #log.debug('rendered conditional module %s' % str(self.location))
-
         return json.dumps({'html': html})
-        #return html
 
 class ConditionalDescriptor(SequenceDescriptor):
     module_class = ConditionalModule
