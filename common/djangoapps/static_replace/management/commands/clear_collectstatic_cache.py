@@ -3,6 +3,8 @@
 ###
 
 from django.core.management.base import NoArgsCommand
+from django.core.cache import get_cache
+
 
 class Command(NoArgsCommand):
     help = \
