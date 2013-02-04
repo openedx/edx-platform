@@ -13,46 +13,16 @@ from mock import Mock
 
 import xmodule.modulestore.django
 from factories import *
-
-# Subclass TestCase and use to initialize the contentstore
-class CmsTestCase(TestCase):
-
-    def _pre_setup(self):
-        super(CmsTestCase, self)._pre_setup()        
-        # Flush and initialize the module store
-        # It needs the templates because it creates new records
-        # by cloning from the template.
-        # Note that if your test module gets in some weird state
-        # (though it shouldn't), do this manually
-        # from the bash shell to drop it:
-        # $ mongo test_xmodule --eval "db.dropDatabase()"
-        xmodule.modulestore.django._MODULESTORES = {}
-        xmodule.modulestore.django.modulestore().collection.drop()
-        xmodule.templates.update_templates()
-
-    def _post_teardown(self):
-        # Make sure you flush out the test modulestore after the end
-        # of the last test because otherwise on the next run
-        # cms/djangoapps/contentstore/__init__.py
-        # update_templates() will try to update the templates
-        # via upsert and it sometimes seems to be messing things up.
-        xmodule.modulestore.django._MODULESTORES = {}
-        xmodule.modulestore.django.modulestore().collection.drop()
-        super(CmsTestCase, self)._post_teardown()        
-
-def parse_json(response):
-    """Parse response, which is assumed to be json"""
-    return json.loads(response.content)
+from utils import CmsTestCase
 
 TEST_DATA_MODULESTORE = copy.deepcopy(settings.MODULESTORE)
 TEST_DATA_MODULESTORE['default']['OPTIONS']['fs_root'] = path('common/test/data')
 TEST_DATA_MODULESTORE['direct']['OPTIONS']['fs_root'] = path('common/test/data')
 
 @override_settings(MODULESTORE=TEST_DATA_MODULESTORE)
-class NewContentStoreTest(CmsTestCase):
+class ContentStoreTest(CmsTestCase):
 
     def setUp(self):
-        # super(NewContentStoreTest, self).setUp()
         uname = 'testuser'
         email = 'test+courses@edx.org'
         password = 'foo'
@@ -67,11 +37,6 @@ class NewContentStoreTest(CmsTestCase):
         self.user.is_staff = True
         self.user.save()
 
-        # user = UserFactory(username=uname, email=email, password=password,
-        #             is_staff=True, is_active=True)
-        # user.is_authenticated= Mock(return_value=True)
-
-
         self.client = Client()
         self.client.login(username=uname, password=password)
 
@@ -82,13 +47,300 @@ class NewContentStoreTest(CmsTestCase):
             'display_name': 'Robot Super Course',
             }
 
-    def tearDown(self):
-        # super(NewContentStoreTest, self).tearDown()
-        pass
-
     def test_create_course(self):
         """Test new course creation - happy path"""
         resp = self.client.post(reverse('create_new_course'), self.course_data)
         self.assertEqual(resp.status_code, 200)
         data = parse_json(resp)
         self.assertEqual(data['id'], 'i4x://MITx/999/course/Robot_Super_Course')
+
+    def test_create_course_duplicate_course(self):
+        """Test new course creation - error path"""
+        resp = self.client.post(reverse('create_new_course'), self.course_data)
+        resp = self.client.post(reverse('create_new_course'), self.course_data)
+        data = parse_json(resp)
+        self.assertEqual(resp.status_code, 200)
+        self.assertEqual(data['ErrMsg'], 'There is already a course defined with this name.')
+
+    def test_create_course_duplicate_number(self):
+        """Test new course creation - error path"""
+        resp = self.client.post(reverse('create_new_course'), self.course_data)
+        self.course_data['display_name'] = 'Robot Super Course Two'
+
+        resp = self.client.post(reverse('create_new_course'), self.course_data)
+        data = parse_json(resp)
+
+        self.assertEqual(resp.status_code, 200)
+        self.assertEqual(data['ErrMsg'], 
+            'There is already a course defined with the same organization and course number.')
+
+    def test_create_course_with_bad_organization(self):
+        """Test new course creation - error path for bad organization name"""
+        self.course_data['org'] = 'University of California, Berkeley'
+        resp = self.client.post(reverse('create_new_course'), self.course_data)
+        data = parse_json(resp)
+
+        self.assertEqual(resp.status_code, 200)
+        self.assertEqual(data['ErrMsg'],
+            "Unable to create course 'Robot Super Course'.\n\nInvalid characters in 'University of California, Berkeley'.")
+
+    def test_course_index_view_with_no_courses(self):
+        """Test viewing the index page with no courses"""
+        # Create a course so there is something to view
+        resp = self.client.get(reverse('index'))
+        self.assertContains(resp, 
+            '<h1>My Courses</h1>',
+            status_code=200,
+            html=True)
+
+    def test_course_factory(self):
+        course = CourseFactory.create()
+        self.assertIsInstance(course, CourseDescriptor)
+
+    def test_item_factory(self):
+        course = CourseFactory.create()
+        item = ItemFactory.create(parent_location=course.location)
+        self.assertIsInstance(item, SequenceDescriptor)
+
+    def test_course_index_view_with_course(self):
+        """Test viewing the index page with an existing course"""
+        CourseFactory.create(display_name='Robot Super Educational Course')
+        resp = self.client.get(reverse('index'))
+        self.assertContains(resp,
+            '<span class="class-name">Robot Super Educational Course</span>',
+            status_code=200,
+            html=True)
+
+    def test_course_overview_view_with_course(self):
+        """Test viewing the course overview page with an existing course"""
+        CourseFactory.create(org='MITx', course='999', display_name='Robot Super Course')
+
+        data = {
+                'org': 'MITx',
+                'course': '999',
+                'name': Location.clean('Robot Super Course'),
+                }
+
+        resp = self.client.get(reverse('course_index', kwargs=data))
+        self.assertContains(resp, 
+            '<a href="/MITx/999/course/Robot_Super_Course" class="class-name">Robot Super Course</a>',
+            status_code=200,
+            html=True)
+
+    def test_clone_item(self):
+        """Test cloning an item. E.g. creating a new section"""
+        CourseFactory.create(org='MITx', course='999', display_name='Robot Super Course')
+
+        section_data = {
+            'parent_location' : 'i4x://MITx/999/course/Robot_Super_Course',
+            'template' : 'i4x://edx/templates/chapter/Empty',
+            'display_name': 'Section One',
+            }
+
+        resp = self.client.post(reverse('clone_item'), section_data)
+
+        self.assertEqual(resp.status_code, 200)
+        data = parse_json(resp)
+        self.assertRegexpMatches(data['id'], 
+            '^i4x:\/\/MITx\/999\/chapter\/([0-9]|[a-f]){32}$')
+
+    def check_edit_unit(self, test_course_name):
+        import_from_xml(modulestore(), 'common/test/data/', [test_course_name])
+
+        for descriptor in modulestore().get_items(Location(None, None, 'vertical', None, None)):
+            print "Checking ", descriptor.location.url()
+            print descriptor.__class__, descriptor.location
+            resp = self.client.get(reverse('edit_unit', kwargs={'location': descriptor.location.url()}))
+            self.assertEqual(resp.status_code, 200)
+
+    def test_edit_unit_toy(self):
+        self.check_edit_unit('toy')
+
+    def test_edit_unit_full(self):
+        self.check_edit_unit('full')
+
+    def test_static_tab_reordering(self):
+        import_from_xml(modulestore(), 'common/test/data/', ['full'])
+        
+        ms = modulestore('direct')
+        course = ms.get_item(Location(['i4x','edX','full','course','6.002_Spring_2012', None]))
+
+        # reverse the ordering
+        reverse_tabs = []
+        for tab in course.tabs:
+            if tab['type'] == 'static_tab':
+                reverse_tabs.insert(0, 'i4x://edX/full/static_tab/{0}'.format(tab['url_slug']))
+ 
+        resp = self.client.post(reverse('reorder_static_tabs'), json.dumps({'tabs':reverse_tabs}), "application/json")
+
+        course = ms.get_item(Location(['i4x','edX','full','course','6.002_Spring_2012', None]))
+        
+        # compare to make sure that the tabs information is in the expected order after the server call
+        course_tabs = []
+        for tab in course.tabs:
+            if tab['type'] == 'static_tab':
+                course_tabs.append('i4x://edX/full/static_tab/{0}'.format(tab['url_slug']))
+
+        self.assertEqual(reverse_tabs, course_tabs)
+
+
+
+
+    def test_about_overrides(self):
+        '''
+        This test case verifies that a course can use specialized override for about data, e.g. /about/Fall_2012/effort.html 
+        while there is a base definition in /about/effort.html
+        '''
+        import_from_xml(modulestore(), 'common/test/data/', ['full'])
+        ms = modulestore('direct')
+        effort = ms.get_item(Location(['i4x','edX','full','about','effort', None]))
+        self.assertEqual(effort.definition['data'],'6 hours')
+
+        # this one should be in a non-override folder
+        effort = ms.get_item(Location(['i4x','edX','full','about','end_date', None]))
+        self.assertEqual(effort.definition['data'],'TBD')
+
+    def test_remove_hide_progress_tab(self):
+        import_from_xml(modulestore(), 'common/test/data/', ['full'])
+
+        ms = modulestore('direct')
+        cs = contentstore()
+
+        source_location = CourseDescriptor.id_to_location('edX/full/6.002_Spring_2012')
+        course = ms.get_item(source_location)
+        self.assertNotIn('hide_progress_tab', course.metadata)
+
+
+    def test_clone_course(self):
+        import_from_xml(modulestore(), 'common/test/data/', ['full'])
+
+        resp = self.client.post(reverse('create_new_course'), self.course_data)
+        self.assertEqual(resp.status_code, 200)
+        data = parse_json(resp)
+        self.assertEqual(data['id'], 'i4x://MITx/999/course/Robot_Super_Course')
+
+        ms = modulestore('direct')
+        cs = contentstore()
+
+        source_location = CourseDescriptor.id_to_location('edX/full/6.002_Spring_2012')
+        dest_location = CourseDescriptor.id_to_location('MITx/999/Robot_Super_Course')
+
+        clone_course(ms, cs, source_location, dest_location)
+
+        # now loop through all the units in the course and verify that the clone can render them, which 
+        # means the objects are at least present
+        items = ms.get_items(Location(['i4x','edX', 'full', 'vertical', None]))
+        self.assertGreater(len(items), 0)
+        clone_items = ms.get_items(Location(['i4x', 'MITx','999','vertical', None]))
+        self.assertGreater(len(clone_items), 0)
+        for descriptor in items:
+            new_loc = descriptor.location._replace(org = 'MITx', course='999')
+            print "Checking {0} should now also be at {1}".format(descriptor.location.url(), new_loc.url())
+            resp = self.client.get(reverse('edit_unit', kwargs={'location': new_loc.url()}))
+            self.assertEqual(resp.status_code, 200)
+
+    def test_delete_course(self):
+        import_from_xml(modulestore(), 'common/test/data/', ['full'])
+
+        ms = modulestore('direct')
+        cs = contentstore()
+
+        location = CourseDescriptor.id_to_location('edX/full/6.002_Spring_2012')
+
+        delete_course(ms, cs, location)
+
+        items = ms.get_items(Location(['i4x','edX', 'full', 'vertical', None]))
+        self.assertEqual(len(items), 0)
+
+    def verify_content_existence(self, modulestore, root_dir, location, dirname, category_name, filename_suffix=''):
+        fs = OSFS(root_dir / 'test_export')
+        self.assertTrue(fs.exists(dirname))
+
+        query_loc = Location('i4x', location.org, location.course, category_name, None)
+        items = modulestore.get_items(query_loc)
+
+        for item in items:
+            fs = OSFS(root_dir / ('test_export/' + dirname))
+            self.assertTrue(fs.exists(item.location.name + filename_suffix))
+
+    def test_export_course(self):
+        ms = modulestore('direct')
+        cs = contentstore() 
+
+        import_from_xml(ms, 'common/test/data/', ['full'])
+        location = CourseDescriptor.id_to_location('edX/full/6.002_Spring_2012')
+
+        root_dir = path(mkdtemp())
+
+        print 'Exporting to tempdir = {0}'.format(root_dir)
+
+        # export out to a tempdir
+        export_to_xml(ms, cs, location, root_dir, 'test_export')
+
+        # check for static tabs
+        self.verify_content_existence(ms, root_dir, location, 'tabs', 'static_tab', '.html')
+
+        # check for custom_tags
+        self.verify_content_existence(ms, root_dir, location, 'info', 'course_info', '.html')
+
+        # check for custom_tags
+        self.verify_content_existence(ms, root_dir, location, 'custom_tags', 'custom_tag_template')
+  
+
+        # remove old course
+        delete_course(ms, cs, location)
+
+        # reimport
+        import_from_xml(ms, root_dir, ['test_export'])
+
+        items = ms.get_items(Location(['i4x','edX', 'full', 'vertical', None]))
+        self.assertGreater(len(items), 0)
+        for descriptor in items:
+            print "Checking {0}....".format(descriptor.location.url())
+            resp = self.client.get(reverse('edit_unit', kwargs={'location': descriptor.location.url()}))
+            self.assertEqual(resp.status_code, 200)
+
+        shutil.rmtree(root_dir)        
+
+
+    def test_course_handouts_rewrites(self):
+        ms = modulestore('direct')
+        cs = contentstore() 
+
+        # import a test course
+        import_from_xml(ms, 'common/test/data/', ['full'])     
+
+        handout_location= Location(['i4x', 'edX', 'full', 'course_info', 'handouts'])
+
+        # get module info
+        resp = self.client.get(reverse('module_info', kwargs={'module_location': handout_location}))
+
+        # make sure we got a successful response
+        self.assertEqual(resp.status_code, 200)
+
+        # check that /static/ has been converted to the full path
+        # note, we know the link it should be because that's what in the 'full' course in the test data
+        self.assertContains(resp, '/c4x/edX/full/asset/handouts_schematic_tutorial.pdf') 
+
+
+    def test_capa_module(self):
+        """Test that a problem treats markdown specially."""
+        CourseFactory.create(org='MITx', course='999', display_name='Robot Super Course')
+
+        problem_data = {
+            'parent_location' : 'i4x://MITx/999/course/Robot_Super_Course',
+            'template' : 'i4x://edx/templates/problem/Empty'
+            }
+
+        resp = self.client.post(reverse('clone_item'), problem_data)
+
+        self.assertEqual(resp.status_code, 200)
+        payload = parse_json(resp)
+        problem_loc = payload['id']
+        problem = get_modulestore(problem_loc).get_item(problem_loc)
+        # should be a CapaDescriptor
+        self.assertIsInstance(problem, CapaDescriptor, "New problem is not a CapaDescriptor")
+        context = problem.get_context()
+        self.assertIn('markdown', context, "markdown is missing from context")
+        self.assertIn('markdown', problem.metadata, "markdown is missing from metadata")
+        self.assertNotIn('markdown', problem.editable_metadata_fields, "Markdown slipped into the editable metadata fields")
