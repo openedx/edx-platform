@@ -49,8 +49,8 @@ class ConditionalModule(XModule):
 
     def _get_required_modules(self):
         self.required_modules = []
-        for loc in self.descriptor.required_module_locations:
-            module = self.system.get_module(loc)
+        for descriptor in self.descriptor.get_required_module_descriptors():
+            module = self.system.get_module(descriptor)
             self.required_modules.append(module)
         #log.debug('required_modules=%s' % (self.required_modules))
 
@@ -78,10 +78,10 @@ class ConditionalModule(XModule):
                 if not hasattr(module, 'is_attempted'):
                     raise Exception('Error in conditional module: required module %s has no .is_attempted() method' % module)
                 if not module.is_attempted():
-                    log.debug('conditional module: %s not completed' % module)
+                    log.debug('conditional module: %s not attempted' % module)
                     return False
                 else:
-                    log.debug('conditional module: %s IS completed' % module)
+                    log.debug('conditional module: %s IS attempted' % module)
             return True
         else:
             raise Exception('Error in conditional module: unknown condition "%s"' % self.condition)
