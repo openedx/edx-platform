@@ -96,7 +96,7 @@ def replace_static_urls(text, data_directory, course_namespace=None):
         return "".join([quote, url, quote])
 
     return re.sub(
-        _url_replace_regex('/static/(?!{data_dir}'.format(data_dir=data_directory)),
+        _url_replace_regex('/static/(?!{data_dir})'.format(data_dir=data_directory)),
         replace_static_url,
         text
     )
