@@ -414,12 +414,14 @@ class CapaModule(XModule):
         elif self.show_answer == "never":
             return False
         elif self.system.user_is_staff:
-            # This i after the 'never' check because admins can see the answer
+            # This is after the 'never' check because admins can see the answer
             # unless the problem explicitly prevents it
             return True
         elif self.show_answer == 'attempted':
             return self.attempts > 0
         elif self.show_answer == 'answered':
+            # NOTE: this is slightly different from 'attempted' -- resetting the problems
+            # makes lcp.done False, but leaves attempts unchanged.
             return self.lcp.done
         elif self.show_answer == 'closed':
             return self.closed()
@@ -674,18 +676,18 @@ class CapaDescriptor(RawDescriptor):
     # TODO (vshnayder): do problems have any other metadata?  Do they
     # actually use type and points?
     metadata_attributes = RawDescriptor.metadata_attributes + ('type', 'points')
-    
+
     def get_context(self):
         _context = RawDescriptor.get_context(self)
         _context.update({'markdown': self.metadata.get('markdown', '')})
         return _context
-    
+
     @property
     def editable_metadata_fields(self):
         """Remove metadata from the editable fields since it has its own editor"""
         subset = super(CapaDescriptor,self).editable_metadata_fields
         if 'markdown' in subset:
-            subset.remove('markdown') 
+            subset.remove('markdown')
         return subset
 
 
