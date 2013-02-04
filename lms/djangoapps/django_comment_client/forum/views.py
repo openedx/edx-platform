@@ -189,6 +189,9 @@ def single_thread(request, course_id, discussion_id, thread_id):
 
     try:
         thread = cc.Thread.find(thread_id).retrieve(recursive=True, user_id=request.user.id)
+        print("\n\n\n\n\n\n***************************")
+        print("thread.get('group_id','NONE')")
+        print(thread)
     except (cc.utils.CommentClientError, cc.utils.CommentClientUnknownError) as err:
         log.error("Error loading single thread.")
         raise Http404
