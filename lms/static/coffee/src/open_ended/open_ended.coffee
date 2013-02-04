@@ -51,7 +51,8 @@ class OpenEnded
     return @handle_after_action
 
   handle_after_action: (data) ->
-    blah = "blah"
+    if !response.success
+      @gentle_alert data.error
 
   gentle_alert: (msg) =>
     if $('.message-container').length
