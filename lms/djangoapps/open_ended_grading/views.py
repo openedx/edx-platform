@@ -29,6 +29,9 @@ from xmodule import peer_grading_module
 from xmodule import peer_grading_service
 from mitxmako.shortcuts import render_to_string
 from xmodule.x_module import ModuleSystem
+from courseware import module_render
+from xmodule.modulestore.django import modulestore
+from courseware.models import StudentModule, StudentModuleCache
 
 from django.http import HttpResponse, Http404
 
@@ -86,14 +89,14 @@ def staff_grading(request, course_id):
         # Checked above
         'staff_access': True, })
 
-
 @cache_control(no_cache=True, no_store=True, must_revalidate=True)
 def peer_grading(request, course_id):
     '''
     Show a peer grading interface
     '''
+    course = get_course_with_access(request.user, course_id, 'load')
 
-    ajax_url = ajax_url = _reverse_with_slash('peer_grading', course_id)
+    ajax_url = _reverse_with_slash('peer_grading_ajax', course_id)
     track_function = None
     get_module = None
     render_template = render_to_string
@@ -114,16 +117,35 @@ def peer_grading(request, course_id):
     definition = "<peergrading use_for_single_location = 'False'></peergrading>"
     descriptor = peer_grading_module.PeerGradingDescriptor
     instance_state = None
-    pg_url = re.sub("/courses", "i4x:/", ajax_url)[:-1]
 
-    pg_module = peer_grading_module.PeerGradingModule(system, pg_url, definition, descriptor, instance_state)
+    pg_ajax = _reverse_with_slash('peer_grading', course_id)
+    pg_url = re.sub("/courses", "i4x:/",pg_ajax)[:-1]
+    pg_location = request.GET.get('location', pg_url)
 
-    course = get_course_with_access(request.user, course_id, 'load')
+    pg_module = peer_grading_module.PeerGradingModule(system, pg_location, definition, descriptor, instance_state)
 
-    return pg_module.get_html()
+    """
+    return_html = pg_module.get_html()
+    log.debug(return_html)
+    response = render_to_response('peer_grading/peer_grading_notifications.html', {
+        'peer_grading_html' : return_html,
+        'course': course,
+        'problem_location': pg_location,
+        'course_id': course_id,
+        'ajax_url': ajax_url,
+        'staff_access': False,
+        })
+    """
+
+    student_module_cache = StudentModuleCache(course_id,
+        request.user, descriptor)
+
+    pg_xmodule = module_render.get_module(request.user, request, pg_location, student_module_cache, course_id)
+
+    return pg_xmodule.get_html()
 
 @cache_control(no_cache=True, no_store=True, must_revalidate=True)
-def peer_grading_problem(request, course_id):
+def peer_grading_ajax(request, course_id):
     '''
     Show individual problem interface
     '''

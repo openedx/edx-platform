@@ -52,20 +52,28 @@ CACHES = {
     # We set it to be a DummyCache to force reloading of course.xml in dev.
     # In staging environments, we would grab VERSION from data uploaded by the
     # push process.
+    #'general': {
+    #    'BACKEND': 'django.core.cache.backends.locmem.LocMemCache',
+    #    'KEY_PREFIX': 'general',
+    #    'VERSION': 4,
+    #    'LOCATION': 'mitx_loc_mem_cache_general',
+    #    'KEY_FUNCTION': 'util.memcache.safe_key',
+    #}
+
     'general': {
         'BACKEND': 'django.core.cache.backends.dummy.DummyCache',
         'KEY_PREFIX': 'general',
         'VERSION': 4,
         'KEY_FUNCTION': 'util.memcache.safe_key',
-    }
+        }
 }
 
 
 XQUEUE_INTERFACE = {
-    "url": "https://sandbox-xqueue.edx.org",
+    "url": "http://127.0.0.1:3032",
     "django_auth": {
         "username": "lms",
-        "password": "***REMOVED***"
+        "password": "abcd"
     },
     "basic_auth": ('anant', 'agarwal'),
 }
@@ -198,3 +206,9 @@ PIPELINE_SASS_ARGUMENTS = '-r {proj_dir}/static/sass/bourbon/lib/bourbon.rb'.for
 MITX_FEATURES['ENABLE_PEARSON_HACK_TEST'] = True
 PEARSON_TEST_USER = "pearsontest"
 PEARSON_TEST_PASSWORD = "12345"
+
+#AWS upload stuff for local file testing
+AWS_ACCESS_KEY_ID = "***REMOVED***"
+AWS_SECRET_ACCESS_KEY = "***REMOVED***"
+AWS_STORAGE_BUCKET_NAME = 'edxuploads'
+

@@ -300,6 +300,8 @@ if settings.COURSEWARE_ENABLED:
 
         url(r'^courses/(?P<course_id>[^/]+/[^/]+/[^/]+)/peer_grading$',
             'open_ended_grading.views.peer_grading', name='peer_grading'),
+        url(r'^courses/(?P<course_id>[^/]+/[^/]+/[^/]+)/peer_grading_ajax$',
+            'open_ended_grading.views.peer_grading_ajax', name='peer_grading_ajax'),
     )
 
     # discussion forums live within courseware, so courseware must be enabled first
