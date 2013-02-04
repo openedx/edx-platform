@@ -61,7 +61,6 @@ class RandomizeModule(XModule):
                 else:
                     self.choice = random.randrange(0, num_choices)
 
-        log.debug("********* self.choice = %s", self.choice)
         if self.choice is not None:
             self.child_descriptor = self.descriptor.get_children()[self.choice]
             # Now get_children() should return a list with one element
