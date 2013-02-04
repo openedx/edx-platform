@@ -64,6 +64,7 @@
       margin: 20px 40px;
 
 
+
       .title {
         margin: 0 0 15px 0;
         color: $mediumGrey;
@@ -73,10 +74,11 @@
       }
 
       &.new-component-item {
-        border-radius: 3px;
-        border: 1px solid $mediumGrey;
-        background: #fff;
-        @include box-shadow(0 1px 1px rgba(0, 0, 0, .2), 0 1px 0 rgba(255, 255, 255, .4) inset);
+        margin: 20px 0px;
+        border-top: 1px solid $mediumGrey;
+        box-shadow: 1px 3px 2px rgba(182, 182, 182, 0.75) inset;
+        background-color: $lightGrey;
+        margin-bottom: 0px;
 
         .new-component-button {
           display: block;
@@ -86,7 +88,7 @@
         }
 
         h5 {
-          margin-bottom: 12px;
+          margin: 12px 0px;
           color: #fff;
           font-weight: 600;
           font-size: 18px;
@@ -132,6 +134,10 @@
 
         .new-component-templates {
           display: none;
+          margin: 20px 40px 0px 40px;
+          border-radius: 3px;
+          border: 1px solid $mediumGrey;
+          @include box-shadow(0 1px 1px rgba(0, 0, 0, .2), 0 1px 0 rgba(255, 255, 255, .4) inset);
           @include clearfix;
 
           .tab-group {
@@ -152,6 +158,8 @@
 
           // specific menu types
           &.new-component-problem {
+            padding-bottom:10px;
+            background-color: #fff;
 
             .ss-icon, .editor-indicator {
               display: inline-block;
