@@ -285,4 +285,5 @@ INSTALLED_APPS = (
     # For asset pipelining
     'pipeline',
     'staticfiles',
+    'static_replace',
 )
