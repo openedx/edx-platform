@@ -2,10 +2,26 @@ div.timer-main {
   position: fixed;
   z-index: 99;
   width: 100%;
+  border-top: 2px solid #000;
 
   div#timer_wrapper {
     position: relative;
+    top: -3px;
     float: right;
     margin-right: 10px;
+    background: #000;
+    color: #fff;
+    padding: 10px 20px;
+    border-radius: 3px;
+  }
+
+  .timer_label {
+    color: #ccc;
+    font-size: 13px;
+  }
+
+  #exam_timer {
+    font-weight: bold;
+    font-size: 15px;
   }
 }
