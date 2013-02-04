@@ -8,6 +8,8 @@ from django.core.urlresolvers import reverse
 from path import path
 from tempfile import mkdtemp
 import json
+from fs.osfs import OSFS
+
 
 from student.models import Registration
 from django.contrib.auth.models import User
@@ -443,6 +445,17 @@ class ContentStoreTest(TestCase):
         items = ms.get_items(Location(['i4x','edX', 'full', 'vertical', None]))
         self.assertEqual(len(items), 0)
 
+    def verify_content_existence(self, modulestore, root_dir, location, dirname, category_name, filename_suffix=''):
+        fs = OSFS(root_dir / 'test_export')
+        self.assertTrue(fs.exists(dirname))
+
+        query_loc = Location('i4x', location.org, location.course, category_name, None)
+        items = modulestore.get_items(query_loc)
+
+        for item in items:
+            fs = OSFS(root_dir / ('test_export/' + dirname))
+            self.assertTrue(fs.exists(item.location.name + filename_suffix))
+
     def test_export_course(self):
         ms = modulestore('direct')
         cs = contentstore() 
@@ -456,6 +469,16 @@ class ContentStoreTest(TestCase):
 
         # export out to a tempdir
         export_to_xml(ms, cs, location, root_dir, 'test_export')
+
+        # check for static tabs
+        self.verify_content_existence(ms, root_dir, location, 'tabs', 'static_tab', '.html')
+
+        # check for custom_tags
+        self.verify_content_existence(ms, root_dir, location, 'info', 'course_info', '.html')
+
+        # check for custom_tags
+        self.verify_content_existence(ms, root_dir, location, 'custom_tags', 'custom_tag_template')
+  
 
         # remove old course
         delete_course(ms, cs, location)
@@ -471,6 +494,7 @@ class ContentStoreTest(TestCase):
             self.assertEqual(resp.status_code, 200)
 
         shutil.rmtree(root_dir)        
+
 
     def test_course_handouts_rewrites(self):
         ms = modulestore('direct')

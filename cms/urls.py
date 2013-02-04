@@ -68,6 +68,8 @@ urlpatterns = ('',
 
     # temporary landing page for edge
     url(r'^edge$', 'contentstore.views.edge', name='edge'),
+    # noop to squelch ajax errors
+    url(r'^event$', 'contentstore.views.event', name='event'),
 
     url(r'^heartbeat$', include('heartbeat.urls')),
 )

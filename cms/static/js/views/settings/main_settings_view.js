@@ -211,15 +211,15 @@ CMS.Views.Settings.Details = CMS.Views.ValidatingView.extend({
 		'intro_video' : 'course-introduction-video',
 		'effort' : "course-effort"
 	},
-	
-	setupDatePicker : function(fieldName) {
-		var cacheModel = this.model;
-		var div = this.$el.find('#' + this.fieldToSelectorMap[fieldName]);
-		var datefield = $(div).find(".date");
-		var timefield = $(div).find(".time");
-		var cachethis = this;
-		var savefield = function() { 
-			cachethis.clearValidationErrors();
+
+    setupDatePicker: function (fieldName) {
+        var cacheModel = this.model;
+        var div = this.$el.find('#' + this.fieldToSelectorMap[fieldName]);
+        var datefield = $(div).find(".date");
+        var timefield = $(div).find(".time");
+        var cachethis = this;
+        var savefield = function () {
+            cachethis.clearValidationErrors();
             var date = datefield.datepicker('getDate');
             if (date) {
                 var time = timefield.timepicker("getSecondsFromMidnight");
@@ -227,21 +227,24 @@ CMS.Views.Settings.Details = CMS.Views.ValidatingView.extend({
                     time = 0;
                 }
                 var newVal = new Date(date.getTime() + time * 1000);
-                if (cacheModel.get(fieldName) != newVal) cacheModel.save(fieldName, newVal,
-                		{ error : CMS.ServerError});
+                if (cacheModel.get(fieldName).getTime() !== newVal.getTime()) {
+                    cacheModel.save(fieldName, newVal, { error: CMS.ServerError});
+                }
             }
-		};
-		
-		// instrument as date and time pickers
-		timefield.timepicker();
-		
-		// FIXME being called 2x on each change. Was trapping datepicker onSelect b4 but change to datepair broke that
-		datefield.datepicker({ onSelect : savefield });
-		timefield.on('changeTime', savefield);
-		
-		datefield.datepicker('setDate', this.model.get(fieldName));
-		if (this.model.has(fieldName)) timefield.timepicker('setTime', this.model.get(fieldName));
-	},
+        };
+
+        // instrument as date and time pickers
+        timefield.timepicker();
+        datefield.datepicker();
+
+        // Using the change event causes savefield to be triggered twice, but it is necessary
+        // to pick up when the date is typed directly in the field.
+        datefield.change(savefield);
+        timefield.on('changeTime', savefield);
+
+        datefield.datepicker('setDate', this.model.get(fieldName));
+        if (this.model.has(fieldName)) timefield.timepicker('setTime', this.model.get(fieldName));
+    },
 	
 	updateModel: function(event) {
 		switch (event.currentTarget.id) {
@@ -294,29 +297,30 @@ CMS.Views.Settings.Details = CMS.Views.ValidatingView.extend({
 		}
 	},
 	codeMirrors : {},
-	codeMirrorize : function(e, forcedTarget) {
-		if (forcedTarget) {
-			thisTarget = forcedTarget;
-			thisTarget.id = $(thisTarget).attr('id');
-		} else {
-			thisTarget = e.currentTarget;
-		}
+    codeMirrorize: function (e, forcedTarget) {
+        var thisTarget;
+        if (forcedTarget) {
+            thisTarget = forcedTarget;
+            thisTarget.id = $(thisTarget).attr('id');
+        } else {
+            thisTarget = e.currentTarget;
+        }
 
-		if (!this.codeMirrors[thisTarget.id]) {
-			var cachethis = this;
-			var field = this.selectorToField[thisTarget.id];
-			this.codeMirrors[thisTarget.id] = CodeMirror.fromTextArea(thisTarget, {
-				mode: "text/html", lineNumbers: true, lineWrapping: true,
-				onBlur : function(mirror) {
-					mirror.save();
-					cachethis.clearValidationErrors();
-					var newVal = mirror.getValue();
-					if (cachethis.model.get(field) != newVal) cachethis.model.save(field, newVal,
-							{ error : CMS.ServerError});
-				}
-			});
-		}
-	}
+        if (!this.codeMirrors[thisTarget.id]) {
+            var cachethis = this;
+            var field = this.selectorToField[thisTarget.id];
+            this.codeMirrors[thisTarget.id] = CodeMirror.fromTextArea(thisTarget, {
+                mode: "text/html", lineNumbers: true, lineWrapping: true,
+                onBlur: function (mirror) {
+                    mirror.save();
+                    cachethis.clearValidationErrors();
+                    var newVal = mirror.getValue();
+                    if (cachethis.model.get(field) != newVal) cachethis.model.save(field, newVal,
+                        { error: CMS.ServerError});
+                }
+            });
+        }
+    }
 	
 });
 
@@ -668,7 +672,7 @@ CMS.Views.Settings.GraderView = CMS.Views.ValidatingView.extend({
 				$(event.currentTarget).parent().append(
 						this.errorTemplate({message : 'For grading to work, you must change all "' + oldName +
 							'" subsections to "' + this.model.get('type') + '".'}));
-			};
+			}
 			break;
 		default:
 			this.saveIfChanged(event);

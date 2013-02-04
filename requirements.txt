@@ -48,7 +48,6 @@ sorl-thumbnail==11.12
 networkx==1.7
 pygraphviz==1.1
 -r repo-requirements.txt
-pil==1.1.7
 nltk==2.0.4
 django-debug-toolbar-mongo
 dogstatsd-python==0.2.1
@@ -59,3 +58,4 @@ Shapely==1.2.16
 ipython==0.13.1
 xmltodict==0.4.1
 paramiko==1.9.0
+Pillow==1.7.8

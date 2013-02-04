@@ -35,6 +35,29 @@ MAX_ATTEMPTS = 10000
 # Overriden by max_score specified in xml.
 MAX_SCORE = 1
 
+#The highest score allowed for the overall xmodule and for each rubric point
+MAX_SCORE_ALLOWED = 3
+
+#If true, default behavior is to score module as a practice problem.  Otherwise, no grade at all is shown in progress
+#Metadata overrides this.
+IS_SCORED = False
+
+#If true, then default behavior is to require a file upload or pasted link from a student for this problem.
+#Metadata overrides this.
+ACCEPT_FILE_UPLOAD = False
+
+#Contains all reasonable bool and case combinations of True
+TRUE_DICT = ["True", True, "TRUE", "true"]
+
+HUMAN_TASK_TYPE = {
+    'selfassessment' : "Self Assessment",
+    'openended' : "External Grader",
+}
+
+class IncorrectMaxScoreError(Exception):
+    def __init__(self, msg):
+        self.msg = msg
+
 class CombinedOpenEndedModule(XModule):
     """
     This is a module that encapsulates all open ended grading (self assessment, peer assessment, etc).
@@ -135,24 +158,31 @@ class CombinedOpenEndedModule(XModule):
         #Allow reset is true if student has failed the criteria to move to the next child task
         self.allow_reset = instance_state.get('ready_to_reset', False)
         self.max_attempts = int(self.metadata.get('attempts', MAX_ATTEMPTS))
+        self.is_scored = self.metadata.get('is_graded', IS_SCORED) in TRUE_DICT
+        self.accept_file_upload = self.metadata.get('accept_file_upload', ACCEPT_FILE_UPLOAD) in TRUE_DICT
 
         # Used for progress / grading.  Currently get credit just for
         # completion (doesn't matter if you self-assessed correct/incorrect).
         self._max_score = int(self.metadata.get('max_score', MAX_SCORE))
 
+        if self._max_score > MAX_SCORE_ALLOWED:
+            error_message = "Max score {0} is higher than max score allowed {1} for location {2}".format(self._max_score,
+                MAX_SCORE_ALLOWED, location)
+            log.error(error_message)
+            raise IncorrectMaxScoreError(error_message)
+
         rubric_renderer = CombinedOpenEndedRubric(system, True)
-        try:
-            rubric_feedback = rubric_renderer.render_rubric(stringify_children(definition['rubric']))
-        except RubricParsingError:
-            log.error("Failed to parse rubric in location: {1}".format(location))
-            raise 
+        rubric_string = stringify_children(definition['rubric'])
+        rubric_renderer.check_if_rubric_is_parseable(rubric_string, location, MAX_SCORE_ALLOWED)
+
         #Static data is passed to the child modules to render
         self.static_data = {
             'max_score': self._max_score,
             'max_attempts': self.max_attempts,
             'prompt': definition['prompt'],
             'rubric': definition['rubric'],
-            'display_name': self.display_name
+            'display_name': self.display_name,
+            'accept_file_upload': self.accept_file_upload,
         }
 
         self.task_xml = definition['task_xml']
@@ -245,13 +275,13 @@ class CombinedOpenEndedModule(XModule):
         elif current_task_state is None and self.current_task_number > 0:
             last_response_data = self.get_last_response(self.current_task_number - 1)
             last_response = last_response_data['response']
-            current_task_state=json.dumps({
-                'state' : self.ASSESSING,
-                'version' : self.STATE_VERSION,
-                'max_score' : self._max_score,
-                'attempts' : 0,
-                'created' : True,
-                'history' : [{'answer' : str(last_response)}],
+            current_task_state = json.dumps({
+                'state': self.ASSESSING,
+                'version': self.STATE_VERSION,
+                'max_score': self._max_score,
+                'attempts': 0,
+                'created': True,
+                'history': [{'answer': last_response}],
             })
             self.current_task = child_task_module(self.system, self.location,
                 self.current_task_parsed_xml, self.current_task_descriptor, self.static_data,
@@ -265,7 +295,6 @@ class CombinedOpenEndedModule(XModule):
                 self.current_task_parsed_xml, self.current_task_descriptor, self.static_data,
                 instance_state=current_task_state)
 
-        log.debug(current_task_state)
         return True
 
     def check_allow_reset(self):
@@ -304,7 +333,8 @@ class CombinedOpenEndedModule(XModule):
             'task_count': len(self.task_xml),
             'task_number': self.current_task_number + 1,
             'status': self.get_status(),
-            'display_name': self.display_name 
+            'display_name': self.display_name,
+            'accept_file_upload': self.accept_file_upload,
         }
 
         return context
@@ -392,6 +422,15 @@ class CombinedOpenEndedModule(XModule):
         last_correctness = task.is_last_response_correct()
         max_score = task.max_score()
         state = task.state
+        if task_type in HUMAN_TASK_TYPE:
+            human_task_name = HUMAN_TASK_TYPE[task_type]
+        else:
+            human_task_name = task_type
+
+        if state in task.HUMAN_NAMES:
+            human_state = task.HUMAN_NAMES[state]
+        else:
+            human_state = state
         last_response_dict = {
             'response': last_response,
             'score': last_score,
@@ -399,7 +438,8 @@ class CombinedOpenEndedModule(XModule):
             'type': task_type,
             'max_score': max_score,
             'state': state,
-            'human_state': task.HUMAN_NAMES[state],
+            'human_state': human_state,
+            'human_task': human_task_name,
             'correct': last_correctness,
             'min_score_to_attempt': min_score_to_attempt,
             'max_score_to_attempt': max_score_to_attempt,
@@ -546,6 +586,63 @@ class CombinedOpenEndedModule(XModule):
         status_html = self.system.render_template("combined_open_ended_status.html", context)
 
         return status_html
+
+    def check_if_done_and_scored(self):
+        """
+        Checks if the object is currently in a finished state (either student didn't meet criteria to move
+        to next step, in which case they are in the allow_reset state, or they are done with the question
+        entirely, in which case they will be in the self.DONE state), and if it is scored or not.
+        @return: Boolean corresponding to the above.
+        """
+        return (self.state == self.DONE or self.allow_reset) and self.is_scored
+
+    def get_score(self):
+        """
+        Score the student received on the problem, or None if there is no
+        score.
+
+        Returns:
+          dictionary
+             {'score': integer, from 0 to get_max_score(),
+              'total': get_max_score()}
+        """
+        max_score = None
+        score = None
+        if self.check_if_done_and_scored():
+            last_response = self.get_last_response(self.current_task_number)
+            max_score = last_response['max_score']
+            score = last_response['score']
+
+        score_dict = {
+            'score': score,
+            'total': max_score,
+        }
+
+        return score_dict
+
+    def max_score(self):
+        ''' Maximum score. Two notes:
+
+            * This is generic; in abstract, a problem could be 3/5 points on one
+              randomization, and 5/7 on another
+        '''
+        max_score = None
+        if self.check_if_done_and_scored():
+            last_response = self.get_last_response(self.current_task_number)
+            max_score = last_response['max_score']
+        return max_score
+
+    def get_progress(self):
+        ''' Return a progress.Progress object that represents how far the
+        student has gone in this module.  Must be implemented to get correct
+        progress tracking behavior in nesting modules like sequence and
+        vertical.
+
+        If this module has no notion of progress, return None.
+        '''
+        progress_object = Progress(self.current_task_number, len(self.task_xml))
+
+        return progress_object
 
 
 class CombinedOpenEndedDescriptor(XmlDescriptor, EditingDescriptor):
