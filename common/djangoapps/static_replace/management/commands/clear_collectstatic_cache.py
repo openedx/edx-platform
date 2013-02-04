@@ -8,6 +8,6 @@ class Command(NoArgsCommand):
     help = \
 '''Import the specified data directory into the default ModuleStore'''
 
-    def handle_noargs(self):
+    def handle_noargs(self, **options):
         staticfiles_cache = get_cache('staticfiles')
         staticfiles_cache.clear()
