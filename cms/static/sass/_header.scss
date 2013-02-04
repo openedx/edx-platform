@@ -19,7 +19,7 @@
     }
   }
 
-  header {
+  header.primary {
     @include clearfix();
     max-width: $fg-max-width;
     min-width: $fg-min-width;

@@ -5,7 +5,7 @@
   position: relative;
   width: 100%;
 
-  footer {
+  footer.primary {
     @include clearfix();
     @include font-size(13);
     max-width: $fg-max-width;
