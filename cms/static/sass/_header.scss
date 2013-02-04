@@ -19,13 +19,13 @@
     }
   }
 
-  .header {
+  header {
     @include clearfix();
     max-width: $fg-max-width;
     min-width: $fg-min-width;
     width: flex-grid(12);
     margin: 0 auto;
-    color: $lightGrey;
+    color: $gray-l1;
   }
 }
 

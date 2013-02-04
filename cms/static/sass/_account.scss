@@ -19,7 +19,7 @@
     
     header {
       position: relative;
-      margin-bottom: ($baseline/2);
+      margin-bottom: $baseline;
       border-bottom: 1px solid $gray-l4;
       padding-bottom: ($baseline/2);
 
@@ -129,6 +129,22 @@
             &.short {
               width: 25%;
             }
+
+            ::-webkit-input-placeholder {
+               color: $gray-l4;
+            }
+
+            :-moz-placeholder {
+               color: $gray-l3; 
+            }
+
+            ::-moz-placeholder {
+               color: $gray-l3;  
+            }
+
+            :-ms-input-placeholder {  
+               color: $gray-l3; 
+            }
           }
 
           textarea.long {
@@ -212,12 +228,20 @@
 
 .signup {
 
-
 }
 
 .signin {
 
+  #field-password {
+    position: relative;
 
+    .action-forgotpassword {
+      @include font-size(13);
+      position: absolute;
+      top: 0;
+      right: 0;
+    }
+  }
 }
 
 // @include transition(all 1s ease-in-out);
