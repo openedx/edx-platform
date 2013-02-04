@@ -38,7 +38,9 @@ from peer_grading_service import peer_grading_service, GradingServiceError
 log = logging.getLogger(__name__)
 
 USE_FOR_SINGLE_LOCATION = False
+LINK_TO_LOCATION = ""
 TRUE_DICT = [True, "True", "true", "TRUE"]
+
 
 class PeerGradingModule(XModule):
     _VERSION = 1
@@ -60,18 +62,23 @@ class PeerGradingModule(XModule):
         # Load instance state
         if instance_state is not None:
             instance_state = json.loads(instance_state)
+            use_for_single_location = instance_state.get('use_for_single_location', USE_FOR_SINGLE_LOCATION)
         else:
             instance_state = {}
 
         #We need to set the location here so the child modules can use it
         system.set('location', location)
-        log.debug("Location: {0}".format(location))
         self.system = system
         self.peer_gs = peer_grading_service(self.system)
 
-        self.use_for_single_location = self.metadata.get('use_for_single_location', USE_FOR_SINGLE_LOCATION)
+        self.use_for_single_location = self.metadata.get('use_for_single_location', use_for_single_location)
         if isinstance(self.use_for_single_location, basestring):
             self.use_for_single_location = (self.use_for_single_location in TRUE_DICT)
+
+        self.link_to_location = self.metadata.get('link_to_location', USE_FOR_SINGLE_LOCATION)
+        if self.use_for_single_location ==True:
+            #This will raise an exception if the location is invalid
+            link_to_location_object = Location(self.link_to_location)
 
         self.ajax_url = self.system.ajax_url
         if not self.ajax_url.endswith("/"):
@@ -99,15 +106,13 @@ class PeerGradingModule(XModule):
         if not self.use_for_single_location:
             return self.peer_grading()
         else:
-            return self.peer_grading_problem({'location' : self.system.location})
+            return self.peer_grading_problem({'location' : self.link_to_location})
 
     def handle_ajax(self, dispatch, get):
         """
         Needs to be implemented by child modules.  Handles AJAX events.
         @return:
         """
-
-        log.debug(get)
         handlers = {
             'get_next_submission': self.get_next_submission,
             'show_calibration_essay': self.show_calibration_essay,
