@@ -69,6 +69,7 @@ def replace_static_urls(text, data_directory, course_namespace=None):
 
     def replace_static_url(match):
         original = match.group(0)
+        prefix = match.group('prefix')
         quote = match.group('quote')
         rest = match.group('rest')
 
@@ -78,16 +79,16 @@ def replace_static_urls(text, data_directory, course_namespace=None):
         # If we're in debug mode, and the file as requested exists, then don't change the links
         elif (settings.DEBUG and finders.find(rest, True)):
             return original
-        # Otherwise, look the file up in staticfiles_storage
+        # Otherwise, look the file up in staticfiles_storage without the data directory
         else:
-            path = data_directory + '/' + rest
             try:
-                url = staticfiles_storage.url(path)
-            # And if that fails, return the path unmodified
+                url = staticfiles_storage.url(rest)
+            # And if that fails, assume that it's course content, and add manually data directory
             except Exception as err:
                 log.warning("staticfiles_storage couldn't find path {0}: {1}".format(
-                    path, str(err)))
-                return original
+                    rest, str(err)))
+                url = "".join([prefix, data_directory, '/', rest])
+
         return "".join([quote, url, quote])
 
     return re.sub(
