@@ -53,7 +53,7 @@ def replace_course_urls(text, course_id):
         rest = match.group('rest')
         return "".join([quote, '/courses/' + course_id + '/', rest, quote])
 
-    return re.sub(_url_replace_regex('/courses/'), replace_course_url, text)
+    return re.sub(_url_replace_regex('/course/'), replace_course_url, text)
 
 
 def replace_static_urls(text, data_directory, course_namespace=None):
