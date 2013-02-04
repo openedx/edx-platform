@@ -169,8 +169,18 @@ class PeerGradingModule(XModule):
                     self.system.location, self.system.anonymous_student_id
                 ))
                 return None
+            count_graded = response['count_graded']
+            count_required = response['count_required']
+            if count_required>0 and count_graded>=count_required:
+                self.student_data_for_location = response
 
-        
+        score_dict = {
+            'score': int(count_graded>=count_required),
+            'total': self.max_score,
+            }
+
+        return score_dict
+
     def max_score(self):
         ''' Maximum score. Two notes:
 
