@@ -13,6 +13,10 @@ from urlparse import urlparse
 import requests
 from boto.s3.connection import S3Connection
 from boto.s3.key import Key
+#TODO: Settings import is needed now in order to specify the URL and keys for amazon s3 (to upload images).
+#Eventually, the goal is to replace the global django settings import with settings specifically
+#for this module.  There is no easy way to do this now, so piggybacking on the django settings
+#makes sense.
 from django.conf import settings
 import pickle
 import logging

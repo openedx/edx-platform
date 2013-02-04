@@ -4,8 +4,11 @@ import requests
 from requests.exceptions import RequestException, ConnectionError, HTTPError
 import sys
 
+#TODO: Settings import is needed now in order to specify the URL where to find the peer grading service.
+#Eventually, the goal is to replace the global django settings import with settings specifically
+#for this xmodule.  There is no easy way to do this now, so piggybacking on the django settings
+#makes sense.
 from django.conf import settings
-from django.http import HttpResponse, Http404
 
 from combined_open_ended_rubric import CombinedOpenEndedRubric, RubricParsingError
 from lxml import etree
