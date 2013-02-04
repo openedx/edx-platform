@@ -244,6 +244,9 @@ def flagged_problem_list(request, course_id):
 
 @cache_control(no_cache=True, no_store=True, must_revalidate=True)
 def combined_notifications(request, course_id):
+    """
+    Gets combined notifications from the grading controller and displays them
+    """
     course = get_course_with_access(request.user, course_id, 'load')
     user = request.user
     notifications = open_ended_notifications.combined_notifications(course, user)
@@ -292,9 +295,11 @@ def combined_notifications(request, course_id):
         combined_dict
     )
 
+@cache_control(no_cache=True, no_store=True, must_revalidate=True)
 def take_action_on_flags(request, course_id):
     """
-
+    Takes action on student flagged submissions.
+    Currently, only support unflag and ban actions.
     """
     if request.method != 'POST':
         raise Http404
