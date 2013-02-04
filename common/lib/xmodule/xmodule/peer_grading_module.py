@@ -135,12 +135,42 @@ class PeerGradingModule(XModule):
 
         return json.dumps(d, cls=ComplexEncoder)
 
+    def query_data_for_location(self):
+        student_id = self.system.anonymous_student_id
+        location = self.system.location
+        success = False
+        response = {}
+
+        try:
+            response = self.peer_gs.get_data_for_location(location, grader_id)
+            count_graded = response['count_graded']
+            count_required = response['count_required']
+            success = True
+        except GradingServiceError:
+            log.exception("Error getting location data from controller for location {0}, student {1}"
+            .format(location, student_id))
+
+        return success, response
+
     def get_progress(self):
         pass
 
     def get_score(self):
-        pass
+        if not self.use_for_single_location:
+            return None
 
+        try:
+            count_graded = self.student_data_for_location['count_graded']
+            count_required = self.student_data_for_location['count_required']
+        except:
+            success, response = self.query_data_for_location()
+            if not success:
+                log.exception("No instance data found and could not get data from controller for loc {0} student {1}".format(
+                    self.system.location, self.system.anonymous_student_id
+                ))
+                return None
+
+        
     def max_score(self):
         ''' Maximum score. Two notes:
 
@@ -148,9 +178,8 @@ class PeerGradingModule(XModule):
               randomization, and 5/7 on another
         '''
         max_score = None
-        if self.check_if_done_and_scored():
-            last_response = self.get_last_response(self.current_task_number)
-            max_score = last_response['max_score']
+        if self.use_for_single_location:
+            max_score = self.max_score
         return max_score
 
     def get_next_submission(self, get):

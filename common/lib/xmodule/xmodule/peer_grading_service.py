@@ -38,7 +38,7 @@ class PeerGradingService():
     def get_data_for_location(self, problem_location, student_id):
         response = self.get(self.get_data_for_location_url,
             {'location': problem_location, 'student_id': student_id})
-        return self._render_rubric(response)
+        return response
 
     def get_next_submission(self, problem_location, grader_id):
         response = self.get(self.get_next_submission_url,
