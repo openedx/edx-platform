@@ -58,7 +58,7 @@ from cms.djangoapps.models.settings.course_details import CourseDetails,\
     CourseSettingsEncoder
 from cms.djangoapps.models.settings.course_grading import CourseGradingModel
 from cms.djangoapps.contentstore.utils import get_modulestore
-from lxml import etree
+from cms.djangoapps.models.settings.course_metadata import CourseMetadata
 
 # to install PIL on MacOSX: 'easy_install http://dist.repoze.org/PIL-1.1.6.tar.gz'
 
@@ -1177,6 +1177,59 @@ def course_grader_updates(request, org, course, name, grader_index=None):
     elif request.method == 'POST': # post or put, doesn't matter.
         return HttpResponse(json.dumps(CourseGradingModel.update_grader_from_json(Location(['i4x', org, course, 'course',name]), request.POST)),
                             mimetype="application/json")
+
+
+@login_required
+@ensure_csrf_cookie
+def course_edit_metadata(request, org, course, name):
+    """
+    Send models and views as well as html for editing the course editable metadata to the client.
+
+    org, course, name: Attributes of the Location for the item to edit
+    """
+    location = ['i4x', org, course, 'course', name]
+    
+    # check that logged in user has permissions to this item
+    if not has_access(request.user, location):
+        raise PermissionDenied()
+    
+    editable = CourseMetadata.fetch(location)
+    
+    return render_to_response('course_info.html', {
+        'active_tab': 'settings',
+        'editable_metadata': editable,
+        'url_base' : "/" + org + "/" + course + "/",
+        'blacklist_keys' : CourseMetadata.FILTERED_LIST
+    })
+        
+@expect_json
+@login_required
+@ensure_csrf_cookie
+def course_metadata_rest_access(request, org, course, name):
+    """
+    restful CRUD operations on metadata. The payload is a json rep of the metadata dicts. For delete, otoh,
+    the payload is either a key or a list of keys to delete.
+
+    org, course: Attributes of the Location for the item to edit
+    """
+    location = ['i4x', org, course, 'course', name]
+    
+    # check that logged in user has permissions to this item
+    if not has_access(request.user, location):
+        raise PermissionDenied()
+
+    # NB: we're setting Backbone.emulateHTTP to true on the client so everything comes as a post!!!
+    if request.method == 'POST' and 'HTTP_X_HTTP_METHOD_OVERRIDE' in request.META:
+        real_method = request.META['HTTP_X_HTTP_METHOD_OVERRIDE']
+    else:
+        real_method = request.method
+        
+    if request.method == 'GET':
+        return HttpResponse(json.dumps(CourseMetadata.fetch(location)), mimetype="application/json")
+    elif real_method == 'DELETE':  # coming as POST need to pull from Request Header X-HTTP-Method-Override    DELETE
+        return HttpResponse(json.dumps(CourseMetadata.delete_key(location, request.POST)), mimetype="application/json")
+    elif request.method == 'POST':
+        return HttpResponse(json.dumps(CourseMetadata.update_from_json(location, request.POST)), mimetype="application/json")
 
 
 @login_required
