@@ -86,19 +86,23 @@ def peer_grading(request, course_id):
     course_id_parts = course.id.split("/")
     course_id_norun = "/".join(course_id_parts[0:2])
     pg_location = "i4x://" + course_id_norun + "/peergrading/init"
-    log.debug("PG LOCATION :{0}".format(pg_location))
 
     base_course_url  = reverse('courses')
-    problem_url_parts = search.path_to_location(modulestore(), course.id, pg_location)
-    problem_url = base_course_url + "/"
-    for z in xrange(0,len(problem_url_parts)):
-        part = problem_url_parts[z]
-        if part is not None:
-            if z==1:
-                problem_url += "courseware/"
-            problem_url += part + "/"
+    try:
+        problem_url_parts = search.path_to_location(modulestore(), course.id, pg_location)
+        problem_url = base_course_url + "/"
+        for z in xrange(0,len(problem_url_parts)):
+            part = problem_url_parts[z]
+            if part is not None:
+                if z==1:
+                    problem_url += "courseware/"
+                problem_url += part + "/"
 
-    return HttpResponseRedirect(problem_url)
+        return HttpResponseRedirect(problem_url)
+    except:
+        error_message = "Error with initializing peer grading.  Centralized module does not exist.  Please contact course staff."
+        log.error(error_message + "Current course is: {0}".format(course_id))
+        return HttpResponse(error_message)
 
 @cache_control(no_cache=True, no_store=True, must_revalidate=True)
 def student_problem_list(request, course_id):
