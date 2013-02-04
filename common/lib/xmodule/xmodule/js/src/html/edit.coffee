@@ -71,15 +71,16 @@ class @HTMLEditingDescriptor
     e.preventDefault();
 
     if not $(e.currentTarget).hasClass('current')
-      $('.editor-tabs .current', @element).removeClass('current')
       $(e.currentTarget).addClass('current')
       $('table.mceToolbar', @element).toggleClass(HTMLEditingDescriptor.isInactiveClass)
       $(@advanced_editor.getWrapperElement()).toggleClass(HTMLEditingDescriptor.isInactiveClass)
 
       visualEditor = @getVisualEditor()
       if $(e.currentTarget).attr('data-tab') is 'visual'
+        $('.html-tab', @element).removeClass('current')
         @showVisualEditor(visualEditor)
       else
+        $('.visual-tab', @element).removeClass('current')
         @showAdvancedEditor(visualEditor)
 
   # Show the Advanced (codemirror) Editor. Pulled out as a helper method for unit testing.
