@@ -11,8 +11,6 @@ import json
 from fs.osfs import OSFS
 import copy
 
-from student.models import Registration
-from django.contrib.auth.models import User
 from cms.djangoapps.contentstore.utils import get_modulestore
 
 from xmodule.modulestore import Location
@@ -29,22 +27,7 @@ from xmodule.course_module import CourseDescriptor
 from xmodule.seq_module import SequenceDescriptor
 
 from xmodule.modulestore.tests.factories import CourseFactory, ItemFactory
-from .utils import CmsTestCase
-
-def parse_json(response):
-    """Parse response, which is assumed to be json"""
-    return json.loads(response.content)
-
-
-def user(email):
-    """look up a user by email"""
-    return User.objects.get(email=email)
-
-
-def registration(email):
-    """look up registration object by email"""
-    return Registration.objects.get(user__email=email)
-
+from utils import ModuleStoreTestCase, parse_json, user, registration
 
 class ContentStoreTestCase(TestCase):
     def _login(self, email, pw):

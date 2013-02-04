@@ -1,5 +1,4 @@
 from factory import Factory
-# from datetime import datetime
 from time import gmtime
 from uuid import uuid4
 from xmodule.modulestore import Location
@@ -22,7 +21,8 @@ class XModuleCourseFactory(Factory):
 
     @classmethod
     def _create(cls, target_class, *args, **kwargs):
-
+        # This logic was taken from the create_new_course method in
+        # cms/djangoapps/contentstore/views.py
         template = Location('i4x', 'edx', 'templates', 'course', 'Empty')
         org = kwargs.get('org')
         number = kwargs.get('number')
@@ -41,6 +41,7 @@ class XModuleCourseFactory(Factory):
 
         new_course.metadata['data_dir'] = uuid4().hex
         new_course.metadata['start'] = stringify_time(gmtime())
+
         new_course.tabs = [{"type": "courseware"}, 
             {"type": "course_info", "name": "Course Info"}, 
             {"type": "discussion", "name": "Discussion"},
