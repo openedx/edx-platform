@@ -11,7 +11,7 @@ from django.contrib.auth.models import User
 
 from mitxmako.shortcuts import render_to_response, render_to_string
 from courseware.courses import get_course_with_access
-from course_groups.cohorts import get_cohort_id, get_course_cohorts, get_cohorted_commentables, is_course_cohorted
+from course_groups.cohorts import get_cohort_id, get_course_cohorts, get_cohorted_commentables, is_course_cohorted, get_cohort_by_id
 from courseware.access import has_access
 
 from urllib import urlencode
@@ -133,6 +133,8 @@ def forum_form_discussion(request, course_id):
 
     for thread in threads:
         courseware_context = get_courseware_context(thread, course)
+        if thread.get('group_id') and not thread.get('group_name'):
+                thread['group_name'] = get_cohort_by_id(course_id, thread.get('group_id')).name      
         if courseware_context:
             thread.update(courseware_context)
     if request.is_ajax():
@@ -152,10 +154,8 @@ def forum_form_discussion(request, course_id):
         #trending_tags = cc.search_trending_tags(
         #    course_id,
         #)
+        
         cohorts = get_course_cohorts(course_id)
-        cohort_dictionary = dict()
-        for c in cohorts:
-          cohort_dictionary[c.id] = c.name
 
         context = {
             'csrf': csrf(request)['csrf_token'],
@@ -172,7 +172,6 @@ def forum_form_discussion(request, course_id):
             'roles': saxutils.escape(json.dumps(utils.get_role_ids(course_id)), escapedict),
             'is_moderator': cached_has_permission(request.user, "see_all_cohorts", course_id),
             'cohorts': cohorts,
-            'cohort_map': cohort_dictionary,
             'user_cohort': get_cohort_id(user, course_id),
             'cohorted_commentables': get_cohorted_commentables(course_id),
             'is_course_cohorted': is_course_cohorted(course_id)
@@ -189,9 +188,6 @@ def single_thread(request, course_id, discussion_id, thread_id):
 
     try:
         thread = cc.Thread.find(thread_id).retrieve(recursive=True, user_id=request.user.id)
-        print("\n\n\n\n\n\n***************************")
-        print("thread.get('group_id','NONE')")
-        print(thread)
     except (cc.utils.CommentClientError, cc.utils.CommentClientUnknownError) as err:
         log.error("Error loading single thread.")
         raise Http404
@@ -229,6 +225,8 @@ def single_thread(request, course_id, discussion_id, thread_id):
             courseware_context = get_courseware_context(thread, course)
             if courseware_context:
                 thread.update(courseware_context)
+            if thread.get('group_id') and not thread.get('group_name'):
+                thread['group_name'] = get_cohort_by_id(course_id, thread.get('group_id')).name     
 
         threads = [utils.safe_content(thread) for thread in threads]
 
@@ -241,7 +239,6 @@ def single_thread(request, course_id, discussion_id, thread_id):
         #trending_tags = cc.search_trending_tags(
         #    course_id,
         #)
-
 
         annotated_content_info = utils.get_metadata_for_threads(course_id, threads, request.user, user_info)
 
