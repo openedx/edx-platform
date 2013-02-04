@@ -18,8 +18,10 @@ from django.core.urlresolvers import reverse
 
 from fs.errors import ResourceNotFoundError
 
-from lxml.html import rewrite_links
+from courseware.access import has_access
+from static_replace import replace_urls
 
+from lxml.html import rewrite_links
 from module_render import get_module
 from courseware.access import has_access
 from static_replace import replace_urls
@@ -27,12 +29,9 @@ from xmodule.modulestore import Location
 from xmodule.modulestore.django import modulestore
 from xmodule.modulestore.xml import XMLModuleStore
 from xmodule.x_module import XModule
-
-
-
-from open_ended_grading.peer_grading_service import PeerGradingService
-from open_ended_grading.staff_grading_service import StaffGradingService
 from student.models import unique_id_for_user
+
+from open_ended_grading import open_ended_notifications
 
 log = logging.getLogger(__name__)
 
@@ -118,48 +117,44 @@ def _textbooks(tab, user, course, active_page):
 def _staff_grading(tab, user, course, active_page):
     if has_access(user, course, 'staff'):
         link = reverse('staff_grading', args=[course.id])
-        staff_gs = StaffGradingService(settings.STAFF_GRADING_INTERFACE)
-        pending_grading=False
-        tab_name = "Staff grading"
-        img_path= ""
-        try:
-            notifications = json.loads(staff_gs.get_notifications(course.id))
-            if notifications['success']:
-                if notifications['staff_needs_to_grade']:
-                    pending_grading=True
-        except:
-            #Non catastrophic error, so no real action
-            log.info("Problem with getting notifications from staff grading service.")
 
-        if pending_grading:
-            img_path = "/static/images/slider-handle.png"
+        tab_name = "Staff grading"
+
+        notifications  = open_ended_notifications.staff_grading_notifications(course, user)
+        pending_grading = notifications['pending_grading']
+        img_path = notifications['img_path']
 
         tab = [CourseTab(tab_name, link, active_page == "staff_grading", pending_grading, img_path)]
         return tab
     return []
 
 def _peer_grading(tab, user, course, active_page):
+
     if user.is_authenticated():
         link = reverse('peer_grading', args=[course.id])
-        peer_gs = PeerGradingService(settings.PEER_GRADING_INTERFACE)
-        pending_grading=False
         tab_name = "Peer grading"
-        img_path= ""
-        try:
-            notifications = json.loads(peer_gs.get_notifications(course.id,unique_id_for_user(user)))
-            if notifications['success']:
-                if notifications['student_needs_to_peer_grade']:
-                    pending_grading=True
-        except:
-            #Non catastrophic error, so no real action
-            log.info("Problem with getting notifications from peer grading service.")
 
-        if pending_grading:
-            img_path = "/static/images/slider-handle.png"
+        notifications = open_ended_notifications.peer_grading_notifications(course, user)
+        pending_grading = notifications['pending_grading']
+        img_path = notifications['img_path']
 
         tab = [CourseTab(tab_name, link, active_page == "peer_grading", pending_grading, img_path)]
         return tab
     return []
+
+def _combined_open_ended_grading(tab, user, course, active_page):
+    if user.is_authenticated():
+        link = reverse('open_ended_notifications', args=[course.id])
+        tab_name = "Open Ended Panel"
+
+        notifications  = open_ended_notifications.combined_notifications(course, user)
+        pending_grading = notifications['pending_grading']
+        img_path = notifications['img_path']
+
+        tab = [CourseTab(tab_name, link, active_page == "open_ended", pending_grading, img_path)]
+        return tab
+    return []
+
 
 #### Validators
 
@@ -198,6 +193,7 @@ VALID_TAB_TYPES = {
     'static_tab': TabImpl(key_checker(['name', 'url_slug']), _static_tab),
     'peer_grading': TabImpl(null_validator, _peer_grading),
     'staff_grading': TabImpl(null_validator, _staff_grading),
+    'open_ended': TabImpl(null_validator, _combined_open_ended_grading),
     }
 
 

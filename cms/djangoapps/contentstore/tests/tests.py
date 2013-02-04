@@ -445,6 +445,17 @@ class ContentStoreTest(TestCase):
         items = ms.get_items(Location(['i4x','edX', 'full', 'vertical', None]))
         self.assertEqual(len(items), 0)
 
+    def verify_content_existence(self, modulestore, root_dir, location, dirname, category_name, filename_suffix=''):
+        fs = OSFS(root_dir / 'test_export')
+        self.assertTrue(fs.exists(dirname))
+
+        query_loc = Location('i4x', location.org, location.course, category_name, None)
+        items = modulestore.get_items(query_loc)
+
+        for item in items:
+            fs = OSFS(root_dir / ('test_export/' + dirname))
+            self.assertTrue(fs.exists(item.location.name + filename_suffix))
+
     def test_export_course(self):
         ms = modulestore('direct')
         cs = contentstore() 
@@ -460,26 +471,14 @@ class ContentStoreTest(TestCase):
         export_to_xml(ms, cs, location, root_dir, 'test_export')
 
         # check for static tabs
-        fs = OSFS(root_dir / 'test_export')
-        self.assertTrue(fs.exists('tabs'))
-
-        static_tabs_query_loc = Location('i4x', location.org, location.course, 'static_tab', None)
-        static_tabs = ms.get_items(static_tabs_query_loc)
-
-        for static_tab in static_tabs:
-            fs = OSFS(root_dir / 'test_export/tabs')
-            self.assertTrue(fs.exists(static_tab.location.name + '.html'))
+        self.verify_content_existence(ms, root_dir, location, 'tabs', 'static_tab', '.html')
 
         # check for custom_tags
-        fs = OSFS(root_dir / 'test_export')
-        self.assertTrue(fs.exists('custom_tags'))
+        self.verify_content_existence(ms, root_dir, location, 'info', 'course_info', '.html')
 
-        custom_tags_query_loc = Location('i4x', location.org, location.course, 'custom_tag_template', None)
-        custom_tags = ms.get_items(custom_tags_query_loc)
-
-        for custom_tag in custom_tags:
-            fs = OSFS(root_dir / 'test_export/custom_tags')
-            self.assertTrue(fs.exists(custom_tag.location.name))       
+        # check for custom_tags
+        self.verify_content_existence(ms, root_dir, location, 'custom_tags', 'custom_tag_template')
+  
 
         # remove old course
         delete_course(ms, cs, location)
@@ -495,6 +494,7 @@ class ContentStoreTest(TestCase):
             self.assertEqual(resp.status_code, 200)
 
         shutil.rmtree(root_dir)        
+
 
     def test_course_handouts_rewrites(self):
         ms = modulestore('direct')

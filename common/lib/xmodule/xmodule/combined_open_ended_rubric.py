@@ -4,7 +4,8 @@ from lxml import etree
 log=logging.getLogger(__name__)
 
 class RubricParsingError(Exception):
-    pass
+    def __init__(self, msg):
+        self.msg = msg
 
 class CombinedOpenEndedRubric(object):
 
@@ -23,15 +24,32 @@ class CombinedOpenEndedRubric(object):
         Output:
             html: the html that corresponds to the xml given
         '''
+        success = False
         try:
             rubric_categories = self.extract_categories(rubric_xml)
             html = self.system.render_template('open_ended_rubric.html', 
                     {'categories'  : rubric_categories,
                      'has_score': self.has_score,
                      'view_only': self.view_only})
+            success = True
         except:
             raise RubricParsingError("[render_rubric] Could not parse the rubric with xml: {0}".format(rubric_xml))
-        return html
+        return success, html
+
+    def check_if_rubric_is_parseable(self, rubric_string, location, max_score_allowed):
+        success, rubric_feedback = self.render_rubric(rubric_string)
+        if not success:
+            error_message = "Could not parse rubric : {0} for location {1}".format(rubric_string, location.url())
+            log.error(error_message)
+            raise RubricParsingError(error_message)
+
+        rubric_categories = self.extract_categories(rubric_string)
+        for category in rubric_categories:
+            if len(category['options']) > (max_score_allowed + 1):
+                error_message = "Number of score points in rubric {0} higher than the max allowed, which is {1}".format(
+                    len(category['options']), max_score_allowed)
+                log.error(error_message)
+                raise RubricParsingError(error_message)
 
     def extract_categories(self, element):
         '''

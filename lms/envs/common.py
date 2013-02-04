@@ -266,6 +266,24 @@ STATICFILES_DIRS = [
     COMMON_ROOT / "static",
     PROJECT_ROOT / "static",
 ]
+if os.path.isdir(DATA_DIR):
+    # Add the full course repo if there is no static directory
+    STATICFILES_DIRS += [
+        # TODO (cpennington): When courses are stored in a database, this
+        # should no longer be added to STATICFILES
+        (course_dir, DATA_DIR / course_dir)
+        for course_dir in os.listdir(DATA_DIR)
+        if (os.path.isdir(DATA_DIR / course_dir) and
+            not os.path.isdir(DATA_DIR / course_dir / 'static'))
+    ]
+    # Otherwise, add only the static directory from the course dir
+    STATICFILES_DIRS += [
+        # TODO (cpennington): When courses are stored in a database, this
+        # should no longer be added to STATICFILES
+        (course_dir, DATA_DIR / course_dir / 'static')
+        for course_dir in os.listdir(DATA_DIR)
+        if (os.path.isdir(DATA_DIR / course_dir / 'static'))
+    ]
 
 # Locale/Internationalization
 TIME_ZONE = 'America/New_York' # http://en.wikipedia.org/wiki/List_of_tz_zones_by_name
@@ -450,7 +468,7 @@ PIPELINE_JS = {
         'source_filenames': sorted(
             set(rooted_glob(COMMON_ROOT / 'static', 'coffee/src/**/*.coffee') +
                 rooted_glob(PROJECT_ROOT / 'static', 'coffee/src/**/*.coffee')) -
-            set(courseware_js + discussion_js + staff_grading_js + peer_grading_js)
+            set(courseware_js + discussion_js + staff_grading_js + peer_grading_js) 
         ) + [
             'js/form.ext.js',
             'js/my_courses_dropdown.js',

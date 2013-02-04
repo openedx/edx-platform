@@ -125,11 +125,14 @@ urlpatterns = ('',
     url(r'^press/bostonx-announcement$', 'static_template_view.views.render',
         {'template': 'press_releases/bostonx_announcement.html'},
         name="press/bostonx-announcement"),
+    url(r'^press/eric-lander-secret-of-life$', 'static_template_view.views.render',
+        {'template': 'press_releases/eric_lander_secret_of_life.html'},
+        name="press/eric-lander-secret-of-life"),
 
 
     # Should this always update to point to the latest press release?
     (r'^pressrelease$', 'django.views.generic.simple.redirect_to',
-     {'url': '/press/bostonx-announcement'}),
+     {'url': '/press/eric-lander-secret-of-life'}),
 
 
     (r'^favicon\.ico$', 'django.views.generic.simple.redirect_to', {'url': '/static/images/favicon.ico'}),
@@ -282,7 +285,11 @@ if settings.COURSEWARE_ENABLED:
         url(r'^courses/(?P<course_id>[^/]+/[^/]+/[^/]+)/peer_grading/save_calibration_essay$',
             'open_ended_grading.peer_grading_service.save_calibration_essay', name='peer_grading_save_calibration_essay'),
 
-        # Cohorts management
+        # Open Ended problem list
+        url(r'^courses/(?P<course_id>[^/]+/[^/]+/[^/]+)/open_ended_problems$',
+            'open_ended_grading.views.student_problem_list', name='open_ended_problems'),
+		
+		# Cohorts management
         url(r'^courses/(?P<course_id>[^/]+/[^/]+/[^/]+)/cohorts$',
             'course_groups.views.list_cohorts', name="cohorts"),
         url(r'^courses/(?P<course_id>[^/]+/[^/]+/[^/]+)/cohorts/add$',
@@ -301,6 +308,9 @@ if settings.COURSEWARE_ENABLED:
             'course_groups.views.debug_cohort_mgmt',
             name="debug_cohort_mgmt"),
 
+        # Open Ended Notifications
+        url(r'^courses/(?P<course_id>[^/]+/[^/]+/[^/]+)/open_ended_notifications$',
+            'open_ended_grading.views.combined_notifications', name='open_ended_notifications'),
     )
 
     # discussion forums live within courseware, so courseware must be enabled first

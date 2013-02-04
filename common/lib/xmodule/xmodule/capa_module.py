@@ -356,7 +356,7 @@ class CapaModule(XModule):
                 id=self.location.html_id(), ajax_url=self.system.ajax_url) + html + "</div>"
 
         # now do the substitutions which are filesystem based, e.g. '/static/' prefixes
-        return self.system.replace_urls(html)
+        return self.system.replace_urls(html, self.metadata['data_dir'], course_namespace=self.location)
 
     def handle_ajax(self, dispatch, get):
         '''
@@ -397,6 +397,15 @@ class CapaModule(XModule):
             return True
 
         return False
+
+    def is_completed(self):
+        # used by conditional module
+        # return self.answer_available()
+        return self.lcp.done
+
+    def is_attempted(self):
+        # used by conditional module
+        return self.attempts > 0
 
     def answer_available(self):
         ''' Is the user allowed to see an answer?
@@ -461,7 +470,7 @@ class CapaModule(XModule):
         new_answers = dict()
         for answer_id in answers:
             try:
-                new_answer = {answer_id: self.system.replace_urls(answers[answer_id])}
+                new_answer = {answer_id: self.system.replace_urls(answers[answer_id], self.metadata['data_dir'], course_namespace=self.location)}
             except TypeError:
                 log.debug('Unable to perform URL substitution on answers[%s]: %s' % (answer_id, answers[answer_id]))
                 new_answer = {answer_id: answers[answer_id]}
@@ -669,18 +678,18 @@ class CapaDescriptor(RawDescriptor):
     # TODO (vshnayder): do problems have any other metadata?  Do they
     # actually use type and points?
     metadata_attributes = RawDescriptor.metadata_attributes + ('type', 'points')
-
+    
     def get_context(self):
         _context = RawDescriptor.get_context(self)
         _context.update({'markdown': self.metadata.get('markdown', '')})
         return _context
-
+    
     @property
     def editable_metadata_fields(self):
         """Remove metadata from the editable fields since it has its own editor"""
         subset = super(CapaDescriptor,self).editable_metadata_fields
         if 'markdown' in subset:
-            subset.remove('markdown')
+            subset.remove('markdown') 
         return subset
 
 
