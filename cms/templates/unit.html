@@ -1,8 +1,9 @@
 <%inherit file="base.html" />
 <%! from django.core.urlresolvers import reverse %>
 <%namespace name="units" file="widgets/units.html" />
-<%block name="bodyclass">unit</%block>
 <%block name="title">CMS Unit</%block>
+<%block name="bodyclass">is-signedin course unit</%block>
+
 <%block name="jsextra">
   <script type='text/javascript'>
   $(document).ready(function() {

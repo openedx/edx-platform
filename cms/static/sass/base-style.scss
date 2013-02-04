@@ -1,4 +1,5 @@
 @import 'bourbon/bourbon';
+@import 'bourbon/addons/button';
 @import 'vendor/normalize';
 @import 'keyframes';
 
@@ -11,6 +12,7 @@
 @import "extends";
 @import "base";
 @import "header";
+@import "footer";
 @import "dashboard";
 @import "courseware";
 @import "subsection";

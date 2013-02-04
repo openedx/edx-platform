@@ -2,7 +2,7 @@
 .wrapper-header {
   margin: 0 0 ($baseline*1.5) 0;
   padding: $baseline;
-  border-bottom: 1px solid tint($m-gray, 50%);
+  border-bottom: 1px solid $gray;
   @include box-shadow(0 1px 5px 0 rgba(0,0,0, 0.1));
   background: $white;
   height: 76px;
@@ -27,7 +27,7 @@
   color: $lightGrey;
 }
 
-.branding, .info-course, .nav-course, .nav-account {
+.branding, .info-course, .nav-course, .nav-account, .nav-unauth, .nav-pitch {
   display: inline-block;
   vertical-align: top;
 }
@@ -47,35 +47,13 @@
     height: 32px;
     background: transparent url('../img/logo-edx-studio.png') 0 0 no-repeat;
   }
-
-  &:before {
-    @extend .faded-vertical-divider;
-    content: "";
-    display: block;
-    height: 50px;
-    position: absolute;
-    right: 1px;
-    top: -8px;
-    width: 1px;
-  }
-
-  &:after {
-    @extend .faded-vertical-divider-light;
-    content: "";
-    display: block;
-    height: 50px;
-    position: absolute;
-    right: 0px;
-    top: -12px;
-    width: 1px;
-  }
 }
 
 .info-course {
   position: relative;
   max-width: 200px;
   padding-right: 15px;
-  font-size: 14px;
+  @include font-size(14);
 
   &:before {
     @extend .faded-vertical-divider;
@@ -104,7 +82,7 @@
   }
 
   .course-number {
-    font-size: 12px;
+    @include font-size(12);
   }
 
   .course-title {
@@ -112,24 +90,22 @@
     overflow: hidden;
     white-space: nowrap;
     text-overflow: ellipsis;
-    font-size: 16px;
-    font-weight: 600;
+    @include font-size(16);
+    font-weight: 550;
 
   }
 }
 
+// course info
 .nav-course {
-  width: 275px;
+  width: 335px;
   margin-top: -($baseline/4);
-  font-size: 14px;
+  @include font-size(14);
 
-  ol {
-    @include clearfix();
-  }
-
-  .nav-item {
+  > ol > .nav-item {
     display: inline-block;
     vertical-align: bottom;
+    width: 100px;
     margin: 0 ($baseline/2) 0 0;
 
     &:last-child {
@@ -140,6 +116,7 @@
       display: block;
       padding: 5px;
       text-transform: uppercase;
+      font-weight: 550;
 
       &:hover, &:active {
         color: $blue;
@@ -147,7 +124,7 @@
 
       .label-prefix {
         display: block;
-        font-size: 11px;
+        @include font-size(11);
       }
 
       .ss-icon {
@@ -179,13 +156,14 @@
   }
 }
 
+// account-based nav
 .nav-account {
   float: right;
   max-width: 300px;
   min-width: 175px;
   width: 20%;
   margin-top: 10px;
-  font-size: 14px;
+  @include font-size(14);
   text-align: right;
 
   .nav-account-username {
@@ -193,7 +171,7 @@
       display: inline-block;
       vertical-align: middle;
       margin-right: 3px;
-      font-size: 12px;
+      @include font-size(12);
     }
 
     .account-username {
@@ -218,16 +196,16 @@
     position: absolute;
     top: 30px;
     width: 125px;
-    border: 1px solid tint($m-gray, 50%);
+    border: 1px solid $gray-l2;
     padding: ($baseline/4) ($baseline/2);
     @include box-shadow(0 1px 5px 0 rgba(0,0,0, 0.1));
     background: $white;
 
     li {
       margin: 0 0 ($baseline/4) 0;
-      border-bottom: 1px solid tint($m-gray, 75%);
+      border-bottom: 1px solid $gray-l5;
       padding: 0 0($baseline/4) 0;
-      font-size: 13px;
+      @include font-size(13);
 
       &:last-child {
         margin-bottom: 0;
@@ -322,6 +300,86 @@
     }
   }
 }
+
+// is-signed in
+.is-signedin {
+
+  &.course .branding {
+
+    &:before {
+      @extend .faded-vertical-divider;
+      content: "";
+      display: block;
+      height: 50px;
+      position: absolute;
+      right: 1px;
+      top: -8px;
+      width: 1px;
+    }
+
+    &:after {
+      @extend .faded-vertical-divider-light;
+      content: "";
+      display: block;
+      height: 50px;
+      position: absolute;
+      right: 0px;
+      top: -12px;
+      width: 1px;
+    }
+  }
+}
+
+// not signed in
+.not-signedin {
+
+  // unauthenticated nav
+  .nav-not-signedin {
+    float: right;
+    margin-top: ($baseline/4);
+
+    .nav-item {
+      @include font-size(16);
+      display: inline-block;
+      vertical-align: middle;
+      margin: 0 $baseline 0 0;
+      font-weight: 550;
+
+      &:last-child {
+        margin-right: 0;
+      }
+
+      .action {
+        margin-top: -($baseline/4);
+        display: inline-block;
+        padding: ($baseline/4) ($baseline/2);
+        font-weight: 550;
+      }
+    }
+
+    // specific items
+    .nav-not-signedin-help {
+
+    }
+
+    .nav-not-signedin-signup {
+
+      .action-signup {
+        @include blue-button;
+        @include transition(all .15s);
+      }
+    }
+
+    .nav-not-signedin-signin {
+
+      .action-signin {
+        @include white-button;
+        @include transition(all .15s);
+      }
+    }
+  }
+}
+
 
 // js enabled 
 .js {

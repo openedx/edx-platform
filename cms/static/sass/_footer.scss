@@ -1,0 +1,46 @@
+// footer
+.wrapper-footer {
+  margin: ($baseline*1.5) 0 $baseline 0;
+  padding: $baseline;
+  position: relative;
+  width: 100%;
+}
+
+footer {
+  @include clearfix();
+  @include font-size(13);
+  width: flex-grid(12);
+  margin: 0 auto;
+  padding-top: $baseline;
+  border-top: 1px solid $gray-l4;
+  color: $gray;
+
+  .colophon {
+    width: flex-grid(4, 12);
+    float: left;
+    margin-right: flex-gutter(2);
+  }
+
+  .nav-peripheral {
+    width: flex-grid(6, 12);
+    float: right;
+    text-align: right;
+
+    .nav-item {
+      display: inline-block;
+      margin-right: $baseline;
+
+      &:last-child {
+        margin-right: 0;
+      }
+    }
+  }
+
+  a {
+    color: $gray;
+
+    &:hover, &:active {
+      color: $blue;
+    }
+  }
+}

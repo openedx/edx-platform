@@ -1,5 +1,11 @@
+// font-sizing
 @function em($pxval, $base: 16) {
   @return #{$pxval / $base}em;
+}
+
+@mixin font-size($sizeValue: 1.6){
+  font-size: $sizeValue + px;
+  font-size: ($sizeValue/10) + rem;
 }
 
 // Line-height
@@ -26,6 +32,7 @@
   width: 1px;
 }
 
+// vertical and horizontal centering
 @mixin vertically-and-horizontally-centered ( $height, $width ) {
   left: 50%;
   margin-left: -$width / 2;

@@ -4,9 +4,13 @@
 //
 // -------------------------------------
 
+html {
+  font-size: 62.5%;
+}
+
 body {
     min-width: 980px;
-    background: $m-gray-l;
+    background: $gray-l5;
     font-size: 16px;
     line-height: 1.6;
     color: $baseFontColor;
@@ -74,11 +78,6 @@ h1 {
 
 .right {
     float: right;
-}
-
-footer {
-    clear: both;
-    height: 100px;
 }
 
 input[type="text"],

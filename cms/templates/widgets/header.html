@@ -23,10 +23,10 @@
           
           <div class="nav-sub">
             <ul>
-              <li><a href="${reverse('course_index', kwargs=dict(org=ctx_loc.org, course=ctx_loc.course, name=ctx_loc.name))}">Outline</a></li>
-              <li><a href="${reverse('course_info', kwargs=dict(org=ctx_loc.org, course=ctx_loc.course, name=ctx_loc.name))}">Updates</a></li>
-              <li><a href="${reverse('edit_tabs', kwargs=dict(org=ctx_loc.org, course=ctx_loc.course, coursename=ctx_loc.name))}">Pages/Tabs</a></li>
-              <li><a href="${reverse('asset_index', kwargs=dict(org=ctx_loc.org, course=ctx_loc.course, name=ctx_loc.name))}">Files &amp; Uploads</a></li>
+              <li class="nav-item"><a href="${reverse('course_index', kwargs=dict(org=ctx_loc.org, course=ctx_loc.course, name=ctx_loc.name))}">Outline</a></li>
+              <li class="nav-item"><a href="${reverse('course_info', kwargs=dict(org=ctx_loc.org, course=ctx_loc.course, name=ctx_loc.name))}">Updates</a></li>
+              <li class="nav-item"><a href="${reverse('edit_tabs', kwargs=dict(org=ctx_loc.org, course=ctx_loc.course, coursename=ctx_loc.name))}">Pages/Tabs</a></li>
+              <li class="nav-item"><a href="${reverse('asset_index', kwargs=dict(org=ctx_loc.org, course=ctx_loc.course, name=ctx_loc.name))}">Files &amp; Uploads</a></li>
             </ul>
           </div>
         </li>
@@ -36,10 +36,10 @@
           
           <div class="nav-sub">
             <ul>
-              <li><a href="${reverse('asset_index', kwargs=dict(org=ctx_loc.org, course=ctx_loc.course, name=ctx_loc.name))}">Schedule &amp; Details</a></li>
-              <li><a href="${reverse('asset_index', kwargs=dict(org=ctx_loc.org, course=ctx_loc.course, name=ctx_loc.name))}">Grading</a></li>
-              <li><a href="${reverse('manage_users', kwargs=dict(location=ctx_loc))}">Course Team</a></li>
-              <li><a href="${reverse('asset_index', kwargs=dict(org=ctx_loc.org, course=ctx_loc.course, name=ctx_loc.name))}">Advanced Settings</a></li>
+              <li class="nav-item"><a href="${reverse('asset_index', kwargs=dict(org=ctx_loc.org, course=ctx_loc.course, name=ctx_loc.name))}">Schedule &amp; Details</a></li>
+              <li class="nav-item"><a href="${reverse('asset_index', kwargs=dict(org=ctx_loc.org, course=ctx_loc.course, name=ctx_loc.name))}">Grading</a></li>
+              <li class="nav-item"><a href="${reverse('manage_users', kwargs=dict(location=ctx_loc))}">Course Team</a></li>
+              <li class="nav-item"><a href="${reverse('asset_index', kwargs=dict(org=ctx_loc.org, course=ctx_loc.course, name=ctx_loc.name))}">Advanced Settings</a></li>
             </ul>
           </div>
         </li>
@@ -49,8 +49,8 @@
           
           <div class="nav-sub">
             <ul>
-              <li><a href="${reverse('import_course', kwargs=dict(org=ctx_loc.org, course=ctx_loc.course, name=ctx_loc.name))}">Import</a></li>
-              <li><a href="${reverse('export_course', kwargs=dict(org=ctx_loc.org, course=ctx_loc.course, name=ctx_loc.name))}">Export</a></li>
+              <li class="nav-item"><a href="${reverse('import_course', kwargs=dict(org=ctx_loc.org, course=ctx_loc.course, name=ctx_loc.name))}">Import</a></li>
+              <li class="nav-item"><a href="${reverse('export_course', kwargs=dict(org=ctx_loc.org, course=ctx_loc.course, name=ctx_loc.name))}">Export</a></li>
             </ul>
           </div>
         </li>
@@ -58,8 +58,8 @@
     </nav>
     % endif
     
-    % if user.is_authenticated():
-    <nav class="nav-account is-logged-in nav-dropdown">
+    % if user.is_authenticated():    
+    <nav class="nav-account nav-is-signedin nav-dropdown">
       <h2 class="sr">Currently logged in as:</h2>
       <ol>
         <li class="nav-item nav-account-username">
@@ -73,19 +73,28 @@
 
           <div class="nav-sub">
             <ul>
-              <li><a href="#">Help</a></li>
-              <li><a class="action action-logout" href="${reverse('logout')}">Logout</a></li>
+              <li class="nav-item"><a href="#">Help</a></li>
+              <li class="nav-item"><a class="action action-logout" href="${reverse('logout')}">Logout</a></li>
             </ul>
           </div>
         </li>
       </ol>
     </nav>
     % else:
-    <nav class="nav-account nav-dropdown">
-      <h2 class="sr">You're not currently logged in</h2>
+    <nav class="nav-not-signedin">
+      <h2 class="sr">You're not currently signed in</h2>
       <ol>
-        <li>
-          <a class="action action-login" href="${reverse('login')}">Login</a>
+        <li class="nav-item nav-not-signedin-how">
+          <a href="">How Studio Works</a>
+        </li>
+        <li class="nav-item nav-not-signedin-help">
+          <a href="#">Studio Help</a>
+        </li>
+        <li class="nav-item nav-not-signedin-signup">
+          <a class="action action-signup" href="${reverse('signup')}">Sign Up</a>
+        </li>
+        <li class="nav-item nav-not-signedin-signin">
+          <a class="action action-signin" href="${reverse('login')}">Sign In</a>
         </li>
       </ol>
     </nav>
