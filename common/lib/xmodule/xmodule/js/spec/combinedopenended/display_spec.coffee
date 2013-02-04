@@ -45,7 +45,6 @@ describe 'CombinedOpenEnded', ->
       @combined.poll()
       expect(window.queuePollerID).toBeUndefined()
       expect(window.setTimeout).not.toHaveBeenCalled()
-      expect(@combined.reload).toHaveBeenCalled()
 
   describe 'rebind', ->
     beforeEach ->
