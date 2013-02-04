@@ -345,10 +345,10 @@ function goto( mode)
 %if modeflag.get('Analytics'):
 
    <p>
-     Number of students enrolled:
+     Number of students enrolled for ${students_enrolled_json['data'][0]['course_id']}:
      % if students_enrolled_json is not None:
      % if students_enrolled_json['status'] == 'success':
-     ${students_enrolled_json['data']['value']} as of ${students_enrolled_json['time']}
+     ${students_enrolled_json['data'][0]['count']} as of ${students_enrolled_json['time']}
      % else:
      <i> ${students_enrolled_json['error']} </i>
      % endif
@@ -358,10 +358,10 @@ function goto( mode)
    </p>
 
    <p>
-     Number of active students for the past 7 days: 
+     Number of students active for ${students_active_json['data'][0]['course_id']} for the past 7 days: 
      % if students_active_json is not None:
      % if students_active_json['status'] == 'success':
-     ${students_active_json['data']['value']} as of ${students_active_json['time']}
+     ${students_active_json['data'][0]['count']} as of ${students_active_json['time']}
      % else:
      <i> ${students_active_json['error']} </i>
      % endif
@@ -407,8 +407,8 @@ function goto( mode)
      <div class="divScroll">
      <table class="stat_table">
      <tr><th>Problem</th><th>Number of students</th></tr>
-     % for k,v in students_per_problem_correct_json['data'].items():
-     <tr> <td>${k}</td> <td>${v}</td> </tr>
+     % for row in students_per_problem_correct_json['data']:
+     <tr> <td>${row['module_id']}</td> <td>${row['count']}</td> </tr>
      % endfor
      </table>
      </div>
@@ -420,6 +420,7 @@ function goto( mode)
      % endif
    </p>
 
+
    <p>
      Students per module who attempted at least one problem
 
@@ -429,8 +430,8 @@ function goto( mode)
      <div class="divScroll">
      <table class="stat_table">
      <tr><th>Module</th><th>Number of students</th></tr>
-     % for k,v in attempted_problems['data'].items():
-     <tr> <td>${k}</td> <td>${v}</td> </tr>
+     % for row in attempted_problems['data']:
+     <tr> <td>${row['module_id']}</td> <td>${row['count']}</td> </tr>
      % endfor
      </table>
      </div>
@@ -443,6 +444,27 @@ function goto( mode)
 
      </p>
    <p>
+
+   <p>
+     <p>Grade distribution:</p>
+
+     % if overall_grade_distribution is not None:
+     % if overall_grade_distribution['status'] == 'success':
+     <div class="divScroll">
+     <table class="stat_table">
+     <tr><th>Grade</th><th>Number of students</th></tr>
+     % for row in overall_grade_distribution['data']:
+     <tr> <td>${row['overall_grade']}</td> <td>${row['count']}</td> </tr>
+     % endfor
+     </table>
+     </div>
+     % else:
+     <i> ${dropoff_per_day['error']}</i>
+     % endif
+     % else:
+     <i> null data </i>
+     % endif
+   </p>
 
 ##     <p>Number of students who dropped off per day before becoming inactive:</p>
 ##
@@ -464,26 +486,6 @@ function goto( mode)
 ##     % endif
 ##   </p>
 ##
-##   <p>
-##     <p>Grade distribution:</p>
-##
-##     % if overall_grade_distribution is not None:
-##     % if overall_grade_distribution['status'] == 'success':
-##     <div class="divScroll">
-##     <table class="stat_table">
-##     <tr><th>Grade</th><th>Number of students</th></tr>
-##     % for k,v in overall_grade_distribution['data'].items():
-##     <tr> <td>${k}</td> <td>${v}</td> </tr>
-##     % endfor
-##     </table>
-##     </div>
-##     % else:
-##     <i> ${dropoff_per_day['error']}</i>
-##     % endif
-##     % else:
-##     <i> null data </i>
-##     % endif
-##   </p>
 
 
 ##   <p>
