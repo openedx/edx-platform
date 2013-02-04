@@ -12,8 +12,6 @@ from django.core.urlresolvers import reverse
 from student.models import unique_id_for_user
 from courseware.courses import get_course_with_access 
 
-from peer_grading_service import PeerGradingService
-from peer_grading_service import MockPeerGradingService
 from controller_query_service import ControllerQueryService
 from grading_service import GradingServiceError
 import json
@@ -39,10 +37,6 @@ from django.http import HttpResponse, Http404, HttpResponseRedirect
 log = logging.getLogger(__name__)
 
 template_imports = {'urllib': urllib}
-if settings.MOCK_PEER_GRADING:
-    peer_gs = MockPeerGradingService() 
-else:
-    peer_gs = PeerGradingService(settings.PEER_GRADING_INTERFACE)
 
 controller_url = open_ended_util.get_controller_url()
 controller_qs = ControllerQueryService(controller_url)
