@@ -32,15 +32,17 @@ class @Annotatable
 
     onSpanEvent: (fn) ->
         (e) =>
-          span_id = e.target.getAttribute('data-span-id')
+          span_el = e.currentTarget
+          span_id = span_el.getAttribute('data-span-id')
           discussion_id = @getDiscussionId(span_id)
+          discussion_el = @getDiscussionEl(discussion_id)
           span = {
-            id: span_id, 
-            el: e.target 
+            id: span_id
+            el: span_el 
           }
           discussion = { 
-              id: discussion_id, 
-              el: @getDiscussionEl(discussion_id)
+            id: discussion_id
+            el: discussion_el 
           }
           fn.call this, span, discussion
 
@@ -48,10 +50,13 @@ class @Annotatable
         @scrollToDiscussion(discussion.el)
         
     onEnterSpan: (span, discussion) ->
-        $(@discussionSelector, @el).not(discussion.el).toggleClass('opaque', true)
+        @focusDiscussion(discussion.el, true)
     
     onLeaveSpan: (span, discussion) ->
-        $(@discussionSelector, @el).not(discussion.el).toggleClass('opaque', false)
+        @focusDiscussion(discussion.el, false)
+        
+    focusDiscussion: (el, state) ->
+        $(@discussionSelector, @el).not(el).toggleClass('opaque', state)
 
     scrollToDiscussion: (el) ->
         complete = @makeHighlighter(el)
