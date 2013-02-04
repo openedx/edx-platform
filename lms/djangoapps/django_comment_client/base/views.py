@@ -107,7 +107,7 @@ def create_thread(request, course_id, commentable_id):
     #    else:
             # regular users always post with their own id.
     #        group_id = user_group_id
-    if post['group_id']:
+    if 'group_id' in post.keys():
       thread.update_attributes(group_id=post['group_id'])
     
     thread.save()

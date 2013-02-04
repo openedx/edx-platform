@@ -72,6 +72,12 @@ def get_threads(request, course_id, discussion_id=None, per_page=THREADS_PER_PAG
                                                   'tags', 'commentable_ids'])))
 
     threads, page, num_pages = cc.Thread.search(query_params)
+    
+    #now add the group name if the thread has a group id
+    for thread in threads:
+        if thread.get('group_id') and not thread.get('group_name'):
+            thread['group_name'] = get_cohort_by_id(course_id, thread.get('group_id')).name 
+      
 
     query_params['page'] = page
     query_params['num_pages'] = num_pages
