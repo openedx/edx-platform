@@ -2,6 +2,7 @@
 
 import logging
 import urllib
+import re
 
 from django.conf import settings
 from django.views.decorators.cache import cache_control
@@ -24,6 +25,10 @@ import open_ended_notifications
 
 from xmodule.modulestore.django import modulestore
 from xmodule.modulestore import search
+from xmodule import peer_grading_module
+from xmodule import peer_grading_service
+from mitxmako.shortcuts import render_to_string
+from xmodule.x_module import ModuleSystem
 
 from django.http import HttpResponse, Http404
 
@@ -87,41 +92,35 @@ def peer_grading(request, course_id):
     '''
     Show a peer grading interface
     '''
+
+    ajax_url = ajax_url = _reverse_with_slash('peer_grading', course_id)
+    track_function = None
+    get_module = None
+    render_template = render_to_string
+    replace_urls = None
+    anonymous_student_id= unique_id_for_user(request.user)
+
+    system = ModuleSystem(
+        ajax_url,
+        track_function,
+        get_module,
+        render_template,
+        replace_urls,
+        course_id = course_id,
+        anonymous_student_id = anonymous_student_id
+    )
+
+    location  = ""
+    definition = "<peergrading use_for_single_location = 'False'></peergrading>"
+    descriptor = peer_grading_module.PeerGradingDescriptor
+    instance_state = {}
+    pg_url = re.sub("/courses", "i4x://", ajax_url)
+
+    pg_module = peer_grading_module.PeerGradingModule(system, pg_url, definition, descriptor, instance_state)
+
     course = get_course_with_access(request.user, course_id, 'load')
 
-    # call problem list service
-    success = False
-    error_text = ""
-    problem_list = []
-    try:
-        problem_list_json = peer_gs.get_problem_list(course_id, unique_id_for_user(request.user))
-        problem_list_dict = json.loads(problem_list_json)
-        success = problem_list_dict['success']
-        if 'error' in problem_list_dict:
-            error_text = problem_list_dict['error']
-
-        problem_list = problem_list_dict['problem_list']
-
-    except GradingServiceError:
-        error_text = "Error occured while contacting the grading service"
-        success = False
-    # catch error if if the json loads fails
-    except ValueError:
-        error_text = "Could not get problem list"
-        success = False
-
-    ajax_url = _reverse_with_slash('peer_grading', course_id)
-
-    return render_to_response('peer_grading/peer_grading.html', { 
-        'course': course,
-        'course_id': course_id,
-        'ajax_url': ajax_url,
-        'success': success,
-        'problem_list': problem_list,
-        'error_text': error_text,
-        # Checked above
-        'staff_access': False, })
-    
+    return pg_module.get_html()
 
 @cache_control(no_cache=True, no_store=True, must_revalidate=True)
 def peer_grading_problem(request, course_id):
@@ -317,7 +316,7 @@ def take_action_on_flags(request, course_id):
         response = controller_qs.take_action_on_flags(course_id, student_id, submission_id, action_type)
         return HttpResponse(response, mimetype="application/json")
     except GradingServiceError:
-        log.exception("Error saving calibration grade, location: {0}, submission_id: {1}, submission_key: {2}, grader_id: {3}".format(location, submission_id, submission_key, grader_id))
+        log.exception("Error saving calibration grade, submission_id: {0}, submission_key: {1}, grader_id: {2}".format(submission_id, submission_key, grader_id))
         return _err_response('Could not connect to grading service')
     
 

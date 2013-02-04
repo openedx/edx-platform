@@ -297,6 +297,9 @@ if settings.COURSEWARE_ENABLED:
         # Open Ended Notifications
         url(r'^courses/(?P<course_id>[^/]+/[^/]+/[^/]+)/open_ended_notifications$',
             'open_ended_grading.views.combined_notifications', name='open_ended_notifications'),
+
+        url(r'^courses/(?P<course_id>[^/]+/[^/]+/[^/]+)/peer_grading$',
+            'open_ended_grading.views.peer_grading', name='peer_grading'),
     )
 
     # discussion forums live within courseware, so courseware must be enabled first
