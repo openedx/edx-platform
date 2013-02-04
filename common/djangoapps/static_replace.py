@@ -83,8 +83,9 @@ def replace_static_urls(text, data_directory, course_namespace=None):
             log.warning("From finder: %s", url)
         # Otherwise, look the file up in staticfiles_storage
         else:
+            path = data_directory + '/' + rest
             try:
-                url = staticfiles_storage.url(data_directory + '/' + rest)
+                url = staticfiles_storage.url(path)
                 log.warning("From staticfiles_storage: %s", url)
             # And if that fails, return the path unmodified
             except Exception as err:
