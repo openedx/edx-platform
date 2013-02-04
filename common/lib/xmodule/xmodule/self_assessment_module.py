@@ -189,14 +189,11 @@ class SelfAssessmentModule(openendedchild.OpenEndedChild):
             Dictionary with keys 'success' and either 'error' (if not success),
             or 'rubric_html' (if success).
         """
-        # Check to see if attempts are less than max
-        if self.attempts > self.max_attempts:
-            # If too many attempts, prevent student from saving answer and
-            # seeing rubric.  In normal use, students shouldn't see this because
-            # they won't see the reset button once they're out of attempts.
+        # Check to see if this problem is closed
+        if self.closed():
             return {
                 'success': False,
-                'error': 'Too many attempts.'
+                'error': 'This problem is now closed.'
             }
 
         if self.state != self.INITIAL:

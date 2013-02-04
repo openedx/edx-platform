@@ -73,7 +73,7 @@ class OpenEndedChild(object):
         'done': 'Problem complete',
     }
 
-    def __init__(self, system, location, definition, descriptor, static_data,
+    def __init__(self, system, location, definition, descriptor, static_data, parent,
                  instance_state=None, shared_state=None, **kwargs):
         # Load instance state
         if instance_state is not None:
@@ -86,6 +86,8 @@ class OpenEndedChild(object):
         # element.
         # Scores are on scale from 0 to max_score
         self.history = instance_state.get('history', [])
+
+        self.parent = parent
 
         self.state = instance_state.get('state', self.INITIAL)
 
@@ -115,6 +117,9 @@ class OpenEndedChild(object):
         @return: None
         """
         pass
+
+    def closed(self):
+        return self.parent.closed()
 
     def latest_answer(self):
         """Empty string if not available"""

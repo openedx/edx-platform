@@ -30,6 +30,8 @@ class SelfAssessmentTest(unittest.TestCase):
     metadata = {'attempts': '10'}
 
     descriptor = Mock()
+    parent = Mock()
+    parent.closed.return_value = False
 
     def setUp(self):
         state = json.dumps({'student_answers': ["Answer 1", "answer 2", "answer 3"],
@@ -49,7 +51,8 @@ class SelfAssessmentTest(unittest.TestCase):
 
         self.module = SelfAssessmentModule(test_system, self.location,
                                       self.definition, self.descriptor,
-                                      static_data, state, metadata=self.metadata)
+                                      static_data, self.parent, 
+                                      state, metadata=self.metadata)
 
     def test_get_html(self):
         html = self.module.get_html(test_system)
@@ -72,6 +75,7 @@ class SelfAssessmentTest(unittest.TestCase):
 
         # if we now assess as right, skip the REQUEST_HINT state
         self.module.save_answer({'student_answer': 'answer 4'}, test_system)
+        self.parent.closed.assert_called_with()
         self.module.save_assessment({'assessment': '1'}, test_system)
         self.assertEqual(self.module.state, self.module.DONE)
 
