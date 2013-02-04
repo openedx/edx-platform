@@ -6,7 +6,7 @@ django-admin.py test --settings=lms.envs.test --pythonpath=. lms/djangoapps/open
 
 from django.test import TestCase
 from open_ended_grading import staff_grading_service
-from open_ended_grading import peer_grading_service
+from xmodule import peer_grading_service
 from django.core.urlresolvers import reverse
 from django.contrib.auth.models import Group
 
@@ -137,7 +137,7 @@ class TestPeerGradingService(ct.PageLoader):
         self.course_id = "edX/toy/2012_Fall"
         self.toy = modulestore().get_course(self.course_id)
 
-        self.mock_service = peer_grading_service.peer_grading_service()
+        self.mock_service = peer_grading_service.MockPeerGradingService()
 
         self.logout()
 
