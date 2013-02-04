@@ -143,14 +143,50 @@
           margin-right: flex-gutter();
 
           a {
+            @include box-sizing(border-box);
+            @include box-shadow(0 1px ($baseline/10) $shadow-l1);
+            position: relative;
+            top: 0;
             display: block;
+            border: 1px solid $gray-l3;
+            padding: ($baseline/4);
+            background: $white;
+
+            .action-zoom {
+              @include transition(opacity .15s ease-in-out);
+              opacity: 0;
+              position: absolute;
+              left: 110px;
+              top: 110px;
+              min-height: 300px;
+              min-width: 300px;
+
+              .ss-icon {
+                @include font-size(32);
+                @include border-radius(($baseline));
+                display: inline-block;
+                padding: ($baseline*1.5) $baseline $baseline $baseline;
+                background: $blue;
+                color: $white;
+                text-align: center;
+                line-height: 2.75rem;
+              }
+            }
+
+            &:hover {
+              border-color: $blue;
+              top: -($baseline/5);
+
+              .action-zoom {
+                opacity: 0.8;
+              }
+            }
           }
 
           img {
             display: block;
             width: 100%;
             height: 100%;
-            background: $black;
           }
         }
 
@@ -181,10 +217,16 @@
             margin: ($baseline*1.5) 0 0 0;
 
             .proofpoint {
+              @include box-sizing(border-box);
+              @include border-radius(($baseline/4));
               @include transition(color .15s ease-in-out);
+              position: relative;
+              top: 0;
               float: left;
               width: flex-grid(3, 9);
+              min-height: ($baseline*8);
               margin-right: flex-gutter();
+              padding: ($baseline*0.75) $baseline;
               color: $gray-l1;
               cursor: pointer;
 
@@ -196,7 +238,13 @@
               }
 
               &:hover {
-                color: $gray-d3;
+                background: $blue-l5;
+                color: $blue-l2;
+                top: -($baseline/5);
+
+                .title {
+                  color: $blue-d1;
+                }
               }
 
               &:last-child {
