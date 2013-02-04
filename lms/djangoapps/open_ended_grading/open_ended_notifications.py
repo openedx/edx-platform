@@ -19,7 +19,8 @@ KEY_PREFIX = "open_ended_"
 NOTIFICATION_TYPES = (
     ('student_needs_to_peer_grade', 'peer_grading', 'Peer Grading'),
     ('staff_needs_to_grade', 'staff_grading', 'Staff Grading'),
-    ('new_student_grading_to_view', 'open_ended_problems', 'Problems you have submitted')
+    ('new_student_grading_to_view', 'open_ended_problems', 'Problems you have submitted'),
+    ('flagged_submissions_exist', 'open_ended_flagged_problems', 'Flagged Submissions')
     )
 
 def staff_grading_notifications(course, user):

@@ -175,6 +175,7 @@ class PeerGradingProblem
     @submission_container = $('.submission-container')
     @prompt_container = $('.prompt-container')
     @rubric_container = $('.rubric-container')
+    @flag_student_container = $('.flag-student-container')
     @calibration_panel = $('.calibration-panel')
     @grading_panel = $('.grading-panel')
     @content_panel = $('.content-panel')
@@ -201,6 +202,7 @@ class PeerGradingProblem
     @action_button = $('.action-button')
     @calibration_feedback_button = $('.calibration-feedback-button')
     @interstitial_page_button = $('.interstitial-page-button')
+    @flag_student_checkbox = $('.flag-checkbox')
 
     Collapsible.setCollapsibles(@content_panel)
 
@@ -252,7 +254,8 @@ class PeerGradingProblem
       location: @location
       submission_id: @essay_id_input.val()
       submission_key: @submission_key_input.val()
-      feedback: @feedback_area.val() 
+      feedback: @feedback_area.val()
+      submission_flagged: @flag_student_checkbox.is(':checked')
     return data
 
 
@@ -352,7 +355,7 @@ class PeerGradingProblem
       @grading_panel.find('.calibration-text').show()
       @calibration_panel.find('.grading-text').hide()
       @grading_panel.find('.grading-text').hide()
-
+      @flag_student_container.hide()
 
       @submit_button.unbind('click')
       @submit_button.click @submit_calibration_essay
@@ -379,6 +382,7 @@ class PeerGradingProblem
       @grading_panel.find('.calibration-text').hide()
       @calibration_panel.find('.grading-text').show()
       @grading_panel.find('.grading-text').show()
+      @flag_student_container.show()
 
       @submit_button.unbind('click')
       @submit_button.click @submit_grade
