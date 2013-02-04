@@ -194,6 +194,7 @@ this.HTML5Video = (function () {
             // currently doing.
             this.video = this.videoEl[0];
             this.playerState = HTML5Video.PlayerState.UNSTARTED;
+            // this.callStateChangeCallback();
 
             // Attach a 'click' event on the <video> element. It will cause the video to pause/play.
             this.videoEl.on('click', function (event) {
@@ -227,7 +228,7 @@ this.HTML5Video = (function () {
                 _this.video.currentTime = _this.start;
 
                 if ($.isFunction(_this.config.events.onReady) === true) {
-                    _this.config.events.onReady({});
+                    _this.config.events.onReady(null);
                 }
             }, false);
 

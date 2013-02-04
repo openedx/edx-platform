@@ -68,9 +68,14 @@ class @VideoPlayerAlpha extends SubviewAlpha
           onReady: @onReady
           onStateChange: @onStateChange
     else if @video.videoType is 'youtube'
+      prev_player_type = $.cookie('prev_player_type')
+      if prev_player_type == 'html5'
+        youTubeId = @video.videos['1.0']
+      else
+        youTubeId = @video.youtubeId()
       @player = new YT.Player @video.id,
         playerVars: @playerVars
-        videoId: @video.youtubeId()
+        videoId: youTubeId
         events:
           onReady: @onReady
           onStateChange: @onStateChange
@@ -85,6 +90,8 @@ class @VideoPlayerAlpha extends SubviewAlpha
         at: 'top center'
 
   onReady: (event) =>
+    if @video.videoType is 'html5'
+      @player.setPlaybackRate @video.speed
     unless onTouchBasedDevice()
       $('.video-load-complete:first').data('video').player.play()
 
@@ -94,7 +101,14 @@ class @VideoPlayerAlpha extends SubviewAlpha
       when @PlayerState.UNSTARTED
         if @video.videoType is "youtube"
           availableSpeeds = @player.getAvailablePlaybackRates()
+          prev_player_type = $.cookie('prev_player_type')
           if availableSpeeds.length > 1
+            if prev_player_type == 'youtube'
+              $.cookie('prev_player_type', 'html5', expires: 3650, path: '/')
+              @onSpeedChange null, '1.0'
+            else if prev_player_type != 'html5'
+              $.cookie('prev_player_type', 'html5', expires: 3650, path: '/')
+
             baseSpeedSubs = @video.videos["1.0"]
             $.each @video.videos, (index, value) ->
               delete _this.video.videos[index]
@@ -102,8 +116,15 @@ class @VideoPlayerAlpha extends SubviewAlpha
             $.each availableSpeeds, (index, value) ->
               _this.video.videos[value.toFixed(2).replace(/\.00$/, ".0")] = baseSpeedSubs
               _this.video.speeds.push value.toFixed(2).replace(/\.00$/, ".0")
-            @speedControl.reRender @video.speeds
+            @speedControl.reRender @video.speeds, @video.speed
             @video.videoType = 'html5'
+
+            @video.setSpeed $.cookie('video_speed')
+            @player.setPlaybackRate @video.speed
+          else
+            if prev_player_type != 'youtube'
+              $.cookie('prev_player_type', 'youtube', expires: 3650, path: '/')
+
         @onUnstarted()
       when @PlayerState.PLAYING
         @onPlay()

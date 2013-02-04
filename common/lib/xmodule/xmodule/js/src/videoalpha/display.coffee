@@ -15,7 +15,7 @@ class @VideoAlpha
     else
       @videoType = "html5"
       @parseVideoSources @el.data('mp4-source'), @el.data('webm-source'), @el.data('ogg-source')
-      @speeds = ['0.75', '1.0', '1.25', '1.5']
+      @speeds = ['0.75', '1.0', '1.25', '1.50']
       sub = @el.data('sub')
       if (typeof sub isnt "string") or (sub.length is 0)
         sub = ""
