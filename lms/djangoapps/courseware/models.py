@@ -12,14 +12,11 @@ file and check it in at the same time as your model changes. To do that,
 ASSUMPTIONS: modules have unique IDs, even across different module_types
 
 """
+from datetime import datetime, timedelta
+from calendar import timegm
+
 from django.db import models
-#from django.core.cache import cache
 from django.contrib.auth.models import User
-
-#from cache_toolbox import cache_model, cache_relation
-
-#CACHE_TIMEOUT = 60 * 60 * 4 # Set the cache timeout to be four hours
-
 
 class StudentModule(models.Model):
     """
@@ -214,3 +211,82 @@ class OfflineComputedGradeLog(models.Model):
 
     def __unicode__(self):
         return "[OCGLog] %s: %s" % (self.course_id, self.created)
+
+class TimedModule(models.Model):
+    """
+    Keeps student state for a timed activity in a particular course.
+    Includes information about time accommodations granted,
+    time started, and ending time.
+    """
+    ## These three are the key for the object
+
+    # Key used to share state. By default, this is the module_id,
+    # but for abtests and the like, this can be set to a shared value
+    # for many instances of the module.
+    # Filename for homeworks, etc.
+    module_state_key = models.CharField(max_length=255, db_index=True, db_column='module_id')
+    student = models.ForeignKey(User, db_index=True)
+    course_id = models.CharField(max_length=255, db_index=True)
+
+    class Meta:
+        unique_together = (('student', 'module_state_key', 'course_id'),)
+
+    # For a timed activity, we are only interested here
+    # in time-related accommodations, and these should be disjoint.
+    # (For proctored exams, it is possible to have multiple accommodations
+    # apply to an exam, so they require accommodating a multi-choice.)
+    TIME_ACCOMMODATION_CODES = (('NONE', 'No Time Accommodation'),
+                      ('ADDHALFTIME', 'Extra Time - 1 1/2 Time'),
+                      ('ADD30MIN', 'Extra Time - 30 Minutes'),
+                      ('DOUBLE', 'Extra Time - Double Time'),
+                    )
+    accommodation_code = models.CharField(max_length=12, choices=TIME_ACCOMMODATION_CODES, default='NONE', db_index=True)
+
+    def _get_accommodated_duration(self, duration):
+        ''' 
+        Get duration for activity, as adjusted for accommodations.
+        Input and output are expressed in seconds.
+        '''
+        if self.accommodation_code == 'NONE':
+            return duration
+        elif self.accommodation_code == 'ADDHALFTIME':
+            # TODO:  determine what type to return
+            return int(duration * 1.5)
+        elif self.accommodation_code == 'ADD30MIN':
+            return (duration + (30 * 60))
+        elif self.accommodation_code == 'DOUBLE':
+            return (duration * 2)
+       
+    # store state:
+    
+    beginning_at = models.DateTimeField(null=True, db_index=True)
+    ending_at = models.DateTimeField(null=True, db_index=True)
+    created_at = models.DateTimeField(auto_now_add=True, db_index=True)
+    modified_at = models.DateTimeField(auto_now=True, db_index=True)
+
+    @property
+    def has_begun(self):
+        return self.beginning_at is not None
+    
+    @property    
+    def has_ended(self):
+        if not self.ending_at:
+            return False
+        return self.ending_at < datetime.utcnow()
+        
+    def begin(self, duration):
+        ''' 
+        Sets the starting time and ending time for the activity,
+        based on the duration provided (in seconds).
+        '''
+        self.beginning_at = datetime.utcnow()
+        modified_duration = self._get_accommodated_duration(duration)
+        datetime_duration = timedelta(seconds=modified_duration)
+        self.ending_at = self.beginning_at + datetime_duration
+        
+    def get_end_time_in_ms(self):
+        return (timegm(self.ending_at.timetuple()) * 1000)
+
+    def __unicode__(self):
+        return '/'.join([self.course_id, self.student.username, self.module_state_key])
+

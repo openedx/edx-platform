@@ -2,7 +2,6 @@ import logging
 import urllib
 
 from functools import partial
-from time import time
 
 from django.conf import settings
 from django.core.context_processors import csrf
@@ -21,7 +20,7 @@ from courseware.access import has_access
 from courseware.courses import (get_courses, get_course_with_access,
                                 get_courses_by_university, sort_by_announcement)
 import courseware.tabs as tabs
-from courseware.models import StudentModuleCache
+from courseware.models import StudentModuleCache, TimedModule
 from module_render import toc_for_course, get_module, get_instance_module, get_module_for_descriptor
 
 from django_comment_client.utils import get_discussion_title
@@ -402,16 +401,55 @@ def timed_exam(request, course_id, chapter, section):
         # duration from the test, then doing some math to modify the duration based on accommodations,
         # and then use that value as the end.  Once we have calculated this, it should be sticky -- we
         # use the same value for future requests, unless it's a tester.
-        
+
         # get value for duration from the section's metadata:
+        # for now, assume that the duration is set as an integer value, indicating the number of seconds:
         if 'duration' not in section_descriptor.metadata:
             raise Http404
-        
-        # for now, assume that the duration is set as an integer value, indicating the number of seconds:
         duration = int(section_descriptor.metadata.get('duration'))
 
+        # get corresponding time module, if one is present:
+        # TODO: determine what to use for module_key...
+        try: 
+            timed_module = TimedModule.objects.get(student=request.user, course_id=course_id)
+            
+            # if a module exists, check to see if it has already been started,
+            # and if it has already ended.
+            if timed_module.has_ended:
+                # the exam has already ended, and the student has tried to
+                # revisit the exam.  
+                # TODO: determine what do we do here.  
+                # For a Pearson exam, we want to go to the exit page.  
+                # (Not so sure what to do in general.)
+                # Proposal:  store URL in the section descriptor,
+                # along with the duration.  If no such URL is set, 
+                # just put up the error page,
+                raise Exception("Time expired on {}".format(timed_module))
+            elif not timed_module.has_begun:
+                # user has not started the exam, but may have an accommodation
+                # that has been granted to them.
+                # modified_duration = timed_module.get_accommodated_duration(duration)
+                # timed_module.started_at = datetime.utcnow() #  time() * 1000
+                # timed_module.end_date = timed_module. 
+                timed_module.begin(duration)
+                timed_module.save()
+                
+        except TimedModule.DoesNotExist:
+            # no entry found.  So we're starting this test
+            # without any accommodations being preset.
+            # TODO: determine what to use for module_key...
+            timed_module = TimedModule(student=request.user, course_id=course_id)
+            timed_module.begin(duration)
+            timed_module.save()
+        
+                
+        # the exam has already been started, and the student is returning to the 
+        # exam page.  Fetch the end time (in GMT) as stored
+        # in the module when it was started.
+        end_date = timed_module.get_end_time_in_ms()
+        
         # This value should be UTC time as number of milliseconds since epoch.
-        context['end_date'] =  (time() + duration) * 1000
+        context['end_date'] =  end_date
 
         result = render_to_response('courseware/testcenter_exam.html', context)
     except Exception as e:
