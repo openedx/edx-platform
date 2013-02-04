@@ -370,6 +370,7 @@
         @include blue-button;
         @include transition(all .15s);
         @include font-size(14);
+        padding: ($baseline/4) ($baseline/2);
         text-transform: uppercase;
         font-weight: 600 !important;
       }
@@ -381,6 +382,7 @@
         @include white-button;
         @include transition(all .15s);
         @include font-size(14);
+        padding: ($baseline/4) ($baseline/2);
         text-transform: uppercase;
         font-weight: 600 !important;
       }
