@@ -1,5 +1,9 @@
-from django.test import TestCase
 import json
+import copy
+from time import time
+from django.test import TestCase
+from override_settings import override_settings
+from django.conf import settings
 
 from student.models import Registration
 from django.contrib.auth.models import User
@@ -7,14 +11,23 @@ from django.contrib.auth.models import User
 import xmodule.modulestore.django
 from xmodule.templates import update_templates
 
-# Subclass TestCase and use to initialize the contentstore
 class ModuleStoreTestCase(TestCase):
     """ Subclass for any test case that uses the mongodb 
     module store. This clears it out before running the TestCase
     and reinitilizes it with the templates afterwards. """
 
     def _pre_setup(self):
-        super(ModuleStoreTestCase, self)._pre_setup()        
+        super(ModuleStoreTestCase, self)._pre_setup()
+
+        # Use the current seconds since epoch to differentiate
+        # the mongo collections on jenkins.
+        sec_since_epoch = '%s' % int(time()*100)
+        self.orig_MODULESTORE = copy.deepcopy(settings.MODULESTORE)
+        self.test_MODULESTORE = self.orig_MODULESTORE
+        self.test_MODULESTORE['default']['OPTIONS']['collection'] = 'modulestore_%s' % sec_since_epoch
+        self.test_MODULESTORE['direct']['OPTIONS']['collection'] = 'modulestore_%s' % sec_since_epoch
+        settings.MODULESTORE = self.test_MODULESTORE
+
         # Flush and initialize the module store
         # It needs the templates because it creates new records
         # by cloning from the template.
@@ -27,12 +40,14 @@ class ModuleStoreTestCase(TestCase):
         update_templates()
 
     def _post_teardown(self):
-        # Make sure you flush out the test modulestore after the end
-        # of the last test so the collection will be deleted.
-        # Otherwise there will be lingering collections leftover
+        # Make sure you flush out the modulestore.
+        # Drop the collection at the end of the test,
+        # otherwise there will be lingering collections leftover
         # from executing the tests.
         xmodule.modulestore.django._MODULESTORES = {}
         xmodule.modulestore.django.modulestore().collection.drop()
+        settings.MODULESTORE = self.orig_MODULESTORE
+
         super(ModuleStoreTestCase, self)._post_teardown()
 
 def parse_json(response):

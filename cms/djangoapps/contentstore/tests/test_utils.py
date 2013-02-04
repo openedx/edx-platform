@@ -1,6 +1,6 @@
-from django.test.testcases import TestCase
 from  cms.djangoapps.contentstore import utils
 import mock
+from django.test import TestCase
 
 class LMSLinksTestCase(TestCase):
     def about_page_test(self):

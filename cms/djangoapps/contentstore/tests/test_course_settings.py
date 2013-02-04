@@ -6,7 +6,6 @@ import copy
 from util import converters
 from util.converters import jsdate_to_time
 
-from django.test.testcases import TestCase
 from django.contrib.auth.models import User
 from django.test.client import Client
 from django.core.urlresolvers import reverse
@@ -19,6 +18,7 @@ from cms.djangoapps.models.settings.course_details import (CourseDetails,
 from cms.djangoapps.models.settings.course_grading import CourseGradingModel
 from cms.djangoapps.contentstore.utils import get_modulestore
 
+from django.test import TestCase
 from utils import ModuleStoreTestCase
 from xmodule.modulestore.tests.factories import CourseFactory
 
