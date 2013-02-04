@@ -1,5 +1,6 @@
-(function (requirejs, require, define) { define('PollMain', ['logme'], function (logme) { return {
+(function (requirejs, require, define) { define('PollMain', ['logme'], function (logme) {
 
+PollMain.prototype = {
 
 // class @PollModule
 //   constructor: (element) ->
@@ -91,8 +92,15 @@
     );
 },
 
-'initialize': function (element) {
+'initializePollQuestion': function (element) {
     var _this, jsonConfig, c1, obj, strQuestion;
+
+    logme(
+        'Initializing question: ',
+        element
+    );
+
+    /*
 
     if (element.attr('poll_main_processed') === 'true') {
         // This element was already processed once.
@@ -182,6 +190,20 @@
 
         obj.el.appendTo(element);
     }
-}
 
-}; }); }(RequireJS.requirejs, RequireJS.require, RequireJS.define));
+    */
+},
+
+'initializePollConditional': function (element) {
+    logme(
+        'Initializing conditional: ',
+        element
+    );
+}
+};
+
+return PollMain;
+
+function PollMain() {}
+
+}); }(RequireJS.requirejs, RequireJS.require, RequireJS.define));

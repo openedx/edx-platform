@@ -1,10 +1,14 @@
 window.Poll = function (el) {
-    console.log('one');
     RequireJS.require(['PollMain'], function (PollMain) {
-        console.log('two');
-        $(el).children('.poll').each(function (index, value) {
-            console.log('three');
-            PollMain.initialize($(value));
+        var pObj;
+
+        pObj = new PollMain();
+        pObj.vertModule = $(el).parent().parent();
+
+        pObj.initializePollQuestion(pObj.vertModule.find('.poll_question'));
+
+        pObj.vertModule.find('.xmodule_ConditionalModule').each(function (key, value) {
+            pObj.initializePollConditional($(value));
         });
     });
 };
