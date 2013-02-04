@@ -51,7 +51,7 @@ class OpenEnded
     return @handle_after_action
 
   handle_after_action: (data) ->
-    if !response.success
+    if !data.success
       @gentle_alert data.error
 
   gentle_alert: (msg) =>
