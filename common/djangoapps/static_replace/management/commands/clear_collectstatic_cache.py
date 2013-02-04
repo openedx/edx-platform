@@ -1,0 +1,13 @@
+###
+### Script for importing courseware from XML format
+###
+
+from django.core.management.base import NoArgsCommand
+
+class Command(NoArgsCommand):
+    help = \
+'''Import the specified data directory into the default ModuleStore'''
+
+    def handle_noargs(self):
+        staticfiles_cache = get_cache('staticfiles')
+        staticfiles_cache.clear()
