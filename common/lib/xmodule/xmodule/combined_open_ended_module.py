@@ -7,7 +7,11 @@ from lxml import etree
 from lxml.html import rewrite_links
 from path import path
 import os
+import dateutil
+import dateutil.parser
+import datetime
 import sys
+from timeparse import parse_timedelta
 
 from pkg_resources import resource_string
 
@@ -155,11 +159,26 @@ class CombinedOpenEndedModule(XModule):
 
         self.attempts = instance_state.get('attempts', 0)
 
+
         #Allow reset is true if student has failed the criteria to move to the next child task
         self.allow_reset = instance_state.get('ready_to_reset', False)
         self.max_attempts = int(self.metadata.get('attempts', MAX_ATTEMPTS))
         self.is_scored = self.metadata.get('is_graded', IS_SCORED) in TRUE_DICT
         self.accept_file_upload = self.metadata.get('accept_file_upload', ACCEPT_FILE_UPLOAD) in TRUE_DICT
+
+        display_due_date_string = self.metadata.get('due', None)
+        if display_due_date_string is not None:
+            self.display_due_date = dateutil.parser.parse(display_due_date_string)
+        else:
+            self.display_due_date = None
+
+        grace_period_string = self.metadata.get('graceperiod', None)
+        if grace_period_string is not None and self.display_due_date:
+            self.grace_period = parse_timedelta(grace_period_string)
+            self.close_date = self.display_due_date + self.grace_period
+        else:
+            self.grace_period = None
+            self.close_date = self.display_due_date
 
         # Used for progress / grading.  Currently get credit just for
         # completion (doesn't matter if you self-assessed correct/incorrect).
@@ -189,12 +208,12 @@ class CombinedOpenEndedModule(XModule):
         self.setup_next_task()
 
     def closed(self):
-        return True
-        #''' Is the student still allowed to submit answers? '''
-        #if self.attempts == self.max_attempts:
-        #    return True
-        #if self.close_date is not None and datetime.datetime.utcnow() > self.close_date:
-        #    return True
+        ''' Is the student still allowed to submit answers? '''
+        if self.attempts == self.max_attempts:
+            return True
+        if self.close_date is not None and datetime.datetime.utcnow() > self.close_date:
+            return True
+
 
 
     def get_tag_name(self, xml):

@@ -2,8 +2,13 @@
 Helper functions for handling time in the format we like.
 """
 import time
+import re
+from datetime import timedelta
 
 TIME_FORMAT = "%Y-%m-%dT%H:%M"
+
+TIMEDELTA_REGEX = re.compile(r'^((?P<days>\d+?) day(?:s?))?(\s)?((?P<hours>\d+?) hour(?:s?))?(\s)?((?P<minutes>\d+?) minute(?:s)?)?(\s)?((?P<seconds>\d+?) second(?:s)?)?$')
+
 
 def parse_time(time_str):
     """
@@ -20,3 +25,23 @@ def stringify_time(time_struct):
     Convert a time struct to a string
     """
     return time.strftime(TIME_FORMAT, time_struct)
+
+def parse_timedelta(time_str):
+    """
+    time_str: A string with the following components:
+        <D> day[s] (optional)
+        <H> hour[s] (optional)
+        <M> minute[s] (optional)
+        <S> second[s] (optional)
+
+    Returns a datetime.timedelta parsed from the string
+    """
+    parts = TIMEDELTA_REGEX.match(time_str)
+    if not parts:
+        return
+    parts = parts.groupdict()
+    time_params = {}
+    for (name, param) in parts.iteritems():
+        if param:
+            time_params[name] = int(param)
+    return timedelta(**time_params)
