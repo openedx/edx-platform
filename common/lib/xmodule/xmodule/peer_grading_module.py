@@ -249,17 +249,17 @@ class PeerGradingModule(XModule):
         required = set(['location', 'submission_id', 'submission_key', 'score', 'feedback', 'rubric_scores[]', 'submission_flagged'])
         success, message = self._check_required(get, required)
         if not success:
-            return _err_response(message)
+            return self._err_response(message)
         grader_id = self.system.anonymous_student_id
 
-        location = get['location']
-        submission_id = get['submission_id']
-        score = get['score']
-        feedback = get['feedback']
-        submission_key = get['submission_key']
-        rubric_scores = get['rubric_scores[]']
-        submission_flagged = get['submission_flagged']
-        log.debug(get)
+        location = get.get('location')
+        submission_id = get.get('submission_id')
+        score = get.get('score')
+        feedback = get.get('feedback')
+        submission_key = get.get('submission_key')
+        rubric_scores = get.getlist('rubric_scores[]')
+        submission_flagged = get.get('submission_flagged')
+        log.debug("GET: {0}".format(get))
         log.debug(rubric_scores)
         try:
             response = self.peer_gs.save_grade(location, grader_id, submission_id,
