@@ -13,8 +13,9 @@ from xmodule.templates import update_templates
 
 class ModuleStoreTestCase(TestCase):
     """ Subclass for any test case that uses the mongodb 
-    module store. This clears it out before running the TestCase
-    and reinitilizes it with the templates afterwards. """
+    module store. This populates a uniquely named modulestore
+    collection with templates before running the TestCase
+    and drops it they are finished. """
 
     def _pre_setup(self):
         super(ModuleStoreTestCase, self)._pre_setup()
@@ -36,7 +37,6 @@ class ModuleStoreTestCase(TestCase):
         # from the bash shell to drop it:
         # $ mongo test_xmodule --eval "db.dropDatabase()"
         xmodule.modulestore.django._MODULESTORES = {}
-        xmodule.modulestore.django.modulestore().collection.drop()
         update_templates()
 
     def _post_teardown(self):
