@@ -389,38 +389,54 @@ class CapaModule(XModule):
             })
         return json.dumps(d, cls=ComplexEncoder)
 
+    def is_past_due(self):
+        """
+        Is it now past this problem's due date, including grace period?
+        """
+        return (self.close_date is not None and
+                datetime.datetime.utcnow() > self.close_date)
+
     def closed(self):
         ''' Is the student still allowed to submit answers? '''
         if self.attempts == self.max_attempts:
             return True
-        if self.close_date is not None and datetime.datetime.utcnow() > self.close_date:
+        if self.is_past_due():
             return True
 
         return False
 
+    def is_completed(self):
+        # used by conditional module
+        # return self.answer_available()
+        return self.lcp.done
+
+    def is_attempted(self):
+        # used by conditional module
+        return self.attempts > 0
+
     def answer_available(self):
-        ''' Is the user allowed to see an answer?
+        '''
+        Is the user allowed to see an answer?
         '''
         if self.show_answer == '':
             return False
-
-        if self.show_answer == "never":
+        elif self.show_answer == "never":
             return False
-
-        # Admins can see the answer, unless the problem explicitly prevents it
-        if self.system.user_is_staff:
+        elif self.system.user_is_staff:
+            # This is after the 'never' check because admins can see the answer
+            # unless the problem explicitly prevents it
             return True
-
-        if self.show_answer == 'attempted':
+        elif self.show_answer == 'attempted':
             return self.attempts > 0
-
-        if self.show_answer == 'answered':
+        elif self.show_answer == 'answered':
+            # NOTE: this is slightly different from 'attempted' -- resetting the problems
+            # makes lcp.done False, but leaves attempts unchanged.
             return self.lcp.done
-
-        if self.show_answer == 'closed':
+        elif self.show_answer == 'closed':
             return self.closed()
-
-        if self.show_answer == 'always':
+        elif self.show_answer == 'past_due':
+            return self.is_past_due()
+        elif self.show_answer == 'always':
             return True
 
         return False
@@ -669,18 +685,18 @@ class CapaDescriptor(RawDescriptor):
     # TODO (vshnayder): do problems have any other metadata?  Do they
     # actually use type and points?
     metadata_attributes = RawDescriptor.metadata_attributes + ('type', 'points')
-    
+
     def get_context(self):
         _context = RawDescriptor.get_context(self)
         _context.update({'markdown': self.metadata.get('markdown', '')})
         return _context
-    
+
     @property
     def editable_metadata_fields(self):
         """Remove metadata from the editable fields since it has its own editor"""
         subset = super(CapaDescriptor,self).editable_metadata_fields
         if 'markdown' in subset:
-            subset.remove('markdown') 
+            subset.remove('markdown')
         return subset
 
 

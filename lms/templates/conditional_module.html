@@ -1,0 +1,9 @@
+<%
+    from django.core.urlresolvers import reverse
+    reqm = module.required_modules[0]
+    course_id = module.system.course_id
+%>
+
+<p><a
+href="${reverse('jump_to',kwargs=dict(course_id=course_id, location=reqm.location.url()))}">${reqm.display_name}</a>
+must be completed before this will become visible.</p>
