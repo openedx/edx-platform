@@ -5,6 +5,7 @@
 class @PeerGrading
   constructor: (element) ->
     @peer_grading_container = $('.peer-grading')
+    @use_single_location = @peer_grading_container.data('use-single-location')
     @peer_grading_outer_container = $('.peer-grading-container')
     @ajax_url = @peer_grading_container.data('ajax-url')
     @error_container = $('.error-container')
@@ -18,6 +19,9 @@ class @PeerGrading
 
     @problem_list = $('.problem-list')
     @construct_progress_bar()
+
+    if @use_single_location
+      @activate_problem()
 
   construct_progress_bar: () =>
     problems = @problem_list.find('tr').next()
@@ -39,3 +43,7 @@ class @PeerGrading
         new PeerGradingProblem(backend)
       else
         @gentle_alert response.error
+
+  activate_problem: () =>
+    backend = new PeerGradingProblemBackend(@ajax_url, false)
+    new PeerGradingProblem(backend)

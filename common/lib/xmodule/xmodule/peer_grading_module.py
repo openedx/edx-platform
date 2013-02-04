@@ -41,7 +41,7 @@ USE_FOR_SINGLE_LOCATION = False
 LINK_TO_LOCATION = ""
 TRUE_DICT = [True, "True", "true", "TRUE"]
 MAX_SCORE = 1
-
+IS_GRADED = True
 
 class PeerGradingModule(XModule):
     _VERSION = 1
@@ -71,9 +71,13 @@ class PeerGradingModule(XModule):
         self.system = system
         self.peer_gs = peer_grading_service(self.system)
 
-        self.use_for_single_location = self.metadata.get('use_for_single_location', use_for_single_location)
+        self.use_for_single_location = self.metadata.get('use_for_single_location', USE_FOR_SINGLE_LOCATION)
         if isinstance(self.use_for_single_location, basestring):
             self.use_for_single_location = (self.use_for_single_location in TRUE_DICT)
+
+        self.is_graded = self.metadata.get('is_graded', IS_GRADED)
+        if isinstance(self.is_graded, basestring):
+            self.is_graded = (self.is_graded in TRUE_DICT)
 
         self.link_to_location = self.metadata.get('link_to_location', USE_FOR_SINGLE_LOCATION)
         if self.use_for_single_location ==True:
@@ -85,10 +89,10 @@ class PeerGradingModule(XModule):
             self.ajax_url = self.ajax_url + "/"
 
         self.student_data_for_location = instance_state.get('student_data_for_location', {})
-        self.max_score = instance_state.get('max_score', MAX_SCORE)
-        if not isinstance(self.max_score, (int, long)):
+        self.max_grade = instance_state.get('max_grade', MAX_SCORE)
+        if not isinstance(self.max_grade, (int, long)):
             #This could result in an exception, but not wrapping in a try catch block so it moves up the stack
-            self.max_score = int(self.max_score)
+            self.max_grade = int(self.max_grade)
 
     def _err_response(self, msg):
         """
@@ -112,7 +116,7 @@ class PeerGradingModule(XModule):
         if not self.use_for_single_location:
             return self.peer_grading()
         else:
-            return self.peer_grading_problem({'location' : self.link_to_location})
+            return self.peer_grading_problem({'location' : self.link_to_location})['html']
 
     def handle_ajax(self, dispatch, get):
         """
@@ -142,7 +146,7 @@ class PeerGradingModule(XModule):
         response = {}
 
         try:
-            response = self.peer_gs.get_data_for_location(location, grader_id)
+            response = self.peer_gs.get_data_for_location(location, student_id)
             count_graded = response['count_graded']
             count_required = response['count_required']
             success = True
@@ -156,7 +160,7 @@ class PeerGradingModule(XModule):
         pass
 
     def get_score(self):
-        if not self.use_for_single_location:
+        if not self.use_for_single_location or not self.is_graded:
             return None
 
         try:
@@ -176,7 +180,7 @@ class PeerGradingModule(XModule):
 
         score_dict = {
             'score': int(count_graded>=count_required),
-            'total': self.max_score,
+            'total': self.max_grade,
             }
 
         return score_dict
@@ -187,10 +191,10 @@ class PeerGradingModule(XModule):
             * This is generic; in abstract, a problem could be 3/5 points on one
               randomization, and 5/7 on another
         '''
-        max_score = None
-        if self.use_for_single_location:
-            max_score = self.max_score
-        return max_score
+        max_grade = None
+        if self.use_for_single_location and self.is_graded:
+            max_grade = self.max_grade
+        return max_grade
 
     def get_next_submission(self, get):
         """
@@ -430,7 +434,9 @@ class PeerGradingModule(XModule):
             'problem_list': problem_list,
             'error_text': error_text,
             # Checked above
-            'staff_access': False, })
+            'staff_access': False,
+            'use_single_location' : self.use_for_single_location,
+            })
 
         return html
 
@@ -438,12 +444,14 @@ class PeerGradingModule(XModule):
         '''
         Show individual problem interface
         '''
-        if get == None:
-            problem_location = self.system.location
+        if get == None or get.get('location')==None:
+            if not self.use_for_single_location:
+                #This is an error case, because it must be set to use a single location to be called without get parameters
+                return {'html' : "", 'success' : False}
+            problem_location = self.link_to_location
+
         elif get.get('location') is not None:
             problem_location = get.get('location')
-        else:
-            problem_location = self.system.location
 
         ajax_url = self.ajax_url
         html = self.system.render_template('peer_grading/peer_grading_problem.html', {
@@ -452,7 +460,9 @@ class PeerGradingModule(XModule):
             'course_id': self.system.course_id,
             'ajax_url': ajax_url,
             # Checked above
-            'staff_access': False, })
+            'staff_access': False,
+            'use_single_location' : self.use_for_single_location,
+            })
 
         return {'html' : html, 'success' : True}
 
