@@ -32,7 +32,13 @@ class PeerGradingService():
         self.save_calibration_essay_url = self.url + '/save_calibration_essay/'
         self.get_problem_list_url = self.url + '/get_problem_list/'
         self.get_notifications_url = self.url + '/get_notifications/'
+        self.get_data_for_location_url = self.url + '/get_data_for_location/'
         self.system = system
+
+    def get_data_for_location(self, problem_location, student_id):
+        response = self.get(self.get_data_for_location_url,
+            {'location': problem_location, 'student_id': student_id})
+        return self._render_rubric(response)
 
     def get_next_submission(self, problem_location, grader_id):
         response = self.get(self.get_next_submission_url,

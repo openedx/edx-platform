@@ -40,6 +40,7 @@ log = logging.getLogger(__name__)
 USE_FOR_SINGLE_LOCATION = False
 LINK_TO_LOCATION = ""
 TRUE_DICT = [True, "True", "true", "TRUE"]
+MAX_SCORE = 1
 
 
 class PeerGradingModule(XModule):
@@ -62,7 +63,6 @@ class PeerGradingModule(XModule):
         # Load instance state
         if instance_state is not None:
             instance_state = json.loads(instance_state)
-            use_for_single_location = instance_state.get('use_for_single_location', USE_FOR_SINGLE_LOCATION)
         else:
             instance_state = {}
 
@@ -83,6 +83,12 @@ class PeerGradingModule(XModule):
         self.ajax_url = self.system.ajax_url
         if not self.ajax_url.endswith("/"):
             self.ajax_url = self.ajax_url + "/"
+
+        self.student_data_for_location = instance_state.get('student_data_for_location', {})
+        self.max_score = instance_state.get('max_score', MAX_SCORE)
+        if not isinstance(self.max_score, (int, long)):
+            #This could result in an exception, but not wrapping in a try catch block so it moves up the stack
+            self.max_score = int(self.max_score)
 
     def _err_response(self, msg):
         """
@@ -134,6 +140,18 @@ class PeerGradingModule(XModule):
 
     def get_score(self):
         pass
+
+    def max_score(self):
+        ''' Maximum score. Two notes:
+
+            * This is generic; in abstract, a problem could be 3/5 points on one
+              randomization, and 5/7 on another
+        '''
+        max_score = None
+        if self.check_if_done_and_scored():
+            last_response = self.get_last_response(self.current_task_number)
+            max_score = last_response['max_score']
+        return max_score
 
     def get_next_submission(self, get):
         """
@@ -398,6 +416,19 @@ class PeerGradingModule(XModule):
             'staff_access': False, })
 
         return {'html' : html, 'success' : True}
+
+    def get_instance_state(self):
+        """
+        Returns the current instance state.  The module can be recreated from the instance state.
+        Input: None
+        Output: A dictionary containing the instance state.
+        """
+
+        state = {
+            'student_data_for_location' : self.student_data_for_location,
+            }
+
+        return json.dumps(state)
 
 class PeerGradingDescriptor(XmlDescriptor, EditingDescriptor):
     """
