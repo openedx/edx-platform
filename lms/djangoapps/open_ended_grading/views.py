@@ -113,8 +113,8 @@ def peer_grading(request, course_id):
     location  = ""
     definition = "<peergrading use_for_single_location = 'False'></peergrading>"
     descriptor = peer_grading_module.PeerGradingDescriptor
-    instance_state = {}
-    pg_url = re.sub("/courses", "i4x://", ajax_url)
+    instance_state = None
+    pg_url = re.sub("/courses", "i4x:/", ajax_url)[:-1]
 
     pg_module = peer_grading_module.PeerGradingModule(system, pg_url, definition, descriptor, instance_state)
 
