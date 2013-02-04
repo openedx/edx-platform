@@ -88,6 +88,16 @@ PollMain.prototype = {
                     }
                 }
             );
+
+            // window[response.className][response.methodName](response.conditonClass);
+            // var temp = new window[response.className]($('#' + response.conditonId));
+
+            _this.question.element.parent().parent().parent().find('.xmodule_ConditionalModule').each(
+                function (index, value) {
+                    var temp;
+                    temp = new window[response.className]($(value));
+                }
+            );
         }
     );
 },
@@ -100,8 +110,6 @@ PollMain.prototype = {
         element
     );
 
-    /*
-
     if (element.attr('poll_main_processed') === 'true') {
         // This element was already processed once.
         return;
@@ -109,17 +117,15 @@ PollMain.prototype = {
     // Make sure that next time we will not process this element a second time.
     element.attr('poll_main_processed', 'true');
 
-    // Access PollMain instance inside inner functions created by $.each() iterator.
+    // Access PollMain instance inside inner functions.
     _this = this;
 
-    if (this.hasOwnProperty('pollObjects') === false) {
-        this.pollObjects = {};
-    }
+    this.question = {};
 
-    this.element = element;
+    this.question.element = element;
 
     try {
-        jsonConfig = JSON.parse(element.children('.poll_div').html());
+        jsonConfig = JSON.parse(element.children('.poll_question_div').html());
     } catch (err) {
         logme(
             'ERROR: Invalid JSON config for poll ID "' + element.id + '".',
@@ -129,69 +135,67 @@ PollMain.prototype = {
         return;
     }
 
-    logme('JSON config:', jsonConfig);
-    logme('jsonConfig.poll_chain.length = ' + jsonConfig.poll_chain.length);
+    logme('JSON config: ', jsonConfig);
 
-    for (c1 = 0; c1 < jsonConfig.poll_chain.length; c1 += 1) {
-        obj = {};
+    obj = {};
 
-        this.pollObjects[obj.id] = obj;
+    obj.ajax_url = element.data('ajax-url');
+    obj.id = 0;
 
-        obj.id = jsonConfig.poll_chain[c1].id;
-        obj.upvoteId = jsonConfig.poll_chain[c1].upvote_id;
-        obj.downvoteId = jsonConfig.poll_chain[c1].downvote_id;
-        obj.showStats = jsonConfig.poll_chain[c1].show_stats === 'yes';
-        obj.ajax_url = element.data('ajax-url');
+    strQuestion = $('<div />').html(jsonConfig.question).text();
 
-        strQuestion = $('<div />').html(jsonConfig.poll_chain[c1].question).text();
+    c1 = 0;
 
-        obj.el = $(
-            '<div id="poll-' + c1 + '" class="polls" style="' + ((c1 === 0) ? '' : 'display: none;') + '">' +
-                strQuestion +
-                '<div style="width: 500px; height: 150px; margin-left: auto; margin-right: auto;">' +
-                    '<div id="vote_block-' + c1 + '" class="vote_blocks" style="display: inline; float: left; clear: none;">' +
-                        '<ul>' +
-                            '<li>' +
-                                '<input type="radio" id="poll-vote-' + c1 + '-1" name="vote_' + c1 + '-1" value="1" />' +
-                                '<label for="poll-vote-' + c1 + '-1">Yes</label>' +
-                            '</li>' +
-                            '<li>' +
-                                '<input type="radio" id="poll-vote-' + c1 + '-2" name="vote_' + c1 + '-2" value="2" />' +
-                                '<label for="poll-vote-' + c1 + '-2">No</label>' +
-                            '</li>' +
-                        '</ul>' +
-                    '</div>' +
-                    '<div class="submit-button" style="display: inline; float: left; clear: none; margin: 2.5rem;">' +
-                        '<input type="button" value="Cast Your vote" class=".submit-button" name="vote" />' +
-                    '</div>' +
+    obj.el = $(
+        '<div id="poll-' + c1 + '" class="polls" style="' + ((c1 === 0) ? '' : 'display: none;') + '">' +
+            strQuestion +
+            '<div style="width: 500px; height: 150px; margin-left: auto; margin-right: auto;">' +
+                '<div id="vote_block-' + c1 + '" class="vote_blocks" style="display: inline; float: left; clear: none;">' +
+                    '<ul>' +
+                        '<li>' +
+                            '<input type="radio" id="poll-vote-' + c1 + '-1" name="vote_' + c1 + '-1" value="1" />' +
+                            '<label for="poll-vote-' + c1 + '-1">' + jsonConfig.answers.Yes + '</label>' +
+                        '</li>' +
+                        '<li>' +
+                            '<input type="radio" id="poll-vote-' + c1 + '-2" name="vote_' + c1 + '-2" value="2" />' +
+                            '<label for="poll-vote-' + c1 + '-2">' + jsonConfig.answers.No + '</label>' +
+                        '</li>' +
+                        '<li>' +
+                            '<input type="radio" id="poll-vote-' + c1 + '-3" name="vote_' + c1 + '-3" value="3" />' +
+                            '<label for="poll-vote-' + c1 + '-3">' + jsonConfig.answers.Dont_know + '</label>' +
+                        '</li>' +
+                    '</ul>' +
                 '</div>' +
-                '<div class="graph_answer" style="display: none; clear: both;"></div>' +
-            '</div>'
-        );
+                '<div class="submit-button" style="display: inline; float: left; clear: none; margin: 2.5rem;">' +
+                    '<input type="button" value="Cast Your vote" class=".submit-button" name="vote" />' +
+                '</div>' +
+            '</div>' +
+            '<div class="graph_answer" style="display: none; clear: both;"></div>' +
+        '</div>'
+    );
 
-        obj.el.find('input').each(function (index, value) {
-            var val, type;
+    obj.el.find('input').each(function (index, value) {
+        var val, type;
 
-            val = $(value).val();
-            if (val == '1') {
-                type = 'upvote';
-            } else if (val == '2') {
-                type = 'downvote';
-            } else {
-                logme('ERROR: Not a valid input value.');
+        val = $(value).val();
+        if (val == '1') {
+            type = 'upvote';
+        } else if (val == '2') {
+            type = 'downvote';
+        } else if (val == '3') {
+            type = 'do not know';
+        } else {
+            logme('ERROR: Not a valid input value.');
 
-                return;
-            }
+            return;
+        }
 
-            $(value).on('click', function (event) {
-                _this.submitAnswer(event, obj, type);
-            });
+        $(value).on('click', function (event) {
+            _this.submitAnswer(event, obj, type);
         });
+    });
 
-        obj.el.appendTo(element);
-    }
-
-    */
+    obj.el.appendTo(element);
 },
 
 'initializePollConditional': function (element) {
