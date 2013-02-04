@@ -24,20 +24,14 @@ class @VideoSpeedControlAlpha extends SubviewAlpha
         <ol class="video_speeds"></ol>
       </div>
       """
-
     $.each @speeds, (index, speed) =>
       link = $('<a>').attr(href: "#").html("#{speed}x")
       @$('.video_speeds').prepend($('<li>').attr('data-speed', speed).html(link))
-    @setSpeed(@currentSpeed)
+    @setSpeed @currentSpeed
 
   reRender: (newSpeeds) ->
     @$('.video_speeds').empty()
-
-    @speeds newSpeeds
-
-    console.log "Changing speeds"
-    console.log @speeds
-
+    @speeds = newSpeeds
     $.each @speeds, (index, speed) =>
       link = $('<a>').attr(href: "#").html("#{speed}x")
       @$('.video_speeds').prepend($('<li>').attr('data-speed', speed).html(link))
