@@ -1,4 +1,4 @@
-// header
+//studio global header and navigation
 .wrapper-header {
   margin: 0 0 ($baseline*1.5) 0;
   padding: $baseline;
@@ -18,13 +18,15 @@
       color: $blue;
     }
   }
-}
 
-.header {
-  @include clearfix();
-  max-width: 1280px;
-  margin: 0 auto;
-  color: $lightGrey;
+  .header {
+    @include clearfix();
+    max-width: $fg-max-width;
+    min-width: $fg-min-width;
+    width: flex-grid(12);
+    margin: 0 auto;
+    color: $lightGrey;
+  }
 }
 
 .branding, .info-course, .nav-course, .nav-account, .nav-unauth, .nav-pitch {
@@ -91,7 +93,7 @@
     white-space: nowrap;
     text-overflow: ellipsis;
     @include font-size(16);
-    font-weight: 550;
+    font-weight: 600;
 
   }
 }
@@ -116,7 +118,7 @@
       display: block;
       padding: 5px;
       text-transform: uppercase;
-      font-weight: 550;
+      font-weight: 600;
 
       &:hover, &:active {
         color: $blue;
@@ -343,7 +345,7 @@
       display: inline-block;
       vertical-align: middle;
       margin: 0 $baseline 0 0;
-      font-weight: 550;
+      font-weight: 600;
 
       &:last-child {
         margin-right: 0;
@@ -353,7 +355,6 @@
         margin-top: -($baseline/4);
         display: inline-block;
         padding: ($baseline/4) ($baseline/2);
-        font-weight: 550;
       }
     }
 
@@ -363,10 +364,14 @@
     }
 
     .nav-not-signedin-signup {
+      margin-right: ($baseline/2);
 
       .action-signup {
         @include blue-button;
         @include transition(all .15s);
+        @include font-size(14);
+        text-transform: uppercase;
+        font-weight: 600 !important;
       }
     }
 
@@ -375,6 +380,9 @@
       .action-signin {
         @include white-button;
         @include transition(all .15s);
+        @include font-size(14);
+        text-transform: uppercase;
+        font-weight: 600 !important;
       }
     }
   }

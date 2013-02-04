@@ -1,0 +1,223 @@
+// login and sign up UI
+.signup, .signin {
+
+  .wrapper-content {
+    margin: 0;
+    padding: 0 $baseline;
+    position: relative;
+    width: 100%;
+  }
+
+  .content {
+    @include clearfix();
+    @include font-size(16);
+    max-width: $fg-max-width;
+    min-width: $fg-min-width;
+    width: flex-grid(12);
+    margin: 0 auto;
+    color: $gray-d2;
+    
+    header {
+      position: relative;
+      margin-bottom: ($baseline/2);
+      border-bottom: 1px solid $gray-l4;
+      padding-bottom: ($baseline/2);
+
+      h1 {
+        @include font-size(32);
+        float: none;
+        margin: 0;
+        padding: 0;
+        font-weight: 600;
+      }
+
+      .action {
+        @include font-size(13);
+        position: absolute;
+        right: 0;
+        top: 40%;
+      }
+    }
+
+    .introduction {
+      @include font-size(14);
+      margin: 0 0 $baseline 0;
+    }
+  }
+
+  .content-primary, .content-supplementary {
+    @include box-sizing(border-box);
+    float: left;
+  }
+
+  .content-primary {
+    width: flex-grid(7, 12);
+    margin-right: flex-gutter();
+
+    form {
+      @include box-sizing(border-box);
+      @include box-shadow(0 1px 2px $shadow-l1);
+      @include border-radius(2px);
+      width: 100%;
+      border: 1px solid $gray-l2;
+      padding: $baseline ($baseline*1.5);
+      background: $white;
+
+      .form-actions {
+        margin-top: $baseline;
+
+        .action-primary {
+          @include blue-button;
+          @include transition(all .15s);
+          @include font-size(15);
+          display:block;
+          width: 100%;
+          padding: ($baseline*0.75) ($baseline/2);
+          font-weight: 600 !important;
+          text-transform: uppercase;
+        }
+      }
+
+      .list-input {
+        margin: 0;
+        padding: 0;
+        list-style: none;
+
+        .field {
+          margin: 0 0 ($baseline*0.75) 0;
+
+          &:last-child {
+            margin-bottom: 0;
+          }
+
+          &.required {
+
+            label {
+              font-weight: 600;
+            }
+
+            label:after {
+              margin-left: ($baseline/4);
+              content: "*";
+            }
+          }
+
+          label, input, textarea {
+            display: block;
+          }
+
+          label {
+            @include font-size(14);
+            @include transition(color, 0.15s, ease-in-out);
+            margin: 0 0 ($baseline/4) 0;
+
+            &.is-focused {
+              color: $blue;
+            }
+          }
+
+          input, textarea {
+            @include font-size(16);
+            height: 100%;
+            width: 100%;
+            padding: ($baseline/2);       
+
+            &.long {
+              width: 100%;
+            }
+
+            &.short {
+              width: 25%;
+            }
+          }
+
+          textarea.long {
+            height: ($baseline*5);
+          }
+
+          input[type="checkbox"] {
+            display: inline-block;
+            margin-right: ($baseline/4);
+            width: auto;
+            height: auto;
+
+            & + label {
+              display: inline-block;
+            }
+          }
+
+          .tip {
+            @include font-size(13);
+            display: block;
+            margin-top: ($baseline/4);
+            color: $gray-l3;
+          }
+        }
+
+        .field-group {
+          @include clearfix();
+          margin: 0 0 ($baseline/2) 0;
+
+          .field {
+            display: block;
+            width: 47%;
+            border-bottom: none;
+            margin: 0 $baseline 0 0;
+            padding-bottom: 0;
+
+            &:nth-child(odd) {
+              float: left;
+            }
+
+            &:nth-child(even) {
+              float: right;
+              margin-right: 0;
+            }
+
+            input, textarea {
+              width: 100%;
+            }
+          }
+        }
+      }
+    }
+  }
+
+  .content-supplementary {
+    width: flex-grid(4, 12);
+
+    .bit {
+      @include font-size(13);
+      margin: 0 0 $baseline 0;
+      border-bottom: 1px solid $gray-l4;
+      padding: 0 0 $baseline 0;
+      color: $gray-l1;
+
+      &:last-child {
+        margin-bottom: 0;
+        border: none;
+        padding-bottom: 0;
+      }
+
+      h3 {
+        @include font-size(14);
+        margin: 0 0 ($baseline/4) 0;
+        color: $gray-d2;
+        font-weight: 600;
+      }
+
+    }
+  }
+}
+
+.signup {
+
+
+}
+
+.signin {
+
+
+}
+
+// @include transition(all 1s ease-in-out);
