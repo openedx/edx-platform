@@ -34,7 +34,7 @@ from xmodule.modulestore import Location
 from xmodule.modulestore.django import modulestore
 from courseware.models import StudentModule, StudentModuleCache
 
-from django.http import HttpResponse, Http404
+from django.http import HttpResponse, Http404, HttpResponseRedirect
 
 log = logging.getLogger(__name__)
 
@@ -95,75 +95,22 @@ def peer_grading(request, course_id):
     '''
     Show a peer grading interface
     '''
+
     course = get_course_with_access(request.user, course_id, 'load')
+    log.debug(course_id)
+    pg_location = "i4x://" + "MITx/oe101x/" + "peergrading/init"
 
-    ajax_url = _reverse_with_slash('peer_grading_ajax', course_id)
-    track_function = None
-    get_module = None
-    render_template = render_to_string
-    replace_urls = None
-    anonymous_student_id= unique_id_for_user(request.user)
+    base_course_url  = reverse('courses')
+    problem_url_parts = search.path_to_location(modulestore(), course.id, pg_location)
+    problem_url = base_course_url + "/"
+    for z in xrange(0,len(problem_url_parts)):
+        part = problem_url_parts[z]
+        if part is not None:
+            if z==1:
+                problem_url += "courseware/"
+            problem_url += part + "/"
 
-    pg_ajax = _reverse_with_slash('peer_grading', course_id)
-    pg_url = re.sub("/courses", "i4x:/",pg_ajax)[:-1]
-    pg_location = request.GET.get('location', pg_url)
-    pg_location = "i4x://MITx/oe101x/peergrading/init"
-
-    system = ModuleSystem(
-        ajax_url,
-        track_function,
-        get_module,
-        render_template,
-        replace_urls,
-        course_id = course_id,
-        anonymous_student_id = anonymous_student_id
-    )
-
-    definition = "<peergrading use_for_single_location = 'False'></peergrading>"
-    instance_state = None
-
-    descriptor = peer_grading_module.PeerGradingDescriptor(system)
-
-    pg_module = peer_grading_module.PeerGradingModule(system, pg_location, definition, descriptor, instance_state)
-
-    """
-    return_html = pg_module.get_html()
-    log.debug(return_html)
-    response = render_to_response('peer_grading/peer_grading_notifications.html', {
-        'peer_grading_html' : return_html,
-        'course': course,
-        'problem_location': pg_location,
-        'course_id': course_id,
-        'ajax_url': ajax_url,
-        'staff_access': False,
-        })
-    """
-
-    student_module_cache = StudentModuleCache(course_id,
-        request.user, [descriptor])
-
-    pg_xmodule = module_render.get_module(request.user, request, Location(pg_location), student_module_cache, course_id)
-
-    return HttpResponse(pg_xmodule.get_html())
-
-@cache_control(no_cache=True, no_store=True, must_revalidate=True)
-def peer_grading_ajax(request, course_id):
-    '''
-    Show individual problem interface
-    '''
-    course = get_course_with_access(request.user, course_id, 'load')
-    problem_location = request.GET.get("location")
-
-    ajax_url = _reverse_with_slash('peer_grading', course_id)
-
-    return render_to_response('peer_grading/peer_grading_problem.html', { 
-        'view_html': '',
-        'course': course,
-        'problem_location': problem_location,
-        'course_id': course_id,
-        'ajax_url': ajax_url,
-        # Checked above
-        'staff_access': False, })
+    return HttpResponseRedirect(problem_url)
 
 @cache_control(no_cache=True, no_store=True, must_revalidate=True)
 def student_problem_list(request, course_id):
