@@ -29,12 +29,15 @@ class @VideoSpeedControlAlpha extends SubviewAlpha
       @$('.video_speeds').prepend($('<li>').attr('data-speed', speed).html(link))
     @setSpeed @currentSpeed
 
-  reRender: (newSpeeds) ->
+  reRender: (newSpeeds, currentSpeed) ->
     @$('.video_speeds').empty()
+    @$('.video_speeds li').removeClass('active')
     @speeds = newSpeeds
     $.each @speeds, (index, speed) =>
       link = $('<a>').attr(href: "#").html("#{speed}x")
-      @$('.video_speeds').prepend($('<li>').attr('data-speed', speed).html(link))
+      listItem = $('<li>').attr('data-speed', speed).html(link);
+      listItem.addClass('active') if speed is currentSpeed
+      @$('.video_speeds').prepend listItem
     @$('.video_speeds a').click @changeVideoSpeed
 
   changeVideoSpeed: (event) =>
