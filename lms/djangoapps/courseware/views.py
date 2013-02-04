@@ -8,7 +8,7 @@ from django.core.context_processors import csrf
 from django.core.urlresolvers import reverse
 from django.contrib.auth.models import User
 from django.contrib.auth.decorators import login_required
-from django.http import Http404
+from django.http import Http404, HttpResponseRedirect
 from django.shortcuts import redirect
 from mitxmako.shortcuts import render_to_response, render_to_string
 #from django.views.decorators.csrf import ensure_csrf_cookie
@@ -397,6 +397,12 @@ def timed_exam(request, course_id, chapter, section):
 
         context['content'] = section_module.get_html()
         
+        # determine where to go when the exam ends:
+        if 'time_expired_redirect_url' not in section_descriptor.metadata:
+            raise Http404
+        time_expired_redirect_url = section_descriptor.metadata.get('time_expired_redirect_url')
+        context['time_expired_redirect_url'] = time_expired_redirect_url
+        
         # figure out when the timed exam should end.  Going forward, this is determined by getting a "normal"
         # duration from the test, then doing some math to modify the duration based on accommodations,
         # and then use that value as the end.  Once we have calculated this, it should be sticky -- we
@@ -407,7 +413,7 @@ def timed_exam(request, course_id, chapter, section):
         if 'duration' not in section_descriptor.metadata:
             raise Http404
         duration = int(section_descriptor.metadata.get('duration'))
-
+        
         # get corresponding time module, if one is present:
         # TODO: determine what to use for module_key...
         try: 
@@ -424,7 +430,11 @@ def timed_exam(request, course_id, chapter, section):
                 # Proposal:  store URL in the section descriptor,
                 # along with the duration.  If no such URL is set, 
                 # just put up the error page,
-                raise Exception("Time expired on {}".format(timed_module))
+                if time_expired_redirect_url is None:
+                    raise Exception("Time expired on {}".format(timed_module))
+                else:
+                    return HttpResponseRedirect(time_expired_redirect_url)
+                
             elif not timed_module.has_begun:
                 # user has not started the exam, but may have an accommodation
                 # that has been granted to them.

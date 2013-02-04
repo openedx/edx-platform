@@ -61,26 +61,21 @@
   </script>
 
  <script type="text/javascript">  
-       
-   function getRemainingTime(){
-       function pretty_time_string(num) {
-         return ( num < 10 ? "0" : "" ) + num;
-       }
-       
+
+  var timer = {
+    timer_inst : null,   
+    get_remaining_secs : function() {
        // set the end time when the template is rendered.
        // This value should be UTC time as number of milliseconds since epoch.
        var endTime = new Date(${end_date});
        var currentTime = new Date();
        var remaining_secs = Math.floor((endTime - currentTime)/1000);
-
-       // check to see if time has expired.  If so, we need
-       // to go to the exit URL.
-       // TBD...
-       if (remaining_secs <= 0) {
-           return "00:00:00";
-           // do we just set window.location = <url> value?
+       return remaining_secs;
+    },
+    get_time_string : function() {
+       function pretty_time_string(num) {
+         return ( num < 10 ? "0" : "" ) + num;
        }
-       
        // count down in terms of hours, minutes, and seconds:
        var hours = pretty_time_string(Math.floor(remaining_secs / 3600));
        remaining_secs = remaining_secs % 3600;
@@ -90,17 +85,25 @@
        
        var remainingTimeString = hours + ":" + minutes + ":" + seconds;
        return remainingTimeString;
-   }
- 
-   setInterval(function(){
-       $('#exam_timer').text(getRemainingTime()); }, 1000);
-   
- 
-   // presumably we need to call something to clear the interval once 
-   // the time has expired?  Pass the object that the setInterval() returns
-   // to clearInterval()
-   
-   
+    },
+    update_time : function(self) {
+       remaining_secs = self.get_remaining_secs();
+       if (remaining_secs <= 0) {
+           self.end(self);
+       }
+       $('#exam_timer').text(self.get_time_string(remaining_secs));
+    },
+    start : function() { var that = this;
+      this.timer_inst = setInterval(function(){ that.update_time(that); }, 1000);
+    },
+    end : function(self) {
+      clearInterval(self.timer_inst);
+      // redirect to specified URL:
+      window.location = "${time_expired_redirect_url}"; 
+    }
+  }  
+  // start timer right away: 
+  timer.start(); 
  </script>
 
 </%block>
