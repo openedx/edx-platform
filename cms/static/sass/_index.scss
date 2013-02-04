@@ -8,6 +8,8 @@
     }
 
     .wrapper-footer {
+      margin: 0;
+      border-top: 2px solid $gray-l3;
 
       footer.primary {
         border: none;
@@ -17,6 +19,7 @@
     }
 
     .wrapper-content-header, .wrapper-content-features, .wrapper-content-cta {
+      @include box-sizing(border-box);
       margin: 0;
       padding: 0 $baseline;
       position: relative;
@@ -51,8 +54,8 @@
 
     // welcome content
     .wrapper-content-header {
-      padding-bottom: ($baseline*3);
-      padding-top: ($baseline*3);
+      padding-bottom: ($baseline*4);
+      padding-top: ($baseline*4);
       background: $blue;
     }
 
@@ -78,6 +81,7 @@
 
     // feature content
     .wrapper-content-features {
+      @include box-shadow(0 -1px ($baseline/4) $shadow);
       padding-bottom: ($baseline*2);
       padding-top: ($baseline*2);
       background: $white;
@@ -111,11 +115,11 @@
 
         .copy {
           float: left;
-          width: flex-grid(8, 12);
+          width: flex-grid(9, 12);
           margin-top: -($baseline/4);
 
           h3 {
-            margin: 0 0 ($baseline) 0;
+            margin: 0 0 ($baseline/2) 0;
             @include font-size(24);
             font-weight: 600;
           }
@@ -127,12 +131,12 @@
           .list-proofpoints {
             @include clearfix();
             @include font-size(14);
-            width: flex-grid(8, 8);
+            width: flex-grid(9, 9);
             margin: ($baseline*1.5) 0 0 0;
 
             .proofpoint {
               float: left;
-              width: flex-grid(3, 8);
+              width: flex-grid(3, 9);
               margin-right: flex-gutter();
 
               &:last-child {
@@ -178,8 +182,12 @@
     }
 
     .content-cta {
+      border-top: 1px solid $gray-l4;
+
 
       .list-actions {
+        position: relative;
+        margin-top: -($baseline*1.5);
 
         li {
           width: flex-grid(6, 12); 
