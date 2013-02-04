@@ -23,14 +23,6 @@ import open_ended_notifications
 
 from xmodule.modulestore.django import modulestore
 from xmodule.modulestore import search
-from xmodule import peer_grading_module
-from xmodule import peer_grading_service
-from mitxmako.shortcuts import render_to_string
-from xmodule.x_module import ModuleSystem
-from courseware import module_render
-from xmodule.modulestore import Location
-from xmodule.modulestore.django import modulestore
-from courseware.models import StudentModule, StudentModuleCache
 
 from django.http import HttpResponse, Http404, HttpResponseRedirect
 
