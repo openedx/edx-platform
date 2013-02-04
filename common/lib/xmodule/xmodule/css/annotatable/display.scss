@@ -60,4 +60,8 @@ span.annotatable {
     right: 8px;
     margin-top: 4px;
   }
+  
+  &.opaque {
+    opacity: 0.4;
+  }
 }

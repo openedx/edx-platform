@@ -1,4 +1,4 @@
-<div class="annotatable-wrapper" id="${element_id}">
+<div class="annotatable-wrapper" id="${element_id}-wrapper">
 
 <div class="annotatable-header">
 	<div class="help-icon"></div>
@@ -14,9 +14,7 @@
 	
 <script>
 $(function() {
-	// TODO pass spans to module directly
-	var el = $('#${element_id}.annotatable-wrapper');
-	el.data('spans', ${json_discussion_for});
+	$('#${element_id}-wrapper').data('spans', ${json_discussion_for});
 });
 </script>
 
