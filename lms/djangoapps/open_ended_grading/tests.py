@@ -172,7 +172,8 @@ class TestPeerGradingService(ct.PageLoader):
                 'submission_key': 'fake key', 
                 'score': '2',
                 'feedback': 'This is feedback',
-                'rubric_scores[]': [1, 2]}
+                'rubric_scores[]': [1, 2],
+                'submission_flagged' : False}
         r = self.check_for_post_code(200, url, data)
         d = json.loads(r.content)
         self.assertTrue(d['success'])
