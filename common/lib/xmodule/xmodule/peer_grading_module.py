@@ -65,6 +65,7 @@ class PeerGradingModule(XModule):
 
         #We need to set the location here so the child modules can use it
         system.set('location', location)
+        log.debug("Location: {0}".format(location))
         self.system = system
         self.peer_gs = peer_grading_service(self.system)
 

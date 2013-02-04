@@ -30,6 +30,7 @@ from xmodule import peer_grading_service
 from mitxmako.shortcuts import render_to_string
 from xmodule.x_module import ModuleSystem
 from courseware import module_render
+from xmodule.modulestore import Location
 from xmodule.modulestore.django import modulestore
 from courseware.models import StudentModule, StudentModuleCache
 
@@ -103,6 +104,11 @@ def peer_grading(request, course_id):
     replace_urls = None
     anonymous_student_id= unique_id_for_user(request.user)
 
+    pg_ajax = _reverse_with_slash('peer_grading', course_id)
+    pg_url = re.sub("/courses", "i4x:/",pg_ajax)[:-1]
+    pg_location = request.GET.get('location', pg_url)
+    pg_location = "i4x://MITx/oe101x/peergrading/init"
+
     system = ModuleSystem(
         ajax_url,
         track_function,
@@ -113,14 +119,10 @@ def peer_grading(request, course_id):
         anonymous_student_id = anonymous_student_id
     )
 
-    location  = ""
     definition = "<peergrading use_for_single_location = 'False'></peergrading>"
-    descriptor = peer_grading_module.PeerGradingDescriptor
     instance_state = None
 
-    pg_ajax = _reverse_with_slash('peer_grading', course_id)
-    pg_url = re.sub("/courses", "i4x:/",pg_ajax)[:-1]
-    pg_location = request.GET.get('location', pg_url)
+    descriptor = peer_grading_module.PeerGradingDescriptor(system)
 
     pg_module = peer_grading_module.PeerGradingModule(system, pg_location, definition, descriptor, instance_state)
 
@@ -138,11 +140,11 @@ def peer_grading(request, course_id):
     """
 
     student_module_cache = StudentModuleCache(course_id,
-        request.user, descriptor)
+        request.user, [descriptor])
 
-    pg_xmodule = module_render.get_module(request.user, request, pg_location, student_module_cache, course_id)
+    pg_xmodule = module_render.get_module(request.user, request, Location(pg_location), student_module_cache, course_id)
 
-    return pg_xmodule.get_html()
+    return HttpResponse(pg_xmodule.get_html())
 
 @cache_control(no_cache=True, no_store=True, must_revalidate=True)
 def peer_grading_ajax(request, course_id):
