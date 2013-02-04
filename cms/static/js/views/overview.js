@@ -8,7 +8,9 @@ $(document).ready(function() {
         handle: '.drag-handle',
         zIndex: 999,  
         start: initiateHesitate,
-        drag: generateCheckHoverState('.collapsed', ''), // '.unit'),
+        // left 2nd arg in as inert selector b/c i was uncertain whether we'd try to get the shove up/down
+        // to work in the future
+        drag: generateCheckHoverState('.collapsed', ''), 
         stop: removeHesitate,
         revert: "invalid"
     });
@@ -19,7 +21,7 @@ $(document).ready(function() {
         handle: '.section-item .drag-handle',
         zIndex: 999,  
         start: initiateHesitate,
-        drag: generateCheckHoverState('.courseware-section.collapsed', ''), //'.id-holder'),
+        drag: generateCheckHoverState('.courseware-section.collapsed', ''),
         stop: removeHesitate,
         revert: "invalid"
     });
@@ -95,6 +97,7 @@ function computeIntersection(droppable, uiHelper, y) {
                 y  < b ); // Top Half
 }
 
+// NOTE: selectorsToShove is not currently being used but I left this code as it did work but not well
 function generateCheckHoverState(selectorsToOpen, selectorsToShove) {
     return function(event, ui) {
         // copied from jquery.ui.droppable.js $.ui.ddmanager.drag & other ui.intersect
