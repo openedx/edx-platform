@@ -29,49 +29,71 @@ PollMain.prototype = {
     _this = this;
 
     answerEl.addClass('answered');
-    answerEl.css({
-        'background-color': 'green'
-    });
-
-    logme('We are inside submitAnswer() method.', '_this = ', _this, 'answer = ', answer, 'answerEl = ', answerEl);
 
     // Send the data to the server as an AJAX request. Attach a callback that will
     // be fired on server's response.
     $.postWithPrefix(
         _this.ajax_url + '/' + answer,  {},
         function (response) {
+            var dataSeries, tickSets, c1;
+
             logme('The following response was received: ' + JSON.stringify(response));
 
             // Show the answer from server.
             _this.graphAnswerEl.show();
 
-            // function disableClick (event) {
-            //     event.preventDefault();
-            //     return false;
-            // }
-            // pollObj.upvote.click(disableClick);
-            // pollObj.downvote.click(disableClick);
+            dataSeries = [];
+            tickSets = {};
+            c1 = 0;
+
+            response.sum = 0;
+            // To be taken out when we actually have the 'response.sum' parameter.
+            $.each(response.poll_answers, function (index, value) {
+                var numValue;
+
+                numValue = parseFloat(value);
+                if (isFinite(numValue) === false) {
+                    return;
+                }
+
+                response.sum += numValue;
+            });
+
+            $.each(response.poll_answers, function (index, value) {
+                var numValue;
+
+                numValue = parseFloat(value);
+                if (isFinite(numValue) === false) {
+                    return;
+                }
+
+                c1 += 1;
+
+                tickSets[c1.toFixed(1)] = _this.jsonConfig.answers[index]
+
+                dataSeries.push({
+                    'legend': _this.jsonConfig.answers[index],
+                    'data': [[c1, (numValue / response.sum) * 100.0]]
+                });
+            });
 
             jQuery.plot(
                 _this.graphAnswerEl,
-                [
-                    [[1, response.upvotes / (response.upvotes + response.downvotes)   ]],
-                    [[2, response.downvotes / (response.upvotes + response.downvotes) ]]
-                ],
+                dataSeries,
                 {
                     'xaxis': {
                         'min': 0,
-                        'max': 3,
+                        'max': c1 + 1,
                         'tickFormatter': function formatter(val, axis) {
                             var valStr;
 
                             valStr = val.toFixed(axis.tickDecimals);
 
-                            if (valStr === '1.0') {
-                                return 'Yes / Upvote';
-                            } else if (valStr === '2.0') {
-                                return 'No / Downvote';
-                            } else { return ''; }
+                            if (tickSets.hasOwnProperty(valStr)) {
+                                return tickSets[valStr];
+                            } else {
+                                return '';
+                            }
                         }
                     },
                     'yaxis': {
@@ -91,11 +113,13 @@ PollMain.prototype = {
                 }
             );
 
+            /*
             _this.vertModEl.find('.xmodule_ConditionalModule').each(
                 function (index, value) {
                     (new window[response.className]($(value)));
                 }
             );
+            */
         }
     );
 } // End-of: 'submitAnswer': function (answer, answerEl) {
@@ -112,7 +136,7 @@ function PollMain(el) {
         return;
     }
 
-    this.questionEl = this.vertModEl.find('.poll_question');
+    this.questionEl = $(el).find('.poll_question');
     if (this.questionEl.length !== 1) {
         // We require one question DOM element.
         logme('ERROR: PollMain constructor ');
@@ -120,6 +144,8 @@ function PollMain(el) {
         return;
     }
 
+    // Just a safety precussion. If we run this code more than once, multiple 'click' callback handlers will be
+    // attached to the same DOM elements. We don't want this to happen.
     if (this.vertModEl.attr('poll_main_processed') === 'true') {
         logme(
             'ERROR: PolMain JS constructor was called on a DOM element that has already been processed once.'
@@ -158,7 +184,7 @@ function PollMain(el) {
     $.each(this.jsonConfig.answers, function (index, value) {
         var answerEl;
 
-        answerEl = $('<li class="pol_answer">' + value + '</li>');
+        answerEl = $('<div class="poll_answer">' + value + '</li>');
         answerEl.on('click', function () {
             _this.submitAnswer(index, answerEl);
         });

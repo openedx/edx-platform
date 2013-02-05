@@ -1,22 +1,4 @@
-h2 {
-  margin-top: 0;
-  margin-bottom: 15px;
-
-  &.problem-header {
-    section.staff {
-      margin-top: 30px;
-      font-size: 80%;
-    }
-  }
-
-  @media print {
-    display: block;
-    width: auto;
-    border-right: 0;
-  }
-}
-
-section.poll {
+section.poll_question {
   @media print {
     display: block;
     width: auto;
@@ -27,9 +9,32 @@ section.poll {
     }
   }
 
-
   .inline {
       display: inline;
+  }
+
+  h3 {
+    margin-top: 0;
+    margin-bottom: 15px;
+    color: #fe57a1;
+
+    &.problem-header {
+      section.staff {
+        margin-top: 30px;
+        font-size: 80%;
+      }
+    }
+
+    @media print {
+      display: block;
+      width: auto;
+      border-right: 0;
+    }
+  }
+
+  p {
+    text-align: center;
+    font-weight: bold;
   }
 
   .poll_answer {
@@ -40,9 +45,10 @@ section.poll {
     text-align: center;
     margin-left: auto;
     margin-right: auto;
+    vertical-align: middle;
   }
 
-  .poll_answer.selected {
+  .poll_answer.answered {
     background-color: green;
   }
 
@@ -51,5 +57,7 @@ section.poll {
     clear: both;
     width: 400px;
     height: 400px;
+    margin-left: auto;
+    margin-right: auto;
   }
 }
