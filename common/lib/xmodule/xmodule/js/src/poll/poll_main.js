@@ -10,7 +10,12 @@ define('PollMain', ['logme'], function (logme) {
 PollMain.prototype = {
 
 'showAnswerGraph': function (poll_answers, total) {
-    var dataSeries, tickSets, c1, _this;
+    var dataSeries, tickSets, c1, _this, totalValue;
+
+    totalValue = parseFloat(total);
+    if (isFinite(totalValue) === false) {
+        return;
+    }
 
     _this = this;
 
@@ -36,8 +41,8 @@ PollMain.prototype = {
         tickSets[c1.toFixed(1)] = text;
 
         dataSeries.push({
-            'legend': text,
-            'data': [[c1, (numValue / total) * 100.0]]
+            'label': '' + value + '/' + total,
+            'data': [[c1, (numValue / totalValue) * 100.0]]
         });
     });
 
@@ -73,6 +78,10 @@ PollMain.prototype = {
                 'show': true,
                 'align': 'center',
                 'barWidth': 0.5
+            },
+            'legend': {
+                'show': true,
+                'backgroundOpacity': 0
             }
         }
     );
