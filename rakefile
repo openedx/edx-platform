@@ -134,7 +134,7 @@ end
 
     desc "Run pep8 on all #{system} code"
     task "pep8_#{system}" => report_dir do
-        sh("pep8 --ignore=E501 #{system}/djangoapps #{system}/lib | tee #{report_dir}/pep8.report")
+        sh("pep8 #{system} | tee #{report_dir}/pep8.report")
     end
     task :pep8 => "pep8_#{system}"
 
