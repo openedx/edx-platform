@@ -4,6 +4,7 @@ class @Annotatable
     wrapperSelector: '.annotatable-wrapper'
     spanSelector: 'span.annotatable[data-span-id]'
     discussionSelector: '.annotatable-discussion[data-discussion-id]'
+    toggleSelector: '.annotatable-toggle'
  
     constructor: (el) ->
         console.log 'loaded Annotatable' if @_debug
@@ -11,10 +12,14 @@ class @Annotatable
         @init()
 
     init: () ->
+        @hideAnnotations = false
+        @spandata = {}
         @loadSpanData()
         @initEvents()
 
     initEvents: () ->
+        $(@toggleSelector, @el).bind('click', @_bind @onClickToggleAnnotations)
+
         $(@wrapperSelector, @el).delegate(@spanSelector, {
             'click': @_bind @onSpanEvent @onClickSpan
             'mouseenter': @_bind @onSpanEvent @onEnterSpan
@@ -30,6 +35,11 @@ class @Annotatable
     getDiscussionEl: (discussion_id) ->
         $(@discussionSelector, @el).filter('[data-discussion-id="'+discussion_id+'"]')
 
+    onClickToggleAnnotations: (e) ->
+        @hideAnnotations = !@hideAnnotations
+        $(@spanSelector, @el).add(@discussionSelector, @el).toggleClass('hide', @hideAnnotations)
+        $(@toggleSelector, @el).text(if @hideAnnotations then 'Show Annotations' else 'Hide Annotations')
+
     onSpanEvent: (fn) ->
         (e) =>
           span_el = e.currentTarget
@@ -44,7 +54,8 @@ class @Annotatable
             id: discussion_id
             el: discussion_el 
           }
-          fn.call this, span, discussion
+          if !@hideAnnotations
+              fn.call this, span, discussion
 
     onClickSpan: (span, discussion) ->
         @scrollToDiscussion(discussion.el)

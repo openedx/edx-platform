@@ -14,11 +14,23 @@
   }
 }
 
+.annotatable-toggle {
+  display: block;
+  font-size: $body-font-size;
+}
+
 span.annotatable {
   color: $blue;
   cursor: pointer;
   .annotatable-icon {
     margin: auto 2px auto 4px;
+  }
+  &.hide {
+    cursor: none;
+    color: inherit;
+    .annotatable-icon {
+      display: none;
+    }
   }
 }
 
@@ -63,5 +75,8 @@ span.annotatable {
   
   &.opaque {
     opacity: 0.4;
+  }
+  &.hide {
+    display: none;
   }
 }
