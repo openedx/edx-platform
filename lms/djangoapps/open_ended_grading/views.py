@@ -118,28 +118,29 @@ def student_problem_list(request, course_id):
     problem_list = []
     base_course_url  = reverse('courses')
 
-    try:
-        problem_list_json = controller_qs.get_grading_status_list(course_id, unique_id_for_user(request.user))
-        problem_list_dict = json.loads(problem_list_json)
-        success = problem_list_dict['success']
-        if 'error' in problem_list_dict:
-            error_text = problem_list_dict['error']
-            problem_list = []
-        else:
-            problem_list = problem_list_dict['problem_list']
+    #try:
+    problem_list_json = controller_qs.get_grading_status_list(course_id, unique_id_for_user(request.user))
+    problem_list_dict = json.loads(problem_list_json)
+    success = problem_list_dict['success']
+    if 'error' in problem_list_dict:
+        error_text = problem_list_dict['error']
+        problem_list = []
+    else:
+        problem_list = problem_list_dict['problem_list']
 
-        for i in xrange(0,len(problem_list)):
-            problem_url_parts = search.path_to_location(modulestore(), course.id, problem_list[i]['location'])
-            problem_url = base_course_url + "/"
-            for z in xrange(0,len(problem_url_parts)):
-                part = problem_url_parts[z]
-                if part is not None:
-                    if z==1:
-                        problem_url += "courseware/"
-                    problem_url += part + "/"
+    for i in xrange(0,len(problem_list)):
+        problem_url_parts = search.path_to_location(modulestore(), course.id, problem_list[i]['location'])
+        problem_url = base_course_url + "/"
+        for z in xrange(0,len(problem_url_parts)):
+            part = problem_url_parts[z]
+            if part is not None:
+                if z==1:
+                    problem_url += "courseware/"
+                problem_url += part + "/"
 
-            problem_list[i].update({'actual_url' : problem_url})
+        problem_list[i].update({'actual_url' : problem_url})
 
+    """
     except GradingServiceError:
         error_text = "Error occured while contacting the grading service"
         success = False
@@ -147,6 +148,7 @@ def student_problem_list(request, course_id):
     except ValueError:
         error_text = "Could not get problem list"
         success = False
+    """
 
     ajax_url = _reverse_with_slash('open_ended_problems', course_id)
 
@@ -193,16 +195,17 @@ def flagged_problem_list(request, course_id):
         success = False
 
     ajax_url = _reverse_with_slash('open_ended_flagged_problems', course_id)
-
-    return render_to_response('open_ended_problems/open_ended_flagged_problems.html', {
-        'course': course,
-        'course_id': course_id,
-        'ajax_url': ajax_url,
-        'success': success,
-        'problem_list': problem_list,
-        'error_text': error_text,
-        # Checked above
-        'staff_access': True, })
+    context = {
+            'course': course,
+            'course_id': course_id,
+            'ajax_url': ajax_url,
+            'success': success,
+            'problem_list': problem_list,
+            'error_text': error_text,
+            # Checked above
+            'staff_access': True,
+    }
+    return render_to_response('open_ended_problems/open_ended_flagged_problems.html', context)
 
 @cache_control(no_cache=True, no_store=True, must_revalidate=True)
 def combined_notifications(request, course_id):

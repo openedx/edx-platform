@@ -25,7 +25,7 @@ class PeerGradingService(GradingService):
     """
     def __init__(self, config, system):
         config['system'] = system
-        super(StaffGradingService, self).__init__(config)
+        super(PeerGradingService, self).__init__(config)
         self.get_next_submission_url = self.url + '/get_next_submission/'
         self.save_grade_url = self.url + '/save_grade/'
         self.is_student_calibrated_url = self.url + '/is_student_calibrated/'

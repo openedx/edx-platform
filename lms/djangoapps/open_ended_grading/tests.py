@@ -142,7 +142,8 @@ class TestPeerGradingService(ct.PageLoader):
         self.mock_service = peer_grading_service.MockPeerGradingService()
         self.system = ModuleSystem(None, None, None, render_to_string, None)
         self.descriptor = peer_grading_module.PeerGradingDescriptor()
-        self.peer_module = peer_grading_module.PeerGradingModule(self.system,"","<peergrading/>",self.descriptor)
+        location = "i4x://edX/toy/peergrading/init"
+        self.peer_module = peer_grading_module.PeerGradingModule(self.system,location,"<peergrading/>",self.descriptor)
         self.peer_module.peer_gs = self.mock_service
         self.logout()
 
