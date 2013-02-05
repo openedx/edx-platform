@@ -494,11 +494,6 @@ def instructor_dashboard(request, course_id):
                 msg += "Error!  Failed to un-enroll student with email '%s'\n" % student
                 msg += str(err) + '\n'
 
-    elif action == 'Un-enroll ALL students':
-
-        ret = _do_enroll_students(course, course_id, '', overload=True)
-        datatable = ret['datatable']
-
     elif action == 'Enroll multiple students':
 
         students = request.POST.get('enroll_multiple','')
