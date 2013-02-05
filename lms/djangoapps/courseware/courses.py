@@ -19,7 +19,7 @@ from xmodule.contentstore.content import StaticContent
 from xmodule.modulestore.xml import XMLModuleStore
 from xmodule.modulestore.exceptions import ItemNotFoundError
 from xmodule.x_module import XModule
-from static_replace import replace_urls, try_staticfiles_lookup
+from static_replace import replace_static_urls
 from courseware.access import has_access
 import branding
 from courseware.models import StudentModuleCache
@@ -83,13 +83,12 @@ def get_opt_course_with_access(user, course_id, action):
         return None
     return get_course_with_access(user, course_id, action)
 
-    
+
 def course_image_url(course):
     """Try to look up the image url for the course.  If it's not found,
     log an error and return the dead link"""
     if isinstance(modulestore(), XMLModuleStore):
-        path = course.metadata['data_dir'] + "/images/course_image.jpg"
-        return try_staticfiles_lookup(path)
+        return '/static/' + course.metadata['data_dir'] + "/images/course_image.jpg"
     else:
         loc = course.location._replace(tag='c4x', category='asset', name='images_course_image.jpg')
         path = StaticContent.get_url_path_from_location(loc)
@@ -224,8 +223,11 @@ def get_course_syllabus_section(course, section_key):
             dirs = [path("syllabus") / course.url_name, path("syllabus")]
             filepath = find_file(fs, dirs, section_key + ".html")
             with fs.open(filepath) as htmlFile:
-                return replace_urls(htmlFile.read().decode('utf-8'),
-                                    course.metadata['data_dir'], course_namespace=course.location)
+                return replace_static_urls(
+                    htmlFile.read().decode('utf-8'),
+                    course.metadata['data_dir'],
+                    course_namespace=course.location
+                )
         except ResourceNotFoundError:
             log.exception("Missing syllabus section {key} in course {url}".format(
                 key=section_key, url=course.location.url()))
