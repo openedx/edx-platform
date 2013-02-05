@@ -31,7 +31,7 @@ from xmodule_modifiers import replace_course_urls, replace_static_urls, add_hist
 from xmodule.modulestore.exceptions import ItemNotFoundError
 from statsd import statsd
 
-log = logging.getLogger("mitx.courseware")
+log = logging.getLogger(__name__)
 
 
 if settings.XQUEUE_INTERFACE.get('basic_auth') is not None:
