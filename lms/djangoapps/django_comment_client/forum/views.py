@@ -11,7 +11,7 @@ from django.contrib.auth.models import User
 
 from mitxmako.shortcuts import render_to_response, render_to_string
 from courseware.courses import get_course_with_access
-from course_groups.cohorts import get_cohort_id, get_course_cohorts, get_cohorted_commentables, is_course_cohorted, get_cohort_by_id
+from course_groups.cohorts import *
 from courseware.access import has_access
 
 from urllib import urlencode
@@ -93,7 +93,8 @@ def inline_discussion(request, course_id, discussion_id):
 
     try:
         threads, query_params = get_threads(request, course_id, discussion_id, per_page=INLINE_THREADS_PER_PAGE)
-        user_info = cc.User.from_django_user(request.user).to_dict()
+        user = cc.User.from_django_user(request.user)
+        user_info = user.to_dict()
     except (cc.utils.CommentClientError, cc.utils.CommentClientUnknownError) as err:
         # TODO (vshnayder): since none of this code seems to be aware of the fact that
         # sometimes things go wrong, I suspect that the js client is also not
@@ -105,7 +106,27 @@ def inline_discussion(request, course_id, discussion_id):
 
     allow_anonymous = course.metadata.get("allow_anonymous", True)
     allow_anonymous_to_peers = course.metadata.get("allow_anonymous_to_peers", False)
+        
+    #if we can't get the user's cohort, default to visible to all, treat as if the discussion is not cohoroted
+    is_cohorted = is_course_cohorted(course_id) and is_commentable_cohorted(course_id, discussion_id) 
 
+    if is_cohorted:
+      cohorts_dict = dict()
+      #if you're a mod, send all cohorts and let you pick
+      if cached_has_permission(request.user, "see_all_cohorts", course_id):
+          cohorts = get_course_cohorts(course_id)
+          for c in cohorts:
+              cohorts_dict[c.name]=c.id
+      else:
+      #otherwise, just make a dictionary of two 
+          user_cohort = get_cohort_id(user, course_id)
+          cohorts_dict["All Groups"] = None
+          if user_cohort:
+              cohorts_dict[user_cohort.name] = user_cohort.id
+    else:
+          cohorts_dict = None
+          
+          
     return utils.JsonResponse({
         'discussion_data': map(utils.safe_content, threads),
         'user_info': user_info,
@@ -115,6 +136,8 @@ def inline_discussion(request, course_id, discussion_id):
         'roles': utils.get_role_ids(course_id),
         'allow_anonymous_to_peers': allow_anonymous_to_peers,
         'allow_anonymous': allow_anonymous,
+        'cohorts': cohorts_dict,
+        'is_cohorted': is_cohorted       
     })
 
 @login_required
@@ -139,8 +162,6 @@ def forum_form_discussion(request, course_id):
 
     for thread in threads:
         courseware_context = get_courseware_context(thread, course)
-        if thread.get('group_id') and not thread.get('group_name'):
-                thread['group_name'] = get_cohort_by_id(course_id, thread.get('group_id')).name      
         if courseware_context:
             thread.update(courseware_context)
     if request.is_ajax():
