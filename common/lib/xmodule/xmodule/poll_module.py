@@ -53,14 +53,15 @@ class PollModule(XModule):
          }
     css = {'scss': [resource_string(__name__, 'css/poll/display.scss')]}
     js_module_name = "Poll"
-    
+
+    # name of poll to use in links to this poll
     display_name = String(help="Display name for this module", scope=Scope.settings)
 
     voted = Boolean(help="Whether this student has voted on the poll", scope=Scope.student_state, default=False)
-    poll_answer = String(help="Whether this student has voted on the poll", scope=Scope.content, default='')
-    poll_answers = Object(help="Whether this student has voted on the poll", scope=Scope.content, default=dict())
+    poll_answer = String(help="Student answer", scope=Scope.content, default='')
+    poll_answers = Object(help="All possible answers for the poll", scope=Scope.content, default=dict())
 
-    xml_object = String(scope=Scope.content)
+    xml_object = String(scope=Scope.content)  # poll xml
 
 
     def handle_ajax(self, dispatch, get):
@@ -90,8 +91,8 @@ class PollModule(XModule):
         """     """
         xml_object_copy = deepcopy(self.xml_object)
         for element_answer in xml_object_copy.findall('answer'):
-            if element_answer.get('name', ''):
-                self.poll_answers[element_answer.get('name')] = \
+            if element_answer.get('id', None):
+                self.poll_answers[element_answer.get('id')] = \
                          cgi.escape(stringify_children(element_answer))
             xml_object_copy.remove(element_answer)
         return json.dumps({'answers': self.poll_answers,
