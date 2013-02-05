@@ -217,7 +217,7 @@ class PeerGradingModule(XModule):
         required = set(['location'])
         success, message = self._check_required(get, required)
         if not success:
-            return _err_response(message)
+            return self._err_response(message)
         grader_id = self.system.anonymous_student_id
         location = get['location']
 
@@ -296,7 +296,7 @@ class PeerGradingModule(XModule):
         required = set(['location'])
         success, message = self._check_required(get, required)
         if not success:
-            return _err_response(message)
+            return self._err_response(message)
         grader_id = self.system.anonymous_student_id
 
         location = get['location']
@@ -339,7 +339,7 @@ class PeerGradingModule(XModule):
         required = set(['location'])
         success, message = self._check_required(get, required)
         if not success:
-            return _err_response(message)
+            return self._err_response(message)
 
         grader_id = self.system.anonymous_student_id
 
@@ -381,7 +381,7 @@ class PeerGradingModule(XModule):
         required = set(['location', 'submission_id', 'submission_key', 'score', 'feedback', 'rubric_scores[]'])
         success, message = self._check_required(get, required)
         if not success:
-            return _err_response(message)
+            return self._err_response(message)
         grader_id = self.system.anonymous_student_id
 
         location = get['location']
@@ -397,7 +397,7 @@ class PeerGradingModule(XModule):
             return response
         except GradingServiceError:
             log.exception("Error saving calibration grade, location: {0}, submission_id: {1}, submission_key: {2}, grader_id: {3}".format(location, submission_id, submission_key, grader_id))
-            return _err_response('Could not connect to grading service')
+            return self._err_response('Could not connect to grading service')
 
     def peer_grading(self, get = None):
         '''

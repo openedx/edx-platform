@@ -23,6 +23,7 @@ from mitxmako.shortcuts import render_to_string
 import logging
 log = logging.getLogger(__name__)
 from override_settings import override_settings
+from django.http import QueryDict
 
 
 @override_settings(MODULESTORE=ct.TEST_DATA_XML_MODULESTORE)
@@ -100,6 +101,7 @@ class TestStaffGradingService(ct.PageLoader):
                 'submission_id': '123',
                 'location': self.location,
                 'rubric_scores[]': ['1', '2']}
+
         r = self.check_for_post_code(200, url, data)
         d = json.loads(r.content)
         self.assertTrue(d['success'], str(d))
@@ -138,11 +140,12 @@ class TestPeerGradingService(ct.PageLoader):
         
         self.course_id = "edX/toy/2012_Fall"
         self.toy = modulestore().get_course(self.course_id)
+        location = "i4x://edX/toy/peergrading/init"
 
         self.mock_service = peer_grading_service.MockPeerGradingService()
-        self.system = ModuleSystem(None, None, None, render_to_string, None)
-        self.descriptor = peer_grading_module.PeerGradingDescriptor()
-        location = "i4x://edX/toy/peergrading/init"
+        self.system = ModuleSystem(location, None, None, render_to_string, None)
+        self.descriptor = peer_grading_module.PeerGradingDescriptor(self.system)
+
         self.peer_module = peer_grading_module.PeerGradingModule(self.system,location,"<peergrading/>",self.descriptor)
         self.peer_module.peer_gs = self.mock_service
         self.logout()
@@ -153,7 +156,7 @@ class TestPeerGradingService(ct.PageLoader):
         data = {'location': self.location}
 
         r = self.peer_module.get_next_submission(data)
-        d = json.loads(r.content)
+        d = json.loads(r)
         self.assertTrue(d['success'])
         self.assertIsNotNone(d['submission_id'])
         self.assertIsNotNone(d['prompt'])
@@ -163,41 +166,35 @@ class TestPeerGradingService(ct.PageLoader):
     def test_get_next_submission_missing_location(self):
         data = {}
         r = self.peer_module.get_next_submission(data)
-        d = json.loads(r.content)
+        d = json.loads(r)
         self.assertFalse(d['success'])
         self.assertEqual(d['error'], "Missing required keys: location")
 
     def test_save_grade_success(self):
-
-        data = {'location': self.location, 
-                'submission_id': '1', 
-                'submission_key': 'fake key', 
-                'score': '2',
-                'feedback': 'This is feedback',
-                'rubric_scores[]': [1, 2],
-                'submission_flagged' : False}
-        r = self.peer_module.save_grade(data)
+        data = 'rubric_scores[]=1|rubric_scores[]=2|location=' + location + '|submission_id=1|submission_key=fake key|score=2|feedback=feedback|submission_flagged=False'
+        qdict = QueryDict(data.replace("|","&"))
+        r = self.peer_module.save_grade(qdict)
         d = json.loads(r.content)
         self.assertTrue(d['success'])
 
     def test_save_grade_missing_keys(self):
         data = {}
         r = self.peer_module.save_grade(data)
-        d = json.loads(r.content)
+        d = json.loads(r)
         self.assertFalse(d['success'])
         self.assertTrue(d['error'].find('Missing required keys:') > -1)
 
     def test_is_calibrated_success(self):
         data = {'location': self.location}
         r = self.peer_module.is_student_calibrated(data)
-        d = json.loads(r.content)
+        d = json.loads(r)
         self.assertTrue(d['success'])
         self.assertTrue('calibrated' in d)
 
     def test_is_calibrated_failure(self):
         data = {}
         r = self.peer_module.is_student_calibrated(data)
-        d = json.loads(r.content)
+        d = json.loads(r)
         self.assertFalse(d['success'])
         self.assertFalse('calibrated' in d)
 
@@ -205,7 +202,7 @@ class TestPeerGradingService(ct.PageLoader):
         data = {'location': self.location}
 
         r = self.peer_module.show_calibration_essay(data)
-        d = json.loads(r.content)
+        d = json.loads(r)
         self.assertTrue(d['success'])
         self.assertIsNotNone(d['submission_id'])
         self.assertIsNotNone(d['prompt'])
@@ -216,7 +213,7 @@ class TestPeerGradingService(ct.PageLoader):
         data = {}
 
         r = self.peer_module.show_calibration_essay(data)
-        d = json.loads(r.content)
+        d = json.loads(r)
 
         self.assertFalse(d['success'])
         self.assertEqual(d['error'], "Missing required keys: location")
@@ -229,14 +226,14 @@ class TestPeerGradingService(ct.PageLoader):
                 'feedback': 'This is feedback',
                 'rubric_scores[]': [1, 2]}
         r = self.peer_module.save_calibration_essay(data)
-        d = json.loads(r.content)
+        d = json.loads(r)
         self.assertTrue(d['success'])
         self.assertTrue('actual_score' in d)
 
     def test_save_calibration_essay_missing_keys(self):
         data = {}
         r = self.peer_module.save_calibration_essay(data)
-        d = json.loads(r.content)
+        d = json.loads(r)
         self.assertFalse(d['success'])
         self.assertTrue(d['error'].find('Missing required keys:') > -1)
         self.assertFalse('actual_score' in d)
