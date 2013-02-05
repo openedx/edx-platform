@@ -1,5 +1,5 @@
 import json
-import logging 
+import logging
 from xmodule.x_module import XModule
 from xmodule.modulestore import Location
 from xmodule.seq_module import SequenceDescriptor
@@ -24,7 +24,7 @@ class ConditionalModule(XModule):
     js = {'coffee': [resource_string(__name__, 'js/src/javascript_loader.coffee'),
                      resource_string(__name__, 'js/src/conditional/display.coffee'),
                      resource_string(__name__, 'js/src/collapsible.coffee'),
-                     
+
                     ]}
 
     js_module_name = "Conditional"
@@ -65,7 +65,7 @@ class ConditionalModule(XModule):
             for module in self.required_modules:
                 if not hasattr(module, 'poll_answer'):
                     raise Exception('Error in conditional module: required module %s has no poll_answer field' % module)
-                answer =  self.descriptor.xml_attributes.get('answer') 
+                answer =  self.descriptor.xml_attributes.get('answer')
                 if answer == 'unanswered' and module.poll_answer:
                     return False
                 if module.poll_answer != answer:
@@ -86,8 +86,9 @@ class ConditionalModule(XModule):
 
     def handle_ajax(self, dispatch, post):
         '''
-        This is called by courseware.module_render, to handle an AJAX call.
+        This is called by courseware.moduleodule_render, to handle an AJAX call.
         '''
+        # import ipdb; ipdb.set_trace()
         #log.debug('conditional_module handle_ajax: dispatch=%s' % dispatch)
         if not self.is_condition_satisfied():
             context = {'module': self}
@@ -95,8 +96,9 @@ class ConditionalModule(XModule):
             return json.dumps({'html': [html]})
 
         if self.contents is None:
+            import ipdb; ipdb.set_trace()
             # self.contents = [child.get_html() for child in self.get_display_items()]
-            self.contents = [self.system.get_module(child_descriptor.location).get_html() 
+            self.contents = [self.system.get_module(child_descriptor.location).get_html()
                     for child_descriptor in self.descriptor.get_children()]
 
         html = self.contents
@@ -128,3 +130,25 @@ class ConditionalDescriptor(SequenceDescriptor):
         """Returns a list of XModuleDescritpor instances upon which this module depends, but are
         not children of this module"""
         return [self.system.load_item(loc) for loc in self.required_module_locations]
+
+    @classmethod
+    def definition_from_xml(cls, xml_object, system):
+        # import ipdb; ipdb.set_trace()
+        children = []
+        for child in xml_object:
+            try:
+                children.append(system.process_xml(etree.tostring(child)).location.url())
+            except Exception, e:
+                log.exception("Unable to load child when parsing Conditional. Continuing...")
+                if system.error_tracker is not None:
+                    system.error_tracker("ERROR: " + str(e))
+                continue
+        # import ipdb; ipdb.set_trace()
+        return {}, children
+
+    def definition_to_xml(self, resource_fs):
+        xml_object = etree.Element('sequential')
+        for child in self.get_children():
+            xml_object.append(
+                etree.fromstring(child.export_to_xml(resource_fs)))
+        return xml_object
