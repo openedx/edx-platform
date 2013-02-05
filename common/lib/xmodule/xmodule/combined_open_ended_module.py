@@ -29,6 +29,7 @@ VERSION_TUPLES = (
 )
 
 DEFAULT_VERSION = 1
+DEFAULT_VERSION = str(DEFAULT_VERSION)
 
 class CombinedOpenEndedModule(XModule):
     """
