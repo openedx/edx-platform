@@ -6,7 +6,7 @@ django-admin.py test --settings=lms.envs.test --pythonpath=. lms/djangoapps/open
 
 from django.test import TestCase
 from open_ended_grading import staff_grading_service
-from xmodule import peer_grading_service
+from xmodule import peer_grading_service, peer_grading_module
 from django.core.urlresolvers import reverse
 from django.contrib.auth.models import Group
 
@@ -17,6 +17,8 @@ import xmodule.modulestore.django
 from nose import SkipTest
 from mock import patch, Mock
 import json
+from xmodule.x_module import ModuleSystem
+from mitxmako.shortcuts import render_to_string
 
 import logging
 log = logging.getLogger(__name__)
@@ -138,16 +140,18 @@ class TestPeerGradingService(ct.PageLoader):
         self.toy = modulestore().get_course(self.course_id)
 
         self.mock_service = peer_grading_service.MockPeerGradingService()
-
+        self.system = ModuleSystem(None, None, None, render_to_string, None)
+        self.descriptor = peer_grading_module.PeerGradingDescriptor()
+        self.peer_module = peer_grading_module.PeerGradingModule(self.system,"","<peergrading/>",self.descriptor)
+        self.peer_module.peer_gs = self.mock_service
         self.logout()
 
     def test_get_next_submission_success(self):
         self.login(self.student, self.password)
 
-        url = reverse('peer_grading_get_next_submission', kwargs={'course_id': self.course_id})
         data = {'location': self.location}
 
-        r = self.check_for_post_code(200, url, data)
+        r = self.peer_module.get_next_submission(data)
         d = json.loads(r.content)
         self.assertTrue(d['success'])
         self.assertIsNotNone(d['submission_id'])
@@ -156,17 +160,14 @@ class TestPeerGradingService(ct.PageLoader):
         self.assertIsNotNone(d['max_score'])
 
     def test_get_next_submission_missing_location(self):
-        self.login(self.student, self.password)
-        url = reverse('peer_grading_get_next_submission', kwargs={'course_id': self.course_id})
         data = {}
-        r = self.check_for_post_code(200, url, data)
+        r = self.peer_module.get_next_submission(data)
         d = json.loads(r.content)
         self.assertFalse(d['success'])
         self.assertEqual(d['error'], "Missing required keys: location")
 
     def test_save_grade_success(self):
-        self.login(self.student, self.password)
-        url = reverse('peer_grading_save_grade', kwargs={'course_id': self.course_id})
+
         data = {'location': self.location, 
                 'submission_id': '1', 
                 'submission_key': 'fake key', 
@@ -174,44 +175,35 @@ class TestPeerGradingService(ct.PageLoader):
                 'feedback': 'This is feedback',
                 'rubric_scores[]': [1, 2],
                 'submission_flagged' : False}
-        r = self.check_for_post_code(200, url, data)
+        r = self.peer_module.save_grade(data)
         d = json.loads(r.content)
         self.assertTrue(d['success'])
 
     def test_save_grade_missing_keys(self):
-        self.login(self.student, self.password)
-        url = reverse('peer_grading_save_grade', kwargs={'course_id': self.course_id})
         data = {}
-        r = self.check_for_post_code(200, url, data)
+        r = self.peer_module.save_grade(data)
         d = json.loads(r.content)
         self.assertFalse(d['success'])
         self.assertTrue(d['error'].find('Missing required keys:') > -1)
 
     def test_is_calibrated_success(self):
-        self.login(self.student, self.password)
-        url = reverse('peer_grading_is_student_calibrated', kwargs={'course_id': self.course_id})
         data = {'location': self.location}
-        r = self.check_for_post_code(200, url, data)
+        r = self.peer_module.is_student_calibrated(data)
         d = json.loads(r.content)
         self.assertTrue(d['success'])
         self.assertTrue('calibrated' in d)
 
     def test_is_calibrated_failure(self):
-        self.login(self.student, self.password)
-        url = reverse('peer_grading_is_student_calibrated', kwargs={'course_id': self.course_id})
         data = {}
-        r = self.check_for_post_code(200, url, data)
+        r = self.peer_module.is_student_calibrated(data)
         d = json.loads(r.content)
         self.assertFalse(d['success'])
         self.assertFalse('calibrated' in d)
 
     def test_show_calibration_essay_success(self):
-        self.login(self.student, self.password)
-
-        url = reverse('peer_grading_show_calibration_essay', kwargs={'course_id': self.course_id})
         data = {'location': self.location}
 
-        r = self.check_for_post_code(200, url, data)
+        r = self.peer_module.show_calibration_essay(data)
         d = json.loads(r.content)
         self.assertTrue(d['success'])
         self.assertIsNotNone(d['submission_id'])
@@ -220,36 +212,29 @@ class TestPeerGradingService(ct.PageLoader):
         self.assertIsNotNone(d['max_score'])
 
     def test_show_calibration_essay_missing_key(self):
-        self.login(self.student, self.password)
-
-        url = reverse('peer_grading_show_calibration_essay', kwargs={'course_id': self.course_id})
         data = {}
 
-        r = self.check_for_post_code(200, url, data)
+        r = self.peer_module.show_calibration_essay(data)
         d = json.loads(r.content)
 
         self.assertFalse(d['success'])
         self.assertEqual(d['error'], "Missing required keys: location")
 
     def test_save_calibration_essay_success(self):
-        self.login(self.student, self.password)
-        url = reverse('peer_grading_save_calibration_essay', kwargs={'course_id': self.course_id})
         data = {'location': self.location, 
                 'submission_id': '1', 
                 'submission_key': 'fake key', 
                 'score': '2',
                 'feedback': 'This is feedback',
                 'rubric_scores[]': [1, 2]}
-        r = self.check_for_post_code(200, url, data)
+        r = self.peer_module.save_calibration_essay(data)
         d = json.loads(r.content)
         self.assertTrue(d['success'])
         self.assertTrue('actual_score' in d)
 
     def test_save_calibration_essay_missing_keys(self):
-        self.login(self.student, self.password)
-        url = reverse('peer_grading_save_calibration_essay', kwargs={'course_id': self.course_id})
         data = {}
-        r = self.check_for_post_code(200, url, data)
+        r = self.peer_module.save_calibration_essay(data)
         d = json.loads(r.content)
         self.assertFalse(d['success'])
         self.assertTrue(d['error'].find('Missing required keys:') > -1)
