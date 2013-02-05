@@ -127,9 +127,13 @@ class ImageProperties(object):
         """
         image_is_okay = False
         try:
-            image_is_okay = self.count_colors() and self.get_skin_ratio() and not self.image_too_large
+            #image_is_okay = self.count_colors() and self.get_skin_ratio() and not self.image_too_large
+            image_is_okay = self.image_too_large
         except:
             log.exception("Could not run image tests.")
+
+        if not ENABLE_PIL:
+            image_is_okay = True
 
         return image_is_okay
 
