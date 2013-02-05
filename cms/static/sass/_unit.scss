@@ -76,9 +76,10 @@
       &.new-component-item {
         margin: 20px 0px;
         border-top: 1px solid $mediumGrey;
-        box-shadow: 1px 3px 2px rgba(182, 182, 182, 0.75) inset;
+        box-shadow: 0 2px 1px rgba(182, 182, 182, 0.75) inset;
         background-color: $lightGrey;
         margin-bottom: 0px;
+        padding-bottom: 20px;
 
         .new-component-button {
           display: block;
@@ -88,7 +89,7 @@
         }
 
         h5 {
-          margin: 12px 0px;
+          margin: 20px 0px;
           color: #fff;
           font-weight: 600;
           font-size: 18px;
@@ -113,7 +114,7 @@
             height: 100px;
             color: #fff;
             margin-right: 15px;
-            margin-bottom: 15px;
+            margin-bottom: 20px;
             border-radius: 8px;
             font-size: 15px;
             line-height: 14px;
@@ -134,9 +135,10 @@
 
         .new-component-templates {
           display: none;
-          margin: 20px 40px 0px 40px;
+          margin: 20px 40px 20px 40px;
           border-radius: 3px;
           border: 1px solid $mediumGrey;
+          background-color: #fff;
           @include box-shadow(0 1px 1px rgba(0, 0, 0, .2), 0 1px 0 rgba(255, 255, 255, .4) inset);
           @include clearfix;
 
@@ -159,7 +161,6 @@
           // specific menu types
           &.new-component-problem {
             padding-bottom:10px;
-            background-color: #fff;
 
             .ss-icon, .editor-indicator {
               display: inline-block;
@@ -180,7 +181,6 @@
             border: 1px solid $darkGreen;
             background: tint($green,20%);
             color: #fff;            
-            @include transition(background-color .15s);
 
             &:hover {
               background: $brightGreen;
@@ -191,12 +191,15 @@
         .problem-type-tabs {
           list-style-type: none;
           width: 100%;
-          background-color: $lightBluishGrey;
           border-top-left-radius: 3px;
           border-top-right-radius: 3px;
+          @include linear-gradient(top, rgba(255, 255, 255, .4), rgba(255, 255, 255, 0));
+          background-color: $lightBluishGrey;
+          @include box-shadow(0 1px 0 rgba(255, 255, 255, 0.2) inset, 0 -1px 0 rgba(0, 0, 0, 0.2) inset);
 
           li:first-child {
             border-top-left-radius: 3px;
+            margin-left: 20px;
           }
 
           li:last-child {
@@ -206,26 +209,29 @@
             float:left;
             display:inline-block;
             text-align:center;
-            width: 50%;
+            width: auto;
             @include linear-gradient(top, rgba(255, 255, 255, .4), rgba(255, 255, 255, 0));
-            background-color: $lightBluishGrey;
+            background-color: tint($lightBluishGrey, 20%);
             @include box-shadow(0 1px 0 rgba(255, 255, 255, 0.2) inset, 0 -1px 0 rgba(0, 0, 0, 0.2) inset);
-            
+            opacity:.8;
+
             &:hover {
-              opacity: .7;
-              @include linear-gradient(top, rgba(255, 255, 255, .2), rgba(255, 255, 255, 0));
+              @include linear-gradient(top, rgba(255, 255, 255, .4), rgba(255, 255, 255, 0));
+              @include transition(background-color .15s);
+              opacity:1;
             }
 
             &.current {
               border: 0px;
               @include active;
+              opacity:1;
             }
           }
 
           a{
             display: block;
-            padding: 10px 25px;
-            font-size: 14px;
+            padding: 15px 25px;
+            font-size: 15px;
             line-height: 16px;
             text-align: center;
             color: #3c3c3c;
