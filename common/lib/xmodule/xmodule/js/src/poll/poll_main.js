@@ -1,21 +1,80 @@
 (function (requirejs, require, define) {
 define('PollMain', ['logme'], function (logme) {
+    var debugMode;
+
+    debugMode = true;
+    if (debugMode === true) {
+        logme('We are in debug mode.');
+    }
 
 PollMain.prototype = {
 
-// class @PollModule
-//   constructor: (element) ->
-//     @el = element
-//     @ajaxUrl = @$('.container').data('url')
-//     @$('.upvote').on('click', () => $.postWithPrefix(@url('upvote'), @handleVote))
-//     @$('.downvote').on('click', () => $.postWithPrefix(@url('downvote'), @handleVote))
+'showAnswerGraph': function (poll_answers, total) {
+    var dataSeries, tickSets, c1, _this;
 
-//   $: (selector) -> $(selector, @el)
+    _this = this;
 
-//   url: (target) -> "#{@ajaxUrl}/#{target}"
+    // Show the graph answer DOM elementfrom.
+    this.graphAnswerEl.show();
 
-//   handleVote: (response) =>
-//     @$('.container').replaceWith(response.results)
+    dataSeries = [];
+    tickSets = {};
+    c1 = 0;
+
+    $.each(poll_answers, function (index, value) {
+        var numValue;
+
+        numValue = parseFloat(value);
+        if (isFinite(numValue) === false) {
+            return;
+        }
+
+        c1 += 1;
+
+        tickSets[c1.toFixed(1)] = _this.jsonConfig.answers[index]
+
+        dataSeries.push({
+            'legend': _this.jsonConfig.answers[index],
+            'data': [[c1, (numValue / total) * 100.0]]
+        });
+    });
+
+    jQuery.plot(
+        _this.graphAnswerEl,
+        dataSeries,
+        {
+            'xaxis': {
+                'min': 0,
+                'max': c1 + 1,
+                'tickFormatter': function formatter(val, axis) {
+                    var valStr;
+
+                    valStr = val.toFixed(axis.tickDecimals);
+
+                    if (tickSets.hasOwnProperty(valStr)) {
+                        return tickSets[valStr];
+                    } else {
+                        return '';
+                    }
+                }
+            },
+            'yaxis': {
+                'min': 0,
+                'max': 105,
+                'tickFormatter': function formatter(val, axis) {
+                    return val.toFixed(axis.tickDecimals) + ' %';
+                }
+            },
+            'lines':  {  'show': false  },
+            'points': {  'show': false  },
+            'bars': {
+                'show': true,
+                'align': 'center',
+                'barWidth': 0.5
+            }
+        }
+    );
+},
 
 'submitAnswer': function (answer, answerEl) {
     var _this;
@@ -30,98 +89,39 @@ PollMain.prototype = {
 
     answerEl.addClass('answered');
 
-    // Send the data to the server as an AJAX request. Attach a callback that will
-    // be fired on server's response.
-    $.postWithPrefix(
-        _this.ajax_url + '/' + answer,  {},
-        function (response) {
-            var dataSeries, tickSets, c1;
+    if (debugMode === true) {
+        (function () {
+            var response;
 
-            logme('The following response was received: ' + JSON.stringify(response));
+            response = {
+                'poll_answers': {
+                    'Yes': '1',
+                    'No': '1',
+                    'Dont_know': '8'
+                },
+                'total': '10'
+            };
 
-            // Show the answer from server.
-            _this.graphAnswerEl.show();
+            _this.showAnswerGraph(response.poll_answers, response.total);
+        }());
+    } else {
+        // Send the data to the server as an AJAX request. Attach a callback that will
+        // be fired on server's response.
+        $.postWithPrefix(
+            _this.ajax_url + '/' + answer,  {},
+            function (response) {
+                _this.showAnswerGraph(response.poll_answers, response.total);
 
-            dataSeries = [];
-            tickSets = {};
-            c1 = 0;
-
-            response.sum = 0;
-            // To be taken out when we actually have the 'response.sum' parameter.
-            $.each(response.poll_answers, function (index, value) {
-                var numValue;
-
-                numValue = parseFloat(value);
-                if (isFinite(numValue) === false) {
-                    return;
-                }
-
-                response.sum += numValue;
-            });
-
-            $.each(response.poll_answers, function (index, value) {
-                var numValue;
-
-                numValue = parseFloat(value);
-                if (isFinite(numValue) === false) {
-                    return;
-                }
-
-                c1 += 1;
-
-                tickSets[c1.toFixed(1)] = _this.jsonConfig.answers[index]
-
-                dataSeries.push({
-                    'legend': _this.jsonConfig.answers[index],
-                    'data': [[c1, (numValue / response.sum) * 100.0]]
-                });
-            });
-
-            jQuery.plot(
-                _this.graphAnswerEl,
-                dataSeries,
-                {
-                    'xaxis': {
-                        'min': 0,
-                        'max': c1 + 1,
-                        'tickFormatter': function formatter(val, axis) {
-                            var valStr;
-
-                            valStr = val.toFixed(axis.tickDecimals);
-
-                            if (tickSets.hasOwnProperty(valStr)) {
-                                return tickSets[valStr];
-                            } else {
-                                return '';
-                            }
-                        }
-                    },
-                    'yaxis': {
-                        'min': 0,
-                        'max': 100,
-                        'tickFormatter': function formatter(val, axis) {
-                            return val.toFixed(axis.tickDecimals) + ' %';
-                        }
-                    },
-                    'lines':  {  'show': false  },
-                    'points': {  'show': false  },
-                    'bars': {
-                        'show': true,
-                        'align': 'center',
-                        'barWidth': 0.5
+                /*
+                _this.vertModEl.find('.xmodule_ConditionalModule').each(
+                    function (index, value) {
+                        (new window[response.className]($(value)));
                     }
-                }
-            );
-
-            /*
-            _this.vertModEl.find('.xmodule_ConditionalModule').each(
-                function (index, value) {
-                    (new window[response.className]($(value)));
-                }
-            );
-            */
-        }
-    );
+                );
+                */
+            }
+        );
+    }
 } // End-of: 'submitAnswer': function (answer, answerEl) {
 }; // End-of: PollMain.prototype = {
 
@@ -158,15 +158,68 @@ function PollMain(el) {
     // Make sure that next time we will not process this element a second time.
     this.vertModEl.attr('poll_main_processed', 'true');
 
-    try {
-        this.jsonConfig = JSON.parse(this.questionEl.children('.poll_question_div').html());
-    } catch (err) {
-        logme(
-            'ERROR: Invalid JSON config for poll ID "' + this.id + '".',
-            'Error messsage: "' + err.message + '".'
-        );
+    // Access this object inside inner functions.
+    _this = this;
 
-        return;
+    // Test case for when the server part is still not ready. Change to 'false' so you can test actual server
+    // generated JSON config.
+    if (debugMode === true) {
+        (function () {
+            var testNum;
+
+            // Test for when the user has already answered.
+            testNum = 1;
+
+            // Test for when the user did not answer yet.
+            // testNum = 2;
+
+            if (testNum === 1) {
+                _this.jsonConfig = {
+                    'poll_answers': {
+                        'Dont_know': '2',
+                        'No': '1',
+                        'Yes': '4'
+                    },
+                    'total': '7',
+                    'current_answer': 'No',
+                    'answers': {
+                        'Dont_know': 'Don\'t know',
+                        'No': 'No',
+                        'Yes': 'Yes'
+                    },
+                    'question':
+                        "&lt;h3&gt;What's the Right Thing to Do?&lt;/h3&gt;&lt;p&gt;Suppose four shipwrecked " +
+                        "sailors are stranded at sea in a lifeboat, without food or water. Would it be wrong for " +
+                        "three of them to kill and eat the cabin boy, in order to save their own lives?&lt;/p&gt;"
+                };
+            } else if (testNum === 2) {
+                _this.jsonConfig = {
+                    'poll_answers': {},
+                    'total': '',
+                    'current_answer': '',
+                    'answers': {
+                        'Dont_know': 'Don\'t know',
+                        'No': 'No',
+                        'Yes': 'Yes'
+                    },
+                    'question':
+                        "&lt;h3&gt;What's the Right Thing to Do?&lt;/h3&gt;&lt;p&gt;Suppose four shipwrecked " +
+                        "sailors are stranded at sea in a lifeboat, without food or water. Would it be wrong for " +
+                        "three of them to kill and eat the cabin boy, in order to save their own lives?&lt;/p&gt;"
+                };
+            }
+        }());
+    } else {
+        try {
+            this.jsonConfig = JSON.parse(this.questionEl.children('.poll_question_div').html());
+        } catch (err) {
+            logme(
+                'ERROR: Invalid JSON config for poll ID "' + this.id + '".',
+                'Error messsage: "' + err.message + '".'
+            );
+
+            return;
+        }
     }
 
     // Get the DOM id of the question.
@@ -175,11 +228,14 @@ function PollMain(el) {
     // Get the URL to which we will post the users answer to the question.
     this.ajax_url = this.questionEl.data('ajax-url');
 
-    // Access this object inside inner functions.
-    _this = this;
-
     this.questionHtmlMarkup = $('<div />').html(this.jsonConfig.question).text();
     this.questionEl.append(this.questionHtmlMarkup);
+
+    // When the user selects and answer, we will set this flag to true.
+    this.questionAnswered = false;
+
+    logme('this.jsonConfig.answers: ', this.jsonConfig.answers);
+    logme('this.jsonConfig.current_answer: ', this.jsonConfig.current_answer);
 
     $.each(this.jsonConfig.answers, function (index, value) {
         var answerEl;
@@ -188,15 +244,23 @@ function PollMain(el) {
         answerEl.on('click', function () {
             _this.submitAnswer(index, answerEl);
         });
+
+        if (index === _this.jsonConfig.current_answer) {
+            answerEl.addClass('answered');
+            _this.questionAnswered = true;
+        }
+
         answerEl.appendTo(_this.questionEl);
     });
-
-    // When the user selects and answer, we will set this flag to true.
-    this.questionAnswered = false;
 
     this.graphAnswerEl = $('<div class="graph_answer"></div>');
     this.graphAnswerEl.hide();
     this.graphAnswerEl.appendTo(this.questionEl);
+
+    // If it turns out that the user already answered the question, show the answers graph.
+    if (this.questionAnswered === true) {
+        this.showAnswerGraph(_this.jsonConfig.poll_answers, _this.jsonConfig.total);
+    }
 
     logme('PollMain object: ', this);
 } // End-of: function PollMain(el) {
