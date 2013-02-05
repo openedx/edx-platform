@@ -71,7 +71,7 @@ class PollModule(XModule):
         Returns:
             dict
         """
-        if dispatch in self.poll_answers:  # and not self.voted:
+        if dispatch in self.poll_answers and not self.voted:
             d = self.poll_answers
             d[dispatch] += 1
             self.voted = True
