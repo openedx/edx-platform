@@ -590,6 +590,9 @@ INSTALLED_APPS = (
     'wiki.plugins.notifications',
     'course_wiki.plugins.markdownedx',
 
+    # foldit integration
+    'foldit',
+
     # For testing
     'django.contrib.admin',   # only used in DEBUG mode
 

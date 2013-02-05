@@ -41,7 +41,8 @@ setup(
             "static_tab = xmodule.html_module:StaticTabDescriptor",
             "custom_tag_template = xmodule.raw_module:RawDescriptor",
             "about = xmodule.html_module:AboutDescriptor",
-            "graphical_slider_tool = xmodule.gst_module:GraphicalSliderToolDescriptor"
-        ]
+            "graphical_slider_tool = xmodule.gst_module:GraphicalSliderToolDescriptor",
+            "foldit = xmodule.foldit_module:FolditDescriptor",
+         ]
     }
 )

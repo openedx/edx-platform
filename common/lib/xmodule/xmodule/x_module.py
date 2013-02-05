@@ -645,6 +645,17 @@ class XModuleDescriptor(Plugin, HTMLSnippet, ResourceTemplates):
         return False
 
 
+    @property
+    def always_recalculate_grades(self):
+        """
+        Return whether this descriptor always requires recalculation of grades,
+        for example if the score can change via an extrnal service, not just
+        when the student interacts with the module on the page.  A specific
+        example is FoldIt, which posts grade-changing updates through a separate
+        API.
+        """
+        return False
+
     # ================================= JSON PARSING ===========================
     @staticmethod
     def load_from_json(json_data, system, default_class=None):
