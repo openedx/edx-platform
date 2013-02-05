@@ -40,7 +40,7 @@ ALLOWABLE_IMAGE_SUFFIXES = [
 ]
 
 #Maximum allowed dimensions (x and y) for an uploaded image
-MAX_ALLOWED_IMAGE_DIM = 1000
+MAX_ALLOWED_IMAGE_DIM = 1500
 
 #Dimensions to which image is resized before it is evaluated for color count, etc
 MAX_IMAGE_DIM = 150
