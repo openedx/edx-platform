@@ -13,7 +13,7 @@ from student.models import unique_id_for_user
 from courseware.courses import get_course_with_access 
 
 from controller_query_service import ControllerQueryService
-from grading_service import GradingServiceError
+from xmodule.grading_service_module import GradingServiceError
 import json
 from .staff_grading import StaffGrading
 from student.models import unique_id_for_user

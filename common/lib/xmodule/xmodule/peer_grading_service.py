@@ -12,22 +12,20 @@ from django.conf import settings
 
 from combined_open_ended_rubric import CombinedOpenEndedRubric, RubricParsingError
 from lxml import etree
+from grading_service_module import GradingService, GradingServiceError
 
 log=logging.getLogger(__name__)
 
 class GradingServiceError(Exception):
     pass
 
-class PeerGradingService():
+class PeerGradingService(GradingService):
     """
     Interface with the grading controller for peer grading
     """
     def __init__(self, config, system):
-        self.username = config['username']
-        self.password = config['password']
-        self.url = config['url']
-        self.login_url = self.url + '/login/'
-        self.session = requests.session()
+        config['system'] = system
+        super(StaffGradingService, self).__init__(config)
         self.get_next_submission_url = self.url + '/get_next_submission/'
         self.save_grade_url = self.url + '/save_grade/'
         self.is_student_calibrated_url = self.url + '/is_student_calibrated/'
@@ -106,6 +104,14 @@ class PeerGradingService():
         response.raise_for_status()
 
         return response.json
+
+    def try_to_decode(self, text):
+        try:
+            text= json.loads(text)
+        except:
+            pass
+
+        return text
 
     def post(self, url, data, allow_redirects=False):
         """
