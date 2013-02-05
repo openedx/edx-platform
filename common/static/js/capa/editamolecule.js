@@ -98,7 +98,7 @@
             url: molFile,
             dataType: "text",
             success: function(data) {
-                console.log("Done.");
+                //console.log("Done.");
                 loadAppletData(applet, data, input_field);
             },
             error: function() {
@@ -121,8 +121,8 @@
                 input_field, element); 
         var value = { mol: mol, info: info };
 
-        console.log("Molecule info:");
-        console.log(info);
+        //console.log("Molecule info:");
+        //console.log(info);
 
         input_field.val(JSON.stringify(value));
 
@@ -131,16 +131,16 @@
 
     function formatInfo(info, input_field, element) {
         var results = [];
-        console.log("element parent is"+$(element).parent())
+        //console.log("element parent is"+$(element).parent())
         var errordiv = $(element).parent().find('.errormsgs')[0];
-        console.log(errordiv);
+        //console.log(errordiv);
         
         if (!errordiv) {
             // This is a bit hackish, but works.
             // There are situations where formatInfo is called but no div yet exists
             // to my knowledge (blame John Hess) this is always followed by a call to
             // this function once the div does exist
-            console.log("There is no errordiv loaded yet. trying again soon");
+            //console.log("There is no errordiv loaded yet. trying again soon");
             return []
         }
         
@@ -153,12 +153,12 @@
             });
         }
         else {
-            console.log("err");
+            //console.log("err");
 
             // remove Brian's html tags
             var tags = /<((\/)?\w{1,7})>/g;
             var errmsg = info.replace(tags, ' ');
-            console.log(errmsg);
+            //console.log(errmsg);
             errordiv.innerHTML = errmsg;
             errordiv.style.visibility = 'visible';
         }
