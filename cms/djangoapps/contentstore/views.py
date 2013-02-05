@@ -31,7 +31,7 @@ from xmodule.modulestore.exceptions import ItemNotFoundError, InvalidLocationErr
 from xmodule.x_module import ModuleSystem
 from xmodule.error_module import ErrorDescriptor
 from xmodule.errortracker import exc_info_to_str
-from static_replace import replace_static_urls
+import static_replace
 from external_auth.views import ssl_login_shortcut
 
 from mitxmako.shortcuts import render_to_response, render_to_string
@@ -473,7 +473,7 @@ def preview_module_system(request, preview_id, descriptor):
         get_module=partial(get_preview_module, request, preview_id),
         render_template=render_from_lms,
         debug=True,
-        replace_urls=partial(replace_static_urls, data_directory=None, course_namespace=descriptor.location),
+        replace_urls=partial(static_replace.replace_static_urls, data_directory=None, course_namespace=descriptor.location),
         user=request.user,
     )
 
