@@ -98,7 +98,7 @@ class CombinedOpenEndedV1Module():
     css = {'scss': [resource_string(__name__, 'css/combinedopenended/display.scss')]}
 
     def __init__(self, system, location, definition, descriptor,
-                 instance_state=None, shared_state=None, metadata = None, **kwargs):
+                 instance_state=None, shared_state=None, metadata = None, static_data = None, **kwargs):
 
         """
         Definition file should have one or many task blocks, a rubric block, and a prompt block:
@@ -136,7 +136,9 @@ class CombinedOpenEndedV1Module():
         """
 
         self.metadata = metadata
-        self.display_name = metadata['display_name']
+        self.display_name = metadata.get('display_name', "Open Ended")
+        self.rewrite_content_links = static_data['rewrite_content_links']
+
 
         # Load instance state
         if instance_state is not None:
@@ -188,6 +190,7 @@ class CombinedOpenEndedV1Module():
             }
 
         self.task_xml = definition['task_xml']
+        self.location = location
         self.setup_next_task()
 
     def get_tag_name(self, xml):

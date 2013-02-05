@@ -137,10 +137,14 @@ class CombinedOpenEndedModule(XModule):
             self.version = DEFAULT_VERSION
             version_index = versions.index(self.version)
 
+        static_data = {
+            'rewrite_content_links' : self.rewrite_content_links,
+        }
+
         self.child_descriptor = descriptors[version_index](self.system)
         self.child_definition = CombinedOpenEndedV1Descriptor.definition_from_xml(etree.fromstring(definition['xml_string']), self.system)
         self.child_module = modules[version_index](self.system, location, self.child_definition, self.child_descriptor,
-            instance_state = json.dumps(instance_state), metadata = self.metadata)
+            instance_state = json.dumps(instance_state), metadata = self.metadata, static_data= static_data)
 
     def get_html(self):
         return self.child_module.get_html()
