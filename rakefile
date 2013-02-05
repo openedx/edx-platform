@@ -147,6 +147,11 @@ end
                 pythonpath_prefix = "PYTHONPATH=#{File.dirname(app)}"
             end
             app = File.basename(app)
+            if app =~ /.py$/
+                app = app.gsub('.py', '')
+            elsif app =~ /.pyc$/
+                next
+            end
             sh("#{pythonpath_prefix} pylint --rcfile=.pylintrc -f parseable #{app} | tee #{report_dir}/#{app}.pylint.report")
         end
     end
