@@ -57,23 +57,23 @@ class PollModule(XModule):
 
     voted = Boolean(help="Whether this student has voted on the poll", scope=Scope.student_state, default=False)
     poll_answer = String(help="Student answer", scope=Scope.student_state, default='')
-    poll_answers = Object(help="All possible answers for the poll", scope=Scope.content, default=dict())
+    poll_answers = Object(help="All possible answers for the poll", scope=Scope.content, default={})
 
-    xml_object = String(scope=Scope.content)  # poll xml
+    xml_object = Object(scope=Scope.content)  # poll xml
 
 
     def handle_ajax(self, dispatch, get):
-        """Ajax handler.
-
-        Args:
-            dispatch: request slug
-            get: request get parameters
-
-        Returns:
-            dict
-        """
-        if dispatch in self.poll_answers and not self.voted:
-            self.poll_answers[dispatch] += 1
+        ''' '''
+        # import ipdb; ipdb.set_trace()
+        if dispatch in self.poll_answers: # and not self.voted:
+            # self.poll_answers[dispatch] += 1
+            # workaround
+            tmp = {}
+            for key in self.poll_answers:
+                tmp[key] = self.poll_answers[key]
+            tmp[dispatch] += 1
+            self.poll_answers = tmp
+            #end of workaround
             self.voted = True
             self.poll_answer = dispatch
             return json.dumps({'poll_answers': self.poll_answers,
@@ -94,23 +94,24 @@ class PollModule(XModule):
         return self.content
 
     def dump_poll(self):
-        """Dump poll information.
-
-        Returns:
-            string - Serialize json.
-        """
+        """     """
+        # import ipdb; ipdb.set_trace()
+        # self.poll_answers['Yes']=2
         xml_object_copy = deepcopy(self.xml_object)
         answers_to_json = {}
-
-        # Fill self.poll_answers, prepare data for template context.
+        #workaround
+        tmp={}
+        for key in self.poll_answers:
+            tmp[key] = self.poll_answers[key]
         for element_answer in xml_object_copy.findall('answer'):
             answer = element_answer.get('id', None)
             if answer:
-                if answer not in self.poll_answers:
-                    self.poll_answers[answer] = 0
+                if answer not in tmp:
+                    tmp = 0
                 answers_to_json[answer] = \
                     cgi.escape(stringify_children(element_answer))
             xml_object_copy.remove(element_answer)
+        self.poll_answers = tmp
         return json.dumps({'answers': answers_to_json,
               'question': cgi.escape(stringify_children(xml_object_copy)),
               # to show answered poll after reload:
