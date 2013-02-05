@@ -162,7 +162,7 @@
 
               .ss-icon {
                 @include font-size(18);
-                @include border-radius(2px);
+                @include border-top-radius(3px);
                 display: inline-block;
                 padding: ($baseline/4) ($baseline/2);
                 background: $blue;
@@ -232,18 +232,17 @@
               .title {
                 @include font-size(16);
                 margin: 0 0 ($baseline/4) 0;
-                font-weight: 600;
+                font-weight: 500;
                 color: $gray-d3;
               }
 
               &:hover {
                 @include box-shadow(0 1px ($baseline/10) $shadow-l1);
-                background: $blue;
-                color: $blue-l3;
+                background: $blue-l5;
                 top: -($baseline/5);
 
                 .title, strong {
-                  color: $white;
+                  color: $blue;
                 }
               }
 
@@ -331,6 +330,68 @@
           @include font-size(14);
           margin-top: ($baseline/2);
         }
+      }
+    }
+  }
+
+  // js dependant
+  &.js {
+
+    .content-modal {
+      @include border-bottom-radius(2px);
+      @include box-sizing(border-box);
+      @include box-shadow(0 2px 4px $shadow-d1);
+      position: relative;
+      display: none;
+      width: 700px;
+      overflow: hidden;
+      border: 1px solid $gray-d1;
+      padding: ($baseline);
+      background: $white;
+
+      .action-modal-close {
+        @include transition(top .25s ease-in-out);
+        @include border-bottom-radius(3px);
+        position: absolute;
+        top: -3px;
+        right: $baseline;
+        padding: ($baseline/4) ($baseline/2) 0 ($baseline/2);
+        background: $gray-l3;
+        text-align: center;
+
+        .label {
+          @include text-sr();
+        }
+
+        .ss-icon {
+          @include font-size(18);
+          color: $white;
+        }
+
+        &:hover {
+          background: $blue;
+          top: 0;
+        }
+      }
+
+      img {
+        @include box-sizing(border-box);
+        width: 100%;
+        padding: ($baseline/10);
+        border: 1px solid $gray-l4;
+      }
+
+      .title {
+        @include font-size(18);
+        margin: 0 0 ($baseline/2) 0;
+        font-weight: 600;
+        color: $gray-d3;
+      }
+
+      .description {
+        @include font-size(13);
+        margin-top: ($baseline/2);
+        color: $gray-l1;
       }
     }
   }

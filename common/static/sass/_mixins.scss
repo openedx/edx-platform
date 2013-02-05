@@ -8,7 +8,7 @@
   font-size: ($sizeValue/10) + rem;
 }
 
-// Line-height
+// line-height
 @function lh($amount: 1) {
   @return $body-line-height * $amount;
 }

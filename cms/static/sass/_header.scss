@@ -128,6 +128,7 @@
       .label-prefix {
         display: block;
         @include font-size(11);
+        font-weight: 400;
       }
 
       .ss-icon {
@@ -346,7 +347,7 @@
       display: inline-block;
       vertical-align: middle;
       margin: 0 $baseline 0 0;
-      font-weight: 600;
+      font-weight: 500;
 
       &:last-child {
         margin-right: 0;
@@ -391,6 +392,18 @@
   }
 }
 
+
+// active/current nav states
+body.howitworks .nav-not-signedin-hiw,
+body.signin .nav-not-signedin-signin,
+body.signup .nav-not-signedin-signup,
+body.course.outline .nav-course-courseware
+{
+
+  a {
+    color: $blue;
+  }
+}
 
 // js enabled 
 .js {
