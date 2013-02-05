@@ -71,14 +71,12 @@ class PollModule(XModule):
         Returns:
             dict
         """
-        if dispatch in self.poll_answers and not self.voted:
-            tmp = {}
-            for key in self.poll_answers:
-                tmp[key] = self.poll_answers[key]
-            tmp[dispatch] += 1
+        if dispatch in self.poll_answers:  # and not self.voted:
+            d = self.poll_answers
+            d[dispatch] += 1
             self.voted = True
             self.poll_answer = dispatch
-            self.poll_answers = tmp
+            self.poll_answers = d
             return json.dumps({'poll_answers': self.poll_answers,
                                'total': sum(self.poll_answers.values()),
                                'callback': {'objectName': 'Conditional'}
@@ -103,18 +101,17 @@ class PollModule(XModule):
         xml_object_copy = deepcopy(self.xml_object)
         answers_to_json = {}
         #workaround
-        tmp={}
-        for key in self.poll_answers:
-            tmp[key] = self.poll_answers[key]
+        d = self.poll_answers
+         # Fill self.poll_answers, prepare data for template context.
         for element_answer in xml_object_copy.findall('answer'):
             answer = element_answer.get('id', None)
             if answer:
-                if answer not in tmp:
-                    tmp[answer] = 0
+                if answer not in d:
+                    d[answer] = 0
                 answers_to_json[answer] = \
                     cgi.escape(stringify_children(element_answer))
             xml_object_copy.remove(element_answer)
-        self.poll_answers = tmp
+        self.poll_answers = d
         return json.dumps({'answers': answers_to_json,
               'question': cgi.escape(stringify_children(xml_object_copy)),
               # to show answered poll after reload:
