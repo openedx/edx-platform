@@ -384,12 +384,12 @@ class PeerGradingModule(XModule):
             return self._err_response(message)
         grader_id = self.system.anonymous_student_id
 
-        location = get['location']
-        calibration_essay_id = get['submission_id']
-        submission_key = get['submission_key']
-        score = get['score']
-        feedback = get['feedback']
-        rubric_scores = get['rubric_scores[]']
+        location = get.get('location')
+        calibration_essay_id = get.get('submission_id')
+        submission_key = get.get('submission_key')
+        score = get.get('score')
+        feedback = get.get('feedback')
+        rubric_scores = get.getlist('rubric_scores[]')
 
         try:
             response = self.peer_gs.save_calibration_essay(location, grader_id, calibration_essay_id,

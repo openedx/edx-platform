@@ -39,12 +39,12 @@ class PeerGradingService(GradingService):
     def get_data_for_location(self, problem_location, student_id):
         response = self.get(self.get_data_for_location_url,
             {'location': problem_location, 'student_id': student_id})
-        return response
+        return self.try_to_decode(response)
 
     def get_next_submission(self, problem_location, grader_id):
         response = self.get(self.get_next_submission_url,
             {'location': problem_location, 'grader_id': grader_id})
-        return self._render_rubric(response)
+        return self.try_to_decode(self._render_rubric(response))
 
     def save_grade(self, location, grader_id, submission_id, score, feedback, submission_key, rubric_scores, submission_flagged):
         data = {'grader_id' : grader_id,
@@ -56,16 +56,16 @@ class PeerGradingService(GradingService):
                 'rubric_scores': rubric_scores,
                 'rubric_scores_complete': True,
                 'submission_flagged' : submission_flagged}
-        return self.post(self.save_grade_url, data)
+        return self.try_to_decode(self.post(self.save_grade_url, data))
 
     def is_student_calibrated(self, problem_location, grader_id):
         params = {'problem_id' : problem_location, 'student_id': grader_id}
-        return self.get(self.is_student_calibrated_url, params)
+        return self.try_to_decode(self.get(self.is_student_calibrated_url, params))
 
     def show_calibration_essay(self, problem_location, grader_id):
         params = {'problem_id' : problem_location, 'student_id': grader_id}
         response = self.get(self.show_calibration_essay_url, params)
-        return self._render_rubric(response)
+        return self.try_to_decode(self._render_rubric(response))
 
     def save_calibration_essay(self, problem_location, grader_id, calibration_essay_id, submission_key,
                                score, feedback, rubric_scores):
@@ -77,17 +77,17 @@ class PeerGradingService(GradingService):
                 'feedback': feedback,
                 'rubric_scores[]': rubric_scores,
                 'rubric_scores_complete': True}
-        return self.post(self.save_calibration_essay_url, data)
+        return self.try_to_decode(self.post(self.save_calibration_essay_url, data))
 
     def get_problem_list(self, course_id, grader_id):
         params = {'course_id': course_id, 'student_id': grader_id}
         response = self.get(self.get_problem_list_url, params)
-        return response
+        return self.try_to_decode(response)
 
     def get_notifications(self, course_id, grader_id):
         params = {'course_id': course_id, 'student_id': grader_id}
         response = self.get(self.get_notifications_url, params)
-        return response
+        return self.try_to_decode(response)
 
     def _login(self):
         """
@@ -106,47 +106,6 @@ class PeerGradingService(GradingService):
         return response.json
 
     def try_to_decode(self, text):
-        try:
-            text= json.loads(text)
-        except:
-            pass
-
-        return text
-
-    def post(self, url, data, allow_redirects=False):
-        """
-        Make a post request to the grading controller
-        """
-        try:
-            op = lambda: self.session.post(url, data=data,
-                allow_redirects=allow_redirects)
-            r = self._try_with_login(op)
-        except (RequestException, ConnectionError, HTTPError) as err:
-            # reraise as promised GradingServiceError, but preserve stacktrace.
-            raise GradingServiceError, str(err), sys.exc_info()[2]
-
-        text = r.text
-        try:
-            text= json.loads(text)
-        except:
-            pass
-
-        return text
-
-    def get(self, url, params, allow_redirects=False):
-        """
-        Make a get request to the grading controller
-        """
-        op = lambda: self.session.get(url,
-            allow_redirects=allow_redirects,
-            params=params)
-        try:
-            r = self._try_with_login(op)
-        except (RequestException, ConnectionError, HTTPError) as err:
-            # reraise as promised GradingServiceError, but preserve stacktrace.
-            raise GradingServiceError, str(err), sys.exc_info()[2]
-
-        text = r.text
         try:
             text= json.loads(text)
         except:

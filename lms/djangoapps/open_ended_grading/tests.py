@@ -171,7 +171,7 @@ class TestPeerGradingService(ct.PageLoader):
         self.assertEqual(d['error'], "Missing required keys: location")
 
     def test_save_grade_success(self):
-        data = 'rubric_scores[]=1|rubric_scores[]=2|location=' + location + '|submission_id=1|submission_key=fake key|score=2|feedback=feedback|submission_flagged=False'
+        data = 'rubric_scores[]=1|rubric_scores[]=2|location=' + self.location + '|submission_id=1|submission_key=fake key|score=2|feedback=feedback|submission_flagged=False'
         qdict = QueryDict(data.replace("|","&"))
         r = self.peer_module.save_grade(qdict)
         d = r
@@ -203,6 +203,8 @@ class TestPeerGradingService(ct.PageLoader):
 
         r = self.peer_module.show_calibration_essay(data)
         d = r
+        log.debug(d)
+        log.debug(type(d))
         self.assertTrue(d['success'])
         self.assertIsNotNone(d['submission_id'])
         self.assertIsNotNone(d['prompt'])
@@ -219,13 +221,9 @@ class TestPeerGradingService(ct.PageLoader):
         self.assertEqual(d['error'], "Missing required keys: location")
 
     def test_save_calibration_essay_success(self):
-        data = {'location': self.location, 
-                'submission_id': '1', 
-                'submission_key': 'fake key', 
-                'score': '2',
-                'feedback': 'This is feedback',
-                'rubric_scores[]': [1, 2]}
-        r = self.peer_module.save_calibration_essay(data)
+        data = 'rubric_scores[]=1|rubric_scores[]=2|location=' + self.location + '|submission_id=1|submission_key=fake key|score=2|feedback=feedback|submission_flagged=False'
+        qdict = QueryDict(data.replace("|","&"))
+        r = self.peer_module.save_calibration_essay(qdict)
         d = r
         self.assertTrue(d['success'])
         self.assertTrue('actual_score' in d)
