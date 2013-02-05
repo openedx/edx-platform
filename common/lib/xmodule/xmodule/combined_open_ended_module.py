@@ -19,7 +19,7 @@ from .stringify import stringify_children
 from .x_module import XModule
 from .xml_module import XmlDescriptor
 from xmodule.modulestore import Location
-from combined_open_ended_module_v1 import CombinedOpenEndedV1Module, CombinedOpenEndedV1Descriptor
+from combined_open_ended_modulev1 import CombinedOpenEndedV1Module, CombinedOpenEndedV1Descriptor
 
 log = logging.getLogger("mitx.courseware")
 
@@ -138,7 +138,8 @@ class CombinedOpenEndedModule(XModule):
             version_index = versions.index(self.version)
 
         self.child_descriptor = descriptors[version_index](self.system)
-        self.child_module = modules[version_index](self.system, location, definition, self.child_descriptor, instance_state)
+        self.child_definition = self.child_descriptor.definition_from_xml(etree.fromstring(definition['xml_string']))
+        self.child_module = modules[version_index](self.system, location, self.child_definition, self.child_descriptor, instance_state)
 
     def get_html(self):
         return self.child_module.get_html()
@@ -186,7 +187,7 @@ class CombinedOpenEndedDescriptor(XmlDescriptor, EditingDescriptor):
         'task_xml': dictionary of xml strings,
         }
         """
-        return etree.tostring(xml_object)
+        return {'xml_string' : etree.tostring(xml_object)}
 
 
     def definition_to_xml(self, resource_fs):

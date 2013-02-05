@@ -649,7 +649,7 @@ class CombinedOpenEndedV1Descriptor(XmlDescriptor, EditingDescriptor):
     Module for adding combined open ended questions
     """
     mako_template = "widgets/html-edit.html"
-    module_class = CombinedOpenEndedModule
+    module_class = CombinedOpenEndedV1Module
     filename_extension = "xml"
 
     stores_state = True
