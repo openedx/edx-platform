@@ -58,7 +58,7 @@ class PollModule(XModule):
     display_name = String(help="Display name for this module", scope=Scope.settings)
 
     voted = Boolean(help="Whether this student has voted on the poll", scope=Scope.student_state, default=False)
-    poll_answer = String(help="Student answer", scope=Scope.content, default='')
+    poll_answer = String(help="Student answer", scope=Scope.student_state, default='')
     poll_answers = Object(help="All possible answers for the poll", scope=Scope.content, default=dict())
 
     xml_object = String(scope=Scope.content)  # poll xml
@@ -89,12 +89,16 @@ class PollModule(XModule):
     def dump_poll(self):
         """     """
         xml_object_copy = deepcopy(self.xml_object)
+        answers_to_json = {}
         for element_answer in xml_object_copy.findall('answer'):
-            if element_answer.get('id', None):
-                self.poll_answers[element_answer.get('id')] = \
+            answer = element_answer.get('id', None)
+            if answer:
+                if answer not in self.poll_answers:
+                    self.poll_answers[answer] = 0
+                answers_to_json[answer] = \
                          cgi.escape(stringify_children(element_answer))
             xml_object_copy.remove(element_answer)
-        return json.dumps({'answers': self.poll_answers,
+        return json.dumps({'answers': answers_to_json,
               'question': cgi.escape(stringify_children(xml_object_copy))})
 
 
