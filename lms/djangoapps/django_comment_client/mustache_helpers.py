@@ -5,6 +5,8 @@ import urllib
 import sys
 import inspect
 
+# This method is used to pluralize the words "discussion" and "comment"
+# which is why you need to tack on an "s" for the case of 0 or two or more.
 def pluralize(content, text):
     num, word = text.split(' ')
     num = int(num or '0')

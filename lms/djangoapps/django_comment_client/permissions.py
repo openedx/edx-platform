@@ -29,6 +29,7 @@ def has_permission(user, permission, course_id=None):
 
 
 CONDITIONS = ['is_open', 'is_author']
+# data may be a json file
 def check_condition(user, condition, course_id, data):
     def check_open(user, condition, course_id, data):
         try:
@@ -61,8 +62,10 @@ def check_conditions_permissions(user, permissions, course_id, **kwargs):
     def test(user, per, operator="or"):
         if isinstance(per, basestring):
             if per in CONDITIONS:
-                return check_condition(user, per, course_id, kwargs)
+                return check_condition(user, per, course_id, kwargs['data'])
             return cached_has_permission(user, per, course_id=course_id)
+        # TODO: refactor this to be more clear.
+        # e.g. the "and operator in" bit on the next line is not needed?
         elif isinstance(per, list) and operator in ["and", "or"]:
             results = [test(user, x, operator="and") for x in per]
             if operator == "or":
@@ -102,4 +105,4 @@ def check_permissions_by_view(user, course_id, content, name):
         p = VIEW_PERMISSIONS[name]
     except KeyError:
         logging.warning("Permission for view named %s does not exist in permissions.py" % name)
-    return check_conditions_permissions(user, p, course_id, content=content)
+    return check_conditions_permissions(user, p, course_id, data=content)
