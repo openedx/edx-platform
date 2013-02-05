@@ -66,7 +66,7 @@ class PollModule(XModule):
 
     def handle_ajax(self, dispatch, get):
         ''' '''
-        if dispatch in self.answers:
+        if dispatch in self.poll_answers:
             self.poll_answers[dispatch] += 1
             self.voted = True
             self.poll_answer = dispatch
