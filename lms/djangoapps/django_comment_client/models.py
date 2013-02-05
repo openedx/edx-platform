@@ -46,13 +46,11 @@ class Role(models.Model):
     def add_permission(self, permission):
         self.permissions.add(Permission.objects.get_or_create(name=permission)[0])
 
-
     def has_permission(self, permission):
         course = get_course_by_id(self.course_id)
-        changing_comments = permission.startswith('edit') or \
-            permission.startswith('update') or permission.startswith('create')
-        in_blackout_period = not course.forum_posts_allowed
-        if (self.name == FORUM_ROLE_STUDENT) and in_blackout_period and changing_comments:
+        if self.name == FORUM_ROLE_STUDENT and \
+           (permission.startswith('edit') or permission.startswith('update') or permission.startswith('create')) and \
+           (not course.forum_posts_allowed):
             return False
         
         return self.permissions.filter(name=permission).exists()
