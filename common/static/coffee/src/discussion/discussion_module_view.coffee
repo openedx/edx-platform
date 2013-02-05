@@ -73,10 +73,14 @@ if Backbone?
       # $elem.html("Hide Discussion")
       @discussion = new Discussion()
       @discussion.reset(response.discussion_data, {silent: false})
-      if response.is_cohorted
-        $discussion = $(Mustache.render $("script#_inline_discussion_cohorted").html(), {'threads':response.discussion_data, 'discussionId': discussionId, 'allow_anonymous_to_peers': allow_anonymous_to_peers, 'allow_anonymous': allow_anonymous})
-      else
-        $discussion = $(Mustache.render $("script#_inline_discussion").html(), {'threads':response.discussion_data, 'discussionId': discussionId, 'allow_anonymous_to_peers': allow_anonymous_to_peers, 'allow_anonymous': allow_anonymous})
+
+      #rather than have two different templates to get around (or take advantage of?)
+      #mustache's logic free templates, we added a 'group string' to each thread for inline
+      #discussions for the use case where a commentable is cohorted, but a global
+      #thread is posted by a TA
+      
+      $discussion = $(Mustache.render $("script#_inline_discussion").html(), {'threads':response.discussion_data, 'discussionId': discussionId, 'allow_anonymous_to_peers': allow_anonymous_to_peers, 'allow_anonymous': allow_anonymous})
+
       if @$('section.discussion').length
         @$('section.discussion').replaceWith($discussion)
       else

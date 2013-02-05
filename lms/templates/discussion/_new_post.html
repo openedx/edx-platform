@@ -22,8 +22,6 @@
 </%def>
 
 
-
-
 <article class="new-post-article">
     <div class="inner-wrapper">        
         <form class="new-post-form">
@@ -58,7 +56,9 @@
                                 <option value="${c.id}">${c.name}</option>
                               %endfor
                             %else:
-                              <option value="${user_cohort}">My Cohort</option>
+                                %if user_cohort:
+                                    <option value="${user_cohort}">My Cohort</option>
+                                %endif
                             %endif
 
                         </select>
