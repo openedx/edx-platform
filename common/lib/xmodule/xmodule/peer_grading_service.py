@@ -91,10 +91,9 @@ class PeerGradingService(GradingService):
 
     def try_to_decode(self, text):
         try:
-            text= json.loads(text)
+            text = json.loads(text)
         except:
             pass
-
         return text
 
 """
