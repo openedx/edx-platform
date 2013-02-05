@@ -66,11 +66,12 @@ class PollModule(XModule):
 
     def handle_ajax(self, dispatch, get):
         ''' '''
-        if dispatch in self.poll_answers:
+        if dispatch in self.poll_answers and not self.voted:
             self.poll_answers[dispatch] += 1
             self.voted = True
             self.poll_answer = dispatch
             return json.dumps({'poll_answers': self.poll_answers,
+                               'total': sum(self.poll_answers.values()),
                                'callback': {'objectName': 'Conditional'}
                                })
         return json.dumps({'error': 'Unknown Command!'})
@@ -99,7 +100,11 @@ class PollModule(XModule):
                          cgi.escape(stringify_children(element_answer))
             xml_object_copy.remove(element_answer)
         return json.dumps({'answers': answers_to_json,
-              'question': cgi.escape(stringify_children(xml_object_copy))})
+              'question': cgi.escape(stringify_children(xml_object_copy)),
+
+              # to show answered poll after reload
+                'current_answer': self.poll_answer,
+                'all_answers:': self.poll_answers if self.voted else ''})
 
 
 class PollDescriptor(MakoModuleDescriptor, XmlDescriptor):
