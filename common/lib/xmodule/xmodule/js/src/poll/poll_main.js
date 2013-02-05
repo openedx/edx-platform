@@ -1,4 +1,5 @@
-(function (requirejs, require, define) { define('PollMain', ['logme'], function (logme) {
+(function (requirejs, require, define) {
+define('PollMain', ['logme'], function (logme) {
 
 PollMain.prototype = {
 
@@ -16,32 +17,33 @@ PollMain.prototype = {
 //   handleVote: (response) =>
 //     @$('.container').replaceWith(response.results)
 
-'submitAnswer': function (event, pollObj, vote_type) {
-    var answer, _this;
+'submitAnswer': function (answer, answerEl) {
+    var _this;
+
+    // Make sure that the user can answer a question only once.
+    if (this.questionAnswered === true) {
+        return;
+    }
+    this.questionAnswered = true;
 
     _this = this;
 
-    answer = {
-        'vote_type': vote_type,
-        'id': pollObj.id
-    };
-    logme('We are sending the following answer: ', answer);
+    answerEl.addClass('answered');
+    answerEl.css({
+        'background-color': 'green'
+    });
+
+    logme('We are inside submitAnswer() method.', '_this = ', _this, 'answer = ', answer, 'answerEl = ', answerEl);
 
     // Send the data to the server as an AJAX request. Attach a callback that will
     // be fired on server's response.
     $.postWithPrefix(
-        pollObj.ajax_url + '/submit_answer',  answer,
+        _this.ajax_url + '/' + answer,  {},
         function (response) {
             logme('The following response was received: ' + JSON.stringify(response));
 
             // Show the answer from server.
-            pollObj.graph_answer.show();
-
-            // Show the next poll in series, and disable the current poll's submit and radio buttons.
-            if (pollObj[vote_type + 'Id'] !== '') {
-                _this.pollObjects[pollObj[vote_type + 'Id']].el.appendTo(_this.element);
-                _this.pollObjects[pollObj[vote_type + 'Id']].el.show();
-            }
+            _this.graphAnswerEl.show();
 
             // function disableClick (event) {
             //     event.preventDefault();
@@ -51,7 +53,7 @@ PollMain.prototype = {
             // pollObj.downvote.click(disableClick);
 
             jQuery.plot(
-                pollObj.graph_answer,
+                _this.graphAnswerEl,
                 [
                     [[1, response.upvotes / (response.upvotes + response.downvotes)   ]],
                     [[2, response.downvotes / (response.upvotes + response.downvotes) ]]
@@ -89,125 +91,91 @@ PollMain.prototype = {
                 }
             );
 
-            // window[response.className][response.methodName](response.conditonClass);
-            // var temp = new window[response.className]($('#' + response.conditonId));
-
-            _this.question.element.parent().parent().parent().find('.xmodule_ConditionalModule').each(
+            _this.vertModEl.find('.xmodule_ConditionalModule').each(
                 function (index, value) {
-                    var temp;
-                    temp = new window[response.className]($(value));
+                    (new window[response.className]($(value)));
                 }
             );
         }
     );
-},
+} // End-of: 'submitAnswer': function (answer, answerEl) {
+}; // End-of: PollMain.prototype = {
 
-'initializePollQuestion': function (element) {
-    var _this, jsonConfig, c1, obj, strQuestion;
+return PollMain;
 
-    logme(
-        'Initializing question: ',
-        element
-    );
+function PollMain(el) {
+    var _this;
 
-    if (element.attr('poll_main_processed') === 'true') {
-        // This element was already processed once.
+    this.vertModEl = $(el).parent().parent();
+    if (this.vertModEl.length !== 1) {
+        // We will work with a single DOM element that contains one question, and zero or more conditionals.
         return;
     }
+
+    this.questionEl = this.vertModEl.find('.poll_question');
+    if (this.questionEl.length !== 1) {
+        // We require one question DOM element.
+        logme('ERROR: PollMain constructor ');
+
+        return;
+    }
+
+    if (this.vertModEl.attr('poll_main_processed') === 'true') {
+        logme(
+            'ERROR: PolMain JS constructor was called on a DOM element that has already been processed once.'
+        );
+
+        return;
+    }
+
+    // This element was not processed earlier.
     // Make sure that next time we will not process this element a second time.
-    element.attr('poll_main_processed', 'true');
-
-    // Access PollMain instance inside inner functions.
-    _this = this;
-
-    this.question = {};
-
-    this.question.element = element;
+    this.vertModEl.attr('poll_main_processed', 'true');
 
     try {
-        jsonConfig = JSON.parse(element.children('.poll_question_div').html());
+        this.jsonConfig = JSON.parse(this.questionEl.children('.poll_question_div').html());
     } catch (err) {
         logme(
-            'ERROR: Invalid JSON config for poll ID "' + element.id + '".',
+            'ERROR: Invalid JSON config for poll ID "' + this.id + '".',
             'Error messsage: "' + err.message + '".'
         );
 
         return;
     }
 
-    logme('JSON config: ', jsonConfig);
+    // Get the DOM id of the question.
+    this.id = this.questionEl.attr('id');
 
-    obj = {};
+    // Get the URL to which we will post the users answer to the question.
+    this.ajax_url = this.questionEl.data('ajax-url');
 
-    obj.ajax_url = element.data('ajax-url');
-    obj.id = 0;
+    // Access this object inside inner functions.
+    _this = this;
 
-    strQuestion = $('<div />').html(jsonConfig.question).text();
+    this.questionHtmlMarkup = $('<div />').html(this.jsonConfig.question).text();
+    this.questionEl.append(this.questionHtmlMarkup);
 
-    c1 = 0;
+    $.each(this.jsonConfig.answers, function (index, value) {
+        var answerEl;
 
-    obj.el = $(
-        '<div id="poll-' + c1 + '" class="polls" style="' + ((c1 === 0) ? '' : 'display: none;') + '">' +
-            strQuestion +
-            '<div style="width: 500px; height: 150px; margin-left: auto; margin-right: auto;">' +
-                '<div id="vote_block-' + c1 + '" class="vote_blocks" style="display: inline; float: left; clear: none;">' +
-                    '<ul>' +
-                        '<li>' +
-                            '<input type="radio" id="poll-vote-' + c1 + '-1" name="vote_' + c1 + '-1" value="1" />' +
-                            '<label for="poll-vote-' + c1 + '-1">' + jsonConfig.answers.Yes + '</label>' +
-                        '</li>' +
-                        '<li>' +
-                            '<input type="radio" id="poll-vote-' + c1 + '-2" name="vote_' + c1 + '-2" value="2" />' +
-                            '<label for="poll-vote-' + c1 + '-2">' + jsonConfig.answers.No + '</label>' +
-                        '</li>' +
-                        '<li>' +
-                            '<input type="radio" id="poll-vote-' + c1 + '-3" name="vote_' + c1 + '-3" value="3" />' +
-                            '<label for="poll-vote-' + c1 + '-3">' + jsonConfig.answers.Dont_know + '</label>' +
-                        '</li>' +
-                    '</ul>' +
-                '</div>' +
-                '<div class="submit-button" style="display: inline; float: left; clear: none; margin: 2.5rem;">' +
-                    '<input type="button" value="Cast Your vote" class=".submit-button" name="vote" />' +
-                '</div>' +
-            '</div>' +
-            '<div class="graph_answer" style="display: none; clear: both;"></div>' +
-        '</div>'
-    );
-
-    obj.el.find('input').each(function (index, value) {
-        var val, type;
-
-        val = $(value).val();
-        if (val == '1') {
-            type = 'upvote';
-        } else if (val == '2') {
-            type = 'downvote';
-        } else if (val == '3') {
-            type = 'do not know';
-        } else {
-            logme('ERROR: Not a valid input value.');
-
-            return;
-        }
-
-        $(value).on('click', function (event) {
-            _this.submitAnswer(event, obj, type);
+        answerEl = $('<li class="pol_answer">' + value + '</li>');
+        answerEl.on('click', function () {
+            _this.submitAnswer(index, answerEl);
         });
+        answerEl.appendTo(_this.questionEl);
     });
 
-    obj.el.appendTo(element);
-},
+    // When the user selects and answer, we will set this flag to true.
+    this.questionAnswered = false;
 
-'initializePollConditional': function (element) {
-    logme(
-        'Initializing conditional: ',
-        element
-    );
-}
-};
+    this.graphAnswerEl = $('<div class="graph_answer"></div>');
+    this.graphAnswerEl.hide();
+    this.graphAnswerEl.appendTo(this.questionEl);
 
-return PollMain;
+    logme('PollMain object: ', this);
+} // End-of: function PollMain(el) {
 
-function PollMain() {}
+}); // End-of: define('PollMain', ['logme'], function (logme) {
 
-}); }(RequireJS.requirejs, RequireJS.require, RequireJS.define));
+// End-of: (function (requirejs, require, define) {
+}(RequireJS.requirejs, RequireJS.require, RequireJS.define));
