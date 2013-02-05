@@ -27,6 +27,7 @@ setup(
             "html = xmodule.html_module:HtmlDescriptor",
             "image = xmodule.backcompat_module:TranslateCustomTagDescriptor",
             "error = xmodule.error_module:ErrorDescriptor",
+            "peergrading = xmodule.peer_grading_module:PeerGradingDescriptor",
             "problem = xmodule.capa_module:CapaDescriptor",
             "problemset = xmodule.seq_module:SequenceDescriptor",
             "randomize = xmodule.randomize_module:RandomizeDescriptor", 

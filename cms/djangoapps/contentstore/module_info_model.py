@@ -1,5 +1,5 @@
 import logging
-from static_replace import replace_urls
+from static_replace import replace_static_urls
 from xmodule.modulestore.exceptions import ItemNotFoundError
 from xmodule.modulestore import Location
 from xmodule.modulestore.django import modulestore
@@ -18,7 +18,17 @@ def get_module_info(store, location, parent_location = None, rewrite_static_link
 
   data = module.definition['data']
   if rewrite_static_links:
-    data = replace_urls(module.definition['data'], course_namespace = Location([module.location.tag, module.location.org, module.location.course, None, None]))
+    data = replace_static_urls(
+        module.definition['data'],
+        None,
+        course_namespace=Location([
+            module.location.tag,
+            module.location.org,
+            module.location.course,
+            None,
+            None
+        ])
+    )
 
   return {
         'id': module.location.url(),
@@ -47,7 +57,7 @@ def set_module_info(store, location, post_data):
   if post_data.get('data') is not None:
       data = post_data['data']
       store.update_item(location, data)
-     
+
   # cdodge: note calling request.POST.get('children') will return None if children is an empty array
   # so it lead to a bug whereby the last component to be deleted in the UI was not actually
   # deleting the children object from the children collection
