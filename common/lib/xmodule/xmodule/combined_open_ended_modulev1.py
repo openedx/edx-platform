@@ -98,7 +98,7 @@ class CombinedOpenEndedV1Module():
     css = {'scss': [resource_string(__name__, 'css/combinedopenended/display.scss')]}
 
     def __init__(self, system, location, definition, descriptor,
-                 instance_state=None, shared_state=None, **kwargs):
+                 instance_state=None, shared_state=None, metadata = None, **kwargs):
 
         """
         Definition file should have one or many task blocks, a rubric block, and a prompt block:
@@ -134,6 +134,8 @@ class CombinedOpenEndedV1Module():
         </combinedopenended>
 
         """
+
+        self.metadata = metadata
 
         # Load instance state
         if instance_state is not None:

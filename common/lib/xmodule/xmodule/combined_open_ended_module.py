@@ -138,8 +138,9 @@ class CombinedOpenEndedModule(XModule):
             version_index = versions.index(self.version)
 
         self.child_descriptor = descriptors[version_index](self.system)
-        self.child_definition = self.child_descriptor.definition_from_xml(etree.fromstring(definition['xml_string']))
-        self.child_module = modules[version_index](self.system, location, self.child_definition, self.child_descriptor, instance_state)
+        self.child_definition = CombinedOpenEndedV1Descriptor.definition_from_xml(etree.fromstring(definition['xml_string']), self.system)
+        self.child_module = modules[version_index](self.system, location, self.child_definition, self.child_descriptor,
+            instance_state = json.dumps(instance_state), metadata = definition['metadata'])
 
     def get_html(self):
         return self.child_module.get_html()
@@ -187,7 +188,8 @@ class CombinedOpenEndedDescriptor(XmlDescriptor, EditingDescriptor):
         'task_xml': dictionary of xml strings,
         }
         """
-        return {'xml_string' : etree.tostring(xml_object)}
+
+        return {'xml_string' : etree.tostring(xml_object), 'metadata' : xml_object.attrib}
 
 
     def definition_to_xml(self, resource_fs):
