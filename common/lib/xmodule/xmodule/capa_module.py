@@ -2,6 +2,7 @@ import cgi
 import datetime
 import dateutil
 import dateutil.parser
+import hashlib
 import json
 import logging
 import traceback
@@ -25,6 +26,22 @@ log = logging.getLogger("mitx.courseware")
 #-----------------------------------------------------------------------------
 TIMEDELTA_REGEX = re.compile(r'^((?P<days>\d+?) day(?:s?))?(\s)?((?P<hours>\d+?) hour(?:s?))?(\s)?((?P<minutes>\d+?) minute(?:s)?)?(\s)?((?P<seconds>\d+?) second(?:s)?)?$')
 
+# Generated this many different variants of problems with rerandomize=per_student
+NUM_RANDOMIZATION_BINS = 20
+
+def randomization_bin(seed, problem_id):
+    """
+    Pick a randomization bin for the problem given the user's seed and a problem id.
+
+    We do this because we only want e.g. 20 randomizations of a problem to make analytics
+    interesting.  To avoid having sets of students that always get the same problems,
+    we'll combine the system's per-student seed with the problem id in picking the bin.
+    """
+    h = hashlib.sha1()
+    h.update(str(seed))
+    h.update(str(problem_id))
+    # get the first few digits of the hash, convert to an int, then mod.
+    return int(h.hexdigest()[:7], 16) % NUM_RANDOMIZATION_BINS
 
 def only_one(lst, default="", process=lambda x: x):
     """
@@ -138,13 +155,9 @@ class CapaModule(XModule):
 
         if self.rerandomize == 'never':
             self.seed = 1
-        elif self.rerandomize == "per_student" and hasattr(self.system, 'id'):
-            # TODO: This line is badly broken:
-            # (1) We're passing student ID to xmodule.
-            # (2) There aren't bins of students.  -- we only want 10 or 20 randomizations, and want to assign students
-            # to these bins, and may not want cohorts.  So e.g. hash(your-id, problem_id) % num_bins.
-            #     - analytics really needs small number of bins.
-            self.seed = system.id
+        elif self.rerandomize == "per_student" and hasattr(self.system, 'seed'):
+            # see comment on randomization_bin
+            self.seed = randomization_bin(system.seed, self.location.url)
         else:
             self.seed = None
 
@@ -389,38 +402,54 @@ class CapaModule(XModule):
             })
         return json.dumps(d, cls=ComplexEncoder)
 
+    def is_past_due(self):
+        """
+        Is it now past this problem's due date, including grace period?
+        """
+        return (self.close_date is not None and
+                datetime.datetime.utcnow() > self.close_date)
+
     def closed(self):
         ''' Is the student still allowed to submit answers? '''
         if self.attempts == self.max_attempts:
             return True
-        if self.close_date is not None and datetime.datetime.utcnow() > self.close_date:
+        if self.is_past_due():
             return True
 
         return False
 
+    def is_completed(self):
+        # used by conditional module
+        # return self.answer_available()
+        return self.lcp.done
+
+    def is_attempted(self):
+        # used by conditional module
+        return self.attempts > 0
+
     def answer_available(self):
-        ''' Is the user allowed to see an answer?
+        '''
+        Is the user allowed to see an answer?
         '''
         if self.show_answer == '':
             return False
-
-        if self.show_answer == "never":
+        elif self.show_answer == "never":
             return False
-
-        # Admins can see the answer, unless the problem explicitly prevents it
-        if self.system.user_is_staff:
+        elif self.system.user_is_staff:
+            # This is after the 'never' check because admins can see the answer
+            # unless the problem explicitly prevents it
             return True
-
-        if self.show_answer == 'attempted':
+        elif self.show_answer == 'attempted':
             return self.attempts > 0
-
-        if self.show_answer == 'answered':
+        elif self.show_answer == 'answered':
+            # NOTE: this is slightly different from 'attempted' -- resetting the problems
+            # makes lcp.done False, but leaves attempts unchanged.
             return self.lcp.done
-
-        if self.show_answer == 'closed':
+        elif self.show_answer == 'closed':
             return self.closed()
-
-        if self.show_answer == 'always':
+        elif self.show_answer == 'past_due':
+            return self.is_past_due()
+        elif self.show_answer == 'always':
             return True
 
         return False
@@ -669,18 +698,18 @@ class CapaDescriptor(RawDescriptor):
     # TODO (vshnayder): do problems have any other metadata?  Do they
     # actually use type and points?
     metadata_attributes = RawDescriptor.metadata_attributes + ('type', 'points')
-    
+
     def get_context(self):
         _context = RawDescriptor.get_context(self)
         _context.update({'markdown': self.metadata.get('markdown', '')})
         return _context
-    
+
     @property
     def editable_metadata_fields(self):
         """Remove metadata from the editable fields since it has its own editor"""
         subset = super(CapaDescriptor,self).editable_metadata_fields
         if 'markdown' in subset:
-            subset.remove('markdown') 
+            subset.remove('markdown')
         return subset
 
 

@@ -50,7 +50,7 @@ class @HTMLEditingDescriptor
     })
 
     @showingVisualEditor = true
-    @element.on('click', '.editor-tabs .tab', @onSwitchEditor)
+    @element.on('click', '.editor-tabs .tab', this, @onSwitchEditor)
 
   @setupTinyMCE: (ed) ->
     ed.addButton('wrapAsCode', {
@@ -71,15 +71,18 @@ class @HTMLEditingDescriptor
     e.preventDefault();
 
     if not $(e.currentTarget).hasClass('current')
-      $('.editor-tabs .current', @element).removeClass('current')
+      element = e.data.element
+
       $(e.currentTarget).addClass('current')
-      $('table.mceToolbar', @element).toggleClass(HTMLEditingDescriptor.isInactiveClass)
+      $(element).find('table.mceToolbar').toggleClass(HTMLEditingDescriptor.isInactiveClass)
       $(@advanced_editor.getWrapperElement()).toggleClass(HTMLEditingDescriptor.isInactiveClass)
 
-      visualEditor = @getVisualEditor()
+      visualEditor = @getVisualEditor(element)
       if $(e.currentTarget).attr('data-tab') is 'visual'
+        $(element).find('.html-tab').removeClass('current')
         @showVisualEditor(visualEditor)
       else
+        $(element).find('.visual-tab').removeClass('current')
         @showAdvancedEditor(visualEditor)
 
   # Show the Advanced (codemirror) Editor. Pulled out as a helper method for unit testing.
@@ -104,17 +107,17 @@ class @HTMLEditingDescriptor
   focusVisualEditor: (visualEditor) ->
     visualEditor.focus()
 
-  getVisualEditor: ->
+  getVisualEditor: (element) ->
     ###
     Returns the instance of TinyMCE.
     This is different from the textarea that exists in the HTML template (@tiny_mce_textarea.
     ###
-    return tinyMCE.get($('.tiny-mce', this.element).attr('id'))
+    return tinyMCE.get($(element).find('.tiny-mce').attr('id'))
 
   save: ->
     @element.off('click', '.editor-tabs .tab', @onSwitchEditor)
     text = @advanced_editor.getValue()
-    visualEditor = @getVisualEditor()
+    visualEditor = @getVisualEditor(@element)
     if @showingVisualEditor and visualEditor.isDirty()
       text = visualEditor.getContent({no_events: 1})
     data: text

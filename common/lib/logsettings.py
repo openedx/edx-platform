@@ -40,6 +40,11 @@ def get_logger_config(log_dir,
     if console_loglevel is None or console_loglevel not in LOG_LEVELS:
         console_loglevel = 'DEBUG' if debug else 'INFO'
 
+    if service_variant is None:
+        # default to a blank string so that if SERVICE_VARIANT is not
+        # set we will not log to a sub directory
+        service_variant = ''
+
     hostname = platform.node().split(".")[0]
     syslog_format = ("[service_variant={service_variant}]"
                      "[%(name)s][env:{logging_env}] %(levelname)s "

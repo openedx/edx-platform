@@ -438,6 +438,7 @@ main_vendor_js = [
 discussion_js = sorted(rooted_glob(PROJECT_ROOT / 'static', 'coffee/src/discussion/**/*.coffee'))
 staff_grading_js = sorted(rooted_glob(PROJECT_ROOT / 'static', 'coffee/src/staff_grading/**/*.coffee'))
 peer_grading_js = sorted(rooted_glob(PROJECT_ROOT / 'static','coffee/src/peer_grading/**/*.coffee'))
+open_ended_js = sorted(rooted_glob(PROJECT_ROOT / 'static','coffee/src/open_ended/**/*.coffee'))
 
 PIPELINE_CSS = {
     'application': {
@@ -468,7 +469,7 @@ PIPELINE_JS = {
         'source_filenames': sorted(
             set(rooted_glob(COMMON_ROOT / 'static', 'coffee/src/**/*.coffee') +
                 rooted_glob(PROJECT_ROOT / 'static', 'coffee/src/**/*.coffee')) -
-            set(courseware_js + discussion_js + staff_grading_js + peer_grading_js) 
+            set(courseware_js + discussion_js + staff_grading_js + peer_grading_js + open_ended_js)
         ) + [
             'js/form.ext.js',
             'js/my_courses_dropdown.js',
@@ -501,6 +502,10 @@ PIPELINE_JS = {
     'peer_grading' : {
         'source_filenames': peer_grading_js,
         'output_filename': 'js/peer_grading.js'
+    },
+    'open_ended' : {
+        'source_filenames': open_ended_js,
+        'output_filename': 'js/open_ended.js'
     }
 }
 
@@ -530,7 +535,7 @@ PIPELINE_COMPILERS = [
     'pipeline.compilers.coffee.CoffeeScriptCompiler',
 ]
 
-PIPELINE_SASS_ARGUMENTS = '-t compressed -r {proj_dir}/static/sass/bourbon/lib/bourbon.rb'.format(proj_dir=PROJECT_ROOT)
+PIPELINE_SASS_ARGUMENTS = '-t expanded -r {proj_dir}/static/sass/bourbon/lib/bourbon.rb'.format(proj_dir=PROJECT_ROOT)
 
 PIPELINE_CSS_COMPRESSOR = None
 PIPELINE_JS_COMPRESSOR = None
@@ -540,7 +545,7 @@ STATICFILES_IGNORE_PATTERNS = (
     "coffee/*",
 )
 
-PIPELINE_YUI_BINARY = 'yui-compressor'
+# PIPELINE_YUI_BINARY = 'yui-compressor'
 PIPELINE_SASS_BINARY = 'sass'
 PIPELINE_COFFEE_SCRIPT_BINARY = 'coffee'
 

@@ -25,6 +25,8 @@ import open_ended_notifications
 from xmodule.modulestore.django import modulestore
 from xmodule.modulestore import search
 
+from django.http import HttpResponse, Http404
+
 log = logging.getLogger(__name__)
 
 template_imports = {'urllib': urllib}
@@ -54,12 +56,14 @@ def _reverse_without_slash(url_name, course_id):
 DESCRIPTION_DICT = {
             'Peer Grading': "View all problems that require peer assessment in this particular course.",
             'Staff Grading': "View ungraded submissions submitted by students for the open ended problems in the course.",
-            'Problems you have submitted': "View open ended problems that you have previously submitted for grading." 
+            'Problems you have submitted': "View open ended problems that you have previously submitted for grading.",
+            'Flagged Submissions' : "View submissions that have been flagged by students as inappropriate."
     }
 ALERT_DICT = {
             'Peer Grading': "New submissions to grade",
             'Staff Grading': "New submissions to grade",
-            'Problems you have submitted': "New grades have been returned" 
+            'Problems you have submitted': "New grades have been returned",
+            'Flagged Submissions' : "Submissions have been flagged for review"
     }
 @cache_control(no_cache=True, no_store=True, must_revalidate=True)
 def staff_grading(request, course_id):
@@ -158,8 +162,9 @@ def student_problem_list(request, course_id):
         success = problem_list_dict['success']
         if 'error' in problem_list_dict:
             error_text = problem_list_dict['error']
-
-        problem_list = problem_list_dict['problem_list']
+            problem_list = []
+        else:
+            problem_list = problem_list_dict['problem_list']
 
         for i in xrange(0,len(problem_list)):
             problem_url_parts = search.path_to_location(modulestore(), course.id, problem_list[i]['location'])
@@ -194,11 +199,57 @@ def student_problem_list(request, course_id):
         'staff_access': False, })
 
 @cache_control(no_cache=True, no_store=True, must_revalidate=True)
+def flagged_problem_list(request, course_id):
+    '''
+    Show a student problem list
+    '''
+    course = get_course_with_access(request.user, course_id, 'staff')
+    student_id = unique_id_for_user(request.user)
+
+    # call problem list service
+    success = False
+    error_text = ""
+    problem_list = []
+    base_course_url  = reverse('courses')
+
+    try:
+        problem_list_json = controller_qs.get_flagged_problem_list(course_id)
+        problem_list_dict = json.loads(problem_list_json)
+        success = problem_list_dict['success']
+        if 'error' in problem_list_dict:
+            error_text = problem_list_dict['error']
+            problem_list=[]
+        else:
+            problem_list = problem_list_dict['flagged_submissions']
+
+    except GradingServiceError:
+        error_text = "Error occured while contacting the grading service"
+        success = False
+    # catch error if if the json loads fails
+    except ValueError:
+        error_text = "Could not get problem list"
+        success = False
+
+    ajax_url = _reverse_with_slash('open_ended_flagged_problems', course_id)
+
+    return render_to_response('open_ended_problems/open_ended_flagged_problems.html', {
+        'course': course,
+        'course_id': course_id,
+        'ajax_url': ajax_url,
+        'success': success,
+        'problem_list': problem_list,
+        'error_text': error_text,
+        # Checked above
+        'staff_access': True, })
+
+@cache_control(no_cache=True, no_store=True, must_revalidate=True)
 def combined_notifications(request, course_id):
+    """
+    Gets combined notifications from the grading controller and displays them
+    """
     course = get_course_with_access(request.user, course_id, 'load')
     user = request.user
     notifications = open_ended_notifications.combined_notifications(course, user)
-    log.debug(notifications)
     response = notifications['response']
     notification_tuples=open_ended_notifications.NOTIFICATION_TYPES
 
@@ -243,5 +294,35 @@ def combined_notifications(request, course_id):
     return render_to_response('open_ended_problems/combined_notifications.html',
         combined_dict
     )
+
+@cache_control(no_cache=True, no_store=True, must_revalidate=True)
+def take_action_on_flags(request, course_id):
+    """
+    Takes action on student flagged submissions.
+    Currently, only support unflag and ban actions.
+    """
+    if request.method != 'POST':
+        raise Http404
+
+
+    required = ['submission_id', 'action_type', 'student_id']
+    for key in required:
+        if key not in request.POST:
+            return HttpResponse(json.dumps({'success': False, 'error': 'Missing key {0}'.format(key)}),
+                mimetype="application/json")
+
+    p = request.POST
+    submission_id = p['submission_id']
+    action_type = p['action_type']
+    student_id = p['student_id']
+    student_id = student_id.strip(' \t\n\r')
+    submission_id = submission_id.strip(' \t\n\r')
+    action_type = action_type.lower().strip(' \t\n\r')
+    try:
+        response = controller_qs.take_action_on_flags(course_id, student_id, submission_id, action_type)
+        return HttpResponse(response, mimetype="application/json")
+    except GradingServiceError:
+        log.exception("Error saving calibration grade, location: {0}, submission_id: {1}, submission_key: {2}, grader_id: {3}".format(location, submission_id, submission_key, grader_id))
+        return _err_response('Could not connect to grading service')
     
 
