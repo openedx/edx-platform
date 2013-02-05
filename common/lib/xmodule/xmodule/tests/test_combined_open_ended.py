@@ -4,7 +4,7 @@ import unittest
 
 from xmodule.openendedchild import OpenEndedChild
 from xmodule.open_ended_module import OpenEndedModule
-from xmodule.combined_open_ended_module import CombinedOpenEndedModule
+from xmodule.combined_open_ended_modulev1 import CombinedOpenEndedV1Module
 
 from xmodule.modulestore import Location
 from lxml import etree
@@ -314,7 +314,7 @@ class CombinedOpenEndedModuleTest(unittest.TestCase):
     descriptor = Mock()
 
     def setUp(self):
-        self.combinedoe = CombinedOpenEndedModule(test_system, self.location, self.definition, self.descriptor, self.static_data, metadata=self.metadata)
+        self.combinedoe = CombinedOpenEndedV1Module(test_system, self.location, self.definition, self.descriptor, self.static_data, metadata=self.metadata)
 
     def test_get_tag_name(self):
         name = self.combinedoe.get_tag_name("<t>Tag</t>")

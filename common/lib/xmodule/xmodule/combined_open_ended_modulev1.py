@@ -137,7 +137,7 @@ class CombinedOpenEndedV1Module():
 
         self.metadata = metadata
         self.display_name = metadata.get('display_name', "Open Ended")
-        self.rewrite_content_links = static_data['rewrite_content_links']
+        self.rewrite_content_links = static_data.get('rewrite_content_links',"")
 
 
         # Load instance state
