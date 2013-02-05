@@ -89,22 +89,6 @@ class PeerGradingService(GradingService):
         response = self.get(self.get_notifications_url, params)
         return self.try_to_decode(response)
 
-    def _login(self):
-        """
-        Log into the staff grading service.
-
-        Raises requests.exceptions.HTTPError if something goes wrong.
-
-        Returns the decoded json dict of the response.
-        """
-        response = self.session.post(self.login_url,
-            {'username': self.username,
-             'password': self.password,})
-
-        response.raise_for_status()
-
-        return response.json
-
     def try_to_decode(self, text):
         try:
             text= json.loads(text)
@@ -112,61 +96,6 @@ class PeerGradingService(GradingService):
             pass
 
         return text
-
-
-    def _try_with_login(self, operation):
-        """
-        Call operation(), which should return a requests response object.  If
-        the request fails with a 'login_required' error, call _login() and try
-        the operation again.
-
-        Returns the result of operation().  Does not catch exceptions.
-        """
-        response = operation()
-        if (response.json
-            and response.json.get('success') == False
-            and response.json.get('error') == 'login_required'):
-            # apparrently we aren't logged in.  Try to fix that.
-            r = self._login()
-            if r and not r.get('success'):
-                log.warning("Couldn't log into peer grading backend. Response: %s",
-                    r)
-                # try again
-            response = operation()
-            response.raise_for_status()
-
-        return response
-
-    def _render_rubric(self, response, view_only=False):
-        """
-        Given an HTTP Response with the key 'rubric', render out the html
-        required to display the rubric and put it back into the response
-
-        returns the updated response as a dictionary that can be serialized later
-
-        """
-        try:
-            response_json = json.loads(response)
-        except:
-            response_json = response
-
-        try:
-            if 'rubric' in response_json:
-                rubric = response_json['rubric']
-                rubric_renderer = CombinedOpenEndedRubric(self.system, False)
-                success, rubric_html = rubric_renderer.render_rubric(rubric)
-                response_json['rubric'] = rubric_html
-            return response_json
-        # if we can't parse the rubric into HTML, 
-        except etree.XMLSyntaxError, RubricParsingError:
-            log.exception("Cannot parse rubric string. Raw string: {0}"
-            .format(rubric))
-            return {'success': False,
-                    'error': 'Error displaying submission'}
-        except ValueError:
-            log.exception("Error parsing response: {0}".format(response))
-            return {'success': False,
-                    'error': "Error displaying submission"}
 
 """
 This is a mock peer grading service that can be used for unit tests
