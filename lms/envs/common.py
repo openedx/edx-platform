@@ -512,7 +512,7 @@ PIPELINE_COMPILERS = [
     'pipeline.compilers.coffee.CoffeeScriptCompiler',
 ]
 
-PIPELINE_SASS_ARGUMENTS = '-t expanded -r {proj_dir}/static/sass/bourbon/lib/bourbon.rb'.format(proj_dir=PROJECT_ROOT)
+PIPELINE_SASS_ARGUMENTS = '-t compressed -r {proj_dir}/static/sass/bourbon/lib/bourbon.rb'.format(proj_dir=PROJECT_ROOT)
 
 PIPELINE_CSS_COMPRESSOR = None
 PIPELINE_JS_COMPRESSOR = None
@@ -522,7 +522,7 @@ STATICFILES_IGNORE_PATTERNS = (
     "coffee/*",
 )
 
-# PIPELINE_YUI_BINARY = 'yui-compressor'
+PIPELINE_YUI_BINARY = 'yui-compressor'
 PIPELINE_SASS_BINARY = 'sass'
 PIPELINE_COFFEE_SCRIPT_BINARY = 'coffee'
 
