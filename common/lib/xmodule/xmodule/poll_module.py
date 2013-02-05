@@ -115,7 +115,7 @@ class PollModule(XModule):
         return json.dumps({'answers': answers_to_json,
               'question': cgi.escape(stringify_children(xml_object_copy)),
               # to show answered poll after reload:
-                'poll_answer': '',  # self.poll_answer,
+                'poll_answer': self.poll_answer,
                 'poll_answers': self.poll_answers if self.voted else {},
                 'total': sum(self.poll_answers.values()) if self.voted else ''})
 
