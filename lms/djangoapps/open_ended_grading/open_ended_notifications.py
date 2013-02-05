@@ -1,6 +1,5 @@
 from django.conf import settings
 from staff_grading_service import StaffGradingService
-from peer_grading_service import PeerGradingService
 from open_ended_grading.controller_query_service import ControllerQueryService
 import json
 from student.models import unique_id_for_user
@@ -10,6 +9,7 @@ import logging
 from courseware.access import has_access
 from util.cache import cache
 import datetime
+from xmodule import peer_grading_service
 
 log=logging.getLogger(__name__)
 

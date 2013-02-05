@@ -33,7 +33,9 @@ class CombinedOpenEndedRubric(object):
                      'view_only': self.view_only})
             success = True
         except:
-            raise RubricParsingError("[render_rubric] Could not parse the rubric with xml: {0}".format(rubric_xml))
+            error_message = "[render_rubric] Could not parse the rubric with xml: {0}".format(rubric_xml)
+            log.error(error_message)
+            raise RubricParsingError(error_message)
         return success, html
 
     def check_if_rubric_is_parseable(self, rubric_string, location, max_score_allowed):

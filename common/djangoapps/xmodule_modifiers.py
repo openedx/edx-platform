@@ -64,7 +64,6 @@ def replace_static_urls(get_html, data_dir, course_namespace=None):
         return static_replace.replace_static_urls(get_html(), data_dir, course_namespace)
     return _get_html
 
-
 def grade_histogram(module_id):
     ''' Print out a histogram of grades on a given problem.
         Part of staff member debug info.
