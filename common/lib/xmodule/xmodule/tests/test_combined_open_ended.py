@@ -41,16 +41,15 @@ class OpenEndedChildTest(unittest.TestCase):
             'max_score': max_score, 
             'display_name': 'Name',
             'accept_file_upload' : False,
+            'close_date': None
             }
     definition = Mock()
-    parent = Mock()
-    parent.closed.return_value = False;
     descriptor = Mock()
 
     def setUp(self):
         self.openendedchild = OpenEndedChild(test_system, self.location, 
                 self.definition, self.descriptor, self.static_data, 
-                self.parent, self.metadata) 
+                self.metadata) 
  
 
     def test_latest_answer_empty(self):
@@ -158,6 +157,7 @@ class OpenEndedModuleTest(unittest.TestCase):
             'max_score': max_score, 
             'display_name': 'Name',
             'accept_file_upload': False,
+            'close_date': None
             }
 
     oeparam = etree.XML('''
@@ -169,8 +169,6 @@ class OpenEndedModuleTest(unittest.TestCase):
     ''')
     definition = {'oeparam': oeparam}
     descriptor = Mock()
-    parent = Mock()
-    parent.closed.return_value = False;
 
     def setUp(self):
         test_system.location = self.location
@@ -179,7 +177,7 @@ class OpenEndedModuleTest(unittest.TestCase):
         test_system.xqueue = {'interface':self.mock_xqueue, 'callback_url':'/', 'default_queuename': 'testqueue', 'waittime': 1}
         self.openendedmodule = OpenEndedModule(test_system, self.location, 
                 self.definition, self.descriptor, self.static_data, 
-                self.parent, self.metadata) 
+                self.metadata) 
 
     def test_message_post(self):
         get = {'feedback': 'feedback text',
