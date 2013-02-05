@@ -71,8 +71,7 @@ class PollModule(XModule):
             self.voted = True
             self.poll_answer = dispatch
             return json.dumps({'poll_answers': self.poll_answers,
-                               'callback': {'object': 'Conditional',
-                                            'method': 'update'}
+                               'callback': {'objectName': 'Conditional'}
                                })
         return json.dumps({'error': 'Unknown Command!'})
 
