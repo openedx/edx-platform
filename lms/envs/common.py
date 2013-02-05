@@ -545,7 +545,7 @@ STATICFILES_IGNORE_PATTERNS = (
     "coffee/*",
 )
 
-PIPELINE_YUI_BINARY = 'yui-compressor'
+# PIPELINE_YUI_BINARY = 'yui-compressor'
 PIPELINE_SASS_BINARY = 'sass'
 PIPELINE_COFFEE_SCRIPT_BINARY = 'coffee'
 
