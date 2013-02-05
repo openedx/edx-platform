@@ -74,14 +74,25 @@
         margin: 0 0 ($baseline/2) 0;
         border-bottom: 1px solid $blue-l1;
         padding: 0;
-        font-weight: 600;
+        font-weight: 500;
         color: $white;
+      }
+
+      .logo {
+        @include text-hide();
+        position: relative;
+        top: 3px;
+        display: inline-block;
+        vertical-align: baseline;
+        width: 282px;
+        height: 57px;
+        background: transparent url('../img/logo-edx-studio-white.png') 0 0 no-repeat;
       }
 
       .tagline {
         @include font-size(24);
         margin: 0;
-        color: $white;
+        color: $blue-l3;
       }
     }
 
@@ -377,6 +388,8 @@
       img {
         @include box-sizing(border-box);
         width: 100%;
+        max-height: 50%;
+        overflow-y: scroll;
         padding: ($baseline/10);
         border: 1px solid $gray-l4;
       }
