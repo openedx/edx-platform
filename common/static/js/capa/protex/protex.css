@@ -2,6 +2,10 @@
    background-color: #BBBBBB;
 }
 
+.protex-canvas {
+	outline: none;
+}
+
 .protex-caption-panel {
 	padding: 10px 10px 10px 10px;
 	margin: 0px 0px 0px 0px;
