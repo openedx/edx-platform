@@ -4,14 +4,14 @@ var $gwt_version = "2.5.0";
 var $wnd = parent;
 var $doc = $wnd.document;
 var $moduleName, $moduleBase;
-var $strongName = 'C6CC2FE28A276F9AD839FEB4866C99F7';
+var $strongName = 'E8EDF03FE9C26D69E2C7DB17E15CF0ED';
 var $stats = $wnd.__gwtStatsEvent ? function(a) {return $wnd.__gwtStatsEvent(a);} : null,
 $sessionId = $wnd.__gwtStatsSessionId ? $wnd.__gwtStatsSessionId : null;
 $stats && $stats({moduleName:'jsmolcalc',sessionId:$sessionId,subSystem:'startup',evtGroup:'moduleStartup',millis:(new Date()).getTime(),type:'moduleEvalStart'});
 </script></head>
 <body>
 <script><!--
-var _, seedTable = {}, Q$Object = 0, Q$String = 1, Q$LongLibBase$LongEmul = 2, Q$Atom = 3, Q$JsMolCalcAPI$Task = 4, Q$Target = 5, Q$int_$1 = 6, Q$Serializable = 7, Q$CharSequence = 8, Q$Comparable = 9, Q$StackTraceElement = 10, Q$Throwable = 11, Q$List = 12, Q$Map = 13, Q$Map$Entry = 14, Q$Set = 15, Q$Exportable = 16, CM$ = {};
+var _, seedTable = {}, Q$Object = 0, Q$String = 1, Q$LongLibBase$LongEmul = 2, Q$JsMolCalc$Atom = 3, Q$int_$1 = 4, Q$Serializable = 5, Q$CharSequence = 6, Q$Comparable = 7, Q$StackTraceElement = 8, Q$Throwable = 9, Q$List = 10, Q$Map = 11, Q$Map$Entry = 12, Q$Set = 13, Q$Exportable = 14, CM$ = {};
 function newSeed(id){
   return new seedTable[id];
 }
@@ -87,11 +87,6 @@ _.e = null;
 function equals__devirtual$(this$static, other){
   var maybeJsoInvocation;
   return maybeJsoInvocation = this$static , isJavaObject(maybeJsoInvocation)?maybeJsoInvocation.equals$(other):maybeJsoInvocation === other;
-}
-
-function getClass__devirtual$(this$static){
-  var maybeJsoInvocation;
-  return maybeJsoInvocation = this$static , isJavaObject(maybeJsoInvocation)?maybeJsoInvocation.___clazz$:Lcom_google_gwt_core_client_JavaScriptObject_2_classLit;
 }
 
 function hashCode__devirtual$(this$static){
@@ -234,46 +229,14 @@ defineSeed(14, 12, {}, SchedulerImpl_0);
 _.entryCommands = null;
 _.finallyCommands = null;
 var INSTANCE;
-function extractNameFromToString(fnToString){
-  var index, start, toReturn;
-  toReturn = '';
-  fnToString = $trim(fnToString);
-  index = fnToString.indexOf('(');
-  start = fnToString.indexOf('function') == 0?8:0;
-  if (index == -1) {
-    index = $indexOf(fnToString, String.fromCharCode(64));
-    start = fnToString.indexOf('function ') == 0?9:0;
-  }
-  index != -1 && (toReturn = $trim(fnToString.substr(start, index - start)));
-  return toReturn.length > 0?toReturn:'anonymous';
-}
-
-function $collect(this$static){
-  var seen = {};
-  var toReturn = [];
-  var callee = arguments.callee.caller.caller;
-  while (callee) {
-    var name_0 = this$static.extractName(callee.toString());
-    toReturn.push(name_0);
-    var keyName = ':' + name_0;
-    var withThisName = seen[keyName];
-    if (withThisName) {
-      var i, j;
-      for (i = 0 , j = withThisName.length; i < j; i++) {
-        if (withThisName[i] === callee) {
-          return toReturn;
-        }
-      }
-    }
-    (withThisName || (seen[keyName] = [])).push(callee);
-    callee = callee.caller;
-  }
-  return toReturn;
+function splice(arr, length_0){
+  arr.length >= length_0 && arr.splice(0, length_0);
+  return arr;
 }
 
 function $createStackTrace(e){
   var i, j, stack, stackTrace;
-  stack = (instanceOfJso(e.e)?dynamicCastJso(e.e):null , []);
+  stack = $inferFrom(instanceOfJso(e.e)?dynamicCastJso(e.e):null);
   stackTrace = initDim(_3Ljava_lang_StackTraceElement_2_classLit, makeCastMap([Q$Serializable]), Q$StackTraceElement, stack.length, 0);
   for (i = 0 , j = stackTrace.length; i < j; ++i) {
     stackTrace[i] = new StackTraceElement_0(stack[i]);
@@ -283,7 +246,7 @@ function $createStackTrace(e){
 
 function $fillInStackTrace(){
   var i, j, stack, stackTrace;
-  stack = $collect(new StackTraceCreator$Collector_0);
+  stack = splice($inferFrom($makeException()), 3);
   stackTrace = initDim(_3Ljava_lang_StackTraceElement_2_classLit, makeCastMap([Q$Serializable]), Q$StackTraceElement, stack.length, 0);
   for (i = 0 , j = stackTrace.length; i < j; ++i) {
     stackTrace[i] = new StackTraceElement_0(stack[i]);
@@ -291,56 +254,60 @@ function $fillInStackTrace(){
   $setStackTrace(stackTrace);
 }
 
-function StackTraceCreator$Collector_0(){
+function $makeException(){
+  try {
+    null.a();
+  }
+   catch (e) {
+    return e;
+  }
 }
 
-defineSeed(17, 1, {}, StackTraceCreator$Collector_0);
-_.extractName = function extractName(fnToString){
-  return extractNameFromToString(fnToString);
-}
-;
-function $append(a, x){
-  a[a.explicitLength++] = x == null?'null':x;
-}
-
-function $appendNonNull(a, x){
-  a[a.explicitLength++] = x;
+function $inferFrom(e){
+  var i, j, stack;
+  stack = $getStack(e);
+  for (i = 0 , j = stack.length; i < j; ++i) {
+    stack[i] = stack[i].length == 0?'anonymous':stack[i];
+  }
+  return stack;
 }
 
-function $createData(){
-  var array = [];
-  array.explicitLength = 0;
-  return array;
+function $getStack(e){
+  var i, i2, idx, j, toReturn;
+  toReturn = e && e.message?e.message.split('\n'):[];
+  for (i = 0 , i2 = 0 , j = toReturn.length; i2 < j; ++i , i2 += 2) {
+    idx = toReturn[i2].lastIndexOf('function ');
+    idx == -1?(toReturn[i] = '' , undefined):(toReturn[i] = $trim($substring(toReturn[i2], idx + 9)) , undefined);
+  }
+  toReturn.length = i;
+  return toReturn;
 }
 
-function $replace(a, start, end, toInsert){
-  var s;
-  s = $takeString(a);
-  $appendNonNull(a, s.substr(0, start - 0));
-  a[a.explicitLength++] = toInsert == null?'null':toInsert;
-  $appendNonNull(a, $substring(s, end));
+defineSeed(20, 1, {});
+function $append(this$static, x){
+  this$static.string += x;
 }
 
-function $takeString(a){
-  var s = a.join('');
-  a.length = a.explicitLength = 0;
-  return s;
+function $appendNonNull(this$static, x){
+  this$static.string += x;
 }
 
-function $toString(a){
-  var s;
-  s = $takeString(a);
-  $appendNonNull(a, s);
-  return s;
+function $replace(this$static, start, end, toInsert){
+  this$static.string = $substring_0(this$static.string, 0, start) + toInsert + $substring(this$static.string, end);
 }
 
+function StringBufferImplAppend_0(){
+}
+
+defineSeed(21, 20, {}, StringBufferImplAppend_0);
+_.string = '';
 function $getDefaultNative(){
   return ['USD', 'US$', 2, 'US$', '$'];
 }
 
 function $clinit_LocaleInfo(){
   $clinit_LocaleInfo = nullMethod;
-  instance_0 = new LocaleInfo_0;
+  instance = new LocaleInfo_0;
 }
 
 function $getNumberConstants(this$static){
@@ -351,31 +318,31 @@ function $getNumberConstants(this$static){
 function LocaleInfo_0(){
 }
 
-defineSeed(24, 1, {}, LocaleInfo_0);
+defineSeed(26, 1, {}, LocaleInfo_0);
 _.numberConstants = null;
-var instance_0;
+var instance;
 function $clinit_NumberFormat(){
   $clinit_NumberFormat = nullMethod;
-  $getNumberConstants(($clinit_LocaleInfo() , $clinit_LocaleInfo() , instance_0));
+  $getNumberConstants(($clinit_LocaleInfo() , $clinit_LocaleInfo() , instance));
 }
 
 function $addExponent(this$static, digits){
   var exponentDigits, i;
-  $append(digits.data, 'E');
+  digits.impl.string += 'E';
   if (this$static.exponent < 0) {
     this$static.exponent = -this$static.exponent;
-    $append(digits.data, '-');
+    digits.impl.string += '-';
   }
   exponentDigits = '' + this$static.exponent;
   for (i = exponentDigits.length; i < this$static.minExponentDigits; ++i) {
-    $appendNonNull(digits.data, '0');
+    digits.impl.string += '0';
   }
-  $append(digits.data, exponentDigits);
+  $append(digits.impl, exponentDigits);
 }
 
 function $addZeroAndDecimal(this$static, digits){
   if (this$static.digitsLength == 0) {
-    $replace(digits.data, 0, 0, '0');
+    $replace(digits.impl, 0, 0, '0');
     ++this$static.decimalPosition;
     ++this$static.digitsLength;
   }
@@ -390,18 +357,18 @@ function $adjustFractionDigits(this$static, digits){
   requiredDigits = this$static.decimalPosition + this$static.minimumFractionDigits;
   if (this$static.digitsLength < requiredDigits) {
     while (this$static.digitsLength < requiredDigits) {
-      $appendNonNull(digits.data, '0');
+      digits.impl.string += '0';
       ++this$static.digitsLength;
     }
   }
    else {
     toRemove = this$static.decimalPosition + this$static.maximumFractionDigits;
     toRemove > this$static.digitsLength && (toRemove = this$static.digitsLength);
-    while (toRemove > requiredDigits && $charAt($toString(digits.data), toRemove - 1) == 48) {
+    while (toRemove > requiredDigits && $charAt(digits.impl.string, toRemove - 1) == 48) {
       --toRemove;
     }
     if (toRemove < this$static.digitsLength) {
-      $delete(digits, toRemove, this$static.digitsLength);
+      $delete_0(digits, toRemove, this$static.digitsLength);
       this$static.digitsLength = toRemove;
     }
   }
@@ -410,11 +377,11 @@ function $adjustFractionDigits(this$static, digits){
 function $computeExponent(this$static, digits){
   var remainder, strip;
   strip = 0;
-  while (strip < this$static.digitsLength - 1 && $charAt($toString(digits.data), strip) == 48) {
+  while (strip < this$static.digitsLength - 1 && $charAt(digits.impl.string, strip) == 48) {
     ++strip;
   }
   if (strip > 0) {
-    $replace(digits.data, 0, strip, '');
+    $replace(digits.impl, 0, strip, '');
     this$static.digitsLength -= strip;
     this$static.exponent -= strip;
   }
@@ -429,7 +396,7 @@ function $computeExponent(this$static, digits){
     this$static.exponent += this$static.decimalPosition - this$static.minimumIntegerDigits;
     this$static.decimalPosition = this$static.minimumIntegerDigits;
   }
-  if (this$static.digitsLength == 1 && $toString(digits.data).charCodeAt(0) == 48) {
+  if (this$static.digitsLength == 1 && digits.impl.string.charCodeAt(0) == 48) {
     this$static.exponent = 0;
     this$static.decimalPosition = this$static.minimumIntegerDigits;
   }
@@ -445,20 +412,20 @@ function $format(this$static, number){
   buf = new StringBuilder_0;
   if (!isFinite(number)) {
     $append_1(buf, isNegative?this$static.negativePrefix:this$static.positivePrefix);
-    $append(buf.data, '\u221E');
+    buf.impl.string += '\u221E';
     $append_1(buf, isNegative?this$static.negativeSuffix:this$static.positiveSuffix);
-    return $toString(buf.data);
+    return buf.impl.string;
   }
   number *= this$static.multiplier;
   scale = toScaledString(buf, number);
-  preRound = $toString(buf.data).length + scale + this$static.maximumFractionDigits + 3;
-  if (preRound > 0 && preRound < $toString(buf.data).length && $charAt($toString(buf.data), preRound) == 57) {
+  preRound = buf.impl.string.length + scale + this$static.maximumFractionDigits + 3;
+  if (preRound > 0 && preRound < buf.impl.string.length && $charAt(buf.impl.string, preRound) == 57) {
     $propagateCarry(this$static, buf, preRound - 1);
-    scale += $toString(buf.data).length - preRound;
-    $delete(buf, preRound, $toString(buf.data).length);
+    scale += buf.impl.string.length - preRound;
+    $delete_0(buf, preRound, buf.impl.string.length);
   }
   this$static.exponent = 0;
-  this$static.digitsLength = $toString(buf.data).length;
+  this$static.digitsLength = buf.impl.string.length;
   this$static.decimalPosition = this$static.digitsLength + scale;
   useExponent = this$static.useExponentialNotation;
   currentGroupingSize = this$static.groupingSize;
@@ -472,7 +439,7 @@ function $format(this$static, number){
   useExponent && $addExponent(this$static, buf);
   $insert(buf, 0, isNegative?this$static.negativePrefix:this$static.positivePrefix);
   $append_1(buf, isNegative?this$static.negativeSuffix:this$static.positiveSuffix);
-  return $toString(buf.data);
+  return buf.impl.string;
 }
 
 function $insertGroupingSeparators(this$static, digits, g){
@@ -488,7 +455,7 @@ function $insertGroupingSeparators(this$static, digits, g){
 
 function $parseAffix(this$static, pattern, start, affix, inNegativePattern){
   var ch, inQuote, len, pos;
-  $replace_0(affix, $toString(affix.data).length);
+  $delete(affix, affix.impl.string.length);
   inQuote = false;
   len = pattern.length;
   for (pos = start; pos < len; ++pos) {
@@ -496,7 +463,7 @@ function $parseAffix(this$static, pattern, start, affix, inNegativePattern){
     if (ch == 39) {
       if (pos + 1 < len && pattern.charCodeAt(pos + 1) == 39) {
         ++pos;
-        $append(affix.data, "'");
+        affix.impl.string += "'";
       }
        else {
         inQuote = !inQuote;
@@ -504,7 +471,7 @@ function $parseAffix(this$static, pattern, start, affix, inNegativePattern){
       continue;
     }
     if (inQuote) {
-      $appendNonNull(affix.data, String.fromCharCode(ch));
+      $appendNonNull(affix.impl, String.fromCharCode(ch));
     }
      else {
       switch (ch) {
@@ -539,7 +506,7 @@ function $parseAffix(this$static, pattern, start, affix, inNegativePattern){
             this$static.multiplier = 100;
           }
 
-          $append(affix.data, '%');
+          affix.impl.string += '%';
           break;
         case 8240:
           if (!inNegativePattern) {
@@ -549,12 +516,12 @@ function $parseAffix(this$static, pattern, start, affix, inNegativePattern){
             this$static.multiplier = 1000;
           }
 
-          $append(affix.data, '\u2030');
+          affix.impl.string += '\u2030';
           break;
         case 45:
-          $append(affix.data, '-');
+          affix.impl.string += '-';
           break;
-        default:$appendNonNull(affix.data, String.fromCharCode(ch));
+        default:$appendNonNull(affix.impl, String.fromCharCode(ch));
       }
     }
   }
@@ -566,17 +533,17 @@ function $parsePattern(this$static, pattern){
   pos = 0;
   affix = new StringBuffer_0;
   pos += $parseAffix(this$static, pattern, 0, affix, false);
-  this$static.positivePrefix = $toString(affix.data);
+  this$static.positivePrefix = affix.impl.string;
   pos += $parseTrunk(this$static, pattern, pos, false);
   pos += $parseAffix(this$static, pattern, pos, affix, false);
-  this$static.positiveSuffix = $toString(affix.data);
+  this$static.positiveSuffix = affix.impl.string;
   if (pos < pattern.length && pattern.charCodeAt(pos) == 59) {
     ++pos;
     pos += $parseAffix(this$static, pattern, pos, affix, true);
-    this$static.negativePrefix = $toString(affix.data);
+    this$static.negativePrefix = affix.impl.string;
     pos += $parseTrunk(this$static, pattern, pos, true);
     pos += $parseAffix(this$static, pattern, pos, affix, true);
-    this$static.negativeSuffix = $toString(affix.data);
+    this$static.negativeSuffix = affix.impl.string;
   }
    else {
     this$static.negativePrefix = '-' + this$static.positivePrefix;
@@ -677,7 +644,7 @@ function $processLeadingZeros(this$static, digits){
   var i, prefix, strip;
   if (this$static.decimalPosition > this$static.digitsLength) {
     while (this$static.digitsLength < this$static.decimalPosition) {
-      $appendNonNull(digits.data, '0');
+      digits.impl.string += '0';
       ++this$static.digitsLength;
     }
   }
@@ -685,22 +652,22 @@ function $processLeadingZeros(this$static, digits){
     if (this$static.decimalPosition < this$static.minimumIntegerDigits) {
       prefix = new StringBuilder_0;
       while (this$static.decimalPosition < this$static.minimumIntegerDigits) {
-        $appendNonNull(prefix.data, '0');
+        prefix.impl.string += '0';
         ++this$static.decimalPosition;
         ++this$static.digitsLength;
       }
-      $insert(digits, 0, $toString(prefix.data));
+      $insert(digits, 0, prefix.impl.string);
     }
      else if (this$static.decimalPosition > this$static.minimumIntegerDigits) {
       strip = this$static.decimalPosition - this$static.minimumIntegerDigits;
       for (i = 0; i < strip; ++i) {
-        if ($charAt($toString(digits.data), i) != 48) {
+        if ($charAt(digits.impl.string, i) != 48) {
           strip = i;
           break;
         }
       }
       if (strip > 0) {
-        $replace(digits.data, 0, strip, '');
+        $replace(digits.impl, 0, strip, '');
         this$static.digitsLength -= strip;
         this$static.decimalPosition -= strip;
       }
@@ -712,7 +679,7 @@ function $propagateCarry(this$static, digits, i){
   var carry, digit;
   carry = true;
   while (carry && i >= 0) {
-    digit = $charAt($toString(digits.data), i);
+    digit = $charAt(digits.impl.string, i);
     if (digit == 57) {
       $setCharAt(digits, i--, 48);
     }
@@ -722,7 +689,7 @@ function $propagateCarry(this$static, digits, i){
     }
   }
   if (carry) {
-    $replace(digits.data, 0, 0, '1');
+    $replace(digits.impl, 0, 0, '1');
     ++this$static.decimalPosition;
     ++this$static.digitsLength;
   }
@@ -756,26 +723,26 @@ function NumberFormat_1(cdata){
 
 function toScaledString(buf, val){
   var dot, expDigits, expIdx, scale, startLen;
-  startLen = $toString(buf.data).length;
+  startLen = buf.impl.string.length;
   $append_1(buf, val.toPrecision(20));
   scale = 0;
-  expIdx = $indexOf_0($toString(buf.data), 'e', startLen);
-  expIdx < 0 && (expIdx = $indexOf_0($toString(buf.data), 'E', startLen));
+  expIdx = $indexOf(buf.impl.string, 'e', startLen);
+  expIdx < 0 && (expIdx = $indexOf(buf.impl.string, 'E', startLen));
   if (expIdx >= 0) {
     expDigits = expIdx + 1;
-    expDigits < $toString(buf.data).length && $charAt($toString(buf.data), expDigits) == 43 && ++expDigits;
-    expDigits < $toString(buf.data).length && (scale = __parseAndValidateInt($substring($toString(buf.data), expDigits)));
-    $delete(buf, expIdx, $toString(buf.data).length);
+    expDigits < buf.impl.string.length && $charAt(buf.impl.string, expDigits) == 43 && ++expDigits;
+    expDigits < buf.impl.string.length && (scale = __parseAndValidateInt($substring(buf.impl.string, expDigits)));
+    $delete_0(buf, expIdx, buf.impl.string.length);
   }
-  dot = $indexOf_0($toString(buf.data), '.', startLen);
+  dot = $indexOf(buf.impl.string, '.', startLen);
   if (dot >= 0) {
-    $replace(buf.data, dot, dot + 1, '');
-    scale -= $toString(buf.data).length - dot;
+    $replace(buf.impl, dot, dot + 1, '');
+    scale -= buf.impl.string.length - dot;
   }
   return scale;
 }
 
-defineSeed(25, 1, {}, NumberFormat_1);
+defineSeed(27, 1, {}, NumberFormat_1);
 _.currencyData = null;
 _.decimalPosition = 0;
 _.decimalSeparatorAlwaysShown = false;
@@ -798,7 +765,7 @@ _.useExponentialNotation = false;
 function NumberConstantsImpl__0(){
 }
 
-defineSeed(26, 1, {}, NumberConstantsImpl__0);
+defineSeed(28, 1, {}, NumberConstantsImpl__0);
 function $getSimpleCurrencySymbol(this$static){
   return this$static[4] || this$static[1];
 }
@@ -874,7 +841,7 @@ function setCheck(array, index, value){
   return array[index] = value;
 }
 
-defineSeed(28, 1, {}, Array_0);
+defineSeed(30, 1, {}, Array_0);
 _.queryId$ = 0;
 function $clinit_Array$ExpandoWrapper(){
   $clinit_Array$ExpandoWrapper = nullMethod;
@@ -944,11 +911,10 @@ function init(){
   var runtimeValue;
   !!$stats && onModuleStart('com.google.gwt.useragent.client.UserAgentAsserter');
   runtimeValue = $getRuntimeValue();
-  $equals('ie9', runtimeValue) || ($wnd.alert('ERROR: Possible problem with your *.gwt.xml module file.\nThe compile time user.agent value (ie9) does not match the runtime user.agent value (' + runtimeValue + '). Expect more errors.\n') , undefined);
+  $equals('opera', runtimeValue) || ($wnd.alert('ERROR: Possible problem with your *.gwt.xml module file.\nThe compile time user.agent value (opera) does not match the runtime user.agent value (' + runtimeValue + '). Expect more errors.\n') , undefined);
   !!$stats && onModuleStart('com.google.gwt.user.client.DocumentModeAsserter');
   $onModuleLoad();
   !!$stats && onModuleStart('edu.umb.bio.jsMolCalc.client.JsMolCalcAPI');
-  new TaskExporterImpl_0;
   $clinit_ExporterUtil();
   new ExportAllExporterImpl_0;
 }
@@ -964,8 +930,6 @@ function onModuleStart(mainClassName){
   return $stats({moduleName:$moduleName, sessionId:$sessionId, subSystem:'startup', evtGroup:'moduleStartup', millis:(new Date).getTime(), type:'onModuleLoadStart', className:mainClassName});
 }
 
---></script>
-<script><!--
 function $onModuleLoad(){
   var allowedModes, currentMode, i;
   currentMode = $doc.compatMode;
@@ -978,6 +942,8 @@ function $onModuleLoad(){
   allowedModes.length == 1 && $equals('CSS1Compat', allowedModes[0]) && $equals('BackCompat', currentMode)?"GWT no longer supports Quirks Mode (document.compatMode=' BackCompat').<br>Make sure your application's host HTML page has a Standards Mode (document.compatMode=' CSS1Compat') doctype,<br>e.g. by using &lt;!doctype html&gt; at the start of your application's HTML page.<br><br>To continue using this unsupported rendering mode and risk layout problems, suppress this message by adding<br>the following line to your*.gwt.xml module file:<br>&nbsp;&nbsp;&lt;extend-configuration-property name=\"document.compatMode\" value=\"" + currentMode + '"/&gt;':"Your *.gwt.xml module configuration prohibits the use of the current doucment rendering mode (document.compatMode=' " + currentMode + "').<br>Modify your application's host HTML page doctype, or update your custom 'document.compatMode' configuration property settings.";
 }
 
+--></script>
+<script><!--
 function $getRuntimeValue(){
   var ua = navigator.userAgent.toLowerCase();
   var makeVersion = function(result){
@@ -1022,30 +988,30 @@ function $getRuntimeValue(){
 function $export(){
   if (!exported) {
     exported = true;
-    new InfoExporterImpl_0;
     $export0();
   }
 }
 
 function $export0(){
-  var pkg = declarePackage('jsmol.API');
+  var pkg = ($clinit_ExporterUtil() , $declarePackage('jsmol.API'));
   var __0;
   $wnd.jsmol.API = $entry(function(){
     var g, j = this;
     isAssignableToInstance(Ledu_umb_bio_jsMolCalc_client_JsMolCalcAPI$API_2_classLit, arguments)?(g = arguments[0]):arguments.length == 0 && (g = new JsMolCalcAPI$API_0);
     j.g = g;
-    setWrapper(g, j);
+    g['__gwtex_wrap'] = j;
     return j;
   }
   );
   __0 = $wnd.jsmol.API.prototype = new Object;
-  $wnd.jsmol.API.getInfo = $entry(function(a0, a1, a2){
-    var result;
-    return wrap((result = computeAndDisplay(a0, a1, a2) , new JsMolCalcAPI$Info_0(result.info)));
+  $wnd.jsmol.API.getErrors = $entry(function(a0, a1, a2){
+    var iat, info;
+    return new JsMolCalc_0 , iat = $computeAndDisplay(a0, a1, a2) , info = iat.info , info.indexOf('It is not possible') == 0?info:'';
   }
   );
-  $wnd.jsmol.API.getTasks = $entry(function(a0, a1, a2){
-    return wrap_0(getTasks(a0, a1, a2));
+  $wnd.jsmol.API.getInfo = $entry(function(a0, a1, a2){
+    var iat;
+    return new JsMolCalc_0 , iat = $computeAndDisplay(a0, a1, a2) , iat.info;
   }
   );
   addTypeMap(Ledu_umb_bio_jsMolCalc_client_JsMolCalcAPI$API_2_classLit, $wnd.jsmol.API);
@@ -1058,446 +1024,18 @@ function APIExporterImpl_0(){
   $export();
 }
 
-defineSeed(40, 1, {}, APIExporterImpl_0);
+defineSeed(42, 1, {}, APIExporterImpl_0);
 var exported = false;
-function $getAtomSpec(this$static){
-  var charged;
-  this$static.chargeOffset = 0;
-  this$static.chargeString = '';
-  if ($equals(this$static.element, 'C')) {
-    switch (this$static.hybridization) {
-      case 3:
-        switch (this$static.numNeighborHs) {
-          case 4:
-            return new AtomSpec_0(0.528, 'C: sp3, H4', false, false);
-          case 3:
-            return this$static.numNeighborXs == 0?this$static.numNeighborPi == 0?new AtomSpec_0(0.528, 'C: sp3; C H H H, no pi', false, false):new AtomSpec_0(0.267, 'C: sp3; C H H H, pi', false, false):new AtomSpec_0(-0.032, 'C: sp3; X H H H', false, false);
-          case 2:
-            if (this$static.numNeighborXs == 0) {
-              switch (this$static.numNeighborPi) {
-                case 0:
-                  return new AtomSpec_0(0.358, 'C: sp3; C C H H, no pi', false, false);
-                case 1:
-                  return new AtomSpec_0(-0.008, 'C: sp3; C C H H, 1 pi', false, false);
-                case 2:
-                  return new AtomSpec_0(-0.185, 'C: sp3; C C H H, 2 pi', false, false);
-                default:return new AtomSpec_0(0, 'C: sp3; ? ? H H', false, false);
-              }
-            }
-             else {
-              switch (this$static.numNeighborPi) {
-                case 0:
-                  return new AtomSpec_0(-0.137, 'C: sp3; C X H H, no pi', false, false);
-                case 1:
-                  return new AtomSpec_0(-0.303, 'C: sp3; C X H H, 1 pi', false, false);
-                case 2:
-                  return new AtomSpec_0(-0.815, 'C: sp3; C X H H, 2 pi', false, false);
-                default:return new AtomSpec_0(0, 'C: sp3; ? X H H, H2', false, false);
-              }
-            }
-
-          case 1:
-            if (this$static.numNeighborXs == 0) {
-              switch (this$static.numNeighborPi) {
-                case 0:
-                  return new AtomSpec_0(0.127, 'C: sp3; C C C H, no pi', false, false);
-                case 1:
-                  return new AtomSpec_0(-0.243, 'C: sp3; C C C H, 1 pi', false, false);
-                default:return new AtomSpec_0(-0.499, 'C: sp3; C C C H, >1 pi', false, false);
-              }
-            }
-             else {
-              switch (this$static.numNeighborPi) {
-                case 0:
-                  return new AtomSpec_0(-0.205, 'C: sp3; C C/X X H, no pi', false, false);
-                case 1:
-                  return new AtomSpec_0(-0.305, 'C: sp3; C C/X X H, 1 pi', false, false);
-                default:return new AtomSpec_0(-0.709, 'C: sp3; C C/X X H, >1 pi', false, false);
-              }
-            }
-
-          case 0:
-            if (this$static.numNeighborXs == 0) {
-              switch (this$static.numNeighborPi) {
-                case 0:
-                  return new AtomSpec_0(-0.006, 'C: sp3; C C C C, no pi', false, false);
-                case 1:
-                  return new AtomSpec_0(-0.57, 'C: sp3; C C C C, 1 pi', false, false);
-                default:return new AtomSpec_0(-0.317, 'C: sp3; C C C C, >1 pi', false, false);
-              }
-            }
-             else {
-              switch (this$static.numNeighborPi) {
-                case 0:
-                  return new AtomSpec_0(-0.316, 'C: sp3; C C/X C/X X, no pi', false, false);
-                default:return new AtomSpec_0(-0.723, 'C: sp3; C C/X C/X X, pi', false, false);
-              }
-            }
-
-          default:return new AtomSpec_0(0, 'C: sp3; unknown', false, false);
-        }
-
-      case 2:
-        if (!this$static.aromatic) {
-          switch (this$static.numNeighborHs) {
-            case 2:
-              return new AtomSpec_0(0.42, 'C: sp2; =? H H', false, false);
-            case 1:
-              switch (this$static.numNeighborXs) {
-                case 1:
-                  return this$static.numNeighborPi == 0?new AtomSpec_0(0.001, 'C: sp2; =? X H, no pi', false, false):new AtomSpec_0(-0.31, 'C: sp2; =? X H, 1 pi', false, false);
-                case 0:
-                  return this$static.numNeighborPi == 0?new AtomSpec_0(0.466, 'C: sp2; =? C H, no pi', false, false):new AtomSpec_0(0.136, 'C: sp2; =? C H, 1 pi', false, false);
-                default:return new AtomSpec_0(0, 'C: sp2; =? H, unknown', false, false);
-              }
-
-            case 0:
-              switch (this$static.numNeighborXs) {
-                case 2:
-                  return this$static.numNeighborPi == 0?new AtomSpec_0(0.005, 'C: sp2; =? X X, no pi', false, false):new AtomSpec_0(-0.315, 'C: sp2; =? X X, pi', false, false);
-                case 1:
-                  return this$static.numNeighborPi == 0?new AtomSpec_0(-0.03, 'C: sp2; =? C X, no pi', false, false):new AtomSpec_0(-0.027, 'C: sp2; =? C X, pi', false, false);
-                case 0:
-                  return this$static.numNeighborPi == 0?new AtomSpec_0(0.05, 'C: sp2; =? C C, no pi', false, false):new AtomSpec_0(0.013, 'C: sp2; =? C C, pi', false, false);
-                default:return new AtomSpec_0(0, 'C: sp2; =? C C, unknown', false, false);
-              }
-
-            default:return new AtomSpec_0(0, 'C: sp2; unknown', false, false);
-          }
-        }
-
-        switch (this$static.numNeighborHs) {
-          case 1:
-            return this$static.numNeighborNAro == 0?new AtomSpec_0(0.337, 'C: aromatic; C C H', false, false):new AtomSpec_0(0.126, 'C: aromatic; aro-N C H', false, false);
-          case 0:
-            switch (this$static.numNeighborXs) {
-              case 2:
-                return this$static.numNeighborNAro == 0?new AtomSpec_0(0, 'C: aromatic; unknown C X X', false, false):new AtomSpec_0(0.366, 'C: aromatic; aro-N C X', false, false);
-              case 1:
-                return this$static.numNeighborNAro == 0?new AtomSpec_0(-0.151, 'C: aromatic; C C X', false, false):new AtomSpec_0(0.174, 'C: aromatic; aro-N C C', false, false);
-              case 0:
-                return new AtomSpec_0(0.296, 'C: aromatic; C C C', false, false);
-              default:return new AtomSpec_0(0, 'C: aromatic; unknown', false, false);
-            }
-
-          default:return new AtomSpec_0(0, 'C: aromatic; unknown', false, false);
-        }
-
-      case 1:
-        if (this$static.isAnAllene)
-          return new AtomSpec_0(2.073, 'C: =C=', false, false);
-        return this$static.numNeighborHs == 0?new AtomSpec_0(0.33, 'C: sp; ? ?', false, false):new AtomSpec_0(0.209, 'C: sp; ? H', false, false);
-      default:return new AtomSpec_0(0, 'C: unknown', false, false);
-    }
-  }
-  if ($equals(this$static.element, 'N')) {
-    charged = false;
-    if (this$static.charge == 1) {
-      charged = true;
-      if (this$static.aromatic) {
-        this$static.chargeOffset = -1;
-        this$static.chargeString = ' (N+Aro)';
-      }
-       else {
-        switch (this$static.numNeighborCs) {
-          case 4:
-            this$static.chargeOffset = -4.5;
-            this$static.chargeString = ' (N+quat)';
-            break;
-          case 3:
-            this$static.chargeOffset = -3;
-            this$static.chargeString = ' (N+tert)';
-            break;
-          case 2:
-            this$static.chargeOffset = -2.5;
-            this$static.chargeString = ' (N+sec)';
-            break;
-          case 1:
-            this$static.chargeOffset = -2;
-            this$static.chargeString = ' (N+pri)';
-            break;
-          default:this$static.chargeOffset = 0;
-            this$static.chargeString = ' (N+???)';
-        }
-      }
-    }
-    if (this$static.amide) {
-      switch (this$static.numNeighborHs) {
-        case 2:
-          return new AtomSpec_0(-0.646 + this$static.chargeOffset, 'N: amide; C=O H H' + this$static.chargeString, true, charged);
-        case 1:
-          return this$static.numNeighborXs == 0?new AtomSpec_0(-0.096 + this$static.chargeOffset, 'N: amide; C=O C H' + this$static.chargeString, true, charged):new AtomSpec_0(-0.044 + this$static.chargeOffset, 'N: amide; C=O X H' + this$static.chargeString, true, charged);
-        case 0:
-          return this$static.numNeighborXs == 0?new AtomSpec_0(0.078 + this$static.chargeOffset, 'N: amide; C=O C C' + this$static.chargeString, !charged, charged):new AtomSpec_0(-0.118 + this$static.chargeOffset, 'N: amide; C=O C X' + this$static.chargeString, !charged, charged);
-      }
-    }
-    switch (this$static.hybridization) {
-      case 3:
-        switch (this$static.numNeighborHs) {
-          case 2:
-            if (this$static.numNeighborXs != 0)
-              return new AtomSpec_0(-1.082 + this$static.chargeOffset, 'N: sp3; X H H' + this$static.chargeString, true, charged);
-            return this$static.numNeighborPi == 0?new AtomSpec_0(-0.534 + this$static.chargeOffset, 'N: sp3; C H H, no pi' + this$static.chargeString, true, charged):new AtomSpec_0(-0.329 + this$static.chargeOffset, 'N: sp3; C H H, pi' + this$static.chargeString, true, charged);
-          case 1:
-            if (this$static.numNeighborXs != 0)
-              return new AtomSpec_0(0.324 + this$static.chargeOffset, 'N: sp3; C X H' + this$static.chargeString, true, charged);
-            return this$static.numNeighborPi == 0?new AtomSpec_0(-0.112 + this$static.chargeOffset, 'N: sp3; C C H, no pi' + this$static.chargeString, true, charged):new AtomSpec_0(0.166 + this$static.chargeOffset, 'N: sp3; C C H, pi' + this$static.chargeString, true, charged);
-          case 0:
-            if (this$static.numNeighborXs != 0)
-              return new AtomSpec_0(-0.239 + this$static.chargeOffset, 'N: sp3; C C X' + this$static.chargeString, !charged, charged);
-            return this$static.numNeighborPi == 0?new AtomSpec_0(0.159 + this$static.chargeOffset, 'N: sp3; C C C, no pi' + this$static.chargeString, !charged, charged):new AtomSpec_0(0.761 + this$static.chargeOffset, 'N: sp3; C C C, pi' + this$static.chargeString, !charged, charged);
-          default:return new AtomSpec_0(this$static.chargeOffset, 'N: sp3; unknown' + this$static.chargeString, true, charged);
-        }
-
-      case 2:
-        if (this$static.aromatic) {
-          return new AtomSpec_0(-0.493 + this$static.chargeOffset, 'N: aromatic' + this$static.chargeString, !charged, charged);
-        }
-
-        if ($equals(this$static.doubleBondedNeighbor, 'C')) {
-          return this$static.numNeighborXs == 0?this$static.numNeighborPi == 0?this$static.numNeighborHs == 0?new AtomSpec_0(0.007 + this$static.chargeOffset, 'N: sp2; =C ? no H, no pi' + this$static.chargeString, !charged, charged):new AtomSpec_0(0.007 + this$static.chargeOffset, 'N: sp2; =C ? H, no pi' + this$static.chargeString, true, charged):this$static.numNeighborHs == 0?new AtomSpec_0(-0.275 + this$static.chargeOffset, 'N: sp2; =C ? no H, pi' + this$static.chargeString, !charged, charged):new AtomSpec_0(-0.275 + this$static.chargeOffset, 'N: sp2; =C ? H, pi' + this$static.chargeString, true, charged):this$static.numNeighborPi == 0?this$static.numNeighborHs == 0?new AtomSpec_0(0.366 + this$static.chargeOffset, 'N: sp2; =C X no H, no pi' + this$static.chargeString, !charged, charged):new AtomSpec_0(0.366 + this$static.chargeOffset, 'N: sp2; =C X H, no pi' + this$static.chargeString, true, charged):this$static.numNeighborHs == 0?new AtomSpec_0(0.251 + this$static.chargeOffset, 'N: sp2; =C X no H, pi' + this$static.chargeString, !charged, charged):new AtomSpec_0(0.251 + this$static.chargeOffset, 'N: sp2; =C X H, pi' + this$static.chargeString, true, charged);
-        }
-
-        if ($equals(this$static.doubleBondedNeighbor, 'N')) {
-          return this$static.numNeighborXs == 1?this$static.numNeighborHs == 0?new AtomSpec_0(0.536 + this$static.chargeOffset, 'N: sp2; =N ? no H' + this$static.chargeString, !charged, charged):new AtomSpec_0(0.536 + this$static.chargeOffset, 'N: sp2; =N ? H' + this$static.chargeString, true, charged):this$static.numNeighborHs == 0?new AtomSpec_0(-0.597 + this$static.chargeOffset, 'N: sp2; =N X no H' + this$static.chargeString, !charged, charged):new AtomSpec_0(-0.597 + this$static.chargeOffset, 'N: sp2; =N X H' + this$static.chargeString, true, charged);
-        }
-
-        if ($equals(this$static.doubleBondedNeighbor, 'O'))
-          return new AtomSpec_0(0.427 + this$static.chargeOffset, 'N: nitroso' + this$static.chargeString, true, charged);
-        if (this$static.numNeighborXs != 0)
-          return new AtomSpec_0(0.427, 'N: sp2; =? ?', true, charged);
-        return new AtomSpec_0(this$static.chargeOffset, 'N: sp2; unknown' + this$static.chargeString, true, charged);
-      case 1:
-        return $equals(this$static.doubleBondedNeighbor, 'O2')?new AtomSpec_0(1.178, 'N: nitro', true, false):this$static.numNeighborHs == 0?new AtomSpec_0(-0.566 + this$static.chargeOffset, 'N: sp no H' + this$static.chargeString, !charged, charged):new AtomSpec_0(-0.566 + this$static.chargeOffset, 'N: sp H' + this$static.chargeString, true, charged);
-      default:return new AtomSpec_0(this$static.chargeOffset, 'N: unknown' + this$static.chargeString, true, charged);
-    }
-  }
-  if ($equals(this$static.element, 'O')) {
-    charged = false;
-    if (this$static.charge == -1) {
-      charged = true;
-      this$static.chargeOffset = -3.5;
-      this$static.chargeString = ' (-)';
-    }
-    switch (this$static.hybridization) {
-      case 3:
-        switch (this$static.numNeighborHs) {
-          case 1:
-            if (this$static.numNeighborXs != 0)
-              return new AtomSpec_0(-0.522 + this$static.chargeOffset, 'O: sp3; X H' + this$static.chargeString, true, charged);
-            return this$static.numNeighborPi == 0?new AtomSpec_0(-0.467 + this$static.chargeOffset, 'O: sp3; C H, no pi' + this$static.chargeString, true, charged):new AtomSpec_0(0.082 + this$static.chargeOffset, 'O: sp3; C H, pi' + this$static.chargeString, true, charged);
-          case 0:
-            if (this$static.numNeighborXs != 0)
-              return new AtomSpec_0(0.105 + this$static.chargeOffset, 'O: sp3; C X' + this$static.chargeString, true, charged);
-            return this$static.numNeighborPi == 0?new AtomSpec_0(0.084 + this$static.chargeOffset, 'O: sp3; C C, no pi' + this$static.chargeString, true, charged):new AtomSpec_0(0.435 + this$static.chargeOffset, 'O: sp3; C C, pi' + this$static.chargeString, true, charged);
-          default:return new AtomSpec_0(this$static.chargeOffset, 'O: sp3; unknown' + this$static.chargeString, true, charged);
-        }
-
-      case 2:
-        return new AtomSpec_0(-0.399 + this$static.chargeOffset, 'O: sp2' + this$static.chargeString, true, charged);
-      default:return new AtomSpec_0(this$static.chargeOffset, 'O: unknown' + this$static.chargeString, true, charged);
-    }
-  }
-  if ($equals(this$static.element, 'S')) {
-    charged = false;
-    if (this$static.charge == -1) {
-      this$static.chargeOffset = -0.75;
-      this$static.chargeString = ' (-)';
-      charged = true;
-    }
-    switch (this$static.hybridization) {
-      case 3:
-        return this$static.numNeighborHs == 0?new AtomSpec_0(0.255 + this$static.chargeOffset, 'S: sp3; C/X C/X' + this$static.chargeString, false, charged):new AtomSpec_0(0.419 + this$static.chargeOffset, 'S: sp3; C/X H' + this$static.chargeString, false, charged);
-      case 2:
-        return $equals(this$static.doubleBondedNeighbor, 'O')?new AtomSpec_0(-1.375, 'S: sulfoxide', false, charged):new AtomSpec_0(-0.148 + this$static.chargeOffset, 'S: sp2' + this$static.chargeString, false, charged);
-      case 1:
-        if ($equals(this$static.doubleBondedNeighbor, 'O2')) {
-          return new AtomSpec_0(-0.168, 'S: sulfone', false, charged);
-        }
-
-      default:return new AtomSpec_0(this$static.chargeOffset, 'S: unknown' + this$static.chargeString, false, charged);
-    }
-  }
-  if ($equals(this$static.element, 'P') && this$static.hybridization == 2) {
-    if ($equals(this$static.doubleBondedNeighbor, 'O')) {
-      return new AtomSpec_0(-0.447, 'P: in phosphate', false, false);
-    }
-    if ($equals(this$static.doubleBondedNeighbor, 'S')) {
-      return new AtomSpec_0(1.253, 'P: in thio-phosphate', false, false);
-    }
-    return new AtomSpec_0(0, 'P: unknown', false, false);
-  }
-  if ($equals(this$static.element, 'F')) {
-    return this$static.numNeighborPi == 0?new AtomSpec_0(0.375, 'F; no pi', false, false):new AtomSpec_0(0.202, 'F; pi', false, false);
-  }
-  if ($equals(this$static.element, 'Cl')) {
-    return this$static.numNeighborPi == 0?new AtomSpec_0(0.512, 'Cl; no pi', false, false):new AtomSpec_0(0.663, 'Cl; pi', false, false);
-  }
-  if ($equals(this$static.element, 'Br')) {
-    return this$static.numNeighborPi == 0?new AtomSpec_0(0.85, 'Br; no pi', false, false):new AtomSpec_0(0.839, 'Br; pi', false, false);
-  }
-  if ($equals(this$static.element, 'I')) {
-    return this$static.numNeighborPi == 0?new AtomSpec_0(1.05, 'I; no pi', false, false):new AtomSpec_0(1.109, 'I; pi', false, false);
-  }
-  return new AtomSpec_0(0, 'unknown atom', false, false);
-}
-
-function $getNumNeighborHs(this$static){
-  if ($equals(this$static.element, 'C')) {
-    this$static.numNeighborHs = this$static.hybridization + 1 - this$static.numNeighborCs - this$static.numNeighborXs;
-    return this$static.numNeighborHs;
-  }
-  if ($equals(this$static.element, 'N')) {
-    this$static.numNeighborHs = this$static.hybridization - this$static.numNeighborCs - this$static.numNeighborXs + this$static.charge;
-    return this$static.numNeighborHs;
-  }
-  if ($equals(this$static.element, 'O') || $equals(this$static.element, 'S')) {
-    this$static.numNeighborHs = this$static.hybridization - 1 - this$static.numNeighborCs - this$static.numNeighborXs + this$static.charge;
-    return this$static.numNeighborHs;
-  }
-  this$static.numNeighborHs = 1 - this$static.numNeighborCs - this$static.numNeighborXs;
-  return this$static.numNeighborHs;
-}
-
-function $processNeighbor(this$static, element, bondIndex, aromatic){
-  $equals(element, 'O') && bondIndex == 2 && (this$static.isACarbonyl = true);
-  aromatic && ++this$static.numNeighborAro;
-  $equals(element, 'N') && aromatic && ++this$static.numNeighborNAro;
-  bondIndex == 2 && ($equals(this$static.doubleBondedNeighbor, 'O')?(this$static.doubleBondedNeighbor = 'O2'):(this$static.doubleBondedNeighbor = element));
-  if ($equals(element, 'C')) {
-    ++this$static.numNeighborCs;
-    return;
-  }
-  ($equals(element, 'N') || $equals(element, 'O') || $equals(element, 'S') || $equals(element, 'Cl') || $equals(element, 'F') || $equals(element, 'Br') || $equals(element, 'I')) && ++this$static.numNeighborXs;
-  return;
-}
-
-function $updateHybridization(this$static, bondIndex){
-  if (this$static.isAnAllene) {
-    return;
-  }
-  if (bondIndex == 2 && this$static.alreadyHasOneDoubleBond) {
-    this$static.isAnAllene = true;
-    this$static.currentMaxBondIndex = 3;
-    this$static.hybridization = 1;
-    return;
-  }
-  bondIndex == 2 && (this$static.alreadyHasOneDoubleBond = true);
-  if (bondIndex > this$static.currentMaxBondIndex) {
-    this$static.currentMaxBondIndex = bondIndex;
-    this$static.hybridization = 4 - this$static.currentMaxBondIndex;
-  }
-}
-
-function Atom_0(){
-  this.element = '';
-  this.charge = 0;
-  this.aromatic = false;
-  this.amide = false;
-  this.isACarbonyl = false;
-  this.doubleBondedNeighbor = '';
-  this.numNeighborHs = 0;
-  this.numNeighborCs = 0;
-  this.numNeighborXs = 0;
-  this.hybridization = 3;
-  this.numNeighborPi = 0;
-  this.numNeighborNAro = 0;
-  this.numNeighborAro = 0;
-  this.chargeOffset = 0;
-  this.chargeString = '';
-  this.alreadyHasOneDoubleBond = false;
-  this.isAnAllene = false;
-  this.currentMaxBondIndex = 0;
-}
-
-defineSeed(41, 1, makeCastMap([Q$Atom]), Atom_0);
-_.alreadyHasOneDoubleBond = false;
-_.amide = false;
-_.aromatic = false;
-_.charge = 0;
-_.chargeOffset = 0;
-_.chargeString = null;
-_.currentMaxBondIndex = 0;
-_.doubleBondedNeighbor = null;
-_.element = null;
-_.hybridization = 0;
-_.isACarbonyl = false;
-_.isAnAllene = false;
-_.numNeighborAro = 0;
-_.numNeighborCs = 0;
-_.numNeighborHs = 0;
-_.numNeighborNAro = 0;
-_.numNeighborPi = 0;
-_.numNeighborXs = 0;
-function AtomSpec_0(logp, type, canMakeHbonds, canMakeIonicBonds){
-  this.type = type;
-  this.logp = logp;
-  this.canMakeHbonds = canMakeHbonds;
-  this.canMakeIonicBonds = canMakeIonicBonds;
-}
-
-defineSeed(42, 1, {}, AtomSpec_0);
-_.canMakeHbonds = false;
-_.canMakeIonicBonds = false;
-_.logp = 0;
-_.type = null;
-function InfoAndTargets_0(info, targets){
-  this.info = info;
-  this.targets = targets;
-}
-
-defineSeed(43, 1, {}, InfoAndTargets_0);
-_.info = null;
-_.targets = null;
-function $export_0(){
-  if (!exported_0) {
-    exported_0 = true;
-    $export0_0();
-  }
-}
-
-function $export0_0(){
-  var pkg = declarePackage('edu.umb.bio.jsMolCalc.JsMolCalcAPI.Info');
-  var __0;
-  $wnd.edu.umb.bio.jsMolCalc.JsMolCalcAPI.Info = $entry(function(){
-    var g, j = this;
-    isAssignableToInstance(Ledu_umb_bio_jsMolCalc_client_JsMolCalcAPI$Info_2_classLit, arguments)?(g = arguments[0]):arguments.length == 1 && (g = ___create(gwtInstance(arguments[0])));
-    j.g = g;
-    setWrapper(g, j);
-    return j;
-  }
-  );
-  __0 = $wnd.edu.umb.bio.jsMolCalc.JsMolCalcAPI.Info.prototype = new Object;
-  __0.toString = $entry(function(){
-    return this.g.toString_0();
-  }
-  );
-  addTypeMap(Ledu_umb_bio_jsMolCalc_client_JsMolCalcAPI$Info_2_classLit, $wnd.edu.umb.bio.jsMolCalc.JsMolCalcAPI.Info);
-  if (pkg)
-    for (p in pkg)
-      $wnd.edu.umb.bio.jsMolCalc.JsMolCalcAPI.Info[p] === undefined && ($wnd.edu.umb.bio.jsMolCalc.JsMolCalcAPI.Info[p] = pkg[p]);
-}
-
-function InfoExporterImpl_0(){
-  $export_0();
-}
-
-function ___create(a0){
-  return new JsMolCalcAPI$Info_0(a0);
-}
-
-defineSeed(44, 1, {}, InfoExporterImpl_0);
-var exported_0 = false;
---></script>
-<script><!--
-function computeAndDisplay(molString, smileString, jmeString){
-  var atom, atomDataLines, atomLineParts, atomList, atomNumber, bondArray, bondIndex, bondLineParts, br, c, canMakeHbonds, canMakeIonicBonds, charge, chargeLineParts, cl, currentAtom, currentAtomSpec, currentNeighbor, element, errorString, f, fifthAtom, firstAtom, formula, fourthAtom, h, i, illegalAtoms, info, iodine, j, k, l, line3Parts, logp, m, molStringLines, n, neighbors, nf, numAromaticAtoms, numAtoms, numBonds, o, p_0, s, secondAtom, sixthAtom, targets, thirdAtom;
+function $computeAndDisplay(molString, smileString, jmeString){
+  var atom, atomDataLines, atomLineParts, atomList, atomNumber, bondArray, bondIndex, bondLineParts, bondString, br, c, canMakeHbonds, canMakeIonicBonds, charge, chargeLineParts, cl, currentAtom, currentAtomSpec, currentNeighbor, element, errorString, f, fifthAtom, firstAtom, formula, formulaString, fourthAtom, h, i, illegalAtoms, iodine, j, k, l, line3Parts, logp, logpString, m, molStringLines, moleculeInfo, n, neighbors, nf, numAromaticAtoms, numAtoms, numBonds, o, p_0, s, secondAtom, sixthAtom, targets, thirdAtom;
   if ($equals(molString, '') || $equals(smileString, '') || $equals(jmeString, '')) {
-    return new InfoAndTargets_0(null, null);
+    return new JsMolCalc$InfoAndTargets_0('');
   }
   atomDataLines = new StringBuffer_0;
+  logpString = '';
+  bondString = '';
   atomList = new ArrayList_0;
-  $add_0(atomList, new Atom_0);
+  $add_0(atomList, new JsMolCalc$Atom_0);
   molStringLines = $split(molString, '\n', 0);
   line3Parts = $split(molStringLines[3], '[ ]+', 0);
   numAtoms = __parseAndValidateInt(line3Parts[1]);
@@ -1505,7 +1043,7 @@ function computeAndDisplay(molString, smileString, jmeString){
   for (i = 1; i < numAtoms + 1; ++i) {
     atomLineParts = $split(molStringLines[i + 3], '[ ]+', 0);
     element = atomLineParts[4];
-    atom = new Atom_0;
+    atom = new JsMolCalc$Atom_0;
     atom.element = element;
     setCheck(atomList.array, atomList.size++, atom);
   }
@@ -1514,7 +1052,7 @@ function computeAndDisplay(molString, smileString, jmeString){
       chargeLineParts = $split(molStringLines[i], '[ ]+', 0);
       atomNumber = __parseAndValidateInt(chargeLineParts[3]);
       charge = __parseAndValidateInt(chargeLineParts[4]);
-      atom = dynamicCast((checkIndex(atomNumber, atomList.size) , atomList.array[atomNumber]), Q$Atom);
+      atom = dynamicCast((checkIndex(atomNumber, atomList.size) , atomList.array[atomNumber]), Q$JsMolCalc$Atom);
       atom.charge = charge;
     }
   }
@@ -1529,30 +1067,32 @@ function computeAndDisplay(molString, smileString, jmeString){
     bondIndex = __parseAndValidateInt(bondLineParts[3]);
     bondArray[firstAtom][secondAtom] = bondIndex;
     bondArray[secondAtom][firstAtom] = bondIndex;
+    $addBondToNonHAtom(dynamicCast((checkIndex(firstAtom, atomList.size) , atomList.array[firstAtom]), Q$JsMolCalc$Atom), bondIndex);
+    $addBondToNonHAtom(dynamicCast((checkIndex(secondAtom, atomList.size) , atomList.array[secondAtom]), Q$JsMolCalc$Atom), bondIndex);
   }
   for (i = 1; i < numAtoms + 1; ++i) {
-    currentAtom = dynamicCast((checkIndex(i, atomList.size) , atomList.array[i]), Q$Atom);
+    currentAtom = dynamicCast((checkIndex(i, atomList.size) , atomList.array[i]), Q$JsMolCalc$Atom);
     for (j = 1; j < numAtoms + 1; ++j) {
       bondArray[i][j] != 0 && $updateHybridization(currentAtom, bondArray[i][j]);
     }
   }
   for (i = 1; i < numAtoms + 1; ++i) {
-    firstAtom = dynamicCast((checkIndex(i, atomList.size) , atomList.array[i]), Q$Atom);
+    firstAtom = dynamicCast((checkIndex(i, atomList.size) , atomList.array[i]), Q$JsMolCalc$Atom);
     if (($equals(firstAtom.element, 'C') || $equals(firstAtom.element, 'N')) && (firstAtom.hybridization == 2 || firstAtom.aromatic)) {
       for (j = 1; j < numAtoms + 1; ++j) {
-        secondAtom = dynamicCast((checkIndex(j, atomList.size) , atomList.array[j]), Q$Atom);
+        secondAtom = dynamicCast((checkIndex(j, atomList.size) , atomList.array[j]), Q$JsMolCalc$Atom);
         if ((bondArray[i][j] == 1 || bondArray[i][j] == 2 || secondAtom.aromatic && bondArray[i][j] != 0 || firstAtom.aromatic && bondArray[i][j] != 0) && ($equals(secondAtom.element, 'C') || $equals(secondAtom.element, 'N')) && secondAtom.hybridization == 2 && i != j) {
           for (k = 1; k < numAtoms + 1; ++k) {
-            thirdAtom = dynamicCast((checkIndex(k, atomList.size) , atomList.array[k]), Q$Atom);
+            thirdAtom = dynamicCast((checkIndex(k, atomList.size) , atomList.array[k]), Q$JsMolCalc$Atom);
             if ((bondArray[j][k] == 1 && bondArray[i][j] == 2 || bondArray[j][k] == 2 && bondArray[i][j] == 1 || thirdAtom.aromatic && bondArray[j][k] != 0 || secondAtom.aromatic && bondArray[j][k] != 0) && ($equals(thirdAtom.element, 'C') || $equals(thirdAtom.element, 'N')) && thirdAtom.hybridization == 2 && k != i && k != j) {
               for (l = 1; l < numAtoms + 1; ++l) {
-                fourthAtom = dynamicCast((checkIndex(l, atomList.size) , atomList.array[l]), Q$Atom);
+                fourthAtom = dynamicCast((checkIndex(l, atomList.size) , atomList.array[l]), Q$JsMolCalc$Atom);
                 if ((bondArray[k][l] == 1 && bondArray[j][k] == 2 || bondArray[k][l] == 2 && bondArray[j][k] == 1 || fourthAtom.aromatic && bondArray[k][l] != 0 || thirdAtom.aromatic && bondArray[k][l] != 0) && ($equals(fourthAtom.element, 'C') || $equals(fourthAtom.element, 'N')) && fourthAtom.hybridization == 2 && l != i && l != j && l != k) {
                   for (m = 1; m < numAtoms + 1; ++m) {
-                    fifthAtom = dynamicCast((checkIndex(m, atomList.size) , atomList.array[m]), Q$Atom);
+                    fifthAtom = dynamicCast((checkIndex(m, atomList.size) , atomList.array[m]), Q$JsMolCalc$Atom);
                     if ((bondArray[l][m] == 1 && bondArray[k][l] == 2 || bondArray[l][m] == 2 && bondArray[k][l] == 1 || fifthAtom.aromatic && bondArray[l][m] != 0 || fourthAtom.aromatic && bondArray[l][m] != 0) && ($equals(fifthAtom.element, 'C') || $equals(fifthAtom.element, 'N')) && fifthAtom.hybridization == 2 && m != i && m != j && m != k && m != l) {
                       for (n = 1; n < numAtoms + 1; ++n) {
-                        sixthAtom = dynamicCast((checkIndex(n, atomList.size) , atomList.array[n]), Q$Atom);
+                        sixthAtom = dynamicCast((checkIndex(n, atomList.size) , atomList.array[n]), Q$JsMolCalc$Atom);
                         if ((bondArray[m][n] == 1 && bondArray[l][m] == 2 || bondArray[m][n] == 2 && bondArray[l][m] == 1 || sixthAtom.aromatic && bondArray[m][n] != 0 || fifthAtom.aromatic && bondArray[m][n] != 0) && ($equals(sixthAtom.element, 'C') || $equals(sixthAtom.element, 'N')) && sixthAtom.hybridization == 2 && n != i && n != j && n != k && n != l && n != m) {
                           if (bondArray[n][i] == 2 && bondArray[m][n] == 1 || bondArray[n][i] == 1 && bondArray[m][n] == 2) {
                             firstAtom.aromatic = true;
@@ -1575,19 +1115,19 @@ function computeAndDisplay(molString, smileString, jmeString){
     }
   }
   for (i = 1; i < numAtoms + 1; ++i) {
-    currentAtom = dynamicCast((checkIndex(i, atomList.size) , atomList.array[i]), Q$Atom);
+    currentAtom = dynamicCast((checkIndex(i, atomList.size) , atomList.array[i]), Q$JsMolCalc$Atom);
     for (j = 1; j < numAtoms + 1; ++j) {
       if (bondArray[i][j] != 0) {
-        currentNeighbor = dynamicCast((checkIndex(j, atomList.size) , atomList.array[j]), Q$Atom);
+        currentNeighbor = dynamicCast((checkIndex(j, atomList.size) , atomList.array[j]), Q$JsMolCalc$Atom);
         $processNeighbor(currentAtom, currentNeighbor.element, bondArray[i][j], currentNeighbor.aromatic);
       }
     }
   }
   for (i = 1; i < numAtoms + 1; ++i) {
-    currentAtom = dynamicCast((checkIndex(i, atomList.size) , atomList.array[i]), Q$Atom);
+    currentAtom = dynamicCast((checkIndex(i, atomList.size) , atomList.array[i]), Q$JsMolCalc$Atom);
     for (j = 1; j < numAtoms + 1; ++j) {
       if (bondArray[i][j] != 0) {
-        currentNeighbor = dynamicCast((checkIndex(j, atomList.size) , atomList.array[j]), Q$Atom);
+        currentNeighbor = dynamicCast((checkIndex(j, atomList.size) , atomList.array[j]), Q$JsMolCalc$Atom);
         if (currentNeighbor.hybridization < 3) {
           for (k = 1; k < numAtoms + 1; ++k) {
             bondArray[j][k] > 1 && k != i && ++currentAtom.numNeighborPi;
@@ -1599,63 +1139,69 @@ function computeAndDisplay(molString, smileString, jmeString){
   h = 0;
   charge = 0;
   for (i = 1; i < numAtoms + 1; ++i) {
-    atom = dynamicCast((checkIndex(i, atomList.size) , atomList.array[i]), Q$Atom);
+    atom = dynamicCast((checkIndex(i, atomList.size) , atomList.array[i]), Q$JsMolCalc$Atom);
     $getNumNeighborHs(atom);
     h = h + atom.numNeighborHs;
     charge = charge + atom.charge;
   }
   for (i = 1; i < numAtoms + 1; ++i) {
-    currentAtom = dynamicCast((checkIndex(i, atomList.size) , atomList.array[i]), Q$Atom);
+    currentAtom = dynamicCast((checkIndex(i, atomList.size) , atomList.array[i]), Q$JsMolCalc$Atom);
     for (j = 1; j < numAtoms + 1; ++j) {
       if (bondArray[i][j] != 0) {
-        currentNeighbor = dynamicCast((checkIndex(j, atomList.size) , atomList.array[j]), Q$Atom);
+        currentNeighbor = dynamicCast((checkIndex(j, atomList.size) , atomList.array[j]), Q$JsMolCalc$Atom);
         $equals(currentAtom.element, 'N') && currentNeighbor.isACarbonyl && (currentAtom.amide = true);
       }
     }
   }
   illegalAtoms = new StringBuffer_0;
   for (i = 1; i < numAtoms + 1; ++i) {
-    atom = dynamicCast((checkIndex(i, atomList.size) , atomList.array[i]), Q$Atom);
-    $equals(atom.element, 'C') && atom.charge != 0 && ($append(illegalAtoms.data, 'A Charged C atom.<br>') , illegalAtoms);
+    atom = dynamicCast((checkIndex(i, atomList.size) , atomList.array[i]), Q$JsMolCalc$Atom);
+    $equals(atom.element, 'C') && atom.charge != 0 && (illegalAtoms.impl.string += 'A Charged C atom.<br>' , illegalAtoms);
     if ($equals(atom.element, 'N')) {
-      atom.charge > 1 && ($append(illegalAtoms.data, 'An N atom with too high + charge.<br>') , illegalAtoms);
-      atom.charge < 0 && ($append(illegalAtoms.data, 'An N atom with - charge.<br>') , illegalAtoms);
-      $getNumNeighborHs(atom) < 0 && !($equals(atom.doubleBondedNeighbor, 'O2') && $getNumNeighborHs(atom) == -2 && atom.numNeighborCs == 1 && atom.numNeighborXs == 2 && atom.charge == 0) && ($append(illegalAtoms.data, 'An N atom making too many bonds.<br>') , illegalAtoms);
+      atom.charge > 1 && (illegalAtoms.impl.string += 'An N atom with too high + charge.<br>' , illegalAtoms);
+      atom.charge < 0 && (illegalAtoms.impl.string += 'An N atom with - charge.<br>' , illegalAtoms);
+      $getNumNeighborHs(atom) < 0 && !($equals(atom.doubleBondedNeighbor, 'O2') && $getNumNeighborHs(atom) == -2 && atom.numNeighborCs == 1 && atom.numNeighborXs == 2 && atom.charge == 0) && (illegalAtoms.impl.string += 'An N atom making too many bonds.<br>' , illegalAtoms);
     }
     if ($equals(atom.element, 'O')) {
-      atom.charge < -1 && ($append(illegalAtoms.data, 'An O atom with too high - charge.<br>') , illegalAtoms);
-      atom.charge > 0 && ($append(illegalAtoms.data, 'An O atom with + charge.<br>') , illegalAtoms);
+      atom.charge < -1 && (illegalAtoms.impl.string += 'An O atom with too high - charge.<br>' , illegalAtoms);
+      atom.charge > 0 && (illegalAtoms.impl.string += 'An O atom with + charge.<br>' , illegalAtoms);
     }
     if ($equals(atom.element, 'S')) {
-      atom.charge > 0 && ($append(illegalAtoms.data, 'An S atom with a + charge.<br>') , illegalAtoms);
-      $getNumNeighborHs(atom) < 0 && $getNumNeighborHs(atom) != -4 && $getNumNeighborHs(atom) != -2 && ($append(illegalAtoms.data, 'An S atom not making 2, 4, or 6 bonds.<br>') , illegalAtoms);
+      atom.charge > 0 && (illegalAtoms.impl.string += 'An S atom with a + charge.<br>' , illegalAtoms);
+      $getNumNeighborHs(atom) < 0 && $getNumNeighborHs(atom) != -4 && $getNumNeighborHs(atom) != -2 && (illegalAtoms.impl.string += 'An S atom not making 2, 4, or 6 bonds.<br>' , illegalAtoms);
     }
     if ($equals(atom.element, 'P')) {
-      atom.charge != 0 && ($append(illegalAtoms.data, 'A Charged P atom.<br>') , illegalAtoms);
-      atom.numNeighborHs != -3 && ($append(illegalAtoms.data, 'A P atom not making 5 bonds.<br>') , illegalAtoms);
+      atom.charge != 0 && (illegalAtoms.impl.string += 'A Charged P atom.<br>' , illegalAtoms);
+      atom.numNeighborHs != -3 && (illegalAtoms.impl.string += 'A P atom not making 5 bonds.<br>' , illegalAtoms);
     }
-    ($equals(atom.element, 'F') || $equals(atom.element, 'Cl') || $equals(atom.element, 'Br') || $equals(atom.element, 'I')) && atom.charge != 0 && $append_0(illegalAtoms, 'A Charged ' + atom.element + ' atom.<br>');
-    $equals(atom.element, 'X') && ($append(illegalAtoms.data, 'An X atom.<br>') , illegalAtoms);
+    if ($equals(atom.element, 'F') || $equals(atom.element, 'Cl') || $equals(atom.element, 'Br') || $equals(atom.element, 'I')) {
+      atom.charge != 0 && $append_0(illegalAtoms, 'A Charged ' + atom.element + ' atom.<br>');
+      atom.numBondsToNonHAtoms > 1 && $append_0(illegalAtoms, 'A ' + atom.element + ' atom making more than one bond.<br>');
+    }
+    $equals(atom.element, 'X') && (illegalAtoms.impl.string += 'An X atom.<br>' , illegalAtoms);
   }
   errorString = '';
-  $toString(illegalAtoms.data).length != 0 && (errorString = '<html><body>It is not possible to calculate logp<br>for your molecule because it contains:<br>' + $toString(illegalAtoms.data) + '<\/body><\/html>');
+  illegalAtoms.impl.string.length != 0 && (errorString = '<html><body>It is not possible to calculate the properties<br>of your molecule because it contains:<br>' + illegalAtoms.impl.string + '<\/body><\/html>');
   logp = 0;
   canMakeHbonds = false;
   canMakeIonicBonds = false;
-  if ($toString(illegalAtoms.data).length == 0) {
+  if (illegalAtoms.impl.string.length == 0) {
     nf = ($clinit_NumberFormat() , new NumberFormat_1($getDefaultNative()));
     for (i = 1; i < numAtoms + 1; ++i) {
-      atom = dynamicCast((checkIndex(i, atomList.size) , atomList.array[i]), Q$Atom);
+      atom = dynamicCast((checkIndex(i, atomList.size) , atomList.array[i]), Q$JsMolCalc$Atom);
       currentAtomSpec = $getAtomSpec(atom);
       logp = logp + currentAtomSpec.logp;
       canMakeHbonds = canMakeHbonds || currentAtomSpec.canMakeHbonds;
       canMakeIonicBonds = canMakeIonicBonds || currentAtomSpec.canMakeIonicBonds;
       neighbors = new StringBuffer_0;
       for (j = 1; j < numAtoms + 1; ++j) {
-        bondArray[i][j] != 0 && ($append(neighbors.data, j + ' ') , neighbors);
+        bondArray[i][j] != 0 && ($append(neighbors.impl, j + ' ') , neighbors);
       }
-      $append_0(atomDataLines, i + ' ' + currentAtomSpec.type + '; bonded to: ' + $toString(neighbors.data) + '; logp= ' + $format(nf, currentAtomSpec.logp) + '; H-bonds: ' + currentAtomSpec.canMakeHbonds + '; ionic bonds: ' + currentAtomSpec.canMakeIonicBonds + '\n');
+      $append_0(atomDataLines, i + ' ' + currentAtomSpec.type + '; bonded to: ' + neighbors.impl.string + '; logp= ' + $format(nf, currentAtomSpec.logp) + '; H-bonds: ' + currentAtomSpec.canMakeHbonds + '; ionic bonds: ' + currentAtomSpec.canMakeIonicBonds + '\n');
     }
+    logp < 0?(logpString = '<font color=green>Hydrophobicity index = ' + $format(nf, logp) + '<\/font>'):(logpString = '<font color=red>Hydrophobicity index = ' + $format(nf, logp) + '<\/font>');
+    canMakeHbonds?(bondString = '<font color=green>Can Make Strong Hydrogen Bonds<\/font><br>'):(bondString = '<font color=red>Can not Make Strong Hydrogen Bonds<\/font><br>');
+    canMakeIonicBonds?(bondString += '<font color=green>Can Make Ionic Bonds<\/font>'):(bondString += '<font color=red>Can not Make Ionic Bonds<\/font>');
   }
   numBonds = 0;
   numAromaticAtoms = 0;
@@ -1721,209 +1267,469 @@ function computeAndDisplay(molString, smileString, jmeString){
         ++numBonds;
     }
   }
-  prettyPrint('C', c, formula);
-  prettyPrint('H', h, formula);
-  prettyPrint('N', n, formula);
-  prettyPrint('O', o, formula);
-  prettyPrint('P', p_0, formula);
-  prettyPrint('S', s, formula);
-  prettyPrint('Cl', cl, formula);
-  prettyPrint('Br', br, formula);
-  prettyPrint('F', f, formula);
-  prettyPrint('I', iodine, formula);
+  $prettyPrint('C', c, formula);
+  $prettyPrint('H', h, formula);
+  $prettyPrint('N', n, formula);
+  $prettyPrint('O', o, formula);
+  $prettyPrint('P', p_0, formula);
+  $prettyPrint('S', s, formula);
+  $prettyPrint('Cl', cl, formula);
+  $prettyPrint('Br', br, formula);
+  $prettyPrint('F', f, formula);
+  $prettyPrint('I', iodine, formula);
   if (charge != 0) {
-    $append(formula.data, '(');
-    charge == -1?($append(formula.data, '-') , formula):charge > 0 && ($append(formula.data, '+') , formula);
-    (charge < 0?-charge:charge) != 1 && ($append(formula.data, '' + charge) , formula);
-    $append(formula.data, ')');
+    formula.impl.string += '(';
+    charge == -1?(formula.impl.string += '-' , formula):charge > 0 && (formula.impl.string += '+' , formula);
+    (charge < 0?-charge:charge) != 1 && ($append(formula.impl, '' + charge) , formula);
+    formula.impl.string += ')';
   }
-  'Formula: ' + $toString(formula.data);
-  $equals(errorString, '')?(info = new MoleculeInfo_0(canMakeHbonds, canMakeIonicBonds, logp, null)):(info = new MoleculeInfo_0(false, false, 0, errorString));
-  targets = initDim(_3Ledu_umb_bio_jsMolCalc_client_Target_2_classLit, makeCastMap([Q$Serializable]), Q$Target, 4, 0);
+  formulaString = 'Formula: ' + formula.impl.string;
+  $equals(errorString, '')?(moleculeInfo = '<html><body>' + formulaString + '<br>' + logpString + '<br>' + bondString + '<\/body><\/html>'):(moleculeInfo = errorString);
   if ($equals(errorString, '')) {
-    canMakeHbonds?(targets[0] = new Target_1(1)):(targets[0] = new Target_1(2));
-    canMakeIonicBonds?(targets[1] = new Target_1(3)):(targets[1] = new Target_1(4));
-    targets[2] = new Target_0(logp - 1.5, logp - 0.5);
-    targets[3] = new Target_0(logp + 0.5, logp + 1.5);
+    nf = ($clinit_NumberFormat() , new NumberFormat_1($getDefaultNative()));
+    targets = '<html><body>Edit the molecule so that it:<br><ul>';
+    targets += '<li>can ';
+    canMakeHbonds && (targets += ' not ');
+    targets += 'make Hydrogen bonds<\/li>';
+    targets += '<li>can ';
+    canMakeIonicBonds && (targets += ' not ');
+    targets += 'make Ionic bonds<\/li>';
+    targets += '<li>has a relative hydrophobicity between ';
+    targets += $format(nf, logp - 1.5);
+    targets += ' and ';
+    targets += $format(nf, logp - 0.5);
+    targets += '<\/li>';
+    targets += '<li>has a relative hydrophobicity between ';
+    targets += $format(nf, logp + 0.5);
+    targets += ' and ';
+    targets += $format(nf, logp + 1.5);
+    targets += '<\/li>';
+    targets += '<\/ul><\/body><\/html>';
   }
-  return new InfoAndTargets_0(info, targets);
+  return new JsMolCalc$InfoAndTargets_0(moleculeInfo);
 }
 
-function prettyPrint(atomLabel, number, outString){
+function $prettyPrint(atomLabel, number, outString){
   if (number == 0) {
     return;
   }
-  $append(outString.data, atomLabel);
+  $append(outString.impl, atomLabel);
   if (number == 1) {
-    $append(outString.data, ' ');
+    outString.impl.string += ' ';
     return;
   }
-  $append(outString.data, '<sub>' + number + '<\/sub> ');
+  $append(outString.impl, '<sub>' + number + '<\/sub> ');
 }
 
+function JsMolCalc_0(){
+  new ArrayList_0;
+}
+
+defineSeed(43, 1, {}, JsMolCalc_0);
+function $addBondToNonHAtom(this$static, bondIndex){
+  this$static.numBondsToNonHAtoms = this$static.numBondsToNonHAtoms + bondIndex;
+}
+
+--></script>
+<script><!--
+function $getAtomSpec(this$static){
+  var charged;
+  this$static.chargeOffset = 0;
+  this$static.chargeString = '';
+  if ($equals(this$static.element, 'C')) {
+    switch (this$static.hybridization) {
+      case 3:
+        switch (this$static.numNeighborHs) {
+          case 4:
+            return new JsMolCalc$AtomSpec_0(0.528, 'C: sp3, H4', false, false);
+          case 3:
+            return this$static.numNeighborXs == 0?this$static.numNeighborPi == 0?new JsMolCalc$AtomSpec_0(0.528, 'C: sp3; C H H H, no pi', false, false):new JsMolCalc$AtomSpec_0(0.267, 'C: sp3; C H H H, pi', false, false):new JsMolCalc$AtomSpec_0(-0.032, 'C: sp3; X H H H', false, false);
+          case 2:
+            if (this$static.numNeighborXs == 0) {
+              switch (this$static.numNeighborPi) {
+                case 0:
+                  return new JsMolCalc$AtomSpec_0(0.358, 'C: sp3; C C H H, no pi', false, false);
+                case 1:
+                  return new JsMolCalc$AtomSpec_0(-0.008, 'C: sp3; C C H H, 1 pi', false, false);
+                case 2:
+                  return new JsMolCalc$AtomSpec_0(-0.185, 'C: sp3; C C H H, 2 pi', false, false);
+                default:return new JsMolCalc$AtomSpec_0(0, 'C: sp3; ? ? H H', false, false);
+              }
+            }
+             else {
+              switch (this$static.numNeighborPi) {
+                case 0:
+                  return new JsMolCalc$AtomSpec_0(-0.137, 'C: sp3; C X H H, no pi', false, false);
+                case 1:
+                  return new JsMolCalc$AtomSpec_0(-0.303, 'C: sp3; C X H H, 1 pi', false, false);
+                case 2:
+                  return new JsMolCalc$AtomSpec_0(-0.815, 'C: sp3; C X H H, 2 pi', false, false);
+                default:return new JsMolCalc$AtomSpec_0(0, 'C: sp3; ? X H H, H2', false, false);
+              }
+            }
+
+          case 1:
+            if (this$static.numNeighborXs == 0) {
+              switch (this$static.numNeighborPi) {
+                case 0:
+                  return new JsMolCalc$AtomSpec_0(0.127, 'C: sp3; C C C H, no pi', false, false);
+                case 1:
+                  return new JsMolCalc$AtomSpec_0(-0.243, 'C: sp3; C C C H, 1 pi', false, false);
+                default:return new JsMolCalc$AtomSpec_0(-0.499, 'C: sp3; C C C H, >1 pi', false, false);
+              }
+            }
+             else {
+              switch (this$static.numNeighborPi) {
+                case 0:
+                  return new JsMolCalc$AtomSpec_0(-0.205, 'C: sp3; C C/X X H, no pi', false, false);
+                case 1:
+                  return new JsMolCalc$AtomSpec_0(-0.305, 'C: sp3; C C/X X H, 1 pi', false, false);
+                default:return new JsMolCalc$AtomSpec_0(-0.709, 'C: sp3; C C/X X H, >1 pi', false, false);
+              }
+            }
+
+          case 0:
+            if (this$static.numNeighborXs == 0) {
+              switch (this$static.numNeighborPi) {
+                case 0:
+                  return new JsMolCalc$AtomSpec_0(-0.006, 'C: sp3; C C C C, no pi', false, false);
+                case 1:
+                  return new JsMolCalc$AtomSpec_0(-0.57, 'C: sp3; C C C C, 1 pi', false, false);
+                default:return new JsMolCalc$AtomSpec_0(-0.317, 'C: sp3; C C C C, >1 pi', false, false);
+              }
+            }
+             else {
+              switch (this$static.numNeighborPi) {
+                case 0:
+                  return new JsMolCalc$AtomSpec_0(-0.316, 'C: sp3; C C/X C/X X, no pi', false, false);
+                default:return new JsMolCalc$AtomSpec_0(-0.723, 'C: sp3; C C/X C/X X, pi', false, false);
+              }
+            }
+
+          default:return new JsMolCalc$AtomSpec_0(0, 'C: sp3; unknown', false, false);
+        }
+
+      case 2:
+        if (!this$static.aromatic) {
+          switch (this$static.numNeighborHs) {
+            case 2:
+              return new JsMolCalc$AtomSpec_0(0.42, 'C: sp2; =? H H', false, false);
+            case 1:
+              switch (this$static.numNeighborXs) {
+                case 1:
+                  return this$static.numNeighborPi == 0?new JsMolCalc$AtomSpec_0(0.001, 'C: sp2; =? X H, no pi', false, false):new JsMolCalc$AtomSpec_0(-0.31, 'C: sp2; =? X H, 1 pi', false, false);
+                case 0:
+                  return this$static.numNeighborPi == 0?new JsMolCalc$AtomSpec_0(0.466, 'C: sp2; =? C H, no pi', false, false):new JsMolCalc$AtomSpec_0(0.136, 'C: sp2; =? C H, 1 pi', false, false);
+                default:return new JsMolCalc$AtomSpec_0(0, 'C: sp2; =? H, unknown', false, false);
+              }
+
+            case 0:
+              switch (this$static.numNeighborXs) {
+                case 2:
+                  return this$static.numNeighborPi == 0?new JsMolCalc$AtomSpec_0(0.005, 'C: sp2; =? X X, no pi', false, false):new JsMolCalc$AtomSpec_0(-0.315, 'C: sp2; =? X X, pi', false, false);
+                case 1:
+                  return this$static.numNeighborPi == 0?new JsMolCalc$AtomSpec_0(-0.03, 'C: sp2; =? C X, no pi', false, false):new JsMolCalc$AtomSpec_0(-0.027, 'C: sp2; =? C X, pi', false, false);
+                case 0:
+                  return this$static.numNeighborPi == 0?new JsMolCalc$AtomSpec_0(0.05, 'C: sp2; =? C C, no pi', false, false):new JsMolCalc$AtomSpec_0(0.013, 'C: sp2; =? C C, pi', false, false);
+                default:return new JsMolCalc$AtomSpec_0(0, 'C: sp2; =? C C, unknown', false, false);
+              }
+
+            default:return new JsMolCalc$AtomSpec_0(0, 'C: sp2; unknown', false, false);
+          }
+        }
+
+        switch (this$static.numNeighborHs) {
+          case 1:
+            return this$static.numNeighborNAro == 0?new JsMolCalc$AtomSpec_0(0.337, 'C: aromatic; C C H', false, false):new JsMolCalc$AtomSpec_0(0.126, 'C: aromatic; aro-N C H', false, false);
+          case 0:
+            switch (this$static.numNeighborXs) {
+              case 2:
+                return this$static.numNeighborNAro == 0?new JsMolCalc$AtomSpec_0(0, 'C: aromatic; unknown C X X', false, false):new JsMolCalc$AtomSpec_0(0.366, 'C: aromatic; aro-N C X', false, false);
+              case 1:
+                return this$static.numNeighborNAro == 0?new JsMolCalc$AtomSpec_0(-0.151, 'C: aromatic; C C X', false, false):new JsMolCalc$AtomSpec_0(0.174, 'C: aromatic; aro-N C C', false, false);
+              case 0:
+                return new JsMolCalc$AtomSpec_0(0.296, 'C: aromatic; C C C', false, false);
+              default:return new JsMolCalc$AtomSpec_0(0, 'C: aromatic; unknown', false, false);
+            }
+
+          default:return new JsMolCalc$AtomSpec_0(0, 'C: aromatic; unknown', false, false);
+        }
+
+      case 1:
+        if (this$static.isAnAllene)
+          return new JsMolCalc$AtomSpec_0(2.073, 'C: =C=', false, false);
+        return this$static.numNeighborHs == 0?new JsMolCalc$AtomSpec_0(0.33, 'C: sp; ? ?', false, false):new JsMolCalc$AtomSpec_0(0.209, 'C: sp; ? H', false, false);
+      default:return new JsMolCalc$AtomSpec_0(0, 'C: unknown', false, false);
+    }
+  }
+  if ($equals(this$static.element, 'N')) {
+    charged = false;
+    if (this$static.charge == 1) {
+      charged = true;
+      if (this$static.aromatic) {
+        this$static.chargeOffset = -1;
+        this$static.chargeString = ' (N+Aro)';
+      }
+       else {
+        switch (this$static.numNeighborCs) {
+          case 4:
+            this$static.chargeOffset = -4.5;
+            this$static.chargeString = ' (N+quat)';
+            break;
+          case 3:
+            this$static.chargeOffset = -3;
+            this$static.chargeString = ' (N+tert)';
+            break;
+          case 2:
+            this$static.chargeOffset = -2.5;
+            this$static.chargeString = ' (N+sec)';
+            break;
+          case 1:
+            this$static.chargeOffset = -2;
+            this$static.chargeString = ' (N+pri)';
+            break;
+          default:this$static.chargeOffset = 0;
+            this$static.chargeString = ' (N+???)';
+        }
+      }
+    }
+    if (this$static.amide) {
+      switch (this$static.numNeighborHs) {
+        case 2:
+          return new JsMolCalc$AtomSpec_0(-0.646 + this$static.chargeOffset, 'N: amide; C=O H H' + this$static.chargeString, true, charged);
+        case 1:
+          return this$static.numNeighborXs == 0?new JsMolCalc$AtomSpec_0(-0.096 + this$static.chargeOffset, 'N: amide; C=O C H' + this$static.chargeString, true, charged):new JsMolCalc$AtomSpec_0(-0.044 + this$static.chargeOffset, 'N: amide; C=O X H' + this$static.chargeString, true, charged);
+        case 0:
+          return this$static.numNeighborXs == 0?new JsMolCalc$AtomSpec_0(0.078 + this$static.chargeOffset, 'N: amide; C=O C C' + this$static.chargeString, !charged, charged):new JsMolCalc$AtomSpec_0(-0.118 + this$static.chargeOffset, 'N: amide; C=O C X' + this$static.chargeString, !charged, charged);
+      }
+    }
+    switch (this$static.hybridization) {
+      case 3:
+        switch (this$static.numNeighborHs) {
+          case 2:
+            if (this$static.numNeighborXs != 0)
+              return new JsMolCalc$AtomSpec_0(-1.082 + this$static.chargeOffset, 'N: sp3; X H H' + this$static.chargeString, true, charged);
+            return this$static.numNeighborPi == 0?new JsMolCalc$AtomSpec_0(-0.534 + this$static.chargeOffset, 'N: sp3; C H H, no pi' + this$static.chargeString, true, charged):new JsMolCalc$AtomSpec_0(-0.329 + this$static.chargeOffset, 'N: sp3; C H H, pi' + this$static.chargeString, true, charged);
+          case 1:
+            if (this$static.numNeighborXs != 0)
+              return new JsMolCalc$AtomSpec_0(0.324 + this$static.chargeOffset, 'N: sp3; C X H' + this$static.chargeString, true, charged);
+            return this$static.numNeighborPi == 0?new JsMolCalc$AtomSpec_0(-0.112 + this$static.chargeOffset, 'N: sp3; C C H, no pi' + this$static.chargeString, true, charged):new JsMolCalc$AtomSpec_0(0.166 + this$static.chargeOffset, 'N: sp3; C C H, pi' + this$static.chargeString, true, charged);
+          case 0:
+            if (this$static.numNeighborXs != 0)
+              return new JsMolCalc$AtomSpec_0(-0.239 + this$static.chargeOffset, 'N: sp3; C C X' + this$static.chargeString, !charged, charged);
+            return this$static.numNeighborPi == 0?new JsMolCalc$AtomSpec_0(0.159 + this$static.chargeOffset, 'N: sp3; C C C, no pi' + this$static.chargeString, !charged, charged):new JsMolCalc$AtomSpec_0(0.761 + this$static.chargeOffset, 'N: sp3; C C C, pi' + this$static.chargeString, !charged, charged);
+          default:return new JsMolCalc$AtomSpec_0(this$static.chargeOffset, 'N: sp3; unknown' + this$static.chargeString, true, charged);
+        }
+
+      case 2:
+        if (this$static.aromatic) {
+          return new JsMolCalc$AtomSpec_0(-0.493 + this$static.chargeOffset, 'N: aromatic' + this$static.chargeString, !charged, charged);
+        }
+
+        if ($equals(this$static.doubleBondedNeighbor, 'C')) {
+          return this$static.numNeighborXs == 0?this$static.numNeighborPi == 0?this$static.numNeighborHs == 0?new JsMolCalc$AtomSpec_0(0.007 + this$static.chargeOffset, 'N: sp2; =C ? no H, no pi' + this$static.chargeString, !charged, charged):new JsMolCalc$AtomSpec_0(0.007 + this$static.chargeOffset, 'N: sp2; =C ? H, no pi' + this$static.chargeString, true, charged):this$static.numNeighborHs == 0?new JsMolCalc$AtomSpec_0(-0.275 + this$static.chargeOffset, 'N: sp2; =C ? no H, pi' + this$static.chargeString, !charged, charged):new JsMolCalc$AtomSpec_0(-0.275 + this$static.chargeOffset, 'N: sp2; =C ? H, pi' + this$static.chargeString, true, charged):this$static.numNeighborPi == 0?this$static.numNeighborHs == 0?new JsMolCalc$AtomSpec_0(0.366 + this$static.chargeOffset, 'N: sp2; =C X no H, no pi' + this$static.chargeString, !charged, charged):new JsMolCalc$AtomSpec_0(0.366 + this$static.chargeOffset, 'N: sp2; =C X H, no pi' + this$static.chargeString, true, charged):this$static.numNeighborHs == 0?new JsMolCalc$AtomSpec_0(0.251 + this$static.chargeOffset, 'N: sp2; =C X no H, pi' + this$static.chargeString, !charged, charged):new JsMolCalc$AtomSpec_0(0.251 + this$static.chargeOffset, 'N: sp2; =C X H, pi' + this$static.chargeString, true, charged);
+        }
+
+        if ($equals(this$static.doubleBondedNeighbor, 'N')) {
+          return this$static.numNeighborXs == 1?this$static.numNeighborHs == 0?new JsMolCalc$AtomSpec_0(0.536 + this$static.chargeOffset, 'N: sp2; =N ? no H' + this$static.chargeString, !charged, charged):new JsMolCalc$AtomSpec_0(0.536 + this$static.chargeOffset, 'N: sp2; =N ? H' + this$static.chargeString, true, charged):this$static.numNeighborHs == 0?new JsMolCalc$AtomSpec_0(-0.597 + this$static.chargeOffset, 'N: sp2; =N X no H' + this$static.chargeString, !charged, charged):new JsMolCalc$AtomSpec_0(-0.597 + this$static.chargeOffset, 'N: sp2; =N X H' + this$static.chargeString, true, charged);
+        }
+
+        if ($equals(this$static.doubleBondedNeighbor, 'O'))
+          return new JsMolCalc$AtomSpec_0(0.427 + this$static.chargeOffset, 'N: nitroso' + this$static.chargeString, true, charged);
+        if (this$static.numNeighborXs != 0)
+          return new JsMolCalc$AtomSpec_0(0.427, 'N: sp2; =? ?', true, charged);
+        return new JsMolCalc$AtomSpec_0(this$static.chargeOffset, 'N: sp2; unknown' + this$static.chargeString, true, charged);
+      case 1:
+        return $equals(this$static.doubleBondedNeighbor, 'O2')?new JsMolCalc$AtomSpec_0(1.178, 'N: nitro', true, false):this$static.numNeighborHs == 0?new JsMolCalc$AtomSpec_0(-0.566 + this$static.chargeOffset, 'N: sp no H' + this$static.chargeString, !charged, charged):new JsMolCalc$AtomSpec_0(-0.566 + this$static.chargeOffset, 'N: sp H' + this$static.chargeString, true, charged);
+      default:return new JsMolCalc$AtomSpec_0(this$static.chargeOffset, 'N: unknown' + this$static.chargeString, true, charged);
+    }
+  }
+  if ($equals(this$static.element, 'O')) {
+    charged = false;
+    if (this$static.charge == -1) {
+      charged = true;
+      this$static.chargeOffset = -3.5;
+      this$static.chargeString = ' (-)';
+    }
+    switch (this$static.hybridization) {
+      case 3:
+        switch (this$static.numNeighborHs) {
+          case 1:
+            if (this$static.numNeighborXs != 0)
+              return new JsMolCalc$AtomSpec_0(-0.522 + this$static.chargeOffset, 'O: sp3; X H' + this$static.chargeString, true, charged);
+            return this$static.numNeighborPi == 0?new JsMolCalc$AtomSpec_0(-0.467 + this$static.chargeOffset, 'O: sp3; C H, no pi' + this$static.chargeString, true, charged):new JsMolCalc$AtomSpec_0(0.082 + this$static.chargeOffset, 'O: sp3; C H, pi' + this$static.chargeString, true, charged);
+          case 0:
+            if (this$static.numNeighborXs != 0)
+              return new JsMolCalc$AtomSpec_0(0.105 + this$static.chargeOffset, 'O: sp3; C X' + this$static.chargeString, true, charged);
+            return this$static.numNeighborPi == 0?new JsMolCalc$AtomSpec_0(0.084 + this$static.chargeOffset, 'O: sp3; C C, no pi' + this$static.chargeString, true, charged):new JsMolCalc$AtomSpec_0(0.435 + this$static.chargeOffset, 'O: sp3; C C, pi' + this$static.chargeString, true, charged);
+          default:return new JsMolCalc$AtomSpec_0(this$static.chargeOffset, 'O: sp3; unknown' + this$static.chargeString, true, charged);
+        }
+
+      case 2:
+        return new JsMolCalc$AtomSpec_0(-0.399 + this$static.chargeOffset, 'O: sp2' + this$static.chargeString, true, charged);
+      default:return new JsMolCalc$AtomSpec_0(this$static.chargeOffset, 'O: unknown' + this$static.chargeString, true, charged);
+    }
+  }
+  if ($equals(this$static.element, 'S')) {
+    charged = false;
+    if (this$static.charge == -1) {
+      this$static.chargeOffset = -0.75;
+      this$static.chargeString = ' (-)';
+      charged = true;
+    }
+    switch (this$static.hybridization) {
+      case 3:
+        return this$static.numNeighborHs == 0?new JsMolCalc$AtomSpec_0(0.255 + this$static.chargeOffset, 'S: sp3; C/X C/X' + this$static.chargeString, false, charged):new JsMolCalc$AtomSpec_0(0.419 + this$static.chargeOffset, 'S: sp3; C/X H' + this$static.chargeString, false, charged);
+      case 2:
+        return $equals(this$static.doubleBondedNeighbor, 'O')?new JsMolCalc$AtomSpec_0(-1.375, 'S: sulfoxide', false, charged):new JsMolCalc$AtomSpec_0(-0.148 + this$static.chargeOffset, 'S: sp2' + this$static.chargeString, false, charged);
+      case 1:
+        if ($equals(this$static.doubleBondedNeighbor, 'O2')) {
+          return new JsMolCalc$AtomSpec_0(-0.168, 'S: sulfone', false, charged);
+        }
+
+      default:return new JsMolCalc$AtomSpec_0(this$static.chargeOffset, 'S: unknown' + this$static.chargeString, false, charged);
+    }
+  }
+  if ($equals(this$static.element, 'P') && this$static.hybridization == 2) {
+    if ($equals(this$static.doubleBondedNeighbor, 'O')) {
+      return new JsMolCalc$AtomSpec_0(-0.447, 'P: in phosphate', false, false);
+    }
+    if ($equals(this$static.doubleBondedNeighbor, 'S')) {
+      return new JsMolCalc$AtomSpec_0(1.253, 'P: in thio-phosphate', false, false);
+    }
+    return new JsMolCalc$AtomSpec_0(0, 'P: unknown', false, false);
+  }
+  if ($equals(this$static.element, 'F')) {
+    return this$static.numNeighborPi == 0?new JsMolCalc$AtomSpec_0(0.375, 'F; no pi', false, false):new JsMolCalc$AtomSpec_0(0.202, 'F; pi', false, false);
+  }
+  if ($equals(this$static.element, 'Cl')) {
+    return this$static.numNeighborPi == 0?new JsMolCalc$AtomSpec_0(0.512, 'Cl; no pi', false, false):new JsMolCalc$AtomSpec_0(0.663, 'Cl; pi', false, false);
+  }
+  if ($equals(this$static.element, 'Br')) {
+    return this$static.numNeighborPi == 0?new JsMolCalc$AtomSpec_0(0.85, 'Br; no pi', false, false):new JsMolCalc$AtomSpec_0(0.839, 'Br; pi', false, false);
+  }
+  if ($equals(this$static.element, 'I')) {
+    return this$static.numNeighborPi == 0?new JsMolCalc$AtomSpec_0(1.05, 'I; no pi', false, false):new JsMolCalc$AtomSpec_0(1.109, 'I; pi', false, false);
+  }
+  return new JsMolCalc$AtomSpec_0(0, 'unknown atom', false, false);
+}
+
+function $getNumNeighborHs(this$static){
+  if ($equals(this$static.element, 'C')) {
+    this$static.numNeighborHs = this$static.hybridization + 1 - this$static.numNeighborCs - this$static.numNeighborXs;
+    return this$static.numNeighborHs;
+  }
+  if ($equals(this$static.element, 'N')) {
+    this$static.numNeighborHs = this$static.hybridization - this$static.numNeighborCs - this$static.numNeighborXs + this$static.charge;
+    return this$static.numNeighborHs;
+  }
+  if ($equals(this$static.element, 'O') || $equals(this$static.element, 'S')) {
+    this$static.numNeighborHs = this$static.hybridization - 1 - this$static.numNeighborCs - this$static.numNeighborXs + this$static.charge;
+    return this$static.numNeighborHs;
+  }
+  this$static.numNeighborHs = 1 - this$static.numNeighborCs - this$static.numNeighborXs;
+  return this$static.numNeighborHs;
+}
+
+function $processNeighbor(this$static, element, bondIndex, aromatic){
+  $equals(element, 'O') && bondIndex == 2 && (this$static.isACarbonyl = true);
+  aromatic && ++this$static.numNeighborAro;
+  $equals(element, 'N') && aromatic && ++this$static.numNeighborNAro;
+  bondIndex == 2 && ($equals(this$static.doubleBondedNeighbor, 'O')?(this$static.doubleBondedNeighbor = 'O2'):(this$static.doubleBondedNeighbor = element));
+  if ($equals(element, 'C')) {
+    ++this$static.numNeighborCs;
+    return;
+  }
+  ($equals(element, 'N') || $equals(element, 'O') || $equals(element, 'S') || $equals(element, 'Cl') || $equals(element, 'F') || $equals(element, 'Br') || $equals(element, 'I')) && ++this$static.numNeighborXs;
+  return;
+}
+
+function $updateHybridization(this$static, bondIndex){
+  if (this$static.isAnAllene) {
+    return;
+  }
+  if (bondIndex == 2 && this$static.alreadyHasOneDoubleBond) {
+    this$static.isAnAllene = true;
+    this$static.currentMaxBondIndex = 3;
+    this$static.hybridization = 1;
+    return;
+  }
+  bondIndex == 2 && (this$static.alreadyHasOneDoubleBond = true);
+  if (bondIndex > this$static.currentMaxBondIndex) {
+    this$static.currentMaxBondIndex = bondIndex;
+    this$static.hybridization = 4 - this$static.currentMaxBondIndex;
+  }
+}
+
+function JsMolCalc$Atom_0(){
+  this.element = '';
+  this.charge = 0;
+  this.aromatic = false;
+  this.amide = false;
+  this.isACarbonyl = false;
+  this.doubleBondedNeighbor = '';
+  this.numNeighborHs = 0;
+  this.numNeighborCs = 0;
+  this.numNeighborXs = 0;
+  this.hybridization = 3;
+  this.numNeighborPi = 0;
+  this.numNeighborNAro = 0;
+  this.numNeighborAro = 0;
+  this.chargeOffset = 0;
+  this.chargeString = '';
+  this.alreadyHasOneDoubleBond = false;
+  this.isAnAllene = false;
+  this.currentMaxBondIndex = 0;
+  this.numBondsToNonHAtoms = 0;
+}
+
+defineSeed(44, 1, makeCastMap([Q$JsMolCalc$Atom]), JsMolCalc$Atom_0);
+_.alreadyHasOneDoubleBond = false;
+_.amide = false;
+_.aromatic = false;
+_.charge = 0;
+_.chargeOffset = 0;
+_.chargeString = null;
+_.currentMaxBondIndex = 0;
+_.doubleBondedNeighbor = null;
+_.element = null;
+_.hybridization = 0;
+_.isACarbonyl = false;
+_.isAnAllene = false;
+_.numBondsToNonHAtoms = 0;
+_.numNeighborAro = 0;
+_.numNeighborCs = 0;
+_.numNeighborHs = 0;
+_.numNeighborNAro = 0;
+_.numNeighborPi = 0;
+_.numNeighborXs = 0;
+function JsMolCalc$AtomSpec_0(logp, type, canMakeHbonds, canMakeIonicBonds){
+  this.type = type;
+  this.logp = logp;
+  this.canMakeHbonds = canMakeHbonds;
+  this.canMakeIonicBonds = canMakeIonicBonds;
+}
+
+defineSeed(45, 1, {}, JsMolCalc$AtomSpec_0);
+_.canMakeHbonds = false;
+_.canMakeIonicBonds = false;
+_.logp = 0;
+_.type = null;
+function JsMolCalc$InfoAndTargets_0(info){
+  this.info = info;
+}
+
+defineSeed(46, 1, {}, JsMolCalc$InfoAndTargets_0);
+_.info = null;
 function JsMolCalcAPI$API_0(){
 }
 
-function getTasks(mol, smile, jme){
-  var i, length_0, result, tasks;
-  result = computeAndDisplay(mol, smile, jme);
-  length_0 = result.targets.length;
-  tasks = initDim(_3Ledu_umb_bio_jsMolCalc_client_JsMolCalcAPI$Task_2_classLit, makeCastMap([Q$Serializable]), Q$JsMolCalcAPI$Task, length_0, 0);
-  for (i = 0; i < length_0; ++i) {
-    tasks[i] = new JsMolCalcAPI$Task_0(result.targets[i]);
-  }
-  return tasks;
-}
-
-defineSeed(46, 1, makeCastMap([Q$Exportable]), JsMolCalcAPI$API_0);
-function JsMolCalcAPI$Info_0(info){
-  this._info = info;
-}
-
-defineSeed(47, 1, makeCastMap([Q$Exportable]), JsMolCalcAPI$Info_0);
-_.toString_0 = function toString_0(){
-  return $toString_0(this._info);
-}
-;
-_._info = null;
-function JsMolCalcAPI$Task_0(target){
-  this._target = target;
-}
-
-defineSeed(48, 1, makeCastMap([Q$JsMolCalcAPI$Task, Q$Exportable]), JsMolCalcAPI$Task_0);
-_.check_0 = function check(info){
-  return $isCorrect(this._target, info._info)?'correct':'incorrect';
-}
-;
-_.toString_0 = function toString_1(){
-  return $toString_1(this._target);
-}
-;
-_._target = null;
-function $toString_0(this$static){
-  var b, nf;
-  nf = ($clinit_NumberFormat() , new NumberFormat_1($getDefaultNative()));
-  b = new StringBuffer_0;
-  if (this$static.errorString != null) {
-    $append_0(b, this$static.errorString);
-  }
-   else {
-    this$static.phobicity < 0?$append_0(b, '<font color=green>Hydrophobicity index = ' + $format(nf, this$static.phobicity) + '<\/font><br>'):$append_0(b, '<font color=red>Hydrophobicity index = ' + $format(nf, this$static.phobicity) + '<\/font><br>');
-    this$static.canMakeHBonds?($append(b.data, '<font color=green>Can Make Strong Hydrogen Bonds<\/font><br>') , b):($append(b.data, '<font color=red>Can not Make Strong Hydrogen Bonds<\/font><br>') , b);
-    this$static.canMakeIonicBonds?($append(b.data, '<font color=green>Can Make Ionic Bonds<\/font><br>') , b):($append(b.data, '<font color=red>Can not Make Ionic Bonds<\/font><br>') , b);
-  }
-  return $toString(b.data);
-}
-
-function MoleculeInfo_0(hBonds, iBonds, phobicity, errorString){
-  this.canMakeHBonds = hBonds;
-  this.canMakeIonicBonds = iBonds;
-  this.phobicity = phobicity;
-  this.errorString = errorString;
-}
-
-defineSeed(49, 1, {}, MoleculeInfo_0);
-_.canMakeHBonds = false;
-_.canMakeIonicBonds = false;
-_.errorString = null;
-_.phobicity = 0;
-function $isCorrect(this$static, info){
-  switch (this$static.type) {
-    case 0:
-      return info.phobicity > this$static.loPhobicLimit && info.phobicity < this$static.hiPhobicLimit;
-    case 1:
-      return !info.canMakeHBonds;
-    case 2:
-      return info.canMakeHBonds;
-    case 3:
-      return !info.canMakeIonicBonds;
-    case 4:
-      return info.canMakeIonicBonds;
-    default:return false;
-  }
-}
-
-function $toString_1(this$static){
-  var nf;
-  switch (this$static.type) {
-    case 0:
-      nf = ($clinit_NumberFormat() , new NumberFormat_1($getDefaultNative()));
-      return 'Has a relative hydrophobicity betweeen ' + $format(nf, this$static.loPhobicLimit) + ' and ' + $format(nf, this$static.hiPhobicLimit);
-    case 1:
-      return 'Can not make strong Hydrogen Bonds';
-    case 2:
-      return 'Can make strong Hydrogen Bonds';
-    case 3:
-      return 'Can not make Ionic Bonds';
-    case 4:
-      return 'Can make Ionic Bonds';
-    default:return 'Error in setting target type';
-  }
-}
-
-function Target_0(loPhobicLimit, hiPhobicLimit){
-  this.type = 0;
-  this.loPhobicLimit = loPhobicLimit;
-  this.hiPhobicLimit = hiPhobicLimit;
-}
-
-function Target_1(type){
-  this.type = type;
-}
-
-defineSeed(50, 1, makeCastMap([Q$Target]), Target_0, Target_1);
-_.hiPhobicLimit = 0;
-_.loPhobicLimit = 0;
-_.type = 0;
-function $export_1(){
-  if (!exported_1) {
-    exported_1 = true;
-    new InfoExporterImpl_0;
-    $export0_1();
-  }
-}
-
-function $export0_1(){
-  var pkg = declarePackage('edu.umb.bio.jsMolCalc.JsMolCalcAPI.Task');
-  var __0;
-  $wnd.edu.umb.bio.jsMolCalc.JsMolCalcAPI.Task = $entry(function(){
-    var g, j = this;
-    isAssignableToInstance(Ledu_umb_bio_jsMolCalc_client_JsMolCalcAPI$Task_2_classLit, arguments)?(g = arguments[0]):arguments.length == 1 && (g = ___create_0(gwtInstance(arguments[0])));
-    j.g = g;
-    setWrapper(g, j);
-    return j;
-  }
-  );
-  __0 = $wnd.edu.umb.bio.jsMolCalc.JsMolCalcAPI.Task.prototype = new Object;
-  __0.check = $entry(function(a0){
-    return this.g.check_0(a0.g);
-  }
-  );
-  __0.toString = $entry(function(){
-    return this.g.toString_0();
-  }
-  );
-  addTypeMap(Ledu_umb_bio_jsMolCalc_client_JsMolCalcAPI$Task_2_classLit, $wnd.edu.umb.bio.jsMolCalc.JsMolCalcAPI.Task);
-  if (pkg)
-    for (p in pkg)
-      $wnd.edu.umb.bio.jsMolCalc.JsMolCalcAPI.Task[p] === undefined && ($wnd.edu.umb.bio.jsMolCalc.JsMolCalcAPI.Task[p] = pkg[p]);
-}
-
-function TaskExporterImpl_0(){
-  $export_1();
-}
-
-function ___create_0(a0){
-  return new JsMolCalcAPI$Task_0(a0);
-}
-
-defineSeed(51, 1, {}, TaskExporterImpl_0);
-var exported_1 = false;
+defineSeed(47, 1, makeCastMap([Q$Exportable]), JsMolCalcAPI$API_0);
 function ArrayStoreException_0(){
   $fillInStackTrace();
 }
 
-defineSeed(52, 6, makeCastMap([Q$Serializable, Q$Throwable]), ArrayStoreException_0);
+defineSeed(48, 6, makeCastMap([Q$Serializable, Q$Throwable]), ArrayStoreException_0);
 function digit_0(c){
   if (c >= 48 && c < 58) {
     return c - 48;
@@ -1944,7 +1750,6 @@ function createForArray(packageName, className, seedId){
   var clazz;
   clazz = new Class_0;
   isInstantiable(seedId != 0?-seedId:0) && setClassLiteral(seedId != 0?-seedId:0, clazz);
-  clazz.modifiers = 4;
   clazz.superclass = Ljava_lang_Object_2_classLit;
   return clazz;
 }
@@ -1961,7 +1766,6 @@ function createForInterface(packageName, className){
   var clazz;
   clazz = new Class_0;
   isInstantiable(0) && setClassLiteral(0, clazz);
-  clazz.modifiers = 2;
   return clazz;
 }
 
@@ -2002,15 +1806,14 @@ function setClassLiteral(seedId, clazz){
   proto.___clazz$ = clazz;
 }
 
-defineSeed(54, 1, {}, Class_0);
-_.modifiers = 0;
+defineSeed(50, 1, {}, Class_0);
 _.seedId = 0;
 _.superclass = null;
 function ClassCastException_0(){
   $fillInStackTrace();
 }
 
-defineSeed(55, 6, makeCastMap([Q$Serializable, Q$Throwable]), ClassCastException_0);
+defineSeed(51, 6, makeCastMap([Q$Serializable, Q$Throwable]), ClassCastException_0);
 function __parseAndValidateInt(s){
   var i, length_0, startIndex, toReturn;
   if (s == null) {
@@ -2037,26 +1840,26 @@ function IllegalArgumentException_0(message){
   $fillInStackTrace();
 }
 
-defineSeed(58, 6, makeCastMap([Q$Serializable, Q$Throwable]), IllegalArgumentException_0);
+defineSeed(54, 6, makeCastMap([Q$Serializable, Q$Throwable]), IllegalArgumentException_0);
 function IndexOutOfBoundsException_0(message){
   $fillInStackTrace();
 }
 
-defineSeed(59, 6, makeCastMap([Q$Serializable, Q$Throwable]), IndexOutOfBoundsException_0);
+defineSeed(55, 6, makeCastMap([Q$Serializable, Q$Throwable]), IndexOutOfBoundsException_0);
 function NullPointerException_0(){
   $fillInStackTrace();
 }
 
-defineSeed(60, 6, makeCastMap([Q$Serializable, Q$Throwable]), NullPointerException_0);
+defineSeed(56, 6, makeCastMap([Q$Serializable, Q$Throwable]), NullPointerException_0);
 function NumberFormatException_0(message){
   $fillInStackTrace();
 }
 
-defineSeed(61, 58, makeCastMap([Q$Serializable, Q$Throwable]), NumberFormatException_0);
+defineSeed(57, 54, makeCastMap([Q$Serializable, Q$Throwable]), NumberFormatException_0);
 function StackTraceElement_0(methodName){
 }
 
-defineSeed(62, 1, makeCastMap([Q$Serializable, Q$StackTraceElement]), StackTraceElement_0);
+defineSeed(58, 1, makeCastMap([Q$Serializable, Q$StackTraceElement]), StackTraceElement_0);
 function $charAt(this$static, index){
   return this$static.charCodeAt(index);
 }
@@ -2068,11 +1871,7 @@ function $equals(this$static, other){
   return String(this$static) == other;
 }
 
-function $indexOf(this$static, str){
-  return this$static.indexOf(str);
-}
-
-function $indexOf_0(this$static, str, startIndex){
+function $indexOf(this$static, str, startIndex){
   return this$static.indexOf(str, startIndex);
 }
 
@@ -2116,6 +1915,10 @@ function $split(this$static, regex, maxMatch){
 
 function $substring(this$static, beginIndex){
   return this$static.substr(beginIndex, this$static.length - beginIndex);
+}
+
+function $substring_0(this$static, beginIndex, endIndex){
+  return this$static.substr(beginIndex, endIndex - beginIndex);
 }
 
 function $trim(this$static){
@@ -2187,56 +1990,55 @@ function increment(){
 
 var back_0, count_0 = 0, front;
 function $append_0(this$static, x){
-  $append(this$static.data, x);
+  $append(this$static.impl, x);
   return this$static;
 }
 
-function $replace_0(this$static, end){
-  $replace(this$static.data, 0, end, '');
-  return this$static;
+function $delete(this$static, end){
+  return $replace(this$static.impl, 0, end, '') , this$static;
 }
 
 function StringBuffer_0(){
-  this.data = $createData();
+  this.impl = new StringBufferImplAppend_0;
 }
 
-defineSeed(64, 1, makeCastMap([Q$CharSequence]), StringBuffer_0);
+defineSeed(60, 1, makeCastMap([Q$CharSequence]), StringBuffer_0);
 function $append_1(this$static, x){
-  $append(this$static.data, x);
+  $append(this$static.impl, x);
   return this$static;
 }
 
 function $charAt_0(this$static, index){
-  return $charAt($toString(this$static.data), index);
+  return $charAt(this$static.impl.string, index);
 }
 
-function $delete(this$static, start, end){
-  return $replace(this$static.data, start, end, '') , this$static;
+function $delete_0(this$static, start, end){
+  return $replace(this$static.impl, start, end, '') , this$static;
 }
 
 function $insert(this$static, index, x){
-  return $replace(this$static.data, index, index, x) , this$static;
+  return $replace(this$static.impl, index, index, x) , this$static;
 }
 
-function $replace_1(this$static, start, end, toInsert){
-  $replace(this$static.data, start, end, toInsert);
+function $replace_0(this$static, start, end, toInsert){
+  $replace(this$static.impl, start, end, toInsert);
   return this$static;
 }
 
 function $setCharAt(this$static, index, x){
-  $replace_1(this$static, index, index + 1, String.fromCharCode(x));
+  $replace_0(this$static, index, index + 1, String.fromCharCode(x));
 }
 
 function StringBuilder_0(){
-  this.data = $createData();
+  this.impl = new StringBufferImplAppend_0;
 }
 
-defineSeed(65, 1, makeCastMap([Q$CharSequence]), StringBuilder_0);
+defineSeed(61, 1, makeCastMap([Q$CharSequence]), StringBuilder_0);
 function UnsupportedOperationException_0(){
   $fillInStackTrace();
 }
 
-defineSeed(66, 6, makeCastMap([Q$Serializable, Q$Throwable]), UnsupportedOperationException_0);
+defineSeed(62, 6, makeCastMap([Q$Serializable, Q$Throwable]), UnsupportedOperationException_0);
 function $advanceToFind(iter, o){
   var t;
   while (iter.hasNext()) {
@@ -2248,7 +2050,7 @@ function $advanceToFind(iter, o){
   return null;
 }
 
-defineSeed(67, 1, {});
+defineSeed(63, 1, {});
 _.add = function add(o){
   throw new UnsupportedOperationException_0;
 }
@@ -2259,7 +2061,9 @@ _.contains = function contains(o){
   return !!iter;
 }
 ;
-defineSeed(69, 1, makeCastMap([Q$Map]));
+--></script>
+<script><!--
+defineSeed(65, 1, makeCastMap([Q$Map]));
 _.equals$ = function equals_1(obj){
   var entry, entry$iterator, otherKey, otherMap, otherValue;
   if (obj === this) {
@@ -2360,8 +2164,6 @@ function $hasHashValue(this$static, key, hashCode){
   return false;
 }
 
---></script>
-<script><!--
 function $hasStringValue(this$static, key){
   return ':' + key in this$static.stringMap;
 }
@@ -2411,7 +2213,7 @@ function $putStringValue(this$static, key, value){
   return result;
 }
 
-defineSeed(68, 69, makeCastMap([Q$Map]));
+defineSeed(64, 65, makeCastMap([Q$Map]));
 _.equalsBridge = function equalsBridge(value1, value2){
   return maskUndefined(value1) === maskUndefined(value2) || value1 != null && equals__devirtual$(value1, value2);
 }
@@ -2421,7 +2223,7 @@ _.nullSlot = null;
 _.nullSlotLive = false;
 _.size = 0;
 _.stringMap = null;
-defineSeed(71, 67, makeCastMap([Q$Set]));
+defineSeed(67, 63, makeCastMap([Q$Set]));
 _.equals$ = function equals_2(o){
   var iter, other, otherItem;
   if (o === this) {
@@ -2460,7 +2262,7 @@ function AbstractHashMap$EntrySet_0(this$0){
   this.this$0 = this$0;
 }
 
-defineSeed(70, 71, makeCastMap([Q$Set]), AbstractHashMap$EntrySet_0);
+defineSeed(66, 67, makeCastMap([Q$Set]), AbstractHashMap$EntrySet_0);
 _.contains = function contains_0(o){
   var entry, key, value;
   if (instanceOf(o, Q$Map$Entry)) {
@@ -2492,7 +2294,7 @@ function AbstractHashMap$EntrySetIterator_0(this$0){
   this.iter = new AbstractList$IteratorImpl_0(list);
 }
 
-defineSeed(72, 1, {}, AbstractHashMap$EntrySetIterator_0);
+defineSeed(68, 1, {}, AbstractHashMap$EntrySetIterator_0);
 _.hasNext = function hasNext(){
   return $hasNext(this.iter);
 }
@@ -2502,7 +2304,7 @@ _.next = function next_0(){
 }
 ;
 _.iter = null;
-defineSeed(74, 1, makeCastMap([Q$Map$Entry]));
+defineSeed(70, 1, makeCastMap([Q$Map$Entry]));
 _.equals$ = function equals_3(other){
   var entry;
   if (instanceOf(other, Q$Map$Entry)) {
@@ -2527,7 +2329,7 @@ function AbstractHashMap$MapEntryNull_0(this$0){
   this.this$0 = this$0;
 }
 
-defineSeed(73, 74, makeCastMap([Q$Map$Entry]), AbstractHashMap$MapEntryNull_0);
+defineSeed(69, 70, makeCastMap([Q$Map$Entry]), AbstractHashMap$MapEntryNull_0);
 _.getKey = function getKey(){
   return null;
 }
@@ -2546,7 +2348,7 @@ function AbstractHashMap$MapEntryString_0(this$0, key){
   this.key = key;
 }
 
-defineSeed(75, 74, makeCastMap([Q$Map$Entry]), AbstractHashMap$MapEntryString_0);
+defineSeed(71, 70, makeCastMap([Q$Map$Entry]), AbstractHashMap$MapEntryString_0);
 _.getKey = function getKey_0(){
   return this.key;
 }
@@ -2569,7 +2371,7 @@ function indexOutOfBounds(index, size){
   throw new IndexOutOfBoundsException_0('Index: ' + index + ', Size: ' + size);
 }
 
-defineSeed(76, 67, makeCastMap([Q$List]));
+defineSeed(72, 63, makeCastMap([Q$List]));
 _.add = function add_0(obj){
   $add(this, this.size_0(), obj);
   return true;
@@ -2630,7 +2432,7 @@ function AbstractList$IteratorImpl_0(this$0){
   this.this$0 = this$0;
 }
 
-defineSeed(77, 1, {}, AbstractList$IteratorImpl_0);
+defineSeed(73, 1, {}, AbstractList$IteratorImpl_0);
 _.hasNext = function hasNext_0(){
   return $hasNext(this);
 }
@@ -2643,7 +2445,7 @@ _.i = 0;
 _.this$0 = null;
 function $add(this$static, index, o){
   (index < 0 || index > this$static.size) && indexOutOfBounds(index, this$static.size);
-  splice(this$static.array, index, 0, o);
+  splice_0(this$static.array, index, 0, o);
   ++this$static.size;
 }
 
@@ -2657,7 +2459,7 @@ function $get_0(this$static, index){
   return this$static.array[index];
 }
 
-function $indexOf_1(this$static, o, index){
+function $indexOf_0(this$static, o, index){
   for (; index < this$static.size; ++index) {
     if (equalsWithNullCheck(o, this$static.array[index])) {
       return index;
@@ -2670,17 +2472,17 @@ function ArrayList_0(){
   this.array = initDim(_3Ljava_lang_Object_2_classLit, makeCastMap([Q$Serializable]), Q$Object, 0, 0);
 }
 
-function splice(array, index, deleteCount, value){
+function splice_0(array, index, deleteCount, value){
   array.splice(index, deleteCount, value);
 }
 
-defineSeed(78, 76, makeCastMap([Q$Serializable, Q$List]), ArrayList_0);
+defineSeed(74, 72, makeCastMap([Q$Serializable, Q$List]), ArrayList_0);
 _.add = function add_1(o){
   return $add_0(this, o);
 }
 ;
 _.contains = function contains_1(o){
-  return $indexOf_1(this, o, 0) != -1;
+  return $indexOf_0(this, o, 0) != -1;
 }
 ;
 _.size_0 = function size_1(){
@@ -2707,13 +2509,13 @@ function HashMap_0(){
   this.size = 0;
 }
 
-defineSeed(80, 68, makeCastMap([Q$Serializable, Q$Map]), HashMap_0);
+defineSeed(76, 64, makeCastMap([Q$Serializable, Q$Map]), HashMap_0);
 function MapEntryImpl_0(key, value){
   this.key = key;
   this.value = value;
 }
 
-defineSeed(81, 74, makeCastMap([Q$Map$Entry]), MapEntryImpl_0);
+defineSeed(77, 70, makeCastMap([Q$Map$Entry]), MapEntryImpl_0);
 _.getKey = function getKey_1(){
   return this.key;
 }
@@ -2735,7 +2537,7 @@ function NoSuchElementException_0(){
   $fillInStackTrace();
 }
 
-defineSeed(82, 6, makeCastMap([Q$Serializable, Q$Throwable]), NoSuchElementException_0);
+defineSeed(78, 6, makeCastMap([Q$Serializable, Q$Throwable]), NoSuchElementException_0);
 function equalsWithNullCheck(a, b){
   return maskUndefined(a) === maskUndefined(b) || a != null && equals__devirtual$(a, b);
 }
@@ -2744,8 +2546,8 @@ function ExportAllExporterImpl_0(){
   new APIExporterImpl_0;
 }
 
-defineSeed(84, 1, {}, ExportAllExporterImpl_0);
-defineSeed(86, 1, {});
+defineSeed(80, 1, {}, ExportAllExporterImpl_0);
+defineSeed(82, 1, {});
 function $addTypeMap(this$static, type, exportedConstructor){
   $put(this$static.typeMap, type, exportedConstructor);
 }
@@ -2765,59 +2567,14 @@ function $declarePackage(qualifiedExportName){
   return o;
 }
 
-function $setWrapper(this$static, type){
-  var cons, wrapper;
-  if ((getClass__devirtual$(type).modifiers & 4) != 0) {
-    return [];
-  }
-  cons = $typeConstructor(this$static, getClass__devirtual$(type));
-  wrapper = cons && typeof cons == 'function'?new cons(type):type;
-  type['__gwtex_wrap'] = wrapper;
-  return wrapper;
-}
-
-function $typeConstructor(this$static, type){
-  var o, sup;
-  o = $get(this$static.typeMap, type);
-  sup = type.superclass;
-  if (o == null && !!sup && sup != Ljava_lang_Object_2_classLit) {
-    return $typeConstructor(this$static, sup);
-  }
-  return dynamicCastJso(o);
-}
-
-function $wrap(this$static, type){
-  var wrapper;
-  if (type == null) {
-    return null;
-  }
-  return wrapper = type['__gwtex_wrap'] , !wrapper && (wrapper = $setWrapper(this$static, type)) , wrapper;
-}
-
-function $wrap_0(this$static, type){
-  var i, wrapperArray;
-  if (type == null) {
-    return null;
-  }
-  wrapperArray = [];
-  for (i = 0; i < type.length; ++i) {
-    wrapperArray[i] = $wrap(this$static, type[i]);
-  }
-  return wrapperArray;
-}
-
 function ExporterBaseActual_0(){
   this.typeMap = new HashMap_0;
   new HashMap_0;
   new HashMap_0;
 }
 
-function getGwtInstance(o){
-  return o && o.g?o.g:null;
-}
-
 function isAssignableToClass(o, clazz){
-  var sup;
+  var sup, maybeJsoInvocation;
   if (Ljava_lang_Object_2_classLit == clazz) {
     return true;
   }
@@ -2825,7 +2582,7 @@ function isAssignableToClass(o, clazz){
     return true;
   }
   if (o != null) {
-    for (sup = getClass__devirtual$(o); !!sup && sup != Ljava_lang_Object_2_classLit; sup = sup.superclass) {
+    for (sup = (maybeJsoInvocation = o , isJavaObject(maybeJsoInvocation)?maybeJsoInvocation.___clazz$:Lcom_google_gwt_core_client_JavaScriptObject_2_classLit); !!sup && sup != Ljava_lang_Object_2_classLit; sup = sup.superclass) {
       if (sup == clazz) {
         return true;
       }
@@ -2834,7 +2591,7 @@ function isAssignableToClass(o, clazz){
   return false;
 }
 
-defineSeed(85, 86, {}, ExporterBaseActual_0);
+defineSeed(81, 82, {}, ExporterBaseActual_0);
 function $clinit_ExporterUtil(){
   $clinit_ExporterUtil = nullMethod;
   impl = new ExporterBaseActual_0;
@@ -2845,36 +2602,10 @@ function addTypeMap(type, exportedConstructor){
   $addTypeMap(impl, type, exportedConstructor);
 }
 
-function declarePackage(qualifiedExportName){
-  $clinit_ExporterUtil();
-  return $declarePackage(qualifiedExportName);
-}
-
-function gwtInstance(o){
-  var g;
-  $clinit_ExporterUtil();
-  return o != null && instanceOfJso(o) && (g = getGwtInstance(dynamicCastJso(o))) != null?g:o;
-}
-
 function isAssignableToInstance(clazz, args){
   var o;
   $clinit_ExporterUtil();
   return o = args && args[0] && (typeof args[0] == 'object' || typeof args[0] == 'function')?args[0]:null , isAssignableToClass(o, clazz);
-}
-
-function setWrapper(instance, wrapper){
-  $clinit_ExporterUtil();
-  instance['__gwtex_wrap'] = wrapper;
-}
-
-function wrap(type){
-  $clinit_ExporterUtil();
-  return $wrap(impl, type);
-}
-
-function wrap_0(type){
-  $clinit_ExporterUtil();
-  return $wrap_0(impl, type);
 }
 
 var impl;
@@ -2894,7 +2625,7 @@ function gwtOnLoad(errFn, modName, modBase, softPermutationId){
   }
 }
 
-var Ljava_lang_Object_2_classLit = createForClass('java.lang.', 'Object', 1, null), Lcom_google_gwt_core_client_JavaScriptObject_2_classLit = createForClass('com.google.gwt.core.client.', 'JavaScriptObject$', 9, Ljava_lang_Object_2_classLit), _3I_classLit = createForArray('', '[I', 94), _3Ljava_lang_Object_2_classLit = createForArray('[Ljava.lang.', 'Object;', 92), Ljava_lang_Throwable_2_classLit = createForClass('java.lang.', 'Throwable', 8, Ljava_lang_Object_2_classLit), Ljava_lang_Exception_2_classLit = createForClass('java.lang.', 'Exception', 7, Ljava_lang_Throwable_2_classLit), Ljava_lang_RuntimeException_2_classLit = createForClass('java.lang.', 'RuntimeException', 6, Ljava_lang_Exception_2_classLit), Ljava_lang_StackTraceElement_2_classLit = createForClass('java.lang.', 'StackTraceElement', 62, Ljava_lang_Object_2_classLit), _3Ljava_lang_StackTraceElement_2_classLit = createForArray('[Ljava.lang.', 'StackTraceElement;', 95), Lcom_google_gwt_lang_SeedUtil_2_classLit = createForClass('com.google.gwt.lang.', 'SeedUtil', 34, Ljava_lang_Object_2_classLit), Ledu_umb_bio_jsMolCalc_client_JsMolCalcAPI$Info_2_classLit = createForClass('edu.umb.bio.jsMolCalc.client.', 'JsMolCalcAPI$Info', 47, Ljava_lang_Object_2_classLit), Ledu_umb_bio_jsMolCalc_client_JsMolCalcAPI$Task_2_classLit = createForClass('edu.umb.bio.jsMolCalc.client.', 'JsMolCalcAPI$Task', 48, Ljava_lang_Object_2_classLit), Ledu_umb_bio_jsMolCalc_client_JsMolCalcAPI$API_2_classLit = createForClass('edu.umb.bio.jsMolCalc.client.', 'JsMolCalcAPI$API', 46, Ljava_lang_Object_2_classLit), _3Ledu_umb_bio_jsMolCalc_client_JsMolCalcAPI$Task_2_classLit = createForArray('[Ledu.umb.bio.jsMolCalc.client.', 'JsMolCalcAPI$Task;', 96), Ljava_lang_Class_2_classLit = createForClass('java.lang.', 'Class', 54, Ljava_lang_Object_2_classLit), Ljava_lang_String_2_classLit = createForClass('java.lang.', 'String', 2, Ljava_lang_Object_2_classLit), _3Ljava_lang_String_2_classLit = createForArray('[Ljava.lang.', 'String;', 93), Ljava_lang_ClassCastException_2_classLit = createForClass('java.lang.', 'ClassCastException', 55, Ljava_lang_RuntimeException_2_classLit), Ljava_lang_StringBuilder_2_classLit = createForClass('java.lang.', 'StringBuilder', 65, Ljava_lang_Object_2_classLit), Ljava_lang_ArrayStoreException_2_classLit = createForClass('java.lang.', 'ArrayStoreException', 52, Ljava_lang_RuntimeException_2_classLit), Lcom_google_gwt_core_client_JavaScriptException_2_classLit = createForClass('com.google.gwt.core.client.', 'JavaScriptException', 5, Ljava_lang_RuntimeException_2_classLit), Ledu_umb_bio_jsMolCalc_client_TaskExporterImpl_2_classLit = createForClass('edu.umb.bio.jsMolCalc.client.', 'TaskExporterImpl', 51, Ljava_lang_Object_2_classLit), Lorg_timepedia_exporter_client_ExporterBaseImpl_2_classLit = createForClass('org.timepedia.exporter.client.', 'ExporterBaseImpl', 86, Ljava_lang_Object_2_classLit), Lorg_timepedia_exporter_client_ExporterBaseActual_2_classLit = createForClass('org.timepedia.exporter.client.', 'ExporterBaseActual', 85, Lorg_timepedia_exporter_client_ExporterBaseImpl_2_classLit), Lorg_timepedia_exporter_client_Exportable_2_classLit = createForInterface('org.timepedia.exporter.client.', 'Exportable'), Lorg_timepedia_exporter_client_ExportAllExporterImpl_2_classLit = createForClass('org.timepedia.exporter.client.', 'ExportAllExporterImpl', 84, Ljava_lang_Object_2_classLit), Lcom_google_gwt_core_client_impl_StackTraceCreator$Collector_2_classLit = createForClass('com.google.gwt.core.client.impl.', 'StackTraceCreator$Collector', 17, Ljava_lang_Object_2_classLit), Lcom_google_gwt_core_client_Scheduler_2_classLit = createForClass('com.google.gwt.core.client.', 'Scheduler', 12, Ljava_lang_Object_2_classLit), Lcom_google_gwt_core_client_impl_SchedulerImpl_2_classLit = createForClass('com.google.gwt.core.client.impl.', 'SchedulerImpl', 14, Lcom_google_gwt_core_client_Scheduler_2_classLit), Ledu_umb_bio_jsMolCalc_client_InfoExporterImpl_2_classLit = createForClass('edu.umb.bio.jsMolCalc.client.', 'InfoExporterImpl', 44, Ljava_lang_Object_2_classLit), Ljava_util_AbstractMap_2_classLit = createForClass('java.util.', 'AbstractMap', 69, Ljava_lang_Object_2_classLit), Ljava_util_AbstractHashMap_2_classLit = createForClass('java.util.', 'AbstractHashMap', 68, Ljava_util_AbstractMap_2_classLit), Ljava_util_AbstractCollection_2_classLit = createForClass('java.util.', 'AbstractCollection', 67, Ljava_lang_Object_2_classLit), Ljava_util_AbstractSet_2_classLit = createForClass('java.util.', 'AbstractSet', 71, Ljava_util_AbstractCollection_2_classLit), Ljava_util_AbstractHashMap$EntrySet_2_classLit = createForClass('java.util.', 'AbstractHashMap$EntrySet', 70, Ljava_util_AbstractSet_2_classLit), Ljava_util_AbstractHashMap$EntrySetIterator_2_classLit = createForClass('java.util.', 'AbstractHashMap$EntrySetIterator', 72, Ljava_lang_Object_2_classLit), Ljava_util_AbstractMapEntry_2_classLit = createForClass('java.util.', 'AbstractMapEntry', 74, Ljava_lang_Object_2_classLit), Ljava_util_AbstractHashMap$MapEntryNull_2_classLit = createForClass('java.util.', 'AbstractHashMap$MapEntryNull', 73, Ljava_util_AbstractMapEntry_2_classLit), Ljava_util_AbstractHashMap$MapEntryString_2_classLit = createForClass('java.util.', 'AbstractHashMap$MapEntryString', 75, Ljava_util_AbstractMapEntry_2_classLit), Ljava_lang_NullPointerException_2_classLit = createForClass('java.lang.', 'NullPointerException', 60, Ljava_lang_RuntimeException_2_classLit), Ljava_lang_IllegalArgumentException_2_classLit = createForClass('java.lang.', 'IllegalArgumentException', 58, Ljava_lang_RuntimeException_2_classLit), Ledu_umb_bio_jsMolCalc_client_Target_2_classLit = createForClass('edu.umb.bio.jsMolCalc.client.', 'Target', 50, Ljava_lang_Object_2_classLit), Ljava_util_HashMap_2_classLit = createForClass('java.util.', 'HashMap', 80, Ljava_util_AbstractHashMap_2_classLit), Ledu_umb_bio_jsMolCalc_client_APIExporterImpl_2_classLit = createForClass('edu.umb.bio.jsMolCalc.client.', 'APIExporterImpl', 40, Ljava_lang_Object_2_classLit), Ledu_umb_bio_jsMolCalc_client_MoleculeInfo_2_classLit = createForClass('edu.umb.bio.jsMolCalc.client.', 'MoleculeInfo', 49, Ljava_lang_Object_2_classLit), Lcom_google_gwt_i18n_client_NumberFormat_2_classLit = createForClass('com.google.gwt.i18n.client.', 'NumberFormat', 25, Ljava_lang_Object_2_classLit), Ljava_lang_StringBuffer_2_classLit = createForClass('java.lang.', 'StringBuffer', 64, Ljava_lang_Object_2_classLit), Lcom_google_gwt_i18n_client_LocaleInfo_2_classLit = createForClass('com.google.gwt.i18n.client.', 'LocaleInfo', 24, Ljava_lang_Object_2_classLit), Ljava_lang_UnsupportedOperationException_2_classLit = createForClass('java.lang.', 'UnsupportedOperationException', 66, Ljava_lang_RuntimeException_2_classLit), Ledu_umb_bio_jsMolCalc_client_InfoAndTargets_2_classLit = createForClass('edu.umb.bio.jsMolCalc.client.', 'InfoAndTargets', 43, Ljava_lang_Object_2_classLit), _3_3I_classLit = createForArray('', '[[I', 97), _3Ledu_umb_bio_jsMolCalc_client_Target_2_classLit = createForArray('[Ledu.umb.bio.jsMolCalc.client.', 'Target;', 98), Ljava_lang_NumberFormatException_2_classLit = createForClass('java.lang.', 'NumberFormatException', 61, Ljava_lang_IllegalArgumentException_2_classLit), Ljava_util_MapEntryImpl_2_classLit = createForClass('java.util.', 'MapEntryImpl', 81, Ljava_util_AbstractMapEntry_2_classLit), Ljava_util_AbstractList_2_classLit = createForClass('java.util.', 'AbstractList', 76, Ljava_util_AbstractCollection_2_classLit), Ljava_util_ArrayList_2_classLit = createForClass('java.util.', 'ArrayList', 78, Ljava_util_AbstractList_2_classLit), Ljava_util_AbstractList$IteratorImpl_2_classLit = createForClass('java.util.', 'AbstractList$IteratorImpl', 77, Ljava_lang_Object_2_classLit), Ledu_umb_bio_jsMolCalc_client_Atom_2_classLit = createForClass('edu.umb.bio.jsMolCalc.client.', 'Atom', 41, Ljava_lang_Object_2_classLit), Ledu_umb_bio_jsMolCalc_client_AtomSpec_2_classLit = createForClass('edu.umb.bio.jsMolCalc.client.', 'AtomSpec', 42, Ljava_lang_Object_2_classLit), Lcom_google_gwt_i18n_client_constants_NumberConstantsImpl_1_2_classLit = createForClass('com.google.gwt.i18n.client.constants.', 'NumberConstantsImpl_', 26, Ljava_lang_Object_2_classLit), Ljava_lang_IndexOutOfBoundsException_2_classLit = createForClass('java.lang.', 'IndexOutOfBoundsException', 59, Ljava_lang_RuntimeException_2_classLit), Ljava_util_NoSuchElementException_2_classLit = createForClass('java.util.', 'NoSuchElementException', 82, Ljava_lang_RuntimeException_2_classLit);
+var Ljava_lang_Object_2_classLit = createForClass('java.lang.', 'Object', 1, null), Lcom_google_gwt_core_client_JavaScriptObject_2_classLit = createForClass('com.google.gwt.core.client.', 'JavaScriptObject$', 9, Ljava_lang_Object_2_classLit), _3I_classLit = createForArray('', '[I', 89), _3Ljava_lang_Object_2_classLit = createForArray('[Ljava.lang.', 'Object;', 87), Ljava_lang_Throwable_2_classLit = createForClass('java.lang.', 'Throwable', 8, Ljava_lang_Object_2_classLit), Ljava_lang_Exception_2_classLit = createForClass('java.lang.', 'Exception', 7, Ljava_lang_Throwable_2_classLit), Ljava_lang_RuntimeException_2_classLit = createForClass('java.lang.', 'RuntimeException', 6, Ljava_lang_Exception_2_classLit), Ljava_lang_StackTraceElement_2_classLit = createForClass('java.lang.', 'StackTraceElement', 58, Ljava_lang_Object_2_classLit), _3Ljava_lang_StackTraceElement_2_classLit = createForArray('[Ljava.lang.', 'StackTraceElement;', 90), Lcom_google_gwt_lang_SeedUtil_2_classLit = createForClass('com.google.gwt.lang.', 'SeedUtil', 36, Ljava_lang_Object_2_classLit), Ledu_umb_bio_jsMolCalc_client_JsMolCalcAPI$API_2_classLit = createForClass('edu.umb.bio.jsMolCalc.client.', 'JsMolCalcAPI$API', 47, Ljava_lang_Object_2_classLit), Ljava_lang_Class_2_classLit = createForClass('java.lang.', 'Class', 50, Ljava_lang_Object_2_classLit), Ljava_lang_String_2_classLit = createForClass('java.lang.', 'String', 2, Ljava_lang_Object_2_classLit), _3Ljava_lang_String_2_classLit = createForArray('[Ljava.lang.', 'String;', 88), Ljava_lang_ClassCastException_2_classLit = createForClass('java.lang.', 'ClassCastException', 51, Ljava_lang_RuntimeException_2_classLit), Ljava_lang_StringBuilder_2_classLit = createForClass('java.lang.', 'StringBuilder', 61, Ljava_lang_Object_2_classLit), Ljava_lang_ArrayStoreException_2_classLit = createForClass('java.lang.', 'ArrayStoreException', 48, Ljava_lang_RuntimeException_2_classLit), Lcom_google_gwt_core_client_JavaScriptException_2_classLit = createForClass('com.google.gwt.core.client.', 'JavaScriptException', 5, Ljava_lang_RuntimeException_2_classLit), Lcom_google_gwt_core_client_impl_StringBufferImpl_2_classLit = createForClass('com.google.gwt.core.client.impl.', 'StringBufferImpl', 20, Ljava_lang_Object_2_classLit), Lorg_timepedia_exporter_client_ExporterBaseImpl_2_classLit = createForClass('org.timepedia.exporter.client.', 'ExporterBaseImpl', 82, Ljava_lang_Object_2_classLit), Lorg_timepedia_exporter_client_ExporterBaseActual_2_classLit = createForClass('org.timepedia.exporter.client.', 'ExporterBaseActual', 81, Lorg_timepedia_exporter_client_ExporterBaseImpl_2_classLit), Lorg_timepedia_exporter_client_Exportable_2_classLit = createForInterface('org.timepedia.exporter.client.', 'Exportable'), Lorg_timepedia_exporter_client_ExportAllExporterImpl_2_classLit = createForClass('org.timepedia.exporter.client.', 'ExportAllExporterImpl', 80, Ljava_lang_Object_2_classLit), Lcom_google_gwt_core_client_impl_StringBufferImplAppend_2_classLit = createForClass('com.google.gwt.core.client.impl.', 'StringBufferImplAppend', 21, Lcom_google_gwt_core_client_impl_StringBufferImpl_2_classLit), Lcom_google_gwt_core_client_Scheduler_2_classLit = createForClass('com.google.gwt.core.client.', 'Scheduler', 12, Ljava_lang_Object_2_classLit), Lcom_google_gwt_core_client_impl_SchedulerImpl_2_classLit = createForClass('com.google.gwt.core.client.impl.', 'SchedulerImpl', 14, Lcom_google_gwt_core_client_Scheduler_2_classLit), Ljava_util_AbstractMap_2_classLit = createForClass('java.util.', 'AbstractMap', 65, Ljava_lang_Object_2_classLit), Ljava_util_AbstractHashMap_2_classLit = createForClass('java.util.', 'AbstractHashMap', 64, Ljava_util_AbstractMap_2_classLit), Ljava_util_AbstractCollection_2_classLit = createForClass('java.util.', 'AbstractCollection', 63, Ljava_lang_Object_2_classLit), Ljava_util_AbstractSet_2_classLit = createForClass('java.util.', 'AbstractSet', 67, Ljava_util_AbstractCollection_2_classLit), Ljava_util_AbstractHashMap$EntrySet_2_classLit = createForClass('java.util.', 'AbstractHashMap$EntrySet', 66, Ljava_util_AbstractSet_2_classLit), Ljava_util_AbstractHashMap$EntrySetIterator_2_classLit = createForClass('java.util.', 'AbstractHashMap$EntrySetIterator', 68, Ljava_lang_Object_2_classLit), Ljava_util_AbstractMapEntry_2_classLit = createForClass('java.util.', 'AbstractMapEntry', 70, Ljava_lang_Object_2_classLit), Ljava_util_AbstractHashMap$MapEntryNull_2_classLit = createForClass('java.util.', 'AbstractHashMap$MapEntryNull', 69, Ljava_util_AbstractMapEntry_2_classLit), Ljava_util_AbstractHashMap$MapEntryString_2_classLit = createForClass('java.util.', 'AbstractHashMap$MapEntryString', 71, Ljava_util_AbstractMapEntry_2_classLit), Ljava_lang_NullPointerException_2_classLit = createForClass('java.lang.', 'NullPointerException', 56, Ljava_lang_RuntimeException_2_classLit), Ljava_lang_IllegalArgumentException_2_classLit = createForClass('java.lang.', 'IllegalArgumentException', 54, Ljava_lang_RuntimeException_2_classLit), Ljava_util_HashMap_2_classLit = createForClass('java.util.', 'HashMap', 76, Ljava_util_AbstractHashMap_2_classLit), Ledu_umb_bio_jsMolCalc_client_APIExporterImpl_2_classLit = createForClass('edu.umb.bio.jsMolCalc.client.', 'APIExporterImpl', 42, Ljava_lang_Object_2_classLit), Ljava_lang_StringBuffer_2_classLit = createForClass('java.lang.', 'StringBuffer', 60, Ljava_lang_Object_2_classLit), Ledu_umb_bio_jsMolCalc_client_JsMolCalc_2_classLit = createForClass('edu.umb.bio.jsMolCalc.client.', 'JsMolCalc', 43, Ljava_lang_Object_2_classLit), _3_3I_classLit = createForArray('', '[[I', 91), Ledu_umb_bio_jsMolCalc_client_JsMolCalc$Atom_2_classLit = createForClass('edu.umb.bio.jsMolCalc.client.', 'JsMolCalc$Atom', 44, Ljava_lang_Object_2_classLit), Ledu_umb_bio_jsMolCalc_client_JsMolCalc$AtomSpec_2_classLit = createForClass('edu.umb.bio.jsMolCalc.client.', 'JsMolCalc$AtomSpec', 45, Ljava_lang_Object_2_classLit), Ledu_umb_bio_jsMolCalc_client_JsMolCalc$InfoAndTargets_2_classLit = createForClass('edu.umb.bio.jsMolCalc.client.', 'JsMolCalc$InfoAndTargets', 46, Ljava_lang_Object_2_classLit), Ljava_util_AbstractList_2_classLit = createForClass('java.util.', 'AbstractList', 72, Ljava_util_AbstractCollection_2_classLit), Ljava_util_ArrayList_2_classLit = createForClass('java.util.', 'ArrayList', 74, Ljava_util_AbstractList_2_classLit), Ljava_util_AbstractList$IteratorImpl_2_classLit = createForClass('java.util.', 'AbstractList$IteratorImpl', 73, Ljava_lang_Object_2_classLit), Ljava_lang_UnsupportedOperationException_2_classLit = createForClass('java.lang.', 'UnsupportedOperationException', 62, Ljava_lang_RuntimeException_2_classLit), Lcom_google_gwt_i18n_client_NumberFormat_2_classLit = createForClass('com.google.gwt.i18n.client.', 'NumberFormat', 27, Ljava_lang_Object_2_classLit), Ljava_lang_NumberFormatException_2_classLit = createForClass('java.lang.', 'NumberFormatException', 57, Ljava_lang_IllegalArgumentException_2_classLit), Lcom_google_gwt_i18n_client_LocaleInfo_2_classLit = createForClass('com.google.gwt.i18n.client.', 'LocaleInfo', 26, Ljava_lang_Object_2_classLit), Ljava_util_MapEntryImpl_2_classLit = createForClass('java.util.', 'MapEntryImpl', 77, Ljava_util_AbstractMapEntry_2_classLit), Ljava_lang_IndexOutOfBoundsException_2_classLit = createForClass('java.lang.', 'IndexOutOfBoundsException', 55, Ljava_lang_RuntimeException_2_classLit), Ljava_util_NoSuchElementException_2_classLit = createForClass('java.util.', 'NoSuchElementException', 78, Ljava_lang_RuntimeException_2_classLit), Lcom_google_gwt_i18n_client_constants_NumberConstantsImpl_1_2_classLit = createForClass('com.google.gwt.i18n.client.constants.', 'NumberConstantsImpl_', 28, Ljava_lang_Object_2_classLit);
 $stats && $stats({moduleName:'jsmolcalc',sessionId:$sessionId,subSystem:'startup',evtGroup:'moduleStartup',millis:(new Date()).getTime(),type:'moduleEvalEnd'});
 if ($wnd.jsmolcalc) $wnd.jsmolcalc.onScriptLoad();
 --></script></body></html>

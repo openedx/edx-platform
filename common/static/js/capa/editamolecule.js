@@ -107,11 +107,13 @@
         var smiles = applet[0].smiles();
         var jme = applet[0].jmeFile();
 
-        var info = formatInfo(jsmol.API.getInfo(mol, smiles, jme).toString());
+        var info = jsmol.API.getInfo(mol, smiles, jme).toString();
+        var err = jsmol.API.getErrors(mol, smiles, jme).toString();
         var value = { mol: mol, info: info };
 
         console.log("Molecule info:");
         console.log(info);
+        console.log(err);
 
         input_field.val(JSON.stringify(value));
 
