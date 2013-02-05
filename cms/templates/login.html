@@ -14,8 +14,6 @@
 
     <article class="content-primary" role="main">
       <form id="login_form" method="post" action="login_post">
-        <div id="login_error" name="login_error" class="message message-status message-status-error">
-        </div>
         
         <fieldset>
           <legend class="sr">Required Information to Sign into edX Studio</legend>
@@ -81,10 +79,10 @@
         if(json.success) {
           location.href = "${reverse('index')}";
         } else if($('#login_error').length == 0) {
-          $('#login_form').prepend('<div id="login_error">' + json.value + '</div>');
-          $('#login_error').slideDown(150);
+          $('#login_form').prepend('<div id="login_error" class="message message-status error">' + json.value + '</span></div>');
+          $('#login_error').addClass('is-shown');
         } else {
-          $('#login_error').stop().slideDown(150);
+          $('#login_error').stop().addClass('is-shown');
           $('#login_error').html(json.value);
         }
       }

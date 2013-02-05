@@ -17,7 +17,7 @@
 
     <article class="content-primary" role="main">
       <form id="register_form" method="post" action="register_post">
-        <div id="register_error" name="register_error" class="message message-status message-status-error">
+        <div id="register_error" name="register_error" class="message message-status message-status error">
         </div>
         
         <fieldset>
@@ -131,7 +131,7 @@
             if(json.success) {
               location.href = "${reverse('index')}";
             } else {
-              $('#register_error').html(json.value).stop().slideDown(150);
+              $('#register_error').html(json.value).stop().addClass('is-shown');
             }
           }
         );
