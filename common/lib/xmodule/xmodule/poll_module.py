@@ -101,10 +101,10 @@ class PollModule(XModule):
             xml_object_copy.remove(element_answer)
         return json.dumps({'answers': answers_to_json,
               'question': cgi.escape(stringify_children(xml_object_copy)),
-
-              # to show answered poll after reload
-                'current_answer': self.poll_answer,
-                'all_answers:': self.poll_answers if self.voted else ''})
+              # to show answered poll after reload:
+                'poll_answer': self.poll_answer,
+                'poll_answers:': self.poll_answers if self.voted else '',
+                'total': sum(self.poll_answers.values())})
 
 
 class PollDescriptor(MakoModuleDescriptor, XmlDescriptor):
