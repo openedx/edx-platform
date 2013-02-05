@@ -239,6 +239,7 @@ class TimedModule(models.Model):
                       ('ADDHALFTIME', 'Extra Time - 1 1/2 Time'),
                       ('ADD30MIN', 'Extra Time - 30 Minutes'),
                       ('DOUBLE', 'Extra Time - Double Time'),
+                      ('TESTING', 'Extra Time -- Large amount for testing purposes')
                     )
     accommodation_code = models.CharField(max_length=12, choices=TIME_ACCOMMODATION_CODES, default='NONE', db_index=True)
 
@@ -256,6 +257,9 @@ class TimedModule(models.Model):
             return (duration + (30 * 60))
         elif self.accommodation_code == 'DOUBLE':
             return (duration * 2)
+        elif self.accommodation_code == 'TESTING':
+            # when testing, set timer to run for a week at a time.
+            return 3600 * 24 * 7
        
     # store state:
     

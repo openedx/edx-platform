@@ -1,12 +1,10 @@
 import datetime
 import feedparser
-#import itertools
 import json
 import logging
 import random
 import string
 import sys
-#import time
 import urllib
 import uuid
 
@@ -18,10 +16,13 @@ from django.contrib.auth.models import User
 from django.contrib.auth.decorators import login_required
 from django.core.context_processors import csrf
 from django.core.mail import send_mail
+from django.core.urlresolvers import reverse
 from django.core.validators import validate_email, validate_slug, ValidationError
 from django.db import IntegrityError
-from django.http import HttpResponse, HttpResponseForbidden, Http404
+from django.http import HttpResponse, HttpResponseForbidden, Http404,\
+    HttpResponseRedirect
 from django.shortcuts import redirect
+
 from mitxmako.shortcuts import render_to_response, render_to_string
 from bs4 import BeautifulSoup
 from django.core.cache import cache
@@ -39,11 +40,11 @@ from xmodule.course_module import CourseDescriptor
 from xmodule.modulestore.exceptions import ItemNotFoundError
 from xmodule.modulestore.django import modulestore
 
-#from datetime import date
 from collections import namedtuple
 
 from courseware.courses import get_courses, sort_by_announcement
 from courseware.access import has_access
+from courseware.models import TimedModule
 
 from statsd import statsd
 
@@ -1058,7 +1059,7 @@ def accept_name_change(request):
 # TODO: This is a giant kludge to give Pearson something to test against ASAP.
 #       Will need to get replaced by something that actually ties into TestCenterUser
 @csrf_exempt
-def test_center_login(request):
+def atest_center_login(request):
     if not settings.MITX_FEATURES.get('ENABLE_PEARSON_HACK_TEST'):
         raise Http404
 
@@ -1074,6 +1075,125 @@ def test_center_login(request):
         return redirect('/courses/MITx/6.002x/2012_Fall/courseware/Final_Exam/Final_Exam_Fall_2012/')
     else:
         return HttpResponseForbidden()
+
+
+@csrf_exempt
+def test_center_login(request):
+    # errors are returned by navigating to the error_url, adding a query parameter named "code" 
+    # which contains the error code describing the exceptional condition.
+    def makeErrorURL(error_url, error_code):
+        return "{}&code={}".format(error_url, error_code);
+     
+    # get provided error URL, which will be used as a known prefix for returning error messages to the
+    # Pearson shell.  It does not have a trailing slash, so we need to add one when creating output URLs.
+    error_url = request.POST.get("errorURL")
+
+    # check that the parameters have not been tampered with, by comparing the code provided by Pearson
+    # with the code we calculate for the same parameters.
+    if 'code' not in request.POST:
+        return HttpResponseRedirect(makeErrorURL(error_url, "missingSecurityCode"));
+    code = request.POST.get("code")
+
+    # calculate SHA for query string
+    # TODO: figure out how to get the original query string, so we can hash it and compare.
+    
+    
+    if 'clientCandidateID' not in request.POST:
+        return HttpResponseRedirect(makeErrorURL(error_url, "missingClientCandidateID"));
+    client_candidate_id = request.POST.get("clientCandidateID")
+    
+    # TODO: check remaining parameters, and maybe at least log if they're not matching
+    # expected values....
+    # registration_id = request.POST.get("registrationID")
+    # exit_url = request.POST.get("exitURL")
+    
+
+    # find testcenter_user that matches the provided ID:
+    try:
+        testcenteruser = TestCenterUser.objects.get(client_candidate_id=client_candidate_id)
+    except TestCenterUser.DoesNotExist:
+        return HttpResponseRedirect(makeErrorURL(error_url, "invalidClientCandidateID"));
+
+
+    # find testcenter_registration that matches the provided exam code:
+    # Note that we could rely on either the registrationId or the exam code, 
+    # or possibly both.
+    if 'vueExamSeriesCode' not in request.POST:
+        # TODO: confirm this error code (made up, not in documentation)
+        return HttpResponseRedirect(makeErrorURL(error_url, "missingExamSeriesCode"));
+    exam_series_code = request.POST.get('vueExamSeriesCode')
+    
+    registrations = TestCenterRegistration.objects.filter(testcenter_user=testcenteruser, exam_series_code=exam_series_code)
+    
+    if not registrations:
+        return HttpResponseRedirect(makeErrorURL(error_url, "noTestsAssigned"));
+    
+    # TODO: figure out what to do if there are more than one registrations....
+    # for now, just take the first...
+    registration = registrations[0]
+    course_id = registration.course_id
+    
+    # if we want to look up whether the test has already been taken, or to 
+    # communicate that a time accommodation needs to be applied, we need to 
+    # know the module_id to use that corresponds to the particular exam_series_code.
+    # For now, we can hardcode that...
+    if exam_series_code == '6002x001':
+        chapter_url_name = 'Final_Exam'
+        section_url_name = 'Final_Exam_Fall_2012'
+        redirect_url = reverse('courseware_section', args=[course_id, chapter_url_name, section_url_name])
+        location = 'i4x://MITx/6.002x/2012_Fall/sequence/Final_Exam_Fall_2012'
+    else:
+        # TODO: clarify if this is the right error code for this condition.
+        return HttpResponseRedirect(makeErrorURL(error_url, "incorrectCandidateTests"));
+    
+    
+    time_accommodation_mapping = {'ET12ET' : 'ADDHALFTIME',
+                                  'ET30MN' : 'ADD30MIN',
+                                  'ETDBTM' : 'ADDDOUBLE', }
+    
+    # check if the test has already been taken
+    timed_modules = TimedModule.objects.filter(student=testcenteruser.user, course_id=course_id, module_state_key=location)
+    if timed_modules:
+        timed_module = timed_modules[0]
+        if timed_module.has_ended:
+            return HttpResponseRedirect(makeErrorURL(error_url, "allTestsTaken"));
+    elif registration.get_accommodation_codes():
+        # we don't have a timed module created yet, so if we have time accommodations
+        # to implement, create an entry now:
+        time_accommodation_code = None
+        for code in registration.get_accommodation_codes():
+            if code in time_accommodation_mapping:
+                time_accommodation_code = time_accommodation_mapping[code]
+        if client_candidate_id == "edX003671291147":
+            time_accommodation_code = 'TESTING'
+        if time_accommodation_code:
+            timed_module = TimedModule(student=request.user, course_id=course_id, module_state_key=location)
+            timed_module.accommodation_code = time_accommodation_code
+            timed_module.save()
+                    
+    # Now log the user in:
+#    user = authenticate(username=testcenteruser.user.username,
+#                        password=testcenteruser.user.password)
+#    
+#    if user is None:
+#        # argh.  We couldn't login!
+#        return HttpResponseRedirect(makeErrorURL(error_url, "ARGH! User cannot log in"));
+        
+    # UGLY HACK!!!
+    # Login assumes that authentication has occurred, and that there is a 
+    # backend annotation on the user object, indicating which backend
+    # against which the user was authenticated.  We're authenticating here
+    # against the registration entry, and assuming that the request given
+    # this information is correct, we allow the user to be logged in
+    # without a password.  This could all be formalized in a backend object
+    # that does the above checking.  
+    # TODO: create a backend class to do this.
+    # testcenteruser.user.backend = "%s.%s" % (backend.__module__, backend.__class__.__name__)    
+    testcenteruser.user.backend = "%s.%s" % ("TestcenterAuthenticationModule", "TestcenterAuthenticationClass")    
+    login(request, testcenteruser.user)
+    
+    # And start the test:
+    return redirect(redirect_url)
 
 
 def _get_news(top=None):

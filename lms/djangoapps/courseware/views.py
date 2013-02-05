@@ -415,9 +415,8 @@ def timed_exam(request, course_id, chapter, section):
         duration = int(section_descriptor.metadata.get('duration'))
         
         # get corresponding time module, if one is present:
-        # TODO: determine what to use for module_key...
         try: 
-            timed_module = TimedModule.objects.get(student=request.user, course_id=course_id)
+            timed_module = TimedModule.objects.get(student=request.user, course_id=course_id, module_state_key=section_module.id)
             
             # if a module exists, check to see if it has already been started,
             # and if it has already ended.
@@ -447,8 +446,7 @@ def timed_exam(request, course_id, chapter, section):
         except TimedModule.DoesNotExist:
             # no entry found.  So we're starting this test
             # without any accommodations being preset.
-            # TODO: determine what to use for module_key...
-            timed_module = TimedModule(student=request.user, course_id=course_id)
+            timed_module = TimedModule(student=request.user, course_id=course_id, module_state_key=section_module.id)
             timed_module.begin(duration)
             timed_module.save()
         
