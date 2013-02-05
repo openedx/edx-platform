@@ -128,12 +128,14 @@ class ImageProperties(object):
         image_is_okay = False
         try:
             #image_is_okay = self.count_colors() and self.get_skin_ratio() and not self.image_too_large
-            image_is_okay = self.image_too_large
+            image_is_okay = not self.image_too_large
         except:
             log.exception("Could not run image tests.")
 
         if not ENABLE_PIL:
             image_is_okay = True
+
+        #log.debug("Image OK: {0}".format(image_is_okay))
 
         return image_is_okay
 
@@ -252,7 +254,9 @@ def upload_to_s3(file_to_upload, keyname):
 
         return True, public_url
     except:
-        return False, "Could not connect to S3."
+        error_message = "Could not connect to S3."
+        log.exception(error_message)
+        return False, error_message
 
 
 def get_from_s3(s3_public_url):
