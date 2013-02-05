@@ -140,7 +140,7 @@ class CombinedOpenEndedModule(XModule):
         self.child_descriptor = descriptors[version_index](self.system)
         self.child_definition = CombinedOpenEndedV1Descriptor.definition_from_xml(etree.fromstring(definition['xml_string']), self.system)
         self.child_module = modules[version_index](self.system, location, self.child_definition, self.child_descriptor,
-            instance_state = json.dumps(instance_state), metadata = definition['metadata'])
+            instance_state = json.dumps(instance_state), metadata = self.metadata)
 
     def get_html(self):
         return self.child_module.get_html()
@@ -159,6 +159,14 @@ class CombinedOpenEndedModule(XModule):
 
     def get_progress(self):
         return self.child_module.get_progress()
+
+    @property
+    def due_date(self):
+        return self.child_module.due_date
+
+    @property
+    def display_name(self):
+        return self.child_module.display_name
 
 
 class CombinedOpenEndedDescriptor(XmlDescriptor, EditingDescriptor):

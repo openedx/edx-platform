@@ -136,6 +136,7 @@ class CombinedOpenEndedV1Module():
         """
 
         self.metadata = metadata
+        self.display_name = metadata['display_name']
 
         # Load instance state
         if instance_state is not None:
