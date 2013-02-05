@@ -156,7 +156,7 @@ class TestPeerGradingService(ct.PageLoader):
         data = {'location': self.location}
 
         r = self.peer_module.get_next_submission(data)
-        d = json.loads(r)
+        d = r
         self.assertTrue(d['success'])
         self.assertIsNotNone(d['submission_id'])
         self.assertIsNotNone(d['prompt'])
@@ -166,7 +166,7 @@ class TestPeerGradingService(ct.PageLoader):
     def test_get_next_submission_missing_location(self):
         data = {}
         r = self.peer_module.get_next_submission(data)
-        d = json.loads(r)
+        d = r
         self.assertFalse(d['success'])
         self.assertEqual(d['error'], "Missing required keys: location")
 
@@ -174,27 +174,27 @@ class TestPeerGradingService(ct.PageLoader):
         data = 'rubric_scores[]=1|rubric_scores[]=2|location=' + location + '|submission_id=1|submission_key=fake key|score=2|feedback=feedback|submission_flagged=False'
         qdict = QueryDict(data.replace("|","&"))
         r = self.peer_module.save_grade(qdict)
-        d = json.loads(r.content)
+        d = r
         self.assertTrue(d['success'])
 
     def test_save_grade_missing_keys(self):
         data = {}
         r = self.peer_module.save_grade(data)
-        d = json.loads(r)
+        d = r
         self.assertFalse(d['success'])
         self.assertTrue(d['error'].find('Missing required keys:') > -1)
 
     def test_is_calibrated_success(self):
         data = {'location': self.location}
         r = self.peer_module.is_student_calibrated(data)
-        d = json.loads(r)
+        d = r
         self.assertTrue(d['success'])
         self.assertTrue('calibrated' in d)
 
     def test_is_calibrated_failure(self):
         data = {}
         r = self.peer_module.is_student_calibrated(data)
-        d = json.loads(r)
+        d = r
         self.assertFalse(d['success'])
         self.assertFalse('calibrated' in d)
 
@@ -202,7 +202,7 @@ class TestPeerGradingService(ct.PageLoader):
         data = {'location': self.location}
 
         r = self.peer_module.show_calibration_essay(data)
-        d = json.loads(r)
+        d = r
         self.assertTrue(d['success'])
         self.assertIsNotNone(d['submission_id'])
         self.assertIsNotNone(d['prompt'])
@@ -213,7 +213,7 @@ class TestPeerGradingService(ct.PageLoader):
         data = {}
 
         r = self.peer_module.show_calibration_essay(data)
-        d = json.loads(r)
+        d = r
 
         self.assertFalse(d['success'])
         self.assertEqual(d['error'], "Missing required keys: location")
@@ -226,14 +226,14 @@ class TestPeerGradingService(ct.PageLoader):
                 'feedback': 'This is feedback',
                 'rubric_scores[]': [1, 2]}
         r = self.peer_module.save_calibration_essay(data)
-        d = json.loads(r)
+        d = r
         self.assertTrue(d['success'])
         self.assertTrue('actual_score' in d)
 
     def test_save_calibration_essay_missing_keys(self):
         data = {}
         r = self.peer_module.save_calibration_essay(data)
-        d = json.loads(r)
+        d = r
         self.assertFalse(d['success'])
         self.assertTrue(d['error'].find('Missing required keys:') > -1)
         self.assertFalse('actual_score' in d)

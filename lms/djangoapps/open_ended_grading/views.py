@@ -95,7 +95,7 @@ def peer_grading(request, course_id):
         return HttpResponseRedirect(problem_url)
     except:
         error_message = "Error with initializing peer grading.  Centralized module does not exist.  Please contact course staff."
-        log.error(error_message + "Current course is: {0}".format(course_id))
+        log.exception(error_message + "Current course is: {0}".format(course_id))
         return HttpResponse(error_message)
 
 def generate_problem_url(problem_url_parts, base_course_url):
@@ -112,6 +112,7 @@ def generate_problem_url(problem_url_parts, base_course_url):
             if z==1:
                 problem_url += "courseware/"
             problem_url += part + "/"
+    return problem_url
 
 
 @cache_control(no_cache=True, no_store=True, must_revalidate=True)
