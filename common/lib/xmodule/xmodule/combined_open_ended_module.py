@@ -143,7 +143,20 @@ class CombinedOpenEndedModule(XModule):
     def get_html(self):
         return self.child_module.get_html()
 
-    
+    def handle_ajax(self, dispatch, get):
+        return self.child_module.handle_ajax(dispatch, get)
+
+    def get_instance_state(self):
+        return self.child_module.get_instance_state()
+
+    def get_score(self):
+        return self.child_module.get_score()
+
+    def max_score(self):
+        return self.child_module.max_score()
+
+    def get_progress(self):
+        return self.child_module.get_progress()
 
 
 class CombinedOpenEndedDescriptor(XmlDescriptor, EditingDescriptor):
@@ -173,20 +186,7 @@ class CombinedOpenEndedDescriptor(XmlDescriptor, EditingDescriptor):
         'task_xml': dictionary of xml strings,
         }
         """
-        expected_children = ['task', 'rubric', 'prompt']
-        for child in expected_children:
-            if len(xml_object.xpath(child)) == 0:
-                raise ValueError("Combined Open Ended definition must include at least one '{0}' tag".format(child))
-
-        def parse_task(k):
-            """Assumes that xml_object has child k"""
-            return [stringify_children(xml_object.xpath(k)[i]) for i in xrange(0, len(xml_object.xpath(k)))]
-
-        def parse(k):
-            """Assumes that xml_object has child k"""
-            return xml_object.xpath(k)[0]
-
-        return {'task_xml': parse_task('task'), 'prompt': parse('prompt'), 'rubric': parse('rubric')}
+        return etree.tostring(xml_object)
 
 
     def definition_to_xml(self, resource_fs):
