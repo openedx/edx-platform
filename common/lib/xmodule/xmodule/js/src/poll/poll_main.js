@@ -2,7 +2,7 @@
 define('PollMain', ['logme'], function (logme) {
     var debugMode;
 
-    debugMode = true;
+    debugMode = false;
     if (debugMode === true) {
         logme('We are in debug mode.');
     }

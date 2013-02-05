@@ -45,9 +45,8 @@ class PollModule(XModule):
     js = {
       'coffee': [resource_string(__name__, 'js/src/javascript_loader.coffee')],
       'js': [resource_string(__name__, 'js/src/poll/logme.js'),
-              resource_string(__name__, 'js/src/poll/poll.js'),
-             resource_string(__name__, 'js/src/poll/poll_main.js')
-             ]
+             resource_string(__name__, 'js/src/poll/poll.js'),
+             resource_string(__name__, 'js/src/poll/poll_main.js')]
          }
     css = {'scss': [resource_string(__name__, 'css/poll/display.scss')]}
     js_module_name = "Poll"
@@ -63,19 +62,23 @@ class PollModule(XModule):
 
 
     def handle_ajax(self, dispatch, get):
-        ''' '''
-        # import ipdb; ipdb.set_trace()
-        if dispatch in self.poll_answers: # and not self.voted:
-            # self.poll_answers[dispatch] += 1
-            # workaround
+        """Ajax handler.
+
+        Args:
+            dispatch: request slug
+            get: request get parameters
+
+        Returns:
+            dict
+        """
+        if dispatch in self.poll_answers and not self.voted:
             tmp = {}
             for key in self.poll_answers:
                 tmp[key] = self.poll_answers[key]
             tmp[dispatch] += 1
-            self.poll_answers = tmp
-            #end of workaround
             self.voted = True
             self.poll_answer = dispatch
+            self.poll_answers = tmp
             return json.dumps({'poll_answers': self.poll_answers,
                                'total': sum(self.poll_answers.values()),
                                'callback': {'objectName': 'Conditional'}
@@ -107,7 +110,7 @@ class PollModule(XModule):
             answer = element_answer.get('id', None)
             if answer:
                 if answer not in tmp:
-                    tmp = 0
+                    tmp[answer] = 0
                 answers_to_json[answer] = \
                     cgi.escape(stringify_children(element_answer))
             xml_object_copy.remove(element_answer)
@@ -115,8 +118,8 @@ class PollModule(XModule):
         return json.dumps({'answers': answers_to_json,
               'question': cgi.escape(stringify_children(xml_object_copy)),
               # to show answered poll after reload:
-                'poll_answer': self.poll_answer,
-                'poll_answers:': self.poll_answers if self.voted else {},
+                'poll_answer': '',  # self.poll_answer,
+                'poll_answers': self.poll_answers if self.voted else {},
                 'total': sum(self.poll_answers.values()) if self.voted else ''})
 
 
