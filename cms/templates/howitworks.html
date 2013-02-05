@@ -24,7 +24,7 @@
     <ol class="list-features">
       <li class="feature">
         <figure class="img zoom">
-          <a href="/static/img/howitworks-feature1.png">
+          <a rel="modal" href="#hiw-feature1">
             <img src="/static/img/thumb-hiw-feature1.png" alt="Studio Helps You Keep Your Courses Organized" />
             <figcaption class="sr">Studio Helps You Keep Your Courses Organized</figcaption>
             <span class="action-zoom">
@@ -58,7 +58,7 @@
 
       <li class="feature">
         <figure class="img zoom">
-        <a href="/static/img/howitworks-feature2.png">
+        <a rel="modal" href="#hiw-feature2">
           <img src="/static/img/thumb-hiw-feature1.png" alt="Studio Keeps Your Learning Sequences and Lectures, Together" />
           <figcaption class="sr">Studio Keeps Your Learning Sequences and Lectures, Together</figcaption>
           <span class="action-zoom">
@@ -92,7 +92,7 @@
 
       <li class="feature">
         <figure class="img zoom">
-          <a href="/static/img/thumb-hiw-feature3.png">
+          <a rel="modal" href="#hiw-feature3">
             <img src="/static/img/thumb-hiw-feature1.png" alt="Studio Gives You Simple, Fast, and Incremental Publishing. With Friends." />
             <figcaption class="sr">Studio Gives You Simple, Fast, and Incremental Publishing. With Friends.</figcaption>
             <span class="action-zoom">
@@ -143,11 +143,28 @@
     </ul>
   </section>
 </div>
+
+<!-- <div class="content-modal" id="hiw-feature1">
+  <h3>Feature #1</h3>
+  <img src="/static/img/hiw-feature1.png" alt="" />
+</div>
+
+<div class="content-modal" id="hiw-feature2">
+  <h3>Feature #2</h3>
+  <img src="/static/img/hiw-feature1.png" alt="" />
+</div>
+
+<div class="content-modal" id="hiw-feature3">
+  <h3>Feature #3</h3>
+  <img src="/static/img/hiw-feature1.png" alt="" />
+</div> -->
 </%block>
 
 <%block name="jsextra">
   <script type="text/javascript">
     (function() {
+
+      $("a[rel*=modal]").leanModal({closeButton: ".modal_close"});
 
     })(this)
   </script>

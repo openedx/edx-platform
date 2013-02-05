@@ -148,37 +148,35 @@
             position: relative;
             top: 0;
             display: block;
+            overflow: hidden;
             border: 1px solid $gray-l3;
             padding: ($baseline/4);
             background: $white;
 
             .action-zoom {
-              @include transition(opacity .15s ease-in-out);
-              opacity: 0;
+              @include transition(bottom .50s ease-in-out);
               position: absolute;
-              left: 110px;
-              top: 110px;
-              min-height: 300px;
-              min-width: 300px;
+              bottom: -30px;
+              right: ($baseline/2);
+              opacity: 0;
 
               .ss-icon {
-                @include font-size(32);
-                @include border-radius(($baseline));
+                @include font-size(18);
+                @include border-radius(2px);
                 display: inline-block;
-                padding: ($baseline*1.5) $baseline $baseline $baseline;
+                padding: ($baseline/4) ($baseline/2);
                 background: $blue;
                 color: $white;
                 text-align: center;
-                line-height: 2.75rem;
               }
             }
 
             &:hover {
               border-color: $blue;
-              top: -($baseline/5);
 
               .action-zoom {
-                opacity: 0.8;
+                opacity: 1.0;
+                bottom: -2px;
               }
             }
           }
@@ -207,7 +205,8 @@
           }
 
           strong {
-            font-weight: 700;
+            color: $pink-l1;
+            font-weight: 500;
           }
 
           .list-proofpoints {
@@ -219,7 +218,7 @@
             .proofpoint {
               @include box-sizing(border-box);
               @include border-radius(($baseline/4));
-              @include transition(color .15s ease-in-out);
+              @include transition(color .50s ease-in-out);
               position: relative;
               top: 0;
               float: left;
@@ -238,12 +237,13 @@
               }
 
               &:hover {
-                background: $blue-l5;
-                color: $blue-l2;
+                @include box-shadow(0 1px ($baseline/10) $shadow-l1);
+                background: $blue;
+                color: $blue-l3;
                 top: -($baseline/5);
 
-                .title {
-                  color: $blue-d1;
+                .title, strong {
+                  color: $white;
                 }
               }
 
