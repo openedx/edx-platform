@@ -63,15 +63,11 @@ class AnnotatableModule(XModule):
 
     def _get_discussion_html(self, discussion_id, discussion_title):
         """ Returns html to display the discussion thread """
-
-        tpl = u'<div class="annotatable-discussion" data-discussion-id="{0}">'
-        tpl += '<div class="annotatable-icon"> </div>'
-        tpl += '<span class="annotatable-discussion-label">Guided Discussion: </span>'
-        tpl += '<span class="annotatable-discussion-thread">{1}</span>'
-        tpl += '<a class="annotatable-show-discussion" href="javascript:void(0);">Show Discussion</a>'
-        tpl += '</div>'
-  
-        return tpl.format(discussion_id, discussion_title)
+        context = {
+                   'discussion_id': discussion_id,
+                   'discussion_title': discussion_title
+        }
+        return self.system.render_template('annotatable_discussion.html', context)
     
     def _attach_discussion(self, span, index, xmltree):
         """ Attaches a discussion thread to the annotation span. """

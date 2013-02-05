@@ -59,13 +59,34 @@ class @Annotatable
         $(@discussionSelector, @el).not(el).toggleClass('opaque', state)
 
     scrollToDiscussion: (el) ->
+        padding = 20
         complete = @makeHighlighter(el)
-        top = el.offset().top - 20 # with some padding
+        animOpts = {
+            scrollTop : el.offset().top - padding
+        }
+        
+        if @canScrollToDiscussion(el)
+            $('html, body').animate(animOpts, 500, 'swing', complete)
+        else
+            complete()
 
-        $('html, body').animate({ scrollTop: top }, 750, 'swing', complete)
+    canScrollToDiscussion: (el) ->
+        scrollTop = el.offset().top
+        docHeight = $(document).height()
+        winHeight = $(window).height()
+        winScrollTop = window.scrollY
+
+        viewStart = winScrollTop
+        viewEnd = winScrollTop + (.75 * winHeight)
+        inView = viewStart < scrollTop < viewEnd
+
+        scrollable = !inView
+        atDocEnd = viewStart + winHeight >= docHeight
+
+        return (if atDocEnd then false else scrollable)
     
     makeHighlighter: (el) ->
-        return @_once -> el.effect('highlight', {}, 750)
+        return @_once -> el.effect('highlight', {}, 500)
             
     _once: (fn) ->
         done = false
