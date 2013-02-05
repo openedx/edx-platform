@@ -168,14 +168,22 @@ class CombinedOpenEndedModule(XModule):
 
         display_due_date_string = self.metadata.get('due', None)
         if display_due_date_string is not None:
-            self.display_due_date = dateutil.parser.parse(display_due_date_string)
+            try:
+                self.display_due_date = dateutil.parser.parse(display_due_date_string)
+            except ValueError:
+                log.error("Could not parse due date {0} for location {1}".format(display_due_date_string, location))
+                raise
         else:
             self.display_due_date = None
 
         grace_period_string = self.metadata.get('graceperiod', None)
         if grace_period_string is not None and self.display_due_date:
-            self.grace_period = parse_timedelta(grace_period_string)
-            self.close_date = self.display_due_date + self.grace_period
+            try:
+                self.grace_period = parse_timedelta(grace_period_string)
+                self.close_date = self.display_due_date + self.grace_period
+            except:
+                log.error("Error parsing the grace period {0} for location {1}".format(grace_period_string, location))
+                raise
         else:
             self.grace_period = None
             self.close_date = self.display_due_date
@@ -209,7 +217,7 @@ class CombinedOpenEndedModule(XModule):
 
     def closed(self):
         ''' Is the student still allowed to submit answers? '''
-        if self.attempts == self.max_attempts:
+        if self.attempts >= self.max_attempts:
             return True
         if self.close_date is not None and datetime.datetime.utcnow() > self.close_date:
             return True
