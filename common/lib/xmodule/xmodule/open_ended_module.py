@@ -550,11 +550,9 @@ class OpenEndedModule(openendedchild.OpenEndedChild):
         """
         # Once we close the problem, we should not allow students
         # to save answers
-        if self.closed():
-            return {
-                'success': False,
-                'error': 'Problem is closed.'
-            }
+        closed, msg = self.check_if_closed()
+        if closed:
+            return msg
 
         if self.state != self.INITIAL:
             return self.out_of_sync_error(get)

@@ -122,6 +122,22 @@ class OpenEndedChild(object):
             return True
         return False
 
+    def check_if_closed(self):
+        if self.closed():
+            return True, {
+                'success': False,
+                'error': 'This problem is now closed.'
+            }
+        elif self.attempts > self.max_attempts:
+            return True, {
+                'success': False,
+                'error': 'Too many attempts.'
+            }
+        else:
+            return False, {}
+
+
+
     def latest_answer(self):
         """Empty string if not available"""
         if not self.history:

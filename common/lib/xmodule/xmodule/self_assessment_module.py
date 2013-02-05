@@ -190,11 +190,9 @@ class SelfAssessmentModule(openendedchild.OpenEndedChild):
             or 'rubric_html' (if success).
         """
         # Check to see if this problem is closed
-        if self.closed():
-            return {
-                'success': False,
-                'error': 'This problem is now closed.'
-            }
+        closed, msg = self.check_if_closed()
+        if closed:
+            return msg
 
         if self.state != self.INITIAL:
             return self.out_of_sync_error(get)
