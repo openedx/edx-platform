@@ -1109,6 +1109,8 @@ def get_course_settings(request, org, course, name):
     return render_to_response('settings.html', {
         'active_tab': 'settings', 
         'context_course': course_module,
+        'advanced_blacklist' : json.dumps(CourseMetadata.FILTERED_LIST),
+        'advanced_dict' : json.dumps(CourseMetadata.fetch(location)),
         'course_details' : json.dumps(course_details, cls=CourseSettingsEncoder)
     })
         
@@ -1133,6 +1135,9 @@ def course_settings_updates(request, org, course, name, section):
         manager = CourseDetails
     elif section == 'grading':
         manager = CourseGradingModel
+    elif section == 'advanced':
+        # not implemented b/c it assumes prefetched and then everything thru course_edit_metadata
+        return
     else: return
     
     if request.method == 'GET':
@@ -1194,14 +1199,10 @@ def course_edit_metadata(request, org, course, name):
     
     editable = CourseMetadata.fetch(location)
     
-    return render_to_response('course_info.html', {
-        'active_tab': 'settings',
-        'editable_metadata': editable,
-        'url_base' : "/" + org + "/" + course + "/",
-        'blacklist_keys' : CourseMetadata.FILTERED_LIST
-    })
+    # for now defer to settings general until we split the divs out into separate pages
+    return get_course_settings(request, org, course, name)
         
-@expect_json
+## NB: expect_json failed on ["key", "key2"] and json payload
 @login_required
 @ensure_csrf_cookie
 def course_metadata_rest_access(request, org, course, name):
@@ -1225,10 +1226,11 @@ def course_metadata_rest_access(request, org, course, name):
         
     if request.method == 'GET':
         return HttpResponse(json.dumps(CourseMetadata.fetch(location)), mimetype="application/json")
-    elif real_method == 'DELETE':  # coming as POST need to pull from Request Header X-HTTP-Method-Override    DELETE
-        return HttpResponse(json.dumps(CourseMetadata.delete_key(location, request.POST)), mimetype="application/json")
+    elif real_method == 'DELETE':
+        return HttpResponse(json.dumps(CourseMetadata.delete_key(location, json.loads(request.body))), mimetype="application/json")
     elif request.method == 'POST':
-        return HttpResponse(json.dumps(CourseMetadata.update_from_json(location, request.POST)), mimetype="application/json")
+        # NOTE: request.POST is messed up because expect_json cloned_request.POST.copy() is creating a defective entry w/ the whole payload as the key
+        return HttpResponse(json.dumps(CourseMetadata.update_from_json(location, json.loads(request.body))), mimetype="application/json")
 
 
 @login_required

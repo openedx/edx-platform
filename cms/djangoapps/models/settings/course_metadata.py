@@ -7,8 +7,8 @@ class CourseMetadata(object):
     For CRUD operations on metadata fields which do not have specific editors on the other pages including any user generated ones.
     The objects have no predefined attrs but instead are obj encodings of the editable metadata.
     '''
-
-    FILTERED_LIST = ['start', 'end', 'enrollment_start', 'enrollment_end', 'tabs', 'graceperiod']
+    # __new_advanced_key__ is used by client not server; so, could argue against it being here
+    FILTERED_LIST = ['start', 'end', 'enrollment_start', 'enrollment_end', 'tabs', 'graceperiod', '__new_advanced_key__']
     
     @classmethod
     def fetch(cls, course_location):
@@ -57,14 +57,10 @@ class CourseMetadata(object):
         '''
         descriptor = get_modulestore(course_location).get_item(course_location)
         
-        if isinstance(payload, list):
-            for key in payload:
-                if key in descriptor.metadata:
-                    del descriptor.metadata[key]
-        else:
-            if payload in descriptor.metadata:
-                del descriptor.metadata[payload]
-        
+        for key in payload['deleteKeys']:
+            if key in descriptor.metadata:
+                del descriptor.metadata[key]
+    
         get_modulestore(course_location).update_metadata(course_location, descriptor.metadata)
         
         return cls.fetch(course_location)
