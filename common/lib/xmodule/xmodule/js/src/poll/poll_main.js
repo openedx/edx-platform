@@ -22,7 +22,7 @@ PollMain.prototype = {
     c1 = 0;
 
     $.each(poll_answers, function (index, value) {
-        var numValue;
+        var numValue, text;
 
         numValue = parseFloat(value);
         if (isFinite(numValue) === false) {
@@ -31,10 +31,12 @@ PollMain.prototype = {
 
         c1 += 1;
 
-        tickSets[c1.toFixed(1)] = _this.jsonConfig.answers[index]
+        text = _this.jsonConfig.answers[index].substring(0, 10);
+
+        tickSets[c1.toFixed(1)] = text;
 
         dataSeries.push({
-            'legend': _this.jsonConfig.answers[index],
+            'legend': text,
             'data': [[c1, (numValue / total) * 100.0]]
         });
     });
@@ -110,6 +112,8 @@ PollMain.prototype = {
         $.postWithPrefix(
             _this.ajax_url + '/' + answer,  {},
             function (response) {
+                logme('response:', response);
+
                 _this.showAnswerGraph(response.poll_answers, response.total);
 
                 /*
@@ -168,10 +172,10 @@ function PollMain(el) {
             var testNum;
 
             // Test for when the user has already answered.
-            testNum = 1;
+            // testNum = 1;
 
             // Test for when the user did not answer yet.
-            // testNum = 2;
+            testNum = 2;
 
             if (testNum === 1) {
                 _this.jsonConfig = {
@@ -181,9 +185,12 @@ function PollMain(el) {
                         'Yes': '4'
                     },
                     'total': '7',
-                    'current_answer': 'No',
+                    'poll_answer': 'No',
                     'answers': {
-                        'Dont_know': 'Don\'t know',
+                        'Dont_know':
+                            'Don\'t know. What does it mean to not know? Well, the student must be able to ' +
+                            'answer this question for himself. In the case when difficulties arise, he should' +
+                            'consult a TA.',
                         'No': 'No',
                         'Yes': 'Yes'
                     },
@@ -196,9 +203,12 @@ function PollMain(el) {
                 _this.jsonConfig = {
                     'poll_answers': {},
                     'total': '',
-                    'current_answer': '',
+                    'poll_answer': '',
                     'answers': {
-                        'Dont_know': 'Don\'t know',
+                        'Dont_know':
+                            'Don\'t know. What does it mean to not know? Well, the student must be able to ' +
+                            'answer this question for himself. In the case when difficulties arise, he should' +
+                            'consult a TA.',
                         'No': 'No',
                         'Yes': 'Yes'
                     },
@@ -235,7 +245,7 @@ function PollMain(el) {
     this.questionAnswered = false;
 
     logme('this.jsonConfig.answers: ', this.jsonConfig.answers);
-    logme('this.jsonConfig.current_answer: ', this.jsonConfig.current_answer);
+    logme('this.jsonConfig.poll_answer: ', this.jsonConfig.poll_answer);
 
     $.each(this.jsonConfig.answers, function (index, value) {
         var answerEl;
@@ -245,7 +255,7 @@ function PollMain(el) {
             _this.submitAnswer(index, answerEl);
         });
 
-        if (index === _this.jsonConfig.current_answer) {
+        if (index === _this.jsonConfig.poll_answer) {
             answerEl.addClass('answered');
             _this.questionAnswered = true;
         }
@@ -257,12 +267,12 @@ function PollMain(el) {
     this.graphAnswerEl.hide();
     this.graphAnswerEl.appendTo(this.questionEl);
 
+    logme('PollMain object: ', this);
+
     // If it turns out that the user already answered the question, show the answers graph.
     if (this.questionAnswered === true) {
-        this.showAnswerGraph(_this.jsonConfig.poll_answers, _this.jsonConfig.total);
+        this.showAnswerGraph(this.jsonConfig.poll_answers, this.jsonConfig.total);
     }
-
-    logme('PollMain object: ', this);
 } // End-of: function PollMain(el) {
 
 }); // End-of: define('PollMain', ['logme'], function (logme) {
