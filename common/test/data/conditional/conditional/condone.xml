@@ -1,0 +1,3 @@
+        <conditional condition="require_attempted" required="problem/choiceprob">
+            <html url_name="secret_page" />
+        </conditional>

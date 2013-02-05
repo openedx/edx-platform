@@ -50,7 +50,7 @@ class MockPeerGradingService(object):
                 'max_score': 4})
 
     def save_grade(self, location, grader_id, submission_id, 
-            score, feedback, submission_key, rubric_scores):
+            score, feedback, submission_key, rubric_scores, submission_flagged):
         return json.dumps({'success': True})
 
     def is_student_calibrated(self, problem_location, grader_id):
@@ -97,7 +97,7 @@ class PeerGradingService(GradingService):
                 {'location': problem_location, 'grader_id': grader_id})
         return json.dumps(self._render_rubric(response))
 
-    def save_grade(self, location, grader_id, submission_id, score, feedback, submission_key, rubric_scores):
+    def save_grade(self, location, grader_id, submission_id, score, feedback, submission_key, rubric_scores, submission_flagged):
         data = {'grader_id' : grader_id,
                 'submission_id' : submission_id,
                 'score' : score,
@@ -105,7 +105,8 @@ class PeerGradingService(GradingService):
                 'submission_key': submission_key,
                 'location': location,
                 'rubric_scores': rubric_scores,
-                'rubric_scores_complete': True}
+                'rubric_scores_complete': True,
+                'submission_flagged' : submission_flagged}
         return self.post(self.save_grade_url, data)
 
     def is_student_calibrated(self, problem_location, grader_id):
@@ -233,7 +234,7 @@ def save_grade(request, course_id):
         error: if there was an error in the submission, this is the error message
     """
     _check_post(request)
-    required = set(['location', 'submission_id', 'submission_key', 'score', 'feedback', 'rubric_scores[]'])
+    required = set(['location', 'submission_id', 'submission_key', 'score', 'feedback', 'rubric_scores[]', 'submission_flagged'])
     success, message = _check_required(request, required)
     if not success:
         return _err_response(message)
@@ -245,9 +246,10 @@ def save_grade(request, course_id):
     feedback = p['feedback']
     submission_key = p['submission_key']
     rubric_scores = p.getlist('rubric_scores[]')
+    submission_flagged = p['submission_flagged']
     try:
         response = peer_grading_service().save_grade(location, grader_id, submission_id, 
-                score, feedback, submission_key, rubric_scores)
+                score, feedback, submission_key, rubric_scores, submission_flagged)
         return HttpResponse(response, mimetype="application/json")
     except GradingServiceError:
         log.exception("""Error saving grade.  server url: {0}, location: {1}, submission_id:{2}, 

@@ -113,6 +113,9 @@ class StudentModuleCache(object):
                                          descriptor_filter=lambda descriptor: True,
                                          select_for_update=False):
         """
+        obtain and return cache for descriptor descendents (ie children) AND modules required by the descriptor, 
+        but which are not children of the module
+
         course_id: the course in the context of which we want StudentModules.
         user: the django user for whom to load modules.
         descriptor: An XModuleDescriptor
@@ -132,7 +135,7 @@ class StudentModuleCache(object):
             if depth is None or depth > 0:
                 new_depth = depth - 1 if depth is not None else depth
 
-                for child in descriptor.get_children():
+                for child in descriptor.get_children() + descriptor.get_required_module_descriptors():
                     descriptors.extend(get_child_descriptors(child, new_depth, descriptor_filter))
 
             return descriptors

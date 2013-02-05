@@ -261,7 +261,6 @@ def edit_unit(request, location):
             break
 
     lms_link = get_lms_link_for_item(item.location)
-    preview_lms_link = get_lms_link_for_item(item.location, preview=True)
 
     component_templates = defaultdict(list)
 
