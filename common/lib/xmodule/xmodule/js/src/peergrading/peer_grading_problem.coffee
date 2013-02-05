@@ -309,6 +309,7 @@ class @PeerGradingProblem
     if Rubric.check_complete()
       # show button if we have scores for all categories
       @show_submit_button()
+      @grade = Rubric.get_total_score()
 
 
 
@@ -382,6 +383,7 @@ class @PeerGradingProblem
   # render common information between calibration and grading
   render_submission_data: (response) =>
     @content_panel.show()
+    @error_container.hide()
 
     @submission_container.append(@make_paragraphs(response.student_response))
     @prompt_container.html(response.prompt)
