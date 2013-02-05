@@ -221,6 +221,7 @@ class CombinedOpenEndedModule(XModule):
             return True
         if self.close_date is not None and datetime.datetime.utcnow() > self.close_date:
             return True
+        return False
 
 
 
