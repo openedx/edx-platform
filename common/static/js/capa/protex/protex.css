@@ -15,8 +15,8 @@
 }
 
 .protex-textbox {
-    font: normal normal normal 12pt/normal 'Open Sans', sans-serif;
-    padding: 2px 2px 2px 2px;
+    font: normal normal normal 12pt/normal 'Open Sans', sans-serif !important;
+    padding: 2px 2px 2px 2px !important;
 }
 
 .protex-caption-panel-ss-bonds-on {
