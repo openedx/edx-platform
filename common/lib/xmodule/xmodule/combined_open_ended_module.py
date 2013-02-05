@@ -210,19 +210,11 @@ class CombinedOpenEndedModule(XModule):
             'rubric': definition['rubric'],
             'display_name': self.display_name,
             'accept_file_upload': self.accept_file_upload,
+            'close_date': self.close_date
         }
 
         self.task_xml = definition['task_xml']
         self.setup_next_task()
-
-    def closed(self):
-        ''' Is the student still allowed to submit answers? '''
-        if self.attempts >= self.max_attempts:
-            return True
-        if self.close_date is not None and datetime.datetime.utcnow() > self.close_date:
-            return True
-        return False
-
 
 
     def get_tag_name(self, xml):
@@ -306,7 +298,7 @@ class CombinedOpenEndedModule(XModule):
         self.current_task_parsed_xml = self.current_task_descriptor.definition_from_xml(etree_xml, self.system)
         if current_task_state is None and self.current_task_number == 0:
             self.current_task = child_task_module(self.system, self.location,
-                self.current_task_parsed_xml, self.current_task_descriptor, self.static_data, self)
+                self.current_task_parsed_xml, self.current_task_descriptor, self.static_data)
             self.task_states.append(self.current_task.get_instance_state())
             self.state = self.ASSESSING
         elif current_task_state is None and self.current_task_number > 0:
@@ -322,7 +314,7 @@ class CombinedOpenEndedModule(XModule):
             })
             self.current_task = child_task_module(self.system, self.location,
                 self.current_task_parsed_xml, self.current_task_descriptor, self.static_data,
-                self, instance_state=current_task_state)
+                instance_state=current_task_state)
             self.task_states.append(self.current_task.get_instance_state())
             self.state = self.ASSESSING
         else:
@@ -330,7 +322,7 @@ class CombinedOpenEndedModule(XModule):
                 current_task_state = self.overwrite_state(current_task_state)
             self.current_task = child_task_module(self.system, self.location,
                 self.current_task_parsed_xml, self.current_task_descriptor, self.static_data,
-                self, instance_state=current_task_state)
+                instance_state=current_task_state)
 
         return True
 
@@ -442,7 +434,7 @@ class CombinedOpenEndedModule(XModule):
 
         task_parsed_xml = task_descriptor.definition_from_xml(etree_xml, self.system)
         task = children['modules'][task_type](self.system, self.location, task_parsed_xml, task_descriptor,
-            self.static_data, self, instance_state=task_state)
+            self.static_data, instance_state=task_state)
         last_response = task.latest_answer()
         last_score = task.latest_score()
         last_post_assessment = task.latest_post_assessment(self.system)
