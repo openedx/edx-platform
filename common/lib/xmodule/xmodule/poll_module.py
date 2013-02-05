@@ -1,5 +1,4 @@
-"""
-Poll module is ungraded xmodule used by students to
+"""Poll module is ungraded xmodule used by students to
 to do set of polls.
 
 Poll module contains a nummber of 2 - steps basic sequences. Every sequence
@@ -7,7 +6,7 @@ has data from all previous sequences. Selection of sequences can be in
 control block.
 
 Basic sequence:
-
+`
 0. Control block
     a) get data from any previous sequence
     b) if block
@@ -16,7 +15,7 @@ Basic sequence:
 
 1. First. - must be, always visible
 If student does not yet anwered - Question
-If stundent have not answered - Question with statistics (yes/no)
+If student have not answered - Question with statistics (yes/no)
 
 2. Second - optional, if student does not yet answered on 1st - hidden
 If student answers first time - show plot with statistics from
@@ -42,8 +41,7 @@ log = logging.getLogger(__name__)
 
 
 class PollModule(XModule):
-    ''' Poll Module
-    '''
+    """Poll Module"""
     js = {
       'coffee': [resource_string(__name__, 'js/src/javascript_loader.coffee')],
       'js': [resource_string(__name__, 'js/src/poll/logme.js'),
@@ -65,7 +63,15 @@ class PollModule(XModule):
 
 
     def handle_ajax(self, dispatch, get):
-        ''' '''
+        """Ajax handler.
+
+        Args:
+            dispatch: request slug
+            get: request get parameters
+
+        Returns:
+            dict
+        """
         if dispatch in self.poll_answers and not self.voted:
             self.poll_answers[dispatch] += 1
             self.voted = True
@@ -77,7 +83,7 @@ class PollModule(XModule):
         return json.dumps({'error': 'Unknown Command!'})
 
     def get_html(self):
-        """ Renders parameters to template. """
+        """Renders parameters to template."""
         params = {
                   'element_id': self.location.html_id(),
                   'element_class': self.location.category,
@@ -88,16 +94,22 @@ class PollModule(XModule):
         return self.content
 
     def dump_poll(self):
-        """     """
+        """Dump poll information.
+
+        Returns:
+            string - Serialize json.
+        """
         xml_object_copy = deepcopy(self.xml_object)
         answers_to_json = {}
+
+        # Fill self.poll_answers, prepare data for template context.
         for element_answer in xml_object_copy.findall('answer'):
             answer = element_answer.get('id', None)
             if answer:
                 if answer not in self.poll_answers:
                     self.poll_answers[answer] = 0
                 answers_to_json[answer] = \
-                         cgi.escape(stringify_children(element_answer))
+                    cgi.escape(stringify_children(element_answer))
             xml_object_copy.remove(element_answer)
         return json.dumps({'answers': answers_to_json,
               'question': cgi.escape(stringify_children(xml_object_copy)),
@@ -114,11 +126,11 @@ class PollDescriptor(MakoModuleDescriptor, XmlDescriptor):
 
     @classmethod
     def definition_from_xml(cls, xml_object, system):
-        """
-        Pull out the data into dictionary.
+        """Pull out the data into dictionary.
 
         Args:
             xml_object: xml from file.
+            system: `system` object.
 
         Returns:
             dict
@@ -131,7 +143,7 @@ class PollDescriptor(MakoModuleDescriptor, XmlDescriptor):
         return {'xml_object': xml_object}, []
 
     def definition_to_xml(self, resource_fs):
-        '''Return an xml element representing this definition.'''
+        """Return an xml element representing this definition."""
         #  TODO test and fix
         xml_object = etree.Element('poll_question')
 
