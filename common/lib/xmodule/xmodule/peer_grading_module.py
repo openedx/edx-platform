@@ -20,6 +20,7 @@ import copy
 import itertools
 import json
 import logging
+import datetime.datetime
 from lxml.html import rewrite_links
 import os
 from pkg_resources import resource_string
@@ -71,6 +72,16 @@ class PeerGradingModule(XModule):
         self.system = system
         self.peer_gs = peer_grading_service(self.system)
 
+
+        self.use_for_single_location = self.metadata.get('use_for_single_location', USE_FOR_SINGLE_LOCATION)
+        if isinstance(self.use_for_single_location, basestring):
+            self.use_for_single_location = (self.use_for_single_location in TRUE_DICT)
+
+        self.is_graded = self.metadata.get('is_graded', IS_GRADED)
+        if isinstance(self.is_graded, basestring):
+            self.is_graded = (self.is_graded in TRUE_DICT)
+
+        #TODO: do we only want to allow this for single locations?
         display_due_date_string = self.metadata.get('due', None)
         grace_period_string = self.metadata.get('graceperiod', None)
 
@@ -81,14 +92,6 @@ class PeerGradingModule(XModule):
             raise
 
         self.display_due_date = self.timeinfo.display_due_date
-
-        self.use_for_single_location = self.metadata.get('use_for_single_location', USE_FOR_SINGLE_LOCATION)
-        if isinstance(self.use_for_single_location, basestring):
-            self.use_for_single_location = (self.use_for_single_location in TRUE_DICT)
-
-        self.is_graded = self.metadata.get('is_graded', IS_GRADED)
-        if isinstance(self.is_graded, basestring):
-            self.is_graded = (self.is_graded in TRUE_DICT)
 
         self.link_to_location = self.metadata.get('link_to_location', USE_FOR_SINGLE_LOCATION)
         if self.use_for_single_location ==True:
@@ -104,6 +107,11 @@ class PeerGradingModule(XModule):
         if not isinstance(self.max_grade, (int, long)):
             #This could result in an exception, but not wrapping in a try catch block so it moves up the stack
             self.max_grade = int(self.max_grade)
+
+    def closed(self):
+        if self.timeinfo.close_date is not None and datetime.utcnow() > self.timeinfo.close_date:
+            return True
+        return False
 
     def _err_response(self, msg):
         """
@@ -124,6 +132,8 @@ class PeerGradingModule(XModule):
          Needs to be implemented by inheritors.  Renders the HTML that students see.
         @return:
         """
+        if self.closed():
+            return self.peer_grading_closed()
         if not self.use_for_single_location:
             return self.peer_grading()
         else:
@@ -409,6 +419,16 @@ class PeerGradingModule(XModule):
         except GradingServiceError:
             log.exception("Error saving calibration grade, location: {0}, submission_id: {1}, submission_key: {2}, grader_id: {3}".format(location, submission_id, submission_key, grader_id))
             return self._err_response('Could not connect to grading service')
+
+    def peer_grading_closed(self):
+        '''
+        Show the Peer grading closed template
+        '''
+        html = self.system.render_template('peer_grading/peer_grading_closed.html', {
+            'use_for_single_location': self.use_single_location
+            })
+        return html
+
 
     def peer_grading(self, get = None):
         '''
