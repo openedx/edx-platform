@@ -13,9 +13,10 @@ from django.test import TestCase, LiveServerTestCase
 from django.core.urlresolvers import reverse
 from django.test.client import RequestFactory
 
+
 class MyFetcher(HTTPFetcher):
     """A fetcher that uses server-internal calls for performing HTTP
-    requests. 
+    requests.
     """
 
     def __init__(self, client):
@@ -42,7 +43,7 @@ class MyFetcher(HTTPFetcher):
             if headers and 'Accept' in headers:
                 data['CONTENT_TYPE'] = headers['Accept']
             response = self.client.get(url, data)
-        
+
         # Translate the test client response to the fetcher's HTTP response abstraction
         content = response.content
         final_url = url
@@ -59,6 +60,7 @@ class MyFetcher(HTTPFetcher):
             headers=response_headers,
             status=status,
             )
+
 
 class OpenIdProviderTest(TestCase):
 
@@ -78,7 +80,7 @@ class OpenIdProviderTest(TestCase):
         provider_url = reverse('openid-provider-xrds')
         factory = RequestFactory()
         request = factory.request()
-        abs_provider_url = request.build_absolute_uri(location = provider_url)
+        abs_provider_url = request.build_absolute_uri(location=provider_url)
 
         # In order for this absolute URL to work (i.e. to get xrds, then authentication)
         # in the test environment, we either need a live server that works with the default
@@ -86,10 +88,10 @@ class OpenIdProviderTest(TestCase):
         # Here we do the latter:
         fetcher = MyFetcher(self.client)
         openid.fetchers.setDefaultFetcher(fetcher, wrap_exceptions=False)
-        
+
         # now we can begin the login process by invoking a local openid client,
         # with a pointer to the (also-local) openid provider:
-        with self.settings(OPENID_SSO_SERVER_URL = abs_provider_url):
+        with self.settings(OPENID_SSO_SERVER_URL=abs_provider_url):
             url = reverse('openid-login')
             resp = self.client.post(url)
             code = 200
@@ -107,7 +109,7 @@ class OpenIdProviderTest(TestCase):
         provider_url = reverse('openid-provider-login')
         factory = RequestFactory()
         request = factory.request()
-        abs_provider_url = request.build_absolute_uri(location = provider_url)
+        abs_provider_url = request.build_absolute_uri(location=provider_url)
 
         # In order for this absolute URL to work (i.e. to get xrds, then authentication)
         # in the test environment, we either need a live server that works with the default
@@ -115,10 +117,10 @@ class OpenIdProviderTest(TestCase):
         # Here we do the latter:
         fetcher = MyFetcher(self.client)
         openid.fetchers.setDefaultFetcher(fetcher, wrap_exceptions=False)
-        
+
         # now we can begin the login process by invoking a local openid client,
         # with a pointer to the (also-local) openid provider:
-        with self.settings(OPENID_SSO_SERVER_URL = abs_provider_url):
+        with self.settings(OPENID_SSO_SERVER_URL=abs_provider_url):
             url = reverse('openid-login')
             resp = self.client.post(url)
             code = 200
@@ -143,43 +145,43 @@ class OpenIdProviderTest(TestCase):
             self.assertContains(resp, '<input type="submit" value="Continue" />', html=True)
             # this should work on the server:
             self.assertContains(resp, '<input name="openid.realm" type="hidden" value="http://testserver/" />', html=True)
-            
+
             # not included here are elements that will vary from run to run:
             # <input name="openid.return_to" type="hidden" value="http://testserver/openid/complete/?janrain_nonce=2013-01-23T06%3A20%3A17ZaN7j6H" />
             # <input name="openid.assoc_handle" type="hidden" value="{HMAC-SHA1}{50ff8120}{rh87+Q==}" />
-            
-            
+
+
     def testOpenIdSetup(self):
         if not settings.MITX_FEATURES.get('AUTH_USE_OPENID_PROVIDER'):
             return
         url = reverse('openid-provider-login')
         post_args = {
-                     "openid.mode" : "checkid_setup",
-                     "openid.return_to" : "http://testserver/openid/complete/?janrain_nonce=2013-01-23T06%3A20%3A17ZaN7j6H",
-                     "openid.assoc_handle" : "{HMAC-SHA1}{50ff8120}{rh87+Q==}",
-                     "openid.claimed_id" : "http://specs.openid.net/auth/2.0/identifier_select",
-                     "openid.ns" : "http://specs.openid.net/auth/2.0",
-                     "openid.realm" : "http://testserver/",
-                     "openid.identity" : "http://specs.openid.net/auth/2.0/identifier_select",
-                     "openid.ns.ax" : "http://openid.net/srv/ax/1.0",
-                     "openid.ax.mode" : "fetch_request",
-                     "openid.ax.required" : "email,fullname,old_email,firstname,old_nickname,lastname,old_fullname,nickname",
-                     "openid.ax.type.fullname" : "http://axschema.org/namePerson",
-                     "openid.ax.type.lastname" : "http://axschema.org/namePerson/last",
-                     "openid.ax.type.firstname" : "http://axschema.org/namePerson/first",
-                     "openid.ax.type.nickname" : "http://axschema.org/namePerson/friendly",
-                     "openid.ax.type.email" : "http://axschema.org/contact/email",
-                     "openid.ax.type.old_email" : "http://schema.openid.net/contact/email",
-                     "openid.ax.type.old_nickname" : "http://schema.openid.net/namePerson/friendly",
-                     "openid.ax.type.old_fullname" : "http://schema.openid.net/namePerson",
+                     "openid.mode": "checkid_setup",
+                     "openid.return_to": "http://testserver/openid/complete/?janrain_nonce=2013-01-23T06%3A20%3A17ZaN7j6H",
+                     "openid.assoc_handle": "{HMAC-SHA1}{50ff8120}{rh87+Q==}",
+                     "openid.claimed_id": "http://specs.openid.net/auth/2.0/identifier_select",
+                     "openid.ns": "http://specs.openid.net/auth/2.0",
+                     "openid.realm": "http://testserver/",
+                     "openid.identity": "http://specs.openid.net/auth/2.0/identifier_select",
+                     "openid.ns.ax": "http://openid.net/srv/ax/1.0",
+                     "openid.ax.mode": "fetch_request",
+                     "openid.ax.required": "email,fullname,old_email,firstname,old_nickname,lastname,old_fullname,nickname",
+                     "openid.ax.type.fullname": "http://axschema.org/namePerson",
+                     "openid.ax.type.lastname": "http://axschema.org/namePerson/last",
+                     "openid.ax.type.firstname": "http://axschema.org/namePerson/first",
+                     "openid.ax.type.nickname": "http://axschema.org/namePerson/friendly",
+                     "openid.ax.type.email": "http://axschema.org/contact/email",
+                     "openid.ax.type.old_email": "http://schema.openid.net/contact/email",
+                     "openid.ax.type.old_nickname": "http://schema.openid.net/namePerson/friendly",
+                     "openid.ax.type.old_fullname": "http://schema.openid.net/namePerson",
                      }
         resp = self.client.post(url, post_args)
         code = 200
         self.assertEqual(resp.status_code, code,
                          "got code {0} for url '{1}'. Expected code {2}"
                          .format(resp.status_code, url, code))
-        
-            
+
+
 # In order for this absolute URL to work (i.e. to get xrds, then authentication)
 # in the test environment, we either need a live server that works with the default
 # fetcher (i.e. urlopen2), or a test server that is reached through a custom fetcher.
@@ -196,11 +198,11 @@ class OpenIdProviderLiveServerTest(LiveServerTestCase):
         provider_url = reverse('openid-provider-xrds')
         factory = RequestFactory()
         request = factory.request()
-        abs_provider_url = request.build_absolute_uri(location = provider_url)
+        abs_provider_url = request.build_absolute_uri(location=provider_url)
 
         # now we can begin the login process by invoking a local openid client,
         # with a pointer to the (also-local) openid provider:
-        with self.settings(OPENID_SSO_SERVER_URL = abs_provider_url):
+        with self.settings(OPENID_SSO_SERVER_URL=abs_provider_url):
             url = reverse('openid-login')
             resp = self.client.post(url)
             code = 200

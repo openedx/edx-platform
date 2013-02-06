@@ -3,10 +3,12 @@ from xmodule.contentstore.content import StaticContent
 from xmodule.contentstore.content import ContentStore
 from xmodule.modulestore import Location
 
+
 class Content:
     def __init__(self, location, content_type):
         self.location = location
         self.content_type = content_type
+
 
 class ContentTest(unittest.TestCase):
     def test_thumbnail_none(self):

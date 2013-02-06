@@ -23,7 +23,7 @@ MITX_FEATURES['ENABLE_DISCUSSION_SERVICE'] = False
 WIKI_ENABLED = True
 
 # Makes the tests run much faster...
-SOUTH_TESTS_MIGRATE = False # To disable migrations and use syncdb instead
+SOUTH_TESTS_MIGRATE = False   # To disable migrations and use syncdb instead
 
 # Nose Test Runner
 INSTALLED_APPS += ('django_nose',)
@@ -57,7 +57,7 @@ XQUEUE_INTERFACE = {
     },
     "basic_auth": ('anant', 'agarwal'),
 }
-XQUEUE_WAITTIME_BETWEEN_REQUESTS = 5 # seconds
+XQUEUE_WAITTIME_BETWEEN_REQUESTS = 5   # seconds
 
 
 # Don't rely on a real staff grading backend

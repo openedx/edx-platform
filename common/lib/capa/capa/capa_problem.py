@@ -75,7 +75,7 @@ global_context = {'random': random,
                   'draganddrop': verifiers.draganddrop}
 
 # These should be removed from HTML output, including all subelements
-html_problem_semantics = ["codeparam", "responseparam", "answer", "script", "hintgroup", "openendedparam","openendedrubric"]
+html_problem_semantics = ["codeparam", "responseparam", "answer", "script", "hintgroup", "openendedparam", "openendedrubric"]
 
 log = logging.getLogger('mitx.' + __name__)
 
@@ -453,7 +453,7 @@ class LoncapaProblem(object):
                 exec code in context, context
             except Exception as err:
                 log.exception("Error while execing script code: " + code)
-                msg = "Error while executing script code: %s" % str(err).replace('<','&lt;')
+                msg = "Error while executing script code: %s" % str(err).replace('<', '&lt;')
                 raise responsetypes.LoncapaProblemError(msg)
             finally:
                 sys.path = original_path
@@ -502,7 +502,7 @@ class LoncapaProblem(object):
                    'id': problemtree.get('id'),
                    'feedback': {'message': msg,
                                 'hint': hint,
-                                'hintmode': hintmode,}}
+                                'hintmode': hintmode, }}
 
             input_type_cls = inputtypes.registry.get_class_for_tag(problemtree.tag)
             the_input = input_type_cls(self.system, problemtree, state)

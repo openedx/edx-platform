@@ -5,6 +5,10 @@ import urllib
 import sys
 import inspect
 
+# This method is used to pluralize the words "discussion" and "comment"
+# which is why you need to tack on an "s" for the case of 0 or two or more.
+
+
 def pluralize(content, text):
     num, word = text.split(' ')
     num = int(num or '0')
@@ -13,11 +17,14 @@ def pluralize(content, text):
     else:
         return word
 
+
 def url_for_user(content, user_id):
     return urlresolvers.reverse('django_comment_client.forum.views.user_profile', args=[content['course_id'], user_id])
 
-def url_for_tags(content, tags): # assume that attribute 'tags' is in the format u'a, b, c'
+
+def url_for_tags(content, tags):   # assume that attribute 'tags' is in the format u'a, b, c'
     return _url_for_tags(content['course_id'], tags)
+
 
 def close_thread_text(content):
     if content.get('closed'):

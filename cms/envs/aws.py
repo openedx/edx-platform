@@ -52,10 +52,6 @@ LOGGING = get_logger_config(LOG_DIR,
                             debug=False,
                             service_variant=SERVICE_VARIANT)
 
-with open(ENV_ROOT / "repos.json") as repos_file:
-    REPOS = json.load(repos_file)
-
-
 ################ SECURE AUTH ITEMS ###############################
 # Secret things: passwords, access keys, etc.
 with open(ENV_ROOT / CONFIG_PREFIX + "auth.json") as auth_file:

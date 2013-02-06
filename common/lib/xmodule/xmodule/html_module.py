@@ -133,7 +133,7 @@ class HtmlDescriptor(XmlDescriptor, EditingDescriptor):
 
                     # TODO (ichuang): remove this after migration
                     # for Fall 2012 LMS migration: keep filename (and unmangled filename)
-                    definition['filename'] = [ filepath, filename ]
+                    definition['filename'] = [filepath, filename]
 
                     return definition
 
@@ -180,12 +180,14 @@ class AboutDescriptor(HtmlDescriptor):
     """
     template_dir_name = "about"
 
+
 class StaticTabDescriptor(HtmlDescriptor):
     """
     These pieces of course content are treated as HtmlModules but we need to overload where the templates are located
     in order to be able to create new ones
     """
     template_dir_name = "statictab"
+
 
 class CourseInfoDescriptor(HtmlDescriptor):
     """

@@ -10,6 +10,7 @@ from lxml import etree
 
 from . import test_system
 
+
 class CapaFactory(object):
     """
     A helper class to create problem modules with various parameters for testing.
@@ -58,7 +59,7 @@ class CapaFactory(object):
 
             attempts: also added to instance state.  Will be converted to an int.
         """
-        definition = {'data': CapaFactory.sample_problem_xml,}
+        definition = {'data': CapaFactory.sample_problem_xml, }
         location = Location(["i4x", "edX", "capa_test", "problem",
                              "SampleProblem{0}".format(CapaFactory.next_num())])
         metadata = {}
@@ -208,8 +209,3 @@ class CapaModuleTest(unittest.TestCase):
                                             due=self.yesterday_str,
                                             graceperiod=self.two_day_delta_str)
         self.assertFalse(still_in_grace.answer_available())
-
-
-
-
-

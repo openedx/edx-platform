@@ -186,9 +186,9 @@ class LoncapaResponse(object):
         tree = etree.Element('span')
 
         # problem author can make this span display:inline
-        if self.xml.get('inline',''):
-            tree.set('class','inline')
-            
+        if self.xml.get('inline', ''):
+            tree.set('class', 'inline')
+
         for item in self.xml:
             # call provided procedure to do the rendering
             item_xhtml = renderer(item)
@@ -1294,7 +1294,7 @@ class CodeResponse(LoncapaResponse):
 
         # State associated with the queueing request
         queuestate = {'key': queuekey,
-                      'time': qtime,}
+                      'time': qtime, }
 
         cmap = CorrectMap()
         if error:
