@@ -4,7 +4,7 @@ import unittest
 
 from xmodule.openendedchild import OpenEndedChild
 from xmodule.open_ended_module import OpenEndedModule
-from xmodule.combined_open_ended_module import CombinedOpenEndedModule
+from xmodule.combined_open_ended_modulev1 import CombinedOpenEndedV1Module
 
 from xmodule.modulestore import Location
 from lxml import etree
@@ -159,7 +159,8 @@ class OpenEndedModuleTest(unittest.TestCase):
             'max_score': max_score,
             'display_name': 'Name',
             'accept_file_upload': False,
-            'close_date': None
+            'rewrite_content_links' : "",
+            'close_date': None,
             }
 
     oeparam = etree.XML('''
@@ -283,13 +284,16 @@ class CombinedOpenEndedModuleTest(unittest.TestCase):
 
     metadata = {'attempts': '10', 'max_score': max_score}
 
-    static_data = json.dumps({
+    static_data = {
             'max_attempts': 20,
             'prompt': prompt,
             'rubric': rubric,
             'max_score': max_score,
-            'display_name': 'Name'
-            })
+            'display_name': 'Name',
+            'accept_file_upload' : False,
+            'rewrite_content_links' : "",
+            'close_date' : "",
+            }
 
     oeparam = etree.XML('''
       <openendedparam>
@@ -321,7 +325,7 @@ class CombinedOpenEndedModuleTest(unittest.TestCase):
     descriptor = Mock()
 
     def setUp(self):
-        self.combinedoe = CombinedOpenEndedModule(test_system, self.location, self.definition, self.descriptor, self.static_data, metadata=self.metadata)
+        self.combinedoe = CombinedOpenEndedV1Module(test_system, self.location, self.definition, self.descriptor, static_data = self.static_data, metadata=self.metadata)
 
     def test_get_tag_name(self):
         name = self.combinedoe.get_tag_name("<t>Tag</t>")
@@ -331,14 +335,14 @@ class CombinedOpenEndedModuleTest(unittest.TestCase):
         response_dict = self.combinedoe.get_last_response(0)
         self.assertEqual(response_dict['type'], "selfassessment")
         self.assertEqual(response_dict['max_score'], self.max_score)
-        self.assertEqual(response_dict['state'], CombinedOpenEndedModule.INITIAL)
+        self.assertEqual(response_dict['state'], CombinedOpenEndedV1Module.INITIAL)
 
     def test_update_task_states(self):
         changed = self.combinedoe.update_task_states()
         self.assertFalse(changed)
 
         current_task = self.combinedoe.current_task
-        current_task.change_state(CombinedOpenEndedModule.DONE)
+        current_task.change_state(CombinedOpenEndedV1Module.DONE)
         changed = self.combinedoe.update_task_states()
 
         self.assertTrue(changed)
