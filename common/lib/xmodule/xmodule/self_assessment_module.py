@@ -125,7 +125,7 @@ class SelfAssessmentModule(openendedchild.OpenEndedChild):
         if self.state == self.INITIAL:
             return ''
 
-        rubric_renderer = CombinedOpenEndedRubric(system, True)
+        rubric_renderer = CombinedOpenEndedRubric(system, False)
         success, rubric_html = rubric_renderer.render_rubric(self.rubric)
 
         # we'll render it
@@ -190,15 +190,10 @@ class SelfAssessmentModule(openendedchild.OpenEndedChild):
             Dictionary with keys 'success' and either 'error' (if not success),
             or 'rubric_html' (if success).
         """
-        # Check to see if attempts are less than max
-        if self.attempts > self.max_attempts:
-            # If too many attempts, prevent student from saving answer and
-            # seeing rubric.  In normal use, students shouldn't see this because
-            # they won't see the reset button once they're out of attempts.
-            return {
-                'success': False,
-                'error': 'Too many attempts.'
-            }
+        # Check to see if this problem is closed
+        closed, msg = self.check_if_closed()
+        if closed:
+            return msg
 
         if self.state != self.INITIAL:
             return self.out_of_sync_error(get)

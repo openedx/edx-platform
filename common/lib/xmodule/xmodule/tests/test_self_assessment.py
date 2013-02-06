@@ -46,11 +46,13 @@ class SelfAssessmentTest(unittest.TestCase):
                 'max_score': 1,
                 'display_name': "Name",
                 'accept_file_upload': False,
+                'close_date': None
                 }
 
         self.module = SelfAssessmentModule(test_system, self.location,
                                       self.definition, self.descriptor,
-                                      static_data, state, metadata=self.metadata)
+                                      static_data, 
+                                      state, metadata=self.metadata)
 
     def test_get_html(self):
         html = self.module.get_html(test_system)

@@ -231,47 +231,6 @@ div.result-container {
       }
 }
 
-div.result-container, section.open-ended-child {
-    .rubric {
-            margin-bottom:25px;
-            tr {
-                margin:10px 0px;
-                height: 100%;
-            }
-            td {
-                padding: 20px 0px 25px 0px;
-                margin: 10px 0px;
-                height: 100%;
-            }
-            th {
-                padding: 5px;
-                margin: 5px;
-            }
-            label,
-            .view-only {
-                margin:2px;
-                position: relative;
-                padding: 10px 15px 25px 15px;
-                width: 145px;
-                height:100%;
-                display: inline-block;
-                min-height: 50px;
-                min-width: 50px;
-                background-color: #CCC;
-                font-size: .85em;
-            }
-            .grade {
-              position: absolute;
-              bottom:0px;
-              right:0px;
-              margin:10px;
-            }
-            .selected-grade {
-              background: #666;
-              color: white;
-            }
-        }
-}
 
 section.open-ended-child {
   @media print {
@@ -445,7 +404,6 @@ section.open-ended-child {
     div.short-form-response {
           background: #F6F6F6;
           border: 1px solid #ddd;
-          border-top: 0;
           margin-bottom: 20px;
           overflow-y: auto;
           height: 200px;
@@ -586,11 +544,6 @@ section.open-ended-child {
     }
 
     .submission_feedback {
-      // background: #F3F3F3;
-      // border: 1px solid #ddd;
-      // @include border-radius(3px);
-      // padding: 8px 12px;
-      // margin-top: 10px;
       @include inline-block;
       font-style: italic;
       margin: 8px 0 0 10px;
