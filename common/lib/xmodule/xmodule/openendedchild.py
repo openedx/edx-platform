@@ -339,7 +339,7 @@ class OpenEndedChild(object):
         image_tag = ""
         image_ok = False
         if 'can_upload_files' in get_data:
-            if get_data['can_upload_files'] == 'true':
+            if get_data['can_upload_files'] in ['true', '1']:
                 has_file_to_upload = True
                 file = get_data['student_file'][0]
                 uploaded_to_s3, image_ok, s3_public_url = self.upload_image_to_s3(file)
@@ -378,7 +378,7 @@ class OpenEndedChild(object):
         elif has_file_to_upload and not uploaded_to_s3 and image_ok:
             #In this case, an image was submitted by the student, but the image could not be uploaded to S3.  Likely
             #a config issue (development vs deployment).  For now, just treat this as a "success"
-            log.warning("Student AJAX post to combined open ended xmodule indicated that it contained an image, "
+            log.exception("Student AJAX post to combined open ended xmodule indicated that it contained an image, "
                         "but the image was not able to be uploaded to S3.  This could indicate a config"
                         "issue with this deployment, but it could also indicate a problem with S3 or with the"
                         "student image itself.")
@@ -387,6 +387,8 @@ class OpenEndedChild(object):
             #If there is no file to upload, probably the student has embedded the link in the answer text
             success, get_data['student_answer'] = self.check_for_url_in_text(get_data['student_answer'])
             overall_success = success
+
+        #log.debug("Has file: {0} Uploaded: {1} Image Ok: {2}".format(has_file_to_upload, uploaded_to_s3, image_ok))
 
         return overall_success, get_data
 
