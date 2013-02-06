@@ -42,6 +42,7 @@ class OpenEndedChildTest(unittest.TestCase):
             'max_score': max_score,
             'display_name': 'Name',
             'accept_file_upload': False,
+            'close_date': None
             }
     definition = Mock()
     descriptor = Mock()
@@ -157,6 +158,7 @@ class OpenEndedModuleTest(unittest.TestCase):
             'max_score': max_score,
             'display_name': 'Name',
             'accept_file_upload': False,
+            'close_date': None
             }
 
     oeparam = etree.XML('''

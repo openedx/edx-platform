@@ -74,7 +74,7 @@ class OpenEndedChild(object):
         'done': 'Problem complete',
     }
 
-    def __init__(self, system, location, definition, descriptor, static_data,
+    def __init__(self, system, location, definition, descriptor, static_data, 
                  instance_state=None, shared_state=None, **kwargs):
         # Load instance state
         if instance_state is not None:
@@ -99,6 +99,7 @@ class OpenEndedChild(object):
         self.rubric = static_data['rubric']
         self.display_name = static_data['display_name']
         self.accept_file_upload = static_data['accept_file_upload']
+        self.close_date = static_data['close_date']
 
         # Used for progress / grading.  Currently get credit just for
         # completion (doesn't matter if you self-assessed correct/incorrect).
@@ -116,6 +117,27 @@ class OpenEndedChild(object):
         @return: None
         """
         pass
+
+    def closed(self):
+        if self.close_date is not None and datetime.utcnow() > self.close_date:
+            return True
+        return False
+
+    def check_if_closed(self):
+        if self.closed():
+            return True, {
+                'success': False,
+                'error': 'This problem is now closed.'
+            }
+        elif self.attempts > self.max_attempts:
+            return True, {
+                'success': False,
+                'error': 'Too many attempts.'
+            }
+        else:
+            return False, {}
+
+
 
     def latest_answer(self):
         """Empty string if not available"""
