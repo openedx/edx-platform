@@ -1,0 +1,130 @@
+<sequential>
+    <problem name="test_6" showanswer="never" attempts="10" max_attempts="10" display_name="Melting Point and Pressure 1">
+    <startouttext/>
+<p>How does the melting point of water (H2O) change with increasing pressure?</p>
+<endouttext/>
+<multiplechoiceresponse direction="vertical" randomize="yes">
+    <choicegroup type="MultipleChoice">
+    <choice location="random" correct="true"  name="A"><text>decreases</text></choice>
+    <choice location="random" correct="false" name="B"><text>is unchanged</text></choice>
+    <choice location="random" correct="false" name="C"><text>increases</text></choice>
+    <choice location="random" correct="false" name="D"><text>increases and then decreases</text></choice>
+</choicegroup>
+</multiplechoiceresponse>
+</problem>
+
+ <problem name="test_7" showanswer="never" attempts="10" max_attempts="10" display_name="Melting Point and Pressure 2">
+    <startouttext/>
+<p>How does the melting point of water (H2O) change with increasing pressure?</p>
+<endouttext/>
+<multiplechoiceresponse direction="vertical" randomize="yes">
+    <choicegroup type="MultipleChoice">
+    <choice location="random" correct="true"  name="A"><text>decreases</text></choice>
+    <choice location="random" correct="false" name="B"><text>is unchanged</text></choice>
+    <choice location="random" correct="false" name="C"><text>increases</text></choice>
+    <choice location="random" correct="false" name="D"><text>increases and then decreases</text></choice>
+</choicegroup>
+</multiplechoiceresponse>
+</problem>
+
+    <vertical>
+        <poll_question id="first_poll" display_name="first poll">
+                <h3>What's the Right Thing to Do?</h3>
+                <p>Suppose four shipwrecked sailors are stranded at sea in a lifeboat, without
+    food or water. Would it be wrong for three of them to kill and eat the cabin
+    boy, in order to save their own lives?</p>
+            <answer id="Yes">Yes</answer>
+            <answer id="No">No</answer>
+            <answer id="Dont_know">Don't know</answer>
+        </poll_question>
+
+       <!--  <conditional condition="answer" required="poll_question/first_poll" answer="Yes">
+                <test1></test1>
+                <test2>
+                    <poll_question name="first_yes" display_name="first yes poll">
+                            <h3>Yes?</h3>
+                            <p>Really yes?</p>
+                         <answer name="Yes">Yes</answer>
+                         <answer name="No">No</answer>
+                    </poll_question>
+                </test2>
+        </conditional> -->
+
+        <!--
+        <conditional condition="answer" required="poll_question/first_poll" answer="No">
+            <poll_question name="first_no" display_name="first no poll">
+                    <h3>No?</h3>
+                    <p>Are you sure?</p>
+              <answer name="Yes">Yes</answer>
+              <answer name="No">No</answer>
+            </poll_question>
+        </conditional>
+        -->
+
+       <!--  <conditional condition="answer" required="poll_question/first_poll" answer_value="not yes, not no">
+            <html>You can't decide</html>
+        </conditional> -->
+         <conditional condition="answer" required="poll_question/first_poll" answer="unanswered">
+                 <html>You can't see this element until you've done the poll</html>
+        </conditional>
+
+       <!--  <conditional condition="answer" required="poll_question/first_poll">
+            <if answer_to="poll_question/first_poll" is="Yes">
+                <poll_question name="first_yes">
+                        <h3>Yes?</h3>
+                        <p>Really yes?</p>
+                     <answer name="Yes">Yes</answer>
+                     <answer name="No">No</answer>
+                </poll_question>
+            </if>
+            <if answer_to="poll_question/first_poll" is="no">
+                <poll_question name="first_no">
+                        <h3>No?</h3>
+                        <p>Are you sure?</p>
+                  <answer name="Yes">Yes</answer>
+                  <answer name="No">No</answer>
+                </poll_question>
+            </if>
+            <if answer_to="poll_question/first_poll" is="anything_else">
+                <html>You can't decide</html>
+            </if>
+            <if answer_to="poll_question/first_poll" is="unanswered">
+                 <html>You can't see this element until you've done the poll</html>
+            </if>
+        </conditional>
+
+         <conditional condition="answer" required="poll_question/first_poll; poll_question/first_yes">
+            <if answer_to="poll_question/first_yes" is="Yes">
+                <html>Third level of question branching, A</html>
+            </if>
+            <if answer_to="poll_question/first_yes" is="anything_else">
+                <html>Third level of question branching, B</html>
+            </if>
+        </conditional> -->
+
+    </vertical>
+
+<!--     <conditional condition="require_completed" required="problem/test_6; problem/test_7">
+        <video youtube="1.0:hbpmBYE86go" url_name="A1V1_Video_Resources" display_name="Synthetic diamonds">
+          <source src="https://s3.amazonaws.com/edx-course-videos/mit-3091x/M-3091X-FA12-SynthDiam_100.mp4"/>
+        </video>
+
+           <problem name="test_cond_1" showanswer="never" attempts="10" max_attempts="10" display_name="Melting Point and Pressure">
+    <startouttext/>
+<p>How does the melting point of water (H2O) change with increasing pressure?</p>
+<endouttext/>
+<multiplechoiceresponse direction="vertical" randomize="yes">
+    <choicegroup type="MultipleChoice">
+    <choice location="random" correct="true"  name="A"><text>decreases</text></choice>
+    <choice location="random" correct="false" name="B"><text>is unchanged</text></choice>
+    <choice location="random" correct="false" name="C"><text>increases</text></choice>
+    <choice location="random" correct="false" name="D"><text>increases and then decreases</text></choice>
+</choicegroup>
+</multiplechoiceresponse>
+</problem>
+ <video youtube="1.0:hbpmBYE86go" url_name="A1V1_Video_Resources1" display_name="Synthetic diamonds1">
+          <source src="https://s3.amazonaws.com/edx-course-videos/mit-3091x/M-3091X-FA12-SynthDiam_100.mp4"/>
+        </video>
+    </conditional> -->
+
+</sequential>

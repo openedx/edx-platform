@@ -100,9 +100,9 @@ class XmlDescriptor(XModuleDescriptor):
         # VS[compat] Remove once unused.
         'name', 'slug')
 
-    metadata_to_strip = ('data_dir', 
+    metadata_to_strip = ('data_dir',
             # cdodge: @TODO: We need to figure out a way to export out 'tabs' and 'grading_policy' which is on the course
-            'tabs', 'grading_policy', 'is_draft', 'published_by', 'published_date', 
+            'tabs', 'grading_policy', 'is_draft', 'published_by', 'published_date',
             'discussion_blackouts',
            # VS[compat] -- remove the below attrs once everything is in the CMS
            'course', 'org', 'url_name', 'filename',
@@ -119,7 +119,7 @@ class XmlDescriptor(XModuleDescriptor):
     bool_map = AttrMap(to_bool, from_bool)
 
     to_int = lambda val: int(val)
-    from_int = lambda val: str(val) 
+    from_int = lambda val: str(val)
     int_map = AttrMap(to_int, from_int)
     xml_attribute_map = {
         # type conversion: want True/False in python, "true"/"false" in xml

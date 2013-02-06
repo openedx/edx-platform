@@ -1,5 +1,7 @@
-from itertools import chain
+# -*- coding: utf-8 -*-
+
 from lxml import etree
+
 
 def stringify_children(node):
     '''
@@ -25,4 +27,5 @@ def stringify_children(node):
         parts.append(etree.tostring(c, with_tail=True))
 
     # filter removes possible Nones in texts and tails
-    return ''.join(filter(None, parts))
+    result = ''.join(filter(None, parts))
+    return result

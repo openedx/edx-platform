@@ -1,0 +1,54 @@
+<sequential>
+    <vertical>
+    <problem showanswer="never" attempts="1" display_name="Melting Point and Pressure">
+    <startouttext/>
+<p>How does the melting point of water (H2O) change with increasing pressure?</p>
+<endouttext/>
+<multiplechoiceresponse direction="vertical" randomize="yes">
+    <choicegroup type="MultipleChoice">
+    <choice location="random" correct="true"  name="A"><text>decreases</text></choice>
+    <choice location="random" correct="false" name="B"><text>is unchanged</text></choice>
+    <choice location="random" correct="false" name="C"><text>increases</text></choice>
+    <choice location="random" correct="false" name="D"><text>increases and then decreases</text></choice>
+</choicegroup>
+</multiplechoiceresponse>
+</problem>
+</vertical>
+    <vertical>
+    <poll>
+        <question id="1" upvote="2">
+        <!-- After upvote - follow up question, after downvote - no followup -->
+        <!-- default is to show plot, upvote=end, downvote = end -->
+            <h3>What's the Right Thing to Do?</h3>
+            <p>Suppose four shipwrecked sailors are stranded at sea in a lifeboat, without
+food or water. Would it be wrong for three of them to kill and eat the cabin
+boy, in order to save their own lives?</p>
+        </question>
+        <question id="2" show_stats="no">
+            Question text
+        </question>
+    </poll>
+
+    <poll>
+        <question id="1" upvote="2" downvote="3">
+            <h3>What's the Right Thing to Do?</h3>
+            <p>Suppose four shipwrecked sailors are stranded at sea in a lifeboat, without
+food or water. Would it be wrong for three of them to kill and eat the cabin
+boy, in order to save their own lives?</p>
+        </question>
+        <question id="2">
+            <h3>What's the Right Thing to Do?</h3>
+            <p>Should they try to swim across the ocean?</p>
+        </question>
+        <question id="3" show_stats="no">
+            <h3>What's the Right Thing to Do?</h3>
+            <p>Should they try catch fish</p>
+        </question>
+    </poll>
+</vertical>
+  <!--   <conditional condition="require_completed" required="tag/url_name1 tag/url_name2">
+        <video youtube="1.0:80lyCgMVIiA" url_name="A1V1_Video_Resources" display_name="Synthetic diamonds">
+          <source src="https://s3.amazonaws.com/edx-course-videos/mit-3091x/M-3091X-FA12-SynthDiam_100.mp4"/>
+        </video>
+    </conditional> -->
+</sequential>
