@@ -296,7 +296,10 @@ class CourseMetadataEditingTest(CourseTestCase):
         self.assertIn('rerandomize', test_model, 'Missing rerandomize metadata field')
         
     def test_update_from_json(self):
-        test_model = CourseMetadata.update_from_json(self.course_location, { "a" : 1, "b_a_c_h" : { "c" : "test" }, "test_text" : "a text string" })
+        test_model = CourseMetadata.update_from_json(self.course_location, 
+                                                     { "a" : 1, 
+                                                      "b_a_c_h" : { "c" : "test" }, 
+                                                      "test_text" : "a text string"})
         self.assertIn('display_name', test_model, 'Missing editable metadata field')
         self.assertEqual(test_model['display_name'], 'Robot Super Course', "not expected value")
         self.assertIn('a', test_model, 'Missing new a metadata field')
@@ -315,6 +318,15 @@ class CourseMetadataEditingTest(CourseTestCase):
         self.assertDictEqual(test_model['b_a_c_h'], { "c" : "test" }, "b_a_c_h not expected value")
         self.assertIn('test_text', test_model, 'Missing test_text metadata field')
         self.assertEqual(test_model['test_text'], "a text string", "test_text not expected value")
+        # now change some of the existing metadata
+        test_model = CourseMetadata.update_from_json(self.course_location, 
+                                                     { "a" : 2, 
+                                                      "display_name" : "jolly roger"})
+        self.assertIn('display_name', test_model, 'Missing editable metadata field')
+        self.assertEqual(test_model['display_name'], 'jolly roger', "not expected value")
+        self.assertIn('a', test_model, 'Missing revised a metadata field')
+        self.assertEqual(test_model['a'], 2, "a not expected value")
+
         
     def test_delete_key(self):
         test_model = CourseMetadata.delete_key(self.fullcourse_location, { 'deleteKeys' : ['doesnt_exist', 'showanswer', 'xqa_key']})
