@@ -1,17 +1,14 @@
-from path import path
+# -*- coding: utf-8 -*-
+
 import unittest
 from fs.memoryfs import MemoryFS
 
 from lxml import etree
 from mock import Mock, patch
-from collections import defaultdict
 
-from xmodule.x_module import XMLParsingSystem, XModuleDescriptor
 from xmodule.xml_module import is_pointer_tag
-from xmodule.errortracker import make_error_tracker
 from xmodule.modulestore import Location
 from xmodule.modulestore.xml import ImportSystem, XMLModuleStore
-from xmodule.modulestore.exceptions import ItemNotFoundError
 from xmodule.modulestore.inheritance import compute_inherited_metadata
 
 from .test_export import DATA_DIR
@@ -64,7 +61,6 @@ class ImportTestCase(unittest.TestCase):
         self.assertEqual(descriptor.__class__.__name__,
                          'ErrorDescriptor')
 
-
     def test_unique_url_names(self):
         '''Check that each error gets its very own url_name'''
         bad_xml = '''<sequential display_name="oops"><video url="hi"></sequential>'''
@@ -75,7 +71,6 @@ class ImportTestCase(unittest.TestCase):
         descriptor2 = system.process_xml(bad_xml2)
 
         self.assertNotEqual(descriptor1.location, descriptor2.location)
-
 
     def test_reimport(self):
         '''Make sure an already-exported error xml tag loads properly'''
@@ -137,7 +132,6 @@ class ImportTestCase(unittest.TestCase):
         descriptor = system.process_xml(start_xml)
         compute_inherited_metadata(descriptor)
 
-        print descriptor, descriptor._model_data
         self.assertEqual(descriptor.lms.due, v)
 
         # Check that the child inherits due correctly
@@ -149,7 +143,7 @@ class ImportTestCase(unittest.TestCase):
         exported_xml = descriptor.export_to_xml(resource_fs)
 
         # Check that the exported xml is just a pointer
-        print "Exported xml:", exported_xml
+        # Exported exported_xml
         pointer = etree.fromstring(exported_xml)
         self.assertTrue(is_pointer_tag(pointer))
         # but it's a special case course pointer
@@ -196,17 +190,17 @@ class ImportTestCase(unittest.TestCase):
                """]
 
         for xml_str in yes:
-            print "should be True for {0}".format(xml_str)
+            # should be True for xml_str
             self.assertTrue(is_pointer_tag(etree.fromstring(xml_str)))
 
         for xml_str in no:
-            print "should be False for {0}".format(xml_str)
+            # should be False for xml_str
             self.assertFalse(is_pointer_tag(etree.fromstring(xml_str)))
 
     def test_metadata_inherit(self):
         """Make sure that metadata is inherited properly"""
 
-        print "Starting import"
+        # Starting import"
         initial_import = XMLModuleStore(DATA_DIR, course_dirs=['toy'])
 
         courses = initial_import.get_courses()
@@ -215,20 +209,19 @@ class ImportTestCase(unittest.TestCase):
 
         def check_for_key(key, node):
             "recursive check for presence of key"
-            print "Checking {0}".format(node.location.url())
+            # Checking node.location.url()
             self.assertTrue(key in node._model_data)
             for c in node.get_children():
                 check_for_key(key, c)
 
         check_for_key('graceperiod', course)
 
-
     def test_policy_loading(self):
         """Make sure that when two courses share content with the same
         org and course names, policy applies to the right one."""
 
         def get_course(name):
-            print "Importing {0}".format(name)
+            # Importing name
 
             modulestore = XMLModuleStore(DATA_DIR, course_dirs=[name])
             courses = modulestore.get_courses()
@@ -254,7 +247,6 @@ class ImportTestCase(unittest.TestCase):
         # appropriate attribute maps -- 'graded' should be True, not 'true'
         self.assertEqual(toy.lms.graded, True)
 
-
     def test_definition_loading(self):
         """When two courses share the same org and course name and
         both have a module with the same url_name, the definitions shouldn't clash.
@@ -270,15 +262,14 @@ class ImportTestCase(unittest.TestCase):
 
         location = Location(["i4x", "edX", "toy", "video", "Welcome"])
         toy_video = modulestore.get_instance(toy_id, location)
-        two_toy_video =  modulestore.get_instance(two_toy_id, location)
+        two_toy_video = modulestore.get_instance(two_toy_id, location)
         self.assertEqual(etree.fromstring(toy_video.data).get('youtube'), "1.0:p2Q6BrNhdh8")
         self.assertEqual(etree.fromstring(two_toy_video.data).get('youtube'), "1.0:p2Q6BrNhdh9")
-
 
     def test_colon_in_url_name(self):
         """Ensure that colons in url_names convert to file paths properly"""
 
-        print "Starting import"
+        # Starting import
         modulestore = XMLModuleStore(DATA_DIR, course_dirs=['toy'])
 
         courses = modulestore.get_courses()
@@ -286,7 +277,7 @@ class ImportTestCase(unittest.TestCase):
         course = courses[0]
         course_id = course.id
 
-        print "course errors:"
+        # course errors
         for (msg, err) in modulestore.get_item_errors(course.location):
             print msg
             print err
@@ -297,12 +288,10 @@ class ImportTestCase(unittest.TestCase):
         ch2 = chapters[1]
         self.assertEquals(ch2.url_name, "secret:magic")
 
-        print "Ch2 location: ", ch2.location
-
         also_ch2 = modulestore.get_instance(course_id, ch2.location)
         self.assertEquals(ch2, also_ch2)
 
-        print "making sure html loaded"
+        # making sure html loaded
         cloc = course.location
         loc = Location(cloc.tag, cloc.org, cloc.course, 'html', 'secret:toylab')
         html = modulestore.get_instance(course_id, loc)
@@ -315,8 +304,6 @@ class ImportTestCase(unittest.TestCase):
 
         modulestore = XMLModuleStore(DATA_DIR, course_dirs=['toy'])
 
-        toy_id = "edX/toy/2012_Fall"
-
         course = modulestore.get_courses()[0]
         chapters = course.get_children()
         ch1 = chapters[0]
@@ -324,7 +311,7 @@ class ImportTestCase(unittest.TestCase):
 
         self.assertEqual(len(sections), 4)
 
-        for i in (2,3):
+        for i in (2, 3):
             video = sections[i]
             # Name should be 'video_{hash}'
             print "video {0} url_name: {1}".format(i, video.url_name)

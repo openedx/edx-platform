@@ -23,19 +23,20 @@ answer from other users.
 
 """
 
+
 import json
 import logging
 import cgi
 from copy import deepcopy
 
-from lxml import html, etree
+from lxml import etree
 from pkg_resources import resource_string
 
 from xmodule.x_module import XModule
 from xmodule.stringify import stringify_children
 from xmodule.mako_module import MakoModuleDescriptor
 from xmodule.xml_module import XmlDescriptor
-from xblock.core import Integer, Scope, String, List, Object, Boolean
+from xblock.core import Scope, String, Object, Boolean
 
 log = logging.getLogger(__name__)
 
@@ -59,7 +60,6 @@ class PollModule(XModule):
     poll_answers = Object(help="All possible answers for the poll", scope=Scope.content, default={})
 
     xml_object = Object(scope=Scope.content)  # poll xml
-
 
     def handle_ajax(self, dispatch, get):
         """Ajax handler.
@@ -145,7 +145,7 @@ class PollDescriptor(MakoModuleDescriptor, XmlDescriptor):
 
     def definition_to_xml(self, resource_fs):
         """Return an xml element representing this definition."""
-        #  TODO test and fix
+        # TODO test and fix
         xml_object = etree.Element('poll_question')
 
         def add_child(k):
