@@ -240,6 +240,8 @@ nav .nav-item {
     left: -7px;
     top: 47px;
     width: 140px;
+    opacity: 0;
+    pointer-events: none;
   }
 
   .nav-sub {
