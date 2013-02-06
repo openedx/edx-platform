@@ -143,7 +143,7 @@ class CombinedOpenEndedModule(XModule):
         }
 
         self.child_descriptor = descriptors[version_index](self.system)
-        self.child_definition = CombinedOpenEndedV1Descriptor.definition_from_xml(etree.fromstring(definition['xml_string']), self.system)
+        self.child_definition = descriptors[version_index].definition_from_xml(etree.fromstring(definition['xml_string']), self.system)
         self.child_module = modules[version_index](self.system, location, self.child_definition, self.child_descriptor,
             instance_state = json.dumps(instance_state), metadata = self.metadata, static_data= static_data)
 
