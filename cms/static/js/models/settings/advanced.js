@@ -8,7 +8,7 @@ CMS.Models.Settings.Advanced = Backbone.Model.extend({
     initialize: function() {
         console.log('in initialize');
         var editor = ace.edit('course-advanced-policy-1-value');
-        editor.setTheme("ace/theme/monokai");
-        editor.getSession().setMode("ace/mode/javascript");
+        editor.setTheme("ace/theme/chrome");
+        editor.getSession().setMode("ace/mode/json");
     }
 });
