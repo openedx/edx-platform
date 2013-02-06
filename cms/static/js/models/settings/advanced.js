@@ -123,7 +123,7 @@ CMS.Views.Settings.Advanced = CMS.Views.ValidatingView.extend({
         this.model.deleteKeys = [];
         var self = this;
         this.model.fetch({
-            success : this.render,
+            success : function() { self.render(); },
             error : CMS.ServerError
         });
     },
