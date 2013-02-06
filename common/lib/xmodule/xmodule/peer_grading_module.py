@@ -44,6 +44,7 @@ TRUE_DICT = [True, "True", "true", "TRUE"]
 MAX_SCORE = 1
 IS_GRADED = True
 
+
 class PeerGradingModule(XModule):
     _VERSION = 1
 
@@ -94,7 +95,7 @@ class PeerGradingModule(XModule):
         self.display_due_date = self.timeinfo.display_due_date
 
         self.link_to_location = self.metadata.get('link_to_location', USE_FOR_SINGLE_LOCATION)
-        if self.use_for_single_location ==True:
+        if self.use_for_single_location == True:
             #This will raise an exception if the location is invalid
             link_to_location_object = Location(self.link_to_location)
 
@@ -137,7 +138,7 @@ class PeerGradingModule(XModule):
         if not self.use_for_single_location:
             return self.peer_grading()
         else:
-            return self.peer_grading_problem({'location' : self.link_to_location})['html']
+            return self.peer_grading_problem({'location': self.link_to_location})['html']
 
     def handle_ajax(self, dispatch, get):
         """
@@ -149,8 +150,8 @@ class PeerGradingModule(XModule):
             'show_calibration_essay': self.show_calibration_essay,
             'is_student_calibrated': self.is_student_calibrated,
             'save_grade': self.save_grade,
-            'save_calibration_essay' : self.save_calibration_essay,
-            'problem' : self.peer_grading_problem,
+            'save_calibration_essay': self.save_calibration_essay,
+            'problem': self.peer_grading_problem,
             }
 
         if dispatch not in handlers:
@@ -196,11 +197,11 @@ class PeerGradingModule(XModule):
                 return None
             count_graded = response['count_graded']
             count_required = response['count_required']
-            if count_required>0 and count_graded>=count_required:
+            if count_required > 0 and count_graded >= count_required:
                 self.student_data_for_location = response
 
         score_dict = {
-            'score': int(count_graded>=count_required),
+            'score': int(count_graded >= count_required),
             'total': self.max_grade,
             }
 
@@ -430,7 +431,7 @@ class PeerGradingModule(XModule):
         return html
 
 
-    def peer_grading(self, get = None):
+    def peer_grading(self, get=None):
         '''
         Show a peer grading interface
         '''
@@ -465,19 +466,19 @@ class PeerGradingModule(XModule):
             'error_text': error_text,
             # Checked above
             'staff_access': False,
-            'use_single_location' : self.use_for_single_location,
+            'use_single_location': self.use_for_single_location,
             })
 
         return html
 
-    def peer_grading_problem(self, get = None):
+    def peer_grading_problem(self, get=None):
         '''
         Show individual problem interface
         '''
-        if get == None or get.get('location')==None:
+        if get == None or get.get('location') == None:
             if not self.use_for_single_location:
                 #This is an error case, because it must be set to use a single location to be called without get parameters
-                return {'html' : "", 'success' : False}
+                return {'html': "", 'success': False}
             problem_location = self.link_to_location
 
         elif get.get('location') is not None:
@@ -491,10 +492,10 @@ class PeerGradingModule(XModule):
             'ajax_url': ajax_url,
             # Checked above
             'staff_access': False,
-            'use_single_location' : self.use_for_single_location,
+            'use_single_location': self.use_for_single_location,
             })
 
-        return {'html' : html, 'success' : True}
+        return {'html': html, 'success': True}
 
     def get_instance_state(self):
         """
@@ -504,10 +505,11 @@ class PeerGradingModule(XModule):
         """
 
         state = {
-            'student_data_for_location' : self.student_data_for_location,
+            'student_data_for_location': self.student_data_for_location,
             }
 
         return json.dumps(state)
+
 
 class PeerGradingDescriptor(XmlDescriptor, EditingDescriptor):
     """

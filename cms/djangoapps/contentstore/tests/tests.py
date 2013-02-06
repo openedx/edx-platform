@@ -28,6 +28,7 @@ from xmodule.seq_module import SequenceDescriptor
 from xmodule.modulestore.tests.factories import CourseFactory, ItemFactory
 from utils import ModuleStoreTestCase, parse_json, user, registration
 
+
 class ContentStoreTestCase(ModuleStoreTestCase):
     def _login(self, email, pw):
         """Login.  View should always return 200.  The success/fail is in the

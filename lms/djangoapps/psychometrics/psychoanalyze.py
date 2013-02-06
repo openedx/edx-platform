@@ -66,7 +66,7 @@ class StatVar(object):
             if x > self.max:
                 self.max = x
         self.sum += x
-        self.sum2 += x**2
+        self.sum2 += x ** 2
         self.cnt += 1
 
     def avg(self):
@@ -77,11 +77,11 @@ class StatVar(object):
     def var(self):
         if self.cnt is None:
             return 0
-        return (self.sum2 / 1.0 / self.cnt / (self.unit**2)) - (self.avg()**2)
+        return (self.sum2 / 1.0 / self.cnt / (self.unit ** 2)) - (self.avg() ** 2)
 
     def sdv(self):
         v = self.var()
-        if v>0:
+        if v > 0:
             return math.sqrt(v)
         else:
             return 0
@@ -112,7 +112,7 @@ def make_histogram(ydata, bins=None):
     hist = dict(zip(bins, [0] * nbins))
     for y in ydata:
         for b in bins[::-1]:    # in reverse order
-            if y>b:
+            if y > b:
                 hist[b] += 1
                 break
     # hist['bins'] = bins
@@ -128,7 +128,7 @@ def problems_with_psychometric_data(course_id):
     '''
     pmdset = PsychometricData.objects.using(db).filter(studentmodule__course_id=course_id)
     plist = [p['studentmodule__module_state_key'] for p in pmdset.values('studentmodule__module_state_key').distinct()]
-    problems = dict( (p, pmdset.filter(studentmodule__module_state_key=p).count()) for p in plist )
+    problems = dict((p, pmdset.filter(studentmodule__module_state_key=p).count()) for p in plist)
 
     return problems
 
@@ -241,7 +241,7 @@ def generate_plots_for_problem(problem):
         ylast = 0
         for x in xdat:
             y = gset.filter(attempts=x).count() / ngset
-            ydat.append( y + ylast )
+            ydat.append(y + ylast)
             ylast = y + ylast
         yset['ydat'] = ydat
 

@@ -3,6 +3,7 @@ from xmodule.modulestore import Location
 from xmodule.contentstore.content import StaticContent
 from django.test import TestCase
 
+
 class Content:
     def __init__(self, location, content):
         self.location = location
@@ -10,6 +11,7 @@ class Content:
 
     def get_id(self):
         return StaticContent.get_id_from_location(self.location)
+
 
 class CachingTestCase(TestCase):
 #   Tests for https://edx.lighthouseapp.com/projects/102637/tickets/112-updating-asset-does-not-refresh-the-cached-copy

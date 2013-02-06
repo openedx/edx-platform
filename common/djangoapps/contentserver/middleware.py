@@ -12,7 +12,7 @@ from xmodule.exceptions import NotFoundError
 class StaticContentServer(object):
     def process_request(self, request):
         # look to see if the request is prefixed with 'c4x' tag
-        if request.path.startswith('/' + XASSET_LOCATION_TAG +'/'):
+        if request.path.startswith('/' + XASSET_LOCATION_TAG + '/'):
             loc = StaticContent.get_location_from_path(request.path)
             # first look in our cache so we don't have to round-trip to the DB
             content = get_cached_content(loc)

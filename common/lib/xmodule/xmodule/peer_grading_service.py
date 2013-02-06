@@ -14,10 +14,12 @@ from combined_open_ended_rubric import CombinedOpenEndedRubric, RubricParsingErr
 from lxml import etree
 from grading_service_module import GradingService, GradingServiceError
 
-log=logging.getLogger(__name__)
+log = logging.getLogger(__name__)
+
 
 class GradingServiceError(Exception):
     pass
+
 
 class PeerGradingService(GradingService):
     """
@@ -47,23 +49,23 @@ class PeerGradingService(GradingService):
         return self.try_to_decode(self._render_rubric(response))
 
     def save_grade(self, location, grader_id, submission_id, score, feedback, submission_key, rubric_scores, submission_flagged):
-        data = {'grader_id' : grader_id,
-                'submission_id' : submission_id,
-                'score' : score,
-                'feedback' : feedback,
+        data = {'grader_id': grader_id,
+                'submission_id': submission_id,
+                'score': score,
+                'feedback': feedback,
                 'submission_key': submission_key,
                 'location': location,
                 'rubric_scores': rubric_scores,
                 'rubric_scores_complete': True,
-                'submission_flagged' : submission_flagged}
+                'submission_flagged': submission_flagged}
         return self.try_to_decode(self.post(self.save_grade_url, data))
 
     def is_student_calibrated(self, problem_location, grader_id):
-        params = {'problem_id' : problem_location, 'student_id': grader_id}
+        params = {'problem_id': problem_location, 'student_id': grader_id}
         return self.try_to_decode(self.get(self.is_student_calibrated_url, params))
 
     def show_calibration_essay(self, problem_location, grader_id):
-        params = {'problem_id' : problem_location, 'student_id': grader_id}
+        params = {'problem_id': problem_location, 'student_id': grader_id}
         response = self.get(self.show_calibration_essay_url, params)
         return self.try_to_decode(self._render_rubric(response))
 
@@ -100,10 +102,12 @@ class PeerGradingService(GradingService):
 This is a mock peer grading service that can be used for unit tests
 without making actual service calls to the grading controller
 """
+
+
 class MockPeerGradingService(object):
     def get_next_submission(self, problem_location, grader_id):
         return json.dumps({'success': True,
-                           'submission_id':1,
+                           'submission_id': 1,
                            'submission_key': "",
                            'student_response': 'fake student response',
                            'prompt': 'fake submission prompt',
@@ -119,7 +123,7 @@ class MockPeerGradingService(object):
 
     def show_calibration_essay(self, problem_location, grader_id):
         return json.dumps({'success': True,
-                           'submission_id':1,
+                           'submission_id': 1,
                            'submission_key': '',
                            'student_response': 'fake student response',
                            'prompt': 'fake submission prompt',
@@ -140,6 +144,8 @@ class MockPeerGradingService(object):
                            ]})
 
 _service = None
+
+
 def peer_grading_service(system):
     """
     Return a peer grading service instance--if settings.MOCK_PEER_GRADING is True,

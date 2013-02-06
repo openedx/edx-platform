@@ -34,11 +34,11 @@ DATA_DIR = COURSES_ROOT
 MAKO_TEMPLATES['course'] = [DATA_DIR]
 MAKO_TEMPLATES['sections'] = [DATA_DIR / 'sections']
 MAKO_TEMPLATES['custom_tags'] = [DATA_DIR / 'custom_tags']
-MAKO_TEMPLATES['main'] = [PROJECT_ROOT / 'templates', 
+MAKO_TEMPLATES['main'] = [PROJECT_ROOT / 'templates',
                           DATA_DIR / 'info',
                           DATA_DIR / 'problems']
 
-LOGGING = get_logger_config(TEST_ROOT / "log", 
+LOGGING = get_logger_config(TEST_ROOT / "log",
                             logging_env="dev",
                             tracking_filename="tracking.log",
                             debug=True)
@@ -51,7 +51,7 @@ DATABASES = {
 }
 
 CACHES = {
-    # This is the cache used for most things. 
+    # This is the cache used for most things.
     # In staging/prod envs, the sessions also live here.
     'default': {
         'BACKEND': 'django.core.cache.backends.locmem.LocMemCache',
