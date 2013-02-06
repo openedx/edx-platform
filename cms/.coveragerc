@@ -1,7 +1,7 @@
 # .coveragerc for cms
 [run]
 data_file = reports/cms/.coverage
-source = cms
+source = cms,common/djangoapps
 omit = cms/envs/*, cms/manage.py
 
 [report]

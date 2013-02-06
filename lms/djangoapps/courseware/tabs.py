@@ -19,12 +19,10 @@ from django.core.urlresolvers import reverse
 from fs.errors import ResourceNotFoundError
 
 from courseware.access import has_access
-from static_replace import replace_urls
 
 from lxml.html import rewrite_links
 from module_render import get_module
 from courseware.access import has_access
-from static_replace import replace_urls
 from xmodule.modulestore import Location
 from xmodule.modulestore.django import modulestore
 from xmodule.modulestore.xml import XMLModuleStore

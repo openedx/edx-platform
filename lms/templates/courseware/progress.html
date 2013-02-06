@@ -32,7 +32,9 @@ ${progress_graph.body(grade_summary, course.grade_cutoffs, "grade-detail-graph",
         <h1>Course Progress</h1>
       </header>
 
-      <div id="grade-detail-graph"></div>
+      %if not course.metadata.get('disable_progress_graph',False):
+        <div id="grade-detail-graph"></div>
+      %endif
 
       <ol class="chapters">
         %for chapter in courseware_summary:

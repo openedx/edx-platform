@@ -2,10 +2,10 @@ import re
 import json
 import logging
 import time
+import static_replace
 
 from django.conf import settings
 from functools import wraps
-from static_replace import replace_urls
 from mitxmako.shortcuts import render_to_string
 from xmodule.seq_module import SequenceModule
 from xmodule.vertical_module import VerticalModule
@@ -49,10 +49,10 @@ def replace_course_urls(get_html, course_id):
     """
     @wraps(get_html)
     def _get_html():
-        return replace_urls(get_html(), staticfiles_prefix='/courses/'+course_id, replace_prefix='/course/')
+        return static_replace.replace_course_urls(get_html(), course_id)
     return _get_html
 
-def replace_static_urls(get_html, prefix, course_namespace=None):
+def replace_static_urls(get_html, data_dir, course_namespace=None):
     """
     Updates the supplied module with a new get_html function that wraps
     the old get_html function and substitutes urls of the form /static/...
@@ -61,9 +61,8 @@ def replace_static_urls(get_html, prefix, course_namespace=None):
 
     @wraps(get_html)
     def _get_html():
-        return replace_urls(get_html(), staticfiles_prefix=prefix, course_namespace = course_namespace)
+        return static_replace.replace_static_urls(get_html(), data_dir, course_namespace)
     return _get_html
-
 
 def grade_histogram(module_id):
     ''' Print out a histogram of grades on a given problem.

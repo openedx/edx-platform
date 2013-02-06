@@ -21,7 +21,9 @@ class StaticContentServer(object):
                 try:
                     content = contentstore().find(loc)
                 except NotFoundError:
-                    raise Http404
+                    response = HttpResponse()
+                    response.status_code = 404
+                    return response
 
                 # since we fetched it from DB, let's cache it going forward
                 set_cached_content(content)
