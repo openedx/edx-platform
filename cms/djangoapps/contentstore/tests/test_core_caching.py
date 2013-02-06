@@ -1,7 +1,7 @@
-from django.test.testcases import TestCase
 from cache_toolbox.core import get_cached_content, set_cached_content, del_cached_content
 from xmodule.modulestore import Location
 from xmodule.contentstore.content import StaticContent
+from django.test import TestCase
 
 class Content:
     def __init__(self, location, content):
@@ -32,7 +32,3 @@ class CachingTestCase(TestCase):
             'should not be stored in cache with unicodeLocation')
         self.assertEqual(None, get_cached_content(self.nonUnicodeLocation),
             'should not be stored in cache with nonUnicodeLocation')
-
-
-
-
