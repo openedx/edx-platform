@@ -20,7 +20,7 @@ import copy
 import itertools
 import json
 import logging
-import datetime.datetime
+from datetime import datetime
 from lxml.html import rewrite_links
 import os
 from pkg_resources import resource_string
@@ -425,7 +425,7 @@ class PeerGradingModule(XModule):
         Show the Peer grading closed template
         '''
         html = self.system.render_template('peer_grading/peer_grading_closed.html', {
-            'use_for_single_location': self.use_single_location
+            'use_for_single_location': self.use_for_single_location
             })
         return html
 
