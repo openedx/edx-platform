@@ -2,7 +2,7 @@
     var timeout = 100;
 
     // Simple "lock" to prevent applets from being initialized more than once
-    if (typeof(_editamolecule_loaded) == 'undefined') {
+    if (typeof(_editamolecule_loaded) == 'undefined' || _editamolecule_loaded == false) {
         _editamolecule_loaded = true;
         loadGWTScripts();
         waitForGWT();
@@ -59,7 +59,7 @@
         if (typeof(jsmol) != 'undefined' && typeof(JavaScriptApplet) != 'undefined') {
             // ready, initialize applets
             initializeApplets();
-            _editamolecule_loaded = false;
+            _editamolecule_loaded = false;  // for reloading when checking is pressed
         } else {
             setTimeout(waitForGWT, timeout);
         }
@@ -87,11 +87,7 @@
         var parent = $(element).parent();
         var input_field = parent.find('input[type=hidden]');
         var reset_button = parent.find('button.reset');
-
-        // Add div for error messages
-        $('<br/> <br/> <div class="errormsgs" style="padding: 5px 5px 5px 5px;\
-                visibility:hidden; background-color:#FA6666; height:60px;\
-                width:400px;"> </div>').appendTo(parent);
+        var message_field = parent.find('.error_message');
 
         // Applet options
         applet.setAntialias(true);
@@ -107,16 +103,14 @@
 
         reset_button.on('click', function() {
             requestAppletData(element, applet, input_field);
-
-            // Make sure remaining error messages are cleared
-            var errordiv = $(element).parent().find('.errormsgs')[0];
-            errordiv.style.visibility = 'hidden';
+            message_field.html('').hide(); // clear messages
         });
 
         // Update the input element everytime the is an interaction
         // with the applet (click, drag, etc)
         $(element).on('mouseup', function() {
-            updateInput(applet, input_field, element);
+            var values = updateInput(applet, input_field);
+            updateMessages(message_field, values);
         });
     }
 
@@ -139,51 +133,53 @@
         updateInput(applet, input_field);
     }
 
-    function updateInput(applet, input_field, element) {
+    function updateInput(applet, input_field) {
         var mol = applet.molFile();
         var smiles = applet.smiles();
         var jme = applet.jmeFile();
 
-        var info = formatInfo(jsmol.API.getInfo(mol, smiles, jme).toString(),
-                input_field, element);
-        var value = { mol: mol, info: info };
+        var raw_info = jsmol.API.getInfo(mol, smiles, jme).toString();
+        var info = formatInfo(raw_info);
+        var error = formatError(raw_info);
+        var value = { mol: mol, info: info, error: error };
 
         input_field.val(JSON.stringify(value));
 
         return value;
     }
 
-    function formatInfo(info, input_field, element) {
+    function formatInfo(raw_info) {
         var results = [];
-        var errordiv = $(element).parent().find('.errormsgs')[0];
 
-        if (!errordiv) {
-            // This is a bit hackish, but works.
-            // There are situations where formatInfo is called but no div yet exists
-            // to my knowledge (blame John Hess) this is always followed by a call to
-            // this function once the div does exist
-            //console.log("There is no errordiv loaded yet. trying again soon");
-            return []
-        }
-
-        if (info.search("It is not possible") == -1) {
-            errordiv.innerHTML = '';
-            errordiv.style.visibility = 'hidden';
-            var fragment = $('<div>').append(info);
+        if (raw_info.search("It is not possible") == -1) {
+            var fragment = $('<div>').append(raw_info);
             fragment.find('font').each(function () {
                 results.push($(this).html());
             });
-        }
-        else {
-            // remove Brian's html tags
-            var tags = /<((\/)?\w{1,7})>/g;
-            var errmsg = info.replace(tags, ' ');
-
-            errordiv.innerHTML = errmsg;
-            errordiv.style.visibility = 'visible';
         }
 
         return results;
     }
 
+    function formatError(raw_info) {
+        var error = '';
+
+        if (raw_info.search("It is not possible") != -1) {
+            var tags = /<((\/)?\w{1,7})>/g;
+            error = raw_info.replace(tags, ' ');
+
+        }
+        return error;
+    }
+
+
+    function updateMessages(message_field, values) {
+        var error = values['error'];
+        if (error) {
+            message_field.html(error).show();
+        } else {
+            // Clear messages
+            message_field.html('').hide();
+        }
+    }
 }).call(this);
