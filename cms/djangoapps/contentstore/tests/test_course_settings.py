@@ -294,30 +294,18 @@ class CourseMetadataEditingTest(CourseTestCase):
         self.assertIn('display_name', test_model, 'full missing editable metadata field')
         self.assertEqual(test_model['display_name'], 'Testing', "not expected value")
         self.assertIn('rerandomize', test_model, 'Missing rerandomize metadata field')
+        self.assertIn('showanswer', test_model, 'showanswer field ')
+        self.assertIn('xqa_key', test_model, 'xqa_key field ')
         
     def test_update_from_json(self):
         test_model = CourseMetadata.update_from_json(self.course_location, 
                                                      { "a" : 1, 
                                                       "b_a_c_h" : { "c" : "test" }, 
                                                       "test_text" : "a text string"})
-        self.assertIn('display_name', test_model, 'Missing editable metadata field')
-        self.assertEqual(test_model['display_name'], 'Robot Super Course', "not expected value")
-        self.assertIn('a', test_model, 'Missing new a metadata field')
-        self.assertEqual(test_model['a'], 1, "a not expected value")
-        self.assertIn('b_a_c_h', test_model, 'Missing b_a_c_h metadata field')
-        self.assertDictEqual(test_model['b_a_c_h'], { "c" : "test" }, "b_a_c_h not expected value")
-        self.assertIn('test_text', test_model, 'Missing test_text metadata field')
-        self.assertEqual(test_model['test_text'], "a text string", "test_text not expected value")
+        self.update_check(test_model)
         # try fresh fetch to ensure persistence
         test_model = CourseMetadata.fetch(self.course_location)
-        self.assertIn('display_name', test_model, 'Missing editable metadata field')
-        self.assertEqual(test_model['display_name'], 'Robot Super Course', "not expected value")
-        self.assertIn('a', test_model, 'Missing new a metadata field')
-        self.assertEqual(test_model['a'], 1, "a not expected value")
-        self.assertIn('b_a_c_h', test_model, 'Missing b_a_c_h metadata field')
-        self.assertDictEqual(test_model['b_a_c_h'], { "c" : "test" }, "b_a_c_h not expected value")
-        self.assertIn('test_text', test_model, 'Missing test_text metadata field')
-        self.assertEqual(test_model['test_text'], "a text string", "test_text not expected value")
+        self.update_check(test_model)
         # now change some of the existing metadata
         test_model = CourseMetadata.update_from_json(self.course_location, 
                                                      { "a" : 2, 
@@ -326,6 +314,16 @@ class CourseMetadataEditingTest(CourseTestCase):
         self.assertEqual(test_model['display_name'], 'jolly roger', "not expected value")
         self.assertIn('a', test_model, 'Missing revised a metadata field')
         self.assertEqual(test_model['a'], 2, "a not expected value")
+
+    def update_check(self, test_model):
+        self.assertIn('display_name', test_model, 'Missing editable metadata field')
+        self.assertEqual(test_model['display_name'], 'Robot Super Course', "not expected value")
+        self.assertIn('a', test_model, 'Missing new a metadata field')
+        self.assertEqual(test_model['a'], 1, "a not expected value")
+        self.assertIn('b_a_c_h', test_model, 'Missing b_a_c_h metadata field')
+        self.assertDictEqual(test_model['b_a_c_h'], { "c" : "test" }, "b_a_c_h not expected value")
+        self.assertIn('test_text', test_model, 'Missing test_text metadata field')
+        self.assertEqual(test_model['test_text'], "a text string", "test_text not expected value")
 
         
     def test_delete_key(self):
