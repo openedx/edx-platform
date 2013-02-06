@@ -1,7 +1,8 @@
-from django.test.testcases import TestCase
 from cache_toolbox.core import get_cached_content, set_cached_content, del_cached_content
 from xmodule.modulestore import Location
 from xmodule.contentstore.content import StaticContent
+from django.test import TestCase
+
 
 class Content:
     def __init__(self, location, content):
@@ -10,6 +11,7 @@ class Content:
 
     def get_id(self):
         return StaticContent.get_id_from_location(self.location)
+
 
 class CachingTestCase(TestCase):
 #   Tests for https://edx.lighthouseapp.com/projects/102637/tickets/112-updating-asset-does-not-refresh-the-cached-copy
@@ -32,7 +34,3 @@ class CachingTestCase(TestCase):
             'should not be stored in cache with unicodeLocation')
         self.assertEqual(None, get_cached_content(self.nonUnicodeLocation),
             'should not be stored in cache with nonUnicodeLocation')
-
-
-
-

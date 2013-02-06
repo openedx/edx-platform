@@ -59,5 +59,3 @@ def check_problem_code(ans, the_lcp, correct_answers, false_answers):
            'msg': msg + endmsg,
            }
     return ret
-
-

@@ -53,6 +53,7 @@ def test_mongo_filestore(mock_modulestore, mock_static_content):
 
     mock_static_content.convert_legacy_static_url.assert_called_once_with('file.png', NAMESPACE)
 
+
 @patch('static_replace.settings')
 @patch('static_replace.modulestore')
 @patch('static_replace.staticfiles_storage')

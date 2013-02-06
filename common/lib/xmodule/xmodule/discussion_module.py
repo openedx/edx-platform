@@ -6,6 +6,7 @@ from xmodule.raw_module import RawDescriptor
 
 import json
 
+
 class DiscussionModule(XModule):
     js = {'coffee':
             [resource_string(__name__, 'js/src/time.coffee'),
@@ -29,6 +30,7 @@ class DiscussionModule(XModule):
         self.discussion_id = xml_data.attrib['id']
         self.title = xml_data.attrib['for']
         self.discussion_category = xml_data.attrib['discussion_category']
+
 
 class DiscussionDescriptor(RawDescriptor):
     module_class = DiscussionModule

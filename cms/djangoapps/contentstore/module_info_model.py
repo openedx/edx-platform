@@ -7,7 +7,8 @@ from lxml import etree
 import re
 from django.http import HttpResponseBadRequest, Http404
 
-def get_module_info(store, location, parent_location = None, rewrite_static_links = False):
+
+def get_module_info(store, location, parent_location=None, rewrite_static_links=False):
   try:
     if location.revision is None:
         module = store.get_item(location)
@@ -35,6 +36,7 @@ def get_module_info(store, location, parent_location = None, rewrite_static_link
         'data': data,
         'metadata': module.metadata
     }
+
 
 def set_module_info(store, location, post_data):
   module = None

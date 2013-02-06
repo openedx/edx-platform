@@ -33,6 +33,7 @@ from open_ended_grading import open_ended_notifications
 
 log = logging.getLogger(__name__)
 
+
 class InvalidTabsException(Exception):
     """
     A complaint about invalid tabs.
@@ -40,6 +41,7 @@ class InvalidTabsException(Exception):
     pass
 
 CourseTabBase = namedtuple('CourseTab', 'name link is_active has_img img')
+
 
 def CourseTab(name, link, is_active, has_img=False, img=""):
     return CourseTabBase(name, link, is_active, has_img, img)
@@ -64,9 +66,11 @@ def _courseware(tab, user, course, active_page):
     link = reverse('courseware', args=[course.id])
     return [CourseTab('Courseware', link, active_page == "courseware")]
 
+
 def _course_info(tab, user, course, active_page):
     link = reverse('info', args=[course.id])
     return [CourseTab(tab['name'], link, active_page == "info")]
+
 
 def _progress(tab, user, course, active_page):
     if user.is_authenticated():
@@ -74,11 +78,13 @@ def _progress(tab, user, course, active_page):
         return [CourseTab(tab['name'], link, active_page == "progress")]
     return []
 
+
 def _wiki(tab, user, course, active_page):
     if settings.WIKI_ENABLED:
         link = reverse('course_wiki', args=[course.id])
         return [CourseTab(tab['name'], link, active_page == 'wiki')]
     return []
+
 
 def _discussion(tab, user, course, active_page):
     """
@@ -87,17 +93,19 @@ def _discussion(tab, user, course, active_page):
     if settings.MITX_FEATURES.get('ENABLE_DISCUSSION_SERVICE'):
         link = reverse('django_comment_client.forum.views.forum_form_discussion',
                               args=[course.id])
-        return [CourseTab(tab['name'], link, active_page=='discussion')]
+        return [CourseTab(tab['name'], link, active_page == 'discussion')]
     return []
+
 
 def _external_link(tab, user, course, active_page):
     # external links are never active
     return [CourseTab(tab['name'], tab['link'], False)]
 
+
 def _static_tab(tab, user, course, active_page):
     link = reverse('static_tab', args=[course.id, tab['url_slug']])
     active_str = 'static_tab_{0}'.format(tab['url_slug'])
-    return [CourseTab(tab['name'], link, active_page==active_str)]
+    return [CourseTab(tab['name'], link, active_page == active_str)]
 
 
 def _textbooks(tab, user, course, active_page):
@@ -107,7 +115,7 @@ def _textbooks(tab, user, course, active_page):
     if user.is_authenticated() and settings.MITX_FEATURES.get('ENABLE_TEXTBOOK'):
         # since there can be more than one textbook, active_page is e.g. "book/0".
         return [CourseTab(textbook.title, reverse('book', args=[course.id, index]),
-                          active_page=="textbook/{0}".format(index))
+                          active_page == "textbook/{0}".format(index))
                 for index, textbook in enumerate(course.textbooks)]
     return []
 
@@ -126,6 +134,7 @@ def _staff_grading(tab, user, course, active_page):
         return tab
     return []
 
+
 def _peer_grading(tab, user, course, active_page):
 
     if user.is_authenticated():
@@ -139,6 +148,7 @@ def _peer_grading(tab, user, course, active_page):
         tab = [CourseTab(tab_name, link, active_page == "peer_grading", pending_grading, img_path)]
         return tab
     return []
+
 
 def _combined_open_ended_grading(tab, user, course, active_page):
     if user.is_authenticated():
@@ -170,6 +180,7 @@ def key_checker(expected_keys):
 
 
 need_name = key_checker(['name'])
+
 
 def null_validator(d):
     """
@@ -235,7 +246,7 @@ def get_course_tabs(user, course, active_page):
     """
     Return the tabs to show a particular user, as a list of CourseTab items.
     """
-    if not hasattr(course,'tabs') or not course.tabs:
+    if not hasattr(course, 'tabs') or not course.tabs:
         return get_default_tabs(user, course, active_page)
 
     # TODO (vshnayder): There needs to be a place to call this right after course
@@ -269,7 +280,7 @@ def get_default_tabs(user, course, active_page):
 
     if hasattr(course, 'syllabus_present') and course.syllabus_present:
         link = reverse('syllabus', args=[course.id])
-        tabs.append(CourseTab('Syllabus', link, active_page=='syllabus'))
+        tabs.append(CourseTab('Syllabus', link, active_page == 'syllabus'))
 
     tabs.extend(_textbooks({}, user, course, active_page))
 
@@ -290,9 +301,10 @@ def get_default_tabs(user, course, active_page):
 
     if has_access(user, course, 'staff'):
         link = reverse('instructor_dashboard', args=[course.id])
-        tabs.append(CourseTab('Instructor', link, active_page=='instructor'))
+        tabs.append(CourseTab('Instructor', link, active_page == 'instructor'))
 
     return tabs
+
 
 def get_static_tab_by_slug(course, tab_slug):
     """
@@ -307,6 +319,7 @@ def get_static_tab_by_slug(course, tab_slug):
             return tab
 
     return None
+
 
 def get_static_tab_contents(request, cache, course, tab):
 

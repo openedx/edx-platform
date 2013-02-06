@@ -21,6 +21,7 @@ from mitxmako.shortcuts import render_to_string
 
 log = logging.getLogger(__name__)
 
+
 class MockStaffGradingService(object):
     """
     A simple mockup of a staff grading service, testing.
@@ -28,7 +29,7 @@ class MockStaffGradingService(object):
     def __init__(self):
         self.cnt = 0
 
-    def get_next(self,course_id, location, grader_id):
+    def get_next(self, course_id, location, grader_id):
         self.cnt += 1
         return json.dumps({'success': True,
                            'submission_id': self.cnt,
@@ -61,7 +62,7 @@ class StaffGradingService(GradingService):
     Interface to staff grading backend.
     """
     def __init__(self, config):
-        config['system'] = ModuleSystem(None,None,None,render_to_string,None)
+        config['system'] = ModuleSystem(None, None, None, render_to_string, None)
         super(StaffGradingService, self).__init__(config)
         self.get_next_url = self.url + '/get_next_submission/'
         self.save_grade_url = self.url + '/save_grade/'
@@ -85,7 +86,7 @@ class StaffGradingService(GradingService):
         Raises:
             GradingServiceError: something went wrong with the connection.
         """
-        params = {'course_id': course_id,'grader_id': grader_id}
+        params = {'course_id': course_id, 'grader_id': grader_id}
         return self.get(self.get_problem_list_url, params)
 
 
@@ -165,6 +166,7 @@ def staff_grading_service():
         _service = StaffGradingService(settings.STAFF_GRADING_INTERFACE)
 
     return _service
+
 
 def _err_response(msg):
     """
@@ -329,4 +331,3 @@ def save_grade(request, course_id):
     # Ok, save_grade seemed to work.  Get the next submission to grade.
     return HttpResponse(_get_next(course_id, grader_id, location),
                         mimetype="application/json")
-

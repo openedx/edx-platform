@@ -36,7 +36,7 @@ class Migration(SchemaMigration):
                 for column in ASKBOT_AUTH_USER_COLUMNS:
                     db.delete_column('auth_user', column)
         except Exception as ex:
-            print "Couldn't remove askbot because of {0} -- it was probably never here to begin with.".format(ex)            
+            print "Couldn't remove askbot because of {0} -- it was probably never here to begin with.".format(ex)
 
     def backwards(self, orm):
         raise RuntimeError("Cannot reverse this migration: there's no going back to Askbot.")

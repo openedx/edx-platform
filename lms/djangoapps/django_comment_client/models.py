@@ -35,7 +35,7 @@ class Role(models.Model):
     def __unicode__(self):
         return self.name + " for " + (self.course_id if self.course_id else "all courses")
 
-    def inherit_permissions(self, role): # TODO the name of this method is a little bit confusing,
+    def inherit_permissions(self, role):   # TODO the name of this method is a little bit confusing,
                                          # since it's one-off and doesn't handle inheritance later
         if role.course_id and role.course_id != self.course_id:
             logging.warning("{0} cannot inherit permissions from {1} due to course_id inconsistency", \
@@ -46,15 +46,13 @@ class Role(models.Model):
     def add_permission(self, permission):
         self.permissions.add(Permission.objects.get_or_create(name=permission)[0])
 
-
     def has_permission(self, permission):
         course = get_course_by_id(self.course_id)
-        changing_comments = permission.startswith('edit') or \
-            permission.startswith('update') or permission.startswith('create')
-        in_blackout_period = not course.forum_posts_allowed
-        if (self.name == FORUM_ROLE_STUDENT) and in_blackout_period and changing_comments:
+        if self.name == FORUM_ROLE_STUDENT and \
+           (permission.startswith('edit') or permission.startswith('update') or permission.startswith('create')) and \
+           (not course.forum_posts_allowed):
             return False
-        
+
         return self.permissions.filter(name=permission).exists()
 
 

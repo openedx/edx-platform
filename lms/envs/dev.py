@@ -165,7 +165,7 @@ INSTALLED_APPS += ('django_openid_auth',)
 
 OPENID_CREATE_USERS = False
 OPENID_UPDATE_DETAILS_FROM_SREG = True
-OPENID_SSO_SERVER_URL = 'https://www.google.com/accounts/o8/id'	# TODO: accept more endpoints
+OPENID_SSO_SERVER_URL = 'https://www.google.com/accounts/o8/id'  	# TODO: accept more endpoints
 OPENID_USE_AS_ADMIN_LOGIN = False
 
 OPENID_PROVIDER_TRUSTED_ROOTS = ['*']

@@ -8,6 +8,7 @@ from util.cache import cache
 from django.core import cache
 cache = cache.get_cache('default')
 
+
 def cached_has_permission(user, permission, course_id=None):
     """
     Call has_permission if it's not cached. A change in a user's role or
@@ -21,6 +22,7 @@ def cached_has_permission(user, permission, course_id=None):
         cache.set(key, val, CACHE_LIFESPAN)
     return val
 
+
 def has_permission(user, permission, course_id=None):
     for role in user.roles.filter(course_id=course_id):
         if role.has_permission(permission):
@@ -29,7 +31,8 @@ def has_permission(user, permission, course_id=None):
 
 
 CONDITIONS = ['is_open', 'is_author']
-# data may be a json file
+
+
 def check_condition(user, condition, course_id, data):
     def check_open(user, condition, course_id, data):
         try:
@@ -44,8 +47,8 @@ def check_condition(user, condition, course_id, data):
             return False
 
     handlers = {
-        'is_open'      : check_open,
-        'is_author'    : check_author,
+        'is_open': check_open,
+        'is_author': check_author,
     }
 
     return handlers[condition](user, condition, course_id, data)
@@ -62,10 +65,8 @@ def check_conditions_permissions(user, permissions, course_id, **kwargs):
     def test(user, per, operator="or"):
         if isinstance(per, basestring):
             if per in CONDITIONS:
-                return check_condition(user, per, course_id, kwargs['data'])
+                return check_condition(user, per, course_id, kwargs)
             return cached_has_permission(user, per, course_id=course_id)
-        # TODO: refactor this to be more clear.
-        # e.g. the "and operator in" bit on the next line is not needed?
         elif isinstance(per, list) and operator in ["and", "or"]:
             results = [test(user, x, operator="and") for x in per]
             if operator == "or":
@@ -96,7 +97,7 @@ VIEW_PERMISSIONS = {
     'unfollow_commentable':     ['unfollow_commentable'],
     'unfollow_user'     :       ['unfollow_user'],
     'create_thread'     :       ['create_thread'],
-    'update_moderator_status' : ['manage_moderator'],
+    'update_moderator_status': ['manage_moderator'],
 }
 
 
@@ -105,4 +106,4 @@ def check_permissions_by_view(user, course_id, content, name):
         p = VIEW_PERMISSIONS[name]
     except KeyError:
         logging.warning("Permission for view named %s does not exist in permissions.py" % name)
-    return check_conditions_permissions(user, p, course_id, data=content)
+    return check_conditions_permissions(user, p, course_id, content=content)
