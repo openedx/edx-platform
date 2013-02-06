@@ -551,6 +551,43 @@
 
     .settings-advanced {
 
+      // messages - should be synced up with global messages in the future
+      .message {
+        display: block;
+        font-size: 14px;
+      }
+
+      .message-status {
+        display: none;
+        @include border-top-radius(2px);
+        @include box-sizing(border-box);
+        border-bottom: 2px solid $yellow;
+        margin: 0 0 20px 0;
+        padding: 10px 20px;
+        font-weight: 500;
+        background: $paleYellow;
+
+        .text {
+          display: inline-block;
+        }
+
+        &.error {
+          border-color: shade($red, 50%);
+          background: tint($red, 20%);
+          color: $white;
+        }
+
+        &.confirm {
+          border-color: shade($green, 50%);
+          background: tint($green, 20%);
+          color: $white;
+        }
+
+        &.is-shown {
+          display: block;
+        }
+      }
+
       .course-advanced-policy-list {
 
         .row {
