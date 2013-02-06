@@ -16,6 +16,9 @@ from django.utils.timezone import UTC
 from cms.djangoapps.models.settings.course_grading import CourseGradingModel
 from cms.djangoapps.contentstore.utils import get_modulestore
 import copy
+from cms.djangoapps.models.settings.course_metadata import CourseMetadata
+from xmodule.modulestore.xml_importer import import_from_xml
+from xmodule.modulestore.django import modulestore
 
 # YYYY-MM-DDThh:mm:ss.s+/-HH:MM
 class ConvertersTestCase(TestCase):
@@ -273,3 +276,53 @@ class CourseGradingTest(CourseTestCase):
         self.assertDictEqual(test_grader.graders[1], altered_grader, "drop_count[1] + 2")
         
         
+class CourseMetadataEditingTest(CourseTestCase):
+    def setUp(self):
+        CourseTestCase.setUp(self)
+        # add in the full class too
+        import_from_xml(modulestore(), 'common/test/data/', ['full'])
+        self.fullcourse_location = Location(['i4x','edX','full','course','6.002_Spring_2012', None])
+
+        
+    def test_fetch_initial_fields(self):
+        test_model = CourseMetadata.fetch(self.course_location)
+        self.assertIn('display_name', test_model, 'Missing editable metadata field')
+        self.assertEqual(test_model['display_name'], 'Robot Super Course', "not expected value")
+        
+        test_model = CourseMetadata.fetch(self.fullcourse_location)
+        self.assertNotIn('graceperiod', test_model, 'blacklisted field leaked in')
+        self.assertIn('display_name', test_model, 'full missing editable metadata field')
+        self.assertEqual(test_model['display_name'], 'Testing', "not expected value")
+        self.assertIn('rerandomize', test_model, 'Missing rerandomize metadata field')
+        
+    def test_update_from_json(self):
+        test_model = CourseMetadata.update_from_json(self.course_location, { "a" : 1, "b_a_c_h" : { "c" : "test" }, "test_text" : "a text string" })
+        self.assertIn('display_name', test_model, 'Missing editable metadata field')
+        self.assertEqual(test_model['display_name'], 'Robot Super Course', "not expected value")
+        self.assertIn('a', test_model, 'Missing new a metadata field')
+        self.assertEqual(test_model['a'], 1, "a not expected value")
+        self.assertIn('b_a_c_h', test_model, 'Missing b_a_c_h metadata field')
+        self.assertDictEqual(test_model['b_a_c_h'], { "c" : "test" }, "b_a_c_h not expected value")
+        self.assertIn('test_text', test_model, 'Missing test_text metadata field')
+        self.assertEqual(test_model['test_text'], "a text string", "test_text not expected value")
+        # try fresh fetch to ensure persistence
+        test_model = CourseMetadata.fetch(self.course_location)
+        self.assertIn('display_name', test_model, 'Missing editable metadata field')
+        self.assertEqual(test_model['display_name'], 'Robot Super Course', "not expected value")
+        self.assertIn('a', test_model, 'Missing new a metadata field')
+        self.assertEqual(test_model['a'], 1, "a not expected value")
+        self.assertIn('b_a_c_h', test_model, 'Missing b_a_c_h metadata field')
+        self.assertDictEqual(test_model['b_a_c_h'], { "c" : "test" }, "b_a_c_h not expected value")
+        self.assertIn('test_text', test_model, 'Missing test_text metadata field')
+        self.assertEqual(test_model['test_text'], "a text string", "test_text not expected value")
+        
+    def test_delete_key(self):
+        test_model = CourseMetadata.delete_key(self.fullcourse_location, { 'deleteKeys' : ['doesnt_exist', 'showanswer', 'xqa_key']})
+        # ensure no harm
+        self.assertNotIn('graceperiod', test_model, 'blacklisted field leaked in')
+        self.assertIn('display_name', test_model, 'full missing editable metadata field')
+        self.assertEqual(test_model['display_name'], 'Testing', "not expected value")
+        self.assertIn('rerandomize', test_model, 'Missing rerandomize metadata field')
+        # check for deletion effectiveness
+        self.assertNotIn('showanswer', test_model, 'showanswer field still in')
+        self.assertNotIn('xqa_key', test_model, 'xqa_key field still in')
