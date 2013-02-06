@@ -1,7 +1,7 @@
 from django.conf import settings
 from staff_grading_service import StaffGradingService
-from peer_grading_service import PeerGradingService
 from open_ended_grading.controller_query_service import ControllerQueryService
+from xmodule import peer_grading_service
 import json
 from student.models import unique_id_for_user
 import open_ended_util
@@ -10,6 +10,9 @@ import logging
 from courseware.access import has_access
 from util.cache import cache
 import datetime
+from xmodule import peer_grading_service
+from xmodule.x_module import ModuleSystem
+from mitxmako.shortcuts import render_to_string
 
 log=logging.getLogger(__name__)
 
@@ -19,7 +22,8 @@ KEY_PREFIX = "open_ended_"
 NOTIFICATION_TYPES = (
     ('student_needs_to_peer_grade', 'peer_grading', 'Peer Grading'),
     ('staff_needs_to_grade', 'staff_grading', 'Staff Grading'),
-    ('new_student_grading_to_view', 'open_ended_problems', 'Problems you have submitted')
+    ('new_student_grading_to_view', 'open_ended_problems', 'Problems you have submitted'),
+    ('flagged_submissions_exist', 'open_ended_flagged_problems', 'Flagged Submissions')
     )
 
 def staff_grading_notifications(course, user):
@@ -54,7 +58,8 @@ def staff_grading_notifications(course, user):
     return notification_dict
 
 def peer_grading_notifications(course, user):
-    peer_gs = PeerGradingService(settings.PEER_GRADING_INTERFACE)
+    system = ModuleSystem(None,None,None,render_to_string,None)
+    peer_gs = peer_grading_service.PeerGradingService(settings.PEER_GRADING_INTERFACE, system)
     pending_grading=False
     img_path= ""
     course_id = course.id

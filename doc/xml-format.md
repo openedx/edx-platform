@@ -141,6 +141,7 @@ That's basically all there is to the organizational structure.  Read the next se
 
 * `abtest` -- Support for A/B testing.  TODO: add details..
 * `chapter` -- top level organization unit of a course.   The courseware display code currently expects the top level `course` element to contain only chapters, though there is no philosophical reason why this is required, so we may change it to properly display non-chapters at the top level.
+* `conditional` -- conditional element, which shows one or more modules only if certain conditions are satisfied.
 * `course` -- top level tag.  Contains everything else.
 * `customtag` -- render an html template, filling in some parameters, and return the resulting html.  See below for details.
 * `discussion` -- Inline discussion forum
@@ -162,6 +163,22 @@ Container tags include `chapter`, `sequential`, `videosequence`, `vertical`, and
 ### `course`
 
 `course` is also a container, and is similar, with one extra wrinkle: the top level pointer tag _must_ have  `org` and `course` attributes specified--the organization name, and course name.  Note that `course` is referring to the platonic ideal of this course (e.g. "6.002x"), not to any particular run of this course.  The `url_name` should be the particular run of this course.
+
+### `conditional`
+
+`conditional` is as special kind of container tag as well.  Here are two examples:
+
+        <conditional condition="require_completed" required="problem/choiceprob">
+            <video url_name="secret_video" />
+        </conditional>
+
+        <conditional condition="require_attempted" required="problem/choiceprob&problem/sumprob">
+            <html url_name="secret_page" />
+        </conditional>
+
+The condition can be either `require_completed`, in which case the required modules must be completed, or `require_attempted`, in which case the required modules must have been attempted.
+
+The required modules are specified as a set of `tag`/`url_name`, joined by an ampersand.
 
 ### `customtag`
 
@@ -251,6 +268,7 @@ Supported fields at the course level:
 
 * "start" -- specify the start date for the course.  Format-by-example: "2012-09-05T12:00".
 * "advertised_start" -- specify what you want displayed as the start date of the course in the course listing and course about pages. This can be useful if you want to let people in early before the formal start. Format-by-example: "2012-09-05T12:00".
+* "disable_policy_graph" -- set to true (or "Yes"), if the policy graph should be disabled (ie not shown).
 * "enrollment_start", "enrollment_end" -- when can students enroll?  (if not specified, can enroll anytime).   Same format as "start".
 * "end" -- specify the end date for the course.  Format-by-example: "2012-11-05T12:00".
 * "end_of_course_survey_url" -- a url for an end of course survey -- shown after course is over, next to certificate download links.

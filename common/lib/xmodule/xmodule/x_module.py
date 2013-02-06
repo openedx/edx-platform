@@ -585,6 +585,11 @@ class XModuleDescriptor(Plugin, HTMLSnippet, ResourceTemplates):
                 self._inherited_metadata.add(attr)
                 self.metadata[attr] = metadata[attr]
 
+    def get_required_module_descriptors(self):
+        """Returns a list of XModuleDescritpor instances upon which this module depends, but are
+        not children of this module"""
+        return []
+
     def get_children(self):
         """Returns a list of XModuleDescriptor instances for the children of
         this module"""

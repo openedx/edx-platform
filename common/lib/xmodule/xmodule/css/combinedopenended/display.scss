@@ -442,12 +442,13 @@ section.open-ended-child {
       margin: 10px;
     }
 
-    span.short-form-response {
-          padding: 9px;
+    div.short-form-response {
           background: #F6F6F6;
           border: 1px solid #ddd;
           border-top: 0;
           margin-bottom: 20px;
+          overflow-y: auto;
+          height: 200px;
           @include clearfix;
      }
 

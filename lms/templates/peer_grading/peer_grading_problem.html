@@ -1,23 +1,5 @@
-
-<%inherit file="/main.html" />
-<%block name="bodyclass">${course.css_class}</%block>
-<%namespace name='static' file='/static_content.html'/>
-
-<%block name="headextra">
-  <%static:css group='course'/>
-</%block>
-
-<%block name="title"><title>${course.number} Peer Grading.</title></%block>
-
-<%include file="/courseware/course_navigation.html" args="active_page='peer_grading'" />
-
-<%block name="js_extra">
-  <%static:js group='peer_grading'/>
-</%block>
-
-
-<section class="container">
-    <div class="peer-grading" data-ajax_url="${ajax_url}" data-location="${problem_location}">
+<section class="container peer-grading-container">
+    <div class="peer-grading" data-ajax-url="${ajax_url}" data-location="${problem_location}" data-use-single-location="${use_single_location}">
         <div class="error-container"></div>
 
         <section class="content-panel">
@@ -72,6 +54,7 @@
           </p>
           <textarea name="feedback" placeholder="Feedback for student (optional)"
                     class="feedback-area" cols="70" ></textarea>
+          <p class="flag-student-container">Flag this submission for review by course staff (use if the submission contains inappropriate content): <input type="checkbox" class="flag-checkbox" value="student_is_flagged"></p>
         </div>
           
 

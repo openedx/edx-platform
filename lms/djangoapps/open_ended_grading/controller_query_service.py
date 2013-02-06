@@ -3,11 +3,12 @@ import logging
 import requests
 from requests.exceptions import RequestException, ConnectionError, HTTPError
 import sys
-from grading_service import GradingService
-from grading_service import GradingServiceError
+from xmodule.grading_service_module import GradingService, GradingServiceError
 
 from django.conf import settings
 from django.http import HttpResponse, Http404
+from xmodule.x_module import ModuleSystem
+from mitxmako.shortcuts import render_to_string
 
 log = logging.getLogger(__name__)
 
@@ -16,11 +17,14 @@ class ControllerQueryService(GradingService):
     Interface to staff grading backend.
     """
     def __init__(self, config):
+        config['system'] = ModuleSystem(None,None,None,render_to_string,None)
         super(ControllerQueryService, self).__init__(config)
         self.check_eta_url = self.url + '/get_submission_eta/'
         self.is_unique_url = self.url + '/is_name_unique/'
         self.combined_notifications_url = self.url + '/combined_notifications/'
         self.grading_status_list_url = self.url + '/get_grading_status_list/'
+        self.flagged_problem_list_url = self.url + '/get_flagged_problem_list/'
+        self.take_action_on_flags_url = self.url + '/take_action_on_flags/'
 
     def check_if_name_is_unique(self, location, problem_id, course_id):
         params = {
@@ -57,3 +61,23 @@ class ControllerQueryService(GradingService):
 
         response = self.get(self.grading_status_list_url, params)
         return response
+
+    def get_flagged_problem_list(self, course_id):
+        params = {
+            'course_id' : course_id,
+            }
+
+        response = self.get(self.flagged_problem_list_url, params)
+        return response
+
+    def take_action_on_flags(self, course_id, student_id, submission_id, action_type):
+        params = {
+            'course_id' : course_id,
+            'student_id' : student_id,
+            'submission_id' : submission_id,
+            'action_type' : action_type
+            }
+
+        response = self.post(self.take_action_on_flags_url, params)
+        return response
+

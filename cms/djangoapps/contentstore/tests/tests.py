@@ -515,6 +515,9 @@ class ContentStoreTest(TestCase):
         # note, we know the link it should be because that's what in the 'full' course in the test data
         self.assertContains(resp, '/c4x/edX/full/asset/handouts_schematic_tutorial.pdf') 
 
+    def test_missing_static_content(self):
+        resp = self.client.get("/c4x/asd/asd/asd/asd")
+        self.assertEqual(resp.status_code, 404)
 
     def test_capa_module(self):
         """Test that a problem treats markdown specially."""
