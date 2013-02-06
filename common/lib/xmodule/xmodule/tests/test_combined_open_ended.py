@@ -159,11 +159,8 @@ class OpenEndedModuleTest(unittest.TestCase):
             'max_score': max_score,
             'display_name': 'Name',
             'accept_file_upload': False,
-<<<<<<< HEAD
             'rewrite_content_links' : "",
-=======
-            'close_date': None
->>>>>>> origin/master
+            'close_date': None,
             }
 
     oeparam = etree.XML('''
