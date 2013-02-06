@@ -61,7 +61,8 @@ def get_threads(request, course_id, discussion_id=None, per_page=THREADS_PER_PAG
 
 
     #if the course-user is cohorted, then add the group id
-    group_id = get_cohort_id(user, course_id)
+    group_id = get_cohort_id(request.user, course_id)
+    
     if group_id:
         default_query_params["group_id"] = group_id
 
@@ -73,11 +74,12 @@ def get_threads(request, course_id, discussion_id=None, per_page=THREADS_PER_PAG
 
     threads, page, num_pages = cc.Thread.search(query_params)
     
+    
     #now add the group name if the thread has a group id
     for thread in threads:
         if thread.get('group_id'):
             thread['group_name'] = get_cohort_by_id(course_id, thread.get('group_id')).name
-            thread['group_string'] = "This post visible only to Group ${group_name}."
+            thread['group_string'] = "This post visible only to Group %s." % (thread['group_name'])
         else:
             thread['group_name'] = ""
             thread['group_string'] = "This post visible to everyone."
@@ -111,6 +113,9 @@ def inline_discussion(request, course_id, discussion_id):
     allow_anonymous = course.metadata.get("allow_anonymous", True)
     allow_anonymous_to_peers = course.metadata.get("allow_anonymous_to_peers", False)
         
+    #since inline is all one commentable, only show or allow the choice of cohorts
+    #if the commentable is cohorted, otherwise everything is not cohorted
+    #and no one has the option of choosing a cohort
     is_cohorted = is_course_cohorted(course_id) and is_commentable_cohorted(course_id, discussion_id) 
 
     cohorts_list = list()
@@ -118,17 +123,24 @@ def inline_discussion(request, course_id, discussion_id):
     if is_cohorted:
       
       #if you're a mod, send all cohorts and let you pick
-      if cached_has_permission(request.user, "see_all_cohorts", course_id) or True:
+      if cached_has_permission(request.user, "see_all_cohorts", course_id):
           cohorts = get_course_cohorts(course_id)
           for c in cohorts:
               cohorts_list.append({'name':c.name, 'id':c.id})
               
       else:
       #otherwise, just make a dictionary of two 
-          user_cohort = get_cohort_id(user, course_id)
+          user_cohort = get_cohort(user, course_id)
+          if user_cohort:
+              user_cohort_name = user_cohort.name
+              user_cohort_id = user_cohort.id
+          else:
+              user_cohort_name = user_cohort_id = None
+            
+
           cohorts_list.append({'name':'All Groups','id':None})
           if user_cohort:
-              cohorts_list.append({'name':user_cohort.name, 'id':user_cohort.id})
+              cohorts_list.append({'name':user_cohort_name, 'id':user_cohort_id})
           else:
               cohorts_list = None
           
@@ -297,7 +309,7 @@ def single_thread(request, course_id, discussion_id, thread_id):
             'roles': saxutils.escape(json.dumps(utils.get_role_ids(course_id)), escapedict),
             'thread_pages': query_params['num_pages'],
             'is_course_cohorted': is_course_cohorted(course_id),
-            'is_moderator': cached_has_permission(request.user, "see_all_cohorts", course_id) or True,
+            'is_moderator': cached_has_permission(request.user, "see_all_cohorts", course_id),
             'cohorts': cohorts,
             'user_cohort': get_cohort_id(request.user, course_id),
             'cohorted_commentables': cohorted_commentables

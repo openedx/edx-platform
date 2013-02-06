@@ -74,13 +74,12 @@ if Backbone?
       @discussion = new Discussion()
       @discussion.reset(response.discussion_data, {silent: false})
 
-      #rather than have two different templates to get around (or take advantage of?)
-      #mustache's logic free templates, we added a 'group string' to each thread for inline
-      #discussions for the use case where a commentable is cohorted, but a global
-      #thread is posted by a TA
+      #use same discussion template but different thread templated
+      #determined in the coffeescript based on whether or not there's a
+      #group id
       
       $discussion = $(Mustache.render $("script#_inline_discussion").html(), {'threads':response.discussion_data, 'discussionId': discussionId, 'allow_anonymous_to_peers': allow_anonymous_to_peers, 'allow_anonymous': allow_anonymous})
-
+      
       if @$('section.discussion').length
         @$('section.discussion').replaceWith($discussion)
       else
