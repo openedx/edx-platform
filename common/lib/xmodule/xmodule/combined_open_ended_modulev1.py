@@ -23,6 +23,10 @@ import self_assessment_module
 import open_ended_module
 from combined_open_ended_rubric import CombinedOpenEndedRubric, RubricParsingError
 from .stringify import stringify_children
+import dateutil
+import dateutil.parser
+import datetime
+from timeparse import parse_timedelta
 
 log = logging.getLogger("mitx.courseware")
 
@@ -53,10 +57,6 @@ HUMAN_TASK_TYPE = {
     'selfassessment' : "Self Assessment",
     'openended' : "External Grader",
     }
-
-class IncorrectMaxScoreError(Exception):
-    def __init__(self, msg):
-        self.msg = msg
 
 class CombinedOpenEndedV1Module():
     """
@@ -165,19 +165,35 @@ class CombinedOpenEndedV1Module():
         self.is_scored = self.metadata.get('is_graded', IS_SCORED) in TRUE_DICT
         self.accept_file_upload = self.metadata.get('accept_file_upload', ACCEPT_FILE_UPLOAD) in TRUE_DICT
 
+        display_due_date_string = self.metadata.get('due', None)
+        if display_due_date_string is not None:
+            try:
+                self.display_due_date = dateutil.parser.parse(display_due_date_string)
+            except ValueError:
+                log.error("Could not parse due date {0} for location {1}".format(display_due_date_string, location))
+                raise
+        else:
+            self.display_due_date = None
+
+        grace_period_string = self.metadata.get('graceperiod', None)
+        if grace_period_string is not None and self.display_due_date:
+            try:
+                self.grace_period = parse_timedelta(grace_period_string)
+                self.close_date = self.display_due_date + self.grace_period
+            except:
+                log.error("Error parsing the grace period {0} for location {1}".format(grace_period_string, location))
+                raise
+        else:
+            self.grace_period = None
+            self.close_date = self.display_due_date
+
         # Used for progress / grading.  Currently get credit just for
         # completion (doesn't matter if you self-assessed correct/incorrect).
         self._max_score = int(self.metadata.get('max_score', MAX_SCORE))
 
-        if self._max_score > MAX_SCORE_ALLOWED:
-            error_message = "Max score {0} is higher than max score allowed {1} for location {2}".format(self._max_score,
-                MAX_SCORE_ALLOWED, location)
-            log.error(error_message)
-            raise IncorrectMaxScoreError(error_message)
-
         rubric_renderer = CombinedOpenEndedRubric(system, True)
         rubric_string = stringify_children(definition['rubric'])
-        rubric_renderer.check_if_rubric_is_parseable(rubric_string, location, MAX_SCORE_ALLOWED)
+        rubric_renderer.check_if_rubric_is_parseable(rubric_string, location, MAX_SCORE_ALLOWED, self._max_score)
 
         #Static data is passed to the child modules to render
         self.static_data = {
@@ -187,6 +203,7 @@ class CombinedOpenEndedV1Module():
             'rubric': definition['rubric'],
             'display_name': self.display_name,
             'accept_file_upload': self.accept_file_upload,
+            'close_date' : self.close_date,
             }
 
         self.task_xml = definition['task_xml']

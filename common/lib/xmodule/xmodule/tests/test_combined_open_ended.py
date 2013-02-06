@@ -31,9 +31,10 @@ class OpenEndedChildTest(unittest.TestCase):
         <category>
         <description>Response Quality</description>
         <option>The response is not a satisfactory answer to the question.  It either fails to address the question or does so in a limited way, with no evidence of higher-order thinking.</option>
+        <option>Second option</option>
         </category>
          </rubric></rubric>'''
-    max_score = 4
+    max_score = 1
 
     static_data = {
             'max_attempts': 20,
@@ -42,6 +43,7 @@ class OpenEndedChildTest(unittest.TestCase):
             'max_score': max_score,
             'display_name': 'Name',
             'accept_file_upload': False,
+            'close_date': None
             }
     definition = Mock()
     descriptor = Mock()
@@ -158,6 +160,7 @@ class OpenEndedModuleTest(unittest.TestCase):
             'display_name': 'Name',
             'accept_file_upload': False,
             'rewrite_content_links' : "",
+            'close_date': None,
             }
 
     oeparam = etree.XML('''
@@ -274,9 +277,10 @@ class CombinedOpenEndedModuleTest(unittest.TestCase):
         <category>
         <description>Response Quality</description>
         <option>The response is not a satisfactory answer to the question.  It either fails to address the question or does so in a limited way, with no evidence of higher-order thinking.</option>
+        <option>Second option</option>
         </category>
          </rubric></rubric>'''
-    max_score = 3
+    max_score = 1
 
     metadata = {'attempts': '10', 'max_score': max_score}
 
@@ -288,6 +292,7 @@ class CombinedOpenEndedModuleTest(unittest.TestCase):
             'display_name': 'Name',
             'accept_file_upload' : False,
             'rewrite_content_links' : "",
+            'close_date' : "",
             }
 
     oeparam = etree.XML('''
@@ -320,7 +325,7 @@ class CombinedOpenEndedModuleTest(unittest.TestCase):
     descriptor = Mock()
 
     def setUp(self):
-        self.combinedoe = CombinedOpenEndedV1Module(test_system, self.location, self.definition, self.descriptor, self.static_data, metadata=self.metadata)
+        self.combinedoe = CombinedOpenEndedV1Module(test_system, self.location, self.definition, self.descriptor, static_data = self.static_data, metadata=self.metadata)
 
     def test_get_tag_name(self):
         name = self.combinedoe.get_tag_name("<t>Tag</t>")

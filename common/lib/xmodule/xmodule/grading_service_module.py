@@ -113,7 +113,7 @@ class GradingService(object):
         try:
             if 'rubric' in response_json:
                 rubric = response_json['rubric']
-                rubric_renderer = CombinedOpenEndedRubric(self.system, False)
+                rubric_renderer = CombinedOpenEndedRubric(self.system, view_only)
                 success, rubric_html = rubric_renderer.render_rubric(rubric)
                 response_json['rubric'] = rubric_html
             return response_json
