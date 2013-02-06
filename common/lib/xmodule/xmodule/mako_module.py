@@ -34,7 +34,7 @@ class MakoModuleDescriptor(XModuleDescriptor):
         """
         return {'module': self,
                 'metadata': self.metadata,
-                'editable_metadata_fields' : self.editable_metadata_fields
+                'editable_metadata_fields': self.editable_metadata_fields
                 }
 
     def get_html(self):
@@ -46,4 +46,3 @@ class MakoModuleDescriptor(XModuleDescriptor):
     def editable_metadata_fields(self):
         subset = [name for name in self.metadata.keys() if name not in self.system_metadata_fields]
         return subset
-

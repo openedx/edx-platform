@@ -14,6 +14,7 @@ from auth.authz import _copy_course_group
 # To run from command line: rake cms:clone SOURCE_LOC=MITx/111/Foo1 DEST_LOC=MITx/135/Foo3
 #
 
+
 class Command(BaseCommand):
     help = \
 '''Clone a MongoDB backed course to another location'''

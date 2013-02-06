@@ -12,6 +12,7 @@ from pkg_resources import resource_string
 
 log = logging.getLogger('mitx.' + __name__)
 
+
 class RandomizeModule(XModule):
     """
     Chooses a random child module.  Chooses the same one every time for each student.
@@ -96,7 +97,7 @@ class RandomizeModule(XModule):
     def get_icon_class(self):
         return self.child.get_icon_class() if self.child else 'other'
 
-    
+
 class RandomizeDescriptor(SequenceDescriptor):
     # the editing interface can be the same as for sequences -- just a container
     module_class = RandomizeModule
@@ -118,4 +119,3 @@ class RandomizeDescriptor(SequenceDescriptor):
         makes it use module.get_child_descriptors().
         """
         return True
-

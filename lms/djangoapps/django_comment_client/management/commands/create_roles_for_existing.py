@@ -8,6 +8,7 @@ from django.core.management.base import BaseCommand, CommandError
 
 from student.models import CourseEnrollment, assign_default_role
 
+
 class Command(BaseCommand):
     args = 'course_id'
     help = 'Seed default permisssions and roles'

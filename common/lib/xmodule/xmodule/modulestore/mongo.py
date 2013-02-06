@@ -304,7 +304,7 @@ class MongoModuleStore(ModuleStoreBase):
             if location.category == 'static_tab':
                 course = self.get_course_for_item(item.location)
                 existing_tabs = course.tabs or []
-                existing_tabs.append({'type':'static_tab', 'name' : item.metadata.get('display_name'), 'url_slug' : item.location.name})
+                existing_tabs.append({'type': 'static_tab', 'name': item.metadata.get('display_name'), 'url_slug': item.location.name})
                 course.tabs = existing_tabs
                 self.update_metadata(course.location, course.metadata)
 
@@ -423,7 +423,7 @@ class MongoModuleStore(ModuleStoreBase):
 
 
     def get_parent_locations(self, location, course_id):
-        '''Find all locations that are the parents of this location in this 
+        '''Find all locations that are the parents of this location in this
         course.  Needed for path_to_location().
         '''
         location = Location.ensure_fully_specified(location)

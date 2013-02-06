@@ -20,7 +20,10 @@
       return module
 
     catch error
-      console.error "Unable to load #{moduleType}: #{error.message}" if console
+      if window.console and console.log
+        console.error "Unable to load #{moduleType}: #{error.message}"
+      else
+        throw error
 
   ###
   Load all modules on the page of the specified type.

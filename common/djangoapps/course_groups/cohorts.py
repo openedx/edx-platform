@@ -13,6 +13,7 @@ from .models import CourseUserGroup
 
 log = logging.getLogger(__name__)
 
+
 def is_course_cohorted(course_id):
     """
     Given a course id, return a boolean for whether or not the course is
@@ -63,7 +64,23 @@ def is_commentable_cohorted(course_id, commentable_id):
                                                                ans))
     return ans
 
+    
+def get_cohorted_commentables(course_id):
+    """
+    Given a course_id return a list of strings representing cohorted commentables
+    """
 
+    course = courses.get_course_by_id(course_id)
+    
+    if not course.is_cohorted:
+        # this is the easy case :)
+        ans = []
+    else: 
+        ans = course.cohorted_discussions
+
+    return ans
+    
+    
 def get_cohort(user, course_id):
     """
     Given a django User and a course_id, return the user's cohort in that
@@ -115,6 +132,7 @@ def get_course_cohorts(course_id):
 
 ### Helpers for cohort management views
 
+
 def get_cohort_by_name(course_id, name):
     """
     Return the CourseUserGroup object for the given cohort.  Raises DoesNotExist
@@ -124,6 +142,7 @@ def get_cohort_by_name(course_id, name):
                                        group_type=CourseUserGroup.COHORT,
                                        name=name)
 
+
 def get_cohort_by_id(course_id, cohort_id):
     """
     Return the CourseUserGroup object for the given cohort.  Raises DoesNotExist
@@ -132,6 +151,7 @@ def get_cohort_by_id(course_id, cohort_id):
     return CourseUserGroup.objects.get(course_id=course_id,
                                        group_type=CourseUserGroup.COHORT,
                                        id=cohort_id)
+
 
 def add_cohort(course_id, name):
     """
@@ -148,11 +168,13 @@ def add_cohort(course_id, name):
                                           group_type=CourseUserGroup.COHORT,
                                           name=name)
 
+
 class CohortConflict(Exception):
     """
     Raised when user to be added is already in another cohort in same course.
     """
     pass
+
 
 def add_user_to_cohort(cohort, username_or_email):
     """
@@ -211,4 +233,3 @@ def delete_empty_cohort(course_id, name):
                 name, course_id))
 
     cohort.delete()
-
