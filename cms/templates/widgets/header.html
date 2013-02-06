@@ -38,10 +38,10 @@
             
             <div class="nav-sub">
               <ul>
-                <li class="nav-item"><a href="${reverse('asset_index', kwargs=dict(org=ctx_loc.org, course=ctx_loc.course, name=ctx_loc.name))}">Schedule &amp; Details</a></li>
-                <li class="nav-item"><a href="${reverse('asset_index', kwargs=dict(org=ctx_loc.org, course=ctx_loc.course, name=ctx_loc.name))}">Grading</a></li>
+                <li class="nav-item"><a href="${reverse('contentstore.views.get_course_settings', kwargs=dict(org=ctx_loc.org, course=ctx_loc.course, name=ctx_loc.name))}">Schedule &amp; Details</a></li>
+                <li class="nav-item"><a href="${reverse('contentstore.views.get_course_settings', kwargs={'org' : ctx_loc.org, 'course' : ctx_loc.course, 'name': ctx_loc.name})}">Grading</a></li>
                 <li class="nav-item"><a href="${reverse('manage_users', kwargs=dict(location=ctx_loc))}">Course Team</a></li>
-                <li class="nav-item"><a href="${reverse('asset_index', kwargs=dict(org=ctx_loc.org, course=ctx_loc.course, name=ctx_loc.name))}">Advanced Settings</a></li>
+                <li class="nav-item"><a href="${reverse('course_settings', kwargs={'org' : ctx_loc.org, 'course' : ctx_loc.course, 'name': ctx_loc.name})}">Advanced Settings</a></li>
               </ul>
             </div>
           </li>
