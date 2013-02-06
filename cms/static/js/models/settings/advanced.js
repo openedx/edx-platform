@@ -16,5 +16,42 @@ CMS.Models.Settings.Advanced = Backbone.Model.extend({
             }
         }
         if (!_.isEmpty(errors)) return errors;
+    },
+    
+    save : function (attrs, options) {
+        // wraps the save call w/ the deletion of the removed keys after we know the saved ones worked
+        options = options ? _.clone(options) : {};
+        // add saveSuccess to the success
+        var success = options.success;
+        var model = this;
+        options.success = function(model, resp, options) {
+          model.afterSave(model);
+          if (success) success(model, resp, options);
+        };
+        Backbone.Model.prototype.save.call(this, attrs, options);
+    },
+    
+    afterSave : function(self) {
+        // remove deleted attrs
+        if (!_.isEmpty(self.deleteKeys)) {
+            // remove the to be deleted keys from the returned model
+            _.each(self.deleteKeys, function(key) { self.unset(key); });
+            // not able to do via backbone since we're not destroying the model
+            $.ajax({
+                url : self.url,
+                // json to and fro
+                contentType : "application/json",
+                dataType : "json",
+                // delete
+                type : 'DELETE',
+                // data
+                data : JSON.stringify({ deleteKeys : self.deleteKeys})
+            })
+            .fail(function(hdr, status, error) { CMS.ServerError(self, "Deleting keys:" + status); })
+            .done(function(data, status, error) {
+                // clear deleteKeys on success
+                self.deleteKeys = [];
+            });
+        }
     }
 });

@@ -73,35 +73,15 @@ CMS.Views.Settings.Advanced = CMS.Views.ValidatingView.extend({
         // TODO one last verification scan:
         //    call validateKey on each to ensure proper format
         //    check for dupes
-
+        var self = this;
         this.model.save({},
             {
             success : function() {
+                self.render();
                 window.alert("Saved");
             },
             error : CMS.ServerError
         });
-        // FIXME don't delete if the validation didn't succeed in the save call
-        // remove deleted attrs
-        if (!_.isEmpty(this.model.deleteKeys)) {
-            var self = this;
-            // not able to do via backbone since we're not destroying the model
-            $.ajax({
-                url : this.model.url,
-                // json to and fro
-                contentType : "application/json",
-                dataType : "json",
-                // delete
-                type : 'DELETE',
-                // data
-                data : JSON.stringify({ deleteKeys : this.model.deleteKeys})
-            })
-                .fail(function(hdr, status, error) { CMS.ServerError(self.model, "Deleting keys:" + status); })
-                .done(function(data, status, error) {
-                    // clear deleteKeys on success
-                    self.model.deleteKeys = [];
-                });
-        }
     },
     revertView : function(event) {
         this.model.deleteKeys = [];
@@ -149,6 +129,10 @@ CMS.Views.Settings.Advanced = CMS.Views.ValidatingView.extend({
             var validation = this.model.validate(newEntryModel);
             if (validation) {
                 console.log('reserved key');
+                if (_.has(validation, newKey)) {
+                    // swap to the key which the map knows about
+                    validation[oldKey] = validation[newKey];
+                }
                 this.model.trigger("error", this.model, validation);
                 // abandon update
                 return;
