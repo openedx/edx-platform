@@ -24,7 +24,7 @@
             
             //Load target shape
             var target_shape = $('#target_shape').val();
-            protexSetTargetShape(target_shape);
+            //protexSetTargetShape(target_shape);
             
             //Get answer from protex and store it into the hidden input field
             //when Check button is clicked
@@ -36,6 +36,11 @@
                 var value = {protex_answer: protex_answer};
                 input_field.val(JSON.stringify(value));
             });
+            
+            //TO DO: Fix this, it works but is utterly ugly and unreliable
+            setTimeout(function() {
+              protexSetTargetShape(target_shape);}, 2000);
+
         }
         else {
             setTimeout(function() {initializeProtex(); }, timeout);
