@@ -11,6 +11,8 @@ from django.http import HttpResponse
 from django.utils import simplejson
 from django_comment_client.models import Role
 from django_comment_client.permissions import check_permissions_by_view
+from xmodule.modulestore.exceptions import NoPathToItem
+
 from mitxmako import middleware
 import pystache_custom as pystache
 
@@ -157,6 +159,14 @@ def initialize_discussion_info(course):
             if key not in module.metadata:
                 log.warning("Required key '%s' not in discussion %s, leaving out of category map" % (key, module.location))
                 skip_module = True
+
+        # cdodge: pre-compute the path_to_location. Note this can throw an exception for any
+        # dangling discussion modules
+        try:
+            _DISCUSSIONINFO[course.id]['path_to_location'] = path_to_location(modulestore(), course.id, module.location)
+        except NoPathToItem:
+            log.warning("Could not compute path_to_location for {0}. Perhaps this is an orphaned discussion module?!? Skipping...".format(module.location))
+            skip_module = True
 
         if skip_module:
             continue
@@ -360,7 +370,13 @@ def get_courseware_context(content, course):
     if id in id_map:
         location = id_map[id]["location"].url()
         title = id_map[id]["title"]
-        (course_id, chapter, section, position) = path_to_location(modulestore(), course.id, location)
+
+        # cdodge: did we pre-compute, if so, then let's use that rather than recomputing
+        if 'path_to_location' in _DISCUSSIONINFO[course.id]:
+            (course_id, chapter, section, position) = _DISCUSSIONINFO[course.id]['path_to_location']
+        else:
+            (course_id, chapter, section, position) = path_to_location(modulestore(), course.id, location)
+
         url = reverse('courseware_position', kwargs={"course_id":course_id,
                                                      "chapter":chapter,
                                                      "section":section,
