@@ -61,7 +61,7 @@ CMS.Views.Settings.Advanced = CMS.Views.ValidatingView.extend({
         var self = this;
         _.each(_.sortBy(_.keys(this.model.attributes), _.identity), 
                 function(key) {
-                    listEle$.append(self.template({ key : key, value : self[key]}));
+                    listEle$.append(self.template({ key : key, value : self.model.get(key)}));
                     self.fieldToSelectorMap[key] = key;
         });
         
@@ -122,6 +122,7 @@ CMS.Views.Settings.Advanced = CMS.Views.ValidatingView.extend({
     revertView : function(event) {
         this.model.deleteKeys = [];
         var self = this;
+        this.model.clear({silent : true});
         this.model.fetch({
             success : function() { self.render(); },
             error : CMS.ServerError
