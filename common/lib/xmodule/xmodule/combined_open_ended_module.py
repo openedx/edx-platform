@@ -54,10 +54,6 @@ HUMAN_TASK_TYPE = {
     'openended' : "External Grader",
 }
 
-class IncorrectMaxScoreError(Exception):
-    def __init__(self, msg):
-        self.msg = msg
-
 class CombinedOpenEndedModule(XModule):
     """
     This is a module that encapsulates all open ended grading (self assessment, peer assessment, etc).
