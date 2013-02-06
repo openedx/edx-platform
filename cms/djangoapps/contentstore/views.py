@@ -31,7 +31,7 @@ from xmodule.modulestore.exceptions import ItemNotFoundError, InvalidLocationErr
 from xmodule.x_module import ModuleSystem
 from xmodule.error_module import ErrorDescriptor
 from xmodule.errortracker import exc_info_to_str
-from static_replace import replace_static_urls
+import static_replace
 from external_auth.views import ssl_login_shortcut
 
 from mitxmako.shortcuts import render_to_response, render_to_string
@@ -473,7 +473,7 @@ def preview_module_system(request, preview_id, descriptor):
         get_module=partial(get_preview_module, request, preview_id),
         render_template=render_from_lms,
         debug=True,
-        replace_urls=partial(replace_static_urls, data_directory=None, course_namespace=descriptor.location),
+        replace_urls=partial(static_replace.replace_static_urls, data_directory=None, course_namespace=descriptor.location),
         user=request.user,
     )
 
@@ -1240,6 +1240,11 @@ def edge(request):
 @login_required
 @expect_json
 def create_new_course(request):
+    # This logic is repeated in xmodule/modulestore/tests/factories.py
+    # so if you change anything here, you need to also change it there.
+    # TODO: write a test that creates two courses, one with the factory and
+    # the other with this method, then compare them to make sure they are 
+    # equivalent.
     template = Location(request.POST['template'])
     org = request.POST.get('org')
     number = request.POST.get('number')
@@ -1289,8 +1294,11 @@ def initialize_course_tabs(course):
     # at least a list populated with the minimal times
     # @TODO: I don't like the fact that the presentation tier is away of these data related constraints, let's find a better
     # place for this. Also rather than using a simple list of dictionaries a nice class model would be helpful here
-    course.tabs = [{"type": "courseware"},
-        {"type": "course_info", "name": "Course Info"},
+
+    # This logic is repeated in xmodule/modulestore/tests/factories.py
+    # so if you change anything here, you need to also change it there.
+    course.tabs = [{"type": "courseware"}, 
+        {"type": "course_info", "name": "Course Info"}, 
         {"type": "discussion", "name": "Discussion"},
         {"type": "wiki", "name": "Wiki"},
         {"type": "progress", "name": "Progress"}]
