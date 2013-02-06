@@ -38,6 +38,7 @@ MAX_ATTEMPTS = 1
 # Overriden by max_score specified in xml.
 MAX_SCORE = 1
 
+
 class OpenEndedChild(object):
     """
     States:
@@ -375,18 +376,13 @@ class OpenEndedChild(object):
         """
         success = False
         links = re.findall(r'(https?://\S+)', string)
-        if len(links)>0:
+        if len(links) > 0:
             for link in links:
                 success = open_ended_image_submission.run_url_tests(link)
                 if not success:
                     string = re.sub(link, '', string)
                 else:
-                    string = re.sub(link, self.generate_image_tag_from_url(link,link), string)
+                    string = re.sub(link, self.generate_image_tag_from_url(link, link), string)
                     success = True
 
         return success, string
-
-
-
-
-

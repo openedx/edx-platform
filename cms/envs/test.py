@@ -19,7 +19,7 @@ TEST_RUNNER = 'django_nose.NoseTestSuiteRunner'
 TEST_ROOT = path('test_root')
 
 # Makes the tests run much faster...
-SOUTH_TESTS_MIGRATE = False # To disable migrations and use syncdb instead
+SOUTH_TESTS_MIGRATE = False   # To disable migrations and use syncdb instead
 
 # Want static files in the same dir for running on jenkins.
 STATIC_ROOT = TEST_ROOT / "staticfiles"
@@ -62,7 +62,7 @@ CONTENTSTORE = {
     'ENGINE': 'xmodule.contentstore.mongo.MongoContentStore',
     'OPTIONS': {
         'host': 'localhost',
-        'db' : 'xcontent',
+        'db': 'xcontent',
     }
 }
 
@@ -76,7 +76,7 @@ DATABASES = {
 LMS_BASE = "localhost:8000"
 
 CACHES = {
-    # This is the cache used for most things. Askbot will not work without a 
+    # This is the cache used for most things. Askbot will not work without a
     # functioning cache -- it relies on caching to load its settings in places.
     # In staging/prod envs, the sessions also live here.
     'default': {

@@ -2,9 +2,10 @@ import string
 import random
 import collections
 
-from django.test import TestCase                         
+from django.test import TestCase
 
 from django_comment_client.helpers import pluralize
+
 
 class PluralizeTestCase(TestCase):
 

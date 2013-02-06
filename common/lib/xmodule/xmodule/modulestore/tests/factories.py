@@ -5,11 +5,14 @@ from xmodule.modulestore import Location
 from xmodule.modulestore.django import modulestore
 from xmodule.timeparse import stringify_time
 
-def XMODULE_COURSE_CREATION(class_to_create, **kwargs): 
+
+def XMODULE_COURSE_CREATION(class_to_create, **kwargs):
     return XModuleCourseFactory._create(class_to_create, **kwargs)
+
 
 def XMODULE_ITEM_CREATION(class_to_create, **kwargs):
     return XModuleItemFactory._create(class_to_create, **kwargs)
+
 
 class XModuleCourseFactory(Factory):
     """
@@ -27,7 +30,7 @@ class XModuleCourseFactory(Factory):
         org = kwargs.get('org')
         number = kwargs.get('number')
         display_name = kwargs.get('display_name')
-        location = Location('i4x', org, number, 
+        location = Location('i4x', org, number,
                             'course', Location.clean(display_name))
 
         store = modulestore('direct')
@@ -42,19 +45,21 @@ class XModuleCourseFactory(Factory):
         new_course.metadata['data_dir'] = uuid4().hex
         new_course.metadata['start'] = stringify_time(gmtime())
 
-        new_course.tabs = [{"type": "courseware"}, 
+        new_course.tabs = [{"type": "courseware"},
             {"type": "course_info", "name": "Course Info"}, 
             {"type": "discussion", "name": "Discussion"},
             {"type": "wiki", "name": "Wiki"},
             {"type": "progress", "name": "Progress"}]
 
         # Update the data in the mongo datastore
-        store.update_metadata(new_course.location.url(), new_course.own_metadata)   
+        store.update_metadata(new_course.location.url(), new_course.own_metadata)
 
         return new_course
 
+
 class Course:
     pass
+
 
 class CourseFactory(XModuleCourseFactory):
     FACTORY_FOR = Course
@@ -63,6 +68,7 @@ class CourseFactory(XModuleCourseFactory):
     org = 'MITx'
     number = '999'
     display_name = 'Robot Super Course'
+
 
 class XModuleItemFactory(Factory):
     """
@@ -80,7 +86,7 @@ class XModuleItemFactory(Factory):
         """
 
         DETACHED_CATEGORIES = ['about', 'static_tab', 'course_info']
-        
+
         parent_location = Location(kwargs.get('parent_location'))
         template = Location(kwargs.get('template'))
         display_name = kwargs.get('display_name')
@@ -107,8 +113,10 @@ class XModuleItemFactory(Factory):
 
         return new_item
 
+
 class Item:
     pass
+
 
 class ItemFactory(XModuleItemFactory):
     FACTORY_FOR = Item

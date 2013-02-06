@@ -29,6 +29,7 @@ TIMEDELTA_REGEX = re.compile(r'^((?P<days>\d+?) day(?:s?))?(\s)?((?P<hours>\d+?)
 # Generated this many different variants of problems with rerandomize=per_student
 NUM_RANDOMIZATION_BINS = 20
 
+
 def randomization_bin(seed, problem_id):
     """
     Pick a randomization bin for the problem given the user's seed and a problem id.
@@ -42,6 +43,7 @@ def randomization_bin(seed, problem_id):
     h.update(str(problem_id))
     # get the first few digits of the hash, convert to an int, then mod.
     return int(h.hexdigest()[:7], 16) % NUM_RANDOMIZATION_BINS
+
 
 def only_one(lst, default="", process=lambda x: x):
     """
@@ -283,7 +285,7 @@ class CapaModule(XModule):
 
                 #   Next, generate a fresh LoncapaProblem
                 self.lcp = LoncapaProblem(self.definition['data'], self.location.html_id(),
-                               state=None, # Tabula rasa
+                               state=None,   # Tabula rasa
                                seed=self.seed, system=self.system)
 
                 # Prepend a scary warning to the student
@@ -302,7 +304,7 @@ class CapaModule(XModule):
                 html = warning
                 try:
                     html += self.lcp.get_html()
-                except Exception, err: # Couldn't do it. Give up
+                except Exception, err:   # Couldn't do it. Give up
                     log.exception(err)
                     raise
 
@@ -315,7 +317,7 @@ class CapaModule(XModule):
         # check button is context-specific.
 
         # Put a "Check" button if unlimited attempts or still some left
-        if self.max_attempts is None or self.attempts < self.max_attempts-1:
+        if self.max_attempts is None or self.attempts < self.max_attempts - 1:
             check_button = "Check"
         else:
             # Will be final check so let user know that
@@ -561,9 +563,9 @@ class CapaModule(XModule):
             current_time = datetime.datetime.now()
             prev_submit_time = self.lcp.get_recentmost_queuetime()
             waittime_between_requests = self.system.xqueue['waittime']
-            if (current_time-prev_submit_time).total_seconds() < waittime_between_requests:
+            if (current_time - prev_submit_time).total_seconds() < waittime_between_requests:
                 msg = 'You must wait at least %d seconds between submissions' % waittime_between_requests
-                return {'success': msg, 'html': ''} # Prompts a modal dialog in ajax callback
+                return {'success': msg, 'html': ''}   # Prompts a modal dialog in ajax callback
 
         try:
             old_state = self.lcp.get_state()
@@ -596,7 +598,7 @@ class CapaModule(XModule):
 	event_info['attempts'] = self.attempts
         self.system.track_function('save_problem_check', event_info)
 
-	if hasattr(self.system,'psychometrics_handler'):	# update PsychometricsData using callback
+	if hasattr(self.system, 'psychometrics_handler'):  	# update PsychometricsData using callback
 		self.system.psychometrics_handler(self.get_instance_state())
 
         # render problem into HTML
@@ -707,7 +709,7 @@ class CapaDescriptor(RawDescriptor):
     @property
     def editable_metadata_fields(self):
         """Remove metadata from the editable fields since it has its own editor"""
-        subset = super(CapaDescriptor,self).editable_metadata_fields
+        subset = super(CapaDescriptor, self).editable_metadata_fields
         if 'markdown' in subset:
             subset.remove('markdown')
         return subset

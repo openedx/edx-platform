@@ -11,8 +11,9 @@ from django.contrib.auth.models import User
 import xmodule.modulestore.django
 from xmodule.templates import update_templates
 
+
 class ModuleStoreTestCase(TestCase):
-    """ Subclass for any test case that uses the mongodb 
+    """ Subclass for any test case that uses the mongodb
     module store. This populates a uniquely named modulestore
     collection with templates before running the TestCase
     and drops it they are finished. """
@@ -22,7 +23,7 @@ class ModuleStoreTestCase(TestCase):
 
         # Use the current seconds since epoch to differentiate
         # the mongo collections on jenkins.
-        sec_since_epoch = '%s' % int(time()*100)
+        sec_since_epoch = '%s' % int(time() * 100)
         self.orig_MODULESTORE = copy.deepcopy(settings.MODULESTORE)
         self.test_MODULESTORE = self.orig_MODULESTORE
         self.test_MODULESTORE['default']['OPTIONS']['collection'] = 'modulestore_%s' % sec_since_epoch
@@ -50,13 +51,16 @@ class ModuleStoreTestCase(TestCase):
 
         super(ModuleStoreTestCase, self)._post_teardown()
 
+
 def parse_json(response):
     """Parse response, which is assumed to be json"""
     return json.loads(response.content)
 
+
 def user(email):
     """look up a user by email"""
     return User.objects.get(email=email)
+
 
 def registration(email):
     """look up registration object by email"""

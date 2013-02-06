@@ -25,6 +25,7 @@ from combined_open_ended_rubric import CombinedOpenEndedRubric
 
 log = logging.getLogger("mitx.courseware")
 
+
 class SelfAssessmentModule(openendedchild.OpenEndedChild):
     """
     A Self Assessment module that allows students to write open-ended responses,
