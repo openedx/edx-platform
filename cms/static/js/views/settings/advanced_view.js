@@ -65,7 +65,7 @@ CMS.Views.Settings.Advanced = CMS.Views.ValidatingView.extend({
         delete this.fieldToSelectorMap[key];
         if (key !== this.new_key) {
             this.model.deleteKeys.push(key);
-            delete this.model[key];
+            this.model.unset(key);
         }
         li$.remove();
     },
@@ -151,6 +151,12 @@ CMS.Views.Settings.Advanced = CMS.Views.ValidatingView.extend({
             else {
                 // enable the value entry
                 this.$el.find('.course-advanced-policy-value').removeClass('disabled');
+            }
+            
+            // check for newkey being the name of one which was previously deleted in this session
+            var wasDeleting = this.model.deleteKeys.indexOf(newKey);
+            if (wasDeleting >= 0) {
+                this.model.deleteKeys.splice(wasDeleting, 1);
             }
 
             // update gui (sets all the ids etc)
