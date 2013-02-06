@@ -388,7 +388,6 @@
       img {
         @include box-sizing(border-box);
         width: 100%;
-        max-height: 50%;
         overflow-y: scroll;
         padding: ($baseline/10);
         border: 1px solid $gray-l4;
