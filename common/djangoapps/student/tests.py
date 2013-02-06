@@ -17,6 +17,7 @@ COURSE_2 = 'edx/full/6.002_Spring_2012'
 
 log = logging.getLogger(__name__)
 
+
 class CourseEndingTest(TestCase):
     """Test things related to course endings: certificates, surveys, etc"""
 
@@ -40,7 +41,7 @@ class CourseEndingTest(TestCase):
                          {'status': 'processing',
                           'show_disabled_download_button': False,
                           'show_download_url': False,
-                          'show_survey_button': False,})
+                          'show_survey_button': False, })
 
         cert_status = {'status': 'unavailable'}
         self.assertEqual(_cert_info(user, course, cert_status),

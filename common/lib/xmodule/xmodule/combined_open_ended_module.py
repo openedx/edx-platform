@@ -50,8 +50,8 @@ ACCEPT_FILE_UPLOAD = False
 TRUE_DICT = ["True", True, "TRUE", "true"]
 
 HUMAN_TASK_TYPE = {
-    'selfassessment' : "Self Assessment",
-    'openended' : "External Grader",
+    'selfassessment': "Self Assessment",
+    'openended': "External Grader",
 }
 
 class CombinedOpenEndedModule(XModule):

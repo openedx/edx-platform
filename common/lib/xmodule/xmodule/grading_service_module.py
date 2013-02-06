@@ -10,8 +10,10 @@ from lxml import etree
 
 log = logging.getLogger(__name__)
 
+
 class GradingServiceError(Exception):
     pass
+
 
 class GradingService(object):
     """
@@ -35,7 +37,7 @@ class GradingService(object):
         """
         response = self.session.post(self.login_url,
             {'username': self.username,
-             'password': self.password,})
+             'password': self.password, })
 
         response.raise_for_status()
 

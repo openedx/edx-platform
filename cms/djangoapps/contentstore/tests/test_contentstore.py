@@ -35,6 +35,7 @@ TEST_DATA_MODULESTORE = copy.deepcopy(settings.MODULESTORE)
 TEST_DATA_MODULESTORE['default']['OPTIONS']['fs_root'] = path('common/test/data')
 TEST_DATA_MODULESTORE['direct']['OPTIONS']['fs_root'] = path('common/test/data')
 
+
 @override_settings(MODULESTORE=TEST_DATA_MODULESTORE)
 class ContentStoreToyCourseTest(ModuleStoreTestCase):
     """
@@ -77,20 +78,20 @@ class ContentStoreToyCourseTest(ModuleStoreTestCase):
 
     def test_static_tab_reordering(self):
         import_from_xml(modulestore(), 'common/test/data/', ['full'])
-        
+
         ms = modulestore('direct')
-        course = ms.get_item(Location(['i4x','edX','full','course','6.002_Spring_2012', None]))
+        course = ms.get_item(Location(['i4x', 'edX', 'full', 'course', '6.002_Spring_2012', None]))
 
         # reverse the ordering
         reverse_tabs = []
         for tab in course.tabs:
             if tab['type'] == 'static_tab':
                 reverse_tabs.insert(0, 'i4x://edX/full/static_tab/{0}'.format(tab['url_slug']))
- 
-        resp = self.client.post(reverse('reorder_static_tabs'), json.dumps({'tabs':reverse_tabs}), "application/json")
 
-        course = ms.get_item(Location(['i4x','edX','full','course','6.002_Spring_2012', None]))
-        
+        resp = self.client.post(reverse('reorder_static_tabs'), json.dumps({'tabs': reverse_tabs}), "application/json")
+
+        course = ms.get_item(Location(['i4x', 'edX', 'full', 'course', '6.002_Spring_2012', None]))
+
         # compare to make sure that the tabs information is in the expected order after the server call
         course_tabs = []
         for tab in course.tabs:
@@ -101,17 +102,17 @@ class ContentStoreToyCourseTest(ModuleStoreTestCase):
 
     def test_about_overrides(self):
         '''
-        This test case verifies that a course can use specialized override for about data, e.g. /about/Fall_2012/effort.html 
+        This test case verifies that a course can use specialized override for about data, e.g. /about/Fall_2012/effort.html
         while there is a base definition in /about/effort.html
         '''
         import_from_xml(modulestore(), 'common/test/data/', ['full'])
         ms = modulestore('direct')
-        effort = ms.get_item(Location(['i4x','edX','full','about','effort', None]))
-        self.assertEqual(effort.definition['data'],'6 hours')
+        effort = ms.get_item(Location(['i4x', 'edX', 'full', 'about', 'effort', None]))
+        self.assertEqual(effort.definition['data'], '6 hours')
 
         # this one should be in a non-override folder
-        effort = ms.get_item(Location(['i4x','edX','full','about','end_date', None]))
-        self.assertEqual(effort.definition['data'],'TBD')
+        effort = ms.get_item(Location(['i4x', 'edX', 'full', 'about', 'end_date', None]))
+        self.assertEqual(effort.definition['data'], 'TBD')
 
     def test_remove_hide_progress_tab(self):
         import_from_xml(modulestore(), 'common/test/data/', ['full'])
@@ -147,14 +148,14 @@ class ContentStoreToyCourseTest(ModuleStoreTestCase):
 
         clone_course(ms, cs, source_location, dest_location)
 
-        # now loop through all the units in the course and verify that the clone can render them, which 
+        # now loop through all the units in the course and verify that the clone can render them, which
         # means the objects are at least present
-        items = ms.get_items(Location(['i4x','edX', 'full', 'vertical', None]))
+        items = ms.get_items(Location(['i4x', 'edX', 'full', 'vertical', None]))
         self.assertGreater(len(items), 0)
-        clone_items = ms.get_items(Location(['i4x', 'MITx','999','vertical', None]))
+        clone_items = ms.get_items(Location(['i4x', 'MITx', '999', 'vertical', None]))
         self.assertGreater(len(clone_items), 0)
         for descriptor in items:
-            new_loc = descriptor.location._replace(org = 'MITx', course='999')
+            new_loc = descriptor.location._replace(org='MITx', course='999')
             print "Checking {0} should now also be at {1}".format(descriptor.location.url(), new_loc.url())
             resp = self.client.get(reverse('edit_unit', kwargs={'location': new_loc.url()}))
             self.assertEqual(resp.status_code, 200)
@@ -169,7 +170,7 @@ class ContentStoreToyCourseTest(ModuleStoreTestCase):
 
         delete_course(ms, cs, location)
 
-        items = ms.get_items(Location(['i4x','edX', 'full', 'vertical', None]))
+        items = ms.get_items(Location(['i4x', 'edX', 'full', 'vertical', None]))
         self.assertEqual(len(items), 0)
 
     def verify_content_existence(self, modulestore, root_dir, location, dirname, category_name, filename_suffix=''):
@@ -185,7 +186,7 @@ class ContentStoreToyCourseTest(ModuleStoreTestCase):
 
     def test_export_course(self):
         ms = modulestore('direct')
-        cs = contentstore() 
+        cs = contentstore()
 
         import_from_xml(ms, 'common/test/data/', ['full'])
         location = CourseDescriptor.id_to_location('edX/full/6.002_Spring_2012')
@@ -205,7 +206,7 @@ class ContentStoreToyCourseTest(ModuleStoreTestCase):
 
         # check for custom_tags
         self.verify_content_existence(ms, root_dir, location, 'custom_tags', 'custom_tag_template')
-  
+
 
         # remove old course
         delete_course(ms, cs, location)
@@ -213,23 +214,23 @@ class ContentStoreToyCourseTest(ModuleStoreTestCase):
         # reimport
         import_from_xml(ms, root_dir, ['test_export'])
 
-        items = ms.get_items(Location(['i4x','edX', 'full', 'vertical', None]))
+        items = ms.get_items(Location(['i4x', 'edX', 'full', 'vertical', None]))
         self.assertGreater(len(items), 0)
         for descriptor in items:
             print "Checking {0}....".format(descriptor.location.url())
             resp = self.client.get(reverse('edit_unit', kwargs={'location': descriptor.location.url()}))
             self.assertEqual(resp.status_code, 200)
 
-        shutil.rmtree(root_dir)        
+        shutil.rmtree(root_dir)
 
     def test_course_handouts_rewrites(self):
         ms = modulestore('direct')
-        cs = contentstore() 
+        cs = contentstore()
 
         # import a test course
-        import_from_xml(ms, 'common/test/data/', ['full'])     
+        import_from_xml(ms, 'common/test/data/', ['full'])
 
-        handout_location= Location(['i4x', 'edX', 'full', 'course_info', 'handouts'])
+        handout_location = Location(['i4x', 'edX', 'full', 'course_info', 'handouts'])
 
         # get module info
         resp = self.client.get(reverse('module_info', kwargs={'module_location': handout_location}))
@@ -239,7 +240,7 @@ class ContentStoreToyCourseTest(ModuleStoreTestCase):
 
         # check that /static/ has been converted to the full path
         # note, we know the link it should be because that's what in the 'full' course in the test data
-        self.assertContains(resp, '/c4x/edX/full/asset/handouts_schematic_tutorial.pdf') 
+        self.assertContains(resp, '/c4x/edX/full/asset/handouts_schematic_tutorial.pdf')
 
 
 class ContentStoreTest(ModuleStoreTestCase):
@@ -302,7 +303,7 @@ class ContentStoreTest(ModuleStoreTestCase):
         data = parse_json(resp)
 
         self.assertEqual(resp.status_code, 200)
-        self.assertEqual(data['ErrMsg'], 
+        self.assertEqual(data['ErrMsg'],
             'There is already a course defined with the same organization and course number.')
 
     def test_create_course_with_bad_organization(self):
@@ -319,7 +320,7 @@ class ContentStoreTest(ModuleStoreTestCase):
         """Test viewing the index page with no courses"""
         # Create a course so there is something to view
         resp = self.client.get(reverse('index'))
-        self.assertContains(resp, 
+        self.assertContains(resp,
             '<h1>My Courses</h1>',
             status_code=200,
             html=True)
@@ -355,7 +356,7 @@ class ContentStoreTest(ModuleStoreTestCase):
                 }
 
         resp = self.client.get(reverse('course_index', kwargs=data))
-        self.assertContains(resp, 
+        self.assertContains(resp,
             '<a href="/MITx/999/course/Robot_Super_Course" class="class-name">Robot Super Course</a>',
             status_code=200,
             html=True)
@@ -365,8 +366,8 @@ class ContentStoreTest(ModuleStoreTestCase):
         CourseFactory.create(org='MITx', course='999', display_name='Robot Super Course')
 
         section_data = {
-            'parent_location' : 'i4x://MITx/999/course/Robot_Super_Course',
-            'template' : 'i4x://edx/templates/chapter/Empty',
+            'parent_location': 'i4x://MITx/999/course/Robot_Super_Course',
+            'template': 'i4x://edx/templates/chapter/Empty',
             'display_name': 'Section One',
             }
 
@@ -374,7 +375,7 @@ class ContentStoreTest(ModuleStoreTestCase):
 
         self.assertEqual(resp.status_code, 200)
         data = parse_json(resp)
-        self.assertRegexpMatches(data['id'], 
+        self.assertRegexpMatches(data['id'],
             '^i4x:\/\/MITx\/999\/chapter\/([0-9]|[a-f]){32}$')
 
     def test_capa_module(self):
@@ -382,8 +383,8 @@ class ContentStoreTest(ModuleStoreTestCase):
         CourseFactory.create(org='MITx', course='999', display_name='Robot Super Course')
 
         problem_data = {
-            'parent_location' : 'i4x://MITx/999/course/Robot_Super_Course',
-            'template' : 'i4x://edx/templates/problem/Empty'
+            'parent_location': 'i4x://MITx/999/course/Robot_Super_Course',
+            'template': 'i4x://edx/templates/problem/Empty'
             }
 
         resp = self.client.post(reverse('clone_item'), problem_data)

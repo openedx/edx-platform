@@ -215,7 +215,7 @@ def ssl_dn_extract_info(dn):
     else:
         return None
     return (user, email, fullname)
-    
+
 
 def ssl_get_cert_from_request(request):
     """
@@ -460,7 +460,7 @@ def provider_login(request):
                                     openid_request.answer(False), {})
 
         # checkid_setup, so display login page
-        # (by falling through to the provider_login at the 
+        # (by falling through to the provider_login at the
         # bottom of this method).
         elif openid_request.mode == 'checkid_setup':
             if openid_request.idSelect():
@@ -482,7 +482,7 @@ def provider_login(request):
 
     # handle login redirection:  these are also sent to this view function,
     # but are distinguished by lacking the openid mode.  We also know that
-    # they are posts, because they come from the popup 
+    # they are posts, because they come from the popup
     elif request.method == 'POST' and 'openid_setup' in request.session:
         # get OpenID request from session
         openid_setup = request.session['openid_setup']
@@ -495,7 +495,7 @@ def provider_login(request):
             return default_render_failure(request, "Invalid OpenID trust root")
 
         # check if user with given email exists
-        # Failure is redirected to this method (by using the original URL), 
+        # Failure is redirected to this method (by using the original URL),
         # which will bring up the login dialog.
         email = request.POST.get('email', None)
         try:
@@ -542,17 +542,17 @@ def provider_login(request):
             # missing fields is up to the Consumer. The proper change
             # should only return the username, however this will likely
             # break the CS50 client. Temporarily we will be returning
-            # username filling in for fullname in addition to username 
+            # username filling in for fullname in addition to username
             # as sreg nickname.
-            
-            # Note too that this is hardcoded, and not really responding to 
+
+            # Note too that this is hardcoded, and not really responding to
             # the extensions that were registered in the first place.
             results = {
                 'nickname': user.username,
                 'email': user.email,
                 'fullname': user.username
                 }
-            
+
             # the request succeeded:
             return provider_respond(server, openid_request, response, results)
 

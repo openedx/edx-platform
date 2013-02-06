@@ -142,7 +142,7 @@ class XQueueCertInterface(object):
 
         """
 
-        VALID_STATUSES = [ status.generating,
+        VALID_STATUSES = [status.generating,
                 status.unavailable, status.deleted, status.error,
                 status.notpassing]
 

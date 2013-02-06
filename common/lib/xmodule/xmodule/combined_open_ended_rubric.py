@@ -1,11 +1,13 @@
 import logging
 from lxml import etree
 
-log=logging.getLogger(__name__)
+log = logging.getLogger(__name__)
+
 
 class RubricParsingError(Exception):
     def __init__(self, msg):
         self.msg = msg
+
 
 class CombinedOpenEndedRubric(object):
 
@@ -30,7 +32,7 @@ class CombinedOpenEndedRubric(object):
             max_scores = map((lambda cat: cat['options'][-1]['points']), rubric_categories)
             max_score = max(max_scores)
             html = self.system.render_template('open_ended_rubric.html', 
-                    {'categories'  : rubric_categories,
+                    {'categories': rubric_categories,
                      'has_score': self.has_score,
                      'view_only': self.view_only,
                      'max_score': max_score})
@@ -71,8 +73,8 @@ class CombinedOpenEndedRubric(object):
             options: [{text: "Option 1 Name", points: 0}, {text:"Option 2 Name", points: 5}]
             },
            { category: "Category 2 Name",
-             options: [{text: "Option 1 Name", points: 0}, 
-                         {text: "Option 2 Name", points: 1}, 
+             options: [{text: "Option 1 Name", points: 0},
+                         {text: "Option 2 Name", points: 1},
                          {text: "Option 3 Name", points: 2]}]
 
         '''
@@ -88,7 +90,7 @@ class CombinedOpenEndedRubric(object):
 
 
     def extract_category(self, category):
-        ''' 
+        '''
         construct an individual category
         {category: "Category 1 Name",
          options: [{text: "Option 1 text", points: 1},
@@ -121,7 +123,7 @@ class CombinedOpenEndedRubric(object):
         autonumbering = True
         # parse options
         for option in optionsxml:
-            if option.tag != 'option': 
+            if option.tag != 'option':
                 raise RubricParsingError("[extract_category]: expected option tag, got {0} instead".format(option.tag))
             else:
                 pointstr = option.get("points")
@@ -138,7 +140,7 @@ class CombinedOpenEndedRubric(object):
                     cur_points = cur_points + 1
                 else:
                     raise Exception("[extract_category]: missing points attribute. Cannot continue to auto-create points values after a points value is explicitly defined.")
-                
+
                 selected = score == points
                 optiontext = option.text
                 options.append({'text': option.text, 'points': points, 'selected': selected})
