@@ -29,10 +29,13 @@ class CombinedOpenEndedRubric(object):
         success = False
         try:
             rubric_categories = self.extract_categories(rubric_xml)
-            html = self.system.render_template('open_ended_rubric.html',
+            max_scores = map((lambda cat: cat['options'][-1]['points']), rubric_categories)
+            max_score = max(max_scores)
+            html = self.system.render_template('open_ended_rubric.html', 
                     {'categories': rubric_categories,
                      'has_score': self.has_score,
-                     'view_only': self.view_only})
+                     'view_only': self.view_only,
+                     'max_score': max_score})
             success = True
         except:
             error_message = "[render_rubric] Could not parse the rubric with xml: {0}".format(rubric_xml)
@@ -40,7 +43,7 @@ class CombinedOpenEndedRubric(object):
             raise RubricParsingError(error_message)
         return success, html
 
-    def check_if_rubric_is_parseable(self, rubric_string, location, max_score_allowed):
+    def check_if_rubric_is_parseable(self, rubric_string, location, max_score_allowed, max_score):
         success, rubric_feedback = self.render_rubric(rubric_string)
         if not success:
             error_message = "Could not parse rubric : {0} for location {1}".format(rubric_string, location.url())
@@ -48,12 +51,20 @@ class CombinedOpenEndedRubric(object):
             raise RubricParsingError(error_message)
 
         rubric_categories = self.extract_categories(rubric_string)
+        total = 0
         for category in rubric_categories:
+            total = total + len(category['options']) - 1
             if len(category['options']) > (max_score_allowed + 1):
                 error_message = "Number of score points in rubric {0} higher than the max allowed, which is {1}".format(
                     len(category['options']), max_score_allowed)
                 log.error(error_message)
                 raise RubricParsingError(error_message)
+
+        if total != max_score:
+            error_msg = "The max score {0} for problem {1} does not match the total number of points in the rubric {2}".format(
+                    max_score, location, total)
+            log.error(error_msg)
+            raise RubricParsingError(error_msg)
 
     def extract_categories(self, element):
         '''

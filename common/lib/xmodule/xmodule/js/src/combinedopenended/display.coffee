@@ -1,3 +1,36 @@
+class @Rubric
+  constructor: () ->
+
+  # finds the scores for each rubric category
+  @get_score_list: () =>
+    # find the number of categories:
+    num_categories = $('table.rubric tr').length
+
+    score_lst = []
+    # get the score for each one
+    for i in [0..(num_categories-2)]
+      score = $("input[name='score-selection-#{i}']:checked").val()
+      score_lst.push(score)
+
+    return score_lst
+
+  @get_total_score: () ->
+    score_lst = @get_score_list()
+    tot = 0
+    for score in score_lst
+      tot += parseInt(score)
+    return tot
+
+  @check_complete: () ->
+     # check to see whether or not any categories have not been scored
+    num_categories = $('table.rubric tr').length
+    # -2 because we want to skip the header
+    for i in [0..(num_categories-2)]
+      score = $("input[name='score-selection-#{i}']:checked").val()
+      if score == undefined
+        return false
+    return true
+
 class @CombinedOpenEnded
   constructor: (element) ->
     @element=element
@@ -222,9 +255,9 @@ class @CombinedOpenEnded
 
   save_assessment: (event) =>
     event.preventDefault()
-    if @child_state == 'assessing'
-      checked_assessment = @$('input[name="grade-selection"]:checked')
-      data = {'assessment' : checked_assessment.val()}
+    if @child_state == 'assessing' && Rubric.check_complete()
+      checked_assessment = Rubric.get_total_score()
+      data = {'assessment' : checked_assessment}
       $.postWithPrefix "#{@ajax_url}/save_assessment", data, (response) =>
         if response.success
           @child_state = response.state

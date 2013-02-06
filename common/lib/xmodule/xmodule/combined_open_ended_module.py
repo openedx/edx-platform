@@ -58,12 +58,6 @@ HUMAN_TASK_TYPE = {
     'openended': "External Grader",
 }
 
-
-class IncorrectMaxScoreError(Exception):
-    def __init__(self, msg):
-        self.msg = msg
-
-
 class CombinedOpenEndedModule(XModule):
     """
     This is a module that encapsulates all open ended grading (self assessment, peer assessment, etc).
@@ -194,15 +188,10 @@ class CombinedOpenEndedModule(XModule):
         # completion (doesn't matter if you self-assessed correct/incorrect).
         self._max_score = int(self.metadata.get('max_score', MAX_SCORE))
 
-        if self._max_score > MAX_SCORE_ALLOWED:
-            error_message = "Max score {0} is higher than max score allowed {1} for location {2}".format(self._max_score,
-                MAX_SCORE_ALLOWED, location)
-            log.error(error_message)
-            raise IncorrectMaxScoreError(error_message)
 
         rubric_renderer = CombinedOpenEndedRubric(system, True)
         rubric_string = stringify_children(definition['rubric'])
-        rubric_renderer.check_if_rubric_is_parseable(rubric_string, location, MAX_SCORE_ALLOWED)
+        rubric_renderer.check_if_rubric_is_parseable(rubric_string, location, MAX_SCORE_ALLOWED, self._max_score)
 
         #Static data is passed to the child modules to render
         self.static_data = {
