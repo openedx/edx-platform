@@ -93,6 +93,8 @@ def login_page(request):
         'forgot_password_link': "//{base}/#forgot-password-modal".format(base=settings.LMS_BASE),
     })
 
+def howitworks(request):
+    return render_to_response('howitworks.html', {})
 
 # ==== Views for any logged-in user ==================================
 

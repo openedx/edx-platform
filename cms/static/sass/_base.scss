@@ -4,9 +4,13 @@
 //
 // -------------------------------------
 
+html {
+  font-size: 62.5%;
+}
+
 body {
     min-width: 980px;
-    background: rgb(240, 241, 245);
+    background: $gray-l5;
     font-size: 16px;
     line-height: 1.6;
     color: $baseFontColor;
@@ -42,6 +46,12 @@ h1 {
     margin-bottom: 30px;
 }
 
+.wrapper {
+  @include clearfix();
+  @include box-sizing(border-box);
+  width: 100%;
+}
+
 .main-wrapper {
     position: relative;
     margin: 0 40px;
@@ -68,11 +78,6 @@ h1 {
 
 .right {
     float: right;
-}
-
-footer {
-    clear: both;
-    height: 100px;
 }
 
 input[type="text"],
@@ -417,4 +422,9 @@ body.show-wip {
     font-size: 20px;
     color: rgba(0, 0, 0, 0.85);
   }
+}
+
+// basic utility
+.sr {
+  @include text-sr();
 }

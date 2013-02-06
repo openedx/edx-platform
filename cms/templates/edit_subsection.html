@@ -7,8 +7,9 @@
 %>
 
 <%! from django.core.urlresolvers import reverse %>
-<%block name="bodyclass">subsection</%block>
 <%block name="title">CMS Subsection</%block>
+<%block name="bodyclass">is-signedin course subsection</%block>
+
 
 <%namespace name="units" file="widgets/units.html" />
 <%namespace name='static' file='static_content.html'/>
@@ -96,6 +97,7 @@
       </div>
     </div>
   </div>
+</div>
 </div>
 </%block>
 

@@ -39,6 +39,21 @@ $(document).ready(function() {
     $('.unit .item-actions .delete-button').bind('click', deleteUnit);
     $('.new-unit-item').bind('click', createNewUnit);
 
+    // nav-related
+    $('body').addClass('js');
+
+    $('.nav-dropdown .nav-item .title').click(function(e){
+
+        $subnav = $(this).parent().find('.nav-sub');
+        $title = $(this).parent().find('.title');
+
+        e.preventDefault();
+        $('.nav-dropdown .nav-item .title').removeClass('is-selected');
+        $('.nav-dropdown .nav-item .nav-sub').removeClass('is-shown');
+        $title.toggleClass('is-selected');
+        $subnav.toggleClass('is-shown');
+      });
+
     // toggling overview section details
     $(function(){
       if($('.courseware-section').length > 0) {
