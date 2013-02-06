@@ -142,13 +142,6 @@
           @include box-shadow(0 1px 1px rgba(0, 0, 0, .2), 0 1px 0 rgba(255, 255, 255, .4) inset);
           @include clearfix;
 
-          .tab-group {
-            border-bottom-right-radius: 3px;
-            border-bottom-left-radius: 3px;
-            color: #3c3c3c;
-            text-shadow: 0 1px 0 rgba(255, 255, 255, 0.3);
-          }
-
           .cancel-button {
             margin: 20px 0px 10px 10px;
             @include white-button;
@@ -216,8 +209,6 @@
             opacity:.8;
 
             &:hover {
-              @include linear-gradient(top, rgba(255, 255, 255, .4), rgba(255, 255, 255, 0));
-              @include transition(background-color .15s);
               opacity:1;
             }
 
@@ -291,7 +282,6 @@
                 width: 17;
                 height: 21px;
                 vertical-align: middle;
-                background: url(../img/problem-selector-icons.png) no-repeat;
               }
             }
 
