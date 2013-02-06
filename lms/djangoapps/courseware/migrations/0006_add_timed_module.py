@@ -11,7 +11,7 @@ class Migration(SchemaMigration):
         # Adding model 'TimedModule'
         db.create_table('courseware_timedmodule', (
             ('id', self.gf('django.db.models.fields.AutoField')(primary_key=True)),
-            ('module_state_key', self.gf('django.db.models.fields.CharField')(max_length=255, db_column='module_id', db_index=True)),
+            ('location', self.gf('django.db.models.fields.CharField')(max_length=255, db_column='location', db_index=True)),
             ('student', self.gf('django.db.models.fields.related.ForeignKey')(to=orm['auth.User'])),
             ('course_id', self.gf('django.db.models.fields.CharField')(max_length=255, db_index=True)),
             ('accommodation_code', self.gf('django.db.models.fields.CharField')(default='NONE', max_length=12, db_index=True)),
@@ -22,13 +22,13 @@ class Migration(SchemaMigration):
         ))
         db.send_create_signal('courseware', ['TimedModule'])
 
-        # Adding unique constraint on 'TimedModule', fields ['student', 'module_state_key', 'course_id']
-        db.create_unique('courseware_timedmodule', ['student_id', 'module_id', 'course_id'])
+        # Adding unique constraint on 'TimedModule', fields ['student', 'location', 'course_id']
+        db.create_unique('courseware_timedmodule', ['student_id', 'location', 'course_id'])
 
 
     def backwards(self, orm):
-        # Removing unique constraint on 'TimedModule', fields ['student', 'module_state_key', 'course_id']
-        db.delete_unique('courseware_timedmodule', ['student_id', 'module_id', 'course_id'])
+        # Removing unique constraint on 'TimedModule', fields ['student', 'location', 'course_id']
+        db.delete_unique('courseware_timedmodule', ['student_id', 'location', 'course_id'])
 
         # Deleting model 'TimedModule'
         db.delete_table('courseware_timedmodule')
@@ -103,15 +103,15 @@ class Migration(SchemaMigration):
             'student': ('django.db.models.fields.related.ForeignKey', [], {'to': "orm['auth.User']"})
         },
         'courseware.timedmodule': {
-            'Meta': {'unique_together': "(('student', 'module_state_key', 'course_id'),)", 'object_name': 'TimedModule'},
+            'Meta': {'unique_together': "(('student', 'location', 'course_id'),)", 'object_name': 'TimedModule'},
             'accommodation_code': ('django.db.models.fields.CharField', [], {'default': "'NONE'", 'max_length': '12', 'db_index': 'True'}),
             'beginning_at': ('django.db.models.fields.DateTimeField', [], {'null': 'True', 'db_index': 'True'}),
             'course_id': ('django.db.models.fields.CharField', [], {'max_length': '255', 'db_index': 'True'}),
             'created_at': ('django.db.models.fields.DateTimeField', [], {'auto_now_add': 'True', 'db_index': 'True', 'blank': 'True'}),
             'ending_at': ('django.db.models.fields.DateTimeField', [], {'null': 'True', 'db_index': 'True'}),
             'id': ('django.db.models.fields.AutoField', [], {'primary_key': 'True'}),
+            'location': ('django.db.models.fields.CharField', [], {'max_length': '255', 'db_column': "'location'", 'db_index': 'True'}),
             'modified_at': ('django.db.models.fields.DateTimeField', [], {'auto_now': 'True', 'db_index': 'True', 'blank': 'True'}),
-            'module_state_key': ('django.db.models.fields.CharField', [], {'max_length': '255', 'db_column': "'module_id'", 'db_index': 'True'}),
             'student': ('django.db.models.fields.related.ForeignKey', [], {'to': "orm['auth.User']"})
         }
     }

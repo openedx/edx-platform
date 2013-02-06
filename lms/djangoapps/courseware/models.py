@@ -224,12 +224,14 @@ class TimedModule(models.Model):
     # but for abtests and the like, this can be set to a shared value
     # for many instances of the module.
     # Filename for homeworks, etc.
-    module_state_key = models.CharField(max_length=255, db_index=True, db_column='module_id')
+    # module_state_key = models.CharField(max_length=255, db_index=True, db_column='module_id')
+    location = models.CharField(max_length=255, db_index=True, db_column='location')
     student = models.ForeignKey(User, db_index=True)
     course_id = models.CharField(max_length=255, db_index=True)
 
     class Meta:
-        unique_together = (('student', 'module_state_key', 'course_id'),)
+#        unique_together = (('student', 'module_state_key', 'course_id'),)
+        unique_together = (('student', 'location', 'course_id'),)
 
     # For a timed activity, we are only interested here
     # in time-related accommodations, and these should be disjoint.

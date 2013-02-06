@@ -1138,10 +1138,11 @@ def test_center_login(request):
     # know the module_id to use that corresponds to the particular exam_series_code.
     # For now, we can hardcode that...
     if exam_series_code == '6002x001':
-        chapter_url_name = 'Final_Exam'
-        section_url_name = 'Final_Exam_Fall_2012'
-        redirect_url = reverse('courseware_section', args=[course_id, chapter_url_name, section_url_name])
-        location = 'i4x://MITx/6.002x/2012_Fall/sequence/Final_Exam_Fall_2012'
+        # This should not be hardcoded here, but should be added to the exam definition.
+        # TODO: look the location up in the course, by finding the exam_info with the matching code,
+        # and get the location from that.
+        location = 'i4x://MITx/6.002x/sequential/Final_Exam_Fall_2012'
+        redirect_url = reverse('jump_to', kwargs={'course_id': course_id, 'location': location})
     else:
         # TODO: clarify if this is the right error code for this condition.
         return HttpResponseRedirect(makeErrorURL(error_url, "incorrectCandidateTests"));
@@ -1152,7 +1153,7 @@ def test_center_login(request):
                                   'ETDBTM' : 'ADDDOUBLE', }
     
     # check if the test has already been taken
-    timed_modules = TimedModule.objects.filter(student=testcenteruser.user, course_id=course_id, module_state_key=location)
+    timed_modules = TimedModule.objects.filter(student=testcenteruser.user, course_id=course_id, location=location)
     if timed_modules:
         timed_module = timed_modules[0]
         if timed_module.has_ended:
@@ -1167,17 +1168,9 @@ def test_center_login(request):
         if client_candidate_id == "edX003671291147":
             time_accommodation_code = 'TESTING'
         if time_accommodation_code:
-            timed_module = TimedModule(student=request.user, course_id=course_id, module_state_key=location)
+            timed_module = TimedModule(student=request.user, course_id=course_id, location=location)
             timed_module.accommodation_code = time_accommodation_code
             timed_module.save()
-                    
-    # Now log the user in:
-#    user = authenticate(username=testcenteruser.user.username,
-#                        password=testcenteruser.user.password)
-#    
-#    if user is None:
-#        # argh.  We couldn't login!
-#        return HttpResponseRedirect(makeErrorURL(error_url, "ARGH! User cannot log in"));
         
     # UGLY HACK!!!
     # Login assumes that authentication has occurred, and that there is a 
