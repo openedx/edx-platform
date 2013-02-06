@@ -292,6 +292,7 @@ class CombinedOpenEndedModuleTest(unittest.TestCase):
             'display_name': 'Name',
             'accept_file_upload' : False,
             'rewrite_content_links' : "",
+            'close_date' : "",
             }
 
     oeparam = etree.XML('''

@@ -203,6 +203,7 @@ class CombinedOpenEndedV1Module():
             'rubric': definition['rubric'],
             'display_name': self.display_name,
             'accept_file_upload': self.accept_file_upload,
+            'close_date' : self.close_date,
             }
 
         self.task_xml = definition['task_xml']
