@@ -549,14 +549,11 @@ class OpenEndedModule(openendedchild.OpenEndedChild):
         @param system: modulesystem
         @return: Success indicator
         """
-        if self.attempts > self.max_attempts:
-            # If too many attempts, prevent student from saving answer and
-            # seeing rubric.  In normal use, students shouldn't see this because
-            # they won't see the reset button once they're out of attempts.
-            return {
-                'success': False,
-                'error': 'Too many attempts.'
-            }
+        # Once we close the problem, we should not allow students
+        # to save answers
+        closed, msg = self.check_if_closed()
+        if closed:
+            return msg
 
         if self.state != self.INITIAL:
             return self.out_of_sync_error(get)

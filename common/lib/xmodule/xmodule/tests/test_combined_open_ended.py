@@ -31,9 +31,10 @@ class OpenEndedChildTest(unittest.TestCase):
         <category>
         <description>Response Quality</description>
         <option>The response is not a satisfactory answer to the question.  It either fails to address the question or does so in a limited way, with no evidence of higher-order thinking.</option>
+        <option>Second option</option>
         </category>
          </rubric></rubric>'''
-    max_score = 4
+    max_score = 1
 
     static_data = {
             'max_attempts': 20,
@@ -42,6 +43,7 @@ class OpenEndedChildTest(unittest.TestCase):
             'max_score': max_score,
             'display_name': 'Name',
             'accept_file_upload': False,
+            'close_date': None
             }
     definition = Mock()
     descriptor = Mock()
@@ -157,7 +159,11 @@ class OpenEndedModuleTest(unittest.TestCase):
             'max_score': max_score,
             'display_name': 'Name',
             'accept_file_upload': False,
+<<<<<<< HEAD
             'rewrite_content_links' : "",
+=======
+            'close_date': None
+>>>>>>> origin/master
             }
 
     oeparam = etree.XML('''
@@ -274,9 +280,10 @@ class CombinedOpenEndedModuleTest(unittest.TestCase):
         <category>
         <description>Response Quality</description>
         <option>The response is not a satisfactory answer to the question.  It either fails to address the question or does so in a limited way, with no evidence of higher-order thinking.</option>
+        <option>Second option</option>
         </category>
          </rubric></rubric>'''
-    max_score = 3
+    max_score = 1
 
     metadata = {'attempts': '10', 'max_score': max_score}
 
