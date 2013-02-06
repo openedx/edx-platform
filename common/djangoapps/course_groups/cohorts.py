@@ -64,7 +64,23 @@ def is_commentable_cohorted(course_id, commentable_id):
                                                                ans))
     return ans
 
+    
+def get_cohorted_commentables(course_id):
+    """
+    Given a course_id return a list of strings representing cohorted commentables
+    """
 
+    course = courses.get_course_by_id(course_id)
+    
+    if not course.is_cohorted:
+        # this is the easy case :)
+        ans = []
+    else: 
+        ans = course.cohorted_discussions
+
+    return ans
+    
+    
 def get_cohort(user, course_id):
     """
     Given a django User and a course_id, return the user's cohort in that
