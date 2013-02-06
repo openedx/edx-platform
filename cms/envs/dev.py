@@ -12,7 +12,7 @@ TEMPLATE_DEBUG = DEBUG
 LOGGING = get_logger_config(ENV_ROOT / "log",
                             logging_env="dev",
                             tracking_filename="tracking.log",
-                            dev_env = True,
+                            dev_env=True,
                             debug=True)
 
 modulestore_options = {
@@ -41,7 +41,7 @@ CONTENTSTORE = {
     'ENGINE': 'xmodule.contentstore.mongo.MongoContentStore',
     'OPTIONS': {
         'host': 'localhost',
-        'db' : 'xcontent',
+        'db': 'xcontent',
     }
 }
 

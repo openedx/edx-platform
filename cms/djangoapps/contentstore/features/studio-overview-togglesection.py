@@ -6,10 +6,12 @@ from nose.tools import assert_true, assert_false, assert_equal
 from logging import getLogger
 logger = getLogger(__name__)
 
+
 @step(u'I have a course with no sections$')
 def have_a_course(step):
     clear_courses()
     course = CourseFactory.create()
+
 
 @step(u'I have a course with 1 section$')
 def have_a_course_with_1_section(step):
@@ -18,8 +20,9 @@ def have_a_course_with_1_section(step):
     section = ItemFactory.create(parent_location=course.location)
     subsection1 = ItemFactory.create(
         parent_location=section.location,
-        template = 'i4x://edx/templates/sequential/Empty',
-        display_name = 'Subsection One',)
+        template='i4x://edx/templates/sequential/Empty',
+        display_name='Subsection One',)
+
 
 @step(u'I have a course with multiple sections$')
 def have_a_course_with_two_sections(step):
@@ -28,19 +31,20 @@ def have_a_course_with_two_sections(step):
     section = ItemFactory.create(parent_location=course.location)
     subsection1 = ItemFactory.create(
         parent_location=section.location,
-        template = 'i4x://edx/templates/sequential/Empty',
-        display_name = 'Subsection One',)
+        template='i4x://edx/templates/sequential/Empty',
+        display_name='Subsection One',)
     section2 = ItemFactory.create(
         parent_location=course.location,
         display_name='Section Two',)
     subsection2 = ItemFactory.create(
         parent_location=section2.location,
-        template = 'i4x://edx/templates/sequential/Empty',
-        display_name = 'Subsection Alpha',)
+        template='i4x://edx/templates/sequential/Empty',
+        display_name='Subsection Alpha',)
     subsection3 = ItemFactory.create(
         parent_location=section2.location,
-        template = 'i4x://edx/templates/sequential/Empty',
-        display_name = 'Subsection Beta',)
+        template='i4x://edx/templates/sequential/Empty',
+        display_name='Subsection Beta',)
+
 
 @step(u'I navigate to the course overview page$')
 def navigate_to_the_course_overview_page(step):
@@ -48,14 +52,17 @@ def navigate_to_the_course_overview_page(step):
     course_locator = '.class-name'
     css_click(course_locator)
 
+
 @step(u'I navigate to the courseware page of a course with multiple sections')
 def nav_to_the_courseware_page_of_a_course_with_multiple_sections(step):
     step.given('I have a course with multiple sections')
     step.given('I navigate to the course overview page')
 
+
 @step(u'I add a section')
 def i_add_a_section(step):
     add_section(name='My New Section That I Just Added')
+
 
 @step(u'I click the "([^"]*)" link$')
 def i_click_the_text_span(step, text):
@@ -65,15 +72,18 @@ def i_click_the_text_span(step, text):
     assert_equal(world.browser.find_by_css(span_locator).value, text)
     css_click(span_locator)
 
+
 @step(u'I collapse the first section$')
 def i_collapse_a_section(step):
     collapse_locator = 'section.courseware-section a.collapse'
     css_click(collapse_locator)
 
+
 @step(u'I expand the first section$')
 def i_expand_a_section(step):
     expand_locator = 'section.courseware-section a.expand'
     css_click(expand_locator)
+
 
 @step(u'I see the "([^"]*)" link$')
 def i_see_the_span_with_text(step, text):
@@ -82,6 +92,7 @@ def i_see_the_span_with_text(step, text):
     assert_equal(world.browser.find_by_css(span_locator).value, text)
     assert_true(world.browser.find_by_css(span_locator).visible)
 
+
 @step(u'I do not see the "([^"]*)" link$')
 def i_do_not_see_the_span_with_text(step, text):
     # Note that the span will exist on the page but not be visible
@@ -89,12 +100,14 @@ def i_do_not_see_the_span_with_text(step, text):
     assert_true(world.browser.is_element_present_by_css(span_locator))
     assert_false(world.browser.find_by_css(span_locator).visible)
 
+
 @step(u'all sections are expanded$')
 def all_sections_are_expanded(step):
     subsection_locator = 'div.subsection-list'
     subsections = world.browser.find_by_css(subsection_locator)
     for s in subsections:
         assert_true(s.visible)
+
 
 @step(u'all sections are collapsed$')
 def all_sections_are_expanded(step):

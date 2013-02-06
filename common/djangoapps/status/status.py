@@ -10,6 +10,7 @@ import sys
 
 log = logging.getLogger(__name__)
 
+
 def get_site_status_msg(course_id):
     """
     Look for a file settings.STATUS_MESSAGE_PATH.  If found, read it,

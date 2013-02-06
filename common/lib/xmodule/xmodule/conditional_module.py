@@ -9,12 +9,13 @@ from pkg_resources import resource_string
 
 log = logging.getLogger('mitx.' + __name__)
 
+
 class ConditionalModule(XModule):
     '''
     Blocks child module from showing unless certain conditions are met.
 
     Example:
-        
+
         <conditional condition="require_completed" required="tag/url_name1&tag/url_name2">
             <video url_name="secret_video" />
         </conditional>
@@ -37,13 +38,13 @@ class ConditionalModule(XModule):
     def __init__(self, system, location, definition, descriptor, instance_state=None, shared_state=None, **kwargs):
         """
         In addition to the normal XModule init, provide:
-        
+
             self.condition            = string describing condition required
 
         """
         XModule.__init__(self, system, location, definition, descriptor, instance_state, shared_state, **kwargs)
         self.contents = None
-        self.condition = self.metadata.get('condition','')
+        self.condition = self.metadata.get('condition', '')
         #log.debug('conditional module required=%s' % self.required_modules_list)
 
     def _get_required_modules(self):
@@ -56,7 +57,7 @@ class ConditionalModule(XModule):
     def is_condition_satisfied(self):
         self._get_required_modules()
 
-        if self.condition=='require_completed':
+        if self.condition == 'require_completed':
             # all required modules must be completed, as determined by
             # the modules .is_completed() method
             for module in self.required_modules:
@@ -70,7 +71,7 @@ class ConditionalModule(XModule):
                 else:
                     log.debug('conditional module: %s IS completed' % module)
             return True
-        elif self.condition=='require_attempted':
+        elif self.condition == 'require_attempted':
             # all required modules must be attempted, as determined by
             # the modules .is_attempted() method
             for module in self.required_modules:
@@ -111,8 +112,9 @@ class ConditionalModule(XModule):
 
         # for now, just deal with one child
         html = self.contents[0]
-        
+
         return json.dumps({'html': html})
+
 
 class ConditionalDescriptor(SequenceDescriptor):
     module_class = ConditionalModule
@@ -125,7 +127,7 @@ class ConditionalDescriptor(SequenceDescriptor):
     def __init__(self, *args, **kwargs):
         super(ConditionalDescriptor, self).__init__(*args, **kwargs)
 
-        required_module_list = [tuple(x.split('/',1)) for x in self.metadata.get('required','').split('&')]
+        required_module_list = [tuple(x.split('/', 1)) for x in self.metadata.get('required', '').split('&')]
         self.required_module_locations = []
         for (tag, name) in required_module_list:
             loc = self.location.dict()
@@ -133,9 +135,8 @@ class ConditionalDescriptor(SequenceDescriptor):
             loc['name'] = name
             self.required_module_locations.append(Location(loc))
         log.debug('ConditionalDescriptor required_module_locations=%s' % self.required_module_locations)
-        
+
     def get_required_module_descriptors(self):
         """Returns a list of XModuleDescritpor instances upon which this module depends, but are
         not children of this module"""
         return [self.system.load_item(loc) for loc in self.required_module_locations]
-    

@@ -15,6 +15,7 @@ from auth.authz import _delete_course_group
 # To run from command line: rake cms:delete_course LOC=MITx/111/Foo1
 #
 
+
 class Command(BaseCommand):
     help = \
 '''Delete a MongoDB backed course'''
@@ -35,6 +36,3 @@ class Command(BaseCommand):
               print 'removing User permissions from course....'
               # in the django layer, we need to remove all the user permissions groups associated with this course
               _delete_course_group(loc)            
-
-
-

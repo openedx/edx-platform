@@ -5,21 +5,15 @@ import requests
 from requests.exceptions import RequestException, ConnectionError, HTTPError
 import sys
 
-from django.conf import settings
-from django.http import HttpResponse, Http404
-
-from courseware.access import has_access
-from util.json_request import expect_json
-from xmodule.course_module import CourseDescriptor
 from xmodule.combined_open_ended_rubric import CombinedOpenEndedRubric, RubricParsingError
 from lxml import etree
-from mitxmako.shortcuts import render_to_string
-from xmodule.x_module import ModuleSystem
 
 log = logging.getLogger(__name__)
 
+
 class GradingServiceError(Exception):
     pass
+
 
 class GradingService(object):
     """
@@ -31,7 +25,7 @@ class GradingService(object):
         self.url = config['url']
         self.login_url = self.url + '/login/'
         self.session = requests.session()
-        self.system = ModuleSystem(None, None, None, render_to_string, None)
+        self.system = config['system']
 
     def _login(self):
         """
@@ -42,20 +36,20 @@ class GradingService(object):
         Returns the decoded json dict of the response.
         """
         response = self.session.post(self.login_url,
-                                     {'username': self.username,
-                                      'password': self.password,})
+            {'username': self.username,
+             'password': self.password, })
 
         response.raise_for_status()
 
         return response.json
 
-    def post(self, url, data, allow_redirects=False): 
+    def post(self, url, data, allow_redirects=False):
         """
         Make a post request to the grading controller
         """
         try:
             op = lambda: self.session.post(url, data=data,
-                                           allow_redirects=allow_redirects)
+                allow_redirects=allow_redirects)
             r = self._try_with_login(op)
         except (RequestException, ConnectionError, HTTPError) as err:
             # reraise as promised GradingServiceError, but preserve stacktrace.
@@ -69,8 +63,8 @@ class GradingService(object):
         """
         log.debug(params)
         op = lambda: self.session.get(url,
-                                      allow_redirects=allow_redirects,
-                                      params=params)
+            allow_redirects=allow_redirects,
+            params=params)
         try:
             r = self._try_with_login(op)
         except (RequestException, ConnectionError, HTTPError) as err:
@@ -78,7 +72,7 @@ class GradingService(object):
             raise GradingServiceError, str(err), sys.exc_info()[2]
 
         return r.text
-        
+
 
     def _try_with_login(self, operation):
         """
@@ -96,8 +90,8 @@ class GradingService(object):
             r = self._login()
             if r and not r.get('success'):
                 log.warning("Couldn't log into staff_grading backend. Response: %s",
-                            r)
-            # try again
+                    r)
+                # try again
             response = operation()
             response.raise_for_status()
 
@@ -113,23 +107,23 @@ class GradingService(object):
         """
         try:
             response_json = json.loads(response)
+        except:
+            response_json = response
+
+        try:
             if 'rubric' in response_json:
                 rubric = response_json['rubric']
-                rubric_renderer = CombinedOpenEndedRubric(self.system, False)
+                rubric_renderer = CombinedOpenEndedRubric(self.system, view_only)
                 success, rubric_html = rubric_renderer.render_rubric(rubric)
                 response_json['rubric'] = rubric_html
             return response_json
-        # if we can't parse the rubric into HTML, 
+        # if we can't parse the rubric into HTML,
         except etree.XMLSyntaxError, RubricParsingError:
             log.exception("Cannot parse rubric string. Raw string: {0}"
-                          .format(rubric))
+            .format(rubric))
             return {'success': False,
-                               'error': 'Error displaying submission'}
+                    'error': 'Error displaying submission'}
         except ValueError:
             log.exception("Error parsing response: {0}".format(response))
             return {'success': False,
-                                'error': "Error displaying submission"} 
-
-
-
-
+                    'error': "Error displaying submission"}

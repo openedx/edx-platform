@@ -30,6 +30,7 @@ PAGES_NEARBY_DELTA = 2
 escapedict = {'"': '&quot;'}
 log = logging.getLogger("edx.discussions")
 
+
 def get_threads(request, course_id, discussion_id=None, per_page=THREADS_PER_PAGE):
     """
     This may raise cc.utils.CommentClientError or
@@ -88,6 +89,7 @@ def get_threads(request, course_id, discussion_id=None, per_page=THREADS_PER_PAG
     query_params['num_pages'] = num_pages
 
     return threads, query_params
+
 
 def inline_discussion(request, course_id, discussion_id):
   
@@ -158,6 +160,7 @@ def inline_discussion(request, course_id, discussion_id):
         'is_cohorted': is_cohorted       
     })
 
+
 @login_required
 def forum_form_discussion(request, course_id):
     
@@ -185,7 +188,7 @@ def forum_form_discussion(request, course_id):
             thread.update(courseware_context)
     if request.is_ajax():
         return utils.JsonResponse({
-            'discussion_data': threads, # TODO: Standardize on 'discussion_data' vs 'threads'
+            'discussion_data': threads,   # TODO: Standardize on 'discussion_data' vs 'threads'
             'annotated_content_info': annotated_content_info,
             'num_pages': query_params['num_pages'],
             'page': query_params['page'],
@@ -210,11 +213,11 @@ def forum_form_discussion(request, course_id):
             'course': course,
             #'recent_active_threads': recent_active_threads,
             #'trending_tags': trending_tags,
-            'staff_access' : has_access(request.user, course, 'staff'),
-            'threads': saxutils.escape(json.dumps(threads),escapedict),
+            'staff_access': has_access(request.user, course, 'staff'),
+            'threads': saxutils.escape(json.dumps(threads), escapedict),
             'thread_pages': query_params['num_pages'],
-            'user_info': saxutils.escape(json.dumps(user_info),escapedict),
-            'annotated_content_info': saxutils.escape(json.dumps(annotated_content_info),escapedict),
+            'user_info': saxutils.escape(json.dumps(user_info), escapedict),
+            'annotated_content_info': saxutils.escape(json.dumps(annotated_content_info), escapedict),
             'course_id': course.id,
             'category_map': category_map,
             'roles': saxutils.escape(json.dumps(utils.get_role_ids(course_id)), escapedict),
@@ -226,6 +229,7 @@ def forum_form_discussion(request, course_id):
         }
         # print "start rendering.."
         return render_to_response('discussion/index.html', context)
+
 
 @login_required
 def single_thread(request, course_id, discussion_id, thread_id):
@@ -296,13 +300,13 @@ def single_thread(request, course_id, discussion_id, thread_id):
         context = {
             'discussion_id': discussion_id,
             'csrf': csrf(request)['csrf_token'],
-            'init': '', #TODO: What is this?
-            'user_info': saxutils.escape(json.dumps(user_info),escapedict),
+            'init': '',   # TODO: What is this?
+            'user_info': saxutils.escape(json.dumps(user_info), escapedict),
             'annotated_content_info': saxutils.escape(json.dumps(annotated_content_info), escapedict),
             'course': course,
             #'recent_active_threads': recent_active_threads,
             #'trending_tags': trending_tags,
-            'course_id': course.id, #TODO: Why pass both course and course.id to template?
+            'course_id': course.id,   # TODO: Why pass both course and course.id to template?
             'thread_id': thread_id,
             'threads': saxutils.escape(json.dumps(threads), escapedict),
             'category_map': category_map,
@@ -317,6 +321,7 @@ def single_thread(request, course_id, discussion_id, thread_id):
 
         return render_to_response('discussion/single_thread.html', context)
 
+
 @login_required
 def user_profile(request, course_id, user_id):
     #TODO: Allow sorting?
@@ -326,7 +331,7 @@ def user_profile(request, course_id, user_id):
 
         query_params = {
             'page': request.GET.get('page', 1),
-            'per_page': THREADS_PER_PAGE, # more than threads_per_page to show more activities
+            'per_page': THREADS_PER_PAGE,   # more than threads_per_page to show more activities
             }
 
         threads, page, num_pages = profiled_user.active_threads(query_params)
@@ -341,7 +346,7 @@ def user_profile(request, course_id, user_id):
                 'discussion_data': map(utils.safe_content, threads),
                 'page': query_params['page'],
                 'num_pages': query_params['num_pages'],
-                'annotated_content_info': saxutils.escape(json.dumps(annotated_content_info),escapedict),
+                'annotated_content_info': saxutils.escape(json.dumps(annotated_content_info), escapedict),
             })
         else:
 
@@ -352,8 +357,8 @@ def user_profile(request, course_id, user_id):
                 'django_user': User.objects.get(id=user_id),
                 'profiled_user': profiled_user.to_dict(),
                 'threads': saxutils.escape(json.dumps(threads), escapedict),
-                'user_info': saxutils.escape(json.dumps(user_info),escapedict),
-                'annotated_content_info': saxutils.escape(json.dumps(annotated_content_info),escapedict),
+                'user_info': saxutils.escape(json.dumps(user_info), escapedict),
+                'annotated_content_info': saxutils.escape(json.dumps(annotated_content_info), escapedict),
 #                'content': content,
             }
 
@@ -369,7 +374,7 @@ def followed_threads(request, course_id, user_id):
 
         query_params = {
             'page': request.GET.get('page', 1),
-            'per_page': THREADS_PER_PAGE, # more than threads_per_page to show more activities
+            'per_page': THREADS_PER_PAGE,   # more than threads_per_page to show more activities
             'sort_key': request.GET.get('sort_key', 'date'),
             'sort_order': request.GET.get('sort_order', 'desc'),
         }
@@ -395,8 +400,8 @@ def followed_threads(request, course_id, user_id):
                 'django_user': User.objects.get(id=user_id),
                 'profiled_user': profiled_user.to_dict(),
                 'threads': saxutils.escape(json.dumps(threads), escapedict),
-                'user_info': saxutils.escape(json.dumps(user_info),escapedict),
-                'annotated_content_info': saxutils.escape(json.dumps(annotated_content_info),escapedict),
+                'user_info': saxutils.escape(json.dumps(user_info), escapedict),
+                'annotated_content_info': saxutils.escape(json.dumps(annotated_content_info), escapedict),
                 #                'content': content,
             }
 

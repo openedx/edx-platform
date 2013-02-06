@@ -6,6 +6,7 @@ import sys
 
 log = logging.getLogger(__name__)
 
+
 class RawDescriptor(XmlDescriptor, XMLEditingDescriptor):
     """
     Module that provides a raw editing view of its data and children.  It
@@ -13,7 +14,7 @@ class RawDescriptor(XmlDescriptor, XMLEditingDescriptor):
     """
     @classmethod
     def definition_from_xml(cls, xml_object, system):
-        return {'data': etree.tostring(xml_object, pretty_print=True,encoding='unicode')}
+        return {'data': etree.tostring(xml_object, pretty_print=True, encoding='unicode')}
 
     def definition_to_xml(self, resource_fs):
         try:
