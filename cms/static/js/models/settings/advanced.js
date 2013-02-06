@@ -59,9 +59,9 @@ CMS.Views.Settings.Advanced = CMS.Views.ValidatingView.extend({
         
         // iterate through model and produce key : value editors for each property in model.get
         var self = this;
-        _.each(this.model.attributes, 
-                function(value, key) {
-                    listEle$.append(self.template({ key : key, value : value}));
+        _.each(_.sortBy(_.keys(this.model.attributes), _.identity), 
+                function(key) {
+                    listEle$.append(self.template({ key : key, value : self[key]}));
                     self.fieldToSelectorMap[key] = key;
         });
         
