@@ -164,19 +164,19 @@ nav .nav-item {
         font-weight: 400;
       }
 
-      .ss-icon {
-       
-      }
-
       &.is-selected {
-        color: $blue;
+        color: $blue-d1;
+
+        .icon-expand {
+          color: $blue-d1;
+        }
       }
     }
 
     // current state
     &.is-current {
 
-      .title {
+      .title, .icon-expanded {
         color: $blue;
       }
     }
@@ -231,7 +231,16 @@ nav .nav-item {
     position: relative;
 
     .icon-expand {
+      @include transition (color 0.5s ease-in-out);
+      margin-left: 2px;
+      color: $gray-l2;
+    }
 
+    &:hover {
+
+      .icon-expand {
+        color: $blue;
+      }
     }
   }
 
@@ -268,7 +277,7 @@ nav .nav-item {
       border-color: rgba(255, 255, 255, 0);
       border-bottom-color: #fff;
       border-width: 5px;
-      right: ($baseline/4);
+      right: 3px;
       margin-left: -5px;
     }
 
@@ -276,7 +285,7 @@ nav .nav-item {
       border-color: rgba(178, 178, 178, 0);
       border-bottom-color: $gray-l2;
       border-width: 6px;
-      right: ($baseline/4);
+      right: 3px;
       margin-left: -6px;
     }
 
@@ -315,12 +324,12 @@ nav .nav-item {
 
     .nav-sub:after {
       left: auto;
-      right: 10px;
+      right: 11px;
     }
 
     .nav-sub:before {
       left: auto;
-      right: 9px;
+      right: 10px;
     }
   }
 
@@ -329,22 +338,22 @@ nav .nav-item {
     .nav-course-courseware {
 
       .nav-sub:after {
-        left: 86px;
+        left: 88px;
       }
 
       .nav-sub:before {
-        left: 86px;
+        left: 88px;
       }
     }
 
     .nav-course-settings {
 
       .nav-sub:after {
-        left: 86px;
+        left: 88px;
       }
 
       .nav-sub:before {
-        left: 86px;
+        left: 88px;
       }
     }
 
@@ -356,11 +365,11 @@ nav .nav-item {
       }
 
       .nav-sub:after {
-        left: 66px;
+        left: 68px;
       }
 
       .nav-sub:before {
-        left: 66px;
+        left: 68px;
       }
     }
   }

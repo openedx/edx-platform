@@ -51,12 +51,13 @@ $(document).ready(function() {
 
       if ($subnav.hasClass('is-shown')) {
         $subnav.removeClass('is-shown');
+        $title.removeClass('is-selected');
       }
 
       else {
         $('.nav-dropdown .nav-item .title').removeClass('is-selected');
         $('.nav-dropdown .nav-item .wrapper-nav-sub').removeClass('is-shown');
-        $title.toggleClass('is-selected');
+        $title.addClass('is-selected');
         $subnav.addClass('is-shown');
       }
     });
