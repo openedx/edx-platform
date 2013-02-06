@@ -157,6 +157,7 @@ class OpenEndedModuleTest(unittest.TestCase):
             'max_score': max_score,
             'display_name': 'Name',
             'accept_file_upload': False,
+            'rewrite_content_links' : "",
             }
 
     oeparam = etree.XML('''
@@ -279,13 +280,15 @@ class CombinedOpenEndedModuleTest(unittest.TestCase):
 
     metadata = {'attempts': '10', 'max_score': max_score}
 
-    static_data = json.dumps({
+    static_data = {
             'max_attempts': 20,
             'prompt': prompt,
             'rubric': rubric,
             'max_score': max_score,
-            'display_name': 'Name'
-            })
+            'display_name': 'Name',
+            'accept_file_upload' : False,
+            'rewrite_content_links' : "",
+            }
 
     oeparam = etree.XML('''
       <openendedparam>
