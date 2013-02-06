@@ -7,13 +7,10 @@ from lxml import etree
 from lxml.html import rewrite_links
 from path import path
 import os
-import dateutil
-import dateutil.parser
-import datetime
 import sys
-from timeparse import parse_timedelta
 
 from pkg_resources import resource_string
+from timeinfo import TimeInfo
 
 from .capa_module import only_one, ComplexEncoder
 from .editing_module import EditingDescriptor
@@ -167,26 +164,16 @@ class CombinedOpenEndedModule(XModule):
         self.accept_file_upload = self.metadata.get('accept_file_upload', ACCEPT_FILE_UPLOAD) in TRUE_DICT
 
         display_due_date_string = self.metadata.get('due', None)
-        if display_due_date_string is not None:
-            try:
-                self.display_due_date = dateutil.parser.parse(display_due_date_string)
-            except ValueError:
-                log.error("Could not parse due date {0} for location {1}".format(display_due_date_string, location))
-                raise
-        else:
-            self.display_due_date = None
 
         grace_period_string = self.metadata.get('graceperiod', None)
-        if grace_period_string is not None and self.display_due_date:
-            try:
-                self.grace_period = parse_timedelta(grace_period_string)
-                self.close_date = self.display_due_date + self.grace_period
-            except:
-                log.error("Error parsing the grace period {0} for location {1}".format(grace_period_string, location))
-                raise
-        else:
-            self.grace_period = None
-            self.close_date = self.display_due_date
+
+        try:
+            self.timeinfo = TimeInfo(display_due_date_string, grace_period_string)  
+        except:
+            log.error("Error parsing due date information in location {0}".format(location))
+            raise
+
+        self.display_due_date = self.timeinfo.display_due_date
 
         # Used for progress / grading.  Currently get credit just for
         # completion (doesn't matter if you self-assessed correct/incorrect).
@@ -210,7 +197,7 @@ class CombinedOpenEndedModule(XModule):
             'rubric': definition['rubric'],
             'display_name': self.display_name,
             'accept_file_upload': self.accept_file_upload,
-            'close_date': self.close_date
+            'close_date': self.timeinfo.close_date
         }
 
         self.task_xml = definition['task_xml']

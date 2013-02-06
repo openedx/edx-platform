@@ -22,7 +22,6 @@ import json
 import logging
 from lxml.html import rewrite_links
 import os
-
 from pkg_resources import resource_string
 from .capa_module import only_one, ComplexEncoder
 from .editing_module import EditingDescriptor
@@ -32,6 +31,7 @@ from .stringify import stringify_children
 from .x_module import XModule
 from .xml_module import XmlDescriptor
 from xmodule.modulestore import Location
+from timeinfo import TimeInfo
 
 from peer_grading_service import peer_grading_service, GradingServiceError
 
@@ -70,6 +70,17 @@ class PeerGradingModule(XModule):
         system.set('location', location)
         self.system = system
         self.peer_gs = peer_grading_service(self.system)
+
+        display_due_date_string = self.metadata.get('due', None)
+        grace_period_string = self.metadata.get('graceperiod', None)
+
+        try:
+            self.timeinfo = TimeInfo(display_due_date_string, grace_period_string)  
+        except:
+            log.error("Error parsing due date information in location {0}".format(location))
+            raise
+
+        self.display_due_date = self.timeinfo.display_due_date
 
         self.use_for_single_location = self.metadata.get('use_for_single_location', USE_FOR_SINGLE_LOCATION)
         if isinstance(self.use_for_single_location, basestring):
