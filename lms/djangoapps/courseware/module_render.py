@@ -2,6 +2,9 @@ import json
 import logging
 import pyparsing
 import sys
+import static_replace
+
+from functools import partial
 
 from django.conf import settings
 from django.contrib.auth.models import User
@@ -18,7 +21,6 @@ from courseware.access import has_access
 from mitxmako.shortcuts import render_to_string
 from models import StudentModule, StudentModuleCache
 from psychometrics.psychoanalyze import make_psychometrics_data_update_handler
-from static_replace import replace_urls
 from student.models import unique_id_for_user
 from xmodule.errortracker import exc_info_to_str
 from xmodule.exceptions import NotFoundError
@@ -244,7 +246,11 @@ def _get_module(user, request, descriptor, student_module_cache, course_id,
                           # TODO (cpennington): This should be removed when all html from
                           # a module is coming through get_html and is therefore covered
                           # by the replace_static_urls code below
-                          replace_urls=replace_urls,
+                          replace_urls=partial(
+                              static_replace.replace_static_urls,
+                              data_directory=descriptor.metadata.get('data_dir', ''),
+                              course_namespace=descriptor.location._replace(category=None, name=None),
+                          ),
                           node_path=settings.NODE_PATH,
                           anonymous_student_id=unique_id_for_user(user),
                           course_id=course_id,
@@ -280,7 +286,7 @@ def _get_module(user, request, descriptor, student_module_cache, course_id,
 
     module.get_html = replace_static_urls(
         _get_html,
-        module.metadata['data_dir'] if 'data_dir' in module.metadata else '', 
+        module.metadata.get('data_dir', ''),
         course_namespace = module.location._replace(category=None, name=None))
 
     # Allow URLs of the form '/course/' refer to the root of multicourse directory

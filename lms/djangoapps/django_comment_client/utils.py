@@ -35,6 +35,7 @@ def strip_blank(dic):
         return isinstance(v, str) and len(v.strip()) == 0
     return dict([(k, v) for k, v in dic.iteritems() if not _is_blank(v)])
 
+# TODO should we be checking if d1 and d2 have the same keys with different values?
 def merge_dict(dic1, dic2):
     return dict(dic1.items() + dic2.items())
 

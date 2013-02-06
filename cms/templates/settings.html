@@ -1,4 +1,5 @@
 <%inherit file="base.html" />
+<%! from django.core.urlresolvers import reverse %>
 <%block name="bodyclass">settings</%block>
 <%block name="title">Settings</%block>
 
@@ -15,24 +16,28 @@ from contentstore import utils
   <script src="${static.url('js/vendor/date.js')}"></script>
   
   <script type="text/javascript" src="${static.url('js/template_loader.js')}"></script>
+  <script type="text/javascript" src="${static.url('js/views/server_error.js')}"></script>
   <script type="text/javascript" src="${static.url('js/models/course_relative.js')}"></script>
-  <script type="text/javascript" src="${static.url('js/models/settings/advanced.js')}"></script>
   <script type="text/javascript" src="${static.url('js/models/settings/course_details.js')}"></script>
   <script type="text/javascript" src="${static.url('js/models/settings/course_settings.js')}"></script>
   <script type="text/javascript" src="${static.url('js/models/settings/course_grading_policy.js')}"></script>
   <script type="text/javascript" src="${static.url('js/views/settings/main_settings_view.js')}"></script>
-  <script type="text/javascript" src="${static.url('js/views/server_error.js')}"></script>
+  <script type="text/javascript" src="${static.url('js/models/settings/advanced.js')}"></script>
   
   <script type="text/javascript">
     $(document).ready(function(){
 
+        // proactively populate advanced b/c it has the filtered list and doesn't really follow the model pattern
+        var advancedModel = new CMS.Models.Settings.Advanced(${advanced_dict | n}, {parse:true});
+        advancedModel.blacklistKeys = ${advanced_blacklist | n};
+        advancedModel.url = "${reverse('course_advanced_settings', kwargs=dict(org=context_course.location.org, course=context_course.location.course, name=context_course.location.name))}";
+        
         var settingsModel = new CMS.Models.Settings.CourseSettings({
             courseLocation: new CMS.Models.Location('${context_course.location}',{parse:true}),
-            details: new CMS.Models.Settings.CourseDetails(${course_details|n},{parse:true})
+            details: new CMS.Models.Settings.CourseDetails(${course_details|n},{parse:true}),
+            advanced: advancedModel
         });
 
-        var advancedSettingsModel = new CMS.Models.Settings.Advanced({});
-        
         var editor = new CMS.Views.Settings.Main({
             el: $('.main-wrapper'),
             model : settingsModel
@@ -743,90 +748,6 @@ from contentstore import utils
 
                   <!-- basic empty & initial empty field (if user had no values yet) -->
                   <ul class="input-list course-advanced-policy-list">
-                    <li class="input multi course-advanced-policy-list-item">
-                      <div class="row">
-                        <div class="key">
-                          <label for="course-advanced-policy-1-key">Policy Key:</label>
-                          <div class="field">
-                            <input type="text" class="short" id="course-advanced-policy-1-key" value="" />
-                            <span class="tip tip-stacked">Keys are case sensitive and cannot contain spaces or start with a number</span>
-                          </div>      
-                        </div>
-                        <div class="value">
-                          <label for="course-advanced-policy-1-value">Policy Value:</label>
-                          <div class="field">
-                            <div class="ace text" id="course-advanced-policy-1-value">some existing text</div>
-                          </div>      
-                        </div>
-                      </div>
-                      <a href="#" class="delete-button standard remove-item advanced-policy-data"><span class="delete-icon"></span>Delete</a>
-                    </li>
-
-                    <!-- error existing key pair example -->
-                    <li class="input multi course-advanced-policy-list-item">
-                      <div class="row">
-                        <div class="key">
-                          <label for="course-advanced-policy-2-key">Policy Key:</label>
-                          <div class="field">
-                            <input type="text" class="short" id="course-advanced-policy-2-key" value="" />
-                            <span class="tip tip-stacked">Keys are case sensitive and cannot contain spaces or start with a number</span>
-                          </div>      
-                        </div>
-                        <div class="value">
-                          <label for="course-advanced-policy-2-value">Policy Value:</label>
-                          <div class="field">
-                            <textarea class="ace text" id="course-advanced-policy-2-value"></textarea>
-                          </div>      
-                        </div>
-                      </div>
-                      <span class="message-error">This policy key, $KEYNAME, already exists.</span>
-
-                      <a href="#" class="delete-button standard remove-item advanced-policy-data"><span class="delete-icon"></span>Delete</a>
-                    </li>
-
-                    <!-- error on key left empty example -->
-                    <li class="input multi course-advanced-policy-list-item">
-                      <div class="row">
-                        <div class="key error">
-                          <label for="course-advanced-policy-3-key">Policy Key:</label>
-                          <div class="field">
-                            <input type="text" class="short" id="course-advanced-policy-3-key" value="" />
-                            <span class="tip tip-stacked">Keys are case sensitive and cannot contain spaces or start with a number</span>
-                          </div>      
-                        </div>
-                        <div class="value error">
-                          <label for="course-advanced-policy-3-value">Policy Value:</label>
-                          <div class="field">
-                            <textarea class="ace text" id="course-advanced-policy-3-value"></textarea>
-                          </div>      
-                        </div>
-                      </div>
-                      <span class="message-error">You cannot leave the key value for this pair blank.</span>
-
-                      <a href="#" class="delete-button standard remove-item advanced-policy-data"><span class="delete-icon"></span>Delete</a>
-                    </li>
-
-                    <!-- error with value formatting example -->
-                    <li class="input multi course-advanced-policy-list-item">
-                      <div class="row">
-                        <div class="key error">
-                          <label for="course-advanced-policy-4-key">Policy Key:</label>
-                          <div class="field">
-                            <input type="text" class="short" id="course-advanced-policy-4-key" value="" />
-                            <span class="tip tip-stacked">Keys are case sensitive and cannot contain spaces or start with a number</span>
-                          </div>  
-                        </div>
-                        <div class="value error">
-                          <label for="course-advanced-policy-4-value">Policy Value:</label>
-                          <div class="field">
-                            <textarea class="ace text" id="course-advanced-policy-4-value" value=""></textarea>
-                          </div>      
-                        </div>
-                      </div>
-                      <span class="message-error">The JSON value for $KEYNAME is invalid.</span>
-
-                      <a href="#" class="delete-button standard remove-item advanced-policy-data"><span class="delete-icon"></span>Delete</a>
-                    </li>
                   </ul>                  
 
                   <!-- advanced policy actions -->
@@ -838,14 +759,6 @@ from contentstore import utils
                     </a>
                   </div>
 
-                  <!-- advanced policy actions (with disabled save state) -->
-                  <div class="actions actions-advanced-policies">
-                    <a href="#" class="save-button disabled">Save</a>
-                    <a href="#" class="cancel-button">Cancel</a>
-                    <a href="#" class="new-button new-advanced-policy-item add-policy-data">
-                      <span class="plus-icon white"></span>New Manual Policy
-                    </a>
-                  </div>
                 </div>
               </div>
             </section><!-- .settings-advanced-policies -->

@@ -7,8 +7,7 @@ import logging
 import requests
 from requests.exceptions import RequestException, ConnectionError, HTTPError
 import sys
-from grading_service import GradingService
-from grading_service import GradingServiceError
+from xmodule.grading_service_module import GradingService, GradingServiceError
 
 from django.conf import settings
 from django.http import HttpResponse, Http404
@@ -21,8 +20,6 @@ from xmodule.x_module import ModuleSystem
 from mitxmako.shortcuts import render_to_string
 
 log = logging.getLogger(__name__)
-
-
 
 class MockStaffGradingService(object):
     """
@@ -64,6 +61,7 @@ class StaffGradingService(GradingService):
     Interface to staff grading backend.
     """
     def __init__(self, config):
+        config['system'] = ModuleSystem(None,None,None,render_to_string,None)
         super(StaffGradingService, self).__init__(config)
         self.get_next_url = self.url + '/get_next_submission/'
         self.save_grade_url = self.url + '/save_grade/'

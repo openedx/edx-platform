@@ -8,7 +8,9 @@ $(document).ready(function() {
         handle: '.drag-handle',
         zIndex: 999,  
         start: initiateHesitate,
-        drag: checkHoverState,
+        // left 2nd arg in as inert selector b/c i was uncertain whether we'd try to get the shove up/down
+        // to work in the future
+        drag: generateCheckHoverState('.collapsed', ''), 
         stop: removeHesitate,
         revert: "invalid"
     });
@@ -19,7 +21,7 @@ $(document).ready(function() {
         handle: '.section-item .drag-handle',
         zIndex: 999,  
         start: initiateHesitate,
-        drag: checkHoverState,
+        drag: generateCheckHoverState('.courseware-section.collapsed', ''),
         stop: removeHesitate,
         revert: "invalid"
     });
@@ -56,64 +58,100 @@ $(document).ready(function() {
         drop: onSectionReordered,
         greedy: true
     });
-    
-});
 
+});
 
 CMS.HesitateEvent.toggleXpandHesitation = null;
 function initiateHesitate(event, ui) {
         CMS.HesitateEvent.toggleXpandHesitation = new CMS.HesitateEvent(expandSection, 'dragLeave', true);
         $('.collapsed').on('dragEnter', CMS.HesitateEvent.toggleXpandHesitation, CMS.HesitateEvent.toggleXpandHesitation.trigger);
-        $('.collapsed').each(function() {
+        $('.collapsed, .unit, .id-holder').each(function() {
                 this.proportions = {width : this.offsetWidth, height : this.offsetHeight };
                 // reset b/c these were holding values from aborts
                 this.isover = false;
         });
 }
-function checkHoverState(event, ui) {
+
+function computeIntersection(droppable, uiHelper, y) {
+    /*
+     * Test whether y falls within the bounds of the droppable on the Y axis
+     */
+    // NOTE: this only judges y axis intersection b/c that's all we're doing right now
+    //  don't expand the thing being carried
+    if (uiHelper.is(droppable)) {
+        return null;
+    }
+
+    $.extend(droppable, {offset : $(droppable).offset()});
+
+    var t = droppable.offset.top, 
+        b = t + droppable.proportions.height;
+
+    if (t === b) {
+        // probably wrong values b/c invisible at the time of caching
+        droppable.proportions = { width : droppable.offsetWidth, height : droppable.offsetHeight };
+        b = t + droppable.proportions.height;
+    }
+    //  equivalent to the intersects test
+    return (t < y && // Bottom Half
+                y  < b ); // Top Half
+}
+
+// NOTE: selectorsToShove is not currently being used but I left this code as it did work but not well
+function generateCheckHoverState(selectorsToOpen, selectorsToShove) {
+    return function(event, ui) {
         // copied from jquery.ui.droppable.js $.ui.ddmanager.drag & other ui.intersect
         var draggable = $(this).data("ui-draggable"),
-                x1 = (draggable.positionAbs || draggable.position.absolute).left + (draggable.helperProportions.width / 2), 
-                y1 = (draggable.positionAbs || draggable.position.absolute).top + (draggable.helperProportions.height / 2);
-        $('.collapsed').each(function() {
-                // don't expand the thing being carried
-                if (ui.helper.is(this)) {
-                        return;
-                }
-                
-                $.extend(this, {offset : $(this).offset()});
+            centerY = (draggable.positionAbs || draggable.position.absolute).top + (draggable.helperProportions.height / 2);
+        $(selectorsToOpen).each(function() {
+            var intersects = computeIntersection(this, ui.helper, centerY),
+                c = !intersects && this.isover ? "isout" : (intersects && !this.isover ? "isover" : null);
 
-                var droppable = this,
-                        l = droppable.offset.left, 
-                        r = l + droppable.proportions.width,
-                        t = droppable.offset.top, 
-                        b = t + droppable.proportions.height;
-                
-                if (l === r) {
-                        // probably wrong values b/c invisible at the time of caching
-                        droppable.proportions = { width : droppable.offsetWidth, height : droppable.offsetHeight };
-                        r = l + droppable.proportions.width;
-                        b = t + droppable.proportions.height;
-                }
-                // equivalent to the intersects test
-                var intersects = (l < x1  && // Right Half
-                                        x1  < r && // Left Half
-                                        t < y1 && // Bottom Half
-                                        y1  < b ), // Top Half
+            if(!c) {
+                return;
+            }
 
-                        c = !intersects && this.isover ? "isout" : (intersects && !this.isover ? "isover" : null);
-                        
-                if(!c) {
-                        return;
-                }
-
-                this[c] = true;
-                this[c === "isout" ? "isover" : "isout"] = false;
-                $(this).trigger(c === "isover" ? "dragEnter" : "dragLeave");
+            this[c] = true;
+            this[c === "isout" ? "isover" : "isout"] = false;
+            $(this).trigger(c === "isover" ? "dragEnter" : "dragLeave");
         });
+        
+        $(selectorsToShove).each(function() {
+            var intersectsBottom = computeIntersection(this, ui.helper, (draggable.positionAbs || draggable.position.absolute).top);
+            
+            if ($(this).hasClass('ui-dragging-pushup')) {
+                if (!intersectsBottom) {
+                     console.log('not up', $(this).data('id'));
+                     $(this).removeClass('ui-dragging-pushup');
+                 }
+            }
+            else if (intersectsBottom) {
+                console.log('up', $(this).data('id'));
+                $(this).addClass('ui-dragging-pushup');
+            }
+            
+            var intersectsTop = computeIntersection(this, ui.helper, 
+                    (draggable.positionAbs || draggable.position.absolute).top + draggable.helperProportions.height);
+            
+            if ($(this).hasClass('ui-dragging-pushdown')) {
+                if (!intersectsTop) {
+                    console.log('not down', $(this).data('id'));
+                    $(this).removeClass('ui-dragging-pushdown');
+                }
+            }
+            else if (intersectsTop) {
+                console.log('down', $(this).data('id'));
+                $(this).addClass('ui-dragging-pushdown');
+            }
+            
+        });
+    }
 }
+
 function removeHesitate(event, ui) {
         $('.collapsed').off('dragEnter', CMS.HesitateEvent.toggleXpandHesitation.trigger);
+        $('.ui-dragging-pushdown').removeClass('ui-dragging-pushdown');
+        $('.ui-dragging-pushup').removeClass('ui-dragging-pushup');
         CMS.HesitateEvent.toggleXpandHesitation = null;
 }
 
@@ -189,3 +227,5 @@ function _handleReorder(event, ui, parentIdField, childrenSelector) {
         });
 
 }
+
+
