@@ -320,7 +320,7 @@ class CombinedOpenEndedModuleTest(unittest.TestCase):
     descriptor = Mock()
 
     def setUp(self):
-        self.combinedoe = CombinedOpenEndedV1Module(test_system, self.location, self.definition, self.descriptor, self.static_data, metadata=self.metadata)
+        self.combinedoe = CombinedOpenEndedV1Module(test_system, self.location, self.definition, self.descriptor, static_data = self.static_data, metadata=self.metadata)
 
     def test_get_tag_name(self):
         name = self.combinedoe.get_tag_name("<t>Tag</t>")
