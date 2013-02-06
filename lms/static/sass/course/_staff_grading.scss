@@ -10,7 +10,8 @@ div.peer-grading{
     }
 
     h2{
-        a{
+        a
+        {
             text-size: .5em;
         }
     }
@@ -22,7 +23,6 @@ div.peer-grading{
     label {
         margin: 0px;
         padding: 2px;
-        @include: inline-block;
         min-width: 50px;
         background-color: #CCC;
         text-size: 1.5em;
