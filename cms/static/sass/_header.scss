@@ -402,6 +402,14 @@ nav .nav-item {
 // STATE: not signed in
 .not-signedin {
 
+  .wrapper-left {
+    width: flex-grid(4, 12);
+  }
+
+  .wrapper-right {
+    width: flex-grid(8, 12);
+  }
+
   // STATE: not signed in - unauthenticated nav
   .nav-not-signedin {
     float: right;
