@@ -21,6 +21,7 @@ def _url_replace_regex(prefix):
         (?P=quote)           # the first matching closing quote
         """.format(prefix=prefix)
 
+
 def try_staticfiles_lookup(path):
     """
     Try to lookup a path in staticfiles_storage.  If it fails, return

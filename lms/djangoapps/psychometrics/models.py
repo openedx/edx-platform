@@ -7,6 +7,7 @@
 from django.db import models
 from courseware.models import StudentModule
 
+
 class PsychometricData(models.Model):
     """
     This data is a table linking student, module, and module performance,
@@ -25,7 +26,7 @@ class PsychometricData(models.Model):
 
     done = models.BooleanField(default=False)
     attempts = models.IntegerField(default=0)			# extracted from studentmodule.state
-    checktimes = models.TextField(null=True, blank=True)	# internally stored as list of datetime objects
+    checktimes = models.TextField(null=True, blank=True)  	# internally stored as list of datetime objects
 
     # keep in mind
     # grade = studentmodule.grade
@@ -33,7 +34,7 @@ class PsychometricData(models.Model):
     # student = studentmodule.student
     # course_id = studentmodule.course_id
     # location = studentmodule.module_state_key
-    
+
     def __unicode__(self):
         sm = self.studentmodule
         return "[PsychometricData] %s url=%s, grade=%s, max=%s, attempts=%s, ct=%s" % (sm.student,
@@ -42,4 +43,3 @@ class PsychometricData(models.Model):
                                                                                        sm.max_grade,
                                                                                        self.attempts,
                                                                                        self.checktimes)
-    

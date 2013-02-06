@@ -4,13 +4,17 @@
 #
 # Create all staff_* groups for classes in data directory.
 
-import os, sys, string, re
+import os
+import sys
+import string
+import re
 
 from django.core.management.base import BaseCommand
 from django.conf import settings
 from django.contrib.auth.models import User, Group
 from path import path
 from lxml import etree
+
 
 def create_groups():
     '''
@@ -26,7 +30,7 @@ def create_groups():
             continue
         if not os.path.isdir(path(data_dir) / course_dir):
             continue
-        
+
         cxfn = path(data_dir) / course_dir / 'course.xml'
         try:
             coursexml = etree.parse(cxfn)
@@ -38,10 +42,11 @@ def create_groups():
         if course is None:
             print "oops, can't get course id for %s" % course_dir
             continue
-        print "course=%s for course_dir=%s" % (course,course_dir)
-    
+        print "course=%s for course_dir=%s" % (course, course_dir)
+
         create_group('staff_%s' % course)		# staff group
         create_group('instructor_%s' % course)		# instructor group (can manage staff group list)
+
 
 def create_group(gname):
     if Group.objects.filter(name=gname):
@@ -50,6 +55,7 @@ def create_group(gname):
     g = Group(name=gname)
     g.save()
     print "    created group %s" % gname
+
 
 class Command(BaseCommand):
     help = "Create groups associated with all courses in data_dir."

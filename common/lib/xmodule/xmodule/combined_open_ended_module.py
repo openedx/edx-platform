@@ -50,13 +50,15 @@ ACCEPT_FILE_UPLOAD = False
 TRUE_DICT = ["True", True, "TRUE", "true"]
 
 HUMAN_TASK_TYPE = {
-    'selfassessment' : "Self Assessment",
-    'openended' : "External Grader",
+    'selfassessment': "Self Assessment",
+    'openended': "External Grader",
 }
+
 
 class IncorrectMaxScoreError(Exception):
     def __init__(self, msg):
         self.msg = msg
+
 
 class CombinedOpenEndedModule(XModule):
     """

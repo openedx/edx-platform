@@ -51,7 +51,7 @@ class ABTestModule(XModule):
 
     def get_shared_state(self):
         return json.dumps({'group': self.group})
-    
+
     def get_child_descriptors(self):
         active_locations = set(self.definition['data']['group_content'][self.group])
         return [desc for desc in self.descriptor.get_children() if desc.location.url() in active_locations]
@@ -171,7 +171,7 @@ class ABTestDescriptor(RawDescriptor, XmlDescriptor):
                 group_elem.append(etree.fromstring(child.export_to_xml(resource_fs)))
 
         return xml_object
-    
-    
+
+
     def has_dynamic_children(self):
         return True

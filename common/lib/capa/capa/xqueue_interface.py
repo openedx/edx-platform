@@ -10,6 +10,7 @@ import requests
 log = logging.getLogger('mitx.' + __name__)
 dateformat = '%Y%m%d%H%M%S'
 
+
 def make_hashkey(seed):
     '''
     Generate a string key by hashing
@@ -29,9 +30,9 @@ def make_xheader(lms_callback_url, lms_key, queue_name):
           'queue_name': designate a specific queue within xqueue server, e.g. 'MITx-6.00x' (string)
         }
     """
-    return json.dumps({ 'lms_callback_url': lms_callback_url,
+    return json.dumps({'lms_callback_url': lms_callback_url,
                         'lms_key': lms_key,
-                        'queue_name': queue_name })
+                        'queue_name': queue_name})
 
 
 def parse_xreply(xreply):
@@ -96,18 +97,18 @@ class XQueueInterface(object):
 
 
     def _login(self):
-        payload = { 'username': self.auth['username'],
-                    'password': self.auth['password'] }
+        payload = {'username': self.auth['username'],
+                    'password': self.auth['password']}
         return self._http_post(self.url + '/xqueue/login/', payload)
 
 
     def _send_to_queue(self, header, body, files_to_upload):
         payload = {'xqueue_header': header,
-                   'xqueue_body'  : body}
+                   'xqueue_body': body}
         files = {}
         if files_to_upload is not None:
             for f in files_to_upload:
-                files.update({ f.name: f })
+                files.update({f.name: f})
 
         return self._http_post(self.url + '/xqueue/submit/', payload, files=files)
 

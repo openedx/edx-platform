@@ -39,7 +39,7 @@ class Command(BaseCommand):
         ("LastUpdate", "user_updated_at"),  # in UTC, so same as what we store
     ])
 
-    # define defaults, even thought 'store_true' shouldn't need them.  
+    # define defaults, even thought 'store_true' shouldn't need them.
     # (call_command will set None as default value for all options that don't have one,
     # so one cannot rely on presence/absence of flags in that world.)
     option_list = BaseCommand.option_list + (
@@ -56,7 +56,7 @@ class Command(BaseCommand):
     )
 
     def handle(self, **options):
-        # update time should use UTC in order to be comparable to the user_updated_at 
+        # update time should use UTC in order to be comparable to the user_updated_at
         # field
         uploaded_at = datetime.utcnow()
 
@@ -100,7 +100,7 @@ class Command(BaseCommand):
                                     extrasaction='ignore')
             writer.writeheader()
             for tcu in TestCenterUser.objects.order_by('id'):
-                if tcu.needs_uploading: # or dump_all
+                if tcu.needs_uploading:   # or dump_all
                     record = dict((csv_field, ensure_encoding(getattr(tcu, model_field)))
                                   for csv_field, model_field
                                   in Command.CSV_TO_MODEL_FIELDS.items())

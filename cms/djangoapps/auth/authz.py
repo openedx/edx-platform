@@ -18,6 +18,8 @@ STAFF_ROLE_NAME = 'staff'
 # we're just making a Django group for each location/role combo
 # to do this we're just creating a Group name which is a formatted string
 # of those two variables
+
+
 def get_course_groupname_for_role(location, role):
     loc = Location(location)
     # hack: check for existence of a group name in the legacy LMS format <role>_<course>
@@ -25,10 +27,11 @@ def get_course_groupname_for_role(location, role):
     # more information
     groupname = '{0}_{1}'.format(role, loc.course)
 
-    if len(Group.objects.filter(name = groupname)) == 0:
-        groupname = '{0}_{1}'.format(role,loc.course_id)
+    if len(Group.objects.filter(name=groupname)) == 0:
+        groupname = '{0}_{1}'.format(role, loc.course_id)
 
     return groupname
+
 
 def get_users_in_course_group_by_role(location, role):
     groupname = get_course_groupname_for_role(location, role)
@@ -39,6 +42,8 @@ def get_users_in_course_group_by_role(location, role):
 '''
 Create all permission groups for a new course and subscribe the caller into those roles
 '''
+
+
 def create_all_course_groups(creator, location):
     create_new_course_group(creator, location, INSTRUCTOR_ROLE_NAME)
     create_new_course_group(creator, location, STAFF_ROLE_NAME)
@@ -46,7 +51,7 @@ def create_all_course_groups(creator, location):
 
 def create_new_course_group(creator, location, role):
     groupname = get_course_groupname_for_role(location, role)
-    (group, created) =Group.objects.get_or_create(name=groupname)
+    (group, created) = Group.objects.get_or_create(name=groupname)
     if created:
         group.save()
 
@@ -59,6 +64,8 @@ def create_new_course_group(creator, location, role):
 This is to be called only by either a command line code path or through a app which has already
 asserted permissions
 '''
+
+
 def _delete_course_group(location):
     # remove all memberships
     instructors = Group.objects.get(name=get_course_groupname_for_role(location, INSTRUCTOR_ROLE_NAME))
@@ -75,6 +82,8 @@ def _delete_course_group(location):
 This is to be called only by either a command line code path or through an app which has already
 asserted permissions to do this action
 '''
+
+
 def _copy_course_group(source, dest):
     instructors = Group.objects.get(name=get_course_groupname_for_role(source, INSTRUCTOR_ROLE_NAME))
     new_instructors_group = Group.objects.get(name=get_course_groupname_for_role(dest, INSTRUCTOR_ROLE_NAME))
@@ -86,7 +95,7 @@ def _copy_course_group(source, dest):
     new_staff_group = Group.objects.get(name=get_course_groupname_for_role(dest, STAFF_ROLE_NAME))
     for user in staff.user_set.all():
         user.groups.add(new_staff_group)
-        user.save()    
+        user.save()
 
 
 def add_user_to_course_group(caller, user, location, role):
@@ -133,8 +142,6 @@ def remove_user_from_course_group(caller, user, location, role):
 def is_user_in_course_group_role(user, location, role):
     if user.is_active and user.is_authenticated:
         # all "is_staff" flagged accounts belong to all groups
-        return user.is_staff or user.groups.filter(name=get_course_groupname_for_role(location,role)).count() > 0
+        return user.is_staff or user.groups.filter(name=get_course_groupname_for_role(location, role)).count() > 0
 
     return False
-
-    

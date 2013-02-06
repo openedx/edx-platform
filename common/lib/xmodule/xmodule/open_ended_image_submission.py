@@ -51,6 +51,7 @@ MAX_COLORS_TO_COUNT = 16
 #Maximum number of colors allowed in an uploaded image
 MAX_COLORS = 400
 
+
 class ImageProperties(object):
     """
     Class to check properties of an image and to validate if they are allowed.
@@ -187,6 +188,7 @@ class URLProperties(object):
                 return success
         return success
 
+
 def run_url_tests(url_string):
     """
     Creates a URLProperties object and runs all tests
@@ -244,7 +246,7 @@ def upload_to_s3(file_to_upload, keyname):
         #k.set_metadata("Content-Type", 'images/png')
 
         k.set_acl("public-read")
-        public_url = k.generate_url(60 * 60 * 24 * 365) # URL timeout in seconds.
+        public_url = k.generate_url(60 * 60 * 24 * 365)   # URL timeout in seconds.
 
         return True, public_url
     except:
@@ -260,6 +262,3 @@ def get_from_s3(s3_public_url):
     r = requests.get(s3_public_url, timeout=2)
     data = r.text
     return data
-
-
-

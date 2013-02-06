@@ -46,10 +46,10 @@ class Command(BaseCommand):
             if not hasattr(settings, value):
                 raise CommandError('No entry in the AWS settings'
                                    '(env/auth.json) for {0}'.format(value))
-                
+
         # check additional required settings for import and export:
         if options['mode'] in ('export', 'both'):
-            for value in ['LOCAL_EXPORT','SFTP_EXPORT']: 
+            for value in ['LOCAL_EXPORT', 'SFTP_EXPORT']:
                 if value not in settings.PEARSON:
                     raise CommandError('No entry in the PEARSON settings'
                                        '(env/auth.json) for {0}'.format(value))
@@ -57,9 +57,9 @@ class Command(BaseCommand):
             source_dir = settings.PEARSON['LOCAL_EXPORT']
             if not os.path.isdir(source_dir):
                 os.makedirs(source_dir)
-                    
+
         if options['mode'] in ('import', 'both'):
-            for value in ['LOCAL_IMPORT','SFTP_IMPORT']: 
+            for value in ['LOCAL_IMPORT', 'SFTP_IMPORT']:
                 if value not in settings.PEARSON:
                     raise CommandError('No entry in the PEARSON settings'
                                        '(env/auth.json) for {0}'.format(value))
@@ -76,7 +76,7 @@ class Command(BaseCommand):
                     t.connect(username=settings.PEARSON['SFTP_USERNAME'],
                               password=settings.PEARSON['SFTP_PASSWORD'])
                     sftp = paramiko.SFTPClient.from_transport(t)
-                    
+
                     if mode == 'export':
                         try:
                             sftp.chdir(files_to)
@@ -92,7 +92,7 @@ class Command(BaseCommand):
                         except IOError:
                             raise CommandError('SFTP source path does not exist: {}'.format(files_from))
                         for filename in sftp.listdir('.'):
-                            # skip subdirectories 
+                            # skip subdirectories
                             if not S_ISDIR(sftp.stat(filename).st_mode):
                                 sftp.get(filename, files_to + '/' + filename)
                                 # delete files from sftp server once they are successfully pulled off:
@@ -112,7 +112,7 @@ class Command(BaseCommand):
                 try:
                     for filename in os.listdir(files_from):
                         source_file = os.path.join(files_from, filename)
-                        # use mode as name of directory into which to write files 
+                        # use mode as name of directory into which to write files
                         dest_file = os.path.join(mode, filename)
                         upload_file_to_s3(bucket, source_file, dest_file)
                         if deleteAfterCopy:
@@ -135,17 +135,17 @@ class Command(BaseCommand):
             k.set_contents_from_filename(source_file)
 
         def export_pearson():
-            options = { 'dest-from-settings' : True }
+            options = {'dest-from-settings': True}
             call_command('pearson_export_cdd', **options)
             call_command('pearson_export_ead', **options)
             mode = 'export'
-            sftp(settings.PEARSON['LOCAL_EXPORT'], settings.PEARSON['SFTP_EXPORT'], mode, deleteAfterCopy = False)
+            sftp(settings.PEARSON['LOCAL_EXPORT'], settings.PEARSON['SFTP_EXPORT'], mode, deleteAfterCopy=False)
             s3(settings.PEARSON['LOCAL_EXPORT'], settings.PEARSON['S3_BUCKET'], mode, deleteAfterCopy=True)
 
         def import_pearson():
             mode = 'import'
             try:
-                sftp(settings.PEARSON['SFTP_IMPORT'], settings.PEARSON['LOCAL_IMPORT'], mode, deleteAfterCopy = True)
+                sftp(settings.PEARSON['SFTP_IMPORT'], settings.PEARSON['LOCAL_IMPORT'], mode, deleteAfterCopy=True)
                 s3(settings.PEARSON['LOCAL_IMPORT'], settings.PEARSON['S3_BUCKET'], mode, deleteAfterCopy=False)
             except Exception as e:
                 dog_http_api.event('Pearson Import failure', str(e))
