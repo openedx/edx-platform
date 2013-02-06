@@ -1,5 +1,4 @@
 #!/usr/bin/env python
-from django.core import management
 
 import argparse
 import os
@@ -42,21 +41,34 @@ def main(argv):
     test_py_path = find_full_path(test_py_path)
     test_spec = "%s:%s.%s" % (test_py_path, test_class, test_method)
 
+    settings = None
     if test_py_path.startswith('cms'):
         settings = 'cms.envs.test'
     elif test_py_path.startswith('lms'):
         settings = 'lms.envs.test'
+
+    if settings:
+        # Run as a django test suite
+        from django.core import management
+
+        django_args = ["django-admin.py", "test", "--pythonpath=."]
+        django_args.append("--settings=%s" % settings)
+        if args.nocapture:
+            django_args.append("-s")
+        django_args.append(test_spec)
+
+        print " ".join(django_args)
+        management.execute_from_command_line(django_args)
     else:
-        raise Exception("Couldn't determine settings to use!")
+        # Run as a nose test suite
+        import nose.core
+        nose_args = ["nosetests"]
+        if args.nocapture:
+            nose_args.append("-s")
+        nose_args.append(test_spec)
+        print " ".join(nose_args)
+        nose.core.main(argv=nose_args)
 
-    django_args = ["django-admin.py", "test", "--pythonpath=."]
-    django_args.append("--settings=%s" % settings)
-    if args.nocapture:
-        django_args.append("-s")
-    django_args.append(test_spec)
-
-    print " ".join(django_args)
-    management.execute_from_command_line(django_args)
 
 if __name__ == "__main__":
     main(sys.argv[1:])
