@@ -152,14 +152,14 @@ function PollMain(el) {
     this.questionEl = $(el).find('.poll_question');
     if (this.questionEl.length !== 1) {
         // We require one question DOM element.
-        logme('ERROR: PollMain constructor ');
+        logme('ERROR: PollMain constructor requires one question DOM element.');
 
         return;
     }
 
     // Just a safety precussion. If we run this code more than once, multiple 'click' callback handlers will be
     // attached to the same DOM elements. We don't want this to happen.
-    if (this.vertModEl.attr('poll_main_processed') === 'true') {
+    if (this.questionEl.attr('poll_main_processed') === 'true') {
         logme(
             'ERROR: PolMain JS constructor was called on a DOM element that has already been processed once.'
         );
@@ -169,7 +169,7 @@ function PollMain(el) {
 
     // This element was not processed earlier.
     // Make sure that next time we will not process this element a second time.
-    this.vertModEl.attr('poll_main_processed', 'true');
+    this.questionEl.attr('poll_main_processed', 'true');
 
     // Access this object inside inner functions.
     _this = this;
@@ -239,6 +239,18 @@ function PollMain(el) {
 
             return;
         }
+    }
+
+    if (
+        (this.jsonConfig.poll_answer.length > 0) &&
+        (this.jsonConfig.answers.hasOwnProperty(this.jsonConfig.poll_answer) === false)
+    ) {
+        this.questionEl.append(
+            '<h3>Error!</h3>' +
+            '<p>XML data format changed. List of answers was modified, but poll data was not updated.</p>'
+        );
+
+        return;
     }
 
     // Get the DOM id of the question.
