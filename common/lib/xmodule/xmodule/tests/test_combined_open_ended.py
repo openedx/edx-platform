@@ -324,14 +324,14 @@ class CombinedOpenEndedModuleTest(unittest.TestCase):
         response_dict = self.combinedoe.get_last_response(0)
         self.assertEqual(response_dict['type'], "selfassessment")
         self.assertEqual(response_dict['max_score'], self.max_score)
-        self.assertEqual(response_dict['state'], CombinedOpenEndedModule.INITIAL)
+        self.assertEqual(response_dict['state'], CombinedOpenEndedV1Module.INITIAL)
 
     def test_update_task_states(self):
         changed = self.combinedoe.update_task_states()
         self.assertFalse(changed)
 
         current_task = self.combinedoe.current_task
-        current_task.change_state(CombinedOpenEndedModule.DONE)
+        current_task.change_state(CombinedOpenEndedV1Module.DONE)
         changed = self.combinedoe.update_task_states()
 
         self.assertTrue(changed)
