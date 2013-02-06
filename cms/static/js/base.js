@@ -44,7 +44,7 @@ $(document).ready(function() {
 
     $('.nav-dropdown .nav-item .title').click(function(e){
 
-        $subnav = $(this).parent().find('.nav-sub');
+        $subnav = $(this).parent().find('.wrapper-nav-sub');
         $title = $(this).parent().find('.title');
 
         e.preventDefault();

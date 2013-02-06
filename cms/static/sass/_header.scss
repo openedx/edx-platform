@@ -198,7 +198,7 @@ nav .nav-item {
 // specific elements - account-based nav
 .nav-account {
   width: 100%;
-  margin-top: 10px;
+  margin-top: ($baseline*0.75);
   @include font-size(14);
   text-align: right;
 
@@ -235,15 +235,48 @@ nav .nav-item {
     }
   }
 
+  .wrapper-nav-sub {
+    position: absolute;
+    left: -7px;
+    top: 47px;
+    width: 140px;
+  }
+
   .nav-sub {
     @include border-radius(2px);
-    position: absolute;
-    top: 30px;
-    width: 125px;
+    @include box-sizing(border-box);
+    @include box-shadow(0 1px 5px 0 rgba(0,0,0, 0.1));
+    position: relative;
+    width: 100%;
     border: 1px solid $gray-l2;
     padding: ($baseline/4) ($baseline/2);
-    @include box-shadow(0 1px 5px 0 rgba(0,0,0, 0.1));
     background: $white;
+
+    &:after, &:before {
+      bottom: 100%;
+      border: solid transparent;
+      content: " ";
+      height: 0;
+      width: 0;
+      position: absolute;
+      pointer-events: none;
+    }
+
+    &:after {
+      border-color: rgba(255, 255, 255, 0);
+      border-bottom-color: #fff;
+      border-width: 5px;
+      right: ($baseline/4);
+      margin-left: -5px;
+    }
+
+    &:before {
+      border-color: rgba(178, 178, 178, 0);
+      border-bottom-color: $gray-l2;
+      border-width: 6px;
+      right: ($baseline/4);
+      margin-left: -6px;
+    }
 
     .nav-item {
       display: block;
@@ -262,85 +295,70 @@ nav .nav-item {
         display: block;
       }
     }
-
-    // arrows
-    &:after, &:before {
-
-    }
-
-    &:after {
-
-    }
-
-    &:before {
-
-    }
-  }
-
-  // UI - dropdown - vendor
-  .arrow_box {
-    position: relative;
-    background: #fff;
-    border: 1px solid #a1a1a1;
-  }
-  .arrow_box:after, .arrow_box:before {
-    bottom: 100%;
-    border: solid transparent;
-    content: " ";
-    height: 0;
-    width: 0;
-    position: absolute;
-    pointer-events: none;
-  }
-
-  .arrow_box:after {
-    border-color: rgba(255, 255, 255, 0);
-    border-bottom-color: #fff;
-    border-width: 10px;
-    left: 50%;
-    margin-left: -10px;
-  }
-  .arrow_box:before {
-    border-color: rgba(161, 161, 161, 0);
-    border-bottom-color: #a1a1a1;
-    border-width: 11px;
-    left: 50%;
-    margin-left: -11px;
   }
 
   // UI - dropdown - specific navs
   &.nav-account {
 
+    .wrapper-nav-sub {
+      top: 27px;
+      left: auto;
+      right: -($baseline/2);
+      width: 110px;
+    }
+
     .nav-sub {
-      right: 0;
       text-align: left;
+    }
+
+    .nav-sub:after {
+      left: auto;
+      right: 10px;
+    }
+
+    .nav-sub:before {
+      left: auto;
+      right: 9px;
     }
   }
 
   &.nav-course {
 
-    .nav-sub {
-      left: -5px;
-    }
-
     .nav-course-courseware {
 
-      .nav-sub {
-        top: 50px;
+      .nav-sub:after {
+        left: 86px;
+      }
+
+      .nav-sub:before {
+        left: 86px;
       }
     }
 
     .nav-course-settings {
 
-      .nav-sub {
-        top: 50px;
+      .nav-sub:after {
+        left: 86px;
+      }
+
+      .nav-sub:before {
+        left: 86px;
       }
     }
 
     .nav-course-tools {
 
-      .nav-sub {
-      
+      .wrapper-nav-sub {
+        top: ($baseline*1.5);
+        width: 100px;
+      }
+
+      .nav-sub:after {
+        left: 66px;
+      }
+
+      .nav-sub:before {
+        left: 66px;
       }
     }
   }
@@ -461,7 +479,7 @@ body.course.outline .nav-course-courseware
     }
   }
 
-  .nav-sub {
+  .wrapper-nav-sub {
     @include transition (opacity 1.0s ease-in-out 0s);
     opacity: 0;
     pointer-events: none;
