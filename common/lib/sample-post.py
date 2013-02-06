@@ -1,4 +1,14 @@
-# A simple script demonstrating how to have an external program save results to the server
+# A simple script demonstrating how to have an external program post problem
+# responses to an edx server.
+#
+# ***** NOTE *****
+# This is not intended as a stable public API.  In fact, it is almost certainly
+# going to change.  If you use this for some reason, be prepared to change your
+# code.
+#
+# We will be working to define a stable public API for external programs.  We
+# don't have have one yet (Feb 2013).
+
 
 import requests
 import sys
