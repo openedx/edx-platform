@@ -1,21 +1,27 @@
-from django.test.testcases import TestCase
 import datetime
 import time
+import json
+import calendar
+import copy
+from util import converters
+from util.converters import jsdate_to_time
+
 from django.contrib.auth.models import User
-import xmodule
 from django.test.client import Client
 from django.core.urlresolvers import reverse
-from xmodule.modulestore import Location
-from cms.djangoapps.models.settings.course_details import CourseDetails,\
-    CourseSettingsEncoder
-import json
-from util import converters
-import calendar
-from util.converters import jsdate_to_time
 from django.utils.timezone import UTC
+
+import xmodule
+from xmodule.modulestore import Location
+from cms.djangoapps.models.settings.course_details import (CourseDetails,
+                                                    CourseSettingsEncoder)
 from cms.djangoapps.models.settings.course_grading import CourseGradingModel
 from cms.djangoapps.contentstore.utils import get_modulestore
-import copy
+
+from django.test import TestCase
+from utils import ModuleStoreTestCase
+from xmodule.modulestore.tests.factories import CourseFactory
+
 
 # YYYY-MM-DDThh:mm:ss.s+/-HH:MM
 class ConvertersTestCase(TestCase):
@@ -36,8 +42,15 @@ class ConvertersTestCase(TestCase):
         self.compare_dates(converters.jsdate_to_time("2013-01-01T00:00:00"), converters.jsdate_to_time("2012-12-31T23:59:59"), datetime.timedelta(seconds=1))
     
     
-class CourseTestCase(TestCase):
+class CourseTestCase(ModuleStoreTestCase):
     def setUp(self):
+        """
+        These tests need a user in the DB so that the django Test Client
+        can log them in.
+        They inherit from the ModuleStoreTestCase class so that the mongodb collection
+        will be cleared out before each test case execution and deleted
+        afterwards.
+        """
         uname = 'testuser'
         email = 'test+courses@edx.org'
         password = 'foo'
@@ -52,36 +65,15 @@ class CourseTestCase(TestCase):
         self.user.is_staff = True
         self.user.save()
 
-        # Flush and initialize the module store
-        # It needs the templates because it creates new records
-        # by cloning from the template.
-        # Note that if your test module gets in some weird state
-        # (though it shouldn't), do this manually
-        # from the bash shell to drop it:
-        # $ mongo test_xmodule --eval "db.dropDatabase()"
-        xmodule.modulestore.django._MODULESTORES = {}
-        xmodule.modulestore.django.modulestore().collection.drop()
-        xmodule.templates.update_templates()
-
         self.client = Client()
         self.client.login(username=uname, password=password)
 
-        self.course_data = {
-            'template': 'i4x://edx/templates/course/Empty',
-            'org': 'MITx',
-            'number': '999',
-            'display_name': 'Robot Super Course',
-            }
-        self.course_location = Location('i4x', 'MITx', '999', 'course', 'Robot_Super_Course')
-        self.create_course()
-
-    def tearDown(self):
-        xmodule.modulestore.django._MODULESTORES = {}
-        xmodule.modulestore.django.modulestore().collection.drop()
-
-    def create_course(self):
-        """Create new course"""
-        self.client.post(reverse('create_new_course'), self.course_data)
+        t='i4x://edx/templates/course/Empty'
+        o='MITx'
+        n='999'
+        dn='Robot Super Course'
+        self.course_location = Location('i4x', o, n, 'course', 'Robot_Super_Course')
+        CourseFactory.create(template=t, org=o, number=n, display_name=dn)
 
 class CourseDetailsTestCase(CourseTestCase):
     def test_virgin_fetch(self):
@@ -145,7 +137,6 @@ class CourseDetailsViewTest(CourseTestCase):
             return datetime.isoformat("T")
         else:
             return None
-
         
     def test_update_and_fetch(self):
         details = CourseDetails.fetch(self.course_location)
@@ -271,5 +262,3 @@ class CourseGradingTest(CourseTestCase):
         test_grader.graders[1]['drop_count'] = test_grader.graders[1].get('drop_count') + 1
         altered_grader = CourseGradingModel.update_grader_from_json(test_grader.course_location, test_grader.graders[1])
         self.assertDictEqual(test_grader.graders[1], altered_grader, "drop_count[1] + 2")
-        
-        

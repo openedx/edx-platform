@@ -1240,6 +1240,11 @@ def edge(request):
 @login_required
 @expect_json
 def create_new_course(request):
+    # This logic is repeated in xmodule/modulestore/tests/factories.py
+    # so if you change anything here, you need to also change it there.
+    # TODO: write a test that creates two courses, one with the factory and
+    # the other with this method, then compare them to make sure they are 
+    # equivalent.
     template = Location(request.POST['template'])
     org = request.POST.get('org')
     number = request.POST.get('number')
@@ -1289,8 +1294,11 @@ def initialize_course_tabs(course):
     # at least a list populated with the minimal times
     # @TODO: I don't like the fact that the presentation tier is away of these data related constraints, let's find a better
     # place for this. Also rather than using a simple list of dictionaries a nice class model would be helpful here
-    course.tabs = [{"type": "courseware"},
-        {"type": "course_info", "name": "Course Info"},
+
+    # This logic is repeated in xmodule/modulestore/tests/factories.py
+    # so if you change anything here, you need to also change it there.
+    course.tabs = [{"type": "courseware"}, 
+        {"type": "course_info", "name": "Course Info"}, 
         {"type": "discussion", "name": "Discussion"},
         {"type": "wiki", "name": "Wiki"},
         {"type": "progress", "name": "Progress"}]
