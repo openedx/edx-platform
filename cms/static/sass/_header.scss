@@ -49,6 +49,12 @@
   float: right;
 }
 
+// general nav styles
+// ====================
+nav .nav-item {
+  display: inline-block;
+}
+
 // ====================
 
 // specific elements - branding
@@ -79,7 +85,7 @@
 // specific elements - course name/info
 .info-course {
   position: relative;
-  max-width: 200px;
+  max-width: 195px;
   margin-top: -3px;
   padding-right: $baseline;
   @include font-size(14);
@@ -133,7 +139,6 @@
   @include font-size(14);
 
   > ol > .nav-item {
-    display: inline-block;
     vertical-align: bottom;
     width: 100px;
     margin: 0 ($baseline/2) 0 0;
@@ -192,14 +197,14 @@
 
 // specific elements - account-based nav
 .nav-account {
-  max-width: 300px;
-  min-width: 175px;
-  width: 20%;
+  width: 100%;
   margin-top: 10px;
   @include font-size(14);
   text-align: right;
 
   .nav-account-username {
+    width: 100%;
+
     .ss-icon {
       display: inline-block;
       vertical-align: middle;
@@ -224,6 +229,10 @@
 
   .nav-item {
     position: relative;
+
+    .icon-expand {
+
+    }
   }
 
   .nav-sub {
@@ -236,7 +245,8 @@
     @include box-shadow(0 1px 5px 0 rgba(0,0,0, 0.1));
     background: $white;
 
-    li {
+    .nav-item {
+      display: block;
       margin: 0 0 ($baseline/4) 0;
       border-bottom: 1px solid $gray-l5;
       padding: 0 0($baseline/4) 0;
@@ -379,7 +389,6 @@
 
     .nav-item {
       @include font-size(16);
-      display: inline-block;
       vertical-align: middle;
       margin: 0 $baseline 0 0;
 
