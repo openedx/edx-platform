@@ -12,6 +12,7 @@ from django.core.management.base import BaseCommand
 from xmodule.modulestore.xml import XMLModuleStore
 from xmodule.errortracker import make_error_tracker
 
+
 def traverse_tree(course):
     '''Load every descriptor in course.  Return bool success value.'''
     queue = [course]

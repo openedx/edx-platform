@@ -62,6 +62,7 @@ class CertificateStatuses(object):
     restricted = 'restricted'
     error = 'error'
 
+
 class CertificateWhitelist(models.Model):
     """
     Tracks students who are whitelisted, all users
@@ -73,6 +74,7 @@ class CertificateWhitelist(models.Model):
     user = models.ForeignKey(User)
     course_id = models.CharField(max_length=255, blank=True, default='')
     whitelist = models.BooleanField(default=0)
+
 
 class GeneratedCertificate(models.Model):
     user = models.ForeignKey(User)

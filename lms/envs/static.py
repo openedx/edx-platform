@@ -12,7 +12,7 @@ from logsettings import get_logger_config
 
 STATIC_GRAB = True
 
-LOGGING = get_logger_config(ENV_ROOT / "log", 
+LOGGING = get_logger_config(ENV_ROOT / "log",
                             logging_env="dev",
                             tracking_filename="tracking.log",
                             debug=False)
@@ -25,7 +25,7 @@ DATABASES = {
 }
 
 CACHES = {
-    # This is the cache used for most things. 
+    # This is the cache used for most things.
     # In staging/prod envs, the sessions also live here.
     'default': {
         'BACKEND': 'django.core.cache.backends.locmem.LocMemCache',

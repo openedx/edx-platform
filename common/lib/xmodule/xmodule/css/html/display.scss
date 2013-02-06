@@ -52,11 +52,15 @@ em, i {
 }
 
 strong, b {
-  font-style: bold;
+  font-weight: bold;
 }
 
 p + p, ul + p, ol + p {
   margin-top: 20px;
+}
+
+blockquote {
+  margin: 1em 40px;
 }
 
 ol, ul {

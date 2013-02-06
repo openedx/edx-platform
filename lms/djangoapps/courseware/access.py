@@ -186,9 +186,9 @@ def _get_access_group_name_course_desc(course, action):
     '''
     Return name of group which gives staff access to course.  Only understands action = 'staff' and 'instructor'
     '''
-    if action=='staff':
+    if action == 'staff':
         return _course_staff_group_name(course.location)
-    elif action=='instructor':
+    elif action == 'instructor':
         return _course_instructor_group_name(course.location)
 
     return []
@@ -367,6 +367,7 @@ def _course_staff_group_name(location, course_context=None):
 
     return 'staff_%s' % course_id
 
+
 def course_beta_test_group_name(location):
     """
     Get the name of the beta tester group for a location.  Right now, that's
@@ -461,6 +462,7 @@ def _adjust_start_date_for_beta_testers(user, descriptor):
         return effective.timetuple()
 
     return descriptor.start
+
 
 def _has_instructor_access_to_location(user, location, course_context=None):
     return _has_access_to_location(user, location, 'instructor', course_context)
