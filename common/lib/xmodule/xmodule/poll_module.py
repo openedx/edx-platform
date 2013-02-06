@@ -24,9 +24,9 @@ answer from other users.
 """
 
 
+import cgi
 import json
 import logging
-import cgi
 from copy import deepcopy
 
 from lxml import etree
@@ -36,7 +36,7 @@ from xmodule.x_module import XModule
 from xmodule.stringify import stringify_children
 from xmodule.mako_module import MakoModuleDescriptor
 from xmodule.xml_module import XmlDescriptor
-from xblock.core import Scope, String, Object, Boolean
+from xblock.core import Scope, String, Object, Boolean, List
 
 log = logging.getLogger(__name__)
 
@@ -59,7 +59,8 @@ class PollModule(XModule):
     poll_answer = String(help="Student answer", scope=Scope.student_state, default='')
     poll_answers = Object(help="All possible answers for the poll", scope=Scope.content, default={})
 
-    xml_object = Object(scope=Scope.content)  # poll xml
+    answers = List(help="Poll answers", scope=Scope.content, default=[])
+    question = String(help="Poll question", scope=Scope.content, default='')
 
     def handle_ajax(self, dispatch, get):
         """Ajax handler.
@@ -72,11 +73,11 @@ class PollModule(XModule):
             dict
         """
         if dispatch in self.poll_answers and not self.voted:
-            d = self.poll_answers
-            d[dispatch] += 1
+            temp_poll_answers = self.poll_answers
+            temp_poll_answers[dispatch] += 1
             self.voted = True
             self.poll_answer = dispatch
-            self.poll_answers = d
+            self.poll_answers = temp_poll_answers
             return json.dumps({'poll_answers': self.poll_answers,
                                'total': sum(self.poll_answers.values()),
                                'callback': {'objectName': 'Conditional'}
@@ -95,35 +96,37 @@ class PollModule(XModule):
         return self.content
 
     def dump_poll(self):
-        """     """
-        # import ipdb; ipdb.set_trace()
-        # self.poll_answers['Yes']=2
-        xml_object_copy = deepcopy(self.xml_object)
+        """Dump poll information.
+
+        Returns:
+            string - Serialize json.
+        """
         answers_to_json = {}
         #workaround
-        d = self.poll_answers
+        temp_poll_answers = self.poll_answers
          # Fill self.poll_answers, prepare data for template context.
-        for element_answer in xml_object_copy.findall('answer'):
-            answer = element_answer.get('id', None)
-            if answer:
-                if answer not in d:
-                    d[answer] = 0
-                answers_to_json[answer] = \
-                    cgi.escape(stringify_children(element_answer))
-            xml_object_copy.remove(element_answer)
-        self.poll_answers = d
+        for answer in self.answers:
+            if answer['id'] not in temp_poll_answers:
+                temp_poll_answers[answer['id']] = 0
+            answers_to_json[answer['id']] = cgi.escape(answer['text'])
+        self.poll_answers = temp_poll_answers
         return json.dumps({'answers': answers_to_json,
-              'question': cgi.escape(stringify_children(xml_object_copy)),
-              # to show answered poll after reload:
-                'poll_answer': self.poll_answer,
-                'poll_answers': self.poll_answers if self.voted else {},
-                'total': sum(self.poll_answers.values()) if self.voted else ''})
+            'question': cgi.escape(self.question),
+            # to show answered poll after reload:
+            'poll_answer': self.poll_answer,
+            'poll_answers': self.poll_answers if self.voted else {},
+            'total': sum(self.poll_answers.values()) if self.voted else 0})
 
 
 class PollDescriptor(MakoModuleDescriptor, XmlDescriptor):
     module_class = PollModule
     template_dir_name = 'poll'
     stores_state = True
+
+    answers = List(help="Poll answers", scope=Scope.content, default=[])
+    question = String(help="Poll question", scope=Scope.content, default='')
+    display_name = String(help="Display name for this module", scope=Scope.settings)
+    id = String(help="ID attribute for this module", scope=Scope.settings)
 
     @classmethod
     def definition_from_xml(cls, xml_object, system):
@@ -134,26 +137,48 @@ class PollDescriptor(MakoModuleDescriptor, XmlDescriptor):
             system: `system` object.
 
         Returns:
-            dict
+            (definition, children) - tuple
+            definition - dict
+            children - list
         """
         # check for presense of required tags in xml
         if len(xml_object.xpath('answer')) == 0:
             raise ValueError("Poll_question definition must include \
                 at least one 'answer' tag")
 
-        return {'xml_object': xml_object}, []
+        xml_object_copy = deepcopy(xml_object)
+        answers = []
+        for element_answer in xml_object_copy.findall('answer'):
+            answer_id = element_answer.get('id', None)
+            if answer_id:
+                answers.append({
+                    'id': answer_id,
+                    'text': stringify_children(element_answer)
+                })
+            xml_object_copy.remove(element_answer)
+
+        definition = {
+            'answers': answers,
+            'question': stringify_children(xml_object_copy)
+        }
+        children = []
+
+        return (definition, children)
 
     def definition_to_xml(self, resource_fs):
         """Return an xml element representing this definition."""
-        # TODO test and fix
-        xml_object = etree.Element('poll_question')
+        poll_str = '<poll_question>{0}</poll_question>'.format(self.question)
+        xml_object = etree.fromstring(poll_str)
+        xml_object.set('display_name', self.display_name)
+        xml_object.set('id', self.id)
 
-        def add_child(k):
-            child_str = '<{tag}>{body}</{tag}>'.format(tag=k, body=self.definition[k])
+        def add_child(xml_obj, answer):
+            child_str = '<answer id="{id}">{text}</answer>'.format(
+                id=answer['id'], text=answer['text'])
             child_node = etree.fromstring(child_str)
             xml_object.append(child_node)
 
-        for child in ['render', 'sequence']:
-            add_child(child)
+        for answer in self.answers:
+            add_child(xml_object, answer)
 
         return xml_object
