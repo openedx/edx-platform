@@ -67,7 +67,7 @@ class DraftModuleStore(ModuleStoreBase):
         TODO (vshnayder): this may want to live outside the modulestore eventually
         """
 
-        # cdodge: we're forcing depth=0 here as the Draft store is not handling caching well 
+        # cdodge: we're forcing depth=0 here as the Draft store is not handling caching well
         try:
             return wrap_draft(super(DraftModuleStore, self).get_instance(course_id, as_draft(location), depth=0))
         except ItemNotFoundError:

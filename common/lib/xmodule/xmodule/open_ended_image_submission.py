@@ -13,6 +13,10 @@ from urlparse import urlparse
 import requests
 from boto.s3.connection import S3Connection
 from boto.s3.key import Key
+#TODO: Settings import is needed now in order to specify the URL and keys for amazon s3 (to upload images).
+#Eventually, the goal is to replace the global django settings import with settings specifically
+#for this module.  There is no easy way to do this now, so piggybacking on the django settings
+#makes sense.
 from django.conf import settings
 import pickle
 import logging
@@ -46,6 +50,7 @@ MAX_COLORS_TO_COUNT = 16
 
 #Maximum number of colors allowed in an uploaded image
 MAX_COLORS = 400
+
 
 class ImageProperties(object):
     """
@@ -183,6 +188,7 @@ class URLProperties(object):
                 return success
         return success
 
+
 def run_url_tests(url_string):
     """
     Creates a URLProperties object and runs all tests
@@ -240,7 +246,7 @@ def upload_to_s3(file_to_upload, keyname):
         #k.set_metadata("Content-Type", 'images/png')
 
         k.set_acl("public-read")
-        public_url = k.generate_url(60 * 60 * 24 * 365) # URL timeout in seconds.
+        public_url = k.generate_url(60 * 60 * 24 * 365)   # URL timeout in seconds.
 
         return True, public_url
     except:
@@ -256,6 +262,3 @@ def get_from_s3(s3_public_url):
     r = requests.get(s3_public_url, timeout=2)
     data = r.text
     return data
-
-
-

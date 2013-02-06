@@ -4,8 +4,8 @@ def lazyproperty(fn):
     """
     Use this decorator for lazy generation of properties that
     are expensive to compute. From http://stackoverflow.com/a/3013910/86828
-    
-    
+
+
     Example:
     class Test(object):
 
@@ -13,7 +13,7 @@ def lazyproperty(fn):
         def a(self):
             print 'generating "a"'
             return range(5)
-    
+
     Interactive Session:
     >>> t = Test()
     >>> t.__dict__
@@ -26,7 +26,7 @@ def lazyproperty(fn):
     >>> t.a
     [0, 1, 2, 3, 4]
     """
-    
+
     attr_name = '_lazy_' + fn.__name__
     @property
     def _lazyprop(self):

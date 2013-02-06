@@ -137,6 +137,7 @@ def redirect_to_course_position(course_module, first_time):
                                                           'chapter': chapter.url_name,
                                                           'section': section.url_name}))
 
+
 def save_child_position(seq_module, child_name, instance_module):
     """
     child_name: url_name of the child
@@ -151,6 +152,7 @@ def save_child_position(seq_module, child_name, instance_module):
                 seq_module.position = position
                 instance_module.state = seq_module.get_instance_state()
                 instance_module.save()
+
 
 @login_required
 @ensure_csrf_cookie
@@ -184,7 +186,7 @@ def index(request, course_id, chapter=None, section=None,
     registered = registered_for_course(course, request.user)
     if not registered:
         # TODO (vshnayder): do course instructors need to be registered to see course?
-        log.debug('User %s tried to view course %s but is not enrolled' % (request.user,course.location.url()))
+        log.debug('User %s tried to view course %s but is not enrolled' % (request.user, course.location.url()))
         return redirect(reverse('about_course', args=[course.id]))
 
     try:
@@ -212,7 +214,7 @@ def index(request, course_id, chapter=None, section=None,
             'init': '',
             'content': '',
             'staff_access': staff_access,
-            'xqa_server': settings.MITX_FEATURES.get('USE_XQA_SERVER','http://xqa:server@content-qa.mitx.mit.edu/xqa')
+            'xqa_server': settings.MITX_FEATURES.get('USE_XQA_SERVER', 'http://xqa:server@content-qa.mitx.mit.edu/xqa')
             }
 
         chapter_descriptor = course.get_child_by(lambda m: m.url_name == chapter)
@@ -288,7 +290,7 @@ def index(request, course_id, chapter=None, section=None,
             try:
                 result = render_to_response('courseware/courseware-error.html',
                                             {'staff_access': staff_access,
-                                            'course' : course})
+                                            'course': course})
             except:
                 # Let the exception propagate, relying on global config to at
                 # at least return a nice error message
@@ -296,6 +298,7 @@ def index(request, course_id, chapter=None, section=None,
                 raise
 
     return result
+
 
 @ensure_csrf_cookie
 def jump_to(request, course_id, location):
@@ -333,6 +336,7 @@ def jump_to(request, course_id, location):
     else:
         return redirect('courseware_position', course_id=course_id, chapter=chapter, section=section, position=position)
 
+
 @ensure_csrf_cookie
 def course_info(request, course_id):
     """
@@ -343,8 +347,9 @@ def course_info(request, course_id):
     course = get_course_with_access(request.user, course_id, 'load')
     staff_access = has_access(request.user, course, 'staff')
 
-    return render_to_response('courseware/info.html', {'request' : request, 'course_id' : course_id, 'cache' : None, 
+    return render_to_response('courseware/info.html', {'request': request, 'course_id': course_id, 'cache': None,
             'course': course, 'staff_access': staff_access})
+
 
 @ensure_csrf_cookie
 def static_tab(request, course_id, tab_slug):
@@ -368,9 +373,11 @@ def static_tab(request, course_id, tab_slug):
                               {'course': course,
                                'tab': tab,
                                'tab_contents': contents,
-                               'staff_access': staff_access,})
+                               'staff_access': staff_access, })
 
 # TODO arjun: remove when custom tabs in place, see courseware/syllabus.py
+
+
 @ensure_csrf_cookie
 def syllabus(request, course_id):
     """
@@ -382,7 +389,7 @@ def syllabus(request, course_id):
     staff_access = has_access(request.user, course, 'staff')
 
     return render_to_response('courseware/syllabus.html', {'course': course,
-                                            'staff_access': staff_access,})
+                                            'staff_access': staff_access, })
 
 
 def registered_for_course(course, user):
@@ -393,6 +400,7 @@ def registered_for_course(course, user):
         return CourseEnrollment.objects.filter(user=user, course_id=course.id).exists()
     else:
         return False
+
 
 @ensure_csrf_cookie
 @cache_if_anonymous
@@ -412,7 +420,7 @@ def course_about(request, course_id):
                               {'course': course,
                                'registered': registered,
                                'course_target': course_target,
-                               'show_courseware_link' : show_courseware_link})
+                               'show_courseware_link': show_courseware_link})
 
 
 @ensure_csrf_cookie
@@ -424,6 +432,7 @@ def static_university_profile(request, org_id):
     template_file = "university_profile/{0}.html".format(org_id).lower()
     context = dict(courses=[], org_id=org_id)
     return render_to_response(template_file, context)
+
 
 @ensure_csrf_cookie
 @cache_if_anonymous
@@ -446,6 +455,7 @@ def university_profile(request, org_id):
 
     return render_to_response(template_file, context)
 
+
 def render_notifications(request, course, notifications):
     context = {
         'notifications': notifications,
@@ -453,6 +463,7 @@ def render_notifications(request, course, notifications):
         'course': course,
     }
     return render_to_string('courseware/notifications.html', context)
+
 
 @login_required
 def news(request, course_id):
@@ -466,6 +477,7 @@ def news(request, course_id):
     }
 
     return render_to_response('courseware/news.html', context)
+
 
 @login_required
 @cache_control(no_cache=True, no_store=True, must_revalidate=True)

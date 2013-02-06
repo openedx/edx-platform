@@ -9,7 +9,6 @@ TIME_FORMAT = "%Y-%m-%dT%H:%M"
 
 TIMEDELTA_REGEX = re.compile(r'^((?P<days>\d+?) day(?:s?))?(\s)?((?P<hours>\d+?) hour(?:s?))?(\s)?((?P<minutes>\d+?) minute(?:s)?)?(\s)?((?P<seconds>\d+?) second(?:s)?)?$')
 
-
 def parse_time(time_str):
     """
     Takes a time string in TIME_FORMAT
@@ -19,6 +18,7 @@ def parse_time(time_str):
     Raises ValueError if the string is not in the right format.
     """
     return time.strptime(time_str, TIME_FORMAT)
+
 
 def stringify_time(time_struct):
     """

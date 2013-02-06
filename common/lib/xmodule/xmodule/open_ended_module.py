@@ -38,6 +38,7 @@ from combined_open_ended_rubric import CombinedOpenEndedRubric
 
 log = logging.getLogger("mitx.courseware")
 
+
 class OpenEndedModule(openendedchild.OpenEndedChild):
     """
     The open ended module supports all external open ended grader problems.
@@ -300,7 +301,7 @@ class OpenEndedModule(openendedchild.OpenEndedChild):
 
         # We want to display available feedback in a particular order.
         # This dictionary specifies which goes first--lower first.
-        priorities = {# These go at the start of the feedback
+        priorities = {  # These go at the start of the feedback
                       'spelling': 0,
                       'grammar': 1,
                       # needs to be after all the other feedback
@@ -671,5 +672,3 @@ class OpenEndedDescriptor(XmlDescriptor, EditingDescriptor):
             add_child(child)
 
         return elt
-
-

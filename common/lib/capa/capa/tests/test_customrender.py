@@ -8,6 +8,7 @@ from capa import customrender
 # just a handy shortcut
 lookup_tag = customrender.registry.get_class_for_tag
 
+
 def extract_context(xml):
     """
     Given an xml element corresponding to the output of test_system.render_template, get back the
@@ -15,8 +16,10 @@ def extract_context(xml):
     """
     return eval(xml.text)
 
+
 def quote_attr(s):
     return saxutils.quoteattr(s)[1:-1]  # don't want the outer quotes
+
 
 class HelperTest(unittest.TestCase):
     '''
@@ -50,7 +53,7 @@ class SolutionRenderTest(unittest.TestCase):
         # our test_system "renders" templates to a div with the repr of the context
         xml = renderer.get_html()
         context = extract_context(xml)
-        self.assertEqual(context, {'id' : 'solution_12'})
+        self.assertEqual(context, {'id': 'solution_12'})
 
 
 class MathRenderTest(unittest.TestCase):
@@ -65,12 +68,11 @@ class MathRenderTest(unittest.TestCase):
         renderer = lookup_tag('math')(test_system, element)
 
         self.assertEqual(renderer.mathstr, mathjax_out)
-    
+
     def test_parsing(self):
         self.check_parse('$abc$', '[mathjaxinline]abc[/mathjaxinline]')
         self.check_parse('$abc', '$abc')
         self.check_parse(r'$\displaystyle 2+2$', '[mathjax] 2+2[/mathjax]')
-        
+
 
     # NOTE: not testing get_html yet because I don't understand why it's doing what it's doing.
-        

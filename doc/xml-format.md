@@ -268,6 +268,7 @@ Supported fields at the course level:
 
 * "start" -- specify the start date for the course.  Format-by-example: "2012-09-05T12:00".
 * "advertised_start" -- specify what you want displayed as the start date of the course in the course listing and course about pages. This can be useful if you want to let people in early before the formal start. Format-by-example: "2012-09-05T12:00".
+* "disable_policy_graph" -- set to true (or "Yes"), if the policy graph should be disabled (ie not shown).
 * "enrollment_start", "enrollment_end" -- when can students enroll?  (if not specified, can enroll anytime).   Same format as "start".
 * "end" -- specify the end date for the course.  Format-by-example: "2012-11-05T12:00".
 * "end_of_course_survey_url" -- a url for an end of course survey -- shown after course is over, next to certificate download links.

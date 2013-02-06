@@ -12,7 +12,8 @@ from xmodule.modulestore.django import modulestore, _MODULESTORES
 
 # NOTE: running this with the lms.envs.test config works without
 # manually overriding the modulestore.  However, running with
-# cms.envs.test doesn't.  
+# cms.envs.test doesn't.
+
 
 def xml_store_config(data_dir):
     return {
@@ -27,6 +28,7 @@ def xml_store_config(data_dir):
 
 TEST_DATA_DIR = settings.COMMON_TEST_DATA_ROOT
 TEST_DATA_XML_MODULESTORE = xml_store_config(TEST_DATA_DIR)
+
 
 @override_settings(MODULESTORE=TEST_DATA_XML_MODULESTORE)
 class TestCohorts(django.test.TestCase):
@@ -184,6 +186,3 @@ class TestCohorts(django.test.TestCase):
         self.assertTrue(
             is_commentable_cohorted(course.id, to_id("Feedback")),
             "Feedback was listed as cohorted.  Should be.")
-
-
-
