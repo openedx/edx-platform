@@ -8,6 +8,7 @@ from lxml import etree
 
 from . import test_system
 
+
 class SelfAssessmentTest(unittest.TestCase):
 
     rubric = '''<rubric><rubric>
@@ -44,12 +45,14 @@ class SelfAssessmentTest(unittest.TestCase):
                 'prompt': self.prompt,
                 'max_score': 1,
                 'display_name': "Name",
-                'accept_file_upload' : False,
+                'accept_file_upload': False,
+                'close_date': None
                 }
 
         self.module = SelfAssessmentModule(test_system, self.location,
                                       self.definition, self.descriptor,
-                                      static_data, state, metadata=self.metadata)
+                                      static_data, 
+                                      state, metadata=self.metadata)
 
     def test_get_html(self):
         html = self.module.get_html(test_system)
@@ -74,4 +77,3 @@ class SelfAssessmentTest(unittest.TestCase):
         self.module.save_answer({'student_answer': 'answer 4'}, test_system)
         self.module.save_assessment({'assessment': '1'}, test_system)
         self.assertEqual(self.module.state, self.module.DONE)
-

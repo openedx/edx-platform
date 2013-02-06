@@ -93,6 +93,7 @@ def accepts(request, media_type):
     accept = parse_accept_header(request.META.get("HTTP_ACCEPT", ""))
     return media_type in [t for (t, p, q) in accept]
 
+
 def debug_request(request):
     """Return a pretty printed version of the request"""
 

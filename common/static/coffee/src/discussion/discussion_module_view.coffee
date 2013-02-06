@@ -73,7 +73,13 @@ if Backbone?
       # $elem.html("Hide Discussion")
       @discussion = new Discussion()
       @discussion.reset(response.discussion_data, {silent: false})
+
+      #use same discussion template but different thread templated
+      #determined in the coffeescript based on whether or not there's a
+      #group id
+      
       $discussion = $(Mustache.render $("script#_inline_discussion").html(), {'threads':response.discussion_data, 'discussionId': discussionId, 'allow_anonymous_to_peers': allow_anonymous_to_peers, 'allow_anonymous': allow_anonymous})
+      
       if @$('section.discussion').length
         @$('section.discussion').replaceWith($discussion)
       else

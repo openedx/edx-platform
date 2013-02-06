@@ -121,7 +121,7 @@ class VideoModule(XModule):
         return self.youtube
 
     def get_html(self):
-        if isinstance(modulestore(), XMLModuleStore) :
+        if isinstance(modulestore(), XMLModuleStore):
             # VS[compat]
             # cdodge: filesystem static content support.
             caption_asset_path = "/static/{0}/subs/".format(self.metadata['data_dir'])

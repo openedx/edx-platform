@@ -113,7 +113,7 @@ class StudentModuleCache(object):
                                          descriptor_filter=lambda descriptor: True,
                                          select_for_update=False):
         """
-        obtain and return cache for descriptor descendents (ie children) AND modules required by the descriptor, 
+        obtain and return cache for descriptor descendents (ie children) AND modules required by the descriptor,
         but which are not children of the module
 
         course_id: the course in the context of which we want StudentModules.
@@ -212,7 +212,7 @@ class OfflineComputedGradeLog(models.Model):
 
     course_id = models.CharField(max_length=255, db_index=True)
     created = models.DateTimeField(auto_now_add=True, null=True, db_index=True)
-    seconds = models.IntegerField(default=0)	# seconds elapsed for computation
+    seconds = models.IntegerField(default=0)  	# seconds elapsed for computation
     nstudents = models.IntegerField(default=0)
 
     def __unicode__(self):
