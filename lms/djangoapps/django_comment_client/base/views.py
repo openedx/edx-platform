@@ -109,11 +109,13 @@ def create_thread(request, course_id, commentable_id):
     #    else:
             # regular users always post with their own id.
     #        group_id = user_group_id
-    if 'group_id' in post.keys():
-      thread.update_attributes(group_id=post['group_id'])
+    group_id = post.get('group_id')
+    if group_id:
+      thread.update_attributes(group_id=group_id)
     
+    log.debug("Saving thread %r", thread.attributes)
     thread.save()
-    print thread
+
     if post.get('auto_subscribe', 'false').lower() == 'true':
         user = cc.User.from_django_user(request.user)
         user.follow(thread)
