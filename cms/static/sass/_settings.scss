@@ -63,6 +63,15 @@
           color: $blue;
         }
 
+        .instructions {
+          font-size: 14px;
+          margin: 0 0 20px 0;
+
+          strong {
+            font-weight: 600;
+          }
+        }
+
         > section {
           margin-bottom: 100px;
           @include clearfix;
@@ -189,8 +198,8 @@
 
     // form layouts
     .row {
-      margin-bottom: 30px;
-      padding-bottom: 30px;
+      margin-bottom: 15px;
+      padding-bottom: 15px;
       border-bottom: 1px solid $lightGrey;
 
       &:last-child {
@@ -538,8 +547,99 @@
           margin-left: 10px;
         }
       }
+    }
 
+    .settings-advanced {
 
+      .course-advanced-policy-list {
+
+        .row {
+          @include clearfix();
+
+        }
+
+        .key, .value {
+          margin: 0;
+          border: none;
+          padding: 0;
+
+          // existing fields
+          &.existing {
+
+            input, textarea {
+              color: $mediumGrey;
+            }
+          }
+        }
+
+        .key {
+          float: left;
+          width: 30%;
+          margin-right: 5px;
+
+          .field {
+
+            input {
+              width: 100%;
+            }
+
+            .tip {
+              @include transition (opacity 0.5s ease-in-out 0s);
+              opacity: 0;
+            }
+
+            input:focus {
+
+              & + .tip {
+                opacity: 1.0;
+              }
+            }
+          }
+        }
+
+        .value {
+          float: right;
+          width: 65%;
+
+          .field {
+
+            textarea {
+              width: 100%;
+              height: 100px;
+            }
+          }
+        }
+
+        .message-error {
+          float: left;
+          margin: 0 0 10px 0;
+        }
+      }
+
+      .actions {
+        @include clearfix();
+        margin-top: 15px;
+        border-top: 1px solid $lightGrey;
+        padding-top: 15px;
+
+        .save-button {
+          float: left;
+          @include blue-button;
+          margin-right: 10px;
+          padding-top: 8px;
+          padding-bottom: 8px;
+        }
+
+        .cancel-button {
+          float: left;
+          @include white-button;
+          margin-top: 4px;
+        }
+
+        .new-button {
+          float: right;
+        }
+      }
     }
 
     // states
@@ -569,8 +669,12 @@
     //    }
     // }
 
-    input.error, textarea.error {
+    input.error, textarea.error, .error input, .error textarea {
       border-color: $red;
+    }
+
+    .error label {
+      color: $red;
     }
 
     .message-error {

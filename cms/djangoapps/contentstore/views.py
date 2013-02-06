@@ -58,7 +58,7 @@ from cms.djangoapps.models.settings.course_details import CourseDetails,\
     CourseSettingsEncoder
 from cms.djangoapps.models.settings.course_grading import CourseGradingModel
 from cms.djangoapps.contentstore.utils import get_modulestore
-from lxml import etree
+from cms.djangoapps.models.settings.course_metadata import CourseMetadata
 
 # to install PIL on MacOSX: 'easy_install http://dist.repoze.org/PIL-1.1.6.tar.gz'
 
@@ -1109,6 +1109,8 @@ def get_course_settings(request, org, course, name):
     return render_to_response('settings.html', {
         'active_tab': 'settings',
         'context_course': course_module,
+        'advanced_blacklist' : json.dumps(CourseMetadata.FILTERED_LIST),
+        'advanced_dict' : json.dumps(CourseMetadata.fetch(location)),
         'course_details' : json.dumps(course_details, cls=CourseSettingsEncoder)
     })
 
@@ -1133,6 +1135,9 @@ def course_settings_updates(request, org, course, name, section):
         manager = CourseDetails
     elif section == 'grading':
         manager = CourseGradingModel
+    elif section == 'advanced':
+        # not implemented b/c it assumes prefetched and then everything thru course_edit_metadata
+        return
     else: return
 
     if request.method == 'GET':
@@ -1176,6 +1181,56 @@ def course_grader_updates(request, org, course, name, grader_index=None):
     elif request.method == 'POST': # post or put, doesn't matter.
         return HttpResponse(json.dumps(CourseGradingModel.update_grader_from_json(Location(['i4x', org, course, 'course',name]), request.POST)),
                             mimetype="application/json")
+
+
+@login_required
+@ensure_csrf_cookie
+def course_edit_metadata(request, org, course, name):
+    """
+    Send models and views as well as html for editing the course editable metadata to the client.
+
+    org, course, name: Attributes of the Location for the item to edit
+    """
+    location = ['i4x', org, course, 'course', name]
+    
+    # check that logged in user has permissions to this item
+    if not has_access(request.user, location):
+        raise PermissionDenied()
+    
+    editable = CourseMetadata.fetch(location)
+    
+    # for now defer to settings general until we split the divs out into separate pages
+    return get_course_settings(request, org, course, name)
+        
+## NB: expect_json failed on ["key", "key2"] and json payload
+@login_required
+@ensure_csrf_cookie
+def course_metadata_rest_access(request, org, course, name):
+    """
+    restful CRUD operations on metadata. The payload is a json rep of the metadata dicts. For delete, otoh,
+    the payload is either a key or a list of keys to delete.
+
+    org, course: Attributes of the Location for the item to edit
+    """
+    location = ['i4x', org, course, 'course', name]
+    
+    # check that logged in user has permissions to this item
+    if not has_access(request.user, location):
+        raise PermissionDenied()
+
+    # NB: we're setting Backbone.emulateHTTP to true on the client so everything comes as a post!!!
+    if request.method == 'POST' and 'HTTP_X_HTTP_METHOD_OVERRIDE' in request.META:
+        real_method = request.META['HTTP_X_HTTP_METHOD_OVERRIDE']
+    else:
+        real_method = request.method
+        
+    if request.method == 'GET':
+        return HttpResponse(json.dumps(CourseMetadata.fetch(location)), mimetype="application/json")
+    elif real_method == 'DELETE':
+        return HttpResponse(json.dumps(CourseMetadata.delete_key(location, json.loads(request.body))), mimetype="application/json")
+    elif request.method == 'POST':
+        # NOTE: request.POST is messed up because expect_json cloned_request.POST.copy() is creating a defective entry w/ the whole payload as the key
+        return HttpResponse(json.dumps(CourseMetadata.update_from_json(location, json.loads(request.body))), mimetype="application/json")
 
 
 @login_required

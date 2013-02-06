@@ -45,6 +45,7 @@ urlpatterns = ('',
     url(r'^(?P<org>[^/]+)/(?P<course>[^/]+)/settings/(?P<name>[^/]+)$', 'contentstore.views.get_course_settings', name='course_settings'),
     url(r'^(?P<org>[^/]+)/(?P<course>[^/]+)/settings/(?P<name>[^/]+)/section/(?P<section>[^/]+).*$', 'contentstore.views.course_settings_updates', name='course_settings'),
     url(r'^(?P<org>[^/]+)/(?P<course>[^/]+)/grades/(?P<name>[^/]+)/(?P<grader_index>.*)$', 'contentstore.views.course_grader_updates', name='course_settings'),
+    url(r'^(?P<org>[^/]+)/(?P<course>[^/]+)/advanced/(?P<name>[^/]+).*$', 'contentstore.views.course_metadata_rest_access', name='course_advanced_settings'),
 
     url(r'^(?P<org>[^/]+)/(?P<course>[^/]+)/(?P<category>[^/]+)/(?P<name>[^/]+)/gradeas.*$', 'contentstore.views.assignment_type_update', name='assignment_type_update'),
 
