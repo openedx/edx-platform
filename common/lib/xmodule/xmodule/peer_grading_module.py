@@ -82,7 +82,6 @@ class PeerGradingModule(XModule):
         if isinstance(self.is_graded, basestring):
             self.is_graded = (self.is_graded in TRUE_DICT)
 
-        #TODO: do we only want to allow this for single locations?
         display_due_date_string = self.metadata.get('due', None)
         grace_period_string = self.metadata.get('graceperiod', None)
 

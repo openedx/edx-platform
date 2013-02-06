@@ -8,8 +8,14 @@ log = logging.getLogger(__name__)
 
 class TimeInfo(object):
     """
-    This is a simple object that stores datetime information for an XModule
+    This is a simple object that calculates and stores datetime information for an XModule
     based on the due date string and the grace period string
+
+    So far it parses out three different pieces of time information:
+        self.display_due_date - the 'official' due date that gets displayed to students
+        self.grace_period - the length of the grace period
+        self.close_date - the real due date
+
     """
     def __init__(self, display_due_date_string, grace_period_string):
         if display_due_date_string is not None:
