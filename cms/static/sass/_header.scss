@@ -63,7 +63,7 @@ nav .nav-item {
   vertical-align: top;
 }
 
-.branding, .info-course, .nav-course {
+.branding, .info-course {
   margin: 0 ($baseline*0.75) 0 0;
 }
 
@@ -85,9 +85,8 @@ nav .nav-item {
 // specific elements - course name/info
 .info-course {
   position: relative;
-  max-width: 195px;
   margin-top: -3px;
-  padding-right: $baseline;
+  padding-right: ($baseline*0.75);
   @include font-size(14);
 
   &:before {
@@ -122,6 +121,7 @@ nav .nav-item {
 
   .course-title {
     width: 100%;
+    max-width: 220px;
     overflow: hidden;
     white-space: nowrap;
     text-overflow: ellipsis;
@@ -140,7 +140,6 @@ nav .nav-item {
 
   > ol > .nav-item {
     vertical-align: bottom;
-    width: 100px;
     margin: 0 ($baseline/2) 0 0;
 
     &:last-child {
@@ -205,13 +204,6 @@ nav .nav-item {
   .nav-account-username {
     width: 100%;
 
-    .ss-icon {
-      display: inline-block;
-      vertical-align: middle;
-      margin-right: 3px;
-      @include font-size(12);
-    }
-
     .account-username {
       display: inline-block;
       width: 80%;
@@ -231,8 +223,9 @@ nav .nav-item {
     position: relative;
 
     .icon-expand {
-      @include transition (color 0.5s ease-in-out);
+      @include transition (color 0.5s ease-in-out, opacity 0.5s ease-in-out);
       margin-left: 2px;
+      opacity: 0.5;
       color: $gray-l2;
     }
 
@@ -240,6 +233,7 @@ nav .nav-item {
 
       .icon-expand {
         color: $blue;
+        opacity: 1.0;
       }
     }
   }
@@ -320,6 +314,10 @@ nav .nav-item {
 
     .nav-sub {
       text-align: left;
+
+      .icon-expand {
+        top: -2px;
+      }
     }
 
     .nav-sub:after {

@@ -12,7 +12,7 @@
         <h2 class="sr">Current Course:</h2>
         <a href="${reverse('course_index', kwargs=dict(org=ctx_loc.org, course=ctx_loc.course, name=ctx_loc.name))}">
         <span class="course-number">PH207x:</span>
-        <span class="course-title">${context_course.display_name}</span>
+        <span class="course-title" title="${context_course.display_name}">${context_course.display_name}</span>
         </a>
       </div>
       
@@ -28,7 +28,7 @@
                 <ul>
                   <li class="nav-item"><a href="${reverse('course_index', kwargs=dict(org=ctx_loc.org, course=ctx_loc.course, name=ctx_loc.name))}">Outline</a></li>
                   <li class="nav-item"><a href="${reverse('course_info', kwargs=dict(org=ctx_loc.org, course=ctx_loc.course, name=ctx_loc.name))}">Updates</a></li>
-                  <li class="nav-item"><a href="${reverse('edit_tabs', kwargs=dict(org=ctx_loc.org, course=ctx_loc.course, coursename=ctx_loc.name))}">Pages/Tabs</a></li>
+                  <li class="nav-item"><a href="${reverse('edit_tabs', kwargs=dict(org=ctx_loc.org, course=ctx_loc.course, coursename=ctx_loc.name))}">Static Pages</a></li>
                   <li class="nav-item"><a href="${reverse('asset_index', kwargs=dict(org=ctx_loc.org, course=ctx_loc.course, name=ctx_loc.name))}">Files &amp; Uploads</a></li>
                 </ul>
               </div>
@@ -84,8 +84,8 @@
             <div class="wrapper wrapper-nav-sub">
               <div class="nav-sub">
                 <ul>
-                  <li class="nav-item"><a href="#">My Courses</a></li>
-                  <li class="nav-item"><a href="#">Help</a></li>
+                  <li class="nav-item"><a href="${reverse('course_index', kwargs=dict(org=ctx_loc.org, course=ctx_loc.course, name=ctx_loc.name))}">My Courses</a></li>
+                  <li class="nav-item"><a href="http://help.edge.edx.org/" rel="external">Help</a></li>
                   <li class="nav-item"><a class="action action-logout" href="${reverse('logout')}">Logout</a></li>
                 </ul>
               </div>
@@ -101,7 +101,7 @@
             <a href="#">How Studio Works</a>
           </li>
           <li class="nav-item nav-not-signedin-help">
-            <a href="#">Studio Help</a>
+            <a href="http://help.edge.edx.org/" rel="external">Studio Help</a>
           </li>
           <li class="nav-item nav-not-signedin-signup">
             <a class="action action-signup" href="${reverse('signup')}">Sign Up</a>

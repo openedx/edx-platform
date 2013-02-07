@@ -49,18 +49,30 @@ $(document).ready(function() {
 
     e.preventDefault();
 
-      if ($subnav.hasClass('is-shown')) {
-        $subnav.removeClass('is-shown');
-        $title.removeClass('is-selected');
-      }
+    if ($subnav.hasClass('is-shown')) {
+      $subnav.removeClass('is-shown');
+      $title.removeClass('is-selected');
+    }
 
-      else {
-        $('.nav-dropdown .nav-item .title').removeClass('is-selected');
-        $('.nav-dropdown .nav-item .wrapper-nav-sub').removeClass('is-shown');
-        $title.addClass('is-selected');
-        $subnav.addClass('is-shown');
-      }
-    });
+    else {
+      $('.nav-dropdown .nav-item .title').removeClass('is-selected');
+      $('.nav-dropdown .nav-item .wrapper-nav-sub').removeClass('is-shown');
+      $title.addClass('is-selected');
+      $subnav.addClass('is-shown');
+    }
+  });
+
+  // general link management - new window/tab
+  $('a[rel="external"]').attr('title','This link will open in a new browser/window tab').click(function(e) {
+    window.open($(this).attr('href'));
+    e.preventDefault();
+  });
+
+  // general link management - lean modal window
+  $('a[rel="modal"]').attr('title','This link will open in a modal window').leanModal({overlay : 0.50, closeButton: '.action-modal-close' });
+  $('.action-modal-close').click(function(e){
+    (e).preventDefault();
+  });
 
   // toggling overview section details
   $(function(){
