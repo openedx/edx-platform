@@ -23,6 +23,7 @@ setup(
             "course = xmodule.course_module:CourseDescriptor",
             "customtag = xmodule.template_module:CustomTagDescriptor",
             "discuss = xmodule.backcompat_module:TranslateCustomTagDescriptor",
+            "fixedtime = xmodule.fixed_time_module:FixedTimeDescriptor",
             "html = xmodule.html_module:HtmlDescriptor",
             "image = xmodule.backcompat_module:TranslateCustomTagDescriptor",
             "error = xmodule.error_module:ErrorDescriptor",
