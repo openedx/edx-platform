@@ -100,6 +100,7 @@ class TestStaffGradingService(ct.PageLoader):
                 'feedback': 'great!',
                 'submission_id': '123',
                 'location': self.location,
+                'submission_flagged': "true",
                 'rubric_scores[]': ['1', '2']}
 
         r = self.check_for_post_code(200, url, data)

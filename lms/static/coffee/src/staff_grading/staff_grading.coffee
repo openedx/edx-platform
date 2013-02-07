@@ -170,6 +170,7 @@ class @StaffGrading
     @feedback_area = $('.feedback-area')
     @score_selection_container = $('.score-selection-container')
     @grade_selection_container = $('.grade-selection-container')
+    @flag_submission_checkbox = $('.flag-checkbox')
 
     @submit_button = $('.submit-button')
     @action_button = $('.action-button')
@@ -255,6 +256,7 @@ class @StaffGrading
       submission_id: @submission_id
       location: @location
       skipped: true
+      submission_flagged: false
     @backend.post('save_grade', data, @ajax_callback)
 
   get_problem_list: () ->
@@ -268,6 +270,7 @@ class @StaffGrading
       feedback: @feedback_area.val()
       submission_id: @submission_id
       location: @location
+      submission_flagged: @flag_submission_checkbox.is(':checked')
     
     @backend.post('save_grade', data, @ajax_callback)
 
