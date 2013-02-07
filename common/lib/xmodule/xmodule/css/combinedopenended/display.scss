@@ -401,7 +401,7 @@ section.open-ended-child {
     div.short-form-response {
           background: #F6F6F6;
           border: 1px solid #ddd;
-          margin-bottom: 20px;
+          margin-bottom: 0px;
           overflow-y: auto;
           height: 200px;
           @include clearfix;
@@ -475,14 +475,17 @@ section.open-ended-child {
     margin-left: .75rem;
   }
 
-  ul.rubric-list
-  {
-    list-style-type: none;
-    padding:0;
-    margin:0;
-    float:left;
-    display: block;
-  }
+    ul.rubric-list{
+        list-style-type: none;
+        padding:0;
+        margin:0;
+        li {
+             &.rubric-list-item{
+                 margin-bottom: 0px;
+                 padding: 0px;
+             }
+        }
+    }
 
   ol {
     list-style: decimal outside none;

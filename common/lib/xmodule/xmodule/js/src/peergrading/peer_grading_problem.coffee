@@ -323,7 +323,7 @@ class @PeerGradingProblem
     if response.success
 
       # load in all the data
-      @submission_container.html("<h3>Training Essay</h3>")
+      @submission_container.html("")
       @render_submission_data(response)
       # TODO: indicate that we're in calibration mode
       @calibration_panel.addClass('current-state')
@@ -350,7 +350,7 @@ class @PeerGradingProblem
   render_submission: (response) =>
     if response.success
       @submit_button.hide()
-      @submission_container.html("<h3>Submitted Essay</h3>")
+      @submission_container.html("")
       @render_submission_data(response)
 
       @calibration_panel.removeClass('current-state')

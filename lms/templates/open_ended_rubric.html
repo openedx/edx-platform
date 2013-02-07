@@ -15,9 +15,9 @@
                 % for j in range(len(category['options'])):
                 <% option = category['options'][j] %>
                     %if option['selected'] and not view_only:
-                        <li class="selected-grade">
+                        <li class="selected-grade rubric-list-item">
                     %else:
-                        <li>
+                        <li class="rubric-list-item">
                     % endif
                     % if view_only:
                         % if option['selected']:
