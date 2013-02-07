@@ -242,11 +242,6 @@ def forum_form_discussion(request, course_id):
             'is_course_cohorted': is_course_cohorted(course_id)
         }
         # print "start rendering.."
-        print "\n\n\n\n\n\n*************************"
-        print is_course_cohorted(course_id)
-        print cached_has_permission(request.user, "see_all_cohorts", course_id)
-        print cohorts
-        
         
         return render_to_response('discussion/index.html', context)
 
