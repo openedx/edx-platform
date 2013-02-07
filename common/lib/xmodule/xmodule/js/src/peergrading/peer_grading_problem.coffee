@@ -181,7 +181,6 @@ class @PeerGradingProblem
     @grading_message = $('.grading-message')
     @grading_message.hide()
     @question_header = $('.question-header')
-    @question_header
     @question_header.click @collapse_question
 
     @grading_wrapper =$('.grading-wrapper')
@@ -445,4 +444,4 @@ class @PeerGradingProblem
       new_text = "(Show)"
     else
       new_text = "(Hide)"
-      @question_header.text(new_text)
+    @question_header.text(new_text)

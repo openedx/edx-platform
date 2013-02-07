@@ -180,6 +180,9 @@ class @StaffGrading
     @ml_error_info_container = $('.ml-error-info-container')
 
     @breadcrumbs = $('.breadcrumbs')
+
+    @question_header = $('.question-header')
+    @question_header.click @collapse_question
     
     # model state
     @state = state_no_data
@@ -428,7 +431,17 @@ class @StaffGrading
       @get_next_submission(@location)
     else
       @error('System got into invalid state for submission: ' + @state)
-  
+      
+  collapse_question: () =>
+    @prompt_container.slideToggle()
+    @prompt_container.toggleClass('open')
+    if @question_header.text() == "(Hide)"
+      new_text = "(Show)"
+    else
+      new_text = "(Hide)"
+    @question_header.text(new_text)
+
+
 
 # for now, just create an instance and load it...
 mock_backend = false
