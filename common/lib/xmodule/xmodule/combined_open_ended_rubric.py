@@ -171,12 +171,18 @@ class CombinedOpenEndedRubric(object):
                             rubric_categories[i]['options'][j]['grader_types'].append(grader_type)
 
         log.debug(rubric_categories)
+        grader_type_image_dict = {
+            'SA' : '/static/images/self_assessment_icon.png',
+            'PE' : '/static/images/peer_grading_icon.png',
+            'ML' : '/static/images/ml_grading_icon.png',
+        }
         html = self.system.render_template('open_ended_rubric.html',
             {'categories': rubric_categories,
              'has_score': True,
              'view_only': True,
              'max_score': max_score,
-             'combined_rubric' : True
+             'combined_rubric' : True,
+             'grader_type_image_dict' : grader_type_image_dict,
             })
         return html
 
