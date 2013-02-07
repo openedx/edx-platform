@@ -55,6 +55,9 @@ class @CombinedOpenEnded
     @show_results_button=@$('.show-results-button')
     @show_results_button.click @show_results
 
+    @question_header = @$('.question-header')
+    @question_header.click @collapse_question
+
     # valid states: 'initial', 'assessing', 'post_assessment', 'done'
     Collapsible.setCollapsibles(@el)
     @submit_evaluation_button = $('.submit-evaluation-button')
@@ -66,7 +69,7 @@ class @CombinedOpenEnded
     @el = $(element).find('section.open-ended-child')
     @errors_area = @$('.error')
     @answer_area = @$('textarea.answer')
-
+    @prompt_container = @$('.prompt')
     @rubric_wrapper = @$('.rubric-wrapper')
     @hint_wrapper = @$('.hint-wrapper')
     @message_wrapper = @$('.message-wrapper')
@@ -80,6 +83,11 @@ class @CombinedOpenEnded
     @file_upload_area = @$('.file-upload')
     @can_upload_files = false
     @open_ended_child= @$('.open-ended-child')
+
+    if @task_number>1
+      @prompt_hide()
+    else if @task_number==1 and @child_state!='initial'
+      @prompt_hide()
 
     @find_assessment_elements()
     @find_hint_elements()
@@ -155,6 +163,8 @@ class @CombinedOpenEnded
     @next_problem_button.hide()
     @hide_file_upload()
     @hint_area.attr('disabled', false)
+    if @task_number==1 and @child_state=='assessing'
+      @prompt_hide()
     if @child_state == 'done'
       @rubric_wrapper.hide()
     if @child_type=="openended"
@@ -389,3 +399,26 @@ class @CombinedOpenEnded
   # wrap this so that it can be mocked
   reload: ->
     location.reload()
+
+  collapse_question: () =>
+    @prompt_container.slideToggle()
+    @prompt_container.toggleClass('open')
+    if @question_header.text() == "(Hide)"
+      new_text = "(Show)"
+    else
+      new_text = "(Hide)"
+    @question_header.text(new_text)
+
+  prompt_show: () =>
+    if @prompt_container.is(":hidden")==true
+      @prompt_container.slideToggle()
+      @prompt_container.toggleClass('open')
+      @question_header.text("(Hide)")
+
+  prompt_hide: () =>
+    if @prompt_container.is(":visible")==true
+      @prompt_container.slideToggle()
+      @prompt_container.toggleClass('open')
+      @question_header.text("(Show)")
+
+

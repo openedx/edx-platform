@@ -413,7 +413,7 @@ class @PeerGradingProblem
     if score == actual_score
       calibration_wrapper.append("<p>Congratulations! Your score matches the actual score!</p>")
     else
-      calibration_wrapper.append("<p>Please try to understand the grading critera better to be more accurate next time.</p>")
+      calibration_wrapper.append("<p>Please try to understand the grading criteria better to be more accurate next time.</p>")
 
     # disable score selection and submission from the grading interface
     $("input[name='score-selection']").attr('disabled', true)
