@@ -1109,8 +1109,31 @@ def get_course_settings(request, org, course, name):
     course_details = CourseDetails.fetch(location)
 
     return render_to_response('settings.html', {
-        'active_tab': 'settings',
         'context_course': course_module,
+        'course_location' : location,
+        'course_details' : json.dumps(course_details, cls=CourseSettingsEncoder)
+    })
+
+@login_required
+@ensure_csrf_cookie
+def course_config_graders_page(request, org, course, name):
+    """
+    Send models and views as well as html for editing the course settings to the client.
+
+    org, course, name: Attributes of the Location for the item to edit
+    """
+    location = ['i4x', org, course, 'course', name]
+
+    # check that logged in user has permissions to this item
+    if not has_access(request.user, location):
+        raise PermissionDenied()
+
+    course_module = modulestore().get_item(location)
+    course_details = CourseGradingModel.fetch(location)
+
+    return render_to_response('settings_graders.html', {
+        'context_course': course_module,
+        'course_location' : location,
         'course_details' : json.dumps(course_details, cls=CourseSettingsEncoder)
     })
 

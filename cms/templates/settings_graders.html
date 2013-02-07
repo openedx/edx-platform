@@ -1,0 +1,123 @@
+<%inherit file="base.html" />
+<%block name="title">Grading</%block>
+<%block name="bodyclass">is-signedin course settings</%block>
+
+
+<%namespace name='static' file='static_content.html'/>
+<%!
+from contentstore import utils 
+%>
+
+
+<%block name="jsextra">
+  <link rel="stylesheet" type="text/css" href="${static.url('js/vendor/timepicker/jquery.timepicker.css')}" />
+  <script src="${static.url('js/vendor/timepicker/jquery.timepicker.js')}"></script>
+  
+  <script type="text/javascript" src="${static.url('js/template_loader.js')}"></script>
+  <script type="text/javascript" src="${static.url('js/views/server_error.js')}"></script>
+  <script type="text/javascript" src="${static.url('js/models/course_relative.js')}"></script>
+  <script type="text/javascript" src="${static.url('js/views/validating_view.js')}"></script>
+  <script type="text/javascript" src="${static.url('js/models/settings/course_grading_policy.js')}"></script>
+  <script type="text/javascript" src="${static.url('js/views/settings/settings_grading_view.js')}"></script>
+  
+  <script type="text/javascript">
+    $(document).ready(function(){
+    
+        var editor = new CMS.Views.Settings.Grading({
+            el: $('.settings-grading'),
+            model : new CMS.Models.Settings.CourseGradingPolicy(${course_details|n},{parse:true})
+        });
+        
+        editor.render();
+    });
+      
+  </script>
+</%block>
+
+<%block name="content">
+  <!-- -->
+  <div class="main-wrapper">
+    <div class="inner-wrapper">      
+      <h1>Settings</h1>
+      <article class="settings-overview">
+        <div class="settings-page-section main-column">
+
+          <section class="settings-grading is-shown">
+            <h2 class="title">Grading</h2>
+
+            <section class="settings-grading-range">
+              <header>
+                <h3>Overall Grade Range</h3>
+                <span class="detail">Course grade ranges and their values</span>
+              </header>
+
+              <div class="row">
+                
+                <div class="grade-controls course-grading-range well">
+                  <a href="#" class="new-grade-button"><span class="plus-icon"></span></a>
+                  <div class="grade-slider">
+                    <div class="grade-bar">
+                      <ol class="increments">
+                        <li class="increment-0">0</li>
+                        <li class="increment-10">10</li>
+                        <li class="increment-20">20</li>
+                        <li class="increment-30">30</li>
+                        <li class="increment-40">40</li>
+                        <li class="increment-50">50</li>
+                        <li class="increment-60">60</li>
+                        <li class="increment-70">70</li>
+                        <li class="increment-80">80</li>
+                        <li class="increment-90">90</li>
+                        <li class="increment-100">100</li>
+                      </ol>
+                      <ol class="grades">
+                      </ol>
+                    </div>
+                  </div>
+                </div>
+
+              </div>
+            </section>
+
+            <section class="settings-grading-general">
+              <header>
+                <h3>General Grading</h3>
+                <span class="detail">Deadlines and Requirements</span>
+              </header>
+
+              <div class="row row-col2">
+                <label for="course-grading-graceperiod">Grace Period on Deadline:</label>
+
+                <div class="field">
+                  <div class="input">
+                    <input type="text" class="short time" id="course-grading-graceperiod" value="0:00" placeholder="e.g. 10 minutes">
+                    <span class="tip tip-inline">leeway on due dates</span>
+                  </div>
+                </div>
+              </div>
+            </section>
+
+            <section class="setting-grading-assignment-types">
+              <header>
+                <h3>Assignment Types</h3>
+              </header>
+
+              <div class="row">
+                <div class="field enum">
+                  <ul class="input-list course-grading-assignment-list">
+                  </ul>
+
+                  <a href="#" class="new-button new-course-grading-item add-grading-data">
+                    <span class="plus-icon white"></span>New Assignment Type
+                  </a>
+                  </div>
+                </div>
+            </section>
+          </section><!-- .settings-grading -->
+
+        </div>
+      </article>
+    </div>
+  </div>
+  <footer></footer>
+</%block>

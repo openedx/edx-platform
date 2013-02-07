@@ -42,7 +42,7 @@
               <div class="nav-sub">
                 <ul>
                   <li class="nav-item"><a href="${reverse('contentstore.views.get_course_settings', kwargs=dict(org=ctx_loc.org, course=ctx_loc.course, name=ctx_loc.name))}">Schedule &amp; Details</a></li>
-                  <li class="nav-item"><a href="${reverse('contentstore.views.get_course_settings', kwargs={'org' : ctx_loc.org, 'course' : ctx_loc.course, 'name': ctx_loc.name})}">Grading</a></li>
+                  <li class="nav-item"><a href="${reverse('contentstore.views.course_config_graders_page', kwargs={'org' : ctx_loc.org, 'course' : ctx_loc.course, 'name': ctx_loc.name})}">Grading</a></li>
                   <li class="nav-item"><a href="${reverse('manage_users', kwargs=dict(location=ctx_loc))}">Course Team</a></li>
                   <li class="nav-item"><a href="${reverse('course_settings', kwargs={'org' : ctx_loc.org, 'course' : ctx_loc.course, 'name': ctx_loc.name})}">Advanced Settings</a></li>
                 </ul>
@@ -84,7 +84,10 @@
             <div class="wrapper wrapper-nav-sub">
               <div class="nav-sub">
                 <ul>
+                  % if context_course:
+                  <% ctx_loc = context_course.location %>
                   <li class="nav-item"><a href="${reverse('course_index', kwargs=dict(org=ctx_loc.org, course=ctx_loc.course, name=ctx_loc.name))}">My Courses</a></li>
+                  % endif
                   <li class="nav-item"><a href="http://help.edge.edx.org/" rel="external">Help</a></li>
                   <li class="nav-item"><a class="action action-logout" href="${reverse('logout')}">Logout</a></li>
                 </ul>
