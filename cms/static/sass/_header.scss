@@ -172,14 +172,6 @@ nav .nav-item {
       }
     }
 
-    // current state
-    &.is-current {
-
-      .title, .icon-expanded {
-        color: $blue;
-      }
-    }
-
     // specific nav items
     &.nav-course-courseware {
     }
@@ -480,14 +472,47 @@ nav .nav-item {
 // ====================
 
 // STATE: active/current nav states
+
+.nav-item.is-current,
 body.howitworks .nav-not-signedin-hiw,
 body.signin .nav-not-signedin-signin,
 body.signup .nav-not-signedin-signup,
-body.course.outline .nav-course-courseware
+
+// course content
+body.course.outline .nav-course-courseware .title,
+body.course.updates .nav-course-courseware .title,
+body.course.pages .nav-course-courseware .title,
+body.course.uploads .nav-course-courseware .title,
+
+body.course.outline .nav-course-courseware-outline,
+body.course.updates .nav-course-courseware-updates,
+body.course.pages .nav-course-courseware-pages,
+body.course.uploads .nav-course-courseware-uploads,
+
+// course settings
+body.course.schedule .nav-course-settings .title,
+body.course.grading .nav-course-settings .title,
+body.course.team .nav-course-settings .title,
+body.course.advanced .nav-course-settings .title,
+
+body.course.schedule .nav-course-settings-schedule,
+body.course.grading .nav-course-settings-grading,
+body.course.team .nav-course-settings-team,
+body.course.advanced .nav-course-settings-advanced,
+
+// course tools
+body.course.import .nav-course-tools .title,
+body.course.export .nav-course-tools .title,
+
+body.course.import .nav-course-tools-import,
+body.course.export .nav-course-tools-export,
+
 {
 
+  color: $blue !important;
+
   a {
-    color: $blue;
+    color: $blue !important;
   }
 }
 
