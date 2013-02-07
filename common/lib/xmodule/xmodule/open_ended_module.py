@@ -388,7 +388,10 @@ class OpenEndedModule(openendedchild.OpenEndedChild):
         feedback = self._convert_longform_feedback_to_html(response_items)
         if response_items['rubric_scores_complete'] == True:
             rubric_renderer = CombinedOpenEndedRubric(system, True)
-            success, rubric_feedback = rubric_renderer.render_rubric(response_items['rubric_xml'])
+            rubric_dict = rubric_renderer.render_rubric(response_items['rubric_xml'])
+            success = rubric_dict['success']
+            rubric_feedback = rubric_dict['html']
+            rubric_scores = rubric_dict['rubric_scores']
 
         if not response_items['success']:
             return system.render_template("open_ended_error.html",
@@ -401,7 +404,7 @@ class OpenEndedModule(openendedchild.OpenEndedChild):
             'rubric_feedback': rubric_feedback
         })
 
-        return feedback_template
+        return feedback_template, rubric_scores
 
 
     def _parse_score_msg(self, score_msg, system, join_feedback=True):
@@ -452,6 +455,7 @@ class OpenEndedModule(openendedchild.OpenEndedChild):
             #This is to support peer grading
         if isinstance(score_result['score'], list):
             feedback_items = []
+            rubric_scores = []
             for i in xrange(0, len(score_result['score'])):
                 new_score_result = {
                     'score': score_result['score'][i],
@@ -463,7 +467,9 @@ class OpenEndedModule(openendedchild.OpenEndedChild):
                     'rubric_scores_complete': score_result['rubric_scores_complete'][i],
                     'rubric_xml': score_result['rubric_xml'][i],
                 }
-                feedback_items.append(self._format_feedback(new_score_result, system))
+                feedback_template, rubric_score = self._format_feedback(new_score_result, system)
+                feedback_items.append(feedback_template)
+                rubric_scores.append(rubric_score)
             if join_feedback:
                 feedback = "".join(feedback_items)
             else:
@@ -471,13 +477,14 @@ class OpenEndedModule(openendedchild.OpenEndedChild):
             score = int(median(score_result['score']))
         else:
             #This is for instructor and ML grading
-            feedback = self._format_feedback(score_result, system)
+            feedback, rubric_score = self._format_feedback(score_result, system)
             score = score_result['score']
+            rubric_scores = [rubric_score]
 
         self.submission_id = score_result['submission_id']
         self.grader_id = score_result['grader_id']
 
-        return {'valid': True, 'score': score, 'feedback': feedback}
+        return {'valid': True, 'score': score, 'feedback': feedback, 'rubric_scores' : rubric_scores}
 
     def latest_post_assessment(self, system, short_feedback=False, join_feedback=True):
         """

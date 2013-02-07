@@ -137,8 +137,6 @@ class OpenEndedChild(object):
         else:
             return False, {}
 
-
-
     def latest_answer(self):
         """Empty string if not available"""
         if not self.history:

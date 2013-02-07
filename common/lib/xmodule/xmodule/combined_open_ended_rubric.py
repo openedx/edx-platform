@@ -29,6 +29,7 @@ class CombinedOpenEndedRubric(object):
         success = False
         try:
             rubric_categories = self.extract_categories(rubric_xml)
+            rubric_scores = [cat['score'] for cat in rubric_categories]
             max_scores = map((lambda cat: cat['options'][-1]['points']), rubric_categories)
             max_score = max(max_scores)
             html = self.system.render_template('open_ended_rubric.html', 
@@ -41,7 +42,7 @@ class CombinedOpenEndedRubric(object):
             error_message = "[render_rubric] Could not parse the rubric with xml: {0}".format(rubric_xml)
             log.error(error_message)
             raise RubricParsingError(error_message)
-        return success, html
+        return {'success' : success, 'html' : html, 'rubric_scores' : rubric_scores}
 
     def check_if_rubric_is_parseable(self, rubric_string, location, max_score_allowed, max_score):
         success, rubric_feedback = self.render_rubric(rubric_string)
@@ -149,7 +150,7 @@ class CombinedOpenEndedRubric(object):
         options = sorted(options, key=lambda option: option['points'])
         CombinedOpenEndedRubric.validate_options(options)
 
-        return {'description': description, 'options': options}
+        return {'description': description, 'options': options, 'score' : score}
 
 
     @staticmethod

@@ -108,7 +108,6 @@ class SelfAssessmentModule(openendedchild.OpenEndedChild):
         if dispatch not in handlers:
             return 'Error'
 
-        log.debug(get)
         before = self.get_progress()
         d = handlers[dispatch](get, system)
         after = self.get_progress()
@@ -126,7 +125,9 @@ class SelfAssessmentModule(openendedchild.OpenEndedChild):
             return ''
 
         rubric_renderer = CombinedOpenEndedRubric(system, False)
-        success, rubric_html = rubric_renderer.render_rubric(self.rubric)
+        rubric_dict = rubric_renderer.render_rubric(self.rubric)
+        success = rubric_dict['success']
+        rubric_html = rubric_dict['html']
 
         # we'll render it
         context = {'rubric': rubric_html,
@@ -235,8 +236,9 @@ class SelfAssessmentModule(openendedchild.OpenEndedChild):
 
         try:
             score = int(get['assessment'])
+            score_list = get.getlist('score_list[]')
         except ValueError:
-            return {'success': False, 'error': "Non-integer score value"}
+            return {'success': False, 'error': "Non-integer score value, or no score list"}
 
         self.record_latest_score(score)
 

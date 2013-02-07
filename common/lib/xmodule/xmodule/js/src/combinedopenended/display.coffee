@@ -266,7 +266,8 @@ class @CombinedOpenEnded
     event.preventDefault()
     if @child_state == 'assessing' && Rubric.check_complete()
       checked_assessment = Rubric.get_total_score()
-      data = {'assessment' : checked_assessment}
+      score_list = Rubric.get_score_list()
+      data = {'assessment' : checked_assessment, 'score_list' : score_list}
       $.postWithPrefix "#{@ajax_url}/save_assessment", data, (response) =>
         if response.success
           @child_state = response.state
