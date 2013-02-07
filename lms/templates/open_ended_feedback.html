@@ -1,9 +1,11 @@
 <section>
     <div class="shortform-custom" data-open-text='Show detailed results' data-close-text='Hide detailed results'>
-        <div class="result-output">
-            <p>Score: ${score}</p>
-        </div>
         ${rubric_feedback | n}
+        % if grader_type=="PE":
+            <div class="result-output">
+                ${ feedback | n}
+            </div>
+        % endif
     </div>
     <div class="longform">
         <div class="result-output">
