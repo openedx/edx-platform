@@ -834,3 +834,108 @@ class DragAndDropInput(InputTypeBase):
 registry.register(DragAndDropInput)
 
 #--------------------------------------------------------------------------------------------------------------------
+
+
+class EditAMoleculeInput(InputTypeBase):
+    """
+    An input type for edit-a-molecule.  Integrates with the molecule editor java applet.
+
+    Example:
+
+    <editamolecule size="50"/>
+
+    options: size -- width of the textbox.
+    """
+
+    template = "editamolecule.html"
+    tags = ['editamoleculeinput']
+
+    @classmethod
+    def get_attributes(cls):
+        """
+        Can set size of text field.
+        """
+        return [Attribute('file'),
+                Attribute('missing', None)]
+
+    def _extra_context(self):
+        """
+        """
+        context = {
+            'applet_loader': '/static/js/capa/editamolecule.js',
+        }
+
+        return context
+
+registry.register(EditAMoleculeInput)
+
+#-----------------------------------------------------------------------------
+
+class DesignProtein2dInput(InputTypeBase):
+    """
+    An input type for design of a protein in 2D. Integrates with the Protex java applet.
+
+    Example:
+
+    <designprotein2d width="800" hight="500" target_shape="E;NE;NW;W;SW;E;none" />
+    """
+
+    template = "designprotein2dinput.html"
+    tags = ['designprotein2dinput']
+
+    @classmethod
+    def get_attributes(cls):
+        """
+        Note: width, hight, and target_shape are required.
+        """
+        return [Attribute('width'),
+                Attribute('height'),
+                Attribute('target_shape')
+                ]
+
+    def _extra_context(self):
+        """
+        """
+        context = {
+            'applet_loader': '/static/js/capa/design-protein-2d.js',
+        }
+
+        return context
+
+registry.register(DesignProtein2dInput)
+
+#-----------------------------------------------------------------------------
+
+class EditAGeneInput(InputTypeBase):
+    """
+        An input type for editing a gene. Integrates with the genex java applet.
+        
+        Example:
+        
+        <editagene width="800" hight="500" dna_sequence="ETAAGGCTATAACCGA" />
+        """
+    
+    template = "editageneinput.html"
+    tags = ['editageneinput']
+    
+    @classmethod
+    def get_attributes(cls):
+        """
+            Note: width, hight, and dna_sequencee are required.
+            """
+        return [Attribute('width'),
+                Attribute('height'),
+                Attribute('dna_sequence')
+                ]
+    
+    def _extra_context(self):
+        """
+            """
+        context = {
+            'applet_loader': '/static/js/capa/edit-a-gene.js',
+        }
+        
+        return context
+
+registry.register(EditAGeneInput)
+

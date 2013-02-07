@@ -81,6 +81,9 @@ MITX_FEATURES = {
     'AUTH_USE_OPENID': False,
     'AUTH_USE_MIT_CERTIFICATES': False,
     'AUTH_USE_OPENID_PROVIDER': False,
+
+    # Flip to True when the YouTube iframe API breaks (again)
+    'USE_YOUTUBE_OBJECT_API': False,
 }
 
 # Used for A/B testing
