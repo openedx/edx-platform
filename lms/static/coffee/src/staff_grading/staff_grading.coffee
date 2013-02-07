@@ -292,6 +292,7 @@ class @StaffGrading
     @min_for_ml = response.min_for_ml
     @num_pending = response.num_pending
     @state = state_grading
+    @collapse_question
     if not @max_score?
       @error("No max score specified for submission.")
 
@@ -431,7 +432,7 @@ class @StaffGrading
       @get_next_submission(@location)
     else
       @error('System got into invalid state for submission: ' + @state)
-      
+
   collapse_question: () =>
     @prompt_container.slideToggle()
     @prompt_container.toggleClass('open')
