@@ -73,7 +73,7 @@ class ImportSystem(XMLParsingSystem, MakoDescriptorSystem):
                 # VS[compat]. Take this out once course conversion is done (perhaps leave the uniqueness check)
 
                 # tags that really need unique names--they store (or should store) state.
-                need_uniq_names = ('problem', 'sequential', 'video', 'course', 'chapter', 'videosequence', 'fixedtime')
+                need_uniq_names = ('problem', 'sequential', 'video', 'course', 'chapter', 'videosequence', 'timelimit')
 
                 attr = xml_data.attrib
                 tag = xml_data.tag

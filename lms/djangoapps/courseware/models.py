@@ -12,9 +12,6 @@ file and check it in at the same time as your model changes. To do that,
 ASSUMPTIONS: modules have unique IDs, even across different module_types
 
 """
-from datetime import datetime, timedelta
-from calendar import timegm
-
 from django.db import models
 from django.contrib.auth.models import User
 
@@ -211,4 +208,3 @@ class OfflineComputedGradeLog(models.Model):
 
     def __unicode__(self):
         return "[OCGLog] %s: %s" % (self.course_id, self.created)
-
