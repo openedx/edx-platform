@@ -229,8 +229,8 @@ def forum_form_discussion(request, course_id):
             'is_course_cohorted': is_course_cohorted(course_id)
         }
         # print "start rendering.."
+        
         return render_to_response('discussion/index.html', context)
-
 
 @login_required
 def single_thread(request, course_id, discussion_id, thread_id):
