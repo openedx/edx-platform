@@ -4,22 +4,16 @@ import logging
 from lxml import etree
 from time import time
 
-from xmodule.mako_module import MakoModuleDescriptor
+from xmodule.editing_module import XMLEditingDescriptor
 from xmodule.xml_module import XmlDescriptor
 from xmodule.x_module import XModule
 from xmodule.progress import Progress
 from xmodule.exceptions import NotFoundError
-from pkg_resources import resource_string
 
 
 log = logging.getLogger(__name__)
 
-# HACK: This shouldn't be hard-coded to two types
-# OBSOLETE: This obsoletes 'type'
-# class_priority = ['video', 'problem']
-
-
-class FixedTimeModule(XModule):
+class TimeLimitModule(XModule):
     ''' 
     Wrapper module which imposes a time constraint for the completion of its child.
     '''
@@ -29,9 +23,7 @@ class FixedTimeModule(XModule):
         XModule.__init__(self, system, location, definition, descriptor,
                          instance_state, shared_state, **kwargs)
 
-        # NOTE: Position is 1-indexed.  This is silly, but there are now student
-        # positions saved on prod, so it's not easy to fix.
-#        self.position = 1
+        self.rendered = False
         self.beginning_at = None
         self.ending_at = None
         self.accommodation_code = None
@@ -46,13 +38,6 @@ class FixedTimeModule(XModule):
             if 'accommodation_code' in state:
                 self.accommodation_code = state['accommodation_code']
                 
-
-        # if position is specified in system, then use that instead
-#        if system.get('position'):
-#            self.position = int(system.get('position'))
-
-        self.rendered = False
-
     # For a timed activity, we are only interested here
     # in time-related accommodations, and these should be disjoint.
     # (For proctored exams, it is possible to have multiple accommodations
@@ -81,8 +66,6 @@ class FixedTimeModule(XModule):
         elif self.accommodation_code == 'TESTING':
             # when testing, set timer to run for a week at a time.
             return 3600 * 24 * 7
-       
-    # store state:
 
     @property
     def has_begun(self):
@@ -101,8 +84,6 @@ class FixedTimeModule(XModule):
         '''
         self.beginning_at = time()
         modified_duration = self._get_accommodated_duration(duration)
-        # datetime_duration = timedelta(seconds=modified_duration)
-        # self.ending_at = self.beginning_at + datetime_duration
         self.ending_at = self.beginning_at + modified_duration
         
     def get_end_time_in_ms(self):
@@ -132,31 +113,32 @@ class FixedTimeModule(XModule):
         progress = reduce(Progress.add_counts, progresses)
         return progress
 
-    def handle_ajax(self, dispatch, get):        # TODO: bounds checking
-#        ''' get = request.POST instance '''
-#        if dispatch == 'goto_position':
-#            self.position = int(get['position'])
-#            return json.dumps({'success': True})
+    def handle_ajax(self, dispatch, get):
         raise NotFoundError('Unexpected dispatch type')
 
     def render(self):
         if self.rendered:
             return
         # assumes there is one and only one child, so it only renders the first child
-        child = self.get_display_items()[0]
-        self.content = child.get_html()
+        children = self.get_display_items()
+        if children:
+            child = children[0]
+            self.content = child.get_html()
         self.rendered = True
 
     def get_icon_class(self):
-        return self.get_children()[0].get_icon_class()
+        children = self.get_children()
+        if children:
+            return children[0].get_icon_class()
+        else:
+            return "other"
 
+class TimeLimitDescriptor(XMLEditingDescriptor, XmlDescriptor):
 
-class FixedTimeDescriptor(MakoModuleDescriptor, XmlDescriptor):
-    # TODO: fix this template?!
-    mako_template = 'widgets/sequence-edit.html'
-    module_class = FixedTimeModule
+    module_class = TimeLimitModule
 
-    stores_state = True # For remembering when a student started, and when they should end
+    # For remembering when a student started, and when they should end
+    stores_state = True 
 
     @classmethod
     def definition_from_xml(cls, xml_object, system):
@@ -165,14 +147,14 @@ class FixedTimeDescriptor(MakoModuleDescriptor, XmlDescriptor):
             try:
                 children.append(system.process_xml(etree.tostring(child, encoding='unicode')).location.url())
             except Exception as e:
-                log.exception("Unable to load child when parsing FixedTime wrapper. Continuing...")
+                log.exception("Unable to load child when parsing TimeLimit wrapper. Continuing...")
                 if system.error_tracker is not None:
                     system.error_tracker("ERROR: " + str(e))
                 continue
         return {'children': children}
 
     def definition_to_xml(self, resource_fs):
-        xml_object = etree.Element('fixedtime')
+        xml_object = etree.Element('timelimit')
         for child in self.get_children():
             xml_object.append(
                 etree.fromstring(child.export_to_xml(resource_fs)))

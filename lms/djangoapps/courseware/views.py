@@ -20,7 +20,7 @@ from courseware.access import has_access
 from courseware.courses import (get_courses, get_course_with_access,
                                 get_courses_by_university, sort_by_announcement)
 import courseware.tabs as tabs
-from courseware.models import StudentModuleCache, TimedModule
+from courseware.models import StudentModule, StudentModuleCache
 from module_render import toc_for_course, get_module, get_instance_module, get_module_for_descriptor
 
 from django_comment_client.utils import get_discussion_title
@@ -31,6 +31,7 @@ from xmodule.modulestore import Location
 from xmodule.modulestore.django import modulestore
 from xmodule.modulestore.exceptions import InvalidLocationError, ItemNotFoundError, NoPathToItem
 from xmodule.modulestore.search import path_to_location
+#from xmodule.fixed_time_module import FixedTimeModule
 
 import comment_client
 
@@ -152,6 +153,80 @@ def save_child_position(seq_module, child_name, instance_module):
                 instance_module.state = seq_module.get_instance_state()
                 instance_module.save()
 
+def check_for_active_timelimit_module(request, course_id, course):
+    '''
+    Looks for a timing module for the given user and course that is currently active.
+    If found, returns a context dict with timer-related values to enable display of time remaining.
+    ''' 
+    context = {}
+    timelimit_student_modules = StudentModule.objects.filter(student=request.user, course_id=course_id, module_type='timelimit')
+    if timelimit_student_modules:
+        for timelimit_student_module in timelimit_student_modules: 
+            # get the corresponding section_descriptor for the given StudentModel entry:
+            module_state_key = timelimit_student_module.module_state_key
+            timelimit_descriptor = modulestore().get_instance(course_id, Location(module_state_key))
+            timelimit_module_cache = StudentModuleCache.cache_for_descriptor_descendents(course.id, request.user, 
+                                                                                     timelimit_descriptor, depth=None)
+            timelimit_module = get_module_for_descriptor(request.user, request, timelimit_descriptor, 
+                                                     timelimit_module_cache, course.id, position=None)
+            if timelimit_module is not None and timelimit_module.category == 'timelimit' and \
+                    timelimit_module.has_begun and not timelimit_module.has_ended:
+                location = timelimit_module.location
+                # determine where to go when the timer expires:
+                if 'time_expired_redirect_url' not in timelimit_descriptor.metadata:
+                    # TODO: provide a better error
+                    raise Http404
+                time_expired_redirect_url = timelimit_descriptor.metadata.get('time_expired_redirect_url')
+                context['time_expired_redirect_url'] = time_expired_redirect_url
+                # Fetch the end time (in GMT) as stored in the module when it was started.
+                # This value should be UTC time as number of milliseconds since epoch.
+                end_date = timelimit_module.get_end_time_in_ms()
+                context['timer_expiration_datetime'] = end_date
+                if 'suppress_toplevel_navigation' in timelimit_descriptor.metadata:
+                    context['suppress_toplevel_navigation'] = timelimit_descriptor.metadata['suppress_toplevel_navigation']
+                return_url = reverse('jump_to', kwargs={'course_id':course_id, 'location':location})
+                context['timer_navigation_return_url'] = return_url
+    return context
+
+def update_timelimit_module(user, course_id, student_module_cache, timelimit_descriptor, timelimit_module):
+    '''
+    Updates the state of the provided timing module, starting it if it hasn't begun.
+    Returns dict with timer-related values to enable display of time remaining.
+    Returns 'timer_expiration_datetime' in dict if timer is still active, and not if timer has expired.
+    ''' 
+    context = {}
+    # determine where to go when the exam ends:
+    if 'time_expired_redirect_url' not in timelimit_descriptor.metadata: 
+        # TODO: provide a better error
+        raise Http404
+    time_expired_redirect_url = timelimit_descriptor.metadata.get('time_expired_redirect_url')
+    context['time_expired_redirect_url'] = time_expired_redirect_url
+
+    if not timelimit_module.has_ended:
+        if not timelimit_module.has_begun:
+            # user has not started the exam, so start it now.
+            if 'duration' not in timelimit_descriptor.metadata:
+                # TODO: provide a better error
+                raise Http404
+            # The user may have an accommodation that has been granted to them.
+            # This accommodation information should already be stored in the module's state.
+            duration = int(timelimit_descriptor.metadata.get('duration'))
+            timelimit_module.begin(duration)
+            # we have changed state, so we need to persist the change:
+            instance_module = get_instance_module(course_id, user, timelimit_module, student_module_cache)
+            instance_module.state = timelimit_module.get_instance_state()
+            instance_module.save()
+            
+        # the exam has been started, either because the student is returning to the
+        # exam page, or because they have just visited it.  Fetch the end time (in GMT) as stored
+        # in the module when it was started.
+        # This value should be UTC time as number of milliseconds since epoch.
+        context['timer_expiration_datetime'] = timelimit_module.get_end_time_in_ms()
+        # also use the timed module to determine whether top-level navigation is visible:
+        if 'suppress_toplevel_navigation' in timelimit_descriptor.metadata:
+            context['suppress_toplevel_navigation'] = timelimit_descriptor.metadata['suppress_toplevel_navigation']
+    return context
+
 @login_required
 @ensure_csrf_cookie
 @cache_control(no_cache=True, no_store=True, must_revalidate=True)
@@ -215,43 +290,6 @@ def index(request, course_id, chapter=None, section=None,
             'xqa_server': settings.MITX_FEATURES.get('USE_XQA_SERVER','http://xqa:server@content-qa.mitx.mit.edu/xqa')
             }
 
-        # check here if this page is within a course that has an active timed module running.  If so, then 
-        # display the appropriate timer information:
-        timed_modules = TimedModule.objects.filter(student=request.user, course_id=course_id)
-        if timed_modules:
-            for timed_module in timed_modules:
-                if timed_module.has_begun and not timed_module.has_ended:
-                    # a timed module has been found that is active, so display 
-                    # the relevant time:
-                    # module_state_key = timed_module.module_state_key
-                    location = timed_module.location
-                    
-                    # when we actually make the state be stored in the StudentModule, then 
-                    # we can fetch what we need from that.
-                    # student_module = student_module_cache.lookup(course_id, 'sequential', module_state_key)
-                    # But the module doesn't give us anything helpful to find the corresponding descriptor
-                    
-                    # get the corresponding section_descriptor for this timed_module entry:
-                    section_descriptor = modulestore().get_instance(course_id, Location(location))
-                    
-                    # determine where to go when the timer expires:
-                    # Note that if we could get this from the timed_module, we wouldn't have to 
-                    # fetch the section_descriptor in the first place.
-                    if 'time_expired_redirect_url' not in section_descriptor.metadata:
-                        raise Http404
-                    time_expired_redirect_url = section_descriptor.metadata.get('time_expired_redirect_url')
-                    context['time_expired_redirect_url'] = time_expired_redirect_url
-                
-                    # Fetch the end time (in GMT) as stored in the module when it was started.
-                    # This value should be UTC time as number of milliseconds since epoch.
-                    end_date = timed_module.get_end_time_in_ms()
-                    context['timer_expiration_datetime'] =  end_date
-                    if 'suppress_toplevel_navigation' in section_descriptor.metadata:
-                        context['suppress_toplevel_navigation'] = section_descriptor.metadata['suppress_toplevel_navigation']
-                    return_url = reverse('jump_to', kwargs={'course_id': course_id, 'location': location})
-                    context['timer_navigation_return_url'] = return_url
-      
-
         chapter_descriptor = course.get_child_by(lambda m: m.url_name == chapter)
         if chapter_descriptor is not None:
             instance_module = get_instance_module(course_id, request.user, course_module, student_module_cache)
@@ -286,7 +324,20 @@ def index(request, course_id, chapter=None, section=None,
             instance_module = get_instance_module(course_id, request.user, chapter_module, student_module_cache)
             save_child_position(chapter_module, section, instance_module)
 
-
+            # check here if this section *is* a timed module.  
+            if section_module.category == 'timelimit':
+                timer_context = update_timelimit_module(request.user, course_id, student_module_cache, 
+                                                        section_descriptor, section_module)
+                if 'timer_expiration_datetime' in timer_context:
+                    context.update(timer_context)
+                else:
+                    # if there is no expiration defined, then we know the timer has expired:
+                    return HttpResponseRedirect(timer_context['time_expired_redirect_url'])
+            else:
+                # check here if this page is within a course that has an active timed module running.  If so, then 
+                # add in the appropriate timer information to the rendering context:
+                context.update(check_for_active_timelimit_module(request, course_id, course))
+                
             context['content'] = section_module.get_html()
         else:
             # section is none, so display a message
@@ -321,201 +372,6 @@ def index(request, course_id, chapter=None, section=None,
                               chapter=chapter,
                               section=section,
                               position=position
-                              ))
-            try:
-                result = render_to_response('courseware/courseware-error.html',
-                                            {'staff_access': staff_access,
-                                            'course' : course})
-            except:
-                # Let the exception propagate, relying on global config to at
-                # at least return a nice error message
-                log.exception("Error while rendering courseware-error page")
-                raise
-
-    return result
-
-@login_required
-@ensure_csrf_cookie
-@cache_control(no_cache=True, no_store=True, must_revalidate=True)
-def timed_exam(request, course_id, chapter, section):
-    """
-    Displays only associated content.  If course, chapter,
-    and section are all specified, renders the page, or returns an error if they
-    are invalid.
-
-    Returns an error if these are not all specified and correct.
-    
-    Arguments:
-
-     - request    : HTTP request
-     - course_id  : course id (str: ORG/course/URL_NAME)
-     - chapter    : chapter url_name (str)
-     - section    : section url_name (str)
-
-    Returns:
-
-     - HTTPresponse
-    """
-    course = get_course_with_access(request.user, course_id, 'load', depth=2)
-    staff_access = has_access(request.user, course, 'staff')
-    registered = registered_for_course(course, request.user)
-    if not registered:
-        log.debug('User %s tried to view course %s but is not enrolled' % (request.user,course.location.url()))
-        raise # error
-    try:
-        student_module_cache = StudentModuleCache.cache_for_descriptor_descendents(
-            course.id, request.user, course, depth=2)
-
-        # Has this student been in this course before?
-        # first_time = student_module_cache.lookup(course_id, 'course', course.location.url()) is None
-
-        # Load the module for the course
-        course_module = get_module_for_descriptor(request.user, request, course, student_module_cache, course.id)
-        if course_module is None:
-            log.warning('If you see this, something went wrong: if we got this'
-                        ' far, should have gotten a course module for this user')
-            # return redirect(reverse('about_course', args=[course.id]))
-            raise # error
-        
-        if chapter is None:
-            # return redirect_to_course_position(course_module, first_time)
-            raise # error
-
-        # BW: add this test earlier, and remove later clause
-        if section is None:
-            # return redirect_to_course_position(course_module, first_time)
-            raise # error
-        
-        context = {
-            'csrf': csrf(request)['csrf_token'],
-            'COURSE_TITLE': course.title,
-            'course': course,
-            'init': '',
-            'content': '',
-            'staff_access': staff_access,
-            'xqa_server': settings.MITX_FEATURES.get('USE_XQA_SERVER','http://xqa:server@content-qa.mitx.mit.edu/xqa')
-            }
-
-        # in general, we may want to disable accordion display on timed exams.  
-        provide_accordion = True
-        if provide_accordion:
-            context['accordion'] = render_accordion(request, course, chapter, section)
-
-        chapter_descriptor = course.get_child_by(lambda m: m.url_name == chapter)
-        if chapter_descriptor is not None:
-            instance_module = get_instance_module(course_id, request.user, course_module, student_module_cache)
-            save_child_position(course_module, chapter, instance_module)
-        else:
-            raise Http404
-
-        chapter_module = course_module.get_child_by(lambda m: m.url_name == chapter)
-        if chapter_module is None:
-            # User may be trying to access a chapter that isn't live yet
-            raise Http404
-
-        section_descriptor = chapter_descriptor.get_child_by(lambda m: m.url_name == section)
-        if section_descriptor is None:
-            # Specifically asked-for section doesn't exist
-            raise Http404
-
-        # Load all descendents of the section, because we're going to display its
-        # html, which in general will need all of its children
-        section_module = get_module(request.user, request, section_descriptor.location,
-                                    student_module_cache, course.id, position=None, depth=None)
-        if section_module is None:
-            # User may be trying to be clever and access something
-            # they don't have access to.
-            raise Http404
-
-        # Save where we are in the chapter:
-        instance_module = get_instance_module(course_id, request.user, chapter_module, student_module_cache)
-        save_child_position(chapter_module, section, instance_module)
-
-
-        context['content'] = section_module.get_html()
-        
-        # determine where to go when the exam ends:
-        if 'time_expired_redirect_url' not in section_descriptor.metadata:
-            raise Http404
-        time_expired_redirect_url = section_descriptor.metadata.get('time_expired_redirect_url')
-        context['time_expired_redirect_url'] = time_expired_redirect_url
-        
-        # figure out when the timed exam should end.  Going forward, this is determined by getting a "normal"
-        # duration from the test, then doing some math to modify the duration based on accommodations,
-        # and then use that value as the end.  Once we have calculated this, it should be sticky -- we
-        # use the same value for future requests, unless it's a tester.
-
-        # get value for duration from the section's metadata:
-        # for now, assume that the duration is set as an integer value, indicating the number of seconds:
-        if 'duration' not in section_descriptor.metadata:
-            raise Http404
-        duration = int(section_descriptor.metadata.get('duration'))
-        
-        # get corresponding time module, if one is present:
-        try: 
-            timed_module = TimedModule.objects.get(student=request.user, course_id=course_id, location=section_module.location)
-            
-            # if a module exists, check to see if it has already been started,
-            # and if it has already ended.
-            if timed_module.has_ended:
-                # the exam has already ended, and the student has tried to
-                # revisit the exam.  
-                # TODO: determine what do we do here.  
-                # For a Pearson exam, we want to go to the exit page.  
-                # (Not so sure what to do in general.)
-                # Proposal:  store URL in the section descriptor,
-                # along with the duration.  If no such URL is set, 
-                # just put up the error page,
-                if time_expired_redirect_url is None:
-                    raise Exception("Time expired on {}".format(timed_module))
-                else:
-                    return HttpResponseRedirect(time_expired_redirect_url)
-                
-            elif not timed_module.has_begun:
-                # user has not started the exam, but may have an accommodation
-                # that has been granted to them.
-                # modified_duration = timed_module.get_accommodated_duration(duration)
-                # timed_module.started_at = datetime.utcnow() #  time() * 1000
-                # timed_module.end_date = timed_module. 
-                timed_module.begin(duration)
-                timed_module.save()
-                
-        except TimedModule.DoesNotExist:
-            # no entry found.  So we're starting this test
-            # without any accommodations being preset.
-            timed_module = TimedModule(student=request.user, course_id=course_id, location=section_module.location)
-            timed_module.begin(duration)
-            timed_module.save()
-        
-                
-        # the exam has already been started, and the student is returning to the 
-        # exam page.  Fetch the end time (in GMT) as stored
-        # in the module when it was started.
-        end_date = timed_module.get_end_time_in_ms()
-        
-        # This value should be UTC time as number of milliseconds since epoch.
-        # context['end_date'] =  end_date
-        context['timer_expiration_datetime'] =  end_date
-        if 'suppress_toplevel_navigation' in section_descriptor.metadata:
-            context['suppress_toplevel_navigation'] = section_descriptor.metadata['suppress_toplevel_navigation']
-        
-        result = render_to_response('courseware/courseware.html', context)
-    except Exception as e:
-        if isinstance(e, Http404):
-            # let it propagate
-            raise
-
-        # In production, don't want to let a 500 out for any reason
-        if settings.DEBUG:
-            raise
-        else:
-            log.exception("Error in exam view: user={user}, course={course},"
-                          " chapter={chapter} section={section}"
-                          "position={position}".format(
-                              user=request.user,
-                              course=course,
-                              chapter=chapter,
-                              section=section
                               ))
             try:
                 result = render_to_response('courseware/courseware-error.html',

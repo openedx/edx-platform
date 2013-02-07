@@ -39,12 +39,15 @@ from certificates.models import CertificateStatuses, certificate_status_for_stud
 from xmodule.course_module import CourseDescriptor
 from xmodule.modulestore.exceptions import ItemNotFoundError
 from xmodule.modulestore.django import modulestore
+from xmodule.modulestore import Location
 
 from collections import namedtuple
 
 from courseware.courses import get_courses, sort_by_announcement
 from courseware.access import has_access
-from courseware.models import TimedModule
+from courseware.models import StudentModuleCache
+from courseware.views import get_module_for_descriptor
+from courseware.module_render import get_instance_module
 
 from statsd import statsd
 
@@ -1082,13 +1085,14 @@ def test_center_login(request):
     # errors are returned by navigating to the error_url, adding a query parameter named "code" 
     # which contains the error code describing the exceptional condition.
     def makeErrorURL(error_url, error_code):
-        return "{}&code={}".format(error_url, error_code);
+        log.error("generating error URL with error code {}".format(error_code))
+        return "{}?code={}".format(error_url, error_code);
      
     # get provided error URL, which will be used as a known prefix for returning error messages to the
-    # Pearson shell.  It does not have a trailing slash, so we need to add one when creating output URLs.
+    # Pearson shell.  
     error_url = request.POST.get("errorURL")
 
-    # check that the parameters have not been tampered with, by comparing the code provided by Pearson
+    # TODO: check that the parameters have not been tampered with, by comparing the code provided by Pearson
     # with the code we calculate for the same parameters.
     if 'code' not in request.POST:
         return HttpResponseRedirect(makeErrorURL(error_url, "missingSecurityCode"));
@@ -1112,65 +1116,81 @@ def test_center_login(request):
     try:
         testcenteruser = TestCenterUser.objects.get(client_candidate_id=client_candidate_id)
     except TestCenterUser.DoesNotExist:
+        log.error("not able to find demographics for cand ID {}".format(client_candidate_id))
         return HttpResponseRedirect(makeErrorURL(error_url, "invalidClientCandidateID"));
 
 
     # find testcenter_registration that matches the provided exam code:
-    # Note that we could rely on either the registrationId or the exam code, 
-    # or possibly both.
+    # Note that we could rely in future on either the registrationId or the exam code, 
+    # or possibly both.  But for now we know what to do with an ExamSeriesCode, 
+    # while we currently have no record of RegistrationID values at all.
     if 'vueExamSeriesCode' not in request.POST:
         # TODO: confirm this error code (made up, not in documentation)
+        log.error("missing exam series code for cand ID {}".format(client_candidate_id))
         return HttpResponseRedirect(makeErrorURL(error_url, "missingExamSeriesCode"));
     exam_series_code = request.POST.get('vueExamSeriesCode')
     
     registrations = TestCenterRegistration.objects.filter(testcenter_user=testcenteruser, exam_series_code=exam_series_code)
-    
     if not registrations:
+        log.error("not able to find exam registration for exam {} and cand ID {}".format(exam_series_code, client_candidate_id))
         return HttpResponseRedirect(makeErrorURL(error_url, "noTestsAssigned"));
     
     # TODO: figure out what to do if there are more than one registrations....
     # for now, just take the first...
     registration = registrations[0]
+    
     course_id = registration.course_id
-    
-    # if we want to look up whether the test has already been taken, or to 
-    # communicate that a time accommodation needs to be applied, we need to 
-    # know the module_id to use that corresponds to the particular exam_series_code.
-    # For now, we can hardcode that...
-    if exam_series_code == '6002x001':
-        # This should not be hardcoded here, but should be added to the exam definition.
-        # TODO: look the location up in the course, by finding the exam_info with the matching code,
-        # and get the location from that.
-        location = 'i4x://MITx/6.002x/sequential/Final_Exam_Fall_2012'
-        redirect_url = reverse('jump_to', kwargs={'course_id': course_id, 'location': location})
-    else:
-        # TODO: clarify if this is the right error code for this condition.
+    course = course_from_id(course_id)  # assume it will be found....
+    if not course:
+        log.error("not able to find course from ID {} for cand ID {}".format(course_id, client_candidate_id))
         return HttpResponseRedirect(makeErrorURL(error_url, "incorrectCandidateTests"));
+    exam = course.get_test_center_exam(exam_series_code)
+    if not exam:
+        log.error("not able to find exam {} for course ID {} and cand ID {}".format(exam_series_code, course_id, client_candidate_id))
+        return HttpResponseRedirect(makeErrorURL(error_url, "incorrectCandidateTests"));
+    location = exam.exam_url
+    redirect_url = reverse('jump_to', kwargs={'course_id': course_id, 'location': location})
+
+    log.info("proceeding with test of cand {} on exam {} for course {}: URL = {}".format(client_candidate_id, exam_series_code, course_id, location))
+
+    # check if the test has already been taken
+    timelimit_descriptor = modulestore().get_instance(course_id, Location(location))
+    if not timelimit_descriptor:
+        log.error("cand {} on exam {} for course {}: descriptor not found for location {}".format(client_candidate_id, exam_series_code, course_id, location))
+        return HttpResponseRedirect(makeErrorURL(error_url, "missingClientProgram"));
+        
+    timelimit_module_cache = StudentModuleCache.cache_for_descriptor_descendents(course_id, testcenteruser.user, 
+                                                                                 timelimit_descriptor, depth=None)
+    timelimit_module = get_module_for_descriptor(request.user, request, timelimit_descriptor, 
+                                                 timelimit_module_cache, course_id, position=None)
+    if not timelimit_module.category == 'timelimit':
+        log.error("cand {} on exam {} for course {}: non-timelimit module at location {}".format(client_candidate_id, exam_series_code, course_id, location))
+        return HttpResponseRedirect(makeErrorURL(error_url, "missingClientProgram"));
+        
+    if timelimit_module and timelimit_module.has_ended:
+        log.warning("cand {} on exam {} for course {}: test already over at {}".format(client_candidate_id, exam_series_code, course_id, timelimit_module.ending_at))
+        return HttpResponseRedirect(makeErrorURL(error_url, "allTestsTaken"));
     
-    
+    # check if we need to provide an accommodation:
     time_accommodation_mapping = {'ET12ET' : 'ADDHALFTIME',
                                   'ET30MN' : 'ADD30MIN',
                                   'ETDBTM' : 'ADDDOUBLE', }
-    
-    # check if the test has already been taken
-    timed_modules = TimedModule.objects.filter(student=testcenteruser.user, course_id=course_id, location=location)
-    if timed_modules:
-        timed_module = timed_modules[0]
-        if timed_module.has_ended:
-            return HttpResponseRedirect(makeErrorURL(error_url, "allTestsTaken"));
-    elif registration.get_accommodation_codes():
-        # we don't have a timed module created yet, so if we have time accommodations
-        # to implement, create an entry now:
-        time_accommodation_code = None
+
+    time_accommodation_code = None
+    if registration.get_accommodation_codes():
         for code in registration.get_accommodation_codes():
             if code in time_accommodation_mapping:
                 time_accommodation_code = time_accommodation_mapping[code]
-        if client_candidate_id == "edX003671291147":
-            time_accommodation_code = 'TESTING'
-        if time_accommodation_code:
-            timed_module = TimedModule(student=request.user, course_id=course_id, location=location)
-            timed_module.accommodation_code = time_accommodation_code
-            timed_module.save()
+    # special, hard-coded client ID used by Pearson shell for testing:
+    if client_candidate_id == "edX003671291147":
+        time_accommodation_code = 'TESTING'
+        
+    if time_accommodation_code:
+        timelimit_module.accommodation_code = time_accommodation_code
+        instance_module = get_instance_module(course_id, testcenteruser.user, timelimit_module, timelimit_module_cache)
+        instance_module.state = timelimit_module.get_instance_state()
+        instance_module.save()
+        log.info("cand {} on exam {} for course {}: receiving accommodation {}".format(client_candidate_id, exam_series_code, course_id, time_accommodation_code))
         
     # UGLY HACK!!!
     # Login assumes that authentication has occurred, and that there is a 
