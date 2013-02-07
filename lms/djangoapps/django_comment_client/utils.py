@@ -407,7 +407,12 @@ def get_courseware_context(content, course):
         if 'path_to_location' in _DISCUSSIONINFO[course.id] and location in _DISCUSSIONINFO[course.id]['path_to_location']:
             (course_id, chapter, section, position) = _DISCUSSIONINFO[course.id]['path_to_location'][location]
         else:
-            (course_id, chapter, section, position) = path_to_location(modulestore(), course.id, location)
+            try:
+                (course_id, chapter, section, position) = path_to_location(modulestore(), course.id, location)
+            except NoPathToItem:
+                # Object is not in the graph any longer, let's just get path to the base of the course
+                # so that we can at least return something to the caller
+                (course_id, chapter, section, position) = path_to_location(modulestore(), course.id, course.location)
 
         url = reverse('courseware_position', kwargs={"course_id":course_id,
                                                      "chapter":chapter,
