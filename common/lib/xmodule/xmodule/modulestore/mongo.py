@@ -158,15 +158,24 @@ def location_to_query(location, wildcard=True):
     If `wildcard` is True, then a None in a location is treated as a wildcard
     query. Otherwise, it is searched for literally
     """
-    query = SON()
-    # Location dict is ordered by specificity, and SON
-    # will preserve that order for queries
-    for key, val in Location(location).dict().iteritems():
-        if wildcard and val is None:
-            continue
-        query['_id.{key}'.format(key=key)] = val
+    query = namedtuple_to_son(Location(location), prefix='_id.')
+
+    if wildcard:
+        for key, value in query.items():
+            if value is None:
+                del query[key]
 
     return query
+
+
+def namedtuple_to_son(namedtuple, prefix=''):
+    """
+    Converts a namedtuple into a SON object with the same key order
+    """
+    son = SON()
+    for idx, field_name in enumerate(namedtuple._fields):
+        son[prefix + field_name] = namedtuple[idx]
+    return son
 
 
 class MongoModuleStore(ModuleStoreBase):
@@ -225,6 +234,7 @@ class MongoModuleStore(ModuleStoreBase):
         If depth is None, will load all the children.
         This will make a number of queries that is linear in the depth.
         """
+
         data = {}
         to_process = list(items)
         while to_process and depth is None or depth >= 0:
@@ -238,8 +248,10 @@ class MongoModuleStore(ModuleStoreBase):
             # http://www.mongodb.org/display/DOCS/Advanced+Queries#AdvancedQueries-%24or
             # for or-query syntax
             if children:
-                to_process = list(self.collection.find(
-                    {'_id': {'$in': [Location(child).dict() for child in children]}}))
+                query = {
+                    '_id': {'$in': [namedtuple_to_son(Location(child)) for child in children]}
+                }
+                to_process = self.collection.find(query)
             else:
                 to_process = []
             # If depth is None, then we just recurse until we hit all the descendents
@@ -331,14 +343,19 @@ class MongoModuleStore(ModuleStoreBase):
         item = self._find_one(location)
         return self._load_items([item], depth)[0]
 
-    def get_instance(self, course_id, location):
+    def get_instance(self, course_id, location, depth=0):
         """
         TODO (vshnayder): implement policy tracking in mongo.
         For now, just delegate to get_item and ignore policy.
-        """
-        return self.get_item(location)
 
-    def get_items(self, location, depth=0):
+        depth (int): An argument that some module stores may use to prefetch
+            descendents of the queried modules for more efficient results later
+            in the request. The depth is counted in the number of
+            calls to get_children() to cache. None indicates to cache all descendents.
+        """
+        return self.get_item(location, depth=depth)
+
+    def get_items(self, location, course_id=None, depth=0):
         items = self.collection.find(
             location_to_query(location),
             sort=[('revision', pymongo.ASCENDING)],
@@ -363,14 +380,17 @@ class MongoModuleStore(ModuleStoreBase):
             if location.category == 'static_tab':
                 course = self.get_course_for_item(item.location)
                 existing_tabs = course.tabs or []
-                existing_tabs.append({'type':'static_tab', 'name' : item.lms.display_name, 'url_slug' : item.location.name})
+                existing_tabs.append({
+                    'type': 'static_tab',
+                    'name': item.lms.display_name,
+                    'url_slug': item.location.name
+                })
                 course.tabs = existing_tabs
                 self.update_metadata(course.location, course._model_data._kvs._metadata)
 
             return item
         except pymongo.errors.DuplicateKeyError:
             raise DuplicateItemError(location)
-
 
     def get_course_for_item(self, location):
         '''
@@ -461,6 +481,7 @@ class MongoModuleStore(ModuleStoreBase):
 
         self._update_single_item(location, {'metadata': metadata})
 
+
     def delete_item(self, location):
         """
         Delete an item from this modulestore
@@ -479,12 +500,10 @@ class MongoModuleStore(ModuleStoreBase):
 
         self.collection.remove({'_id': Location(location).dict()})
 
-    def get_parent_locations(self, location):
-        '''Find all locations that are the parents of this location.  Needed
-        for path_to_location().
 
-        returns an iterable of things that can be passed to Location.  This may
-        be empty if there are no parents.
+    def get_parent_locations(self, location, course_id):
+        '''Find all locations that are the parents of this location in this
+        course.  Needed for path_to_location().
         '''
         location = Location.ensure_fully_specified(location)
         items = self.collection.find({'definition.children': location.url()},

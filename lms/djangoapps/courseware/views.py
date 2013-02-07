@@ -1,9 +1,5 @@
-import csv
-import json
 import logging
 import urllib
-import itertools
-import StringIO
 
 from functools import partial
 
@@ -12,7 +8,7 @@ from django.core.context_processors import csrf
 from django.core.urlresolvers import reverse
 from django.contrib.auth.models import User
 from django.contrib.auth.decorators import login_required
-from django.http import Http404, HttpResponse
+from django.http import Http404
 from django.shortcuts import redirect
 from mitxmako.shortcuts import render_to_response, render_to_string
 #from django.views.decorators.csrf import ensure_csrf_cookie
@@ -21,19 +17,17 @@ from django.views.decorators.cache import cache_control
 
 from courseware import grades
 from courseware.access import has_access
-from courseware.courses import (get_course_with_access, get_courses_by_university)
+from courseware.courses import (get_courses, get_course_with_access,
+                                get_courses_by_university, sort_by_announcement)
 import courseware.tabs as tabs
 from courseware.model_data import ModelDataCache
 from module_render import toc_for_course, get_module
 from student.models import UserProfile
 
-from multicourse import multicourse_settings
-
 from django_comment_client.utils import get_discussion_title
 
 from student.models import UserTestGroup, CourseEnrollment
 from util.cache import cache, cache_if_anonymous
-from xmodule.course_module import CourseDescriptor
 from xmodule.modulestore import Location
 from xmodule.modulestore.django import modulestore
 from xmodule.modulestore.exceptions import InvalidLocationError, ItemNotFoundError, NoPathToItem
@@ -44,6 +38,7 @@ import comment_client
 log = logging.getLogger("mitx.courseware")
 
 template_imports = {'urllib': urllib}
+
 
 
 def user_groups(user):
@@ -69,16 +64,16 @@ def user_groups(user):
     return group_names
 
 
-
 @ensure_csrf_cookie
 @cache_if_anonymous
 def courses(request):
     '''
     Render "find courses" page.  The course selection work is done in courseware.courses.
     '''
-    universities = get_courses_by_university(request.user,
-                                             domain=request.META.get('HTTP_HOST'))
-    return render_to_response("courses.html", {'universities': universities})
+    courses = get_courses(request.user, request.META.get('HTTP_HOST'))
+    courses = sort_by_announcement(courses)
+
+    return render_to_response("courseware/courses.html", {'courses': courses})
 
 
 def render_accordion(request, course, chapter, section, model_data_cache):
@@ -97,7 +92,7 @@ def render_accordion(request, course, chapter, section, model_data_cache):
     context = dict([('toc', toc),
                     ('course_id', course.id),
                     ('csrf', csrf(request)['csrf_token'])] + template_imports.items())
-    return render_to_string('accordion.html', context)
+    return render_to_string('courseware/accordion.html', context)
 
 
 def get_current_child(xmodule):
@@ -154,6 +149,7 @@ def redirect_to_course_position(course_module):
     urlargs['section'] = section.url_name
     return redirect(reverse('courseware_section', kwargs=urlargs))
 
+
 def save_child_position(seq_module, child_name):
     """
     child_name: url_name of the child
@@ -163,6 +159,7 @@ def save_child_position(seq_module, child_name):
             # Only save if position changed
             if position != seq_module.position:
                 seq_module.position = position
+
 
 @login_required
 @ensure_csrf_cookie
@@ -191,19 +188,19 @@ def index(request, course_id, chapter=None, section=None,
 
      - HTTPresponse
     """
-    course = get_course_with_access(request.user, course_id, 'load')
+    course = get_course_with_access(request.user, course_id, 'load', depth=2)
     staff_access = has_access(request.user, course, 'staff')
     registered = registered_for_course(course, request.user)
     if not registered:
         # TODO (vshnayder): do course instructors need to be registered to see course?
-        log.debug('User %s tried to view course %s but is not enrolled' % (request.user,course.location.url()))
+        log.debug('User %s tried to view course %s but is not enrolled' % (request.user, course.location.url()))
         return redirect(reverse('about_course', args=[course.id]))
 
     try:
         model_data_cache = ModelDataCache.cache_for_descriptor_descendents(
             course.id, request.user, course, depth=2)
 
-        course_module = get_module(request.user, request, course.location, model_data_cache, course.id)
+        course_module = get_module_for_descriptor(request.user, request, course, model_data_cache, course.id)
         if course_module is None:
             log.warning('If you see this, something went wrong: if we got this'
                         ' far, should have gotten a course module for this user')
@@ -220,32 +217,34 @@ def index(request, course_id, chapter=None, section=None,
             'init': '',
             'content': '',
             'staff_access': staff_access,
-            'xqa_server': settings.MITX_FEATURES.get('USE_XQA_SERVER','http://xqa:server@content-qa.mitx.mit.edu/xqa')
+            'xqa_server': settings.MITX_FEATURES.get('USE_XQA_SERVER', 'http://xqa:server@content-qa.mitx.mit.edu/xqa')
             }
 
-        chapter_descriptor = course.get_child_by_url_name(chapter)
+        chapter_descriptor = course.get_child_by(lambda m: m.url_name == chapter)
         if chapter_descriptor is not None:
             save_child_position(course_module, chapter)
         else:
             raise Http404
 
-        chapter_module = get_module(request.user, request, chapter_descriptor.location,
-                                    model_data_cache, course_id)
+        chapter_module = course_module.get_child_by(lambda m: m.url_name == chapter)
         if chapter_module is None:
             # User may be trying to access a chapter that isn't live yet
             raise Http404
 
         if section is not None:
-            section_descriptor = chapter_descriptor.get_child_by_url_name(section)
+            section_descriptor = chapter_descriptor.get_child_by(lambda m: m.url_name == section)
             if section_descriptor is None:
                 # Specifically asked-for section doesn't exist
                 raise Http404
 
+            # Load all descendants of the section, because we're going to display its
+            # html, which in general will need all of its children
             section_model_data_cache = ModelDataCache.cache_for_descriptor_descendents(
-                course_id, request.user, section_descriptor)
+                course_id, request.user, section_descriptor, depth=None)
             section_module = get_module(request.user, request,
                                 section_descriptor.location,
-                                section_model_data_cache, course_id, position)
+                                section_model_data_cache, course_id, position, depth=None)
+
             if section_module is None:
                 # User may be trying to be clever and access something
                 # they don't have access to.
@@ -292,7 +291,7 @@ def index(request, course_id, chapter=None, section=None,
             try:
                 result = render_to_response('courseware/courseware-error.html',
                                             {'staff_access': staff_access,
-                                            'course' : course})
+                                            'course': course})
             except:
                 # Let the exception propagate, relying on global config to at
                 # at least return a nice error message
@@ -326,18 +325,19 @@ def jump_to(request, course_id, location):
     except NoPathToItem:
         raise Http404("This location is not in any class: {0}".format(location))
 
-    # cdodge: the CAS is generating a link to the LMS for 'subsections' (aka sequentials)
-    # and there is no associated 'Position' for this. The above Path_to_location is returning None for Position
-    # however, this ends up producing a 404 on the redirect
-    if position is None:
-        position = 0
-
+    # choose the appropriate view (and provide the necessary args) based on the
+    # args provided by the redirect.
     # Rely on index to do all error handling and access control.
-    return redirect('courseware_position',
-                    course_id=course_id,
-                    chapter=chapter,
-                    section=section,
-                    position=position)
+    if chapter is None:
+        return redirect('courseware', course_id=course_id)
+    elif section is None:
+        return redirect('courseware_chapter', course_id=course_id, chapter=chapter)
+    elif position is None:
+        return redirect('courseware_section', course_id=course_id, chapter=chapter, section=section)
+    else:
+        return redirect('courseware_position', course_id=course_id, chapter=chapter, section=section, position=position)
+
+
 @ensure_csrf_cookie
 def course_info(request, course_id):
     """
@@ -348,8 +348,9 @@ def course_info(request, course_id):
     course = get_course_with_access(request.user, course_id, 'load')
     staff_access = has_access(request.user, course, 'staff')
 
-    return render_to_response('courseware/info.html', {'request' : request, 'course_id' : course_id, 'cache' : None, 
+    return render_to_response('courseware/info.html', {'request': request, 'course_id': course_id, 'cache': None,
             'course': course, 'staff_access': staff_access})
+
 
 @ensure_csrf_cookie
 def static_tab(request, course_id, tab_slug):
@@ -373,9 +374,11 @@ def static_tab(request, course_id, tab_slug):
                               {'course': course,
                                'tab': tab,
                                'tab_contents': contents,
-                               'staff_access': staff_access,})
+                               'staff_access': staff_access, })
 
 # TODO arjun: remove when custom tabs in place, see courseware/syllabus.py
+
+
 @ensure_csrf_cookie
 def syllabus(request, course_id):
     """
@@ -387,7 +390,7 @@ def syllabus(request, course_id):
     staff_access = has_access(request.user, course, 'staff')
 
     return render_to_response('courseware/syllabus.html', {'course': course,
-                                            'staff_access': staff_access,})
+                                            'staff_access': staff_access, })
 
 
 def registered_for_course(course, user):
@@ -398,6 +401,7 @@ def registered_for_course(course, user):
         return CourseEnrollment.objects.filter(user=user, course_id=course.id).exists()
     else:
         return False
+
 
 @ensure_csrf_cookie
 @cache_if_anonymous
@@ -413,11 +417,11 @@ def course_about(request, course_id):
     show_courseware_link = (has_access(request.user, course, 'load') or
                             settings.MITX_FEATURES.get('ENABLE_LMS_MIGRATION'))
 
-    return render_to_response('portal/course_about.html',
-                              { 'course': course,
+    return render_to_response('courseware/course_about.html',
+                              {'course': course,
                                'registered': registered,
                                'course_target': course_target,
-                               'show_courseware_link' : show_courseware_link})
+                               'show_courseware_link': show_courseware_link})
 
 
 @ensure_csrf_cookie
@@ -429,6 +433,7 @@ def static_university_profile(request, org_id):
     template_file = "university_profile/{0}.html".format(org_id).lower()
     context = dict(courses=[], org_id=org_id)
     return render_to_response(template_file, context)
+
 
 @ensure_csrf_cookie
 @cache_if_anonymous
@@ -444,10 +449,13 @@ def university_profile(request, org_id):
     # Only grab courses for this org...
     courses = get_courses_by_university(request.user,
                                         domain=request.META.get('HTTP_HOST'))[org_id]
+    courses = sort_by_announcement(courses)
+
     context = dict(courses=courses, org_id=org_id)
     template_file = "university_profile/{0}.html".format(org_id).lower()
 
     return render_to_response(template_file, context)
+
 
 def render_notifications(request, course, notifications):
     context = {
@@ -455,7 +463,8 @@ def render_notifications(request, course, notifications):
         'get_discussion_title': partial(get_discussion_title, request=request, course=course),
         'course': course,
     }
-    return render_to_string('notifications.html', context)
+    return render_to_string('courseware/notifications.html', context)
+
 
 @login_required
 def news(request, course_id):
@@ -468,7 +477,8 @@ def news(request, course_id):
         'content': render_notifications(request, course, notifications),
     }
 
-    return render_to_response('news.html', context)
+    return render_to_response('courseware/news.html', context)
+
 
 @login_required
 @cache_control(no_cache=True, no_store=True, must_revalidate=True)

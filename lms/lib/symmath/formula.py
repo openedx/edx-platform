@@ -154,8 +154,9 @@ def my_sympify(expr, normphase=False, matrix=False, abcsym=False, do_qubit=False
 
 class formula(object):
     '''
-    Representation of a mathematical formula object.  Accepts mathml math expression for constructing,
-    and can produce sympy translation.  The formula may or may not include an assignment (=).
+    Representation of a mathematical formula object.  Accepts mathml math expression
+    for constructing, and can produce sympy translation.  The formula may or may not
+    include an assignment (=).
     '''
     def __init__(self, expr, asciimath='', options=None):
         self.expr = expr.strip()
@@ -194,8 +195,12 @@ class formula(object):
 
     def preprocess_pmathml(self, xml):
         '''
-        Pre-process presentation MathML from ASCIIMathML to make it more acceptable for SnuggleTeX, and also
-        to accomodate some sympy conventions (eg hat(i) for \hat{i}).
+        Pre-process presentation MathML from ASCIIMathML to make it more
+        acceptable for SnuggleTeX, and also to accomodate some sympy
+        conventions (eg hat(i) for \hat{i}).
+
+        This method would be a good spot to look for an integral and convert
+        it, if possible...
         '''
 
         if type(xml) == str or type(xml) == unicode:
@@ -266,6 +271,9 @@ class formula(object):
         '''
         Return sympy expression for the math formula.
         The math formula is converted to Content MathML then that is parsed.
+
+        This is a recursive function, called on every CMML node. Support for
+        more functions can be added by modifying opdict, abould halfway down
         '''
 
         if self.the_sympy: return self.the_sympy
@@ -422,7 +430,8 @@ class formula(object):
 
     def GetContentMathML(self, asciimath, mathml):
         # URL = 'http://192.168.1.2:8080/snuggletex-webapp-1.2.2/ASCIIMathMLUpConversionDemo'
-        URL = 'http://127.0.0.1:8080/snuggletex-webapp-1.2.2/ASCIIMathMLUpConversionDemo'
+        # URL = 'http://127.0.0.1:8080/snuggletex-webapp-1.2.2/ASCIIMathMLUpConversionDemo'
+        URL = 'https://math-xserver.mitx.mit.edu/snuggletex-webapp-1.2.2/ASCIIMathMLUpConversionDemo'
 
         if 1:
             payload = {'asciiMathInput': asciimath,
@@ -430,7 +439,7 @@ class formula(object):
                        #'asciiMathML':unicode(mathml).encode('utf-8'),
                        }
             headers = {'User-Agent': "Mozilla/5.0 (Windows; U; Windows NT 5.1; en-US; rv:1.8.1.13) Gecko/20080311 Firefox/2.0.0.13"}
-            r = requests.post(URL, data=payload, headers=headers)
+            r = requests.post(URL, data=payload, headers=headers, verify=False)
             r.encoding = 'utf-8'
             ret = r.text
             #print "encoding: ",r.encoding

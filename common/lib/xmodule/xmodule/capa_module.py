@@ -2,6 +2,7 @@ import cgi
 import datetime
 import dateutil
 import dateutil.parser
+import hashlib
 import json
 import logging
 import traceback
@@ -31,6 +32,25 @@ class StringyInteger(Integer):
         if isinstance(value, basestring):
             return int(value)
         return value
+
+
+# Generated this many different variants of problems with rerandomize=per_student
+NUM_RANDOMIZATION_BINS = 20
+
+
+def randomization_bin(seed, problem_id):
+    """
+    Pick a randomization bin for the problem given the user's seed and a problem id.
+
+    We do this because we only want e.g. 20 randomizations of a problem to make analytics
+    interesting.  To avoid having sets of students that always get the same problems,
+    we'll combine the system's per-student seed with the problem id in picking the bin.
+    """
+    h = hashlib.sha1()
+    h.update(str(seed))
+    h.update(str(problem_id))
+    # get the first few digits of the hash, convert to an int, then mod.
+    return int(h.hexdigest()[:7], 16) % NUM_RANDOMIZATION_BINS
 
 
 class Randomization(String):
@@ -77,7 +97,8 @@ class CapaModule(XModule):
                      resource_string(__name__, 'js/src/javascript_loader.coffee'),
                     ],
           'js': [resource_string(__name__, 'js/src/capa/imageinput.js'),
-                 resource_string(__name__, 'js/src/capa/schematic.js')]}
+                 resource_string(__name__, 'js/src/capa/schematic.js')
+                 ]}
 
     js_module_name = "Problem"
     css = {'scss': [resource_string(__name__, 'css/capa/display.scss')]}
@@ -100,13 +121,14 @@ class CapaModule(XModule):
         if self.seed is None:
             if self.rerandomize == 'never':
                 self.seed = 1
-            elif self.rerandomize == "per_student" and hasattr(self.system, 'id'):
-                # TODO: This line is badly broken:
-                # (1) We're passing student ID to xmodule.
-                # (2) There aren't bins of students.  -- we only want 10 or 20 randomizations, and want to assign students
-                # to these bins, and may not want cohorts.  So e.g. hash(your-id, problem_id) % num_bins.
-                #     - analytics really needs small number of bins.
-                self.seed = system.id
+            elif self.rerandomize == "per_student" and hasattr(self.system, 'seed'):
+                # see comment on randomization_bin
+                self.seed = randomization_bin(system.seed, self.location.url)
+
+        # Need the problem location in openendedresponse to send out.  Adding
+        # it to the system here seems like the least clunky way to get it
+        # there.
+        self.system.set('location', self.location.url())
 
         try:
             # TODO (vshnayder): move as much as possible of this work and error
@@ -184,6 +206,7 @@ class CapaModule(XModule):
             'element_id': self.location.html_id(),
             'id': self.id,
             'ajax_url': self.system.ajax_url,
+            'progress': Progress.to_js_status_str(self.get_progress())
         })
 
     def get_problem_html(self, encapsulate=True):
@@ -255,7 +278,7 @@ class CapaModule(XModule):
         # check button is context-specific.
 
         # Put a "Check" button if unlimited attempts or still some left
-        if self.max_attempts is None or self.attempts < self.max_attempts-1:
+        if self.max_attempts is None or self.attempts < self.max_attempts - 1:
             check_button = "Check"
         else:
             # Will be final check so let user know that
@@ -309,11 +332,7 @@ class CapaModule(XModule):
                 id=self.location.html_id(), ajax_url=self.system.ajax_url) + html + "</div>"
 
         # now do the substitutions which are filesystem based, e.g. '/static/' prefixes
-        return self.system.replace_urls(
-            html,
-            getattr(self.descriptor, 'data_dir', ''),
-            course_namespace=self.location
-        )
+        return self.system.replace_urls(html)
 
     def handle_ajax(self, dispatch, get):
         '''
@@ -346,41 +365,58 @@ class CapaModule(XModule):
             })
         return json.dumps(d, cls=ComplexEncoder)
 
+    def is_past_due(self):
+        """
+        Is it now past this problem's due date, including grace period?
+        """
+        return (self.close_date is not None and
+                datetime.datetime.utcnow() > self.close_date)
+
     def closed(self):
         ''' Is the student still allowed to submit answers? '''
         if self.attempts == self.max_attempts:
             return True
-        if self.close_date is not None and datetime.datetime.utcnow() > self.close_date:
+        if self.is_past_due():
             return True
 
         return False
 
+    def is_completed(self):
+        # used by conditional module
+        # return self.answer_available()
+        return self.lcp.done
+
+    def is_attempted(self):
+        # used by conditional module
+        return self.attempts > 0
+
     def answer_available(self):
-        ''' Is the user allowed to see an answer?
+        '''
+        Is the user allowed to see an answer?
         '''
         if self.showanswer == '':
             return False
-
-        if self.showanswer == "never":
+        elif self.showanswer == "never":
             return False
-
-        # Admins can see the answer, unless the problem explicitly prevents it
-        if self.system.user_is_staff:
+        elif self.system.user_is_staff:
+            # This is after the 'never' check because admins can see the answer
+            # unless the problem explicitly prevents it
             return True
-
-        if self.showanswer == 'attempted':
+        elif self.showanswer == 'attempted':
             return self.attempts > 0
-
-        if self.showanswer == 'answered':
-            return self.done
-
-        if self.showanswer == 'closed':
+        elif self.showanswer == 'answered':
+            # NOTE: this is slightly different from 'attempted' -- resetting the problems
+            # makes lcp.done False, but leaves attempts unchanged.
+            return self.lcp.done
+        elif self.showanswer == 'closed':
             return self.closed()
-
-        if self.showanswer == 'always':
+        elif self.showanswer == 'past_due':
+            return self.is_past_due()
+        elif self.showanswer == 'always':
             return True
 
         return False
+
 
     def update_score(self, get):
         """
@@ -420,13 +456,7 @@ class CapaModule(XModule):
         new_answers = dict()
         for answer_id in answers:
             try:
-                new_answer = {
-                    answer_id: self.system.replace_urls(
-                        answers[answer_id],
-                        getattr(self, 'data_dir', ''),
-                        course_namespace=self.location
-                    )
-                }
+                new_answer = {answer_id: self.system.replace_urls(answers[answer_id])}
             except TypeError:
                 log.debug('Unable to perform URL substitution on answers[%s]: %s' % (answer_id, answers[answer_id]))
                 new_answer = {answer_id: answers[answer_id]}
@@ -643,6 +673,10 @@ class CapaDescriptor(RawDescriptor):
     stores_state = True
     has_score = True
     template_dir_name = 'problem'
+    mako_template = "widgets/problem-edit.html"
+    js = {'coffee': [resource_string(__name__, 'js/src/problem/edit.coffee')]}
+    js_module_name = "MarkdownEditingDescriptor"
+    css = {'scss': [resource_string(__name__, 'css/editor/edit.scss'), resource_string(__name__, 'css/problem/edit.scss')]}
 
     # Capa modules have some additional metadata:
     # TODO (vshnayder): do problems have any other metadata?  Do they
@@ -653,6 +687,19 @@ class CapaDescriptor(RawDescriptor):
     # is the attribute `attempts`. This will do that conversion
     metadata_translations = dict(RawDescriptor.metadata_translations)
     metadata_translations['attempts'] = 'max_attempts'
+
+    def get_context(self):
+        _context = RawDescriptor.get_context(self)
+        _context.update({'markdown': self.metadata.get('markdown', '')})
+        return _context
+
+    @property
+    def editable_metadata_fields(self):
+        """Remove metadata from the editable fields since it has its own editor"""
+        subset = super(CapaDescriptor, self).editable_metadata_fields
+        if 'markdown' in subset:
+            del subset['markdown']
+        return subset
 
     # VS[compat]
     # TODO (cpennington): Delete this method once all fall 2012 course are being

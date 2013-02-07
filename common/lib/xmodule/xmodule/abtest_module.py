@@ -63,8 +63,9 @@ class ABTestModule(XModule):
     def group(self):
         del self.group_assignments[self.experiment]
 
-    def get_children_locations(self):
-        return self.group_content[self.group]
+    def get_child_descriptors(self):
+        active_locations = set(self.group_content[self.group])
+        return [desc for desc in self.descriptor.get_children() if desc.location.url() in active_locations]
 
     def displayable_items(self):
         # Most modules return "self" as the displayable_item. We never display ourself

@@ -54,22 +54,26 @@ class DraftModuleStore(ModuleStoreBase):
             in the request. The depth is counted in the number of calls to
             get_children() to cache. None indicates to cache all descendents
         """
-        try:
-            return wrap_draft(super(DraftModuleStore, self).get_item(as_draft(location), depth))
-        except ItemNotFoundError:
-            return wrap_draft(super(DraftModuleStore, self).get_item(location, depth))
 
-    def get_instance(self, course_id, location):
+        # cdodge: we're forcing depth=0 here as the Draft store is not handling caching well
+        try:
+            return wrap_draft(super(DraftModuleStore, self).get_item(as_draft(location), depth=0))
+        except ItemNotFoundError:
+            return wrap_draft(super(DraftModuleStore, self).get_item(location, depth=0))
+
+    def get_instance(self, course_id, location, depth=0):
         """
         Get an instance of this location, with policy for course_id applied.
         TODO (vshnayder): this may want to live outside the modulestore eventually
         """
-        try:
-            return wrap_draft(super(DraftModuleStore, self).get_instance(course_id, as_draft(location)))
-        except ItemNotFoundError:
-            return wrap_draft(super(DraftModuleStore, self).get_instance(course_id, location))
 
-    def get_items(self, location, depth=0):
+        # cdodge: we're forcing depth=0 here as the Draft store is not handling caching well
+        try:
+            return wrap_draft(super(DraftModuleStore, self).get_instance(course_id, as_draft(location), depth=0))
+        except ItemNotFoundError:
+            return wrap_draft(super(DraftModuleStore, self).get_instance(course_id, location, depth=0))
+
+    def get_items(self, location, course_id=None, depth=0):
         """
         Returns a list of XModuleDescriptor instances for the items
         that match location. Any element of location that is None is treated
@@ -83,8 +87,10 @@ class DraftModuleStore(ModuleStoreBase):
             get_children() to cache. None indicates to cache all descendents
         """
         draft_loc = as_draft(location)
-        draft_items = super(DraftModuleStore, self).get_items(draft_loc, depth)
-        items = super(DraftModuleStore, self).get_items(location, depth)
+
+        # cdodge: we're forcing depth=0 here as the Draft store is not handling caching well
+        draft_items = super(DraftModuleStore, self).get_items(draft_loc, course_id=course_id, depth=0)
+        items = super(DraftModuleStore, self).get_items(location, course_id=course_id, depth=0)
 
         draft_locs_found = set(item.location._replace(revision=None) for item in draft_items)
         non_draft_items = [
@@ -160,13 +166,13 @@ class DraftModuleStore(ModuleStoreBase):
         return super(DraftModuleStore, self).delete_item(as_draft(location))
 
 
-    def get_parent_locations(self, location):
+    def get_parent_locations(self, location, course_id):
         '''Find all locations that are the parents of this location.  Needed
         for path_to_location().
 
         returns an iterable of things that can be passed to Location.
         '''
-        return super(DraftModuleStore, self).get_parent_locations(location)
+        return super(DraftModuleStore, self).get_parent_locations(location, course_id)
 
     def publish(self, location, published_by_id):
         """

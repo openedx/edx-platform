@@ -55,7 +55,7 @@ CMS.Views.ValidatingView = Backbone.View.extend({
 		var newVal = $(event.currentTarget).val();
 		if (currentVal != newVal) {
 			this.clearValidationErrors();
-			this.model.save(field, newVal);
+			this.model.save(field, newVal, { error : CMS.ServerError});
 			return true;
 		}
 		else return false;
@@ -211,15 +211,15 @@ CMS.Views.Settings.Details = CMS.Views.ValidatingView.extend({
 		'intro_video' : 'course-introduction-video',
 		'effort' : "course-effort"
 	},
-	
-	setupDatePicker : function(fieldName) {
-		var cacheModel = this.model;
-		var div = this.$el.find('#' + this.fieldToSelectorMap[fieldName]);
-		var datefield = $(div).find(".date");
-		var timefield = $(div).find(".time");
-		var cachethis = this;
-		var savefield = function() { 
-			cachethis.clearValidationErrors();
+
+    setupDatePicker: function (fieldName) {
+        var cacheModel = this.model;
+        var div = this.$el.find('#' + this.fieldToSelectorMap[fieldName]);
+        var datefield = $(div).find(".date");
+        var timefield = $(div).find(".time");
+        var cachethis = this;
+        var savefield = function () {
+            cachethis.clearValidationErrors();
             var date = datefield.datepicker('getDate');
             if (date) {
                 var time = timefield.timepicker("getSecondsFromMidnight");
@@ -227,20 +227,24 @@ CMS.Views.Settings.Details = CMS.Views.ValidatingView.extend({
                     time = 0;
                 }
                 var newVal = new Date(date.getTime() + time * 1000);
-                if (cacheModel.get(fieldName) != newVal) cacheModel.save(fieldName, newVal);
+                if (cacheModel.get(fieldName).getTime() !== newVal.getTime()) {
+                    cacheModel.save(fieldName, newVal, { error: CMS.ServerError});
+                }
             }
-		};
-		
-		// instrument as date and time pickers
-		timefield.timepicker();
-		
-		// FIXME being called 2x on each change. Was trapping datepicker onSelect b4 but change to datepair broke that
-		datefield.datepicker({ onSelect : savefield });
-		timefield.on('changeTime', savefield);
-		
-		datefield.datepicker('setDate', this.model.get(fieldName));
-		if (this.model.has(fieldName)) timefield.timepicker('setTime', this.model.get(fieldName));
-	},
+        };
+
+        // instrument as date and time pickers
+        timefield.timepicker();
+        datefield.datepicker();
+
+        // Using the change event causes savefield to be triggered twice, but it is necessary
+        // to pick up when the date is typed directly in the field.
+        datefield.change(savefield);
+        timefield.on('changeTime', savefield);
+
+        datefield.datepicker('setDate', this.model.get(fieldName));
+        if (this.model.has(fieldName)) timefield.timepicker('setTime', this.model.get(fieldName));
+    },
 	
 	updateModel: function(event) {
 		switch (event.currentTarget.id) {
@@ -276,7 +280,8 @@ CMS.Views.Settings.Details = CMS.Views.ValidatingView.extend({
 	},
 	
 	removeSyllabus: function() {
-		if (this.model.has('syllabus'))	this.model.save({'syllabus': null});
+		if (this.model.has('syllabus'))	this.model.save({'syllabus': null}, 
+				{ error : CMS.ServerError});
 	},
 	
 	assetSyllabus : function() {
@@ -292,28 +297,30 @@ CMS.Views.Settings.Details = CMS.Views.ValidatingView.extend({
 		}
 	},
 	codeMirrors : {},
-	codeMirrorize : function(e, forcedTarget) {
-		if (forcedTarget) {
-			thisTarget = forcedTarget;
-			thisTarget.id = $(thisTarget).attr('id');
-		} else {
-			thisTarget = e.currentTarget;
-		}
+    codeMirrorize: function (e, forcedTarget) {
+        var thisTarget;
+        if (forcedTarget) {
+            thisTarget = forcedTarget;
+            thisTarget.id = $(thisTarget).attr('id');
+        } else {
+            thisTarget = e.currentTarget;
+        }
 
-		if (!this.codeMirrors[thisTarget.id]) {
-			var cachethis = this;
-			var field = this.selectorToField[thisTarget.id];
-			this.codeMirrors[thisTarget.id] = CodeMirror.fromTextArea(thisTarget, {
-				mode: "text/html", lineNumbers: true, lineWrapping: true,
-				onBlur : function(mirror) {
-					mirror.save();
-					cachethis.clearValidationErrors();
-					var newVal = mirror.getValue();
-					if (cachethis.model.get(field) != newVal) cachethis.model.save(field, newVal);
-				}
-			});
-		}
-	}
+        if (!this.codeMirrors[thisTarget.id]) {
+            var cachethis = this;
+            var field = this.selectorToField[thisTarget.id];
+            this.codeMirrors[thisTarget.id] = CodeMirror.fromTextArea(thisTarget, {
+                mode: "text/html", lineNumbers: true, lineWrapping: true,
+                onBlur: function (mirror) {
+                    mirror.save();
+                    cachethis.clearValidationErrors();
+                    var newVal = mirror.getValue();
+                    if (cachethis.model.get(field) != newVal) cachethis.model.save(field, newVal,
+                        { error: CMS.ServerError});
+                }
+            });
+        }
+    }
 	
 });
 
@@ -388,6 +395,9 @@ CMS.Views.Settings.Grading = CMS.Views.ValidatingView.extend({
 		var graceEle = this.$el.find('#course-grading-graceperiod');
 		graceEle.timepicker({'timeFormat' : 'H:i'}); // init doesn't take setTime
 		if (this.model.has('grace_period')) graceEle.timepicker('setTime', this.model.gracePeriodToDate());
+		// remove any existing listeners to keep them from piling on b/c render gets called frequently
+		graceEle.off('change', this.setGracePeriod);
+		graceEle.on('change', this, this.setGracePeriod);
 		
 		return this;
 	},
@@ -398,14 +408,17 @@ CMS.Views.Settings.Grading = CMS.Views.ValidatingView.extend({
 	fieldToSelectorMap : {
 		'grace_period' : 'course-grading-graceperiod'
 	},
+	setGracePeriod : function(event) {
+		event.data.clearValidationErrors();
+		var newVal = event.data.model.dateToGracePeriod($(event.currentTarget).timepicker('getTime'));
+		if (event.data.model.get('grace_period') != newVal) event.data.model.save('grace_period', newVal,
+				{ error : CMS.ServerError});
+	},
 	updateModel : function(event) {
 		if (!this.selectorToField[event.currentTarget.id]) return;
 
 		switch (this.selectorToField[event.currentTarget.id]) {
-		case 'grace_period':
-			this.clearValidationErrors();
-			var newVal = this.model.dateToGracePeriod($(event.currentTarget).timepicker('getTime'));
-			if (this.model.get('grace_period') != newVal) this.model.save('grace_period', newVal);
+		case 'grace_period': // handled above
 			break;
 
 		default:
@@ -535,7 +548,8 @@ CMS.Views.Settings.Grading = CMS.Views.ValidatingView.extend({
 					object[cutoff['designation']] = cutoff['cutoff'] / 100.0;
 					return object;
 				}, 
-				{}));
+				{}),
+				{ error : CMS.ServerError});
 	},
 	
 	addNewGrade: function(e) {
@@ -658,7 +672,7 @@ CMS.Views.Settings.GraderView = CMS.Views.ValidatingView.extend({
 				$(event.currentTarget).parent().append(
 						this.errorTemplate({message : 'For grading to work, you must change all "' + oldName +
 							'" subsections to "' + this.model.get('type') + '".'}));
-			};
+			}
 			break;
 		default:
 			this.saveIfChanged(event);
@@ -666,7 +680,8 @@ CMS.Views.Settings.GraderView = CMS.Views.ValidatingView.extend({
 		}
 	},
 	deleteModel : function(e) {
-		this.model.destroy();
+		this.model.destroy(
+				{ error : CMS.ServerError});
 		e.preventDefault();
 	}
 	

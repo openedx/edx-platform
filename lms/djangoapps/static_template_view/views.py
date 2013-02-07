@@ -46,4 +46,3 @@ def render_404(request):
 
 def render_500(request):
     return HttpResponseServerError(render_to_string('static_templates/server-error.html', {}))
-

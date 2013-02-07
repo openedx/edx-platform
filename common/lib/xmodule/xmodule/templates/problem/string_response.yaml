@@ -3,6 +3,29 @@ metadata:
     display_name: String Response
     rerandomize: never
     showanswer: always
+    weight: ""
+    attempts: ""
+    # Note, the extra newlines are needed to make the yaml parser add blank lines instead of folding
+    markdown: 
+        "A string response problem accepts a line of text input from the 
+        student, and evaluates the input for correctness based on an expected 
+        answer within each input box. 
+        
+    
+        The answer is correct if it matches every character of the expected answer. This can be a problem with  
+        international spelling, dates, or anything where the format of the answer is not clear.
+         
+    
+        Which US state has Lansing as its capital?
+
+        = Michigan
+        
+
+        [explanation]
+        Lansing is the capital of Michigan, although it is not Michgan's largest city, 
+        or even the seat of the county in which it resides.
+        [explanation]
+        "
 data: |
     <problem showanswer="always">
     <p>

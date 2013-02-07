@@ -13,6 +13,9 @@ Module containing the problem elements which render into input objects
 - imageinput  (for clickable image)
 - optioninput (for option list)
 - filesubmission (upload a file)
+- crystallography
+- vsepr_input
+- drag_and_drop
 
 These are matched by *.html files templates/*.html which are mako templates with the
 actual html.
@@ -41,6 +44,7 @@ from lxml import etree
 import re
 import shlex  # for splitting quoted strings
 import sys
+import os
 
 from registry import TagRegistry
 
@@ -49,6 +53,7 @@ log = logging.getLogger(__name__)
 #########################################################################
 
 registry = TagRegistry()
+
 
 class Attribute(object):
     """
@@ -409,7 +414,7 @@ class JavascriptInput(InputTypeBase):
         return [Attribute('params', None),
                 Attribute('problem_state', None),
                 Attribute('display_class', None),
-                Attribute('display_file', None),]
+                Attribute('display_file', None), ]
 
 
     def setup(self):
@@ -473,11 +478,12 @@ class TextLine(InputTypeBase):
 
     def _extra_context(self):
         return {'do_math': self.do_math,
-                'preprocessor': self.preprocessor,}
+                'preprocessor': self.preprocessor, }
 
 registry.register(TextLine)
 
 #-----------------------------------------------------------------------------
+
 
 class FileSubmission(InputTypeBase):
     """
@@ -504,7 +510,7 @@ class FileSubmission(InputTypeBase):
         Convert the list of allowed files to a convenient format.
         """
         return [Attribute('allowed_files', '[]', transform=cls.parse_files),
-                Attribute('required_files', '[]', transform=cls.parse_files),]
+                Attribute('required_files', '[]', transform=cls.parse_files), ]
 
     def setup(self):
         """
@@ -520,7 +526,7 @@ class FileSubmission(InputTypeBase):
             self.msg = FileSubmission.submitted_msg
 
     def _extra_context(self):
-        return {'queue_len': self.queue_len,}
+        return {'queue_len': self.queue_len, }
         return context
 
 registry.register(FileSubmission)
@@ -578,7 +584,7 @@ class CodeInput(InputTypeBase):
 
     def _extra_context(self):
         """Defined queue_len, add it """
-        return {'queue_len': self.queue_len,}
+        return {'queue_len': self.queue_len, }
 
 registry.register(CodeInput)
 
@@ -602,13 +608,14 @@ class Schematic(InputTypeBase):
             Attribute('parts', None),
             Attribute('analyses', None),
             Attribute('initial_value', None),
-            Attribute('submit_analyses', None),]
+            Attribute('submit_analyses', None), ]
 
         return context
 
 registry.register(Schematic)
 
 #-----------------------------------------------------------------------------
+
 
 class ImageInput(InputTypeBase):
     """
@@ -631,7 +638,7 @@ class ImageInput(InputTypeBase):
         """
         return [Attribute('src'),
                 Attribute('height'),
-                Attribute('width'),]
+                Attribute('width'), ]
 
 
     def setup(self):
@@ -656,6 +663,7 @@ registry.register(ImageInput)
 
 #-----------------------------------------------------------------------------
 
+
 class Crystallography(InputTypeBase):
     """
     An input for crystallography -- user selects 3 points on the axes, and we get a plane.
@@ -671,17 +679,14 @@ class Crystallography(InputTypeBase):
         """
         Note: height, width are required.
         """
-        return [Attribute('size', None),
-                Attribute('height'),
+        return [Attribute('height'),
                 Attribute('width'),
-
-                # can probably be removed (textline should prob be always-hidden)
-                Attribute('hidden', ''),
                 ]
 
 registry.register(Crystallography)
 
 # -------------------------------------------------------------------------
+
 
 class VseprInput(InputTypeBase):
     """
@@ -695,7 +700,7 @@ class VseprInput(InputTypeBase):
     @classmethod
     def get_attributes(cls):
         """
-        Note: height, width are required.
+        Note: height, width, molecules and geometries are required.
         """
         return [Attribute('height'),
                 Attribute('width'),
@@ -727,12 +732,210 @@ class ChemicalEquationInput(InputTypeBase):
         """
         Can set size of text field.
         """
-        return [Attribute('size', '20'),]
+        return [Attribute('size', '20'), ]
 
     def _extra_context(self):
         """
         TODO (vshnayder): Get rid of this once we have a standard way of requiring js to be loaded.
         """
-        return {'previewer': '/static/js/capa/chemical_equation_preview.js',}
+        return {'previewer': '/static/js/capa/chemical_equation_preview.js', }
 
 registry.register(ChemicalEquationInput)
+
+#-----------------------------------------------------------------------------
+
+
+class DragAndDropInput(InputTypeBase):
+    """
+    Input for drag and drop problems. Allows student to drag and drop images and
+    labels to base image.
+    """
+
+    template = 'drag_and_drop_input.html'
+    tags = ['drag_and_drop_input']
+
+    def setup(self):
+
+        def parse(tag, tag_type):
+            """Parses <tag ... /> xml element to dictionary. Stores
+                'draggable' and 'target' tags with attributes to dictionary and
+                returns last.
+
+                Args:
+                    tag: xml etree element <tag...> with attributes
+
+                    tag_type: 'draggable' or 'target'.
+
+                    If tag_type is 'draggable' : all attributes except id
+                    (name or label or icon or can_reuse) are optional
+
+                    If tag_type is 'target' all attributes (name, x, y, w, h)
+                    are required. (x, y) - coordinates of center of target,
+                    w, h - weight and height of target.
+
+                Returns:
+                    Dictionary of vaues of attributes:
+                    dict{'name': smth, 'label': smth, 'icon': smth,
+                    'can_reuse': smth}.
+            """
+            tag_attrs = dict()
+            tag_attrs['draggable'] = {'id': Attribute._sentinel,
+                                      'label': "", 'icon': "",
+                                      'can_reuse': ""}
+
+            tag_attrs['target'] = {'id': Attribute._sentinel,
+                                    'x': Attribute._sentinel,
+                                    'y': Attribute._sentinel,
+                                    'w': Attribute._sentinel,
+                                    'h': Attribute._sentinel}
+
+            dic = dict()
+
+            for attr_name in tag_attrs[tag_type].keys():
+                dic[attr_name] = Attribute(attr_name,
+                    default=tag_attrs[tag_type][attr_name]).parse_from_xml(tag)
+
+            if tag_type == 'draggable' and not self.no_labels:
+                dic['label'] = dic['label'] or dic['id']
+
+            return dic
+
+        # add labels to images?:
+        self.no_labels = Attribute('no_labels',
+                                        default="False").parse_from_xml(self.xml)
+
+        to_js = dict()
+
+        # image drag and drop onto
+        to_js['base_image'] = Attribute('img').parse_from_xml(self.xml)
+
+        # outline places on image where to drag adn drop
+        to_js['target_outline'] = Attribute('target_outline',
+                                        default="False").parse_from_xml(self.xml)
+        # one draggable per target?
+        to_js['one_per_target'] = Attribute('one_per_target',
+                                        default="True").parse_from_xml(self.xml)
+        # list of draggables
+        to_js['draggables'] = [parse(draggable, 'draggable') for draggable in
+                                                self.xml.iterchildren('draggable')]
+        # list of targets
+        to_js['targets'] = [parse(target, 'target') for target in
+                                                self.xml.iterchildren('target')]
+
+        # custom background color for labels:
+        label_bg_color = Attribute('label_bg_color',
+                                   default=None).parse_from_xml(self.xml)
+        if label_bg_color:
+            to_js['label_bg_color'] = label_bg_color
+
+        self.loaded_attributes['drag_and_drop_json'] = json.dumps(to_js)
+        self.to_render.add('drag_and_drop_json')
+
+registry.register(DragAndDropInput)
+
+#--------------------------------------------------------------------------------------------------------------------
+
+
+class EditAMoleculeInput(InputTypeBase):
+    """
+    An input type for edit-a-molecule.  Integrates with the molecule editor java applet.
+
+    Example:
+
+    <editamolecule size="50"/>
+
+    options: size -- width of the textbox.
+    """
+
+    template = "editamolecule.html"
+    tags = ['editamoleculeinput']
+
+    @classmethod
+    def get_attributes(cls):
+        """
+        Can set size of text field.
+        """
+        return [Attribute('file'),
+                Attribute('missing', None)]
+
+    def _extra_context(self):
+        """
+        """
+        context = {
+            'applet_loader': '/static/js/capa/editamolecule.js',
+        }
+
+        return context
+
+registry.register(EditAMoleculeInput)
+
+#-----------------------------------------------------------------------------
+
+class DesignProtein2dInput(InputTypeBase):
+    """
+    An input type for design of a protein in 2D. Integrates with the Protex java applet.
+
+    Example:
+
+    <designprotein2d width="800" hight="500" target_shape="E;NE;NW;W;SW;E;none" />
+    """
+
+    template = "designprotein2dinput.html"
+    tags = ['designprotein2dinput']
+
+    @classmethod
+    def get_attributes(cls):
+        """
+        Note: width, hight, and target_shape are required.
+        """
+        return [Attribute('width'),
+                Attribute('height'),
+                Attribute('target_shape')
+                ]
+
+    def _extra_context(self):
+        """
+        """
+        context = {
+            'applet_loader': '/static/js/capa/design-protein-2d.js',
+        }
+
+        return context
+
+registry.register(DesignProtein2dInput)
+
+#-----------------------------------------------------------------------------
+
+class EditAGeneInput(InputTypeBase):
+    """
+        An input type for editing a gene. Integrates with the genex java applet.
+        
+        Example:
+        
+        <editagene width="800" hight="500" dna_sequence="ETAAGGCTATAACCGA" />
+        """
+    
+    template = "editageneinput.html"
+    tags = ['editageneinput']
+    
+    @classmethod
+    def get_attributes(cls):
+        """
+            Note: width, hight, and dna_sequencee are required.
+            """
+        return [Attribute('width'),
+                Attribute('height'),
+                Attribute('dna_sequence')
+                ]
+    
+    def _extra_context(self):
+        """
+            """
+        context = {
+            'applet_loader': '/static/js/capa/edit-a-gene.js',
+        }
+        
+        return context
+
+registry.register(EditAGeneInput)
+

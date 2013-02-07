@@ -4,7 +4,7 @@ unittests for xmodule
 Run like this:
 
     rake test_common/lib/xmodule
-    
+
 """
 
 import unittest
@@ -19,16 +19,17 @@ import xmodule
 from xmodule.x_module import ModuleSystem
 from mock import Mock
 
-i4xs = ModuleSystem(
+test_system = ModuleSystem(
     ajax_url='courses/course_id/modx/a_location',
     track_function=Mock(),
     get_module=Mock(),
-    render_template=Mock(),
+    # "render" to just the context...
+    render_template=lambda template, context: str(context),
     replace_urls=Mock(),
-    user=Mock(),
+    user=Mock(is_staff=False),
     filestore=Mock(),
     debug=True,
-    xqueue={'interface':None, 'callback_url':'/', 'default_queuename': 'testqueue', 'waittime': 10},
+    xqueue={'interface': None, 'callback_url': '/', 'default_queuename': 'testqueue', 'waittime': 10},
     node_path=os.environ.get("NODE_PATH", "/usr/local/lib/node_modules"),
     anonymous_student_id = 'student',
     xblock_model_data = lambda descriptor: descriptor._model_data,
@@ -85,4 +86,3 @@ class ModelsTest(unittest.TestCase):
         except:
             exception_happened = True
         self.assertTrue(exception_happened)
-

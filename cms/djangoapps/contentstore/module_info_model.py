@@ -1,5 +1,5 @@
 import logging
-from static_replace import replace_urls
+from static_replace import replace_static_urls
 from xmodule.modulestore.exceptions import ItemNotFoundError
 from xmodule.modulestore import Location
 from xmodule.modulestore.django import modulestore
@@ -7,18 +7,29 @@ from lxml import etree
 import re
 from django.http import HttpResponseBadRequest, Http404
 
-def get_module_info(store, location, parent_location = None, rewrite_static_links = False):
-    try:
-        if location.revision is None:
-            module = store.get_item(location)
-        else:
-            module = store.get_item(location)
-    except ItemNotFoundError:
-        raise Http404
 
-    data = module.data
-    if rewrite_static_links:
-        data = replace_urls(module.data, course_namespace = Location([module.location.tag, module.location.org, module.location.course, None, None]))
+def get_module_info(store, location, parent_location=None, rewrite_static_links=False):
+  try:
+    if location.revision is None:
+        module = store.get_item(location)
+    else:
+        module = store.get_item(location)
+  except ItemNotFoundError:
+    raise Http404
+
+  data = module.data
+  if rewrite_static_links:
+    data = replace_static_urls(
+        module.data,
+        None,
+        course_namespace=Location([
+            module.location.tag,
+            module.location.org,
+            module.location.course,
+            None,
+            None
+        ])
+    )
 
     return {
         'id': module.location.url(),
@@ -26,6 +37,7 @@ def get_module_info(store, location, parent_location = None, rewrite_static_link
         # TODO (cpennington): This really shouldn't have to do this much reaching in to get the metadata
         'metadata': module._model_data._kvs._metadata
     }
+
 
 def set_module_info(store, location, post_data):
     module = None

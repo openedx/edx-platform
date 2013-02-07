@@ -1,8 +1,10 @@
-import hashlib
 import json
 import logging
 import pyparsing
 import sys
+import static_replace
+
+from functools import partial
 
 from django.conf import settings
 from django.contrib.auth.models import User
@@ -19,7 +21,7 @@ from courseware.access import has_access
 from mitxmako.shortcuts import render_to_string
 from models import StudentModule
 from psychometrics.psychoanalyze import make_psychometrics_data_update_handler
-from static_replace import replace_urls
+from student.models import unique_id_for_user
 from xmodule.errortracker import exc_info_to_str
 from xmodule.exceptions import NotFoundError
 from xmodule.modulestore import Location
@@ -84,7 +86,7 @@ def toc_for_course(user, request, course, active_chapter, active_section, model_
     model_data_cache must include data from the course module and 2 levels of its descendents
     '''
 
-    course_module = get_module(user, request, course.location, model_data_cache, course.id)
+    course_module = get_module_for_descriptor(user, request, course, model_data_cache, course.id)
     if course_module is None:
         return None
 
@@ -117,7 +119,7 @@ def toc_for_course(user, request, course, active_chapter, active_section, model_
 
 def get_module(user, request, location, model_data_cache, course_id,
                position=None, not_found_ok = False, wrap_xmodule_display=True,
-               grade_bucket_type=None):
+               grade_bucket_type=None, depth=0):
     """
     Get an instance of the xmodule class identified by location,
     setting the state based on an existing StudentModule, or creating one if none
@@ -132,13 +134,20 @@ def get_module(user, request, location, model_data_cache, course_id,
       - course_id             : the course_id in the context of which to load module
       - position              : extra information from URL for user-specified
                                 position within module
+      - depth                 : number of levels of descendents to cache when loading this module.
+                                None means cache all descendents
 
     Returns: xmodule instance, or None if the user does not have access to the
     module.  If there's an error, will try to return an instance of ErrorModule
     if possible.  If not possible, return None.
     """
     try:
-        return _get_module(user, request, location, model_data_cache, course_id, position, wrap_xmodule_display)
+        location = Location(location)
+        descriptor = modulestore().get_instance(course_id, location, depth=depth)
+        return get_module_for_descriptor(user, request, descriptor, model_data_cache, course_id,
+                                         position=position, not_found_ok=not_found_ok,
+                                         wrap_xmodule_display=wrap_xmodule_display,
+                                         grade_bucket_type=grade_bucket_type)
     except ItemNotFoundError:
         if not not_found_ok:
             log.exception("Error in get_module")
@@ -149,23 +158,15 @@ def get_module(user, request, location, model_data_cache, course_id,
         return None
 
 
-def _get_module(user, request, location, model_data_cache, course_id,
+def get_module_for_descriptor(user, request, descriptor, model_data_cache, course_id,
                 position=None, wrap_xmodule_display=True, grade_bucket_type=None):
     """
     Actually implement get_module.  See docstring there for details.
     """
-    location = Location(location)
-    descriptor = modulestore().get_instance(course_id, location)
 
     # Short circuit--if the user shouldn't have access, bail without doing any work
     if not has_access(user, descriptor, 'load', course_id):
         return None
-
-    # Anonymized student identifier
-    h = hashlib.md5()
-    h.update(settings.SECRET_KEY)
-    h.update(str(user.id))
-    anonymous_student_id = h.hexdigest()
 
     # Setup system context for module instance
     ajax_url = reverse('modx_dispatch',
@@ -199,12 +200,12 @@ def _get_module(user, request, location, model_data_cache, course_id,
               'waittime': settings.XQUEUE_WAITTIME_BETWEEN_REQUESTS
              }
 
-    def inner_get_module(location):
+    def inner_get_module(descriptor):
         """
         Delegate to get_module.  It does an access check, so may return None
         """
-        return get_module(user, request, location,
-                                       model_data_cache, course_id, position)
+        return get_module_for_descriptor(user, request, descriptor,
+                                         student_module_cache, course_id, position)
 
     def xblock_model_data(descriptor):
         return DbModel(
@@ -257,11 +258,16 @@ def _get_module(user, request, location, model_data_cache, course_id,
                           # TODO (cpennington): This should be removed when all html from
                           # a module is coming through get_html and is therefore covered
                           # by the replace_static_urls code below
-                          replace_urls=replace_urls,
+                          replace_urls=partial(
+                              static_replace.replace_static_urls,
+                              data_directory=descriptor.metadata.get('data_dir', ''),
+                              course_namespace=descriptor.location._replace(category=None, name=None),
+                          ),
                           node_path=settings.NODE_PATH,
-                          anonymous_student_id=anonymous_student_id,
                           xblock_model_data=xblock_model_data,
                           publish=publish,
+                          anonymous_student_id=unique_id_for_user(user),
+                          course_id=course_id,
                           )
     # pass position specified in URL to module through ModuleSystem
     system.set('position', position)
@@ -298,7 +304,7 @@ def _get_module(user, request, location, model_data_cache, course_id,
     module.get_html = replace_static_urls(
         _get_html,
         getattr(module, 'data_dir', ''),
-        course_namespace = module.location._replace(category=None, name=None))
+        course_namespace=module.location._replace(category=None, name=None))
 
     # Allow URLs of the form '/course/' refer to the root of multicourse directory
     #   hierarchy of this course
@@ -383,9 +389,9 @@ def modx_dispatch(request, dispatch, location, course_id):
                 return HttpResponse(json.dumps({'success': too_many_files_msg}))
 
             for inputfile in inputfiles:
-                if inputfile.size > settings.STUDENT_FILEUPLOAD_MAX_SIZE: # Bytes
+                if inputfile.size > settings.STUDENT_FILEUPLOAD_MAX_SIZE:   # Bytes
                     file_too_big_msg = 'Submission aborted! Your file "%s" is too large (max size: %d MB)' %\
-                                        (inputfile.name, settings.STUDENT_FILEUPLOAD_MAX_SIZE/(1000**2))
+                                        (inputfile.name, settings.STUDENT_FILEUPLOAD_MAX_SIZE / (1000 ** 2))
                     return HttpResponse(json.dumps({'success': file_too_big_msg}))
             p[fileinput_id] = inputfiles
 
@@ -412,6 +418,7 @@ def modx_dispatch(request, dispatch, location, course_id):
     # Return whatever the module wanted to return to the client/caller
     return HttpResponse(ajax_return)
 
+
 def preview_chemcalc(request):
     """
     Render an html preview of a chemical formula or equation.  The fact that
@@ -430,7 +437,7 @@ def preview_chemcalc(request):
         raise Http404
 
     result = {'preview': '',
-              'error': '' }
+              'error': ''}
     formula = request.GET.get('formula')
     if formula is None:
         result['error'] = "No formula specified."
@@ -449,17 +456,15 @@ def preview_chemcalc(request):
     return HttpResponse(json.dumps(result))
 
 
-def get_score_bucket(grade,max_grade):
+def get_score_bucket(grade, max_grade):
     """
     Function to split arbitrary score ranges into 3 buckets.
     Used with statsd tracking.
     """
-    score_bucket="incorrect"
-    if(grade>0 and grade<max_grade):
-        score_bucket="partial"
-    elif(grade==max_grade):
-        score_bucket="correct"
+    score_bucket = "incorrect"
+    if(grade > 0 and grade < max_grade):
+        score_bucket = "partial"
+    elif(grade == max_grade):
+        score_bucket = "correct"
 
     return score_bucket
-
-

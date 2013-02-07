@@ -29,9 +29,7 @@ $(document).ready(function() {
     $('.expand-collapse-icon').bind('click', toggleSubmodules);
     $('.visibility-options').bind('change', setVisibility);
 
-    $('.unit-history ol a').bind('click', showHistoryModal);
     $modal.bind('click', hideModal);
-    $modalCover.bind('click', hideHistoryModal);
     $modalCover.bind('click', hideModal);
     $('.assets .upload-button').bind('click', showUploadModal);
     $('.upload-modal .close-button').bind('click', hideModal);
@@ -41,7 +39,13 @@ $(document).ready(function() {
     $('.unit .item-actions .delete-button').bind('click', deleteUnit);
     $('.new-unit-item').bind('click', createNewUnit);
 
-    $('.collapse-all-button').bind('click', collapseAll);
+    // toggling overview section details
+    $(function(){
+      if($('.courseware-section').length > 0) {
+        $('.toggle-button-sections').addClass('is-shown');
+      }
+    });
+    $('.toggle-button-sections').bind('click', toggleSections);
 
     // autosave when a field is updated on the subsection page
     $body.on('keyup', '.subsection-display-name-input, .unit-subtitle, .policy-list-value', checkForNewValue);
@@ -50,13 +54,6 @@ $(document).ready(function() {
     });
     $("#start_date, #start_time, #due_date, #due_time").bind('change', autosaveInput);
     $('.sync-date, .remove-date').bind('click', autosaveInput);
-
-    // making the unit list sortable
-    $('.sortable-unit-list').sortable({
-        axis: 'y',
-        handle: '.drag-handle',
-        update: onUnitReordered
-    });
 
     // expand/collapse methods for optional date setters
     $('.set-date').bind('click', showDateSetter);
@@ -81,20 +78,6 @@ $(document).ready(function() {
     $('.import .choose-file-button, .import .choose-file-button-inline').bind('click', function(e) {
         e.preventDefault();
         $('.import .file-input').click();
-    });
-
-    // Subsection reordering
-    $('.subsection-list > ol').sortable({
-        axis: 'y',
-        handle: '.section-item .drag-handle',
-        update: onSubsectionReordered
-    });
-
-    // Section reordering
-    $('.courseware-overview').sortable({
-        axis: 'y',
-        handle: 'header .drag-handle',
-        update: onSectionReordered
     });
 
     $('.new-course-button').bind('click', addNewCourse);
@@ -125,9 +108,32 @@ $(document).ready(function() {
     });
 });
 
-function collapseAll(e) {
-    $('.branch').addClass('collapsed');
-    $('.expand-collapse-icon').removeClass('collapse').addClass('expand');
+// function collapseAll(e) {
+//     $('.branch').addClass('collapsed');
+//     $('.expand-collapse-icon').removeClass('collapse').addClass('expand');
+// }
+
+function toggleSections(e) {
+  e.preventDefault();
+
+  $section = $('.courseware-section');
+  sectionCount = $section.length;
+  $button = $(this);
+  $labelCollapsed = $('<i class="ss-icon ss-symbolicons-block">up</i> <span class="label">Collapse All Sections</span>');
+  $labelExpanded = $('<i class="ss-icon ss-symbolicons-block">down</i> <span class="label">Expand All Sections</span>');
+
+  var buttonLabel = $button.hasClass('is-activated') ? $labelCollapsed : $labelExpanded;
+  $button.toggleClass('is-activated').html(buttonLabel);
+
+  if($button.hasClass('is-activated')) {
+      $section.addClass('collapsed');
+      // first child in order to avoid the icons on the subsection lists which are not in the first child 
+      $section.find('header .expand-collapse-icon').removeClass('collapse').addClass('expand');
+  } else {
+      $section.removeClass('collapsed');
+      // first child in order to avoid the icons on the subsection lists which are not in the first child 
+      $section.find('header .expand-collapse-icon').removeClass('expand').addClass('collapse');
+  }
 }
 
 function editSectionPublishDate(e) {
@@ -213,56 +219,6 @@ function removePolicyMetadata(e) {
         _parent_el.appendTo("#policy-to-delete");
     }
     saveSubsection()
-}
-
-
-// This method only changes the ordering of the child objects in a subsection
-function onUnitReordered() {
-    var subsection_id = $(this).data('subsection-id');
-
-    var _els = $(this).children('li:.leaf');
-    var children = _els.map(function(idx, el) { return $(el).data('id'); }).get();
-
-    // call into server to commit the new order
-    $.ajax({
-	    url: "/save_item",
-		type: "POST",
-		dataType: "json",
-		contentType: "application/json",
-		data:JSON.stringify({ 'id' : subsection_id, 'children' : children})
-	});
-}
-
-function onSubsectionReordered() {
-    var section_id = $(this).data('section-id');
-
-    var _els = $(this).children('li:.branch');
-    var children = _els.map(function(idx, el) { return $(el).data('id'); }).get();
-
-    // call into server to commit the new order
-    $.ajax({
-        url: "/save_item",
-        type: "POST",
-        dataType: "json",
-        contentType: "application/json",
-        data:JSON.stringify({ 'id' : section_id, 'children' : children})
-    });
-}
-
-function onSectionReordered() {
-    var course_id = $(this).data('course-id');
-
-    var _els = $(this).children('section:.branch');
-    var children = _els.map(function(idx, el) { return $(el).data('id'); }).get();
-
-    // call into server to commit the new order
-    $.ajax({
-        url: "/save_item",
-        type: "POST",
-        dataType: "json",
-        contentType: "application/json",
-        data:JSON.stringify({ 'id' : course_id, 'children' : children})
-    });
 }
 
 function getEdxTimeFromDateTimeVals(date_val, time_val, format) {
@@ -473,7 +429,7 @@ function displayFinishedUpload(xhr) {
     }
 
     var resp = JSON.parse(xhr.responseText);
-    $('.upload-modal .embeddable-xml-input').val('<img src="' + xhr.getResponseHeader('asset_url') + '"/>');
+    $('.upload-modal .embeddable-xml-input').val(xhr.getResponseHeader('asset_url'));
     $('.upload-modal .embeddable').show();
     $('.upload-modal .file-name').hide();
     $('.upload-modal .progress-fill').html(resp.msg);
@@ -498,9 +454,14 @@ function hideModal(e) {
     if(e) {
         e.preventDefault();
     }
-    $('.file-input').unbind('change', startUpload);
-    $modal.hide();
-    $modalCover.hide();
+    // Unit editors do not want the modal cover to hide when users click outside
+    // of the editor. Users must press Cancel or Save to exit the editor.
+    // module_edit adds and removes the "is-fixed" class.
+    if (!$modalCover.hasClass("is-fixed")) {
+        $('.file-input').unbind('change', startUpload);
+        $modal.hide();
+        $modalCover.hide();
+    }
 }
 
 function onKeyUp(e) {
@@ -528,21 +489,6 @@ function editComponent(e) {
 function closeComponentEditor(e) {
     e.preventDefault();
     $(this).closest('.xmodule_edit').removeClass('editing').find('.component-editor').slideUp(150);
-}
-
-
-function showHistoryModal(e) {
-    e.preventDefault();
-
-    $modal.show();
-    $modalCover.show();
-}
-
-function hideHistoryModal(e) {
-    e.preventDefault();
-
-    $modal.hide();
-    $modalCover.hide();
 }
 
 function showDateSetter(e) {

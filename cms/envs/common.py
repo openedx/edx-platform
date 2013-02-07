@@ -33,7 +33,8 @@ MITX_FEATURES = {
     'USE_DJANGO_PIPELINE': True,
     'GITHUB_PUSH': False,
     'ENABLE_DISCUSSION_SERVICE': False,
-    'AUTH_USE_MIT_CERTIFICATES' : False,
+    'AUTH_USE_MIT_CERTIFICATES': False,
+    'STUB_VIDEO_FOR_TESTING': False,   # do not display video when running automated acceptance tests
 }
 ENABLE_JASMINE = False
 
@@ -228,7 +229,7 @@ PIPELINE_JS = {
         'source_filenames': sorted(
             rooted_glob(COMMON_ROOT / 'static/', 'coffee/src/**/*.coffee') +
             rooted_glob(PROJECT_ROOT / 'static/', 'coffee/src/**/*.coffee')
-        ) + ['js/base.js'],
+        ) + ['js/hesitate.js', 'js/base.js'],
         'output_filename': 'js/cms-application.js',
     },
     'module-js': {
@@ -280,8 +281,9 @@ INSTALLED_APPS = (
     'contentstore',
     'auth',
     'student',  # misleading name due to sharing with lms
-
+    'course_groups',  # not used in cms (yet), but tests run
     # For asset pipelining
     'pipeline',
     'staticfiles',
+    'static_replace',
 )

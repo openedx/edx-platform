@@ -5,6 +5,7 @@ from mako.template import Template
 from xmodule.modulestore.django import modulestore
 import logging
 
+
 class CustomTagModule(XModule):
     """
     This module supports tags of the form
@@ -72,4 +73,3 @@ class CustomTagDescriptor(RawDescriptor):
         to export them in a file with yet another layer of indirection.
         """
         return False
-

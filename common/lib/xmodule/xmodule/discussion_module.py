@@ -5,6 +5,7 @@ from xmodule.x_module import XModule
 from xmodule.raw_module import RawDescriptor
 from xblock.core import String, Scope
 
+
 class DiscussionModule(XModule):
     js = {'coffee':
             [resource_string(__name__, 'js/src/time.coffee'),

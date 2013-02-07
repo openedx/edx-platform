@@ -2,15 +2,16 @@ import re
 import json
 import logging
 import time
+import static_replace
 
 from django.conf import settings
 from functools import wraps
-from static_replace import replace_urls
 from mitxmako.shortcuts import render_to_string
 from xmodule.seq_module import SequenceModule
 from xmodule.vertical_module import VerticalModule
 
 log = logging.getLogger("mitx.xmodule_modifiers")
+
 
 def wrap_xmodule(get_html, module, template, context=None):
     """
@@ -49,10 +50,11 @@ def replace_course_urls(get_html, course_id):
     """
     @wraps(get_html)
     def _get_html():
-        return replace_urls(get_html(), staticfiles_prefix='/courses/'+course_id, replace_prefix='/course/')
+        return static_replace.replace_course_urls(get_html(), course_id)
     return _get_html
 
-def replace_static_urls(get_html, prefix, course_namespace=None):
+
+def replace_static_urls(get_html, data_dir, course_namespace=None):
     """
     Updates the supplied module with a new get_html function that wraps
     the old get_html function and substitutes urls of the form /static/...
@@ -61,7 +63,7 @@ def replace_static_urls(get_html, prefix, course_namespace=None):
 
     @wraps(get_html)
     def _get_html():
-        return replace_urls(get_html(), staticfiles_prefix=prefix, course_namespace = course_namespace)
+        return static_replace.replace_static_urls(get_html(), data_dir, course_namespace)
     return _get_html
 
 
@@ -99,7 +101,7 @@ def add_histogram(get_html, module, user):
     @wraps(get_html)
     def _get_html():
 
-        if type(module) in [SequenceModule, VerticalModule]:	# TODO: make this more general, eg use an XModule attribute instead
+        if type(module) in [SequenceModule, VerticalModule]:  	# TODO: make this more general, eg use an XModule attribute instead
             return get_html()
 
         module_id = module.id
@@ -112,7 +114,8 @@ def add_histogram(get_html, module, user):
         # TODO (ichuang): use _has_access_descriptor.can_load in lms.courseware.access, instead of now>mstart comparison here
         now = time.gmtime()
         is_released = "unknown"
-        mstart = getattr(module.descriptor.lms,'start')
+        mstart = module.descriptor.lms.start
+
         if mstart is not None:
             is_released = "<font color='red'>Yes!</font>" if (now > mstart) else "<font color='green'>Not yet</font>"
 
@@ -120,12 +123,12 @@ def add_histogram(get_html, module, user):
                          'lms_fields': [(field.name, getattr(module.lms, field.name)) for field in module.lms.fields],
                          'location': module.location,
                          'xqa_key': module.lms.xqa_key,
-                         'source_file' : source_file,
+                         'source_file': source_file,
                          'category': str(module.__class__.__name__),
                          # Template uses element_id in js function names, so can't allow dashes
-                         'element_id': module.location.html_id().replace('-','_'),
+                         'element_id': module.location.html_id().replace('-', '_'),
                          'user': user,
-                         'xqa_server' : settings.MITX_FEATURES.get('USE_XQA_SERVER','http://xqa:server@content-qa.mitx.mit.edu/xqa'),
+                         'xqa_server': settings.MITX_FEATURES.get('USE_XQA_SERVER', 'http://xqa:server@content-qa.mitx.mit.edu/xqa'),
                          'histogram': json.dumps(histogram),
                          'render_histogram': render_histogram,
                          'module_content': get_html(),
@@ -134,4 +137,3 @@ def add_histogram(get_html, module, user):
         return render_to_string("staff_problem_info.html", staff_context)
 
     return _get_html
-

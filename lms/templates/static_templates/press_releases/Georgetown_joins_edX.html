@@ -1,0 +1,73 @@
+<%! from django.core.urlresolvers import reverse %>
+<%inherit file="../../main.html" />
+
+<%namespace name='static' file='../../static_content.html'/>
+
+<%block name="title"><title>Georgetown University joins edX</title></%block>
+<div id="fb-root"></div>
+<script>(function(d, s, id) {
+var js, fjs = d.getElementsByTagName(s)[0];
+if (d.getElementById(id)) return;
+js = d.createElement(s); js.id = id;
+js.src = "//connect.facebook.net/en_US/all.js#xfbml=1";
+fjs.parentNode.insertBefore(js, fjs);
+}(document, 'script', 'facebook-jssdk'));</script>
+
+<section class="pressrelease">
+
+  <section class="container">
+    <h1>Georgetown University joins edX</h1>
+    <hr class="horizontal-divider"/>
+    <article>
+      <h2>Georgetown becomes sixth institution to join global movement in year one, Broadens course options and brings its unique mission-driven perspective to the world of online learning</h2>
+
+      <p><strong>CAMBRIDGE, MA &mdash; December 10, 2012</strong> &mdash; EdX, the not-for-profit online learning initiative founded by <a href="http://www.harvard.edu">Harvard University</a> and the <a href="http://www.mit.edu">Massachusetts Institute of Technology</a> (MIT), announced today the addition of <a href="http://www.georgetown.edu">Georgetown University</a> to its group of educational leaders who are focused on providing a category-leading, quality higher education experience to the global online community. </p>
+
+      <p>“It is a privilege to partner with edX and this extraordinary collection of universities,” said Dr. John J. DeGioia, President of Georgetown University. “Our Catholic and Jesuit identity compels us to work at the frontiers of excellence in higher education, and we see in this partnership an exciting opportunity to more fully realize this mission. Not only will it enrich our capacity to serve our global family&ndash;beyond our campuses here in Washington, D.C.&ndash;but it will also allow us to extend the applications of our research and our scholarship.”</p>
+
+      <p>Georgetown University, the nation’s oldest Catholic and Jesuit university, is one of the world’s leading academic and research institutions, offering a unique educational experience that prepares the next generation of global citizens to lead and make a difference in the world. Students receive a world-class learning experience focused on educating the whole person through exposure to different faiths, cultures and beliefs. Georgetown University will provide a series of GeorgetownX courses to the open source platform and broaden the course offerings available on edx.org.</p>
+
+      <p>“We welcome Georgetown University to edX,” said Anant Agarwal, President of edX. “Georgetown has a long history of research and educational excellence, with a demonstrated commitment to the arts and sciences, foreign service, law, medicine, public policy, business, and nursing and health studies. Georgetown, with its distinguished presence around the world including a School of Foreign Service campus in Qatar, shares with edX a global perspective and a mission to expand educational opportunities.”</p>
+
+      <p>Through edX, the “X Universities” will provide interactive education wherever there is access to the Internet. They will enhance teaching and learning through research about how students learn, and how technologies and game-like experiences can facilitate effective teaching both on-campus and online. The University of California, Berkeley joined edX in July, the University of Texas System joined in October, and Wellesley College joined earlier in December. </p>
+
+      <p>“Georgetown University is an excellent addition to edX,” said MIT President L. Rafael Reif. “It brings important strength in many areas of scholarship and has long had an especially powerful voice in public life and discourse. The edX community stands to benefit greatly from what Georgetown will offer.”</p>
+
+      <p>“EdX is an innovation that will expand access to high-quality educational content for millions around the world while helping us better understand how technology can improve the academic experience for students in classrooms across our campuses,” said Harvard President Drew Faust. “Georgetown’s commitment to technology enhanced learning, its excellence in education, and its long history as an institution dedicated to public service make it a welcome addition to edX.”</p>
+
+      <p>GeorgetownX will offer courses on edX beginning in the fall of 2013.  All of the courses will be hosted from edX’s innovative platform at <a href="http://www.edx.org">www.edx.org</a>.</p>
+
+      <h2>About edX</h2>
+
+      <p>edX is a not-for-profit enterprise of its founding partners Harvard University and the Massachusetts Institute of Technology that features learning designed specifically for interactive study via the web. Based on a long history of collaboration and their shared educational missions the founders are creating a new online-learning experience. Anant Agarwal, former Director of MIT’s Computer Science and Artificial Intelligence Laboratory, serves as the first president of edX. Along with offering online courses, the institutions will use edX to research how students learn and how technology can transform learning-both on-campus and worldwide.  EdX is based in Cambridge, Massachusetts and is governed by MIT and Harvard.</p>
+
+      <h2>About Georgetown University</h2>
+
+      <p>Georgetown University is the oldest Catholic and Jesuit university in America, founded in 1789 by Archbishop John Carroll. Georgetown today is a major student-centered, international, research university offering respected undergraduate, graduate and professional programs from its home in Washington, D.C. For more information about Georgetown University, visit <a href="http://www.georgetown.edu">www.georgetown.edu</a>.</p>
+
+      <section class="contact">
+        <p><strong>Contact: </strong>Brad Baker</p>
+        <p>BBaker@webershandwick.com</p>
+        <p>617-520-7043</p>
+        <br/>
+      </section>
+
+      <section class="footer">
+        <hr class="horizontal-divider"/>
+        <div class="logo"></div><h3 class="date">12 - 10 - 2012</h3>
+        <div class="social-sharing">
+          <hr class="horizontal-divider"/>
+          <p>Share with friends and family:</p>
+          <a href="http://twitter.com/intent/tweet?text=Georgetown+becomes+sixth+institution+to+edX.+Broadens+course+options+and+brings+its+unique+mission-driven+perspective+to+the+world+of+online+learning:+http://www.edx.org/press/georgetown-joins-edx" class="share">
+            <img src="${static.url('images/social/twitter-sharing.png')}"/>
+          </a>
+
+          <a href="mailto:?subject=Georgetown%20University%20joins%20edX&body=Georgetown%20becomes%20sixth%20institution%20to%20edX.%20Broadens%20course%20options%20and%20brings%20its%20unique%20mission-driven%20perspective%20to%20the%20world%20of%20online%20learning…http://edx.org/press/georgetown-joins-edx" class="share">
+            <img src="${static.url('images/social/email-sharing.png')}"/>
+          </a>
+          <div class="fb-like" data-href="http://edx.org/press/georgetown-joins-edx" data-send="true" data-width="450" data-show-faces="true"></div>
+        </div>
+      </section>
+    </article>
+  </section>
+</section>

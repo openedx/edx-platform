@@ -12,8 +12,10 @@ from .inheritance import own_metadata
 
 log = logging.getLogger(__name__)
 
-def import_static_content(modules, course_loc, course_data_path, static_content_store, target_location_namespace, subpath = 'static'):
-    
+
+def import_static_content(modules, course_loc, course_data_path, static_content_store, target_location_namespace,
+    subpath='static', verbose=False):
+
     remap_dict = {}
 
     # now import all static assets
@@ -24,6 +26,9 @@ def import_static_content(modules, course_loc, course_data_path, static_content_
 
             try:
                 content_path = os.path.join(dirname, filename)
+                if verbose:
+                    log.debug('importing static content {0}...'.format(content_path))
+
                 fullname_with_subpath = content_path.replace(static_dir, '')  # strip away leading path from the name
                 if fullname_with_subpath.startswith('/'):
                     fullname_with_subpath = fullname_with_subpath[1:]
@@ -33,13 +38,13 @@ def import_static_content(modules, course_loc, course_data_path, static_content_
                 with open(content_path, 'rb') as f:
                     data = f.read()
 
-                content = StaticContent(content_loc, filename, mime_type, data, import_path = fullname_with_subpath)
+                content = StaticContent(content_loc, filename, mime_type, data, import_path=fullname_with_subpath)
 
                 # first let's save a thumbnail so we can get back a thumbnail location
-                thumbnail_content = static_content_store.generate_thumbnail(content)
+                (thumbnail_content, thumbnail_location) = static_content_store.generate_thumbnail(content)
 
                 if thumbnail_content is not None:
-                    content.thumbnail_location = thumbnail_content.location
+                    content.thumbnail_location = thumbnail_location
 
                 #then commit the content
                 static_content_store.save(content)
@@ -47,11 +52,12 @@ def import_static_content(modules, course_loc, course_data_path, static_content_
                 #store the remapping information which will be needed to subsitute in the module data
                 remap_dict[fullname_with_subpath] = content_loc.name
             except:
-                raise 
+                raise
 
     return remap_dict
 
-def verify_content_links(module, base_dir, static_content_store, link, remap_dict = None):
+
+def verify_content_links(module, base_dir, static_content_store, link, remap_dict=None):
     if link.startswith('/static/'):
         # yes, then parse out the name
         path = link[len('/static/'):]
@@ -67,30 +73,30 @@ def verify_content_links(module, base_dir, static_content_store, link, remap_dic
                 with open(static_pathname, 'rb') as f:
                     data = f.read()
 
-                content = StaticContent(content_loc, filename, mime_type, data, import_path = path) 
+                content = StaticContent(content_loc, filename, mime_type, data, import_path=path)
 
                 # first let's save a thumbnail so we can get back a thumbnail location
-                thumbnail_content = static_content_store.generate_thumbnail(content)
+                (thumbnail_content, thumbnail_location) = static_content_store.generate_thumbnail(content)
 
                 if thumbnail_content is not None:
-                    content.thumbnail_location = thumbnail_content.location
+                    content.thumbnail_location = thumbnail_location
 
                 #then commit the content
-                static_content_store.save(content)   
+                static_content_store.save(content)
 
-                new_link = StaticContent.get_url_path_from_location(content_loc)   
+                new_link = StaticContent.get_url_path_from_location(content_loc)
 
                 if remap_dict is not None:
                     remap_dict[link] = new_link
 
-                return new_link                 
+                return new_link
             except Exception, e:
                 logging.exception('Skipping failed content load from {0}. Exception: {1}'.format(path, e))
 
     return link
 
 
-def import_module_from_xml(modulestore, static_content_store, course_data_path, module, target_location_namespace=None):
+def import_module_from_xml(modulestore, static_content_store, course_data_path, module, target_location_namespace=None, verbose=False):
     # remap module to the new namespace
     if target_location_namespace is not None:
         # This looks a bit wonky as we need to also change the 'name' of the imported course to be what
@@ -146,10 +152,7 @@ def import_module_from_xml(modulestore, static_content_store, course_data_path, 
     modulestore.update_metadata(module.location, own_metadata(module))
 
 
-def import_course_from_xml(modulestore, static_content_store, course_data_path, module, target_location_namespace=None):
-    # HACK: for now we don't support progress tabs. There's a special metadata configuration setting for this.
-    module.hide_progress_tab = True
-
+def import_course_from_xml(modulestore, static_content_store, course_data_path, module, target_location_namespace=None, verbose=False):
     # cdodge: more hacks (what else). Seems like we have a problem when importing a course (like 6.002) which
     # does not have any tabs defined in the policy file. The import goes fine and then displays fine in LMS,
     # but if someone tries to add a new tab in the CMS, then the LMS barfs because it expects that -
@@ -163,12 +166,12 @@ def import_course_from_xml(modulestore, static_content_store, course_data_path, 
     # a bit of a hack, but typically the "course image" which is shown on marketing pages is hard coded to /images/course_image.jpg
     # so let's make sure we import in case there are no other references to it in the modules
     verify_content_links(module, course_data_path, static_content_store, '/static/images/course_image.jpg')
-    import_module_from_xml(modulestore, static_content_store, course_data_path, module, target_location_namespace)
+    import_module_from_xml(modulestore, static_content_store, course_data_path, module, target_location_namespace, verbose=verbose)
 
 
-def import_from_xml(store, data_dir, course_dirs=None, 
+def import_from_xml(store, data_dir, course_dirs=None,
                     default_class='xmodule.raw_module.RawDescriptor',
-                    load_error_modules=True, static_content_store=None, target_location_namespace=None):
+                    load_error_modules=True, static_content_store=None, target_location_namespace=None, verbose=False):
     """
     Import the specified xml data_dir into the "store" modulestore,
     using org and course as the location org and course.
@@ -182,7 +185,7 @@ def import_from_xml(store, data_dir, course_dirs=None,
     the policy.json. so we need to keep the original url_name during import
 
     """
-    
+
     module_store = XMLModuleStore(
         data_dir,
         default_class=default_class,
@@ -198,33 +201,35 @@ def import_from_xml(store, data_dir, course_dirs=None,
 
         course_data_path = None
         course_location = None
-        # Quick scan to get course Location as well as the course_data_path
-        for module in module_store.modules[course_id].itervalues():
-            if module.category == 'course':
-                course_data_path = path(data_dir) / module.data_dir
-                course_location = module.location
-
-        if static_content_store is not None:
-            _namespace_rename = target_location_namespace if target_location_namespace is not None else  module_store.modules[course_id].location
-            
-            # first pass to find everything in /static/
-            import_static_content(module_store.modules[course_id], course_location, course_data_path, static_content_store, 
-                _namespace_rename, subpath='static')
 
         # Import course modules first, because importing some of the children requires the course to exist
         for module in module_store.modules[course_id].itervalues():
             if module.category == 'course':
-                import_course_from_xml(store, static_content_store, course_data_path, module, target_location_namespace)
+                import_course_from_xml(
+                    store,
+                    static_content_store,
+                    course_data_path,
+                    module,
+                    target_location_namespace,
+                    verbose=verbose
+                )
 
         # Import the rest of the modules
         for module in module_store.modules[course_id].itervalues():
             if module.category != 'course':
-                import_module_from_xml(store, static_content_store, course_data_path, module, target_location_namespace)
+                import_module_from_xml(
+                    store,
+                    static_content_store,
+                    course_data_path,
+                    module,
+                    target_location_namespace,
+                    verbose=verbose
+                )
 
     return module_store, course_items
 
 
-def validate_category_hierarcy(module_store, course_id, parent_category, expected_child_category):
+def validate_category_hierarchy(module_store, course_id, parent_category, expected_child_category):
     err_cnt = 0
 
     parents = []
@@ -242,13 +247,15 @@ def validate_category_hierarcy(module_store, course_id, parent_category, expecte
 
     return err_cnt
 
-def validate_data_source_path_existence(path, is_err = True, extra_msg = None):
+
+def validate_data_source_path_existence(path, is_err=True, extra_msg=None):
     _cnt = 0
     if not os.path.exists(path):
-        print ("{0}: Expected folder at {1}. {2}".format('ERROR' if is_err == True else 'WARNING', path, extra_msg if 
+        print ("{0}: Expected folder at {1}. {2}".format('ERROR' if is_err == True else 'WARNING', path, extra_msg if
             extra_msg is not None else ''))
         _cnt = 1
     return _cnt
+
 
 def validate_data_source_paths(data_dir, course_dir):
     # check that there is a '/static/' directory
@@ -256,12 +263,12 @@ def validate_data_source_paths(data_dir, course_dir):
     err_cnt = 0
     warn_cnt = 0
     err_cnt += validate_data_source_path_existence(course_path / 'static')
-    warn_cnt += validate_data_source_path_existence(course_path / 'static/subs', is_err = False, 
-        extra_msg = 'Video captions (if they are used) will not work unless they are static/subs.')
+    warn_cnt += validate_data_source_path_existence(course_path / 'static/subs', is_err=False,
+        extra_msg='Video captions (if they are used) will not work unless they are static/subs.')
     return err_cnt, warn_cnt
 
 
-def perform_xlint(data_dir, course_dirs, 
+def perform_xlint(data_dir, course_dirs,
                     default_class='xmodule.raw_module.RawDescriptor',
                     load_error_modules=True):
     err_cnt = 0
@@ -285,9 +292,9 @@ def perform_xlint(data_dir, course_dirs,
         for err_log_entry in err_log.errors:
             msg = err_log_entry[0]
             if msg.startswith('ERROR:'):
-                err_cnt+=1
+                err_cnt += 1
             else:
-                warn_cnt+=1
+                warn_cnt += 1
 
     # then count outright all courses that failed to load at all
     for err_log in module_store.errored_courses.itervalues():
@@ -295,17 +302,24 @@ def perform_xlint(data_dir, course_dirs,
             msg = err_log_entry[0]
             print msg
             if msg.startswith('ERROR:'):
-                err_cnt+=1
+                err_cnt += 1
             else:
-                warn_cnt+=1
+                warn_cnt += 1
 
     for course_id in module_store.modules.keys():
         # constrain that courses only have 'chapter' children
-        err_cnt += validate_category_hierarcy(module_store, course_id, "course", "chapter")
+        err_cnt += validate_category_hierarchy(module_store, course_id, "course", "chapter")
         # constrain that chapters only have 'sequentials'
-        err_cnt += validate_category_hierarcy(module_store, course_id, "chapter", "sequential")
+        err_cnt += validate_category_hierarchy(module_store, course_id, "chapter", "sequential")
         # constrain that sequentials only have 'verticals'
-        err_cnt += validate_category_hierarcy(module_store, course_id, "sequential", "vertical")
+        err_cnt += validate_category_hierarchy(module_store, course_id, "sequential", "vertical")
+
+        # check for a presence of a course marketing video
+        location_elements = course_id.split('/')
+        if Location(['i4x', location_elements[0], location_elements[1], 'about', 'video', None]) not in module_store.modules[course_id]:
+            print "WARN: Missing course marketing video. It is recommended that every course have a marketing video."
+            warn_cnt += 1
+
 
     print "\n\n------------------------------------------\nVALIDATION SUMMARY: {0} Errors   {1} Warnings\n".format(err_cnt, warn_cnt)
 
@@ -315,6 +329,3 @@ def perform_xlint(data_dir, course_dirs,
         print "This course can be imported, but some errors may occur during the run of the course. It is recommend that you fix your courseware before importing"
     else:
         print "This course can be imported successfully."
-
-       
-

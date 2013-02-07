@@ -33,6 +33,9 @@ from xml.sax.saxutils import unescape
 import chem
 import chem.chemcalc
 import chem.chemtools
+import chem.miller
+import verifiers
+import verifiers.draganddrop
 
 import calc
 from correctmap import CorrectMap
@@ -52,7 +55,7 @@ response_tag_dict = dict([(x.response_tag, x) for x in responsetypes.__all__])
 solution_tags = ['solution']
 
 # these get captured as student responses
-response_properties = ["codeparam", "responseparam", "answer"]
+response_properties = ["codeparam", "responseparam", "answer", "openendedparam"]
 
 # special problem tags which should be turned into innocuous HTML
 html_transforms = {'problem': {'tag': 'div'},
@@ -67,10 +70,12 @@ global_context = {'random': random,
                   'calc': calc,
                   'eia': eia,
                   'chemcalc': chem.chemcalc,
-                  'chemtools': chem.chemtools}
+                  'chemtools': chem.chemtools,
+                  'miller': chem.miller,
+                  'draganddrop': verifiers.draganddrop}
 
 # These should be removed from HTML output, including all subelements
-html_problem_semantics = ["codeparam", "responseparam", "answer", "script", "hintgroup"]
+html_problem_semantics = ["codeparam", "responseparam", "answer", "script", "hintgroup", "openendedparam", "openendedrubric"]
 
 log = logging.getLogger(__name__)
 
@@ -450,7 +455,7 @@ class LoncapaProblem(object):
                 exec code in context, context
             except Exception as err:
                 log.exception("Error while execing script code: " + code)
-                msg = "Error while executing script code: %s" % str(err).replace('<','&lt;')
+                msg = "Error while executing script code: %s" % str(err).replace('<', '&lt;')
                 raise responsetypes.LoncapaProblemError(msg)
             finally:
                 sys.path = original_path
@@ -499,7 +504,7 @@ class LoncapaProblem(object):
                    'id': problemtree.get('id'),
                    'feedback': {'message': msg,
                                 'hint': hint,
-                                'hintmode': hintmode,}}
+                                'hintmode': hintmode, }}
 
             input_type_cls = inputtypes.registry.get_class_for_tag(problemtree.tag)
             the_input = input_type_cls(self.system, problemtree, state)

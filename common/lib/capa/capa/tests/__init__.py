@@ -8,6 +8,7 @@ import xml.sax.saxutils as saxutils
 
 TEST_DIR = os.path.dirname(os.path.realpath(__file__))
 
+
 def tst_render_template(template, context):
     """
     A test version of render to template.  Renders to the repr of the context, completely ignoring
@@ -25,7 +26,7 @@ test_system = Mock(
     user=Mock(),
     filestore=fs.osfs.OSFS(os.path.join(TEST_DIR, "test_files")),
     debug=True,
-    xqueue={'interface':None, 'callback_url':'/', 'default_queuename': 'testqueue', 'waittime': 10},
+    xqueue={'interface': None, 'callback_url': '/', 'default_queuename': 'testqueue', 'waittime': 10},
     node_path=os.environ.get("NODE_PATH", "/usr/local/lib/node_modules"),
-    anonymous_student_id = 'student'
+    anonymous_student_id='student'
 )

@@ -65,4 +65,3 @@ class MakoModuleDescriptor(XModuleDescriptor):
             fields[field.name] = field.read_from(self)
 
         return fields
-

@@ -1,21 +1,23 @@
-from xmodule.x_module import (XModuleDescriptor, policy_key)
-from xmodule.modulestore import Location
-from xmodule.modulestore.inheritance import own_metadata
-from xblock.core import Object, Scope
-from lxml import etree
 import json
 import copy
 import logging
-import traceback
-from collections import namedtuple
-from fs.errors import ResourceNotFoundError
 import os
 import sys
+from collections import namedtuple
+from lxml import etree
+
+from xblock.core import Object, Scope
+from xmodule.x_module import (XModuleDescriptor, policy_key)
+from xmodule.modulestore import Location
+from xmodule.modulestore.inheritance import own_metadata
 
 log = logging.getLogger(__name__)
 
+# assume all XML files are persisted as utf-8.
 edx_xml_parser = etree.XMLParser(dtd_validation=False, load_dtd=False,
-                                 remove_comments=True, remove_blank_text=True)
+                                 remove_comments=True, remove_blank_text=True,
+                                 encoding='utf-8')
+
 
 def name_to_pathname(name):
     """
@@ -23,6 +25,7 @@ def name_to_pathname(name):
     This allows users of the xml format to organize content into directories
     """
     return name.replace(':', '/')
+
 
 def is_pointer_tag(xml_obj):
     """
@@ -47,6 +50,7 @@ def is_pointer_tag(xml_obj):
 
     return len(xml_obj) == 0 and actual_attr == expected_attr and not has_text
 
+
 def get_metadata_from_xml(xml_object, remove=True):
     meta = xml_object.find('meta')
     if meta is None:
@@ -58,6 +62,7 @@ def get_metadata_from_xml(xml_object, remove=True):
     return dmdata
 
 _AttrMapBase = namedtuple('_AttrMap', 'from_xml to_xml')
+
 
 class AttrMap(_AttrMapBase):
     """
@@ -96,14 +101,17 @@ class XmlDescriptor(XModuleDescriptor):
     metadata_attributes = ('format', 'graceperiod', 'showanswer', 'rerandomize',
         'start', 'due', 'graded', 'display_name', 'url_name', 'hide_from_toc',
         'ispublic', 	# if True, then course is listed for all users; see
-        'xqa_key',	# for xqaa server access
+        'xqa_key',  	# for xqaa server access
+        # information about testcenter exams is a dict (of dicts), not a string,
+        # so it cannot be easily exportable as a course element's attribute.
+        'testcenter_info',
         # VS[compat] Remove once unused.
         'name', 'slug')
 
-    metadata_to_strip = ('data_dir', 
+    metadata_to_strip = ('data_dir',
             # cdodge: @TODO: We need to figure out a way to export out 'tabs' and 'grading_policy' which is on the course
-            'tabs', 'grading_policy', 'is_draft', 'published_by', 'published_date', 
-            'discussion_blackouts',
+            'tabs', 'grading_policy', 'is_draft', 'published_by', 'published_date',
+            'discussion_blackouts', 'testcenter_info',
            # VS[compat] -- remove the below attrs once everything is in the CMS
            'course', 'org', 'url_name', 'filename',
            # Used for storing xml attributes between import and export, for roundtrips
@@ -119,7 +127,7 @@ class XmlDescriptor(XModuleDescriptor):
     bool_map = AttrMap(to_bool, from_bool)
 
     to_int = lambda val: int(val)
-    from_int = lambda val: str(val) 
+    from_int = lambda val: str(val)
     int_map = AttrMap(to_int, from_int)
     xml_attribute_map = {
         # type conversion: want True/False in python, "true"/"false" in xml
@@ -127,23 +135,21 @@ class XmlDescriptor(XModuleDescriptor):
         'hide_progress_tab': bool_map,
         'allow_anonymous': bool_map,
         'allow_anonymous_to_peers': bool_map,
-        'weight':int_map
+        'weight': int_map
     }
-
 
     # VS[compat].  Backwards compatibility code that can go away after
     # importing 2012 courses.
     # A set of metadata key conversions that we want to make
     metadata_translations = {
-        'slug' : 'url_name',
-        'name' : 'display_name',
+        'slug': 'url_name',
+        'name': 'display_name',
         }
 
     @classmethod
     def _translate(cls, key):
         'VS[compat]'
         return cls.metadata_translations.get(key, key)
-
 
     @classmethod
     def definition_from_xml(cls, xml_object, system):
@@ -292,6 +298,7 @@ class XmlDescriptor(XModuleDescriptor):
             definition_xml = xml_object  # this is just a pointer, not the real definition content
 
         definition, children = cls.load_definition(definition_xml, system, location)  # note this removes metadata
+
         # VS[compat] -- make Ike's github preview links work in both old and
         # new file layouts
         if is_pointer_tag(xml_object):
@@ -393,9 +400,9 @@ class XmlDescriptor(XModuleDescriptor):
             # Write the definition to a file
             url_path = name_to_pathname(self.url_name)
             filepath = self.__class__._format_filepath(self.category, url_path)
-            resource_fs.makedir(os.path.dirname(filepath), allow_recreate=True)
+            resource_fs.makedir(os.path.dirname(filepath), recursive=True, allow_recreate=True)
             with resource_fs.open(filepath, 'w') as file:
-                file.write(etree.tostring(xml_object, pretty_print=True))
+                file.write(etree.tostring(xml_object, pretty_print=True, encoding='utf-8'))
 
             # And return just a pointer with the category and filename.
             record_object = etree.Element(self.category)
@@ -410,7 +417,7 @@ class XmlDescriptor(XModuleDescriptor):
             record_object.set('org', self.location.org)
             record_object.set('course', self.location.course)
 
-        return etree.tostring(record_object, pretty_print=True)
+        return etree.tostring(record_object, pretty_print=True, encoding='utf-8')
 
     def definition_to_xml(self, resource_fs):
         """

@@ -8,6 +8,10 @@ INHERITABLE_METADATA = (
     # TODO: This is used by the XMLModuleStore to provide for locations for
     # static files, and will need to be removed when that code is removed
     'data_dir'
+    # How many days early to show a course element to beta testers (float)
+    # intended to be set per-course, but can be overridden in for specific
+    # elements.  Can be a float.
+    'days_early_for_beta'
 )
 
 def compute_inherited_metadata(descriptor):

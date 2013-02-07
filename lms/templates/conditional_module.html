@@ -1,0 +1,15 @@
+<%
+    from django.core.urlresolvers import reverse
+    reqm = module.required_modules[0]
+    course_id = module.system.course_id
+    condition = module.condition
+%>
+
+<p><a href="${reverse('jump_to',kwargs=dict(course_id=course_id, location=reqm.location.url()))}">${reqm.display_name}</a>
+must be 
+% if 'attempted' in condition:
+  attempted
+% else:
+  completed 
+% endif
+before this will become visible.</p>

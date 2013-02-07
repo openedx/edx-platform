@@ -20,12 +20,13 @@ from xmodule.modulestore.xml import XMLModuleStore
 from xmodule.modulestore.exceptions import ItemNotFoundError
 from xmodule.x_module import XModule
 from courseware.model_data import ModelDataCache
-from static_replace import replace_urls, try_staticfiles_lookup
+from static_replace import replace_static_urls
 from courseware.access import has_access
 import branding
 from xmodule.modulestore.exceptions import ItemNotFoundError
 
 log = logging.getLogger(__name__)
+
 
 def get_request_for_thread():
     """Walk up the stack, return the nearest first argument named "request"."""
@@ -42,28 +43,31 @@ def get_request_for_thread():
         del frame
 
 
-def get_course_by_id(course_id):
+def get_course_by_id(course_id, depth=0):
     """
     Given a course id, return the corresponding course descriptor.
 
     If course_id is not valid, raises a 404.
+    depth: The number of levels of children for the modulestore to cache. None means infinite depth
     """
     try:
         course_loc = CourseDescriptor.id_to_location(course_id)
-        return modulestore().get_instance(course_id, course_loc)
+        return modulestore().get_instance(course_id, course_loc, depth=depth)
     except (KeyError, ItemNotFoundError):
         raise Http404("Course not found.")
 
 
-def get_course_with_access(user, course_id, action):
+def get_course_with_access(user, course_id, action, depth=0):
     """
     Given a course_id, look up the corresponding course descriptor,
     check that the user has the access to perform the specified action
     on the course, and return the descriptor.
 
     Raises a 404 if the course_id is invalid, or the user doesn't have access.
+
+    depth: The number of levels of children for the modulestore to cache. None means infinite depth
     """
-    course = get_course_by_id(course_id)
+    course = get_course_by_id(course_id, depth=depth)
     if not has_access(user, course, action):
         # Deliberately return a non-specific error message to avoid
         # leaking info about access control settings
@@ -85,12 +89,12 @@ def course_image_url(course):
     """Try to look up the image url for the course.  If it's not found,
     log an error and return the dead link"""
     if isinstance(modulestore(), XMLModuleStore):
-        path = course.data_dir + "/images/course_image.jpg"
-        return try_staticfiles_lookup(path)
+        return '/static/' + course.metadata['data_dir'] + "/images/course_image.jpg"
     else:
         loc = course.location._replace(tag='c4x', category='asset', name='images_course_image.jpg')
         path = StaticContent.get_url_path_from_location(loc)
         return path
+
 
 def find_file(fs, dirs, filename):
     """
@@ -107,6 +111,7 @@ def find_file(fs, dirs, filename):
         if fs.exists(filepath):
             return filepath
     raise ResourceNotFoundError("Could not find {0}".format(filename))
+
 
 def get_course_about_section(course, section_key):
     """
@@ -243,8 +248,11 @@ def get_course_syllabus_section(course, section_key):
             dirs = [path("syllabus") / course.url_name, path("syllabus")]
             filepath = find_file(fs, dirs, section_key + ".html")
             with fs.open(filepath) as htmlFile:
-                return replace_urls(htmlFile.read().decode('utf-8'),
-                                    course.data_dir, course_namespace=course.location)
+                return replace_static_urls(
+                    htmlFile.read().decode('utf-8'),
+                    course.metadata['data_dir'],
+                    course_namespace=course.location
+                )
         except ResourceNotFoundError:
             log.exception("Missing syllabus section {key} in course {url}".format(
                 key=section_key, url=course.location.url()))
@@ -260,11 +268,35 @@ def get_courses_by_university(user, domain=None):
     '''
     # TODO: Clean up how 'error' is done.
     # filter out any courses that errored.
-    visible_courses = branding.get_visible_courses(domain)
+    visible_courses = get_courses(user, domain)
 
     universities = defaultdict(list)
     for course in visible_courses:
-        if not has_access(user, course, 'see_exists'):
-            continue
         universities[course.org].append(course)
+
     return universities
+
+
+def get_courses(user, domain=None):
+    '''
+    Returns a list of courses available, sorted by course.number
+    '''
+    courses = branding.get_visible_courses(domain)
+    courses = [c for c in courses if has_access(user, c, 'see_exists')]
+
+    courses = sorted(courses, key=lambda course: course.number)
+
+    return courses
+
+
+def sort_by_announcement(courses):
+    """
+    Sorts a list of courses by their announcement date. If the date is
+    not available, sort them by their start date.
+    """
+
+    # Sort courses by how far are they from they start day
+    key = lambda course: course.sorting_score
+    courses = sorted(courses, key=key)
+
+    return courses

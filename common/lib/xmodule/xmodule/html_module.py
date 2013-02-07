@@ -6,16 +6,13 @@ import sys
 from lxml import etree
 from path import path
 
-from .x_module import XModule
 from pkg_resources import resource_string
-from .xml_module import XmlDescriptor, name_to_pathname
-from .editing_module import EditingDescriptor
-from .stringify import stringify_children
-from .html_checker import check_html
-from xmodule.modulestore import Location
-
-from xmodule.contentstore.content import XASSET_SRCREF_PREFIX, StaticContent
 from xblock.core import Scope, String
+from xmodule.editing_module import EditingDescriptor
+from xmodule.html_checker import check_html
+from xmodule.stringify import stringify_children
+from xmodule.x_module import XModule
+from xmodule.xml_module import XmlDescriptor, name_to_pathname
 
 log = logging.getLogger("mitx.courseware")
 
@@ -27,12 +24,12 @@ class HtmlModule(XModule):
                     ]
          }
     js_module_name = "HTMLModule"
+    css = {'scss': [resource_string(__name__, 'css/html/display.scss')]}
 
     data = String(help="Html contents to display for this module", scope=Scope.content)
-    
+
     def get_html(self):
         return self.data
-
 
 
 class HtmlDescriptor(XmlDescriptor, EditingDescriptor):
@@ -43,11 +40,12 @@ class HtmlDescriptor(XmlDescriptor, EditingDescriptor):
     module_class = HtmlModule
     filename_extension = "xml"
     template_dir_name = "html"
-    
+
     data = String(help="Html contents to display for this module", scope=Scope.content)
 
     js = {'coffee': [resource_string(__name__, 'js/src/html/edit.coffee')]}
     js_module_name = "HTMLEditingDescriptor"
+    css = {'scss': [resource_string(__name__, 'css/editor/edit.scss'), resource_string(__name__, 'css/html/edit.scss')]}
 
     # VS[compat] TODO (cpennington): Delete this method once all fall 2012 course
     # are being edited in the cms
@@ -103,8 +101,6 @@ class HtmlDescriptor(XmlDescriptor, EditingDescriptor):
             filepath = "{base}/{name}.html".format(base=base, name=filename)
             #log.debug("looking for html file for {0} at {1}".format(location, filepath))
 
-
-
             # VS[compat]
             # TODO (cpennington): If the file doesn't exist at the right path,
             # give the class a chance to fix it up. The file will be written out
@@ -120,7 +116,7 @@ class HtmlDescriptor(XmlDescriptor, EditingDescriptor):
 
             try:
                 with system.resources_fs.open(filepath) as file:
-                    html = file.read()
+                    html = file.read().decode('utf-8')
                     # Log a warning if we can't parse the file, but don't error
                     if not check_html(html):
                         msg = "Couldn't parse html in {0}.".format(filepath)
@@ -131,7 +127,7 @@ class HtmlDescriptor(XmlDescriptor, EditingDescriptor):
 
                     # TODO (ichuang): remove this after migration
                     # for Fall 2012 LMS migration: keep filename (and unmangled filename)
-                    definition['filename'] = [ filepath, filename ]
+                    definition['filename'] = [filepath, filename]
 
                     return definition, []
 
@@ -155,13 +151,12 @@ class HtmlDescriptor(XmlDescriptor, EditingDescriptor):
 
         # Not proper format.  Write html to file, return an empty tag
         pathname = name_to_pathname(self.url_name)
-        pathdir = path(pathname).dirname()
         filepath = u'{category}/{pathname}.html'.format(category=self.category,
                                                     pathname=pathname)
 
         resource_fs.makedir(os.path.dirname(filepath), recursive=True, allow_recreate=True)
         with resource_fs.open(filepath, 'w') as file:
-            file.write(self.data)
+            file.write(self.data.encode('utf-8'))
 
         # write out the relative name
         relname = path(pathname).basename()
@@ -178,12 +173,14 @@ class AboutDescriptor(HtmlDescriptor):
     """
     template_dir_name = "about"
 
+
 class StaticTabDescriptor(HtmlDescriptor):
     """
     These pieces of course content are treated as HtmlModules but we need to overload where the templates are located
     in order to be able to create new ones
     """
     template_dir_name = "statictab"
+
 
 class CourseInfoDescriptor(HtmlDescriptor):
     """

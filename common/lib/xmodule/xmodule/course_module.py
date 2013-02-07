@@ -1,11 +1,18 @@
+import logging
 from cStringIO import StringIO
+from math import exp, erf
 from lxml import etree
-from path import path # NOTE (THK): Only used for detecting presence of syllabus
-from xmodule.graders import grader_from_conf
+from path import path  # NOTE (THK): Only used for detecting presence of syllabus
+import requests
+import time
+from datetime import datetime
+
 from xmodule.modulestore import Location
 from xmodule.seq_module import SequenceDescriptor, SequenceModule
 from xmodule.timeparse import parse_time
 from xmodule.util.decorators import lazyproperty
+from xmodule.graders import grader_from_conf
+from datetime import datetime
 import json
 import logging
 import requests
@@ -15,10 +22,43 @@ import copy
 from xblock.core import Scope, ModelType, List, String, Object, Boolean
 from .fields import Date
 
+
 log = logging.getLogger(__name__)
+
+
+class StringOrDate(Date):
+    def from_json(self, value):
+        """
+        Parse an optional metadata key containing a time: if present, complain
+        if it doesn't parse.
+        Return None if not present or invalid.
+        """
+        if value is None:
+            return None
+
+        try:
+            return time.strptime(value, self.time_format)
+        except ValueError:
+            return value
+
+    def to_json(self, value):
+        """
+        Convert a time struct to a string
+        """
+        if value is None:
+            return None
+
+        try:
+            return time.strftime(self.time_format, value)
+        except ValueError:
+            return value
+
+
 
 edx_xml_parser = etree.XMLParser(dtd_validation=False, load_dtd=False,
                                  remove_comments=True, remove_blank_text=True)
+
+_cached_toc = {}
 
 class Textbook(object):
     def __init__(self, title, book_url):
@@ -42,6 +82,24 @@ class Textbook(object):
         Returns XML tree representation of the table of contents
         """
         toc_url = self.book_url + 'toc.xml'
+
+        # cdodge: I've added this caching of TOC because in Mongo-backed instances (but not Filesystem stores)
+        # course modules have a very short lifespan and are constantly being created and torn down.
+        # Since this module in the __init__() method does a synchronous call to AWS to get the TOC
+        # this is causing a big performance problem. So let's be a bit smarter about this and cache
+        # each fetch and store in-mem for 10 minutes.
+        # NOTE: I have to get this onto sandbox ASAP as we're having runtime failures. I'd like to swing back and
+        # rewrite to use the traditional Django in-memory cache.
+        try:
+            # see if we already fetched this
+            if toc_url in _cached_toc:
+                (table_of_contents, timestamp) = _cached_toc[toc_url]
+                age = datetime.now() - timestamp
+                # expire every 10 minutes
+                if age.seconds < 600:
+                    return table_of_contents
+        except Exception as err:
+            pass
 
         # Get the table of contents from S3
         log.info("Retrieving textbook table of contents from %s" % toc_url)
@@ -98,7 +156,7 @@ class CourseDescriptor(SequenceDescriptor):
     enrollment_end = Date(help="Date that enrollment for this class is closed", scope=Scope.settings)
     start = Date(help="Start time when this module is visible", scope=Scope.settings)
     end = Date(help="Date that this class ends", scope=Scope.settings)
-    advertised_start = Date(help="Date that this course is advertised to start", scope=Scope.settings)
+    advertised_start = StringOrDate(help="Date that this course is advertised to start", scope=Scope.settings)
     grading_policy = Object(help="Grading policy definition for this class", scope=Scope.content, default={})
     show_calculator = Boolean(help="Whether to show the calculator in this course", default=False, scope=Scope.settings)
     display_name = String(help="Display name for this module", scope=Scope.settings)
@@ -110,6 +168,7 @@ class CourseDescriptor(SequenceDescriptor):
         scope=Scope.settings,
         computed_default=lambda c: {'General': {'id': c.location.html_id()}},
         )
+    testcenter_info = Object(help="Dictionary of Test Center info", scope=Scope.settings)
     has_children = True
 
     info_sidebar_name = String(scope=Scope.settings, default='Course Handouts')
@@ -163,41 +222,55 @@ class CourseDescriptor(SequenceDescriptor):
 
         self.set_grading_policy(self.grading_policy)
 
+        self.test_center_exams = []
+        test_center_info = self.testcenter_info
+        if test_center_info is not None:
+            for exam_name in test_center_info:
+                try:
+                    exam_info = test_center_info[exam_name]
+                    self.test_center_exams.append(self.TestCenterExam(self.id, exam_name, exam_info))
+                except Exception as err:
+                    # If we can't parse the test center exam info, don't break
+                    # the rest of the courseware.
+                    msg = 'Error %s: Unable to load test-center exam info for exam "%s" of course "%s"' % (err, exam_name, self.id)
+                    log.error(msg)
+                    continue
+
     def defaut_grading_policy(self):
         """
         Return a dict which is a copy of the default grading policy
         """
-        default = {"GRADER" : [
+        default = {"GRADER": [
                 {
-                    "type" : "Homework",
-                    "min_count" : 12,
-                    "drop_count" : 2,
-                    "short_label" : "HW",
-                    "weight" : 0.15
+                    "type": "Homework",
+                    "min_count": 12,
+                    "drop_count": 2,
+                    "short_label": "HW",
+                    "weight": 0.15
                 },
                 {
-                    "type" : "Lab",
-                    "min_count" : 12,
-                    "drop_count" : 2,
-                    "weight" : 0.15
+                    "type": "Lab",
+                    "min_count": 12,
+                    "drop_count": 2,
+                    "weight": 0.15
                 },
                 {
-                    "type" : "Midterm Exam",
-                    "short_label" : "Midterm",
-                    "min_count" : 1,
-                    "drop_count" : 0,
-                    "weight" : 0.3
+                    "type": "Midterm Exam",
+                    "short_label": "Midterm",
+                    "min_count": 1,
+                    "drop_count": 0,
+                    "weight": 0.3
                 },
                 {
-                    "type" : "Final Exam",
-                    "short_label" : "Final",
-                    "min_count" : 1,
-                    "drop_count" : 0,
-                    "weight" : 0.4
+                    "type": "Final Exam",
+                    "short_label": "Final",
+                    "min_count": 1,
+                    "drop_count": 0,
+                    "weight": 0.4
                 }
             ],
-            "GRADE_CUTOFFS" : {
-                "Pass" : 0.5
+            "GRADE_CUTOFFS": {
+                "Pass": 0.5
             }}
         return copy.deepcopy(default)
 
@@ -246,7 +319,8 @@ class CourseDescriptor(SequenceDescriptor):
         instance = super(CourseDescriptor, cls).from_xml(xml_data, system, org, course)
 
         # bleh, have to parse the XML here to just pull out the url_name attribute
-        course_file = StringIO(xml_data)
+        # I don't think it's stored anywhere in the instance.
+        course_file = StringIO(xml_data.encode('ascii', 'ignore'))
         xml_obj = etree.parse(course_file, parser=edx_xml_parser).getroot()
 
         policy_dir = None
@@ -259,7 +333,11 @@ class CourseDescriptor(SequenceDescriptor):
         if policy_dir:
             paths = [policy_dir + '/grading_policy.json'] + paths
 
-        policy = json.loads(cls.read_grading_policy(paths, system))
+        try:
+            policy = json.loads(cls.read_grading_policy(paths, system))
+        except ValueError:
+            system.error_tracker("Unable to decode grading policy as json")
+            policy = None
 
         # cdodge: import the grading policy information that is on disk and put into the
         # descriptor 'definition' bucket as a dictionary so that it is persisted in the DB
@@ -307,11 +385,11 @@ class CourseDescriptor(SequenceDescriptor):
     @property
     def grader(self):
         return self._grading_policy['GRADER']
-    
+
     @property
     def raw_grader(self):
         return self._grading_policy['RAW_GRADER']
-    
+
     @raw_grader.setter
     def raw_grader(self, value):
         # NOTE WELL: this change will not update the processed graders. If we need that, this needs to call grader_from_conf
@@ -321,12 +399,128 @@ class CourseDescriptor(SequenceDescriptor):
     @property
     def grade_cutoffs(self):
         return self._grading_policy['GRADE_CUTOFFS']
-    
+
     @grade_cutoffs.setter
     def grade_cutoffs(self, value):
         self._grading_policy['GRADE_CUTOFFS'] = value
-        self.grading_policy['GRADE_CUTOFFS'] = value
-    
+
+
+    @property
+    def lowest_passing_grade(self):
+        return min(self._grading_policy['GRADE_CUTOFFS'].values())
+
+    @property
+    def tabs(self):
+        """
+        Return the tabs config, as a python object, or None if not specified.
+        """
+        return self.metadata.get('tabs')
+
+    @tabs.setter
+    def tabs(self, value):
+        self.metadata['tabs'] = value
+
+    @property
+    def show_calculator(self):
+        return self.metadata.get("show_calculator", None) == "Yes"
+
+    @property
+    def is_cohorted(self):
+        """
+        Return whether the course is cohorted.
+        """
+        config = self.metadata.get("cohort_config")
+        if config is None:
+            return False
+
+        return bool(config.get("cohorted"))
+
+    @property
+    def top_level_discussion_topic_ids(self):
+        """
+        Return list of topic ids defined in course policy.
+        """
+        topics = self.metadata.get("discussion_topics", {})
+        return [d["id"] for d in topics.values()]
+
+
+    @property
+    def cohorted_discussions(self):
+        """
+        Return the set of discussions that is explicitly cohorted.  It may be
+        the empty set.  Note that all inline discussions are automatically
+        cohorted based on the course's is_cohorted setting.
+        """
+        config = self.metadata.get("cohort_config")
+        if config is None:
+            return set()
+
+        return set(config.get("cohorted_discussions", []))
+
+
+
+    @property
+    def is_new(self):
+        """
+        Returns if the course has been flagged as new in the metadata. If
+        there is no flag, return a heuristic value considering the
+        announcement and the start dates.
+        """
+        flag = self.metadata.get('is_new', None)
+        if flag is None:
+            # Use a heuristic if the course has not been flagged
+            announcement, start, now = self._sorting_dates()
+            if announcement and (now - announcement).days < 30:
+                # The course has been announced for less that month
+                return True
+            elif (now - start).days < 1:
+                # The course has not started yet
+                return True
+            else:
+                return False
+        elif isinstance(flag, basestring):
+            return flag.lower() in ['true', 'yes', 'y']
+        else:
+            return bool(flag)
+
+    @property
+    def sorting_score(self):
+        """
+        Returns a number that can be used to sort the courses according
+        the how "new"" they are. The "newness"" score is computed using a
+        heuristic that takes into account the announcement and
+        (advertized) start dates of the course if available.
+
+        The lower the number the "newer" the course.
+        """
+        # Make courses that have an announcement date shave a lower
+        # score than courses than don't, older courses should have a
+        # higher score.
+        announcement, start, now = self._sorting_dates()
+        scale = 300.0  # about a year
+        if announcement:
+            days = (now - announcement).days
+            score = -exp(-days / scale)
+        else:
+            days = (now - start).days
+            score = exp(days / scale)
+        return score
+
+    def _sorting_dates(self):
+        # utility function to get datetime objects for dates used to
+        # compute the is_new flag and the sorting_score
+        def to_datetime(timestamp):
+            return datetime.fromtimestamp(time.mktime(timestamp))
+
+        def get_date(field):
+            timetuple = self._try_parse_time(field)
+            return to_datetime(timetuple) if timetuple else None
+
+        announcement = get_date('announcement')
+        start = get_date('advertised_start') or to_datetime(self.start)
+        now = to_datetime(time.gmtime())
+
+        return announcement, start, now
 
     @lazyproperty
     def grading_context(self):
@@ -371,16 +565,16 @@ class CourseDescriptor(SequenceDescriptor):
                     xmoduledescriptors.append(s)
 
                     # The xmoduledescriptors included here are only the ones that have scores.
-                    section_description = { 'section_descriptor' : s, 'xmoduledescriptors' : filter(lambda child: child.has_score, xmoduledescriptors) }
+                    section_description = {'section_descriptor': s, 'xmoduledescriptors': filter(lambda child: child.has_score, xmoduledescriptors)}
 
                     section_format = s.lms.format
-                    graded_sections[ section_format ] = graded_sections.get( section_format, [] ) + [section_description]
+                    graded_sections[section_format] = graded_sections.get(section_format, []) + [section_description]
 
                     all_descriptors.extend(xmoduledescriptors)
                     all_descriptors.append(s)
 
-        return { 'graded_sections' : graded_sections,
-                 'all_descriptors' : all_descriptors,}
+        return {'graded_sections': graded_sections,
+                 'all_descriptors': all_descriptors, }
 
 
     @staticmethod
@@ -407,7 +601,6 @@ class CourseDescriptor(SequenceDescriptor):
             raise ValueError("{0} is not a course location".format(loc))
         return "/".join([loc.org, loc.course, loc.name])
 
-
     @property
     def id(self):
         """Return the course_id for this course"""
@@ -415,14 +608,16 @@ class CourseDescriptor(SequenceDescriptor):
 
     @property
     def start_date_text(self):
-        return time.strftime("%b %d, %Y", self.advertised_start or self.start)
+        if isinstance(self.advertised_start, basestring):
+            return self.advertised_start
+        elif self.advertised_start is None and self.start is None:
+            return 'TBD'
+        else:
+            return time.strftime("%b %d, %Y", self.advertised_start or self.start)
 
     @property
     def end_date_text(self):
         return time.strftime("%b %d, %Y", self.end)
-
-
-
 
     @property
     def forum_posts_allowed(self):
@@ -436,8 +631,90 @@ class CourseDescriptor(SequenceDescriptor):
                     return False
         except:
             log.exception("Error parsing discussion_blackouts for course {0}".format(self.id))
-        
+
         return True
+
+    class TestCenterExam(object):
+        def __init__(self, course_id, exam_name, exam_info):
+            self.course_id = course_id
+            self.exam_name = exam_name
+            self.exam_info = exam_info
+            self.exam_series_code = exam_info.get('Exam_Series_Code') or exam_name
+            self.display_name = exam_info.get('Exam_Display_Name') or self.exam_series_code
+            self.first_eligible_appointment_date = self._try_parse_time('First_Eligible_Appointment_Date')
+            if self.first_eligible_appointment_date is None:
+                raise ValueError("First appointment date must be specified")
+            # TODO: If defaulting the last appointment date, it should be the
+            # *end* of the same day, not the same time.  It's going to be used as the
+            # end of the exam overall, so we don't want the exam to disappear too soon.
+            # It's also used optionally as the registration end date, so time matters there too.
+            self.last_eligible_appointment_date = self._try_parse_time('Last_Eligible_Appointment_Date')   # or self.first_eligible_appointment_date
+            if self.last_eligible_appointment_date is None:
+                raise ValueError("Last appointment date must be specified")
+            self.registration_start_date = self._try_parse_time('Registration_Start_Date') or time.gmtime(0)
+            self.registration_end_date = self._try_parse_time('Registration_End_Date') or self.last_eligible_appointment_date
+            # do validation within the exam info:
+            if self.registration_start_date > self.registration_end_date:
+                raise ValueError("Registration start date must be before registration end date")
+            if self.first_eligible_appointment_date > self.last_eligible_appointment_date:
+                raise ValueError("First appointment date must be before last appointment date")
+            if self.registration_end_date > self.last_eligible_appointment_date:
+                raise ValueError("Registration end date must be before last appointment date")
+
+
+        def _try_parse_time(self, key):
+            """
+            Parse an optional metadata key containing a time: if present, complain
+            if it doesn't parse.
+            Return None if not present or invalid.
+            """
+            if key in self.exam_info:
+                try:
+                    return parse_time(self.exam_info[key])
+                except ValueError as e:
+                    msg = "Exam {0} in course {1} loaded with a bad exam_info key '{2}': '{3}'".format(self.exam_name, self.course_id, self.exam_info[key], e)
+                    log.warning(msg)
+                return None
+
+        def has_started(self):
+            return time.gmtime() > self.first_eligible_appointment_date
+
+        def has_ended(self):
+            return time.gmtime() > self.last_eligible_appointment_date
+
+        def has_started_registration(self):
+            return time.gmtime() > self.registration_start_date
+
+        def has_ended_registration(self):
+            return time.gmtime() > self.registration_end_date
+
+        def is_registering(self):
+            now = time.gmtime()
+            return now >= self.registration_start_date and now <= self.registration_end_date
+
+        @property
+        def first_eligible_appointment_date_text(self):
+            return time.strftime("%b %d, %Y", self.first_eligible_appointment_date)
+
+        @property
+        def last_eligible_appointment_date_text(self):
+            return time.strftime("%b %d, %Y", self.last_eligible_appointment_date)
+
+        @property
+        def registration_end_date_text(self):
+            return time.strftime("%b %d, %Y at %H:%M UTC", self.registration_end_date)
+
+    @property
+    def current_test_center_exam(self):
+        exams = [exam for exam in self.test_center_exams if exam.has_started_registration() and not exam.has_ended()]
+        if len(exams) > 1:
+            # TODO: output some kind of warning.  This should already be
+            # caught if we decide to do validation at load time.
+            return exams[0]
+        elif len(exams) == 1:
+            return exams[0]
+        else:
+            return None
 
     @property
     def title(self):
@@ -450,6 +727,3 @@ class CourseDescriptor(SequenceDescriptor):
     @property
     def org(self):
         return self.location.org
-
-
-

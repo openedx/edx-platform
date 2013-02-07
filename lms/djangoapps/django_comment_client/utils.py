@@ -1,53 +1,70 @@
-import time
 from collections import defaultdict
-from importlib import import_module
+import logging
+import time
+import urllib
+from datetime import datetime
 
 from courseware.module_render import get_module
 from xmodule.modulestore import Location
 from xmodule.modulestore.django import modulestore
 from xmodule.modulestore.search import path_to_location
+from django.contrib.auth.models import User
+from django.core.urlresolvers import reverse
+from django.db import connection
 from django.http import HttpResponse
 from django.utils import simplejson
-from django.db import connection
-from django.conf import settings
-from django.core.urlresolvers import reverse
-from django.contrib.auth.models import User
-from django_comment_client.permissions import check_permissions_by_view
 from django_comment_client.models import Role
+from django_comment_client.permissions import check_permissions_by_view
 from mitxmako import middleware
-
-import logging
-import operator
-import itertools
-import urllib
 import pystache_custom as pystache
 
+from xmodule.modulestore import Location
+from xmodule.modulestore.django import modulestore
+from xmodule.modulestore.search import path_to_location
+
+log = logging.getLogger(__name__)
 
 # TODO these should be cached via django's caching rather than in-memory globals
 _FULLMODULES = None
 _DISCUSSIONINFO = defaultdict(dict)
 
+
 def extract(dic, keys):
     return {k: dic.get(k) for k in keys}
 
+
 def strip_none(dic):
     return dict([(k, v) for k, v in dic.iteritems() if v is not None])
+
 
 def strip_blank(dic):
     def _is_blank(v):
         return isinstance(v, str) and len(v.strip()) == 0
     return dict([(k, v) for k, v in dic.iteritems() if not _is_blank(v)])
 
+# TODO should we be checking if d1 and d2 have the same keys with different values?
+
+
 def merge_dict(dic1, dic2):
     return dict(dic1.items() + dic2.items())
+
 
 def get_role_ids(course_id):
     roles = Role.objects.filter(course_id=course_id)
     staff = list(User.objects.filter(is_staff=True).values_list('id', flat=True))
     roles_with_ids = {'Staff': staff}
     for role in roles:
-      roles_with_ids[role.name] = list(role.users.values_list('id', flat=True))
+        roles_with_ids[role.name] = list(role.users.values_list('id', flat=True))
     return roles_with_ids
+
+
+def has_forum_access(uname, course_id, rolename):
+    try:
+        role = Role.objects.get(name=rolename, course_id=course_id)
+    except Role.DoesNotExist:
+        return False
+    return role.users.filter(username=uname).exists()
+
 
 def get_full_modules():
     global _FULLMODULES
@@ -55,28 +72,29 @@ def get_full_modules():
         _FULLMODULES = modulestore().modules
     return _FULLMODULES
 
+
 def get_discussion_id_map(course):
     """
         return a dict of the form {category: modules}
     """
     global _DISCUSSIONINFO
-    if not _DISCUSSIONINFO[course.id]:
-        initialize_discussion_info(course)
+    initialize_discussion_info(course)
     return _DISCUSSIONINFO[course.id]['id_map']
+
 
 def get_discussion_title(course, discussion_id):
     global _DISCUSSIONINFO
-    if not _DISCUSSIONINFO[course.id]:
-        initialize_discussion_info(course)
+    initialize_discussion_info(course)
     title = _DISCUSSIONINFO[course.id]['id_map'].get(discussion_id, {}).get('title', '(no title)')
     return title
+
 
 def get_discussion_category_map(course):
 
     global _DISCUSSIONINFO
-    if not _DISCUSSIONINFO[course.id]:
-        initialize_discussion_info(course)
+    initialize_discussion_info(course)
     return filter_unstarted_categories(_DISCUSSIONINFO[course.id]['category_map'])
+
 
 def filter_unstarted_categories(category_map):
 
@@ -115,6 +133,7 @@ def filter_unstarted_categories(category_map):
 
     return result_map
 
+
 def sort_map_entries(category_map):
     things = []
     for title, entry in category_map["entries"].items():
@@ -124,32 +143,50 @@ def sort_map_entries(category_map):
         sort_map_entries(category_map["subcategories"][title])
     category_map["children"] = [x[0] for x in sorted(things, key=lambda x: x[1]["sort_key"])]
 
+
 def initialize_discussion_info(course):
 
     global _DISCUSSIONINFO
+
+    # only cache in-memory discussion information for 10 minutes
+    # this is because we need a short-term hack fix for
+    # mongo-backed courseware whereby new discussion modules can be added
+    # without LMS service restart
+
     if _DISCUSSIONINFO[course.id]:
-        return
+        timestamp = _DISCUSSIONINFO[course.id].get('timestamp', datetime.now())
+        age = datetime.now() - timestamp
+        # expire every 5 minutes
+        if age.seconds < 300:
+            return
 
     course_id = course.id
-    url_course_id = course_id.replace('/', '_').replace('.', '_')
-
-    all_modules = get_full_modules()[course_id]
 
     discussion_id_map = {}
-
     unexpanded_category_map = defaultdict(list)
 
-    for location, module in all_modules.items():
-        if location.category == 'discussion':
-            id = module.discussion_id
-            category = module.discussion_category
-            title = module.discussion_target
-            sort_key = module.sort_key
-            category = " / ".join([x.strip() for x in category.split("/")])
-            last_category = category.split("/")[-1]
-            discussion_id_map[id] = {"location": location, "title": last_category + " / " + title}
-            unexpanded_category_map[category].append({"title": title, "id": id,
-                "sort_key": sort_key, "start_date": module.lms.start})
+    # get all discussion models within this course_id
+    all_modules = modulestore().get_items(['i4x', course.location.org, course.location.course, 'discussion', None], course_id=course_id)
+
+    for module in all_modules:
+        skip_module = False
+        for key in ('id', 'discussion_category', 'for'):
+            if key not in module.metadata:
+                log.warning("Required key '%s' not in discussion %s, leaving out of category map" % (key, module.location))
+                skip_module = True
+
+        if skip_module:
+            continue
+
+        id = module.discussion_id
+        category = module.discussion_category
+        title = module.discussion_target
+        sort_key = module.sort_key
+        category = " / ".join([x.strip() for x in category.split("/")])
+        last_category = category.split("/")[-1]
+        discussion_id_map[id] = {"location": location, "title": last_category + " / " + title}
+        unexpanded_category_map[category].append({"title": title, "id": id,
+            "sort_key": sort_key, "start_date": module.lms.start})
 
     category_map = {"entries": defaultdict(dict), "subcategories": defaultdict(dict)}
     for category_path, entries in unexpanded_category_map.items():
@@ -188,6 +225,9 @@ def initialize_discussion_info(course):
                                                       "sort_key": entry["sort_key"],
                                                       "start_date": entry["start_date"]}
 
+    # TODO.  BUG! : course location is not unique across multiple course runs!
+    # (I think Kevin already noticed this)  Need to send course_id with requests, store it
+    # in the backend.
     for topic, entry in course.discussion_topics.items():
         category_map['entries'][topic] = {"id": entry["id"],
                                           "sort_key": entry.get("sort_key", topic),
@@ -196,12 +236,15 @@ def initialize_discussion_info(course):
 
     _DISCUSSIONINFO[course.id]['id_map'] = discussion_id_map
     _DISCUSSIONINFO[course.id]['category_map'] = category_map
+    _DISCUSSIONINFO[course.id]['timestamp'] = datetime.now()
+
 
 class JsonResponse(HttpResponse):
     def __init__(self, data=None):
         content = simplejson.dumps(data)
         super(JsonResponse, self).__init__(content,
                                            mimetype='application/json; charset=utf-8')
+
 
 class JsonError(HttpResponse):
     def __init__(self, error_messages=[], status=400):
@@ -213,13 +256,16 @@ class JsonError(HttpResponse):
         super(JsonError, self).__init__(content,
                                         mimetype='application/json; charset=utf-8', status=status)
 
+
 class HtmlResponse(HttpResponse):
     def __init__(self, html=''):
         super(HtmlResponse, self).__init__(html, content_type='text/plain')
 
+
 class ViewNameMiddleware(object):
     def process_view(self, request, view_func, view_args, view_kwargs):
         request.view_name = view_func.__name__
+
 
 class QueryCountDebugMiddleware(object):
     """
@@ -243,8 +289,9 @@ class QueryCountDebugMiddleware(object):
                     query_time = query.get('duration', 0) / 1000
                 total_time += float(query_time)
 
-            logging.info('%s queries run, total %s seconds' % (len(connection.queries), total_time))
+            log.info('%s queries run, total %s seconds' % (len(connection.queries), total_time))
         return response
+
 
 def get_ability(course_id, content, user):
     return {
@@ -257,6 +304,8 @@ def get_ability(course_id, content, user):
     }
 
 #TODO: RENAME
+
+
 def get_annotated_content_info(course_id, content, user, user_info):
     """
     Get metadata for an individual content (thread or comment)
@@ -273,6 +322,8 @@ def get_annotated_content_info(course_id, content, user, user_info):
     }
 
 #TODO: RENAME
+
+
 def get_annotated_content_infos(course_id, thread, user, user_info):
     """
     Get metadata for a thread and its children
@@ -285,6 +336,7 @@ def get_annotated_content_infos(course_id, thread, user, user_info):
     annotate(thread)
     return infos
 
+
 def get_metadata_for_threads(course_id, threads, user, user_info):
     def infogetter(thread):
         return get_annotated_content_infos(course_id, thread, user, user_info)
@@ -293,12 +345,16 @@ def get_metadata_for_threads(course_id, threads, user, user_info):
     return metadata
 
 # put this method in utils.py to avoid circular import dependency between helpers and mustache_helpers
+
+
 def url_for_tags(course_id, tags):
     return reverse('django_comment_client.forum.views.forum_form_discussion', args=[course_id]) + '?' + urllib.urlencode({'tags': tags})
+
 
 def render_mustache(template_name, dictionary, *args, **kwargs):
     template = middleware.lookup['main'].get_template(template_name).source
     return pystache.render(template, dictionary)
+
 
 def permalink(content):
     if content['type'] == 'thread':
@@ -308,6 +364,7 @@ def permalink(content):
         return reverse('django_comment_client.forum.views.single_thread',
                        args=[content['course_id'], content['commentable_id'], content['thread_id']]) + '#' + content['id']
 
+
 def extend_content(content):
     roles = {}
     if content.get('user_id'):
@@ -315,7 +372,7 @@ def extend_content(content):
             user = User.objects.get(pk=content['user_id'])
             roles = dict(('name', role.name.lower()) for role in user.roles.filter(course_id=content['course_id']))
         except user.DoesNotExist:
-            logging.error('User ID {0} in comment content {1} but not in our DB.'.format(content.get('user_id'), content.get('id')))
+            log.error('User ID {0} in comment content {1} but not in our DB.'.format(content.get('user_id'), content.get('id')))
 
     content_info = {
         'displayed_title': content.get('highlighted_title') or content.get('title', ''),
@@ -323,9 +380,10 @@ def extend_content(content):
         'raw_tags': ','.join(content.get('tags', [])),
         'permalink': permalink(content),
         'roles': roles,
-        'updated': content['created_at']!=content['updated_at'],
+        'updated': content['created_at'] != content['updated_at'],
     }
     return merge_dict(content, content_info)
+
 
 def get_courseware_context(content, course):
     id_map = get_discussion_id_map(course)
@@ -335,12 +393,13 @@ def get_courseware_context(content, course):
         location = id_map[id]["location"].url()
         title = id_map[id]["title"]
         (course_id, chapter, section, position) = path_to_location(modulestore(), course.id, location)
-        url = reverse('courseware_position', kwargs={"course_id":course_id,
-                                                     "chapter":chapter,
-                                                     "section":section,
-                                                     "position":position})
+        url = reverse('courseware_position', kwargs={"course_id": course_id,
+                                                     "chapter": chapter,
+                                                     "section": section,
+                                                     "position": position})
         content_info = {"courseware_url": url, "courseware_title": title}
     return content_info
+
 
 def safe_content(content):
     fields = [

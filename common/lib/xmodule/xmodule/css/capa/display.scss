@@ -20,6 +20,7 @@ h2 {
   color: darken($error-red, 10%);
 }
 
+
 section.problem {
   @media print {
     display: block;
@@ -118,16 +119,6 @@ section.problem {
         background: url('../images/unanswered-icon.png') center center no-repeat;
         height: 14px;
         width: 14px;
-      }
-    }
-
-    &.processing {
-      p.status {
-        @include inline-block();
-        background: url('../images/spinner.gif') center center no-repeat;
-        height: 20px;
-        width: 20px;
-        text-indent: -9999px;
       }
     }
 
@@ -250,6 +241,13 @@ section.problem {
       }
     }
 
+    .reload
+    {
+      float:right;
+      margin: 10px;
+    }
+
+
     .grader-status {
       padding: 9px;
       background: #F6F6F6;
@@ -264,6 +262,13 @@ section.problem {
         display: block;
         float: left;
         margin: -7px 7px 0 0;
+      }
+
+      .grading {
+        background: url('../images/info-icon.png') left center no-repeat;
+        padding-left: 25px;
+        text-indent: 0px;
+        margin: 0px 7px 0 0;
       }
 
       p {
@@ -293,6 +298,51 @@ section.problem {
           float: left;
         }
       }
+
+    }
+    .evaluation {
+        p {
+            margin-bottom: 4px;
+        }
+    }
+
+
+    .feedback-on-feedback {
+        height: 100px;
+        margin-right: 20px;
+    }
+
+    .evaluation-response {
+        header {
+            text-align: right;
+            a {
+                font-size: .85em;
+            }
+        }
+    }
+
+    .evaluation-scoring {
+        .scoring-list {
+            list-style-type: none;
+            margin-left: 3px;
+
+            li {
+                &:first-child {
+                    margin-left: 0px;
+                }
+                display:inline;
+                margin-left: 50px;
+
+                label {
+                    font-size: .9em;
+                }
+
+            }
+        }
+
+    }
+    .submit-message-container {
+        margin: 10px 0px ;
     }
   }
 
@@ -630,6 +680,10 @@ section.problem {
       color: #2C2C2C;
       font-family: monospace;
       font-size: 1em;
+      padding-top: 10px;
+      header {
+          font-size: 1.4em;
+      }
 
       .shortform {
         font-weight: bold;
@@ -685,7 +739,67 @@ section.problem {
             color: #B00;
           }
         }
+
+        .markup-text{
+          margin: 5px;
+          padding: 20px 0px 15px 50px;
+          border-top: 1px solid #DDD;
+          border-left: 20px solid #FAFAFA;
+
+          bs {
+            color: #BB0000;
+          }
+
+          bg {
+            color: #BDA046;
+          }
+        }
       }
     }
+  }
+
+  .rubric {
+      tr {
+          margin:10px 0px;
+          height: 100%;
+      }
+      td {
+          padding: 20px 0px;
+          margin: 10px 0px;
+          height: 100%;
+      }
+      th {
+          padding: 5px;
+          margin: 5px;
+      }
+      label,
+      .view-only {
+          margin:3px;
+          position: relative;
+          padding: 15px;
+          width: 150px;
+          height:100%;
+          display: inline-block;
+          min-height: 50px;
+          min-width: 50px;
+          background-color: #CCC;
+          font-size: .9em;
+      }
+      .grade {
+        position: absolute;
+        bottom:0px;
+        right:0px;
+        margin:10px;
+      }
+      .selected-grade {
+        background: #666;
+        color: white; 
+      }
+      input[type=radio]:checked + label {
+        background: #666;
+        color: white; }
+      input[class='score-selection'] {
+        display: none; 
+      }
   }
 }

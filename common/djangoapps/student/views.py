@@ -1,14 +1,15 @@
 import datetime
 import feedparser
-import itertools
+#import itertools
 import json
 import logging
 import random
 import string
 import sys
-import time
+#import time
 import urllib
 import uuid
+
 
 from django.conf import settings
 from django.contrib.auth import logout, authenticate, login
@@ -26,26 +27,29 @@ from bs4 import BeautifulSoup
 from django.core.cache import cache
 
 from django_future.csrf import ensure_csrf_cookie, csrf_exempt
-from student.models import (Registration, UserProfile,
+from student.models import (Registration, UserProfile, TestCenterUser, TestCenterUserForm,
+                            TestCenterRegistration, TestCenterRegistrationForm,
                             PendingNameChange, PendingEmailChange,
-                            CourseEnrollment)
+                            CourseEnrollment, unique_id_for_user,
+                            get_testcenter_registration)
 
 from certificates.models import CertificateStatuses, certificate_status_for_student
 
 from xmodule.course_module import CourseDescriptor
 from xmodule.modulestore.exceptions import ItemNotFoundError
 from xmodule.modulestore.django import modulestore
-from xmodule.modulestore.exceptions import ItemNotFoundError
 
-from datetime import date
+#from datetime import date
 from collections import namedtuple
-from courseware.courses import get_courses_by_university
+
+from courseware.courses import get_courses, sort_by_announcement
 from courseware.access import has_access
 
 from statsd import statsd
 
 log = logging.getLogger("mitx.student")
 Article = namedtuple('Article', 'title url author image deck publication publish_date')
+
 
 def csrf_token(context):
     ''' A csrf token that can be included in a form.
@@ -68,30 +72,22 @@ def index(request, extra_context={}, user=None):
     extra_context is used to allow immediate display of certain modal windows, eg signup,
     as used by external_auth.
     '''
-    feed_data = cache.get("students_index_rss_feed_data")
-    if feed_data == None:
-        if hasattr(settings, 'RSS_URL'):
-            feed_data = urllib.urlopen(settings.RSS_URL).read()
-        else:
-            feed_data = render_to_string("feed.rss", None)
-        cache.set("students_index_rss_feed_data", feed_data, settings.RSS_TIMEOUT)
-
-    feed = feedparser.parse(feed_data)
-    entries = feed['entries'][0:3]
-    for entry in entries:
-        soup = BeautifulSoup(entry.description)
-        entry.image = soup.img['src'] if soup.img else None
-        entry.summary = soup.getText()
 
     # The course selection work is done in courseware.courses.
-    domain = settings.MITX_FEATURES.get('FORCE_UNIVERSITY_DOMAIN')	# normally False
-    if domain==False:				# do explicit check, because domain=None is valid
+    domain = settings.MITX_FEATURES.get('FORCE_UNIVERSITY_DOMAIN')  	# normally False
+    if domain == False:				# do explicit check, because domain=None is valid
         domain = request.META.get('HTTP_HOST')
-    universities = get_courses_by_university(None,
-                                             domain=domain)
-    context = {'universities': universities, 'entries': entries}
+
+    courses = get_courses(None, domain=domain)
+    courses = sort_by_announcement(courses)
+
+    # Get the 3 most recent news
+    top_news = _get_news(top=3)
+
+    context = {'courses': courses, 'news': top_news}
     context.update(extra_context)
     return render_to_response('index.html', context)
+
 
 def course_from_id(course_id):
     """Return the CourseDescriptor corresponding to this course_id"""
@@ -102,15 +98,17 @@ import re
 day_pattern = re.compile('\s\d+,\s')
 multimonth_pattern = re.compile('\s?\-\s?\S+\s')
 
+
 def get_date_for_press(publish_date):
     import datetime
     # strip off extra months, and just use the first:
     date = re.sub(multimonth_pattern, ", ", publish_date)
     if re.search(day_pattern, date):
-        date = datetime.datetime.strptime(date, "%B %d, %Y") 
-    else: 
-        date = datetime.datetime.strptime(date, "%B, %Y") 
+        date = datetime.datetime.strptime(date, "%B %d, %Y")
+    else:
+        date = datetime.datetime.strptime(date, "%B, %Y")
     return date
+
 
 def press(request):
     json_articles = cache.get("student_press_json_articles")
@@ -125,6 +123,90 @@ def press(request):
     articles = [Article(**article) for article in json_articles]
     articles.sort(key=lambda item: get_date_for_press(item.publish_date), reverse=True)
     return render_to_response('static_templates/press.html', {'articles': articles})
+
+
+def process_survey_link(survey_link, user):
+    """
+    If {UNIQUE_ID} appears in the link, replace it with a unique id for the user.
+    Currently, this is sha1(user.username).  Otherwise, return survey_link.
+    """
+    return survey_link.format(UNIQUE_ID=unique_id_for_user(user))
+
+
+def cert_info(user, course):
+    """
+    Get the certificate info needed to render the dashboard section for the given
+    student and course.  Returns a dictionary with keys:
+
+    'status': one of 'generating', 'ready', 'notpassing', 'processing', 'restricted'
+    'show_download_url': bool
+    'download_url': url, only present if show_download_url is True
+    'show_disabled_download_button': bool -- true if state is 'generating'
+    'show_survey_button': bool
+    'survey_url': url, only if show_survey_button is True
+    'grade': if status is not 'processing'
+    """
+    if not course.has_ended():
+        return {}
+
+    return _cert_info(user, course, certificate_status_for_student(user, course.id))
+
+
+def _cert_info(user, course, cert_status):
+    """
+    Implements the logic for cert_info -- split out for testing.
+    """
+    default_status = 'processing'
+
+    default_info = {'status': default_status,
+                    'show_disabled_download_button': False,
+                    'show_download_url': False,
+                    'show_survey_button': False}
+
+    if cert_status is None:
+        return default_info
+
+    # simplify the status for the template using this lookup table
+    template_state = {
+        CertificateStatuses.generating: 'generating',
+        CertificateStatuses.regenerating: 'generating',
+        CertificateStatuses.downloadable: 'ready',
+        CertificateStatuses.notpassing: 'notpassing',
+        CertificateStatuses.restricted: 'restricted',
+        }
+
+    status = template_state.get(cert_status['status'], default_status)
+
+    d = {'status': status,
+         'show_download_url': status == 'ready',
+         'show_disabled_download_button': status == 'generating', }
+
+    if (status in ('generating', 'ready', 'notpassing', 'restricted') and
+        course.end_of_course_survey_url is not None):
+        d.update({
+         'show_survey_button': True,
+         'survey_url': process_survey_link(course.end_of_course_survey_url, user)})
+    else:
+        d['show_survey_button'] = False
+
+    if status == 'ready':
+        if 'download_url' not in cert_status:
+            log.warning("User %s has a downloadable cert for %s, but no download url",
+                        user.username, course.id)
+            return default_info
+        else:
+            d['download_url'] = cert_status['download_url']
+
+    if status in ('generating', 'ready', 'notpassing', 'restricted'):
+        if 'grade' not in cert_status:
+            # Note: as of 11/20/2012, we know there are students in this state-- cs169.1x,
+            # who need to be regraded (we weren't tracking 'notpassing' at first).
+            # We can add a log.warning here once we think it shouldn't happen.
+            return default_info
+        else:
+            d['grade'] = cert_status['grade']
+
+    return d
 
 
 @login_required
@@ -160,19 +242,21 @@ def dashboard(request):
     show_courseware_links_for = frozenset(course.id for course in courses
                                           if has_access(request.user, course, 'load'))
 
-    # TODO: workaround to not have to zip courses and certificates in the template
-    # since before there is a migration to certificates
-    if settings.MITX_FEATURES.get('CERTIFICATES_ENABLED'):
-        cert_statuses = { course.id: certificate_status_for_student(request.user, course.id) for course in courses}
-    else:
-        cert_statuses = {}
+    cert_statuses = {course.id: cert_info(request.user, course) for course in courses}
+
+    exam_registrations = {course.id: exam_registration_info(request.user, course) for course in courses}
+
+    # Get the 3 most recent news
+    top_news = _get_news(top=3)
 
     context = {'courses': courses,
                'message': message,
                'staff_access': staff_access,
                'errored_courses': errored_courses,
-               'show_courseware_links_for' : show_courseware_links_for,
+               'show_courseware_links_for': show_courseware_links_for,
                'cert_statuses': cert_statuses,
+               'news': top_news,
+               'exam_registrations': exam_registrations,
                }
 
     return render_to_response('dashboard.html', context)
@@ -224,7 +308,7 @@ def change_enrollment(request):
         try:
             course = course_from_id(course_id)
         except ItemNotFoundError:
-            log.warning("User {0} tried to enroll in non-existant course {1}"
+            log.warning("User {0} tried to enroll in non-existent course {1}"
                       .format(user.username, enrollment.course_id))
             return {'success': False, 'error': 'The course requested does not exist.'}
 
@@ -233,7 +317,7 @@ def change_enrollment(request):
                     'error': 'enrollment in {} not allowed at this time'
                     .format(course.lms.display_name)}
 
-        org, course_num, run=course_id.split("/")
+        org, course_num, run = course_id.split("/")
         statsd.increment("common.student.enrollment",
                         tags=["org:{0}".format(org),
                               "course:{0}".format(course_num),
@@ -247,7 +331,7 @@ def change_enrollment(request):
             enrollment = CourseEnrollment.objects.get(user=user, course_id=course_id)
             enrollment.delete()
 
-            org, course_num, run=course_id.split("/")
+            org, course_num, run = course_id.split("/")
             statsd.increment("common.student.unenrollment",
                             tags=["org:{0}".format(org),
                                   "course:{0}".format(course_num),
@@ -260,6 +344,14 @@ def change_enrollment(request):
         return {'success': False, 'error': 'Invalid enrollment_action.'}
 
     return {'success': False, 'error': 'We weren\'t able to unenroll you. Please try again.'}
+
+
+@ensure_csrf_cookie
+def accounts_login(request, error=""):
+
+
+    return render_to_response('accounts_login.html', {'error': error})
+
 
 
 # Need different levels of logging
@@ -337,6 +429,7 @@ def change_setting(request):
     return HttpResponse(json.dumps({'success': True,
                                     'location': up.location, }))
 
+
 def _do_create_account(post_vars):
     """
     Given cleaned post variables, create the User and UserProfile objects, as well as the
@@ -382,8 +475,9 @@ def _do_create_account(post_vars):
     try:
         profile.year_of_birth = int(post_vars['year_of_birth'])
     except (ValueError, KeyError):
-        profile.year_of_birth = None  # If they give us garbage, just ignore it instead
-                                # of asking them to put an integer.
+        # If they give us garbage, just ignore it instead
+        # of asking them to put an integer.
+        profile.year_of_birth = None
     try:
         profile.save()
     except Exception:
@@ -463,7 +557,7 @@ def create_account(request, post_override=None):
 
     # Ok, looks like everything is legit.  Create the account.
     ret = _do_create_account(post_vars)
-    if isinstance(ret,HttpResponse):		# if there was an error then return that
+    if isinstance(ret, HttpResponse):		# if there was an error then return that
         return ret
     (user, profile, registration) = ret
 
@@ -503,7 +597,7 @@ def create_account(request, post_override=None):
         eamap.user = login_user
         eamap.dtsignup = datetime.datetime.now()
         eamap.save()
-        log.debug('Updated ExternalAuthMap for %s to be %s' % (post_vars['username'],eamap))
+        log.debug('Updated ExternalAuthMap for %s to be %s' % (post_vars['username'], eamap))
 
         if settings.MITX_FEATURES.get('BYPASS_ACTIVATION_EMAIL_FOR_EXTAUTH'):
             log.debug('bypassing activation email')
@@ -511,6 +605,175 @@ def create_account(request, post_override=None):
             login_user.save()
 
     statsd.increment("common.student.account_created")
+
+    js = {'success': True}
+    return HttpResponse(json.dumps(js), mimetype="application/json")
+
+
+def exam_registration_info(user, course):
+    """ Returns a Registration object if the user is currently registered for a current
+    exam of the course.  Returns None if the user is not registered, or if there is no
+    current exam for the course.
+    """
+    exam_info = course.current_test_center_exam
+    if exam_info is None:
+        return None
+
+    exam_code = exam_info.exam_series_code
+    registrations = get_testcenter_registration(user, course.id, exam_code)
+    if registrations:
+        registration = registrations[0]
+    else:
+        registration = None
+    return registration
+
+
+@login_required
+@ensure_csrf_cookie
+def begin_exam_registration(request, course_id):
+    """ Handles request to register the user for the current
+    test center exam of the specified course.  Called by form
+    in dashboard.html.
+    """
+    user = request.user
+
+    try:
+        course = course_from_id(course_id)
+    except ItemNotFoundError:
+        log.error("User {0} enrolled in non-existent course {1}".format(user.username, course_id))
+        raise Http404
+
+    # get the exam to be registered for:
+    # (For now, we just assume there is one at most.)
+    # if there is no exam now (because someone bookmarked this stupid page),
+    # then return a 404:
+    exam_info = course.current_test_center_exam
+    if exam_info is None:
+        raise Http404
+
+    # determine if the user is registered for this course:
+    registration = exam_registration_info(user, course)
+
+    # we want to populate the registration page with the relevant information,
+    # if it already exists.  Create an empty object otherwise.
+    try:
+        testcenteruser = TestCenterUser.objects.get(user=user)
+    except TestCenterUser.DoesNotExist:
+        testcenteruser = TestCenterUser()
+        testcenteruser.user = user
+
+    context = {'course': course,
+               'user': user,
+               'testcenteruser': testcenteruser,
+               'registration': registration,
+               'exam_info': exam_info,
+               }
+
+    return render_to_response('test_center_register.html', context)
+
+
+@ensure_csrf_cookie
+def create_exam_registration(request, post_override=None):
+    '''
+    JSON call to create a test center exam registration.
+    Called by form in test_center_register.html
+    '''
+    post_vars = post_override if post_override else request.POST
+
+    # first determine if we need to create a new TestCenterUser, or if we are making any update
+    # to an existing TestCenterUser.
+    username = post_vars['username']
+    user = User.objects.get(username=username)
+    course_id = post_vars['course_id']
+    course = course_from_id(course_id)  # assume it will be found....
+
+    # make sure that any demographic data values received from the page have been stripped.
+    # Whitespace is not an acceptable response for any of these values
+    demographic_data = {}
+    for fieldname in TestCenterUser.user_provided_fields():
+        if fieldname in post_vars:
+            demographic_data[fieldname] = (post_vars[fieldname]).strip()
+
+    try:
+        testcenter_user = TestCenterUser.objects.get(user=user)
+        needs_updating = testcenter_user.needs_update(demographic_data)
+        log.info("User {0} enrolled in course {1} {2}updating demographic info for exam registration".format(user.username, course_id, "" if needs_updating else "not "))
+    except TestCenterUser.DoesNotExist:
+        # do additional initialization here:
+        testcenter_user = TestCenterUser.create(user)
+        needs_updating = True
+        log.info("User {0} enrolled in course {1} creating demographic info for exam registration".format(user.username, course_id))
+
+    # perform validation:
+    if needs_updating:
+        # first perform validation on the user information
+        # using a Django Form.
+        form = TestCenterUserForm(instance=testcenter_user, data=demographic_data)
+        if form.is_valid():
+            form.update_and_save()
+        else:
+            response_data = {'success': False}
+            # return a list of errors...
+            response_data['field_errors'] = form.errors
+            response_data['non_field_errors'] = form.non_field_errors()
+            return HttpResponse(json.dumps(response_data), mimetype="application/json")
+
+    # create and save the registration:
+    needs_saving = False
+    exam = course.current_test_center_exam
+    exam_code = exam.exam_series_code
+    registrations = get_testcenter_registration(user, course_id, exam_code)
+    if registrations:
+        registration = registrations[0]
+        # NOTE: we do not bother to check here to see if the registration has changed,
+        # because at the moment there is no way for a user to change anything about their
+        # registration.  They only provide an optional accommodation request once, and
+        # cannot make changes to it thereafter.
+        # It is possible that the exam_info content has been changed, such as the
+        # scheduled exam dates, but those kinds of changes should not be handled through
+        # this registration screen.
+
+    else:
+        accommodation_request = post_vars.get('accommodation_request', '')
+        registration = TestCenterRegistration.create(testcenter_user, exam, accommodation_request)
+        needs_saving = True
+        log.info("User {0} enrolled in course {1} creating new exam registration".format(user.username, course_id))
+
+    if needs_saving:
+        # do validation of registration.  (Mainly whether an accommodation request is too long.)
+        form = TestCenterRegistrationForm(instance=registration, data=post_vars)
+        if form.is_valid():
+            form.update_and_save()
+        else:
+            response_data = {'success': False}
+            # return a list of errors...
+            response_data['field_errors'] = form.errors
+            response_data['non_field_errors'] = form.non_field_errors()
+            return HttpResponse(json.dumps(response_data), mimetype="application/json")
+
+
+    # only do the following if there is accommodation text to send,
+    # and a destination to which to send it.
+    # TODO: still need to create the accommodation email templates
+#    if 'accommodation_request' in post_vars and 'TESTCENTER_ACCOMMODATION_REQUEST_EMAIL' in settings:
+#        d = {'accommodation_request': post_vars['accommodation_request'] }
+#
+#        # composes accommodation email
+#        subject = render_to_string('emails/accommodation_email_subject.txt', d)
+#        # Email subject *must not* contain newlines
+#        subject = ''.join(subject.splitlines())
+#        message = render_to_string('emails/accommodation_email.txt', d)
+#
+#        try:
+#            dest_addr = settings['TESTCENTER_ACCOMMODATION_REQUEST_EMAIL']
+#            from_addr = user.email
+#            send_mail(subject, message, from_addr, [dest_addr], fail_silently=False)
+#        except:
+#            log.exception(sys.exc_info())
+#            response_data = {'success': False}
+#            response_data['non_field_errors'] =  [ 'Could not send accommodation e-mail.', ]
+#            return HttpResponse(json.dumps(response_data), mimetype="application/json")
+
 
     js = {'success': True}
     return HttpResponse(json.dumps(js), mimetype="application/json")
@@ -570,7 +833,7 @@ def password_reset(request):
 
     # By default, Django doesn't allow Users with is_active = False to reset their passwords,
     # but this bites people who signed up a long time ago, never activated, and forgot their
-    # password. So for their sake, we'll auto-activate a user for whome password_reset is called.
+    # password. So for their sake, we'll auto-activate a user for whom password_reset is called.
     try:
         user = User.objects.get(email=request.POST['email'])
         user.is_active = True
@@ -580,15 +843,16 @@ def password_reset(request):
 
     form = PasswordResetForm(request.POST)
     if form.is_valid():
-        form.save(use_https = request.is_secure(),
-                  from_email = settings.DEFAULT_FROM_EMAIL,
-                  request = request,
-                  domain_override = request.get_host())
-        return HttpResponse(json.dumps({'success':True,
+        form.save(use_https=request.is_secure(),
+                  from_email=settings.DEFAULT_FROM_EMAIL,
+                  request=request,
+                  domain_override=request.get_host())
+        return HttpResponse(json.dumps({'success': True,
                                         'value': render_to_string('registration/password_reset_done.html', {})}))
     else:
         return HttpResponse(json.dumps({'success': False,
                                         'error': 'Invalid e-mail'}))
+
 
 @ensure_csrf_cookie
 def reactivation_email(request):
@@ -601,6 +865,7 @@ def reactivation_email(request):
         return HttpResponse(json.dumps({'success': False,
                                         'error': 'No inactive user with this e-mail exists'}))
     return reactivation_email_for_user(user)
+
 
 def reactivation_email_for_user(user):
     reg = Registration.objects.get(user=user)
@@ -742,11 +1007,11 @@ def pending_name_changes(request):
 
     changes = list(PendingNameChange.objects.all())
     js = {'students': [{'new_name': c.new_name,
-                        'rationale':c.rationale,
-                        'old_name':UserProfile.objects.get(user=c.user).name,
-                        'email':c.user.email,
-                        'uid':c.user.id,
-                        'cid':c.id} for c in changes]}
+                        'rationale': c.rationale,
+                        'old_name': UserProfile.objects.get(user=c.user).name,
+                        'email': c.user.email,
+                        'uid': c.user.id,
+                        'cid': c.id} for c in changes]}
     return render_to_response('name_changes.html', js)
 
 
@@ -803,6 +1068,8 @@ def accept_name_change(request):
 
 # TODO: This is a giant kludge to give Pearson something to test against ASAP.
 #       Will need to get replaced by something that actually ties into TestCenterUser
+
+
 @csrf_exempt
 def test_center_login(request):
     if not settings.MITX_FEATURES.get('ENABLE_PEARSON_HACK_TEST'):
@@ -820,3 +1087,24 @@ def test_center_login(request):
         return redirect('/courses/MITx/6.002x/2012_Fall/courseware/Final_Exam/Final_Exam_Fall_2012/')
     else:
         return HttpResponseForbidden()
+
+
+def _get_news(top=None):
+    "Return the n top news items on settings.RSS_URL"
+
+    feed_data = cache.get("students_index_rss_feed_data")
+    if feed_data == None:
+        if hasattr(settings, 'RSS_URL'):
+            feed_data = urllib.urlopen(settings.RSS_URL).read()
+        else:
+            feed_data = render_to_string("feed.rss", None)
+        cache.set("students_index_rss_feed_data", feed_data, settings.RSS_TIMEOUT)
+
+    feed = feedparser.parse(feed_data)
+    entries = feed['entries'][0:top]  # all entries if top is None
+    for entry in entries:
+        soup = BeautifulSoup(entry.description)
+        entry.image = soup.img['src'] if soup.img else None
+        entry.summary = soup.getText()
+
+    return entries

@@ -141,6 +141,7 @@ That's basically all there is to the organizational structure.  Read the next se
 
 * `abtest` -- Support for A/B testing.  TODO: add details..
 * `chapter` -- top level organization unit of a course.   The courseware display code currently expects the top level `course` element to contain only chapters, though there is no philosophical reason why this is required, so we may change it to properly display non-chapters at the top level.
+* `conditional` -- conditional element, which shows one or more modules only if certain conditions are satisfied.
 * `course` -- top level tag.  Contains everything else.
 * `customtag` -- render an html template, filling in some parameters, and return the resulting html.  See below for details.
 * `discussion` -- Inline discussion forum
@@ -162,6 +163,22 @@ Container tags include `chapter`, `sequential`, `videosequence`, `vertical`, and
 ### `course`
 
 `course` is also a container, and is similar, with one extra wrinkle: the top level pointer tag _must_ have  `org` and `course` attributes specified--the organization name, and course name.  Note that `course` is referring to the platonic ideal of this course (e.g. "6.002x"), not to any particular run of this course.  The `url_name` should be the particular run of this course.
+
+### `conditional`
+
+`conditional` is as special kind of container tag as well.  Here are two examples:
+
+        <conditional condition="require_completed" required="problem/choiceprob">
+            <video url_name="secret_video" />
+        </conditional>
+
+        <conditional condition="require_attempted" required="problem/choiceprob&problem/sumprob">
+            <html url_name="secret_page" />
+        </conditional>
+
+The condition can be either `require_completed`, in which case the required modules must be completed, or `require_attempted`, in which case the required modules must have been attempted.
+
+The required modules are specified as a set of `tag`/`url_name`, joined by an ampersand.
 
 ### `customtag`
 
@@ -251,12 +268,19 @@ Supported fields at the course level:
 
 * "start" -- specify the start date for the course.  Format-by-example: "2012-09-05T12:00".
 * "advertised_start" -- specify what you want displayed as the start date of the course in the course listing and course about pages. This can be useful if you want to let people in early before the formal start. Format-by-example: "2012-09-05T12:00".
+* "disable_policy_graph" -- set to true (or "Yes"), if the policy graph should be disabled (ie not shown).
 * "enrollment_start", "enrollment_end" -- when can students enroll?  (if not specified, can enroll anytime).   Same format as "start".
 * "end" -- specify the end date for the course.  Format-by-example: "2012-11-05T12:00".
 * "end_of_course_survey_url" -- a url for an end of course survey -- shown after course is over, next to certificate download links.
 * "tabs" -- have custom tabs in the courseware.  See below for details on config.
 * "discussion_blackouts" -- An array of time intervals during which you want to disable a student's ability to create or edit posts in the forum. Moderators, Community TAs, and Admins are unaffected. You might use this during exam periods, but please be aware that the forum is often a very good place to catch mistakes and clarify points to students. The better long term solution would be to have better flagging/moderation mechanisms, but this is the hammer we have today. Format by example: [["2012-10-29T04:00", "2012-11-03T04:00"], ["2012-12-30T04:00", "2013-01-02T04:00"]]
 * "show_calculator" (value "Yes" if desired)
+* "days_early_for_beta" -- number of days (floating point ok) early that students in the beta-testers group get to see course content.  Can also be specified for any other course element, and overrides values set at higher levels.
+* "cohort_config" : dictionary with keys 
+    - "cohorted" : boolean.  Set to true if this course uses student cohorts.  If so, all inline discussions are automatically cohorted, and top-level discussion topics are configurable with an optional 'cohorted': bool parameter (with default value false).  
+    - "cohorted_discussions": list of discussions that should be cohorted.  
+    - ... more to come.  ('auto_cohort', how to auto cohort, etc)
+
 * TODO: there are others
 
 ### Grading policy file contents
@@ -418,6 +442,10 @@ If you want to customize the courseware tabs displayed for your course, specify 
 * "external_link".  Parameters "name", "link".
 * "textbooks".  No parameters--generates tab names from book titles.
 * "progress".  Parameter "name".
+* "static_tab".  Parameters "name", 'url_slug'--will look for tab contents in
+                       'tabs/{course_url_name}/{tab url_slug}.html'
+* "staff_grading". No parameters.  If specified, displays the staff grading tab for instructors.
+
 
 # Tips for content developers
 
@@ -429,9 +457,7 @@ before the week 1 material to make it easy to find in the file.
 
 * Come up with a consistent pattern for url_names, so that it's easy to know where to look for any piece of content.  It will also help to come up with a standard way of splitting your content files.  As a point of departure, we suggest splitting chapters, sequences, html, and problems into separate files.
 
-* A heads up: our content management system will allow you to develop content through a web browser, but will be backed by this same xml at first.  Once that happens, every element will be in its own file to make access and updates faster.
-
-* Prefer the most "semantic" name for containers: e.g., use problemset rather than vertical for a problem set.  That way, if we decide to display problem sets differently, we don't have to change the xml.
+* Prefer the most "semantic" name for containers: e.g., use problemset rather than sequential for a problem set.  That way, if we decide to display problem sets differently, we don't have to change the xml.
 
 # Other file locations (info and about)
 

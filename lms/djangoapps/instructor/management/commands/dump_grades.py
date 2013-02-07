@@ -3,7 +3,9 @@
 # django management command: dump grades to csv files
 # for use by batch processes
 
-import os, sys, string
+import os
+import sys
+import string
 import datetime
 import json
 
@@ -13,6 +15,7 @@ from xmodule.modulestore.django import modulestore
 
 from django.conf import settings
 from django.core.management.base import BaseCommand
+
 
 class Command(BaseCommand):
     help = "dump grades to CSV file.  Usage: dump_grades course_id_or_dir filename dump_type\n"
@@ -32,12 +35,12 @@ class Command(BaseCommand):
         fn = "grades.csv"
         get_raw_scores = False
 
-        if len(args)>0:
+        if len(args) > 0:
             course_id = args[0]
-        if len(args)>1:
+        if len(args) > 1:
             fn = args[1]
-        if len(args)>2:
-            get_raw_scores = args[2].lower()=='raw'
+        if len(args) > 2:
+            get_raw_scores = args[2].lower() == 'raw'
 
         request = self.DummyRequest()
         try:
@@ -54,15 +57,15 @@ class Command(BaseCommand):
         print "-----------------------------------------------------------------------------"
         print "Dumping grades from %s to file %s (get_raw_scores=%s)" % (course.id, fn, get_raw_scores)
         datatable = get_student_grade_summary_data(request, course, course.id, get_raw_scores=get_raw_scores)
-    
-        fp = open(fn,'w')
-    
+
+        fp = open(fn, 'w')
+
         writer = csv.writer(fp, dialect='excel', quotechar='"', quoting=csv.QUOTE_ALL)
         writer.writerow(datatable['header'])
         for datarow in datatable['data']:
             encoded_row = [unicode(s).encode('utf-8') for s in datarow]
             writer.writerow(encoded_row)
-    
+
         fp.close()
         print "Done: %d records dumped" % len(datatable['data'])
 
@@ -74,6 +77,3 @@ class Command(BaseCommand):
             return 'edx.mit.edu'
         def is_secure(self):
             return False
-
-    
-        

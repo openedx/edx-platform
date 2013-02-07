@@ -9,13 +9,14 @@ TODO:
 - check rendering -- e.g. msg should appear in the rendered output.  If possible, test that
   templates are escaping things properly.
 
-  
+
 - test unicode in values, parameters, etc.
 - test various html escapes
 - test funny xml chars -- should never get xml parse error if things are escaped properly.
 
 """
 
+import json
 from lxml import etree
 import unittest
 import xml.sax.saxutils as saxutils
@@ -29,6 +30,7 @@ lookup_tag = inputtypes.registry.get_class_for_tag
 
 def quote_attr(s):
     return saxutils.quoteattr(s)[1:-1]  # don't want the outer quotes
+
 
 class OptionInputTest(unittest.TestCase):
     '''
@@ -99,7 +101,7 @@ class ChoiceGroupTest(unittest.TestCase):
                     'input_type': expected_input_type,
                     'choices': [('foil1', '<text>This is foil One.</text>'),
                                 ('foil2', '<text>This is foil Two.</text>'),
-                                ('foil3', 'This is foil Three.'),],
+                                ('foil3', 'This is foil Three.'), ],
                     'name_array_suffix': expected_suffix,   # what is this for??
                     }
 
@@ -136,7 +138,7 @@ class JavascriptInputTest(unittest.TestCase):
 
         element = etree.fromstring(xml_str)
 
-        state = {'value': '3',}
+        state = {'value': '3', }
         the_input = lookup_tag('javascriptinput')(test_system, element, state)
 
         context = the_input._get_render_context()
@@ -148,7 +150,7 @@ class JavascriptInputTest(unittest.TestCase):
                     'params': params,
                     'display_file': display_file,
                     'display_class': display_class,
-                    'problem_state': problem_state,}
+                    'problem_state': problem_state, }
 
         self.assertEqual(context, expected)
 
@@ -164,7 +166,7 @@ class TextLineTest(unittest.TestCase):
 
         element = etree.fromstring(xml_str)
 
-        state = {'value': 'BumbleBee',}
+        state = {'value': 'BumbleBee', }
         the_input = lookup_tag('textline')(test_system, element, state)
 
         context = the_input._get_render_context()
@@ -192,7 +194,7 @@ class TextLineTest(unittest.TestCase):
 
         element = etree.fromstring(xml_str)
 
-        state = {'value': 'BumbleBee',}
+        state = {'value': 'BumbleBee', }
         the_input = lookup_tag('textline')(test_system, element, state)
 
         context = the_input._get_render_context()
@@ -230,7 +232,7 @@ class FileSubmissionTest(unittest.TestCase):
 
         state = {'value': 'BumbleBee.py',
                  'status': 'incomplete',
-                 'feedback' : {'message': '3'}, }
+                 'feedback': {'message': '3'}, }
         input_class = lookup_tag('filesubmission')
         the_input = input_class(test_system, element, state)
 
@@ -274,7 +276,7 @@ class CodeInputTest(unittest.TestCase):
 
         state = {'value': 'print "good evening"',
                  'status': 'incomplete',
-                 'feedback' : {'message': '3'}, }
+                 'feedback': {'message': '3'}, }
 
         input_class = lookup_tag('codeinput')
         the_input = input_class(test_system, element, state)
@@ -407,13 +409,11 @@ class CrystallographyTest(unittest.TestCase):
     def test_rendering(self):
         height = '12'
         width = '33'
-        size = '10'
 
         xml_str = """<crystallography id="prob_1_2"
         height="{h}"
         width="{w}"
-        size="{s}"
-        />""".format(h=height, w=width, s=size)
+        />""".format(h=height, w=width)
 
         element = etree.fromstring(xml_str)
 
@@ -428,9 +428,7 @@ class CrystallographyTest(unittest.TestCase):
         expected = {'id': 'prob_1_2',
                     'value': value,
                     'status': 'unsubmitted',
-                    'size': size,
                     'msg': '',
-                    'hidden': '',
                     'width': width,
                     'height': height,
                    }
@@ -491,7 +489,7 @@ class ChemicalEquationTest(unittest.TestCase):
 
         element = etree.fromstring(xml_str)
 
-        state = {'value': 'H2OYeah',}
+        state = {'value': 'H2OYeah', }
         the_input = lookup_tag('chemicalequationinput')(test_system, element, state)
 
         context = the_input._get_render_context()
@@ -505,3 +503,70 @@ class ChemicalEquationTest(unittest.TestCase):
                     }
         self.assertEqual(context, expected)
 
+
+class DragAndDropTest(unittest.TestCase):
+    '''
+    Check that drag and drop inputs work
+    '''
+
+    def test_rendering(self):
+        path_to_images = '/static/images/'
+
+        xml_str = """
+        <drag_and_drop_input id="prob_1_2" img="{path}about_1.png" target_outline="false">
+            <draggable id="1" label="Label 1"/>
+            <draggable id="name_with_icon" label="cc" icon="{path}cc.jpg"/>
+            <draggable id="with_icon" label="arrow-left" icon="{path}arrow-left.png" />
+            <draggable id="5" label="Label2" />
+            <draggable id="2" label="Mute" icon="{path}mute.png" />
+            <draggable id="name_label_icon3" label="spinner" icon="{path}spinner.gif" />
+            <draggable id="name4" label="Star" icon="{path}volume.png" />
+            <draggable id="7" label="Label3" />
+
+            <target id="t1" x="210" y="90" w="90" h="90"/>
+            <target id="t2" x="370" y="160" w="90" h="90"/>
+
+        </drag_and_drop_input>
+        """.format(path=path_to_images)
+
+        element = etree.fromstring(xml_str)
+
+        value = 'abc'
+        state = {'value': value,
+                 'status': 'unsubmitted'}
+
+        user_input = {  # order matters, for string comparison
+                        "target_outline": "false",
+                        "base_image": "/static/images/about_1.png",
+                        "draggables": [
+{"can_reuse": "", "label": "Label 1", "id": "1", "icon": ""},
+{"can_reuse": "", "label": "cc", "id": "name_with_icon", "icon": "/static/images/cc.jpg", },
+{"can_reuse": "", "label": "arrow-left", "id": "with_icon", "icon": "/static/images/arrow-left.png", "can_reuse": ""},
+{"can_reuse": "", "label": "Label2", "id": "5", "icon": "", "can_reuse": ""},
+{"can_reuse": "", "label": "Mute", "id": "2", "icon": "/static/images/mute.png", "can_reuse": ""},
+{"can_reuse": "", "label": "spinner", "id": "name_label_icon3", "icon": "/static/images/spinner.gif", "can_reuse": ""},
+{"can_reuse": "", "label": "Star", "id": "name4", "icon": "/static/images/volume.png", "can_reuse": ""},
+{"can_reuse": "", "label": "Label3", "id": "7", "icon": "", "can_reuse": ""}],
+                        "one_per_target": "True",
+                        "targets": [
+                {"y": "90", "x": "210", "id": "t1", "w": "90", "h": "90"},
+                {"y": "160", "x": "370", "id": "t2", "w": "90", "h": "90"}
+                                    ]
+                    }
+
+        the_input = lookup_tag('drag_and_drop_input')(test_system, element, state)
+
+        context = the_input._get_render_context()
+        expected = {'id': 'prob_1_2',
+                    'value': value,
+                    'status': 'unsubmitted',
+                    'msg': '',
+                    'drag_and_drop_json': json.dumps(user_input)
+                    }
+
+        # as we are dumping 'draggables' dicts while dumping user_input, string
+        # comparison will fail, as order of keys is random.
+        self.assertEqual(json.loads(context['drag_and_drop_json']), user_input)
+        context.pop('drag_and_drop_json')
+        expected.pop('drag_and_drop_json')
+        self.assertEqual(context, expected)

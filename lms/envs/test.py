@@ -22,7 +22,7 @@ MITX_FEATURES['ENABLE_DISCUSSION_SERVICE'] = False
 WIKI_ENABLED = True
 
 # Makes the tests run much faster...
-SOUTH_TESTS_MIGRATE = False # To disable migrations and use syncdb instead
+SOUTH_TESTS_MIGRATE = False   # To disable migrations and use syncdb instead
 
 # Nose Test Runner
 INSTALLED_APPS += ('django_nose',)
@@ -56,7 +56,12 @@ XQUEUE_INTERFACE = {
     },
     "basic_auth": ('anant', 'agarwal'),
 }
-XQUEUE_WAITTIME_BETWEEN_REQUESTS = 5 # seconds
+XQUEUE_WAITTIME_BETWEEN_REQUESTS = 5   # seconds
+
+
+# Don't rely on a real staff grading backend
+MOCK_STAFF_GRADING = True
+MOCK_PEER_GRADING = True
 
 # TODO (cpennington): We need to figure out how envs/test.py can inject things
 # into common.py so that we don't have to repeat this sort of thing
@@ -92,7 +97,7 @@ DATABASES = {
 }
 
 CACHES = {
-    # This is the cache used for most things. 
+    # This is the cache used for most things.
     # In staging/prod envs, the sessions also live here.
     'default': {
         'BACKEND': 'django.core.cache.backends.locmem.LocMemCache',
@@ -119,7 +124,14 @@ SECRET_KEY = '85920908f28904ed733fe576320db18cabd7b6cd'
 ################################## OPENID ######################################
 MITX_FEATURES['AUTH_USE_OPENID'] = True
 MITX_FEATURES['AUTH_USE_OPENID_PROVIDER'] = True
+
+OPENID_CREATE_USERS = False
+OPENID_UPDATE_DETAILS_FROM_SREG = True
+OPENID_USE_AS_ADMIN_LOGIN = False
 OPENID_PROVIDER_TRUSTED_ROOTS = ['*']
+
+INSTALLED_APPS += ('external_auth',)
+INSTALLED_APPS += ('django_openid_auth',)
 
 ############################ STATIC FILES #############################
 DEFAULT_FILE_STORAGE = 'django.core.files.storage.FileSystemStorage'

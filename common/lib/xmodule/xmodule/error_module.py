@@ -151,14 +151,14 @@ class ErrorDescriptor(JSONEditingDescriptor):
         '''
         try:
             xml = etree.fromstring(self.contents)
-            return etree.tostring(xml)
+            return etree.tostring(xml, encoding='unicode')
         except etree.XMLSyntaxError:
             # still not valid.
             root = etree.Element('error')
             root.text = self.contents
             err_node = etree.SubElement(root, 'error_msg')
             err_node.text = self.error_msg
-            return etree.tostring(root)
+            return etree.tostring(root, encoding='unicode')
 
 
 class NonStaffErrorDescriptor(ErrorDescriptor):

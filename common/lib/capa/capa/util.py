@@ -51,17 +51,40 @@ def convert_files_to_filenames(answers):
     new_answers = dict()
     for answer_id in answers.keys():
         answer = answers[answer_id]
-        if is_list_of_files(answer): # Files are stored as a list, even if one file
+        if is_list_of_files(answer):   # Files are stored as a list, even if one file
             new_answers[answer_id] = [f.name for f in answer]
         else:
             new_answers[answer_id] = answers[answer_id]
     return new_answers
 
+
 def is_list_of_files(files):
     return isinstance(files, list) and all(is_file(f) for f in files)
+
 
 def is_file(file_to_test):
     '''
     Duck typing to check if 'file_to_test' is a File object
     '''
     return all(hasattr(file_to_test, method) for method in ['read', 'name'])
+
+
+def find_with_default(node, path, default):
+    """
+    Look for a child of node using , and return its text if found.
+    Otherwise returns default.
+
+    Arguments:
+       node: lxml node
+       path: xpath search expression
+       default: value to return if nothing found
+
+    Returns:
+       node.find(path).text if the find succeeds, default otherwise.
+
+    """
+    v = node.find(path)
+    if v is not None:
+        return v.text
+    else:
+        return default

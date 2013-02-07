@@ -43,16 +43,16 @@ class HTMLSnippet(object):
         All of these will be loaded onto the page in the CMS
         """
         # cdodge: We've moved the xmodule.coffee script from an outside directory into the xmodule area of common
-        # this means we need to make sure that all xmodules include this dependency which had been previously implicitly 
+        # this means we need to make sure that all xmodules include this dependency which had been previously implicitly
         # fulfilled in a different area of code
         js = cls.js
-        
+
         if js is None:
             js = {}
 
         if 'coffee' not in js:
             js['coffee'] = []
-        
+
         js['coffee'].append(resource_string(__name__, 'js/src/xmodule.coffee'))
 
         return js
@@ -128,7 +128,8 @@ class XModule(HTMLSnippet, XBlock):
         Return module instances for all the children of this module.
         '''
         if self._loaded_children is None:
-            children = [self.system.get_module(loc) for loc in self.get_children_locations()]
+            child_descriptors = self.get_child_descriptors()
+            children = [self.system.get_module(descriptor) for descriptor in child_descriptors]
             # get_module returns None if the current user doesn't have access
             # to the location.
             self._loaded_children = [c for c in children if c is not None]
@@ -138,23 +139,29 @@ class XModule(HTMLSnippet, XBlock):
     def __unicode__(self):
         return '<x_module(id={0})>'.format(self.id)
 
-    def get_children_locations(self):
+    def get_child_descriptors(self):
         '''
-        Returns the locations of each of child modules.
-        
+        Returns the descriptors of the child modules
+
         Overriding this changes the behavior of get_children and
         anything that uses get_children, such as get_display_items.
-       
+
         This method will not instantiate the modules of the children
         unless absolutely necessary, so it is cheaper to call than get_children
-        
+
         These children will be the same children returned by the
         descriptor unless descriptor.has_dynamic_children() is true.
         '''
-        if not self.has_children:
-            return []
+        return self.descriptor.get_children()
 
-        return self.children
+    def get_child_by(self, selector):
+        """
+        Return a child XModuleDescriptor with the specified url_name, if it exists, and None otherwise.
+        """
+        for child in self.get_children():
+            if selector(child):
+                return child
+        return None
 
     def get_display_items(self):
         '''
@@ -183,8 +190,20 @@ class XModule(HTMLSnippet, XBlock):
     ### Functions used in the LMS
 
     def get_score(self):
-        ''' Score the student received on the problem.
-        '''
+        """
+        Score the student received on the problem, or None if there is no
+        score.
+
+        Returns:
+          dictionary
+             {'score': integer, from 0 to get_max_score(),
+              'total': get_max_score()}
+
+          NOTE (vshnayder): not sure if this was the intended return value, but
+          that's what it's doing now.  I suspect that we really want it to just
+          return a number.  Would need to change (at least) capa and
+          modx_dispatch to match if we did that.
+        """
         return None
 
     def max_score(self):
@@ -213,6 +232,19 @@ class XModule(HTMLSnippet, XBlock):
         ''' dispatch is last part of the URL.
             get is a dictionary-like object '''
         return ""
+
+    # cdodge: added to support dynamic substitutions of
+    # links for courseware assets (e.g. images). <link> is passed through from lxml.html parser
+    def rewrite_content_links(self, link):
+        # see if we start with our format, e.g. 'xasset:<filename>'
+        if link.startswith(XASSET_SRCREF_PREFIX):
+            # yes, then parse out the name
+            name = link[len(XASSET_SRCREF_PREFIX):]
+            loc = Location(self.location)
+            # resolve the reference to our internal 'filepath' which
+            link = StaticContent.compute_location_filename(loc.org, loc.course, name)
+
+        return link
 
 
 def policy_key(location):
@@ -252,7 +284,7 @@ class ResourceTemplates(object):
                 log.warning("Skipping unknown template file %s" % template_file)
                 continue
             template_content = resource_string(__name__, os.path.join(dirname, template_file))
-            template = yaml.load(template_content)
+            template = yaml.safe_load(template_content)
             templates.append(Template(**template))
 
         return templates
@@ -273,7 +305,7 @@ class XModuleDescriptor(HTMLSnippet, ResourceTemplates, XBlock):
     module_class = XModule
 
     # Attributes for inspection of the descriptor
-    
+
     # Indicates whether the xmodule state should be
     # stored in a database (independent of shared state)
     stores_state = False
@@ -286,7 +318,7 @@ class XModuleDescriptor(HTMLSnippet, ResourceTemplates, XBlock):
     # cdodge: this is a list of metadata names which are 'system' metadata
     # and should not be edited by an end-user
     system_metadata_fields = ['data_dir', 'published_date', 'published_by', 'is_draft']
-    
+
     # A list of descriptor attributes that must be equal for the descriptors to
     # be equal
     equality_attributes = ('_model_data', 'location')
@@ -324,6 +356,11 @@ class XModuleDescriptor(HTMLSnippet, ResourceTemplates, XBlock):
 
         self._child_instances = None
 
+    def get_required_module_descriptors(self):
+        """Returns a list of XModuleDescritpor instances upon which this module depends, but are
+        not children of this module"""
+        return []
+
     def get_children(self):
         """Returns a list of XModuleDescriptor instances for the children of
         this module"""
@@ -342,13 +379,13 @@ class XModuleDescriptor(HTMLSnippet, ResourceTemplates, XBlock):
 
         return self._child_instances
 
-    def get_child_by_url_name(self, url_name):
+    def get_child_by(self, selector):
         """
         Return a child XModuleDescriptor with the specified url_name, if it exists, and None otherwise.
         """
-        for c in self.get_children():
-            if c.url_name == url_name:
-                return c
+        for child in self.get_children():
+            if selector(child):
+                return child
         return None
 
     def xmodule(self, system):
@@ -363,17 +400,17 @@ class XModuleDescriptor(HTMLSnippet, ResourceTemplates, XBlock):
             self,
             system.xblock_model_data(self),
         )
-    
+
     def has_dynamic_children(self):
         """
         Returns True if this descriptor has dynamic children for a given
         student when the module is created.
-        
+
         Returns False if the children of this descriptor are the same
-        children that the module will return for any student. 
+        children that the module will return for any student.
         """
         return False
-        
+
 
     # ================================= JSON PARSING ===========================
     @staticmethod
@@ -514,7 +551,6 @@ class XModuleDescriptor(HTMLSnippet, ResourceTemplates, XBlock):
         ))
 
 
-
 class DescriptorSystem(object):
     def __init__(self, load_item, resources_fs, error_tracker, **kwargs):
         """
@@ -599,7 +635,8 @@ class ModuleSystem(object):
                  xqueue=None,
                  publish=None,
                  node_path="",
-                 anonymous_student_id=''):
+                 anonymous_student_id='',
+                 course_id=None):
         '''
         Create a closure around the system environment.
 
@@ -610,7 +647,7 @@ class ModuleSystem(object):
                          TODO: Not used, and has inconsistent args in different
                          files.  Update or remove.
 
-        get_module - function that takes (location) and returns a corresponding
+        get_module - function that takes a descriptor and returns a corresponding
                          module instance object.  If the current user does not have
                          access to that location, returns None.
 
@@ -634,6 +671,8 @@ class ModuleSystem(object):
                          ajax results.
 
         anonymous_student_id - Used for tracking modules with student id
+
+        course_id - the course_id containing this module
         '''
         self.ajax_url = ajax_url
         self.xqueue = xqueue
@@ -646,6 +685,7 @@ class ModuleSystem(object):
         self.replace_urls = replace_urls
         self.node_path = node_path
         self.anonymous_student_id = anonymous_student_id
+        self.course_id = course_id
         self.user_is_staff = user is not None and user.is_staff
         self.xblock_model_data = xblock_model_data
 

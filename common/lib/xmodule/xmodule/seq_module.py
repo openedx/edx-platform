@@ -11,7 +11,7 @@ from xmodule.exceptions import NotFoundError
 from xblock.core import Integer, Scope
 from pkg_resources import resource_string
 
-log = logging.getLogger("mitx.common.lib.seq_module")
+log = logging.getLogger(__name__)
 
 # HACK: This shouldn't be hard-coded to two types
 # OBSOLETE: This obsoletes 'type'
@@ -130,8 +130,8 @@ class SequenceDescriptor(MakoModuleDescriptor, XmlDescriptor):
         children = []
         for child in xml_object:
             try:
-                children.append(system.process_xml(etree.tostring(child)).location.url())
-            except Exception, e:
+                children.append(system.process_xml(etree.tostring(child, encoding='unicode')).location.url())
+            except Exception as e:
                 log.exception("Unable to load child when parsing Sequence. Continuing...")
                 if system.error_tracker is not None:
                     system.error_tracker("ERROR: " + str(e))
@@ -144,4 +144,3 @@ class SequenceDescriptor(MakoModuleDescriptor, XmlDescriptor):
             xml_object.append(
                 etree.fromstring(child.export_to_xml(resource_fs)))
         return xml_object
-
