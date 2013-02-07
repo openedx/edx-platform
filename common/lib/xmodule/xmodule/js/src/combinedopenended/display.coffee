@@ -64,6 +64,7 @@ class @CombinedOpenEnded
     @submit_evaluation_button.click @message_post
 
     @results_container = $('.result-container')
+    @combined_rubric_container = $('.combined-rubric-container')
 
     # Where to put the rubric once we load it
     @el = $(element).find('section.open-ended-child')
@@ -122,6 +123,13 @@ class @CombinedOpenEnded
       else
         @gentle_alert response.error
 
+  show_combined_rubric_current: () =>
+    data = {}
+    $.postWithPrefix "#{@ajax_url}/get_combined_rubric", data, (response) =>
+      if response.success
+        @combined_rubric_container.after(response.html).remove()
+        @combined_rubric_container= $('div.combined_rubric_container')
+
   message_post: (event)=>
     Logger.log 'message_post', @answers
     external_grader_message=$(event.target).parent().parent().parent()
@@ -163,6 +171,9 @@ class @CombinedOpenEnded
     @next_problem_button.hide()
     @hide_file_upload()
     @hint_area.attr('disabled', false)
+
+    if @task_number>1
+      @show_combined_rubric_current()
     if @task_number==1 and @child_state=='assessing'
       @prompt_hide()
     if @child_state == 'done'

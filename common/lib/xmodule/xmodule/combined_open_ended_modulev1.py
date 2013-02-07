@@ -519,20 +519,23 @@ class CombinedOpenEndedV1Module():
         Input: AJAX get dictionary
         Output: Dictionary to be rendered via ajax that contains the result html.
         """
-        task_number = int(get['task_number'])
         self.update_task_states()
         all_responses = []
-        for i in xrange(0,task_number+1):
+        for i in xrange(0,self.current_task_number+1):
             all_responses.append(self.get_last_response(i))
-        rubric_scores = [rd['rubric_scores'] for rd in all_responses]
-        grader_types = [rd['grader_types'] for rd in all_responses]
-        feedback_items = [rd['feedback_items'] for rd in all_responses]
+        rubric_scores = [rd['rubric_scores'] for rd in all_responses if len(rd['rubric_scores'])>0]
+        grader_types = [rd['grader_types'] for rd in all_responses if len(rd['grader_types'])>0]
+        feedback_items = [rd['feedback_items'] for rd in all_responses if len(rd['feedback_items'])>0]
 
         rubric_html = self.rubric_renderer.render_combined_rubric(stringify_children(self.static_data['rubric']), rubric_scores,
             grader_types, feedback_items)
 
         response_dict = all_responses[-1]
-        context = {'results': rubric_html, 'task_number': task_number + 1, 'task_name' : response_dict['human_task']}
+        context = {
+            'results': rubric_html,
+            'task_name' : 'Combined Rubric',
+            'class_name' : 'combined-rubric-container'
+        }
         html = self.system.render_template('combined_open_ended_results.html', context)
         return {'html': html, 'success': True}
 
@@ -545,7 +548,12 @@ class CombinedOpenEndedV1Module():
         task_number = int(get['task_number'])
         self.update_task_states()
         response_dict = self.get_last_response(task_number)
-        context = {'results': response_dict['post_assessment'], 'task_number': task_number + 1, 'task_name' : response_dict['human_task']}
+        context = {
+            'results': response_dict['post_assessment'],
+            'task_number': task_number + 1,
+            'task_name' : response_dict['human_task'],
+            'class_name' : "result-container",
+        }
         html = self.system.render_template('combined_open_ended_results.html', context)
         return {'html': html, 'success': True}
 
@@ -563,7 +571,8 @@ class CombinedOpenEndedV1Module():
         handlers = {
             'next_problem': self.next_problem,
             'reset': self.reset,
-            'get_results': self.get_results
+            'get_results': self.get_results,
+            'get_combined_rubric': self.get_rubric,
         }
 
         if dispatch not in handlers:
