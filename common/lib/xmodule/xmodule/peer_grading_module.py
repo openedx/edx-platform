@@ -32,6 +32,7 @@ from .stringify import stringify_children
 from .x_module import XModule
 from .xml_module import XmlDescriptor
 from xmodule.modulestore import Location
+from xmodule.modulestore.django import modulestore
 from timeinfo import TimeInfo
 
 from peer_grading_service import peer_grading_service, GradingServiceError
@@ -109,9 +110,13 @@ class PeerGradingModule(XModule):
             self.max_grade = int(self.max_grade)
 
     def closed(self):
-        if self.timeinfo.close_date is not None and datetime.utcnow() > self.timeinfo.close_date:
+        return self._closed(self.timeinfo)
+
+    def _closed(self, timeinfo):
+        if timeinfo.close_date is not None and datetime.utcnow() > timeinfo.close_date:
             return True
         return False
+
 
     def _err_response(self, msg):
         """
@@ -455,6 +460,44 @@ class PeerGradingModule(XModule):
         except ValueError:
             error_text = "Could not get problem list"
             success = False
+
+
+        # grab all peer grading module descriptors for this course
+        peer_grading_modules = modulestore().get_items(['i4x', self.location.org, self.location.course, 'peergrading', None], self.system.course_id)
+
+        # construct a dictionary for fast lookups
+        module_dict = {}
+        for module in peer_grading_modules:
+            linked_location = module.metadata.get("link_to_location", None)
+            if linked_location:
+                module_dict[linked_location] = module
+
+        def _find_corresponding_module_for_location(location):
+            if location in module_dict:
+                return module_dict[location]
+            else:
+                return None
+
+        for problem in problem_list:
+            problem_location = problem['location']
+            descriptor = _find_corresponding_module_for_location(problem_location)
+            if descriptor:
+                problem['due'] = descriptor.metadata.get('due', None)
+                grace_period_string = descriptor.metadata.get('graceperiod', None)
+                try:
+                    problem_timeinfo = TimeInfo(problem['due'], grace_period_string)
+                except:
+                    log.error("Malformed due date or grace period string for location {0}".format(problem_location))
+                    raise
+                if self._closed(problem_timeinfo):
+                    problem['closed'] = True
+                else:
+                    problem['closed'] = False
+            else: 
+                # if we can't find the due date, assume that it doesn't have one
+                problem['due'] = None
+                problem['closed'] = False
+
 
         ajax_url = self.ajax_url
         html = self.system.render_template('peer_grading/peer_grading.html', {
