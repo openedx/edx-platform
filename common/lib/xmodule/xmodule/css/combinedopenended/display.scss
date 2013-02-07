@@ -478,6 +478,13 @@ section.open-ended-child {
     margin-left: .75rem;
   }
 
+  ul.rubric-list
+  {
+    list-style-type: none;
+    padding:0;
+    margin:0;
+  }
+
   ol {
     list-style: decimal outside none;
     margin-bottom: lh();

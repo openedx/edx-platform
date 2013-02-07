@@ -239,7 +239,7 @@ class @PeerGradingProblem
   # finds the scores for each rubric category
   get_score_list: () =>
     # find the number of categories:
-    num_categories = $('table.rubric tr').length
+    num_categories = $('ul.rubric-list li').length
 
     score_lst = []
     # get the score for each one
