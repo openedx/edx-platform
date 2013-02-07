@@ -42,16 +42,18 @@ CMS.Views.Settings.Advanced = CMS.Views.ValidatingView.extend({
         var self = this;
         _.each(_.sortBy(_.keys(this.model.attributes), _.identity),
             function(key) {
-                // TODO: working here
-                var newEl = self.template({ key : key, value : self.model.get(key)});
-                listEle$.append(newEl);
-
+                listEle$.append(self.template({ key : key, value : JSON.stringify(self.model.get(key))}));
                 self.fieldToSelectorMap[key] = key;
+            });
 
-                //        var editor = ace.edit('course-advanced-policy-1-value');
-                //        editor.setTheme("ace/theme/chrome");
-                //        editor.getSession().setMode("ace/mode/json");
-
+        // Swap in ACE Editor for all the value (JSON) fields.
+        var policyValueDivs = listEle$.find('.ace');
+        _.each(policyValueDivs,
+            function (div) {
+                var editor = ace.edit(div);
+                 editor.setTheme("ace/theme/chrome");
+                 editor.getSession().setMode("ace/mode/json");
+                 editor.setHighlightActiveLine(false);
             });
         return this;
     },
@@ -106,7 +108,7 @@ CMS.Views.Settings.Advanced = CMS.Views.ValidatingView.extend({
         var newKey = $(event.currentTarget).val();
         console.log('update ', oldKey, newKey); // TODO: REMOVE ME
         if (oldKey !== newKey) {
-            // may erase other errors but difficult to just remove these
+            // TODO: is it OK to erase other validation messages?
             this.clearValidationErrors();
 
             if (!this.validateKey(oldKey, newKey)) return;
