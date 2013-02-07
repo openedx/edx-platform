@@ -3,6 +3,7 @@ from student.models import User, UserProfile, Registration
 from datetime import datetime
 import uuid
 
+
 class UserProfileFactory(factory.Factory):
     FACTORY_FOR = UserProfile
 
@@ -10,11 +11,13 @@ class UserProfileFactory(factory.Factory):
     name = 'Robot Studio'
     courseware = 'course.xml'
 
+
 class RegistrationFactory(factory.Factory):
     FACTORY_FOR = Registration
 
     user = None
     activation_key = uuid.uuid4().hex
+
 
 class UserFactory(factory.Factory):
     FACTORY_FOR = User

@@ -116,4 +116,3 @@ class Command(BaseCommand):
                     tcuser.save()
                 except TestCenterUser.DoesNotExist:
                     Command.datadog_error(" Failed to find record for client_candidate_id {}".format(client_candidate_id), vcdcfile.name)
-

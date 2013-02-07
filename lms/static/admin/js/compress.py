@@ -6,6 +6,7 @@ import sys
 
 here = os.path.dirname(__file__)
 
+
 def main():
     usage = "usage: %prog [file1..fileN]"
     description = """With no file paths given this script will automatically

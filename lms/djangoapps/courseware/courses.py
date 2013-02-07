@@ -19,13 +19,14 @@ from xmodule.contentstore.content import StaticContent
 from xmodule.modulestore.xml import XMLModuleStore
 from xmodule.modulestore.exceptions import ItemNotFoundError
 from xmodule.x_module import XModule
-from static_replace import replace_urls, try_staticfiles_lookup
+from static_replace import replace_static_urls
 from courseware.access import has_access
 import branding
 from courseware.models import StudentModuleCache
 from xmodule.modulestore.exceptions import ItemNotFoundError
 
 log = logging.getLogger(__name__)
+
 
 def get_request_for_thread():
     """Walk up the stack, return the nearest first argument named "request"."""
@@ -152,7 +153,7 @@ def get_course_about_section(course, section_key):
             request = get_request_for_thread()
 
             loc = course.location._replace(category='about', name=section_key)
-            course_module = get_module(request.user, request, loc, None, course.id, not_found_ok = True, wrap_xmodule_display = False)
+            course_module = get_module(request.user, request, loc, None, course.id, not_found_ok=True, wrap_xmodule_display=False)
 
             html = ''
 
@@ -190,7 +191,7 @@ def get_course_info_section(request, cache, course, section_key):
 
 
     loc = Location(course.location.tag, course.location.org, course.location.course, 'course_info', section_key)
-    course_module = get_module(request.user, request, loc, cache, course.id, wrap_xmodule_display = False)
+    course_module = get_module(request.user, request, loc, cache, course.id, wrap_xmodule_display=False)
     html = ''
 
     if course_module is not None:
@@ -223,8 +224,11 @@ def get_course_syllabus_section(course, section_key):
             dirs = [path("syllabus") / course.url_name, path("syllabus")]
             filepath = find_file(fs, dirs, section_key + ".html")
             with fs.open(filepath) as htmlFile:
-                return replace_urls(htmlFile.read().decode('utf-8'),
-                                    course.metadata['data_dir'], course_namespace=course.location)
+                return replace_static_urls(
+                    htmlFile.read().decode('utf-8'),
+                    course.metadata['data_dir'],
+                    course_namespace=course.location
+                )
         except ResourceNotFoundError:
             log.exception("Missing syllabus section {key} in course {url}".format(
                 key=section_key, url=course.location.url()))
@@ -256,7 +260,7 @@ def get_courses(user, domain=None):
     courses = branding.get_visible_courses(domain)
     courses = [c for c in courses if has_access(user, c, 'see_exists')]
 
-    courses = sorted(courses, key=lambda course:course.number)
+    courses = sorted(courses, key=lambda course: course.number)
 
     return courses
 

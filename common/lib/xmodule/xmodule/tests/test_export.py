@@ -27,6 +27,7 @@ def strip_metadata(descriptor, key):
     for d in descriptor.get_children():
         strip_metadata(d, key)
 
+
 def strip_filenames(descriptor):
     """
     Recursively strips 'filename' from all children's definitions.
@@ -119,12 +120,12 @@ class RoundTripTestCase(unittest.TestCase):
 
     def test_selfassessment_roundtrip(self):
         #Test selfassessment xmodule to see if it exports correctly
-        self.check_export_roundtrip(DATA_DIR,"self_assessment")
+        self.check_export_roundtrip(DATA_DIR, "self_assessment")
 
     def test_graphicslidertool_roundtrip(self):
         #Test graphicslidertool xmodule to see if it exports correctly
-        self.check_export_roundtrip(DATA_DIR,"graphic_slider_tool")
+        self.check_export_roundtrip(DATA_DIR, "graphic_slider_tool")
 
     def test_exam_registration_roundtrip(self):
         # Test exam_registration xmodule to see if it exports correctly
-        self.check_export_roundtrip(DATA_DIR,"test_exam_registration")
+        self.check_export_roundtrip(DATA_DIR, "test_exam_registration")

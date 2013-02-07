@@ -65,6 +65,11 @@ div.info-wrapper {
             list-style-type: disc;
           }
 
+          > ol {
+            list-style: decimal outside none;
+            padding: 0 0 0 1em; 
+          }
+
           li {
             margin-bottom: lh(.5);
           }

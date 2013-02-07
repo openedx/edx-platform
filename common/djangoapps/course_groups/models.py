@@ -5,6 +5,7 @@ from django.db import models
 
 log = logging.getLogger(__name__)
 
+
 class CourseUserGroup(models.Model):
     """
     This model represents groups of users in a course.  Groups may have different types,
@@ -30,5 +31,3 @@ class CourseUserGroup(models.Model):
     COHORT = 'cohort'
     GROUP_TYPE_CHOICES = ((COHORT, 'Cohort'),)
     group_type = models.CharField(max_length=20, choices=GROUP_TYPE_CHOICES)
-
-

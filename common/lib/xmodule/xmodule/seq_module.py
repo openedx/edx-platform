@@ -88,8 +88,8 @@ class SequenceModule(XModule):
                 'type': child.get_icon_class(),
                 'id': child.id,
             }
-            if childinfo['title']=='':
-                childinfo['title'] = child.metadata.get('display_name','')
+            if childinfo['title'] == '':
+                childinfo['title'] = child.metadata.get('display_name', '')
             contents.append(childinfo)
 
         params = {'items': contents,
@@ -116,7 +116,7 @@ class SequenceDescriptor(MakoModuleDescriptor, XmlDescriptor):
     mako_template = 'widgets/sequence-edit.html'
     module_class = SequenceModule
 
-    stores_state = True # For remembering where in the sequence the student is
+    stores_state = True   # For remembering where in the sequence the student is
 
     js = {'coffee': [resource_string(__name__, 'js/src/sequence/edit.coffee')]}
     js_module_name = "SequenceDescriptor"
@@ -140,4 +140,3 @@ class SequenceDescriptor(MakoModuleDescriptor, XmlDescriptor):
             xml_object.append(
                 etree.fromstring(child.export_to_xml(resource_fs)))
         return xml_object
-

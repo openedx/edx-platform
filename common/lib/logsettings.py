@@ -5,6 +5,7 @@ from logging.handlers import SysLogHandler
 
 LOG_LEVELS = ['DEBUG', 'INFO', 'WARNING', 'ERROR', 'CRITICAL']
 
+
 def get_logger_config(log_dir,
                       logging_env="no_env",
                       tracking_filename="tracking.log",
@@ -13,7 +14,8 @@ def get_logger_config(log_dir,
                       syslog_addr=None,
                       debug=False,
                       local_loglevel='INFO',
-                      console_loglevel=None):
+                      console_loglevel=None,
+                      service_variant=None):
 
     """
 
@@ -38,14 +40,21 @@ def get_logger_config(log_dir,
     if console_loglevel is None or console_loglevel not in LOG_LEVELS:
         console_loglevel = 'DEBUG' if debug else 'INFO'
 
+    if service_variant is None:
+        # default to a blank string so that if SERVICE_VARIANT is not
+        # set we will not log to a sub directory
+        service_variant = ''
+
     hostname = platform.node().split(".")[0]
-    syslog_format = ("[%(name)s][env:{logging_env}] %(levelname)s "
+    syslog_format = ("[service_variant={service_variant}]"
+                     "[%(name)s][env:{logging_env}] %(levelname)s "
                      "[{hostname}  %(process)d] [%(filename)s:%(lineno)d] "
-                     "- %(message)s").format(
-                        logging_env=logging_env, hostname=hostname)
+                     "- %(message)s").format(service_variant=service_variant,
+                                             logging_env=logging_env,
+                                             hostname=hostname)
 
     handlers = ['console', 'local'] if debug else ['console',
-                                'syslogger-remote', 'local']
+                                                   'syslogger-remote', 'local']
 
     logger_config = {
         'version': 1,
@@ -78,27 +87,12 @@ def get_logger_config(log_dir,
             }
         },
         'loggers': {
-            'django': {
-                'handlers': handlers,
-                'propagate': True,
-                'level': 'INFO'
-            },
             'tracking': {
                 'handlers': ['tracking'],
                 'level': 'DEBUG',
                 'propagate': False,
             },
             '': {
-                'handlers': handlers,
-                'level': 'DEBUG',
-                'propagate': False
-            },
-            'mitx': {
-                'handlers': handlers,
-                'level': 'DEBUG',
-                'propagate': False
-            },
-            'keyedcache': {
                 'handlers': handlers,
                 'level': 'DEBUG',
                 'propagate': False
@@ -128,6 +122,9 @@ def get_logger_config(log_dir,
             },
         })
     else:
+        # for production environments we will only
+        # log INFO and up
+        logger_config['loggers']['']['level'] = 'INFO'
         logger_config['handlers'].update({
             'local': {
                 'level': local_loglevel,

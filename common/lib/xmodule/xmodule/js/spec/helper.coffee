@@ -64,7 +64,6 @@ jasmine.stubVideoPlayer = (context, enableParts, createPlayer=true) ->
   if createPlayer
     return new VideoPlayer(video: context.video)
 
-spyOn(window, 'onunload')
 
 # Stub jQuery.cookie
 $.cookie = jasmine.createSpy('jQuery.cookie').andReturn '1.0'
