@@ -204,6 +204,13 @@ nav .nav-item {
   .nav-account-username {
     width: 100%;
 
+    .icon-user {
+      display: inline-block;
+      vertical-align: middle;
+      margin-right: 3px;
+      @include font-size(12);
+    }
+
     .account-username {
       display: inline-block;
       width: 80%;
