@@ -306,6 +306,7 @@ class OpenEndedModule(openendedchild.OpenEndedChild):
                       'grammar': 1,
                       # needs to be after all the other feedback
                       'markup_text': 3}
+        do_not_render = ['topicality', 'prompt-overlap']
 
         default_priority = 2
 
@@ -359,6 +360,10 @@ class OpenEndedModule(openendedchild.OpenEndedChild):
         if response_items['success']:
             if len(feedback) == 0:
                 return format_feedback('errors', 'No feedback available')
+
+            for tag in do_not_render:
+                if tag in feedback:
+                    feedback.pop(tag)
 
             feedback_lst = sorted(feedback.items(), key=get_priority)
             feedback_list_part1 = u"\n".join(format_feedback(k, v) for k, v in feedback_lst)

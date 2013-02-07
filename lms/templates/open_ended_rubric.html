@@ -1,11 +1,11 @@
 <form class="rubric-template" id="inputtype_${id}" xmlns="http://www.w3.org/1999/html">
-    <h3>Rubric</h3>
     % if view_only and has_score:
-    <p>This is the rubric that was used to grade your submission. The highlighted selection matches how the grader feels you performed in each category.</p>
+        <p></p>
     % elif view_only:
-    <p>Use the below rubric to rate this submission.</p>
+        <p>Use the below rubric to rate this submission.</p>
     % else:
-    <p>Select the criteria you feel best represents this submission in each category.</p>
+        <h3>Rubric</h3>
+        <p>Select the criteria you feel best represents this submission in each category.</p>
     % endif
     <div class="rubric">
         % for i in range(len(categories)):
@@ -14,23 +14,25 @@
             <ul class="rubric-list">
                 % for j in range(len(category['options'])):
                 <% option = category['options'][j] %>
-                %if option['selected']:
-                <li class="selected-grade">
+                    %if option['selected']:
+                        <li class="selected-grade">
                     %else:
-                <li>
+                        <li>
                     % endif
                     % if view_only:
-                    ## if this is the selected rubric block, show it highlighted
-                    <div class="rubric-label">
-                        ${option['points']} points : ${option['text']}
-                    </div>
+                        % if option['selected']:
+                            ## if this is the selected rubric block, show it highlighted
+                            <div class="rubric-label">
+                                ${option['points']} points : ${option['text']}
+                            </div>
+                        % endif
                     % else:
-                    <label class="rubric-label" for="score-${i}-${j}">
-                        <input type="radio" class="score-selection" name="score-selection-${i}" id="score-${i}-${j}" value="${option['points']}"/>
-                        <span class="wrappable"> ${option['points']} points : ${option['text']}</span>
-                    </label>
+                        <label class="rubric-label" for="score-${i}-${j}">
+                            <input type="radio" class="score-selection" name="score-selection-${i}" id="score-${i}-${j}" value="${option['points']}"/>
+                            <span class="wrappable"> ${option['points']} points : ${option['text']}</span>
+                        </label>
                     % endif
-                </li>
+                    </li>
                 % endfor
             </ul>
         % endfor
