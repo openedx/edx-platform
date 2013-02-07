@@ -183,6 +183,7 @@ class @StaffGrading
 
     @question_header = $('.question-header')
     @question_header.click @collapse_question
+    @collapse_question()
     
     # model state
     @state = state_no_data
@@ -292,7 +293,6 @@ class @StaffGrading
     @min_for_ml = response.min_for_ml
     @num_pending = response.num_pending
     @state = state_grading
-    @collapse_question
     if not @max_score?
       @error("No max score specified for submission.")
 

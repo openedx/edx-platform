@@ -204,6 +204,7 @@ class @PeerGradingProblem
     @calibration_feedback_button = $('.calibration-feedback-button')
     @interstitial_page_button = $('.interstitial-page-button')
     @flag_student_checkbox = $('.flag-checkbox')
+    @collapse_question()
 
     Collapsible.setCollapsibles(@content_panel)
 
@@ -270,7 +271,6 @@ class @PeerGradingProblem
        if response.calibrated and (@calibration == null or @calibration == false)
          @calibration = false
          @fetch_submission_essay()
-         @collapse_question()
       # If we were calibrating before and no longer need to,
       # show the interstitial page
        else if response.calibrated and @calibration == true
