@@ -157,7 +157,7 @@ class CombinedOpenEndedRubric(object):
         return {'description': description, 'options': options, 'score' : score}
 
     def render_combined_rubric(self,rubric_xml,scores,score_types,feedback_types):
-        score_tuples = CombinedOpenEndedRubric.reformat_scores_for_rendering(scores,score_types,feedback_types)
+        success, score_tuples = CombinedOpenEndedRubric.reformat_scores_for_rendering(scores,score_types,feedback_types)
         rubric_categories = self.extract_categories(rubric_xml)
         max_scores = map((lambda cat: cat['options'][-1]['points']), rubric_categories)
         max_score = max(max_scores)

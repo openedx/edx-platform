@@ -528,7 +528,7 @@ class CombinedOpenEndedV1Module():
         grader_types = [rd['grader_types'] for rd in all_responses]
         feedback_items = [rd['feedback_items'] for rd in all_responses]
 
-        rubric_html = self.rubric_renderer.render_combined_rubric(self.static_data['rubric'], rubric_scores,
+        rubric_html = self.rubric_renderer.render_combined_rubric(stringify_children(self.static_data['rubric']), rubric_scores,
             grader_types, feedback_items)
 
         context = {'results': rubric_html, 'task_number': task_number + 1, 'task_name' : response_dict['human_task']}
