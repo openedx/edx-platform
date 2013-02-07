@@ -47,10 +47,11 @@ section.combined-open-ended-status {
 
     .statusitem {
       color: #2C2C2C;
-      font-size: 1em;
+      background-color : #d4d4d4;
+      font-size: .9em;
       padding: 0px;
-      display: block;
-      width: 70%;
+      display: inline;
+      width: 20%;
       .show-results {
           margin-top: .3em;
           text-align:right;
@@ -61,7 +62,7 @@ section.combined-open-ended-status {
    }
 
    .statusitem-current {
-     background-color: #d4d4d4;
+     background-color: #B2B2B2;
      color: #222;
   }
 
