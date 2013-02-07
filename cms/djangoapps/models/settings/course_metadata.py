@@ -32,7 +32,9 @@ class CourseMetadata(object):
     @classmethod
     def update_from_json(cls, course_location, jsondict):
         """
-        Decode the json into CourseMetadata and save any changed attrs to the db
+        Decode the json into CourseMetadata and save any changed attrs to the db.
+        
+        Ensures none of the fields are in the blacklist.
         """
         descriptor = get_modulestore(course_location).get_item(course_location)
         
