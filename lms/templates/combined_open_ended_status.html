@@ -9,9 +9,6 @@
         %endif
 
             ${status['human_task']} (${status['human_state']}) ${status['score']} / ${status['max_score']}
-            %if status['type']=="openended" and status['state'] in ['done', 'post_assessment']:
-               <a href="#results" class="show-results-button"> Show results</a>
-            %endif
         </div>
     %endfor
 </section>

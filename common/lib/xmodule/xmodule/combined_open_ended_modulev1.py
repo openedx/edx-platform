@@ -513,7 +513,7 @@ class CombinedOpenEndedV1Module():
             pass
         return return_html
 
-    def get_results(self, get):
+    def get_rubric(self, get):
         """
         Gets the results of a given grader via ajax.
         Input: AJAX get dictionary
@@ -531,11 +531,12 @@ class CombinedOpenEndedV1Module():
         rubric_html = self.rubric_renderer.render_combined_rubric(stringify_children(self.static_data['rubric']), rubric_scores,
             grader_types, feedback_items)
 
+        response_dict = all_responses[-1]
         context = {'results': rubric_html, 'task_number': task_number + 1, 'task_name' : response_dict['human_task']}
         html = self.system.render_template('combined_open_ended_results.html', context)
         return {'html': html, 'success': True}
 
-    def get_results_old(self, get):
+    def get_results(self, get):
         """
         Gets the results of a given grader via ajax.
         Input: AJAX get dictionary
