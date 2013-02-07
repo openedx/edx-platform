@@ -237,10 +237,14 @@ class SelfAssessmentModule(openendedchild.OpenEndedChild):
         try:
             score = int(get['assessment'])
             score_list = get.getlist('score_list[]')
+            for i in xrange(0,len(score_list)):
+                score_list[i] = int(score_list[i])
         except ValueError:
             return {'success': False, 'error': "Non-integer score value, or no score list"}
 
+        #Record score as assessment and rubric scores as post assessment
         self.record_latest_score(score)
+        self.record_latest_post_assessment(json.dumps(score_list))
 
         d = {'success': True, }
 
