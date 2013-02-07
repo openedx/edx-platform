@@ -463,7 +463,8 @@ class PeerGradingModule(XModule):
 
 
         # grab all peer grading module descriptors for this course
-        peer_grading_modules = modulestore().get_items(['i4x', self.location.org, self.location.course, 'peergrading', None], self.system.course_id)
+        peer_grading_modules = modulestore().get_items(
+                ['i4x', self.location.org, self.location.course, 'peergrading', None], self.system.course_id)
 
         # construct a dictionary for fast lookups
         module_dict = {}
@@ -473,6 +474,9 @@ class PeerGradingModule(XModule):
                 module_dict[linked_location] = module
 
         def _find_corresponding_module_for_location(location):
+            '''
+            find the peer grading module that links to the given location
+            '''
             if location in module_dict:
                 return module_dict[location]
             else:

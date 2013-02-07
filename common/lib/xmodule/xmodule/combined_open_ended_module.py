@@ -10,7 +10,6 @@ import os
 import sys
 
 from pkg_resources import resource_string
-from timeinfo import TimeInfo
 
 from .capa_module import only_one, ComplexEncoder
 from .editing_module import EditingDescriptor
