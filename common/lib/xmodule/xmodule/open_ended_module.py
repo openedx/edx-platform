@@ -484,11 +484,19 @@ class OpenEndedModule(openendedchild.OpenEndedChild):
             score = score_result['score']
             rubric_scores = [rubric_score]
             grader_types = [score_result['grader_type']]
+            feedback_items = [feedback]
 
         self.submission_id = score_result['submission_id']
         self.grader_id = score_result['grader_id']
 
-        return {'valid': True, 'score': score, 'feedback': feedback, 'rubric_scores' : rubric_scores, 'grader_types' : grader_types}
+        return {
+            'valid': True,
+            'score': score,
+            'feedback': feedback,
+            'rubric_scores' : rubric_scores,
+            'grader_types' : grader_types,
+            'feedback_items' : feedback_items
+        }
 
     def latest_post_assessment(self, system, short_feedback=False, join_feedback=True):
         """
