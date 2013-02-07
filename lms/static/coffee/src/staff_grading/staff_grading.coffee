@@ -328,6 +328,7 @@ class @StaffGrading
     @error_container.html(@error_msg)
     @message_container.toggle(@message != "")
     @error_container.toggle(@error_msg != "")
+    @flag_submission_checkbox.prop('checked', false)
 
 
     # only show the grading elements when we are not in list view or the state
