@@ -16,10 +16,7 @@ if Backbone?
       @$delegateElement = @$local
 
     render: ->
-      if @model.has('group_id')
-        @template = DiscussionUtil.getTemplate("_inline_thread_cohorted")
-      else
-        @template = DiscussionUtil.getTemplate("_inline_thread")
+      @template = DiscussionUtil.getTemplate("_inline_thread")
 
       if not @model.has('abbreviatedBody')
         @abbreviateBody()

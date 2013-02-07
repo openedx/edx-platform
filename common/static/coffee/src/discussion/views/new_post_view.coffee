@@ -14,9 +14,8 @@ if Backbone?
           @setSelectedTopic()
 
           DiscussionUtil.makeWmdEditor @$el, $.proxy(@$, @), "new-post-body"
-          
           @$(".new-post-tags").tagsInput DiscussionUtil.tagsInputOptions()
-          
+
       events:
           "submit .new-post-form":            "createPost"
           "click  .topic_dropdown_button":    "toggleTopicDropdown"
@@ -66,11 +65,6 @@ if Backbone?
               @topicText  = @getFullTopicName($target)
               @topicId   = $target.data('discussion_id')
               @setSelectedTopic()
-              if $target.attr('cohorted') == "True"
-                $('.choose-cohort').show();
-              else
-                $('.choose-cohort').hide();
-              
 
       setSelectedTopic: ->
           @dropdownButton.html(@fitName(@topicText) + ' <span class="drop-arrow">▾</span>')
@@ -122,7 +116,6 @@ if Backbone?
           title   = @$(".new-post-title").val()
           body    = @$(".new-post-body").find(".wmd-input").val()
           tags    = @$(".new-post-tags").val()
-          group = @$(".new-post-group option:selected").attr("value")
 
           anonymous          = false || @$("input.discussion-anonymous").is(":checked")
           anonymous_to_peers = false || @$("input.discussion-anonymous-to-peers").is(":checked")
@@ -144,7 +137,6 @@ if Backbone?
                   anonymous: anonymous
                   anonymous_to_peers: anonymous_to_peers
                   auto_subscribe: follow
-                  group_id: group
               error: DiscussionUtil.formErrorHandler(@$(".new-post-form-errors"))
               success: (response, textStatus) =>
                   # TODO: Move this out of the callback, this makes it feel sluggish
