@@ -7,15 +7,39 @@
         if (typeof(protex) !== "undefined" && protex) {
             protex.onInjectionDone("protex");
         }
-        if (typeof(protex) !== "undefined") {
-            initializeProtex();    
-        }
+        /*if (typeof(protex) !== "undefined") {
+            //initializeProtex();    
+        }*/
         else {
             setTimeout(function() { waitForProtex(); }, timeout);
         }
     }
     
-    function initializeProtex() {
+    //NOTE:
+    // Protex uses three global functions:
+    // protexSetTargetShape (exported from GWT)
+    // exported protexCheckAnswer (exported from GWT)
+    // It calls protexIsReady with a deferred command when it has finished 
+    // initialization and has drawn itself
+    
+    protexIsReady = function() {
+        //Load target shape
+        var target_shape = $('#target_shape').val();
+        protexSetTargetShape(target_shape);
+            
+        //Get answer from protex and store it into the hidden input field
+        //when Check button is clicked
+        var problem = $('#protex_container').parents('.problem');
+        var check_button = problem.find('input.check');
+        var input_field = problem.find('input[type=hidden]');
+        check_button.on('click', function() {
+            var protex_answer = protexCheckAnswer();
+            var value = {protex_answer: protex_answer};
+            input_field.val(JSON.stringify(value));
+        });              
+    };
+    
+    /*function initializeProtex() {
         //Check to see if the two exported GWT functions protexSetTargetShape 
         // and protexCheckAnswer have been appended to global scope -- this 
         //happens at the end of onModuleLoad() in GWT
@@ -45,5 +69,5 @@
         else {
             setTimeout(function() {initializeProtex(); }, timeout);
         }
-    }
+    }*/
 }).call(this);
