@@ -511,7 +511,7 @@ class CombinedOpenEndedV1Module():
         task_number = int(get['task_number'])
         self.update_task_states()
         response_dict = self.get_last_response(task_number)
-        context = {'results': response_dict['post_assessment'], 'task_number': task_number + 1}
+        context = {'results': response_dict['post_assessment'], 'task_number': task_number + 1, 'task_name' : response_dict['human_task']}
         html = self.system.render_template('combined_open_ended_results.html', context)
         return {'html': html, 'success': True}
 
