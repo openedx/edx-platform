@@ -2,7 +2,6 @@
 
 # Instructions:
 #   - AppArmor.md from xserver
-#   XXX- apt-get install timelimit
 
 import os, os.path
 import resource
@@ -26,8 +25,7 @@ if os.path.exists(SANDBOX_PYTHON):
     # Python -S inhibits loading site.py, which prevent Ubuntu from adding
     # specialized traceback handlers that fail in the sandbox.
     PYTHON_CMD = [
-        #'timelimit', '-t', '1', '-s', '9',
-        'sudo', '-u', 'sandbox', 
+        'sudo', '-u', 'sandbox',
         SANDBOX_PYTHON, '-S'
     ]
 elif STRICT:
@@ -46,9 +44,9 @@ def jailpy(code, files=None, argv=None, stdin=None):
 
     `code` is a string containing the Python code to run.
 
-    `files` is a list of file paths. 
+    `files` is a list of file paths.
 
-    Return an object with: 
+    Return an object with:
 
         .stdout: stdout of the program, a string
         .stderr: stderr of the program, a string
@@ -80,7 +78,6 @@ def jailpy(code, files=None, argv=None, stdin=None):
         result = JailResult()
         result.stdout, result.stderr = subproc.communicate(stdin)
         result.status = subproc.returncode
-        killer.join()
 
     return result
 
@@ -106,17 +103,16 @@ class ProcessKillerThread(threading.Thread):
         self.limit = limit
 
     def run(self):
-        time.sleep(self.limit)
+        start = time.time()
+        while (time.time() - start) < self.limit:
+            time.sleep(.1)
+            if self.subproc.poll() is not None:
+                # Process ended, no need for us any more.
+                return
+
         if self.subproc.poll() is None:
             # Can't use subproc.kill because we launched the subproc with sudo.
-            #killargs = ["sudo", "-u", "sandbox", "kill", "-9", str(self.subproc.pid)]
-            killargs = ["sudo", "-u", "sandbox", "ps", str(self.subproc.pid)]
-            print killargs
+            killargs = ["sudo", "kill", "-9", str(self.subproc.pid)]
             kill = subprocess.Popen(killargs, stdout=subprocess.PIPE, stderr=subprocess.PIPE)
             out, err = kill.communicate()
-            print out
-            print err
-            print "Return status: %r" % kill.returncode
-            #if ret:
-            #print "Couldn't kill: %r" % ret
-            #os.system("sudo -u sandbox kill -9 %s" % self.subproc.pid)
+            # TODO: This doesn't actually kill the process.... :(
