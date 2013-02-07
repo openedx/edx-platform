@@ -169,12 +169,6 @@ body.discussion {
         }
       }
 
-      .form-group-label {
-        display: block;
-        padding-top: 5px;
-        color:#fff;
-      }
-
       .topic_dropdown_button {
         position: relative;
         z-index: 1000;
@@ -187,7 +181,7 @@ body.discussion {
         .drop-arrow {
           float: right;
           color: #999;
-          line-height: 37px;
+          line-height: 36px;
         }
       }
 
@@ -1026,18 +1020,6 @@ body.discussion {
       }
 
     }
-    .group-filter-label {
-      width: 40px;
-      margin-left:10px;
-    }
-
-    .group-filter-select {
-      margin: 5px 0px 5px 5px;
-      width: 80px;
-      font-size:10px;
-      background: transparent;
-      border-color: #ccc;
-    }
   }
 
   .post-list-wrapper {
@@ -1345,8 +1327,6 @@ body.discussion {
       margin-left: 40px;
     }
 
-
-
     .post-tools {
       @include clearfix;
       margin-top: 15px;
@@ -1376,8 +1356,6 @@ body.discussion {
   .responses li header {
     margin-bottom: 20px;
   }
-
-  
 
   .responses {
     list-style: none;
@@ -2434,11 +2412,3 @@ body.discussion {
 .discussion-user-threads {
   @extend .discussion-module
 }
-
-
-.group-visibility-label {
-    font-size: 12px;
-    color:#000;
-    font-style: italic;
-    background-color:#fff;
-  }
