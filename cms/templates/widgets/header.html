@@ -84,9 +84,9 @@
             <div class="wrapper wrapper-nav-sub">
               <div class="nav-sub">
                 <ul>
-                  <li class="nav-item"><a href="${reverse('course_index', kwargs=dict(org=ctx_loc.org, course=ctx_loc.course, name=ctx_loc.name))}">My Courses</a></li>
-                  <li class="nav-item"><a href="http://help.edge.edx.org/" rel="external">Help</a></li>
-                  <li class="nav-item"><a class="action action-logout" href="${reverse('logout')}">Logout</a></li>
+                  <li class="nav-item nav-account-dashboard"><a href="#">My Courses</a></li>
+                  <li class="nav-item nav-account-help"><a href="http://help.edge.edx.org/" rel="external">Studio Help</a></li>
+                  <li class="nav-item nav-account-signout"><a class="action action-signout" href="${reverse('logout')}">Sign Out</a></li>
                 </ul>
               </div>
             </div>

@@ -63,12 +63,9 @@ nav .nav-item {
   vertical-align: top;
 }
 
-.branding, .info-course {
-  margin: 0 ($baseline*0.75) 0 0;
-}
-
 .branding {
   position: relative;
+  margin: 0 ($baseline*0.75) 0 0;
   padding-right: ($baseline*0.75);
 
   a {
@@ -85,7 +82,7 @@ nav .nav-item {
 // specific elements - course name/info
 .info-course {
   position: relative;
-  margin-top: -3px;
+  margin: -3px ($baseline/2) 0 0;
   padding-right: ($baseline*0.75);
   @include font-size(14);
 
@@ -475,8 +472,9 @@ nav .nav-item {
 
 .nav-item.is-current,
 body.howitworks .nav-not-signedin-hiw,
-body.signin .nav-not-signedin-signin,
-body.signup .nav-not-signedin-signup,
+
+// dashboard
+body.dashboard .nav-account-dashboard,
 
 // course content
 body.course.outline .nav-course-courseware .title,
@@ -509,10 +507,26 @@ body.course.export .nav-course-tools-export,
 
 {
 
-  color: $blue !important;
+  color: $blue;
 
   a {
-    color: $blue !important;
+    color: $blue;
+  }
+}
+
+body.signup .nav-not-signedin-signin {
+
+  a {
+    background-color: #d9e3ee;
+    color: #6d788b;    
+  }
+}
+
+body.signin .nav-not-signedin-signup {
+  
+  a {
+    background-color: #62aaf5;
+    color: #fff;    
   }
 }
 

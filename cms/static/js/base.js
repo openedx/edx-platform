@@ -63,7 +63,7 @@ $(document).ready(function() {
   });
 
   // general link management - new window/tab
-  $('a[rel="external"]').attr('title','This link will open in a new browser/window tab').click(function(e) {
+  $('a[rel="external"]').attr('title','This link will open in a new browser window/tab').click(function(e) {
     window.open($(this).attr('href'));
     e.preventDefault();
   });
