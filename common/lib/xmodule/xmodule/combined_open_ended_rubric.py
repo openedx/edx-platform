@@ -163,13 +163,14 @@ class CombinedOpenEndedRubric(object):
         max_score = max(max_scores)
         for i in xrange(0,len(rubric_categories)):
             category = rubric_categories[i]
-            rubric_categories[i]['grader_types'] = []
             for j in xrange(0,len(category['options'])):
+                rubric_categories[i]['options'][j]['grader_types'] = []
                 for tuple in score_tuples:
                     if tuple[1] == i and tuple[2] ==j:
                         for grader_type in tuple[3]:
-                            rubric_categories[i]['grader_types'].append(grader_type)
+                            rubric_categories[i]['options'][j]['grader_types'].append(grader_type)
 
+        log.debug(rubric_categories)
         html = self.system.render_template('open_ended_rubric.html',
             {'categories': rubric_categories,
              'has_score': True,
@@ -200,9 +201,11 @@ class CombinedOpenEndedRubric(object):
     def reformat_scores_for_rendering(scores, score_types, feedback_types):
         success = False
         if len(scores)==0:
+            log.error("Score length is 0.")
             return success, ""
 
         if len(scores) != len(score_types) or len(feedback_types) != len(scores):
+            log.error("Length mismatches.")
             return success, ""
 
         score_lists = []
@@ -219,9 +222,7 @@ class CombinedOpenEndedRubric(object):
         score_list_len = len(score_lists[0])
         for i in xrange(0,len(score_lists)):
             score_list = score_lists[i]
-            score_type = score_type_list[i]
-            feedback_type = feedback_type_list[i]
-            if len(score_list)!=score_list_len or len(score_type)!=score_list_len or len(feedback_type)!=score_list_len:
+            if len(score_list)!=score_list_len:
                 return success, ""
 
         score_tuples = []
@@ -230,8 +231,8 @@ class CombinedOpenEndedRubric(object):
                 tuple = [1,j,score_lists[i][j],[],[]]
                 score_tuples, tup_ind = CombinedOpenEndedRubric.check_for_tuple_matches(score_tuples,tuple)
                 score_tuples[tup_ind][0] += 1
-                score_tuples[tup_ind][3].append(score_type_list[i][j])
-                score_tuples[tup_ind][4].append(feedback_type_list[i][j])
+                score_tuples[tup_ind][3].append(score_type_list[i])
+                score_tuples[tup_ind][4].append(feedback_type_list[i])
 
         success = True
         return success, score_tuples
