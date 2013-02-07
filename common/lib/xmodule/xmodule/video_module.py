@@ -128,6 +128,17 @@ class VideoModule(XModule):
         else:
             caption_asset_path = StaticContent.get_base_url_path_for_course_assets(self.location) + '/subs_'
 
+        # We normally let JS parse this, but in the case that we need a hacked
+        # out <object> player because YouTube has broken their <iframe> API for
+        # the third time in a year, we need to extract it server side.
+        normal_speed_video_id = None # The 1.0 speed video
+
+        # video_list() example:
+        #   "0.75:nugHYNiD3fI,1.0:7m8pab1MfYY,1.25:3CxdPGXShq8,1.50:F-D7bOFCnXA"
+        for video_id_str in self.video_list().split(","):
+            if video_id_str.startswith("1.0:"):
+                normal_speed_video_id = video_id_str.split(":")[1]
+
         return self.system.render_template('video.html', {
             'streams': self.video_list(),
             'id': self.location.html_id(),
@@ -140,7 +151,8 @@ class VideoModule(XModule):
             'caption_asset_path': caption_asset_path,
             'show_captions': self.show_captions,
             'start': self.start_time,
-            'end': self.end_time
+            'end': self.end_time,
+            'normal_speed_video_id': normal_speed_video_id
         })
 
 
