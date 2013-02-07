@@ -11,7 +11,7 @@ from django.contrib.auth.models import User
 
 from mitxmako.shortcuts import render_to_response, render_to_string
 from courseware.courses import get_course_with_access
-from course_groups.cohorts import is_course_cohorted, get_cohort_id, is_commentable_cohorted, get_cohorted_commentables, get_cohort, get_course_cohorts, get_cohort_by_id 
+from course_groups.cohorts import *
 from courseware.access import has_access
 
 from urllib import urlencode
@@ -50,22 +50,21 @@ def get_threads(request, course_id, discussion_id=None, per_page=THREADS_PER_PAG
 
     if not request.GET.get('sort_key'):
         # If the user did not select a sort key, use their last used sort key
-        cc_user = cc.User.from_django_user(request.user)
-        cc_user.retrieve()
+        user = cc.User.from_django_user(request.user)
+        user.retrieve()
         # TODO: After the comment service is updated this can just be user.default_sort_key because the service returns the default value
-        default_query_params['sort_key'] = cc_user.get('default_sort_key') or default_query_params['sort_key']
+        default_query_params['sort_key'] = user.get('default_sort_key') or default_query_params['sort_key']
     else:
         # If the user clicked a sort key, update their default sort key
-        cc_user = cc.User.from_django_user(request.user)
-        cc_user.default_sort_key = request.GET.get('sort_key')
-        cc_user.save()
+        user = cc.User.from_django_user(request.user)
+        user.default_sort_key = request.GET.get('sort_key')
+        user.save()
 
 
     #if the course-user is cohorted, then add the group id
     group_id = get_cohort_id(request.user, course_id)
     
-    #if you're an instructor, show everything
-    if group_id and not cached_has_permission(request.user, "see_all_cohorts", course_id):
+    if group_id:
         default_query_params["group_id"] = group_id
 
     query_params = merge_dict(default_query_params,
@@ -102,8 +101,8 @@ def inline_discussion(request, course_id, discussion_id):
 
     try:
         threads, query_params = get_threads(request, course_id, discussion_id, per_page=INLINE_THREADS_PER_PAGE)
-        cc_user = cc.User.from_django_user(request.user)
-        user_info = cc_user.to_dict()
+        user = cc.User.from_django_user(request.user)
+        user_info = user.to_dict()
     except (cc.utils.CommentClientError, cc.utils.CommentClientUnknownError) as err:
         # TODO (vshnayder): since none of this code seems to be aware of the fact that
         # sometimes things go wrong, I suspect that the js client is also not
@@ -133,7 +132,7 @@ def inline_discussion(request, course_id, discussion_id):
               
       else:
       #otherwise, just make a dictionary of two 
-          user_cohort = get_cohort(cc_user, course_id)
+          user_cohort = get_cohort(user, course_id)
           if user_cohort:
               user_cohort_name = user_cohort.name
               user_cohort_id = user_cohort.id
