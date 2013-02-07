@@ -55,7 +55,7 @@ TRUE_DICT = ["True", True, "TRUE", "true"]
 
 HUMAN_TASK_TYPE = {
     'selfassessment' : "Self Assessment",
-    'openended' : "External Grader",
+    'openended' : "edX Assessment",
     }
 
 class CombinedOpenEndedV1Module():
