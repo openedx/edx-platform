@@ -61,13 +61,27 @@ def get_threads(request, course_id, discussion_id=None, per_page=THREADS_PER_PAG
         cc_user.save()
 
 
-    #if the course-user is cohorted, then add the group id
-    group_id = get_cohort_id(request.user, course_id)
+    #there are 2 dimensions to consider when executing a search with respect to group id
+    #is user a moderator
+    #did the user request a group
     
-    #if you're an instructor, show everything
-    if group_id and not cached_has_permission(request.user, "see_all_cohorts", course_id):
+    #if the user requested a group explicitly, give them that group, othewrise, if mod, show all, else if student, use cohort
+    
+    group_id = request.GET.get('group_id')
+    
+    if group_id == "all":
+        group_id = None
+    
+    if not group_id:
+        if not cached_has_permission(request.user, "see_all_cohorts", course_id):
+            group_id = get_cohort_id(request.user, course_id)
+        
+    if group_id:
         default_query_params["group_id"] = group_id
 
+        
+    #so by default, a moderator sees all items, and a student sees his cohort
+        
     query_params = merge_dict(default_query_params,
                               strip_none(extract(request.GET,
                                                  ['page', 'sort_key',
@@ -75,7 +89,6 @@ def get_threads(request, course_id, discussion_id=None, per_page=THREADS_PER_PAG
                                                   'tags', 'commentable_ids'])))
 
     threads, page, num_pages = cc.Thread.search(query_params)
-    
     
     #now add the group name if the thread has a group id
     for thread in threads:
@@ -229,6 +242,11 @@ def forum_form_discussion(request, course_id):
             'is_course_cohorted': is_course_cohorted(course_id)
         }
         # print "start rendering.."
+        print "\n\n\n\n\n\n*************************"
+        print is_course_cohorted(course_id)
+        print cached_has_permission(request.user, "see_all_cohorts", course_id)
+        print cohorts
+        
         
         return render_to_response('discussion/index.html', context)
 
