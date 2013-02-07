@@ -332,7 +332,7 @@ class ImportTestCase(unittest.TestCase):
         location = Location(location.tag, location.org, location.course,
             'sequential', 'Problem_Demos')
         module = modulestore.get_instance(course.id, location)
-        self.assertEqual(len(module.children), 3)
+        self.assertEqual(len(module.children), 1)
 
     def test_error_on_import(self):
         '''Check that when load_error_module is false, an exception is raised, rather than returning an ErrorModule'''
