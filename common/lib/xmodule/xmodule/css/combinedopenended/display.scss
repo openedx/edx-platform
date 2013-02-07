@@ -480,6 +480,8 @@ section.open-ended-child {
     list-style-type: none;
     padding:0;
     margin:0;
+    float:left;
+    display: block;
   }
 
   ol {
@@ -507,9 +509,8 @@ section.open-ended-child {
   }
 
   li {
-    line-height: 1.4em;
-    margin-bottom: lh(.5);
-
+    margin-bottom: 0px;
+    padding: 0px;
     &:last-child {
       margin-bottom: 0;
     }
