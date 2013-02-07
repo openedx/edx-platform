@@ -441,9 +441,12 @@ class CombinedOpenEndedV1Module():
             else:
                 last_post_evaluation = task.format_feedback_with_evaluation(self.system, last_post_assessment)
             last_post_assessment = last_post_evaluation
-            rubric_scores = task._parse_score_msg(task.history[-1].get('post_assessment', ""), self.system)['rubric_scores']
+            rubric_data = task._parse_score_msg(task.history[-1].get('post_assessment', ""), self.system)
+            rubric_scores = rubric_data['rubric_scores']
+            grader_types = rubric_data['grader_types']
         elif task_type== "selfassessment":
             rubric_scores = last_post_assessment
+            grader_types = ['SA']
             last_post_assessment = ""
         last_correctness = task.is_last_response_correct()
         max_score = task.max_score()
@@ -471,7 +474,6 @@ class CombinedOpenEndedV1Module():
             'max_score_to_attempt': max_score_to_attempt,
             'rubric_scores' : rubric_scores,
             }
-        log.debug(last_response_dict)
         return last_response_dict
 
     def update_task_states(self):
@@ -506,6 +508,19 @@ class CombinedOpenEndedV1Module():
             #return_html=self.get_html()
             pass
         return return_html
+
+    def get_rubric_scores(self, get):
+        """
+        Gets the results of a given grader via ajax.
+        Input: AJAX get dictionary
+        Output: Dictionary to be rendered via ajax that contains the result html.
+        """
+        task_number = int(get['task_number'])
+        self.update_task_states()
+        response_dict = self.get_last_response(task_number)
+        context = {'results': response_dict['post_assessment'], 'task_number': task_number + 1, 'task_name' : response_dict['human_task']}
+        html = self.system.render_template('combined_open_ended_results.html', context)
+        return {'html': html, 'success': True}
 
     def get_results(self, get):
         """

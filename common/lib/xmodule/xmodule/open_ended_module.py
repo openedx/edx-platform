@@ -457,6 +457,7 @@ class OpenEndedModule(openendedchild.OpenEndedChild):
         if isinstance(score_result['score'], list):
             feedback_items = []
             rubric_scores = []
+            grader_types = []
             for i in xrange(0, len(score_result['score'])):
                 new_score_result = {
                     'score': score_result['score'][i],
@@ -471,6 +472,7 @@ class OpenEndedModule(openendedchild.OpenEndedChild):
                 feedback_template, rubric_score = self._format_feedback(new_score_result, system)
                 feedback_items.append(feedback_template)
                 rubric_scores.append(rubric_score)
+                grader_types.append(score_result['grader_type'])
             if join_feedback:
                 feedback = "".join(feedback_items)
             else:
@@ -481,11 +483,12 @@ class OpenEndedModule(openendedchild.OpenEndedChild):
             feedback, rubric_score = self._format_feedback(score_result, system)
             score = score_result['score']
             rubric_scores = [rubric_score]
+            grader_types = [score_result['grader_type']]
 
         self.submission_id = score_result['submission_id']
         self.grader_id = score_result['grader_id']
 
-        return {'valid': True, 'score': score, 'feedback': feedback, 'rubric_scores' : rubric_scores}
+        return {'valid': True, 'score': score, 'feedback': feedback, 'rubric_scores' : rubric_scores, 'grader_types' : grader_types}
 
     def latest_post_assessment(self, system, short_feedback=False, join_feedback=True):
         """

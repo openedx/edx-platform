@@ -108,6 +108,11 @@ def get_logger_config(log_dir,
                 'propagate': False,
                 'level':'DEBUG',
             },
+            'pipeline.compilers' : {
+                'handlers': ['null'],
+                'propagate': False,
+                'level':'DEBUG',
+            },
             '': {
                 'handlers': handlers,
                 'level': 'DEBUG',

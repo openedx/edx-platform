@@ -170,3 +170,51 @@ class CombinedOpenEndedRubric(object):
                 raise RubricParsingError("[extract_category]: found duplicate point values between two different options")
             else:
                 prev = option['points']
+
+    @staticmethod
+    def reformat_scores_for_rendering(scores, score_types):
+        success = False
+        if len(scores)==0:
+            return success
+
+        score_lists = []
+        score_type_list = []
+        for i in xrange(0,len(scores)):
+            score_cont_list = scores[i]
+            for j in xrange(0,len(score_cont_list)):
+                score_list = score_cont_list[j]
+                score_lists.append(score_list)
+                score_type_list.append(score_types[i])
+
+        score_list_len = len(score_lists[0])
+        for score_list in score_lists:
+            if len(score_list)!=score_list_len:
+                return success
+
+        score_tuples = []
+        for i in xrange(0,len(score_lists)):
+            for j in xrange(0,len(score_lists[i])):
+                tuple = (1,j,score_lists[i][j])
+                score_tuples, tup_ind = CombinedOpenEndedRubric.check_for_tuple_matches(score_tuples,tuple)
+                score_tuples[tup_ind][0] += 1
+
+    @staticmethod
+    def check_for_tuple_matches(tuples, tuple):
+        category = tuple[1]
+        score = tuple[2]
+        tup_ind = -1
+        for t in xrange(0,len(tuples)):
+            if tuples[t][1] == category and tuples[t][2] == score:
+                tup_ind = t
+                break
+
+        if tup_ind == -1:
+            tuples.append([0,category,score])
+            tup_ind = len(tuples)-1
+        return tuples, tup_ind
+
+
+
+
+
+
