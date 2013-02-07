@@ -36,7 +36,9 @@ class CombinedOpenEndedRubric(object):
                     {'categories': rubric_categories,
                      'has_score': self.has_score,
                      'view_only': self.view_only,
-                     'max_score': max_score})
+                     'max_score': max_score,
+                     'combined_rubric' : False
+                    })
             success = True
         except:
             error_message = "[render_rubric] Could not parse the rubric with xml: {0}".format(rubric_xml)
@@ -154,6 +156,29 @@ class CombinedOpenEndedRubric(object):
 
         return {'description': description, 'options': options, 'score' : score}
 
+    def render_combined_rubric(self,rubric_xml,scores,score_types,feedback_types):
+        score_tuples = CombinedOpenEndedRubric.reformat_scores_for_rendering(scores,score_types,feedback_types)
+        rubric_categories = self.extract_categories(rubric_xml)
+        max_scores = map((lambda cat: cat['options'][-1]['points']), rubric_categories)
+        max_score = max(max_scores)
+        for i in xrange(0,len(rubric_categories)):
+            category = rubric_categories[i]
+            rubric_categories[i]['grader_types'] = []
+            for j in xrange(0,len(category['options'])):
+                for tuple in score_tuples:
+                    if tuple[1] == i and tuple[2] ==j:
+                        for grader_type in tuple[3]:
+                            rubric_categories[i]['grader_types'].append(grader_type)
+
+        html = self.system.render_template('open_ended_rubric.html',
+            {'categories': rubric_categories,
+             'has_score': True,
+             'view_only': True,
+             'max_score': max_score,
+             'combined_rubric' : True
+            })
+        return html
+
 
     @staticmethod
     def validate_options(options):
@@ -175,10 +200,10 @@ class CombinedOpenEndedRubric(object):
     def reformat_scores_for_rendering(scores, score_types, feedback_types):
         success = False
         if len(scores)==0:
-            return success
+            return success, ""
 
         if len(scores) != len(score_types) or len(feedback_types) != len(scores):
-            return success
+            return success, ""
 
         score_lists = []
         score_type_list = []
@@ -197,7 +222,7 @@ class CombinedOpenEndedRubric(object):
             score_type = score_type_list[i]
             feedback_type = feedback_type_list[i]
             if len(score_list)!=score_list_len or len(score_type)!=score_list_len or len(feedback_type)!=score_list_len:
-                return success
+                return success, ""
 
         score_tuples = []
         for i in xrange(0,len(score_lists)):
@@ -207,6 +232,9 @@ class CombinedOpenEndedRubric(object):
                 score_tuples[tup_ind][0] += 1
                 score_tuples[tup_ind][3].append(score_type_list[i][j])
                 score_tuples[tup_ind][4].append(feedback_type_list[i][j])
+
+        success = True
+        return success, score_tuples
 
     @staticmethod
     def check_for_tuple_matches(tuples, tuple):

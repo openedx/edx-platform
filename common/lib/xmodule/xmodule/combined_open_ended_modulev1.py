@@ -191,9 +191,9 @@ class CombinedOpenEndedV1Module():
         # completion (doesn't matter if you self-assessed correct/incorrect).
         self._max_score = int(self.metadata.get('max_score', MAX_SCORE))
 
-        rubric_renderer = CombinedOpenEndedRubric(system, True)
+        self.rubric_renderer = CombinedOpenEndedRubric(system, True)
         rubric_string = stringify_children(definition['rubric'])
-        rubric_renderer.check_if_rubric_is_parseable(rubric_string, location, MAX_SCORE_ALLOWED, self._max_score)
+        self.rubric_renderer.check_if_rubric_is_parseable(rubric_string, location, MAX_SCORE_ALLOWED, self._max_score)
 
         #Static data is passed to the child modules to render
         self.static_data = {
@@ -444,9 +444,11 @@ class CombinedOpenEndedV1Module():
             rubric_data = task._parse_score_msg(task.history[-1].get('post_assessment', ""), self.system)
             rubric_scores = rubric_data['rubric_scores']
             grader_types = rubric_data['grader_types']
+            feedback_items = rubric_data['feedback_items']
         elif task_type== "selfassessment":
             rubric_scores = last_post_assessment
             grader_types = ['SA']
+            feedback_items = []
             last_post_assessment = ""
         last_correctness = task.is_last_response_correct()
         max_score = task.max_score()
@@ -473,6 +475,8 @@ class CombinedOpenEndedV1Module():
             'min_score_to_attempt': min_score_to_attempt,
             'max_score_to_attempt': max_score_to_attempt,
             'rubric_scores' : rubric_scores,
+            'grader_types' : grader_types,
+            'feedback_items' : feedback_items,
             }
         return last_response_dict
 
@@ -509,7 +513,7 @@ class CombinedOpenEndedV1Module():
             pass
         return return_html
 
-    def get_rubric_scores(self, get):
+    def get_results(self, get):
         """
         Gets the results of a given grader via ajax.
         Input: AJAX get dictionary
@@ -517,12 +521,21 @@ class CombinedOpenEndedV1Module():
         """
         task_number = int(get['task_number'])
         self.update_task_states()
-        response_dict = self.get_last_response(task_number)
-        context = {'results': response_dict['post_assessment'], 'task_number': task_number + 1, 'task_name' : response_dict['human_task']}
+        all_responses = []
+        for i in xrange(0,task_number+1):
+            all_responses.append(self.get_last_response(i))
+        rubric_scores = [rd['rubric_scores'] for rd in all_responses]
+        grader_types = [rd['grader_types'] for rd in all_responses]
+        feedback_items = [rd['feedback_items'] for rd in all_responses]
+
+        rubric_html = self.rubric_renderer.render_combined_rubric(self.static_data['rubric'], rubric_scores,
+            grader_types, feedback_items)
+
+        context = {'results': rubric_html, 'task_number': task_number + 1, 'task_name' : response_dict['human_task']}
         html = self.system.render_template('combined_open_ended_results.html', context)
         return {'html': html, 'success': True}
 
-    def get_results(self, get):
+    def get_results_old(self, get):
         """
         Gets the results of a given grader via ajax.
         Input: AJAX get dictionary
