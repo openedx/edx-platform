@@ -7,6 +7,7 @@ GRADER_TYPE_IMAGE_DICT = {
     'SA' : '/static/images/self_assessment_icon.png',
     'PE' : '/static/images/peer_grading_icon.png',
     'ML' : '/static/images/ml_grading_icon.png',
+    'IN' : '/static/images/peer_grading_icon.png',
     }
 
 class RubricParsingError(Exception):

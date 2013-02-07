@@ -21,7 +21,7 @@ from .xml_module import XmlDescriptor
 from xmodule.modulestore import Location
 import self_assessment_module
 import open_ended_module
-from combined_open_ended_rubric import CombinedOpenEndedRubric, RubricParsingError
+from combined_open_ended_rubric import CombinedOpenEndedRubric, RubricParsingError, GRADER_TYPE_IMAGE_DICT
 from .stringify import stringify_children
 import dateutil
 import dateutil.parser
@@ -477,6 +477,7 @@ class CombinedOpenEndedV1Module():
             'rubric_scores' : rubric_scores,
             'grader_types' : grader_types,
             'feedback_items' : feedback_items,
+            'grader_type' : grader_types[0],
             }
         return last_response_dict
 
@@ -647,7 +648,7 @@ class CombinedOpenEndedV1Module():
             task_data = self.get_last_response(i)
             task_data.update({'task_number': i + 1})
             status.append(task_data)
-        context = {'status_list': status}
+        context = {'status_list': status, 'grader_type_image_dict' : GRADER_TYPE_IMAGE_DICT}
         status_html = self.system.render_template("combined_open_ended_status.html", context)
 
         return status_html

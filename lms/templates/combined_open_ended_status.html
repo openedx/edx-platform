@@ -8,7 +8,8 @@
             <div class="statusitem" data-status-number="${i}">
         %endif
 
-            ${status['human_task']} (${status['human_state']}) ${status['score']} / ${status['max_score']}
+                <% grader_image = grader_type_image_dict[status['grader_type']]%>
+                ${status['human_task']}(${status['human_state']}) ${status['score']} / ${status['max_score']}
         </div>
     %endfor
 </section>
