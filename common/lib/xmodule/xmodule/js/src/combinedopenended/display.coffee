@@ -4,11 +4,11 @@ class @Rubric
   # finds the scores for each rubric category
   @get_score_list: () =>
     # find the number of categories:
-    num_categories = $('table.rubric tr').length
+    num_categories = $('b.rubric-category').length
 
     score_lst = []
     # get the score for each one
-    for i in [0..(num_categories-2)]
+    for i in [0..(num_categories-1)]
       score = $("input[name='score-selection-#{i}']:checked").val()
       score_lst.push(score)
 
@@ -23,9 +23,8 @@ class @Rubric
 
   @check_complete: () ->
      # check to see whether or not any categories have not been scored
-    num_categories = $('table.rubric tr').length
-    # -2 because we want to skip the header
-    for i in [0..(num_categories-2)]
+    num_categories = $('b.rubric-category').length
+    for i in [0..(num_categories-1)]
       score = $("input[name='score-selection-#{i}']:checked").val()
       if score == undefined
         return false
@@ -102,7 +101,7 @@ class @CombinedOpenEnded
         Collapsible.setCollapsibles(@results_container)
 
   show_results: (event) =>
-    status_item = $(event.target).parent().parent()
+    status_item = $(event.target).parent()
     status_number = status_item.data('status-number')
     data = {'task_number' : status_number}
     $.postWithPrefix "#{@ajax_url}/get_results", data, (response) =>

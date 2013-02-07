@@ -22,10 +22,7 @@
             % endif
 
             %if status['type']=="openended" and status['state'] in ['done', 'post_assessment']:
-                <div class="show-results">
-                    <a href="#results" class="show-results-button">Show results from Step ${status['task_number']}</a>
-
-                </div>
+               <a href="#results" class="show-results-button">Show results</a>
             %endif
         </div>
     %endfor

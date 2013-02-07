@@ -24,14 +24,11 @@ section.combined-open-ended {
   @include clearfix;
   .status-container
   {
-      float:right;
-      width:40%;
+      padding-bottom: 5px;
   }
   .item-container
   {
-      float:left;
-      width: 53%;
-      padding-bottom: 50px;
+      padding-bottom: 10px;
   }
 
   .result-container
@@ -49,11 +46,11 @@ section.combined-open-ended {
 section.combined-open-ended-status {
 
     .statusitem {
-      background-color: #FAFAFA;
       color: #2C2C2C;
-      font-family: monospace;
-      font-size: 1em;
-      padding: 10px;
+      font-size: .8em;
+      padding: 0px;
+      display: block;
+      width: 55%;
       .show-results {
           margin-top: .3em;
           text-align:right;
