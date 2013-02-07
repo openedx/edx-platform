@@ -180,6 +180,9 @@ class @PeerGradingProblem
     @content_panel = $('.content-panel')
     @grading_message = $('.grading-message')
     @grading_message.hide()
+    @question_header = $('.question-header')
+    @question_header
+    @question_header.click @collapse_question
 
     @grading_wrapper =$('.grading-wrapper')
     @calibration_feedback_panel = $('.calibration-feedback')
@@ -268,6 +271,7 @@ class @PeerGradingProblem
        if response.calibrated and (@calibration == null or @calibration == false)
          @calibration = false
          @fetch_submission_essay()
+         @collapse_question()
       # If we were calibrating before and no longer need to,
       # show the interstitial page
        else if response.calibrated and @calibration == true
@@ -433,3 +437,12 @@ class @PeerGradingProblem
   setup_score_selection: (max_score) =>
     # And now hook up an event handler again
     $("input[class='score-selection']").change @graded_callback
+
+  collapse_question: () =>
+    @prompt_container.slideToggle()
+    @prompt_container.toggleClass('open')
+    if @question_header.text() == "(Hide)"
+      new_text = "(Show)"
+    else
+      new_text = "(Hide)"
+      @question_header.text(new_text)

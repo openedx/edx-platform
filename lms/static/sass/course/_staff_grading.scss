@@ -33,6 +33,9 @@ div.peer-grading{
         &.submission-container{
               overflow-y: auto;
               height: 200px;
+              background: #F6F6F6;
+              border: 1px solid #ddd;
+              @include clearfix;
         }
     }
 
