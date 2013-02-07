@@ -172,31 +172,41 @@ class CombinedOpenEndedRubric(object):
                 prev = option['points']
 
     @staticmethod
-    def reformat_scores_for_rendering(scores, score_types):
+    def reformat_scores_for_rendering(scores, score_types, feedback_types):
         success = False
         if len(scores)==0:
             return success
 
+        if len(scores) != len(score_types) or len(feedback_types) != len(scores):
+            return success
+
         score_lists = []
         score_type_list = []
+        feedback_type_list = []
         for i in xrange(0,len(scores)):
             score_cont_list = scores[i]
             for j in xrange(0,len(score_cont_list)):
                 score_list = score_cont_list[j]
                 score_lists.append(score_list)
-                score_type_list.append(score_types[i])
+                score_type_list.append(score_types[i][j])
+                feedback_type_list.append(feedback_types[i][j])
 
         score_list_len = len(score_lists[0])
-        for score_list in score_lists:
-            if len(score_list)!=score_list_len:
+        for i in xrange(0,len(score_lists)):
+            score_list = score_lists[i]
+            score_type = score_type_list[i]
+            feedback_type = feedback_type_list[i]
+            if len(score_list)!=score_list_len or len(score_type)!=score_list_len or len(feedback_type)!=score_list_len:
                 return success
 
         score_tuples = []
         for i in xrange(0,len(score_lists)):
             for j in xrange(0,len(score_lists[i])):
-                tuple = (1,j,score_lists[i][j])
+                tuple = [1,j,score_lists[i][j],[],[]]
                 score_tuples, tup_ind = CombinedOpenEndedRubric.check_for_tuple_matches(score_tuples,tuple)
                 score_tuples[tup_ind][0] += 1
+                score_tuples[tup_ind][3].append(score_type_list[i][j])
+                score_tuples[tup_ind][4].append(feedback_type_list[i][j])
 
     @staticmethod
     def check_for_tuple_matches(tuples, tuple):
@@ -209,7 +219,7 @@ class CombinedOpenEndedRubric(object):
                 break
 
         if tup_ind == -1:
-            tuples.append([0,category,score])
+            tuples.append([0,category,score,[],[]])
             tup_ind = len(tuples)-1
         return tuples, tup_ind
 
