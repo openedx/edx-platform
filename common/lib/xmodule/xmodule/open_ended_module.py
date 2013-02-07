@@ -386,6 +386,7 @@ class OpenEndedModule(openendedchild.OpenEndedChild):
 
         rubric_feedback = ""
         feedback = self._convert_longform_feedback_to_html(response_items)
+        rubric_scores = []
         if response_items['rubric_scores_complete'] == True:
             rubric_renderer = CombinedOpenEndedRubric(system, True)
             rubric_dict = rubric_renderer.render_rubric(response_items['rubric_xml'])
@@ -428,7 +429,7 @@ class OpenEndedModule(openendedchild.OpenEndedChild):
             correct:         Correctness of submission (Boolean)
             score:           Points to be assigned (numeric, can be float)
         """
-        fail = {'valid': False, 'score': 0, 'feedback': ''}
+        fail = {'valid': False, 'score': 0, 'feedback': '', 'rubric_scores' : []}
         try:
             score_result = json.loads(score_msg)
         except (TypeError, ValueError):

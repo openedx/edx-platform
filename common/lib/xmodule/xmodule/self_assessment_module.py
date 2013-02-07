@@ -257,6 +257,7 @@ class SelfAssessmentModule(openendedchild.OpenEndedChild):
 
     def save_hint(self, get, system):
         '''
+        Not used currently, as hints have been removed from the system.
         Save the hint.
         Returns a dict { 'success': bool,
                          'message_html': message_html,
@@ -276,6 +277,15 @@ class SelfAssessmentModule(openendedchild.OpenEndedChild):
         return {'success': True,
                 'message_html': self.get_message_html(),
                 'allow_reset': self._allow_reset()}
+
+    def latest_post_assessment(self, system):
+        latest_post_assessment =  super(SelfAssessmentModule, self).latest_post_assessment(system)
+        try:
+            rubric_scores = json.loads(latest_post_assessment)
+        except:
+            log.error("Cannot parse rubric scores in self assessment module from {0}".format(latest_post_assessment))
+            rubric_scores = []
+        return [rubric_scores]
 
 
 class SelfAssessmentDescriptor(XmlDescriptor, EditingDescriptor):

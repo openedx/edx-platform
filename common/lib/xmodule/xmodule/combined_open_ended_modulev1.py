@@ -441,6 +441,10 @@ class CombinedOpenEndedV1Module():
             else:
                 last_post_evaluation = task.format_feedback_with_evaluation(self.system, last_post_assessment)
             last_post_assessment = last_post_evaluation
+            rubric_scores = task._parse_score_msg(task.history[-1].get('post_assessment', ""), self.system)['rubric_scores']
+        elif task_type== "selfassessment":
+            rubric_scores = last_post_assessment
+            last_post_assessment = ""
         last_correctness = task.is_last_response_correct()
         max_score = task.max_score()
         state = task.state
@@ -465,8 +469,9 @@ class CombinedOpenEndedV1Module():
             'correct': last_correctness,
             'min_score_to_attempt': min_score_to_attempt,
             'max_score_to_attempt': max_score_to_attempt,
+            'rubric_scores' : rubric_scores,
             }
-
+        log.debug(last_response_dict)
         return last_response_dict
 
     def update_task_states(self):

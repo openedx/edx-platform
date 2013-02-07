@@ -45,7 +45,9 @@ class CombinedOpenEndedRubric(object):
         return {'success' : success, 'html' : html, 'rubric_scores' : rubric_scores}
 
     def check_if_rubric_is_parseable(self, rubric_string, location, max_score_allowed, max_score):
-        success, rubric_feedback = self.render_rubric(rubric_string)
+        rubric_dict = self.render_rubric(rubric_string)
+        success = rubric_dict['success']
+        rubric_feedback = rubric_dict['html']
         if not success:
             error_message = "Could not parse rubric : {0} for location {1}".format(rubric_string, location.url())
             log.error(error_message)
