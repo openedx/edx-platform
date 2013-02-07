@@ -448,7 +448,7 @@ class CombinedOpenEndedV1Module():
         elif task_type== "selfassessment":
             rubric_scores = last_post_assessment
             grader_types = ['SA']
-            feedback_items = []
+            feedback_items = ['']
             last_post_assessment = ""
         last_correctness = task.is_last_response_correct()
         max_score = task.max_score()
