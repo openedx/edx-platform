@@ -387,7 +387,7 @@ def instructor_dashboard(request, course_id):
     # DataDump
 
     elif 'Download CSV of all student profile data' in action:
-        enrolled_students = User.objects.filter(courseenrollment__course_id=course_id).order_by('username')
+        enrolled_students = User.objects.filter(courseenrollment__course_id=course_id).order_by('username').select_related("profile")
         profkeys = ['name', 'language', 'location', 'year_of_birth', 'gender', 'level_of_education',
                     'mailing_address', 'goals']
         datatable = {'header': ['username', 'email'] + profkeys}
