@@ -5,7 +5,14 @@
   <head>
     <meta charset="utf-8">
     <meta http-equiv="X-UA-Compatible" content="IE=edge,chrome=1">
-    <title><%block name="title"></%block></title>
+    <title>
+        <%block name="title"></%block> | 
+        % if context_course:
+        <% ctx_loc = context_course.location %>
+        ${context_course.display_name} | 
+        % endif
+        edX Studio
+    </title>
 
     <meta name="viewport" content="width=device-width,initial-scale=1">
     <meta name="path_prefix" content="${MITX_ROOT_URL}">
