@@ -1,7 +1,0 @@
---- 
-open_files: 
-  - lms/templates/discussion/mustache/_inline_discussion.mustache
-  - common/static/coffee/src/discussion/discussion_module_view.coffee
-  - lms/templates/discussion/_new_post.html
-  - lms/templates/discussion/mustache/_inline_discussion_cohorted.mustache
-  - lms/djangoapps/django_comment_client/forum/views.py
