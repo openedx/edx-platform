@@ -285,7 +285,9 @@ if Backbone?
     
     chooseCohort: (event) ->
       @group_id = @$('.cohort-options :selected').val()
-      @retrieveAllThreads()
+      @collection.current_page = 0
+      @collection.reset()
+      @loadMorePages(event)
       
     retrieveDiscussion: (discussion_id, callback=null) ->
       url = DiscussionUtil.urlFor("retrieve_discussion", discussion_id)
