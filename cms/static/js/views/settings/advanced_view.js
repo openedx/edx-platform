@@ -26,11 +26,6 @@ CMS.Views.Settings.Advanced = CMS.Views.ValidatingView.extend({
             }
         );
         this.model.on('error', this.handleValidationError, this);
-        this.render = _.wrap(this.render, function(render) {
-            render();
-            self.afterRender();
-            return self;
-        });
     },
     render: function() {
         // catch potential outside call before template loaded
@@ -50,12 +45,6 @@ CMS.Views.Settings.Advanced = CMS.Views.ValidatingView.extend({
                 self.fieldToSelectorMap[key] = key;
             });
 
-        return this;
-    },
-
-    afterRender: function () {
-        var self = this;
-        var listEle$ = this.$el.find('.course-advanced-policy-list');
         var policyValueDivs = listEle$.find('.ace');
         _.each(policyValueDivs,
             function (div) {
@@ -75,6 +64,7 @@ CMS.Views.Settings.Advanced = CMS.Views.ValidatingView.extend({
                 // Seems to be OK in afterRender method.
                 editor.getSession().setMode("ace/mode/json");
             });
+        return this;
     },
 
     deleteEntry : function(event) {
