@@ -44,27 +44,27 @@ CMS.Views.Settings.Advanced = CMS.Views.ValidatingView.extend({
                 listEle$.append(self.template({ key : key, value : JSON.stringify(self.model.get(key))}));
                 self.fieldToSelectorMap[key] = key;
             });
-
         var policyValueDivs = listEle$.find('.ace');
-        _.each(policyValueDivs,
-            function (div) {
-                var editor = ace.edit(div);
-                editor.setTheme("ace/theme/chrome");
-                editor.setHighlightActiveLine(false);
-                editor.on("blur",
-                    function (e) {
-                        var key = $(editor.container).closest('.row').children('.key').attr('id');
-                        // TODO: error checking in case it does not parse!
-                        var quotedValue = editor.getValue();
-                        var JSONValue = JSON.parse(quotedValue);
-                        self.model.set(key, JSONValue, {validate: true});
-
-                    });
-                // Calling getSession() directly in render causes a crash on Chrome.
-                // Seems to be OK in afterRender method.
-                editor.getSession().setMode("ace/mode/json");
-            });
+        _.each(policyValueDivs, this.attachAce, this);
         return this;
+    },
+    attachAce : function (div) {
+        var self = this;
+        var editor = ace.edit(div);
+        editor.setTheme("ace/theme/chrome");
+        editor.setHighlightActiveLine(false);
+        editor.on("blur",
+            function (e) {
+                var key = $(editor.container).closest('.row').children('.key').attr('id');
+                // TODO: error checking in case it does not parse!
+                var quotedValue = editor.getValue();
+                var JSONValue = JSON.parse(quotedValue);
+                self.model.set(key, JSONValue, {validate: true});
+
+            });
+        // Calling getSession() directly in render causes a crash on Chrome.
+        // Seems to be OK in afterRender method.
+        editor.getSession().setMode("ace/mode/json");
     },
 
     deleteEntry : function(event) {
@@ -106,10 +106,15 @@ CMS.Views.Settings.Advanced = CMS.Views.ValidatingView.extend({
     },
     addEntry : function() {
         var listEle$ = this.$el.find('.course-advanced-policy-list');
-        listEle$.append(this.template({ key : "", value : ""}));
+        var newEle = this.template({ key : "", value : JSON.stringify("")});
+        listEle$.append(newEle);
         // disable the value entry until there's an acceptable key
-        listEle$.find('.course-advanced-policy-value').addClass('disabled');
+        $(newEle).find('.course-advanced-policy-value').addClass('disabled');
         this.fieldToSelectorMap[this.new_key] = this.new_key;
+        // need to refind b/c replaceWith seems to copy rather than use the specific ele instance
+        var policyValueDivs = this.$el.find('#' + this.new_key).closest('li').find('.ace');
+        // only 1 but hey, let's take advantage of the context mechanism
+        _.each(policyValueDivs, this.attachAce, this);
     },
     updateKey : function(event) {
         // old key: either the key as in the model or new_key.
@@ -160,10 +165,6 @@ CMS.Views.Settings.Advanced = CMS.Views.ValidatingView.extend({
                 this.model.deleteKeys.push(oldKey);
                 this.model.unset(oldKey) ;
             }
-            else {
-                // enable the value entry
-                this.$el.find('.course-advanced-policy-value').removeClass('disabled');
-            }
             
             // check for newkey being the name of one which was previously deleted in this session
             var wasDeleting = this.model.deleteKeys.indexOf(newKey);
@@ -172,8 +173,13 @@ CMS.Views.Settings.Advanced = CMS.Views.ValidatingView.extend({
             }
 
             // update gui (sets all the ids etc)
-            $(event.currentTarget).closest('li').replaceWith(this.template({key : newKey, value : this.model.get(newKey) }));
-
+            var newEle = this.template({key : newKey, value : JSON.stringify(this.model.get(newKey)) });
+            $(event.currentTarget).closest('li').replaceWith(newEle);
+            // need to refind b/c replaceWith seems to copy rather than use the specific ele instance
+            var policyValueDivs = this.$el.find('#' + newKey).closest('li').find('.ace');
+            // only 1 but hey, let's take advantage of the context mechanism
+            _.each(policyValueDivs, this.attachAce, this);
+            
             this.fieldToSelectorMap[newKey] = newKey;
         }
     },
