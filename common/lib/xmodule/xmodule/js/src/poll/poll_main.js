@@ -125,6 +125,17 @@ PollMain.prototype = {
 
                 _this.showAnswerGraph(response.poll_answers, response.total);
 
+                _this.jsonConfig.poll_answer = answer;
+                _this.jsonConfig.total = response.total;
+                $.each(response.poll_answers, function (index, value) {
+                    _this.jsonConfig.poll_answers[index] = value;
+                });
+
+                logme('Current "jsonConfig": ');
+                logme(_this.jsonConfig);
+
+                _this.questionEl.children('.poll_question_div').html(JSON.stringify(_this.jsonConfig));
+
                 /*
                 _this.vertModEl.find('.xmodule_ConditionalModule').each(
                     function (index, value) {
@@ -135,7 +146,56 @@ PollMain.prototype = {
             }
         );
     }
-} // End-of: 'submitAnswer': function (answer, answerEl) {
+}, // End-of: 'submitAnswer': function (answer, answerEl) {
+
+'postInit': function () {
+    var _this;
+
+    // Access this object inside inner functions.
+    _this = this;
+
+    // Get the DOM id of the question.
+    this.id = this.questionEl.attr('id');
+
+    // Get the URL to which we will post the users answer to the question.
+    this.ajax_url = this.questionEl.data('ajax-url');
+
+    this.questionHtmlMarkup = $('<div />').html(this.jsonConfig.question).text();
+    this.questionEl.append(this.questionHtmlMarkup);
+
+    // When the user selects and answer, we will set this flag to true.
+    this.questionAnswered = false;
+
+    logme('this.jsonConfig.answers: ', this.jsonConfig.answers);
+    logme('this.jsonConfig.poll_answer: ', this.jsonConfig.poll_answer);
+
+    $.each(this.jsonConfig.answers, function (index, value) {
+        var answerEl;
+
+        answerEl = $('<div class="poll_answer">' + value + '</li>');
+        answerEl.on('click', function () {
+            _this.submitAnswer(index, answerEl);
+        });
+
+        if (index === _this.jsonConfig.poll_answer) {
+            answerEl.addClass('answered');
+            _this.questionAnswered = true;
+        }
+
+        answerEl.appendTo(_this.questionEl);
+    });
+
+    this.graphAnswerEl = $('<div class="graph_answer"></div>');
+    this.graphAnswerEl.hide();
+    this.graphAnswerEl.appendTo(this.questionEl);
+
+    logme('PollMain object: ', this);
+
+    // If it turns out that the user already answered the question, show the answers graph.
+    if (this.questionAnswered === true) {
+        this.showAnswerGraph(this.jsonConfig.poll_answers, this.jsonConfig.total);
+    }
+} // End-of: 'postInit': function () {
 }; // End-of: PollMain.prototype = {
 
 return PollMain;
@@ -227,6 +287,8 @@ function PollMain(el) {
                         "three of them to kill and eat the cabin boy, in order to save their own lives?&lt;/p&gt;"
                 };
             }
+
+            _this.postInit();
         }());
     } else {
         try {
@@ -253,47 +315,15 @@ function PollMain(el) {
         return;
     }
 
-    // Get the DOM id of the question.
-    this.id = this.questionEl.attr('id');
+    $.postWithPrefix(
+        _this.ajax_url + '/' + 'get_state',  {},
+        function (response) {
+            logme('Get pre init state.');
+            logme('response:', response);
 
-    // Get the URL to which we will post the users answer to the question.
-    this.ajax_url = this.questionEl.data('ajax-url');
-
-    this.questionHtmlMarkup = $('<div />').html(this.jsonConfig.question).text();
-    this.questionEl.append(this.questionHtmlMarkup);
-
-    // When the user selects and answer, we will set this flag to true.
-    this.questionAnswered = false;
-
-    logme('this.jsonConfig.answers: ', this.jsonConfig.answers);
-    logme('this.jsonConfig.poll_answer: ', this.jsonConfig.poll_answer);
-
-    $.each(this.jsonConfig.answers, function (index, value) {
-        var answerEl;
-
-        answerEl = $('<div class="poll_answer">' + value + '</li>');
-        answerEl.on('click', function () {
-            _this.submitAnswer(index, answerEl);
-        });
-
-        if (index === _this.jsonConfig.poll_answer) {
-            answerEl.addClass('answered');
-            _this.questionAnswered = true;
+            _this.postInit();
         }
-
-        answerEl.appendTo(_this.questionEl);
-    });
-
-    this.graphAnswerEl = $('<div class="graph_answer"></div>');
-    this.graphAnswerEl.hide();
-    this.graphAnswerEl.appendTo(this.questionEl);
-
-    logme('PollMain object: ', this);
-
-    // If it turns out that the user already answered the question, show the answers graph.
-    if (this.questionAnswered === true) {
-        this.showAnswerGraph(this.jsonConfig.poll_answers, this.jsonConfig.total);
-    }
+    );
 } // End-of: function PollMain(el) {
 
 }); // End-of: define('PollMain', ['logme'], function (logme) {
