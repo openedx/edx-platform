@@ -1,3 +1,5 @@
+"""Test jailpy.py"""
+
 import textwrap
 import unittest
 from nose.plugins.skip import SkipTest
@@ -52,6 +54,18 @@ class TestLimits(unittest.TestCase):
                 """))
         self.assertNotEqual(res.status, 0)
         self.assertEqual(res.stdout, "")
+
+    def test_cant_write_files(self):
+        res = jailpy(dedent("""\
+                print "Trying"
+                with open("mydata.txt", "w") as f:
+                    f.write("hello")
+                with open("mydata.txt") as f2:
+                    print "Got this:", f2.read()
+                """))
+        self.assertNotEqual(res.status, 0)
+        self.assertEqual(res.stdout, "Trying\n")
+        self.assertIn("ermission denied", res.stderr)
 
     # TODO: write files
     # TODO: read network
