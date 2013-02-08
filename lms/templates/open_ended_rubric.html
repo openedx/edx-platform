@@ -28,8 +28,10 @@
                         % elif combined_rubric == True:
                             <div class="rubric-label">
                                 %for grader_type in category['options'][j]['grader_types']:
-                                    <% grader_image = grader_type_image_dict[grader_type]%>
-                                    <img src="${grader_image}"/>
+                                    % if grader_type in grader_type_image_dict:
+                                        <% grader_image = grader_type_image_dict[grader_type]%>
+                                        <img src="${grader_image}"/>
+                                    % endif
                                 %endfor
                                 ${option['points']} points : ${option['text']}
                             </div>

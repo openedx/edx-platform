@@ -7,8 +7,9 @@
         %else:
             <div class="statusitem" data-status-number="${i}">
         %endif
-
-                <% grader_image = grader_type_image_dict[status['grader_type']]%>
+                %if status['grader_type'] in grader_type_image_dict:
+                    <% grader_image = grader_type_image_dict[status['grader_type']]%>
+                %endif
                 ${status['human_task']}(${status['human_state']}) ${status['score']} / ${status['max_score']}
         </div>
     %endfor

@@ -8,6 +8,7 @@ from lxml.html import rewrite_links
 from path import path
 import os
 import sys
+import re
 
 from pkg_resources import resource_string
 
@@ -462,6 +463,10 @@ class CombinedOpenEndedV1Module():
             human_state = task.HUMAN_NAMES[state]
         else:
             human_state = state
+        if len(grader_types)>0:
+            grader_type = grader_types[0]
+        else:
+            grader_type = "IN"
         last_response_dict = {
             'response': last_response,
             'score': last_score,
@@ -477,7 +482,7 @@ class CombinedOpenEndedV1Module():
             'rubric_scores' : rubric_scores,
             'grader_types' : grader_types,
             'feedback_items' : feedback_items,
-            'grader_type' : grader_types[0],
+            'grader_type' : grader_type,
             }
         return last_response_dict
 
@@ -648,6 +653,7 @@ class CombinedOpenEndedV1Module():
             task_data = self.get_last_response(i)
             task_data.update({'task_number': i + 1})
             status.append(task_data)
+
         context = {'status_list': status, 'grader_type_image_dict' : GRADER_TYPE_IMAGE_DICT}
         status_html = self.system.render_template("combined_open_ended_status.html", context)
 
