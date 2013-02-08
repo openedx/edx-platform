@@ -26,6 +26,8 @@ PollMain.prototype = {
     tickSets = {};
     c1 = 0;
 
+    logme('poll_answers: ', poll_answers, '_this.jsonConfig.answers: ', _this.jsonConfig.answers);
+
     $.each(poll_answers, function (index, value) {
         var numValue, text;
 
@@ -113,6 +115,7 @@ PollMain.prototype = {
                 'total': '10'
             };
 
+            logme('One.');
             _this.showAnswerGraph(response.poll_answers, response.total);
         }());
     } else {
@@ -123,18 +126,8 @@ PollMain.prototype = {
             function (response) {
                 logme('response:', response);
 
+                logme('Two.');
                 _this.showAnswerGraph(response.poll_answers, response.total);
-
-                _this.jsonConfig.poll_answer = answer;
-                _this.jsonConfig.total = response.total;
-                $.each(response.poll_answers, function (index, value) {
-                    _this.jsonConfig.poll_answers[index] = value;
-                });
-
-                logme('Current "jsonConfig": ');
-                logme(_this.jsonConfig);
-
-                _this.questionEl.children('.poll_question_div').html(JSON.stringify(_this.jsonConfig));
 
                 /*
                 _this.vertModEl.find('.xmodule_ConditionalModule').each(
@@ -153,6 +146,18 @@ PollMain.prototype = {
 
     // Access this object inside inner functions.
     _this = this;
+
+    if (
+        (this.jsonConfig.poll_answer.length > 0) &&
+        (this.jsonConfig.answers.hasOwnProperty(this.jsonConfig.poll_answer) === false)
+    ) {
+        this.questionEl.append(
+            '<h3>Error!</h3>' +
+            '<p>XML data format changed. List of answers was modified, but poll data was not updated.</p>'
+        );
+
+        return;
+    }
 
     // Get the DOM id of the question.
     this.id = this.questionEl.attr('id');
@@ -193,6 +198,7 @@ PollMain.prototype = {
 
     // If it turns out that the user already answered the question, show the answers graph.
     if (this.questionAnswered === true) {
+        logme('Three');
         this.showAnswerGraph(this.jsonConfig.poll_answers, this.jsonConfig.total);
     }
 } // End-of: 'postInit': function () {
@@ -290,9 +296,35 @@ function PollMain(el) {
 
             _this.postInit();
         }());
+
+        return;
     } else {
         try {
             this.jsonConfig = JSON.parse(this.questionEl.children('.poll_question_div').html());
+
+            $.postWithPrefix(
+                '' + this.questionEl.data('ajax-url') + '/' + 'get_state',  {},
+                function (response) {
+                    logme('Get pre init state.');
+                    logme('response:', response);
+
+                    _this.jsonConfig.poll_answer = response.poll_answer;
+                    _this.jsonConfig.total = response.total;
+
+                    $.each(response.poll_answers, function (index, value) {
+                        _this.jsonConfig.poll_answers[index] = value;
+                    });
+
+                    logme('Current "jsonConfig": ');
+                    logme(_this.jsonConfig);
+
+                    _this.questionEl.children('.poll_question_div').html(JSON.stringify(_this.jsonConfig));
+
+                    _this.postInit();
+                }
+            );
+
+            return;
         } catch (err) {
             logme(
                 'ERROR: Invalid JSON config for poll ID "' + this.id + '".',
@@ -302,28 +334,6 @@ function PollMain(el) {
             return;
         }
     }
-
-    if (
-        (this.jsonConfig.poll_answer.length > 0) &&
-        (this.jsonConfig.answers.hasOwnProperty(this.jsonConfig.poll_answer) === false)
-    ) {
-        this.questionEl.append(
-            '<h3>Error!</h3>' +
-            '<p>XML data format changed. List of answers was modified, but poll data was not updated.</p>'
-        );
-
-        return;
-    }
-
-    $.postWithPrefix(
-        _this.ajax_url + '/' + 'get_state',  {},
-        function (response) {
-            logme('Get pre init state.');
-            logme('response:', response);
-
-            _this.postInit();
-        }
-    );
 } // End-of: function PollMain(el) {
 
 }); // End-of: define('PollMain', ['logme'], function (logme) {
