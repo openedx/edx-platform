@@ -32,10 +32,6 @@ class AnnotatableModule(XModule):
         """ Returns true if the element is a valid annotation span, false otherwise. """
         return element.tag == 'span' and element.get('class') == 'annotatable'
 
-    def _is_span_container(self, element):
-        """ Returns true if the element is a valid span contanier, false otherwise. """
-        return element.tag == 'p' # Assume content is in paragraph form (for now...)
-
     def _iterspans(self, xmltree, callbacks):
         """ Iterates over span elements and invokes each callback on the span. """
 
@@ -45,60 +41,62 @@ class AnnotatableModule(XModule):
                 for callback in callbacks:
                     callback(element, index, xmltree)
                 index += 1
+ 
+    def _set_span_data(self, span, index, xmltree):
+        """ Sets an ID and discussion anchor for the span. """
+
+        if 'anchor' in span.attrib:
+            span.set('data-discussion-anchor', span.get('anchor'))
+            del span.attrib['anchor']
     
-    def _get_span_container(self, span):
-        """ Returns the first container element of the span.
-            The intent is to add the discussion widgets at the 
-            end of the container, not interspersed with the text. """
+    def _decorate_span(self, span, index, xmltree):
+        """ Decorates the span with an icon and highlight.  """
 
-        container = None
-        for parent in span.iterancestors():
-            if self._is_span_container(parent):
-                container = parent
-                break 
-       
-        if container is None:
-            return parent
-        return container
-
-    def _get_discussion_html(self, discussion_id, discussion_title):
-        """ Returns html to display the discussion thread """
-        context = {
-                   'discussion_id': discussion_id,
-                   'discussion_title': discussion_title
-        }
-        return self.system.render_template('annotatable_discussion.html', context)
-    
-    def _attach_discussion(self, span, index, xmltree):
-        """ Attaches a discussion thread to the annotation span. """
-
-        span_id = 'span-{0}'.format(index) # How should we anchor spans? 
-        span.set('data-span-id', span_id)
-
-        discussion_id = 'discussion-{0}'.format(index) # How do we get a real discussion ID?
-        discussion_title = 'Thread Title {0}'.format(index) # How do we get the discussion Title?
-        discussion_html = self._get_discussion_html(discussion_id, discussion_title)
-        discussion_xmltree = etree.fromstring(discussion_html)
-
-        span_container = self._get_span_container(span)
-        span_container.append(discussion_xmltree)
-
-        self.discussion_for[span_id] = discussion_id
-    
-    def _add_icon(self, span, index, xmltree):
-        """ Adds an icon to the annotation span. """
-
+        cls = ['annotatable', ]
+        marker = self._get_marker_color(span)
+        if marker is None:
+            cls.append('highlight-yellow')
+        else:
+            cls.append('highlight-'+marker)
+        
+        span.set('class', ' '.join(cls))
         span_icon = etree.Element('span', { 'class': 'annotatable-icon'} )
         span_icon.text = '';
         span_icon.tail = span.text
         span.text = ''
         span.insert(0, span_icon)
+        
+    def _decorate_comment(self, span, index, xmltree):
+        """ Sets the comment class. """
+
+        comment = None
+        for child in span.iterchildren():
+            if child.get('class') == 'comment':
+                comment = child
+                break
+
+        if comment is not None:
+            comment.set('class', 'annotatable-comment')
+
+    def _get_marker_color(self, span):
+        valid_markers = ['yellow', 'orange', 'purple', 'blue', 'green']
+        if 'marker' in span.attrib:
+            marker = span.attrib['marker']
+            del span.attrib['marker']
+            if marker in valid_markers:
+                return marker
+        return None
     
     def _render(self):
         """ Renders annotatable content by transforming spans and adding discussions. """
 
         xmltree = etree.fromstring(self.content)
-        self._iterspans(xmltree, [ self._add_icon, self._attach_discussion ])
+        self._iterspans(xmltree, [ 
+            self._set_span_data,
+            self._decorate_span,
+            self._decorate_comment
+        ])
+
         return etree.tostring(xmltree)
 
     def get_html(self):
@@ -107,8 +105,7 @@ class AnnotatableModule(XModule):
         context = {
             'display_name': self.display_name,
             'element_id': self.element_id,
-            'html_content': self._render(),
-            'json_discussion_for': json.dumps(self.discussion_for)        
+            'html_content': self._render()
         }
 
         # template dir: lms/templates
@@ -121,7 +118,7 @@ class AnnotatableModule(XModule):
         
         self.element_id = self.location.html_id();
         self.content = self.definition['data']
-        self.discussion_for = {} # Maps spans to discussions by id (for JS)
+        self.spans = {} 
 
 
 class AnnotatableDescriptor(RawDescriptor):

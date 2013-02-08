@@ -2,108 +2,93 @@ class @Annotatable
     @_debug: true
 
     wrapperSelector: '.annotatable-wrapper'
-    spanSelector: 'span.annotatable[data-span-id]'
-    discussionSelector: '.annotatable-discussion[data-discussion-id]'
     toggleSelector: '.annotatable-toggle'
+    spanSelector: 'span.annotatable'
+    commentSelector: '.annotatable-comment'
+    replySelector: 'a.annotatable-reply'
  
     constructor: (el) ->
         console.log 'loaded Annotatable' if @_debug
-        @el = el
-        @init()
+        @init(el)
 
-    init: () ->
+    $: (selector) ->
+        $(selector, @el)
+
+    init: (el) ->
+        @el = el
         @hideAnnotations = false
-        @spandata = {}
-        @loadSpanData()
         @initEvents()
+        @initToolTips()
 
     initEvents: () ->
-        $(@toggleSelector, @el).bind('click', @_bind @onClickToggleAnnotations)
-
-        $(@wrapperSelector, @el).delegate(@spanSelector, {
-            'click': @_bind @onSpanEvent @onClickSpan
-            'mouseenter': @_bind @onSpanEvent @onEnterSpan
-            'mouseleave': @_bind @onSpanEvent @onLeaveSpan
-        })
-
-    loadSpanData: () ->
-        @spandata = $(@wrapperSelector, @el).data('spans')
-        
-    getDiscussionId: (span_id) ->
-        @spandata[span_id]
-        
-    getDiscussionEl: (discussion_id) ->
-        $(@discussionSelector, @el).filter('[data-discussion-id="'+discussion_id+'"]')
-
-    onClickToggleAnnotations: (e) ->
-        @hideAnnotations = !@hideAnnotations
-        $(@spanSelector, @el).add(@discussionSelector, @el).toggleClass('hide', @hideAnnotations)
-        $(@toggleSelector, @el).text(if @hideAnnotations then 'Show Annotations' else 'Hide Annotations')
-
-    onSpanEvent: (fn) ->
-        (e) =>
-          span_el = e.currentTarget
-          span_id = span_el.getAttribute('data-span-id')
-          discussion_id = @getDiscussionId(span_id)
-          discussion_el = @getDiscussionEl(discussion_id)
-          span = {
-            id: span_id
-            el: span_el 
-          }
-          discussion = { 
-            id: discussion_id
-            el: discussion_el 
-          }
-          if !@hideAnnotations
-              fn.call this, span, discussion
-
-    onClickSpan: (span, discussion) ->
-        @scrollToDiscussion(discussion.el)
-        
-    onEnterSpan: (span, discussion) ->
-        @focusDiscussion(discussion.el, true)
-    
-    onLeaveSpan: (span, discussion) ->
-        @focusDiscussion(discussion.el, false)
-        
-    focusDiscussion: (el, state) ->
-        $(@discussionSelector, @el).not(el).toggleClass('opaque', state)
-
-    scrollToDiscussion: (el) ->
-        padding = 20
-        complete = @makeHighlighter(el)
-        animOpts = {
-            scrollTop : el.offset().top - padding
-        }
-        
-        if @canScrollToDiscussion(el)
-            $('html, body').animate(animOpts, 500, 'swing', complete)
-        else
-            complete()
-
-    canScrollToDiscussion: (el) ->
-        scrollTop = el.offset().top
-        docHeight = $(document).height()
-        winHeight = $(window).height()
-        winScrollTop = window.scrollY
-
-        viewStart = winScrollTop
-        viewEnd = winScrollTop + (.75 * winHeight)
-        inView = viewStart < scrollTop < viewEnd
-
-        scrollable = !inView
-        atDocEnd = viewStart + winHeight >= docHeight
-
-        return (if atDocEnd then false else scrollable)
-    
-    makeHighlighter: (el) ->
-        return @_once -> el.effect('highlight', {}, 500)
+        @$(@toggleSelector).bind 'click', @onClickToggleAnnotations
+        @$(@wrapperSelector).delegate @replySelector, 'click', @onClickReply
             
-    _once: (fn) ->
-        done = false
-        return => 
-            fn.call this unless done
-            done = true
+    initToolTips: () ->
+        @$(@spanSelector).each (index, el) =>
+            $(el).qtip(@getTipOptions el)
 
-    _bind: (fn) ->
-        return => fn.apply(this, arguments)
+    getTipOptions: (el) ->
+        content:
+            title: 
+                text: @makeTipTitle(el)
+                button: 'Close'
+            text: @makeTipComment(el)
+        position:
+            my: 'bottom center' # of tooltip
+            at: 'top center' # of target
+            target: 'mouse'
+            container: @$(@wrapperSelector)
+            adjust: 
+                mouse: false # dont follow the mouse
+                method: 'shift none'
+        show: 
+            event: 'click'
+        hide:
+            event: 'click'
+        style:
+            classes: 'ui-tooltip-annotatable'
+        events:
+            show: @onShowTipComment
+
+    onShowTipComment: (event, api) =>
+        event.preventDefault() if @hideAnnotations
+
+    onClickToggleAnnotations: (e) =>
+        @hideAnnotations = !@hideAnnotations
+        hide = @hideAnnotations
+
+        @hideAllTips() if hide
+        @$(@spanSelector).toggleClass('hide', hide)
+        @$(@toggleSelector).text((if hide then 'Show' else 'Hide') + ' Annotations')
+
+    onClickReply: (e) =>
+        hash = $(e.currentTarget).attr('href')
+        if hash?.charAt(0) == '#'
+            name = hash.substr(1)
+            anchor = $("a[name='#{name}']").first()
+            @scrollTo(anchor) if anchor.length == 1
+
+    scrollTo: (el, padding = 20) ->
+        scrollTop = el.offset().top - padding
+        $('html,body').animate(scrollTop: scrollTop, 500, 'swing')
+
+    makeTipComment: (el) ->
+        return (api) =>
+            comment = $(@commentSelector, el).first().clone()
+            anchor = $(el).data('discussion-anchor')
+            if anchor
+                comment.append(@createReplyLink(anchor))
+            comment.contents()
+
+    makeTipTitle: (el) ->
+        return (api) =>
+            comment = $(@commentSelector, el).first()
+            title = comment.attr('title')
+            (if title then title else 'Commentary')
+    
+    createReplyLink: (anchor) ->
+        $("<a class=\"annotatable-reply\" href=\"##{anchor}\">Reply to Comment</a>")
+    
+    hideAllTips: () ->
+        @$(@spanSelector).each (index, el) -> $(el).qtip('api').hide()

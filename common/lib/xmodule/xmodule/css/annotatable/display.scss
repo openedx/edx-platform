@@ -20,17 +20,30 @@
 }
 
 span.annotatable {
-  color: $blue;
   cursor: pointer;
-  .annotatable-icon {
-    margin: auto 2px auto 4px;
+  @each $highlight in (
+    (yellow rgb(239, 255, 0)), 
+    (orange rgb(255,113,0)),
+    (purple rgb(255,0,197)),
+    (blue rgb(0,90,255)),
+    (green rgb(111,255,9))) {
+    &.highlight-#{nth($highlight,1)} {
+      background-color: #{lighten(nth($highlight,2), 20%)};
+    }
   }
   &.hide {
     cursor: none;
-    color: inherit;
+    background-color: inherit;
     .annotatable-icon {
       display: none;
     }
+  }
+
+  .annotatable-comment {
+    display: none;
+  }
+  .annotatable-icon {
+    margin: auto 2px auto 4px;
   }
 }
 
@@ -40,6 +53,11 @@ span.annotatable {
   width: 16px;
   height: 17px;
   background: url(../images/link-icon.png) no-repeat;  
+}
+
+.annotatable-reply {
+  display: block;
+  margin: 1em 0 .5em 0;
 }
 
 .help-icon {
@@ -53,30 +71,20 @@ span.annotatable {
   background: url(../images/info-icon.png) no-repeat;
 }
 
-.annotatable-discussion {
-  display: block;
-  border: 1px solid $border-color;
-  border-radius: 3px;
-  margin: 1em 0;
-  position: relative;
-  padding: 4px;
-
-  .annotatable-discussion-label {
-    font-weight: bold;
+.ui-tooltip.qtip.ui-tooltip-annotatable {
+  $border-color: #F1D031;
+  .ui-tooltip-titlebar {
+    border-color: $border-color;
   }
-  .annotatable-icon {
-    margin: auto 4px auto 0px;
-  }
-  .annotatable-show-discussion {
-    position: absolute;
-    right: 8px;
-    margin-top: 4px;
-  }
-  
-  &.opaque {
-    opacity: 0.4;
-  }
-  &.hide {
-    display: none;
+  .ui-tooltip-content {
+    background: rgba(255, 255, 255, 0.9);
+    border: 1px solid $border-color;
+    color: #000;
+    margin-bottom: 6px;
+    margin-right: 0;
+    overflow: visible;
+    padding: 4px;
+    text-align: left;
+    -webkit-font-smoothing: antialiased; 
   }
 }

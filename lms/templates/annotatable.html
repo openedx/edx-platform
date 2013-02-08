@@ -1,22 +1,14 @@
 <div class="annotatable-wrapper" id="${element_id}-wrapper">
-
-<div class="annotatable-header">
-	<div class="help-icon"></div>
-	% if display_name is not UNDEFINED and display_name is not None:
-	  <div class="annotatable-title">${display_name} </div>
-	% endif
-	<div class="annotatable-description">Annotated Reading + Guided Discussion</div>
-	<a href="javascript:void(0)" class="annotatable-toggle">Hide Annotations</a>
-</div>
-
-<div class="annotatable-content">
-	${html_content}
-</div>
+	<div class="annotatable-header">
+		<div class="help-icon"></div>
+		% if display_name is not UNDEFINED and display_name is not None:
+		  <div class="annotatable-title">${display_name} </div>
+		% endif
+		<div class="annotatable-description">Annotated Reading + Guided Discussion</div>
+		<a href="javascript:void(0)" class="annotatable-toggle">Hide Annotations</a>
+	</div>
 	
-<script>
-$(function() {
-	$('#${element_id}-wrapper').data('spans', ${json_discussion_for});
-});
-</script>
-
+	<div class="annotatable-content">
+		${html_content}
+	</div>
 </div>
