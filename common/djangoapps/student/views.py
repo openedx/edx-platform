@@ -45,7 +45,7 @@ from collections import namedtuple
 from courseware.courses import get_courses, sort_by_announcement
 from courseware.access import has_access
 from courseware.models import StudentModuleCache
-from courseware.views import get_module_for_descriptor
+from courseware.views import get_module_for_descriptor, jump_to
 from courseware.module_render import get_instance_module
 
 from statsd import statsd
@@ -1138,8 +1138,6 @@ def test_center_login(request):
         log.error("not able to find exam {} for course ID {} and cand ID {}".format(exam_series_code, course_id, client_candidate_id))
         return HttpResponseRedirect(makeErrorURL(error_url, "incorrectCandidateTests"));
     location = exam.exam_url
-    redirect_url = reverse('jump_to', kwargs={'course_id': course_id, 'location': location})
-
     log.info("proceeding with test of cand {} on exam {} for course {}: URL = {}".format(client_candidate_id, exam_series_code, course_id, location))
 
     # check if the test has already been taken
@@ -1195,7 +1193,7 @@ def test_center_login(request):
     login(request, testcenteruser.user)
     
     # And start the test:
-    return redirect(redirect_url)
+    return jump_to(request, course_id, location)
 
 
 def _get_news(top=None):
