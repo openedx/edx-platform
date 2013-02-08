@@ -648,7 +648,7 @@ class CourseDescriptor(SequenceDescriptor):
                 raise ValueError("First appointment date must be before last appointment date")
             if self.registration_end_date > self.last_eligible_appointment_date:
                 raise ValueError("Registration end date must be before last appointment date")
-
+            self.exam_url = exam_info.get('Exam_URL')
 
         def _try_parse_time(self, key):
             """
@@ -704,6 +704,10 @@ class CourseDescriptor(SequenceDescriptor):
         else:
             return None
 
+    def get_test_center_exam(self, exam_series_code):
+        exams = [exam for exam in self.test_center_exams if exam.exam_series_code == exam_series_code]
+        return exams[0] if len(exams) == 1 else None
+        
     @property
     def title(self):
         return self.display_name
