@@ -1,31 +1,20 @@
-import copy
-from fs.errors import ResourceNotFoundError
-import itertools
 import json
 import logging
 from lxml import etree
 from lxml.html import rewrite_links
-from path import path
-import os
-import sys
 
 from pkg_resources import resource_string
 
-from .capa_module import only_one, ComplexEncoder
+from .capa_module import ComplexEncoder
 from .editing_module import EditingDescriptor
-from .html_checker import check_html
 from progress import Progress
 from .stringify import stringify_children
-from .x_module import XModule
 from .xml_module import XmlDescriptor
-from xmodule.modulestore import Location
 import self_assessment_module
 import open_ended_module
-from combined_open_ended_rubric import CombinedOpenEndedRubric, RubricParsingError
-from .stringify import stringify_children
+from combined_open_ended_rubric import CombinedOpenEndedRubric
 import dateutil
 import dateutil.parser
-import datetime
 from timeparse import parse_timedelta
 
 log = logging.getLogger("mitx.courseware")

@@ -1,27 +1,9 @@
-import copy
-from fs.errors import ResourceNotFoundError
-import itertools
 import json
 import logging
-from lxml import etree
-from lxml.html import rewrite_links
 from lxml.html.clean import Cleaner, autolink_html
-from path import path
-import os
-import sys
-import hashlib
-import capa.xqueue_interface as xqueue_interface
 import re
 
-from pkg_resources import resource_string
-
-from .capa_module import only_one, ComplexEncoder
-from .editing_module import EditingDescriptor
-from .html_checker import check_html
 from progress import Progress
-from .stringify import stringify_children
-from .xml_module import XmlDescriptor
-from xmodule.modulestore import Location
 from capa.util import *
 import open_ended_image_submission
 
@@ -74,7 +56,7 @@ class OpenEndedChild(object):
         'done': 'Problem complete',
     }
 
-    def __init__(self, system, location, definition, descriptor, static_data, 
+    def __init__(self, system, location, definition, descriptor, static_data,
                  instance_state=None, shared_state=None, **kwargs):
         # Load instance state
         if instance_state is not None:

@@ -24,7 +24,7 @@ from lxml.html import rewrite_links
 import os
 
 from pkg_resources import resource_string
-from .capa_module import only_one, ComplexEncoder
+from .capa_module import ComplexEncoder
 from .editing_module import EditingDescriptor
 from .html_checker import check_html
 from progress import Progress
