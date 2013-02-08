@@ -172,6 +172,13 @@ class HtmlDescriptor(XmlDescriptor, EditingDescriptor):
         elt.set("filename", relname)
         return elt
 
+    @property
+    def editable_metadata_fields(self):
+        """Remove metadata from the editable fields since it has its own editor"""
+        subset = [field for field in super(HtmlDescriptor,self).editable_metadata_fields
+                  if field not in ['empty']]
+        return subset
+
 
 class AboutDescriptor(HtmlDescriptor):
     """

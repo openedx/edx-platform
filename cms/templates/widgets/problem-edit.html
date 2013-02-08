@@ -1,7 +1,7 @@
 <%include file="metadata-edit.html" />
 <section class="problem-editor editor">
     <div class="row">
-        %if markdown != '' or data == '<problem>\n</problem>\n':
+        %if enable_markdown:
         <div class="editor-bar">
             <ul class="format-buttons">
                 <li><a href="#" class="header-button" data-tooltip="Heading 1"><span
