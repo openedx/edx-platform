@@ -54,6 +54,7 @@ CMS.Views.Settings.Advanced = CMS.Views.ValidatingView.extend({
     },
 
     afterRender: function () {
+        var self = this;
         var listEle$ = this.$el.find('.course-advanced-policy-list');
         var policyValueDivs = listEle$.find('.ace');
         _.each(policyValueDivs,
@@ -67,7 +68,7 @@ CMS.Views.Settings.Advanced = CMS.Views.ValidatingView.extend({
                         // TODO: error checking in case it does not parse!
                         var quotedValue = editor.getValue();
                         var JSONValue = JSON.parse(quotedValue);
-                        self.model.set(key, JSONValue, {validate:true});
+                        self.model.set(key, JSONValue, {validate: true});
 
                     });
                 // Calling getSession() directly in render causes a crash on Chrome.
