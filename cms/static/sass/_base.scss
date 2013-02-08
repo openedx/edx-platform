@@ -534,3 +534,16 @@ hr.divide {
 .sr {
   @include text-sr();
 }
+
+.non-list {
+  list-style: none;
+  margin: 0;
+  padding: 0;
+}
+
+.wrap {
+  text-wrap: wrap;
+  white-space: pre-wrap;
+  white-space: -moz-pre-wrap;
+  word-wrap: break-word;
+}

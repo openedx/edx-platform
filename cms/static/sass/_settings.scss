@@ -44,6 +44,14 @@ body.course.settings {
 
     }
 
+    // UI hints/tips
+    .tip {
+      @include font-size(13);
+      display: block;
+      margin-top: ($baseline/4);
+      color: $gray-l3;
+    }
+
     // form basics
     .list-input {
       margin: 0;
@@ -51,7 +59,7 @@ body.course.settings {
       list-style: none;
 
       .field {
-        margin: 0 0 ($baseline*0.75) 0;
+        margin: 0 0 $baseline 0;
 
         &:last-child {
           margin-bottom: 0;
@@ -77,6 +85,7 @@ body.course.settings {
           @include font-size(14);
           @include transition(color, 0.15s, ease-in-out);
           margin: 0 0 ($baseline/4) 0;
+          font-weight: 400;
 
           &.is-focused {
             color: $blue;
@@ -84,33 +93,15 @@ body.course.settings {
         }
 
         input, textarea {
+          @include placeholder($gray-l4);
           @include font-size(16);
-          height: 100%;
-          width: 100%;
+          @include size(100%,100%);
           padding: ($baseline/2);       
 
           &.long {
-            width: 100%;
           }
 
           &.short {
-            width: 25%;
-          }
-
-          ::-webkit-input-placeholder {
-             color: $gray-l4;
-          }
-
-          :-moz-placeholder {
-             color: $gray-l3; 
-          }
-
-          ::-moz-placeholder {
-             color: $gray-l3;  
-          }
-
-          :-ms-input-placeholder {  
-             color: $gray-l3; 
           }
         }
 
@@ -128,39 +119,122 @@ body.course.settings {
             display: inline-block;
           }
         }
-
-        .tip {
-          @include font-size(13);
-          display: block;
-          margin-top: ($baseline/4);
-          color: $gray-l3;
-        }
       }
 
       .field-group {
         @include clearfix();
         margin: 0 0 ($baseline/2) 0;
+      }
+    }
+
+    // existing inputs
+    .input-existing {
+      margin: 0 0 $baseline 0;
+
+      .actions {
+        margin: ($baseline/4) 0 0 0;
+
+        .remove-item {
+          @include white-button;
+          @include font-size(13);
+        }
+      }
+    }
+
+    // not editable fields
+    .field.is-not-editable {
+
+      label, .label {
+        color: $gray-l3;
+      }
+
+      input {
+        opacity: 0.25;
+      }
+    }
+     
+    // specific fields - basic
+    &.basic {
+
+      .list-input {
+        @include clearfix();
 
         .field {
-          display: block;
-          width: 47%;
-          border-bottom: none;
-          margin: 0 $baseline 0 0;
-          padding-bottom: 0;
-
-          &:nth-child(odd) {
-            float: left;
-          }
-
-          &:nth-child(even) {
-            float: right;
-            margin-right: 0;
-          }
-
-          input, textarea {
-            width: 100%;
-          }
+          margin-bottom: 0;
         }
+      }
+
+      #field-course-organization {
+        float: left;
+        width: flex-grid(2, 9);
+        margin-right: flex-gutter();
+      }
+
+      #field-course-number {
+        float: left;
+        width: flex-grid(2, 9);
+        margin-right: flex-gutter();
+      }
+
+      #field-course-name {
+        float: left;
+        width: flex-grid(5, 9);
+      }
+    }
+
+    // specific fields - schedule
+    &.schedule {
+
+      .list-input {
+        margin-bottom: ($baseline*1.5);
+
+        &:last-child {
+          margin-bottom: 0;
+        }
+      }
+
+      .field-group {
+        @include clearfix();
+        border-bottom: 1px solid $gray-l5;
+        padding-bottom: ($baseline/2);
+
+        &:last-child {
+          border: none;
+          padding-bottom: 0;
+        }
+
+        .field {
+          float: left;
+          width: flex-grid(3, 9);
+          margin-bottom: ($baseline/4);
+          margin-right: flex-gutter();
+
+        }
+      }
+    }
+    
+    // specific fields - overview
+    #field-course-overview {
+
+      #course-overview {
+        height: ($baseline*20);
+      }
+    }
+
+    // specific fields - video
+    #field-course-introduction-video {
+
+      // current video saved/referenced
+      .current {
+        @include size(640px,362px);
+      }
+    }
+
+    // specific fields - requirements
+    &.requirements {
+
+      #field-course-effort {
+        width: flex-grid(3, 9);
       }
     }
   }

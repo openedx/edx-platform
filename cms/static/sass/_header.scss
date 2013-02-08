@@ -220,6 +220,7 @@
     position: relative;
 
     .icon-expand {
+      @include font-size(14);
       @include transition (color 0.5s ease-in-out, opacity 0.5s ease-in-out);
       margin-left: 2px;
       opacity: 0.5;

@@ -33,7 +33,7 @@
 }
 
 // vertical and horizontal centering
-@mixin vertically-and-horizontally-centered ( $height, $width ) {
+@mixin vertically-and-horizontally-centered ($height, $width) {
   left: 50%;
   margin-left: -$width / 2;
   //margin-top: -$height / 2;
@@ -41,4 +41,27 @@
   min-width: $width;
   position: absolute;
   top: 150px;
+}
+
+// sizing
+@mixin size($width: $baseline, $height: $baseline) {
+  height: $height;
+  width: $width;
+}
+
+@mixin square($size: $baseline) {
+  @include size($size);
+}
+
+// placeholder styling
+@mixin placeholder($color) {
+  :-moz-placeholder {
+    color: $color;
+  }
+  ::-webkit-input-placeholder {
+    color: $color;
+  }
+  :-ms-input-placeholder {  
+     color: $color; 
+  }
 }
