@@ -311,6 +311,11 @@
     .content-cta {
       border-top: 1px solid $gray-l4;
 
+      header {
+        border: none;
+        margin: 0;
+        padding: 0;
+      }
 
       .list-actions {
         position: relative;

@@ -29,6 +29,10 @@
     margin: 0 auto;
     color: $gray-l1;
   }
+
+  nav .nav-item {
+    display: inline-block;
+  }
 }
 
 // ====================
@@ -51,9 +55,6 @@
 
 // general nav styles
 // ====================
-nav .nav-item {
-  display: inline-block;
-}
 
 // ====================
 
@@ -81,10 +82,10 @@ nav .nav-item {
 
 // specific elements - course name/info
 .info-course {
+  @include font-size(14);
   position: relative;
   margin: -3px ($baseline/2) 0 0;
   padding-right: ($baseline*0.75);
-  @include font-size(14);
 
   &:before {
     @extend .faded-vertical-divider;

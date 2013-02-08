@@ -1,4 +1,5 @@
-// login and sign up UI
+// Studio - Sign In/Up
+// ====================
 .signup, .signin {
 
   .wrapper-content {
@@ -25,7 +26,6 @@
 
       h1 {
         @include font-size(32);
-        float: none;
         margin: 0;
         padding: 0;
         font-weight: 600;
@@ -243,6 +243,8 @@
     }
   }
 }
+
+// ====================
 
 // messages
 .message {
