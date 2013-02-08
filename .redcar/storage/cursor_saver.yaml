@@ -207,4 +207,7 @@ cursor_positions:
   - :path: common/static/coffee/src/discussion/views/discussion_thread_view_inline.coffee
     :cursor_offset: 1244
     :timestamp: 2013-02-06 17:12:07 -05:00
+  - :path: .gitignore
+    :cursor_offset: 330
+    :timestamp: 2013-02-08 15:08:21 -05:00
 files_to_retain: 0

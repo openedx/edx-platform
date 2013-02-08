@@ -23,9 +23,9 @@
         %if is_course_cohorted and is_moderator:
         <span class="group-filter-label cohort">Show:</span>
             <select class="group-filter-select cohort-options cohort"> 
-                <option value="all">All Groups</option>
+                <option value="all">View All</option>
                     %for c in cohorts:
-                        <option value="${c.id}">${c.name} and public</option>
+                        <option value="${c.id}">View as ${c.name}</option>
                     %endfor
             </select>        
         %endif
