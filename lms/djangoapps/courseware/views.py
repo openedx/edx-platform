@@ -174,8 +174,7 @@ def check_for_active_timelimit_module(request, course_id, course):
                 location = timelimit_module.location
                 # determine where to go when the timer expires:
                 if 'time_expired_redirect_url' not in timelimit_descriptor.metadata:
-                    # TODO: provide a better error
-                    raise Http404
+                    raise Http404("No {0} metadata at this location: {1} ".format('time_expired_redirect_url', location))
                 time_expired_redirect_url = timelimit_descriptor.metadata.get('time_expired_redirect_url')
                 context['time_expired_redirect_url'] = time_expired_redirect_url
                 # Fetch the end time (in GMT) as stored in the module when it was started.
@@ -197,8 +196,7 @@ def update_timelimit_module(user, course_id, student_module_cache, timelimit_des
     context = {}
     # determine where to go when the exam ends:
     if 'time_expired_redirect_url' not in timelimit_descriptor.metadata: 
-        # TODO: provide a better error
-        raise Http404
+        raise Http404("No {0} metadata at this location: {1} ".format('time_expired_redirect_url', timelimit_module.location))
     time_expired_redirect_url = timelimit_descriptor.metadata.get('time_expired_redirect_url')
     context['time_expired_redirect_url'] = time_expired_redirect_url
 
@@ -206,8 +204,7 @@ def update_timelimit_module(user, course_id, student_module_cache, timelimit_des
         if not timelimit_module.has_begun:
             # user has not started the exam, so start it now.
             if 'duration' not in timelimit_descriptor.metadata:
-                # TODO: provide a better error
-                raise Http404
+                raise Http404("No {0} metadata at this location: {1} ".format('duration', timelimit_module.location))
             # The user may have an accommodation that has been granted to them.
             # This accommodation information should already be stored in the module's state.
             duration = int(timelimit_descriptor.metadata.get('duration'))
@@ -295,7 +292,7 @@ def index(request, course_id, chapter=None, section=None,
             instance_module = get_instance_module(course_id, request.user, course_module, student_module_cache)
             save_child_position(course_module, chapter, instance_module)
         else:
-            raise Http404
+            raise Http404('No chapter descriptor found with name {}'.format(chapter))
 
         chapter_module = course_module.get_child_by(lambda m: m.url_name == chapter)
         if chapter_module is None:

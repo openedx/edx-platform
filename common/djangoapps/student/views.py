@@ -1166,10 +1166,9 @@ def test_center_login(request):
                                   'ETDBTM' : 'ADDDOUBLE', }
 
     time_accommodation_code = None
-    if registration.get_accommodation_codes():
-        for code in registration.get_accommodation_codes():
-            if code in time_accommodation_mapping:
-                time_accommodation_code = time_accommodation_mapping[code]
+    for code in registration.get_accommodation_codes():
+        if code in time_accommodation_mapping:
+            time_accommodation_code = time_accommodation_mapping[code]
     # special, hard-coded client ID used by Pearson shell for testing:
     if client_candidate_id == "edX003671291147":
         time_accommodation_code = 'TESTING'
