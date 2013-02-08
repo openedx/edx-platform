@@ -11,8 +11,7 @@ CMS.Views.Settings.Advanced = CMS.Views.ValidatingView.extend({
         'click .cancel-button' : "revertView",
         'click .new-button' : "addEntry",
         // update model on changes
-        'change #course-advanced-policy-key' : "updateKey",
-        'change #course-advanced-policy-value' : "updateValue"
+        'change #course-advanced-policy-key' : "updateKey"
         // TODO enable/disable save (add disabled class) based on validation & dirty
         // TODO enable/disable new button?
     },
@@ -27,6 +26,11 @@ CMS.Views.Settings.Advanced = CMS.Views.ValidatingView.extend({
             }
         );
         this.model.on('error', this.handleValidationError, this);
+        this.render = _.wrap(this.render, function(render) {
+            render();
+            self.afterRender();
+            return self;
+        });
     },
     render: function() {
         // catch potential outside call before template loaded
@@ -46,17 +50,32 @@ CMS.Views.Settings.Advanced = CMS.Views.ValidatingView.extend({
                 self.fieldToSelectorMap[key] = key;
             });
 
-        // Swap in ACE Editor for all the value (JSON) fields.
+        return this;
+    },
+
+    afterRender: function () {
+        var listEle$ = this.$el.find('.course-advanced-policy-list');
         var policyValueDivs = listEle$.find('.ace');
         _.each(policyValueDivs,
             function (div) {
                 var editor = ace.edit(div);
-                 editor.setTheme("ace/theme/chrome");
-                 editor.getSession().setMode("ace/mode/json");
-                 editor.setHighlightActiveLine(false);
+                editor.setTheme("ace/theme/chrome");
+                editor.setHighlightActiveLine(false);
+                editor.on("blur",
+                    function (e) {
+                        var key = $(editor.container).closest('.row').children('.key').attr('id');
+                        // TODO: error checking in case it does not parse!
+                        var quotedValue = editor.getValue();
+                        var JSONValue = JSON.parse(quotedValue);
+                        self.model.set(key, JSONValue, {validate:true});
+
+                    });
+                // Calling getSession() directly in render causes a crash on Chrome.
+                // Seems to be OK in afterRender method.
+                editor.getSession().setMode("ace/mode/json");
             });
-        return this;
     },
+
     deleteEntry : function(event) {
         event.preventDefault();
         // find out which entry
@@ -178,13 +197,5 @@ CMS.Views.Settings.Advanced = CMS.Views.ValidatingView.extend({
             return false;
         }
         else return true;
-    },
-    updateValue : function(event) {
-        // much simpler than key munging. just update the value
-        var key = $(event.currentTarget).closest('.row').children('.key').attr('id');
-        var value = $(event.currentTarget).val();
-        console.log('updating ', key, value);
-
-        this.model.set(key, value, {validate:true});
     }
 });
