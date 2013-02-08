@@ -92,7 +92,8 @@ class ConditionalModule(XModule):
         an AJAX call.
         """
         if not self.is_condition_satisfied():
-            context = {'module': self}
+            context = {'module': self,
+                        'show_deps': False}
             html = self.system.render_template('conditional_module.html',
                 context)
             return json.dumps({'html': [html]})
