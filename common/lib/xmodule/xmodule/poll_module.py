@@ -70,8 +70,13 @@ class PollModule(XModule):
                                'total': sum(self.poll_answers.values()),
                                'callback': {'objectName': 'Conditional'}
                                })
-        # return error message
-        return json.dumps({'error': 'Unknown Command!'})
+        elif dispatch == 'get_state':
+            return json.dumps({'poll_answer': self.poll_answer,
+                               'poll_answers': self.poll_answers,
+                               'total': sum(self.poll_answers.values())
+                               })
+        else: # return error message
+            return json.dumps({'error': 'Unknown Command!'})
 
     def get_html(self):
         """Renders parameters to template."""
