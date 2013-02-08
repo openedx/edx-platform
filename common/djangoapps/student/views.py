@@ -1099,7 +1099,6 @@ def test_center_login(request):
     # expected values....
     # registration_id = request.POST.get("registrationID")
     # exit_url = request.POST.get("exitURL")
-    
 
     # find testcenter_user that matches the provided ID:
     try:
@@ -1107,7 +1106,6 @@ def test_center_login(request):
     except TestCenterUser.DoesNotExist:
         log.error("not able to find demographics for cand ID {}".format(client_candidate_id))
         return HttpResponseRedirect(makeErrorURL(error_url, "invalidClientCandidateID"));
-
 
     # find testcenter_registration that matches the provided exam code:
     # Note that we could rely in future on either the registrationId or the exam code, 
@@ -1118,7 +1116,11 @@ def test_center_login(request):
         log.error("missing exam series code for cand ID {}".format(client_candidate_id))
         return HttpResponseRedirect(makeErrorURL(error_url, "missingExamSeriesCode"));
     exam_series_code = request.POST.get('vueExamSeriesCode')
-    
+    # special case for supporting test user:
+    if client_candidate_id == "edX003671291147" and exam_series_code != '6002x001':
+        log.warning("test user {} using unexpected exam code {}, coercing to 6002x001".format(client_candidate_id, exam_series_code))
+        exam_series_code = '6002x001'
+
     registrations = TestCenterRegistration.objects.filter(testcenter_user=testcenteruser, exam_series_code=exam_series_code)
     if not registrations:
         log.error("not able to find exam registration for exam {} and cand ID {}".format(exam_series_code, client_candidate_id))
