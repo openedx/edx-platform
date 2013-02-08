@@ -70,7 +70,7 @@ class OpenEndedChild(object):
     HUMAN_NAMES = {
         'initial': 'Not started',
         'assessing': 'In progress',
-        'post_assessment': 'In progress',
+        'post_assessment': 'Done',
         'done': 'Done',
     }
 
