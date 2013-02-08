@@ -3,6 +3,9 @@ if (!CMS.Views['Settings']) CMS.Views.Settings = {};
 CMS.Views.Settings.Advanced = CMS.Views.ValidatingView.extend({
     // the key for a newly added policy-- before the user has entered a key value
     new_key : "__new_advanced_key__",
+    error_saving : "error_saving",
+    unsaved_changes: "unsaved_changes",
+    successful_changes: "successful_changes",
 
     // Model class is CMS.Models.Settings.Advanced
     events : {
@@ -46,6 +49,7 @@ CMS.Views.Settings.Advanced = CMS.Views.ValidatingView.extend({
             });
         var policyValueDivs = listEle$.find('.ace');
         _.each(policyValueDivs, this.attachAce, this);
+        this.showMessage();
         return this;
     },
     attachAce : function (div) {
@@ -60,11 +64,32 @@ CMS.Views.Settings.Advanced = CMS.Views.ValidatingView.extend({
                 var quotedValue = editor.getValue();
                 var JSONValue = JSON.parse(quotedValue);
                 self.model.set(key, JSONValue, {validate: true});
+                self.showMessage(self.unsaved_changes);
 
             });
         // Calling getSession() directly in render causes a crash on Chrome.
         // Seems to be OK in afterRender method.
         editor.getSession().setMode("ace/mode/json");
+    },
+
+    showMessage: function (type) {
+        this.$el.find(".message-status").removeClass("is-shown");
+        // var saveButton = this.$el.find(".save-button").addClass('disabled');
+        // var cancelButton = this.$el.find(".cancel-button").addClass('disabled');
+        if (type) {
+            if (type === this.error_saving) {
+                this.$el.find(".message-status.error").addClass("is-shown");
+                // saveButton.removeClass("disabled");
+                // cancelButton.removeClass("disabled");
+            }
+            else if (type === this.unsaved_changes) {
+                this.$el.find(".message-status.warning").addClass("is-shown");
+                // saveButton.removeClass("disabled");
+                // cancelButton.removeClass("disabled");
+            }
+            else if (type === this.successful_changes)
+                this.$el.find(".message-status.confirm").addClass("is-shown");
+        }
     },
 
     deleteEntry : function(event) {
@@ -80,6 +105,7 @@ CMS.Views.Settings.Advanced = CMS.Views.ValidatingView.extend({
             this.model.unset(key);
         }
         li$.remove();
+        this.showMessage(this.unsaved_changes);
     },
     saveView : function(event) {
         // TODO one last verification scan:
@@ -90,7 +116,7 @@ CMS.Views.Settings.Advanced = CMS.Views.ValidatingView.extend({
             {
             success : function() {
                 self.render();
-                window.alert("Saved");
+                self.showMessage(self.successful_changes);
             },
             error : CMS.ServerError
         });
@@ -115,6 +141,7 @@ CMS.Views.Settings.Advanced = CMS.Views.ValidatingView.extend({
         var policyValueDivs = this.$el.find('#' + this.new_key).closest('li').find('.ace');
         // only 1 but hey, let's take advantage of the context mechanism
         _.each(policyValueDivs, this.attachAce, this);
+        this.showMessage(this.unsaved_changes);
     },
     updateKey : function(event) {
         // old key: either the key as in the model or new_key.
@@ -181,6 +208,7 @@ CMS.Views.Settings.Advanced = CMS.Views.ValidatingView.extend({
             _.each(policyValueDivs, this.attachAce, this);
             
             this.fieldToSelectorMap[newKey] = newKey;
+            this.showMessage(this.unsaved_changes);
         }
     },
     validateKey : function(oldKey, newKey) {
