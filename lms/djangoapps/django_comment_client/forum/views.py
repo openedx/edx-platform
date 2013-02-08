@@ -171,7 +171,7 @@ def inline_discussion(request, course_id, discussion_id):
         'allow_anonymous_to_peers': allow_anonymous_to_peers,
         'allow_anonymous': allow_anonymous,
         'cohorts': cohorts_list,
-        'is_cohorted': is_cohorted       
+        'is_cohorted': is_cohorted
     })
 
 
