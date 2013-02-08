@@ -22,10 +22,13 @@ class ConditionalModule(XModule):
 
     Example:
 
-        <conditional sources="i4x://.../problem_1" completed="True">
+        <conditional sources="i4x://.../problem_1; i4x://.../problem_2" completed="True">
             <show sources="i4x://.../test_6; i4x://.../Avi_resources"/>
             <video url_name="secret_video" />
         </conditional>
+
+        TODO string comparison
+            multiple answer for every poll
 
     """
 
@@ -74,7 +77,7 @@ class ConditionalModule(XModule):
                 if callable(attr):
                     attr = attr()
 
-                return xml_value == attr
+                return xml_value == str(attr)
         return False
 
     def get_html(self):
