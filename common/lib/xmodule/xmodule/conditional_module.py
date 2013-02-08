@@ -59,7 +59,7 @@ class ConditionalModule(XModule):
             % xml_attr)
 
     def is_condition_satisfied(self):
-        self.required_modules = [self.system.get_module(descriptor) for
+        self.required_modules = [self.system.get_module(descriptor.location) for
             descriptor in self.descriptor.get_required_module_descriptors()]
         xml_value, attr_name = self._get_condition()
 
