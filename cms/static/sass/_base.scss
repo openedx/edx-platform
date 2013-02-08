@@ -535,6 +535,10 @@ hr.divide {
   @include text-sr();
 }
 
+.fake-link {
+  cursor: pointer;
+}
+
 .non-list {
   list-style: none;
   margin: 0;

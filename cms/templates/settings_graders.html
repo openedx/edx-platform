@@ -1,13 +1,11 @@
 <%inherit file="base.html" />
 <%block name="title">Grading</%block>
-<%block name="bodyclass">is-signedin course settings</%block>
-
+<%block name="bodyclass">is-signedin course grading settings</%block>
 
 <%namespace name='static' file='static_content.html'/>
 <%!
 from contentstore import utils 
 %>
-
 
 <%block name="jsextra">
   <link rel="stylesheet" type="text/css" href="${static.url('js/vendor/timepicker/jquery.timepicker.css')}" />
@@ -22,102 +20,140 @@ from contentstore import utils
   
   <script type="text/javascript">
     $(document).ready(function(){
+
+      $("form :input").focus(function() {
+        $("label[for='" + this.id + "']").addClass("is-focused");
+      }).blur(function() {
+        $("label").removeClass("is-focused");
+      });
+      
+      var editor = new CMS.Views.Settings.Details({
+          el: $('.settings-details'),
+          model: new CMS.Models.Settings.CourseDetails(${course_details|n},{parse:true})
+      });
     
-        var editor = new CMS.Views.Settings.Grading({
-            el: $('.settings-grading'),
-            model : new CMS.Models.Settings.CourseGradingPolicy(${course_details|n},{parse:true})
-        });
-        
-        editor.render();
+      var editor = new CMS.Views.Settings.Grading({
+          el: $('.settings-grading'),
+          model : new CMS.Models.Settings.CourseGradingPolicy(${course_details|n},{parse:true})
+      });
+      
+      editor.render();
     });
       
   </script>
 </%block>
 
 <%block name="content">
-  <!-- -->
-  <div class="main-wrapper">
-    <div class="inner-wrapper">      
-      <h1>Settings</h1>
-      <article class="settings-overview">
-        <div class="settings-page-section main-column">
+<div class="wrapper-content wrapper">
+  <section class="content">
+    <header>
+      <span class="title-sub">Settings</span>
+      <h1 class="title-1">Grading</h1>
+    </header>
 
-          <section class="settings-grading is-shown">
-            <h2 class="title">Grading</h2>
+    <!-- <div class="introduction">
+      <p>Lorem ipsum dolor sit amet, consectetuer adipiscing elit. Aenean commodo ligula eget dolor. Aenean massa. Cum sociis natoque penatibus et magnis dis parturient montes, nascetur ridiculus mus. Donec quam felis, ultricies nec, pellentesque eu, pretium quis, sem.</p>
+    </div> -->
 
-            <section class="settings-grading-range">
-              <header>
-                <h3>Overall Grade Range</h3>
-                <span class="detail">Course grade ranges and their values</span>
-              </header>
+    <article class="content-primary" role="main">
+      <form id="settings_details" method="post" action="">
+        <section class="group-settings grade-range">
+          <header>
+            <h2 class="title-2">Overall Grade Range</h2>
+            <span class="tip">Your overall grading scale for student final grades</span>
+          </header>
 
-              <div class="row">
-                
-                <div class="grade-controls course-grading-range well">
-                  <a href="#" class="new-grade-button"><span class="plus-icon"></span></a>
-                  <div class="grade-slider">
-                    <div class="grade-bar">
-                      <ol class="increments">
-                        <li class="increment-0">0</li>
-                        <li class="increment-10">10</li>
-                        <li class="increment-20">20</li>
-                        <li class="increment-30">30</li>
-                        <li class="increment-40">40</li>
-                        <li class="increment-50">50</li>
-                        <li class="increment-60">60</li>
-                        <li class="increment-70">70</li>
-                        <li class="increment-80">80</li>
-                        <li class="increment-90">90</li>
-                        <li class="increment-100">100</li>
-                      </ol>
-                      <ol class="grades">
-                      </ol>
-                    </div>
-                  </div>
-                </div>
-
-              </div>
-            </section>
-
-            <section class="settings-grading-general">
-              <header>
-                <h3>General Grading</h3>
-                <span class="detail">Deadlines and Requirements</span>
-              </header>
-
-              <div class="row row-col2">
-                <label for="course-grading-graceperiod">Grace Period on Deadline:</label>
-
-                <div class="field">
-                  <div class="input">
-                    <input type="text" class="short time" id="course-grading-graceperiod" value="0:00" placeholder="e.g. 10 minutes">
-                    <span class="tip tip-inline">leeway on due dates</span>
+          <ol class="list-input">
+            <li class="field text is-not-editable" id="field-course-organization">
+              <div class="grade-controls course-grading-range well">
+                <a href="#" class="new-grade-button"><span class="plus-icon"></span></a>
+                <div class="grade-slider">
+                  <div class="grade-bar">
+                    <ol class="increments">
+                      <li class="increment-0">0</li>
+                      <li class="increment-10">10</li>
+                      <li class="increment-20">20</li>
+                      <li class="increment-30">30</li>
+                      <li class="increment-40">40</li>
+                      <li class="increment-50">50</li>
+                      <li class="increment-60">60</li>
+                      <li class="increment-70">70</li>
+                      <li class="increment-80">80</li>
+                      <li class="increment-90">90</li>
+                      <li class="increment-100">100</li>
+                    </ol>
+                    <ol class="grades">
+                    </ol>
                   </div>
                 </div>
               </div>
-            </section>
+            </li>
+          </ol>
+          <span class="tip tip-stacked">Add different overall course grading scales and drag to set their cut-off points</span>
+        </section>
 
-            <section class="setting-grading-assignment-types">
-              <header>
-                <h3>Assignment Types</h3>
-              </header>
+        <hr class="divide" />
 
-              <div class="row">
-                <div class="field enum">
-                  <ul class="input-list course-grading-assignment-list">
-                  </ul>
+        <section class="group-settings">
+          <header>
+            <h2 class="title-2">Grading Rules &amp; Policies</h2>
+            <span class="tip">Deadlines, requirements, and logistics around grading student work</span>
+          </header>
 
-                  <a href="#" class="new-button new-course-grading-item add-grading-data">
-                    <span class="plus-icon white"></span>New Assignment Type
-                  </a>
-                  </div>
-                </div>
-            </section>
-          </section><!-- .settings-grading -->
+          <ol class="list-input">
+            <li class="field text is-not-editable" id="field-course-organization">
+              <label for="course-organization">Organization</label>
+              <input type="text" class="long" id="course-organization" value="[Course Organization]" disabled="disabled" />
+            </li>
 
-        </div>
-      </article>
-    </div>
-  </div>
-  <footer></footer>
+            <li class="field text is-not-editable" id="field-course-number">
+              <label for="course-number">Course Number</label>
+              <input type="text" class="short" id="course-number" value="[Course No.]" disabled="disabled">
+            </li>
+
+            <li class="field text is-not-editable" id="field-course-name">
+              <label for="course-name">Course Name</label>
+              <input type="text" class="long" id="course-name" value="[Course Name]" disabled="disabled" />
+            </li>
+          </ol>
+          <span class="tip tip-stacked">These are used in <a href="${utils.get_lms_link_for_about_page(course_location)}" />your course URL</a>, and cannot be changed</span>
+        </section>
+
+        <hr class="divide" />
+
+        <section class="group-settings">
+          <header>
+            <h2 class="title-2">Assignment Types</h2>
+            <span class="tip">Categories and labels for any exercises that are gradable</span>
+          </header>
+
+          <ol class="list-input">
+            <li class="field text is-not-editable" id="field-course-organization">
+              <label for="course-organization">Organization</label>
+              <input type="text" class="long" id="course-organization" value="[Course Organization]" disabled="disabled" />
+            </li>
+          </ol>
+          <span class="tip tip-stacked">These are used in <a href="${utils.get_lms_link_for_about_page(course_location)}" />your course URL</a>, and cannot be changed</span>
+        </section>
+      </form>
+    </article>
+
+    <aside class="content-supplementary" role="complimentary">
+      <div class="bit">
+        <h3 class="title-3">How will these settings be used</h3>
+        <p>Lorem ipsum dolor sit amet, consectetuer adipiscing elit. Aenean commodo ligula eget dolor. Aenean massa. Cum sociis natoque penatibus et magnis dis parturient montes, nascetur ridiculus mus. Donec quam felis, ultricies nec, pellentesque eu, pretium quis, sem.</p>
+      </div>
+
+      <div class="bit">
+        <h3 class="title-3">Other Course Settings</h3>
+        <nav class="nav-related">
+          <ul>
+            <li class="nav-item"><a href="">Details &amp; Schedule</a></li>
+            <li class="nav-item"><a href="">Advanced Settings</a></li>
+          </ul>
+        </nav>
+      </div>
+    </aside>
+  </section>
+</div>
 </%block>
