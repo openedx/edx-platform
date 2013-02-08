@@ -285,7 +285,7 @@ if Backbone?
           if $(event.target).attr('cohorted') == "True"
             @retrieveDiscussions(discussionIds, "function(){$('.cohort').show();}")
           else
-            @retrieveDiscussions(discussionIds, "function(){$('.cohort').show();}")
+            @retrieveDiscussions(discussionIds, "function(){$('.cohort').hide();}")
     
     chooseCohort: (event) ->
       @group_id = @$('.cohort-options :selected').val()
