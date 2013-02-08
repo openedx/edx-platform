@@ -12,6 +12,7 @@ import cgi
 import json
 import logging
 from copy import deepcopy
+from collections import OrderedDict
 
 from lxml import etree
 from pkg_resources import resource_string
@@ -94,7 +95,7 @@ class PollModule(XModule):
         Returns:
             string - Serialize json.
         """
-        answers_to_json = {}
+        answers_to_json = OrderedDict()
 
         # FIXME: fix this, when xblock support mutable types.
         # Now we use this hack.
