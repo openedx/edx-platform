@@ -2,6 +2,8 @@
 
 import json
 
+from .lazymod import LazyModule
+
 def straw(v):
     return json.loads(json.dumps(jsonable_dict(v)))
 
@@ -26,6 +28,13 @@ def safe_exec(code, globals_dict, locals_dict=None, future_division=False, assum
         l_dict = g_dict
     else:
         l_dict = straw(locals_dict)
+
+    for modname in assumed_imports or ():
+        if isinstance(modname, tuple):
+            name, modname = modname
+        else:
+            name = modname
+        g_dict[name] = LazyModule(modname)
 
     exec code in g_dict, l_dict
 
