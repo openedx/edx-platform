@@ -35,100 +35,69 @@ class ConditionalModule(XModule):
     js_module_name = "Conditional"
     css = {'scss': [resource_string(__name__, 'css/capa/display.scss')]}
 
-    # xml_object = String(scope=Scope.content)
     contents = String(scope=Scope.content)
-    show_modules = String(scope=Scope.content)
 
-    conditions_map = {'poll_answer': 'poll_answer',
-                'compeleted': 'is_competed()'}
-
-    def _get_required_modules(self):
-        self.required_modules = []
-        for loc in self.descriptor.required_module_locations:
-            module = self.system.get_module(loc)
-            self.required_modules.append(module)
-        #log.debug('required_modules=%s' % (self.required_modules))
+    # TODO
+    conditions_map = {
+        'poll_answer': 'poll_answer',  # poll_question attr
+        'compeleted': 'is_competed',  # capa_problem attr
+        'voted': 'voted'  # poll_question attr
+    }
 
     def _get_condition(self):
         # get first valid contition
-        for key in self.conditions_map:
-            if self.descriptor.xml_attributes.get(key, None):
-                return key
+        for xml_attr, attr_name in self.conditions_map.iteritems():
+            xml_value = self.descriptor.xml_attributes.get(xml_attr)
+            if xml_value:
+                return xml_value, attr_name
+        raise Exception('Error in conditional module: unknown condition "%s"'
+            % xml_attr)
 
     def is_condition_satisfied(self):
-        self._get_required_modules()
-        self.condition = self._get_condition()
+        self.required_modules = [self.system.get_module(descriptor) for
+            descriptor in self.descriptor.get_required_module_descriptors()]
+        xml_value, attr_name = self._get_condition()
 
-        if self.condition == 'completed':
-            # all required modules must be completed, as determined by
-            # the modules .is_completed() method
+        if xml_value:
             for module in self.required_modules:
-                #log.debug('in is_condition_satisfied; student_answers=%s' % module.lcp.student_answers)
-                #log.debug('in is_condition_satisfied; instance_state=%s' % module.instance_state)
-                if not hasattr(module, self.conditions_map.get('poll_answer')):
-                    raise Exception('Error in conditional module: required module %s has no .is_completed() method' % module)
-                if not getattr(module, self.conditions_map.get('completed'))():
-                    log.debug('conditional module: %s not completed' % module)
-                    return False
-                else:
-                    log.debug('conditional module: %s IS completed' % module)
-            return True
-        elif self.condition == 'poll_answer':
-            for module in self.required_modules:
-                if not hasattr(module, self.conditions_map.get(self.condition)):
-                    raise Exception('Error in conditional module: required module %s has no poll_answer field' % module)
-                module_value = getattr(module, self.conditions_map.get(self.condition))
-                answer = self.descriptor.xml_attributes.get(self.condition)
-                if answer == 'unanswered' and module_value:
-                    return False
-                if module_value != answer:
-                    return False
-            return True
-        else:
-            raise Exception('Error in conditional module: unknown condition "%s"' % self.condition)
+                if not hasattr(module, attr_name):
+                    raise Exception('Error in conditional module: \
+                        required module %s has no .is_completed() method'
+                        % module)
 
+                attr = getattr(module, attr_name)
+                if callable(attr):
+                    attr = attr()
+
+                return xml_value == attr
         return False
 
     def get_html(self):
-        # self.is_condition_satisfied()
         return self.system.render_template('conditional_ajax.html', {
             'element_id': self.location.html_id(),
             'id': self.id,
             'ajax_url': self.system.ajax_url,
         })
 
-    def _get_modules_to_show(self):
-        to_show = [tuple(x.strip().split('/', 1)) for x in self.show_modules.split(';')]
-        self.modules_to_show = []
-        for (tag, name) in to_show:
-            loc = self.location.dict()
-            loc['category'] = tag
-            loc['name'] = name
-            self.modules_to_show.append(Location(loc))
-
     def handle_ajax(self, dispatch, post):
         '''
         This is called by courseware.moduleodule_render, to handle an AJAX call.
         '''
-        #log.debug('conditional_module handle_ajax: dispatch=%s' % dispatch)
         if not self.is_condition_satisfied():
             context = {'module': self}
             html = self.system.render_template('conditional_module.html', context)
             return json.dumps({'html': [html]})
 
         if self.contents is None:
-            # self.contents = [child.get_html() for child in self.get_display_items()]
-            # self.contents = [self.system.get_module(x).get_html() for x in self.modules_to_show]
             self.contents = [self.system.get_module(child_descriptor.location).get_html()
                     for child_descriptor in self.descriptor.get_children()]
 
         html = self.contents
-        #log.debug('rendered conditional module %s' % str(self.location))
         return json.dumps({'html': html})
 
 
 class ConditionalDescriptor(SequenceDescriptor):
-    """TODO: add docs."""
+    """Descriptor for conditional xmodule."""
     module_class = ConditionalModule
 
     filename_extension = "xml"
@@ -136,24 +105,22 @@ class ConditionalDescriptor(SequenceDescriptor):
     stores_state = True
     has_score = False
 
-    show_modules = String(scope=Scope.content)
-
-    def __init__(self, *args, **kwargs):
-        super(ConditionalDescriptor, self).__init__(*args, **kwargs)
-        required_module_list = [(x.strip().split('/', 5)[4:6]) for x in
-            self.xml_attributes.get('source', '').split(';')]
-        self.required_module_locations = []
-        for (tag, name) in required_module_list:
-            loc = self.location.dict()
-            loc['category'] = tag
-            loc['name'] = name
-            self.required_module_locations.append(Location(loc))
-        log.debug('ConditionalDescriptor required_module_locations=%s' % self.required_module_locations)
-
     def get_required_module_descriptors(self):
-        """Returns a list of XModuleDescritpor instances upon which this module depends, but are
+        """TODO: Returns a list of XModuleDescritpor instances upon which this module depends, but are
         not children of this module"""
-        return [self.system.load_item(loc) for loc in self.required_module_locations]
+        descriptors = []
+        sources = self.xml_attributes.get('sources')
+        if sources:
+            locations = [location.strip() for location in sources.split(';')]
+            for location in locations:
+                # Check valid location url.
+                if Location.is_valid(location):
+                    try:
+                        descriptor = self.system.load_item(location)
+                        descriptors.append(descriptor)
+                    except ItemNotFoundError:
+                        log.exception("Invalid module by location.")
+        return descriptors
 
     @classmethod
     def definition_from_xml(cls, xml_object, system):
@@ -170,7 +137,7 @@ class ConditionalDescriptor(SequenceDescriptor):
                             system.load_item(location)
                             urls.append(location)
                         except ItemNotFoundError:
-                            pass
+                            log.exception("Invalid descriptor by location.")
             return urls
 
         children = []
