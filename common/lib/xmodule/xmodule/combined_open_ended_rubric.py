@@ -10,6 +10,13 @@ GRADER_TYPE_IMAGE_DICT = {
     'IN' : '/static/images/peer_grading_icon.png',
     }
 
+HUMAN_GRADER_TYPE = {
+    'SA' : 'Self-Assessment',
+    'PE' : 'Peer-Assessment',
+    'IN' : 'Instructor-Assessment',
+    'ML' : 'AI-Assessment',
+    }
+
 class RubricParsingError(Exception):
     def __init__(self, msg):
         self.msg = msg
@@ -184,6 +191,7 @@ class CombinedOpenEndedRubric(object):
              'max_score': max_score,
              'combined_rubric' : True,
              'grader_type_image_dict' : GRADER_TYPE_IMAGE_DICT,
+             'human_grader_types' : HUMAN_GRADER_TYPE,
             })
         return html
 

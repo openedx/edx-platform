@@ -22,7 +22,7 @@ from .xml_module import XmlDescriptor
 from xmodule.modulestore import Location
 import self_assessment_module
 import open_ended_module
-from combined_open_ended_rubric import CombinedOpenEndedRubric, RubricParsingError, GRADER_TYPE_IMAGE_DICT
+from combined_open_ended_rubric import CombinedOpenEndedRubric, RubricParsingError, GRADER_TYPE_IMAGE_DICT, HUMAN_GRADER_TYPE
 from .stringify import stringify_children
 import dateutil
 import dateutil.parser
@@ -467,6 +467,12 @@ class CombinedOpenEndedV1Module():
             grader_type = grader_types[0]
         else:
             grader_type = "IN"
+
+        if grader_type in HUMAN_GRADER_TYPE:
+            human_grader_name = HUMAN_GRADER_TYPE[grader_type]
+        else:
+            human_grader_name = grader_type
+
         last_response_dict = {
             'response': last_response,
             'score': last_score,
@@ -483,6 +489,7 @@ class CombinedOpenEndedV1Module():
             'grader_types' : grader_types,
             'feedback_items' : feedback_items,
             'grader_type' : grader_type,
+            'human_grader_type' : human_grader_name,
             }
         return last_response_dict
 
@@ -563,6 +570,15 @@ class CombinedOpenEndedV1Module():
         html = self.system.render_template('combined_open_ended_results.html', context)
         return {'html': html, 'success': True}
 
+    def get_status_ajax(self, get):
+        """
+        Gets the results of a given grader via ajax.
+        Input: AJAX get dictionary
+        Output: Dictionary to be rendered via ajax that contains the result html.
+        """
+        html = self.get_status()
+        return {'html': html, 'success': True}
+
     def handle_ajax(self, dispatch, get):
         """
         This is called by courseware.module_render, to handle an AJAX call.
@@ -579,6 +595,7 @@ class CombinedOpenEndedV1Module():
             'reset': self.reset,
             'get_results': self.get_results,
             'get_combined_rubric': self.get_rubric,
+            'get_status' : self.get_status_ajax,
         }
 
         if dispatch not in handlers:

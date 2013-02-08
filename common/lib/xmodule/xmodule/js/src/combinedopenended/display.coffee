@@ -51,6 +51,7 @@ class @CombinedOpenEnded
     @reset_button.click @reset
     @next_problem_button = @$('.next-step-button')
     @next_problem_button.click @next_problem
+    @status_container = @$('.status-elements')
 
     @show_results_button=@$('.show-results-button')
     @show_results_button.click @show_results
@@ -130,6 +131,13 @@ class @CombinedOpenEnded
         @combined_rubric_container.after(response.html).remove()
         @combined_rubric_container= $('div.combined_rubric_container')
 
+  show_status_current: () =>
+    data = {}
+    $.postWithPrefix "#{@ajax_url}/get_status", data, (response) =>
+      if response.success
+        @status_container.after(response.html).remove()
+        @status_container= $('.status-elements')
+
   message_post: (event)=>
     Logger.log 'message_post', @answers
     external_grader_message=$(event.target).parent().parent().parent()
@@ -171,7 +179,7 @@ class @CombinedOpenEnded
     @next_problem_button.hide()
     @hide_file_upload()
     @hint_area.attr('disabled', false)
-
+    @show_status_current()
     if @task_number>1
       @show_combined_rubric_current()
     if @task_number==1 and @child_state=='assessing'
