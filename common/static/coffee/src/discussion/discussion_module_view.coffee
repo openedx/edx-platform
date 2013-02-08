@@ -70,6 +70,7 @@ if Backbone?
       DiscussionUtil.loadRoles(response.roles)
       allow_anonymous = response.allow_anonymous
       allow_anonymous_to_peers = response.allow_anonymous_to_peers
+      cohorts = response.cohorts
       # $elem.html("Hide Discussion")
       @discussion = new Discussion()
       @discussion.reset(response.discussion_data, {silent: false})
@@ -78,8 +79,12 @@ if Backbone?
       #determined in the coffeescript based on whether or not there's a
       #group id
       
-      $discussion = $(Mustache.render $("script#_inline_discussion").html(), {'threads':response.discussion_data, 'discussionId': discussionId, 'allow_anonymous_to_peers': allow_anonymous_to_peers, 'allow_anonymous': allow_anonymous})
+      if response.is_cohorted
+        source = "script#_inline_discussion_cohorted"
+      else
+        source = "script#_inline_discussion"
       
+      $discussion = $(Mustache.render $(source).html(), {'threads':response.discussion_data, 'discussionId': discussionId, 'allow_anonymous_to_peers': allow_anonymous_to_peers, 'allow_anonymous': allow_anonymous, 'cohorts':cohorts})
       if @$('section.discussion').length
         @$('section.discussion').replaceWith($discussion)
       else
