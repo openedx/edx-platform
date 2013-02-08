@@ -1,4 +1,4 @@
-1360362070
+1360364478
 Ammeter	/home/kevin/mitx_all/mitx/lms/static/coffee/module/1-222009e8c24f5628677581995d2488d9.js	function Ammeter(x,y,rotation,color,offset)
 B	/home/kevin/mitx_all/mitx/common/static/js/capa/jsme/jsme_export.nocache.js	function B()
 B	/home/kevin/mitx_all/mitx/common/static/js/capa/protex/protex.nocache.js	function B(){var b=false;try{var c=m.location.search;return (c.indexOf(U)!=-1||(c.indexOf(V)!=-1||m.external&&m.external.gwtOnLoad))&&c.indexOf(W)==-1}catch(a){}B=function()
@@ -46,7 +46,6 @@ Device	/home/kevin/mitx_all/mitx/lms/static/coffee/module/1-222009e8c24f56286775
 Diode	/home/kevin/mitx_all/mitx/lms/static/coffee/module/1-222009e8c24f5628677581995d2488d9.js	function Diode(n1,n2,v,type)
 Diode	/home/kevin/mitx_all/mitx/lms/static/coffee/module/1-222009e8c24f5628677581995d2488d9.js	function Diode(x,y,rotation,name,area,type)
 DiscussionModuleView	/home/kevin/mitx_all/mitx/common/static/coffee/src/discussion/discussion_module_view.js	function DiscussionModuleView()
-DiscussionThreadListView	/home/kevin/mitx_all/mitx/common/static/coffee/src/discussion/views/discussion_thread_list_view.js	function DiscussionThreadListView()
 E	/home/kevin/mitx_all/mitx/common/static/js/capa/jsme/jsme_export.nocache.js	function E()
 E	/home/kevin/mitx_all/mitx/common/static/js/capa/protex/protex.nocache.js	function E(){var b=document.getElementsByTagName(mb);for(var c=0,d=b.length;c<d;++c){var e=b[c],f=e.getAttribute(nb),g;if(f){f=f.replace(ob,P);if(f.indexOf(pb)>=0){continue}if(f==qb){g=e.getAttribute(rb);if(g){var h,i=g.indexOf(sb);if(i>=0){f=g.substring(0,i);h=g.substring(i+1)}else{f=g;h=P}u[f]=h}}else if(f==tb){g=e.getAttribute(rb);if(g){try{A=eval(g)}catch(a){alert(ub+g+vb)}}}else if(f==wb){g=e.getAttribute(rb);if(g){try{z=eval(g)}catch(a){alert(ub+g+xb)
 ElOutput	/home/kevin/mitx_all/mitx/lms/static/coffee/module/7-40fec654f1c6f76f154392f82caf37df.js	function ElOutput(config, state)
@@ -146,7 +145,6 @@ ctor	/home/kevin/mitx_all/mitx/lms/static/coffee/module/5-2f8f384f2ff10dfe7b3afd
 ctor	/home/kevin/mitx_all/mitx/lms/static/coffee/module/3-ae3a8f704bfe7366649872bb0cee3863.js	function ctor() { this.constructor = child; } ctor.prototype = parent.prototype; child.prototype = new ctor()
 ctor	/home/kevin/mitx_all/mitx/lms/static/coffee/module/6-7682277e07e67ea91adaf3e720f359a6.js	function ctor() { this.constructor = child; } ctor.prototype = parent.prototype; child.prototype = new ctor()
 ctor	/home/kevin/mitx_all/mitx/lms/static/coffee/module/1-e54b5c7f7b657100c24d82263144a4fd.js	function ctor() { this.constructor = child; } ctor.prototype = parent.prototype; child.prototype = new ctor()
-ctor	/home/kevin/mitx_all/mitx/common/static/coffee/src/discussion/views/discussion_thread_list_view.js	function ctor() { this.constructor = child; } ctor.prototype = parent.prototype; child.prototype = new ctor()
 dialog_cancel	/home/kevin/mitx_all/mitx/lms/static/coffee/module/1-222009e8c24f5628677581995d2488d9.js	function dialog_cancel(event)
 dialog_check_for_ENTER	/home/kevin/mitx_all/mitx/lms/static/coffee/module/1-222009e8c24f5628677581995d2488d9.js	function dialog_check_for_ENTER(event)
 dialog_okay	/home/kevin/mitx_all/mitx/lms/static/coffee/module/1-222009e8c24f5628677581995d2488d9.js	function dialog_okay(event)

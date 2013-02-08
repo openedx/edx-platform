@@ -977,7 +977,7 @@ body.discussion {
   }
 
   .sort-bar {
-    height: 27px;
+    height: auto;
     border-bottom: 1px solid #a3a3a3;
     @include linear-gradient(top, rgba(255, 255, 255, .3), rgba(255, 255, 255, 0));
     background-color: #aeaeae;

@@ -135,9 +135,6 @@ cursor_positions:
   - :path: common/static/coffee/src/discussion/utils.coffee
     :cursor_offset: 316
     :timestamp: 2013-02-05 21:29:02 -05:00
-  - :path: lms/templates/discussion/mustache/_inline_discussion_cohorted.mustache
-    :cursor_offset: 2158
-    :timestamp: 2013-02-05 21:17:52 -05:00
   - :path: lms/templates/discussion/_single_thread.html
     :cursor_offset: 308
     :timestamp: 2013-02-06 17:12:07 -05:00
@@ -184,9 +181,6 @@ cursor_positions:
   - :path: lms/templates/discussion/index.html
     :cursor_offset: 408
     :timestamp: 2012-12-10 23:45:38 -05:00
-  - :path: lms/templates/discussion/_new_post.html
-    :cursor_offset: 2472
-    :timestamp: 2013-02-06 21:29:38 -05:00
   - :path: common/static/coffee/src/discussion/views/new_post_inline_vew.js
     :cursor_offset: 0
     :timestamp: 2013-02-06 18:31:50 -05:00
@@ -196,9 +190,6 @@ cursor_positions:
   - :path: lms/templates/discussion/mustache/_inline_discussion.mustache
     :cursor_offset: 1994
     :timestamp: 2013-02-07 19:39:13 -05:00
-  - :path: common/static/coffee/src/discussion/views/discussion_thread_list_view.coffee
-    :cursor_offset: 9947
-    :timestamp: 2013-02-07 19:14:08 -05:00
   - :path: common/static/coffee/src/discussion/views/new_post_inline_vew.coffee
     :cursor_offset: 917
     :timestamp: 2013-02-06 17:12:07 -05:00
@@ -210,4 +201,20 @@ cursor_positions:
   - :path: .gitignore
     :cursor_offset: 330
     :timestamp: 2013-02-08 15:08:21 -05:00
+  - :path: lms/templates/discussion/mustache/_inline_discussion_cohorted.mustache
+    :cursor_offset: 2147
+    :timestamp: 2013-02-08 14:41:31 -05:00
+  - :path: lms/templates/discussion/_new_post.html
+    :cursor_offset: 464
+    :timestamp: 2013-02-07 10:06:27 -05:00
+    :selection_offset: 405
+    :block_selection_mode: false
+  - :path: lms/templates/discussion/_thread_list_template.html
+    :cursor_offset: 1257
+    :timestamp: 2013-02-08 15:40:40 -05:00
+  - :path: common/static/coffee/src/discussion/views/discussion_thread_list_view.coffee
+    :cursor_offset: 10449
+    :timestamp: 2013-02-08 17:21:06 -05:00
+    :selection_offset: 10438
+    :block_selection_mode: false
 files_to_retain: 0
