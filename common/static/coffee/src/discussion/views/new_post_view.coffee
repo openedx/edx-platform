@@ -17,6 +17,11 @@ if Backbone?
           
           @$(".new-post-tags").tagsInput DiscussionUtil.tagsInputOptions()
           
+          if @$($(".topic_menu li a")[0]).attr('cohorted') != "True"
+            $('.choose-cohort').hide();
+          
+            
+          
       events:
           "submit .new-post-form":            "createPost"
           "click  .topic_dropdown_button":    "toggleTopicDropdown"

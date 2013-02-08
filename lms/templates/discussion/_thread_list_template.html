@@ -18,6 +18,17 @@
             <li><a href="#" data-sort="votes">votes</a></li>
             <li><a href="#" data-sort="comments">comments</a></li>
         </ul>
+        
+
+        %if is_course_cohorted and is_moderator:
+        <span class="group-filter-label cohort">Show:</span>
+            <select class="group-filter-select cohort-options cohort"> 
+                <option value="all">All Groups</option>
+                    %for c in cohorts:
+                        <option value="${c.id}">${c.name} and public</option>
+                    %endfor
+            </select>        
+        %endif
     </div>
     <div class="post-list-wrapper">
         <ul class="post-list">

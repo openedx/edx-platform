@@ -1,0 +1,3 @@
+--- 
+open_files: 
+  - lms/djangoapps/django_comment_client/forum/views.py
