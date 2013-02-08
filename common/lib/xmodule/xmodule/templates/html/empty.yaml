@@ -1,6 +1,7 @@
 ---
 metadata:
-      display_name: Empty
+    display_name: Blank HTML Page
+    empty: True
 
 data: |
 
