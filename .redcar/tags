@@ -1,4 +1,4 @@
-1360356040
+1360356243
 Ammeter	/home/kevin/mitx_all/mitx/lms/static/coffee/module/1-222009e8c24f5628677581995d2488d9.js	function Ammeter(x,y,rotation,color,offset)
 B	/home/kevin/mitx_all/mitx/common/static/js/capa/jsme/jsme_export.nocache.js	function B()
 B	/home/kevin/mitx_all/mitx/common/static/js/capa/protex/protex.nocache.js	function B(){var b=false;try{var c=m.location.search;return (c.indexOf(U)!=-1||(c.indexOf(V)!=-1||m.external&&m.external.gwtOnLoad))&&c.indexOf(W)==-1}catch(a){}B=function()
