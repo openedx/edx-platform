@@ -814,11 +814,7 @@ class TestCourseGrader(LoginEnrollmentTestCase):
         xmodule.modulestore.django._MODULESTORES = {}
         courses = modulestore().get_courses()
 
-        def find_course(course_id):
-            """Assumes the course is present"""
-            return [c for c in courses if c.id == course_id][0]
-
-        self.graded_course = find_course("edX/graded/2012_Fall")
+        self.graded_course = modulestore().get_course("edX/graded/2012_Fall")
 
         # create a test student
         self.student = 'view@test.com'
