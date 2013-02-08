@@ -1,4 +1,6 @@
-# -*- coding: utf-8 -*-
+"""Conditional module is the xmodule, which you can use for disabling
+some xmodules by conditions.
+"""
 
 import json
 import logging
@@ -20,7 +22,8 @@ class ConditionalModule(XModule):
 
     Example:
 
-        <conditional condition="require_completed" required="tag/url_name1&tag/url_name2">
+        <conditional sources="i4x://.../problem_1" completed="True">
+            <show sources="i4x://.../test_6; i4x://.../Avi_resources"/>
             <video url_name="secret_video" />
         </conditional>
 
@@ -37,7 +40,9 @@ class ConditionalModule(XModule):
 
     contents = String(scope=Scope.content)
 
-    # TODO
+    # Map
+    # key: <tag attribute in xml>
+    # value: <name of module attribute>
     conditions_map = {
         'poll_answer': 'poll_answer',  # poll_question attr
         'compeleted': 'is_competed',  # capa_problem attr
@@ -45,7 +50,7 @@ class ConditionalModule(XModule):
     }
 
     def _get_condition(self):
-        # get first valid contition
+        # Get first valid condition.
         for xml_attr, attr_name in self.conditions_map.iteritems():
             xml_value = self.descriptor.xml_attributes.get(xml_attr)
             if xml_value:
@@ -80,17 +85,19 @@ class ConditionalModule(XModule):
         })
 
     def handle_ajax(self, dispatch, post):
-        '''
-        This is called by courseware.moduleodule_render, to handle an AJAX call.
-        '''
+        """This is called by courseware.moduleodule_render, to handle
+        an AJAX call.
+        """
         if not self.is_condition_satisfied():
             context = {'module': self}
-            html = self.system.render_template('conditional_module.html', context)
+            html = self.system.render_template('conditional_module.html',
+                context)
             return json.dumps({'html': [html]})
 
         if self.contents is None:
-            self.contents = [self.system.get_module(child_descriptor.location).get_html()
-                    for child_descriptor in self.descriptor.get_children()]
+            self.contents = [self.system.get_module(child_descriptor.location
+                ).get_html()
+                for child_descriptor in self.descriptor.get_children()]
 
         html = self.contents
         return json.dumps({'html': html})
