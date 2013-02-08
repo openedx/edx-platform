@@ -32,6 +32,7 @@ class ConditionalModule(XModule):
 
     # xml_object = String(scope=Scope.content)
     contents = String(scope=Scope.content)
+    show_modules = String(scope=Scope.content)
 
     def _get_required_modules(self):
         self.required_modules = []
@@ -84,6 +85,16 @@ class ConditionalModule(XModule):
             'ajax_url': self.system.ajax_url,
         })
 
+    def _get_modules_to_show(self):
+        to_show = [tuple(x.strip().split('/',1)) for x in self.show_modules.split(';')]
+        self.modules_to_show = []
+        for (tag, name) in to_show:
+            loc = self.location.dict()
+            loc['category'] = tag
+            loc['name'] = name
+            self.modules_to_show.append(Location(loc))
+
+
     def handle_ajax(self, dispatch, post):
         '''
         This is called by courseware.moduleodule_render, to handle an AJAX call.
@@ -98,8 +109,10 @@ class ConditionalModule(XModule):
         if self.contents is None:
             import ipdb; ipdb.set_trace()
             # self.contents = [child.get_html() for child in self.get_display_items()]
-            self.contents = [self.system.get_module(child_descriptor.location).get_html()
+            self.contents = [self.system.get_module(x).get_html() for x in self.modules_to_show]
+            self.contents += [self.system.get_module(child_descriptor.location).get_html()
                     for child_descriptor in self.descriptor.get_children()]
+
 
         html = self.contents
         #log.debug('rendered conditional module %s' % str(self.location))
@@ -114,16 +127,19 @@ class ConditionalDescriptor(SequenceDescriptor):
     stores_state = True
     has_score = False
 
+    show_modules = String(scope=Scope.content)
+
     def __init__(self, *args, **kwargs):
         super(ConditionalDescriptor, self).__init__(*args, **kwargs)
         # import ipdb; ipdb.set_trace()
-        required_module_list = [tuple(x.strip().split('/',1)) for x in self.xml_attributes.get('required','').split(';')]
+        required_module_list = [(x.strip().split('/',5)[4:6]) for x in self.xml_attributes.get('source','').split(';')]
         self.required_module_locations = []
         for (tag, name) in required_module_list:
             loc = self.location.dict()
             loc['category'] = tag
             loc['name'] = name
             self.required_module_locations.append(Location(loc))
+        # import ipdb; ipdb.set_trace()
         log.debug('ConditionalDescriptor required_module_locations=%s' % self.required_module_locations)
 
     def get_required_module_descriptors(self):
@@ -133,18 +149,19 @@ class ConditionalDescriptor(SequenceDescriptor):
 
     @classmethod
     def definition_from_xml(cls, xml_object, system):
-        # import ipdb; ipdb.set_trace()
         children = []
         for child in xml_object:
-            try:
-                children.append(system.process_xml(etree.tostring(child)).location.url())
-            except Exception, e:
-                log.exception("Unable to load child when parsing Conditional. Continuing...")
-                if system.error_tracker is not None:
-                    system.error_tracker("ERROR: " + str(e))
-                continue
-        # import ipdb; ipdb.set_trace()
-        return {}, children
+            if child.tag != 'show':
+                try:
+                    children.append(system.process_xml(etree.tostring(child)).location.url())
+                except Exception, e:
+                    log.exception("Unable to load child when parsing Conditional. Continuing...")
+                    if system.error_tracker is not None:
+                        system.error_tracker("ERROR: " + str(e))
+                    continue
+            else:
+                cls.show_modules = child.get('source')
+        return {'show_modules':''}, children
 
     def definition_to_xml(self, resource_fs):
         xml_object = etree.Element('sequential')
