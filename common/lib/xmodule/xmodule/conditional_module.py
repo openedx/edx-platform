@@ -38,6 +38,9 @@ class ConditionalModule(XModule):
     contents = String(scope=Scope.content)
     show_modules = String(scope=Scope.content)
 
+    conditions_map = {'poll_answer': 'poll_answer',
+                'compeleted': 'is_competed()'}
+
     def _get_required_modules(self):
         self.required_modules = []
         for loc in self.descriptor.required_module_locations:
@@ -46,34 +49,38 @@ class ConditionalModule(XModule):
         #log.debug('required_modules=%s' % (self.required_modules))
 
     def _get_condition(self):
-        return self.descriptor.xml_attributes.get('condition', '')
+        # get first valid contition
+        for key in self.conditions_map:
+            if self.descriptor.xml_attributes.get(key, None):
+                return key
 
     def is_condition_satisfied(self):
         self._get_required_modules()
         self.condition = self._get_condition()
 
-        if self.condition == 'require_completed':
+        if self.condition == 'completed':
             # all required modules must be completed, as determined by
             # the modules .is_completed() method
             for module in self.required_modules:
                 #log.debug('in is_condition_satisfied; student_answers=%s' % module.lcp.student_answers)
                 #log.debug('in is_condition_satisfied; instance_state=%s' % module.instance_state)
-                if not hasattr(module, 'is_completed'):
+                if not hasattr(module, self.conditions_map.get('poll_answer')):
                     raise Exception('Error in conditional module: required module %s has no .is_completed() method' % module)
-                if not module.is_completed():
+                if not getattr(module, self.conditions_map.get('completed'))():
                     log.debug('conditional module: %s not completed' % module)
                     return False
                 else:
                     log.debug('conditional module: %s IS completed' % module)
             return True
-        elif self.condition == 'answer':
+        elif self.condition == 'poll_answer':
             for module in self.required_modules:
-                if not hasattr(module, 'poll_answer'):
+                if not hasattr(module, self.conditions_map.get(self.condition)):
                     raise Exception('Error in conditional module: required module %s has no poll_answer field' % module)
-                answer = self.descriptor.xml_attributes.get('answer')
-                if answer == 'unanswered' and module.poll_answer:
+                module_value = getattr(module, self.conditions_map.get(self.condition))
+                answer = self.descriptor.xml_attributes.get(self.condition)
+                if answer == 'unanswered' and module_value:
                     return False
-                if module.poll_answer != answer:
+                if module_value != answer:
                     return False
             return True
         else:
@@ -110,8 +117,8 @@ class ConditionalModule(XModule):
 
         if self.contents is None:
             # self.contents = [child.get_html() for child in self.get_display_items()]
-            self.contents = [self.system.get_module(x).get_html() for x in self.modules_to_show]
-            self.contents += [self.system.get_module(child_descriptor.location).get_html()
+            # self.contents = [self.system.get_module(x).get_html() for x in self.modules_to_show]
+            self.contents = [self.system.get_module(child_descriptor.location).get_html()
                     for child_descriptor in self.descriptor.get_children()]
 
         html = self.contents
@@ -140,7 +147,6 @@ class ConditionalDescriptor(SequenceDescriptor):
             loc['category'] = tag
             loc['name'] = name
             self.required_module_locations.append(Location(loc))
-        # import ipdb; ipdb.set_trace()
         log.debug('ConditionalDescriptor required_module_locations=%s' % self.required_module_locations)
 
     def get_required_module_descriptors(self):
@@ -156,10 +162,10 @@ class ConditionalDescriptor(SequenceDescriptor):
             sources = child.get('sources')
             if sources:
                 for url in [url.strip() for url in sources.split(';')]:
-                    try:
-                        Location(url)
+                    # Check valid location url.
+                    if Location.is_valid(url):
                         urls.append(url)
-                    except:
+                    else:
                         log.exception("Bad location url - {0}".format(url))
             return urls
 
