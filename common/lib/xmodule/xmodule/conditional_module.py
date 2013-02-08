@@ -9,6 +9,7 @@ from xmodule.x_module import XModule
 from xmodule.modulestore import Location
 from xmodule.seq_module import SequenceDescriptor
 from xblock.core import String, Scope
+from xmodule.modulestore.exceptions import ItemNotFoundError
 
 log = logging.getLogger('mitx.' + __name__)
 
@@ -161,12 +162,15 @@ class ConditionalDescriptor(SequenceDescriptor):
             urls = []
             sources = child.get('sources')
             if sources:
-                for url in [url.strip() for url in sources.split(';')]:
+                locations = [location.strip() for location in sources.split(';')]
+                for location in locations:
                     # Check valid location url.
-                    if Location.is_valid(url):
-                        urls.append(url)
-                    else:
-                        log.exception("Bad location url - {0}".format(url))
+                    if Location.is_valid(location):
+                        try:
+                            system.load_item(location)
+                            urls.append(location)
+                        except ItemNotFoundError:
+                            pass
             return urls
 
         children = []
