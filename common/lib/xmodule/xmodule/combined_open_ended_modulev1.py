@@ -600,12 +600,16 @@ class CombinedOpenEndedV1Module():
                     'rubric_html': rubric_html,
                     'grader_type': ri['grader_type'],
                     'feedback' : feedback,
+                    'grader_id' : ri['grader_ids'][i],
+                    'submission_id' : ri['submission_ids'][i],
                 }
                 context_list.append(context)
         feedback_table = self.system.render_template('open_ended_result_table.html', {
             'context_list' : context_list,
             'grader_type_image_dict' : GRADER_TYPE_IMAGE_DICT,
             'human_grader_types' : HUMAN_GRADER_TYPE,
+            'rows': 50,
+            'cols': 50,
         })
         context = {
             'results': feedback_table,

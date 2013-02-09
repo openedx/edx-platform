@@ -137,9 +137,8 @@ div.result-container {
     }
 
     .evaluation-response {
-        margin-bottom: 10px;
+        margin-bottom: 2px;
         header {
-            text-align: right;
             a {
                 font-size: .85em;
             }
@@ -253,10 +252,15 @@ div.result-container {
           }
         }
       }
-  .rubric-result {
-    font-size: .9em;
+  .rubric-result-container {
+    .rubric-result {
+      font-size: .9em;
+      padding: 2px;
+      display: inline-table;
+    }
     padding: 2px;
-    display: inline-table;
+    margin: 0px;
+    display : inline;
   }
 }
 
