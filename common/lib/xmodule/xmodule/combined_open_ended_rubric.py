@@ -53,7 +53,10 @@ class CombinedOpenEndedRubric(object):
             rubric_scores = [cat['score'] for cat in rubric_categories]
             max_scores = map((lambda cat: cat['options'][-1]['points']), rubric_categories)
             max_score = max(max_scores)
-            html = self.system.render_template('open_ended_rubric.html',
+            rubric_template = 'open_ended_rubric.html'
+            if self.view_only:
+                rubric_template = 'open_ended_view_only_rubric.html'
+            html = self.system.render_template(rubric_template,
                     {'categories': rubric_categories,
                      'has_score': self.has_score,
                      'view_only': self.view_only,
@@ -192,7 +195,7 @@ class CombinedOpenEndedRubric(object):
                             rubric_categories[i]['options'][j]['grader_types'].append(grader_type)
 
         log.debug(rubric_categories)
-        html = self.system.render_template('open_ended_rubric.html',
+        html = self.system.render_template('open_ended_combined_rubric.html',
             {'categories': rubric_categories,
              'has_score': True,
              'view_only': True,
