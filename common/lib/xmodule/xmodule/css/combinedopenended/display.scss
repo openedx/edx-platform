@@ -119,6 +119,7 @@ div.combined-rubric-container {
       }
     }
   }
+  margin-bottom: 5px;
 }
 
 div.result-container {
@@ -252,6 +253,11 @@ div.result-container {
           }
         }
       }
+  .rubric-result {
+    font-size: .9em;
+    padding: 2px;
+    display: inline-table;
+  }
 }
 
 

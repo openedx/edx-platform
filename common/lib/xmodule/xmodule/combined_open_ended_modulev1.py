@@ -591,15 +591,22 @@ class CombinedOpenEndedV1Module():
         for ri in all_responses:
             for i in xrange(0,len(ri['rubric_scores'])):
                 feedback = ri['feedback_dicts'][i].get('feedback','')
+                rubric_data = self.rubric_renderer.render_rubric(stringify_children(self.static_data['rubric']), ri['rubric_scores'][i])
+                if rubric_data['success']:
+                    rubric_html = rubric_data['html']
+                else:
+                    rubric_html = ''
                 context = {
-                    'rubric_html': self.rubric_renderer.render_rubric(stringify_children(self.static_data['rubric']), ri['rubric_scores'][i]),
+                    'rubric_html': rubric_html,
                     'grader_type': ri['grader_type'],
-                    'grader_type_image_dict' : GRADER_TYPE_IMAGE_DICT,
-                    'human_grader_types' : HUMAN_GRADER_TYPE,
                     'feedback' : feedback,
                 }
                 context_list.append(context)
-        feedback_table = self.system.render_template('open_ended_result_table.html', {'context_list' : context_list})
+        feedback_table = self.system.render_template('open_ended_result_table.html', {
+            'context_list' : context_list,
+            'grader_type_image_dict' : GRADER_TYPE_IMAGE_DICT,
+            'human_grader_types' : HUMAN_GRADER_TYPE,
+        })
         context = {
             'results': feedback_table,
             'task_name' : "Combined Results",

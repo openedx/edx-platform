@@ -1,14 +1,21 @@
-% for context in context_list:
-    % if context['grader_type'] in grader_type_image_dict:
+% for co in context_list:
+    % if co['grader_type'] in grader_type_image_dict:
+        <%grader_type=co['grader_type']%>
         <% grader_image = grader_type_image_dict[grader_type] %>
         % if grader_type in human_grader_types:
             <% human_title = human_grader_types[grader_type] %>
         % else:
             <% human_title = grader_type %>
         % endif
-        <img src="${grader_image}" title="${human_title}"/>
-        % endif
-        ${rubric_html}
-        ${feedback}
+        <div class="rubric-result">
+            <img src="${grader_image}" title="${human_title}"/>
+        </div>
+        <div class="rubric-result">
+            ${co['rubric_html']}
+        </div>
+        <div class="rubric-result">
+            ${co['feedback']}
+        </div>
+        <br/>
     %endif
 %endfor
