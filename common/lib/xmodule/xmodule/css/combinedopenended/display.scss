@@ -43,6 +43,17 @@ section.combined-open-ended {
   }
 }
 
+section.legend-container {
+  .legenditem {
+    color: 	#FFFFFF;
+    background-color : #000000;
+    font-size: .9em;
+    padding: 2px;
+    display: inline;
+    width: 20%;
+  }
+}
+
 section.combined-open-ended-status {
 
     .statusitem {
@@ -59,12 +70,12 @@ section.combined-open-ended-status {
       .show-results-button {
           font: 1em monospace;
       }
-   }
+    }
 
    .statusitem-current {
      background-color: #B2B2B2;
      color: #222;
-  }
+   }
 
     span {
         &.unanswered {

@@ -397,13 +397,13 @@ class @CombinedOpenEnded
         window.queuePollerID = window.setTimeout(@poll, 10000)
 
   setup_file_upload: =>
-    if window.File and window.FileReader and window.FileList and window.Blob
-        if @accept_file_upload == "True"
-          @can_upload_files = true
-          @file_upload_area.html('<input type="file" class="file-upload-box">')
-          @file_upload_area.show()
-    else
-      @gentle_alert 'File uploads are required for this question, but are not supported in this browser. Try the newest version of google chrome.  Alternatively, if you have uploaded the image to the web, you can paste a link to it into the answer box.'
+    if @accept_file_upload == "True"
+      if window.File and window.FileReader and window.FileList and window.Blob
+        @can_upload_files = true
+        @file_upload_area.html('<input type="file" class="file-upload-box">')
+        @file_upload_area.show()
+      else
+        @gentle_alert 'File uploads are required for this question, but are not supported in this browser. Try the newest version of google chrome.  Alternatively, if you have uploaded the image to the web, you can paste a link to it into the answer box.'
 
   hide_file_upload: =>
     if @accept_file_upload == "True"
