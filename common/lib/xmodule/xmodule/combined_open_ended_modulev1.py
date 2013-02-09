@@ -433,6 +433,9 @@ class CombinedOpenEndedV1Module():
         last_score = task.latest_score()
         last_post_assessment = task.latest_post_assessment(self.system)
         last_post_feedback = ""
+        feedback_dicts = [{}]
+        grader_ids = [0]
+        submission_ids = [0]
         if task_type == "openended":
             last_post_assessment = task.latest_post_assessment(self.system, short_feedback=False, join_feedback=False)
             if isinstance(last_post_assessment, list):
@@ -447,6 +450,9 @@ class CombinedOpenEndedV1Module():
             rubric_scores = rubric_data['rubric_scores']
             grader_types = rubric_data['grader_types']
             feedback_items = rubric_data['feedback_items']
+            feedback_dicts =  rubric_data['feedback_dicts']
+            grader_ids = rubric_data['grader_ids']
+            submission_ids =  rubric_data['submission_ids']
         elif task_type== "selfassessment":
             rubric_scores = last_post_assessment
             grader_types = ['SA']
@@ -491,6 +497,9 @@ class CombinedOpenEndedV1Module():
             'feedback_items' : feedback_items,
             'grader_type' : grader_type,
             'human_grader_type' : human_grader_name,
+            'feedback_dicts' : feedback_dicts,
+            'grader_ids' : grader_ids,
+            'submission_ids' : submission_ids,
             }
         return last_response_dict
 
