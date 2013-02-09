@@ -15,12 +15,20 @@
                 ${co['rubric_html']}
             </div>
             <div class="rubric-result">
-                ${co['feedback']}
+                %if len(co['feedback'])>2:
+                    <div class="collapsible evaluation-response">
+                        <header>
+                            <a href="#">See full feedback</a>
+                        </header>
+                        <section class="feedback-full">
+                            ${co['feedback']}
+                        </section>
+                %endif
             </div>
             %if grader_type!="SA":
                 <div class="rubric-result">
                     <input type="hidden" value="${co['grader_id']}" class="grader_id" />
-                    <input type="hidden" value="${co['submission_id']}" class=submission_id" />
+                    <input type="hidden" value="${co['submission_id']}" class="submission_id" />
                     <div class="collapsible evaluation-response">
                         <header>
                             <a href="#">Respond to Feedback</a>
