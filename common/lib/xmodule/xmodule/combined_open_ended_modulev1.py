@@ -558,7 +558,7 @@ class CombinedOpenEndedV1Module():
         response_dict = all_responses[-1]
         context = {
             'results': rubric_html,
-            'task_name' : 'Combined Rubric',
+            'task_name' : 'Scored Rubric',
             'class_name' : 'combined-rubric-container'
         }
         html = self.system.render_template('combined_open_ended_results.html', context)
@@ -613,7 +613,7 @@ class CombinedOpenEndedV1Module():
         })
         context = {
             'results': feedback_table,
-            'task_name' : "Combined Results",
+            'task_name' : "Results",
             'class_name' : "result-container",
             }
         html = self.system.render_template('combined_open_ended_results.html', context)

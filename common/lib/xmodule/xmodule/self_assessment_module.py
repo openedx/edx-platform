@@ -249,7 +249,6 @@ class SelfAssessmentModule(openendedchild.OpenEndedChild):
         d = {'success': True, }
 
         self.change_state(self.DONE)
-        d['message_html'] = self.get_message_html()
         d['allow_reset'] = self._allow_reset()
 
         d['state'] = self.state

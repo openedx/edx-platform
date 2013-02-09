@@ -309,7 +309,6 @@ class @CombinedOpenEnded
             @find_hint_elements()
           else if @child_state == 'done'
             @rubric_wrapper.hide()
-            @message_wrapper.html(response.message_html)
 
           @rebind()
         else
