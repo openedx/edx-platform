@@ -573,9 +573,10 @@ class CombinedOpenEndedV1Module():
         Input: AJAX get dictionary
         Output: Dictionary to be rendered via ajax that contains the result html.
         """
-        task_number = int(get['task_number'])
         self.update_task_states()
-        response_dict = self.get_last_response(task_number)
+        loop_up_to_task = self.current_task_number+1
+        for i in xrange(0,loop_up_to_task):
+            all_responses.append(self.get_last_response(i))
         context = {
             'results': response_dict['post_assessment'],
             'task_number': task_number + 1,

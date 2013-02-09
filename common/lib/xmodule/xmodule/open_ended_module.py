@@ -429,7 +429,17 @@ class OpenEndedModule(openendedchild.OpenEndedChild):
             correct:         Correctness of submission (Boolean)
             score:           Points to be assigned (numeric, can be float)
         """
-        fail = {'valid': False, 'score': 0, 'feedback': '', 'rubric_scores' : [[0]], 'grader_types' : [''], 'feedback_items' : ['']}
+        fail = {
+            'valid': False,
+            'score': 0,
+            'feedback': '',
+            'rubric_scores' : [[0]],
+            'grader_types' : [''],
+            'feedback_items' : [''],
+            'feedback_dicts' : [{}],
+            'grader_ids' : [0],
+            'submission_ids' : [0],
+            }
         try:
             score_result = json.loads(score_msg)
         except (TypeError, ValueError):
@@ -458,6 +468,9 @@ class OpenEndedModule(openendedchild.OpenEndedChild):
             feedback_items = []
             rubric_scores = []
             grader_types = []
+            feedback_dicts = []
+            grader_ids = []
+            submission_ids = []
             for i in xrange(0, len(score_result['score'])):
                 new_score_result = {
                     'score': score_result['score'][i],
@@ -473,6 +486,9 @@ class OpenEndedModule(openendedchild.OpenEndedChild):
                 feedback_items.append(feedback_template)
                 rubric_scores.append(rubric_score)
                 grader_types.append(score_result['grader_type'])
+                feedback_dicts.append(score_result['feedback'][i])
+                grader_ids.append(score_result['grader_id'][i])
+                submission_ids.append(score_result['submission_id'])
             if join_feedback:
                 feedback = "".join(feedback_items)
             else:
@@ -485,6 +501,9 @@ class OpenEndedModule(openendedchild.OpenEndedChild):
             rubric_scores = [rubric_score]
             grader_types = [score_result['grader_type']]
             feedback_items = [feedback]
+            feedback_dicts = [score_result['feedback']]
+            grader_ids = [score_result['grader_id']]
+            submission_ids = [score_result['submission_id']]
 
         self.submission_id = score_result['submission_id']
         self.grader_id = score_result['grader_id']
@@ -495,7 +514,10 @@ class OpenEndedModule(openendedchild.OpenEndedChild):
             'feedback': feedback,
             'rubric_scores' : rubric_scores,
             'grader_types' : grader_types,
-            'feedback_items' : feedback_items
+            'feedback_items' : feedback_items,
+            'feedback_dicts' : feedback_dicts,
+            'grader_ids' : grader_ids,
+            'submission_ids' : submission_ids,
         }
 
     def latest_post_assessment(self, system, short_feedback=False, join_feedback=True):
