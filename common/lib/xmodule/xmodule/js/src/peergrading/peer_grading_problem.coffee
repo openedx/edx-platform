@@ -217,7 +217,7 @@ class @PeerGradingProblem
     @calibration_feedback_button.click =>
       @calibration_feedback_panel.hide()
       @grading_wrapper.show()
-      @gentle_alert "Calibration essay saved.  Fetching next essay."
+      @gentle_alert "Calibration essay saved.  Fetched the next essay."
       @is_calibrated_check()
 
     @interstitial_page_button.click =>
@@ -318,7 +318,7 @@ class @PeerGradingProblem
     if response.success
       @is_calibrated_check()
       @grading_message.fadeIn()
-      @grading_message.html("<p>Grade sent successfully.</p>")
+      @grading_message.html("<p>Successfully saved your feedback. Fetched the next essay.</p>")
     else
       if response.error
         @render_error(response.error)
@@ -360,6 +360,7 @@ class @PeerGradingProblem
       @calibration_panel.find('.grading-text').hide()
       @grading_panel.find('.grading-text').hide()
       @flag_student_container.hide()
+      @feedback_area.val("")
 
       @submit_button.unbind('click')
       @submit_button.click @submit_calibration_essay
@@ -387,6 +388,7 @@ class @PeerGradingProblem
       @calibration_panel.find('.grading-text').show()
       @grading_panel.find('.grading-text').show()
       @flag_student_container.show()
+      @feedback_area.val("")
 
       @submit_button.unbind('click')
       @submit_button.click @submit_grade
