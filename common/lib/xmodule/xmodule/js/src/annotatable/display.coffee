@@ -3,64 +3,89 @@ class @Annotatable
 
     wrapperSelector: '.annotatable-wrapper'
     toggleSelector: '.annotatable-toggle'
-    spanSelector: 'span.annotatable'
+    spanSelector: '.annotatable-span'
     commentSelector: '.annotatable-comment'
-    replySelector: 'a.annotatable-reply'
+    replySelector: '.annotatable-reply'
+    helpSelector: '.annotatable-help-icon'
  
     constructor: (el) ->
         console.log 'loaded Annotatable' if @_debug
-        @init(el)
+        @el = el
+        @init()
 
     $: (selector) ->
         $(selector, @el)
 
-    init: (el) ->
-        @el = el
-        @hideAnnotations = false
+    init: () ->
         @initEvents()
-        @initToolTips()
+        @initTips()
 
     initEvents: () ->
+        @annotationsHidden = false
         @$(@toggleSelector).bind 'click', @onClickToggleAnnotations
         @$(@wrapperSelector).delegate @replySelector, 'click', @onClickReply
-            
-    initToolTips: () ->
+
+    initTips: () ->
+        @visibleTips = []
         @$(@spanSelector).each (index, el) =>
             $(el).qtip(@getTipOptions el)
 
+        @$(@helpSelector).qtip
+            position:
+                my: 'right top'
+                at: 'bottom left'
+            content:
+                title: 'Annotated Reading Help'
+                text: "To reveal annotations in the reading, click the highlighted areas.
+                       Discuss the annotations in the forums using the reply link at the
+                       end of the annotation.<br/><br/>
+                       To conceal annotations, use the <i>Hide Annotations</i> button."
+
     getTipOptions: (el) ->
         content:
-            title: 
+            title:
                 text: @makeTipTitle(el)
                 button: 'Close'
-            text: @makeTipComment(el)
+            text: @makeTipContent(el)
         position:
             my: 'bottom center' # of tooltip
             at: 'top center' # of target
             target: 'mouse'
             container: @$(@wrapperSelector)
-            adjust: 
+            adjust:
                 mouse: false # dont follow the mouse
-                method: 'shift none'
-        show: 
+        show:
             event: 'click'
         hide:
             event: 'click'
         style:
             classes: 'ui-tooltip-annotatable'
         events:
-            show: @onShowTipComment
+            render: @onRenderTip
+            show: @onShowTip
 
-    onShowTipComment: (event, api) =>
-        event.preventDefault() if @hideAnnotations
+    onRenderTip: (event, api) =>
+        $(api.elements.tooltip).draggable
+            handle: '.ui-tooltip-title'
+            cursor: 'move'
+
+    onShowTip: (event, api) =>
+        event.preventDefault() if @annotationsHidden
 
     onClickToggleAnnotations: (e) =>
-        @hideAnnotations = !@hideAnnotations
-        hide = @hideAnnotations
+        toggle = @$(@toggleSelector)
+        spans = @$(@spanSelector)
 
-        @hideAllTips() if hide
-        @$(@spanSelector).toggleClass('hide', hide)
-        @$(@toggleSelector).text((if hide then 'Show' else 'Hide') + ' Annotations')
+        @annotationsHidden = !@annotationsHidden
+        if @annotationsHidden
+            spans.toggleClass('hide', true)
+            toggle.text('Show Annotations')
+            @visibleTips = @getVisibleTips()
+            @hideTips(@visibleTips)
+        else
+            spans.toggleClass('hide', false)
+            toggle.text('Hide Annotations')
+            @showTips(@visibleTips)
 
     onClickReply: (e) =>
         hash = $(e.currentTarget).attr('href')
@@ -70,11 +95,16 @@ class @Annotatable
             @scrollTo(anchor) if anchor.length == 1
 
     scrollTo: (el, padding = 20) ->
-        scrollTop = el.offset().top - padding
-        $('html,body').animate(scrollTop: scrollTop, 500, 'swing')
+        props =
+            scrollTop: (el.offset().top - padding)
+        opts =
+            duration: 500
+            complete: @_once -> el.effect 'highlight', {}, 2000
 
-    makeTipComment: (el) ->
-        return (api) =>
+        $('html,body').animate(props, opts)
+
+    makeTipContent: (el) ->
+        (api) =>
             comment = $(@commentSelector, el).first().clone()
             anchor = $(el).data('discussion-anchor')
             if anchor
@@ -82,13 +112,36 @@ class @Annotatable
             comment.contents()
 
     makeTipTitle: (el) ->
-        return (api) =>
+        (api) =>
             comment = $(@commentSelector, el).first()
             title = comment.attr('title')
             (if title then title else 'Commentary')
     
     createReplyLink: (anchor) ->
-        $("<a class=\"annotatable-reply\" href=\"##{anchor}\">Reply to Comment</a>")
+        $("<a class=\"annotatable-reply\" href=\"##{anchor}\">Reply to this comment</a>")
+
+    getVisibleTips: () ->
+        visible = []
+        @$(@spanSelector).each (index, el) ->
+            api = $(el).qtip('api')
+            tip = $(api?.elements.tooltip)
+            if tip.is(':visible')
+                visible.push [el, tip.offset()]
+        visible
     
-    hideAllTips: () ->
-        @$(@spanSelector).each (index, el) -> $(el).qtip('api').hide()
+    hideTips: (items) ->
+        elements = (pair[0] for pair in items)
+        $(elements).qtip('hide')
+
+    showTips: (items) ->
+        $.each items, (index, item) ->
+            [el, offset] = item
+            api = $(el).qtip('api')
+            api?.show()
+            $(api?.elements.tooltip).offset(offset)
+ 
+    _once: (fn) ->
+        done = false
+        return =>
+            fn.call this unless done
+            done = true

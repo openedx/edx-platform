@@ -30,20 +30,20 @@ class AnnotatableModule(XModule):
 
     def _is_span(self, element):
         """ Returns true if the element is a valid annotation span, false otherwise. """
-        return element.tag == 'span' and element.get('class') == 'annotatable'
+        return element.get('class') == 'annotatable'
 
     def _iterspans(self, xmltree, callbacks):
-        """ Iterates over span elements and invokes each callback on the span. """
+        """ Iterates over elements and invokes each callback on the span. """
 
         index = 0
-        for element in xmltree.iter('span'):
+        for element in xmltree.iter():
             if self._is_span(element):
                 for callback in callbacks:
                     callback(element, index, xmltree)
                 index += 1
  
     def _set_span_data(self, span, index, xmltree):
-        """ Sets an ID and discussion anchor for the span. """
+        """ Sets the discussion anchor for the span. """
 
         if 'anchor' in span.attrib:
             span.set('data-discussion-anchor', span.get('anchor'))
@@ -52,13 +52,12 @@ class AnnotatableModule(XModule):
     def _decorate_span(self, span, index, xmltree):
         """ Decorates the span with an icon and highlight.  """
 
-        cls = ['annotatable', ]
+        cls = ['annotatable-span', 'highlight']
         marker = self._get_marker_color(span)
-        if marker is None:
-            cls.append('highlight-yellow')
-        else:
+        if marker is not None:
             cls.append('highlight-'+marker)
         
+        span.tag = 'div'
         span.set('class', ' '.join(cls))
         span_icon = etree.Element('span', { 'class': 'annotatable-icon'} )
         span_icon.text = '';
@@ -76,9 +75,12 @@ class AnnotatableModule(XModule):
                 break
 
         if comment is not None:
+            comment.tag = 'div'
             comment.set('class', 'annotatable-comment')
 
     def _get_marker_color(self, span):
+        """ Returns the name of the marker color for the span if it is valid, otherwise none."""
+
         valid_markers = ['yellow', 'orange', 'purple', 'blue', 'green']
         if 'marker' in span.attrib:
             marker = span.attrib['marker']

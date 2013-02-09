@@ -19,7 +19,8 @@
   font-size: $body-font-size;
 }
 
-span.annotatable {
+.annotatable-span {
+  display: inline;
   cursor: pointer;
   @each $highlight in (
     (yellow rgb(239, 255, 0)), 
@@ -27,9 +28,10 @@ span.annotatable {
     (purple rgb(255,0,197)),
     (blue rgb(0,90,255)),
     (green rgb(111,255,9))) {
-    &.highlight-#{nth($highlight,1)} {
-      background-color: #{lighten(nth($highlight,2), 20%)};
-    }
+    $marker: nth($highlight,1);
+    $color: lighten(nth($highlight,2), 20%);
+    @if $marker == yellow { &.highlight { background-color: $color; } }
+    &.highlight-#{$marker} { background-color: $color; }
   }
   &.hide {
     cursor: none;
@@ -50,7 +52,7 @@ span.annotatable {
 .annotatable-icon {
   display: inline-block;
   vertical-align: middle;
-  width: 16px;
+  width: 17px;
   height: 17px;
   background: url(../images/link-icon.png) no-repeat;  
 }
@@ -60,12 +62,12 @@ span.annotatable {
   margin: 1em 0 .5em 0;
 }
 
-.help-icon {
+.annotatable-help-icon {
   display: block;
   position: absolute;
   right: 0;
   top: 33%;
-  width: 16px;
+  width: 17px;
   height: 17px;
   margin: 0 7px 0 0;
   background: url(../images/info-icon.png) no-repeat;
@@ -80,11 +82,14 @@ span.annotatable {
     background: rgba(255, 255, 255, 0.9);
     border: 1px solid $border-color;
     color: #000;
+    font-weight: normal;
     margin-bottom: 6px;
     margin-right: 0;
-    overflow: visible;
     padding: 4px;
     text-align: left;
+    max-width: 300px;
+    max-height: 300px;
+    overflow: auto;
     -webkit-font-smoothing: antialiased; 
   }
 }
