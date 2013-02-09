@@ -57,7 +57,6 @@
 
     </section>
     </section>
-
     <!-- Calibration feedback: Shown after a calibration is sent -->
     <section class="calibration-feedback">
     <h2>How did I do?</h2>
@@ -68,9 +67,18 @@
 
     <!-- Interstitial Page: Shown between calibration and grading steps -->
     <section class="interstitial-page">
-        <h1>Congratulations!</h1>
-        <p> You have now completed the calibration step. You are now ready to start grading.</p>
+        <h1>Ready to grade!</h1>
+        <p> You have finished learning to grade, which means that you are now ready to start grading.</p>
         <input type="button" class="interstitial-page-button" value="Start Grading!" name="interstitial-page-button" />
+    </section>
+
+    <!-- Calibration Interstitial Page: Shown before calibration -->
+    <section class="calibration-interstitial-page">
+        <h1>Learning to grade</h1>
+        <p> You have not yet finished learning to grade this problem.</p>
+        <p> You will now be shown a series of instructor-scored essays, and will be asked to score them yourself.</p>
+        <p> Once you can score the essays similarly to an instructor, you will be ready to grade your peers.</p>
+        <input type="button" class="calibration-interstitial-page-button" value="Start learning to grade" name="calibration-interstitial-page-button" />
     </section>
 
     <input type="button" value="Go Back" class="action-button" name="back" />

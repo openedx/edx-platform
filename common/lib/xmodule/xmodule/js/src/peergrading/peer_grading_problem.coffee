@@ -188,6 +188,9 @@ class @PeerGradingProblem
     @interstitial_page = $('.interstitial-page')
     @interstitial_page.hide()
 
+    @calibration_interstitial_page = $('.calibration-interstitial-page')
+    @calibration_interstitial_page.hide()
+
     @error_container = $('.error-container')
 
     @submission_key_input = $("input[name='submission-key']")
@@ -203,6 +206,7 @@ class @PeerGradingProblem
     @action_button = $('.action-button')
     @calibration_feedback_button = $('.calibration-feedback-button')
     @interstitial_page_button = $('.interstitial-page-button')
+    @calibration_interstitial_page_button = $('.calibration-interstitial-page-button')
     @flag_student_checkbox = $('.flag-checkbox')
     @collapse_question()
 
@@ -213,11 +217,20 @@ class @PeerGradingProblem
     @calibration_feedback_button.click =>
       @calibration_feedback_panel.hide()
       @grading_wrapper.show()
+      @gentle_alert "Calibration essay saved.  Fetching next essay."
       @is_calibrated_check()
 
     @interstitial_page_button.click =>
       @interstitial_page.hide()
       @is_calibrated_check()
+
+    @calibration_interstitial_page_button.click =>
+      @calibration_interstitial_page.hide()
+      @is_calibrated_check()
+
+    @calibration_feedback_button.hide()
+    @calibration_feedback_panel.hide()
+    @error_container.hide()
 
     @is_calibrated_check()
 
@@ -236,6 +249,9 @@ class @PeerGradingProblem
   fetch_submission_essay: () =>
     @backend.post('get_next_submission', {location: @location}, @render_submission)
 
+  gentle_alert: (msg) =>
+    @grading_message.fadeIn()
+    @grading_message.html("<p>" + msg + "</p>")
 
   construct_data: () ->
     data =
@@ -276,6 +292,9 @@ class @PeerGradingProblem
        else if response.calibrated and @calibration == true
          @calibration = false
          @render_interstitial_page()
+       else if not response.calibrated and @calibration==null
+         @calibration=true
+         @render_calibration_interstitial_page()
        else
          @calibration = true
          @fetch_calibration_essay()
@@ -411,17 +430,23 @@ class @PeerGradingProblem
     actual_score = parseInt(response.actual_score)
 
     if score == actual_score
-      calibration_wrapper.append("<p>Congratulations! Your score matches the actual score!</p>")
+      calibration_wrapper.append("<p>Your score matches the actual score!</p>")
     else
-      calibration_wrapper.append("<p>Please try to understand the grading criteria better to be more accurate next time.</p>")
+      calibration_wrapper.append("<p>You may want to review the rubric again.</p>")
 
     # disable score selection and submission from the grading interface
     $("input[name='score-selection']").attr('disabled', true)
     @submit_button.hide()
+    @calibration_feedback_button.show()
 
   render_interstitial_page: () =>
     @content_panel.hide()
     @interstitial_page.show()
+
+  render_calibration_interstitial_page: () =>
+    @content_panel.hide()
+    @action_button.hide()
+    @calibration_interstitial_page.show()
 
   render_error: (error_message) =>
       @error_container.show()
