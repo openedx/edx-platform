@@ -53,8 +53,6 @@ class SelfAssessmentModule(openendedchild.OpenEndedChild):
         @param descriptor: SelfAssessmentDescriptor
         @return: None
         """
-        self.submit_message = definition['submitmessage']
-        self.hint_prompt = definition['hintprompt']
         self.prompt = stringify_children(self.prompt)
         self.rubric = stringify_children(self.rubric)
 
@@ -76,8 +74,6 @@ class SelfAssessmentModule(openendedchild.OpenEndedChild):
             'previous_answer': previous_answer,
             'ajax_url': system.ajax_url,
             'initial_rubric': self.get_rubric_html(system),
-            'initial_hint': "",
-            'initial_message': self.get_message_html(),
             'state': self.state,
             'allow_reset': self._allow_reset(),
             'child_type': 'selfassessment',
@@ -157,8 +153,7 @@ class SelfAssessmentModule(openendedchild.OpenEndedChild):
         else:
             hint = ''
 
-        context = {'hint_prompt': self.hint_prompt,
-                   'hint': hint}
+        context = {'hint': hint}
 
         if self.state == self.POST_ASSESSMENT:
             context['read_only'] = False
@@ -168,15 +163,6 @@ class SelfAssessmentModule(openendedchild.OpenEndedChild):
             raise ValueError("Illegal state '%r'" % self.state)
 
         return system.render_template('self_assessment_hint.html', context)
-
-    def get_message_html(self):
-        """
-        Return the appropriate version of the message view, based on state.
-        """
-        if self.state != self.DONE:
-            return ""
-
-        return """<div class="save_message">{0}</div>""".format(self.submit_message)
 
 
     def save_answer(self, get, system):
@@ -274,7 +260,7 @@ class SelfAssessmentModule(openendedchild.OpenEndedChild):
         self.change_state(self.DONE)
 
         return {'success': True,
-                'message_html': self.get_message_html(),
+                'message_html': '',
                 'allow_reset': self._allow_reset()}
 
     def latest_post_assessment(self, system):
@@ -314,7 +300,7 @@ class SelfAssessmentDescriptor(XmlDescriptor, EditingDescriptor):
         'hintprompt': 'some-html'
         }
         """
-        expected_children = ['submitmessage', 'hintprompt']
+        expected_children = []
         for child in expected_children:
             if len(xml_object.xpath(child)) != 1:
                 raise ValueError("Self assessment definition must include exactly one '{0}' tag".format(child))
@@ -323,9 +309,7 @@ class SelfAssessmentDescriptor(XmlDescriptor, EditingDescriptor):
             """Assumes that xml_object has child k"""
             return stringify_children(xml_object.xpath(k)[0])
 
-        return {'submitmessage': parse('submitmessage'),
-                'hintprompt': parse('hintprompt'),
-        }
+        return {}
 
     def definition_to_xml(self, resource_fs):
         '''Return an xml element representing this definition.'''
@@ -336,7 +320,7 @@ class SelfAssessmentDescriptor(XmlDescriptor, EditingDescriptor):
             child_node = etree.fromstring(child_str)
             elt.append(child_node)
 
-        for child in ['submitmessage', 'hintprompt']:
+        for child in []:
             add_child(child)
 
         return elt
