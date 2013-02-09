@@ -192,7 +192,9 @@ class @CombinedOpenEnded
     @next_problem_button.hide()
     @hide_file_upload()
     @hint_area.attr('disabled', false)
-    @show_status_current()
+    if @task_number>1 or @child_state!='initial'
+      @show_status_current()
+
     if @task_number==1 and @child_state=='assessing'
       @prompt_hide()
     if @child_state == 'done'

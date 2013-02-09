@@ -355,7 +355,7 @@ class CombinedOpenEndedV1Module():
             'state': self.state,
             'task_count': len(self.task_xml),
             'task_number': self.current_task_number + 1,
-            'status': self.get_status(),
+            'status': self.get_status(False),
             'display_name': self.display_name,
             'accept_file_upload': self.accept_file_upload,
             'legend_list' : LEGEND_LIST,
@@ -621,7 +621,7 @@ class CombinedOpenEndedV1Module():
         Input: AJAX get dictionary
         Output: Dictionary to be rendered via ajax that contains the result html.
         """
-        html = self.get_status()
+        html = self.get_status(True)
         return {'html': html, 'success': True}
 
     def handle_ajax(self, dispatch, get):
@@ -705,7 +705,7 @@ class CombinedOpenEndedV1Module():
 
         return json.dumps(state)
 
-    def get_status(self):
+    def get_status(self, render_via_ajax):
         """
         Gets the status panel to be displayed at the top right.
         Input: None
@@ -717,7 +717,12 @@ class CombinedOpenEndedV1Module():
             task_data.update({'task_number': i + 1})
             status.append(task_data)
 
-        context = {'status_list': status, 'grader_type_image_dict' : GRADER_TYPE_IMAGE_DICT, 'legend_list' : LEGEND_LIST}
+        context = {
+            'status_list': status,
+            'grader_type_image_dict' : GRADER_TYPE_IMAGE_DICT,
+            'legend_list' : LEGEND_LIST,
+            'render_via_ajax' : render_via_ajax,
+        }
         status_html = self.system.render_template("combined_open_ended_status.html", context)
 
         return status_html

@@ -10,7 +10,7 @@
             %else:
                 <div class="statusitem" data-status-number="${i}">
             %endif
-                    %if status['grader_type'] in grader_type_image_dict:
+                    %if status['grader_type'] in grader_type_image_dict and render_via_ajax:
                         <% grader_image = grader_type_image_dict[status['grader_type']]%>
                         <img src="${grader_image}" title=${status['human_grader_type']}>
                     %else:
