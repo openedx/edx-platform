@@ -330,6 +330,7 @@ class @PeerGradingProblem
     # check to see whether or not any categories have not been scored
     if Rubric.check_complete()
       # show button if we have scores for all categories
+      @grading_message.hide()
       @show_submit_button()
       @grade = Rubric.get_total_score()
 
@@ -441,6 +442,7 @@ class @PeerGradingProblem
 
   render_interstitial_page: () =>
     @content_panel.hide()
+    @grading_message.hide()
     @interstitial_page.show()
 
   render_calibration_interstitial_page: () =>
