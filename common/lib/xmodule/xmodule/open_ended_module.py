@@ -429,7 +429,7 @@ class OpenEndedModule(openendedchild.OpenEndedChild):
             correct:         Correctness of submission (Boolean)
             score:           Points to be assigned (numeric, can be float)
         """
-        fail = {'valid': False, 'score': 0, 'feedback': '', 'rubric_scores' : [[0,0]], 'grader_types' : [''], 'feedback_items' : ['']}
+        fail = {'valid': False, 'score': 0, 'feedback': '', 'rubric_scores' : [[0]], 'grader_types' : [''], 'feedback_items' : ['']}
         try:
             score_result = json.loads(score_msg)
         except (TypeError, ValueError):

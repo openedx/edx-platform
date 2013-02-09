@@ -534,12 +534,20 @@ class CombinedOpenEndedV1Module():
         """
         self.update_task_states()
         all_responses = []
-        for i in xrange(0,self.current_task_number+1):
+        loop_up_to_task = self.current_task_number+1
+        if self.state in [self.ASSESSING, self.INITIAL] and self.current_task_number>0:
+            loop_up_to_task = loop_up_to_task-1
+        log.debug(self.state)
+        log.debug(self.current_task_number)
+        log.debug(loop_up_to_task)
+        for i in xrange(0,loop_up_to_task):
             all_responses.append(self.get_last_response(i))
         rubric_scores = [rd['rubric_scores'] for rd in all_responses if len(rd['rubric_scores'])>0]
         grader_types = [rd['grader_types'] for rd in all_responses if len(rd['grader_types'])>0]
         feedback_items = [rd['feedback_items'] for rd in all_responses if len(rd['feedback_items'])>0]
-
+        log.debug(rubric_scores)
+        log.debug(grader_types)
+        log.debug(feedback_items)
         rubric_html = self.rubric_renderer.render_combined_rubric(stringify_children(self.static_data['rubric']), rubric_scores,
             grader_types, feedback_items)
 
