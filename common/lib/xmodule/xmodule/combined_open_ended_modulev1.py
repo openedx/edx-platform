@@ -534,18 +534,11 @@ class CombinedOpenEndedV1Module():
         """
         all_responses = []
         loop_up_to_task = self.current_task_number+1
-        if self.state in [self.ASSESSING, self.INITIAL] and self.current_task_number>0:
-            loop_up_to_task = loop_up_to_task-1
-        log.debug(self.allow_reset)
-        log.debug(self.check_allow_reset())
-        log.debug(self.state)
-        log.debug(self.current_task_number)
-        log.debug(loop_up_to_task)
         for i in xrange(0,loop_up_to_task):
             all_responses.append(self.get_last_response(i))
-        rubric_scores = [rd['rubric_scores'] for rd in all_responses if len(rd['rubric_scores'])>0]
-        grader_types = [rd['grader_types'] for rd in all_responses if len(rd['grader_types'])>0]
-        feedback_items = [rd['feedback_items'] for rd in all_responses if len(rd['feedback_items'])>0]
+        rubric_scores = [all_responses[i]['rubric_scores'] for i in xrange(0,len(all_responses)) if len(all_responses[i]['rubric_scores'])>0 and all_responses[i]['grader_types'][0] in HUMAN_GRADER_TYPE.keys()]
+        grader_types = [all_responses[i]['grader_types'] for i in xrange(0,len(all_responses)) if len(all_responses[i]['grader_types'])>0 and all_responses[i]['grader_types'][0] in HUMAN_GRADER_TYPE.keys()]
+        feedback_items = [all_responses[i]['feedback_items'] for i in xrange(0,len(all_responses)) if len(all_responses[i]['feedback_items'])>0 and all_responses[i]['grader_types'][0] in HUMAN_GRADER_TYPE.keys()]
         log.debug(rubric_scores)
         log.debug(grader_types)
         log.debug(feedback_items)
