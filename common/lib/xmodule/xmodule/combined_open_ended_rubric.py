@@ -8,6 +8,7 @@ GRADER_TYPE_IMAGE_DICT = {
     'PE' : '/static/images/peer_grading_icon.png',
     'ML' : '/static/images/ml_grading_icon.png',
     'IN' : '/static/images/peer_grading_icon.png',
+    'BC' : '/static/images/ml_grading_icon.png',
     }
 
 HUMAN_GRADER_TYPE = {
@@ -15,6 +16,7 @@ HUMAN_GRADER_TYPE = {
     'PE' : 'Peer-Assessment',
     'IN' : 'Instructor-Assessment',
     'ML' : 'AI-Assessment',
+    'BC' : 'AI-Assessment',
     }
 
 class RubricParsingError(Exception):
