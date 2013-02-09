@@ -48,26 +48,26 @@ class CombinedOpenEndedRubric(object):
             html: the html that corresponds to the xml given
         '''
         success = False
-        try:
-            rubric_categories = self.extract_categories(rubric_xml)
-            rubric_scores = [cat['score'] for cat in rubric_categories]
-            max_scores = map((lambda cat: cat['options'][-1]['points']), rubric_categories)
-            max_score = max(max_scores)
-            rubric_template = 'open_ended_rubric.html'
-            if self.view_only:
-                rubric_template = 'open_ended_view_only_rubric.html'
-            html = self.system.render_template(rubric_template,
-                    {'categories': rubric_categories,
-                     'has_score': self.has_score,
-                     'view_only': self.view_only,
-                     'max_score': max_score,
-                     'combined_rubric' : False
-                    })
-            success = True
-        except:
-            error_message = "[render_rubric] Could not parse the rubric with xml: {0}".format(rubric_xml)
-            log.error(error_message)
-            raise RubricParsingError(error_message)
+        #try:
+        rubric_categories = self.extract_categories(rubric_xml)
+        rubric_scores = [cat['score'] for cat in rubric_categories]
+        max_scores = map((lambda cat: cat['options'][-1]['points']), rubric_categories)
+        max_score = max(max_scores)
+        rubric_template = 'open_ended_rubric.html'
+        if self.view_only:
+            rubric_template = 'open_ended_view_only_rubric.html'
+        html = self.system.render_template(rubric_template,
+                {'categories': rubric_categories,
+                 'has_score': self.has_score,
+                 'view_only': self.view_only,
+                 'max_score': max_score,
+                 'combined_rubric' : False
+                })
+        success = True
+        #except:
+        #    error_message = "[render_rubric] Could not parse the rubric with xml: {0}".format(rubric_xml)
+        #    log.error(error_message)
+        #    raise RubricParsingError(error_message)
         return {'success' : success, 'html' : html, 'rubric_scores' : rubric_scores}
 
     def check_if_rubric_is_parseable(self, rubric_string, location, max_score_allowed, max_score):

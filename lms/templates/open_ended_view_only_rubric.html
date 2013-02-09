@@ -6,6 +6,7 @@
                 <% option = category['options'][j] %>
                 % if option['selected']:
                    ${category['description']} : ${option['points']} points
+                % endif
             % endfor
         % endfor
     </div>

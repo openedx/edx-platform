@@ -51,6 +51,7 @@ section.legend-container {
     display: inline;
     width: 20%;
   }
+  margin-bottom: 5px;
 }
 
 section.combined-open-ended-status {
@@ -104,6 +105,20 @@ section.combined-open-ended-status {
           float: right;
         }
     }
+}
+
+div.combined-rubric-container {
+  ul.rubric-list{
+    list-style-type: none;
+    padding:0;
+    margin:0;
+    li {
+      &.rubric-list-item{
+        margin-bottom: 2px;
+        padding: 0px;
+      }
+    }
+  }
 }
 
 div.result-container {
