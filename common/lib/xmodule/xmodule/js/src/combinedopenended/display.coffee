@@ -96,6 +96,9 @@ class @CombinedOpenEnded
 
     @rebind()
 
+    if @task_number>1
+      @show_combined_rubric_current()
+
   # locally scoped jquery.
   $: (selector) ->
     $(selector, @el)
@@ -180,8 +183,6 @@ class @CombinedOpenEnded
     @hide_file_upload()
     @hint_area.attr('disabled', false)
     @show_status_current()
-    if @task_number>1
-      @show_combined_rubric_current()
     if @task_number==1 and @child_state=='assessing'
       @prompt_hide()
     if @child_state == 'done'

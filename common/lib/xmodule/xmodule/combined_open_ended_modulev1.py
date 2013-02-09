@@ -532,11 +532,12 @@ class CombinedOpenEndedV1Module():
         Input: AJAX get dictionary
         Output: Dictionary to be rendered via ajax that contains the result html.
         """
-        self.update_task_states()
         all_responses = []
         loop_up_to_task = self.current_task_number+1
         if self.state in [self.ASSESSING, self.INITIAL] and self.current_task_number>0:
             loop_up_to_task = loop_up_to_task-1
+        log.debug(self.allow_reset)
+        log.debug(self.check_allow_reset())
         log.debug(self.state)
         log.debug(self.current_task_number)
         log.debug(loop_up_to_task)
