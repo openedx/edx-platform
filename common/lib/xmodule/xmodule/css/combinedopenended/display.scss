@@ -119,11 +119,13 @@ div.combined-rubric-container {
       }
     }
   }
-  margin-bottom: 5px;
+  padding-bottom: 5px;
+  padding-top: 5px;
 }
 
 div.result-container {
-
+  padding-top: 5px;
+  padding-bottom: 5px;
  .evaluation {
 
         p {
@@ -218,20 +220,6 @@ div.result-container {
 
               dd {
                 margin-left: 24pt;
-              }
-            }
-
-            .result-correct {
-              background: url('../images/correct-icon.png') left 20px no-repeat;
-              .result-actual-output {
-                color: #090;
-              }
-            }
-
-            .result-incorrect {
-              background: url('../images/incorrect-icon.png') left 20px no-repeat;
-              .result-actual-output {
-                color: #B00;
               }
             }
 
