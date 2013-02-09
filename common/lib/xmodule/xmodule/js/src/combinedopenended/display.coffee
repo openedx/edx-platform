@@ -101,6 +101,7 @@ class @CombinedOpenEnded
 
     if @task_number>1
       @show_combined_rubric_current()
+      @show_results_current()
 
   # locally scoped jquery.
   $: (selector) ->
