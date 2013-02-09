@@ -67,6 +67,9 @@ class @CombinedOpenEnded
     @results_container = $('.result-container')
     @combined_rubric_container = $('.combined-rubric-container')
 
+    @legend_container= $('.legend-container')
+    @show_legend_current()
+
     # Where to put the rubric once we load it
     @el = $(element).find('section.open-ended-child')
     @errors_area = @$('.error')
@@ -140,6 +143,13 @@ class @CombinedOpenEnded
       if response.success
         @status_container.after(response.html).remove()
         @status_container= $('.status-elements')
+
+  show_legend_current: () =>
+    data = {}
+    $.postWithPrefix "#{@ajax_url}/get_legend", data, (response) =>
+      if response.success
+        @legend_container.after(response.html).remove()
+        @legend_container= $('.legend-container')
 
   message_post: (event)=>
     Logger.log 'message_post', @answers

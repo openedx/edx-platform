@@ -358,6 +358,7 @@ class CombinedOpenEndedV1Module():
             'status': self.get_status(),
             'display_name': self.display_name,
             'accept_file_upload': self.accept_file_upload,
+            'legend_list' : LEGEND_LIST,
             }
 
         return context
@@ -554,6 +555,18 @@ class CombinedOpenEndedV1Module():
         html = self.system.render_template('combined_open_ended_results.html', context)
         return {'html': html, 'success': True}
 
+    def get_legend(self, get):
+        """
+        Gets the results of a given grader via ajax.
+        Input: AJAX get dictionary
+        Output: Dictionary to be rendered via ajax that contains the result html.
+        """
+        context = {
+            'legend_list' : LEGEND_LIST,
+            }
+        html = self.system.render_template('combined_open_ended_legend.html', context)
+        return {'html': html, 'success': True}
+
     def get_results(self, get):
         """
         Gets the results of a given grader via ajax.
@@ -598,6 +611,7 @@ class CombinedOpenEndedV1Module():
             'get_results': self.get_results,
             'get_combined_rubric': self.get_rubric,
             'get_status' : self.get_status_ajax,
+            'get_legend' : self.get_legend,
         }
 
         if dispatch not in handlers:
