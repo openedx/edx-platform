@@ -19,6 +19,10 @@ HUMAN_GRADER_TYPE = {
     'BC' : 'AI-Assessment',
     }
 
+DO_NOT_DISPLAY = ['BC', 'IN']
+
+LEGEND_LIST = [{'name' : HUMAN_GRADER_TYPE[k], 'image' : GRADER_TYPE_IMAGE_DICT[k]} for k in GRADER_TYPE_IMAGE_DICT.keys() if k not in DO_NOT_DISPLAY ]
+
 class RubricParsingError(Exception):
     def __init__(self, msg):
         self.msg = msg

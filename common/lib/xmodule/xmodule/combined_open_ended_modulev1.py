@@ -22,7 +22,7 @@ from .xml_module import XmlDescriptor
 from xmodule.modulestore import Location
 import self_assessment_module
 import open_ended_module
-from combined_open_ended_rubric import CombinedOpenEndedRubric, RubricParsingError, GRADER_TYPE_IMAGE_DICT, HUMAN_GRADER_TYPE
+from combined_open_ended_rubric import CombinedOpenEndedRubric, RubricParsingError, GRADER_TYPE_IMAGE_DICT, HUMAN_GRADER_TYPE, LEGEND_LIST
 from .stringify import stringify_children
 import dateutil
 import dateutil.parser
@@ -673,7 +673,7 @@ class CombinedOpenEndedV1Module():
             task_data.update({'task_number': i + 1})
             status.append(task_data)
 
-        context = {'status_list': status, 'grader_type_image_dict' : GRADER_TYPE_IMAGE_DICT}
+        context = {'status_list': status, 'grader_type_image_dict' : GRADER_TYPE_IMAGE_DICT, 'legend_list' : LEGEND_LIST}
         status_html = self.system.render_template("combined_open_ended_status.html", context)
 
         return status_html
