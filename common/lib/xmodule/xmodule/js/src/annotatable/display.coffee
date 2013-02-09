@@ -52,7 +52,9 @@ class @Annotatable
             at: 'top center' # of target
             target: 'mouse'
             container: @$(@wrapperSelector)
+            viewport: true,
             adjust:
+                method: 'none shift'
                 mouse: false # dont follow the mouse
         show:
             event: 'click'
