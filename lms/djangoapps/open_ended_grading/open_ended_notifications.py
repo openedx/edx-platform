@@ -50,7 +50,7 @@ def staff_grading_notifications(course, user):
         log.info("Problem with getting notifications from staff grading service.")
 
     if pending_grading:
-        img_path = "/static/images/slider-handle.png"
+        img_path = "/static/images/grading_notification.png"
 
     notification_dict = {'pending_grading': pending_grading, 'img_path': img_path, 'response': notifications}
 
@@ -83,7 +83,7 @@ def peer_grading_notifications(course, user):
         log.info("Problem with getting notifications from peer grading service.")
 
     if pending_grading:
-        img_path = "/static/images/slider-handle.png"
+        img_path = "/static/images/grading_notification.png"
 
     notification_dict = {'pending_grading': pending_grading, 'img_path': img_path, 'response': notifications}
 
@@ -129,7 +129,7 @@ def combined_notifications(course, user):
         log.exception("Problem with getting notifications from controller query service.")
 
     if pending_grading:
-        img_path = "/static/images/slider-handle.png"
+        img_path = "/static/images/grading_notification.png"
 
     notification_dict = {'pending_grading': pending_grading, 'img_path': img_path, 'response': notifications}
 
