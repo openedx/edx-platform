@@ -1112,9 +1112,11 @@ def test_center_login(request):
     # or possibly both.  But for now we know what to do with an ExamSeriesCode, 
     # while we currently have no record of RegistrationID values at all.
     if 'vueExamSeriesCode' not in request.POST:
-        # TODO: confirm this error code (made up, not in documentation)
+        # we are not allowed to make up a new error code, according to Pearson, 
+        # so instead of "missingExamSeriesCode", we use a valid one that is 
+        # inaccurate but at least distinct.  (Sigh.)
         log.error("missing exam series code for cand ID {}".format(client_candidate_id))
-        return HttpResponseRedirect(makeErrorURL(error_url, "missingExamSeriesCode"));
+        return HttpResponseRedirect(makeErrorURL(error_url, "missingPartnerID"));
     exam_series_code = request.POST.get('vueExamSeriesCode')
     # special case for supporting test user:
     if client_candidate_id == "edX003671291147" and exam_series_code != '6002x001':
@@ -1188,7 +1190,7 @@ def test_center_login(request):
     # this information is correct, we allow the user to be logged in
     # without a password.  This could all be formalized in a backend object
     # that does the above checking.  
-    # TODO: create a backend class to do this.
+    # TODO: (brian) create a backend class to do this.
     # testcenteruser.user.backend = "%s.%s" % (backend.__module__, backend.__class__.__name__)    
     testcenteruser.user.backend = "%s.%s" % ("TestcenterAuthenticationModule", "TestcenterAuthenticationClass")    
     login(request, testcenteruser.user)
