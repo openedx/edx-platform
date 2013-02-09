@@ -613,7 +613,7 @@ class CombinedOpenEndedV1Module():
         })
         context = {
             'results': feedback_table,
-            'task_name' : "Results",
+            'task_name' : "Feedback",
             'class_name' : "result-container",
             }
         html = self.system.render_template('combined_open_ended_results.html', context)
