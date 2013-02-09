@@ -2,11 +2,11 @@ class @Annotatable
     @_debug: true
 
     wrapperSelector: '.annotatable-wrapper'
-    toggleSelector: '.annotatable-toggle'
-    spanSelector: '.annotatable-span'
+    toggleSelector:  '.annotatable-toggle'
+    spanSelector:    '.annotatable-span'
     commentSelector: '.annotatable-comment'
-    replySelector: '.annotatable-reply'
-    helpSelector: '.annotatable-help-icon'
+    replySelector:   '.annotatable-reply'
+    helpSelector:    '.annotatable-help-icon'
  
     constructor: (el) ->
         console.log 'loaded Annotatable' if @_debug
@@ -26,10 +26,8 @@ class @Annotatable
         @$(@wrapperSelector).delegate @replySelector, 'click', @onClickReply
 
     initTips: () ->
-        @visibleTips = []
-        @$(@spanSelector).each (index, el) =>
-            $(el).qtip(@getTipOptions el)
-
+        @savedTips = []
+        @$(@spanSelector).each (index, el) => $(el).qtip(@getTipOptions el)
         @$(@helpSelector).qtip
             position:
                 my: 'right top'
@@ -75,42 +73,42 @@ class @Annotatable
         event.preventDefault() if @annotationsHidden
 
     onClickToggleAnnotations: (e) =>
-        toggle = @$(@toggleSelector)
-        spans = @$(@spanSelector)
-
-        @annotationsHidden = !@annotationsHidden
-        if @annotationsHidden
-            spans.toggleClass('hide', true)
-            toggle.text('Show Annotations')
-            @visibleTips = @getVisibleTips()
-            @hideTips(@visibleTips)
-        else
-            spans.toggleClass('hide', false)
-            toggle.text('Hide Annotations')
-            @showTips(@visibleTips)
+        @annotationsHidden = not @annotationsHidden
+        @toggleButtonText @annotationsHidden
+        @toggleSpans @annotationsHidden
+        @toggleTips @annotationsHidden
 
     onClickReply: (e) =>
         hash = $(e.currentTarget).attr('href')
         if hash?.charAt(0) == '#'
             name = hash.substr(1)
             anchor = $("a[name='#{name}']").first()
-            @scrollTo(anchor) if anchor.length == 1
+            @scrollTo(anchor)
 
-    scrollTo: (el, padding = 20) ->
-        props =
-            scrollTop: (el.offset().top - padding)
-        opts =
+    toggleTips: (hide) ->
+        if hide
+            @closeAndSaveTips()
+        else
+            @openSavedTips()
+
+    toggleButtonText: (hide) ->
+        buttonText = (if hide then 'Show' else 'Hide')+' Annotations'
+        @$(@toggleSelector).text(buttonText)
+
+    toggleSpans: (hide) ->
+        @$(@spanSelector).toggleClass 'hide', hide
+
+    scrollTo: (el) ->
+        options =
             duration: 500
-            complete: @_once -> el.effect 'highlight', {}, 2000
-
-        $('html,body').animate(props, opts)
+            onAfter: @_once -> el.effect 'highlight', {}, 2000
+        $('html,body').scrollTo(el, options)
 
     makeTipContent: (el) ->
         (api) =>
-            comment = $(@commentSelector, el).first().clone()
             anchor = $(el).data('discussion-anchor')
-            if anchor
-                comment.append(@createReplyLink(anchor))
+            comment = $(@commentSelector, el).first().clone()
+            comment.append(@createReplyLink(anchor)) if anchor
             comment.contents()
 
     makeTipTitle: (el) ->
@@ -120,9 +118,19 @@ class @Annotatable
             (if title then title else 'Commentary')
     
     createReplyLink: (anchor) ->
-        $("<a class=\"annotatable-reply\" href=\"##{anchor}\">Reply to this comment</a>")
+        cls = 'annotatable-reply'
+        href = '#' + anchor
+        text = 'Reply to this comment'
+        $("<a class=\"#{cls}\" href=\"#{href}\">#{text}</a>")
 
-    getVisibleTips: () ->
+    openSavedTips: () ->
+        @showTips @savedTips
+
+    closeAndSaveTips: () ->
+        @savedTips = @findVisibleTips()
+        @hideTips @savedTips
+
+    findVisibleTips: () ->
         visible = []
         @$(@spanSelector).each (index, el) ->
             api = $(el).qtip('api')
@@ -130,16 +138,16 @@ class @Annotatable
             if tip.is(':visible')
                 visible.push [el, tip.offset()]
         visible
-    
-    hideTips: (items) ->
-        elements = (pair[0] for pair in items)
+
+    hideTips: (pairs) ->
+        elements = (pair[0] for pair in pairs)
         $(elements).qtip('hide')
 
-    showTips: (items) ->
-        $.each items, (index, item) ->
-            [el, offset] = item
+    showTips: (pairs) ->
+        $.each pairs, (index, pair) ->
+            [el, offset] = pair
+            $(el).qtip('show')
             api = $(el).qtip('api')
-            api?.show()
             $(api?.elements.tooltip).offset(offset)
  
     _once: (fn) ->
