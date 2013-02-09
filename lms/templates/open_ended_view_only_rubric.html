@@ -5,7 +5,7 @@
             % for j in range(len(category['options'])):
                 <% option = category['options'][j] %>
                 % if option['selected']:
-                   ${category['description']} : ${option['points']} points
+                   ${category['description']} : ${option['points']} points ,
                 % endif
             % endfor
         % endfor

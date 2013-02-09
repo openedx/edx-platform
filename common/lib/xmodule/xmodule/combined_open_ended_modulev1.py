@@ -586,12 +586,24 @@ class CombinedOpenEndedV1Module():
         loop_up_to_task = self.current_task_number+1
         for i in xrange(0,loop_up_to_task):
             all_responses.append(self.get_last_response(i))
+        context_list = []
+        for ri in all_responses:
+            for i in xrange(0,len(ri['rubric_scores'])):
+                feedback = ri['feedback_dicts'][i].get('feedback','')
+                context = {
+                    'rubric_html': self.rubric_renderer.render_rubric(stringify_children(self.static_data['rubric']), ri['rubric_scores'][i]),
+                    'grader_type': ri['grader_type'],
+                    'grader_type_image_dict' : GRADER_TYPE_IMAGE_DICT,
+                    'human_grader_types' : HUMAN_GRADER_TYPE,
+                    'feedback' : feedback,
+                }
+                context_list.append(context)
+        feedback_table = self.system.render_template('open_ended_result_table.html', context_list)
         context = {
-            'results': response_dict['post_assessment'],
-            'task_number': task_number + 1,
-            'task_name' : response_dict['human_task'],
+            'results': feedback_table,
+            'task_name' : "Combined Results",
             'class_name' : "result-container",
-        }
+            }
         html = self.system.render_template('combined_open_ended_results.html', context)
         return {'html': html, 'success': True}
 
