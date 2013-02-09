@@ -584,6 +584,7 @@ class CombinedOpenEndedV1Module():
         """
         self.update_task_states()
         loop_up_to_task = self.current_task_number+1
+        all_responses =[]
         for i in xrange(0,loop_up_to_task):
             all_responses.append(self.get_last_response(i))
         context_list = []
@@ -598,7 +599,7 @@ class CombinedOpenEndedV1Module():
                     'feedback' : feedback,
                 }
                 context_list.append(context)
-        feedback_table = self.system.render_template('open_ended_result_table.html', context_list)
+        feedback_table = self.system.render_template('open_ended_result_table.html', {'context_list' : context_list})
         context = {
             'results': feedback_table,
             'task_name' : "Combined Results",

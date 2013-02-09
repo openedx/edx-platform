@@ -486,7 +486,11 @@ class OpenEndedModule(openendedchild.OpenEndedChild):
                 feedback_items.append(feedback_template)
                 rubric_scores.append(rubric_score)
                 grader_types.append(score_result['grader_type'])
-                feedback_dicts.append(score_result['feedback'][i])
+                try:
+                    feedback_dict = json.loads(score_result['feedback'][i])
+                except:
+                    pass
+                feedback_dicts.append(feedback_dict)
                 grader_ids.append(score_result['grader_id'][i])
                 submission_ids.append(score_result['submission_id'])
             if join_feedback:
@@ -501,7 +505,11 @@ class OpenEndedModule(openendedchild.OpenEndedChild):
             rubric_scores = [rubric_score]
             grader_types = [score_result['grader_type']]
             feedback_items = [feedback]
-            feedback_dicts = [score_result['feedback']]
+            try:
+                feedback_dict = json.loads(score_result['feedback'])
+            except:
+                pass
+            feedback_dicts = [feedback_dict]
             grader_ids = [score_result['grader_id']]
             submission_ids = [score_result['submission_id']]
 
