@@ -1,52 +1,22 @@
 <form class="rubric-template" id="inputtype_${id}" xmlns="http://www.w3.org/1999/html">
-    % if view_only and has_score:
-        <p></p>
-    % elif view_only:
-        <p>Use the below rubric to rate this submission.</p>
-    % else:
-        <h3>Rubric</h3>
-        <p>Select the criteria you feel best represents this submission in each category.</p>
-    % endif
+    <h3>Rubric</h3>
+    <p>Select the criteria you feel best represents this submission in each category.</p>
     <div class="rubric">
         % for i in range(len(categories)):
         <% category = categories[i] %>
-            <b class="rubric-category">${category['description']}</b><br/>
+            <b class="rubric-category">${category['description']}</b> <br/>
             <ul class="rubric-list">
                 % for j in range(len(category['options'])):
                 <% option = category['options'][j] %>
-                    %if option['selected'] and not view_only:
+                    %if option['selected']:
                         <li class="selected-grade rubric-list-item">
                     %else:
                         <li class="rubric-list-item">
                     % endif
-                    % if view_only:
-                        % if option['selected'] and combined_rubric==False:
-                            ## if this is the selected rubric block, show it highlighted
-                            <div class="rubric-label">
-                                ${option['points']} points : ${option['text']}
-                            </div>
-                        % elif combined_rubric == True:
-                            <div class="rubric-label">
-                                %for grader_type in category['options'][j]['grader_types']:
-                                    % if grader_type in grader_type_image_dict:
-                                        <% grader_image = grader_type_image_dict[grader_type] %>
-                                        % if grader_type in human_grader_types:
-                                            <% human_title = human_grader_types[grader_type] %>
-                                        % else:
-                                            <% human_title = grader_type %>
-                                        % endif
-                                        <img src="${grader_image}" title="${human_title}"/>
-                                    % endif
-                                %endfor
-                                ${option['points']} points : ${option['text']}
-                            </div>
-                        % endif
-                    % else:
-                        <label class="rubric-label" for="score-${i}-${j}">
-                            <input type="radio" class="score-selection" name="score-selection-${i}" id="score-${i}-${j}" value="${option['points']}"/>
-                            <span class="wrappable"> ${option['points']} points : ${option['text']}</span>
-                        </label>
-                    % endif
+                    <label class="rubric-label" for="score-${i}-${j}">
+                        <input type="radio" class="score-selection" name="score-selection-${i}" id="score-${i}-${j}" value="${option['points']}"/>
+                        <span class="wrappable"> ${option['points']} points : ${option['text']}</span>
+                    </label>
                     </li>
                 % endfor
             </ul>
