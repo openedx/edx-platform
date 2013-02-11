@@ -47,29 +47,28 @@ CMS.Views.Settings.Advanced = CMS.Views.ValidatingView.extend({
                 listEle$.append(self.template({ key : key, value : JSON.stringify(self.model.get(key))}));
                 self.fieldToSelectorMap[key] = key;
             });
-        var policyValueDivs = listEle$.find('.ace');
-        _.each(policyValueDivs, this.attachAce, this);
+        var policyValues = listEle$.find('.json');
+        _.each(policyValues, this.attachJSONEditor, this);
         this.showMessage();
         return this;
     },
-    attachAce : function (div) {
+    attachJSONEditor : function (textarea) {
         var self = this;
-        var editor = ace.edit(div);
-        editor.setTheme("ace/theme/chrome");
-        editor.setHighlightActiveLine(false);
-        editor.on("blur",
-            function (e) {
-                var key = $(editor.container).closest('.row').children('.key').attr('id');
-                // TODO: error checking in case it does not parse!
-                var quotedValue = editor.getValue();
+        CodeMirror.fromTextArea(textarea, {
+            mode: "text/html", lineNumbers: true, lineWrapping: true,
+            onBlur: function (mirror) {
+                var key = $(mirror.getWrapperElement()).closest('.row').children('.key').attr('id');
+                mirror.save();
+                var quotedValue = mirror.getValue();
                 var JSONValue = JSON.parse(quotedValue);
                 self.model.set(key, JSONValue, {validate: true});
                 self.showMessage(self.unsaved_changes);
-
-            });
-        // Calling getSession() directly in render causes a crash on Chrome.
-        // Seems to be OK in afterRender method.
-        editor.getSession().setMode("ace/mode/json");
+                // cachethis.clearValidationErrors();
+                // var newVal = mirror.getValue();
+                // if (cachethis.model.get(field) != newVal) cachethis.model.save(field, newVal,
+                //    { error: CMS.ServerError});
+            }
+        });
     },
 
     showMessage: function (type) {
@@ -140,7 +139,7 @@ CMS.Views.Settings.Advanced = CMS.Views.ValidatingView.extend({
         // need to refind b/c replaceWith seems to copy rather than use the specific ele instance
         var policyValueDivs = this.$el.find('#' + this.new_key).closest('li').find('.ace');
         // only 1 but hey, let's take advantage of the context mechanism
-        _.each(policyValueDivs, this.attachAce, this);
+        _.each(policyValueDivs, this.attachJSONEditor, this);
         this.showMessage(this.unsaved_changes);
     },
     updateKey : function(event) {
@@ -205,7 +204,7 @@ CMS.Views.Settings.Advanced = CMS.Views.ValidatingView.extend({
             // need to refind b/c replaceWith seems to copy rather than use the specific ele instance
             var policyValueDivs = this.$el.find('#' + newKey).closest('li').find('.ace');
             // only 1 but hey, let's take advantage of the context mechanism
-            _.each(policyValueDivs, this.attachAce, this);
+            _.each(policyValueDivs, this.attachJSONEditor, this);
             
             this.fieldToSelectorMap[newKey] = newKey;
             this.showMessage(this.unsaved_changes);
