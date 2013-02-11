@@ -29,6 +29,7 @@ class PeerGradingService(GradingService):
         config['system'] = system
         super(PeerGradingService, self).__init__(config)
         self.url = config['url'] + config['peer_grading']
+        self.login_url = self.url + '/login/'
         self.get_next_submission_url = self.url + '/get_next_submission/'
         self.save_grade_url = self.url + '/save_grade/'
         self.is_student_calibrated_url = self.url + '/is_student_calibrated/'

@@ -23,7 +23,6 @@ class GradingService(object):
         self.username = config['username']
         self.password = config['password']
         self.url = config['url']
-        self.login_url = self.url + '/login/'
         self.session = requests.session()
         self.system = config['system']
 

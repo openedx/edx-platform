@@ -64,6 +64,8 @@ class StaffGradingService(GradingService):
     def __init__(self, config):
         config['system'] = ModuleSystem(None, None, None, render_to_string, None)
         super(StaffGradingService, self).__init__(config)
+        self.url = config['url'] + config['staff_grading']
+        self.login_url = self.url + '/login/'
         self.get_next_url = self.url + '/get_next_submission/'
         self.save_grade_url = self.url + '/save_grade/'
         self.get_problem_list_url = self.url + '/get_problem_list/'

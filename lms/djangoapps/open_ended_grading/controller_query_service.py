@@ -21,6 +21,7 @@ class ControllerQueryService(GradingService):
         config['system'] = ModuleSystem(None, None, None, render_to_string, None)
         super(ControllerQueryService, self).__init__(config)
         self.url = config['url'] + config['grading_controller']
+        self.login_url = self.url + '/login/'
         self.check_eta_url = self.url + '/get_submission_eta/'
         self.is_unique_url = self.url + '/is_name_unique/'
         self.combined_notifications_url = self.url + '/combined_notifications/'
