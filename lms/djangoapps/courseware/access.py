@@ -343,9 +343,9 @@ def _does_course_group_name_exist(name):
 
 def group_names_for(role, location, course_context=None):
     """Returns the group names for a given role with this location. Plural 
-    because it will return both the name we expectd now as well as the legacy
+    because it will return both the name we expect now as well as the legacy
     group name we support for backwards compatibility. This should not check
-    the DB for existance of a group (like some of its callers do) because that's
+    the DB for existence of a group (like some of its callers do) because that's
     a DB roundtrip, and we expect this might be invoked many times as we crawl
     an XModule tree."""
     loc = Location(location)
