@@ -392,10 +392,10 @@ class @StaffGrading
 
     else if @state == state_grading
       @ml_error_info_container.html(@ml_error_info)
-      meta_list = $("<ul>")
-      meta_list.append("<li><span class='meta-info'>Available - </span> #{@num_pending}</li>")
-      meta_list.append("<li><span class='meta-info'>Graded - </span> #{@num_graded}</li>")
-      meta_list.append("<li><span class='meta-info'>Needed for ML - </span> #{Math.max(@min_for_ml - @num_graded, 0)}</li>")
+      meta_list = $("<div>")
+      meta_list.append("<div class='meta-info'>#{@num_pending} available | </div>")
+      meta_list.append("<div class='meta-info'>#{@num_graded} graded | </div>")
+      meta_list.append("<div class='meta-info'>#{Math.max(@min_for_ml - @num_graded, 0)} more needed to start ML </div><br/>")
       @problem_meta_info.html(meta_list)
 
       @prompt_container.html(@prompt)

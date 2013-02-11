@@ -113,18 +113,9 @@ div.peer-grading{
     {
         background-color: #eee;
         padding:2px;
-        h3
+        div
         {
-            font-size:1em;
-        }
-        ul
-        {
-            list-style-type: none;
-            font-size: .85em;
-            li
-            {
-                margin: 1px 0px;
-            }
+            display : inline;
         }
     }
     .message-container,
