@@ -10,6 +10,7 @@ import json
 from fs.osfs import OSFS
 import copy
 from mock import Mock
+from json import dumps, loads
 
 from student.models import Registration
 from django.contrib.auth.models import User
@@ -207,6 +208,15 @@ class ContentStoreToyCourseTest(ModuleStoreTestCase):
         # check for custom_tags
         self.verify_content_existence(ms, root_dir, location, 'custom_tags', 'custom_tag_template')
 
+        # check for graiding_policy.json
+        fs = OSFS(root_dir / 'test_export/policies/6.002_Spring_2012')
+        self.assertTrue(fs.exists('grading_policy.json'))
+
+        # compare what's on disk compared to what we have in our course
+        with fs.open('grading_policy.json','r') as grading_policy:
+            on_disk = loads(grading_policy.read())
+            course = ms.get_item(location)
+            self.assertEqual(on_disk, course.definition['data']['grading_policy'])
 
         # remove old course
         delete_course(ms, cs, location)
