@@ -130,12 +130,17 @@ PollMain.prototype = {
                 _this.showAnswerGraph(response.poll_answers, response.total);
 
                 if (_this.verticalSectionEl !== null) {
-                    _this.verticalSectionEl.find('xmodule_ConditionalModule', function (index, value) {
+                    console.log('Looking for conditional modules');
+                    $(_this.verticalSectionEl).find('.xmodule_ConditionalModule').each(function (index, value) {
                         console.log('Found conditional element. index = ');
                         console.log(index);
                         console.log('value = ');
                         console.log(value);
+
+                        (new window.Conditional(value));
                     });
+                } else {
+                    console.log('Did not find any conditional modules');
                 }
 
                 /*
