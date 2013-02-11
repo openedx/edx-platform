@@ -81,15 +81,22 @@ def test_data_dir_fallback(mock_storage, mock_modulestore, mock_settings):
 
 
 def test_raw_static_check():
+    """
+    Make sure replace_static_urls leaves alone things that end in '.raw'
+    """
     path = '"/static/foo.png?raw"'
     assert_equals(path, replace_static_urls(path, DATA_DIRECTORY))
+
+    text = 'text <tag a="/static/js/capa/protex/protex.nocache.js?raw"/><div class="'
+    assert_equals(path, replace_static_urls(path, text))
 
 
 def test_regex():
     yes = ('"/static/foo.png"',
            '"/static/foo.png"',
            "'/static/foo.png'")
-    no = ('"/static/foo.png?raw"',
+
+    no = ('"/not-static/foo.png"',
           '"/static/foo',  # no matching quote
           )
 
