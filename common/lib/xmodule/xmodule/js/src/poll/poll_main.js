@@ -129,6 +129,15 @@ PollMain.prototype = {
                 logme('Two.');
                 _this.showAnswerGraph(response.poll_answers, response.total);
 
+                if (_this.verticalSectionEl !== null) {
+                    _this.verticalSectionEl.find('xmodule_ConditionalModule', function (index, value) {
+                        console.log('Found conditional element. index = ');
+                        console.log(index);
+                        console.log('value = ');
+                        console.log(value);
+                    });
+                }
+
                 /*
                 _this.vertModEl.find('.xmodule_ConditionalModule').each(
                     function (index, value) {
@@ -208,6 +217,37 @@ return PollMain;
 
 function PollMain(el) {
     var _this;
+
+    var tel, c1;
+
+    tel = $(el)[0];
+    c1 = 0;
+
+    console.log(tel);
+
+    this.verticalSectionEl = null;
+
+    while (tel.tagName.toLowerCase() !== 'body') {
+        tel = $(tel).parent()[0];
+        c1 += 1;
+
+        console.log('' + c1 + ': parent = ');
+        console.log(tel);
+
+        if ((tel.tagName.toLowerCase() === 'section') && ($(tel).hasClass('xmodule_VerticalModule') === true)) {
+            console.log('Found vertical section. Saving element for future use.');
+            this.verticalSectionEl = tel;
+
+            break;
+        } else if (c1 > 50) {
+            console.log('ERROR: HTML hierarchy is very large.');
+
+            break;
+        }
+    }
+
+    console.log('this.verticalSectionEl = ');
+    console.log(this.verticalSectionEl);
 
     this.vertModEl = $(el).parent().parent();
     if (this.vertModEl.length !== 1) {
