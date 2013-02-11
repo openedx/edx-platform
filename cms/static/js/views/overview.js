@@ -58,6 +58,9 @@ $(document).ready(function() {
         drop: onSectionReordered,
         greedy: true
     });
+    
+    // stop clicks on drag bars from doing their thing w/o stopping drag (did this cancel pointer?)
+    $('.courseware-overview').click(function(e) {e.preventDefault(); });
 
 });
 
