@@ -84,8 +84,8 @@ CMS.Views.Settings.Details = CMS.Views.ValidatingView.extend({
     setupDatePicker: function (fieldName) {
         var cacheModel = this.model;
         var div = this.$el.find('#' + this.fieldToSelectorMap[fieldName]);
-        var datefield = $(div).find(".date");
-        var timefield = $(div).find(".time");
+        var datefield = $(div).find("input:.date");
+        var timefield = $(div).find("input:.time");
         var cachethis = this;
         var savefield = function () {
             cachethis.clearValidationErrors();
@@ -97,7 +97,7 @@ CMS.Views.Settings.Details = CMS.Views.ValidatingView.extend({
                 }
                 var newVal = new Date(date.getTime() + time * 1000);
                 if (cacheModel.get(fieldName).getTime() !== newVal.getTime()) {
-                    cacheModel.save(fieldName, newVal, { error: CMS.ServerError});
+                    cacheModel.save(fieldName, newVal);
                 }
             }
         };
@@ -149,8 +149,7 @@ CMS.Views.Settings.Details = CMS.Views.ValidatingView.extend({
     },
 
     removeSyllabus: function() {
-        if (this.model.has('syllabus'))	this.model.save({'syllabus': null}, 
-                { error : CMS.ServerError});
+        if (this.model.has('syllabus'))	this.model.save({'syllabus': null});
     },
 
     assetSyllabus : function() {
@@ -184,8 +183,7 @@ CMS.Views.Settings.Details = CMS.Views.ValidatingView.extend({
                     mirror.save();
                     cachethis.clearValidationErrors();
                     var newVal = mirror.getValue();
-                    if (cachethis.model.get(field) != newVal) cachethis.model.save(field, newVal,
-                            { error: CMS.ServerError});
+                    if (cachethis.model.get(field) != newVal) cachethis.model.save(field, newVal);
                 }
             });
         }

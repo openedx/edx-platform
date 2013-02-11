@@ -19,9 +19,19 @@ CMS.Views.ValidatingView = Backbone.View.extend({
     },
     _cacheValidationErrors : [],
     handleValidationError : function(model, error) {
+        // error triggered either by validation or server error
         // error is object w/ fields and error strings
         for (var field in error) {
-            var ele = this.$el.find('#' + this.fieldToSelectorMap[field]); 
+            var ele = this.$el.find('#' + this.fieldToSelectorMap[field]);
+            if (ele.length === 0) {
+                // check if it might a server error: note a typo in the field name 
+                // or failure to put in a map may cause this to muffle validation errors
+                if (_.has(error, 'error') && _.has(error, 'responseText')) {
+                    CMS.ServerError(model, error);
+                    return;
+                }
+                else continue;
+            }
             this._cacheValidationErrors.push(ele);
             if ($(ele).is('div')) {
                 // put error on the contained inputs
@@ -50,9 +60,9 @@ CMS.Views.ValidatingView = Backbone.View.extend({
         var field = this.selectorToField[event.currentTarget.id];
         var currentVal = this.model.get(field);
         var newVal = $(event.currentTarget).val();
+        this.clearValidationErrors(); // curr = new if user reverts manually
         if (currentVal != newVal) {
-            this.clearValidationErrors();
-            this.model.save(field, newVal, { error : CMS.ServerError});
+            this.model.save(field, newVal);
             return true;
         }
         else return false;
