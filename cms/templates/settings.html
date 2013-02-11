@@ -28,6 +28,12 @@ from contentstore import utils
   <script type="text/javascript">
     $(document).ready(function(){
 
+        // to show/hide the alert, just toggle the "is-shown" class with JS - CSS handles the rest
+        $('.test-notification').click(function(e){
+          e.preventDefault();
+          $('.wrapper-notification').toggleClass('is-shown');
+        });        
+
         // proactively populate advanced b/c it has the filtered list and doesn't really follow the model pattern
         var advancedModel = new CMS.Models.Settings.Advanced(${advanced_dict | n}, {parse:true});
         advancedModel.blacklistKeys = ${advanced_blacklist | n};
@@ -54,7 +60,10 @@ from contentstore import utils
   <!-- -->
   <div class="main-wrapper">
     <div class="inner-wrapper">      
+      <a href="#" class="test-notification">Test Notification (for testing purposes)!</a>
+
       <h1>Settings</h1>
+
       <article class="settings-overview">
         <div class="sidebar">
           <nav class="settings-page-menu">
@@ -780,5 +789,21 @@ from contentstore import utils
       </article>
     </div>
   </div>
-  <footer></footer>
+
+  <!-- notification: change has been made and a save is needed -->
+  <div class="wrapper wrapper-notification wrapper-notification-warning">
+    <div class="notification warning">
+      <div class="copy">
+        <i class="ss-icon ss-symbolicons-block icon icon-warning">&#x26A0;</i>
+        <p><strong>Note: </strong>Your changes will not take effect until you <strong>save your progress</strong>.</p> 
+      </div>
+
+      <div class="actions">
+        <ul>
+          <li><a href="#" class="save-button">Save</a></li>
+          <li><a href="#" class="cancel-button">Cancel</a></li>
+        </ul>
+      </div>
+    </div>
+  </div>
 </%block>
