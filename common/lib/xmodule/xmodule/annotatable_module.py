@@ -50,7 +50,7 @@ class AnnotatableModule(XModule):
             del span.attrib['anchor']
     
     def _decorate_span(self, span, index, xmltree):
-        """ Decorates the span with an icon and highlight.  """
+        """ Decorates the span highlight.  """
 
         cls = ['annotatable-span', 'highlight']
         marker = self._get_marker_color(span)
@@ -59,11 +59,6 @@ class AnnotatableModule(XModule):
         
         span.tag = 'div'
         span.set('class', ' '.join(cls))
-        span_icon = etree.Element('span', { 'class': 'annotatable-icon'} )
-        span_icon.text = '';
-        span_icon.tail = span.text
-        span.text = ''
-        span.insert(0, span_icon)
         
     def _decorate_comment(self, span, index, xmltree):
         """ Sets the comment class. """

@@ -108,8 +108,8 @@ class @Annotatable
         (api) =>
             anchor = $(el).data('discussion-anchor')
             comment = $(@commentSelector, el).first().clone()
-            comment.append(@createReplyLink(anchor)) if anchor
-            comment.contents()
+            comment = comment.after(@createReplyLink(anchor)) if anchor
+            comment
 
     makeTipTitle: (el) ->
         (api) =>
