@@ -21,7 +21,6 @@
       });
     });
   </script>
-
 </%block>
 <%block name="content">
   <div class="main-wrapper edit-state-${unit_state}" data-id="${unit_location}">
@@ -34,6 +33,23 @@
         </p>
         <a href="${published_preview_link}" target="_blank" class="alert-action secondary">Preview the published version</a>
       </div>
+
+      <header class="page">
+        <nav class="hierarchy">
+          <ul>
+            <li class="nav-item"><a href="#">Section Name</a></li>
+            <li class="nav-item"><a href="#">Learning Sequence Name</a></li>
+          </ul>
+        </nav>
+        <h1 class="title-1">Unit Name</h1>
+
+        <nav class="actions">
+          <li class="nav-item"><a href="#">Preview Unit</a></li>
+          <li class="nav-item"><a href="#">View Live</a></li>
+          <li class="nav-item"><a href="#">Edit Draft</a></li>
+        </nav>
+      </header>
+
       <div class="main-column">
         <article class="unit-body window">
           <p class="unit-name-input"><label>Display Name:</label><input type="text" value="${unit.display_name}" class="unit-display-name-input" /></p>
