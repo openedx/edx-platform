@@ -56,9 +56,14 @@ class AnnotatableModule(XModule):
         marker = self._get_marker_color(span)
         if marker is not None:
             cls.append('highlight-'+marker)
-        
-        span.tag = 'div'
+
+        icon = etree.Element('span', { 'class': 'annotatable-icon ss-icon ss-textchat' })
+        icon.append(etree.Entity('#xE396'))
+        icon.tail = span.text
+        span.text = ''
+        span.insert(0, icon)
         span.set('class', ' '.join(cls))
+        span.tag = 'div'
         
     def _decorate_comment(self, span, index, xmltree):
         """ Sets the comment class. """
