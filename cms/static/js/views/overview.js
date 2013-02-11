@@ -202,13 +202,17 @@ function _handleReorder(event, ui, parentIdField, childrenSelector) {
                 children = _.without(children, ui.draggable.data('id'));
         }
         // add to this parent (figure out where)
-        for (var i = 0; i < _els.length; i++) {
-                if (!ui.draggable.is(_els[i]) && ui.offset.top < $(_els[i]).offset().top) {
+        for (var i = 0, bump = 0; i < _els.length; i++) {
+            if (ui.draggable.is(_els[i])) {
+                bump = -1; // bump indicates that the draggable was passed in the dom but not children's list b/c
+                // it's not in that list
+            }
+            else if (ui.offset.top < $(_els[i]).offset().top) {
                         // insert at i in children and _els
                         ui.draggable.insertBefore($(_els[i]));
                         // TODO figure out correct way to have it remove the style: top:n; setting (and similar line below)
                         ui.draggable.attr("style", "position:relative;");
-                        children.splice(i, 0, ui.draggable.data('id'));
+                        children.splice(i + bump, 0, ui.draggable.data('id'));
                         break;
                 }
         }
