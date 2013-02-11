@@ -165,13 +165,6 @@ STATICFILES_DIRS = [
 # This is how you would use the textbook images locally
 #    ("book", ENV_ROOT / "book_images")
 ]
-if os.path.isdir(GITHUB_REPO_ROOT):
-    STATICFILES_DIRS += [
-        # TODO (cpennington): When courses aren't loaded from github, remove this
-        (course_dir, GITHUB_REPO_ROOT / course_dir)
-        for course_dir in os.listdir(GITHUB_REPO_ROOT)
-        if os.path.isdir(GITHUB_REPO_ROOT / course_dir)
-    ]
 
 # Locale/Internationalization
 TIME_ZONE = 'America/New_York'  # http://en.wikipedia.org/wiki/List_of_tz_zones_by_name

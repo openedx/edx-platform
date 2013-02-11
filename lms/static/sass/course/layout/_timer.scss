@@ -1,0 +1,38 @@
+div.timer-main {
+  position: fixed;
+  z-index: 99;
+  top: 0;
+  right: 0;
+  width: 100%;
+  border-top: 2px solid #000;
+
+  div#timer_wrapper {
+    position: absolute;
+    top: -3px;
+    right: 10px;
+    background: #000;
+    color: #fff;
+    padding: 10px 20px;
+    border-radius: 3px;
+  }
+
+  .timer_return_url {
+    display: block;
+    margin-bottom: 5px;
+    border-bottom: 1px solid tint(#000, 20%);
+    padding-bottom: 5px;
+    font-size: 13px;
+  }
+
+  .timer_label {
+    color: #b0b0b0;
+    font-size: 13px;
+    margin-bottom: 3px;
+  }
+
+  #exam_timer {
+    font-weight: bold;
+    font-size: 15px;
+    letter-spacing: 1px;
+  }
+}
