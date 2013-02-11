@@ -93,7 +93,7 @@ class ConditionalModule(XModule):
         """
         if not self.is_condition_satisfied():
             context = {'module': self,
-                        'show_deps': False}
+                       'message': self.descriptor.xml_attributes.get('message')}
             html = self.system.render_template('conditional_module.html',
                 context)
             return json.dumps({'html': [html]})
