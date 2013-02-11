@@ -263,6 +263,12 @@ body.course.settings {
       .current {
         @include size(640px,362px);
       }
+
+      .actions {
+        margin-top: ($baseline/2);
+        border-top: 1px solid $gray-l5;
+        padding-top: ($baseline/2);
+      }
     }
 
     // specific fields - requirements
