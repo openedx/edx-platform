@@ -238,8 +238,7 @@ def symmath_check(expect, ans, dynamath=None, options=None, debug=None, xml=None
     ###### PMathML input ######
     # convert mathml answer to formula
     try:
-        if dynamath:
-            mmlans = dynamath[0]
+        mmlans = dynamath[0] if dynamath else None
     except Exception, err:
         mmlans = None
     if not mmlans:
