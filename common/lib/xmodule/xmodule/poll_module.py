@@ -42,7 +42,7 @@ class PollModule(XModule):
 
     voted = Boolean(help="Whether this student has voted on the poll", scope=Scope.student_state, default=False)
     poll_answer = String(help="Student answer", scope=Scope.student_state, default='')
-    poll_answers = Object(help="All possible answers for the poll fro other students", scope=Scope.content, default={})
+    poll_answers = Object(help="All possible answers for the poll fro other students", scope=Scope.content)
 
     answers = List(help="Poll answers from xml", scope=Scope.content, default=[])
     question = String(help="Poll question", scope=Scope.content, default='')
@@ -95,6 +95,11 @@ class PollModule(XModule):
         Returns:
             string - Serialize json.
         """
+        # FIXME: hack for resolving caching `default={}` during definition
+        # poll_answers field
+        if self.poll_answers is None:
+            self.poll_answers = {}
+
         answers_to_json = OrderedDict()
 
         # FIXME: fix this, when xblock support mutable types.
