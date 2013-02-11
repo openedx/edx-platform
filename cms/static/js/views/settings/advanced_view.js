@@ -10,14 +10,13 @@ CMS.Views.Settings.Advanced = CMS.Views.ValidatingView.extend({
     // Model class is CMS.Models.Settings.Advanced
     events : {
         'click .delete-button' : "deleteEntry",
-        'click .save-button' : "saveView",
-        'click .cancel-button' : "revertView",
+//        'click .save-button' : "saveView",      TODO: put back once Advanced is not in tab view
+//        'click .cancel-button' : "revertView",  with current code, must attach listener in initialize method
         'click .new-button' : "addEntry",
         // update model on changes
         'change #course-advanced-policy-key' : "updateKey",
-        'keydown #course-advanced-policy-key' : "enableSaveCancelButtons"
+        'keydown #course-advanced-policy-key' : "showSaveCancelButtons"
         // TODO enable/disable save based on validation (currently enabled whenever there are changes)
-        // TODO enable/disable new button?
     },
     initialize : function() {
         var self = this;
@@ -29,6 +28,8 @@ CMS.Views.Settings.Advanced = CMS.Views.ValidatingView.extend({
                 self.render();
             }
         );
+        $('.save-button').on('click', this, this.saveView);
+        $('.cancel-button').on('click', this, this.revertView);
         this.model.on('error', this.handleValidationError, this);
     },
     render: function() {
@@ -58,7 +59,7 @@ CMS.Views.Settings.Advanced = CMS.Views.ValidatingView.extend({
         CodeMirror.fromTextArea(textarea, {
             mode: "application/json", lineNumbers: false, lineWrapping: true,
             onChange: function() {
-                self.enableSaveCancelButtons();
+                self.showSaveCancelButtons();
             },
             onBlur: function (mirror) {
                 var key = $(mirror.getWrapperElement()).closest('.row').children('.key').attr('id');
@@ -78,31 +79,29 @@ CMS.Views.Settings.Advanced = CMS.Views.ValidatingView.extend({
                 this.$el.find(".message-status.error").addClass("is-shown");
             }
             else if (type === this.unsaved_changes) {
-                this.$el.find(".message-status.warning").addClass("is-shown");
+                $('.wrapper-notification').addClass('is-shown');
             }
             else if (type === this.successful_changes) {
                 this.$el.find(".message-status.confirm").addClass("is-shown");
-                this.disableSaveCancelButtons();
+                this.hideSaveCancelButtons();
             }
         }
         else {
             // This is the case of the page first rendering.
-            this.disableSaveCancelButtons();
+            this.hideSaveCancelButtons();
         }
     },
 
-    enableSaveCancelButtons: function() {
-       if (!this.buttonsEnabled) {
-           this.$el.find(".save-button").removeClass('disabled');
-           this.$el.find(".cancel-button").show();
-           this.buttonsEnabled = true;
+    showSaveCancelButtons: function() {
+       if (!this.buttonsVisible) {
+           $('.wrapper-notification').addClass('is-shown');
+           this.buttonsVisible = true;
        }
     },
 
-    disableSaveCancelButtons: function() {
-        this.$el.find(".save-button").addClass('disabled');
-        this.$el.find(".cancel-button").hide();
-        this.buttonsEnabled = false;
+    hideSaveCancelButtons: function() {
+        $('.wrapper-notification').removeClass('is-shown');
+        this.buttonsVisible = false;
     },
 
     toggleNewButton: function (enable) {
@@ -134,8 +133,8 @@ CMS.Views.Settings.Advanced = CMS.Views.ValidatingView.extend({
         // TODO one last verification scan:
         //    call validateKey on each to ensure proper format
         //    check for dupes
-        var self = this;
-        this.model.save({},
+        var self = event.data;
+        self.model.save({},
             {
             success : function() {
                 self.render();
@@ -145,10 +144,10 @@ CMS.Views.Settings.Advanced = CMS.Views.ValidatingView.extend({
         });
     },
     revertView : function(event) {
-        this.model.deleteKeys = [];
-        var self = this;
-        this.model.clear({silent : true});
-        this.model.fetch({
+        var self = event.data;
+        self.model.deleteKeys = [];
+        self.model.clear({silent : true});
+        self.model.fetch({
             success : function() { self.render(); },
             error : CMS.ServerError
         });

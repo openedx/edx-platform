@@ -28,12 +28,6 @@ from contentstore import utils
   <script type="text/javascript">
     $(document).ready(function(){
 
-        // to show/hide the alert, just toggle the "is-shown" class with JS - CSS handles the rest
-        $('.test-notification').click(function(e){
-          e.preventDefault();
-          $('.wrapper-notification').toggleClass('is-shown');
-        });        
-
         // proactively populate advanced b/c it has the filtered list and doesn't really follow the model pattern
         var advancedModel = new CMS.Models.Settings.Advanced(${advanced_dict | n}, {parse:true});
         advancedModel.blacklistKeys = ${advanced_blacklist | n};
@@ -59,8 +53,7 @@ from contentstore import utils
 <%block name="content">
   <!-- -->
   <div class="main-wrapper">
-    <div class="inner-wrapper">      
-      <a href="#" class="test-notification">Test Notification (for testing purposes)!</a>
+    <div class="inner-wrapper">
 
       <h1>Settings</h1>
 
@@ -753,10 +746,6 @@ from contentstore import utils
               There was an error saving your information. Please see below.
             </div>
 
-            <div class="message message-status warning is-shown">
-              Your changes will not take effect until you press "Save" on the bottom of the page.
-            </div>
-
             <section class="settings-advanced-policies">
               <header>
                 <h3>Manual Policy Definition</h3>
@@ -774,8 +763,6 @@ from contentstore import utils
 
                   <!-- advanced policy actions -->
                   <div class="actions actions-advanced-policies">
-                    <a href="#" class="save-button">Save</a>
-                    <a href="#" class="cancel-button">Cancel</a>
                     <a href="#" class="new-button new-advanced-policy-item add-policy-data">
                       <span class="plus-icon white"></span>New Manual Policy
                     </a>
@@ -795,7 +782,7 @@ from contentstore import utils
     <div class="notification warning">
       <div class="copy">
         <i class="ss-icon ss-symbolicons-block icon icon-warning">&#x26A0;</i>
-        <p><strong>Note: </strong>Your changes will not take effect until you <strong>save your progress</strong>.</p> 
+        <p><strong>Note: </strong>Your changes will not take effect until you <strong>save your progress</strong>.</p>
       </div>
 
       <div class="actions">
