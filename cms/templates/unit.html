@@ -21,47 +21,9 @@
       });
     });
   </script>
+
 </%block>
 <%block name="content">
-<div class="wrapper-content wrapper">
-  <section class="content">
-
-    <header class="page">
-      <nav class="hierarchy">
-        <ul>
-          <li class="nav-item"><a href="#">Section Name</a></li>
-          <li class="nav-item"><a href="#">Learning Sequence Name</a></li>
-        </ul>
-      </nav>
-      <h1 class="title-1">Unit Name</h1>
-      <!-- <p class="unit-name-input"><label>Display Name:</label><input type="text" value="${unit.display_name}" class="unit-display-name-input" /></p> -->
-
-      <nav class="actions">
-        <li class="nav-item"><a href="#">Preview Unit</a></li>
-        <li class="nav-item"><a href="#">View Live</a></li>
-        <li class="nav-item"><a href="#">Edit Draft</a></li>
-      </nav>
-
-      <h2 class="sr">Unit Metadata &amp; Properties</h2>
-      <ul class="list-metadata">
-        <li class="metadata status-visibility">
-          <label for="visibility-select">Visibility:</label>
-          <select class="visibility-select">
-            <option value="public">Public</option>
-            <option value="private">Private</option>
-          </select>
-        </li>
-        <li class="metadata status-release">
-          <p>This unit is scheduled to be released on <span class="date">06 February, 2013</span> at <span class="time">12:00 PM</span> with <a href="#">"Introduction to the Course"</a></p>
-        </li>
-        <li class="metadata metadata-url">
-          <span class="label">Unit URL:</span> <span class="value"><a href="#">/courseware/db0cfa58100f4ca48c614cfb618030d1/7317287782624b9b924bd70ce5ca7b2d</a></span>
-        </li>
-      </ul>
-    </header>
-  </section>
-</div>
-
   <div class="main-wrapper edit-state-${unit_state}" data-id="${unit_location}">
     <div class="inner-wrapper">
       <div class="alert editing-draft-alert">
@@ -72,9 +34,9 @@
         </p>
         <a href="${published_preview_link}" target="_blank" class="alert-action secondary">Preview the published version</a>
       </div>
-
       <div class="main-column">
         <article class="unit-body window">
+          <p class="unit-name-input"><label>Display Name:</label><input type="text" value="${unit.display_name}" class="unit-display-name-input" /></p>
           <ol class="components">
             % for id in components:
             <li class="component" data-id="${id}"/>
@@ -136,7 +98,7 @@
       </div>
 
       <div class="sidebar">
-        <!-- <div class="unit-settings window">
+        <div class="unit-settings window">
           <h4 class="header">Unit Settings</h4>
           <div class="window-contents">
             <div class="row visibility">
@@ -163,7 +125,7 @@
               <a href="${published_preview_link}" target="_blank" class="view-button">View Live</a>
             </div>
           </div>
-        </div> -->
+        </div>
         <div class="window unit-location">
           <h4 class="header">Unit Location</h4>
           <div class="window-contents">
