@@ -13,12 +13,22 @@ log = logging.getLogger(__name__)
 
 
 def _url_replace_regex(prefix):
+    """
+    Match static urls in quotes that don't end in '?raw'.
+
+    I'm sorry.  http://xkcd.com/1171/
+
+    (?<!blah) means "don't match if the previous thing is blah".  Clear, eh?
+       (grep for negative lookbehind assertion in
+       http://docs.python.org/2/library/re.html)
+    """
     return r"""
-        (?x)                 # flags=re.VERBOSE
-        (?P<quote>\\?['"])   # the opening quotes
-        (?P<prefix>{prefix}) # theeprefix
-        (?P<rest>.*?)        # everything else in the url
-        (?P=quote)           # the first matching closing quote
+        (?x)                      # flags=re.VERBOSE
+        (?P<quote>\\?['"])        # the opening quotes
+        (?P<prefix>{prefix})      # the prefix
+        (?P<rest>.*?              # everything else in the url...
+               (?<!\?raw))        # ...but not if it has '?raw' at the end.
+        (?P=quote)                # the first matching closing quote
         """.format(prefix=prefix)
 
 
