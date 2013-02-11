@@ -65,6 +65,7 @@ body.course.settings {
     .remove-item {
       @include white-button;
       @include font-size(13);
+      font-weight: 400;
     }
 
     .new-button {
@@ -147,6 +148,32 @@ body.course.settings {
       .field-group {
         @include clearfix();
         margin: 0 0 ($baseline/2) 0;
+      }
+
+      // enumerated/grouped lists
+      &.enum {
+
+        .field-group {
+          @include box-sizing(border-box);
+          @include border-radius(3px);
+          background: $gray-l5;
+          padding: ($baseline/2);
+
+          &:last-child {
+            padding-bottom: ($baseline/2); 
+          }
+
+          .actions {
+            @include clearfix();
+            margin-top: ($baseline/2);
+            border-top: 1px solid $gray-l4;
+            padding-top: ($baseline/2);
+
+            .remove-item {
+              float: right;
+            }
+          }
+        }
       }
     }
 
@@ -526,11 +553,6 @@ body.course.settings {
         .delete-button {
           margin: 0;
         }
-      }
-
-      > .actions {
-        border-top: 1px solid $gray-l5;
-        padding-top: $baseline;
       }
     }
   }
