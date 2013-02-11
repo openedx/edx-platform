@@ -58,7 +58,7 @@ class PollModule(XModule):
             json string
         """
         if dispatch in self.poll_answers and not self.voted:
-            # FIXME: fix this, when xblock support mutable types.
+            # FIXME: fix this, when xblock will support mutable types.
             # Now we use this hack.
             temp_poll_answers = self.poll_answers
             temp_poll_answers[dispatch] += 1
