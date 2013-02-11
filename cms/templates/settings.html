@@ -212,7 +212,7 @@ from contentstore import utils
         <h3 class="title-3">Other Course Settings</h3>
         <nav class="nav-related">
           <ul>
-            <li class="nav-item"><a href="">Grading</a></li>
+            <li class="nav-item"><a href="${reverse('contentstore.views.course_config_graders_page', kwargs={'org' : ctx_loc.org, 'course' : ctx_loc.course, 'name': ctx_loc.name})}">Grading</a></li>
           </ul>
         </nav>
       </div>
