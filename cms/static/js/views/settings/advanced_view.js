@@ -14,8 +14,9 @@ CMS.Views.Settings.Advanced = CMS.Views.ValidatingView.extend({
         'click .cancel-button' : "revertView",
         'click .new-button' : "addEntry",
         // update model on changes
-        'change #course-advanced-policy-key' : "updateKey"
-        // TODO enable/disable save (add disabled class) based on validation & dirty
+        'change #course-advanced-policy-key' : "updateKey",
+        'keydown #course-advanced-policy-key' : "enableSaveCancelButtons"
+        // TODO enable/disable save based on validation (currently enabled whenever there are changes)
         // TODO enable/disable new button?
     },
     initialize : function() {
@@ -56,6 +57,9 @@ CMS.Views.Settings.Advanced = CMS.Views.ValidatingView.extend({
         var self = this;
         CodeMirror.fromTextArea(textarea, {
             mode: "application/json", lineNumbers: false, lineWrapping: true,
+            onChange: function() {
+                self.enableSaveCancelButtons();
+            },
             onBlur: function (mirror) {
                 var key = $(mirror.getWrapperElement()).closest('.row').children('.key').attr('id');
                 var quotedValue = mirror.getValue();
@@ -69,22 +73,36 @@ CMS.Views.Settings.Advanced = CMS.Views.ValidatingView.extend({
 
     showMessage: function (type) {
         this.$el.find(".message-status").removeClass("is-shown");
-        var saveButton = this.$el.find(".save-button").addClass('disabled');
-        var cancelButton = this.$el.find(".cancel-button").addClass('disabled');
         if (type) {
             if (type === this.error_saving) {
                 this.$el.find(".message-status.error").addClass("is-shown");
-                saveButton.removeClass("disabled");
-                cancelButton.removeClass("disabled");
             }
             else if (type === this.unsaved_changes) {
                 this.$el.find(".message-status.warning").addClass("is-shown");
-                saveButton.removeClass("disabled");
-                cancelButton.removeClass("disabled");
             }
-            else if (type === this.successful_changes)
+            else if (type === this.successful_changes) {
                 this.$el.find(".message-status.confirm").addClass("is-shown");
+                this.disableSaveCancelButtons();
+            }
         }
+        else {
+            // This is the case of the page first rendering.
+            this.disableSaveCancelButtons();
+        }
+    },
+
+    enableSaveCancelButtons: function() {
+       if (!this.buttonsEnabled) {
+           this.$el.find(".save-button").removeClass('disabled');
+           this.$el.find(".cancel-button").show();
+           this.buttonsEnabled = true;
+       }
+    },
+
+    disableSaveCancelButtons: function() {
+        this.$el.find(".save-button").addClass('disabled');
+        this.$el.find(".cancel-button").hide();
+        this.buttonsEnabled = false;
     },
 
     deleteEntry : function(event) {
