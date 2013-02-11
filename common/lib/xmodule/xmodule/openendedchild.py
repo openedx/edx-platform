@@ -100,6 +100,7 @@ class OpenEndedChild(object):
         self.display_name = static_data['display_name']
         self.accept_file_upload = static_data['accept_file_upload']
         self.close_date = static_data['close_date']
+        self.s3_interface = static_data['s3_interface']
 
         # Used for progress / grading.  Currently get credit just for
         # completion (doesn't matter if you self-assessed correct/incorrect).
@@ -319,7 +320,7 @@ class OpenEndedChild(object):
 
             try:
                 image_data.seek(0)
-                success, s3_public_url = open_ended_image_submission.upload_to_s3(image_data, image_key)
+                success, s3_public_url = open_ended_image_submission.upload_to_s3(image_data, image_key, self.s3_interface)
             except:
                 log.exception("Could not upload image to S3.")
 
