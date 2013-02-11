@@ -286,9 +286,22 @@ body.course.settings {
     // specific fields - video
     #field-course-introduction-video {
 
-      // current video saved/referenced
-      .current {
-        @include size(640px,362px);
+      .input-existing {
+        @include box-sizing(border-box);
+        @include border-radius(3px);
+        background: $gray-l5;
+        padding: ($baseline/2);
+
+        .actions {
+          @include clearfix();
+          margin-top: ($baseline/2);
+          border-top: 1px solid $gray-l4;
+          padding-top: ($baseline/2);
+
+          .remove-item {
+            float: right;
+          }
+        }
       }
 
       .actions {
