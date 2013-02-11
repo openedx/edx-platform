@@ -999,7 +999,7 @@ def sympy_check2():
         self.context['debug'] = self.system.DEBUG
 
         # exec the check function
-        if type(self.code) == str:
+        if isinstance(self.code, basestring):
             try:
                 exec self.code in self.context['global_context'], self.context
                 correct = self.context['correct']
