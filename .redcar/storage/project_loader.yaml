@@ -1,3 +1,9 @@
 --- 
 open_files: 
+  - lms/templates/discussion/mustache/_inline_discussion.mustache
+  - common/static/coffee/src/discussion/discussion_module_view.coffee
   - lms/djangoapps/django_comment_client/forum/views.py
+  - lms/static/sass/_discussion.scss
+  - lms/templates/discussion/_filter_dropdown.html
+  - common/static/coffee/src/discussion/views/new_post_view.coffee
+  - common/static/coffee/src/discussion/views/discussion_thread_list_view.coffee
