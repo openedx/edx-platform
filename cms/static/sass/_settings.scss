@@ -44,12 +44,30 @@ body.course.settings {
 
     }
 
-    // UI hints/tips
+    // UI hints/tips/messages
     .tip {
       @include font-size(13);
       display: block;
       margin-top: ($baseline/4);
       color: $gray-l3;
+    }
+
+    .message-error {
+      @include font-size(13);
+      display: block;
+      margin-top: ($baseline/4);
+      margin-bottom: ($baseline/2);
+      color: $red;
+    }
+
+    // buttons
+    .remove-item {
+      @include white-button;
+      @include font-size(13);
+    }
+
+    .new-button {
+      @include font-size(13);
     }
 
     // form basics
@@ -103,6 +121,10 @@ body.course.settings {
 
           &.short {
           }
+
+          &.error {
+            border-color: $red;
+          }
         }
 
         textarea.long {
@@ -133,11 +155,6 @@ body.course.settings {
 
       .actions {
         margin: ($baseline/4) 0 0 0;
-
-        .remove-item {
-          @include white-button;
-          @include font-size(13);
-        }
       }
     }
 
@@ -150,6 +167,14 @@ body.course.settings {
 
       input {
         opacity: 0.25;
+      }
+    }
+
+    // field with error
+    .field.error {
+
+      input, textarea {
+        border-color: $red;
       }
     }
      
@@ -208,7 +233,16 @@ body.course.settings {
           width: flex-grid(3, 9);
           margin-bottom: ($baseline/4);
           margin-right: flex-gutter();
+        }
 
+        .field.time {
+          position: relative;
+
+          .tip {
+            position: absolute;
+            top: 0;
+            right: 0;
+          }
         }
       }
     }
@@ -235,6 +269,263 @@ body.course.settings {
 
       #field-course-effort {
         width: flex-grid(3, 9);
+      }
+    }
+
+    // specific fields - grading range (artifact styling)
+    &.grade-range {
+      margin-bottom: ($baseline*3);
+
+      .grade-controls {
+        @include clearfix;
+        width: flex-grid(9,9);
+      }
+
+      .new-grade-button {
+        @include box-sizing(border-box);
+        @include linear-gradient(top, rgba(255, 255, 255, 0.8), rgba(255, 255, 255, 0));
+        @include box-shadow(0 1px 0 rgba(255, 255, 255, .3) inset);
+        width: flex-grid(1,9);
+        height: ($baseline*2);
+        position: relative;
+        display: inline-block;
+        vertical-align: middle;
+        margin-right: flex-gutter();
+        border-radius: 20px;
+        border: 1px solid $darkGrey;
+        background-color: #d1dae3;
+        color: #6d788b;
+
+        .plus-icon {
+          position: absolute;
+          top: 50%;
+          left: 50%;
+          margin-left: -6px;
+          margin-top: -6px;
+        }
+      }
+
+      .grade-slider {
+        @include box-sizing(border-box);
+        width: flex-grid(8,9);
+        display: inline-block;
+        vertical-align: middle;
+
+        .grade-bar {
+          position: relative;
+          width: 100%;
+          height: ($baseline*2.5);
+          background: $lightGrey;
+
+          .increments {
+            position: relative;
+
+            li {
+              position: absolute;
+              top: 52px;
+              width: 30px;
+              margin-left: -15px;
+              font-size: 9px;
+              text-align: center;
+
+              &.increment-0 {
+                left: 0;
+              }
+
+              &.increment-10 {
+                left: 10%;
+              }
+
+              &.increment-20 {
+                left: 20%;
+              }
+
+              &.increment-30 {
+                left: 30%;
+              }
+
+              &.increment-40 {
+                left: 40%;
+              }
+
+              &.increment-50 {
+                left: 50%;
+              }
+
+              &.increment-60 {
+                left: 60%;
+              }
+
+              &.increment-70 {
+                left: 70%;
+              }
+
+              &.increment-80 {
+                left: 80%;
+              }
+
+              &.increment-90 {
+                left: 90%;
+              }
+
+              &.increment-100 {
+                left: 100%;
+              }
+            }
+          }
+          
+          .grade-specific-bar {
+            height: 50px !important;
+          }
+
+          .grades {
+            position: relative;
+
+            li {
+              position: absolute;
+              top: 0;
+              height: 50px;     
+              text-align: right;
+              @include border-radius(2px);
+
+              &:hover,
+              &.is-dragging {
+                .remove-button {
+                  display: block;
+                }
+              }
+
+              &.is-dragging {
+
+              }
+
+              .remove-button {
+                display: none;
+                position: absolute;
+                top: -17px;
+                right: 1px;
+                height: 17px;
+                font-size: 10px;
+              }
+
+              &:nth-child(1) {
+                background: #4fe696;
+              }
+
+              &:nth-child(2) {
+                background: #ffdf7e;
+              }
+
+              &:nth-child(3) {
+                background: #ffb657;
+              }
+
+              &:nth-child(4) {
+                background: #ef54a1;
+              }
+
+              &:nth-child(5),
+              &.bar-fail {
+                background: #fb336c;
+              }
+
+              .letter-grade {
+                display: block;
+                margin: 10px 15px 0 0;
+                font-size: 16px;
+                font-weight: 700;
+                line-height: 14px;
+              }
+
+              .range {
+                display: block;
+                margin-right: 15px;
+                font-size: 10px;
+                line-height: 12px;
+              }
+
+              .drag-bar {
+                position: absolute;
+                top: 0;
+                right: -1px;
+                height: 50px;
+                width: 2px;
+                background-color: #fff;
+                @include box-shadow(-1px 0 3px rgba(0,0,0,0.1));
+
+                cursor: ew-resize;
+                @include transition(none);
+
+                &:hover {
+                  width: 6px;
+                  right: -2px;
+                }
+              }
+            }
+          }
+        }
+      }
+    }
+
+    // specific fields - grading rules
+    &.grade-rules {
+
+      #field-course-grading-graceperiod {
+        width: flex-grid(3, 9);
+      }
+    }
+
+    &.assignment-types {
+
+      .list-input {
+        margin-bottom: ($baseline*1.5);
+
+        &:last-child {
+          margin-bottom: 0;
+        }
+      }
+
+      .field-group {
+        @include clearfix();
+        width: flex-grid(9, 9);
+        margin-bottom: ($baseline*1.5);
+        border-bottom: 1px solid $gray-l5;
+        padding-bottom: ($baseline*1.5);
+
+        &:last-child {
+          border: none;
+          padding-bottom: 0;
+        }
+
+        .field {
+          display: inline-block;
+          vertical-align: top;
+          width: flex-grid(3, 6);
+          margin-bottom: ($baseline/2);
+          margin-right: flex-gutter();
+        }
+
+        #field-course-grading-assignment-shortname,
+        #field-course-grading-assignment-totalassignments, 
+        #field-course-grading-assignment-gradeweight, 
+        #field-course-grading-assignment-droppable {
+          width: flex-grid(2, 6);
+        }
+      }
+
+      .actions {
+        float: left;
+        width: flex-grid(9, 9);
+
+        .delete-button {
+          margin: 0;
+        }
+      }
+
+      > .actions {
+        margin-top: $baseline;
+        border-top: 1px solid $gray-l5;
+        padding-top: $baseline;
       }
     }
   }

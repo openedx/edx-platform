@@ -28,7 +28,7 @@ from contentstore import utils
       }).blur(function() {
         $("label").removeClass("is-focused");
       });
-    
+
       var editor = new CMS.Views.Settings.Details({
           el: $('.settings-details'),
           model: new CMS.Models.Settings.CourseDetails(${course_details|n},{parse:true})
@@ -53,7 +53,7 @@ from contentstore import utils
     </div> -->
 
     <article class="content-primary" role="main">
-      <form id="settings_details" method="post" action="">
+      <form id="settings_details" class="settings-details" method="post" action="">
         <section class="group-settings basic">
           <header>
             <h2 class="title-2">Basic Information</h2>
@@ -176,7 +176,7 @@ from contentstore import utils
               </div>
 
               <div class="input">
-                <input type="text" class="long new-course-introduction-video add-video-data" id="course-introduction-video" value="" placeholder="id" autocomplete="off" />
+                <input type="text" class="long new-course-introduction-video add-video-data" id="course-introduction-video" value="" placeholder="your YouTube video's ID" autocomplete="off" />
                 <span class="tip tip-stacked">Enter your YouTube video's ID (along with any restriction parameters)</span>
               </div>
             </li>
