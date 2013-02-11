@@ -6,7 +6,8 @@ django-admin.py test --settings=lms.envs.test --pythonpath=. lms/djangoapps/open
 
 from django.test import TestCase
 from open_ended_grading import staff_grading_service
-from xmodule import peer_grading_service, peer_grading_module
+from xmodule.open_ended_grading_classes import peer_grading_service
+from xmodule import  peer_grading_module
 from django.core.urlresolvers import reverse
 from django.contrib.auth.models import Group
 

@@ -4,10 +4,7 @@ This module provides views that proxy to the staff grading backend service.
 
 import json
 import logging
-import requests
-from requests.exceptions import RequestException, ConnectionError, HTTPError
-import sys
-from xmodule.grading_service_module import GradingService, GradingServiceError
+from xmodule.open_ended_grading_classes.grading_service_module import GradingService, GradingServiceError
 
 from django.conf import settings
 from django.http import HttpResponse, Http404

@@ -2,7 +2,6 @@
 
 import logging
 import urllib
-import re
 
 from django.conf import settings
 from django.views.decorators.cache import cache_control
@@ -13,9 +12,8 @@ from student.models import unique_id_for_user
 from courseware.courses import get_course_with_access
 
 from controller_query_service import ControllerQueryService
-from xmodule.grading_service_module import GradingServiceError
+from xmodule.open_ended_grading_classes.grading_service_module import GradingServiceError
 import json
-from .staff_grading import StaffGrading
 from student.models import unique_id_for_user
 
 import open_ended_util

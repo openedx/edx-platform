@@ -2,7 +2,7 @@ import json
 from mock import Mock
 import unittest
 
-from xmodule.self_assessment_module import SelfAssessmentModule
+from xmodule.open_ended_grading_classes.self_assessment_module import SelfAssessmentModule
 from xmodule.modulestore import Location
 from lxml import etree
 

@@ -16,6 +16,7 @@ import re
 from pkg_resources import resource_string
 
 from .capa_module import only_one, ComplexEncoder
+from open_ended_grading_classes import open_ended_image_submission
 from .editing_module import EditingDescriptor
 from .html_checker import check_html
 from progress import Progress
@@ -23,7 +24,6 @@ from .stringify import stringify_children
 from .xml_module import XmlDescriptor
 from xmodule.modulestore import Location
 from capa.util import *
-import open_ended_image_submission
 
 from datetime import datetime
 

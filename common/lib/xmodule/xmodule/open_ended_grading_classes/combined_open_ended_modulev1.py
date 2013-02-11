@@ -1,14 +1,7 @@
-import copy
-from fs.errors import ResourceNotFoundError
-import itertools
 import json
 import logging
 from lxml import etree
 from lxml.html import rewrite_links
-from path import path
-import os
-import sys
-import re
 
 from pkg_resources import resource_string
 
@@ -19,14 +12,12 @@ from progress import Progress
 from .stringify import stringify_children
 from .x_module import XModule
 from .xml_module import XmlDescriptor
-from xmodule.modulestore import Location
 import self_assessment_module
 import open_ended_module
-from combined_open_ended_rubric import CombinedOpenEndedRubric, RubricParsingError, GRADER_TYPE_IMAGE_DICT, HUMAN_GRADER_TYPE, LEGEND_LIST
+from combined_open_ended_rubric import CombinedOpenEndedRubric, GRADER_TYPE_IMAGE_DICT, HUMAN_GRADER_TYPE, LEGEND_LIST
 from .stringify import stringify_children
 import dateutil
 import dateutil.parser
-import datetime
 from timeparse import parse_timedelta
 
 log = logging.getLogger("mitx.courseware")

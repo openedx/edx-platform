@@ -1,12 +1,6 @@
-import json
 import logging
-import requests
-from requests.exceptions import RequestException, ConnectionError, HTTPError
-import sys
-from xmodule.grading_service_module import GradingService, GradingServiceError
+from xmodule.open_ended_grading_classes.grading_service_module import GradingService
 
-from django.conf import settings
-from django.http import HttpResponse, Http404
 from xmodule.x_module import ModuleSystem
 from mitxmako.shortcuts import render_to_string
 

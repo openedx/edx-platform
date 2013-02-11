@@ -5,28 +5,18 @@ hints, answers, and assessment judgment (currently only correct/incorrect).
 Parses xml definition file--see below for exact format.
 """
 
-import copy
-from fs.errors import ResourceNotFoundError
-import itertools
 import json
 import logging
 from lxml import etree
-from lxml.html import rewrite_links
-from path import path
-import os
-import sys
-import hashlib
 import capa.xqueue_interface as xqueue_interface
 
 from pkg_resources import resource_string
 
-from .capa_module import only_one, ComplexEncoder
+from .capa_module import  ComplexEncoder
 from .editing_module import EditingDescriptor
-from .html_checker import check_html
 from progress import Progress
 from .stringify import stringify_children
 from .xml_module import XmlDescriptor
-from xmodule.modulestore import Location
 from capa.util import *
 import openendedchild
 

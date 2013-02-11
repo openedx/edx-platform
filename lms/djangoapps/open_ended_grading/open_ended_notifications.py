@@ -1,7 +1,7 @@
 from django.conf import settings
+from xmodule.open_ended_grading_classes import peer_grading_service
 from staff_grading_service import StaffGradingService
 from open_ended_grading.controller_query_service import ControllerQueryService
-from xmodule import peer_grading_service
 import json
 from student.models import unique_id_for_user
 import open_ended_util
@@ -10,7 +10,6 @@ import logging
 from courseware.access import has_access
 from util.cache import cache
 import datetime
-from xmodule import peer_grading_service
 from xmodule.x_module import ModuleSystem
 from mitxmako.shortcuts import render_to_string
 

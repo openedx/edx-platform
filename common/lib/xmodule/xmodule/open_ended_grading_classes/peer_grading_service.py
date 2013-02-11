@@ -1,12 +1,7 @@
 import json
 import logging
-import requests
-from requests.exceptions import RequestException, ConnectionError, HTTPError
-import sys
 
-from combined_open_ended_rubric import CombinedOpenEndedRubric, RubricParsingError
-from lxml import etree
-from grading_service_module import GradingService, GradingServiceError
+from grading_service_module import GradingService
 
 log = logging.getLogger(__name__)
 

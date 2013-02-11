@@ -1,29 +1,17 @@
 import json
 import logging
-import requests
-import sys
 
-from combined_open_ended_rubric import CombinedOpenEndedRubric
 from lxml import etree
 
-import copy
-import itertools
-import json
-import logging
-from lxml.html import rewrite_links
-import os
-
 from pkg_resources import resource_string
-from .capa_module import only_one, ComplexEncoder
+from .capa_module import  ComplexEncoder
 from .editing_module import EditingDescriptor
-from .html_checker import check_html
-from progress import Progress
 from .stringify import stringify_children
 from .x_module import XModule
 from .xml_module import XmlDescriptor
 from xmodule.modulestore import Location
 
-from peer_grading_service import PeerGradingService, GradingServiceError
+from open_ended_grading_classes.peer_grading_service import PeerGradingService, GradingServiceError
 
 log = logging.getLogger(__name__)
 

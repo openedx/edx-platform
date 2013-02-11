@@ -2,9 +2,9 @@ import json
 from mock import Mock, MagicMock, ANY
 import unittest
 
-from xmodule.openendedchild import OpenEndedChild
-from xmodule.open_ended_module import OpenEndedModule
-from xmodule.combined_open_ended_modulev1 import CombinedOpenEndedV1Module
+from xmodule.open_ended_grading_classes.openendedchild import OpenEndedChild
+from xmodule.open_ended_grading_classes.open_ended_module import OpenEndedModule
+from xmodule.open_ended_grading_classes.combined_open_ended_modulev1 import CombinedOpenEndedV1Module
 
 from xmodule.modulestore import Location
 from lxml import etree

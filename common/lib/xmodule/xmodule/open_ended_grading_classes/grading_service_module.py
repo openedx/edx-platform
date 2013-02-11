@@ -5,7 +5,7 @@ import requests
 from requests.exceptions import RequestException, ConnectionError, HTTPError
 import sys
 
-from xmodule.combined_open_ended_rubric import CombinedOpenEndedRubric, RubricParsingError
+from combined_open_ended_rubric import CombinedOpenEndedRubric
 from lxml import etree
 
 log = logging.getLogger(__name__)
