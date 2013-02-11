@@ -105,6 +105,16 @@ CMS.Views.Settings.Advanced = CMS.Views.ValidatingView.extend({
         this.buttonsEnabled = false;
     },
 
+    toggleNewButton: function (enable) {
+        var newButton = this.$el.find(".new-button");
+        if (enable) {
+            newButton.removeClass('disabled');
+        }
+        else {
+            newButton.addClass('disabled');
+        }
+    },
+
     deleteEntry : function(event) {
         event.preventDefault();
         // find out which entry
@@ -154,6 +164,7 @@ CMS.Views.Settings.Advanced = CMS.Views.ValidatingView.extend({
         var policyValueDivs = this.$el.find('#' + this.new_key).closest('li').find('.json');
         // only 1 but hey, let's take advantage of the context mechanism
         _.each(policyValueDivs, this.attachJSONEditor, this);
+        this.toggleNewButton(false);
         this.showMessage(this.unsaved_changes);
     },
     updateKey : function(event) {
@@ -204,6 +215,10 @@ CMS.Views.Settings.Advanced = CMS.Views.ValidatingView.extend({
                 // mark the old key for deletion and delete from field maps
                 this.model.deleteKeys.push(oldKey);
                 this.model.unset(oldKey) ;
+            }
+            else {
+                // id for the new entry will now be the key value. Enable new entry button.
+                this.toggleNewButton(true);
             }
             
             // check for newkey being the name of one which was previously deleted in this session
