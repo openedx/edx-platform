@@ -11,6 +11,7 @@ body.course.settings {
     @extend .window;
     width: flex-grid(9, 12);
     margin-right: flex-gutter();
+    padding: $baseline ($baseline*1.5);
   }
 
   .group-settings {
@@ -478,7 +479,6 @@ body.course.settings {
     &.assignment-types {
 
       .list-input {
-        margin-bottom: ($baseline*1.5);
 
         &:last-child {
           margin-bottom: 0;
@@ -523,7 +523,6 @@ body.course.settings {
       }
 
       > .actions {
-        margin-top: $baseline;
         border-top: 1px solid $gray-l5;
         padding-top: $baseline;
       }
