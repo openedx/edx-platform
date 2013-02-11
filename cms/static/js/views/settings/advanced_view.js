@@ -87,8 +87,9 @@ CMS.Views.Settings.Advanced = CMS.Views.ValidatingView.extend({
             }
         }
         else {
-            // This is the case of the page first rendering.
+            // This is the case of the page first rendering, or when Cancel is pressed.
             this.hideSaveCancelButtons();
+            this.toggleNewButton(true);
         }
     },
 
@@ -171,7 +172,6 @@ CMS.Views.Settings.Advanced = CMS.Views.ValidatingView.extend({
         // That is, it doesn't change as the val changes until val is accepted.
         var oldKey = $(event.currentTarget).closest('.key').attr('id');
         var newKey = $(event.currentTarget).val();
-        console.log('update ', oldKey, newKey); // TODO: REMOVE ME
         if (oldKey !== newKey) {
             // TODO: is it OK to erase other validation messages?
             this.clearValidationErrors();
@@ -179,10 +179,9 @@ CMS.Views.Settings.Advanced = CMS.Views.ValidatingView.extend({
             if (!this.validateKey(oldKey, newKey)) return;
 
             if (this.model.has(newKey)) {
-                console.log('dupe key');
                 var error = {};
-                error[oldKey] = newKey + " has another entry";
-                error[newKey] = "Other entry for " + newKey;
+                error[oldKey] = 'You have already defined "' + newKey + '" in the manual policy definitions.';
+                error[newKey] = "You tried to enter a duplicate of this key.";
                 this.model.trigger("error", this.model, error);
                 return false;
             }
@@ -195,7 +194,6 @@ CMS.Views.Settings.Advanced = CMS.Views.ValidatingView.extend({
 
             var validation = this.model.validate(newEntryModel);
             if (validation) {
-                console.log('reserved key');
                 if (_.has(validation, newKey)) {
                     // swap to the key which the map knows about
                     validation[oldKey] = validation[newKey];
@@ -242,7 +240,6 @@ CMS.Views.Settings.Advanced = CMS.Views.ValidatingView.extend({
         // model validation can't handle malformed keys nor notice if 2 fields have same key; so, need to add that chk here
         // TODO ensure there's no spaces or illegal chars
         if (_.isEmpty(newKey)) {
-            console.log('no key');
             var error = {};
             error[oldKey] = "Key cannot be an empty string";
             this.model.trigger("error", this.model, error);
