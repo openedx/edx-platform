@@ -149,6 +149,14 @@ h1 {
       color: $gray-d2;
       font-weight: 600;
     }
+
+    p {
+      margin: 0 0 $baseline 0;
+
+      &:last-child {
+        margin-bottom: 0;
+      }
+    }
   }
 }
 
