@@ -59,7 +59,7 @@ $(document).ready(function() {
         greedy: true
     });
     
-    // stop clicks on drag bars from doing their thing w/o stopping drag (did this cancel pointer?)
+    // stop clicks on drag bars from doing their thing w/o stopping drag
     $('.drag-handle').click(function(e) {e.preventDefault(); });
 
 });
