@@ -55,36 +55,32 @@ CMS.Views.Settings.Advanced = CMS.Views.ValidatingView.extend({
     attachJSONEditor : function (textarea) {
         var self = this;
         CodeMirror.fromTextArea(textarea, {
-            mode: "text/html", lineNumbers: true, lineWrapping: true,
+            mode: "application/json", lineNumbers: false, lineWrapping: true,
             onBlur: function (mirror) {
                 var key = $(mirror.getWrapperElement()).closest('.row').children('.key').attr('id');
-                mirror.save();
                 var quotedValue = mirror.getValue();
+                // TODO: error checking
                 var JSONValue = JSON.parse(quotedValue);
                 self.model.set(key, JSONValue, {validate: true});
                 self.showMessage(self.unsaved_changes);
-                // cachethis.clearValidationErrors();
-                // var newVal = mirror.getValue();
-                // if (cachethis.model.get(field) != newVal) cachethis.model.save(field, newVal,
-                //    { error: CMS.ServerError});
             }
         });
     },
 
     showMessage: function (type) {
         this.$el.find(".message-status").removeClass("is-shown");
-        // var saveButton = this.$el.find(".save-button").addClass('disabled');
-        // var cancelButton = this.$el.find(".cancel-button").addClass('disabled');
+        var saveButton = this.$el.find(".save-button").addClass('disabled');
+        var cancelButton = this.$el.find(".cancel-button").addClass('disabled');
         if (type) {
             if (type === this.error_saving) {
                 this.$el.find(".message-status.error").addClass("is-shown");
-                // saveButton.removeClass("disabled");
-                // cancelButton.removeClass("disabled");
+                saveButton.removeClass("disabled");
+                cancelButton.removeClass("disabled");
             }
             else if (type === this.unsaved_changes) {
                 this.$el.find(".message-status.warning").addClass("is-shown");
-                // saveButton.removeClass("disabled");
-                // cancelButton.removeClass("disabled");
+                saveButton.removeClass("disabled");
+                cancelButton.removeClass("disabled");
             }
             else if (type === this.successful_changes)
                 this.$el.find(".message-status.confirm").addClass("is-shown");
@@ -136,8 +132,8 @@ CMS.Views.Settings.Advanced = CMS.Views.ValidatingView.extend({
         // disable the value entry until there's an acceptable key
         $(newEle).find('.course-advanced-policy-value').addClass('disabled');
         this.fieldToSelectorMap[this.new_key] = this.new_key;
-        // need to refind b/c replaceWith seems to copy rather than use the specific ele instance
-        var policyValueDivs = this.$el.find('#' + this.new_key).closest('li').find('.ace');
+        // need to re-find b/c replaceWith seems to copy rather than use the specific ele instance
+        var policyValueDivs = this.$el.find('#' + this.new_key).closest('li').find('.json');
         // only 1 but hey, let's take advantage of the context mechanism
         _.each(policyValueDivs, this.attachJSONEditor, this);
         this.showMessage(this.unsaved_changes);
@@ -201,8 +197,8 @@ CMS.Views.Settings.Advanced = CMS.Views.ValidatingView.extend({
             // update gui (sets all the ids etc)
             var newEle = this.template({key : newKey, value : JSON.stringify(this.model.get(newKey)) });
             $(event.currentTarget).closest('li').replaceWith(newEle);
-            // need to refind b/c replaceWith seems to copy rather than use the specific ele instance
-            var policyValueDivs = this.$el.find('#' + newKey).closest('li').find('.ace');
+            // need to re-find b/c replaceWith seems to copy rather than use the specific ele instance
+            var policyValueDivs = this.$el.find('#' + newKey).closest('li').find('.json');
             // only 1 but hey, let's take advantage of the context mechanism
             _.each(policyValueDivs, this.attachJSONEditor, this);
             
