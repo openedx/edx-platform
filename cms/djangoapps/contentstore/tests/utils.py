@@ -2,7 +2,6 @@ import json
 import copy
 from time import time
 from django.test import TestCase
-from override_settings import override_settings
 from django.conf import settings
 
 from student.models import Registration

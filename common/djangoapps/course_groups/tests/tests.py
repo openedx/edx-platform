@@ -2,7 +2,7 @@ import django.test
 from django.contrib.auth.models import User
 from django.conf import settings
 
-from override_settings import override_settings
+from django.test.utils import override_settings
 
 from course_groups.models import CourseUserGroup
 from course_groups.cohorts import (get_cohort, get_course_cohorts,
