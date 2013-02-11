@@ -1,5 +1,6 @@
 ${module_content}
-%if edit_link:
+%if location.category in ['problem','video','html']:
+%  if edit_link:
 <div>
 	<a href="${edit_link}">Edit</a> /
 	<a href="#${element_id}_xqa-modal" onclick="javascript:getlog('${element_id}', {
@@ -9,7 +10,7 @@ ${module_content}
         'user': '${user}'
      })" id="${element_id}_xqa_log">QA</a>
 </div>
-% endif
+%  endif
 <div><a href="#${element_id}_debug" id="${element_id}_trig">Staff Debug Info</a></div>
 
 <section id="${element_id}_xqa-modal" class="modal xqa-modal" style="width:80%; left:20%; height:80%; overflow:auto" >
@@ -74,3 +75,5 @@ category = ${category | h}
         'user': '${user}'
     });
 </script>
+%endif
+
