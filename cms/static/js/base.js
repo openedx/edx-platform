@@ -31,7 +31,7 @@ $(document).ready(function() {
 
   $modal.bind('click', hideModal);
   $modalCover.bind('click', hideModal);
-  $('.assets .upload-button').bind('click', showUploadModal);
+  $('.uploads .upload-button').bind('click', showUploadModal);
   $('.upload-modal .close-button').bind('click', hideModal);
 
   $body.on('click', '.embeddable-xml-input', function(){ $(this).select(); });
