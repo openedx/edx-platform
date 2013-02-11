@@ -28,6 +28,7 @@ class PeerGradingService(GradingService):
     def __init__(self, config, system):
         config['system'] = system
         super(PeerGradingService, self).__init__(config)
+        self.url = config['url'] + config['peer_grading']
         self.get_next_submission_url = self.url + '/get_next_submission/'
         self.save_grade_url = self.url + '/save_grade/'
         self.is_student_calibrated_url = self.url + '/is_student_calibrated/'
@@ -161,6 +162,6 @@ def peer_grading_service(system):
     if settings.MOCK_PEER_GRADING:
         _service = MockPeerGradingService()
     else:
-        _service = PeerGradingService(settings.PEER_GRADING_INTERFACE, system)
+        _service = PeerGradingService(settings.OPEN_ENDED_GRADING_INTERFACE, system)
 
     return _service

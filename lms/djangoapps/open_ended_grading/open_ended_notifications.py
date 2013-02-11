@@ -28,7 +28,7 @@ NOTIFICATION_TYPES = (
 
 
 def staff_grading_notifications(course, user):
-    staff_gs = StaffGradingService(settings.STAFF_GRADING_INTERFACE)
+    staff_gs = StaffGradingService(settings.OPEN_ENDED_GRADING_INTERFACE)
     pending_grading = False
     img_path = ""
     course_id = course.id
@@ -61,7 +61,7 @@ def staff_grading_notifications(course, user):
 
 def peer_grading_notifications(course, user):
     system = ModuleSystem(None, None, None, render_to_string, None)
-    peer_gs = peer_grading_service.PeerGradingService(settings.PEER_GRADING_INTERFACE, system)
+    peer_gs = peer_grading_service.PeerGradingService(settings.OPEN_ENDED_GRADING_INTERFACE, system)
     pending_grading = False
     img_path = ""
     course_id = course.id
@@ -93,8 +93,7 @@ def peer_grading_notifications(course, user):
 
 
 def combined_notifications(course, user):
-    controller_url = open_ended_util.get_controller_url()
-    controller_qs = ControllerQueryService(controller_url)
+    controller_qs = ControllerQueryService(settings.OPEN_ENDED_GRADING_INTERFACE)
     student_id = unique_id_for_user(user)
     user_is_staff = has_access(user, course, 'staff')
     course_id = course.id

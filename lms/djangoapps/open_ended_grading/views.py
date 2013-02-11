@@ -30,8 +30,7 @@ log = logging.getLogger(__name__)
 
 template_imports = {'urllib': urllib}
 
-controller_url = open_ended_util.get_controller_url()
-controller_qs = ControllerQueryService(controller_url)
+controller_qs = ControllerQueryService(settings.OPEN_ENDED_GRADING_INTERFACE)
 
 """
 Reverses the URL from the name and the course id, and then adds a trailing slash if

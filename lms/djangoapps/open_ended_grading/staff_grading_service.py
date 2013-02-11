@@ -163,7 +163,7 @@ def staff_grading_service():
     if settings.MOCK_STAFF_GRADING:
         _service = MockStaffGradingService()
     else:
-        _service = StaffGradingService(settings.STAFF_GRADING_INTERFACE)
+        _service = StaffGradingService(settings.OPEN_ENDED_GRADING_INTERFACE)
 
     return _service
 

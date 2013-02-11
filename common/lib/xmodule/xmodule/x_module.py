@@ -869,7 +869,10 @@ class ModuleSystem(object):
                  xqueue=None,
                  node_path="",
                  anonymous_student_id='',
-                 course_id=None):
+                 course_id=None,
+                 peer_grading_interface=None,
+                 staff_grading_interface=None,
+                 s3_interface=None):
         '''
         Create a closure around the system environment.
 
@@ -920,6 +923,9 @@ class ModuleSystem(object):
         self.anonymous_student_id = anonymous_student_id
         self.course_id = course_id
         self.user_is_staff = user is not None and user.is_staff
+        self.peer_grading_interface = peer_grading_interface
+        self.staff_grading_interface = staff_grading_interface
+        self.s3_interface = s3_interface
 
     def get(self, attr):
         '''	provide uniform access to attributes (like etree).'''
