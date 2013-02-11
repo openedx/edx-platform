@@ -205,6 +205,7 @@ class CombinedOpenEndedV1Module():
             'display_name': self.display_name,
             'accept_file_upload': self.accept_file_upload,
             'close_date' : self.close_date,
+            's3_interface' : self.system.s3_interface,
             }
 
         self.task_xml = definition['task_xml']

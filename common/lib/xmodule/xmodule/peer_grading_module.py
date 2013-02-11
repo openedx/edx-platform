@@ -3,8 +3,6 @@ import logging
 import requests
 import sys
 
-from django.conf import settings
-
 from combined_open_ended_rubric import CombinedOpenEndedRubric
 from lxml import etree
 
@@ -25,7 +23,7 @@ from .x_module import XModule
 from .xml_module import XmlDescriptor
 from xmodule.modulestore import Location
 
-from peer_grading_service import peer_grading_service, GradingServiceError
+from peer_grading_service import PeerGradingService, GradingServiceError
 
 log = logging.getLogger(__name__)
 
@@ -62,7 +60,7 @@ class PeerGradingModule(XModule):
         #We need to set the location here so the child modules can use it
         system.set('location', location)
         self.system = system
-        self.peer_gs = peer_grading_service(self.system)
+        self.peer_gs = PeerGradingService(self.system.open_ended_grading_interface, self.system)
 
         self.use_for_single_location = self.metadata.get('use_for_single_location', USE_FOR_SINGLE_LOCATION)
         if isinstance(self.use_for_single_location, basestring):
