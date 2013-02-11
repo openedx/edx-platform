@@ -500,7 +500,6 @@ hr.divide {
   }
 }
 
-// misc
 .tooltip {
   position: absolute;
   top: 0;
@@ -529,6 +528,8 @@ hr.divide {
   }
 }
 
+// ====================
+
 // basic utility
 .sr {
   @include text-sr();
@@ -549,4 +550,14 @@ hr.divide {
   white-space: pre-wrap;
   white-space: -moz-pre-wrap;
   word-wrap: break-word;
+}
+
+// ====================
+
+// works in progress
+body.hide-wip {
+
+  .wip-box {
+    display: none;
+  }
 }
