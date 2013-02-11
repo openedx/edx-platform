@@ -132,7 +132,7 @@ class PeerGradingModule(XModule):
 
     def query_data_for_location(self):
         student_id = self.system.anonymous_student_id
-        location = self.system.location
+        location = self.link_to_location
         success = False
         response = {}
 
@@ -161,7 +161,7 @@ class PeerGradingModule(XModule):
             success, response = self.query_data_for_location()
             if not success:
                 log.exception("No instance data found and could not get data from controller for loc {0} student {1}".format(
-                    self.system.location, self.system.anonymous_student_id
+                    self.system.location.url(), self.system.anonymous_student_id
                 ))
                 return None
             count_graded = response['count_graded']
