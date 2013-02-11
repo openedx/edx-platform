@@ -16,7 +16,7 @@ import re
 from pkg_resources import resource_string
 
 from .capa_module import only_one, ComplexEncoder
-from open_ended_grading_classes import open_ended_image_submission
+import open_ended_image_submission
 from .editing_module import EditingDescriptor
 from .html_checker import check_html
 from progress import Progress

@@ -7,7 +7,7 @@ from pkg_resources import resource_string
 from .editing_module import EditingDescriptor
 from .x_module import XModule
 from .xml_module import XmlDescriptor
-from open_ended_grading_classes.combined_open_ended_modulev1 import CombinedOpenEndedV1Module, CombinedOpenEndedV1Descriptor
+from xmodule.open_ended_grading_classes.combined_open_ended_modulev1 import CombinedOpenEndedV1Module, CombinedOpenEndedV1Descriptor
 
 log = logging.getLogger("mitx.courseware")
 

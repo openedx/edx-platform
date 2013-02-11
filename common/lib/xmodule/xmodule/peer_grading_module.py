@@ -11,7 +11,7 @@ from .x_module import XModule
 from .xml_module import XmlDescriptor
 from xmodule.modulestore import Location
 
-from open_ended_grading_classes.peer_grading_service import PeerGradingService, GradingServiceError
+from xmodule.open_ended_grading_classes.peer_grading_service import PeerGradingService, GradingServiceError
 
 log = logging.getLogger(__name__)
 

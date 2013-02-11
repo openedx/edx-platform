@@ -11,7 +11,7 @@ from .stringify import stringify_children
 from .xml_module import XmlDescriptor
 import openendedchild
 
-from open_ended_grading_classes.combined_open_ended_rubric import CombinedOpenEndedRubric
+from combined_open_ended_rubric import CombinedOpenEndedRubric
 
 log = logging.getLogger("mitx.courseware")
 
