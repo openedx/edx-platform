@@ -3,32 +3,27 @@ class @Conditional
   constructor: (element) ->
     @el = $(element).find('.conditional-wrapper')
 
-    if @el.data('conditional_module_processed') is 'true'
-      console.log 'Conditional already processed this element'
+    @passed = @el.data('passed') is true
+    if @passed is true
+      console.log 'Conditional is already passed.'
 
-    console.log 'Conditional processing this element for the first time.'
-    @el.data 'conditional_module_processed', 'true'
+      return
 
-    @id = @el.data('problem-id')
-    @element_id = @el.attr('id')
+    console.log 'Conditional is not passed. Must re-check with server.'
+
     @url = @el.data('url')
     @render()
 
-  $: (selector) ->
-    $(selector, @el)
-
-  updateProgress: (response) =>
-    if response.progress_changed
-        @el.attr progress: response.progress_status
-        @el.trigger('progressChanged')
-
-  render: (content) ->
-    if content
-      @el.append(i) for i in content
-      XModule.loadModules(@el)
-    else
+  render: () ->
       $.postWithPrefix "#{@url}/conditional_get", (response) =>
         console.log response
-        @el.append(i) for i in response.html
-        XModule.loadModules(@el)
+
+        if ((response.passed is true) && (@passed is false))
+          console.log '(response.passed is true) && (@passed is false)'
+
+          @el.data 'passed', 'true'
+
+          @el.append(i) for i in response.html
+          XModule.loadModules @el
+
 
