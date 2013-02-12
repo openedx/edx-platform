@@ -50,7 +50,7 @@ class CombinedOpenEndedRubric(object):
         success = False
         try:
             rubric_categories = self.extract_categories(rubric_xml)
-            if score_list:
+            if score_list and len(score_list)==len(rubric_categories):
                 for i in xrange(0,len(rubric_categories)):
                     category = rubric_categories[i]
                     for j in xrange(0,len(category['options'])):
@@ -72,7 +72,7 @@ class CombinedOpenEndedRubric(object):
             success = True
         except:
             error_message = "[render_rubric] Could not parse the rubric with xml: {0}".format(rubric_xml)
-            log.error(error_message)
+            log.exception(error_message)
             raise RubricParsingError(error_message)
         return {'success' : success, 'html' : html, 'rubric_scores' : rubric_scores}
 
@@ -200,7 +200,6 @@ class CombinedOpenEndedRubric(object):
                         for grader_type in tuple[3]:
                             rubric_categories[i]['options'][j]['grader_types'].append(grader_type)
 
-        log.debug(rubric_categories)
         html = self.system.render_template('open_ended_combined_rubric.html',
             {'categories': rubric_categories,
              'has_score': True,
