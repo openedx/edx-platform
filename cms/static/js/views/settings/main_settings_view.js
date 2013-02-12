@@ -227,7 +227,7 @@ CMS.Views.Settings.Details = CMS.Views.ValidatingView.extend({
                     time = 0;
                 }
                 var newVal = new Date(date.getTime() + time * 1000);
-                if (cacheModel.get(fieldName).getTime() !== newVal.getTime()) {
+                if (!cacheModel.has(fieldName) || cacheModel.get(fieldName).getTime() !== newVal.getTime()) {
                     cacheModel.save(fieldName, newVal, { error: CMS.ServerError});
                 }
             }
