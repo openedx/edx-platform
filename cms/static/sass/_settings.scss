@@ -553,7 +553,7 @@
 
       // specific to code mirror instance in JSON policy editing, need to sync up with other similar code mirror UIs
       .CodeMirror {
-        padding: 6px 8px 8px;
+        padding: 6px 8px;
         @include box-sizing(border-box);
         border: 1px solid $mediumGrey;
         border-radius: 2px;
@@ -566,7 +566,7 @@
 
         .CodeMirror-scroll {
           height: auto;
-          min-height: 50px;
+          min-height: 20px;
           max-height: 200px;
         }
       }
@@ -643,12 +643,21 @@
             .tip {
               @include transition (opacity 0.5s ease-in-out 0s);
               opacity: 0;
+              position: absolute;
+              bottom: 25px;
             }
 
             input:focus {
 
               & + .tip {
                 opacity: 1.0;
+              }
+            }
+
+            input.error {
+
+              & + .tip {
+                opacity: 0;
               }
             }
           }
