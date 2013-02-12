@@ -319,7 +319,7 @@ class ImportTestCase(unittest.TestCase):
             self.assertEqual(len(video.url_name), len('video_') + 12)
 
     def test_poll_xmodule(self):
-        modulestore = XMLModuleStore(DATA_DIR, course_dirs=['poll'])
+        modulestore = XMLModuleStore(DATA_DIR, course_dirs=['conditional_and_poll'])
 
         course = modulestore.get_courses()[0]
         chapters = course.get_children()
@@ -332,7 +332,7 @@ class ImportTestCase(unittest.TestCase):
         location = Location(location.tag, location.org, location.course,
             'sequential', 'Problem_Demos')
         module = modulestore.get_instance(course.id, location)
-        self.assertEqual(len(module.children), 1)
+        self.assertEqual(len(module.children), 2)
 
     def test_error_on_import(self):
         '''Check that when load_error_module is false, an exception is raised, rather than returning an ErrorModule'''

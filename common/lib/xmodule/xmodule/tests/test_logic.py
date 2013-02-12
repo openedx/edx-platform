@@ -4,6 +4,7 @@ import json
 import unittest
 
 from xmodule.poll_module import PollModule
+from xmodule.conditional_module import ConditionalModule
 
 
 class LogicTest(unittest.TestCase):
@@ -46,3 +47,19 @@ class PollModuleTest(LogicTest):
         self.assertEqual(total, 2)
         self.assertDictEqual(callback, {'objectName': 'Conditional'})
         self.assertEqual(self.xmodule.poll_answer, 'No')
+
+
+class ConditionalModuleTest(LogicTest):
+    xmodule_class = ConditionalModule
+    raw_model_data = {
+        'contents': 'Some content'
+    }
+
+    def test_ajax_request(self):
+        # Mock is_condition_satisfied
+        self.xmodule.is_condition_satisfied = lambda: True
+
+        response = self.ajax_request('No', {})
+        html = response['html']
+
+        self.assertEqual(html, 'Some content')

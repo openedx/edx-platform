@@ -75,7 +75,7 @@ class PollModule(XModule):
                                'poll_answers': self.poll_answers,
                                'total': sum(self.poll_answers.values())
                                })
-        else: # return error message
+        else:  # return error message
             return json.dumps({'error': 'Unknown Command!'})
 
     def get_html(self):

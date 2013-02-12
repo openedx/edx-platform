@@ -1,0 +1,31 @@
+<sequential>
+    <vertical>
+        <poll_question id="first_poll" display_name="first poll">
+                <h3>What's the Right Thing to Do?</h3>
+                <p>Suppose four shipwrecked sailors are stranded at sea in a lifeboat, without
+    food or water. Would it be wrong for three of them to kill and eat the cabin
+    boy, in order to save their own lives?</p>
+            <answer id="Yes">Yes</answer>
+            <answer id="No">No</answer>
+            <answer id="Dont_know">Don't know</answer>
+        </poll_question>
+        <poll_question id="second_poll" display_name="second poll">
+                <h3>What's the Right Thing to Do?</h3>
+                <p>Suppose four shipwrecked sailors are stranded at sea in a lifeboat, without
+    food or water. Would it be wrong for three of them to kill and eat the cabin
+    boy, in order to save their own lives?</p>
+            <answer id="Yes">Yes</answer>
+            <answer id="No">No</answer>
+            <answer id="Dont_know">Don't know</answer>
+        </poll_question>
+    </vertical>
+
+    <wrapper>
+        <!-- Test many show tags -->
+        <html>Condition: first_poll - Yes</html>
+        <conditional sources="i4x://HarvardX/ER22x/poll_question/first_poll" poll_answer="Yes">
+            <html>In first condition.</html>
+            <show sources="i4x://HarvardX/ER22x/poll_question/second_poll"/>
+        </conditional>
+    </wrapper>
+</sequential>
