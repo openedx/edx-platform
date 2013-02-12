@@ -11,7 +11,7 @@
       <div class="info-course">
         <h2 class="sr">Current Course:</h2>
         <a href="${reverse('course_index', kwargs=dict(org=ctx_loc.org, course=ctx_loc.course, name=ctx_loc.name))}">
-        <span class="course-number">PH207x:</span>
+        <span class="course-org">${ctx_loc.org}</span><span class="course-number">${ctx_loc.course}</span>
         <span class="course-title" title="${context_course.display_name}">${context_course.display_name}</span>
         </a>
       </div>

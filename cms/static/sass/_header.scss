@@ -109,15 +109,17 @@
     width: 1px;
   }
 
-  .course-number, .course-title {
-    display: block;
+  .course-org {
+    margin-right: ($baseline/4);
   }
 
-  .course-number {
+  .course-number, .course-org {
     @include font-size(12);
+    display: inline-block;
   }
 
   .course-title {
+    display: block;
     width: 100%;
     max-width: 220px;
     overflow: hidden;
