@@ -63,7 +63,7 @@
 
 .branding {
   position: relative;
-  margin: 0 ($baseline*0.75) 0 0;
+  margin: 0 ($baseline/2) 0 0;
   padding-right: ($baseline*0.75);
 
   a {
@@ -120,6 +120,7 @@
     width: 100%;
     max-width: 220px;
     overflow: hidden;
+    margin-top: -4px;
     white-space: nowrap;
     text-overflow: ellipsis;
     @include font-size(16);
@@ -202,10 +203,16 @@
 
     .account-username {
       display: inline-block;
+      vertical-align: middle;
       width: 80%;
       overflow: hidden;
       white-space: nowrap;
       text-overflow: ellipsis;
+    }
+
+    .icon-expand {
+      display: inline-block;
+      vertical-align: middle;
     }
   }
 }
@@ -221,6 +228,7 @@
     .icon-expand {
       @include font-size(14);
       @include transition (color 0.5s ease-in-out, opacity 0.5s ease-in-out);
+      display: inline-block;
       margin-left: 2px;
       opacity: 0.5;
       color: $gray-l2;
@@ -305,7 +313,7 @@
     .wrapper-nav-sub {
       top: 27px;
       left: auto;
-      right: -($baseline/2);
+      right: -13px;
       width: 110px;
     }
 

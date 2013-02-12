@@ -153,7 +153,7 @@ from contentstore import utils
         <section class="group-settings marketing">
           <header>
             <h2 class="title-2">Introducing Your Course</h2>
-            <span class="tip">Information for perspective students</span>
+            <span class="tip">Information for prospective students</span>
           </header>
 
           <ol class="list-input">
@@ -218,6 +218,7 @@ from contentstore import utils
         <nav class="nav-related">
           <ul>
             <li class="nav-item"><a href="${reverse('contentstore.views.course_config_graders_page', kwargs={'org' : ctx_loc.org, 'course' : ctx_loc.course, 'name': ctx_loc.name})}">Grading</a></li>
+            <li class="nav-item"><a href="${reverse('manage_users', kwargs=dict(location=ctx_loc))}">Course Team</a></li>
           </ul>
         </nav>
       % endif
