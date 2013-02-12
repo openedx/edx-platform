@@ -96,8 +96,11 @@ class PeerGradingModule(XModule):
 
         self.link_to_location = self.metadata.get('link_to_location', USE_FOR_SINGLE_LOCATION)
         if self.use_for_single_location == True:
-            #This will raise an exception if the location is invalid
-            link_to_location_object = Location(self.link_to_location)
+            self.linked_problem = modulestore().get_instance(self.system.course_id, self.link_to_location)
+            log.debug("problem metadata: {0}".format(self.linked_problem.metadata))
+            due_date = self.linked_problem.metadata.get('peer_grading_due', None)
+            if due_date:
+                self.metadata['due'] = due_date
 
         self.ajax_url = self.system.ajax_url
         if not self.ajax_url.endswith("/"):
@@ -462,31 +465,18 @@ class PeerGradingModule(XModule):
             success = False
 
 
-        # grab all peer grading module descriptors for this course
-        peer_grading_modules = modulestore().get_items(
-                ['i4x', self.location.org, self.location.course, 'peergrading', None], self.system.course_id)
-
-        # construct a dictionary for fast lookups
-        module_dict = {}
-        for module in peer_grading_modules:
-            linked_location = module.metadata.get("link_to_location", None)
-            if linked_location:
-                module_dict[linked_location] = module
-
         def _find_corresponding_module_for_location(location):
             '''
             find the peer grading module that links to the given location
             '''
-            if location in module_dict:
-                return module_dict[location]
-            else:
-                return None
+            return modulestore().get_instance(self.system.course_id, location)
+
 
         for problem in problem_list:
             problem_location = problem['location']
             descriptor = _find_corresponding_module_for_location(problem_location)
             if descriptor:
-                problem['due'] = descriptor.metadata.get('due', None)
+                problem['due'] = descriptor.metadata.get('peer_grading_due', None)
                 grace_period_string = descriptor.metadata.get('graceperiod', None)
                 try:
                     problem_timeinfo = TimeInfo(problem['due'], grace_period_string)
