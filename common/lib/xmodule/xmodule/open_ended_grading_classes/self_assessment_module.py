@@ -177,9 +177,14 @@ class SelfAssessmentModule(openendedchild.OpenEndedChild):
         # add new history element with answer and empty score and hint.
         success, get = self.append_image_to_student_answer(get)
         if success:
-            get['student_answer'] = SelfAssessmentModule.sanitize_html(get['student_answer'])
-            self.new_history_entry(get['student_answer'])
-            self.change_state(self.ASSESSING)
+            success, allowed_to_submit, error_message = self.check_if_student_can_submit()
+            if allowed_to_submit:
+                get['student_answer'] = SelfAssessmentModule.sanitize_html(get['student_answer'])
+                self.new_history_entry(get['student_answer'])
+                self.change_state(self.ASSESSING)
+            else:
+                #Error message already defined, so we can just pass
+                pass
         else:
             error_message = "There was a problem saving the image in your submission.  Please try a different image, or try pasting a link to an image into the answer box."
 

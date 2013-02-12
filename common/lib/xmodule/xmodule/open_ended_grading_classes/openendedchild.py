@@ -416,6 +416,7 @@ class OpenEndedChild(object):
         location = self.system.location.url()
         student_id = self.system.anonymous_student_id
         success = False
+        allowed_to_submit = True
         response = {}
         try:
             response = self.peer_gs.get_data_for_location(location, student_id)
@@ -425,9 +426,10 @@ class OpenEndedChild(object):
         except:
             error_message = ("Need to peer grade more in order to make another submission.  "
                              "You have graded {0}, {1} are required.").format(count_graded, count_required)
-            return success, False, error_message
+            return success, allowed_to_submit, error_message
         if count_graded>=count_required:
-            return success, True, ""
+            return success, allowed_to_submit, ""
         else:
-            return success, False, ""
+            allowed_to_submit = False
+            return success, allowed_to_submit, ""
 

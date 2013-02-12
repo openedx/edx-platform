@@ -606,10 +606,15 @@ class OpenEndedModule(openendedchild.OpenEndedChild):
         success, get = self.append_image_to_student_answer(get)
         error_message = ""
         if success:
-            get['student_answer'] = OpenEndedModule.sanitize_html(get['student_answer'])
-            self.new_history_entry(get['student_answer'])
-            self.send_to_grader(get['student_answer'], system)
-            self.change_state(self.ASSESSING)
+            success, allowed_to_submit, error_message = self.check_if_student_can_submit()
+            if allowed_to_submit:
+                get['student_answer'] = OpenEndedModule.sanitize_html(get['student_answer'])
+                self.new_history_entry(get['student_answer'])
+                self.send_to_grader(get['student_answer'], system)
+                self.change_state(self.ASSESSING)
+            else:
+                #Error message already defined, so we can just pass it down the chain
+                pass
         else:
             error_message = "There was a problem saving the image in your submission.  Please try a different image, or try pasting a link to an image into the answer box."
 
