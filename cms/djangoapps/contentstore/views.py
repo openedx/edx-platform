@@ -94,6 +94,8 @@ def login_page(request):
         'forgot_password_link': "//{base}/#forgot-password-modal".format(base=settings.LMS_BASE),
     })
 
+def howitworks(request):
+    return render_to_response('howitworks.html', {})
 
 # ==== Views for any logged-in user ==================================
 
@@ -730,8 +732,6 @@ def clone_item(request):
 
 #@login_required
 #@ensure_csrf_cookie
-
-
 def upload_asset(request, org, course, coursename):
     '''
     cdodge: this method allows for POST uploading of files into the course asset library, which will
@@ -796,8 +796,6 @@ def upload_asset(request, org, course, coursename):
 '''
 This view will return all CMS users who are editors for the specified course
 '''
-
-
 @login_required
 @ensure_csrf_cookie
 def manage_users(request, location):
@@ -819,7 +817,7 @@ def manage_users(request, location):
     })
 
 
-def create_json_response(errmsg=None):
+def create_json_response(errmsg = None):
     if errmsg is not None:
         resp = HttpResponse(json.dumps({'Status': 'Failed', 'ErrMsg': errmsg}))
     else:
@@ -831,8 +829,6 @@ def create_json_response(errmsg=None):
 This POST-back view will add a user - specified by email - to the list of editors for
 the specified course
 '''
-
-
 @expect_json
 @login_required
 @ensure_csrf_cookie
@@ -865,8 +861,6 @@ def add_user(request, location):
 This POST-back view will remove a user - specified by email - from the list of editors for
 the specified course
 '''
-
-
 @expect_json
 @login_required
 @ensure_csrf_cookie
@@ -1124,8 +1118,31 @@ def get_course_settings(request, org, course, name):
     course_details = CourseDetails.fetch(location)
 
     return render_to_response('settings.html', {
-        'active_tab': 'settings',
         'context_course': course_module,
+        'course_location' : location,
+        'course_details' : json.dumps(course_details, cls=CourseSettingsEncoder)
+    })
+
+@login_required
+@ensure_csrf_cookie
+def course_config_graders_page(request, org, course, name):
+    """
+    Send models and views as well as html for editing the course settings to the client.
+
+    org, course, name: Attributes of the Location for the item to edit
+    """
+    location = ['i4x', org, course, 'course', name]
+
+    # check that logged in user has permissions to this item
+    if not has_access(request.user, location):
+        raise PermissionDenied()
+
+    course_module = modulestore().get_item(location)
+    course_details = CourseGradingModel.fetch(location)
+
+    return render_to_response('settings_graders.html', {
+        'context_course': course_module,
+        'course_location' : location,
         'course_details': json.dumps(course_details, cls=CourseSettingsEncoder)
     })
 

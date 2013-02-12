@@ -5,23 +5,29 @@
   <head>
     <meta charset="utf-8">
     <meta http-equiv="X-UA-Compatible" content="IE=edge,chrome=1">
+    <title>
+        <%block name="title"></%block> | 
+        % if context_course:
+        <% ctx_loc = context_course.location %>
+        ${context_course.display_name} | 
+        % endif
+        edX Studio
+    </title>
+
+    <meta name="viewport" content="width=device-width,initial-scale=1">
+    <meta name="path_prefix" content="${MITX_ROOT_URL}">
 
     <%static:css group='base-style'/>
     <link rel="stylesheet" type="text/css" href="${static.url('js/vendor/markitup/skins/simple/style.css')}" />
     <link rel="stylesheet" type="text/css" href="${static.url('js/vendor/markitup/sets/wiki/style.css')}" />
-    <link rel="stylesheet" type="text/css" href="${static.url('css/vendor/symbolset.ss-standard.css')}" />
     <link rel="stylesheet" type="text/css" href="${static.url('css/vendor/symbolset.ss-symbolicons-block.css')}" />
+    <link rel="stylesheet" type="text/css" href="${static.url('css/vendor/symbolset.ss-standard.css')}" />
    
-    <title><%block name="title"></%block></title>
-    <meta name="viewport" content="width=device-width,initial-scale=1">
-
-    <meta name="path_prefix" content="${MITX_ROOT_URL}">
-
     <%block name="header_extras"></%block>
   </head>
 
   <body class="<%block name='bodyclass'></%block> hide-wip">
-    <%include file="widgets/header.html" args="active_tab=active_tab"/>
+    <%include file="widgets/header.html" />
     <%include file="courseware_vendor_js.html"/>
 
     <script type="text/javascript" src="${static.url('js/vendor/json2.js')}"></script>
@@ -47,9 +53,9 @@
     </script>
 
     <%block name="content"></%block>
+    <%include file="widgets/footer.html" />
 
     <%block name="jsextra"></%block>
-
   </body>
 </html>
 

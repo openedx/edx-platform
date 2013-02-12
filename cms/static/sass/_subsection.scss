@@ -1,3 +1,11 @@
+.subsection .main-wrapper {
+  margin: 40px;
+}
+
+.subsection .inner-wrapper {
+  @include clearfix();
+}
+
 .subsection-body {
 	padding: 32px 40px;
 	@include clearfix;
