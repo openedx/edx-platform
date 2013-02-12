@@ -10,8 +10,9 @@ from pkg_resources import resource_string
 from xmodule.x_module import XModule
 from xmodule.modulestore import Location
 from xmodule.seq_module import SequenceDescriptor
-from xblock.core import String, Scope
+from xblock.core import String, Scope, List
 from xmodule.modulestore.exceptions import ItemNotFoundError
+
 
 log = logging.getLogger('mitx.' + __name__)
 
@@ -109,12 +110,16 @@ class ConditionalModule(XModule):
 
 class ConditionalDescriptor(SequenceDescriptor):
     """Descriptor for conditional xmodule."""
+    _tag_name = 'conditional'
+
     module_class = ConditionalModule
 
     filename_extension = "xml"
 
     stores_state = True
     has_score = False
+
+    show_tag_list = List(help="Poll answers", scope=Scope.content)
 
     def get_required_module_descriptors(self):
         """TODO: Returns a list of XModuleDescritpor instances upon which this module depends, but are
@@ -152,9 +157,12 @@ class ConditionalDescriptor(SequenceDescriptor):
             return urls
 
         children = []
+        show_tag_list = []
         for child in xml_object:
             if child.tag == 'show':
-                children.extend(parse_show_tag(child))
+                location = parse_show_tag(child)
+                children.extend(location)
+                show_tag_list.extend(location)
             else:
                 try:
                     descriptor = system.process_xml(etree.tostring(child))
@@ -162,11 +170,17 @@ class ConditionalDescriptor(SequenceDescriptor):
                     children.append(module_url)
                 except:
                     log.exception("Unable to load child when parsing Conditional.")
-        return {}, children
+        return {'show_tag_list': show_tag_list}, children
 
     def definition_to_xml(self, resource_fs):
-        xml_object = etree.Element('sequential')
+        xml_object = etree.Element(self._tag_name)
         for child in self.get_children():
-            xml_object.append(
-                etree.fromstring(child.export_to_xml(resource_fs)))
+            location = str(child.location)
+            if location in self.show_tag_list:
+                show_str = '<{tag_name} sources="{sources}" />'.format(
+                    tag_name='show', sources=location)
+                xml_object.append(etree.fromstring(show_str))
+            else:
+                xml_object.append(
+                    etree.fromstring(child.export_to_xml(resource_fs)))
         return xml_object
