@@ -4,7 +4,7 @@ define('PollMain', ['logme'], function (logme) {
 
     debugMode = false;
     if (debugMode === true) {
-        logme('We are in debug mode.');
+        logme('MESSAGE: We are in debug mode.');
     }
 
 PollMain.prototype = {
@@ -25,8 +25,6 @@ PollMain.prototype = {
     dataSeries = [];
     tickSets = {};
     c1 = 0;
-
-    logme('poll_answers: ', poll_answers, '_this.jsonConfig.answers: ', _this.jsonConfig.answers);
 
     $.each(poll_answers, function (index, value) {
         var numValue, text;
@@ -115,7 +113,6 @@ PollMain.prototype = {
                 'total': '10'
             };
 
-            logme('One.');
             _this.showAnswerGraph(response.poll_answers, response.total);
         }());
     } else {
@@ -124,32 +121,13 @@ PollMain.prototype = {
         $.postWithPrefix(
             _this.ajax_url + '/' + answer,  {},
             function (response) {
-                logme('response:', response);
-
-                logme('Two.');
                 _this.showAnswerGraph(response.poll_answers, response.total);
 
                 if (_this.verticalSectionEl !== null) {
-                    console.log('Looking for conditional modules');
                     $(_this.verticalSectionEl).find('.xmodule_ConditionalModule').each(function (index, value) {
-                        console.log('Found conditional element. index = ');
-                        console.log(index);
-                        console.log('value = ');
-                        console.log(value);
-
-                        (new window.Conditional(value));
+                        new window.Conditional(value);
                     });
-                } else {
-                    console.log('Did not find any conditional modules');
                 }
-
-                /*
-                _this.vertModEl.find('.xmodule_ConditionalModule').each(
-                    function (index, value) {
-                        (new window[response.className]($(value)));
-                    }
-                );
-                */
             }
         );
     }
@@ -185,9 +163,6 @@ PollMain.prototype = {
     // When the user selects and answer, we will set this flag to true.
     this.questionAnswered = false;
 
-    logme('this.jsonConfig.answers: ', this.jsonConfig.answers);
-    logme('this.jsonConfig.poll_answer: ', this.jsonConfig.poll_answer);
-
     $.each(this.jsonConfig.answers, function (index, value) {
         var answerEl;
 
@@ -208,11 +183,8 @@ PollMain.prototype = {
     this.graphAnswerEl.hide();
     this.graphAnswerEl.appendTo(this.questionEl);
 
-    logme('PollMain object: ', this);
-
     // If it turns out that the user already answered the question, show the answers graph.
     if (this.questionAnswered === true) {
-        logme('Three');
         this.showAnswerGraph(this.jsonConfig.poll_answers, this.jsonConfig.total);
     }
 } // End-of: 'postInit': function () {
@@ -222,43 +194,6 @@ return PollMain;
 
 function PollMain(el) {
     var _this;
-
-    var tel, c1;
-
-    tel = $(el)[0];
-    c1 = 0;
-
-    console.log(tel);
-
-    this.verticalSectionEl = null;
-
-    while (tel.tagName.toLowerCase() !== 'body') {
-        tel = $(tel).parent()[0];
-        c1 += 1;
-
-        console.log('' + c1 + ': parent = ');
-        console.log(tel);
-
-        if ((tel.tagName.toLowerCase() === 'section') && ($(tel).hasClass('xmodule_VerticalModule') === true)) {
-            console.log('Found vertical section. Saving element for future use.');
-            this.verticalSectionEl = tel;
-
-            break;
-        } else if (c1 > 50) {
-            console.log('ERROR: HTML hierarchy is very large.');
-
-            break;
-        }
-    }
-
-    console.log('this.verticalSectionEl = ');
-    console.log(this.verticalSectionEl);
-
-    this.vertModEl = $(el).parent().parent();
-    if (this.vertModEl.length !== 1) {
-        // We will work with a single DOM element that contains one question, and zero or more conditionals.
-        return;
-    }
 
     this.questionEl = $(el).find('.poll_question');
     if (this.questionEl.length !== 1) {
@@ -284,6 +219,31 @@ function PollMain(el) {
 
     // Access this object inside inner functions.
     _this = this;
+
+    // DOM element which contains the current poll along with any conditionals. By default we assume that such
+    // element is not present. We will try to find it.
+    this.verticalSectionEl = null;
+
+    (function (tempEl, c1) {
+        while (tempEl.tagName.toLowerCase() !== 'body') {
+            tempEl = $(tempEl).parent()[0];
+            c1 += 1;
+
+            if (
+                (tempEl.tagName.toLowerCase() === 'section') &&
+                ($(tempEl).hasClass('xmodule_VerticalModule') === true)
+            ) {
+                _this.verticalSectionEl = tempEl;
+
+                break;
+            } else if (c1 > 50) {
+                // In case something breaks, and we enter an endless loop, a sane
+                // limit for loop iterations.
+
+                break;
+            }
+        }
+    }($(el)[0], 0));
 
     // Test case for when the server part is still not ready. Change to 'false' so you can test actual server
     // generated JSON config.
@@ -350,9 +310,6 @@ function PollMain(el) {
             $.postWithPrefix(
                 '' + this.questionEl.data('ajax-url') + '/' + 'get_state',  {},
                 function (response) {
-                    logme('Get pre init state.');
-                    logme('response:', response);
-
                     _this.jsonConfig.poll_answer = response.poll_answer;
                     _this.jsonConfig.total = response.total;
 
@@ -360,11 +317,7 @@ function PollMain(el) {
                         _this.jsonConfig.poll_answers[index] = value;
                     });
 
-                    logme('Current "jsonConfig": ');
-                    logme(_this.jsonConfig);
-
                     _this.questionEl.children('.poll_question_div').html(JSON.stringify(_this.jsonConfig));
-
                     _this.postInit();
                 }
             );
