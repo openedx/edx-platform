@@ -12,8 +12,10 @@ def _message(reqm, message):
                         location=reqm.location.url())),
         url_name = reqm.display_name))
 %>
+<div data-passed="false">
 % if message:
 	% for reqm in module.required_modules:
 		<p>${_message(reqm, message)}</p>
 	% endfor
 % endif
+</div>

@@ -96,7 +96,7 @@ class ConditionalModule(XModule):
                        'message': self.descriptor.xml_attributes.get('message')}
             html = self.system.render_template('conditional_module.html',
                 context)
-            return json.dumps({'html': [html]})
+            return json.dumps({'html': [html], 'passed': False})
 
         if self.contents is None:
             self.contents = [self.system.get_module(child_descriptor.location
@@ -104,7 +104,7 @@ class ConditionalModule(XModule):
                 for child_descriptor in self.descriptor.get_children()]
 
         html = self.contents
-        return json.dumps({'html': html})
+        return json.dumps({'html': html, 'passed': True})
 
 
 class ConditionalDescriptor(SequenceDescriptor):
