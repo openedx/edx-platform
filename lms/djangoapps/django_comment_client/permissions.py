@@ -8,6 +8,7 @@ from util.cache import cache
 from django.core import cache
 cache = cache.get_cache('default')
 
+
 def cached_has_permission(user, permission, course_id=None):
     """
     Call has_permission if it's not cached. A change in a user's role or
@@ -21,6 +22,7 @@ def cached_has_permission(user, permission, course_id=None):
         cache.set(key, val, CACHE_LIFESPAN)
     return val
 
+
 def has_permission(user, permission, course_id=None):
     for role in user.roles.filter(course_id=course_id):
         if role.has_permission(permission):
@@ -29,6 +31,8 @@ def has_permission(user, permission, course_id=None):
 
 
 CONDITIONS = ['is_open', 'is_author']
+
+
 def check_condition(user, condition, course_id, data):
     def check_open(user, condition, course_id, data):
         try:
@@ -43,8 +47,8 @@ def check_condition(user, condition, course_id, data):
             return False
 
     handlers = {
-        'is_open'      : check_open,
-        'is_author'    : check_author,
+        'is_open': check_open,
+        'is_author': check_author,
     }
 
     return handlers[condition](user, condition, course_id, data)
@@ -93,7 +97,7 @@ VIEW_PERMISSIONS = {
     'unfollow_commentable':     ['unfollow_commentable'],
     'unfollow_user'     :       ['unfollow_user'],
     'create_thread'     :       ['create_thread'],
-    'update_moderator_status' : ['manage_moderator'],
+    'update_moderator_status': ['manage_moderator'],
 }
 
 

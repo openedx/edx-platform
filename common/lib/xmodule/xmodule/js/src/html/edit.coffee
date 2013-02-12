@@ -10,7 +10,8 @@ class @HTMLEditingDescriptor
       lineWrapping: true
     })
 
-    $(@advanced_editor.getWrapperElement()).addClass(HTMLEditingDescriptor.isInactiveClass)
+    @$advancedEditorWrapper = $(@advanced_editor.getWrapperElement())
+    @$advancedEditorWrapper.addClass(HTMLEditingDescriptor.isInactiveClass)
 
 #   This is a workaround for the fact that tinyMCE's baseURL property is not getting correctly set on AWS
 #   instances (like sandbox). It is not necessary to explicitly set baseURL when running locally.
@@ -43,16 +44,21 @@ class @HTMLEditingDescriptor
       theme_advanced_blockformats : "p,pre,h1,h2,h3",
       width: '100%',
       height: '400px',
-      setup : HTMLEditingDescriptor.setupTinyMCE,
+      setup : @setupTinyMCE,
       # Cannot get access to tinyMCE Editor instance (for focusing) until after it is rendered.
       # The tinyMCE callback passes in the editor as a paramter.
       init_instance_callback: @focusVisualEditor
     })
 
     @showingVisualEditor = true
+    # Doing these find operations within onSwitchEditor leads to sporadic failures on Chrome (version 20 and older).
+    $element = $(element)
+    @$htmlTab = $element.find('.html-tab')
+    @$visualTab = $element.find('.visual-tab')
+
     @element.on('click', '.editor-tabs .tab', @onSwitchEditor)
 
-  @setupTinyMCE: (ed) ->
+  setupTinyMCE: (ed) =>
     ed.addButton('wrapAsCode', {
       title : 'Code',
       image : '/static/images/ico-tinymce-code.png',
@@ -67,19 +73,23 @@ class @HTMLEditingDescriptor
       command.setActive('wrapAsCode', e.nodeName == 'CODE')
     )
 
-  onSwitchEditor: (e)=>
+    @visualEditor = ed
+
+  onSwitchEditor: (e) =>
     e.preventDefault();
 
-    if not $(e.currentTarget).hasClass('current')
-      $('.editor-tabs .current', @element).removeClass('current')
-      $(e.currentTarget).addClass('current')
-      $('table.mceToolbar', @element).toggleClass(HTMLEditingDescriptor.isInactiveClass)
-      $(@advanced_editor.getWrapperElement()).toggleClass(HTMLEditingDescriptor.isInactiveClass)
+    $currentTarget = $(e.currentTarget)
+    if not $currentTarget.hasClass('current')
+      $currentTarget.addClass('current')
+      @$mceToolbar.toggleClass(HTMLEditingDescriptor.isInactiveClass)
+      @$advancedEditorWrapper.toggleClass(HTMLEditingDescriptor.isInactiveClass)
 
       visualEditor = @getVisualEditor()
-      if $(e.currentTarget).attr('data-tab') is 'visual'
+      if $currentTarget.data('tab') is 'visual'
+        @$htmlTab.removeClass('current')
         @showVisualEditor(visualEditor)
       else
+        @$visualTab.removeClass('current')
         @showAdvancedEditor(visualEditor)
 
   # Show the Advanced (codemirror) Editor. Pulled out as a helper method for unit testing.
@@ -97,19 +107,24 @@ class @HTMLEditingDescriptor
     # In order for isDirty() to return true ONLY if edits have been made after setting the text,
     # both the startContent must be sync'ed up and the dirty flag set to false.
     visualEditor.startContent = visualEditor.getContent({format: "raw", no_events: 1});
-    visualEditor.isNotDirty = true
     @focusVisualEditor(visualEditor)
     @showingVisualEditor = true
 
-  focusVisualEditor: (visualEditor) ->
+  focusVisualEditor: (visualEditor) =>
     visualEditor.focus()
+    # Need to mark editor as not dirty both when it is initially created and when we switch back to it.
+    visualEditor.isNotDirty = true
+    if not @$mceToolbar?
+      @$mceToolbar = $(@element).find('table.mceToolbar')
 
-  getVisualEditor: ->
+  getVisualEditor: () ->
     ###
     Returns the instance of TinyMCE.
     This is different from the textarea that exists in the HTML template (@tiny_mce_textarea.
+
+    Pulled out as a helper method for unit test.
     ###
-    return tinyMCE.get($('.tiny-mce', this.element).attr('id'))
+    return @visualEditor
 
   save: ->
     @element.off('click', '.editor-tabs .tab', @onSwitchEditor)

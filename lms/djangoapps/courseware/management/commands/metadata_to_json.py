@@ -14,6 +14,7 @@ from django.core.management.base import BaseCommand
 from xmodule.modulestore.xml import XMLModuleStore
 from xmodule.x_module import policy_key
 
+
 def import_course(course_dir, verbose=True):
     course_dir = path(course_dir)
     data_dir = course_dir.dirname()
@@ -44,6 +45,7 @@ def import_course(course_dir, verbose=True):
 
     return course
 
+
 def node_metadata(node):
     # make a copy
     to_export = ('format', 'display_name',
@@ -54,6 +56,7 @@ def node_metadata(node):
     orig = node.own_metadata
     d = {k: orig[k] for k in to_export if k in orig}
     return d
+
 
 def get_metadata(course):
     d = OrderedDict({})

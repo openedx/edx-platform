@@ -5,17 +5,19 @@ from xmodule.modulestore.exceptions import ItemNotFoundError
 
 DIRECT_ONLY_CATEGORIES = ['course', 'chapter', 'sequential', 'about', 'static_tab', 'course_info']
 
+
 def get_modulestore(location):
     """
     Returns the correct modulestore to use for modifying the specified location
     """
     if not isinstance(location, Location):
         location = Location(location)
-        
+
     if location.category in DIRECT_ONLY_CATEGORIES:
         return modulestore('direct')
     else:
         return modulestore()
+
 
 def get_course_location_for_item(location):
     '''
@@ -45,6 +47,7 @@ def get_course_location_for_item(location):
         location = courses[0].location
 
     return location
+
 
 def get_course_for_item(location):
     '''
@@ -85,6 +88,7 @@ def get_lms_link_for_item(location, preview=False):
 
     return lms_link
 
+
 def get_lms_link_for_about_page(location):
     """
     Returns the url to the course about page from the location tuple.
@@ -99,12 +103,14 @@ def get_lms_link_for_about_page(location):
 
     return lms_link
 
+
 def get_course_id(location):
     """
     Returns the course_id from a given the location tuple.
     """
     # TODO: These will need to be changed to point to the particular instance of this problem in the particular course
     return modulestore().get_containing_courses(Location(location))[0].id
+
 
 class UnitState(object):
     draft = 'draft'
@@ -134,6 +140,7 @@ def compute_unit_state(unit):
 
 def get_date_display(date):
     return date.strftime("%d %B, %Y at %I:%M %p")
+
 
 def update_item(location, value):
     """

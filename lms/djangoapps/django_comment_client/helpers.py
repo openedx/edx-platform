@@ -12,12 +12,19 @@ import pystache_custom as pystache
 import urllib
 import os
 
+# This method is used to pluralize the words "discussion" and "comment"
+# when referring to how many discussion threads or comments the user
+# has contributed to.
+
+
 def pluralize(singular_term, count):
     if int(count) >= 2 or int(count) == 0:
         return singular_term + 's'
     return singular_term
 
 # TODO there should be a better way to handle this
+
+
 def include_mustache_templates():
     mustache_dir = settings.PROJECT_ROOT / 'templates' / 'discussion' / 'mustache'
     valid_file_name = lambda file_name: file_name.endswith('.mustache')
@@ -27,6 +34,7 @@ def include_mustache_templates():
 
     file_contents = map(read_file, filter(valid_file_name, os.listdir(mustache_dir)))
     return '\n'.join(map(wrap_in_tag, map(strip_file_name, file_contents)))
+
 
 def render_content(content, additional_context={}):
 

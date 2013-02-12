@@ -2,6 +2,8 @@ import logging
 from xmodule.modulestore import Location
 from xmodule.modulestore.django import modulestore
 from fs.osfs import OSFS
+from json import dumps
+
 
 def export_to_xml(modulestore, contentstore, course_location, root_dir, course_dir):
 
@@ -23,8 +25,17 @@ def export_to_xml(modulestore, contentstore, course_location, root_dir, course_d
   # export the custom tags
   export_extra_content(export_fs, modulestore, course_location, 'custom_tag_template', 'custom_tags')
 
+  # export the course updates
+  export_extra_content(export_fs, modulestore, course_location, 'course_info', 'info', '.html')
 
-def export_extra_content(export_fs, modulestore, course_location, category_type, dirname, file_suffix = ''):
+  # export the grading policy
+  policies_dir = export_fs.makeopendir('policies')
+  course_run_policy_dir = policies_dir.makeopendir(course.location.name)
+  with course_run_policy_dir.open('grading_policy.json', 'w') as grading_policy:
+    grading_policy.write(dumps(course.definition['data']['grading_policy']))
+
+
+def export_extra_content(export_fs, modulestore, course_location, category_type, dirname, file_suffix=''):
   query_loc = Location('i4x', course_location.org, course_location.course, category_type, None)
   items = modulestore.get_items(query_loc)
 
@@ -33,7 +44,3 @@ def export_extra_content(export_fs, modulestore, course_location, category_type,
     for item in items:
       with item_dir.open(item.location.name + file_suffix, 'w') as item_file:
         item_file.write(item.definition['data'].encode('utf8'))
-
-
-
-  

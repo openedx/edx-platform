@@ -9,9 +9,13 @@ state_graded = "graded"
 state_no_data = "no_data"
 state_error = "error"
 
-class StaffGradingBackend
+class @StaffGradingBackend
   constructor: (ajax_url, mock_backend) ->
     @ajax_url = ajax_url
+    # prevent this from trying to make requests when we don't have
+    # a proper url
+    if !ajax_url
+      mock_backend = true
     @mock_backend = mock_backend
     if @mock_backend
       @mock_cnt = 0
@@ -142,7 +146,7 @@ The standard chunk of Lorem Ipsum used since the 1500s is reproduced below for t
         .error => callback({success: false, error: "Error occured while performing this operation"})
 
 
-class StaffGrading
+class @StaffGrading
   constructor: (backend) ->
     @backend = backend
 
@@ -208,54 +212,18 @@ class StaffGrading
 
 
   setup_score_selection: =>
-    # first, get rid of all the old inputs, if any.
-    @grade_selection_container.html("""
-    <h3>Overall Score</h3>
-    <p>Choose an overall score for this submission.</p>
-    """)
-    # Now create new labels and inputs for each possible score.
-    for score in [0..@max_score]
-      id = 'score-' + score
-      label = """<label for="#{id}">#{score}</label>"""
-      input = """
-              <input type="radio" class="grade-selection" name="grade-selection" id="#{id}" value="#{score}"/>
-              """  # "  fix broken parsing in emacs
-      @grade_selection_container.append(input + label)
-    $('.grade-selection').click => @graded_callback()
-
     @score_selection_container.html(@rubric)
     $('.score-selection').click => @graded_callback()
 
 
   graded_callback: () =>
-    @grade = $("input[name='grade-selection']:checked").val()
-    if @grade == undefined
-      return
-    # check to see whether or not any categories have not been scored
-    num_categories = $('table.rubric tr').length
-    for i in [0..(num_categories-1)]
-      score = $("input[name='score-selection-#{i}']:checked").val()
-      if score == undefined
-        return
-    # show button if we have scores for all categories
-    @state = state_graded
-    @submit_button.show()
+   # show button if we have scores for all categories
+    if Rubric.check_complete()
+      @state = state_graded
+      @submit_button.show()
 
   set_button_text: (text) =>
     @action_button.attr('value', text)
-
-  # finds the scores for each rubric category
-  get_score_list: () =>
-    # find the number of categories:
-    num_categories = $('table.rubric tr').length
-
-    score_lst = []
-    # get the score for each one
-    for i in [0..(num_categories-1)]
-      score = $("input[name='score-selection-#{i}']:checked").val()
-      score_lst.push(score)
-
-    return score_lst
 
   ajax_callback: (response) =>
     # always clear out errors and messages on transition.
@@ -281,8 +249,8 @@ class StaffGrading
 
   skip_and_get_next: () =>
     data =
-      score: @grade
-      rubric_scores: @get_score_list()
+      score: Rubric.get_total_score()
+      rubric_scores: Rubric.get_score_list()
       feedback: @feedback_area.val()
       submission_id: @submission_id
       location: @location
@@ -295,8 +263,8 @@ class StaffGrading
 
   submit_and_get_next: () ->
     data =
-      score: @grade
-      rubric_scores: @get_score_list()
+      score: Rubric.get_total_score()
+      rubric_scores: Rubric.get_score_list()
       feedback: @feedback_area.val()
       submission_id: @submission_id
       location: @location

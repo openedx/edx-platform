@@ -11,4 +11,3 @@ admin.site.register(StudentModule)
 admin.site.register(OfflineComputedGrade)
 
 admin.site.register(OfflineComputedGradeLog)
-

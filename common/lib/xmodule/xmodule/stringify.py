@@ -1,6 +1,7 @@
 from itertools import chain
 from lxml import etree
 
+
 def stringify_children(node):
     '''
     Return all contents of an xml tree, without the outside tags.

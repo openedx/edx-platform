@@ -14,6 +14,7 @@ from django.db import DEFAULT_DB_ALIAS
 from . import app_settings
 from xmodule.contentstore.content import StaticContent
 
+
 def get_instance(model, instance_or_pk, timeout=None, using=None):
     """
     Returns the ``model`` instance with a primary key of ``instance_or_pk``.
@@ -108,11 +109,14 @@ def instance_key(model, instance_or_pk):
         getattr(instance_or_pk, 'pk', instance_or_pk),
     )
 
+
 def set_cached_content(content):
     cache.set(str(content.location), content)
 
+
 def get_cached_content(location):
     return cache.get(str(location))
+
 
 def del_cached_content(location):
     cache.delete(str(location))
