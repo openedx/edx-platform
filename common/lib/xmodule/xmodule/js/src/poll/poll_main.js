@@ -123,8 +123,8 @@ PollMain.prototype = {
             function (response) {
                 _this.showAnswerGraph(response.poll_answers, response.total);
 
-                if (_this.verticalSectionEl !== null) {
-                    $(_this.verticalSectionEl).find('.xmodule_ConditionalModule').each(function (index, value) {
+                if (_this.wrapperSectionEl !== null) {
+                    $(_this.wrapperSectionEl).find('.xmodule_ConditionalModule').each(function (index, value) {
                         new window.Conditional(value);
                     });
                 }
@@ -222,7 +222,7 @@ function PollMain(el) {
 
     // DOM element which contains the current poll along with any conditionals. By default we assume that such
     // element is not present. We will try to find it.
-    this.verticalSectionEl = null;
+    this.wrapperSectionEl = null;
 
     (function (tempEl, c1) {
         while (tempEl.tagName.toLowerCase() !== 'body') {
@@ -231,9 +231,9 @@ function PollMain(el) {
 
             if (
                 (tempEl.tagName.toLowerCase() === 'section') &&
-                ($(tempEl).hasClass('xmodule_VerticalModule') === true)
+                ($(tempEl).hasClass('xmodule_WrapperModule') === true)
             ) {
-                _this.verticalSectionEl = tempEl;
+                _this.wrapperSectionEl = tempEl;
 
                 break;
             } else if (c1 > 50) {
