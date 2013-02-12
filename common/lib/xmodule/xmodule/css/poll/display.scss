@@ -17,6 +17,7 @@ section.poll_question {
     margin-top: 0;
     margin-bottom: 15px;
     color: #fe57a1;
+    font-size: 1.9em;
 
     &.problem-header {
       section.staff {
@@ -40,10 +41,21 @@ section.poll_question {
   .poll_answer {
     margin-bottom: 20px;
 
+    &.short {
+        clear: both;
+    }
+
     .question {
       height: auto;
       clear: both;
-      min-height: 60px;
+      min-height: 30px;
+
+      &.short {
+        clear: none;
+        width: 30%;
+        display: inline;
+        float: left;
+      }
 
       .button {
         -webkit-appearance: none;
@@ -102,8 +114,8 @@ section.poll_question {
         vertical-align: top;
         white-space: pre-line;
 
-        width: 60px;
-        height: 60px;
+        width: 25px;
+        height: 25px;
 
         word-spacing: 0px;
         writing-mode: lr-tb;
@@ -126,10 +138,14 @@ section.poll_question {
         float: left;
         width: 80%;
         text-align: left;
-        min-height: 60px;
+        min-height: 30px;
         margin-left: 20px;
         height: auto;
         margin-bottom: 20px;
+
+        &.short {
+          width: 100px;
+        }
       }
     }
 
@@ -138,18 +154,35 @@ section.poll_question {
       margin-top: 20px;
       clear: both;
 
+      &.short {
+        margin-top: 0;
+        clear: none;
+        display: inline;
+        float: right;
+        width: 70%;
+      }
+
       .bar {
-        width: 85%;
+        width: 75%;
         height: 28px;
         border: 1px solid black;
         display: inline;
         float: left;
         margin-right: 10px;
 
+        &.short {
+          height: 20px;
+          margin-top: 3px;
+        }
+
         .percent {
           background-color: gray;
-          width: 300px;
+          width: 0px;
           height: 28px;
+
+          &.short {
+            height: 20px;
+          }
         }
       }
 
@@ -159,12 +192,13 @@ section.poll_question {
         float: right;
         height: 28px;
         text-align: right;
+
+        &.short {
+          width: 120px;
+          height: auto;
+        }
       }
     }
-  }
-
-  .poll_answer {
-
   }
 
   .poll_answer.answered {

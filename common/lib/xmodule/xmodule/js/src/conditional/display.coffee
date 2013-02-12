@@ -13,13 +13,19 @@ class @Conditional
       @passed = null
 
     @url = @el.data('url')
-    @render()
+    @render(element)
 
-  render: () ->
+  render: (element) ->
       $.postWithPrefix "#{@url}/conditional_get", (response) =>
         if (((response.passed is true) && (@passed is false)) || (@passed is null))
           @el.data 'passed', response.passed
 
           @el.html ''
           @el.append(i) for i in response.html
+
+          if @el.html().length < 5
+            $(element).hide()
+          else
+            $(element).show()
+
           XModule.loadModules @el

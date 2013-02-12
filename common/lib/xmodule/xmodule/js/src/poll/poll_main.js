@@ -114,6 +114,13 @@ PollMain.prototype = {
     this.questionAnswered = false;
 
     this.answersObj = {};
+    this.shortVersion = true;
+
+    $.each(this.jsonConfig.answers, function (index, value) {
+        if (value.length >= 18) {
+            _this.shortVersion = false;
+        }
+    });
 
     $.each(this.jsonConfig.answers, function (index, value) {
         var answer;
@@ -146,6 +153,14 @@ PollMain.prototype = {
 
         answer.textEl.html(value);
 
+        if (_this.shortVersion === true) {
+            $.each(answer, function (index, value) {
+                if (value instanceof jQuery) {
+                    value.addClass('short');
+                }
+            });
+        }
+
         answer.el.appendTo(_this.questionEl);
 
         answer.buttonEl.on('click', function () {
@@ -156,20 +171,6 @@ PollMain.prototype = {
             answer.buttonEl.addClass('answered');
             _this.questionAnswered = true;
         }
-
-        /*
-        answerEl = $('<li class="poll_answer">' + value + '</li>');
-        answerEl.on('click', function () {
-            _this.submitAnswer(index, answerEl);
-        });
-
-        if (index === _this.jsonConfig.poll_answer) {
-            answerEl.addClass('answered');
-            _this.questionAnswered = true;
-        }
-
-        answerEl.appendTo(_this.questionEl);
-        */
     });
 
     this.graphAnswerEl = $('<div class="graph_answer"></div>');
