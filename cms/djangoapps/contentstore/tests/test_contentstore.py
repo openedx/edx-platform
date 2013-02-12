@@ -1,7 +1,7 @@
 import json
 import shutil
 from django.test.client import Client
-from override_settings import override_settings
+from django.test.utils import override_settings
 from django.conf import settings
 from django.core.urlresolvers import reverse
 from path import path
