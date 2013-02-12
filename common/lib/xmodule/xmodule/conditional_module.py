@@ -124,46 +124,44 @@ class ConditionalDescriptor(SequenceDescriptor):
 
     show_tag_list = List(help="Poll answers", scope=Scope.content)
 
-    def get_required_module_descriptors(self):
-        """TODO: Returns a list of XModuleDescritpor instances upon which this module depends, but are
-        not children of this module"""
-        descriptors = []
-        sources = self.xml_attributes.get('sources')
+    @staticmethod
+    def parse_sources(xml_element, system, return_descriptor=False):
+        """Parse xml_element 'sources' attr and:
+        if return_descriptor=True - return list of descriptors
+        if return_descriptor=False - return list of lcoations
+        """
+        result = []
+        sources = xml_element.get('sources')
         if sources:
             locations = [location.strip() for location in sources.split(';')]
             for location in locations:
                 # Check valid location url.
                 if Location.is_valid(location):
                     try:
-                        descriptor = self.system.load_item(location)
-                        descriptors.append(descriptor)
+                        descriptor = system.load_item(location)
+                        if return_descriptor:
+                            result.append(descriptor)
+                        else:
+                            result.append(location)
                     except ItemNotFoundError:
                         log.exception("Invalid module by location.")
-        return descriptors
+        return result
+
+    def get_required_module_descriptors(self):
+        """Returns a list of XModuleDescritpor instances upon
+        which this module depends.
+        """
+        return ConditionalDescriptor.parse_sources(
+            self.xml_attributes, self.system, True)
 
     @classmethod
     def definition_from_xml(cls, xml_object, system):
-        def parse_show_tag(child):
-            """Return list of valid module urls from <show> tag."""
-            urls = []
-            sources = child.get('sources')
-            if sources:
-                locations = [location.strip() for location in sources.split(';')]
-                for location in locations:
-                    # Check valid location url.
-                    if Location.is_valid(location):
-                        try:
-                            system.load_item(location)
-                            urls.append(location)
-                        except ItemNotFoundError:
-                            log.exception("Invalid descriptor by location.")
-            return urls
-
         children = []
         show_tag_list = []
         for child in xml_object:
             if child.tag == 'show':
-                location = parse_show_tag(child)
+                location = ConditionalDescriptor.parse_sources(
+                    child, system)
                 children.extend(location)
                 show_tag_list.extend(location)
             else:
