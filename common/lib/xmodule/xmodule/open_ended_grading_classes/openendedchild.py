@@ -418,8 +418,8 @@ class OpenEndedChild(object):
         success = False
         allowed_to_submit = True
         response = {}
-        error_string = ("You need to peer grade more in order to make another submission.  "
-        "You have graded {0}, and {1} are required.  You have made {2} successful peer grading submissions.")
+        error_string = ("You need to peer grade {0} more in order to make another submission.  "
+        "You have graded {1}, and {2} are required.  You have made {3} successful peer grading submissions.")
         try:
             response = self.peer_gs.get_data_for_location(location, student_id)
             count_graded = response['count_graded']
@@ -433,6 +433,6 @@ class OpenEndedChild(object):
             return success, allowed_to_submit, ""
         else:
             allowed_to_submit = False
-            error_message = error_string.format(count_graded, count_required, student_sub_count)
+            error_message = error_string.format(count_required-count_graded, count_graded, count_required, student_sub_count)
             return success, allowed_to_submit, error_message
 
