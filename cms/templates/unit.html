@@ -24,22 +24,48 @@
 
 </%block>
 <%block name="content">
-<div class="wrapper-mast wrapper">
-  <header class="mast">
-    <nav class="nav-hierarchy">
+
+<div class="wrapper-alert">
+  <div class="alert has-actions alert-editing-draft">
+
+    <div class="copy">
+      <h2 class="title-3">You are editing a draft.</h2>
+      <p class="message">
+      % if published_date:
+      This unit was originally published on ${published_date}.
+      % endif</p>
+    </div>
+
+    <nav class="nav-actions">
+      <h3 class="sr">Alert Actions</h3>
       <ul>
         <li class="nav-item">
-          <a href="#">Section Name</a>
-        </li>
-        <li class="nav-item">
-          <a href="#">Subsection Name</a>
+          <a href="${published_preview_link}" rel="external" class="action action-primary">Preview the published version</a>
         </li>
       </ul>
     </nav>
+  </div>
+</div>
 
-    <h1 class="title-1">Unit Name</h1>
+<div class="wrapper-mast wrapper">
+  <header class="mast has-actions">
+    <div class="title">
+      <nav class="nav-hierarchy">
+        <ul>
+          <li class="nav-item">
+            <a href="#">Section Name</a>
+          </li>
+          <li class="nav-item">
+            <a href="#">Subsection Name</a>
+          </li>
+        </ul>
+      </nav>
+
+      <h1 class="title-1">Unit Name</h1>
+    </div>
 
     <nav class="nav-actions">
+      <h3 class="sr">Unit Actions</h3>
       <ul>
         <li class="nav-item">
           <a href="#">Preview Unit</a>
@@ -55,15 +81,21 @@
 
     <div class="metadata status-unit">
       <div class="status-visibility">
-        
+        <label for="unit-visibility">Visibility:</label>
+        <select class="visibility-select" id="unit-visibility">
+          <option value="public">Public</option>
+          <option value="private">Private</option>
+        </select>
       </div>
 
       <div class="status-release">
-        
+        <h3 class="label">Will be Released:</h3>
+        <p>to <strong>students</strong> on <strong>February 06, 2013 at 12:00 PM</strong> within <a href="">"Introduction to the Course"</a></p>
       </div>
 
       <div class="status-url">
-        
+        <h3 class="label">Unit URL Title:</h3>
+        <p><a href="">/courseware/db0cfa58100f4ca48c614cfb618030d1/7317287782624b9b924bd70ce5ca7b2d</a></p>
       </div>
     </div>    
   </header>
@@ -71,14 +103,6 @@
 
   <div class="main-wrapper edit-state-${unit_state}" data-id="${unit_location}">
     <div class="inner-wrapper">
-      <div class="alert editing-draft-alert">
-        <p class="alert-message"><strong>You are editing a draft.</strong>
-        % if published_date:
-        This unit was originally published on ${published_date}.
-        % endif
-        </p>
-        <a href="${published_preview_link}" target="_blank" class="alert-action secondary">Preview the published version</a>
-      </div>
       <div class="main-column">
         <article class="unit-body window">
           <p class="unit-name-input"><label>Display Name:</label><input type="text" value="${unit.display_name}" class="unit-display-name-input" /></p>

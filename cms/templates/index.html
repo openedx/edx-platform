@@ -33,21 +33,32 @@
 </%block>
 
 <%block name="content">
+  <div class="wrapper-mast wrapper">
+    <header class="mast has-actions">
+      <div  class="title">
+        <h1 class="title-1">My Courses</h1>
+      </div>
+
+      <nav class="nav-actions">
+        <h3 class="sr">Page Actions</h3>
+        <ul>
+          <li class="nav-item">
+            <a href="#" class="new-button new-course-button"><span class="plus-icon white"></span> New Course</a>
+          </li>
+        </ul>
+      </nav>
+    </header>
+  </div>
+
   <div class="main-wrapper">
     <div class="inner-wrapper">
-      <h1>My Courses</h1>
       <article class="my-classes">
         % if user.is_active:
-        <a href="#" class="new-button new-course-button"><span class="plus-icon white"></span> New Course</a>
         <ul class="class-list">
           %for course, url in courses:
           <li>
             <a href="${url}" class="class-name">
               <span class="class-name">${course}</span>
-              <!--
-              <span class="detail">Started: 9/21/2012</span>
-              <span class="detail">Ends: 10/21/2012</span>
-              -->
             </a>
           </li>
             %endfor

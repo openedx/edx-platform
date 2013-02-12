@@ -49,41 +49,42 @@ h1 {
 
 // ====================
 
-// layout - basic
+// layout - basic page header
 .wrapper-mast {
   margin: 0;
   padding: 0 $baseline;
   position: relative;
   
   .mast {
-      @include clearfix();
-      @include font-size(16);
-      position: relative;
-      max-width: $fg-max-width;
-      min-width: $fg-min-width;
-      width: flex-grid(12);
-      margin: 0 auto $baseline auto;
-      border-bottom: 1px solid $gray-l4;
-      padding-bottom: ($baseline/2);
-      color: $gray-d2;
+    @include clearfix();
+    @include font-size(16);
+    position: relative;
+    max-width: $fg-max-width;
+    min-width: $fg-min-width;
+    width: flex-grid(12);
+    margin: 0 auto $baseline auto;
+    border-bottom: 1px solid $gray-l4;
+    padding-bottom: ($baseline/2);
+    color: $gray-d2;
 
-      .title-sub {
-        @include font-size(14);
-        display: block;
-        margin: 0;
-        color: $gray-l2;
-      }
-
-      .title, .title-1 {
-        @include font-size(32);
-        margin: 0;
-        padding: 0;
-        font-weight: 600;
-        color: $gray-d3;
-      }
+    .title-sub {
+      @include font-size(14);
+      display: block;
+      margin: 0;
+      color: $gray-l2;
     }
+
+    .title, .title-1 {
+      @include font-size(32);
+      margin: 0;
+      padding: 0;
+      font-weight: 600;
+      color: $gray-d3;
+    }
+  }
 }
 
+// layout - basic page content
 .wrapper-content {
   margin: 0;
   padding: 0 $baseline;
@@ -131,6 +132,7 @@ h1 {
   @include box-sizing(border-box);
 }
 
+// layout - primary content
 .content-primary {
 
   .title-1, .title-2, .title-3, .title-4, .title-5, .title-5 {
@@ -162,6 +164,7 @@ h1 {
   }
 }
 
+// layout - supplemental content
 .content-supplementary {
 
   .bit {
