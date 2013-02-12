@@ -66,12 +66,12 @@ class ConditionalModule(XModule):
             descriptor in self.descriptor.get_required_module_descriptors()]
         xml_value, attr_name = self._get_condition()
 
-        if xml_value:
+        if xml_value and self.required_modules:
             for module in self.required_modules:
                 if not hasattr(module, attr_name):
                     raise Exception('Error in conditional module: \
-                        required module %s has no .is_completed() method'
-                        % module)
+                    required module {module} has no {module_attr}'.format(
+                        module=module, module_attr=attr_name))
 
                 attr = getattr(module, attr_name)
                 if callable(attr):
