@@ -105,8 +105,12 @@ class @Annotatable
             onAfter: @makeAfterScroll(el)
         })
  
-    makeAfterScroll: (el, duration = 500) ->
-        @_once -> el.effect 'shake', {}, duration
+    makeAfterScroll: (el, duration = 1500) ->
+        @_once ->
+            btn = $('.discussion-show', el)
+            if !btn.hasClass('shown')
+                btn.click()
+            #el.effect 'highlight', {}, duration
 
     makeTipContent: (el) ->
         (api) =>
