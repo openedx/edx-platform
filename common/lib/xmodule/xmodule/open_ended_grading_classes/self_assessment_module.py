@@ -183,11 +183,12 @@ class SelfAssessmentModule(openendedchild.OpenEndedChild):
                 self.new_history_entry(get['student_answer'])
                 self.change_state(self.ASSESSING)
             else:
-                #Error message already defined, so we can just pass
-                pass
+                #Error message already defined
+                success = False
         else:
             error_message = "There was a problem saving the image in your submission.  Please try a different image, or try pasting a link to an image into the answer box."
 
+        log.debug(error_message)
         return {
             'success': success,
             'rubric_html': self.get_rubric_html(system),

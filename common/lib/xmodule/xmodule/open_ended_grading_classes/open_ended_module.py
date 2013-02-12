@@ -613,13 +613,13 @@ class OpenEndedModule(openendedchild.OpenEndedChild):
                 self.send_to_grader(get['student_answer'], system)
                 self.change_state(self.ASSESSING)
             else:
-                #Error message already defined, so we can just pass it down the chain
-                pass
+                #Error message already defined
+                success = False
         else:
             error_message = "There was a problem saving the image in your submission.  Please try a different image, or try pasting a link to an image into the answer box."
 
         return {
-            'success': True,
+            'success': success,
             'error': error_message,
             'student_response': get['student_answer']
         }
