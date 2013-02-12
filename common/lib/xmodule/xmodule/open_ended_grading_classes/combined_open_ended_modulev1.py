@@ -7,7 +7,6 @@ from lxml.html import rewrite_links
 from xmodule.capa_module import only_one, ComplexEncoder
 from xmodule.editing_module import EditingDescriptor
 from xmodule.html_checker import check_html
-
 from xmodule.progress import Progress
 from xmodule.stringify import stringify_children
 from xmodule.x_module import XModule
@@ -15,7 +14,6 @@ from xmodule.xml_module import XmlDescriptor
 import self_assessment_module
 import open_ended_module
 from combined_open_ended_rubric import CombinedOpenEndedRubric, GRADER_TYPE_IMAGE_DICT, HUMAN_GRADER_TYPE, LEGEND_LIST
-from xmodule.stringify import stringify_children
 import dateutil
 import dateutil.parser
 from xmodule.timeparse import parse_timedelta
@@ -784,9 +782,6 @@ class CombinedOpenEndedV1Descriptor(XmlDescriptor, EditingDescriptor):
     stores_state = True
     has_score = True
     template_dir_name = "combinedopenended"
-
-    js = {'coffee': [resource_string(__name__, 'js/src/html/edit.coffee')]}
-    js_module_name = "HTMLEditingDescriptor"
 
     @classmethod
     def definition_from_xml(cls, xml_object, system):

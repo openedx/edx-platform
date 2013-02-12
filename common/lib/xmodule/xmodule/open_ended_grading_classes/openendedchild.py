@@ -20,7 +20,7 @@ from xmodule.html_checker import check_html
 from xmodule.progress import Progress
 from xmodule.stringify import stringify_children
 from xmodule.xml_module import XmlDescriptor
-from xmodule.xmodule.modulestore import Location
+from xmodule.modulestore import Location
 from capa.util import *
 
 from datetime import datetime
