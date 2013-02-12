@@ -42,7 +42,7 @@ setup(
             "static_tab = xmodule.html_module:StaticTabDescriptor",
             "custom_tag_template = xmodule.raw_module:RawDescriptor",
             "about = xmodule.html_module:AboutDescriptor",
-            "wrapper = xmodule.vertical_module:VerticalDescriptor",
+            "wrapper = xmodule.wrapper_module:WrapperDescriptor",
         ],
     }
 )

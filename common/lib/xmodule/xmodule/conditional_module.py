@@ -67,25 +67,28 @@ class ConditionalModule(XModule):
             descriptor in self.descriptor.get_required_module_descriptors()]
         xml_value, attr_name = self._get_condition()
 
-        if xml_value:
+        if xml_value and self.required_modules:
             for module in self.required_modules:
                 if not hasattr(module, attr_name):
                     raise Exception('Error in conditional module: \
-                        required module %s has no .is_completed() method'
-                        % module)
+                    required module {module} has no {module_attr}'.format(
+                        module=module, module_attr=attr_name))
 
                 attr = getattr(module, attr_name)
                 if callable(attr):
                     attr = attr()
 
-                return xml_value == str(attr)
+                if xml_value != str(attr):
+                    break
+            else:
+                return True
         return False
 
     def get_html(self):
         return self.system.render_template('conditional_ajax.html', {
             'element_id': self.location.html_id(),
             'id': self.id,
-            'ajax_url': self.system.ajax_url,
+            'ajax_url': self.system.ajax_url
         })
 
     def handle_ajax(self, dispatch, post):
@@ -97,7 +100,7 @@ class ConditionalModule(XModule):
                        'message': self.descriptor.xml_attributes.get('message')}
             html = self.system.render_template('conditional_module.html',
                 context)
-            return json.dumps({'html': [html]})
+            return json.dumps({'html': [html], 'passed': False})
 
         if self.contents is None:
             self.contents = [self.system.get_module(child_descriptor.location
@@ -105,7 +108,7 @@ class ConditionalModule(XModule):
                 for child_descriptor in self.descriptor.get_children()]
 
         html = self.contents
-        return json.dumps({'html': html})
+        return json.dumps({'html': html, 'passed': True})
 
 
 class ConditionalDescriptor(SequenceDescriptor):
