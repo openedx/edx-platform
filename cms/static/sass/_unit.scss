@@ -231,6 +231,7 @@
             background: #fff;
             border: 0px;
             color: #3c3c3c;
+            @include transition (none);
 
             &:hover {
               background: tint($green,30%); 
