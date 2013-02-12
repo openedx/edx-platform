@@ -155,7 +155,8 @@ class CourseGradingModel(object):
             if 'grace_period' in graceperiodjson:
                 graceperiodjson = graceperiodjson['grace_period']
 
-            grace_rep = " ".join(["%s %s" % (value, key) for (key, value) in graceperiodjson.iteritems()])
+            # lms requires these to be in a fixed order
+            grace_rep = "{0[hours]:d} hours {0[minutes]:d} minutes {0[seconds]:d} seconds".format(graceperiodjson) 
 
             descriptor = get_modulestore(course_location).get_item(course_location)
             descriptor.metadata['graceperiod'] = grace_rep
