@@ -85,6 +85,7 @@ class ConditionalModule(XModule):
             'element_id': self.location.html_id(),
             'id': self.id,
             'ajax_url': self.system.ajax_url,
+            'passed': json.dumps(self.is_condition_satisfied())
         })
 
     def handle_ajax(self, dispatch, post):
