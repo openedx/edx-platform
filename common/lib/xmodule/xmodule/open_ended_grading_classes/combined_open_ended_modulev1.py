@@ -48,6 +48,10 @@ HUMAN_TASK_TYPE = {
     'openended' : "edX Assessment",
     }
 
+#Default value that controls whether or not to skip basic spelling checks in the controller
+#Metadata overrides this
+SKIP_BASIC_CHECKS = False
+
 class CombinedOpenEndedV1Module():
     """
     This is a module that encapsulates all open ended grading (self assessment, peer assessment, etc).
@@ -146,6 +150,7 @@ class CombinedOpenEndedV1Module():
         self.max_attempts = int(self.metadata.get('attempts', MAX_ATTEMPTS))
         self.is_scored = self.metadata.get('is_graded', IS_SCORED) in TRUE_DICT
         self.accept_file_upload = self.metadata.get('accept_file_upload', ACCEPT_FILE_UPLOAD) in TRUE_DICT
+        self.skip_basic_checks = self.metadata.get('skip_spelling_checks', SKIP_BASIC_CHECKS)
 
         display_due_date_string = self.metadata.get('due', None)
         if display_due_date_string is not None:
@@ -187,6 +192,7 @@ class CombinedOpenEndedV1Module():
             'accept_file_upload': self.accept_file_upload,
             'close_date' : self.close_date,
             's3_interface' : self.system.s3_interface,
+            'skip_basic_checks' : self.skip_basic_checks,
             }
 
         self.task_xml = definition['task_xml']
