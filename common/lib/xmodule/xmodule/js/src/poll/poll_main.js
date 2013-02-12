@@ -10,7 +10,7 @@ define('PollMain', ['logme'], function (logme) {
 PollMain.prototype = {
 
 'showAnswerGraph': function (poll_answers, total) {
-    var dataSeries, tickSets, c1, _this, totalValue;
+    var _this, totalValue;
 
     totalValue = parseFloat(total);
     if (isFinite(totalValue) === false) {
@@ -19,75 +19,25 @@ PollMain.prototype = {
 
     _this = this;
 
-    // Show the graph answer DOM elementfrom.
-    this.graphAnswerEl.show();
-
-    dataSeries = [];
-    tickSets = {};
-    c1 = 0;
-
     $.each(poll_answers, function (index, value) {
-        var numValue, text;
+        var numValue, percentValue;
 
         numValue = parseFloat(value);
         if (isFinite(numValue) === false) {
             return;
         }
 
-        c1 += 1;
+        percentValue = (numValue / totalValue) * 100.0;
 
-        text = _this.jsonConfig.answers[index].substring(0, 10);
-
-        tickSets[c1.toFixed(1)] = text;
-
-        dataSeries.push({
-            'label': '' + value + '/' + total,
-            'data': [[c1, (numValue / totalValue) * 100.0]]
+        _this.answersObj[index].statsEl.show();
+        _this.answersObj[index].numberEl.html('' + value + ' (' + percentValue.toFixed(1) + '%)');
+        _this.answersObj[index].percentEl.css({
+            'width': '' + percentValue.toFixed(1) + '%'
         });
     });
-
-    jQuery.plot(
-        _this.graphAnswerEl,
-        dataSeries,
-        {
-            'xaxis': {
-                'min': 0,
-                'max': c1 + 1,
-                'tickFormatter': function formatter(val, axis) {
-                    var valStr;
-
-                    valStr = val.toFixed(axis.tickDecimals);
-
-                    if (tickSets.hasOwnProperty(valStr)) {
-                        return tickSets[valStr];
-                    } else {
-                        return '';
-                    }
-                }
-            },
-            'yaxis': {
-                'min': 0,
-                'max': 105,
-                'tickFormatter': function formatter(val, axis) {
-                    return val.toFixed(axis.tickDecimals) + ' %';
-                }
-            },
-            'lines':  {  'show': false  },
-            'points': {  'show': false  },
-            'bars': {
-                'show': true,
-                'align': 'center',
-                'barWidth': 0.5
-            },
-            'legend': {
-                'show': true,
-                'backgroundOpacity': 0
-            }
-        }
-    );
 },
 
-'submitAnswer': function (answer, answerEl) {
+'submitAnswer': function (answer, answerObj) {
     var _this;
 
     // Make sure that the user can answer a question only once.
@@ -98,7 +48,7 @@ PollMain.prototype = {
 
     _this = this;
 
-    answerEl.addClass('answered');
+    answerObj.buttonEl.addClass('answered');
 
     if (debugMode === true) {
         (function () {
@@ -163,10 +113,52 @@ PollMain.prototype = {
     // When the user selects and answer, we will set this flag to true.
     this.questionAnswered = false;
 
-    $.each(this.jsonConfig.answers, function (index, value) {
-        var answerEl;
+    this.answersObj = {};
 
-        answerEl = $('<div class="poll_answer">' + value + '</li>');
+    $.each(this.jsonConfig.answers, function (index, value) {
+        var answer;
+
+        answer = {};
+
+        _this.answersObj[index] = answer;
+
+        answer.el = $('<div class="poll_answer"></div>');
+
+        answer.questionEl = $('<div class="question"></div>');
+        answer.buttonEl = $('<div class="button"></div>');
+        answer.textEl = $('<div class="text"></div>');
+        answer.questionEl.append(answer.buttonEl);
+        answer.questionEl.append(answer.textEl);
+
+        answer.el.append(answer.questionEl);
+
+        answer.statsEl = $('<div class="stats"></div>');
+        answer.barEl = $('<div class="bar"></div>');
+        answer.percentEl = $('<div class="percent"></div>');
+        answer.barEl.append(answer.percentEl);
+        answer.numberEl = $('<div class="number"></div>');
+        answer.statsEl.append(answer.barEl);
+        answer.statsEl.append(answer.numberEl);
+
+        answer.statsEl.hide();
+
+        answer.el.append(answer.statsEl);
+
+        answer.textEl.html(value);
+
+        answer.el.appendTo(_this.questionEl);
+
+        answer.buttonEl.on('click', function () {
+            _this.submitAnswer(index, answer);
+        });
+
+        if (index === _this.jsonConfig.poll_answer) {
+            answer.buttonEl.addClass('answered');
+            _this.questionAnswered = true;
+        }
+
+        /*
+        answerEl = $('<li class="poll_answer">' + value + '</li>');
         answerEl.on('click', function () {
             _this.submitAnswer(index, answerEl);
         });
@@ -177,6 +169,7 @@ PollMain.prototype = {
         }
 
         answerEl.appendTo(_this.questionEl);
+        */
     });
 
     this.graphAnswerEl = $('<div class="graph_answer"></div>');

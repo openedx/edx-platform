@@ -20,5 +20,6 @@ class @Conditional
         if (((response.passed is true) && (@passed is false)) || (@passed is null))
           @el.data 'passed', response.passed
 
+          @el.html ''
           @el.append(i) for i in response.html
           XModule.loadModules @el
