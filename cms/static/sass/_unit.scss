@@ -183,21 +183,16 @@
 
         .problem-type-tabs {
           list-style-type: none;
+          border-radius: 0;
           width: 100%;
-          border-top-left-radius: 3px;
-          border-top-right-radius: 3px;
           @include linear-gradient(top, rgba(255, 255, 255, .4), rgba(255, 255, 255, 0));
           background-color: $lightBluishGrey;
           @include box-shadow(0 1px 0 rgba(255, 255, 255, 0.2) inset, 0 -1px 0 rgba(0, 0, 0, 0.2) inset);
 
           li:first-child {
-            border-top-left-radius: 3px;
             margin-left: 20px;
           }
 
-          li:last-child {
-            border-top-right-radius: 3px;
-          }
           li {
             float:left;
             display:inline-block;
@@ -212,7 +207,7 @@
               opacity:1;
             }
 
-            &.current {
+            &.ui-state-active {
               border: 0px;
               @include active;
               opacity:1;
@@ -271,7 +266,6 @@
 
             .name {
               float: left;
-              @include transition(opacity .15s);
 
               .ss-icon {
                 @include transition(opacity .15s);
