@@ -126,6 +126,10 @@ class ConditionalDescriptor(SequenceDescriptor):
 
     @staticmethod
     def parse_sources(xml_element, system, return_descriptor=False):
+        """Parse xml_element 'sources' attr and:
+        if return_descriptor=True - return list of descriptors
+        if return_descriptor=False - return list of lcoations
+        """
         result = []
         sources = xml_element.get('sources')
         if sources:
@@ -144,8 +148,9 @@ class ConditionalDescriptor(SequenceDescriptor):
         return result
 
     def get_required_module_descriptors(self):
-        """TODO: Returns a list of XModuleDescritpor instances upon which this module depends, but are
-        not children of this module"""
+        """Returns a list of XModuleDescritpor instances upon
+        which this module depends.
+        """
         return ConditionalDescriptor.parse_sources(
             self.xml_attributes, self.system, True)
 
