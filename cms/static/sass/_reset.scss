@@ -148,13 +148,20 @@ removing jquery ui ui-lightness styling
 	@include linear-gradient(top, rgba(255, 255, 255, .4), rgba(255, 255, 255, 0));
 	//background-color: $lightBluishGrey;
 	@include box-shadow(0 1px 0 rgba(255, 255, 255, 0.2) inset, 0 -1px 0 rgba(0, 0, 0, 0.2) inset);
-
+	
 	li:first-child {
 		margin-left: 20px;
 	}
 	li {
+		opacity: .8;
+
 		&:ui-state-active {
-			background-color: rgba(255, 255, 255, .3)
+			background-color: rgba(255, 255, 255, .3);
+			opacity: 1;
+		}
+		a:focus {
+			outline: none;
+			border: 0px;
 		}
 	}
 /*

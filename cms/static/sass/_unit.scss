@@ -199,12 +199,13 @@
             text-align:center;
             width: auto;
             @include linear-gradient(top, rgba(255, 255, 255, .4), rgba(255, 255, 255, 0));
-            background-color: tint($lightBluishGrey, 20%);
+            background-color: tint($lightBluishGrey, 10%);
             @include box-shadow(0 1px 0 rgba(255, 255, 255, 0.2) inset, 0 -1px 0 rgba(0, 0, 0, 0.2) inset);
             opacity:.8;
 
             &:hover {
               opacity:1;
+              background-color: tint($lightBluishGrey, 20%);
             }
 
             &.ui-state-active {
