@@ -28,7 +28,7 @@ CMS.Models.Settings.CourseGradingPolicy = Backbone.Model.extend({
     },
     url : function() {
         var location = this.get('course_location');
-        return '/' + location.get('org') + "/" + location.get('course') + '/settings-grading/' + location.get('name') + '/section/grading';
+        return '/' + location.get('org') + "/" + location.get('course') + '/settings-details/' + location.get('name') + '/section/grading';
     },
     gracePeriodToDate : function() {
         var newDate = new Date();
