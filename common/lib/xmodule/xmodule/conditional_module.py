@@ -77,7 +77,10 @@ class ConditionalModule(XModule):
                 if callable(attr):
                     attr = attr()
 
-                return xml_value == str(attr)
+                if xml_value != str(attr):
+                    break
+            else:
+                return True
         return False
 
     def get_html(self):
