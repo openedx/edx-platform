@@ -2,13 +2,11 @@ import json
 import logging
 from lxml import etree
 
-from pkg_resources import resource_string
-
-from .capa_module import  ComplexEncoder
-from .editing_module import EditingDescriptor
-from progress import Progress
-from .stringify import stringify_children
-from .xml_module import XmlDescriptor
+from xmodule.capa_module import  ComplexEncoder
+from xmodule.editing_module import EditingDescriptor
+from xmodule.progress import Progress
+from xmodule.stringify import stringify_children
+from xmodule.xml_module import XmlDescriptor
 import openendedchild
 
 from combined_open_ended_rubric import CombinedOpenEndedRubric
@@ -274,10 +272,6 @@ class SelfAssessmentDescriptor(XmlDescriptor, EditingDescriptor):
     stores_state = True
     has_score = True
     template_dir_name = "selfassessment"
-
-    js = {'coffee': [resource_string(__name__, 'js/src/html/edit.coffee')]}
-    js_module_name = "HTMLEditingDescriptor"
-    css = {'scss': [resource_string(__name__, 'css/editor/edit.scss'), resource_string(__name__, 'css/html/edit.scss')]}
 
     @classmethod
     def definition_from_xml(cls, xml_object, system):

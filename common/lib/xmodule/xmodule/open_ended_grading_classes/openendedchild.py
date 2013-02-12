@@ -13,16 +13,14 @@ import hashlib
 import capa.xqueue_interface as xqueue_interface
 import re
 
-from pkg_resources import resource_string
-
-from .capa_module import only_one, ComplexEncoder
+from xmodule.capa_module import only_one, ComplexEncoder
 import open_ended_image_submission
-from .editing_module import EditingDescriptor
-from .html_checker import check_html
-from progress import Progress
-from .stringify import stringify_children
-from .xml_module import XmlDescriptor
-from xmodule.modulestore import Location
+from xmodule.editing_module import EditingDescriptor
+from xmodule.html_checker import check_html
+from xmodule.progress import Progress
+from xmodule.stringify import stringify_children
+from xmodule.xml_module import XmlDescriptor
+from xmodule.xmodule.modulestore import Location
 from capa.util import *
 
 from datetime import datetime
