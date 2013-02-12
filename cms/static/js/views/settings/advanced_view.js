@@ -56,16 +56,21 @@ CMS.Views.Settings.Advanced = CMS.Views.ValidatingView.extend({
     attachJSONEditor : function (textarea) {
         var self = this;
         CodeMirror.fromTextArea(textarea, {
-            mode: "application/json", lineNumbers: false, lineWrapping: true,
+            mode: "application/json", lineNumbers: false, lineWrapping: false,
             onChange: function() {
                 self.showSaveCancelButtons();
             },
             onBlur: function (mirror) {
                 var key = $(mirror.getWrapperElement()).closest('.row').children('.key').attr('id');
                 var quotedValue = mirror.getValue();
-                // TODO: error checking
-                var JSONValue = JSON.parse(quotedValue);
-                self.model.set(key, JSONValue, {validate: true});
+                try {
+                    var JSONValue = JSON.parse(quotedValue);
+                    self.model.set(key, JSONValue, {validate: true});
+                }
+                catch (e) {
+                    // TODO: error checking
+                    console.log(e);
+                }
             }
         });
     },
