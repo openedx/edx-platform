@@ -77,15 +77,17 @@ class ConditionalModule(XModule):
                 if callable(attr):
                     attr = attr()
 
-                return xml_value == str(attr)
+                if xml_value != str(attr):
+                    break
+            else:
+                return True
         return False
 
     def get_html(self):
         return self.system.render_template('conditional_ajax.html', {
             'element_id': self.location.html_id(),
             'id': self.id,
-            'ajax_url': self.system.ajax_url,
-            'passed': json.dumps(self.is_condition_satisfied())
+            'ajax_url': self.system.ajax_url
         })
 
     def handle_ajax(self, dispatch, post):
