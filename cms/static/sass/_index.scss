@@ -240,7 +240,6 @@
               margin-right: flex-gutter();
               padding: ($baseline*0.75) $baseline;
               color: $gray-l1;
-              cursor: pointer;
 
               .title {
                 @include font-size(16);
@@ -254,7 +253,7 @@
                 background: $blue-l5;
                 top: -($baseline/5);
 
-                .title, strong {
+                .title {
                   color: $blue;
                 }
               }

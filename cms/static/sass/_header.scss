@@ -53,9 +53,6 @@
   float: right;
 }
 
-// general nav styles
-// ====================
-
 // ====================
 
 // specific elements - branding
@@ -515,6 +512,7 @@ body.course.export .nav-course-tools-export,
 
   a {
     color: $blue;
+    pointer-events: none;
   }
 }
 
