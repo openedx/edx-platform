@@ -4,7 +4,6 @@ CMS.Views.Settings.Advanced = CMS.Views.ValidatingView.extend({
     // the key for a newly added policy-- before the user has entered a key value
     new_key : "__new_advanced_key__",
     error_saving : "error_saving",
-    unsaved_changes: "unsaved_changes",
     successful_changes: "successful_changes",
 
     // Model class is CMS.Models.Settings.Advanced
@@ -67,7 +66,6 @@ CMS.Views.Settings.Advanced = CMS.Views.ValidatingView.extend({
                 // TODO: error checking
                 var JSONValue = JSON.parse(quotedValue);
                 self.model.set(key, JSONValue, {validate: true});
-                self.showMessage(self.unsaved_changes);
             }
         });
     },
@@ -77,9 +75,6 @@ CMS.Views.Settings.Advanced = CMS.Views.ValidatingView.extend({
         if (type) {
             if (type === this.error_saving) {
                 this.$el.find(".message-status.error").addClass("is-shown");
-            }
-            else if (type === this.unsaved_changes) {
-                $('.wrapper-notification').addClass('is-shown');
             }
             else if (type === this.successful_changes) {
                 this.$el.find(".message-status.confirm").addClass("is-shown");
@@ -95,6 +90,7 @@ CMS.Views.Settings.Advanced = CMS.Views.ValidatingView.extend({
 
     showSaveCancelButtons: function() {
        if (!this.buttonsVisible) {
+           this.$el.find(".message-status").removeClass("is-shown");
            $('.wrapper-notification').addClass('is-shown');
            this.buttonsVisible = true;
        }
@@ -128,7 +124,7 @@ CMS.Views.Settings.Advanced = CMS.Views.ValidatingView.extend({
             this.model.unset(key);
         }
         li$.remove();
-        this.showMessage(this.unsaved_changes);
+        this.showSaveCancelButtons();
     },
     saveView : function(event) {
         // TODO one last verification scan:
@@ -165,7 +161,7 @@ CMS.Views.Settings.Advanced = CMS.Views.ValidatingView.extend({
         // only 1 but hey, let's take advantage of the context mechanism
         _.each(policyValueDivs, this.attachJSONEditor, this);
         this.toggleNewButton(false);
-        this.showMessage(this.unsaved_changes);
+        this.showSaveCancelButtons();
     },
     updateKey : function(event) {
         // old key: either the key as in the model or new_key.
@@ -233,7 +229,6 @@ CMS.Views.Settings.Advanced = CMS.Views.ValidatingView.extend({
             _.each(policyValueDivs, this.attachJSONEditor, this);
             
             this.fieldToSelectorMap[newKey] = newKey;
-            this.showMessage(this.unsaved_changes);
         }
     },
     validateKey : function(oldKey, newKey) {
