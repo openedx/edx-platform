@@ -43,11 +43,11 @@ class AnnotatableModule(XModule):
                 index += 1
  
     def _set_span_data(self, span, index, xmltree):
-        """ Sets the discussion anchor for the span. """
+        """ Sets the associated discussion id for the span. """
 
-        if 'anchor' in span.attrib:
-            span.set('data-discussion-anchor', span.get('anchor'))
-            del span.attrib['anchor']
+        if 'discussion' in span.attrib:
+            span.set('data-discussion-id', span.get('discussion'))
+            del span.attrib['discussion']
     
     def _decorate_span(self, span, index, xmltree):
         """ Decorates the span highlight.  """

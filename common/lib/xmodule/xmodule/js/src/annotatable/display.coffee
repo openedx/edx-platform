@@ -7,6 +7,7 @@ class @Annotatable
     commentSelector: '.annotatable-comment'
     replySelector:   '.annotatable-reply'
     helpSelector:    '.annotatable-help-icon'
+    inlineDiscussionSelector: '.xmodule_DiscussionModule .discussion-module'
  
     constructor: (el) ->
         console.log 'loaded Annotatable' if @_debug
@@ -73,15 +74,14 @@ class @Annotatable
 
     onClickReply: (e) =>
         e.preventDefault()
-        anchorEl = @getAnchorByName e.currentTarget
-        @scrollTo anchorEl if anchorEl
+        @scrollTo(@getInlineDiscussion e.currentTarget)
     
-    getAnchorByName: (el) ->
-        hash = $(el).attr('href')
-        if hash?.charAt(0) == '#'
-            name = hash.substr(1)
-            anchor = $("a[name='#{name}']").first()
-        anchor
+    getInlineDiscussion: (el) ->
+        discussion_id = @getDiscussionId(el)
+        $(@inlineDiscussionSelector).filter("[data-discussion-id='#{discussion_id}']")
+
+    getDiscussionId: (el) ->
+        $(el).data('discussion-id')
 
     toggleAnnotations: () ->
         @annotationsHidden = not @annotationsHidden
@@ -105,14 +105,14 @@ class @Annotatable
             onAfter: @makeAfterScroll(el)
         })
  
-    makeAfterScroll: (el, duration = 2000) ->
-        @_once -> el.effect 'highlight', {}, duration
+    makeAfterScroll: (el, duration = 500) ->
+        @_once -> el.effect 'shake', {}, duration
 
     makeTipContent: (el) ->
         (api) =>
-            anchor = $(el).data('discussion-anchor')
+            discussion_id = @getDiscussionId(el)
             comment = $(@commentSelector, el).first().clone()
-            comment = comment.after(@createReplyLink anchor) if anchor
+            comment = comment.after(@createReplyLink discussion_id) if discussion_id
             comment
 
     makeTipTitle: (el) ->
@@ -121,11 +121,8 @@ class @Annotatable
             title = comment.attr('title')
             (if title then title else 'Commentary')
 
-    createReplyLink: (anchor) ->
-        cls = 'annotatable-reply'
-        href = '#' + anchor
-        text = 'See Full Discussion'
-        $("<a class=\"#{cls}\" href=\"#{href}\">#{text}</a>")
+    createReplyLink: (discussion_id) ->
+        $("<a class=\"annotatable-reply\" href=\"javascript:void(0);\" data-discussion-id=\"#{discussion_id}\">See Full Discussion</a>")
 
     openSavedTips: () ->
         @showTips @savedTips
