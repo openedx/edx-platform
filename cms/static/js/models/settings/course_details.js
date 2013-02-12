@@ -61,7 +61,7 @@ CMS.Models.Settings.CourseDetails = Backbone.Model.extend({
 
     url: function() {
         var location = this.get('location');
-        return '/' + location.get('org') + "/" + location.get('course') + '/settings/' + location.get('name') + '/section/details';
+        return '/' + location.get('org') + "/" + location.get('course') + '/settings-details/' + location.get('name') + '/section/details';
     },
 
     _videokey_illegal_chars : /[^a-zA-Z0-9_-]/g,
