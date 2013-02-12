@@ -155,6 +155,7 @@ class PeerGradingModule(XModule):
             count_graded = response['count_graded']
             count_required = response['count_required']
             if count_required > 0 and count_graded >= count_required:
+                #Ensures that once a student receives a final score for peer grading, that it does not change.
                 self.student_data_for_location = response
 
         score_dict = {

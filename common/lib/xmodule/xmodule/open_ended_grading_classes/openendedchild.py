@@ -22,6 +22,7 @@ from xmodule.stringify import stringify_children
 from xmodule.xml_module import XmlDescriptor
 from xmodule.modulestore import Location
 from capa.util import *
+from peer_grading_service import PeerGradingService
 
 from datetime import datetime
 
@@ -104,7 +105,9 @@ class OpenEndedChild(object):
         # Used for progress / grading.  Currently get credit just for
         # completion (doesn't matter if you self-assessed correct/incorrect).
         self._max_score = static_data['max_score']
+        self.peer_gs = PeerGradingService(system.open_ended_grading_interface, system)
 
+        self.system = system
         self.setup_response(system, location, definition, descriptor)
 
     def setup_response(self, system, location, definition, descriptor):
@@ -408,3 +411,23 @@ class OpenEndedChild(object):
                     success = True
 
         return success, string
+
+    def check_if_student_can_submit(self):
+        location = self.system.location.url()
+        student_id = self.system.anonymous_student_id
+        success = False
+        response = {}
+        try:
+            response = self.peer_gs.get_data_for_location(location, student_id)
+            count_graded = response['count_graded']
+            count_required = response['count_required']
+            success = True
+        except:
+            error_message = ("Need to peer grade more in order to make another submission.  "
+                             "You have graded {0}, {1} are required.").format(count_graded, count_required)
+            return success, False, error_message
+        if count_graded>=count_required:
+            return success, True, ""
+        else:
+            return success, False, ""
+
