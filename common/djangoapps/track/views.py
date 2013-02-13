@@ -17,18 +17,20 @@ from track.models import TrackingLog
 
 log = logging.getLogger("tracking")
 
-LOGFIELDS = ['username','ip','event_source','event_type','event','agent','page','time','host']
+LOGFIELDS = ['username', 'ip', 'event_source', 'event_type', 'event', 'agent', 'page', 'time', 'host']
+
 
 def log_event(event):
     event_str = json.dumps(event)
     log.info(event_str[:settings.TRACK_MAX_EVENT])
     if settings.MITX_FEATURES.get('ENABLE_SQL_TRACKING_LOGS'):
         event['time'] = dateutil.parser.parse(event['time'])
-        tldat = TrackingLog(**dict( (x,event[x]) for x in LOGFIELDS ))
+        tldat = TrackingLog(**dict((x, event[x]) for x in LOGFIELDS))
         try:
             tldat.save()
         except Exception as err:
             log.exception(err)
+
 
 def user_track(request):
     try:  # TODO: Do the same for many of the optional META parameters
@@ -87,13 +89,14 @@ def server_track(request, event_type, event, page=None):
         "host": request.META['SERVER_NAME'],
         }
 
-    if event_type.startswith("/event_logs") and request.user.is_staff:	# don't log
+    if event_type.startswith("/event_logs") and request.user.is_staff:  	# don't log
         return
     log_event(event)
 
+
 @login_required
 @ensure_csrf_cookie
-def view_tracking_log(request,args=''):
+def view_tracking_log(request, args=''):
     if not request.user.is_staff:
         return redirect('/')
     nlen = 100
@@ -104,16 +107,15 @@ def view_tracking_log(request,args=''):
                 nlen = int(arg)
             if arg.startswith('username='):
                 username = arg[9:]
-            
+
     record_instances = TrackingLog.objects.all().order_by('-time')
     if username:
         record_instances = record_instances.filter(username=username)
     record_instances = record_instances[0:nlen]
-    
+
     # fix dtstamp
     fmt = '%a %d-%b-%y %H:%M:%S'  # "%Y-%m-%d %H:%M:%S %Z%z"
     for rinst in record_instances:
         rinst.dtstr = rinst.time.replace(tzinfo=pytz.utc).astimezone(pytz.timezone('US/Eastern')).strftime(fmt)
 
-    return render_to_response('tracking_log.html',{'records':record_instances})
-
+    return render_to_response('tracking_log.html', {'records': record_instances})

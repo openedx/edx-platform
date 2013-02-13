@@ -39,14 +39,18 @@
         <h1 class="title-1">My Courses</h1>
       </div>
 
+      % if user.is_active:
       <nav class="nav-actions">
         <h3 class="sr">Page Actions</h3>
         <ul>
           <li class="nav-item">
-            <a href="#" class="new-button new-course-button"><span class="plus-icon white"></span> New Course</a>
+            % if not disable_course_creation:
+              <a href="#" class="new-button new-course-button"><span class="plus-icon white"></span> New Course</a>
+            % endif
           </li>
         </ul>
       </nav>
+      % endif
     </header>
   </div>
 

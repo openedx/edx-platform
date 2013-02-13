@@ -47,6 +47,7 @@ body.course.settings {
 
     // UI hints/tips/messages
     .tip {
+      @include transition(color, 0.15s, ease-in-out);
       @include font-size(13);
       display: block;
       margin-top: ($baseline/4);
@@ -127,6 +128,13 @@ body.course.settings {
           &.error {
             border-color: $red;
           }
+
+          &:focus {
+
+            + .tip {
+              color: $gray;
+            }
+          }
         }
 
         textarea.long {
@@ -157,10 +165,10 @@ body.course.settings {
           @include box-sizing(border-box);
           @include border-radius(3px);
           background: $gray-l5;
-          padding: ($baseline/2);
+          padding: $baseline;
 
           &:last-child {
-            padding-bottom: ($baseline/2); 
+            padding-bottom: $baseline; 
           }
 
           .actions {

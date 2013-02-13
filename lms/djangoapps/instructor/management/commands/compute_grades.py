@@ -3,7 +3,9 @@
 # django management command: dump grades to csv files
 # for use by batch processes
 
-import os, sys, string
+import os
+import sys
+import string
 import datetime
 import json
 
@@ -15,6 +17,7 @@ from xmodule.modulestore.django import modulestore
 from django.conf import settings
 from django.core.management.base import BaseCommand
 
+
 class Command(BaseCommand):
     help = "Compute grades for all students in a course, and store result in DB.\n"
     help += "Usage: compute_grades course_id_or_dir \n"
@@ -25,7 +28,7 @@ class Command(BaseCommand):
 
         print "args = ", args
 
-        if len(args)>0:
+        if len(args) > 0:
             course_id = args[0]
         else:
             print self.help
@@ -46,7 +49,3 @@ class Command(BaseCommand):
         print "Computing grades for %s" % (course.id)
 
         offline_grade_calculation(course.id)
-
-
-    
-        

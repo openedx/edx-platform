@@ -4,6 +4,7 @@
 // basic reset
 html {
   font-size: 62.5%;
+  overflow-y: scroll;
 }
 
 body {
@@ -192,6 +193,22 @@ h1 {
 
       &:last-child {
         margin-bottom: 0;
+      }
+    }
+
+    .nav-related {
+
+      .nav-item {
+        margin-bottom: ($baseline/4);
+        border-bottom: 1px dotted $gray-l4;
+        padding-bottom: ($baseline/4);
+
+
+        &:last-child {
+          margin-bottom: 0;
+          border: none;
+          padding-bottom: 0;
+        }
       }
     }
   }
@@ -604,5 +621,15 @@ body.hide-wip {
 
   .wip-box {
     display: none;
+  }
+}
+
+// ====================
+
+// needed fudges for now
+body.dashboard {
+
+  .my-classes {
+    margin-top: $baseline;
   }
 }

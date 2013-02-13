@@ -52,4 +52,3 @@ class RandomizeModuleTestCase(unittest.TestCase):
 
     # TODO: add tests that create a module and check.  Passing state is a good way to
     # check that child access works...
-

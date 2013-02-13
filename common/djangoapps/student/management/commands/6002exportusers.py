@@ -57,7 +57,7 @@ from student.userprofile. '''
                 d[key] = item
             return d
 
-        extracted = [{'up':extract_dict(up_keys, t[0]), 'u':extract_dict(user_keys, t[1])} for t in user_tuples]
+        extracted = [{'up': extract_dict(up_keys, t[0]), 'u':extract_dict(user_keys, t[1])} for t in user_tuples]
         fp = open('transfer_users.txt', 'w')
         json.dump(extracted, fp)
         fp.close()
