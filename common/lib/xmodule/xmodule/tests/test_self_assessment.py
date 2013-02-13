@@ -28,8 +28,6 @@ class SelfAssessmentTest(unittest.TestCase):
     location = Location(["i4x", "edX", "sa_test", "selfassessment",
                          "SampleQuestion"])
 
-    metadata = {'attempts': '10'}
-
     descriptor = Mock()
 
     def setUp(self):
@@ -46,13 +44,14 @@ class SelfAssessmentTest(unittest.TestCase):
                 'max_score': 1,
                 'display_name': "Name",
                 'accept_file_upload': False,
-                'close_date': None
+                'close_date': None,
+                'attempts': '10'
+
                 }
 
         self.module = SelfAssessmentModule(test_system, self.location,
-                                      self.definition, self.descriptor,
-                                      static_data, 
-                                      state, metadata=self.metadata)
+                                      self.descriptor,
+                                      static_data)
 
     def test_get_html(self):
         html = self.module.get_html(test_system)

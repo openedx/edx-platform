@@ -370,13 +370,13 @@ class ImportTestCase(BaseCourseTestCase):
         self.assertFalse(course.is_cohorted)
 
         # empty config -> False
-        course.metadata['cohort_config'] = {}
+        course.cohort_config = {}
         self.assertFalse(course.is_cohorted)
 
         # false config -> False
-        course.metadata['cohort_config'] = {'cohorted': False}
+        course.cohort_config = {'cohorted': False}
         self.assertFalse(course.is_cohorted)
 
         # and finally...
-        course.metadata['cohort_config'] = {'cohorted': True}
+        course.cohort_config = {'cohorted': True}
         self.assertTrue(course.is_cohorted)
