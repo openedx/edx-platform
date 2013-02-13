@@ -48,6 +48,10 @@ this.HTML5Video = (function () {
         };
 
         Player.prototype.getDuration = function () {
+            if (isFinite(this.video.duration) === false) {
+                return 0;
+            }
+
             return this.video.duration;
         };
 

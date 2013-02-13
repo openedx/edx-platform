@@ -8,13 +8,13 @@ class @VideoAlpha
     @caption_asset_path = @el.data('caption-asset-path')
     @show_captions = @el.data('show-captions').toString() == "true"
     @el = $("#video_#{@id}")
-    if @parseVideos(@el.data("streams")) is true
+    if @parseYoutubeId(@el.data("streams")) is true
       @videoType = "youtube"
       @fetchMetadata()
       @parseSpeed()
     else
       @videoType = "html5"
-      @parseVideoSources @el.data('mp4-source'), @el.data('webm-source'), @el.data('ogg-source')
+      @parseHtml5Sources @el.data('mp4-source'), @el.data('webm-source'), @el.data('ogg-source')
       @speeds = ['0.75', '1.0', '1.25', '1.50']
       sub = @el.data('sub')
       if (typeof sub isnt "string") or (sub.length is 0)
@@ -33,32 +33,30 @@ class @VideoAlpha
       @hide_captions = true
       $.cookie('hide_captions', @hide_captions, expires: 3650, path: '/')
       @el.addClass 'closed'
-    _this = this
     if ((@videoType is "youtube") and (YT.Player)) or ((@videoType is "html5") and (HTML5Video.Player))
       @embed()
     else
       if @videoType is "youtube"
-        window.onYouTubePlayerAPIReady = ->
-          _this.embed()
+        window.onYouTubePlayerAPIReady = =>
+          @embed()
       else if @videoType is "html5"
-        window.onHTML5PlayerAPIReady = ->
-          _this.embed()
+        window.onHTML5PlayerAPIReady = =>
+          @embed()
 
   youtubeId: (speed)->
     @videos[speed || @speed]
 
-  parseVideos: (videos)->
+  parseYoutubeId: (videos)->
     return false  if (typeof videos isnt "string") or (videos.length is 0)
     @videos = {}
-    _this = this
-    $.each videos.split(/,/), (index, video) ->
+    $.each videos.split(/,/), (index, video) =>
       speed = undefined
       video = video.split(/:/)
       speed = parseFloat(video[0]).toFixed(2).replace(/\.00$/, ".0")
-      _this.videos[speed] = video[1]
+      @videos[speed] = video[1]
     true
 
-  parseVideoSources: (mp4Source, webmSource, oggSource)->
+  parseHtml5Sources: (mp4Source, webmSource, oggSource)->
     @html5Sources =
       mp4: null
       webm: null
@@ -71,12 +69,14 @@ class @VideoAlpha
     @speeds = ($.map @videos, (url, speed) -> speed).sort()
     @setSpeed $.cookie('video_speed')
 
-  setSpeed: (newSpeed)->
+  setSpeed: (newSpeed, updateCookie)->
     if @speeds.indexOf(newSpeed) isnt -1
       @speed = newSpeed
-      $.cookie "video_speed", "" + newSpeed,
-        expires: 3650
-        path: "/"
+
+      if updateCookie isnt false
+        $.cookie "video_speed", "" + newSpeed,
+          expires: 3650
+          path: "/"
     else
       @speed = "1.0"
 
