@@ -99,6 +99,7 @@ class OpenEndedChild(object):
         self.accept_file_upload = static_data['accept_file_upload']
         self.close_date = static_data['close_date']
         self.s3_interface = static_data['s3_interface']
+        self.system = system
 
         # Used for progress / grading.  Currently get credit just for
         # completion (doesn't matter if you self-assessed correct/incorrect).
@@ -339,6 +340,7 @@ class OpenEndedChild(object):
             if get_data['can_upload_files'] in ['true', '1']:
                 has_file_to_upload = True
                 file = get_data['student_file'][0]
+                self.system.track_function('open_ended_image_upload', {'filename': file.name})
                 uploaded_to_s3, image_ok, s3_public_url = self.upload_image_to_s3(file)
                 if uploaded_to_s3:
                     image_tag = self.generate_image_tag_from_url(s3_public_url, file.name)
