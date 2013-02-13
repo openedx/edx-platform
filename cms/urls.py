@@ -6,7 +6,8 @@ from django.conf.urls import patterns, include, url
 # admin.autodiscover()
 
 urlpatterns = ('',
-    url(r'^$', 'contentstore.views.index', name='index'),
+    url(r'^$', 'contentstore.views.howitworks', name='homepage'),
+    url(r'^listing', 'contentstore.views.index', name='index'),
     url(r'^edit/(?P<location>.*?)$', 'contentstore.views.edit_unit', name='edit_unit'),
     url(r'^subsection/(?P<location>.*?)$', 'contentstore.views.edit_subsection', name='edit_subsection'),
     url(r'^preview_component/(?P<location>.*?)$', 'contentstore.views.preview_component', name='preview_component'),

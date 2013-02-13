@@ -95,7 +95,10 @@ def login_page(request):
     })
 
 def howitworks(request):
-    return render_to_response('howitworks.html', {})
+    if request.user.is_authenticated():
+        return index(request)
+    else: 
+        return render_to_response('howitworks.html', {})
 
 # ==== Views for any logged-in user ==================================
 

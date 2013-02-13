@@ -77,7 +77,7 @@
       submit_data,
       function(json) {
         if(json.success) {
-          location.href = "${reverse('index')}";
+          location.href = "${reverse('homepage')}";
         } else if($('#login_error').length == 0) {
           $('#login_form').prepend('<div id="login_error" class="message message-status error">' + json.value + '</span></div>');
           $('#login_error').addClass('is-shown');
