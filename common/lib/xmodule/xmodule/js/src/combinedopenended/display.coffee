@@ -89,6 +89,8 @@ class @CombinedOpenEnded
     @can_upload_files = false
     @open_ended_child= @$('.open-ended-child')
 
+    @out_of_sync_message = 'The problem state got out of sync.  Try reloading the page.'
+
     if @task_number>1
       @prompt_hide()
     else if @task_number==1 and @child_state!='initial'
@@ -293,7 +295,7 @@ class @CombinedOpenEnded
       $.ajaxWithPrefix("#{@ajax_url}/save_answer",settings)
 
     else
-      @errors_area.html('Problem state got out of sync.  Try reloading the page.')
+      @errors_area.html(@out_of_sync_message)
 
   save_assessment: (event) =>
     event.preventDefault()
@@ -315,7 +317,7 @@ class @CombinedOpenEnded
         else
           @errors_area.html(response.error)
     else
-      @errors_area.html('Problem state got out of sync.  Try reloading the page.')
+      @errors_area.html(@out_of_sync_message)
 
   save_hint:  (event) =>
     event.preventDefault()
@@ -330,7 +332,7 @@ class @CombinedOpenEnded
         else
           @errors_area.html(response.error)
     else
-      @errors_area.html('Problem state got out of sync.  Try reloading the page.')
+      @errors_area.html(@out_of_sync_message)
 
   skip_post_assessment: =>
     if @child_state == 'post_assessment'
@@ -342,7 +344,7 @@ class @CombinedOpenEnded
         else
           @errors_area.html(response.error)
     else
-      @errors_area.html('Problem state got out of sync.  Try reloading the page.')
+      @errors_area.html(@out_of_sync_message)
 
   reset: (event) =>
     event.preventDefault()
@@ -362,7 +364,7 @@ class @CombinedOpenEnded
         else
           @errors_area.html(response.error)
     else
-      @errors_area.html('Problem state got out of sync.  Try reloading the page.')
+      @errors_area.html(@out_of_sync_message)
 
   next_problem: =>
     if @child_state == 'done'
@@ -385,7 +387,7 @@ class @CombinedOpenEnded
         else
           @errors_area.html(response.error)
     else
-      @errors_area.html('Problem state got out of sync.  Try reloading the page.')
+      @errors_area.html(@out_of_sync_message)
 
   gentle_alert: (msg) =>
     if @el.find('.open-ended-alert').length

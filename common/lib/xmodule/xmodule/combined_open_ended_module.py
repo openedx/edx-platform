@@ -108,11 +108,13 @@ class CombinedOpenEndedModule(XModule):
             instance_state = {}
 
         self.version = self.metadata.get('version', DEFAULT_VERSION)
+        version_error_string = "Version of combined open ended module {0} is not correct.  Going with version {1}"
         if not isinstance(self.version, basestring):
             try:
                 self.version = str(self.version)
             except:
-                log.error("Version {0} is not correct.  Going with version {1}".format(self.version, DEFAULT_VERSION))
+                #This is a dev_facing_error
+                log.info(version_error_string.format(self.version, DEFAULT_VERSION))
                 self.version = DEFAULT_VERSION
 
         versions = [i[0] for i in VERSION_TUPLES]
@@ -122,7 +124,8 @@ class CombinedOpenEndedModule(XModule):
         try:
             version_index = versions.index(self.version)
         except:
-            log.error("Version {0} is not correct.  Going with version {1}".format(self.version, DEFAULT_VERSION))
+            #This is a dev_facing_error
+            log.error(version_error_string.format(self.version, DEFAULT_VERSION))
             self.version = DEFAULT_VERSION
             version_index = versions.index(self.version)
 

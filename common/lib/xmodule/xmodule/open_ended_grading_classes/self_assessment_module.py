@@ -90,7 +90,10 @@ class SelfAssessmentModule(openendedchild.OpenEndedChild):
         }
 
         if dispatch not in handlers:
-            return 'Error'
+            #This is a dev_facing_error
+            log.error("Cannot find {0} in handlers in handle_ajax function for open_ended_module.py".format(dispatch))
+            #This is a dev_facing_error
+            return json.dumps({'error': 'Error handling action.  Please try again.', 'success' : False})
 
         before = self.get_progress()
         d = handlers[dispatch](get, system)
@@ -223,7 +226,7 @@ class SelfAssessmentModule(openendedchild.OpenEndedChild):
                 score_list[i] = int(score_list[i])
         except ValueError:
             #This is a dev_facing_error
-            log.error("Non-integer score value passed to save_assessment , or no score list present.")
+            log.error("Non-integer score value passed to save_assessment ,or no score list present.")
             #This is a student_facing_error
             return {'success': False, 'error': "Error saving your score.  Please notify course staff."}
 
