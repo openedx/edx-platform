@@ -446,7 +446,7 @@ class CourseDescriptor(SequenceDescriptor):
         # utility function to get datetime objects for dates used to
         # compute the is_new flag and the sorting_score
         def to_datetime(timestamp):
-            return datetime.fromtimestamp(time.mktime(timestamp))
+            return datetime(*timestamp[:6])
 
         def get_date(field):
             timetuple = self._try_parse_time(field)

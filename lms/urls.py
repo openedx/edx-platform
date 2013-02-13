@@ -320,10 +320,6 @@ if settings.COURSEWARE_ENABLED:
         'courseware.views.static_tab', name="static_tab"),
         )
 
-if settings.QUICKEDIT:
-    urlpatterns += (url(r'^quickedit/(?P<id>[^/]*)$', 'dogfood.views.quickedit'),)
-    urlpatterns += (url(r'^dogfood/(?P<id>[^/]*)$', 'dogfood.views.df_capa_problem'),)
-
 if settings.ENABLE_JASMINE:
     urlpatterns += (url(r'^_jasmine/', include('django_jasmine.urls')),)
 

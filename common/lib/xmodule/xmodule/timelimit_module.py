@@ -86,8 +86,8 @@ class TimeLimitModule(XModule):
         modified_duration = self._get_accommodated_duration(duration)
         self.ending_at = self.beginning_at + modified_duration
         
-    def get_end_time_in_ms(self):
-        return int(self.ending_at * 1000)
+    def get_remaining_time_in_ms(self):
+        return int((self.ending_at - time()) * 1000)
 
     def get_instance_state(self):
         state = {}
