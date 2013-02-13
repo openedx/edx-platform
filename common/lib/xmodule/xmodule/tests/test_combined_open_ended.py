@@ -12,6 +12,8 @@ import capa.xqueue_interface as xqueue_interface
 from datetime import datetime
 
 from . import test_system
+
+import test_util_open_ended
 """
 Tests for the various pieces of the CombinedOpenEndedGrading system
 
@@ -163,8 +165,8 @@ class OpenEndedModuleTest(unittest.TestCase):
             'accept_file_upload': False,
             'rewrite_content_links' : "",
             'close_date': None,
-            's3_interface' : "",
-            'open_ended_grading_interface' : {},
+            's3_interface' : test_util_open_ended.S3_INTERFACE,
+            'open_ended_grading_interface' : test_util_open_ended.OPEN_ENDED_GRADING_INTERFACE,
             }
 
     oeparam = etree.XML('''
@@ -297,8 +299,8 @@ class CombinedOpenEndedModuleTest(unittest.TestCase):
             'accept_file_upload' : False,
             'rewrite_content_links' : "",
             'close_date' : "",
-            's3_interface' : "",
-            'open_ended_grading_interface' : {},
+            's3_interface' : test_util_open_ended.S3_INTERFACE,
+            'open_ended_grading_interface' : test_util_open_ended.OPEN_ENDED_GRADING_INTERFACE,
             }
 
     oeparam = etree.XML('''

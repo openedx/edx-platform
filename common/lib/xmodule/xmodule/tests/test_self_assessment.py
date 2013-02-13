@@ -9,6 +9,7 @@ from nose.plugins.skip import SkipTest
 
 from . import test_system
 
+import test_util_open_ended
 
 class SelfAssessmentTest(unittest.TestCase):
 
@@ -48,8 +49,8 @@ class SelfAssessmentTest(unittest.TestCase):
                 'display_name': "Name",
                 'accept_file_upload': False,
                 'close_date': None,
-                's3_interface' : "",
-                'open_ended_grading_interface' : {},
+                's3_interface' : test_util_open_ended.S3_INTERFACE,
+                'open_ended_grading_interface' : test_util_open_ended.OPEN_ENDED_GRADING_INTERFACE,
                 }
 
         self.module = SelfAssessmentModule(test_system, self.location,

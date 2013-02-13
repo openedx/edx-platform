@@ -26,6 +26,8 @@ log = logging.getLogger(__name__)
 from override_settings import override_settings
 from django.http import QueryDict
 
+from xmodule.tests import test_util_open_ended
+
 
 @override_settings(MODULESTORE=ct.TEST_DATA_XML_MODULESTORE)
 class TestStaffGradingService(ct.PageLoader):
@@ -144,7 +146,10 @@ class TestPeerGradingService(ct.PageLoader):
         location = "i4x://edX/toy/peergrading/init"
 
         self.mock_service = peer_grading_service.MockPeerGradingService()
-        self.system = ModuleSystem(location, None, None, render_to_string, None, s3_interface = "", open_ended_grading_interface={})
+        self.system = ModuleSystem(location, None, None, render_to_string, None,
+            s3_interface = test_util_open_ended.S3_INTERFACE,
+            open_ended_grading_interface=test_util_open_ended.OPEN_ENDED_GRADING_INTERFACE
+        )
         self.descriptor = peer_grading_module.PeerGradingDescriptor(self.system)
         self.peer_module = peer_grading_module.PeerGradingModule(self.system, location, "<peergrading/>", self.descriptor)
         self.peer_module.peer_gs = self.mock_service
