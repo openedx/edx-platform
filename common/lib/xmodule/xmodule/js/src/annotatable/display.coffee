@@ -6,10 +6,11 @@ class @Annotatable
     spanSelector:    '.annotatable-span'
     commentSelector: '.annotatable-comment'
     replySelector:   '.annotatable-reply'
-    returnSelector:  '.annotatable-return'
     helpSelector:    '.annotatable-help-icon'
+    returnSelector:  '.annotatable-return'
+
     discussionXModuleSelector: '.xmodule_DiscussionModule'
-    discussionSelector: '.discussion-module'
+    discussionSelector:        '.discussion-module'
  
     constructor: (el) ->
         console.log 'loaded Annotatable' if @_debug
@@ -82,7 +83,8 @@ class @Annotatable
 
     onClickReturn: (e) =>
         e.preventDefault()
-        @scrollTo(@getSpan e.currentTarget, @afterScrollToSpan)
+        span_el = @getSpan e.currentTarget
+        @scrollTo(span_el, @afterScrollToSpan)
 
     getSpan: (el) ->
         discussion_id = @getDiscussionId(el)
@@ -96,34 +98,38 @@ class @Annotatable
         $(el).data('discussion-id')
 
     toggleAnnotations: () ->
-        @annotationsHidden = not @annotationsHidden
-        @toggleButtonText @annotationsHidden
-        @toggleSpans @annotationsHidden
-        @toggleTips @annotationsHidden
+        hide = (@annotationsHidden = not @annotationsHidden)
+        @toggleButtonText hide
+        @toggleSpans hide
+        @toggleReturnLinks hide
+        @toggleTips hide
 
     toggleTips: (hide) ->
         if hide then @closeAndSaveTips() else @openSavedTips()
+
+    toggleReturnLinks: (hide) ->
+        $(@returnSelector)[if hide then 'hide' else 'show']()
 
     toggleButtonText: (hide) ->
         buttonText = (if hide then 'Show' else 'Hide')+' Annotations'
         @$(@toggleSelector).text(buttonText)
 
     toggleSpans: (hide) ->
-        @$(@spanSelector).toggleClass 'hide', hide
+        @$(@spanSelector).toggleClass 'hide', hide, 250
 
-    scrollTo: (el, after) ->
+    scrollTo: (el, after = -> true) ->
         $('html,body').scrollTo(el, {
             duration: 500
-            #onAfter: @_once => after.call this, el
+            onAfter: @_once => after.call this, el
+            offset: -20
         })
  
-    afterScrollToDiscussion: () ->
-        (el) ->
-            btn = $('.discussion-show', el)
-            btn.click() if !btn.hasClass('shown')
+    afterScrollToDiscussion: (el) ->
+        btn = $('.discussion-show', el)
+        btn.click() if !btn.hasClass('shown')
 
     afterScrollToSpan: (el) ->
-        (el) -> el.effect('highlight', {}, 500)
+        el.effect 'highlight', {color: 'rgba(0,0,0,0.5)' }, 1000
 
     makeTipContent: (el) ->
         (api) =>
@@ -142,7 +148,7 @@ class @Annotatable
         $("<a class=\"annotatable-reply\" href=\"javascript:void(0);\" data-discussion-id=\"#{discussion_id}\">See Full Discussion</a>")
 
     createReturnLink: (discussion_id) ->
-        $("<a class=\"annotatable-return button\" href=\"javascript:void(0);\" data-discussion-id=\"#{discussion_id}\">Return to annotation</a>")
+        $("<a class=\"annotatable-return\" href=\"javascript:void(0);\" data-discussion-id=\"#{discussion_id}\">Return to annotation</a>")
 
     openSavedTips: () ->
         @showTips @savedTips
