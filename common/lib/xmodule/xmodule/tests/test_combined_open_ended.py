@@ -43,7 +43,9 @@ class OpenEndedChildTest(unittest.TestCase):
             'max_score': max_score,
             'display_name': 'Name',
             'accept_file_upload': False,
-            'close_date': None
+            'close_date': None,
+            's3_interface' : "",
+            'open_ended_grading_interface' : {},
             }
     definition = Mock()
     descriptor = Mock()
@@ -161,6 +163,8 @@ class OpenEndedModuleTest(unittest.TestCase):
             'accept_file_upload': False,
             'rewrite_content_links' : "",
             'close_date': None,
+            's3_interface' : "",
+            'open_ended_grading_interface' : {},
             }
 
     oeparam = etree.XML('''
@@ -293,6 +297,8 @@ class CombinedOpenEndedModuleTest(unittest.TestCase):
             'accept_file_upload' : False,
             'rewrite_content_links' : "",
             'close_date' : "",
+            's3_interface' : "",
+            'open_ended_grading_interface' : {},
             }
 
     oeparam = etree.XML('''
