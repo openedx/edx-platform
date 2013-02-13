@@ -23,7 +23,7 @@ log = logging.getLogger("mitx.courseware")
 # Set the default number of max attempts.  Should be 1 for production
 # Set higher for debugging/testing
 # attempts specified in xml definition overrides this.
-MAX_ATTEMPTS = 10000
+MAX_ATTEMPTS = 1
 
 # Set maximum available number of points.
 # Overriden by max_score specified in xml.
