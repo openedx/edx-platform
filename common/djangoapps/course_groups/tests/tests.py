@@ -70,13 +70,13 @@ class TestCohorts(django.test.TestCase):
                               "id": to_id(name)})
                       for name in discussions)
 
-        course.metadata["discussion_topics"] = topics
+        course.discussion_topics = topics
 
         d = {"cohorted": cohorted}
         if cohorted_discussions is not None:
             d["cohorted_discussions"] = [to_id(name)
                                          for name in cohorted_discussions]
-        course.metadata["cohort_config"] = d
+        course.cohort_config = d
 
 
     def setUp(self):

@@ -260,7 +260,7 @@ def get_module_for_descriptor(user, request, descriptor, model_data_cache, cours
                           # by the replace_static_urls code below
                           replace_urls=partial(
                               static_replace.replace_static_urls,
-                              data_directory=descriptor.data_dir,
+                              data_directory=getattr(descriptor, 'data_dir', None),
                               course_namespace=descriptor.location._replace(category=None, name=None),
                           ),
                           node_path=settings.NODE_PATH,
