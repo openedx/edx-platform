@@ -1,35 +1,33 @@
-import logging
 from static_replace import replace_static_urls
 from xmodule.modulestore.exceptions import ItemNotFoundError
 from xmodule.modulestore import Location
-from xmodule.modulestore.django import modulestore
-from lxml import etree
-import re
-from django.http import HttpResponseBadRequest, Http404
+from django.http import Http404
 
 
 def get_module_info(store, location, parent_location=None, rewrite_static_links=False):
-  try:
-    if location.revision is None:
-        module = store.get_item(location)
-    else:
-        module = store.get_item(location)
-  except ItemNotFoundError:
-    raise Http404
+    try:
+        if location.revision is None:
+            module = store.get_item(location)
+        else:
+            module = store.get_item(location)
+    except ItemNotFoundError:
+        # create a new one
+        template_location = Location(['i4x', 'edx', 'templates', location.category, 'Empty'])
+        module = store.clone_item(template_location, location)
 
-  data = module.data
-  if rewrite_static_links:
-    data = replace_static_urls(
-        module.data,
-        None,
-        course_namespace=Location([
-            module.location.tag,
-            module.location.org,
-            module.location.course,
+    data = module.data
+    if rewrite_static_links:
+        data = replace_static_urls(
+            module.data,
             None,
-            None
-        ])
-    )
+            course_namespace=Location([
+                module.location.tag,
+                module.location.org,
+                module.location.course,
+                None,
+                None
+            ])
+        )
 
     return {
         'id': module.location.url(),
@@ -41,7 +39,6 @@ def get_module_info(store, location, parent_location=None, rewrite_static_links=
 
 def set_module_info(store, location, post_data):
     module = None
-    isNew = False
     try:
         if location.revision is None:
             module = store.get_item(location)
@@ -55,7 +52,6 @@ def set_module_info(store, location, post_data):
         # presume that we have an 'Empty' template
         template_location = Location(['i4x', 'edx', 'templates', location.category, 'Empty'])
         module = store.clone_item(template_location, location)
-        isNew = True
 
     if post_data.get('data') is not None:
         data = post_data['data']

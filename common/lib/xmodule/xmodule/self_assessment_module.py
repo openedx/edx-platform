@@ -51,9 +51,6 @@ class SelfAssessmentModule(openendedchild.OpenEndedChild):
     REQUEST_HINT = 'request_hint'
     DONE = 'done'
 
-    js = {'coffee': [resource_string(__name__, 'js/src/selfassessment/display.coffee')]}
-    js_module_name = "SelfAssessment"
-
     student_answers = List(scope=Scope.student_state, default=[])
     scores = List(scope=Scope.student_state, default=[])
     hints = List(scope=Scope.student_state, default=[])

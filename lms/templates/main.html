@@ -29,13 +29,18 @@
 
 <body class="<%block name='bodyclass'/>">
 
+% if not suppress_toplevel_navigation:
   <%include file="navigation.html" />
+% endif
+
   <section class="content-wrapper">
     ${self.body()}
     <%block name="bodyextra"/>
   </section>
 
+% if not suppress_toplevel_navigation:
   <%include file="footer.html" />
+% endif
 
   <%static:js group='application'/>
   <%static:js group='module-js'/>

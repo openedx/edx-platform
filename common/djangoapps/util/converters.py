@@ -18,8 +18,9 @@ def jsdate_to_time(field):
     """
     if field is None:
         return field
-    elif isinstance(field, basestring):  # iso format but ignores time zone assuming it's Z
-        d = datetime.datetime(*map(int, re.split('[^\d]', field)[:6]))   # stop after seconds. Debatable
+    elif isinstance(field, basestring):
+        # ISO format but ignores time zone assuming it's Z.
+        d = datetime.datetime(*map(int, re.split('[^\d]', field)[:6]))  # stop after seconds. Debatable
         return d.utctimetuple()
     elif isinstance(field, (int, long, float)):
         return time.gmtime(field / 1000)

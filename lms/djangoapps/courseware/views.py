@@ -8,7 +8,7 @@ from django.core.context_processors import csrf
 from django.core.urlresolvers import reverse
 from django.contrib.auth.models import User
 from django.contrib.auth.decorators import login_required
-from django.http import Http404
+from django.http import Http404, HttpResponseRedirect
 from django.shortcuts import redirect
 from mitxmako.shortcuts import render_to_response, render_to_string
 #from django.views.decorators.csrf import ensure_csrf_cookie
@@ -21,8 +21,8 @@ from courseware.courses import (get_courses, get_course_with_access,
                                 get_courses_by_university, sort_by_announcement)
 import courseware.tabs as tabs
 from courseware.model_data import ModelDataCache
-from module_render import toc_for_course, get_module
-from student.models import UserProfile
+from module_render import toc_for_course, get_module_for_descriptor, get_module
+from courseware.models import StudentModule
 
 from django_comment_client.utils import get_discussion_title
 
@@ -38,7 +38,6 @@ import comment_client
 log = logging.getLogger("mitx.courseware")
 
 template_imports = {'urllib': urllib}
-
 
 
 def user_groups(user):
@@ -161,6 +160,71 @@ def save_child_position(seq_module, child_name):
                 seq_module.position = position
 
 
+def check_for_active_timelimit_module(request, course_id, course):
+    '''
+    Looks for a timing module for the given user and course that is currently active.
+    If found, returns a context dict with timer-related values to enable display of time remaining.
+    '''
+    context = {}
+
+    # TODO (cpennington): Once we can query the course structure, replace this with such a query
+    timelimit_student_modules = StudentModule.objects.filter(student=request.user, course_id=course_id, module_type='timelimit')
+    if timelimit_student_modules:
+        for timelimit_student_module in timelimit_student_modules:
+            # get the corresponding section_descriptor for the given StudentModel entry:
+            module_state_key = timelimit_student_module.module_state_key
+            timelimit_descriptor = modulestore().get_instance(course_id, Location(module_state_key))
+            timelimit_module_cache = ModelDataCache.cache_for_descriptor_descendents(course.id, request.user,
+                                                                                     timelimit_descriptor, depth=None)
+            timelimit_module = get_module_for_descriptor(request.user, request, timelimit_descriptor,
+                                                         timelimit_module_cache, course.id, position=None)
+            if timelimit_module is not None and timelimit_module.category == 'timelimit' and \
+                    timelimit_module.has_begun and not timelimit_module.has_ended:
+                location = timelimit_module.location
+                # determine where to go when the timer expires:
+                if timelimit_descriptor.time_expired_redirect_url is None:
+                    raise Http404("no time_expired_redirect_url specified at this location: {} ".format(timelimit_module.location))
+                context['time_expired_redirect_url'] = timelimit_descriptor.time_expired_redirect_url
+                # Fetch the remaining time relative to the end time as stored in the module when it was started.
+                # This value should be in milliseconds.
+                remaining_time = timelimit_module.get_remaining_time_in_ms()
+                context['timer_expiration_duration'] = remaining_time
+                context['suppress_toplevel_navigation'] = timelimit_descriptor.metadata.suppress_toplevel_navigation
+                return_url = reverse('jump_to', kwargs={'course_id': course_id, 'location': location})
+                context['timer_navigation_return_url'] = return_url
+    return context
+
+
+def update_timelimit_module(user, course_id, model_data_cache, timelimit_descriptor, timelimit_module):
+    '''
+    Updates the state of the provided timing module, starting it if it hasn't begun.
+    Returns dict with timer-related values to enable display of time remaining.
+    Returns 'timer_expiration_duration' in dict if timer is still active, and not if timer has expired.
+    '''
+    context = {}
+    # determine where to go when the exam ends:
+    if timelimit_descriptor.time_expired_redirect_url is None:
+        raise Http404("No time_expired_redirect_url specified at this location: {} ".format(timelimit_module.location))
+    context['time_expired_redirect_url'] = timelimit_descriptor.time_expired_redirect_url
+
+    if not timelimit_module.has_ended:
+        if not timelimit_module.has_begun:
+            # user has not started the exam, so start it now.
+            if timelimit_descriptor.duration is None:
+                raise Http404("No duration specified at this location: {} ".format(timelimit_module.location))
+            # The user may have an accommodation that has been granted to them.
+            # This accommodation information should already be stored in the module's state.
+            timelimit_module.begin(timelimit_descriptor.duration)
+
+        # the exam has been started, either because the student is returning to the
+        # exam page, or because they have just visited it.  Fetch the remaining time relative to the
+        # end time as stored in the module when it was started.
+        context['timer_expiration_duration'] = timelimit_module.get_remaining_time_in_ms()
+        # also use the timed module to determine whether top-level navigation is visible:
+        context['suppress_toplevel_navigation'] = timelimit_descriptor.suppress_toplevel_navigation
+    return context
+
+
 @login_required
 @ensure_csrf_cookie
 @cache_control(no_cache=True, no_store=True, must_revalidate=True)
@@ -224,7 +288,7 @@ def index(request, course_id, chapter=None, section=None,
         if chapter_descriptor is not None:
             save_child_position(course_module, chapter)
         else:
-            raise Http404
+            raise Http404('No chapter descriptor found with name {}'.format(chapter))
 
         chapter_module = course_module.get_child_by(lambda m: m.url_name == chapter)
         if chapter_module is None:
@@ -252,6 +316,20 @@ def index(request, course_id, chapter=None, section=None,
 
             # Save where we are in the chapter
             save_child_position(chapter_module, section)
+
+            # check here if this section *is* a timed module.
+            if section_module.category == 'timelimit':
+                timer_context = update_timelimit_module(request.user, course_id, student_module_cache,
+                                                        section_descriptor, section_module)
+                if 'timer_expiration_duration' in timer_context:
+                    context.update(timer_context)
+                else:
+                    # if there is no expiration defined, then we know the timer has expired:
+                    return HttpResponseRedirect(timer_context['time_expired_redirect_url'])
+            else:
+                # check here if this page is within a course that has an active timed module running.  If so, then
+                # add in the appropriate timer information to the rendering context:
+                context.update(check_for_active_timelimit_module(request, course_id, course))
 
             context['content'] = section_module.get_html()
         else:

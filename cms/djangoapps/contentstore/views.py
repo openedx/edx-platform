@@ -126,7 +126,8 @@ def index(request):
                         course.location.course,
                         course.location.name]))
                     for course in courses],
-        'user': request.user
+        'user': request.user,
+        'disable_course_creation': settings.MITX_FEATURES.get('DISABLE_COURSE_CREATION', False) and not request.user.is_staff
     })
 
 
@@ -1254,6 +1255,10 @@ def edge(request):
 @login_required
 @expect_json
 def create_new_course(request):
+
+    if settings.MITX_FEATURES.get('DISABLE_COURSE_CREATION', False) and not request.user.is_staff:
+        raise PermissionDenied()
+
     # This logic is repeated in xmodule/modulestore/tests/factories.py
     # so if you change anything here, you need to also change it there.
     # TODO: write a test that creates two courses, one with the factory and

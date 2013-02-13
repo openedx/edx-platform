@@ -9,6 +9,7 @@ gfortran
 liblapack-dev
 libfreetype6-dev
 libpng12-dev
+libjpeg-dev
 libxml2-dev
 libxslt-dev
 yui-compressor

@@ -156,13 +156,8 @@ class CourseGradingModel(object):
             if 'grace_period' in graceperiodjson:
                 graceperiodjson = graceperiodjson['grace_period']
 
-            timedelta_kwargs = dict(
-                (key, float(val))
-                for key, val
-                in graceperiodjson.items()
-                if key in ('days', 'seconds', 'minutes', 'hours')
-            )
-            grace_rep = timedelta(**timedelta_kwargs)
+            # lms requires these to be in a fixed order
+            grace_rep = "{0[hours]:d} hours {0[minutes]:d} minutes {0[seconds]:d} seconds".format(graceperiodjson)
 
             descriptor = get_modulestore(course_location).get_item(course_location)
             descriptor.lms.graceperiod = grace_rep
@@ -241,6 +236,7 @@ class CourseGradingModel(object):
 
     @staticmethod
     def convert_set_grace_period(descriptor):
+<<<<<<< HEAD
         # 5 hours 59 minutes 59 seconds => converted to iso format
         rawgrace = descriptor.lms.graceperiod
         if rawgrace:
@@ -265,6 +261,14 @@ class CourseGradingModel(object):
             return graceperiod
         else:
             return None
+=======
+        # 5 hours 59 minutes 59 seconds => { hours: 5, minutes : 59, seconds : 59}
+        rawgrace = descriptor.metadata.get('graceperiod', None)
+        if rawgrace:
+            parsedgrace = {str(key): int(val) for (val, key) in re.findall('\s*(\d+)\s*(\w+)', rawgrace)}
+            return parsedgrace
+        else: return None
+>>>>>>> origin/master
 
     @staticmethod
     def parse_grader(json_grader):

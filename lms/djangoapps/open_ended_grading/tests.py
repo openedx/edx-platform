@@ -22,7 +22,7 @@ from mitxmako.shortcuts import render_to_string
 
 import logging
 log = logging.getLogger(__name__)
-from override_settings import override_settings
+from django.test.utils import override_settings
 from django.http import QueryDict
 
 
