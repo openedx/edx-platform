@@ -39,15 +39,20 @@ $(document).ready(function() {
   $('.unit .item-actions .delete-button').bind('click', deleteUnit);
   $('.new-unit-item').bind('click', createNewUnit);
 
-  // nav-related
   $('body').addClass('js');
+
+  // nav - dropdown related
+  $body.click(function(e){
+    $('.nav-dropdown .nav-item .wrapper-nav-sub').removeClass('is-shown');
+    $('.nav-dropdown .nav-item .title').removeClass('is-selected');
+  });
 
   $('.nav-dropdown .nav-item .title').click(function(e){
 
     $subnav = $(this).parent().find('.wrapper-nav-sub');
     $title = $(this).parent().find('.title');
-
     e.preventDefault();
+    e.stopPropagation();
 
     if ($subnav.hasClass('is-shown')) {
       $subnav.removeClass('is-shown');
