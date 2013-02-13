@@ -96,11 +96,13 @@ class ConditionalModule(XModule):
         an AJAX call.
         """
         if not self.is_condition_satisfied():
+            message = self.descriptor.xml_attributes.get('message')
             context = {'module': self,
-                       'message': self.descriptor.xml_attributes.get('message')}
+                       'message': message}
             html = self.system.render_template('conditional_module.html',
                 context)
-            return json.dumps({'html': [html], 'passed': False})
+            return json.dumps({'html': [html], 'passed': False,
+                                'message': bool(message)})
 
         if self.contents is None:
             self.contents = [self.system.get_module(child_descriptor.location
