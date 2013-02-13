@@ -143,10 +143,6 @@ class CourseDetailsViewTest(CourseTestCase):
     def test_update_and_fetch(self):
         details = CourseDetails.fetch(self.course_location)
 
-        resp = self.client.get(reverse('course_settings', kwargs={'org': self.course_location.org, 'course': self.course_location.course,
-                                                                  'name': self.course_location.name}))
-        self.assertContains(resp, '<li><a href="#" class="is-shown" data-section="details">Course Details</a></li>', status_code=200, html=True)
-
         # resp s/b json from here on
         url = reverse('course_settings', kwargs={'org': self.course_location.org, 'course': self.course_location.course,
                                                  'name': self.course_location.name, 'section': 'details'})
