@@ -151,14 +151,6 @@
       font-weight: 600;
       color: $gray-d3;
 
-      &:hover, &:active, &.is-selected {
-        color: $blue;
-
-        .icon-expand {
-          color: $blue;
-        }
-      }
-
       .label-prefix {
         display: block;
         @include font-size(11);
@@ -546,6 +538,14 @@ body.signin .nav-not-signedin-signup {
     .nav-item .title {
       outline: 0;
       cursor: pointer;
+
+      &:hover, &:active, &.is-selected {
+        color: $blue;
+
+        .icon-expand {
+          color: $blue;
+        }
+      }
     }
   }
 
