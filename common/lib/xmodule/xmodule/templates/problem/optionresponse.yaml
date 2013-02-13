@@ -28,13 +28,13 @@ metadata:
         "
 data: |
   <problem>
-  <p>Dropdown problems gives a limited set of options for students to respond with, and present those options
+  <p>Dropdown problems give a limited set of options for students to respond with, and present those options
   in a format that encourages them to search for a specific answer rather than being immediately presented with options from which to recognize the correct answer.</p>
 
   <p>
   The answer options and the identification of the correct answer is defined in the <b>optioninput</b> tag. 
   </p>
-  <p>Translation between Dropdowns and __________ is extremely straightforward:
+  <p>Translation between Dropdown and __________ is extremely straightforward:
       
   <optionresponse>
         <optioninput options="('Multiple Choice','Text Input','Numerical Input','External Response','Image Response')" correct="Multiple Choice"></optioninput>
