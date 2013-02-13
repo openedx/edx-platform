@@ -22,7 +22,7 @@ CMS.Views.Settings.Details = CMS.Views.ValidatingView.extend({
         this.$el.find("#course-organization").val(this.model.get('location').get('org'));
         this.$el.find("#course-number").val(this.model.get('location').get('course'));
         this.$el.find('.set-date').datepicker({ 'dateFormat': 'm/d/yy' });
-        
+
         var dateIntrospect = new Date();
         this.$el.find('#timezone').html("(" + dateIntrospect.getTimezone() + ")");
 
@@ -96,7 +96,7 @@ CMS.Views.Settings.Details = CMS.Views.ValidatingView.extend({
                     time = 0;
                 }
                 var newVal = new Date(date.getTime() + time * 1000);
-                if (cacheModel.get(fieldName).getTime() !== newVal.getTime()) {
+                if (!cacheModel.has(fieldName) || cacheModel.get(fieldName).getTime() !== newVal.getTime()) {
                     cacheModel.save(fieldName, newVal);
                 }
             }
@@ -190,3 +190,4 @@ CMS.Views.Settings.Details = CMS.Views.ValidatingView.extend({
     }
 
 });
+

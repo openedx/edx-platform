@@ -107,12 +107,13 @@ class @HTMLEditingDescriptor
     # In order for isDirty() to return true ONLY if edits have been made after setting the text,
     # both the startContent must be sync'ed up and the dirty flag set to false.
     visualEditor.startContent = visualEditor.getContent({format: "raw", no_events: 1});
-    visualEditor.isNotDirty = true
     @focusVisualEditor(visualEditor)
     @showingVisualEditor = true
 
   focusVisualEditor: (visualEditor) =>
     visualEditor.focus()
+    # Need to mark editor as not dirty both when it is initially created and when we switch back to it.
+    visualEditor.isNotDirty = true
     if not @$mceToolbar?
       @$mceToolbar = $(@element).find('table.mceToolbar')
 

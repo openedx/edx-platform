@@ -49,7 +49,7 @@ urlpatterns = ('',
 
     url(r'^(?P<org>[^/]+)/(?P<course>[^/]+)/(?P<category>[^/]+)/(?P<name>[^/]+)/gradeas.*$', 'contentstore.views.assignment_type_update', name='assignment_type_update'),
 
-    url(r'^pages/(?P<org>[^/]+)/(?P<course>[^/]+)/course/(?P<coursename>[^/]+)$', 'contentstore.views.static_pages', 
+    url(r'^pages/(?P<org>[^/]+)/(?P<course>[^/]+)/course/(?P<coursename>[^/]+)$', 'contentstore.views.static_pages',
         name='static_pages'),
     url(r'^edit_static/(?P<org>[^/]+)/(?P<course>[^/]+)/course/(?P<coursename>[^/]+)$', 'contentstore.views.edit_static', name='edit_static'),
     url(r'^edit_tabs/(?P<org>[^/]+)/(?P<course>[^/]+)/course/(?P<coursename>[^/]+)$', 'contentstore.views.edit_tabs', name='edit_tabs'),
@@ -57,7 +57,7 @@ urlpatterns = ('',
 
     # this is a generic method to return the data/metadata associated with a xmodule
     url(r'^module_info/(?P<module_location>.*)$', 'contentstore.views.module_info', name='module_info'),
- 
+
 
     # temporary landing page for a course
     url(r'^edge/(?P<org>[^/]+)/(?P<course>[^/]+)/course/(?P<coursename>[^/]+)$', 'contentstore.views.landing', name='landing'),

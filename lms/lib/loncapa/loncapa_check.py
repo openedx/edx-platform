@@ -33,5 +33,3 @@ def lc_choose(index, *args):
 
 deg2rad = math.pi / 180.0
 rad2deg = 180.0 / math.pi
-
-

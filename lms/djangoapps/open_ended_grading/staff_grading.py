@@ -22,4 +22,3 @@ class StaffGrading(object):
         return "<b>Instructor grading!</b>"
         # context = {}
         # return render_to_string('courseware/instructor_grading_view.html', context)
-

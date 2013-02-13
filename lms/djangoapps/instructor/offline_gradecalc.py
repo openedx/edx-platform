@@ -31,7 +31,7 @@ class MyEncoder(JSONEncoder):
 
 def offline_grade_calculation(course_id):
     '''
-    Compute grades for all students for a specified course, and save results to the DB.  
+    Compute grades for all students for a specified course, and save results to the DB.
     '''
 
     tstart = time.time()
@@ -59,16 +59,16 @@ def offline_grade_calculation(course_id):
         ocg, created = models.OfflineComputedGrade.objects.get_or_create(user=student, course_id=course_id)
         ocg.gradeset = gs
         ocg.save()
-        print "%s done" % student	# print statement used because this is run by a management command
+        print "%s done" % student  	# print statement used because this is run by a management command
 
     tend = time.time()
     dt = tend - tstart
-    
+
     ocgl = models.OfflineComputedGradeLog(course_id=course_id, seconds=dt, nstudents=len(enrolled_students))
     ocgl.save()
     print ocgl
     print "All Done!"
-    
+
 
 def offline_grades_available(course_id):
     '''
@@ -80,7 +80,7 @@ def offline_grades_available(course_id):
         return False
     return ocgl.latest('created')
 
-    
+
 def student_grades(student, request, course, keep_raw_scores=False, use_offline=False):
     '''
     This is the main interface to get grades.  It has the same parameters as grades.grade, as well
@@ -89,15 +89,11 @@ def student_grades(student, request, course, keep_raw_scores=False, use_offline=
 
     if not use_offline:
         return grades.grade(student, request, course, keep_raw_scores=keep_raw_scores)
-    
+
     try:
         ocg = models.OfflineComputedGrade.objects.get(user=student, course_id=course.id)
     except models.OfflineComputedGrade.DoesNotExist:
-        return dict(raw_scores=[], section_breakdown=[], 
+        return dict(raw_scores=[], section_breakdown=[],
                     msg='Error: no offline gradeset available for %s, %s' % (student, course.id))
-    
+
     return json.loads(ocg.gradeset)
-
-
-        
-

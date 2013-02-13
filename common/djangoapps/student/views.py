@@ -1,12 +1,10 @@
 import datetime
 import feedparser
-#import itertools
 import json
 import logging
 import random
 import string
 import sys
-#import time
 import urllib
 import uuid
 
@@ -16,17 +14,19 @@ from django.contrib.auth import logout, authenticate, login
 from django.contrib.auth.forms import PasswordResetForm
 from django.contrib.auth.models import User
 from django.contrib.auth.decorators import login_required
+from django.core.cache import cache
 from django.core.context_processors import csrf
 from django.core.mail import send_mail
+from django.core.urlresolvers import reverse
 from django.core.validators import validate_email, validate_slug, ValidationError
 from django.db import IntegrityError
-from django.http import HttpResponse, HttpResponseForbidden, Http404
+from django.http import HttpResponse, HttpResponseRedirect, Http404
 from django.shortcuts import redirect
+from django_future.csrf import ensure_csrf_cookie, csrf_exempt
+
 from mitxmako.shortcuts import render_to_response, render_to_string
 from bs4 import BeautifulSoup
-from django.core.cache import cache
 
-from django_future.csrf import ensure_csrf_cookie, csrf_exempt
 from student.models import (Registration, UserProfile, TestCenterUser, TestCenterUserForm,
                             TestCenterRegistration, TestCenterRegistrationForm,
                             PendingNameChange, PendingEmailChange,
@@ -38,17 +38,21 @@ from certificates.models import CertificateStatuses, certificate_status_for_stud
 from xmodule.course_module import CourseDescriptor
 from xmodule.modulestore.exceptions import ItemNotFoundError
 from xmodule.modulestore.django import modulestore
+from xmodule.modulestore import Location
 
-#from datetime import date
 from collections import namedtuple
 
 from courseware.courses import get_courses, sort_by_announcement
 from courseware.access import has_access
+from courseware.models import StudentModuleCache
+from courseware.views import get_module_for_descriptor, jump_to
+from courseware.module_render import get_instance_module
 
 from statsd import statsd
 
 log = logging.getLogger("mitx.student")
 Article = namedtuple('Article', 'title url author image deck publication publish_date')
+
 
 def csrf_token(context):
     ''' A csrf token that can be included in a form.
@@ -73,8 +77,8 @@ def index(request, extra_context={}, user=None):
     '''
 
     # The course selection work is done in courseware.courses.
-    domain = settings.MITX_FEATURES.get('FORCE_UNIVERSITY_DOMAIN')	# normally False
-    if domain==False:				# do explicit check, because domain=None is valid
+    domain = settings.MITX_FEATURES.get('FORCE_UNIVERSITY_DOMAIN')  	# normally False
+    if domain == False:				# do explicit check, because domain=None is valid
         domain = request.META.get('HTTP_HOST')
 
     courses = get_courses(None, domain=domain)
@@ -97,6 +101,7 @@ import re
 day_pattern = re.compile('\s\d+,\s')
 multimonth_pattern = re.compile('\s?\-\s?\S+\s')
 
+
 def get_date_for_press(publish_date):
     import datetime
     # strip off extra months, and just use the first:
@@ -106,6 +111,7 @@ def get_date_for_press(publish_date):
     else:
         date = datetime.datetime.strptime(date, "%B, %Y")
     return date
+
 
 def press(request):
     json_articles = cache.get("student_press_json_articles")
@@ -148,6 +154,7 @@ def cert_info(user, course):
 
     return _cert_info(user, course, certificate_status_for_student(user, course.id))
 
+
 def _cert_info(user, course, cert_status):
     """
     Implements the logic for cert_info -- split out for testing.
@@ -175,7 +182,7 @@ def _cert_info(user, course, cert_status):
 
     d = {'status': status,
          'show_download_url': status == 'ready',
-         'show_disabled_download_button': status == 'generating',}
+         'show_disabled_download_button': status == 'generating', }
 
     if (status in ('generating', 'ready', 'notpassing', 'restricted') and
         course.end_of_course_survey_url is not None):
@@ -203,6 +210,7 @@ def _cert_info(user, course, cert_status):
             d['grade'] = cert_status['grade']
 
     return d
+
 
 @login_required
 @ensure_csrf_cookie
@@ -237,9 +245,9 @@ def dashboard(request):
     show_courseware_links_for = frozenset(course.id for course in courses
                                           if has_access(request.user, course, 'load'))
 
-    cert_statuses = { course.id: cert_info(request.user, course) for course in courses}
+    cert_statuses = {course.id: cert_info(request.user, course) for course in courses}
 
-    exam_registrations = { course.id: exam_registration_info(request.user, course) for course in courses}
+    exam_registrations = {course.id: exam_registration_info(request.user, course) for course in courses}
 
     # Get the 3 most recent news
     top_news = _get_news(top=3)
@@ -248,7 +256,7 @@ def dashboard(request):
                'message': message,
                'staff_access': staff_access,
                'errored_courses': errored_courses,
-               'show_courseware_links_for' : show_courseware_links_for,
+               'show_courseware_links_for': show_courseware_links_for,
                'cert_statuses': cert_statuses,
                'news': top_news,
                'exam_registrations': exam_registrations,
@@ -312,7 +320,7 @@ def change_enrollment(request):
                     'error': 'enrollment in {} not allowed at this time'
                     .format(course.display_name)}
 
-        org, course_num, run=course_id.split("/")
+        org, course_num, run = course_id.split("/")
         statsd.increment("common.student.enrollment",
                         tags=["org:{0}".format(org),
                               "course:{0}".format(course_num),
@@ -326,7 +334,7 @@ def change_enrollment(request):
             enrollment = CourseEnrollment.objects.get(user=user, course_id=course_id)
             enrollment.delete()
 
-            org, course_num, run=course_id.split("/")
+            org, course_num, run = course_id.split("/")
             statsd.increment("common.student.unenrollment",
                             tags=["org:{0}".format(org),
                                   "course:{0}".format(course_num),
@@ -345,7 +353,7 @@ def change_enrollment(request):
 def accounts_login(request, error=""):
 
 
-    return render_to_response('accounts_login.html', { 'error': error })
+    return render_to_response('accounts_login.html', {'error': error})
 
 
 
@@ -423,6 +431,7 @@ def change_setting(request):
 
     return HttpResponse(json.dumps({'success': True,
                                     'location': up.location, }))
+
 
 def _do_create_account(post_vars):
     """
@@ -551,7 +560,7 @@ def create_account(request, post_override=None):
 
     # Ok, looks like everything is legit.  Create the account.
     ret = _do_create_account(post_vars)
-    if isinstance(ret,HttpResponse):		# if there was an error then return that
+    if isinstance(ret, HttpResponse):		# if there was an error then return that
         return ret
     (user, profile, registration) = ret
 
@@ -591,7 +600,7 @@ def create_account(request, post_override=None):
         eamap.user = login_user
         eamap.dtsignup = datetime.datetime.now()
         eamap.save()
-        log.debug('Updated ExternalAuthMap for %s to be %s' % (post_vars['username'],eamap))
+        log.debug('Updated ExternalAuthMap for %s to be %s' % (post_vars['username'], eamap))
 
         if settings.MITX_FEATURES.get('BYPASS_ACTIVATION_EMAIL_FOR_EXTAUTH'):
             log.debug('bypassing activation email')
@@ -602,6 +611,7 @@ def create_account(request, post_override=None):
 
     js = {'success': True}
     return HttpResponse(json.dumps(js), mimetype="application/json")
+
 
 def exam_registration_info(user, course):
     """ Returns a Registration object if the user is currently registered for a current
@@ -619,6 +629,7 @@ def exam_registration_info(user, course):
     else:
         registration = None
     return registration
+
 
 @login_required
 @ensure_csrf_cookie
@@ -662,6 +673,7 @@ def begin_exam_registration(request, course_id):
                }
 
     return render_to_response('test_center_register.html', context)
+
 
 @ensure_csrf_cookie
 def create_exam_registration(request, post_override=None):
@@ -725,7 +737,7 @@ def create_exam_registration(request, post_override=None):
         # this registration screen.
 
     else:
-        accommodation_request = post_vars.get('accommodation_request','')
+        accommodation_request = post_vars.get('accommodation_request', '')
         registration = TestCenterRegistration.create(testcenter_user, exam, accommodation_request)
         needs_saving = True
         log.info("User {0} enrolled in course {1} creating new exam registration".format(user.username, course_id))
@@ -834,15 +846,16 @@ def password_reset(request):
 
     form = PasswordResetForm(request.POST)
     if form.is_valid():
-        form.save(use_https = request.is_secure(),
-                  from_email = settings.DEFAULT_FROM_EMAIL,
-                  request = request,
-                  domain_override = request.get_host())
-        return HttpResponse(json.dumps({'success':True,
+        form.save(use_https=request.is_secure(),
+                  from_email=settings.DEFAULT_FROM_EMAIL,
+                  request=request,
+                  domain_override=request.get_host())
+        return HttpResponse(json.dumps({'success': True,
                                         'value': render_to_string('registration/password_reset_done.html', {})}))
     else:
         return HttpResponse(json.dumps({'success': False,
                                         'error': 'Invalid e-mail'}))
+
 
 @ensure_csrf_cookie
 def reactivation_email(request):
@@ -855,6 +868,7 @@ def reactivation_email(request):
         return HttpResponse(json.dumps({'success': False,
                                         'error': 'No inactive user with this e-mail exists'}))
     return reactivation_email_for_user(user)
+
 
 def reactivation_email_for_user(user):
     reg = Registration.objects.get(user=user)
@@ -996,11 +1010,11 @@ def pending_name_changes(request):
 
     changes = list(PendingNameChange.objects.all())
     js = {'students': [{'new_name': c.new_name,
-                        'rationale':c.rationale,
-                        'old_name':UserProfile.objects.get(user=c.user).name,
-                        'email':c.user.email,
-                        'uid':c.user.id,
-                        'cid':c.id} for c in changes]}
+                        'rationale': c.rationale,
+                        'old_name': UserProfile.objects.get(user=c.user).name,
+                        'email': c.user.email,
+                        'uid': c.user.id,
+                        'cid': c.id} for c in changes]}
     return render_to_response('name_changes.html', js)
 
 
@@ -1055,25 +1069,134 @@ def accept_name_change(request):
 
     return accept_name_change_by_id(int(request.POST['id']))
 
-# TODO: This is a giant kludge to give Pearson something to test against ASAP.
-#       Will need to get replaced by something that actually ties into TestCenterUser
 @csrf_exempt
 def test_center_login(request):
-    if not settings.MITX_FEATURES.get('ENABLE_PEARSON_HACK_TEST'):
-        raise Http404
-
-    client_candidate_id = request.POST.get("clientCandidateID")
-    # registration_id = request.POST.get("registrationID")
-    exit_url = request.POST.get("exitURL")
+    # errors are returned by navigating to the error_url, adding a query parameter named "code" 
+    # which contains the error code describing the exceptional condition.
+    def makeErrorURL(error_url, error_code):
+        log.error("generating error URL with error code {}".format(error_code))
+        return "{}?code={}".format(error_url, error_code);
+     
+    # get provided error URL, which will be used as a known prefix for returning error messages to the
+    # Pearson shell.  
     error_url = request.POST.get("errorURL")
 
+    # TODO: check that the parameters have not been tampered with, by comparing the code provided by Pearson
+    # with the code we calculate for the same parameters.
+    if 'code' not in request.POST:
+        return HttpResponseRedirect(makeErrorURL(error_url, "missingSecurityCode"));
+    code = request.POST.get("code")
+
+    # calculate SHA for query string
+    # TODO: figure out how to get the original query string, so we can hash it and compare.
+    
+    
+    if 'clientCandidateID' not in request.POST:
+        return HttpResponseRedirect(makeErrorURL(error_url, "missingClientCandidateID"));
+    client_candidate_id = request.POST.get("clientCandidateID")
+    
+    # TODO: check remaining parameters, and maybe at least log if they're not matching
+    # expected values....
+    # registration_id = request.POST.get("registrationID")
+    # exit_url = request.POST.get("exitURL")
+
+    # find testcenter_user that matches the provided ID:
+    try:
+        testcenteruser = TestCenterUser.objects.get(client_candidate_id=client_candidate_id)
+    except TestCenterUser.DoesNotExist:
+        log.error("not able to find demographics for cand ID {}".format(client_candidate_id))
+        return HttpResponseRedirect(makeErrorURL(error_url, "invalidClientCandidateID"));
+
+    # find testcenter_registration that matches the provided exam code:
+    # Note that we could rely in future on either the registrationId or the exam code, 
+    # or possibly both.  But for now we know what to do with an ExamSeriesCode, 
+    # while we currently have no record of RegistrationID values at all.
+    if 'vueExamSeriesCode' not in request.POST:
+        # we are not allowed to make up a new error code, according to Pearson, 
+        # so instead of "missingExamSeriesCode", we use a valid one that is 
+        # inaccurate but at least distinct.  (Sigh.)
+        log.error("missing exam series code for cand ID {}".format(client_candidate_id))
+        return HttpResponseRedirect(makeErrorURL(error_url, "missingPartnerID"));
+    exam_series_code = request.POST.get('vueExamSeriesCode')
+    # special case for supporting test user:
+    if client_candidate_id == "edX003671291147" and exam_series_code != '6002x001':
+        log.warning("test user {} using unexpected exam code {}, coercing to 6002x001".format(client_candidate_id, exam_series_code))
+        exam_series_code = '6002x001'
+
+    registrations = TestCenterRegistration.objects.filter(testcenter_user=testcenteruser, exam_series_code=exam_series_code)
+    if not registrations:
+        log.error("not able to find exam registration for exam {} and cand ID {}".format(exam_series_code, client_candidate_id))
+        return HttpResponseRedirect(makeErrorURL(error_url, "noTestsAssigned"));
+    
+    # TODO: figure out what to do if there are more than one registrations....
+    # for now, just take the first...
+    registration = registrations[0]
+    
+    course_id = registration.course_id
+    course = course_from_id(course_id)  # assume it will be found....
+    if not course:
+        log.error("not able to find course from ID {} for cand ID {}".format(course_id, client_candidate_id))
+        return HttpResponseRedirect(makeErrorURL(error_url, "incorrectCandidateTests"));
+    exam = course.get_test_center_exam(exam_series_code)
+    if not exam:
+        log.error("not able to find exam {} for course ID {} and cand ID {}".format(exam_series_code, course_id, client_candidate_id))
+        return HttpResponseRedirect(makeErrorURL(error_url, "incorrectCandidateTests"));
+    location = exam.exam_url
+    log.info("proceeding with test of cand {} on exam {} for course {}: URL = {}".format(client_candidate_id, exam_series_code, course_id, location))
+
+    # check if the test has already been taken
+    timelimit_descriptor = modulestore().get_instance(course_id, Location(location))
+    if not timelimit_descriptor:
+        log.error("cand {} on exam {} for course {}: descriptor not found for location {}".format(client_candidate_id, exam_series_code, course_id, location))
+        return HttpResponseRedirect(makeErrorURL(error_url, "missingClientProgram"));
+        
+    timelimit_module_cache = StudentModuleCache.cache_for_descriptor_descendents(course_id, testcenteruser.user, 
+                                                                                 timelimit_descriptor, depth=None)
+    timelimit_module = get_module_for_descriptor(request.user, request, timelimit_descriptor, 
+                                                 timelimit_module_cache, course_id, position=None)
+    if not timelimit_module.category == 'timelimit':
+        log.error("cand {} on exam {} for course {}: non-timelimit module at location {}".format(client_candidate_id, exam_series_code, course_id, location))
+        return HttpResponseRedirect(makeErrorURL(error_url, "missingClientProgram"));
+        
+    if timelimit_module and timelimit_module.has_ended:
+        log.warning("cand {} on exam {} for course {}: test already over at {}".format(client_candidate_id, exam_series_code, course_id, timelimit_module.ending_at))
+        return HttpResponseRedirect(makeErrorURL(error_url, "allTestsTaken"));
+    
+    # check if we need to provide an accommodation:
+    time_accommodation_mapping = {'ET12ET' : 'ADDHALFTIME',
+                                  'ET30MN' : 'ADD30MIN',
+                                  'ETDBTM' : 'ADDDOUBLE', }
+
+    time_accommodation_code = None
+    for code in registration.get_accommodation_codes():
+        if code in time_accommodation_mapping:
+            time_accommodation_code = time_accommodation_mapping[code]
+    # special, hard-coded client ID used by Pearson shell for testing:
     if client_candidate_id == "edX003671291147":
-        user = authenticate(username=settings.PEARSON_TEST_USER,
-                            password=settings.PEARSON_TEST_PASSWORD)
-        login(request, user)
-        return redirect('/courses/MITx/6.002x/2012_Fall/courseware/Final_Exam/Final_Exam_Fall_2012/')
-    else:
-        return HttpResponseForbidden()
+        time_accommodation_code = 'TESTING'
+        
+    if time_accommodation_code:
+        timelimit_module.accommodation_code = time_accommodation_code
+        instance_module = get_instance_module(course_id, testcenteruser.user, timelimit_module, timelimit_module_cache)
+        instance_module.state = timelimit_module.get_instance_state()
+        instance_module.save()
+        log.info("cand {} on exam {} for course {}: receiving accommodation {}".format(client_candidate_id, exam_series_code, course_id, time_accommodation_code))
+        
+    # UGLY HACK!!!
+    # Login assumes that authentication has occurred, and that there is a 
+    # backend annotation on the user object, indicating which backend
+    # against which the user was authenticated.  We're authenticating here
+    # against the registration entry, and assuming that the request given
+    # this information is correct, we allow the user to be logged in
+    # without a password.  This could all be formalized in a backend object
+    # that does the above checking.  
+    # TODO: (brian) create a backend class to do this.
+    # testcenteruser.user.backend = "%s.%s" % (backend.__module__, backend.__class__.__name__)    
+    testcenteruser.user.backend = "%s.%s" % ("TestcenterAuthenticationModule", "TestcenterAuthenticationClass")    
+    login(request, testcenteruser.user)
+    
+    # And start the test:
+    return jump_to(request, course_id, location)
 
 
 def _get_news(top=None):

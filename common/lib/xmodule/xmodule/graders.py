@@ -49,6 +49,7 @@ def invalid_args(func, argdict):
     if keywords: return set()  # All accepted
     return set(argdict) - set(args)
 
+
 def grader_from_conf(conf):
     """
     This creates a CourseGrader from a configuration (such as in course_settings.py).
@@ -80,7 +81,7 @@ def grader_from_conf(conf):
                 subgrader_class = SingleSectionGrader
             else:
                 raise ValueError("Configuration has no appropriate grader class.")
-            
+
             bad_args = invalid_args(subgrader_class.__init__, subgraderconf)
             # See note above concerning 'name'.
             if bad_args.issuperset({name}):
@@ -90,7 +91,7 @@ def grader_from_conf(conf):
                 log.warning("Invalid arguments for a subgrader: %s", bad_args)
                 for key in bad_args:
                     del subgraderconf[key]
-            
+
             subgrader = subgrader_class(**subgraderconf)
             subgraders.append((subgrader, subgrader.category, weight))
 
@@ -210,13 +211,13 @@ class SingleSectionGrader(CourseGrader):
                     break
 
         if foundScore or generate_random_scores:
-            if generate_random_scores:	# for debugging!
-                earned = random.randint(2,15)
+            if generate_random_scores:  	# for debugging!
+                earned = random.randint(2, 15)
                 possible = random.randint(earned, 15)
-            else: # We found the score
+            else:   # We found the score
                 earned = foundScore.earned
                 possible = foundScore.possible
-                
+
             percent = earned / float(possible)
             detail = "{name} - {percent:.0%} ({earned:.3n}/{possible:.3n})".format(name=self.name,
                                                                         percent=percent,
@@ -245,7 +246,7 @@ class AssignmentFormatGrader(CourseGrader):
     min_count defines how many assignments are expected throughout the course. Placeholder
     scores (of 0) will be inserted if the number of matching sections in the course is < min_count.
     If there number of matching sections in the course is > min_count, min_count will be ignored.
-    
+
     show_only_average is to suppress the display of each assignment in this grader and instead
     only show the total score of this grader in the breakdown.
 
@@ -257,7 +258,7 @@ class AssignmentFormatGrader(CourseGrader):
 
     short_label is similar to section_type, but shorter. For example, for Homework it would be
     "HW".
-    
+
     starting_index is the first number that will appear. For example, starting_index=3 and
     min_count = 2 would produce the labels "Assignment 3", "Assignment 4"
 
@@ -296,16 +297,16 @@ class AssignmentFormatGrader(CourseGrader):
         breakdown = []
         for i in range(max(self.min_count, len(scores))):
             if i < len(scores) or generate_random_scores:
-                if generate_random_scores:	# for debugging!
-                    earned = random.randint(2,15)
-                    possible = random.randint(earned, 15)                    
+                if generate_random_scores:  	# for debugging!
+                    earned = random.randint(2, 15)
+                    possible = random.randint(earned, 15)
                     section_name = "Generated"
-                    
+
                 else:
                     earned = scores[i].earned
                     possible = scores[i].possible
                     section_name = scores[i].section
-                
+
                 percentage = earned / float(possible)
                 summary = "{section_type} {index} - {name} - {percent:.0%} ({earned:.3n}/{possible:.3n})".format(index=i + self.starting_index,
                                                                 section_type=self.section_type,
@@ -318,7 +319,7 @@ class AssignmentFormatGrader(CourseGrader):
                 summary = "{section_type} {index} Unreleased - 0% (?/?)".format(index=i + self.starting_index, section_type=self.section_type)
 
             short_label = "{short_label} {index:02d}".format(index=i + self.starting_index, short_label=self.short_label)
-            
+
             breakdown.append({'percent': percentage, 'label': short_label, 'detail': summary, 'category': self.category})
 
         total_percent, dropped_indices = totalWithDrops(breakdown, self.drop_count)
@@ -328,13 +329,13 @@ class AssignmentFormatGrader(CourseGrader):
 
         total_detail = "{section_type} Average = {percent:.0%}".format(percent=total_percent, section_type=self.section_type)
         total_label = "{short_label} Avg".format(short_label=self.short_label)
-        
+
         if self.show_only_average:
             breakdown = []
-        
+
         if not self.hide_average:
             breakdown.append({'percent': total_percent, 'label': total_label, 'detail': total_detail, 'category': self.category, 'prominent': True})
-        
+
         return {'percent': total_percent,
                 'section_breakdown': breakdown,
                 #No grade_breakdown here

@@ -54,6 +54,7 @@ log = logging.getLogger('mitx.' + __name__)
 
 registry = TagRegistry()
 
+
 class Attribute(object):
     """
     Allows specifying required and optional attributes for input types.
@@ -413,7 +414,7 @@ class JavascriptInput(InputTypeBase):
         return [Attribute('params', None),
                 Attribute('problem_state', None),
                 Attribute('display_class', None),
-                Attribute('display_file', None),]
+                Attribute('display_file', None), ]
 
 
     def setup(self):
@@ -477,11 +478,12 @@ class TextLine(InputTypeBase):
 
     def _extra_context(self):
         return {'do_math': self.do_math,
-                'preprocessor': self.preprocessor,}
+                'preprocessor': self.preprocessor, }
 
 registry.register(TextLine)
 
 #-----------------------------------------------------------------------------
+
 
 class FileSubmission(InputTypeBase):
     """
@@ -508,7 +510,7 @@ class FileSubmission(InputTypeBase):
         Convert the list of allowed files to a convenient format.
         """
         return [Attribute('allowed_files', '[]', transform=cls.parse_files),
-                Attribute('required_files', '[]', transform=cls.parse_files),]
+                Attribute('required_files', '[]', transform=cls.parse_files), ]
 
     def setup(self):
         """
@@ -524,7 +526,7 @@ class FileSubmission(InputTypeBase):
             self.msg = FileSubmission.submitted_msg
 
     def _extra_context(self):
-        return {'queue_len': self.queue_len,}
+        return {'queue_len': self.queue_len, }
         return context
 
 registry.register(FileSubmission)
@@ -582,7 +584,7 @@ class CodeInput(InputTypeBase):
 
     def _extra_context(self):
         """Defined queue_len, add it """
-        return {'queue_len': self.queue_len,}
+        return {'queue_len': self.queue_len, }
 
 registry.register(CodeInput)
 
@@ -606,13 +608,14 @@ class Schematic(InputTypeBase):
             Attribute('parts', None),
             Attribute('analyses', None),
             Attribute('initial_value', None),
-            Attribute('submit_analyses', None),]
+            Attribute('submit_analyses', None), ]
 
         return context
 
 registry.register(Schematic)
 
 #-----------------------------------------------------------------------------
+
 
 class ImageInput(InputTypeBase):
     """
@@ -635,7 +638,7 @@ class ImageInput(InputTypeBase):
         """
         return [Attribute('src'),
                 Attribute('height'),
-                Attribute('width'),]
+                Attribute('width'), ]
 
 
     def setup(self):
@@ -659,6 +662,7 @@ class ImageInput(InputTypeBase):
 registry.register(ImageInput)
 
 #-----------------------------------------------------------------------------
+
 
 class Crystallography(InputTypeBase):
     """
@@ -728,17 +732,18 @@ class ChemicalEquationInput(InputTypeBase):
         """
         Can set size of text field.
         """
-        return [Attribute('size', '20'),]
+        return [Attribute('size', '20'), ]
 
     def _extra_context(self):
         """
         TODO (vshnayder): Get rid of this once we have a standard way of requiring js to be loaded.
         """
-        return {'previewer': '/static/js/capa/chemical_equation_preview.js',}
+        return {'previewer': '/static/js/capa/chemical_equation_preview.js', }
 
 registry.register(ChemicalEquationInput)
 
 #-----------------------------------------------------------------------------
+
 
 class DragAndDropInput(InputTypeBase):
     """
@@ -829,3 +834,108 @@ class DragAndDropInput(InputTypeBase):
 registry.register(DragAndDropInput)
 
 #--------------------------------------------------------------------------------------------------------------------
+
+
+class EditAMoleculeInput(InputTypeBase):
+    """
+    An input type for edit-a-molecule.  Integrates with the molecule editor java applet.
+
+    Example:
+
+    <editamolecule size="50"/>
+
+    options: size -- width of the textbox.
+    """
+
+    template = "editamolecule.html"
+    tags = ['editamoleculeinput']
+
+    @classmethod
+    def get_attributes(cls):
+        """
+        Can set size of text field.
+        """
+        return [Attribute('file'),
+                Attribute('missing', None)]
+
+    def _extra_context(self):
+        """
+        """
+        context = {
+            'applet_loader': '/static/js/capa/editamolecule.js',
+        }
+
+        return context
+
+registry.register(EditAMoleculeInput)
+
+#-----------------------------------------------------------------------------
+
+class DesignProtein2dInput(InputTypeBase):
+    """
+    An input type for design of a protein in 2D. Integrates with the Protex java applet.
+
+    Example:
+
+    <designprotein2d width="800" hight="500" target_shape="E;NE;NW;W;SW;E;none" />
+    """
+
+    template = "designprotein2dinput.html"
+    tags = ['designprotein2dinput']
+
+    @classmethod
+    def get_attributes(cls):
+        """
+        Note: width, hight, and target_shape are required.
+        """
+        return [Attribute('width'),
+                Attribute('height'),
+                Attribute('target_shape')
+                ]
+
+    def _extra_context(self):
+        """
+        """
+        context = {
+            'applet_loader': '/static/js/capa/design-protein-2d.js',
+        }
+
+        return context
+
+registry.register(DesignProtein2dInput)
+
+#-----------------------------------------------------------------------------
+
+class EditAGeneInput(InputTypeBase):
+    """
+        An input type for editing a gene. Integrates with the genex java applet.
+        
+        Example:
+        
+        <editagene width="800" hight="500" dna_sequence="ETAAGGCTATAACCGA" />
+        """
+    
+    template = "editageneinput.html"
+    tags = ['editageneinput']
+    
+    @classmethod
+    def get_attributes(cls):
+        """
+            Note: width, hight, and dna_sequencee are required.
+            """
+        return [Attribute('width'),
+                Attribute('height'),
+                Attribute('dna_sequence')
+                ]
+    
+    def _extra_context(self):
+        """
+            """
+        context = {
+            'applet_loader': '/static/js/capa/edit-a-gene.js',
+        }
+        
+        return context
+
+registry.register(EditAGeneInput)
+

@@ -61,6 +61,7 @@ class BaseCourseTestCase(unittest.TestCase):
         self.assertEquals(len(courses), 1)
         return courses[0]
 
+
 class ImportTestCase(BaseCourseTestCase):
 
     def test_fallback(self):
@@ -323,7 +324,7 @@ class ImportTestCase(BaseCourseTestCase):
 
         self.assertEqual(len(sections), 4)
 
-        for i in (2,3):
+        for i in (2, 3):
             video = sections[i]
             # Name should be 'video_{hash}'
             print "video {0} url_name: {1}".format(i, video.url_name)
@@ -379,5 +380,3 @@ class ImportTestCase(BaseCourseTestCase):
         # and finally...
         course.metadata['cohort_config'] = {'cohorted': True}
         self.assertTrue(course.is_cohorted)
-
-

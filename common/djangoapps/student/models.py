@@ -107,6 +107,7 @@ class UserProfile(models.Model):
 TEST_CENTER_STATUS_ACCEPTED = "Accepted"
 TEST_CENTER_STATUS_ERROR = "Error"
 
+
 class TestCenterUser(models.Model):
     """This is our representation of the User for in-person testing, and
     specifically for Pearson at this point. A few things to note:
@@ -190,7 +191,7 @@ class TestCenterUser(models.Model):
 
     @staticmethod
     def user_provided_fields():
-        return [ 'first_name', 'middle_name', 'last_name', 'suffix', 'salutation',
+        return ['first_name', 'middle_name', 'last_name', 'suffix', 'salutation',
                 'address_1', 'address_2', 'address_3', 'city', 'state', 'postal_code', 'country',
                 'phone', 'extension', 'phone_country_code', 'fax', 'fax_country_code', 'company_name']
 
@@ -208,7 +209,7 @@ class TestCenterUser(models.Model):
     @staticmethod
     def _generate_edx_id(prefix):
         NUM_DIGITS = 12
-        return u"{}{:012}".format(prefix, randint(1, 10**NUM_DIGITS-1))
+        return u"{}{:012}".format(prefix, randint(1, 10 ** NUM_DIGITS - 1))
 
     @staticmethod
     def _generate_candidate_id():
@@ -237,10 +238,11 @@ class TestCenterUser(models.Model):
     def is_pending(self):
         return not self.is_accepted and not self.is_rejected
 
+
 class TestCenterUserForm(ModelForm):
     class Meta:
         model = TestCenterUser
-        fields = ( 'first_name', 'middle_name', 'last_name', 'suffix', 'salutation',
+        fields = ('first_name', 'middle_name', 'last_name', 'suffix', 'salutation',
                 'address_1', 'address_2', 'address_3', 'city', 'state', 'postal_code', 'country',
                 'phone', 'extension', 'phone_country_code', 'fax', 'fax_country_code', 'company_name')
 
@@ -313,7 +315,8 @@ ACCOMMODATION_CODES = (
                       ('SRSGNR', 'Separate Room and Sign Language Interpreter'),
                       )
 
-ACCOMMODATION_CODE_DICT = { code : name for (code, name) in ACCOMMODATION_CODES }
+ACCOMMODATION_CODE_DICT = {code: name for (code, name) in ACCOMMODATION_CODES}
+
 
 class TestCenterRegistration(models.Model):
     """
@@ -389,10 +392,10 @@ class TestCenterRegistration(models.Model):
         elif self.uploaded_at is None:
             return 'Add'
         elif self.registration_is_rejected:
-            # Assume that if the registration was rejected before, 
-            # it is more likely this is the (first) correction 
+            # Assume that if the registration was rejected before,
+            # it is more likely this is the (first) correction
             # than a second correction in flight before the first was
-            # processed. 
+            # processed.
             return 'Add'
         else:
             # TODO: decide what to send when we have uploaded an initial version,
@@ -417,7 +420,7 @@ class TestCenterRegistration(models.Model):
 
     @classmethod
     def create(cls, testcenter_user, exam, accommodation_request):
-        registration = cls(testcenter_user = testcenter_user)
+        registration = cls(testcenter_user=testcenter_user)
         registration.course_id = exam.course_id
         registration.accommodation_request = accommodation_request.strip()
         registration.exam_series_code = exam.exam_series_code
@@ -501,7 +504,7 @@ class TestCenterRegistration(models.Model):
         return self.accommodation_code.split('*')
 
     def get_accommodation_names(self):
-        return [ ACCOMMODATION_CODE_DICT.get(code, "Unknown code " + code) for code in self.get_accommodation_codes() ]
+        return [ACCOMMODATION_CODE_DICT.get(code, "Unknown code " + code) for code in self.get_accommodation_codes()]
 
     @property
     def registration_signup_url(self):
@@ -512,7 +515,7 @@ class TestCenterRegistration(models.Model):
             return "Accepted"
         elif self.demographics_is_rejected:
             return "Rejected"
-        else: 
+        else:
             return "Pending"
 
     def accommodation_status(self):
@@ -522,7 +525,7 @@ class TestCenterRegistration(models.Model):
             return "Accepted"
         elif self.accommodation_is_rejected:
             return "Rejected"
-        else: 
+        else:
             return "Pending"
 
     def registration_status(self):
@@ -532,12 +535,12 @@ class TestCenterRegistration(models.Model):
             return "Rejected"
         else:
             return "Pending"
-        
+
 
 class TestCenterRegistrationForm(ModelForm):
     class Meta:
         model = TestCenterRegistration
-        fields = ( 'accommodation_request', 'accommodation_code' )
+        fields = ('accommodation_request', 'accommodation_code')
 
     def clean_accommodation_request(self):
         code = self.cleaned_data['accommodation_request']
@@ -575,6 +578,7 @@ def get_testcenter_registration(user, course_id, exam_series_code):
 # nosetests thinks that anything with _test_ in the name is a test.
 # Correct this (https://nose.readthedocs.org/en/latest/finding_tests.html)
 get_testcenter_registration.__test__ = False
+
 
 def unique_id_for_user(user):
     """
@@ -665,6 +669,7 @@ class CourseEnrollmentAllowed(models.Model):
 #cache_relation(User.profile)
 
 #### Helper methods for use from python manage.py shell and other classes.
+
 
 def get_user_by_username_or_email(username_or_email):
     """
@@ -767,4 +772,3 @@ def update_user_information(sender, instance, created, **kwargs):
         log = logging.getLogger("mitx.discussion")
         log.error(unicode(e))
         log.error("update user info to discussion failed for user with id: " + str(instance.id))
-

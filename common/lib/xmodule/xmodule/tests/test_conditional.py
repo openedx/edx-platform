@@ -17,9 +17,10 @@ from xmodule.modulestore.exceptions import ItemNotFoundError
 from .test_export import DATA_DIR
 
 ORG = 'test_org'
-COURSE = 'conditional'	# name of directory with course data
+COURSE = 'conditional'  	# name of directory with course data
 
 from . import test_system
+
 
 class DummySystem(ImportSystem):
 
@@ -82,19 +83,22 @@ class ConditionalModuleTest(unittest.TestCase):
                 location = descriptor
                 descriptor = self.modulestore.get_instance(course.id, location, depth=None)
             location = descriptor.location
-            instance_state = instance_states.get(location.category,None)
-            print "inner_get_module, location.category=%s, inst_state=%s" % (location.category, instance_state)
+            instance_state = instance_states.get(location.category, None)
+            print "inner_get_module, location=%s, inst_state=%s" % (location, instance_state)
             return descriptor.xmodule_constructor(test_system)(instance_state, shared_state)
 
-        location = Location(["i4x", "edX", "cond_test", "conditional","condone"])
-        module = inner_get_module(location)
+        location = Location(["i4x", "edX", "cond_test", "conditional", "condone"])
 
         def replace_urls(text, staticfiles_prefix=None, replace_prefix='/static/', course_namespace=None):
             return text
         test_system.replace_urls = replace_urls
         test_system.get_module = inner_get_module
 
+        module = inner_get_module(location)
         print "module: ", module
+        print "module definition: ", module.definition
+        print "module children: ", module.get_children()
+        print "module display items (children): ", module.get_display_items()
 
         html = module.get_html()
         print "html type: ", type(html)
@@ -105,15 +109,13 @@ class ConditionalModuleTest(unittest.TestCase):
         gdi =  module.get_display_items()
         print "gdi=", gdi
 
-        ajax = json.loads(module.handle_ajax('',''))
+        ajax = json.loads(module.handle_ajax('', ''))
         self.assertTrue('xmodule.conditional_module' in ajax['html'])
         print "ajax: ", ajax
 
         # now change state of the capa problem to make it completed
-        instance_states['problem'] = json.dumps({'attempts':1})
+        instance_states['problem'] = json.dumps({'attempts': 1})
 
-        ajax = json.loads(module.handle_ajax('',''))
+        ajax = json.loads(module.handle_ajax('', ''))
         self.assertTrue('This is a secret' in ajax['html'])
         print "post-attempt ajax: ", ajax
-
-

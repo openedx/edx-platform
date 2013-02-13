@@ -38,6 +38,7 @@ from combined_open_ended_rubric import CombinedOpenEndedRubric
 
 log = logging.getLogger("mitx.courseware")
 
+
 class OpenEndedModule(openendedchild.OpenEndedChild):
     """
     The open ended module supports all external open ended grader problems.
@@ -300,7 +301,7 @@ class OpenEndedModule(openendedchild.OpenEndedChild):
 
         # We want to display available feedback in a particular order.
         # This dictionary specifies which goes first--lower first.
-        priorities = {# These go at the start of the feedback
+        priorities = {  # These go at the start of the feedback
                       'spelling': 0,
                       'grammar': 1,
                       # needs to be after all the other feedback
@@ -548,14 +549,11 @@ class OpenEndedModule(openendedchild.OpenEndedChild):
         @param system: modulesystem
         @return: Success indicator
         """
-        if self.attempts > self.max_attempts:
-            # If too many attempts, prevent student from saving answer and
-            # seeing rubric.  In normal use, students shouldn't see this because
-            # they won't see the reset button once they're out of attempts.
-            return {
-                'success': False,
-                'error': 'Too many attempts.'
-            }
+        # Once we close the problem, we should not allow students
+        # to save answers
+        closed, msg = self.check_if_closed()
+        if closed:
+            return msg
 
         if self.state != self.INITIAL:
             return self.out_of_sync_error(get)
@@ -674,5 +672,3 @@ class OpenEndedDescriptor(XmlDescriptor, EditingDescriptor):
             add_child(child)
 
         return elt
-
-
