@@ -200,7 +200,6 @@ COURSE_TITLE = "Circuits and Electronics"
 ### Dark code. Should be enabled in local settings for devel.
 
 ENABLE_MULTICOURSE = False     # set to False to disable multicourse display (see lib.util.views.mitxhome)
-QUICKEDIT = False
 
 WIKI_ENABLED = False
 
