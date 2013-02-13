@@ -62,14 +62,36 @@ CMS.Views.Settings.Advanced = CMS.Views.ValidatingView.extend({
             },
             onBlur: function (mirror) {
                 var key = $(mirror.getWrapperElement()).closest('.row').children('.key').attr('id');
-                var quotedValue = mirror.getValue();
+                var stringValue = $.trim(mirror.getValue());
+                // update CodeMirror to show the trimmed value.
+                mirror.setValue(stringValue);
+                var JSONValue = undefined;
                 try {
-                    var JSONValue = JSON.parse(quotedValue);
-                    self.model.set(key, JSONValue, {validate: true});
+                    JSONValue = JSON.parse(stringValue);
+                } catch (e) {
+                    // If it didn't parse, try converting non-arrays/non-objects to a String.
+                    // But don't convert single-quote strings, which are most likely errors.
+                    var firstNonWhite = stringValue.substring(0, 1);
+                    if (firstNonWhite !== "{" && firstNonWhite !== "[" && firstNonWhite !== "'") {
+                        try {
+                            stringValue = '"'+stringValue +'"';
+                            JSONValue = JSON.parse(stringValue);
+                            mirror.setValue(stringValue);
+                        } catch(quotedE) {
+                            // TODO: validation error
+                            console.log("Error with JSON, even after converting to String.")
+                            console.log(quotedE);
+                            JSONValue = undefined;
+                        }
+                    }
+                    else {
+                        // TODO: validation error
+                        console.log("Error with JSON, but will not convert to String.")
+                        console.log(e);
+                    }
                 }
-                catch (e) {
-                    // TODO: error checking
-                    console.log(e);
+                if (JSONValue !== undefined) {
+                    self.model.set(key, JSONValue, {validate: true});
                 }
             }
         });
