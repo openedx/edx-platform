@@ -43,10 +43,12 @@ class VideoAlphaModule(XModule):
         self.sub = xmltree.get('sub')
         self.position = 0
         self.show_captions = xmltree.get('show_captions', 'true')
-        self.source = self._get_source(xmltree)
-        self.mp4_source = self._get_source(xmltree, ['mp4'])
-        self.webm_source = self._get_source(xmltree, ['webm'])
-        self.ogv_source = self._get_source(xmltree, ['ogv'])
+        self.sources = {
+            'main': self._get_source(xmltree),
+            'mp4': self._get_source(xmltree, ['mp4']),
+            'webm': self._get_source(xmltree, ['webm']),
+            'ogv': self._get_source(xmltree, ['ogv']),
+        }
         self.track = self._get_track(xmltree)
         self.start_time, self.end_time = self._get_timeframe(xmltree)
 
@@ -127,7 +129,7 @@ class VideoAlphaModule(XModule):
         return self.youtube
 
     def get_html(self):
-        if isinstance(modulestore(), MongoModuleStore) :
+        if isinstance(modulestore(), MongoModuleStore):
             caption_asset_path = StaticContent.get_base_url_path_for_course_assets(self.location) + '/subs_'
         else:
             # VS[compat]
@@ -138,11 +140,8 @@ class VideoAlphaModule(XModule):
             'streams': self.videoalpha_list(),
             'id': self.location.html_id(),
             'position': self.position,
-            'mp4_source': self.mp4_source,
-            'webm_source': self.webm_source,
-            'ogv_source': self.ogv_source,
             'sub': self.sub,
-            'source': self.source,
+            'sources': self.sources,
             'track': self.track,
             'display_name': self.display_name,
             # TODO (cpennington): This won't work when we move to data that isn't on the filesystem
