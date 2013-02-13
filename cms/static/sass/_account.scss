@@ -145,6 +145,13 @@ body.signup, body.signin {
             :-ms-input-placeholder {  
                color: $gray-l3; 
             }
+
+            &:focus {
+
+              + .tip {
+                color: $gray;
+              }
+            }
           }
 
           textarea.long {
@@ -163,6 +170,7 @@ body.signup, body.signin {
           }
 
           .tip {
+            @include transition(color, 0.15s, ease-in-out);
             @include font-size(13);
             display: block;
             margin-top: ($baseline/4);

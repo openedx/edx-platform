@@ -152,10 +152,10 @@ from contentstore import utils
             <hr class="divide" />
 
         <section class="group-settings marketing">
-              <header>
+          <header>
             <h2 class="title-2">Introducing Your Course</h2>
             <span class="tip">Information for prospective students</span>
-              </header>
+          </header>
 
           <ol class="list-input">
             <li class="field text" id="field-course-overview">
@@ -219,11 +219,12 @@ from contentstore import utils
         <nav class="nav-related">
           <ul>
             <li class="nav-item"><a href="${reverse('contentstore.views.course_config_graders_page', kwargs={'org' : ctx_loc.org, 'course' : ctx_loc.course, 'name': ctx_loc.name})}">Grading</a></li>
-                  </ul>
+            <li class="nav-item"><a href="${reverse('manage_users', kwargs=dict(location=ctx_loc))}">Course Team</a></li>
+          </ul>
         </nav>
       % endif
-                  </div>
+      </div>
     </aside>
-            </section>
-                  </div>
+  </section>
+</div>
 </%block>
