@@ -59,6 +59,7 @@ class @VideoPlayerAlpha extends SubviewAlpha
       showinfo: 0
       enablejsapi: 1
       modestbranding: 1
+      html5: 1
     if @video.start
       @playerVars.start = @video.start
       @playerVars.wmode = 'window'
