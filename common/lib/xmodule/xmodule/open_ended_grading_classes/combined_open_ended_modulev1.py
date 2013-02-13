@@ -157,6 +157,7 @@ class CombinedOpenEndedV1Module():
             try:
                 self.display_due_date = dateutil.parser.parse(display_due_date_string)
             except ValueError:
+                #This is a staff_facing_error
                 log.error("Could not parse due date {0} for location {1}".format(display_due_date_string, location))
                 raise
         else:
@@ -168,6 +169,7 @@ class CombinedOpenEndedV1Module():
                 self.grace_period = parse_timedelta(grace_period_string)
                 self.close_date = self.display_due_date + self.grace_period
             except:
+                #This is a staff_facing_error
                 log.error("Error parsing the grace period {0} for location {1}".format(grace_period_string, location))
                 raise
         else:
@@ -662,7 +664,10 @@ class CombinedOpenEndedV1Module():
         if self.attempts > self.max_attempts:
             return {
                 'success': False,
-                'error': 'Too many attempts.'
+                #This is a student_facing_error
+                'error': ('You have attempted this question {0} times.  '
+                          'You are only allowed to attempt it {1} times.').format(
+                    self.attempts, self.max_attempts)
             }
         self.state = self.INITIAL
         self.allow_reset = False
@@ -801,6 +806,7 @@ class CombinedOpenEndedV1Descriptor(XmlDescriptor, EditingDescriptor):
         expected_children = ['task', 'rubric', 'prompt']
         for child in expected_children:
             if len(xml_object.xpath(child)) == 0:
+                #This is a staff_facing_error
                 raise ValueError("Combined Open Ended definition must include at least one '{0}' tag".format(child))
 
         def parse_task(k):
