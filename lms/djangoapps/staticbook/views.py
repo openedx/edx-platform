@@ -30,3 +30,23 @@ def index(request, course_id, book_index, page=None):
 
 def index_shifted(request, course_id, page):
     return index(request, course_id=course_id, page=int(page) + 24)
+
+
+@login_required
+def pdf_index(request, course_id, book_index, chapter=None, page=None):
+    course = get_course_with_access(request.user, course_id, 'load')
+    staff_access = has_access(request.user, course, 'staff')
+
+    book_index = int(book_index)
+    textbook = course.pdf_textbooks[book_index]
+
+#    if page is None:
+#        page = textbook.start_page
+
+    return render_to_response('static_pdfbook.html',
+                              {'book_index': book_index, 
+                               'course': course, 
+                               'textbook': textbook,
+                               'page': page,
+                               'chapter': chapter,
+                               'staff_access': staff_access})
