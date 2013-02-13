@@ -207,7 +207,7 @@ PIPELINE_CSS = {
     'base-style': {
         'source_filenames': [
             'js/vendor/CodeMirror/codemirror.css',
-            'css/vendor/ui-lightndess/jquery-ui-1.8.22.custom.css',
+            'css/vendor/ui-lightness/jquery-ui-1.8.22.custom.css',
             'css/vendor/jquery.qtip.min.css',
             'sass/base-style.scss'
         ],
