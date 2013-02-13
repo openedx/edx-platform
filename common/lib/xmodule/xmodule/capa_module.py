@@ -709,7 +709,7 @@ class CapaDescriptor(RawDescriptor):
 
     @property
     def editable_metadata_fields(self):
-        """Remove metadata from the editable fields since it has its own editor"""
+        """Remove any metadata from the editable fields which have their own editor or shouldn't be edited by user."""
         subset = [field for field in super(CapaDescriptor,self).editable_metadata_fields
                   if field not in ['markdown', 'empty']]
         return subset
