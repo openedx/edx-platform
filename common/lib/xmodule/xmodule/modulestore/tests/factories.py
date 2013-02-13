@@ -99,7 +99,7 @@ class XModuleItemFactory(Factory):
         new_item = store.clone_item(template, dest_location)
 
         # TODO: This needs to be deleted when we have proper storage for static content
-        new_item.metadata['data_dir'] = parent.metadata['data_dir']
+        new_item.data_dir = parent.data_dir
 
         # replace the display name with an optional parameter passed in from the caller
         if display_name is not None:

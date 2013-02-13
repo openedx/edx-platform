@@ -303,7 +303,7 @@ def get_module_for_descriptor(user, request, descriptor, model_data_cache, cours
 
     module.get_html = replace_static_urls(
         _get_html,
-        getattr(module, 'data_dir', ''),
+        getattr(descriptor, 'data_dir', None),
         course_namespace=module.location._replace(category=None, name=None))
 
     # Allow URLs of the form '/course/' refer to the root of multicourse directory
