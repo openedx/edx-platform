@@ -1,13 +1,13 @@
 .annotatable-header {
   margin-bottom: 1em;
   .annotatable-title {
-    font-size: em(20);
+    font-size: em(22);
     text-transform: uppercase;
     padding: 2px 4px;
   }
   .annotatable-description {
     position: relative;
-    font-size: em(14);
+    font-size: $body-font-size;
     padding: 2px 4px;
     border: 1px solid $border-color;
     border-radius: 3px;
@@ -57,7 +57,8 @@
   background: url(../images/info-icon.png) no-repeat;
 }
 
-.ui-tooltip.qtip.ui-tooltip-annotatable {
+.ui-tooltip.qtip.ui-tooltip {
+  font-size: $body-font-size;
   border: 1px solid #333;
   border-radius: 1em;
   background-color: rgba(0,0,0,.85);
@@ -65,6 +66,7 @@
   -webkit-font-smoothing: antialiased;
 
   .ui-tooltip-titlebar {
+    font-size: em(16);
     color: inherit;
     background-color: transparent;
     padding: 5px 10px;
@@ -85,26 +87,30 @@
   }
   .ui-tooltip-content {
     color: inherit;
-    background-color: transparent;
+    font-size: em(14);
     text-align: left;
     font-weight: 400;
-    font-size: 11px;
-    padding: 0 10px;
+    padding: 0 10px 10px 10px;
+    background-color: transparent;
   } 
-  p { color: inherit; }
+  p { 
+      color: inherit; 
+      line-height: normal;
+  }
 }
 
-.ui-tooltip.qtip.ui-tooltip-annotatable-comment {
+.ui-tooltip.qtip.ui-tooltip-annotatable {
   max-width: 350px;
   .ui-tooltip-title:before { 
     font-weight: normal;
     content: "Guided Discussion: ";
   }
   .ui-tooltip-content {  
+    padding: 0 10px;
     .annotatable-comment {
       display: block;
       margin: 0px 0px 10px 0;
-      max-height: 200px;
+      max-height: 175px;
       overflow: hidden;
     }
     .annotatable-reply {

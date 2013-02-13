@@ -6,8 +6,10 @@ class @Annotatable
     spanSelector:    '.annotatable-span'
     commentSelector: '.annotatable-comment'
     replySelector:   '.annotatable-reply'
+    returnSelector:  '.annotatable-return'
     helpSelector:    '.annotatable-help-icon'
-    inlineDiscussionSelector: '.xmodule_DiscussionModule .discussion-module'
+    discussionXModuleSelector: '.xmodule_DiscussionModule'
+    discussionSelector: '.discussion-module'
  
     constructor: (el) ->
         console.log 'loaded Annotatable' if @_debug
@@ -20,11 +22,13 @@ class @Annotatable
     init: () ->
         @initEvents()
         @initTips()
+        @initDiscussionReturnLinks()
 
     initEvents: () ->
         @annotationsHidden = false
         @$(@toggleSelector).bind 'click', @onClickToggleAnnotations
         @$(@wrapperSelector).delegate @replySelector, 'click', @onClickReply
+        $(@discussionXModuleSelector).delegate @returnSelector, 'click', @onClickReturn
 
     initTips: () ->
         @savedTips = []
@@ -35,13 +39,12 @@ class @Annotatable
                 at: 'bottom left'
                 container: @$(@wrapperSelector)
             content:
-                title: 'Annotated Reading Help'
-                text: "Move your cursor over the highlighted areas to display annotations. 
-                       Discuss the annotations in the forums using the link at the
-                       bottom of the annotation. You may hide annotations at any time by
-                       using the button at the top of the section."
-            style:
-                classes: 'ui-tooltip-annotatable'
+                title: 'Annotated Reading'
+                text: true # use title attribute of this element
+
+    initDiscussionReturnLinks: () ->
+        $(@discussionXModuleSelector).find(@discussionSelector).each (index, el) =>
+            $(el).after @createReturnLink(@getDiscussionId el)
 
     getTipOptions: (el) ->
         content:
@@ -62,7 +65,7 @@ class @Annotatable
         hide:
             event: 'unfocus'
         style:
-            classes: 'ui-tooltip-annotatable ui-tooltip-annotatable-comment'
+            classes: 'ui-tooltip-annotatable'
         events:
             show: @onShowTip
 
@@ -74,11 +77,20 @@ class @Annotatable
 
     onClickReply: (e) =>
         e.preventDefault()
-        @scrollTo(@getInlineDiscussion e.currentTarget)
+        discussion_el = @getInlineDiscussion e.currentTarget
+        @scrollTo(discussion_el, @afterScrollToDiscussion)
+
+    onClickReturn: (e) =>
+        e.preventDefault()
+        @scrollTo(@getSpan e.currentTarget, @afterScrollToSpan)
+
+    getSpan: (el) ->
+        discussion_id = @getDiscussionId(el)
+        @$(@spanSelector).filter("[data-discussion-id='#{discussion_id}']")
     
     getInlineDiscussion: (el) ->
         discussion_id = @getDiscussionId(el)
-        $(@inlineDiscussionSelector).filter("[data-discussion-id='#{discussion_id}']")
+        $(@discussionXModuleSelector).find(@discussionSelector).filter("[data-discussion-id='#{discussion_id}']")
 
     getDiscussionId: (el) ->
         $(el).data('discussion-id')
@@ -99,18 +111,19 @@ class @Annotatable
     toggleSpans: (hide) ->
         @$(@spanSelector).toggleClass 'hide', hide
 
-    scrollTo: (el) ->
+    scrollTo: (el, after) ->
         $('html,body').scrollTo(el, {
-            duration: 500,
-            onAfter: @makeAfterScroll(el)
+            duration: 500
+            #onAfter: @_once => after.call this, el
         })
  
-    makeAfterScroll: (el, duration = 1500) ->
-        @_once ->
+    afterScrollToDiscussion: () ->
+        (el) ->
             btn = $('.discussion-show', el)
-            if !btn.hasClass('shown')
-                btn.click()
-            #el.effect 'highlight', {}, duration
+            btn.click() if !btn.hasClass('shown')
+
+    afterScrollToSpan: (el) ->
+        (el) -> el.effect('highlight', {}, 500)
 
     makeTipContent: (el) ->
         (api) =>
@@ -127,6 +140,9 @@ class @Annotatable
 
     createReplyLink: (discussion_id) ->
         $("<a class=\"annotatable-reply\" href=\"javascript:void(0);\" data-discussion-id=\"#{discussion_id}\">See Full Discussion</a>")
+
+    createReturnLink: (discussion_id) ->
+        $("<a class=\"annotatable-return button\" href=\"javascript:void(0);\" data-discussion-id=\"#{discussion_id}\">Return to annotation</a>")
 
     openSavedTips: () ->
         @showTips @savedTips

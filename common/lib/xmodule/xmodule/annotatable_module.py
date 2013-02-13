@@ -50,18 +50,13 @@ class AnnotatableModule(XModule):
             del span.attrib['discussion']
     
     def _decorate_span(self, span, index, xmltree):
-        """ Decorates the span highlight.  """
+        """ Adds a highlight class to the span. """
 
         cls = ['annotatable-span', 'highlight']
         marker = self._get_marker_color(span)
         if marker is not None:
             cls.append('highlight-'+marker)
 
-        icon = etree.Element('span', { 'class': 'annotatable-icon ss-icon ss-textchat' })
-        icon.append(etree.Entity('#xE396'))
-        icon.tail = span.text
-        span.text = ''
-        span.insert(0, icon)
         span.set('class', ' '.join(cls))
         span.tag = 'div'
         
@@ -79,7 +74,7 @@ class AnnotatableModule(XModule):
             comment.set('class', 'annotatable-comment')
 
     def _get_marker_color(self, span):
-        """ Returns the name of the marker color for the span if it is valid, otherwise none."""
+        """ Returns the name of the marker/highlight color for the span if it is valid, otherwise none."""
 
         valid_markers = ['yellow', 'orange', 'purple', 'blue', 'green']
         if 'marker' in span.attrib:
@@ -88,7 +83,7 @@ class AnnotatableModule(XModule):
             if marker in valid_markers:
                 return marker
         return None
-    
+
     def _render(self):
         """ Renders annotatable content by transforming spans and adding discussions. """
 
@@ -98,6 +93,7 @@ class AnnotatableModule(XModule):
             self._decorate_span,
             self._decorate_comment
         ])
+        xmltree.tag = 'div'
 
         return etree.tostring(xmltree)
 
@@ -120,8 +116,6 @@ class AnnotatableModule(XModule):
         
         self.element_id = self.location.html_id();
         self.content = self.definition['data']
-        self.spans = {} 
-
 
 class AnnotatableDescriptor(RawDescriptor):
     module_class = AnnotatableModule
