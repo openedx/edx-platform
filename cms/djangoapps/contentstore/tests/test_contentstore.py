@@ -27,10 +27,12 @@ from xmodule.contentstore.django import contentstore
 from xmodule.templates import update_templates
 from xmodule.modulestore.xml_exporter import export_to_xml
 from xmodule.modulestore.xml_importer import import_from_xml
+from xmodule.templates import update_templates
 
 from xmodule.capa_module import CapaDescriptor
 from xmodule.course_module import CourseDescriptor
 from xmodule.seq_module import SequenceDescriptor
+from xmodule.modulestore.exceptions import ItemNotFoundError
 
 TEST_DATA_MODULESTORE = copy.deepcopy(settings.MODULESTORE)
 TEST_DATA_MODULESTORE['default']['OPTIONS']['fs_root'] = path('common/test/data')
@@ -409,3 +411,32 @@ class ContentStoreTest(ModuleStoreTestCase):
         self.assertIn('markdown', context, "markdown is missing from context")
         self.assertIn('markdown', problem.metadata, "markdown is missing from metadata")
         self.assertNotIn('markdown', problem.editable_metadata_fields, "Markdown slipped into the editable metadata fields")
+
+
+class TemplateTestCase(ModuleStoreTestCase):
+
+    def test_template_cleanup(self):        
+        ms = modulestore('direct')
+
+        # insert a bogus template in the store
+        bogus_template_location = Location('i4x', 'edx', 'templates', 'html', 'bogus')
+        source_template_location = Location('i4x', 'edx', 'templates', 'html', 'Empty')
+        
+        ms.clone_item(source_template_location, bogus_template_location)
+
+        verify_create = ms.get_item(bogus_template_location)
+        self.assertIsNotNone(verify_create)
+
+        # now run cleanup
+        update_templates()
+
+        # now try to find dangling template, it should not be in DB any longer
+        asserted = False
+        try:
+            verify_create = ms.get_item(bogus_template_location)
+        except ItemNotFoundError:
+            asserted = True
+
+        self.assertTrue(asserted)     
+
+

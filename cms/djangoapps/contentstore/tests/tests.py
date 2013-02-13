@@ -86,7 +86,6 @@ class ContentStoreTestCase(ModuleStoreTestCase):
         # Now make sure that the user is now actually activated
         self.assertTrue(user(email).is_active)
 
-
 class AuthTestCase(ContentStoreTestCase):
     """Check that various permissions-related things work"""
 
