@@ -19,6 +19,18 @@ log = logging.getLogger(__name__)
 
 
 class VideoAlphaModule(XModule):
+    """
+    XML source example:
+
+    <videoalpha show_captions="true"
+        youtube="0.75:jNCf2gIqpeE,1.0:ZwkTiUPN0mg,1.25:rsq9auxASqI,1.50:kMyNdzVHHgg"
+        url_name="lecture_21_3" display_name="S19V3: Vacancies"
+    >
+        <source src=".../mit-3091x/M-3091X-FA12-L21-3_100.mp4"/>
+        <source src=".../mit-3091x/M-3091X-FA12-L21-3_100.webm"/>
+        <source src=".../mit-3091x/M-3091X-FA12-L21-3_100.ogv"/>
+    </videoalpha>
+    """
     video_time = 0
     icon_class = 'video'
 
