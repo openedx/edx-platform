@@ -442,6 +442,7 @@ class OpenEndedChild(object):
             return success, allowed_to_submit, ""
         else:
             allowed_to_submit = False
+            #This is a student_facing_error
             error_message = error_string.format(count_required-count_graded, count_graded, count_required, student_sub_count)
             return success, allowed_to_submit, error_message
 
