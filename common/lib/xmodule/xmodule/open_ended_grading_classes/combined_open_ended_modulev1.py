@@ -340,6 +340,7 @@ class CombinedOpenEndedV1Module():
             'status': self.get_status(False),
             'display_name': self.display_name,
             'accept_file_upload': self.accept_file_upload,
+            'location': self.location,
             'legend_list' : LEGEND_LIST,
             }
 

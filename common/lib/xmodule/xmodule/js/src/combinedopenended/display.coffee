@@ -1,6 +1,21 @@
 class @Rubric
   constructor: () ->
 
+  @initialize: (location) ->
+    $('.rubric').data("location", location) 
+    $('input[class="score-selection"]').change @tracking_callback
+
+  @tracking_callback: (event) ->
+    target_selection = $(event.target).val()
+    # chop off the beginning of the name so that we can get the number of the category
+    category = $(event.target).prop("name").substring(16)
+    location = $('.rubric').data('location')
+    # probably want the original problem location as well
+
+    data = {location: location, selection: target_selection, category: category}
+    Logger.log 'rubric_select', data
+
+
   # finds the scores for each rubric category
   @get_score_list: () =>
     # find the number of categories:
@@ -45,6 +60,8 @@ class @CombinedOpenEnded
     @task_count = @el.data('task-count')
     @task_number = @el.data('task-number')
     @accept_file_upload = @el.data('accept-file-upload')
+    @location = @el.data('location')
+    Rubric.initialize(@location)
 
     @allow_reset = @el.data('allow_reset')
     @reset_button = @$('.reset-button')
@@ -153,7 +170,6 @@ class @CombinedOpenEnded
         @legend_container= $('.legend-container')
 
   message_post: (event)=>
-    Logger.log 'message_post', @answers
     external_grader_message=$(event.target).parent().parent().parent()
     evaluation_scoring = $(event.target).parent()
 
@@ -181,6 +197,7 @@ class @CombinedOpenEnded
         @gentle_alert response.msg
         $('section.evaluation').slideToggle()
         @message_wrapper.html(response.message_html)
+
 
     $.ajaxWithPrefix("#{@ajax_url}/save_post_assessment", settings)
 

@@ -420,6 +420,7 @@ class @PeerGradingProblem
     @submit_button.hide()
     @action_button.hide()
     @calibration_feedback_panel.hide()
+    Rubric.initialize(@location)
 
 
   render_calibration_feedback: (response) =>

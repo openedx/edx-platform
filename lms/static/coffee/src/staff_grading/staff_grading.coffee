@@ -148,6 +148,7 @@ The standard chunk of Lorem Ipsum used since the 1500s is reproduced below for t
 
 class @StaffGrading
   constructor: (backend) ->
+    AjaxPrefix.addAjaxPrefix(jQuery, -> "")
     @backend = backend
 
     # all the jquery selectors
@@ -218,6 +219,7 @@ class @StaffGrading
   setup_score_selection: =>
     @score_selection_container.html(@rubric)
     $('.score-selection').click => @graded_callback()
+    Rubric.initialize(@location)
 
 
   graded_callback: () =>
