@@ -50,7 +50,7 @@ class CombinedOpenEndedRubric(object):
         success = False
         try:
             rubric_categories = self.extract_categories(rubric_xml)
-            if score_list:
+            if score_list and len(score_list)==len(rubric_categories):
                 for i in xrange(0,len(rubric_categories)):
                     category = rubric_categories[i]
                     for j in xrange(0,len(category['options'])):
