@@ -19,6 +19,18 @@ log = logging.getLogger(__name__)
 
 
 class VideoAlphaModule(XModule):
+    """
+    XML source example:
+
+        <videoalpha show_captions="true"
+            youtube="0.75:jNCf2gIqpeE,1.0:ZwkTiUPN0mg,1.25:rsq9auxASqI,1.50:kMyNdzVHHgg"
+            url_name="lecture_21_3" display_name="S19V3: Vacancies"
+        >
+            <source src=".../mit-3091x/M-3091X-FA12-L21-3_100.mp4"/>
+            <source src=".../mit-3091x/M-3091X-FA12-L21-3_100.webm"/>
+            <source src=".../mit-3091x/M-3091X-FA12-L21-3_100.ogv"/>
+        </videoalpha>
+    """
     video_time = 0
     icon_class = 'video'
 
@@ -39,14 +51,16 @@ class VideoAlphaModule(XModule):
         XModule.__init__(self, system, location, definition, descriptor,
                          instance_state, shared_state, **kwargs)
         xmltree = etree.fromstring(self.definition['data'])
-        self.youtube = xmltree.get('youtube')
+        self.youtube_streams = xmltree.get('youtube')
         self.sub = xmltree.get('sub')
         self.position = 0
         self.show_captions = xmltree.get('show_captions', 'true')
-        self.source = self._get_source(xmltree)
-        self.mp4_source = self._get_source(xmltree, ['mp4'])
-        self.webm_source = self._get_source(xmltree, ['webm'])
-        self.ogv_source = self._get_source(xmltree, ['ogv'])
+        self.sources = {
+            'main': self._get_source(xmltree),
+            'mp4': self._get_source(xmltree, ['mp4']),
+            'webm': self._get_source(xmltree, ['webm']),
+            'ogv': self._get_source(xmltree, ['ogv']),
+        }
         self.track = self._get_track(xmltree)
         self.start_time, self.end_time = self._get_timeframe(xmltree)
 
@@ -109,25 +123,12 @@ class VideoAlphaModule(XModule):
             return json.dumps({'success': True})
         raise Http404()
 
-    def get_progress(self):
-        ''' TODO (vshnayder): Get and save duration of youtube video, then return
-        fraction watched.
-        (Be careful to notice when video link changes and update)
-
-        For now, we have no way of knowing if the video has even been watched, so
-        just return None.
-        '''
-        return None
-
     def get_instance_state(self):
         #log.debug(u"STATE POSITION {0}".format(self.position))
         return json.dumps({'position': self.position})
 
-    def videoalpha_list(self):
-        return self.youtube
-
     def get_html(self):
-        if isinstance(modulestore(), MongoModuleStore) :
+        if isinstance(modulestore(), MongoModuleStore):
             caption_asset_path = StaticContent.get_base_url_path_for_course_assets(self.location) + '/subs_'
         else:
             # VS[compat]
@@ -135,14 +136,10 @@ class VideoAlphaModule(XModule):
             caption_asset_path = "/static/{0}/subs/".format(self.metadata['data_dir'])
 
         return self.system.render_template('videoalpha.html', {
-            'streams': self.videoalpha_list(),
+            'youtube_streams': self.youtube_streams,
             'id': self.location.html_id(),
-            'position': self.position,
-            'mp4_source': self.mp4_source,
-            'webm_source': self.webm_source,
-            'ogv_source': self.ogv_source,
             'sub': self.sub,
-            'source': self.source,
+            'sources': self.sources,
             'track': self.track,
             'display_name': self.display_name,
             # TODO (cpennington): This won't work when we move to data that isn't on the filesystem
