@@ -742,11 +742,11 @@ class TestViewAuth(PageLoader):
         yesterday = time.time() - 24 * 3600
 
         # toy course's hasn't started
-        self.toy.metadata['start'] = stringify_time(time.gmtime(tomorrow))
+        self.toy.lms.start = time.gmtime(tomorrow)
         self.assertFalse(self.toy.has_started())
 
         # but should be accessible for beta testers
-        self.toy.days_early_for_beta = 2
+        self.toy.lms.days_early_for_beta = 2
 
         # student user shouldn't see it
         student_user = user(self.student)

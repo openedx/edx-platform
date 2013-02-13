@@ -94,26 +94,26 @@ class IsNewCourseTestCase(unittest.TestCase):
 
 
     @patch('xmodule.course_module.time.gmtime')
-    def test_is_new(self, gmtime_mock):
+    def test_is_newish(self, gmtime_mock):
         gmtime_mock.return_value = NOW
 
         descriptor = self.get_dummy_course(start='2012-12-02T12:00', is_new=True)
-        assert(descriptor.is_new is True)
+        assert(descriptor.is_newish is True)
 
         descriptor = self.get_dummy_course(start='2013-02-02T12:00', is_new=False)
         assert(descriptor.is_new is False)
 
         descriptor = self.get_dummy_course(start='2013-02-02T12:00', is_new=True)
-        assert(descriptor.is_new is True)
+        assert(descriptor.is_newish is True)
 
         descriptor = self.get_dummy_course(start='2013-01-15T12:00')
-        assert(descriptor.is_new is True)
+        assert(descriptor.is_newish is True)
 
         descriptor = self.get_dummy_course(start='2013-03-00T12:00')
-        assert(descriptor.is_new is True)
+        assert(descriptor.is_newish is True)
 
         descriptor = self.get_dummy_course(start='2012-10-15T12:00')
-        assert(descriptor.is_new is False)
+        assert(descriptor.is_newish is False)
 
         descriptor = self.get_dummy_course(start='2012-12-31T12:00')
-        assert(descriptor.is_new is True)
+        assert(descriptor.is_newish is True)

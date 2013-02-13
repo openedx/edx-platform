@@ -58,10 +58,10 @@ class SelfAssessmentModule(openendedchild.OpenEndedChild):
 
     # Used for progress / grading.  Currently get credit just for
     # completion (doesn't matter if you self-assessed correct/incorrect).
-    max_score = Integer(scope=Scope.settings, default=MAX_SCORE)
+    max_score = Integer(scope=Scope.settings, default=openendedchild.MAX_SCORE)
+    max_attempts = Integer(scope=Scope.settings, default=openendedchild.MAX_ATTEMPTS)
 
     attempts = Integer(scope=Scope.student_state, default=0)
-    max_attempts = Integer(scope=Scope.settings, default=MAX_ATTEMPTS)
     rubric = String(scope=Scope.content)
     prompt = String(scope=Scope.content)
     submitmessage = String(scope=Scope.content)
@@ -318,9 +318,9 @@ class SelfAssessmentDescriptor(XmlDescriptor, EditingDescriptor):
 
     # Used for progress / grading.  Currently get credit just for
     # completion (doesn't matter if you self-assessed correct/incorrect).
-    max_score = Integer(scope=Scope.settings, default=MAX_SCORE)
+    max_score = Integer(scope=Scope.settings, default=openendedchild.MAX_SCORE)
 
-    max_attempts = Integer(scope=Scope.settings, default=MAX_ATTEMPTS)
+    max_attempts = Integer(scope=Scope.settings, default=openendedchild.MAX_ATTEMPTS)
     rubric = String(scope=Scope.content)
     prompt = String(scope=Scope.content)
     submitmessage = String(scope=Scope.content)

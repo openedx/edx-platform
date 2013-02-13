@@ -177,7 +177,7 @@ class GraphicalSliderToolDescriptor(MakoModuleDescriptor, XmlDescriptor):
         return {
                     'render': parse('render'),
                     'configuration': parse('configuration')
-                }
+                }, []
 
     def definition_to_xml(self, resource_fs):
         '''Return an xml element representing this definition.'''

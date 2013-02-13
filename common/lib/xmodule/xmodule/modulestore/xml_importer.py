@@ -199,16 +199,13 @@ def import_from_xml(store, data_dir, course_dirs=None,
     course_items = []
     for course_id in module_store.modules.keys():
 
-        course_data_path = None
-        course_location = None
-
         # Import course modules first, because importing some of the children requires the course to exist
         for module in module_store.modules[course_id].itervalues():
             if module.category == 'course':
                 import_course_from_xml(
                     store,
                     static_content_store,
-                    course_data_path,
+                    data_dir / module.data_dir,
                     module,
                     target_location_namespace,
                     verbose=verbose
@@ -220,7 +217,7 @@ def import_from_xml(store, data_dir, course_dirs=None,
                 import_module_from_xml(
                     store,
                     static_content_store,
-                    course_data_path,
+                    data_dir / module.data_dir,
                     module,
                     target_location_namespace,
                     verbose=verbose

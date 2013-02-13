@@ -443,7 +443,11 @@ def static_tab(request, course_id, tab_slug):
     if tab is None:
         raise Http404
 
-    contents = tabs.get_static_tab_contents(request, None, course, tab)
+    contents = tabs.get_static_tab_contents(
+        request,
+        course,
+        tab
+    )
     if contents is None:
         raise Http404
 

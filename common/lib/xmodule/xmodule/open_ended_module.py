@@ -20,7 +20,6 @@ import capa.xqueue_interface as xqueue_interface
 
 from pkg_resources import resource_string
 
-from .capa_module import only_one, ComplexEncoder
 from .editing_module import EditingDescriptor
 from .html_checker import check_html
 from progress import Progress
@@ -656,7 +655,7 @@ class OpenEndedDescriptor(XmlDescriptor, EditingDescriptor):
             """Assumes that xml_object has child k"""
             return xml_object.xpath(k)[0]
 
-        return {'oeparam': parse('openendedparam'), }
+        return {'oeparam': parse('openendedparam')}, []
 
 
     def definition_to_xml(self, resource_fs):

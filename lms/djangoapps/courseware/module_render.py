@@ -145,7 +145,7 @@ def get_module(user, request, location, model_data_cache, course_id,
         location = Location(location)
         descriptor = modulestore().get_instance(course_id, location, depth=depth)
         return get_module_for_descriptor(user, request, descriptor, model_data_cache, course_id,
-                                         position=position, not_found_ok=not_found_ok,
+                                         position=position,
                                          wrap_xmodule_display=wrap_xmodule_display,
                                          grade_bucket_type=grade_bucket_type)
     except ItemNotFoundError:
@@ -205,14 +205,14 @@ def get_module_for_descriptor(user, request, descriptor, model_data_cache, cours
         Delegate to get_module.  It does an access check, so may return None
         """
         return get_module_for_descriptor(user, request, descriptor,
-                                         student_module_cache, course_id, position)
+                                         model_data_cache, course_id, position)
 
     def xblock_model_data(descriptor):
         return DbModel(
             LmsKeyValueStore(descriptor._model_data, model_data_cache),
             descriptor.module_class,
             user.id,
-            LmsUsage(location, location)
+            LmsUsage(descriptor.location, descriptor.location)
         )
 
     def publish(event):
@@ -260,7 +260,7 @@ def get_module_for_descriptor(user, request, descriptor, model_data_cache, cours
                           # by the replace_static_urls code below
                           replace_urls=partial(
                               static_replace.replace_static_urls,
-                              data_directory=descriptor.metadata.get('data_dir', ''),
+                              data_directory=descriptor.data_dir,
                               course_namespace=descriptor.location._replace(category=None, name=None),
                           ),
                           node_path=settings.NODE_PATH,
@@ -282,7 +282,7 @@ def get_module_for_descriptor(user, request, descriptor, model_data_cache, cours
         log.exception("Error creating module from descriptor {0}".format(descriptor))
 
         # make an ErrorDescriptor -- assuming that the descriptor's system is ok
-        if has_access(user, location, 'staff', course_id):
+        if has_access(user, descriptor.location, 'staff', course_id):
             err_descriptor_class = ErrorDescriptor
         else:
             err_descriptor_class = NonStaffErrorDescriptor

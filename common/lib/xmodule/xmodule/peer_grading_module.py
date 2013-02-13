@@ -32,6 +32,7 @@ from .stringify import stringify_children
 from .x_module import XModule
 from .xml_module import XmlDescriptor
 from xmodule.modulestore import Location
+from xblock.core import Scope, Object, Integer, Boolean, String
 
 from peer_grading_service import peer_grading_service, GradingServiceError
 
@@ -56,32 +57,26 @@ class PeerGradingModule(XModule):
 
     css = {'scss': [resource_string(__name__, 'css/combinedopenended/display.scss')]}
 
-    def __init__(self, system, location, definition, descriptor,
-                 instance_state=None, shared_state=None, **kwargs):
-        XModule.__init__(self, system, location, definition, descriptor,
-            instance_state, shared_state, **kwargs)
+    student_data_for_location = Object(scope=Scope.student_state)
+    max_grade = Integer(default=MAX_SCORE, scope=Scope.student_state)
+    use_for_single_location = Boolean(default=USE_FOR_SINGLE_LOCATION, scope=Scope.settings)
+    is_graded = Boolean(default=IS_GRADED, scope=Scope.settings)
+    link_to_location = String(default=LINK_TO_LOCATION, scope=Scope.settings)
 
-        # Load instance state
-        if instance_state is not None:
-            instance_state = json.loads(instance_state)
-        else:
-            instance_state = {}
+    def __init__(self, *args, **kwargs):
+        super(PeerGradingModule, self).__init__(*args, **kwargs)
 
         #We need to set the location here so the child modules can use it
-        system.set('location', location)
-        self.system = system
+        self.system.set('location', self.location)
         self.peer_gs = peer_grading_service(self.system)
 
-        self.use_for_single_location = self.metadata.get('use_for_single_location', USE_FOR_SINGLE_LOCATION)
         if isinstance(self.use_for_single_location, basestring):
             self.use_for_single_location = (self.use_for_single_location in TRUE_DICT)
 
-        self.is_graded = self.metadata.get('is_graded', IS_GRADED)
         if isinstance(self.is_graded, basestring):
             self.is_graded = (self.is_graded in TRUE_DICT)
 
-        self.link_to_location = self.metadata.get('link_to_location', USE_FOR_SINGLE_LOCATION)
-        if self.use_for_single_location == True:
+        if self.use_for_single_location:
             #This will raise an exception if the location is invalid
             link_to_location_object = Location(self.link_to_location)
 
@@ -89,8 +84,6 @@ class PeerGradingModule(XModule):
         if not self.ajax_url.endswith("/"):
             self.ajax_url = self.ajax_url + "/"
 
-        self.student_data_for_location = instance_state.get('student_data_for_location', {})
-        self.max_grade = instance_state.get('max_grade', MAX_SCORE)
         if not isinstance(self.max_grade, (int, long)):
             #This could result in an exception, but not wrapping in a try catch block so it moves up the stack
             self.max_grade = int(self.max_grade)
@@ -521,7 +514,7 @@ class PeerGradingDescriptor(XmlDescriptor, EditingDescriptor):
             """Assumes that xml_object has child k"""
             return xml_object.xpath(k)[0]
 
-        return {}
+        return {}, []
 
 
     def definition_to_xml(self, resource_fs):

@@ -169,6 +169,11 @@ class CourseDescriptor(SequenceDescriptor):
         computed_default=lambda c: {'General': {'id': c.location.html_id()}},
         )
     testcenter_info = Object(help="Dictionary of Test Center info", scope=Scope.settings)
+    announcement = Date(help="Date this course is announced", scope=Scope.settings)
+    cohort_config = Object(help="Dictionary defining cohort configuration", scope=Scope.settings)
+    is_new = Boolean(help="Whether this course should be flagged as new", scope=Scope.settings)
+    no_grade = Boolean(help="True if this course isn't graded", default=False, scope=Scope.settings)
+    disable_progress_graph = Boolean(help="True if this course shouldn't display the progress graph", default=False, scope=Scope.settings)
     has_children = True
 
     info_sidebar_name = String(scope=Scope.settings, default='Course Handouts')
@@ -410,26 +415,11 @@ class CourseDescriptor(SequenceDescriptor):
         return min(self._grading_policy['GRADE_CUTOFFS'].values())
 
     @property
-    def tabs(self):
-        """
-        Return the tabs config, as a python object, or None if not specified.
-        """
-        return self.metadata.get('tabs')
-
-    @tabs.setter
-    def tabs(self, value):
-        self.metadata['tabs'] = value
-
-    @property
-    def show_calculator(self):
-        return self.metadata.get("show_calculator", None) == "Yes"
-
-    @property
     def is_cohorted(self):
         """
         Return whether the course is cohorted.
         """
-        config = self.metadata.get("cohort_config")
+        config = self.cohort_config
         if config is None:
             return False
 
@@ -440,7 +430,7 @@ class CourseDescriptor(SequenceDescriptor):
         """
         Return list of topic ids defined in course policy.
         """
-        topics = self.metadata.get("discussion_topics", {})
+        topics = self.discussion_topics
         return [d["id"] for d in topics.values()]
 
 
@@ -451,7 +441,7 @@ class CourseDescriptor(SequenceDescriptor):
         the empty set.  Note that all inline discussions are automatically
         cohorted based on the course's is_cohorted setting.
         """
-        config = self.metadata.get("cohort_config")
+        config = self.cohort_config
         if config is None:
             return set()
 
@@ -460,13 +450,13 @@ class CourseDescriptor(SequenceDescriptor):
 
 
     @property
-    def is_new(self):
+    def is_newish(self):
         """
-        Returns if the course has been flagged as new in the metadata. If
+        Returns if the course has been flagged as new. If
         there is no flag, return a heuristic value considering the
         announcement and the start dates.
         """
-        flag = self.metadata.get('is_new', None)
+        flag = self.is_new
         if flag is None:
             # Use a heuristic if the course has not been flagged
             announcement, start, now = self._sorting_dates()
@@ -512,12 +502,10 @@ class CourseDescriptor(SequenceDescriptor):
         def to_datetime(timestamp):
             return datetime(*timestamp[:6])
 
-        def get_date(field):
-            timetuple = self._try_parse_time(field)
-            return to_datetime(timetuple) if timetuple else None
-
-        announcement = get_date('announcement')
-        start = get_date('advertised_start') or to_datetime(self.start)
+        announcement = self.announcement
+        if announcement is not None:
+            announcement = to_datetime(announcement)
+        start = self.advertised_start or to_datetime(self.start)
         now = to_datetime(time.gmtime())
 
         return announcement, start, now
@@ -719,7 +707,7 @@ class CourseDescriptor(SequenceDescriptor):
     def get_test_center_exam(self, exam_series_code):
         exams = [exam for exam in self.test_center_exams if exam.exam_series_code == exam_series_code]
         return exams[0] if len(exams) == 1 else None
-        
+
     @property
     def title(self):
         return self.display_name

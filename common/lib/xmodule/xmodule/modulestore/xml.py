@@ -456,6 +456,9 @@ class XMLModuleStore(ModuleStoreBase):
     def _load_extra_content(self, system, course_descriptor, category, path, course_dir):
 
         for filepath in glob.glob(path / '*'):
+            if not os.path.isfile(filepath):
+                continue
+
             with open(filepath) as f:
                 try:
                     html = f.read().decode('utf-8')

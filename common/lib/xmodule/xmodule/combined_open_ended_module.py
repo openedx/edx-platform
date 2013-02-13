@@ -190,7 +190,7 @@ class CombinedOpenEndedDescriptor(XmlDescriptor, EditingDescriptor):
         }
         """
 
-        return {'xml_string' : etree.tostring(xml_object), 'metadata' : xml_object.attrib}
+        return {'xml_string' : etree.tostring(xml_object), 'metadata' : xml_object.attrib}, []
 
 
     def definition_to_xml(self, resource_fs):

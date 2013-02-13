@@ -4,6 +4,7 @@ import logging
 from xmodule.x_module import XModule
 from xmodule.modulestore import Location
 from xmodule.seq_module import SequenceDescriptor
+from xblock.core import String, Scope
 
 from pkg_resources import resource_string
 
@@ -34,6 +35,7 @@ class ConditionalModule(XModule):
     js_module_name = "Conditional"
     css = {'scss': [resource_string(__name__, 'css/capa/display.scss')]}
 
+    condition = String(help="Condition for this module", default='', scope=Scope.settings)
 
     def __init__(self, system, location, definition, descriptor, instance_state=None, shared_state=None, **kwargs):
         """
@@ -44,7 +46,6 @@ class ConditionalModule(XModule):
         """
         XModule.__init__(self, system, location, definition, descriptor, instance_state, shared_state, **kwargs)
         self.contents = None
-        self.condition = self.metadata.get('condition', '')
         self._get_required_modules()
         children = self.get_display_items()
         if children:
@@ -128,16 +129,18 @@ class ConditionalDescriptor(SequenceDescriptor):
     stores_state = True
     has_score = False
 
+    required = String(help="List of required xmodule locations, separated by &", default='', scope=Scope.settings)
+
     def __init__(self, *args, **kwargs):
         super(ConditionalDescriptor, self).__init__(*args, **kwargs)
 
-        required_module_list = [tuple(x.split('/', 1)) for x in self.metadata.get('required', '').split('&')]
+        required_module_list = [tuple(x.split('/', 1)) for x in self.required.split('&')]
         self.required_module_locations = []
         for rm in required_module_list:
             try:
                 (tag, name) = rm
             except Exception as err:
-                msg = "Specification of required module in conditional is broken: %s" % self.metadata.get('required')
+                msg = "Specification of required module in conditional is broken: %s" % self.required
                 log.warning(msg)
                 self.system.error_tracker(msg)
                 continue

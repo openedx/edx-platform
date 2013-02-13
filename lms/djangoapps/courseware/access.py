@@ -442,7 +442,7 @@ def _adjust_start_date_for_beta_testers(user, descriptor):
     NOTE: If testing manually, make sure MITX_FEATURES['DISABLE_START_DATES'] = False
     in envs/dev.py!
     """
-    if descriptor.days_early_for_beta is None:
+    if descriptor.lms.days_early_for_beta is None:
         # bail early if no beta testing is set up
         return descriptor.lms.start
 
@@ -456,12 +456,12 @@ def _adjust_start_date_for_beta_testers(user, descriptor):
         # (fun fact: datetime(*a_time_struct[:6]) is the beautiful syntax for
         # converting time_structs into datetimes)
         start_as_datetime = datetime(*descriptor.lms.start[:6])
-        delta = timedelta(descriptor.days_early_for_beta)
+        delta = timedelta(descriptor.lms.days_early_for_beta)
         effective = start_as_datetime - delta
         # ...and back to time_struct
         return effective.timetuple()
 
-    return descriptor.start
+    return descriptor.lms.start
 
 
 def _has_instructor_access_to_location(user, location, course_context=None):
