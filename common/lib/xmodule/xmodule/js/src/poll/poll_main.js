@@ -1,11 +1,5 @@
 (function (requirejs, require, define) {
 define('PollMain', ['logme'], function (logme) {
-    var debugMode;
-
-    debugMode = false;
-    if (debugMode === true) {
-        logme('MESSAGE: We are in debug mode.');
-    }
 
 PollMain.prototype = {
 
@@ -50,37 +44,20 @@ PollMain.prototype = {
 
     answerObj.buttonEl.addClass('answered');
 
-    if (debugMode === true) {
-        (function () {
-            var response;
-
-            response = {
-                'poll_answers': {
-                    'Yes': '1',
-                    'No': '1',
-                    'Dont_know': '8'
-                },
-                'total': '10'
-            };
-
+    // Send the data to the server as an AJAX request. Attach a callback that will
+    // be fired on server's response.
+    $.postWithPrefix(
+        _this.ajax_url + '/' + answer,  {},
+        function (response) {
             _this.showAnswerGraph(response.poll_answers, response.total);
-        }());
-    } else {
-        // Send the data to the server as an AJAX request. Attach a callback that will
-        // be fired on server's response.
-        $.postWithPrefix(
-            _this.ajax_url + '/' + answer,  {},
-            function (response) {
-                _this.showAnswerGraph(response.poll_answers, response.total);
 
-                if (_this.wrapperSectionEl !== null) {
-                    $(_this.wrapperSectionEl).find('.xmodule_ConditionalModule').each(function (index, value) {
-                        new window.Conditional(value);
-                    });
-                }
+            if (_this.wrapperSectionEl !== null) {
+                $(_this.wrapperSectionEl).find('.xmodule_ConditionalModule').each(function (index, value) {
+                    new window.Conditional(value);
+                });
             }
-        );
-    }
+        }
+    );
 }, // End-of: 'submitAnswer': function (answer, answerEl) {
 
 'postInit': function () {
@@ -163,6 +140,10 @@ PollMain.prototype = {
 
         answer.el.appendTo(_this.questionEl);
 
+        answer.textEl.on('click', function () {
+            _this.submitAnswer(index, answer);
+        });
+
         answer.buttonEl.on('click', function () {
             _this.submitAnswer(index, answer);
         });
@@ -239,92 +220,32 @@ function PollMain(el) {
         }
     }($(el)[0], 0));
 
-    // Test case for when the server part is still not ready. Change to 'false' so you can test actual server
-    // generated JSON config.
-    if (debugMode === true) {
-        (function () {
-            var testNum;
+    try {
+        this.jsonConfig = JSON.parse(this.questionEl.children('.poll_question_div').html());
 
-            // Test for when the user has already answered.
-            // testNum = 1;
+        $.postWithPrefix(
+            '' + this.questionEl.data('ajax-url') + '/' + 'get_state',  {},
+            function (response) {
+                _this.jsonConfig.poll_answer = response.poll_answer;
+                _this.jsonConfig.total = response.total;
 
-            // Test for when the user did not answer yet.
-            testNum = 2;
+                $.each(response.poll_answers, function (index, value) {
+                    _this.jsonConfig.poll_answers[index] = value;
+                });
 
-            if (testNum === 1) {
-                _this.jsonConfig = {
-                    'poll_answers': {
-                        'Dont_know': '2',
-                        'No': '1',
-                        'Yes': '4'
-                    },
-                    'total': '7',
-                    'poll_answer': 'No',
-                    'answers': {
-                        'Dont_know':
-                            'Don\'t know. What does it mean to not know? Well, the student must be able to ' +
-                            'answer this question for himself. In the case when difficulties arise, he should' +
-                            'consult a TA.',
-                        'No': 'No',
-                        'Yes': 'Yes'
-                    },
-                    'question':
-                        "&lt;h3&gt;What's the Right Thing to Do?&lt;/h3&gt;&lt;p&gt;Suppose four shipwrecked " +
-                        "sailors are stranded at sea in a lifeboat, without food or water. Would it be wrong for " +
-                        "three of them to kill and eat the cabin boy, in order to save their own lives?&lt;/p&gt;"
-                };
-            } else if (testNum === 2) {
-                _this.jsonConfig = {
-                    'poll_answers': {},
-                    'total': '',
-                    'poll_answer': '',
-                    'answers': {
-                        'Dont_know':
-                            'Don\'t know. What does it mean to not know? Well, the student must be able to ' +
-                            'answer this question for himself. In the case when difficulties arise, he should' +
-                            'consult a TA.',
-                        'No': 'No',
-                        'Yes': 'Yes'
-                    },
-                    'question':
-                        "&lt;h3&gt;What's the Right Thing to Do?&lt;/h3&gt;&lt;p&gt;Suppose four shipwrecked " +
-                        "sailors are stranded at sea in a lifeboat, without food or water. Would it be wrong for " +
-                        "three of them to kill and eat the cabin boy, in order to save their own lives?&lt;/p&gt;"
-                };
+                _this.questionEl.children('.poll_question_div').html(JSON.stringify(_this.jsonConfig));
+                _this.postInit();
             }
-
-            _this.postInit();
-        }());
+        );
 
         return;
-    } else {
-        try {
-            this.jsonConfig = JSON.parse(this.questionEl.children('.poll_question_div').html());
+    } catch (err) {
+        logme(
+            'ERROR: Invalid JSON config for poll ID "' + this.id + '".',
+            'Error messsage: "' + err.message + '".'
+        );
 
-            $.postWithPrefix(
-                '' + this.questionEl.data('ajax-url') + '/' + 'get_state',  {},
-                function (response) {
-                    _this.jsonConfig.poll_answer = response.poll_answer;
-                    _this.jsonConfig.total = response.total;
-
-                    $.each(response.poll_answers, function (index, value) {
-                        _this.jsonConfig.poll_answers[index] = value;
-                    });
-
-                    _this.questionEl.children('.poll_question_div').html(JSON.stringify(_this.jsonConfig));
-                    _this.postInit();
-                }
-            );
-
-            return;
-        } catch (err) {
-            logme(
-                'ERROR: Invalid JSON config for poll ID "' + this.id + '".',
-                'Error messsage: "' + err.message + '".'
-            );
-
-            return;
-        }
+        return;
     }
 } // End-of: function PollMain(el) {
 

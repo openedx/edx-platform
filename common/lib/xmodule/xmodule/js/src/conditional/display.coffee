@@ -23,9 +23,18 @@ class @Conditional
           @el.html ''
           @el.append(i) for i in response.html
 
+          parentEl = $(element).parent()
+          parentId = parentEl.attr 'id'
+
           if @el.html().length < 5
-            $(element).hide()
+            if parentId.indexOf('vert') is 0
+              parentEl.hide()
+            else
+              $(element).hide()
           else
-            $(element).show()
+            if parentId.indexOf('vert') is 0
+              parentEl.show()
+            else
+              $(element).show()
 
           XModule.loadModules @el
