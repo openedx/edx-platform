@@ -39,7 +39,7 @@ class VideoAlphaModule(XModule):
         XModule.__init__(self, system, location, definition, descriptor,
                          instance_state, shared_state, **kwargs)
         xmltree = etree.fromstring(self.definition['data'])
-        self.youtube = xmltree.get('youtube')
+        self.youtube_streams = xmltree.get('youtube')
         self.sub = xmltree.get('sub')
         self.position = 0
         self.show_captions = xmltree.get('show_captions', 'true')
@@ -115,9 +115,6 @@ class VideoAlphaModule(XModule):
         #log.debug(u"STATE POSITION {0}".format(self.position))
         return json.dumps({'position': self.position})
 
-    def videoalpha_list(self):
-        return self.youtube
-
     def get_html(self):
         if isinstance(modulestore(), MongoModuleStore):
             caption_asset_path = StaticContent.get_base_url_path_for_course_assets(self.location) + '/subs_'
@@ -127,7 +124,7 @@ class VideoAlphaModule(XModule):
             caption_asset_path = "/static/{0}/subs/".format(self.metadata['data_dir'])
 
         return self.system.render_template('videoalpha.html', {
-            'streams': self.videoalpha_list(),
+            'youtube_streams': self.youtube_streams,
             'id': self.location.html_id(),
             'sub': self.sub,
             'sources': self.sources,
