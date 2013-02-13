@@ -26,7 +26,7 @@ class @Conditional
           parentEl = $(element).parent()
           parentId = parentEl.attr 'id'
 
-          if @el.html().length < 5
+          if response.message is false
             if parentId.indexOf('vert') is 0
               parentEl.hide()
             else
