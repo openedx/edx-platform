@@ -111,16 +111,6 @@ class VideoAlphaModule(XModule):
             return json.dumps({'success': True})
         raise Http404()
 
-    def get_progress(self):
-        ''' TODO (vshnayder): Get and save duration of youtube video, then return
-        fraction watched.
-        (Be careful to notice when video link changes and update)
-
-        For now, we have no way of knowing if the video has even been watched, so
-        just return None.
-        '''
-        return None
-
     def get_instance_state(self):
         #log.debug(u"STATE POSITION {0}".format(self.position))
         return json.dumps({'position': self.position})
@@ -139,7 +129,6 @@ class VideoAlphaModule(XModule):
         return self.system.render_template('videoalpha.html', {
             'streams': self.videoalpha_list(),
             'id': self.location.html_id(),
-            'position': self.position,
             'sub': self.sub,
             'sources': self.sources,
             'track': self.track,
