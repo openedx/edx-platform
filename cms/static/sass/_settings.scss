@@ -569,6 +569,18 @@
           min-height: 20px;
           max-height: 200px;
         }
+
+        // editor color changes just for JSON
+        .CodeMirror-lines {
+
+          .cm-string {
+            color: #cb9c40;
+          }
+
+          pre {
+            margin-bottom: 5px;
+          }
+        }
       }
 
       // messages - should be synced up with global messages in the future
