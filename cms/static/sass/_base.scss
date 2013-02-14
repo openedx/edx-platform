@@ -224,9 +224,11 @@ h1 {
   }
 
   .introduction {
+    @include box-sizing(border-box);
     @include font-size(14);
     width: flex-grid(12);
     margin: 0 0 $baseline 0;
+    padding: 0 $baseline;
 
     .copy strong {
       font-weight: 600;
