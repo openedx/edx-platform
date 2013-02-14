@@ -112,14 +112,9 @@ class FolditDescriptor(XmlDescriptor, EditingDescriptor):
     js = {'coffee': [resource_string(__name__, 'js/src/html/edit.coffee')]}
     js_module_name = "HTMLEditingDescriptor"
 
-    @property
-    def always_recalculate_grades(self):
-        """
-        The grade changes without any student interaction with the edx website,
-        so always need to actually check.
-        """
-        return True
-
+    # The grade changes without any student interaction with the edx website,
+    # so always need to actually check.
+    always_recalculate_grades = True
 
     @classmethod
     def definition_from_xml(cls, xml_object, system):
