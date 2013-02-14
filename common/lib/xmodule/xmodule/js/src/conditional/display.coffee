@@ -1,16 +1,26 @@
 class @Conditional
 
-  constructor: (element) ->
+  constructor: (element, callerElId) ->
     @el = $(element).find('.conditional-wrapper')
 
-    if @el.data('passed') is true
-      @passed = true
+    @callerElId = callerElId
 
+    if @el.data('passed') is true
       return
     else if @el.data('passed') is false
       @passed = false
     else
       @passed = null
+
+    if callerElId isnt undefined and @passed isnt null
+      console.log 'callerElId isnt undefined and @passed isnt null'
+
+      dependencies = @el.data('depends')
+      console.log 'dependencies: ', dependencies
+      console.log 'callerElId: ', callerElId
+      if (typeof dependencies is 'string') and (dependencies.length > 0) and (dependencies.indexOf(callerElId) is -1)
+        console.log 'Caller ID was not found in the dependencies.'
+        return
 
     @url = @el.data('url')
     @render(element)

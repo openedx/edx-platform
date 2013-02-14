@@ -53,7 +53,7 @@ PollMain.prototype = {
 
             if (_this.wrapperSectionEl !== null) {
                 $(_this.wrapperSectionEl).find('.xmodule_ConditionalModule').each(function (index, value) {
-                    new window.Conditional(value);
+                    new window.Conditional(value, _this.id);
                 });
             }
         }
