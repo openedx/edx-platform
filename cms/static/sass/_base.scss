@@ -133,7 +133,7 @@ h1 {
 
       .nav-actions {
         position: relative;
-        bottom: -($baseline*1.5);
+        bottom: -($baseline*0.75);
         float: right;
         width: flex-grid(4,12);
         text-align: right;
@@ -162,6 +162,14 @@ h1 {
           @include font-size(18);
           margin-top: ($baseline/4);
         }
+      }
+    }
+
+    // layout with actions
+    &.has-subtitle {
+
+      .nav-actions {
+        bottom: -($baseline*1.5);
       }
     }
   }
