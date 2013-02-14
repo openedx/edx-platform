@@ -1023,3 +1023,8 @@ class TestSchematicResponse(TestSubmittingProblems):
         resp = self.submit_question_answer('cfn_problem', {'2_1': "xyzzy!"})
         respdata = json.loads(resp.content)
         self.assertEqual(respdata['success'], 'incorrect')
+
+    def test_computed_answer(self):
+        resp = self.submit_question_answer('computed_answer', {'2_1': "Xyzzy"})
+        respdata = json.loads(resp.content)
+        self.assertEqual(respdata['success'], 'correct')

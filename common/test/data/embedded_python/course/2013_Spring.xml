@@ -92,6 +92,20 @@ print(num)
   </text>
 </problem>
 
+<problem url_name="computed_answer">
+
+  <customresponse>
+    <textline size="5" correct_answer="Xyzzy"/>
+    <answer type="loncapa/python">
+if submission[0] == "Xyzzy":
+    correct = ['correct']
+else:
+    correct = ['incorrect']
+    </answer>
+  </customresponse>
+
+</problem>
+
     </vertical>
   </chapter>
 </course>
