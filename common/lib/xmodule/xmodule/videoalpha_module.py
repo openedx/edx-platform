@@ -8,7 +8,7 @@ from django.http import Http404
 
 from xmodule.x_module import XModule
 from xmodule.raw_module import RawDescriptor
-from xmodule.modulestore.xml import XMLModuleStore
+from xmodule.modulestore.mongo import MongoModuleStore
 from xmodule.modulestore.django import modulestore
 from xmodule.contentstore.content import StaticContent
 
@@ -18,29 +18,49 @@ import time
 log = logging.getLogger(__name__)
 
 
-class VideoModule(XModule):
+class VideoAlphaModule(XModule):
+    """
+    XML source example:
+
+        <videoalpha show_captions="true"
+            youtube="0.75:jNCf2gIqpeE,1.0:ZwkTiUPN0mg,1.25:rsq9auxASqI,1.50:kMyNdzVHHgg"
+            url_name="lecture_21_3" display_name="S19V3: Vacancies"
+        >
+            <source src=".../mit-3091x/M-3091X-FA12-L21-3_100.mp4"/>
+            <source src=".../mit-3091x/M-3091X-FA12-L21-3_100.webm"/>
+            <source src=".../mit-3091x/M-3091X-FA12-L21-3_100.ogv"/>
+        </videoalpha>
+    """
     video_time = 0
     icon_class = 'video'
 
-    js = {'coffee':
+    js = {
+        'js': [resource_string(__name__, 'js/src/videoalpha/display/html5_video.js')],
+        'coffee':
         [resource_string(__name__, 'js/src/time.coffee'),
-         resource_string(__name__, 'js/src/video/display.coffee')] +
-        [resource_string(__name__, 'js/src/video/display/' + filename)
+         resource_string(__name__, 'js/src/videoalpha/display.coffee')] +
+        [resource_string(__name__, 'js/src/videoalpha/display/' + filename)
          for filename
-         in sorted(resource_listdir(__name__, 'js/src/video/display'))
+         in sorted(resource_listdir(__name__, 'js/src/videoalpha/display'))
          if filename.endswith('.coffee')]}
-    css = {'scss': [resource_string(__name__, 'css/video/display.scss')]}
-    js_module_name = "Video"
+    css = {'scss': [resource_string(__name__, 'css/videoalpha/display.scss')]}
+    js_module_name = "VideoAlpha"
 
     def __init__(self, system, location, definition, descriptor,
                  instance_state=None, shared_state=None, **kwargs):
         XModule.__init__(self, system, location, definition, descriptor,
                          instance_state, shared_state, **kwargs)
         xmltree = etree.fromstring(self.definition['data'])
-        self.youtube = xmltree.get('youtube')
+        self.youtube_streams = xmltree.get('youtube')
+        self.sub = xmltree.get('sub')
         self.position = 0
         self.show_captions = xmltree.get('show_captions', 'true')
-        self.source = self._get_source(xmltree)
+        self.sources = {
+            'main': self._get_source(xmltree),
+            'mp4': self._get_source(xmltree, ['mp4']),
+            'webm': self._get_source(xmltree, ['webm']),
+            'ogv': self._get_source(xmltree, ['ogv']),
+        }
         self.track = self._get_track(xmltree)
         self.start_time, self.end_time = self._get_timeframe(xmltree)
 
@@ -49,24 +69,25 @@ class VideoModule(XModule):
             if 'position' in state:
                 self.position = int(float(state['position']))
 
-    def _get_source(self, xmltree):
-        # find the first valid source
-        return self._get_first_external(xmltree, 'source')
+    def _get_source(self, xmltree, exts=None):
+        """Find the first valid source, which ends with one of `exts`."""
+        exts = ['mp4', 'ogv', 'avi', 'webm'] if exts is None else exts
+        condition = lambda src: any([src.endswith(ext) for ext in exts])
+        return self._get_first_external(xmltree, 'source', condition)
 
     def _get_track(self, xmltree):
         # find the first valid track
         return self._get_first_external(xmltree, 'track')
 
-    def _get_first_external(self, xmltree, tag):
-        """
-        Will return the first valid element
-        of the given tag.
-        'valid' means has a non-empty 'src' attribute
+    def _get_first_external(self, xmltree, tag, condition=bool):
+        """Will return the first 'valid' element of the given tag.
+        'valid' means that `condition('src' attribute) == True`
         """
         result = None
+
         for element in xmltree.findall(tag):
             src = element.get('src')
-            if src:
+            if condition(src):
                 result = src
                 break
         return result
@@ -89,11 +110,10 @@ class VideoModule(XModule):
         return parse_time(xmltree.get('from')), parse_time(xmltree.get('to'))
 
     def handle_ajax(self, dispatch, get):
-        '''
-        Handle ajax calls to this video.
-        TODO (vshnayder): This is not being called right now, so the position
-        is not being saved.
-        '''
+        """Handle ajax calls to this video.
+        TODO (vshnayder): This is not being called right now, so the
+        position is not being saved.
+        """
         log.debug(u"GET {0}".format(get))
         log.debug(u"DISPATCH {0}".format(dispatch))
         if dispatch == 'goto_position':
@@ -102,47 +122,22 @@ class VideoModule(XModule):
             return json.dumps({'success': True})
         raise Http404()
 
-    def get_progress(self):
-        ''' TODO (vshnayder): Get and save duration of youtube video, then return
-        fraction watched.
-        (Be careful to notice when video link changes and update)
-
-        For now, we have no way of knowing if the video has even been watched, so
-        just return None.
-        '''
-        return None
-
     def get_instance_state(self):
-        #log.debug(u"STATE POSITION {0}".format(self.position))
         return json.dumps({'position': self.position})
 
-    def video_list(self):
-        return self.youtube
-
     def get_html(self):
-        if isinstance(modulestore(), XMLModuleStore):
+        if isinstance(modulestore(), MongoModuleStore):
+            caption_asset_path = StaticContent.get_base_url_path_for_course_assets(self.location) + '/subs_'
+        else:
             # VS[compat]
             # cdodge: filesystem static content support.
             caption_asset_path = "/static/{0}/subs/".format(self.metadata['data_dir'])
-        else:
-            caption_asset_path = StaticContent.get_base_url_path_for_course_assets(self.location) + '/subs_'
 
-        # We normally let JS parse this, but in the case that we need a hacked
-        # out <object> player because YouTube has broken their <iframe> API for
-        # the third time in a year, we need to extract it server side.
-        normal_speed_video_id = None # The 1.0 speed video
-
-        # video_list() example:
-        #   "0.75:nugHYNiD3fI,1.0:7m8pab1MfYY,1.25:3CxdPGXShq8,1.50:F-D7bOFCnXA"
-        for video_id_str in self.video_list().split(","):
-            if video_id_str.startswith("1.0:"):
-                normal_speed_video_id = video_id_str.split(":")[1]
-
-        return self.system.render_template('video.html', {
-            'streams': self.video_list(),
+        return self.system.render_template('videoalpha.html', {
+            'youtube_streams': self.youtube_streams,
             'id': self.location.html_id(),
-            'position': self.position,
-            'source': self.source,
+            'sub': self.sub,
+            'sources': self.sources,
             'track': self.track,
             'display_name': self.display_name,
             # TODO (cpennington): This won't work when we move to data that isn't on the filesystem
@@ -150,12 +145,11 @@ class VideoModule(XModule):
             'caption_asset_path': caption_asset_path,
             'show_captions': self.show_captions,
             'start': self.start_time,
-            'end': self.end_time,
-            'normal_speed_video_id': normal_speed_video_id
+            'end': self.end_time
         })
 
 
-class VideoDescriptor(RawDescriptor):
-    module_class = VideoModule
+class VideoAlphaDescriptor(RawDescriptor):
+    module_class = VideoAlphaModule
     stores_state = True
-    template_dir_name = "video"
+    template_dir_name = "videoalpha"
