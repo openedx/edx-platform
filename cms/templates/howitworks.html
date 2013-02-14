@@ -183,17 +183,3 @@
   </a>
 </div>
 </%block>
-
-<%block name="jsextra">
-  <script type="text/javascript">
-    (function() {
-
-      // lean modal window
-      $('a[rel*=modal]').leanModal({overlay : 0.50, closeButton: '.action-modal-close' });
-      $('a.action-modal-close').click(function(e){
-        (e).preventDefault();
-      });
-
-    })(this)
-  </script>
-</%block>

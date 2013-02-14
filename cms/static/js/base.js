@@ -41,6 +41,12 @@ $(document).ready(function() {
 
   $('body').addClass('js');
 
+  // lean/simple modal
+  $('a[rel*=modal]').leanModal({overlay : 0.80, closeButton: '.action-modal-close' });
+  $('a.action-modal-close').click(function(e){
+    (e).preventDefault();
+  });
+
   // nav - dropdown related
   $body.click(function(e){
     $('.nav-dropdown .nav-item .wrapper-nav-sub').removeClass('is-shown');
