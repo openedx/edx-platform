@@ -65,6 +65,7 @@ class ConditionalModule(XModule):
     def is_condition_satisfied(self):
         self.required_modules = [self.system.get_module(descriptor.location) for
             descriptor in self.descriptor.get_required_module_descriptors()]
+
         xml_value, attr_name = self._get_condition()
 
         if xml_value and self.required_modules:
@@ -85,10 +86,15 @@ class ConditionalModule(XModule):
         return False
 
     def get_html(self):
+        # Calculate html ids of dependencies
+        self.required_html_ids = [descriptor.location.html_id() for
+            descriptor in self.descriptor.get_required_module_descriptors()]
+
         return self.system.render_template('conditional_ajax.html', {
             'element_id': self.location.html_id(),
             'id': self.id,
-            'ajax_url': self.system.ajax_url
+            'ajax_url': self.system.ajax_url,
+            'depends': ';'.join(self.required_html_ids)
         })
 
     def handle_ajax(self, dispatch, post):
