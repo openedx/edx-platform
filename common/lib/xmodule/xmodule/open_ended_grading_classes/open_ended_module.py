@@ -59,7 +59,7 @@ class OpenEndedModule(openendedchild.OpenEndedChild):
         self.submission_id = None
         self.grader_id = None
 
-        error_message = "No {0} found in problem xml for open ended problem."
+        error_message = "No {0} found in problem xml for open ended problem. Contact the learning sciences group for assistance."
         if oeparam is None:
             #This is a staff_facing_error
             raise ValueError(error_message.format('oeparam'))
@@ -716,7 +716,7 @@ class OpenEndedDescriptor(XmlDescriptor, EditingDescriptor):
         for child in ['openendedparam']:
             if len(xml_object.xpath(child)) != 1:
                 #This is a staff_facing_error
-                raise ValueError("Open Ended definition must include exactly one '{0}' tag".format(child))
+                raise ValueError("Open Ended definition must include exactly one '{0}' tag. Contact the learning sciences group for assistance.".format(child))
 
         def parse(k):
             """Assumes that xml_object has child k"""

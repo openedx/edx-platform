@@ -72,7 +72,7 @@ class CombinedOpenEndedRubric(object):
             success = True
         except:
             #This is a staff_facing_error
-            error_message = "[render_rubric] Could not parse the rubric with xml: {0}".format(rubric_xml)
+            error_message = "[render_rubric] Could not parse the rubric with xml: {0}. Contact the learning sciences group for assistance.".format(rubric_xml)
             log.exception(error_message)
             raise RubricParsingError(error_message)
         return {'success' : success, 'html' : html, 'rubric_scores' : rubric_scores}
@@ -83,7 +83,7 @@ class CombinedOpenEndedRubric(object):
         rubric_feedback = rubric_dict['html']
         if not success:
             #This is a staff_facing_error
-            error_message = "Could not parse rubric : {0} for location {1}".format(rubric_string, location.url())
+            error_message = "Could not parse rubric : {0} for location {1}. Contact the learning sciences group for assistance.".format(rubric_string, location.url())
             log.error(error_message)
             raise RubricParsingError(error_message)
 
@@ -93,14 +93,14 @@ class CombinedOpenEndedRubric(object):
             total = total + len(category['options']) - 1
             if len(category['options']) > (max_score_allowed + 1):
                 #This is a staff_facing_error
-                error_message = "Number of score points in rubric {0} higher than the max allowed, which is {1}".format(
+                error_message = "Number of score points in rubric {0} higher than the max allowed, which is {1}. Contact the learning sciences group for assistance.".format(
                     len(category['options']), max_score_allowed)
                 log.error(error_message)
                 raise RubricParsingError(error_message)
 
         if total != max_score:
             #This is a staff_facing_error
-            error_msg = "The max score {0} for problem {1} does not match the total number of points in the rubric {2}".format(
+            error_msg = "The max score {0} for problem {1} does not match the total number of points in the rubric {2}. Contact the learning sciences group for assistance.".format(
                     max_score, location, total)
             log.error(error_msg)
             raise RubricParsingError(error_msg)
@@ -123,7 +123,7 @@ class CombinedOpenEndedRubric(object):
         for category in element:
             if category.tag != 'category':
                 #This is a staff_facing_error
-                raise RubricParsingError("[extract_categories] Expected a <category> tag: got {0} instead".format(category.tag))
+                raise RubricParsingError("[extract_categories] Expected a <category> tag: got {0} instead. Contact the learning sciences group for assistance.".format(category.tag))
             else:
                 categories.append(self.extract_category(category))
         return categories
@@ -150,13 +150,13 @@ class CombinedOpenEndedRubric(object):
         # if we are missing the score tag and we are expecting one
         elif self.has_score:
             #This is a staff_facing_error
-            raise RubricParsingError("[extract_category] Category {0} is missing a score".format(descriptionxml.text))
+            raise RubricParsingError("[extract_category] Category {0} is missing a score. Contact the learning sciences group for assistance.".format(descriptionxml.text))
 
 
         # parse description
         if descriptionxml.tag != 'description':
             #This is a staff_facing_error
-            raise RubricParsingError("[extract_category]: expected description tag, got {0} instead".format(descriptionxml.tag))
+            raise RubricParsingError("[extract_category]: expected description tag, got {0} instead. Contact the learning sciences group for assistance.".format(descriptionxml.tag))
 
         description = descriptionxml.text
 
@@ -167,7 +167,7 @@ class CombinedOpenEndedRubric(object):
         for option in optionsxml:
             if option.tag != 'option':
                 #This is a staff_facing_error
-                raise RubricParsingError("[extract_category]: expected option tag, got {0} instead".format(option.tag))
+                raise RubricParsingError("[extract_category]: expected option tag, got {0} instead. Contact the learning sciences group for assistance.".format(option.tag))
             else:
                 pointstr = option.get("points")
                 if pointstr:
@@ -177,7 +177,7 @@ class CombinedOpenEndedRubric(object):
                         points = int(pointstr)
                     except ValueError:
                         #This is a staff_facing_error
-                        raise RubricParsingError("[extract_category]: expected points to have int, got {0} instead".format(pointstr))
+                        raise RubricParsingError("[extract_category]: expected points to have int, got {0} instead. Contact the learning sciences group for assistance.".format(pointstr))
                 elif autonumbering:
                     # use the generated one if we're in the right mode
                     points = cur_points
@@ -228,14 +228,14 @@ class CombinedOpenEndedRubric(object):
         '''
         if len(options) == 0:
             #This is a staff_facing_error
-            raise RubricParsingError("[extract_category]: no options associated with this category")
+            raise RubricParsingError("[extract_category]: no options associated with this category. Contact the learning sciences group for assistance.")
         if len(options) == 1:
             return
         prev = options[0]['points']
         for option in options[1:]:
             if prev == option['points']:
                 #This is a staff_facing_error
-                raise RubricParsingError("[extract_category]: found duplicate point values between two different options")
+                raise RubricParsingError("[extract_category]: found duplicate point values between two different options. Contact the learning sciences group for assistance.")
             else:
                 prev = option['points']
 

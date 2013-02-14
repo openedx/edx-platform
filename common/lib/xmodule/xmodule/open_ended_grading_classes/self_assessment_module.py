@@ -303,7 +303,7 @@ class SelfAssessmentDescriptor(XmlDescriptor, EditingDescriptor):
         for child in expected_children:
             if len(xml_object.xpath(child)) != 1:
                 #This is a staff_facing_error
-                raise ValueError("Self assessment definition must include exactly one '{0}' tag".format(child))
+                raise ValueError("Self assessment definition must include exactly one '{0}' tag. Contact the learning sciences group for assistance.".format(child))
 
         def parse(k):
             """Assumes that xml_object has child k"""

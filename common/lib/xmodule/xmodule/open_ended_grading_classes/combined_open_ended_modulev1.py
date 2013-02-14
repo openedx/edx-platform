@@ -158,7 +158,7 @@ class CombinedOpenEndedV1Module():
                 self.display_due_date = dateutil.parser.parse(display_due_date_string)
             except ValueError:
                 #This is a staff_facing_error
-                log.error("Could not parse due date {0} for location {1}".format(display_due_date_string, location))
+                log.error("Could not parse due date {0} for location {1}.  Contact the learning sciences group for assistance.".format(display_due_date_string, location))
                 raise
         else:
             self.display_due_date = None
@@ -170,7 +170,7 @@ class CombinedOpenEndedV1Module():
                 self.close_date = self.display_due_date + self.grace_period
             except:
                 #This is a staff_facing_error
-                log.error("Error parsing the grace period {0} for location {1}".format(grace_period_string, location))
+                log.error("Error parsing the grace period {0} for location {1}. Contact the learning sciences group for assistance.".format(grace_period_string, location))
                 raise
         else:
             self.grace_period = None
@@ -807,7 +807,7 @@ class CombinedOpenEndedV1Descriptor(XmlDescriptor, EditingDescriptor):
         for child in expected_children:
             if len(xml_object.xpath(child)) == 0:
                 #This is a staff_facing_error
-                raise ValueError("Combined Open Ended definition must include at least one '{0}' tag".format(child))
+                raise ValueError("Combined Open Ended definition must include at least one '{0}' tag. Contact the learning sciences group for assistance.".format(child))
 
         def parse_task(k):
             """Assumes that xml_object has child k"""
