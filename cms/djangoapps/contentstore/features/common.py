@@ -1,12 +1,10 @@
 from lettuce import world, step
 from factories import *
-from django.core.management import call_command
 from lettuce.django import django_url
-from django.conf import settings
-from django.core.management import call_command
 from nose.tools import assert_true
 from nose.tools import assert_equal
 import xmodule.modulestore.django
+from selenium.webdriver.support.ui import WebDriverWait
 
 from logging import getLogger
 logger = getLogger(__name__)
@@ -37,6 +35,12 @@ def i_press_the_category_delete_icon(step, category):
     else:
         assert False, 'Invalid category: %s' % category
     css_click(css)
+
+@step('I have opened a new course in Studio$')
+def i_have_opened_a_new_course(step):
+    clear_courses()
+    log_into_studio()
+    create_a_course()
 
 ####### HELPER FUNCTIONS ##############
 def create_studio_user(
@@ -75,10 +79,23 @@ def assert_css_with_text(css,text):
     assert_equal(world.browser.find_by_css(css).text, text)
 
 def css_click(css):
+    assert_true(world.browser.is_element_present_by_css(css, 5))
     world.browser.find_by_css(css).first.click()
 
 def css_fill(css, value):
     world.browser.find_by_css(css).first.fill(value)
+
+def css_find(css):
+    return world.browser.find_by_css(css)
+
+def wait_for(func):
+    WebDriverWait(world.browser.driver, 10).until(func)
+
+def id_find(id):
+    return world.browser.find_by_id(id)
+
+def reload():
+    return world.browser.reload()
 
 def clear_courses():
     flush_xmodule_store()

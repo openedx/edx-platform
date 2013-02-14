@@ -2,12 +2,6 @@ from lettuce import world, step
 from common import *
 
 ############### ACTIONS ####################
-@step('I have opened a new course in Studio$')
-def i_have_opened_a_new_course(step):
-    clear_courses()
-    log_into_studio()
-    create_a_course()
-
 @step('I click the new section link$')
 def i_click_new_section_link(step):
     link_css = 'a.new-courseware-section-button'
