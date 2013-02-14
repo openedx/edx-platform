@@ -440,9 +440,6 @@ class LoncapaProblem(object):
         random.seed(self.seed)
 
         context = {}
-
-        # pass instance of LoncapaProblem in
-        context['the_lcp'] = self
         context['script_code'] = ''
 
         self._execute_scripts(tree.findall('.//script'), context)
@@ -473,7 +470,9 @@ class LoncapaProblem(object):
             context['script_code'] += code
             try:
                 # use "context" for global context; thus defs in code are global within code
-                safe_exec.safe_exec(code, context)
+                locals_dict = {}
+                safe_exec.safe_exec(code, context, locals_dict)
+                context.update(locals_dict)
             except Exception as err:
                 log.exception("Error while execing script code: " + code)
                 msg = "Error while executing script code: %s" % str(err).replace('<', '&lt;')

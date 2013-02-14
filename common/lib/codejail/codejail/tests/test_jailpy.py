@@ -33,6 +33,13 @@ class TestFeatures(unittest.TestCase):
             Exception: FAIL
             """))
 
+    def test_stdin_is_provided(self):
+        res = jailpy(
+            "import json,sys; print sum(json.load(sys.stdin))",
+            stdin="[1, 2.5, 33]"
+        )
+        self.assertEqual(res.stdout.strip(), "36.5")
+
 
 class TestLimits(unittest.TestCase):
     def test_cant_use_too_much_memory(self):

@@ -2,7 +2,7 @@
 
 import codejail.safe_exec
 
-def safe_exec(code, globals_dict, locals_dict=None):
+def safe_exec(code, globals_dict, locals_dict):
     codejail.safe_exec.safe_exec(
         code, globals_dict, locals_dict, future_division=True,
         assumed_imports=[
