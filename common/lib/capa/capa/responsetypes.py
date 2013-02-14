@@ -1318,10 +1318,8 @@ class CodeResponse(LoncapaResponse):
         # Check if XML uses the ExternalResponse format or the generic
         # CodeResponse format
         codeparam = self.xml.find('codeparam')
-        if codeparam is None:
-            self._parse_externalresponse_xml()
-        else:
-            self._parse_coderesponse_xml(codeparam)
+        assert codeparam is not None, "Unsupported old format! <coderesponse> without <codeparam>"
+        self._parse_coderesponse_xml(codeparam)
 
     def _parse_coderesponse_xml(self, codeparam):
         '''
@@ -1340,63 +1338,6 @@ class CodeResponse(LoncapaResponse):
             codeparam, 'initial_display', '')
         self.answer = find_with_default(codeparam, 'answer_display',
                                         'No answer provided.')
-
-    def _parse_externalresponse_xml(self):
-        '''
-        VS[compat]: Suppport for old ExternalResponse XML format. When successful, sets:
-            self.initial_display
-            self.answer (an answer to display to the student in the LMS)
-            self.payload
-        '''
-        answer = self.xml.find('answer')
-
-        if answer is not None:
-            answer_src = answer.get('src')
-            if answer_src is not None:
-                code = self.system.filesystem.open('src/' + answer_src).read()
-            else:
-                code = answer.text
-        else:  # no <answer> stanza; get code from <script>
-            code = self.context['script_code']
-            if not code:
-                msg = '%s: Missing answer script code for coderesponse' % unicode(
-                    self)
-                msg += "\nSee XML source line %s" % getattr(
-                    self.xml, 'sourceline', '<unavailable>')
-                raise LoncapaProblemError(msg)
-
-        tests = self.xml.get('tests')
-
-        # Extract 'answer' and 'initial_display' from XML. Note that the code to be exec'ed here is:
-        #   (1) Internal edX code, i.e. NOT student submissions, and
-        #   (2) The code should only define the strings 'initial_display', 'answer',
-        #           'preamble', 'test_program'
-        #           following the ExternalResponse XML format
-        penv = {}
-        penv['__builtins__'] = globals()['__builtins__']
-        try:
-            raise Exception("exec 3")
-            exec(code, penv, penv)
-        except Exception as err:
-            log.error(
-                'Error in CodeResponse %s: Error in problem reference code' % err)
-            raise Exception(err)
-        try:
-            self.answer = penv['answer']
-            self.initial_display = penv['initial_display']
-        except Exception as err:
-            log.error("Error in CodeResponse %s: Problem reference code does not define"
-                      " 'answer' and/or 'initial_display' in <answer>...</answer>" % err)
-            raise Exception(err)
-
-        # Finally, make the ExternalResponse input XML format conform to the generic
-        # exteral grader interface
-        #   The XML tagging of grader_payload is pyxserver-specific
-        grader_payload = '<pyxserver>'
-        grader_payload += '<tests>' + tests + '</tests>\n'
-        grader_payload += '<processor>' + code + '</processor>'
-        grader_payload += '</pyxserver>'
-        self.payload = {'grader_payload': grader_payload}
 
     def get_score(self, student_answers):
         try:
