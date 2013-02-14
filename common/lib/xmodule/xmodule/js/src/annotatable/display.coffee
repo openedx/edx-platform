@@ -11,7 +11,9 @@ class @Annotatable
 
     discussionXModuleSelector: '.xmodule_DiscussionModule'
     discussionSelector:        '.discussion-module'
- 
+
+    commentMaxLength: 750 # Max length characters to show in the comment hover state
+
     constructor: (el) ->
         console.log 'loaded Annotatable' if @_debug
         @el = el
@@ -84,7 +86,8 @@ class @Annotatable
     onClickReturn: (e) =>
         e.preventDefault()
         span_el = @getSpan e.currentTarget
-        @scrollTo(span_el, @afterScrollToSpan)
+        offset = -200
+        @scrollTo(span_el, @afterScrollToSpan, offset)
 
     getSpan: (el) ->
         discussion_id = @getDiscussionId(el)
@@ -117,11 +120,11 @@ class @Annotatable
     toggleSpans: (hide) ->
         @$(@spanSelector).toggleClass 'hide', hide, 250
 
-    scrollTo: (el, after = -> true) ->
+    scrollTo: (el, after, offset = -20) ->
         $('html,body').scrollTo(el, {
             duration: 500
-            onAfter: @_once => after.call this, el
-            offset: -20
+            onAfter: @_once => after?.call this, el
+            offset: offset
         })
  
     afterScrollToDiscussion: (el) ->
@@ -135,7 +138,10 @@ class @Annotatable
         (api) =>
             discussion_id = @getDiscussionId(el)
             comment = $(@commentSelector, el).first().clone()
-            comment = comment.after(@createReplyLink discussion_id) if discussion_id
+            text = @_truncate comment.text().trim(), @commentMaxLength
+            comment.text(text)
+            if discussion_id
+                comment = comment.after(@createReplyLink discussion_id)
             comment
 
     makeTipTitle: (el) ->
@@ -182,3 +188,9 @@ class @Annotatable
         return =>
             fn.call this unless done
             done = true
+
+    _truncate: (text = '', limit) ->
+        if text.length > limit
+            text.substring(0, limit - 1).split(' ').slice(0, -1).join(' ') + '...' # truncate on word boundary
+        else
+            text

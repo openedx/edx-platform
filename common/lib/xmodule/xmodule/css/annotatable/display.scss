@@ -100,7 +100,7 @@
 }
 
 .ui-tooltip.qtip.ui-tooltip-annotatable {
-  max-width: 350px;
+  max-width: 375px;
   .ui-tooltip-title:before { 
     font-weight: normal;
     content: "Guided Discussion: ";
@@ -110,8 +110,8 @@
     .annotatable-comment {
       display: block;
       margin: 0px 0px 10px 0;
-      max-height: 175px;
-      overflow: hidden;
+      max-height: 225px; // truncate the text via JS so we can get an ellipsis
+      overflow: auto;
     }
     .annotatable-reply {
       display: block;
