@@ -1028,3 +1028,9 @@ class TestSchematicResponse(TestSubmittingProblems):
         resp = self.submit_question_answer('computed_answer', {'2_1': "Xyzzy"})
         respdata = json.loads(resp.content)
         self.assertEqual(respdata['success'], 'correct')
+
+        self.reset_question_answer('computed_answer')
+
+        resp = self.submit_question_answer('computed_answer', {'2_1': "NO!"})
+        respdata = json.loads(resp.content)
+        self.assertEqual(respdata['success'], 'incorrect')
