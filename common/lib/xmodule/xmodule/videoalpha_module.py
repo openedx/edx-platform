@@ -69,10 +69,10 @@ class VideoAlphaModule(XModule):
             if 'position' in state:
                 self.position = int(float(state['position']))
 
-    def _get_source(self, xmltree, ext=None):
-        """Find the first valid source, which ends with one of `ext`."""
-        ext = ['mp4', 'ogv', 'avi', 'webm'] if ext is None else ext
-        condition = lambda src: any([src.endswith(ext) for ext in ext])
+    def _get_source(self, xmltree, exts=None):
+        """Find the first valid source, which ends with one of `exts`."""
+        exts = ['mp4', 'ogv', 'avi', 'webm'] if exts is None else exts
+        condition = lambda src: any([src.endswith(ext) for ext in exts])
         return self._get_first_external(xmltree, 'source', condition)
 
     def _get_track(self, xmltree):
