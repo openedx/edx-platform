@@ -5,6 +5,7 @@ import logging
 from django.contrib.auth.decorators import login_required
 from django.http import HttpResponse
 from django.views.decorators.http import require_POST
+from django.views.decorators.csrf import csrf_exempt
 
 from foldit.models import Score, PuzzleComplete
 from student.models import unique_id_for_user
@@ -13,14 +14,18 @@ log = logging.getLogger(__name__)
 
 
 @login_required
+@csrf_exempt
 @require_POST
 def foldit_ops(request):
-    log.debug(request.POST)
-
+    """
+    Endpoint view for foldit operations.
+    """
     responses = []
     if "SetPlayerPuzzleScores" in request.POST:
         puzzle_scores_json = request.POST.get("SetPlayerPuzzleScores")
         pz_verify_json = request.POST.get("SetPlayerPuzzleScoresVerify")
+        log.debug("SetPlayerPuzzleScores message: puzzle scores: %r",
+                  puzzle_scores_json)
 
         puzzle_score_verify = json.loads(pz_verify_json)
         if not verifies_ok(request.user.email,
@@ -29,7 +34,7 @@ def foldit_ops(request):
                               "Success": "false",
                               "ErrorString": "Verification failed",
                               "ErrorCode": "VerifyFailed"})
-            log.info("Verification of SetPlayerPuzzleScores failed:" +
+            log.warning("Verification of SetPlayerPuzzleScores failed:" +
                      "user %s, scores json %r, verify %r",
                      request.user, puzzle_scores_json, pz_verify_json)
         else:
@@ -40,6 +45,9 @@ def foldit_ops(request):
         puzzles_complete_json = request.POST.get("SetPuzzlesComplete")
         pc_verify_json = request.POST.get("SetPuzzlesCompleteVerify")
 
+        log.debug("SetPuzzlesComplete message: %r",
+                  puzzles_complete_json)
+
         puzzles_complete_verify = json.loads(pc_verify_json)
 
         if not verifies_ok(request.user.email,
@@ -48,7 +56,7 @@ def foldit_ops(request):
                               "Success": "false",
                               "ErrorString": "Verification failed",
                               "ErrorCode": "VerifyFailed"})
-            log.info("Verification of SetPuzzlesComplete failed:" +
+            log.warning("Verification of SetPuzzlesComplete failed:" +
                      " user %s, puzzles json %r, verify %r",
                      request.user, puzzles_complete_json, pc_verify_json)
         else:
