@@ -357,6 +357,12 @@ if settings.MITX_FEATURES.get('ENABLE_SQL_TRACKING_LOGS'):
         url(r'^event_logs/(?P<args>.+)$', 'track.views.view_tracking_log'),
         )
 
+# FoldIt views
+urlpatterns += (
+    # The path is hardcoded into their app...
+    url(r'^comm/foldit_ops', 'foldit.views.foldit_ops', name="foldit_ops"),
+)
+
 urlpatterns = patterns(*urlpatterns)
 
 if settings.DEBUG:

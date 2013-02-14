@@ -3,7 +3,11 @@ from xmodule.raw_module import RawDescriptor
 
 
 class HiddenModule(XModule):
-    pass
+    def get_html(self):
+        if self.system.user_is_staff:
+            return "ERROR: This module is unknown--students will not see it at all"
+        else:
+            return ""
 
 
 class HiddenDescriptor(RawDescriptor):
