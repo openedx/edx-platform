@@ -1013,14 +1013,6 @@ class TestSchematicResponse(TestSubmittingProblems):
         respdata = json.loads(resp.content)
         self.assertEqual(respdata['success'], 'incorrect')
 
-
-@override_settings(MODULESTORE=TEST_DATA_XML_MODULESTORE)
-class TestCustomResponseCfnFunction(TestSubmittingProblems):
-    """Check that cfn functions work properly."""
-
-    course_slug = "embedded_python"
-    course_when = "2013_Spring"
-
     def test_check_function(self):
         resp = self.submit_question_answer('cfn_problem', {'2_1': "0, 1, 2, 3, 4, 5, 'Outside of loop', 6"})
         respdata = json.loads(resp.content)
