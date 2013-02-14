@@ -69,10 +69,10 @@ class VideoAlphaModule(XModule):
             if 'position' in state:
                 self.position = int(float(state['position']))
 
-    def _get_source(self, xmltree, extensions=['mp4', 'ogv', 'avi', 'webm']):
-        """Find the first valid source, which ends with one of
-        `extensions`."""
-        condition = lambda src: any([src.endswith(ext) for ext in extensions])
+    def _get_source(self, xmltree, ext=None):
+        """Find the first valid source, which ends with one of `ext`."""
+        ext = ['mp4', 'ogv', 'avi', 'webm'] if ext is None else ext
+        condition = lambda src: any([src.endswith(ext) for ext in ext])
         return self._get_first_external(xmltree, 'source', condition)
 
     def _get_track(self, xmltree):
@@ -110,11 +110,10 @@ class VideoAlphaModule(XModule):
         return parse_time(xmltree.get('from')), parse_time(xmltree.get('to'))
 
     def handle_ajax(self, dispatch, get):
-        '''
-        Handle ajax calls to this video.
-        TODO (vshnayder): This is not being called right now, so the position
-        is not being saved.
-        '''
+        """Handle ajax calls to this video.
+        TODO (vshnayder): This is not being called right now, so the
+        position is not being saved.
+        """
         log.debug(u"GET {0}".format(get))
         log.debug(u"DISPATCH {0}".format(dispatch))
         if dispatch == 'goto_position':
@@ -124,7 +123,6 @@ class VideoAlphaModule(XModule):
         raise Http404()
 
     def get_instance_state(self):
-        #log.debug(u"STATE POSITION {0}".format(self.position))
         return json.dumps({'position': self.position})
 
     def get_html(self):
