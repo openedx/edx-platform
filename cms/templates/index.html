@@ -61,9 +61,10 @@
         <ul class="class-list">
           %for course, url in courses:
           <li>
-            <a href="${url}" class="class-name">
+            <a class="class-link" href="${url}" class="class-name">
               <span class="class-name">${course}</span>
             </a>
+            <a href="#" class="button view-button view-live-button"><i class="ss-icon ss-symbolicons-block icon icon-view">&#xE010;</i>View Live</a>
           </li>
             %endfor
         </ul>

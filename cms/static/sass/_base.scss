@@ -651,7 +651,6 @@ hr.divide {
 .view-button {
   @include blue-button;
   @include font-size(13);
-  padding: 8px 20px 10px;
   text-align: center;
 
   &.big {
