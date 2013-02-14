@@ -165,13 +165,14 @@ section.poll_question {
 
       .bar {
         width: 75%;
-        height: 28px;
+        height: 20px;
         border: 1px solid black;
         display: inline;
         float: left;
         margin-right: 10px;
 
         &.short {
+          width: 65%;
           height: 20px;
           margin-top: 3px;
         }
@@ -179,11 +180,9 @@ section.poll_question {
         .percent {
           background-color: gray;
           width: 0px;
-          height: 28px;
+          height: 20px;
 
-          &.short {
-            height: 20px;
-          }
+          &.short { }
         }
       }
 

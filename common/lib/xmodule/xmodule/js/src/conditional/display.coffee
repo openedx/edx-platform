@@ -13,13 +13,8 @@ class @Conditional
       @passed = null
 
     if callerElId isnt undefined and @passed isnt null
-      console.log 'callerElId isnt undefined and @passed isnt null'
-
       dependencies = @el.data('depends')
-      console.log 'dependencies: ', dependencies
-      console.log 'callerElId: ', callerElId
       if (typeof dependencies is 'string') and (dependencies.length > 0) and (dependencies.indexOf(callerElId) is -1)
-        console.log 'Caller ID was not found in the dependencies.'
         return
 
     @url = @el.data('url')
