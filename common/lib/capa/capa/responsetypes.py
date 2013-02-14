@@ -661,15 +661,6 @@ class ChoiceResponse(LoncapaResponse):
 
 class MultipleChoiceResponse(LoncapaResponse):
     # TODO: handle direction and randomize
-    snippets = [{'snippet': '''<multiplechoiceresponse direction="vertical" randomize="yes">
-     <choicegroup type="MultipleChoice">
-        <choice location="random" correct="false"><span>`a+b`<br/></span></choice>
-        <choice location="random" correct="true"><span><math>a+b^2</math><br/></span></choice>
-        <choice location="random" correct="false"><math>a+b+c</math></choice>
-        <choice location="bottom" correct="false"><math>a+b+d</math></choice>
-     </choicegroup>
-    </multiplechoiceresponse>
-    '''}]
 
     response_tag = 'multiplechoiceresponse'
     max_inputfields = 1
@@ -755,14 +746,6 @@ class OptionResponse(LoncapaResponse):
     '''
     TODO: handle direction and randomize
     '''
-    snippets = [{'snippet': """<optionresponse direction="vertical" randomize="yes">
-        <optioninput options="('Up','Down')" correct="Up">
-          <text>The location of the sky</text>
-        </optioninput>
-        <optioninput options="('Up','Down')" correct="Down">
-          <text>The location of the earth</text>
-        </optioninput>
-    </optionresponse>"""}]
 
     response_tag = 'optionresponse'
     hint_tag = 'optionhint'
@@ -903,39 +886,6 @@ class CustomResponse(LoncapaResponse):
     Custom response.  The python code to be run should be in <answer>...</answer>
     or in a <script>...</script>
     '''
-    snippets = [{'snippet': r"""<customresponse>
-    <text>
-    <br/>
-    Suppose that \(I(t)\) rises from \(0\) to \(I_S\) at a time \(t_0 \neq 0\)
-    In the space provided below write an algebraic expression for \(I(t)\).
-    <br/>
-    <textline size="5" correct_answer="IS*u(t-t0)" />
-    </text>
-    <answer type="loncapa/python">
-    correct=['correct']
-    try:
-        r = str(submission[0])
-    except ValueError:
-        correct[0] ='incorrect'
-        r = '0'
-    if not(r=="IS*u(t-t0)"):
-        correct[0] ='incorrect'
-    </answer>
-    </customresponse>"""},
-                {'snippet': """<script type="loncapa/python"><![CDATA[
-
-def sympy_check2():
-  messages[0] = '%s:%s' % (submission[0],fromjs[0].replace('<','&lt;'))
-  #messages[0] = str(answers)
-  correct[0] = 'correct'
-
-]]>
-</script>
-
-  <customresponse cfn="sympy_check2" type="cs" expect="2.27E-39" dojs="math" size="30" answer="2.27E-39">
-    <textline size="40" dojs="math" />
-    <responseparam description="Numerical Tolerance" type="tolerance" default="0.00001" name="tol"/>
-  </customresponse>"""}]
 
     response_tag = 'customresponse'
 
@@ -1245,16 +1195,6 @@ class SymbolicResponse(CustomResponse):
     """
     Symbolic math response checking, using symmath library.
     """
-    snippets = [{'snippet': r'''<problem>
-      <text>Compute \[ \exp\left(-i \frac{\theta}{2} \left[ \begin{matrix} 0 & 1 \\ 1 & 0 \end{matrix} \right] \right) \]
-      and give the resulting \(2\times 2\) matrix: <br/>
-        <symbolicresponse answer="">
-          <textline size="40" math="1" />
-        </symbolicresponse>
-      <br/>
-      Your input should be typed in as a list of lists, eg <tt>[[1,2],[3,4]]</tt>.
-      </text>
-    </problem>'''}]
 
     response_tag = 'symbolicresponse'
 
@@ -1518,44 +1458,6 @@ class ExternalResponse(LoncapaResponse):
     Typically used by coding problems.
 
     '''
-    snippets = [{'snippet': '''<externalresponse tests="repeat:10,generate">
-    <textbox rows="10" cols="70"  mode="python"/>
-    <answer><![CDATA[
-initial_display = """
-def inc(x):
-"""
-
-answer = """
-def inc(n):
-    return n+1
-"""
-preamble = """
-import sympy
-"""
-test_program = """
-import random
-
-def testInc(n = None):
-    if n is None:
-       n = random.randint(2, 20)
-    print 'Test is: inc(%d)'%n
-    return str(inc(n))
-
-def main():
-   f = os.fdopen(3,'w')
-   test = int(sys.argv[1])
-   rndlist = map(int,os.getenv('rndlist').split(','))
-   random.seed(rndlist[0])
-   if test == 1: f.write(testInc(0))
-   elif test == 2: f.write(testInc(1))
-   else:  f.write(testInc())
-   f.close()
-
-main()
-"""
-]]>
-    </answer>
-  </externalresponse>'''}]
 
     response_tag = 'externalresponse'
     allowed_inputfields = ['textline', 'textbox']
@@ -1701,23 +1603,6 @@ class FormulaResponse(LoncapaResponse):
     '''
     Checking of symbolic math response using numerical sampling.
     '''
-    snippets = [{'snippet': '''<problem>
-
-    <script type="loncapa/python">
-    I = "m*c^2"
-    </script>
-
-    <text>
-    <br/>
-    Give an equation for the relativistic energy of an object with mass m.
-    </text>
-    <formularesponse type="cs" samples="m,c@1,2:3,4#10" answer="$I">
-      <responseparam description="Numerical Tolerance" type="tolerance"
-                   default="0.00001" name="tol" />
-      <textline size="40" math="1" />
-    </formularesponse>
-
-    </problem>'''}]
 
     response_tag = 'formularesponse'
     hint_tag = 'formulahint'
@@ -1908,19 +1793,6 @@ class ImageResponse(LoncapaResponse):
     Returns:
         True, if click is inside any region or rectangle. Otherwise False.
     """
-    snippets = [{'snippet': '''<imageresponse>
-      <imageinput src="image1.jpg" width="200" height="100"
-      rectangle="(10,10)-(20,30)" />
-      <imageinput src="image2.jpg" width="210" height="130"
-      rectangle="(12,12)-(40,60)" />
-      <imageinput src="image3.jpg" width="210" height="130"
-      rectangle="(10,10)-(20,30);(12,12)-(40,60)" />
-      <imageinput src="image4.jpg" width="811" height="610"
-      rectangle="(10,10)-(20,30);(12,12)-(40,60)"
-      regions="[[[10,10], [20,30], [40, 10]], [[100,100], [120,130], [110,150]]]"/>
-      <imageinput src="image5.jpg" width="200" height="200"
-      regions="[[[10,10], [20,30], [40, 10]], [[100,100], [120,130], [110,150]]]"/>
-    </imageresponse>'''}]
 
     response_tag = 'imageresponse'
     allowed_inputfields = ['imageinput']
