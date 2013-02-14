@@ -30,7 +30,7 @@ if Backbone?
 
     convertMath: ->
       element = @$(".response-body")
-      element.html DiscussionUtil.postMathJaxProcessor DiscussionUtil.markdownWithHighlight element.html()
+      element.html DiscussionUtil.postMathJaxProcessor DiscussionUtil.markdownWithHighlight element.text()
       MathJax.Hub.Queue ["Typeset", MathJax.Hub, element[0]]
 
     markAsStaff: ->

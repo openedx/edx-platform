@@ -1,7 +1,6 @@
 import json
 import shutil
 from django.test.client import Client
-from override_settings import override_settings
 from django.conf import settings
 from django.core.urlresolvers import reverse
 from path import path
@@ -85,7 +84,6 @@ class ContentStoreTestCase(ModuleStoreTestCase):
         self.assertEqual(resp.status_code, 200)
         # Now make sure that the user is now actually activated
         self.assertTrue(user(email).is_active)
-
 
 class AuthTestCase(ContentStoreTestCase):
     """Check that various permissions-related things work"""
