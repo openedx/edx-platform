@@ -9,8 +9,7 @@
 
 <%block name="js_extra">
 
-  <!-- Use latest PDF.js build from Github -->
-  <script type="text/javascript" src="https://raw.github.com/mozilla/pdf.js/gh-pages/build/pdf.js"></script>
+  <script type="text/javascript" src="/static/js/vendor/pdf.js"></script>
   
   <script type="text/javascript">
     //
@@ -28,7 +27,7 @@
     PDFJS.disableWorker = true;
 
     var pdfDoc = null,
-        pageNum = 1,
+        pageNum = ${int(page) if page is not None else 1},
         scale = 0.8,
         canvas = document.getElementById('the-canvas'),
         ctx = canvas.getContext('2d');
@@ -86,8 +85,7 @@
   </script>  
 </%block>
 
-<!-- TODO: what should active_page be set to here???? textbook/0 or pdftextbook/0? -->
-<%include file="/courseware/course_navigation.html" args="active_page='textbook/{0}'.format(book_index)" />
+<%include file="/courseware/course_navigation.html" args="active_page='pdftextbook/{0}'.format(book_index)" />
 
 <section class="container">
   <div class="book-wrapper">
