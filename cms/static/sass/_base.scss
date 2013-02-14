@@ -127,7 +127,7 @@ h1 {
 
       .title {
         float: left;
-        width: flex-grid(5,12);
+        width: flex-grid(6,12);
         margin-right: flex-gutter();
       }
 
@@ -135,7 +135,7 @@ h1 {
         position: relative;
         bottom: -($baseline*0.75);
         float: right;
-        width: flex-grid(4,12);
+        width: flex-grid(6,12);
         text-align: right;
 
         .nav-item {
@@ -155,6 +155,11 @@ h1 {
         }
 
         .new-button {
+          font-weight: 700 !important;
+        }
+
+        .view-button {
+
           font-weight: 700 !important;
         }
 
@@ -639,6 +644,26 @@ hr.divide {
     vertical-align: middle;
     margin-right: ($baseline/4);
     margin-top: ($baseline/10);
+    line-height: 0;
+  }
+}
+
+.view-button {
+  @include blue-button;
+  @include font-size(13);
+  padding: 8px 20px 10px;
+  text-align: center;
+
+  &.big {
+    display: block;
+  }
+
+  .icon-view {
+    @include font-size(15);
+    display: inline-block;
+    vertical-align: middle;
+    margin-right: ($baseline/2);
+    margin-top: ($baseline/5);
     line-height: 0;
   }
 }
