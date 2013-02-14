@@ -22,12 +22,14 @@ import track.views
 
 log = logging.getLogger(__name__)
 
+
 def json_http_response(data):
     """
     Return an HttpResponse with the data json-serialized and the right content
     type header.
     """
     return HttpResponse(json.dumps(data), content_type="application/json")
+
 
 def split_by_comma_and_whitespace(s):
     """
@@ -176,6 +178,7 @@ def add_users_to_cohort(request, course_id, cohort_id):
                             'present': present,
                             'conflict': conflict,
                             'unknown': unknown})
+
 
 @ensure_csrf_cookie
 @require_POST

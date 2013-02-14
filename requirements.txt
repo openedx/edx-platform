@@ -24,7 +24,6 @@ django_nose
 nosexcover==1.0.7
 rednose==0.3.3
 GitPython==0.3.2.RC1
-django-override-settings==1.2
 mock==0.8.0
 PyYAML==3.10
 South==0.7.6

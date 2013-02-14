@@ -1,7 +1,7 @@
 from django.conf import settings
 
 MAX_COMMENT_DEPTH = None
-MAX_UPLOAD_FILE_SIZE = 1024 * 1024 #result in bytes
+MAX_UPLOAD_FILE_SIZE = 1024 * 1024   # result in bytes
 ALLOWED_UPLOAD_FILE_TYPES = ('.jpg', '.jpeg', '.gif', '.bmp', '.png', '.tiff')
 
 if hasattr(settings, 'DISCUSSION_SETTINGS'):

@@ -33,8 +33,8 @@ MITX_FEATURES = {
     'USE_DJANGO_PIPELINE': True,
     'GITHUB_PUSH': False,
     'ENABLE_DISCUSSION_SERVICE': False,
-    'AUTH_USE_MIT_CERTIFICATES' : False,
-    'STUB_VIDEO_FOR_TESTING': False, # do not display video when running automated acceptance tests
+    'AUTH_USE_MIT_CERTIFICATES': False,
+    'STUB_VIDEO_FOR_TESTING': False,   # do not display video when running automated acceptance tests
 }
 ENABLE_JASMINE = False
 
@@ -165,13 +165,6 @@ STATICFILES_DIRS = [
 # This is how you would use the textbook images locally
 #    ("book", ENV_ROOT / "book_images")
 ]
-if os.path.isdir(GITHUB_REPO_ROOT):
-    STATICFILES_DIRS += [
-        # TODO (cpennington): When courses aren't loaded from github, remove this
-        (course_dir, GITHUB_REPO_ROOT / course_dir)
-        for course_dir in os.listdir(GITHUB_REPO_ROOT)
-        if os.path.isdir(GITHUB_REPO_ROOT / course_dir)
-    ]
 
 # Locale/Internationalization
 TIME_ZONE = 'America/New_York'  # http://en.wikipedia.org/wiki/List_of_tz_zones_by_name
@@ -229,7 +222,7 @@ PIPELINE_JS = {
         'source_filenames': sorted(
             rooted_glob(COMMON_ROOT / 'static/', 'coffee/src/**/*.coffee') +
             rooted_glob(PROJECT_ROOT / 'static/', 'coffee/src/**/*.coffee')
-        ) + [ 'js/hesitate.js', 'js/base.js'],
+        ) + ['js/hesitate.js', 'js/base.js'],
         'output_filename': 'js/cms-application.js',
     },
     'module-js': {
@@ -285,4 +278,5 @@ INSTALLED_APPS = (
     # For asset pipelining
     'pipeline',
     'staticfiles',
+    'static_replace',
 )

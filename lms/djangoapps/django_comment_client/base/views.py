@@ -30,6 +30,7 @@ from django_comment_client.models import Role
 
 log = logging.getLogger(__name__)
 
+
 def permitted(fn):
     @functools.wraps(fn)
     def wrapper(request, *args, **kwargs):
@@ -46,6 +47,7 @@ def permitted(fn):
         else:
             return JsonError("unauthorized", status=401)
     return wrapper
+
 
 def ajax_content_response(request, course_id, content, template_name):
     context = {
@@ -82,11 +84,11 @@ def create_thread(request, course_id, commentable_id):
 
     thread = cc.Thread(**extract(post, ['body', 'title', 'tags']))
     thread.update_attributes(**{
-        'anonymous'          : anonymous,
-        'anonymous_to_peers' : anonymous_to_peers,
-        'commentable_id'     : commentable_id,
-        'course_id'          : course_id,
-        'user_id'            : request.user.id,
+        'anonymous': anonymous,
+        'anonymous_to_peers': anonymous_to_peers,
+        'commentable_id': commentable_id,
+        'course_id': course_id,
+        'user_id': request.user.id,
     })
 
 
@@ -118,6 +120,7 @@ def create_thread(request, course_id, commentable_id):
     else:
         return JsonResponse(utils.safe_content(data))
 
+
 @require_POST
 @login_required
 @permitted
@@ -129,6 +132,7 @@ def update_thread(request, course_id, thread_id):
         return ajax_content_response(request, course_id, thread.to_dict(), 'discussion/ajax_update_thread.html')
     else:
         return JsonResponse(utils.safe_content(thread.to_dict()))
+
 
 def _create_comment(request, course_id, thread_id=None, parent_id=None):
     post = request.POST
@@ -146,12 +150,12 @@ def _create_comment(request, course_id, thread_id=None, parent_id=None):
         anonymous_to_peers = False
 
     comment.update_attributes(**{
-        'anonymous'          : anonymous,
-        'anonymous_to_peers' : anonymous_to_peers,
-        'user_id'   : request.user.id,
-        'course_id' : course_id,
-        'thread_id' : thread_id,
-        'parent_id' : parent_id,
+        'anonymous': anonymous,
+        'anonymous_to_peers': anonymous_to_peers,
+        'user_id': request.user.id,
+        'course_id': course_id,
+        'thread_id': thread_id,
+        'parent_id': parent_id,
     })
     comment.save()
     if post.get('auto_subscribe', 'false').lower() == 'true':
@@ -162,6 +166,7 @@ def _create_comment(request, course_id, thread_id=None, parent_id=None):
     else:
         return JsonResponse(utils.safe_content(comment.to_dict()))
 
+
 @require_POST
 @login_required
 @permitted
@@ -171,6 +176,7 @@ def create_comment(request, course_id, thread_id):
             return JsonError("Comment level too deep")
     return _create_comment(request, course_id, thread_id=thread_id)
 
+
 @require_POST
 @login_required
 @permitted
@@ -178,6 +184,7 @@ def delete_thread(request, course_id, thread_id):
     thread = cc.Thread.find(thread_id)
     thread.delete()
     return JsonResponse(utils.safe_content(thread.to_dict()))
+
 
 @require_POST
 @login_required
@@ -191,6 +198,7 @@ def update_comment(request, course_id, comment_id):
     else:
         return JsonResponse(utils.safe_content(comment.to_dict()))
 
+
 @require_POST
 @login_required
 @permitted
@@ -199,6 +207,7 @@ def endorse_comment(request, course_id, comment_id):
     comment.endorsed = request.POST.get('endorsed', 'false').lower() == 'true'
     comment.save()
     return JsonResponse(utils.safe_content(comment.to_dict()))
+
 
 @require_POST
 @login_required
@@ -213,6 +222,7 @@ def openclose_thread(request, course_id, thread_id):
         'ability': utils.get_ability(course_id, thread, request.user),
     })
 
+
 @require_POST
 @login_required
 @permitted
@@ -222,6 +232,7 @@ def create_sub_comment(request, course_id, comment_id):
             return JsonError("Comment level too deep")
     return _create_comment(request, course_id, parent_id=comment_id)
 
+
 @require_POST
 @login_required
 @permitted
@@ -229,6 +240,7 @@ def delete_comment(request, course_id, comment_id):
     comment = cc.Comment.find(comment_id)
     comment.delete()
     return JsonResponse(utils.safe_content(comment.to_dict()))
+
 
 @require_POST
 @login_required
@@ -239,6 +251,7 @@ def vote_for_comment(request, course_id, comment_id, value):
     user.vote(comment, value)
     return JsonResponse(utils.safe_content(comment.to_dict()))
 
+
 @require_POST
 @login_required
 @permitted
@@ -248,6 +261,7 @@ def undo_vote_for_comment(request, course_id, comment_id):
     user.unvote(comment)
     return JsonResponse(utils.safe_content(comment.to_dict()))
 
+
 @require_POST
 @login_required
 @permitted
@@ -256,6 +270,7 @@ def vote_for_thread(request, course_id, thread_id, value):
     thread = cc.Thread.find(thread_id)
     user.vote(thread, value)
     return JsonResponse(utils.safe_content(thread.to_dict()))
+
 
 @require_POST
 @login_required
@@ -276,6 +291,7 @@ def follow_thread(request, course_id, thread_id):
     user.follow(thread)
     return JsonResponse({})
 
+
 @require_POST
 @login_required
 @permitted
@@ -284,6 +300,7 @@ def follow_commentable(request, course_id, commentable_id):
     commentable = cc.Commentable.find(commentable_id)
     user.follow(commentable)
     return JsonResponse({})
+
 
 @require_POST
 @login_required
@@ -294,6 +311,7 @@ def follow_user(request, course_id, followed_user_id):
     user.follow(followed_user)
     return JsonResponse({})
 
+
 @require_POST
 @login_required
 @permitted
@@ -302,6 +320,7 @@ def unfollow_thread(request, course_id, thread_id):
     thread = cc.Thread.find(thread_id)
     user.unfollow(thread)
     return JsonResponse({})
+
 
 @require_POST
 @login_required
@@ -312,6 +331,7 @@ def unfollow_commentable(request, course_id, commentable_id):
     user.unfollow(commentable)
     return JsonResponse({})
 
+
 @require_POST
 @login_required
 @permitted
@@ -320,6 +340,7 @@ def unfollow_user(request, course_id, followed_user_id):
     followed_user = cc.User.find(followed_user_id)
     user.unfollow(followed_user)
     return JsonResponse({})
+
 
 @require_POST
 @login_required
@@ -351,6 +372,7 @@ def update_moderator_status(request, course_id, user_id):
     else:
         return JsonResponse({})
 
+
 @require_GET
 def search_similar_threads(request, course_id, commentable_id):
     text = request.GET.get('text', None)
@@ -362,10 +384,11 @@ def search_similar_threads(request, course_id, commentable_id):
         threads = cc.search_similar_threads(course_id, recursive=False, query_params=query_params)
     else:
         theads = []
-    context = { 'threads': map(utils.extend_content, threads) }
+    context = {'threads': map(utils.extend_content, threads)}
     return JsonResponse({
         'html': render_to_string('discussion/_similar_posts.html', context)
     })
+
 
 @require_GET
 def tags_autocomplete(request, course_id):
@@ -375,10 +398,11 @@ def tags_autocomplete(request, course_id):
         results = cc.tags_autocomplete(value)
     return JsonResponse(results)
 
+
 @require_POST
 @login_required
 @csrf.csrf_exempt
-def upload(request, course_id):#ajax upload file to a question or answer
+def upload(request, course_id):  # ajax upload file to a question or answer
     """view that handles file upload via Ajax
     """
 
@@ -409,7 +433,7 @@ def upload(request, course_id):#ajax upload file to a question or answer
                             time.time()
                         ).replace(
                             '.',
-                            str(random.randint(0,100000))
+                            str(random.randint(0, 100000))
                         ) + file_extension
 
         file_storage = get_storage_class()()

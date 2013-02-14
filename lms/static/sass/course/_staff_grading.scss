@@ -12,7 +12,7 @@ div.peer-grading{
     label {
         margin: 10px;
         padding: 5px;
-        display: inline-block;
+        @include inline-block;
         min-width: 50px;
         background-color: #CCC;
         text-size: 1.5em;
@@ -120,7 +120,7 @@ div.peer-grading{
         margin-right:20px;
         > div
         {
-            padding: 10px;
+            padding: 2px;
             margin: 0px;
             background: #eee;
             height: 10em;
@@ -176,49 +176,4 @@ div.peer-grading{
         }
     }
     padding: 40px;
-  .rubric {
-      tr {
-          margin:10px 0px;
-          height: 100%;
-      }
-      td {
-          padding: 20px 0px 25px 0px;
-          height: 100%;
-      }
-      th {
-          padding: 5px;
-          margin: 5px;
-      }
-      label,
-      .view-only {
-          margin:2px;
-          position: relative;
-          padding: 15px 15px 25px 15px;
-          width: 150px;
-          height:100%;
-          display: inline-block;
-          min-height: 50px;
-          min-width: 50px;
-          background-color: #CCC;
-          font-size: .9em;
-      }
-      .grade {
-        position: absolute;
-        bottom:0px;
-        right:0px;
-        margin:10px;
-      }
-      .selected-grade {
-        background: #666;
-        color: white; 
-      }
-      input[type=radio]:checked + label {
-        background: #666;
-        color: white; }
-      input[class='score-selection'] {
-        display: none; 
-      }
-  }
-    
 }
-

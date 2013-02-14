@@ -109,16 +109,16 @@ class HTMLSnippet(object):
         All of these will be loaded onto the page in the CMS
         """
         # cdodge: We've moved the xmodule.coffee script from an outside directory into the xmodule area of common
-        # this means we need to make sure that all xmodules include this dependency which had been previously implicitly 
+        # this means we need to make sure that all xmodules include this dependency which had been previously implicitly
         # fulfilled in a different area of code
         js = cls.js
-        
+
         if js is None:
             js = {}
 
         if 'coffee' not in js:
             js['coffee'] = []
-        
+
         js['coffee'].append(resource_string(__name__, 'js/src/xmodule.coffee'))
 
         return js
@@ -538,7 +538,7 @@ class XModuleDescriptor(Plugin, HTMLSnippet, ResourceTemplates):
     def start(self, value):
         if isinstance(value, time.struct_time):
             self.metadata['start'] = stringify_time(value)
-        
+
     @property
     def days_early_for_beta(self):
         """

@@ -3,9 +3,10 @@ import time
 from mock import Mock
 from django.test import TestCase
 
-from xmodule.modulestore import Location 
+from xmodule.modulestore import Location
 from factories import CourseEnrollmentAllowedFactory
 import courseware.access as access
+
 
 class AccessTestCase(TestCase):
     def test__has_global_staff_access(self):
@@ -44,13 +45,13 @@ class AccessTestCase(TestCase):
         self.assertTrue(access._has_access_to_location(u, location,
                                                         'instructor', None))
 
-        # A user does not have staff access if they are 
+        # A user does not have staff access if they are
         # not in either the staff or the the instructor group
         g.name = 'student_only'
         self.assertFalse(access._has_access_to_location(u, location,
                                                         'staff', None))
 
-        # A user does not have instructor access if they are 
+        # A user does not have instructor access if they are
         # not in the instructor group
         g.name = 'student_only'
         self.assertFalse(access._has_access_to_location(u, location,
@@ -69,7 +70,7 @@ class AccessTestCase(TestCase):
         # TODO: override DISABLE_START_DATES and test the start date branch of the method
         u = Mock()
         d = Mock()
-        d.start = time.gmtime(time.time() - 86400) # make sure the start time is in the past
+        d.start = time.gmtime(time.time() - 86400)   # make sure the start time is in the past
 
         # Always returns true because DISABLE_START_DATES is set in test.py
         self.assertTrue(access._has_access_descriptor(u, d, 'load'))
@@ -105,5 +106,5 @@ class AccessTestCase(TestCase):
         c.metadata.get = 'is_public'
         self.assertTrue(access._has_access_course_desc(u, c, 'enroll'))
 
-        # TODO: 
+        # TODO:
         # Non-staff cannot enroll outside the open enrollment period if not specifically allowed

@@ -73,7 +73,7 @@ class ImportSystem(XMLParsingSystem, MakoDescriptorSystem):
                 # VS[compat]. Take this out once course conversion is done (perhaps leave the uniqueness check)
 
                 # tags that really need unique names--they store (or should store) state.
-                need_uniq_names = ('problem', 'sequential', 'video', 'course', 'chapter', 'videosequence')
+                need_uniq_names = ('problem', 'sequential', 'video', 'course', 'chapter', 'videosequence', 'timelimit')
 
                 attr = xml_data.attrib
                 tag = xml_data.tag
@@ -363,7 +363,7 @@ class XMLModuleStore(ModuleStoreBase):
             # been imported into the cms from xml
             course_file = StringIO(clean_out_mako_templating(course_file.read()))
 
-            course_data = etree.parse(course_file,parser=edx_xml_parser).getroot()
+            course_data = etree.parse(course_file, parser=edx_xml_parser).getroot()
 
             org = course_data.get('org')
 
@@ -437,7 +437,7 @@ class XMLModuleStore(ModuleStoreBase):
             self.load_extra_content(system, course_descriptor, 'course_info', self.data_dir / course_dir / 'info', course_dir, url_name)
 
             # now import all static tabs which are expected to be stored in
-            # in <content_dir>/tabs or <content_dir>/tabs/<url_name>           
+            # in <content_dir>/tabs or <content_dir>/tabs/<url_name>
             self.load_extra_content(system, course_descriptor, 'static_tab', self.data_dir / course_dir / 'tabs', course_dir, url_name)
 
             self.load_extra_content(system, course_descriptor, 'custom_tag_template', self.data_dir / course_dir / 'custom_tags', course_dir, url_name)
@@ -454,12 +454,12 @@ class XMLModuleStore(ModuleStoreBase):
 
          # then look in a override folder based on the course run
         if os.path.isdir(base_dir / url_name):
-            self._load_extra_content(system, course_descriptor, category, base_dir / url_name, course_dir)       
+            self._load_extra_content(system, course_descriptor, category, base_dir / url_name, course_dir)
 
 
     def _load_extra_content(self, system, course_descriptor, category, path, course_dir):
 
-        for filepath in glob.glob(path/ '*'):
+        for filepath in glob.glob(path / '*'):
             if not os.path.isdir(filepath):
                 with open(filepath) as f:
                     try:
@@ -467,7 +467,7 @@ class XMLModuleStore(ModuleStoreBase):
                         # tabs are referenced in policy.json through a 'slug' which is just the filename without the .html suffix
                         slug = os.path.splitext(os.path.basename(filepath))[0]
                         loc = Location('i4x', course_descriptor.location.org, course_descriptor.location.course, category, slug)
-                        module = HtmlDescriptor(system, definition={'data' : html}, **{'location' : loc})
+                        module = HtmlDescriptor(system, definition={'data': html}, **{'location': loc})
                         # VS[compat]:
                         # Hack because we need to pull in the 'display_name' for static tabs (because we need to edit them)
                         # from the course policy
@@ -555,7 +555,7 @@ class XMLModuleStore(ModuleStoreBase):
         Return a dictionary of course_dir -> [(msg, exception_str)], for each
         course_dir where course loading failed.
         """
-        return dict( (k, self.errored_courses[k].errors) for k in self.errored_courses)
+        return dict((k, self.errored_courses[k].errors) for k in self.errored_courses)
 
     def update_item(self, location, data):
         """
@@ -590,7 +590,7 @@ class XMLModuleStore(ModuleStoreBase):
         raise NotImplementedError("XMLModuleStores are read-only")
 
     def get_parent_locations(self, location, course_id):
-        '''Find all locations that are the parents of this location in this 
+        '''Find all locations that are the parents of this location in this
         course.  Needed for path_to_location().
 
         returns an iterable of things that can be passed to Location.  This may

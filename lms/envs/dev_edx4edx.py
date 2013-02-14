@@ -34,9 +34,8 @@ EDX4EDX_ROOT = ENV_ROOT / "data/edx4edx"
 
 DEBUG = True
 ENABLE_MULTICOURSE = True     # set to False to disable multicourse display (see lib.util.views.mitxhome)
-QUICKEDIT = True
 
-MAKO_TEMPLATES['course'] = [DATA_DIR, EDX4EDX_ROOT ]
+MAKO_TEMPLATES['course'] = [DATA_DIR, EDX4EDX_ROOT]
 
 #MITX_FEATURES['USE_DJANGO_PIPELINE'] = False
 MITX_FEATURES['DISPLAY_HISTOGRAMS_TO_STAFF'] = False
@@ -49,12 +48,12 @@ COURSE_TITLE = "edx4edx: edX Author Course"
 SITE_NAME = "ichuang.mitx.mit.edu"
 
 COURSE_SETTINGS =  {'edx4edx': {'number' : 'edX.01',
-                                    'title'  : 'edx4edx: edX Author Course',
+                                    'title': 'edx4edx: edX Author Course',
                                     'xmlpath': '/edx4edx/',
                                     'github_url': 'https://github.com/MITx/edx4edx',
-                                    'active' : True,
-                                    'default_chapter' : 'Introduction',
-                                    'default_section' : 'edx4edx_Course',
+                                    'active': True,
+                                    'default_chapter': 'Introduction',
+                                    'default_section': 'edx4edx_Course',
                                     },
                     }
 

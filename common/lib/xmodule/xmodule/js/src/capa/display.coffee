@@ -11,8 +11,9 @@ class @Problem
     $(selector, @el)
 
   bind: =>
-    @el.find('.problem > div').each (index, element) =>
-      MathJax.Hub.Queue ["Typeset", MathJax.Hub, element]
+    if MathJax?
+      @el.find('.problem > div').each (index, element) =>
+        MathJax.Hub.Queue ["Typeset", MathJax.Hub, element]
 
     window.update_schematics()
 
@@ -31,8 +32,9 @@ class @Problem
 
     # Dynamath
     @$('input.math').keyup(@refreshMath)
-    @$('input.math').each (index, element) =>
-      MathJax.Hub.Queue [@refreshMath, null, element]
+    if MathJax?
+      @$('input.math').each (index, element) =>
+        MathJax.Hub.Queue [@refreshMath, null, element]
 
   updateProgress: (response) =>
     if response.progress_changed
@@ -230,8 +232,9 @@ class @Problem
               showMethod = @inputtypeShowAnswerMethods[cls]
               showMethod(inputtype, display, answers) if showMethod?
 
-        @el.find('.problem > div').each (index, element) =>
-          MathJax.Hub.Queue ["Typeset", MathJax.Hub, element]
+        if MathJax?
+          @el.find('.problem > div').each (index, element) =>
+            MathJax.Hub.Queue ["Typeset", MathJax.Hub, element]
 
         @$('.show').val 'Hide Answer'
         @el.addClass 'showed'
@@ -273,7 +276,7 @@ class @Problem
     preprocessor_tag = "inputtype_" + elid
     mathjax_preprocessor = @inputtypeDisplays[preprocessor_tag]
 
-    if jax = MathJax.Hub.getAllJax(target)[0]
+    if MathJax? and jax = MathJax.Hub.getAllJax(target)[0]
       eqn = $(element).val()
       if mathjax_preprocessor
         eqn = mathjax_preprocessor(eqn)
@@ -286,7 +289,8 @@ class @Problem
       $("##{element.id}_dynamath").val(jax.root.toMathML '')
     catch exception
       throw exception unless exception.restart
-      MathJax.Callback.After [@refreshMath, jax], exception.restart
+      if MathJax?
+        MathJax.Callback.After [@refreshMath, jax], exception.restart
 
   refreshAnswers: =>
     @$('input.schematic').each (index, element) ->
