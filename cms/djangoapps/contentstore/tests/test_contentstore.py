@@ -212,11 +212,20 @@ class ContentStoreToyCourseTest(ModuleStoreTestCase):
         fs = OSFS(root_dir / 'test_export/policies/6.002_Spring_2012')
         self.assertTrue(fs.exists('grading_policy.json'))
 
+        course = ms.get_item(location)
         # compare what's on disk compared to what we have in our course
         with fs.open('grading_policy.json','r') as grading_policy:
-            on_disk = loads(grading_policy.read())
-            course = ms.get_item(location)
+            on_disk = loads(grading_policy.read())    
             self.assertEqual(on_disk, course.definition['data']['grading_policy'])
+
+        #check for policy.json
+        self.assertTrue(fs.exists('policy.json'))
+
+        # compare what's on disk to what we have in the course module
+        with fs.open('policy.json','r') as course_policy:
+            on_disk = loads(course_policy.read())
+            self.assertIn('course/6.002_Spring_2012', on_disk)
+            self.assertEqual(on_disk['course/6.002_Spring_2012'], course.metadata)
 
         # remove old course
         delete_course(ms, cs, location)
