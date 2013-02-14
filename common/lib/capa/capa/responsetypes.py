@@ -37,7 +37,7 @@ from lxml import etree
 from lxml.html.soupparser import fromstring as fromstring_bs     # uses Beautiful Soup!!! FIXME?
 import xqueue_interface
 
-from codejail.safe_exec import safe_exec
+import safe_exec
 
 log = logging.getLogger(__name__)
 
@@ -971,6 +971,11 @@ def sympy_check2():
             if cfn:
                 log.debug("cfn = %s" % cfn)
 
+                # This is a bit twisty.  We used to grab the cfn function from
+                # the context, but now that we sandbox Python execution, we
+                # can't get functions from previous executions.  So we make an
+                # actual function that will re-execute the original script,
+                # and invoke the function with the data needed.
                 def make_check_function(script_code, cfn):
                     def check_function(expect, ans):
                         code = (script_code + "\n" +
@@ -979,7 +984,7 @@ def sympy_check2():
                             'expect': expect,
                             'ans': ans,
                         }
-                        safe_exec(code, globals_dict)
+                        safe_exec.safe_exec(code, globals_dict)
                         return globals_dict['cfn_return']
                     return check_function
 
@@ -1924,7 +1929,7 @@ class SchematicResponse(LoncapaResponse):
             json.loads(student_answers[k]) for k in sorted(self.answer_ids)
         ]
         self.context.update({'submission': submission})
-        safe_exec(self.code, {}, self.context)
+        safe_exec.safe_exec(self.code, {}, self.context)
         cmap = CorrectMap()
         cmap.set_dict(dict(zip(sorted(
             self.answer_ids), self.context['correct'])))

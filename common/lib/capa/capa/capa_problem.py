@@ -13,8 +13,6 @@ Main module which shows problems (of "capa" type).
 This is used by capa_module.
 '''
 
-from __future__ import division
-
 from datetime import datetime
 import logging
 import math
@@ -29,17 +27,6 @@ from lxml import etree
 from xml.sax.saxutils import unescape
 from copy import deepcopy
 
-<<<<<<< HEAD
-import chem
-import chem.miller
-import chem.chemcalc
-import chem.chemtools
-import verifiers
-import verifiers.draganddrop
-
-import calc
-=======
->>>>>>> Work in progress to sandbox the uses of eval in LMS.
 from .correctmap import CorrectMap
 import inputtypes
 import customrender
@@ -48,8 +35,7 @@ import xqueue_interface
 
 # to be replaced with auto-registering
 import responsetypes
-
-from codejail.safe_exec import safe_exec
+import safe_exec
 
 # dict of tagname, Response Class -- this should come from auto-registering
 response_tag_dict = dict([(x.response_tag, x) for x in responsetypes.__all__])
@@ -65,32 +51,6 @@ html_transforms = {'problem': {'tag': 'div'},
                    "text": {'tag': 'span'},
                    "math": {'tag': 'span'},
                    }
-
-<<<<<<< HEAD
-global_context = {'random': random,
-                  'numpy': numpy,
-                  'math': math,
-                  'scipy': scipy,
-                  'calc': calc,
-                  'eia': eia,
-                  'chemcalc': chem.chemcalc,
-                  'chemtools': chem.chemtools,
-                  'miller': chem.miller,
-                  'draganddrop': verifiers.draganddrop}
-=======
-safe_exec_assumed_imports = [
-    "random",
-    "numpy",
-    "math",
-    "scipy",
-    "calc",
-    "eia",
-    ("chemcalc", "chem.chemcalc"),
-    ("chemtools", "chem.chemtools"),
-    ("miller", "chem.miller"),
-    ("draganddrop", "verifiers.draganddrop"),
-]
->>>>>>> Work in progress to sandbox the uses of eval in LMS.
 
 # These should be removed from HTML output, including all subelements
 html_problem_semantics = ["codeparam", "responseparam", "answer", "script", "hintgroup", "openendedparam", "openendedrubric"]
@@ -479,16 +439,6 @@ class LoncapaProblem(object):
         '''
         random.seed(self.seed)
 
-        # TODO: REMOVE THIS COMMENTED OUT CODE.
-        ## save global context in here also
-        #context = {'global_context': global_context}
-        #
-        ## initialize context to have stuff in global_context
-        #context.update(global_context)
-        #
-        # put globals there also
-        #context['__builtins__'] = globals()['__builtins__']
-
         context = {}
 
         # pass instance of LoncapaProblem in
@@ -523,7 +473,7 @@ class LoncapaProblem(object):
             context['script_code'] += code
             try:
                 # use "context" for global context; thus defs in code are global within code
-                safe_exec(code, context, future_division=True, assumed_imports=safe_exec_assumed_imports)
+                safe_exec.safe_exec(code, context)
             except Exception as err:
                 log.exception("Error while execing script code: " + code)
                 msg = "Error while executing script code: %s" % str(err).replace('<', '&lt;')
