@@ -986,7 +986,7 @@ class TestSchematicResponse(TestSubmittingProblems):
         return resp
 
     def test_get_graded(self):
-        resp = self.submit_question_answer('H1P1',
+        resp = self.submit_question_answer('schematic_problem',
             [['transient', {'Z': [
             [0.0000004, 2.8],
             [0.0000009, 2.8],
@@ -1001,8 +1001,8 @@ class TestSchematicResponse(TestSubmittingProblems):
         respdata = json.loads(resp.content)
         self.assertEqual(respdata['success'], 'correct')
 
-        self.reset_question_answer('H1P1')
-        resp = self.submit_question_answer('H1P1',
+        self.reset_question_answer('schematic_problem')
+        resp = self.submit_question_answer('schematic_problem',
             [['transient', {'Z': [
             [0.0000004, 2.8],
             [0.0000009, 0.0],       # wrong.
@@ -1014,5 +1014,33 @@ class TestSchematicResponse(TestSubmittingProblems):
             [0.0000039, 0.2]
             ]}]]
             )
+        respdata = json.loads(resp.content)
+        self.assertEqual(respdata['success'], 'incorrect')
+
+
+@override_settings(MODULESTORE=TEST_DATA_XML_MODULESTORE)
+class TestCustomResponseCfnFunction(TestSubmittingProblems):
+    """Check that cfn functions work properly."""
+
+    course_slug = "embedded_python"
+    course_when = "2013_Spring"
+
+    def submit_question_answer(self, problem_url_name, responses):
+        """Particular to the embedded_python/2013_Spring course."""
+        problem_location = self.problem_location(problem_url_name)
+        modx_url = self.modx_url(problem_location, 'problem_check')
+        resp = self.client.post(modx_url, {
+            'input_i4x-edX-embedded_python-problem-{0}_2_1'.format(problem_url_name): responses,
+            })
+        return resp
+
+    def test_get_graded(self):
+        resp = self.submit_question_answer('cfn_problem', "0, 1, 2, 3, 4, 5, 'Outside of loop', 6")
+        respdata = json.loads(resp.content)
+        self.assertEqual(respdata['success'], 'correct')
+
+        self.reset_question_answer('cfn_problem')
+
+        resp = self.submit_question_answer('cfn_problem', "xyzzy!")
         respdata = json.loads(resp.content)
         self.assertEqual(respdata['success'], 'incorrect')

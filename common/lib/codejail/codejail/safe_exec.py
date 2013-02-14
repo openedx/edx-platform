@@ -19,6 +19,11 @@ def jsonable_dict(d):
     return jd
 
 def safe_exec(code, globals_dict, locals_dict=None, future_division=False, assumed_imports=None):
+    """Execute code safely.
+
+    Returns None.  The code can modify globals in `global_dict`.
+
+    """
     if future_division:
         code = "from __future__ import division\n" + code
 
