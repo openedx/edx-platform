@@ -31,8 +31,15 @@ def export_to_xml(modulestore, contentstore, course_location, root_dir, course_d
   # export the grading policy
   policies_dir = export_fs.makeopendir('policies')
   course_run_policy_dir = policies_dir.makeopendir(course.location.name)
-  with course_run_policy_dir.open('grading_policy.json', 'w') as grading_policy:
-    grading_policy.write(dumps(course.definition['data']['grading_policy']))
+  if 'grading_policy' in course.definition['data']:
+    with course_run_policy_dir.open('grading_policy.json', 'w') as grading_policy:
+      grading_policy.write(dumps(course.definition['data']['grading_policy']))
+
+  # export all of the course metadata in policy.json
+  with course_run_policy_dir.open('policy.json', 'w') as course_policy:
+    policy = {}
+    policy = {'course/' + course.location.name: course.metadata}
+    course_policy.write(dumps(policy)) 
 
 
 def export_extra_content(export_fs, modulestore, course_location, category_type, dirname, file_suffix=''):

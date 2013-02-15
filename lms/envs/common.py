@@ -200,7 +200,6 @@ COURSE_TITLE = "Circuits and Electronics"
 ### Dark code. Should be enabled in local settings for devel.
 
 ENABLE_MULTICOURSE = False     # set to False to disable multicourse display (see lib.util.views.mitxhome)
-QUICKEDIT = False
 
 WIKI_ENABLED = False
 
@@ -575,6 +574,9 @@ INSTALLED_APPS = (
     'wiki.plugins.links',
     'wiki.plugins.notifications',
     'course_wiki.plugins.markdownedx',
+
+    # foldit integration
+    'foldit',
 
     # For testing
     'django.contrib.admin',   # only used in DEBUG mode
