@@ -4,13 +4,13 @@ from lettuce.django import django_url
 
 @step('I click on View Courseware')
 def i_click_on_view_courseware(step):
-    css = 'p.enter-course'
+    css = 'a.enter-course'
     world.browser.find_by_css(css).first.click()
 
 
 @step('I click on the "([^"]*)" tab$')
 def i_click_on_the_tab(step, tab):
-    world.browser.find_link_by_text(tab).first.click()
+    world.browser.find_link_by_partial_text(tab).first.click()
     world.save_the_html()
 
 
