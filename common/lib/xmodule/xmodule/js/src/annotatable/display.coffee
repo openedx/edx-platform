@@ -137,7 +137,6 @@ class @Annotatable
  
     afterScrollToDiscussion: (discussion_el) ->
         btn = $('.discussion-show', discussion_el)
-        console.log(btn)
         btn.click() if !btn.hasClass('shown')
 
     afterScrollToSpan: (span_el) ->
