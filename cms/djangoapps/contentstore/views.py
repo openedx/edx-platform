@@ -278,7 +278,7 @@ def edit_unit(request, location):
                 template.display_name,
                 template.location.url(),
                 'markdown' in template.metadata,
-                template.location.name == 'Empty'
+                'empty' in template.metadata
             ))
 
     components = [
