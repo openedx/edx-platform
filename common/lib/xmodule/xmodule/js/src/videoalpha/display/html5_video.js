@@ -1,4 +1,10 @@
-this.HTML5Video = (function () {
+(function (requirejs, require, define) {
+
+// HTML5Video module.
+define(
+'videoalpha/display/html5_video.js',
+[],
+function () {
     var HTML5Video;
 
     HTML5Video = {};
@@ -48,10 +54,6 @@ this.HTML5Video = (function () {
         };
 
         Player.prototype.getDuration = function () {
-            if (isFinite(this.video.duration) === false) {
-                return 0;
-            }
-
             return this.video.duration;
         };
 
@@ -290,5 +292,8 @@ this.HTML5Video = (function () {
         'CUED': 5
     };
 
+    // HTML5Video object - what this module exports.
     return HTML5Video;
-}());
+})
+
+}(RequireJS.requirejs, RequireJS.require, RequireJS.define));

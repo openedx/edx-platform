@@ -68,14 +68,14 @@ class VideoAlphaModule(VideoAlphaFields, XModule):
     icon_class = 'video'
 
     js = {
-        'js': [resource_string(__name__, 'js/src/videoalpha/display/html5_video.js')],
-        'coffee':
-        [resource_string(__name__, 'js/src/time.coffee'),
-         resource_string(__name__, 'js/src/videoalpha/display.coffee')] +
-        [resource_string(__name__, 'js/src/videoalpha/display/' + filename)
-         for filename
-         in sorted(resource_listdir(__name__, 'js/src/videoalpha/display'))
-         if filename.endswith('.coffee')]}
+        'js': [
+            resource_string(__name__, 'js/src/videoalpha/display/bind.js'),
+            resource_string(__name__, 'js/src/videoalpha/display/initialize.js'),
+            resource_string(__name__, 'js/src/videoalpha/display/html5_video.js'),
+            resource_string(__name__, 'js/src/videoalpha/display/video_player.js'),
+            resource_string(__name__, 'js/src/videoalpha/main.js')
+        ]
+    }
     css = {'scss': [resource_string(__name__, 'css/videoalpha/display.scss')]}
     js_module_name = "VideoAlpha"
 
