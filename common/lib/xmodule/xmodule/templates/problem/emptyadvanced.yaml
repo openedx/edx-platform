@@ -1,12 +1,11 @@
 ---
 metadata:
-    display_name: Blank Common Problem
+    display_name: Blank Advanced Problem
     rerandomize: never
     showanswer: always
-    markdown: ""
     weight: ""
-    empty: True
     attempts: ""
+    empty: True
 data: |
   <problem>
   </problem>

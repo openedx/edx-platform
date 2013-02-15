@@ -703,15 +703,15 @@ class CapaDescriptor(RawDescriptor):
 
     def get_context(self):
         _context = RawDescriptor.get_context(self)
-        _context.update({'markdown': self.metadata.get('markdown', '')})
+        _context.update({'markdown': self.metadata.get('markdown', ''),
+                         'enable_markdown' : 'markdown' in self.metadata})
         return _context
 
     @property
     def editable_metadata_fields(self):
-        """Remove metadata from the editable fields since it has its own editor"""
-        subset = super(CapaDescriptor, self).editable_metadata_fields
-        if 'markdown' in subset:
-            subset.remove('markdown')
+        """Remove any metadata from the editable fields which have their own editor or shouldn't be edited by user."""
+        subset = [field for field in super(CapaDescriptor,self).editable_metadata_fields
+                  if field not in ['markdown', 'empty']]
         return subset
 
 
