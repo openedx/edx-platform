@@ -85,7 +85,8 @@ urlpatterns += (
     url(r'^activate/(?P<key>[^/]*)$', 'student.views.activate_account', name='activate'),
 
     # form page
-    url(r'^login$', 'contentstore.views.login_page', name='login'),
+    url(r'^login$', 'contentstore.views.old_login_redirect', name='old_login'),
+    url(r'^signin$', 'contentstore.views.login_page', name='login'),
     # ajax view that actually does the work
     url(r'^login_post$', 'student.views.login_user', name='login_post'),
 

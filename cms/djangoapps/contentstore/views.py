@@ -59,6 +59,7 @@ from cms.djangoapps.models.settings.course_details import CourseDetails,\
 from cms.djangoapps.models.settings.course_grading import CourseGradingModel
 from cms.djangoapps.contentstore.utils import get_modulestore
 from lxml import etree
+from django.shortcuts import redirect
 
 # to install PIL on MacOSX: 'easy_install http://dist.repoze.org/PIL-1.1.6.tar.gz'
 
@@ -81,6 +82,11 @@ def signup(request):
     csrf_token = csrf(request)['csrf_token']
     return render_to_response('signup.html', {'csrf': csrf_token})
 
+def old_login_redirect(request):
+    '''
+    Redirect to the active login url.
+    '''
+    return redirect('login', permanent=True)
 
 @ssl_login_shortcut
 @ensure_csrf_cookie
