@@ -192,6 +192,7 @@ def import_from_xml(store, data_dir, course_dirs=None,
         course_dirs=course_dirs,
         load_error_modules=load_error_modules
     )
+    data_dir = path(data_dir)
 
     # NOTE: the XmlModuleStore does not implement get_items() which would be a preferable means
     # to enumerate the entire collection of course modules. It will be left as a TBD to implement that

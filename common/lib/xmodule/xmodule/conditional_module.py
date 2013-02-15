@@ -37,14 +37,15 @@ class ConditionalModule(XModule):
 
     condition = String(help="Condition for this module", default='', scope=Scope.settings)
 
-    def __init__(self, system, location, definition, descriptor, instance_state=None, shared_state=None, **kwargs):
+    def __init__(self, *args, **kwargs):
         """
         In addition to the normal XModule init, provide:
 
             self.condition            = string describing condition required
 
         """
-        XModule.__init__(self, system, location, definition, descriptor, instance_state, shared_state, **kwargs)
+        super(ConditionalModule, self).__init__(*args, **kwargs)
+
         self.contents = None
         self._get_required_modules()
         children = self.get_display_items()

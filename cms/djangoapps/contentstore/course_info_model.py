@@ -1,7 +1,7 @@
 from xmodule.modulestore.exceptions import ItemNotFoundError
 from xmodule.modulestore import Location
 from xmodule.modulestore.django import modulestore
-from lxml import html
+from lxml import html, etree
 import re
 from django.http import HttpResponseBadRequest
 import logging

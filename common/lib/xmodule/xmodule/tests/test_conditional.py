@@ -75,17 +75,12 @@ class ConditionalModuleTest(unittest.TestCase):
         print "Course: ", course
         print "id: ", course.id
 
-        instance_states = dict(problem=None)
-        shared_state = None
-
         def inner_get_module(descriptor):
             if isinstance(descriptor, Location):
                 location = descriptor
                 descriptor = self.modulestore.get_instance(course.id, location, depth=None)
             location = descriptor.location
-            instance_state = instance_states.get(location.category, None)
-            print "inner_get_module, location=%s, inst_state=%s" % (location, instance_state)
-            return descriptor.xmodule_constructor(test_system)(instance_state, shared_state)
+            return descriptor.xmodule(test_system)
 
         location = Location(["i4x", "edX", "cond_test", "conditional", "condone"])
 
@@ -96,7 +91,7 @@ class ConditionalModuleTest(unittest.TestCase):
 
         module = inner_get_module(location)
         print "module: ", module
-        print "module definition: ", module.definition
+        print "module.condition: ", module.condition
         print "module children: ", module.get_children()
         print "module display items (children): ", module.get_display_items()
 
@@ -110,12 +105,12 @@ class ConditionalModuleTest(unittest.TestCase):
         print "gdi=", gdi
 
         ajax = json.loads(module.handle_ajax('', ''))
-        self.assertTrue('xmodule.conditional_module' in ajax['html'])
         print "ajax: ", ajax
+        self.assertTrue('ConditionalModule' in ajax['html'])
 
         # now change state of the capa problem to make it completed
-        instance_states['problem'] = json.dumps({'attempts': 1})
+        inner_get_module(Location('i4x://edX/cond_test/problem/choiceprob')).attempts = 1
 
         ajax = json.loads(module.handle_ajax('', ''))
-        self.assertTrue('This is a secret' in ajax['html'])
         print "post-attempt ajax: ", ajax
+        self.assertTrue('This is a secret' in ajax['html'])

@@ -354,7 +354,7 @@ class ImportTestCase(BaseCourseTestCase):
         render_string_from_sample_gst_xml = """
         <slider var="a" style="width:400px;float:left;"/>\
 <plot style="margin-top:15px;margin-bottom:15px;"/>""".strip()
-        self.assertEqual(gst_sample.definition['render'], render_string_from_sample_gst_xml)
+        self.assertEqual(gst_sample.render, render_string_from_sample_gst_xml)
 
     def test_cohort_config(self):
         """

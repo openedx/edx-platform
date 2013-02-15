@@ -62,37 +62,30 @@ class CapaFactory(object):
         definition = {'data': CapaFactory.sample_problem_xml, }
         location = Location(["i4x", "edX", "capa_test", "problem",
                              "SampleProblem{0}".format(CapaFactory.next_num())])
-        metadata = {}
+        model_data = {}
         if graceperiod is not None:
-            metadata['graceperiod'] = graceperiod
+            model_data['graceperiod'] = graceperiod
         if due is not None:
-            metadata['due'] = due
+            model_data['due'] = due
         if max_attempts is not None:
-            metadata['attempts'] = max_attempts
+            model_data['max_attempts'] = int(max_attempts)
         if showanswer is not None:
-            metadata['showanswer'] = showanswer
+            model_data['showanswer'] = showanswer
         if force_save_button is not None:
-            metadata['force_save_button'] = force_save_button
+            model_data['force_save_button'] = force_save_button
         if rerandomize is not None:
-            metadata['rerandomize'] = rerandomize
+            model_data['rerandomize'] = rerandomize
 
 
         descriptor = Mock(weight="1")
-        instance_state_dict = {}
         if problem_state is not None:
-            instance_state_dict = problem_state
+            model_data.update(problem_state)
         if attempts is not None:
             # converting to int here because I keep putting "0" and "1" in the tests
             # since everything else is a string.
-            instance_state_dict['attempts'] = int(attempts)
-        if len(instance_state_dict) > 0:
-            instance_state = json.dumps(instance_state_dict)
-        else:
-            instance_state = None
+            model_data['attempts'] = int(attempts)
 
-        module = CapaModule(test_system, location,
-                            definition, descriptor,
-                                      instance_state, None, metadata=metadata)
+        module = CapaModule(test_system, location, descriptor, model_data)
 
         return module
 

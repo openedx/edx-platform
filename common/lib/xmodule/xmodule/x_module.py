@@ -390,9 +390,9 @@ class XModuleDescriptor(HTMLSnippet, ResourceTemplates, XBlock):
 
     def xmodule(self, system):
         """
-        Returns a constructor for an XModule. This constructor takes two
-        arguments: instance_state and shared_state, and returns a fully
-        instantiated XModule
+        Returns an XModule.
+
+        system: Module system
         """
         return self.module_class(
             system,

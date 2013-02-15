@@ -281,7 +281,7 @@ def edit_unit(request, location):
             component_templates[template.location.category].append((
                 template.lms.display_name,
                 template.location.url(),
-                'markdown' in template.metadata,
+                hasattr(template, 'markdown') and template.markdown != '',
                 template.location.name == 'Empty'
             ))
 
@@ -944,7 +944,7 @@ def reorder_static_tabs(request):
     for tab in course.tabs:
         if tab['type'] == 'static_tab':
             reordered_tabs.append({'type': 'static_tab',
-                'name': tab_items[static_tab_idx].metadata.get('display_name'),
+                'name': tab_items[static_tab_idx].lms.display_name,
                 'url_slug': tab_items[static_tab_idx].location.name})
             static_tab_idx += 1
         else:
@@ -953,7 +953,7 @@ def reorder_static_tabs(request):
 
     # OK, re-assemble the static tabs in the new order
     course.tabs = reordered_tabs
-    modulestore('direct').update_metadata(course.location, course.metadata)
+    modulestore('direct').update_metadata(course.location, own_metadata(course))
     return HttpResponse()
 
 
