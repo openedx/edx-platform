@@ -1,12 +1,12 @@
 ---
 metadata:
-    display_name: Numerical Response
+    display_name: Numerical Input
     rerandomize: never
     showanswer: always
     weight: ""
     attempts: ""
     markdown: 
-       "A numerical response problem accepts a line of text input from the
+       "A numerical input problem accepts a line of text input from the
        student, and evaluates the input for correctness based on its
        numerical value.
        
@@ -45,7 +45,7 @@ metadata:
 data: |
    <problem>
    <p>
-   A numerical response problem accepts a line of text input from the
+   A numerical input problem accepts a line of text input from the
    student, and evaluates the input for correctness based on its
    numerical value.  
    </p>

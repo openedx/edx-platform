@@ -221,6 +221,15 @@ this.HTML5Video = (function () {
             // and end playing at the specified end time. After it was paused, or when a seek operation happeded,
             // the starting time and ending time will reset to the beginning and the end of the video respectively.
             this.video.addEventListener('canplay', function () {
+                // Because firefox triggers 'canplay' event every time when 'currentTime' property
+                // changes, we must make sure that this block of code runs only once. Otherwise,
+                // this will be an endless loop ('currentTime' property is changed below).
+                //
+                // Chrome is immune to this behavior.
+                if (_this.playerState !== HTML5Video.PlayerState.UNSTARTED) {
+                    return;
+                }
+
                 _this.playerState = HTML5Video.PlayerState.PAUSED;
 
                 if (_this.start > _this.video.duration) {
