@@ -640,9 +640,10 @@ function addNewCourse(e) {
   e.preventDefault();
 
   $(e.target).hide();
+  $('.content .introduction').hide();
   var $newCourse = $($('#new-course-template').html());
   var $cancelButton = $newCourse.find('.new-course-cancel');
-  $('.new-course-button').after($newCourse);
+  $('.inner-wrapper').prepend($newCourse);
   $newCourse.find('.new-course-name').focus().select();
   $newCourse.find('form').bind('submit', saveNewCourse);
   $cancelButton.bind('click', cancelNewCourse);
@@ -681,6 +682,7 @@ function saveNewCourse(e) {
 function cancelNewCourse(e) {
   e.preventDefault();
   $('.new-course-button').show();
+  $('.content .introduction').show();
   $(this).parents('section.new-course').remove();
 }
 
