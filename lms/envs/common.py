@@ -84,6 +84,10 @@ MITX_FEATURES = {
 
     # Flip to True when the YouTube iframe API breaks (again)
     'USE_YOUTUBE_OBJECT_API': False,
+
+    # Give a UI to show a student's submission history in a problem by the 
+    # Staff Debug tool.
+    'ENABLE_STUDENT_HISTORY_VIEW': True
 }
 
 # Used for A/B testing

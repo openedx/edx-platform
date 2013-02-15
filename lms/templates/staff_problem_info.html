@@ -1,3 +1,4 @@
+## The JS for this is defined in xqa_interface.html
 ${module_content}
 %if location.category in ['problem','video','html']:
 %  if edit_link:
@@ -12,6 +13,10 @@ ${module_content}
 </div>
 %  endif
 <div><a href="#${element_id}_debug" id="${element_id}_trig">Staff Debug Info</a></div>
+
+%  if settings.MITX_FEATURES.get('ENABLE_STUDENT_HISTORY_VIEW'):
+<div><a href="#${element_id}_history" id="${element_id}_history_trig">Submission history</a></div>
+%  endif
 
 <section id="${element_id}_xqa-modal" class="modal xqa-modal" style="width:80%; left:20%; height:80%; overflow:auto" >
   <div class="inner-wrapper">
@@ -57,8 +62,26 @@ category = ${category | h}
   </div>
 </section>
 
-<div id="${element_id}_setup"></div>
+<section class="modal history-modal" id="${element_id}_history" style="width:80%; left:20%; height:80%; overflow:auto;" >
+  <div class="inner-wrapper" style="color:black">
+    <header>
+      <h2>Submission History Viewer</h2>
+    </header>
+    <form id="${element_id}_history_form">
+      <label for="${element_id}_history_student_username">User:</label>
+      <input id="${element_id}_history_student_username" type="text" placeholder=""/>
+      <input type="hidden" id="${element_id}_history_location" value="${location}"/>
+      <div class="submit">
+        <button name="submit" type="submit">View History</button>
+      </div>
+    </form>
 
+    <div id="${element_id}_history_text" class="staff_info" style="display:block">
+    </div>
+  </div>
+</section>
+
+<div id="${element_id}_setup"></div>
 
 <script type="text/javascript">
 // assumes courseware.html's loaded this method.

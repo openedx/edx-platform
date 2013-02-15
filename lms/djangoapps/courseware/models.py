@@ -12,8 +12,10 @@ file and check it in at the same time as your model changes. To do that,
 ASSUMPTIONS: modules have unique IDs, even across different module_types
 
 """
-from django.db import models
 from django.contrib.auth.models import User
+from django.db import models
+from django.db.models.signals import post_save
+from django.dispatch import receiver
 
 class StudentModule(models.Model):
     """
@@ -58,6 +60,35 @@ class StudentModule(models.Model):
     def __unicode__(self):
         return '/'.join([self.course_id, self.module_type,
                          self.student.username, self.module_state_key, str(self.state)[:20]])
+
+
+class StudentModuleHistory(models.Model):
+    """Keeps a complete history of state changes for a given XModule for a given
+    Student. Right now, we restrict this to problems so that the table doesn't
+    explode in size."""
+
+    class Meta:
+        get_latest_by = "created"
+
+    student_module = models.ForeignKey(StudentModule, db_index=True)
+    version = models.CharField(max_length=255, null=True, blank=True, db_index=True)
+
+    # This should be populated from the modified field in StudentModule
+    created = models.DateTimeField(db_index=True)
+    state = models.TextField(null=True, blank=True)
+    grade = models.FloatField(null=True, blank=True)
+    max_grade = models.FloatField(null=True, blank=True)
+
+    @receiver(post_save, sender=StudentModule)
+    def save_history(sender, instance, **kwargs):
+        if instance.module_type == 'problem':
+            history_entry = StudentModuleHistory(student_module=instance,
+                                                 version=None,
+                                                 created=instance.modified,
+                                                 state=instance.state,
+                                                 grade=instance.grade,
+                                                 max_grade=instance.max_grade)
+            history_entry.save()
 
 
 # TODO (cpennington): Remove these once the LMS switches to using XModuleDescriptors
