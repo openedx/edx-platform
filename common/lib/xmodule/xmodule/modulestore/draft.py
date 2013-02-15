@@ -183,6 +183,10 @@ class DraftModuleStore(ModuleStoreBase):
         metadata.update(draft.metadata)
         metadata['published_date'] = tuple(datetime.utcnow().timetuple())
         metadata['published_by'] = published_by_id
+
+        if 'is_draft' in metadata:
+            del metadata['is_draft']      
+
         super(DraftModuleStore, self).update_item(location, draft.definition.get('data', {}))
         super(DraftModuleStore, self).update_children(location, draft.definition.get('children', []))
         super(DraftModuleStore, self).update_metadata(location, metadata)

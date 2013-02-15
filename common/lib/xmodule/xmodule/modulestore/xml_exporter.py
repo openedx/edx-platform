@@ -5,7 +5,7 @@ from fs.osfs import OSFS
 from json import dumps
 
 
-def export_to_xml(modulestore, contentstore, course_location, root_dir, course_dir):
+def export_to_xml(modulestore, contentstore, course_location, root_dir, course_dir, draft_modulestore = None):
 
   course = modulestore.get_item(course_location)
 
@@ -40,6 +40,24 @@ def export_to_xml(modulestore, contentstore, course_location, root_dir, course_d
     policy = {}
     policy = {'course/' + course.location.name: course.metadata}
     course_policy.write(dumps(policy)) 
+
+  # export everything from the draft store, unfortunately this will create lots of duplicates
+  if draft_modulestore is not None:
+      draft_course = draft_modulestore.get_item(course_location)
+      draft_course_dir = export_fs.makeopendir('drafts')
+      xml = draft_course.export_to_xml(draft_course_dir)
+      with draft_course_dir.open('course.xml', 'w') as course_xml:
+        course_xml.write(xml)
+
+  '''
+  draft_items = modulestore.get_items([None, None, None, 'vertical', None, 'draft'])
+  logging.debug('draft_items = {0}'.format(draft_items))
+  if len(draft_items) > 0:
+     
+    for draft_item in draft_items:
+      draft_item.export_to_xml(draft_items_dir)
+    #with draft_items_dir.open(draft_item.location.name + '.xml', 'w'):
+  '''    
 
 
 def export_extra_content(export_fs, modulestore, course_location, category_type, dirname, file_suffix=''):

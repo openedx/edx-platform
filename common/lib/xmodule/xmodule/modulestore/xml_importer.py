@@ -220,8 +220,14 @@ def import_from_xml(store, data_dir, course_dirs=None,
             # inherited metadata everywhere.
             store.update_metadata(module.location, dict(module.own_metadata))
 
+        # now import any 'draft' items
+        import_course_draft(store, course_data_path, target_location_namespace)
+
     return module_store, course_items
 
+
+def import_course_draft(store, course_data_path, target_location_namespace):
+    pass
 
 def remap_namespace(module, target_location_namespace):
     if target_location_namespace is None:
