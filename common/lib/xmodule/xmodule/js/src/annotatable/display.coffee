@@ -47,7 +47,7 @@ class @Annotatable
 
     initDiscussionReturnLinks: () ->
         $(@discussionXModuleSelector).find(@discussionSelector).each (index, el) =>
-            $(el).after @createReturnLink(@getDiscussionId el)
+            $(el).before @createReturnLink(@getDiscussionId el)
 
     getTipOptions: (el) ->
         content:
@@ -80,14 +80,22 @@ class @Annotatable
 
     onClickReply: (e) =>
         e.preventDefault()
+
         discussion_el = @getInlineDiscussion e.currentTarget
-        @scrollTo(discussion_el, @afterScrollToDiscussion)
+        return_el = discussion_el.prev(@returnSelector)
+
+        if return_el.length == 1
+            @scrollTo(return_el, () -> @afterScrollToDiscussion(discussion_el))
+        else
+            @scrollTo(discussion_el, @afterScrollToDiscussion)
 
     onClickReturn: (e) =>
         e.preventDefault()
-        span_el = @getSpan e.currentTarget
+
+        el = @getSpan e.currentTarget
         offset = -200
-        @scrollTo(span_el, @afterScrollToSpan, offset)
+
+        @scrollTo(el, @afterScrollToSpan, offset)
 
     getSpan: (el) ->
         discussion_id = @getDiscussionId(el)
@@ -125,14 +133,15 @@ class @Annotatable
             duration: 500
             onAfter: @_once => after?.call this, el
             offset: offset
-        })
+        }) if el
  
-    afterScrollToDiscussion: (el) ->
-        btn = $('.discussion-show', el)
+    afterScrollToDiscussion: (discussion_el) ->
+        btn = $('.discussion-show', discussion_el)
+        console.log(btn)
         btn.click() if !btn.hasClass('shown')
 
-    afterScrollToSpan: (el) ->
-        el.effect 'highlight', {color: 'rgba(0,0,0,0.5)' }, 1000
+    afterScrollToSpan: (span_el) ->
+        span_el.effect 'highlight', {color: 'rgba(0,0,0,0.5)' }, 1000
 
     makeTipContent: (el) ->
         (api) =>

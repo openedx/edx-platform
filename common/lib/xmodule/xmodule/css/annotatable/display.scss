@@ -11,7 +11,21 @@
     padding: 2px 4px;
     border: 1px solid $border-color;
     border-radius: 3px;
-    .annotatable-toggle { }
+    .annotatable-toggle {
+      position: absolute;
+      top: 0;
+      right: 30px;
+    }
+    .annotatable-help-icon {
+      display: block;
+      position: absolute;
+      top: 0;
+      right: 0;
+      width: 17px;
+      height: 17px;
+      background: url(../images/info-icon.png) no-repeat;
+    }
+    .annotatable-toggle, .annotatable-help-icon { margin: 2px 7px 2px 0; }
   }
 }
 
@@ -44,17 +58,6 @@
   .annotatable-comment {
     display: none;
   }
-}
-
-.annotatable-help-icon {
-  display: block;
-  position: absolute;
-  right: 0;
-  top: 33%;
-  width: 17px;
-  height: 17px;
-  margin: 0 7px 0 0;
-  background: url(../images/info-icon.png) no-repeat;
 }
 
 .ui-tooltip.qtip.ui-tooltip {
