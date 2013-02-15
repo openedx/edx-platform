@@ -6,7 +6,7 @@ from django.conf import settings
 
 from mock import Mock
 
-from override_settings import override_settings
+from django.test.utils import override_settings
 
 import xmodule.modulestore.django
 

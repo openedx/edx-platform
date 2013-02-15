@@ -343,6 +343,14 @@ def get_score(course_id, user, problem_descriptor, module_creator, student_modul
            Can return None if user doesn't have access, or if something else went wrong.
     cache: A StudentModuleCache
     """
+    if problem_descriptor.always_recalculate_grades:
+        problem = module_creator(problem_descriptor)
+        d = problem.get_score()
+        if d is not None:
+            return (d['score'], d['total'])
+        else:
+            return (None, None)
+
     if not (problem_descriptor.stores_state and problem_descriptor.has_score):
         # These are not problems, and do not have a score
         return (None, None)

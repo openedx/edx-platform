@@ -1,7 +1,7 @@
 from django.conf import settings
 from django.test import TestCase
 import os
-from override_settings import override_settings
+from django.test.utils import override_settings
 from tempfile import NamedTemporaryFile
 
 from status import get_site_status_msg
