@@ -3,8 +3,8 @@
 // Initialize module.
 define(
 'videoalpha/display/initialize.js',
-['videoalpha/display/bind.js'],
-function (bind) {
+['videoalpha/display/bind.js', 'videoalpha/display/video_player.js'],
+function (bind, VideoPlayer) {
 
     // Initialize() function - what this module "exports".
     return function (state, element) {
@@ -99,6 +99,23 @@ function (bind) {
             state.el.addClass('closed');
         }
 
+        // By default we will be forcing HTML5 player mode. Only in the case when, after initializtion, we will
+        // get one available playback rate, we will change to Flash player mode. There is a need to store this
+        // setting in cookies because otherwise we will have to change from HTML5 to Flash on every page load
+        // in a browser that doesn't fully support HTML5. When we have this setting in cookies, we can select
+        // the proper mode from the start (not having to change mode later on).
+        (function (currentPlayerMode) {
+            if ((currentPlayerMode !== 'html5') && (currentPlayerMode !== 'flash')) {
+                $.cookie('current_player_mode', 'html5', {
+                    expires: 3650,
+                    path: '/'
+                });
+                state.currentPlayerMode = 'html5';
+            } else  {
+                state.currentPlayerMode = currentPlayerMode;
+            }
+        }($.cookie('current_player_mode')));
+
         // Launch embedding of actual video content, or set it up so that it will be done as soon as the
         // appropriate video player (YouTube or stand alone HTML5) is loaded, and can handle embedding.
         if (
@@ -139,7 +156,7 @@ function (bind) {
             var speed;
 
             video = video.split(/:/);
-            speed = parseFloat(video[0]).toFixed(2).replace(/\.00$/, ".0");
+            speed = parseFloat(video[0]).toFixed(2).replace(/\.00$/, '.0');
 
             state.videos[speed] = video[1];
         });
@@ -179,22 +196,26 @@ function (bind) {
         state.setSpeed($.cookie('video_speed'));
     }
 
-    function embed(state) { }
+    function embed(state) {
+        VideoPlayer(state);
+    }
 
     // Public functions start here.
     // These are available via the 'state' object. Their context ('this' keyword) is the 'state' object.
     // The magic private function that makes them available and sets up their context is makeFunctionsPublic().
 
-    function setSpeed(newSpeed) {
+    function setSpeed(newSpeed, updateCookie) {
         if (this.speeds.indexOf(newSpeed) !== -1) {
             this.speed = newSpeed;
+        } else {
+            this.speed = '1.0';
+        }
 
-            $.cookie('video_speed', '' + newSpeed, {
+        if (updateCookie !== false) {
+            $.cookie('video_speed', this.speed, {
                 expires: 3650,
                 path: '/'
             });
-        } else {
-            this.speed = '1.0';
         }
     }
 
