@@ -61,6 +61,7 @@ class @CombinedOpenEnded
     @task_number = @el.data('task-number')
     @accept_file_upload = @el.data('accept-file-upload')
     @location = @el.data('location')
+    # set up handlers for click tracking
     Rubric.initialize(@location)
 
     @allow_reset = @el.data('allow_reset')
@@ -133,6 +134,9 @@ class @CombinedOpenEnded
         @submit_evaluation_button = $('.submit-evaluation-button')
         @submit_evaluation_button.click @message_post
         Collapsible.setCollapsibles(@results_container)
+        # make sure we still have click tracking
+        $('.evaluation-response a').click @log_feedback_click
+        $('input[name="evaluation-score"]').change @log_feedback_selection
 
   show_results: (event) =>
     status_item = $(event.target).parent()
@@ -471,4 +475,13 @@ class @CombinedOpenEnded
       @prompt_container.toggleClass('open')
       @question_header.text("(Show)")
 
+  log_feedback_click: (event) ->
+    link_text = $(event.target).html()
+    if link_text == 'See full feedback'
+      Logger.log 'show_full_feedback', {}
+    else if link_text == 'Respond to Feedback'
+      Logger.log 'show_respond_to_feedback', {}
 
+  log_feedback_selection: (event) ->
+    target_selection = $(event.target).val()
+    Logger.log 'feedback_response_selected', {value: target_selection}
