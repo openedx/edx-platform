@@ -1,26 +1,45 @@
 class @Conditional
 
-  constructor: (element) ->
+  constructor: (element, callerElId) ->
     @el = $(element).find('.conditional-wrapper')
-    @id = @el.data('problem-id')
-    @element_id = @el.attr('id')
-    @url = @el.data('url')
-    @render()
 
-  $: (selector) ->
-    $(selector, @el)
+    @callerElId = callerElId
 
-  updateProgress: (response) =>
-    if response.progress_changed
-        @el.attr progress: response.progress_status
-        @el.trigger('progressChanged')
-
-  render: (content) ->
-    if content
-      @el.html(content)
-      XModule.loadModules(@el)
+    if @el.data('passed') is true
+      return
+    else if @el.data('passed') is false
+      @passed = false
     else
-      $.postWithPrefix "#{@url}/conditional_get", (response) =>
-        @el.html(response.html)
-        XModule.loadModules(@el)
+      @passed = null
 
+    if callerElId isnt undefined and @passed isnt null
+      dependencies = @el.data('depends')
+      if (typeof dependencies is 'string') and (dependencies.length > 0) and (dependencies.indexOf(callerElId) is -1)
+        return
+
+    @url = @el.data('url')
+    @render(element)
+
+  render: (element) ->
+      $.postWithPrefix "#{@url}/conditional_get", (response) =>
+        if (((response.passed is true) && (@passed is false)) || (@passed is null))
+          @el.data 'passed', response.passed
+
+          @el.html ''
+          @el.append(i) for i in response.html
+
+          parentEl = $(element).parent()
+          parentId = parentEl.attr 'id'
+
+          if response.message is false
+            if parentId.indexOf('vert') is 0
+              parentEl.hide()
+            else
+              $(element).hide()
+          else
+            if parentId.indexOf('vert') is 0
+              parentEl.show()
+            else
+              $(element).show()
+
+          XModule.loadModules @el

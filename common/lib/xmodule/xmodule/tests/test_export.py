@@ -28,7 +28,6 @@ def strip_filenames(descriptor):
         strip_filenames(d)
 
 
-
 class RoundTripTestCase(unittest.TestCase):
     ''' Check that our test courses roundtrip properly.
         Same course imported , than exported, then imported again.
@@ -91,7 +90,6 @@ class RoundTripTestCase(unittest.TestCase):
             self.assertEquals(initial_import.modules[course_id][location],
                               second_import.modules[course_id][location])
 
-
     def setUp(self):
         self.maxDiff = None
 
@@ -103,6 +101,9 @@ class RoundTripTestCase(unittest.TestCase):
 
     def test_full_roundtrip(self):
         self.check_export_roundtrip(DATA_DIR, "full")
+
+    def test_conditional_and_poll_roundtrip(self):
+        self.check_export_roundtrip(DATA_DIR, "conditional_and_poll")
 
     def test_selfassessment_roundtrip(self):
         #Test selfassessment xmodule to see if it exports correctly

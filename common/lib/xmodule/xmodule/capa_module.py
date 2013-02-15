@@ -521,7 +521,6 @@ class CapaModule(XModule):
 
         answers = self.make_dict_of_responses(get)
         event_info['answers'] = convert_files_to_filenames(answers)
-
         # Too late. Cannot submit
         if self.closed():
             event_info['failure'] = 'closed'

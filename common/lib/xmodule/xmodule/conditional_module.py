@@ -1,127 +1,129 @@
+"""Conditional module is the xmodule, which you can use for disabling
+some xmodules by conditions.
+"""
+
 import json
 import logging
+from lxml import etree
+from pkg_resources import resource_string
 
 from xmodule.x_module import XModule
 from xmodule.modulestore import Location
 from xmodule.seq_module import SequenceDescriptor
-from xblock.core import String, Scope
+from xblock.core import String, Scope, List
+from xmodule.modulestore.exceptions import ItemNotFoundError
 
-from pkg_resources import resource_string
 
 log = logging.getLogger('mitx.' + __name__)
 
 
 class ConditionalModule(XModule):
-    '''
+    """
     Blocks child module from showing unless certain conditions are met.
 
     Example:
 
-        <conditional condition="require_completed" required="tag/url_name1&tag/url_name2">
+        <conditional sources="i4x://.../problem_1; i4x://.../problem_2" completed="True">
+            <show sources="i4x://.../test_6; i4x://.../Avi_resources"/>
             <video url_name="secret_video" />
         </conditional>
 
-        <conditional condition="require_attempted" required="tag/url_name1&tag/url_name2">
-            <video url_name="secret_video" />
-        </conditional>
+        TODO string comparison
+            multiple answer for every poll
 
-    '''
+    """
 
-    js = {'coffee': [resource_string(__name__, 'js/src/conditional/display.coffee'),
+    js = {'coffee': [resource_string(__name__, 'js/src/javascript_loader.coffee'),
+                     resource_string(__name__, 'js/src/conditional/display.coffee'),
                      resource_string(__name__, 'js/src/collapsible.coffee'),
-                     resource_string(__name__, 'js/src/javascript_loader.coffee'),
+
                     ]}
 
     js_module_name = "Conditional"
     css = {'scss': [resource_string(__name__, 'css/capa/display.scss')]}
 
-    condition = String(help="Condition for this module", default='', scope=Scope.settings)
+    contents = String(scope=Scope.content)
 
-    def __init__(self, system, location, definition, descriptor, instance_state=None, shared_state=None, **kwargs):
-        """
-        In addition to the normal XModule init, provide:
+    # Map
+    # key: <tag attribute in xml>
+    # value: <name of module attribute>
+    conditions_map = {
+        'poll_answer': 'poll_answer',  # poll_question attr
+        'compeleted': 'is_competed',  # capa_problem attr
+        'attempted': 'is_attempted',  # capa_problem attr
+        'voted': 'voted'  # poll_question attr
+    }
 
-            self.condition            = string describing condition required
-
-        """
-        XModule.__init__(self, system, location, definition, descriptor, instance_state, shared_state, **kwargs)
-        self.contents = None
-        self._get_required_modules()
-        children = self.get_display_items()
-        if children:
-            self.icon_class = children[0].get_icon_class()
-        #log.debug('conditional module required=%s' % self.required_modules_list)
-
-    def _get_required_modules(self):
-        self.required_modules = []
-        for descriptor in self.descriptor.get_required_module_descriptors():
-            module = self.system.get_module(descriptor)
-            self.required_modules.append(module)
-        #log.debug('required_modules=%s' % (self.required_modules))
+    def _get_condition(self):
+        # Get first valid condition.
+        for xml_attr, attr_name in self.conditions_map.iteritems():
+            xml_value = self.descriptor.xml_attributes.get(xml_attr)
+            if xml_value:
+                return xml_value, attr_name
+        raise Exception('Error in conditional module: unknown condition "%s"'
+            % xml_attr)
 
     def is_condition_satisfied(self):
-        self._get_required_modules()
+        self.required_modules = [self.system.get_module(descriptor.location) for
+            descriptor in self.descriptor.get_required_module_descriptors()]
 
-        if self.condition == 'require_completed':
-            # all required modules must be completed, as determined by
-            # the modules .is_completed() method
-            for module in self.required_modules:
-                #log.debug('in is_condition_satisfied; student_answers=%s' % module.lcp.student_answers)
-                #log.debug('in is_condition_satisfied; instance_state=%s' % module.instance_state)
-                if not hasattr(module, 'is_completed'):
-                    raise Exception('Error in conditional module: required module %s has no .is_completed() method' % module)
-                if not module.is_completed():
-                    log.debug('conditional module: %s not completed' % module)
-                    return False
-                else:
-                    log.debug('conditional module: %s IS completed' % module)
-            return True
-        elif self.condition == 'require_attempted':
-            # all required modules must be attempted, as determined by
-            # the modules .is_attempted() method
-            for module in self.required_modules:
-                if not hasattr(module, 'is_attempted'):
-                    raise Exception('Error in conditional module: required module %s has no .is_attempted() method' % module)
-                if not module.is_attempted():
-                    log.debug('conditional module: %s not attempted' % module)
-                    return False
-                else:
-                    log.debug('conditional module: %s IS attempted' % module)
-            return True
-        else:
-            raise Exception('Error in conditional module: unknown condition "%s"' % self.condition)
+        xml_value, attr_name = self._get_condition()
 
-        return True
+        if xml_value and self.required_modules:
+            for module in self.required_modules:
+                if not hasattr(module, attr_name):
+                    raise Exception('Error in conditional module: \
+                    required module {module} has no {module_attr}'.format(
+                        module=module, module_attr=attr_name))
+
+                attr = getattr(module, attr_name)
+                if callable(attr):
+                    attr = attr()
+
+                if xml_value != str(attr):
+                    break
+            else:
+                return True
+        return False
 
     def get_html(self):
-        self.is_condition_satisfied()
+        # Calculate html ids of dependencies
+        self.required_html_ids = [descriptor.location.html_id() for
+            descriptor in self.descriptor.get_required_module_descriptors()]
+
         return self.system.render_template('conditional_ajax.html', {
             'element_id': self.location.html_id(),
             'id': self.id,
             'ajax_url': self.system.ajax_url,
+            'depends': ';'.join(self.required_html_ids)
         })
 
     def handle_ajax(self, dispatch, post):
-        '''
-        This is called by courseware.module_render, to handle an AJAX call.
-        '''
-        #log.debug('conditional_module handle_ajax: dispatch=%s' % dispatch)
-
+        """This is called by courseware.moduleodule_render, to handle
+        an AJAX call.
+        """
         if not self.is_condition_satisfied():
-            context = {'module': self}
-            html = self.system.render_template('conditional_module.html', context)
-            return json.dumps({'html': html})
+            message = self.descriptor.xml_attributes.get('message')
+            context = {'module': self,
+                       'message': message}
+            html = self.system.render_template('conditional_module.html',
+                context)
+            return json.dumps({'html': [html], 'passed': False,
+                                'message': bool(message)})
 
         if self.contents is None:
-            self.contents = [child.get_html() for child in self.get_display_items()]
+            self.contents = [self.system.get_module(child_descriptor.location
+                ).get_html()
+                for child_descriptor in self.descriptor.get_children()]
 
-        # for now, just deal with one child
-        html = self.contents[0]
-
-        return json.dumps({'html': html})
+        html = self.contents
+        return json.dumps({'html': html, 'passed': True})
 
 
 class ConditionalDescriptor(SequenceDescriptor):
+    """Descriptor for conditional xmodule."""
+    _tag_name = 'conditional'
+
     module_class = ConditionalModule
 
     filename_extension = "xml"
@@ -129,28 +131,66 @@ class ConditionalDescriptor(SequenceDescriptor):
     stores_state = True
     has_score = False
 
-    required = String(help="List of required xmodule locations, separated by &", default='', scope=Scope.settings)
+    show_tag_list = List(help="Poll answers", scope=Scope.content)
 
-    def __init__(self, *args, **kwargs):
-        super(ConditionalDescriptor, self).__init__(*args, **kwargs)
-
-        required_module_list = [tuple(x.split('/', 1)) for x in self.required.split('&')]
-        self.required_module_locations = []
-        for rm in required_module_list:
-            try:
-                (tag, name) = rm
-            except Exception as err:
-                msg = "Specification of required module in conditional is broken: %s" % self.required
-                log.warning(msg)
-                self.system.error_tracker(msg)
-                continue
-            loc = self.location.dict()
-            loc['category'] = tag
-            loc['name'] = name
-            self.required_module_locations.append(Location(loc))
-        log.debug('ConditionalDescriptor required_module_locations=%s' % self.required_module_locations)
+    @staticmethod
+    def parse_sources(xml_element, system, return_descriptor=False):
+        """Parse xml_element 'sources' attr and:
+        if return_descriptor=True - return list of descriptors
+        if return_descriptor=False - return list of lcoations
+        """
+        result = []
+        sources = xml_element.get('sources')
+        if sources:
+            locations = [location.strip() for location in sources.split(';')]
+            for location in locations:
+                # Check valid location url.
+                if Location.is_valid(location):
+                    try:
+                        descriptor = system.load_item(location)
+                        if return_descriptor:
+                            result.append(descriptor)
+                        else:
+                            result.append(location)
+                    except ItemNotFoundError:
+                        log.exception("Invalid module by location.")
+        return result
 
     def get_required_module_descriptors(self):
-        """Returns a list of XModuleDescritpor instances upon which this module depends, but are
-        not children of this module"""
-        return [self.system.load_item(loc) for loc in self.required_module_locations]
+        """Returns a list of XModuleDescritpor instances upon
+        which this module depends.
+        """
+        return ConditionalDescriptor.parse_sources(
+            self.xml_attributes, self.system, True)
+
+    @classmethod
+    def definition_from_xml(cls, xml_object, system):
+        children = []
+        show_tag_list = []
+        for child in xml_object:
+            if child.tag == 'show':
+                location = ConditionalDescriptor.parse_sources(
+                    child, system)
+                children.extend(location)
+                show_tag_list.extend(location)
+            else:
+                try:
+                    descriptor = system.process_xml(etree.tostring(child))
+                    module_url = descriptor.location.url()
+                    children.append(module_url)
+                except:
+                    log.exception("Unable to load child when parsing Conditional.")
+        return {'show_tag_list': show_tag_list}, children
+
+    def definition_to_xml(self, resource_fs):
+        xml_object = etree.Element(self._tag_name)
+        for child in self.get_children():
+            location = str(child.location)
+            if location in self.show_tag_list:
+                show_str = '<{tag_name} sources="{sources}" />'.format(
+                    tag_name='show', sources=location)
+                xml_object.append(etree.fromstring(show_str))
+            else:
+                xml_object.append(
+                    etree.fromstring(child.export_to_xml(resource_fs)))
+        return xml_object

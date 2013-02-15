@@ -1,3 +1,5 @@
+# -*- coding: utf-8 -*-
+
 from path import path
 import unittest
 from fs.memoryfs import MemoryFS
@@ -76,7 +78,6 @@ class ImportTestCase(BaseCourseTestCase):
         self.assertEqual(descriptor.__class__.__name__,
                          'ErrorDescriptor')
 
-
     def test_unique_url_names(self):
         '''Check that each error gets its very own url_name'''
         bad_xml = '''<sequential display_name="oops"><video url="hi"></sequential>'''
@@ -87,7 +88,6 @@ class ImportTestCase(BaseCourseTestCase):
         descriptor2 = system.process_xml(bad_xml2)
 
         self.assertNotEqual(descriptor1.location, descriptor2.location)
-
 
     def test_reimport(self):
         '''Make sure an already-exported error xml tag loads properly'''
@@ -230,7 +230,6 @@ class ImportTestCase(BaseCourseTestCase):
 
         check_for_key('graceperiod', course)
 
-
     def test_policy_loading(self):
         """Make sure that when two courses share content with the same
         org and course names, policy applies to the right one."""
@@ -254,7 +253,6 @@ class ImportTestCase(BaseCourseTestCase):
         # appropriate attribute maps -- 'graded' should be True, not 'true'
         self.assertEqual(toy.lms.graded, True)
 
-
     def test_definition_loading(self):
         """When two courses share the same org and course name and
         both have a module with the same url_name, the definitions shouldn't clash.
@@ -273,7 +271,6 @@ class ImportTestCase(BaseCourseTestCase):
         two_toy_video =  modulestore.get_instance(two_toy_id, location)
         self.assertEqual(etree.fromstring(toy_video.data).get('youtube'), "1.0:p2Q6BrNhdh8")
         self.assertEqual(etree.fromstring(two_toy_video.data).get('youtube'), "1.0:p2Q6BrNhdh9")
-
 
     def test_colon_in_url_name(self):
         """Ensure that colons in url_names convert to file paths properly"""
@@ -330,6 +327,22 @@ class ImportTestCase(BaseCourseTestCase):
             print "video {0} url_name: {1}".format(i, video.url_name)
 
             self.assertEqual(len(video.url_name), len('video_') + 12)
+
+    def test_poll_xmodule(self):
+        modulestore = XMLModuleStore(DATA_DIR, course_dirs=['conditional_and_poll'])
+
+        course = modulestore.get_courses()[0]
+        chapters = course.get_children()
+        ch1 = chapters[0]
+        sections = ch1.get_children()
+
+        self.assertEqual(len(sections), 1)
+
+        location = course.location
+        location = Location(location.tag, location.org, location.course,
+            'sequential', 'Problem_Demos')
+        module = modulestore.get_instance(course.id, location)
+        self.assertEqual(len(module.children), 2)
 
     def test_error_on_import(self):
         '''Check that when load_error_module is false, an exception is raised, rather than returning an ErrorModule'''

@@ -183,6 +183,12 @@ end
 
 TEST_TASK_DIRS = []
 
+task :fastlms do
+    # this is >2 times faster that rake [lms], and does not need web, good for local dev
+    django_admin = ENV['DJANGO_ADMIN_PATH'] || select_executable('django-admin.py', 'django-admin')
+    sh("#{django_admin} runserver --traceback --settings=lms.envs.dev   --pythonpath=.")
+end
+
 [:lms, :cms].each do |system|
     report_dir = report_dir_path(system)
 

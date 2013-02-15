@@ -75,7 +75,7 @@ class ModelDataCache(object):
             if depth is None or depth > 0:
                 new_depth = depth - 1 if depth is not None else depth
 
-                for child in descriptor.get_children():
+                for child in descriptor.get_children() + descriptor.get_required_module_descriptors():
                     descriptors.extend(get_child_descriptors(child, new_depth, descriptor_filter))
 
             return descriptors

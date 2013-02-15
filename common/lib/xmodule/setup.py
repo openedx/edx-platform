@@ -28,6 +28,7 @@ setup(
             "image = xmodule.backcompat_module:TranslateCustomTagDescriptor",
             "error = xmodule.error_module:ErrorDescriptor",
             "peergrading = xmodule.peer_grading_module:PeerGradingDescriptor",
+			"poll_question = xmodule.poll_module:PollDescriptor",
             "problem = xmodule.capa_module:CapaDescriptor",
             "problemset = xmodule.seq_module:SequenceDescriptor",
             "randomize = xmodule.randomize_module:RandomizeDescriptor",
@@ -44,8 +45,8 @@ setup(
             "static_tab = xmodule.html_module:StaticTabDescriptor",
             "custom_tag_template = xmodule.raw_module:RawDescriptor",
             "about = xmodule.html_module:AboutDescriptor",
-            "poll = xmodule.poll_module:PollDescriptor",
-            "graphical_slider_tool = xmodule.gst_module:GraphicalSliderToolDescriptor",
-        ]
+			"graphical_slider_tool = xmodule.gst_module:GraphicalSliderToolDescriptor,
+            "wrapper = xmodule.wrapper_module:WrapperDescriptor",
+        ],
     }
 )
