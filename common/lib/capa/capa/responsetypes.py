@@ -489,7 +489,7 @@ class JavascriptResponse(LoncapaResponse):
         output = self.call_node([generator_file,
                                  self.generator,
                                  json.dumps(self.generator_dependencies),
-                                 json.dumps(str(self.context['the_lcp'].seed)),
+                                 json.dumps(str(self.context['seed'])),
                                  json.dumps(self.params)]).strip()
 
         return json.loads(output)
@@ -1201,7 +1201,6 @@ class SymbolicResponse(CustomResponse):
     def setup_response(self):
         self.xml.set('cfn', 'symmath_check')
         code = "from symmath import *"
-        raise Exception("exec 2")
         exec code in self.context, self.context
         CustomResponse.setup_response(self)
 

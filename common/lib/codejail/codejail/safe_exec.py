@@ -52,8 +52,11 @@ if lazymod_py_file.endswith("c"):
 lazymod_py = open(lazymod_py_file).read()
 
 
-def xxxsafe_exec(code, globals_dict, locals_dict, future_division=False, assumed_imports=None):
+def safe_exec(code, globals_dict, locals_dict, future_division=False, assumed_imports=None):
     the_code = []
+
+    if future_division:
+        the_code.append("from __future__ import division\n")
 
     the_code.append(textwrap.dedent("""\
         import json
@@ -73,12 +76,17 @@ def xxxsafe_exec(code, globals_dict, locals_dict, future_division=False, assumed
     the_code.append(textwrap.dedent("""\
         exec code in g_dict, l_dict
         print >>sys.stderr, l_dict.keys()
-        ok_types = (int, long, float, str, unicode, list, tuple, dict)
+        ok_types = (type(None), int, long, float, str, unicode, list, tuple, dict)
         l_dict = {k:v for k,v in l_dict.iteritems() if isinstance(v, ok_types)}
         json.dump(l_dict, sys.stdout)
         """))
 
-    print "".join(the_code)
+    if 0:
+        print "-- {:-<40}".format("jailed ")
+        print "".join(the_code)
+        print "-- {:-<40}".format("exec ")
+        print code
+
     stdin = json.dumps([code, globals_dict, locals_dict])
     res = jailpy.jailpy("".join(the_code), stdin=stdin)
     if res.status != 0:
