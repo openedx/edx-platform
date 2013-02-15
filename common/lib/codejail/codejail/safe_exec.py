@@ -6,44 +6,6 @@ import textwrap
 import lazymod
 import jailpy
 
-# If we aren't running safe, then we need to artificially pass the values
-# through a JSON straw to ensure we aren't passing something that won't
-# be executable in the safe context.
-def straw(d):
-    jd = {}
-    for k,v in d.iteritems():
-        try:
-            json.dumps(v)
-        except TypeError:
-            continue
-        else:
-            jd[k] = v
-    return json.loads(json.dumps(jd))
-
-def safe_exec(code, globals_dict, locals_dict, future_division=False, assumed_imports=None):
-    """Execute code safely.
-
-    Returns None.  The code can modify globals in `global_dict`.
-
-    """
-    if future_division:
-        code = "from __future__ import division\n" + code
-
-    g_dict = straw(globals_dict)
-    l_dict = straw(locals_dict)
-
-    for modname in assumed_imports or ():
-        if isinstance(modname, tuple):
-            name, modname = modname
-        else:
-            name = modname
-        g_dict[name] = lazymod.LazyModule(modname)
-
-    exec code in g_dict, l_dict
-
-    globals_dict.update(straw(g_dict))
-    locals_dict.update(straw(l_dict))
-
 # We'll need the code from lazymod.py for use in jailpy, so read it now.
 lazymod_py_file = lazymod.__file__
 if lazymod_py_file.endswith("c"):
@@ -53,6 +15,22 @@ lazymod_py = open(lazymod_py_file).read()
 
 
 def safe_exec(code, globals_dict, locals_dict, future_division=False, assumed_imports=None):
+    """Execute code as "exec" does, but safely.
+
+    `code` is a string of Python code.  `globals_dict` and `locals_dict` are
+    dictionaries to use as the globals and locals.  Modifications the code
+    makes to `locals_dict` are reflected in the dictionary on return.
+
+    `future_division` determines whether Python-3-style division is used.
+
+    `assumed_imports` is a list of module to make available as implicit
+    imports for the code.  Entries are either a name, "mod", which makes
+    "import mod" part of the code, or a pair, ("fooey", "f"), which makes
+    "import fooey as f" part of the code.  The module name can be dotted.
+
+    Returns None, changes made by `code` are visible in `locals_dict`.
+
+    """
     the_code = []
 
     if future_division:
