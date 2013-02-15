@@ -232,8 +232,6 @@ this.HTML5Video = (function () {
 
                 _this.playerState = HTML5Video.PlayerState.PAUSED;
 
-                console.log('canplay listener: _this.playerState = ' + _this.playerState + '.');
-
                 if (_this.start > _this.video.duration) {
                     _this.start = 0;
                 }
