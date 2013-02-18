@@ -411,6 +411,19 @@ class ResourceTemplates(object):
 
         return templates
 
+# A list of metadata that this module can inherit from its parent module
+inheritable_metadata = (
+    'graded', 'start', 'due', 'graceperiod', 'showanswer', 'rerandomize',
+    # TODO (ichuang): used for Fall 2012 xqa server access
+    'xqa_key',
+    # TODO: This is used by the XMLModuleStore to provide for locations for
+    # static files, and will need to be removed when that code is removed
+    'data_dir',
+    # How many days early to show a course element to beta testers (float)
+    # intended to be set per-course, but can be overridden in for specific
+    # elements.  Can be a float.
+    'days_early_for_beta'
+)
 
 class XModuleDescriptor(Plugin, HTMLSnippet, ResourceTemplates):
     """
@@ -432,20 +445,6 @@ class XModuleDescriptor(Plugin, HTMLSnippet, ResourceTemplates):
     has_score = False  # This indicates whether the xmodule is a problem-type.
     # It should respond to max_score() and grade(). It can be graded or ungraded
     # (like a practice problem).
-
-    # A list of metadata that this module can inherit from its parent module
-    inheritable_metadata = (
-        'graded', 'start', 'due', 'graceperiod', 'showanswer', 'rerandomize',
-        # TODO (ichuang): used for Fall 2012 xqa server access
-        'xqa_key',
-        # TODO: This is used by the XMLModuleStore to provide for locations for
-        # static files, and will need to be removed when that code is removed
-        'data_dir',
-        # How many days early to show a course element to beta testers (float)
-        # intended to be set per-course, but can be overridden in for specific
-        # elements.  Can be a float.
-        'days_early_for_beta'
-    )
 
     # cdodge: this is a list of metadata names which are 'system' metadata
     # and should not be edited by an end-user
@@ -585,12 +584,12 @@ class XModuleDescriptor(Plugin, HTMLSnippet, ResourceTemplates):
     def inherit_metadata(self, metadata):
         """
         Updates this module with metadata inherited from a containing module.
-        Only metadata specified in self.inheritable_metadata will
+        Only metadata specified in inheritable_metadata will
         be inherited
         """
         # Set all inheritable metadata from kwargs that are
-        # in self.inheritable_metadata and aren't already set in metadata
-        for attr in self.inheritable_metadata:
+        # in inheritable_metadata and aren't already set in metadata
+        for attr in inheritable_metadata:
             if attr not in self.metadata and attr in metadata:
                 self._inherited_metadata.add(attr)
                 self.metadata[attr] = metadata[attr]
