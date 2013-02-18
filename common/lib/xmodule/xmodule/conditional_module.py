@@ -49,7 +49,7 @@ class ConditionalModule(XModule):
     # value: <name of module attribute>
     conditions_map = {
         'poll_answer': 'poll_answer',  # poll_question attr
-        'completed': 'is_completed',  # capa_problem attr
+        'compeleted': 'is_competed',  # capa_problem attr
         'attempted': 'is_attempted',  # capa_problem attr
         'voted': 'voted'  # poll_question attr
     }
