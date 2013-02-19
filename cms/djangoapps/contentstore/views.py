@@ -59,6 +59,7 @@ from cms.djangoapps.models.settings.course_details import CourseDetails,\
 from cms.djangoapps.models.settings.course_grading import CourseGradingModel
 from cms.djangoapps.contentstore.utils import get_modulestore
 from lxml import etree
+from django.shortcuts import redirect
 
 # to install PIL on MacOSX: 'easy_install http://dist.repoze.org/PIL-1.1.6.tar.gz'
 
@@ -81,6 +82,11 @@ def signup(request):
     csrf_token = csrf(request)['csrf_token']
     return render_to_response('signup.html', {'csrf': csrf_token})
 
+def old_login_redirect(request):
+    '''
+    Redirect to the active login url.
+    '''
+    return redirect('login', permanent=True)
 
 @ssl_login_shortcut
 @ensure_csrf_cookie
@@ -94,6 +100,11 @@ def login_page(request):
         'forgot_password_link': "//{base}/#forgot-password-modal".format(base=settings.LMS_BASE),
     })
 
+def howitworks(request):
+    if request.user.is_authenticated():
+        return index(request)
+    else: 
+        return render_to_response('howitworks.html', {})
 
 # ==== Views for any logged-in user ==================================
 
@@ -122,7 +133,8 @@ def index(request):
                         course.location.course,
                         course.location.name]))
                     for course in courses],
-        'user': request.user
+        'user': request.user,
+        'disable_course_creation': settings.MITX_FEATURES.get('DISABLE_COURSE_CREATION', False) and not request.user.is_staff
     })
 
 
@@ -272,7 +284,7 @@ def edit_unit(request, location):
                 template.display_name,
                 template.location.url(),
                 'markdown' in template.metadata,
-                template.location.name == 'Empty'
+                'empty' in template.metadata
             ))
 
     components = [
@@ -729,8 +741,6 @@ def clone_item(request):
 
 #@login_required
 #@ensure_csrf_cookie
-
-
 def upload_asset(request, org, course, coursename):
     '''
     cdodge: this method allows for POST uploading of files into the course asset library, which will
@@ -795,8 +805,6 @@ def upload_asset(request, org, course, coursename):
 '''
 This view will return all CMS users who are editors for the specified course
 '''
-
-
 @login_required
 @ensure_csrf_cookie
 def manage_users(request, location):
@@ -818,7 +826,7 @@ def manage_users(request, location):
     })
 
 
-def create_json_response(errmsg=None):
+def create_json_response(errmsg = None):
     if errmsg is not None:
         resp = HttpResponse(json.dumps({'Status': 'Failed', 'ErrMsg': errmsg}))
     else:
@@ -830,8 +838,6 @@ def create_json_response(errmsg=None):
 This POST-back view will add a user - specified by email - to the list of editors for
 the specified course
 '''
-
-
 @expect_json
 @login_required
 @ensure_csrf_cookie
@@ -864,8 +870,6 @@ def add_user(request, location):
 This POST-back view will remove a user - specified by email - from the list of editors for
 the specified course
 '''
-
-
 @expect_json
 @login_required
 @ensure_csrf_cookie
@@ -1123,8 +1127,31 @@ def get_course_settings(request, org, course, name):
     course_details = CourseDetails.fetch(location)
 
     return render_to_response('settings.html', {
-        'active_tab': 'settings',
         'context_course': course_module,
+        'course_location' : location,
+        'course_details' : json.dumps(course_details, cls=CourseSettingsEncoder)
+    })
+
+@login_required
+@ensure_csrf_cookie
+def course_config_graders_page(request, org, course, name):
+    """
+    Send models and views as well as html for editing the course settings to the client.
+
+    org, course, name: Attributes of the Location for the item to edit
+    """
+    location = ['i4x', org, course, 'course', name]
+
+    # check that logged in user has permissions to this item
+    if not has_access(request.user, location):
+        raise PermissionDenied()
+
+    course_module = modulestore().get_item(location)
+    course_details = CourseGradingModel.fetch(location)
+
+    return render_to_response('settings_graders.html', {
+        'context_course': course_module,
+        'course_location' : location,
         'course_details': json.dumps(course_details, cls=CourseSettingsEncoder)
     })
 
@@ -1259,6 +1286,10 @@ def edge(request):
 @login_required
 @expect_json
 def create_new_course(request):
+
+    if settings.MITX_FEATURES.get('DISABLE_COURSE_CREATION', False) and not request.user.is_staff:
+        raise PermissionDenied()
+
     # This logic is repeated in xmodule/modulestore/tests/factories.py
     # so if you change anything here, you need to also change it there.
     # TODO: write a test that creates two courses, one with the factory and

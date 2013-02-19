@@ -4,7 +4,7 @@ class @Rubric
   # finds the scores for each rubric category
   @get_score_list: () =>
     # find the number of categories:
-    num_categories = $('b.rubric-category').length
+    num_categories = $('.rubric-category').length
 
     score_lst = []
     # get the score for each one
@@ -23,7 +23,7 @@ class @Rubric
 
   @check_complete: () ->
      # check to see whether or not any categories have not been scored
-    num_categories = $('b.rubric-category').length
+    num_categories = $('.rubric-category').length
     for i in [0..(num_categories-1)]
       score = $("input[name='score-selection-#{i}']:checked").val()
       if score == undefined

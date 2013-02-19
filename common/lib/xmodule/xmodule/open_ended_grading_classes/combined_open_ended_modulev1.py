@@ -531,9 +531,6 @@ class CombinedOpenEndedV1Module():
         rubric_scores = [all_responses[i]['rubric_scores'] for i in xrange(0,len(all_responses)) if len(all_responses[i]['rubric_scores'])>0 and all_responses[i]['grader_types'][0] in HUMAN_GRADER_TYPE.keys()]
         grader_types = [all_responses[i]['grader_types'] for i in xrange(0,len(all_responses)) if len(all_responses[i]['grader_types'])>0 and all_responses[i]['grader_types'][0] in HUMAN_GRADER_TYPE.keys()]
         feedback_items = [all_responses[i]['feedback_items'] for i in xrange(0,len(all_responses)) if len(all_responses[i]['feedback_items'])>0 and all_responses[i]['grader_types'][0] in HUMAN_GRADER_TYPE.keys()]
-        log.debug(rubric_scores)
-        log.debug(grader_types)
-        log.debug(feedback_items)
         rubric_html = self.rubric_renderer.render_combined_rubric(stringify_children(self.static_data['rubric']), rubric_scores,
             grader_types, feedback_items)
 

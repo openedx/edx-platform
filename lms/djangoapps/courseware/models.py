@@ -13,13 +13,7 @@ ASSUMPTIONS: modules have unique IDs, even across different module_types
 
 """
 from django.db import models
-#from django.core.cache import cache
 from django.contrib.auth.models import User
-
-#from cache_toolbox import cache_model, cache_relation
-
-#CACHE_TIMEOUT = 60 * 60 * 4 # Set the cache timeout to be four hours
-
 
 class StudentModule(models.Model):
     """
@@ -30,6 +24,7 @@ class StudentModule(models.Model):
     MODULE_TYPES = (('problem', 'problem'),
                     ('video', 'video'),
                     ('html', 'html'),
+                    ('timelimit', 'timelimit'),
                     )
     ## These three are the key for the object
     module_type = models.CharField(max_length=32, choices=MODULE_TYPES, default='problem', db_index=True)

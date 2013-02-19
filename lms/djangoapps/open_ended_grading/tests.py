@@ -23,7 +23,7 @@ from mitxmako.shortcuts import render_to_string
 
 import logging
 log = logging.getLogger(__name__)
-from override_settings import override_settings
+from django.test.utils import override_settings
 from django.http import QueryDict
 
 from xmodule.tests import test_util_open_ended
@@ -103,6 +103,7 @@ class TestStaffGradingService(ct.PageLoader):
                 'feedback': 'great!',
                 'submission_id': '123',
                 'location': self.location,
+                'submission_flagged': "true",
                 'rubric_scores[]': ['1', '2']}
 
         r = self.check_for_post_code(200, url, data)
