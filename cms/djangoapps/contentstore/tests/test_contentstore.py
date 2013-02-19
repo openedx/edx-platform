@@ -378,7 +378,7 @@ class ContentStoreTest(ModuleStoreTestCase):
 
         resp = self.client.get(reverse('course_index', kwargs=data))
         self.assertContains(resp,
-            '<a href="/MITx/999/course/Robot_Super_Course" class="class-name">Robot Super Course</a>',
+            '<article class="courseware-overview" data-course-id="i4x://MITx/999/course/Robot_Super_Course">',
             status_code=200,
             html=True)
 

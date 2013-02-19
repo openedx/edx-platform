@@ -11,10 +11,11 @@ def i_fill_in_the_registration_form(step):
     register_form.find_by_name('terms_of_service').check()
 
 
-@step('I press the "([^"]*)" button on the registration form$')
-def i_press_the_button_on_the_registration_form(step, button):
+@step('I press the Create My Account button on the registration form$')
+def i_press_the_button_on_the_registration_form(step):
     register_form = world.browser.find_by_css('form#register_form')
-    register_form.find_by_value(button).click()
+    submit_css = 'button#submit'
+    register_form.find_by_css(submit_css).click()
 
 
 @step('I should see be on the studio home page$')

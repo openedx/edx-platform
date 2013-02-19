@@ -1,5 +1,5 @@
-.unit .main-wrapper,
-.subsection .main-wrapper {
+.unit .main-wrapper {
+  @include clearfix();
   margin: 40px;
 }
 
