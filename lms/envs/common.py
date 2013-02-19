@@ -242,6 +242,16 @@ MODULESTORE = {
 }
 CONTENTSTORE = None
 
+#################### Python sandbox ############################################
+
+CODE_JAIL = {
+    # Path to a sandboxed Python executable.  None means don't bother.
+    'python_bin': None,
+    # User to run as in the sandbox.
+    'user': 'sandbox',
+}
+
+
 ############################ SIGNAL HANDLERS ################################
 # This is imported to register the exception signal handling that logs exceptions
 import monitoring.exceptions  # noqa
@@ -385,6 +395,7 @@ MIDDLEWARE_CLASSES = (
     # 'debug_toolbar.middleware.DebugToolbarMiddleware',
 
     'django_comment_client.utils.ViewNameMiddleware',
+    'codejail.django_integration.ConfigureCodeJailMiddleware',
 )
 
 ############################### Pipeline #######################################

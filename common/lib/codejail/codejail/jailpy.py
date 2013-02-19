@@ -7,6 +7,7 @@ import os, os.path
 import resource
 import shutil
 import subprocess
+import sys
 import threading
 import time
 
@@ -16,21 +17,24 @@ from .util import temp_directory
 
 # Configure the Python command
 
-SANDBOX_POSSIBILITIES = [
-    "~/mitx_all/python-sandbox/bin/python",
-    "/usr/bin/python-sandbox",
-]
+PYTHON_CMD = None
 
-for sandbox_python in SANDBOX_POSSIBILITIES:
-    sandbox_python = os.path.expanduser(sandbox_python)
-    if os.path.exists(sandbox_python):
-        PYTHON_CMD = [
-            'sudo', '-u', 'sandbox',
-            sandbox_python, '-E',
-        ]
-        break
-else:
-    raise Exception("Couldn't find Python sandbox")
+def configure(python_bin, user=None):
+    """Configure the jailpy module."""
+    global PYTHON_CMD
+    PYTHON_CMD = []
+    if user:
+        PYTHON_CMD.extend(['sudo', '-u', 'sandbox'])
+    PYTHON_CMD.extend([python_bin, '-E'])
+
+def is_configured():
+    return bool(PYTHON_CMD)
+
+# By default, look where our current Python is, and maybe there's a
+# python-sandbox alongside.  Only do this if running in a virtualenv.
+if hasattr(sys, 'real_prefix'):
+    if os.path.isdir(sys.prefix + "-sandbox"):
+        configure(sys.prefix + "-sandbox/bin/python", "sandbox")
 
 
 class JailResult(object):
@@ -52,6 +56,9 @@ def jailpy(code, files=None, argv=None, stdin=None):
         .status: return status of the process: an int, 0 for successful
 
     """
+    if not PYTHON_CMD:
+        raise Exception("jailpy needs to be configured")
+
     with temp_directory(delete_when_done=True) as tmpdir:
 
         # All the supporting files are copied into our directory.

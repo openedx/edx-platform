@@ -4,12 +4,17 @@ import textwrap
 import unittest
 from nose.plugins.skip import SkipTest
 
-from codejail.jailpy import jailpy
+from codejail.jailpy import jailpy, is_configured
 
 dedent = textwrap.dedent
 
 class JailPyHelpers(object):
     """Assert helpers for jailpy tests."""
+    def setUp(self):
+        super(JailPyHelpers, self).setUp()
+        if not is_configured():
+            raise SkipTest
+
     def assertResultOk(self, res):
         self.assertEqual(res.stderr, "")
         self.assertEqual(res.status, 0)
