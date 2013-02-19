@@ -125,7 +125,8 @@ def index(request):
                     reverse('course_index', args=[
                         course.location.org,
                         course.location.course,
-                        course.location.name]))
+                        course.location.name]),
+                    get_lms_link_for_item(course.location))
                     for course in courses],
         'user': request.user,
         'disable_course_creation': settings.MITX_FEATURES.get('DISABLE_COURSE_CREATION', False) and not request.user.is_staff
@@ -166,6 +167,8 @@ def course_index(request, org, course, name):
     if not has_access(request.user, location):
         raise PermissionDenied()
 
+    lms_link = get_lms_link_for_item(location)
+
     upload_asset_callback_url = reverse('upload_asset', kwargs={
             'org': org,
             'course': course,
@@ -178,6 +181,7 @@ def course_index(request, org, course, name):
     return render_to_response('overview.html', {
         'active_tab': 'courseware',
         'context_course': course,
+        'lms_link': lms_link,
         'sections': sections,
         'course_graders': json.dumps(CourseGradingModel.fetch(course.location).graders),
         'parent_location': course.location,

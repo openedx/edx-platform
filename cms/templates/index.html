@@ -67,12 +67,12 @@
       <article class="my-classes">
         % if user.is_active:
         <ul class="class-list">
-          %for course, url in courses:
+          %for course, url, lms_link in courses:
           <li>
             <a class="class-link" href="${url}" class="class-name">
               <span class="class-name">${course}</span>
             </a>
-            <a href="#" rel="external" class="button view-button view-live-button"><i class="ss-icon ss-symbolicons-block icon icon-view">&#xE010;</i>View Live</a>
+            <a href="${lms_link}" rel="external" class="button view-button view-live-button"><i class="ss-icon ss-symbolicons-block icon icon-view">&#xE010;</i>View Live</a>
           </li>
             %endfor
         </ul>
