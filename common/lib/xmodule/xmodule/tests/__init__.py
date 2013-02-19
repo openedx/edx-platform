@@ -26,12 +26,12 @@ test_system = ModuleSystem(
     # "render" to just the context...
     render_template=lambda template, context: str(context),
     replace_urls=Mock(),
-    user=Mock(),
+    user=Mock(is_staff=False),
     filestore=Mock(),
     debug=True,
-    xqueue={'interface':None, 'callback_url':'/', 'default_queuename': 'testqueue', 'waittime': 10},
+    xqueue={'interface': None, 'callback_url': '/', 'default_queuename': 'testqueue', 'waittime': 10},
     node_path=os.environ.get("NODE_PATH", "/usr/local/lib/node_modules"),
-    anonymous_student_id = 'student'
+    anonymous_student_id='student'
 )
 
 
@@ -85,4 +85,3 @@ class ModelsTest(unittest.TestCase):
         except:
             exception_happened = True
         self.assertTrue(exception_happened)
-

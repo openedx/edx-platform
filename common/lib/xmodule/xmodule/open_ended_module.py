@@ -38,6 +38,7 @@ from combined_open_ended_rubric import CombinedOpenEndedRubric
 
 log = logging.getLogger("mitx.courseware")
 
+
 class OpenEndedModule(openendedchild.OpenEndedChild):
     """
     The open ended module supports all external open ended grader problems.
@@ -121,6 +122,7 @@ class OpenEndedModule(openendedchild.OpenEndedChild):
             'rubric': rubric_string,
             'initial_display': self.initial_display,
             'answer': self.answer,
+            'problem_id': self.display_name
         })
         updated_grader_payload = json.dumps(parsed_grader_payload)
 
@@ -257,7 +259,7 @@ class OpenEndedModule(openendedchild.OpenEndedChild):
         """
         new_score_msg = self._parse_score_msg(score_msg, system)
         if not new_score_msg['valid']:
-            score_msg['feedback'] = 'Invalid grader reply. Please contact the course staff.'
+            new_score_msg['feedback'] = 'Invalid grader reply. Please contact the course staff.'
 
         self.record_latest_score(new_score_msg['score'])
         self.record_latest_post_assessment(score_msg)
@@ -299,11 +301,12 @@ class OpenEndedModule(openendedchild.OpenEndedChild):
 
         # We want to display available feedback in a particular order.
         # This dictionary specifies which goes first--lower first.
-        priorities = {# These go at the start of the feedback
+        priorities = {  # These go at the start of the feedback
                       'spelling': 0,
                       'grammar': 1,
                       # needs to be after all the other feedback
                       'markup_text': 3}
+        do_not_render = ['topicality', 'prompt-overlap']
 
         default_priority = 2
 
@@ -358,6 +361,10 @@ class OpenEndedModule(openendedchild.OpenEndedChild):
             if len(feedback) == 0:
                 return format_feedback('errors', 'No feedback available')
 
+            for tag in do_not_render:
+                if tag in feedback:
+                    feedback.pop(tag)
+
             feedback_lst = sorted(feedback.items(), key=get_priority)
             feedback_list_part1 = u"\n".join(format_feedback(k, v) for k, v in feedback_lst)
         else:
@@ -377,11 +384,15 @@ class OpenEndedModule(openendedchild.OpenEndedChild):
             Return error message or feedback template
         """
 
-        log.debug(response_items)
-        rubric_feedback=""
+        rubric_feedback = ""
         feedback = self._convert_longform_feedback_to_html(response_items)
-        if response_items['rubric_scores_complete']==True:
-            rubric_feedback = CombinedOpenEndedRubric.render_rubric(response_items['rubric_xml'], system)
+        rubric_scores = []
+        if response_items['rubric_scores_complete'] == True:
+            rubric_renderer = CombinedOpenEndedRubric(system, True)
+            rubric_dict = rubric_renderer.render_rubric(response_items['rubric_xml'])
+            success = rubric_dict['success']
+            rubric_feedback = rubric_dict['html']
+            rubric_scores = rubric_dict['rubric_scores']
 
         if not response_items['success']:
             return system.render_template("open_ended_error.html",
@@ -391,10 +402,10 @@ class OpenEndedModule(openendedchild.OpenEndedChild):
             'grader_type': response_items['grader_type'],
             'score': "{0} / {1}".format(response_items['score'], self.max_score()),
             'feedback': feedback,
-            'rubric_feedback' : rubric_feedback
+            'rubric_feedback': rubric_feedback
         })
 
-        return feedback_template
+        return feedback_template, rubric_scores
 
 
     def _parse_score_msg(self, score_msg, system, join_feedback=True):
@@ -404,6 +415,13 @@ class OpenEndedModule(openendedchild.OpenEndedChild):
              'score': Numeric value (floating point is okay) to assign to answer
              'msg': grader_msg
              'feedback' : feedback from grader
+             'grader_type': what type of grader resulted in this score
+             'grader_id': id of the grader
+             'submission_id' : id of the submission
+             'success': whether or not this submission was successful
+             'rubric_scores': a list of rubric scores
+             'rubric_scores_complete': boolean if rubric scores are complete
+             'rubric_xml': the xml of the rubric in string format
              }
 
         Returns (valid_score_msg, correct, score, msg):
@@ -411,7 +429,17 @@ class OpenEndedModule(openendedchild.OpenEndedChild):
             correct:         Correctness of submission (Boolean)
             score:           Points to be assigned (numeric, can be float)
         """
-        fail = {'valid': False, 'score': 0, 'feedback': ''}
+        fail = {
+            'valid': False,
+            'score': 0,
+            'feedback': '',
+            'rubric_scores' : [[0]],
+            'grader_types' : [''],
+            'feedback_items' : [''],
+            'feedback_dicts' : [{}],
+            'grader_ids' : [0],
+            'submission_ids' : [0],
+            }
         try:
             score_result = json.loads(score_msg)
         except (TypeError, ValueError):
@@ -435,9 +463,14 @@ class OpenEndedModule(openendedchild.OpenEndedChild):
                 log.error(error_message)
                 fail['feedback'] = error_message
                 return fail
-        #This is to support peer grading
+            #This is to support peer grading
         if isinstance(score_result['score'], list):
             feedback_items = []
+            rubric_scores = []
+            grader_types = []
+            feedback_dicts = []
+            grader_ids = []
+            submission_ids = []
             for i in xrange(0, len(score_result['score'])):
                 new_score_result = {
                     'score': score_result['score'][i],
@@ -446,10 +479,20 @@ class OpenEndedModule(openendedchild.OpenEndedChild):
                     'success': score_result['success'],
                     'grader_id': score_result['grader_id'][i],
                     'submission_id': score_result['submission_id'],
-                    'rubric_scores_complete' : score_result['rubric_scores_complete'],
-                    'rubric_xml' : score_result['rubric_xml'],
+                    'rubric_scores_complete': score_result['rubric_scores_complete'][i],
+                    'rubric_xml': score_result['rubric_xml'][i],
                 }
-                feedback_items.append(self._format_feedback(new_score_result, system))
+                feedback_template, rubric_score = self._format_feedback(new_score_result, system)
+                feedback_items.append(feedback_template)
+                rubric_scores.append(rubric_score)
+                grader_types.append(score_result['grader_type'])
+                try:
+                    feedback_dict = json.loads(score_result['feedback'][i])
+                except:
+                    pass
+                feedback_dicts.append(feedback_dict)
+                grader_ids.append(score_result['grader_id'][i])
+                submission_ids.append(score_result['submission_id'])
             if join_feedback:
                 feedback = "".join(feedback_items)
             else:
@@ -457,13 +500,33 @@ class OpenEndedModule(openendedchild.OpenEndedChild):
             score = int(median(score_result['score']))
         else:
             #This is for instructor and ML grading
-            feedback = self._format_feedback(score_result, system)
+            feedback, rubric_score = self._format_feedback(score_result, system)
             score = score_result['score']
+            rubric_scores = [rubric_score]
+            grader_types = [score_result['grader_type']]
+            feedback_items = [feedback]
+            try:
+                feedback_dict = json.loads(score_result['feedback'])
+            except:
+                pass
+            feedback_dicts = [feedback_dict]
+            grader_ids = [score_result['grader_id']]
+            submission_ids = [score_result['submission_id']]
 
         self.submission_id = score_result['submission_id']
         self.grader_id = score_result['grader_id']
 
-        return {'valid': True, 'score': score, 'feedback': feedback}
+        return {
+            'valid': True,
+            'score': score,
+            'feedback': feedback,
+            'rubric_scores' : rubric_scores,
+            'grader_types' : grader_types,
+            'feedback_items' : feedback_items,
+            'feedback_dicts' : feedback_dicts,
+            'grader_ids' : grader_ids,
+            'submission_ids' : submission_ids,
+        }
 
     def latest_post_assessment(self, system, short_feedback=False, join_feedback=True):
         """
@@ -474,7 +537,8 @@ class OpenEndedModule(openendedchild.OpenEndedChild):
         if not self.history:
             return ""
 
-        feedback_dict = self._parse_score_msg(self.history[-1].get('post_assessment', ""), system, join_feedback=join_feedback)
+        feedback_dict = self._parse_score_msg(self.history[-1].get('post_assessment', ""), system,
+            join_feedback=join_feedback)
         if not short_feedback:
             return feedback_dict['feedback'] if feedback_dict['valid'] else ''
         if feedback_dict['valid']:
@@ -539,24 +603,31 @@ class OpenEndedModule(openendedchild.OpenEndedChild):
         @param system: modulesystem
         @return: Success indicator
         """
-        if self.attempts > self.max_attempts:
-            # If too many attempts, prevent student from saving answer and
-            # seeing rubric.  In normal use, students shouldn't see this because
-            # they won't see the reset button once they're out of attempts.
-            return {
-                'success': False,
-                'error': 'Too many attempts.'
-            }
+        # Once we close the problem, we should not allow students
+        # to save answers
+        closed, msg = self.check_if_closed()
+        if closed:
+            return msg
 
         if self.state != self.INITIAL:
             return self.out_of_sync_error(get)
 
         # add new history element with answer and empty score and hint.
-        self.new_history_entry(get['student_answer'])
-        self.send_to_grader(get['student_answer'], system)
-        self.change_state(self.ASSESSING)
+        success, get = self.append_image_to_student_answer(get)
+        error_message = ""
+        if success:
+            get['student_answer'] = OpenEndedModule.sanitize_html(get['student_answer'])
+            self.new_history_entry(get['student_answer'])
+            self.send_to_grader(get['student_answer'], system)
+            self.change_state(self.ASSESSING)
+        else:
+            error_message = "There was a problem saving the image in your submission.  Please try a different image, or try pasting a link to an image into the answer box."
 
-        return {'success': True, }
+        return {
+            'success': True,
+            'error': error_message,
+            'student_response': get['student_answer']
+        }
 
     def update_score(self, get, system):
         """
@@ -600,8 +671,8 @@ class OpenEndedModule(openendedchild.OpenEndedChild):
             'msg': post_assessment,
             'child_type': 'openended',
             'correct': correct,
+            'accept_file_upload': self.accept_file_upload,
         }
-        log.debug(context)
         html = system.render_template('open_ended.html', context)
         return html
 
@@ -655,5 +726,3 @@ class OpenEndedDescriptor(XmlDescriptor, EditingDescriptor):
             add_child(child)
 
         return elt
-
-

@@ -7,8 +7,7 @@ import logging
 import requests
 from requests.exceptions import RequestException, ConnectionError, HTTPError
 import sys
-from grading_service import GradingService
-from grading_service import GradingServiceError
+from xmodule.grading_service_module import GradingService, GradingServiceError
 
 from django.conf import settings
 from django.http import HttpResponse, Http404
@@ -17,9 +16,10 @@ from courseware.access import has_access
 from util.json_request import expect_json
 from xmodule.course_module import CourseDescriptor
 from student.models import unique_id_for_user
+from xmodule.x_module import ModuleSystem
+from mitxmako.shortcuts import render_to_string
 
 log = logging.getLogger(__name__)
-
 
 
 class MockStaffGradingService(object):
@@ -29,7 +29,7 @@ class MockStaffGradingService(object):
     def __init__(self):
         self.cnt = 0
 
-    def get_next(self,course_id, location, grader_id):
+    def get_next(self, course_id, location, grader_id):
         self.cnt += 1
         return json.dumps({'success': True,
                            'submission_id': self.cnt,
@@ -46,14 +46,14 @@ class MockStaffGradingService(object):
         self.cnt += 1
         return json.dumps({'success': True,
         'problem_list': [
-          json.dumps({'location': 'i4x://MITx/3.091x/problem/open_ended_demo1', \
+          json.dumps({'location': 'i4x://MITx/3.091x/problem/open_ended_demo1', 
             'problem_name': "Problem 1", 'num_graded': 3, 'num_pending': 5, 'min_for_ml': 10}),
-          json.dumps({'location': 'i4x://MITx/3.091x/problem/open_ended_demo2', \
+          json.dumps({'location': 'i4x://MITx/3.091x/problem/open_ended_demo2',
             'problem_name': "Problem 2", 'num_graded': 1, 'num_pending': 5, 'min_for_ml': 10})
         ]})
 
 
-    def save_grade(self, course_id, grader_id, submission_id, score, feedback, skipped):
+    def save_grade(self, course_id, grader_id, submission_id, score, feedback, skipped, rubric_scores, submission_flagged):
         return self.get_next(course_id, 'fake location', grader_id)
 
 
@@ -62,6 +62,7 @@ class StaffGradingService(GradingService):
     Interface to staff grading backend.
     """
     def __init__(self, config):
+        config['system'] = ModuleSystem(None, None, None, render_to_string, None)
         super(StaffGradingService, self).__init__(config)
         self.get_next_url = self.url + '/get_next_submission/'
         self.save_grade_url = self.url + '/save_grade/'
@@ -85,7 +86,7 @@ class StaffGradingService(GradingService):
         Raises:
             GradingServiceError: something went wrong with the connection.
         """
-        params = {'course_id': course_id,'grader_id': grader_id}
+        params = {'course_id': course_id, 'grader_id': grader_id}
         return self.get(self.get_problem_list_url, params)
 
 
@@ -107,12 +108,13 @@ class StaffGradingService(GradingService):
         Raises:
             GradingServiceError: something went wrong with the connection.
         """
-        return self.get(self.get_next_url,
+        response = self.get(self.get_next_url,
                                       params={'location': location,
                                               'grader_id': grader_id})
+        return json.dumps(self._render_rubric(response))
 
 
-    def save_grade(self, course_id, grader_id, submission_id, score, feedback, skipped):
+    def save_grade(self, course_id, grader_id, submission_id, score, feedback, skipped, rubric_scores, submission_flagged):
         """
         Save a score and feedback for a submission.
 
@@ -129,7 +131,10 @@ class StaffGradingService(GradingService):
                 'score': score,
                 'feedback': feedback,
                 'grader_id': grader_id,
-                'skipped': skipped}
+                'skipped': skipped,
+                'rubric_scores': rubric_scores,
+                'rubric_scores_complete': True,
+                'submission_flagged': submission_flagged}
 
         return self.post(self.save_grade_url, data=data)
 
@@ -142,6 +147,7 @@ class StaffGradingService(GradingService):
 # don't initialize until staff_grading_service() is called--means that just
 # importing this file doesn't create objects that may not have the right config
 _service = None
+
 
 def staff_grading_service():
     """
@@ -161,6 +167,7 @@ def staff_grading_service():
         _service = StaffGradingService(settings.STAFF_GRADING_INTERFACE)
 
     return _service
+
 
 def _err_response(msg):
     """
@@ -286,7 +293,7 @@ def save_grade(request, course_id):
     if request.method != 'POST':
         raise Http404
 
-    required = set(['score', 'feedback', 'submission_id', 'location'])
+    required = set(['score', 'feedback', 'submission_id', 'location','submission_flagged', 'rubric_scores[]'])
     actual = set(request.POST.keys())
     missing = required - actual
     if len(missing) > 0:
@@ -299,13 +306,16 @@ def save_grade(request, course_id):
 
     location = p['location']
     skipped =  'skipped' in p
+
     try:
         result_json = staff_grading_service().save_grade(course_id,
                                           grader_id,
                                           p['submission_id'],
                                           p['score'],
                                           p['feedback'],
-                                          skipped)
+                                          skipped,
+                                          p.getlist('rubric_scores[]'),
+                                          p['submission_flagged'])
     except GradingServiceError:
         log.exception("Error saving grade")
         return _err_response('Could not connect to grading service')
@@ -323,4 +333,3 @@ def save_grade(request, course_id):
     # Ok, save_grade seemed to work.  Get the next submission to grade.
     return HttpResponse(_get_next(course_id, grader_id, location),
                         mimetype="application/json")
-

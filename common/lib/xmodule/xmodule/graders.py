@@ -1,6 +1,5 @@
 import abc
 import inspect
-import json
 import logging
 import random
 import sys
@@ -12,69 +11,6 @@ log = logging.getLogger("mitx.courseware")
 # This is a tuple for holding scores, either from problems or sections.
 # Section either indicates the name of the problem or the name of the section
 Score = namedtuple("Score", "earned possible graded section")
-
-def load_grading_policy(course_policy_string):
-    """
-    This loads a grading policy from a string (usually read from a file),
-    which can be a JSON object or an empty string.
-
-    The JSON object can have the keys GRADER and GRADE_CUTOFFS. If either is
-    missing, it reverts to the default.
-    """
-
-    default_policy_string = """
-    {
-        "GRADER" : [
-            {
-                "type" : "Homework",
-                "min_count" : 12,
-                "drop_count" : 2,
-                "short_label" : "HW",
-                "weight" : 0.15
-            },
-            {
-                "type" : "Lab",
-                "min_count" : 12,
-                "drop_count" : 2,
-                "category" : "Labs",
-                "weight" : 0.15
-            },
-            {
-                "type" : "Midterm",
-                "name" : "Midterm Exam",
-                "short_label" : "Midterm",
-                "weight" : 0.3
-            },
-            {
-                "type" : "Final",
-                "name" : "Final Exam",
-                "short_label" : "Final",
-                "weight" : 0.4
-            }
-        ],
-        "GRADE_CUTOFFS" : {
-            "A" : 0.87,
-            "B" : 0.7,
-            "C" : 0.6
-        }
-    }
-    """
-
-    # Load the global settings as a dictionary
-    grading_policy = json.loads(default_policy_string)
-
-    # Load the course policies as a dictionary
-    course_policy = {}
-    if course_policy_string:
-        course_policy = json.loads(course_policy_string)
-
-    # Override any global settings with the course settings
-    grading_policy.update(course_policy)
-
-    # Here is where we should parse any configurations, so that we can fail early
-    grading_policy['GRADER'] = grader_from_conf(grading_policy['GRADER'])
-
-    return grading_policy
 
 
 def aggregate_scores(scores, section_name="summary"):
@@ -113,6 +49,7 @@ def invalid_args(func, argdict):
     if keywords: return set()  # All accepted
     return set(argdict) - set(args)
 
+
 def grader_from_conf(conf):
     """
     This creates a CourseGrader from a configuration (such as in course_settings.py).
@@ -129,22 +66,32 @@ def grader_from_conf(conf):
     for subgraderconf in conf:
         subgraderconf = subgraderconf.copy()
         weight = subgraderconf.pop("weight", 0)
+        # NOTE: 'name' used to exist in SingleSectionGrader. We are deprecating SingleSectionGrader
+        # and converting everything into an AssignmentFormatGrader by adding 'min_count' and
+        # 'drop_count'. AssignmentFormatGrader does not expect 'name', so if it appears
+        # in bad_args, go ahead remove it (this causes no errors). Eventually, SingleSectionGrader
+        # should be completely removed.
+        name = 'name'
         try:
             if 'min_count' in subgraderconf:
                 #This is an AssignmentFormatGrader
                 subgrader_class = AssignmentFormatGrader
-            elif 'name' in subgraderconf:
+            elif name in subgraderconf:
                 #This is an SingleSectionGrader
                 subgrader_class = SingleSectionGrader
             else:
                 raise ValueError("Configuration has no appropriate grader class.")
-            
+
             bad_args = invalid_args(subgrader_class.__init__, subgraderconf)
+            # See note above concerning 'name'.
+            if bad_args.issuperset({name}):
+                bad_args = bad_args - {name}
+                del subgraderconf[name]
             if len(bad_args) > 0:
                 log.warning("Invalid arguments for a subgrader: %s", bad_args)
                 for key in bad_args:
                     del subgraderconf[key]
-            
+
             subgrader = subgrader_class(**subgraderconf)
             subgraders.append((subgrader, subgrader.category, weight))
 
@@ -264,13 +211,13 @@ class SingleSectionGrader(CourseGrader):
                     break
 
         if foundScore or generate_random_scores:
-            if generate_random_scores:	# for debugging!
-                earned = random.randint(2,15)
+            if generate_random_scores:  	# for debugging!
+                earned = random.randint(2, 15)
                 possible = random.randint(earned, 15)
-            else: # We found the score
+            else:   # We found the score
                 earned = foundScore.earned
                 possible = foundScore.possible
-                
+
             percent = earned / float(possible)
             detail = "{name} - {percent:.0%} ({earned:.3n}/{possible:.3n})".format(name=self.name,
                                                                         percent=percent,
@@ -299,7 +246,7 @@ class AssignmentFormatGrader(CourseGrader):
     min_count defines how many assignments are expected throughout the course. Placeholder
     scores (of 0) will be inserted if the number of matching sections in the course is < min_count.
     If there number of matching sections in the course is > min_count, min_count will be ignored.
-    
+
     show_only_average is to suppress the display of each assignment in this grader and instead
     only show the total score of this grader in the breakdown.
 
@@ -311,7 +258,7 @@ class AssignmentFormatGrader(CourseGrader):
 
     short_label is similar to section_type, but shorter. For example, for Homework it would be
     "HW".
-    
+
     starting_index is the first number that will appear. For example, starting_index=3 and
     min_count = 2 would produce the labels "Assignment 3", "Assignment 4"
 
@@ -350,16 +297,16 @@ class AssignmentFormatGrader(CourseGrader):
         breakdown = []
         for i in range(max(self.min_count, len(scores))):
             if i < len(scores) or generate_random_scores:
-                if generate_random_scores:	# for debugging!
-                    earned = random.randint(2,15)
-                    possible = random.randint(earned, 15)                    
+                if generate_random_scores:  	# for debugging!
+                    earned = random.randint(2, 15)
+                    possible = random.randint(earned, 15)
                     section_name = "Generated"
-                    
+
                 else:
                     earned = scores[i].earned
                     possible = scores[i].possible
                     section_name = scores[i].section
-                
+
                 percentage = earned / float(possible)
                 summary = "{section_type} {index} - {name} - {percent:.0%} ({earned:.3n}/{possible:.3n})".format(index=i + self.starting_index,
                                                                 section_type=self.section_type,
@@ -372,7 +319,7 @@ class AssignmentFormatGrader(CourseGrader):
                 summary = "{section_type} {index} Unreleased - 0% (?/?)".format(index=i + self.starting_index, section_type=self.section_type)
 
             short_label = "{short_label} {index:02d}".format(index=i + self.starting_index, short_label=self.short_label)
-            
+
             breakdown.append({'percent': percentage, 'label': short_label, 'detail': summary, 'category': self.category})
 
         total_percent, dropped_indices = totalWithDrops(breakdown, self.drop_count)
@@ -382,13 +329,13 @@ class AssignmentFormatGrader(CourseGrader):
 
         total_detail = "{section_type} Average = {percent:.0%}".format(percent=total_percent, section_type=self.section_type)
         total_label = "{short_label} Avg".format(short_label=self.short_label)
-        
+
         if self.show_only_average:
             breakdown = []
-        
+
         if not self.hide_average:
             breakdown.append({'percent': total_percent, 'label': total_label, 'detail': total_detail, 'category': self.category, 'prominent': True})
-        
+
         return {'percent': total_percent,
                 'section_breakdown': breakdown,
                 #No grade_breakdown here

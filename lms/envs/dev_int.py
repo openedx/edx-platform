@@ -14,7 +14,7 @@ from .dev import *
 MITX_FEATURES['SUBDOMAIN_COURSE_LISTINGS'] = True
 
 COURSE_LISTINGS = {
-    'default' : ['BerkeleyX/CS169.1x/2012_Fall',
+    'default': ['BerkeleyX/CS169.1x/2012_Fall',
                  'BerkeleyX/CS188.1x/2012_Fall',
                  'HarvardX/CS50x/2012',
                  'HarvardX/PH207x/2012_Fall',
@@ -25,8 +25,8 @@ COURSE_LISTINGS = {
     'berkeley': ['BerkeleyX/CS169.1x/2012_Fall',
                  'BerkeleyX/CS188.1x/2012_Fall'],
 
-    'harvard' : ['HarvardX/CS50x/2012'],
+    'harvard': ['HarvardX/CS50x/2012'],
 
-    'mit'     : ['MITx/3.091x/2012_Fall',
+    'mit': ['MITx/3.091x/2012_Fall',
                  'MITx/6.00x/2012_Fall']
 }

@@ -13,7 +13,7 @@ urlpatterns = ('',
     # certificate view
 
     url(r'^update_certificate$', 'certificates.views.update_certificate'),
-    url(r'^$', 'branding.views.index', name="root"), # Main marketing page, or redirect to courseware
+    url(r'^$', 'branding.views.index', name="root"),   # Main marketing page, or redirect to courseware
     url(r'^dashboard$', 'student.views.dashboard', name="dashboard"),
     url(r'^signin$', 'student.views.login_user', name="login_user"),
     url(r'^register$', 'student.views.register_user', name="register_user"),
@@ -37,7 +37,7 @@ urlpatterns = ('',
     # url(r'^testcenter/logout$', 'student.test_center_views.logout'),
 
     url(r'^event$', 'track.views.user_track'),
-    url(r'^t/(?P<template>[^/]*)$', 'static_template_view.views.index'), # TODO: Is this used anymore? What is STATIC_GRAB?
+    url(r'^t/(?P<template>[^/]*)$', 'static_template_view.views.index'),   # TODO: Is this used anymore? What is STATIC_GRAB?
 
     url(r'^accounts/login$', 'student.views.accounts_login', name="accounts_login"),
 
@@ -67,9 +67,9 @@ urlpatterns = ('',
 
     url(r'^heartbeat$', include('heartbeat.urls')),
 
-    url(r'^university_profile/UTx$', 'courseware.views.static_university_profile', name="static_university_profile", kwargs={'org_id':'UTx'}),
-    url(r'^university_profile/WellesleyX$', 'courseware.views.static_university_profile', name="static_university_profile", kwargs={'org_id':'WellesleyX'}),
-    url(r'^university_profile/GeorgetownX$', 'courseware.views.static_university_profile', name="static_university_profile", kwargs={'org_id':'GeorgetownX'}),
+    url(r'^university_profile/UTx$', 'courseware.views.static_university_profile', name="static_university_profile", kwargs={'org_id': 'UTx'}),
+    url(r'^university_profile/WellesleyX$', 'courseware.views.static_university_profile', name="static_university_profile", kwargs={'org_id': 'WellesleyX'}),
+    url(r'^university_profile/GeorgetownX$', 'courseware.views.static_university_profile', name="static_university_profile", kwargs={'org_id': 'GeorgetownX'}),
     url(r'^university_profile/(?P<org_id>[^/]+)$', 'courseware.views.university_profile', name="university_profile"),
 
     #Semi-static views (these need to be rendered and have the login bar, but don't change)
@@ -119,12 +119,22 @@ urlpatterns = ('',
     url(r'^press/georgetown-joins-edx$', 'static_template_view.views.render',
         {'template': 'press_releases/Georgetown_joins_edX.html'}, name="press/georgetown-joins-edx"),
     url(r'^press/spring-courses$', 'static_template_view.views.render',
-        {'template': 'press_releases/Spring_2013_course_announcements.html'}, name="press/spring-courses"),
+        {'template': 'press_releases/Spring_2013_course_announcements.html'},
+        name="press/spring-courses"),
     url(r'^press/lewin-course-announcement$', 'static_template_view.views.render',
-        {'template': 'press_releases/Lewin_course_announcement.html'}, name="press/lewin-course-announcement"),
+        {'template': 'press_releases/Lewin_course_announcement.html'},
+        name="press/lewin-course-announcement"),
+    url(r'^press/bostonx-announcement$', 'static_template_view.views.render',
+        {'template': 'press_releases/bostonx_announcement.html'},
+        name="press/bostonx-announcement"),
+    url(r'^press/eric-lander-secret-of-life$', 'static_template_view.views.render',
+        {'template': 'press_releases/eric_lander_secret_of_life.html'},
+        name="press/eric-lander-secret-of-life"),
+
 
     # Should this always update to point to the latest press release?
-    (r'^pressrelease$', 'django.views.generic.simple.redirect_to', {'url': '/press/lewin-course-announcement'}),
+    (r'^pressrelease$', 'django.views.generic.simple.redirect_to',
+     {'url': '/press/eric-lander-secret-of-life'}),
 
 
     (r'^favicon\.ico$', 'django.views.generic.simple.redirect_to', {'url': '/static/images/favicon.ico'}),
@@ -135,7 +145,7 @@ urlpatterns = ('',
 )
 
 if settings.PERFSTATS:
-    urlpatterns += (url(r'^reprofile$','perfstats.views.end_profile'),)
+    urlpatterns += (url(r'^reprofile$', 'perfstats.views.end_profile'),)
 
 
 
@@ -218,7 +228,7 @@ if settings.COURSEWARE_ENABLED:
         url(r'^courses/(?P<course_id>[^/]+/[^/]+/[^/]+)/info$',
             'courseware.views.course_info', name="info"),
         url(r'^courses/(?P<course_id>[^/]+/[^/]+/[^/]+)/syllabus$',
-            'courseware.views.syllabus', name="syllabus"), # TODO arjun remove when custom tabs in place, see courseware/courses.py
+            'courseware.views.syllabus', name="syllabus"),   # TODO arjun remove when custom tabs in place, see courseware/courses.py
         url(r'^courses/(?P<course_id>[^/]+/[^/]+/[^/]+)/book/(?P<book_index>[^/]*)/$',
             'staticbook.views.index', name="book"),
         url(r'^courses/(?P<course_id>[^/]+/[^/]+/[^/]+)/book/(?P<book_index>[^/]*)/(?P<page>[^/]*)$',
@@ -260,22 +270,41 @@ if settings.COURSEWARE_ENABLED:
         url(r'^courses/(?P<course_id>[^/]+/[^/]+/[^/]+)/staff_grading/get_problem_list$',
             'open_ended_grading.staff_grading_service.get_problem_list', name='staff_grading_get_problem_list'),
 
+        # Open Ended problem list
+        url(r'^courses/(?P<course_id>[^/]+/[^/]+/[^/]+)/open_ended_problems$',
+            'open_ended_grading.views.student_problem_list', name='open_ended_problems'),
 
-        # Peer Grading
+        # Open Ended flagged problem list
+        url(r'^courses/(?P<course_id>[^/]+/[^/]+/[^/]+)/open_ended_flagged_problems$',
+            'open_ended_grading.views.flagged_problem_list', name='open_ended_flagged_problems'),
+        url(r'^courses/(?P<course_id>[^/]+/[^/]+/[^/]+)/open_ended_flagged_problems/take_action_on_flags$',
+            'open_ended_grading.views.take_action_on_flags', name='open_ended_flagged_problems_take_action'),
+
+		# Cohorts management
+        url(r'^courses/(?P<course_id>[^/]+/[^/]+/[^/]+)/cohorts$',
+            'course_groups.views.list_cohorts', name="cohorts"),
+        url(r'^courses/(?P<course_id>[^/]+/[^/]+/[^/]+)/cohorts/add$',
+            'course_groups.views.add_cohort',
+            name="add_cohort"),
+        url(r'^courses/(?P<course_id>[^/]+/[^/]+/[^/]+)/cohorts/(?P<cohort_id>[0-9]+)$',
+            'course_groups.views.users_in_cohort',
+            name="list_cohort"),
+        url(r'^courses/(?P<course_id>[^/]+/[^/]+/[^/]+)/cohorts/(?P<cohort_id>[0-9]+)/add$',
+            'course_groups.views.add_users_to_cohort',
+            name="add_to_cohort"),
+        url(r'^courses/(?P<course_id>[^/]+/[^/]+/[^/]+)/cohorts/(?P<cohort_id>[0-9]+)/delete$',
+            'course_groups.views.remove_user_from_cohort',
+            name="remove_from_cohort"),
+        url(r'^courses/(?P<course_id>[^/]+/[^/]+/[^/]+)/cohorts/debug$',
+            'course_groups.views.debug_cohort_mgmt',
+            name="debug_cohort_mgmt"),
+
+        # Open Ended Notifications
+        url(r'^courses/(?P<course_id>[^/]+/[^/]+/[^/]+)/open_ended_notifications$',
+            'open_ended_grading.views.combined_notifications', name='open_ended_notifications'),
+
         url(r'^courses/(?P<course_id>[^/]+/[^/]+/[^/]+)/peer_grading$',
             'open_ended_grading.views.peer_grading', name='peer_grading'),
-        url(r'^courses/(?P<course_id>[^/]+/[^/]+/[^/]+)/peer_grading/problem$',
-            'open_ended_grading.views.peer_grading_problem', name='peer_grading_problem'),
-        url(r'^courses/(?P<course_id>[^/]+/[^/]+/[^/]+)/peer_grading/get_next_submission$',
-            'open_ended_grading.peer_grading_service.get_next_submission', name='peer_grading_get_next_submission'),
-        url(r'^courses/(?P<course_id>[^/]+/[^/]+/[^/]+)/peer_grading/show_calibration_essay$',
-            'open_ended_grading.peer_grading_service.show_calibration_essay', name='peer_grading_show_calibration_essay'),
-        url(r'^courses/(?P<course_id>[^/]+/[^/]+/[^/]+)/peer_grading/is_student_calibrated$',
-            'open_ended_grading.peer_grading_service.is_student_calibrated', name='peer_grading_is_student_calibrated'),
-        url(r'^courses/(?P<course_id>[^/]+/[^/]+/[^/]+)/peer_grading/save_grade$',
-            'open_ended_grading.peer_grading_service.save_grade', name='peer_grading_save_grade'),
-        url(r'^courses/(?P<course_id>[^/]+/[^/]+/[^/]+)/peer_grading/save_calibration_essay$',
-            'open_ended_grading.peer_grading_service.save_calibration_essay', name='peer_grading_save_calibration_essay'),
     )
 
     # discussion forums live within courseware, so courseware must be enabled first
@@ -293,15 +322,12 @@ if settings.COURSEWARE_ENABLED:
         'courseware.views.static_tab', name="static_tab"),
         )
 
-if settings.QUICKEDIT:
-    urlpatterns += (url(r'^quickedit/(?P<id>[^/]*)$', 'dogfood.views.quickedit'),)
-    urlpatterns += (url(r'^dogfood/(?P<id>[^/]*)$', 'dogfood.views.df_capa_problem'),)
+if settings.ENABLE_JASMINE:
+    urlpatterns += (url(r'^_jasmine/', include('django_jasmine.urls')),)
 
 if settings.DEBUG:
     ## Jasmine and admin
-    urlpatterns=urlpatterns + (url(r'^_jasmine/', include('django_jasmine.urls')),
-                    url(r'^admin/', include(admin.site.urls)),
-                    )
+    urlpatterns += (url(r'^admin/', include(admin.site.urls)),)
 
 if settings.MITX_FEATURES.get('AUTH_USE_OPENID'):
     urlpatterns += (
@@ -332,6 +358,12 @@ if settings.MITX_FEATURES.get('ENABLE_SQL_TRACKING_LOGS'):
         url(r'^event_logs$', 'track.views.view_tracking_log'),
         url(r'^event_logs/(?P<args>.+)$', 'track.views.view_tracking_log'),
         )
+
+# FoldIt views
+urlpatterns += (
+    # The path is hardcoded into their app...
+    url(r'^comm/foldit_ops', 'foldit.views.foldit_ops', name="foldit_ops"),
+)
 
 urlpatterns = patterns(*urlpatterns)
 

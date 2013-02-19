@@ -51,10 +51,11 @@ class ABTestModule(XModule):
 
     def get_shared_state(self):
         return json.dumps({'group': self.group})
-    
-    def get_children_locations(self):
-        return self.definition['data']['group_content'][self.group]
-        
+
+    def get_child_descriptors(self):
+        active_locations = set(self.definition['data']['group_content'][self.group])
+        return [desc for desc in self.descriptor.get_children() if desc.location.url() in active_locations]
+
     def displayable_items(self):
         # Most modules return "self" as the displayable_item. We never display ourself
         # (which is why we don't implement get_html). We only display our children.
@@ -66,7 +67,7 @@ class ABTestModule(XModule):
 class ABTestDescriptor(RawDescriptor, XmlDescriptor):
     module_class = ABTestModule
 
-#    template_dir_name = "abtest"
+    template_dir_name = "abtest"
 
     def __init__(self, system, definition=None, **kwargs):
         """
@@ -170,7 +171,7 @@ class ABTestDescriptor(RawDescriptor, XmlDescriptor):
                 group_elem.append(etree.fromstring(child.export_to_xml(resource_fs)))
 
         return xml_object
-    
-    
+
+
     def has_dynamic_children(self):
         return True

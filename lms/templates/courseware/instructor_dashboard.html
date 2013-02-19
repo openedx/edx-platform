@@ -6,6 +6,8 @@
   <%static:css group='course'/>
   <script type="text/javascript" src="${static.url('js/vendor/flot/jquery.flot.js')}"></script>
   <script type="text/javascript" src="${static.url('js/vendor/flot/jquery.flot.axislabels.js')}"></script>
+  <script type="text/javascript" src="${static.url('js/course_groups/cohorts.js')}"></script>
+
 </%block>
 
 <%include file="/courseware/course_navigation.html" args="active_page='instructor'" />
@@ -62,6 +64,7 @@ function goto( mode)
           <a href="#" onclick="goto('Admin');" class="${modeflag.get('Admin')}">Admin</a> |
           <a href="#" onclick="goto('Forum Admin');" class="${modeflag.get('Forum Admin')}">Forum Admin</a> |
           <a href="#" onclick="goto('Enrollment');" class="${modeflag.get('Enrollment')}">Enrollment</a> |
+          <a href="#" onclick="goto('Data');" class="${modeflag.get('Data')}">DataDump</a> |
           <a href="#" onclick="goto('Manage Groups');" class="${modeflag.get('Manage Groups')}">Manage Groups</a> ]
     </h2>
 
@@ -267,6 +270,20 @@ function goto( mode)
 
 ##----------------------------------------------------------------------------- 
 
+%if modeflag.get('Data'):
+    <hr width="40%" style="align:left">
+    <p>
+    <input type="submit" name="action" value="Download CSV of all student profile data">
+    </p>
+    <p> Problem urlname: 
+        <input type="text" name="problem_to_dump" size="40">
+        <input type="submit" name="action" value="Download CSV of all responses to problem">
+    </p>
+    <hr width="40%" style="align:left">
+%endif
+  
+##----------------------------------------------------------------------------- 
+
 %if modeflag.get('Manage Groups'):
   %if instructor_access:
     <hr width="40%" style="align:left">
@@ -282,15 +299,20 @@ function goto( mode)
     <input type="submit" name="action" value="Add beta testers">
     </p>
     <hr width="40%" style="align:left">
+
+    %if course.is_cohorted:
+    <%include file="/course_groups/cohort_management.html" />
+    %endif
+
   %endif
 %endif
 
     </form>
+##----------------------------------------------------------------------------- 
 
 %if msg:
     <p></p><p>${msg}</p>
 %endif
-##----------------------------------------------------------------------------- 
 ##----------------------------------------------------------------------------- 
 
 %if datatable and modeflag.get('Psychometrics') is None:

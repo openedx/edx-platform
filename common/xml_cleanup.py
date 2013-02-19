@@ -8,11 +8,15 @@ In particular, the remove-meta option is only intended to be used after pulling 
 using the metadata_to_json management command.
 """
 
-import os, fnmatch, re, sys
+import os
+import fnmatch
+import re
+import sys
 from lxml import etree
 from collections import defaultdict
 
 INVALID_CHARS = re.compile(r"[^\w.-]")
+
 
 def clean(value):
     """
@@ -23,6 +27,7 @@ def clean(value):
 
 # category -> set of url_names for that category that we've already seen
 used_names = defaultdict(set)
+
 
 def clean_unique(category, name):
     cleaned = clean(name)
@@ -37,6 +42,7 @@ def clean_unique(category, name):
     cleaned = cleaned + str(x)
     used_names[category].add(cleaned)
     return cleaned
+
 
 def cleanup(filepath, remove_meta):
     # Keys that are exported to the policy file, and so
@@ -70,7 +76,7 @@ def cleanup(filepath, remove_meta):
             print "WARNING: {0} has both slug and url_name".format(node)
 
         if ('url_name' in attrs and 'filename' in attrs and
-            len(attrs)==2 and attrs['url_name'] == attrs['filename']):
+            len(attrs) == 2 and attrs['url_name'] == attrs['filename']):
             # This is a pointer tag in disguise.  Get rid of the filename.
             print 'turning {0}.{1} into a pointer tag'.format(node.tag, attrs['url_name'])
             del attrs['filename']
@@ -108,5 +114,3 @@ def main(args):
 
 if __name__ == '__main__':
     main(sys.argv[1:])
-
-

@@ -2,6 +2,7 @@ $baseline: 20px;
 
 $gw-column: 80px;
 $gw-gutter: 20px;
+
 $fg-column: $gw-column;
 $fg-gutter: $gw-gutter;
 $fg-max-columns: 12;
@@ -10,7 +11,9 @@ $fg-min-width: 810px;
 
 $sans-serif: 'Open Sans', $verdana;
 $monospace: Monaco, 'Bitstream Vera Sans Mono', 'Lucida Console', monospace;
+$body-font-family: $sans-serif;
 $serif: $georgia;
+
 
 $white: rgb(255,255,255);
 $black: rgb(0,0,0);
@@ -25,6 +28,9 @@ $border-color: rgb(200, 200, 200);
 $sidebar-color: rgb(246, 246, 246);
 $outer-border-color: rgb(170, 170, 170);
 
+// old variables
+$light-gray: #ddd;
+$dark-gray: #333;
 // edx.org-related
 $m-gray-l: rgb(247, 247, 247);
 $m-gray: rgb(67,67,67);

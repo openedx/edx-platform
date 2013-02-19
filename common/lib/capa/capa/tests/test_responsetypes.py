@@ -16,6 +16,7 @@ from capa.correctmap import CorrectMap
 from capa.util import convert_files_to_filenames
 from capa.xqueue_interface import dateformat
 
+
 class MultiChoiceTest(unittest.TestCase):
     def test_MC_grade(self):
         multichoice_file = os.path.dirname(__file__) + "/test_files/multichoice.xml"
@@ -295,16 +296,16 @@ class CodeResponseTest(unittest.TestCase):
             old_cmap = CorrectMap()
             for i, answer_id in enumerate(answer_ids):
                 queuekey = 1000 + i
-                queuestate = CodeResponseTest.make_queuestate(1000+i, datetime.now())
+                queuestate = CodeResponseTest.make_queuestate(1000 + i, datetime.now())
                 old_cmap.update(CorrectMap(answer_id=answer_ids[i], queuestate=queuestate))
 
             # Message format common to external graders
-            grader_msg = '<span>MESSAGE</span>' # Must be valid XML
-            correct_score_msg = json.dumps({'correct':True, 'score':1, 'msg': grader_msg})
-            incorrect_score_msg = json.dumps({'correct':False, 'score':0, 'msg': grader_msg})
+            grader_msg = '<span>MESSAGE</span>'   # Must be valid XML
+            correct_score_msg = json.dumps({'correct': True, 'score': 1, 'msg': grader_msg})
+            incorrect_score_msg = json.dumps({'correct': False, 'score': 0, 'msg': grader_msg})
 
             xserver_msgs = {'correct': correct_score_msg,
-                            'incorrect': incorrect_score_msg,}
+                            'incorrect': incorrect_score_msg, }
 
             # Incorrect queuekey, state should not be updated
             for correctness in ['correct', 'incorrect']:
@@ -325,7 +326,7 @@ class CodeResponseTest(unittest.TestCase):
 
                     new_cmap = CorrectMap()
                     new_cmap.update(old_cmap)
-                    npoints = 1 if correctness=='correct' else 0
+                    npoints = 1 if correctness == 'correct' else 0
                     new_cmap.set(answer_id=answer_id, npoints=npoints, correctness=correctness, msg=grader_msg, queuestate=None)
 
                     test_lcp.update_score(xserver_msgs[correctness], queuekey=1000 + i)
@@ -361,7 +362,7 @@ class CodeResponseTest(unittest.TestCase):
             for i, answer_id in enumerate(answer_ids):
                 queuekey = 1000 + i
                 latest_timestamp = datetime.now()
-                queuestate = CodeResponseTest.make_queuestate(1000+i, latest_timestamp)
+                queuestate = CodeResponseTest.make_queuestate(1000 + i, latest_timestamp)
                 cmap.update(CorrectMap(answer_id=answer_id, queuestate=queuestate))
             test_lcp.correct_map.update(cmap)
 
@@ -412,6 +413,7 @@ class ChoiceResponseTest(unittest.TestCase):
         self.assertEquals(test_lcp.grade_answers(test_answers).get_correctness('1_3_1'), 'incorrect')
         self.assertEquals(test_lcp.grade_answers(test_answers).get_correctness('1_4_1'), 'correct')
 
+
 class JavascriptResponseTest(unittest.TestCase):
 
     def test_jr_grade(self):
@@ -424,4 +426,3 @@ class JavascriptResponseTest(unittest.TestCase):
 
         self.assertEquals(test_lcp.grade_answers(incorrect_answers).get_correctness('1_2_1'), 'incorrect')
         self.assertEquals(test_lcp.grade_answers(correct_answers).get_correctness('1_2_1'), 'correct')
-

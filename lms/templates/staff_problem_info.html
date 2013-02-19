@@ -1,7 +1,8 @@
 ${module_content}
-%if edit_link:
+%if location.category in ['problem','video','html']:
+%  if edit_link:
 <div>
-	<a href="${edit_link}">Edit</a> / 
+	<a href="${edit_link}">Edit</a> /
 	<a href="#${element_id}_xqa-modal" onclick="javascript:getlog('${element_id}', {
         'location': '${location}',
         'xqa_key': '${xqa_key}',
@@ -9,7 +10,7 @@ ${module_content}
         'user': '${user}'
      })" id="${element_id}_xqa_log">QA</a>
 </div>
-% endif
+%  endif
 <div><a href="#${element_id}_debug" id="${element_id}_trig">Staff Debug Info</a></div>
 
 <section id="${element_id}_xqa-modal" class="modal xqa-modal" style="width:80%; left:20%; height:80%; overflow:auto" >
@@ -61,16 +62,18 @@ category = ${category | h}
 
 <script type="text/javascript">
 // assumes courseware.html's loaded this method.
-setup_debug('${element_id}', 
-	%if edit_link:
-		'${edit_link}',
-	%else:
-		null,
-	%endif
-	{
+  setup_debug('${element_id}',
+    %if edit_link:
+      '${edit_link}',
+    %else:
+      null,
+    %endif
+    {
         'location': '${location}',
         'xqa_key': '${xqa_key}',
         'category': '${category}',
         'user': '${user}'
-     });
+    });
 </script>
+%endif
+
