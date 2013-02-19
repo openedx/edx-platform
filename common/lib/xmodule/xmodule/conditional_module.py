@@ -64,7 +64,7 @@ class ConditionalModule(XModule):
             % xml_attr)
 
     def is_condition_satisfied(self):
-        self.required_modules = [self.system.get_module(descriptor.location) for
+        self.required_modules = [self.system.get_module(descriptor) for
             descriptor in self.descriptor.get_required_module_descriptors()]
 
         xml_value, attr_name = self._get_condition()
@@ -112,9 +112,8 @@ class ConditionalModule(XModule):
                                 'message': bool(message)})
 
         if self.contents is None:
-            self.contents = [self.system.get_module(child_descriptor.location
-                ).get_html()
-                for child_descriptor in self.descriptor.get_children()]
+            self.contents = [self.system.get_module(child_descriptor).get_html()
+                    for child_descriptor in self.descriptor.get_children()]
 
         html = self.contents
         return json.dumps({'html': html, 'passed': True})
@@ -137,7 +136,7 @@ class ConditionalDescriptor(SequenceDescriptor):
     def parse_sources(xml_element, system, return_descriptor=False):
         """Parse xml_element 'sources' attr and:
         if return_descriptor=True - return list of descriptors
-        if return_descriptor=False - return list of lcoations
+        if return_descriptor=False - return list of locations
         """
         result = []
         sources = xml_element.get('sources')
