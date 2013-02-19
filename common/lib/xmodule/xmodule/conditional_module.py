@@ -143,11 +143,10 @@ class ConditionalDescriptor(SequenceDescriptor):
         if sources:
             locations = [location.strip() for location in sources.split(';')]
             for location in locations:
-                # Check valid location url.
-                if Location.is_valid(location):
+                if Location.is_valid(location): # Check valid location url.
                     try:
-                        descriptor = system.load_item(location)
                         if return_descriptor:
+                            descriptor = system.load_item(location)
                             result.append(descriptor)
                         else:
                             result.append(location)
