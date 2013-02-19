@@ -74,6 +74,11 @@ class VideoAlphaModule(VideoAlphaFields, XModule):
             resource_string(__name__, 'js/src/videoalpha/display/html5_video.js'),
             resource_string(__name__, 'js/src/videoalpha/display/video_player.js'),
             resource_string(__name__, 'js/src/videoalpha/display/video_control.js'),
+            resource_string(__name__, 'js/src/videoalpha/display/video_quality_control.js'),
+            resource_string(__name__, 'js/src/videoalpha/display/video_progress_slider.js'),
+            resource_string(__name__, 'js/src/videoalpha/display/video_volume_control.js'),
+            resource_string(__name__, 'js/src/videoalpha/display/video_speed_control.js'),
+            resource_string(__name__, 'js/src/videoalpha/display/video_caption.js'),
             resource_string(__name__, 'js/src/videoalpha/main.js')
         ]
     }
@@ -88,6 +93,11 @@ class VideoAlphaModule(VideoAlphaFields, XModule):
         self.youtube_streams = xmltree.get('youtube', '')
 
         self.sub = xmltree.get('sub')
+
+        self.autoplay = xmltree.get('autoplay') or ''
+        if self.autoplay.lower() not in ['true', 'false']:
+            self.autoplay = ''
+
         self.position = 0
         self.show_captions = xmltree.get('show_captions', 'true')
         self.sources = {
@@ -163,6 +173,7 @@ class VideoAlphaModule(VideoAlphaFields, XModule):
             'youtube_streams': self.youtube_streams,
             'id': self.location.html_id(),
             'sub': self.sub,
+            'autoplay': self.autoplay,
             'sources': self.sources,
             'track': self.track,
             'display_name': self.display_name_with_default,

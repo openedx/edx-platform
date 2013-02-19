@@ -1,0 +1,116 @@
+(function (requirejs, require, define) {
+
+// VideoVolumeControl module.
+define(
+'videoalpha/display/video_volume_control.js',
+['videoalpha/display/bind.js'],
+function (bind) {
+
+    // VideoVolumeControl() function - what this module "exports".
+    return function (state) {
+        state.videoVolumeControl = {};
+
+        makeFunctionsPublic(state);
+        renderElements(state);
+        bindHandlers(state);
+        registerCallbacks(state);
+    };
+
+    // ***************************************************************
+    // Private functions start here.
+    // ***************************************************************
+
+    // function makeFunctionsPublic(state)
+    //
+    //     Functions which will be accessible via 'state' object. When called, these functions will
+    //     get the 'state' object as a context.
+    function makeFunctionsPublic(state) {
+        state.videoVolumeControl.onChange = bind(onChange, state);
+        state.videoVolumeControl.toggleMute = bind(toggleMute, state);
+    }
+
+    // function renderElements(state)
+    //
+    //     Create any necessary DOM elements, attach them, and set their initial configuration. Also
+    //     make the created DOM elements available via the 'state' object. Much easier to work this
+    //     way - you don't have to do repeated jQuery element selects.
+    function renderElements(state) {
+        state.videoVolumeControl.currentVolume = 100;
+
+        state.videoVolumeControl.el = $(
+            '<div class="volume">' +
+                '<a href="#"></a>' +
+                '<div class="volume-slider-container">' +
+                    '<div class="volume-slider"></div>' +
+                '</div>' +
+            '</div>'
+        );
+
+        state.videoVolumeControl.buttonEl = state.videoVolumeControl.el.find('a');
+        state.videoVolumeControl.volumeSliderEl = state.videoVolumeControl.el.find('.volume-slider');
+
+        state.videoControl.secondaryControlsEl.prepend(state.videoVolumeControl.el);
+
+        state.videoVolumeControl.slider = state.videoVolumeControl.volumeSliderEl.slider({
+            'orientation': 'vertical',
+            'range': 'min',
+            'min': 0,
+            'max': 100,
+            'value': 100,
+            'change': state.videoVolumeControl.onChange,
+            'slide': state.videoVolumeControl.onChange
+        });
+    }
+
+    // function bindHandlers(state)
+    //
+    //     Bind any necessary function callbacks to DOM events (click, mousemove, etc.).
+    function bindHandlers(state) {
+        state.videoVolumeControl.buttonEl.on('click', state.videoVolumeControl.toggleMute);
+
+        state.videoVolumeControl.el.on('mouseenter', function() {
+            $(this).addClass('open');
+        });
+
+        state.videoVolumeControl.el.on('mouseleave', function() {
+            $(this).removeClass('open');
+        });
+    }
+
+    // function registerCallbacks(state)
+    //
+    //     Register function callbacks to be called by other modules.
+    function registerCallbacks(state) {
+
+    }
+
+    // ***************************************************************
+    // Public functions start here.
+    // These are available via the 'state' object. Their context ('this' keyword) is the 'state' object.
+    // The magic private function that makes them available and sets up their context is makeFunctionsPublic().
+    // ***************************************************************
+
+    function onChange(event, ui) {
+        this.videoVolumeControl.currentVolume = ui.value;
+        this.videoVolumeControl.el.toggleClass('muted', this.videoVolumeControl.currentVolume === 0);
+
+        $.each(this.callbacks.videoVolumeControl.onChange, function (index, value) {
+            // Each value is a registered callback (JavaScript function object).
+            value(ui.value);
+        });
+    }
+
+    function toggleMute(event) {
+        event.preventDefault();
+
+        if (this.videoVolumeControl.currentVolume > 0) {
+            this.videoVolumeControl.previousVolume = this.videoVolumeControl.currentVolume;
+            this.videoVolumeControl.slider.slider('option', 'value', 0);
+        } else {
+            this.videoVolumeControl.slider.slider('option', 'value', this.videoVolumeControl.previousVolume);
+        }
+    }
+
+});
+
+}(RequireJS.requirejs, RequireJS.require, RequireJS.define));

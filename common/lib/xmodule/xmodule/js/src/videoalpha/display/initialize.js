@@ -3,14 +3,38 @@
 // Initialize module.
 define(
 'videoalpha/display/initialize.js',
-['videoalpha/display/bind.js', 'videoalpha/display/video_player.js'],
+[
+    'videoalpha/display/bind.js',
+    'videoalpha/display/video_player.js'
+],
 function (bind, VideoPlayer) {
 
     // Initialize() function - what this module "exports".
     return function (state, element) {
-        // Functions which will be accessible via 'state' object.
         makeFunctionsPublic(state);
+        renderElements(state, element);
+    };
 
+    // ***************************************************************
+    // Private functions start here.
+    // ***************************************************************
+
+    // function makeFunctionsPublic(state)
+    //
+    //     Functions which will be accessible via 'state' object. When called, these functions will
+    //     get the 'state' object as a context.
+    function makeFunctionsPublic(state) {
+        state.setSpeed    = bind(setSpeed, state);
+        state.youtubeId   = bind(youtubeId, state);
+        state.getDuration = bind(getDuration, state);
+    }
+
+    // function renderElements(state)
+    //
+    //     Create any necessary DOM elements, attach them, and set their initial configuration. Also
+    //     make the created DOM elements available via the 'state' object. Much easier to work this
+    //     way - you don't have to do repeated jQuery element selects.
+    function renderElements(state, element) {
         // The parent element of the video, and the ID.
         state.el = $(element).find('.video');
         state.id = state.el.attr('id').replace(/video_/, '');
@@ -70,9 +94,6 @@ function (bind, VideoPlayer) {
             state.setSpeed($.cookie('video_speed'));
         }
 
-        // TODO: Check after refactoring whether this can be removed.
-        state.el.addClass('video-load-complete');
-
         // Configure displaying of captions.
         //
         // Option
@@ -116,11 +137,49 @@ function (bind, VideoPlayer) {
             }
         }($.cookie('current_player_mode')));
 
+        // Will be used by various components to register callbacks that can be then called by video core,
+        // or other components.
+        state.callbacks = {
+            'videoPlayer': {
+                'onPlay': [],
+                'onPause': [],
+                'onEnded': [],
+                'onPlaybackQualityChange': [],
+                'updatePlayTime': [],
+                'onSpeedSetChange': []
+            },
+            'videoControl': {
+                'togglePlaybackPlay': [],
+                'togglePlaybackPause': [],
+                'toggleFullScreen': []
+            },
+            'videoQualityControl': {
+                'toggleQuality': []
+            },
+            'videoProgressSlider': {
+                'onSlide': [],
+                'onStop': []
+            },
+            'videoVolumeControl': {
+                'onChange': []
+            },
+            'videoSpeedControl': {
+                'changeVideoSpeed': []
+            },
+            'videoCaption': {
+                'seekPlayer': []
+            }
+        };
+
         // Launch embedding of actual video content, or set it up so that it will be done as soon as the
         // appropriate video player (YouTube or stand alone HTML5) is loaded, and can handle embedding.
+        //
+        // Note that the loading of stand alone HTML5 player API is handled by Require JS. At the time
+        // when we reach this code, the stand alone HTML5 player is already loaded, so no further testing
+        // in that case is required.
         if (
             ((state.videoType === 'youtube') && (window.YT) && (window.YT.Player)) ||
-            ((state.videoType === 'html5') && (window.HTML5Video) && (window.HTML5Video.Player))
+            (state.videoType === 'html5')
         ) {
             embed(state);
         } else {
@@ -128,23 +187,24 @@ function (bind, VideoPlayer) {
                 window.onYouTubePlayerAPIReady = function() {
                     embed(state);
                 };
-            } else if (state.videoType === 'html5') {
+            } else { // if (state.videoType === 'html5') {
                 window.onHTML5PlayerAPIReady = function() {
                     embed(state);
                 };
             }
         }
-    };
-
-    // Private functions start here.
-
-    function makeFunctionsPublic(state) {
-        state.setSpeed = bind(setSpeed, state);
-        state.youtubeId = bind(youtubeId, state);
-        state.getDuration = bind(getDuration, state);
-        state.log = bind(log, state);
     }
 
+    // function parseYoutubeStreams(state, youtubeStreams)
+    //
+    //     Take a string in the form:
+    //         "iCawTYPtehk:0.75,KgpclqP-LBA:1.0,9-2670d5nvU:1.5"
+    //     parse it, and make it available via the 'state' object. If we are not given a string, or
+    //     it's length is zero, then we return false.
+    //
+    //     @return
+    //         false: We don't have YouTube video IDs to work with; most likely we have HTML5 video sources.
+    //         true: Parsing of YouTube video IDs went OK, and we can proceed onwards to play YouTube videos.
     function parseYoutubeStreams(state, youtubeStreams) {
         if ((typeof youtubeStreams !== 'string') || (youtubeStreams.length === 0)) {
             return false;
@@ -164,6 +224,10 @@ function (bind, VideoPlayer) {
         return true;
     }
 
+    // function parseVideoSources(state, mp4Source, webmSource, oggSource)
+    //
+    //     Take the HTML5 sources (URLs of videos), and make them available explictly for each type
+    //     of video format (mp4, webm, ogg).
     function parseVideoSources(state, mp4Source, webmSource, oggSource) {
         state.html5Sources = { 'mp4': null, 'webm': null, 'ogg': null };
 
@@ -178,6 +242,11 @@ function (bind, VideoPlayer) {
         }
     }
 
+    // function fetchMetadata(state)
+    //
+    //     When dealing with YouTube videos, we must fetch meta data that has certain key facts
+    //     not available while the video is loading. For example the length of the video can be
+    //     determined from the meta data.
     function fetchMetadata(state) {
         state.metadata = {};
 
@@ -188,6 +257,9 @@ function (bind, VideoPlayer) {
         });
     }
 
+    // function parseSpeed(state)
+    //
+    //     Create a separate array of available speeds.
     function parseSpeed(state) {
         state.speeds = ($.map(state.videos, function(url, speed) {
             return speed;
@@ -196,13 +268,19 @@ function (bind, VideoPlayer) {
         state.setSpeed($.cookie('video_speed'));
     }
 
+    // function embed(state)
+    //
+    //     This function is called when the current type of video player API becomes available.
+    //     It instantiates the core video module.
     function embed(state) {
         VideoPlayer(state);
     }
 
+    // ***************************************************************
     // Public functions start here.
     // These are available via the 'state' object. Their context ('this' keyword) is the 'state' object.
     // The magic private function that makes them available and sets up their context is makeFunctionsPublic().
+    // ***************************************************************
 
     function setSpeed(newSpeed, updateCookie) {
         if (this.speeds.indexOf(newSpeed) !== -1) {
@@ -227,27 +305,51 @@ function (bind, VideoPlayer) {
         return this.metadata[this.youtubeId()].duration;
     }
 
-    function log(eventName) {
-        var logInfo;
+     /*
+     * Because jQuery events can be triggered on some jQuery object, we must make sure that
+     * we don't trigger an event on an undefined object. For this we will have an in-between
+     * method that will check for the existance of an object before triggering an event on it.
+     *
+     * @objChain is an array that contains the chain of properties on the 'state' object. For
+     * example, if
+     *
+     *     objChain = ['videoPlayer', 'stopVideo'];
+     *
+     * then we will check for the existance of the
+     *
+     *     state.videoPlayer.stopVideo
+     *
+     * object, and, if found to be present, will trigger the specified event on this object.
+     *
+     * @eventName - the name of the event to trigger on the specified object.
+     */
+    function trigger(objChain, eventName, extraParameters) {
+        var tmpObj;
 
-        logInfo = {
-            'id':          this.id,
-            'code':        this.youtubeId(),
-            'currentTime': this.player.currentTime,
-            'speed':       this.speed
-        };
+        // Remember that 'this' is the 'state' object.
+        tmpObj = this;
 
-        if (this.videoType === 'youtube') {
-            logInfo.code = this.youtubeId();
-        } else {
-            if (this.videoType === 'html5') {
-                logInfo.code = 'html5';
-            }
+        getFinalObj(0);
+
+        if (tmpObj === null) {
+            return false;
         }
 
-        Logger.log(eventName, logInfo);
-    }
+        tmpObj.trigger(eventName, extraParameters);
 
+        return true;
+
+        function getFinalObj(i) {
+            if (objChain.length !== i) {
+                if (tmpObj.hasOwnProperty(objChain[i]) === true) {
+                    tmpObj = tmpObj[objChain[i]];
+                    getFinalObj(i + 1);
+                } else {
+                    tmpObj = null;
+                }
+            }
+        }
+    }
 });
 
 }(RequireJS.requirejs, RequireJS.require, RequireJS.define));
