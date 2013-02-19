@@ -1,54 +1,51 @@
 import json
-from django.test import TestCase
+import shutil
 from django.test.client import Client
-from mock import patch, Mock
-from override_settings import override_settings
 from django.conf import settings
 from django.core.urlresolvers import reverse
 from path import path
-
-from student.models import Registration
-from django.contrib.auth.models import User
-from xmodule.modulestore.django import modulestore
-import xmodule.modulestore.django
-from xmodule.modulestore import Location
-from xmodule.modulestore.xml_importer import import_from_xml
+from tempfile import mkdtemp
+import json
+from fs.osfs import OSFS
 import copy
 
+from cms.djangoapps.contentstore.utils import get_modulestore
 
-def parse_json(response):
-    """Parse response, which is assumed to be json"""
-    return json.loads(response.content)
+from xmodule.modulestore import Location
+from xmodule.modulestore.store_utilities import clone_course
+from xmodule.modulestore.store_utilities import delete_course
+from xmodule.modulestore.django import modulestore, _MODULESTORES
+from xmodule.contentstore.django import contentstore
+from xmodule.templates import update_templates
+from xmodule.modulestore.xml_exporter import export_to_xml
+from xmodule.modulestore.xml_importer import import_from_xml
+
+from xmodule.capa_module import CapaDescriptor
+from xmodule.course_module import CourseDescriptor
+from xmodule.seq_module import SequenceDescriptor
+
+from xmodule.modulestore.tests.factories import CourseFactory, ItemFactory
+from utils import ModuleStoreTestCase, parse_json, user, registration
 
 
-def user(email):
-    '''look up a user by email'''
-    return User.objects.get(email=email)
-
-
-def registration(email):
-    '''look up registration object by email'''
-    return Registration.objects.get(user__email=email)
-
-
-class ContentStoreTestCase(TestCase):
+class ContentStoreTestCase(ModuleStoreTestCase):
     def _login(self, email, pw):
-        '''Login.  View should always return 200.  The success/fail is in the
-        returned json'''
+        """Login.  View should always return 200.  The success/fail is in the
+        returned json"""
         resp = self.client.post(reverse('login_post'),
                                 {'email': email, 'password': pw})
         self.assertEqual(resp.status_code, 200)
         return resp
 
     def login(self, email, pw):
-        '''Login, check that it worked.'''
+        """Login, check that it worked."""
         resp = self._login(email, pw)
         data = parse_json(resp)
         self.assertTrue(data['success'])
         return resp
 
     def _create_account(self, username, email, pw):
-        '''Try to create an account.  No error checking'''
+        """Try to create an account.  No error checking"""
         resp = self.client.post('/create_account', {
             'username': username,
             'email': email,
@@ -62,7 +59,7 @@ class ContentStoreTestCase(TestCase):
         return resp
 
     def create_account(self, username, email, pw):
-        '''Create the account and check that it worked'''
+        """Create the account and check that it worked"""
         resp = self._create_account(username, email, pw)
         self.assertEqual(resp.status_code, 200)
         data = parse_json(resp)
@@ -74,8 +71,8 @@ class ContentStoreTestCase(TestCase):
         return resp
 
     def _activate_user(self, email):
-        '''Look up the activation key for the user, then hit the activate view.
-        No error checking'''
+        """Look up the activation key for the user, then hit the activate view.
+        No error checking"""
         activation_key = registration(email).activation_key
 
         # and now we try to activate
@@ -87,7 +84,6 @@ class ContentStoreTestCase(TestCase):
         self.assertEqual(resp.status_code, 200)
         # Now make sure that the user is now actually activated
         self.assertTrue(user(email).is_active)
-
 
 class AuthTestCase(ContentStoreTestCase):
     """Check that various permissions-related things work"""
@@ -141,8 +137,6 @@ class AuthTestCase(ContentStoreTestCase):
         """Make sure pages that do require login work."""
         auth_pages = (
             reverse('index'),
-            reverse('edit_item'),
-            reverse('save_item'),
             )
 
         # These are pages that should just load when the user is logged in
@@ -178,34 +172,3 @@ class AuthTestCase(ContentStoreTestCase):
         self.assertEqual(resp.status_code, 302)
 
         # Logged in should work.
-
-TEST_DATA_MODULESTORE = copy.deepcopy(settings.MODULESTORE)
-TEST_DATA_MODULESTORE['default']['OPTIONS']['fs_root'] = path('common/test/data')
-
-@override_settings(MODULESTORE=TEST_DATA_MODULESTORE)
-class EditTestCase(ContentStoreTestCase):
-    """Check that editing functionality works on example courses"""
-
-    def setUp(self):
-        email = 'edit@test.com'
-        password = 'foo'
-        self.create_account('edittest', email, password)
-        self.activate_user(email)
-        self.login(email, password)
-        xmodule.modulestore.django._MODULESTORES = {}
-        xmodule.modulestore.django.modulestore().collection.drop()
-
-    def check_edit_item(self, test_course_name):
-        import_from_xml(modulestore(), 'common/test/data/', [test_course_name])
-
-        for descriptor in modulestore().get_items(Location(None, None, None, None, None)):
-            print "Checking ", descriptor.location.url()
-            print descriptor.__class__, descriptor.location
-            resp = self.client.get(reverse('edit_item'), {'id': descriptor.location.url()})
-            self.assertEqual(resp.status_code, 200)
-
-    def test_edit_item_toy(self):
-        self.check_edit_item('toy')
-
-    def test_edit_item_full(self):
-        self.check_edit_item('full')

@@ -8,7 +8,7 @@ sessions. Assumes structure:
         /log  # Where we're going to write log files
 """
 from .common import *
-from .logsettings import get_logger_config
+from logsettings import get_logger_config
 
 DEBUG = True
 TEMPLATE_DEBUG = True
@@ -100,7 +100,32 @@ SUBDOMAIN_BRANDING = {
     'harvard': 'HarvardX',
 }
 
+# List of `university` landing pages to display, even though they may not
+# have an actual course with that org set
+VIRTUAL_UNIVERSITIES = []
+
 COMMENTS_SERVICE_KEY = "PUT_YOUR_API_KEY_HERE"
+
+############################## Course static files ##########################
+if os.path.isdir(DATA_DIR):
+    # Add the full course repo if there is no static directory
+    STATICFILES_DIRS += [
+        # TODO (cpennington): When courses are stored in a database, this
+        # should no longer be added to STATICFILES
+        (course_dir, DATA_DIR / course_dir)
+        for course_dir in os.listdir(DATA_DIR)
+        if (os.path.isdir(DATA_DIR / course_dir) and
+            not os.path.isdir(DATA_DIR / course_dir / 'static'))
+    ]
+    # Otherwise, add only the static directory from the course dir
+    STATICFILES_DIRS += [
+        # TODO (cpennington): When courses are stored in a database, this
+        # should no longer be added to STATICFILES
+        (course_dir, DATA_DIR / course_dir / 'static')
+        for course_dir in os.listdir(DATA_DIR)
+        if (os.path.isdir(DATA_DIR / course_dir / 'static'))
+    ]
+
 
 ################################# mitx revision string  #####################
 
@@ -140,7 +165,7 @@ INSTALLED_APPS += ('django_openid_auth',)
 
 OPENID_CREATE_USERS = False
 OPENID_UPDATE_DETAILS_FROM_SREG = True
-OPENID_SSO_SERVER_URL = 'https://www.google.com/accounts/o8/id'	# TODO: accept more endpoints
+OPENID_SSO_SERVER_URL = 'https://www.google.com/accounts/o8/id'  	# TODO: accept more endpoints
 OPENID_USE_AS_ADMIN_LOGIN = False
 
 OPENID_PROVIDER_TRUSTED_ROOTS = ['*']

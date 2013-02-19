@@ -4,8 +4,11 @@ from xmodule.course_module import CourseDescriptor
 from django.conf import settings
 
 
-def get_subdomain(domain):
-    return domain.split(".")[0]
+def pick_subdomain(domain, options, default='default'):
+    for option in options:
+        if domain.startswith(option):
+            return option
+    return default
 
 
 def get_visible_courses(domain=None):
@@ -17,9 +20,7 @@ def get_visible_courses(domain=None):
     courses = sorted(courses, key=lambda course: course.number)
 
     if domain and settings.MITX_FEATURES.get('SUBDOMAIN_COURSE_LISTINGS'):
-        subdomain = get_subdomain(domain)
-        if subdomain not in settings.COURSE_LISTINGS:
-            subdomain = 'default'
+        subdomain = pick_subdomain(domain, settings.COURSE_LISTINGS.keys())
         visible_ids = frozenset(settings.COURSE_LISTINGS[subdomain])
         return [course for course in courses if course.id in visible_ids]
     else:
@@ -34,7 +35,7 @@ def get_university(domain=None):
     if not settings.MITX_FEATURES['SUBDOMAIN_BRANDING'] or domain is None:
         return None
 
-    subdomain = get_subdomain(domain)
+    subdomain = pick_subdomain(domain, settings.SUBDOMAIN_BRANDING.keys())
     return settings.SUBDOMAIN_BRANDING.get(subdomain)
 
 

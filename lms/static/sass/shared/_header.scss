@@ -101,7 +101,7 @@ header.global {
       margin-right: 5px;
 
       > a {
-        @include background-image(linear-gradient(-90deg, #fff 0%, rgb(250,250,250) 50%, rgb(237,237,237) 50%, rgb(220,220,220) 100%));
+        @include background-image(linear-gradient(#fff 0%, rgb(250,250,250) 50%, rgb(237,237,237) 50%, rgb(220,220,220) 100%));
         border: 1px solid transparent;
         border-color: rgb(200,200,200);
         @include border-radius(3px);

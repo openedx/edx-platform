@@ -1,0 +1,230 @@
+<%inherit file="base.html" />
+<%block name="title">Schedule &amp; Details</%block>
+<%block name="bodyclass">is-signedin course schedule settings</%block>
+
+<%namespace name='static' file='static_content.html'/>
+<%!
+from contentstore import utils 
+%>
+
+
+<%block name="jsextra">
+  <link rel="stylesheet" type="text/css" href="${static.url('js/vendor/timepicker/jquery.timepicker.css')}" />
+  <script src="${static.url('js/vendor/timepicker/jquery.timepicker.js')}"></script>
+  <script src="${static.url('js/vendor/timepicker/datepair.js')}"></script>
+  <script src="${static.url('js/vendor/date.js')}"></script>
+  
+  <script type="text/javascript" src="${static.url('js/template_loader.js')}"></script>
+  <script type="text/javascript" src="${static.url('js/views/server_error.js')}"></script>
+  <script type="text/javascript" src="${static.url('js/models/course_relative.js')}"></script>
+  <script type="text/javascript" src="${static.url('js/views/validating_view.js')}"></script>
+  <script type="text/javascript" src="${static.url('js/views/settings/main_settings_view.js')}"></script>
+  <script type="text/javascript" src="${static.url('js/models/settings/course_details.js')}"></script>
+  
+  <script type="text/javascript">
+    $(document).ready(function(){
+    
+      $("form :input").focus(function() {
+        $("label[for='" + this.id + "']").addClass("is-focused");
+      }).blur(function() {
+        $("label").removeClass("is-focused");
+        });
+        
+      var editor = new CMS.Views.Settings.Details({
+          el: $('.settings-details'),
+          model: new CMS.Models.Settings.CourseDetails(${course_details|n},{parse:true})
+        });
+        
+        editor.render();
+    });
+      
+  </script>
+</%block>
+
+<%block name="content">
+<div class="wrapper-content wrapper">
+  <section class="content">
+    <header class="page">
+      <span class="title-sub">Settings</span>
+      <h1 class="title-1">Schedule &amp; Details</h1>
+    </header>
+
+    <!-- <div class="introduction">
+      <p>Lorem ipsum dolor sit amet, consectetuer adipiscing elit. Aenean commodo ligula eget dolor. Aenean massa. Cum sociis natoque penatibus et magnis dis parturient montes, nascetur ridiculus mus. Donec quam felis, ultricies nec, pellentesque eu, pretium quis, sem.</p>
+    </div> -->
+
+    <article class="content-primary" role="main">
+      <form id="settings_details" class="settings-details" method="post" action="">
+        <section class="group-settings basic">
+              <header>
+            <h2 class="title-2">Basic Information</h2>
+            <span class="tip">The nuts and bolts of your course</span>
+              </header>
+
+          <ol class="list-input">
+            <li class="field text is-not-editable" id="field-course-organization">
+              <label for="course-organization">Organization</label>
+              <input type="text" class="long" id="course-organization" value="[Course Organization]" disabled="disabled" />
+            </li>
+
+            <li class="field text is-not-editable" id="field-course-number">
+              <label for="course-number">Course Number</label>
+              <input type="text" class="short" id="course-number" value="[Course No.]" disabled="disabled">
+            </li>
+
+            <li class="field text is-not-editable" id="field-course-name">
+              <label for="course-name">Course Name</label>
+              <input type="text" class="long" id="course-name" value="[Course Name]" disabled="disabled" />
+            </li>
+          </ol>
+          <span class="tip tip-stacked">These are used in <a rel="external" href="${utils.get_lms_link_for_about_page(course_location)}" />your course URL</a>, and cannot be changed</span>
+        </section>
+
+            <hr class="divide" />
+
+        <section class="group-settings schedule">
+              <header>
+            <h2 class="title-2">Course Schedule</h2>
+            <span class="tip">Important steps and segments of your course</span>
+              </header>
+
+          <ol class="list-input">
+            <li class="field-group field-group-course-start" id="course-start">
+              <div class="field date" id="field-course-start-date">
+                <label for="course-start-date">Course Start Date</label>
+                <input type="text" class="start-date date start datepicker" id="course-start-date" placeholder="MM/DD/YYYY" autocomplete="off" />
+                      <span class="tip tip-stacked">First day the course begins</span>          
+                    </div>
+
+              <div class="field time" id="field-course-start-time">
+                <label for="course-start-time">Course Start Time</label>
+                <input type="text" class="time start timepicker" id="course-start-time" value="" placeholder="HH:MM" autocomplete="off" />
+                      <span class="tip tip-stacked" id="timezone"></span>          
+                    </div>
+            </li>
+
+            <li class="field-group field-group-course-end" id="course-end">
+              <div class="field date" id="field-course-end-date">
+                <label for="course-end-date">Course End Date</label>
+                <input type="text" class="end-date date end" id="course-end-date" placeholder="MM/DD/YYYY" autocomplete="off" />
+                <span class="tip tip-stacked">Last day your course is active</span>              
+                    </div>
+
+              <div class="field time" id="field-course-end-time">
+                <label for="course-end-time">Course End Time</label>
+                <input type="text" class="time end" id="course-end-time" value="" placeholder="HH:MM" autocomplete="off" />
+                      <span class="tip tip-stacked" id="timezone"></span>          
+                    </div>
+            </li>           
+          </ol>
+
+          <ol class="list-input">
+            <li class="field-group field-group-enrollment-start" id="enrollment-start">
+              <div class="field date" id="field-enrollment-start-date">
+                <label for="course-enrollment-start-date">Enrollment Start Date</label>
+                <input type="text" class="start-date date start" id="course-enrollment-start-date" placeholder="MM/DD/YYYY" autocomplete="off" />
+                      <span class="tip tip-stacked">First day students can enroll</span>          
+                    </div>
+
+              <div class="field time" id="field-enrollment-start-time">
+                <label for="course-enrollment-start-time">Enrollment Start Time</label>
+                <input type="text" class="time start" id="course-enrollment-start-time" value="" placeholder="HH:MM" autocomplete="off" />
+                      <span class="tip tip-stacked" id="timezone"></span>           
+                    </div>
+            </li>
+
+            <li class="field-group field-group-enrollment-end" id="enrollment-end">
+              <div class="field date" id="field-enrollment-end-date">
+                <label for="course-enrollment-end-date">Enrollment End Date</label>
+                <input type="text" class="end-date date end" id="course-enrollment-end-date" placeholder="MM/DD/YYYY" autocomplete="off" />
+                      <span class="tip tip-stacked">Last day students can enroll</span>          
+                    </div>
+
+              <div class="field time" id="field-enrollment-end-time">
+                <label for="course-enrollment-end-time">Enrollment End Time</label>
+                <input type="text" class="time end" id="course-enrollment-end-time" value="" placeholder="HH:MM" autocomplete="off" />
+                      <span class="tip tip-stacked" id="timezone"></span>           
+                    </div>
+            </li> 
+          </ol>
+        </section>
+
+            <hr class="divide" />
+
+        <section class="group-settings marketing">
+          <header>
+            <h2 class="title-2">Introducing Your Course</h2>
+            <span class="tip">Information for prospective students</span>
+          </header>
+
+          <ol class="list-input">
+            <li class="field text" id="field-course-overview">
+              <label for="course-overview">Course Overview</label>
+              <textarea class="tinymce text-editor" id="course-overview"></textarea>
+              <span class="tip tip-stacked">Introductions, prerequisites, FAQs that are used on <a href="${utils.get_lms_link_for_about_page(course_location)}">your course summary page</a></span>
+            </li>
+
+            <li class="field video" id="field-course-introduction-video">
+              <label for="course-overview">Course Introduction Video</label>
+                  <div class="input input-existing">
+                    <div class="current current-course-introduction-video">
+                  <iframe width="618" height="350" src="" frameborder="0" allowfullscreen></iframe>
+
+                    </div>
+                <div class="actions">
+                  <a href="#" class="remove-item remove-course-introduction-video remove-video-data"><span class="delete-icon"></span> Delete Current Video</a>
+                </div>
+                  </div>
+
+                  <div class="input">
+                <input type="text" class="long new-course-introduction-video add-video-data" id="course-introduction-video" value="" placeholder="your YouTube video's ID" autocomplete="off" />
+                <span class="tip tip-stacked">Enter your YouTube video's ID (along with any restriction parameters)</span>
+                  </div>
+            </li>
+          </ol>
+        </section>
+
+            <hr class="divide" />
+
+        <section class="group-settings requirements">
+              <header>
+            <h2 class="title-2">Requirements</h2>
+            <span class="tip">Expectations of the students taking this course</span>
+              </header>
+
+          <ol class="list-input">
+            <li class="field text" id="field-course-effort">
+              <label for="course-effort">Hours of Effort per Week</label>
+              <input type="text" class="short time" id="course-effort" placeholder="HH:MM" />
+                    <span class="tip tip-inline">Time spent on all course work</span>
+                    </li>
+                      </ol>
+            </section>
+      </form>
+    </article>
+
+    <aside class="content-supplementary" role="complimentary">
+     <div class="bit">
+        <h3 class="title-3">How will these settings be used</h3>
+        <p>Your course's schedule settings determine when students can enroll in and begin a course as well as when the course.</p>
+
+        <p>Additionally, details provided on this page are also used in edX's catalog of courses, which new and returning students use to choose new courses to study.</p>
+                </div>
+
+      <div class="bit">
+      % if context_course:
+      <% ctx_loc = context_course.location %>
+      <%! from django.core.urlresolvers import reverse %>
+        <h3 class="title-3">Other Course Settings</h3>
+        <nav class="nav-related">
+          <ul>
+            <li class="nav-item"><a href="${reverse('contentstore.views.course_config_graders_page', kwargs={'org' : ctx_loc.org, 'course' : ctx_loc.course, 'name': ctx_loc.name})}">Grading</a></li>
+            <li class="nav-item"><a href="${reverse('manage_users', kwargs=dict(location=ctx_loc))}">Course Team</a></li>
+          </ul>
+        </nav>
+      % endif
+      </div>
+    </aside>
+  </section>
+</div>
+</%block>

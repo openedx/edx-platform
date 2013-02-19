@@ -16,9 +16,11 @@
 @import 'shared/course_filter';
 @import 'shared/modal';
 @import 'shared/activation_messages';
+
 @import 'multicourse/home';
 @import 'multicourse/dashboard';
 @import 'multicourse/account';
+@import 'multicourse/testcenter-register';
 @import 'multicourse/courses';
 @import 'multicourse/course_about';
 @import 'multicourse/jobs';
@@ -28,7 +30,7 @@
 @import 'multicourse/password_reset';
 @import 'multicourse/error-pages';
 @import 'multicourse/help';
-@import 'multicourse/testcenter-register';
+@import 'multicourse/edge';
 
 @import 'discussion';
 @import 'news';
