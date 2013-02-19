@@ -30,7 +30,7 @@ CMS.Views.ClassInfoUpdateView = Backbone.View.extend({
         "click #course-update-view .save-button" : "onSave",
         "click #course-update-view .cancel-button" : "onCancel",
         "click .post-actions > .edit-button" : "onEdit",
-        "click .delete-button" : "onDelete"
+        "click .post-actions > .delete-button" : "onDelete"
     },
         
     initialize: function() {
