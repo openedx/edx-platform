@@ -14,24 +14,23 @@ from .util import temp_directory
 
 # TODO: limit too much stdout data?
 
-DEBUG = False
-STRICT = True
-
 # Configure the Python command
 
-SANDBOX_PYTHON = "/usr/bin/python-sandbox"
+SANDBOX_POSSIBILITIES = [
+    "~/mitx_all/python-sandbox/bin/python",
+    "/usr/bin/python-sandbox",
+]
 
-if os.path.exists(SANDBOX_PYTHON):
-    # Python -S inhibits loading site.py, which prevent Ubuntu from adding
-    # specialized traceback handlers that fail in the sandbox.
-    PYTHON_CMD = [
-        'sudo', '-u', 'sandbox',
-        SANDBOX_PYTHON, '-S'
-    ]
-elif STRICT:
-    raise Exception("Couldn't find Python sandbox")
+for sandbox_python in SANDBOX_POSSIBILITIES:
+    sandbox_python = os.path.expanduser(sandbox_python)
+    if os.path.exists(sandbox_python):
+        PYTHON_CMD = [
+            'sudo', '-u', 'sandbox',
+            sandbox_python, '-E',
+        ]
+        break
 else:
-    PYTHON_CMD = ['python', '-S']
+    raise Exception("Couldn't find Python sandbox")
 
 
 class JailResult(object):
