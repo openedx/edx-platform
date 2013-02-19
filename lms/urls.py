@@ -65,10 +65,23 @@ urlpatterns = ('',
 
     url(r'^heartbeat$', include('heartbeat.urls')),
 
-    url(r'^university_profile/UTx$', 'courseware.views.static_university_profile', name="static_university_profile", kwargs={'org_id': 'UTx'}),
-    url(r'^university_profile/WellesleyX$', 'courseware.views.static_university_profile', name="static_university_profile", kwargs={'org_id': 'WellesleyX'}),
-    url(r'^university_profile/GeorgetownX$', 'courseware.views.static_university_profile', name="static_university_profile", kwargs={'org_id': 'GeorgetownX'}),
-    url(r'^university_profile/(?P<org_id>[^/]+)$', 'courseware.views.university_profile', name="university_profile"),
+    url(r'^university_profile/UTx$', 'courseware.views.static_university_profile',
+        name="static_university_profile", kwargs={'org_id': 'UTx'}),
+    url(r'^university_profile/WellesleyX$', 'courseware.views.static_university_profile',
+        name="static_university_profile", kwargs={'org_id': 'WellesleyX'}),
+    url(r'^university_profile/GeorgetownX$', 'courseware.views.static_university_profile',
+        name="static_university_profile", kwargs={'org_id': 'GeorgetownX'}),
+    url(r'^university_profile/McGillX$', 'courseware.views.static_university_profile',
+        name="static_university_profile", kwargs={'org_id': 'McGillX'}),
+    url(r'^university_profile/TorontoX$', 'courseware.views.static_university_profile',
+        name="static_university_profile", kwargs={'org_id': 'TorontoX'}),
+    url(r'^university_profile/RiceX$', 'courseware.views.static_university_profile',
+        name="static_university_profile", kwargs={'org_id': 'RiceX'}),
+    url(r'^university_profile/ANUx$', 'courseware.views.static_university_profile',
+        name="static_university_profile", kwargs={'org_id': 'ANUx'}),
+
+    url(r'^university_profile/(?P<org_id>[^/]+)$', 'courseware.views.university_profile',
+        name="university_profile"),
 
     #Semi-static views (these need to be rendered and have the login bar, but don't change)
     url(r'^404$', 'static_template_view.views.render',
