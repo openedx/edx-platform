@@ -8,6 +8,7 @@ from lxml.html import rewrite_links
 from path import path
 import os
 import sys
+import re
 
 from pkg_resources import resource_string
 
@@ -21,7 +22,7 @@ from .xml_module import XmlDescriptor
 from xmodule.modulestore import Location
 import self_assessment_module
 import open_ended_module
-from combined_open_ended_rubric import CombinedOpenEndedRubric, RubricParsingError
+from combined_open_ended_rubric import CombinedOpenEndedRubric, RubricParsingError, GRADER_TYPE_IMAGE_DICT, HUMAN_GRADER_TYPE, LEGEND_LIST
 from .stringify import stringify_children
 import dateutil
 import dateutil.parser
@@ -55,7 +56,7 @@ TRUE_DICT = ["True", True, "TRUE", "true"]
 
 HUMAN_TASK_TYPE = {
     'selfassessment' : "Self Assessment",
-    'openended' : "External Grader",
+    'openended' : "edX Assessment",
     }
 
 class CombinedOpenEndedV1Module():
@@ -191,9 +192,9 @@ class CombinedOpenEndedV1Module():
         # completion (doesn't matter if you self-assessed correct/incorrect).
         self._max_score = int(self.metadata.get('max_score', MAX_SCORE))
 
-        rubric_renderer = CombinedOpenEndedRubric(system, True)
+        self.rubric_renderer = CombinedOpenEndedRubric(system, True)
         rubric_string = stringify_children(definition['rubric'])
-        rubric_renderer.check_if_rubric_is_parseable(rubric_string, location, MAX_SCORE_ALLOWED, self._max_score)
+        self.rubric_renderer.check_if_rubric_is_parseable(rubric_string, location, MAX_SCORE_ALLOWED, self._max_score)
 
         #Static data is passed to the child modules to render
         self.static_data = {
@@ -354,9 +355,10 @@ class CombinedOpenEndedV1Module():
             'state': self.state,
             'task_count': len(self.task_xml),
             'task_number': self.current_task_number + 1,
-            'status': self.get_status(),
+            'status': self.get_status(False),
             'display_name': self.display_name,
             'accept_file_upload': self.accept_file_upload,
+            'legend_list' : LEGEND_LIST,
             }
 
         return context
@@ -431,6 +433,9 @@ class CombinedOpenEndedV1Module():
         last_score = task.latest_score()
         last_post_assessment = task.latest_post_assessment(self.system)
         last_post_feedback = ""
+        feedback_dicts = [{}]
+        grader_ids = [0]
+        submission_ids = [0]
         if task_type == "openended":
             last_post_assessment = task.latest_post_assessment(self.system, short_feedback=False, join_feedback=False)
             if isinstance(last_post_assessment, list):
@@ -441,6 +446,18 @@ class CombinedOpenEndedV1Module():
             else:
                 last_post_evaluation = task.format_feedback_with_evaluation(self.system, last_post_assessment)
             last_post_assessment = last_post_evaluation
+            rubric_data = task._parse_score_msg(task.history[-1].get('post_assessment', ""), self.system)
+            rubric_scores = rubric_data['rubric_scores']
+            grader_types = rubric_data['grader_types']
+            feedback_items = rubric_data['feedback_items']
+            feedback_dicts =  rubric_data['feedback_dicts']
+            grader_ids = rubric_data['grader_ids']
+            submission_ids =  rubric_data['submission_ids']
+        elif task_type== "selfassessment":
+            rubric_scores = last_post_assessment
+            grader_types = ['SA']
+            feedback_items = ['']
+            last_post_assessment = ""
         last_correctness = task.is_last_response_correct()
         max_score = task.max_score()
         state = task.state
@@ -453,6 +470,16 @@ class CombinedOpenEndedV1Module():
             human_state = task.HUMAN_NAMES[state]
         else:
             human_state = state
+        if len(grader_types)>0:
+            grader_type = grader_types[0]
+        else:
+            grader_type = "IN"
+
+        if grader_type in HUMAN_GRADER_TYPE:
+            human_grader_name = HUMAN_GRADER_TYPE[grader_type]
+        else:
+            human_grader_name = grader_type
+
         last_response_dict = {
             'response': last_response,
             'score': last_score,
@@ -465,8 +492,15 @@ class CombinedOpenEndedV1Module():
             'correct': last_correctness,
             'min_score_to_attempt': min_score_to_attempt,
             'max_score_to_attempt': max_score_to_attempt,
+            'rubric_scores' : rubric_scores,
+            'grader_types' : grader_types,
+            'feedback_items' : feedback_items,
+            'grader_type' : grader_type,
+            'human_grader_type' : human_grader_name,
+            'feedback_dicts' : feedback_dicts,
+            'grader_ids' : grader_ids,
+            'submission_ids' : submission_ids,
             }
-
         return last_response_dict
 
     def update_task_states(self):
@@ -502,17 +536,93 @@ class CombinedOpenEndedV1Module():
             pass
         return return_html
 
+    def get_rubric(self, get):
+        """
+        Gets the results of a given grader via ajax.
+        Input: AJAX get dictionary
+        Output: Dictionary to be rendered via ajax that contains the result html.
+        """
+        all_responses = []
+        loop_up_to_task = self.current_task_number+1
+        for i in xrange(0,loop_up_to_task):
+            all_responses.append(self.get_last_response(i))
+        rubric_scores = [all_responses[i]['rubric_scores'] for i in xrange(0,len(all_responses)) if len(all_responses[i]['rubric_scores'])>0 and all_responses[i]['grader_types'][0] in HUMAN_GRADER_TYPE.keys()]
+        grader_types = [all_responses[i]['grader_types'] for i in xrange(0,len(all_responses)) if len(all_responses[i]['grader_types'])>0 and all_responses[i]['grader_types'][0] in HUMAN_GRADER_TYPE.keys()]
+        feedback_items = [all_responses[i]['feedback_items'] for i in xrange(0,len(all_responses)) if len(all_responses[i]['feedback_items'])>0 and all_responses[i]['grader_types'][0] in HUMAN_GRADER_TYPE.keys()]
+        rubric_html = self.rubric_renderer.render_combined_rubric(stringify_children(self.static_data['rubric']), rubric_scores,
+            grader_types, feedback_items)
+
+        response_dict = all_responses[-1]
+        context = {
+            'results': rubric_html,
+            'task_name' : 'Scored Rubric',
+            'class_name' : 'combined-rubric-container'
+        }
+        html = self.system.render_template('combined_open_ended_results.html', context)
+        return {'html': html, 'success': True}
+
+    def get_legend(self, get):
+        """
+        Gets the results of a given grader via ajax.
+        Input: AJAX get dictionary
+        Output: Dictionary to be rendered via ajax that contains the result html.
+        """
+        context = {
+            'legend_list' : LEGEND_LIST,
+            }
+        html = self.system.render_template('combined_open_ended_legend.html', context)
+        return {'html': html, 'success': True}
+
     def get_results(self, get):
         """
         Gets the results of a given grader via ajax.
         Input: AJAX get dictionary
         Output: Dictionary to be rendered via ajax that contains the result html.
         """
-        task_number = int(get['task_number'])
         self.update_task_states()
-        response_dict = self.get_last_response(task_number)
-        context = {'results': response_dict['post_assessment'], 'task_number': task_number + 1}
+        loop_up_to_task = self.current_task_number+1
+        all_responses =[]
+        for i in xrange(0,loop_up_to_task):
+            all_responses.append(self.get_last_response(i))
+        context_list = []
+        for ri in all_responses:
+            for i in xrange(0,len(ri['rubric_scores'])):
+                feedback = ri['feedback_dicts'][i].get('feedback','')
+                rubric_data = self.rubric_renderer.render_rubric(stringify_children(self.static_data['rubric']), ri['rubric_scores'][i])
+                if rubric_data['success']:
+                    rubric_html = rubric_data['html']
+                else:
+                    rubric_html = ''
+                context = {
+                    'rubric_html': rubric_html,
+                    'grader_type': ri['grader_type'],
+                    'feedback' : feedback,
+                    'grader_id' : ri['grader_ids'][i],
+                    'submission_id' : ri['submission_ids'][i],
+                }
+                context_list.append(context)
+        feedback_table = self.system.render_template('open_ended_result_table.html', {
+            'context_list' : context_list,
+            'grader_type_image_dict' : GRADER_TYPE_IMAGE_DICT,
+            'human_grader_types' : HUMAN_GRADER_TYPE,
+            'rows': 50,
+            'cols': 50,
+        })
+        context = {
+            'results': feedback_table,
+            'task_name' : "Feedback",
+            'class_name' : "result-container",
+            }
         html = self.system.render_template('combined_open_ended_results.html', context)
+        return {'html': html, 'success': True}
+
+    def get_status_ajax(self, get):
+        """
+        Gets the results of a given grader via ajax.
+        Input: AJAX get dictionary
+        Output: Dictionary to be rendered via ajax that contains the result html.
+        """
+        html = self.get_status(True)
         return {'html': html, 'success': True}
 
     def handle_ajax(self, dispatch, get):
@@ -529,7 +639,10 @@ class CombinedOpenEndedV1Module():
         handlers = {
             'next_problem': self.next_problem,
             'reset': self.reset,
-            'get_results': self.get_results
+            'get_results': self.get_results,
+            'get_combined_rubric': self.get_rubric,
+            'get_status' : self.get_status_ajax,
+            'get_legend' : self.get_legend,
         }
 
         if dispatch not in handlers:
@@ -593,7 +706,7 @@ class CombinedOpenEndedV1Module():
 
         return json.dumps(state)
 
-    def get_status(self):
+    def get_status(self, render_via_ajax):
         """
         Gets the status panel to be displayed at the top right.
         Input: None
@@ -604,7 +717,13 @@ class CombinedOpenEndedV1Module():
             task_data = self.get_last_response(i)
             task_data.update({'task_number': i + 1})
             status.append(task_data)
-        context = {'status_list': status}
+
+        context = {
+            'status_list': status,
+            'grader_type_image_dict' : GRADER_TYPE_IMAGE_DICT,
+            'legend_list' : LEGEND_LIST,
+            'render_via_ajax' : render_via_ajax,
+        }
         status_html = self.system.render_template("combined_open_ended_status.html", context)
 
         return status_html

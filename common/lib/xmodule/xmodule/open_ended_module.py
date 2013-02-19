@@ -306,6 +306,7 @@ class OpenEndedModule(openendedchild.OpenEndedChild):
                       'grammar': 1,
                       # needs to be after all the other feedback
                       'markup_text': 3}
+        do_not_render = ['topicality', 'prompt-overlap']
 
         default_priority = 2
 
@@ -360,6 +361,10 @@ class OpenEndedModule(openendedchild.OpenEndedChild):
             if len(feedback) == 0:
                 return format_feedback('errors', 'No feedback available')
 
+            for tag in do_not_render:
+                if tag in feedback:
+                    feedback.pop(tag)
+
             feedback_lst = sorted(feedback.items(), key=get_priority)
             feedback_list_part1 = u"\n".join(format_feedback(k, v) for k, v in feedback_lst)
         else:
@@ -381,9 +386,13 @@ class OpenEndedModule(openendedchild.OpenEndedChild):
 
         rubric_feedback = ""
         feedback = self._convert_longform_feedback_to_html(response_items)
+        rubric_scores = []
         if response_items['rubric_scores_complete'] == True:
             rubric_renderer = CombinedOpenEndedRubric(system, True)
-            success, rubric_feedback = rubric_renderer.render_rubric(response_items['rubric_xml'])
+            rubric_dict = rubric_renderer.render_rubric(response_items['rubric_xml'])
+            success = rubric_dict['success']
+            rubric_feedback = rubric_dict['html']
+            rubric_scores = rubric_dict['rubric_scores']
 
         if not response_items['success']:
             return system.render_template("open_ended_error.html",
@@ -396,7 +405,7 @@ class OpenEndedModule(openendedchild.OpenEndedChild):
             'rubric_feedback': rubric_feedback
         })
 
-        return feedback_template
+        return feedback_template, rubric_scores
 
 
     def _parse_score_msg(self, score_msg, system, join_feedback=True):
@@ -420,7 +429,17 @@ class OpenEndedModule(openendedchild.OpenEndedChild):
             correct:         Correctness of submission (Boolean)
             score:           Points to be assigned (numeric, can be float)
         """
-        fail = {'valid': False, 'score': 0, 'feedback': ''}
+        fail = {
+            'valid': False,
+            'score': 0,
+            'feedback': '',
+            'rubric_scores' : [[0]],
+            'grader_types' : [''],
+            'feedback_items' : [''],
+            'feedback_dicts' : [{}],
+            'grader_ids' : [0],
+            'submission_ids' : [0],
+            }
         try:
             score_result = json.loads(score_msg)
         except (TypeError, ValueError):
@@ -447,6 +466,11 @@ class OpenEndedModule(openendedchild.OpenEndedChild):
             #This is to support peer grading
         if isinstance(score_result['score'], list):
             feedback_items = []
+            rubric_scores = []
+            grader_types = []
+            feedback_dicts = []
+            grader_ids = []
+            submission_ids = []
             for i in xrange(0, len(score_result['score'])):
                 new_score_result = {
                     'score': score_result['score'][i],
@@ -458,7 +482,17 @@ class OpenEndedModule(openendedchild.OpenEndedChild):
                     'rubric_scores_complete': score_result['rubric_scores_complete'][i],
                     'rubric_xml': score_result['rubric_xml'][i],
                 }
-                feedback_items.append(self._format_feedback(new_score_result, system))
+                feedback_template, rubric_score = self._format_feedback(new_score_result, system)
+                feedback_items.append(feedback_template)
+                rubric_scores.append(rubric_score)
+                grader_types.append(score_result['grader_type'])
+                try:
+                    feedback_dict = json.loads(score_result['feedback'][i])
+                except:
+                    pass
+                feedback_dicts.append(feedback_dict)
+                grader_ids.append(score_result['grader_id'][i])
+                submission_ids.append(score_result['submission_id'])
             if join_feedback:
                 feedback = "".join(feedback_items)
             else:
@@ -466,13 +500,33 @@ class OpenEndedModule(openendedchild.OpenEndedChild):
             score = int(median(score_result['score']))
         else:
             #This is for instructor and ML grading
-            feedback = self._format_feedback(score_result, system)
+            feedback, rubric_score = self._format_feedback(score_result, system)
             score = score_result['score']
+            rubric_scores = [rubric_score]
+            grader_types = [score_result['grader_type']]
+            feedback_items = [feedback]
+            try:
+                feedback_dict = json.loads(score_result['feedback'])
+            except:
+                pass
+            feedback_dicts = [feedback_dict]
+            grader_ids = [score_result['grader_id']]
+            submission_ids = [score_result['submission_id']]
 
         self.submission_id = score_result['submission_id']
         self.grader_id = score_result['grader_id']
 
-        return {'valid': True, 'score': score, 'feedback': feedback}
+        return {
+            'valid': True,
+            'score': score,
+            'feedback': feedback,
+            'rubric_scores' : rubric_scores,
+            'grader_types' : grader_types,
+            'feedback_items' : feedback_items,
+            'feedback_dicts' : feedback_dicts,
+            'grader_ids' : grader_ids,
+            'submission_ids' : submission_ids,
+        }
 
     def latest_post_assessment(self, system, short_feedback=False, join_feedback=True):
         """

@@ -68,10 +68,10 @@ class OpenEndedChild(object):
 
     #This is used to tell students where they are at in the module
     HUMAN_NAMES = {
-        'initial': 'Started',
-        'assessing': 'Being scored',
-        'post_assessment': 'Scoring finished',
-        'done': 'Problem complete',
+        'initial': 'Not started',
+        'assessing': 'In progress',
+        'post_assessment': 'Done',
+        'done': 'Done',
     }
 
     def __init__(self, system, location, definition, descriptor, static_data, 
@@ -136,8 +136,6 @@ class OpenEndedChild(object):
             }
         else:
             return False, {}
-
-
 
     def latest_answer(self):
         """Empty string if not available"""
