@@ -14,7 +14,7 @@ import fs.osfs
 
 import numpy
 
-import capa.calc as calc
+import calc
 import xmodule
 from xmodule.x_module import ModuleSystem
 from mock import Mock

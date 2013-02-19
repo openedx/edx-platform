@@ -1,0 +1,21 @@
+Choose a place for the virtualenv, call it <SANDENV>
+
+Create a virtualenv:
+
+    virtualenv <SANDENV>
+
+Install the sandbox requirements
+
+
+Edit an AppArmor profile:
+
+    <SANDENV>/bin/python {
+        ...
+    }
+
+Parse the profiles
+
+    $ apparmor_parser
+    $ aaenforce <SANDENV>/bin/python
+
+
