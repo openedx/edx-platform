@@ -8,6 +8,7 @@ from logging import getLogger
 logger = getLogger(__name__)
 
 ## support functions
+
 def get_courses():
     '''
     Returns dict of lists of courses available, keyed by course.org (ie university).
@@ -81,8 +82,8 @@ def get_courseware_with_tabs(course_id):
     course = get_course_by_id(course_id)
     chapters = [chapter for chapter in course.get_children() if chapter.metadata.get('hide_from_toc', 'false').lower() != 'true']
     courseware = [{'chapter_name': c.display_name,
-                    'sections': [{'section_name': s.display_name, 
-                                'clickable_tab_count': len(s.get_children()) if (type(s) == seq_module.SequenceDescriptor) else 0, 
+                    'sections': [{'section_name': s.display_name,
+                                'clickable_tab_count': len(s.get_children()) if (type(s) == seq_module.SequenceDescriptor) else 0,
                                 'tabs': [{'children_count': len(t.get_children()) if (type(t) == vertical_module.VerticalDescriptor) else 0,
                                         'class': t.__class__.__name__}
                                         for t in s.get_children()]}
