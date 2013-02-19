@@ -181,6 +181,10 @@ class @StaffGrading
     @ml_error_info_container = $('.ml-error-info-container')
 
     @breadcrumbs = $('.breadcrumbs')
+
+    @question_header = $('.question-header')
+    @question_header.click @collapse_question
+    @collapse_question()
     
     # model state
     @state = state_no_data
@@ -392,10 +396,10 @@ class @StaffGrading
 
     else if @state == state_grading
       @ml_error_info_container.html(@ml_error_info)
-      meta_list = $("<ul>")
-      meta_list.append("<li><span class='meta-info'>Available - </span> #{@num_pending}</li>")
-      meta_list.append("<li><span class='meta-info'>Graded - </span> #{@num_graded}</li>")
-      meta_list.append("<li><span class='meta-info'>Needed for ML - </span> #{Math.max(@min_for_ml - @num_graded, 0)}</li>")
+      meta_list = $("<div>")
+      meta_list.append("<div class='meta-info'>#{@num_pending} available | </div>")
+      meta_list.append("<div class='meta-info'>#{@num_graded} graded | </div>")
+      meta_list.append("<div class='meta-info'>#{Math.max(@min_for_ml - @num_graded, 0)} more needed to start ML </div><br/>")
       @problem_meta_info.html(meta_list)
 
       @prompt_container.html(@prompt)
@@ -432,7 +436,17 @@ class @StaffGrading
       @get_next_submission(@location)
     else
       @error('System got into invalid state for submission: ' + @state)
-  
+
+  collapse_question: () =>
+    @prompt_container.slideToggle()
+    @prompt_container.toggleClass('open')
+    if @question_header.text() == "(Hide)"
+      new_text = "(Show)"
+    else
+      new_text = "(Hide)"
+    @question_header.text(new_text)
+
+
 
 # for now, just create an instance and load it...
 mock_backend = false
