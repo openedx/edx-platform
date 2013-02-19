@@ -1,3 +1,4 @@
+import pprint
 import json
 import logging
 import re
@@ -42,14 +43,7 @@ class AnnotatableModule(XModule):
                     callback(element, index, xmltree)
                 index += 1
  
-    def _set_span_data(self, span, index, xmltree):
-        """ Sets the associated discussion id for the span. """
-
-        if 'discussion' in span.attrib:
-            span.set('data-discussion-id', span.get('discussion'))
-            del span.attrib['discussion']
-    
-    def _decorate_span(self, span, index, xmltree):
+    def _set_span_highlight(self, span, index, xmltree):
         """ Adds a highlight class to the span. """
 
         cls = ['annotatable-span', 'highlight']
@@ -60,18 +54,62 @@ class AnnotatableModule(XModule):
         span.set('class', ' '.join(cls))
         span.tag = 'div'
         
-    def _decorate_comment(self, span, index, xmltree):
+    def _set_span_comment(self, span, index, xmltree):
         """ Sets the comment class. """
 
-        comment = None
-        for child in span.iterchildren():
-            if child.get('class') == 'comment':
-                comment = child
-                break
-
+        comment = span.find('comment')
         if comment is not None:
             comment.tag = 'div'
             comment.set('class', 'annotatable-comment')
+
+    def _set_span_discussion(self, span, index, xmltree):
+        """ Sets the associated discussion id for the span. """
+
+        if 'discussion' in span.attrib:
+            discussion = span.get('discussion')
+            span.set('data-discussion-id', discussion)
+            del span.attrib['discussion']
+
+    def _set_problem(self, span, index, xmltree):
+        """ Sets the associated problem. """
+
+        problem = span.find('problem')
+        if problem is not None:
+            problem_id = str(index + 1)
+            problem.set('problem_id', problem_id)
+            span.set('data-problem-id', problem_id)
+            parsed_problem = self._parse_problem(problem) 
+            if parsed_problem is not None:
+                self.problems.append(parsed_problem)
+
+    def _parse_problem(self, problem):
+        prompt_el = problem.find('prompt')
+        answer_el = problem.find('answer')
+        tags_el = problem.find('tags')
+
+        tags = []
+        for tag_el in tags_el.iterchildren('tag'):
+            tags.append({
+                'name': tag_el.get('name', ''),
+                'display_name': tag_el.get('display_name', ''),
+                'weight': tag_el.get('weight', 0),
+                'answer': tag_el.get('answer', 'n') == 'y'
+            })
+
+        parsed = {
+            'problem_id': problem.get('problem_id'),
+            'prompt': prompt_el.text, 
+            'answer': answer_el.text,
+            'tags': tags
+        }
+
+        log.debug('parsed problem id = ' + parsed['problem_id'])
+        log.debug("problem keys: " + ", ".join(parsed.keys()))
+        log.debug('prompt = ' + parsed['prompt'])
+        log.debug('answer = ' + parsed['answer'])
+        log.debug('num tags = ' + str(len(parsed['tags'])))
+
+        return parsed
 
     def _get_marker_color(self, span):
         """ Returns the name of the marker/highlight color for the span if it is valid, otherwise none."""
@@ -84,16 +122,32 @@ class AnnotatableModule(XModule):
                 return marker
         return None
 
-    def _render(self):
+    def _get_problem_name(self, problem_type):
+        """ Returns the display name for the problem type. Defaults to annotated reading if none given. """
+        problem_types = { 
+            'classification':    'Classification Exercise + Guided Discussion',
+            'annotated_reading': 'Annotated Reading + Guided Discussion'
+        }
+
+        if problem_type is not None and problem_type in problem_types.keys():
+            return problem_types[problem_type]
+        return problem_types['annotated_reading']
+
+
+    def _render_content(self):
         """ Renders annotatable content by transforming spans and adding discussions. """
 
+        callbacks = [   
+            self._set_span_highlight,
+            self._set_span_comment,
+            self._set_span_discussion,
+            self._set_problem
+        ]
+
         xmltree = etree.fromstring(self.content)
-        self._iterspans(xmltree, [ 
-            self._set_span_data,
-            self._decorate_span,
-            self._decorate_comment
-        ])
         xmltree.tag = 'div'
+
+        self._iterspans(xmltree, callbacks)
 
         return etree.tostring(xmltree)
 
@@ -102,20 +156,29 @@ class AnnotatableModule(XModule):
         
         context = {
             'display_name': self.display_name,
+            'problem_name': self.problem_name,
             'element_id': self.element_id,
-            'html_content': self._render()
+            'html_content': self._render_content(),
+            'has_problems': self.has_problems,
+            'problems': self.problems
         }
 
-        # template dir: lms/templates
         return self.system.render_template('annotatable.html', context)
 
     def __init__(self, system, location, definition, descriptor,
                  instance_state=None, shared_state=None, **kwargs):
         XModule.__init__(self, system, location, definition, descriptor,
                          instance_state, shared_state, **kwargs)
-        
+
+        xmltree = etree.fromstring(self.definition['data'])
+
         self.element_id = self.location.html_id();
         self.content = self.definition['data']
+        self.problem_type = xmltree.get('problem_type')
+        self.has_problems = (self.problem_type == 'classification')
+        self.problem_name = self._get_problem_name(self.problem_type)
+        self.problems = []
+
 
 class AnnotatableDescriptor(RawDescriptor):
     module_class = AnnotatableModule

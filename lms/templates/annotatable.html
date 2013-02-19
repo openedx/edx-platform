@@ -4,13 +4,40 @@
 		  <div class="annotatable-title">${display_name} </div>
 		% endif
 		<div class="annotatable-description">
-                Annotated Reading + Guided Discussion
+                ${problem_name}
 				<a href="javascript:void(0)" class="annotatable-toggle">Hide Annotations</a>
                 <div class="annotatable-help-icon" title="Move your cursor over the highlighted areas to display annotations. Discuss the annotations in the forums using the link at the bottom of the annotation. You may hide annotations at any time by using the button at the top of the section."></div>
         </div>
 	</div>
 	
-	<div class="annotatable-content">
-		${html_content}
-	</div>
+	<div class="annotatable-content">${html_content}</div>
+
+    % if has_problems:
+        <div class="annotatable-problems">
+            % for problem in problems:
+            <div class="annotatable-problem" data-problem-id="${problem['problem_id']}">
+                <div class="annotatable-problem-header">
+                    Classification Exercise: <span class="annotatable-problem-index">(${loop.index + 1} / ${len(problems)}) </span>
+                </div>
+                <div class="annotatable-problem-body">
+                    <div class="annotatable-problem-prompt">${problem['prompt']}</div>
+                    <ul class="annotatable-problem-tags">
+                        % for tag in problem['tags']:
+                            <li>${tag['name']}</li>
+                        % endfor
+                    </ul>
+                    Explain the rationale for your tag selections:<br/>
+                    <textarea></textarea>
+                    <div class="annotatable-problem-controls">
+                        <button class="button annotatable-problem-save">Save</button>
+                        <button class="button annotatable-problem-submit">Submit</button>
+                        <a class="annotatable-problem-return" href="javascript:void(0);">Return to annotation</a>
+                    </div>
+                </div>
+                <div class="annotatable-problem-footer">
+                </div>
+            </div>
+            % endfor
+        </div>
+    % endif
 </div>

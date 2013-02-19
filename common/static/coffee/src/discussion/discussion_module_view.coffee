@@ -77,7 +77,7 @@ if Backbone?
       if @$('section.discussion').length
         @$('section.discussion').replaceWith($discussion)
       else
-        $(".discussion-module").append($discussion)
+        @$el.append($discussion)
       @newPostForm = $('.new-post-article')
       @threadviews = @discussion.map (thread) ->
         new DiscussionThreadInlineView el: @$("article#thread_#{thread.id}"), model: thread

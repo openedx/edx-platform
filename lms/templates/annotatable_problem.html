@@ -1,0 +1,23 @@
+<div class="annotatable-problem" data-problem-id="${problem_id}">
+    <div class="annotatable-problem-header">
+        Classification Exercise: 
+        <span class="annotatable-problem-index">
+            ${problem_index} / ${total_problems}
+        </span>
+    </div>
+    <div class="annotatable-problem-body">
+        <div class="annotatable-problem-prompt">${problem_prompt}</div>
+        <ul class="annotatable-problem-tags">
+            % for tag in problem_tags:
+                <li>${tag.name}</li>
+            % endfor
+        </ul>
+        Explain the rationale for your tag selections:<br/>
+        <textarea></textarea>
+    </div>
+    <div class="annotatable-problem-footer">
+        <button class="button">Save</button>
+        <button class="button">Submit</button>
+        <a href="javascript:void(0);">Return to annotation</a>
+    </div>
+</div>
