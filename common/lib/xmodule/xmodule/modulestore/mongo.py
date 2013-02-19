@@ -69,8 +69,9 @@ class CachingDescriptorSystem(MakoDescriptorSystem):
             # will build a proper course policy framework.
             try:
                 module = XModuleDescriptor.load_from_json(json_data, self, self.default_class)
-                metadata_to_inherit = self.metadata_inheritance_tree.get('parent_metadata', {}).get(location.url(),{})
-                module.inherit_metadata(metadata_to_inherit)
+                if self.metadata_inheritance_tree is not None:
+                    metadata_to_inherit = self.metadata_inheritance_tree.get('parent_metadata', {}).get(location.url(),{})
+                    module.inherit_metadata(metadata_to_inherit)
                 return module
             except:
                 raise
