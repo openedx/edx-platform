@@ -11,10 +11,10 @@ header.global {
     @include clearfix;
     height: 40px;
     margin: 0 auto;
-    max-width: 1200px;
     padding: 18px 10px 0px;
     max-width: grid-width(12);
     min-width: 760px;
+    width: flex-grid(12);
   }
 
   h1.logo {
