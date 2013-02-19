@@ -58,7 +58,8 @@ def safe_exec(code, globals_dict, locals_dict, future_division=False, assumed_im
         json.dump(l_dict, sys.stdout)
         """))
 
-    if 1:
+    # Turn this on to see what's being executed.
+    if 0:
         print "--{:-<40}".format(" jailed ")
         print "".join(the_code)
         print "--{:-<40}".format(" exec ")
@@ -112,5 +113,5 @@ def not_safe_exec(code, globals_dict, locals_dict, future_division=False, assume
 
 # Running Python code in the sandbox makes it difficult to debug.
 # Turn this on to run the code directly.
-if 1:
+if 0:
     safe_exec = not_safe_exec
