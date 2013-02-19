@@ -38,6 +38,7 @@ MAX_ATTEMPTS = 1
 # Overriden by max_score specified in xml.
 MAX_SCORE = 1
 
+
 class OpenEndedChild(object):
     """
     States:
@@ -67,13 +68,13 @@ class OpenEndedChild(object):
 
     #This is used to tell students where they are at in the module
     HUMAN_NAMES = {
-        'initial': 'Started',
-        'assessing': 'Being scored',
-        'post_assessment': 'Scoring finished',
-        'done': 'Problem complete',
+        'initial': 'Not started',
+        'assessing': 'In progress',
+        'post_assessment': 'Done',
+        'done': 'Done',
     }
 
-    def __init__(self, system, location, definition, descriptor, static_data,
+    def __init__(self, system, location, definition, descriptor, static_data, 
                  instance_state=None, shared_state=None, **kwargs):
         # Load instance state
         if instance_state is not None:
@@ -98,6 +99,7 @@ class OpenEndedChild(object):
         self.rubric = static_data['rubric']
         self.display_name = static_data['display_name']
         self.accept_file_upload = static_data['accept_file_upload']
+        self.close_date = static_data['close_date']
 
         # Used for progress / grading.  Currently get credit just for
         # completion (doesn't matter if you self-assessed correct/incorrect).
@@ -115,6 +117,25 @@ class OpenEndedChild(object):
         @return: None
         """
         pass
+
+    def closed(self):
+        if self.close_date is not None and datetime.utcnow() > self.close_date:
+            return True
+        return False
+
+    def check_if_closed(self):
+        if self.closed():
+            return True, {
+                'success': False,
+                'error': 'This problem is now closed.'
+            }
+        elif self.attempts > self.max_attempts:
+            return True, {
+                'success': False,
+                'error': 'Too many attempts.'
+            }
+        else:
+            return False, {}
 
     def latest_answer(self):
         """Empty string if not available"""
@@ -316,7 +337,7 @@ class OpenEndedChild(object):
         image_tag = ""
         image_ok = False
         if 'can_upload_files' in get_data:
-            if get_data['can_upload_files'] == 'true':
+            if get_data['can_upload_files'] in ['true', '1']:
                 has_file_to_upload = True
                 file = get_data['student_file'][0]
                 uploaded_to_s3, image_ok, s3_public_url = self.upload_image_to_s3(file)
@@ -355,7 +376,7 @@ class OpenEndedChild(object):
         elif has_file_to_upload and not uploaded_to_s3 and image_ok:
             #In this case, an image was submitted by the student, but the image could not be uploaded to S3.  Likely
             #a config issue (development vs deployment).  For now, just treat this as a "success"
-            log.warning("Student AJAX post to combined open ended xmodule indicated that it contained an image, "
+            log.exception("Student AJAX post to combined open ended xmodule indicated that it contained an image, "
                         "but the image was not able to be uploaded to S3.  This could indicate a config"
                         "issue with this deployment, but it could also indicate a problem with S3 or with the"
                         "student image itself.")
@@ -364,6 +385,8 @@ class OpenEndedChild(object):
             #If there is no file to upload, probably the student has embedded the link in the answer text
             success, get_data['student_answer'] = self.check_for_url_in_text(get_data['student_answer'])
             overall_success = success
+
+        #log.debug("Has file: {0} Uploaded: {1} Image Ok: {2}".format(has_file_to_upload, uploaded_to_s3, image_ok))
 
         return overall_success, get_data
 
@@ -375,18 +398,13 @@ class OpenEndedChild(object):
         """
         success = False
         links = re.findall(r'(https?://\S+)', string)
-        if len(links)>0:
+        if len(links) > 0:
             for link in links:
                 success = open_ended_image_submission.run_url_tests(link)
                 if not success:
                     string = re.sub(link, '', string)
                 else:
-                    string = re.sub(link, self.generate_image_tag_from_url(link,link), string)
+                    string = re.sub(link, self.generate_image_tag_from_url(link, link), string)
                     success = True
 
         return success, string
-
-
-
-
-

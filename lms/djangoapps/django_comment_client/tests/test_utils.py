@@ -2,7 +2,7 @@ import string
 import random
 import collections
 
-from django.test import TestCase                         
+from django.test import TestCase
 
 import factory
 from django.contrib.auth.models import User
@@ -14,6 +14,7 @@ import django_comment_client.utils as utils
 
 import xmodule.modulestore.django as django
 
+
 class UserFactory(factory.Factory):
     FACTORY_FOR = User
     username = 'robot'
@@ -22,19 +23,23 @@ class UserFactory(factory.Factory):
     is_active = True
     is_staff = False
 
+
 class CourseEnrollmentFactory(factory.Factory):
-    FACTORY_FOR = CourseEnrollment  
+    FACTORY_FOR = CourseEnrollment
     user = factory.SubFactory(UserFactory)
     course_id = 'edX/toy/2012_Fall'
+
 
 class RoleFactory(factory.Factory):
     FACTORY_FOR = Role
     name = 'Student'
     course_id = 'edX/toy/2012_Fall'
 
+
 class PermissionFactory(factory.Factory):
-    FACTORY_FOR = Permission  
+    FACTORY_FOR = Permission
     name = 'create_comment'
+
 
 class DictionaryTestCase(TestCase):
     def test_extract(self):
@@ -54,10 +59,11 @@ class DictionaryTestCase(TestCase):
         self.assertEqual(utils.strip_blank(d), expected)
 
     def test_merge_dict(self):
-        d1 ={'cats': 'meow', 'dogs': 'woof'}
-        d2 ={'lions': 'roar','ducks': 'quack'}
-        expected ={'cats': 'meow', 'dogs': 'woof','lions': 'roar','ducks': 'quack'}
+        d1 = {'cats': 'meow', 'dogs': 'woof'}
+        d2 = {'lions': 'roar', 'ducks': 'quack'}
+        expected = {'cats': 'meow', 'dogs': 'woof', 'lions': 'roar', 'ducks': 'quack'}
         self.assertEqual(utils.merge_dict(d1, d2), expected)
+
 
 class AccessUtilsTestCase(TestCase):
     def setUp(self):

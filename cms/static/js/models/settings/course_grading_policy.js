@@ -13,7 +13,8 @@ CMS.Models.Settings.CourseGradingPolicy = Backbone.Model.extend({
         }
         if (attributes['graders']) {
             var graderCollection;
-            if (this.has('graders')) {
+            // interesting race condition: if {parse:true} when newing, then parse called before .attributes created
+            if (this.attributes && this.has('graders')) {
                 graderCollection = this.get('graders');
                 graderCollection.reset(attributes.graders);
             }
@@ -27,7 +28,7 @@ CMS.Models.Settings.CourseGradingPolicy = Backbone.Model.extend({
     },
     url : function() {
         var location = this.get('course_location');
-        return '/' + location.get('org') + "/" + location.get('course') + '/settings/' + location.get('name') + '/section/grading';
+        return '/' + location.get('org') + "/" + location.get('course') + '/settings-details/' + location.get('name') + '/section/grading';
     },
     gracePeriodToDate : function() {
         var newDate = new Date();
@@ -119,7 +120,7 @@ CMS.Models.Settings.CourseGraderCollection = Backbone.Collection.extend({
     model : CMS.Models.Settings.CourseGrader,
     course_location : null, // must be set to a Location object
     url : function() {
-        return '/' + this.course_location.get('org') + "/" + this.course_location.get('course') + '/grades/' + this.course_location.get('name') + '/';
+        return '/' + this.course_location.get('org') + "/" + this.course_location.get('course') + '/settings-grading/' + this.course_location.get('name') + '/';
     },
     sumWeights : function() {
         return this.reduce(function(subtotal, grader) { return subtotal + grader.get('weight'); }, 0);

@@ -186,9 +186,9 @@ class LoncapaResponse(object):
         tree = etree.Element('span')
 
         # problem author can make this span display:inline
-        if self.xml.get('inline',''):
-            tree.set('class','inline')
-            
+        if self.xml.get('inline', ''):
+            tree.set('class', 'inline')
+
         for item in self.xml:
             # call provided procedure to do the rendering
             item_xhtml = renderer(item)
@@ -632,8 +632,14 @@ class MultipleChoiceResponse(LoncapaResponse):
 
         # define correct choices (after calling secondary setup)
         xml = self.xml
-        cxml = xml.xpath('//*[@id=$id]//choice[@correct="true"]', id=xml.get('id'))
-        self.correct_choices = [contextualize_text(choice.get('name'), self.context) for choice in cxml]
+        cxml = xml.xpath('//*[@id=$id]//choice', id=xml.get('id'))
+
+        # contextualize correct attribute and then select ones for which
+        # correct = "true"
+        self.correct_choices = [
+            contextualize_text(choice.get('name'), self.context)
+            for choice in cxml
+            if contextualize_text(choice.get('correct'), self.context) == "true"]
 
     def mc_setup_response(self):
         '''
@@ -875,7 +881,8 @@ def sympy_check2():
 
     allowed_inputfields = ['textline', 'textbox', 'crystallography',
                             'chemicalequationinput', 'vsepr_input',
-                            'drag_and_drop_input']
+                            'drag_and_drop_input', 'editamoleculeinput',
+                            'designprotein2dinput', 'editageneinput']
 
     def setup_response(self):
         xml = self.xml
@@ -998,7 +1005,7 @@ def sympy_check2():
         self.context['debug'] = self.system.DEBUG
 
         # exec the check function
-        if type(self.code) == str:
+        if isinstance(self.code, basestring):
             try:
                 exec self.code in self.context['global_context'], self.context
                 correct = self.context['correct']
@@ -1294,7 +1301,7 @@ class CodeResponse(LoncapaResponse):
 
         # State associated with the queueing request
         queuestate = {'key': queuekey,
-                      'time': qtime,}
+                      'time': qtime, }
 
         cmap = CorrectMap()
         if error:

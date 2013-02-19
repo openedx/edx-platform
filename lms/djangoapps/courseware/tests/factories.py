@@ -5,6 +5,7 @@ from django.contrib.auth.models import Group
 from datetime import datetime
 import uuid
 
+
 class UserProfileFactory(factory.Factory):
     FACTORY_FOR = UserProfile
 
@@ -12,11 +13,13 @@ class UserProfileFactory(factory.Factory):
     name = 'Robot Studio'
     courseware = 'course.xml'
 
+
 class RegistrationFactory(factory.Factory):
     FACTORY_FOR = Registration
 
     user = None
     activation_key = uuid.uuid4().hex
+
 
 class UserFactory(factory.Factory):
     FACTORY_FOR = User
@@ -32,10 +35,12 @@ class UserFactory(factory.Factory):
     last_login = datetime.now()
     date_joined = datetime.now()
 
+
 class GroupFactory(factory.Factory):
     FACTORY_FOR = Group
 
     name = 'test_group'
+
 
 class CourseEnrollmentAllowedFactory(factory.Factory):
     FACTORY_FOR = CourseEnrollmentAllowed

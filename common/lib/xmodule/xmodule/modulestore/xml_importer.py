@@ -11,9 +11,10 @@ from xmodule.contentstore.content import StaticContent, XASSET_SRCREF_PREFIX
 
 log = logging.getLogger(__name__)
 
-def import_static_content(modules, course_loc, course_data_path, static_content_store, target_location_namespace, 
-    subpath = 'static', verbose=False):
-    
+
+def import_static_content(modules, course_loc, course_data_path, static_content_store, target_location_namespace,
+    subpath='static', verbose=False):
+
     remap_dict = {}
 
     # now import all static assets
@@ -36,7 +37,7 @@ def import_static_content(modules, course_loc, course_data_path, static_content_
                 with open(content_path, 'rb') as f:
                     data = f.read()
 
-                content = StaticContent(content_loc, filename, mime_type, data, import_path = fullname_with_subpath)
+                content = StaticContent(content_loc, filename, mime_type, data, import_path=fullname_with_subpath)
 
                 # first let's save a thumbnail so we can get back a thumbnail location
                 (thumbnail_content, thumbnail_location) = static_content_store.generate_thumbnail(content)
@@ -50,11 +51,12 @@ def import_static_content(modules, course_loc, course_data_path, static_content_
                 #store the remapping information which will be needed to subsitute in the module data
                 remap_dict[fullname_with_subpath] = content_loc.name
             except:
-                raise 
+                raise
 
     return remap_dict
 
-def verify_content_links(module, base_dir, static_content_store, link, remap_dict = None):
+
+def verify_content_links(module, base_dir, static_content_store, link, remap_dict=None):
     if link.startswith('/static/'):
         # yes, then parse out the name
         path = link[len('/static/'):]
@@ -70,7 +72,7 @@ def verify_content_links(module, base_dir, static_content_store, link, remap_dic
                 with open(static_pathname, 'rb') as f:
                     data = f.read()
 
-                content = StaticContent(content_loc, filename, mime_type, data, import_path = path) 
+                content = StaticContent(content_loc, filename, mime_type, data, import_path=path)
 
                 # first let's save a thumbnail so we can get back a thumbnail location
                 (thumbnail_content, thumbnail_location) = static_content_store.generate_thumbnail(content)
@@ -79,20 +81,21 @@ def verify_content_links(module, base_dir, static_content_store, link, remap_dic
                     content.thumbnail_location = thumbnail_location
 
                 #then commit the content
-                static_content_store.save(content)   
+                static_content_store.save(content)
 
-                new_link = StaticContent.get_url_path_from_location(content_loc)   
+                new_link = StaticContent.get_url_path_from_location(content_loc)
 
                 if remap_dict is not None:
                     remap_dict[link] = new_link
 
-                return new_link                 
+                return new_link
             except Exception, e:
                 logging.exception('Skipping failed content load from {0}. Exception: {1}'.format(path, e))
 
     return link
 
-def import_from_xml(store, data_dir, course_dirs=None, 
+
+def import_from_xml(store, data_dir, course_dirs=None,
                     default_class='xmodule.raw_module.RawDescriptor',
                     load_error_modules=True, static_content_store=None, target_location_namespace=None, verbose=False):
     """
@@ -108,7 +111,7 @@ def import_from_xml(store, data_dir, course_dirs=None,
     the policy.json. so we need to keep the original url_name during import
 
     """
-    
+
     module_store = XMLModuleStore(
         data_dir,
         default_class=default_class,
@@ -137,12 +140,12 @@ def import_from_xml(store, data_dir, course_dirs=None,
 
                 module = remap_namespace(module, target_location_namespace)
 
-                # cdodge: more hacks (what else). Seems like we have a problem when importing a course (like 6.002) which 
-                # does not have any tabs defined in the policy file. The import goes fine and then displays fine in LMS, 
-                # but if someone tries to add a new tab in the CMS, then the LMS barfs because it expects that - 
+                # cdodge: more hacks (what else). Seems like we have a problem when importing a course (like 6.002) which
+                # does not have any tabs defined in the policy file. The import goes fine and then displays fine in LMS,
+                # but if someone tries to add a new tab in the CMS, then the LMS barfs because it expects that -
                 # if there is *any* tabs - then there at least needs to be some predefined ones
                 if module.tabs is None or len(module.tabs) == 0:
-                    module.tabs = [{"type": "courseware"}, 
+                    module.tabs = [{"type": "courseware"},
                         {"type": "course_info", "name": "Course Info"}, 
                         {"type": "discussion", "name": "Discussion"},
                         {"type": "wiki", "name": "Wiki"}]  # note, add 'progress' when we can support it on Edge
@@ -159,13 +162,13 @@ def import_from_xml(store, data_dir, course_dirs=None,
 
                 course_items.append(module)
 
-                
+
         # then import all the static content
         if static_content_store is not None:
             _namespace_rename = target_location_namespace if target_location_namespace is not None else course_location
-            
+
             # first pass to find everything in /static/
-            import_static_content(module_store.modules[course_id], course_location, course_data_path, static_content_store, 
+            import_static_content(module_store.modules[course_id], course_location, course_data_path, static_content_store,
                 _namespace_rename, subpath='static', verbose=verbose)
 
         # finally loop through all the modules
@@ -188,18 +191,18 @@ def import_from_xml(store, data_dir, course_dirs=None,
 
                 # cdodge: now go through any link references to '/static/' and make sure we've imported
                 # it as a StaticContent asset
-                try:   
+                try:
                     remap_dict = {}
 
                     # use the rewrite_links as a utility means to enumerate through all links
                     # in the module data. We use that to load that reference into our asset store
                     # IMPORTANT: There appears to be a bug in lxml.rewrite_link which makes us not be able to
                     # do the rewrites natively in that code.
-                    # For example, what I'm seeing is <img src='foo.jpg' />   ->   <img src='bar.jpg'>  
+                    # For example, what I'm seeing is <img src='foo.jpg' />   ->   <img src='bar.jpg'>
                     # Note the dropped element closing tag. This causes the LMS to fail when rendering modules - that's
                     # no good, so we have to do this kludge
                     if isinstance(module_data, str) or isinstance(module_data, unicode):   # some module 'data' fields are non strings which blows up the link traversal code
-                        lxml_rewrite_links(module_data, lambda link: verify_content_links(module, course_data_path, 
+                        lxml_rewrite_links(module_data, lambda link: verify_content_links(module, course_data_path,
                             static_content_store, link, remap_dict))                     
 
                         for key in remap_dict.keys():
@@ -219,17 +222,18 @@ def import_from_xml(store, data_dir, course_dirs=None,
 
     return module_store, course_items
 
+
 def remap_namespace(module, target_location_namespace):
     if target_location_namespace is None:
         return module
-        
+
     # This looks a bit wonky as we need to also change the 'name' of the imported course to be what
     # the caller passed in
     if module.location.category != 'course':
-        module.location = module.location._replace(tag=target_location_namespace.tag, org=target_location_namespace.org, 
+        module.location = module.location._replace(tag=target_location_namespace.tag, org=target_location_namespace.org,
             course=target_location_namespace.course)
     else:
-        module.location = module.location._replace(tag=target_location_namespace.tag, org=target_location_namespace.org, 
+        module.location = module.location._replace(tag=target_location_namespace.tag, org=target_location_namespace.org,
             course=target_location_namespace.course, name=target_location_namespace.name)
 
     # then remap children pointers since they too will be re-namespaced
@@ -238,14 +242,15 @@ def remap_namespace(module, target_location_namespace):
         new_locs = []
         for child in children_locs:
             child_loc = Location(child)
-            new_child_loc = child_loc._replace(tag=target_location_namespace.tag, org=target_location_namespace.org, 
+            new_child_loc = child_loc._replace(tag=target_location_namespace.tag, org=target_location_namespace.org,
                 course=target_location_namespace.course)
 
             new_locs.append(new_child_loc.url())
 
-        module.definition['children'] = new_locs    
+        module.definition['children'] = new_locs
 
     return module
+
 
 def validate_category_hierarchy(module_store, course_id, parent_category, expected_child_category):
     err_cnt = 0
@@ -265,7 +270,8 @@ def validate_category_hierarchy(module_store, course_id, parent_category, expect
 
     return err_cnt
 
-def validate_data_source_path_existence(path, is_err = True, extra_msg = None):
+
+def validate_data_source_path_existence(path, is_err=True, extra_msg=None):
     _cnt = 0
     if not os.path.exists(path):
         print ("{0}: Expected folder at {1}. {2}".format('ERROR' if is_err == True else 'WARNING', path, extra_msg if 
@@ -273,18 +279,19 @@ def validate_data_source_path_existence(path, is_err = True, extra_msg = None):
         _cnt = 1
     return _cnt
 
+
 def validate_data_source_paths(data_dir, course_dir):
     # check that there is a '/static/' directory
     course_path = data_dir / course_dir
     err_cnt = 0
     warn_cnt = 0
     err_cnt += validate_data_source_path_existence(course_path / 'static')
-    warn_cnt += validate_data_source_path_existence(course_path / 'static/subs', is_err = False, 
-        extra_msg = 'Video captions (if they are used) will not work unless they are static/subs.')
+    warn_cnt += validate_data_source_path_existence(course_path / 'static/subs', is_err=False,
+        extra_msg='Video captions (if they are used) will not work unless they are static/subs.')
     return err_cnt, warn_cnt
 
 
-def perform_xlint(data_dir, course_dirs, 
+def perform_xlint(data_dir, course_dirs,
                     default_class='xmodule.raw_module.RawDescriptor',
                     load_error_modules=True):
     err_cnt = 0
@@ -308,9 +315,9 @@ def perform_xlint(data_dir, course_dirs,
         for err_log_entry in err_log.errors:
             msg = err_log_entry[0]
             if msg.startswith('ERROR:'):
-                err_cnt+=1
+                err_cnt += 1
             else:
-                warn_cnt+=1
+                warn_cnt += 1
 
     # then count outright all courses that failed to load at all
     for err_log in module_store.errored_courses.itervalues():
@@ -318,9 +325,9 @@ def perform_xlint(data_dir, course_dirs,
             msg = err_log_entry[0]
             print msg
             if msg.startswith('ERROR:'):
-                err_cnt+=1
+                err_cnt += 1
             else:
-                warn_cnt+=1
+                warn_cnt += 1
 
     for course_id in module_store.modules.keys():
         # constrain that courses only have 'chapter' children
@@ -345,6 +352,3 @@ def perform_xlint(data_dir, course_dirs,
         print "This course can be imported, but some errors may occur during the run of the course. It is recommend that you fix your courseware before importing"
     else:
         print "This course can be imported successfully."
-
-       
-

@@ -1,180 +1,339 @@
-// -------------------------------------
-//
-//  Universal
-//
-// -------------------------------------
+// studio base styling
+// ====================
 
-body {
-    min-width: 980px;
-    background: rgb(240, 241, 245);
-    font-size: 16px;
-    line-height: 1.6;
-    color: $baseFontColor;
+// basic reset
+html {
+  font-size: 62.5%;
+  overflow-y: scroll;
 }
 
-body,
-input {
-    font-family: 'Open Sans', sans-serif;
+body {
+  @include font-size(16);
+  min-width: 980px;
+  background: $gray-l5;
+  line-height: 1.6;
+  color: $baseFontColor;
+}
+
+body, input {
+  font-family: 'Open Sans', sans-serif;
 }
 
 a {
-    text-decoration: none;
-    color: $blue;
-    @include transition(color .15s);
+  text-decoration: none;
+  color: $blue;
+  @include transition(color .15s);
 
-    &:hover {
-        color: #cb9c40;
-    }
+  &:hover {
+    color: #cb9c40;
+  }
 }
 
 h1 {
-    float: left;
-    font-size: 28px;
-    font-weight: 300;
-    margin: 24px 6px;
+  @include font-size(28);
+  font-weight: 300;
 }
 
 .waiting {
-    opacity: 0.1;
+  opacity: 0.1;
 }
 
 .page-actions {
-    margin-bottom: 30px;
+  margin-bottom: 30px;
 }
 
-.main-wrapper {
+.wrapper {
+  @include clearfix();
+  @include box-sizing(border-box);
+  width: 100%;
+}
+
+// ====================
+
+// layout - basic
+.wrapper-content {
+  margin: 0;
+  padding: 0 $baseline;
+  position: relative;
+}
+
+.content {
+  @include clearfix();
+  @include font-size(16);
+  max-width: $fg-max-width;
+  min-width: $fg-min-width;
+  width: flex-grid(12);
+  margin: 0 auto;
+  color: $gray-d2;
+
+  header {
     position: relative;
-    margin: 0 40px;
+    margin-bottom: $baseline;
+    border-bottom: 1px solid $gray-l4;
+    padding-bottom: ($baseline/2);
+
+    .title-sub {
+      @include font-size(14);
+      display: block;
+      margin: 0;
+      color: $gray-l2;
+    }
+
+    .title, .title-1 {
+      @include font-size(32);
+      margin: 0;
+      padding: 0;
+      font-weight: 600;
+      color: $gray-d3;
+    }
+  }
+
+  .introduction {
+    @include font-size(14);
+    margin: 0 0 $baseline 0;
+  }
+}
+
+.content-primary, .content-supplementary {
+  @include box-sizing(border-box);
+}
+
+.content-primary {
+
+  .title-1, .title-2, .title-3, .title-4, .title-5, .title-5 {
+    color: $gray-d3;
+  }
+
+  .title-1 {
+
+  }
+
+  .title-2 {
+    @include font-size(24);
+    margin: 0 0 ($baseline/2) 0;
+    font-weight: 600;
+  }
+
+  .title-3 {
+    @include font-size(16);
+    margin: 0 0 ($baseline/4) 0;
+    font-weight: 500;
+  }
+
+  .title-4 {
+
+  }
+
+  .title-5 {
+
+  }
+}
+
+.content-supplementary {
+
+  .bit {
+    @include font-size(13);
+    margin: 0 0 $baseline 0;
+    border-bottom: 1px solid $gray-l4;
+    padding: 0 0 $baseline 0;
+    color: $gray-l1;
+
+    &:last-child {
+      margin-bottom: 0;
+      border: none;
+      padding-bottom: 0;
+    }
+
+    h3 {
+      @include font-size(14);
+      margin: 0 0 ($baseline/4) 0;
+      color: $gray-d2;
+      font-weight: 600;
+    }
+
+    p {
+      margin: 0 0 $baseline 0;
+
+      &:last-child {
+        margin-bottom: 0;
+      }
+    }
+
+    .nav-related {
+
+      .nav-item {
+        margin-bottom: ($baseline/4);
+        border-bottom: 1px dotted $gray-l4;
+        padding-bottom: ($baseline/4);
+
+
+        &:last-child {
+          margin-bottom: 0;
+          border: none;
+          padding-bottom: 0;
+        }
+      }
+    }
+  }
+}
+
+// ====================
+
+// layout - grandfathered
+.main-wrapper {
+  position: relative;
+  margin: 0 40px;
 }
 
 .inner-wrapper {
-    position: relative;
-    max-width: 1280px;
-    margin: auto;
+  position: relative;
+  max-width: 1280px;
+  margin: auto;
 
-    > article {
-        clear: both;
-    }
+  > article {
+    clear: both;
+  }
 }
 
 .sidebar {
-    float: right;
-    width: 28%;
+  float: right;
+  width: 28%;
 }
 
 .left {
-    float: left;
+  float: left;
 }
 
 .right {
-    float: right;
+  float: right;
 }
 
-footer {
-    clear: both;
-    height: 100px;
-}
+// ====================
 
+// forms
 input[type="text"],
 input[type="email"],
 input[type="password"],
 textarea.text {
-    padding: 6px 8px 8px;
-    @include box-sizing(border-box);
-    border: 1px solid $mediumGrey;
-    border-radius: 2px;
-    @include linear-gradient($lightGrey, tint($lightGrey, 90%));
-    background-color: $lightGrey;
-    @include box-shadow(0 1px 2px rgba(0, 0, 0, .1) inset);
-    font-family: 'Open Sans', sans-serif;
-    font-size: 11px;
-    color: $baseFontColor;
+  padding: 6px 8px 8px;
+  @include box-sizing(border-box);
+  border: 1px solid $mediumGrey;
+  border-radius: 2px;
+  @include linear-gradient($lightGrey, tint($lightGrey, 90%));
+  background-color: $lightGrey;
+  @include box-shadow(0 1px 2px rgba(0, 0, 0, .1) inset);
+  font-family: 'Open Sans', sans-serif;
+  font-size: 11px;
+  color: $baseFontColor;
+  outline: 0;
+
+  &::-webkit-input-placeholder,
+  &:-moz-placeholder,
+  &:-ms-input-placeholder {
+      color: #979faf;
+  }
+
+  &:focus {
+    @include linear-gradient($paleYellow, tint($paleYellow, 90%));
     outline: 0;
-
-    &::-webkit-input-placeholder,
-    &:-moz-placeholder,
-    &:-ms-input-placeholder {
-        color: #979faf;
-    }
-
-    &:focus {
-      @include linear-gradient($paleYellow, tint($paleYellow, 90%));
-      outline: 0;
-    }
+  }
 }
 
+// forms - specific
 input.search {
-    padding: 6px 15px 8px 30px;
-    @include box-sizing(border-box);
-    border: 1px solid $darkGrey;
-    border-radius: 20px;
-    background: url(../img/search-icon.png) no-repeat 8px 7px #edf1f5;
-    font-family: 'Open Sans', sans-serif;
-    color: $baseFontColor;
-    outline: 0;
+  padding: 6px 15px 8px 30px;
+  @include box-sizing(border-box);
+  border: 1px solid $darkGrey;
+  border-radius: 20px;
+  background: url(../img/search-icon.png) no-repeat 8px 7px #edf1f5;
+  font-family: 'Open Sans', sans-serif;
+  color: $baseFontColor;
+  outline: 0;
 
-    &::-webkit-input-placeholder {
-        color: #979faf;
-    }
+  &::-webkit-input-placeholder {
+      color: #979faf;
+  }
 }
 
 label {
-    font-size: 12px;
+  font-size: 12px;
 }
 
 code {
-    padding: 0 4px;
-    border-radius: 3px;
-    background: #eee;
-    font-family: Monaco, monospace;
+  padding: 0 4px;
+  border-radius: 3px;
+  background: #eee;
+  font-family: Monaco, monospace;
 }
 
 .CodeMirror {
-    font-size: 13px;
-    border: 1px solid $darkGrey;
-    background: #fff;
+  font-size: 13px;
+  border: 1px solid $darkGrey;
+  background: #fff;
 }
 
 .text-editor {
-    width: 100%;
-    min-height: 80px;
-    padding: 10px;
-    @include box-sizing(border-box);
-    border: 1px solid $mediumGrey;
-    @include linear-gradient(top, rgba(255, 255, 255, 0), rgba(255, 255, 255, 0.3));
-    background-color:  #edf1f5;
-    @include box-shadow(0 1px 2px rgba(0, 0, 0, 0.1) inset);
-    font-family: Monaco, monospace;
+  width: 100%;
+  min-height: 80px;
+  padding: 10px;
+  @include box-sizing(border-box);
+  border: 1px solid $mediumGrey;
+  @include linear-gradient(top, rgba(255, 255, 255, 0), rgba(255, 255, 255, 0.3));
+  background-color:  #edf1f5;
+  @include box-shadow(0 1px 2px rgba(0, 0, 0, 0.1) inset);
+  font-family: Monaco, monospace;
 }
 
+// ====================
+
+// UI - chrome
+.window {
+  @include clearfix();
+  @include border-radius(3px);
+  @include box-shadow(0 1px 1px $shadow-l1);
+  margin-bottom: $baseline;
+  border: 1px solid $gray-l2;
+  background: $white;
+}
+
+// ====================
+
+// UI - actions
 .new-unit-item,
 .new-subsection-item,
 .new-policy-item {
-    @include grey-button;
-    margin: 5px 8px;
-    padding: 3px 10px 4px 10px;
-    font-size: 10px;
+  @include grey-button;
+  margin: 5px 8px;
+  padding: 3px 10px 4px 10px;
+  font-size: 10px;
 
-    .new-folder-icon,
-    .new-policy-icon,
-    .new-unit-icon {
-        position: relative;
-        top: 2px;
-    }
+  .new-folder-icon,
+  .new-policy-icon,
+  .new-unit-icon {
+    position: relative;
+    top: 2px;
+  }
 }
 
 .item-actions {
-    position: absolute;
-    top: 5px;
-    right: 5px;
+  position: absolute;
+  top: 5px;
+  right: 5px;
 
-    .edit-button,
-    .delete-button,
-    .visibility-toggle {
-        float: left;
-        margin-right: 13px;
-        color: #a4aab7;
-    }
+  .edit-button,
+  .delete-button,
+  .visibility-toggle {
+    float: left;
+    margin-right: 13px;
+    color: #a4aab7;
+  }
+}
+
+// ====================
+
+// misc
+hr.divide {
+  @include text-sr();
 }
 
 .item-details {
@@ -189,81 +348,56 @@ code {
 }
 
 .window {
-    margin-bottom: 20px;
-    border: 1px solid $mediumGrey;
-    border-radius: 3px;
-    background: #fff;
-    @include box-shadow(0 1px 1px rgba(0, 0, 0, 0.1));
+  // @include border-radius(3px);
+  // @include box-shadow(0 1px 1px $shadow-l1);
+  // margin-bottom: $baseline;
+  // border: 1px solid $gray-l2;
+  // background: $white;
 
-    .window-contents {
-        padding: 20px;
+  .window-contents {
+    padding: 20px;
+  }
+
+  .header {
+    padding: 6px 14px;
+    border-bottom: 1px solid $mediumGrey;
+    border-radius: 2px 2px 0 0;
+    @include linear-gradient(top, rgba(255, 255, 255, .4), rgba(255, 255, 255, 0));
+    background-color: $lightBluishGrey;
+    @include box-shadow(0 1px 0 rgba(255, 255, 255, 0.2) inset);
+    font-size: 14px;
+    text-shadow: 0 1px 0 rgba(255, 255, 255, 0.3);
+  }
+
+  label {
+    display: block;
+    margin-bottom: 6px;
+    font-weight: 700;
+
+    &.inline-label {
+      display: inline;
     }
 
-    .header {
-        padding: 6px 14px;
-        border-bottom: 1px solid $mediumGrey;
-        border-radius: 2px 2px 0 0;
-        @include linear-gradient(top, rgba(255, 255, 255, .4), rgba(255, 255, 255, 0));
-        background-color: $lightBluishGrey;
-        @include box-shadow(0 1px 0 rgba(255, 255, 255, 0.2) inset);
-        font-size: 14px;
-        text-shadow: 0 1px 0 rgba(255, 255, 255, 0.3);
+    .description {
+      display: block;
+      font-size: 11px;
+      font-weight: 400;
+      font-style: italic;
+      line-height: 1.3;
+      color: #999;
     }
+  }
 
-    label {
-        display: block;
-        margin-bottom: 6px;
-        font-weight: 700;
-
-        &.inline-label {
-            display: inline;
-        }
-
-        .description {
-            display: block;
-            font-size: 11px;
-            font-weight: 400;
-            font-style: italic;
-            line-height: 1.3;
-            color: #999;
-        }
-    }
-
-    .row {
-        margin-bottom: 10px;
-        padding-bottom: 10px;
-        border-bottom: 1px solid #cbd1db;
-    }
+  .row {
+    margin-bottom: 10px;
+    padding-bottom: 10px;
+    border-bottom: 1px solid #cbd1db;
+  }
 }
 
-body.hide-wip {
-    .wip, .wip-box {
-        display: none !important;
-    }
-}
+// ====================
 
-body.show-wip {
-    .wip {
-        outline: 1px solid #f00 !important;
-        position: relative;
-    }
-
-    .wip-box {
-        @extend .wip;
-        &:after {
-            content: "WIP";
-            font-size: 8px;
-            padding: 2px;
-            background: #f00;
-            color: #fff;
-            @include position(absolute, 0px 0px 0 0);
-        }
-    }
-}
-
-.waiting {
-    
-}
+// system notifications
 .toast-notification {
   display: none;
   position: fixed;
@@ -323,50 +457,50 @@ body.show-wip {
 }
 
 .waiting {
-    position: relative;
+  position: relative;
 
-    &:before {
-        content: '';
-        display: block;
-        position: absolute;
-        top: 0;
-        left: 0;
-        z-index: 999998;
-        width: 100%;
-        height: 100%;
-        border-radius: inherit;
-        background: rgba(255, 255, 255, .9);
-    }
+  &:before {
+    content: '';
+    display: block;
+    position: absolute;
+    top: 0;
+    left: 0;
+    z-index: 999998;
+    width: 100%;
+    height: 100%;
+    border-radius: inherit;
+    background: rgba(255, 255, 255, .9);
+  }
 
-    &:after {
-        content: '';
-        @extend .spinner-icon;
-        display: block;
-        position: absolute;
-        top: 50%;
-        left: 50%;
-        margin-left: -10px;
-        margin-top: -10px;
-        z-index: 999999;
-    }
+  &:after {
+    content: '';
+    @extend .spinner-icon;
+    display: block;
+    position: absolute;
+    top: 50%;
+    left: 50%;
+    margin-left: -10px;
+    margin-top: -10px;
+    z-index: 999999;
+  }
 }
 
 .waiting-inline {
-    &:after {
-        content: '';
-        @extend .spinner-icon;
-    }
+  &:after {
+    content: '';
+    @extend .spinner-icon;
+  }
 }
 
 .new-button {
-    @include green-button;
-    font-size: 13px;
-    padding: 8px 20px 10px;
-    text-align: center;
+  @include green-button;
+  font-size: 13px;
+  padding: 8px 20px 10px;
+  text-align: center;
 
-    &.big {
-        display: block;
-    }
+  &.big {
+    display: block;
+  }
 }
 
 .edit-button.standard,
@@ -386,9 +520,9 @@ body.show-wip {
 
 .delete-button.standard {
 
-    &:hover {
-      background-color: tint($orange, 75%);
-    }
+  &:hover {
+    background-color: tint($orange, 75%);
+  }
 }
 
 .tooltip {
@@ -416,5 +550,49 @@ body.show-wip {
     margin-left: -7px;
     font-size: 20px;
     color: rgba(0, 0, 0, 0.85);
+  }
+}
+
+// ====================
+
+// basic utility
+.sr {
+  @include text-sr();
+}
+
+.fake-link {
+  cursor: pointer;
+}
+
+.non-list {
+  list-style: none;
+  margin: 0;
+  padding: 0;
+}
+
+.wrap {
+  text-wrap: wrap;
+  white-space: pre-wrap;
+  white-space: -moz-pre-wrap;
+  word-wrap: break-word;
+}
+
+// ====================
+
+// works in progress
+body.hide-wip {
+
+  .wip-box {
+    display: none;
+  }
+}
+
+// ====================
+
+// needed fudges for now
+body.dashboard {
+
+  .my-classes {
+    margin-top: $baseline;
   }
 }

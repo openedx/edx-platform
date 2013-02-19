@@ -33,7 +33,7 @@ from xmodule_modifiers import replace_course_urls, replace_static_urls, add_hist
 from xmodule.modulestore.exceptions import ItemNotFoundError
 from statsd import statsd
 
-log = logging.getLogger("mitx.courseware")
+log = logging.getLogger(__name__)
 
 
 if settings.XQUEUE_INTERFACE.get('basic_auth') is not None:
@@ -91,7 +91,7 @@ def toc_for_course(user, request, course, active_chapter, active_section):
 
     chapters = list()
     for chapter in course_module.get_display_items():
-        hide_from_toc = chapter.metadata.get('hide_from_toc','false').lower() == 'true'
+        hide_from_toc = chapter.metadata.get('hide_from_toc', 'false').lower() == 'true'
         if hide_from_toc:
             continue
 
@@ -165,6 +165,7 @@ def get_module_for_descriptor(user, request, descriptor, student_module_cache, c
     """
     return _get_module(user, request, descriptor, student_module_cache, course_id,
                        position=position, wrap_xmodule_display=wrap_xmodule_display)
+
 
 def _get_module(user, request, descriptor, student_module_cache, course_id,
                 position=None, wrap_xmodule_display=True):
@@ -279,6 +280,7 @@ def _get_module(user, request, descriptor, student_module_cache, course_id,
         # Make an error module
         return err_descriptor.xmodule_constructor(system)(None, None)
 
+    system.set('user_is_staff', has_access(user, descriptor.location, 'staff', course_id))
     _get_html = module.get_html
 
     if wrap_xmodule_display == True:
@@ -287,7 +289,7 @@ def _get_module(user, request, descriptor, student_module_cache, course_id,
     module.get_html = replace_static_urls(
         _get_html,
         module.metadata.get('data_dir', ''),
-        course_namespace = module.location._replace(category=None, name=None))
+        course_namespace=module.location._replace(category=None, name=None))
 
     # Allow URLs of the form '/course/' refer to the root of multicourse directory
     #   hierarchy of this course
@@ -300,6 +302,8 @@ def _get_module(user, request, descriptor, student_module_cache, course_id,
     return module
 
 # TODO (vshnayder): Rename this?  It's very confusing.
+
+
 def get_instance_module(course_id, user, module, student_module_cache):
     """
     Returns the StudentModule specific to this module for this student,
@@ -328,6 +332,7 @@ def get_instance_module(course_id, user, module, student_module_cache):
         return instance_module
     else:
         return None
+
 
 def get_shared_instance_module(course_id, user, module, student_module_cache):
     """
@@ -358,6 +363,7 @@ def get_shared_instance_module(course_id, user, module, student_module_cache):
         return shared_module
     else:
         return None
+
 
 @csrf_exempt
 def xqueue_callback(request, course_id, userid, id, dispatch):
@@ -415,8 +421,8 @@ def xqueue_callback(request, course_id, userid, id, dispatch):
         instance_module.save()
 
         #Bin score into range and increment stats
-        score_bucket=get_score_bucket(instance_module.grade, instance_module.max_grade)
-        org, course_num, run=course_id.split("/")
+        score_bucket = get_score_bucket(instance_module.grade, instance_module.max_grade)
+        org, course_num, run = course_id.split("/")
         statsd.increment("lms.courseware.question_answered",
                         tags=["org:{0}".format(org),
                               "course:{0}".format(course_num),
@@ -456,9 +462,9 @@ def modx_dispatch(request, dispatch, location, course_id):
                 return HttpResponse(json.dumps({'success': too_many_files_msg}))
 
             for inputfile in inputfiles:
-                if inputfile.size > settings.STUDENT_FILEUPLOAD_MAX_SIZE: # Bytes
+                if inputfile.size > settings.STUDENT_FILEUPLOAD_MAX_SIZE:   # Bytes
                     file_too_big_msg = 'Submission aborted! Your file "%s" is too large (max size: %d MB)' %\
-                                        (inputfile.name, settings.STUDENT_FILEUPLOAD_MAX_SIZE/(1000**2))
+                                        (inputfile.name, settings.STUDENT_FILEUPLOAD_MAX_SIZE / (1000 ** 2))
                     return HttpResponse(json.dumps({'success': file_too_big_msg}))
             p[fileinput_id] = inputfiles
 
@@ -499,7 +505,7 @@ def modx_dispatch(request, dispatch, location, course_id):
     # Don't track state for anonymous users (who don't have student modules)
     if instance_module is not None:
         instance_module.state = instance.get_instance_state()
-        instance_module.max_grade=instance.max_score()
+        instance_module.max_grade = instance.max_score()
         if instance.get_score():
             instance_module.grade = instance.get_score()['score']
         if (instance_module.grade != oldgrade or
@@ -508,8 +514,8 @@ def modx_dispatch(request, dispatch, location, course_id):
             instance_module.save()
 
             #Bin score into range and increment stats
-            score_bucket=get_score_bucket(instance_module.grade, instance_module.max_grade)
-            org, course_num, run=course_id.split("/")
+            score_bucket = get_score_bucket(instance_module.grade, instance_module.max_grade)
+            org, course_num, run = course_id.split("/")
             statsd.increment("lms.courseware.question_answered",
                             tags=["org:{0}".format(org),
                                   "course:{0}".format(course_num),
@@ -525,6 +531,7 @@ def modx_dispatch(request, dispatch, location, course_id):
 
     # Return whatever the module wanted to return to the client/caller
     return HttpResponse(ajax_return)
+
 
 def preview_chemcalc(request):
     """
@@ -544,7 +551,7 @@ def preview_chemcalc(request):
         raise Http404
 
     result = {'preview': '',
-              'error': '' }
+              'error': ''}
     formula = request.GET.get('formula')
     if formula is None:
         result['error'] = "No formula specified."
@@ -563,17 +570,15 @@ def preview_chemcalc(request):
     return HttpResponse(json.dumps(result))
 
 
-def get_score_bucket(grade,max_grade):
+def get_score_bucket(grade, max_grade):
     """
     Function to split arbitrary score ranges into 3 buckets.
     Used with statsd tracking.
     """
-    score_bucket="incorrect"
-    if(grade>0 and grade<max_grade):
-        score_bucket="partial"
-    elif(grade==max_grade):
-        score_bucket="correct"
+    score_bucket = "incorrect"
+    if(grade > 0 and grade < max_grade):
+        score_bucket = "partial"
+    elif(grade == max_grade):
+        score_bucket = "correct"
 
     return score_bucket
-
-

@@ -40,7 +40,7 @@ ALLOWABLE_IMAGE_SUFFIXES = [
 ]
 
 #Maximum allowed dimensions (x and y) for an uploaded image
-MAX_ALLOWED_IMAGE_DIM = 1000
+MAX_ALLOWED_IMAGE_DIM = 1500
 
 #Dimensions to which image is resized before it is evaluated for color count, etc
 MAX_IMAGE_DIM = 150
@@ -50,6 +50,7 @@ MAX_COLORS_TO_COUNT = 16
 
 #Maximum number of colors allowed in an uploaded image
 MAX_COLORS = 400
+
 
 class ImageProperties(object):
     """
@@ -127,9 +128,15 @@ class ImageProperties(object):
         """
         image_is_okay = False
         try:
-            image_is_okay = self.count_colors() and self.get_skin_ratio() and not self.image_too_large
+            #image_is_okay = self.count_colors() and self.get_skin_ratio() and not self.image_too_large
+            image_is_okay = not self.image_too_large
         except:
             log.exception("Could not run image tests.")
+
+        if not ENABLE_PIL:
+            image_is_okay = True
+
+        #log.debug("Image OK: {0}".format(image_is_okay))
 
         return image_is_okay
 
@@ -186,6 +193,7 @@ class URLProperties(object):
                 success = True
                 return success
         return success
+
 
 def run_url_tests(url_string):
     """
@@ -244,11 +252,13 @@ def upload_to_s3(file_to_upload, keyname):
         #k.set_metadata("Content-Type", 'images/png')
 
         k.set_acl("public-read")
-        public_url = k.generate_url(60 * 60 * 24 * 365) # URL timeout in seconds.
+        public_url = k.generate_url(60 * 60 * 24 * 365)   # URL timeout in seconds.
 
         return True, public_url
     except:
-        return False, "Could not connect to S3."
+        error_message = "Could not connect to S3."
+        log.exception(error_message)
+        return False, error_message
 
 
 def get_from_s3(s3_public_url):
@@ -260,6 +270,3 @@ def get_from_s3(s3_public_url):
     r = requests.get(s3_public_url, timeout=2)
     data = r.text
     return data
-
-
-

@@ -10,8 +10,10 @@ from lxml import etree
 
 log = logging.getLogger(__name__)
 
+
 class GradingServiceError(Exception):
     pass
+
 
 class GradingService(object):
     """
@@ -35,7 +37,7 @@ class GradingService(object):
         """
         response = self.session.post(self.login_url,
             {'username': self.username,
-             'password': self.password,})
+             'password': self.password, })
 
         response.raise_for_status()
 
@@ -111,8 +113,10 @@ class GradingService(object):
         try:
             if 'rubric' in response_json:
                 rubric = response_json['rubric']
-                rubric_renderer = CombinedOpenEndedRubric(self.system, False)
-                success, rubric_html = rubric_renderer.render_rubric(rubric)
+                rubric_renderer = CombinedOpenEndedRubric(self.system, view_only)
+                rubric_dict = rubric_renderer.render_rubric(rubric)
+                success = rubric_dict['success']
+                rubric_html = rubric_dict['html']
                 response_json['rubric'] = rubric_html
             return response_json
         # if we can't parse the rubric into HTML,

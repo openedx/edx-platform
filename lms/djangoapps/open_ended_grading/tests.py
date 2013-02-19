@@ -22,7 +22,7 @@ from mitxmako.shortcuts import render_to_string
 
 import logging
 log = logging.getLogger(__name__)
-from override_settings import override_settings
+from django.test.utils import override_settings
 from django.http import QueryDict
 
 
@@ -44,7 +44,7 @@ class TestStaffGradingService(ct.PageLoader):
         self.create_account('u2', self.instructor, self.password)
         self.activate_user(self.student)
         self.activate_user(self.instructor)
-        
+
         self.course_id = "edX/toy/2012_Fall"
         self.toy = modulestore().get_course(self.course_id)
         def make_instructor(course):
@@ -100,6 +100,7 @@ class TestStaffGradingService(ct.PageLoader):
                 'feedback': 'great!',
                 'submission_id': '123',
                 'location': self.location,
+                'submission_flagged': "true",
                 'rubric_scores[]': ['1', '2']}
 
         r = self.check_for_post_code(200, url, data)
@@ -118,7 +119,7 @@ class TestStaffGradingService(ct.PageLoader):
         self.assertTrue(d['success'], str(d))
         self.assertIsNotNone(d['problem_list'])
 
-    
+
 @override_settings(MODULESTORE=ct.TEST_DATA_XML_MODULESTORE)
 class TestPeerGradingService(ct.PageLoader):
     '''
@@ -137,7 +138,7 @@ class TestPeerGradingService(ct.PageLoader):
         self.create_account('u2', self.instructor, self.password)
         self.activate_user(self.student)
         self.activate_user(self.instructor)
-        
+
         self.course_id = "edX/toy/2012_Fall"
         self.toy = modulestore().get_course(self.course_id)
         location = "i4x://edX/toy/peergrading/init"
@@ -146,7 +147,7 @@ class TestPeerGradingService(ct.PageLoader):
         self.system = ModuleSystem(location, None, None, render_to_string, None)
         self.descriptor = peer_grading_module.PeerGradingDescriptor(self.system)
 
-        self.peer_module = peer_grading_module.PeerGradingModule(self.system,location,"<peergrading/>",self.descriptor)
+        self.peer_module = peer_grading_module.PeerGradingModule(self.system, location, "<peergrading/>", self.descriptor)
         self.peer_module.peer_gs = self.mock_service
         self.logout()
 
@@ -171,7 +172,7 @@ class TestPeerGradingService(ct.PageLoader):
     def test_save_grade_success(self):
         raise SkipTest()
         data = 'rubric_scores[]=1|rubric_scores[]=2|location=' + self.location + '|submission_id=1|submission_key=fake key|score=2|feedback=feedback|submission_flagged=False'
-        qdict = QueryDict(data.replace("|","&"))
+        qdict = QueryDict(data.replace("|", "&"))
         r = self.peer_module.save_grade(qdict)
         d = r
         self.assertTrue(d['success'])
@@ -222,7 +223,7 @@ class TestPeerGradingService(ct.PageLoader):
     def test_save_calibration_essay_success(self):
         raise SkipTest()
         data = 'rubric_scores[]=1|rubric_scores[]=2|location=' + self.location + '|submission_id=1|submission_key=fake key|score=2|feedback=feedback|submission_flagged=False'
-        qdict = QueryDict(data.replace("|","&"))
+        qdict = QueryDict(data.replace("|", "&"))
         r = self.peer_module.save_calibration_essay(qdict)
         d = r
         self.assertTrue(d['success'])
@@ -235,4 +236,3 @@ class TestPeerGradingService(ct.PageLoader):
         self.assertFalse(d['success'])
         self.assertTrue(d['error'].find('Missing required keys:') > -1)
         self.assertFalse('actual_score' in d)
-

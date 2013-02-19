@@ -13,13 +13,20 @@ log = logging.getLogger(__name__)
 
 
 def _url_replace_regex(prefix):
+    """
+    Match static urls in quotes that don't end in '?raw'.
+
+    To anyone contemplating making this more complicated:
+    http://xkcd.com/1171/
+    """
     return r"""
-        (?x)                 # flags=re.VERBOSE
-        (?P<quote>\\?['"])   # the opening quotes
-        (?P<prefix>{prefix}) # theeprefix
-        (?P<rest>.*?)        # everything else in the url
-        (?P=quote)           # the first matching closing quote
+        (?x)                      # flags=re.VERBOSE
+        (?P<quote>\\?['"])        # the opening quotes
+        (?P<prefix>{prefix})      # the prefix
+        (?P<rest>.*?)             # everything else in the url
+        (?P=quote)                # the first matching closing quote
         """.format(prefix=prefix)
+
 
 def try_staticfiles_lookup(path):
     """
@@ -73,21 +80,30 @@ def replace_static_urls(text, data_directory, course_namespace=None):
         quote = match.group('quote')
         rest = match.group('rest')
 
+        # Don't mess with things that end in '?raw'
+        if rest.endswith('?raw'):
+            return original
+
         # course_namespace is not None, then use studio style urls
         if course_namespace is not None and not isinstance(modulestore(), XMLModuleStore):
             url = StaticContent.convert_legacy_static_url(rest, course_namespace)
-        # If we're in debug mode, and the file as requested exists, then don't change the links
-        elif (settings.DEBUG and finders.find(rest, True)):
+        # In debug mode, if we can find the url as is,
+        elif settings.DEBUG and finders.find(rest, True):
             return original
-        # Otherwise, look the file up in staticfiles_storage without the data directory
+        # Otherwise, look the file up in staticfiles_storage, and append the data directory if needed
         else:
+            course_path = "/".join((data_directory, rest))
+
             try:
-                url = staticfiles_storage.url(rest)
+                if staticfiles_storage.exists(rest):
+                    url = staticfiles_storage.url(rest)
+                else:
+                    url = staticfiles_storage.url(course_path)
             # And if that fails, assume that it's course content, and add manually data directory
             except Exception as err:
                 log.warning("staticfiles_storage couldn't find path {0}: {1}".format(
                     rest, str(err)))
-                url = "".join([prefix, data_directory, '/', rest])
+                url = "".join([prefix, course_path])
 
         return "".join([quote, url, quote])
 
