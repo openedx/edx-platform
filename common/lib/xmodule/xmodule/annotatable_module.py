@@ -73,19 +73,25 @@ class AnnotatableModule(XModule):
     def _set_problem(self, span, index, xmltree):
         """ Sets the associated problem. """
 
-        problem = span.find('problem')
-        if problem is not None:
+        problem_el = span.find('problem')
+        if problem_el is not None:
             problem_id = str(index + 1)
-            problem.set('problem_id', problem_id)
+            problem_el.set('problem_id', problem_id)
             span.set('data-problem-id', problem_id)
-            parsed_problem = self._parse_problem(problem) 
+            parsed_problem = self._parse_problem(problem_el)
+            parsed_problem['discussion_id'] = span.get('data-discussion-id')
             if parsed_problem is not None:
                 self.problems.append(parsed_problem)
+            span.remove(problem_el)
 
-    def _parse_problem(self, problem):
-        prompt_el = problem.find('prompt')
-        answer_el = problem.find('answer')
-        tags_el = problem.find('tags')
+    def _parse_problem(self, problem_el):
+        """ Returns the problem XML as a dict. """
+        prompt_el = problem_el.find('prompt')
+        answer_el = problem_el.find('answer')
+        tags_el = problem_el.find('tags')
+
+        if any(v is None for v in (prompt_el, answer_el, tags_el)):
+            return None
 
         tags = []
         for tag_el in tags_el.iterchildren('tag'):
@@ -96,20 +102,14 @@ class AnnotatableModule(XModule):
                 'answer': tag_el.get('answer', 'n') == 'y'
             })
 
-        parsed = {
-            'problem_id': problem.get('problem_id'),
+        result = {
+            'problem_id': problem_el.get('problem_id'),
             'prompt': prompt_el.text, 
             'answer': answer_el.text,
             'tags': tags
         }
 
-        log.debug('parsed problem id = ' + parsed['problem_id'])
-        log.debug("problem keys: " + ", ".join(parsed.keys()))
-        log.debug('prompt = ' + parsed['prompt'])
-        log.debug('answer = ' + parsed['answer'])
-        log.debug('num tags = ' + str(len(parsed['tags'])))
-
-        return parsed
+        return result
 
     def _get_marker_color(self, span):
         """ Returns the name of the marker/highlight color for the span if it is valid, otherwise none."""
@@ -151,16 +151,48 @@ class AnnotatableModule(XModule):
 
         return etree.tostring(xmltree)
 
+    def _render_items(self):
+        items = []
+
+        if self.render_as_problems:
+            discussions = {}
+            for child in self.get_display_items():
+                discussions[child.discussion_id] = child.get_html()
+
+            for problem in self.problems:
+                discussion = None
+                discussion_id = problem['discussion_id']
+                if discussion_id in discussions:
+                    discussion = {
+                        'discussion_id': discussion_id,
+                        'content': discussions[discussion_id]
+                    }
+                items.append({
+                    'problem': problem,
+                    'discussion': discussion
+                })
+        else:
+            for child in self.get_display_items():
+                items.append({ 'discussion': {
+                    'discussion_id': child.discussion_id,
+                    'content': child.get_html()
+                }})
+
+        return items
+
     def get_html(self):
         """ Renders parameters to template. """
-        
+
+        html_content = self._render_content()
+        items = self._render_items()
+
         context = {
             'display_name': self.display_name,
             'problem_name': self.problem_name,
             'element_id': self.element_id,
-            'html_content': self._render_content(),
-            'has_problems': self.has_problems,
-            'problems': self.problems
+            'html_content': html_content,
+            'render_as_problems': self.render_as_problems,
+            'items': items
         }
 
         return self.system.render_template('annotatable.html', context)
@@ -175,7 +207,7 @@ class AnnotatableModule(XModule):
         self.element_id = self.location.html_id();
         self.content = self.definition['data']
         self.problem_type = xmltree.get('problem_type')
-        self.has_problems = (self.problem_type == 'classification')
+        self.render_as_problems = (self.problem_type == 'classification')
         self.problem_name = self._get_problem_name(self.problem_type)
         self.problems = []
 
@@ -184,3 +216,38 @@ class AnnotatableDescriptor(RawDescriptor):
     module_class = AnnotatableModule
     stores_state = True
     template_dir_name = "annotatable"
+
+
+    @classmethod
+    def definition_from_xml(cls, xml_object, system):
+        children = []
+        for child in xml_object.findall('discussion'):
+            try:
+                children.append(system.process_xml(etree.tostring(child, encoding='unicode')).location.url())
+                xml_object.remove(child)
+            except Exception as e:
+                log.exception("Unable to load child when parsing Sequence. Continuing...")
+                if system.error_tracker is not None:
+                    system.error_tracker("ERROR: " + str(e))
+                continue
+        return {
+            'data': etree.tostring(xml_object, pretty_print=True, encoding='unicode'),
+            'children': children
+        }
+
+    def definition_to_xml(self, resource_fs):
+        try:
+            root = etree.fromstring(self.definition['data'])
+            for child in self.get_children():
+                root.append(etree.fromstring(child.export_to_xml(resource_fs)))
+            return root
+        except etree.XMLSyntaxError as err:
+            # Can't recover here, so just add some info and
+            # re-raise
+            lines = self.definition['data'].split('\n')
+            line, offset = err.position
+            msg = ("Unable to create xml for problem {loc}. "
+                   "Context: '{context}'".format(
+                context=lines[line - 1][offset - 40:offset + 40],
+                loc=self.location))
+            raise Exception, msg, sys.exc_info()[2]

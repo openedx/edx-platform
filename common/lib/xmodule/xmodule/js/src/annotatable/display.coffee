@@ -8,6 +8,9 @@ class @Annotatable
     replySelector:   '.annotatable-reply'
     helpSelector:    '.annotatable-help-icon'
     returnSelector:  '.annotatable-return'
+    problemSelector: '.annotatable-problem'
+    problemSubmitSelector: '.annotatable-problem-submit'
+    problemTagSelector: '.annotatable-problem-tags > li'
 
     discussionXModuleSelector: '.xmodule_DiscussionModule'
     discussionSelector:        '.discussion-module'
@@ -25,13 +28,19 @@ class @Annotatable
     init: () ->
         @initEvents()
         @initTips()
-        @initDiscussionReturnLinks()
 
     initEvents: () ->
         @annotationsHidden = false
         @$(@toggleSelector).bind 'click', @onClickToggleAnnotations
         @$(@wrapperSelector).delegate @replySelector, 'click', @onClickReply
         $(@discussionXModuleSelector).delegate @returnSelector, 'click', @onClickReturn
+
+        problemSelector = @problemSelector
+        @$(@problemSubmitSelector).bind 'click', (e) ->
+            $(this).closest(problemSelector).next().show()
+
+        @$(@problemTagSelector).bind 'click', (e) ->
+            $(this).toggleClass('selected')
 
     initTips: () ->
         @savedTips = []
@@ -44,10 +53,6 @@ class @Annotatable
             content:
                 title: 'Annotated Reading'
                 text: true # use title attribute of this element
-
-    initDiscussionReturnLinks: () ->
-        $(@discussionXModuleSelector).find(@discussionSelector).each (index, el) =>
-            $(el).before @createReturnLink(@getDiscussionId el)
 
     getTipOptions: (el) ->
         content:

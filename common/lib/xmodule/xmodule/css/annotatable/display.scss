@@ -62,6 +62,9 @@
 
 .annotatable-problems {
     margin: 25px 0 0 0;
+    .annotatable-discussion {
+        display: none;
+    }
 }
 .annotatable-problem {
     border: 1px solid #ccc;
@@ -88,11 +91,15 @@
         margin: 1em 0;
         padding: 0;
         li {
+            cursor: pointer;
             display: inline;
             padding: .5em;
             margin: 0 .5em 0 0;
             background-color: #ccc;
             border: 1px solid #000;
+            &.selected {
+              background-color: rgba(255,255,10,0.3);
+            }
         }
     }
     .annotatable-problem-controls { 

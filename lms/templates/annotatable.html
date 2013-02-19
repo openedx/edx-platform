@@ -1,3 +1,5 @@
+<%namespace name="annotatable" file="annotatable_problem.html"/>
+
 <div class="annotatable-wrapper" id="${element_id}-wrapper">
 	<div class="annotatable-header">
 		% if display_name is not UNDEFINED and display_name is not None:
@@ -12,32 +14,23 @@
 	
 	<div class="annotatable-content">${html_content}</div>
 
-    % if has_problems:
+    % if render_as_problems:
         <div class="annotatable-problems">
-            % for problem in problems:
-            <div class="annotatable-problem" data-problem-id="${problem['problem_id']}">
-                <div class="annotatable-problem-header">
-                    Classification Exercise: <span class="annotatable-problem-index">(${loop.index + 1} / ${len(problems)}) </span>
-                </div>
-                <div class="annotatable-problem-body">
-                    <div class="annotatable-problem-prompt">${problem['prompt']}</div>
-                    <ul class="annotatable-problem-tags">
-                        % for tag in problem['tags']:
-                            <li>${tag['name']}</li>
-                        % endfor
-                    </ul>
-                    Explain the rationale for your tag selections:<br/>
-                    <textarea></textarea>
-                    <div class="annotatable-problem-controls">
-                        <button class="button annotatable-problem-save">Save</button>
-                        <button class="button annotatable-problem-submit">Submit</button>
-                        <a class="annotatable-problem-return" href="javascript:void(0);">Return to annotation</a>
-                    </div>
-                </div>
-                <div class="annotatable-problem-footer">
-                </div>
-            </div>
+            % for item in items:
+                ${annotatable.render_problem(item['problem'],loop.index,len(items))}
+                % if item['discussion']:
+                    <div class="annotatable-discussion">${item['discussion']['content']}</div>
+                % endif
             % endfor
+        </div>
+    % else:
+        <div class="annotatable-discussions">
+        % for item in items:
+            <div class="annotatable-discussion">
+                <a class="annotatable-return" href="javascript:void(0);" data-discussion-id="${item['discussion']['discussion_id']}">Return to annotation</a>
+                ${item['discussion']['content']}
+            </div>
+        % endfor
         </div>
     % endif
 </div>
