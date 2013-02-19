@@ -23,7 +23,6 @@ CMS.Models.Settings.Advanced = Backbone.Model.extend({
         options = options ? _.clone(options) : {};
         // add saveSuccess to the success
         var success = options.success;
-        var model = this;
         options.success = function(model, resp, options) {
           model.afterSave(model);
           if (success) success(model, resp, options);
