@@ -33,7 +33,7 @@
     // colophon
     .colophon {
       margin-right: flex-gutter(2);
-      width: flex-grid(6);
+      width: flex-grid(6,12);
       float: left;
 
       .nav-colophon {
@@ -82,7 +82,7 @@
     // references
     .references {
       margin: -10px 0 0 0;
-      width: flex-grid(4);
+      width: flex-grid(4,12);
       float: right;
 
       .nav-social {
