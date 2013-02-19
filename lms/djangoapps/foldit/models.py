@@ -25,6 +25,36 @@ class Score(models.Model):
     score_version = models.IntegerField()
     created = models.DateTimeField(auto_now_add=True)
 
+    @staticmethod
+    def display_score(score):
+        """
+        Argument:
+            score (float), as stored in the DB
+
+        Returns:
+            score (float), as displayed to the user in the game and in the leaderboard
+        """
+        # TODO: put in correct formula
+        return -score
+
+    @staticmethod
+    def get_top_n(puzzle_id, n):
+        """
+        Arguments:
+            puzzle_id (int): id of the puzzle for which to look
+            n (int): number of top scores to return.
+
+        Returns:
+           The top (lowest energy, highest display score) n scores for the puzzle.  If
+           there are fewer than n, returns all.  Output is a list of dictionaries, sorted
+           by display_score:
+                [ {username: 'a_user',
+                   score: 8500}, ...]
+        """
+        scores = Score.objects.filter(puzzle_id=puzzle_id).order_by('-best_score')[:n]
+        return [{'username': s.user.username, 'score': display_score(s.best_score)}
+                for s in scores]
+
 
 class PuzzleComplete(models.Model):
     """
