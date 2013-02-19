@@ -8,10 +8,17 @@ from codejail.jailpy import jailpy
 
 dedent = textwrap.dedent
 
-class TestFeatures(unittest.TestCase):
+class JailPyHelpers(object):
+    """Assert helpers for jailpy tests."""
+    def assertResultOk(self, res):
+        self.assertEqual(res.stderr, "")
+        self.assertEqual(res.status, 0)
+
+
+class TestFeatures(JailPyHelpers, unittest.TestCase):
     def test_hello_world(self):
         res = jailpy("print 'Hello, world!'")
-        self.assertEqual(res.status, 0)
+        self.assertResultOk(res)
         self.assertEqual(res.stdout, 'Hello, world!\n')
 
     def test_argv(self):
@@ -19,7 +26,7 @@ class TestFeatures(unittest.TestCase):
                 "import sys; print ':'.join(sys.argv[1:])",
                 argv=["Hello", "world", "-x"]
                 )
-        self.assertEqual(res.status, 0)
+        self.assertResultOk(res)
         self.assertEqual(res.stdout, "Hello:world:-x\n")
 
     def test_ends_with_exception(self):
@@ -38,10 +45,11 @@ class TestFeatures(unittest.TestCase):
             "import json,sys; print sum(json.load(sys.stdin))",
             stdin="[1, 2.5, 33]"
         )
+        self.assertResultOk(res)
         self.assertEqual(res.stdout.strip(), "36.5")
 
 
-class TestLimits(unittest.TestCase):
+class TestLimits(JailPyHelpers, unittest.TestCase):
     def test_cant_use_too_much_memory(self):
         res = jailpy("print sum(range(100000000))")
         self.assertNotEqual(res.status, 0)
@@ -78,7 +86,7 @@ class TestLimits(unittest.TestCase):
     # TODO: read network
     # TODO: fork
 
-class TestMalware(unittest.TestCase):
+class TestMalware(JailPyHelpers, unittest.TestCase):
     def test_crash_cpython(self):
         # http://nedbatchelder.com/blog/201206/eval_really_is_dangerous.html
         res = jailpy(dedent("""\
@@ -119,5 +127,5 @@ class TestMalware(unittest.TestCase):
                     print "Files in %r: %r" % (place, files)
             print "Done."
             """))
-        self.assertEqual(res.status, 0)
+        self.assertResultOk(res)
         self.assertEqual(res.stdout, "Done.\n")
