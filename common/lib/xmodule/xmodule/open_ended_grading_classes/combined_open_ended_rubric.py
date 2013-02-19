@@ -4,7 +4,6 @@ from lxml import etree
 log = logging.getLogger(__name__)
 
 GRADER_TYPE_IMAGE_DICT = {
-    '8B' : '/static/images/random_grading_icon.png',
     'SA' : '/static/images/self_assessment_icon.png',
     'PE' : '/static/images/peer_grading_icon.png',
     'ML' : '/static/images/ml_grading_icon.png',
@@ -13,7 +12,6 @@ GRADER_TYPE_IMAGE_DICT = {
     }
 
 HUMAN_GRADER_TYPE = {
-    '8B' : 'Magic-8-Ball-Assessment',
     'SA' : 'Self-Assessment',
     'PE' : 'Peer-Assessment',
     'IN' : 'Instructor-Assessment',
