@@ -6,7 +6,8 @@ from django.conf.urls import patterns, include, url
 # admin.autodiscover()
 
 urlpatterns = ('',
-    url(r'^$', 'contentstore.views.index', name='index'),
+    url(r'^$', 'contentstore.views.howitworks', name='homepage'),
+    url(r'^listing', 'contentstore.views.index', name='index'),
     url(r'^edit/(?P<location>.*?)$', 'contentstore.views.edit_unit', name='edit_unit'),
     url(r'^subsection/(?P<location>.*?)$', 'contentstore.views.edit_subsection', name='edit_subsection'),
     url(r'^preview_component/(?P<location>.*?)$', 'contentstore.views.preview_component', name='preview_component'),
@@ -42,9 +43,10 @@ urlpatterns = ('',
         'contentstore.views.remove_user', name='remove_user'),
     url(r'^(?P<org>[^/]+)/(?P<course>[^/]+)/info/(?P<name>[^/]+)$', 'contentstore.views.course_info', name='course_info'),
     url(r'^(?P<org>[^/]+)/(?P<course>[^/]+)/course_info/updates/(?P<provided_id>.*)$', 'contentstore.views.course_info_updates', name='course_info'),
-    url(r'^(?P<org>[^/]+)/(?P<course>[^/]+)/settings/(?P<name>[^/]+)$', 'contentstore.views.get_course_settings', name='course_settings'),
-    url(r'^(?P<org>[^/]+)/(?P<course>[^/]+)/settings/(?P<name>[^/]+)/section/(?P<section>[^/]+).*$', 'contentstore.views.course_settings_updates', name='course_settings'),
-    url(r'^(?P<org>[^/]+)/(?P<course>[^/]+)/grades/(?P<name>[^/]+)/(?P<grader_index>.*)$', 'contentstore.views.course_grader_updates', name='course_settings'),
+    url(r'^(?P<org>[^/]+)/(?P<course>[^/]+)/settings-details/(?P<name>[^/]+)$', 'contentstore.views.get_course_settings', name='course_settings'),
+    url(r'^(?P<org>[^/]+)/(?P<course>[^/]+)/settings-grading/(?P<name>[^/]+)$', 'contentstore.views.course_config_graders_page', name='course_settings'),
+    url(r'^(?P<org>[^/]+)/(?P<course>[^/]+)/settings-details/(?P<name>[^/]+)/section/(?P<section>[^/]+).*$', 'contentstore.views.course_settings_updates', name='course_settings'),
+    url(r'^(?P<org>[^/]+)/(?P<course>[^/]+)/settings-grading/(?P<name>[^/]+)/(?P<grader_index>.*)$', 'contentstore.views.course_grader_updates', name='course_settings'),
 
     url(r'^(?P<org>[^/]+)/(?P<course>[^/]+)/(?P<category>[^/]+)/(?P<name>[^/]+)/gradeas.*$', 'contentstore.views.assignment_type_update', name='assignment_type_update'),
 
@@ -76,13 +78,15 @@ urlpatterns = ('',
 
 # User creation and updating views
 urlpatterns += (
+    url(r'^howitworks$', 'contentstore.views.howitworks', name='howitworks'),
     url(r'^signup$', 'contentstore.views.signup', name='signup'),
 
     url(r'^create_account$', 'student.views.create_account'),
     url(r'^activate/(?P<key>[^/]*)$', 'student.views.activate_account', name='activate'),
 
     # form page
-    url(r'^login$', 'contentstore.views.login_page', name='login'),
+    url(r'^login$', 'contentstore.views.old_login_redirect', name='old_login'),
+    url(r'^signin$', 'contentstore.views.login_page', name='login'),
     # ajax view that actually does the work
     url(r'^login_post$', 'student.views.login_user', name='login_post'),
 

@@ -51,7 +51,7 @@ class MockStaffGradingService(object):
         ]})
 
 
-    def save_grade(self, course_id, grader_id, submission_id, score, feedback, skipped, rubric_scores):
+    def save_grade(self, course_id, grader_id, submission_id, score, feedback, skipped, rubric_scores, submission_flagged):
         return self.get_next(course_id, 'fake location', grader_id)
 
 
@@ -114,7 +114,7 @@ class StaffGradingService(GradingService):
         return json.dumps(self._render_rubric(response))
 
 
-    def save_grade(self, course_id, grader_id, submission_id, score, feedback, skipped, rubric_scores):
+    def save_grade(self, course_id, grader_id, submission_id, score, feedback, skipped, rubric_scores, submission_flagged):
         """
         Save a score and feedback for a submission.
 
@@ -133,7 +133,8 @@ class StaffGradingService(GradingService):
                 'grader_id': grader_id,
                 'skipped': skipped,
                 'rubric_scores': rubric_scores,
-                'rubric_scores_complete': True}
+                'rubric_scores_complete': True,
+                'submission_flagged': submission_flagged}
 
         return self.post(self.save_grade_url, data=data)
 
@@ -296,7 +297,7 @@ def save_grade(request, course_id):
     if request.method != 'POST':
         raise Http404
 
-    required = set(['score', 'feedback', 'submission_id', 'location', 'rubric_scores[]'])
+    required = set(['score', 'feedback', 'submission_id', 'location','submission_flagged', 'rubric_scores[]'])
     actual = set(request.POST.keys())
     missing = required - actual
     if len(missing) > 0:
@@ -317,7 +318,8 @@ def save_grade(request, course_id):
                                           p['score'],
                                           p['feedback'],
                                           skipped,
-                                          p.getlist('rubric_scores[]'))
+                                          p.getlist('rubric_scores[]'),
+                                          p['submission_flagged'])
     except GradingServiceError:
         #This is a dev_facing_error
         log.exception("Error saving grade in the staff grading interface in open ended grading.  Request: {0} Course ID: {1}".format(request, course_id))

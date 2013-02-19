@@ -1,20 +1,20 @@
 <%include file="metadata-edit.html" />
 <section class="problem-editor editor">
     <div class="row">
-        %if markdown != '' or data == '<problem>\n</problem>\n':
+        %if enable_markdown:
         <div class="editor-bar">
             <ul class="format-buttons">
                 <li><a href="#" class="header-button" data-tooltip="Heading 1"><span
                         class="problem-editor-icon heading1"></span></a></li>
                 <li><a href="#" class="multiple-choice-button" data-tooltip="Multiple Choice"><span
                         class="problem-editor-icon multiple-choice"></span></a></li>
-                <li><a href="#" class="checks-button" data-tooltip="Check Multiple"><span
+                <li><a href="#" class="checks-button" data-tooltip="Checkboxes"><span
                         class="problem-editor-icon checks"></span></a></li>
-                <li><a href="#" class="string-button" data-tooltip="String Response"><span
+                <li><a href="#" class="string-button" data-tooltip="Text Input"><span
                         class="problem-editor-icon string"></span></a></li>
-                <li><a href="#" class="number-button" data-tooltip="Numerical Response"><span
+                <li><a href="#" class="number-button" data-tooltip="Numerical Input"><span
                         class="problem-editor-icon number"></span></a></li>
-                <li><a href="#" class="dropdown-button" data-tooltip="Option Response"><span
+                <li><a href="#" class="dropdown-button" data-tooltip="Dropdown"><span
                         class="problem-editor-icon dropdown"></span></a></li>
                 <li><a href="#" class="explanation-button" data-tooltip="Explanation"><span
                         class="problem-editor-icon explanation"></span></a></li>
@@ -56,7 +56,7 @@
                 </div>
             </div>
             <div class="row">
-                <h6>Check Multiple</h6>
+                <h6>Checkboxes</h6>
                 <div class="col sample check-multiple">
                     <img src="/static/img/multi-example.png" />
                 </div>
@@ -67,7 +67,7 @@
                 </div>
             </div>
             <div class="row">
-                <h6>String Response</h6>
+                <h6>Text Input</h6>
                 <div class="col sample string-response">
                     <img src="/static/img/string-example.png" />
                 </div>
@@ -76,7 +76,7 @@
                 </div>
             </div>
             <div class="row">
-                <h6>Numerical Response</h6>
+                <h6>Numerical Input</h6>
                 <div class="col sample numerical-response">
                     <img src="/static/img/number-example.png" />
                 </div>
@@ -85,7 +85,7 @@
                 </div>
             </div>
             <div class="row">
-                <h6>Option Response</h6>
+                <h6>Dropdown</h6>
                 <div class="col sample option-reponse">
                     <img src="/static/img/select-example.png" />
                 </div>

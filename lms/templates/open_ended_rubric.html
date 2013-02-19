@@ -4,7 +4,7 @@
     <div class="rubric">
         % for i in range(len(categories)):
         <% category = categories[i] %>
-            <b class="rubric-category">${category['description']}</b> <br/>
+            <span class="rubric-category">${category['description']}</span> <br/>
             <ul class="rubric-list">
                 % for j in range(len(category['options'])):
                 <% option = category['options'][j] %>

@@ -1,5 +1,8 @@
-from nose.tools import assert_equals
-from static_replace import replace_static_urls, replace_course_urls
+import re
+
+from nose.tools import assert_equals, assert_true, assert_false
+from static_replace import (replace_static_urls, replace_course_urls,
+                            _url_replace_regex)
 from mock import patch, Mock
 from xmodule.modulestore import Location
 from xmodule.modulestore.mongo import MongoModuleStore
@@ -75,3 +78,34 @@ def test_data_dir_fallback(mock_storage, mock_modulestore, mock_settings):
 
     mock_storage.exists.return_value = False
     assert_equals('"/static/data_dir/file.png"', replace_static_urls(STATIC_SOURCE, DATA_DIRECTORY))
+
+
+def test_raw_static_check():
+    """
+    Make sure replace_static_urls leaves alone things that end in '.raw'
+    """
+    path = '"/static/foo.png?raw"'
+    assert_equals(path, replace_static_urls(path, DATA_DIRECTORY))
+
+    text = 'text <tag a="/static/js/capa/protex/protex.nocache.js?raw"/><div class="'
+    assert_equals(path, replace_static_urls(path, text))
+
+
+def test_regex():
+    yes = ('"/static/foo.png"',
+           '"/static/foo.png"',
+           "'/static/foo.png'")
+
+    no = ('"/not-static/foo.png"',
+          '"/static/foo',  # no matching quote
+          )
+
+    regex = _url_replace_regex('/static/')
+
+    for s in yes:
+        print 'Should match: {0!r}'.format(s)
+        assert_true(re.match(regex, s))
+
+    for s in no:
+        print 'Should not match: {0!r}'.format(s)
+        assert_false(re.match(regex, s))

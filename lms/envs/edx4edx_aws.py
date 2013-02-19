@@ -6,7 +6,6 @@ COURSE_TITLE = "edx4edx: edX Author Course"
 EDX4EDX_ROOT = ENV_ROOT / "data/edx4edx"
 
 ### Dark code. Should be enabled in local settings for devel.
-QUICKEDIT = True
 ENABLE_MULTICOURSE = True   # set to False to disable multicourse display (see lib.util.views.mitxhome)
 ###
 PIPELINE_CSS_COMPRESSOR = None

@@ -67,7 +67,7 @@ section.course-index {
     }
 
     .chapter {
-      width: 100%;
+      width: 100% !important;
       @include box-sizing(border-box);
       padding: 11px 14px;
       @include linear-gradient(top, rgba(255, 255, 255, .6), rgba(255, 255, 255, 0));
@@ -99,6 +99,8 @@ section.course-index {
       @include border-radius(0);
       margin: 0;
       padding: 9px 0 9px 9px;
+      overflow: auto;
+      width: 100%;
 
       li {
         border-bottom: 0;
