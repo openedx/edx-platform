@@ -219,7 +219,7 @@ class @StaffGrading
 
   setup_score_selection: =>
     @score_selection_container.html(@rubric)
-    $('.score-selection').click => @graded_callback()
+    $('input[class="score-selection"]').change => @graded_callback()
     Rubric.initialize(@location)
 
 
