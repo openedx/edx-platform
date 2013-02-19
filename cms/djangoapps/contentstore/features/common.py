@@ -75,7 +75,7 @@ def flush_xmodule_store():
     xmodule.modulestore.django.modulestore().collection.drop()
     xmodule.templates.update_templates()
 
-def assert_css_with_text(css,text):
+def assert_css_with_text(css, text):
     assert_true(world.browser.is_element_present_by_css(css, 5))
     assert_equal(world.browser.find_by_css(css).text, text)
 
@@ -105,9 +105,9 @@ def fill_in_course_info(
         name='Robot Super Course',
         org='MITx',
         num='101'):
-    css_fill('.new-course-name',name)
-    css_fill('.new-course-org',org)
-    css_fill('.new-course-number',num)
+    css_fill('.new-course-name', name)
+    css_fill('.new-course-org', org)
+    css_fill('.new-course-number', num)
 
 def log_into_studio(
         uname='robot',
@@ -140,9 +140,9 @@ def create_a_course():
 def add_section(name='My Section'):
     link_css = 'a.new-courseware-section-button'
     css_click(link_css)
-    name_css = '.new-section-name'
-    save_css = '.new-section-name-save'
-    css_fill(name_css,name)
+    name_css = 'input.new-section-name'
+    save_css = 'input.new-section-name-save'
+    css_fill(name_css, name)
     css_click(save_css)
     span_css = 'span.section-name-span'
     assert_true(world.browser.is_element_present_by_css(span_css, 5))

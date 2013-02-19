@@ -1122,8 +1122,7 @@ def get_course_settings(request, org, course, name):
     return render_to_response('settings.html', {
         'active_tab': 'settings',
         'context_course': course_module,
-        'advanced_blacklist' : json.dumps(CourseMetadata.FILTERED_LIST),
-        'advanced_dict' : json.dumps(CourseMetadata.fetch(location)),
+        'course_location' : location,
         'course_details' : json.dumps(course_details, cls=CourseSettingsEncoder)
     })
 
@@ -1150,6 +1149,28 @@ def course_config_graders_page(request, org, course, name):
         'course_details': json.dumps(course_details, cls=CourseSettingsEncoder)
     })
 
+@login_required
+@ensure_csrf_cookie
+def course_config_advanced_page(request, org, course, name):
+    """
+    Send models and views as well as html for editing the advanced course settings to the client.
+
+    org, course, name: Attributes of the Location for the item to edit
+    """
+    location = ['i4x', org, course, 'course', name]
+
+    # check that logged in user has permissions to this item
+    if not has_access(request.user, location):
+        raise PermissionDenied()
+
+    course_module = modulestore().get_item(location)
+
+    return render_to_response('settings_advanced.html', {
+        'context_course': course_module,
+        'course_location' : location,
+        'advanced_blacklist' : json.dumps(CourseMetadata.FILTERED_LIST),
+        'advanced_dict' : json.dumps(CourseMetadata.fetch(location)),
+    })
 
 @expect_json
 @login_required
@@ -1172,9 +1193,6 @@ def course_settings_updates(request, org, course, name, section):
         manager = CourseDetails
     elif section == 'grading':
         manager = CourseGradingModel
-    elif section == 'advanced':
-        # not implemented b/c it assumes prefetched and then everything thru course_edit_metadata
-        return
     else: return
 
     if request.method == 'GET':
@@ -1219,30 +1237,11 @@ def course_grader_updates(request, org, course, name, grader_index=None):
         return HttpResponse(json.dumps(CourseGradingModel.update_grader_from_json(Location(['i4x', org, course, 'course', name]), request.POST)),
                             mimetype="application/json")
 
-
-@login_required
-@ensure_csrf_cookie
-def course_edit_metadata(request, org, course, name):
-    """
-    Send models and views as well as html for editing the course editable metadata to the client.
-
-    org, course, name: Attributes of the Location for the item to edit
-    """
-    location = ['i4x', org, course, 'course', name]
-    
-    # check that logged in user has permissions to this item
-    if not has_access(request.user, location):
-        raise PermissionDenied()
-    
-    editable = CourseMetadata.fetch(location)
-    
-    # for now defer to settings general until we split the divs out into separate pages
-    return get_course_settings(request, org, course, name)
         
 ## NB: expect_json failed on ["key", "key2"] and json payload
 @login_required
 @ensure_csrf_cookie
-def course_metadata_rest_access(request, org, course, name):
+def course_advanced_updates(request, org, course, name):
     """
     restful CRUD operations on metadata. The payload is a json rep of the metadata dicts. For delete, otoh,
     the payload is either a key or a list of keys to delete.

@@ -3,9 +3,9 @@ if (!CMS.Views['Settings']) CMS.Views.Settings = {}; // ensure the pseudo pkg ex
 CMS.Views.Settings.Grading = CMS.Views.ValidatingView.extend({
     // Model class is CMS.Models.Settings.CourseGradingPolicy
     events : {
-        "blur input" : "updateModel",
-        "blur textarea" : "updateModel",
-        "blur span[contenteditable=true]" : "updateDesignation",
+        "change input" : "updateModel",
+        "change textarea" : "updateModel",
+        "change span[contenteditable=true]" : "updateDesignation",
         "click .settings-extra header" : "showSettingsExtras",
         "click .new-grade-button" : "addNewGrade",
         "click .remove-button" : "removeGrade",
@@ -310,8 +310,8 @@ CMS.Views.Settings.Grading = CMS.Views.ValidatingView.extend({
 CMS.Views.Settings.GraderView = CMS.Views.ValidatingView.extend({
     // Model class is CMS.Models.Settings.CourseGrader
     events : {
-        "blur input" : "updateModel",
-        "blur textarea" : "updateModel",
+        "change input" : "updateModel",
+        "change textarea" : "updateModel",
         "click .remove-grading-data" : "deleteModel",
         // would love to move to a general superclass, but event hashes don't inherit in backbone :-(
         'focus :input' : "inputFocus",

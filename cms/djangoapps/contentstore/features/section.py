@@ -11,7 +11,7 @@ def i_click_new_section_link(step):
 def i_save_section_name(step):
     name_css = '.new-section-name'
     save_css = '.new-section-name-save'
-    css_fill(name_css,'My Section')
+    css_fill(name_css, 'My Section')
     css_click(save_css)
 
 @step('I have added a new section$')
@@ -27,17 +27,17 @@ def i_click_the_edit_link_for_the_release_date(step):
 def i_save_a_new_section_release_date(step):
     date_css = 'input.start-date.date.hasDatepicker'
     time_css = 'input.start-time.time.ui-timepicker-input'
-    css_fill(date_css,'12/25/2013')
+    css_fill(date_css, '12/25/2013')
     # click here to make the calendar go away
     css_click(time_css)
-    css_fill(time_css,'12:00am')
+    css_fill(time_css, '12:00am')
     css_click('a.save-button')
 
 ############ ASSERTIONS ###################
 @step('I see my section on the Courseware page$')
 def i_see_my_section_on_the_courseware_page(step):
     section_css = 'span.section-name-span'
-    assert_css_with_text(section_css,'My Section')
+    assert_css_with_text(section_css, 'My Section')
 
 @step('the section does not exist$')
 def section_does_not_exist(step):
@@ -57,7 +57,7 @@ def i_see_a_release_date_for_my_section(step):
     date_regex = '[01][0-9]\/[0-3][0-9]\/[12][0-9][0-9][0-9]'
     time_regex = '[0-2][0-9]:[0-5][0-9]'
     match_string = '%s %s at %s' % (msg, date_regex, time_regex)
-    assert re.match(match_string,status_text)
+    assert re.match(match_string, status_text)
 
 @step('I see a link to create a new subsection$')
 def i_see_a_link_to_create_a_new_subsection(step):
