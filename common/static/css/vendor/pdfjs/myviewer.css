@@ -95,25 +95,16 @@ select {
 */
 
 /* outer/inner center provides horizontal center */
-html[dir='ltr'] .outerCenter {
+.outerCenter {
   float: right;
   position: relative;
   right: 50%;
 }
-html[dir='rtl'] .outerCenter {
-  float: left;
-  position: relative;
-  left: 50%;
-}
-html[dir='ltr'] .innerCenter {
+
+.innerCenter {
   float: right;
   position: relative;
   right: -50%;
-}
-html[dir='rtl'] .innerCenter {
-  float: left;
-  position: relative;
-  left: -50%;
 }
 
 #outerContainer {
@@ -228,9 +219,9 @@ html[dir='rtl'] #sidebarContent {
 }
 
 .toolbar {
-/*  position: absolute;
+  position: absolute;
   left: 0;
-  right: 0; */
+  right: 0; 
   height: 32px;
   z-index: 9999;
   cursor: default;
@@ -367,11 +358,17 @@ html[dir='rtl'] .doorHanger:before {
   background-color: rgb(255, 137, 153);
 }
 
-html[dir='ltr'] #toolbarViewerLeft {
+#toolbarViewerLeft {
   margin-left: -1px;
+   position: absolute; 
+  top: 0;
+  left: 0;
 }
-html[dir='rtl'] #toolbarViewerRight {
-  margin-left: -1px;
+
+#toolbarViewerRight {
+  position: absolute; 
+  top: 0;
+  right: 0;
 }
 
 /*
@@ -387,34 +384,20 @@ html[dir='rtl'] #toolbarViewerLeft {
   top: 0;
   right: 0;
 }
-*/html[dir='ltr'] #toolbarViewerLeft > *,
-html[dir='ltr'] #toolbarViewerMiddle > *,
-html[dir='ltr'] #toolbarViewerRight > *,
-html[dir='ltr'] .findbar > * {
+*/
+#toolbarViewerLeft > *,
+#toolbarViewerMiddle > *,
+#toolbarViewerRight > * {
   float: left;
 }
-html[dir='rtl'] #toolbarViewerLeft > *,
-html[dir='rtl'] #toolbarViewerMiddle > *,
-html[dir='rtl'] #toolbarViewerRight > *,
-html[dir='rtl'] .findbar > * {
-  float: right;
-}
 
-html[dir='ltr'] .splitToolbarButton {
+.splitToolbarButton {
   margin: 3px 2px 4px 0;
   display: inline-block;
 }
-html[dir='rtl'] .splitToolbarButton {
-  margin: 3px 0 4px 2px;
-  display: inline-block;
-}
-html[dir='ltr'] .splitToolbarButton > .toolbarButton {
+.splitToolbarButton > .toolbarButton {
   border-radius: 0;
   float: left;
-}
-html[dir='rtl'] .splitToolbarButton > .toolbarButton {
-  border-radius: 0;
-  float: right;
 }
 
 .toolbarButton {
@@ -487,8 +470,7 @@ html[dir='rtl'] .splitToolbarButton > .toolbarButton {
               0 0 1px hsla(0,0%,0%,.05);
   z-index: 199;
 }
-html[dir='ltr'] .splitToolbarButton > .toolbarButton:first-child,
-html[dir='rtl'] .splitToolbarButton > .toolbarButton:last-child {
+.splitToolbarButton > .toolbarButton:first-child {
   position: relative;
   margin: 0;
   margin-right: -1px;
@@ -496,8 +478,7 @@ html[dir='rtl'] .splitToolbarButton > .toolbarButton:last-child {
   border-bottom-left-radius: 2px;
   border-right-color: transparent;
 }
-html[dir='ltr'] .splitToolbarButton > .toolbarButton:last-child,
-html[dir='rtl'] .splitToolbarButton > .toolbarButton:first-child {
+.splitToolbarButton > .toolbarButton:last-child {
   position: relative;
   margin: 0;
   margin-left: -1px;
@@ -513,12 +494,8 @@ html[dir='rtl'] .splitToolbarButton > .toolbarButton:first-child {
   box-shadow: 0 0 0 1px hsla(0,0%,100%,.08);
   display: inline-block;
   margin: 5px 0;
-}
-html[dir='ltr'] .splitToolbarButtonSeparator {
   float:left;
 }
-html[dir='rtl'] .splitToolbarButtonSeparator {
-  float:right;
 }
 .splitToolbarButton:hover > .splitToolbarButtonSeparator,
 .splitToolbarButton.toggled > .splitToolbarButtonSeparator {
@@ -573,13 +550,8 @@ html[dir='rtl'] .splitToolbarButtonSeparator {
   transition-timing-function: ease;
 }
 
-html[dir='ltr'] .toolbarButton,
-html[dir='ltr'] .dropdownToolbarButton {
+.toolbarButton {
   margin: 3px 2px 4px 0;
-}
-html[dir='rtl'] .toolbarButton,
-html[dir='rtl'] .dropdownToolbarButton {
-  margin: 3px 0 4px 2px;
 }
 
 .toolbarButton:hover,
@@ -671,12 +643,7 @@ html[dir='rtl'] .dropdownToolbarButton {
   padding: 3px 2px 2px;
   overflow: hidden;
   background: url(images/toolbarButton-menuArrows.png) no-repeat;
-}
-html[dir='ltr'] .dropdownToolbarButton {
   background-position: 95%;
-}
-html[dir='rtl'] .dropdownToolbarButton {
-  background-position: 5%;
 }
 
 .dropdownToolbarButton > select {
@@ -703,17 +670,11 @@ html[dir='rtl'] .dropdownToolbarButton {
   border-bottom: 1px rgba(255, 255, 255, .5) solid;
 }
 
-html[dir='ltr'] .splitToolbarButton:first-child,
-html[dir='ltr'] .toolbarButton:first-child,
-html[dir='rtl'] .splitToolbarButton:last-child,
-html[dir='rtl'] .toolbarButton:last-child {
+.splitToolbarButton:first-child,
+.toolbarButton:first-child,
+.splitToolbarButton:last-child,
+.toolbarButton:last-child {
   margin-left: 4px;
-}
-html[dir='ltr'] .splitToolbarButton:last-child,
-html[dir='ltr'] .toolbarButton:last-child,
-html[dir='rtl'] .splitToolbarButton:first-child,
-html[dir='rtl'] .toolbarButton:first-child {
-  margin-right: 4px;
 }
 
 .toolbarButtonSpacer {
@@ -1047,7 +1008,7 @@ canvas {
   display: block;
 }
 
-.page {
+.pdfpage {
   direction: ltr;
   width: 816px;
   height: 1056px;
@@ -1060,12 +1021,12 @@ canvas {
   background-color: white;
 }
 
-.page > a {
+.pdfpage > a {
   display: block;
 /*  position: absolute; */
 }
 
-.page > a:hover {
+.pdfpage > a:hover {
   opacity: 0.2;
   background: #ff0;
   -webkit-box-shadow: 0px 2px 10px #ff0;
