@@ -45,7 +45,7 @@ CMS.Views.Settings.Advanced = CMS.Views.ValidatingView.extend({
         var self = this;
         _.each(_.sortBy(_.keys(this.model.attributes), _.identity),
             function(key) {
-                listEle$.append(self.template({ key : key, value : JSON.stringify(self.model.get(key))}));
+                listEle$.append(self.template({ key : key, value : JSON.stringify(self.model.get(key), null, 4)}));
                 self.fieldToSelectorMap[key] = key;
             });
         var policyValues = listEle$.find('.json');
