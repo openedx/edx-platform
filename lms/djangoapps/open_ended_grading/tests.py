@@ -16,7 +16,7 @@ import courseware.tests.tests as ct
 from xmodule.modulestore.django import modulestore
 import xmodule.modulestore.django
 from nose import SkipTest
-from mock import patch, Mock
+from mock import patch, Mock, MagicMock
 import json
 from xmodule.x_module import ModuleSystem
 from mitxmako.shortcuts import render_to_string
@@ -169,23 +169,35 @@ class TestPeerGradingService(ct.PageLoader):
 
     def test_get_next_submission_missing_location(self):
         data = {}
-        r = self.peer_module.get_next_submission(data)
-        d = r
+        d = self.peer_module.get_next_submission(data)
         self.assertFalse(d['success'])
         self.assertEqual(d['error'], "Missing required keys: location")
 
     def test_save_grade_success(self):
-        raise SkipTest()
-        data = 'rubric_scores[]=1|rubric_scores[]=2|location=' + self.location + '|submission_id=1|submission_key=fake key|score=2|feedback=feedback|submission_flagged=False'
-        qdict = QueryDict(data.replace("|", "&"))
+        data = {
+                'rubric_scores[]': [0, 0],
+                'location': self.location,
+                'submission_id': 1,
+                'submission_key': 'fake key',
+                'score': 2,
+                'feedback': 'feedback',
+                'submission_flagged': 'false'
+                }
+
+        qdict = MagicMock()
+        def fake_get_item(key):
+            return data[key]
+        qdict.__getitem__.side_effect = fake_get_item
+        qdict.getlist = fake_get_item
+        qdict.keys = data.keys
+
         r = self.peer_module.save_grade(qdict)
-        d = r
+        d = json.loads(r)
         self.assertTrue(d['success'])
 
     def test_save_grade_missing_keys(self):
         data = {}
-        r = self.peer_module.save_grade(data)
-        d = r
+        d = self.peer_module.save_grade(data)
         self.assertFalse(d['success'])
         self.assertTrue(d['error'].find('Missing required keys:') > -1)
 
@@ -198,8 +210,7 @@ class TestPeerGradingService(ct.PageLoader):
 
     def test_is_calibrated_failure(self):
         data = {}
-        r = self.peer_module.is_student_calibrated(data)
-        d = r
+        d = self.peer_module.is_student_calibrated(data)
         self.assertFalse(d['success'])
         self.assertFalse('calibrated' in d)
 
@@ -219,25 +230,36 @@ class TestPeerGradingService(ct.PageLoader):
     def test_show_calibration_essay_missing_key(self):
         data = {}
 
-        r = self.peer_module.show_calibration_essay(data)
-        d = r
+        d = self.peer_module.show_calibration_essay(data)
 
         self.assertFalse(d['success'])
         self.assertEqual(d['error'], "Missing required keys: location")
 
     def test_save_calibration_essay_success(self):
-        raise SkipTest()
-        data = 'rubric_scores[]=1|rubric_scores[]=2|location=' + self.location + '|submission_id=1|submission_key=fake key|score=2|feedback=feedback|submission_flagged=False'
-        qdict = QueryDict(data.replace("|", "&"))
-        r = self.peer_module.save_calibration_essay(qdict)
-        d = r
+        data = {
+                'rubric_scores[]': [0, 0],
+                'location': self.location,
+                'submission_id': 1,
+                'submission_key': 'fake key',
+                'score': 2,
+                'feedback': 'feedback',
+                'submission_flagged': 'false'
+                }
+
+        qdict = MagicMock()
+        def fake_get_item(key):
+            return data[key]
+        qdict.__getitem__.side_effect = fake_get_item
+        qdict.getlist = fake_get_item
+        qdict.keys = data.keys
+
+        d = self.peer_module.save_calibration_essay(qdict)
         self.assertTrue(d['success'])
         self.assertTrue('actual_score' in d)
 
     def test_save_calibration_essay_missing_keys(self):
         data = {}
-        r = self.peer_module.save_calibration_essay(data)
-        d = r
+        d = self.peer_module.save_calibration_essay(data)
         self.assertFalse(d['success'])
         self.assertTrue(d['error'].find('Missing required keys:') > -1)
         self.assertFalse('actual_score' in d)
