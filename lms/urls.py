@@ -2,6 +2,7 @@ from django.conf import settings
 from django.conf.urls import patterns, include, url
 from django.contrib import admin
 from django.conf.urls.static import static
+from django.views.generic import RedirectView
 import django.contrib.auth.views
 
 # Uncomment the next two lines to enable the admin:
@@ -71,18 +72,38 @@ urlpatterns = ('',
         name="static_university_profile", kwargs={'org_id': 'WellesleyX'}),
     url(r'^university_profile/GeorgetownX$', 'courseware.views.static_university_profile',
         name="static_university_profile", kwargs={'org_id': 'GeorgetownX'}),
+
+    # Dan accidentally sent out a press release with lower case urls for McGill, Toronto,
+    # Rice, ANU, Delft, and EPFL.  Hence the redirects.
     url(r'^university_profile/McGillX$', 'courseware.views.static_university_profile',
         name="static_university_profile", kwargs={'org_id': 'McGillX'}),
+    url(r'^university_profile/mcgillx$',
+        RedirectView.as_view(url='/university_profile/McGillX')),
+
     url(r'^university_profile/TorontoX$', 'courseware.views.static_university_profile',
         name="static_university_profile", kwargs={'org_id': 'TorontoX'}),
+    url(r'^university_profile/torontox$',
+        RedirectView.as_view(url='/university_profile/TorontoX')),
+
     url(r'^university_profile/RiceX$', 'courseware.views.static_university_profile',
         name="static_university_profile", kwargs={'org_id': 'RiceX'}),
+    url(r'^university_profile/ricex$',
+        RedirectView.as_view(url='/university_profile/RiceX')),
+
     url(r'^university_profile/ANUx$', 'courseware.views.static_university_profile',
         name="static_university_profile", kwargs={'org_id': 'ANUx'}),
+    url(r'^university_profile/anux$',
+        RedirectView.as_view(url='/university_profile/ANUx')),
+
     url(r'^university_profile/DelftX$', 'courseware.views.static_university_profile',
         name="static_university_profile", kwargs={'org_id': 'DelftX'}),
+    url(r'^university_profile/delftx$',
+        RedirectView.as_view(url='/university_profile/DelftX')),
+
     url(r'^university_profile/EPFLx$', 'courseware.views.static_university_profile',
         name="static_university_profile", kwargs={'org_id': 'EPFLx'}),
+    url(r'^university_profile/epflx$',
+        RedirectView.as_view(url='/university_profile/EPFLx')),
 
     url(r'^university_profile/(?P<org_id>[^/]+)$', 'courseware.views.university_profile',
         name="university_profile"),
