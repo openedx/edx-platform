@@ -37,9 +37,9 @@
         if(json.success) {
           $('.message.submission-error').removeClass('is-shown'); 
           var u=decodeURI(window.location.search);
-          next=u.split("next=")[1]
+          next=u.split("next=")[1];
           if (next) {
-            location.href=next
+            location.href=next;
           }  else {
             location.href="${reverse('dashboard')}";
           }
