@@ -2,11 +2,17 @@
 
 import codejail.safe_exec
 
-def safe_exec(code, globals_dict, locals_dict):
+CODE_PROLOG = """\
+import random as random_module
+random = random_module.Random(%r)
+random.Random = random_module.Random
+"""
+
+def safe_exec(code, globals_dict, locals_dict, random_seed=None):
+    code_prolog = CODE_PROLOG % random_seed
     codejail.safe_exec.safe_exec(
-        code, globals_dict, locals_dict, future_division=True,
+        code_prolog + code, globals_dict, locals_dict, future_division=True,
         assumed_imports=[
-            "random",
             "numpy",
             "math",
             "scipy",
