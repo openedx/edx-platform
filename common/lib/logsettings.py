@@ -53,7 +53,7 @@ def get_logger_config(log_dir,
                                              logging_env=logging_env,
                                              hostname=hostname)
 
-    handlers = ['console', 'local', 'null'] if debug else ['console',
+    handlers = ['console', 'local'] if debug else ['console',
                                                    'syslogger-remote', 'local']
 
     logger_config = {
@@ -84,12 +84,6 @@ def get_logger_config(log_dir,
                 'level': 'ERROR',
                 'class': 'newrelic_logging.NewRelicHandler',
                 'formatter': 'raw',
-            },
-            'null' : {
-                'level': 'CRITICAL',
-                'class': 'logging.handlers.SysLogHandler',
-                'address': syslog_addr,
-                'formatter': 'syslog_format',
             }
         },
         'loggers': {
@@ -98,26 +92,11 @@ def get_logger_config(log_dir,
                 'level': 'DEBUG',
                 'propagate': False,
             },
-            'django.db.backends': {
-                'handlers': ['null'],
-                'propagate': False,
-                'level':'DEBUG',
-            },
-            'django_comment_client.utils' : {
-                'handlers': ['null'],
-                'propagate': False,
-                'level':'DEBUG',
-            },
-            'pipeline.compilers' : {
-                'handlers': ['null'],
-                'propagate': False,
-                'level':'DEBUG',
-            },
             '': {
                 'handlers': handlers,
                 'level': 'DEBUG',
                 'propagate': False
-            }
+            },
         }
     }
 

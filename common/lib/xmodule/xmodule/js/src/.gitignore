@@ -1,2 +1,1 @@
-*.js
-
+# Please do not ignore *.js files. Some xmodules are written in JS.

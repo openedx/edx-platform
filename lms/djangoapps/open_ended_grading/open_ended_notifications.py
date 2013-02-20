@@ -4,7 +4,6 @@ from staff_grading_service import StaffGradingService
 from open_ended_grading.controller_query_service import ControllerQueryService
 import json
 from student.models import unique_id_for_user
-import open_ended_util
 from courseware.models import StudentModule
 import logging
 from courseware.access import has_access

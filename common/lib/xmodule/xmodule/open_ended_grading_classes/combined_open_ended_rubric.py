@@ -50,7 +50,7 @@ class CombinedOpenEndedRubric(object):
         success = False
         try:
             rubric_categories = self.extract_categories(rubric_xml)
-            if score_list:
+            if score_list and len(score_list)==len(rubric_categories):
                 for i in xrange(0,len(rubric_categories)):
                     category = rubric_categories[i]
                     for j in xrange(0,len(category['options'])):
@@ -231,6 +231,14 @@ class CombinedOpenEndedRubric(object):
 
     @staticmethod
     def reformat_scores_for_rendering(scores, score_types, feedback_types):
+        """
+        Takes in a list of rubric scores, the types of those scores, and feedback associated with them
+        Outputs a reformatted list of score tuples (count, rubric category, rubric score, [graders that gave this score], [feedback types])
+        @param scores:
+        @param score_types:
+        @param feedback_types:
+        @return:
+        """
         success = False
         if len(scores)==0:
             log.error("Score length is 0.")
@@ -271,6 +279,13 @@ class CombinedOpenEndedRubric(object):
 
     @staticmethod
     def check_for_tuple_matches(tuples, tuple):
+        """
+        Checks to see if a tuple in a list of tuples is a match for tuple.
+        If not match, creates a new tuple matching tuple.
+        @param tuples: list of tuples
+        @param tuple: tuples to match
+        @return: a new list of tuples, and the index of the tuple that matches tuple
+        """
         category = tuple[1]
         score = tuple[2]
         tup_ind = -1

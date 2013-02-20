@@ -11,7 +11,7 @@ from django.test import TestCase
 from django.test.client import RequestFactory
 from django.conf import settings
 from django.core.urlresolvers import reverse
-from override_settings import override_settings
+from django.test.utils import override_settings
 
 import xmodule.modulestore.django
 from xmodule.modulestore.mongo import MongoModuleStore

@@ -1,7 +1,7 @@
 import json
 import shutil
 from django.test.client import Client
-from override_settings import override_settings
+from django.test.utils import override_settings
 from django.conf import settings
 from django.core.urlresolvers import reverse
 from path import path
@@ -10,6 +10,7 @@ import json
 from fs.osfs import OSFS
 import copy
 from mock import Mock
+from json import dumps, loads
 
 from student.models import Registration
 from django.contrib.auth.models import User
@@ -26,10 +27,12 @@ from xmodule.contentstore.django import contentstore
 from xmodule.templates import update_templates
 from xmodule.modulestore.xml_exporter import export_to_xml
 from xmodule.modulestore.xml_importer import import_from_xml
+from xmodule.templates import update_templates
 
 from xmodule.capa_module import CapaDescriptor
 from xmodule.course_module import CourseDescriptor
 from xmodule.seq_module import SequenceDescriptor
+from xmodule.modulestore.exceptions import ItemNotFoundError
 
 TEST_DATA_MODULESTORE = copy.deepcopy(settings.MODULESTORE)
 TEST_DATA_MODULESTORE['default']['OPTIONS']['fs_root'] = path('common/test/data')
@@ -207,6 +210,24 @@ class ContentStoreToyCourseTest(ModuleStoreTestCase):
         # check for custom_tags
         self.verify_content_existence(ms, root_dir, location, 'custom_tags', 'custom_tag_template')
 
+        # check for graiding_policy.json
+        fs = OSFS(root_dir / 'test_export/policies/6.002_Spring_2012')
+        self.assertTrue(fs.exists('grading_policy.json'))
+
+        course = ms.get_item(location)
+        # compare what's on disk compared to what we have in our course
+        with fs.open('grading_policy.json','r') as grading_policy:
+            on_disk = loads(grading_policy.read())    
+            self.assertEqual(on_disk, course.definition['data']['grading_policy'])
+
+        #check for policy.json
+        self.assertTrue(fs.exists('policy.json'))
+
+        # compare what's on disk to what we have in the course module
+        with fs.open('policy.json','r') as course_policy:
+            on_disk = loads(course_policy.read())
+            self.assertIn('course/6.002_Spring_2012', on_disk)
+            self.assertEqual(on_disk['course/6.002_Spring_2012'], course.metadata)
 
         # remove old course
         delete_course(ms, cs, location)
@@ -321,7 +342,7 @@ class ContentStoreTest(ModuleStoreTestCase):
         # Create a course so there is something to view
         resp = self.client.get(reverse('index'))
         self.assertContains(resp,
-            '<h1>My Courses</h1>',
+            '<h1 class="title-1">My Courses</h1>',
             status_code=200,
             html=True)
 
@@ -357,7 +378,7 @@ class ContentStoreTest(ModuleStoreTestCase):
 
         resp = self.client.get(reverse('course_index', kwargs=data))
         self.assertContains(resp,
-            '<a href="/MITx/999/course/Robot_Super_Course" class="class-name">Robot Super Course</a>',
+            '<article class="courseware-overview" data-course-id="i4x://MITx/999/course/Robot_Super_Course">',
             status_code=200,
             html=True)
 
@@ -380,11 +401,11 @@ class ContentStoreTest(ModuleStoreTestCase):
 
     def test_capa_module(self):
         """Test that a problem treats markdown specially."""
-        CourseFactory.create(org='MITx', course='999', display_name='Robot Super Course')
+        course = CourseFactory.create(org='MITx', course='999', display_name='Robot Super Course')
 
         problem_data = {
             'parent_location': 'i4x://MITx/999/course/Robot_Super_Course',
-            'template': 'i4x://edx/templates/problem/Empty'
+            'template': 'i4x://edx/templates/problem/Blank_Common_Problem'
             }
 
         resp = self.client.post(reverse('clone_item'), problem_data)
@@ -399,3 +420,32 @@ class ContentStoreTest(ModuleStoreTestCase):
         self.assertIn('markdown', context, "markdown is missing from context")
         self.assertIn('markdown', problem.metadata, "markdown is missing from metadata")
         self.assertNotIn('markdown', problem.editable_metadata_fields, "Markdown slipped into the editable metadata fields")
+
+
+class TemplateTestCase(ModuleStoreTestCase):
+
+    def test_template_cleanup(self):        
+        ms = modulestore('direct')
+
+        # insert a bogus template in the store
+        bogus_template_location = Location('i4x', 'edx', 'templates', 'html', 'bogus')
+        source_template_location = Location('i4x', 'edx', 'templates', 'html', 'Blank_HTML_Page')
+        
+        ms.clone_item(source_template_location, bogus_template_location)
+
+        verify_create = ms.get_item(bogus_template_location)
+        self.assertIsNotNone(verify_create)
+
+        # now run cleanup
+        update_templates()
+
+        # now try to find dangling template, it should not be in DB any longer
+        asserted = False
+        try:
+            verify_create = ms.get_item(bogus_template_location)
+        except ItemNotFoundError:
+            asserted = True
+
+        self.assertTrue(asserted)     
+
+
