@@ -71,7 +71,8 @@ class AnnotatableModule(XModule):
         return data_attrs
 
     def _render_content(self):
-        """ Renders annotatable content by transforming spans and adding discussions. """
+        """ Renders annotatable content with annotation spans and returns HTML. """
+
         xmltree = etree.fromstring(self.content)
         xmltree.tag = 'div'
 
@@ -110,20 +111,16 @@ class AnnotatableModule(XModule):
                          instance_state, shared_state, **kwargs)
 
         xmltree = etree.fromstring(self.definition['data'])
-        discussion_id = ''
-        if 'discussion' in xmltree.attrib:
-            discussion_id = xmltree.get('discussion')
-            del xmltree.attrib['discussion']
-
-        help_text = ''
-        if 'help_text' in xmltree.attrib:
-            help_text = xmltree.get('help_text')
-            del xmltree.attrib['help_text']
+        root_attr = {}
+        for key in ('discussion', 'help_text'):
+            if key in xmltree.attrib:
+                root_attr[key] = xmltree.get(key)
+                del xmltree.attrib[key]
 
         self.content = etree.tostring(xmltree, encoding='unicode')
         self.element_id = self.location.html_id()
-        self.discussion_id = discussion_id
-        self.help_text = help_text
+        self.discussion_id = root_attr['discussion']
+        self.help_text = root_attr['help_text']
 
 class AnnotatableDescriptor(RawDescriptor):
     module_class = AnnotatableModule
