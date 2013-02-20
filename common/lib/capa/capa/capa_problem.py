@@ -17,7 +17,7 @@ from datetime import datetime
 import logging
 import math
 import numpy
-import os
+import os, os.path
 import re
 import struct
 import sys
@@ -452,7 +452,9 @@ class LoncapaProblem(object):
                     continue        # skip perl
             # TODO: evaluate only python
 
-            python_path.extend(self._extract_system_path(script))
+            for d in self._extract_system_path(script):
+                if d not in python_path and os.path.exists(d):
+                    python_path.append(d)
 
             XMLESC = {"&apos;": "'", "&quot;": '"'}
             code = unescape(script.text, XMLESC)
@@ -461,7 +463,7 @@ class LoncapaProblem(object):
         if all_code:
             try:
                 locals_dict = {}
-                safe_exec.safe_exec(all_code, context, locals_dict, random_seed=self.seed)
+                safe_exec.safe_exec(all_code, context, locals_dict, random_seed=self.seed, python_path=python_path)
                 context.update(locals_dict)
             except Exception as err:
                 log.exception("Error while execing script code: " + all_code)
