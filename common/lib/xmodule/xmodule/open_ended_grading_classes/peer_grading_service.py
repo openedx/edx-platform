@@ -30,8 +30,8 @@ class PeerGradingService(GradingService):
         self.system = system
 
     def get_data_for_location(self, problem_location, student_id):
-        response = self.get(self.get_data_for_location_url,
-            {'location': problem_location, 'student_id': student_id})
+        params = {'location': problem_location, 'student_id': student_id}
+        response = self.get(self.get_data_for_location_url, params)
         return self.try_to_decode(response)
 
     def get_next_submission(self, problem_location, grader_id):

@@ -24,6 +24,8 @@ TRUE_DICT = [True, "True", "true", "TRUE"]
 MAX_SCORE = 1
 IS_GRADED = True
 
+EXTERNAL_GRADER_NO_CONTACT_ERROR = "Failed to contact external graders.  Please notify course staff."
+
 
 class PeerGradingModule(XModule):
     _VERSION = 1
@@ -145,7 +147,10 @@ class PeerGradingModule(XModule):
             }
 
         if dispatch not in handlers:
-            return 'Error'
+            #This is a dev_facing_error
+            log.error("Cannot find {0} in handlers in handle_ajax function for open_ended_module.py".format(dispatch))
+            #This is a dev_facing_error
+            return json.dumps({'error': 'Error handling action.  Please try again.', 'success' : False})
 
         d = handlers[dispatch](get)
 
@@ -163,6 +168,7 @@ class PeerGradingModule(XModule):
             count_required = response['count_required']
             success = True
         except GradingServiceError:
+            #This is a dev_facing_error
             log.exception("Error getting location data from controller for location {0}, student {1}"
             .format(location, student_id))
 
@@ -188,6 +194,7 @@ class PeerGradingModule(XModule):
             count_graded = response['count_graded']
             count_required = response['count_required']
             if count_required > 0 and count_graded >= count_required:
+                #Ensures that once a student receives a final score for peer grading, that it does not change.
                 self.student_data_for_location = response
 
         score_dict = {
@@ -237,10 +244,12 @@ class PeerGradingModule(XModule):
             response = self.peer_gs.get_next_submission(location, grader_id)
             return response
         except GradingServiceError:
+            #This is a dev_facing_error
             log.exception("Error getting next submission.  server url: {0}  location: {1}, grader_id: {2}"
             .format(self.peer_gs.url, location, grader_id))
+            #This is a student_facing_error
             return {'success': False,
-                               'error': 'Could not connect to grading service'}
+                               'error': EXTERNAL_GRADER_NO_CONTACT_ERROR}
 
     def save_grade(self, get):
         """
@@ -277,14 +286,16 @@ class PeerGradingModule(XModule):
                 score, feedback, submission_key, rubric_scores, submission_flagged)
             return response
         except GradingServiceError:
-            log.exception("""Error saving grade.  server url: {0}, location: {1}, submission_id:{2},
+            #This is a dev_facing_error
+            log.exception("""Error saving grade to open ended grading service.  server url: {0}, location: {1}, submission_id:{2},
                             submission_key: {3}, score: {4}"""
             .format(self.peer_gs.url,
                 location, submission_id, submission_key, score)
             )
+            #This is a student_facing_error
             return {
                 'success': False,
-                'error': 'Could not connect to grading service'
+                'error': EXTERNAL_GRADER_NO_CONTACT_ERROR
             }
 
     def is_student_calibrated(self, get):
@@ -317,11 +328,13 @@ class PeerGradingModule(XModule):
             response = self.peer_gs.is_student_calibrated(location, grader_id)
             return response
         except GradingServiceError:
-            log.exception("Error from grading service.  server url: {0}, grader_id: {0}, location: {1}"
+            #This is a dev_facing_error
+            log.exception("Error from open ended grading service.  server url: {0}, grader_id: {0}, location: {1}"
             .format(self.peer_gs.url, grader_id, location))
+            #This is a student_facing_error
             return {
                 'success': False,
-                'error': 'Could not connect to grading service'
+                'error': EXTERNAL_GRADER_NO_CONTACT_ERROR
             }
 
     def show_calibration_essay(self, get):
@@ -360,16 +373,20 @@ class PeerGradingModule(XModule):
             response = self.peer_gs.show_calibration_essay(location, grader_id)
             return response
         except GradingServiceError:
-            log.exception("Error from grading service.  server url: {0}, location: {0}"
+            #This is a dev_facing_error
+            log.exception("Error from open ended grading service.  server url: {0}, location: {0}"
             .format(self.peer_gs.url, location))
+            #This is a student_facing_error
             return {'success': False,
-                               'error': 'Could not connect to grading service'}
+                               'error': EXTERNAL_GRADER_NO_CONTACT_ERROR}
         # if we can't parse the rubric into HTML,
         except etree.XMLSyntaxError:
+            #This is a dev_facing_error
             log.exception("Cannot parse rubric string. Raw string: {0}"
             .format(rubric))
+            #This is a student_facing_error
             return {'success': False,
-                               'error': 'Error displaying submission'}
+                               'error': 'Error displaying submission.  Please notify course staff.'}
 
 
     def save_calibration_essay(self, get):
@@ -408,8 +425,10 @@ class PeerGradingModule(XModule):
                 submission_key, score, feedback, rubric_scores)
             return response
         except GradingServiceError:
+            #This is a dev_facing_error
             log.exception("Error saving calibration grade, location: {0}, submission_id: {1}, submission_key: {2}, grader_id: {3}".format(location, submission_id, submission_key, grader_id))
-            return self._err_response('Could not connect to grading service')
+            #This is a student_facing_error
+            return self._err_response('There was an error saving your score.  Please notify course staff.')
 
     def peer_grading_closed(self):
         '''
@@ -440,11 +459,13 @@ class PeerGradingModule(XModule):
             problem_list = problem_list_dict['problem_list']
 
         except GradingServiceError:
-            error_text = "Error occured while contacting the grading service"
+            #This is a student_facing_error
+            error_text = EXTERNAL_GRADER_NO_CONTACT_ERROR
             success = False
         # catch error if if the json loads fails
         except ValueError:
-            error_text = "Could not get problem list"
+            #This is a student_facing_error
+            error_text = "Could not get list of problems to peer grade.  Please notify course staff."
             success = False
 
 
@@ -502,6 +523,8 @@ class PeerGradingModule(XModule):
         if get == None or get.get('location') == None:
             if not self.use_for_single_location:
                 #This is an error case, because it must be set to use a single location to be called without get parameters
+                #This is a dev_facing_error
+                log.error("Peer grading problem in peer_grading_module called with no get parameters, but use_for_single_location is False.")
                 return {'html': "", 'success': False}
             problem_location = self.link_to_location
 
@@ -566,7 +589,8 @@ class PeerGradingDescriptor(XmlDescriptor, EditingDescriptor):
         expected_children = []
         for child in expected_children:
             if len(xml_object.xpath(child)) == 0:
-                raise ValueError("Peer grading definition must include at least one '{0}' tag".format(child))
+                #This is a staff_facing_error
+                raise ValueError("Peer grading definition must include at least one '{0}' tag.  Contact the learning sciences group for assistance.".format(child))
 
         def parse_task(k):
             """Assumes that xml_object has child k"""

@@ -90,7 +90,10 @@ class SelfAssessmentModule(openendedchild.OpenEndedChild):
         }
 
         if dispatch not in handlers:
-            return 'Error'
+            #This is a dev_facing_error
+            log.error("Cannot find {0} in handlers in handle_ajax function for open_ended_module.py".format(dispatch))
+            #This is a dev_facing_error
+            return json.dumps({'error': 'Error handling action.  Please try again.', 'success' : False})
 
         before = self.get_progress()
         d = handlers[dispatch](get, system)
@@ -123,7 +126,8 @@ class SelfAssessmentModule(openendedchild.OpenEndedChild):
         elif self.state in (self.POST_ASSESSMENT, self.DONE):
             context['read_only'] = True
         else:
-            raise ValueError("Illegal state '%r'" % self.state)
+            #This is a dev_facing_error
+            raise ValueError("Self assessment module is in an illegal state '{0}'".format(self.state))
 
         return system.render_template('self_assessment_rubric.html', context)
 
@@ -148,7 +152,8 @@ class SelfAssessmentModule(openendedchild.OpenEndedChild):
         elif self.state == self.DONE:
             context['read_only'] = True
         else:
-            raise ValueError("Illegal state '%r'" % self.state)
+            #This is a dev_facing_error
+            raise ValueError("Self Assessment module is in an illegal state '{0}'".format(self.state))
 
         return system.render_template('self_assessment_hint.html', context)
 
@@ -177,10 +182,16 @@ class SelfAssessmentModule(openendedchild.OpenEndedChild):
         # add new history element with answer and empty score and hint.
         success, get = self.append_image_to_student_answer(get)
         if success:
-            get['student_answer'] = SelfAssessmentModule.sanitize_html(get['student_answer'])
-            self.new_history_entry(get['student_answer'])
-            self.change_state(self.ASSESSING)
+            success, allowed_to_submit, error_message = self.check_if_student_can_submit()
+            if allowed_to_submit:
+                get['student_answer'] = SelfAssessmentModule.sanitize_html(get['student_answer'])
+                self.new_history_entry(get['student_answer'])
+                self.change_state(self.ASSESSING)
+            else:
+                #Error message already defined
+                success = False
         else:
+            #This is a student_facing_error
             error_message = "There was a problem saving the image in your submission.  Please try a different image, or try pasting a link to an image into the answer box."
 
         return {
@@ -214,7 +225,10 @@ class SelfAssessmentModule(openendedchild.OpenEndedChild):
             for i in xrange(0,len(score_list)):
                 score_list[i] = int(score_list[i])
         except ValueError:
-            return {'success': False, 'error': "Non-integer score value, or no score list"}
+            #This is a dev_facing_error
+            log.error("Non-integer score value passed to save_assessment ,or no score list present.")
+            #This is a student_facing_error
+            return {'success': False, 'error': "Error saving your score.  Please notify course staff."}
 
         #Record score as assessment and rubric scores as post assessment
         self.record_latest_score(score)
@@ -256,6 +270,7 @@ class SelfAssessmentModule(openendedchild.OpenEndedChild):
         try:
             rubric_scores = json.loads(latest_post_assessment)
         except:
+            #This is a dev_facing_error
             log.error("Cannot parse rubric scores in self assessment module from {0}".format(latest_post_assessment))
             rubric_scores = []
         return [rubric_scores]
@@ -287,7 +302,8 @@ class SelfAssessmentDescriptor(XmlDescriptor, EditingDescriptor):
         expected_children = []
         for child in expected_children:
             if len(xml_object.xpath(child)) != 1:
-                raise ValueError("Self assessment definition must include exactly one '{0}' tag".format(child))
+                #This is a staff_facing_error
+                raise ValueError("Self assessment definition must include exactly one '{0}' tag. Contact the learning sciences group for assistance.".format(child))
 
         def parse(k):
             """Assumes that xml_object has child k"""

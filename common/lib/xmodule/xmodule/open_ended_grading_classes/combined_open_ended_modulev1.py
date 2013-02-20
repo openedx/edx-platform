@@ -19,7 +19,7 @@ log = logging.getLogger("mitx.courseware")
 # Set the default number of max attempts.  Should be 1 for production
 # Set higher for debugging/testing
 # attempts specified in xml definition overrides this.
-MAX_ATTEMPTS = 10000
+MAX_ATTEMPTS = 1
 
 # Set maximum available number of points.
 # Overriden by max_score specified in xml.
@@ -149,6 +149,7 @@ class CombinedOpenEndedV1Module():
         self.skip_basic_checks = self.metadata.get('skip_spelling_checks', SKIP_BASIC_CHECKS)
 
         display_due_date_string = self.metadata.get('due', None)
+    
         grace_period_string = self.metadata.get('graceperiod', None)
         try:
             self.timeinfo = TimeInfo(display_due_date_string, grace_period_string)  
@@ -645,7 +646,10 @@ class CombinedOpenEndedV1Module():
         if self.attempts > self.max_attempts:
             return {
                 'success': False,
-                'error': 'Too many attempts.'
+                #This is a student_facing_error
+                'error': ('You have attempted this question {0} times.  '
+                          'You are only allowed to attempt it {1} times.').format(
+                    self.attempts, self.max_attempts)
             }
         self.state = self.INITIAL
         self.allow_reset = False
@@ -784,7 +788,8 @@ class CombinedOpenEndedV1Descriptor(XmlDescriptor, EditingDescriptor):
         expected_children = ['task', 'rubric', 'prompt']
         for child in expected_children:
             if len(xml_object.xpath(child)) == 0:
-                raise ValueError("Combined Open Ended definition must include at least one '{0}' tag".format(child))
+                #This is a staff_facing_error
+                raise ValueError("Combined Open Ended definition must include at least one '{0}' tag. Contact the learning sciences group for assistance.".format(child))
 
         def parse_task(k):
             """Assumes that xml_object has child k"""

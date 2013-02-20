@@ -175,6 +175,7 @@ class @PeerGradingProblem
     @prompt_container = $('.prompt-container')
     @rubric_container = $('.rubric-container')
     @flag_student_container = $('.flag-student-container')
+    @answer_unknown_container = $('.answer-unknown-container')
     @calibration_panel = $('.calibration-panel')
     @grading_panel = $('.grading-panel')
     @content_panel = $('.content-panel')
@@ -208,6 +209,7 @@ class @PeerGradingProblem
     @interstitial_page_button = $('.interstitial-page-button')
     @calibration_interstitial_page_button = $('.calibration-interstitial-page-button')
     @flag_student_checkbox = $('.flag-checkbox')
+    @answer_unknown_checkbox = $('.answer-unknown-checkbox')
     @collapse_question()
 
     Collapsible.setCollapsibles(@content_panel)
@@ -262,6 +264,7 @@ class @PeerGradingProblem
       submission_key: @submission_key_input.val()
       feedback: @feedback_area.val()
       submission_flagged: @flag_student_checkbox.is(':checked')
+      answer_unknown: @answer_unknown_checkbox.is(':checked')
     return data
 
 
@@ -360,6 +363,8 @@ class @PeerGradingProblem
       @calibration_panel.find('.grading-text').hide()
       @grading_panel.find('.grading-text').hide()
       @flag_student_container.hide()
+      @answer_unknown_container.hide()
+
       @feedback_area.val("")
 
       @submit_button.unbind('click')
@@ -388,6 +393,7 @@ class @PeerGradingProblem
       @calibration_panel.find('.grading-text').show()
       @grading_panel.find('.grading-text').show()
       @flag_student_container.show()
+      @answer_unknown_container.show()
       @feedback_area.val("")
 
       @submit_button.unbind('click')
