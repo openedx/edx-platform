@@ -342,7 +342,7 @@ class ContentStoreTest(ModuleStoreTestCase):
         # Create a course so there is something to view
         resp = self.client.get(reverse('index'))
         self.assertContains(resp,
-            '<h1>My Courses</h1>',
+            '<h1 class="title-1">My Courses</h1>',
             status_code=200,
             html=True)
 

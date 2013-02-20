@@ -59,4 +59,4 @@ def i_am_on_tab(step, tab_name):
 @step('I see a link for adding a new section$')
 def i_see_new_section_link(step):
     link_css = 'a.new-courseware-section-button'
-    assert_css_with_text(link_css, 'New Section')
+    assert_css_with_text(link_css, '+ New Section')
