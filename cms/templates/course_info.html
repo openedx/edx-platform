@@ -2,8 +2,9 @@
 <%namespace name='static' file='static_content.html'/>
 
 <!-- TODO decode course # from context_course into title -->
-<%block name="title">Course Info</%block>
-<%block name="bodyclass">course-info</%block>
+<%block name="title">Updates</%block>
+<%block name="bodyclass">is-signedin course course-info updates</%block>
+
 
 <%block name="jsextra">
   <script type="text/javascript" src="${static.url('js/template_loader.js')}"></script>
@@ -41,16 +42,38 @@
 </%block>
 
 <%block name="content">
+  <div class="wrapper-mast wrapper">
+    <header class="mast has-actions has-subtitle">
+      <div class="title">
+        <span class="title-sub">Course Content</span>
+        <h1 class="title-1">Course Updates</h1>
+      </div>
+
+      <nav class="nav-actions">
+        <h3 class="sr">Page Actions</h3>
+        <ul>
+          <li class="nav-item">
+            <a href="#" class=" button new-button new-update-button"><i class="ss-icon ss-symbolicons-standard icon icon-create">&#x002B;</i> New Update</a>
+          </li>
+        </ul>
+      </nav>
+    </header>
+  </div>
+
+  <div class="wrapper-content wrapper">
+    <section class="content">
+      <div class="introduction">
+        <p clas="copy">Course updates are announcements or notifications you want to share with your class. Other course authors have used them for important exam/date reminders, change in schedules, and to call out any important steps students need to be aware of.</p>
+      </div>
+    </section>
+  </div>
+
   <div class="main-wrapper">
     <div class="inner-wrapper">
-      <h1>Course Info</h1>
       <div class="course-info-wrapper">
         <div class="main-column window">
           <article class="course-updates" id="course-update-view">
-            <h2>Course Updates & News</h2>
-            <a href="#" class="new-update-button">New Update</a>
             <ol class="update-list" id="course-update-list"></ol>
-            <!-- probably replace w/ a vertical where each element of the vertical is a separate update w/ a date and html field -->
           </article>
         </div>
         <div class="sidebar window course-handouts" id="course-handouts-view"></div>

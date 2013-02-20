@@ -20,7 +20,8 @@ def i_visit_the_studio_homepage(step):
     # LETTUCE_SERVER_PORT = 8001
     # in your settings.py file.
     world.browser.visit(django_url('/'))
-    assert world.browser.is_element_present_by_css('body.no-header', 10)
+    signin_css = 'a.action-signin'
+    assert world.browser.is_element_present_by_css(signin_css, 10)
 
 
 @step('I am logged into Studio$')
@@ -113,7 +114,11 @@ def log_into_studio(
     create_studio_user(uname=uname, email=email, is_staff=is_staff)
     world.browser.cookies.delete()
     world.browser.visit(django_url('/'))
-    world.browser.is_element_present_by_css('body.no-header', 10)
+    signin_css = 'a.action-signin'
+    world.browser.is_element_present_by_css(signin_css, 10)
+
+    # click the signin button
+    css_click(signin_css)
 
     login_form = world.browser.find_by_css('form#login_form')
     login_form.find_by_name('email').fill(email)
@@ -127,16 +132,19 @@ def create_a_course():
     css_click('a.new-course-button')
     fill_in_course_info()
     css_click('input.new-course-save')
-    assert_true(world.browser.is_element_present_by_css('a#courseware-tab', 5))
+    course_title_css = 'span.course-title'
+    assert_true(world.browser.is_element_present_by_css(course_title_css, 5))
 
 
 def add_section(name='My Section'):
     link_css = 'a.new-courseware-section-button'
     css_click(link_css)
-    name_css = '.new-section-name'
-    save_css = '.new-section-name-save'
+    name_css = 'input.new-section-name'
+    save_css = 'input.new-section-name-save'
     css_fill(name_css, name)
     css_click(save_css)
+    span_css = 'span.section-name-span'
+    assert_true(world.browser.is_element_present_by_css(span_css, 5))
 
 
 def add_subsection(name='Subsection One'):

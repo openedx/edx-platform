@@ -1,4 +1,5 @@
 @import 'bourbon/bourbon';
+@import 'bourbon/addons/button';
 @import 'vendor/normalize';
 @import 'keyframes';
 
@@ -8,8 +9,10 @@
 @import "fonts";
 @import "variables";
 @import "cms_mixins";
+@import "extends";
 @import "base";
 @import "header";
+@import "footer";
 @import "dashboard";
 @import "courseware";
 @import "subsection";
@@ -26,6 +29,8 @@
 @import "modal";
 @import "alerts";
 @import "login";
+@import "account";
+@import "index";
 @import 'jquery-ui-calendar';
 
 @import 'content-types';

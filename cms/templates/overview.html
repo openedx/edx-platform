@@ -6,7 +6,8 @@
    from datetime import datetime
 %>
 <%! from django.core.urlresolvers import reverse %>
-<%block name="title">CMS Courseware Overview</%block>
+<%block name="title">Course Outline</%block>
+<%block name="bodyclass">is-signedin course outline</%block>
 
 <%namespace name='static' file='static_content.html'/>
 <%namespace name="units" file="widgets/units.html" />
@@ -119,12 +120,32 @@
     </div>
   </div>
 
+  <div class="wrapper-mast wrapper">
+    <header class="mast has-actions has-subtitle">
+      <div class="title">
+        <span class="title-sub">Course Content</span>
+        <h1 class="title-1">Course Outline</h1>
+      </div>
+
+      <nav class="nav-actions">
+        <h3 class="sr">Page Actions</h3>
+        <ul>
+          <li class="nav-item">
+            <a href="#" class="toggle-button toggle-button-sections"><i class="ss-icon ss-symbolicons-block icon">up</i> <span class="label">Collapse All Sections</span></a>
+          </li>
+          <li class="nav-item">
+            <a href="#" class="button new-button new-courseware-section-button"><i class="ss-icon ss-symbolicons-standard icon icon-create">&#x002B;</i> New Section</a>
+          </li>
+          <li class="nav-item">
+            <a href="${lms_link}" rel="external" class="button view-button view-live-button"><i class="ss-icon ss-symbolicons-block icon icon-view">&#xE010;</i>View Live</a>
+          </li>
+        </ul>
+      </nav>
+    </header>
+  </div>
+
   <div class="main-wrapper">
     <div class="inner-wrapper">
-      <div class="page-actions">
-        <a href="#" class="new-button new-courseware-section-button"><span class="plus-icon white"></span> New Section</a>
-        <a href="#" class="toggle-button toggle-button-sections"><i class="ss-icon ss-symbolicons-block">up</i> <span class="label">Collapse All Sections</span></a>
-      </div>
       <article class="courseware-overview" data-course-id="${context_course.location.url()}">        
         % for section in sections:
         <section class="courseware-section branch" data-id="${section.location}">
