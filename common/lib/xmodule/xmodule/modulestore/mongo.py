@@ -76,7 +76,6 @@ class CachingDescriptorSystem(MakoDescriptorSystem):
                     module.inherit_metadata(metadata_to_inherit)
                 return module
             except:
-                raise
                 return ErrorDescriptor.from_json(
                     json_data,
                     self,
