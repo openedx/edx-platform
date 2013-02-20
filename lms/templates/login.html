@@ -1,6 +1,7 @@
 <%inherit file="main.html" />
 
 <%namespace name='static' file='static_content.html'/>
+<%! from django.core.urlresolvers import reverse %>
 <%block name="title"><title>Log into your edX Account</title></%block>
 
 <%block name="js_extra">
@@ -28,6 +29,19 @@
 
     });
   </script>
+
+
+  <script type="text/javascript">
+    (function() {
+     $(document).delegate('#login-form', 'ajax:success', function(data, json, xhr) {
+       if(json.success) {
+         location.href="${reverse('dashboard')}";
+       }
+      });
+    })(this)
+  </script>
+
+
 </%block>
 
 <section class="login container">
@@ -45,7 +59,7 @@
       <h2 class="is-hidden">Login Form</h2>
     </header>
 
-    <form role="form" id="login-form" method="post" data-remote="true" action="/login">
+    <form role="form" id="login-form" method="post" data-remote="true" action="/login_ajax">
       
       <!-- status messages -->
       <div role="alert" class="status message is-hidden">
@@ -117,4 +131,5 @@
       <p>Looking for help in logging in or with your edX account? <a href="#">View our help section for answers to commonly asked questions</a></p>
     </div>
   </aside>
-</section>
+  </section>
+
