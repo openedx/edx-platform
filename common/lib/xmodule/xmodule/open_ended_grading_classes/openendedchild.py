@@ -456,6 +456,17 @@ class OpenEndedChild(object):
         except:
             pass
 
-        
+        success = response['success']
+        if isinstance(success, basestring):
+            success = (success.lower()=="true")
+
+        if success:
+            eta = controller_query_service.convert_seconds_to_human_readable(response['eta'])
+            eta_string = "Please check back for your response in approximately "
+        else:
+            eta_string = ""
+
+        return eta_string
+
 
 
