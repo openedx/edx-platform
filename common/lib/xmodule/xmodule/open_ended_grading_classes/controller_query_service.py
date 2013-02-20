@@ -1,5 +1,5 @@
 import logging
-from xmodule.open_ended_grading_classes.grading_service_module import GradingService
+from grading_service_module import GradingService
 
 log = logging.getLogger(__name__)
 
