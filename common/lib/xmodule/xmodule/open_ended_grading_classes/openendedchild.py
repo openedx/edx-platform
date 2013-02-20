@@ -462,7 +462,7 @@ class OpenEndedChild(object):
 
         if success:
             eta = controller_query_service.convert_seconds_to_human_readable(response['eta'])
-            eta_string = "Please check back for your response in approximately "
+            eta_string = "Please check back for your response in at most {0}.".format(eta)
         else:
             eta_string = ""
 
