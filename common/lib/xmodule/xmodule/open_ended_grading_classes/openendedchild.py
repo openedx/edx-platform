@@ -437,14 +437,14 @@ class OpenEndedChild(object):
         error_string = ("You need to peer grade {0} more in order to make another submission.  "
         "You have graded {1}, and {2} are required.  You have made {3} successful peer grading submissions.")
         try:
-            response = self.peer_gs.get_data_for_location(location_string, student_id)
+            response = self.peer_gs.get_data_for_location(self.location_string, student_id)
             count_graded = response['count_graded']
             count_required = response['count_required']
             student_sub_count = response['student_sub_count']
             success = True
         except:
             #This is a dev_facing_error
-            log.error("Could not contact external open ended graders for location {0} and student {1}".format(location_string,student_id))
+            log.error("Could not contact external open ended graders for location {0} and student {1}".format(self.location_string,student_id))
             #This is a student_facing_error
             error_message = "Could not contact the graders.  Please notify course staff."
             return success, allowed_to_submit, error_message
