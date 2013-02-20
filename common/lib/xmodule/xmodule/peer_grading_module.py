@@ -428,7 +428,7 @@ class PeerGradingModule(XModule):
             #This is a dev_facing_error
             log.exception("Error saving calibration grade, location: {0}, submission_id: {1}, submission_key: {2}, grader_id: {3}".format(location, submission_id, submission_key, grader_id))
             #This is a student_facing_error
-            return self._err_response('')
+            return self._err_response('There was an error saving your score.  Please notify course staff.')
 
     def peer_grading_closed(self):
         '''

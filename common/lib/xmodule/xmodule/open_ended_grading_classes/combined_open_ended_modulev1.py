@@ -13,9 +13,6 @@ from xmodule.xml_module import XmlDescriptor
 import self_assessment_module
 import open_ended_module
 from combined_open_ended_rubric import CombinedOpenEndedRubric, GRADER_TYPE_IMAGE_DICT, HUMAN_GRADER_TYPE, LEGEND_LIST
-import dateutil
-import dateutil.parser
-from xmodule.timeparse import parse_timedelta
 
 log = logging.getLogger("mitx.courseware")
 
@@ -152,7 +149,7 @@ class CombinedOpenEndedV1Module():
         self.skip_basic_checks = self.metadata.get('skip_spelling_checks', SKIP_BASIC_CHECKS)
 
         display_due_date_string = self.metadata.get('due', None)
-
+    
         grace_period_string = self.metadata.get('graceperiod', None)
         try:
             self.timeinfo = TimeInfo(display_due_date_string, grace_period_string)  

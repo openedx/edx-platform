@@ -498,6 +498,7 @@ input.courseware-unit-search-input {
     }
 
     &.new-section {
+
         header {
             height: auto;
             @include clearfix();
@@ -505,6 +506,15 @@ input.courseware-unit-search-input {
 
         .expand-collapse-icon {
             visibility: hidden;
+        }
+
+        .item-details {
+          padding: 25px 0 0 0;
+
+          .section-name {
+            float: none;
+            width: 100%;
+          }
         }
     }
 }
