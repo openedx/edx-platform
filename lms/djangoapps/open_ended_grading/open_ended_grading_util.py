@@ -8,5 +8,5 @@ def convert_seconds_to_human_readable(seconds):
     else:
         human_string = "{0} days".format(round(seconds/(60*60*24),1))
 
-    eta_string = "In {0}.".format(human_string)
+    eta_string = "{0}".format(human_string)
     return eta_string
