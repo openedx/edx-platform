@@ -1,5 +1,4 @@
-from lettuce import world, step  # , before, after
-from factories import *
+from lettuce import world, step
 from django.core.management import call_command
 from nose.tools import assert_equals, assert_in
 from lettuce.django import django_url

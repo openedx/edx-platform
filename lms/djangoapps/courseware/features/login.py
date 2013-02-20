@@ -34,7 +34,6 @@ def click_the_dropdown(step):
 
 #### helper functions
 
-
 def user_is_an_unactivated_user(uname):
     u = User.objects.get(username=uname)
     u.is_active = False
