@@ -623,6 +623,15 @@ body.course.settings {
     // specific fields - advanced settings
     &.advanced-policies {
 
+      .field-group {
+        margin-bottom: ($baseline*1.5);
+
+        &:last-child {
+          border: none;
+          padding-bottom: 0;
+        }
+      }
+
       .course-advanced-policy-list-item {
         @include clearfix();
         position: relative;
@@ -704,6 +713,7 @@ body.course.settings {
         }
 
         .CodeMirror-scroll {
+          overflow: hidden;
           height: auto;
           min-height: ($baseline*1.5);
           max-height: ($baseline*10);
