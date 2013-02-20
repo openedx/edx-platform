@@ -1,36 +1,13 @@
-<%namespace name="annotatable" file="annotatable_problem.html"/>
-
-<div class="annotatable-wrapper" id="${element_id}-wrapper">
+<div class="annotatable-wrapper" data-discussion-id="${discussion_id}">
 	<div class="annotatable-header">
 		% if display_name is not UNDEFINED and display_name is not None:
 		  <div class="annotatable-title">${display_name} </div>
 		% endif
 		<div class="annotatable-description">
-                ${problem_name}
-				<a href="javascript:void(0)" class="annotatable-toggle">Hide Annotations</a>
+                Guided Discussion
+				<a class="annotatable-toggle" href="javascript:void(0)">Hide Annotations</a>
                 <div class="annotatable-help-icon" title="Move your cursor over the highlighted areas to display annotations. Discuss the annotations in the forums using the link at the bottom of the annotation. You may hide annotations at any time by using the button at the top of the section."></div>
         </div>
 	</div>
-	
-	<div class="annotatable-content">${html_content}</div>
-
-    % if render_as_problems:
-        <div class="annotatable-problems">
-            % for item in items:
-                ${annotatable.render_problem(item['problem'],loop.index,len(items))}
-                % if item['discussion']:
-                    <div class="annotatable-discussion">${item['discussion']['content']}</div>
-                % endif
-            % endfor
-        </div>
-    % else:
-        <div class="annotatable-discussions">
-        % for item in items:
-            <div class="annotatable-discussion">
-                <a class="annotatable-return" href="javascript:void(0);" data-discussion-id="${item['discussion']['discussion_id']}">Return to annotation</a>
-                ${item['discussion']['content']}
-            </div>
-        % endfor
-        </div>
-    % endif
+	<div class="annotatable-content">${content_html}</div>
 </div>

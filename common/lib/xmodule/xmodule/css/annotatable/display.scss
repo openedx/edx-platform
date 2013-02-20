@@ -13,7 +13,6 @@
     border-radius: 3px;
     .annotatable-toggle {
       position: absolute;
-      top: 0;
       right: 30px;
     }
     .annotatable-help-icon {
@@ -25,7 +24,9 @@
       height: 17px;
       background: url(../images/info-icon.png) no-repeat;
     }
-    .annotatable-toggle, .annotatable-help-icon { margin: 2px 7px 2px 0; }
+    .annotatable-toggle, .annotatable-help-icon {
+      margin: 2px 7px 2px 0;
+    }
   }
 }
 
@@ -159,16 +160,12 @@
 
 .ui-tooltip.qtip.ui-tooltip-annotatable {
   max-width: 375px;
-  .ui-tooltip-title:before { 
-    font-weight: normal;
-    content: "Guided Discussion: ";
-  }
   .ui-tooltip-content {  
     padding: 0 10px;
     .annotatable-comment {
       display: block;
       margin: 0px 0px 10px 0;
-      max-height: 225px; // truncate the text via JS so we can get an ellipsis
+      max-height: 225px;
       overflow: auto;
     }
     .annotatable-reply {

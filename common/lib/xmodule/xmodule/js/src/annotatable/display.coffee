@@ -4,18 +4,12 @@ class @Annotatable
     wrapperSelector: '.annotatable-wrapper'
     toggleSelector:  '.annotatable-toggle'
     spanSelector:    '.annotatable-span'
-    commentSelector: '.annotatable-comment'
     replySelector:   '.annotatable-reply'
     helpSelector:    '.annotatable-help-icon'
     returnSelector:  '.annotatable-return'
-    problemSelector: '.annotatable-problem'
-    problemSubmitSelector: '.annotatable-problem-submit'
-    problemTagSelector: '.annotatable-problem-tags > li'
 
     discussionXModuleSelector: '.xmodule_DiscussionModule'
     discussionSelector:        '.discussion-module'
-
-    commentMaxLength: 750 # Max length characters to show in the comment hover state
 
     constructor: (el) ->
         console.log 'loaded Annotatable' if @_debug
@@ -28,6 +22,7 @@ class @Annotatable
     init: () ->
         @initEvents()
         @initTips()
+        @initDiscussion()
 
     initEvents: () ->
         @annotationsHidden = false
@@ -35,13 +30,9 @@ class @Annotatable
         @$(@wrapperSelector).delegate @replySelector, 'click', @onClickReply
         $(@discussionXModuleSelector).delegate @returnSelector, 'click', @onClickReturn
 
-        problemSelector = @problemSelector
-        @$(@problemSubmitSelector).bind 'click', (e) ->
-            $(this).closest(problemSelector).next().show()
-
-        @$(@problemTagSelector).bind 'click', (e) ->
-            $(this).toggleClass('selected')
-
+    initDiscussion: () ->
+        1
+  
     initTips: () ->
         @savedTips = []
         @$(@spanSelector).each (index, el) => $(el).qtip(@getTipOptions el)
@@ -86,13 +77,11 @@ class @Annotatable
     onClickReply: (e) =>
         e.preventDefault()
 
-        discussion_el = @getInlineDiscussion e.currentTarget
-        return_el = discussion_el.prev(@returnSelector)
-
-        if return_el.length == 1
-            @scrollTo(return_el, () -> @afterScrollToDiscussion(discussion_el))
+        problem_el = @getProblemEl e.currentTarget
+        if problem_el.length == 1
+            @scrollTo(problem_el, @afterScrollToProblem)
         else
-            @scrollTo(discussion_el, @afterScrollToDiscussion)
+            console.log 'Problem not found! Event: ', e
 
     onClickReturn: (e) =>
         e.preventDefault()
@@ -103,15 +92,24 @@ class @Annotatable
         @scrollTo(el, @afterScrollToSpan, offset)
 
     getSpan: (el) ->
-        discussion_id = @getDiscussionId(el)
-        @$(@spanSelector).filter("[data-discussion-id='#{discussion_id}']")
+        span_id = @getSpanId(el)
+        @$(@spanSelector).filter("[data-span-id='#{span_id}']")
     
-    getInlineDiscussion: (el) ->
-        discussion_id = @getDiscussionId(el)
+    getDiscussion: (el) ->
+        discussion_id = @getDiscussionId()
         $(@discussionXModuleSelector).find(@discussionSelector).filter("[data-discussion-id='#{discussion_id}']")
 
-    getDiscussionId: (el) ->
-        $(el).data('discussion-id')
+    getProblem: (el) ->
+        el # TODO
+
+    getProblemId: (el) ->
+        $(el).data('problem-id')
+
+    getSpanId: (el) ->
+        $(el).data('span-id')
+        
+    getDiscussionId: () ->
+        @$(@wrapperSelector).data('discussion-id')
 
     toggleAnnotations: () ->
         hide = (@annotationsHidden = not @annotationsHidden)
@@ -144,30 +142,32 @@ class @Annotatable
         btn = $('.discussion-show', discussion_el)
         btn.click() if !btn.hasClass('shown')
 
+    afterScrollToProblem: (problem_el) ->
+        problem_el.effect 'highlight', {}, 500
+
     afterScrollToSpan: (span_el) ->
         span_el.effect 'highlight', {color: 'rgba(0,0,0,0.5)' }, 1000
 
     makeTipContent: (el) ->
         (api) =>
-            discussion_id = @getDiscussionId(el)
-            comment = $(@commentSelector, el).first().clone()
-            text = @_truncate comment.text().trim(), @commentMaxLength
-            comment.text(text)
-            if discussion_id
-                comment = comment.after(@createReplyLink discussion_id)
-            comment
+            text = $(el).data('comment-body')
+            comment = @createCommentEl(text)
+            reply = @createReplyLink('dummy-problem-id')
+            $(comment).add(reply)
 
     makeTipTitle: (el) ->
         (api) =>
-            comment = $(@commentSelector, el).first()
-            title = comment.attr('title')
+            title = $(el).data('comment-title')
             (if title then title else 'Commentary')
 
-    createReplyLink: (discussion_id) ->
-        $("<a class=\"annotatable-reply\" href=\"javascript:void(0);\" data-discussion-id=\"#{discussion_id}\">See Full Discussion</a>")
+    createCommentEl: (text) ->
+        $("<div class=\"annotatable-comment\">#{text}</div>")
 
-    createReturnLink: (discussion_id) ->
-        $("<a class=\"annotatable-return\" href=\"javascript:void(0);\" data-discussion-id=\"#{discussion_id}\">Return to annotation</a>")
+    createReplyLink: (problem_id) ->
+        $("<a class=\"annotatable-reply\" href=\"javascript:void(0);\" data-problem-id=\"#{problem_id}\">Reply to Annotation</a>")
+
+    createReturnLink: (span_id) ->
+        $("<a class=\"annotatable-return\" href=\"javascript:void(0);\" data-span-id=\"#{span_id}\">Return to annotation</a>")
 
     openSavedTips: () ->
         @showTips @savedTips
@@ -201,9 +201,3 @@ class @Annotatable
         return =>
             fn.call this unless done
             done = true
-
-    _truncate: (text = '', limit) ->
-        if text.length > limit
-            text.substring(0, limit - 1).split(' ').slice(0, -1).join(' ') + '...' # truncate on word boundary
-        else
-            text
