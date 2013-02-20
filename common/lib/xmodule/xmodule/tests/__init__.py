@@ -19,6 +19,15 @@ import xmodule
 from xmodule.x_module import ModuleSystem
 from mock import Mock
 
+open_ended_grading_interface = {
+        'url': 'http://sandbox-grader-001.m.edx.org/peer_grading',
+        'username': 'incorrect_user',
+        'password': 'incorrect_pass',
+        'staff_grading' : 'staff_grading',
+        'peer_grading' : 'peer_grading',
+        'grading_controller' : 'grading_controller'
+    }
+
 test_system = ModuleSystem(
     ajax_url='courses/course_id/modx/a_location',
     track_function=Mock(),
@@ -31,7 +40,8 @@ test_system = ModuleSystem(
     debug=True,
     xqueue={'interface': None, 'callback_url': '/', 'default_queuename': 'testqueue', 'waittime': 10},
     node_path=os.environ.get("NODE_PATH", "/usr/local/lib/node_modules"),
-    anonymous_student_id='student'
+    anonymous_student_id='student',
+    open_ended_grading_interface= open_ended_grading_interface
 )
 
 
