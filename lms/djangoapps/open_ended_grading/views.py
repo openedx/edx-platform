@@ -22,6 +22,7 @@ from xmodule.modulestore.django import modulestore
 from xmodule.modulestore import search
 
 from django.http import HttpResponse, Http404, HttpResponseRedirect
+import open_ended_grading_util
 
 log = logging.getLogger(__name__)
 
@@ -150,6 +151,18 @@ def student_problem_list(request, course_id):
             problem_url_parts = search.path_to_location(modulestore(), course.id, problem_list[i]['location'])
             problem_url = generate_problem_url(problem_url_parts, base_course_url)
             problem_list[i].update({'actual_url': problem_url})
+            eta_available = problem_list[i]['eta_available']
+            if isinstance(eta_available, basestring):
+                eta_available = (eta_available.lower() == "true")
+
+            eta_string = "N/A"
+            if eta_available:
+                try:
+                    eta_string = open_ended_grading_util.convert_seconds_to_human_readable(int(problem_list[i]['eta']))
+                except:
+                    #This is a student_facing_error
+                    eta_string = "Error getting ETA."
+            problem_list[i].update({'eta_string' : eta_string})
 
     except GradingServiceError:
         #This is a student_facing_error
