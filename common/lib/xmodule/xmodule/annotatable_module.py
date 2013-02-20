@@ -29,43 +29,66 @@ class AnnotatableModule(XModule):
     css = {'scss': [resource_string(__name__, 'css/annotatable/display.scss')]}
     icon_class = 'annotatable'
 
-    def _set_annotation_class(self, el):
-        """ Sets the CSS class on the annotation span. """
+    def _get_annotation_class_attr(self, index, el):
+        """ Returns a dict with the CSS class attribute to set on the annotation
+            and an XML key to delete from the element.
+         """
 
         cls = ['annotatable-span', 'highlight']
-        cls.append('highlight-'+self._get_highlight(el))
-        el.set('class', ' '.join(cls))
 
-    def _set_annotation_data(self, el):
-        """ Transforms the annotation span's xml attributes to HTML data attributes. """
+        highlight_key = 'highlight'
+        color = el.get(highlight_key)
+        valid_colors = ['yellow', 'orange', 'purple', 'blue', 'green']
+        if color is not None and color in valid_colors:
+            cls.append('highlight-'+color)
 
-        attrs_map = {'body': 'data-comment-body', 'title': 'data-comment-title'}
+        cls_str = ' '.join(cls)
+
+        return  { 'class': {
+            'value': cls_str,
+            '_delete': highlight_key }
+        }
+
+    def _get_annotation_data_attr(self, index, el):
+        """ Returns a dict with the HTML data attributes to set on the annotation
+            and an XML key to delete from the element
+        """
+
+        attrs_map = {
+            'body': 'data-comment-body',
+            'title': 'data-comment-title'
+        }
+        data_attrs = {
+            'data-span-id': { 'value': str(index) }
+        }
+
         for xml_key in attrs_map.keys():
             if xml_key in el.attrib:
                 value = el.get(xml_key, '')
                 html_key = attrs_map[xml_key]
-                el.set(html_key, value)
-                del el.attrib[xml_key]
+                data_attrs[html_key] = { 'value': value, '_delete': xml_key }
 
-    def _get_highlight(self, el):
-        """ Returns the name of the marker/highlight color for the span if it is valid, otherwise none."""
-
-        valid_highlights = ['yellow', 'orange', 'purple', 'blue', 'green']
-        default_highlight = 'yellow'
-        highlight = el.get('highlight', default_highlight)
-        if highlight in valid_highlights:
-            return highlight
-        return default_highlight
+        return data_attrs
 
     def _render_content(self):
         """ Renders annotatable content by transforming spans and adding discussions. """
         xmltree = etree.fromstring(self.content)
         xmltree.tag = 'div'
 
+        index = 0
         for el in xmltree.findall('.//annotation'):
+            index += 1
+
             el.tag = 'div'
-            self._set_annotation_class(el)
-            self._set_annotation_data(el)
+
+            attr = {}
+            attr.update(self._get_annotation_class_attr(index, el))
+            attr.update(self._get_annotation_data_attr(index, el))
+            for key in attr.keys():
+                el.set(key, attr[key]['value'])
+                if '_delete' in attr[key]:
+                    delete_key = attr[key]['_delete']
+                    del el.attrib[delete_key]
 
         return etree.tostring(xmltree, encoding='unicode')
 
@@ -75,6 +98,7 @@ class AnnotatableModule(XModule):
             'display_name': self.display_name,
             'element_id': self.element_id,
             'discussion_id': self.discussion_id,
+            'help_text': self.help_text,
             'content_html': self._render_content()
         }
 
@@ -91,9 +115,15 @@ class AnnotatableModule(XModule):
             discussion_id = xmltree.get('discussion')
             del xmltree.attrib['discussion']
 
+        help_text = ''
+        if 'help_text' in xmltree.attrib:
+            help_text = xmltree.get('help_text')
+            del xmltree.attrib['help_text']
+
         self.content = etree.tostring(xmltree, encoding='unicode')
         self.element_id = self.location.html_id()
         self.discussion_id = discussion_id
+        self.help_text = help_text
 
 class AnnotatableDescriptor(RawDescriptor):
     module_class = AnnotatableModule
