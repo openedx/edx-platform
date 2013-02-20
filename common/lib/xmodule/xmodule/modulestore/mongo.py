@@ -11,7 +11,7 @@ from datetime import datetime, timedelta
 
 from importlib import import_module
 from xmodule.errortracker import null_error_tracker, exc_info_to_str
-from xmodule.x_module import XModuleDescriptor, inheritable_metadata
+from xmodule.x_module import XModuleDescriptor
 from xmodule.mako_module import MakoDescriptorSystem
 from xmodule.error_module import ErrorDescriptor
 
@@ -185,7 +185,7 @@ class MongoModuleStore(ModuleStoreBase):
         def _compute_inherited_metadata(url):
             my_metadata = results_by_url[url]['metadata']
             for key in my_metadata.keys():
-                if key not in inheritable_metadata:
+                if key not in XModuleDescriptor.inheritable_metadata:
                     del my_metadata[key]
             results_by_url[url]['metadata'] = my_metadata
 
