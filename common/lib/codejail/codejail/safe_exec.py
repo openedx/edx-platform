@@ -28,14 +28,12 @@ def names_and_modules(assumed_imports):
             yield modname, modname
 
 
-def safe_exec(code, globals_dict, locals_dict, future_division=False, assumed_imports=None, files=None, python_path=None):
+def safe_exec(code, globals_dict, locals_dict, assumed_imports=None, files=None, python_path=None):
     """Execute code as "exec" does, but safely.
 
     `code` is a string of Python code.  `globals_dict` and `locals_dict` are
     dictionaries to use as the globals and locals.  Modifications the code
     makes to `locals_dict` are reflected in the dictionary on return.
-
-    `future_division` determines whether Python-3-style division is used.
 
     `assumed_imports` is a list of modules to make available as implicit
     imports for the code.  Entries are either a name, "mod", which makes
@@ -47,9 +45,6 @@ def safe_exec(code, globals_dict, locals_dict, future_division=False, assumed_im
     """
     the_code = []
     files = list(files or ())
-
-    if future_division:
-        the_code.append("from __future__ import division\n")
 
     the_code.append(textwrap.dedent("""\
         import json
@@ -90,7 +85,7 @@ def safe_exec(code, globals_dict, locals_dict, future_division=False, assumed_im
     locals_dict.update(json.loads(res.stdout))
 
 
-def not_safe_exec(code, globals_dict, locals_dict, future_division=False, assumed_imports=None, files=None, python_path=None):
+def not_safe_exec(code, globals_dict, locals_dict, assumed_imports=None, files=None, python_path=None):
     """Another implementation of `safe_exec`, but not safe.
 
     This can be swapped in for debugging problems in sandboxed Python code.
@@ -114,9 +109,6 @@ def not_safe_exec(code, globals_dict, locals_dict, future_division=False, assume
             else:
                 jd[k] = v
         return json.loads(json.dumps(jd))
-
-    if future_division:
-        code = "from __future__ import division\n" + code
 
     g_dict = straw(globals_dict)
     l_dict = straw(locals_dict)

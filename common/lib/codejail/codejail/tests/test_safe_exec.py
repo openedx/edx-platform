@@ -13,15 +13,6 @@ class SafeExecTests(object):
         self.safe_exec("a = 17", g, l)
         self.assertEqual(l['a'], 17)
 
-    def test_division(self):
-        g, l = {}, {}
-        # No future division: 1/2 is 0.
-        self.safe_exec("a = 1/2", g, l)
-        self.assertEqual(l['a'], 0)
-        # Future division: 1/2 is 0.5.
-        self.safe_exec("a = 1/2", g, l, future_division=True)
-        self.assertEqual(l['a'], 0.5)
-
     def test_assumed_imports(self):
         g, l = {}, {}
         # Using string without importing it is bad.
