@@ -52,21 +52,22 @@
 
 		.icon {
 			display: inline-block;
-			vertical-align: middle;
+			vertical-align: top;
 			margin-right: 5px;
 			font-size: 20px;
 		}
 
 		p {
+			width: flex-grid(8, 9);
 			display: inline-block;
-			vertical-align: middle;
+			vertical-align: top;
 		}
 	}
 
 	.actions {
 		float: right;
 		width: flex-grid(3, 12);
-		margin-top: 2px;
+		margin-top: ($baseline/2);
 		text-align: right;
 
 		li {
