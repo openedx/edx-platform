@@ -7,12 +7,10 @@ CMS.Views.Settings.Advanced = CMS.Views.ValidatingView.extend({
     // Model class is CMS.Models.Settings.Advanced
     events : {
         'click .delete-button' : "deleteEntry",
-//        'click .save-button' : "saveView",      TODO: put back once Advanced is not in tab view
-//        'click .cancel-button' : "revertView",  with current code, must attach listener in initialize method
         'click .new-button' : "addEntry",
         // update model on changes
-        'change #course-advanced-policy-key' : "updateKey",
-        'keydown #course-advanced-policy-key' : "showSaveCancelButtons"
+        'change .policy-key' : "updateKey",
+        'keydown .policy-key' : "showSaveCancelButtons"
         // TODO enable/disable save based on validation (currently enabled whenever there are changes)
     },
     initialize : function() {
@@ -43,7 +41,7 @@ CMS.Views.Settings.Advanced = CMS.Views.ValidatingView.extend({
         var self = this;
         _.each(_.sortBy(_.keys(this.model.attributes), _.identity),
             function(key) {
-                listEle$.append(self.template({ key : key, value : JSON.stringify(self.model.get(key), null, 4)}));
+                listEle$.append(self.getTemplate(key, self.model.get(key)));
                 self.fieldToSelectorMap[key] = key;
             });
         var policyValues = listEle$.find('.json');
@@ -54,8 +52,7 @@ CMS.Views.Settings.Advanced = CMS.Views.ValidatingView.extend({
     attachJSONEditor : function (textarea) {
         // Since we are allowing duplicate keys at the moment, it is possible that we will try to attach
         // JSON Editor to a value that already has one. Therefore only attach if no CodeMirror peer exists.
-        var siblings = $(textarea).siblings();
-        if (siblings.length >= 1 && $(siblings[0]).hasClass('CodeMirror')) {
+        if ( $(textarea).siblings().hasClass('CodeMirror')) {
             return;
         }
 
@@ -185,10 +182,8 @@ CMS.Views.Settings.Advanced = CMS.Views.ValidatingView.extend({
     },
     addEntry : function() {
         var listEle$ = this.$el.find('.course-advanced-policy-list');
-        var newEle = this.template({ key : "", value : JSON.stringify("")});
+        var newEle = this.getTemplate("", "");
         listEle$.append(newEle);
-        // disable the value entry until there's an acceptable key
-        $(newEle).find('.course-advanced-policy-value').addClass('disabled');
         this.fieldToSelectorMap[this.model.new_key] = this.model.new_key;
         // need to re-find b/c replaceWith seems to copy rather than use the specific ele instance
         var policyValueDivs = this.$el.find('#' + this.model.new_key).closest('li').find('.json');
@@ -198,9 +193,10 @@ CMS.Views.Settings.Advanced = CMS.Views.ValidatingView.extend({
         this.showSaveCancelButtons();
     },
     updateKey : function(event) {
+        var parentElement = $(event.currentTarget).closest('.key');
         // old key: either the key as in the model or new_key.
         // That is, it doesn't change as the val changes until val is accepted.
-        var oldKey = $(event.currentTarget).closest('.key').attr('id');
+        var oldKey = parentElement.attr('id');
         // TODO: validation of keys with spaces. For now at least trim strings to remove initial and
         // trailing whitespace
         var newKey = $.trim($(event.currentTarget).val());
@@ -257,15 +253,8 @@ CMS.Views.Settings.Advanced = CMS.Views.ValidatingView.extend({
                 this.model.deleteKeys.splice(wasDeleting, 1);
             }
 
-            // update gui (sets all the ids etc)
-            var newEle = this.template({key : newKey, value : JSON.stringify(this.model.get(newKey)) });
-            $(event.currentTarget).closest('li').replaceWith(newEle);
-            // need to re-find b/c replaceWith seems to copy rather than use the specific ele instance
-            var policyValueDivs = this.$el.find('#' + newKey).closest('li').find('.json');
-
-            // Because we are not dis-allowing duplicate key definitions, we may get back more than one
-            // div. But attachJSONEditor will only attach editor if it is not already defined.
-            _.each(policyValueDivs, this.attachJSONEditor, this);
+            // Update the ID to the new value.
+            parentElement.attr('id', newKey);
             
             this.fieldToSelectorMap[newKey] = newKey;
         }
@@ -282,5 +271,10 @@ CMS.Views.Settings.Advanced = CMS.Views.ValidatingView.extend({
 //        }
 //        else return true;
         return true;
+    },
+
+    getTemplate: function (key, value) {
+        return this.template({ key : key, value : JSON.stringify(value, null, 4),
+            keyUniqueId: _.uniqueId('policy_key_'), valueUniqueId: _.uniqueId('policy_value_')});
     }
 });

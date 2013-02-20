@@ -1,13 +1,13 @@
 <li class="field-group course-advanced-policy-list-item">
 	<div class="field text key" id="<%= (_.isEmpty(key) ? '__new_advanced_key__' : key) %>">
-		<label for="course-advanced-policy-key">Policy Key:</label>
-		<input type="text" class="short" id="course-advanced-policy-key" value="<%= key %>" /> 
+		<label for="<%= keyUniqueId %>">Policy Key:</label>
+		<input type="text" class="short policy-key" id="<%= keyUniqueId %>" value="<%= key %>" />
 		<span class="tip tip-stacked">Keys are case	sensitive and cannot contain spaces or start with a number</span>
   </div>
   
   <div class="field text value">
-    <label for="course-advanced-policy-value">Policy Value:</label>
-    <textarea class="json text" id="course-advanced-policy-value"><%= value %></textarea>
+    <label for="<%= valueUniqueId %>">Policy Value:</label>
+    <textarea class="json text" id="<%= valueUniqueId %>"><%= value %></textarea>
   </div>
 	
 	<div class="actions">
