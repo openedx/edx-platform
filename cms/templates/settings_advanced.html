@@ -17,93 +17,103 @@ from contentstore import utils
 <script type="text/javascript" src="${static.url('js/views/settings/advanced_view.js')}"></script>
 
 <script type="text/javascript">
-    $(document).ready(function () {
+$(document).ready(function () {
 
-        // proactively populate advanced b/c it has the filtered list and doesn't really follow the model pattern
-        var advancedModel = new CMS.Models.Settings.Advanced(${advanced_dict | n}, {parse: true});
-        advancedModel.blacklistKeys = ${advanced_blacklist | n};
-        advancedModel.url = "${reverse('course_advanced_settings_updates', kwargs=dict(org=context_course.location.org, course=context_course.location.course, name=context_course.location.name))}";
+  // hilighting labels when fields are focused in
+  $("form :input").focus(function() {
+    $("label[for='" + this.id + "']").addClass("is-focused");
+    }).blur(function() {
+      $("label").removeClass("is-focused");
+      });
 
-        var editor = new CMS.Views.Settings.Advanced({
-            el: $('.settings-advanced'),
-            model: advancedModel
-        });
+    // proactively populate advanced b/c it has the filtered list and doesn't really follow the model pattern
+    var advancedModel = new CMS.Models.Settings.Advanced(${advanced_dict | n}, {parse: true});
+    advancedModel.blacklistKeys = ${advanced_blacklist | n};
+    advancedModel.url = "${reverse('course_advanced_settings_updates', kwargs=dict(org=context_course.location.org, course=context_course.location.course, name=context_course.location.name))}";
 
-        editor.render();
+    var editor = new CMS.Views.Settings.Advanced({
+      el: $('.settings-advanced'),
+      model: advancedModel
+      });
 
-    });
+editor.render();
+
+});
 
 </script>
 </%block>
 
 <%block name="content">
 <div class="wrapper-content wrapper">
-    <section class="content">
-        <header class="page">
-            <span class="title-sub">Settings</span>
+  <section class="content">
+    <header class="page">
+      <span class="title-sub">Settings</span>
+      <h1 class="title-1">Advanced</h1>
+    </header>
 
-            <h1 class="title-1">Advanced</h1>
-        </header>
+    <article class="content-primary" role="main">
+      <form id="settings_advanced" class="settings-advanced" method="post" action="">
+        <section class="group-settings advanced-policies">
+          <header>
+            <h2 class="title-2">Manual Policy Definition</h2>
+            <span class="tip">Manually Edit Course Policy Values (JSON Key and Pair values)</span>
+          </header>
 
+          <p class="instructions"><strong>Warning</strong>: Add only manual policy data that you are familiar
+          with.</p>
 
-        <article class="content-primary" role="main">
-            <section class="settings-advanced">
-                <div class="message message-status confirm is-shown">
-                    Your policy changes have been saved.
-                </div>
+          <ul class="list-input course-advanced-policy-list enum">
+              
+          </ul>
 
-                <div class="message message-status error is-shown">
-                    There was an error saving your information. Please see below.
-                </div>
+          <div class="actions">
+            <a href="#" class="button new-button new-advanced-policy-item add-policy-data">
+              <span class="plus-icon white"></span>New Manual Policy
+            </a>            
+          </div>
+        </section>
+      </form>
+    </article>
 
-                <section class="settings-advanced-policies">
-                    <header>
-                        <h3>Manual Policy Definition</h3>
-                        <span class="detail">Manually Edit Course Policy Values (JSON Key and Pair values)</span>
-                    </header>
+    <aside class="content-supplementary" role="complimentary">
+      <div class="bit">
+        <h3 class="title-3">How will these settings be used</h3>
+        <p>Lorem ipsum dolor sit amet, consectetuer adipiscing elit. Aenean commodo ligula eget dolor. Aenean massa. Cum sociis natoque penatibus et magnis dis parturient montes, nascetur ridiculus mus. Donec quam felis, ultricies nec, pellentesque eu, pretium quis, sem. Nulla consequat massa quis enim. Donec pede justo, fringilla vel, aliquet nec, vulputate eget, arcu. In enim justo, rhoncus ut, imperdiet a, venenatis vitae, justo. Nullam dictum felis eu pede mollis pretium.</p>
+      </div>
 
-                    <p class="instructions"><strong>Warning</strong>: Add only manual policy data that you are familiar
-                        with.</p>
+      <div class="bit">
+      % if context_course:
+      <% ctx_loc = context_course.location %>
+      <%! from django.core.urlresolvers import reverse %>
+        <h3 class="title-3">Other Course Settings</h3>
+        <nav class="nav-related">
+          <ul>
+            <li class="nav-item"><a href="${reverse('contentstore.views.get_course_settings', kwargs=dict(org=ctx_loc.org, course=ctx_loc.course, name=ctx_loc.name))}">Details &amp; Schedule</a></li>
+            <li class="nav-item"><a href="${reverse('manage_users', kwargs=dict(location=ctx_loc))}">Course Team</a></li>
+          </ul>
+        </nav>
+      % endif
+      </div>
+    </aside>
+  </section>
+</div>
 
-                    <div class="row">
-                        <div class="field enum">
+<!-- notification: change has been made and a save is needed -->
+<div class="wrapper wrapper-notification wrapper-notification-warning">
+  <div class="notification warning">
+    <div class="copy">
+      <i class="ss-icon ss-symbolicons-block icon icon-warning">&#x26A0;</i>
 
-                            <!-- basic empty & initial empty field (if user had no values yet) -->
-                            <ul class="input-list course-advanced-policy-list">
-                            </ul>
+      <p><strong>Note: </strong>Your changes will not take effect until you <strong>save your
+      progress</strong>.</p>
+    </div>
 
-                            <!-- advanced policy actions -->
-                            <div class="actions actions-advanced-policies">
-                                <a href="#" class="new-button new-advanced-policy-item add-policy-data">
-                                    <span class="plus-icon white"></span>New Manual Policy
-                                </a>
-                            </div>
-
-                        </div>
-                    </div>
-                </section>
-                <!-- .settings-advanced-policies -->
-            </section>
-        </article>
-
-        <!-- notification: change has been made and a save is needed -->
-        <div class="wrapper wrapper-notification wrapper-notification-warning">
-            <div class="notification warning">
-                <div class="copy">
-                    <i class="ss-icon ss-symbolicons-block icon icon-warning">&#x26A0;</i>
-
-                    <p><strong>Note: </strong>Your changes will not take effect until you <strong>save your
-                        progress</strong>.</p>
-                </div>
-
-                <div class="actions">
-                    <ul>
-                        <li><a href="#" class="save-button">Save</a></li>
-                        <li><a href="#" class="cancel-button">Cancel</a></li>
-                    </ul>
-                </div>
-            </div>
-        </div>
-    </section>
+    <div class="actions">
+      <ul>
+        <li><a href="#" class="save-button">Save</a></li>
+        <li><a href="#" class="cancel-button">Cancel</a></li>
+      </ul>
+    </div>
+  </div>
 </div>
 </%block>

@@ -1,18 +1,16 @@
-<li class="input multi course-advanced-policy-list-item">
-	<div class="row">
-		<div class="key" id="<%= (_.isEmpty(key) ? '__new_advanced_key__' : key) %>">
-			<label for="course-advanced-policy-key">Policy Key:</label>
-			<div class="field">
-				<input type="text" class="short" id="course-advanced-policy-key" value="<%= key %>" /> 
-				<span class="tip tip-stacked">Keys are case	sensitive and cannot contain spaces or start with a number</span>
-			</div>
-		</div>
-		<div class="value">
-			<label for="course-advanced-policy-value">Policy Value:</label>
-			<div class="field">
-				<textarea class="json text" id="course-advanced-policy-value"><%= value %></textarea>
-			</div>
-		</div>
-	</div> <a href="#" class="delete-button standard remove-item advanced-policy-data">
-	<span class="delete-icon"></span>Delete</a>
+<li class="field-group course-advanced-policy-list-item">
+	<div class="field text key" id="<%= (_.isEmpty(key) ? '__new_advanced_key__' : key) %>">
+		<label for="course-advanced-policy-key">Policy Key:</label>
+		<input type="text" class="short" id="course-advanced-policy-key" value="<%= key %>" /> 
+		<span class="tip tip-stacked">Keys are case	sensitive and cannot contain spaces or start with a number</span>
+  </div>
+  
+  <div class="field text value">
+    <label for="course-advanced-policy-value">Policy Value:</label>
+    <textarea class="json text" id="course-advanced-policy-value"><%= value %></textarea>
+  </div>
+	
+	<div class="actions">
+		<a href="#" class="button delete-button standard remove-item remove-grading-data"><span class="delete-icon"></span>Delete</a>
+	</div>
 </li>

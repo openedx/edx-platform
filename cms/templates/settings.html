@@ -23,7 +23,8 @@ from contentstore import utils
   
   <script type="text/javascript">
     $(document).ready(function(){
-    
+      
+      // hilighting labels when fields are focused in
       $("form :input").focus(function() {
         $("label[for='" + this.id + "']").addClass("is-focused");
       }).blur(function() {
