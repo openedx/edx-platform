@@ -50,7 +50,142 @@ h1 {
 
 // ====================
 
-// layout - basic
+// layout - basic page header
+.wrapper-mast {
+  margin: 0;
+  padding: 0 $baseline;
+  position: relative;
+  
+  .mast, .metadata {
+    @include clearfix();
+    @include font-size(16);
+    position: relative;
+    max-width: $fg-max-width;
+    min-width: $fg-min-width;
+    width: flex-grid(12);
+    margin: 0 auto $baseline auto;
+    color: $gray-d2;
+  }
+
+  .mast {
+    border-bottom: 1px solid $gray-l4;
+    padding-bottom: ($baseline/2);
+
+    .title-sub {
+      @include font-size(14);
+      position: relative;
+      top: ($baseline/4);
+      display: block;
+      margin: 0;
+      color: $gray-l2;
+      font-weight: 400;
+    }
+
+    .title, .title-1 {
+      @include font-size(32);
+      margin: 0;
+      padding: 0;
+      font-weight: 600;
+      color: $gray-d3;
+    }
+
+    .nav-hierarchy {
+      @include font-size(14);
+      display: block;
+      margin: 0;
+      color: $gray-l2;
+      font-weight: 400;
+
+      .nav-item {
+        display: inline;
+        vertical-align: middle;
+        margin-right: ($baseline/4);
+
+        &:after {
+          content: ">>";
+          margin-left: ($baseline/4);
+        }
+
+        &:last-child {
+          margin-right: 0;
+
+          &:after {
+            content: none;
+          }
+        }
+      }
+    }
+
+    // layout with actions
+    .title {
+      width: flex-grid(12);
+    }
+
+    // layout with actions
+    &.has-actions {
+      @include clearfix();
+
+      .title {
+        float: left;
+        width: flex-grid(6,12);
+        margin-right: flex-gutter();
+      }
+
+      .nav-actions {
+        position: relative;
+        bottom: -($baseline*0.75);
+        float: right;
+        width: flex-grid(6,12);
+        text-align: right;
+
+        .nav-item {
+          display: inline-block;
+          vertical-align: top;
+          margin-right: ($baseline/2);
+
+          &:last-child {
+            margin-right: 0;
+          }
+        }
+
+        // buttons
+        .button {
+          padding: ($baseline/4) ($baseline/2) ($baseline/3) ($baseline/2) !important;
+          font-weight: 400 !important;
+        }
+
+        .new-button {
+          font-weight: 700 !important;
+        }
+
+        .view-button {
+
+          font-weight: 700 !important;
+        }
+
+        .upload-button .icon-create {
+          @include font-size(18);
+          margin-top: ($baseline/4);
+        }
+      }
+    }
+
+    // layout with actions
+    &.has-subtitle {
+
+      .nav-actions {
+        bottom: -($baseline*1.5);
+      }
+    }
+  }
+
+  // page metadata/action bar
+  .metadata {
+
+  }
+}
+
+// layout - basic page content
 .wrapper-content {
   margin: 0;
   padding: 0 $baseline;
@@ -89,8 +224,39 @@ h1 {
   }
 
   .introduction {
+    @include box-sizing(border-box);
     @include font-size(14);
+    width: flex-grid(12);
     margin: 0 0 $baseline 0;
+
+    .copy strong {
+      font-weight: 600;
+    }
+
+    &.has-links {
+      @include clearfix();
+
+      .copy {
+        float: left;
+        width: flex-grid(8,12);
+        margin-right: flex-gutter();
+      }
+
+      .nav-introduction-supplementary {
+        @include font-size(13);
+        float: right;
+        width: flex-grid(4,12);
+        display: block;
+        text-align: right;
+
+        .icon {
+          @include font-size(14);
+          display: inline-block;
+          vertical-align: middle;
+          margin-right: ($baseline/4);
+        }
+      }
+    }
   }
 }
 
@@ -98,6 +264,7 @@ h1 {
   @include box-sizing(border-box);
 }
 
+// layout - primary content
 .content-primary {
 
   .title-1, .title-2, .title-3, .title-4, .title-5, .title-5 {
@@ -129,6 +296,7 @@ h1 {
   }
 }
 
+// layout - supplemental content
 .content-supplementary {
 
   .bit {
@@ -494,22 +662,49 @@ hr.divide {
 
 .new-button {
   @include green-button;
-  font-size: 13px;
+  @include font-size(13);
   padding: 8px 20px 10px;
   text-align: center;
 
   &.big {
     display: block;
   }
+
+  .icon-create {
+    display: inline-block;
+    vertical-align: middle;
+    margin-right: ($baseline/4);
+    margin-top: ($baseline/10);
+    line-height: 0;
+  }
+}
+
+.view-button {
+  @include blue-button;
+  @include font-size(13);
+  text-align: center;
+
+  &.big {
+    display: block;
+  }
+
+  .icon-view {
+    @include font-size(15);
+    display: inline-block;
+    vertical-align: middle;
+    margin-right: ($baseline/2);
+    margin-top: ($baseline/5);
+    line-height: 0;
+  }
 }
 
 .edit-button.standard,
 .delete-button.standard {
-  float: left;
+  @include font-size(12);
   @include white-button;
+  float: left;
   padding: 3px 10px 4px;
   margin-left: 7px;
-  font-size: 12px;
   font-weight: 400;
 
   .edit-icon,
@@ -575,6 +770,72 @@ hr.divide {
   white-space: pre-wrap;
   white-space: -moz-pre-wrap;
   word-wrap: break-word;
+}
+
+// ====================
+
+// js dependant
+body.js {
+
+  // lean/simple modal window
+  .content-modal {
+    @include border-bottom-radius(2px);
+    @include box-sizing(border-box);
+    @include box-shadow(0 2px 4px $shadow-d1);
+    position: relative;
+    display: none;
+    width: 700px;
+    overflow: hidden;
+    border: 1px solid $gray-d1;
+    padding: ($baseline);
+    background: $white;
+
+    .action-modal-close {
+      @include transition(top .25s ease-in-out);
+      @include border-bottom-radius(3px);
+      position: absolute;
+      top: -3px;
+      right: $baseline;
+      padding: ($baseline/4) ($baseline/2) 0 ($baseline/2);
+      background: $gray-l3;
+      text-align: center;
+
+      .label {
+        @include text-sr();
+      }
+
+      .ss-icon {
+        @include font-size(18);
+        color: $white;
+      }
+
+      &:hover {
+        background: $blue;
+        top: 0;
+      }
+    }
+
+    img {
+      @include box-sizing(border-box);
+      width: 100%;
+      overflow-y: scroll;
+      padding: ($baseline/10);
+      border: 1px solid $gray-l4;
+    }
+
+    .title {
+      @include font-size(18);
+      margin: 0 0 ($baseline/2) 0;
+      font-weight: 600;
+      color: $gray-d3;
+    }
+
+    .description {
+      @include font-size(13);
+      margin-top: ($baseline/2);
+      color: $gray-l1;
+    }
+  }
 }
 
 // ====================

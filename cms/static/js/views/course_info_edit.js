@@ -10,7 +10,7 @@ CMS.Views.CourseInfoEdit = Backbone.View.extend({
   render: function() {
     // instantiate the ClassInfoUpdateView and delegate the proper dom to it
     new CMS.Views.ClassInfoUpdateView({
-        el: this.$('#course-update-view'),
+        el: $('body.updates'),
         collection: this.model.get('updates')
     });
 
@@ -27,10 +27,10 @@ CMS.Views.ClassInfoUpdateView = Backbone.View.extend({
     // collection is CourseUpdateCollection
     events: {
         "click .new-update-button" : "onNew",
-        "click .save-button" : "onSave",
-        "click .cancel-button" : "onCancel",
-        "click .edit-button" : "onEdit",
-        "click .delete-button" : "onDelete"
+        "click #course-update-view .save-button" : "onSave",
+        "click #course-update-view .cancel-button" : "onCancel",
+        "click .post-actions > .edit-button" : "onEdit",
+        "click .post-actions > .delete-button" : "onDelete"
     },
         
     initialize: function() {
