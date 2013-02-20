@@ -66,9 +66,7 @@ class CachingDescriptorSystem(MakoDescriptorSystem):
         if json_data is None:
             return self.modulestore.get_item(location)
         else:
-            # TODO (vshnayder): metadata inheritance is somewhat broken because mongo, doesn't
-            # always load an entire course.  We're punting on this until after launch, and then
-            # will build a proper course policy framework.
+            # load the module and apply the inherited metadata
             try:
                 module = XModuleDescriptor.load_from_json(json_data, self, self.default_class)
                 if self.metadata_inheritance_tree is not None:
