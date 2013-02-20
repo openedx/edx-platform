@@ -75,8 +75,12 @@ class PeerGradingModule(XModule):
 
         self.link_to_location = self.metadata.get('link_to_location', USE_FOR_SINGLE_LOCATION)
         if self.use_for_single_location == True:
-            self.linked_problem = modulestore().get_instance(self.system.course_id, self.link_to_location)
-            log.debug("problem metadata: {0}".format(self.linked_problem.metadata))
+            try:
+                self.linked_problem = modulestore().get_instance(self.system.course_id, self.link_to_location)
+            except:
+                log.error("Linked location {0} for peer grading module {1} does not exist".format(
+                    self.link_to_location, self.location))
+                raise
             due_date = self.linked_problem.metadata.get('peer_grading_due', None)
             if due_date:
                 self.metadata['due'] = due_date
@@ -448,7 +452,12 @@ class PeerGradingModule(XModule):
             '''
             find the peer grading module that links to the given location
             '''
-            return modulestore().get_instance(self.system.course_id, location)
+            try:
+                return modulestore().get_instance(self.system.course_id, location)
+            except:
+                # the linked problem doesn't exist
+                log.error("Problem {0} does not exist in this course".format(location))
+                raise
 
 
         for problem in problem_list:
