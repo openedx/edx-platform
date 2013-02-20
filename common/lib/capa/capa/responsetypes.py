@@ -1199,6 +1199,8 @@ class SymbolicResponse(CustomResponse):
     response_tag = 'symbolicresponse'
 
     def setup_response(self):
+        # No, this is not pretty.
+        self.context['script_code'] += "from symmath import symmath_check\n"
         self.xml.set('cfn', 'symmath_check')
         CustomResponse.setup_response(self)
 
