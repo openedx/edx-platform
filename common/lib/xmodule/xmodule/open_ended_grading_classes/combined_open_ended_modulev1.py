@@ -2,7 +2,7 @@ import json
 import logging
 from lxml import etree
 from lxml.html import rewrite_links
-from timeinfo import TimeInfo
+from xmodule.timeinfo import TimeInfo
 from xmodule.capa_module import only_one, ComplexEncoder
 from xmodule.editing_module import EditingDescriptor
 from xmodule.html_checker import check_html
