@@ -2,10 +2,12 @@
 
 import codejail.safe_exec
 
-# This will set up the name "random" as a properly-seeded stand-in for the
-# random module. Also, capa assumes float-friendly division always.
+# Establish the Python environment for Capa.
+# Capa assumes float-friendly division always.
+# The name "random" is a properly-seeded stand-in for the random module.
 CODE_PROLOG = """\
 from __future__ import division
+
 import random as random_module
 random = random_module.Random(%r)
 random.Random = random_module.Random

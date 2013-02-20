@@ -73,7 +73,7 @@ def safe_exec(code, globals_dict, locals_dict, assumed_imports=None, files=None,
     jailed_code = "".join(the_code)
 
     # Turn this on to see what's being executed.
-    if 1:
+    if 0:
         print "--{:-<40}".format(" jailed ")
         print jailed_code
         print "--{:-<40}".format(" exec ")
