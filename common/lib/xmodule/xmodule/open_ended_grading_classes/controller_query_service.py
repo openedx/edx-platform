@@ -1,8 +1,6 @@
 import logging
 from xmodule.open_ended_grading_classes.grading_service_module import GradingService
 
-from mitxmako.shortcuts import render_to_string
-
 log = logging.getLogger(__name__)
 
 
@@ -12,7 +10,6 @@ class ControllerQueryService(GradingService):
     """
     def __init__(self, config, system):
         config['system'] = system
-        #ModuleSystem(None, None, None, render_to_string, None)
         super(ControllerQueryService, self).__init__(config)
         self.url = config['url'] + config['grading_controller']
         self.login_url = self.url + '/login/'
