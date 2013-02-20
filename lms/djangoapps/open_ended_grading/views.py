@@ -23,6 +23,7 @@ from xmodule.modulestore.django import modulestore
 from xmodule.modulestore import search
 
 from django.http import HttpResponse, Http404, HttpResponseRedirect
+from mitxmako.shortcuts import render_to_string
 
 log = logging.getLogger(__name__)
 

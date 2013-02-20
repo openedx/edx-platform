@@ -663,16 +663,20 @@ class OpenEndedModule(openendedchild.OpenEndedChild):
         Output: Rendered HTML
         """
         #set context variables and render template
+        eta_string = None
         if self.state != self.INITIAL:
             latest = self.latest_answer()
             previous_answer = latest if latest is not None else self.initial_display
             post_assessment = self.latest_post_assessment(system)
             score = self.latest_score()
             correct = 'correct' if self.is_submission_correct(score) else 'incorrect'
+            if self.state == self.ASSESSING:
+                eta_string = self.get_eta()
         else:
             post_assessment = ""
             correct = ""
             previous_answer = self.initial_display
+
 
         context = {
             'prompt': self.prompt,
@@ -686,6 +690,7 @@ class OpenEndedModule(openendedchild.OpenEndedChild):
             'child_type': 'openended',
             'correct': correct,
             'accept_file_upload': self.accept_file_upload,
+            'eta_message' : eta_string,
         }
         html = system.render_template('open_ended.html', context)
         return html
