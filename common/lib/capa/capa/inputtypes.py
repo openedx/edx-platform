@@ -909,15 +909,15 @@ registry.register(DesignProtein2dInput)
 class EditAGeneInput(InputTypeBase):
     """
         An input type for editing a gene. Integrates with the genex java applet.
-        
+
         Example:
-        
+
         <editagene width="800" hight="500" dna_sequence="ETAAGGCTATAACCGA" />
         """
-    
+
     template = "editageneinput.html"
     tags = ['editageneinput']
-    
+
     @classmethod
     def get_attributes(cls):
         """
@@ -927,15 +927,58 @@ class EditAGeneInput(InputTypeBase):
                 Attribute('height'),
                 Attribute('dna_sequence')
                 ]
-    
+
     def _extra_context(self):
         """
             """
         context = {
             'applet_loader': '/static/js/capa/edit-a-gene.js',
         }
-        
+
         return context
 
 registry.register(EditAGeneInput)
+
+#---------------------------------------------------------------------
+
+class AnnotationInput(InputTypeBase):
+    """
+    Input type for annotations / tags: students can enter some notes or other text
+    (currently ungraded), and then choose from a set of tags, which are graded.
+
+    Example:
+
+    <annotationinput>
+    <text>Dr Seuss uses colors!  How?</text>
+    <comment_prompt>Write down some notes:</comment_prompt>
+    <tag_prompt>Now pick the right color</tag_prompt>
+    <options>
+      <option score="0">blue -- color of grass</option>
+      <option score="1">ham -- color of grass</option>
+      <option score="2">green -- color of grass</option>
+    </options>
+    </annotationinput>
+
+    <text>The location of the sky</text>
+
+    # TODO: allow ordering to be randomized
+    """
+
+    template = "annotationinput.html"
+    tags = ['annotationinput']
+
+    def setup(self):
+        # Pull out all the things from the xml
+        self.text = 'text'
+        self.comment_prompt = 'comment_prompt'
+        self.tag_prompt = 'tag_prompt'
+        self.options = [(0, 'blue'), (1, 'green'), (2, 'red')]
+
+    def _extra_context(self):
+        return {'text': self.text,
+                'comment_prompt': self.comment_prompt,
+                'tag_prompt': self.tag_prompt,
+                'options': self.options}
+
+registry.register(AnnotationInput)
 

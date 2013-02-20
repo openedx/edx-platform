@@ -1,0 +1,37 @@
+<form class="annotation-input">
+TODO: make the textline hidden once it all works
+<div class="script_placeholder" data-src="/static/js/capa/annotationinput.js"/>
+
+<p>Text: ${text}</p>
+
+<p>Comment prompt: ${comment_prompt}</p>
+
+<textarea id="input_${id}_comment" name="input_${id}_comment"/>
+
+<p>Tag prompt: ${tag_prompt}</p>
+
+<input type="text" style="" name="input_${id}" id="input_${id}"/>
+
+Value: ${value}
+
+      % for option_id, option_description in options:
+          <p>${option_id}, ${option_description}</p>
+      % endfor
+
+  <span id="answer_${id}"></span>
+
+  % if status == 'unsubmitted':
+  <span class="unanswered" style="display:inline-block;" id="status_${id}"></span>
+  % elif status == 'correct': 
+  <span class="correct" id="status_${id}"></span>
+  % elif status == 'incorrect':
+  <span class="incorrect" id="status_${id}"></span>
+  % elif status == 'incomplete':
+  <span class="incorrect" id="status_${id}"></span>
+  % endif
+</form>
+
+% if msg:
+<span class="message">${msg|n}</span>
+% endif
+
