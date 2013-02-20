@@ -48,18 +48,18 @@
 
   <section role="main" class="content">
     <header>
-      <h2 class="is-hidden">Registration Form</h2>
+      <h2 class="sr">Registration Form</h2>
     </header>
 
     <form role="form" id="register-form" method="post" data-remote="true" action="/create_account">
       
       <!-- status messages -->
-      <div role="alert" class="status message is-hidden">
+      <div role="alert" class="status message">
         <h3 class="message-title">We're sorry, edX enrollment is not available in your region</h3>
         <p class="message-copy">Lorem ipsum dolor sit amet, consectetuer adipiscing elit. Lorem ipsum dolor sit amet, consectetuer adipiscing elit.</p>
       </div>
 
-      <div role="alert" class="status message submission-error is-hidden">
+      <div role="alert" class="status message submission-error">
         <h3 class="message-title">The following errors occured while processing your registration: </h3>
         <ul class="message-copy">
           <li>You must accept the terms of service.</li>
@@ -68,12 +68,12 @@
         </ul>
       </div>
 
-      <div role="alert" class="status message submission-error is-hidden">
+      <div role="alert" class="status message submission-error">
         <h3 class="message-title">The following errors occured while processing your registration: </h3>
         <p class="message-copy">To enroll, you must follow the honor code</p>
       </div>
 
-      <div role="alert" class="status message system-error is-hidden">
+      <div role="alert" class="status message system-error">
         <h3 class="message-title">We're sorry, our systems seem to be having trouble processing your registration</h3>
         <p class="message-copy">Someone has been made aware of this issue. Please try again shortly. Please <a href="">contact us</a> about any concerns you have.</p>
       </div>
@@ -84,7 +84,7 @@
       </p>
 
       <fieldset class="group group-form group-form-requiredinformation">
-        <legend class="is-hidden">Required Information</legend>
+        <legend class="sr">Required Information</legend>
 
         % if has_extauth_info is UNDEFINED:
 
@@ -128,7 +128,7 @@
       </fieldset>
 
       <fieldset class="group group-form group-form-secondary group-form-personalinformation">
-        <legend class="is-hidden">Optional Personal Information</legend>
+        <legend class="sr">Optional Personal Information</legend>
 
         <ol class="list-input">
           <li class="field-group">
@@ -166,7 +166,7 @@
       </fieldset>
 
       <fieldset class="group group-form group-form-personalinformation2">
-        <legend class="is-hidden">Optional Personal Information</legend>
+        <legend class="sr">Optional Personal Information</legend>
 
         <ol class="list-input">
           <li class="field text" id="field-address-mailing">
@@ -182,7 +182,7 @@
       </fieldset>
 
       <fieldset class="group group-form group-form-accountacknowledgements">
-        <legend class="is-hidden">Account Acknowledgements</legend>
+        <legend class="sr">Account Acknowledgements</legend>
 
         <ol class="list-input">
           <li class="field-group">
@@ -207,7 +207,7 @@
 
   <aside role="complementary">
     <header>
-      <h3 class="is-hidden">Registration Help</h3>
+      <h3 class="sr">Registration Help</h3>
     </header>
 
     <div class="cta cta-welcome">

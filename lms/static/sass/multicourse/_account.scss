@@ -13,14 +13,15 @@
 // js-enabled
 .js {
 
-  // utility
-  .is-shown {
-    display: block;
-  }
+  #register-form, #login-form {
 
-  // hidden
-  .is-hidden {
-    display: none;
+    .status.message {
+      display: none;
+
+      &.is-shown {
+        display: block;
+      }
+    }
   }
 }
 

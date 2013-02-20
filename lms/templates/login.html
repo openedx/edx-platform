@@ -61,30 +61,30 @@
 
   <section role="main" class="content">
     <header>
-      <h2 class="is-hidden">Login Form</h2>
+      <h2 class="sr">Login Form</h2>
     </header>
 
     <form role="form" id="login-form" method="post" data-remote="true" action="/login_ajax">
       
       <!-- status messages -->
-      <div role="alert" class="status message is-hidden">
+      <div role="alert" class="status message">
         <h3 class="message-title">We're Sorry, edX accounts are unavailable currently</h3>
         <p class="message-copy">Lorem ipsum dolor sit amet, consectetuer adipiscing elit. Lorem ipsum dolor sit amet, consectetuer adipiscing elit.</p>
       </div>
 
-      <div role="alert" class="status message submission-error is-hidden">
+      <div role="alert" class="status message submission-error">
         <h3 class="message-title">The following errors occured while logging you in: </h3>
         <ul class="message-copy">
           <li>Your email or password is incorrect</li>
         </ul>
       </div>
 
-      <p class="instructions is-hidden">
+      <p class="instructions sr">
         Please provide the following information to log into your edX account. Required fields are noted by <strong class="indicator">bold text and an asterisk (*)</strong>. 
       </p>
 
       <fieldset class="group group-form group-form-requiredinformation">
-        <legend class="is-hidden">Required Information</legend>
+        <legend class="sr">Required Information</legend>
 
         <ol class="list-input">
           <li class="field required text" id="field-email">
@@ -102,7 +102,7 @@
       </fieldset>
 
       <fieldset class="group group-form group-form-secondary group-form-accountpreferences">
-        <legend class="is-hidden">Account Preferences</legend>
+        <legend class="sr">Account Preferences</legend>
 
         <ol class="list-input">
           <li class="field required checkbox" id="field-remember">
@@ -120,7 +120,7 @@
 
   <aside role="complementary">
     <header>
-      <h2 class="is-hidden">Helpful Information</h2>
+      <h2 class="sr">Helpful Information</h2>
     </header>
 
     % if settings.MITX_FEATURES.get('AUTH_USE_OPENID'):

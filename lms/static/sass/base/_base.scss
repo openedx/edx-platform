@@ -204,5 +204,6 @@ mark {
   }
 }
 
-
-
+.sr {
+  @include text-sr();
+}
