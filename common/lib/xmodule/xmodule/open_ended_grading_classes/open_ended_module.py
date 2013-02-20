@@ -108,7 +108,7 @@ class OpenEndedModule(openendedchild.OpenEndedChild):
         self.answer = find_with_default(oeparam, 'answer_display', 'No answer given.')
 
         parsed_grader_payload.update({
-            'location': system.location.url(),
+            'location': self.location_string,
             'course_id': system.course_id,
             'prompt': prompt_string,
             'rubric': rubric_string,
@@ -138,7 +138,7 @@ class OpenEndedModule(openendedchild.OpenEndedChild):
         """
 
         event_info = dict()
-        event_info['problem_id'] = system.location.url()
+        event_info['problem_id'] = self.location_string
         event_info['student_id'] = system.anonymous_student_id
         event_info['survey_responses'] = get
 
