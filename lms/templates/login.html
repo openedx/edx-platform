@@ -35,6 +35,7 @@
     (function() {
       $(document).delegate('#login-form', 'ajax:success', function(data, json, xhr) {
         if(json.success) {
+          $('.message.submission-error').removeClass('is-shown'); 
           var u=decodeURI(window.location.search);
           next=u.split("next=")[1]
           if (next) {
@@ -42,7 +43,10 @@
           }  else {
             location.href="${reverse('dashboard')}";
           }
-       }
+        } else {
+          $('.message.submission-error').addClass('is-shown'); 
+          $('.message.submission-error .message-copy').html(json.value);
+        }
       });
     })(this)
   </script>

@@ -61,21 +61,7 @@
 
       <div role="alert" class="status message submission-error">
         <h3 class="message-title">The following errors occured while processing your registration: </h3>
-        <ul class="message-copy">
-          <li>You must accept the terms of service.</li>
-          <li>You must accept the terms of service.</li>
-          <li>Your username must be a minimum of 2 characters long (e.g. "edx").</li>
-        </ul>
-      </div>
-
-      <div role="alert" class="status message submission-error">
-        <h3 class="message-title">The following errors occured while processing your registration: </h3>
-        <p class="message-copy">To enroll, you must follow the honor code</p>
-      </div>
-
-      <div role="alert" class="status message system-error">
-        <h3 class="message-title">We're sorry, our systems seem to be having trouble processing your registration</h3>
-        <p class="message-copy">Someone has been made aware of this issue. Please try again shortly. Please <a href="">contact us</a> about any concerns you have.</p>
+        <ul class="message-copy"> </ul>
       </div>
 
       <p class="instructions">
@@ -242,8 +228,9 @@
      if(json.success) {
        location.href="${reverse('dashboard')}";
      } else {
+       $('.status.message.submission-error').addClass('is-shown');
+       $('.status.message.submission-error .message-copy').html(json.value).stop().css("display", "block");
        $(".field-error").removeClass('field-error');
-       $('#register_error').html(json.value).stop().css("display", "block");
        $("[data-field='"+json.field+"']").addClass('field-error')
      }
     });
