@@ -1,33 +1,18 @@
-import copy
-from fs.errors import ResourceNotFoundError
-import itertools
 import json
 import logging
 from lxml import etree
 from lxml.html import rewrite_links
-from path import path
-import os
-import sys
-import re
-
-from pkg_resources import resource_string
-
-from .capa_module import only_one, ComplexEncoder
-from .editing_module import EditingDescriptor
-from .html_checker import check_html
-from progress import Progress
-from .stringify import stringify_children
-from .x_module import XModule
-from .xml_module import XmlDescriptor
-from xmodule.modulestore import Location
+from xmodule.timeinfo import TimeInfo
+from xmodule.capa_module import only_one, ComplexEncoder
+from xmodule.editing_module import EditingDescriptor
+from xmodule.html_checker import check_html
+from xmodule.progress import Progress
+from xmodule.stringify import stringify_children
+from xmodule.x_module import XModule
+from xmodule.xml_module import XmlDescriptor
 import self_assessment_module
 import open_ended_module
-from combined_open_ended_rubric import CombinedOpenEndedRubric, RubricParsingError, GRADER_TYPE_IMAGE_DICT, HUMAN_GRADER_TYPE, LEGEND_LIST
-from .stringify import stringify_children
-import dateutil
-import dateutil.parser
-import datetime
-from timeparse import parse_timedelta
+from combined_open_ended_rubric import CombinedOpenEndedRubric, GRADER_TYPE_IMAGE_DICT, HUMAN_GRADER_TYPE, LEGEND_LIST
 
 log = logging.getLogger("mitx.courseware")
 
@@ -59,6 +44,10 @@ HUMAN_TASK_TYPE = {
     'openended' : "edX Assessment",
     }
 
+#Default value that controls whether or not to skip basic spelling checks in the controller
+#Metadata overrides this
+SKIP_BASIC_CHECKS = False
+
 class CombinedOpenEndedV1Module():
     """
     This is a module that encapsulates all open ended grading (self assessment, peer assessment, etc).
@@ -73,7 +62,7 @@ class CombinedOpenEndedV1Module():
         'save_assessment' -- Saves the student assessment (or external grader assessment)
         'save_post_assessment' -- saves a post assessment (hint, feedback on feedback, etc)
     ajax actions implemented by combined open ended module are:
-        'reset' -- resets the whole combined open ended module and returns to the first child module
+        'reset' -- resets the whole combined open ended module and returns to the first child moduleresource_string
         'next_problem' -- moves to the next child module
         'get_results' -- gets results from a given child module
 
@@ -89,14 +78,6 @@ class CombinedOpenEndedV1Module():
     ASSESSING = 'assessing'
     INTERMEDIATE_DONE = 'intermediate_done'
     DONE = 'done'
-
-    js = {'coffee': [resource_string(__name__, 'js/src/combinedopenended/display.coffee'),
-                     resource_string(__name__, 'js/src/collapsible.coffee'),
-                     resource_string(__name__, 'js/src/javascript_loader.coffee'),
-                     ]}
-    js_module_name = "CombinedOpenEnded"
-
-    css = {'scss': [resource_string(__name__, 'css/combinedopenended/display.scss')]}
 
     def __init__(self, system, location, definition, descriptor,
                  instance_state=None, shared_state=None, metadata = None, static_data = None, **kwargs):
@@ -165,28 +146,16 @@ class CombinedOpenEndedV1Module():
         self.max_attempts = int(self.metadata.get('attempts', MAX_ATTEMPTS))
         self.is_scored = self.metadata.get('is_graded', IS_SCORED) in TRUE_DICT
         self.accept_file_upload = self.metadata.get('accept_file_upload', ACCEPT_FILE_UPLOAD) in TRUE_DICT
+        self.skip_basic_checks = self.metadata.get('skip_spelling_checks', SKIP_BASIC_CHECKS)
 
         display_due_date_string = self.metadata.get('due', None)
-        if display_due_date_string is not None:
-            try:
-                self.display_due_date = dateutil.parser.parse(display_due_date_string)
-            except ValueError:
-                log.error("Could not parse due date {0} for location {1}".format(display_due_date_string, location))
-                raise
-        else:
-            self.display_due_date = None
-
         grace_period_string = self.metadata.get('graceperiod', None)
-        if grace_period_string is not None and self.display_due_date:
-            try:
-                self.grace_period = parse_timedelta(grace_period_string)
-                self.close_date = self.display_due_date + self.grace_period
-            except:
-                log.error("Error parsing the grace period {0} for location {1}".format(grace_period_string, location))
-                raise
-        else:
-            self.grace_period = None
-            self.close_date = self.display_due_date
+        try:
+            self.timeinfo = TimeInfo(display_due_date_string, grace_period_string)  
+        except:
+            log.error("Error parsing due date information in location {0}".format(location))
+            raise
+        self.display_due_date = self.timeinfo.display_due_date
 
         # Used for progress / grading.  Currently get credit just for
         # completion (doesn't matter if you self-assessed correct/incorrect).
@@ -204,7 +173,9 @@ class CombinedOpenEndedV1Module():
             'rubric': definition['rubric'],
             'display_name': self.display_name,
             'accept_file_upload': self.accept_file_upload,
-            'close_date' : self.close_date,
+            'close_date' : self.timeinfo.close_date,
+            's3_interface' : self.system.s3_interface,
+            'skip_basic_checks' : self.skip_basic_checks,
             }
 
         self.task_xml = definition['task_xml']
@@ -797,9 +768,6 @@ class CombinedOpenEndedV1Descriptor(XmlDescriptor, EditingDescriptor):
     stores_state = True
     has_score = True
     template_dir_name = "combinedopenended"
-
-    js = {'coffee': [resource_string(__name__, 'js/src/html/edit.coffee')]}
-    js_module_name = "HTMLEditingDescriptor"
 
     @classmethod
     def definition_from_xml(cls, xml_object, system):

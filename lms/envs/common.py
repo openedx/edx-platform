@@ -310,36 +310,29 @@ WIKI_USE_BOOTSTRAP_SELECT_WIDGET = False
 WIKI_LINK_LIVE_LOOKUPS = False
 WIKI_LINK_DEFAULT_LEVEL = 2
 
-################################# Staff grading config  #####################
-
-#By setting up the default settings with an incorrect user name and password,
-# will get an error when attempting to connect
-STAFF_GRADING_INTERFACE = {
-    'url': 'http://sandbox-grader-001.m.edx.org/staff_grading',
-    'username': 'incorrect_user',
-    'password': 'incorrect_pass',
-    }
-
-# Used for testing, debugging
-MOCK_STAFF_GRADING = False
-
 ################################# Pearson TestCenter config  ################
 
 PEARSONVUE_SIGNINPAGE_URL = "https://www1.pearsonvue.com/testtaker/signin/SignInPage/EDX"
 # TESTCENTER_ACCOMMODATION_REQUEST_EMAIL = "exam-help@edx.org"
 
-################################# Peer grading config  #####################
+################################# open ended grading config  #####################
 
 #By setting up the default settings with an incorrect user name and password,
 # will get an error when attempting to connect
-PEER_GRADING_INTERFACE = {
+OPEN_ENDED_GRADING_INTERFACE = {
     'url': 'http://sandbox-grader-001.m.edx.org/peer_grading',
     'username': 'incorrect_user',
     'password': 'incorrect_pass',
+    'staff_grading' : 'staff_grading',
+    'peer_grading' : 'peer_grading',
+    'grading_controller' : 'grading_controller'
     }
 
-# Used for testing, debugging
+# Used for testing, debugging peer grading
 MOCK_PEER_GRADING = False
+
+# Used for testing, debugging staff grading
+MOCK_STAFF_GRADING = False
 
 ################################# Jasmine ###################################
 JASMINE_TEST_DIRECTORY = PROJECT_ROOT + '/static/coffee'

@@ -13,17 +13,15 @@ import hashlib
 import capa.xqueue_interface as xqueue_interface
 import re
 
-from pkg_resources import resource_string
-
-from .capa_module import only_one, ComplexEncoder
-from .editing_module import EditingDescriptor
-from .html_checker import check_html
-from progress import Progress
-from .stringify import stringify_children
-from .xml_module import XmlDescriptor
+from xmodule.capa_module import only_one, ComplexEncoder
+import open_ended_image_submission
+from xmodule.editing_module import EditingDescriptor
+from xmodule.html_checker import check_html
+from xmodule.progress import Progress
+from xmodule.stringify import stringify_children
+from xmodule.xml_module import XmlDescriptor
 from xmodule.modulestore import Location
 from capa.util import *
-import open_ended_image_submission
 
 from datetime import datetime
 
@@ -100,6 +98,8 @@ class OpenEndedChild(object):
         self.display_name = static_data['display_name']
         self.accept_file_upload = static_data['accept_file_upload']
         self.close_date = static_data['close_date']
+        self.s3_interface = static_data['s3_interface']
+        self.skip_basic_checks = static_data['skip_basic_checks']
 
         # Used for progress / grading.  Currently get credit just for
         # completion (doesn't matter if you self-assessed correct/incorrect).
@@ -319,7 +319,7 @@ class OpenEndedChild(object):
 
             try:
                 image_data.seek(0)
-                success, s3_public_url = open_ended_image_submission.upload_to_s3(image_data, image_key)
+                success, s3_public_url = open_ended_image_submission.upload_to_s3(image_data, image_key, self.s3_interface)
             except:
                 log.exception("Could not upload image to S3.")
 

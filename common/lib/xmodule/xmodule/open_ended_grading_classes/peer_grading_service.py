@@ -1,18 +1,7 @@
 import json
 import logging
-import requests
-from requests.exceptions import RequestException, ConnectionError, HTTPError
-import sys
 
-#TODO: Settings import is needed now in order to specify the URL where to find the peer grading service.
-#Eventually, the goal is to replace the global django settings import with settings specifically
-#for this xmodule.  There is no easy way to do this now, so piggybacking on the django settings
-#makes sense.
-from django.conf import settings
-
-from combined_open_ended_rubric import CombinedOpenEndedRubric, RubricParsingError
-from lxml import etree
-from grading_service_module import GradingService, GradingServiceError
+from grading_service_module import GradingService
 
 log = logging.getLogger(__name__)
 
@@ -28,6 +17,8 @@ class PeerGradingService(GradingService):
     def __init__(self, config, system):
         config['system'] = system
         super(PeerGradingService, self).__init__(config)
+        self.url = config['url'] + config['peer_grading']
+        self.login_url = self.url + '/login/'
         self.get_next_submission_url = self.url + '/get_next_submission/'
         self.save_grade_url = self.url + '/save_grade/'
         self.is_student_calibrated_url = self.url + '/is_student_calibrated/'
@@ -143,25 +134,3 @@ class MockPeerGradingService(object):
                                json.dumps({'location': 'i4x://MITx/3.091x/problem/open_ended_demo2',
                                            'problem_name': "Problem 2", 'num_graded': 1, 'num_pending': 5})
                            ]})
-
-_service = None
-
-
-def peer_grading_service(system):
-    """
-    Return a peer grading service instance--if settings.MOCK_PEER_GRADING is True,
-    returns a mock one, otherwise a real one.
-
-    Caches the result, so changing the setting after the first call to this
-    function will have no effect.
-    """
-    global _service
-    if _service is not None:
-        return _service
-
-    if settings.MOCK_PEER_GRADING:
-        _service = MockPeerGradingService()
-    else:
-        _service = PeerGradingService(settings.PEER_GRADING_INTERFACE, system)
-
-    return _service
