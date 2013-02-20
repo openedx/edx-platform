@@ -49,10 +49,18 @@ p {
 
 em, i {
   font-style: italic;
+
+  span {
+    font-style: italic;
+  }
 }
 
 strong, b {
   font-weight: bold;
+
+  span {
+    font-weight: bold;
+  }
 }
 
 p + p, ul + p, ol + p {
