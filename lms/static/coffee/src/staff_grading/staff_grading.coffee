@@ -183,6 +183,8 @@ class @StaffGrading
 
     @breadcrumbs = $('.breadcrumbs')
 
+
+    $(window).keydown @keydown_handler
     @question_header = $('.question-header')
     @question_header.click @collapse_question
     @collapse_question()
@@ -228,6 +230,10 @@ class @StaffGrading
     if Rubric.check_complete()
       @state = state_graded
       @submit_button.show()
+
+  keydown_handler: (e) =>
+    if e.which == 13 && !@list_view && Rubric.check_complete()
+      @submit_and_get_next()
 
   set_button_text: (text) =>
     @action_button.attr('value', text)
