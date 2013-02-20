@@ -43,6 +43,12 @@ $(document).ready(function () {
 
     $('body').addClass('js');
 
+    // lean/simple modal
+    $('a[rel*=modal]').leanModal({overlay : 0.80, closeButton: '.action-modal-close' });
+    $('a.action-modal-close').click(function(e){
+        (e).preventDefault();
+    });
+
     // nav - dropdown related
     $body.click(function (e) {
         $('.nav-dropdown .nav-item .wrapper-nav-sub').removeClass('is-shown');
@@ -638,7 +644,7 @@ function addNewCourse(e) {
     $(e.target).hide();
     var $newCourse = $($('#new-course-template').html());
     var $cancelButton = $newCourse.find('.new-course-cancel');
-    $('.new-course-button').after($newCourse);
+    $('.inner-wrapper').prepend($newCourse);
     $newCourse.find('.new-course-name').focus().select();
     $newCourse.find('form').bind('submit', saveNewCourse);
     $cancelButton.bind('click', cancelNewCourse);

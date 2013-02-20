@@ -2,13 +2,14 @@ import json
 from mock import Mock
 import unittest
 
-from xmodule.self_assessment_module import SelfAssessmentModule
+from xmodule.open_ended_grading_classes.self_assessment_module import SelfAssessmentModule
 from xmodule.modulestore import Location
 from lxml import etree
 from nose.plugins.skip import SkipTest
 
 from . import test_system
 
+import test_util_open_ended
 
 class SelfAssessmentTest(unittest.TestCase):
 
@@ -47,7 +48,10 @@ class SelfAssessmentTest(unittest.TestCase):
                 'max_score': 1,
                 'display_name': "Name",
                 'accept_file_upload': False,
-                'close_date': None
+                'close_date': None,
+                's3_interface' : test_util_open_ended.S3_INTERFACE,
+                'open_ended_grading_interface' : test_util_open_ended.OPEN_ENDED_GRADING_INTERFACE,
+                'skip_basic_checks' : False,
                 }
 
         self.module = SelfAssessmentModule(test_system, self.location,
