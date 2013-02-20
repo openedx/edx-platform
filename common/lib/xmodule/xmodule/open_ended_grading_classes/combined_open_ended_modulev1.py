@@ -1,33 +1,22 @@
-import copy
-from fs.errors import ResourceNotFoundError
-import itertools
 import json
 import logging
 from lxml import etree
 from lxml.html import rewrite_links
-from path import path
-import os
-import sys
-import re
 
-from pkg_resources import resource_string
 
-from .capa_module import only_one, ComplexEncoder
-from .editing_module import EditingDescriptor
-from .html_checker import check_html
-from progress import Progress
-from .stringify import stringify_children
-from .x_module import XModule
-from .xml_module import XmlDescriptor
-from xmodule.modulestore import Location
+from xmodule.capa_module import only_one, ComplexEncoder
+from xmodule.editing_module import EditingDescriptor
+from xmodule.html_checker import check_html
+from xmodule.progress import Progress
+from xmodule.stringify import stringify_children
+from xmodule.x_module import XModule
+from xmodule.xml_module import XmlDescriptor
 import self_assessment_module
 import open_ended_module
-from combined_open_ended_rubric import CombinedOpenEndedRubric, RubricParsingError, GRADER_TYPE_IMAGE_DICT, HUMAN_GRADER_TYPE, LEGEND_LIST
-from .stringify import stringify_children
+from combined_open_ended_rubric import CombinedOpenEndedRubric, GRADER_TYPE_IMAGE_DICT, HUMAN_GRADER_TYPE, LEGEND_LIST
 import dateutil
 import dateutil.parser
-import datetime
-from timeparse import parse_timedelta
+from xmodule.timeparse import parse_timedelta
 
 log = logging.getLogger("mitx.courseware")
 
@@ -73,7 +62,7 @@ class CombinedOpenEndedV1Module():
         'save_assessment' -- Saves the student assessment (or external grader assessment)
         'save_post_assessment' -- saves a post assessment (hint, feedback on feedback, etc)
     ajax actions implemented by combined open ended module are:
-        'reset' -- resets the whole combined open ended module and returns to the first child module
+        'reset' -- resets the whole combined open ended module and returns to the first child moduleresource_string
         'next_problem' -- moves to the next child module
         'get_results' -- gets results from a given child module
 
@@ -89,14 +78,6 @@ class CombinedOpenEndedV1Module():
     ASSESSING = 'assessing'
     INTERMEDIATE_DONE = 'intermediate_done'
     DONE = 'done'
-
-    js = {'coffee': [resource_string(__name__, 'js/src/combinedopenended/display.coffee'),
-                     resource_string(__name__, 'js/src/collapsible.coffee'),
-                     resource_string(__name__, 'js/src/javascript_loader.coffee'),
-                     ]}
-    js_module_name = "CombinedOpenEnded"
-
-    css = {'scss': [resource_string(__name__, 'css/combinedopenended/display.scss')]}
 
     def __init__(self, system, location, definition, descriptor,
                  instance_state=None, shared_state=None, metadata = None, static_data = None, **kwargs):
@@ -205,6 +186,7 @@ class CombinedOpenEndedV1Module():
             'display_name': self.display_name,
             'accept_file_upload': self.accept_file_upload,
             'close_date' : self.close_date,
+            's3_interface' : self.system.s3_interface,
             }
 
         self.task_xml = definition['task_xml']
@@ -797,9 +779,6 @@ class CombinedOpenEndedV1Descriptor(XmlDescriptor, EditingDescriptor):
     stores_state = True
     has_score = True
     template_dir_name = "combinedopenended"
-
-    js = {'coffee': [resource_string(__name__, 'js/src/html/edit.coffee')]}
-    js_module_name = "HTMLEditingDescriptor"
 
     @classmethod
     def definition_from_xml(cls, xml_object, system):

@@ -5,28 +5,16 @@ hints, answers, and assessment judgment (currently only correct/incorrect).
 Parses xml definition file--see below for exact format.
 """
 
-import copy
-from fs.errors import ResourceNotFoundError
-import itertools
 import json
 import logging
 from lxml import etree
-from lxml.html import rewrite_links
-from path import path
-import os
-import sys
-import hashlib
 import capa.xqueue_interface as xqueue_interface
 
-from pkg_resources import resource_string
-
-from .capa_module import only_one, ComplexEncoder
-from .editing_module import EditingDescriptor
-from .html_checker import check_html
-from progress import Progress
-from .stringify import stringify_children
-from .xml_module import XmlDescriptor
-from xmodule.modulestore import Location
+from xmodule.capa_module import  ComplexEncoder
+from xmodule.editing_module import EditingDescriptor
+from xmodule.progress import Progress
+from xmodule.stringify import stringify_children
+from xmodule.xml_module import XmlDescriptor
 from capa.util import *
 import openendedchild
 
@@ -688,9 +676,6 @@ class OpenEndedDescriptor(XmlDescriptor, EditingDescriptor):
     stores_state = True
     has_score = True
     template_dir_name = "openended"
-
-    js = {'coffee': [resource_string(__name__, 'js/src/html/edit.coffee')]}
-    js_module_name = "HTMLEditingDescriptor"
 
     @classmethod
     def definition_from_xml(cls, xml_object, system):
