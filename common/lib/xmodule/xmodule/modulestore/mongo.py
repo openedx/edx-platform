@@ -29,6 +29,8 @@ class CachingDescriptorSystem(MakoDescriptorSystem):
     """
     A system that has a cache of module json that it will use to load modules
     from, with a backup of calling to the underlying modulestore for more data
+    TODO (cdodge) when the 'split module store' work has been completed we can remove all
+    references to metadata_inheritance_tree
     """
     def __init__(self, modulestore, module_data, default_class, resources_fs,
                  error_tracker, render_template, metadata_inheritance_tree = None):
@@ -153,6 +155,9 @@ class MongoModuleStore(ModuleStoreBase):
         self.metadata_inheritance_cache = {}
 
     def get_metadata_inheritance_tree(self, location):
+        '''
+        TODO (cdodge) This method can be deleted when the 'split module store' work has been completed
+        '''
         
         # get all collections in the course, this query should not return any leaf nodes
         query = { '_id.org' : location.org,
@@ -207,6 +212,9 @@ class MongoModuleStore(ModuleStoreBase):
         return cache
 
     def get_cached_metadata_inheritance_tree(self, location, max_age_allowed):
+        '''
+        TODO (cdodge) This method can be deleted when the 'split module store' work has been completed
+        '''
         cache_name = '{0}/{1}'.format(location.org, location.course)
         cache = self.metadata_inheritance_cache.get(cache_name,{'parent_metadata': {}, 
             'timestamp': datetime.now() - timedelta(hours=1)})
@@ -274,6 +282,8 @@ class MongoModuleStore(ModuleStoreBase):
 
         resource_fs = OSFS(root)
 
+        # TODO (cdodge): When the 'split module store' work has been completed, we should remove
+        # the 'metadata_inheritance_tree' parameter
         system = CachingDescriptorSystem(
             self,
             data_cache,
