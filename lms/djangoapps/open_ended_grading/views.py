@@ -11,7 +11,8 @@ from django.core.urlresolvers import reverse
 from student.models import unique_id_for_user
 from courseware.courses import get_course_with_access
 
-from controller_query_service import ControllerQueryService
+from xmodule.x_module import ModuleSystem
+from xmodule.open_ended_grading_classes.controller_query_service import ControllerQueryService, convert_seconds_to_human_readable
 from xmodule.open_ended_grading_classes.grading_service_module import GradingServiceError
 import json
 from student.models import unique_id_for_user
@@ -22,13 +23,13 @@ from xmodule.modulestore.django import modulestore
 from xmodule.modulestore import search
 
 from django.http import HttpResponse, Http404, HttpResponseRedirect
-import open_ended_grading_util
 
 log = logging.getLogger(__name__)
 
 template_imports = {'urllib': urllib}
 
-controller_qs = ControllerQueryService(settings.OPEN_ENDED_GRADING_INTERFACE)
+system = ModuleSystem(None, None, None, render_to_string, None)
+controller_qs = ControllerQueryService(settings.OPEN_ENDED_GRADING_INTERFACE, system)
 
 """
 Reverses the URL from the name and the course id, and then adds a trailing slash if
@@ -158,7 +159,7 @@ def student_problem_list(request, course_id):
             eta_string = "N/A"
             if eta_available:
                 try:
-                    eta_string = open_ended_grading_util.convert_seconds_to_human_readable(int(problem_list[i]['eta']))
+                    eta_string = convert_seconds_to_human_readable(int(problem_list[i]['eta']))
                 except:
                     #This is a student_facing_error
                     eta_string = "Error getting ETA."

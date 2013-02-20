@@ -1,7 +1,6 @@
 import logging
 from xmodule.open_ended_grading_classes.grading_service_module import GradingService
 
-from xmodule.x_module import ModuleSystem
 from mitxmako.shortcuts import render_to_string
 
 log = logging.getLogger(__name__)
@@ -11,8 +10,9 @@ class ControllerQueryService(GradingService):
     """
     Interface to staff grading backend.
     """
-    def __init__(self, config):
-        config['system'] = ModuleSystem(None, None, None, render_to_string, None)
+    def __init__(self, config, system):
+        config['system'] = system
+        #ModuleSystem(None, None, None, render_to_string, None)
         super(ControllerQueryService, self).__init__(config)
         self.url = config['url'] + config['grading_controller']
         self.login_url = self.url + '/login/'
@@ -77,3 +77,16 @@ class ControllerQueryService(GradingService):
 
         response = self.post(self.take_action_on_flags_url, params)
         return response
+
+def convert_seconds_to_human_readable(seconds):
+    if seconds < 60:
+        human_string = "{0} seconds".format(seconds)
+    elif seconds < 60 * 60:
+        human_string = "{0} minutes".format(round(seconds/60,1))
+    elif seconds < (24*60*60):
+        human_string = "{0} hours".format(round(seconds/(60*60),1))
+    else:
+        human_string = "{0} days".format(round(seconds/(60*60*24),1))
+
+    eta_string = "{0}".format(human_string)
+    return eta_string

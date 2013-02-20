@@ -23,6 +23,7 @@ from xmodule.xml_module import XmlDescriptor
 from xmodule.modulestore import Location
 from capa.util import *
 from peer_grading_service import PeerGradingService
+import controller_query_service
 
 from datetime import datetime
 
@@ -106,8 +107,10 @@ class OpenEndedChild(object):
         # completion (doesn't matter if you self-assessed correct/incorrect).
         self._max_score = static_data['max_score']
         self.peer_gs = PeerGradingService(system.open_ended_grading_interface, system)
+        self.controller_qs = controller_query_service.ControllerQueryService(system.open_ended_grading_interface,system)
 
         self.system = system
+        self.location = location
         self.setup_response(system, location, definition, descriptor)
 
     def setup_response(self, system, location, definition, descriptor):
@@ -445,4 +448,14 @@ class OpenEndedChild(object):
             #This is a student_facing_error
             error_message = error_string.format(count_required-count_graded, count_graded, count_required, student_sub_count)
             return success, allowed_to_submit, error_message
+
+    def get_eta(self):
+        response = self.controller_qs.check_for_eta(self.location.url())
+        try:
+            response = json.loads(response)
+        except:
+            pass
+
+        
+
 
