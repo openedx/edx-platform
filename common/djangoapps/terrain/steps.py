@@ -1,8 +1,6 @@
 from lettuce import world, step
 from factories import *
-from django.core.management import call_command
 from lettuce.django import django_url
-from django.conf import settings
 from django.contrib.auth.models import User
 from student.models import CourseEnrollment
 from urllib import quote_plus
