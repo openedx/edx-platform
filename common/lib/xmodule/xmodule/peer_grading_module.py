@@ -1,33 +1,12 @@
-"""
-This module provides an interface on the grading-service backend
-for peer grading
-
-Use peer_grading_service() to get the version specified
-in settings.PEER_GRADING_INTERFACE
-
-"""
 import json
 import logging
-import requests
-import sys
 
-from django.conf import settings
-
-from combined_open_ended_rubric import CombinedOpenEndedRubric
 from lxml import etree
 
-import copy
-import itertools
-import json
-import logging
 from datetime import datetime
-from lxml.html import rewrite_links
-import os
 from pkg_resources import resource_string
-from .capa_module import only_one, ComplexEncoder
+from .capa_module import  ComplexEncoder
 from .editing_module import EditingDescriptor
-from .html_checker import check_html
-from progress import Progress
 from .stringify import stringify_children
 from .x_module import XModule
 from .xml_module import XmlDescriptor
@@ -35,7 +14,7 @@ from xmodule.modulestore import Location
 from xmodule.modulestore.django import modulestore
 from timeinfo import TimeInfo
 
-from peer_grading_service import peer_grading_service, GradingServiceError
+from xmodule.open_ended_grading_classes.peer_grading_service import PeerGradingService, GradingServiceError
 
 log = logging.getLogger(__name__)
 
@@ -72,7 +51,7 @@ class PeerGradingModule(XModule):
         #We need to set the location here so the child modules can use it
         system.set('location', location)
         self.system = system
-        self.peer_gs = peer_grading_service(self.system)
+        self.peer_gs = PeerGradingService(self.system.open_ended_grading_interface, self.system)
 
 
         self.use_for_single_location = self.metadata.get('use_for_single_location', USE_FOR_SINGLE_LOCATION)
@@ -170,7 +149,7 @@ class PeerGradingModule(XModule):
 
     def query_data_for_location(self):
         student_id = self.system.anonymous_student_id
-        location = self.system.location
+        location = self.link_to_location
         success = False
         response = {}
 
@@ -199,7 +178,7 @@ class PeerGradingModule(XModule):
             success, response = self.query_data_for_location()
             if not success:
                 log.exception("No instance data found and could not get data from controller for loc {0} student {1}".format(
-                    self.system.location, self.system.anonymous_student_id
+                    self.system.location.url(), self.system.anonymous_student_id
                 ))
                 return None
             count_graded = response['count_graded']

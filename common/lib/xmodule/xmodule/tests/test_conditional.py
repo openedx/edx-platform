@@ -84,18 +84,21 @@ class ConditionalModuleTest(unittest.TestCase):
                 descriptor = self.modulestore.get_instance(course.id, location, depth=None)
             location = descriptor.location
             instance_state = instance_states.get(location.category, None)
-            print "inner_get_module, location.category=%s, inst_state=%s" % (location.category, instance_state)
+            print "inner_get_module, location=%s, inst_state=%s" % (location, instance_state)
             return descriptor.xmodule_constructor(test_system)(instance_state, shared_state)
 
         location = Location(["i4x", "edX", "cond_test", "conditional", "condone"])
-        module = inner_get_module(location)
 
         def replace_urls(text, staticfiles_prefix=None, replace_prefix='/static/', course_namespace=None):
             return text
         test_system.replace_urls = replace_urls
         test_system.get_module = inner_get_module
 
+        module = inner_get_module(location)
         print "module: ", module
+        print "module definition: ", module.definition
+        print "module children: ", module.get_children()
+        print "module display items (children): ", module.get_display_items()
 
         html = module.get_html()
         print "html type: ", type(html)

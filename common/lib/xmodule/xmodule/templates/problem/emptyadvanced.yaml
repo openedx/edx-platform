@@ -1,0 +1,13 @@
+---
+metadata:
+    display_name: Blank Advanced Problem
+    rerandomize: never
+    showanswer: always
+    weight: ""
+    attempts: ""
+    empty: True
+data: |
+  <problem>
+  </problem>
+
+children: []

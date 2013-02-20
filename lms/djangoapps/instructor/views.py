@@ -386,6 +386,46 @@ def instructor_dashboard(request, course_id):
             track.views.server_track(request, 'remove-instructor {0}'.format(user), {}, page='idashboard')
 
     #----------------------------------------
+    # DataDump
+
+    elif 'Download CSV of all student profile data' in action:
+        enrolled_students = User.objects.filter(courseenrollment__course_id=course_id).order_by('username').select_related("profile")
+        profkeys = ['name', 'language', 'location', 'year_of_birth', 'gender', 'level_of_education',
+                    'mailing_address', 'goals']
+        datatable = {'header': ['username', 'email'] + profkeys}
+        def getdat(u):
+            p = u.profile
+            return [u.username, u.email] + [getattr(p,x,'') for x in profkeys]
+        
+        datatable['data'] = [getdat(u) for u in enrolled_students]
+        datatable['title'] = 'Student profile data for course %s' % course_id
+        return return_csv('profiledata_%s.csv' % course_id, datatable)
+
+
+    elif 'Download CSV of all responses to problem' in action:
+        problem_to_dump = request.POST.get('problem_to_dump','')
+
+        if problem_to_dump[-4:]==".xml":
+            problem_to_dump=problem_to_dump[:-4]
+        try:
+            (org, course_name, run)=course_id.split("/")
+            module_state_key="i4x://"+org+"/"+course_name+"/problem/"+problem_to_dump
+            smdat = StudentModule.objects.filter(course_id=course_id,
+                                                 module_state_key=module_state_key)
+            smdat = smdat.order_by('student')
+            msg += "Found %d records to dump " % len(smdat)
+        except Exception as err:
+            msg+="<font color='red'>Couldn't find module with that urlname.  </font>"
+            msg += "<pre>%s</pre>" % escape(err)
+            smdat = []
+        
+        if smdat:
+            datatable = {'header': ['username', 'state']}
+            datatable['data'] = [ [x.student.username, x.state] for x in smdat ]
+            datatable['title'] = 'Student state for problem %s' % problem_to_dump
+            return return_csv('student_state_from_%s.csv' % problem_to_dump, datatable)
+
+    #----------------------------------------
     # Group management
 
     elif 'List beta testers' in action:

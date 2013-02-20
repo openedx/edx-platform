@@ -2,7 +2,6 @@
 
 import logging
 import urllib
-import re
 
 from django.conf import settings
 from django.views.decorators.cache import cache_control
@@ -13,12 +12,10 @@ from student.models import unique_id_for_user
 from courseware.courses import get_course_with_access
 
 from controller_query_service import ControllerQueryService
-from xmodule.grading_service_module import GradingServiceError
+from xmodule.open_ended_grading_classes.grading_service_module import GradingServiceError
 import json
-from .staff_grading import StaffGrading
 from student.models import unique_id_for_user
 
-import open_ended_util
 import open_ended_notifications
 
 from xmodule.modulestore.django import modulestore
@@ -30,8 +27,7 @@ log = logging.getLogger(__name__)
 
 template_imports = {'urllib': urllib}
 
-controller_url = open_ended_util.get_controller_url()
-controller_qs = ControllerQueryService(controller_url)
+controller_qs = ControllerQueryService(settings.OPEN_ENDED_GRADING_INTERFACE)
 
 """
 Reverses the URL from the name and the course id, and then adds a trailing slash if
