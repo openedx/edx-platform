@@ -45,6 +45,19 @@ def create_new_entries(step):
 def they_are_alphabetized(step):
     assert_policy_entries(["a", "display_name", "z"], ['"zebra"', '"Robot Super Course"', '"apple"'])
 
+@step('I create a JSON object$')
+def create_JSON_object(step):
+    create_entry("json", '{"key": "value", "key_2": "value_2"}')
+    click_save()
+
+@step('it is displayed as formatted$')
+def it_is_formatted(step):
+    assert_policy_entries(["display_name", "json"], ['"Robot Super Course"', '{\n    "key": "value",\n    "key_2": "value_2"\n}'])
+
+# TODO: this is copied from terrain's step.py. Need to figure out how to share that code.
+@step('I reload the page$')
+def reload_the_page(step):
+    world.browser.reload()
 
 def create_entry(key, value):
     css_click_at('a.new-advanced-policy-item')
@@ -53,7 +66,8 @@ def create_entry(key, value):
 #   For some reason have to get the instance for each command (get error that it is no longer attached to the DOM)
 #   Have to do all this because Selenium has a bug that fill does not remove existing text
     css_find('.CodeMirror textarea').last.double_click()
-    css_find('.CodeMirror textarea').last._element.send_keys(Keys.ARROW_LEFT)
+    css_find('.CodeMirror textarea').last._element.send_keys(Keys.BACK_SPACE)
+    css_find('.CodeMirror textarea').last._element.send_keys(Keys.BACK_SPACE)
     css_find('.CodeMirror textarea').last.fill(value)
 
 

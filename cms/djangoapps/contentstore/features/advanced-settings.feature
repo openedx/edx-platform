@@ -22,3 +22,9 @@ Feature: Advanced (manual) course policy
     Then they are alphabetized
     And I reload the page
     Then they are alphabetized
+
+  Scenario: Test how multi-line input appears
+    Given I have opened a new course in Studio
+    When I select the Advanced Settings
+    And I create a JSON object
+    Then it is displayed as formatted
