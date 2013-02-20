@@ -33,7 +33,7 @@ from xmodule_modifiers import replace_course_urls, replace_static_urls, add_hist
 from xmodule.modulestore.exceptions import ItemNotFoundError
 from statsd import statsd
 
-log = logging.getLogger("mitx.courseware")
+log = logging.getLogger(__name__)
 
 
 if settings.XQUEUE_INTERFACE.get('basic_auth') is not None:
@@ -280,6 +280,7 @@ def _get_module(user, request, descriptor, student_module_cache, course_id,
         # Make an error module
         return err_descriptor.xmodule_constructor(system)(None, None)
 
+    system.set('user_is_staff', has_access(user, descriptor.location, 'staff', course_id))
     _get_html = module.get_html
 
     if wrap_xmodule_display == True:

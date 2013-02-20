@@ -26,10 +26,6 @@ metadata:
             
             ( ) The vegetable peeler
             
-            ( ) Android
-            
-            ( ) The Beatles
-            
             
        [explanation]
        The release of the iPod allowed consumers to carry their entire music library with them in a 
@@ -51,8 +47,6 @@ data: |
            <choice correct="false" name="beatles">Napster</choice>
            <choice correct="true" name="ipod">The iPod</choice>
            <choice correct="false" name="peeler">The vegetable peeler</choice>
-           <choice correct="false" name="android">Android</choice>
-           <choice correct="false" name="beatles">The Beatles</choice>
         </choicegroup>
        </multiplechoiceresponse>
        <solution>

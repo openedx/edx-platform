@@ -413,7 +413,7 @@ def instructor_dashboard(request, course_id):
             smdat = StudentModule.objects.filter(course_id=course_id,
                                                  module_state_key=module_state_key)
             smdat = smdat.order_by('student')
-            msg+="Found module to reset.  "
+            msg += "Found %d records to dump " % len(smdat)
         except Exception as err:
             msg+="<font color='red'>Couldn't find module with that urlname.  </font>"
             msg += "<pre>%s</pre>" % escape(err)

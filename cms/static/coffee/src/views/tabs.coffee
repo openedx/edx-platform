@@ -1,6 +1,4 @@
 class CMS.Views.TabsEdit extends Backbone.View
-  events:
-    'click .new-tab': 'addNewTab'
 
   initialize: =>
     @$('.component').each((idx, element) =>
@@ -13,6 +11,7 @@ class CMS.Views.TabsEdit extends Backbone.View
         )
     )
 
+    @options.mast.find('.new-tab').on('click', @addNewTab)
     @$('.components').sortable(
       handle: '.drag-handle'
       update: @tabMoved

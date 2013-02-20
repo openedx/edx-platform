@@ -53,8 +53,6 @@ class SelfAssessmentModule(openendedchild.OpenEndedChild):
         @param descriptor: SelfAssessmentDescriptor
         @return: None
         """
-        self.submit_message = definition['submitmessage']
-        self.hint_prompt = definition['hintprompt']
         self.prompt = stringify_children(self.prompt)
         self.rubric = stringify_children(self.rubric)
 
@@ -76,8 +74,6 @@ class SelfAssessmentModule(openendedchild.OpenEndedChild):
             'previous_answer': previous_answer,
             'ajax_url': system.ajax_url,
             'initial_rubric': self.get_rubric_html(system),
-            'initial_hint': "",
-            'initial_message': self.get_message_html(),
             'state': self.state,
             'allow_reset': self._allow_reset(),
             'child_type': 'selfassessment',
@@ -108,7 +104,6 @@ class SelfAssessmentModule(openendedchild.OpenEndedChild):
         if dispatch not in handlers:
             return 'Error'
 
-        log.debug(get)
         before = self.get_progress()
         d = handlers[dispatch](get, system)
         after = self.get_progress()
@@ -126,7 +121,9 @@ class SelfAssessmentModule(openendedchild.OpenEndedChild):
             return ''
 
         rubric_renderer = CombinedOpenEndedRubric(system, False)
-        success, rubric_html = rubric_renderer.render_rubric(self.rubric)
+        rubric_dict = rubric_renderer.render_rubric(self.rubric)
+        success = rubric_dict['success']
+        rubric_html = rubric_dict['html']
 
         # we'll render it
         context = {'rubric': rubric_html,
@@ -156,8 +153,7 @@ class SelfAssessmentModule(openendedchild.OpenEndedChild):
         else:
             hint = ''
 
-        context = {'hint_prompt': self.hint_prompt,
-                   'hint': hint}
+        context = {'hint': hint}
 
         if self.state == self.POST_ASSESSMENT:
             context['read_only'] = False
@@ -167,15 +163,6 @@ class SelfAssessmentModule(openendedchild.OpenEndedChild):
             raise ValueError("Illegal state '%r'" % self.state)
 
         return system.render_template('self_assessment_hint.html', context)
-
-    def get_message_html(self):
-        """
-        Return the appropriate version of the message view, based on state.
-        """
-        if self.state != self.DONE:
-            return ""
-
-        return """<div class="save_message">{0}</div>""".format(self.submit_message)
 
 
     def save_answer(self, get, system):
@@ -235,15 +222,19 @@ class SelfAssessmentModule(openendedchild.OpenEndedChild):
 
         try:
             score = int(get['assessment'])
+            score_list = get.getlist('score_list[]')
+            for i in xrange(0,len(score_list)):
+                score_list[i] = int(score_list[i])
         except ValueError:
-            return {'success': False, 'error': "Non-integer score value"}
+            return {'success': False, 'error': "Non-integer score value, or no score list"}
 
+        #Record score as assessment and rubric scores as post assessment
         self.record_latest_score(score)
+        self.record_latest_post_assessment(json.dumps(score_list))
 
         d = {'success': True, }
 
         self.change_state(self.DONE)
-        d['message_html'] = self.get_message_html()
         d['allow_reset'] = self._allow_reset()
 
         d['state'] = self.state
@@ -251,6 +242,7 @@ class SelfAssessmentModule(openendedchild.OpenEndedChild):
 
     def save_hint(self, get, system):
         '''
+        Not used currently, as hints have been removed from the system.
         Save the hint.
         Returns a dict { 'success': bool,
                          'message_html': message_html,
@@ -268,8 +260,17 @@ class SelfAssessmentModule(openendedchild.OpenEndedChild):
         self.change_state(self.DONE)
 
         return {'success': True,
-                'message_html': self.get_message_html(),
+                'message_html': '',
                 'allow_reset': self._allow_reset()}
+
+    def latest_post_assessment(self, system):
+        latest_post_assessment =  super(SelfAssessmentModule, self).latest_post_assessment(system)
+        try:
+            rubric_scores = json.loads(latest_post_assessment)
+        except:
+            log.error("Cannot parse rubric scores in self assessment module from {0}".format(latest_post_assessment))
+            rubric_scores = []
+        return [rubric_scores]
 
 
 class SelfAssessmentDescriptor(XmlDescriptor, EditingDescriptor):
@@ -299,7 +300,7 @@ class SelfAssessmentDescriptor(XmlDescriptor, EditingDescriptor):
         'hintprompt': 'some-html'
         }
         """
-        expected_children = ['submitmessage', 'hintprompt']
+        expected_children = []
         for child in expected_children:
             if len(xml_object.xpath(child)) != 1:
                 raise ValueError("Self assessment definition must include exactly one '{0}' tag".format(child))
@@ -308,9 +309,7 @@ class SelfAssessmentDescriptor(XmlDescriptor, EditingDescriptor):
             """Assumes that xml_object has child k"""
             return stringify_children(xml_object.xpath(k)[0])
 
-        return {'submitmessage': parse('submitmessage'),
-                'hintprompt': parse('hintprompt'),
-        }
+        return {}
 
     def definition_to_xml(self, resource_fs):
         '''Return an xml element representing this definition.'''
@@ -321,7 +320,7 @@ class SelfAssessmentDescriptor(XmlDescriptor, EditingDescriptor):
             child_node = etree.fromstring(child_str)
             elt.append(child_node)
 
-        for child in ['submitmessage', 'hintprompt']:
+        for child in []:
             add_child(child)
 
         return elt

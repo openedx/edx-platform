@@ -38,4 +38,4 @@ MITX_FEATURES['STUB_VIDEO_FOR_TESTING'] = True
 
 # Include the lettuce app for acceptance testing, including the 'harvest' django-admin command
 INSTALLED_APPS += ('lettuce.django',)
-LETTUCE_APPS = ('portal',)  # dummy app covers the home page, login, registration, and course enrollment
+LETTUCE_APPS = ('courseware',)

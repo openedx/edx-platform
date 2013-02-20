@@ -214,11 +214,20 @@ class ContentStoreToyCourseTest(ModuleStoreTestCase):
         fs = OSFS(root_dir / 'test_export/policies/6.002_Spring_2012')
         self.assertTrue(fs.exists('grading_policy.json'))
 
+        course = ms.get_item(location)
         # compare what's on disk compared to what we have in our course
         with fs.open('grading_policy.json','r') as grading_policy:
-            on_disk = loads(grading_policy.read())
-            course = ms.get_item(location)
+            on_disk = loads(grading_policy.read())    
             self.assertEqual(on_disk, course.definition['data']['grading_policy'])
+
+        #check for policy.json
+        self.assertTrue(fs.exists('policy.json'))
+
+        # compare what's on disk to what we have in the course module
+        with fs.open('policy.json','r') as course_policy:
+            on_disk = loads(course_policy.read())
+            self.assertIn('course/6.002_Spring_2012', on_disk)
+            self.assertEqual(on_disk['course/6.002_Spring_2012'], course.metadata)
 
         # remove old course
         delete_course(ms, cs, location)
@@ -333,7 +342,7 @@ class ContentStoreTest(ModuleStoreTestCase):
         # Create a course so there is something to view
         resp = self.client.get(reverse('index'))
         self.assertContains(resp,
-            '<h1>My Courses</h1>',
+            '<h1 class="title-1">My Courses</h1>',
             status_code=200,
             html=True)
 
@@ -369,7 +378,7 @@ class ContentStoreTest(ModuleStoreTestCase):
 
         resp = self.client.get(reverse('course_index', kwargs=data))
         self.assertContains(resp,
-            '<a href="/MITx/999/course/Robot_Super_Course" class="class-name">Robot Super Course</a>',
+            '<article class="courseware-overview" data-course-id="i4x://MITx/999/course/Robot_Super_Course">',
             status_code=200,
             html=True)
 
@@ -392,11 +401,11 @@ class ContentStoreTest(ModuleStoreTestCase):
 
     def test_capa_module(self):
         """Test that a problem treats markdown specially."""
-        CourseFactory.create(org='MITx', course='999', display_name='Robot Super Course')
+        course = CourseFactory.create(org='MITx', course='999', display_name='Robot Super Course')
 
         problem_data = {
             'parent_location': 'i4x://MITx/999/course/Robot_Super_Course',
-            'template': 'i4x://edx/templates/problem/Empty'
+            'template': 'i4x://edx/templates/problem/Blank_Common_Problem'
             }
 
         resp = self.client.post(reverse('clone_item'), problem_data)
@@ -420,7 +429,7 @@ class TemplateTestCase(ModuleStoreTestCase):
 
         # insert a bogus template in the store
         bogus_template_location = Location('i4x', 'edx', 'templates', 'html', 'bogus')
-        source_template_location = Location('i4x', 'edx', 'templates', 'html', 'Empty')
+        source_template_location = Location('i4x', 'edx', 'templates', 'html', 'Blank_HTML_Page')
         
         ms.clone_item(source_template_location, bogus_template_location)
 

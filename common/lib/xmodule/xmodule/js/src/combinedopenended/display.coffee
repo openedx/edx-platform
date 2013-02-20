@@ -4,11 +4,11 @@ class @Rubric
   # finds the scores for each rubric category
   @get_score_list: () =>
     # find the number of categories:
-    num_categories = $('table.rubric tr').length
+    num_categories = $('.rubric-category').length
 
     score_lst = []
     # get the score for each one
-    for i in [0..(num_categories-2)]
+    for i in [0..(num_categories-1)]
       score = $("input[name='score-selection-#{i}']:checked").val()
       score_lst.push(score)
 
@@ -23,9 +23,8 @@ class @Rubric
 
   @check_complete: () ->
      # check to see whether or not any categories have not been scored
-    num_categories = $('table.rubric tr').length
-    # -2 because we want to skip the header
-    for i in [0..(num_categories-2)]
+    num_categories = $('.rubric-category').length
+    for i in [0..(num_categories-1)]
       score = $("input[name='score-selection-#{i}']:checked").val()
       if score == undefined
         return false
@@ -52,9 +51,13 @@ class @CombinedOpenEnded
     @reset_button.click @reset
     @next_problem_button = @$('.next-step-button')
     @next_problem_button.click @next_problem
+    @status_container = @$('.status-elements')
 
     @show_results_button=@$('.show-results-button')
     @show_results_button.click @show_results
+
+    @question_header = @$('.question-header')
+    @question_header.click @collapse_question
 
     # valid states: 'initial', 'assessing', 'post_assessment', 'done'
     Collapsible.setCollapsibles(@el)
@@ -62,12 +65,16 @@ class @CombinedOpenEnded
     @submit_evaluation_button.click @message_post
 
     @results_container = $('.result-container')
+    @combined_rubric_container = $('.combined-rubric-container')
+
+    @legend_container= $('.legend-container')
+    @show_legend_current()
 
     # Where to put the rubric once we load it
     @el = $(element).find('section.open-ended-child')
     @errors_area = @$('.error')
     @answer_area = @$('textarea.answer')
-
+    @prompt_container = @$('.prompt')
     @rubric_wrapper = @$('.rubric-wrapper')
     @hint_wrapper = @$('.hint-wrapper')
     @message_wrapper = @$('.message-wrapper')
@@ -82,10 +89,19 @@ class @CombinedOpenEnded
     @can_upload_files = false
     @open_ended_child= @$('.open-ended-child')
 
+    if @task_number>1
+      @prompt_hide()
+    else if @task_number==1 and @child_state!='initial'
+      @prompt_hide()
+
     @find_assessment_elements()
     @find_hint_elements()
 
     @rebind()
+
+    if @task_number>1
+      @show_combined_rubric_current()
+      @show_results_current()
 
   # locally scoped jquery.
   $: (selector) ->
@@ -102,7 +118,7 @@ class @CombinedOpenEnded
         Collapsible.setCollapsibles(@results_container)
 
   show_results: (event) =>
-    status_item = $(event.target).parent().parent()
+    status_item = $(event.target).parent()
     status_number = status_item.data('status-number')
     data = {'task_number' : status_number}
     $.postWithPrefix "#{@ajax_url}/get_results", data, (response) =>
@@ -114,6 +130,27 @@ class @CombinedOpenEnded
         Collapsible.setCollapsibles(@results_container)
       else
         @gentle_alert response.error
+
+  show_combined_rubric_current: () =>
+    data = {}
+    $.postWithPrefix "#{@ajax_url}/get_combined_rubric", data, (response) =>
+      if response.success
+        @combined_rubric_container.after(response.html).remove()
+        @combined_rubric_container= $('div.combined_rubric_container')
+
+  show_status_current: () =>
+    data = {}
+    $.postWithPrefix "#{@ajax_url}/get_status", data, (response) =>
+      if response.success
+        @status_container.after(response.html).remove()
+        @status_container= $('.status-elements')
+
+  show_legend_current: () =>
+    data = {}
+    $.postWithPrefix "#{@ajax_url}/get_legend", data, (response) =>
+      if response.success
+        @legend_container.after(response.html).remove()
+        @legend_container= $('.legend-container')
 
   message_post: (event)=>
     Logger.log 'message_post', @answers
@@ -156,6 +193,11 @@ class @CombinedOpenEnded
     @next_problem_button.hide()
     @hide_file_upload()
     @hint_area.attr('disabled', false)
+    if @task_number>1 or @child_state!='initial'
+      @show_status_current()
+
+    if @task_number==1 and @child_state=='assessing'
+      @prompt_hide()
     if @child_state == 'done'
       @rubric_wrapper.hide()
     if @child_type=="openended"
@@ -257,7 +299,8 @@ class @CombinedOpenEnded
     event.preventDefault()
     if @child_state == 'assessing' && Rubric.check_complete()
       checked_assessment = Rubric.get_total_score()
-      data = {'assessment' : checked_assessment}
+      score_list = Rubric.get_score_list()
+      data = {'assessment' : checked_assessment, 'score_list' : score_list}
       $.postWithPrefix "#{@ajax_url}/save_assessment", data, (response) =>
         if response.success
           @child_state = response.state
@@ -267,7 +310,6 @@ class @CombinedOpenEnded
             @find_hint_elements()
           else if @child_state == 'done'
             @rubric_wrapper.hide()
-            @message_wrapper.html(response.message_html)
 
           @rebind()
         else
@@ -367,13 +409,13 @@ class @CombinedOpenEnded
         window.queuePollerID = window.setTimeout(@poll, 10000)
 
   setup_file_upload: =>
-    if window.File and window.FileReader and window.FileList and window.Blob
-        if @accept_file_upload == "True"
-          @can_upload_files = true
-          @file_upload_area.html('<input type="file" class="file-upload-box">')
-          @file_upload_area.show()
-    else
-      @gentle_alert 'File uploads are required for this question, but are not supported in this browser. Try the newest version of google chrome.  Alternatively, if you have uploaded the image to the web, you can paste a link to it into the answer box.'
+    if @accept_file_upload == "True"
+      if window.File and window.FileReader and window.FileList and window.Blob
+        @can_upload_files = true
+        @file_upload_area.html('<input type="file" class="file-upload-box">')
+        @file_upload_area.show()
+      else
+        @gentle_alert 'File uploads are required for this question, but are not supported in this browser. Try the newest version of google chrome.  Alternatively, if you have uploaded the image to the web, you can paste a link to it into the answer box.'
 
   hide_file_upload: =>
     if @accept_file_upload == "True"
@@ -390,3 +432,26 @@ class @CombinedOpenEnded
   # wrap this so that it can be mocked
   reload: ->
     location.reload()
+
+  collapse_question: () =>
+    @prompt_container.slideToggle()
+    @prompt_container.toggleClass('open')
+    if @question_header.text() == "(Hide)"
+      new_text = "(Show)"
+    else
+      new_text = "(Hide)"
+    @question_header.text(new_text)
+
+  prompt_show: () =>
+    if @prompt_container.is(":hidden")==true
+      @prompt_container.slideToggle()
+      @prompt_container.toggleClass('open')
+      @question_header.text("(Hide)")
+
+  prompt_hide: () =>
+    if @prompt_container.is(":visible")==true
+      @prompt_container.slideToggle()
+      @prompt_container.toggleClass('open')
+      @question_header.text("(Show)")
+
+
