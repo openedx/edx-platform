@@ -21,6 +21,11 @@ def wait(step, seconds):
     time.sleep(float(seconds))
 
 
+@step('I reload the page$')
+def reload_the_page(step):
+    world.browser.reload()
+
+
 @step('I (?:visit|access|open) the homepage$')
 def i_visit_the_homepage(step):
     world.browser.visit(django_url('/'))
