@@ -121,10 +121,6 @@ def id_find(id):
     return world.browser.find_by_id(id)
 
 
-def reload():
-    return world.browser.reload()
-
-
 def clear_courses():
     flush_xmodule_store()
 
