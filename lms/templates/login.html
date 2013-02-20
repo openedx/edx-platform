@@ -33,14 +33,19 @@
 
   <script type="text/javascript">
     (function() {
-     $(document).delegate('#login-form', 'ajax:success', function(data, json, xhr) {
-       if(json.success) {
-         location.href="${reverse('dashboard')}";
+      $(document).delegate('#login-form', 'ajax:success', function(data, json, xhr) {
+        if(json.success) {
+          var u=decodeURI(window.location.search);
+          next=u.split("next=")[1]
+          if (next) {
+            location.href=next
+          }  else {
+            location.href="${reverse('dashboard')}";
+          }
        }
       });
     })(this)
   </script>
-
 
 </%block>
 
