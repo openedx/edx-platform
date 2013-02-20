@@ -147,6 +147,7 @@ def add_section(name='My Section'):
     span_css = 'span.section-name-span'
     assert_true(world.browser.is_element_present_by_css(span_css, 5))
 
+
 def add_subsection(name='Subsection One'):
     css = 'a.new-subsection-item'
     css_click(css)
