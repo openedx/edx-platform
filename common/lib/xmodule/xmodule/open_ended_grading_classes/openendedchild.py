@@ -99,6 +99,7 @@ class OpenEndedChild(object):
         self.accept_file_upload = static_data['accept_file_upload']
         self.close_date = static_data['close_date']
         self.s3_interface = static_data['s3_interface']
+        self.skip_basic_checks = static_data['skip_basic_checks']
         self.system = system
 
         # Used for progress / grading.  Currently get credit just for

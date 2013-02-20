@@ -51,6 +51,7 @@ class SelfAssessmentTest(unittest.TestCase):
                 'close_date': None,
                 's3_interface' : test_util_open_ended.S3_INTERFACE,
                 'open_ended_grading_interface' : test_util_open_ended.OPEN_ENDED_GRADING_INTERFACE,
+                'skip_basic_checks' : False,
                 }
 
         self.module = SelfAssessmentModule(test_system, self.location,
