@@ -18,7 +18,6 @@ import logging
 import math
 import numpy
 import os
-import random
 import re
 import struct
 import sys
@@ -437,49 +436,42 @@ class LoncapaProblem(object):
 
         Problem XML goes to Python execution context. Runs everything in script tags.
         '''
-        random.seed(self.seed)
-
         context = {}
         context['seed'] = self.seed
-        context['script_code'] = ''
+        all_code = ''
 
-        self._execute_scripts(tree.findall('.//script'), context)
+        python_path = []
 
-        return context
-
-    def _execute_scripts(self, scripts, context):
-        '''
-        Executes scripts in the given context.
-        '''
-        original_path = sys.path
-
-        for script in scripts:
-            sys.path = original_path + self._extract_system_path(script)
+        for script in tree.findall('.//script'):
 
             stype = script.get('type')
-
             if stype:
                 if 'javascript' in stype:
                     continue    # skip javascript
                 if 'perl' in stype:
                     continue        # skip perl
             # TODO: evaluate only python
+
+            python_path.extend(self._extract_system_path(script))
+
             code = script.text
             XMLESC = {"&apos;": "'", "&quot;": '"'}
             code = unescape(code, XMLESC)
-            # store code source in context
-            context['script_code'] += code
+            all_code += code
+
+        if all_code:
             try:
-                # use "context" for global context; thus defs in code are global within code
                 locals_dict = {}
-                safe_exec.safe_exec(code, context, locals_dict)
+                safe_exec.safe_exec(all_code, context, locals_dict, random_seed=self.seed)
                 context.update(locals_dict)
             except Exception as err:
-                log.exception("Error while execing script code: " + code)
+                log.exception("Error while execing script code: " + all_code)
                 msg = "Error while executing script code: %s" % str(err).replace('<', '&lt;')
                 raise responsetypes.LoncapaProblemError(msg)
-            finally:
-                sys.path = original_path
+
+        # store code source in context
+        context['script_code'] = all_code
+        return context
 
 
 
