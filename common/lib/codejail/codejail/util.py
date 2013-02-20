@@ -49,3 +49,23 @@ class ModuleIsolation(object):
         # and delete them all so another import will run code for real again.
         for m in new_mods:
             del sys.modules[m]
+
+
+class ChangeDirectory(object):
+    def __init__(self, new_dir):
+        self.old_dir = os.getcwd()
+        os.chdir(new_dir)
+
+    def clean_up(self):
+        os.chdir(self.old_dir)
+
+@contextlib.contextmanager
+def change_directory(new_dir):
+    """
+    A context manager to change the directory, and then change it back.
+    """
+    cd = ChangeDirectory(new_dir)
+    try:
+        yield new_dir
+    finally:
+        cd.clean_up()

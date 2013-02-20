@@ -1,5 +1,6 @@
 """Test jailpy.py"""
 
+import os.path
 import textwrap
 import unittest
 from nose.plugins.skip import SkipTest
@@ -52,6 +53,14 @@ class TestFeatures(JailPyHelpers, unittest.TestCase):
         )
         self.assertResultOk(res)
         self.assertEqual(res.stdout.strip(), "36.5")
+
+    def test_files_are_copied(self):
+        res = jailpy(
+            "print 'Look:', open('hello.txt').read()",
+            files=[os.path.dirname(__file__) + "/hello.txt"]
+        )
+        self.assertResultOk(res)
+        self.assertEqual(res.stdout, 'Look: Hello there.\n\n')
 
 
 class TestLimits(JailPyHelpers, unittest.TestCase):

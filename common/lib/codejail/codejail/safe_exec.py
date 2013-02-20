@@ -1,10 +1,15 @@
 """Safe execution of untrusted Python code."""
 
 import json
+import os.path
+import shutil
+import sys
 import textwrap
 
 import lazymod
 import jailpy
+
+from util import temp_directory, change_directory, TempDirectory
 
 # We'll need the code from lazymod.py for use in jailpy, so read it now.
 lazymod_py_file = lazymod.__file__
@@ -23,7 +28,7 @@ def names_and_modules(assumed_imports):
             yield modname, modname
 
 
-def safe_exec(code, globals_dict, locals_dict, future_division=False, assumed_imports=None):
+def safe_exec(code, globals_dict, locals_dict, future_division=False, assumed_imports=None, files=None, python_path=None):
     """Execute code as "exec" does, but safely.
 
     `code` is a string of Python code.  `globals_dict` and `locals_dict` are
@@ -41,6 +46,7 @@ def safe_exec(code, globals_dict, locals_dict, future_division=False, assumed_im
 
     """
     the_code = []
+    files = list(files or ())
 
     if future_division:
         the_code.append("from __future__ import division\n")
@@ -50,6 +56,11 @@ def safe_exec(code, globals_dict, locals_dict, future_division=False, assumed_im
         import sys
         code, g_dict, l_dict = json.load(sys.stdin)
         """))
+
+    for pydir in python_path or ():
+        pybase = os.path.basename(pydir)
+        the_code.append("sys.path.append(%r)\n" % pybase)
+        files.append(pydir)
 
     if assumed_imports:
         the_code.append(lazymod_py)
@@ -63,24 +74,29 @@ def safe_exec(code, globals_dict, locals_dict, future_division=False, assumed_im
         json.dump(l_dict, sys.stdout)
         """))
 
+    stdin = json.dumps([code, globals_dict, locals_dict])
+    jailed_code = "".join(the_code)
+
     # Turn this on to see what's being executed.
-    if 0:
+    if 1:
         print "--{:-<40}".format(" jailed ")
-        print "".join(the_code)
+        print jailed_code
         print "--{:-<40}".format(" exec ")
         print code
 
-    stdin = json.dumps([code, globals_dict, locals_dict])
-    res = jailpy.jailpy("".join(the_code), stdin=stdin)
+    res = jailpy.jailpy(jailed_code, stdin=stdin, files=files)
     if res.status != 0:
         raise Exception("Couldn't excecute jailed code: %s" % res.stderr)
     locals_dict.update(json.loads(res.stdout))
 
 
-def not_safe_exec(code, globals_dict, locals_dict, future_division=False, assumed_imports=None):
+def not_safe_exec(code, globals_dict, locals_dict, future_division=False, assumed_imports=None, files=None, python_path=None):
     """Another implementation of `safe_exec`, but not safe.
 
     This can be swapped in for debugging problems in sandboxed Python code.
+
+    This is not thread-safe, due to temporarily changing the current directory
+    and modifying sys.path.
 
     """
     def straw(d):
@@ -108,7 +124,20 @@ def not_safe_exec(code, globals_dict, locals_dict, future_division=False, assume
     for name, modname in names_and_modules(assumed_imports or ()):
         g_dict[name] = lazymod.LazyModule(modname)
 
-    exec code in g_dict, l_dict
+    with temp_directory(delete_when_done=True) as tmpdir:
+        with change_directory(tmpdir):
+            # Copy the files here.
+            for filename in files or ():
+                dest = os.path.join(tmpdir, os.path.basename(filename))
+                shutil.copyfile(filename, dest)
+
+            original_path = sys.path
+            if python_path:
+                sys.path.extend(python_path)
+            try:
+                exec code in g_dict, l_dict
+            finally:
+                sys.path = original_path
 
     locals_dict.update(straw(l_dict))
 

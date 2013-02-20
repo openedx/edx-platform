@@ -454,9 +454,8 @@ class LoncapaProblem(object):
 
             python_path.extend(self._extract_system_path(script))
 
-            code = script.text
             XMLESC = {"&apos;": "'", "&quot;": '"'}
-            code = unescape(code, XMLESC)
+            code = unescape(script.text, XMLESC)
             all_code += code
 
         if all_code:

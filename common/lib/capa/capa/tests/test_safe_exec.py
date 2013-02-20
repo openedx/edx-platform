@@ -1,5 +1,6 @@
 """Test safe_exec.py"""
 
+import os.path
 import random
 import unittest
 
@@ -35,3 +36,11 @@ class TestSafeExec(unittest.TestCase):
         # With a seed, the results are predictable
         safe_exec("rnums = [random.randint(0, 999) for _ in xrange(100)]", g, l, random_seed=17)
         self.assertEqual(l['rnums'], rnums)
+
+    def test_python_lib(self):
+        pylib = os.path.dirname(__file__) + "/test_files/pylib"
+        g, l = {}, {}
+        safe_exec(
+            "import constant; a = constant.THE_CONST",
+            g, l, python_path=[pylib]
+        )

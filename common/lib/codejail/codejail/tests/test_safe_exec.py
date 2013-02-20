@@ -1,12 +1,10 @@
 """Test safe_exec.py"""
 
-import textwrap
+import os.path
 import unittest
 from nose.plugins.skip import SkipTest
 
 from codejail.safe_exec import safe_exec, not_safe_exec
-
-dedent = textwrap.dedent
 
 class SafeExecTests(object):
     """The tests for `safe_exec`, will be mixed into specific test classes below."""
@@ -36,6 +34,22 @@ class SafeExecTests(object):
         self.safe_exec("a = op.join('x', 'y')", g, l, assumed_imports=[("op", "os.path")])
         self.assertEqual(l['a'][0], 'x')
         self.assertEqual(l['a'][-1], 'y')
+
+    def test_files_are_copied(self):
+        g, l = {}, {}
+        self.safe_exec(
+            "a = 'Look: ' + open('hello.txt').read()", g, l,
+            files=[os.path.dirname(__file__) + "/hello.txt"]
+        )
+        self.assertEqual(l['a'], 'Look: Hello there.\n')
+
+    def test_python_path(self):
+        g, l = {}, {}
+        self.safe_exec(
+            "import module; a = module.const", g, l,
+            python_path=[os.path.dirname(__file__) + "/pylib"]
+        )
+        self.assertEqual(l['a'], 42)
 
 
 class TestSafeExec(SafeExecTests, unittest.TestCase):

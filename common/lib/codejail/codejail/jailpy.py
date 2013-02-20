@@ -63,8 +63,11 @@ def jailpy(code, files=None, argv=None, stdin=None):
 
         # All the supporting files are copied into our directory.
         for filename in files or ():
-            dest = os.path.join(tmpdir, os.path.basename(filename))
-            shutil.copyfile(filename, dest)
+            if os.path.isfile(filename):
+                shutil.copy(filename, tmpdir)
+            else:
+                dest = os.path.join(tmpdir, os.path.basename(filename))
+                shutil.copytree(filename, dest)
 
         # Create the main file.
         with open(os.path.join(tmpdir, "jailed_code.py"), "w") as jailed:
