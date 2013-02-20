@@ -6,7 +6,8 @@ django-admin.py test --settings=lms.envs.test --pythonpath=. lms/djangoapps/open
 
 from django.test import TestCase
 from open_ended_grading import staff_grading_service
-from xmodule import peer_grading_service, peer_grading_module
+from xmodule.open_ended_grading_classes import peer_grading_service
+from xmodule import  peer_grading_module
 from django.core.urlresolvers import reverse
 from django.contrib.auth.models import Group
 
@@ -24,6 +25,8 @@ import logging
 log = logging.getLogger(__name__)
 from django.test.utils import override_settings
 from django.http import QueryDict
+
+from xmodule.tests import test_util_open_ended
 
 
 @override_settings(MODULESTORE=ct.TEST_DATA_XML_MODULESTORE)
@@ -144,9 +147,11 @@ class TestPeerGradingService(ct.PageLoader):
         location = "i4x://edX/toy/peergrading/init"
 
         self.mock_service = peer_grading_service.MockPeerGradingService()
-        self.system = ModuleSystem(location, None, None, render_to_string, None)
+        self.system = ModuleSystem(location, None, None, render_to_string, None,
+            s3_interface = test_util_open_ended.S3_INTERFACE,
+            open_ended_grading_interface=test_util_open_ended.OPEN_ENDED_GRADING_INTERFACE
+        )
         self.descriptor = peer_grading_module.PeerGradingDescriptor(self.system)
-
         self.peer_module = peer_grading_module.PeerGradingModule(self.system, location, "<peergrading/>", self.descriptor)
         self.peer_module.peer_gs = self.mock_service
         self.logout()

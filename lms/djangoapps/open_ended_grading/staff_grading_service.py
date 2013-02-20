@@ -4,10 +4,7 @@ This module provides views that proxy to the staff grading backend service.
 
 import json
 import logging
-import requests
-from requests.exceptions import RequestException, ConnectionError, HTTPError
-import sys
-from xmodule.grading_service_module import GradingService, GradingServiceError
+from xmodule.open_ended_grading_classes.grading_service_module import GradingService, GradingServiceError
 
 from django.conf import settings
 from django.http import HttpResponse, Http404
@@ -64,6 +61,8 @@ class StaffGradingService(GradingService):
     def __init__(self, config):
         config['system'] = ModuleSystem(None, None, None, render_to_string, None)
         super(StaffGradingService, self).__init__(config)
+        self.url = config['url'] + config['staff_grading']
+        self.login_url = self.url + '/login/'
         self.get_next_url = self.url + '/get_next_submission/'
         self.save_grade_url = self.url + '/save_grade/'
         self.get_problem_list_url = self.url + '/get_problem_list/'
@@ -164,7 +163,7 @@ def staff_grading_service():
     if settings.MOCK_STAFF_GRADING:
         _service = MockStaffGradingService()
     else:
-        _service = StaffGradingService(settings.STAFF_GRADING_INTERFACE)
+        _service = StaffGradingService(settings.OPEN_ENDED_GRADING_INTERFACE)
 
     return _service
 

@@ -5,7 +5,7 @@ import requests
 from requests.exceptions import RequestException, ConnectionError, HTTPError
 import sys
 
-from xmodule.combined_open_ended_rubric import CombinedOpenEndedRubric, RubricParsingError
+from combined_open_ended_rubric import CombinedOpenEndedRubric
 from lxml import etree
 
 log = logging.getLogger(__name__)
@@ -22,8 +22,6 @@ class GradingService(object):
     def __init__(self, config):
         self.username = config['username']
         self.password = config['password']
-        self.url = config['url']
-        self.login_url = self.url + '/login/'
         self.session = requests.session()
         self.system = config['system']
 

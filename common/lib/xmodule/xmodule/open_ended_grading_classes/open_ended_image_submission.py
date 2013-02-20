@@ -13,11 +13,6 @@ from urlparse import urlparse
 import requests
 from boto.s3.connection import S3Connection
 from boto.s3.key import Key
-#TODO: Settings import is needed now in order to specify the URL and keys for amazon s3 (to upload images).
-#Eventually, the goal is to replace the global django settings import with settings specifically
-#for this module.  There is no easy way to do this now, so piggybacking on the django settings
-#makes sense.
-from django.conf import settings
 import pickle
 import logging
 import re
@@ -221,7 +216,7 @@ def run_image_tests(image):
     return success
 
 
-def upload_to_s3(file_to_upload, keyname):
+def upload_to_s3(file_to_upload, keyname, s3_interface):
     '''
     Upload file to S3 using provided keyname.
 
@@ -237,8 +232,8 @@ def upload_to_s3(file_to_upload, keyname):
     #im.save(out_im, 'PNG')
 
     try:
-        conn = S3Connection(settings.AWS_ACCESS_KEY_ID, settings.AWS_SECRET_ACCESS_KEY)
-        bucketname = str(settings.AWS_STORAGE_BUCKET_NAME)
+        conn = S3Connection(s3_interface['access_key'], s3_interface['secret_access_key'])
+        bucketname = str(s3_interface['storage_bucket_name'])
         bucket = conn.create_bucket(bucketname.lower())
 
         k = Key(bucket)
