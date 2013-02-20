@@ -14,6 +14,15 @@ if lazymod_py_file.endswith("c"):
 lazymod_py = open(lazymod_py_file).read()
 
 
+def names_and_modules(assumed_imports):
+    """Get uniform names and modules from assumed_imports."""
+    for modname in assumed_imports:
+        if isinstance(modname, tuple):
+            yield modname
+        else:
+            yield modname, modname
+
+
 def safe_exec(code, globals_dict, locals_dict, future_division=False, assumed_imports=None):
     """Execute code as "exec" does, but safely.
 
@@ -44,11 +53,7 @@ def safe_exec(code, globals_dict, locals_dict, future_division=False, assumed_im
 
     if assumed_imports:
         the_code.append(lazymod_py)
-        for modname in assumed_imports:
-            if isinstance(modname, tuple):
-                name, modname = modname
-            else:
-                name = modname
+        for name, modname in names_and_modules(assumed_imports):
             the_code.append("g_dict['{}'] = LazyModule('{}')\n".format(name, modname))
 
     the_code.append(textwrap.dedent("""\
@@ -100,11 +105,7 @@ def not_safe_exec(code, globals_dict, locals_dict, future_division=False, assume
     g_dict = straw(globals_dict)
     l_dict = straw(locals_dict)
 
-    for modname in assumed_imports or ():
-        if isinstance(modname, tuple):
-            name, modname = modname
-        else:
-            name = modname
+    for name, modname in names_and_modules(assumed_imports or ()):
         g_dict[name] = lazymod.LazyModule(modname)
 
     exec code in g_dict, l_dict
