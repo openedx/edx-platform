@@ -113,6 +113,6 @@ def not_safe_exec(code, globals_dict, locals_dict, future_division=False, assume
     locals_dict.update(straw(l_dict))
 
 # Running Python code in the sandbox makes it difficult to debug.
-# Turn this on to run the code directly.
-if 0:
+# Change 0 to 1 to run the code directly.
+if 0 or not jailpy.is_configured():
     safe_exec = not_safe_exec
