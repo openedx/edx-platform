@@ -640,7 +640,7 @@ class CapaModule(XModule):
             event_info['failure'] = 'done'
             self.system.track_function('save_problem_fail', event_info)
             return {'success': False,
-                    'msg': "Problem needs to be reset prior to save."}
+                    'msg': "Problem needs to be reset prior to save"}
 
         self.lcp.student_answers = answers
 
