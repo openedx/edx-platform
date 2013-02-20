@@ -1,8 +1,6 @@
 if (!CMS.Views['Settings']) CMS.Views.Settings = {};
 
 CMS.Views.Settings.Advanced = CMS.Views.ValidatingView.extend({
-    // the key for a newly added policy-- before the user has entered a key value
-    new_key : "__new_advanced_key__",
     error_saving : "error_saving",
     successful_changes: "successful_changes",
 
@@ -54,6 +52,13 @@ CMS.Views.Settings.Advanced = CMS.Views.ValidatingView.extend({
         return this;
     },
     attachJSONEditor : function (textarea) {
+        // Since we are allowing duplicate keys at the moment, it is possible that we will try to attach
+        // JSON Editor to a value that already has one. Therefore only attach if no CodeMirror peer exists.
+        var siblings = $(textarea).siblings();
+        if (siblings.length >= 1 && $(siblings[0]).hasClass('CodeMirror')) {
+            return;
+        }
+
         var self = this;
         CodeMirror.fromTextArea(textarea, {
             mode: "application/json", lineNumbers: false, lineWrapping: false,
@@ -61,7 +66,7 @@ CMS.Views.Settings.Advanced = CMS.Views.ValidatingView.extend({
                 self.showSaveCancelButtons();
             },
             onBlur: function (mirror) {
-                var key = $(mirror.getWrapperElement()).closest('.row').children('.key').attr('id');
+                var key = $(mirror.getWrapperElement()).closest('.field-group').children('.key').attr('id');
                 var stringValue = $.trim(mirror.getValue());
                 // update CodeMirror to show the trimmed value.
                 mirror.setValue(stringValue);
@@ -79,18 +84,20 @@ CMS.Views.Settings.Advanced = CMS.Views.ValidatingView.extend({
                             mirror.setValue(stringValue);
                         } catch(quotedE) {
                             // TODO: validation error
-                            console.log("Error with JSON, even after converting to String.")
+                            console.log("Error with JSON, even after converting to String.");
                             console.log(quotedE);
                             JSONValue = undefined;
                         }
                     }
                     else {
                         // TODO: validation error
-                        console.log("Error with JSON, but will not convert to String.")
+                        console.log("Error with JSON, but will not convert to String.");
                         console.log(e);
                     }
                 }
                 if (JSONValue !== undefined) {
+                    // Is it OK to clear all validation errors? If we don't we get problems with errors overlaying.
+                    self.clearValidationErrors();
                     self.model.set(key, JSONValue, {validate: true});
                 }
             }
@@ -146,7 +153,7 @@ CMS.Views.Settings.Advanced = CMS.Views.ValidatingView.extend({
         var key = $('.key', li$).attr('id');
 
         delete this.fieldToSelectorMap[key];
-        if (key !== this.new_key) {
+        if (key !== this.model.new_key) {
             this.model.deleteKeys.push(key);
             this.model.unset(key);
         }
@@ -182,9 +189,9 @@ CMS.Views.Settings.Advanced = CMS.Views.ValidatingView.extend({
         listEle$.append(newEle);
         // disable the value entry until there's an acceptable key
         $(newEle).find('.course-advanced-policy-value').addClass('disabled');
-        this.fieldToSelectorMap[this.new_key] = this.new_key;
+        this.fieldToSelectorMap[this.model.new_key] = this.model.new_key;
         // need to re-find b/c replaceWith seems to copy rather than use the specific ele instance
-        var policyValueDivs = this.$el.find('#' + this.new_key).closest('li').find('.json');
+        var policyValueDivs = this.$el.find('#' + this.model.new_key).closest('li').find('.json');
         // only 1 but hey, let's take advantage of the context mechanism
         _.each(policyValueDivs, this.attachJSONEditor, this);
         this.toggleNewButton(false);
@@ -194,26 +201,29 @@ CMS.Views.Settings.Advanced = CMS.Views.ValidatingView.extend({
         // old key: either the key as in the model or new_key.
         // That is, it doesn't change as the val changes until val is accepted.
         var oldKey = $(event.currentTarget).closest('.key').attr('id');
-        var newKey = $(event.currentTarget).val();
+        // TODO: validation of keys with spaces. For now at least trim strings to remove initial and
+        // trailing whitespace
+        var newKey = $.trim($(event.currentTarget).val());
         if (oldKey !== newKey) {
             // TODO: is it OK to erase other validation messages?
             this.clearValidationErrors();
 
             if (!this.validateKey(oldKey, newKey)) return;
 
-            if (this.model.has(newKey)) {
-                var error = {};
-                error[oldKey] = 'You have already defined "' + newKey + '" in the manual policy definitions.';
-                error[newKey] = "You tried to enter a duplicate of this key.";
-                this.model.trigger("error", this.model, error);
-                return false;
-            }
+//  TODO: re-enable validation
+//            if (this.model.has(newKey)) {
+//                var error = {};
+//                error[oldKey] = 'You have already defined "' + newKey + '" in the manual policy definitions.';
+//                error[newKey] = "You tried to enter a duplicate of this key.";
+//                this.model.trigger("error", this.model, error);
+//                return false;
+//            }
 
             // explicitly call validate to determine whether to proceed (relying on triggered error means putting continuation in the success
             // method which is uglier I think?)
             var newEntryModel = {};
             // set the new key's value to the old one's
-            newEntryModel[newKey] = (oldKey === this.new_key ? '' : this.model.get(oldKey));
+            newEntryModel[newKey] = (oldKey === this.model.new_key ? '' : this.model.get(oldKey));
 
             var validation = this.model.validate(newEntryModel);
             if (validation) {
@@ -231,7 +241,7 @@ CMS.Views.Settings.Advanced = CMS.Views.ValidatingView.extend({
 
             delete this.fieldToSelectorMap[oldKey];
 
-            if (oldKey !== this.new_key) {
+            if (oldKey !== this.model.new_key) {
                 // mark the old key for deletion and delete from field maps
                 this.model.deleteKeys.push(oldKey);
                 this.model.unset(oldKey) ;
@@ -252,7 +262,9 @@ CMS.Views.Settings.Advanced = CMS.Views.ValidatingView.extend({
             $(event.currentTarget).closest('li').replaceWith(newEle);
             // need to re-find b/c replaceWith seems to copy rather than use the specific ele instance
             var policyValueDivs = this.$el.find('#' + newKey).closest('li').find('.json');
-            // only 1 but hey, let's take advantage of the context mechanism
+
+            // Because we are not dis-allowing duplicate key definitions, we may get back more than one
+            // div. But attachJSONEditor will only attach editor if it is not already defined.
             _.each(policyValueDivs, this.attachJSONEditor, this);
             
             this.fieldToSelectorMap[newKey] = newKey;
@@ -260,13 +272,15 @@ CMS.Views.Settings.Advanced = CMS.Views.ValidatingView.extend({
     },
     validateKey : function(oldKey, newKey) {
         // model validation can't handle malformed keys nor notice if 2 fields have same key; so, need to add that chk here
-        // TODO ensure there's no spaces or illegal chars
-        if (_.isEmpty(newKey)) {
-            var error = {};
-            error[oldKey] = "Key cannot be an empty string";
-            this.model.trigger("error", this.model, error);
-            return false;
-        }
-        else return true;
+        // TODO ensure there's no spaces or illegal chars (note some checking for spaces currently done in model's
+        // validate method.
+//        if (_.isEmpty(newKey)) {
+//            var error = {};
+//            error[oldKey] = "Key cannot be an empty string";
+//            this.model.trigger("error", this.model, error);
+//            return false;
+//        }
+//        else return true;
+        return true;
     }
 });

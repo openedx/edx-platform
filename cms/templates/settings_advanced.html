@@ -1,6 +1,6 @@
 <%inherit file="base.html" />
 <%! from django.core.urlresolvers import reverse %>
-<%block name="title">Advanced</%block>
+<%block name="title">Advanced Settings</%block>
 <%block name="bodyclass">is-signedin course advanced settings</%block>
 
 <%namespace name='static' file='static_content.html'/>
@@ -53,6 +53,15 @@ editor.render();
 
     <article class="content-primary" role="main">
       <form id="settings_advanced" class="settings-advanced" method="post" action="">
+
+        <div class="message message-status confirm is-shown">
+          Your policy changes have been saved.
+        </div>
+
+        <div class="message message-status error is-shown">
+          There was an error saving your information. Please see below.
+        </div>
+
         <section class="group-settings advanced-policies">
           <header>
             <h2 class="title-2">Manual Policy Definition</h2>
@@ -89,6 +98,7 @@ editor.render();
         <nav class="nav-related">
           <ul>
             <li class="nav-item"><a href="${reverse('contentstore.views.get_course_settings', kwargs=dict(org=ctx_loc.org, course=ctx_loc.course, name=ctx_loc.name))}">Details &amp; Schedule</a></li>
+            <li class="nav-item"><a href="${reverse('contentstore.views.course_config_graders_page', kwargs={'org' : ctx_loc.org, 'course' : ctx_loc.course, 'name': ctx_loc.name})}">Grading</a></li>
             <li class="nav-item"><a href="${reverse('manage_users', kwargs=dict(location=ctx_loc))}">Course Team</a></li>
           </ul>
         </nav>

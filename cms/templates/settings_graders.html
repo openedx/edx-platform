@@ -141,6 +141,7 @@ from contentstore import utils
           <ul>
             <li class="nav-item"><a href="${reverse('contentstore.views.get_course_settings', kwargs=dict(org=ctx_loc.org, course=ctx_loc.course, name=ctx_loc.name))}">Details &amp; Schedule</a></li>
             <li class="nav-item"><a href="${reverse('manage_users', kwargs=dict(location=ctx_loc))}">Course Team</a></li>
+            <li class="nav-item"><a href="${reverse('course_advanced_settings', kwargs={'org' : ctx_loc.org, 'course' : ctx_loc.course, 'name': ctx_loc.name})}">Advanced Settings</a></li>
           </ul>
         </nav>
       % endif
