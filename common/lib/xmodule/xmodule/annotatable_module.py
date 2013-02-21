@@ -50,16 +50,17 @@ class AnnotatableModule(XModule):
         }
 
     def _get_annotation_data_attr(self, index, el):
-        """ Returns a dict with the HTML data attributes to set on the annotation
-            and an XML key to delete from the element
+        """ Returns a dict in which the keys are the HTML data attributes
+            to set on the annotation element. Each data attribute has a
+            corresponding 'value' and (optional) '_delete' key to specify
+            an XML attribute to delete.
         """
 
+        data_attrs = {}
         attrs_map = {
             'body': 'data-comment-body',
-            'title': 'data-comment-title'
-        }
-        data_attrs = {
-            'data-span-id': { 'value': str(index) }
+            'title': 'data-comment-title',
+            'problem': 'data-problem-id'
         }
 
         for xml_key in attrs_map.keys():
@@ -67,6 +68,8 @@ class AnnotatableModule(XModule):
                 value = el.get(xml_key, '')
                 html_key = attrs_map[xml_key]
                 data_attrs[html_key] = { 'value': value, '_delete': xml_key }
+
+        data_attrs['data-span-id'] = { 'value': str(index) }
 
         return data_attrs
 
@@ -78,9 +81,7 @@ class AnnotatableModule(XModule):
 
         index = 0
         for el in xmltree.findall('.//annotation'):
-            index += 1
-
-            el.tag = 'div'
+            el.tag = 'span'
 
             attr = {}
             attr.update(self._get_annotation_class_attr(index, el))
@@ -90,6 +91,7 @@ class AnnotatableModule(XModule):
                 if '_delete' in attr[key]:
                     delete_key = attr[key]['_delete']
                     del el.attrib[delete_key]
+            index += 1
 
         return etree.tostring(xmltree, encoding='unicode')
 

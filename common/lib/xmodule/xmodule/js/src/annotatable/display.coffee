@@ -1,5 +1,5 @@
 class @Annotatable
-    @_debug: true
+    _debug: true
 
     wrapperSelector: '.annotatable-wrapper'
     toggleSelector:  '.annotatable-toggle'
@@ -7,6 +7,7 @@ class @Annotatable
     replySelector:   '.annotatable-reply'
     helpSelector:    '.annotatable-help-icon'
     returnSelector:  '.annotatable-return'
+    problemSelector: 'section.problem'
 
     discussionXModuleSelector: '.xmodule_DiscussionModule'
     discussionSelector:        '.discussion-module'
@@ -76,37 +77,36 @@ class @Annotatable
 
     onClickReply: (e) =>
         e.preventDefault()
-
-        problem_el = @getProblemEl e.currentTarget
-        if problem_el.length == 1
-            @scrollTo(problem_el, @afterScrollToProblem)
-        else
-            console.log 'Problem not found! Event: ', e
+        offset = -20
+        el = @getProblem e.currentTarget
+        @scrollTo(el, @afterScrollToProblem, offset)
 
     onClickReturn: (e) =>
         e.preventDefault()
-
-        el = @getSpan e.currentTarget
         offset = -200
-
+        el = @getSpan e.currentTarget
         @scrollTo(el, @afterScrollToSpan, offset)
 
     getSpan: (el) ->
         span_id = @getSpanId(el)
         @$(@spanSelector).filter("[data-span-id='#{span_id}']")
+
+    getProblem: (el) ->
+        problem_id = parseInt(@getProblemId(el), 10)
+        if isNaN(problem_id)
+            console.log 'invalid problem identifier' if @_debug
+            return $()
+        return $(@problemSelector).eq(problem_id - 1)
     
-    getDiscussion: (el) ->
+    getDiscussion: () ->
         discussion_id = @getDiscussionId()
         $(@discussionXModuleSelector).find(@discussionSelector).filter("[data-discussion-id='#{discussion_id}']")
 
-    getProblem: (el) ->
-        el # TODO
+    getSpanId: (el) ->
+        $(el).data('span-id')
 
     getProblemId: (el) ->
         $(el).data('problem-id')
-
-    getSpanId: (el) ->
-        $(el).data('span-id')
         
     getDiscussionId: () ->
         @$(@wrapperSelector).data('discussion-id')
@@ -152,7 +152,8 @@ class @Annotatable
         (api) =>
             text = $(el).data('comment-body')
             comment = @createCommentEl(text)
-            reply = @createReplyLink('dummy-problem-id')
+            problem_id = @getProblemId(el)
+            reply = @createReplyLink(problem_id)
             $(comment).add(reply)
 
     makeTipTitle: (el) ->

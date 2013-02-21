@@ -13,9 +13,8 @@
     % endfor
     </ul>
 
-    <!--
-
-    Value: ${value} <input type="text" style="" name="input_${id}" id="input_${id}"/>
+    <div style="display:none">
+    Value: ${value} <input type="text" name="input_${id}" id="input_${id}"/>
     TODO: make the textline hidden once it all works
     <span id="answer_${id}"></span>
 
@@ -28,8 +27,7 @@
     % elif status == 'incomplete':
     <span class="incorrect" id="status_${id}"></span>
     % endif
-
-    -->
+    </div>
 </div>
 </form>
 

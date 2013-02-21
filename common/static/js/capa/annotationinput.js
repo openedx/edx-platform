@@ -1,7 +1,7 @@
 (function () {
     console.log('annotation input loaded: ', this);
     var update = function() {
-             alert("o hi");
+             console.log("annotation input update");
     };
 
     var inputs = $('.annotation-input input');
