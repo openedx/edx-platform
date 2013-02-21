@@ -55,9 +55,6 @@ def pdf_index(request, course_id, book_index, chapter=None, page=None):
     textbook['url'] = remap_static_url(textbook['url'], course)
     # then remap all the chapter URLs as well, if they are provided.
     
-#    if page is None:
-#        page = textbook.start_page
-
     return render_to_response('static_pdfbook.html',
                               {'book_index': book_index, 
                                'course': course, 
