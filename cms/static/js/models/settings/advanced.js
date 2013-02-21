@@ -18,7 +18,7 @@ CMS.Models.Settings.Advanced = Backbone.Model.extend({
                 errors[key] = "A key must be entered.";
             }
             else if (_.contains(this.blacklistKeys, key)) {
-                errors[key] = key + " is a reserved keyword or has another editor";
+                errors[key] = key + " is a reserved keyword or can be edited on another screen";
             }
         }
         if (!_.isEmpty(errors)) return errors;
