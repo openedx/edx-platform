@@ -422,6 +422,18 @@ class ContentStoreTest(ModuleStoreTestCase):
         self.assertIn('markdown', problem.metadata, "markdown is missing from metadata")
         self.assertNotIn('markdown', problem.editable_metadata_fields, "Markdown slipped into the editable metadata fields")
 
+    def test_import_metadata_with_attempts_empty_string(self):
+        import_from_xml(modulestore(), 'common/test/data/', ['simple'])
+        ms = modulestore('direct')
+        did_load_item = False
+        try:       
+            ms.get_item(Location(['i4x', 'edX', 'simple', 'problem', 'ps01-simple', None]))
+            did_load_item = True
+        except ItemNotFoundError:
+            pass
+
+        # make sure we found the item (e.g. it didn't error while loading)
+        self.assertTrue(did_load_item)   
 
     def test_metadata_inheritance(self):
         import_from_xml(modulestore(), 'common/test/data/', ['full'])
