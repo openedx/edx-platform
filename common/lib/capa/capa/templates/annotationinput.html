@@ -14,8 +14,8 @@ TODO: make the textline hidden once it all works
 
 Value: ${value}
 
-      % for option_id, option_description in options:
-          <p>${option_id}, ${option_description}</p>
+      % for option in options:
+          <p>${option['id']}, ${option['tag']}, ${option['description']}, ${option['score']}</p>
       % endfor
 
   <span id="answer_${id}"></span>

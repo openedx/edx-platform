@@ -968,11 +968,25 @@ class AnnotationInput(InputTypeBase):
     tags = ['annotationinput']
 
     def setup(self):
-        # Pull out all the things from the xml
-        self.text = 'text'
-        self.comment_prompt = 'comment_prompt'
-        self.tag_prompt = 'tag_prompt'
-        self.options = [(0, 'blue'), (1, 'green'), (2, 'red')]
+        xml = self.xml
+
+        self.text = xml.findtext('./text')
+        self.comment_prompt = xml.findtext('./comment_prompt')
+        self.tag_prompt = xml.findtext('./tag_prompt')
+        self.options = self._find_options()
+
+    def _find_options(self):
+        options = []
+        index = 0
+        for option in self.xml.findall('./options/option'):
+            options.append({
+                'id': index,
+                'tag': option.text,
+                'description': option.get('description', ''),
+                'score': option.get('score', 0)
+            })
+            index += 1
+        return options
 
     def _extra_context(self):
         return {'text': self.text,
