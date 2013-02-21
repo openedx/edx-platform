@@ -131,7 +131,6 @@ CMS.Views.Settings.Advanced = CMS.Views.ValidatingView.extend({
     showSaveCancelButtons: function(event) {
         if (!this.buttonsVisible) {
             if (event && event.type === 'keypress') {
-                console.log(event.charCode, event.keyCode);
                 // check whether it's really an altering event
                 if (!((event.charCode && String.fromCharCode(event.charCode) !== "") ||
                         // 8 = backspace, 46 = delete
