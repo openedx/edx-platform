@@ -19,13 +19,6 @@ from contentstore import utils
 <script type="text/javascript">
 $(document).ready(function () {
 
-  // hilighting labels when fields are focused in
-  $("form :input").focus(function() {
-    $("label[for='" + this.id + "']").addClass("is-focused");
-    }).blur(function() {
-      $("label").removeClass("is-focused");
-      });
-
     // proactively populate advanced b/c it has the filtered list and doesn't really follow the model pattern
     var advancedModel = new CMS.Models.Settings.Advanced(${advanced_dict | n}, {parse: true});
     advancedModel.blacklistKeys = ${advanced_blacklist | n};
