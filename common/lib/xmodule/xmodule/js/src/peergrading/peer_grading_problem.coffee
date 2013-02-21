@@ -471,9 +471,9 @@ class @PeerGradingProblem
     @prompt_container.slideToggle()
     @prompt_container.toggleClass('open')
     if @question_header.text() == "(Hide)"
-      Logger.log 'hide_question', {location: @location}
+      Logger.log 'peer_grading_hide_question', {location: @location}
       new_text = "(Show)"
     else
-      Logger.log 'show_question', {location: @location}
+      Logger.log 'peer_grading_show_question', {location: @location}
       new_text = "(Hide)"
     @question_header.text(new_text)

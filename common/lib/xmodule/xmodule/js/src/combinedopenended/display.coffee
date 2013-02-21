@@ -8,7 +8,7 @@ class @Rubric
   @tracking_callback: (event) ->
     target_selection = $(event.target).val()
     # chop off the beginning of the name so that we can get the number of the category
-    category = $(event.target).prop("name").substring(16)
+    category = $(event.target).data("category")
     location = $('.rubric').data('location')
     # probably want the original problem location as well
 
@@ -459,7 +459,9 @@ class @CombinedOpenEnded
     @prompt_container.toggleClass('open')
     if @question_header.text() == "(Hide)"
       new_text = "(Show)"
+      Logger.log 'oe_hide_question', {location: @location}
     else
+      Logger.log 'oe_show_question', {location: @location}
       new_text = "(Hide)"
     @question_header.text(new_text)
 
@@ -478,10 +480,13 @@ class @CombinedOpenEnded
   log_feedback_click: (event) ->
     link_text = $(event.target).html()
     if link_text == 'See full feedback'
-      Logger.log 'show_full_feedback', {}
+      Logger.log 'oe_show_full_feedback', {}
     else if link_text == 'Respond to Feedback'
-      Logger.log 'show_respond_to_feedback', {}
+      Logger.log 'oe_show_respond_to_feedback', {}
+    else
+      generated_event_type = link_text.toLowerCase().replace(" ","_")
+      Logger.log "oe_" + generated_event_type, {}
 
   log_feedback_selection: (event) ->
     target_selection = $(event.target).val()
-    Logger.log 'feedback_response_selected', {value: target_selection}
+    Logger.log 'oe_feedback_response_selected', {value: target_selection}
