@@ -108,6 +108,12 @@ class OpenEndedChild(object):
         self.peer_gs = PeerGradingService(system.open_ended_grading_interface, system)
 
         self.system = system
+        self.location_string = location
+        try:
+            self.location_string = self.location_string.url()
+        except:
+            pass
+
         self.setup_response(system, location, definition, descriptor)
 
     def setup_response(self, system, location, definition, descriptor):
@@ -418,7 +424,8 @@ class OpenEndedChild(object):
         return success, string
 
     def check_if_student_can_submit(self):
-        location = self.system.location.url()
+        location = self.location_string
+
         student_id = self.system.anonymous_student_id
         success = False
         allowed_to_submit = True
