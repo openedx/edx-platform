@@ -1,34 +1,36 @@
 <form class="annotation-input">
-TODO: make the textline hidden once it all works
 <div class="script_placeholder" data-src="/static/js/capa/annotationinput.js"/>
 
-<p>Text: ${text}</p>
+<div class="header">${title}</div>
+<div class="body">
+    <div class="prompt prompt-text">${text}</div>
+    <div class="prompt">${comment_prompt}</div>
+    <textarea id="input_${id}_comment" name="input_${id}_comment"/>
+    <div class="prompt">${tag_prompt}</div>
+    <ul class="tags">
+    % for option in options:
+          <li data-id="${option['id']}"><span>${option['description']}</span></li>
+    % endfor
+    </ul>
 
-<p>Comment prompt: ${comment_prompt}</p>
+    <!--
 
-<textarea id="input_${id}_comment" name="input_${id}_comment"/>
+    Value: ${value} <input type="text" style="" name="input_${id}" id="input_${id}"/>
+    TODO: make the textline hidden once it all works
+    <span id="answer_${id}"></span>
 
-<p>Tag prompt: ${tag_prompt}</p>
+    % if status == 'unsubmitted':
+    <span class="unanswered" style="display:inline-block;" id="status_${id}"></span>
+    % elif status == 'correct':
+    <span class="correct" id="status_${id}"></span>
+    % elif status == 'incorrect':
+    <span class="incorrect" id="status_${id}"></span>
+    % elif status == 'incomplete':
+    <span class="incorrect" id="status_${id}"></span>
+    % endif
 
-<input type="text" style="" name="input_${id}" id="input_${id}"/>
-
-Value: ${value}
-
-      % for option in options:
-          <p>${option['id']}, ${option['tag']}, ${option['description']}, ${option['score']}</p>
-      % endfor
-
-  <span id="answer_${id}"></span>
-
-  % if status == 'unsubmitted':
-  <span class="unanswered" style="display:inline-block;" id="status_${id}"></span>
-  % elif status == 'correct': 
-  <span class="correct" id="status_${id}"></span>
-  % elif status == 'incorrect':
-  <span class="incorrect" id="status_${id}"></span>
-  % elif status == 'incomplete':
-  <span class="incorrect" id="status_${id}"></span>
-  % endif
+    -->
+</div>
 </form>
 
 % if msg:

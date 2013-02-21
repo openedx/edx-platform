@@ -802,4 +802,49 @@ section.problem {
         display: none; 
       }
   }
+
+  .annotation-input {
+    $yellow: rgba(255,255,10,0.3);
+
+    border: 1px solid #ccc;
+    border-radius: 1em;
+    margin: 0 0 1em 0;
+    .header {
+      font-weight: bold;
+      border-bottom: 1px solid #ccc;
+      padding: .5em 1em;
+    }
+    .body { padding: .5em 1em; }
+    .prompt { font-style: italic; }
+    .prompt.prompt-text {
+      padding: .5em;
+      color:  #333;
+      background-color: $yellow;
+      font-style: normal;
+      border: 1px solid darken($yellow, 10%);
+    }
+    .prompt, ul.tags {
+      margin: .5em 0;
+      padding: 0;
+    }
+    ul.tags {
+      display: block;
+      list-style-type: none;
+      margin-left: 1em;
+      li {
+        display: block;
+        margin: 1em 0 0 1.5em;
+        span {
+          cursor: pointer;
+          display: inline-block;
+          padding: .25em .5em;
+          border: 1px solid rgb(102,102,102);
+          &.selected {
+            background-color: $yellow;
+          }
+        }
+      }
+    }
+    textarea { width: 100%; }
+  }
 }

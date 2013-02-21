@@ -970,6 +970,7 @@ class AnnotationInput(InputTypeBase):
     def setup(self):
         xml = self.xml
 
+        self.title = xml.findtext('./title', 'Annotation Exercise')
         self.text = xml.findtext('./text')
         self.comment_prompt = xml.findtext('./comment_prompt')
         self.tag_prompt = xml.findtext('./tag_prompt')
@@ -981,15 +982,15 @@ class AnnotationInput(InputTypeBase):
         for option in self.xml.findall('./options/option'):
             options.append({
                 'id': index,
-                'tag': option.text,
-                'description': option.get('description', ''),
+                'description': option.text,
                 'score': option.get('score', 0)
             })
             index += 1
         return options
 
     def _extra_context(self):
-        return {'text': self.text,
+        return {'title': self.title,
+                'text': self.text,
                 'comment_prompt': self.comment_prompt,
                 'tag_prompt': self.tag_prompt,
                 'options': self.options}

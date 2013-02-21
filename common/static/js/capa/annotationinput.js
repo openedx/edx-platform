@@ -1,4 +1,5 @@
 (function () {
+    console.log('annotation input loaded: ', this);
     var update = function() {
              alert("o hi");
     };
