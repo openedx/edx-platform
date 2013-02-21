@@ -59,12 +59,14 @@ class OpenEndedModule(openendedchild.OpenEndedChild):
         self.submission_id = None
         self.grader_id = None
 
+        error_message = "No {0} found in problem xml for open ended problem. Contact the learning sciences group for assistance."
         if oeparam is None:
-            raise ValueError("No oeparam found in problem xml.")
+            #This is a staff_facing_error
+            raise ValueError(error_message.format('oeparam'))
         if self.prompt is None:
-            raise ValueError("No prompt found in problem xml.")
+            raise ValueError(error_message.format('prompt'))
         if self.rubric is None:
-            raise ValueError("No rubric found in problem xml.")
+            raise ValueError(error_message.format('rubric'))
 
         self._parse(oeparam, self.prompt, self.rubric, system)
 
@@ -72,6 +74,7 @@ class OpenEndedModule(openendedchild.OpenEndedChild):
             self.created = False
             self.send_to_grader(self.latest_answer(), system)
             self.created = False
+
 
     def _parse(self, oeparam, prompt, rubric, system):
         '''
@@ -98,13 +101,14 @@ class OpenEndedModule(openendedchild.OpenEndedChild):
             # __init__ adds it (easiest way to get problem location into
             # response types)
         except TypeError, ValueError:
-            log.exception("Grader payload %r is not a json object!", grader_payload)
+            #This is a dev_facing_error
+            log.exception("Grader payload from external open ended grading server is not a json object! Object: {0}".format(grader_payload))
 
         self.initial_display = find_with_default(oeparam, 'initial_display', '')
         self.answer = find_with_default(oeparam, 'answer_display', 'No answer given.')
 
         parsed_grader_payload.update({
-            'location': system.location.url(),
+            'location': self.location_string,
             'course_id': system.course_id,
             'prompt': prompt_string,
             'rubric': rubric_string,
@@ -134,24 +138,27 @@ class OpenEndedModule(openendedchild.OpenEndedChild):
         """
 
         event_info = dict()
-        event_info['problem_id'] = system.location.url()
+        event_info['problem_id'] = self.location_string
         event_info['student_id'] = system.anonymous_student_id
         event_info['survey_responses'] = get
 
         survey_responses = event_info['survey_responses']
         for tag in ['feedback', 'submission_id', 'grader_id', 'score']:
             if tag not in survey_responses:
-                return {'success': False, 'msg': "Could not find needed tag {0}".format(tag)}
+                #This is a student_facing_error
+                return {'success': False, 'msg': "Could not find needed tag {0} in the survey responses.  Please try submitting again.".format(tag)}
         try:
             submission_id = int(survey_responses['submission_id'])
             grader_id = int(survey_responses['grader_id'])
             feedback = str(survey_responses['feedback'].encode('ascii', 'ignore'))
             score = int(survey_responses['score'])
         except:
+            #This is a dev_facing_error
             error_message = ("Could not parse submission id, grader id, "
                              "or feedback from message_post ajax call.  Here is the message data: {0}".format(
                 survey_responses))
             log.exception(error_message)
+            #This is a student_facing_error
             return {'success': False, 'msg': "There was an error saving your feedback.  Please contact course staff."}
 
         qinterface = system.xqueue['interface']
@@ -188,6 +195,7 @@ class OpenEndedModule(openendedchild.OpenEndedChild):
 
         self.state = self.DONE
 
+        #This is a student_facing_message
         return {'success': success, 'msg': "Successfully submitted your feedback."}
 
     def send_to_grader(self, submission, system):
@@ -337,18 +345,22 @@ class OpenEndedModule(openendedchild.OpenEndedChild):
 
         for tag in ['success', 'feedback', 'submission_id', 'grader_id']:
             if tag not in response_items:
-                return format_feedback('errors', 'Error getting feedback')
+                #This is a student_facing_error
+                return format_feedback('errors', 'Error getting feedback from grader.')
 
         feedback_items = response_items['feedback']
         try:
             feedback = json.loads(feedback_items)
         except (TypeError, ValueError):
-            log.exception("feedback_items have invalid json %r", feedback_items)
-            return format_feedback('errors', 'Could not parse feedback')
+            #This is a dev_facing_error
+            log.exception("feedback_items from external open ended grader have invalid json {0}".format(feedback_items))
+            #This is a student_facing_error
+            return format_feedback('errors', 'Error getting feedback from grader.')
 
         if response_items['success']:
             if len(feedback) == 0:
-                return format_feedback('errors', 'No feedback available')
+                #This is a student_facing_error
+                return format_feedback('errors', 'No feedback available from grader.')
 
             for tag in do_not_render:
                 if tag in feedback:
@@ -357,6 +369,7 @@ class OpenEndedModule(openendedchild.OpenEndedChild):
             feedback_lst = sorted(feedback.items(), key=get_priority)
             feedback_list_part1 = u"\n".join(format_feedback(k, v) for k, v in feedback_lst)
         else:
+            #This is a student_facing_error
             feedback_list_part1 = format_feedback('errors', response_items['feedback'])
 
         feedback_list_part2 = (u"\n".join([format_feedback_hidden(feedback_type, value)
@@ -432,14 +445,16 @@ class OpenEndedModule(openendedchild.OpenEndedChild):
         try:
             score_result = json.loads(score_msg)
         except (TypeError, ValueError):
-            error_message = ("External grader message should be a JSON-serialized dict."
+            #This is a dev_facing_error
+            error_message = ("External open ended grader message should be a JSON-serialized dict."
                              " Received score_msg = {0}".format(score_msg))
             log.error(error_message)
             fail['feedback'] = error_message
             return fail
 
         if not isinstance(score_result, dict):
-            error_message = ("External grader message should be a JSON-serialized dict."
+            #This is a dev_facing_error
+            error_message = ("External open ended grader message should be a JSON-serialized dict."
                              " Received score_result = {0}".format(score_result))
             log.error(error_message)
             fail['feedback'] = error_message
@@ -447,7 +462,8 @@ class OpenEndedModule(openendedchild.OpenEndedChild):
 
         for tag in ['score', 'feedback', 'grader_type', 'success', 'grader_id', 'submission_id']:
             if tag not in score_result:
-                error_message = ("External grader message is missing required tag: {0}"
+                #This is a dev_facing_error
+                error_message = ("External open ended grader message is missing required tag: {0}"
                                  .format(tag))
                 log.error(error_message)
                 fail['feedback'] = error_message
@@ -564,7 +580,10 @@ class OpenEndedModule(openendedchild.OpenEndedChild):
         }
 
         if dispatch not in handlers:
-            return 'Error'
+            #This is a dev_facing_error
+            log.error("Cannot find {0} in handlers in handle_ajax function for open_ended_module.py".format(dispatch))
+            #This is a dev_facing_error
+            return json.dumps({'error': 'Error handling action.  Please try again.', 'success' : False})
 
         before = self.get_progress()
         d = handlers[dispatch](get, system)
@@ -605,15 +624,21 @@ class OpenEndedModule(openendedchild.OpenEndedChild):
         success, get = self.append_image_to_student_answer(get)
         error_message = ""
         if success:
-            get['student_answer'] = OpenEndedModule.sanitize_html(get['student_answer'])
-            self.new_history_entry(get['student_answer'])
-            self.send_to_grader(get['student_answer'], system)
-            self.change_state(self.ASSESSING)
+            success, allowed_to_submit, error_message = self.check_if_student_can_submit()
+            if allowed_to_submit:
+                get['student_answer'] = OpenEndedModule.sanitize_html(get['student_answer'])
+                self.new_history_entry(get['student_answer'])
+                self.send_to_grader(get['student_answer'], system)
+                self.change_state(self.ASSESSING)
+            else:
+                #Error message already defined
+                success = False
         else:
+            #This is a student_facing_error
             error_message = "There was a problem saving the image in your submission.  Please try a different image, or try pasting a link to an image into the answer box."
 
         return {
-            'success': True,
+            'success': success,
             'error': error_message,
             'student_response': get['student_answer']
         }
@@ -690,7 +715,8 @@ class OpenEndedDescriptor(XmlDescriptor, EditingDescriptor):
         """
         for child in ['openendedparam']:
             if len(xml_object.xpath(child)) != 1:
-                raise ValueError("Open Ended definition must include exactly one '{0}' tag".format(child))
+                #This is a staff_facing_error
+                raise ValueError("Open Ended definition must include exactly one '{0}' tag. Contact the learning sciences group for assistance.".format(child))
 
         def parse(k):
             """Assumes that xml_object has child k"""
