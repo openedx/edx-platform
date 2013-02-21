@@ -35,3 +35,10 @@
   position: absolute;
   top: 150px;
 }
+
+// sunsetted, but still used mixins
+@mixin hide-text(){
+  text-indent: -9999px;
+  overflow: hidden;
+  display: block;
+}
