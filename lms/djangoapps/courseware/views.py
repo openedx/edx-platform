@@ -177,10 +177,10 @@ def check_for_active_timelimit_module(request, course_id, course):
                     raise Http404("No {0} metadata at this location: {1} ".format('time_expired_redirect_url', location))
                 time_expired_redirect_url = timelimit_descriptor.metadata.get('time_expired_redirect_url')
                 context['time_expired_redirect_url'] = time_expired_redirect_url
-                # Fetch the end time (in GMT) as stored in the module when it was started.
-                # This value should be UTC time as number of milliseconds since epoch.
-                end_date = timelimit_module.get_end_time_in_ms()
-                context['timer_expiration_datetime'] = end_date
+                # Fetch the remaining time relative to the end time as stored in the module when it was started.
+                # This value should be in milliseconds.
+                remaining_time = timelimit_module.get_remaining_time_in_ms()
+                context['timer_expiration_duration'] = remaining_time
                 if 'suppress_toplevel_navigation' in timelimit_descriptor.metadata:
                     context['suppress_toplevel_navigation'] = timelimit_descriptor.metadata['suppress_toplevel_navigation']
                 return_url = reverse('jump_to', kwargs={'course_id':course_id, 'location':location})
@@ -191,7 +191,7 @@ def update_timelimit_module(user, course_id, student_module_cache, timelimit_des
     '''
     Updates the state of the provided timing module, starting it if it hasn't begun.
     Returns dict with timer-related values to enable display of time remaining.
-    Returns 'timer_expiration_datetime' in dict if timer is still active, and not if timer has expired.
+    Returns 'timer_expiration_duration' in dict if timer is still active, and not if timer has expired.
     ''' 
     context = {}
     # determine where to go when the exam ends:
@@ -215,10 +215,9 @@ def update_timelimit_module(user, course_id, student_module_cache, timelimit_des
             instance_module.save()
             
         # the exam has been started, either because the student is returning to the
-        # exam page, or because they have just visited it.  Fetch the end time (in GMT) as stored
-        # in the module when it was started.
-        # This value should be UTC time as number of milliseconds since epoch.
-        context['timer_expiration_datetime'] = timelimit_module.get_end_time_in_ms()
+        # exam page, or because they have just visited it.  Fetch the remaining time relative to the
+        # end time as stored in the module when it was started.
+        context['timer_expiration_duration'] = timelimit_module.get_remaining_time_in_ms()
         # also use the timed module to determine whether top-level navigation is visible:
         if 'suppress_toplevel_navigation' in timelimit_descriptor.metadata:
             context['suppress_toplevel_navigation'] = timelimit_descriptor.metadata['suppress_toplevel_navigation']
@@ -325,7 +324,7 @@ def index(request, course_id, chapter=None, section=None,
             if section_module.category == 'timelimit':
                 timer_context = update_timelimit_module(request.user, course_id, student_module_cache, 
                                                         section_descriptor, section_module)
-                if 'timer_expiration_datetime' in timer_context:
+                if 'timer_expiration_duration' in timer_context:
                     context.update(timer_context)
                 else:
                     # if there is no expiration defined, then we know the timer has expired:

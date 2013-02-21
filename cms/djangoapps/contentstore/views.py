@@ -59,6 +59,7 @@ from cms.djangoapps.models.settings.course_details import CourseDetails,\
 from cms.djangoapps.models.settings.course_grading import CourseGradingModel
 from cms.djangoapps.contentstore.utils import get_modulestore
 from lxml import etree
+from django.shortcuts import redirect
 
 # to install PIL on MacOSX: 'easy_install http://dist.repoze.org/PIL-1.1.6.tar.gz'
 
@@ -81,6 +82,11 @@ def signup(request):
     csrf_token = csrf(request)['csrf_token']
     return render_to_response('signup.html', {'csrf': csrf_token})
 
+def old_login_redirect(request):
+    '''
+    Redirect to the active login url.
+    '''
+    return redirect('login', permanent=True)
 
 @ssl_login_shortcut
 @ensure_csrf_cookie
@@ -94,6 +100,11 @@ def login_page(request):
         'forgot_password_link': "//{base}/#forgot-password-modal".format(base=settings.LMS_BASE),
     })
 
+def howitworks(request):
+    if request.user.is_authenticated():
+        return index(request)
+    else: 
+        return render_to_response('howitworks.html', {})
 
 # ==== Views for any logged-in user ==================================
 
@@ -120,7 +131,8 @@ def index(request):
                     reverse('course_index', args=[
                         course.location.org,
                         course.location.course,
-                        course.location.name]))
+                        course.location.name]),
+                    get_lms_link_for_item(course.location))
                     for course in courses],
         'user': request.user,
         'disable_course_creation': settings.MITX_FEATURES.get('DISABLE_COURSE_CREATION', False) and not request.user.is_staff
@@ -161,6 +173,8 @@ def course_index(request, org, course, name):
     if not has_access(request.user, location):
         raise PermissionDenied()
 
+    lms_link = get_lms_link_for_item(location)
+
     upload_asset_callback_url = reverse('upload_asset', kwargs={
             'org': org,
             'course': course,
@@ -173,6 +187,7 @@ def course_index(request, org, course, name):
     return render_to_response('overview.html', {
         'active_tab': 'courseware',
         'context_course': course,
+        'lms_link': lms_link,
         'sections': sections,
         'course_graders': json.dumps(CourseGradingModel.fetch(course.location).graders),
         'parent_location': course.location,
@@ -273,7 +288,7 @@ def edit_unit(request, location):
                 template.display_name,
                 template.location.url(),
                 'markdown' in template.metadata,
-                template.location.name == 'Empty'
+                'empty' in template.metadata
             ))
 
     components = [
@@ -730,8 +745,6 @@ def clone_item(request):
 
 #@login_required
 #@ensure_csrf_cookie
-
-
 def upload_asset(request, org, course, coursename):
     '''
     cdodge: this method allows for POST uploading of files into the course asset library, which will
@@ -796,8 +809,6 @@ def upload_asset(request, org, course, coursename):
 '''
 This view will return all CMS users who are editors for the specified course
 '''
-
-
 @login_required
 @ensure_csrf_cookie
 def manage_users(request, location):
@@ -819,7 +830,7 @@ def manage_users(request, location):
     })
 
 
-def create_json_response(errmsg=None):
+def create_json_response(errmsg = None):
     if errmsg is not None:
         resp = HttpResponse(json.dumps({'Status': 'Failed', 'ErrMsg': errmsg}))
     else:
@@ -831,8 +842,6 @@ def create_json_response(errmsg=None):
 This POST-back view will add a user - specified by email - to the list of editors for
 the specified course
 '''
-
-
 @expect_json
 @login_required
 @ensure_csrf_cookie
@@ -865,8 +874,6 @@ def add_user(request, location):
 This POST-back view will remove a user - specified by email - from the list of editors for
 the specified course
 '''
-
-
 @expect_json
 @login_required
 @ensure_csrf_cookie
@@ -1124,8 +1131,31 @@ def get_course_settings(request, org, course, name):
     course_details = CourseDetails.fetch(location)
 
     return render_to_response('settings.html', {
-        'active_tab': 'settings',
         'context_course': course_module,
+        'course_location' : location,
+        'course_details' : json.dumps(course_details, cls=CourseSettingsEncoder)
+    })
+
+@login_required
+@ensure_csrf_cookie
+def course_config_graders_page(request, org, course, name):
+    """
+    Send models and views as well as html for editing the course settings to the client.
+
+    org, course, name: Attributes of the Location for the item to edit
+    """
+    location = ['i4x', org, course, 'course', name]
+
+    # check that logged in user has permissions to this item
+    if not has_access(request.user, location):
+        raise PermissionDenied()
+
+    course_module = modulestore().get_item(location)
+    course_details = CourseGradingModel.fetch(location)
+
+    return render_to_response('settings_graders.html', {
+        'context_course': course_module,
+        'course_location' : location,
         'course_details': json.dumps(course_details, cls=CourseSettingsEncoder)
     })
 

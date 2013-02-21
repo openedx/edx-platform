@@ -1,5 +1,5 @@
 from django.core.urlresolvers import reverse
-from override_settings import override_settings
+from django.test.utils import override_settings
 
 import xmodule.modulestore.django
 

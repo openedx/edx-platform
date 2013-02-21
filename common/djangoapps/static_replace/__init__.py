@@ -13,12 +13,18 @@ log = logging.getLogger(__name__)
 
 
 def _url_replace_regex(prefix):
+    """
+    Match static urls in quotes that don't end in '?raw'.
+
+    To anyone contemplating making this more complicated:
+    http://xkcd.com/1171/
+    """
     return r"""
-        (?x)                 # flags=re.VERBOSE
-        (?P<quote>\\?['"])   # the opening quotes
-        (?P<prefix>{prefix}) # theeprefix
-        (?P<rest>.*?)        # everything else in the url
-        (?P=quote)           # the first matching closing quote
+        (?x)                      # flags=re.VERBOSE
+        (?P<quote>\\?['"])        # the opening quotes
+        (?P<prefix>{prefix})      # the prefix
+        (?P<rest>.*?)             # everything else in the url
+        (?P=quote)                # the first matching closing quote
         """.format(prefix=prefix)
 
 
@@ -73,6 +79,10 @@ def replace_static_urls(text, data_directory, course_namespace=None):
         prefix = match.group('prefix')
         quote = match.group('quote')
         rest = match.group('rest')
+
+        # Don't mess with things that end in '?raw'
+        if rest.endswith('?raw'):
+            return original
 
         # course_namespace is not None, then use studio style urls
         if course_namespace is not None and not isinstance(modulestore(), XMLModuleStore):

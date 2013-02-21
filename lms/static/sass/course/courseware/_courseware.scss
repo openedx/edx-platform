@@ -248,3 +248,17 @@ section.self-assessment {
         font-weight: bold;
     }
 }
+
+section.foldit {
+   table {
+       margin-top: 10px;
+   }
+   th {
+        text-align: center;
+   }
+   td {
+       padding-left: 5px;
+       padding-right: 5px;
+
+   }
+}

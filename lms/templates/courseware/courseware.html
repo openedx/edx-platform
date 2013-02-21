@@ -32,7 +32,7 @@
   <!-- TODO: http://docs.jquery.com/Plugins/Validation -->
   <script type="text/javascript">
     document.write('\x3Cscript type="text/javascript" src="' +
-        document.location.protocol + '//www.youtube.com/player_api">\x3C/script>');
+        document.location.protocol + '//www.youtube.com/iframe_api">\x3C/script>');
   </script>
 
   <script type="text/javascript">
@@ -60,14 +60,12 @@
       });
   </script>
 
-% if timer_expiration_datetime:
-  <script type="text/javascript">  
+% if timer_expiration_duration:
+  <script type="text/javascript">
     var timer = {
-      timer_inst : null,   
-      get_remaining_secs : function() {
-        // set the end time when the template is rendered.
-        // This value should be UTC time as number of milliseconds since epoch.
-        var endTime = new Date(${timer_expiration_datetime});
+      timer_inst : null,
+      end_time : null,
+      get_remaining_secs : function(endTime) {
         var currentTime = new Date();
         var remaining_secs = Math.floor((endTime - currentTime)/1000);
         return remaining_secs;
@@ -81,35 +79,38 @@
         remaining_secs = remaining_secs % 3600;
         var minutes = pretty_time_string(Math.floor(remaining_secs / 60));
         remaining_secs = remaining_secs % 60;
-        var seconds = pretty_time_string(Math.floor(remaining_secs));      
-       
+        var seconds = pretty_time_string(Math.floor(remaining_secs));
+
         var remainingTimeString = hours + ":" + minutes + ":" + seconds;
         return remainingTimeString;
       },
       update_time : function(self) {
-        remaining_secs = self.get_remaining_secs();
+        remaining_secs = self.get_remaining_secs(self.end_time);
         if (remaining_secs <= 0) {
           self.end(self);
         }
         $('#exam_timer').text(self.get_time_string(remaining_secs));
       },
       start : function() { var that = this;
+        // set the end time when the template is rendered.
+        // This value should be UTC time as number of milliseconds since epoch.
+        this.end_time = new Date((new Date()).getTime() + ${timer_expiration_duration});
         this.timer_inst = setInterval(function(){ that.update_time(that); }, 1000);
       },
       end : function(self) {
         clearInterval(self.timer_inst);
         // redirect to specified URL:
-        window.location = "${time_expired_redirect_url}"; 
+        window.location = "${time_expired_redirect_url}";
       }
-    }  
-    // start timer right away: 
-    timer.start(); 
+    }
+    // start timer right away:
+    timer.start();
   </script>
 % endif
 
 </%block>
 
-% if timer_expiration_datetime:
+% if timer_expiration_duration:
 <div class="timer-main">
   <div id="timer_wrapper">
     % if timer_navigation_return_url:

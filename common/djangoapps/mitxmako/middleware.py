@@ -13,7 +13,7 @@
 #   limitations under the License.
 
 from mako.lookup import TemplateLookup
-import tempfile
+import tempdir
 from django.template import RequestContext
 from django.conf import settings
 
@@ -29,7 +29,7 @@ class MakoMiddleware(object):
         module_directory = getattr(settings, 'MAKO_MODULE_DIR', None)
 
         if module_directory is None:
-            module_directory = tempfile.mkdtemp()
+            module_directory = tempdir.mkdtemp_clean()
 
         for location in template_locations:
             lookup[location] = TemplateLookup(directories=template_locations[location],
