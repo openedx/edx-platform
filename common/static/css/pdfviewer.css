@@ -590,7 +590,7 @@ select {
   margin: 4px 2px 4px 0;
   border: 1px solid transparent;
   border-radius: 2px;
-/*  color: hsl(0,0%,85%); can't get background to work, so let this be black... */
+  color: hsl(0,0%,85%);
   font-size: 12px;
   line-height: 14px;
   text-align: left;

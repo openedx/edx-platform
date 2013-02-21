@@ -32,8 +32,6 @@ PDFJS.disableWorker = true;
         if (options.pageNum) {
             pageNum = options.pageNum;
         }
-        var currentScale = 1.0;
-        var currentScaleValue = "1";
 
         var viewerElement = document.getElementById('viewer');
         var ANNOT_MIN_SIZE = 10;
@@ -42,15 +40,41 @@ PDFJS.disableWorker = true;
         var MIN_SCALE = 0.25;
         var MAX_SCALE = 4.0;
 
+        var currentScale = UNKNOWN_SCALE;
+        var currentScaleValue = "0";
+        var DEFAULT_SCALE_VALUE = "1";
+
+	// TESTING:
+	var destinations = null;
+
         var setupText = function setupText(textdiv, content, viewport) {
+
+            function getPageNumberFromDest(dest) {
+		var destPage = 1;
+		if (dest instanceof Array) {
+		    var destRef = dest[0]; 
+		    if (destRef instanceof Object) {
+			// we would need to look this up in the 
+			// list of all pages that have been loaded,
+			// but we're trying to not have to load all the pages
+			// right now.  
+			// destPage = this.pagesRefMap[destRef.num + ' ' + destRef.gen + ' R'];
+		    } else {
+			destPage = (destRef + 1);
+		    }
+		}
+		return destPage;
+	    }
+
             function bindLink(link, dest) {
-                // TODO:  get this to work for document-internal links
-                //          link.href = PDFView.getDestinationHash(dest);
-                //          link.onclick = function pageViewSetupLinksOnclick() {
-                //              if (dest)
-                //                  PDFView.navigateTo(dest);
-                //              return false;
-                //          };
+		// get page number from dest:
+		destPage = getPageNumberFromDest(dest);
+                link.href = '#page=' + destPage;
+                link.onclick = function pageViewSetupLinksOnclick() {
+                    if (dest && dest instanceof Array )
+                        renderPage(destPage);
+                    return false;
+                };
             }
 
             function createElementWithStyle(tagName, item, rect) {
@@ -109,11 +133,16 @@ PDFJS.disableWorker = true;
                 }
             });
         }
+
         //
         // Get page info from document, resize canvas accordingly, and render page
         //
-        //    function renderPage(num) {
         renderPage = function(num) {
+	    // don't try to render a page that cannot be rendered
+	    if (num < 1 || num > pdfDocument.numPages) {
+		return;
+	    }
+
             // Update logging:
             log_event("book", { "type" : "gotopage", "old" : pageNum, "new" : num });
 
@@ -176,7 +205,6 @@ PDFJS.disableWorker = true;
             log_event("book", { "type" : "nextpage", "new" : pageNum });
         }
 
-        // Check to see if 
         selectScaleOption = function(value) {
             var options = $('#scaleSelect options');
             var predefinedValueFound = false;
@@ -245,7 +273,8 @@ PDFJS.disableWorker = true;
         PDFJS.getDocument(url).then(
             function getDocument(_pdfDocument) {
                 pdfDocument = _pdfDocument;
-                renderPage(pageNum);
+		// display the current page with a default scale value:
+		parseScale(DEFAULT_SCALE_VALUE);
             }, 
             function getDocumentError(message, exception) {
                 // placeholder: don't expect errors :)
@@ -271,6 +300,13 @@ PDFJS.disableWorker = true;
 
         $('#scaleSelect').change(function(event) {
             parseScale(this.value);
+        });
+
+        $('#pageNumber').change(function(event) {
+	    var newPageVal = parseInt(this.value);
+	    if (newPageVal) {
+		renderPage(newPageVal);
+	    }
         });
     }
 })(jQuery);
