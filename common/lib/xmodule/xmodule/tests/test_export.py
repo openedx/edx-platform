@@ -4,7 +4,7 @@ from fs.osfs import OSFS
 from nose.tools import assert_equals, assert_true
 from path import path
 from tempfile import mkdtemp
-from shutil import copytree
+import shutil
 
 from xmodule.modulestore.xml import XMLModuleStore
 
@@ -46,11 +46,11 @@ class RoundTripTestCase(unittest.TestCase):
         Thus we make sure that export and import work properly.
     '''
     def check_export_roundtrip(self, data_dir, course_dir):
-        root_dir = path(mkdtemp())
+        root_dir = path(self.temp_dir)
         print "Copying test course to temp dir {0}".format(root_dir)
 
         data_dir = path(data_dir)
-        copytree(data_dir / course_dir, root_dir / course_dir)
+        shutil.copytree(data_dir / course_dir, root_dir / course_dir)
 
         print "Starting import"
         initial_import = XMLModuleStore(root_dir, course_dirs=[course_dir])
@@ -108,6 +108,8 @@ class RoundTripTestCase(unittest.TestCase):
 
     def setUp(self):
         self.maxDiff = None
+        self.temp_dir = mkdtemp()
+        self.addCleanup(shutil.rmtree, self.temp_dir)
 
     def test_toy_roundtrip(self):
         self.check_export_roundtrip(DATA_DIR, "toy")

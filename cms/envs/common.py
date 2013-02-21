@@ -20,7 +20,6 @@ Longer TODO:
 """
 
 import sys
-import tempfile
 import os.path
 import os
 import lms.envs.common
@@ -59,7 +58,8 @@ sys.path.append(COMMON_ROOT / 'lib')
 
 ############################# WEB CONFIGURATION #############################
 # This is where we stick our compiled template files.
-MAKO_MODULE_DIR = tempfile.mkdtemp('mako')
+from tempdir import mkdtemp_clean
+MAKO_MODULE_DIR = mkdtemp_clean('mako')
 MAKO_TEMPLATES = {}
 MAKO_TEMPLATES['main'] = [
     PROJECT_ROOT / 'templates',
@@ -74,8 +74,8 @@ TEMPLATE_DIRS = MAKO_TEMPLATES['main']
 
 MITX_ROOT_URL = ''
 
-LOGIN_REDIRECT_URL = MITX_ROOT_URL + '/login'
-LOGIN_URL = MITX_ROOT_URL + '/login'
+LOGIN_REDIRECT_URL = MITX_ROOT_URL + '/signin'
+LOGIN_URL = MITX_ROOT_URL + '/signin'
 
 
 TEMPLATE_CONTEXT_PROCESSORS = (

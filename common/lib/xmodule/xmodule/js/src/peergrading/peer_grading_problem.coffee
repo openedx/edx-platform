@@ -175,16 +175,22 @@ class @PeerGradingProblem
     @prompt_container = $('.prompt-container')
     @rubric_container = $('.rubric-container')
     @flag_student_container = $('.flag-student-container')
+    @answer_unknown_container = $('.answer-unknown-container')
     @calibration_panel = $('.calibration-panel')
     @grading_panel = $('.grading-panel')
     @content_panel = $('.content-panel')
     @grading_message = $('.grading-message')
     @grading_message.hide()
+    @question_header = $('.question-header')
+    @question_header.click @collapse_question
 
     @grading_wrapper =$('.grading-wrapper')
     @calibration_feedback_panel = $('.calibration-feedback')
     @interstitial_page = $('.interstitial-page')
     @interstitial_page.hide()
+
+    @calibration_interstitial_page = $('.calibration-interstitial-page')
+    @calibration_interstitial_page.hide()
 
     @error_container = $('.error-container')
 
@@ -201,7 +207,10 @@ class @PeerGradingProblem
     @action_button = $('.action-button')
     @calibration_feedback_button = $('.calibration-feedback-button')
     @interstitial_page_button = $('.interstitial-page-button')
+    @calibration_interstitial_page_button = $('.calibration-interstitial-page-button')
     @flag_student_checkbox = $('.flag-checkbox')
+    @answer_unknown_checkbox = $('.answer-unknown-checkbox')
+    @collapse_question()
 
     Collapsible.setCollapsibles(@content_panel)
 
@@ -210,11 +219,20 @@ class @PeerGradingProblem
     @calibration_feedback_button.click =>
       @calibration_feedback_panel.hide()
       @grading_wrapper.show()
+      @gentle_alert "Calibration essay saved.  Fetched the next essay."
       @is_calibrated_check()
 
     @interstitial_page_button.click =>
       @interstitial_page.hide()
       @is_calibrated_check()
+
+    @calibration_interstitial_page_button.click =>
+      @calibration_interstitial_page.hide()
+      @is_calibrated_check()
+
+    @calibration_feedback_button.hide()
+    @calibration_feedback_panel.hide()
+    @error_container.hide()
 
     @is_calibrated_check()
 
@@ -233,6 +251,9 @@ class @PeerGradingProblem
   fetch_submission_essay: () =>
     @backend.post('get_next_submission', {location: @location}, @render_submission)
 
+  gentle_alert: (msg) =>
+    @grading_message.fadeIn()
+    @grading_message.html("<p>" + msg + "</p>")
 
   construct_data: () ->
     data =
@@ -243,6 +264,7 @@ class @PeerGradingProblem
       submission_key: @submission_key_input.val()
       feedback: @feedback_area.val()
       submission_flagged: @flag_student_checkbox.is(':checked')
+      answer_unknown: @answer_unknown_checkbox.is(':checked')
     return data
 
 
@@ -273,6 +295,9 @@ class @PeerGradingProblem
        else if response.calibrated and @calibration == true
          @calibration = false
          @render_interstitial_page()
+       else if not response.calibrated and @calibration==null
+         @calibration=true
+         @render_calibration_interstitial_page()
        else
          @calibration = true
          @fetch_calibration_essay()
@@ -296,7 +321,7 @@ class @PeerGradingProblem
     if response.success
       @is_calibrated_check()
       @grading_message.fadeIn()
-      @grading_message.html("<p>Grade sent successfully.</p>")
+      @grading_message.html("<p>Successfully saved your feedback. Fetched the next essay.</p>")
     else
       if response.error
         @render_error(response.error)
@@ -308,6 +333,7 @@ class @PeerGradingProblem
     # check to see whether or not any categories have not been scored
     if Rubric.check_complete()
       # show button if we have scores for all categories
+      @grading_message.hide()
       @show_submit_button()
       @grade = Rubric.get_total_score()
 
@@ -323,7 +349,7 @@ class @PeerGradingProblem
     if response.success
 
       # load in all the data
-      @submission_container.html("<h3>Training Essay</h3>")
+      @submission_container.html("")
       @render_submission_data(response)
       # TODO: indicate that we're in calibration mode
       @calibration_panel.addClass('current-state')
@@ -337,6 +363,9 @@ class @PeerGradingProblem
       @calibration_panel.find('.grading-text').hide()
       @grading_panel.find('.grading-text').hide()
       @flag_student_container.hide()
+      @answer_unknown_container.hide()
+
+      @feedback_area.val("")
 
       @submit_button.unbind('click')
       @submit_button.click @submit_calibration_essay
@@ -350,7 +379,7 @@ class @PeerGradingProblem
   render_submission: (response) =>
     if response.success
       @submit_button.hide()
-      @submission_container.html("<h3>Submitted Essay</h3>")
+      @submission_container.html("")
       @render_submission_data(response)
 
       @calibration_panel.removeClass('current-state')
@@ -364,6 +393,8 @@ class @PeerGradingProblem
       @calibration_panel.find('.grading-text').show()
       @grading_panel.find('.grading-text').show()
       @flag_student_container.show()
+      @answer_unknown_container.show()
+      @feedback_area.val("")
 
       @submit_button.unbind('click')
       @submit_button.click @submit_grade
@@ -395,6 +426,7 @@ class @PeerGradingProblem
     @submit_button.hide()
     @action_button.hide()
     @calibration_feedback_panel.hide()
+    Rubric.initialize(@location)
 
 
   render_calibration_feedback: (response) =>
@@ -408,17 +440,24 @@ class @PeerGradingProblem
     actual_score = parseInt(response.actual_score)
 
     if score == actual_score
-      calibration_wrapper.append("<p>Congratulations! Your score matches the actual score!</p>")
+      calibration_wrapper.append("<p>Your score matches the actual score!</p>")
     else
-      calibration_wrapper.append("<p>Please try to understand the grading critera better to be more accurate next time.</p>")
+      calibration_wrapper.append("<p>You may want to review the rubric again.</p>")
 
     # disable score selection and submission from the grading interface
     $("input[name='score-selection']").attr('disabled', true)
     @submit_button.hide()
+    @calibration_feedback_button.show()
 
   render_interstitial_page: () =>
     @content_panel.hide()
+    @grading_message.hide()
     @interstitial_page.show()
+
+  render_calibration_interstitial_page: () =>
+    @content_panel.hide()
+    @action_button.hide()
+    @calibration_interstitial_page.show()
 
   render_error: (error_message) =>
       @error_container.show()
@@ -433,3 +472,14 @@ class @PeerGradingProblem
   setup_score_selection: (max_score) =>
     # And now hook up an event handler again
     $("input[class='score-selection']").change @graded_callback
+
+  collapse_question: () =>
+    @prompt_container.slideToggle()
+    @prompt_container.toggleClass('open')
+    if @question_header.text() == "(Hide)"
+      Logger.log 'peer_grading_hide_question', {location: @location}
+      new_text = "(Show)"
+    else
+      Logger.log 'peer_grading_show_question', {location: @location}
+      new_text = "(Hide)"
+    @question_header.text(new_text)

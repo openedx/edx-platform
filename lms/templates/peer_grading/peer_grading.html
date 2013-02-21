@@ -14,6 +14,7 @@
                 <table class="problem-list">
                     <tr>
                         <th>Problem Name</th>
+                        <th>Due date</th>
                         <th>Graded</th>
                         <th>Available</th>
                         <th>Required</th>
@@ -22,7 +23,18 @@
                 %for problem in problem_list:
                 <tr data-graded="${problem['num_graded']}" data-required="${problem['num_required']}">
                     <td class="problem-name">
-                        <a href="#problem" data-location="${problem['location']}" class="problem-button">${problem['problem_name']}</a>
+                        %if problem['closed']:
+                            ${problem['problem_name']}
+                        %else:
+                            <a href="#problem" data-location="${problem['location']}" class="problem-button">${problem['problem_name']}</a>
+                        %endif
+                    </td>
+                    <td>
+                        % if problem['due']:
+                            ${problem['due']}
+                        % else:
+                            No due date
+                        % endif
                     </td>
                     <td>
                         ${problem['num_graded']}
