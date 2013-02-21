@@ -425,14 +425,15 @@ class ContentStoreTest(ModuleStoreTestCase):
     def test_import_metadata_with_attempts_empty_string(self):
         import_from_xml(modulestore(), 'common/test/data/', ['simple'])
         ms = modulestore('direct')
-        asserted = False
+        did_load_item = False
         try:       
-            effort = ms.get_item(Location(['i4x', 'edX', 'simple', 'problem', 'ps01-simple', None]))
+            ms.get_item(Location(['i4x', 'edX', 'simple', 'problem', 'ps01-simple', None]))
+            did_load_item = True
         except ItemNotFoundError:
-            asserted = True
+            pass
 
         # make sure we found the item (e.g. it didn't error while loading)
-        self.assertFalse(asserted)   
+        self.assertTrue(did_load_item)   
 
     def test_metadata_inheritance(self):
         import_from_xml(modulestore(), 'common/test/data/', ['full'])
