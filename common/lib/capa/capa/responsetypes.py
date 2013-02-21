@@ -927,15 +927,19 @@ class CustomResponse(LoncapaResponse):
                 # actual function that will re-execute the original script,
                 # and invoke the function with the data needed.
                 def make_check_function(script_code, cfn):
-                    def check_function(expect, ans):
-                        code = (script_code + "\n" +
-                                "cfn_return = %s(expect, ans)\n" % cfn)
+                    def check_function(expect, ans, **kwargs):
+                        code = [script_code, "kwargs = {}"]
+                        for name, val in kwargs.iteritems():
+                            if isinstance(val, (str, list, tuple, int, long, float, dict)):
+                                code.append("kwargs[%r] = %r" % (name, val))
+                        code.append("cfn_return = %s(expect, ans, **kwargs)" % cfn)
+                        code.append("") # a final newline
                         globals_dict = {
                             'expect': expect,
                             'ans': ans,
                         }
                         locals_dict = {}
-                        safe_exec.safe_exec(code, globals_dict, locals_dict)
+                        safe_exec.safe_exec("\n".join(code), globals_dict, locals_dict)
                         return locals_dict['cfn_return']
                     return check_function
 
@@ -953,6 +957,8 @@ class CustomResponse(LoncapaResponse):
                         'src/' + answer_src).read()
                 else:
                     self.code = answer.text
+
+        self.cfn_kwargs_keys = []
 
     def get_score(self, student_answers):
         '''
@@ -1054,7 +1060,8 @@ class CustomResponse(LoncapaResponse):
             log.debug(" submission = %s" % submission)
             try:
                 answer_given = submission[0] if (len(idset) == 1) else submission
-                ret = fn(self.expect, answer_given)
+                kwargs = {n:self.context.get(n) for n in self.cfn_kwargs_keys}
+                ret = fn(self.expect, answer_given, **kwargs)
             except Exception as err:
                 self._handle_exec_exception(err)
 
@@ -1203,6 +1210,7 @@ class SymbolicResponse(CustomResponse):
         self.context['script_code'] += "from symmath import symmath_check\n"
         self.xml.set('cfn', 'symmath_check')
         CustomResponse.setup_response(self)
+        self.cfn_kwargs_keys.extend(['dynamath', 'options', 'debug'])
 
 #-----------------------------------------------------------------------------
 
