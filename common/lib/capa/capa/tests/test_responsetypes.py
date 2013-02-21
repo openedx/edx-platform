@@ -10,6 +10,7 @@ import os
 import random
 import unittest
 import textwrap
+import mock
 
 from . import test_system
 
@@ -186,7 +187,6 @@ class ImageResponseTest(ResponseTest):
 
 class SymbolicResponseTest(unittest.TestCase):
     def test_sr_grade(self):
-        raise SkipTest()  # This test fails due to dependencies on a local copy of snuggletex-webapp. Until we have figured that out, we'll just skip this test
         symbolicresponse_file = os.path.dirname(__file__) + "/test_files/symbolicresponse.xml"
         test_lcp = lcp.LoncapaProblem(open(symbolicresponse_file).read(), '1', system=test_system)
         correct_answers = {'1_2_1': 'cos(theta)*[[1,0],[0,1]] + i*sin(theta)*[[0,1],[1,0]]',
@@ -264,14 +264,25 @@ class SymbolicResponseTest(unittest.TestCase):
                            }
         wrong_answers = {'1_2_1': '2',
                          '1_2_1_dynamath': '''
-                         <math xmlns="http://www.w3.org/1998/Math/MathML">
-                           <mstyle displaystyle="true">
-                             <mn>2</mn>
-                           </mstyle>
-                         </math>''',
-                         }
-        self.assertEquals(test_lcp.grade_answers(correct_answers).get_correctness('1_2_1'), 'correct')
-        self.assertEquals(test_lcp.grade_answers(wrong_answers).get_correctness('1_2_1'), 'incorrect')
+                            <math xmlns="http://www.w3.org/1998/Math/MathML">
+                            <mstyle displaystyle="true">
+                                <mn>2</mn>
+                            </mstyle>
+                            </math>''',
+                        }
+
+        import requests
+        d = os.path.dirname(__file__)
+        correct_snuggletex_response = open(os.path.join(d, "test_files/snuggletex_correct.html")).read().decode('utf8')
+        wrong_snuggletex_response = open(os.path.join(d, "test_files/snuggletex_wrong.html")).read().decode('utf8')
+
+        with mock.patch.object(requests, 'post') as mock_post:
+            mock_post.return_value.text = correct_snuggletex_response
+            self.assertEquals(test_lcp.grade_answers(correct_answers).get_correctness('1_2_1'), 'correct')
+
+        with mock.patch.object(requests, 'post') as mock_post:
+            mock_post.return_value.text = wrong_snuggletex_response
+            self.assertEquals(test_lcp.grade_answers(wrong_answers).get_correctness('1_2_1'), 'incorrect')
 
 
 class OptionResponseTest(ResponseTest):
