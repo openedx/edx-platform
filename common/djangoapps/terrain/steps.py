@@ -108,6 +108,11 @@ def i_am_an_edx_user(step):
 
 #### helper functions
 
+@world.absorb
+def scroll_to_bottom():
+    # Maximize the browser
+    world.browser.execute_script("window.scrollTo(0, screen.height);")
+
 
 @world.absorb
 def create_user(uname):

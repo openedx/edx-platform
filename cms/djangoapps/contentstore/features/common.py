@@ -11,6 +11,7 @@ logger = getLogger(__name__)
 
 ###########  STEP HELPERS ##############
 
+
 @step('I (?:visit|access|open) the Studio homepage$')
 def i_visit_the_studio_homepage(step):
     # To make this go to port 8001, put
@@ -49,6 +50,7 @@ def i_have_opened_a_new_course(step):
     create_a_course()
 
 ####### HELPER FUNCTIONS ##############
+
 
 def create_studio_user(
         uname='robot',

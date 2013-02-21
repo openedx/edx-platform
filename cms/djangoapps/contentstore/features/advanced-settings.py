@@ -45,30 +45,37 @@ def create_new_entries(step):
 def they_are_alphabetized(step):
     assert_policy_entries(["a", "display_name", "z"], ['"zebra"', '"Robot Super Course"', '"apple"'])
 
+
 @step('I create a JSON object$')
 def create_JSON_object(step):
     create_entry("json", '{"key": "value", "key_2": "value_2"}')
     click_save()
 
+
 @step('it is displayed as formatted$')
 def it_is_formatted(step):
     assert_policy_entries(["display_name", "json"], ['"Robot Super Course"', '{\n    "key": "value",\n    "key_2": "value_2"\n}'])
+
 
 # TODO: this is copied from terrain's step.py. Need to figure out how to share that code.
 @step('I reload the page$')
 def reload_the_page(step):
     world.browser.reload()
 
+
 def create_entry(key, value):
-    css_click_at('a.new-advanced-policy-item')
-    newKey = css_find('#__new_advanced_key__ input').first
-    newKey.fill(key)
+    # Scroll down the page so the button is visible
+    world.scroll_to_bottom()
+    css_click_at('a.new-advanced-policy-item', 10, 10)
+    new_key_css = 'div#__new_advanced_key__ input'
+    new_key_element = css_find(new_key_css).first
+    new_key_element.fill(key)
 #   For some reason have to get the instance for each command (get error that it is no longer attached to the DOM)
 #   Have to do all this because Selenium has a bug that fill does not remove existing text
-    css_find('.CodeMirror textarea').last.double_click()
-    css_find('.CodeMirror textarea').last._element.send_keys(Keys.BACK_SPACE)
-    css_find('.CodeMirror textarea').last._element.send_keys(Keys.BACK_SPACE)
-    css_find('.CodeMirror textarea').last.fill(value)
+    new_value_css = 'div.CodeMirror textarea'
+    css_find(new_value_css).last.fill("")
+    css_find(new_value_css).last._element.send_keys(Keys.DELETE, Keys.DELETE)
+    css_find(new_value_css).last.fill(value)
 
 
 def delete_entry(index):
@@ -91,11 +98,12 @@ def assert_entries(css, expected_values):
     assert_equal(len(expected_values), len(webElements))
 #   Sometimes get stale reference if I hold on to the array of elements
     for counter in range(len(expected_values)):
-      assert_equal(expected_values[counter], css_find(css)[counter].value)
+        assert_equal(expected_values[counter], css_find(css)[counter].value)
 
 
 def click_save():
     css = ".save-button"
+
     def is_shown(driver):
         visible = css_find(css).first.visible
         if visible:
