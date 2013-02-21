@@ -67,10 +67,18 @@ class SelfAssessmentTest(unittest.TestCase):
         def get_fake_item(name):
             return responses[name]
 
+        def get_data_for_location(self,location,student):
+            return {
+            'count_graded' : 0,
+            'count_required' : 0,
+            'student_sub_count': 0,
+            }
+
         mock_query_dict = MagicMock()
         mock_query_dict.__getitem__.side_effect = get_fake_item
         mock_query_dict.getlist = get_fake_item
 
+        self.module.peer_gs.get_data_for_location = get_data_for_location
 
         self.assertEqual(self.module.get_score()['score'], 0)
 

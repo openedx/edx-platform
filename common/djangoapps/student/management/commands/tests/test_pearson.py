@@ -7,6 +7,7 @@ import logging
 import os
 from tempfile import mkdtemp
 import cStringIO
+import shutil
 import sys
 
 from django.test import TestCase
@@ -143,23 +144,18 @@ class PearsonTestCase(TestCase):
     '''
     Base class for tests running Pearson-related commands
     '''
-    import_dir = mkdtemp(prefix="import")
-    export_dir = mkdtemp(prefix="export")
 
     def assertErrorContains(self, error_message, expected):
         self.assertTrue(error_message.find(expected) >= 0, 'error message "{}" did not contain "{}"'.format(error_message, expected))
 
+    def setUp(self):
+        self.import_dir = mkdtemp(prefix="import")
+        self.addCleanup(shutil.rmtree, self.import_dir)
+        self.export_dir = mkdtemp(prefix="export")
+        self.addCleanup(shutil.rmtree, self.export_dir)
+
     def tearDown(self):
-        def delete_temp_dir(dirname):
-            if os.path.exists(dirname):
-                for filename in os.listdir(dirname):
-                    os.remove(os.path.join(dirname, filename))
-                os.rmdir(dirname)
-
-        # clean up after any test data was dumped to temp directory
-        delete_temp_dir(self.import_dir)
-        delete_temp_dir(self.export_dir)
-
+        pass
         # and clean up the database:
 #        TestCenterUser.objects.all().delete()
 #        TestCenterRegistration.objects.all().delete()

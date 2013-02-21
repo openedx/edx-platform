@@ -44,5 +44,6 @@ class MakoModuleDescriptor(XModuleDescriptor):
     # cdodge: encapsulate a means to expose "editable" metadata fields (i.e. not internal system metadata)
     @property
     def editable_metadata_fields(self):
-        subset = [name for name in self.metadata.keys() if name not in self.system_metadata_fields]
+        subset = [name for name in self.metadata.keys() if name not in self.system_metadata_fields and 
+            name not in self._inherited_metadata]
         return subset
