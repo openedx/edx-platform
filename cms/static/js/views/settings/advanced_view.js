@@ -10,7 +10,6 @@ CMS.Views.Settings.Advanced = CMS.Views.ValidatingView.extend({
         'click .new-button' : "addEntry",
         // update model on changes
         'change .policy-key' : "updateKey",
-        // keyup fired on tab and other non-altering events
         'keypress .policy-key' : "showSaveCancelButtons",
         'focus :input' : "focusInput",
         'blur :input' : "blurInput"
@@ -26,6 +25,7 @@ CMS.Views.Settings.Advanced = CMS.Views.ValidatingView.extend({
                 self.render();
             }
         );
+        // because these are outside of this.$el, they can't be in the event hash
         $('.save-button').on('click', this, this.saveView);
         $('.cancel-button').on('click', this, this.revertView);
         this.model.on('error', this.handleValidationError, this);
@@ -47,12 +47,6 @@ CMS.Views.Settings.Advanced = CMS.Views.ValidatingView.extend({
             function(key) {
                 listEle$.append(self.renderTemplate(key, self.model.get(key)));
             });
-        // hilighting labels when fields are focused in
-//        listEle$.find(":input").focus(function(event) {
-//            listEle$.find("label[for='" + this.id + "']").addClass("is-focused");
-//          }).blur(function() {
-//              listEle$.find("label[for='" + this.id + "']").removeClass("is-focused");
-//            });
 
         var policyValues = listEle$.find('.json');
         _.each(policyValues, this.attachJSONEditor, this);
