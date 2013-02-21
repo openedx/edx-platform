@@ -9,7 +9,7 @@
 <%block name="headextra">
 <%static:css group='course'/>
 <%static:js group='courseware'/>
-    <link rel="stylesheet" href="/static/css/vendor/pdfjs/myviewer.css"/>
+    <link rel="stylesheet" href="/static/css/pdfviewer.css"/>
     <script type="text/javascript" src="/static/js/vendor/pdfjs/pdf.js"></script>
     <script type="text/javascript" src="/static/js/pdfviewer.js"></script> 
 </%block>
@@ -22,7 +22,7 @@
     $(document).ready(function() {
         $('#outerContainer').PDFViewer( { 
             % if page is not None:
-            'pageNum' : page,
+            'pageNum' : ${page},
             % endif
             'url' : url
         });

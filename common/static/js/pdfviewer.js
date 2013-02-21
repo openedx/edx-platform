@@ -30,7 +30,7 @@ PDFJS.disableWorker = true;
         var url = options['url'];
         var pageNum = 1;
         if (options.pageNum) {
-            pageNum = int(options.pageNum);
+            pageNum = options.pageNum;
         }
         var currentScale = 1.0;
         var currentScaleValue = "1";
@@ -178,7 +178,7 @@ PDFJS.disableWorker = true;
 
         // Check to see if 
         selectScaleOption = function(value) {
-            var options = $('#scaleSelect').options;
+            var options = $('#scaleSelect options');
             var predefinedValueFound = false;
             for (var i = 0; i < options.length; i++) {
                 var option = options[i];
