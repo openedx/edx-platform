@@ -20,7 +20,6 @@ Longer TODO:
 """
 import sys
 import os
-import tempfile
 from xmodule.static_content import write_module_styles, write_module_js
 
 from path import path
@@ -133,7 +132,8 @@ OPENID_PROVIDER_TRUSTED_ROOTS = ['cs50.net', '*.cs50.net']
 ################################## MITXWEB #####################################
 # This is where we stick our compiled template files. Most of the app uses Mako
 # templates
-MAKO_MODULE_DIR = tempfile.mkdtemp('mako')
+from tempdir import mkdtemp_clean
+MAKO_MODULE_DIR = mkdtemp_clean('mako')
 MAKO_TEMPLATES = {}
 MAKO_TEMPLATES['main'] = [PROJECT_ROOT / 'templates',
                           COMMON_ROOT / 'templates',

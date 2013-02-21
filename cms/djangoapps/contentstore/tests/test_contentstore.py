@@ -5,7 +5,7 @@ from django.test.utils import override_settings
 from django.conf import settings
 from django.core.urlresolvers import reverse
 from path import path
-from tempfile import mkdtemp
+from tempdir import mkdtemp_clean
 import json
 from fs.osfs import OSFS
 import copy
@@ -194,7 +194,7 @@ class ContentStoreToyCourseTest(ModuleStoreTestCase):
         import_from_xml(ms, 'common/test/data/', ['full'])
         location = CourseDescriptor.id_to_location('edX/full/6.002_Spring_2012')
 
-        root_dir = path(mkdtemp())
+        root_dir = path(mkdtemp_clean())
 
         print 'Exporting to tempdir = {0}'.format(root_dir)
 
