@@ -96,6 +96,18 @@ class TestLimits(JailPyHelpers, unittest.TestCase):
         self.assertEqual(res.stdout, "Trying\n")
         self.assertIn("ermission denied", res.stderr)
 
+    def test_cant_use_network(self):
+        res = jailpy(dedent("""\
+                import urllib
+                print "Reading google"
+                u = urllib.urlopen("http://google.com")
+                google = u.read()
+                print len(google)
+                """))
+        self.assertNotEqual(res.status, 0)
+        self.assertEqual(res.stdout, "Reading google\n")
+        self.assertIn("IOError", res.stderr)
+
     # TODO: write files
     # TODO: read network
     # TODO: fork
