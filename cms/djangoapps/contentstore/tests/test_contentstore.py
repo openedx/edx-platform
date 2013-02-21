@@ -451,7 +451,7 @@ class ContentStoreTest(ModuleStoreTestCase):
         self.assertGreater(len(verticals), 0)
 
         new_component_location = Location('i4x', 'edX', 'full', 'html', 'new_component')
-        source_template_location = Location('i4x', 'edx', 'templates', 'html', 'Empty')
+        source_template_location = Location('i4x', 'edx', 'templates', 'html', 'Blank_HTML_Page')
         
         # crate a new module and add it as a child to a vertical
         ms.clone_item(source_template_location, new_component_location)
