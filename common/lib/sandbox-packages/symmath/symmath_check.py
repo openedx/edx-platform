@@ -324,4 +324,5 @@ def symmath_check(expect, ans, dynamath=None, options=None, debug=None, xml=None
             msg += "<p>Difference: %s</p>" % to_latex(diff)
         msg += '<hr>'
 
-    return {'ok': False, 'msg': msg, 'ex': fexpect, 'got': fsym}
+    # Used to return more keys: 'ex': fexpect, 'got': fsym
+    return {'ok': False, 'msg': msg}
