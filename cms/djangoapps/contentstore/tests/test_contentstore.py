@@ -264,6 +264,7 @@ class ContentStoreToyCourseTest(ModuleStoreTestCase):
         self.assertContains(resp, '/c4x/edX/full/asset/handouts_schematic_tutorial.pdf')
 
 
+
 class ContentStoreTest(ModuleStoreTestCase):
     """
     Tests for the CMS ContentStore application.
@@ -420,6 +421,52 @@ class ContentStoreTest(ModuleStoreTestCase):
         self.assertIn('markdown', context, "markdown is missing from context")
         self.assertIn('markdown', problem.metadata, "markdown is missing from metadata")
         self.assertNotIn('markdown', problem.editable_metadata_fields, "Markdown slipped into the editable metadata fields")
+
+
+    def test_metadata_inheritance(self):
+        import_from_xml(modulestore(), 'common/test/data/', ['full'])
+
+        ms = modulestore('direct')
+        course = ms.get_item(Location(['i4x', 'edX', 'full', 'course', '6.002_Spring_2012', None]))
+
+        verticals = ms.get_items(['i4x', 'edX', 'full', 'vertical', None, None])
+
+        # let's assert on the metadata_inheritance on an existing vertical
+        for vertical in verticals:
+            self.assertIn('xqa_key', vertical.metadata)
+            self.assertEqual(course.metadata['xqa_key'], vertical.metadata['xqa_key'])
+
+        self.assertGreater(len(verticals), 0)
+
+        new_component_location = Location('i4x', 'edX', 'full', 'html', 'new_component')
+        source_template_location = Location('i4x', 'edx', 'templates', 'html', 'Empty')
+        
+        # crate a new module and add it as a child to a vertical
+        ms.clone_item(source_template_location, new_component_location)
+        parent = verticals[0]
+        ms.update_children(parent.location, parent.definition.get('children', []) + [new_component_location.url()])
+
+        # flush the cache
+        ms.get_cached_metadata_inheritance_tree(new_component_location, -1)
+        new_module = ms.get_item(new_component_location)
+
+        # check for grace period definition which should be defined at the course level
+        self.assertIn('graceperiod', new_module.metadata)
+
+        self.assertEqual(course.metadata['graceperiod'], new_module.metadata['graceperiod'])
+
+        #
+        # now let's define an override at the leaf node level
+        #
+        new_module.metadata['graceperiod'] = '1 day'
+        ms.update_metadata(new_module.location, new_module.metadata)
+
+        # flush the cache and refetch
+        ms.get_cached_metadata_inheritance_tree(new_component_location, -1)
+        new_module = ms.get_item(new_component_location)
+
+        self.assertIn('graceperiod', new_module.metadata)
+        self.assertEqual('1 day', new_module.metadata['graceperiod'])
 
 
 class TemplateTestCase(ModuleStoreTestCase):
