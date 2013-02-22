@@ -976,6 +976,11 @@ class AnnotationInput(InputTypeBase):
         self.tag_prompt = xml.findtext('./tag_prompt')
         self.options = self._find_options()
 
+        # Need to provide a value that JSON can parse if there is no
+        # student-supplied value yet.
+        if self.value == "":
+            self.value = 'null'
+
     def _find_options(self):
         options = []
         index = 0

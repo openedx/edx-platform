@@ -1,12 +1,79 @@
 (function () {
-    console.log('annotation input loaded: ', this);
-    var update = function() {
-             console.log("annotation input update");
-    };
+    var debug = true;
 
-    var inputs = $('.annotation-input input');
-    // update on load
-    inputs.each(update); 
-    // and on every change
-    inputs.bind("input", update);
+    var module = {
+        debug: debug,
+        inputSelector: '.annotation-input',
+        tagSelector: '.tag',
+        commentSelector: 'textarea.comment',
+        valueSelector: 'input.value', // stash tag selections and comment here as a JSON string...
+
+        init: function() {
+            var that = this;
+
+            if(this.debug) { console.log('annotation input loaded: '); }
+
+            $(this.inputSelector).each(function(index, el) {
+                if(!$(el).data('listening')) {
+                    $(el).delegate(that.tagSelector, 'click', $.proxy(that.onClickTag, that));
+                    $(el).delegate(that.commentSelector, 'change', $.proxy(that.onChangeComment, that));
+                    $(el).data('listening', 'yes');
+                }
+            });
+        },
+        onChangeComment: function(e) {
+            var value_el = this.findValueEl(e.target);
+            var current_value = this.currentValue(value_el);
+            var target_value = $(e.target).val();
+
+            current_value.comment = target_value;
+            this.setValue(value_el, current_value);
+        },
+        onClickTag: function(e) {
+            var target_el = e.target, target_value, target_index;
+            var value_el, current_value;
+
+            value_el = this.findValueEl(e.target);
+            current_value = this.currentValue(value_el);
+            target_value = $(e.target).data('id');
+
+            if(!$(target_el).hasClass('selected')) {
+                current_value.options.push(target_value);
+            } else {
+                target_index = current_value.options.indexOf(target_value);
+                if(target_index !== -1) {
+                    current_value.options.splice(target_index, 1);
+                }
+            }
+
+            this.setValue(value_el, current_value);
+            $(target_el).toggleClass('selected');
+        },
+        findValueEl: function(target_el) {
+            var input_el = $(target_el).closest(this.inputSelector);
+            return $(this.valueSelector, input_el);
+        },
+        currentValue: function(value_el) {
+            var json = $(value_el).val();
+
+            var result = JSON.parse(json);
+            if(result === null) {
+                result = {};
+            }
+            if(!result.hasOwnProperty('options')) {
+                result.options = [];
+            }
+            if(!result.hasOwnProperty('comment')) {
+                result.comment = '';
+            }
+
+            return result;
+        },
+        setValue: function(value_el, new_value) {
+            var json = JSON.stringify(new_value);
+            $(value_el).val(json);
+        }
+    }
+
+    module.init();
 }).call(this);

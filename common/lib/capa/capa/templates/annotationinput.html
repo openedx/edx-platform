@@ -5,17 +5,18 @@
 <div class="annotation-body">
     <div class="prompt prompt-text">${text}</div>
     <div class="prompt">${comment_prompt}</div>
-    <textarea id="input_${id}_comment" name="input_${id}_comment"/>
+    <textarea class="comment" id="input_${id}_comment" name="input_${id}_comment"/>
     <div class="prompt">${tag_prompt}</div>
     <ul class="tags">
     % for option in options:
-          <li data-id="${option['id']}"><span>${option['description']}</span></li>
+          <li><span class="tag" data-id="${option['id']}">${option['description']}</span></li>
     % endfor
     </ul>
 
-    <div style="display:none">
-    Value: ${value} <input type="text" name="input_${id}" id="input_${id}"/>
-    TODO: make the textline hidden once it all works
+    <div style="display:block">
+        Value: ${value}
+        <br/><input type="text" class="value" name="input_${id}" id="input_${id}" value="${value}" size="75"/>
+        <br/>TODO: make the textline hidden once it all works
     <span id="answer_${id}"></span>
 
     % if status == 'unsubmitted':
