@@ -1,4 +1,5 @@
 from student.models import User, UserProfile, Registration
+from django.contrib.auth.models import Group
 from datetime import datetime
 from factory import Factory
 from xmodule.modulestore import Location
@@ -7,6 +8,12 @@ from time import gmtime
 from uuid import uuid4
 from xmodule.timeparse import stringify_time
 
+
+class GroupFactory(Factory):
+    FACTORY_FOR = Group
+
+    name = 'staff_MITx/999/Robot_Super_Course'
+    
 
 class UserProfileFactory(Factory):
     FACTORY_FOR = UserProfile

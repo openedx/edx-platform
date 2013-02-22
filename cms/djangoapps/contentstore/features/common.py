@@ -1,10 +1,13 @@
 from lettuce import world, step
-from factories import *
 from lettuce.django import django_url
 from nose.tools import assert_true
 from nose.tools import assert_equal
-import xmodule.modulestore.django
 from selenium.webdriver.support.ui import WebDriverWait
+
+from terrain.factories import UserFactory, RegistrationFactory, UserProfileFactory
+from terrain.factories import CourseFactory, GroupFactory
+import xmodule.modulestore.django
+from auth.authz import get_user_by_email
 
 from logging import getLogger
 logger = getLogger(__name__)
@@ -159,9 +162,18 @@ def log_into_studio(
 
 
 def create_a_course():
-    css_click('a.new-course-button')
-    fill_in_course_info()
-    css_click('input.new-course-save')
+    c = CourseFactory.create(org='MITx', course='999', display_name='Robot Super Course')
+
+    # Add the user to the instructor group of the course
+    # so they will have the permissions to see it in studio
+    g = GroupFactory.create(name='instructor_MITx/999/Robot_Super_Course')
+    u = get_user_by_email('robot+studio@edx.org')
+    u.groups.add(g)
+    u.save()
+    world.browser.reload()
+
+    course_link_css = 'span.class-name'
+    css_click(course_link_css)
     course_title_css = 'span.course-title'
     assert_true(world.browser.is_element_present_by_css(course_title_css, 5))
 

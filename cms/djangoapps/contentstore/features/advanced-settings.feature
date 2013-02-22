@@ -28,3 +28,4 @@ Feature: Advanced (manual) course policy
     When I select the Advanced Settings
     And I create a JSON object
     Then it is displayed as formatted
+
