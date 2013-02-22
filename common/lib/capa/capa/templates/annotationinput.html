@@ -3,20 +3,30 @@
 
 <div class="annotation-header">${title}</div>
 <div class="annotation-body">
-    <div class="prompt prompt-text">${text}</div>
-    <div class="prompt">${comment_prompt}</div>
-    <textarea class="comment" id="input_${id}_comment" name="input_${id}_comment"/>
-    <div class="prompt">${tag_prompt}</div>
+
+    <div class="block block-highlight">${text}</div>
+    <div class="block block-comment">${comment}</div>
+
+    <div class="block">${comment_prompt}</div>
+    <textarea class="comment" id="input_${id}_comment" name="input_${id}_comment">${comment_value|h}</textarea>
+
+    <div class="block">${tag_prompt}</div>
     <ul class="tags">
     % for option in options:
-          <li><span class="tag" data-id="${option['id']}">${option['description']}</span></li>
+        <li><span class="tag
+        % if option['id'] in options_value:
+            selected
+        % endif
+        " data-id="${option['id']}">${option['description']}</span></li>
     % endfor
     </ul>
 
-    <div style="display:block">
-        Value: ${value}
-        <br/><input type="text" class="value" name="input_${id}" id="input_${id}" value="${value}" size="75"/>
-        <br/>TODO: make the textline hidden once it all works
+    <div class="debug-value">
+        Rendered Value: <pre>${value}</pre><br/>
+        Input Value:<br/><input type="text" class="value" name="input_${id}" id="input_${id}" value="${value|h}" size="75"/>
+        <br/><em>Hide this value input box when it's all working!!!</em>
+    </div>
+
     <span id="answer_${id}"></span>
 
     % if status == 'unsubmitted':
@@ -28,7 +38,8 @@
     % elif status == 'incomplete':
     <span class="incorrect" id="status_${id}"></span>
     % endif
-    </div>
+
+
 
     <a class="annotation-return" href="javascript:void(0)">Return to Annotation</a><br/>
 </div>

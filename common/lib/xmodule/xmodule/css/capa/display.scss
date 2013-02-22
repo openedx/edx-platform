@@ -809,6 +809,7 @@ section.problem {
     border: 1px solid #ccc;
     border-radius: 1em;
     margin: 0 0 1em 0;
+
     .annotation-header {
       font-weight: bold;
       border-bottom: 1px solid #ccc;
@@ -817,18 +818,20 @@ section.problem {
     .annotation-body { padding: .5em 1em; }
     .annotation-return { float: right; }
     .annotation-return:after { content: " \2191" }
-    .prompt { font-style: italic; }
-    .prompt.prompt-text {
-      padding: .5em;
-      color:  #333;
-      background-color: $yellow;
-      font-style: normal;
-      border: 1px solid darken($yellow, 10%);
-    }
-    .prompt, ul.tags {
+
+    .block, ul.tags {
       margin: .5em 0;
       padding: 0;
     }
+    .block-highlight {
+      padding: .5em;
+      color:  #333;
+      font-style: normal;
+      background-color: $yellow;
+      border: 1px solid darken($yellow, 10%);
+    }
+    .block-comment { font-style: italic; }
+
     ul.tags {
       display: block;
       list-style-type: none;
@@ -847,6 +850,14 @@ section.problem {
         }
       }
     }
-    textarea { width: 100%; }
+    textarea.comment { width: 100%; }
+    .debug-value {
+        color: #fff;
+        padding: 1em;
+        margin: 1em 0;
+        background-color: #999;
+        border: 1px solid #000;
+        pre { background-color: #CCC; color: #000; }
+    }
   }
 }

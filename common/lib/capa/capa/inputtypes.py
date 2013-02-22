@@ -972,13 +972,14 @@ class AnnotationInput(InputTypeBase):
 
         self.title = xml.findtext('./title', 'Annotation Exercise')
         self.text = xml.findtext('./text')
-        self.comment_prompt = xml.findtext('./comment_prompt')
-        self.tag_prompt = xml.findtext('./tag_prompt')
+        self.comment = xml.findtext('./comment')
+        self.comment_prompt = xml.findtext('./comment_prompt', 'Type a commentary below:')
+        self.tag_prompt = xml.findtext('./tag_prompt', 'Select one or more tags:')
         self.options = self._find_options()
 
         # Need to provide a value that JSON can parse if there is no
         # student-supplied value yet.
-        if self.value == "":
+        if self.value == '':
             self.value = 'null'
 
     def _find_options(self):
@@ -993,12 +994,37 @@ class AnnotationInput(InputTypeBase):
             index += 1
         return options
 
+    def _unpack_value(self):
+        unpacked_value = json.loads(self.value)
+        if type(unpacked_value) != dict:
+            unpacked_value = {}
+
+        comment_value = unpacked_value.get('comment', '')
+        if not isinstance(comment_value, basestring):
+            comment_value = ''
+
+        options_value = unpacked_value.get('options', [])
+        if not isinstance(options_value, list):
+            options_value = []
+
+        return {
+            'options_value': options_value,
+            'comment_value': comment_value
+        }
+
     def _extra_context(self):
-        return {'title': self.title,
+        extra_context = {
+                'title': self.title,
                 'text': self.text,
+                'comment': self.comment,
                 'comment_prompt': self.comment_prompt,
                 'tag_prompt': self.tag_prompt,
-                'options': self.options}
+                'options': self.options,
+         }
+        unpacked_value = self._unpack_value()
+        extra_context.update(unpacked_value)
+
+        return extra_context
 
 registry.register(AnnotationInput)
 
