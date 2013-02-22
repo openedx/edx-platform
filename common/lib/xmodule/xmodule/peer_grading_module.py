@@ -60,6 +60,18 @@ class PeerGradingModule(XModule):
         if isinstance(self.use_for_single_location, basestring):
             self.use_for_single_location = (self.use_for_single_location in TRUE_DICT)
 
+        self.link_to_location = self.metadata.get('link_to_location', USE_FOR_SINGLE_LOCATION)
+        if self.use_for_single_location == True:
+            try:
+                self.linked_problem = modulestore().get_instance(self.system.course_id, self.link_to_location)
+            except:
+                log.error("Linked location {0} for peer grading module {1} does not exist".format(
+                    self.link_to_location, self.location))
+                raise
+            due_date = self.linked_problem.metadata.get('peer_grading_due', None)
+            if due_date:
+                self.metadata['due'] = due_date
+
         self.is_graded = self.metadata.get('is_graded', IS_GRADED)
         if isinstance(self.is_graded, basestring):
             self.is_graded = (self.is_graded in TRUE_DICT)
@@ -75,17 +87,6 @@ class PeerGradingModule(XModule):
 
         self.display_due_date = self.timeinfo.display_due_date
 
-        self.link_to_location = self.metadata.get('link_to_location', USE_FOR_SINGLE_LOCATION)
-        if self.use_for_single_location == True:
-            try:
-                self.linked_problem = modulestore().get_instance(self.system.course_id, self.link_to_location)
-            except:
-                log.error("Linked location {0} for peer grading module {1} does not exist".format(
-                    self.link_to_location, self.location))
-                raise
-            due_date = self.linked_problem.metadata.get('peer_grading_due', None)
-            if due_date:
-                self.metadata['due'] = due_date
 
         self.ajax_url = self.system.ajax_url
         if not self.ajax_url.endswith("/"):
@@ -606,13 +607,4 @@ class PeerGradingDescriptor(XmlDescriptor, EditingDescriptor):
     def definition_to_xml(self, resource_fs):
         '''Return an xml element representing this definition.'''
         elt = etree.Element('peergrading')
-
-        def add_child(k):
-            child_str = '<{tag}>{body}</{tag}>'.format(tag=k, body=self.definition[k])
-            child_node = etree.fromstring(child_str)
-            elt.append(child_node)
-
-        for child in ['task']:
-            add_child(child)
-
         return elt
