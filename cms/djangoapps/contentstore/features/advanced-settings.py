@@ -5,6 +5,9 @@ import time
 from nose.tools import assert_equal
 from nose.tools import assert_true
 
+"""
+http://selenium.googlecode.com/svn/trunk/docs/api/py/webdriver/selenium.webdriver.common.keys.html
+"""
 from selenium.webdriver.common.keys import Keys
 
 
@@ -24,20 +27,39 @@ def i_am_on_advanced_course_settings(step):
     step.given('I select the Advanced Settings')
 
 
-@step('I see only the display name$')
-def i_see_only_display_name(step):
-    assert_policy_entries(["display_name"], ['"Robot Super Course"'])
+# TODO: this is copied from terrain's step.py. Need to figure out how to share that code.
+@step('I reload the page$')
+def reload_the_page(step):
+    world.browser.reload()
 
 
-@step('I delete the display name')
-def i_delete_the_display_name(step):
+@step(u'I edit the name of a policy key$')
+def edit_the_name_of_a_policy_key(step):
+    policy_key_css = 'input.policy-key'
+    e = css_find(policy_key_css).first
+    e.fill('new')
+
+
+@step(u'I press the "([^"]*)" notification button$')
+def press_the_notification_button(step, name):
+    world.browser.click_link_by_text(name)
+
+
+@step(u'I edit the value of a policy key$')
+def edit_the_value_of_a_policy_key(step):
+    """
+    It is hard to figure out how to get into the CodeMirror
+    area, so cheat and do it from the policy key field :)
+    """
+    policy_key_css = 'input.policy-key'
+    e = css_find(policy_key_css).first
+    e._element.send_keys(Keys.TAB, Keys.END, Keys.ARROW_LEFT, ' ', 'X')
+
+
+@step('I delete the display name$')
+def delete_the_display_name(step):
     delete_entry(0)
     click_save()
-
-
-@step('there are no advanced policy settings$')
-def no_policy_settings(step):
-    assert_policy_entries([], [])
 
 
 @step('create New Entries$')
@@ -47,15 +69,26 @@ def create_new_entries(step):
     click_save()
 
 
-@step('they are alphabetized$')
-def they_are_alphabetized(step):
-    assert_policy_entries(["a", "display_name", "z"], ['"zebra"', '"Robot Super Course"', '"apple"'])
-
-
 @step('I create a JSON object$')
 def create_JSON_object(step):
     create_entry("json", '{"key": "value", "key_2": "value_2"}')
     click_save()
+
+
+############### RESULTS ####################
+@step('I see only the display name$')
+def i_see_only_display_name(step):
+    assert_policy_entries(["display_name"], ['"Robot Super Course"'])
+
+
+@step('there are no advanced policy settings$')
+def no_policy_settings(step):
+    assert_policy_entries([], [])
+
+
+@step('they are alphabetized$')
+def they_are_alphabetized(step):
+    assert_policy_entries(["a", "display_name", "z"], ['"zebra"', '"Robot Super Course"', '"apple"'])
 
 
 @step('it is displayed as formatted$')
@@ -63,12 +96,35 @@ def it_is_formatted(step):
     assert_policy_entries(["display_name", "json"], ['"Robot Super Course"', '{\n    "key": "value",\n    "key_2": "value_2"\n}'])
 
 
-# TODO: this is copied from terrain's step.py. Need to figure out how to share that code.
-@step('I reload the page$')
-def reload_the_page(step):
-    world.browser.reload()
+@step(u'the policy key name is unchanged$')
+def the_policy_key_name_is_unchanged(step):
+    policy_key_css = 'input.policy-key'
+    e = css_find(policy_key_css).first
+    assert_equal(e.value, 'display_name')
 
 
+@step(u'the policy key name is changed$')
+def the_policy_key_name_is_changed(step):
+    policy_key_css = 'input.policy-key'
+    e = css_find(policy_key_css).first
+    assert_equal(e.value, 'new')
+
+
+@step(u'the policy key value is unchanged$')
+def the_policy_key_value_is_unchanged(step):
+    policy_value_css = 'li.course-advanced-policy-list-item div.value textarea'
+    e = css_find(policy_value_css).first
+    assert_equal(e.value, '"Robot Super Course"')
+
+
+@step(u'the policy key value is changed$')
+def the_policy_key_value_is_unchanged(step):
+    policy_value_css = 'li.course-advanced-policy-list-item div.value textarea'
+    e = css_find(policy_value_css).first
+    assert_equal(e.value, '"Robot Super Course X"')
+
+
+############# HELPERS ###############
 def create_entry(key, value):
     # Scroll down the page so the button is visible
     world.scroll_to_bottom()

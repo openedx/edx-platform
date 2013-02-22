@@ -14,6 +14,30 @@ Feature: Advanced (manual) course policy
     And I reload the page
     Then there are no advanced policy settings
 
+  Scenario: Test cancel editing key name
+    Given I am on the Advanced Course Settings page in Studio
+    When I edit the name of a policy key
+    And I press the "Cancel" notification button
+    Then the policy key name is unchanged
+
+  Scenario: Test editing key name
+    Given I am on the Advanced Course Settings page in Studio
+    When I edit the name of a policy key
+    And I press the "Save" notification button
+    Then the policy key name is changed
+
+  Scenario: Test cancel editing key value
+    Given I am on the Advanced Course Settings page in Studio
+    When I edit the value of a policy key
+    And I press the "Cancel" notification button
+    Then the policy key value is unchanged
+
+  Scenario: Test editing key value
+    Given I am on the Advanced Course Settings page in Studio
+    When I edit the value of a policy key
+    And I press the "Save" notification button
+    Then the policy key value is changed
+
   Scenario: Add new entries, and they appear alphabetically after save
     Given I am on the Advanced Course Settings page in Studio
     When I create New Entries
