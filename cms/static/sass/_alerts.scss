@@ -266,14 +266,8 @@
   	    }
 
         .action-primary {
-          @include transition (opacity 0.25s ease-in-out);
           @include font-size(13);
           font-weight: 600;
-          opacity: 0.90;
-
-          &:hover {
-            opacity: 1.0;
-          }
         }
 
         .action-secondary {
