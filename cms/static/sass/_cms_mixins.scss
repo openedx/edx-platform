@@ -1,26 +1,20 @@
-@mixin clearfix {
-	&:after {
-		content: '';
-		display: block;
-		height: 0;
-		visibility: hidden;
-		clear: both;
-	}
-}
+// studio specific mixins
+// ====================
 
+// buttons
 @mixin button {
 	display: inline-block;
-	padding: 4px 20px 6px;
-	font-size: 14px;
+	padding: ($baseline/5) $baseline ($baseline/4);
+	@include font-size(14);
 	font-weight: 700;
 	@include box-shadow(0 1px 0 rgba(255, 255, 255, .3) inset, 0 0 0 rgba(0, 0, 0, 0));
 	@include transition(background-color .15s, box-shadow .15s);
 
 	&.disabled {
-		border: 1px solid $lightGrey !important;
+		border: 1px solid $gray-l1 !important;
 		border-radius: 3px !important;
-		background: $lightGrey !important;
-		color: $darkGrey !important;
+		background: $gray-l1 !important;
+		color: $gray-d1 !important;
 		pointer-events: none;
 		cursor: none;
 		&:hover {
@@ -33,34 +27,119 @@
 	}
 }
 
-@mixin blue-button {
+// button - green
+@mixin green-button {
 	@include button;
-	border: 1px solid #437fbf;
+	border: 1px solid $green-d1;
 	border-radius: 3px;
 	@include linear-gradient(top, rgba(255, 255, 255, .3), rgba(255, 255, 255, 0));
-	background-color: $blue;
-	color: #fff;
+	background-color: $green;
+	@include box-shadow(0 1px 0 rgba(255, 255, 255, .3) inset);
+	color: $white;
 
-	&:hover, &.active {
-		background-color: #62aaf5;
-		color: #fff;
+	&:hover {
+		background-color: $green-s1;
+		color: $white;
+	}
+
+	&.disabled {
+		border: 1px solid $green-l3 !important;
+		background: $green-l3 !important;
+		color: $white !important;
+		@include box-shadow(none);
 	}
 }
 
-@mixin green-button {
-  @include button;
-  border: 1px solid #0d7011;
-  border-radius: 3px;
-  @include linear-gradient(top, rgba(255, 255, 255, .3), rgba(255, 255, 255, 0));
-  background-color: $green;
-  color: #fff;
+// button - blue
+@mixin blue-button {
+	@include button;
+	border: 1px solid $blue-d1;
+	border-radius: 3px;
+	@include linear-gradient(top, rgba(255, 255, 255, .3), rgba(255, 255, 255, 0));
+	background-color: $blue;
+	color: $white;
 
-  &:hover {
-  background-color: #129416;
-  color: #fff;
-  }
+	&:hover, &.active {
+		background-color: $blue-s2;
+		color: $white;
+	}
+
+	&.disabled {
+		border: 1px solid $blue-l3 !important;
+		background: $blue-l3 !important;
+		color: $white !important;
+		@include box-shadow(none);
+	}
 }
 
+// button - red
+@mixin red-button {
+	@include button;
+	border: 1px solid $red-d1;
+	border-radius: 3px;
+	@include linear-gradient(top, rgba(255, 255, 255, .3), rgba(255, 255, 255, 0));
+	background-color: $red;
+	color: $white;
+
+	&:hover, &.active {
+		background-color: $red-s1;
+		color: $white;
+	}
+
+	&.disabled {
+		border: 1px solid $red-l3 !important;
+		background: $red-l3 !important;
+		color: $white !important;
+		@include box-shadow(none);
+	}
+}
+
+// button - pink
+@mixin pink-button {
+	@include button;
+	border: 1px solid $pink-d1;
+	border-radius: 3px;
+	@include linear-gradient(top, rgba(255, 255, 255, .3), rgba(255, 255, 255, 0));
+	background-color: $pink;
+	color: $white;
+
+	&:hover, &.active {
+		background-color: $pink-s1;
+		color: $white;
+	}
+
+	&.disabled {
+		border: 1px solid $pink-l3 !important;
+		background: $pink-l3 !important;
+		color: $white !important;
+		@include box-shadow(none);
+	}
+}
+
+// button - orange
+@mixin orange-button {
+	@include button;
+	border: 1px solid $orange-d1;
+	border-radius: 3px;
+	@include linear-gradient(top, rgba(255, 255, 255, 0.4), rgba(255, 255, 255, 0) 60%);
+	background-color: $orange;
+	@include box-shadow(0 1px 0 rgba(255, 255, 255, .3) inset);
+	color: $gray-d2;
+
+	&:hover {
+		background-color: $orange-s2;
+		color: $gray-d2;
+	}
+
+	&.disabled {
+		border: 1px solid $orange-l3 !important;
+		background: $orange-l2 !important;
+		color: $gray-l1 !important;
+		@include box-shadow(none);
+	}
+}
+
+// button - white
 @mixin white-button {
   @include button;
   border: 1px solid $mediumGrey;
@@ -77,24 +156,10 @@
   }
 }
 
-@mixin orange-button {
-	@include button;
-	border: 1px solid #bda046;
-	border-radius: 3px;
-	@include linear-gradient(top, rgba(255, 255, 255, 0.4), rgba(255, 255, 255, 0) 60%);
-	background-color: #edbd3c;
-	@include box-shadow(0 1px 0 rgba(255, 255, 255, .3) inset);
-	color: #3c3c3c;
-
-	&:hover {
-		background-color: #ffcd46;
-		color: #3c3c3c;
-	}
-}
-
+// button - grey
 @mixin grey-button {
 	@include button;
-	border: 1px solid $darkGrey;
+	border: 1px solid $gray-d2;
 	border-radius: 3px;
 	@include linear-gradient(top, rgba(255, 255, 255, .3), rgba(255, 255, 255, 0));
 	background-color: #d1dae3;
@@ -107,42 +172,25 @@
 	}
 }
 
-@mixin green-button {
-	@include button;
-	border: 1px solid $darkGreen;
-	border-radius: 3px;
-	@include linear-gradient(top, rgba(255, 255, 255, .3), rgba(255, 255, 255, 0));
-	background-color: $green;
-	@include box-shadow(0 1px 0 rgba(255, 255, 255, .3) inset);
-	color: #fff;
-
-	&:hover {
-		background-color: $brightGreen;
-		color: #fff;
-	}
-
-	&.disabled {
-		border: 1px solid $disabledGreen !important;
-		background: $disabledGreen !important;
-		color: #fff !important;
-		@include box-shadow(none);
-	}
-}
-
+// button - grey dark
 @mixin dark-grey-button {
 	@include button;
 	border: 1px solid #1c1e20;
 	border-radius: 3px;
 	background: -webkit-linear-gradient(top, rgba(255, 255, 255, .2), rgba(255, 255, 255, 0)) $extraDarkGrey;
 	box-shadow: 0 1px 0 rgba(255, 255, 255, .2) inset;
-	color: #fff;
+	color: $white;
 
 	&:hover {
 		background-color: #595f64;
-		color: #fff;
+		color: $white;
 	}
 }
 
+
+// ====================
+
+// UI
 @mixin edit-box {
 	padding: 15px 20px;
 	border-radius: 3px;
@@ -276,17 +324,9 @@
 	}
 }
 
-@mixin sr-text {
-  border: 0; 
-  clip: rect(0 0 0 0); 
-  height: 1px; 
-  margin: -1px; 
-  overflow: hidden; 
-  padding: 0; 
-  position: absolute; 
-  width: 1px;
-}
+// ====================
 
+// sunsetted mixins
 @mixin active {
 	@include linear-gradient(top, rgba(255, 255, 255, .4), rgba(255, 255, 255, 0));
 	background-color: rgba(255, 255, 255, .3);

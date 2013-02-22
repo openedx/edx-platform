@@ -8,10 +8,15 @@
   font-size: ($sizeValue/10) + rem;
 }
 
+
+// ====================
+
 // line-height
 @function lh($amount: 1) {
   @return $body-line-height * $amount;
 }
+
+// ====================
 
 // image-replacement hidden text
 @mixin text-hide() {
@@ -32,6 +37,8 @@
   width: 1px;
 }
 
+// ====================
+
 // vertical and horizontal centering
 @mixin vertically-and-horizontally-centered ($height, $width) {
   left: 50%;
@@ -43,6 +50,8 @@
   top: 150px;
 }
 
+// ====================
+
 // sizing
 @mixin size($width: $baseline, $height: $baseline) {
   height: $height;
@@ -52,6 +61,8 @@
 @mixin square($size: $baseline) {
   @include size($size);
 }
+
+// ====================
 
 // placeholder styling
 @mixin placeholder($color) {
@@ -64,4 +75,27 @@
   :-ms-input-placeholder {  
      color: $color; 
   }
+}
+
+// utility
+@mixin clearfix {
+  &:after {
+    content: '';
+    display: block;
+    height: 0;
+    visibility: hidden;
+    clear: both;
+  }
+}
+
+// sunsetted mixins 
+@mixin sr-text {
+  border: 0; 
+  clip: rect(0 0 0 0); 
+  height: 1px; 
+  margin: -1px; 
+  overflow: hidden; 
+  padding: 0; 
+  position: absolute; 
+  width: 1px;
 }

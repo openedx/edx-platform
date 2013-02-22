@@ -128,7 +128,6 @@
       color: $orange;
     }
 
-
     &:hover {
       border-bottom-color: $orange-s2;
 
@@ -139,18 +138,17 @@
   }
 
   &.wrapper-alert-error {
-    border-bottom-color: $red;
+    border-bottom-color: $red-l1;
 
     .icon-error {
-      color: $red;
+      color: $red-l1;
     }
 
-
     &:hover {
-      border-bottom-color: $red-s2;
+      border-bottom-color: $red;
 
       .icon-error {
-        color: $red-s2;
+        color: $red;
       }
     }
   }
@@ -161,7 +159,6 @@
     .icon-confirmation {
       color: $green;
     }
-
 
     &:hover {
       border-bottom-color: $green-s2;
@@ -179,7 +176,6 @@
       color: $blue;
     }
 
-
     &:hover {
       border-bottom-color: $blue-s2;
 
@@ -195,7 +191,6 @@
     .icon-step-required {
       color: $pink;
     }
-
 
     &:hover {
       border-bottom-color: $pink-s2;
@@ -251,12 +246,12 @@
     }
 
   	.copy {
-  		width: flex-grid(8, 12);
+  		width: flex-grid(7, 12);
   		margin-right: flex-gutter();
   	}
 
   	.nav-actions {
-  	  width: flex-grid(3, 12);
+  	  width: flex-grid(4, 12);
       float: right;
       margin-top: ($baseline/2);
   	  text-align: right;
@@ -269,6 +264,21 @@
   	    &:last-child {
   	      margin-right: 0;
   	    }
+
+        .action-primary {
+          @include transition (opacity 0.25s ease-in-out);
+          @include font-size(13);
+          font-weight: 600;
+          opacity: 0.90;
+
+          &:hover {
+            opacity: 1.0;
+          }
+        }
+
+        .action-secondary {
+          @include font-size(13);
+        }
   	  }
   	}
   }
@@ -276,22 +286,82 @@
   // alert types
   &.warning {
   	
+    .action-primary {
+      @include orange-button;
+      border-color: $orange-d2;
+    }
+
+    a {
+      color: $orange;
+
+      &:hover {
+        color: $orange-s2;
+      }
+    }
   }
 
   &.error {
 
+    .action-primary {
+      @include red-button;
+      border-color: $red-d2;
+    }
+
+    a {
+      color: $red-l1;
+
+      &:hover {
+        color: $red;
+      }
+    }
   }
 
   &.confirmation {
 
+    .action-primary {
+      @include green-button;
+      border-color: $green-d2;
+    }
+
+    a {
+      color: $green;
+
+      &:hover {
+        color: $green-s2;
+      }
+    }
   }
 
   &.announcement {
 
+    .action-primary {
+      @include blue-button;
+      border-color: $blue-d2;
+    }
+
+    a {
+      color: $blue;
+
+      &:hover {
+        color: $blue-s2;
+      }
+    }
   }
 
   &.step-required {
 
+    .action-primary {
+      border-color: $pink-d2;
+      @include pink-button;
+    }
+
+    a {
+      color: $pink;
+
+      &:hover {
+        color: $pink-s1;
+      }
+    }
   }
 }
 
