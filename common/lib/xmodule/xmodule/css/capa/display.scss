@@ -809,12 +809,14 @@ section.problem {
     border: 1px solid #ccc;
     border-radius: 1em;
     margin: 0 0 1em 0;
-    .header {
+    .annotation-header {
       font-weight: bold;
       border-bottom: 1px solid #ccc;
       padding: .5em 1em;
     }
-    .body { padding: .5em 1em; }
+    .annotation-body { padding: .5em 1em; }
+    .annotation-return { float: right; }
+    .annotation-return:after { content: " \2191" }
     .prompt { font-style: italic; }
     .prompt.prompt-text {
       padding: .5em;

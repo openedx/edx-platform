@@ -1,8 +1,8 @@
 <form class="annotation-input">
 <div class="script_placeholder" data-src="/static/js/capa/annotationinput.js"/>
 
-<div class="header">${title}</div>
-<div class="body">
+<div class="annotation-header">${title}</div>
+<div class="annotation-body">
     <div class="prompt prompt-text">${text}</div>
     <div class="prompt">${comment_prompt}</div>
     <textarea id="input_${id}_comment" name="input_${id}_comment"/>
@@ -28,6 +28,8 @@
     <span class="incorrect" id="status_${id}"></span>
     % endif
     </div>
+
+    <a class="annotation-return" href="javascript:void(0)">Return to Annotation</a><br/>
 </div>
 </form>
 

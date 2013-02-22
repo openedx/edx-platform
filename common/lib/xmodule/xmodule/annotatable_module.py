@@ -69,8 +69,6 @@ class AnnotatableModule(XModule):
                 html_key = attrs_map[xml_key]
                 data_attrs[html_key] = { 'value': value, '_delete': xml_key }
 
-        data_attrs['data-span-id'] = { 'value': str(index) }
-
         return data_attrs
 
     def _render_content(self):

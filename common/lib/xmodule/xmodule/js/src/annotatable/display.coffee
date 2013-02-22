@@ -6,8 +6,10 @@ class @Annotatable
     spanSelector:    '.annotatable-span'
     replySelector:   '.annotatable-reply'
     helpSelector:    '.annotatable-help-icon'
-    returnSelector:  '.annotatable-return'
+
+    problemXModuleSelector: '.xmodule_CapaModule'
     problemSelector: 'section.problem'
+    problemReturnSelector:  'section.problem .annotation-return'
 
     discussionXModuleSelector: '.xmodule_DiscussionModule'
     discussionSelector:        '.discussion-module'
@@ -26,24 +28,38 @@ class @Annotatable
         @initDiscussion()
 
     initEvents: () ->
+        # For handling hide/show of annotations
         @annotationsHidden = false
         @$(@toggleSelector).bind 'click', @onClickToggleAnnotations
-        @$(@wrapperSelector).delegate @replySelector, 'click', @onClickReply
-        $(@discussionXModuleSelector).delegate @returnSelector, 'click', @onClickReturn
 
-    initDiscussion: () ->
-        1
+        # For handling 'reply to annotation' events that scroll to the associated capa problem.
+        # These are contained in the tooltips, which should be rendered somewhere in the wrapper
+        # (see the qtip2 options, this must be set explicitly, otherwise they render in the body).
+        @$(@wrapperSelector).delegate @replySelector, 'click', @onClickReply
+
+        # This is a silly hack, but it assumes two things:
+        #   1) There are annotationinput capa problems rendered on the page
+        #   2) Each one has its an embedded "return to annotation" link.
+        # The capa problem's html is injected via AJAX so this just sets a listener on the body and
+        # handles the click event there.
+        $('body').delegate @problemReturnSelector, 'click', @onClickReturn
+
+    initDiscussion: () -> 1
   
     initTips: () ->
         @savedTips = []
-        @$(@spanSelector).each (index, el) => $(el).qtip(@getTipOptions el)
+
+        # Adds a tooltip to each annotation span to display the instructor prompt
+        @$(@spanSelector).each (index, el) =>
+            $(el).qtip(@getTipOptions el)
+
         @$(@helpSelector).qtip
             position:
                 my: 'right top'
                 at: 'bottom left'
                 container: @$(@wrapperSelector)
             content:
-                title: 'Annotated Reading'
+                title: 'Instructions'
                 text: true # use title attribute of this element
 
     getTipOptions: (el) ->
@@ -79,31 +95,31 @@ class @Annotatable
         e.preventDefault()
         offset = -20
         el = @getProblem e.currentTarget
-        @scrollTo(el, @afterScrollToProblem, offset)
+        if el.length > 0
+            @scrollTo(el, @afterScrollToProblem, offset)
+        else
+            console.log('problem not found. event: ', e) if @_debug
 
     onClickReturn: (e) =>
         e.preventDefault()
         offset = -200
-        el = @getSpan e.currentTarget
-        @scrollTo(el, @afterScrollToSpan, offset)
+        el = @getSpanForProblemReturn e.currentTarget
+        if el.length > 0
+            @scrollTo(el, @afterScrollToSpan, offset)
+        else
+            console.log('span not found. event:', e) if @_debug
 
-    getSpan: (el) ->
-        span_id = @getSpanId(el)
-        @$(@spanSelector).filter("[data-span-id='#{span_id}']")
+    getSpanForProblemReturn: (el) ->
+        problem_id = $(@problemReturnSelector).index(el)
+        @$(@spanSelector).filter("[data-problem-id='#{problem_id}']")
 
     getProblem: (el) ->
-        problem_id = parseInt(@getProblemId(el), 10)
-        if isNaN(problem_id)
-            console.log 'invalid problem identifier' if @_debug
-            return $()
-        return $(@problemSelector).eq(problem_id - 1)
+        problem_id = @getProblemId(el)
+        $(@problemSelector).eq(problem_id)
     
     getDiscussion: () ->
         discussion_id = @getDiscussionId()
         $(@discussionXModuleSelector).find(@discussionSelector).filter("[data-discussion-id='#{discussion_id}']")
-
-    getSpanId: (el) ->
-        $(el).data('span-id')
 
     getProblemId: (el) ->
         $(el).data('problem-id')
@@ -136,7 +152,7 @@ class @Annotatable
             duration: 500
             onAfter: @_once => after?.call this, el
             offset: offset
-        }) if el
+        }) if $(el).length > 0
  
     afterScrollToDiscussion: (discussion_el) ->
         btn = $('.discussion-show', discussion_el)
@@ -151,7 +167,7 @@ class @Annotatable
     makeTipContent: (el) ->
         (api) =>
             text = $(el).data('comment-body')
-            comment = @createCommentEl(text)
+            comment = @createComment(text)
             problem_id = @getProblemId(el)
             reply = @createReplyLink(problem_id)
             $(comment).add(reply)
@@ -161,14 +177,11 @@ class @Annotatable
             title = $(el).data('comment-title')
             (if title then title else 'Commentary')
 
-    createCommentEl: (text) ->
+    createComment: (text) ->
         $("<div class=\"annotatable-comment\">#{text}</div>")
 
     createReplyLink: (problem_id) ->
         $("<a class=\"annotatable-reply\" href=\"javascript:void(0);\" data-problem-id=\"#{problem_id}\">Reply to Annotation</a>")
-
-    createReturnLink: (span_id) ->
-        $("<a class=\"annotatable-return\" href=\"javascript:void(0);\" data-span-id=\"#{span_id}\">Return to annotation</a>")
 
     openSavedTips: () ->
         @showTips @savedTips
