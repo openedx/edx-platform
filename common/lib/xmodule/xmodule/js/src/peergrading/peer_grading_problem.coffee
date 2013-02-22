@@ -426,6 +426,7 @@ class @PeerGradingProblem
     @submit_button.hide()
     @action_button.hide()
     @calibration_feedback_panel.hide()
+    Rubric.initialize(@location)
 
 
   render_calibration_feedback: (response) =>
@@ -476,7 +477,9 @@ class @PeerGradingProblem
     @prompt_container.slideToggle()
     @prompt_container.toggleClass('open')
     if @question_header.text() == "(Hide)"
+      Logger.log 'peer_grading_hide_question', {location: @location}
       new_text = "(Show)"
     else
+      Logger.log 'peer_grading_show_question', {location: @location}
       new_text = "(Hide)"
     @question_header.text(new_text)

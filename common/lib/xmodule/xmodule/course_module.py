@@ -352,6 +352,13 @@ class CourseDescriptor(SequenceDescriptor):
         """
         return self.metadata.get('tabs')
 
+    @property
+    def pdf_textbooks(self):
+        """
+        Return the pdf_textbooks config, as a python object, or None if not specified.
+        """
+        return self.metadata.get('pdf_textbooks')
+
     @tabs.setter
     def tabs(self, value):
         self.metadata['tabs'] = value

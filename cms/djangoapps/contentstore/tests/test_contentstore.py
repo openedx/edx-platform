@@ -5,7 +5,7 @@ from django.test.utils import override_settings
 from django.conf import settings
 from django.core.urlresolvers import reverse
 from path import path
-from tempfile import mkdtemp
+from tempdir import mkdtemp_clean
 import json
 from fs.osfs import OSFS
 import copy
@@ -194,7 +194,7 @@ class ContentStoreToyCourseTest(ModuleStoreTestCase):
         import_from_xml(ms, 'common/test/data/', ['full'])
         location = CourseDescriptor.id_to_location('edX/full/6.002_Spring_2012')
 
-        root_dir = path(mkdtemp())
+        root_dir = path(mkdtemp_clean())
 
         print 'Exporting to tempdir = {0}'.format(root_dir)
 
@@ -262,6 +262,7 @@ class ContentStoreToyCourseTest(ModuleStoreTestCase):
         # check that /static/ has been converted to the full path
         # note, we know the link it should be because that's what in the 'full' course in the test data
         self.assertContains(resp, '/c4x/edX/full/asset/handouts_schematic_tutorial.pdf')
+
 
 
 class ContentStoreTest(ModuleStoreTestCase):
@@ -420,6 +421,64 @@ class ContentStoreTest(ModuleStoreTestCase):
         self.assertIn('markdown', context, "markdown is missing from context")
         self.assertIn('markdown', problem.metadata, "markdown is missing from metadata")
         self.assertNotIn('markdown', problem.editable_metadata_fields, "Markdown slipped into the editable metadata fields")
+
+    def test_import_metadata_with_attempts_empty_string(self):
+        import_from_xml(modulestore(), 'common/test/data/', ['simple'])
+        ms = modulestore('direct')
+        did_load_item = False
+        try:       
+            ms.get_item(Location(['i4x', 'edX', 'simple', 'problem', 'ps01-simple', None]))
+            did_load_item = True
+        except ItemNotFoundError:
+            pass
+
+        # make sure we found the item (e.g. it didn't error while loading)
+        self.assertTrue(did_load_item)   
+
+    def test_metadata_inheritance(self):
+        import_from_xml(modulestore(), 'common/test/data/', ['full'])
+
+        ms = modulestore('direct')
+        course = ms.get_item(Location(['i4x', 'edX', 'full', 'course', '6.002_Spring_2012', None]))
+
+        verticals = ms.get_items(['i4x', 'edX', 'full', 'vertical', None, None])
+
+        # let's assert on the metadata_inheritance on an existing vertical
+        for vertical in verticals:
+            self.assertIn('xqa_key', vertical.metadata)
+            self.assertEqual(course.metadata['xqa_key'], vertical.metadata['xqa_key'])
+
+        self.assertGreater(len(verticals), 0)
+
+        new_component_location = Location('i4x', 'edX', 'full', 'html', 'new_component')
+        source_template_location = Location('i4x', 'edx', 'templates', 'html', 'Blank_HTML_Page')
+        
+        # crate a new module and add it as a child to a vertical
+        ms.clone_item(source_template_location, new_component_location)
+        parent = verticals[0]
+        ms.update_children(parent.location, parent.definition.get('children', []) + [new_component_location.url()])
+
+        # flush the cache
+        ms.get_cached_metadata_inheritance_tree(new_component_location, -1)
+        new_module = ms.get_item(new_component_location)
+
+        # check for grace period definition which should be defined at the course level
+        self.assertIn('graceperiod', new_module.metadata)
+
+        self.assertEqual(course.metadata['graceperiod'], new_module.metadata['graceperiod'])
+
+        #
+        # now let's define an override at the leaf node level
+        #
+        new_module.metadata['graceperiod'] = '1 day'
+        ms.update_metadata(new_module.location, new_module.metadata)
+
+        # flush the cache and refetch
+        ms.get_cached_metadata_inheritance_tree(new_component_location, -1)
+        new_module = ms.get_item(new_component_location)
+
+        self.assertIn('graceperiod', new_module.metadata)
+        self.assertEqual('1 day', new_module.metadata['graceperiod'])
 
 
 class TemplateTestCase(ModuleStoreTestCase):
