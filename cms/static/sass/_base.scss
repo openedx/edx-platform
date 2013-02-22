@@ -50,6 +50,51 @@ h1 {
 
 // ====================
 
+// typography - basic
+.title-1, .title-2, .title-3, .title-4, .title-5, .title-6 {
+  font-weight: 600;
+  color: $gray-d3;
+  margin: 0;
+  padding: 0;
+}
+
+.title-1 {
+  @include font-size(32);
+  margin-bottom: ($baseline*1.5);
+}
+
+.title-2 {
+  @include font-size(24);
+  margin-bottom: $baseline;
+}
+
+.title-3 {
+  @include font-size(16);
+  margin-bottom: ($baseline/2);
+}
+
+.title-4 {
+  @include font-size(14);
+  margin-bottom: $baseline;
+  font-weight: 500
+}
+
+.title-5 {
+  @include font-size(14);
+  color: $gray-l1;
+  margin-bottom: $baseline;
+  font-weight: 500
+}
+
+.title-6 {
+  @include font-size(14);
+  color: $gray-l2;
+  margin-bottom: $baseline;
+  font-weight: 500
+}
+
+// ====================
+
 // layout - basic page header
 .wrapper-mast {
   margin: 0;

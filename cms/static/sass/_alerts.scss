@@ -102,19 +102,19 @@
 
 // alerts
 .wrapper-alert {
-  @include clearfix();
   @include box-sizing(border-box);
-  @include transition (opacity 2.0s ease-in-out 5s);
-  @include box-shadow(0 1px 2px rgba(0,0,0,0.2));
+  @include transition (opacity 2.0s ease-in-out 5s, border 0.5s ease-in-out);
+  @include box-shadow(0 1px 1px $white, inset 0 2px 5px $shadow-d1);
   position: relative;
   top: -($baseline*1.5);
   z-index: 100;
   overflow: hidden;
   width: 100%;
   opacity: 0;
-  border-bottom: 2px solid $blue-d2;
+  border-bottom: 4px solid $gray-l1;
+  border-top: 1px solid $black;
   padding: $baseline ($baseline*2);
-  background: $blue;
+  background: $gray-d3;
 
   &.is-shown {
     bottom: 0;
@@ -122,27 +122,95 @@
   }
 
   &.wrapper-alert-warning {
-  	background: $orange-s1;
-    border-color: $orange-d1;
+    border-bottom-color: $orange;
+
+    .icon-warning {
+      color: $orange;
+    }
+
+
+    &:hover {
+      border-bottom-color: $orange-s2;
+
+      .icon-warning {
+        color: $orange-s2;
+      }
+    }
   }
 
   &.wrapper-alert-error {
-    border-color: shade($red, 50%);
-    color: $white;
+    border-bottom-color: $red;
+
+    .icon-error {
+      color: $red;
+    }
+
+
+    &:hover {
+      border-bottom-color: $red-s2;
+
+      .icon-error {
+        color: $red-s2;
+      }
+    }
   }
 
-  &.wrapper-alert-confirm {
-    border-color: shade($green, 30%);
+  &.wrapper-alert-confirmation {
+    border-bottom-color: $green;
+
+    .icon-confirmation {
+      color: $green;
+    }
+
+
+    &:hover {
+      border-bottom-color: $green-s2;
+
+      .icon-confirmation {
+        color: $green-s2;
+      }
+    }
   }
 
-  &.wrapper-alert-inform {
-    border-color: $blue-d1;
+  &.wrapper-alert-announcement {
+    border-bottom-color: $blue;
+
+    .icon-announcement {
+      color: $blue;
+    }
+
+
+    &:hover {
+      border-bottom-color: $blue-s2;
+
+      .icon-announcement {
+        color: $blue-s2;
+      }
+    }
+  }
+
+  &.wrapper-alert-step-required {
+    border-bottom-color: $pink;
+
+    .icon-step-required {
+      color: $pink;
+    }
+
+
+    &:hover {
+      border-bottom-color: $pink-s2;
+
+      .icon-announcement {
+        color: $pink-s2;
+      }
+    }
   }
 }
 
 .alert {
 	@include font-size(14);
   @include box-sizing(border-box);
+  @include clearfix();
   margin: 0 auto;
   width: flex-grid(12);
   max-width: $fg-max-width;
@@ -153,40 +221,47 @@
     font-weight: 700;
   }
 
+  .icon, .copy {
+    float: left;
+  }
+
+  .icon {
+    @include transition (color 0.5s ease-in-out);
+    @include font-size(28);
+    width: flex-grid(1, 12);
+    margin-right: flex-gutter();
+    text-align: right;
+  }
+
   .copy {
     @include font-size(14);
+    width: flex-grid(10, 12);
+    color: $gray-l2;
 
-    .icon {
-      @include font-size(24);
-      @include border-radius(50px);
-      display: inline-block;
-      vertical-align: top;
-      margin-right: ($baseline/2);
-      padding: ($baseline/4) ($baseline/2) ($baseline/10) ($baseline/2);
-    }
-
-    p {
-      width: flex-grid(8, 9);
-      display: inline-block;
-      vertical-align: top;
+    .title {
+      margin-bottom: 0;
+      color: $white;
     }
   }
 
   &.has-actions {
   	
+    .icon {
+      width: flex-grid(1, 12);
+    }
+
   	.copy {
-  		float: left;
   		width: flex-grid(8, 12);
   		margin-right: flex-gutter();
   	}
 
-  	.actions {
-  	  float: right;
-  	  width: flex-grid(4, 12);
-  	  margin-top: ($baseline/2);
+  	.nav-actions {
+  	  width: flex-grid(3, 12);
+      float: right;
+      margin-top: ($baseline/2);
   	  text-align: right;
 
-  	  li {
+  	  .nav-item {
   	    display: inline-block;
   	    vertical-align: middle;
   	    margin-right: ($baseline/2);
@@ -200,15 +275,23 @@
 
   // alert types
   &.warning {
-  	color: $gray-d2;
+  	
+  }
 
-  	.copy {
+  &.error {
 
-  		.icon {
-  			background: $gray-d2;
-  			color: $orange-s1;
-  		}
-  	}
+  }
+
+  &.confirmation {
+
+  }
+
+  &.announcement {
+
+  }
+
+  &.step-required {
+
   }
 }
 

@@ -106,6 +106,135 @@
 </%block>
 
 <%block name="content">
+  <!-- alert: you're editing a draft -->
+  <div class="wrapper wrapper-alert wrapper-alert-warning is-shown">
+    <div class="alert warning has-actions">
+      <i class="ss-icon ss-symbolicons-block icon icon-warning">&#x26A0;</i>
+
+      <div class="copy">
+      <h2 class="title title-3">You are editing a draft</h2>
+        <p>Lorem ipsum dolor sit amet, consectetuer adipiscing elit. Aenean commodo ligula eget dolor. Aenean massa.</p>
+      </div>
+
+      <nav class="nav-actions">
+        <h3 class="sr">Alert Actions</h3>
+        <ul>
+          <li class="nav-item">
+            <a href="#" rel="external" class="button save-button">Save Draft</a>
+          </li>
+          <li class="nav-item">
+            <a href="#" rel="external" class="button cancel-button">Disgard Draft</a>
+          </li>
+        </ul>
+      </nav>
+    </div>
+  </div>
+
+  <!-- alert: save confirmed -->
+  <div class="wrapper wrapper-alert wrapper-alert-confirmation is-shown">
+    <div class="alert confirmation">
+      <i class="ss-icon ss-symbolicons-standard icon icon-confirmation">&#x2713;</i>
+
+      <div class="copy">
+        <h2 class="title title-3">Your changes have been saved</h2>
+        <p>Lorem ipsum dolor sit amet, consectetuer adipiscing elit. Aenean commodo ligula eget dolor. Aenean massa. <a rel="page" href="#test">Please see below</a></p>
+      </div>
+    </div>
+  </div>
+
+  <!-- alert: delete confirmed -->
+  <div class="wrapper wrapper-alert wrapper-alert-confirmation is-shown">
+    <div class="alert confirmation">
+      <i class="ss-icon ss-symbolicons-standard icon icon-confirmation">&#x2713;</i>
+
+      <div class="copy">
+        <h2 class="title title-3">X Has been removed</h2>
+        <p>Lorem ipsum dolor sit amet, consectetuer adipiscing elit. Aenean commodo ligula eget dolor. Aenean massa.</p>
+      </div>
+    </div>
+  </div>
+
+  <!-- alert: system error -->
+  <div class="wrapper wrapper-alert wrapper-alert-error is-shown">
+    <div class="alert error">
+      <i class="ss-icon ss-symbolicons-block icon icon-error">&#x26A0;</i>
+
+      <div class="copy">
+        <h2 class="title title-3">We're Sorry, there was a error with Studio</h2>
+        <p>Lorem ipsum dolor sit amet, consectetuer adipiscing elit. Aenean commodo ligula eget dolor. Aenean massa.</p>
+      </div>
+    </div>
+  </div>
+
+  <!-- alert: user error -->
+  <div class="wrapper wrapper-alert wrapper-alert-error is-shown">
+    <div class="alert error has-actions">
+      <i class="ss-icon ss-symbolicons-block icon icon-error">&#x26A0;</i>
+
+      <div class="copy">
+        <h2 class="title title-3">There was an error in your submission</h2>
+        <p>Lorem ipsum dolor sit amet, consectetuer adipiscing elit. Aenean commodo ligula eget dolor. Aenean massa. <a rel="page" href="#test">Please see below</a></p>
+      </div>
+
+      <nav class="nav-actions">
+        <h3 class="sr">Alert Actions</h3>
+        <ul>
+          <li class="nav-item">
+            <a href="#" rel="external" class="button save-button">Replace with Draft</a>
+          </li>
+          <li class="nav-item">
+            <a href="#" rel="external" class="button cancel-button">Delete Draft</a>
+          </li>
+        </ul>
+      </nav>
+    </div>
+  </div>
+
+  <!-- alert: announcement w/ actions -->
+  <div class="wrapper wrapper-alert wrapper-alert-announcement is-shown">
+    <div class="alert announcement has-actions">
+      <i class="ss-icon ss-symbolicons-block icon icon-announcement">&#x1F4E2;</i>
+
+      <div class="copy">
+        <h2 class="title title-3">Studio will be unavailable this weekend</h2>
+        <p>Lorem ipsum dolor sit amet, consectetuer adipiscing elit. Aenean commodo ligula eget dolor. Aenean massa. Lorem ipsum dolor sit amet, consectetuer adipiscing elit. Aenean commodo ligula eget dolor. Aenean massa.</p>
+      </div>
+
+      <nav class="nav-actions">
+        <h3 class="sr">Alert Actions</h3>
+        <ul>
+          <li class="nav-item">
+            <a href="#" rel="external">Contact edX Staff</a>
+          </li>
+        </ul>
+      </nav>
+    </div>
+  </div>
+
+  <!-- alert: announcement -->
+  <div class="wrapper wrapper-alert wrapper-alert-announcement is-shown">
+    <div class="alert announcement">
+      <i class="ss-icon ss-symbolicons-block icon icon-announcement">&#x1F4E2;</i>
+
+      <div class="copy">
+        <h2 class="title title-3">Studio will be unavailable this weekend</h2>
+        <p>Lorem ipsum dolor sit amet, consectetuer adipiscing elit. Aenean commodo ligula eget dolor. Aenean massa. Lorem ipsum dolor sit amet, consectetuer adipiscing elit. Aenean commodo ligula eget dolor. Aenean massa.</p>
+      </div>
+    </div>
+  </div>
+
+  <!-- alert: step required -->
+  <div class="wrapper wrapper-alert wrapper-alert-step-required is-shown">
+    <div class="alert step-required">
+      <i class="ss-icon ss-symbolicons-block icon icon-step-required">&#xE0D1;</i>
+
+      <div class="copy">
+        <h2 class="title title-3">Your Studio account has been created, but needs to be activated</h2>
+        <p>Lorem ipsum dolor sit amet, consectetuer adipiscing elit. Aenean commodo ligula eget dolor. Aenean massa. Lorem ipsum dolor sit amet, consectetuer adipiscing elit. Aenean commodo ligula eget dolor. Aenean massa.</p>
+      </div>
+    </div>
+  </div>
+
   <div class="edit-subsection-publish-settings">
     <div class="settings">
       <h3>Section Release Date</h3>

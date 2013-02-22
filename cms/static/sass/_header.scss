@@ -5,7 +5,7 @@
   margin: 0 0 ($baseline*1.5) 0;
   padding: $baseline;
   border-bottom: 1px solid $gray;
-  @include box-shadow(0 1px 5px 0 rgba(0,0,0, 0.1));
+  @include box-shadow(0 1px 5px 0 rgba(0,0,0, 0.2));
   background: $white;
   height: 76px;
   position: relative;
