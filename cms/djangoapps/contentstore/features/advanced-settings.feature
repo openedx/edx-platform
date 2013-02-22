@@ -8,24 +8,20 @@ Feature: Advanced (manual) course policy
     Then I see only the display name
 
   Scenario: Test if there are no policy settings without existing UI controls
-    Given I have opened a new course in Studio
-    When I select the Advanced Settings
-    And I delete the display name
+    Given I am on the Advanced Course Settings page in Studio
+    When I delete the display name
     Then there are no advanced policy settings
     And I reload the page
     Then there are no advanced policy settings
 
   Scenario: Add new entries, and they appear alphabetically after save
-    Given I have opened a new course in Studio
-    When I select the Advanced Settings
-    And I create New Entries
+    Given I am on the Advanced Course Settings page in Studio
+    When I create New Entries
     Then they are alphabetized
     And I reload the page
     Then they are alphabetized
 
   Scenario: Test how multi-line input appears
-    Given I have opened a new course in Studio
-    When I select the Advanced Settings
-    And I create a JSON object
+    Given I am on the Advanced Course Settings page in Studio
+    When I create a JSON object
     Then it is displayed as formatted
-

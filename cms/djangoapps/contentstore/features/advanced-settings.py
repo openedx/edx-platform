@@ -18,6 +18,12 @@ def i_select_advanced_settings(step):
     css_click(link_css)
 
 
+@step('I am on the Advanced Course Settings page in Studio$')
+def i_am_on_advanced_course_settings(step):
+    step.given('I have opened a new course in Studio')
+    step.given('I select the Advanced Settings')
+
+
 @step('I see only the display name$')
 def i_see_only_display_name(step):
     assert_policy_entries(["display_name"], ['"Robot Super Course"'])
