@@ -358,6 +358,10 @@ urlpatterns += (
     url(r'^comm/foldit_ops', 'foldit.views.foldit_ops', name="foldit_ops"),
 )
 
+urlpatterns += (
+    url(r'^debug/run_python', 'debug.views.run_python'),
+)
+
 urlpatterns = patterns(*urlpatterns)
 
 if settings.DEBUG:
