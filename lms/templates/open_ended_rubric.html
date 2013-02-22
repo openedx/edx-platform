@@ -14,7 +14,7 @@
                         <li class="rubric-list-item">
                     % endif
                     <label class="rubric-label" for="score-${i}-${j}">
-                        <input type="radio" class="score-selection" name="score-selection-${i}" id="score-${i}-${j}" value="${option['points']}"/>
+                        <input type="radio" class="score-selection" data-category="${i}" name="score-selection-${i}" id="score-${i}-${j}" value="${option['points']}"/>
                         <span class="wrappable"> ${option['points']} points : ${option['text']}</span>
                     </label>
                     </li>

@@ -23,6 +23,7 @@ from xmodule.xml_module import XmlDescriptor
 from xmodule.modulestore import Location
 from capa.util import *
 from peer_grading_service import PeerGradingService
+import controller_query_service
 
 from datetime import datetime
 
@@ -106,8 +107,10 @@ class OpenEndedChild(object):
         # completion (doesn't matter if you self-assessed correct/incorrect).
         self._max_score = static_data['max_score']
         self.peer_gs = PeerGradingService(system.open_ended_grading_interface, system)
+        self.controller_qs = controller_query_service.ControllerQueryService(system.open_ended_grading_interface,system)
 
         self.system = system
+        
         self.location_string = location
         try:
             self.location_string = self.location_string.url()
@@ -354,6 +357,10 @@ class OpenEndedChild(object):
             if get_data['can_upload_files'] in ['true', '1']:
                 has_file_to_upload = True
                 file = get_data['student_file'][0]
+                if self.system.track_fuction:
+                    self.system.track_function('open_ended_image_upload', {'filename': file.name})
+                else:
+                    log.info("No tracking function found when uploading image.")
                 uploaded_to_s3, image_ok, s3_public_url = self.upload_image_to_s3(file)
                 if uploaded_to_s3:
                     image_tag = self.generate_image_tag_from_url(s3_public_url, file.name)
@@ -434,14 +441,14 @@ class OpenEndedChild(object):
         error_string = ("You need to peer grade {0} more in order to make another submission.  "
         "You have graded {1}, and {2} are required.  You have made {3} successful peer grading submissions.")
         try:
-            response = self.peer_gs.get_data_for_location(location, student_id)
+            response = self.peer_gs.get_data_for_location(self.location_string, student_id)
             count_graded = response['count_graded']
             count_required = response['count_required']
             student_sub_count = response['student_sub_count']
             success = True
         except:
             #This is a dev_facing_error
-            log.error("Could not contact external open ended graders for location {0} and student {1}".format(location,student_id))
+            log.error("Could not contact external open ended graders for location {0} and student {1}".format(self.location_string,student_id))
             #This is a student_facing_error
             error_message = "Could not contact the graders.  Please notify course staff."
             return success, allowed_to_submit, error_message
@@ -452,4 +459,25 @@ class OpenEndedChild(object):
             #This is a student_facing_error
             error_message = error_string.format(count_required-count_graded, count_graded, count_required, student_sub_count)
             return success, allowed_to_submit, error_message
+
+    def get_eta(self):
+        response = self.controller_qs.check_for_eta(self.location_string)
+        try:
+            response = json.loads(response)
+        except:
+            pass
+
+        success = response['success']
+        if isinstance(success, basestring):
+            success = (success.lower()=="true")
+
+        if success:
+            eta = controller_query_service.convert_seconds_to_human_readable(response['eta'])
+            eta_string = "Please check back for your response in at most {0}.".format(eta)
+        else:
+            eta_string = ""
+
+        return eta_string
+
+
 

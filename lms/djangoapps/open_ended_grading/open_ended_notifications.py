@@ -1,7 +1,7 @@
 from django.conf import settings
 from xmodule.open_ended_grading_classes import peer_grading_service
 from staff_grading_service import StaffGradingService
-from open_ended_grading.controller_query_service import ControllerQueryService
+from xmodule.open_ended_grading_classes.controller_query_service import ControllerQueryService
 import json
 from student.models import unique_id_for_user
 from courseware.models import StudentModule
@@ -93,7 +93,8 @@ def peer_grading_notifications(course, user):
 
 
 def combined_notifications(course, user):
-    controller_qs = ControllerQueryService(settings.OPEN_ENDED_GRADING_INTERFACE)
+    system = ModuleSystem(None, None, None, render_to_string, None)
+    controller_qs = ControllerQueryService(settings.OPEN_ENDED_GRADING_INTERFACE, system)
     student_id = unique_id_for_user(user)
     user_is_staff = has_access(user, course, 'staff')
     course_id = course.id
