@@ -1,12 +1,11 @@
 <div class="annotatable-wrapper" data-discussion-id="${discussion_id}">
 	<div class="annotatable-header">
 		% if display_name is not UNDEFINED and display_name is not None:
-		  <div class="annotatable-title">${display_name} </div>
+		  <div class="annotatable-title">${display_name}</div>
 		% endif
 		<div class="annotatable-description">
-                Guided Discussion
-				<a class="annotatable-toggle" href="javascript:void(0)">Hide Annotations</a>
-                <div class="annotatable-help-icon" title="${help_text}"></div>
+            Guided Discussion 
+            <a class="annotatable-toggle" href="javascript:void(0)">Hide Annotations</a>
         </div>
 	</div>
 	<div class="annotatable-content">${content_html}</div>

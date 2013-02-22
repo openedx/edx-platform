@@ -21,11 +21,16 @@
     % endfor
     </ul>
 
+    % if debug:
     <div class="debug-value">
-        Rendered Value: <pre>${value}</pre><br/>
-        Input Value:<br/><input type="text" class="value" name="input_${id}" id="input_${id}" value="${value|h}" size="75"/>
-        <br/><em>Hide this value input box when it's all working!!!</em>
+        Rendered with value:<br/>
+        <pre>${value}</pre>
+        Current input value:<br/>
+        <input type="text" class="value" name="input_${id}" id="input_${id}" value="${value|h}" />
     </div>
+    % else:
+        <input type="hidden" class="value" name="input_${id}" id="input_${id}" value="${value|h}" />
+    % endif
 
     <span id="answer_${id}"></span>
 
@@ -38,8 +43,6 @@
     % elif status == 'incomplete':
     <span class="incorrect" id="status_${id}"></span>
     % endif
-
-
 
     <a class="annotation-return" href="javascript:void(0)">Return to Annotation</a><br/>
 </div>

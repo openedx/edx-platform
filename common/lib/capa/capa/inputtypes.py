@@ -949,7 +949,9 @@ class AnnotationInput(InputTypeBase):
     Example:
 
     <annotationinput>
+    <title>Annotation Exercise</title>
     <text>Dr Seuss uses colors!  How?</text>
+    <comment>Why does Dr Seuss use colors!?</comment>
     <comment_prompt>Write down some notes:</comment_prompt>
     <tag_prompt>Now pick the right color</tag_prompt>
     <options>
@@ -969,6 +971,8 @@ class AnnotationInput(InputTypeBase):
 
     def setup(self):
         xml = self.xml
+
+        self.debug = False # set to True to display extra debug info with input
 
         self.title = xml.findtext('./title', 'Annotation Exercise')
         self.text = xml.findtext('./text')
@@ -1020,6 +1024,7 @@ class AnnotationInput(InputTypeBase):
                 'comment_prompt': self.comment_prompt,
                 'tag_prompt': self.tag_prompt,
                 'options': self.options,
+                'debug': self.debug
          }
         unpacked_value = self._unpack_value()
         extra_context.update(unpacked_value)

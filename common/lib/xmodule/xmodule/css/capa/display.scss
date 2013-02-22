@@ -857,7 +857,15 @@ section.problem {
         margin: 1em 0;
         background-color: #999;
         border: 1px solid #000;
+        input[type="text"] { width: 100%; }
         pre { background-color: #CCC; color: #000; }
+        &:before {
+          display: block;
+          content: "debug input value";
+          text-transform: uppercase;
+          font-weight: bold;
+          font-size: 1.5em;
+        }
     }
   }
 }

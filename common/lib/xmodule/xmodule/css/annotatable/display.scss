@@ -13,18 +13,7 @@
     border-radius: 3px;
     .annotatable-toggle {
       position: absolute;
-      right: 30px;
-    }
-    .annotatable-help-icon {
-      display: block;
-      position: absolute;
-      top: 0;
       right: 0;
-      width: 17px;
-      height: 17px;
-      background: url(../images/info-icon.png) no-repeat;
-    }
-    .annotatable-toggle, .annotatable-help-icon {
       margin: 2px 7px 2px 0;
     }
   }

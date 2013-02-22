@@ -5,7 +5,6 @@ class @Annotatable
     toggleSelector:  '.annotatable-toggle'
     spanSelector:    '.annotatable-span'
     replySelector:   '.annotatable-reply'
-    helpSelector:    '.annotatable-help-icon'
 
     problemXModuleSelector: '.xmodule_CapaModule'
     problemSelector: 'section.problem'
@@ -48,19 +47,8 @@ class @Annotatable
   
     initTips: () ->
         @savedTips = []
-
-        # Adds a tooltip to each annotation span to display the instructor prompt
         @$(@spanSelector).each (index, el) =>
             $(el).qtip(@getTipOptions el)
-
-        @$(@helpSelector).qtip
-            position:
-                my: 'right top'
-                at: 'bottom left'
-                container: @$(@wrapperSelector)
-            content:
-                title: 'Instructions'
-                text: true # use title attribute of this element
 
     getTipOptions: (el) ->
         content:

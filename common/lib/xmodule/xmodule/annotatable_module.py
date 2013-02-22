@@ -1,7 +1,4 @@
-import pprint
-import json
 import logging
-import re
 
 from lxml import etree
 from pkg_resources import resource_string, resource_listdir
@@ -11,9 +8,6 @@ from xmodule.raw_module import RawDescriptor
 from xmodule.modulestore.mongo import MongoModuleStore
 from xmodule.modulestore.django import modulestore
 from xmodule.contentstore.content import StaticContent
-
-import datetime
-import time
 
 log = logging.getLogger(__name__)
 
@@ -99,7 +93,6 @@ class AnnotatableModule(XModule):
             'display_name': self.display_name,
             'element_id': self.element_id,
             'discussion_id': self.discussion_id,
-            'help_text': self.help_text,
             'content_html': self._render_content()
         }
 
@@ -111,18 +104,13 @@ class AnnotatableModule(XModule):
                          instance_state, shared_state, **kwargs)
 
         xmltree = etree.fromstring(self.definition['data'])
-        root_attr = {}
-        for key in ('discussion', 'help_text'):
-            if key in xmltree.attrib:
-                root_attr[key] = xmltree.get(key)
-                del xmltree.attrib[key]
-
+        self.discussion_id = xmltree.get('discussion', '')
+        del xmltree.attrib['discussion']
         self.content = etree.tostring(xmltree, encoding='unicode')
         self.element_id = self.location.html_id()
-        self.discussion_id = root_attr['discussion']
-        self.help_text = root_attr['help_text']
 
 class AnnotatableDescriptor(RawDescriptor):
     module_class = AnnotatableModule
     stores_state = True
     template_dir_name = "annotatable"
+
