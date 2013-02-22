@@ -44,7 +44,9 @@
     <span class="incorrect" id="status_${id}"></span>
     % endif
 
-    <a class="annotation-return" href="javascript:void(0)">Return to Annotation</a><br/>
+    % if return_to_annotation:
+        <a class="annotation-return" href="javascript:void(0)">Return to Annotation</a><br/>
+    % endif
 </div>
 </form>
 

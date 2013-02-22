@@ -1,5 +1,5 @@
 class @Annotatable
-    _debug: true
+    _debug: false
 
     wrapperSelector: '.annotatable-wrapper'
     toggleSelector:  '.annotatable-toggle'
@@ -8,10 +8,8 @@ class @Annotatable
 
     problemXModuleSelector: '.xmodule_CapaModule'
     problemSelector: 'section.problem'
+    problemInputSelector: '.annotation-input'
     problemReturnSelector:  'section.problem .annotation-return'
-
-    discussionXModuleSelector: '.xmodule_DiscussionModule'
-    discussionSelector:        '.discussion-module'
 
     constructor: (el) ->
         console.log 'loaded Annotatable' if @_debug
@@ -24,7 +22,6 @@ class @Annotatable
     init: () ->
         @initEvents()
         @initTips()
-        @initDiscussion()
 
     initEvents: () ->
         # For handling hide/show of annotations
@@ -36,14 +33,12 @@ class @Annotatable
         # (see the qtip2 options, this must be set explicitly, otherwise they render in the body).
         @$(@wrapperSelector).delegate @replySelector, 'click', @onClickReply
 
-        # This is a silly hack, but it assumes two things:
+        # For handling 'return to annotation' events from capa problems. Assumes that:
         #   1) There are annotationinput capa problems rendered on the page
-        #   2) Each one has its an embedded "return to annotation" link.
+        #   2) Each one has an embedded "return to annotation" link (from the capa problem template).
         # The capa problem's html is injected via AJAX so this just sets a listener on the body and
         # handles the click event there.
         $('body').delegate @problemReturnSelector, 'click', @onClickReturn
-
-    initDiscussion: () -> 1
   
     initTips: () ->
         @savedTips = []
@@ -103,17 +98,10 @@ class @Annotatable
 
     getProblem: (el) ->
         problem_id = @getProblemId(el)
-        $(@problemSelector).eq(problem_id)
-    
-    getDiscussion: () ->
-        discussion_id = @getDiscussionId()
-        $(@discussionXModuleSelector).find(@discussionSelector).filter("[data-discussion-id='#{discussion_id}']")
+        $(@problemSelector).has(@problemInputSelector).eq(problem_id)
 
     getProblemId: (el) ->
         $(el).data('problem-id')
-        
-    getDiscussionId: () ->
-        @$(@wrapperSelector).data('discussion-id')
 
     toggleAnnotations: () ->
         hide = (@annotationsHidden = not @annotationsHidden)
@@ -142,10 +130,6 @@ class @Annotatable
             offset: offset
         }) if $(el).length > 0
  
-    afterScrollToDiscussion: (discussion_el) ->
-        btn = $('.discussion-show', discussion_el)
-        btn.click() if !btn.hasClass('shown')
-
     afterScrollToProblem: (problem_el) ->
         problem_el.effect 'highlight', {}, 500
 
