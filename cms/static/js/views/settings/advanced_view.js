@@ -10,7 +10,10 @@ CMS.Views.Settings.Advanced = CMS.Views.ValidatingView.extend({
         'click .new-button' : "addEntry",
         // update model on changes
         'change .policy-key' : "updateKey",
+        // keypress to catch alpha keys and backspace/delete on some browsers
         'keypress .policy-key' : "showSaveCancelButtons",
+        // keyup to catch backspace/delete reliably
+        'keyup .policy-key' : "showSaveCancelButtons",
         'focus :input' : "focusInput",
         'blur :input' : "blurInput"
         // TODO enable/disable save based on validation (currently enabled whenever there are changes)
@@ -130,8 +133,9 @@ CMS.Views.Settings.Advanced = CMS.Views.ValidatingView.extend({
 
     showSaveCancelButtons: function(event) {
         if (!this.buttonsVisible) {
-            if (event && event.type === 'keypress') {
-                // check whether it's really an altering event
+            if (event && (event.type === 'keypress' || event.type === 'keyup')) {
+                // check whether it's really an altering event: note, String.fromCharCode(keyCode) will 
+                // give positive values for control/command/option-letter combos; so, don't use it
                 if (!((event.charCode && String.fromCharCode(event.charCode) !== "") ||
                         // 8 = backspace, 46 = delete
                         event.keyCode === 8 || event.keyCode === 46)) return;
