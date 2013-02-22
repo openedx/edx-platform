@@ -26,17 +26,19 @@ class Score(models.Model):
     created = models.DateTimeField(auto_now_add=True)
 
     @staticmethod
-    def display_score(score):
+    def display_score(score, sum_of=1):
         """
         Argument:
-            score (float), as stored in the DB
+            score (float), as stored in the DB (i.e., "rosetta score")
+            sum_of (int): if this score is the sum of scores of individual
+               problems, how many elements are in that sum
 
         Returns:
             score (float), as displayed to the user in the game and in the leaderboard
         """
-        # TODO: put in correct formula
-        return -score
+        return (-score) * 10 + 8000 * sum_of
 
+    # TODO: delete this, incorporate it in get_tops_n
     @staticmethod
     def get_top_n(puzzle_id, n):
         """
@@ -52,8 +54,32 @@ class Score(models.Model):
                    score: 8500}, ...]
         """
         scores = Score.objects.filter(puzzle_id=puzzle_id).order_by('-best_score')[:n]
-        return [{'username': s.user.username, 'score': display_score(s.best_score)}
+        return [{'username': s.user.username, 'score': Score.display_score(s.best_score)}
                 for s in scores]
+
+    @staticmethod
+    def get_tops_n(n, puzzles=['994559']):
+        """
+        Arguments:
+            puzzles: a list of puzzle ids that we will use. If not specified,
+            defaults to puzzle used in 7012x.
+            n (int): number of top scores to return
+
+
+        Returns:
+            The top n sum of scores for puzzles in <puzzles>. Output is a list
+            of disctionaries, sorted by display_score:
+                [ {username: 'a_user',
+                   score: 12000} ...]
+        """
+        scores = Score.objects.filter(puzzle_id__in=puzzles).annotate(
+                    total_score=models.Sum('best_score')).order_by(
+                        '-total_score')[:n]
+        num = len(puzzles)
+
+        return [{'username': s.user.username,
+                 'total_score': Score.display_score(s.total_score, num)}
+                 for s in scores]
 
 
 class PuzzleComplete(models.Model):

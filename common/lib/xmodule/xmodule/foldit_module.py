@@ -66,6 +66,14 @@ class FolditModule(XModule):
             PuzzleComplete.completed_puzzles(self.system.anonymous_student_id),
             key=lambda d: (d['set'], d['subset']))
 
+    def puzzle_leaders(self, n=10):
+        """
+        Returns a list of n pairs (user, score) corresponding to the top
+        scores; the pairs are in descending order of score.
+        """
+        from foldit.models import Score
+
+        return [(e['username'], e['total_score']) for e in Score.get_tops_n(10)]
 
     def get_html(self):
         """
@@ -80,6 +88,7 @@ class FolditModule(XModule):
             'success': self.is_complete(),
             'goal_level': goal_level,
             'completed': self.completed_puzzles(),
+            'top_scores': self.puzzle_leaders(),
             }
 
         return self.system.render_template('foldit.html', context)
@@ -95,6 +104,7 @@ class FolditModule(XModule):
 
     def max_score(self):
         return 1
+
 
 
 class FolditDescriptor(XmlDescriptor, EditingDescriptor):
