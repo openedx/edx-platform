@@ -10,7 +10,7 @@
       <h2>High Level Source Editing</h2>
     </header>
 
-    <form id="hls-form">
+    <form id="hls-form" enctype="multipart/form-data">
       <section class="source-edit">
           <textarea name="" data-metadata-name="source_code" class="source-edit-box hls-data" rows="8" cols="40">${metadata['source_code']|h}</textarea>
       </section>
@@ -18,6 +18,9 @@
         <button type="reset" class="hls-compile">Save &amp; Compile to edX XML</button>
         <button type="reset" class="hls-save">Save</button>
         <button type="reset" class="hls-refresh">Refresh</button>
+	<div style="display:none"><input type="file" name="hlsfile" id="hlsfile" /></div>
+        <span id="message"></span>
+        <button type="reset" class="hls-upload" style="float:right">Upload</button>
       </div>
     </form>
 
@@ -32,12 +35,43 @@
 
      $('#hls-trig-${hlskey}').click(function(){slow_refresh_hls($('#hls-modal-${hlskey}'))})
 
+     // file upload button
+     $('#hls-modal-${hlskey}').find('.hls-upload').click(function(){
+            $('#hls-modal-${hlskey}').find('#hlsfile').trigger('click');
+	    });
+
+     $('#hls-modal-${hlskey}').find('#hlsfile').change(function() {
+        console.log('handler for hlsfile input called');
+        var file = $('#hls-modal-${hlskey}').find('#hlsfile')[0].files[0];
+        el = $('#hls-modal-${hlskey}');
+	console.log(file);
+
+	var reader = new FileReader();
+	reader.onload = function(event) {
+	    var contents = event.target.result;
+	    process_file_contents(el, contents);
+	};
+	reader.readAsText(file);
+     });
+
+     // file upload processing
+     function process_file_contents(el, contents){
+         // console.log("File contents: " + contents);
+         editor = el.data('editor');
+	 editor.setValue(contents);
+	 console.log('doing compile and save');
+	 // trigger compile & save
+         el.find('.hls-compile').trigger('click');
+     }
+
      // refresh button
 
      $('#hls-modal-${hlskey}').find('.hls-refresh').click(function(){refresh_hls($('#hls-modal-${hlskey}'))});
 
      function refresh_hls(el){
 	 el.data('editor').refresh();
+	 // hide gray overlay
+	 $('#lean_overlay').hide();
       }
 
      function slow_refresh_hls(el){
@@ -52,15 +86,55 @@
 
      // compile & save button
 
-     $('#hls-modal-${hlskey}').find('.hls-compile').click(compile_hls_${hlskey});
+     //  $('#hls-modal-${hlskey}').find('.hls-compile').click(compile_hls_${hlskey});
+     $('#hls-modal-${hlskey}').find('.hls-compile').click(function(){
+         el = $('#hls-modal-${hlskey}');
+         compile_hls(el);
+     });
      
-     function compile_hls_${hlskey}(){
+     // connect to server using POST (requires cross-domain-access)
+
+     function compile_hls(el){	
+          editor = el.data('editor')
+          hlsdata = editor.getValue();
+	  // console.log('hlsdata=' + hlsdata);
+
+          $.ajax({
+             url: "https://studio-input-filter.mitx.mit.edu/latex2edx?raw=1",
+             type: "POST",
+             data: ""+hlsdata,
+             crossDomain: true,
+             processData: false,
+             success: function(data){
+                          console.log('latex2edx success!');
+                          console.log(data);
+                          xml = data.xml;
+                          if (xml.length==0){
+                              alert('Conversion failed!  error:'+ data.message);
+                              //set_status(el, "Conversion failed - please try another file", false);
+                          }else{
+			      //set_status(el, "Done!", true);
+                              // post_images(el, location, data, file);
+                              // post_source_code(el, location, file);
+			      el.closest('.component').find('.CodeMirror-wrap')[0].CodeMirror.setValue(xml);
+			      save_hls(el);
+                          }
+                      },
+             error: function() {
+                       alert('Error: cannot connect to word2edx server');
+                       console.log('error!');
+                   }
+         });
+     }
+
+     ## this version uses JSONP and GET, which limits file sizes
+     function old_compile_hls_${hlskey}(){	
 
           editor = $('#hls-modal-${hlskey}').data('editor')
           var myquery = { latexin: editor.getValue() };
 
           $.ajax({
-              url: '${metadata.get('source_processor_url','https://qisx.mit.edu:5443/latex2edx')}',
+              url: '${metadata.get('source_processor_url','https://studio-input-filter.mitx.mit.edu/latex2edx')}',
               type: 'GET',
               contentType: 'application/json',
               data: escape(JSON.stringify(myquery)),
@@ -108,5 +182,14 @@
           el.find('.hls-data').val(el.data('editor').getValue());
           el.closest('.component').find('.save-button').click();
      }
+
+  ## add upload and download links / buttons to component edit box
+  $('#hls-modal-${hlskey}').closest('.component').find('.component-actions').append('<div id="link-${hlskey}" style="float:right;"></div>');
+  $('#link-${hlskey}').html('<a class="upload-button standard" id="upload-${hlskey}">upload</a>');
+  $('#upload-${hlskey}').click(function(){
+            $('#hls-modal-${hlskey}').closest('.component').find('.edit-button').trigger('click'); // open up editor window
+	    $('#hls-trig-${hlskey}').trigger('click');	// open up HLS editor window
+            $('#hls-modal-${hlskey}').find('#hlsfile').trigger('click');
+   });
 
   </script>
