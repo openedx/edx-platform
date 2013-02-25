@@ -115,14 +115,23 @@ class ConditionalModule(XModule):
             self.contents = [self.system.get_module(child_descriptor).get_html()
                     for child_descriptor in self.descriptor.get_children()]
 
-            # TODO make this work
-            self.icon_class = self.system.get_module(
-                            self.descriptor.get_children()[0]).get_icon_class()
-
         html = self.contents
 
-
         return json.dumps({'html': html, 'passed': True})
+
+    def get_icon_class(self):
+        new_class = 'other'
+        if self.is_condition_satisfied():
+            # HACK: This shouldn't be hard-coded to two types
+            # OBSOLETE: This obsoletes 'type'
+            class_priority = ['video', 'problem']
+
+            child_classes = [self.system.get_module(child_descriptor).get_icon_class()
+                        for child_descriptor in self.descriptor.get_children()]
+            for c in class_priority:
+                if c in child_classes:
+                    new_class = c
+        return new_class
 
 
 class ConditionalDescriptor(SequenceDescriptor):
