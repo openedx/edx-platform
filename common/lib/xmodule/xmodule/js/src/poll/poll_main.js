@@ -42,6 +42,8 @@ PollMain.prototype = {
 
     _this = this;
 
+    console.log('submit answer');
+
     answerObj.buttonEl.addClass('answered');
 
     // Send the data to the server as an AJAX request. Attach a callback that will
@@ -49,6 +51,9 @@ PollMain.prototype = {
     $.postWithPrefix(
         _this.ajax_url + '/' + answer,  {},
         function (response) {
+            console.log('success! response = ');
+            console.log(response);
+
             _this.showAnswerGraph(response.poll_answers, response.total);
 
             if (_this.canReset === true) {
@@ -190,7 +195,7 @@ PollMain.prototype = {
 
     console.log(this.jsonConfig.reset);
 
-    if (this.jsonConfig.reset === "True"){
+    if ((typeof this.jsonConfig.reset === 'string') && (this.jsonConfig.reset.toLowerCase() === 'true')) {
         this.canReset = true;
 
         this.resetButton = $('<div class="button reset-button">Reset</div>');
