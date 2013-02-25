@@ -85,6 +85,7 @@ class PollModule(XModule):
             self.poll_answers = temp_poll_answers
 
             self.poll_answer = ''
+            return json.dumps('success')
         else:  # return error message
             return json.dumps({'error': 'Unknown Command!'})
 
