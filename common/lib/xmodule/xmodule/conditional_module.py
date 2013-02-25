@@ -28,9 +28,16 @@ class ConditionalModule(XModule):
             <video url_name="secret_video" />
         </conditional>
 
-        TODO string comparison
-            multiple answer for every poll
+        <conditional> tag attributes:
+            sources - location id of required modules, separated by ';'
 
+            completed - map to `is_completed` module method
+            attempted - map to `is_attempted` module method
+            poll_answer - map to `poll_answer` module attribute
+            voted - map to `voted` module attribute
+
+        <conditional> tag attributes:
+            sources - location id of modules, separated by ';'
     """
 
     js = {'coffee': [resource_string(__name__, 'js/src/javascript_loader.coffee'),
