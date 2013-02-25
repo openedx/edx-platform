@@ -51,7 +51,9 @@ PollMain.prototype = {
         function (response) {
             _this.showAnswerGraph(response.poll_answers, response.total);
 
-            _this.resetButton.show();
+            if (_this.canReset === true) {
+                _this.resetButton.show();
+            }
 
             // Initialize Conditional constructors.
             if (_this.wrapperSectionEl !== null) {
@@ -61,7 +63,6 @@ PollMain.prototype = {
             }
         }
     );
-
 
 }, // End-of: 'submitAnswer': function (answer, answerEl) {
 
@@ -187,7 +188,11 @@ PollMain.prototype = {
         }
     });
 
+    console.log(this.jsonConfig.reset);
+
     if (this.jsonConfig.reset === "True"){
+        this.canReset = true;
+
         this.resetButton = $('<div class="button reset-button">Reset</div>');
 
         if (this.questionAnswered === false) {
@@ -199,6 +204,8 @@ PollMain.prototype = {
         this.resetButton.on('click', function () {
             _this.submitReset();
         });
+    } else {
+        this.canReset = false;
     }
 
     // If it turns out that the user already answered the question, show the answers graph.
