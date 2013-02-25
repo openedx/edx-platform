@@ -66,5 +66,4 @@ def pdf_index(request, course_id, book_index, chapter=None, page=None):
                                'textbook': textbook,
                                'chapter': chapter,
                                'page': page,
-                               'chapter': chapter,
                                'staff_access': staff_access})

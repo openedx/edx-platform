@@ -27,7 +27,20 @@ PDFJS.disableWorker = true;
         var pdfViewer = this;
 
         var pdfDocument = null;
-        var url = options['url'];
+        var url = null;
+        if (options.url) {
+            url = options.url;
+        }
+        var chapter_urls = null;
+        if (options.chapters) {
+            chapter_urls = options.chapters;
+        }
+        var chapterNum = 1;
+        if (options.chapterNum) {
+            chapterNum = options.chapterNum;
+            // TODO: this should only be specified if there are 
+            // chapters, and it should be in-bounds.
+        }
         var pageNum = 1;
         if (options.pageNum) {
             pageNum = options.pageNum;
@@ -47,25 +60,25 @@ PDFJS.disableWorker = true;
         var setupText = function setupText(textdiv, content, viewport) {
 
             function getPageNumberFromDest(dest) {
-		var destPage = 1;
-		if (dest instanceof Array) {
-		    var destRef = dest[0]; 
-		    if (destRef instanceof Object) {
-			// we would need to look this up in the 
-			// list of all pages that have been loaded,
-			// but we're trying to not have to load all the pages
-			// right now.  
-			// destPage = this.pagesRefMap[destRef.num + ' ' + destRef.gen + ' R'];
-		    } else {
-			destPage = (destRef + 1);
-		    }
-		}
-		return destPage;
-	    }
+                var destPage = 1;
+                if (dest instanceof Array) {
+                    var destRef = dest[0]; 
+                    if (destRef instanceof Object) {
+                        // we would need to look this up in the 
+                        // list of all pages that have been loaded,
+                        // but we're trying to not have to load all the pages
+                        // right now.  
+                        // destPage = this.pagesRefMap[destRef.num + ' ' + destRef.gen + ' R'];
+                    } else {
+                        destPage = (destRef + 1);
+                    }
+                }
+                return destPage;
+            }
 
             function bindLink(link, dest) {
-		// get page number from dest:
-		destPage = getPageNumberFromDest(dest);
+                // get page number from dest:
+                destPage = getPageNumberFromDest(dest);
                 link.href = '#page=' + destPage;
                 link.onclick = function pageViewSetupLinksOnclick() {
                     if (dest && dest instanceof Array )
@@ -135,10 +148,10 @@ PDFJS.disableWorker = true;
         // Get page info from document, resize canvas accordingly, and render page
         //
         renderPage = function(num) {
-	    // don't try to render a page that cannot be rendered
-	    if (num < 1 || num > pdfDocument.numPages) {
-		return;
-	    }
+            // don't try to render a page that cannot be rendered
+            if (num < 1 || num > pdfDocument.numPages) {
+                return;
+            }
 
             // Update logging:
             log_event("book", { "type" : "gotopage", "old" : pageNum, "new" : num });
@@ -268,21 +281,25 @@ PDFJS.disableWorker = true;
         // Asynchronously download PDF as an ArrayBuffer
         //
         loadUrl = function pdfViewLoadUrl(url_to_load) {
-          PDFJS.getDocument(url).then(
-            function getDocument(_pdfDocument) {
-                pdfDocument = _pdfDocument;
-		// display the current page with a default scale value:
-		parseScale(DEFAULT_SCALE_VALUE);
-            }, 
-            function getDocumentError(message, exception) {
-                // placeholder: don't expect errors :)
-            }, 
-            function getDocumentProgress(progressData) {
-                // placeholder: not yet ready to display loading progress
-            });
-	    };
+            PDFJS.getDocument(url_to_load).then(
+                function getDocument(_pdfDocument) {
+                    pdfDocument = _pdfDocument;
+                    // display the current page with a default scale value:
+		    currentScale = UNKNOWN_SCALE;
+                    parseScale(DEFAULT_SCALE_VALUE);
+                }, 
+                function getDocumentError(message, exception) {
+                    // placeholder: don't expect errors :)
+                }, 
+                function getDocumentProgress(progressData) {
+                    // placeholder: not yet ready to display loading progress
+                });
+            }; 
 
-        loadUrl(url);
+        loadChapterUrl = function pdfViewLoadChapterUrl(chapter_index) {
+            var chapter_url = chapter_urls[chapter_index];
+            loadUrl(chapter_url);
+        }
 
         $("#previous").click(function(event) {
             prevPage();
@@ -303,12 +320,33 @@ PDFJS.disableWorker = true;
             parseScale(this.value);
         });
 
+
         $('#pageNumber').change(function(event) {
-	    var newPageVal = parseInt(this.value);
-	    if (newPageVal) {
-		renderPage(newPageVal);
-	    }
+            var newPageVal = parseInt(this.value);
+            if (newPageVal) {
+                renderPage(newPageVal);
+            }
         });
-	return pdfViewer;
+
+        // define navigation links for chapters:  
+        if (chapter_urls != null) {
+            var loadChapterUrlHelper = function(i) {
+                return function(event) {
+                    loadChapterUrl(i);
+                };
+            };
+            for (var index = 1; index <= chapter_urls.length; index += 1) {
+                $("#pdfchapter-" + index).click(loadChapterUrlHelper(index));
+            }   
+        }
+
+        // finally, load the appropriate page
+        if (url != null) {
+            loadUrl(url);
+        } else {
+            loadChapterUrl(chapterNum);
+        }       
+            
+        return pdfViewer;
     }
 })(jQuery);

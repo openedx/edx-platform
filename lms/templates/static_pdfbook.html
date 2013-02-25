@@ -17,45 +17,27 @@
 <%block name="js_extra">
   <script type="text/javascript">
 
-%if 'url' in textbook:
-    var url = "${textbook['url']}";
-
     $(document).ready(function() {
-        $('#outerContainer').PDFViewer( { 
-            % if page is not None:
-            'pageNum' : ${page},
-            % endif
-            'url' : url
-        });
+        var options = {};
+        %if 'url' in textbook:
+            options.url = "${textbook['url']}";
+        %endif
+        %if 'chapters' in textbook:
+            var chptrs = [];
+            %for chap in textbook['chapters']:
+                chptrs.push("${chap['url']}");
+            %endfor
+            options.chapters = chptrs;
+        %endif
+        %if chapter is not None:
+            options.chapterNum : ${chapter};
+        %endif
+        %if page is not None:
+            options.pageNum : ${page};
+        %endif
+    
+        $('#outerContainer').PDFViewer(options);
     });
-%else:
-
-    var my_pdfviewer = null;
-
-    function load_url(url_to_load, page_to_load) {
-//        $('#outerContainer').PDFViewer( { 
-//            'pageNum' : page_to_load,
-//            'url' : url_to_load
-//        });
-       my_pdfviewer.loadUrl(url_to_load, page_to_load);
-    }
-    // since we have no url, we must rely on chapter display, 
-    // so make sure we have a value.
-    var url = "${ textbook['chapters'][chapter-1 if chapter is not None else 0]['url'] }";
-
-    $(document).ready(function() {
-        // load_url(url, ${page if page is not None else 1});
-        var my_pdfviewer = $('#outerContainer').PDFViewer( { 
-            'pageNum' : ${page if page is not None else 1},
-            'url' : url
-        });
-        if (my_pdfviewer) {
-           
-        }
- 
-    } );
-%endif
-
   </script>  
 </%block>
 
@@ -121,25 +103,21 @@
 %if 'chapters' in textbook:
     <section aria-label="Textbook Navigation" class="book-sidebar">
 
-      <ul id="pdfbooknav" class="treeview-booknav">
-          <%def name="print_entry(entry)">
-              <li>
-                  <a href="javascript:load_url(${entry.get('url')}, 1)">
-                      <span class="chapter">
-                          ${entry.get('title')}
-                      </span>
-                  </a>
-              </li>
+      <div id="pdfbooknav" class="treeview-booknav">
+          <%def name="print_entry(entry, index_value)">
+              <div id="pdfchapter-${index_value}">
+                <span class="chapter">
+                  ${entry.get('title')}
+                </span>
+              </div>
           </%def>
 
+          <% index = 0 %>
           % for entry in textbook['chapters']:
-            ${print_entry(entry)}
+            <% index += 1 %>
+            ${print_entry(entry, index)}
           % endfor
-        
-        ## Don't delete this empty list item. Without it, Jquery.TreeView won't
-        ## render the last list item as expandable.
-        <li></li> 
-      </ul>
+      </div>
     </section>
 %endif
 
