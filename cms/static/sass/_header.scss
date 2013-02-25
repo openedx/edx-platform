@@ -1,109 +1,562 @@
-body.no-header {
-	.primary-header {
-		display: none;
-	}
+// studio global header and navigation
+// ====================
+
+.wrapper-header {
+  margin: 0 0 ($baseline*1.5) 0;
+  padding: $baseline;
+  border-bottom: 1px solid $gray;
+  @include box-shadow(0 1px 5px 0 rgba(0,0,0, 0.1));
+  background: $white;
+  height: 76px;
+  position: relative;
+  width: 100%;
+  z-index: 10;
+
+  a {
+    color: $baseFontColor;
+    display: block;
+
+    &:hover, &:active {
+      color: $blue;
+    }
+  }
+
+  header.primary {
+    @include clearfix();
+    max-width: $fg-max-width;
+    min-width: $fg-min-width;
+    width: flex-grid(12);
+    margin: 0 auto;
+    color: $gray-l1;
+  }
+
+  nav .nav-item {
+    display: inline-block;
+  }
 }
 
-@mixin active {
-	@include linear-gradient(top, rgba(255, 255, 255, .4), rgba(255, 255, 255, 0));
-	background-color: rgba(255, 255, 255, .3);
-	@include box-shadow(0 -1px 0 rgba(0, 0, 0, .2) inset, 0 1px 0 #fff inset);
-	text-shadow: 0 1px 0 rgba(255, 255, 255, 0.5);
+// ====================
+
+// basic layout
+.wrapper-left, .wrapper-right {
+  @include box-sizing(border-box);
 }
 
-.primary-header {
-	width: 100%;
-	margin-bottom: 30px;
+.wrapper-left {
+  width: flex-grid(10, 12);
+  float: left;
+  margin-right: flex-gutter();
+}
 
-	&.active-tab-courseware #courseware-tab {
-		@include active;
-	}
+.wrapper-right {
+  width: flex-grid(2, 12);
+  float: right;
+}
 
-	&.active-tab-assets #assets-tab {
-		@include active;
-	}
-	
-	&.active-tab-pages #pages-tab {
-		@include active;
-	}
+// ====================
 
-	&.active-tab-users #users-tab {
-		@include active;
-	}
+// specific elements - branding
+.branding, .info-course, .nav-course, .nav-account, .nav-unauth, .nav-pitch {
+  display: inline-block;
+  vertical-align: top;
+}
 
-	&.active-tab-settings #settings-tab {
-		@include active;
-	}
+.branding {
+  position: relative;
+  margin: 0 ($baseline/2) 0 0;
+  padding-right: ($baseline*0.75);
 
-	&.active-tab-import #import-tab {
-		@include active;
-	}
+  a {
+    @include text-hide();
+    display: block;
+    width: 164px;
+    height: 32px;
+    background: transparent url('../img/logo-edx-studio.png') 0 0 no-repeat;
+  }
+}
 
-	&.active-tab-export #export-tab {
-		@include active;
-	}
+// ====================
 
-	.drop-icon {
-		margin-left: 5px;
-		font-size: 11px;
-	}
+// specific elements - course name/info
+.info-course {
+  @include font-size(14);
+  position: relative;
+  margin: -3px ($baseline/2) 0 0;
+  padding-right: ($baseline*0.75);
 
-	.settings-icon {
-		font-size: 18px;
-		line-height: 18px;
-	}
+  &:before {
+    @extend .faded-vertical-divider;
+    content: "";
+    display: block;
+    height: 50px;
+    position: absolute;
+    right: 1px;
+    top: -8px;
+    width: 1px;
+  }
 
-	.class-nav-bar {
-		clear: both;
-		@include linear-gradient(top, rgba(255, 255, 255, .4), rgba(255, 255, 255, 0));
-		background-color: $lightBluishGrey;
-		@include box-shadow(0 1px 0 rgba(255, 255, 255, 0.2) inset, 0 -1px 0 rgba(0, 0, 0, 0.2) inset);
-	}
+  &:after {
+    @extend .faded-vertical-divider-light;
+    content: "";
+    display: block;
+    height: 50px;
+    position: absolute;
+    right: 0px;
+    top: -12px;
+    width: 1px;
+  }
 
-	.class-nav {
-		@include clearfix;		
+  .course-org {
+    margin-right: ($baseline/4);
+  }
 
-		a {
-			float: left;
-			display: inline-block;
-			padding: 15px 25px 17px;
-			font-size: 15px;
-			color: #3c3c3c;
-			text-shadow: 0 1px 0 rgba(255, 255, 255, 0.3);
+  .course-number, .course-org {
+    @include font-size(12);
+    display: inline-block;
+  }
 
-			&:hover {
-				@include linear-gradient(top, rgba(255, 255, 255, .2), rgba(255, 255, 255, 0));
-			}
-		}
+  .course-title {
+    display: block;
+    width: 100%;
+    max-width: 220px;
+    overflow: hidden;
+    margin-top: -4px;
+    white-space: nowrap;
+    text-overflow: ellipsis;
+    @include font-size(16);
+    font-weight: 600;
+  }
+}
 
-		li {
-			float: left;
-		}
-	}
+// ====================
 
-	.class {
-		@include clearfix;
-		height: 100%;
-		font-size: 12px;
-		color: rgb(163, 171, 184);
-		@include linear-gradient(top, rgba(255, 255, 255, 0), rgba(255, 255, 255, .1));
-		background-color: rgb(47, 53, 63);
+// specific elements - course nav
+.nav-course {
+  width: 335px;
+  margin-top: -($baseline/4);
+  @include font-size(14);
 
-		a {
-			display: inline-block;
-			height: 20px;
-			padding: 5px 10px 6px;
-			color: rgb(163, 171, 184);			
-		}
+  > ol > .nav-item {
+    vertical-align: bottom;
+    margin: 0 ($baseline/2) 0 0;
 
-		.home {
-			position: relative;
-			top: 1px;
-		}
+    &:last-child {
+      margin-right: 0;
+    }
 
-		.log-out {
-			position: relative;
-			top: 3px;
-		}
-	}
+    .title {
+      display: block;
+      padding: 5px;
+      text-transform: uppercase;
+      font-weight: 600;
+      color: $gray-d3;
+
+      .label-prefix {
+        display: block;
+        @include font-size(11);
+        font-weight: 400;
+      }
+    }
+
+    // specific nav items
+    &.nav-course-courseware {
+    }
+
+    &.nav-course-settings {
+    }
+
+    &.nav-course-tools {
+    }
+  }
+}
+
+// ====================
+
+// specific elements - account-based nav
+.nav-account {
+  width: 100%;
+  margin-top: ($baseline*0.75);
+  @include font-size(14);
+  text-align: right;
+
+  .nav-account-username {
+    width: 100%;
+
+    .icon-user {
+      display: inline-block;
+      vertical-align: middle;
+      margin-right: 3px;
+      @include font-size(12);
+    }
+
+    .account-username {
+      display: inline-block;
+      vertical-align: middle;
+      width: 80%;
+      overflow: hidden;
+      white-space: nowrap;
+      text-overflow: ellipsis;
+    }
+
+    .icon-expand {
+      display: inline-block;
+      vertical-align: middle;
+    }
+  }
+}
+
+// ====================
+
+// UI - dropdown
+.nav-dropdown {
+
+  .nav-item {
+    position: relative;
+
+    .icon-expand {
+      @include font-size(14);
+      @include transition (color 0.5s ease-in-out, opacity 0.5s ease-in-out);
+      display: inline-block;
+      margin-left: 2px;
+      opacity: 0.5;
+      color: $gray-l2;
+    }
+
+    &:hover {
+
+      .icon-expand {
+        color: $blue;
+        opacity: 1.0;
+      }
+    }
+  }
+
+  .wrapper-nav-sub {
+    position: absolute;
+    left: -7px;
+    top: 47px;
+    width: 140px;
+    opacity: 0;
+    pointer-events: none;
+  }
+
+  .nav-sub {
+    @include border-radius(2px);
+    @include box-sizing(border-box);
+    @include box-shadow(0 1px 5px 0 rgba(0,0,0, 0.1));
+    position: relative;
+    width: 100%;
+    border: 1px solid $gray-l2;
+    padding: ($baseline/4) ($baseline/2);
+    background: $white;
+
+    &:after, &:before {
+      bottom: 100%;
+      border: solid transparent;
+      content: " ";
+      height: 0;
+      width: 0;
+      position: absolute;
+      pointer-events: none;
+    }
+
+    &:after {
+      border-color: rgba(255, 255, 255, 0);
+      border-bottom-color: #fff;
+      border-width: 5px;
+      right: 3px;
+      margin-left: -5px;
+    }
+
+    &:before {
+      border-color: rgba(178, 178, 178, 0);
+      border-bottom-color: $gray-l2;
+      border-width: 6px;
+      right: 3px;
+      margin-left: -6px;
+    }
+
+    .nav-item {
+      display: block;
+      margin: 0 0 ($baseline/4) 0;
+      border-bottom: 1px solid $gray-l5;
+      padding: 0 0($baseline/4) 0;
+      @include font-size(13);
+
+      &:last-child {
+        margin-bottom: 0;
+        border-bottom: none;
+        padding-bottom: 0;
+      }
+
+      a {
+        display: block;
+      }
+    }
+  }
+
+  // UI - dropdown - specific navs
+  &.nav-account {
+
+    .wrapper-nav-sub {
+      top: 27px;
+      left: auto;
+      right: -13px;
+      width: 110px;
+    }
+
+    .nav-sub {
+      text-align: left;
+
+      .icon-expand {
+        top: -2px;
+      }
+    }
+
+    .nav-sub:after {
+      left: auto;
+      right: 11px;
+    }
+
+    .nav-sub:before {
+      left: auto;
+      right: 10px;
+    }
+  }
+
+  &.nav-course {
+
+    .nav-course-courseware {
+
+      .nav-sub:after {
+        left: 88px;
+      }
+
+      .nav-sub:before {
+        left: 88px;
+      }
+    }
+
+    .nav-course-settings {
+
+      .nav-sub:after {
+        left: 88px;
+      }
+
+      .nav-sub:before {
+        left: 88px;
+      }
+    }
+
+    .nav-course-tools {
+
+      .wrapper-nav-sub {
+        top: ($baseline*1.5);
+        width: 100px;
+      }
+
+      .nav-sub:after {
+        left: 68px;
+      }
+
+      .nav-sub:before {
+        left: 68px;
+      }
+    }
+  }
+}
+
+// ====================
+
+// STATE: is-signed in
+.is-signedin {
+
+  &.course .branding {
+
+    &:before {
+      @extend .faded-vertical-divider;
+      content: "";
+      display: block;
+      height: 50px;
+      position: absolute;
+      right: 1px;
+      top: -8px;
+      width: 1px;
+    }
+
+    &:after {
+      @extend .faded-vertical-divider-light;
+      content: "";
+      display: block;
+      height: 50px;
+      position: absolute;
+      right: 0px;
+      top: -12px;
+      width: 1px;
+    }
+  }
+}
+
+// ====================
+
+// STATE: not signed in
+.not-signedin {
+
+  .wrapper-left {
+    width: flex-grid(4, 12);
+  }
+
+  .wrapper-right {
+    width: flex-grid(8, 12);
+  }
+
+  // STATE: not signed in - unauthenticated nav
+  .nav-not-signedin {
+    float: right;
+    margin-top: ($baseline/4);
+
+    .nav-item {
+      @include font-size(16);
+      vertical-align: middle;
+      margin: 0 $baseline 0 0;
+
+      &:last-child {
+        margin-right: 0;
+      }
+
+      .action {
+        margin-top: -($baseline/4);
+        display: inline-block;
+        padding: ($baseline/4) ($baseline/2);
+      }
+    }
+
+    // STATE: not signed in - specific items
+    .nav-not-signedin-help {
+
+    }
+
+    .nav-not-signedin-signup {
+      margin-right: ($baseline/2);
+
+      .action-signup {
+        @include blue-button;
+        @include transition(all .15s);
+        @include font-size(14);
+        padding: ($baseline/4) ($baseline/2);
+        text-transform: uppercase;
+        font-weight: 600;
+      }
+    }
+
+    .nav-not-signedin-signin {
+
+      .action-signin {
+        @include white-button;
+        @include transition(all .15s);
+        @include font-size(14);
+        padding: ($baseline/4) ($baseline/2);
+        text-transform: uppercase;
+        font-weight: 600;
+      }
+    }
+  }
+}
+
+// ====================
+
+// STATE: active/current nav states
+
+.nav-item.is-current,
+body.howitworks .nav-not-signedin-hiw,
+
+// dashboard
+body.dashboard .nav-account-dashboard,
+
+// course content
+body.course.outline .nav-course-courseware .title,
+body.course.updates .nav-course-courseware .title,
+body.course.pages .nav-course-courseware .title,
+body.course.uploads .nav-course-courseware .title,
+
+body.course.outline .nav-course-courseware-outline,
+body.course.updates .nav-course-courseware-updates,
+body.course.pages .nav-course-courseware-pages,
+body.course.uploads .nav-course-courseware-uploads,
+
+// course settings
+body.course.schedule .nav-course-settings .title,
+body.course.grading .nav-course-settings .title,
+body.course.team .nav-course-settings .title,
+body.course.advanced .nav-course-settings .title,
+
+body.course.schedule .nav-course-settings-schedule,
+body.course.grading .nav-course-settings-grading,
+body.course.team .nav-course-settings-team,
+body.course.advanced .nav-course-settings-advanced,
+
+// course tools
+body.course.import .nav-course-tools .title,
+body.course.export .nav-course-tools .title,
+
+body.course.import .nav-course-tools-import,
+body.course.export .nav-course-tools-export,
+
+{
+
+  color: $blue;
+
+  a {
+    color: $blue;
+    pointer-events: none;
+  }
+}
+
+body.signup .nav-not-signedin-signin {
+
+  a {
+    background-color: #d9e3ee;
+    color: #6d788b;    
+  }
+}
+
+body.signin .nav-not-signedin-signup {
+  
+  a {
+    background-color: #62aaf5;
+    color: #fff;    
+  }
+}
+
+// ====================
+
+// STATE: js enabled 
+.js {
+
+  .nav-dropdown {
+
+    .nav-item .title {
+      outline: 0;
+      cursor: pointer;
+
+      &:hover, &:active, &.is-selected {
+        color: $blue;
+
+        .icon-expand {
+          color: $blue;
+        }
+      }
+    }
+  }
+
+  .wrapper-nav-sub {
+    @include transition (opacity 1.0s ease-in-out 0s);
+    opacity: 0;
+    pointer-events: none;
+
+    &.is-shown {
+      opacity: 1.0;
+      pointer-events: auto;
+    }
+  }
 }

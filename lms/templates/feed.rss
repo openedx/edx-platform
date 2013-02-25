@@ -6,7 +6,16 @@
   <link type="text/html" rel="alternate" href="http://blog.edx.org/"/>
   ##<link type="application/atom+xml" rel="self" href="https://github.com/blog.atom"/>
   <title>EdX Blog</title>
-  <updated>2013-01-30T14:00:12-07:00</updated>
+  <updated>2013-02-20T14:00:12-07:00</updated>
+  <entry>
+    <id>tag:www.edx.org,2012:Post/13</id>
+    <published>2013-02-20T10:00:00-07:00</published>
+    <updated>2013-02-20T10:00:00-07:00</updated>
+    <link type="text/html" rel="alternate" href="${reverse('press/edx-expands-internationally')}"/>
+    <title>edX Expands Internationally and Doubles its Institutional Membership with the Addition of Six New Schools</title>
+    <content type="html">&lt;img src=&quot;${static.url('images/press/releases/edx-logo_240x180.png')}&quot; /&gt;
+        &lt;p&gt;&lt;/p&gt;</content>
+  </entry>
   <entry>
     <id>tag:www.edx.org,2012:Post/13</id>
     <published>2013-01-30T10:00:00-07:00</published>
@@ -17,21 +26,21 @@
         &lt;p&gt;&lt;/p&gt;</content>
   </entry>
   <entry>
-    <id>tag:www.edx.org,2012:Post/12</id>
-    <published>2013-01-29T10:00:00-07:00</published>
-    <updated>2013-01-29T10:00:00-07:00</updated>
-    <link type="text/html" rel="alternate" href="${reverse('press/bostonx-announcement')}"/>
-    <title>City of Boston and edX partner to establish BostonX to improve educational access for residents</title>
-    <content type="html">&lt;img src=&quot;${static.url('images/press/releases/edx-logo_240x180.png')}&quot; /&gt;
-        &lt;p&gt;&lt;/p&gt;</content>
-  </entry>
-  <entry>
     <id>tag:www.edx.org,2012:Post/11</id>
     <published>2013-01-22T10:00:00-07:00</published>
     <updated>2013-01-22T10:00:00-07:00</updated>
     <link type="text/html" rel="alternate" href="${reverse('press/lewin-course-announcement')}"/>
     <title>New course from legendary MIT physics professor Walter Lewin</title>
     <content type="html">&lt;img src=&quot;${static.url('images/press/releases/dr-lewin-316_240x180.jpg')}&quot; /&gt;
+        &lt;p&gt;&lt;/p&gt;</content>
+  </entry>
+  <entry>
+    <id>tag:www.edx.org,2012:Post/12</id>
+    <published>2013-01-29T10:00:00-07:00</published>
+    <updated>2013-01-29T10:00:00-07:00</updated>
+    <link type="text/html" rel="alternate" href="${reverse('press/bostonx-announcement')}"/>
+    <title>City of Boston and edX partner to establish BostonX to improve educational access for residents</title>
+    <content type="html">&lt;img src=&quot;${static.url('images/press/releases/edx-logo_240x180.png')}&quot; /&gt;
         &lt;p&gt;&lt;/p&gt;</content>
   </entry>
   <!-- <entry> -->

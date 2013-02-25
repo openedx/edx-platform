@@ -55,3 +55,15 @@
 		margin-top: 13px;
 	}
 }
+
+// lean modal alternative
+#lean_overlay {
+	position: fixed;
+	z-index: 10000;
+	top: 0px;
+	left: 0px;
+	display: none;
+	height: 100%;
+	width: 100%;
+	background: $black;
+}

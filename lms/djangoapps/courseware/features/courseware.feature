@@ -9,10 +9,3 @@ Feature: View the Courseware Tab
     And I click on View Courseware
     When I click on the "Courseware" tab
     Then the "Courseware" tab is active
-
-    # TODO: fix this one? Not sure whether you should get a 404.
-    # Scenario: I cannot get to the courseware tab when not logged in
-    # Given I am not logged in
-    # And I visit the homepage
-    # When I visit the courseware URL    
-    # Then the login dialog is visible

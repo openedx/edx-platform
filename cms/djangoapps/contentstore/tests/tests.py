@@ -4,7 +4,6 @@ from django.test.client import Client
 from django.conf import settings
 from django.core.urlresolvers import reverse
 from path import path
-from tempfile import mkdtemp
 import json
 from fs.osfs import OSFS
 import copy
