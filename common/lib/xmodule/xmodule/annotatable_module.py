@@ -93,6 +93,7 @@ class AnnotatableModule(XModule):
             'display_name': self.display_name,
             'element_id': self.element_id,
             'discussion_id': self.discussion_id,
+            'instructions_html': self.instructions_html,
             'content_html': self._render_content()
         }
 
@@ -103,11 +104,25 @@ class AnnotatableModule(XModule):
         XModule.__init__(self, system, location, definition, descriptor,
                          instance_state, shared_state, **kwargs)
 
+        self.element_id = self.location.html_id()
+
         xmltree = etree.fromstring(self.definition['data'])
+
+        # extract discussion id
         self.discussion_id = xmltree.get('discussion', '')
         del xmltree.attrib['discussion']
+
+        # extract instructions text (if any)
+        instructions = xmltree.find('instructions')
+        instructions_html = None
+        if instructions is not None:
+            instructions.tag = 'div'
+            instructions_html = etree.tostring(instructions, encoding='unicode')
+            xmltree.remove(instructions)
+        self.instructions_html = instructions_html
+
+        # everything else is annotatable content
         self.content = etree.tostring(xmltree, encoding='unicode')
-        self.element_id = self.location.html_id()
 
 class AnnotatableDescriptor(RawDescriptor):
     module_class = AnnotatableModule

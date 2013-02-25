@@ -1,21 +1,22 @@
 .annotatable-header {
-  margin-bottom: 1em;
+  margin-bottom: .5em;
   .annotatable-title {
     font-size: em(22);
     text-transform: uppercase;
     padding: 2px 4px;
   }
-  .annotatable-description {
-    position: relative;
-    font-size: $body-font-size;
-    padding: 2px 4px;
-    border: 1px solid $border-color;
-    border-radius: 3px;
-    .annotatable-toggle {
-      position: absolute;
-      right: 0;
-      margin: 2px 7px 2px 0;
-    }
+}
+
+.annotatable-description {
+  position: relative;
+  padding: 2px 4px;
+  border: 1px solid $border-color;
+  border-radius: 3px;
+  margin-bottom: .5em;
+  .annotatable-toggle {
+    position: absolute;
+    right: 0;
+    margin: 2px 7px 2px 0;
   }
 }
 
@@ -49,62 +50,6 @@
     display: none;
   }
 }
-
-.annotatable-problems {
-    margin: 25px 0 0 0;
-    .annotatable-discussion {
-        display: none;
-    }
-  .annotatable-problem {
-    border: 1px solid #ccc;
-    border-radius: 1em;
-    margin: 0 0 1em 0;
-  }
-  .annotatable-problem-header {
-    font-weight: bold;
-    border-bottom: 1px solid #ccc;
-    .annotatable-problem-index { font-weight: normal; }
-  }
-  .annotatable-problem-body {
-    position: relative;
-    textarea {
-      display: inline-block;
-      width: 55%;
-    }
-    .annotatable-problem-prompt {
-      font-style: italic;
-    }
-    ul.annotatable-problem-tags {
-      display: block;
-      list-style-type: none;
-      margin: 1em 0;
-      padding: 0;
-      li {
-        cursor: pointer;
-        display: inline;
-        padding: .5em;
-        margin: 0 .5em 0 0;
-        background-color: #ccc;
-        border: 1px solid #000;
-        &.selected {
-          background-color: rgba(255,255,10,0.3);
-        }
-      }
-    }
-    .annotatable-problem-controls {
-      display: inline-block;
-      margin: 0 4px 0 8px;
-    }
-  }
-  .annotatable-problem-footer {}
-
-  .annotatable-problem-header,
-  .annotatable-problem-body,
-  .annotatable-problem-footer {
-    padding: .5em 1em;
-  }
-}
-
 
 .ui-tooltip.qtip.ui-tooltip {
   font-size: $body-font-size;

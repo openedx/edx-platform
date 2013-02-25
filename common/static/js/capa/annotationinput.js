@@ -23,18 +23,18 @@
         },
         onChangeComment: function(e) {
             var value_el = this.findValueEl(e.target);
-            var current_value = this.currentValue(value_el);
+            var current_value = this.loadValue(value_el);
             var target_value = $(e.target).val();
 
             current_value.comment = target_value;
-            this.setValue(value_el, current_value);
+            this.storeValue(value_el, current_value);
         },
         onClickTag: function(e) {
             var target_el = e.target, target_value, target_index;
             var value_el, current_value;
 
             value_el = this.findValueEl(e.target);
-            current_value = this.currentValue(value_el);
+            current_value = this.loadValue(value_el);
             target_value = $(e.target).data('id');
 
             if(!$(target_el).hasClass('selected')) {
@@ -46,14 +46,14 @@
                 }
             }
 
-            this.setValue(value_el, current_value);
+            this.storeValue(value_el, current_value);
             $(target_el).toggleClass('selected');
         },
         findValueEl: function(target_el) {
             var input_el = $(target_el).closest(this.inputSelector);
             return $(this.valueSelector, input_el);
         },
-        currentValue: function(value_el) {
+        loadValue: function(value_el) {
             var json = $(value_el).val();
 
             var result = JSON.parse(json);
@@ -69,7 +69,7 @@
 
             return result;
         },
-        setValue: function(value_el, new_value) {
+        storeValue: function(value_el, new_value) {
             var json = JSON.stringify(new_value);
             $(value_el).val(json);
         }

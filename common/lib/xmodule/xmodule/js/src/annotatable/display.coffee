@@ -1,15 +1,17 @@
 class @Annotatable
     _debug: false
 
-    wrapperSelector: '.annotatable-wrapper'
-    toggleSelector:  '.annotatable-toggle'
-    spanSelector:    '.annotatable-span'
-    replySelector:   '.annotatable-reply'
+    wrapperSelector:            '.annotatable-wrapper'
+    toggleAnnotationsSelector:  '.annotatable-toggle-annotations'
+    toggleInstructionsSelector: '.annotatable-toggle-instructions'
+    instructionsSelector:       '.annotatable-instructions'
+    spanSelector:               '.annotatable-span'
+    replySelector:              '.annotatable-reply'
 
-    problemXModuleSelector: '.xmodule_CapaModule'
-    problemSelector: 'section.problem'
-    problemInputSelector: '.annotation-input'
-    problemReturnSelector:  'section.problem .annotation-return'
+    problemXModuleSelector:     '.xmodule_CapaModule'
+    problemSelector:            'section.problem'
+    problemInputSelector:       'section.problem .annotation-input'
+    problemReturnSelector:      'section.problem .annotation-return'
 
     constructor: (el) ->
         console.log 'loaded Annotatable' if @_debug
@@ -24,9 +26,12 @@ class @Annotatable
         @initTips()
 
     initEvents: () ->
-        # For handling hide/show of annotations
+        # For handling hide/show of annotations and instructions
         @annotationsHidden = false
-        @$(@toggleSelector).bind 'click', @onClickToggleAnnotations
+        @$(@toggleAnnotationsSelector).bind 'click', @onClickToggleAnnotations
+
+        @instructionsHidden = false
+        @$(@toggleInstructionsSelector).bind 'click', @onClickToggleInstructions
 
         # For handling 'reply to annotation' events that scroll to the associated capa problem.
         # These are contained in the tooltips, which should be rendered somewhere in the wrapper
@@ -68,29 +73,15 @@ class @Annotatable
         events:
             show: @onShowTip
 
-    onShowTip: (event, api) =>
-        event.preventDefault() if @annotationsHidden
+    onShowTip: (event, api) => event.preventDefault() if @annotationsHidden
 
-    onClickToggleAnnotations: (e) =>
-        @toggleAnnotations()
+    onClickToggleAnnotations: (e) => @toggleAnnotations()
 
-    onClickReply: (e) =>
-        e.preventDefault()
-        offset = -20
-        el = @getProblem e.currentTarget
-        if el.length > 0
-            @scrollTo(el, @afterScrollToProblem, offset)
-        else
-            console.log('problem not found. event: ', e) if @_debug
+    onClickToggleInstructions: (e) => @toggleInstructions()
 
-    onClickReturn: (e) =>
-        e.preventDefault()
-        offset = -200
-        el = @getSpanForProblemReturn e.currentTarget
-        if el.length > 0
-            @scrollTo(el, @afterScrollToSpan, offset)
-        else
-            console.log('span not found. event:', e) if @_debug
+    onClickReply: (e) => @replyTo(e.currentTarget)
+
+    onClickReturn: (e) => @returnFrom(e.currentTarget)
 
     getSpanForProblemReturn: (el) ->
         problem_id = $(@problemReturnSelector).index(el)
@@ -105,23 +96,47 @@ class @Annotatable
 
     toggleAnnotations: () ->
         hide = (@annotationsHidden = not @annotationsHidden)
-        @toggleButtonText hide
+        @toggleAnnotationButtonText hide
         @toggleSpans hide
-        @toggleReturnLinks hide
         @toggleTips hide
 
     toggleTips: (hide) ->
         if hide then @closeAndSaveTips() else @openSavedTips()
 
-    toggleReturnLinks: (hide) ->
-        $(@returnSelector)[if hide then 'hide' else 'show']()
-
-    toggleButtonText: (hide) ->
+    toggleAnnotationButtonText: (hide) ->
         buttonText = (if hide then 'Show' else 'Hide')+' Annotations'
-        @$(@toggleSelector).text(buttonText)
+        @$(@toggleAnnotationsSelector).text(buttonText)
+
+    toggleInstructions: () ->
+      hide = (@instructionsHidden = not @instructionsHidden)
+      @toggleInstructionsButtonText hide
+      @toggleInstructionsText hide
+
+    toggleInstructionsButtonText: (hide) ->
+        buttonText = (if hide then 'Show' else 'Hide')+' Instructions'
+        @$(@toggleInstructionsSelector).text(buttonText)
+
+    toggleInstructionsText: (hide) ->
+        @$(@instructionsSelector)[if hide then 'slideUp' else 'slideDown']()
 
     toggleSpans: (hide) ->
         @$(@spanSelector).toggleClass 'hide', hide, 250
+
+    replyTo: (buttonEl) ->
+      offset = -20
+      el = @getProblem buttonEl
+      if el.length > 0
+        @scrollTo(el, @afterScrollToProblem, offset)
+      else
+        console.log('problem not found. event: ', e) if @_debug
+
+    returnFrom: (buttonEl) ->
+      offset = -200
+      el = @getSpanForProblemReturn buttonEl
+      if el.length > 0
+        @scrollTo(el, @afterScrollToSpan, offset)
+      else
+        console.log('span not found. event:', e) if @_debug
 
     scrollTo: (el, after, offset = -20) ->
         $('html,body').scrollTo(el, {
