@@ -92,7 +92,7 @@ def clone_course(modulestore, contentstore, source_location, dest_location, dele
   return True
 
 
-def delete_course(modulestore, contentstore, source_location):
+def delete_course(modulestore, contentstore, source_location, commit = False):
     # first check to see if the modulestore is Mongo backed
   if not isinstance(modulestore, MongoModuleStore):
     raise Exception("Expected a MongoModuleStore in the runtime. Aborting....")
@@ -107,7 +107,8 @@ def delete_course(modulestore, contentstore, source_location):
     thumb_loc = Location(thumb["_id"])
     id = StaticContent.get_id_from_location(thumb_loc)
     print "Deleting {0}...".format(id)
-    contentstore.delete(id)
+    if commit:
+      contentstore.delete(id)
 
   # then delete all of the assets
   assets = contentstore.get_all_content_for_course(source_location)
@@ -115,7 +116,8 @@ def delete_course(modulestore, contentstore, source_location):
     asset_loc = Location(asset["_id"])
     id = StaticContent.get_id_from_location(asset_loc)
     print "Deleting {0}...".format(id)
-    contentstore.delete(id)
+    if commit:
+      contentstore.delete(id)
 
   # then delete all course modules
   modules = modulestore.get_items([source_location.tag, source_location.org, source_location.course, None, None, None])
@@ -123,10 +125,12 @@ def delete_course(modulestore, contentstore, source_location):
   for module in modules:
     if module.category != 'course':   # save deleting the course module for last
       print "Deleting {0}...".format(module.location)
-      modulestore.delete_item(module.location)
+      if commit:
+        modulestore.delete_item(module.location)
 
   # finally delete the top-level course module itself
   print "Deleting {0}...".format(source_location)
-  modulestore.delete_item(source_location)
+  if commit:
+    modulestore.delete_item(source_location)
 
   return True
