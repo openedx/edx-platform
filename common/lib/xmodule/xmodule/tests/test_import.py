@@ -328,7 +328,7 @@ class ImportTestCase(BaseCourseTestCase):
 
             self.assertEqual(len(video.url_name), len('video_') + 12)
 
-    def test_poll_xmodule(self):
+    def test_poll_and_conditional_xmodule(self):
         modulestore = XMLModuleStore(DATA_DIR, course_dirs=['conditional_and_poll'])
 
         course = modulestore.get_courses()[0]
