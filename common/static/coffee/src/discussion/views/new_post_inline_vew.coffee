@@ -25,6 +25,7 @@ if Backbone?
       event.preventDefault()
       title   = @$(".new-post-title").val()
       body    = @$(".new-post-body").find(".wmd-input").val()
+      group = @$(".new-post-group option:selected").attr("value")
 
       # TODO tags: commenting out til we know what to do with them
       #tags    = @$(".new-post-tags").val()
@@ -45,6 +46,7 @@ if Backbone?
         data:
           title: title
           body: body
+          group_id: group
           
           # TODO tags: commenting out til we know what to do with them
           #tags: tags
