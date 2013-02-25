@@ -1,6 +1,6 @@
 import json
 import copy
-from time import time
+from uuid import uuid4
 from django.test import TestCase
 from django.conf import settings
 
@@ -20,13 +20,12 @@ class ModuleStoreTestCase(TestCase):
     def _pre_setup(self):
         super(ModuleStoreTestCase, self)._pre_setup()
 
-        # Use the current seconds since epoch to differentiate
+        # Use a uuid to differentiate
         # the mongo collections on jenkins.
-        sec_since_epoch = '%s' % int(time() * 100)
         self.orig_MODULESTORE = copy.deepcopy(settings.MODULESTORE)
         self.test_MODULESTORE = self.orig_MODULESTORE
-        self.test_MODULESTORE['default']['OPTIONS']['collection'] = 'modulestore_%s' % sec_since_epoch
-        self.test_MODULESTORE['direct']['OPTIONS']['collection'] = 'modulestore_%s' % sec_since_epoch
+        self.test_MODULESTORE['default']['OPTIONS']['collection'] = 'modulestore_%s' % uuid4().hex
+        self.test_MODULESTORE['direct']['OPTIONS']['collection'] = 'modulestore_%s' % uuid4().hex
         settings.MODULESTORE = self.test_MODULESTORE
 
         # Flush and initialize the module store

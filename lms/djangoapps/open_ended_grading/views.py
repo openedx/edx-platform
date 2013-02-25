@@ -11,7 +11,8 @@ from django.core.urlresolvers import reverse
 from student.models import unique_id_for_user
 from courseware.courses import get_course_with_access
 
-from controller_query_service import ControllerQueryService
+from xmodule.x_module import ModuleSystem
+from xmodule.open_ended_grading_classes.controller_query_service import ControllerQueryService, convert_seconds_to_human_readable
 from xmodule.open_ended_grading_classes.grading_service_module import GradingServiceError
 import json
 from student.models import unique_id_for_user
@@ -22,12 +23,14 @@ from xmodule.modulestore.django import modulestore
 from xmodule.modulestore import search
 
 from django.http import HttpResponse, Http404, HttpResponseRedirect
+from mitxmako.shortcuts import render_to_string
 
 log = logging.getLogger(__name__)
 
 template_imports = {'urllib': urllib}
 
-controller_qs = ControllerQueryService(settings.OPEN_ENDED_GRADING_INTERFACE)
+system = ModuleSystem(None, None, None, render_to_string, None)
+controller_qs = ControllerQueryService(settings.OPEN_ENDED_GRADING_INTERFACE, system)
 
 """
 Reverses the URL from the name and the course id, and then adds a trailing slash if
@@ -150,6 +153,18 @@ def student_problem_list(request, course_id):
             problem_url_parts = search.path_to_location(modulestore(), course.id, problem_list[i]['location'])
             problem_url = generate_problem_url(problem_url_parts, base_course_url)
             problem_list[i].update({'actual_url': problem_url})
+            eta_available = problem_list[i]['eta_available']
+            if isinstance(eta_available, basestring):
+                eta_available = (eta_available.lower() == "true")
+
+            eta_string = "N/A"
+            if eta_available:
+                try:
+                    eta_string = convert_seconds_to_human_readable(int(problem_list[i]['eta']))
+                except:
+                    #This is a student_facing_error
+                    eta_string = "Error getting ETA."
+            problem_list[i].update({'eta_string' : eta_string})
 
     except GradingServiceError:
         #This is a student_facing_error

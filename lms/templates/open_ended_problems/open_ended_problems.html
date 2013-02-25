@@ -27,7 +27,8 @@
             <tr>
                 <th>Problem Name</th>
                 <th>Status</th>
-                <th>Type of Grading</th>
+                <th>Grader Type</th>
+                <th>ETA</th>
             </tr>
             %for problem in problem_list:
             <tr>
@@ -39,6 +40,9 @@
                 </td>
                 <td> 
                     ${problem['grader_type']}
+                </td>
+                <td>
+                    ${problem['eta_string']}
                 </td>
             </tr>
             %endfor

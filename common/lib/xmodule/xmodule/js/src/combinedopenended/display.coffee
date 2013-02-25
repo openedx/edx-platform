@@ -1,6 +1,21 @@
 class @Rubric
   constructor: () ->
 
+  @initialize: (location) ->
+    $('.rubric').data("location", location) 
+    $('input[class="score-selection"]').change @tracking_callback
+
+  @tracking_callback: (event) ->
+    target_selection = $(event.target).val()
+    # chop off the beginning of the name so that we can get the number of the category
+    category = $(event.target).data("category")
+    location = $('.rubric').data('location')
+    # probably want the original problem location as well
+
+    data = {location: location, selection: target_selection, category: category}
+    Logger.log 'rubric_select', data
+
+
   # finds the scores for each rubric category
   @get_score_list: () =>
     # find the number of categories:
@@ -45,6 +60,9 @@ class @CombinedOpenEnded
     @task_count = @el.data('task-count')
     @task_number = @el.data('task-number')
     @accept_file_upload = @el.data('accept-file-upload')
+    @location = @el.data('location')
+    # set up handlers for click tracking
+    Rubric.initialize(@location)
 
     @allow_reset = @el.data('allow_reset')
     @reset_button = @$('.reset-button')
@@ -118,6 +136,9 @@ class @CombinedOpenEnded
         @submit_evaluation_button = $('.submit-evaluation-button')
         @submit_evaluation_button.click @message_post
         Collapsible.setCollapsibles(@results_container)
+        # make sure we still have click tracking
+        $('.evaluation-response a').click @log_feedback_click
+        $('input[name="evaluation-score"]').change @log_feedback_selection
 
   show_results: (event) =>
     status_item = $(event.target).parent()
@@ -155,7 +176,6 @@ class @CombinedOpenEnded
         @legend_container= $('.legend-container')
 
   message_post: (event)=>
-    Logger.log 'message_post', @answers
     external_grader_message=$(event.target).parent().parent().parent()
     evaluation_scoring = $(event.target).parent()
 
@@ -183,6 +203,7 @@ class @CombinedOpenEnded
         @gentle_alert response.msg
         $('section.evaluation').slideToggle()
         @message_wrapper.html(response.message_html)
+
 
     $.ajaxWithPrefix("#{@ajax_url}/save_post_assessment", settings)
 
@@ -406,7 +427,7 @@ class @CombinedOpenEnded
     $.postWithPrefix "#{@ajax_url}/check_for_score", (response) =>
       if response.state == "done" or response.state=="post_assessment"
         delete window.queuePollerID
-        location.reload()
+        @reload()
       else
         window.queuePollerID = window.setTimeout(@poll, 10000)
 
@@ -440,7 +461,9 @@ class @CombinedOpenEnded
     @prompt_container.toggleClass('open')
     if @question_header.text() == "(Hide)"
       new_text = "(Show)"
+      Logger.log 'oe_hide_question', {location: @location}
     else
+      Logger.log 'oe_show_question', {location: @location}
       new_text = "(Hide)"
     @question_header.text(new_text)
 
@@ -456,4 +479,16 @@ class @CombinedOpenEnded
       @prompt_container.toggleClass('open')
       @question_header.text("(Show)")
 
+  log_feedback_click: (event) ->
+    link_text = $(event.target).html()
+    if link_text == 'See full feedback'
+      Logger.log 'oe_show_full_feedback', {}
+    else if link_text == 'Respond to Feedback'
+      Logger.log 'oe_show_respond_to_feedback', {}
+    else
+      generated_event_type = link_text.toLowerCase().replace(" ","_")
+      Logger.log "oe_" + generated_event_type, {}
 
+  log_feedback_selection: (event) ->
+    target_selection = $(event.target).val()
+    Logger.log 'oe_feedback_response_selected', {value: target_selection}
