@@ -75,7 +75,8 @@ class PollModule(XModule):
                                'poll_answers': self.poll_answers,
                                'total': sum(self.poll_answers.values())
                                })
-        elif dispatch == 'reset_poll' and self.voted:
+        elif dispatch == 'reset_poll' and self.voted and \
+                self.descriptor.xml_attributes.get('reset'):
             self.voted = False
 
             # FIXME: fix this, when xblock will support mutable types.
@@ -131,7 +132,7 @@ class PollModule(XModule):
             'poll_answer': self.poll_answer,
             'poll_answers': self.poll_answers if self.voted else {},
             'total': sum(self.poll_answers.values()) if self.voted else 0,
-            'reset': self.descriptor.xml_attributes.get('reset', True)})
+            'reset': str(self.descriptor.xml_attributes.get('reset', 'true')).lower()})
 
 
 class PollDescriptor(MakoModuleDescriptor, XmlDescriptor):
