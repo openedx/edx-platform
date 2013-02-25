@@ -35,16 +35,18 @@ class FolditTestCase(TestCase):
         UserProfile.objects.create(user=self.user)
         UserProfile.objects.create(user=self.user2)
 
-    def make_request(self, post_data, user=self.user):
+    def make_request(self, post_data, user=None):
         request = self.factory.post(self.url, post_data)
-        request.user = user
+        request.user = self.user if not user else user
         return request
 
-    def make_puzzle_score_request(self, puzzle_ids, best_scores, user=self.user):
+    def make_puzzle_score_request(self, puzzle_ids, best_scores, user=None):
         """
         Given lists of puzzle_ids and best_scores (must have same length), make a
         SetPlayerPuzzleScores request and return the response.
         """
+        user = self.user if not user else user
+
         def score_dict(puzzle_id, best_score):
             return {"PuzzleID": puzzle_id,
                     "ScoreType": "score",
@@ -109,7 +111,7 @@ class FolditTestCase(TestCase):
         # There should now be a score in the db.
         top_10 = Score.get_tops_n(puzzle_id, 10)
         self.assertEqual(len(top_10), 1)
-        self.assertEqual(top_10[0]['score'], Score.display_score(best_score))
+        self.assertEqual(top_10[0]['score'], Score.display_score(orig_score))
 
         # Reporting a better score should overwrite
         better_score = 0.06
