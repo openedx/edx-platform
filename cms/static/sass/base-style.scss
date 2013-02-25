@@ -1,5 +1,6 @@
 @import 'bourbon/bourbon';
 @import 'bourbon/addons/button';
+@import "variables";
 @import 'vendor/normalize';
 @import 'keyframes';
 
@@ -7,7 +8,6 @@
 @import 'mixins';
 
 @import "fonts";
-@import "variables";
 @import "cms_mixins";
 @import "extends";
 @import "base";

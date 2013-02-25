@@ -1,3 +1,33 @@
+// studio animations & keyframes
+// ====================
+
+// rotate clockwise
+@mixin rotateClockwise {
+  0% {
+    @include transform(rotate(0deg));
+  }
+
+  25% {
+    @include transform(rotate(90deg));
+  }
+
+  50% {
+    @include transform(rotate(180deg));
+  }
+
+  100% {
+    @include transform(rotate(360deg));
+  }
+}
+
+@-moz-keyframes rotateClockwise { @include rotateClockwise(); }
+@-webkit-keyframes rotateClockwise { @include rotateClockwise(); }
+@-o-keyframes rotateClockwise { @include rotateClockwise(); }
+@keyframes rotateClockwise { @include rotateClockwise();}
+
+// ====================
+
+// bounce in
 @mixin bounce-in {
   0% {
     opacity: 0;

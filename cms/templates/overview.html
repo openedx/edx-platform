@@ -13,375 +13,484 @@
 <%namespace name="units" file="widgets/units.html" />
 
 <%block name="jsextra">
-  <link rel="stylesheet" type="text/css" href="${static.url('js/vendor/timepicker/jquery.timepicker.css')}" />
-  <script src="${static.url('js/vendor/timepicker/jquery.timepicker.js')}"></script>
-  <script src="${static.url('js/vendor/timepicker/datepair.js')}"></script>
-  <script src="${static.url('js/vendor/date.js')}"></script>
-  <script type="text/javascript" src="${static.url('js/models/course_relative.js')}"></script>
-  <script type="text/javascript" src="${static.url('js/views/grader-select-view.js')}"></script>
-  <script type="text/javascript" src="${static.url('js/views/overview.js')}"></script>
-  <script type="text/javascript" src="${static.url('js/models/settings/course_grading_policy.js')}"></script>
+<link rel="stylesheet" type="text/css" href="${static.url('js/vendor/timepicker/jquery.timepicker.css')}" />
+<script src="${static.url('js/vendor/timepicker/jquery.timepicker.js')}"></script>
+<script src="${static.url('js/vendor/timepicker/datepair.js')}"></script>
+<script src="${static.url('js/vendor/date.js')}"></script>
+<script type="text/javascript" src="${static.url('js/models/course_relative.js')}"></script>
+<script type="text/javascript" src="${static.url('js/views/grader-select-view.js')}"></script>
+<script type="text/javascript" src="${static.url('js/views/overview.js')}"></script>
+<script type="text/javascript" src="${static.url('js/models/settings/course_grading_policy.js')}"></script>
 
-  <script type="text/javascript">
-  $(document).ready(function(){
-    // TODO figure out whether these should be in window or someplace else or whether they're only needed as local vars
-    // I believe that current (New Section/New Subsection) cause full page reloads which means these aren't needed globally
-    // but we really should change that behavior.
-    if (!window.graderTypes) {
-	    window.graderTypes = new CMS.Models.Settings.CourseGraderCollection();
-	    window.graderTypes.course_location = new CMS.Models.Location('${parent_location}');
-	    window.graderTypes.reset(${course_graders|n});
-    }
-    
-    $(".gradable-status").each(function(index, ele) {
-        var gradeView = new CMS.Views.OverviewAssignmentGrader({
-            el : ele,
-            graders : window.graderTypes
-        });
-    });
-  });
+<script type="text/javascript">
+$(document).ready(function(){
+  // TODO figure out whether these should be in window or someplace else or whether they're only needed as local vars
+  // I believe that current (New Section/New Subsection) cause full page reloads which means these aren't needed globally
+  // but we really should change that behavior.
+  if (!window.graderTypes) {
+    window.graderTypes = new CMS.Models.Settings.CourseGraderCollection();
+    window.graderTypes.course_location = new CMS.Models.Location('${parent_location}');
+    window.graderTypes.reset(${course_graders|n});
+  }
   
-  </script>
+  $(".gradable-status").each(function(index, ele) {
+      var gradeView = new CMS.Views.OverviewAssignmentGrader({
+          el : ele,
+          graders : window.graderTypes
+      });
+  });
+});
+
+</script>
 </%block>
 
 <%block name="header_extras">
-  <script type="text/template" id="new-section-template">
-    <section class="courseware-section branch new-section">
-      <header>
-        <a href="#"  data-tooltip="Collapse/expand this section" class="expand-collapse-icon collapse"></a>
-        <div class="item-details">
-          <h3 class="section-name">
-          <form class="section-name-form">
-            <input type="text" value="New Section Name" class="new-section-name" />
-            <input type="submit" class="new-section-name-save" data-parent="${parent_location}" data-template="${new_section_template}" value="Save" />
-            <input type="button" class="new-section-name-cancel" value="Cancel" /></h3>
-          </form>
-        </div>
-      </header>
-    </section>
-  </script>
-
-  <script type="text/template" id="blank-slate-template">
-    <section class="courseware-section branch new-section">
-      <header>
-        <a href="#"  data-tooltip="Collapse/expand this section" class="expand-collapse-icon collapse"></a>
-        <div class="item-details">
-          <h3 class="section-name">
-          <span class="section-name-span">Click here to set the section name</span>
-          <form class="section-name-form">
-            <input type="text" value="New Section Name" class="new-section-name" />
-            <input type="submit" class="new-section-name-save" data-parent="${parent_location}" data-template="${new_section_template}" value="Save" />
-            <input type="button" class="new-section-name-cancel" value="Cancel" /></h3>
-          </form>
-        </div>
-        <div class="item-actions">
-          <a href="#" data-tooltip="Delete this section" class="delete-button delete-section-button"><span class="delete-icon"></span></a>
-          <a href="#" data-tooltip="Drag to re-order" class="drag-handle"></a>
-        </div>
-      </header>
-    </section>
-  </script>
-
-  <script type="text/template" id="new-subsection-template">
-    <li class="branch collapsed">
-      <div class="section-item editing">
-        <form class="new-subsection-form">
-          <span class="folder-icon"></span>
-          <span class="subsection-name">
-            <input type="text" value="New Subsection" class="new-subsection-name-input" />
-          </span>
-          <input type="submit" value="Save" class="new-subsection-name-save" />
-          <input type="button" value="Cancel" class="new-subsection-name-cancel" />
+<script type="text/template" id="new-section-template">
+  <section class="courseware-section branch new-section">
+    <header>
+      <a href="#"  data-tooltip="Collapse/expand this section" class="expand-collapse-icon collapse"></a>
+      <div class="item-details">
+        <h3 class="section-name">
+        <form class="section-name-form">
+          <input type="text" value="New Section Name" class="new-section-name" />
+          <input type="submit" class="new-section-name-save" data-parent="${parent_location}" data-template="${new_section_template}" value="Save" />
+          <input type="button" class="new-section-name-cancel" value="Cancel" /></h3>
         </form>
       </div>
-      <ol>
-        <li>
-          <a href="unit.html" class="new-unit-item">
-            <span class="new-unit-icon"></span>New Unit
-          </a>
-        </li>
-      </ol>
-    </li>
-  </script>
+    </header>
+  </section>
+</script>
+
+<script type="text/template" id="blank-slate-template">
+  <section class="courseware-section branch new-section">
+    <header>
+      <a href="#"  data-tooltip="Collapse/expand this section" class="expand-collapse-icon collapse"></a>
+      <div class="item-details">
+        <h3 class="section-name">
+        <span class="section-name-span">Click here to set the section name</span>
+        <form class="section-name-form">
+          <input type="text" value="New Section Name" class="new-section-name" />
+          <input type="submit" class="new-section-name-save" data-parent="${parent_location}" data-template="${new_section_template}" value="Save" />
+          <input type="button" class="new-section-name-cancel" value="Cancel" /></h3>
+        </form>
+      </div>
+      <div class="item-actions">
+        <a href="#" data-tooltip="Delete this section" class="delete-button delete-section-button"><span class="delete-icon"></span></a>
+        <a href="#" data-tooltip="Drag to re-order" class="drag-handle"></a>
+      </div>
+    </header>
+  </section>
+</script>
+
+<script type="text/template" id="new-subsection-template">
+  <li class="branch collapsed">
+    <div class="section-item editing">
+      <form class="new-subsection-form">
+        <span class="folder-icon"></span>
+        <span class="subsection-name">
+          <input type="text" value="New Subsection" class="new-subsection-name-input" />
+        </span>
+        <input type="submit" value="Save" class="new-subsection-name-save" />
+        <input type="button" value="Cancel" class="new-subsection-name-cancel" />
+      </form>
+    </div>
+    <ol>
+      <li>
+        <a href="unit.html" class="new-unit-item">
+          <span class="new-unit-icon"></span>New Unit
+        </a>
+      </li>
+    </ol>
+  </li>
+</script>
 </%block>
 
 <%block name="content">
-  <!-- alert: you're editing a draft -->
-  <div class="wrapper wrapper-alert wrapper-alert-warning is-shown">
-    <div class="alert warning has-actions">
-      <i class="ss-icon ss-symbolicons-block icon icon-warning">&#x26A0;</i>
+<!-- alert: you're editing a draft -->
+<div class="wrapper wrapper-alert wrapper-alert-warning is-shown">
+  <div class="alert warning has-actions">
+    <i class="ss-icon ss-symbolicons-block icon icon-warning">&#x26A0;</i>
 
-      <div class="copy">
+    <div class="copy">
       <h2 class="title title-3">You are editing a draft</h2>
-        <p>Lorem ipsum dolor sit amet, consectetuer adipiscing elit. Aenean commodo ligula eget dolor. Aenean massa.</p>
-      </div>
-
-      <nav class="nav-actions">
-        <h3 class="sr">Alert Actions</h3>
-        <ul>
-          <li class="nav-item">
-            <a href="#" rel="external" class="button save-button action-primary">Save Draft</a>
-          </li>
-          <li class="nav-item">
-            <a href="#" rel="external" class="button cancel-button action-secondary">Disgard Draft</a>
-          </li>
-        </ul>
-      </nav>
+      <p>Lorem ipsum dolor sit amet, consectetuer adipiscing elit. Aenean commodo ligula eget dolor. Aenean massa.</p>
     </div>
+
+    <nav class="nav-actions">
+      <h3 class="sr">Alert Actions</h3>
+      <ul>
+        <li class="nav-item">
+          <a href="#" class="button save-button action-primary">Save Draft</a>
+        </li>
+        <li class="nav-item">
+          <a href="#" class="button cancel-button action-secondary">Disgard Draft</a>
+        </li>
+      </ul>
+    </nav>
   </div>
+</div>
 
-  <!-- alert: newer version -->
-  <div class="wrapper wrapper-alert wrapper-alert-warning is-shown">
-    <div class="alert warning has-actions">
-      <i class="ss-icon ss-symbolicons-block icon icon-warning">&#x26A0;</i>
+<!-- alert: newer version -->
+<div class="wrapper wrapper-alert wrapper-alert-warning is-shown">
+  <div class="alert warning has-actions">
+    <i class="ss-icon ss-symbolicons-block icon icon-warning">&#x26A0;</i>
 
-      <div class="copy">
+    <div class="copy">
       <h2 class="title title-3">A Newer Version of This Exists</h2>
-        <p>Lorem ipsum dolor sit amet, consectetuer adipiscing elit. Aenean commodo ligula eget dolor. Aenean massa.</p>
-      </div>
+      <p>Lorem ipsum dolor sit amet, consectetuer adipiscing elit. Aenean commodo ligula eget dolor. Aenean massa.</p>
+    </div>
 
-      <nav class="nav-actions">
-        <h3 class="sr">Alert Actions</h3>
-        <ul>
-          <li class="nav-item">
-            <a href="#" rel="external" class="button save-button action-primary">View Newer Version</a>
-          </li>
-          <li class="nav-item">
-            <a href="#" rel="external" class="button cancel-button action-secondary">Continue Editing</a>
-          </li>
-        </ul>
-      </nav>
+    <nav class="nav-actions">
+      <h3 class="sr">Alert Actions</h3>
+      <ul>
+        <li class="nav-item">
+          <a href="#" class="button save-button action-primary">Go to Newer Version</a>
+        </li>
+        <li class="nav-item">
+          <a href="#" class="button cancel-button action-secondary">Continue Editing</a>
+        </li>
+      </ul>
+    </nav>
+  </div>
+</div>
+
+<!-- alert: save confirmed -->
+<div class="wrapper wrapper-alert wrapper-alert-confirmation is-shown">
+  <div class="alert confirmation">
+    <i class="ss-icon ss-symbolicons-standard icon icon-confirmation">&#x2713;</i>
+
+    <div class="copy">
+      <h2 class="title title-3">Your changes have been saved</h2>
+      <p>Lorem ipsum dolor sit amet, consectetuer adipiscing elit. Aenean commodo ligula eget dolor. Aenean massa. <a rel="page" href="#test">Please see below</a></p>
     </div>
   </div>
+</div>
 
-  <!-- alert: save confirmed -->
-  <div class="wrapper wrapper-alert wrapper-alert-confirmation is-shown">
-    <div class="alert confirmation">
-      <i class="ss-icon ss-symbolicons-standard icon icon-confirmation">&#x2713;</i>
+<!-- alert: delete confirmed -->
+<div class="wrapper wrapper-alert wrapper-alert-confirmation is-shown">
+  <div class="alert confirmation">
+    <i class="ss-icon ss-symbolicons-standard icon icon-confirmation">&#x2713;</i>
 
-      <div class="copy">
-        <h2 class="title title-3">Your changes have been saved</h2>
-        <p>Lorem ipsum dolor sit amet, consectetuer adipiscing elit. Aenean commodo ligula eget dolor. Aenean massa. <a rel="page" href="#test">Please see below</a></p>
-      </div>
+    <div class="copy">
+      <h2 class="title title-3">X Has been removed</h2>
+      <p>Lorem ipsum dolor sit amet, consectetuer adipiscing elit. Aenean commodo ligula eget dolor. Aenean massa.</p>
     </div>
   </div>
+</div>
 
-  <!-- alert: delete confirmed -->
-  <div class="wrapper wrapper-alert wrapper-alert-confirmation is-shown">
-    <div class="alert confirmation">
-      <i class="ss-icon ss-symbolicons-standard icon icon-confirmation">&#x2713;</i>
+<!-- alert: system error -->
+<div class="wrapper wrapper-alert wrapper-alert-error is-shown">
+  <div class="alert error">
+    <i class="ss-icon ss-symbolicons-block icon icon-error">&#x26A0;</i>
 
-      <div class="copy">
-        <h2 class="title title-3">X Has been removed</h2>
-        <p>Lorem ipsum dolor sit amet, consectetuer adipiscing elit. Aenean commodo ligula eget dolor. Aenean massa.</p>
-      </div>
+    <div class="copy">
+      <h2 class="title title-3">We're sorry, there was a error with Studio</h2>
+      <p>Lorem ipsum dolor sit amet, consectetuer adipiscing elit. Aenean commodo ligula eget dolor. Aenean massa.</p>
     </div>
   </div>
+</div>
 
-  <!-- alert: system error -->
-  <div class="wrapper wrapper-alert wrapper-alert-error is-shown">
-    <div class="alert error">
-      <i class="ss-icon ss-symbolicons-block icon icon-error">&#x26A0;</i>
+<!-- alert: user error -->
+<div class="wrapper wrapper-alert wrapper-alert-error is-shown">
+  <div class="alert error has-actions">
+    <i class="ss-icon ss-symbolicons-block icon icon-error">&#x26A0;</i>
 
-      <div class="copy">
-        <h2 class="title title-3">We're sorry, there was a error with Studio</h2>
-        <p>Lorem ipsum dolor sit amet, consectetuer adipiscing elit. Aenean commodo ligula eget dolor. Aenean massa.</p>
-      </div>
+    <div class="copy">
+      <h2 class="title title-3">There was an error in your submission</h2>
+      <p>Lorem ipsum dolor sit amet, consectetuer adipiscing elit. Aenean commodo ligula eget dolor. Aenean massa. <a rel="page" href="#test">Please see below</a></p>
+    </div>
+
+    <nav class="nav-actions">
+      <h3 class="sr">Alert Actions</h3>
+      <ul>
+        <li class="nav-item">
+          <a href="#" class="button cancel-button action-primary">Cancel Your Submission</a>
+        </li>
+      </ul>
+    </nav>
+  </div>
+</div>
+
+<!-- alert: announcement w/ actions -->
+<div class="wrapper wrapper-alert wrapper-alert-announcement is-shown">
+  <div class="alert announcement has-actions">
+    <i class="ss-icon ss-symbolicons-block icon icon-announcement">&#x1F4E2;</i>
+
+    <div class="copy">
+      <h2 class="title title-3">Studio will be unavailable this weekend</h2>
+      <p>Lorem ipsum dolor sit amet, consectetuer adipiscing elit. Aenean commodo ligula eget dolor. Aenean massa. Lorem ipsum dolor sit amet, consectetuer adipiscing elit. Aenean commodo ligula eget dolor. Aenean massa.</p>
+    </div>
+
+    <nav class="nav-actions">
+      <h3 class="sr">Alert Actions</h3>
+      <ul>
+        <li class="nav-item">
+          <a href="#" rel="external" class="action-primary">Contact edX Staff</a>
+        </li>
+        <li class="nav-item">
+          <a href="#" class="action-secondary">Manage Your edX Notifications</a>
+        </li>
+      </ul>
+    </nav>
+  </div>
+</div>
+
+<!-- alert: announcement -->
+<div class="wrapper wrapper-alert wrapper-alert-announcement is-shown">
+  <div class="alert announcement">
+    <i class="ss-icon ss-symbolicons-block icon icon-announcement">&#x1F4E2;</i>
+
+    <div class="copy">
+      <h2 class="title title-3">Studio will be unavailable this weekend</h2>
+      <p>Lorem ipsum dolor sit amet, consectetuer adipiscing elit. Aenean commodo ligula eget dolor. Aenean massa. Lorem ipsum dolor sit amet, consectetuer adipiscing elit. Aenean commodo ligula eget dolor. Aenean massa.</p>
     </div>
   </div>
+</div>
 
-  <!-- alert: user error -->
-  <div class="wrapper wrapper-alert wrapper-alert-error is-shown">
-    <div class="alert error has-actions">
-      <i class="ss-icon ss-symbolicons-block icon icon-error">&#x26A0;</i>
+<!-- alert: step required -->
+<div class="wrapper wrapper-alert wrapper-alert-step-required is-shown">
+  <div class="alert step-required has-actions">
+    <i class="ss-icon ss-symbolicons-block icon icon-step-required">&#xE0D1;</i>
 
-      <div class="copy">
-        <h2 class="title title-3">There was an error in your submission</h2>
-        <p>Lorem ipsum dolor sit amet, consectetuer adipiscing elit. Aenean commodo ligula eget dolor. Aenean massa. <a rel="page" href="#test">Please see below</a></p>
-      </div>
-
-      <nav class="nav-actions">
-        <h3 class="sr">Alert Actions</h3>
-        <ul>
-          <li class="nav-item">
-            <a href="#" rel="external" class="button cancel-button action-primary">Cancel Your Submission</a>
-          </li>
-        </ul>
-      </nav>
+    <div class="copy">
+      <h2 class="title title-3">Your Studio account has been created, but needs to be activated</h2>
+      <p>Donec sed odio dui. Fusce dapibus, tellus ac cursus commodo, tortor mauris condimentum nibh, ut fermentum massa justo sit amet risus. Etiam porta sem malesuada magna mollis euismod. Cras mattis consectetur purus sit amet fermentum. Curabitur blandit tempus porttitor.</p>
     </div>
+
+    <nav class="nav-actions">
+      <h3 class="sr">Alert Actions</h3>
+      <ul>
+        <li class="nav-item">
+          <a href="#" class="action-primary">Re-send Activation Message</a>
+        </li>
+        <li class="nav-item">
+          <a href="#" rel="external" class="action-secondary">Contact edX Support</a>
+        </li>
+      </ul>
+    </nav>
   </div>
+</div>
 
-  <!-- alert: announcement w/ actions -->
-  <div class="wrapper wrapper-alert wrapper-alert-announcement is-shown">
-    <div class="alert announcement has-actions">
-      <i class="ss-icon ss-symbolicons-block icon icon-announcement">&#x1F4E2;</i>
-
-      <div class="copy">
-        <h2 class="title title-3">Studio will be unavailable this weekend</h2>
-        <p>Lorem ipsum dolor sit amet, consectetuer adipiscing elit. Aenean commodo ligula eget dolor. Aenean massa. Lorem ipsum dolor sit amet, consectetuer adipiscing elit. Aenean commodo ligula eget dolor. Aenean massa.</p>
-      </div>
-
-      <nav class="nav-actions">
-        <h3 class="sr">Alert Actions</h3>
-        <ul>
-          <li class="nav-item">
-            <a href="#" rel="external" class="action-primary">Contact edX Staff</a>
-          </li>
-          <li class="nav-item">
-            <a href="#" rel="external" class="action-secondary">Manage Your edX Notifications</a>
-          </li>
-        </ul>
-      </nav>
-    </div>
-  </div>
-
-  <!-- alert: announcement -->
-  <div class="wrapper wrapper-alert wrapper-alert-announcement is-shown">
-    <div class="alert announcement">
-      <i class="ss-icon ss-symbolicons-block icon icon-announcement">&#x1F4E2;</i>
-
-      <div class="copy">
-        <h2 class="title title-3">Studio will be unavailable this weekend</h2>
-        <p>Lorem ipsum dolor sit amet, consectetuer adipiscing elit. Aenean commodo ligula eget dolor. Aenean massa. Lorem ipsum dolor sit amet, consectetuer adipiscing elit. Aenean commodo ligula eget dolor. Aenean massa.</p>
+<div class="edit-subsection-publish-settings">
+  <div class="settings">
+    <h3>Section Release Date</h3>
+    <div class="picker datepair">
+      <input class="start-date date" type="text" name="start_date" value="" placeholder="MM/DD/YYYY" class="date" size='15' autocomplete="off"/>
+      <input class="start-time time" type="text" name="start_time" value="" placeholder="HH:MM" class="time" size='10' autocomplete="off"/>
+      <div class="description">
+        <p>On the date set above, this section – <strong class="section-name"></strong> – will be released to students. Any units marked private will only be visible to admins.</p>
       </div>
     </div>
+    <a href="#" class="save-button">Save</a><a href="#" class="cancel-button">Cancel</a>
   </div>
+</div>
 
-  <!-- alert: step required -->
-  <div class="wrapper wrapper-alert wrapper-alert-step-required is-shown">
-    <div class="alert step-required has-actions">
-      <i class="ss-icon ss-symbolicons-block icon icon-step-required">&#xE0D1;</i>
+<div class="wrapper wrapper-testing">
+  <div class="testing">
+    <ul>
+      <li><a href="#" class="test-notification">Toggle Notification</a></li>
+    </ul>
+  </div>
+</div>
 
-      <div class="copy">
-        <h2 class="title title-3">Your Studio account has been created, but needs to be activated</h2>
-        <p>Donec sed odio dui. Fusce dapibus, tellus ac cursus commodo, tortor mauris condimentum nibh, ut fermentum massa justo sit amet risus. Etiam porta sem malesuada magna mollis euismod. Cras mattis consectetur purus sit amet fermentum. Curabitur blandit tempus porttitor.</p>
-      </div>
-
-      <nav class="nav-actions">
-        <h3 class="sr">Alert Actions</h3>
-        <ul>
-          <li class="nav-item">
-            <a href="#" rel="external" class="action-primary">Re-send Activation Message</a>
-          </li>
-          <li class="nav-item">
-            <a href="#" rel="external" class="action-secondary">Contact edX Support</a>
-          </li>
-        </ul>
-      </nav>
+<div class="wrapper-mast wrapper">
+  <header class="mast has-actions has-subtitle">
+    <div class="title">
+      <span class="title-sub">Course Content</span>
+      <h1 class="title-1">Course Outline</h1>
     </div>
-  </div>
 
-  <div class="edit-subsection-publish-settings">
-    <div class="settings">
-      <h3>Section Release Date</h3>
-      <div class="picker datepair">
-        <input class="start-date date" type="text" name="start_date" value="" placeholder="MM/DD/YYYY" class="date" size='15' autocomplete="off"/>
-        <input class="start-time time" type="text" name="start_time" value="" placeholder="HH:MM" class="time" size='10' autocomplete="off"/>
-        <div class="description">
-          <p>On the date set above, this section – <strong class="section-name"></strong> – will be released to students. Any units marked private will only be visible to admins.</p>
-        </div>
-      </div>
-      <a href="#" class="save-button">Save</a><a href="#" class="cancel-button">Cancel</a>
-    </div>
-  </div>
+    <nav class="nav-actions">
+      <h3 class="sr">Page Actions</h3>
+      <ul>
+        <li class="nav-item">
+          <a href="#" class="toggle-button toggle-button-sections"><i class="ss-icon ss-symbolicons-block icon">up</i> <span class="label">Collapse All Sections</span></a>
+        </li>
+        <li class="nav-item">
+          <a href="#" class="button new-button new-courseware-section-button"><i class="ss-icon ss-symbolicons-standard icon icon-create">&#x002B;</i> New Section</a>
+        </li>
+        <li class="nav-item">
+          <a href="${lms_link}" rel="external" class="button view-button view-live-button"><i class="ss-icon ss-symbolicons-block icon icon-view">&#xE010;</i>View Live</a>
+        </li>
+      </ul>
+    </nav>
+  </header>
+</div>
 
-  <div class="wrapper-mast wrapper">
-    <header class="mast has-actions has-subtitle">
-      <div class="title">
-        <span class="title-sub">Course Content</span>
-        <h1 class="title-1">Course Outline</h1>
-      </div>
+<div class="main-wrapper">
+  <div class="inner-wrapper">
+    <article class="courseware-overview" data-course-id="${context_course.location.url()}">        
+      % for section in sections:
+      <section class="courseware-section branch" data-id="${section.location}">
+        <header>
+          <a href="#" data-tooltip="Expand/collapse this section" class="expand-collapse-icon collapse"></a>
 
-      <nav class="nav-actions">
-        <h3 class="sr">Page Actions</h3>
-        <ul>
-          <li class="nav-item">
-            <a href="#" class="toggle-button toggle-button-sections"><i class="ss-icon ss-symbolicons-block icon">up</i> <span class="label">Collapse All Sections</span></a>
-          </li>
-          <li class="nav-item">
-            <a href="#" class="button new-button new-courseware-section-button"><i class="ss-icon ss-symbolicons-standard icon icon-create">&#x002B;</i> New Section</a>
-          </li>
-          <li class="nav-item">
-            <a href="${lms_link}" rel="external" class="button view-button view-live-button"><i class="ss-icon ss-symbolicons-block icon icon-view">&#xE010;</i>View Live</a>
-          </li>
-        </ul>
-      </nav>
-    </header>
-  </div>
-
-  <div class="main-wrapper">
-    <div class="inner-wrapper">
-      <article class="courseware-overview" data-course-id="${context_course.location.url()}">        
-        % for section in sections:
-        <section class="courseware-section branch" data-id="${section.location}">
-          <header>
-            <a href="#" data-tooltip="Expand/collapse this section" class="expand-collapse-icon collapse"></a>
-
-            <div class="item-details" data-id="${section.location}">
-              <h3 class="section-name">
-                <span data-tooltip="Edit this section's name" class="section-name-span">${section.display_name}</span>
-                <form class="section-name-edit" style="display:none">
-                  <input type="text" value="${section.display_name}" class="edit-section-name" autocomplete="off"/>
-                  <input type="submit" class="save-button edit-section-name-save" value="Save" />
-                  <input type="button" class="cancel-button edit-section-name-cancel" value="Cancel" />
-                </form>
-              </h3>
-              <div class="section-published-date">
-                <%
-                  start_date = datetime.fromtimestamp(mktime(section.start)) if section.start is not None else None
-                  start_date_str = start_date.strftime('%m/%d/%Y') if start_date is not None else ''
-                  start_time_str = start_date.strftime('%H:%M') if start_date is not None else ''
-                %>
-                %if start_date is None:
-                  <span class="published-status">This section has not been released.</span>
-                  <a href="#" class="schedule-button" data-date="" data-time="" data-id="${section.location}">Schedule</a>
-                %else:
-                  <span class="published-status"><strong>Will Release:</strong> ${start_date_str} at ${start_time_str}</span>
-                  <a href="#" class="edit-button" data-date="${start_date_str}" data-time="${start_time_str}" data-id="${section.location}">Edit</a>
-                %endif
-              </div>              
-            </div>
-            
-            <div class="item-actions">
-              <a href="#" data-tooltip="Delete this section" class="delete-button delete-section-button"><span class="delete-icon"></span></a>
-              <a href="#" data-tooltip="Drag to reorder" class="drag-handle"></a>
-            </div>
-          </header>
-          <div class="subsection-list">
-            <div class="list-header">
-              <a href="#" class="new-subsection-item" data-template="${new_subsection_template}">
-                <span class="new-folder-icon"></span>New Subsection
-              </a>
-            </div>
-            <ol data-section-id="${section.location.url()}">
-              % for subsection in section.get_children():
-              <li class="branch collapsed id-holder" data-id="${subsection.location}">
-                <div class="section-item">
-                  <div class="details">
-                    <a href="#" data-tooltip="Expand/collapse this subsection" class="expand-collapse-icon expand"></a>
-                    <a href="${reverse('edit_subsection', args=[subsection.location])}">
-                      <span class="folder-icon"></span>
-                      <span class="subsection-name"><span class="subsection-name-value">${subsection.display_name}</span></span>
-                    </a>
-                  </div>
-                  
-                  <div class="gradable-status" data-initial-status="${subsection.metadata.get('format', 'Not Graded')}">
-                  </div>
-                  
-                  <div class="item-actions">
-                    <a href="#" data-tooltip="Delete this subsection" class="delete-button delete-subsection-button"><span class="delete-icon"></span></a>                    
-                    <a href="#" data-tooltip="Drag to reorder" class="drag-handle"></a>
-                  </div>
-                </div>
-                ${units.enum_units(subsection)}
-              </li>
-              % endfor
-            </ol>
+          <div class="item-details" data-id="${section.location}">
+            <h3 class="section-name">
+              <span data-tooltip="Edit this section's name" class="section-name-span">${section.display_name}</span>
+              <form class="section-name-edit" style="display:none">
+                <input type="text" value="${section.display_name}" class="edit-section-name" autocomplete="off"/>
+                <input type="submit" class="save-button edit-section-name-save" value="Save" />
+                <input type="button" class="cancel-button edit-section-name-cancel" value="Cancel" />
+              </form>
+            </h3>
+            <div class="section-published-date">
+              <%
+                start_date = datetime.fromtimestamp(mktime(section.start)) if section.start is not None else None
+                start_date_str = start_date.strftime('%m/%d/%Y') if start_date is not None else ''
+                start_time_str = start_date.strftime('%H:%M') if start_date is not None else ''
+              %>
+              %if start_date is None:
+                <span class="published-status">This section has not been released.</span>
+                <a href="#" class="schedule-button" data-date="" data-time="" data-id="${section.location}">Schedule</a>
+              %else:
+                <span class="published-status"><strong>Will Release:</strong> ${start_date_str} at ${start_time_str}</span>
+                <a href="#" class="edit-button" data-date="${start_date_str}" data-time="${start_time_str}" data-id="${section.location}">Edit</a>
+              %endif
+            </div>              
           </div>
-        </section>
-        % endfor
-      </article>
+          
+          <div class="item-actions">
+            <a href="#" data-tooltip="Delete this section" class="delete-button delete-section-button"><span class="delete-icon"></span></a>
+            <a href="#" data-tooltip="Drag to reorder" class="drag-handle"></a>
+          </div>
+        </header>
+        <div class="subsection-list">
+          <div class="list-header">
+            <a href="#" class="new-subsection-item" data-template="${new_subsection_template}">
+              <span class="new-folder-icon"></span>New Subsection
+            </a>
+          </div>
+          <ol data-section-id="${section.location.url()}">
+            % for subsection in section.get_children():
+            <li class="branch collapsed id-holder" data-id="${subsection.location}">
+              <div class="section-item">
+                <div class="details">
+                  <a href="#" data-tooltip="Expand/collapse this subsection" class="expand-collapse-icon expand"></a>
+                  <a href="${reverse('edit_subsection', args=[subsection.location])}">
+                    <span class="folder-icon"></span>
+                    <span class="subsection-name"><span class="subsection-name-value">${subsection.display_name}</span></span>
+                  </a>
+                </div>
+                
+                <div class="gradable-status" data-initial-status="${subsection.metadata.get('format', 'Not Graded')}">
+                </div>
+                
+                <div class="item-actions">
+                  <a href="#" data-tooltip="Delete this subsection" class="delete-button delete-subsection-button"><span class="delete-icon"></span></a>                    
+                  <a href="#" data-tooltip="Drag to reorder" class="drag-handle"></a>
+                </div>
+              </div>
+              ${units.enum_units(subsection)}
+            </li>
+            % endfor
+          </ol>
+        </div>
+      </section>
+      % endfor
+    </article>
+  </div>
+</div>
+<footer></footer>
+
+<!-- notification: change has been made and a save is needed -->
+<div class="wrapper wrapper-notification wrapper-notification-change">
+  <div class="notification change has-actions">
+    <i class="ss-icon ss-symbolicons-block icon icon-change">&#x1F4DD;</i>
+    
+    <div class="copy">
+      <h2 class="title title-3">You've Made Some Changes</h2>
+      <p><strong>Note:</strong> Your changes will not take effect until you <strong>save your progress</strong>.</p>
+    </div>
+
+    <nav class="nav-actions">
+      <h3 class="sr">Notification Actions</h3>
+      <ul>
+        <li class="nav-item">
+          <a href="#" class="action-primary">Save Changes</a>
+        </li>
+        <li class="nav-item">
+          <a href="#" class="action-secondary">Don't Save</a>
+        </li>
+      </ul>
+    </nav>
+  </div>
+</div>
+
+<!-- notification: newer version exists -->
+<div class="wrapper wrapper-notification wrapper-notification-warning">
+  <div class="notification warning has-actions">
+    <i class="ss-icon ss-symbolicons-block icon icon-warning">&#x26A0;</i>
+    
+    <div class="copy">
+      <h2 class="title title-3">A Newer Version of This Exists</h2>
+      <p>Lorem ipsum dolor sit amet, consectetuer adipiscing elit. Aenean commodo ligula eget dolor. Aenean massa.</p>
+    </div>
+
+    <nav class="nav-actions">
+      <h3 class="sr">Notification Actions</h3>
+      <ul>
+        <li class="nav-item">
+          <a href="#" class="button save-button action-primary">Go to Newer Version</a>
+        </li>
+        <li class="nav-item">
+          <a href="#" class="button cancel-button action-secondary">Continue Editing</a>
+        </li>
+      </ul>
+    </nav>
+    
+    <a href="#" rel="view" class="action action-notification-close">
+      <i class="ss-icon ss-symbolicons-block icon icon-close">&#x2421;</i>
+      <span class="label">close notification</span>
+    </a>
+  </div>
+</div>
+
+<!-- notification: warning about editing something dangerous -->
+<div class="wrapper wrapper-notification wrapper-notification-warning">
+  <div class="notification warning has-actions">
+    <i class="ss-icon ss-symbolicons-block icon icon-warning">&#x26A0;</i>
+    
+    <div class="copy">
+      <h2 class="title title-3">Are You Sure You Want to Edit That?</h2>
+      <p>Lorem ipsum dolor sit amet, consectetuer adipiscing elit. Aenean commodo ligula eget dolor. Aenean massa.</p>
+    </div>
+
+    <nav class="nav-actions">
+      <h3 class="sr">Notification Actions</h3>
+      <ul>
+        <li class="nav-item">
+          <a href="#" class="action-primary">Yes, I want to Edit X</a>
+        </li>
+        <li class="nav-item">
+          <a href="#" class="action-secondary">No, I do not</a>
+        </li>
+      </ul>
+    </nav>
+  </div>
+</div>
+
+<!-- notification: status - saving -->
+<div class="wrapper wrapper-notification wrapper-notification-status">
+  <div class="notification saving">
+    <i class="ss-icon ss-symbolicons-block icon icon-saving">&#x2699;</i>
+    
+    <div class="copy">
+      <h2 class="title title-3">Saving</h2>
+      <p>Hamster wheels are turning pretty fast right now. Hang on! Saving will be done soon.</p>
     </div>
   </div>
-  <footer></footer>
+</div>
+
+<!-- notification: status - helper -->
+<div class="wrapper wrapper-notification wrapper-notification-status">
+  <div class="notification helping">
+    <i class="ss-icon ss-symbolicons-block icon icon-helping">&#x2753;</i>
+    
+    <div class="copy">
+      <h2 class="title title-3">Fun Fact:</h2>
+      <p>Using the checkmark will allow you make a subsection gradable as an assignment, which counts towards a student's total grade</p>
+    </div>
+  </div>
+</div>
 </%block>

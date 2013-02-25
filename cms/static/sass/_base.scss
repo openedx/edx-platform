@@ -25,7 +25,7 @@ a {
   @include transition(color .15s);
 
   &:hover {
-    color: #cb9c40;
+    color: $orange-d1;
   }
 }
 
@@ -885,11 +885,28 @@ body.js {
 
 // ====================
 
-// works in progress
+// works in progress & testing
 body.hide-wip {
 
   .wip-box {
     display: none;
+  }
+}
+
+.wrapper-testing {
+  background: $black;
+  width: 100%;
+  height: auto;
+
+  .testing {
+    @include font-size(14);
+    position: relative;
+    max-width: $fg-max-width;
+    min-width: $fg-min-width;
+    width: flex-grid(12);
+    margin: 0 auto $baseline auto;
+    padding: $baseline;
+    color: $white;
   }
 }
 

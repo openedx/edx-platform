@@ -5,17 +5,19 @@
 .wrapper-notification {
   @include clearfix();
   @include box-sizing(border-box);
-  @include transition (bottom 2.0s ease-in-out 5s, opacity 2.0s ease-in-out 5s);
-  @include box-shadow(0 -1px 2px rgba(0,0,0,0.1));
+  // @include transition (bottom 1.5s ease-in-out 0.25s);
+  transition: bottom 1.5s ease-in-out 0.25s;
+  -webkit-transition: bottom 1.5s ease-in-out 0.25s;
+  @include box-shadow(0 -1px 3px $shadow);
   position: fixed;
-  bottom: -100px;
+  bottom: -1000px;
   z-index: 1000;
   width: 100%;
   overflow: hidden;
   opacity: 0;
-  border-top: 1px solid $gray-d1;
-  padding: $baseline ($baseline*2);
-  background: $white;
+  border-top: 4px solid $gray-l1;
+  padding: ($baseline*0.75) ($baseline*2);
+  background: $gray-d3;
 
   &.is-shown {
     bottom: 0;
@@ -23,78 +25,263 @@
   }
 
   &.wrapper-notification-warning {
-    border-color: shade($yellow, 25%);
-    background: tint($yellow, 25%);
+    border-top-color: $orange;
+
+    .icon-warning {
+      color: $orange;
+    }
+
+    &:hover {
+      border-top-color: $orange-s2;
+
+      .icon-warning {
+        color: $orange-s2;
+      }
+    }
   }
 
   &.wrapper-notification-error {
-    border-color: shade($red, 50%);
-    background: tint($red, 20%);
-    color: $white;
+    border-top-color: $red-l1;
+
+    .icon-error {
+      color: $red-l1;
+    }
+
+    &:hover {
+      border-top-color: $red;
+
+      .icon-error {
+        color: $red;
+      }
+    }
   }
 
-  &.wrapper-notification-confirm {
-    border-color: shade($green, 30%);
-    background: tint($green, 40%);
-    color: shade($green, 30%);
+  &.wrapper-notification-confirmation {
+    border-top-color: $green;
+
+    .icon-error {
+      color: $green;
+    }
+
+    &:hover {
+      border-top-color: $green-s1;
+
+      .icon-error {
+        color: $green-s1;
+      }
+    }
+  }
+
+  // shorter/status notifications
+  &.wrapper-notification-status {
+    width: ($baseline*10);
+    right: ($baseline);
+    padding: ($baseline/2) $baseline;
+
+    .notification {
+      background: red;
+      @include box-sizing(border-box);
+      @include clearfix();
+      width: 100%;
+      max-width: none;
+      min-width: none;
+
+      .icon {
+        width: auto;
+      }
+
+      .copy {
+        width: auto;
+      }
+    }    
   }
 }
 
 .notification {
   @include box-sizing(border-box);
+  @include clearfix();
   margin: 0 auto;
   width: flex-grid(12);
   max-width: $fg-max-width;
   min-width: $fg-min-width;
 
-  .copy {
+  strong {
+    font-weight: 700;
+  }
+
+  .icon, .copy {
     float: left;
-    width: flex-grid(9, 12);
+  }
+
+  .icon {
+    @include transition (color 0.5s ease-in-out);
+    @include font-size(28);
+    width: flex-grid(1, 12);
     margin-right: flex-gutter();
-    margin-top: 5px;
-    font-size: 14px;
+    text-align: right;
+    color: $white;
+  }
 
-    .icon {
-      display: inline-block;
-      vertical-align: top;
-      margin-right: 5px;
-      font-size: 20px;
-    }
+  .copy {
+    @include font-size(13);
+    width: flex-grid(10, 12);
+    color: $gray-l2;
 
-    p {
-      width: flex-grid(8, 9);
-      display: inline-block;
-      vertical-align: top;
+    .title {
+      @include font-size(14);
+      margin-bottom: 0;
+      color: $white;
     }
   }
 
-  .actions {
-    float: right;
-    width: flex-grid(3, 12);
-    margin-top: ($baseline/2);
-    text-align: right;
+  // with cancel
+  .action-notification-close {
+    @include transition(top .25s ease-in-out);
+    @include border-bottom-radius(3px);
+    position: absolute;
+    top: -($baseline/4);
+    left: ($baseline/2);
+    padding: ($baseline/4) ($baseline/2) 0 ($baseline/2);
+    background: $gray-d2;
+    text-align: center;
 
-    li {
-      display: inline-block;
-      vertical-align: middle;
-      margin-right: 10px;
+    .label {
+      @include text-sr();
+    }
 
-      &:last-child {
-        margin-right: 0;
+    .ss-icon {
+      @include font-size(14);
+      color: $white;
+    }
+
+    &:hover {
+      background: $blue;
+      top: 0;
+    }
+  }
+
+  // with actions
+  &.has-actions {
+    
+    .icon {
+      width: flex-grid(1, 12);
+    }
+
+    .copy {
+      width: flex-grid(7, 12);
+      margin-right: flex-gutter();
+    }
+
+    .nav-actions {
+      width: flex-grid(4, 12);
+      float: right;
+      margin-top: ($baseline/2);
+      text-align: right;
+
+      .nav-item {
+        display: inline-block;
+        vertical-align: middle;
+        margin-right: ($baseline/2);
+
+        &:last-child {
+          margin-right: 0;
+        }
+
+        .action-primary {
+          @include font-size(13);
+          font-weight: 600;
+        }
+
+        .action-secondary {
+          @include font-size(13);
+        }
+      }
+    }
+  }
+
+  // notification types
+  &.warning {
+
+    .action-notification-close {
+
+      &:hover {
+        background: $orange;
       }
     }
 
-    .save-button {
-      @include blue-button;
+    .action-primary {
+      @include orange-button;
+      border-color: $orange-d2;
     }
 
-    .cancel-button {
-      @include white-button;
+    a {
+      color: $orange;
+
+      &:hover {
+        color: $orange-s2;
+      }
     }
   }
 
-  strong {
-    font-weight: 700;
+  &.error {
+
+    .action-notification-close {
+
+      &:hover {
+        background: $red-l1;
+      }
+    }
+
+    .action-primary {
+      @include red-button;
+      border-color: $red-d2;
+    }
+
+    a {
+      color: $red-l1;
+
+      &:hover {
+        color: $red;
+      }
+    }
+  }
+
+  &.confirmation {
+
+    .action-notification-close {
+
+      &:hover {
+        background: $green;
+      }
+    }
+
+    .action-primary {
+      @include green-button;
+      border-color: $green-d2;
+    }
+
+    a {
+      color: $green;
+
+      &:hover {
+        color: $green-s2;
+      }
+    }
+  }
+
+  &.announcement {
+
+    .action-notification-close {
+
+      &:hover {
+        background: $blue;
+      }
+    }
+
+    .action-primary {
+      @include blue-button;
+      border-color: $blue-d2;
+    }
   }
 }
 
@@ -103,10 +290,9 @@
 // alerts
 .wrapper-alert {
   @include box-sizing(border-box);
-  @include transition (opacity 2.0s ease-in-out 5s, border 0.5s ease-in-out);
-  @include box-shadow(0 1px 1px $white, inset 0 2px 5px $shadow-d1);
+  @include box-shadow(0 1px 1px $white, inset 0 2px 2px $shadow-d1);
   position: relative;
-  top: -($baseline*1.5);
+  top: -($baseline*20);
   z-index: 100;
   overflow: hidden;
   width: 100%;
@@ -117,7 +303,6 @@
   background: $gray-d3;
 
   &.is-shown {
-    bottom: 0;
     opacity: 1.0;
   }
 
@@ -222,14 +407,14 @@
 
   .icon {
     @include transition (color 0.5s ease-in-out);
-    @include font-size(28);
+    @include font-size(22);
     width: flex-grid(1, 12);
     margin-right: flex-gutter();
     text-align: right;
   }
 
   .copy {
-    @include font-size(14);
+    @include font-size(13);
     width: flex-grid(10, 12);
     color: $gray-l2;
 
@@ -331,14 +516,6 @@
     .action-primary {
       @include blue-button;
       border-color: $blue-d2;
-    }
-
-    a {
-      color: $blue;
-
-      &:hover {
-        color: $blue-s2;
-      }
     }
   }
 

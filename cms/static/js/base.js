@@ -43,6 +43,25 @@ $(document).ready(function () {
 
     $('body').addClass('js');
 
+    // notifications
+    $('.testing .test-notification').click(function(e) {
+        (e).preventDefault();
+        manageNotification(e);
+    });
+
+    function manageNotification(e) {
+        var $notificationRibbon = $('.wrapper-notification');
+
+        // showing
+        $notificationRibbon.toggleClass('is-shown');
+
+        // controls for closing notification
+        $notificationRibbon.find('.action-notification-close').click(function(e) {
+            (e).preventDefault();
+            $notificationRibbon.toggleClass('is-shown');
+        });
+    }
+
     // lean/simple modal
     $('a[rel*=modal]').leanModal({overlay : 0.80, closeButton: '.action-modal-close' });
     $('a.action-modal-close').click(function(e){
