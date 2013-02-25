@@ -210,7 +210,7 @@ PollMain.prototype = {
     if ((typeof this.jsonConfig.reset === 'string') && (this.jsonConfig.reset.toLowerCase() === 'true')) {
         this.canReset = true;
 
-        this.resetButton = $('<div class="button reset-button">Reset</div>');
+        this.resetButton = $('<div class="button reset-button">Change your vote</div>');
 
         if (this.questionAnswered === false) {
             this.resetButton.hide();
