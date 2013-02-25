@@ -1,16 +1,20 @@
 class @Conditional
 
-  constructor: (element, callerElId) ->
+  constructor: (element, callerElId, reset) ->
     @el = $(element).find('.conditional-wrapper')
 
     @callerElId = callerElId
 
-    if @el.data('passed') is true
-      return
-    else if @el.data('passed') is false
-      @passed = false
-    else
+    if reset is true
+      @el.data('passed', null)
       @passed = null
+    else
+      if @el.data('passed') is true
+        return
+      else if @el.data('passed') is false
+        @passed = false
+      else
+        @passed = null
 
     if callerElId isnt undefined and @passed isnt null
       dependencies = @el.data('depends')
