@@ -426,3 +426,70 @@ class JavascriptResponseTest(unittest.TestCase):
 
         self.assertEquals(test_lcp.grade_answers(incorrect_answers).get_correctness('1_2_1'), 'incorrect')
         self.assertEquals(test_lcp.grade_answers(correct_answers).get_correctness('1_2_1'), 'correct')
+
+from response_xml_factory import NumericalResponseXMLFactory
+class NumericalResponseTest(unittest.TestCase):
+
+    def setUp(self):
+        self.xml_factory = NumericalResponseXMLFactory()
+    
+    def test_grade_exact(self):
+        xml = self.xml_factory.build_xml(question_text="What is 2 + 2?",
+                                        explanation="The answer is 4",
+                                        answer=4)
+        correct_responses = ["4", "4.0", "4.00"]
+        incorrect_responses = ["", "3.9", "4.1", "0"]
+        self._test_grading(xml, correct_responses, incorrect_responses)
+        
+
+    def test_grade_decimal_tolerance(self):
+        xml = self.xml_factory.build_xml(question_text="What is 2 + 2 approximately?",
+                                        explanation="The answer is 4",
+                                        answer=4,
+                                        tolerance=0.1)
+        correct_responses = ["4.0", "4.00", "4.09", "3.91"] 
+        incorrect_responses = ["", "4.11", "3.89", "0"]
+        self._test_grading(xml, correct_responses, incorrect_responses)
+                        
+    def test_grade_percent_tolerance(self):
+        xml = self.xml_factory.build_xml(question_text="What is 2 + 2 approximately?",
+                                        explanation="The answer is 4",
+                                        answer=4,
+                                        tolerance="10%")
+        correct_responses = ["4.0", "4.3", "3.7", "4.30", "3.70"]
+        incorrect_responses = ["", "4.5", "3.5", "0"]
+        self._test_grading(xml, correct_responses, incorrect_responses)
+
+    def test_grade_with_script(self):
+        script_text = "computed_response = math.sqrt(4)"
+        xml = self.xml_factory.build_xml(question_text="What is sqrt(4)?",
+                                        explanation="The answer is 2",
+                                        answer="$computed_response",
+                                        script=script_text)
+        correct_responses = ["2", "2.0"]
+        incorrect_responses = ["", "2.01", "1.99", "0"]
+        self._test_grading(xml, correct_responses, incorrect_responses)
+
+    def test_grade_with_script_and_tolerance(self):
+        script_text = "computed_response = math.sqrt(4)"
+        xml = self.xml_factory.build_xml(question_text="What is sqrt(4)?",
+                                        explanation="The answer is 2",
+                                        answer="$computed_response",
+                                        tolerance="0.1",
+                                        script=script_text)
+        correct_responses = ["2", "2.0", "2.05", "1.95"]
+        incorrect_responses = ["", "2.11", "1.89", "0"]
+        self._test_grading(xml, correct_responses, incorrect_responses)
+
+
+    def _test_grading(self, xml, correct_answers, incorrect_answers):
+
+        problem = lcp.LoncapaProblem(xml, '1', system=test_system)
+
+        for input_str in correct_answers:
+            result = problem.grade_answers({'1_2_1': input_str}).get_correctness('1_2_1')
+            self.assertEqual(result, 'correct')
+
+        for input_str in incorrect_answers:
+            result = problem.grade_answers({'1_2_1': input_str}).get_correctness('1_2_1')
+            self.assertEqual(result, 'incorrect')

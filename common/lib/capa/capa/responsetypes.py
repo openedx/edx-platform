@@ -1048,19 +1048,24 @@ def sympy_check2():
                 correct = ['correct'] * len(idset) if ret['ok'] else ['incorrect'] * len(idset)
                 msg = ret['msg']
 
-                if 1:
-                    # try to clean up message html
-                    msg = '<html>' + msg + '</html>'
-                    msg = msg.replace('&#60;', '&lt;')
-                    #msg = msg.replace('&lt;','<')
-                    msg = etree.tostring(fromstring_bs(msg, convertEntities=None),
-                                         pretty_print=True)
-                    #msg = etree.tostring(fromstring_bs(msg),pretty_print=True)
-                    msg = msg.replace('&#13;', '')
-                    #msg = re.sub('<html>(.*)</html>','\\1',msg,flags=re.M|re.DOTALL)   # python 2.7
-                    msg = re.sub('(?ms)<html>(.*)</html>', '\\1', msg)
+                def _cleanup_msg_html(msg_html):
+                    cleaned = msg_html
 
-                messages[0] = msg
+                    # try to clean up message html
+                    cleaned = '<html>' + cleaned + '</html>'
+                    cleaned = cleaned.replace('&#60;', '&lt;')
+                    cleaned = etree.tostring(fromstring_bs(cleaned, convertEntities=None),
+                                         pretty_print=True)
+                    cleaned = cleaned.replace('&#13;', '')
+                    cleaned = re.sub('(?ms)<html>(.*)</html>', '\\1', cleaned)
+
+                    return cleaned
+
+                if type(msg) == str:
+                    messages[0] = _cleanup_msg_html(msg)
+                elif type(msg) == list:
+                    for i in range(0, len(msg)):
+                        messages[i] = _cleanup_msg_html(msg[i])
             else:
                 correct = ['correct'] * len(idset) if ret else ['incorrect'] * len(idset)
 
