@@ -77,12 +77,24 @@ PollMain.prototype = {
 
     _this = this;
 
+    console.log('submit reset');
+
     // Send the data to the server as an AJAX request. Attach a callback that will
     // be fired on server's response.
     $.postWithPrefix(
         this.ajax_url + '/' + 'reset_poll',
         {},
         function (response) {
+            console.log('success! response = ');
+            console.log(response);
+
+            if (
+                (response.hasOwnProperty('status') !== true) ||
+                (typeof response.status !== 'string') ||
+                (response.status.toLowerCase() !== 'success')) {
+                return;
+            }
+
             _this.questionAnswered = false;
             _this.questionEl.find('.button.answered').removeClass('answered');
             _this.questionEl.find('.stats').hide();
