@@ -17,12 +17,14 @@ log = logging.getLogger(__name__)
 # OBSOLETE: This obsoletes 'type'
 class_priority = ['video', 'problem']
 
+
 def display_name(module):
     if hasattr(module, 'display_name'):
         return module.display_name
 
     if hasattr(module, 'lms'):
         return module.lms.display_name
+
 
 class SequenceModule(XModule):
     ''' Layout module which lays out content in a temporal sequence
@@ -84,14 +86,14 @@ class SequenceModule(XModule):
                 'title': "\n".join(
                     display_name(grand_child)
                     for grand_child in child.get_children()
-                    if display_name(grand_child) is not None
+                    if display_name(grand_child)
                 ),
                 'progress_status': Progress.to_js_status_str(progress),
                 'progress_detail': Progress.to_js_detail_str(progress),
                 'type': child.get_icon_class(),
                 'id': child.id,
             }
-            if childinfo['title']=='':
+            if childinfo['title'] == '':
                 childinfo['title'] = display_name(child)
             contents.append(childinfo)
 
