@@ -1,21 +1,56 @@
-Choose a place for the virtualenv, call it <SANDENV>
+Choose a place for the virtualenv, call it <SANDENV>.  It will be automatically
+detected and used if you put it right alongside your existing virtualenv, but
+with -sandbox appended.  So if your existing virtualenv is in ~/mitx_all/python,
+make <SANDENV> be ~/mitx_all/python-sandbox (but you'll need to spell out your
+home directory instead of ~).
+
+Other details here that depend on your configuration:
+
+    - Your mitx working tree is <MITX>, for example, ~/mitx_all/mitx
+
+    - The user running the LMS is <USER>, for example, you on a dev machine,
+      or www-data on a server.
 
 Create a virtualenv:
 
-    virtualenv <SANDENV>
+    $ sudo virtualenv <SANDENV>
 
 Install the sandbox requirements
 
+    $ source <SANDENV>/bin/activate
+    $ sudo pip install -r sandbox-requirements.txt
 
-Edit an AppArmor profile:
+Add a sandbox user:
+
+    $ sudo addgroup sandbox
+    $ sudo adduser --disabled-login sandbox --ingroup sandbox
+
+Let the web server run the sandboxed Python as sandbox.  Create the file
+/etc/sudoers.d/01-sandbox:
+
+    $ visudo -f /etc/sudoers.d/01-sandbox
+
+    <USER> ALL=(sandbox) NOPASSWD:<SANDENV>/bin/python
+    <USER> ALL=(ALL) NOPASSWD:/bin/kill
+
+Edit an AppArmor profile.  The file must be named for the python executable,
+but with slashes changed to dots:
+
+    #include <tunables/global>
 
     <SANDENV>/bin/python {
-        ...
+        #include <abstractions/base>
+
+        <SANDENV>/** mr,
+        <MITX>/common/lib/sandbox-packages/** r,
+        /usr/local/lib/python2.7/** r,
+        /usr/lib/python2.7/** rix,
+
+        /tmp/** rix,
     }
 
 Parse the profiles
 
-    $ apparmor_parser
-    $ aaenforce <SANDENV>/bin/python
+    $ sudo apparmor_parser <APPARMOR_FILE>
 
-
+Reactivate your real virtualenv again
