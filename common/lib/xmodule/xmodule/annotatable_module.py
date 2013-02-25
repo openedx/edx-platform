@@ -28,20 +28,19 @@ class AnnotatableModule(XModule):
             and an XML key to delete from the element.
          """
 
+        attr = {}
         cls = ['annotatable-span', 'highlight']
-
-        highlight_key = 'highlight'
-        color = el.get(highlight_key)
         valid_colors = ['yellow', 'orange', 'purple', 'blue', 'green']
+        highlight_key = 'highlight'
+
+        color = el.get(highlight_key)
         if color is not None and color in valid_colors:
             cls.append('highlight-'+color)
+            attr['_delete'] = highlight_key
 
-        cls_str = ' '.join(cls)
+        attr['value'] = ' '.join(cls)
 
-        return  { 'class': {
-            'value': cls_str,
-            '_delete': highlight_key }
-        }
+        return { 'class' : attr }
 
     def _get_annotation_data_attr(self, index, el):
         """ Returns a dict in which the keys are the HTML data attributes
