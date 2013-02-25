@@ -75,6 +75,16 @@ class PollModule(XModule):
                                'poll_answers': self.poll_answers,
                                'total': sum(self.poll_answers.values())
                                })
+        elif dispatch == 'reset_poll' and self.voted:
+            self.voted = False
+
+            # FIXME: fix this, when xblock will support mutable types.
+            # Now we use this hack.
+            temp_poll_answers = self.poll_answers
+            temp_poll_answers[self.poll_answer] -= 1
+            self.poll_answers = temp_poll_answers
+
+            self.poll_answer = ''
         else:  # return error message
             return json.dumps({'error': 'Unknown Command!'})
 
@@ -119,7 +129,8 @@ class PollModule(XModule):
             # to show answered poll after reload:
             'poll_answer': self.poll_answer,
             'poll_answers': self.poll_answers if self.voted else {},
-            'total': sum(self.poll_answers.values()) if self.voted else 0})
+            'total': sum(self.poll_answers.values()) if self.voted else 0,
+            'reset': self.descriptor.xml_attributes.get('reset', True)})
 
 
 class PollDescriptor(MakoModuleDescriptor, XmlDescriptor):
