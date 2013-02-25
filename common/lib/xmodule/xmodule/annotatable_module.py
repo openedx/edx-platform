@@ -12,7 +12,6 @@ from xmodule.contentstore.content import StaticContent
 log = logging.getLogger(__name__)
 
 class AnnotatableModule(XModule):
-    # Note: js and css in common/lib/xmodule/xmodule
     js = {'coffee': [resource_string(__name__, 'js/src/javascript_loader.coffee'),
                      resource_string(__name__, 'js/src/collapsible.coffee'),
                      resource_string(__name__, 'js/src/html/display.coffee'),
@@ -77,22 +76,32 @@ class AnnotatableModule(XModule):
             attr = {}
             attr.update(self._get_annotation_class_attr(index, el))
             attr.update(self._get_annotation_data_attr(index, el))
+
             for key in attr.keys():
                 el.set(key, attr[key]['value'])
-                if '_delete' in attr[key]:
+                if '_delete' in attr[key] and attr[key]['_delete'] is not None:
                     delete_key = attr[key]['_delete']
                     del el.attrib[delete_key]
+
             index += 1
 
         return etree.tostring(xmltree, encoding='unicode')
+
+    def _extract_instructions(self, xmltree):
+        """ Removes <instructions> from the xmltree and returns them as a string, otherwise None. """
+        instructions = xmltree.find('instructions')
+        if instructions is not None:
+            instructions.tag = 'div'
+            xmltree.remove(instructions)
+            return etree.tostring(instructions, encoding='unicode')
+        return None
 
     def get_html(self):
         """ Renders parameters to template. """
         context = {
             'display_name': self.display_name,
             'element_id': self.element_id,
-            'discussion_id': self.discussion_id,
-            'instructions_html': self.instructions_html,
+            'instructions_html': self.instructions,
             'content_html': self._render_content()
         }
 
@@ -103,25 +112,11 @@ class AnnotatableModule(XModule):
         XModule.__init__(self, system, location, definition, descriptor,
                          instance_state, shared_state, **kwargs)
 
-        self.element_id = self.location.html_id()
-
         xmltree = etree.fromstring(self.definition['data'])
 
-        # extract discussion id
-        self.discussion_id = xmltree.get('discussion', '')
-        del xmltree.attrib['discussion']
-
-        # extract instructions text (if any)
-        instructions = xmltree.find('instructions')
-        instructions_html = None
-        if instructions is not None:
-            instructions.tag = 'div'
-            instructions_html = etree.tostring(instructions, encoding='unicode')
-            xmltree.remove(instructions)
-        self.instructions_html = instructions_html
-
-        # everything else is annotatable content
+        self.instructions = self._extract_instructions(xmltree)
         self.content = etree.tostring(xmltree, encoding='unicode')
+        self.element_id = self.location.html_id()
 
 class AnnotatableDescriptor(RawDescriptor):
     module_class = AnnotatableModule

@@ -7,17 +7,27 @@
   }
 }
 
-.annotatable-description {
+.annotatable-section {
   position: relative;
-  padding: 2px 4px;
+  padding: .5em 1em;
   border: 1px solid $border-color;
-  border-radius: 3px;
+  border-radius: .5em;
   margin-bottom: .5em;
-  .annotatable-toggle {
-    position: absolute;
-    right: 0;
-    margin: 2px 7px 2px 0;
+
+  .annotatable-section-title {}
+  .annotatable-section-body {
+    border-top: 1px solid $border-color;
+    margin-top: .5em;
+    padding-top: .5em;
   }
+}
+
+.annotatable-toggle {
+  position: absolute;
+  right: 0;
+  margin: 2px 1em 2px 0;
+  &.expanded:after { content: " \2191" }
+  &.collapsed:after { content: " \2193" }
 }
 
 .annotatable-span {

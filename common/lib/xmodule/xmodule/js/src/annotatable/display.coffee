@@ -5,6 +5,7 @@ class @Annotatable
     toggleAnnotationsSelector:  '.annotatable-toggle-annotations'
     toggleInstructionsSelector: '.annotatable-toggle-instructions'
     instructionsSelector:       '.annotatable-instructions'
+    sectionSelector:            '.annotatable-section'
     spanSelector:               '.annotatable-span'
     replySelector:              '.annotatable-reply'
 
@@ -109,12 +110,13 @@ class @Annotatable
 
     toggleInstructions: () ->
       hide = (@instructionsHidden = not @instructionsHidden)
-      @toggleInstructionsButtonText hide
+      @toggleInstructionsButton hide
       @toggleInstructionsText hide
 
-    toggleInstructionsButtonText: (hide) ->
-        buttonText = (if hide then 'Show' else 'Hide')+' Instructions'
-        @$(@toggleInstructionsSelector).text(buttonText)
+    toggleInstructionsButton: (hide) ->
+        txt = (if hide then 'Expand' else 'Collapse')+' Instructions'
+        cls = (if hide then ['expanded', 'collapsed'] else ['collapsed','expanded'])
+        @$(@toggleInstructionsSelector).text(txt).removeClass(cls[0]).addClass(cls[1])
 
     toggleInstructionsText: (hide) ->
         @$(@instructionsSelector)[if hide then 'slideUp' else 'slideDown']()
