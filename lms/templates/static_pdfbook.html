@@ -17,6 +17,7 @@
 <%block name="js_extra">
   <script type="text/javascript">
 
+%if 'url' in textbook:
     var url = "${textbook['url']}";
 
     $(document).ready(function() {
@@ -27,6 +28,34 @@
             'url' : url
         });
     });
+%else:
+
+    var my_pdfviewer = null;
+
+    function load_url(url_to_load, page_to_load) {
+//        $('#outerContainer').PDFViewer( { 
+//            'pageNum' : page_to_load,
+//            'url' : url_to_load
+//        });
+       my_pdfviewer.loadUrl(url_to_load, page_to_load);
+    }
+    // since we have no url, we must rely on chapter display, 
+    // so make sure we have a value.
+    var url = "${ textbook['chapters'][chapter-1 if chapter is not None else 0]['url'] }";
+
+    $(document).ready(function() {
+        // load_url(url, ${page if page is not None else 1});
+        var my_pdfviewer = $('#outerContainer').PDFViewer( { 
+            'pageNum' : ${page if page is not None else 1},
+            'url' : url
+        });
+        if (my_pdfviewer) {
+           
+        }
+ 
+    } );
+%endif
+
   </script>  
 </%block>
 
@@ -35,6 +64,7 @@
 
     <div id="outerContainer">
       <div id="mainContainer">
+
         <div class="toolbar">
           <div id="toolbarContainer">
             <div id="toolbarViewer">
@@ -87,6 +117,31 @@
             </div>
           </div>
         </div>
+
+%if 'chapters' in textbook:
+    <section aria-label="Textbook Navigation" class="book-sidebar">
+
+      <ul id="pdfbooknav" class="treeview-booknav">
+          <%def name="print_entry(entry)">
+              <li>
+                  <a href="javascript:load_url(${entry.get('url')}, 1)">
+                      <span class="chapter">
+                          ${entry.get('title')}
+                      </span>
+                  </a>
+              </li>
+          </%def>
+
+          % for entry in textbook['chapters']:
+            ${print_entry(entry)}
+          % endfor
+        
+        ## Don't delete this empty list item. Without it, Jquery.TreeView won't
+        ## render the last list item as expandable.
+        <li></li> 
+      </ul>
+    </section>
+%endif
 
         <div id="viewerContainer">
           <div id="viewer" contextmenu="viewerContextMenu"></div>

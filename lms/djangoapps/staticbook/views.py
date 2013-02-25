@@ -52,13 +52,19 @@ def pdf_index(request, course_id, book_index, chapter=None, page=None):
         # strip off the quotes again...
         return output_url[1:-1]
 
-    textbook['url'] = remap_static_url(textbook['url'], course)
+    if 'url' in textbook:
+        textbook['url'] = remap_static_url(textbook['url'], course)
     # then remap all the chapter URLs as well, if they are provided.
-    
+    if 'chapters' in textbook:
+        for entry in textbook['chapters']:
+            entry['url'] = remap_static_url(entry['url'], course)            
+
+
     return render_to_response('static_pdfbook.html',
                               {'book_index': book_index, 
                                'course': course, 
                                'textbook': textbook,
+                               'chapter': chapter,
                                'page': page,
                                'chapter': chapter,
                                'staff_access': staff_access})

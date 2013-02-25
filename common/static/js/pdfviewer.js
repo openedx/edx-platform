@@ -44,9 +44,6 @@ PDFJS.disableWorker = true;
         var currentScaleValue = "0";
         var DEFAULT_SCALE_VALUE = "1";
 
-	// TESTING:
-	var destinations = null;
-
         var setupText = function setupText(textdiv, content, viewport) {
 
             function getPageNumberFromDest(dest) {
@@ -270,7 +267,8 @@ PDFJS.disableWorker = true;
         //
         // Asynchronously download PDF as an ArrayBuffer
         //
-        PDFJS.getDocument(url).then(
+        loadUrl = function pdfViewLoadUrl(url_to_load) {
+          PDFJS.getDocument(url).then(
             function getDocument(_pdfDocument) {
                 pdfDocument = _pdfDocument;
 		// display the current page with a default scale value:
@@ -282,6 +280,9 @@ PDFJS.disableWorker = true;
             function getDocumentProgress(progressData) {
                 // placeholder: not yet ready to display loading progress
             });
+	    };
+
+        loadUrl(url);
 
         $("#previous").click(function(event) {
             prevPage();
@@ -308,5 +309,6 @@ PDFJS.disableWorker = true;
 		renderPage(newPageVal);
 	    }
         });
+	return pdfViewer;
     }
 })(jQuery);
