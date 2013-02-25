@@ -149,7 +149,8 @@ class @Annotatable
         problem_el.effect 'highlight', {}, 500
 
     afterScrollToSpan: (span_el) ->
-        span_el.effect 'highlight', {color: 'rgba(0,0,0,0.5)' }, 1000
+        span_el.addClass 'selected', 400, 'swing', ->
+            span_el.removeClass 'selected', 400, 'swing'
 
     makeTipContent: (el) ->
         (api) =>
