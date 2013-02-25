@@ -12,7 +12,7 @@ log = logging.getLogger(__name__)
 
 class FolditModule(XModule):
 
-    css = {'scss': [resource_string(__name__, 'css/foldit/leadeboard.scss')]}
+    css = {'scss': [resource_string(__name__, 'css/foldit/leaderboard.scss')]}
 
     def __init__(self, system, location, definition, descriptor,
                  instance_state=None, shared_state=None, **kwargs):
