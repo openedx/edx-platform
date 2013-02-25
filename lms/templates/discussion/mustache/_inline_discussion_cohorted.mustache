@@ -27,6 +27,18 @@
                     {{#allow_anonymous_to_peers}}
                         <input type="checkbox" name="anonymous" class="discussion-anonymous-to-peers" id="new-post-anonymous-to-peers"><label for="new-post-anonymous-to-peers">post anonymously to classmates</label>
                     {{/allow_anonymous_to_peers}}
+                    
+                    <div class="form-group-label choose-cohort">
+                        Make visible to:
+                        <select class="group-filter-select new-post-group" name = "group_id"> 
+                              {{#cohorts}}
+                                <option value="{{id}}">{{name}}</option>
+                              {{/cohorts}}
+                                
+
+                        </select>
+                    </div>                    
+
                 </div>
             </form>
         </div>
