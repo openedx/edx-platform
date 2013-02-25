@@ -42,6 +42,8 @@ PollMain.prototype = {
 
     _this = this;
 
+    console.log('submiting answer');
+
     answerObj.buttonEl.addClass('answered');
 
     // Send the data to the server as an AJAX request. Attach a callback that will
@@ -49,6 +51,9 @@ PollMain.prototype = {
     $.postWithPrefix(
         _this.ajax_url + '/' + answer,  {},
         function (response) {
+            console.log('success! response = ');
+            console.log(response);
+
             _this.showAnswerGraph(response.poll_answers, response.total);
             _this.resetButton.show();
             if (_this.wrapperSectionEl !== null) {
@@ -65,17 +70,28 @@ PollMain.prototype = {
 
 'submitReset': function () {
     var _this;
+
     _this = this;
+
+    console.log('submiting rset');
+
     // Send the data to the server as an AJAX request. Attach a callback that will
     // be fired on server's response.
     $.postWithPrefix(
-        _this.ajax_url + '/' + 'reset',  {},
+        this.ajax_url + '/' + 'reset_poll',
+        {},
         function (response) {
+            console.log('success! response = ');
+            console.log(response);
+
             _this.questionAnswered = false;
-            $(_this.questionEl).find('.button').removeClass('answered');
-            _this.graphAnswerEl.hide();
-            $(_this.questionEl).find('.stats').hide();
+
+            _this.questionEl.find('.button.answered').removeClass('answered');
+
+            _this.questionEl.find('.stats').hide();
+
             _this.resetButton.hide();
+
             if (_this.wrapperSectionEl !== null) {
                 $(_this.wrapperSectionEl).find('.xmodule_ConditionalModule').each(function (index, value) {
                     new window.Conditional(value, _this.id.replace(/^poll_/, ''));
@@ -179,19 +195,20 @@ PollMain.prototype = {
         }
     });
 
-    this.graphAnswerEl = $('<div class="graph_answer"></div>');
-    this.graphAnswerEl.hide();
-    this.graphAnswerEl.appendTo(this.questionEl);
+    if (this.jsonConfig.reset === "True"){
+        this.resetButton = $('<div class="button reset-button">Reset</div>');
 
-    if (_this.jsonConfig.reset === "True")
-        {
-            _this.resetButton = $('<div class="button reset-button">Reset</div>');
-            _this.resetButton.appendTo(_this.questionEl);
-            _this.resetButton.hide();
-            _this.resetButton.on('click', function () {
-                _this.submitReset();
-            });
+        if (this.questionAnswered === false) {
+            this.resetButton.hide();
         }
+
+        this.resetButton.appendTo(this.questionEl);
+
+        this.resetButton.on('click', function () {
+            _this.submitReset();
+        });
+    }
+
     // If it turns out that the user already answered the question, show the answers graph.
     if (this.questionAnswered === true) {
         this.showAnswerGraph(this.jsonConfig.poll_answers, this.jsonConfig.total);
