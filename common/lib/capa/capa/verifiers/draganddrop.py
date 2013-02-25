@@ -326,7 +326,11 @@ class DragAndDrop(object):
                 else:
                     self.excess_draggables[draggable_name] = \
                     self.excess_draggables.get(draggable_name, False)
-
+        if len(correct_answer)==0:
+            for draggable_dict in user_answer['draggables']:
+                # draggable_dict is 1-to-1 {draggable_name: position}
+                draggable_name = draggable_dict.keys()[0]
+                self.excess_draggables[draggable_name] = False
 
 def grade(user_input, correct_answer):
     """ Creates DragAndDrop instance from user_input and correct_answer and
