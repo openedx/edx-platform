@@ -214,13 +214,8 @@ section.poll_question {
     text-shadow: rgb(7, 103, 148) 0px 1px 0px;
   }
 
-  .graph_answer {
-    display: none;
+  .button.reset-button {
     clear: both;
-    width: 400px;
-    height: 400px;
-    margin-top: 30px;
-    margin-left: auto;
-    margin-right: auto;
+    float: right;
   }
 }

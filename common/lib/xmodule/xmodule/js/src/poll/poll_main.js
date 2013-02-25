@@ -42,8 +42,6 @@ PollMain.prototype = {
 
     _this = this;
 
-    console.log('submiting answer');
-
     answerObj.buttonEl.addClass('answered');
 
     // Send the data to the server as an AJAX request. Attach a callback that will
@@ -51,11 +49,11 @@ PollMain.prototype = {
     $.postWithPrefix(
         _this.ajax_url + '/' + answer,  {},
         function (response) {
-            console.log('success! response = ');
-            console.log(response);
-
             _this.showAnswerGraph(response.poll_answers, response.total);
+
             _this.resetButton.show();
+
+            // Initialize Conditional constructors.
             if (_this.wrapperSectionEl !== null) {
                 $(_this.wrapperSectionEl).find('.xmodule_ConditionalModule').each(function (index, value) {
                     new window.Conditional(value, _this.id.replace(/^poll_/, ''));
@@ -73,28 +71,22 @@ PollMain.prototype = {
 
     _this = this;
 
-    console.log('submiting rset');
-
     // Send the data to the server as an AJAX request. Attach a callback that will
     // be fired on server's response.
     $.postWithPrefix(
         this.ajax_url + '/' + 'reset_poll',
         {},
         function (response) {
-            console.log('success! response = ');
-            console.log(response);
-
             _this.questionAnswered = false;
-
             _this.questionEl.find('.button.answered').removeClass('answered');
-
             _this.questionEl.find('.stats').hide();
-
             _this.resetButton.hide();
 
+            // Initialize Conditional constructors. We will specify the third parameter as 'true'
+            // notifying the constructor that this is a reset operation.
             if (_this.wrapperSectionEl !== null) {
                 $(_this.wrapperSectionEl).find('.xmodule_ConditionalModule').each(function (index, value) {
-                    new window.Conditional(value, _this.id.replace(/^poll_/, ''));
+                    new window.Conditional(value, _this.id.replace(/^poll_/, ''), true);
                 });
             }
         }
