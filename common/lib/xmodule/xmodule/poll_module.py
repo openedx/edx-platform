@@ -76,7 +76,7 @@ class PollModule(XModule):
                                'total': sum(self.poll_answers.values())
                                })
         elif dispatch == 'reset_poll' and self.voted and \
-                self.descriptor.xml_attributes.get('reset'):
+                self.descriptor.xml_attributes.get('reset', 'True').lower() != 'false':
             self.voted = False
 
             # FIXME: fix this, when xblock will support mutable types.
@@ -86,7 +86,7 @@ class PollModule(XModule):
             self.poll_answers = temp_poll_answers
 
             self.poll_answer = ''
-            return json.dumps('success')
+            return json.dumps({'status': 'success'})
         else:  # return error message
             return json.dumps({'error': 'Unknown Command!'})
 
