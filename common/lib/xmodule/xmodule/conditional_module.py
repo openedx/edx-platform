@@ -115,8 +115,7 @@ class ConditionalModule(XModule):
                        'message': message}
             html = self.system.render_template('conditional_module.html',
                 context)
-            return json.dumps({'html': [html], 'passed': False,
-                                'message': bool(message)})
+            return json.dumps({'html': [html], 'message': bool(message)})
 
         if self.contents is None:
             self.contents = [self.system.get_module(child_descriptor).get_html()
@@ -124,7 +123,7 @@ class ConditionalModule(XModule):
 
         html = self.contents
 
-        return json.dumps({'html': html, 'passed': True})
+        return json.dumps({'html': html})
 
     def get_icon_class(self):
         new_class = 'other'
@@ -165,7 +164,7 @@ class ConditionalDescriptor(SequenceDescriptor):
         if sources:
             locations = [location.strip() for location in sources.split(';')]
             for location in locations:
-                if Location.is_valid(location): # Check valid location url.
+                if Location.is_valid(location):  # Check valid location url.
                     try:
                         if return_descriptor:
                             descriptor = system.load_item(location)

@@ -104,7 +104,7 @@ PollMain.prototype = {
             // notifying the constructor that this is a reset operation.
             if (_this.wrapperSectionEl !== null) {
                 $(_this.wrapperSectionEl).find('.xmodule_ConditionalModule').each(function (index, value) {
-                    new window.Conditional(value, _this.id.replace(/^poll_/, ''), true);
+                    new window.Conditional(value, _this.id.replace(/^poll_/, ''));
                 });
             }
         }
